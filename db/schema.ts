@@ -9,6 +9,7 @@ export const plays = sqliteTable("plays", {
   playType: text("play_type", { enum: ["single", "parlay", "teaser"] }).notNull(),
   market: text("market").notNull().default("spread"),
   primaryReason: text("primary_reason").notNull().default("other"),
+  pickedBy: text("picked_by", { enum: ["gabe", "jarrett"] }).notNull().default("gabe"),
   title: text("title").notNull(),
   legs: text("legs").notNull().default(""),
   book: text("book").notNull(),
@@ -34,6 +35,23 @@ export const plays = sqliteTable("plays", {
   check("plays_status_check", sql`${table.status} in ('research', 'card', 'placed', 'settled', 'passed')`),
   check("plays_result_check", sql`${table.result} in ('pending', 'win', 'loss', 'push', 'void')`),
   check("plays_stake_check", sql`${table.stakeCents} >= 1250`)
+]);
+
+export const liveLines = sqliteTable("live_lines", {
+  id: text("id").primaryKey(),
+  gameId: text("game_id").notNull(),
+  book: text("book", { enum: ["betmgm", "caesars"] }).notNull(),
+  market: text("market", { enum: ["spread", "total", "moneyline"] }).notNull(),
+  side: text("side").notNull(),
+  point: real("point"),
+  americanPrice: integer("american_price").notNull(),
+  capturedAt: text("captured_at").notNull(),
+  sourceEventId: text("source_event_id").notNull(),
+  sourceHash: text("source_hash").notNull(),
+  updatedAt: text("updated_at").notNull()
+}, (table) => [
+  index("idx_live_lines_game_book_market").on(table.gameId, table.book, table.market),
+  index("idx_live_lines_captured_at").on(table.capturedAt)
 ]);
 
 export type PlayRow = typeof plays.$inferSelect;

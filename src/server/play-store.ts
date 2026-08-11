@@ -9,6 +9,7 @@ type PlayDatabaseRow = {
   play_type: WeeklyPlay["playType"];
   market: string;
   primary_reason: string;
+  picked_by: WeeklyPlay["pickedBy"];
   title: string;
   legs: string;
   book: string;
@@ -37,6 +38,7 @@ const CREATE_PLAYS_SQL = `
     play_type text NOT NULL,
     market text DEFAULT 'spread' NOT NULL,
     primary_reason text DEFAULT 'other' NOT NULL,
+    picked_by text DEFAULT 'gabe' NOT NULL,
     title text NOT NULL,
     legs text DEFAULT '' NOT NULL,
     book text NOT NULL,
@@ -64,10 +66,10 @@ const CREATE_PLAYS_SQL = `
 
 const INSERT_PLAY_SQL = `
   INSERT OR IGNORE INTO plays (
-    id, season, week, game_id, play_type, market, primary_reason, title, legs, book, american_odds, stake_cents,
+    id, season, week, game_id, play_type, market, primary_reason, picked_by, title, legs, book, american_odds, stake_cents,
     model_edge_pp, estimated_ev_percent, confidence, stats_case, football_case,
     status, result, profit_cents, closing_clv_cents, created_by, created_at, updated_at
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
 
 function mapRow(row: PlayDatabaseRow): WeeklyPlay {
@@ -79,6 +81,7 @@ function mapRow(row: PlayDatabaseRow): WeeklyPlay {
     playType: row.play_type,
     market: row.market,
     primaryReason: row.primary_reason,
+    pickedBy: row.picked_by,
     title: row.title,
     legs: row.legs,
     book: row.book,
@@ -108,6 +111,7 @@ export async function ensurePlayStore(): Promise<void> {
   if (!names.has("game_id")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN game_id text DEFAULT '' NOT NULL"));
   if (!names.has("market")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN market text DEFAULT 'spread' NOT NULL"));
   if (!names.has("primary_reason")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN primary_reason text DEFAULT 'other' NOT NULL"));
+  if (!names.has("picked_by")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN picked_by text DEFAULT 'gabe' NOT NULL"));
   if (upgrades.length) await d1.batch(upgrades);
   await d1.batch([
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_season_week_status ON plays (season, week, status)"),
@@ -127,7 +131,7 @@ export async function listPlays(week = 1): Promise<WeeklyPlay[]> {
 export async function addPlay(play: WeeklyPlay): Promise<WeeklyPlay> {
   await ensurePlayStore();
   await getD1().prepare(INSERT_PLAY_SQL).bind(
-    play.id, play.season, play.week, play.gameId, play.playType, play.market, play.primaryReason, play.title, play.legs, play.book,
+    play.id, play.season, play.week, play.gameId, play.playType, play.market, play.primaryReason, play.pickedBy, play.title, play.legs, play.book,
     play.americanOdds, play.stakeCents, play.modelEdgePp, play.estimatedEvPercent,
     play.confidence, play.statsCase, play.footballCase, play.status, play.result,
     play.profitCents, play.closingClvCents, play.createdBy, play.createdAt, play.updatedAt

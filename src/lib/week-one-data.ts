@@ -16,6 +16,25 @@ export type WeekOneMatchup = {
 
 export const officialScheduleSource = "https://www.nfl.com/news/2026-nfl-schedule-release-complete-slate-of-week-1-games";
 
+export const weekOneKickoffs: Record<string, string> = {
+  "ne-sea": "2026-09-10T00:20:00.000Z",
+  "sf-lar": "2026-09-11T00:35:00.000Z",
+  "chi-car": "2026-09-13T17:00:00.000Z",
+  "tb-cin": "2026-09-13T17:00:00.000Z",
+  "no-det": "2026-09-13T17:00:00.000Z",
+  "buf-hou": "2026-09-13T17:00:00.000Z",
+  "bal-ind": "2026-09-13T17:00:00.000Z",
+  "cle-jax": "2026-09-13T17:00:00.000Z",
+  "atl-pit": "2026-09-13T17:00:00.000Z",
+  "nyj-ten": "2026-09-13T17:00:00.000Z",
+  "ari-lac": "2026-09-13T20:25:00.000Z",
+  "mia-lv": "2026-09-13T20:25:00.000Z",
+  "gb-min": "2026-09-13T20:25:00.000Z",
+  "was-phi": "2026-09-13T20:25:00.000Z",
+  "dal-nyg": "2026-09-14T00:20:00.000Z",
+  "den-kc": "2026-09-15T00:15:00.000Z"
+};
+
 export const weekOneMatchups: WeekOneMatchup[] = [
   { id: "ne-sea", day: "Wednesday", date: "SEP 9", timePt: "5:20 PM", away: "NE", awayName: "New England Patriots", home: "SEA", homeName: "Seattle Seahawks", venue: "Lumen Field", network: "NBC", researchFocus: "Super Bowl rematch with meaningful Seattle backfield and secondary turnover.", quantQuestion: "How much of Seattle's 2025 efficiency survives its personnel changes?", footballQuestion: "Does New England's defensive continuity travel against Seattle's reworked run game?" },
   { id: "sf-lar", day: "Thursday", date: "SEP 10", timePt: "5:35 PM", away: "SF", awayName: "San Francisco 49ers", home: "LAR", homeName: "Los Angeles Rams", venue: "Melbourne Cricket Ground", network: "Netflix", researchFocus: "The NFL's first Australia game adds unusual travel and preparation uncertainty to a familiar rivalry.", quantQuestion: "How should international travel widen the forecast interval rather than force a direction?", footballQuestion: "Which returning defenders and new Rams personnel materially change the Shanahan–McVay matchup?" },

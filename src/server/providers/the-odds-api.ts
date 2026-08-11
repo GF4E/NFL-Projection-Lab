@@ -13,7 +13,7 @@ const marketSchema = z.object({
   outcomes: z.array(outcomeSchema).min(2)
 });
 const bookmakerSchema = z.object({
-  key: z.enum(["betmgm", "fanduel"]),
+  key: z.enum(["betmgm", "williamhill_us"]),
   last_update: z.string(),
   markets: z.array(marketSchema)
 });
@@ -48,7 +48,7 @@ export async function fetchOddsSnapshots(input: {
     regions: "us",
     markets: "h2h,spreads,totals",
     oddsFormat: "american",
-    bookmakers: "betmgm,fanduel",
+    bookmakers: "betmgm,williamhill_us",
     dateFormat: "iso"
   });
   const response = await fetcher(
@@ -71,7 +71,7 @@ export async function fetchOddsSnapshots(input: {
         market.outcomes.map((outcome) => ({
           id: `${game.id}:${bookmaker.key}:${market.key}:${outcome.name}:${input.scheduledFor}`,
           gameId: game.id,
-          book: bookmaker.key as BookKey,
+          book: (bookmaker.key === "williamhill_us" ? "caesars" : "betmgm") as BookKey,
           market: marketKey(market.key),
           side: outcome.name,
           point: outcome.point ?? null,
@@ -83,6 +83,6 @@ export async function fetchOddsSnapshots(input: {
       )
     )
   );
-  if (!snapshots.length) throw new Error("Odds provider returned no eligible BetMGM/FanDuel quotes");
+  if (!snapshots.length) throw new Error("Odds provider returned no eligible BetMGM/Caesars quotes");
   return { snapshots, used, remaining, lastCost, rawHash };
 }

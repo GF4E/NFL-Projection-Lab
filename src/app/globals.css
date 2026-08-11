@@ -167,6 +167,107 @@ button:disabled { cursor: wait; opacity: .62; }
 .reason-chips span[data-lane="Quant"] { border-color: rgba(105,190,40,.27); }
 .reason-chips span[data-lane="Football"] { border-color: rgba(242,101,34,.3); }
 .research-return { min-height: 40px; padding: 0 20px; display: flex; align-items: center; justify-content: flex-end; border-top: 1px solid var(--line); color: var(--acid); font: 700 9px var(--display); text-transform: uppercase; }
+
+/* Week 1 sportsbook board */
+.week-one-page { width: 100%; max-width: none; padding: 18px 22px 78px; }
+.sportsbook-board { --book-accent: #18a8f5; color: #f5f7f6; }
+.sportsbook-board.book-caesars { --book-accent: #d5b16a; }
+.sportsbook-topline { min-height: 86px; display: flex; align-items: center; justify-content: space-between; gap: 22px; border-bottom: 1px solid #39423f; }
+.sportsbook-topline > div:first-child { display: flex; align-items: baseline; gap: 14px; }
+.sportsbook-topline span { color: #8f9b97; font: 700 11px var(--display); letter-spacing: .11em; }
+.sportsbook-topline h1 { margin: 0; font: 800 58px/.82 var(--display); letter-spacing: -.025em; text-transform: uppercase; }
+.board-controls { display: flex; align-items: center; gap: 9px; }
+.click-toggle { padding: 3px; display: flex; border: 1px solid #3a4541; border-radius: 7px; background: #101917; }
+.click-toggle button, .refresh-lines { min-height: 39px; padding: 0 16px; border: 0; border-radius: 4px; background: transparent; color: #9fa8a5; font: 800 12px var(--display); text-transform: uppercase; }
+.click-toggle button.active { background: var(--book-accent); color: #07110f; }
+.click-toggle.compact button { padding-inline: 11px; }
+.refresh-lines { border: 1px solid #3a4541; color: #f5f7f6; }
+.refresh-lines:hover { border-color: var(--book-accent); color: var(--book-accent); }
+.line-status { min-height: 45px; padding: 0 13px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #313b38; border-top: 0; background: #101917; }
+.line-status span { display: flex; align-items: center; gap: 9px; font: 800 11px var(--display); letter-spacing: .07em; text-transform: uppercase; }
+.line-status i { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 10px rgba(240,179,90,.55); }
+.line-status[data-ready="true"] i { background: var(--acid); box-shadow: 0 0 10px rgba(198,255,98,.55); }
+.line-status small { color: #7c8984; font: 700 9px var(--display); letter-spacing: .07em; }
+.line-status small a { color: var(--book-accent); }
+.sportsbook-layout { margin-top: 12px; display: grid; grid-template-columns: minmax(660px, 1fr) 390px; gap: 12px; align-items: start; }
+.event-board { min-width: 0; border: 1px solid #34403c; background: #121b19; }
+.market-column-head { min-height: 47px; padding: 0 13px; display: grid; grid-template-columns: minmax(170px, 1fr) repeat(3, minmax(105px, 150px)); gap: 8px; align-items: center; border-bottom: 1px solid #39433f; background: #0d1513; }
+.market-column-head span { color: #a5afab; font: 800 13px var(--display); text-align: center; text-transform: uppercase; }
+.market-column-head span:first-child { text-align: left; }
+.event-day-label { min-height: 38px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #36413d; background: #202a27; }
+.event-day-label b { font: 800 15px var(--display); letter-spacing: .06em; text-transform: uppercase; }
+.event-day-label span { color: #98a39f; font: 700 10px var(--display); text-transform: uppercase; }
+.event-market { position: relative; padding: 0 12px 10px; border-bottom: 1px solid #35403c; background: linear-gradient(90deg, rgba(255,255,255,.015), transparent 60%); }
+.event-market:last-child { border-bottom: 0; }
+.event-time { min-height: 42px; display: flex; align-items: center; justify-content: space-between; }
+.event-time b { color: #b7c0bd; font: 750 14px var(--display); letter-spacing: .03em; }
+.event-time span { color: #6e7c77; font: 700 10px var(--display); }
+.team-line { min-height: 78px; display: grid; grid-template-columns: minmax(170px, 1fr) repeat(3, minmax(105px, 150px)); gap: 8px; align-items: stretch; }
+.team-line + .team-line { margin-top: 7px; }
+.team-code { display: flex; align-items: center; gap: 15px; }
+.team-code i { width: 50px; height: 50px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.16); border-radius: 50%; box-shadow: inset 0 0 18px rgba(0,0,0,.25); color: white; font: 900 20px var(--display); font-style: normal; }
+.team-code b { font: 800 31px/.9 var(--display); letter-spacing: -.01em; }
+.price-cell { min-width: 0; padding: 7px 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 1px solid #444e4b; border-radius: 6px; background: #2a3230; color: #f7f8f7; transition: .13s ease; }
+.price-cell:not(:disabled):hover { border-color: var(--book-accent); background: #333d3a; transform: translateY(-1px); }
+.price-cell.active { border-color: var(--book-accent); background: color-mix(in srgb, var(--book-accent) 22%, #28312e); box-shadow: inset 0 -3px var(--book-accent); }
+.price-cell:disabled { color: #58645f; background: #202725; cursor: default; }
+.price-cell strong { font: 800 22px/.9 var(--display); }
+.price-cell span { margin-top: 5px; color: #c7cecb; font: 800 15px var(--display); }
+.model-ribbon { min-height: 42px; margin-top: 10px; padding: 0 10px; display: grid; grid-template-columns: 1.1fr .8fr 1.3fr auto; gap: 12px; align-items: center; border: 1px solid #303b37; background: #0e1715; }
+.model-ribbon span { color: #75827d; font: 800 9px var(--display); letter-spacing: .08em; }
+.model-ribbon b { margin-left: 5px; color: #f4f6f5; font-size: 12px; }
+.model-ribbon a { color: var(--book-accent); font: 800 10px var(--display); text-transform: uppercase; }
+.shared-slip { position: sticky; top: 80px; max-height: calc(100vh - 96px); overflow-y: auto; border: 1px solid #394440; background: #151e1c; box-shadow: 0 16px 40px rgba(0,0,0,.24); }
+.slip-head { min-height: 77px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #37413e; background: #202927; }
+.slip-head span { color: var(--book-accent); font: 800 10px var(--display); letter-spacing: .1em; }
+.slip-head h2 { margin: 3px 0 0; font: 800 27px/.9 var(--display); text-transform: uppercase; }
+.slip-head button { border: 0; background: transparent; color: #9ca7a3; font: 800 10px var(--display); text-transform: uppercase; }
+.picker-switch, .slip-mode { display: grid; grid-template-columns: 1fr 1fr; }
+.picker-switch button, .slip-mode button { min-height: 47px; border: 0; border-bottom: 1px solid #36413d; background: #111a18; color: #8d9994; font: 800 14px var(--display); text-transform: uppercase; }
+.picker-switch button + button, .slip-mode button + button { border-left: 1px solid #36413d; }
+.picker-switch button.active.gabe { background: var(--seahawks-navy); color: white; box-shadow: inset 0 -4px var(--seahawks-green); }
+.picker-switch button.active.jarrett { background: var(--auburn-navy); color: white; box-shadow: inset 0 -4px var(--auburn-orange); }
+.slip-mode button { min-height: 40px; font-size: 11px; }
+.slip-mode button.active { color: #07110f; background: var(--book-accent); }
+.empty-slip { min-height: 150px; padding: 28px 20px; display: flex; flex-direction: column; justify-content: center; text-align: center; }
+.empty-slip b { font: 800 26px var(--display); text-transform: uppercase; }
+.empty-slip p { margin: 4px 0 0; color: #86938e; font-size: 11px; }
+.slip-legs { padding: 8px 14px; }
+.slip-legs article { position: relative; min-height: 96px; padding: 13px 4px; display: grid; grid-template-columns: 27px 1fr auto; gap: 10px; align-items: center; border-bottom: 1px solid #36413d; }
+.slip-legs article > button { width: 25px; height: 25px; border: 1px solid #59635f; border-radius: 50%; background: transparent; color: #e2e6e4; font-size: 18px; line-height: 1; }
+.slip-legs article > div { display: flex; flex-direction: column; }
+.slip-legs small { color: #7f8c87; font: 700 9px var(--display); text-transform: uppercase; }
+.slip-legs article div b { margin-top: 3px; font: 800 20px var(--display); }
+.slip-legs article div span { margin-top: 2px; color: var(--book-accent); font: 700 9px var(--display); }
+.slip-legs article > strong { font: 800 18px var(--display); }
+.slip-legs article > em { position: absolute; top: 8px; right: 0; color: #596661; font: 800 8px var(--display); font-style: normal; }
+.reason-clicks, .stake-clicks { padding: 13px 14px; display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid #35403c; }
+.reason-clicks > span, .stake-clicks > span { width: 100%; color: #75827d; font: 800 9px var(--display); letter-spacing: .08em; }
+.reason-clicks button, .stake-clicks button { min-height: 29px; padding: 0 8px; border: 1px solid #414c48; border-radius: 4px; background: transparent; color: #aeb7b3; font: 700 9px var(--display); }
+.reason-clicks button.active, .stake-clicks button.active { border-color: var(--book-accent); background: color-mix(in srgb, var(--book-accent) 18%, transparent); color: white; }
+.stake-clicks button { min-width: 54px; font-size: 11px; }
+.value-meter { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #37413e; }
+.value-meter > div { min-height: 76px; padding: 13px 14px; display: flex; flex-direction: column; border-right: 1px solid #37413e; }
+.value-meter > div:nth-child(2) { border-right: 0; }
+.value-meter .vig-loss { min-height: 91px; grid-column: 1 / 3; border-top: 1px solid #37413e; border-right: 0; background: rgba(255,112,91,.045); }
+.value-meter span { color: #77847f; font: 800 9px var(--display); letter-spacing: .08em; }
+.value-meter b { margin-top: 3px; font: 800 25px var(--display); }
+.value-meter .vig-loss b { color: var(--red); font-size: 31px; }
+.value-meter small { color: #9ca7a3; font: 700 10px var(--display); }
+.save-slip { width: calc(100% - 28px); min-height: 48px; margin: 14px; border: 0; border-radius: 4px; background: var(--book-accent); color: #07110f; font: 900 13px var(--display); letter-spacing: .06em; text-transform: uppercase; }
+.slip-message { min-height: 31px; margin: 0; padding: 0 14px; color: var(--gold); font-size: 10px; line-height: 1.4; }
+.value-note { margin: 0; padding: 10px 14px 15px; border-top: 1px solid #303b37; color: #68756f; font-size: 9px; line-height: 1.4; }
+.compact-shared-card { margin-top: 12px; min-height: 76px; display: flex; align-items: stretch; border: 1px solid #35403c; background: #111a18; overflow-x: auto; }
+.compact-shared-card > div { min-width: 145px; padding: 13px 16px; }
+.compact-shared-card > div span { color: var(--acid); font: 800 9px var(--display); }
+.compact-shared-card > div h2 { margin: 3px 0 0; font: 800 25px var(--display); text-transform: uppercase; }
+.compact-shared-card article { min-width: 210px; padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid #35403c; }
+.compact-shared-card article b { font: 800 15px var(--display); }
+.compact-shared-card article span { width: fit-content; margin: 3px 0; padding: 2px 5px; font: 800 8px var(--display); text-transform: uppercase; }
+.compact-shared-card article span.gabe { background: var(--seahawks-green); color: var(--seahawks-navy); }
+.compact-shared-card article span.jarrett { background: var(--auburn-orange); color: white; }
+.compact-shared-card article small { color: #7b8883; font: 700 9px var(--display); }
+.compact-shared-card > a { min-width: 96px; padding: 0 14px; display: grid; place-items: center; border-left: 1px solid #35403c; color: var(--acid); font: 800 10px var(--display); text-transform: uppercase; }
 .research-method { display: grid; grid-template-columns: 1fr 1fr; }
 .research-method article { min-height: 132px; padding: 18px; display: grid; grid-template-columns: 32px 1fr; gap: 12px; border-bottom: 1px solid var(--line); }
 .research-method article:nth-child(even) { border-left: 1px solid var(--line); }
@@ -365,9 +466,17 @@ button:disabled { cursor: wait; opacity: .62; }
   .research-layout, .team-room-grid { grid-template-columns: 1fr; }
   .research-guardrails ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
   .matchup-workspace { grid-template-columns: 320px minmax(0, 1fr); }
+  .sportsbook-layout { grid-template-columns: minmax(560px, 1fr) 335px; }
+  .market-column-head, .team-line { grid-template-columns: minmax(140px, 1fr) repeat(3, minmax(86px, 120px)); }
+  .team-code i { width: 43px; height: 43px; }
+  .team-code b { font-size: 26px; }
 }
 
 @media (max-width: 900px) {
+  .sportsbook-topline { align-items: flex-start; flex-direction: column; padding: 15px 0; }
+  .board-controls { width: 100%; flex-wrap: wrap; }
+  .sportsbook-layout { grid-template-columns: 1fr; }
+  .shared-slip { position: static; max-height: none; }
   .matchup-workspace { grid-template-columns: 1fr; }
   .matchup-picker { max-height: 430px; border-right: 0; border-bottom: 1px solid var(--line); }
   .contract-fields { grid-template-columns: repeat(3, 1fr); }
@@ -395,6 +504,24 @@ button:disabled { cursor: wait; opacity: .62; }
   .topbar .eyebrow, .top-status span { display: none; }
   .page { padding: 28px 13px 86px; }
   .week-one-page { padding-top: 18px; }
+  .sportsbook-topline > div:first-child { align-items: flex-start; flex-direction: column; gap: 4px; }
+  .sportsbook-topline h1 { font-size: 50px; }
+  .board-controls { gap: 6px; }
+  .click-toggle { flex: 1; }
+  .click-toggle button { flex: 1; padding-inline: 8px; }
+  .click-toggle.compact { flex: 0 0 auto; }
+  .refresh-lines { width: 100%; }
+  .line-status { align-items: flex-start; flex-direction: column; justify-content: center; gap: 3px; }
+  .event-board { overflow-x: auto; }
+  .market-column-head, .event-day-label, .event-market { min-width: 440px; }
+  .market-column-head, .team-line { grid-template-columns: 118px repeat(3, 94px); }
+  .team-code { gap: 9px; }
+  .team-code i { width: 36px; height: 36px; font-size: 15px; }
+  .team-code b { font-size: 23px; }
+  .price-cell strong { font-size: 19px; }
+  .price-cell span { font-size: 13px; }
+  .model-ribbon { grid-template-columns: 1fr 1fr 1.3fr auto; gap: 6px; }
+  .compact-shared-card { margin-bottom: 2px; }
   .week-label { min-height: 83px; align-items: flex-start; }
   .week-label > div { display: block; }
   .week-label h1 { margin-top: 4px; font-size: 45px; }

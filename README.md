@@ -18,12 +18,12 @@ The Week 1 card starts empty. Matchup prompts are research questions, not live r
 - Power-method de-vigging for moneylines, spreads, and totals; a frozen 25% model / 75% market blend; translated book EV; quarter-Kelly on a 100u reference bankroll; 0.5u floor and 2u cap.
 - Weighted logistic champion/challenger models with season-varying home-field and scoring effects, fixed structural configuration, a Tuesday promotion gate, deterministic model/data/config hashes, and a 100-member fixed-seed refit bootstrap.
 - Immutable team-card revisions, exact-contract approval hashes, quote rechecks, two-person approval, cash-placement confirmation, paper-book selection, kickoff locking, stale-draft expiry, and no automatic approval.
-- BetMGM/FanDuel comparison, translated price delta, uncertainty display, movement/edge-decay views, snapshot ages, current injury/QB/weather inputs, and Sunday Mode.
+- BetMGM/Caesars comparison, power-method no-vig probabilities, translated price delta, uncertainty display, movement/edge-decay views, snapshot ages, current injury/QB/weather inputs, and Sunday Mode.
 - Separate Full and Executed-only records with book-specific translated CLV in cents and points.
 - Provider adapters for The Odds API, nflverse, official current injury feeds, and Open-Meteo kickoff-hour forecasts.
 - Private Supabase authentication, two-person team membership, row-level access controls, owner-only overrides/corrections/configuration/access, operational ledgers, and database-level approval/quote guards.
 - Exactly two Web Push types: `awaiting_you` and `edge_threshold`.
-- A 20-case acceptance suite covering the original engine plus the official Week 1 matchup, research, card, and tracker workflow.
+- A 22-case acceptance suite covering the original engine plus the official Week 1 matchup, live-line, no-vig, bet-slip, card, and tracker workflow.
 
 The interface starts with the official 2026 Week 1 schedule and no picks so the workflow can be reviewed before credentials and live market feeds are enabled.
 
@@ -56,7 +56,7 @@ No unauthenticated application API is exposed. Provider jobs use the service rol
 ## Frozen 2026 settings
 
 - `1u = $25`
-- Books: BetMGM and FanDuel
+- Books: BetMGM and Caesars (Caesars requires the provider's paid feed)
 - Shrinkage weight: `w = 0.25`
 - Bootstrap: 100 fixed-seed coefficient refits; 10th/90th edge percentiles
 - Suggested size: quarter-Kelly, 100u reference, floor down to 0.5u, cap 2u
@@ -86,4 +86,4 @@ pnpm test
 NEXT_PUBLIC_DEMO_MODE=true pnpm build
 ```
 
-The acceptance test names correspond to the 17 engine tests plus three matchup-and-card workflow tests in `tests/acceptance.test.ts`.
+The acceptance test names correspond to the 17 engine tests plus five matchup, live-line, and card workflow tests in `tests/acceptance.test.ts`.

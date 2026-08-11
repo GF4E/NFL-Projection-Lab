@@ -2,6 +2,7 @@ export type PlayType = "single" | "parlay" | "teaser";
 export type PlayConfidence = "watch" | "lean" | "play" | "best";
 export type PlayStatus = "research" | "card" | "placed" | "settled" | "passed";
 export type PlayResult = "pending" | "win" | "loss" | "push" | "void";
+export type PickedBy = "gabe" | "jarrett";
 
 export type WeeklyPlay = {
   id: string;
@@ -11,6 +12,7 @@ export type WeeklyPlay = {
   playType: PlayType;
   market: string;
   primaryReason: string;
+  pickedBy: PickedBy;
   title: string;
   legs: string;
   book: string;

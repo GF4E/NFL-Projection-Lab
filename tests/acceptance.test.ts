@@ -23,8 +23,10 @@ import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, profitForResult } from "@/domain/settlement";
 import { fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
 import { estimatedEvFromEdge, trackerSummary } from "@/domain/play-card";
+import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneMatchups } from "@/lib/week-one-data";
+import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
 import type { BookEvaluation, JobState, PushDelivery, SettledPick } from "@/domain/types";
 import { artifact, forecast, history, metrics, pick, quote, settled } from "./fixtures";
 
@@ -45,7 +47,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
       translatedAmericanPrice: -108, powerExponent: 1.1, fairProbability: 0.51,
       shrunkProbability: 0.54, expectedValue: 0.03, edge: 0.03, uncertaintyInterval: [0.01, 0.05], translationWarning: "none"
     });
-    expect(() => translatedPriceDeltaCents(evaluation(-2.5), { ...evaluation(-3), book: "fanduel" })).toThrow(/prohibited/);
+    expect(() => translatedPriceDeltaCents(evaluation(-2.5), { ...evaluation(-3), book: "caesars" })).toThrow(/prohibited/);
   });
 
   it("2. uses the power method for spread, total, favorite, underdog, and near-even markets", () => {
@@ -160,8 +162,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(different.pointClv).toBe(0.5);
     const same = calculateTranslatedClv({ entryPrice: -105, entryPoint: -3, closingQuote: quote({ point: -3, side: "Buffalo -3" }), closingOpponentQuote: opponent, consensusSpread: -3, artifact });
     expect(same.priceClvCents).not.toBeNull();
-    const better = chooseBetterPaperClose([{ ...same, book: "betmgm" }, { ...different, book: "fanduel" }]);
-    expect(["betmgm", "fanduel"]).toContain(better.book);
+    const better = chooseBetterPaperClose([{ ...same, book: "betmgm" }, { ...different, book: "caesars" }]);
+    expect(["betmgm", "caesars"]).toContain(better.book);
   });
 
   it("15. filters Sunday today, exposes countdown/age/flags, expires drafts, and never auto-approves", () => {
@@ -235,5 +237,50 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(summary.lossCount).toBe(1);
     expect(summary.profitCents).toBe(-455);
     expect(summary.averageClvCents).toBeCloseTo(1.05);
+  });
+
+  it("21. power-de-vigs visible price pairs and shows cumulative parlay value lost", () => {
+    const raw = [
+      { id: "ne-sea:betmgm:spread:ne", gameId: "ne-sea", book: "betmgm" as const, market: "spread" as const, side: "NE", point: 2.5, americanPrice: -110, capturedAt: "2026-08-11", sourceEventId: "event-1", sourceHash: "hash" },
+      { id: "ne-sea:betmgm:spread:sea", gameId: "ne-sea", book: "betmgm" as const, market: "spread" as const, side: "SEA", point: -2.5, americanPrice: -110, capturedAt: "2026-08-11", sourceEventId: "event-1", sourceHash: "hash" },
+      { id: "den-kc:betmgm:spread:den", gameId: "den-kc", book: "betmgm" as const, market: "spread" as const, side: "DEN", point: 3, americanPrice: -110, capturedAt: "2026-08-11", sourceEventId: "event-2", sourceHash: "hash" },
+      { id: "den-kc:betmgm:spread:kc", gameId: "den-kc", book: "betmgm" as const, market: "spread" as const, side: "KC", point: -3, americanPrice: -110, capturedAt: "2026-08-11", sourceEventId: "event-2", sourceHash: "hash" }
+    ];
+    const enriched = enrichWithPowerDevig(raw);
+    expect(enriched[0].fairProbability).toBeCloseTo(0.5, 10);
+    expect(enriched[0].marketVigPercent).toBeCloseTo(4.7619, 3);
+    const legs: SlipLeg[] = [
+      { ...enriched[0], matchup: "NE @ SEA", selection: "NE +2.5" },
+      { ...enriched[2], matchup: "DEN @ KC", selection: "DEN +3" }
+    ];
+    const value = analyzeSlipValue(legs);
+    expect(value?.offeredAmerican).toBe(264);
+    expect(value?.fairAmerican).toBe(300);
+    expect(value?.vigDragPercent).toBeCloseTo(8.88, 1);
+    expect(value?.lossPerUnitDollars).toBeCloseTo(2.22, 1);
+    expect(analyzeSlipValue([legs[0], { ...legs[1], gameId: "ne-sea" }])).toBeNull();
+  });
+
+  it("22. maps the provider's BetMGM and Caesars aliases onto the Week 1 board", async () => {
+    const event = {
+      id: "provider-ne-sea",
+      commence_time: "2026-09-10T00:20:00Z",
+      home_team: "Seattle Seahawks",
+      away_team: "New England Patriots",
+      bookmakers: ["betmgm", "williamhill_us"].map((key) => ({
+        key,
+        last_update: "2026-08-11T20:00:00Z",
+        markets: [
+          { key: "spreads", outcomes: [{ name: "New England Patriots", point: 2.5, price: -110 }, { name: "Seattle Seahawks", point: -2.5, price: -110 }] },
+          { key: "totals", outcomes: [{ name: "Over", point: 44.5, price: -105 }, { name: "Under", point: 44.5, price: -115 }] },
+          { key: "h2h", outcomes: [{ name: "New England Patriots", price: 125 }, { name: "Seattle Seahawks", price: -145 }] }
+        ]
+      }))
+    };
+    const fetcher = async () => new Response(JSON.stringify([event]), { status: 200, headers: { "x-requests-used": "3", "x-requests-remaining": "497", "x-requests-last": "3" } });
+    const result = await fetchWeekOneLiveOdds("test-key", fetcher as typeof fetch);
+    expect(result.lines).toHaveLength(12);
+    expect(new Set(result.lines.map((line) => line.book))).toEqual(new Set(["betmgm", "caesars"]));
+    expect(result.lines.find((line) => line.book === "caesars" && line.side === "SEA")?.americanPrice).toBe(-110);
   });
 });

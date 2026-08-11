@@ -65,11 +65,11 @@ export function PlayTracker() {
       <div className="tracker-table">
         <div className="tracker-head"><span>Play</span><span>Type</span><span>Price</span><span>Stake</span><span>Edge</span><span>State / result</span></div>
         {rows.map((play) => <div className="tracker-row" key={play.id}>
-          <div><strong>{play.title}</strong><small>{play.book} · Week {play.week}</small></div>
+          <div><strong>{play.title}</strong><small>{play.pickedBy === "gabe" ? "Gabe" : "Jarrett"} · {play.book} · Week {play.week}</small></div>
           <span className={`type-tag ${play.playType}`}>{play.playType}</span>
           <span>{odds(play.americanOdds)}</span>
           <span><b>${(play.stakeCents / 100).toFixed(0)}</b><small>{stakeToUnits(play.stakeCents)}u</small></span>
-          <span className="positive">+{play.modelEdgePp.toFixed(1)} pp</span>
+          <span className={play.modelEdgePp > 0 ? "positive" : ""}>{play.modelEdgePp ? `${play.modelEdgePp > 0 ? "+" : ""}${play.modelEdgePp.toFixed(1)} pp` : "—"}</span>
           <div className="result-cell">{play.status === "settled" ? <><b className={play.result === "win" ? "positive" : play.result === "loss" ? "negative" : ""}>{play.result}</b><small>{dollars(play.profitCents)} · {play.closingClvCents?.toFixed(1)}¢ CLV</small></> : play.status === "placed" ? <div className="grade-buttons"><button onClick={() => update(play, "settled", "win")}>W</button><button onClick={() => update(play, "settled", "loss")}>L</button><button onClick={() => update(play, "settled", "push")}>P</button></div> : <button className="track-action" onClick={() => update(play, "placed", "pending")}>Mark placed</button>}</div>
         </div>)}
       </div>

@@ -6,7 +6,7 @@ export interface StructuralConfig {
   season: number;
   frozen: boolean;
   unitDollars: number;
-  executionBooks: readonly ["betmgm", "fanduel"];
+  executionBooks: readonly ["betmgm", "caesars"];
   model: {
     trainingStartSeason: number;
     decayHalfLifeSeasons: number;
@@ -59,8 +59,8 @@ export function assertStructuralConfigFrozen(inSeason: boolean): void {
   if (inSeason && !structuralConfig.frozen) {
     throw new Error("Structural configuration must be frozen during the season");
   }
-  if (structuralConfig.executionBooks.join(",") !== "betmgm,fanduel") {
-    throw new Error("Only BetMGM and FanDuel are permitted execution books");
+  if (structuralConfig.executionBooks.join(",") !== "betmgm,caesars") {
+    throw new Error("Only BetMGM and Caesars are permitted execution books");
   }
   if (structuralConfig.unitDollars !== 25) {
     throw new Error("The 2026 unit must remain fixed at $25");
