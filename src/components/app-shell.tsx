@@ -12,15 +12,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </Link>
         <NavLinks />
         <div className="rail-foot">
-          <span className="signal"><i /> Live champion</span>
-          <div className="member-stack"><b>G</b><span>Owner-only preview</span></div>
-          <p>1 unit = $25</p>
+          <span className="signal"><i /> Research current</span>
+          <div className="member-stack"><b>G</b><b>J</b><span>Jarrett access pending</span></div>
+          <p>1u = $25 · weekly $400–$600</p>
         </div>
       </aside>
       <div className="workspace">
         <header className="topbar">
-          <div><span className="eyebrow">2026 REGULAR SEASON</span><strong>Week 01 · rehearsal data</strong></div>
-          <div className="top-status"><span>Odds 42s ago</span><span>Model v26.08.11</span><button aria-label="Open alerts">1</button></div>
+          <div><span className="eyebrow">2026 PROJECTION LAB</span><strong>Week 01 · rehearsal board</strong></div>
+          <div className="top-status"><span>Target $400–$600</span><span>8 plays · $400</span><button aria-label="Open notes">2</button></div>
         </header>
         <main>{children}</main>
       </div>

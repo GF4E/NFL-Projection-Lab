@@ -1,17 +1,35 @@
 import { PageHeader } from "@/components/page-header";
+import { researchSignals } from "@/lib/play-data";
 
-const features = ["EPA / play", "Success rate", "Explosive rate", "Regressed turnovers", "Pace", "Pass rate over expectation"];
+const marketReads = [
+  { label: "Sides", value: "2.4 pp", note: "Median top-5 edge", direction: "up" },
+  { label: "Totals", value: "1.7 pp", note: "Wind creating dispersion", direction: "flat" },
+  { label: "Moneylines", value: "0.8 pp", note: "Mostly efficient", direction: "down" },
+  { label: "Teasers", value: "2.6 pp", note: "Two key-number crosses", direction: "up" }
+] as const;
 
-export default function ModelPage() {
-  return <div className="page">
-    <PageHeader eyebrow="MODEL ROOM" title="Self-updating. Structurally frozen.">
-      Weekly football state can move; the rules of the engine cannot drift mid-season.
+export default function ResearchPage() {
+  return <div className="page research-page">
+    <PageHeader eyebrow="RESEARCH DESK" title="Evidence first. Story second. Price always.">
+      Primary data, market movement and matchup context are kept separate so a useful football observation cannot quietly become a fake statistical certainty.
     </PageHeader>
-    <div className="loop-grid">
-      <section className="loop-card"><div className="loop-number">A</div><span className="status-pill green">Automatic</span><h2>Weekly state</h2><p>Completed Week 18 changed team features and strength means. No coefficient gate needed.</p><div className="loop-stat"><span>Last run</span><b>Tue · 06:30 PT</b></div><div className="feature-tags">{features.map((feature) => <span key={feature}>{feature}</span>)}</div></section>
-      <section className="loop-card featured"><div className="loop-number">B</div><span className="status-pill green">Promoted</span><h2>Tuesday challenger</h2><p>Same trailing three-season walk-forward rows. Every model and data artifact logged.</p><div className="gate-comparison"><div><span>Champion log loss</span><b>0.6721</b></div><strong>→</strong><div><span>Challenger</span><b>0.6714</b></div></div><div className="gate-checks"><span>≤ +0.002 <b>Pass</b></span><span>Slope 0.94 <b>Pass</b></span></div></section>
-      <section className="loop-card"><div className="loop-number">C</div><span className="status-pill ink">Manual only</span><h2>Offseason structure</h2><p>Half-life, K, shrinkage, features, calibration, QB tiers, alerts and margin tables.</p><div className="loop-stat"><span>Configuration</span><b>Frozen · 2026.1</b></div><div className="hash-stack"><code>config 98f2…a7e</code><code>margin 18ac…d31</code><code>schema a102…1bf</code></div></section>
+    <section className="research-lead">
+      <div className="research-thesis"><span className="kicker">WEEKLY MARKET THESIS</span><h2>Week 1 uncertainty is wide. Pay for numbers, not confidence.</h2><p>Returning production and offensive-line continuity carry more signal than last season&apos;s raw record. The card favors translated spread value, lower-variance singles and teasers that cross both 3 and 7.</p><div className="thesis-foot"><span>Updated Tue 7:32 PT</span><span>Training cutoff: 2025 season</span><span>Odds snapshot: rehearsal</span></div></div>
+      <div className="market-grid">{marketReads.map((item) => <article key={item.label}><span>{item.label}</span><strong>{item.value}</strong><p>{item.note}</p><i className={item.direction} /></article>)}</div>
+    </section>
+    <div className="research-layout">
+      <section className="signal-board panel-lite">
+        <div className="section-heading"><div><span className="kicker">PRIMARY RESEARCH &amp; TRENDS</span><h2>Signals worth discussing</h2></div><span className="step-chip">SOURCE + SAMPLE</span></div>
+        <div className="signal-list">{researchSignals.map((signal) => <article key={signal.title}>
+          <div className={`evidence-grade grade-${signal.grade.toLowerCase()}`}><small>GRADE</small><strong>{signal.grade}</strong></div>
+          <div className="signal-copy"><span>{signal.matchup}</span><h3>{signal.title}</h3><p>{signal.finding}</p><div><small>{signal.sample}</small><small>{signal.source}</small></div></div>
+        </article>)}</div>
+      </section>
+      <aside className="research-guardrails panel-lite">
+        <span className="kicker">HOW TO READ THIS</span><h2>A trend is not a reason by itself.</h2>
+        <ol><li><b>Start with price.</b><span>A true matchup insight can already be fully reflected in the line.</span></li><li><b>Prefer stable rates.</b><span>EPA and success rate travel better than turnover margin or one-score record.</span></li><li><b>Name the sample.</b><span>Small samples and multiple comparisons get an explicit warning.</span></li><li><b>Invite the football veto.</b><span>Personnel, role and chemistry context can expose a missing variable.</span></li></ol>
+        <div className="research-warning"><b>Current caution</b><p>These are rehearsal examples, not live 2026 recommendations. Forecast uncertainty is intentionally visible.</p></div>
+      </aside>
     </div>
-    <section className="panel engine-panel"><div className="panel-head"><div><span className="section-label">DISCRETE PRICING ENGINE</span><h2>Margins keep their shape</h2></div><span className="status-pill green">2010–2025</span></div><div className="engine-flow"><div><span>01</span><b>Empirical residuals</b><small>Decay weighted</small></div><i>→</i><div><span>02</span><b>Half-point lookup</b><small>Cover / push / loss</small></div><i>→</i><div><span>03</span><b>Power de-vig</b><small>All three markets</small></div><i>→</i><div><span>04</span><b>Market blend</b><small>w = 0.25 frozen</small></div><i>→</i><div><span>05</span><b>Book EV + Kelly</b><small>0.5u floor · 2u cap</small></div></div><p className="engine-note">No normal CDF. No fixed key-number percentages. No different-point price comparison before translation.</p></section>
   </div>;
 }

@@ -1,18 +1,12 @@
-import { GameCard } from "@/components/game-card";
 import { PageHeader } from "@/components/page-header";
-import { sundayGames } from "@/lib/demo-data";
+import { PlayBuilder } from "@/components/play-builder";
 
 export default function SundayPage() {
-  return <div className="page sunday-page">
-    <PageHeader eyebrow="SUNDAY MODE · SEP 13" title="The live board">
-      Today only. Every number carries its age; approved cards never move on their own.
+  return <div className="page card-page">
+    <PageHeader eyebrow="WEEK 01 · PLAY SHEET" title="Build the card. Keep the edge.">
+      Start simple: what is the bet, why is the price wrong, what does the football say, and how much belongs on it? The detail stays one click deeper.
     </PageHeader>
-    <div className="slate-strip">
-      <div><span>Today&apos;s queue</span><strong>3 games</strong></div>
-      <div><span>Suggested exposure</span><strong>1.5u <small>/ 10u</small></strong></div>
-      <div><span>Joint approvals</span><strong>1 <small>/ 2 eligible</small></strong></div>
-      <div><span>System state</span><strong className="positive">Current</strong></div>
-    </div>
-    <div className="game-list">{sundayGames.map((game) => <GameCard game={game} key={game.id} />)}</div>
+    <PlayBuilder />
+    <p className="education-note">Private research and record-keeping workspace. It never places a wager or treats a model output as certainty.</p>
   </div>;
 }

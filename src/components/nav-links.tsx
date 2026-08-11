@@ -4,12 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const nav = [
-  ["/sunday", "Sunday", "LIVE"],
-  ["/team", "Team card", "02"],
-  ["/records", "Records", ""],
-  ["/model", "Model room", ""],
-  ["/digest", "Weekly digest", "01"],
-  ["/settings", "Settings", ""]
+  ["/sunday", "Weekly card", "8"],
+  ["/model", "Research", "4"],
+  ["/records", "Bet tracker", ""],
+  ["/team", "Team room", ""]
 ] as const;
 
 export function NavLinks() {

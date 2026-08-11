@@ -1,31 +1,18 @@
 import { PageHeader } from "@/components/page-header";
-import { Sparkline } from "@/components/sparkline";
 
 export default function TeamPage() {
-  return <div className="page">
-    <PageHeader eyebrow="SHARED TEAM CARD" title="One call, made together">
-      Owner-only review is active. The second approval seat stays locked until you release it.
+  return <div className="page team-room-page">
+    <PageHeader eyebrow="TEAM ROOM" title="Two reads. One card.">
+      The point is not to out-predict each other. The statistical read finds a mispriced contract; the football read tests whether the assumptions make sense on the field.
     </PageHeader>
-    <div className="two-column">
-      <section className="panel candidate-editor">
-        <div className="panel-head"><div><span className="section-label">CANDIDATE · REVISION 4</span><h2>Buffalo −2.5</h2></div><span className="status-pill amber">Owner review</span></div>
-        <div className="contract-grid">
-          <label>Market<strong>Spread</strong></label><label>Selection<strong>Buffalo −2.5</strong></label>
-          <label>Units<strong>1.0u · $25</strong></label><label>Execution<strong>Paper</strong></label>
-          <label>Book<strong>BetMGM</strong></label><label>Frozen quote<strong>−2.5 · −110</strong></label>
-        </div>
-        <div className="rationale"><span>Joint rationale</span><p>Buffalo&apos;s pressure advantage remains after the market blend. The bootstrap interval is fully positive; BetMGM owns the higher point-adjusted EV.</p></div>
-        <div className="freeze-list"><span>Consensus <b>snap_01HZX</b></span><span>Model <b>v26.08.11</b></span><span>Data <b>3b8d…2e1</b></span><span>Interval <b>+0.8 to +5.9%</b></span></div>
-        <div className="audit-line"><i /><div><b>Gabe approved revision 4</b><span>12:41:08 PT · hash 52ef…91c</span></div></div>
-        <div className="audit-line pending"><i /><div><b>Teammate seat locked</b><span>No invitation, account, access grant, or push delivery exists</span></div></div>
-        <button className="wide-action">Copy owner-review contract</button>
-      </section>
-      <aside className="panel revision-panel">
-        <div className="panel-head"><div><span className="section-label">REVISION HISTORY</span><h2>Nothing overwritten</h2></div></div>
-        {[4,3,2,1].map((revision, index) => <div className={index === 0 ? "revision current" : "revision"} key={revision}><b>R{revision}</b><div><strong>{index === 0 ? "BUF −2.5 · −110" : index === 1 ? "BUF −3 · +102" : "BUF −2.5 · −108"}</strong><span>{index === 0 ? "Current · Gabe approved" : "Superseded · approvals reset"}</span></div><small>{index === 0 ? "42s" : `${index + 1}h`}</small></div>)}
-        <div className="mini-chart"><span>Quote history</span><Sparkline values={[18,17,19,16,15,13,14,12]} /></div>
-        <p className="guardrail">After the site is approved and a teammate is invited, any point or price move before second approval creates a new revision and resets both approvals.</p>
-      </aside>
+    <section className="handoff-flow">
+      <article><span>01</span><b>Market read</b><p>Gabe posts the contract, translated price, model edge, uncertainty and statistical case.</p><small>NUMBERS</small></article><i>→</i>
+      <article><span>02</span><b>Football read</b><p>Jarrett adds personnel form, usage, coaching, chemistry and a clear football veto if needed.</p><small>CONTEXT</small></article><i>→</i>
+      <article><span>03</span><b>Card decision</b><p>The play enters the $400–$600 sheet only when the price and the matchup survive both reads.</p><small>ONE TEAM</small></article>
+    </section>
+    <div className="team-room-grid">
+      <section className="handoff-card panel-lite"><div className="section-heading"><div><span className="kicker">CURRENT HANDOFF</span><h2>Green Bay +2.5</h2></div><span className="step-chip">AWAITING FIELD READ</span></div><div className="handoff-price"><div><span>Best quote</span><strong>BetMGM · −110</strong></div><div><span>Model edge</span><strong className="positive">+2.5 pp</strong></div><div><span>Suggested stake</span><strong>$50 · 2u</strong></div></div><div className="dual-notes"><article><span className="role-mark data">G</span><div><b>Statistical case</b><p>Early-down EPA, pressure allowed and half-point translation all favor Green Bay at +2.5. The interval is positive but not wide enough for a best-bet label.</p></div></article><article className="empty-note"><span className="role-mark field">J</span><div><b>Football check</b><p>Check the offensive-line rotation, new receiver roles and whether the matchup creates a protection problem the model is missing.</p></div></article></div></section>
+      <aside className="access-note panel-lite"><span className="kicker">COLLABORATION STATUS</span><h2>Jarrett&apos;s seat is designed, but access is not active.</h2><p>The hosting workspace currently blocks outside visitor invitations. The product is ready for his football notes as soon as that workspace setting changes.</p><div><b>Until then</b><span>Gabe can build, research and track the rehearsal card without implying Jarrett approved anything.</span></div></aside>
     </div>
   </div>;
 }

@@ -22,6 +22,8 @@ import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, profitForResult } from "@/domain/settlement";
 import { fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
+import { estimatedEvFromEdge, trackerSummary, weeklyAllocation } from "@/domain/play-card";
+import { rehearsalPlays } from "@/lib/play-data";
 import type { BookEvaluation, JobState, PushDelivery, SettledPick } from "@/domain/types";
 import { artifact, forecast, history, metrics, pick, quote, settled } from "./fixtures";
 
@@ -199,5 +201,36 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(securityMigration).toContain("claim_projection_lab_invite");
     expect(securityMigration).toContain("enable row level security");
     expect(securityMigration).toContain("drop policy if exists member_update_pick_state");
+  });
+
+  it("18. builds a $400–$600 weekly card with singles, a parlay, and a teaser", () => {
+    const allocation = weeklyAllocation(rehearsalPlays);
+    expect(allocation.stakedCents).toBe(40_000);
+    expect(allocation.units).toBe(16);
+    expect(allocation.count).toBe(8);
+    expect(allocation.inTargetBand).toBe(true);
+    expect(new Set(rehearsalPlays.map((play) => play.playType))).toEqual(new Set(["single", "parlay", "teaser"]));
+  });
+
+  it("19. converts the simple intake edge and price into an explicit EV estimate", () => {
+    expect(estimatedEvFromEdge(-110, 0)).toBeCloseTo(0, 10);
+    expect(estimatedEvFromEdge(-110, 3.4)).toBeGreaterThan(0);
+    expect(estimatedEvFromEdge(138, -5)).toBeLessThan(0);
+  });
+
+  it("20. keeps settlement accounting inside the separate bet tracker", () => {
+    const rows = rehearsalPlays.slice(0, 2).map((play, index) => ({
+      ...play,
+      status: "settled" as const,
+      result: index === 0 ? "win" as const : "loss" as const,
+      profitCents: index === 0 ? 4_545 : -5_000,
+      closingClvCents: index === 0 ? 3.2 : -1.1
+    }));
+    const summary = trackerSummary(rows);
+    expect(summary.settledCount).toBe(2);
+    expect(summary.winCount).toBe(1);
+    expect(summary.lossCount).toBe(1);
+    expect(summary.profitCents).toBe(-455);
+    expect(summary.averageClvCents).toBeCloseTo(1.05);
   });
 });
