@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const nav = [
-  ["/sunday", "Weekly card", "8"],
+  ["/sunday", "Week 1", "16"],
   ["/model", "Research", "4"],
   ["/records", "Bet tracker", ""],
   ["/team", "Team room", ""]

@@ -22,8 +22,9 @@ import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, profitForResult } from "@/domain/settlement";
 import { fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
-import { estimatedEvFromEdge, trackerSummary, weeklyAllocation } from "@/domain/play-card";
+import { estimatedEvFromEdge, trackerSummary } from "@/domain/play-card";
 import { rehearsalPlays } from "@/lib/play-data";
+import { pickReasons, weekOneMatchups } from "@/lib/week-one-data";
 import type { BookEvaluation, JobState, PushDelivery, SettledPick } from "@/domain/types";
 import { artifact, forecast, history, metrics, pick, quote, settled } from "./fixtures";
 
@@ -203,13 +204,15 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(securityMigration).toContain("drop policy if exists member_update_pick_state");
   });
 
-  it("18. builds a $400–$600 weekly card with singles, a parlay, and a teaser", () => {
-    const allocation = weeklyAllocation(rehearsalPlays);
-    expect(allocation.stakedCents).toBe(40_000);
-    expect(allocation.units).toBe(16);
-    expect(allocation.count).toBe(8);
-    expect(allocation.inTargetBand).toBe(true);
-    expect(new Set(rehearsalPlays.map((play) => play.playType))).toEqual(new Set(["single", "parlay", "teaser"]));
+  it("18. loads the complete Week 1 schedule and the shared research taxonomy", () => {
+    expect(weekOneMatchups).toHaveLength(16);
+    expect(new Set(weekOneMatchups.flatMap((game) => [game.away, game.home])).size).toBe(32);
+    expect(weekOneMatchups[0]).toMatchObject({ away: "NE", home: "SEA", day: "Wednesday" });
+    expect(new Set(weekOneMatchups.map((game) => game.day))).toEqual(new Set(["Wednesday", "Thursday", "Sunday", "Monday"]));
+    expect(new Set(pickReasons.map((reason) => reason.lane))).toEqual(new Set(["Quant", "Football", "Situational", "Market", "Open"]));
+    const page = readFileSync("src/app/(dashboard)/sunday/page.tsx", "utf8");
+    expect(page).not.toContain("target");
+    expect(page).not.toContain("Build the card");
   });
 
   it("19. converts the simple intake edge and price into an explicit EV estimate", () => {

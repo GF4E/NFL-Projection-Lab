@@ -1,16 +1,16 @@
 # NFL Projection Lab v1.1
 
-A private NFL research, weekly card-building, and bet-tracking workspace. The main workflow targets roughly $400–$600 of weekly rehearsal plays across singles, parlays, and teasers. The application records decisions and never places a wager.
+A private NFL research, weekly card-building, and bet-tracking workspace. The application records decisions and never places a wager.
 
 ## Product workflow
 
-- **Weekly card:** one compact play sheet with the bet, book, price, model edge, estimated EV, stake, confidence, and both the statistical and football cases.
-- **Simple intake:** a short form adds a single, parlay, or teaser to the persistent shared ledger; the detailed statistical context stays one click deeper.
+- **Week 1 workspace:** all 16 official matchups are selectable by kickoff window, with a direct path from matchup research to the betting card.
+- **Simple intake:** a short form records the exact contract, book, price, model edge, stake, confidence, and one standardized primary reason.
 - **Research desk:** primary-data observations, trends, sample sizes, source freshness, uncertainty, and explicit warnings against treating descriptive patterns as causal.
 - **Team room:** Gabe owns the market/model read; Jarrett owns personnel, form, chemistry, and the football veto. The two roles are complementary, not competitive.
 - **Bet tracker:** a separate ledger for placed and settled plays, with stake, result, dollar and unit profit, ROI, and CLV.
 
-The example Week 1 card contains eight plays totaling $400, or 16 units. It is rehearsal data, not a live recommendation.
+The Week 1 card starts empty. Matchup prompts are research questions, not live recommendations, and prices remain explicitly unloaded until a market feed is connected.
 
 ## Statistical engine
 
@@ -23,9 +23,9 @@ The example Week 1 card contains eight plays totaling $400, or 16 units. It is r
 - Provider adapters for The Odds API, nflverse, official current injury feeds, and Open-Meteo kickoff-hour forecasts.
 - Private Supabase authentication, two-person team membership, row-level access controls, owner-only overrides/corrections/configuration/access, operational ledgers, and database-level approval/quote guards.
 - Exactly two Web Push types: `awaiting_you` and `edge_threshold`.
-- A 20-case acceptance suite covering the original engine plus the simplified weekly-card and tracker workflow.
+- A 20-case acceptance suite covering the original engine plus the official Week 1 matchup, research, card, and tracker workflow.
 
-The interface starts with rehearsal data so the workflow can be reviewed before credentials and the live 2026 feeds are enabled.
+The interface starts with the official 2026 Week 1 schedule and no picks so the workflow can be reviewed before credentials and live market feeds are enabled.
 
 ## Local preview
 
@@ -40,7 +40,7 @@ Open `http://localhost:3000/sunday`.
 
 ## Persistent site storage
 
-The deployed card and tracker use a private D1 database. The generated migration lives in `drizzle/`; runtime initialization is idempotent and seeds the eight-play rehearsal card only when the database is empty.
+The deployed card and tracker use a private D1 database. Generated migrations live in `drizzle/`; runtime initialization and schema upgrades are idempotent.
 
 ## Optional live-data setup
 
@@ -60,7 +60,7 @@ No unauthenticated application API is exposed. Provider jobs use the service rol
 - Shrinkage weight: `w = 0.25`
 - Bootstrap: 100 fixed-seed coefficient refits; 10th/90th edge percentiles
 - Suggested size: quarter-Kelly, 100u reference, floor down to 0.5u, cap 2u
-- Limits: one side and one total per game, 3u per game, 2u per play; weekly target 16u and ceiling 24u ($400–$600)
+- Limits: one side and one total per game, 3u per game, 2u per play, and 10u per week
 - Edge push threshold: absolute 3.0 percentage points
 - Credit alert / ceiling: 400 / 450
 
@@ -86,4 +86,4 @@ pnpm test
 NEXT_PUBLIC_DEMO_MODE=true pnpm build
 ```
 
-The acceptance test names correspond to the 17 engine tests plus three simplified-workflow tests in `tests/acceptance.test.ts`.
+The acceptance test names correspond to the 17 engine tests plus three matchup-and-card workflow tests in `tests/acceptance.test.ts`.

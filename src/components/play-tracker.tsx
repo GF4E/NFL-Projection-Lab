@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { rehearsalPlays } from "@/lib/play-data";
+import { useEffect, useMemo, useState } from "react";
 import { stakeToUnits, trackerSummary, type PlayResult, type WeeklyPlay } from "@/domain/play-card";
 
 type Filter = "all" | "open" | "settled";
@@ -14,7 +13,7 @@ function dollars(cents: number): string {
 function odds(value: number): string { return value > 0 ? `+${value}` : `${value}`; }
 
 export function PlayTracker() {
-  const [plays, setPlays] = useState<WeeklyPlay[]>(rehearsalPlays);
+  const [plays, setPlays] = useState<WeeklyPlay[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
   const [message, setMessage] = useState("Card entries flow here when marked placed.");
   const summary = useMemo(() => trackerSummary(plays), [plays]);
@@ -23,6 +22,18 @@ export function PlayTracker() {
     if (filter === "settled") return play.status === "settled";
     return play.status !== "passed";
   });
+
+  useEffect(() => {
+    let active = true;
+    fetch("/api/plays?week=1")
+      .then(async (response) => {
+        const data = await response.json() as { plays?: WeeklyPlay[]; error?: string };
+        if (!response.ok) throw new Error(data.error ?? "Unable to load tracked plays");
+        if (active) setPlays(data.plays ?? []);
+      })
+      .catch((error: unknown) => active && setMessage(error instanceof Error ? error.message : "Unable to load tracked plays"));
+    return () => { active = false; };
+  }, []);
 
   async function update(play: WeeklyPlay, status: "placed" | "settled", result: PlayResult) {
     setMessage(`Updating ${play.title}…`);

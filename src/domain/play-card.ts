@@ -7,7 +7,10 @@ export type WeeklyPlay = {
   id: string;
   season: number;
   week: number;
+  gameId: string;
   playType: PlayType;
+  market: string;
+  primaryReason: string;
   title: string;
   legs: string;
   book: string;
@@ -28,26 +31,9 @@ export type WeeklyPlay = {
 };
 
 export const UNIT_CENTS = 2_500;
-export const WEEKLY_TARGET_MIN_CENTS = 40_000;
-export const WEEKLY_TARGET_MAX_CENTS = 60_000;
 
 export function stakeToUnits(stakeCents: number): number {
   return Math.round((stakeCents / UNIT_CENTS) * 10) / 10;
-}
-
-export function weeklyAllocation(plays: readonly WeeklyPlay[]) {
-  const included = plays.filter((play) => ["card", "placed", "settled"].includes(play.status));
-  const stakedCents = included.reduce((sum, play) => sum + play.stakeCents, 0);
-  const targetProgress = Math.min(100, Math.round((stakedCents / WEEKLY_TARGET_MIN_CENTS) * 100));
-  return {
-    stakedCents,
-    units: stakeToUnits(stakedCents),
-    count: included.length,
-    targetProgress,
-    inTargetBand: stakedCents >= WEEKLY_TARGET_MIN_CENTS && stakedCents <= WEEKLY_TARGET_MAX_CENTS,
-    remainingToMinimumCents: Math.max(0, WEEKLY_TARGET_MIN_CENTS - stakedCents),
-    roomToMaximumCents: Math.max(0, WEEKLY_TARGET_MAX_CENTS - stakedCents)
-  };
 }
 
 export function trackerSummary(plays: readonly WeeklyPlay[]) {

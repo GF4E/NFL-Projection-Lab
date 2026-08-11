@@ -6,7 +6,10 @@ import { addPlay, listPlays } from "@/server/play-store";
 export const dynamic = "force-dynamic";
 
 const createPlaySchema = z.object({
+  gameId: z.string().trim().min(3).max(40),
   playType: z.enum(["single", "parlay", "teaser"]),
+  market: z.enum(["spread", "moneyline", "total", "teaser", "parlay"]),
+  primaryReason: z.string().trim().min(3).max(60),
   title: z.string().trim().min(3).max(120),
   legs: z.string().trim().min(3).max(180),
   book: z.enum(["BetMGM", "FanDuel"]),
@@ -40,7 +43,10 @@ export async function POST(request: Request) {
       id: crypto.randomUUID(),
       season: 2026,
       week: 1,
+      gameId: input.gameId,
       playType: input.playType,
+      market: input.market,
+      primaryReason: input.primaryReason,
       title: input.title,
       legs: input.legs,
       book: input.book,
