@@ -1,0 +1,57 @@
+{
+  "version": "2026.preseason.1",
+  "season": 2026,
+  "frozen": true,
+  "unitDollars": 25,
+  "executionBooks": ["betmgm", "fanduel"],
+  "model": {
+    "trainingStartSeason": 2010,
+    "decayHalfLifeSeasons": 2.5,
+    "decayCandidates": [1.5, 2, 2.5, 3, 4],
+    "shrinkageWeight": 0.25,
+    "strengthK": 0.18,
+    "promotionLogLossTolerance": 0.002,
+    "promotionCalibrationSlope": [0.8, 1.2],
+    "bootstrapMembers": 100,
+    "bootstrapSeedStart": 202600,
+    "intervalPercentiles": [0.1, 0.9],
+    "keyMargins": [3, 6, 7, 10, 14],
+    "keyMarginBoundarySeason": 2015,
+    "seasonEffects": "random_effects"
+  },
+  "sizing": {
+    "kellyFraction": 0.25,
+    "referenceBankrollUnits": 100,
+    "roundDownUnits": 0.5,
+    "minimumUnits": 0.5,
+    "maximumUnits": 2,
+    "maximumGameUnits": 3,
+    "maximumWeekUnits": 10,
+    "maximumSidePositionsPerGame": 1,
+    "maximumTotalsPerGame": 1
+  },
+  "monitoring": {
+    "pushEdgeThreshold": 0.03,
+    "calibrationSlope": [0.7, 1.3],
+    "psiThreshold": 0.2,
+    "softAnchorCentGap": 3,
+    "softAnchorConsecutiveWeeks": 4,
+    "creditAlert": 400,
+    "creditCeiling": 450,
+    "monthlyPlanCredits": 500,
+    "reserveCredits": 50
+  },
+  "qbTiers": {
+    "definitions": [],
+    "learnedPointPriors": [],
+    "status": "requires_offseason_estimation"
+  },
+  "dataSources": {
+    "historicalInjuriesThrough": 2024,
+    "currentInjuries": "official_nfl_or_team",
+    "settlement": "nflverse",
+    "weather": "open_meteo_kickoff_hour",
+    "oddsRegion": "us",
+    "oddsMarkets": ["h2h", "spreads", "totals"]
+  }
+}

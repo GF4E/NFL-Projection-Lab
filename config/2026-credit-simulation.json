@@ -1,0 +1,12 @@
+{
+  "source": "https://github.com/nflverse/nfldata/raw/master/data/games.csv",
+  "retrievedAt": "2026-08-11",
+  "method": "Distinct REG season gameday + gametime kickoff windows; one US region; three markets",
+  "billingPeriods": [
+    { "month": "2026-09", "kickoffWindows": 18, "weeklySlates": 4, "ordinaryWeekdaySnapshots": 16 },
+    { "month": "2026-10", "kickoffWindows": 29, "weeklySlates": 5, "ordinaryWeekdaySnapshots": 22 },
+    { "month": "2026-11", "kickoffWindows": 35, "weeklySlates": 5, "ordinaryWeekdaySnapshots": 21 },
+    { "month": "2026-12", "kickoffWindows": 30, "weeklySlates": 5, "ordinaryWeekdaySnapshots": 23 },
+    { "month": "2027-01", "kickoffWindows": 6, "weeklySlates": 2, "ordinaryWeekdaySnapshots": 7 }
+  ]
+}
