@@ -25,7 +25,7 @@ import { correctSettlement, gradePick, profitForResult } from "@/domain/settleme
 import { fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
 import { addTeamApproval, estimatedEvFromEdge, isTeamApproved, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
-import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, rankTeaserPairs, scanMarketConfirmedProps, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
+import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
@@ -426,6 +426,23 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(store).toContain("THEN 'card' ELSE 'research'");
     expect(board).toContain("Awaiting ${missing} on this exact contract");
     expect(board).toContain("Approve team card");
+  });
+
+  it("35. withholds unpublished availability and surfaces only complete last-good official snapshots", () => {
+    expect(summarizeGameAvailability({ freshness: "unavailable", lastSuccessAt: null })).toMatchObject({
+      status: "pending", reportedPlayers: 0, capturedAt: null
+    });
+    expect(summarizeGameAvailability({
+      freshness: "stale",
+      lastSuccessAt: "2026-09-10T20:00:00.000Z",
+      counts: {
+        reportedPlayers: 7, out: 1, doubtful: 0, questionable: 2,
+        qbListed: 1, qbOutOrDoubtful: 0, sourceTimestamp: "2026-09-10T19:55:00.000Z"
+      }
+    })).toEqual({
+      status: "stale", reportedPlayers: 7, out: 1, doubtful: 0, questionable: 2,
+      qbListed: 1, qbOutOrDoubtful: 0, capturedAt: "2026-09-10T19:55:00.000Z"
+    });
   });
 
   it("35. gives posted totals a leakage-safe projected number and carries its edge into the team card", () => {

@@ -389,6 +389,7 @@ export function WeekOneBoard() {
             const homeSpread = bookLines.find((line) => line.market === "spread" && line.side === game.home);
             const vig = (["spread", "total", "moneyline"] as const).map((market) => bookmakerMarketVig(lines, game.id, book, market));
             const gameIntel = intelligence?.games.find((item) => item.gameId === game.id);
+            const availability = gameIntel?.availability;
             const projection = gameIntel?.projections.find((item) => item.book === book);
             const totalProjection = gameIntel?.totals.find((item) => item.book === book);
             const deskOpen = openGame === game.id;
@@ -465,7 +466,7 @@ export function WeekOneBoard() {
                 <section className="quick-props">
                   <div className="quick-head"><span>+EV PROPS</span><small>{propsLoading === game.id ? "Scanning…" : currentProps.length ? `${currentProps.length} found` : "None yet"}</small></div>
                   {propsLoading === game.id ? <p>Checking exact same-point prices across books…</p> : currentProps.length ? currentProps.map((prop) => <button onClick={() => addProp(prop, `${game.away} @ ${game.home}`)} key={prop.id}>
-                    <div><b>{prop.player}</b><small>{prop.side} {prop.point} {propMarketTitle(prop.market)}</small></div>
+                    <div><b>{prop.player}</b><small>{prop.side} {prop.point} {propMarketTitle(prop.market)} · {prop.referenceBooks} refs · floor +{(prop.lowerBoundExpectedValue * 100).toFixed(1)}%</small></div>
                     <strong>{formatOdds(prop.americanPrice)}</strong><em>+{(prop.expectedValue * 100).toFixed(1)}%</em>
                   </button>) : <p>{propBoard?.message ?? "Props are scanned when posted."}</p>}
                 </section>
@@ -477,7 +478,12 @@ export function WeekOneBoard() {
                     {projection && <small>model gap {Math.abs(projection.projectedHomePoint - movementOpen.point).toFixed(1)} → {Math.abs(projection.projectedHomePoint - movementCurrent.point).toFixed(1)} pts</small>}
                   </div>}
                   <div className="evidence-signals">
-                    <div className="quick-head"><span>MATCHUP EVIDENCE</span><small>rolling 17 games</small></div>
+                    <div className="quick-head"><span>MATCHUP EVIDENCE</span><small>{availability?.status === "current" ? `NFL REPORT ${availability.capturedAt ? snapshotAge(availability.capturedAt) : "LIVE"}` : "rolling 17 games"}</small></div>
+                    {availability && availability.status !== "pending" && <div className={`availability-inline ${availability.status}`}>
+                      <span>AVAILABILITY</span>
+                      <b>{availability.reportedPlayers} listed · {availability.out} out · {availability.questionable} questionable</b>
+                      <em>{availability.qbOutOrDoubtful ? "QB OUT / DOUBTFUL" : availability.qbListed ? "QB ON REPORT" : "QB NOT LISTED"}</em>
+                    </div>}
                     <div>{gameIntel?.signals.map((signal) => <article key={signal.id}>
                       <span>{signal.label}</span><b>{signal.lean}</b><small>{signal.detail}</small>
                     </article>)}</div>

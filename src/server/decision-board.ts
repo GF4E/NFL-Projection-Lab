@@ -7,8 +7,10 @@ import {
   nflverseExpectedMarginToHomePoint,
   normalizeNflverseTeam,
   rankTeaserPairs,
+  summarizeGameAvailability,
   type BaselineProjection,
   type DecisionBoardPayload,
+  type GameAvailabilityContext,
   type LineMovementSeries,
   type MatchupSignal,
   type TeamBaseline,
@@ -22,6 +24,7 @@ import { americanToDecimal } from "@/domain/odds";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
 import type { HistoricalMarginRow } from "@/domain/types";
 import { weeklySlate } from "./weekly-slate";
+import { ensureOfficialInjuryStore, getOfficialInjuryImportState } from "./official-injuries/store";
 import { getD1 } from "../../db";
 
 interface FeatureRow {
@@ -72,6 +75,17 @@ interface LineRow {
   captured_at: string;
   source_event_id: string;
   source_hash: string;
+}
+
+interface InjuryAggregateRow {
+  game_id: string;
+  reported_players: number;
+  out_count: number;
+  doubtful_count: number;
+  questionable_count: number;
+  qb_listed: number;
+  qb_out_or_doubtful: number;
+  source_timestamp: string | null;
 }
 
 type Aggregate = {
@@ -397,9 +411,11 @@ export async function buildDecisionBoard(
   options: { season?: number; week?: number; now?: Date } = {}
 ): Promise<DecisionBoardPayload> {
   const slate = await weeklySlate({ db, season: options.season, week: options.week, now: options.now });
+  await ensureOfficialInjuryStore(db);
   const activeGameIds = slate.games.map((game) => game.id);
   const activePlaceholders = activeGameIds.map(() => "?").join(", ");
-  const [lineResult, gameResult, featureResult, movementHistory] = await Promise.all([
+  const injuryDataset = `official-injuries:${slate.season}:reg${slate.week}`;
+  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState] = await Promise.all([
     db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line
       FROM nfl_games WHERE season BETWEEN 2010 AND ? AND result IS NOT NULL AND spread_line IS NOT NULL
@@ -414,7 +430,20 @@ export async function buildDecisionBoard(
           WHERE season_type = 'REG' AND (season < ? OR (season = ? AND week < ?))
         ) WHERE recency_rank <= 17
         ORDER BY season DESC, week DESC`).bind(slate.season, slate.season, slate.week).all<FeatureRow>(),
-    loadMovementHistory(db, activeGameIds)
+    loadMovementHistory(db, activeGameIds),
+    db.prepare(`SELECT game_id,
+        COUNT(*) AS reported_players,
+        SUM(CASE WHEN LOWER(COALESCE(game_status, '')) = 'out' THEN 1 ELSE 0 END) AS out_count,
+        SUM(CASE WHEN LOWER(COALESCE(game_status, '')) = 'doubtful' THEN 1 ELSE 0 END) AS doubtful_count,
+        SUM(CASE WHEN LOWER(COALESCE(game_status, '')) = 'questionable' THEN 1 ELSE 0 END) AS questionable_count,
+        SUM(CASE WHEN UPPER(COALESCE(position, '')) = 'QB' THEN 1 ELSE 0 END) AS qb_listed,
+        SUM(CASE WHEN UPPER(COALESCE(position, '')) = 'QB'
+          AND LOWER(COALESCE(game_status, '')) IN ('out', 'doubtful') THEN 1 ELSE 0 END) AS qb_out_or_doubtful,
+        MAX(source_timestamp) AS source_timestamp
+      FROM official_injury_reports
+      WHERE season = ? AND week = ? AND game_id IN (${activePlaceholders})
+      GROUP BY game_id`).bind(slate.season, slate.week, ...activeGameIds).all<InjuryAggregateRow>(),
+    getOfficialInjuryImportState(db, injuryDataset)
   ]);
   const featureRows = featureResult.results;
   const latestTrainingSeason = Math.max(structuralConfig.model.trainingStartSeason, ...gameResult.results.map((row) => row.season));
@@ -442,6 +471,7 @@ export async function buildDecisionBoard(
     edge: Math.max(-0.25, Math.min(0.25, (row.total - row.total_line) * 0.025)),
     weight: 0.5 ** ((latestTrainingSeason - row.season) / structuralConfig.model.decayHalfLifeSeasons)
   }]));
+  const injuryByGame = new Map(injuryResult.results.map((row) => [row.game_id, row]));
   const games = slate.games.map((game) => {
     const gameLines = lines.filter((line) => line.gameId === game.id);
     const homeSpreads = gameLines.filter((line) => line.market === "spread" && line.side === game.home && line.point !== null);
@@ -508,6 +538,20 @@ export async function buildDecisionBoard(
     }) : [];
     const away = profiles.get(game.away) ?? null;
     const home = profiles.get(game.home) ?? null;
+    const injuries = injuryByGame.get(game.id);
+    const availability: GameAvailabilityContext = summarizeGameAvailability({
+      freshness: injuryState?.freshness ?? null,
+      lastSuccessAt: injuryState?.lastSuccessAt ?? null,
+      counts: injuries ? {
+        reportedPlayers: injuries.reported_players,
+        out: injuries.out_count,
+        doubtful: injuries.doubtful_count,
+        questionable: injuries.questionable_count,
+        qbListed: injuries.qb_listed,
+        qbOutOrDoubtful: injuries.qb_out_or_doubtful,
+        sourceTimestamp: injuries.source_timestamp
+      } : null
+    });
     return {
       gameId: game.id,
       away,
@@ -516,7 +560,8 @@ export async function buildDecisionBoard(
       totals: totalProjections(game.id, gameLines, away, home, leagueScoring, totalEdgeNoise),
       teasers,
       signals: matchupSignals(away, home),
-      movements: lineMovements(game.id, movementHistory, gameLines)
+      movements: lineMovements(game.id, movementHistory, gameLines),
+      availability
     };
   });
   const teaserPairs = rankTeaserPairs(games.flatMap((game) => game.teasers));

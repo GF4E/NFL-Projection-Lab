@@ -107,6 +107,42 @@ export interface LineMovementSeries {
   snapshots: LineMovementPoint[];
 }
 
+export interface GameAvailabilityContext {
+  status: "current" | "stale" | "pending";
+  reportedPlayers: number;
+  out: number;
+  doubtful: number;
+  questionable: number;
+  qbListed: number;
+  qbOutOrDoubtful: number;
+  capturedAt: string | null;
+}
+
+export function summarizeGameAvailability(input: {
+  freshness: "current" | "stale" | "running" | "unavailable" | null;
+  lastSuccessAt: string | null;
+  counts?: {
+    reportedPlayers: number;
+    out: number;
+    doubtful: number;
+    questionable: number;
+    qbListed: number;
+    qbOutOrDoubtful: number;
+    sourceTimestamp: string | null;
+  } | null;
+}): GameAvailabilityContext {
+  return {
+    status: input.lastSuccessAt ? (input.freshness === "current" ? "current" : "stale") : "pending",
+    reportedPlayers: input.counts?.reportedPlayers ?? 0,
+    out: input.counts?.out ?? 0,
+    doubtful: input.counts?.doubtful ?? 0,
+    questionable: input.counts?.questionable ?? 0,
+    qbListed: input.counts?.qbListed ?? 0,
+    qbOutOrDoubtful: input.counts?.qbOutOrDoubtful ?? 0,
+    capturedAt: input.counts?.sourceTimestamp ?? input.lastSuccessAt
+  };
+}
+
 export interface DecisionBoardGame {
   gameId: string;
   away: TeamBaseline | null;
@@ -116,6 +152,7 @@ export interface DecisionBoardGame {
   teasers: TeaserCandidate[];
   signals: MatchupSignal[];
   movements: LineMovementSeries[];
+  availability: GameAvailabilityContext;
 }
 
 export interface DecisionBoardPayload {
