@@ -17,6 +17,7 @@ export async function generateMetadata() {
   return {
     title,
     description,
+    icons: { icon: "/og.png" },
     openGraph: { title, description, type: "website", images: [{ url: image, width: 1731, height: 909, alt: "NFL Projection Lab weekly model-versus-market board" }] },
     twitter: { card: "summary_large_image", title, description, images: [image] }
   };
