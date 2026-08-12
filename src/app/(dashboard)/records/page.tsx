@@ -4,7 +4,7 @@ import { PlayTracker } from "@/components/play-tracker";
 export default function RecordsPage() {
   return <div className="page tracker-page">
     <PageHeader eyebrow="SEASON RECORD" title="2026 running total">
-      Every week rolls into one ledger. Profit, units, ROI and verified closing-line value stay together.
+      One full record for every approved pick, plus a separate cash-placed record. The two never merge.
     </PageHeader>
     <PlayTracker />
   </div>;

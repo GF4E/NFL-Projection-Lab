@@ -85,6 +85,8 @@ export async function POST(request: Request) {
       confidence: input.confidence,
       statsCase: input.statsCase,
       footballCase: input.footballCase,
+      executionStatus: "paper",
+      cashPlacementConfirmed: false,
       status: "research",
       result: "pending",
       profitCents: 0,

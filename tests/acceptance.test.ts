@@ -23,7 +23,7 @@ import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, profitForResult } from "@/domain/settlement";
 import { fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
-import { addTeamApproval, estimatedEvFromEdge, isTeamApproved, trackerSummary } from "@/domain/play-card";
+import { addTeamApproval, estimatedEvFromEdge, isTeamApproved, trackerRecordSummaries, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
@@ -242,6 +242,14 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(summary.profitCents).toBe(-455);
     expect(summary.averageClvCents).toBeCloseTo(1.05);
     expect(summary.clvCount).toBe(2);
+    expect(summary.maximumDrawdownCents).toBe(5000);
+    const records = trackerRecordSummaries([
+      { ...rows[0], executionStatus: "executed", cashPlacementConfirmed: true },
+      { ...rows[1], executionStatus: "paper", cashPlacementConfirmed: false }
+    ]);
+    expect(records.full.settledCount).toBe(2);
+    expect(records.executedOnly.settledCount).toBe(1);
+    expect(records.executedOnly.profitCents).toBe(4545);
   });
 
   it("21. power-de-vigs visible price pairs and shows cumulative parlay value lost", () => {

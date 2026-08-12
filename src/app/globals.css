@@ -415,11 +415,16 @@ button:disabled { cursor: wait; opacity: .62; }
 .play-status > span, .play-status > small { color: var(--muted); font: 600 8px var(--display); text-align: center; text-transform: uppercase; }
 .play-status button, .track-action { padding: 7px 5px; border: 1px solid rgba(198,255,98,.28); background: rgba(198,255,98,.07); color: var(--acid); font: 700 8px var(--display); text-transform: uppercase; }
 
-.tracker-kpis { display: grid; grid-template-columns: repeat(4, 1fr); margin-bottom: 14px; border: 1px solid var(--line); }
-.tracker-kpis article { min-height: 112px; padding: 18px 20px; display: flex; flex-direction: column; justify-content: center; }
-.tracker-kpis article + article { border-left: 1px solid var(--line); }
-.tracker-kpis span, .tracker-kpis small { color: var(--muted); font: 600 9px var(--display); text-transform: uppercase; }
-.tracker-kpis strong { margin: 4px 0 1px; font: 700 32px var(--display); }
+.record-lanes { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+.record-lane { border: 1px solid var(--line); background: var(--ink-soft); }
+.record-lane header { min-height: 78px; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; gap: 14px; border-bottom: 1px solid var(--line); }
+.record-lane header span, .record-lane header small, .record-lane-stats span, .record-lane-stats small { color: var(--muted); font: 600 8px var(--display); text-transform: uppercase; }
+.record-lane header span { color: var(--acid); font-weight: 800; letter-spacing: .08em; }
+.record-lane header h2 { margin: 3px 0 0; font: 700 31px var(--display); }
+.record-lane-stats { display: grid; grid-template-columns: repeat(4, 1fr); }
+.record-lane-stats div { min-height: 89px; padding: 13px 15px; display: flex; flex-direction: column; justify-content: center; }
+.record-lane-stats div + div { border-left: 1px solid var(--line); }
+.record-lane-stats strong { margin: 3px 0 1px; font: 700 20px var(--display); }
 .tracker-toolbar { padding: 19px 20px; display: flex; justify-content: space-between; align-items: end; gap: 20px; border-bottom: 1px solid var(--line); }
 .tracker-toolbar h2 { margin: 3px 0 0; font: 650 29px var(--display); text-transform: uppercase; }
 .filter-tabs { display: flex; border: 1px solid var(--line); }
@@ -553,9 +558,7 @@ button:disabled { cursor: wait; opacity: .62; }
   .quick-card { position: static; }
   .research-lead { grid-template-columns: 1fr; }
   .market-grid { border-left: 0; border-top: 1px solid var(--line); }
-  .tracker-kpis { grid-template-columns: 1fr 1fr; }
-  .tracker-kpis article:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); }
-  .tracker-kpis article:nth-child(4) { border-top: 1px solid var(--line); }
+  .record-lanes { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 720px) {
@@ -628,6 +631,9 @@ button:disabled { cursor: wait; opacity: .62; }
   .edge-stack, .stake-stack { padding-top: 9px; border-top: 1px solid var(--line); }
   .play-status { justify-content: end; }
   .tracker-toolbar { align-items: flex-start; flex-direction: column; }
+  .record-lane-stats { grid-template-columns: 1fr 1fr; }
+  .record-lane-stats div:nth-child(3) { border-left: 0; border-top: 1px solid var(--line); }
+  .record-lane-stats div:nth-child(4) { border-top: 1px solid var(--line); }
   .tracker-table { overflow-x: auto; }
   .tracker-head, .tracker-row { width: 780px; }
   .research-thesis { padding: 22px 19px; }

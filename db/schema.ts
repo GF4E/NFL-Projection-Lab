@@ -24,6 +24,8 @@ export const plays = sqliteTable("plays", {
   confidence: text("confidence", { enum: ["watch", "lean", "play", "best"] }).notNull(),
   statsCase: text("stats_case").notNull(),
   footballCase: text("football_case").notNull().default("Awaiting football read"),
+  executionStatus: text("execution_status", { enum: ["paper", "executed"] }).notNull().default("paper"),
+  cashPlacementConfirmed: integer("cash_placement_confirmed", { mode: "boolean" }).notNull().default(false),
   status: text("status", { enum: ["research", "card", "placed", "settled", "passed"] }).notNull().default("card"),
   result: text("result", { enum: ["pending", "win", "loss", "push", "void"] }).notNull().default("pending"),
   profitCents: integer("profit_cents").notNull().default(0),
@@ -36,6 +38,7 @@ export const plays = sqliteTable("plays", {
   index("idx_plays_created_at").on(table.createdAt),
   check("plays_play_type_check", sql`${table.playType} in ('single', 'parlay', 'teaser')`),
   check("plays_confidence_check", sql`${table.confidence} in ('watch', 'lean', 'play', 'best')`),
+  check("plays_execution_status_check", sql`${table.executionStatus} in ('paper', 'executed')`),
   check("plays_status_check", sql`${table.status} in ('research', 'card', 'placed', 'settled', 'passed')`),
   check("plays_result_check", sql`${table.result} in ('pending', 'win', 'loss', 'push', 'void')`),
   check("plays_stake_check", sql`${table.stakeCents} >= 1250`)
