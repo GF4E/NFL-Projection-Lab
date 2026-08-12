@@ -26,8 +26,9 @@ import { estimatedEvFromEdge, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, scanMarketConfirmedProps, type RawPropQuote } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
-import { pickReasons, weekOneMatchups } from "@/lib/week-one-data";
+import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
+import { inspectMainlineCompleteness, scheduledMainlineCandidates, scheduledPropCandidates, type ScheduledGame } from "@/domain/odds-schedule";
 import type { BookEvaluation, JobState, PushDelivery, SettledPick } from "@/domain/types";
 import { artifact, forecast, history, metrics, pick, quote, settled } from "./fixtures";
 
@@ -326,5 +327,23 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(marginVersusConsensusResidual(8, 3)).toBe(5);
     expect(marginVersusConsensusResidual(-4, -2.5)).toBe(-1.5);
     expect(normalizeNflverseTeam("LA")).toBe("LAR");
+  });
+
+  it("27. schedules idempotent opener and kickoff snapshots without duplicate kickoff windows", () => {
+    const games: ScheduledGame[] = weekOneMatchups.map((game) => ({ id: game.id, away: game.away, home: game.home, kickoffAt: weekOneKickoffs[game.id] }));
+    const sundayOpen = scheduledMainlineCandidates(new Date("2026-09-07T01:05:00.000Z"), games);
+    expect(sundayOpen.map((candidate) => candidate.job)).toEqual(["open_sunday"]);
+    const oneHourBeforeSundayEarly = scheduledMainlineCandidates(new Date("2026-09-13T16:05:00.000Z"), games);
+    expect(oneHourBeforeSundayEarly.filter((candidate) => candidate.job === "kickoff_minus_60")).toHaveLength(1);
+    expect(new Set(oneHourBeforeSundayEarly.map((candidate) => candidate.key)).size).toBe(oneHourBeforeSundayEarly.length);
+    const props = scheduledPropCandidates(new Date("2026-09-13T16:05:00.000Z"), games, new Set(["chi-car", "atl-pit"]));
+    expect(props.map((candidate) => candidate.gameId).sort()).toEqual(["atl-pit", "chi-car"]);
+  });
+
+  it("28. rejects a partial mainline payload so stale complete prices survive", () => {
+    const partial = [{ gameId: "ne-sea", book: "betmgm", market: "total" }] as Awaited<ReturnType<typeof fetchWeekOneLiveOdds>>["lines"];
+    const result = inspectMainlineCompleteness(partial, weekOneMatchups.map((game) => game.id));
+    expect(result).toMatchObject({ complete: false, completeGames: 0, totalGames: 16 });
+    expect(result.missingGameIds).toContain("ne-sea");
   });
 });

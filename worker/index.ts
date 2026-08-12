@@ -4,6 +4,7 @@ import { runNflverseAutomation } from "../src/server/nflverse/automation";
 import { listNflverseImportStates } from "../src/server/nflverse/store";
 import { buildDecisionBoard } from "../src/server/decision-board";
 import { getPlayerPropBoard, refreshPlayerPropBoard } from "../src/server/player-props";
+import { listOddsAutomationRuns, runScheduledOddsAutomation } from "../src/server/odds-automation";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -93,6 +94,10 @@ const worker = {
     if (url.pathname === "/api/props") {
       return handlePropsRequest(request, env);
     }
+    if (url.pathname === "/api/odds-automation") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405, { allow: "GET" });
+      return json({ runs: await listOddsAutomationRuns(env.DB) });
+    }
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
       return handleImageOptimization(request, {
@@ -110,6 +115,11 @@ const worker = {
       db: env.DB,
       now: new Date(controller.scheduledTime),
       allowPlayByPlay: true
+    }));
+    ctx.waitUntil(runScheduledOddsAutomation({
+      db: env.DB,
+      apiKey: env.ODDS_API_KEY,
+      now: new Date(controller.scheduledTime)
     }));
   }
 };

@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { check, index, integer, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { check, index, integer, primaryKey, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 export const plays = sqliteTable("plays", {
   id: text("id").primaryKey(),
@@ -54,6 +54,25 @@ export const liveLines = sqliteTable("live_lines", {
   index("idx_live_lines_captured_at").on(table.capturedAt)
 ]);
 
+export const liveLineSnapshots = sqliteTable("live_line_snapshots", {
+  snapshotKey: text("snapshot_key").notNull(),
+  lineId: text("line_id").notNull(),
+  gameId: text("game_id").notNull(),
+  book: text("book", { enum: ["betmgm", "caesars"] }).notNull(),
+  market: text("market", { enum: ["spread", "total", "moneyline"] }).notNull(),
+  side: text("side").notNull(),
+  point: real("point"),
+  americanPrice: integer("american_price").notNull(),
+  capturedAt: text("captured_at").notNull(),
+  sourceEventId: text("source_event_id").notNull(),
+  sourceHash: text("source_hash").notNull(),
+  fetchedAt: text("fetched_at").notNull()
+}, (table) => [
+  primaryKey({ columns: [table.snapshotKey, table.lineId] }),
+  index("idx_line_snapshots_game_time").on(table.gameId, table.fetchedAt),
+  index("idx_line_snapshots_key").on(table.snapshotKey)
+]);
+
 export const playerPropQuotes = sqliteTable("player_prop_quotes", {
   id: text("id").primaryKey(),
   gameId: text("game_id").notNull(),
@@ -90,6 +109,21 @@ export const oddsQuotaState = sqliteTable("odds_quota_state", {
   lastCost: integer("last_cost").notNull(),
   updatedAt: text("updated_at").notNull()
 });
+
+export const oddsAutomationRuns = sqliteTable("odds_automation_runs", {
+  snapshotKey: text("snapshot_key").primaryKey(),
+  job: text("job").notNull(),
+  scheduledFor: text("scheduled_for").notNull(),
+  gameId: text("game_id"),
+  status: text("status", { enum: ["running", "succeeded", "failed", "skipped"] }).notNull(),
+  startedAt: text("started_at").notNull(),
+  completedAt: text("completed_at"),
+  message: text("message"),
+  quotaUsed: integer("quota_used")
+}, (table) => [
+  index("idx_odds_runs_schedule").on(table.scheduledFor, table.status),
+  index("idx_odds_runs_game").on(table.gameId, table.scheduledFor)
+]);
 
 export const nflverseImportState = sqliteTable("nflverse_import_state", {
   dataset: text("dataset").primaryKey(),

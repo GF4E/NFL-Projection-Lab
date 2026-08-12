@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { listLiveLines, replaceLiveLines } from "@/server/live-line-store";
-import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
-import { assertOddsCreditsAvailable, ODDS_CREDIT_CEILING, recordOddsQuota } from "@/server/odds-quota";
+import { listLiveLines } from "@/server/live-line-store";
+import { refreshCompleteWeekOneMainlines } from "@/server/odds-automation";
 
 export const dynamic = "force-dynamic";
 
@@ -30,16 +29,17 @@ export async function POST() {
     if (Date.now() - newest < 60_000) {
       return NextResponse.json({ lines: cached, configured: true, caesarsRequiresPaidPlan: true, cached: true });
     }
-    await assertOddsCreditsAvailable(3);
-    const result = await fetchWeekOneLiveOdds(apiKey);
-    await recordOddsQuota({ used: result.used, remaining: result.remaining, lastCost: result.lastCost });
-    if (result.used > ODDS_CREDIT_CEILING) throw new Error("Odds credit ceiling exceeded; cached lines were preserved");
-    const lines = await replaceLiveLines(result.lines);
+    const fetchedAt = new Date().toISOString();
+    const result = await refreshCompleteWeekOneMainlines({
+      apiKey,
+      snapshotKey: `the-odds-api:manual:${fetchedAt.slice(0, 16)}`,
+      fetchedAt
+    });
     return NextResponse.json({
-      lines,
+      lines: result.lines,
       configured: true,
       caesarsRequiresPaidPlan: true,
-      quota: { used: result.used, remaining: result.remaining, lastCost: result.lastCost }
+      quota: result.quota
     });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to refresh live lines" }, { status: 503 });
