@@ -427,4 +427,15 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("Awaiting ${missing} on this exact contract");
     expect(board).toContain("Approve team card");
   });
+
+  it("35. gives posted totals a leakage-safe projected number and carries its edge into the team card", () => {
+    const server = readFileSync("src/server/decision-board.ts", "utf8");
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(server).toContain("weightedLeagueScoring");
+    expect(server).toContain("season < ? OR week < ?");
+    expect(server).toContain("totalProjections(game.id, gameLines, away, home, leagueScoring)");
+    expect(board).toContain("MODEL TOTAL");
+    expect(board).toContain('line.market === "total"');
+    expect(board).toContain("estimatedEvPercent: legExpectedValuePercent(leg)");
+  });
 });

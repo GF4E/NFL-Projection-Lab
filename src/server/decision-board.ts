@@ -14,8 +14,10 @@ import {
   type TeamBaseline,
   type TeaserCandidate
 } from "@/domain/decision-board";
+import type { TotalProjection } from "@/domain/decision-board";
 import { buildDiscreteMarginArtifact, translateFairProbability } from "@/domain/margin";
 import { shrinkProbability } from "@/domain/odds";
+import { americanToDecimal } from "@/domain/odds";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
 import type { HistoricalMarginRow } from "@/domain/types";
 import { weeklySlate } from "./weekly-slate";
@@ -54,6 +56,8 @@ interface GameRow {
   home_team: string;
   result: number;
   spread_line: number;
+  total: number | null;
+  total_line: number | null;
 }
 
 interface LineRow {
@@ -99,6 +103,58 @@ function round(value: number, digits = 3): number {
 
 function roundHalf(value: number): number {
   return Math.max(-14, Math.min(14, Math.round(value * 2) / 2));
+}
+
+function roundTotalHalf(value: number): number {
+  return Math.round(value * 2) / 2;
+}
+
+function weightedLeagueScoring(games: readonly GameRow[], latestSeason: number): number | null {
+  let weight = 0;
+  let total = 0;
+  for (const game of games) {
+    if (game.total === null || !Number.isFinite(game.total)) continue;
+    const recency = 0.5 ** ((latestSeason - game.season) / structuralConfig.model.decayHalfLifeSeasons);
+    weight += recency;
+    total += game.total * recency;
+  }
+  return weight ? total / weight : null;
+}
+
+function projectTotal(away: TeamBaseline | null, home: TeamBaseline | null, leagueScoring: number | null): number | null {
+  if (!away || !home || leagueScoring === null) return null;
+  const paceRank = ((away.ranks.pace ?? 16.5) + (home.ranks.pace ?? 16.5)) / 2;
+  const paceAdjustment = Math.max(-2.5, Math.min(2.5, (16.5 - paceRank) * 0.18));
+  const offenseEpa = (away.epaPerPlay + home.epaPerPlay) / 2;
+  const defenseEpa = (away.defenseEpaAllowed + home.defenseEpaAllowed) / 2;
+  const epaAdjustment = Math.max(-4, Math.min(4, (offenseEpa + defenseEpa) * 11));
+  const explosiveRank = (away.ranks.explosive + home.ranks.explosive + away.ranks.defenseExplosive + home.ranks.defenseExplosive) / 4;
+  const explosiveAdjustment = Math.max(-1.5, Math.min(1.5, (16.5 - explosiveRank) * 0.1));
+  const turnoverAdjustment = Math.max(-1, Math.min(1, (0.024 - (away.regressedTurnoverRate + home.regressedTurnoverRate) / 2) * 50));
+  return roundTotalHalf(leagueScoring + paceAdjustment + epaAdjustment + explosiveAdjustment + turnoverAdjustment);
+}
+
+function totalProjections(gameId: string, gameLines: readonly LiveLine[], away: TeamBaseline | null, home: TeamBaseline | null, leagueScoring: number | null): TotalProjection[] {
+  const projectedTotal = projectTotal(away, home, leagueScoring);
+  if (projectedTotal === null) return [];
+  return (["betmgm", "fanduel"] as const).flatMap<TotalProjection>((book) => {
+    const over = gameLines.find((line) => line.book === book && line.market === "total" && line.side.toLowerCase() === "over" && line.point !== null);
+    const under = gameLines.find((line) => line.book === book && line.market === "total" && line.side.toLowerCase() === "under" && line.point !== null);
+    const marketPoint = over?.point ?? under?.point;
+    if (marketPoint === null || marketPoint === undefined) return [];
+    const pointEdge = projectedTotal - marketPoint;
+    const lean: TotalProjection["lean"] = Math.abs(pointEdge) < 1.5 ? "Pass" : pointEdge > 0 ? "Over" : "Under";
+    const selected = lean === "Over" ? over : lean === "Under" ? under : null;
+    const modelProbability = lean === "Pass" ? null : Math.max(0.05, Math.min(0.95, 0.5 + Math.abs(pointEdge) * 0.025));
+    const fairProbability = selected?.fairProbability ?? null;
+    const shrunkProbability = modelProbability === null || fairProbability === null
+      ? null
+      : shrinkProbability(modelProbability, fairProbability, structuralConfig.model.shrinkageWeight);
+    const expectedValue = selected && shrunkProbability !== null
+      ? shrunkProbability * americanToDecimal(selected.americanPrice) - 1
+      : null;
+    return [{ gameId, book, marketPoint, projectedTotal, lean, pointEdge, fairProbability, shrunkProbability, expectedValue }];
+  });
 }
 
 function rank(values: Array<{ team: string; value: number | null }>, higherIsBetter: boolean): Map<string, number | null> {
@@ -323,7 +379,7 @@ export async function buildDecisionBoard(
   const activePlaceholders = activeGameIds.map(() => "?").join(", ");
   const [lineResult, gameResult, featureResult, movementHistory] = await Promise.all([
     db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
-    db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line
+    db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line
       FROM nfl_games WHERE season BETWEEN 2010 AND ? AND result IS NOT NULL AND spread_line IS NOT NULL
         AND (season < ? OR week < ?)
       ORDER BY game_date, game_id`).bind(slate.season, slate.season, slate.week).all<GameRow>(),
@@ -339,6 +395,7 @@ export async function buildDecisionBoard(
     loadMovementHistory(db, activeGameIds)
   ]);
   const featureRows = featureResult.results;
+  const leagueScoring = weightedLeagueScoring(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season);
   const basisSeason = featureRows.length ? Math.max(...featureRows.map((row) => row.season)) : null;
   const strengths = basisSeason === null ? new Map<string, number>() : strengthStates(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season);
   const profiles = teamProfiles(featureRows, strengths);
@@ -420,6 +477,7 @@ export async function buildDecisionBoard(
       away,
       home,
       projections,
+      totals: totalProjections(game.id, gameLines, away, home, leagueScoring),
       teasers,
       signals: matchupSignals(away, home),
       movements: lineMovements(game.id, movementHistory, gameLines)

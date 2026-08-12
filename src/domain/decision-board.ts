@@ -49,6 +49,18 @@ export interface BaselineProjection {
   translationWarning: "none" | "interpolated" | "extrapolated" | "unsupported";
 }
 
+export interface TotalProjection {
+  gameId: string;
+  book: "betmgm" | "fanduel";
+  marketPoint: number;
+  projectedTotal: number;
+  lean: "Over" | "Under" | "Pass";
+  pointEdge: number;
+  fairProbability: number | null;
+  shrunkProbability: number | null;
+  expectedValue: number | null;
+}
+
 export interface TeaserCandidate {
   gameId: string;
   book: "betmgm" | "fanduel";
@@ -98,6 +110,7 @@ export interface DecisionBoardGame {
   away: TeamBaseline | null;
   home: TeamBaseline | null;
   projections: BaselineProjection[];
+  totals: TotalProjection[];
   teasers: TeaserCandidate[];
   signals: MatchupSignal[];
   movements: LineMovementSeries[];

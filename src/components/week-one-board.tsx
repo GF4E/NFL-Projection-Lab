@@ -201,9 +201,12 @@ export function WeekOneBoard() {
       return;
     }
     const projection = intelligence?.games.find((game) => game.gameId === line.gameId)?.projections.find((item) => item.book === line.book);
-    const shrunkProbability = line.market !== "spread" || !projection || projection.shrunkHomeProbability === null
-      ? null
-      : line.side === projection.homeTeam ? projection.shrunkHomeProbability : 1 - projection.shrunkHomeProbability;
+    const totalProjection = intelligence?.games.find((game) => game.gameId === line.gameId)?.totals.find((item) => item.book === line.book);
+    const shrunkProbability = line.market === "spread" && projection?.shrunkHomeProbability !== null && projection?.shrunkHomeProbability !== undefined
+      ? line.side === projection.homeTeam ? projection.shrunkHomeProbability : 1 - projection.shrunkHomeProbability
+      : line.market === "total" && totalProjection?.shrunkProbability !== null && totalProjection?.shrunkProbability !== undefined && totalProjection.lean.toLowerCase() === line.side.toLowerCase()
+        ? totalProjection.shrunkProbability
+        : null;
     addLeg({
       id: line.id, kind: "mainline", gameId: line.gameId, book: line.book, market: line.market, side: line.side,
       point: line.point, americanPrice: line.americanPrice, fairProbability: line.fairProbability,
@@ -350,6 +353,7 @@ export function WeekOneBoard() {
             const vig = (["spread", "total", "moneyline"] as const).map((market) => bookmakerMarketVig(lines, game.id, book, market));
             const gameIntel = intelligence?.games.find((item) => item.gameId === game.id);
             const projection = gameIntel?.projections.find((item) => item.book === book);
+            const totalProjection = gameIntel?.totals.find((item) => item.book === book);
             const deskOpen = openGame === game.id;
             const propBoard = propBoards[game.id];
             const currentProps = propBoard?.candidates.filter((item) => item.executionBook === book) ?? [];
@@ -387,7 +391,7 @@ export function WeekOneBoard() {
               <div className="model-ribbon">
                 <span>{projection?.marketSource === "nflverse_consensus" ? "CONSENSUS" : "MARKET"} <b>{homeSpread ? `${game.home} ${formatPoint(homeSpread.point)}` : projection ? `${game.home} ${formatPoint(projection.marketHomePoint)}` : "—"}</b></span>
                 <span>MODEL LINE <b>{projection ? `${game.home} ${formatPoint(projection.projectedHomePoint)}` : "—"}</b></span>
-                <span>MODEL HOME <b>{projection ? formatPercent(projection.shrunkHomeProbability) : "—"}</b></span>
+                <span>MODEL TOTAL <b>{totalProjection ? `${totalProjection.projectedTotal} · ${totalProjection.lean === "Pass" ? "PASS" : `${totalProjection.lean.toUpperCase()} ${Math.abs(totalProjection.pointEdge).toFixed(1)}`}` : "—"}</b></span>
                 <span>VIG <b>{vig.map((value) => value === null ? "—" : value.toFixed(1)).join(" / ")}%</b></span>
                 <button onClick={() => toggleDecisionDesk(game.id)} aria-expanded={deskOpen}>{deskOpen ? "Close" : "Picks"} {deskOpen ? "↑" : "↓"}</button>
               </div>
