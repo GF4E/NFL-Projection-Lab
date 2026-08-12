@@ -11,7 +11,7 @@ import type {
 } from "@/domain/decision-board";
 import { analyzeSlipValue, decimalToAmerican, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
 import { americanToDecimal } from "@/domain/odds";
-import type { PickedBy, WeeklyPlay } from "@/domain/play-card";
+import { isTeamApproved, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
 import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
 import { pickReasons } from "@/lib/week-one-data";
 
@@ -76,6 +76,19 @@ function bookmakerMarketVig(lines: readonly LiveLine[], gameId: string, book: Li
 
 function combinedAmerican(legs: readonly SelectedLeg[]): number {
   return decimalToAmerican(legs.reduce((product, leg) => product * americanToDecimal(leg.americanPrice), 1));
+}
+
+function legExpectedValuePercent(leg: SelectedLeg): number {
+  if (leg.fairProbability === null) return 0;
+  const probability = Math.min(0.99, Math.max(0.01, leg.fairProbability + (leg.edge ?? 0)));
+  return (probability * americanToDecimal(leg.americanPrice) - 1) * 100;
+}
+
+function slipExpectedValuePercent(legs: readonly SelectedLeg[]): number {
+  if (!legs.length || legs.some((leg) => leg.fairProbability === null)) return 0;
+  const probability = legs.reduce((product, leg) => product * Math.min(0.99, Math.max(0.01, (leg.fairProbability ?? 0) + (leg.edge ?? 0))), 1);
+  const offered = legs.reduce((product, leg) => product * americanToDecimal(leg.americanPrice), 1);
+  return (probability * offered - 1) * 100;
 }
 
 function snapshotAge(capturedAt: string): string {
@@ -187,10 +200,15 @@ export function WeekOneBoard() {
       setMessage("Use a highlighted six-point teaser leg under Picks.");
       return;
     }
+    const projection = intelligence?.games.find((game) => game.gameId === line.gameId)?.projections.find((item) => item.book === line.book);
+    const shrunkProbability = line.market !== "spread" || !projection || projection.shrunkHomeProbability === null
+      ? null
+      : line.side === projection.homeTeam ? projection.shrunkHomeProbability : 1 - projection.shrunkHomeProbability;
     addLeg({
       id: line.id, kind: "mainline", gameId: line.gameId, book: line.book, market: line.market, side: line.side,
       point: line.point, americanPrice: line.americanPrice, fairProbability: line.fairProbability,
-      matchup, selection: lineSelection(line), detail: `${marketTitle(line.market)} · ${formatOdds(line.americanPrice)}`, edge: null
+      matchup, selection: lineSelection(line), detail: `${marketTitle(line.market)} · ${formatOdds(line.americanPrice)}`,
+      edge: shrunkProbability === null || line.fairProbability === null ? null : shrunkProbability - line.fairProbability
     });
   }
 
@@ -250,7 +268,7 @@ export function WeekOneBoard() {
       setMessage("Teaser withheld: use two different games and an offered price that is at least break-even versus the empirical fair probability.");
       return;
     }
-    setMessage(`Saving to the shared Week ${slate.week} card…`);
+    setMessage(`Recording ${picker === "gabe" ? "Gabe" : "Jarrett"}'s Week ${slate.week} approval…`);
     const selectedReason = pickReasons.find((item) => item.value === reason) ?? pickReasons[0];
     const entries = slipMode === "straight" ? slip.map((leg) => ({
       gameId: leg.gameId,
@@ -260,6 +278,7 @@ export function WeekOneBoard() {
       legs: `${leg.matchup} · ${leg.detail}`,
       americanOdds: leg.americanPrice,
       modelEdgePp: (leg.edge ?? 0) * 100,
+      estimatedEvPercent: legExpectedValuePercent(leg),
       statsCase: `${selectedReason.label}. ${leg.detail}.`
     })) : [{
       gameId: `multi-week-${slate.week}`,
@@ -269,6 +288,7 @@ export function WeekOneBoard() {
       legs: slip.map((leg) => `${leg.selection} (${leg.matchup})`).join(" · "),
       americanOdds: slipMode === "teaser" ? teaserPrice : combinedAmerican(slip),
       modelEdgePp: 0,
+      estimatedEvPercent: slipMode === "teaser" ? teaserValue?.evPercent ?? 0 : slipExpectedValuePercent(slip),
       statsCase: `${selectedReason.label}. ${slipMode === "teaser" ? "Empirical teaser EV cleared the selected book price." : "Power-de-vigged independent-leg price check completed."}`
     }];
     try {
@@ -280,16 +300,25 @@ export function WeekOneBoard() {
             ...entry,
             week: slate.week,
             book: bookNames[slip[0].book], primaryReason: reason, pickedBy: picker, stakeDollars: stake,
-            confidence: "play", footballCase: `${picker === "gabe" ? "Gabe" : "Jarrett"} selected this contract from the shared decision board.`, status: "card"
+            confidence: "play", footballCase: "The team selected this exact contract from the shared decision board.", status: "card"
           })
         });
         const data = await response.json() as { play?: WeeklyPlay; error?: string };
         if (!response.ok || !data.play) throw new Error(data.error ?? "Could not save the slip");
         return data.play;
       }));
-      setPlays((current) => [...current, ...saved]);
-      setSlip([]);
-      setMessage(`${picker === "gabe" ? "Gabe" : "Jarrett"} added ${saved.length} ${saved.length === 1 ? "pick" : "picks"} to the shared card.`);
+      setPlays((current) => {
+        const next = new Map(current.map((play) => [play.id, play]));
+        for (const play of saved) next.set(play.id, play);
+        return [...next.values()];
+      });
+      if (saved.every((play) => isTeamApproved(play.approvals))) {
+        setSlip([]);
+        setMessage(`Team approved · ${saved.length} ${saved.length === 1 ? "pick is" : "picks are"} now official.`);
+      } else {
+        const missing = picker === "gabe" ? "Jarrett" : "Gabe";
+        setMessage(`${picker === "gabe" ? "Gabe" : "Jarrett"} approved. Awaiting ${missing} on this exact contract.`);
+      }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not save the slip");
     }
@@ -424,15 +453,15 @@ export function WeekOneBoard() {
           <div><span>NO-VIG FAIR</span><b>{slipMode === "teaser" ? teaserValue ? formatOdds(teaserValue.fairAmerican) : "—" : slipValue ? formatOdds(slipValue.fairAmerican) : "—"}</b></div>
           <div className={`vig-loss ${slipMode === "teaser" && teaserValue && teaserValue.evPercent >= 0 ? "positive-value" : ""}`}><span>{slipMode === "teaser" ? "ESTIMATED EV" : "VALUE LOST"}</span><b>{slipMode === "teaser" ? teaserValue ? `${teaserValue.evPercent >= 0 ? "+" : ""}${teaserValue.evPercent.toFixed(1)}%` : "—" : slipValue ? `${slipValue.vigDragPercent.toFixed(1)}%` : "—"}</b><small>{slipMode === "teaser" ? teaserValue ? `${formatPercent(teaserValue.fairProbability)} joint fair probability` : "Add two priced teaser legs from different games" : slipValue ? `$${slipValue.lossPerUnitDollars.toFixed(2)} per 1u · latest leg +${slipValue.incrementalDragPercent.toFixed(1)}pp` : slip.length > 1 ? "Same-game or incomplete pair: withheld" : "Add a priced leg"}</small></div>
         </div>
-        <button className="save-slip" disabled={!slip.length || (slipMode === "teaser" && (!teaserValue || teaserValue.evPercent < 0))} onClick={saveSlip}>Save to shared card</button>
+        <button className="save-slip" disabled={!slip.length || (slipMode === "teaser" && (!teaserValue || teaserValue.evPercent < 0))} onClick={saveSlip}>Approve team card</button>
         <p className="slip-message" aria-live="polite">{message}</p>
-        <p className="value-note">Estimated value only. Saving a card never places a wager.</p>
+        <p className="value-note">Estimated value only. Approval never places a wager.</p>
       </aside>
     </div>
 
     <section className="compact-shared-card">
-      <div><span>SHARED CARD</span><h2>{plays.length ? `${plays.length} picks` : "Empty"}</h2></div>
-      {plays.slice(-6).map((play) => <article key={play.id}><b>{play.title}</b><span className={play.pickedBy}>{play.pickedBy === "gabe" ? "Gabe" : "Jarrett"}</span><small>{play.book} {formatOdds(play.americanOdds)} · ${(play.stakeCents / 100).toFixed(0)}</small></article>)}
+      <div><span>TEAM CARD</span><h2>{plays.filter((play) => isTeamApproved(play.approvals)).length ? `${plays.filter((play) => isTeamApproved(play.approvals)).length} official` : plays.length ? `${plays.length} awaiting` : "Empty"}</h2></div>
+      {plays.slice(-6).map((play) => <article key={play.id}><b>{play.title}</b><span className={isTeamApproved(play.approvals) ? "team-approved" : "team-awaiting"}>{play.approvals?.includes("gabe") ? "G✓" : "G—"} · {play.approvals?.includes("jarrett") ? "J✓" : "J—"}</span><small>{play.book} {formatOdds(play.americanOdds)} · ${(play.stakeCents / 100).toFixed(0)}</small></article>)}
       <Link href="/records">Season record →</Link>
     </section>
   </div>;

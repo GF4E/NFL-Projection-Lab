@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { stakeToUnits, trackerSummary, type PlayResult, type WeeklyPlay } from "@/domain/play-card";
+import { isTeamApproved, stakeToUnits, trackerSummary, type PlayResult, type WeeklyPlay } from "@/domain/play-card";
 
 type Filter = "all" | "open" | "settled";
 
@@ -15,9 +15,10 @@ function odds(value: number): string { return value > 0 ? `+${value}` : `${value
 export function PlayTracker() {
   const [plays, setPlays] = useState<WeeklyPlay[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
-  const [message, setMessage] = useState("Every 2026 card entry rolls into this season ledger.");
-  const summary = useMemo(() => trackerSummary(plays), [plays]);
-  const rows = plays.filter((play) => {
+  const [message, setMessage] = useState("Only jointly approved picks enter the 2026 ledger.");
+  const official = useMemo(() => plays.filter((play) => isTeamApproved(play.approvals)), [plays]);
+  const summary = useMemo(() => trackerSummary(official), [official]);
+  const rows = official.filter((play) => {
     if (filter === "open") return play.status !== "settled" && play.status !== "passed";
     if (filter === "settled") return play.status === "settled";
     return play.status !== "passed";

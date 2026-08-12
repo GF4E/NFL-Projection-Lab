@@ -3,6 +3,9 @@ import { check, index, integer, primaryKey, real, sqliteTable, text } from "driz
 
 export const plays = sqliteTable("plays", {
   id: text("id").primaryKey(),
+  contractKey: text("contract_key").notNull().default(""),
+  gabeApproved: integer("gabe_approved").notNull().default(0),
+  jarrettApproved: integer("jarrett_approved").notNull().default(0),
   season: integer("season").notNull().default(2026),
   week: integer("week").notNull(),
   gameId: text("game_id").notNull().default(""),

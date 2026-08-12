@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { estimatedEvFromEdge, type WeeklyPlay } from "@/domain/play-card";
-import { addPlay, listPlays } from "@/server/play-store";
+import { stableHash } from "@/domain/hash";
+import { addOrApprovePlay, listPlays } from "@/server/play-store";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,7 @@ const createPlaySchema = z.object({
   americanOdds: z.number().int().refine((value) => value <= -100 || value >= 100, "Use valid American odds"),
   stakeDollars: z.number().min(12.5).max(200),
   modelEdgePp: z.number().min(-10).max(20),
+  estimatedEvPercent: z.number().min(-100).max(100).optional(),
   confidence: z.enum(["watch", "lean", "play", "best"]),
   statsCase: z.string().trim().min(8).max(500),
   footballCase: z.string().trim().min(3).max(500),
@@ -45,8 +47,18 @@ export async function POST(request: Request) {
   try {
     const input = createPlaySchema.parse(await request.json());
     const now = new Date().toISOString();
+    const contractKey = stableHash({
+      season: 2026, week: input.week, gameId: input.gameId, playType: input.playType,
+      market: input.market, title: input.title, legs: input.legs, book: input.book,
+      americanOdds: input.americanOdds, stakeDollars: input.stakeDollars,
+      primaryReason: input.primaryReason, modelEdgePp: input.modelEdgePp,
+      estimatedEvPercent: input.estimatedEvPercent ?? null,
+      statsCase: input.statsCase, footballCase: input.footballCase
+    });
     const play: WeeklyPlay = {
-      id: crypto.randomUUID(),
+      id: `team:${contractKey}`,
+      contractKey,
+      approvals: [input.pickedBy],
       season: 2026,
       week: input.week,
       gameId: input.gameId,
@@ -60,11 +72,11 @@ export async function POST(request: Request) {
       americanOdds: input.americanOdds,
       stakeCents: Math.round(input.stakeDollars * 100),
       modelEdgePp: input.modelEdgePp,
-      estimatedEvPercent: estimatedEvFromEdge(input.americanOdds, input.modelEdgePp),
+      estimatedEvPercent: input.estimatedEvPercent ?? estimatedEvFromEdge(input.americanOdds, input.modelEdgePp),
       confidence: input.confidence,
       statsCase: input.statsCase,
       footballCase: input.footballCase,
-      status: input.status,
+      status: "research",
       result: "pending",
       profitCents: 0,
       closingClvCents: null,
@@ -72,7 +84,7 @@ export async function POST(request: Request) {
       createdAt: now,
       updatedAt: now
     };
-    return NextResponse.json({ play: await addPlay(play) }, { status: 201 });
+    return NextResponse.json({ play: await addOrApprovePlay(play, input.pickedBy) }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.issues[0]?.message ?? "Invalid play" }, { status: 400 });

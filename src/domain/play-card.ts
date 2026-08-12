@@ -6,6 +6,8 @@ export type PickedBy = "gabe" | "jarrett";
 
 export type WeeklyPlay = {
   id: string;
+  contractKey?: string;
+  approvals?: PickedBy[];
   season: number;
   week: number;
   gameId: string;
@@ -33,6 +35,14 @@ export type WeeklyPlay = {
 };
 
 export const UNIT_CENTS = 2_500;
+
+export function addTeamApproval(current: readonly PickedBy[], actor: PickedBy): PickedBy[] {
+  return ([...new Set([...current, actor])] as PickedBy[]).sort((left, right) => left === "gabe" ? -1 : right === "gabe" ? 1 : 0);
+}
+
+export function isTeamApproved(approvals: readonly PickedBy[] | undefined): boolean {
+  return approvals?.includes("gabe") === true && approvals.includes("jarrett");
+}
 
 export function stakeToUnits(stakeCents: number): number {
   return Math.round((stakeCents / UNIT_CENTS) * 10) / 10;

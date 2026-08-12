@@ -23,7 +23,7 @@ import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, profitForResult } from "@/domain/settlement";
 import { fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
-import { estimatedEvFromEdge, trackerSummary } from "@/domain/play-card";
+import { addTeamApproval, estimatedEvFromEdge, isTeamApproved, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, rankTeaserPairs, scanMarketConfirmedProps, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
@@ -410,5 +410,21 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(tracker).not.toContain("closingClvCents: result ===");
     expect(store).toContain("week === undefined");
     expect(store).toContain("ORDER BY week, created_at ASC");
+  });
+
+  it("34. requires both teammates on the same immutable contract before a pick enters the team record", () => {
+    const gabeOnly = addTeamApproval([], "gabe");
+    expect(addTeamApproval(gabeOnly, "gabe")).toEqual(["gabe"]);
+    expect(isTeamApproved(gabeOnly)).toBe(false);
+    expect(isTeamApproved(addTeamApproval(gabeOnly, "jarrett"))).toBe(true);
+    const route = readFileSync("src/app/api/plays/route.ts", "utf8");
+    const store = readFileSync("src/server/play-store.ts", "utf8");
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(route).toContain("id: `team:${contractKey}`");
+    expect(store).toContain("gabe_approved = CASE");
+    expect(store).toContain("jarrett_approved = CASE");
+    expect(store).toContain("THEN 'card' ELSE 'research'");
+    expect(board).toContain("Awaiting ${missing} on this exact contract");
+    expect(board).toContain("Approve team card");
   });
 });

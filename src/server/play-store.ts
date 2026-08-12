@@ -1,8 +1,11 @@
 import { getD1 } from "../../db";
-import type { WeeklyPlay } from "@/domain/play-card";
+import type { PickedBy, WeeklyPlay } from "@/domain/play-card";
 
 type PlayDatabaseRow = {
   id: string;
+  contract_key: string;
+  gabe_approved: number;
+  jarrett_approved: number;
   season: number;
   week: number;
   game_id: string;
@@ -32,6 +35,9 @@ type PlayDatabaseRow = {
 const CREATE_PLAYS_SQL = `
   CREATE TABLE IF NOT EXISTS plays (
     id text PRIMARY KEY NOT NULL,
+    contract_key text DEFAULT '' NOT NULL,
+    gabe_approved integer DEFAULT 0 NOT NULL,
+    jarrett_approved integer DEFAULT 0 NOT NULL,
     season integer DEFAULT 2026 NOT NULL,
     week integer NOT NULL,
     game_id text DEFAULT '' NOT NULL,
@@ -66,15 +72,26 @@ const CREATE_PLAYS_SQL = `
 
 const INSERT_PLAY_SQL = `
   INSERT OR IGNORE INTO plays (
-    id, season, week, game_id, play_type, market, primary_reason, picked_by, title, legs, book, american_odds, stake_cents,
+    id, contract_key, gabe_approved, jarrett_approved, season, week, game_id, play_type, market, primary_reason, picked_by, title, legs, book, american_odds, stake_cents,
     model_edge_pp, estimated_ev_percent, confidence, stats_case, football_case,
     status, result, profit_cents, closing_clv_cents, created_by, created_at, updated_at
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
+
+function approvalsFor(row: PlayDatabaseRow): PickedBy[] {
+  const approvals: PickedBy[] = [];
+  if (row.gabe_approved) approvals.push("gabe");
+  if (row.jarrett_approved) approvals.push("jarrett");
+  if (approvals.length) return approvals;
+  // Legacy rows are treated as already accepted so existing records remain intact.
+  return row.status === "research" ? [] : ["gabe", "jarrett"];
+}
 
 function mapRow(row: PlayDatabaseRow): WeeklyPlay {
   return {
     id: row.id,
+    contractKey: row.contract_key,
+    approvals: approvalsFor(row),
     season: row.season,
     week: row.week,
     gameId: row.game_id,
@@ -112,6 +129,9 @@ export async function ensurePlayStore(): Promise<void> {
   if (!names.has("market")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN market text DEFAULT 'spread' NOT NULL"));
   if (!names.has("primary_reason")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN primary_reason text DEFAULT 'other' NOT NULL"));
   if (!names.has("picked_by")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN picked_by text DEFAULT 'gabe' NOT NULL"));
+  if (!names.has("contract_key")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN contract_key text DEFAULT '' NOT NULL"));
+  if (!names.has("gabe_approved")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN gabe_approved integer DEFAULT 0 NOT NULL"));
+  if (!names.has("jarrett_approved")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN jarrett_approved integer DEFAULT 0 NOT NULL"));
   if (upgrades.length) await d1.batch(upgrades);
   await d1.batch([
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_season_week_status ON plays (season, week, status)"),
@@ -135,15 +155,32 @@ export async function getPlay(id: string): Promise<WeeklyPlay | null> {
   return row ? mapRow(row) : null;
 }
 
-export async function addPlay(play: WeeklyPlay): Promise<WeeklyPlay> {
+export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promise<WeeklyPlay> {
   await ensurePlayStore();
+  const existing = await getD1().prepare("SELECT * FROM plays WHERE id = ?").bind(play.id).first<PlayDatabaseRow>();
+  if (existing) {
+    await getD1().prepare(`UPDATE plays SET
+      gabe_approved = CASE WHEN ? = 'gabe' THEN 1 ELSE gabe_approved END,
+      jarrett_approved = CASE WHEN ? = 'jarrett' THEN 1 ELSE jarrett_approved END,
+      status = CASE WHEN (gabe_approved = 1 OR ? = 'gabe') AND (jarrett_approved = 1 OR ? = 'jarrett') THEN 'card' ELSE 'research' END,
+      updated_at = ? WHERE id = ?`)
+      .bind(actor, actor, actor, actor, play.updatedAt, play.id).run();
+    return (await getPlay(play.id))!;
+  }
   await getD1().prepare(INSERT_PLAY_SQL).bind(
-    play.id, play.season, play.week, play.gameId, play.playType, play.market, play.primaryReason, play.pickedBy, play.title, play.legs, play.book,
+    play.id, play.contractKey ?? "", actor === "gabe" ? 1 : 0, actor === "jarrett" ? 1 : 0,
+    play.season, play.week, play.gameId, play.playType, play.market, play.primaryReason, play.pickedBy, play.title, play.legs, play.book,
     play.americanOdds, play.stakeCents, play.modelEdgePp, play.estimatedEvPercent,
-    play.confidence, play.statsCase, play.footballCase, play.status, play.result,
+    play.confidence, play.statsCase, play.footballCase, "research", play.result,
     play.profitCents, play.closingClvCents, play.createdBy, play.createdAt, play.updatedAt
   ).run();
-  return play;
+  await getD1().prepare(`UPDATE plays SET
+    gabe_approved = CASE WHEN ? = 'gabe' THEN 1 ELSE gabe_approved END,
+    jarrett_approved = CASE WHEN ? = 'jarrett' THEN 1 ELSE jarrett_approved END,
+    status = CASE WHEN (gabe_approved = 1 OR ? = 'gabe') AND (jarrett_approved = 1 OR ? = 'jarrett') THEN 'card' ELSE 'research' END,
+    updated_at = ? WHERE id = ?`)
+    .bind(actor, actor, actor, actor, play.updatedAt, play.id).run();
+  return (await getPlay(play.id))!;
 }
 
 export async function updatePlayResult(
