@@ -223,7 +223,9 @@ export async function runNflverseAutomation(input: {
   allowPlayByPlay?: boolean;
 }): Promise<NflverseAutomationResult> {
   const now = input.now ?? new Date();
-  const fetcher = input.fetcher ?? fetch;
+  const fetcher: typeof fetch = input.fetcher
+    ? (request, init) => input.fetcher!(request, init)
+    : (request, init) => fetch(request, init);
   const currentSeason = nflSeasonForDate(now);
   const parts = pacificParts(now);
   const historyState = await getNflverseImportState(input.db, HISTORY_SCHEDULE_DATASET);
