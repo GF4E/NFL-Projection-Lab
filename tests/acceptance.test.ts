@@ -440,4 +440,12 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("straightEv");
     expect(board).toContain("shrunk bet probability");
   });
+
+  it("36. highlights a better book only on an identical side and point", () => {
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(board).toContain("candidate.point === line.point");
+    expect(board).toContain("line.americanPrice > comparable.americanPrice");
+    expect(board).toContain("best-exact-price");
+    expect(board).not.toContain("candidate.point !== line.point && candidate.americanPrice");
+  });
 });

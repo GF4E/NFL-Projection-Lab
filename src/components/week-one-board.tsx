@@ -388,8 +388,10 @@ export function WeekOneBoard() {
                   const line = bookLines.find((candidate) => candidate.market === market && candidate.side.toLowerCase() === side.toLowerCase());
                   const active = Boolean(line && slip.some((leg) => leg.id === line.id));
                   const againstPreference = Boolean(line && market !== "total" && [game.away, game.home].some((team) => preferredTeams.has(team) && team !== line.side));
-                  return <button className={`price-cell ${active ? "active" : ""} ${againstPreference ? "preference-conflict" : ""}`} disabled={!line} onClick={() => line && toggleLine(line, `${game.away} @ ${game.home}`)} key={market} aria-label={line ? `Select ${lineSelection(line)} at ${formatOdds(line.americanPrice)}` : `${marketTitle(market)} unavailable`}>
-                    {line ? <><strong>{market === "moneyline" ? formatOdds(line.americanPrice) : market === "total" ? `${row.totalSide === "Over" ? "O" : "U"} ${line.point}` : formatPoint(line.point)}</strong>{market !== "moneyline" && <span>{formatOdds(line.americanPrice)}</span>}<small>{snapshotAge(line.capturedAt)}</small></> : <strong>—</strong>}
+                  const comparable = line ? lines.find((candidate) => candidate.gameId === line.gameId && candidate.book !== line.book && candidate.market === line.market && candidate.side.toLowerCase() === line.side.toLowerCase() && candidate.point === line.point) : null;
+                  const bestExactPrice = Boolean(line && comparable && line.americanPrice > comparable.americanPrice);
+                  return <button className={`price-cell ${active ? "active" : ""} ${againstPreference ? "preference-conflict" : ""} ${bestExactPrice ? "best-exact-price" : ""}`} disabled={!line} onClick={() => line && toggleLine(line, `${game.away} @ ${game.home}`)} key={market} aria-label={line ? `Select ${lineSelection(line)} at ${formatOdds(line.americanPrice)}` : `${marketTitle(market)} unavailable`}>
+                    {line ? <>{bestExactPrice && <em>BEST</em>}<strong>{market === "moneyline" ? formatOdds(line.americanPrice) : market === "total" ? `${row.totalSide === "Over" ? "O" : "U"} ${line.point}` : formatPoint(line.point)}</strong>{market !== "moneyline" && <span>{formatOdds(line.americanPrice)}</span>}<small>{snapshotAge(line.capturedAt)}</small></> : <strong>—</strong>}
                   </button>;
                 })}
               </div>)}

@@ -215,6 +215,8 @@ button:disabled { cursor: wait; opacity: .62; }
 .price-cell span { margin-top: 5px; color: #c7cecb; font: 800 15px var(--display); }
 .price-cell small { position: absolute; top: 5px; right: 6px; color: #77837f; font: 800 7px var(--display); }
 .price-cell.preference-conflict { box-shadow: inset 3px 0 rgba(255,112,91,.28); }
+.price-cell.best-exact-price { border-color: color-mix(in srgb, var(--book-accent) 70%, #444e4b); }
+.price-cell > em { position: absolute; bottom: 5px; left: 6px; color: var(--book-accent); font: 900 7px var(--display); font-style: normal; letter-spacing: .06em; }
 .team-code em { color: var(--acid); font-size: 14px; font-style: normal; }
 .model-ribbon { min-height: 44px; margin-top: 10px; padding: 0 10px; display: grid; grid-template-columns: 1.05fr 1.05fr 1fr .9fr auto; gap: 10px; align-items: center; border: 1px solid #303b37; background: #0e1715; }
 .model-ribbon span { color: #75827d; font: 800 9px var(--display); letter-spacing: .08em; }
