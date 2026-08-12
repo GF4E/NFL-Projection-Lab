@@ -1,4 +1,5 @@
-import { createHash } from "node:crypto";
+import { sha256 } from "@noble/hashes/sha2.js";
+import { bytesToHex } from "@noble/hashes/utils.js";
 
 function canonicalize(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonicalize);
@@ -13,7 +14,5 @@ function canonicalize(value: unknown): unknown {
 }
 
 export function stableHash(value: unknown): string {
-  return createHash("sha256")
-    .update(JSON.stringify(canonicalize(value)))
-    .digest("hex");
+  return bytesToHex(sha256(new TextEncoder().encode(JSON.stringify(canonicalize(value)))));
 }

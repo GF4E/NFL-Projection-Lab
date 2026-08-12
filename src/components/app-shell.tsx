@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { FieldMark } from "./icons";
 import { NavLinks } from "./nav-links";
+import { NflverseRefreshBeacon } from "./nflverse-refresh-beacon";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="app-frame">
+      <NflverseRefreshBeacon />
       <aside className="rail">
         <Link className="brand" href="/sunday" aria-label="NFL Projection Lab home">
           <FieldMark className="brand-mark" />

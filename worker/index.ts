@@ -1,5 +1,6 @@
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
+import { runNflverseAutomation } from "../src/server/nflverse/automation";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -22,6 +23,11 @@ interface ExecutionContext {
   passThroughOnException(): void;
 }
 
+interface ScheduledController {
+  scheduledTime: number;
+  cron: string;
+}
+
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -36,6 +42,13 @@ const worker = {
       }, allowedWidths);
     }
     return handler.fetch(request, env, ctx);
+  },
+  async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(runNflverseAutomation({
+      db: env.DB,
+      now: new Date(controller.scheduledTime),
+      allowPlayByPlay: true
+    }));
   }
 };
 

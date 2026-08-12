@@ -16,6 +16,18 @@ All scheduled timestamps are evaluated in `America/Los_Angeles`; use an aware sc
 | Credit meter | Daily | `credit-meter` |
 | Digest | After settlement | `weekly-digest` |
 
+## Built-in nflverse automation
+
+The deployed Worker has an idempotent `*/5 * * * *` trigger and the app sends the same refresh request when the private workspace opens.
+
+- Live schedules: checked every five minutes; unchanged ETags produce no data writes.
+- Schedule history: loaded on first run and revalidated after Tuesday 06:00 Pacific once the prior refresh is at least six days old.
+- Current-season play-by-play: checked once per Pacific calendar day between 01:00 and 05:00.
+- Historical play-by-play: missing seasons from the 2010 training boundary are filled newest-first, one season per trigger during the overnight window.
+- Storage: play rows are streamed from the compressed nflverse CSV and reduced to team-game feature rows before D1 publication.
+
+The importer stages validated rows before publication. A schema, row-count, HTTP, decompression, or parsing failure marks the dataset stale, creates an idempotent data alert, releases the import lease, and leaves the prior production rows untouched.
+
 ## Failure contract
 
 1. Start or reuse the deterministic pipeline key.

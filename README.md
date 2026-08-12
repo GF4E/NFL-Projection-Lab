@@ -42,6 +42,14 @@ Open `http://localhost:3000/sunday`.
 
 The deployed card and tracker use a private D1 database. Generated migrations live in `drizzle/`; runtime initialization and schema upgrades are idempotent.
 
+The same database now carries the automatic nflverse warehouse:
+
+- `nfl_games` stores validated schedules, finals, game-level closing lines, rest, roof/weather metadata, quarterbacks, and stadium fields from 2010 forward.
+- `nfl_team_game_features` stores streamed team-game aggregates for EPA, success rate, explosive rate, turnovers, pace, pass rate, expected pass rate, and PROE. Raw play-by-play is not copied into D1.
+- `nflverse_import_state` and `nflverse_import_alerts` retain source hashes, freshness, leases, row counts, failures, and the last successful snapshot.
+
+The Worker checks schedules every five minutes. Opening the private site also starts the same idempotent check. Between 1:00am and 5:00am Pacific it checks the current play-by-play season once per day and backfills one missing historical season per five-minute run, newest first. A failed validation never replaces the last good rows.
+
 ## Optional live-data setup
 
 1. Create a Supabase project.
@@ -74,6 +82,7 @@ Structural settings live in `config/structural.config.json`; era definitions and
 - Open-Meteo values must be valid for kickoff hour and are withheld for closed/fixed roofs.
 - A partial, stale, missing, or schema-invalid import aborts, creates an in-app alert, marks dependents stale, and preserves the last good values.
 - Finals come from nflverse, never The Odds API scores endpoint.
+- nflverse requires no API key. Schedule refreshes use the public `games.csv`; play-by-play uses the public compressed CSV release and is parsed as a stream.
 
 The actual published 2026 nflverse schedule was reduced to distinct kickoff windows in `config/2026-credit-simulation.json`. November is the busiest projected billing period at 408 credits, firing the alert while remaining under the 450 ceiling.
 

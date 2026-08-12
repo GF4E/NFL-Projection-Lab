@@ -54,5 +54,103 @@ export const liveLines = sqliteTable("live_lines", {
   index("idx_live_lines_captured_at").on(table.capturedAt)
 ]);
 
+export const nflverseImportState = sqliteTable("nflverse_import_state", {
+  dataset: text("dataset").primaryKey(),
+  freshness: text("freshness", { enum: ["current", "stale", "running", "unavailable"] }).notNull(),
+  sourceUrl: text("source_url"),
+  sourceTag: text("source_tag"),
+  sourceHash: text("source_hash"),
+  rowCount: integer("row_count").notNull().default(0),
+  lastCheckedAt: text("last_checked_at"),
+  lastSuccessAt: text("last_success_at"),
+  lastError: text("last_error"),
+  leaseExpiresAt: text("lease_expires_at")
+});
+
+export const nflverseImportAlerts = sqliteTable("nflverse_import_alerts", {
+  id: text("id").primaryKey(),
+  dataset: text("dataset").notNull(),
+  message: text("message").notNull(),
+  createdAt: text("created_at").notNull(),
+  resolvedAt: text("resolved_at")
+}, (table) => [
+  index("idx_nfl_alerts_unresolved").on(table.resolvedAt, table.createdAt)
+]);
+
+export const nflGames = sqliteTable("nfl_games", {
+  gameId: text("game_id").primaryKey(),
+  season: integer("season").notNull(),
+  seasonType: text("season_type").notNull(),
+  week: integer("week").notNull(),
+  gameDate: text("game_date").notNull(),
+  gameTime: text("game_time"),
+  weekday: text("weekday"),
+  awayTeam: text("away_team").notNull(),
+  awayScore: integer("away_score"),
+  homeTeam: text("home_team").notNull(),
+  homeScore: integer("home_score"),
+  location: text("location"),
+  result: real("result"),
+  total: real("total"),
+  overtime: integer("overtime", { mode: "boolean" }).notNull(),
+  awayRest: integer("away_rest"),
+  homeRest: integer("home_rest"),
+  awayMoneyline: integer("away_moneyline"),
+  homeMoneyline: integer("home_moneyline"),
+  spreadLine: real("spread_line"),
+  awaySpreadOdds: integer("away_spread_odds"),
+  homeSpreadOdds: integer("home_spread_odds"),
+  totalLine: real("total_line"),
+  underOdds: integer("under_odds"),
+  overOdds: integer("over_odds"),
+  divisionGame: integer("division_game", { mode: "boolean" }).notNull(),
+  roof: text("roof"),
+  surface: text("surface"),
+  temperature: real("temperature"),
+  wind: real("wind"),
+  awayQbId: text("away_qb_id"),
+  homeQbId: text("home_qb_id"),
+  awayQbName: text("away_qb_name"),
+  homeQbName: text("home_qb_name"),
+  awayCoach: text("away_coach"),
+  homeCoach: text("home_coach"),
+  referee: text("referee"),
+  stadiumId: text("stadium_id"),
+  stadium: text("stadium"),
+  sourceRowHash: text("source_row_hash").notNull(),
+  importedAt: text("imported_at").notNull()
+}, (table) => [
+  index("idx_nfl_games_season_week").on(table.season, table.seasonType, table.week),
+  index("idx_nfl_games_date").on(table.gameDate)
+]);
+
+export const nflTeamGameFeatures = sqliteTable("nfl_team_game_features", {
+  id: text("id").primaryKey(),
+  gameId: text("game_id").notNull(),
+  season: integer("season").notNull(),
+  seasonType: text("season_type").notNull(),
+  week: integer("week").notNull(),
+  gameDate: text("game_date").notNull(),
+  team: text("team").notNull(),
+  opponent: text("opponent").notNull(),
+  homeAway: text("home_away", { enum: ["home", "away"] }).notNull(),
+  plays: integer("plays").notNull(),
+  epaPerPlay: real("epa_per_play").notNull(),
+  successRate: real("success_rate").notNull(),
+  explosiveRate: real("explosive_rate").notNull(),
+  turnovers: integer("turnovers").notNull(),
+  turnoverRate: real("turnover_rate").notNull(),
+  secondsPerPlay: real("seconds_per_play"),
+  dropbacks: integer("dropbacks").notNull(),
+  passRate: real("pass_rate").notNull(),
+  expectedPassRate: real("expected_pass_rate"),
+  passRateOverExpectation: real("pass_rate_over_expectation"),
+  sourceHash: text("source_hash").notNull(),
+  importedAt: text("imported_at").notNull()
+}, (table) => [
+  index("idx_nfl_features_season_week").on(table.season, table.seasonType, table.week),
+  index("idx_nfl_features_team").on(table.team, table.season, table.week)
+]);
+
 export type PlayRow = typeof plays.$inferSelect;
 export type NewPlayRow = typeof plays.$inferInsert;

@@ -9,6 +9,7 @@ const { d1, r2 } = hostingConfig;
 const localBindingConfig = {
   main: "./worker/index.ts",
   compatibility_flags: ["nodejs_compat"],
+  triggers: { crons: ["*/5 * * * *"] },
   d1_databases: d1 ? [{ binding: d1, database_name: "projection-lab-d1", database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID }] : [],
   r2_buckets: r2 ? [{ binding: r2, bucket_name: "projection-lab-r2" }] : []
 };
