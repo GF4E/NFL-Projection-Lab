@@ -327,7 +327,7 @@ export function WeekOneBoard() {
                 })}
               </div>)}
               <div className="model-ribbon">
-                <span>MARKET <b>{homeSpread ? `${game.home} ${formatPoint(homeSpread.point)}` : "—"}</b></span>
+                <span>{projection?.marketSource === "nflverse_consensus" ? "CONSENSUS" : "MARKET"} <b>{homeSpread ? `${game.home} ${formatPoint(homeSpread.point)}` : projection ? `${game.home} ${formatPoint(projection.marketHomePoint)}` : "—"}</b></span>
                 <span>MODEL LINE <b>{projection ? `${game.home} ${formatPoint(projection.projectedHomePoint)}` : "—"}</b></span>
                 <span>MODEL HOME <b>{projection ? formatPercent(projection.shrunkHomeProbability) : "—"}</b></span>
                 <span>VIG <b>{vig.map((value) => value === null ? "—" : value.toFixed(1)).join(" / ")}%</b></span>

@@ -3,6 +3,9 @@ import {
   crossedKeyNumbers,
   fairAmericanFromProbability,
   isClassicWongPoint,
+  marginVersusConsensusResidual,
+  nflverseExpectedMarginToHomePoint,
+  normalizeNflverseTeam,
   type BaselineProjection,
   type DecisionBoardPayload,
   type TeamBaseline,
@@ -36,6 +39,13 @@ interface GameRow {
   home_team: string;
   result: number;
   spread_line: number;
+}
+
+interface CurrentScheduleRow {
+  game_id: string;
+  away_team: string;
+  home_team: string;
+  spread_line: number | null;
 }
 
 interface LineRow {
@@ -88,8 +98,9 @@ function teamProfiles(rows: FeatureRow[], strengths: Map<string, number>): Map<s
     Math.max(1, rows.reduce((sum, row) => sum + row.plays, 0));
   const aggregates = new Map<string, Aggregate>();
   for (const row of rows) {
-    const current = aggregates.get(row.team) ?? {
-      team: row.team, season: row.season, games: 0, plays: 0, epa: 0, success: 0,
+    const team = normalizeNflverseTeam(row.team);
+    const current = aggregates.get(team) ?? {
+      team, season: row.season, games: 0, plays: 0, epa: 0, success: 0,
       explosive: 0, turnovers: 0, pace: 0, pacePlays: 0, proe: 0, proePlays: 0
     };
     current.games += 1;
@@ -106,7 +117,7 @@ function teamProfiles(rows: FeatureRow[], strengths: Map<string, number>): Map<s
       current.proe += row.pass_rate_over_expectation * row.plays;
       current.proePlays += row.plays;
     }
-    aggregates.set(row.team, current);
+    aggregates.set(team, current);
   }
   const base = [...aggregates.values()].map((item) => ({
     team: item.team,
@@ -149,10 +160,12 @@ function strengthStates(games: GameRow[], latestSeason: number): Map<string, num
   const states = new Map<string, number>();
   for (const game of [...games].sort((left, right) => left.game_date.localeCompare(right.game_date) || left.week - right.week)) {
     const timeWeight = 0.5 ** ((latestSeason - game.season) / structuralConfig.model.decayHalfLifeSeasons);
-    const residual = game.result + game.spread_line;
+    const residual = marginVersusConsensusResidual(game.result, game.spread_line);
     const move = structuralConfig.model.strengthK * timeWeight * residual / 2;
-    states.set(game.home_team, (states.get(game.home_team) ?? 0) + move);
-    states.set(game.away_team, (states.get(game.away_team) ?? 0) - move);
+    const homeTeam = normalizeNflverseTeam(game.home_team);
+    const awayTeam = normalizeNflverseTeam(game.away_team);
+    states.set(homeTeam, (states.get(homeTeam) ?? 0) + move);
+    states.set(awayTeam, (states.get(awayTeam) ?? 0) - move);
   }
   return states;
 }
@@ -165,12 +178,14 @@ function rawLine(row: LineRow): Omit<LiveLine, "fairProbability" | "marketVigPer
 }
 
 export async function buildDecisionBoard(db: D1Database = getD1()): Promise<DecisionBoardPayload> {
-  const [seasonResult, lineResult, gameResult] = await Promise.all([
+  const [seasonResult, lineResult, gameResult, currentScheduleResult] = await Promise.all([
     db.prepare("SELECT MAX(season) AS season FROM nfl_team_game_features WHERE season <= 2025").first<{ season: number | null }>(),
     db.prepare("SELECT * FROM live_lines ORDER BY game_id, book, market, side").all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line
       FROM nfl_games WHERE season BETWEEN 2010 AND 2025 AND result IS NOT NULL AND spread_line IS NOT NULL
-      ORDER BY game_date, game_id`).all<GameRow>()
+      ORDER BY game_date, game_id`).all<GameRow>(),
+    db.prepare(`SELECT game_id, away_team, home_team, spread_line FROM nfl_games
+      WHERE season = 2026 AND season_type = 'REG' AND week = 1`).all<CurrentScheduleRow>()
   ]);
   const basisSeason = seasonResult?.season ?? null;
   const featureRows = basisSeason === null
@@ -181,8 +196,8 @@ export async function buildDecisionBoard(db: D1Database = getD1()): Promise<Deci
   const strengths = basisSeason === null ? new Map<string, number>() : strengthStates(gameResult.results.filter((row) => row.season >= basisSeason - 2), basisSeason);
   const profiles = teamProfiles(featureRows, strengths);
   const historicalRows: HistoricalMarginRow[] = gameResult.results.flatMap((row) => [
-    { gameId: `${row.game_id}:home`, season: row.season, consensusSpread: row.spread_line, actualMargin: row.result },
-    { gameId: `${row.game_id}:away`, season: row.season, consensusSpread: -row.spread_line, actualMargin: -row.result }
+    { gameId: `${row.game_id}:home`, season: row.season, consensusSpread: nflverseExpectedMarginToHomePoint(row.spread_line), actualMargin: row.result },
+    { gameId: `${row.game_id}:away`, season: row.season, consensusSpread: row.spread_line, actualMargin: -row.result }
   ]);
   const artifact = historicalRows.length ? buildDiscreteMarginArtifact(historicalRows, {
     latestCompletedSeason: 2025,
@@ -195,24 +210,40 @@ export async function buildDecisionBoard(db: D1Database = getD1()): Promise<Deci
   const games = weekOneMatchups.map((game) => {
     const gameLines = lines.filter((line) => line.gameId === game.id);
     const homeSpreads = gameLines.filter((line) => line.market === "spread" && line.side === game.home && line.point !== null);
-    const consensusHomePoint = homeSpreads.length ? homeSpreads.reduce((sum, line) => sum + (line.point ?? 0), 0) / homeSpreads.length : null;
+    const schedule = currentScheduleResult.results.find((row) => normalizeNflverseTeam(row.away_team) === game.away && normalizeNflverseTeam(row.home_team) === game.home);
+    const scheduleHomePoint = schedule?.spread_line === null || schedule?.spread_line === undefined
+      ? null
+      : nflverseExpectedMarginToHomePoint(schedule.spread_line);
+    const consensusHomePoint = homeSpreads.length
+      ? homeSpreads.reduce((sum, line) => sum + (line.point ?? 0), 0) / homeSpreads.length
+      : scheduleHomePoint;
     const strengthDelta = (strengths.get(game.home) ?? 0) - (strengths.get(game.away) ?? 0);
-    const projections: BaselineProjection[] = artifact && consensusHomePoint !== null ? homeSpreads.flatMap((line) => {
-      if (line.fairProbability === null || line.point === null) return [];
-      const projectedHomePoint = roundHalf(line.point - strengthDelta);
-      const translated = translateFairProbability(artifact, consensusHomePoint, projectedHomePoint, line.point, 0.5);
+    type ProjectionAnchor = { book: "betmgm" | "caesars"; point: number; fairProbability: number; marketSource: BaselineProjection["marketSource"] };
+    const projectionAnchors = (["betmgm", "caesars"] as const).flatMap<ProjectionAnchor>((book) => {
+      const line = homeSpreads.find((candidate) => candidate.book === book);
+      if (line?.point !== null && line?.fairProbability !== null && line?.fairProbability !== undefined) {
+        return [{ book, point: line.point, fairProbability: line.fairProbability, marketSource: "book" as const }];
+      }
+      return scheduleHomePoint === null
+        ? []
+        : [{ book, point: scheduleHomePoint, fairProbability: 0.5, marketSource: "nflverse_consensus" as const }];
+    });
+    const projections: BaselineProjection[] = artifact && consensusHomePoint !== null ? projectionAnchors.map((anchor) => {
+      const projectedHomePoint = roundHalf(anchor.point - strengthDelta);
+      const translated = translateFairProbability(artifact, consensusHomePoint, projectedHomePoint, anchor.point, 0.5);
       const modelProbability = translated.probability;
-      return [{
+      return {
         gameId: game.id,
-        book: line.book,
+        book: anchor.book,
         homeTeam: game.home,
-        marketHomePoint: line.point,
+        marketHomePoint: anchor.point,
         projectedHomePoint,
         homeCoverProbability: modelProbability,
-        shrunkHomeProbability: modelProbability === null ? null : shrinkProbability(modelProbability, line.fairProbability, structuralConfig.model.shrinkageWeight),
-        marketHomeProbability: line.fairProbability,
+        shrunkHomeProbability: modelProbability === null ? null : shrinkProbability(modelProbability, anchor.fairProbability, structuralConfig.model.shrinkageWeight),
+        marketHomeProbability: anchor.fairProbability,
+        marketSource: anchor.marketSource,
         translationWarning: translated.warning
-      }];
+      };
     }) : [];
     const teasers: TeaserCandidate[] = artifact ? gameLines.filter((line) => line.market === "spread" && line.point !== null && line.fairProbability !== null).map((line) => {
       const sideLines = gameLines.filter((candidate) => candidate.market === "spread" && candidate.side === line.side && candidate.point !== null);

@@ -24,7 +24,7 @@ import { correctSettlement, gradePick, profitForResult } from "@/domain/settleme
 import { fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
 import { estimatedEvFromEdge, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
-import { crossedKeyNumbers, isClassicWongPoint, scanMarketConfirmedProps, type RawPropQuote } from "@/domain/decision-board";
+import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, scanMarketConfirmedProps, type RawPropQuote } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
@@ -318,5 +318,13 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(nav).not.toContain("Team room");
     expect(readFileSync("src/app/(dashboard)/model/page.tsx", "utf8")).toContain('redirect("/sunday")');
     expect(readFileSync("src/app/(dashboard)/team/page.tsx", "utf8")).toContain('redirect("/sunday")');
+  });
+
+  it("26. converts nflverse expected home margin into the sportsbook point without reversing residuals", () => {
+    expect(nflverseExpectedMarginToHomePoint(3.5)).toBe(-3.5);
+    expect(nflverseExpectedMarginToHomePoint(-2.5)).toBe(2.5);
+    expect(marginVersusConsensusResidual(8, 3)).toBe(5);
+    expect(marginVersusConsensusResidual(-4, -2.5)).toBe(-1.5);
+    expect(normalizeNflverseTeam("LA")).toBe("LAR");
   });
 });

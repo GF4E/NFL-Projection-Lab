@@ -39,6 +39,7 @@ export interface BaselineProjection {
   homeCoverProbability: number | null;
   shrunkHomeProbability: number | null;
   marketHomeProbability: number;
+  marketSource: "book" | "nflverse_consensus";
   translationWarning: "none" | "interpolated" | "extrapolated" | "unsupported";
 }
 
@@ -210,4 +211,16 @@ export function crossedKeyNumbers(fromPoint: number, toPoint: number, keys = [3,
   const low = Math.min(fromPoint, toPoint);
   const high = Math.max(fromPoint, toPoint);
   return keys.filter((key) => (low < key && high > key) || (low < -key && high > -key));
+}
+
+export function nflverseExpectedMarginToHomePoint(expectedHomeMargin: number): number {
+  return -expectedHomeMargin;
+}
+
+export function marginVersusConsensusResidual(actualHomeMargin: number, expectedHomeMargin: number): number {
+  return actualHomeMargin - expectedHomeMargin;
+}
+
+export function normalizeNflverseTeam(team: string): string {
+  return team === "LA" ? "LAR" : team;
 }
