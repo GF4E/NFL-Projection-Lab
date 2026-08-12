@@ -7,6 +7,8 @@ import { buildDecisionBoard } from "../src/server/decision-board";
 import { getPlayerPropBoard, refreshPlayerPropBoard } from "../src/server/player-props";
 import { listOddsAutomationRuns, runScheduledOddsAutomation } from "../src/server/odds-automation";
 import { weeklySlate } from "../src/server/weekly-slate";
+import { runOfficialInjuryAutomation } from "../src/server/official-injuries/automation";
+import { listOfficialInjuryImportStates } from "../src/server/official-injuries/store";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -67,8 +69,9 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
   try {
     if (request.method === "POST") {
       const result = await runNflverseAutomation({ db: env.DB, allowPlayByPlay: true });
+      const injuries = await runOfficialInjuryAutomation({ db: env.DB });
       const settlement = await settleCompletedTeamPlays(env.DB);
-      return json({ result, settlement, states: await listNflverseImportStates(env.DB) });
+      return json({ result, injuries, settlement, states: await listNflverseImportStates(env.DB) });
     }
     return json({ states: await listNflverseImportStates(env.DB) });
   } catch (error) {
@@ -114,6 +117,10 @@ const worker = {
       if (request.method !== "GET") return json({ error: "Method not allowed" }, 405, { allow: "GET" });
       return json({ runs: await listOddsAutomationRuns(env.DB) });
     }
+    if (url.pathname === "/api/game-context") {
+      if (request.method !== "GET") return json({ error: "Method not allowed" }, 405, { allow: "GET" });
+      return json({ injuryImports: await listOfficialInjuryImportStates(env.DB) });
+    }
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
       return handleImageOptimization(request, {
@@ -139,6 +146,10 @@ const worker = {
       db: env.DB,
       apiKey: env.ODDS_API_KEY,
       now: new Date(controller.scheduledTime)
+    }));
+    ctx.waitUntil(runOfficialInjuryAutomation({
+      db: env.DB,
+      now: scheduledAt
     }));
   }
 };
