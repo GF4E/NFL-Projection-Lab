@@ -66,6 +66,8 @@ export interface DecisionBoardGame {
 
 export interface DecisionBoardPayload {
   generatedAt: string;
+  season: number;
+  week: number;
   basisSeason: number | null;
   artifactHash: string | null;
   games: DecisionBoardGame[];

@@ -7,7 +7,6 @@ import {
   type RawPropQuote
 } from "@/domain/decision-board";
 import { stableHash } from "@/domain/hash";
-import { weekOneMatchups } from "@/lib/week-one-data";
 import { getD1 } from "../../db";
 import {
   assertOddsCreditsAvailable,
@@ -15,6 +14,7 @@ import {
   ODDS_CREDIT_CEILING,
   recordOddsQuota
 } from "./odds-quota";
+import { seasonSchedule } from "./weekly-slate";
 
 const CACHE_MS = 15 * 60_000;
 
@@ -150,7 +150,7 @@ async function resolveEventId(input: {
   const cached = await input.db.prepare("SELECT source_event_id FROM live_lines WHERE game_id = ? LIMIT 1")
     .bind(input.gameId).first<{ source_event_id: string }>();
   if (cached?.source_event_id) return cached.source_event_id;
-  const matchup = weekOneMatchups.find((game) => game.id === input.gameId);
+  const matchup = (await seasonSchedule({ db: input.db })).find((game) => game.id === input.gameId);
   if (!matchup) return null;
   const query = new URLSearchParams({ apiKey: input.apiKey, dateFormat: "iso" });
   const response = await input.fetcher(`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/events?${query}`, { cache: "no-store" });

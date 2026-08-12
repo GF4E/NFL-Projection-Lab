@@ -13,11 +13,11 @@ export async function generateMetadata() {
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
   const image = `${protocol}://${host}/og.png`;
   const title = "NFL Projection Lab · Weekly Play Sheet";
-  const description = "A private Week 1 model-versus-market board with visible vig drag and a shared two-person card";
+  const description = "A private weekly model-versus-market board with visible vig drag and a shared two-person card";
   return {
     title,
     description,
-    openGraph: { title, description, type: "website", images: [{ url: image, width: 1731, height: 909, alt: "NFL Projection Lab Week 1 model-versus-market board" }] },
+    openGraph: { title, description, type: "website", images: [{ url: image, width: 1731, height: 909, alt: "NFL Projection Lab weekly model-versus-market board" }] },
     twitter: { card: "summary_large_image", title, description, images: [image] }
   };
 }

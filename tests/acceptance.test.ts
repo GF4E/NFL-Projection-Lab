@@ -29,6 +29,7 @@ import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
 import { inspectMainlineCompleteness, scheduledMainlineCandidates, scheduledPropCandidates, type ScheduledGame } from "@/domain/odds-schedule";
+import { boardGameId, chooseActiveWeek, easternScheduleTimeToIso, normalizeScheduleTeam } from "@/domain/weekly-slate";
 import type { BookEvaluation, JobState, PushDelivery, SettledPick } from "@/domain/types";
 import { artifact, forecast, history, metrics, pick, quote, settled } from "./fixtures";
 
@@ -345,5 +346,25 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const result = inspectMainlineCompleteness(partial, weekOneMatchups.map((game) => game.id));
     expect(result).toMatchObject({ complete: false, completeGames: 0, totalGames: 16 });
     expect(result.missingGameIds).toContain("ne-sea");
+  });
+
+  it("29. derives the active week and Pacific-ready kickoff from the nflverse schedule", () => {
+    const weeks = [{ week: 1, lastGameDate: "2026-09-14" }, { week: 2, lastGameDate: "2026-09-21" }];
+    expect(chooseActiveWeek(weeks, "2026-09-14")).toBe(1);
+    expect(chooseActiveWeek(weeks, "2026-09-15")).toBe(2);
+    expect(chooseActiveWeek(weeks, "2026-10-01")).toBe(2);
+    expect(easternScheduleTimeToIso("2026-09-09", "20:20")).toBe("2026-09-10T00:20:00.000Z");
+    expect(easternScheduleTimeToIso("2026-12-06", "13:00")).toBe("2026-12-06T18:00:00.000Z");
+    expect(normalizeScheduleTeam("LA")).toBe("LAR");
+    expect(boardGameId("LA", "SEA")).toBe("lar-sea");
+  });
+
+  it("30. keeps the automatic rollover and refresh plumbing behind the compact card", () => {
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(board).toContain('fetch("/api/weekly-slate")');
+    expect(board).toContain("slate.week");
+    expect(board).not.toContain("Refresh lines");
+    expect(board).not.toContain("weekOneMatchups");
+    expect(readFileSync("src/server/player-props.ts", "utf8")).toContain("seasonSchedule");
   });
 });

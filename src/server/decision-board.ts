@@ -15,7 +15,7 @@ import { buildDiscreteMarginArtifact, translateFairProbability } from "@/domain/
 import { shrinkProbability } from "@/domain/odds";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
 import type { HistoricalMarginRow } from "@/domain/types";
-import { weekOneMatchups } from "@/lib/week-one-data";
+import { weeklySlate } from "./weekly-slate";
 import { getD1 } from "../../db";
 
 interface FeatureRow {
@@ -39,13 +39,6 @@ interface GameRow {
   home_team: string;
   result: number;
   spread_line: number;
-}
-
-interface CurrentScheduleRow {
-  game_id: string;
-  away_team: string;
-  home_team: string;
-  spread_line: number | null;
 }
 
 interface LineRow {
@@ -103,6 +96,7 @@ function teamProfiles(rows: FeatureRow[], strengths: Map<string, number>): Map<s
       team, season: row.season, games: 0, plays: 0, epa: 0, success: 0,
       explosive: 0, turnovers: 0, pace: 0, pacePlays: 0, proe: 0, proePlays: 0
     };
+    current.season = Math.max(current.season, row.season);
     current.games += 1;
     current.plays += row.plays;
     current.epa += row.epa_per_play * row.plays;
@@ -177,25 +171,32 @@ function rawLine(row: LineRow): Omit<LiveLine, "fairProbability" | "marketVigPer
   };
 }
 
-export async function buildDecisionBoard(db: D1Database = getD1()): Promise<DecisionBoardPayload> {
-  const [seasonResult, lineResult, gameResult, currentScheduleResult] = await Promise.all([
-    db.prepare("SELECT MAX(season) AS season FROM nfl_team_game_features WHERE season <= 2025").first<{ season: number | null }>(),
+export async function buildDecisionBoard(
+  db: D1Database = getD1(),
+  options: { season?: number; week?: number; now?: Date } = {}
+): Promise<DecisionBoardPayload> {
+  const slate = await weeklySlate({ db, season: options.season, week: options.week, now: options.now });
+  const [lineResult, gameResult, featureResult] = await Promise.all([
     db.prepare("SELECT * FROM live_lines ORDER BY game_id, book, market, side").all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line
-      FROM nfl_games WHERE season BETWEEN 2010 AND 2025 AND result IS NOT NULL AND spread_line IS NOT NULL
-      ORDER BY game_date, game_id`).all<GameRow>(),
-    db.prepare(`SELECT game_id, away_team, home_team, spread_line FROM nfl_games
-      WHERE season = 2026 AND season_type = 'REG' AND week = 1`).all<CurrentScheduleRow>()
+      FROM nfl_games WHERE season BETWEEN 2010 AND ? AND result IS NOT NULL AND spread_line IS NOT NULL
+        AND (season < ? OR week < ?)
+      ORDER BY game_date, game_id`).bind(slate.season, slate.season, slate.week).all<GameRow>(),
+    db.prepare(`SELECT season, team, plays, epa_per_play, success_rate, explosive_rate,
+        turnover_rate, seconds_per_play, pass_rate_over_expectation FROM (
+          SELECT season, week, team, plays, epa_per_play, success_rate, explosive_rate,
+            turnover_rate, seconds_per_play, pass_rate_over_expectation,
+            ROW_NUMBER() OVER (PARTITION BY team ORDER BY season DESC, week DESC, game_date DESC) AS recency_rank
+          FROM nfl_team_game_features
+          WHERE season_type = 'REG' AND (season < ? OR (season = ? AND week < ?))
+        ) WHERE recency_rank <= 17
+        ORDER BY season DESC, week DESC`).bind(slate.season, slate.season, slate.week).all<FeatureRow>()
   ]);
-  const basisSeason = seasonResult?.season ?? null;
-  const featureRows = basisSeason === null
-    ? []
-    : (await db.prepare(`SELECT season, team, plays, epa_per_play, success_rate, explosive_rate,
-        turnover_rate, seconds_per_play, pass_rate_over_expectation
-        FROM nfl_team_game_features WHERE season = ? AND season_type = 'REG'`).bind(basisSeason).all<FeatureRow>()).results;
-  const strengths = basisSeason === null ? new Map<string, number>() : strengthStates(gameResult.results.filter((row) => row.season >= basisSeason - 2), basisSeason);
+  const featureRows = featureResult.results;
+  const basisSeason = featureRows.length ? Math.max(...featureRows.map((row) => row.season)) : null;
+  const strengths = basisSeason === null ? new Map<string, number>() : strengthStates(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season);
   const profiles = teamProfiles(featureRows, strengths);
-  const historicalRows: HistoricalMarginRow[] = gameResult.results.flatMap((row) => [
+  const historicalRows: HistoricalMarginRow[] = gameResult.results.filter((row) => row.season <= 2025).flatMap((row) => [
     { gameId: `${row.game_id}:home`, season: row.season, consensusSpread: nflverseExpectedMarginToHomePoint(row.spread_line), actualMargin: row.result },
     { gameId: `${row.game_id}:away`, season: row.season, consensusSpread: row.spread_line, actualMargin: -row.result }
   ]);
@@ -207,13 +208,10 @@ export async function buildDecisionBoard(db: D1Database = getD1()): Promise<Deci
     generatedAt: new Date().toISOString()
   }) : null;
   const lines = enrichWithPowerDevig(lineResult.results.map(rawLine));
-  const games = weekOneMatchups.map((game) => {
+  const games = slate.games.map((game) => {
     const gameLines = lines.filter((line) => line.gameId === game.id);
     const homeSpreads = gameLines.filter((line) => line.market === "spread" && line.side === game.home && line.point !== null);
-    const schedule = currentScheduleResult.results.find((row) => normalizeNflverseTeam(row.away_team) === game.away && normalizeNflverseTeam(row.home_team) === game.home);
-    const scheduleHomePoint = schedule?.spread_line === null || schedule?.spread_line === undefined
-      ? null
-      : nflverseExpectedMarginToHomePoint(schedule.spread_line);
+    const scheduleHomePoint = game.consensusHomePoint;
     const consensusHomePoint = homeSpreads.length
       ? homeSpreads.reduce((sum, line) => sum + (line.point ?? 0), 0) / homeSpreads.length
       : scheduleHomePoint;
@@ -272,6 +270,8 @@ export async function buildDecisionBoard(db: D1Database = getD1()): Promise<Deci
   });
   return {
     generatedAt: new Date().toISOString(),
+    season: slate.season,
+    week: slate.week,
     basisSeason,
     artifactHash: artifact?.artifactHash ?? null,
     games,

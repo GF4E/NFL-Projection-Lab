@@ -11,9 +11,9 @@ import type {
 import { analyzeSlipValue, decimalToAmerican, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
 import { americanToDecimal } from "@/domain/odds";
 import type { PickedBy, WeeklyPlay } from "@/domain/play-card";
-import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
+import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
+import { pickReasons } from "@/lib/week-one-data";
 
-const days = ["Wednesday", "Thursday", "Sunday", "Monday"] as const;
 const bookNames: Record<LineBookKey, string> = { betmgm: "BetMGM", caesars: "Caesars" };
 const preferredTeams = new Set(["SEA", "ATL"]);
 const teamColors: Record<string, string> = {
@@ -25,7 +25,7 @@ const teamColors: Record<string, string> = {
 
 type TimeZoneChoice = "PT" | "ET";
 type SlipMode = "straight" | "parlay" | "teaser";
-type LinesResponse = { lines?: LiveLine[]; configured?: boolean; caesarsRequiresPaidPlan?: boolean; error?: string; cached?: boolean };
+type LinesResponse = { lines?: LiveLine[]; configured?: boolean; season?: number; week?: number; caesarsRequiresPaidPlan?: boolean; error?: string; cached?: boolean };
 type DecisionResponse = DecisionBoardPayload & { error?: string };
 type SelectedLeg = ValueLeg & {
   id: string;
@@ -54,8 +54,8 @@ function propMarketTitle(market: PropCandidate["market"]): string {
   return "Receiving yards";
 }
 
-function formatKickoff(gameId: string, choice: TimeZoneChoice): string {
-  const date = new Date(weekOneKickoffs[gameId]);
+function formatKickoff(game: WeeklyMatchup, choice: TimeZoneChoice): string {
+  const date = new Date(game.kickoffAt);
   const formatted = new Intl.DateTimeFormat("en-US", {
     timeZone: choice === "PT" ? "America/Los_Angeles" : "America/New_York",
     month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
@@ -88,9 +88,9 @@ function snapshotAge(capturedAt: string): string {
 export function WeekOneBoard() {
   const [book, setBook] = useState<LineBookKey>("betmgm");
   const [timeZone, setTimeZone] = useState<TimeZoneChoice>("PT");
+  const [slate, setSlate] = useState<WeeklySlate | null>(null);
   const [lines, setLines] = useState<LiveLine[]>([]);
   const [configured, setConfigured] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
   const [slip, setSlip] = useState<SelectedLeg[]>([]);
   const [picker, setPicker] = useState<PickedBy>("gabe");
   const [slipMode, setSlipMode] = useState<SlipMode>("parlay");
@@ -103,6 +103,8 @@ export function WeekOneBoard() {
   const [propBoards, setPropBoards] = useState<Record<string, PlayerPropBoard>>({});
   const [propsLoading, setPropsLoading] = useState<string | null>(null);
   const [teaserPrice, setTeaserPrice] = useState(-120);
+  const matchups = useMemo(() => slate?.games ?? [], [slate]);
+  const days = useMemo(() => [...new Set(matchups.map((game) => game.day))], [matchups]);
   const slipValue = useMemo(() => slipMode === "teaser" ? null : analyzeSlipValue(slip), [slip, slipMode]);
   const latestCapture = useMemo(() => lines.reduce<string | null>((latest, line) => !latest || line.capturedAt > latest ? line.capturedAt : latest, null), [lines]);
   const teaserValue = useMemo(() => {
@@ -115,40 +117,26 @@ export function WeekOneBoard() {
 
   useEffect(() => {
     let active = true;
-    Promise.all([
-      fetch("/api/lines").then((response) => response.json() as Promise<LinesResponse>),
-      fetch("/api/plays?week=1").then((response) => response.json() as Promise<{ plays?: WeeklyPlay[] }>),
-      fetch("/api/decision-board").then((response) => response.json() as Promise<DecisionResponse>)
-    ]).then(([lineData, playData, decisionData]) => {
+    (async () => {
+      const slateResponse = await fetch("/api/weekly-slate");
+      const slateData = await slateResponse.json() as WeeklySlate & { error?: string };
+      if (!slateResponse.ok || slateData.error) throw new Error(slateData.error ?? "The weekly schedule is unavailable");
+      const query = `?week=${slateData.week}`;
+      const [lineData, playData, decisionData] = await Promise.all([
+        fetch(`/api/lines${query}`).then((response) => response.json() as Promise<LinesResponse>),
+        fetch(`/api/plays${query}`).then((response) => response.json() as Promise<{ plays?: WeeklyPlay[] }>),
+        fetch(`/api/decision-board${query}`).then((response) => response.json() as Promise<DecisionResponse>)
+      ]);
       if (!active) return;
+      setSlate(slateData);
       setLines(lineData.lines ?? []);
       setConfigured(Boolean(lineData.configured));
       setPlays(playData.plays ?? []);
       if (!decisionData.error) setIntelligence(decisionData);
       if (!lineData.configured) setMessage("Live prices need the Odds API key. The board will not invent them.");
-    }).catch(() => active && setMessage("The last good board could not be loaded."));
+    })().catch((error) => active && setMessage(error instanceof Error ? error.message : "The last good board could not be loaded."));
     return () => { active = false; };
   }, []);
-
-  async function refreshLines() {
-    setRefreshing(true);
-    setMessage("Refreshing BetMGM and Caesars…");
-    try {
-      const response = await fetch("/api/lines", { method: "POST" });
-      const data = await response.json() as LinesResponse;
-      if (!response.ok) throw new Error(data.error ?? "Could not refresh lines");
-      setLines(data.lines ?? []);
-      setConfigured(Boolean(data.configured));
-      const decisionResponse = await fetch("/api/decision-board");
-      const decisionData = await decisionResponse.json() as DecisionResponse;
-      if (decisionResponse.ok && !decisionData.error) setIntelligence(decisionData);
-      setMessage(data.cached ? "Current snapshot is already fresh." : "Live prices and the baseline were refreshed.");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not refresh lines");
-    } finally {
-      setRefreshing(false);
-    }
-  }
 
   async function toggleDecisionDesk(gameId: string) {
     const next = openGame === gameId ? null : gameId;
@@ -212,7 +200,7 @@ export function WeekOneBoard() {
   }
 
   async function saveSlip() {
-    if (!slip.length) return;
+    if (!slip.length || !slate) return;
     if (slipMode === "parlay" && slip.length < 2) {
       setMessage("A parlay needs at least two legs. Switch to Straights or add another line.");
       return;
@@ -225,7 +213,7 @@ export function WeekOneBoard() {
       setMessage("Teaser withheld: use two different games and an offered price that is at least break-even versus the empirical fair probability.");
       return;
     }
-    setMessage("Saving to the shared Week 1 card…");
+    setMessage(`Saving to the shared Week ${slate.week} card…`);
     const selectedReason = pickReasons.find((item) => item.value === reason) ?? pickReasons[0];
     const entries = slipMode === "straight" ? slip.map((leg) => ({
       gameId: leg.gameId,
@@ -237,7 +225,7 @@ export function WeekOneBoard() {
       modelEdgePp: (leg.edge ?? 0) * 100,
       statsCase: `${selectedReason.label}. ${leg.detail}.`
     })) : [{
-      gameId: "multi-week-1",
+      gameId: `multi-week-${slate.week}`,
       playType: slipMode,
       market: slipMode,
       title: `${slip.length}-leg ${bookNames[slip[0].book]} ${slipMode}`,
@@ -253,6 +241,7 @@ export function WeekOneBoard() {
           headers: { "content-type": "application/json" },
           body: JSON.stringify({
             ...entry,
+            week: slate.week,
             book: bookNames[slip[0].book], primaryReason: reason, pickedBy: picker, stakeDollars: stake,
             confidence: "play", footballCase: `${picker === "gabe" ? "Gabe" : "Jarrett"} selected this contract from the shared decision board.`, status: "card"
           })
@@ -271,11 +260,10 @@ export function WeekOneBoard() {
 
   return <div className={`sportsbook-board book-${book}`}>
     <header className="sportsbook-topline">
-      <div><span>2026 REGULAR SEASON</span><h1>Week 1</h1></div>
+      <div><span>{slate?.season ?? 2026} REGULAR SEASON</span><h1>Week {slate?.week ?? 1}</h1></div>
       <div className="board-controls">
         <div className="click-toggle" role="group" aria-label="Sportsbook">{(["betmgm", "caesars"] as const).map((value) => <button className={book === value ? "active" : ""} onClick={() => setBook(value)} key={value}>{bookNames[value]}</button>)}</div>
         <div className="click-toggle compact" role="group" aria-label="Time zone">{(["PT", "ET"] as const).map((value) => <button className={timeZone === value ? "active" : ""} onClick={() => setTimeZone(value)} key={value}>{value}</button>)}</div>
-        <button className="refresh-lines" onClick={refreshLines} disabled={refreshing}>{refreshing ? "Loading…" : "Refresh lines"}</button>
       </div>
     </header>
 
@@ -285,11 +273,11 @@ export function WeekOneBoard() {
     </div>
 
     <div className="sportsbook-layout">
-      <section className="event-board" aria-label="Week 1 game lines">
+      <section className="event-board" aria-label={`Week ${slate?.week ?? 1} game lines`}>
         <div className="market-column-head"><span>Matchup</span><span>Spread</span><span>Total</span><span>Money</span></div>
         {days.map((day) => <div className="event-day" key={day}>
-          <div className="event-day-label"><b>{day}</b><span>{weekOneMatchups.filter((game) => game.day === day).length} games</span></div>
-          {weekOneMatchups.filter((game) => game.day === day).map((game) => {
+          <div className="event-day-label"><b>{day}</b><span>{matchups.filter((game) => game.day === day).length} games</span></div>
+          {matchups.filter((game) => game.day === day).map((game) => {
             const bookLines = lines.filter((line) => line.gameId === game.id && line.book === book);
             const rowData = [{ team: game.away, totalSide: "Over" }, { team: game.home, totalSide: "Under" }] as const;
             const homeSpread = bookLines.find((line) => line.market === "spread" && line.side === game.home);
@@ -313,7 +301,7 @@ export function WeekOneBoard() {
             const preferenceConflict = Boolean(leanTeam && [game.away, game.home].some((team) => preferredTeams.has(team) && team !== leanTeam));
             const leanActionable = Boolean(leanLine && homeEdge !== null && Math.abs(homeEdge) >= 0.005 && (!preferenceConflict || Math.abs(homeEdge) >= 0.03));
             return <article className={`event-market ${deskOpen ? "desk-open" : ""}`} key={game.id}>
-              <div className="event-time"><b>{formatKickoff(game.id, timeZone)}</b><span>{game.network}</span></div>
+              <div className="event-time"><b>{formatKickoff(game, timeZone)}</b>{game.network && <span>{game.network}</span>}</div>
               {rowData.map((row) => <div className="team-line" key={row.team}>
                 <div className="team-code"><i style={{ background: teamColors[row.team] ?? "#53615b" }}>{row.team.slice(0, 1)}</i><b>{row.team}</b>{preferredTeams.has(row.team) && <em title="Preferred team">★</em>}</div>
                 {(["spread", "total", "moneyline"] as const).map((market) => {

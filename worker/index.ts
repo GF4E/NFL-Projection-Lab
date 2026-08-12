@@ -5,6 +5,7 @@ import { listNflverseImportStates } from "../src/server/nflverse/store";
 import { buildDecisionBoard } from "../src/server/decision-board";
 import { getPlayerPropBoard, refreshPlayerPropBoard } from "../src/server/player-props";
 import { listOddsAutomationRuns, runScheduledOddsAutomation } from "../src/server/odds-automation";
+import { weeklySlate } from "../src/server/weekly-slate";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -86,9 +87,22 @@ const worker = {
     }
     if (url.pathname === "/api/decision-board") {
       try {
-        return json(await buildDecisionBoard(env.DB));
+        const rawWeek = url.searchParams.get("week");
+        const week = rawWeek === null ? undefined : Number(rawWeek);
+        if (week !== undefined && (!Number.isInteger(week) || week < 1 || week > 18)) return json({ error: "week must be an integer from 1 through 18" }, 400);
+        return json(await buildDecisionBoard(env.DB, { week }));
       } catch (error) {
         return json({ error: error instanceof Error ? error.message : "Unable to build decision board" }, 503);
+      }
+    }
+    if (url.pathname === "/api/weekly-slate") {
+      try {
+        const rawWeek = url.searchParams.get("week");
+        const week = rawWeek === null ? undefined : Number(rawWeek);
+        if (week !== undefined && (!Number.isInteger(week) || week < 1 || week > 18)) return json({ error: "week must be an integer from 1 through 18" }, 400);
+        return json(await weeklySlate({ db: env.DB, week }));
+      } catch (error) {
+        return json({ error: error instanceof Error ? error.message : "Unable to load weekly schedule" }, 503);
       }
     }
     if (url.pathname === "/api/props") {

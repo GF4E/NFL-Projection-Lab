@@ -78,9 +78,13 @@ export async function ensureLiveLineStore(d1: D1Database = getD1()): Promise<voi
   await d1.prepare("PRAGMA optimize").run();
 }
 
-export async function listLiveLines(d1: D1Database = getD1()): Promise<LiveLine[]> {
+export async function listLiveLines(d1: D1Database = getD1(), gameIds?: readonly string[]): Promise<LiveLine[]> {
   await ensureLiveLineStore(d1);
-  const result = await d1.prepare("SELECT * FROM live_lines ORDER BY game_id, book, market, side").all<LiveLineRow>();
+  if (gameIds && !gameIds.length) return [];
+  const statement = gameIds
+    ? d1.prepare(`SELECT * FROM live_lines WHERE game_id IN (${gameIds.map(() => "?").join(", ")}) ORDER BY game_id, book, market, side`).bind(...gameIds)
+    : d1.prepare("SELECT * FROM live_lines ORDER BY game_id, book, market, side");
+  const result = await statement.all<LiveLineRow>();
   return enrichWithPowerDevig(result.results.map(mapRow));
 }
 
@@ -124,5 +128,5 @@ export async function replaceLiveLines(
       }
     }
   }
-  return listLiveLines(d1);
+  return listLiveLines(d1, [...new Set(lines.map((line) => line.gameId))]);
 }

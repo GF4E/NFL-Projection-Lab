@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { stableHash } from "@/domain/hash";
 import type { LineBookKey, LineMarketKey, LiveLine } from "@/domain/line-board";
+import type { WeeklyMatchup } from "@/domain/weekly-slate";
 import { weekOneMatchups } from "@/lib/week-one-data";
 
 type RawLiveLine = Omit<LiveLine, "fairProbability" | "marketVigPercent">;
@@ -31,7 +32,7 @@ const eventSchema = z.object({
 const bookKey = (key: "betmgm" | "williamhill_us"): LineBookKey => key === "betmgm" ? "betmgm" : "caesars";
 const marketKey = (key: "h2h" | "spreads" | "totals"): LineMarketKey => key === "h2h" ? "moneyline" : key === "spreads" ? "spread" : "total";
 
-export async function fetchWeekOneLiveOdds(apiKey: string, fetcher: typeof fetch = fetch): Promise<{
+export async function fetchLiveOddsForSlate(apiKey: string, matchups: readonly Pick<WeeklyMatchup, "id" | "home" | "away" | "homeName" | "awayName">[], fetcher: typeof fetch = fetch): Promise<{
   lines: RawLiveLine[];
   used: number;
   remaining: number;
@@ -57,7 +58,7 @@ export async function fetchWeekOneLiveOdds(apiKey: string, fetcher: typeof fetch
   const lines: RawLiveLine[] = [];
 
   for (const event of events) {
-    const matchup = weekOneMatchups.find((game) => game.homeName === event.home_team && game.awayName === event.away_team);
+    const matchup = matchups.find((game) => game.homeName === event.home_team && game.awayName === event.away_team);
     if (!matchup) continue;
     for (const bookmaker of event.bookmakers) {
       for (const market of bookmaker.markets) {
@@ -88,6 +89,16 @@ export async function fetchWeekOneLiveOdds(apiKey: string, fetcher: typeof fetch
       }
     }
   }
-  if (!lines.length) throw new Error("The provider returned no BetMGM or Caesars Week 1 lines yet");
+  if (!lines.length) throw new Error("The provider returned no BetMGM or Caesars lines for the active week");
   return { lines, used, remaining, lastCost, sourceHash };
+}
+
+export async function fetchWeekOneLiveOdds(apiKey: string, fetcher: typeof fetch = fetch) {
+  return fetchLiveOddsForSlate(apiKey, weekOneMatchups.map((game) => ({
+    id: game.id,
+    home: game.home,
+    away: game.away,
+    homeName: game.homeName,
+    awayName: game.awayName
+  })), fetcher);
 }

@@ -1,13 +1,13 @@
-import { weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import {
   inspectMainlineCompleteness,
-  scheduledMainlineCandidates as scheduledMainlineCandidatesForGames,
-  scheduledPropCandidates as scheduledPropCandidatesForGames,
+  scheduledMainlineCandidates,
+  scheduledPropCandidates,
   type MainlineValidationResult,
   type OddsAutomationJob,
   type ScheduledGame,
   type ScheduledOddsCandidate
 } from "@/domain/odds-schedule";
+import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
 import { getD1 } from "../../db";
 import { listLiveLines, replaceLiveLines } from "./live-line-store";
 import {
@@ -17,7 +17,8 @@ import {
   recordOddsQuota
 } from "./odds-quota";
 import { refreshPlayerPropBoard } from "./player-props";
-import { fetchWeekOneLiveOdds } from "./week-one-live-odds";
+import { fetchLiveOddsForSlate } from "./week-one-live-odds";
+import { seasonSchedule, weeklySlate } from "./weekly-slate";
 
 const MAINLINE_COST = 3;
 
@@ -63,32 +64,24 @@ async function ensureStore(db: D1Database): Promise<void> {
   await db.batch(schema.map((statement) => db.prepare(statement)));
 }
 
-const scheduledGames: ScheduledGame[] = weekOneMatchups.map((game) => ({
-  id: game.id,
-  away: game.away,
-  home: game.home,
-  kickoffAt: weekOneKickoffs[game.id]
-}));
-
-export function scheduledMainlineCandidates(now: Date): ScheduledOddsCandidate[] {
-  return scheduledMainlineCandidatesForGames(now, scheduledGames);
+export function inspectSlateMainlineCompleteness(
+  lines: Awaited<ReturnType<typeof fetchLiveOddsForSlate>>["lines"],
+  matchups: readonly Pick<WeeklyMatchup, "id">[]
+): MainlineValidationResult {
+  return inspectMainlineCompleteness(lines, matchups.map((game) => game.id));
 }
 
-export function scheduledPropCandidates(now: Date, trackedGameIds: ReadonlySet<string>): ScheduledOddsCandidate[] {
-  return scheduledPropCandidatesForGames(now, scheduledGames, trackedGameIds);
-}
-
-export function inspectWeekOneMainlineCompleteness(lines: Awaited<ReturnType<typeof fetchWeekOneLiveOdds>>["lines"]): MainlineValidationResult {
-  return inspectMainlineCompleteness(lines, weekOneMatchups.map((game) => game.id));
-}
-
-export function validateCompleteWeekOneMainlines(lines: Awaited<ReturnType<typeof fetchWeekOneLiveOdds>>["lines"]): void {
-  const result = inspectWeekOneMainlineCompleteness(lines);
+export function validateCompleteSlateMainlines(
+  lines: Awaited<ReturnType<typeof fetchLiveOddsForSlate>>["lines"],
+  matchups: readonly Pick<WeeklyMatchup, "id">[]
+): void {
+  const result = inspectSlateMainlineCompleteness(lines, matchups);
   if (!result.complete) throw new Error(`Provider board is partial (${result.completeGames}/${result.totalGames} games have spread, total and moneyline); last good prices preserved`);
 }
 
-export async function refreshCompleteWeekOneMainlines(input: {
+export async function refreshCompleteSlateMainlines(input: {
   apiKey: string;
+  matchups: readonly WeeklyMatchup[];
   db?: D1Database;
   fetcher?: typeof fetch;
   snapshotKey: string;
@@ -96,13 +89,29 @@ export async function refreshCompleteWeekOneMainlines(input: {
 }) {
   const db = input.db ?? getD1();
   await assertOddsCreditsAvailable(MAINLINE_COST, db);
-  const result = await fetchWeekOneLiveOdds(input.apiKey, input.fetcher ?? fetch);
+  const result = await fetchLiveOddsForSlate(input.apiKey, input.matchups, input.fetcher ?? fetch);
   await recordOddsQuota({ used: result.used, remaining: result.remaining, lastCost: result.lastCost }, db);
-  validateCompleteWeekOneMainlines(result.lines);
+  validateCompleteSlateMainlines(result.lines, input.matchups);
   return {
     lines: await replaceLiveLines(result.lines, { db, snapshotKey: input.snapshotKey, fetchedAt: input.fetchedAt }),
     quota: { used: result.used, remaining: result.remaining, lastCost: result.lastCost }
   };
+}
+
+function asScheduledGames(matchups: readonly WeeklyMatchup[]): ScheduledGame[] {
+  return matchups.map((game) => ({ id: game.id, away: game.away, home: game.home, kickoffAt: game.kickoffAt }));
+}
+
+async function targetSlateForCandidate(db: D1Database, now: Date, job: OddsAutomationJob): Promise<WeeklySlate> {
+  const current = await weeklySlate({ db, now });
+  if (job !== "open_sunday" && job !== "open_monday") return current;
+  const firstKickoff = Math.min(...current.games.map((game) => Date.parse(game.kickoffAt)));
+  if (now.getTime() < firstKickoff || current.week >= 18) return current;
+  try {
+    return await weeklySlate({ db, season: current.season, week: current.week + 1, now });
+  } catch {
+    return current;
+  }
 }
 
 async function trackedPropGameIds(db: D1Database): Promise<Set<string>> {
@@ -147,7 +156,8 @@ export async function runScheduledOddsAutomation(input: {
   const checkedAt = now.toISOString();
   await ensureStore(db);
   const tracked = await trackedPropGameIds(db);
-  const due = [...scheduledMainlineCandidates(now), ...scheduledPropCandidates(now, tracked)]
+  const schedule = asScheduledGames(await seasonSchedule({ db }));
+  const due = [...scheduledMainlineCandidates(now, schedule), ...scheduledPropCandidates(now, schedule, tracked)]
     .sort((left, right) => left.priority - right.priority);
   const summary: OddsAutomationSummary = { checkedAt, due: due.length, completed: 0, failed: 0, skipped: 0, results: [] };
   for (const candidate of due) {
@@ -170,7 +180,8 @@ export async function runScheduledOddsAutomation(input: {
         summary.completed += 1;
         summary.results.push({ key: candidate.key, status: "succeeded", message });
       } else {
-        const refreshed = await refreshCompleteWeekOneMainlines({ apiKey: input.apiKey, db, fetcher: input.fetcher, snapshotKey: candidate.key, fetchedAt: checkedAt });
+        const target = await targetSlateForCandidate(db, now, candidate.job);
+        const refreshed = await refreshCompleteSlateMainlines({ apiKey: input.apiKey, matchups: target.games, db, fetcher: input.fetcher, snapshotKey: candidate.key, fetchedAt: checkedAt });
         const message = `${refreshed.lines.length} complete mainline quotes published`;
         await finishRun(db, candidate.key, "succeeded", message);
         summary.completed += 1;
@@ -193,5 +204,6 @@ export async function listOddsAutomationRuns(db: D1Database = getD1()): Promise<
 }
 
 export async function currentAutomatedLines(db: D1Database = getD1()) {
-  return listLiveLines(db);
+  const slate = await weeklySlate({ db });
+  return listLiveLines(db, slate.games.map((game) => game.id));
 }
