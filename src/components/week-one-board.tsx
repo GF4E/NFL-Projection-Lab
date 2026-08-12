@@ -287,7 +287,8 @@ export function WeekOneBoard() {
       americanOdds: leg.americanPrice,
       modelEdgePp: (leg.edge ?? 0) * 100,
       estimatedEvPercent: legExpectedValuePercent(leg),
-      statsCase: `${selectedReason.label}. ${leg.detail}.`
+      statsCase: `${selectedReason.label}. ${leg.detail}.`,
+      contract: [{ gameId: leg.gameId, market: leg.market === "prop" ? "prop" as const : leg.market as "spread" | "total" | "moneyline", side: leg.side, point: leg.point, americanPrice: leg.americanPrice, selection: leg.selection }]
     })) : [{
       gameId: `multi-week-${slate.week}`,
       playType: slipMode,
@@ -297,7 +298,8 @@ export function WeekOneBoard() {
       americanOdds: slipMode === "teaser" ? teaserPrice : combinedAmerican(slip),
       modelEdgePp: 0,
       estimatedEvPercent: slipMode === "teaser" ? teaserValue?.evPercent ?? 0 : slipExpectedValuePercent(slip),
-      statsCase: `${selectedReason.label}. ${slipMode === "teaser" ? "Empirical teaser EV cleared the selected book price." : "Power-de-vigged independent-leg price check completed."}`
+      statsCase: `${selectedReason.label}. ${slipMode === "teaser" ? "Empirical teaser EV cleared the selected book price." : "Power-de-vigged independent-leg price check completed."}`,
+      contract: slip.map((leg) => ({ gameId: leg.gameId, market: leg.kind === "teaser" ? "teaser" as const : leg.market === "prop" ? "prop" as const : leg.market as "spread" | "total" | "moneyline", side: leg.side, point: leg.point, americanPrice: leg.americanPrice, selection: leg.selection }))
     }];
     try {
       const saved = await Promise.all(entries.map(async (entry) => {

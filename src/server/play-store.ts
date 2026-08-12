@@ -4,6 +4,7 @@ import type { PickedBy, WeeklyPlay } from "@/domain/play-card";
 type PlayDatabaseRow = {
   id: string;
   contract_key: string;
+  contract_json: string;
   gabe_approved: number;
   jarrett_approved: number;
   season: number;
@@ -36,6 +37,7 @@ const CREATE_PLAYS_SQL = `
   CREATE TABLE IF NOT EXISTS plays (
     id text PRIMARY KEY NOT NULL,
     contract_key text DEFAULT '' NOT NULL,
+    contract_json text DEFAULT '[]' NOT NULL,
     gabe_approved integer DEFAULT 0 NOT NULL,
     jarrett_approved integer DEFAULT 0 NOT NULL,
     season integer DEFAULT 2026 NOT NULL,
@@ -72,11 +74,20 @@ const CREATE_PLAYS_SQL = `
 
 const INSERT_PLAY_SQL = `
   INSERT OR IGNORE INTO plays (
-    id, contract_key, gabe_approved, jarrett_approved, season, week, game_id, play_type, market, primary_reason, picked_by, title, legs, book, american_odds, stake_cents,
+    id, contract_key, contract_json, gabe_approved, jarrett_approved, season, week, game_id, play_type, market, primary_reason, picked_by, title, legs, book, american_odds, stake_cents,
     model_edge_pp, estimated_ev_percent, confidence, stats_case, football_case,
     status, result, profit_cents, closing_clv_cents, created_by, created_at, updated_at
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
+
+function contractFor(row: PlayDatabaseRow): WeeklyPlay["contract"] {
+  try {
+    const parsed = JSON.parse(row.contract_json || "[]") as unknown;
+    return Array.isArray(parsed) ? parsed as WeeklyPlay["contract"] : [];
+  } catch {
+    return [];
+  }
+}
 
 function approvalsFor(row: PlayDatabaseRow): PickedBy[] {
   const approvals: PickedBy[] = [];
@@ -91,6 +102,7 @@ function mapRow(row: PlayDatabaseRow): WeeklyPlay {
   return {
     id: row.id,
     contractKey: row.contract_key,
+    contract: contractFor(row),
     approvals: approvalsFor(row),
     season: row.season,
     week: row.week,
@@ -119,8 +131,7 @@ function mapRow(row: PlayDatabaseRow): WeeklyPlay {
   };
 }
 
-export async function ensurePlayStore(): Promise<void> {
-  const d1 = getD1();
+export async function ensurePlayStore(d1: D1Database = getD1()): Promise<void> {
   await d1.prepare(CREATE_PLAYS_SQL).run();
   const columns = await d1.prepare("PRAGMA table_info(plays)").all<{ name: string }>();
   const names = new Set(columns.results.map((column) => column.name));
@@ -130,6 +141,7 @@ export async function ensurePlayStore(): Promise<void> {
   if (!names.has("primary_reason")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN primary_reason text DEFAULT 'other' NOT NULL"));
   if (!names.has("picked_by")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN picked_by text DEFAULT 'gabe' NOT NULL"));
   if (!names.has("contract_key")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN contract_key text DEFAULT '' NOT NULL"));
+  if (!names.has("contract_json")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN contract_json text DEFAULT '[]' NOT NULL"));
   if (!names.has("gabe_approved")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN gabe_approved integer DEFAULT 0 NOT NULL"));
   if (!names.has("jarrett_approved")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN jarrett_approved integer DEFAULT 0 NOT NULL"));
   if (upgrades.length) await d1.batch(upgrades);
@@ -168,7 +180,7 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
     return (await getPlay(play.id))!;
   }
   await getD1().prepare(INSERT_PLAY_SQL).bind(
-    play.id, play.contractKey ?? "", actor === "gabe" ? 1 : 0, actor === "jarrett" ? 1 : 0,
+    play.id, play.contractKey ?? "", JSON.stringify(play.contract ?? []), actor === "gabe" ? 1 : 0, actor === "jarrett" ? 1 : 0,
     play.season, play.week, play.gameId, play.playType, play.market, play.primaryReason, play.pickedBy, play.title, play.legs, play.book,
     play.americanOdds, play.stakeCents, play.modelEdgePp, play.estimatedEvPercent,
     play.confidence, play.statsCase, play.footballCase, "research", play.result,

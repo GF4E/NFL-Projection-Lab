@@ -2,6 +2,7 @@ import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } fr
 import handler from "vinext/server/app-router-entry";
 import { runNflverseAutomation } from "../src/server/nflverse/automation";
 import { listNflverseImportStates } from "../src/server/nflverse/store";
+import { settleCompletedTeamPlays } from "../src/server/automatic-settlement";
 import { buildDecisionBoard } from "../src/server/decision-board";
 import { getPlayerPropBoard, refreshPlayerPropBoard } from "../src/server/player-props";
 import { listOddsAutomationRuns, runScheduledOddsAutomation } from "../src/server/odds-automation";
@@ -66,7 +67,8 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
   try {
     if (request.method === "POST") {
       const result = await runNflverseAutomation({ db: env.DB, allowPlayByPlay: true });
-      return json({ result, states: await listNflverseImportStates(env.DB) });
+      const settlement = await settleCompletedTeamPlays(env.DB);
+      return json({ result, settlement, states: await listNflverseImportStates(env.DB) });
     }
     return json({ states: await listNflverseImportStates(env.DB) });
   } catch (error) {
@@ -125,11 +127,14 @@ const worker = {
     return handler.fetch(request, env, ctx);
   },
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    ctx.waitUntil(runNflverseAutomation({
-      db: env.DB,
-      now: new Date(controller.scheduledTime),
-      allowPlayByPlay: true
-    }));
+    const scheduledAt = new Date(controller.scheduledTime);
+    ctx.waitUntil(
+      runNflverseAutomation({
+        db: env.DB,
+        now: scheduledAt,
+        allowPlayByPlay: true
+      }).then(() => settleCompletedTeamPlays(env.DB, scheduledAt))
+    );
     ctx.waitUntil(runScheduledOddsAutomation({
       db: env.DB,
       apiKey: env.ODDS_API_KEY,

@@ -4,6 +4,7 @@ import { check, index, integer, primaryKey, real, sqliteTable, text } from "driz
 export const plays = sqliteTable("plays", {
   id: text("id").primaryKey(),
   contractKey: text("contract_key").notNull().default(""),
+  contractJson: text("contract_json").notNull().default("[]"),
   gabeApproved: integer("gabe_approved").notNull().default(0),
   jarrettApproved: integer("jarrett_approved").notNull().default(0),
   season: integer("season").notNull().default(2026),
@@ -38,6 +39,16 @@ export const plays = sqliteTable("plays", {
   check("plays_status_check", sql`${table.status} in ('research', 'card', 'placed', 'settled', 'passed')`),
   check("plays_result_check", sql`${table.result} in ('pending', 'win', 'loss', 'push', 'void')`),
   check("plays_stake_check", sql`${table.stakeCents} >= 1250`)
+]);
+
+export const playSettlementAudit = sqliteTable("play_settlement_audit", {
+  playId: text("play_id").notNull(),
+  finalHash: text("final_hash").notNull(),
+  result: text("result", { enum: ["win", "loss", "push"] }).notNull(),
+  settledAt: text("settled_at").notNull(),
+  source: text("source").notNull()
+}, (table) => [
+  primaryKey({ columns: [table.playId, table.finalHash] })
 ]);
 
 export const liveLines = sqliteTable("live_lines", {

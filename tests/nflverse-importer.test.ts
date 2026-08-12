@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { nflSeasonForDate, shouldRetryUncompressedPbp } from "@/server/nflverse/automation";
 import { parseCsvStream, textStream } from "@/server/nflverse/csv";
 import { aggregatePbpCsv, parseScheduleCsv } from "@/server/nflverse/transform";
+import { gradeStoredLeg } from "@/domain/settlement";
 
 const scheduleHeader = [
   "game_id", "season", "game_type", "week", "gameday", "weekday", "gametime",
@@ -95,5 +96,38 @@ describe("automatic nflverse importer", () => {
     expect(readFileSync("worker/index.ts", "utf8")).toContain("async scheduled");
     expect(readFileSync("src/app/layout.tsx", "utf8")).toContain("@fontsource/roboto/900.css");
     expect(readFileSync("src/app/globals.css", "utf8")).toContain('--display: "Roboto"');
+  });
+
+  it("automatically grades supported team-card contracts from nflverse finals", () => {
+    const final = {
+      gameId: "atl-pit",
+      awayTeam: "ATL",
+      homeTeam: "PIT",
+      awayScore: 24,
+      homeScore: 20,
+      sourceHash: "official-final"
+    };
+    const leg = (market: "spread" | "total" | "moneyline" | "prop" | "teaser", side: string, point: number | null) => ({
+      gameId: final.gameId,
+      market,
+      side,
+      point,
+      americanPrice: -110,
+      selection: `${side} ${point ?? "ML"}`
+    });
+
+    expect(gradeStoredLeg(leg("spread", "ATL", 3.5), final)).toBe("win");
+    expect(gradeStoredLeg(leg("spread", "PIT", -3.5), final)).toBe("loss");
+    expect(gradeStoredLeg(leg("total", "Over", 41.5), final)).toBe("win");
+    expect(gradeStoredLeg(leg("total", "Under", 44), final)).toBe("push");
+    expect(gradeStoredLeg(leg("moneyline", "ATL", null), final)).toBe("win");
+    expect(gradeStoredLeg(leg("teaser", "ATL", 7.5), final)).toBe("win");
+    expect(gradeStoredLeg(leg("prop", "Player Over", 55.5), final)).toBeNull();
+
+    const worker = readFileSync("worker/index.ts", "utf8");
+    const settlement = readFileSync("src/server/automatic-settlement.ts", "utf8");
+    expect(worker).toContain(".then(() => settleCompletedTeamPlays");
+    expect(settlement).toContain("play_settlement_audit");
+    expect(settlement).not.toContain("closing_clv_cents =");
   });
 });

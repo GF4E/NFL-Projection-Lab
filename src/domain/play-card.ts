@@ -4,9 +4,19 @@ export type PlayStatus = "research" | "card" | "placed" | "settled" | "passed";
 export type PlayResult = "pending" | "win" | "loss" | "push" | "void";
 export type PickedBy = "gabe" | "jarrett";
 
+export type StoredPlayLeg = {
+  gameId: string;
+  market: "spread" | "total" | "moneyline" | "prop" | "teaser";
+  side: string;
+  point: number | null;
+  americanPrice: number;
+  selection: string;
+};
+
 export type WeeklyPlay = {
   id: string;
   contractKey?: string;
+  contract?: StoredPlayLeg[];
   approvals?: PickedBy[];
   season: number;
   week: number;

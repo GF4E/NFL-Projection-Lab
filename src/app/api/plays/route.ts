@@ -20,6 +20,14 @@ const createPlaySchema = z.object({
   stakeDollars: z.number().min(12.5).max(200),
   modelEdgePp: z.number().min(-10).max(20),
   estimatedEvPercent: z.number().min(-100).max(100).optional(),
+  contract: z.array(z.object({
+    gameId: z.string().trim().min(3).max(40),
+    market: z.enum(["spread", "total", "moneyline", "prop", "teaser"]),
+    side: z.string().trim().min(2).max(80),
+    point: z.number().nullable(),
+    americanPrice: z.number().int().refine((value) => value <= -100 || value >= 100),
+    selection: z.string().trim().min(2).max(120)
+  })).min(1).max(12),
   confidence: z.enum(["watch", "lean", "play", "best"]),
   statsCase: z.string().trim().min(8).max(500),
   footballCase: z.string().trim().min(3).max(500),
@@ -53,12 +61,13 @@ export async function POST(request: Request) {
       americanOdds: input.americanOdds, stakeDollars: input.stakeDollars,
       primaryReason: input.primaryReason, modelEdgePp: input.modelEdgePp,
       estimatedEvPercent: input.estimatedEvPercent ?? null,
-      statsCase: input.statsCase, footballCase: input.footballCase
+      contract: input.contract, statsCase: input.statsCase, footballCase: input.footballCase
     });
     const play: WeeklyPlay = {
       id: `team:${contractKey}`,
       contractKey,
       approvals: [input.pickedBy],
+      contract: input.contract,
       season: 2026,
       week: input.week,
       gameId: input.gameId,
