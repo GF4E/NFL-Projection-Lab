@@ -1,6 +1,6 @@
 import { americanToDecimal, americanToImplied, impliedToAmerican, powerDevig } from "./odds";
 
-export type LineBookKey = "betmgm" | "caesars";
+export type LineBookKey = "betmgm" | "fanduel";
 export type LineMarketKey = "spread" | "total" | "moneyline";
 
 export type LiveLine = {

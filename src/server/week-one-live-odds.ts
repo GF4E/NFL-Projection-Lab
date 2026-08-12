@@ -17,7 +17,7 @@ const marketSchema = z.object({
   outcomes: z.array(outcomeSchema).min(2)
 });
 const bookmakerSchema = z.object({
-  key: z.enum(["betmgm", "williamhill_us"]),
+  key: z.enum(["betmgm", "fanduel"]),
   last_update: z.string(),
   markets: z.array(marketSchema)
 });
@@ -29,7 +29,7 @@ const eventSchema = z.object({
   bookmakers: z.array(bookmakerSchema)
 });
 
-const bookKey = (key: "betmgm" | "williamhill_us"): LineBookKey => key === "betmgm" ? "betmgm" : "caesars";
+const bookKey = (key: "betmgm" | "fanduel"): LineBookKey => key;
 const marketKey = (key: "h2h" | "spreads" | "totals"): LineMarketKey => key === "h2h" ? "moneyline" : key === "spreads" ? "spread" : "total";
 
 export async function fetchLiveOddsForSlate(apiKey: string, matchups: readonly Pick<WeeklyMatchup, "id" | "home" | "away" | "homeName" | "awayName">[], fetcher: typeof fetch = fetch): Promise<{
@@ -44,7 +44,7 @@ export async function fetchLiveOddsForSlate(apiKey: string, matchups: readonly P
     regions: "us",
     markets: "h2h,spreads,totals",
     oddsFormat: "american",
-    bookmakers: "betmgm,williamhill_us",
+    bookmakers: "betmgm,fanduel",
     dateFormat: "iso"
   });
   const response = await fetcher(`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?${query}`, { cache: "no-store" });
@@ -89,7 +89,7 @@ export async function fetchLiveOddsForSlate(apiKey: string, matchups: readonly P
       }
     }
   }
-  if (!lines.length) throw new Error("The provider returned no BetMGM or Caesars lines for the active week");
+  if (!lines.length) throw new Error("The provider returned no BetMGM or FanDuel lines for the active week");
   return { lines, used, remaining, lastCost, sourceHash };
 }
 

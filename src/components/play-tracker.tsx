@@ -15,7 +15,7 @@ function odds(value: number): string { return value > 0 ? `+${value}` : `${value
 export function PlayTracker() {
   const [plays, setPlays] = useState<WeeklyPlay[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
-  const [message, setMessage] = useState("Card entries flow here when marked placed.");
+  const [message, setMessage] = useState("Every 2026 card entry rolls into this season ledger.");
   const summary = useMemo(() => trackerSummary(plays), [plays]);
   const rows = plays.filter((play) => {
     if (filter === "open") return play.status !== "settled" && play.status !== "passed";
@@ -25,7 +25,7 @@ export function PlayTracker() {
 
   useEffect(() => {
     let active = true;
-    fetch("/api/plays?week=1")
+    fetch("/api/plays")
       .then(async (response) => {
         const data = await response.json() as { plays?: WeeklyPlay[]; error?: string };
         if (!response.ok) throw new Error(data.error ?? "Unable to load tracked plays");
@@ -41,7 +41,7 @@ export function PlayTracker() {
       const response = await fetch(`/api/plays/${play.id}`, {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ status, result, closingClvCents: result === "pending" ? null : 2.4 })
+        body: JSON.stringify({ status, result, closingClvCents: null })
       });
       const data = await response.json() as { play?: WeeklyPlay; error?: string };
       if (!response.ok || !data.play) throw new Error(data.error ?? "Update failed");
@@ -57,10 +57,10 @@ export function PlayTracker() {
       <article><span>Settled</span><strong>{summary.winCount}–{summary.lossCount}–{summary.pushCount}</strong><small>{summary.settledCount} graded plays</small></article>
       <article><span>Profit</span><strong className={summary.profitCents >= 0 ? "positive" : "negative"}>{dollars(summary.profitCents)}</strong><small>{(summary.profitCents / 2500).toFixed(1)} units</small></article>
       <article><span>ROI</span><strong>{summary.roiPercent.toFixed(1)}%</strong><small>On {dollars(summary.stakedCents).replace("+", "")} settled risk</small></article>
-      <article><span>Average CLV</span><strong>{summary.averageClvCents >= 0 ? "+" : ""}{summary.averageClvCents.toFixed(1)}¢</strong><small>Primary performance check</small></article>
+      <article><span>Average CLV</span><strong>{summary.clvCount ? `${summary.averageClvCents >= 0 ? "+" : ""}${summary.averageClvCents.toFixed(1)}¢` : "—"}</strong><small>{summary.clvCount ? `${summary.clvCount} verified closes` : "No verified closes yet"}</small></article>
     </section>
     <section className="tracker-panel panel-lite">
-      <div className="tracker-toolbar"><div><span className="kicker">BET LEDGER</span><h2>Every play, separate from the research</h2></div><div className="filter-tabs" role="group" aria-label="Filter tracked plays">{(["all", "open", "settled"] as const).map((value) => <button className={filter === value ? "active" : ""} onClick={() => setFilter(value)} key={value}>{value}</button>)}</div></div>
+      <div className="tracker-toolbar"><div><span className="kicker">2026 LEDGER</span><h2>Every week, one running record</h2></div><div className="filter-tabs" role="group" aria-label="Filter tracked plays">{(["all", "open", "settled"] as const).map((value) => <button className={filter === value ? "active" : ""} onClick={() => setFilter(value)} key={value}>{value}</button>)}</div></div>
       <p className="tracker-message" aria-live="polite">{message}</p>
       <div className="tracker-table">
         <div className="tracker-head"><span>Play</span><span>Type</span><span>Price</span><span>Stake</span><span>Edge</span><span>State / result</span></div>
@@ -70,7 +70,7 @@ export function PlayTracker() {
           <span>{odds(play.americanOdds)}</span>
           <span><b>${(play.stakeCents / 100).toFixed(0)}</b><small>{stakeToUnits(play.stakeCents)}u</small></span>
           <span className={play.modelEdgePp > 0 ? "positive" : ""}>{play.modelEdgePp ? `${play.modelEdgePp > 0 ? "+" : ""}${play.modelEdgePp.toFixed(1)} pp` : "—"}</span>
-          <div className="result-cell">{play.status === "settled" ? <><b className={play.result === "win" ? "positive" : play.result === "loss" ? "negative" : ""}>{play.result}</b><small>{dollars(play.profitCents)} · {play.closingClvCents?.toFixed(1)}¢ CLV</small></> : play.status === "placed" ? <div className="grade-buttons"><button onClick={() => update(play, "settled", "win")}>W</button><button onClick={() => update(play, "settled", "loss")}>L</button><button onClick={() => update(play, "settled", "push")}>P</button></div> : <button className="track-action" onClick={() => update(play, "placed", "pending")}>Mark placed</button>}</div>
+          <div className="result-cell">{play.status === "settled" ? <><b className={play.result === "win" ? "positive" : play.result === "loss" ? "negative" : ""}>{play.result}</b><small>{dollars(play.profitCents)} · {play.closingClvCents === null ? "CLV pending" : `${play.closingClvCents.toFixed(1)}¢ CLV`}</small></> : play.status === "placed" ? <div className="grade-buttons"><button onClick={() => update(play, "settled", "win")}>W</button><button onClick={() => update(play, "settled", "loss")}>L</button><button onClick={() => update(play, "settled", "push")}>P</button></div> : <button className="track-action" onClick={() => update(play, "placed", "pending")}>Mark placed</button>}</div>
         </div>)}
       </div>
     </section>

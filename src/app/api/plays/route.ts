@@ -30,8 +30,12 @@ function requestAuthor(request: Request): string {
 
 export async function GET(request: Request) {
   try {
-    const week = Number(new URL(request.url).searchParams.get("week") ?? "1");
-    return NextResponse.json({ plays: await listPlays(Number.isFinite(week) ? week : 1) });
+    const rawWeek = new URL(request.url).searchParams.get("week");
+    const week = rawWeek === null ? undefined : Number(rawWeek);
+    if (week !== undefined && (!Number.isInteger(week) || week < 1 || week > 18)) {
+      return NextResponse.json({ error: "week must be an integer from 1 through 18" }, { status: 400 });
+    }
+    return NextResponse.json({ plays: await listPlays(week) });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load plays" }, { status: 503 });
   }

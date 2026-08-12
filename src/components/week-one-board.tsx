@@ -15,7 +15,7 @@ import type { PickedBy, WeeklyPlay } from "@/domain/play-card";
 import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
 import { pickReasons } from "@/lib/week-one-data";
 
-const bookNames: Record<LineBookKey, string> = { betmgm: "BetMGM", caesars: "Caesars" };
+const bookNames: Record<LineBookKey, string> = { betmgm: "BetMGM", fanduel: "FanDuel" };
 const preferredTeams = new Set(["SEA", "ATL"]);
 const teamColors: Record<string, string> = {
   ARI: "#97233f", ATL: "#a71930", BAL: "#241773", BUF: "#00338d", CAR: "#0085ca", CHI: "#0b162a", CIN: "#fb4f14", CLE: "#311d00",
@@ -26,7 +26,7 @@ const teamColors: Record<string, string> = {
 
 type TimeZoneChoice = "PT" | "ET";
 type SlipMode = "straight" | "parlay" | "teaser";
-type LinesResponse = { lines?: LiveLine[]; configured?: boolean; season?: number; week?: number; caesarsRequiresPaidPlan?: boolean; error?: string; cached?: boolean };
+type LinesResponse = { lines?: LiveLine[]; configured?: boolean; season?: number; week?: number; comparisonBooks?: LineBookKey[]; error?: string; cached?: boolean };
 type DecisionResponse = DecisionBoardPayload & { error?: string };
 type SelectedLeg = ValueLeg & {
   id: string;
@@ -299,14 +299,14 @@ export function WeekOneBoard() {
     <header className="sportsbook-topline">
       <div><span>{slate?.season ?? 2026} REGULAR SEASON</span><h1>Week {slate?.week ?? 1}</h1></div>
       <div className="board-controls">
-        <div className="click-toggle" role="group" aria-label="Sportsbook">{(["betmgm", "caesars"] as const).map((value) => <button className={book === value ? "active" : ""} onClick={() => setBook(value)} key={value}>{bookNames[value]}</button>)}</div>
+        <div className="click-toggle" role="group" aria-label="Sportsbook">{(["betmgm", "fanduel"] as const).map((value) => <button className={book === value ? "active" : ""} onClick={() => setBook(value)} key={value}>{bookNames[value]}</button>)}</div>
         <div className="click-toggle compact" role="group" aria-label="Time zone">{(["PT", "ET"] as const).map((value) => <button className={timeZone === value ? "active" : ""} onClick={() => setTimeZone(value)} key={value}>{value}</button>)}</div>
       </div>
     </header>
 
     <div className="line-status" data-ready={lines.length > 0}>
       <span><i />{lines.length ? `${bookNames[book]} snapshot loaded` : configured ? "Feed connected · load the first snapshot" : "Live odds key needed"}</span>
-      <small>{latestCapture ? `UPDATED ${new Date(latestCapture).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : book === "caesars" ? "CAESARS REQUIRES THE PAID FEED" : "BETMGM IS AVAILABLE ON THE FREE FEED"}{!configured && <> · <a href="https://the-odds-api.com/" target="_blank" rel="noreferrer">GET KEY ↗</a></>}</small>
+      <small>{latestCapture ? `UPDATED ${new Date(latestCapture).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : `${bookNames[book].toUpperCase()} IS CONNECTED THROUGH THE FREE US FEED`}{!configured && <> · <a href="https://the-odds-api.com/" target="_blank" rel="noreferrer">GET KEY ↗</a></>}</small>
     </div>
 
     <div className="sportsbook-layout">

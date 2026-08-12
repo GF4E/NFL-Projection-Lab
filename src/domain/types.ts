@@ -1,4 +1,4 @@
-export type BookKey = "betmgm" | "caesars" | "fanduel";
+export type BookKey = "betmgm" | "fanduel";
 export type MarketKey = "spread" | "total" | "moneyline";
 export type ExecutionStatus = "executed" | "paper";
 export type TeamPickStatus =

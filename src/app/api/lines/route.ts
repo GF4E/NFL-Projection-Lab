@@ -20,7 +20,7 @@ export async function GET(request: Request) {
       season: slate.season,
       week: slate.week,
       configured: configured(),
-      caesarsRequiresPaidPlan: true
+      comparisonBooks: ["betmgm", "fanduel"]
     });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load cached lines" }, { status: 503 });
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     const cached = await listLiveLines(undefined, slate.games.map((game) => game.id));
     const newest = Math.max(0, ...cached.map((line) => new Date(line.capturedAt).getTime()));
     if (Date.now() - newest < 60_000) {
-      return NextResponse.json({ lines: cached, configured: true, caesarsRequiresPaidPlan: true, cached: true });
+      return NextResponse.json({ lines: cached, configured: true, comparisonBooks: ["betmgm", "fanduel"], cached: true });
     }
     const fetchedAt = new Date().toISOString();
     const result = await refreshCompleteSlateMainlines({
@@ -51,7 +51,7 @@ export async function POST(request: Request) {
       season: slate.season,
       week: slate.week,
       configured: true,
-      caesarsRequiresPaidPlan: true,
+      comparisonBooks: ["betmgm", "fanduel"],
       quota: result.quota
     });
   } catch (error) {

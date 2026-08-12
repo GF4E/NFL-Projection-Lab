@@ -120,12 +120,19 @@ export async function ensurePlayStore(): Promise<void> {
   await d1.prepare("PRAGMA optimize").run();
 }
 
-export async function listPlays(week = 1): Promise<WeeklyPlay[]> {
+export async function listPlays(week?: number): Promise<WeeklyPlay[]> {
   await ensurePlayStore();
-  const result = await getD1().prepare(
-    "SELECT * FROM plays WHERE season = 2026 AND week = ? AND game_id <> '' ORDER BY created_at ASC"
-  ).bind(week).all<PlayDatabaseRow>();
+  const statement = week === undefined
+    ? getD1().prepare("SELECT * FROM plays WHERE season = 2026 AND game_id <> '' ORDER BY week, created_at ASC")
+    : getD1().prepare("SELECT * FROM plays WHERE season = 2026 AND week = ? AND game_id <> '' ORDER BY created_at ASC").bind(week);
+  const result = await statement.all<PlayDatabaseRow>();
   return result.results.map(mapRow);
+}
+
+export async function getPlay(id: string): Promise<WeeklyPlay | null> {
+  await ensurePlayStore();
+  const row = await getD1().prepare("SELECT * FROM plays WHERE id = ?").bind(id).first<PlayDatabaseRow>();
+  return row ? mapRow(row) : null;
 }
 
 export async function addPlay(play: WeeklyPlay): Promise<WeeklyPlay> {

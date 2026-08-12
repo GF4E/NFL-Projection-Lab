@@ -38,7 +38,7 @@ export interface TeamBaseline {
 
 export interface BaselineProjection {
   gameId: string;
-  book: "betmgm" | "caesars";
+  book: "betmgm" | "fanduel";
   homeTeam: string;
   marketHomePoint: number;
   projectedHomePoint: number;
@@ -51,7 +51,7 @@ export interface BaselineProjection {
 
 export interface TeaserCandidate {
   gameId: string;
-  book: "betmgm" | "caesars";
+  book: "betmgm" | "fanduel";
   team: string;
   opponent: string;
   originalPoint: number;
@@ -65,7 +65,7 @@ export interface TeaserCandidate {
 
 export interface TeaserPairCandidate {
   id: string;
-  book: "betmgm" | "caesars";
+  book: "betmgm" | "fanduel";
   legs: [TeaserCandidate, TeaserCandidate];
   offeredAmerican: number;
   fairProbability: number;
@@ -87,7 +87,7 @@ export interface LineMovementPoint {
 }
 
 export interface LineMovementSeries {
-  book: "betmgm" | "caesars";
+  book: "betmgm" | "fanduel";
   market: "spread";
   side: string;
   snapshots: LineMovementPoint[];
@@ -131,7 +131,7 @@ export interface RawPropQuote {
 export interface PropCandidate {
   id: string;
   gameId: string;
-  executionBook: "betmgm" | "caesars";
+  executionBook: "betmgm" | "fanduel";
   market: PropMarketKey;
   player: string;
   side: "Over" | "Under";
@@ -194,7 +194,7 @@ export function scanMarketConfirmedProps(
   const fair = deviggedQuotes(quotes);
   const candidates: PropCandidate[] = [];
   for (const quote of quotes) {
-    const executionBook = quote.book === "betmgm" ? "betmgm" : quote.book === "williamhill_us" ? "caesars" : null;
+    const executionBook = quote.book === "betmgm" ? "betmgm" : quote.book === "fanduel" ? "fanduel" : null;
     const executionFairProbability = fair.get(quote.id);
     if (!executionBook || executionFairProbability === undefined) continue;
     const references = quotes
@@ -235,7 +235,7 @@ export function scanMarketConfirmedProps(
       capturedAt: quote.capturedAt
     });
   }
-  return (["betmgm", "caesars"] as const).flatMap((book) => candidates
+  return (["betmgm", "fanduel"] as const).flatMap((book) => candidates
     .filter((candidate) => candidate.executionBook === book)
     .sort((left, right) => right.lowerBoundExpectedValue - left.lowerBoundExpectedValue || right.expectedValue - left.expectedValue)
     .slice(0, maximumPerBook));

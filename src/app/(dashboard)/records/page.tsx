@@ -3,8 +3,8 @@ import { PlayTracker } from "@/components/play-tracker";
 
 export default function RecordsPage() {
   return <div className="page tracker-page">
-    <PageHeader eyebrow="BET TRACKER" title="The record gets its own room.">
-      Research creates possibilities. Only plays that reach the card enter this ledger, with stake, result, profit and closing-line value kept together.
+    <PageHeader eyebrow="SEASON RECORD" title="2026 running total">
+      Every week rolls into one ledger. Profit, units, ROI and verified closing-line value stay together.
     </PageHeader>
     <PlayTracker />
   </div>;

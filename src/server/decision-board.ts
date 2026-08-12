@@ -362,8 +362,8 @@ export async function buildDecisionBoard(
       ? homeSpreads.reduce((sum, line) => sum + (line.point ?? 0), 0) / homeSpreads.length
       : scheduleHomePoint;
     const strengthDelta = (strengths.get(game.home) ?? 0) - (strengths.get(game.away) ?? 0);
-    type ProjectionAnchor = { book: "betmgm" | "caesars"; point: number; fairProbability: number; marketSource: BaselineProjection["marketSource"] };
-    const projectionAnchors = (["betmgm", "caesars"] as const).flatMap<ProjectionAnchor>((book) => {
+    type ProjectionAnchor = { book: "betmgm" | "fanduel"; point: number; fairProbability: number; marketSource: BaselineProjection["marketSource"] };
+    const projectionAnchors = (["betmgm", "fanduel"] as const).flatMap<ProjectionAnchor>((book) => {
       const line = homeSpreads.find((candidate) => candidate.book === book);
       if (line?.point !== null && line?.fairProbability !== null && line?.fairProbability !== undefined) {
         return [{ book, point: line.point, fairProbability: line.fairProbability, marketSource: "book" as const }];

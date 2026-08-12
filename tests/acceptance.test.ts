@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import creditConfig from "../config/2026-credit-simulation.json";
 import eraConfig from "../config/era.config.json";
+import { structuralConfig } from "@/domain/config";
 import {
   buildDiscreteMarginArtifact,
   translateFairProbability
@@ -50,7 +51,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
       translatedAmericanPrice: -108, powerExponent: 1.1, fairProbability: 0.51,
       shrunkProbability: 0.54, expectedValue: 0.03, edge: 0.03, uncertaintyInterval: [0.01, 0.05], translationWarning: "none"
     });
-    expect(() => translatedPriceDeltaCents(evaluation(-2.5), { ...evaluation(-3), book: "caesars" })).toThrow(/prohibited/);
+    expect(() => translatedPriceDeltaCents(evaluation(-2.5), { ...evaluation(-3), book: "fanduel" })).toThrow(/prohibited/);
   });
 
   it("2. uses the power method for spread, total, favorite, underdog, and near-even markets", () => {
@@ -165,8 +166,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(different.pointClv).toBe(0.5);
     const same = calculateTranslatedClv({ entryPrice: -105, entryPoint: -3, closingQuote: quote({ point: -3, side: "Buffalo -3" }), closingOpponentQuote: opponent, consensusSpread: -3, artifact });
     expect(same.priceClvCents).not.toBeNull();
-    const better = chooseBetterPaperClose([{ ...same, book: "betmgm" }, { ...different, book: "caesars" }]);
-    expect(["betmgm", "caesars"]).toContain(better.book);
+    const better = chooseBetterPaperClose([{ ...same, book: "betmgm" }, { ...different, book: "fanduel" }]);
+    expect(["betmgm", "fanduel"]).toContain(better.book);
   });
 
   it("15. filters Sunday today, exposes countdown/age/flags, expires drafts, and never auto-approves", () => {
@@ -240,6 +241,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(summary.lossCount).toBe(1);
     expect(summary.profitCents).toBe(-455);
     expect(summary.averageClvCents).toBeCloseTo(1.05);
+    expect(summary.clvCount).toBe(2);
   });
 
   it("21. power-de-vigs visible price pairs and shows cumulative parlay value lost", () => {
@@ -264,13 +266,13 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(analyzeSlipValue([legs[0], { ...legs[1], gameId: "ne-sea" }])).toBeNull();
   });
 
-  it("22. maps the provider's BetMGM and Caesars aliases onto the Week 1 board", async () => {
+  it("22. maps the provider's BetMGM and FanDuel books onto the Week 1 board", async () => {
     const event = {
       id: "provider-ne-sea",
       commence_time: "2026-09-10T00:20:00Z",
       home_team: "Seattle Seahawks",
       away_team: "New England Patriots",
-      bookmakers: ["betmgm", "williamhill_us"].map((key) => ({
+      bookmakers: ["betmgm", "fanduel"].map((key) => ({
         key,
         last_update: "2026-08-11T20:00:00Z",
         markets: [
@@ -283,25 +285,32 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const fetcher = async () => new Response(JSON.stringify([event]), { status: 200, headers: { "x-requests-used": "3", "x-requests-remaining": "497", "x-requests-last": "3" } });
     const result = await fetchWeekOneLiveOdds("test-key", fetcher as typeof fetch);
     expect(result.lines).toHaveLength(12);
-    expect(new Set(result.lines.map((line) => line.book))).toEqual(new Set(["betmgm", "caesars"]));
-    expect(result.lines.find((line) => line.book === "caesars" && line.side === "SEA")?.americanPrice).toBe(-110);
+    expect(new Set(result.lines.map((line) => line.book))).toEqual(new Set(["betmgm", "fanduel"]));
+    expect(result.lines.find((line) => line.book === "fanduel" && line.side === "SEA")?.americanPrice).toBe(-110);
   });
 
   it("23. confirms props only across three independent books at the exact same point", () => {
-    const quotePair = (book: string, point: number, over: number, under: number): RawPropQuote[] => ([
-      { id: `${book}:over:${point}`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player: "Quarterback", side: "Over", point, americanPrice: over, capturedAt: "2026-09-09T18:00:00Z", sourceHash: "hash" },
-      { id: `${book}:under:${point}`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player: "Quarterback", side: "Under", point, americanPrice: under, capturedAt: "2026-09-09T18:00:00Z", sourceHash: "hash" }
+    const quotePair = (book: string, point: number, over: number, under: number, player = "Quarterback"): RawPropQuote[] => ([
+      { id: `${book}:${player}:over:${point}`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player, side: "Over", point, americanPrice: over, capturedAt: "2026-09-09T18:00:00Z", sourceHash: "hash" },
+      { id: `${book}:${player}:under:${point}`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player, side: "Under", point, americanPrice: under, capturedAt: "2026-09-09T18:00:00Z", sourceHash: "hash" }
     ]);
     const exact = [
       ...quotePair("betmgm", 249.5, 120, -150),
       ...quotePair("draftkings", 249.5, -135, 105),
       ...quotePair("fanduel", 249.5, -130, 100),
-      ...quotePair("bovada", 249.5, -125, -105)
+      ...quotePair("bovada", 249.5, -125, -105),
+      ...quotePair("fanduel", 59.5, 120, -150, "Running Back"),
+      ...quotePair("betmgm", 59.5, -135, 105, "Running Back"),
+      ...quotePair("draftkings", 59.5, -130, 100, "Running Back"),
+      ...quotePair("bovada", 59.5, -125, -105, "Running Back")
     ];
     const candidates = scanMarketConfirmedProps(exact);
-    expect(candidates).toHaveLength(1);
-    expect(candidates[0]).toMatchObject({ executionBook: "betmgm", side: "Over", point: 249.5, referenceBooks: 3 });
-    expect(candidates[0].expectedValue).toBeGreaterThan(0.02);
+    expect(candidates).toHaveLength(2);
+    expect(candidates).toEqual(expect.arrayContaining([
+      expect.objectContaining({ executionBook: "betmgm", side: "Over", point: 249.5, referenceBooks: 3 }),
+      expect.objectContaining({ executionBook: "fanduel", side: "Over", point: 59.5, referenceBooks: 3 })
+    ]));
+    expect(candidates.every((candidate) => candidate.expectedValue > 0.02)).toBe(true);
     const mismatched = exact.map((row) => row.book === "bovada" ? { ...row, point: 250.5 } : row);
     expect(scanMarketConfirmedProps(mismatched)).toEqual([]);
   });
@@ -390,5 +399,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("MATCHUP EVIDENCE");
     expect(board).toContain("addTeaserPair");
     expect(readFileSync("src/server/decision-board.ts", "utf8")).toContain("ROW_NUMBER() OVER (PARTITION BY team");
+  });
+
+  it("33. uses the two free execution feeds and keeps the record season-wide without inventing CLV", () => {
+    expect(structuralConfig.executionBooks).toEqual(["betmgm", "fanduel"]);
+    const tracker = readFileSync("src/components/play-tracker.tsx", "utf8");
+    const store = readFileSync("src/server/play-store.ts", "utf8");
+    expect(tracker).toContain('fetch("/api/plays")');
+    expect(tracker).toContain("closingClvCents: null");
+    expect(tracker).not.toContain("closingClvCents: result ===");
+    expect(store).toContain("week === undefined");
+    expect(store).toContain("ORDER BY week, created_at ASC");
   });
 });

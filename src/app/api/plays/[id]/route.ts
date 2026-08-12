@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { listPlays } from "@/server/play-store";
-import { updatePlayResult } from "@/server/play-store";
+import { getPlay, updatePlayResult } from "@/server/play-store";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +20,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   try {
     const { id } = await params;
     const input = updateSchema.parse(await request.json());
-    const existing = (await listPlays()).find((play) => play.id === id);
+    const existing = await getPlay(id);
     if (!existing) return NextResponse.json({ error: "Play not found" }, { status: 404 });
     const play = await updatePlayResult(id, {
       status: input.status,

@@ -52,6 +52,7 @@ export function trackerSummary(plays: readonly WeeklyPlay[]) {
     profitCents,
     roiPercent: stakedCents ? (profitCents / stakedCents) * 100 : 0,
     averageClvCents,
+    clvCount: clvRows.length,
     winCount: settled.filter((play) => play.result === "win").length,
     lossCount: settled.filter((play) => play.result === "loss").length,
     pushCount: settled.filter((play) => ["push", "void"].includes(play.result)).length

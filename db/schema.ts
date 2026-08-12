@@ -40,7 +40,7 @@ export const plays = sqliteTable("plays", {
 export const liveLines = sqliteTable("live_lines", {
   id: text("id").primaryKey(),
   gameId: text("game_id").notNull(),
-  book: text("book", { enum: ["betmgm", "caesars"] }).notNull(),
+  book: text("book", { enum: ["betmgm", "fanduel"] }).notNull(),
   market: text("market", { enum: ["spread", "total", "moneyline"] }).notNull(),
   side: text("side").notNull(),
   point: real("point"),
@@ -58,7 +58,7 @@ export const liveLineSnapshots = sqliteTable("live_line_snapshots", {
   snapshotKey: text("snapshot_key").notNull(),
   lineId: text("line_id").notNull(),
   gameId: text("game_id").notNull(),
-  book: text("book", { enum: ["betmgm", "caesars"] }).notNull(),
+  book: text("book", { enum: ["betmgm", "fanduel"] }).notNull(),
   market: text("market", { enum: ["spread", "total", "moneyline"] }).notNull(),
   side: text("side").notNull(),
   point: real("point"),

@@ -82,8 +82,8 @@ export async function listLiveLines(d1: D1Database = getD1(), gameIds?: readonly
   await ensureLiveLineStore(d1);
   if (gameIds && !gameIds.length) return [];
   const statement = gameIds
-    ? d1.prepare(`SELECT * FROM live_lines WHERE game_id IN (${gameIds.map(() => "?").join(", ")}) ORDER BY game_id, book, market, side`).bind(...gameIds)
-    : d1.prepare("SELECT * FROM live_lines ORDER BY game_id, book, market, side");
+    ? d1.prepare(`SELECT * FROM live_lines WHERE book IN ('betmgm', 'fanduel') AND game_id IN (${gameIds.map(() => "?").join(", ")}) ORDER BY game_id, book, market, side`).bind(...gameIds)
+    : d1.prepare("SELECT * FROM live_lines WHERE book IN ('betmgm', 'fanduel') ORDER BY game_id, book, market, side");
   const result = await statement.all<LiveLineRow>();
   return enrichWithPowerDevig(result.results.map(mapRow));
 }
