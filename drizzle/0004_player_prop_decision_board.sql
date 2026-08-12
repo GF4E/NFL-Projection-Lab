@@ -1,4 +1,4 @@
-CREATE TABLE `player_prop_quotes` (
+CREATE TABLE IF NOT EXISTS `player_prop_quotes` (
 	`id` text PRIMARY KEY NOT NULL,
 	`game_id` text NOT NULL,
 	`event_id` text NOT NULL,
@@ -12,11 +12,11 @@ CREATE TABLE `player_prop_quotes` (
 	`source_hash` text NOT NULL
 );
 --> statement-breakpoint
-CREATE INDEX `idx_prop_quotes_game_book` ON `player_prop_quotes` (`game_id`,`book`);
+CREATE INDEX IF NOT EXISTS `idx_prop_quotes_game_book` ON `player_prop_quotes` (`game_id`,`book`);
 --> statement-breakpoint
-CREATE INDEX `idx_prop_quotes_contract` ON `player_prop_quotes` (`game_id`,`market`,`player`,`point`);
+CREATE INDEX IF NOT EXISTS `idx_prop_quotes_contract` ON `player_prop_quotes` (`game_id`,`market`,`player`,`point`);
 --> statement-breakpoint
-CREATE TABLE `player_prop_scan_state` (
+CREATE TABLE IF NOT EXISTS `player_prop_scan_state` (
 	`game_id` text PRIMARY KEY NOT NULL,
 	`event_id` text,
 	`status` text NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE `player_prop_scan_state` (
 	`message` text
 );
 --> statement-breakpoint
-CREATE TABLE `odds_quota_state` (
+CREATE TABLE IF NOT EXISTS `odds_quota_state` (
 	`provider` text PRIMARY KEY NOT NULL,
 	`used` integer NOT NULL,
 	`remaining` integer NOT NULL,
@@ -36,7 +36,7 @@ CREATE TABLE `odds_quota_state` (
 	`updated_at` text NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE `live_line_snapshots` (
+CREATE TABLE IF NOT EXISTS `live_line_snapshots` (
 	`snapshot_key` text NOT NULL,
 	`line_id` text NOT NULL,
 	`game_id` text NOT NULL,
@@ -52,11 +52,11 @@ CREATE TABLE `live_line_snapshots` (
 	PRIMARY KEY (`snapshot_key`, `line_id`)
 );
 --> statement-breakpoint
-CREATE INDEX `idx_line_snapshots_game_time` ON `live_line_snapshots` (`game_id`,`fetched_at`);
+CREATE INDEX IF NOT EXISTS `idx_line_snapshots_game_time` ON `live_line_snapshots` (`game_id`,`fetched_at`);
 --> statement-breakpoint
-CREATE INDEX `idx_line_snapshots_key` ON `live_line_snapshots` (`snapshot_key`);
+CREATE INDEX IF NOT EXISTS `idx_line_snapshots_key` ON `live_line_snapshots` (`snapshot_key`);
 --> statement-breakpoint
-CREATE TABLE `odds_automation_runs` (
+CREATE TABLE IF NOT EXISTS `odds_automation_runs` (
 	`snapshot_key` text PRIMARY KEY NOT NULL,
 	`job` text NOT NULL,
 	`scheduled_for` text NOT NULL,
@@ -68,6 +68,6 @@ CREATE TABLE `odds_automation_runs` (
 	`quota_used` integer
 );
 --> statement-breakpoint
-CREATE INDEX `idx_odds_runs_schedule` ON `odds_automation_runs` (`scheduled_for`,`status`);
+CREATE INDEX IF NOT EXISTS `idx_odds_runs_schedule` ON `odds_automation_runs` (`scheduled_for`,`status`);
 --> statement-breakpoint
-CREATE INDEX `idx_odds_runs_game` ON `odds_automation_runs` (`game_id`,`scheduled_for`);
+CREATE INDEX IF NOT EXISTS `idx_odds_runs_game` ON `odds_automation_runs` (`game_id`,`scheduled_for`);
