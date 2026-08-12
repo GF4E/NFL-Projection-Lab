@@ -24,5 +24,5 @@ export async function generateMetadata() {
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body>{children}</body></html>;
+  return <html lang="en"><head><link rel="icon" href="/og.png" type="image/png" /></head><body>{children}</body></html>;
 }
