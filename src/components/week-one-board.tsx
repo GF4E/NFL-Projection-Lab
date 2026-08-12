@@ -6,7 +6,8 @@ import type {
   DecisionBoardPayload,
   PlayerPropBoard,
   PropCandidate,
-  TeaserCandidate
+  TeaserCandidate,
+  TeaserPairCandidate
 } from "@/domain/decision-board";
 import { analyzeSlipValue, decimalToAmerican, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
 import { americanToDecimal } from "@/domain/odds";
@@ -83,6 +84,22 @@ function snapshotAge(capturedAt: string): string {
   if (minutes < 60) return `${minutes}M`;
   if (minutes < 1_440) return `${Math.round(minutes / 60)}H`;
   return `${Math.round(minutes / 1_440)}D`;
+}
+
+function SpreadSparkline({ values }: { values: readonly number[] }) {
+  if (!values.length) return null;
+  const minimum = Math.min(...values);
+  const maximum = Math.max(...values);
+  const span = Math.max(1, maximum - minimum);
+  const points = values.map((value, index) => {
+    const x = values.length === 1 ? 45 : index * 90 / (values.length - 1);
+    const y = 19 - (value - minimum) / span * 16;
+    return `${x},${y}`;
+  }).join(" ");
+  return <svg className="spread-sparkline" viewBox="0 0 90 22" role="img" aria-label="Open-to-current spread movement">
+    <polyline points={points} fill="none" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+    <circle cx={points.split(" ").at(-1)?.split(",")[0]} cy={points.split(" ").at(-1)?.split(",")[1]} r="2.5" fill="currentColor" />
+  </svg>;
 }
 
 export function WeekOneBoard() {
@@ -199,6 +216,26 @@ export function WeekOneBoard() {
     });
   }
 
+  function addTeaserPair(pair: TeaserPairCandidate) {
+    const legs = pair.legs.flatMap<SelectedLeg>((candidate) => {
+      const line = lines.find((item) => item.gameId === candidate.gameId && item.book === candidate.book && item.market === "spread" && item.side === candidate.team);
+      const matchup = matchups.find((game) => game.id === candidate.gameId);
+      if (!line || !matchup || candidate.fairProbability === null) return [];
+      return [{
+        id: `teaser:${line.id}:${candidate.teasedPoint}`, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
+        point: candidate.teasedPoint, americanPrice: line.americanPrice, fairProbability: candidate.fairProbability,
+        matchup: `${matchup.away} @ ${matchup.home}`, selection: `${line.side} ${formatPoint(candidate.teasedPoint)}`,
+        detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : candidate.classification === "key_number" ? "key-number" : "positive-EV"} leg`,
+        edge: candidate.fairProbability - (line.fairProbability ?? 0)
+      }];
+    });
+    if (legs.length !== 2) return;
+    setSlipMode("teaser");
+    setSlip(legs);
+    setTeaserPrice(pair.offeredAmerican);
+    setMessage(`Positive-EV ${bookNames[pair.book]} teaser pair loaded. Confirm the offered price before saving.`);
+  }
+
   async function saveSlip() {
     if (!slip.length || !slate) return;
     if (slipMode === "parlay" && slip.length < 2) {
@@ -290,6 +327,10 @@ export function WeekOneBoard() {
             const teaserCandidates = (gameIntel?.teasers.filter((item) => item.book === book && (item.classification !== "ordinary" || (item.fairProbability ?? 0) >= 0.68)) ?? [])
               .sort((left, right) => (left.classification === "classic_wong" ? -1 : 0) - (right.classification === "classic_wong" ? -1 : 0) || (right.fairProbability ?? 0) - (left.fairProbability ?? 0))
               .slice(0, 2);
+            const teaserPair = intelligence?.teaserPairs.find((pair) => pair.book === book && pair.legs.some((leg) => leg.gameId === game.id));
+            const movement = gameIntel?.movements.find((series) => series.book === book && series.side === game.home);
+            const movementOpen = movement?.snapshots[0];
+            const movementCurrent = movement?.snapshots.at(-1);
             const homeEdge = projection?.shrunkHomeProbability === null || projection?.shrunkHomeProbability === undefined
               ? null
               : projection.shrunkHomeProbability - projection.marketHomeProbability;
@@ -327,7 +368,12 @@ export function WeekOneBoard() {
                   {preferenceConflict && homeEdge !== null && Math.abs(homeEdge) < 0.03 ? <em>PASS · preferred-team conflict</em> : leanActionable && leanLine ? <button onClick={() => toggleLine(leanLine, `${game.away} @ ${game.home}`)}>Add {leanTeam}</button> : <em>PASS</em>}
                 </section>
                 <section className="quick-teasers">
-                  <div className="quick-head"><span>TEASER LEGS</span><small>{teaserCandidates.length ? "6 points" : "None"}</small></div>
+                  <div className="quick-head"><span>TEASER LEGS</span><small>{teaserPair ? "Pair ready" : teaserCandidates.length ? "6 points" : "None"}</small></div>
+                  {teaserPair && <button className="teaser-pair" onClick={() => addTeaserPair(teaserPair)}>
+                    <span className="teaser-class classic_wong">PAIR</span>
+                    <b>With {teaserPair.legs.find((leg) => leg.gameId !== game.id)?.team}</b>
+                    <small>+{(teaserPair.expectedValue * 100).toFixed(1)}% @ {formatOdds(teaserPair.offeredAmerican)}</small>
+                  </button>}
                   {teaserCandidates.length ? teaserCandidates.map((candidate) => <button onClick={() => addTeaser(candidate, `${game.away} @ ${game.home}`)} key={`${candidate.book}:${candidate.team}:${candidate.originalPoint}`}>
                     <span className={`teaser-class ${candidate.classification}`}>{candidate.classification === "classic_wong" ? "WONG" : "KEY"}</span>
                     <b>{candidate.team} {formatPoint(candidate.teasedPoint)}</b>
@@ -341,6 +387,20 @@ export function WeekOneBoard() {
                     <strong>{formatOdds(prop.americanPrice)}</strong><em>+{(prop.expectedValue * 100).toFixed(1)}%</em>
                   </button>) : <p>{propBoard?.message ?? "Props are scanned when posted."}</p>}
                 </section>
+                {(gameIntel?.signals.length || (movementOpen && movementCurrent)) && <section className="quick-evidence">
+                  {movementOpen && movementCurrent && <div className="movement-mini">
+                    <span>OPEN → NOW</span>
+                    <SpreadSparkline values={movement?.snapshots.map((snapshot) => snapshot.point) ?? []} />
+                    <b>{game.home} {formatPoint(movementOpen.point)} {formatOdds(movementOpen.americanPrice)} → {formatPoint(movementCurrent.point)} {formatOdds(movementCurrent.americanPrice)}</b>
+                    {projection && <small>model gap {Math.abs(projection.projectedHomePoint - movementOpen.point).toFixed(1)} → {Math.abs(projection.projectedHomePoint - movementCurrent.point).toFixed(1)} pts</small>}
+                  </div>}
+                  <div className="evidence-signals">
+                    <div className="quick-head"><span>MATCHUP EVIDENCE</span><small>rolling 17 games</small></div>
+                    <div>{gameIntel?.signals.map((signal) => <article key={signal.id}>
+                      <span>{signal.label}</span><b>{signal.lean}</b><small>{signal.detail}</small>
+                    </article>)}</div>
+                  </div>
+                </section>}
               </div>}
             </article>;
           })}

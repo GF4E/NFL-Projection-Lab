@@ -15,6 +15,9 @@ export interface TeamBaseline {
   epaPerPlay: number;
   successRate: number;
   explosiveRate: number;
+  defenseEpaAllowed: number;
+  defenseSuccessAllowed: number;
+  defenseExplosiveAllowed: number;
   regressedTurnoverRate: number;
   secondsPerPlay: number | null;
   proe: number | null;
@@ -23,6 +26,9 @@ export interface TeamBaseline {
     epa: number;
     success: number;
     explosive: number;
+    defenseEpa: number;
+    defenseSuccess: number;
+    defenseExplosive: number;
     turnovers: number;
     pace: number | null;
     proe: number | null;
@@ -47,6 +53,7 @@ export interface TeaserCandidate {
   gameId: string;
   book: "betmgm" | "caesars";
   team: string;
+  opponent: string;
   originalPoint: number;
   teasedPoint: number;
   fairProbability: number | null;
@@ -56,12 +63,44 @@ export interface TeaserCandidate {
   warning: "none" | "interpolated" | "extrapolated" | "unsupported";
 }
 
+export interface TeaserPairCandidate {
+  id: string;
+  book: "betmgm" | "caesars";
+  legs: [TeaserCandidate, TeaserCandidate];
+  offeredAmerican: number;
+  fairProbability: number;
+  expectedValue: number;
+}
+
+export interface MatchupSignal {
+  id: "efficiency" | "success" | "explosive" | "turnovers" | "pace";
+  label: string;
+  lean: string;
+  detail: string;
+  strength: number;
+}
+
+export interface LineMovementPoint {
+  point: number;
+  americanPrice: number;
+  capturedAt: string;
+}
+
+export interface LineMovementSeries {
+  book: "betmgm" | "caesars";
+  market: "spread";
+  side: string;
+  snapshots: LineMovementPoint[];
+}
+
 export interface DecisionBoardGame {
   gameId: string;
   away: TeamBaseline | null;
   home: TeamBaseline | null;
   projections: BaselineProjection[];
   teasers: TeaserCandidate[];
+  signals: MatchupSignal[];
+  movements: LineMovementSeries[];
 }
 
 export interface DecisionBoardPayload {
@@ -71,6 +110,7 @@ export interface DecisionBoardPayload {
   basisSeason: number | null;
   artifactHash: string | null;
   games: DecisionBoardGame[];
+  teaserPairs: TeaserPairCandidate[];
   method: string;
 }
 
@@ -213,6 +253,44 @@ export function crossedKeyNumbers(fromPoint: number, toPoint: number, keys = [3,
   const low = Math.min(fromPoint, toPoint);
   const high = Math.max(fromPoint, toPoint);
   return keys.filter((key) => (low < key && high > key) || (low < -key && high > -key));
+}
+
+export function rankTeaserPairs(
+  candidates: readonly TeaserCandidate[],
+  options: { offeredAmerican?: number; maximum?: number; preferredTeams?: readonly string[]; exceptionalEvThreshold?: number } = {}
+): TeaserPairCandidate[] {
+  const offeredAmerican = options.offeredAmerican ?? -120;
+  const offeredDecimal = americanToDecimal(offeredAmerican);
+  const preferred = new Set(options.preferredTeams ?? ["SEA", "ATL"]);
+  const exceptionalEvThreshold = options.exceptionalEvThreshold ?? 0.05;
+  const pairs: TeaserPairCandidate[] = [];
+  for (let leftIndex = 0; leftIndex < candidates.length; leftIndex += 1) {
+    const left = candidates[leftIndex];
+    if (left.fairProbability === null || left.warning === "unsupported") continue;
+    for (let rightIndex = leftIndex + 1; rightIndex < candidates.length; rightIndex += 1) {
+      const right = candidates[rightIndex];
+      if (right.fairProbability === null || right.warning === "unsupported") continue;
+      if (left.book !== right.book || left.gameId === right.gameId) continue;
+      const fairProbability = left.fairProbability * right.fairProbability;
+      const expectedValue = fairProbability * offeredDecimal - 1;
+      if (expectedValue < 0) continue;
+      const opposesPreferredTeam = preferred.has(left.opponent) || preferred.has(right.opponent);
+      if (opposesPreferredTeam && expectedValue < exceptionalEvThreshold) continue;
+      const legs = [left, right] as [TeaserCandidate, TeaserCandidate];
+      pairs.push({
+        id: `teaser-pair:${left.book}:${left.gameId}:${left.team}:${right.gameId}:${right.team}`,
+        book: left.book,
+        legs,
+        offeredAmerican,
+        fairProbability,
+        expectedValue
+      });
+    }
+  }
+  return pairs.sort((left, right) =>
+    right.expectedValue - left.expectedValue ||
+    right.legs.filter((leg) => leg.classification === "classic_wong").length - left.legs.filter((leg) => leg.classification === "classic_wong").length
+  ).slice(0, options.maximum ?? 8);
 }
 
 export function nflverseExpectedMarginToHomePoint(expectedHomeMargin: number): number {

@@ -6,8 +6,11 @@ import {
   marginVersusConsensusResidual,
   nflverseExpectedMarginToHomePoint,
   normalizeNflverseTeam,
+  rankTeaserPairs,
   type BaselineProjection,
   type DecisionBoardPayload,
+  type LineMovementSeries,
+  type MatchupSignal,
   type TeamBaseline,
   type TeaserCandidate
 } from "@/domain/decision-board";
@@ -21,6 +24,7 @@ import { getD1 } from "../../db";
 interface FeatureRow {
   season: number;
   team: string;
+  opponent: string;
   plays: number;
   epa_per_play: number;
   success_rate: number;
@@ -28,6 +32,17 @@ interface FeatureRow {
   turnover_rate: number;
   seconds_per_play: number | null;
   pass_rate_over_expectation: number | null;
+}
+
+interface SnapshotRow {
+  game_id: string;
+  book: LiveLine["book"];
+  market: LiveLine["market"];
+  side: string;
+  point: number | null;
+  american_price: number;
+  captured_at: string;
+  fetched_at: string;
 }
 
 interface GameRow {
@@ -69,6 +84,14 @@ type Aggregate = {
   proePlays: number;
 };
 
+type DefenseAggregate = {
+  team: string;
+  plays: number;
+  epaAllowed: number;
+  successAllowed: number;
+  explosiveAllowed: number;
+};
+
 function round(value: number, digits = 3): number {
   const factor = 10 ** digits;
   return Math.round(value * factor) / factor;
@@ -90,6 +113,7 @@ function teamProfiles(rows: FeatureRow[], strengths: Map<string, number>): Map<s
   const leagueTurnoverRate = rows.reduce((sum, row) => sum + row.turnover_rate * row.plays, 0) /
     Math.max(1, rows.reduce((sum, row) => sum + row.plays, 0));
   const aggregates = new Map<string, Aggregate>();
+  const defenses = new Map<string, DefenseAggregate>();
   for (const row of rows) {
     const team = normalizeNflverseTeam(row.team);
     const current = aggregates.get(team) ?? {
@@ -112,23 +136,39 @@ function teamProfiles(rows: FeatureRow[], strengths: Map<string, number>): Map<s
       current.proePlays += row.plays;
     }
     aggregates.set(team, current);
+    const opponent = normalizeNflverseTeam(row.opponent);
+    const defense = defenses.get(opponent) ?? { team: opponent, plays: 0, epaAllowed: 0, successAllowed: 0, explosiveAllowed: 0 };
+    defense.plays += row.plays;
+    defense.epaAllowed += row.epa_per_play * row.plays;
+    defense.successAllowed += row.success_rate * row.plays;
+    defense.explosiveAllowed += row.explosive_rate * row.plays;
+    defenses.set(opponent, defense);
   }
-  const base = [...aggregates.values()].map((item) => ({
-    team: item.team,
-    season: item.season,
-    games: item.games,
-    epaPerPlay: item.epa / Math.max(1, item.plays),
-    successRate: item.success / Math.max(1, item.plays),
-    explosiveRate: item.explosive / Math.max(1, item.plays),
-    regressedTurnoverRate: (item.turnovers + leagueTurnoverRate * 200) / Math.max(1, item.plays + 200),
-    secondsPerPlay: item.pacePlays ? item.pace / item.pacePlays : null,
-    proe: item.proePlays ? item.proe / item.proePlays : null,
-    strength: strengths.get(item.team) ?? 0
-  }));
+  const base = [...aggregates.values()].map((item) => {
+    const defense = defenses.get(item.team);
+    return {
+      team: item.team,
+      season: item.season,
+      games: item.games,
+      epaPerPlay: item.epa / Math.max(1, item.plays),
+      successRate: item.success / Math.max(1, item.plays),
+      explosiveRate: item.explosive / Math.max(1, item.plays),
+      defenseEpaAllowed: (defense?.epaAllowed ?? 0) / Math.max(1, defense?.plays ?? 0),
+      defenseSuccessAllowed: (defense?.successAllowed ?? 0) / Math.max(1, defense?.plays ?? 0),
+      defenseExplosiveAllowed: (defense?.explosiveAllowed ?? 0) / Math.max(1, defense?.plays ?? 0),
+      regressedTurnoverRate: (item.turnovers + leagueTurnoverRate * 200) / Math.max(1, item.plays + 200),
+      secondsPerPlay: item.pacePlays ? item.pace / item.pacePlays : null,
+      proe: item.proePlays ? item.proe / item.proePlays : null,
+      strength: strengths.get(item.team) ?? 0
+    };
+  });
   const ranks = {
     epa: rank(base.map((item) => ({ team: item.team, value: item.epaPerPlay })), true),
     success: rank(base.map((item) => ({ team: item.team, value: item.successRate })), true),
     explosive: rank(base.map((item) => ({ team: item.team, value: item.explosiveRate })), true),
+    defenseEpa: rank(base.map((item) => ({ team: item.team, value: item.defenseEpaAllowed })), false),
+    defenseSuccess: rank(base.map((item) => ({ team: item.team, value: item.defenseSuccessAllowed })), false),
+    defenseExplosive: rank(base.map((item) => ({ team: item.team, value: item.defenseExplosiveAllowed })), false),
     turnovers: rank(base.map((item) => ({ team: item.team, value: item.regressedTurnoverRate })), false),
     pace: rank(base.map((item) => ({ team: item.team, value: item.secondsPerPlay })), false),
     proe: rank(base.map((item) => ({ team: item.team, value: item.proe })), true),
@@ -139,15 +179,118 @@ function teamProfiles(rows: FeatureRow[], strengths: Map<string, number>): Map<s
     epaPerPlay: round(item.epaPerPlay),
     successRate: round(item.successRate),
     explosiveRate: round(item.explosiveRate),
+    defenseEpaAllowed: round(item.defenseEpaAllowed),
+    defenseSuccessAllowed: round(item.defenseSuccessAllowed),
+    defenseExplosiveAllowed: round(item.defenseExplosiveAllowed),
     regressedTurnoverRate: round(item.regressedTurnoverRate),
     secondsPerPlay: item.secondsPerPlay === null ? null : round(item.secondsPerPlay, 1),
     proe: item.proe === null ? null : round(item.proe),
     strength: round(item.strength, 2),
     ranks: {
       epa: ranks.epa.get(item.team)!, success: ranks.success.get(item.team)!, explosive: ranks.explosive.get(item.team)!,
+      defenseEpa: ranks.defenseEpa.get(item.team)!, defenseSuccess: ranks.defenseSuccess.get(item.team)!, defenseExplosive: ranks.defenseExplosive.get(item.team)!,
       turnovers: ranks.turnovers.get(item.team)!, pace: ranks.pace.get(item.team) ?? null, proe: ranks.proe.get(item.team) ?? null, strength: ranks.strength.get(item.team)!
     }
   }]));
+}
+
+function matchupMetricSignal(input: {
+  id: "efficiency" | "success" | "explosive";
+  label: string;
+  away: TeamBaseline;
+  home: TeamBaseline;
+  awayOffenseRank: number;
+  homeOffenseRank: number;
+  awayDefenseRank: number;
+  homeDefenseRank: number;
+}): MatchupSignal | null {
+  const awayScore = 33 - input.awayOffenseRank + input.homeDefenseRank;
+  const homeScore = 33 - input.homeOffenseRank + input.awayDefenseRank;
+  const difference = homeScore - awayScore;
+  if (Math.abs(difference) < 7) return null;
+  const team = difference > 0 ? input.home : input.away;
+  const opponent = difference > 0 ? input.away : input.home;
+  const offenseRank = difference > 0 ? input.homeOffenseRank : input.awayOffenseRank;
+  const opponentDefenseRank = difference > 0 ? input.awayDefenseRank : input.homeDefenseRank;
+  return {
+    id: input.id,
+    label: input.label,
+    lean: team.team,
+    detail: `${team.team} O #${offenseRank} vs ${opponent.team} D #${opponentDefenseRank}`,
+    strength: Math.abs(difference)
+  };
+}
+
+function matchupSignals(away: TeamBaseline | null, home: TeamBaseline | null): MatchupSignal[] {
+  if (!away || !home) return [];
+  const candidates: Array<MatchupSignal | null> = [
+    matchupMetricSignal({
+      id: "efficiency", label: "EPA EDGE", away, home,
+      awayOffenseRank: away.ranks.epa, homeOffenseRank: home.ranks.epa,
+      awayDefenseRank: away.ranks.defenseEpa, homeDefenseRank: home.ranks.defenseEpa
+    }),
+    matchupMetricSignal({
+      id: "success", label: "DOWN-TO-DOWN", away, home,
+      awayOffenseRank: away.ranks.success, homeOffenseRank: home.ranks.success,
+      awayDefenseRank: away.ranks.defenseSuccess, homeDefenseRank: home.ranks.defenseSuccess
+    }),
+    matchupMetricSignal({
+      id: "explosive", label: "EXPLOSIVE", away, home,
+      awayOffenseRank: away.ranks.explosive, homeOffenseRank: home.ranks.explosive,
+      awayDefenseRank: away.ranks.defenseExplosive, homeDefenseRank: home.ranks.defenseExplosive
+    })
+  ];
+  const turnoverDifference = away.regressedTurnoverRate - home.regressedTurnoverRate;
+  if (Math.abs(turnoverDifference) >= 0.003) {
+    const lean = turnoverDifference > 0 ? home : away;
+    candidates.push({
+      id: "turnovers",
+      label: "BALL SECURITY",
+      lean: lean.team,
+      detail: `${(lean.regressedTurnoverRate * 100).toFixed(1)}% regressed turnover rate`,
+      strength: Math.abs(turnoverDifference) * 1_000
+    });
+  }
+  if (away.ranks.pace !== null && home.ranks.pace !== null) {
+    if (away.ranks.pace <= 12 && home.ranks.pace <= 12) {
+      candidates.push({ id: "pace", label: "PACE", lean: "OVER", detail: `tempo #${away.ranks.pace} / #${home.ranks.pace}`, strength: 9 });
+    } else if (away.ranks.pace >= 21 && home.ranks.pace >= 21) {
+      candidates.push({ id: "pace", label: "PACE", lean: "UNDER", detail: `tempo #${away.ranks.pace} / #${home.ranks.pace}`, strength: 9 });
+    }
+  }
+  return candidates.filter((signal): signal is MatchupSignal => signal !== null)
+    .sort((left, right) => right.strength - left.strength)
+    .slice(0, 3);
+}
+
+function sampleMovement(points: LineMovementSeries["snapshots"]): LineMovementSeries["snapshots"] {
+  if (points.length <= 12) return points;
+  const sampled = points.filter((_, index) => index === 0 || index === points.length - 1 || index % Math.ceil(points.length / 10) === 0);
+  return sampled.slice(0, 12);
+}
+
+function lineMovements(gameId: string, history: readonly SnapshotRow[], lines: readonly LiveLine[]): LineMovementSeries[] {
+  return lines.filter((line) => line.gameId === gameId && line.market === "spread" && line.point !== null).map((line) => {
+    const snapshots = history
+      .filter((row) => row.game_id === gameId && row.book === line.book && row.market === "spread" && row.side === line.side && row.point !== null)
+      .map((row) => ({ point: row.point!, americanPrice: row.american_price, capturedAt: row.captured_at }));
+    snapshots.push({ point: line.point!, americanPrice: line.americanPrice, capturedAt: line.capturedAt });
+    const unique = [...new Map(snapshots.map((point) => [`${point.capturedAt}:${point.point}:${point.americanPrice}`, point])).values()]
+      .sort((left, right) => left.capturedAt.localeCompare(right.capturedAt));
+    return { book: line.book, market: "spread" as const, side: line.side, snapshots: sampleMovement(unique) };
+  });
+}
+
+async function loadMovementHistory(db: D1Database, gameIds: readonly string[]): Promise<SnapshotRow[]> {
+  try {
+    const placeholders = gameIds.map(() => "?").join(", ");
+    const result = await db.prepare(`SELECT game_id, book, market, side, point, american_price, captured_at, fetched_at
+      FROM live_line_snapshots WHERE market = 'spread' AND game_id IN (${placeholders})
+      ORDER BY game_id, book, side, fetched_at`).bind(...gameIds).all<SnapshotRow>();
+    return result.results;
+  } catch {
+    return [];
+  }
 }
 
 function strengthStates(games: GameRow[], latestSeason: number): Map<string, number> {
@@ -176,21 +319,24 @@ export async function buildDecisionBoard(
   options: { season?: number; week?: number; now?: Date } = {}
 ): Promise<DecisionBoardPayload> {
   const slate = await weeklySlate({ db, season: options.season, week: options.week, now: options.now });
-  const [lineResult, gameResult, featureResult] = await Promise.all([
-    db.prepare("SELECT * FROM live_lines ORDER BY game_id, book, market, side").all<LineRow>(),
+  const activeGameIds = slate.games.map((game) => game.id);
+  const activePlaceholders = activeGameIds.map(() => "?").join(", ");
+  const [lineResult, gameResult, featureResult, movementHistory] = await Promise.all([
+    db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line
       FROM nfl_games WHERE season BETWEEN 2010 AND ? AND result IS NOT NULL AND spread_line IS NOT NULL
         AND (season < ? OR week < ?)
       ORDER BY game_date, game_id`).bind(slate.season, slate.season, slate.week).all<GameRow>(),
-    db.prepare(`SELECT season, team, plays, epa_per_play, success_rate, explosive_rate,
+    db.prepare(`SELECT season, team, opponent, plays, epa_per_play, success_rate, explosive_rate,
         turnover_rate, seconds_per_play, pass_rate_over_expectation FROM (
-          SELECT season, week, team, plays, epa_per_play, success_rate, explosive_rate,
+          SELECT season, week, team, opponent, plays, epa_per_play, success_rate, explosive_rate,
             turnover_rate, seconds_per_play, pass_rate_over_expectation,
             ROW_NUMBER() OVER (PARTITION BY team ORDER BY season DESC, week DESC, game_date DESC) AS recency_rank
           FROM nfl_team_game_features
           WHERE season_type = 'REG' AND (season < ? OR (season = ? AND week < ?))
         ) WHERE recency_rank <= 17
-        ORDER BY season DESC, week DESC`).bind(slate.season, slate.season, slate.week).all<FeatureRow>()
+        ORDER BY season DESC, week DESC`).bind(slate.season, slate.season, slate.week).all<FeatureRow>(),
+    loadMovementHistory(db, activeGameIds)
   ]);
   const featureRows = featureResult.results;
   const basisSeason = featureRows.length ? Math.max(...featureRows.map((row) => row.season)) : null;
@@ -257,6 +403,7 @@ export async function buildDecisionBoard(
         gameId: game.id,
         book: line.book,
         team: line.side,
+        opponent: line.side === game.home ? game.away : game.home,
         originalPoint: line.point!,
         teasedPoint,
         fairProbability: translated.probability,
@@ -266,8 +413,19 @@ export async function buildDecisionBoard(
         warning: translated.warning
       };
     }) : [];
-    return { gameId: game.id, away: profiles.get(game.away) ?? null, home: profiles.get(game.home) ?? null, projections, teasers };
+    const away = profiles.get(game.away) ?? null;
+    const home = profiles.get(game.home) ?? null;
+    return {
+      gameId: game.id,
+      away,
+      home,
+      projections,
+      teasers,
+      signals: matchupSignals(away, home),
+      movements: lineMovements(game.id, movementHistory, gameLines)
+    };
   });
+  const teaserPairs = rankTeaserPairs(games.flatMap((game) => game.teasers));
   return {
     generatedAt: new Date().toISOString(),
     season: slate.season,
@@ -275,6 +433,7 @@ export async function buildDecisionBoard(
     basisSeason,
     artifactHash: artifact?.artifactHash ?? null,
     games,
-    method: "Leakage-safe 2025 team efficiency and decay-weighted margin-versus-close strength, shrunk 25% toward a data-derived baseline and 75% toward the power-de-vigged market. This is the preseason baseline, not a promoted in-season champion."
+    teaserPairs,
+    method: "Leakage-safe rolling 17-game offense and defense evidence with decay-weighted margin-versus-close strength, shrunk 25% toward the model and 75% toward the power-de-vigged market."
   };
 }

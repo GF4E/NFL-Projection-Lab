@@ -24,7 +24,7 @@ import { correctSettlement, gradePick, profitForResult } from "@/domain/settleme
 import { fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
 import { estimatedEvFromEdge, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
-import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, scanMarketConfirmedProps, type RawPropQuote } from "@/domain/decision-board";
+import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, rankTeaserPairs, scanMarketConfirmedProps, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
@@ -366,5 +366,29 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).not.toContain("Refresh lines");
     expect(board).not.toContain("weekOneMatchups");
     expect(readFileSync("src/server/player-props.ts", "utf8")).toContain("seasonSchedule");
+  });
+
+  it("31. ranks non-Wong teaser pairs only when their joint fair probability clears the offered price", () => {
+    const teaser = (gameId: string, team: string, opponent: string, fairProbability: number): TeaserCandidate => ({
+      gameId, book: "betmgm", team, opponent, originalPoint: 4.5, teasedPoint: 10.5,
+      fairProbability, fairAmerican: -300, classification: "ordinary", crossedKeys: [6, 7, 10], warning: "none"
+    });
+    const ordinaryPair = rankTeaserPairs([
+      teaser("g1", "PIT", "BAL", 0.75),
+      teaser("g2", "KC", "DEN", 0.74)
+    ]);
+    expect(ordinaryPair).toHaveLength(1);
+    expect(ordinaryPair[0].expectedValue).toBeGreaterThan(0);
+    expect(ordinaryPair[0].legs.every((leg) => leg.classification === "ordinary")).toBe(true);
+    expect(rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.7), teaser("g2", "KC", "DEN", 0.7)])).toEqual([]);
+    expect(rankTeaserPairs([teaser("g1", "NE", "SEA", 0.75), teaser("g2", "KC", "DEN", 0.74)])).toEqual([]);
+  });
+
+  it("32. co-locates movement and rolling matchup evidence inside the existing Picks drawer", () => {
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(board).toContain("OPEN → NOW");
+    expect(board).toContain("MATCHUP EVIDENCE");
+    expect(board).toContain("addTeaserPair");
+    expect(readFileSync("src/server/decision-board.ts", "utf8")).toContain("ROW_NUMBER() OVER (PARTITION BY team");
   });
 });
