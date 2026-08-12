@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { listLiveLines, replaceLiveLines } from "@/server/live-line-store";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
+import { assertOddsCreditsAvailable, ODDS_CREDIT_CEILING, recordOddsQuota } from "@/server/odds-quota";
 
 export const dynamic = "force-dynamic";
 
@@ -29,8 +30,10 @@ export async function POST() {
     if (Date.now() - newest < 60_000) {
       return NextResponse.json({ lines: cached, configured: true, caesarsRequiresPaidPlan: true, cached: true });
     }
+    await assertOddsCreditsAvailable(3);
     const result = await fetchWeekOneLiveOdds(apiKey);
-    if (result.used > 450) throw new Error("Odds credit ceiling exceeded; cached lines were preserved");
+    await recordOddsQuota({ used: result.used, remaining: result.remaining, lastCost: result.lastCost });
+    if (result.used > ODDS_CREDIT_CEILING) throw new Error("Odds credit ceiling exceeded; cached lines were preserved");
     const lines = await replaceLiveLines(result.lines);
     return NextResponse.json({
       lines,

@@ -2,6 +2,8 @@ import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } fr
 import handler from "vinext/server/app-router-entry";
 import { runNflverseAutomation } from "../src/server/nflverse/automation";
 import { listNflverseImportStates } from "../src/server/nflverse/store";
+import { buildDecisionBoard } from "../src/server/decision-board";
+import { getPlayerPropBoard, refreshPlayerPropBoard } from "../src/server/player-props";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -10,6 +12,7 @@ interface AssetFetcher {
 interface Env {
   ASSETS: AssetFetcher;
   DB: D1Database;
+  ODDS_API_KEY?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -17,6 +20,20 @@ interface Env {
       };
     };
   };
+}
+
+async function handlePropsRequest(request: Request, env: Env): Promise<Response> {
+  if (request.method !== "GET" && request.method !== "POST") return json({ error: "Method not allowed" }, 405, { allow: "GET, POST" });
+  const gameId = new URL(request.url).searchParams.get("gameId");
+  if (!gameId) return json({ error: "gameId is required" }, 400);
+  try {
+    const payload = request.method === "POST"
+      ? await refreshPlayerPropBoard({ gameId, apiKey: env.ODDS_API_KEY, db: env.DB })
+      : await getPlayerPropBoard(gameId, env.DB);
+    return json(payload);
+  } catch (error) {
+    return json({ error: error instanceof Error ? error.message : "Unable to load props" }, 503);
+  }
 }
 
 interface ExecutionContext {
@@ -65,6 +82,16 @@ const worker = {
     // and production deployments all reach the same Cloudflare-bound D1 database.
     if (url.pathname === "/api/nflverse") {
       return handleNflverseRequest(request, env);
+    }
+    if (url.pathname === "/api/decision-board") {
+      try {
+        return json(await buildDecisionBoard(env.DB));
+      } catch (error) {
+        return json({ error: error instanceof Error ? error.message : "Unable to build decision board" }, 503);
+      }
+    }
+    if (url.pathname === "/api/props") {
+      return handlePropsRequest(request, env);
     }
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];

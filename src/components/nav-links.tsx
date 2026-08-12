@@ -5,9 +5,7 @@ import { usePathname } from "next/navigation";
 
 const nav = [
   ["/sunday", "Week 1", "16"],
-  ["/model", "Research", "4"],
-  ["/records", "Bet tracker", ""],
-  ["/team", "Team room", ""]
+  ["/records", "Season record", ""]
 ] as const;
 
 export function NavLinks() {

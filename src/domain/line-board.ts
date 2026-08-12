@@ -23,6 +23,8 @@ export type SlipLeg = Pick<LiveLine, "id" | "gameId" | "book" | "market" | "side
   selection: string;
 };
 
+export type ValueLeg = Pick<SlipLeg, "gameId" | "americanPrice" | "fairProbability">;
+
 export function enrichWithPowerDevig(lines: readonly Omit<LiveLine, "fairProbability" | "marketVigPercent">[]): LiveLine[] {
   const groups = new Map<string, typeof lines>();
   for (const line of lines) {
@@ -55,14 +57,14 @@ export type SlipValue = {
   hasSameGameCorrelation: boolean;
 };
 
-function cumulativeDrag(legs: readonly SlipLeg[]): number | null {
+function cumulativeDrag(legs: readonly ValueLeg[]): number | null {
   if (!legs.length || legs.some((leg) => leg.fairProbability === null)) return null;
   const offeredDecimal = legs.reduce((product, leg) => product * americanToDecimal(leg.americanPrice), 1);
   const fairWinProbability = legs.reduce((product, leg) => product * (leg.fairProbability ?? 0), 1);
   return Math.max(0, 1 - offeredDecimal * fairWinProbability);
 }
 
-export function analyzeSlipValue(legs: readonly SlipLeg[], unitDollars = 25): SlipValue | null {
+export function analyzeSlipValue(legs: readonly ValueLeg[], unitDollars = 25): SlipValue | null {
   const hasSameGameCorrelation = new Set(legs.map((leg) => leg.gameId)).size !== legs.length;
   if (!legs.length || hasSameGameCorrelation || legs.some((leg) => leg.fairProbability === null)) return null;
   const offeredDecimal = legs.reduce((product, leg) => product * americanToDecimal(leg.americanPrice), 1);

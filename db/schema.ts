@@ -54,6 +54,43 @@ export const liveLines = sqliteTable("live_lines", {
   index("idx_live_lines_captured_at").on(table.capturedAt)
 ]);
 
+export const playerPropQuotes = sqliteTable("player_prop_quotes", {
+  id: text("id").primaryKey(),
+  gameId: text("game_id").notNull(),
+  eventId: text("event_id").notNull(),
+  book: text("book").notNull(),
+  market: text("market").notNull(),
+  player: text("player").notNull(),
+  side: text("side", { enum: ["Over", "Under"] }).notNull(),
+  point: real("point").notNull(),
+  americanPrice: integer("american_price").notNull(),
+  capturedAt: text("captured_at").notNull(),
+  sourceHash: text("source_hash").notNull()
+}, (table) => [
+  index("idx_prop_quotes_game_book").on(table.gameId, table.book),
+  index("idx_prop_quotes_contract").on(table.gameId, table.market, table.player, table.point)
+]);
+
+export const playerPropScanState = sqliteTable("player_prop_scan_state", {
+  gameId: text("game_id").primaryKey(),
+  eventId: text("event_id"),
+  status: text("status", { enum: ["current", "stale", "unavailable"] }).notNull(),
+  lastCheckedAt: text("last_checked_at"),
+  lastSuccessAt: text("last_success_at"),
+  quotaUsed: integer("quota_used"),
+  quotaRemaining: integer("quota_remaining"),
+  quotaLastCost: integer("quota_last_cost"),
+  message: text("message")
+});
+
+export const oddsQuotaState = sqliteTable("odds_quota_state", {
+  provider: text("provider").primaryKey(),
+  used: integer("used").notNull(),
+  remaining: integer("remaining").notNull(),
+  lastCost: integer("last_cost").notNull(),
+  updatedAt: text("updated_at").notNull()
+});
+
 export const nflverseImportState = sqliteTable("nflverse_import_state", {
   dataset: text("dataset").primaryKey(),
   freshness: text("freshness", { enum: ["current", "stale", "running", "unavailable"] }).notNull(),

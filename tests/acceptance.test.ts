@@ -24,6 +24,7 @@ import { correctSettlement, gradePick, profitForResult } from "@/domain/settleme
 import { fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
 import { estimatedEvFromEdge, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
+import { crossedKeyNumbers, isClassicWongPoint, scanMarketConfirmedProps, type RawPropQuote } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
@@ -282,5 +283,40 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(result.lines).toHaveLength(12);
     expect(new Set(result.lines.map((line) => line.book))).toEqual(new Set(["betmgm", "caesars"]));
     expect(result.lines.find((line) => line.book === "caesars" && line.side === "SEA")?.americanPrice).toBe(-110);
+  });
+
+  it("23. confirms props only across three independent books at the exact same point", () => {
+    const quotePair = (book: string, point: number, over: number, under: number): RawPropQuote[] => ([
+      { id: `${book}:over:${point}`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player: "Quarterback", side: "Over", point, americanPrice: over, capturedAt: "2026-09-09T18:00:00Z", sourceHash: "hash" },
+      { id: `${book}:under:${point}`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player: "Quarterback", side: "Under", point, americanPrice: under, capturedAt: "2026-09-09T18:00:00Z", sourceHash: "hash" }
+    ]);
+    const exact = [
+      ...quotePair("betmgm", 249.5, 120, -150),
+      ...quotePair("draftkings", 249.5, -135, 105),
+      ...quotePair("fanduel", 249.5, -130, 100),
+      ...quotePair("bovada", 249.5, -125, -105)
+    ];
+    const candidates = scanMarketConfirmedProps(exact);
+    expect(candidates).toHaveLength(1);
+    expect(candidates[0]).toMatchObject({ executionBook: "betmgm", side: "Over", point: 249.5, referenceBooks: 3 });
+    expect(candidates[0].expectedValue).toBeGreaterThan(0.02);
+    const mismatched = exact.map((row) => row.book === "bovada" ? { ...row, point: 250.5 } : row);
+    expect(scanMarketConfirmedProps(mismatched)).toEqual([]);
+  });
+
+  it("24. identifies classic Wong paths and derives crossed key numbers", () => {
+    expect(isClassicWongPoint(2.5)).toBe(true);
+    expect(isClassicWongPoint(-8)).toBe(true);
+    expect(isClassicWongPoint(3)).toBe(false);
+    expect(crossedKeyNumbers(-8, -2)).toEqual([3, 6, 7]);
+    expect(crossedKeyNumbers(2.5, 8.5)).toEqual([3, 6, 7]);
+  });
+
+  it("25. keeps methodology and team-room exposition behind the compact weekly screen", () => {
+    const nav = readFileSync("src/components/nav-links.tsx", "utf8");
+    expect(nav).not.toContain("Research");
+    expect(nav).not.toContain("Team room");
+    expect(readFileSync("src/app/(dashboard)/model/page.tsx", "utf8")).toContain('redirect("/sunday")');
+    expect(readFileSync("src/app/(dashboard)/team/page.tsx", "utf8")).toContain('redirect("/sunday")');
   });
 });

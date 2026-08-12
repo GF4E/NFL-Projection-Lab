@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 const createPlaySchema = z.object({
   gameId: z.string().trim().min(3).max(40),
   playType: z.enum(["single", "parlay", "teaser"]),
-  market: z.enum(["spread", "moneyline", "total", "teaser", "parlay"]),
+  market: z.enum(["spread", "moneyline", "total", "prop", "teaser", "parlay"]),
   primaryReason: z.string().trim().min(3).max(60),
   pickedBy: z.enum(["gabe", "jarrett"]),
   title: z.string().trim().min(3).max(120),
