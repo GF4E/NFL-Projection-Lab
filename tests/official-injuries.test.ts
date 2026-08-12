@@ -68,6 +68,15 @@ describe("official NFL injury importer", () => {
     })).toThrow("Partial official injury imports are prohibited");
   });
 
+  it("recognizes the official preseason placeholder as not yet published", () => {
+    expect(() => parseOfficialNflInjuryHtml({
+      html: "<title>Official NFL Injury Report for Players - Week 1 of the 2026 Season | NFL.com</title>",
+      season: 2026,
+      week: 1,
+      schedule: [{ gameId: "ne-sea", awayTeam: "NE", homeTeam: "SEA" }]
+    })).toThrow("Official NFL injury reports are not published for Week 1");
+  });
+
   it("keeps the feed in the background instead of adding another site tab", () => {
     const worker = readFileSync("worker/index.ts", "utf8");
     const navigation = readFileSync("src/components/nav-links.tsx", "utf8");

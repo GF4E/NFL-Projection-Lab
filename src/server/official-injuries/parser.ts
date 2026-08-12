@@ -95,7 +95,8 @@ export function parseOfficialNflInjuryHtml(input: {
   week: number;
   schedule: readonly InjuryScheduleGame[];
 }): ParsedOfficialInjuryReport {
-  const heading = input.html.match(/Injuries\s*-\s*WEEK\s+(\d+)/i);
+  const heading = input.html.match(/Injuries\s*-\s*WEEK\s+(\d+)/i)
+    ?? input.html.match(/Official NFL Injury Report[^<]*Week\s+(\d+)/i);
   if (!heading || Number(heading[1]) !== input.week) {
     throw new Error(`Official NFL injury page does not contain Week ${input.week}`);
   }
