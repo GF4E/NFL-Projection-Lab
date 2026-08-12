@@ -12,14 +12,31 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-function weightedDraw(rows: WeightedTrainingRow[], random: () => number): WeightedTrainingRow {
-  const total = rows.reduce((sum, row) => sum + row.weight, 0);
-  let cursor = random() * total;
+function cumulativeWeights(rows: readonly WeightedTrainingRow[]): { cumulative: number[]; total: number } {
+  const cumulative: number[] = [];
+  let total = 0;
   for (const row of rows) {
-    cursor -= row.weight;
-    if (cursor <= 0) return row;
+    total += row.weight;
+    cumulative.push(total);
   }
-  return rows[rows.length - 1];
+  return { cumulative, total };
+}
+
+function weightedDraw(
+  rows: readonly WeightedTrainingRow[],
+  cumulative: readonly number[],
+  total: number,
+  random: () => number
+): WeightedTrainingRow {
+  const target = random() * total;
+  let low = 0;
+  let high = cumulative.length - 1;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (target < cumulative[middle]) high = middle;
+    else low = middle + 1;
+  }
+  return rows[low];
 }
 
 function percentile(sorted: number[], probability: number): number {
@@ -36,10 +53,12 @@ export function bootstrapEdgeInterval(
   seedStart = 202600
 ): { interval: [number, number]; seeds: number[]; memberEdges: number[] } {
   if (!rows.length) throw new Error("Bootstrap requires leakage-safe training rows");
+  if (rows.some((row) => !Number.isFinite(row.weight) || row.weight <= 0)) throw new Error("Bootstrap weights must be positive");
+  const weights = cumulativeWeights(rows);
   const seeds = Array.from({ length: members }, (_, index) => seedStart + index);
   const memberEdges = seeds.map((seed) => {
     const random = mulberry32(seed);
-    const sample = Array.from({ length: rows.length }, () => weightedDraw(rows, random));
+    const sample = Array.from({ length: rows.length }, () => weightedDraw(rows, weights.cumulative, weights.total, random));
     return sample.reduce((sum, row) => sum + row.edge, 0) / sample.length;
   });
   const sorted = [...memberEdges].sort((left, right) => left - right);

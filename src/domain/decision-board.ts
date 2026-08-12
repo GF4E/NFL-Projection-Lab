@@ -44,6 +44,7 @@ export interface BaselineProjection {
   projectedHomePoint: number;
   homeCoverProbability: number | null;
   shrunkHomeProbability: number | null;
+  edgeInterval: [number, number] | null;
   marketHomeProbability: number;
   marketSource: "book" | "nflverse_consensus";
   translationWarning: "none" | "interpolated" | "extrapolated" | "unsupported";
@@ -59,6 +60,7 @@ export interface TotalProjection {
   fairProbability: number | null;
   shrunkProbability: number | null;
   expectedValue: number | null;
+  edgeInterval: [number, number] | null;
 }
 
 export interface TeaserCandidate {

@@ -433,7 +433,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(server).toContain("weightedLeagueScoring");
     expect(server).toContain("season < ? OR week < ?");
-    expect(server).toContain("totalProjections(game.id, gameLines, away, home, leagueScoring)");
+    expect(server).toContain("totalProjections(game.id, gameLines, away, home, leagueScoring, totalEdgeNoise)");
     expect(board).toContain("MODEL TOTAL");
     expect(board).toContain('line.market === "total"');
     expect(board).toContain("estimatedEvPercent: legExpectedValuePercent(leg)");
@@ -447,5 +447,19 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("line.americanPrice > comparable.americanPrice");
     expect(board).toContain("best-exact-price");
     expect(board).not.toContain("candidate.point !== line.point && candidate.americanPrice");
+  });
+
+  it("37. connects the fixed-seed 80% interval and quarter-Kelly sizing to every live card", () => {
+    const server = readFileSync("src/server/decision-board.ts", "utf8");
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(server).toContain("bootstrapEdgeInterval");
+    expect(server).toContain("structuralConfig.model.bootstrapMembers");
+    expect(server).toContain("structuralConfig.model.bootstrapSeedStart");
+    expect(server).toContain("edgeInterval");
+    expect(board).toContain("sizeKelly");
+    expect(board).toContain("sideSizing.suggestedUnits");
+    expect(board).toContain("totalSizing.suggestedUnits");
+    expect(board).toContain('sideSizing.greyed ? "uncertain"');
+    expect(board).toContain('totalSizing.greyed ? "uncertain"');
   });
 });

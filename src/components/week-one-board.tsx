@@ -11,7 +11,9 @@ import type {
 } from "@/domain/decision-board";
 import { analyzeSlipValue, decimalToAmerican, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
 import { americanToDecimal } from "@/domain/odds";
+import { structuralConfig } from "@/domain/config";
 import { isTeamApproved, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
+import { sizeKelly, type SizingResult } from "@/domain/sizing";
 import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
 import { pickReasons } from "@/lib/week-one-data";
 
@@ -93,6 +95,25 @@ function slipExpectedValuePercent(legs: readonly SelectedLeg[]): number {
   const probability = legs.reduce((product, leg) => product * Math.min(0.99, Math.max(0.01, (leg.fairProbability ?? 0) + (leg.edge ?? 0))), 1);
   const offered = legs.reduce((product, leg) => product * americanToDecimal(leg.americanPrice), 1);
   return (probability * offered - 1) * 100;
+}
+
+function recommendation(
+  probability: number | null,
+  americanPrice: number | null,
+  edgeInterval: [number, number] | null
+): SizingResult | null {
+  if (probability === null || americanPrice === null || edgeInterval === null) return null;
+  return sizeKelly(probability, americanPrice, edgeInterval, {
+    referenceBankrollUnits: structuralConfig.sizing.referenceBankrollUnits,
+    kellyFraction: structuralConfig.sizing.kellyFraction,
+    increment: structuralConfig.sizing.roundDownUnits,
+    minimum: structuralConfig.sizing.minimumUnits,
+    maximum: structuralConfig.sizing.maximumUnits
+  });
+}
+
+function formatInterval(interval: [number, number] | null): string {
+  return interval ? `${(interval[0] * 100).toFixed(1)} to ${(interval[1] * 100).toFixed(1)}pp` : "interval unavailable";
 }
 
 function snapshotAge(capturedAt: string): string {
@@ -212,6 +233,15 @@ export function WeekOneBoard() {
       : line.market === "total" && totalProjection?.shrunkProbability !== null && totalProjection?.shrunkProbability !== undefined && totalProjection.lean.toLowerCase() === line.side.toLowerCase()
         ? totalProjection.shrunkProbability
         : null;
+    const edgeInterval = line.market === "spread" && projection?.edgeInterval
+      ? line.side === projection.homeTeam
+        ? projection.edgeInterval
+        : [-projection.edgeInterval[1], -projection.edgeInterval[0]] as [number, number]
+      : line.market === "total" && totalProjection?.edgeInterval && totalProjection.lean.toLowerCase() === line.side.toLowerCase()
+        ? totalProjection.edgeInterval
+        : null;
+    const sized = recommendation(shrunkProbability, line.americanPrice, edgeInterval);
+    if (sized?.included) setStake(sized.suggestedUnits * 25);
     addLeg({
       id: line.id, kind: "mainline", gameId: line.gameId, book: line.book, market: line.market, side: line.side,
       point: line.point, americanPrice: line.americanPrice, fairProbability: line.fairProbability,
@@ -379,8 +409,18 @@ export function WeekOneBoard() {
             const leanProbability = homeEdge === null || projection?.shrunkHomeProbability === null || projection?.shrunkHomeProbability === undefined
               ? null
               : homeEdge >= 0 ? projection.shrunkHomeProbability : 1 - projection.shrunkHomeProbability;
+            const leanInterval = projection?.edgeInterval
+              ? homeEdge !== null && homeEdge < 0
+                ? [-projection.edgeInterval[1], -projection.edgeInterval[0]] as [number, number]
+                : projection.edgeInterval
+              : null;
+            const sideSizing = recommendation(leanProbability, leanLine?.americanPrice ?? null, leanInterval);
+            const totalLine = totalProjection?.lean === "Pass"
+              ? null
+              : bookLines.find((line) => line.market === "total" && line.side.toLowerCase() === totalProjection?.lean.toLowerCase());
+            const totalSizing = recommendation(totalProjection?.shrunkProbability ?? null, totalLine?.americanPrice ?? null, totalProjection?.edgeInterval ?? null);
             const preferenceConflict = Boolean(leanTeam && [game.away, game.home].some((team) => preferredTeams.has(team) && team !== leanTeam));
-            const leanActionable = Boolean(leanLine && homeEdge !== null && Math.abs(homeEdge) >= 0.005 && (!preferenceConflict || Math.abs(homeEdge) >= 0.03));
+            const leanActionable = Boolean(leanLine && sideSizing?.included && (!preferenceConflict || Math.abs(homeEdge ?? 0) >= 0.03));
             return <article className={`event-market ${deskOpen ? "desk-open" : ""}`} key={game.id}>
               <div className="event-time"><b>{formatKickoff(game, timeZone)}</b>{game.network && <span>{game.network}</span>}</div>
               {rowData.map((row) => <div className="team-line" key={row.team}>
@@ -399,15 +439,15 @@ export function WeekOneBoard() {
               </div>)}
               <div className="model-ribbon">
                 <span>{projection?.marketSource === "nflverse_consensus" ? "CONSENSUS" : "MARKET"} <b>{homeSpread ? `${game.home} ${formatPoint(homeSpread.point)}` : projection ? `${game.home} ${formatPoint(projection.marketHomePoint)}` : "—"}</b></span>
-                <span>MODEL LINE <b>{projection ? `${game.home} ${formatPoint(projection.projectedHomePoint)}` : "—"}</b></span>
-                <span>MODEL TOTAL <b>{totalProjection ? `${totalProjection.projectedTotal} · ${totalProjection.lean === "Pass" ? "PASS" : `${totalProjection.lean.toUpperCase()} ${Math.abs(totalProjection.pointEdge).toFixed(1)}`}` : "—"}</b></span>
+                <span>MODEL LINE <b>{projection ? `${game.home} ${formatPoint(projection.projectedHomePoint)}` : "—"}{sideSizing?.included && <em className={`unit-suggestion ${sideSizing.greyed ? "uncertain" : ""}`}> · {sideSizing.suggestedUnits}u</em>}</b></span>
+                <span>MODEL TOTAL <b>{totalProjection ? `${totalProjection.projectedTotal} · ${totalProjection.lean === "Pass" ? "PASS" : `${totalProjection.lean.toUpperCase()} ${Math.abs(totalProjection.pointEdge).toFixed(1)}`}` : "—"}{totalSizing?.included && <em className={`unit-suggestion ${totalSizing.greyed ? "uncertain" : ""}`}> · {totalSizing.suggestedUnits}u</em>}</b></span>
                 <span>VIG <b>{vig.map((value) => value === null ? "—" : value.toFixed(1)).join(" / ")}%</b></span>
                 <button onClick={() => toggleDecisionDesk(game.id)} aria-expanded={deskOpen}>{deskOpen ? "Close" : "Picks"} {deskOpen ? "↑" : "↓"}</button>
               </div>
               {deskOpen && <div className="quick-picks">
                 <section className="quick-side">
-                  <div><span>BEST SIDE SIGNAL</span>{leanTeam && leanLine && homeEdge !== null ? <><b>{leanTeam} {formatPoint(leanLine.point)}</b><small>{formatPercent(leanProbability)} · {Math.abs(homeEdge * 100).toFixed(1)}pp over market</small></> : <><b>No side edge</b><small>Current market and background model agree</small></>}</div>
-                  {preferenceConflict && homeEdge !== null && Math.abs(homeEdge) < 0.03 ? <em>PASS · preferred-team conflict</em> : leanActionable && leanLine ? <button onClick={() => toggleLine(leanLine, `${game.away} @ ${game.home}`)}>Add {leanTeam}</button> : <em>PASS</em>}
+                  <div className={sideSizing?.greyed ? "uncertain" : ""}><span>BEST SIDE SIGNAL</span>{leanTeam && leanLine && homeEdge !== null ? <><b>{leanTeam} {formatPoint(leanLine.point)}</b><small>{formatPercent(leanProbability)} · {Math.abs(homeEdge * 100).toFixed(1)}pp edge · {sideSizing?.included ? `${sideSizing.suggestedUnits}u` : "pass"}</small><small>80% {formatInterval(leanInterval)}</small></> : <><b>No side edge</b><small>Current market and background model agree</small></>}</div>
+                  {preferenceConflict && homeEdge !== null && Math.abs(homeEdge) < 0.03 ? <em>PASS · preferred-team conflict</em> : leanActionable && leanLine ? <button onClick={() => toggleLine(leanLine, `${game.away} @ ${game.home}`)}>Add {sideSizing?.suggestedUnits}u</button> : <em>PASS</em>}
                 </section>
                 <section className="quick-teasers">
                   <div className="quick-head"><span>TEASER LEGS</span><small>{teaserPair ? "Pair ready" : teaserCandidates.length ? "6 points" : "None"}</small></div>
@@ -460,7 +500,7 @@ export function WeekOneBoard() {
         {slip.length === 0 ? <div className="empty-slip"><b>Click a line.</b><p>The contract lands here. No typing, no dropdowns.</p></div> : <div className="slip-legs">{slip.map((leg, index) => <article key={leg.id}><button onClick={() => setSlip((current) => current.filter((item) => item.id !== leg.id))}>×</button><div><small>{leg.matchup} · {marketTitle(leg.market)}</small><b>{leg.selection}</b><span>{leg.detail} · {leg.kind === "teaser" || leg.edge === null ? "Fair" : "Bet"} {formatPercent(leg.kind === "teaser" ? leg.fairProbability : legBetProbability(leg))}</span></div><strong>{leg.kind === "teaser" ? "6 PT" : formatOdds(leg.americanPrice)}</strong><em>LEG {index + 1}</em></article>)}</div>}
         {slipMode === "teaser" && <div className="teaser-price"><span>OFFERED 2-TEAM PRICE</span><div>{[-110, -120, -130, -140].map((price) => <button className={teaserPrice === price ? "active" : ""} onClick={() => setTeaserPrice(price)} key={price}>{price}</button>)}</div><small>Confirm the live book price. A teaser is blocked when estimated EV is negative.</small></div>}
         <div className="reason-clicks"><span>WHY</span>{pickReasons.slice(0, 8).map((item) => <button className={reason === item.value ? "active" : ""} onClick={() => setReason(item.value)} key={item.value}>{item.label.replace("Model disagrees with market price", "Model edge").replace("Opponent-adjusted efficiency matchup", "Efficiency").replace("Turnover or scoring regression", "Regression").replace("Personnel or injury advantage", "Personnel").replace("Coaching or scheme matchup", "Scheme").replace("Role clarity / team chemistry", "Chemistry").replace("Better number / key-number value", "Key number").replace("Pace / scoring environment", "Pace")}</button>)}</div>
-        <div className="stake-clicks"><span>STAKE</span>{[12.5, 25, 50].map((value) => <button className={stake === value ? "active" : ""} onClick={() => setStake(value)} key={value}>{value / 25}u</button>)}</div>
+        <div className="stake-clicks"><span>STAKE</span>{[12.5, 25, 37.5, 50].map((value) => <button className={stake === value ? "active" : ""} onClick={() => setStake(value)} key={value}>{value / 25}u</button>)}</div>
         <div className="value-meter">
           <div><span>BOOK PRICE</span><b>{slip.length ? slipMode === "teaser" ? formatOdds(teaserPrice) : formatOdds(combinedAmerican(slip)) : "—"}</b></div>
           <div><span>NO-VIG FAIR</span><b>{slipMode === "teaser" ? teaserValue ? formatOdds(teaserValue.fairAmerican) : "—" : slipValue ? formatOdds(slipValue.fairAmerican) : "—"}</b></div>

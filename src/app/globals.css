@@ -221,11 +221,14 @@ button:disabled { cursor: wait; opacity: .62; }
 .model-ribbon { min-height: 44px; margin-top: 10px; padding: 0 10px; display: grid; grid-template-columns: 1.05fr 1.05fr 1fr .9fr auto; gap: 10px; align-items: center; border: 1px solid #303b37; background: #0e1715; }
 .model-ribbon span { color: #75827d; font: 800 9px var(--display); letter-spacing: .08em; }
 .model-ribbon b { margin-left: 5px; color: #f4f6f5; font-size: 12px; }
+.unit-suggestion { color: var(--acid); font-style: normal; }
+.unit-suggestion.uncertain { color: #7d8985; }
 .model-ribbon > button { min-height: 30px; padding: 0 11px; border: 1px solid color-mix(in srgb, var(--book-accent) 55%, #303b37); border-radius: 4px; background: color-mix(in srgb, var(--book-accent) 12%, transparent); color: var(--book-accent); font: 900 10px var(--display); text-transform: uppercase; }
 .quick-picks { position: relative; margin-top: 7px; display: grid; grid-template-columns: .9fr 1fr 1.35fr; gap: 7px; }
 .quick-picks > section { min-height: 96px; padding: 11px; border: 1px solid #34403c; background: #101917; }
 .quick-side { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .quick-side > div { min-width: 0; display: flex; flex-direction: column; }
+.quick-side > div.uncertain { opacity: .48; }
 .quick-side span, .quick-head > span { color: #7d8a85; font: 900 8px var(--display); letter-spacing: .09em; }
 .quick-side b { margin-top: 5px; font: 900 21px/.95 var(--display); }
 .quick-side small { margin-top: 4px; color: #a5afab; font: 700 9px var(--display); }

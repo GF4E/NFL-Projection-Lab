@@ -16,6 +16,7 @@ import {
 } from "@/domain/decision-board";
 import type { TotalProjection } from "@/domain/decision-board";
 import { buildDiscreteMarginArtifact, translateFairProbability } from "@/domain/margin";
+import { bootstrapEdgeInterval, type WeightedTrainingRow } from "@/domain/bootstrap";
 import { shrinkProbability } from "@/domain/odds";
 import { americanToDecimal } from "@/domain/odds";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
@@ -109,6 +110,16 @@ function roundTotalHalf(value: number): number {
   return Math.round(value * 2) / 2;
 }
 
+function historicalEdgeInterval(rows: readonly WeightedTrainingRow[], scale = 1): [number, number] | null {
+  if (rows.length < 32) return null;
+  const bootstrap = bootstrapEdgeInterval(
+    [...rows],
+    structuralConfig.model.bootstrapMembers,
+    structuralConfig.model.bootstrapSeedStart
+  );
+  return [bootstrap.interval[0] * scale, bootstrap.interval[1] * scale];
+}
+
 function weightedLeagueScoring(games: readonly GameRow[], latestSeason: number): number | null {
   let weight = 0;
   let total = 0;
@@ -134,7 +145,14 @@ function projectTotal(away: TeamBaseline | null, home: TeamBaseline | null, leag
   return roundTotalHalf(leagueScoring + paceAdjustment + epaAdjustment + explosiveAdjustment + turnoverAdjustment);
 }
 
-function totalProjections(gameId: string, gameLines: readonly LiveLine[], away: TeamBaseline | null, home: TeamBaseline | null, leagueScoring: number | null): TotalProjection[] {
+function totalProjections(
+  gameId: string,
+  gameLines: readonly LiveLine[],
+  away: TeamBaseline | null,
+  home: TeamBaseline | null,
+  leagueScoring: number | null,
+  edgeNoiseInterval: [number, number] | null
+): TotalProjection[] {
   const projectedTotal = projectTotal(away, home, leagueScoring);
   if (projectedTotal === null) return [];
   return (["betmgm", "fanduel"] as const).flatMap<TotalProjection>((book) => {
@@ -153,7 +171,11 @@ function totalProjections(gameId: string, gameLines: readonly LiveLine[], away: 
     const expectedValue = selected && shrunkProbability !== null
       ? shrunkProbability * americanToDecimal(selected.americanPrice) - 1
       : null;
-    return [{ gameId, book, marketPoint, projectedTotal, lean, pointEdge, fairProbability, shrunkProbability, expectedValue }];
+    const center = shrunkProbability === null || fairProbability === null ? null : shrunkProbability - fairProbability;
+    const edgeInterval = edgeNoiseInterval === null || center === null
+      ? null
+      : [center + edgeNoiseInterval[0], center + edgeNoiseInterval[1]] as [number, number];
+    return [{ gameId, book, marketPoint, projectedTotal, lean, pointEdge, fairProbability, shrunkProbability, expectedValue, edgeInterval }];
   });
 }
 
@@ -395,6 +417,7 @@ export async function buildDecisionBoard(
     loadMovementHistory(db, activeGameIds)
   ]);
   const featureRows = featureResult.results;
+  const latestTrainingSeason = Math.max(structuralConfig.model.trainingStartSeason, ...gameResult.results.map((row) => row.season));
   const leagueScoring = weightedLeagueScoring(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season);
   const basisSeason = featureRows.length ? Math.max(...featureRows.map((row) => row.season)) : null;
   const strengths = basisSeason === null ? new Map<string, number>() : strengthStates(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season);
@@ -411,6 +434,14 @@ export async function buildDecisionBoard(
     generatedAt: new Date().toISOString()
   }) : null;
   const lines = enrichWithPowerDevig(lineResult.results.map(rawLine));
+  const sideEdgeNoise = historicalEdgeInterval(gameResult.results.map((row) => ({
+    edge: Math.max(-0.25, Math.min(0.25, marginVersusConsensusResidual(row.result, row.spread_line) * 0.025)),
+    weight: 0.5 ** ((latestTrainingSeason - row.season) / structuralConfig.model.decayHalfLifeSeasons)
+  })));
+  const totalEdgeNoise = historicalEdgeInterval(gameResult.results.flatMap((row) => row.total === null || row.total_line === null ? [] : [{
+    edge: Math.max(-0.25, Math.min(0.25, (row.total - row.total_line) * 0.025)),
+    weight: 0.5 ** ((latestTrainingSeason - row.season) / structuralConfig.model.decayHalfLifeSeasons)
+  }]));
   const games = slate.games.map((game) => {
     const gameLines = lines.filter((line) => line.gameId === game.id);
     const homeSpreads = gameLines.filter((line) => line.market === "spread" && line.side === game.home && line.point !== null);
@@ -433,6 +464,8 @@ export async function buildDecisionBoard(
       const projectedHomePoint = roundHalf(anchor.point - strengthDelta);
       const translated = translateFairProbability(artifact, consensusHomePoint, projectedHomePoint, anchor.point, 0.5);
       const modelProbability = translated.probability;
+      const shrunkHomeProbability = modelProbability === null ? null : shrinkProbability(modelProbability, anchor.fairProbability, structuralConfig.model.shrinkageWeight);
+      const edgeCenter = shrunkHomeProbability === null ? null : shrunkHomeProbability - anchor.fairProbability;
       return {
         gameId: game.id,
         book: anchor.book,
@@ -440,7 +473,10 @@ export async function buildDecisionBoard(
         marketHomePoint: anchor.point,
         projectedHomePoint,
         homeCoverProbability: modelProbability,
-        shrunkHomeProbability: modelProbability === null ? null : shrinkProbability(modelProbability, anchor.fairProbability, structuralConfig.model.shrinkageWeight),
+        shrunkHomeProbability,
+        edgeInterval: edgeCenter === null || sideEdgeNoise === null
+          ? null
+          : [edgeCenter + sideEdgeNoise[0], edgeCenter + sideEdgeNoise[1]],
         marketHomeProbability: anchor.fairProbability,
         marketSource: anchor.marketSource,
         translationWarning: translated.warning
@@ -477,7 +513,7 @@ export async function buildDecisionBoard(
       away,
       home,
       projections,
-      totals: totalProjections(game.id, gameLines, away, home, leagueScoring),
+      totals: totalProjections(game.id, gameLines, away, home, leagueScoring, totalEdgeNoise),
       teasers,
       signals: matchupSignals(away, home),
       movements: lineMovements(game.id, movementHistory, gameLines)
