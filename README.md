@@ -48,7 +48,7 @@ The same database now carries the automatic nflverse warehouse:
 - `nfl_team_game_features` stores streamed team-game aggregates for EPA, success rate, explosive rate, turnovers, pace, pass rate, expected pass rate, and PROE. Raw play-by-play is not copied into D1.
 - `nflverse_import_state` and `nflverse_import_alerts` retain source hashes, freshness, leases, row counts, failures, and the last successful snapshot.
 
-The Worker checks schedules every five minutes. Opening the private site also starts the same idempotent check. Between 1:00am and 5:00am Pacific it checks the current play-by-play season once per day and backfills one missing historical season per five-minute run, newest first. A failed validation never replaces the last good rows.
+The Worker checks schedules every five minutes. While the private site is open, it also runs the same idempotent check every five minutes. After 1:00am Pacific it checks the current play-by-play season once per day and backfills one missing historical season per trigger, newest first; a later trigger catches up if the overnight run was missed. A failed validation never replaces the last good rows.
 
 ## Optional live-data setup
 

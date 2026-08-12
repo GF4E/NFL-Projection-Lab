@@ -234,8 +234,8 @@ export async function runNflverseAutomation(input: {
   let playByPlay: NflverseAutomationResult["playByPlay"] = "skipped";
   let playByPlaySeason: number | null = null;
   let teamGameRows = 0;
-  const pbpWindow = parts.hour >= 1 && parts.hour < 5;
-  if ((input.allowPlayByPlay ?? true) && pbpWindow) {
+  const nightlyPbpIsDue = parts.hour >= 1;
+  if ((input.allowPlayByPlay ?? true) && nightlyPbpIsDue) {
     const currentState = await getNflverseImportState(input.db, `pbp:${currentSeason}`);
     if (!checkedToday(currentState?.lastCheckedAt ?? null, parts.dayKey)) {
       const current = await refreshPbpSeason({ db: input.db, season: currentSeason, currentSeason, now, fetcher });
