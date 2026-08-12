@@ -24,7 +24,7 @@ The deployed Worker has an idempotent `*/5 * * * *` trigger and the app sends th
 - Schedule history: loaded on first run and revalidated after Tuesday 06:00 Pacific once the prior refresh is at least six days old.
 - Current-season play-by-play: checked once per Pacific calendar day after 01:00; a later trigger catches up if the overnight trigger was missed.
 - Historical play-by-play: missing seasons from the 2010 training boundary are filled newest-first, one season per trigger after 01:00.
-- Storage: play rows are streamed from the compressed nflverse CSV and reduced to team-game feature rows before D1 publication.
+- Storage: play rows are streamed from the compressed nflverse CSV and reduced to team-game feature rows before D1 publication. Older concatenated-gzip releases automatically retry the equivalent uncompressed nflverse CSV when the edge decompressor rejects trailing members.
 
 The importer stages validated rows before publication. A schema, row-count, HTTP, decompression, or parsing failure marks the dataset stale, creates an idempotent data alert, releases the import lease, and leaves the prior production rows untouched.
 

@@ -82,7 +82,9 @@ Structural settings live in `config/structural.config.json`; era definitions and
 - Open-Meteo values must be valid for kickoff hour and are withheld for closed/fixed roofs.
 - A partial, stale, missing, or schema-invalid import aborts, creates an in-app alert, marks dependents stale, and preserves the last good values.
 - Finals come from nflverse, never The Odds API scores endpoint.
-- nflverse requires no API key. Schedule refreshes use the public `games.csv`; play-by-play uses the public compressed CSV release and is parsed as a stream.
+- nflverse requires no API key. Schedule refreshes use the public `games.csv`; play-by-play uses the public compressed CSV release and is parsed as a stream. If the edge runtime rejects an older multi-member gzip archive, the importer retries nflverse's equivalent uncompressed CSV without weakening validation or publication guarantees.
+
+Roboto is bundled with the application at weights 400–900, so the deployed interface does not depend on a third-party font request.
 
 The actual published 2026 nflverse schedule was reduced to distinct kickoff windows in `config/2026-credit-simulation.json`. November is the busiest projected billing period at 408 credits, firing the alert while remaining under the 450 ceiling.
 

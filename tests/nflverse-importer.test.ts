@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { nflSeasonForDate } from "@/server/nflverse/automation";
+import { nflSeasonForDate, shouldRetryUncompressedPbp } from "@/server/nflverse/automation";
 import { parseCsvStream, textStream } from "@/server/nflverse/csv";
 import { aggregatePbpCsv, parseScheduleCsv } from "@/server/nflverse/transform";
 
@@ -83,6 +83,11 @@ describe("automatic nflverse importer", () => {
   it("uses the NFL season year across the January boundary", () => {
     expect(nflSeasonForDate(new Date("2026-01-15T20:00:00Z"))).toBe(2025);
     expect(nflSeasonForDate(new Date("2026-08-11T20:00:00Z"))).toBe(2026);
+  });
+
+  it("falls back to the plain CSV for multi-member gzip archives rejected by the edge runtime", () => {
+    expect(shouldRetryUncompressedPbp(new Error("Trailing bytes after end of compressed data"))).toBe(true);
+    expect(shouldRetryUncompressedPbp(new Error("nflverse schema is missing: epa"))).toBe(false);
   });
 
   it("wires the five-minute schedule and Roboto into the deployed app", () => {

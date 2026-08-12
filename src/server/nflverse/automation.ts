@@ -63,6 +63,36 @@ function etag(response: Response): string | null {
   return response.headers.get("etag") ?? response.headers.get("last-modified");
 }
 
+export function shouldRetryUncompressedPbp(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return /compressed|decompress|gzip|trailing bytes/i.test(message);
+}
+
+async function aggregatePbpResponse(input: {
+  response: Response;
+  compressed: boolean;
+  season: number;
+  currentSeason: number;
+}): Promise<{ features: Awaited<ReturnType<typeof aggregatePbpCsv>>; sourceHash: string }> {
+  if (!input.response.body) throw new Error(`nflverse play-by-play ${input.season} returned an empty body`);
+
+  const hash = createHash("sha256");
+  const hashedBody = input.response.body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
+    transform(chunk, controller) {
+      hash.update(chunk);
+      controller.enqueue(chunk);
+    }
+  }));
+  const csvBody = input.compressed
+    ? hashedBody.pipeThrough(new DecompressionStream("gzip") as unknown as TransformStream<Uint8Array, Uint8Array>)
+    : hashedBody;
+  const features = await aggregatePbpCsv(csvBody, {
+    season: input.season,
+    currentSeason: input.currentSeason
+  });
+  return { features, sourceHash: hash.digest("hex") };
+}
+
 async function refreshSchedules(input: {
   db: D1Database;
   now: Date;
@@ -177,32 +207,41 @@ async function refreshPbpSeason(input: {
       return { state: "unavailable", rows: 0 };
     }
     if (!response.ok) throw new Error(`nflverse play-by-play ${input.season} fetch failed with HTTP ${response.status}`);
-    if (!response.body) throw new Error(`nflverse play-by-play ${input.season} returned an empty body`);
 
-    const hash = createHash("sha256");
-    const hashedBody = response.body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
-      transform(chunk, controller) {
-        hash.update(chunk);
-        controller.enqueue(chunk);
+    let usedResponse = response;
+    let usedSourceUrl = sourceUrl;
+    let aggregate;
+    try {
+      aggregate = await aggregatePbpResponse({
+        response,
+        compressed: true,
+        season: input.season,
+        currentSeason: input.currentSeason
+      });
+    } catch (error) {
+      if (!shouldRetryUncompressedPbp(error)) throw error;
+      usedSourceUrl = NFLVERSE_URLS.pbpCsvPlain(input.season);
+      usedResponse = await input.fetcher(usedSourceUrl, { cache: "no-store" });
+      if (!usedResponse.ok) {
+        throw new Error(`nflverse uncompressed play-by-play ${input.season} fallback failed with HTTP ${usedResponse.status}`);
       }
-    }));
-    const gzip = new DecompressionStream("gzip") as unknown as TransformStream<Uint8Array, Uint8Array>;
-    const decompressed = hashedBody.pipeThrough(gzip);
-    const features = await aggregatePbpCsv(decompressed, {
-      season: input.season,
-      currentSeason: input.currentSeason
-    });
-    const sourceHash = hash.digest("hex");
+      aggregate = await aggregatePbpResponse({
+        response: usedResponse,
+        compressed: false,
+        season: input.season,
+        currentSeason: input.currentSeason
+      });
+    }
     await publishTeamGameFeatures({
       db: input.db,
       dataset,
-      features,
-      sourceUrl,
-      sourceTag: etag(response),
-      sourceHash,
+      features: aggregate.features,
+      sourceUrl: usedSourceUrl,
+      sourceTag: etag(usedResponse),
+      sourceHash: aggregate.sourceHash,
       importedAt: checkedAt
     });
-    return { state: "updated", rows: features.length };
+    return { state: "updated", rows: aggregate.features.length };
   } catch (error) {
     const message = error instanceof Error ? error.message : `Unknown nflverse play-by-play ${input.season} failure`;
     await failNflverseImport({ db: input.db, dataset, failedAt: checkedAt, message });
