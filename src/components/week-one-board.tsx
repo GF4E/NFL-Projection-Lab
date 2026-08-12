@@ -84,6 +84,10 @@ function legExpectedValuePercent(leg: SelectedLeg): number {
   return (probability * americanToDecimal(leg.americanPrice) - 1) * 100;
 }
 
+function legBetProbability(leg: SelectedLeg): number | null {
+  return leg.fairProbability === null ? null : Math.min(0.99, Math.max(0.01, leg.fairProbability + (leg.edge ?? 0)));
+}
+
 function slipExpectedValuePercent(legs: readonly SelectedLeg[]): number {
   if (!legs.length || legs.some((leg) => leg.fairProbability === null)) return 0;
   const probability = legs.reduce((product, leg) => product * Math.min(0.99, Math.max(0.01, (leg.fairProbability ?? 0) + (leg.edge ?? 0))), 1);
@@ -136,6 +140,7 @@ export function WeekOneBoard() {
   const matchups = useMemo(() => slate?.games ?? [], [slate]);
   const days = useMemo(() => [...new Set(matchups.map((game) => game.day))], [matchups]);
   const slipValue = useMemo(() => slipMode === "teaser" ? null : analyzeSlipValue(slip), [slip, slipMode]);
+  const straightEv = useMemo(() => slipMode === "straight" && slip.length === 1 ? legExpectedValuePercent(slip[0]) : null, [slip, slipMode]);
   const latestCapture = useMemo(() => lines.reduce<string | null>((latest, line) => !latest || line.capturedAt > latest ? line.capturedAt : latest, null), [lines]);
   const teaserValue = useMemo(() => {
     if (slipMode !== "teaser" || slip.length < 2 || slip.some((leg) => leg.kind !== "teaser" || leg.fairProbability === null)) return null;
@@ -448,14 +453,14 @@ export function WeekOneBoard() {
           <button className={slipMode === "parlay" ? "active" : ""} onClick={() => { setSlipMode("parlay"); setSlip((current) => current.filter((leg) => leg.kind !== "teaser")); }}>Parlay</button>
           <button className={slipMode === "teaser" ? "active" : ""} onClick={() => { setSlipMode("teaser"); setSlip((current) => current.filter((leg) => leg.kind === "teaser")); }}>Teaser</button>
         </div>
-        {slip.length === 0 ? <div className="empty-slip"><b>Click a line.</b><p>The contract lands here. No typing, no dropdowns.</p></div> : <div className="slip-legs">{slip.map((leg, index) => <article key={leg.id}><button onClick={() => setSlip((current) => current.filter((item) => item.id !== leg.id))}>×</button><div><small>{leg.matchup} · {marketTitle(leg.market)}</small><b>{leg.selection}</b><span>{leg.detail} · Fair {formatPercent(leg.fairProbability)}</span></div><strong>{leg.kind === "teaser" ? "6 PT" : formatOdds(leg.americanPrice)}</strong><em>LEG {index + 1}</em></article>)}</div>}
+        {slip.length === 0 ? <div className="empty-slip"><b>Click a line.</b><p>The contract lands here. No typing, no dropdowns.</p></div> : <div className="slip-legs">{slip.map((leg, index) => <article key={leg.id}><button onClick={() => setSlip((current) => current.filter((item) => item.id !== leg.id))}>×</button><div><small>{leg.matchup} · {marketTitle(leg.market)}</small><b>{leg.selection}</b><span>{leg.detail} · {leg.kind === "teaser" || leg.edge === null ? "Fair" : "Bet"} {formatPercent(leg.kind === "teaser" ? leg.fairProbability : legBetProbability(leg))}</span></div><strong>{leg.kind === "teaser" ? "6 PT" : formatOdds(leg.americanPrice)}</strong><em>LEG {index + 1}</em></article>)}</div>}
         {slipMode === "teaser" && <div className="teaser-price"><span>OFFERED 2-TEAM PRICE</span><div>{[-110, -120, -130, -140].map((price) => <button className={teaserPrice === price ? "active" : ""} onClick={() => setTeaserPrice(price)} key={price}>{price}</button>)}</div><small>Confirm the live book price. A teaser is blocked when estimated EV is negative.</small></div>}
         <div className="reason-clicks"><span>WHY</span>{pickReasons.slice(0, 8).map((item) => <button className={reason === item.value ? "active" : ""} onClick={() => setReason(item.value)} key={item.value}>{item.label.replace("Model disagrees with market price", "Model edge").replace("Opponent-adjusted efficiency matchup", "Efficiency").replace("Turnover or scoring regression", "Regression").replace("Personnel or injury advantage", "Personnel").replace("Coaching or scheme matchup", "Scheme").replace("Role clarity / team chemistry", "Chemistry").replace("Better number / key-number value", "Key number").replace("Pace / scoring environment", "Pace")}</button>)}</div>
         <div className="stake-clicks"><span>STAKE</span>{[12.5, 25, 50].map((value) => <button className={stake === value ? "active" : ""} onClick={() => setStake(value)} key={value}>{value / 25}u</button>)}</div>
         <div className="value-meter">
           <div><span>BOOK PRICE</span><b>{slip.length ? slipMode === "teaser" ? formatOdds(teaserPrice) : formatOdds(combinedAmerican(slip)) : "—"}</b></div>
           <div><span>NO-VIG FAIR</span><b>{slipMode === "teaser" ? teaserValue ? formatOdds(teaserValue.fairAmerican) : "—" : slipValue ? formatOdds(slipValue.fairAmerican) : "—"}</b></div>
-          <div className={`vig-loss ${slipMode === "teaser" && teaserValue && teaserValue.evPercent >= 0 ? "positive-value" : ""}`}><span>{slipMode === "teaser" ? "ESTIMATED EV" : "VALUE LOST"}</span><b>{slipMode === "teaser" ? teaserValue ? `${teaserValue.evPercent >= 0 ? "+" : ""}${teaserValue.evPercent.toFixed(1)}%` : "—" : slipValue ? `${slipValue.vigDragPercent.toFixed(1)}%` : "—"}</b><small>{slipMode === "teaser" ? teaserValue ? `${formatPercent(teaserValue.fairProbability)} joint fair probability` : "Add two priced teaser legs from different games" : slipValue ? `$${slipValue.lossPerUnitDollars.toFixed(2)} per 1u · latest leg +${slipValue.incrementalDragPercent.toFixed(1)}pp` : slip.length > 1 ? "Same-game or incomplete pair: withheld" : "Add a priced leg"}</small></div>
+          <div className={`vig-loss ${(slipMode === "teaser" && teaserValue && teaserValue.evPercent >= 0) || (straightEv !== null && straightEv >= 0) ? "positive-value" : ""}`}><span>{slipMode === "teaser" || slipMode === "straight" ? "ESTIMATED EV" : "VALUE LOST"}</span><b>{slipMode === "teaser" ? teaserValue ? `${teaserValue.evPercent >= 0 ? "+" : ""}${teaserValue.evPercent.toFixed(1)}%` : "—" : slipMode === "straight" ? straightEv === null ? "—" : `${straightEv >= 0 ? "+" : ""}${straightEv.toFixed(1)}%` : slipValue ? `${slipValue.vigDragPercent.toFixed(1)}%` : "—"}</b><small>{slipMode === "teaser" ? teaserValue ? `${formatPercent(teaserValue.fairProbability)} joint fair probability` : "Add two priced teaser legs from different games" : slipMode === "straight" ? slip.length === 1 ? `${formatPercent(legBetProbability(slip[0]))} shrunk bet probability` : "Select one straight to inspect its EV" : slipValue ? `$${slipValue.lossPerUnitDollars.toFixed(2)} per 1u · latest leg +${slipValue.incrementalDragPercent.toFixed(1)}pp` : slip.length > 1 ? "Same-game or incomplete pair: withheld" : "Add a priced leg"}</small></div>
         </div>
         <button className="save-slip" disabled={!slip.length || (slipMode === "teaser" && (!teaserValue || teaserValue.evPercent < 0))} onClick={saveSlip}>Approve team card</button>
         <p className="slip-message" aria-live="polite">{message}</p>

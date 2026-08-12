@@ -437,5 +437,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("MODEL TOTAL");
     expect(board).toContain('line.market === "total"');
     expect(board).toContain("estimatedEvPercent: legExpectedValuePercent(leg)");
+    expect(board).toContain("straightEv");
+    expect(board).toContain("shrunk bet probability");
   });
 });
