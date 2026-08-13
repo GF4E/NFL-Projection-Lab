@@ -4,6 +4,16 @@ import type { PickedBy } from "./play-card";
 export const TEAM_SESSION_COOKIE = "projection_lab_team";
 export const TEAM_SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60;
 
+export function isPublicTeamGatePath(path: string): boolean {
+  return path === "/login" ||
+    path === "/api/team-session" ||
+    path === "/favicon.ico" ||
+    path === "/og.png" ||
+    path.startsWith("/_next/") ||
+    path.startsWith("/_vinext/") ||
+    path.startsWith("/team-logos/");
+}
+
 interface TeamSessionPayload {
   actor: PickedBy;
   email: string;

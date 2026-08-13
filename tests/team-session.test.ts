@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { actorForTeamAccessToken, createTeamSession, verifyTeamSession } from "@/domain/team-session";
+import {
+  actorForTeamAccessToken,
+  createTeamSession,
+  isPublicTeamGatePath,
+  verifyTeamSession
+} from "@/domain/team-session";
 
 describe("signed two-person worker session", () => {
   const secret = "session-secret-that-is-longer-than-thirty-two-characters";
@@ -16,5 +21,17 @@ describe("signed two-person worker session", () => {
     expect((await verifyTeamSession({ token, secret, now }))?.actor).toBe("jarrett");
     expect(await verifyTeamSession({ token: `${token.slice(0, -1)}x`, secret, now })).toBeNull();
     expect(await verifyTeamSession({ token, secret, now: new Date("2026-10-01T16:00:00.000Z") })).toBeNull();
+  });
+
+  it("exposes only the login exchange and its required static assets", () => {
+    expect(isPublicTeamGatePath("/login")).toBe(true);
+    expect(isPublicTeamGatePath("/api/team-session")).toBe(true);
+    expect(isPublicTeamGatePath("/_next/static/login.js")).toBe(true);
+    expect(isPublicTeamGatePath("/_vinext/static/login.css")).toBe(true);
+    expect(isPublicTeamGatePath("/team-logos/sea.png")).toBe(true);
+    expect(isPublicTeamGatePath("/sunday")).toBe(false);
+    expect(isPublicTeamGatePath("/api/weekly-slate")).toBe(false);
+    expect(isPublicTeamGatePath("/api/private-export.png")).toBe(false);
+    expect(isPublicTeamGatePath("/sw.js")).toBe(false);
   });
 });

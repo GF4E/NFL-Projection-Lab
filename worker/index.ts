@@ -14,6 +14,7 @@ import {
   actorForTeamAccessToken,
   createTeamSession,
   expiredTeamSessionCookie,
+  isPublicTeamGatePath,
   serializedTeamSessionCookie,
   teamSessionCookie,
   verifyTeamSession
@@ -122,18 +123,12 @@ async function handleTeamSessionRequest(request: Request, env: Env): Promise<Res
   }
 }
 
-function publicTeamGatePath(path: string): boolean {
-  return path === "/login" || path === "/api/team-session" || path === "/favicon.ico" ||
-    path === "/og.png" || path.startsWith("/_next/") || path.startsWith("/_vinext/") ||
-    /\.(?:css|js|woff2?|png|svg|jpg|jpeg|gif|webp|ico)$/i.test(path);
-}
-
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     if (env.INTERNAL_TEAM_GATE_ENABLED === "true") {
       if (url.pathname === "/api/team-session") return handleTeamSessionRequest(request, env);
-      if (!publicTeamGatePath(url.pathname)) {
+      if (!isPublicTeamGatePath(url.pathname)) {
         const session = await verifyTeamSession({
           token: teamSessionCookie(request),
           secret: env.TEAM_SESSION_SECRET
