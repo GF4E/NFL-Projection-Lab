@@ -33,6 +33,7 @@ type LinesResponse = { lines?: LiveLine[]; configured?: boolean; season?: number
 type DecisionResponse = DecisionBoardPayload & { error?: string };
 type SelectedLeg = ValueLeg & {
   id: string;
+  sourceQuoteId: string;
   kind: "mainline" | "prop" | "teaser";
   book: LineBookKey;
   market: LineMarketKey | "prop" | "teaser";
@@ -246,7 +247,7 @@ export function WeekOneBoard() {
     const sized = recommendation(shrunkProbability, line.americanPrice, edgeInterval);
     if (sized?.included) setStake(sized.suggestedUnits * 25);
     addLeg({
-      id: line.id, kind: "mainline", gameId: line.gameId, book: line.book, market: line.market, side: line.side,
+      id: line.id, sourceQuoteId: line.id, kind: "mainline", gameId: line.gameId, book: line.book, market: line.market, side: line.side,
       point: line.point, americanPrice: line.americanPrice, fairProbability: line.fairProbability,
       matchup, selection: lineSelection(line), detail: `${marketTitle(line.market)} · ${formatOdds(line.americanPrice)}`,
       edge: shrunkProbability === null || line.fairProbability === null ? null : shrunkProbability - line.fairProbability
@@ -257,7 +258,7 @@ export function WeekOneBoard() {
     setSlipMode("straight");
     setStake(prop.suggestedUnits * 25);
     addLeg({
-      id: prop.id, kind: "prop", gameId: prop.gameId, book: prop.executionBook, market: "prop", side: prop.side,
+      id: prop.id, sourceQuoteId: prop.sourceQuoteId, kind: "prop", gameId: prop.gameId, book: prop.executionBook, market: "prop", side: prop.side,
       point: prop.point, americanPrice: prop.americanPrice, fairProbability: prop.executionFairProbability,
       matchup, selection: `${prop.player} ${prop.side} ${prop.point}`,
       detail: `${propMarketTitle(prop.market)} · ${prop.referenceBooks}-book confirmation`, edge: prop.edge
@@ -269,7 +270,7 @@ export function WeekOneBoard() {
     if (!line || candidate.fairProbability === null || candidate.pushProbability === null) return;
     setSlipMode("teaser");
     addLeg({
-      id: `teaser:${line.id}:${candidate.teasedPoint}`, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
+      id: `teaser:${line.id}:${candidate.teasedPoint}`, sourceQuoteId: line.id, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
       point: candidate.teasedPoint, americanPrice: line.americanPrice, fairProbability: candidate.fairProbability,
       matchup, selection: `${line.side} ${formatPoint(candidate.teasedPoint)}`,
       detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : "key-number"} leg`, edge: candidate.fairProbability - (line.fairProbability ?? 0),
@@ -283,7 +284,7 @@ export function WeekOneBoard() {
       const matchup = matchups.find((game) => game.id === candidate.gameId);
       if (!line || !matchup || candidate.fairProbability === null || candidate.pushProbability === null) return [];
       return [{
-        id: `teaser:${line.id}:${candidate.teasedPoint}`, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
+        id: `teaser:${line.id}:${candidate.teasedPoint}`, sourceQuoteId: line.id, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
         point: candidate.teasedPoint, americanPrice: line.americanPrice, fairProbability: candidate.fairProbability,
         matchup: `${matchup.away} @ ${matchup.home}`, selection: `${line.side} ${formatPoint(candidate.teasedPoint)}`,
         detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : candidate.classification === "key_number" ? "key-number" : "positive-EV"} leg`,
@@ -323,7 +324,7 @@ export function WeekOneBoard() {
       modelEdgePp: (leg.edge ?? 0) * 100,
       estimatedEvPercent: legExpectedValuePercent(leg),
       statsCase: `${selectedReason.label}. ${leg.detail}.`,
-      contract: [{ gameId: leg.gameId, market: leg.market === "prop" ? "prop" as const : leg.market as "spread" | "total" | "moneyline", side: leg.side, point: leg.point, americanPrice: leg.americanPrice, selection: leg.selection }]
+      contract: [{ sourceQuoteId: leg.sourceQuoteId, gameId: leg.gameId, market: leg.market === "prop" ? "prop" as const : leg.market as "spread" | "total" | "moneyline", side: leg.side, point: leg.point, americanPrice: leg.americanPrice, selection: leg.selection }]
     })) : [{
       gameId: `multi-week-${slate.week}`,
       playType: slipMode,
@@ -334,7 +335,7 @@ export function WeekOneBoard() {
       modelEdgePp: 0,
       estimatedEvPercent: slipMode === "teaser" ? teaserValue?.evPercent ?? 0 : slipExpectedValuePercent(slip),
       statsCase: `${selectedReason.label}. ${slipMode === "teaser" ? "Push-adjusted empirical teaser EV cleared the selected book price." : "Power-de-vigged independent-leg price check completed."}`,
-      contract: slip.map((leg) => ({ gameId: leg.gameId, market: leg.kind === "teaser" ? "teaser" as const : leg.market === "prop" ? "prop" as const : leg.market as "spread" | "total" | "moneyline", side: leg.side, point: leg.point, americanPrice: leg.americanPrice, selection: leg.selection }))
+      contract: slip.map((leg) => ({ sourceQuoteId: leg.sourceQuoteId, gameId: leg.gameId, market: leg.kind === "teaser" ? "teaser" as const : leg.market === "prop" ? "prop" as const : leg.market as "spread" | "total" | "moneyline", side: leg.side, point: leg.point, americanPrice: leg.americanPrice, selection: leg.selection }))
     }];
     try {
       const saved = await Promise.all(entries.map(async (entry) => {

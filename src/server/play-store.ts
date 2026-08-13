@@ -1,5 +1,5 @@
 import { getD1 } from "../../db";
-import type { PickedBy, WeeklyPlay } from "@/domain/play-card";
+import { isTeamApproved, storedLegMatchesQuote, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
 
 type PlayDatabaseRow = {
   id: string;
@@ -184,11 +184,38 @@ export async function getPlay(id: string): Promise<WeeklyPlay | null> {
   return row ? mapRow(row) : null;
 }
 
+async function assertApprovalContractCurrent(d1: D1Database, play: WeeklyPlay): Promise<void> {
+  const contract = play.contract ?? [];
+  if (!contract.length || contract.some((leg) => !leg.sourceQuoteId)) {
+    throw new Error("This draft predates quote verification. Refresh it before the second approval.");
+  }
+  for (const leg of contract) {
+    if (leg.market === "prop") {
+      const quote = await d1.prepare("SELECT point, american_price FROM player_prop_quotes WHERE id = ?")
+        .bind(leg.sourceQuoteId).first<{ point: number; american_price: number }>();
+      if (!quote || !storedLegMatchesQuote(leg, { point: quote.point, americanPrice: quote.american_price })) {
+        throw new Error("A player-prop point or price changed. Refresh the card; both approvals must restart.");
+      }
+      continue;
+    }
+    const quote = await d1.prepare("SELECT point, american_price FROM live_lines WHERE id = ?")
+      .bind(leg.sourceQuoteId).first<{ point: number | null; american_price: number }>();
+    if (!quote || !storedLegMatchesQuote(leg, { point: quote.point, americanPrice: quote.american_price })) {
+      throw new Error("A point or price changed. Refresh the card; both approvals must restart.");
+    }
+  }
+}
+
 export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promise<WeeklyPlay> {
   await ensurePlayStore();
-  const existing = await getD1().prepare("SELECT * FROM plays WHERE id = ?").bind(play.id).first<PlayDatabaseRow>();
+  const d1 = getD1();
+  const existing = await d1.prepare("SELECT * FROM plays WHERE id = ?").bind(play.id).first<PlayDatabaseRow>();
   if (existing) {
-    await getD1().prepare(`UPDATE plays SET
+    const current = mapRow(existing);
+    if (!current.approvals?.includes(actor) && !isTeamApproved(current.approvals)) {
+      await assertApprovalContractCurrent(d1, current);
+    }
+    await d1.prepare(`UPDATE plays SET
       gabe_approved = CASE WHEN ? = 'gabe' THEN 1 ELSE gabe_approved END,
       jarrett_approved = CASE WHEN ? = 'jarrett' THEN 1 ELSE jarrett_approved END,
       status = CASE WHEN (gabe_approved = 1 OR ? = 'gabe') AND (jarrett_approved = 1 OR ? = 'jarrett') THEN 'card' ELSE 'research' END,
@@ -196,14 +223,14 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
       .bind(actor, actor, actor, actor, play.updatedAt, play.id).run();
     return (await getPlay(play.id))!;
   }
-  await getD1().prepare(INSERT_PLAY_SQL).bind(
+  await d1.prepare(INSERT_PLAY_SQL).bind(
     play.id, play.contractKey ?? "", JSON.stringify(play.contract ?? []), actor === "gabe" ? 1 : 0, actor === "jarrett" ? 1 : 0,
     play.season, play.week, play.gameId, play.playType, play.market, play.primaryReason, play.pickedBy, play.title, play.legs, play.book,
     play.americanOdds, play.stakeCents, play.modelEdgePp, play.estimatedEvPercent,
     play.confidence, play.statsCase, play.footballCase, play.executionStatus, play.cashPlacementConfirmed ? 1 : 0, "research", play.result,
     play.profitCents, play.closingClvCents, play.closingClvPoints, play.clvReferenceBook, play.createdBy, play.createdAt, play.updatedAt
   ).run();
-  await getD1().prepare(`UPDATE plays SET
+  await d1.prepare(`UPDATE plays SET
     gabe_approved = CASE WHEN ? = 'gabe' THEN 1 ELSE gabe_approved END,
     jarrett_approved = CASE WHEN ? = 'jarrett' THEN 1 ELSE jarrett_approved END,
     status = CASE WHEN (gabe_approved = 1 OR ? = 'gabe') AND (jarrett_approved = 1 OR ? = 'jarrett') THEN 'card' ELSE 'research' END,

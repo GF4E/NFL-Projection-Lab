@@ -24,7 +24,7 @@ import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "@/domain/settlement";
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
-import { addTeamApproval, approvalActorForEmail, estimatedEvFromEdge, isTeamApproved, trackerRecordSummaries, trackerSummary } from "@/domain/play-card";
+import { addTeamApproval, approvalActorForEmail, estimatedEvFromEdge, isTeamApproved, storedLegMatchesQuote, trackerRecordSummaries, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
@@ -541,6 +541,24 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(route).not.toContain('pickedBy: z.enum(["gabe", "jarrett"])');
     expect(board).toContain('aria-label="Authenticated approver"');
     expect(board).not.toContain('onClick={() => setPicker("jarrett")}');
+  });
+
+  it("36d. rechecks every source quote before a second approval can freeze the contract", () => {
+    const spreadLeg = { gameId: "g1", market: "spread" as const, side: "SEA", point: -3, americanPrice: -110, selection: "SEA -3" };
+    expect(storedLegMatchesQuote(spreadLeg, { point: -3, americanPrice: -110 })).toBe(true);
+    expect(storedLegMatchesQuote(spreadLeg, { point: -2.5, americanPrice: -110 })).toBe(false);
+    expect(storedLegMatchesQuote(spreadLeg, { point: -3, americanPrice: -115 })).toBe(false);
+    const teaserLeg = { ...spreadLeg, market: "teaser" as const, point: 3 };
+    expect(storedLegMatchesQuote(teaserLeg, { point: -3, americanPrice: -120 })).toBe(true);
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    const route = readFileSync("src/app/api/plays/route.ts", "utf8");
+    const store = readFileSync("src/server/play-store.ts", "utf8");
+    expect(board).toContain("sourceQuoteId: leg.sourceQuoteId");
+    expect(route).toContain("sourceQuoteId: z.string()");
+    expect(store).toContain("assertApprovalContractCurrent");
+    expect(store).toContain("player_prop_quotes WHERE id = ?");
+    expect(store).toContain("live_lines WHERE id = ?");
+    expect(store).toContain("both approvals must restart");
   });
 
   it("37. connects the fixed-seed 80% interval and quarter-Kelly sizing to every live card", () => {

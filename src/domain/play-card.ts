@@ -6,6 +6,7 @@ export type PickedBy = "gabe" | "jarrett";
 export type PlayExecutionStatus = "paper" | "executed";
 
 export type StoredPlayLeg = {
+  sourceQuoteId?: string;
   gameId: string;
   market: "spread" | "total" | "moneyline" | "prop" | "teaser";
   side: string;
@@ -53,6 +54,14 @@ export const UNIT_CENTS = 2_500;
 
 export function approvalActorForEmail(email: string | null | undefined, jarrettEmail: string): PickedBy {
   return email?.trim().toLowerCase() === jarrettEmail.trim().toLowerCase() ? "jarrett" : "gabe";
+}
+
+export function storedLegMatchesQuote(
+  leg: StoredPlayLeg,
+  quote: { point: number | null; americanPrice: number }
+): boolean {
+  const expectedPoint = leg.market === "teaser" && leg.point !== null ? leg.point - 6 : leg.point;
+  return quote.point === expectedPoint && (leg.market === "teaser" || quote.americanPrice === leg.americanPrice);
 }
 
 export function addTeamApproval(current: readonly PickedBy[], actor: PickedBy): PickedBy[] {

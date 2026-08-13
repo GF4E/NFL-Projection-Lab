@@ -21,6 +21,7 @@ const createPlaySchema = z.object({
   modelEdgePp: z.number().min(-10).max(20),
   estimatedEvPercent: z.number().min(-100).max(100).optional(),
   contract: z.array(z.object({
+    sourceQuoteId: z.string().trim().min(3).max(160),
     gameId: z.string().trim().min(3).max(40),
     market: z.enum(["spread", "total", "moneyline", "prop", "teaser"]),
     side: z.string().trim().min(2).max(80),

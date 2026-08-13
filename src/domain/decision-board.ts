@@ -337,6 +337,7 @@ export interface RawPropQuote {
 
 export interface PropCandidate {
   id: string;
+  sourceQuoteId: string;
   gameId: string;
   executionBook: "betmgm" | "fanduel";
   market: PropMarketKey;
@@ -437,6 +438,7 @@ export function scanMarketConfirmedProps(
     if (!sizing.included) continue;
     candidates.push({
       id: `prop:${quote.id}`,
+      sourceQuoteId: quote.id,
       gameId: quote.gameId,
       executionBook,
       market: quote.market,
