@@ -414,7 +414,7 @@ button:disabled { cursor: wait; opacity: .62; }
 .matchup-cell .event-time span { padding-left: 7px; border-left: 1px solid #34403c; font-size: 7px; }
 .team-stack { display: grid; gap: 1px; }
 .team-code { min-width: 0; gap: 9px; }
-.team-code .team-logo { width: 33px; height: 33px; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
+.team-code .team-logo { width: 33px; height: 33px; flex: 0 0 33px; display: block; border: 0; border-radius: 0; background: transparent; box-shadow: none; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
 .team-code b { font-size: 19px; letter-spacing: .015em; }
 .team-code em { font-size: 10px; }
 .game-decision-state { display: grid; gap: 3px; }
@@ -456,7 +456,7 @@ button:disabled { cursor: wait; opacity: .62; }
   .sportsbook-layout { grid-template-columns: minmax(730px, 1fr) 285px; }
   .sportsbook-layout.slip-collapsed { grid-template-columns: minmax(0, 1fr) 184px; }
   .market-column-head, .matchup-market-row { grid-template-columns: minmax(165px, 1.15fr) repeat(3, minmax(102px, .8fr)) minmax(175px, 1fr); }
-  .team-code .team-logo { width: 29px; height: 29px; }
+  .team-code .team-logo { width: 29px; height: 29px; flex-basis: 29px; }
   .weekly-opportunity-queue { grid-template-columns: 108px repeat(5, minmax(115px, 1fr)); }
 }
 
@@ -786,7 +786,7 @@ button:disabled { cursor: wait; opacity: .62; }
   .sportsbook-layout { grid-template-columns: minmax(730px, 1fr) 285px; }
   .sportsbook-layout.slip-collapsed { grid-template-columns: minmax(0, 1fr) 184px; }
   .market-column-head, .matchup-market-row { grid-template-columns: minmax(165px, 1.15fr) repeat(3, minmax(102px, .8fr)) minmax(175px, 1fr); }
-  .team-code .team-logo { width: 29px; height: 29px; }
+  .team-code .team-logo { width: 29px; height: 29px; flex-basis: 29px; }
   .team-code b { font-size: 18px; }
 }
 

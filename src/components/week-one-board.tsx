@@ -707,7 +707,7 @@ export function WeekOneBoard() {
                   </div>
                   <div className="team-stack">
                     {rowData.map((row) => <div className="team-code" key={row.team}>
-                      <Image className="team-logo" src={teamLogoPath(row.team)} alt="" width={38} height={38} aria-hidden="true" />
+                      <Image className="team-logo" src={teamLogoPath(row.team)} alt="" width={38} height={38} priority unoptimized aria-hidden="true" />
                       <b>{row.team}</b>
                       {preferredTeams.has(row.team) && <em title="Preferred team">★</em>}
                     </div>)}
