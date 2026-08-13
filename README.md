@@ -24,7 +24,7 @@ The Week 1 card starts empty. Matchup prompts are research questions, not live r
 - Provider adapters for The Odds API, nflverse, official current injury feeds, and Open-Meteo kickoff-hour forecasts.
 - Private Supabase authentication, two-person team membership, row-level access controls, owner-only overrides/corrections/configuration/access, operational ledgers, and database-level approval/quote guards.
 - Exactly two Web Push types: `awaiting_you` and `edge_threshold`.
-- A 50-case acceptance suite covering the engine, live data, matchup board, no-vig pricing, bet slip, approvals, settlement, and record workflow.
+- A comprehensive acceptance suite covering the engine, live data, matchup board, no-vig pricing, bet slip, approvals, settlement, and record workflow.
 
 The interface starts with the official 2026 Week 1 schedule and no picks so the workflow can be reviewed before credentials and live market feeds are enabled.
 
@@ -67,6 +67,7 @@ No unauthenticated application API is exposed. Provider jobs use the service rol
 - `1u = $25`
 - Books: BetMGM and FanDuel
 - Shrinkage weight: `w = 0.25`
+- Strength-state update: `K = 0.005`, selected by pooled 2023–2025 rolling-origin residual RMSE and recorded in `config/strength-state-validation.json`
 - Bootstrap: 100 fixed-seed coefficient refits; 10th/90th edge percentiles
 - Suggested size: quarter-Kelly, 100u reference, floor down to 0.5u, cap 2u
 - Limits: one side and one total per game, 3u per game, 2u per play, and 10u per week

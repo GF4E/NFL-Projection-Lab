@@ -13,6 +13,7 @@ export interface StructuralConfig {
     decayCandidates: number[];
     shrinkageWeight: number;
     strengthK: number;
+    strengthValidationArtifact: string;
     promotionLogLossTolerance: number;
     promotionCalibrationSlope: number[];
     bootstrapMembers: number;

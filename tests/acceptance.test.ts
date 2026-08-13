@@ -618,6 +618,21 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(readFileSync("src/app/setup/page.tsx", "utf8")).toContain('redirect("/sunday")');
   });
 
+  it("37. freezes the strength update size selected by rolling-origin residual validation", () => {
+    const validation = JSON.parse(readFileSync("config/strength-state-validation.json", "utf8")) as {
+      selectedK: number;
+      selectionMetric: string;
+      results: Array<{ k: number; pooledRmse: number }>;
+    };
+    expect(validation.selectionMetric).toBe("pooled rolling-origin residual RMSE");
+    expect(structuralConfig.model.strengthK).toBe(validation.selectedK);
+    const selected = validation.results.find((row) => row.k === validation.selectedK)!;
+    const market = validation.results.find((row) => row.k === 0)!;
+    const previous = validation.results.find((row) => row.k === 0.18)!;
+    expect(selected.pooledRmse).toBeLessThan(market.pooledRmse);
+    expect(previous.pooledRmse).toBeGreaterThan(market.pooledRmse * 2);
+  });
+
   it("36. highlights a better book only on an identical side and point", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(board).toContain("candidate.point === line.point");
