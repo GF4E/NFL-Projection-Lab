@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { priceTwoTeamTeaser } from "@/domain/decision-board";
 import type {
   DecisionBoardPayload,
@@ -10,7 +10,7 @@ import type {
   TeaserCandidate,
   TeaserPairCandidate
 } from "@/domain/decision-board";
-import { analyzeSlipValue, decimalToAmerican, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
+import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
 import { rankMainlineRecommendations } from "@/domain/mainline-recommendations";
 import { structuralConfig } from "@/domain/config";
@@ -149,6 +149,7 @@ function SpreadSparkline({ values }: { values: readonly number[] }) {
 
 export function WeekOneBoard() {
   const [book, setBook] = useState<LineBookKey>("betmgm");
+  const initialBookChosen = useRef(false);
   const [timeZone, setTimeZone] = useState<TimeZoneChoice>("PT");
   const [slate, setSlate] = useState<WeeklySlate | null>(null);
   const [lines, setLines] = useState<LiveLine[]>([]);
@@ -169,7 +170,8 @@ export function WeekOneBoard() {
   const days = useMemo(() => [...new Set(matchups.map((game) => game.day))], [matchups]);
   const slipValue = useMemo(() => slipMode === "teaser" ? null : analyzeSlipValue(slip), [slip, slipMode]);
   const straightEv = useMemo(() => slipMode === "straight" && slip.length === 1 ? legExpectedValuePercent(slip[0]) : null, [slip, slipMode]);
-  const latestCapture = useMemo(() => lines.reduce<string | null>((latest, line) => !latest || line.capturedAt > latest ? line.capturedAt : latest, null), [lines]);
+  const latestCapture = useMemo(() => lines.reduce<string | null>((latest, line) =>
+    line.book === book && (!latest || line.capturedAt > latest) ? line.capturedAt : latest, null), [book, lines]);
   const teaserValue = useMemo(() => {
     if (slipMode !== "teaser" || slip.length !== 2 || slip.some((leg) => leg.kind !== "teaser" || leg.fairProbability === null || leg.pushProbability === undefined)) return null;
     if (new Set(slip.map((leg) => leg.gameId)).size !== slip.length) return null;
@@ -191,7 +193,12 @@ export function WeekOneBoard() {
       ]);
       if (!active) return;
       setSlate(slateData);
-      setLines(lineData.lines ?? []);
+      const nextLines = lineData.lines ?? [];
+      setLines(nextLines);
+      if (!initialBookChosen.current) {
+        setBook(bestCoveredExecutionBook(nextLines));
+        initialBookChosen.current = true;
+      }
       setConfigured(Boolean(lineData.configured));
       setPlays(playData.plays ?? []);
       if (playData.actor) setPicker(playData.actor);

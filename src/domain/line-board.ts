@@ -27,6 +27,29 @@ export type ValueLeg = Pick<SlipLeg, "gameId" | "americanPrice" | "fairProbabili
   pushProbability?: number;
 };
 
+export function bestCoveredExecutionBook(
+  lines: readonly LiveLine[],
+  preferred: LineBookKey = "betmgm"
+): LineBookKey {
+  const coverage = new Map<LineBookKey, Set<string>>([
+    ["betmgm", new Set()],
+    ["fanduel", new Set()]
+  ]);
+  const groups = new Map<string, LiveLine[]>();
+  for (const line of lines) {
+    const key = `${line.book}:${line.gameId}:${line.market}`;
+    groups.set(key, [...(groups.get(key) ?? []), line]);
+  }
+  for (const group of groups.values()) {
+    const first = group[0];
+    if (!first || new Set(group.map((line) => line.side.toLowerCase())).size !== 2) continue;
+    if (group.some((line) => line.fairProbability === null)) continue;
+    coverage.get(first.book)!.add(`${first.gameId}:${first.market}`);
+  }
+  const alternative: LineBookKey = preferred === "betmgm" ? "fanduel" : "betmgm";
+  return coverage.get(alternative)!.size > coverage.get(preferred)!.size ? alternative : preferred;
+}
+
 export function enrichWithPowerDevig(lines: readonly Omit<LiveLine, "fairProbability" | "marketVigPercent">[]): LiveLine[] {
   const groups = new Map<string, typeof lines>();
   for (const line of lines) {

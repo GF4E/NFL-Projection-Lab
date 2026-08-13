@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { BaselineProjection, MoneylineProjection, TotalProjection } from "@/domain/decision-board";
 import type { LineMarketKey, LiveLine } from "@/domain/line-board";
+import { bestCoveredExecutionBook } from "@/domain/line-board";
 import { rankMainlineRecommendations } from "@/domain/mainline-recommendations";
 
 const capturedAt = "2026-09-13T18:00:00.000Z";
@@ -46,6 +47,21 @@ function moneyline(overrides: Partial<MoneylineProjection> = {}): MoneylineProje
 }
 
 describe("exact-price mainline recommendations", () => {
+  it("defaults to the execution book with the most complete two-sided market coverage", () => {
+    const betmgm = [
+      line("mgm-home-ml", "moneyline", "LAR", null, -140, 0.58),
+      line("mgm-away-ml", "moneyline", "SEA", null, 120, 0.42)
+    ];
+    const fanduel = [
+      ...betmgm.map((item) => ({ ...item, id: `fd:${item.id}`, book: "fanduel" as const })),
+      { ...line("fd-home-spread", "spread", "LAR", -2.5, -110, 0.5), book: "fanduel" as const },
+      { ...line("fd-away-spread", "spread", "SEA", 2.5, -110, 0.5), book: "fanduel" as const }
+    ];
+    expect(bestCoveredExecutionBook([...betmgm, ...fanduel])).toBe("fanduel");
+    expect(bestCoveredExecutionBook(betmgm)).toBe("betmgm");
+    expect(bestCoveredExecutionBook([...betmgm, ...fanduel.slice(0, 2)])).toBe("betmgm");
+  });
+
   it("co-locates the best side and total with break-even, EV, and Kelly sizing", () => {
     const candidates = rankMainlineRecommendations({
       gameId: "sea-lar", awayTeam: "SEA", homeTeam: "LAR", book: "betmgm",
