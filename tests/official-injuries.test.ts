@@ -79,8 +79,10 @@ describe("official NFL injury importer", () => {
 
   it("keeps the feed in the background instead of adding another site tab", () => {
     const worker = readFileSync("worker/index.ts", "utf8");
+    const maintenance = readFileSync("src/server/background-maintenance.ts", "utf8");
     const navigation = readFileSync("src/components/nav-links.tsx", "utf8");
-    expect(worker).toContain("runOfficialInjuryAutomation");
+    expect(worker).toContain("runBackgroundMaintenance");
+    expect(maintenance).toContain("runOfficialInjuryAutomation");
     expect(worker).toContain('/api/game-context');
     expect(navigation).not.toContain('"Research"');
     expect(navigation).not.toContain('"Model"');

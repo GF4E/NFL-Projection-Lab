@@ -27,7 +27,7 @@ import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
 import { addTeamApproval, approvalActorForEmail, draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, isTeamApproved, storedLegMatchesQuote, trackerRecordSummaries, trackerSummary, validateTeamCardPortfolio } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
-import { buildPlayerPropEvidence, crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
+import { buildPlayerPropEvidence, crossedKeyNumbers, isClassicWongPoint, isPropPlayerUnavailable, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
@@ -129,7 +129,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(failed.freshness).toBe("stale");
     expect(failed.alert).not.toBeNull();
     expect(completeImport(failed, [4], "2026-09-16").freshness).toBe("current");
-    expect(readFileSync("src/app/api/nflverse/route.ts", "utf8")).toContain("runModelLifecycleAutomation");
+    expect(readFileSync("src/app/api/nflverse/route.ts", "utf8")).toContain("runBackgroundMaintenance");
+    expect(readFileSync("src/server/background-maintenance.ts", "utf8")).toContain("runModelLifecycleAutomation");
   });
 
   it("8. rejects W+ data and forecast-time source leakage", () => {
@@ -395,6 +396,22 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(candidates).toHaveLength(1);
     expect(candidates[0]).toMatchObject({ executionBook: "betmgm", sampleGames: 8 });
     expect(candidates[0].betProbability).toBeGreaterThan(candidates[0].consensusProbability);
+    expect(scanMarketConfirmedProps(quotes, {
+      evidence: [evidence!], requireEvidence: true, requireConfirmedAvailability: true,
+      availabilityConfirmed: false
+    })).toEqual([]);
+    expect(scanMarketConfirmedProps(quotes, {
+      evidence: [evidence!], requireEvidence: true, requireConfirmedAvailability: true,
+      availabilityConfirmed: true, unavailablePlayers: ["Quarterback"]
+    })).toEqual([]);
+    expect(scanMarketConfirmedProps(quotes, {
+      evidence: [evidence!], requireEvidence: true, requireConfirmedAvailability: true,
+      availabilityConfirmed: true, unavailablePlayers: []
+    })).toHaveLength(1);
+    expect(isPropPlayerUnavailable("Out")).toBe(true);
+    expect(isPropPlayerUnavailable("Doubtful")).toBe(true);
+    expect(isPropPlayerUnavailable("Questionable")).toBe(false);
+    expect(isPropPlayerUnavailable(null, true)).toBe(true);
     const stale = [...pair("betmgm"), ...pair("fanduel"), ...pair("draftkings"), ...pair("bovada", "2026-09-09T17:00:00Z")];
     expect(scanMarketConfirmedProps(stale, { evidence: [evidence!], requireEvidence: true, maximumSnapshotSkewMs: 10 * 60_000 })).toEqual([]);
   });
@@ -478,6 +495,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(props.map((candidate) => candidate.gameId).sort()).toEqual([
       "atl-pit", "bal-ind", "buf-hou", "chi-car", "cle-jax", "no-det", "nyj-ten", "tb-cin"
     ]);
+    expect(scheduledPropCandidates(new Date("2026-09-13T16:40:00.000Z"), games).map((candidate) => candidate.gameId)).toContain("atl-pit");
+    expect(scheduledPropCandidates(new Date("2026-09-13T16:51:00.000Z"), games).map((candidate) => candidate.gameId)).not.toContain("atl-pit");
+    expect(readFileSync("src/server/odds-automation.ts", "utf8")).toContain("getPlayerPropAvailability");
   });
 
   it("28. rejects a partial mainline payload so stale complete prices survive", () => {
@@ -661,7 +681,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const weatherAutomation = readFileSync("src/server/weather/automation.ts", "utf8");
     expect(weatherStore).toContain("kickoff_weather_stage");
     expect(weatherAutomation).toContain("eligible.map(({ gameId }) => gameId)");
-    expect(readFileSync("worker/index.ts", "utf8")).toContain('stage("model lifecycle"');
+    const maintenance = readFileSync("src/server/background-maintenance.ts", "utf8");
+    expect(readFileSync("worker/index.ts", "utf8")).toContain("runBackgroundMaintenance");
+    expect(maintenance).toContain("lifecycle: () => runModelLifecycleAutomation");
   });
 
   it("36. highlights a better book only on an identical side and point", () => {
@@ -725,10 +747,12 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(draftExpirationReason({ ...play, createdAt: "2026-09-13T19:30:00.000Z" }, "2026-09-13T20:00:00.000Z", kickoffs)).toBe("kickoff");
     const store = readFileSync("src/server/play-store.ts", "utf8");
     const worker = readFileSync("worker/index.ts", "utf8");
+    const maintenance = readFileSync("src/server/background-maintenance.ts", "utf8");
     expect(store).toContain("play_state_audit");
     expect(store).toContain("expireStaleTeamDrafts");
     expect(store).toContain("Approval is closed because this contract has kicked off");
-    expect(worker).toContain("expireStaleTeamDrafts(env.DB, scheduledAt)");
+    expect(worker).toContain("runBackgroundMaintenance");
+    expect(maintenance).toContain("expireStaleTeamDrafts(input.db, now)");
   });
 
   it("37. connects the fixed-seed 80% interval and quarter-Kelly sizing to every live card", () => {

@@ -39,6 +39,7 @@ export interface ScheduledGame {
 }
 
 const SLOT_WINDOW_MS = 15 * 60_000;
+const PROP_RETRY_WINDOW_MS = 50 * 60_000;
 const REQUEST_COST = 3;
 
 function pacificParts(date: Date): { dayKey: string; weekday: string; minuteOfDay: number } {
@@ -83,9 +84,9 @@ function recurringCandidate(now: Date, games: readonly ScheduledGame[]): Schedul
   };
 }
 
-function isDue(now: Date, target: number): boolean {
+function isDue(now: Date, target: number, windowMs = SLOT_WINDOW_MS): boolean {
   const delta = now.getTime() - target;
-  return delta >= 0 && delta < SLOT_WINDOW_MS;
+  return delta >= 0 && delta < windowMs;
 }
 
 export function scheduledMainlineCandidates(now: Date, games: readonly ScheduledGame[]): ScheduledOddsCandidate[] {
@@ -118,7 +119,7 @@ export function scheduledMainlineCandidates(now: Date, games: readonly Scheduled
 export function scheduledPropCandidates(now: Date, games: readonly ScheduledGame[]): ScheduledOddsCandidate[] {
   return games.flatMap((game) => {
     const target = Date.parse(game.kickoffAt) - 60 * 60_000;
-    if (!isDue(now, target)) return [];
+    if (!isDue(now, target, PROP_RETRY_WINDOW_MS)) return [];
     const scheduledFor = new Date(target).toISOString();
     return [{
       key: deterministicSnapshotKey({ provider: "the-odds-api", job: "props_minus_60", scheduledFor, gameId: game.id }),

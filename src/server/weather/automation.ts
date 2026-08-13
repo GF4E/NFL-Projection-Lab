@@ -38,10 +38,15 @@ export function weatherRefreshIntervalMs(millisecondsToKickoff: number): number 
 
 export function effectiveKickoffRoof(
   defaultRoof: WeatherInput["roof"],
-  officialContext: { inactivesConfirmed: boolean; roof: WeatherInput["roof"] } | null
+  officialContext: {
+    freshness: "current" | "stale" | "running" | "unavailable";
+    inactivesConfirmed: boolean;
+    roof: WeatherInput["roof"];
+  } | null
 ): WeatherInput["roof"] {
   if (defaultRoof !== "unconfirmed") return defaultRoof;
-  return officialContext?.inactivesConfirmed && (officialContext.roof === "open" || officialContext.roof === "closed")
+  return officialContext?.freshness === "current" && officialContext.inactivesConfirmed
+    && (officialContext.roof === "open" || officialContext.roof === "closed")
     ? officialContext.roof
     : "unconfirmed";
 }

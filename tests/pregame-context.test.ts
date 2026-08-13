@@ -58,7 +58,8 @@ describe("official kickoff-minus-90 context", () => {
     expect(parseOfficialRoofDesignation('<script>{"roofStatus":"closed"}</script>')).toBe("closed");
     expect(parseOfficialRoofDesignation("<dt>STADIUM</dt><dd>STATE FARM STADIUM</dd>")).toBeNull();
     expect(effectiveKickoffRoof("unconfirmed", null)).toBe("unconfirmed");
-    expect(effectiveKickoffRoof("unconfirmed", { inactivesConfirmed: true, roof: "open" })).toBe("open");
+    expect(effectiveKickoffRoof("unconfirmed", { freshness: "current", inactivesConfirmed: true, roof: "open" })).toBe("open");
+    expect(effectiveKickoffRoof("unconfirmed", { freshness: "stale", inactivesConfirmed: true, roof: "open" })).toBe("unconfirmed");
     expect(effectiveKickoffRoof("fixed", null)).toBe("fixed");
   });
 

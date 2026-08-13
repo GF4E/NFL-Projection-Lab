@@ -451,6 +451,10 @@ export function propPlayerLookupPattern(player: string): string {
   return `%${surname}%`;
 }
 
+export function isPropPlayerUnavailable(gameStatus: string | null, inactive = false): boolean {
+  return inactive || /\b(?:out|doubtful)\b/i.test(gameStatus ?? "");
+}
+
 export function playerPropEvidenceKey(input: Pick<PlayerPropEvidence, "player" | "market" | "side" | "point">): string {
   return `${input.market}:${normalizePropPlayerName(input.player)}:${input.side}:${input.point}`;
 }
@@ -510,6 +514,9 @@ export function scanMarketConfirmedProps(
     maximumSnapshotSkewMs?: number;
     evidence?: readonly PlayerPropEvidence[];
     requireEvidence?: boolean;
+    availabilityConfirmed?: boolean;
+    unavailablePlayers?: readonly string[];
+    requireConfirmedAvailability?: boolean;
   } = {}
 ): PropCandidate[] {
   const minimumReferenceBooks = options.minimumReferenceBooks ?? structuralConfig.props.minimumReferenceBooks;
@@ -517,9 +524,12 @@ export function scanMarketConfirmedProps(
   const maximumPerBook = options.maximumPerBook ?? structuralConfig.props.maximumPerBook;
   const maximumSnapshotSkewMs = options.maximumSnapshotSkewMs ?? Number.POSITIVE_INFINITY;
   const evidence = new Map((options.evidence ?? []).map((item) => [playerPropEvidenceKey(item), item]));
+  if (options.requireConfirmedAvailability && options.availabilityConfirmed !== true) return [];
+  const unavailablePlayers = new Set((options.unavailablePlayers ?? []).map(normalizePropPlayerName));
   const fair = deviggedQuotes(quotes);
   const candidates: PropCandidate[] = [];
   for (const quote of quotes) {
+    if (unavailablePlayers.has(normalizePropPlayerName(quote.player))) continue;
     const executionBook = quote.book === "betmgm" ? "betmgm" : quote.book === "fanduel" ? "fanduel" : null;
     const executionFairProbability = fair.get(quote.id);
     if (!executionBook || executionFairProbability === undefined) continue;

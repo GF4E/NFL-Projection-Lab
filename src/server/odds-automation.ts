@@ -16,7 +16,7 @@ import {
   getOddsQuotaState,
   recordOddsQuota
 } from "./odds-quota";
-import { refreshPlayerPropBoard } from "./player-props";
+import { getPlayerPropAvailability, refreshPlayerPropBoard } from "./player-props";
 import { fetchLiveOddsForSlate } from "./week-one-live-odds";
 import { seasonSchedule, weeklySlate } from "./weekly-slate";
 
@@ -143,6 +143,15 @@ export async function runScheduledOddsAutomation(input: {
     .sort((left, right) => left.priority - right.priority);
   const summary: OddsAutomationSummary = { checkedAt, due: due.length, completed: 0, failed: 0, skipped: 0, results: [] };
   for (const candidate of due) {
+    if (candidate.job === "props_minus_60" && candidate.gameId) {
+      const availability = await getPlayerPropAvailability(candidate.gameId, db);
+      if (!availability.confirmed) {
+        const message = "Waiting for confirmed official inactives before spending prop credits";
+        summary.skipped += 1;
+        summary.results.push({ key: candidate.key, status: "skipped", message });
+        continue;
+      }
+    }
     if (!await acquireRun(db, candidate, checkedAt)) continue;
     const quota = await getOddsQuotaState(db);
     const throttleReason = plannedOddsThrottleReason(candidate, schedule, quota?.used ?? 0);

@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   PROP_MARKETS,
   buildPlayerPropEvidence,
+  isPropPlayerUnavailable,
   normalizePropPlayerName,
   propPlayerLookupPattern,
   scanMarketConfirmedProps,
@@ -22,6 +23,8 @@ import {
 } from "./odds-quota";
 import { seasonSchedule } from "./weekly-slate";
 import { ensureNflverseStore } from "./nflverse/store";
+import { ensureOfficialInjuryStore } from "./official-injuries/store";
+import { ensurePregameContextStore } from "./pregame-context/store";
 
 const CACHE_MS = 15 * 60_000;
 
@@ -96,6 +99,25 @@ interface PlayerSnapHistoryRow {
   offense_snaps: number;
 }
 
+interface InjuryAvailabilityRow {
+  player: string;
+  game_status: string | null;
+}
+
+interface InactiveAvailabilityRow {
+  player: string;
+}
+
+interface PregameAvailabilityRow {
+  freshness: string;
+  inactives_confirmed: number;
+}
+
+interface PlayerAvailability {
+  confirmed: boolean;
+  unavailablePlayers: string[];
+}
+
 const schema = [
   `CREATE TABLE IF NOT EXISTS player_prop_quotes (
     id text PRIMARY KEY NOT NULL, game_id text NOT NULL, event_id text NOT NULL, book text NOT NULL,
@@ -152,6 +174,33 @@ async function quotesForGame(db: D1Database, gameId: string): Promise<RawPropQuo
 
 async function stateForGame(db: D1Database, gameId: string): Promise<StateRow | null> {
   return db.prepare("SELECT * FROM player_prop_scan_state WHERE game_id = ?").bind(gameId).first<StateRow>();
+}
+
+async function availabilityForGame(db: D1Database, gameId: string): Promise<PlayerAvailability> {
+  const [pregame, injuries, inactives] = await Promise.all([
+    db.prepare(`SELECT freshness, inactives_confirmed FROM official_pregame_context_state
+      WHERE game_id = ?`).bind(gameId).first<PregameAvailabilityRow>(),
+    db.prepare(`SELECT player, game_status FROM official_injury_reports
+      WHERE game_id = ?`).bind(gameId).all<InjuryAvailabilityRow>(),
+    db.prepare(`SELECT player FROM official_inactives
+      WHERE game_id = ?`).bind(gameId).all<InactiveAvailabilityRow>()
+  ]);
+  const unavailablePlayers = new Set(inactives.results.map((row) => row.player));
+  for (const row of injuries.results) {
+    if (isPropPlayerUnavailable(row.game_status)) unavailablePlayers.add(row.player);
+  }
+  return {
+    confirmed: pregame?.freshness === "current" && pregame.inactives_confirmed === 1,
+    unavailablePlayers: [...unavailablePlayers]
+  };
+}
+
+export async function getPlayerPropAvailability(
+  gameId: string,
+  db: D1Database = getD1()
+): Promise<PlayerAvailability> {
+  await Promise.all([ensureOfficialInjuryStore(db), ensurePregameContextStore(db)]);
+  return availabilityForGame(db, gameId);
 }
 
 async function playerEvidenceForGame(db: D1Database, gameId: string, quotes: readonly RawPropQuote[]): Promise<PlayerPropEvidence[]> {
@@ -227,14 +276,20 @@ async function playerEvidenceForGame(db: D1Database, gameId: string, quotes: rea
 }
 
 async function board(db: D1Database, gameId: string, state: StateRow | null, quotes: RawPropQuote[]): Promise<PlayerPropBoard> {
-  const evidence = await playerEvidenceForGame(db, gameId, quotes);
+  const [evidence, availability] = await Promise.all([
+    playerEvidenceForGame(db, gameId, quotes),
+    availabilityForGame(db, gameId)
+  ]);
   const candidates = scanMarketConfirmedProps(quotes, {
     minimumReferenceBooks: structuralConfig.props.minimumReferenceBooks,
     minimumExpectedValue: structuralConfig.props.minimumExpectedValue,
     maximumPerBook: structuralConfig.props.maximumPerBook,
     maximumSnapshotSkewMs: structuralConfig.props.maximumSnapshotSkewMinutes * 60_000,
     evidence,
-    requireEvidence: true
+    requireEvidence: true,
+    availabilityConfirmed: availability.confirmed,
+    unavailablePlayers: availability.unavailablePlayers,
+    requireConfirmedAvailability: true
   });
   return {
     gameId,
@@ -247,7 +302,9 @@ async function board(db: D1Database, gameId: string, state: StateRow | null, quo
       remaining: state.quota_remaining ?? 0,
       lastCost: state.quota_last_cost ?? 0
     },
-    message: candidates.length
+    message: !availability.confirmed
+      ? "Official inactives are not confirmed; prop suggestions are withheld"
+      : candidates.length
       ? `Market and player-history confirmed · ${state?.message ?? "cached prices"}`
       : quotes.length
         ? evidence.length
@@ -258,7 +315,12 @@ async function board(db: D1Database, gameId: string, state: StateRow | null, quo
 }
 
 export async function getPlayerPropBoard(gameId: string, db: D1Database = getD1()): Promise<PlayerPropBoard> {
-  await Promise.all([ensurePlayerPropStore(db), ensureNflverseStore(db)]);
+  await Promise.all([
+    ensurePlayerPropStore(db),
+    ensureNflverseStore(db),
+    ensureOfficialInjuryStore(db),
+    ensurePregameContextStore(db)
+  ]);
   return board(db, gameId, await stateForGame(db, gameId), await quotesForGame(db, gameId));
 }
 
@@ -307,7 +369,12 @@ export async function refreshPlayerPropBoard(input: {
 }): Promise<PlayerPropBoard> {
   const db = input.db ?? getD1();
   const fetcher = input.fetcher ?? fetch;
-  await ensurePlayerPropStore(db);
+  await Promise.all([
+    ensurePlayerPropStore(db),
+    ensureNflverseStore(db),
+    ensureOfficialInjuryStore(db),
+    ensurePregameContextStore(db)
+  ]);
   const checkedAt = new Date().toISOString();
   const existing = await stateForGame(db, input.gameId);
   const cachedQuotes = await quotesForGame(db, input.gameId);

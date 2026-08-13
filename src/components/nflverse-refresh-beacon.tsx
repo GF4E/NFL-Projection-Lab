@@ -15,6 +15,10 @@ export function NflverseRefreshBeacon() {
         method: "POST",
         credentials: "same-origin",
         headers: { "content-type": "application/json" }
+      }).then((response) => {
+        if (response.ok) window.dispatchEvent(new Event("projection-lab:data-refreshed"));
+      }).catch(() => {
+        // Each background runner preserves its last good snapshot and records its own stale state.
       });
     };
 

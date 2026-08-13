@@ -178,7 +178,7 @@ export function WeekOneBoard() {
 
   useEffect(() => {
     let active = true;
-    (async () => {
+    const load = async () => {
       const slateResponse = await fetch("/api/weekly-slate");
       const slateData = await slateResponse.json() as WeeklySlate & { error?: string };
       if (!slateResponse.ok || slateData.error) throw new Error(slateData.error ?? "The weekly schedule is unavailable");
@@ -196,8 +196,18 @@ export function WeekOneBoard() {
       if (playData.actor) setPicker(playData.actor);
       if (!decisionData.error) setIntelligence(decisionData);
       if (!lineData.configured) setMessage("Live prices need the Odds API key. The board will not invent them.");
-    })().catch((error) => active && setMessage(error instanceof Error ? error.message : "The last good board could not be loaded."));
-    return () => { active = false; };
+    };
+    void load().catch((error) => active && setMessage(error instanceof Error ? error.message : "The last good board could not be loaded."));
+    const refreshed = () => {
+      void load().catch(() => {
+        // The current card remains usable when a background refresh fails.
+      });
+    };
+    window.addEventListener("projection-lab:data-refreshed", refreshed);
+    return () => {
+      active = false;
+      window.removeEventListener("projection-lab:data-refreshed", refreshed);
+    };
   }, []);
 
   async function toggleDecisionDesk(gameId: string) {

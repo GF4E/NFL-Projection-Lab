@@ -1,19 +1,13 @@
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
-import { runNflverseAutomation } from "../src/server/nflverse/automation";
 import { listNflverseImportStates } from "../src/server/nflverse/store";
-import { settleCompletedTeamPlays } from "../src/server/automatic-settlement";
 import { buildDecisionBoard } from "../src/server/decision-board";
 import { getPlayerPropBoard, refreshPlayerPropBoard } from "../src/server/player-props";
-import { listOddsAutomationRuns, runScheduledOddsAutomation } from "../src/server/odds-automation";
+import { listOddsAutomationRuns } from "../src/server/odds-automation";
 import { weeklySlate } from "../src/server/weekly-slate";
-import { runOfficialInjuryAutomation } from "../src/server/official-injuries/automation";
 import { listOfficialInjuryImportStates } from "../src/server/official-injuries/store";
-import { runKickoffWeatherAutomation } from "../src/server/weather/automation";
-import { runModelLifecycleAutomation } from "../src/server/model-lifecycle/automation";
-import { runOfficialPregameContextAutomation } from "../src/server/pregame-context/automation";
 import { listPregameContextStates } from "../src/server/pregame-context/store";
-import { expireStaleTeamDrafts } from "../src/server/play-store";
+import { runBackgroundMaintenance } from "../src/server/background-maintenance";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -66,14 +60,6 @@ function json(payload: unknown, status = 200, headers?: HeadersInit): Response {
   });
 }
 
-async function stage<T>(label: string, task: Promise<T>): Promise<T> {
-  try {
-    return await task;
-  } catch (error) {
-    throw new Error(`${label}: ${error instanceof Error ? error.message : "unknown failure"}`);
-  }
-}
-
 async function handleNflverseRequest(request: Request, env: Env): Promise<Response> {
   if (request.method !== "GET" && request.method !== "POST") {
     return json({ error: "Method not allowed" }, 405, { allow: "GET, POST" });
@@ -81,13 +67,8 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
 
   try {
     if (request.method === "POST") {
-      const result = await stage("nflverse importer", runNflverseAutomation({ db: env.DB, allowPlayByPlay: true }));
-      const injuries = await stage("official injuries", runOfficialInjuryAutomation({ db: env.DB }));
-      const pregame = await stage("pregame context", runOfficialPregameContextAutomation({ db: env.DB }));
-      const weather = await stage("kickoff weather", runKickoffWeatherAutomation({ db: env.DB }));
-      const lifecycle = await stage("model lifecycle", runModelLifecycleAutomation({ db: env.DB }));
-      const settlement = await stage("automatic settlement", settleCompletedTeamPlays(env.DB));
-      return json({ result, injuries, pregame, weather, lifecycle, settlement, states: await listNflverseImportStates(env.DB) });
+      const maintenance = await runBackgroundMaintenance({ db: env.DB, apiKey: env.ODDS_API_KEY });
+      return json({ maintenance, states: await listNflverseImportStates(env.DB) });
     }
     return json({ states: await listNflverseImportStates(env.DB) });
   } catch (error) {
@@ -154,29 +135,7 @@ const worker = {
   },
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     const scheduledAt = new Date(controller.scheduledTime);
-    ctx.waitUntil(expireStaleTeamDrafts(env.DB, scheduledAt));
-    ctx.waitUntil(
-      runNflverseAutomation({
-        db: env.DB,
-        now: scheduledAt,
-        allowPlayByPlay: true
-      }).then(async () => {
-        const settlement = await settleCompletedTeamPlays(env.DB, scheduledAt);
-        const pregame = await runOfficialPregameContextAutomation({ db: env.DB, now: scheduledAt });
-        const weather = await runKickoffWeatherAutomation({ db: env.DB, now: scheduledAt });
-        const lifecycle = await runModelLifecycleAutomation({ db: env.DB, now: scheduledAt });
-        return { settlement, pregame, weather, lifecycle };
-      })
-    );
-    ctx.waitUntil(runScheduledOddsAutomation({
-      db: env.DB,
-      apiKey: env.ODDS_API_KEY,
-      now: new Date(controller.scheduledTime)
-    }));
-    ctx.waitUntil(runOfficialInjuryAutomation({
-      db: env.DB,
-      now: scheduledAt
-    }));
+    ctx.waitUntil(runBackgroundMaintenance({ db: env.DB, apiKey: env.ODDS_API_KEY, now: scheduledAt }));
   }
 };
 
