@@ -11,7 +11,7 @@ import type {
   TeaserPairCandidate
 } from "@/domain/decision-board";
 import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, isPricedSlipApprovable, updateSlipSelections, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
-import { alignMatchupEvidence, compactEvidenceLabel } from "@/domain/evidence-alignment";
+import { alignMatchupEvidence, compactEvidenceLabel, evidenceDetail } from "@/domain/evidence-alignment";
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
 import { rankBestBookMainlineRecommendations, rankMainlineRecommendations } from "@/domain/mainline-recommendations";
 import { structuralConfig } from "@/domain/config";
@@ -530,6 +530,7 @@ export function WeekOneBoard() {
                 <section className="quick-mainlines">
                   <div className="quick-head"><span>MODEL BETS</span><small>{actionableMainlines ? `${actionableMainlines} best-book ${actionableMainlines === 1 ? "play" : "plays"}` : "Price check"}</small></div>
                   {mainlineRecommendations.length ? mainlineRecommendations.map((candidate) => {
+                    // Matchup context explains the contract; it is not added to EV or sizing twice.
                     const context = alignMatchupEvidence(gameIntel?.signals ?? [], candidate.market, candidate.line.side);
                     return <button
                       className={`quick-mainline-recommendation ${candidate.sizing.greyed ? "uncertain" : ""}`}
@@ -540,7 +541,7 @@ export function WeekOneBoard() {
                       <div>
                         <b>{lineSelection(candidate.line)} <strong>{formatOdds(candidate.line.americanPrice)}</strong></b>
                         <small>{bookNames[candidate.line.book]} · {marketTitle(candidate.market)} · BET {formatPercent(candidate.betProbability)} · BREAK-EVEN {formatPercent(candidate.breakEvenProbability)}</small>
-                        <small>{candidate.expectedValue >= 0 ? "+" : ""}{(candidate.expectedValue * 100).toFixed(1)}% EV · 80% {formatInterval(candidate.edgeInterval)} · <span className={`evidence-check ${context.verdict}`} title="Context explains the contract but is not added to EV or sizing twice.">{compactEvidenceLabel(context)}</span></small>
+                        <small>{candidate.expectedValue >= 0 ? "+" : ""}{(candidate.expectedValue * 100).toFixed(1)}% EV · 80% {formatInterval(candidate.edgeInterval)} · <span className={`evidence-check ${context.verdict}`} title={evidenceDetail(context)}>{compactEvidenceLabel(context)}</span></small>
                       </div>
                       <em>{candidate.actionable ? `${candidate.sizing.suggestedUnits}u ADD` : candidate.preferenceConflict ? "PASS · TEAM" : "PASS"}</em>
                     </button>;
@@ -558,7 +559,7 @@ export function WeekOneBoard() {
                     return <button onClick={() => addTeaser(candidate, `${game.away} @ ${game.home}`)} key={`${candidate.book}:${candidate.team}:${candidate.originalPoint}`}>
                       <span className={`teaser-class ${candidate.classification}`}>{candidate.classification === "classic_wong" ? "WONG" : candidate.classification === "key_number" ? "KEY" : "EV"}</span>
                       <b>{candidate.team} {formatPoint(candidate.teasedPoint)}</b>
-                      <small>{formatPercent(candidate.fairProbability)} · <span className={`evidence-check ${context.verdict}`} title="Context explains the leg but is not added to its probability twice.">{compactEvidenceLabel(context)}</span></small>
+                      <small>{formatPercent(candidate.fairProbability)} · <span className={`evidence-check ${context.verdict}`} title={evidenceDetail(context)}>{compactEvidenceLabel(context)}</span></small>
                     </button>;
                   }) : <p>No viable path at this line.</p>}
                 </section>

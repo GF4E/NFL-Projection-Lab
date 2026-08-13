@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { alignMatchupEvidence, compactEvidenceLabel } from "@/domain/evidence-alignment";
+import { alignMatchupEvidence, compactEvidenceLabel, evidenceDetail } from "@/domain/evidence-alignment";
 import type { MatchupSignal } from "@/domain/decision-board";
 
 const signals: MatchupSignal[] = [
@@ -14,8 +14,12 @@ describe("contract-specific evidence alignment", () => {
     expect(alignment.relevant.map((signal) => signal.id)).toEqual(["efficiency", "strength"]);
     expect(alignment.supporting.map((signal) => signal.id)).toEqual(["efficiency"]);
     expect(alignment.opposing.map((signal) => signal.id)).toEqual(["strength"]);
-    expect(alignment.verdict).toBe("mixed");
-    expect(compactEvidenceLabel(alignment)).toBe("CTX 1-1 MIXED");
+    expect(alignment.verdict).toBe("supports");
+    expect(alignment.supportingStrength).toBe(20);
+    expect(alignment.opposingStrength).toBe(12);
+    expect(compactEvidenceLabel(alignment)).toBe("FOR · ADJ EPA");
+    expect(evidenceDetail(alignment)).toContain("For: ADJ EPA — SEA O #4 vs LAR D #22");
+    expect(evidenceDetail(alignment)).toContain("Watch: MARKET-ADJUSTED FORM — state #8 vs SEA #13");
   });
 
   it("uses only total-direction signals for totals", () => {
@@ -24,7 +28,7 @@ describe("contract-specific evidence alignment", () => {
     expect(alignment.supporting).toHaveLength(1);
     expect(alignment.opposing).toHaveLength(0);
     expect(alignment.verdict).toBe("supports");
-    expect(compactEvidenceLabel(alignment)).toBe("CTX 1-0 FOR");
+    expect(compactEvidenceLabel(alignment)).toBe("FOR · PACE");
   });
 
   it("marks a teaser leg as contradicted when team context points to its opponent", () => {
@@ -33,12 +37,22 @@ describe("contract-specific evidence alignment", () => {
       { id: "strength", label: "MARKET-ADJUSTED FORM", lean: "LAR", detail: "state #4 vs SEA #22", strength: 18 }
     ], "teaser", "SEA");
     expect(alignment.verdict).toBe("contradicts");
-    expect(compactEvidenceLabel(alignment)).toBe("CTX 0-2 AGAINST");
+    expect(compactEvidenceLabel(alignment)).toBe("AGAINST · ADJ EPA");
   });
 
   it("does not invent a contextual verdict when no relevant signal exists", () => {
     const alignment = alignMatchupEvidence([signals[2]], "moneyline", "SEA");
     expect(alignment.verdict).toBe("insufficient");
-    expect(compactEvidenceLabel(alignment)).toBe("CTX —");
+    expect(compactEvidenceLabel(alignment)).toBe("NO MATCHUP READ");
+  });
+
+  it("calls similarly weighted evidence mixed even when the signal counts differ", () => {
+    const alignment = alignMatchupEvidence([
+      { id: "efficiency", label: "ADJ EPA", lean: "SEA", detail: "one strong signal", strength: 20 },
+      { id: "rest", label: "REST", lean: "LAR", detail: "first caution", strength: 11 },
+      { id: "strength", label: "MARKET-ADJUSTED FORM", lean: "LAR", detail: "second caution", strength: 8 }
+    ], "spread", "SEA");
+    expect(alignment.verdict).toBe("mixed");
+    expect(compactEvidenceLabel(alignment)).toBe("MIXED · ADJ EPA / REST");
   });
 });
