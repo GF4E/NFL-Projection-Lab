@@ -26,7 +26,7 @@ import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "@/domain/settlement";
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
-import { addTeamApproval, approvalActorForEmail, draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, isTeamApproved, storedLegMatchesQuote, trackerRecordSummaries, trackerSummary, validateTeamCardPortfolio } from "@/domain/play-card";
+import { addTeamApproval, approvalActorForEmail, draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, exactContractApprovalRequest, isTeamApproved, storedLegMatchesQuote, trackerRecordSummaries, trackerSummary, validateTeamCardPortfolio } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { buildPlayerPropEvidence, completeLeaguePropEfficiencyPrior, crossedKeyNumbers, isClassicWongPoint, isPropPlayerUnavailable, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
@@ -845,6 +845,38 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(store).toContain("player_prop_quotes WHERE id = ?");
     expect(store).toContain("live_lines WHERE id = ?");
     expect(store).toContain("both approvals must restart");
+  });
+
+  it("36d-2. lets the missing authenticated teammate approve the exact saved contract directly", () => {
+    const pending = {
+      ...rehearsalPlays[0],
+      approvals: ["gabe" as const],
+      contract: [{
+        sourceQuoteId: "quote-sea-spread",
+        gameId: rehearsalPlays[0].gameId,
+        market: "spread" as const,
+        side: "BUF",
+        point: -2.5,
+        americanPrice: -110,
+        selection: "BUF -2.5"
+      }]
+    };
+    const request = exactContractApprovalRequest(pending);
+    expect(request).toMatchObject({
+      week: pending.week,
+      gameId: pending.gameId,
+      playType: pending.playType,
+      market: pending.market,
+      book: pending.book,
+      americanOdds: pending.americanOdds,
+      stakeDollars: pending.stakeCents / 100,
+      contract: pending.contract,
+      status: "card"
+    });
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(board).toContain("approvePending(play)");
+    expect(board).toContain("exactContractApprovalRequest(play)");
+    expect(board).toContain("awaitingMe &&");
   });
 
   it("36e. expires incomplete drafts after 12 hours and closes approval at the earliest kickoff", () => {

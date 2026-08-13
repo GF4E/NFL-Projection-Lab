@@ -323,7 +323,7 @@ button:disabled { cursor: wait; opacity: .62; }
 .compact-shared-card > div { min-width: 145px; padding: 13px 16px; }
 .compact-shared-card > div span { color: var(--acid); font: 800 9px var(--display); }
 .compact-shared-card > div h2 { margin: 3px 0 0; font: 800 25px var(--display); text-transform: uppercase; }
-.compact-shared-card article { min-width: 210px; padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid #35403c; }
+.compact-shared-card article { min-width: 250px; max-width: 330px; padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid #35403c; }
 .compact-shared-card article b { font: 800 15px var(--display); }
 .compact-shared-card article span { width: fit-content; margin: 3px 0; padding: 2px 5px; font: 800 8px var(--display); text-transform: uppercase; }
 .compact-shared-card article span.gabe { background: var(--seahawks-green); color: var(--seahawks-navy); }
@@ -331,6 +331,9 @@ button:disabled { cursor: wait; opacity: .62; }
 .compact-shared-card article span.team-approved { background: var(--acid); color: var(--ink-deep); }
 .compact-shared-card article span.team-awaiting { border: 1px solid #56625d; color: #a6b0ac; }
 .compact-shared-card article small { color: #7b8883; font: 700 9px var(--display); }
+.compact-shared-card article .contract-preview { margin-top: 2px; overflow: hidden; color: #a4aeaa; text-overflow: ellipsis; white-space: nowrap; }
+.card-approval-row { display: flex; align-items: center; gap: 7px; }
+.card-approval-row button { min-height: 23px; padding: 0 8px; border: 1px solid color-mix(in srgb, var(--acid) 45%, transparent); border-radius: 3px; background: color-mix(in srgb, var(--acid) 9%, transparent); color: var(--acid); font: 900 8px var(--display); text-transform: uppercase; }
 .compact-shared-card > a { min-width: 96px; padding: 0 14px; display: grid; place-items: center; border-left: 1px solid #35403c; color: var(--acid); font: 800 10px var(--display); text-transform: uppercase; }
 .research-method { display: grid; grid-template-columns: 1fr 1fr; }
 .research-method article { min-height: 132px; padding: 18px; display: grid; grid-template-columns: 32px 1fr; gap: 12px; border-bottom: 1px solid var(--line); }

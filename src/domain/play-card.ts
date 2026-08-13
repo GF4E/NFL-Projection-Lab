@@ -144,6 +144,29 @@ export function isTeamApproved(approvals: readonly PickedBy[] | undefined): bool
   return approvals?.includes("gabe") === true && approvals.includes("jarrett");
 }
 
+/** Replays the immutable saved contract through the authenticated approval API. */
+export function exactContractApprovalRequest(play: WeeklyPlay) {
+  return {
+    week: play.week,
+    gameId: play.gameId,
+    playType: play.playType,
+    market: play.market,
+    primaryReason: play.primaryReason,
+    title: play.title,
+    legs: play.legs,
+    book: play.book,
+    americanOdds: play.americanOdds,
+    stakeDollars: play.stakeCents / 100,
+    modelEdgePp: play.modelEdgePp,
+    estimatedEvPercent: play.estimatedEvPercent,
+    contract: play.contract ?? [],
+    confidence: play.confidence,
+    statsCase: play.statsCase,
+    footballCase: play.footballCase,
+    status: "card" as const
+  };
+}
+
 export function earliestPlayKickoff(
   play: Pick<WeeklyPlay, "gameId" | "contract">,
   kickoffByGame: ReadonlyMap<string, string>

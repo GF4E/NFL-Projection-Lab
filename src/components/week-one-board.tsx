@@ -14,7 +14,7 @@ import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, type Lin
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
 import { rankMainlineRecommendations } from "@/domain/mainline-recommendations";
 import { structuralConfig } from "@/domain/config";
-import { isTeamApproved, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
+import { exactContractApprovalRequest, isTeamApproved, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
 import { sizeKelly, type SizingResult } from "@/domain/sizing";
 import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
 import { pickReasons } from "@/lib/week-one-data";
@@ -400,6 +400,26 @@ export function WeekOneBoard() {
     }
   }
 
+  async function approvePending(play: WeeklyPlay) {
+    if (isTeamApproved(play.approvals) || play.approvals?.includes(picker)) return;
+    setMessage(`Rechecking ${play.title} at ${play.book} before ${picker === "gabe" ? "Gabe" : "Jarrett"} approves…`);
+    try {
+      const response = await fetch("/api/plays", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(exactContractApprovalRequest(play))
+      });
+      const data = await response.json() as { play?: WeeklyPlay; error?: string };
+      if (!response.ok || !data.play) throw new Error(data.error ?? "Approval failed");
+      setPlays((current) => current.map((row) => row.id === data.play!.id ? data.play! : row));
+      setMessage(isTeamApproved(data.play.approvals)
+        ? `Team approved · ${data.play.title} is now official.`
+        : `${picker === "gabe" ? "Gabe" : "Jarrett"} approved. Awaiting the other teammate.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Approval failed");
+    }
+  }
+
   return <div className={`sportsbook-board book-${book}`}>
     <header className="sportsbook-topline">
       <div><span>{slate?.season ?? 2026} REGULAR SEASON</span><h1>Week {slate?.week ?? 1}</h1></div>
@@ -589,7 +609,18 @@ export function WeekOneBoard() {
 
     <section className="compact-shared-card">
       <div><span>TEAM CARD</span><h2>{plays.filter((play) => isTeamApproved(play.approvals)).length ? `${plays.filter((play) => isTeamApproved(play.approvals)).length} official` : plays.length ? `${plays.length} awaiting` : "Empty"}</h2></div>
-      {plays.slice(-6).map((play) => <article key={play.id}><b>{play.title}</b><span className={isTeamApproved(play.approvals) ? "team-approved" : "team-awaiting"}>{play.approvals?.includes("gabe") ? "G✓" : "G—"} · {play.approvals?.includes("jarrett") ? "J✓" : "J—"}</span><small>{play.book} {formatOdds(play.americanOdds)} · ${(play.stakeCents / 100).toFixed(0)}</small></article>)}
+      {plays.slice(-6).map((play) => {
+        const awaitingMe = !isTeamApproved(play.approvals) && !play.approvals?.includes(picker);
+        return <article key={play.id}>
+          <b>{play.title}</b>
+          <small className="contract-preview">{play.legs}</small>
+          <div className="card-approval-row">
+            <span className={isTeamApproved(play.approvals) ? "team-approved" : "team-awaiting"}>{play.approvals?.includes("gabe") ? "G✓" : "G—"} · {play.approvals?.includes("jarrett") ? "J✓" : "J—"}</span>
+            {awaitingMe && <button onClick={() => approvePending(play)}>Approve</button>}
+          </div>
+          <small>{play.book} {formatOdds(play.americanOdds)} · ${(play.stakeCents / 100).toFixed(0)}</small>
+        </article>;
+      })}
       <Link href="/records">Season record →</Link>
     </section>
   </div>;
