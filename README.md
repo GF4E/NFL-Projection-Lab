@@ -88,7 +88,7 @@ Structural settings live in `config/structural.config.json`; era definitions and
 
 Roboto is bundled with the application at weights 400–900, so the deployed interface does not depend on a third-party font request.
 
-The actual published 2026 nflverse schedule was reduced to distinct kickoff windows in `config/2026-credit-simulation.json`. November is the busiest projected billing period at 408 credits, firing the alert while remaining under the 450 ceiling.
+The actual published 2026 nflverse schedule was reduced to distinct kickoff windows in `config/2026-credit-simulation.json`. October, November, and December each reach the enforced 450-credit ceiling after the reservation plan preserves openers, 15-minute closes, and all scheduled player-prop calls; the alert fires at 400 and lower-priority snapshots are withheld.
 
 ## Verification
 

@@ -292,6 +292,19 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(plannedOddsThrottleReason(lastSixty, novemberGames, 399)).toMatch(/reservation plan/);
   });
 
+  it("10b. keeps the documented busiest-period ceiling aligned with the executable reservation plan", async () => {
+    const readme = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../README.md", import.meta.url), "utf8"));
+    const projected = creditConfig.billingPeriods.map((period) => simulateCreditPeriod({
+      kickoffWindows: Array.from({ length: period.kickoffWindows }, () => ({ kickoffAt: `${period.month}-01T20:00:00Z` })),
+      weeklySlates: period.weeklySlates,
+      weekdaysInSeason: period.ordinaryWeekdaySnapshots,
+      propGames: period.propGames
+    }).projectedCredits);
+    expect(Math.max(...projected)).toBe(450);
+    expect(readme).toContain("October, November, and December each reach the enforced 450-credit ceiling");
+    expect(readme).not.toContain("busiest projected billing period at 408 credits");
+  });
+
   it("11. enforces historical/current injury boundaries, 90-minute flags, failure behavior, and QB audit", () => {
     expect(() => validateHistoricalInjurySeason(2025)).toThrow(/through 2024/);
     const normalized = normalizeOfficialInjuries([{ player: "Starter", team: "BUF", gameId: "g", gameStatus: "Questionable" }], "https://www.buffalobills.com/team/injury-report/", "2026-09-13T17:00:00Z", ["BUF"]);
