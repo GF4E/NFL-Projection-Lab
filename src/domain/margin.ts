@@ -66,7 +66,7 @@ export function buildDiscreteMarginArtifact(
       return [String(margin), mass / totalMassWeight];
     })
   );
-  const unhashed = {
+  const artifactContent = {
     version: `margin-${options.latestCompletedSeason}`,
     seasonRange: [2010, options.latestCompletedSeason] as [number, number],
     boundarySeason: options.boundarySeason,
@@ -76,10 +76,13 @@ export function buildDiscreteMarginArtifact(
     },
     spreadGrid: grid,
     rows,
-    keyMarginMasses,
-    generatedAt: options.generatedAt
+    keyMarginMasses
   };
-  return { ...unhashed, artifactHash: stableHash(unhashed) };
+  return {
+    ...artifactContent,
+    generatedAt: options.generatedAt,
+    artifactHash: stableHash(artifactContent)
+  };
 }
 
 function outcomeCell(

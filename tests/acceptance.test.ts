@@ -97,6 +97,23 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(evaluation.expectedValue).toBeCloseTo(expectedValueWithPush(0.62, 0.1, -110), 10);
   });
 
+  it("1c. hashes the discrete artifact from data and structural settings, not wall-clock generation time", () => {
+    const options = {
+      latestCompletedSeason: 2025,
+      halfLifeSeasons: 2.5,
+      boundarySeason: 2015,
+      keyMargins: [3, 6, 7, 10, 14]
+    };
+    const first = buildDiscreteMarginArtifact(history, { ...options, generatedAt: "2026-02-01T00:00:00.000Z" });
+    const repeated = buildDiscreteMarginArtifact(history, { ...options, generatedAt: "2026-08-13T05:00:00.000Z" });
+    const changed = buildDiscreteMarginArtifact([...history, {
+      gameId: "new-result", season: 2025, consensusSpread: 0, actualMargin: 3
+    }], { ...options, generatedAt: "2026-08-13T05:00:00.000Z" });
+    expect(repeated.artifactHash).toBe(first.artifactHash);
+    expect(changed.artifactHash).not.toBe(first.artifactHash);
+    expect(repeated.generatedAt).not.toBe(first.generatedAt);
+  });
+
   it("2. uses the power method for spread, total, favorite, underdog, and near-even markets", () => {
     for (const pair of [[-110, -110], [-105, -115], [-200, 170], [170, -200], [-101, -101]] as const) {
       const result = powerDevig(pair[0], pair[1]);
