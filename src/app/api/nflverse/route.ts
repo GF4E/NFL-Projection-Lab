@@ -21,9 +21,15 @@ export async function GET() {
 export async function POST() {
   try {
     const db = getD1();
-    const result = await runNflverseAutomation({ db, allowPlayByPlay: true });
-    const lifecycle = await runModelLifecycleAutomation({ db });
-    const settlement = await settleCompletedTeamPlays(db);
+    const result = await runNflverseAutomation({ db, allowPlayByPlay: true }).catch((error) => {
+      throw new Error(`nflverse importer: ${error instanceof Error ? error.message : "unknown failure"}`);
+    });
+    const lifecycle = await runModelLifecycleAutomation({ db }).catch((error) => {
+      throw new Error(`model lifecycle: ${error instanceof Error ? error.message : "unknown failure"}`);
+    });
+    const settlement = await settleCompletedTeamPlays(db).catch((error) => {
+      throw new Error(`automatic settlement: ${error instanceof Error ? error.message : "unknown failure"}`);
+    });
     return NextResponse.json({ result, lifecycle, settlement, states: await listNflverseImportStates(db) });
   } catch (error) {
     return NextResponse.json(

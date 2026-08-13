@@ -67,9 +67,6 @@ export async function runKickoffWeatherAutomation(input: {
     ORDER BY game_date, game_time, game_id`)
     .bind(stadiumConfig.season, checkedAt.slice(0, 10)).all<ScheduledVenueRow>();
   const checks = await lastWeatherChecks(input.db);
-  const contextStates = new Map((await getPregameContextStates(input.db, schedule.results.map((row) =>
-    boardGameId(normalizeScheduleTeam(row.away_team), normalizeScheduleTeam(row.home_team))
-  ))).map((state) => [state.gameId, state]));
   const eligible = schedule.results.flatMap((row) => {
     const gameId = boardGameId(normalizeScheduleTeam(row.away_team), normalizeScheduleTeam(row.home_team));
     const kickoffAt = easternScheduleTimeToIso(row.game_date, row.game_time ?? "13:00");
@@ -78,6 +75,8 @@ export async function runKickoffWeatherAutomation(input: {
     return [{ row, kickoffAt, gameId }];
   });
   if (!eligible.length) return { status: "skipped", eligibleGames: 0, updatedGames: 0, message: null };
+  const contextStates = new Map((await getPregameContextStates(input.db, eligible.map(({ gameId }) => gameId)))
+    .map((state) => [state.gameId, state]));
 
   const prepared: Array<{ gameId: string; roof: WeatherInput["roof"]; promise: Promise<WeatherInput> }> = [];
   const unconfirmed: string[] = [];

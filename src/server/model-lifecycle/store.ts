@@ -53,6 +53,17 @@ const schema = [
     updated_at text NOT NULL,
     PRIMARY KEY (season, team)
   )`,
+  `CREATE TABLE IF NOT EXISTS team_strength_states_stage (
+    run_id text NOT NULL,
+    season integer NOT NULL,
+    team text NOT NULL,
+    mean real NOT NULL,
+    variance real NOT NULL,
+    through_week integer NOT NULL,
+    state_hash text NOT NULL,
+    updated_at text NOT NULL,
+    PRIMARY KEY (run_id, season, team)
+  )`,
   `CREATE TABLE IF NOT EXISTS rolling_feature_states (
     season integer NOT NULL,
     team text NOT NULL,
@@ -66,6 +77,21 @@ const schema = [
     state_hash text NOT NULL,
     updated_at text NOT NULL,
     PRIMARY KEY (season, team)
+  )`,
+  `CREATE TABLE IF NOT EXISTS rolling_feature_states_stage (
+    run_id text NOT NULL,
+    season integer NOT NULL,
+    team text NOT NULL,
+    through_week integer NOT NULL,
+    epa real NOT NULL,
+    success_rate real NOT NULL,
+    explosive_rate real NOT NULL,
+    regressed_turnovers real NOT NULL,
+    pace real NOT NULL,
+    proe real NOT NULL,
+    state_hash text NOT NULL,
+    updated_at text NOT NULL,
+    PRIMARY KEY (run_id, season, team)
   )`,
   `CREATE TABLE IF NOT EXISTS model_versions (
     version_hash text PRIMARY KEY NOT NULL,
@@ -108,6 +134,12 @@ const schema = [
   "CREATE INDEX IF NOT EXISTS idx_model_versions_status ON model_versions (status, promoted_at)",
   "CREATE INDEX IF NOT EXISTS idx_model_runs_completed ON model_run_log (completed_at)"
 ] as const;
+
+function chunks<T>(values: readonly T[], size: number): T[][] {
+  const output: T[][] = [];
+  for (let index = 0; index < values.length; index += size) output.push(values.slice(index, index + size));
+  return output;
+}
 
 function mapLifecycle(row: LifecycleRow): ModelLifecycleState {
   return {
@@ -184,31 +216,52 @@ export async function publishLoopA(input: {
   stateHash: string;
   updatedAt: string;
 }): Promise<void> {
-  const stateStatements = input.states.map((state) => input.db.prepare(`INSERT INTO team_strength_states
-    (season, team, mean, variance, through_week, state_hash, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(season, team) DO UPDATE SET mean = excluded.mean, variance = excluded.variance,
-      through_week = excluded.through_week, state_hash = excluded.state_hash, updated_at = excluded.updated_at`)
-    .bind(input.season, state.team, state.mean, state.variance, state.throughWeek, input.stateHash, input.updatedAt));
-  const featureStatements = input.features.map((feature) => input.db.prepare(`INSERT INTO rolling_feature_states
-    (season, team, through_week, epa, success_rate, explosive_rate, regressed_turnovers, pace, proe, state_hash, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ON CONFLICT(season, team) DO UPDATE SET through_week = excluded.through_week, epa = excluded.epa,
-      success_rate = excluded.success_rate, explosive_rate = excluded.explosive_rate,
-      regressed_turnovers = excluded.regressed_turnovers, pace = excluded.pace, proe = excluded.proe,
-      state_hash = excluded.state_hash, updated_at = excluded.updated_at`)
-    .bind(input.season, feature.team, feature.throughWeek, feature.epa, feature.successRate,
-      feature.explosiveRate, feature.regressedTurnovers, feature.pace, feature.proe,
-      input.stateHash, input.updatedAt));
+  const runId = `${input.season}:${input.throughWeek}:${input.stateHash}`;
   await input.db.batch([
-    ...stateStatements,
-    ...featureStatements,
+    input.db.prepare("DELETE FROM team_strength_states_stage WHERE run_id = ?").bind(runId),
+    input.db.prepare("DELETE FROM rolling_feature_states_stage WHERE run_id = ?").bind(runId)
+  ]);
+  for (const group of chunks(input.states, 10)) {
+    await input.db.batch(group.map((state) => input.db.prepare(`INSERT INTO team_strength_states_stage
+      (run_id, season, team, mean, variance, through_week, state_hash, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(runId, input.season, state.team, state.mean, state.variance, state.throughWeek, input.stateHash, input.updatedAt)));
+  }
+  for (const group of chunks(input.features, 8)) {
+    await input.db.batch(group.map((feature) => input.db.prepare(`INSERT INTO rolling_feature_states_stage
+      (run_id, season, team, through_week, epa, success_rate, explosive_rate, regressed_turnovers, pace, proe, state_hash, updated_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(runId, input.season, feature.team, feature.throughWeek, feature.epa, feature.successRate,
+        feature.explosiveRate, feature.regressedTurnovers, feature.pace, feature.proe,
+        input.stateHash, input.updatedAt)));
+  }
+  await input.db.batch([
+    input.db.prepare(`DELETE FROM team_strength_states WHERE season = ?
+      AND team NOT IN (SELECT team FROM team_strength_states_stage WHERE run_id = ?)`).bind(input.season, runId),
+    input.db.prepare(`INSERT INTO team_strength_states
+      (season, team, mean, variance, through_week, state_hash, updated_at)
+      SELECT season, team, mean, variance, through_week, state_hash, updated_at
+      FROM team_strength_states_stage WHERE run_id = ?
+      ON CONFLICT(season, team) DO UPDATE SET mean = excluded.mean, variance = excluded.variance,
+        through_week = excluded.through_week, state_hash = excluded.state_hash, updated_at = excluded.updated_at`).bind(runId),
+    input.db.prepare(`DELETE FROM rolling_feature_states WHERE season = ?
+      AND team NOT IN (SELECT team FROM rolling_feature_states_stage WHERE run_id = ?)`).bind(input.season, runId),
+    input.db.prepare(`INSERT INTO rolling_feature_states
+      (season, team, through_week, epa, success_rate, explosive_rate, regressed_turnovers, pace, proe, state_hash, updated_at)
+      SELECT season, team, through_week, epa, success_rate, explosive_rate, regressed_turnovers, pace, proe, state_hash, updated_at
+      FROM rolling_feature_states_stage WHERE run_id = ?
+      ON CONFLICT(season, team) DO UPDATE SET through_week = excluded.through_week, epa = excluded.epa,
+        success_rate = excluded.success_rate, explosive_rate = excluded.explosive_rate,
+        regressed_turnovers = excluded.regressed_turnovers, pace = excluded.pace, proe = excluded.proe,
+        state_hash = excluded.state_hash, updated_at = excluded.updated_at`).bind(runId),
     input.db.prepare(`INSERT INTO model_lifecycle_state
       (season, loop_a_through_week, loop_a_hash, last_loop_a_at)
       VALUES (?, ?, ?, ?)
       ON CONFLICT(season) DO UPDATE SET loop_a_through_week = excluded.loop_a_through_week,
         loop_a_hash = excluded.loop_a_hash, last_loop_a_at = excluded.last_loop_a_at`)
-      .bind(input.season, input.throughWeek, input.stateHash, input.updatedAt)
+      .bind(input.season, input.throughWeek, input.stateHash, input.updatedAt),
+    input.db.prepare("DELETE FROM team_strength_states_stage WHERE run_id = ?").bind(runId),
+    input.db.prepare("DELETE FROM rolling_feature_states_stage WHERE run_id = ?").bind(runId)
   ]);
 }
 

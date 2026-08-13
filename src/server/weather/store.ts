@@ -55,6 +55,21 @@ const schema = [
     source_hash text NOT NULL,
     imported_at text NOT NULL
   )`,
+  `CREATE TABLE IF NOT EXISTS kickoff_weather_stage (
+    run_id text NOT NULL,
+    game_id text NOT NULL,
+    stadium text NOT NULL,
+    roof text NOT NULL,
+    kickoff_at text NOT NULL,
+    forecast_issued_at text NOT NULL,
+    valid_at text NOT NULL,
+    wind_mph real,
+    temperature_f real,
+    precipitation_probability real,
+    source_hash text NOT NULL,
+    imported_at text NOT NULL,
+    PRIMARY KEY (run_id, game_id)
+  )`,
   `CREATE TABLE IF NOT EXISTS kickoff_weather_state (
     game_id text PRIMARY KEY NOT NULL,
     freshness text NOT NULL,
@@ -74,6 +89,12 @@ const schema = [
   "CREATE INDEX IF NOT EXISTS idx_weather_snapshots_game ON kickoff_weather_snapshots (game_id, imported_at)",
   "CREATE INDEX IF NOT EXISTS idx_weather_alerts_unresolved ON kickoff_weather_alerts (resolved_at, created_at)"
 ] as const;
+
+function chunks<T>(values: readonly T[], size: number): T[][] {
+  const output: T[][] = [];
+  for (let index = 0; index < values.length; index += size) output.push(values.slice(index, index + size));
+  return output;
+}
 
 export async function ensureKickoffWeatherStore(db: D1Database): Promise<void> {
   await db.batch(schema.map((statement) => db.prepare(statement)));
@@ -117,48 +138,46 @@ export async function publishKickoffWeather(input: {
   checkedAt: string;
 }): Promise<void> {
   if (!input.snapshots.length) return;
-  const statements = input.snapshots.flatMap(({ weather, sourceHash }) => {
-    const values = [
-      weather.gameId, weather.stadium, weather.roof, weather.kickoffAt, weather.forecastIssuedAt,
-      weather.validAt, weather.windMph, weather.temperatureF, weather.precipitationProbability,
-      sourceHash, input.checkedAt
-    ] as const;
-    return [
-      input.db.prepare(`INSERT INTO kickoff_weather_current
-        (game_id, stadium, roof, kickoff_at, forecast_issued_at, valid_at, wind_mph, temperature_f,
-         precipitation_probability, source_hash, imported_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT(game_id) DO UPDATE SET stadium = excluded.stadium, roof = excluded.roof,
-          kickoff_at = excluded.kickoff_at, forecast_issued_at = excluded.forecast_issued_at,
-          valid_at = excluded.valid_at, wind_mph = excluded.wind_mph, temperature_f = excluded.temperature_f,
-          precipitation_probability = excluded.precipitation_probability, source_hash = excluded.source_hash,
-          imported_at = excluded.imported_at`).bind(...values),
-      input.db.prepare(`INSERT OR IGNORE INTO kickoff_weather_snapshots
-        (id, game_id, stadium, roof, kickoff_at, forecast_issued_at, valid_at, wind_mph, temperature_f,
-         precipitation_probability, source_hash, imported_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
-          `${weather.gameId}:${sourceHash}`, ...values
-        ),
-      input.db.prepare(`INSERT INTO kickoff_weather_state
-        (game_id, freshness, roof, source_hash, last_checked_at, last_success_at, last_error)
-        VALUES (?, ?, ?, ?, ?, ?, NULL)
-        ON CONFLICT(game_id) DO UPDATE SET freshness = excluded.freshness, roof = excluded.roof,
-          source_hash = excluded.source_hash, last_checked_at = excluded.last_checked_at,
-          last_success_at = excluded.last_success_at, last_error = NULL`).bind(
-          weather.gameId,
-          weather.roof === "closed" || weather.roof === "fixed" ? "indoors" : "current",
-          weather.roof,
-          sourceHash,
-          input.checkedAt,
-          input.checkedAt
-        )
-    ];
-  });
-  const placeholders = input.snapshots.map(() => "?").join(", ");
-  statements.push(input.db.prepare(`UPDATE kickoff_weather_alerts SET resolved_at = ?
-    WHERE game_id IN (${placeholders}) AND resolved_at IS NULL`)
-    .bind(input.checkedAt, ...input.snapshots.map(({ weather }) => weather.gameId)));
-  await input.db.batch(statements);
+  const runId = `weather:${input.checkedAt}`;
+  await input.db.prepare("DELETE FROM kickoff_weather_stage WHERE run_id = ?").bind(runId).run();
+  for (const group of chunks(input.snapshots, 6)) {
+    await input.db.batch(group.map(({ weather, sourceHash }) => input.db.prepare(`INSERT INTO kickoff_weather_stage
+      (run_id, game_id, stadium, roof, kickoff_at, forecast_issued_at, valid_at, wind_mph, temperature_f,
+       precipitation_probability, source_hash, imported_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(runId, weather.gameId, weather.stadium, weather.roof, weather.kickoffAt, weather.forecastIssuedAt,
+        weather.validAt, weather.windMph, weather.temperatureF, weather.precipitationProbability,
+        sourceHash, input.checkedAt)));
+  }
+  await input.db.batch([
+    input.db.prepare(`INSERT INTO kickoff_weather_current
+      (game_id, stadium, roof, kickoff_at, forecast_issued_at, valid_at, wind_mph, temperature_f,
+       precipitation_probability, source_hash, imported_at)
+      SELECT game_id, stadium, roof, kickoff_at, forecast_issued_at, valid_at, wind_mph, temperature_f,
+        precipitation_probability, source_hash, imported_at FROM kickoff_weather_stage WHERE run_id = ?
+      ON CONFLICT(game_id) DO UPDATE SET stadium = excluded.stadium, roof = excluded.roof,
+        kickoff_at = excluded.kickoff_at, forecast_issued_at = excluded.forecast_issued_at,
+        valid_at = excluded.valid_at, wind_mph = excluded.wind_mph, temperature_f = excluded.temperature_f,
+        precipitation_probability = excluded.precipitation_probability, source_hash = excluded.source_hash,
+        imported_at = excluded.imported_at`).bind(runId),
+    input.db.prepare(`INSERT OR IGNORE INTO kickoff_weather_snapshots
+      (id, game_id, stadium, roof, kickoff_at, forecast_issued_at, valid_at, wind_mph, temperature_f,
+       precipitation_probability, source_hash, imported_at)
+      SELECT game_id || ':' || source_hash, game_id, stadium, roof, kickoff_at, forecast_issued_at, valid_at,
+        wind_mph, temperature_f, precipitation_probability, source_hash, imported_at
+      FROM kickoff_weather_stage WHERE run_id = ?`).bind(runId),
+    input.db.prepare(`INSERT INTO kickoff_weather_state
+      (game_id, freshness, roof, source_hash, last_checked_at, last_success_at, last_error)
+      SELECT game_id, CASE WHEN roof IN ('closed', 'fixed') THEN 'indoors' ELSE 'current' END,
+        roof, source_hash, imported_at, imported_at, NULL FROM kickoff_weather_stage WHERE run_id = ?
+      ON CONFLICT(game_id) DO UPDATE SET freshness = excluded.freshness, roof = excluded.roof,
+        source_hash = excluded.source_hash, last_checked_at = excluded.last_checked_at,
+        last_success_at = excluded.last_success_at, last_error = NULL`).bind(runId),
+    input.db.prepare(`UPDATE kickoff_weather_alerts SET resolved_at = ?
+      WHERE game_id IN (SELECT game_id FROM kickoff_weather_stage WHERE run_id = ?) AND resolved_at IS NULL`)
+      .bind(input.checkedAt, runId),
+    input.db.prepare("DELETE FROM kickoff_weather_stage WHERE run_id = ?").bind(runId)
+  ]);
 }
 
 export async function markRoofUnconfirmed(input: {

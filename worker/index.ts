@@ -66,6 +66,14 @@ function json(payload: unknown, status = 200, headers?: HeadersInit): Response {
   });
 }
 
+async function stage<T>(label: string, task: Promise<T>): Promise<T> {
+  try {
+    return await task;
+  } catch (error) {
+    throw new Error(`${label}: ${error instanceof Error ? error.message : "unknown failure"}`);
+  }
+}
+
 async function handleNflverseRequest(request: Request, env: Env): Promise<Response> {
   if (request.method !== "GET" && request.method !== "POST") {
     return json({ error: "Method not allowed" }, 405, { allow: "GET, POST" });
@@ -73,12 +81,12 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
 
   try {
     if (request.method === "POST") {
-      const result = await runNflverseAutomation({ db: env.DB, allowPlayByPlay: true });
-      const injuries = await runOfficialInjuryAutomation({ db: env.DB });
-      const pregame = await runOfficialPregameContextAutomation({ db: env.DB });
-      const weather = await runKickoffWeatherAutomation({ db: env.DB });
-      const lifecycle = await runModelLifecycleAutomation({ db: env.DB });
-      const settlement = await settleCompletedTeamPlays(env.DB);
+      const result = await stage("nflverse importer", runNflverseAutomation({ db: env.DB, allowPlayByPlay: true }));
+      const injuries = await stage("official injuries", runOfficialInjuryAutomation({ db: env.DB }));
+      const pregame = await stage("pregame context", runOfficialPregameContextAutomation({ db: env.DB }));
+      const weather = await stage("kickoff weather", runKickoffWeatherAutomation({ db: env.DB }));
+      const lifecycle = await stage("model lifecycle", runModelLifecycleAutomation({ db: env.DB }));
+      const settlement = await stage("automatic settlement", settleCompletedTeamPlays(env.DB));
       return json({ result, injuries, pregame, weather, lifecycle, settlement, states: await listNflverseImportStates(env.DB) });
     }
     return json({ states: await listNflverseImportStates(env.DB) });

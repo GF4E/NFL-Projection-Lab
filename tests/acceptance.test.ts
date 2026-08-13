@@ -631,6 +631,14 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const previous = validation.results.find((row) => row.k === 0.18)!;
     expect(selected.pooledRmse).toBeLessThan(market.pooledRmse);
     expect(previous.pooledRmse).toBeGreaterThan(market.pooledRmse * 2);
+    const store = readFileSync("src/server/model-lifecycle/store.ts", "utf8");
+    expect(store).toContain("team_strength_states_stage");
+    expect(store).toContain("rolling_feature_states_stage");
+    const weatherStore = readFileSync("src/server/weather/store.ts", "utf8");
+    const weatherAutomation = readFileSync("src/server/weather/automation.ts", "utf8");
+    expect(weatherStore).toContain("kickoff_weather_stage");
+    expect(weatherAutomation).toContain("eligible.map(({ gameId }) => gameId)");
+    expect(readFileSync("worker/index.ts", "utf8")).toContain('stage("model lifecycle"');
   });
 
   it("36. highlights a better book only on an identical side and point", () => {
