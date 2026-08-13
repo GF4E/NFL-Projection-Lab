@@ -44,6 +44,12 @@ export interface StructuralConfig {
     recencyWeight: number;
     minimumHitRate: number;
   };
+  matchupEvidence: {
+    windowGames: number;
+    opponentAdjustmentMethod: "play_weighted_ridge";
+    ridgePenalty: number;
+    validationArtifact: string;
+  };
   monitoring: {
     pushEdgeThreshold: number;
     calibrationSlope: number[];

@@ -21,6 +21,7 @@ import {
 import type { TotalProjection } from "@/domain/decision-board";
 import { buildDiscreteMarginArtifact, fairSpreadPointForProbability, translateFairProbability } from "@/domain/margin";
 import { bootstrapEdgeInterval, type WeightedTrainingRow } from "@/domain/bootstrap";
+import { fitOpponentAdjustedRatings } from "@/domain/opponent-adjustment";
 import { americanToDecimal, expectedValueWithPush, powerDevig, shrinkProbability } from "@/domain/odds";
 import { applyChampionMarketResidual, predictProbability, type FittedLogisticModel } from "@/domain/model-fit";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
@@ -324,6 +325,18 @@ function rank(values: Array<{ team: string; value: number | null }>, higherIsBet
 }
 
 function teamProfiles(rows: FeatureRow[], strengths: Map<string, number>): Map<string, TeamBaseline> {
+  const adjustment = (metric: "epa_per_play" | "success_rate" | "explosive_rate") => fitOpponentAdjustedRatings(
+    rows.map((row) => ({
+      offense: normalizeNflverseTeam(row.team),
+      defense: normalizeNflverseTeam(row.opponent),
+      value: row[metric],
+      weight: row.plays
+    })),
+    structuralConfig.matchupEvidence.ridgePenalty
+  );
+  const adjustedEpa = adjustment("epa_per_play");
+  const adjustedSuccess = adjustment("success_rate");
+  const adjustedExplosive = adjustment("explosive_rate");
   const leagueTurnoverRate = rows.reduce((sum, row) => sum + row.turnover_rate * row.plays, 0) /
     Math.max(1, rows.reduce((sum, row) => sum + row.plays, 0));
   const aggregates = new Map<string, Aggregate>();
@@ -360,16 +373,19 @@ function teamProfiles(rows: FeatureRow[], strengths: Map<string, number>): Map<s
   }
   const base = [...aggregates.values()].map((item) => {
     const defense = defenses.get(item.team);
+    const epaRating = adjustedEpa?.ratings.get(item.team);
+    const successRating = adjustedSuccess?.ratings.get(item.team);
+    const explosiveRating = adjustedExplosive?.ratings.get(item.team);
     return {
       team: item.team,
       season: item.season,
       games: item.games,
-      epaPerPlay: item.epa / Math.max(1, item.plays),
-      successRate: item.success / Math.max(1, item.plays),
-      explosiveRate: item.explosive / Math.max(1, item.plays),
-      defenseEpaAllowed: (defense?.epaAllowed ?? 0) / Math.max(1, defense?.plays ?? 0),
-      defenseSuccessAllowed: (defense?.successAllowed ?? 0) / Math.max(1, defense?.plays ?? 0),
-      defenseExplosiveAllowed: (defense?.explosiveAllowed ?? 0) / Math.max(1, defense?.plays ?? 0),
+      epaPerPlay: epaRating?.offense ?? item.epa / Math.max(1, item.plays),
+      successRate: successRating?.offense ?? item.success / Math.max(1, item.plays),
+      explosiveRate: explosiveRating?.offense ?? item.explosive / Math.max(1, item.plays),
+      defenseEpaAllowed: epaRating?.defenseAllowed ?? (defense?.epaAllowed ?? 0) / Math.max(1, defense?.plays ?? 0),
+      defenseSuccessAllowed: successRating?.defenseAllowed ?? (defense?.successAllowed ?? 0) / Math.max(1, defense?.plays ?? 0),
+      defenseExplosiveAllowed: explosiveRating?.defenseAllowed ?? (defense?.explosiveAllowed ?? 0) / Math.max(1, defense?.plays ?? 0),
       regressedTurnoverRate: (item.turnovers + leagueTurnoverRate * 200) / Math.max(1, item.plays + 200),
       secondsPerPlay: item.pacePlays ? item.pace / item.pacePlays : null,
       proe: item.proePlays ? item.proe / item.proePlays : null,
@@ -487,8 +503,13 @@ export async function buildDecisionBoard(
             ROW_NUMBER() OVER (PARTITION BY team ORDER BY season DESC, week DESC, game_date DESC) AS recency_rank
           FROM nfl_team_game_features
           WHERE season_type = 'REG' AND (season < ? OR (season = ? AND week < ?))
-        ) WHERE recency_rank <= 17
-        ORDER BY season DESC, week DESC`).bind(slate.season, slate.season, slate.week).all<FeatureRow>(),
+        ) WHERE recency_rank <= ?
+        ORDER BY season DESC, week DESC`).bind(
+          slate.season,
+          slate.season,
+          slate.week,
+          structuralConfig.matchupEvidence.windowGames
+        ).all<FeatureRow>(),
     loadMovementHistory(db, activeGameIds),
     db.prepare(`SELECT game_id,
         COUNT(*) AS reported_players,
@@ -783,6 +804,6 @@ export async function buildDecisionBoard(
     championHash,
     games,
     teaserPairs,
-    method: "Leakage-safe rolling 17-game offense and defense evidence with decay-weighted margin-versus-close strength, calibrated by the logged gated champion, then shrunk 25% toward the model and 75% toward the power-de-vigged market."
+    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); decay-weighted margin-versus-close strength; logged gated champion calibration; then 25% model and 75% power-de-vigged market shrinkage.`
   };
 }

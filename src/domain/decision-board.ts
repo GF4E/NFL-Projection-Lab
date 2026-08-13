@@ -158,7 +158,7 @@ export function matchupSignals(
   if (!away || !home) return [];
   const candidates: Array<MatchupSignal | null> = [
     matchupMetricSignal({
-      id: "efficiency", label: "EPA EDGE", away, home,
+      id: "efficiency", label: "ADJ EPA", away, home,
       awayOffenseRank: away.ranks.epa, homeOffenseRank: home.ranks.epa,
       awayDefenseRank: away.ranks.defenseEpa, homeDefenseRank: home.ranks.defenseEpa
     }),

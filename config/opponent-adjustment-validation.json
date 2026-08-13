@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-08-12T19:23:38-07:00",
+  "trainingSource": "nflverse play-by-play",
+  "sourceUrl": "https://github.com/nflverse/nflverse-data/releases/tag/pbp",
+  "methodReference": "https://radsportsanalytics.com/blog/opponent-adjusted-stats-ridge-regression/",
+  "validationSeasons": [2023, 2024, 2025],
+  "historyWarmupSeason": 2022,
+  "rollingWindowGames": 17,
+  "metrics": ["epa_per_play", "success_rate", "explosive_rate"],
+  "observationWeight": "offensive plays",
+  "candidatePenalties": [0.25, 0.5, 1, 2, 4, 8, 16, 32],
+  "selectionMetric": "pooled play-weighted standardized rolling-origin RMSE",
+  "selectedPenalty": 16,
+  "weightedForecastObservations": 323964,
+  "rawScheduleUnadjustedStandardizedRmse": 1.0066888906,
+  "selectedStandardizedRmse": 0.9761407977,
+  "relativeRmseImprovementPercent": 3.03,
+  "results": [
+    { "penalty": 16, "standardizedRmse": 0.9761407977 },
+    { "penalty": 8, "standardizedRmse": 0.9773674405 },
+    { "penalty": 32, "standardizedRmse": 0.9829925182 },
+    { "penalty": 4, "standardizedRmse": 0.9843047552 },
+    { "penalty": 2, "standardizedRmse": 0.9920044138 },
+    { "penalty": 1, "standardizedRmse": 0.9977396001 },
+    { "penalty": 0.5, "standardizedRmse": 1.0012593551 },
+    { "penalty": 0.25, "standardizedRmse": 1.0032134042 }
+  ]
+}

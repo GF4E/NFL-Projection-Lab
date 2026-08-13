@@ -637,4 +637,21 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(settlement).toContain("offense_snaps + snap.defense_snaps + snap.special_teams_snaps > 0");
     expect(settlement).toContain("propOutcomes");
   });
+
+  it("40. schedule-adjusts matchup evidence with a frozen, rolling-origin-validated ridge fit", () => {
+    const validation = JSON.parse(readFileSync("config/opponent-adjustment-validation.json", "utf8")) as {
+      selectedPenalty: number; relativeRmseImprovementPercent: number; weightedForecastObservations: number;
+    };
+    expect(structuralConfig.matchupEvidence.opponentAdjustmentMethod).toBe("play_weighted_ridge");
+    expect(structuralConfig.matchupEvidence.ridgePenalty).toBe(validation.selectedPenalty);
+    expect(validation.relativeRmseImprovementPercent).toBeGreaterThan(0);
+    expect(validation.weightedForecastObservations).toBe(323_964);
+    const server = readFileSync("src/server/decision-board.ts", "utf8");
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(server).toContain("fitOpponentAdjustedRatings");
+    expect(server).toContain("structuralConfig.matchupEvidence.ridgePenalty");
+    expect(server).toContain("structuralConfig.matchupEvidence.windowGames");
+    expect(board).toContain("MATCHUP EVIDENCE");
+    expect(board).not.toContain("Opponent adjustment methodology");
+  });
 });

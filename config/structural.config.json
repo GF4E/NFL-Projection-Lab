@@ -1,5 +1,5 @@
 {
-  "version": "2026.preseason.2",
+  "version": "2026.preseason.3",
   "season": 2026,
   "frozen": true,
   "unitDollars": 25,
@@ -40,6 +40,12 @@
     "priorGames": 4,
     "recencyWeight": 0.85,
     "minimumHitRate": 0.5
+  },
+  "matchupEvidence": {
+    "windowGames": 17,
+    "opponentAdjustmentMethod": "play_weighted_ridge",
+    "ridgePenalty": 16,
+    "validationArtifact": "opponent-adjustment-validation.json"
   },
   "monitoring": {
     "pushEdgeThreshold": 0.03,
