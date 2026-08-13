@@ -288,6 +288,18 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(new Set(second.approvals.map((approval) => approval.revisionHash))).toEqual(new Set([revisionHash(current)]));
   });
 
+  it("12b. freezes server-derived forecast and consensus provenance at approval", () => {
+    const store = readFileSync("src/server/play-store.ts", "utf8");
+    const provenance = readFileSync("src/server/play-provenance.ts", "utf8");
+    const trigger = readFileSync("src/domain/portfolio-trigger.ts", "utf8");
+    expect(store).toContain("capturePlayForecastSnapshot");
+    expect(store).toContain("forecast_json = ?");
+    expect(provenance).toContain("buildDecisionBoard(db");
+    expect(provenance).toContain("consensusSnapshotId");
+    expect(provenance).toContain("dataHash: board.dataHash");
+    expect(trigger).toContain("Approval requires a complete forecast and consensus snapshot");
+  });
+
   it("13. displays full and executed-only records separately", () => {
     const records = dualRecordSummaries([settled("executed", 1, 3), settled("paper", -0.5, 2)]);
     expect(records.full.picks).toBe(2);

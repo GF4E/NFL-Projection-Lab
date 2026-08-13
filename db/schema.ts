@@ -5,6 +5,7 @@ export const plays = sqliteTable("plays", {
   id: text("id").primaryKey(),
   contractKey: text("contract_key").notNull().default(""),
   contractJson: text("contract_json").notNull().default("[]"),
+  forecastJson: text("forecast_json"),
   gabeApproved: integer("gabe_approved").notNull().default(0),
   jarrettApproved: integer("jarrett_approved").notNull().default(0),
   season: integer("season").notNull().default(2026),
@@ -30,6 +31,8 @@ export const plays = sqliteTable("plays", {
   result: text("result", { enum: ["pending", "win", "loss", "push", "void"] }).notNull().default("pending"),
   profitCents: integer("profit_cents").notNull().default(0),
   closingClvCents: real("closing_clv_cents"),
+  closingClvPoints: real("closing_clv_points"),
+  clvReferenceBook: text("clv_reference_book"),
   createdBy: text("created_by").notNull(),
   createdAt: text("created_at").notNull(),
   updatedAt: text("updated_at").notNull()

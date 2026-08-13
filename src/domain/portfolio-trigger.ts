@@ -64,10 +64,18 @@ export function portfolioTriggerSql(): string {
 }
 
 export function contractGuardTriggerSql(): string {
-  return `CREATE TRIGGER IF NOT EXISTS approval_contract_guard_v1
+  return `CREATE TRIGGER IF NOT EXISTS approval_contract_guard_v2
     BEFORE UPDATE OF status ON plays
     WHEN OLD.status = 'research' AND NEW.status = 'card'
     BEGIN
+      SELECT CASE WHEN NEW.forecast_json IS NULL
+        OR json_valid(NEW.forecast_json) = 0
+        OR NULLIF(json_extract(NEW.forecast_json, '$.configHash'), '') IS NULL
+        OR NULLIF(json_extract(NEW.forecast_json, '$.dataHash'), '') IS NULL
+        OR NULLIF(json_extract(NEW.forecast_json, '$.consensusSnapshotId'), '') IS NULL
+        OR json_array_length(json_extract(NEW.forecast_json, '$.legs')) <> json_array_length(NEW.contract_json)
+      THEN RAISE(ABORT, 'Approval requires a complete forecast and consensus snapshot') END;
+
       SELECT CASE WHEN json_valid(NEW.contract_json) = 0
         OR json_type(NEW.contract_json) <> 'array'
         OR json_array_length(NEW.contract_json) = 0

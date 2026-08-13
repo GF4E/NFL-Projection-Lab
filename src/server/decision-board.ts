@@ -998,6 +998,20 @@ export async function buildDecisionBoard(
       };
     })
   );
+  const dataHash = stableHash({
+    schedule: slate.games,
+    completedGames: gameResult.results,
+    rollingFeatures: featureRows,
+    injuries: injuryResult.results,
+    injuryState,
+    inactives: inactiveResult.results,
+    quarterbackReports: qbReportResult.results,
+    quarterbackInactives: qbInactiveResult.results,
+    pregameStates,
+    weather: weatherRows,
+    strengthStateHash: lifecycle?.loopAHash ?? null,
+    quarterbackOverrides: qbOverrides
+  });
   return {
     generatedAt: new Date().toISOString(),
     season: slate.season,
@@ -1005,6 +1019,7 @@ export async function buildDecisionBoard(
     basisSeason,
     artifactHash: artifact?.artifactHash ?? null,
     configHash,
+    dataHash,
     championHash,
     championStatus,
     games,

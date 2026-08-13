@@ -9,6 +9,7 @@ function database(): DatabaseSync {
   db.exec(`CREATE TABLE plays (
     id text PRIMARY KEY NOT NULL,
     contract_json text NOT NULL,
+    forecast_json text,
     season integer NOT NULL,
     week integer NOT NULL,
     game_id text NOT NULL,
@@ -34,13 +35,28 @@ function add(
   const storedContract = contract.map((item, index) => ({ ...item, sourceQuoteId: `${id}:quote:${index}` }));
   const market = playType === "single" ? contract[0]?.market ?? "spread" : playType;
   const gameId = playType === "single" ? contract[0]?.gameId ?? "missing" : `multi:${id}`;
+  const forecast = {
+    configHash: "config",
+    dataHash: "data",
+    consensusSnapshotId: "consensus",
+    legs: storedContract
+  };
   db.prepare(`INSERT INTO plays
-    (id, contract_json, season, week, game_id, play_type, market, status, stake_cents)
-    VALUES (?, ?, 2026, ?, ?, ?, ?, ?, ?)`)
-    .run(id, JSON.stringify(storedContract), week, gameId, playType, market, status, units * 2_500);
+    (id, contract_json, forecast_json, season, week, game_id, play_type, market, status, stake_cents)
+    VALUES (?, ?, ?, 2026, ?, ?, ?, ?, ?, ?)`)
+    .run(id, JSON.stringify(storedContract), JSON.stringify(forecast), week, gameId, playType, market, status, units * 2_500);
 }
 
 describe("atomic shared-card portfolio guard", () => {
+  it("blocks an approval without complete frozen forecast provenance", () => {
+    const db = database();
+    add(db, "missing-provenance", "research", 1, [{ gameId: "g1", market: "spread" }]);
+    db.prepare("UPDATE plays SET forecast_json = NULL WHERE id = 'missing-provenance'").run();
+    expect(() => db.prepare("UPDATE plays SET status = 'card' WHERE id = 'missing-provenance'").run())
+      .toThrow(/forecast and consensus snapshot/i);
+    db.close();
+  });
+
   it("permits one side plus one total and blocks a second side or total", () => {
     const db = database();
     add(db, "side", "card", 1, [{ gameId: "g1", market: "spread" }]);

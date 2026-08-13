@@ -369,6 +369,7 @@ export interface DecisionBoardPayload {
   basisSeason: number | null;
   artifactHash: string | null;
   configHash: string;
+  dataHash: string;
   championHash: string | null;
   championStatus: "compatible" | "config_mismatch" | "unavailable";
   games: DecisionBoardGame[];

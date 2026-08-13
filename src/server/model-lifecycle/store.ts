@@ -258,6 +258,45 @@ export async function getLatestModelRunAuthorization(db: D1Database): Promise<{
   } : null;
 }
 
+export async function getLatestModelRun(db: D1Database): Promise<ModelRun | null> {
+  await ensureModelLifecycleStore(db);
+  const row = await db.prepare(`SELECT id, champion_hash, challenger_hash, champion_metrics_json,
+      challenger_metrics_json, gate_decision, data_hash, config_hash, feature_schema_hash,
+      code_hash, started_at, completed_at, promoted_at
+    FROM model_run_log ORDER BY completed_at DESC LIMIT 1`).first<{
+      id: string;
+      champion_hash: string;
+      challenger_hash: string;
+      champion_metrics_json: string;
+      challenger_metrics_json: string;
+      gate_decision: "promote" | "retain";
+      data_hash: string;
+      config_hash: string;
+      feature_schema_hash: string;
+      code_hash: string;
+      started_at: string;
+      completed_at: string;
+      promoted_at: string | null;
+    }>();
+  if (!row) return null;
+  return {
+    id: row.id,
+    championVersionHash: row.champion_hash,
+    challengerVersionHash: row.challenger_hash,
+    status: row.gate_decision === "promote" ? "challenger" : "rejected",
+    championMetrics: JSON.parse(row.champion_metrics_json) as ModelMetrics,
+    challengerMetrics: JSON.parse(row.challenger_metrics_json) as ModelMetrics,
+    gateDecision: row.gate_decision,
+    dataSnapshotHash: row.data_hash,
+    configHash: row.config_hash,
+    featureSchemaHash: row.feature_schema_hash,
+    codeHash: row.code_hash,
+    startedAt: row.started_at,
+    completedAt: row.completed_at,
+    promotedAt: row.promoted_at
+  };
+}
+
 export async function getTeamStrengthStates(db: D1Database, season: number): Promise<TeamState[]> {
   await ensureModelLifecycleStore(db);
   const result = await db.prepare(`SELECT team, mean, variance, through_week

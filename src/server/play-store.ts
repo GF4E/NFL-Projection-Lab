@@ -7,16 +7,19 @@ import {
   validateTeamCardPortfolio,
   validateStoredPlayContract,
   type PickedBy,
+  type PlayForecastSnapshot,
   type WeeklyPlay
 } from "@/domain/play-card";
 import { contractGuardTriggerSql, portfolioTriggerSql } from "@/domain/portfolio-trigger";
 import { seasonSchedule } from "./weekly-slate";
 import { queueAndDispatchPush } from "./push/store";
+import { capturePlayForecastSnapshot } from "./play-provenance";
 
 type PlayDatabaseRow = {
   id: string;
   contract_key: string;
   contract_json: string;
+  forecast_json: string | null;
   gabe_approved: number;
   jarrett_approved: number;
   season: number;
@@ -54,6 +57,7 @@ const CREATE_PLAYS_SQL = `
     id text PRIMARY KEY NOT NULL,
     contract_key text DEFAULT '' NOT NULL,
     contract_json text DEFAULT '[]' NOT NULL,
+    forecast_json text,
     gabe_approved integer DEFAULT 0 NOT NULL,
     jarrett_approved integer DEFAULT 0 NOT NULL,
     season integer DEFAULT 2026 NOT NULL,
@@ -95,10 +99,10 @@ const CREATE_PLAYS_SQL = `
 
 const INSERT_PLAY_SQL = `
   INSERT OR IGNORE INTO plays (
-    id, contract_key, contract_json, gabe_approved, jarrett_approved, season, week, game_id, play_type, market, primary_reason, picked_by, title, legs, book, american_odds, stake_cents,
+    id, contract_key, contract_json, forecast_json, gabe_approved, jarrett_approved, season, week, game_id, play_type, market, primary_reason, picked_by, title, legs, book, american_odds, stake_cents,
     model_edge_pp, estimated_ev_percent, confidence, stats_case, football_case, execution_status, cash_placement_confirmed,
     status, result, profit_cents, closing_clv_cents, closing_clv_points, clv_reference_book, created_by, created_at, updated_at
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
 
 function contractFor(row: PlayDatabaseRow): WeeklyPlay["contract"] {
@@ -119,11 +123,20 @@ function approvalsFor(row: PlayDatabaseRow): PickedBy[] {
   return row.status === "research" ? [] : ["gabe", "jarrett"];
 }
 
+function forecastFor(row: PlayDatabaseRow): PlayForecastSnapshot | null {
+  try {
+    return row.forecast_json ? JSON.parse(row.forecast_json) as PlayForecastSnapshot : null;
+  } catch {
+    return null;
+  }
+}
+
 function mapRow(row: PlayDatabaseRow): WeeklyPlay {
   return {
     id: row.id,
     contractKey: row.contract_key,
     contract: contractFor(row),
+    forecastSnapshot: forecastFor(row),
     approvals: approvalsFor(row),
     season: row.season,
     week: row.week,
@@ -196,6 +209,7 @@ export async function ensurePlayStore(d1: D1Database = getD1()): Promise<void> {
   if (!names.has("picked_by")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN picked_by text DEFAULT 'gabe' NOT NULL"));
   if (!names.has("contract_key")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN contract_key text DEFAULT '' NOT NULL"));
   if (!names.has("contract_json")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN contract_json text DEFAULT '[]' NOT NULL"));
+  if (!names.has("forecast_json")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN forecast_json text"));
   if (!names.has("gabe_approved")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN gabe_approved integer DEFAULT 0 NOT NULL"));
   if (!names.has("jarrett_approved")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN jarrett_approved integer DEFAULT 0 NOT NULL"));
   if (!names.has("execution_status")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN execution_status text DEFAULT 'paper' NOT NULL"));
@@ -329,18 +343,20 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
     if (isTeamApproved(current.approvals) || current.approvals?.includes(actor)) return current;
     await assertApprovalWindowOpen(d1, play, play.updatedAt);
     if (current.status === "passed") {
+      await assertApprovalContractCurrent(d1, play);
+      const forecastSnapshot = await capturePlayForecastSnapshot(d1, play);
       await d1.batch([
         d1.prepare(`INSERT OR IGNORE INTO play_state_audit
           (id, play_id, transition, reason, from_status, to_status, snapshot_json, changed_at)
           VALUES (?, ?, 'reactivated', 'fresh_selection', 'passed', 'research', ?, ?)`)
           .bind(`${play.id}:reactivated:${play.updatedAt}`, play.id, JSON.stringify({ contractKey: play.contractKey, contract: play.contract }), play.updatedAt),
-        d1.prepare(`UPDATE plays SET contract_key = ?, contract_json = ?, primary_reason = ?, picked_by = ?,
+        d1.prepare(`UPDATE plays SET contract_key = ?, contract_json = ?, forecast_json = ?, primary_reason = ?, picked_by = ?,
           title = ?, legs = ?, book = ?, american_odds = ?, stake_cents = ?, model_edge_pp = ?,
           estimated_ev_percent = ?, confidence = ?, stats_case = ?, football_case = ?,
           gabe_approved = ?, jarrett_approved = ?, status = 'research', created_by = ?, created_at = ?, updated_at = ?
           WHERE id = ? AND status = 'passed'`)
           .bind(
-            play.contractKey ?? "", JSON.stringify(play.contract ?? []), play.primaryReason, play.pickedBy,
+            play.contractKey ?? "", JSON.stringify(play.contract ?? []), JSON.stringify(forecastSnapshot), play.primaryReason, play.pickedBy,
             play.title, play.legs, play.book, play.americanOdds, play.stakeCents, play.modelEdgePp,
             play.estimatedEvPercent, play.confidence, play.statsCase, play.footballCase,
             actor === "gabe" ? 1 : 0, actor === "jarrett" ? 1 : 0, play.createdBy,
@@ -355,19 +371,22 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
     assertStoredPlayContract(current);
     await assertApprovalContractCurrent(d1, current);
     await assertPortfolioAvailable(d1, current);
+    const forecastSnapshot = await capturePlayForecastSnapshot(d1, current);
     await d1.prepare(`UPDATE plays SET
       gabe_approved = CASE WHEN ? = 'gabe' THEN 1 ELSE gabe_approved END,
       jarrett_approved = CASE WHEN ? = 'jarrett' THEN 1 ELSE jarrett_approved END,
       status = CASE WHEN (gabe_approved = 1 OR ? = 'gabe') AND (jarrett_approved = 1 OR ? = 'jarrett') THEN 'card' ELSE 'research' END,
-      updated_at = ? WHERE id = ? AND status = 'research'`)
-      .bind(actor, actor, actor, actor, play.updatedAt, play.id).run();
+      forecast_json = ?, updated_at = ? WHERE id = ? AND status = 'research'`)
+      .bind(actor, actor, actor, actor, JSON.stringify(forecastSnapshot), play.updatedAt, play.id).run();
     const saved = (await getPlay(play.id))!;
     await notifyMissingApprover(d1, saved);
     return saved;
   }
   await assertApprovalWindowOpen(d1, play, play.updatedAt);
+  await assertApprovalContractCurrent(d1, play);
+  const forecastSnapshot = await capturePlayForecastSnapshot(d1, play);
   await d1.prepare(INSERT_PLAY_SQL).bind(
-    play.id, play.contractKey ?? "", JSON.stringify(play.contract ?? []), actor === "gabe" ? 1 : 0, actor === "jarrett" ? 1 : 0,
+    play.id, play.contractKey ?? "", JSON.stringify(play.contract ?? []), JSON.stringify(forecastSnapshot), actor === "gabe" ? 1 : 0, actor === "jarrett" ? 1 : 0,
     play.season, play.week, play.gameId, play.playType, play.market, play.primaryReason, play.pickedBy, play.title, play.legs, play.book,
     play.americanOdds, play.stakeCents, play.modelEdgePp, play.estimatedEvPercent,
     play.confidence, play.statsCase, play.footballCase, play.executionStatus, play.cashPlacementConfirmed ? 1 : 0, "research", play.result,

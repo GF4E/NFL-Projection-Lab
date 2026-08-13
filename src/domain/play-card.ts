@@ -7,6 +7,37 @@ export type PlayResult = "pending" | "win" | "loss" | "push" | "void";
 export type PickedBy = "gabe" | "jarrett";
 export type PlayExecutionStatus = "paper" | "executed";
 
+export type PlayForecastLegSnapshot = {
+  sourceQuoteId: string;
+  gameId: string;
+  market: StoredPlayLeg["market"];
+  side: string;
+  point: number | null;
+  americanPrice: number;
+  book: "betmgm" | "fanduel";
+  capturedAt: string;
+  sourceHash: string;
+  marketProbability: number | null;
+  modelProbability: number | null;
+  betProbability: number | null;
+  pushProbability: number | null;
+  uncertaintyInterval: [number, number] | null;
+  expectedValue: number | null;
+};
+
+export type PlayForecastSnapshot = {
+  generatedAt: string;
+  boardGeneratedAt: string;
+  championHash: string | null;
+  configHash: string;
+  dataHash: string;
+  artifactHash: string | null;
+  consensusSnapshotId: string;
+  displayedExpectedValuePercent: number;
+  displayedEdgePp: number;
+  legs: PlayForecastLegSnapshot[];
+};
+
 export type StoredPlayLeg = {
   sourceQuoteId?: string;
   gameId: string;
@@ -21,6 +52,7 @@ export type WeeklyPlay = {
   id: string;
   contractKey?: string;
   contract?: StoredPlayLeg[];
+  forecastSnapshot?: PlayForecastSnapshot | null;
   approvals?: PickedBy[];
   season: number;
   week: number;

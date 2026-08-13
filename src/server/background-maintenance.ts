@@ -7,6 +7,7 @@ import { expireStaleTeamDrafts } from "./play-store";
 import { runOfficialPregameContextAutomation } from "./pregame-context/automation";
 import { runKickoffWeatherAutomation } from "./weather/automation";
 import { dispatchPendingPushes } from "./push/store";
+import { generateWeeklyDigest } from "./weekly-digest";
 
 /**
  * Runs every five minutes in production. The official pregame snapshot is resolved first so
@@ -29,9 +30,16 @@ export async function runBackgroundMaintenance(input: {
     drafts: () => expireStaleTeamDrafts(input.db, now),
     settlement: () => settleCompletedTeamPlays(input.db, now)
   }, now.toISOString());
+  const digest = await generateWeeklyDigest({ db: input.db, now }).then(
+    (value) => ({ status: "completed" as const, result: value }),
+    (error: unknown) => ({
+      status: "failed" as const,
+      error: `weekly digest: ${error instanceof Error ? error.message : "unknown failure"}`
+    })
+  );
   try {
-    return { ...result, push: { status: "completed" as const, result: await dispatchPendingPushes({ db: input.db, now: now.toISOString() }) } };
+    return { ...result, digest, push: { status: "completed" as const, result: await dispatchPendingPushes({ db: input.db, now: now.toISOString() }) } };
   } catch (error) {
-    return { ...result, push: { status: "failed" as const, error: error instanceof Error ? error.message : "push retry failed" } };
+    return { ...result, digest, push: { status: "failed" as const, error: error instanceof Error ? error.message : "push retry failed" } };
   }
 }
