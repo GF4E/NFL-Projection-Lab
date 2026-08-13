@@ -538,11 +538,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   });
 
   it("23b. requires independent player history and time-aligned references for production prop cards", () => {
-    const pair = (book: string, capturedAt = "2026-09-09T18:00:00Z"): RawPropQuote[] => ([
-      { id: `${book}:over`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player: "Quarterback Jr.", side: "Over", point: 249.5, americanPrice: book === "betmgm" ? 120 : -130, capturedAt, sourceHash: "hash" },
-      { id: `${book}:under`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player: "Quarterback Jr.", side: "Under", point: 249.5, americanPrice: book === "betmgm" ? -150 : 100, capturedAt, sourceHash: "hash" }
+    const pair = (book: string, capturedAt = "2026-09-09T18:00:00Z", player = "Quarterback Jr."): RawPropQuote[] => ([
+      { id: `${book}:over`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player, side: "Over", point: 249.5, americanPrice: book === "betmgm" ? 120 : -130, capturedAt, sourceHash: "hash" },
+      { id: `${book}:under`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player, side: "Under", point: 249.5, americanPrice: book === "betmgm" ? -150 : 100, capturedAt, sourceHash: "hash" }
     ]);
-    const quotes = [...pair("betmgm"), ...pair("fanduel"), ...pair("draftkings"), ...pair("bovada")];
+    const quotes = [
+      ...pair("betmgm"),
+      ...pair("fanduel", undefined, "Quarterback"),
+      ...pair("draftkings", undefined, "Quarterback II"),
+      ...pair("bovada", undefined, "Quarterback.")
+    ];
     const history = [288, 274, 305, 260, 281, 267, 292, 255].map((value, index) => ({
       player: "Quarterback",
       market: "player_pass_yds" as const,
@@ -814,7 +819,11 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(rankTeaserPairs([teaser("g1", "NE", "SEA", 0.75), teaser("g2", "KC", "DEN", 0.74)], { offeredAmerican: -120 })).toEqual([]);
     const compactBoard = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(compactBoard).toContain("PLAY TO");
+    expect(compactBoard).toContain('teaserPairIsWong ? "WONG" : "EV PAIR"');
+    expect(compactBoard).toContain('leg.teasedPoint)}`).join(" + ")');
     expect(compactBoard).toContain("teaserPair.unitsGreyed ? \" · UNCERTAIN\" : \"\"");
+    expect(compactBoard).toContain('preferenceWithheld ? "PASS · TEAM"');
+    expect(compactBoard).toContain("preferenceGateCleared");
     expect(compactBoard).not.toContain("PAIR READY");
   });
 
@@ -1132,7 +1141,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     const recommendations = readFileSync("src/domain/mainline-recommendations.ts", "utf8");
     expect(board).toContain("MODEL BETS");
-    expect(board).toContain("BREAK-EVEN");
+    expect(board).toContain("BE {formatPercent(candidate.breakEvenProbability)}");
     expect(board).toContain("candidate.expectedValue");
     expect(board).toContain("rankMainlineRecommendations");
     expect(recommendations).toContain("expectedValueWithPush");
@@ -1184,12 +1193,23 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   it("44. surfaces no more than three props and the best exact mainline contracts across both books", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     const mainlines = readFileSync("src/domain/mainline-recommendations.ts", "utf8");
+    const props = readFileSync("src/domain/decision-board.ts", "utf8");
+    const importer = readFileSync("src/server/player-props.ts", "utf8");
     expect(board).toContain("rankBestBookMainlineRecommendations");
     expect(board).toContain("rankBestExecutionProps");
     expect(board).toContain("bookNames[candidate.line.book]");
     expect(board).toContain("bookNames[prop.executionBook]");
+    expect(board).toContain("FAIR {formatPercent(prop.executionFairProbability)} · BET {formatPercent(prop.betProbability)}");
+    expect(board).toContain("FAIR {formatPercent(alternateEvaluation.fairProbability)} · BET {formatPercent(alternateEvaluation.shrunkProbability)}");
     expect(mainlines).toContain("compares contract EV rather than raw prices");
     expect(mainlines).not.toContain("americanPrice -");
+    expect(props).toContain("function deviggedQuotes");
+    expect(props).toContain("powerDevig(over.americanPrice, under.americanPrice)");
+    expect(props).toContain("onePerBook.length < minimumReferenceBooks");
+    expect(props).toContain("lowerBoundExpectedValue <= 0");
+    expect(props).toContain("if (!sizing.included) continue");
+    expect(importer).toContain("requireConfirmedAvailability: true");
+    expect(importer).toContain("maximumPerBook: quotes.length");
   });
 
   it("45. withholds synthetic same-game parlay pricing and labels multiple straights as separate", () => {

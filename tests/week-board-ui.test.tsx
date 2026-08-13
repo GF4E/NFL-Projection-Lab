@@ -185,7 +185,8 @@ describe("compact weekly decision board", () => {
     expect(evidence.join(" ")).toContain("SEA O #4 vs NE D #24");
     expect(evidence.join(" ")).toContain("SEA O #6 vs NE D #22");
     expect(evidence.join(" ")).not.toContain("8 days vs 7 days");
-    expect(container.querySelector(".book-compare")?.textContent).toContain("VS FanDuel -3 -105 · +10.0% EV");
+    expect(container.querySelector(".book-compare")?.textContent).toContain("VS FanDuel -3 -105 · FAIR 49.0% · BET 57.0% · +10.0% EV");
     expect(container.querySelector(".book-compare")?.textContent).toContain("translated");
+    expect(container.querySelector(".quick-mainline-recommendation small")?.textContent).toContain("FAIR 50.0% · BET 60.0% · BE 52.4%");
   });
 });

@@ -701,7 +701,7 @@ export function scanMarketConfirmedProps(
       .filter((reference) =>
         reference.book !== quote.book &&
         reference.market === quote.market &&
-        reference.player === quote.player &&
+        normalizePropPlayerName(reference.player) === normalizePropPlayerName(quote.player) &&
         reference.side === quote.side &&
         reference.point === quote.point &&
         Math.abs(Date.parse(reference.capturedAt) - Date.parse(quote.capturedAt)) <= maximumSnapshotSkewMs &&

@@ -264,7 +264,20 @@ export function WeekOneBoard() {
   const straightSizing = useMemo(() => slipMode === "straight"
     ? slip.map(straightLegSizing)
     : [], [slip, slipMode]);
-  const straightEligibleLegCount = straightSizing.filter((sizing) => sizing?.included).length;
+  const preferenceConflicts = useMemo(() => slip.map((leg) => {
+    if (leg.kind === "prop" || leg.market === "total") return false;
+    const matchup = matchups.find((game) => game.id === leg.gameId);
+    return Boolean(matchup && [matchup.away, matchup.home].some((team) => preferredTeams.has(team) && team !== leg.side));
+  }), [matchups, slip]);
+  const preferenceGateCleared = useMemo(() => preferenceConflicts.every((conflict, index) => {
+    if (!conflict) return true;
+    if (slipMode === "teaser") return Boolean(teaserValue && teaserValue.expectedValue >= structuralConfig.teasers.preferredOpponentExceptionalEv);
+    return (slip[index]?.edge ?? Number.NEGATIVE_INFINITY) >= structuralConfig.monitoring.pushEdgeThreshold;
+  }), [preferenceConflicts, slip, slipMode, teaserValue]);
+  const straightEligibleLegCount = straightSizing.filter((sizing, index) => sizing?.included && (
+    !preferenceConflicts[index] ||
+    (slip[index]?.edge ?? Number.NEGATIVE_INFINITY) >= structuralConfig.monitoring.pushEdgeThreshold
+  )).length;
   const officialPlays = useMemo(() => plays.filter((play) => isTeamApproved(play.approvals)), [plays]);
   const portfolio = useMemo(() => summarizeTeamCardPortfolio(officialPlays, slate?.week ?? 1), [officialPlays, slate?.week]);
   const proposedPortfolioPositions = useMemo<TeamCardPortfolioPosition[]>(() => {
@@ -333,7 +346,7 @@ export function WeekOneBoard() {
     singleBook: new Set(slip.map((leg) => leg.book)).size <= 1,
     standardValue: slipValue,
     teaserExpectedValuePercent: teaserValue?.sizing.included ? teaserValue.evPercent : null
-  }) && (slipMode !== "parlay" || Boolean(parlayDecision?.sizing.included && parlayDecision.expectedValue >= 0)) &&
+  }) && (slipMode !== "parlay" || Boolean(parlayDecision?.sizing.included && parlayDecision.expectedValue >= 0)) && preferenceGateCleared &&
     portfolioConflicts.length === 0;
 
   useEffect(() => {
@@ -764,7 +777,7 @@ export function WeekOneBoard() {
               .sort((left, right) => (left.classification === "classic_wong" ? -1 : 0) - (right.classification === "classic_wong" ? -1 : 0) || (right.fairProbability ?? 0) - (left.fairProbability ?? 0))
               .slice(0, 2);
             const teaserPair = intelligence?.teaserPairs.find((pair) => pair.book === book && pair.legs.some((leg) => leg.gameId === game.id));
-            const pairedTeaserLeg = teaserPair?.legs.find((leg) => leg.gameId !== game.id) ?? null;
+            const teaserPairIsWong = Boolean(teaserPair?.legs.every((leg) => leg.classification === "classic_wong"));
             const movement = gameIntel?.movements.find((series) => series.book === book && series.side === game.home);
             const movementOpen = movement?.snapshots[0];
             const movementCurrent = movement?.snapshots.at(-1);
@@ -893,10 +906,10 @@ export function WeekOneBoard() {
                     >
                       <div>
                         <b>{lineSelection(candidate.line)} <strong>{formatOdds(candidate.line.americanPrice)}</strong></b>
-                        <small>{bookNames[candidate.line.book]} · {marketTitle(candidate.market)} · BET {formatPercent(candidate.betProbability)} · BREAK-EVEN {formatPercent(candidate.breakEvenProbability)}</small>
+                        <small>{bookNames[candidate.line.book]} · {marketTitle(candidate.market)} · FAIR {formatPercent(candidate.line.fairProbability)} · BET {formatPercent(candidate.betProbability)} · BE {formatPercent(candidate.breakEvenProbability)} · {snapshotAge(candidate.line.capturedAt)}</small>
                         <small>{candidate.expectedValue >= 0 ? "+" : ""}{(candidate.expectedValue * 100).toFixed(1)}% EV · 80% {formatInterval(candidate.edgeInterval)} · <span className={`evidence-check ${context.verdict}`} title={evidenceDetail(context)}>{compactEvidenceLabel(context)}</span></small>
                         {alternateEvaluation && <small className="book-compare">
-                          VS {bookNames[alternateEvaluation.book]} {alternateEvaluation.market === "moneyline" ? "ML" : alternateEvaluation.market === "total" ? `${alternateEvaluation.side === "Over" ? "O" : "U"} ${alternateEvaluation.point}` : formatPoint(alternateEvaluation.point)} {formatOdds(alternateEvaluation.americanPrice)} · {alternateEvaluation.expectedValue! >= 0 ? "+" : ""}{(alternateEvaluation.expectedValue! * 100).toFixed(1)}% EV{translatedDelta === null ? "" : ` · ${translatedDelta.toFixed(1)}¢ translated`}
+                          VS {bookNames[alternateEvaluation.book]} {alternateEvaluation.market === "moneyline" ? "ML" : alternateEvaluation.market === "total" ? `${alternateEvaluation.side === "Over" ? "O" : "U"} ${alternateEvaluation.point}` : formatPoint(alternateEvaluation.point)} {formatOdds(alternateEvaluation.americanPrice)} · FAIR {formatPercent(alternateEvaluation.fairProbability)} · BET {formatPercent(alternateEvaluation.shrunkProbability)} · {alternateEvaluation.expectedValue! >= 0 ? "+" : ""}{(alternateEvaluation.expectedValue! * 100).toFixed(1)}% EV{translatedDelta === null ? "" : ` · ${translatedDelta.toFixed(1)}¢ translated`} · {snapshotAge(alternateEvaluation.capturedAt)}
                         </small>}
                         {contractSignals.map((signal) => <small className="contract-signal" key={signal.id}>
                           <span>{signal.label} · {signal.lean}</span> {signal.detail} · {signalInterpretation(signal)}
@@ -909,15 +922,15 @@ export function WeekOneBoard() {
                 <section className="quick-teasers">
                   <div className="quick-head"><span>TEASER VALUE</span><small>{teaserPair ? `BEST PAIR +${(teaserPair.expectedValue * 100).toFixed(1)}%` : teaserCandidates.length ? "BUILD A PAIR" : "NO VIABLE LEG"}</small></div>
                   {teaserPair && <button className={`teaser-pair ${teaserPair.unitsGreyed ? "uncertain" : ""}`} onClick={() => addTeaserPair(teaserPair)}>
-                    <span className="teaser-class classic_wong">PAIR</span>
-                    <div><b>With {pairedTeaserLeg?.team} {pairedTeaserLeg ? formatPoint(pairedTeaserLeg.teasedPoint) : ""}</b><small>SCREEN {formatOdds(teaserPair.screeningAmerican)} · PLAY TO {formatOdds(teaserPair.playToAmerican)}{teaserPair.translationWarning !== "none" ? ` · ${teaserPair.translationWarning}` : ""}</small></div>
+                    <span className={`teaser-class ${teaserPairIsWong ? "classic_wong" : "ordinary"}`}>{teaserPairIsWong ? "WONG" : "EV PAIR"}</span>
+                    <div><b>{teaserPair.legs.map((leg) => `${leg.team} ${formatPoint(leg.teasedPoint)}`).join(" + ")}</b><small>{bookNames[teaserPair.book]} · SCREEN {formatOdds(teaserPair.screeningAmerican)} · PLAY TO {formatOdds(teaserPair.playToAmerican)}{teaserPair.translationWarning !== "none" ? ` · ${teaserPair.translationWarning}` : ""}</small></div>
                     <em>+{(teaserPair.expectedValue * 100).toFixed(1)}% · {teaserPair.suggestedUnits}u{teaserPair.unitsGreyed ? " · UNCERTAIN" : ""}</em>
                   </button>}
                   {teaserCandidates.length ? teaserCandidates.map((candidate) => {
                     const context = alignMatchupEvidence(gameIntel?.signals ?? [], "teaser", candidate.team);
                     return <button onClick={() => addTeaser(candidate, `${game.away} @ ${game.home}`)} key={`${candidate.book}:${candidate.team}:${candidate.originalPoint}`}>
                       <span className={`teaser-class ${candidate.classification}`}>{candidate.classification === "classic_wong" ? "WONG" : candidate.classification === "key_number" ? "KEY" : "EV"}</span>
-                      <div><b>{candidate.team} {formatPoint(candidate.originalPoint)} → {formatPoint(candidate.teasedPoint)}</b><small>{formatPercent(candidate.fairProbability)} fair · {candidate.crossedKeys.length ? `crosses ${candidate.crossedKeys.join("/")}` : "no key crossed"}</small></div>
+                      <div><b>{candidate.team} {formatPoint(candidate.originalPoint)} → {formatPoint(candidate.teasedPoint)}</b><small>{formatPercent(candidate.fairProbability)} fair · {formatPercent(candidate.pushProbability)} push · {candidate.crossedKeys.length ? `crosses ${candidate.crossedKeys.join("/")}` : "no key crossed"}</small></div>
                       <em className={context.verdict} title={evidenceDetail(context)}>{compactEvidenceLabel(context)}</em>
                     </button>;
                   }) : <p>No viable path at this line.</p>}
@@ -925,7 +938,7 @@ export function WeekOneBoard() {
                 <section className="quick-props">
                   <div className="quick-head"><span>{displayedProps.length ? propsActionable ? "+EV PROPS" : "LAST GOOD PROPS" : "PROP CHECK"}</span><small>{propsLoading === game.id ? "LOADING" : displayedProps.length ? propsActionable ? `${displayedProps.length} CLEARED` : "STALE · WITHHELD" : propBoard?.status === "stale" ? "STALE" : "GATED"}</small></div>
                   {propsLoading === game.id ? <p>Checking exact same-point prices across books…</p> : displayedProps.length ? displayedProps.map((prop) => <button className={`${prop.unitsGreyed ? "uncertain" : ""} ${propsActionable ? "" : "stale"}`} disabled={!propsActionable} onClick={() => propsActionable && addProp(prop, `${game.away} @ ${game.home}`)} key={prop.id}>
-                    <div><b>{prop.player}</b><small>{bookNames[prop.executionBook]} · {prop.side} {prop.point} {propMarketTitle(prop.market)} · {prop.referenceBooks} refs · {prop.sampleGames ? `L${prop.sampleGames} proj ${prop.projectedValue?.toFixed(1)} · ${((prop.hitRate ?? 0) * 100).toFixed(0)}% hit · ` : ""}floor +{(prop.lowerBoundExpectedValue * 100).toFixed(1)}% · {snapshotAge(prop.capturedAt)}</small></div>
+                    <div><b>{prop.player}</b><small>{bookNames[prop.executionBook]} · {prop.side} {prop.point} {propMarketTitle(prop.market)} · {prop.referenceBooks} refs · FAIR {formatPercent(prop.executionFairProbability)} · BET {formatPercent(prop.betProbability)} · {prop.sampleGames ? `L${prop.sampleGames} proj ${prop.projectedValue?.toFixed(1)} · ${((prop.hitRate ?? 0) * 100).toFixed(0)}% hit · ` : ""}floor +{(prop.lowerBoundExpectedValue * 100).toFixed(1)}% · {snapshotAge(prop.capturedAt)}</small></div>
                     <strong>{formatOdds(prop.americanPrice)}</strong><em>+{(prop.expectedValue * 100).toFixed(1)}% · {prop.suggestedUnits}u</em>
                   </button>) : <p>{propBoard?.message ?? "Props are scanned when books post them closer to kickoff."}</p>}
                 </section>
@@ -970,10 +983,13 @@ export function WeekOneBoard() {
         </div>
         {slip.length === 0 ? <div className="empty-slip"><b>Click a line.</b><p>The contract lands here. No typing, no dropdowns.</p></div> : <div className="slip-legs">{slip.map((leg, index) => {
           const sizing = slipMode === "straight" ? straightSizing[index] ?? null : null;
-          const decision = slipMode !== "straight" ? `LEG ${index + 1}` : sizing?.included
+          const preferenceWithheld = preferenceConflicts[index] && (slipMode === "teaser"
+            ? !teaserValue || teaserValue.expectedValue < structuralConfig.teasers.preferredOpponentExceptionalEv
+            : (leg.edge ?? Number.NEGATIVE_INFINITY) < structuralConfig.monitoring.pushEdgeThreshold);
+          const decision = preferenceWithheld ? "PASS · TEAM" : slipMode !== "straight" ? `LEG ${index + 1}` : sizing?.included
             ? `${sizing.suggestedUnits}u READY${sizing.greyed ? " · UNCERTAIN" : ""}`
             : sizing ? "PASS · BELOW 0.5u" : "PASS · MODEL WITHHELD";
-          return <article className={slipMode === "straight" && !sizing?.included ? "withheld" : sizing?.greyed ? "uncertain" : ""} key={leg.id}><button onClick={() => setSlip((current) => current.filter((item) => item.id !== leg.id))}>×</button><div><small>{leg.matchup} · {marketTitle(leg.market)}</small><b>{leg.selection}</b><span>{leg.detail} · {leg.kind === "teaser" || leg.edge === null ? "Fair" : "Bet"} {formatPercent(leg.kind === "teaser" ? leg.fairProbability : legBetProbability(leg))}</span></div><strong>{leg.kind === "teaser" ? "6 PT" : formatOdds(leg.americanPrice)}</strong><em>{decision}</em></article>;
+          return <article className={preferenceWithheld || slipMode === "straight" && !sizing?.included ? "withheld" : sizing?.greyed ? "uncertain" : ""} key={leg.id}><button onClick={() => setSlip((current) => current.filter((item) => item.id !== leg.id))}>×</button><div><small>{leg.matchup} · {marketTitle(leg.market)}</small><b>{leg.selection}</b><span>{leg.detail} · {leg.kind === "teaser" || leg.edge === null ? "Fair" : "Bet"} {formatPercent(leg.kind === "teaser" ? leg.fairProbability : legBetProbability(leg))}</span></div><strong>{leg.kind === "teaser" ? "6 PT" : formatOdds(leg.americanPrice)}</strong><em>{decision}</em></article>;
         })}</div>}
         {slipMode === "teaser" && <div className="teaser-price"><span>OFFERED 2-TEAM PRICE</span><div>{structuralConfig.teasers.selectableAmericanPrices.map((price) => <button className={teaserPrice === price ? "active" : ""} onClick={() => setTeaserPrice(price)} key={price}>{price}</button>)}</div><small>Confirm the live book price. A teaser is blocked when estimated EV is negative.</small></div>}
         <div className="reason-clicks"><span>WHY</span>{pickReasons.slice(0, 8).map((item) => <button className={reason === item.value ? "active" : ""} onClick={() => setReason(item.value)} key={item.value}>{item.label.replace("Model disagrees with market price", "Model edge").replace("Opponent-adjusted efficiency matchup", "Efficiency").replace("Turnover or scoring regression", "Regression").replace("Personnel or injury advantage", "Personnel").replace("Coaching or scheme matchup", "Scheme").replace("Role clarity / team chemistry", "Chemistry").replace("Better number / key-number value", "Key number").replace("Pace / scoring environment", "Pace")}</button>)}</div>
@@ -991,6 +1007,7 @@ export function WeekOneBoard() {
         </div>
         <button className="save-slip" disabled={!slipCanApprove} onClick={saveSlip}>Approve team card</button>
         <p className="slip-message" aria-live="polite">{message}</p>
+        {!preferenceGateCleared && <p className="preference-note">SEA / ATL GATE · {slipMode === "teaser" ? `needs +${(structuralConfig.teasers.preferredOpponentExceptionalEv * 100).toFixed(0)}% combined EV` : `needs +${(structuralConfig.monitoring.pushEdgeThreshold * 100).toFixed(1)}pp edge`}</p>}
         <p className="value-note">Estimated value only. Approval never places a wager.</p>
         </div>
       </aside>
