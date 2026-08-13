@@ -131,9 +131,13 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
 
   it("1e. publishes execution-book market coverage separately from consensus fallbacks", () => {
     const board = readFileSync("src/server/decision-board.ts", "utf8");
+    const surface = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(board).toContain("marketCoverage");
     expect(board).toContain('status: completeGames === slate.games.length ? "complete"');
     expect(board).toContain('marketSource: "nflverse_consensus"');
+    expect(surface).toContain("activeMarketCoverage");
+    expect(surface).toContain("POSTED</small>");
+    expect(surface).toContain("ALL 3 MARKETS POSTED");
   });
 
   it("1e2. freezes validated total translation and integer push mass for pricing and CLV", () => {

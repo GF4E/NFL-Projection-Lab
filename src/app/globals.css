@@ -197,6 +197,9 @@ button:disabled { cursor: wait; opacity: .62; }
 .market-column-head { min-height: 47px; padding: 0 13px; display: grid; grid-template-columns: minmax(170px, 1fr) repeat(3, minmax(105px, 150px)); gap: 8px; align-items: center; border-bottom: 1px solid #39433f; background: #0d1513; }
 .market-column-head span { color: #a5afab; font: 800 13px var(--display); text-align: center; text-transform: uppercase; }
 .market-column-head span:first-child { text-align: left; }
+.market-column-head span b { font: inherit; }
+.market-column-head span small { margin-top: 2px; display: block; color: #707d78; font: 800 7px var(--display); letter-spacing: .04em; }
+.market-column-head span.coverage-gap b { color: var(--gold); }
 .event-day-label { min-height: 38px; padding: 0 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #36413d; background: #202a27; }
 .event-day-label b { font: 800 15px var(--display); letter-spacing: .06em; text-transform: uppercase; }
 .event-day-label span { color: #98a39f; font: 700 10px var(--display); text-transform: uppercase; }

@@ -57,6 +57,11 @@ function marketTitle(market: SelectedLeg["market"]): string {
   if (market === "prop") return "Player prop";
   return market[0].toUpperCase() + market.slice(1);
 }
+
+function marketShortTitle(market: LineMarketKey): string {
+  if (market === "moneyline") return "MONEY";
+  return market.toUpperCase();
+}
 function propMarketTitle(market: PropCandidate["market"]): string {
   if (market === "player_pass_yds") return "Pass yards";
   if (market === "player_rush_yds") return "Rush yards";
@@ -203,6 +208,14 @@ export function WeekOneBoard() {
   const straightEv = useMemo(() => slipMode === "straight" && slip.length === 1 ? legExpectedValuePercent(slip[0]) : null, [slip, slipMode]);
   const latestCapture = useMemo(() => lines.reduce<string | null>((latest, line) =>
     line.book === book && (!latest || line.capturedAt > latest) ? line.capturedAt : latest, null), [book, lines]);
+  const activeMarketCoverage = useMemo(() => intelligence?.marketCoverage
+    .filter((item) => item.book === book) ?? [], [book, intelligence]);
+  const coverageReadout = useMemo(() => {
+    if (!activeMarketCoverage.length) return null;
+    const incomplete = activeMarketCoverage.filter((item) => item.status !== "complete");
+    if (!incomplete.length) return "ALL 3 MARKETS POSTED";
+    return incomplete.map((item) => `${marketShortTitle(item.market)} ${item.completeGames}/${item.totalGames}`).join(" · ");
+  }, [activeMarketCoverage]);
   const teaserValue = useMemo(() => {
     if (slipMode !== "teaser" || slip.length !== 2 || slip.some((leg) => leg.kind !== "teaser" || leg.fairProbability === null || leg.pushProbability === undefined || leg.probabilityMembers?.length !== structuralConfig.model.bootstrapMembers || leg.pushProbabilityMembers?.length !== structuralConfig.model.bootstrapMembers)) return null;
     if (new Set(slip.map((leg) => leg.gameId)).size !== slip.length) return null;
@@ -509,12 +522,15 @@ export function WeekOneBoard() {
 
     <div className="line-status" data-ready={lines.length > 0}>
       <span><i />{lines.length ? "LINES LIVE" : configured ? "LINES PENDING" : "ODDS KEY NEEDED"}</span>
-      <small>{latestCapture ? `${bookNames[book].toUpperCase()} · ${snapshotAge(latestCapture)} OLD` : `${bookNames[book].toUpperCase()} · NO SNAPSHOT`}{!configured && <> · <a href="https://the-odds-api.com/" target="_blank" rel="noreferrer">GET KEY ↗</a></>}</small>
+      <small>{bookNames[book].toUpperCase()} · {coverageReadout ? `${coverageReadout} · ` : ""}{latestCapture ? `${snapshotAge(latestCapture)} OLD` : "NO SNAPSHOT"}{!configured && <> · <a href="https://the-odds-api.com/" target="_blank" rel="noreferrer">GET KEY ↗</a></>}</small>
     </div>
 
     <div className={`sportsbook-layout ${slipOpen || slip.length ? "" : "slip-collapsed"}`}>
       <section className="event-board" aria-label={`Week ${slate?.week ?? 1} game lines`}>
-        <div className="market-column-head"><span>Matchup</span><span>Spread</span><span>Total</span><span>Money</span><span>Model / edge</span></div>
+        <div className="market-column-head"><span>Matchup</span>{(["spread", "total", "moneyline"] as const).map((market) => {
+          const coverage = activeMarketCoverage.find((item) => item.market === market);
+          return <span className={coverage?.status === "complete" ? "" : "coverage-gap"} key={market}><b>{marketShortTitle(market)}</b>{coverage && coverage.status !== "complete" && <small>{coverage.completeGames}/{coverage.totalGames} POSTED</small>}</span>;
+        })}<span>Model / edge</span></div>
         {days.map((day) => <div className="event-day" key={day}>
           <div className="event-day-label"><b>{day}</b><span>{matchups.filter((game) => game.day === day).length} games</span></div>
           {matchups.filter((game) => game.day === day).map((game) => {
