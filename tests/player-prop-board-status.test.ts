@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { playerPropBoardMessage } from "@/domain/player-prop-status";
+import { playerPropBoardIsActionable, playerPropBoardMessage } from "@/domain/player-prop-status";
 
 const base = {
   quotes: 12,
@@ -27,5 +27,12 @@ describe("player prop decision status", () => {
   it("withholds stale prices before reporting any other gate", () => {
     expect(playerPropBoardMessage({ ...base, freshQuotes: 0, availabilityConfirmed: false, candidates: 0 }))
       .toContain("prices are older than");
+  });
+
+  it("keeps last-good stale numbers non-actionable", () => {
+    expect(playerPropBoardIsActionable({ status: "current" })).toBe(true);
+    expect(playerPropBoardIsActionable({ status: "stale" })).toBe(false);
+    expect(playerPropBoardIsActionable({ status: "unavailable" })).toBe(false);
+    expect(playerPropBoardIsActionable(null)).toBe(false);
   });
 });

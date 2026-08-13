@@ -1109,21 +1109,23 @@ export async function buildDecisionBoard(
         })
       : [];
     const teasers: TeaserCandidate[] = artifact ? gameLines.filter((line) => line.market === "spread" && line.point !== null && line.fairProbability !== null).map((line) => {
-      const sideLines = gameLines.filter((candidate) => candidate.market === "spread" && candidate.side === line.side && candidate.point !== null);
-      const consensusPoint = sideLines.reduce((sum, candidate) => sum + (candidate.point ?? 0), 0) / Math.max(1, sideLines.length);
-      const teasedPoint = (line.point ?? 0) + 6;
       const projection = projections.find((candidate) => candidate.book === line.book);
       const isHome = projection?.homeTeam === line.side;
+      // Artifact history contains one row per team-side contract. Orient both
+      // the row and posted point to the selected team; never average raw points
+      // from different posted contracts.
+      const consensusPoint = isHome ? consensusHomePoint : consensusHomePoint === null ? null : -consensusHomePoint;
+      const teasedPoint = (line.point ?? 0) + 6;
       const originalBetProbability = projection?.shrunkHomeProbability === null || projection?.shrunkHomeProbability === undefined
         ? null
         : isHome ? projection.shrunkHomeProbability : 1 - projection.shrunkHomeProbability;
       const originalEdgeInterval = projection?.edgeInterval === null || projection?.edgeInterval === undefined
         ? null
         : isHome ? projection.edgeInterval : [-projection.edgeInterval[1], -projection.edgeInterval[0]] as [number, number];
-      const translated = originalBetProbability === null
+      const translated = originalBetProbability === null || consensusPoint === null
         ? { probability: null, pushProbability: null, warning: "unsupported" as const, sourcePoints: [] }
         : translateFairProbability(artifact, consensusPoint, line.point!, teasedPoint, originalBetProbability);
-      const qbLow = originalEdgeInterval === null
+      const qbLow = originalEdgeInterval === null || consensusPoint === null
         ? null
         : translateFairProbability(
             artifact,
@@ -1132,7 +1134,7 @@ export async function buildDecisionBoard(
             teasedPoint,
             Math.max(0.001, Math.min(0.999, line.fairProbability! + originalEdgeInterval[0]))
           ).probability;
-      const qbHigh = originalEdgeInterval === null
+      const qbHigh = originalEdgeInterval === null || consensusPoint === null
         ? null
         : translateFairProbability(
             artifact,
@@ -1145,7 +1147,7 @@ export async function buildDecisionBoard(
       const sideExecutionMembers = spreadBootstrap?.probabilityMembers.length === structuralConfig.model.bootstrapMembers
         ? spreadBootstrap.probabilityMembers.map((probability) => isHome ? probability : 1 - probability)
         : null;
-      const teaserBootstrap = sideExecutionMembers ? bootstrapMarginTranslation({
+      const teaserBootstrap = sideExecutionMembers && consensusPoint !== null ? bootstrapMarginTranslation({
         index: marginBootstrapIndex,
         consensusSpread: consensusPoint,
         fromPoint: line.point!,
@@ -1167,6 +1169,7 @@ export async function buildDecisionBoard(
       const classification: TeaserCandidate["classification"] = isClassicWongPoint(line.point!)
         ? "classic_wong"
         : !crossesZero && crossedKeys.length >= 2 ? "key_number" : "ordinary";
+      const warnings = [canonicalSpreadWarning, projection?.translationWarning ?? "unsupported", translated.warning];
       return {
         gameId: game.id,
         book: line.book,
@@ -1184,7 +1187,9 @@ export async function buildDecisionBoard(
           : fairAmericanFromProbability(translated.probability),
         classification,
         crossedKeys,
-        warning: translated.warning
+        warning: warnings.includes("unsupported") ? "unsupported"
+          : warnings.includes("extrapolated") ? "extrapolated"
+            : warnings.includes("interpolated") ? "interpolated" : "none"
       };
     }) : [];
     const away = profiles.get(game.away) ?? null;
@@ -1254,6 +1259,8 @@ export async function buildDecisionBoard(
     };
     return {
       gameId: game.id,
+      awayTeam: game.away,
+      homeTeam: game.home,
       away,
       home,
       projections,

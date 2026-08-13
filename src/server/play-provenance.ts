@@ -6,6 +6,8 @@ import { authoritativeContractExpectedValue, authoritativeEquivalentEdgeCents, p
 import { priceTwoTeamTeaserDecision } from "@/domain/decision-board";
 import { sizeKelly } from "@/domain/sizing";
 import { structuralConfig } from "@/domain/config";
+import { playerPropBoardIsActionable } from "@/domain/player-prop-status";
+import { isBetAgainstPreferredTeam } from "@/domain/team-preferences";
 import type {
   PlayForecastLegSnapshot,
   PlayForecastSnapshot,
@@ -56,6 +58,12 @@ function mainlineSnapshot(input: {
 }): PlayForecastLegSnapshot {
   const { leg, quote, board } = input;
   const game = board.games.find((candidate) => candidate.gameId === leg.gameId);
+  const preferenceConflict = (leg.market === "spread" || leg.market === "moneyline" || leg.market === "teaser") &&
+    isBetAgainstPreferredTeam({
+      awayTeam: game?.awayTeam ?? game?.away?.team,
+      homeTeam: game?.homeTeam ?? game?.home?.team,
+      selectionTeam: leg.side
+    });
   let marketProbability: number | null = null;
   let modelProbability: number | null = null;
   let betProbability: number | null = null;
@@ -127,7 +135,8 @@ function mainlineSnapshot(input: {
     uncertaintyInterval: directUncertaintyInterval ?? probabilityInterval(marketProbability, edgeInterval),
     uncertaintyMembers: directUncertaintyMembers,
     pushProbabilityMembers: directPushProbabilityMembers,
-    expectedValue
+    expectedValue,
+    preferenceConflict
   };
 }
 
@@ -163,7 +172,10 @@ export async function capturePlayForecastSnapshot(
     }
     const quote = propById.get(leg.sourceQuoteId!);
     if (!quote) throw new Error("Approval provenance could not resolve the exact player-prop quote");
-    const candidate = propBoards.get(leg.gameId)?.candidates.find((item) => item.sourceQuoteId === quote.id);
+    const propBoard = propBoards.get(leg.gameId);
+    const candidate = playerPropBoardIsActionable(propBoard)
+      ? propBoard?.candidates.find((item) => item.sourceQuoteId === quote.id)
+      : undefined;
     return {
       sourceQuoteId: quote.id,
       gameId: quote.game_id,
@@ -183,7 +195,8 @@ export async function capturePlayForecastSnapshot(
         : null,
       uncertaintyMembers: null,
       pushProbabilityMembers: null,
-      expectedValue: candidate?.expectedValue ?? null
+      expectedValue: candidate?.expectedValue ?? null,
+      preferenceConflict: false
     };
   });
   const consensusSnapshotId = stableHash({

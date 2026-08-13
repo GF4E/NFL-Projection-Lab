@@ -64,7 +64,9 @@ export function portfolioTriggerSql(): string {
 }
 
 export function contractGuardTriggerSql(): string {
-  return `CREATE TRIGGER IF NOT EXISTS approval_contract_guard_v5
+  const exceptionalProbabilityEdge = structuralConfig.monitoring.pushEdgeThreshold;
+  const exceptionalTeaserEvPercent = structuralConfig.teasers.preferredOpponentExceptionalEv * 100;
+  return `CREATE TRIGGER IF NOT EXISTS approval_contract_guard_v6
     BEFORE UPDATE OF status ON plays
     WHEN OLD.status = 'research' AND NEW.status = 'card'
     BEGIN
@@ -134,6 +136,24 @@ export function contractGuardTriggerSql(): string {
         json_extract(NEW.forecast_json, '$.authoritativeExpectedValuePercent') IS NULL
         OR json_extract(NEW.forecast_json, '$.authoritativeExpectedValuePercent') < 0
       ) THEN RAISE(ABORT, 'The exact independent-game parlay must have nonnegative EV') END;
+
+      SELECT CASE WHEN NEW.play_type IN ('single', 'parlay') AND EXISTS (
+        SELECT 1 FROM json_each(json_extract(NEW.forecast_json, '$.legs'))
+        WHERE COALESCE(json_extract(value, '$.preferenceConflict'), 0) = 1
+          AND (
+            json_extract(value, '$.betProbability') IS NULL
+            OR json_extract(value, '$.marketProbability') IS NULL
+            OR json_extract(value, '$.betProbability') - json_extract(value, '$.marketProbability') < ${exceptionalProbabilityEdge}
+          )
+      ) THEN RAISE(ABORT, 'A side opposing a preferred team must clear the exceptional edge threshold') END;
+
+      SELECT CASE WHEN NEW.play_type = 'teaser' AND EXISTS (
+        SELECT 1 FROM json_each(json_extract(NEW.forecast_json, '$.legs'))
+        WHERE COALESCE(json_extract(value, '$.preferenceConflict'), 0) = 1
+      ) AND (
+        json_extract(NEW.forecast_json, '$.authoritativeExpectedValuePercent') IS NULL
+        OR json_extract(NEW.forecast_json, '$.authoritativeExpectedValuePercent') < ${exceptionalTeaserEvPercent}
+      ) THEN RAISE(ABORT, 'A teaser opposing a preferred team must clear the exceptional EV threshold') END;
 
       SELECT CASE WHEN NEW.play_type IN ('single', 'parlay', 'teaser') AND (
         json_extract(NEW.forecast_json, '$.authoritativeProbabilityInterval') IS NULL

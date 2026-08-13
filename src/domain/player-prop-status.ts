@@ -1,4 +1,11 @@
 import { structuralConfig } from "./config";
+import type { PlayerPropBoard } from "./decision-board";
+
+export function playerPropBoardIsActionable(
+  board: Pick<PlayerPropBoard, "status"> | null | undefined
+): boolean {
+  return board?.status === "current";
+}
 
 export function playerPropBoardMessage(input: {
   quotes: number;

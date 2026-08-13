@@ -30,7 +30,7 @@ import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
 import { addTeamApproval, approvalActorForEmail, draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, exactContractApprovalRequest, isTeamApproved, storedLegMatchesQuote, summarizeTeamCardPortfolio, teamCardPortfolioBatchConflicts, trackerRecordSummaries, trackerSummary, validateTeamCardPortfolio } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
-import { buildPlayerPropEvidence, completeLeaguePropEfficiencyPrior, crossedKeyNumbers, isClassicWongPoint, isPropPlayerUnavailable, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
+import { assertCompletePropQuotePairs, buildPlayerPropEvidence, completeLeaguePropEfficiencyPrior, crossedKeyNumbers, isClassicWongPoint, isPropPlayerUnavailable, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
@@ -599,6 +599,20 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(structuralConfig.props.matchupValidationArtifact).toBe("prop-matchup-validation.json");
   });
 
+  it("23f. rejects partial prop payloads before replacing the last good board", () => {
+    const over: RawPropQuote = {
+      id: "betmgm:over", gameId: "ne-sea", eventId: "event", book: "betmgm",
+      market: "player_pass_yds", player: "Quarterback", side: "Over", point: 249.5,
+      americanPrice: -110, capturedAt: "2026-09-09T18:00:00Z", sourceHash: "hash"
+    };
+    expect(() => assertCompletePropQuotePairs([over])).toThrow(/partial.*incomplete/i);
+    expect(() => assertCompletePropQuotePairs([over, { ...over, id: "betmgm:under", side: "Under" }])).not.toThrow();
+    const importer = readFileSync("src/server/player-props.ts", "utf8");
+    expect(importer.indexOf("assertCompletePropQuotePairs(quotes)")).toBeLessThan(
+      importer.indexOf('DELETE FROM player_prop_quotes_stage WHERE import_id = ?')
+    );
+  });
+
   it("23e. promotes usage forecasts only where untouched holdout data passes the gate", () => {
     const validation = JSON.parse(readFileSync("config/prop-usage-validation.json", "utf8")) as {
       results: Array<{
@@ -699,6 +713,15 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const result = inspectMainlineCompleteness(partial, weekOneMatchups.map((game) => game.id));
     expect(result).toMatchObject({ complete: false, completeGames: 0, totalGames: 16 });
     expect(result.missingGameIds).toContain("ne-sea");
+    const oneSided = (["spread", "total", "moneyline"] as const).map((market) => ({
+      gameId: "ne-sea", book: "betmgm", market, side: market === "total" ? "Over" : "SEA"
+    }));
+    expect(inspectMainlineCompleteness(oneSided, ["ne-sea"]).complete).toBe(false);
+    const paired = oneSided.flatMap((quote) => [quote, {
+      ...quote,
+      side: quote.market === "total" ? "Under" : "NE"
+    }]);
+    expect(inspectMainlineCompleteness(paired, ["ne-sea"]).complete).toBe(true);
   });
 
   it("29. derives the active week and Pacific-ready kickoff from the nflverse schedule", () => {
@@ -738,6 +761,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(ordinaryPair).toHaveLength(1);
     expect(ordinaryPair[0].expectedValue).toBeGreaterThan(0);
     expect(ordinaryPair[0].legs.every((leg) => leg.classification === "ordinary")).toBe(true);
+    expect(ordinaryPair[0].translationWarning).toBe("none");
     expect(rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.7), teaser("g2", "KC", "DEN", 0.7)], { offeredAmerican: -120 })).toEqual([]);
     const pushAdjusted = rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.78, 0.08), teaser("g2", "KC", "DEN", 0.78, 0.08)], { offeredAmerican: -120 });
     expect(pushAdjusted).toHaveLength(1);
@@ -753,7 +777,14 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(rankTeaserPairs([teaser("g1", "NE", "SEA", 0.75), teaser("g2", "KC", "DEN", 0.74)], { offeredAmerican: -120 })).toEqual([]);
     const compactBoard = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(compactBoard).toContain("PLAY TO");
+    expect(compactBoard).toContain("teaserPair.unitsGreyed ? \" · UNCERTAIN\" : \"\"");
     expect(compactBoard).not.toContain("PAIR READY");
+  });
+
+  it("31a. orients teaser translations from the canonical spread instead of averaging posted points", () => {
+    const board = readFileSync("src/server/decision-board.ts", "utf8");
+    expect(board).toContain("const consensusPoint = isHome ? consensusHomePoint");
+    expect(board).not.toContain("sideLines.reduce");
   });
 
   it("31b. settles two-team teaser pushes and reduces parlay pushes using each stored leg price", () => {

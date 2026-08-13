@@ -5,11 +5,12 @@ import type { LineBookKey, LiveLine } from "@/domain/line-board";
 import { rankMainlineRecommendations } from "@/domain/mainline-recommendations";
 import type { PickedBy } from "@/domain/play-card";
 import type { WeeklyMatchup } from "@/domain/weekly-slate";
+import { PREFERRED_TEAM_CODES } from "@/domain/team-preferences";
 import { queueAndDispatchPush } from "./store";
 
 const recipients: readonly PickedBy[] = ["gabe", "jarrett"];
 const books: readonly LineBookKey[] = ["betmgm", "fanduel"];
-const preferredTeams = new Set(["SEA", "ATL"]);
+const preferredTeams = new Set<string>(PREFERRED_TEAM_CODES);
 
 export interface EdgeObservation {
   key: string;

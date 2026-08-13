@@ -18,13 +18,15 @@ import { alignMatchupEvidence, compactEvidenceLabel, evidenceDetail, materialEvi
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
 import { rankBestBookMainlineRecommendations, rankMainlineRecommendations, rankWeeklyMainlineRecommendations, type MainlineRecommendation } from "@/domain/mainline-recommendations";
 import { structuralConfig } from "@/domain/config";
+import { playerPropBoardIsActionable } from "@/domain/player-prop-status";
+import { PREFERRED_TEAM_CODES } from "@/domain/team-preferences";
 import { exactContractApprovalRequest, isTeamApproved, summarizeTeamCardPortfolio, teamCardPortfolioBatchConflicts, type PickedBy, type TeamCardPortfolioPosition, type WeeklyPlay } from "@/domain/play-card";
 import { sizeKelly, type SizingResult } from "@/domain/sizing";
 import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
 import { pickReasons } from "@/lib/week-one-data";
 
 const bookNames: Record<LineBookKey, string> = { betmgm: "BetMGM", fanduel: "FanDuel" };
-const preferredTeams = new Set(["SEA", "ATL"]);
+const preferredTeams = new Set<string>(PREFERRED_TEAM_CODES);
 
 type TimeZoneChoice = "PT" | "ET";
 type SlipMode = "straight" | "parlay" | "teaser";
@@ -653,7 +655,8 @@ export function WeekOneBoard() {
             const totalProjection = gameIntel?.totals.find((item) => item.book === book);
             const deskOpen = openGame === game.id;
             const propBoard = propBoards[game.id];
-            const currentProps = rankBestExecutionProps(propBoard?.candidates ?? [], structuralConfig.props.maximumPerBook);
+            const displayedProps = rankBestExecutionProps(propBoard?.candidates ?? [], structuralConfig.props.maximumPerBook);
+            const propsActionable = playerPropBoardIsActionable(propBoard);
             const teaserCandidates = (gameIntel?.teasers.filter((item) => item.book === book && (item.classification !== "ordinary" || (item.fairProbability ?? 0) >= 0.68)) ?? [])
               .sort((left, right) => (left.classification === "classic_wong" ? -1 : 0) - (right.classification === "classic_wong" ? -1 : 0) || (right.fairProbability ?? 0) - (left.fairProbability ?? 0))
               .slice(0, 2);
@@ -773,10 +776,10 @@ export function WeekOneBoard() {
                 </section>
                 <section className="quick-teasers">
                   <div className="quick-head"><span>TEASER VALUE</span><small>{teaserPair ? `BEST PAIR +${(teaserPair.expectedValue * 100).toFixed(1)}%` : teaserCandidates.length ? "BUILD A PAIR" : "NO VIABLE LEG"}</small></div>
-                  {teaserPair && <button className="teaser-pair" onClick={() => addTeaserPair(teaserPair)}>
+                  {teaserPair && <button className={`teaser-pair ${teaserPair.unitsGreyed ? "uncertain" : ""}`} onClick={() => addTeaserPair(teaserPair)}>
                     <span className="teaser-class classic_wong">PAIR</span>
-                    <div><b>With {pairedTeaserLeg?.team} {pairedTeaserLeg ? formatPoint(pairedTeaserLeg.teasedPoint) : ""}</b><small>SCREEN {formatOdds(teaserPair.screeningAmerican)} · PLAY TO {formatOdds(teaserPair.playToAmerican)}</small></div>
-                    <em>+{(teaserPair.expectedValue * 100).toFixed(1)}% · {teaserPair.suggestedUnits}u</em>
+                    <div><b>With {pairedTeaserLeg?.team} {pairedTeaserLeg ? formatPoint(pairedTeaserLeg.teasedPoint) : ""}</b><small>SCREEN {formatOdds(teaserPair.screeningAmerican)} · PLAY TO {formatOdds(teaserPair.playToAmerican)}{teaserPair.translationWarning !== "none" ? ` · ${teaserPair.translationWarning}` : ""}</small></div>
+                    <em>+{(teaserPair.expectedValue * 100).toFixed(1)}% · {teaserPair.suggestedUnits}u{teaserPair.unitsGreyed ? " · UNCERTAIN" : ""}</em>
                   </button>}
                   {teaserCandidates.length ? teaserCandidates.map((candidate) => {
                     const context = alignMatchupEvidence(gameIntel?.signals ?? [], "teaser", candidate.team);
@@ -788,8 +791,8 @@ export function WeekOneBoard() {
                   }) : <p>No viable path at this line.</p>}
                 </section>
                 <section className="quick-props">
-                  <div className="quick-head"><span>{currentProps.length ? "FINAL +EV PROPS" : "PROP CHECK"}</span><small>{propsLoading === game.id ? "LOADING" : currentProps.length ? `${currentProps.length} CLEARED` : propBoard?.status === "stale" ? "STALE" : "GATED"}</small></div>
-                  {propsLoading === game.id ? <p>Checking exact same-point prices across books…</p> : currentProps.length ? currentProps.map((prop) => <button className={prop.unitsGreyed ? "uncertain" : ""} onClick={() => addProp(prop, `${game.away} @ ${game.home}`)} key={prop.id}>
+                  <div className="quick-head"><span>{displayedProps.length ? propsActionable ? "+EV PROPS" : "LAST GOOD PROPS" : "PROP CHECK"}</span><small>{propsLoading === game.id ? "LOADING" : displayedProps.length ? propsActionable ? `${displayedProps.length} CLEARED` : "STALE · WITHHELD" : propBoard?.status === "stale" ? "STALE" : "GATED"}</small></div>
+                  {propsLoading === game.id ? <p>Checking exact same-point prices across books…</p> : displayedProps.length ? displayedProps.map((prop) => <button className={`${prop.unitsGreyed ? "uncertain" : ""} ${propsActionable ? "" : "stale"}`} disabled={!propsActionable} onClick={() => propsActionable && addProp(prop, `${game.away} @ ${game.home}`)} key={prop.id}>
                     <div><b>{prop.player}</b><small>{bookNames[prop.executionBook]} · {prop.side} {prop.point} {propMarketTitle(prop.market)} · {prop.referenceBooks} refs · {prop.sampleGames ? `L${prop.sampleGames} proj ${prop.projectedValue?.toFixed(1)} · ${((prop.hitRate ?? 0) * 100).toFixed(0)}% hit · ` : ""}floor +{(prop.lowerBoundExpectedValue * 100).toFixed(1)}% · {snapshotAge(prop.capturedAt)}</small></div>
                     <strong>{formatOdds(prop.americanPrice)}</strong><em>+{(prop.expectedValue * 100).toFixed(1)}% · {prop.suggestedUnits}u</em>
                   </button>) : <p>{propBoard?.message ?? "Props are scanned when books post them closer to kickoff."}</p>}

@@ -29,6 +29,7 @@ export interface MainlineCompletenessQuote {
   gameId: string;
   book: string;
   market: string;
+  side?: string;
 }
 
 export interface ScheduledGame {
@@ -138,8 +139,11 @@ export function inspectMainlineCompleteness(lines: readonly MainlineCompleteness
   for (const gameId of gameIds) {
     const books = [...new Set(lines.filter((line) => line.gameId === gameId).map((line) => line.book))];
     if (books.some((book) => {
-      const markets = new Set(lines.filter((line) => line.gameId === gameId && line.book === book).map((line) => line.market));
-      return [...requiredMarkets].every((market) => markets.has(market));
+      const bookLines = lines.filter((line) => line.gameId === gameId && line.book === book);
+      return [...requiredMarkets].every((market) => {
+        const marketLines = bookLines.filter((line) => line.market === market);
+        return marketLines.length === 2 && new Set(marketLines.map((line) => line.side)).size === 2;
+      });
     })) completeGames.add(gameId);
   }
   return {

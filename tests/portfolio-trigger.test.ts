@@ -137,4 +137,30 @@ describe("atomic shared-card portfolio guard", () => {
       .toThrow(/Kelly inclusion/i);
     db.close();
   });
+
+  it("atomically enforces preferred-team exception thresholds", () => {
+    const db = database();
+    add(db, "preferred-side", "research", 0.5, [{ gameId: "g1", market: "spread" }]);
+    const sideRow = db.prepare("SELECT forecast_json FROM plays WHERE id = 'preferred-side'").get() as { forecast_json: string };
+    const sideForecast = JSON.parse(sideRow.forecast_json) as { legs: Array<Record<string, unknown>> };
+    sideForecast.legs[0] = {
+      ...sideForecast.legs[0], preferenceConflict: true, marketProbability: 0.5, betProbability: 0.529
+    };
+    db.prepare("UPDATE plays SET forecast_json = ? WHERE id = 'preferred-side'").run(JSON.stringify(sideForecast));
+    expect(() => db.prepare("UPDATE plays SET status = 'card' WHERE id = 'preferred-side'").run())
+      .toThrow(/exceptional edge/i);
+
+    add(db, "preferred-teaser", "research", 0.5, [
+      { gameId: "g2", market: "teaser" },
+      { gameId: "g3", market: "teaser" }
+    ], 1, "teaser");
+    const teaserRow = db.prepare("SELECT forecast_json FROM plays WHERE id = 'preferred-teaser'").get() as { forecast_json: string };
+    const teaserForecast = JSON.parse(teaserRow.forecast_json) as { legs: Array<Record<string, unknown>>; authoritativeExpectedValuePercent: number };
+    teaserForecast.legs[0] = { ...teaserForecast.legs[0], preferenceConflict: true };
+    teaserForecast.authoritativeExpectedValuePercent = 4.99;
+    db.prepare("UPDATE plays SET forecast_json = ? WHERE id = 'preferred-teaser'").run(JSON.stringify(teaserForecast));
+    expect(() => db.prepare("UPDATE plays SET status = 'card' WHERE id = 'preferred-teaser'").run())
+      .toThrow(/exceptional EV/i);
+    db.close();
+  });
 });

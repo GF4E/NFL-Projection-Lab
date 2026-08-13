@@ -117,6 +117,42 @@ describe("stored shared-card contract integrity", () => {
     })).toMatch(/Kelly inclusion/i);
   });
 
+  it("enforces the exceptional-edge rule for manual bets against preferred teams", () => {
+    const baseLeg = {
+      sourceQuoteId: "g1:spread", gameId: "g1", market: "spread" as const, side: "LAR", point: -2.5,
+      americanPrice: -110, book: "betmgm" as const, capturedAt: "2026-09-13T18:00:00.000Z", sourceHash: "hash",
+      marketProbability: 0.5, modelProbability: 0.54, betProbability: 0.529, pushProbability: 0,
+      uncertaintyInterval: [0.51, 0.55] as [number, number], uncertaintyMembers: null,
+      pushProbabilityMembers: null, expectedValue: 0.01, preferenceConflict: true
+    };
+    const straight = { playType: "single" as const, contract: [leg("g1")] };
+    const baseDecision = {
+      ...snapshot({ legs: [baseLeg] }),
+      authoritativeProbabilityInterval: [0.51, 0.55] as [number, number],
+      suggestedUnits: 0.5
+    };
+    expect(forecastApprovalEligibilityError(straight, baseDecision)).toMatch(/preferred team/i);
+    expect(forecastApprovalEligibilityError(straight, {
+      ...baseDecision,
+      legs: [{ ...baseLeg, betProbability: 0.53 }]
+    })).toBeNull();
+
+    const teaser = { playType: "teaser" as const, contract: [leg("g1", "teaser"), leg("g2", "teaser")] };
+    const teaserDecision = {
+      ...snapshot({
+        legs: [baseLeg, { ...baseLeg, sourceQuoteId: "g2:teaser", gameId: "g2", preferenceConflict: false }],
+        authoritativeExpectedValuePercent: 4.99
+      }),
+      authoritativeProbabilityInterval: [0.55, 0.61] as [number, number],
+      suggestedUnits: 0.5
+    };
+    expect(forecastApprovalEligibilityError(teaser, teaserDecision)).toMatch(/preferred team/i);
+    expect(forecastApprovalEligibilityError(teaser, {
+      ...teaserDecision,
+      authoritativeExpectedValuePercent: 5
+    })).toBeNull();
+  });
+
   it("binds a stored leg to the same source game, book, market and side", () => {
     const stored = leg("g1");
     const source = {

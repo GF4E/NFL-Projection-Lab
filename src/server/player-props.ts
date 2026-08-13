@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   PROP_MARKETS,
+  assertCompletePropQuotePairs,
   buildPlayerPropEvidence,
   completeLeaguePropEfficiencyPrior,
   isPropPlayerUnavailable,
@@ -475,6 +476,7 @@ export async function refreshPlayerPropBoard(input: {
       await markState({ db, gameId: input.gameId, eventId, status: cachedQuotes.length ? "stale" : "unavailable", checkedAt, successAt: null, quota, message: "Player props are not posted yet; the last good board was preserved" });
       return getPlayerPropBoard(input.gameId, db);
     }
+    assertCompletePropQuotePairs(quotes);
     importId = `props:${input.gameId}:${sourceHash.slice(0, 16)}`;
     await db.prepare("DELETE FROM player_prop_quotes_stage WHERE import_id = ?").bind(importId).run();
     for (const group of chunks(quotes, 75)) {

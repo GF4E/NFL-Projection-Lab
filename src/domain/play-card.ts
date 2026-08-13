@@ -26,6 +26,8 @@ export type PlayForecastLegSnapshot = {
   uncertaintyMembers: number[] | null;
   pushProbabilityMembers: number[] | null;
   expectedValue: number | null;
+  /** True only for a side contract opposing SEA or ATL in that matchup. */
+  preferenceConflict?: boolean;
 };
 
 export type PlayForecastSnapshot = {
@@ -88,6 +90,22 @@ export function forecastApprovalEligibilityError(
     snapshot.authoritativeExpectedValuePercent < -1e-9
   )) {
     return "The exact two-team teaser price is negative EV; refresh the price or choose another pair.";
+  }
+  const exceptionalProbabilityEdge = structuralConfig.monitoring.pushEdgeThreshold;
+  if ((play.playType === "single" || play.playType === "parlay") && snapshot.legs.some((leg) =>
+    leg.preferenceConflict && (
+      leg.betProbability === null || leg.marketProbability === null ||
+      leg.betProbability - leg.marketProbability < exceptionalProbabilityEdge
+    )
+  )) {
+    return `A side opposing a preferred team requires at least ${(exceptionalProbabilityEdge * 100).toFixed(1)} percentage points of edge.`;
+  }
+  const exceptionalTeaserEvPercent = structuralConfig.teasers.preferredOpponentExceptionalEv * 100;
+  if (play.playType === "teaser" && snapshot.legs.some((leg) => leg.preferenceConflict) && (
+    snapshot.authoritativeExpectedValuePercent === null ||
+    snapshot.authoritativeExpectedValuePercent < exceptionalTeaserEvPercent
+  )) {
+    return `A teaser opposing a preferred team requires at least ${exceptionalTeaserEvPercent.toFixed(1)}% expected value.`;
   }
   if ((play.playType === "single" || play.playType === "parlay" || play.playType === "teaser") && (
     snapshot.authoritativeProbabilityInterval === null ||

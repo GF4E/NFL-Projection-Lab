@@ -118,6 +118,7 @@ export interface TeaserPairCandidate {
   edgeInterval: [number, number];
   suggestedUnits: number;
   unitsGreyed: boolean;
+  translationWarning: "none" | "interpolated" | "extrapolated";
 }
 
 export interface TwoTeamTeaserValue {
@@ -347,6 +348,8 @@ export function summarizeGameAvailability(input: {
 
 export interface DecisionBoardGame {
   gameId: string;
+  awayTeam?: string;
+  homeTeam?: string;
   away: TeamBaseline | null;
   home: TeamBaseline | null;
   projections: BaselineProjection[];
@@ -544,6 +547,28 @@ export function isPropPlayerUnavailable(gameStatus: string | null, inactive = fa
 
 export function playerPropEvidenceKey(input: Pick<PlayerPropEvidence, "player" | "market" | "side" | "point">): string {
   return `${input.market}:${normalizePropPlayerName(input.player)}:${input.side}:${input.point}`;
+}
+
+/**
+ * A power de-vig is defined only for a complete Over/Under contract. Reject a
+ * partial provider payload before it can replace the last good prop board.
+ */
+export function assertCompletePropQuotePairs(quotes: readonly RawPropQuote[]): void {
+  const contracts = new Map<string, Set<RawPropQuote["side"]>>();
+  for (const quote of quotes) {
+    const key = `${quote.gameId}:${quote.book}:${quote.market}:${normalizePropPlayerName(quote.player)}:${quote.point}`;
+    const sides = contracts.get(key) ?? new Set<RawPropQuote["side"]>();
+    if (sides.has(quote.side)) {
+      throw new Error(`Player prop import was partial: duplicate ${quote.side} quote for ${quote.player}`);
+    }
+    sides.add(quote.side);
+    contracts.set(key, sides);
+  }
+  for (const [key, sides] of contracts) {
+    if (!sides.has("Over") || !sides.has("Under") || sides.size !== 2) {
+      throw new Error(`Player prop import was partial: incomplete Over/Under contract ${key}`);
+    }
+  }
 }
 
 export function buildPlayerPropEvidence(
@@ -901,6 +926,11 @@ export function rankTeaserPairs(
       const opposesPreferredTeam = preferred.has(left.opponent) || preferred.has(right.opponent);
       if (opposesPreferredTeam && expectedValue < exceptionalEvThreshold) continue;
       const legs = [left, right] as [TeaserCandidate, TeaserCandidate];
+      const translationWarning = [left.warning, right.warning].includes("extrapolated")
+        ? "extrapolated" as const
+        : [left.warning, right.warning].includes("interpolated")
+          ? "interpolated" as const
+          : "none" as const;
       pairs.push({
         id: `teaser-pair:${left.book}:${left.gameId}:${left.team}:${right.gameId}:${right.team}`,
         book: left.book,
@@ -914,7 +944,8 @@ export function rankTeaserPairs(
         expectedValue,
         edgeInterval: priced.edgeInterval,
         suggestedUnits: priced.sizing.suggestedUnits,
-        unitsGreyed: priced.sizing.greyed
+        unitsGreyed: priced.sizing.greyed,
+        translationWarning
       });
     }
   }
