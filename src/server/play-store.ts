@@ -3,12 +3,13 @@ import {
   draftExpirationReason,
   earliestPlayKickoff,
   isTeamApproved,
-  storedLegMatchesQuote,
+  storedLegMatchesSource,
   validateTeamCardPortfolio,
+  validateStoredPlayContract,
   type PickedBy,
   type WeeklyPlay
 } from "@/domain/play-card";
-import { portfolioTriggerSql } from "@/domain/portfolio-trigger";
+import { contractGuardTriggerSql, portfolioTriggerSql } from "@/domain/portfolio-trigger";
 import { seasonSchedule } from "./weekly-slate";
 
 type PlayDatabaseRow = {
@@ -186,6 +187,7 @@ export async function ensurePlayStore(d1: D1Database = getD1()): Promise<void> {
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_season_week_status ON plays (season, week, status)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_created_at ON plays (created_at)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_play_state_audit_play ON play_state_audit (play_id, changed_at)"),
+    d1.prepare(contractGuardTriggerSql()),
     d1.prepare(portfolioTriggerSql())
   ]);
   await d1.prepare("PRAGMA optimize").run();
@@ -262,19 +264,30 @@ async function assertApprovalContractCurrent(d1: D1Database, play: WeeklyPlay): 
   }
   for (const leg of contract) {
     if (leg.market === "prop") {
-      const quote = await d1.prepare("SELECT point, american_price FROM player_prop_quotes WHERE id = ?")
-        .bind(leg.sourceQuoteId).first<{ point: number; american_price: number }>();
-      if (!quote || !storedLegMatchesQuote(leg, { point: quote.point, americanPrice: quote.american_price })) {
-        throw new Error("A player-prop point or price changed. Refresh the card; both approvals must restart.");
+      const quote = await d1.prepare("SELECT game_id, book, market, side, point, american_price FROM player_prop_quotes WHERE id = ?")
+        .bind(leg.sourceQuoteId).first<{ game_id: string; book: string; market: string; side: string; point: number; american_price: number }>();
+      if (!quote || !storedLegMatchesSource(leg, play.book, {
+        gameId: quote.game_id, book: quote.book, market: quote.market, side: quote.side,
+        point: quote.point, americanPrice: quote.american_price
+      })) {
+        throw new Error("A player-prop source, book, point, or price changed. Refresh the card; both approvals must restart.");
       }
       continue;
     }
-    const quote = await d1.prepare("SELECT point, american_price FROM live_lines WHERE id = ?")
-      .bind(leg.sourceQuoteId).first<{ point: number | null; american_price: number }>();
-    if (!quote || !storedLegMatchesQuote(leg, { point: quote.point, americanPrice: quote.american_price })) {
-      throw new Error("A point or price changed. Refresh the card; both approvals must restart.");
+    const quote = await d1.prepare("SELECT game_id, book, market, side, point, american_price FROM live_lines WHERE id = ?")
+      .bind(leg.sourceQuoteId).first<{ game_id: string; book: string; market: string; side: string; point: number | null; american_price: number }>();
+    if (!quote || !storedLegMatchesSource(leg, play.book, {
+      gameId: quote.game_id, book: quote.book, market: quote.market, side: quote.side,
+      point: quote.point, americanPrice: quote.american_price
+    })) {
+      throw new Error("A source, book, point, or price changed. Refresh the card; both approvals must restart.");
     }
   }
+}
+
+function assertStoredPlayContract(play: WeeklyPlay): void {
+  const errors = validateStoredPlayContract(play);
+  if (errors.length) throw new Error(errors[0]);
 }
 
 async function assertPortfolioAvailable(d1: D1Database, play: WeeklyPlay): Promise<void> {
@@ -286,6 +299,7 @@ async function assertPortfolioAvailable(d1: D1Database, play: WeeklyPlay): Promi
 }
 
 export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promise<WeeklyPlay> {
+  assertStoredPlayContract(play);
   const d1 = getD1();
   await ensurePlayStore(d1);
   await expireStaleTeamDrafts(d1, new Date(play.updatedAt), true);
@@ -316,6 +330,7 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
       return (await getPlay(play.id))!;
     }
     if (current.status !== "research") return current;
+    assertStoredPlayContract(current);
     await assertApprovalContractCurrent(d1, current);
     await assertPortfolioAvailable(d1, current);
     await d1.prepare(`UPDATE plays SET

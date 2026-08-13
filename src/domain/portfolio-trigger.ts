@@ -62,3 +62,54 @@ export function portfolioTriggerSql(): string {
       ) THEN RAISE(ABORT, 'Only one total is permitted per game') END;
     END`;
 }
+
+export function contractGuardTriggerSql(): string {
+  return `CREATE TRIGGER IF NOT EXISTS approval_contract_guard_v1
+    BEFORE UPDATE OF status ON plays
+    WHEN OLD.status = 'research' AND NEW.status = 'card'
+    BEGIN
+      SELECT CASE WHEN json_valid(NEW.contract_json) = 0
+        OR json_type(NEW.contract_json) <> 'array'
+        OR json_array_length(NEW.contract_json) = 0
+      THEN RAISE(ABORT, 'A stored contract must contain at least one leg') END;
+
+      SELECT CASE WHEN EXISTS (
+        SELECT 1 FROM json_each(NEW.contract_json)
+        WHERE NULLIF(TRIM(COALESCE(json_extract(value, '$.sourceQuoteId'), '')), '') IS NULL
+      ) THEN RAISE(ABORT, 'Every contract leg must reference its live source quote') END;
+
+      SELECT CASE WHEN (
+        SELECT COUNT(*) FROM json_each(NEW.contract_json)
+      ) <> (
+        SELECT COUNT(DISTINCT json_extract(value, '$.sourceQuoteId')) FROM json_each(NEW.contract_json)
+      ) THEN RAISE(ABORT, 'A source quote can appear only once in a contract') END;
+
+      SELECT CASE WHEN NEW.play_type = 'single' AND (
+        json_array_length(NEW.contract_json) <> 1
+        OR NEW.market <> json_extract(NEW.contract_json, '$[0].market')
+        OR NEW.game_id <> json_extract(NEW.contract_json, '$[0].gameId')
+        OR json_extract(NEW.contract_json, '$[0].market') = 'teaser'
+      ) THEN RAISE(ABORT, 'A straight contract must contain exactly one matching leg') END;
+
+      SELECT CASE WHEN NEW.play_type = 'parlay' AND (
+        NEW.market <> 'parlay'
+        OR json_array_length(NEW.contract_json) < 2
+        OR EXISTS (
+          SELECT 1 FROM json_each(NEW.contract_json)
+          WHERE json_extract(value, '$.market') = 'teaser'
+        )
+        OR (SELECT COUNT(DISTINCT json_extract(value, '$.gameId')) FROM json_each(NEW.contract_json))
+          <> json_array_length(NEW.contract_json)
+      ) THEN RAISE(ABORT, 'Parlay legs must be valid independent-game contracts') END;
+
+      SELECT CASE WHEN NEW.play_type = 'teaser' AND (
+        NEW.market <> 'teaser'
+        OR json_array_length(NEW.contract_json) <> 2
+        OR EXISTS (
+          SELECT 1 FROM json_each(NEW.contract_json)
+          WHERE json_extract(value, '$.market') <> 'teaser'
+        )
+        OR (SELECT COUNT(DISTINCT json_extract(value, '$.gameId')) FROM json_each(NEW.contract_json)) <> 2
+      ) THEN RAISE(ABORT, 'Teaser legs must be valid two-game teaser contracts') END;
+    END`;
+}

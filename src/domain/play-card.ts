@@ -67,6 +67,67 @@ export function storedLegMatchesQuote(
   return quote.point === expectedPoint && (leg.market === "teaser" || quote.americanPrice === leg.americanPrice);
 }
 
+export function normalizeBookKey(book: string): "betmgm" | "fanduel" | null {
+  const normalized = book.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+  return normalized === "betmgm" || normalized === "fanduel" ? normalized : null;
+}
+
+export function storedLegMatchesSource(
+  leg: StoredPlayLeg,
+  selectedBook: string,
+  quote: {
+    gameId: string;
+    book: string;
+    market: string;
+    side: string;
+    point: number | null;
+    americanPrice: number;
+  }
+): boolean {
+  const expectedMarket = leg.market === "teaser" ? "spread" : leg.market;
+  const sameMarket = leg.market === "prop" || quote.market === expectedMarket;
+  return normalizeBookKey(selectedBook) !== null
+    && normalizeBookKey(selectedBook) === normalizeBookKey(quote.book)
+    && quote.gameId === leg.gameId
+    && sameMarket
+    && quote.side.trim().toLowerCase() === leg.side.trim().toLowerCase()
+    && storedLegMatchesQuote(leg, quote);
+}
+
+export function validateStoredPlayContract(
+  play: Pick<WeeklyPlay, "playType" | "market" | "gameId" | "contract">
+): string[] {
+  const contract = play.contract ?? [];
+  if (!contract.length) return ["A stored contract must contain at least one leg"];
+  const errors: string[] = [];
+  const sourceIds = contract.map((item) => item.sourceQuoteId?.trim() ?? "");
+  if (sourceIds.some((id) => !id)) errors.push("Every contract leg must reference its live source quote");
+  if (new Set(sourceIds).size !== sourceIds.length) errors.push("A source quote can appear only once in a contract");
+
+  if (play.playType === "single") {
+    if (contract.length !== 1) errors.push("A straight contract must contain exactly one leg");
+    const first = contract[0];
+    if (first?.market === "teaser") errors.push("A teaser leg cannot be stored as a straight");
+    if (first && play.market !== first.market) errors.push("The straight market must match its stored leg");
+    if (first && play.gameId !== first.gameId) errors.push("The straight game must match its stored leg");
+  } else if (play.playType === "parlay") {
+    if (contract.length < 2) errors.push("A parlay contract must contain at least two legs");
+    if (play.market !== "parlay") errors.push("A parlay contract must use the parlay market");
+    if (contract.some((item) => item.market === "teaser")) errors.push("Teaser legs cannot be stored in a standard parlay");
+    if (new Set(contract.map((item) => item.gameId)).size !== contract.length) {
+      errors.push("Parlay legs must come from different games because same-game correlation is not modeled");
+    }
+  } else {
+    if (contract.length !== 2) errors.push("A teaser contract must contain exactly two legs");
+    if (play.market !== "teaser") errors.push("A teaser contract must use the teaser market");
+    if (contract.some((item) => item.market !== "teaser")) errors.push("A teaser contract may contain only teaser legs");
+    if (new Set(contract.map((item) => item.gameId)).size !== contract.length) {
+      errors.push("Teaser legs must come from two different games");
+    }
+  }
+  return [...new Set(errors)];
+}
+
 export function addTeamApproval(current: readonly PickedBy[], actor: PickedBy): PickedBy[] {
   return ([...new Set([...current, actor])] as PickedBy[]).sort((left, right) => left === "gabe" ? -1 : right === "gabe" ? 1 : 0);
 }

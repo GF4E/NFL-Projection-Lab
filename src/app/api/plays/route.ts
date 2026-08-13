@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import teamConfig from "../../../../config/team.config.json";
-import { approvalActorForEmail, estimatedEvFromEdge, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
+import {
+  approvalActorForEmail,
+  estimatedEvFromEdge,
+  validateStoredPlayContract,
+  type PickedBy,
+  type WeeklyPlay
+} from "@/domain/play-card";
 import { stableHash } from "@/domain/hash";
 import { addOrApprovePlay, listPlays } from "@/server/play-store";
 
@@ -15,7 +21,7 @@ const createPlaySchema = z.object({
   primaryReason: z.string().trim().min(3).max(60),
   title: z.string().trim().min(3).max(120),
   legs: z.string().trim().min(3).max(180),
-  book: z.enum(["BetMGM", "Caesars", "FanDuel"]),
+  book: z.enum(["BetMGM", "FanDuel"]),
   americanOdds: z.number().int().refine((value) => value <= -100 || value >= 100, "Use valid American odds"),
   stakeDollars: z.number().min(12.5).max(50),
   modelEdgePp: z.number().min(-10).max(20),
@@ -62,6 +68,10 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const input = createPlaySchema.parse(await request.json());
+    const contractErrors = validateStoredPlayContract(input);
+    if (contractErrors.length) {
+      return NextResponse.json({ error: contractErrors[0] }, { status: 400 });
+    }
     const actor = requestActor(request);
     const now = new Date().toISOString();
     const contractKey = stableHash({

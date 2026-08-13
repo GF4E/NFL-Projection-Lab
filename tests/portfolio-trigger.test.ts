@@ -1,6 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
-import { portfolioTriggerSql } from "@/domain/portfolio-trigger";
+import { contractGuardTriggerSql, portfolioTriggerSql } from "@/domain/portfolio-trigger";
 
 type Leg = { gameId: string; market: "spread" | "moneyline" | "total" | "prop" | "teaser" };
 
@@ -11,16 +11,33 @@ function database(): DatabaseSync {
     contract_json text NOT NULL,
     season integer NOT NULL,
     week integer NOT NULL,
+    game_id text NOT NULL,
+    play_type text NOT NULL,
+    market text NOT NULL,
     status text NOT NULL,
     stake_cents integer NOT NULL
   )`);
+  db.exec(contractGuardTriggerSql());
   db.exec(portfolioTriggerSql());
   return db;
 }
 
-function add(db: DatabaseSync, id: string, status: string, units: number, contract: Leg[], week = 1): void {
-  db.prepare("INSERT INTO plays (id, contract_json, season, week, status, stake_cents) VALUES (?, ?, 2026, ?, ?, ?)")
-    .run(id, JSON.stringify(contract), week, status, units * 2_500);
+function add(
+  db: DatabaseSync,
+  id: string,
+  status: string,
+  units: number,
+  contract: Leg[],
+  week = 1,
+  playType: "single" | "parlay" | "teaser" = "single"
+): void {
+  const storedContract = contract.map((item, index) => ({ ...item, sourceQuoteId: `${id}:quote:${index}` }));
+  const market = playType === "single" ? contract[0]?.market ?? "spread" : playType;
+  const gameId = playType === "single" ? contract[0]?.gameId ?? "missing" : `multi:${id}`;
+  db.prepare(`INSERT INTO plays
+    (id, contract_json, season, week, game_id, play_type, market, status, stake_cents)
+    VALUES (?, ?, 2026, ?, ?, ?, ?, ?, ?)`)
+    .run(id, JSON.stringify(storedContract), week, gameId, playType, market, status, units * 2_500);
 }
 
 describe("atomic shared-card portfolio guard", () => {
@@ -51,6 +68,21 @@ describe("atomic shared-card portfolio guard", () => {
     }
     add(db, "over-cap", "research", 0.5, [{ gameId: "g9", market: "prop" }]);
     expect(() => db.prepare("UPDATE plays SET status = 'card' WHERE id = 'over-cap'").run()).toThrow(/10u/);
+    db.close();
+  });
+
+  it("atomically blocks same-game parlays and malformed teasers", () => {
+    const db = database();
+    add(db, "same-game", "research", 1, [
+      { gameId: "g1", market: "spread" },
+      { gameId: "g1", market: "prop" }
+    ], 1, "parlay");
+    expect(() => db.prepare("UPDATE plays SET status = 'card' WHERE id = 'same-game'").run()).toThrow(/independent-game/i);
+    add(db, "bad-teaser", "research", 1, [
+      { gameId: "g2", market: "teaser" },
+      { gameId: "g3", market: "spread" }
+    ], 1, "teaser");
+    expect(() => db.prepare("UPDATE plays SET status = 'card' WHERE id = 'bad-teaser'").run()).toThrow(/two-game teaser/i);
     db.close();
   });
 });
