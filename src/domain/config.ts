@@ -44,6 +44,7 @@ export interface StructuralConfig {
     minimumExpectedValue: number;
     maximumPerBook: number;
     maximumSnapshotSkewMinutes: number;
+    maximumQuoteAgeMinutes: number;
     minimumHistoryGames: number;
     historyWindowGames: number;
     priorGames: number;

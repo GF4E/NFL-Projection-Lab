@@ -80,6 +80,10 @@ describe("stored shared-card contract integrity", () => {
     }] });
     const qualifiedPropDecision = { ...qualifiedProp, authoritativeProbabilityInterval: [0.53, 0.6] as [number, number], suggestedUnits: 1 };
     expect(forecastApprovalEligibilityError(propPlay, qualifiedPropDecision)).toBeNull();
+    expect(forecastApprovalEligibilityError(propPlay, {
+      ...qualifiedPropDecision,
+      generatedAt: "2026-09-13T19:16:00.000Z"
+    })).toMatch(/no longer clears/i);
     expect(forecastApprovalEligibilityError(propPlay, snapshot())).toMatch(/no longer clears/i);
     expect(forecastApprovalEligibilityError(
       { playType: "teaser", contract: [leg("g1", "teaser"), leg("g2", "teaser")] },

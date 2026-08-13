@@ -533,6 +533,14 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(isPropPlayerUnavailable(null, true)).toBe(true);
     const stale = [...pair("betmgm"), ...pair("fanduel"), ...pair("draftkings"), ...pair("bovada", "2026-09-09T17:00:00Z")];
     expect(scanMarketConfirmedProps(stale, { evidence: [evidence!], requireEvidence: true, maximumSnapshotSkewMs: 10 * 60_000 })).toEqual([]);
+    expect(scanMarketConfirmedProps(quotes, {
+      evidence: [evidence!], requireEvidence: true,
+      maximumQuoteAgeMs: 75 * 60_000, now: "2026-09-09T19:16:00Z"
+    })).toEqual([]);
+    expect(scanMarketConfirmedProps(quotes, {
+      evidence: [evidence!], requireEvidence: true,
+      maximumQuoteAgeMs: 75 * 60_000, now: "2026-09-09T19:15:00Z"
+    })).toHaveLength(1);
   });
 
   it("23c. counts snap-confirmed zero-opportunity games and returns distinct prop theses", () => {

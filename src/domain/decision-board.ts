@@ -617,6 +617,8 @@ export function scanMarketConfirmedProps(
     minimumExpectedValue?: number;
     maximumPerBook?: number;
     maximumSnapshotSkewMs?: number;
+    maximumQuoteAgeMs?: number;
+    now?: string;
     evidence?: readonly PlayerPropEvidence[];
     requireEvidence?: boolean;
     availabilityConfirmed?: boolean;
@@ -628,12 +630,16 @@ export function scanMarketConfirmedProps(
   const minimumExpectedValue = options.minimumExpectedValue ?? structuralConfig.props.minimumExpectedValue;
   const maximumPerBook = options.maximumPerBook ?? structuralConfig.props.maximumPerBook;
   const maximumSnapshotSkewMs = options.maximumSnapshotSkewMs ?? Number.POSITIVE_INFINITY;
+  const maximumQuoteAgeMs = options.maximumQuoteAgeMs ?? Number.POSITIVE_INFINITY;
+  const nowMs = options.now === undefined ? Number.NaN : Date.parse(options.now);
   const evidence = new Map((options.evidence ?? []).map((item) => [playerPropEvidenceKey(item), item]));
   if (options.requireConfirmedAvailability && options.availabilityConfirmed !== true) return [];
   const unavailablePlayers = new Set((options.unavailablePlayers ?? []).map(normalizePropPlayerName));
   const fair = deviggedQuotes(quotes);
   const candidates: PropCandidate[] = [];
   for (const quote of quotes) {
+    const capturedAtMs = Date.parse(quote.capturedAt);
+    if (!Number.isFinite(capturedAtMs) || Number.isFinite(nowMs) && nowMs - capturedAtMs > maximumQuoteAgeMs) continue;
     if (unavailablePlayers.has(normalizePropPlayerName(quote.player))) continue;
     const executionBook = quote.book === "betmgm" ? "betmgm" : quote.book === "fanduel" ? "fanduel" : null;
     const executionFairProbability = fair.get(quote.id);

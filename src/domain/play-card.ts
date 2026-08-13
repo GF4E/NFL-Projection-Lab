@@ -62,9 +62,13 @@ export function forecastApprovalEligibilityError(
   const snapshotByQuote = new Map(snapshot.legs.map((leg) => [leg.sourceQuoteId, leg]));
   for (const leg of contract.filter((item) => item.market === "prop")) {
     const evidence = leg.sourceQuoteId ? snapshotByQuote.get(leg.sourceQuoteId) : null;
+    const generatedAtMs = Date.parse(snapshot.generatedAt);
+    const capturedAtMs = evidence ? Date.parse(evidence.capturedAt) : Number.NaN;
+    const quoteIsFresh = Number.isFinite(generatedAtMs) && Number.isFinite(capturedAtMs) &&
+      generatedAtMs - capturedAtMs <= structuralConfig.props.maximumQuoteAgeMinutes * 60_000;
     if (!evidence || evidence.market !== "prop" || evidence.betProbability === null ||
       evidence.uncertaintyInterval === null || evidence.expectedValue === null ||
-      evidence.expectedValue < structuralConfig.props.minimumExpectedValue) {
+      evidence.expectedValue < structuralConfig.props.minimumExpectedValue || !quoteIsFresh) {
       return "This player prop no longer clears the current multi-book, history, uncertainty, and availability gates.";
     }
   }

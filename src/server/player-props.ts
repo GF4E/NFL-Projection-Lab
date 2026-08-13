@@ -305,7 +305,13 @@ async function playerEvidenceForGame(db: D1Database, gameId: string, quotes: rea
   });
 }
 
-async function board(db: D1Database, gameId: string, state: StateRow | null, quotes: RawPropQuote[]): Promise<PlayerPropBoard> {
+async function board(
+  db: D1Database,
+  gameId: string,
+  state: StateRow | null,
+  quotes: RawPropQuote[],
+  now = new Date().toISOString()
+): Promise<PlayerPropBoard> {
   const [evidence, availability] = await Promise.all([
     playerEvidenceForGame(db, gameId, quotes),
     availabilityForGame(db, gameId)
@@ -315,15 +321,23 @@ async function board(db: D1Database, gameId: string, state: StateRow | null, quo
     minimumExpectedValue: structuralConfig.props.minimumExpectedValue,
     maximumPerBook: structuralConfig.props.maximumPerBook,
     maximumSnapshotSkewMs: structuralConfig.props.maximumSnapshotSkewMinutes * 60_000,
+    maximumQuoteAgeMs: structuralConfig.props.maximumQuoteAgeMinutes * 60_000,
+    now,
     evidence,
     requireEvidence: true,
     availabilityConfirmed: availability.confirmed,
     unavailablePlayers: availability.unavailablePlayers,
     requireConfirmedAvailability: true
   });
+  const nowMs = Date.parse(now);
+  const freshQuotes = quotes.filter((quote) => {
+    const capturedAtMs = Date.parse(quote.capturedAt);
+    return Number.isFinite(capturedAtMs) && nowMs - capturedAtMs <= structuralConfig.props.maximumQuoteAgeMinutes * 60_000;
+  });
+  const status = state?.status === "current" && quotes.length && !freshQuotes.length ? "stale" : state?.status ?? "unavailable";
   return {
     gameId,
-    status: state?.status ?? "unavailable",
+    status,
     generatedAt: state?.last_success_at ?? state?.last_checked_at ?? new Date().toISOString(),
     eventId: state?.event_id ?? null,
     candidates,
@@ -332,7 +346,9 @@ async function board(db: D1Database, gameId: string, state: StateRow | null, quo
       remaining: state.quota_remaining ?? 0,
       lastCost: state.quota_last_cost ?? 0
     },
-    message: !availability.confirmed
+    message: !freshQuotes.length && quotes.length
+      ? `Prop prices are older than ${structuralConfig.props.maximumQuoteAgeMinutes} minutes; suggestions are withheld until a fresh scan`
+      : !availability.confirmed
       ? "Official inactives are not confirmed; prop suggestions are withheld"
       : candidates.length
       ? `Market and player-history confirmed · ${state?.message ?? "cached prices"}`
