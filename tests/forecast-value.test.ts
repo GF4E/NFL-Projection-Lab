@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { authoritativeContractExpectedValue, priceIndependentParlayDecision } from "@/domain/forecast-value";
+import { authoritativeContractExpectedValue, authoritativeEquivalentEdgeCents, priceIndependentParlayDecision } from "@/domain/forecast-value";
 import { priceTwoTeamTeaserDecision } from "@/domain/decision-board";
 import type { PlayForecastLegSnapshot } from "@/domain/play-card";
 
@@ -50,6 +50,31 @@ describe("authoritative combined-contract EV", () => {
       leg({ sourceQuoteId: "q1", betProbability: 0.51, uncertaintyInterval: [0.49, 0.53] }),
       leg({ sourceQuoteId: "q2", gameId: "g2", betProbability: 0.51, uncertaintyInterval: [0.49, 0.53] })
     ], 264)?.sizing.included).toBe(false);
+  });
+
+  it("derives equivalent-risk edge cents from server-resolved contract probabilities", () => {
+    expect(authoritativeEquivalentEdgeCents({
+      playType: "single", americanOdds: -110,
+      legs: [leg({ betProbability: 0.55, marketProbability: 0.5 })]
+    })).toBeCloseTo(5, 10);
+    expect(authoritativeEquivalentEdgeCents({
+      playType: "parlay", americanOdds: 264,
+      legs: [
+        leg({ sourceQuoteId: "q1", betProbability: 0.55, marketProbability: 0.5 }),
+        leg({ sourceQuoteId: "q2", gameId: "g2", betProbability: 0.56, marketProbability: 0.51 })
+      ]
+    })).toBeCloseTo((0.55 * 0.56 - 0.5 * 0.51) * 100, 10);
+    expect(authoritativeEquivalentEdgeCents({
+      playType: "parlay", americanOdds: 264,
+      legs: [leg({ pushProbability: 0.01 }), leg({ sourceQuoteId: "q2", gameId: "g2" })]
+    })).toBeNull();
+    expect(authoritativeEquivalentEdgeCents({
+      playType: "teaser", americanOdds: -120,
+      legs: [
+        leg({ market: "teaser", betProbability: 0.75 }),
+        leg({ sourceQuoteId: "q2", gameId: "g2", market: "teaser", betProbability: 0.74 })
+      ]
+    })).toBeCloseTo((0.75 * 0.74 - 120 / 220) * 100, 10);
   });
 
   it("recomputes teaser value from the saved combined price", () => {

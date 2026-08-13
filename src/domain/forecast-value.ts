@@ -80,3 +80,36 @@ export function authoritativeContractExpectedValue(input: {
     (1 - leg.pushProbability!) * leg.betProbability! * americanToDecimal(leg.americanPrice)
   ), 1) - 1;
 }
+
+/**
+ * Expresses model-versus-market probability advantage on the same continuous
+ * 0–100 equivalent-risk cent scale used by CLV. Inputs are server-resolved.
+ */
+export function authoritativeEquivalentEdgeCents(input: {
+  playType: WeeklyPlay["playType"];
+  americanOdds: number;
+  legs: readonly PlayForecastLegSnapshot[];
+}): number | null {
+  if (input.playType === "single") {
+    const leg = input.legs.length === 1 ? input.legs[0] : null;
+    return leg?.betProbability === null || leg?.betProbability === undefined ||
+      leg.marketProbability === null
+      ? null
+      : (leg.betProbability - leg.marketProbability) * 100;
+  }
+  if (input.playType === "parlay") {
+    if (input.legs.length < 2 || input.legs.some((leg) =>
+      leg.betProbability === null || leg.marketProbability === null || leg.pushProbability !== 0
+    )) return null;
+    const betProbability = input.legs.reduce((product, leg) => product * leg.betProbability!, 1);
+    const marketProbability = input.legs.reduce((product, leg) => product * leg.marketProbability!, 1);
+    return (betProbability - marketProbability) * 100;
+  }
+  const teaser = priceTwoTeamTeaser(input.legs.map((leg) => ({
+    conditionalWinProbability: leg.betProbability ?? Number.NaN,
+    pushProbability: leg.pushProbability ?? Number.NaN
+  })), input.americanOdds);
+  return teaser
+    ? (teaser.conditionalWinProbability - 1 / americanToDecimal(input.americanOdds)) * 100
+    : null;
+}

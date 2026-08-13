@@ -172,9 +172,10 @@ export async function generateWeeklyDigest(input: {
   const clv = currentWeekPlays.map((play) => play.closing_clv_cents).filter((value): value is number => value !== null);
   const expectedEdgeCents = currentWeekPlays.flatMap((play) => {
     const snapshot = parseJson<PlayForecastSnapshot | null>(play.forecast_json, null);
-    // Probability-point edge and equivalent-risk price cents share the same
-    // continuous 0-100 scale; do not substitute expected-return percentage.
-    return snapshot ? [snapshot.displayedEdgePp] : [];
+    if (!snapshot) return [];
+    // New cards freeze a server-derived value. The display-field fallback is
+    // only for records approved before authoritativeEdgeCents was introduced.
+    return [snapshot.authoritativeEdgeCents ?? snapshot.displayedEdgePp];
   });
   const priorGaps = priorDigestResult.results.flatMap((row) => {
     const digest = parseJson<WeeklyDigest | null>(row.digest_json, null);

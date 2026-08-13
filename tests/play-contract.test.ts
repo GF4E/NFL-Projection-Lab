@@ -28,7 +28,7 @@ describe("stored shared-card contract integrity", () => {
     generatedAt: "2026-09-13T18:00:00.000Z", boardGeneratedAt: "2026-09-13T18:00:00.000Z",
     championHash: "champion", ensembleHash: "ensemble", configHash: "config", dataHash: "data", artifactHash: "artifact",
     consensusSnapshotId: "snapshot", displayedExpectedValuePercent: 2,
-    authoritativeExpectedValuePercent: null, displayedEdgePp: 2, legs: [], ...overrides,
+    authoritativeExpectedValuePercent: null, authoritativeEdgeCents: null, displayedEdgePp: 2, legs: [], ...overrides,
     authoritativeProbabilityInterval: null,
     uncertaintyConfiguration: { members: 100, seedStart: 202600, intervalPercentiles: [0.1, 0.9] as [number, number] },
     suggestedUnits: null, unitsGreyed: false

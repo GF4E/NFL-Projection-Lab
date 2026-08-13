@@ -2,7 +2,7 @@ import { buildDecisionBoard } from "./decision-board";
 import { getPlayerPropBoard } from "./player-props";
 import { stableHash } from "@/domain/hash";
 import { expectedValueWithPush } from "@/domain/odds";
-import { authoritativeContractExpectedValue, priceIndependentParlayDecision } from "@/domain/forecast-value";
+import { authoritativeContractExpectedValue, authoritativeEquivalentEdgeCents, priceIndependentParlayDecision } from "@/domain/forecast-value";
 import { priceTwoTeamTeaserDecision } from "@/domain/decision-board";
 import { sizeKelly } from "@/domain/sizing";
 import { structuralConfig } from "@/domain/config";
@@ -201,6 +201,11 @@ export async function capturePlayForecastSnapshot(
     americanOdds: play.americanOdds,
     legs
   });
+  const authoritativeEdgeCents = authoritativeEquivalentEdgeCents({
+    playType: play.playType,
+    americanOdds: play.americanOdds,
+    legs
+  });
   const sizingConfig = {
     referenceBankrollUnits: structuralConfig.sizing.referenceBankrollUnits,
     kellyFraction: structuralConfig.sizing.kellyFraction,
@@ -252,6 +257,7 @@ export async function capturePlayForecastSnapshot(
       ? null
       : authoritativeExpectedValuePercent * 100,
     authoritativeProbabilityInterval,
+    authoritativeEdgeCents,
     uncertaintyConfiguration: {
       members: structuralConfig.model.bootstrapMembers,
       seedStart: structuralConfig.model.bootstrapSeedStart,

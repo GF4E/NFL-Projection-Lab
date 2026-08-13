@@ -42,6 +42,8 @@ export type PlayForecastSnapshot = {
   authoritativeExpectedValuePercent: number | null;
   /** Contract-level 80% decisive-win probability interval. */
   authoritativeProbabilityInterval: [number, number] | null;
+  /** Server-derived model advantage on the continuous equivalent-risk cent scale. */
+  authoritativeEdgeCents: number | null;
   uncertaintyConfiguration: {
     members: number;
     seedStart: number;
