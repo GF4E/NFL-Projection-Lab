@@ -962,6 +962,9 @@ export async function buildDecisionBoard(
       const originalBetProbability = projection?.shrunkHomeProbability === null || projection?.shrunkHomeProbability === undefined
         ? null
         : isHome ? projection.shrunkHomeProbability : 1 - projection.shrunkHomeProbability;
+      const originalEdgeInterval = projection?.edgeInterval === null || projection?.edgeInterval === undefined
+        ? null
+        : isHome ? projection.edgeInterval : [-projection.edgeInterval[1], -projection.edgeInterval[0]] as [number, number];
       const translated = originalBetProbability === null
         ? { probability: null, pushProbability: null, warning: "unsupported" as const, sourcePoints: [] }
         : translateFairProbability(artifact, consensusPoint, line.point!, teasedPoint, originalBetProbability);
@@ -979,7 +982,30 @@ export async function buildDecisionBoard(
         baseProbabilityMembers,
         intervalPercentiles: structuralConfig.model.intervalPercentiles as [number, number]
       }) : null;
-      const probabilityInterval = marginBootstrap?.probabilityInterval ?? null;
+      const qbLow = originalEdgeInterval === null
+        ? null
+        : translateFairProbability(
+            artifact,
+            consensusPoint,
+            line.point!,
+            teasedPoint,
+            Math.max(0.001, Math.min(0.999, line.fairProbability! + originalEdgeInterval[0]))
+          ).probability;
+      const qbHigh = originalEdgeInterval === null
+        ? null
+        : translateFairProbability(
+            artifact,
+            consensusPoint,
+            line.point!,
+            teasedPoint,
+            Math.max(0.001, Math.min(0.999, line.fairProbability! + originalEdgeInterval[1]))
+          ).probability;
+      const probabilityInterval = marginBootstrap === null || qbLow === null || qbHigh === null
+        ? null
+        : [
+            Math.min(marginBootstrap.probabilityInterval[0], qbLow),
+            Math.max(marginBootstrap.probabilityInterval[1], qbHigh)
+          ] as [number, number];
       const probabilityMembers = probabilityInterval && marginBootstrap
         ? calibrateMembersToInterval(marginBootstrap.probabilityMembers, probabilityInterval)
         : null;
