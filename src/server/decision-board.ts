@@ -1061,6 +1061,7 @@ export async function buildDecisionBoard(
       ? fairSpreadPointForProbability(artifact, consensusHomePoint, consensusHomePoint, canonicalModelProbability)
       : { point: null, warning: "unsupported" as const };
     const projectedHomePoint = inferredFairPoint.point ?? stateProjectedHomePoint;
+    const spreadBootstrapByBook = new Map<BaselineProjection["book"], ReturnType<typeof bootstrapMarginTranslation>>();
     const projections: BaselineProjection[] = artifact && consensusHomePoint !== null && canonicalMarketProbability !== null && canonicalModelProbability !== null && canonicalShrunkProbability !== null && canonicalEdgeInterval
       ? projectionAnchors.map((anchor) => {
           const translated = translateCanonicalSpreadForecast({
@@ -1088,6 +1089,7 @@ export async function buildDecisionBoard(
                 executionBootstrap.probabilityInterval[1] - anchor.fairProbability
               ]
             : null;
+          spreadBootstrapByBook.set(anchor.book, executionBootstrap);
           return {
             gameId: game.id,
             book: anchor.book,
@@ -1098,8 +1100,6 @@ export async function buildDecisionBoard(
             shrunkHomeProbability: translated.shrunkProbability,
             pushProbability: translated.pushProbability,
             edgeInterval: executionEdgeInterval,
-            shrunkHomeProbabilityMembers: executionBootstrap?.probabilityMembers ?? null,
-            pushProbabilityMembers: executionBootstrap?.pushProbabilityMembers ?? null,
             marketHomeProbability: anchor.fairProbability,
             marketSource: anchor.marketSource,
             translationWarning: warnings.includes("unsupported") ? "unsupported"
@@ -1141,8 +1141,9 @@ export async function buildDecisionBoard(
             teasedPoint,
             Math.max(0.001, Math.min(0.999, line.fairProbability! + originalEdgeInterval[1]))
           ).probability;
-      const sideExecutionMembers = projection?.shrunkHomeProbabilityMembers?.length === structuralConfig.model.bootstrapMembers
-        ? projection.shrunkHomeProbabilityMembers.map((probability) => isHome ? probability : 1 - probability)
+      const spreadBootstrap = spreadBootstrapByBook.get(line.book);
+      const sideExecutionMembers = spreadBootstrap?.probabilityMembers.length === structuralConfig.model.bootstrapMembers
+        ? spreadBootstrap.probabilityMembers.map((probability) => isHome ? probability : 1 - probability)
         : null;
       const teaserBootstrap = sideExecutionMembers ? bootstrapMarginTranslation({
         index: marginBootstrapIndex,

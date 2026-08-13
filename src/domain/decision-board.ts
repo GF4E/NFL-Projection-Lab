@@ -49,8 +49,6 @@ export interface BaselineProjection {
   shrunkHomeProbability: number | null;
   pushProbability: number | null;
   edgeInterval: [number, number] | null;
-  shrunkHomeProbabilityMembers: number[] | null;
-  pushProbabilityMembers: number[] | null;
   marketHomeProbability: number;
   marketSource: "book" | "nflverse_consensus";
   translationWarning: "none" | "interpolated" | "extrapolated" | "unsupported";
