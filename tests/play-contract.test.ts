@@ -4,6 +4,7 @@ import {
   forecastApprovalEligibilityError,
   storedLegMatchesSource,
   validateStoredPlayContract,
+  validateStoredPlayPrice,
   type StoredPlayLeg,
   type WeeklyPlay
 } from "@/domain/play-card";
@@ -54,6 +55,15 @@ describe("stored shared-card contract integrity", () => {
     expect(validateStoredPlayContract({
       playType: "teaser", market: "teaser", gameId: "multi", contract: [leg("g1", "teaser"), leg("g1", "teaser", "g1:other")]
     })).toContain("Teaser legs must come from two different games");
+  });
+
+  it("binds the recorded payout to the exact source contracts", () => {
+    expect(validateStoredPlayPrice({ playType: "single", americanOdds: -110, contract: [leg("g1")] })).toBeNull();
+    expect(validateStoredPlayPrice({ playType: "single", americanOdds: -105, contract: [leg("g1")] })).toMatch(/exact source quote/i);
+    expect(validateStoredPlayPrice({ playType: "parlay", americanOdds: 264, contract: [leg("g1"), leg("g2")] })).toBeNull();
+    expect(validateStoredPlayPrice({ playType: "parlay", americanOdds: 300, contract: [leg("g1"), leg("g2")] })).toMatch(/component prices/i);
+    expect(validateStoredPlayPrice({ playType: "teaser", americanOdds: -130, contract: [leg("g1", "teaser"), leg("g2", "teaser")] })).toBeNull();
+    expect(validateStoredPlayPrice({ playType: "teaser", americanOdds: -125, contract: [leg("g1", "teaser"), leg("g2", "teaser")] })).toMatch(/selectable/i);
   });
 
   it("blocks stale props and negative-EV teaser prices at the approval boundary", () => {

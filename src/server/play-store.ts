@@ -7,6 +7,7 @@ import {
   storedLegMatchesSource,
   validateTeamCardPortfolio,
   validateStoredPlayContract,
+  validateStoredPlayPrice,
   type PickedBy,
   type PlayForecastSnapshot,
   type WeeklyPlay
@@ -323,6 +324,8 @@ async function assertApprovalContractCurrent(d1: D1Database, play: WeeklyPlay): 
 function assertStoredPlayContract(play: WeeklyPlay): void {
   const errors = validateStoredPlayContract(play);
   if (errors.length) throw new Error(errors[0]);
+  const priceError = validateStoredPlayPrice(play);
+  if (priceError) throw new Error(priceError);
 }
 
 function assertForecastApprovalEligible(play: WeeklyPlay, snapshot: PlayForecastSnapshot): void {

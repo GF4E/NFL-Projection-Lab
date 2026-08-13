@@ -1,4 +1,5 @@
 import { structuralConfig } from "./config";
+import { americanToDecimal, impliedToAmerican } from "./odds";
 
 export type PlayType = "single" | "parlay" | "teaser";
 export type PlayConfidence = "watch" | "lean" | "play" | "best";
@@ -191,6 +192,31 @@ export function validateStoredPlayContract(
     }
   }
   return [...new Set(errors)];
+}
+
+export function validateStoredPlayPrice(
+  play: Pick<WeeklyPlay, "playType" | "americanOdds" | "contract">
+): string | null {
+  const contract = play.contract ?? [];
+  if (!contract.length) return "A stored contract must contain at least one leg";
+  if (play.playType === "single") {
+    return contract.length === 1 && play.americanOdds === contract[0].americanPrice
+      ? null
+      : "The straight payout must match its exact source quote";
+  }
+  if (play.playType === "teaser") {
+    return structuralConfig.teasers.selectableAmericanPrices.includes(play.americanOdds)
+      ? null
+      : "The teaser payout must be a confirmed selectable two-team price";
+  }
+  const offeredDecimal = contract.reduce(
+    (product, leg) => product * americanToDecimal(leg.americanPrice),
+    1
+  );
+  const expectedAmerican = Math.round(impliedToAmerican(1 / offeredDecimal));
+  return play.americanOdds === expectedAmerican
+    ? null
+    : "The parlay payout does not match its frozen component prices";
 }
 
 export function addTeamApproval(current: readonly PickedBy[], actor: PickedBy): PickedBy[] {

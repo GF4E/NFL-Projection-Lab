@@ -3,6 +3,7 @@ import { z } from "zod";
 import {
   estimatedEvFromEdge,
   validateStoredPlayContract,
+  validateStoredPlayPrice,
   type WeeklyPlay
 } from "@/domain/play-card";
 import { stableHash } from "@/domain/hash";
@@ -62,6 +63,8 @@ export async function POST(request: Request) {
     if (contractErrors.length) {
       return NextResponse.json({ error: contractErrors[0] }, { status: 400 });
     }
+    const priceError = validateStoredPlayPrice(input);
+    if (priceError) return NextResponse.json({ error: priceError }, { status: 400 });
     const actor = member.actor;
     const now = new Date().toISOString();
     const contractKey = stableHash({
