@@ -42,6 +42,30 @@ function logit(probability: number): number {
   return Math.log(bounded / (1 - bounded));
 }
 
+export function buildLifecycleForecastRow(input: {
+  season: number;
+  week: number;
+  market: "spread" | "total" | "moneyline";
+  marketProbability: number;
+  expectedHomeMargin: number;
+  totalLine: number | null;
+  awayRest: number | null;
+  homeRest: number | null;
+  isHomeSide: boolean;
+}): Pick<ModelTrainingRow, "season" | "market" | "features"> {
+  return {
+    season: input.season,
+    market: input.market,
+    features: {
+      expectedHomeMargin: input.expectedHomeMargin / 14,
+      restDelta: ((input.homeRest ?? 7) - (input.awayRest ?? 7)) / 7,
+      totalEnvironment: ((input.totalLine ?? 44) - 44) / 10,
+      marketLogit: logit(input.marketProbability),
+      isHomeSide: input.isHomeSide ? 1 : 0
+    }
+  };
+}
+
 function seasonWeight(season: number, latestSeason: number): number {
   const era = eraConfig.eras.find((candidate) => candidate.season === season) as { trainingMultiplier?: number } | undefined;
   return 0.5 ** ((latestSeason - season) / structuralConfig.model.decayHalfLifeSeasons) * (era?.trainingMultiplier ?? 1);
@@ -50,12 +74,6 @@ function seasonWeight(season: number, latestSeason: number): number {
 export function buildLifecycleTrainingRows(games: readonly LifecycleGameRow[], latestSeason: number): ModelTrainingRow[] {
   return games.flatMap<ModelTrainingRow>((game) => {
     const weight = seasonWeight(game.season, latestSeason);
-    const restDelta = ((game.home_rest ?? 7) - (game.away_rest ?? 7)) / 7;
-    const common = {
-      expectedHomeMargin: game.spread_line / 14,
-      restDelta,
-      totalEnvironment: ((game.total_line ?? 44) - 44) / 10
-    };
     const homeSpreadFair = fairFirst(game.home_spread_odds, game.away_spread_odds);
     const rows: ModelTrainingRow[] = [{
       id: `${game.game_id}:spread`,
@@ -65,7 +83,17 @@ export function buildLifecycleTrainingRows(games: readonly LifecycleGameRow[], l
       outcome: game.result > game.spread_line ? 1 : 0,
       push: game.result === game.spread_line,
       weight,
-      features: { ...common, marketLogit: logit(homeSpreadFair), isHomeSide: 1 }
+      features: buildLifecycleForecastRow({
+        season: game.season,
+        week: game.week,
+        market: "spread",
+        marketProbability: homeSpreadFair,
+        expectedHomeMargin: game.spread_line,
+        totalLine: game.total_line,
+        awayRest: game.away_rest,
+        homeRest: game.home_rest,
+        isHomeSide: true
+      }).features
     }];
     if (game.total !== null && game.total_line !== null) {
       const overFair = fairFirst(game.over_odds, game.under_odds);
@@ -77,7 +105,17 @@ export function buildLifecycleTrainingRows(games: readonly LifecycleGameRow[], l
         outcome: game.total > game.total_line ? 1 : 0,
         push: game.total === game.total_line,
         weight,
-        features: { ...common, marketLogit: logit(overFair), isHomeSide: 0 }
+        features: buildLifecycleForecastRow({
+          season: game.season,
+          week: game.week,
+          market: "total",
+          marketProbability: overFair,
+          expectedHomeMargin: game.spread_line,
+          totalLine: game.total_line,
+          awayRest: game.away_rest,
+          homeRest: game.home_rest,
+          isHomeSide: false
+        }).features
       });
     }
     if (game.result !== 0) {
@@ -90,7 +128,17 @@ export function buildLifecycleTrainingRows(games: readonly LifecycleGameRow[], l
         outcome: game.result > 0 ? 1 : 0,
         push: false,
         weight,
-        features: { ...common, marketLogit: logit(homeMoneylineFair), isHomeSide: 1 }
+        features: buildLifecycleForecastRow({
+          season: game.season,
+          week: game.week,
+          market: "moneyline",
+          marketProbability: homeMoneylineFair,
+          expectedHomeMargin: game.spread_line,
+          totalLine: game.total_line,
+          awayRest: game.away_rest,
+          homeRest: game.home_rest,
+          isHomeSide: true
+        }).features
       });
     }
     return rows;

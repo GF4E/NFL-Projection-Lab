@@ -229,3 +229,31 @@ export function translateFairProbability(
     sourcePoints: [...new Set([...from.sourcePoints, ...to.sourcePoints])]
   };
 }
+
+export function fairSpreadPointForProbability(
+  artifact: DiscreteMarginArtifact,
+  consensusSpread: number,
+  postedPoint: number,
+  targetProbability: number
+): { point: number | null; warning: TranslationResult["warning"] } {
+  const candidates = artifact.spreadGrid.map((fairPoint) => ({
+    fairPoint,
+    translated: translateFairProbability(
+      artifact,
+      consensusSpread,
+      fairPoint,
+      postedPoint,
+      0.5
+    )
+  })).filter((candidate) => candidate.translated.probability !== null);
+  if (!candidates.length) return { point: null, warning: "unsupported" };
+  candidates.sort((left, right) =>
+    Math.abs(left.translated.probability! - targetProbability) -
+    Math.abs(right.translated.probability! - targetProbability) ||
+    Math.abs(left.fairPoint - postedPoint) - Math.abs(right.fairPoint - postedPoint)
+  );
+  return {
+    point: candidates[0].fairPoint,
+    warning: candidates[0].translated.warning
+  };
+}

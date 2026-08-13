@@ -5,6 +5,7 @@ import eraConfig from "../config/era.config.json";
 import { structuralConfig } from "@/domain/config";
 import {
   buildDiscreteMarginArtifact,
+  fairSpreadPointForProbability,
   translateFairProbability
 } from "@/domain/margin";
 import {
@@ -22,7 +23,7 @@ import { dualRecordSummaries } from "@/domain/records";
 import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "@/domain/sunday-mode";
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "@/domain/settlement";
-import { fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
+import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
 import { addTeamApproval, estimatedEvFromEdge, isTeamApproved, trackerRecordSummaries, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
@@ -46,6 +47,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(changed.keyMarginMasses["3"]).toBeGreaterThan(artifact.keyMarginMasses["3"]);
     const translated = translateFairProbability(artifact, -3, -2.5, -3, 0.54);
     expect(translated.probability).not.toBe(0.54);
+    const fairPointProbability = translateFairProbability(artifact, -3, -2.5, -3, 0.5).probability!;
+    const inferred = fairSpreadPointForProbability(artifact, -3, -3, fairPointProbability);
+    expect(inferred.point).toBe(-2.5);
     const evaluation = (canonicalPoint: number): BookEvaluation => ({
       book: "betmgm", rawQuote: quote(), opposingQuote: quote({ side: "NYJ +2.5" }), canonicalPoint,
       translatedAmericanPrice: -108, powerExponent: 1.1, fairProbability: 0.51,
@@ -78,6 +82,11 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const result = sizeKelly(0.56, -110, [-0.01, 0.06], config);
     expect(result.greyed).toBe(true);
     expect(result.suggestedUnits).toBeGreaterThanOrEqual(0.5);
+  });
+
+  it("4b. applies a promoted champion's market residual without erasing weekly state", () => {
+    expect(applyChampionMarketResidual(0.57, 0.52, 0.52)).toBeCloseTo(0.57, 10);
+    expect(applyChampionMarketResidual(0.57, 0.55, 0.52)).toBeGreaterThan(0.57);
   });
 
   it("5. replays consecutive weeks through state updates without implicit coefficient changes", () => {
@@ -482,7 +491,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(server).toContain("weightedLeagueScoring");
     expect(server).toContain("season < ? OR week < ?");
-    expect(server).toContain("totalProjections(game.id, gameLines, away, home, leagueScoring, totalEdgeNoise, weather.totalAdjustmentPoints)");
+    expect(server).toContain("totals: totalProjections(");
+    expect(server).toContain("championModel");
+    expect(server).toContain("applyChampionMarketResidual");
     expect(board).toContain("MODEL TOTAL");
     expect(board).toContain('line.market === "total"');
     expect(board).toContain("estimatedEvPercent: legExpectedValuePercent(leg)");

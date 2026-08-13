@@ -20,6 +20,9 @@ interface ScheduleRow {
   home_team: string;
   stadium: string | null;
   spread_line: number | null;
+  total_line: number | null;
+  away_rest: number | null;
+  home_rest: number | null;
 }
 
 function pacificDate(now: Date): string {
@@ -55,7 +58,10 @@ function rowToMatchup(row: ScheduleRow): WeeklyMatchup {
     homeName: NFL_TEAM_NAMES[home] ?? home,
     venue: row.stadium ?? "",
     network: networkFor({ week: row.week, away, home }),
-    consensusHomePoint: row.spread_line === null ? null : -row.spread_line
+    consensusHomePoint: row.spread_line === null ? null : -row.spread_line,
+    totalLine: row.total_line,
+    awayRest: row.away_rest,
+    homeRest: row.home_rest
   };
 }
 
@@ -72,7 +78,8 @@ export async function weeklySlate(input: { db?: D1Database; season?: number; wee
   const db = input.db ?? getD1();
   const season = input.season ?? 2026;
   const week = input.week ?? await activeWeek({ db, season, now: input.now });
-  const result = await db.prepare(`SELECT game_id, season, week, game_date, game_time, away_team, home_team, stadium, spread_line
+  const result = await db.prepare(`SELECT game_id, season, week, game_date, game_time, away_team, home_team, stadium, spread_line,
+      total_line, away_rest, home_rest
     FROM nfl_games WHERE season = ? AND season_type = 'REG' AND week = ?
     ORDER BY game_date, game_time, game_id`).bind(season, week).all<ScheduleRow>();
   if (!result.results.length) throw new Error(`No nflverse schedule is available for Week ${week}`);
@@ -82,7 +89,8 @@ export async function weeklySlate(input: { db?: D1Database; season?: number; wee
 export async function seasonSchedule(input: { db?: D1Database; season?: number } = {}): Promise<WeeklyMatchup[]> {
   const db = input.db ?? getD1();
   const season = input.season ?? 2026;
-  const result = await db.prepare(`SELECT game_id, season, week, game_date, game_time, away_team, home_team, stadium, spread_line
+  const result = await db.prepare(`SELECT game_id, season, week, game_date, game_time, away_team, home_team, stadium, spread_line,
+      total_line, away_rest, home_rest
     FROM nfl_games WHERE season = ? AND season_type = 'REG'
     ORDER BY game_date, game_time, game_id`).bind(season).all<ScheduleRow>();
   return result.results.map(rowToMatchup);

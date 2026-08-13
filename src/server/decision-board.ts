@@ -18,17 +18,19 @@ import {
   type TeaserCandidate
 } from "@/domain/decision-board";
 import type { TotalProjection } from "@/domain/decision-board";
-import { buildDiscreteMarginArtifact, translateFairProbability } from "@/domain/margin";
+import { buildDiscreteMarginArtifact, fairSpreadPointForProbability, translateFairProbability } from "@/domain/margin";
 import { bootstrapEdgeInterval, type WeightedTrainingRow } from "@/domain/bootstrap";
 import { shrinkProbability } from "@/domain/odds";
 import { americanToDecimal } from "@/domain/odds";
+import { applyChampionMarketResidual, predictProbability, type FittedLogisticModel } from "@/domain/model-fit";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
 import type { HistoricalMarginRow } from "@/domain/types";
 import { fitWeatherTotalAdjustment } from "@/domain/weather-model";
 import { weeklySlate } from "./weekly-slate";
 import { ensureOfficialInjuryStore, getOfficialInjuryImportState } from "./official-injuries/store";
 import { ensureKickoffWeatherStore, listKickoffWeather } from "./weather/store";
-import { ensureModelLifecycleStore, getActiveChampionHash, getTeamStrengthStates } from "./model-lifecycle/store";
+import { ensureModelLifecycleStore, getActiveChampionHash, getModelArtifact, getTeamStrengthStates } from "./model-lifecycle/store";
+import { buildLifecycleForecastRow } from "./model-lifecycle/training";
 import { ensurePregameContextStore, getPregameContextStates } from "./pregame-context/store";
 import { getD1 } from "../../db";
 
@@ -181,7 +183,16 @@ function totalProjections(
   home: TeamBaseline | null,
   leagueScoring: number | null,
   edgeNoiseInterval: [number, number] | null,
-  weatherAdjustmentPoints = 0
+  weatherAdjustmentPoints = 0,
+  championModel: FittedLogisticModel | null = null,
+  forecastContext: {
+    season: number;
+    week: number;
+    expectedHomeMargin: number;
+    totalLine: number | null;
+    awayRest: number | null;
+    homeRest: number | null;
+  } | null = null
 ): TotalProjection[] {
   const baselineTotal = projectTotal(away, home, leagueScoring);
   if (baselineTotal === null) return [];
@@ -194,8 +205,24 @@ function totalProjections(
     const pointEdge = projectedTotal - marketPoint;
     const lean: TotalProjection["lean"] = Math.abs(pointEdge) < 1.5 ? "Pass" : pointEdge > 0 ? "Over" : "Under";
     const selected = lean === "Over" ? over : lean === "Under" ? under : null;
-    const modelProbability = lean === "Pass" ? null : Math.max(0.05, Math.min(0.95, 0.5 + Math.abs(pointEdge) * 0.025));
+    const stateProbability = lean === "Pass" ? null : Math.max(0.05, Math.min(0.95, 0.5 + Math.abs(pointEdge) * 0.025));
     const fairProbability = selected?.fairProbability ?? null;
+    const overMarketProbability = over?.fairProbability ?? null;
+    const championOverProbability = championModel && forecastContext && overMarketProbability !== null
+      ? predictProbability(championModel, buildLifecycleForecastRow({
+          ...forecastContext,
+          market: "total",
+          marketProbability: overMarketProbability,
+          totalLine: marketPoint,
+          isHomeSide: false
+        }))
+      : null;
+    const championSelectionProbability = championOverProbability === null || lean === "Pass"
+      ? null
+      : lean === "Over" ? championOverProbability : 1 - championOverProbability;
+    const modelProbability = stateProbability === null || fairProbability === null || championSelectionProbability === null
+      ? stateProbability
+      : applyChampionMarketResidual(stateProbability, championSelectionProbability, fairProbability);
     const shrunkProbability = modelProbability === null || fairProbability === null
       ? null
       : shrinkProbability(modelProbability, fairProbability, structuralConfig.model.shrinkageWeight);
@@ -486,6 +513,8 @@ export async function buildDecisionBoard(
     : null;
   const strengths = persistedStrengths ?? (basisSeason === null ? new Map<string, number>() : strengthStates(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season));
   const profiles = teamProfiles(featureRows, strengths);
+  const championVersion = championHash ? await getModelArtifact(db, championHash) : null;
+  const championModel = championVersion?.artifact.model ?? null;
   const historicalRows: HistoricalMarginRow[] = gameResult.results.filter((row) => row.season <= 2025).flatMap((row) => [
     { gameId: `${row.game_id}:home`, season: row.season, consensusSpread: nflverseExpectedMarginToHomePoint(row.spread_line), actualMargin: row.result },
     { gameId: `${row.game_id}:away`, season: row.season, consensusSpread: row.spread_line, actualMargin: -row.result }
@@ -517,6 +546,12 @@ export async function buildDecisionBoard(
     const consensusHomePoint = homeSpreads.length
       ? homeSpreads.reduce((sum, line) => sum + (line.point ?? 0), 0) / homeSpreads.length
       : scheduleHomePoint;
+    const totalPoints = gameLines
+      .filter((line) => line.market === "total" && line.point !== null)
+      .map((line) => line.point!);
+    const consensusTotalLine = totalPoints.length
+      ? totalPoints.reduce((sum, point) => sum + point, 0) / totalPoints.length
+      : game.totalLine;
     const strengthDelta = (strengths.get(game.home) ?? 0) - (strengths.get(game.away) ?? 0);
     type ProjectionAnchor = { book: "betmgm" | "fanduel"; point: number; fairProbability: number; marketSource: BaselineProjection["marketSource"] };
     const projectionAnchors = (["betmgm", "fanduel"] as const).flatMap<ProjectionAnchor>((book) => {
@@ -529,9 +564,28 @@ export async function buildDecisionBoard(
         : [{ book, point: scheduleHomePoint, fairProbability: 0.5, marketSource: "nflverse_consensus" as const }];
     });
     const projections: BaselineProjection[] = artifact && consensusHomePoint !== null ? projectionAnchors.map((anchor) => {
-      const projectedHomePoint = roundHalf(anchor.point - strengthDelta);
-      const translated = translateFairProbability(artifact, consensusHomePoint, projectedHomePoint, anchor.point, 0.5);
-      const modelProbability = translated.probability;
+      const stateProjectedHomePoint = roundHalf(anchor.point - strengthDelta);
+      const translated = translateFairProbability(artifact, consensusHomePoint, stateProjectedHomePoint, anchor.point, 0.5);
+      const championProbability = championModel && translated.probability !== null
+        ? predictProbability(championModel, buildLifecycleForecastRow({
+            season: game.season,
+            week: game.week,
+            market: "spread",
+            marketProbability: anchor.fairProbability,
+            expectedHomeMargin: -consensusHomePoint,
+            totalLine: consensusTotalLine,
+            awayRest: game.awayRest,
+            homeRest: game.homeRest,
+            isHomeSide: true
+          }))
+        : null;
+      const modelProbability = translated.probability === null || championProbability === null
+        ? translated.probability
+        : applyChampionMarketResidual(translated.probability, championProbability, anchor.fairProbability);
+      const inferredFairPoint = modelProbability === null
+        ? { point: null, warning: "unsupported" as const }
+        : fairSpreadPointForProbability(artifact, consensusHomePoint, anchor.point, modelProbability);
+      const projectedHomePoint = inferredFairPoint.point ?? stateProjectedHomePoint;
       const shrunkHomeProbability = modelProbability === null ? null : shrinkProbability(modelProbability, anchor.fairProbability, structuralConfig.model.shrinkageWeight);
       const edgeCenter = shrunkHomeProbability === null ? null : shrunkHomeProbability - anchor.fairProbability;
       return {
@@ -547,7 +601,13 @@ export async function buildDecisionBoard(
           : [edgeCenter + sideEdgeNoise[0], edgeCenter + sideEdgeNoise[1]],
         marketHomeProbability: anchor.fairProbability,
         marketSource: anchor.marketSource,
-        translationWarning: translated.warning
+        translationWarning: translated.warning === "extrapolated" || inferredFairPoint.warning === "extrapolated"
+          ? "extrapolated"
+          : translated.warning === "interpolated" || inferredFairPoint.warning === "interpolated"
+            ? "interpolated"
+            : translated.warning === "unsupported" || inferredFairPoint.warning === "unsupported"
+              ? "unsupported"
+              : "none"
       };
     }) : [];
     const teasers: TeaserCandidate[] = artifact ? gameLines.filter((line) => line.market === "spread" && line.point !== null && line.fairProbability !== null).map((line) => {
@@ -648,7 +708,24 @@ export async function buildDecisionBoard(
       away,
       home,
       projections,
-      totals: totalProjections(game.id, gameLines, away, home, leagueScoring, totalEdgeNoise, weather.totalAdjustmentPoints),
+      totals: totalProjections(
+        game.id,
+        gameLines,
+        away,
+        home,
+        leagueScoring,
+        totalEdgeNoise,
+        weather.totalAdjustmentPoints,
+        championModel,
+        {
+          season: game.season,
+          week: game.week,
+          expectedHomeMargin: consensusHomePoint === null ? 0 : -consensusHomePoint,
+          totalLine: consensusTotalLine,
+          awayRest: game.awayRest,
+          homeRest: game.homeRest
+        }
+      ),
       teasers,
       signals: matchupSignals(away, home),
       movements: lineMovements(game.id, movementHistory, gameLines),
@@ -666,6 +743,6 @@ export async function buildDecisionBoard(
     championHash,
     games,
     teaserPairs,
-    method: "Leakage-safe rolling 17-game offense and defense evidence with decay-weighted margin-versus-close strength, shrunk 25% toward the model and 75% toward the power-de-vigged market."
+    method: "Leakage-safe rolling 17-game offense and defense evidence with decay-weighted margin-versus-close strength, calibrated by the logged gated champion, then shrunk 25% toward the model and 75% toward the power-de-vigged market."
   };
 }

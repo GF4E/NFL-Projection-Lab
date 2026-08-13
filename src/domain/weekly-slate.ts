@@ -23,6 +23,9 @@ export interface WeeklyMatchup {
   venue: string;
   network: string;
   consensusHomePoint: number | null;
+  totalLine: number | null;
+  awayRest: number | null;
+  homeRest: number | null;
 }
 
 export interface WeeklySlate {

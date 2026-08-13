@@ -26,6 +26,29 @@ function sigmoid(value: number): number {
   return exponential / (1 + exponential);
 }
 
+function boundedLogit(probability: number): number {
+  const bounded = Math.max(EPSILON, Math.min(1 - EPSILON, probability));
+  return Math.log(bounded / (1 - bounded));
+}
+
+/**
+ * Applies only the champion's learned displacement from the market to an
+ * independently produced state/model probability. A market-baseline champion
+ * is therefore an exact no-op, while a promoted challenger can calibrate the
+ * live forecast without erasing the automatic weekly state update.
+ */
+export function applyChampionMarketResidual(
+  stateProbability: number,
+  championProbability: number,
+  marketProbability: number
+): number {
+  return sigmoid(
+    boundedLogit(stateProbability) +
+    boundedLogit(championProbability) -
+    boundedLogit(marketProbability)
+  );
+}
+
 function dot(left: number[], right: number[]): number {
   return left.reduce((sum, value, index) => sum + value * right[index], 0);
 }
