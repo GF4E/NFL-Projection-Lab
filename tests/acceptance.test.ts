@@ -490,6 +490,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("shrunk bet probability");
   });
 
+  it("36. keeps operational pages in the background and leaves only the weekly board and record visible", () => {
+    const navigation = readFileSync("src/components/nav-links.tsx", "utf8");
+    expect(navigation).toContain('["/sunday"');
+    expect(navigation).toContain('["/records"');
+    for (const route of ["digest", "settings", "model", "team"]) {
+      expect(readFileSync(`src/app/(dashboard)/${route}/page.tsx`, "utf8")).toContain('redirect("/sunday")');
+    }
+    expect(readFileSync("src/app/setup/page.tsx", "utf8")).toContain('redirect("/sunday")');
+  });
+
   it("36. highlights a better book only on an identical side and point", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(board).toContain("candidate.point === line.point");
