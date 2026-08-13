@@ -812,4 +812,17 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("MATCHUP EVIDENCE");
     expect(board).not.toContain("Opponent adjustment methodology");
   });
+
+  it("41. shows exact-price model bets inside the existing Picks drawer", () => {
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    const recommendations = readFileSync("src/domain/mainline-recommendations.ts", "utf8");
+    expect(board).toContain("MODEL BETS");
+    expect(board).toContain("BREAK-EVEN");
+    expect(board).toContain("candidate.expectedValue");
+    expect(board).toContain("rankMainlineRecommendations");
+    expect(recommendations).toContain("expectedValueWithPush");
+    expect(recommendations).toContain("americanToImplied");
+    expect(recommendations).toContain("sideCandidates.sort");
+    expect(board).not.toContain("BEST SIDE SIGNAL");
+  });
 });

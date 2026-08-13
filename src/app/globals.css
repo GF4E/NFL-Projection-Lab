@@ -226,14 +226,17 @@ button:disabled { cursor: wait; opacity: .62; }
 .model-ribbon > button { min-height: 30px; padding: 0 11px; border: 1px solid color-mix(in srgb, var(--book-accent) 55%, #303b37); border-radius: 4px; background: color-mix(in srgb, var(--book-accent) 12%, transparent); color: var(--book-accent); font: 900 10px var(--display); text-transform: uppercase; }
 .quick-picks { position: relative; margin-top: 7px; display: grid; grid-template-columns: .9fr 1fr 1.35fr; gap: 7px; }
 .quick-picks > section { min-height: 96px; padding: 11px; border: 1px solid #34403c; background: #101917; }
-.quick-side { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.quick-side > div { min-width: 0; display: flex; flex-direction: column; }
-.quick-side > div.uncertain { opacity: .48; }
-.quick-side span, .quick-head > span { color: #7d8a85; font: 900 8px var(--display); letter-spacing: .09em; }
-.quick-side b { margin-top: 5px; font: 900 21px/.95 var(--display); }
-.quick-side small { margin-top: 4px; color: #a5afab; font: 700 9px var(--display); }
-.quick-side > button { min-height: 37px; padding: 0 11px; border: 0; border-radius: 4px; background: var(--book-accent); color: #07110f; font: 900 10px var(--display); text-transform: uppercase; white-space: nowrap; }
-.quick-side > em { color: #7c8984; font: 900 9px var(--display); font-style: normal; text-transform: uppercase; text-align: right; }
+.quick-mainlines { min-width: 0; }
+.quick-mainlines > p { margin: 11px 0 0; color: #7e8a85; font-size: 9px; line-height: 1.35; }
+.quick-mainline-recommendation { width: 100%; min-height: 42px; margin-top: 4px; padding: 5px 7px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; border: 1px solid #3c4844; border-radius: 3px; background: #1b2522; color: #f4f6f5; text-align: left; }
+.quick-mainline-recommendation:not(:disabled):hover { border-color: var(--book-accent); }
+.quick-mainline-recommendation:disabled { cursor: default; opacity: .65; }
+.quick-mainline-recommendation > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.quick-mainline-recommendation b { overflow: hidden; font: 900 12px var(--display); text-overflow: ellipsis; white-space: nowrap; }
+.quick-mainline-recommendation b strong { color: #b8c2be; font-size: 10px; }
+.quick-mainline-recommendation small { overflow: hidden; color: #939f9a; font: 700 8px var(--display); text-overflow: ellipsis; white-space: nowrap; }
+.quick-mainline-recommendation > em { color: var(--acid); font: 900 9px var(--display); font-style: normal; white-space: nowrap; }
+.quick-mainline-recommendation.uncertain > em { color: #7d8985; }
 .quick-head { min-height: 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .quick-head small { color: var(--book-accent); font: 800 8px var(--display); text-transform: uppercase; }
 .quick-teasers > button { width: 100%; min-height: 29px; margin-top: 4px; padding: 0 7px; display: grid; grid-template-columns: 38px 1fr auto; gap: 7px; align-items: center; border: 1px solid #3c4844; border-radius: 3px; background: #1b2522; color: #f4f6f5; text-align: left; }
@@ -537,7 +540,7 @@ button:disabled { cursor: wait; opacity: .62; }
   .team-code i { width: 43px; height: 43px; }
   .team-code b { font-size: 26px; }
   .quick-picks { grid-template-columns: 1fr 1fr; }
-  .quick-side { grid-column: 1 / 3; }
+  .quick-mainlines { grid-column: 1 / 3; }
 }
 
 @media (max-width: 900px) {
@@ -546,7 +549,7 @@ button:disabled { cursor: wait; opacity: .62; }
   .sportsbook-layout { grid-template-columns: 1fr; }
   .shared-slip { position: static; max-height: none; }
   .quick-picks { grid-template-columns: 1fr 1fr 1.3fr; }
-  .quick-side { grid-column: auto; }
+  .quick-mainlines { grid-column: auto; }
   .quick-evidence { grid-template-columns: minmax(230px, .7fr) 1.4fr; }
   .matchup-workspace { grid-template-columns: 1fr; }
   .matchup-picker { max-height: 430px; border-right: 0; border-bottom: 1px solid var(--line); }
@@ -592,7 +595,7 @@ button:disabled { cursor: wait; opacity: .62; }
   .model-ribbon { grid-template-columns: 1fr 1fr; gap: 5px; padding-block: 6px; }
   .model-ribbon > button { grid-column: 1 / 3; }
   .quick-picks { grid-template-columns: 1fr; }
-  .quick-side { grid-column: auto; }
+  .quick-mainlines { grid-column: auto; }
   .quick-evidence { grid-template-columns: 1fr; }
   .evidence-signals { padding: 9px 0 0; border-left: 0; border-top: 1px solid #34403c; }
   .compact-shared-card { margin-bottom: 2px; }

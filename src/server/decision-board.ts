@@ -22,7 +22,7 @@ import type { TotalProjection } from "@/domain/decision-board";
 import { buildDiscreteMarginArtifact, fairSpreadPointForProbability, translateFairProbability } from "@/domain/margin";
 import { bootstrapEdgeInterval, type WeightedTrainingRow } from "@/domain/bootstrap";
 import { fitOpponentAdjustedRatings } from "@/domain/opponent-adjustment";
-import { americanToDecimal, expectedValueWithPush, powerDevig, shrinkProbability } from "@/domain/odds";
+import { expectedValueWithPush, powerDevig, shrinkProbability } from "@/domain/odds";
 import { applyChampionMarketResidual, predictProbability, type FittedLogisticModel } from "@/domain/model-fit";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
 import type { HistoricalMarginRow } from "@/domain/types";
@@ -237,14 +237,17 @@ function totalProjections(
     const shrunkProbability = modelProbability === null || fairProbability === null
       ? null
       : shrinkProbability(modelProbability, fairProbability, structuralConfig.model.shrinkageWeight);
-    const expectedValue = selected && shrunkProbability !== null
-      ? shrunkProbability * americanToDecimal(selected.americanPrice) - 1
+    // Half-point totals cannot push. Integer-total EV is withheld until a
+    // validated total-score mass model is available.
+    const pushProbability = Number.isInteger(marketPoint) ? null : 0;
+    const expectedValue = selected && shrunkProbability !== null && pushProbability !== null
+      ? expectedValueWithPush(shrunkProbability, pushProbability, selected.americanPrice)
       : null;
     const center = shrunkProbability === null || fairProbability === null ? null : shrunkProbability - fairProbability;
-    const edgeInterval = edgeNoiseInterval === null || center === null
+    const edgeInterval = edgeNoiseInterval === null || center === null || pushProbability === null
       ? null
       : [center + edgeNoiseInterval[0], center + edgeNoiseInterval[1]] as [number, number];
-    return [{ gameId, book, marketPoint, projectedTotal, lean, pointEdge, fairProbability, shrunkProbability, expectedValue, edgeInterval }];
+    return [{ gameId, book, marketPoint, projectedTotal, lean, pointEdge, fairProbability, shrunkProbability, pushProbability, expectedValue, edgeInterval }];
   });
 }
 
@@ -661,6 +664,7 @@ export async function buildDecisionBoard(
         projectedHomePoint,
         homeCoverProbability: modelProbability,
         shrunkHomeProbability,
+        pushProbability: translated.pushProbability,
         edgeInterval: edgeCenter === null || sideEdgeNoise === null
           ? null
           : [edgeCenter + sideEdgeNoise[0], edgeCenter + sideEdgeNoise[1]],

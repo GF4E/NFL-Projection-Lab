@@ -12,6 +12,7 @@ import type {
 } from "@/domain/decision-board";
 import { analyzeSlipValue, decimalToAmerican, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
+import { rankMainlineRecommendations } from "@/domain/mainline-recommendations";
 import { structuralConfig } from "@/domain/config";
 import { isTeamApproved, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
 import { sizeKelly, type SizingResult } from "@/domain/sizing";
@@ -425,6 +426,7 @@ export function WeekOneBoard() {
               Math.abs(weather.totalAdjustmentPoints) >= 0.5);
             const projection = gameIntel?.projections.find((item) => item.book === book);
             const totalProjection = gameIntel?.totals.find((item) => item.book === book);
+            const moneylineProjection = gameIntel?.moneylines.find((item) => item.book === book);
             const deskOpen = openGame === game.id;
             const propBoard = propBoards[game.id];
             const currentProps = propBoard?.candidates.filter((item) => item.executionBook === book) ?? [];
@@ -453,8 +455,18 @@ export function WeekOneBoard() {
               ? null
               : bookLines.find((line) => line.market === "total" && line.side.toLowerCase() === totalProjection?.lean.toLowerCase());
             const totalSizing = recommendation(totalProjection?.shrunkProbability ?? null, totalLine?.americanPrice ?? null, totalProjection?.edgeInterval ?? null);
-            const preferenceConflict = Boolean(leanTeam && [game.away, game.home].some((team) => preferredTeams.has(team) && team !== leanTeam));
-            const leanActionable = Boolean(leanLine && sideSizing?.included && (!preferenceConflict || Math.abs(homeEdge ?? 0) >= 0.03));
+            const mainlineRecommendations = rankMainlineRecommendations({
+              gameId: game.id,
+              awayTeam: game.away,
+              homeTeam: game.home,
+              book,
+              lines: bookLines,
+              spread: projection ?? null,
+              total: totalProjection ?? null,
+              moneyline: moneylineProjection ?? null,
+              preferredTeams
+            });
+            const actionableMainlines = mainlineRecommendations.filter((candidate) => candidate.actionable).length;
             return <article className={`event-market ${deskOpen ? "desk-open" : ""}`} key={game.id}>
               <div className="event-time"><b>{formatKickoff(game, timeZone)}</b>{game.network && <span>{game.network}</span>}</div>
               {rowData.map((row) => <div className="team-line" key={row.team}>
@@ -479,9 +491,21 @@ export function WeekOneBoard() {
                 <button onClick={() => toggleDecisionDesk(game.id)} aria-expanded={deskOpen}>{deskOpen ? "Close" : "Picks"} {deskOpen ? "↑" : "↓"}</button>
               </div>
               {deskOpen && <div className="quick-picks">
-                <section className="quick-side">
-                  <div className={sideSizing?.greyed ? "uncertain" : ""}><span>BEST SIDE SIGNAL</span>{leanTeam && leanLine && homeEdge !== null ? <><b>{leanTeam} {formatPoint(leanLine.point)}</b><small>{formatPercent(leanProbability)} · {Math.abs(homeEdge * 100).toFixed(1)}pp edge · {sideSizing?.included ? `${sideSizing.suggestedUnits}u` : "pass"}</small><small>80% {formatInterval(leanInterval)}</small></> : <><b>No side edge</b><small>Current market and background model agree</small></>}</div>
-                  {preferenceConflict && homeEdge !== null && Math.abs(homeEdge) < 0.03 ? <em>PASS · preferred-team conflict</em> : leanActionable && leanLine ? <button onClick={() => toggleLine(leanLine, `${game.away} @ ${game.home}`)}>Add {sideSizing?.suggestedUnits}u</button> : <em>PASS</em>}
+                <section className="quick-mainlines">
+                  <div className="quick-head"><span>MODEL BETS</span><small>{actionableMainlines ? `${actionableMainlines} priced ${actionableMainlines === 1 ? "play" : "plays"}` : "Price check"}</small></div>
+                  {mainlineRecommendations.length ? mainlineRecommendations.map((candidate) => <button
+                    className={`quick-mainline-recommendation ${candidate.sizing.greyed ? "uncertain" : ""}`}
+                    disabled={!candidate.actionable}
+                    onClick={() => toggleLine(candidate.line, `${game.away} @ ${game.home}`)}
+                    key={candidate.line.id}
+                  >
+                    <div>
+                      <b>{lineSelection(candidate.line)} <strong>{formatOdds(candidate.line.americanPrice)}</strong></b>
+                      <small>{marketTitle(candidate.market)} · BET {formatPercent(candidate.betProbability)} · BREAK-EVEN {formatPercent(candidate.breakEvenProbability)}</small>
+                      <small>{candidate.expectedValue >= 0 ? "+" : ""}{(candidate.expectedValue * 100).toFixed(1)}% EV · 80% {formatInterval(candidate.edgeInterval)}</small>
+                    </div>
+                    <em>{candidate.actionable ? `${candidate.sizing.suggestedUnits}u ADD` : candidate.preferenceConflict ? "PASS · TEAM" : "PASS"}</em>
+                  </button>) : <p>No exact-price model edge at this book.</p>}
                 </section>
                 <section className="quick-teasers">
                   <div className="quick-head"><span>TEASER LEGS</span><small>{teaserPair ? "Price check" : teaserCandidates.length ? "6 points" : "None"}</small></div>

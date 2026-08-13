@@ -47,6 +47,7 @@ export interface BaselineProjection {
   projectedHomePoint: number;
   homeCoverProbability: number | null;
   shrunkHomeProbability: number | null;
+  pushProbability: number | null;
   edgeInterval: [number, number] | null;
   marketHomeProbability: number;
   marketSource: "book" | "nflverse_consensus";
@@ -62,6 +63,7 @@ export interface TotalProjection {
   pointEdge: number;
   fairProbability: number | null;
   shrunkProbability: number | null;
+  pushProbability: number | null;
   expectedValue: number | null;
   edgeInterval: [number, number] | null;
 }
