@@ -54,6 +54,7 @@ import type { DiscreteMarginArtifact, DiscreteTotalArtifact } from "@/domain/typ
 import { championConfigurationStatus, currentModelCodeHash, currentModelConfigurationHash } from "@/domain/model-version";
 import { bootstrapMarginTranslation, buildMarginBootstrapIndex } from "@/domain/margin-bootstrap";
 import { bootstrapTotalTranslation, buildTotalBootstrapIndex, type TotalBootstrapIndex } from "@/domain/total-bootstrap";
+import { buildMainlineContractEvaluations } from "@/domain/book-comparison";
 
 interface FeatureRow {
   game_id: string;
@@ -392,7 +393,11 @@ function totalProjections(
       : warnings.includes("extrapolated") ? "extrapolated"
         : warnings.includes("interpolated") ? "interpolated" : "none";
     return [{
-      gameId, book, marketPoint, projectedTotal, lean, pointEdge, fairProbability,
+      gameId, book, canonicalPoint: canonical.point, marketPoint, projectedTotal,
+      shrunkOverProbability: translated?.shrunkOverProbability ?? null,
+      marketPushProbability: translated?.pushProbability ?? null,
+      overEdgeInterval: bootstrapOverEdgeInterval,
+      lean, pointEdge, fairProbability,
       shrunkProbability, pushProbability, expectedValue, edgeInterval, translationWarning
     }];
   });
@@ -1257,6 +1262,48 @@ export async function buildDecisionBoard(
       totalAdjustmentPoints: 0,
       trainingGames: null
     };
+    const totals = totalProjections(
+      game.id,
+      gameLines,
+      away,
+      home,
+      leagueScoring,
+      weather.totalAdjustmentPoints,
+      championModel,
+      ensembleModels,
+      frozenTotalArtifact,
+      totalBootstrapIndex,
+      {
+        season: game.season,
+        week: game.week,
+        expectedHomeMargin: consensusHomePoint === null ? 0 : -consensusHomePoint,
+        totalLine: consensusTotalLine,
+        awayRest: game.awayRest,
+        homeRest: game.homeRest,
+        teamContext
+      }
+    );
+    const moneylines = moneylineProjections({
+      gameId: game.id,
+      homeTeam: game.home,
+      gameLines,
+      artifact,
+      consensusHomePoint,
+      stateProjectedHomePoint,
+      championModel,
+      ensembleModels,
+      marginBootstrapIndex,
+      uncertaintyWidening: qbUncertaintyWidening,
+      forecastContext: {
+        season: game.season,
+        week: game.week,
+        expectedHomeMargin: consensusHomePoint === null ? 0 : -consensusHomePoint,
+        totalLine: consensusTotalLine,
+        awayRest: game.awayRest,
+        homeRest: game.homeRest,
+        teamContext
+      }
+    });
     return {
       gameId: game.id,
       awayTeam: game.away,
@@ -1264,47 +1311,16 @@ export async function buildDecisionBoard(
       away,
       home,
       projections,
-      totals: totalProjections(
-        game.id,
-        gameLines,
-        away,
-        home,
-        leagueScoring,
-        weather.totalAdjustmentPoints,
-        championModel,
-        ensembleModels,
-        frozenTotalArtifact,
-        totalBootstrapIndex,
-        {
-          season: game.season,
-          week: game.week,
-          expectedHomeMargin: consensusHomePoint === null ? 0 : -consensusHomePoint,
-          totalLine: consensusTotalLine,
-          awayRest: game.awayRest,
-          homeRest: game.homeRest,
-          teamContext
-        }
-      ),
-      moneylines: moneylineProjections({
-        gameId: game.id,
-        homeTeam: game.home,
-        gameLines,
-        artifact,
+      totals,
+      moneylines,
+      contractEvaluations: buildMainlineContractEvaluations({
+        lines: gameLines,
+        projections,
+        totals,
+        moneylines,
         consensusHomePoint,
-        stateProjectedHomePoint,
-        championModel,
-        ensembleModels,
-        marginBootstrapIndex,
-        uncertaintyWidening: qbUncertaintyWidening,
-        forecastContext: {
-          season: game.season,
-          week: game.week,
-          expectedHomeMargin: consensusHomePoint === null ? 0 : -consensusHomePoint,
-          totalLine: consensusTotalLine,
-          awayRest: game.awayRest,
-          homeRest: game.homeRest,
-          teamContext
-        }
+        marginArtifact: artifact,
+        totalArtifact: frozenTotalArtifact
       }),
       teasers,
       signals: evidence.status === "current"

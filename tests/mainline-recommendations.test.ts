@@ -31,7 +31,8 @@ function spread(overrides: Partial<BaselineProjection> = {}): BaselineProjection
 
 function total(overrides: Partial<TotalProjection> = {}): TotalProjection {
   return {
-    gameId: "sea-lar", book: "betmgm", marketPoint: 45.5, projectedTotal: 48,
+    gameId: "sea-lar", book: "betmgm", canonicalPoint: 45.5, marketPoint: 45.5, projectedTotal: 48,
+    shrunkOverProbability: 0.55, marketPushProbability: 0, overEdgeInterval: [0.01, 0.08],
     lean: "Over", pointEdge: 2.5, fairProbability: 0.5, shrunkProbability: 0.55,
     pushProbability: 0, expectedValue: 0.05, edgeInterval: [0.01, 0.08], translationWarning: "none", ...overrides
   };

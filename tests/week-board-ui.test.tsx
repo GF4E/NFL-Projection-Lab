@@ -47,7 +47,7 @@ function board(): DecisionBoardPayload {
     teaserPairs: [], marketCoverage: [], method: "test",
     games: games.map((game) => ({
       gameId: game.id, awayTeam: game.away, homeTeam: game.home, away: null, home: null,
-      projections: [], totals: [], moneylines: [], teasers: [], signals: [], movements: [],
+      projections: [], totals: [], moneylines: [], contractEvaluations: [], teasers: [], signals: [], movements: [],
       evidence: {
         status: "current", provider: "nflverse", throughSeason: 2025, throughWeek: 18,
         throughDate: "2026-01-04", expectedThroughSeason: 2025, expectedThroughWeek: 18,
@@ -164,6 +164,10 @@ describe("compact weekly decision board", () => {
       { id: "success", label: "DOWN-TO-DOWN", lean: "SEA", detail: "SEA O #6 vs NE D #22", strength: 16 },
       { id: "rest", label: "REST", lean: "NE", detail: "8 days vs 7 days", strength: 7 }
     ];
+    intelligence.games[0].contractEvaluations = [
+      { sourceQuoteId: "mgm-sea", book: "betmgm", market: "spread", side: "SEA", point: -3.5, americanPrice: -110, capturedAt, canonicalPoint: -3.5, translatedAmericanPrice: -110, powerExponent: 1.1, fairProbability: 0.5, shrunkProbability: 0.6, pushProbability: 0.02, expectedValue: 0.12, edgeInterval: [0.04, 0.14], translationWarning: "none" },
+      { sourceQuoteId: "fd-sea", book: "fanduel", market: "spread", side: "SEA", point: -3, americanPrice: -105, capturedAt, canonicalPoint: -3.5, translatedAmericanPrice: -118, powerExponent: 1.08, fairProbability: 0.49, shrunkProbability: 0.57, pushProbability: 0.02, expectedValue: 0.1, edgeInterval: [0.02, 0.12], translationWarning: "none" }
+    ];
     vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.startsWith("/api/weekly-slate")) return response(slate);
@@ -181,5 +185,7 @@ describe("compact weekly decision board", () => {
     expect(evidence.join(" ")).toContain("SEA O #4 vs NE D #24");
     expect(evidence.join(" ")).toContain("SEA O #6 vs NE D #22");
     expect(evidence.join(" ")).not.toContain("8 days vs 7 days");
+    expect(container.querySelector(".book-compare")?.textContent).toContain("VS FanDuel -3 -105 · +10.0% EV");
+    expect(container.querySelector(".book-compare")?.textContent).toContain("translated");
   });
 });

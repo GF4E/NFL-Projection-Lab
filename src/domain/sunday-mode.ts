@@ -20,6 +20,13 @@ export function todayOnly<T>(games: SundayGame<T>[], now: string): SundayGame<T>
   return games.filter((game) => dateInPacific(game.kickoffAt) === today);
 }
 
+export function isPacificSunday(now: string): boolean {
+  return new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Los_Angeles",
+    weekday: "short"
+  }).format(new Date(now)) === "Sun";
+}
+
 export function kickoffCountdown(kickoffAt: string, now: string): number {
   return Math.max(0, new Date(kickoffAt).getTime() - new Date(now).getTime());
 }

@@ -24,7 +24,7 @@ import { createQuarterbackOverride, normalizeOfficialInjuries, validateHistorica
 import { approveRevision, applyKickoffLock, editRevision, revisionHash } from "@/domain/approval";
 import { calculateTranslatedClv, chooseBetterPaperClose } from "@/domain/clv";
 import { dualRecordSummaries } from "@/domain/records";
-import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "@/domain/sunday-mode";
+import { isPacificSunday, kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "@/domain/sunday-mode";
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "@/domain/settlement";
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
@@ -138,6 +138,19 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(surface).toContain("activeMarketCoverage");
     expect(surface).toContain("POSTED</small>");
     expect(surface).toContain("ALL 3 MARKETS POSTED");
+  });
+
+  it("1e1. publishes per-book raw contracts, translated equivalent prices, and exact-point EV", () => {
+    const board = readFileSync("src/server/decision-board.ts", "utf8");
+    const comparison = readFileSync("src/domain/book-comparison.ts", "utf8");
+    const surface = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(board).toContain("buildMainlineContractEvaluations");
+    expect(comparison).toContain("translatedAmericanPrice");
+    expect(comparison).toContain("reapplyPowerHold");
+    expect(comparison).toContain("expectedValueWithPush");
+    expect(surface).toContain("alternateEvaluation.expectedValue");
+    expect(surface).toContain("selectedEvaluation.canonicalPoint === alternateEvaluation.canonicalPoint");
+    expect(surface).toContain("quoteCostCents");
   });
 
   it("1e2. freezes validated total translation and integer push mass for pricing and CLV", () => {
@@ -360,6 +373,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
 
   it("15. filters Sunday today, exposes countdown/age/flags, expires drafts, and never auto-approves", () => {
     const games = [{ kickoffAt: "2026-09-13T20:00:00Z", payload: "today" }, { kickoffAt: "2026-09-14T20:00:00Z", payload: "tomorrow" }];
+    expect(isPacificSunday("2026-09-13T18:00:00Z")).toBe(true);
+    expect(isPacificSunday("2026-09-14T20:00:00Z")).toBe(false);
     expect(todayOnly(games, "2026-09-13T18:00:00Z").map((game) => game.payload)).toEqual(["today"]);
     expect(kickoffCountdown(games[0].kickoffAt, "2026-09-13T19:00:00Z")).toBe(3_600_000);
     expect(snapshotAgeMs("2026-09-13T18:59:00Z", "2026-09-13T19:00:00Z")).toBe(60_000);
@@ -368,6 +383,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(refreshed.revision.status).toBe("draft");
     expect(refreshed.edgeGone).toBe(true);
     expect(applyKickoffLock(pick({ status: "awaiting_approval" }), "2026-09-13T20:00:00Z").status).toBe("void");
+    const surface = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(surface).toContain("visibleMatchups");
+    expect(surface).toContain("INACTIVES ✓");
+    expect(surface).toContain("EDGE GONE · REFRESH");
   });
 
   it("16. allows exactly two idempotent Web Push event types", () => {
@@ -887,7 +906,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(server).toContain("weightedLeagueScoring");
     expect(server).toContain("season < ? OR week < ?");
-    expect(server).toContain("totals: totalProjections(");
+    expect(server).toContain("const totals = totalProjections(");
     expect(server).toContain("championModel");
     expect(server).toContain("applyChampionMarketResidual");
     expect(board).toContain('`TOTAL ${totalProjection.projectedTotal}`');

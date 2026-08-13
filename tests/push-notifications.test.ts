@@ -37,12 +37,13 @@ function board(homeEdge = 0.05): DecisionBoardPayload {
         marketSource: "book", translationWarning: "none"
       }],
       totals: [{
-        gameId: "sea-lar", book: "betmgm", marketPoint: 45.5,
-        projectedTotal: 48, lean: "Over", pointEdge: 2.5, fairProbability: 0.5,
+        gameId: "sea-lar", book: "betmgm", canonicalPoint: 45.5, marketPoint: 45.5,
+        projectedTotal: 48, shrunkOverProbability: 0.54, marketPushProbability: 0,
+        overEdgeInterval: [0.01, 0.07], lean: "Over", pointEdge: 2.5, fairProbability: 0.5,
         shrunkProbability: 0.54, pushProbability: 0, expectedValue: 0.03,
         edgeInterval: [0.01, 0.07], translationWarning: "none"
       }],
-      moneylines: [], teasers: [], signals: [], movements: [],
+      moneylines: [], contractEvaluations: [], teasers: [], signals: [], movements: [],
       evidence: { status: "current", provider: "nflverse", throughSeason: 2025, throughWeek: 18, throughDate: "2026-01-04", expectedThroughSeason: 2025, expectedThroughWeek: 18, featureGames: 544 },
       availability: {
         status: "pending", reportedPlayers: 0, inactivesConfirmed: false,

@@ -58,8 +58,12 @@ export interface BaselineProjection {
 export interface TotalProjection {
   gameId: string;
   book: "betmgm" | "fanduel";
+  canonicalPoint: number;
   marketPoint: number;
   projectedTotal: number;
+  shrunkOverProbability: number | null;
+  marketPushProbability: number | null;
+  overEdgeInterval: [number, number] | null;
   lean: "Over" | "Under" | "Pass";
   pointEdge: number;
   fairProbability: number | null;
@@ -82,6 +86,25 @@ export interface MoneylineProjection {
   homeExpectedValue: number | null;
   awayExpectedValue: number | null;
   edgeInterval: [number, number] | null;
+}
+
+export interface MainlineContractEvaluation {
+  sourceQuoteId: string;
+  book: "betmgm" | "fanduel";
+  market: "spread" | "total" | "moneyline";
+  side: string;
+  point: number | null;
+  americanPrice: number;
+  capturedAt: string;
+  canonicalPoint: number | null;
+  translatedAmericanPrice: number | null;
+  powerExponent: number;
+  fairProbability: number;
+  shrunkProbability: number | null;
+  pushProbability: number | null;
+  expectedValue: number | null;
+  edgeInterval: [number, number] | null;
+  translationWarning: "none" | "interpolated" | "extrapolated" | "unsupported";
 }
 
 export interface TeaserCandidate {
@@ -356,6 +379,7 @@ export interface DecisionBoardGame {
   projections: BaselineProjection[];
   totals: TotalProjection[];
   moneylines: MoneylineProjection[];
+  contractEvaluations: MainlineContractEvaluation[];
   teasers: TeaserCandidate[];
   signals: MatchupSignal[];
   evidence: MatchupEvidenceProvenance;

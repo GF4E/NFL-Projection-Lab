@@ -237,6 +237,7 @@ button:disabled { cursor: wait; opacity: .62; }
 .quick-mainline-recommendation small { overflow: hidden; color: #939f9a; font: 700 8px var(--display); text-overflow: ellipsis; white-space: nowrap; }
 .quick-mainline-recommendation small.contract-signal { margin-top: 2px; color: #c0c8c4; line-height: 1.3; text-overflow: clip; white-space: normal; }
 .quick-mainline-recommendation small.contract-signal span { color: var(--book-accent); font-weight: 900; letter-spacing: .025em; }
+.quick-mainline-recommendation small.book-compare { color: #b8c2be; white-space: normal; }
 .evidence-check { color: #87948f; font-weight: 900; letter-spacing: .025em; }
 .evidence-check.supports { color: var(--acid); }
 .evidence-check.contradicts { color: var(--red); }
@@ -411,6 +412,9 @@ button:disabled { cursor: wait; opacity: .62; }
 .matchup-cell .event-time { min-height: 0; grid-column: 1 / 3; justify-content: flex-start; gap: 7px; }
 .matchup-cell .event-time b { font-size: 9px; letter-spacing: .055em; }
 .matchup-cell .event-time span { padding-left: 7px; border-left: 1px solid #34403c; font-size: 7px; }
+.matchup-cell .event-time .kickoff-countdown { color: var(--gold); }
+.matchup-cell .event-time .pregame-confirmed { color: var(--acid); }
+.matchup-cell .event-time .pregame-pending { color: #8a9691; }
 .team-stack { display: grid; gap: 1px; }
 .team-code { min-width: 0; gap: 9px; }
 .team-code .team-logo { width: 33px; height: 33px; flex: 0 0 33px; display: block; border: 0; border-radius: 0; background: transparent; box-shadow: none; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
@@ -428,6 +432,8 @@ button:disabled { cursor: wait; opacity: .62; }
 .market-pair .price-cell > em { bottom: 2px; left: 4px; font-size: 5px; }
 .row-decision { position: relative; min-width: 0; padding: 7px 7px 5px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 27px; gap: 3px 6px; border: 1px solid #35413d; border-radius: 4px; background: #0e1715; }
 .row-decision.actionable { border-color: color-mix(in srgb, var(--acid) 32%, #35413d); background: linear-gradient(125deg, rgba(198,255,98,.055), #0e1715 66%); }
+.event-market.edge-gone .row-decision { border-color: color-mix(in srgb, var(--red) 52%, #35413d); }
+.event-market.edge-gone .edge-readout b, .event-market.edge-gone .edge-readout small { color: var(--red); }
 .decision-readout { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
 .decision-readout span, .decision-readout small, .row-vig { overflow: hidden; color: #74827d; font: 800 6px var(--display); letter-spacing: .07em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
 .decision-readout b { overflow: hidden; margin: 1px 0; color: #f4f6f5; font: 900 13px var(--display); text-overflow: ellipsis; white-space: nowrap; }

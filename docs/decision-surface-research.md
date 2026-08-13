@@ -19,6 +19,7 @@ Updated 2026-08-13. This is an internal product note; it is not rendered in the 
 - The sportsbook grid remains the primary surface.
 - `Analyze` is the only expansion point. It contains the best exact-price mainline contracts, teaser legs/pairs, confirmed +EV props, compact rolling matchup evidence, and material open-to-now movement.
 - Each exact mainline recommendation carries up to two contract-relevant statistics and plain-language fragments directly beneath its probability and EV. Hover text is supplementary, not the only way to read the evidence.
+- The best exact contract also shows the other execution book's raw point/price, its EV at that contract, and the equivalent-risk cent gap only after both prices have been translated to the same canonical point. This keeps line shopping visible without ever comparing mismatched raw points.
 - Matchup evidence is capped at three signals and uses leakage-safe rolling 17-game ranks. It does not present unverified narrative conclusions.
 - Evidence is capped only after the exact contract is selected. Side/moneyline decisions consider team-direction signals; total decisions consider pace and pass-environment signals. This prevents unrelated high-strength metrics from crowding a relevant statistic off the card.
 - A teaser pair is surfaced only when two different games at the same book have non-negative empirical expected value at the displayed price. Betting against Seattle or Atlanta requires at least 5% expected value.
