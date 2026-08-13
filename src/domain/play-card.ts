@@ -24,6 +24,7 @@ export type PlayForecastLegSnapshot = {
   pushProbability: number | null;
   uncertaintyInterval: [number, number] | null;
   uncertaintyMembers: number[] | null;
+  pushProbabilityMembers: number[] | null;
   expectedValue: number | null;
 };
 

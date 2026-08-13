@@ -709,6 +709,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
       gameId, book: "betmgm", team, opponent, originalPoint: 4.5, teasedPoint: 10.5,
       fairProbability, pushProbability, probabilityInterval: [fairProbability - 0.02, fairProbability + 0.02],
       probabilityMembers: Array.from({ length: 100 }, (_, index) => fairProbability - 0.02 + index * 0.0004),
+      pushProbabilityMembers: Array.from({ length: 100 }, () => pushProbability),
       fairAmerican: -300, classification: "ordinary", crossedKeys: [6, 7, 10], warning: "none"
     });
     const ordinaryPair = rankTeaserPairs([

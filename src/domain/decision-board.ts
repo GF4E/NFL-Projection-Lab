@@ -96,6 +96,7 @@ export interface TeaserCandidate {
   probabilityInterval: [number, number] | null;
   /** Fixed-seed member probabilities, retained in seed order for pair aggregation. */
   probabilityMembers: number[] | null;
+  pushProbabilityMembers: number[] | null;
   fairAmerican: number | null;
   classification: "classic_wong" | "key_number" | "ordinary";
   crossedKeys: number[];
@@ -791,17 +792,20 @@ export function priceTwoTeamTeaserDecision(
     conditionalWinProbability: number;
     pushProbability: number;
     probabilityMembers: readonly number[];
+    pushProbabilityMembers: readonly number[];
   }[],
   offeredAmerican: number
 ): TwoTeamTeaserDecision | null {
   const memberCount = legs[0]?.probabilityMembers.length ?? 0;
-  if (!memberCount || legs.some((leg) => leg.probabilityMembers.length !== memberCount)) return null;
+  if (!memberCount || legs.some((leg) =>
+    leg.probabilityMembers.length !== memberCount || leg.pushProbabilityMembers.length !== memberCount
+  )) return null;
   const central = priceTwoTeamTeaser(legs, offeredAmerican);
   if (!central) return null;
   const memberProbabilities = Array.from({ length: memberCount }, (_, index) => priceTwoTeamTeaser(
     legs.map((leg) => ({
       conditionalWinProbability: leg.probabilityMembers[index],
-      pushProbability: leg.pushProbability
+      pushProbability: leg.pushProbabilityMembers[index]
     })),
     offeredAmerican
   )?.conditionalWinProbability ?? Number.NaN);
@@ -861,21 +865,23 @@ export function rankTeaserPairs(
   const pairs: TeaserPairCandidate[] = [];
   for (let leftIndex = 0; leftIndex < candidates.length; leftIndex += 1) {
     const left = candidates[leftIndex];
-    if (left.fairProbability === null || left.pushProbability === null || left.probabilityInterval === null || left.probabilityMembers?.length !== structuralConfig.model.bootstrapMembers || left.warning === "unsupported") continue;
+    if (left.fairProbability === null || left.pushProbability === null || left.probabilityInterval === null || left.probabilityMembers?.length !== structuralConfig.model.bootstrapMembers || left.pushProbabilityMembers?.length !== structuralConfig.model.bootstrapMembers || left.warning === "unsupported") continue;
     for (let rightIndex = leftIndex + 1; rightIndex < candidates.length; rightIndex += 1) {
       const right = candidates[rightIndex];
-      if (right.fairProbability === null || right.pushProbability === null || right.probabilityInterval === null || right.probabilityMembers?.length !== structuralConfig.model.bootstrapMembers || right.warning === "unsupported") continue;
+      if (right.fairProbability === null || right.pushProbability === null || right.probabilityInterval === null || right.probabilityMembers?.length !== structuralConfig.model.bootstrapMembers || right.pushProbabilityMembers?.length !== structuralConfig.model.bootstrapMembers || right.warning === "unsupported") continue;
       if (left.book !== right.book || left.gameId === right.gameId) continue;
       const priced = priceTwoTeamTeaserDecision([
         {
           conditionalWinProbability: left.fairProbability,
           pushProbability: left.pushProbability,
-          probabilityMembers: left.probabilityMembers
+          probabilityMembers: left.probabilityMembers,
+          pushProbabilityMembers: left.pushProbabilityMembers
         },
         {
           conditionalWinProbability: right.fairProbability,
           pushProbability: right.pushProbability,
-          probabilityMembers: right.probabilityMembers
+          probabilityMembers: right.probabilityMembers,
+          pushProbabilityMembers: right.pushProbabilityMembers
         }
       ], offeredAmerican);
       if (!priced) continue;

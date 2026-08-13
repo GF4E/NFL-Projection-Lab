@@ -52,6 +52,7 @@ import { canonicalTotalMarket, translateCanonicalTotalForecast } from "@/domain/
 import { translateTotalFairProbability } from "@/domain/total";
 import type { DiscreteMarginArtifact, DiscreteTotalArtifact } from "@/domain/types";
 import { championConfigurationStatus, currentModelCodeHash, currentModelConfigurationHash } from "@/domain/model-version";
+import { bootstrapMarginTranslation, buildMarginBootstrapIndex } from "@/domain/margin-bootstrap";
 
 interface FeatureRow {
   game_id: string;
@@ -738,6 +739,28 @@ export async function buildDecisionBoard(
     ? latestRunAuthorization?.challengerHash ?? null
     : null;
   const artifact = frozenMarginArtifact;
+  const marginBootstrapIndex = buildMarginBootstrapIndex(
+    gameResult.results.flatMap((row) => [
+      {
+        gameId: row.game_id,
+        season: row.season,
+        consensusSpread: -row.spread_line,
+        actualMargin: row.result
+      },
+      {
+        gameId: row.game_id,
+        season: row.season,
+        consensusSpread: row.spread_line,
+        actualMargin: -row.result
+      }
+    ]),
+    {
+      referenceSeason: frozenMarginArtifact.decay.referenceSeason,
+      halfLifeSeasons: frozenMarginArtifact.decay.halfLifeSeasons,
+      members: structuralConfig.model.bootstrapMembers,
+      seedStart: structuralConfig.model.bootstrapSeedStart
+    }
+  );
   const lines = enrichWithPowerDevig(lineResult.results.map(rawLine));
   const injuryByTeam = new Map(injuryResult.results.map((row) => [`${row.game_id}:${normalizeNflverseTeam(row.team)}`, row]));
   const inactiveByTeam = new Map(inactiveResult.results.map((row) => [`${row.game_id}:${normalizeNflverseTeam(row.team)}`, row]));
@@ -939,49 +962,26 @@ export async function buildDecisionBoard(
       const originalBetProbability = projection?.shrunkHomeProbability === null || projection?.shrunkHomeProbability === undefined
         ? null
         : isHome ? projection.shrunkHomeProbability : 1 - projection.shrunkHomeProbability;
-      const originalEdgeInterval = projection?.edgeInterval === null || projection?.edgeInterval === undefined
-        ? null
-        : isHome ? projection.edgeInterval : [-projection.edgeInterval[1], -projection.edgeInterval[0]] as [number, number];
       const translated = originalBetProbability === null
         ? { probability: null, pushProbability: null, warning: "unsupported" as const, sourcePoints: [] }
         : translateFairProbability(artifact, consensusPoint, line.point!, teasedPoint, originalBetProbability);
-      const translatedLow = originalEdgeInterval === null
-        ? null
-        : translateFairProbability(
-            artifact,
-            consensusPoint,
-            line.point!,
-            teasedPoint,
-            Math.max(0.001, Math.min(0.999, line.fairProbability! + originalEdgeInterval[0]))
-          );
-      const translatedHigh = originalEdgeInterval === null
-        ? null
-        : translateFairProbability(
-            artifact,
-            consensusPoint,
-            line.point!,
-            teasedPoint,
-            Math.max(0.001, Math.min(0.999, line.fairProbability! + originalEdgeInterval[1]))
-          );
-      const probabilityInterval = translatedLow?.probability === null || translatedLow?.probability === undefined ||
-        translatedHigh?.probability === null || translatedHigh?.probability === undefined
-        ? null
-        : [translatedLow.probability, translatedHigh.probability] as [number, number];
-      const rawProbabilityMembers = ensembleSpread?.memberEdges.length === structuralConfig.model.bootstrapMembers
+      const baseProbabilityMembers = ensembleSpread?.memberEdges.length === structuralConfig.model.bootstrapMembers
         ? ensembleSpread.memberEdges.map((edge) => {
             const canonicalSideMarket = isHome ? canonicalMarketProbability! : 1 - canonicalMarketProbability!;
-            const canonicalMember = Math.max(0.001, Math.min(0.999, canonicalSideMarket + (isHome ? edge : -edge)));
-            return translateFairProbability(
-              artifact,
-              consensusPoint,
-              consensusPoint,
-              teasedPoint,
-              canonicalMember
-            ).probability;
+            return Math.max(0.001, Math.min(0.999, canonicalSideMarket + (isHome ? edge : -edge)));
           })
         : null;
-      const probabilityMembers = probabilityInterval && rawProbabilityMembers?.every((probability) => probability !== null)
-        ? calibrateMembersToInterval(rawProbabilityMembers as number[], probabilityInterval)
+      const marginBootstrap = baseProbabilityMembers ? bootstrapMarginTranslation({
+        index: marginBootstrapIndex,
+        consensusSpread: consensusPoint,
+        fromPoint: consensusPoint,
+        toPoint: teasedPoint,
+        baseProbabilityMembers,
+        intervalPercentiles: structuralConfig.model.intervalPercentiles as [number, number]
+      }) : null;
+      const probabilityInterval = marginBootstrap?.probabilityInterval ?? null;
+      const probabilityMembers = probabilityInterval && marginBootstrap
+        ? calibrateMembersToInterval(marginBootstrap.probabilityMembers, probabilityInterval)
         : null;
       const crossedKeys = crossedKeyNumbers(line.point!, teasedPoint, structuralConfig.model.keyMargins);
       const crossesZero = line.point! < 0 && teasedPoint > 0;
@@ -999,6 +999,7 @@ export async function buildDecisionBoard(
         pushProbability: translated.pushProbability,
         probabilityInterval,
         probabilityMembers,
+        pushProbabilityMembers: marginBootstrap?.pushProbabilityMembers ?? null,
         fairAmerican: translated.probability === null || translated.pushProbability === null
           ? null
           : fairAmericanFromProbability(translated.probability),

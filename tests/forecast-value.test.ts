@@ -8,7 +8,7 @@ function leg(overrides: Partial<PlayForecastLegSnapshot> = {}): PlayForecastLegS
     sourceQuoteId: "quote", gameId: "game", market: "spread", side: "SEA", point: 2.5,
     americanPrice: -110, book: "betmgm", capturedAt: "2026-09-13T18:00:00Z", sourceHash: "hash",
     marketProbability: 0.5, modelProbability: 0.6, betProbability: 0.55, pushProbability: 0,
-    uncertaintyInterval: [0.52, 0.58], uncertaintyMembers: null, expectedValue: 0.05, ...overrides
+    uncertaintyInterval: [0.52, 0.58], uncertaintyMembers: null, pushProbabilityMembers: null, expectedValue: 0.05, ...overrides
   };
 }
 
@@ -45,15 +45,15 @@ describe("authoritative combined-contract EV", () => {
 
   it("prices teaser uncertainty and Kelly from the exact combined payout", () => {
     const decision = priceTwoTeamTeaserDecision([
-      { conditionalWinProbability: 0.79, pushProbability: 0.02, probabilityMembers: Array.from({ length: 100 }, (_, index) => 0.75 + index * 0.0008) },
-      { conditionalWinProbability: 0.78, pushProbability: 0.01, probabilityMembers: Array.from({ length: 100 }, (_, index) => 0.74 + index * 0.0008) }
+      { conditionalWinProbability: 0.79, pushProbability: 0.02, probabilityMembers: Array.from({ length: 100 }, (_, index) => 0.75 + index * 0.0008), pushProbabilityMembers: Array.from({ length: 100 }, () => 0.02) },
+      { conditionalWinProbability: 0.78, pushProbability: 0.01, probabilityMembers: Array.from({ length: 100 }, (_, index) => 0.74 + index * 0.0008), pushProbabilityMembers: Array.from({ length: 100 }, () => 0.01) }
     ], -120);
     expect(decision?.edgeInterval[0]).toBeLessThan(decision!.edgeInterval[1]);
     expect(decision?.sizing.included).toBe(true);
     expect(decision?.sizing.suggestedUnits).toBeLessThanOrEqual(2);
     expect(priceTwoTeamTeaserDecision([
-      { conditionalWinProbability: 0.65, pushProbability: 0, probabilityMembers: Array.from({ length: 100 }, () => 0.65) },
-      { conditionalWinProbability: 0.65, pushProbability: 0, probabilityMembers: Array.from({ length: 100 }, () => 0.65) }
+      { conditionalWinProbability: 0.65, pushProbability: 0, probabilityMembers: Array.from({ length: 100 }, () => 0.65), pushProbabilityMembers: Array.from({ length: 100 }, () => 0) },
+      { conditionalWinProbability: 0.65, pushProbability: 0, probabilityMembers: Array.from({ length: 100 }, () => 0.65), pushProbabilityMembers: Array.from({ length: 100 }, () => 0) }
     ], -120)?.sizing.included).toBe(false);
   });
 });

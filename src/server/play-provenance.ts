@@ -63,6 +63,7 @@ function mainlineSnapshot(input: {
   let edgeInterval: [number, number] | null = null;
   let directUncertaintyInterval: [number, number] | null = null;
   let directUncertaintyMembers: number[] | null = null;
+  let directPushProbabilityMembers: number[] | null = null;
   let expectedValue: number | null = null;
   if (leg.market === "spread") {
     const projection = game?.projections.find((candidate) => candidate.book === quote.book);
@@ -104,6 +105,7 @@ function mainlineSnapshot(input: {
     pushProbability = candidate?.pushProbability ?? null;
     directUncertaintyInterval = candidate?.probabilityInterval ?? null;
     directUncertaintyMembers = candidate?.probabilityMembers ?? null;
+    directPushProbabilityMembers = candidate?.pushProbabilityMembers ?? null;
   }
   if (leg.market !== "teaser" && expectedValue === null && betProbability !== null && pushProbability !== null) {
     expectedValue = expectedValueWithPush(betProbability, pushProbability, quote.american_price);
@@ -124,6 +126,7 @@ function mainlineSnapshot(input: {
     pushProbability,
     uncertaintyInterval: directUncertaintyInterval ?? probabilityInterval(marketProbability, edgeInterval),
     uncertaintyMembers: directUncertaintyMembers,
+    pushProbabilityMembers: directPushProbabilityMembers,
     expectedValue
   };
 }
@@ -179,6 +182,7 @@ export async function capturePlayForecastSnapshot(
         ? probabilityInterval(candidate.executionFairProbability, candidate.edgeInterval)
         : null,
       uncertaintyMembers: null,
+      pushProbabilityMembers: null,
       expectedValue: candidate?.expectedValue ?? null
     };
   });
@@ -216,11 +220,13 @@ export async function capturePlayForecastSnapshot(
     : null;
   const teaserDecision = play.playType === "teaser" && legs.length === 2 && legs.every((leg) =>
     leg.betProbability !== null && leg.pushProbability !== null &&
-    leg.uncertaintyInterval !== null && leg.uncertaintyMembers?.length === structuralConfig.model.bootstrapMembers
+    leg.uncertaintyInterval !== null && leg.uncertaintyMembers?.length === structuralConfig.model.bootstrapMembers &&
+    leg.pushProbabilityMembers?.length === structuralConfig.model.bootstrapMembers
   ) ? priceTwoTeamTeaserDecision(legs.map((leg) => ({
       conditionalWinProbability: leg.betProbability!,
       pushProbability: leg.pushProbability!,
-      probabilityMembers: leg.uncertaintyMembers!
+      probabilityMembers: leg.uncertaintyMembers!,
+      pushProbabilityMembers: leg.pushProbabilityMembers!
     })), play.americanOdds) : null;
   const contractSizing = singleSizing ?? teaserDecision?.sizing ?? null;
   const authoritativeProbabilityInterval = single?.uncertaintyInterval ?? (

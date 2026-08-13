@@ -49,6 +49,7 @@ type SelectedLeg = ValueLeg & {
   pushProbability?: number;
   probabilityInterval?: [number, number];
   probabilityMembers?: number[];
+  pushProbabilityMembers?: number[];
 };
 
 function formatOdds(value: number): string { return value > 0 ? `+${value}` : `${value}`; }
@@ -177,9 +178,9 @@ export function WeekOneBoard() {
   const latestCapture = useMemo(() => lines.reduce<string | null>((latest, line) =>
     line.book === book && (!latest || line.capturedAt > latest) ? line.capturedAt : latest, null), [book, lines]);
   const teaserValue = useMemo(() => {
-    if (slipMode !== "teaser" || slip.length !== 2 || slip.some((leg) => leg.kind !== "teaser" || leg.fairProbability === null || leg.pushProbability === undefined || leg.probabilityMembers?.length !== structuralConfig.model.bootstrapMembers)) return null;
+    if (slipMode !== "teaser" || slip.length !== 2 || slip.some((leg) => leg.kind !== "teaser" || leg.fairProbability === null || leg.pushProbability === undefined || leg.probabilityMembers?.length !== structuralConfig.model.bootstrapMembers || leg.pushProbabilityMembers?.length !== structuralConfig.model.bootstrapMembers)) return null;
     if (new Set(slip.map((leg) => leg.gameId)).size !== slip.length) return null;
-    const priced = priceTwoTeamTeaserDecision(slip.map((leg) => ({ conditionalWinProbability: leg.fairProbability!, pushProbability: leg.pushProbability!, probabilityMembers: leg.probabilityMembers! })), teaserPrice);
+    const priced = priceTwoTeamTeaserDecision(slip.map((leg) => ({ conditionalWinProbability: leg.fairProbability!, pushProbability: leg.pushProbability!, probabilityMembers: leg.probabilityMembers!, pushProbabilityMembers: leg.pushProbabilityMembers! })), teaserPrice);
     return priced ? { ...priced, evPercent: priced.expectedValue * 100 } : null;
   }, [slip, slipMode, teaserPrice]);
   const slipCanApprove = isPricedSlipApprovable({
@@ -313,7 +314,8 @@ export function WeekOneBoard() {
       matchup, selection: `${line.side} ${formatPoint(candidate.teasedPoint)}`,
       detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : candidate.classification === "key_number" ? "key-number" : "positive-EV"} leg`, edge: candidate.fairProbability - (line.fairProbability ?? 0),
       pushProbability: candidate.pushProbability, probabilityInterval: candidate.probabilityInterval ?? undefined,
-      probabilityMembers: candidate.probabilityMembers ?? undefined
+      probabilityMembers: candidate.probabilityMembers ?? undefined,
+      pushProbabilityMembers: candidate.pushProbabilityMembers ?? undefined
     }, "teaser");
   }
 
@@ -329,7 +331,8 @@ export function WeekOneBoard() {
         detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : candidate.classification === "key_number" ? "key-number" : "positive-EV"} leg`,
         edge: candidate.fairProbability - (line.fairProbability ?? 0), pushProbability: candidate.pushProbability,
         probabilityInterval: candidate.probabilityInterval ?? undefined
-        , probabilityMembers: candidate.probabilityMembers ?? undefined
+        , probabilityMembers: candidate.probabilityMembers ?? undefined,
+        pushProbabilityMembers: candidate.pushProbabilityMembers ?? undefined
       }];
     });
     if (legs.length !== 2) return;

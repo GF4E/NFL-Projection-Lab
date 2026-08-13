@@ -76,7 +76,7 @@ describe("stored shared-card contract integrity", () => {
       sourceQuoteId: propLeg.sourceQuoteId!, gameId: "g1", market: "prop", side: "SEA", point: -2.5,
       americanPrice: -110, book: "betmgm", capturedAt: "2026-09-13T18:00:00.000Z", sourceHash: "hash",
       marketProbability: 0.5, modelProbability: 0.62, betProbability: 0.56, pushProbability: 0,
-      uncertaintyInterval: [0.53, 0.6], uncertaintyMembers: null, expectedValue: 0.069
+      uncertaintyInterval: [0.53, 0.6], uncertaintyMembers: null, pushProbabilityMembers: null, expectedValue: 0.069
     }] });
     const qualifiedPropDecision = { ...qualifiedProp, authoritativeProbabilityInterval: [0.53, 0.6] as [number, number], suggestedUnits: 1 };
     expect(forecastApprovalEligibilityError(propPlay, qualifiedPropDecision)).toBeNull();
