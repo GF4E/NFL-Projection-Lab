@@ -10,7 +10,7 @@ import type {
   TeaserCandidate,
   TeaserPairCandidate
 } from "@/domain/decision-board";
-import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
+import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, isPricedSlipApprovable, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
 import { alignMatchupEvidence, compactEvidenceLabel } from "@/domain/evidence-alignment";
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
 import { rankBestBookMainlineRecommendations, rankMainlineRecommendations } from "@/domain/mainline-recommendations";
@@ -179,6 +179,12 @@ export function WeekOneBoard() {
     const priced = priceTwoTeamTeaser(slip.map((leg) => ({ conditionalWinProbability: leg.fairProbability!, pushProbability: leg.pushProbability! })), teaserPrice);
     return priced ? { ...priced, evPercent: priced.expectedValue * 100 } : null;
   }, [slip, slipMode, teaserPrice]);
+  const slipCanApprove = isPricedSlipApprovable({
+    mode: slipMode,
+    legCount: slip.length,
+    standardValue: slipValue,
+    teaserExpectedValuePercent: teaserValue?.evPercent ?? null
+  });
 
   useEffect(() => {
     let active = true;
@@ -605,11 +611,11 @@ export function WeekOneBoard() {
         <div className="reason-clicks"><span>WHY</span>{pickReasons.slice(0, 8).map((item) => <button className={reason === item.value ? "active" : ""} onClick={() => setReason(item.value)} key={item.value}>{item.label.replace("Model disagrees with market price", "Model edge").replace("Opponent-adjusted efficiency matchup", "Efficiency").replace("Turnover or scoring regression", "Regression").replace("Personnel or injury advantage", "Personnel").replace("Coaching or scheme matchup", "Scheme").replace("Role clarity / team chemistry", "Chemistry").replace("Better number / key-number value", "Key number").replace("Pace / scoring environment", "Pace")}</button>)}</div>
         <div className="stake-clicks"><span>STAKE</span>{[12.5, 25, 37.5, 50].map((value) => <button className={stake === value ? "active" : ""} onClick={() => setStake(value)} key={value}>{value / 25}u</button>)}</div>
         <div className="value-meter">
-          <div><span>BOOK PRICE</span><b>{slip.length ? slipMode === "teaser" ? formatOdds(teaserPrice) : formatOdds(combinedAmerican(slip)) : "—"}</b></div>
-          <div><span>NO-VIG FAIR</span><b>{slipMode === "teaser" ? teaserValue ? formatOdds(teaserValue.fairAmerican) : "—" : slipValue ? formatOdds(slipValue.fairAmerican) : "—"}</b></div>
-          <div className={`vig-loss ${(slipMode === "teaser" && teaserValue && teaserValue.evPercent >= 0) || (straightEv !== null && straightEv >= 0) ? "positive-value" : ""}`}><span>{slipMode === "teaser" || slipMode === "straight" ? "ESTIMATED EV" : "VALUE LOST"}</span><b>{slipMode === "teaser" ? teaserValue ? `${teaserValue.evPercent >= 0 ? "+" : ""}${teaserValue.evPercent.toFixed(1)}%` : "—" : slipMode === "straight" ? straightEv === null ? "—" : `${straightEv >= 0 ? "+" : ""}${straightEv.toFixed(1)}%` : slipValue ? `${slipValue.vigDragPercent.toFixed(1)}%` : "—"}</b><small>{slipMode === "teaser" ? teaserValue ? `${formatPercent(teaserValue.winProbability)} win · ${formatPercent(teaserValue.pushProbability)} push` : "Add exactly two priced teaser legs from different games" : slipMode === "straight" ? slip.length === 1 ? `${formatPercent(legBetProbability(slip[0]))} shrunk bet probability` : "Select one straight to inspect its EV" : slipValue ? `$${slipValue.lossPerUnitDollars.toFixed(2)} per 1u · latest leg +${slipValue.incrementalDragPercent.toFixed(1)}pp` : slip.length > 1 ? "Same-game or incomplete pair: withheld" : "Add a priced leg"}</small></div>
+          <div><span>BOOK PRICE</span><b>{!slip.length ? "—" : slipMode === "teaser" ? formatOdds(teaserPrice) : slipMode === "straight" ? slip.length === 1 ? formatOdds(slip[0].americanPrice) : "EACH" : slipValue ? formatOdds(combinedAmerican(slip)) : "—"}</b></div>
+          <div><span>NO-VIG FAIR</span><b>{slipMode === "teaser" ? teaserValue ? formatOdds(teaserValue.fairAmerican) : "—" : slipMode === "straight" ? slip.length === 1 && slipValue ? formatOdds(slipValue.fairAmerican) : "—" : slipValue ? formatOdds(slipValue.fairAmerican) : "—"}</b></div>
+          <div className={`vig-loss ${(slipMode === "teaser" && teaserValue && teaserValue.evPercent >= 0) || (straightEv !== null && straightEv >= 0) ? "positive-value" : ""}`}><span>{slipMode === "teaser" || slipMode === "straight" ? "ESTIMATED EV" : "VALUE LOST"}</span><b>{slipMode === "teaser" ? teaserValue ? `${teaserValue.evPercent >= 0 ? "+" : ""}${teaserValue.evPercent.toFixed(1)}%` : "—" : slipMode === "straight" ? straightEv === null ? "—" : `${straightEv >= 0 ? "+" : ""}${straightEv.toFixed(1)}%` : slipValue ? `${slipValue.vigDragPercent.toFixed(1)}%` : "—"}</b><small>{slipMode === "teaser" ? teaserValue ? `${formatPercent(teaserValue.winProbability)} win · ${formatPercent(teaserValue.pushProbability)} push` : "Add exactly two priced teaser legs from different games" : slipMode === "straight" ? slip.length === 1 ? `${formatPercent(legBetProbability(slip[0]))} shrunk bet probability` : "Multiple straights save as separate picks" : slipValue ? `$${slipValue.lossPerUnitDollars.toFixed(2)} per 1u · latest leg +${slipValue.incrementalDragPercent.toFixed(1)}pp` : slip.length > 1 ? "Same-game or incomplete pair: withheld" : "Add a priced leg"}</small></div>
         </div>
-        <button className="save-slip" disabled={!slip.length || (slipMode === "teaser" && (!teaserValue || teaserValue.evPercent < 0))} onClick={saveSlip}>Approve team card</button>
+        <button className="save-slip" disabled={!slipCanApprove} onClick={saveSlip}>Approve team card</button>
         <p className="slip-message" aria-live="polite">{message}</p>
         <p className="value-note">Estimated value only. Approval never places a wager.</p>
       </aside>

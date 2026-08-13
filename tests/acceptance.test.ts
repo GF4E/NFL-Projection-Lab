@@ -1021,4 +1021,14 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(mainlines).toContain("compares contract EV rather than raw prices");
     expect(mainlines).not.toContain("americanPrice -");
   });
+
+  it("45. withholds synthetic same-game parlay pricing and labels multiple straights as separate", () => {
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(board).toContain("isPricedSlipApprovable");
+    expect(board).toContain('disabled={!slipCanApprove}');
+    expect(board).toContain('slipMode === "straight" ? slip.length === 1 ? formatOdds(slip[0].americanPrice) : "EACH"');
+    expect(board).toContain('slipValue ? formatOdds(combinedAmerican(slip)) : "—"');
+    expect(board).toContain("Same-game or incomplete pair: withheld");
+    expect(board).toContain("Multiple straights save as separate picks");
+  });
 });

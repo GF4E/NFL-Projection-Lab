@@ -111,3 +111,15 @@ export function analyzeSlipValue(legs: readonly ValueLeg[], unitDollars = 25): S
     hasSameGameCorrelation
   };
 }
+
+export function isPricedSlipApprovable(input: {
+  mode: "straight" | "parlay" | "teaser";
+  legCount: number;
+  standardValue: SlipValue | null;
+  teaserExpectedValuePercent: number | null;
+}): boolean {
+  if (input.legCount < 1) return false;
+  if (input.mode === "straight") return true;
+  if (input.mode === "parlay") return input.legCount >= 2 && input.standardValue !== null;
+  return input.legCount === 2 && input.teaserExpectedValuePercent !== null && input.teaserExpectedValuePercent >= 0;
+}
