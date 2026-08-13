@@ -10,6 +10,8 @@ export const NFLVERSE_URLS = {
     `https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_${season}.csv.gz`,
   pbpCsvPlain: (season: number) =>
     `https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_${season}.csv`,
+  playerStatsCsv: (season: number) =>
+    `https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_${season}.csv`,
   historicalInjuries: (season: number) =>
     `https://github.com/nflverse/nflverse-data/releases/download/injuries/injuries_${season}.csv`
 } as const;

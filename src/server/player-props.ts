@@ -1,12 +1,16 @@
 import { z } from "zod";
 import {
   PROP_MARKETS,
+  buildPlayerPropEvidence,
   scanMarketConfirmedProps,
+  type PlayerPropEvidence,
+  type PlayerPropHistoryRow,
   type PlayerPropBoard,
   type PropMarketKey,
   type RawPropQuote
 } from "@/domain/decision-board";
 import { stableHash } from "@/domain/hash";
+import { structuralConfig } from "@/domain/config";
 import { getD1 } from "../../db";
 import {
   assertOddsCreditsAvailable,
@@ -15,6 +19,7 @@ import {
   recordOddsQuota
 } from "./odds-quota";
 import { seasonSchedule } from "./weekly-slate";
+import { ensureNflverseStore } from "./nflverse/store";
 
 const CACHE_MS = 15 * 60_000;
 
@@ -68,6 +73,18 @@ interface QuoteRow {
   source_hash: string;
 }
 
+interface PlayerStatRow {
+  player_display_name: string;
+  season: number;
+  week: number;
+  attempts: number;
+  passing_yards: number;
+  carries: number;
+  rushing_yards: number;
+  targets: number;
+  receiving_yards: number;
+}
+
 const schema = [
   `CREATE TABLE IF NOT EXISTS player_prop_quotes (
     id text PRIMARY KEY NOT NULL, game_id text NOT NULL, event_id text NOT NULL, book text NOT NULL,
@@ -117,8 +134,53 @@ async function stateForGame(db: D1Database, gameId: string): Promise<StateRow | 
   return db.prepare("SELECT * FROM player_prop_scan_state WHERE game_id = ?").bind(gameId).first<StateRow>();
 }
 
-function board(gameId: string, state: StateRow | null, quotes: RawPropQuote[]): PlayerPropBoard {
-  const candidates = scanMarketConfirmedProps(quotes);
+async function playerEvidenceForGame(db: D1Database, gameId: string, quotes: readonly RawPropQuote[]): Promise<PlayerPropEvidence[]> {
+  const matchup = (await seasonSchedule({ db })).find((game) => game.id === gameId);
+  if (!matchup) return [];
+  const players = [...new Set(quotes.map((quote) => quote.player))];
+  if (!players.length) return [];
+  const rows: PlayerStatRow[] = [];
+  for (const group of chunks(players, 60)) {
+    const placeholders = group.map(() => "?").join(", ");
+    const result = await db.prepare(`SELECT player_display_name, season, week, attempts, passing_yards,
+        carries, rushing_yards, targets, receiving_yards
+      FROM nfl_player_week_stats
+      WHERE season_type = 'REG' AND season >= ?
+        AND (season < ? OR (season = ? AND week < ?))
+        AND player_display_name IN (${placeholders})
+      ORDER BY season DESC, week DESC`)
+      .bind(matchup.season - 2, matchup.season, matchup.season, matchup.week, ...group).all<PlayerStatRow>();
+    rows.push(...result.results);
+  }
+  const history: PlayerPropHistoryRow[] = rows.flatMap((row) => [
+    { player: row.player_display_name, market: "player_pass_yds" as const, season: row.season, week: row.week, value: row.passing_yards, opportunities: row.attempts },
+    { player: row.player_display_name, market: "player_rush_yds" as const, season: row.season, week: row.week, value: row.rushing_yards, opportunities: row.carries },
+    { player: row.player_display_name, market: "player_reception_yds" as const, season: row.season, week: row.week, value: row.receiving_yards, opportunities: row.targets }
+  ]);
+  const contracts = [...new Map(quotes.map((quote) => [
+    `${quote.market}:${quote.player}:${quote.side}:${quote.point}`,
+    { player: quote.player, market: quote.market, side: quote.side, point: quote.point }
+  ])).values()];
+  return contracts.flatMap((contract) => {
+    const evidence = buildPlayerPropEvidence(history, contract, {
+      minimumGames: structuralConfig.props.minimumHistoryGames,
+      windowGames: structuralConfig.props.historyWindowGames,
+      priorGames: structuralConfig.props.priorGames
+    });
+    return evidence ? [evidence] : [];
+  });
+}
+
+async function board(db: D1Database, gameId: string, state: StateRow | null, quotes: RawPropQuote[]): Promise<PlayerPropBoard> {
+  const evidence = await playerEvidenceForGame(db, gameId, quotes);
+  const candidates = scanMarketConfirmedProps(quotes, {
+    minimumReferenceBooks: structuralConfig.props.minimumReferenceBooks,
+    minimumExpectedValue: structuralConfig.props.minimumExpectedValue,
+    maximumPerBook: structuralConfig.props.maximumPerBook,
+    maximumSnapshotSkewMs: structuralConfig.props.maximumSnapshotSkewMinutes * 60_000,
+    evidence,
+    requireEvidence: true
+  });
   return {
     gameId,
     status: state?.status ?? "unavailable",
@@ -130,13 +192,19 @@ function board(gameId: string, state: StateRow | null, quotes: RawPropQuote[]): 
       remaining: state.quota_remaining ?? 0,
       lastCost: state.quota_last_cost ?? 0
     },
-    message: state?.message ?? (quotes.length ? "Cached market-confirmed props" : "Props have not been scanned for this game yet")
+    message: candidates.length
+      ? `Market and player-history confirmed · ${state?.message ?? "cached prices"}`
+      : quotes.length
+        ? evidence.length
+          ? "No prop cleared the market, player-history and worst-case EV gates"
+          : "Player-history baseline is not ready; market-only prop signals are withheld"
+        : state?.message ?? "Props have not been scanned for this game yet"
   };
 }
 
 export async function getPlayerPropBoard(gameId: string, db: D1Database = getD1()): Promise<PlayerPropBoard> {
-  await ensureStore(db);
-  return board(gameId, await stateForGame(db, gameId), await quotesForGame(db, gameId));
+  await Promise.all([ensureStore(db), ensureNflverseStore(db)]);
+  return board(db, gameId, await stateForGame(db, gameId), await quotesForGame(db, gameId));
 }
 
 async function resolveEventId(input: {
@@ -189,7 +257,7 @@ export async function refreshPlayerPropBoard(input: {
   const existing = await stateForGame(db, input.gameId);
   const cachedQuotes = await quotesForGame(db, input.gameId);
   if (!input.force && existing?.last_success_at && Date.now() - Date.parse(existing.last_success_at) < CACHE_MS) {
-    return board(input.gameId, existing, cachedQuotes);
+    return board(db, input.gameId, existing, cachedQuotes);
   }
   if (!input.apiKey) {
     await markState({ db, gameId: input.gameId, eventId: existing?.event_id ?? null, status: cachedQuotes.length ? "stale" : "unavailable", checkedAt, successAt: null, quota: null, message: "Player props need the private Odds API key" });

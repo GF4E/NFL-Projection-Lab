@@ -33,6 +33,17 @@ export interface StructuralConfig {
     maximumSidePositionsPerGame: number;
     maximumTotalsPerGame: number;
   };
+  props: {
+    minimumReferenceBooks: number;
+    minimumExpectedValue: number;
+    maximumPerBook: number;
+    maximumSnapshotSkewMinutes: number;
+    minimumHistoryGames: number;
+    historyWindowGames: number;
+    priorGames: number;
+    recencyWeight: number;
+    minimumHitRate: number;
+  };
   monitoring: {
     pushEdgeThreshold: number;
     calibrationSlope: number[];

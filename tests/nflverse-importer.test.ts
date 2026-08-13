@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { nflSeasonForDate, shouldRetryUncompressedPbp } from "@/server/nflverse/automation";
 import { parseCsvStream, textStream } from "@/server/nflverse/csv";
-import { aggregatePbpCsv, parseScheduleCsv } from "@/server/nflverse/transform";
+import { aggregatePbpCsv, parsePlayerStatsCsv, parseScheduleCsv } from "@/server/nflverse/transform";
 import { gradeStoredLeg } from "@/domain/settlement";
 
 const scheduleHeader = [
@@ -19,6 +19,12 @@ const pbpHeader = [
   "defteam", "game_date", "epa", "success", "yards_gained", "qb_dropback", "qb_kneel",
   "qb_spike", "rush_attempt", "pass_attempt", "interception", "fumble_lost", "play", "xpass",
   "pass_oe", "fixed_drive", "drive_time_of_possession"
+];
+
+const playerStatsHeader = [
+  "player_id", "player_name", "player_display_name", "position", "season", "week", "season_type",
+  "game_id", "team", "opponent_team", "attempts", "passing_yards", "carries", "rushing_yards",
+  "receptions", "targets", "receiving_yards"
 ];
 
 function csvRow(header: readonly string[], values: Record<string, string | number>): string {
@@ -81,6 +87,18 @@ describe("automatic nflverse importer", () => {
     expect(newEngland).toMatchObject({ turnovers: 1, turnoverRate: 0.5 });
   });
 
+  it("streams weekly player production for leakage-safe prop evidence", async () => {
+    const rows = [
+      playerStatsHeader.join(","),
+      csvRow(playerStatsHeader, { player_id: "qb1", player_name: "S.Darnold", player_display_name: "Sam Darnold", position: "QB", season: 2026, week: 1, season_type: "REG", game_id: "2026_01_NE_SEA", team: "SEA", opponent_team: "NE", attempts: 31, passing_yards: 268, carries: 3, rushing_yards: 12 }),
+      csvRow(playerStatsHeader, { player_id: "wr1", player_name: "J.Smith-Njigba", player_display_name: "Jaxon Smith-Njigba", position: "WR", season: 2026, week: 1, season_type: "REG", game_id: "2026_01_NE_SEA", team: "SEA", opponent_team: "NE", receptions: 7, targets: 10, receiving_yards: 96 })
+    ];
+    const stats = await parsePlayerStatsCsv(textStream(rows.join("\n"), 9), { season: 2026, currentSeason: 2026 });
+    expect(stats).toHaveLength(2);
+    expect(stats[0]).toMatchObject({ playerDisplayName: "Sam Darnold", attempts: 31, passingYards: 268 });
+    expect(stats[1]).toMatchObject({ playerDisplayName: "Jaxon Smith-Njigba", targets: 10, receivingYards: 96 });
+  });
+
   it("uses the NFL season year across the January boundary", () => {
     expect(nflSeasonForDate(new Date("2026-01-15T20:00:00Z"))).toBe(2025);
     expect(nflSeasonForDate(new Date("2026-08-11T20:00:00Z"))).toBe(2026);
@@ -96,6 +114,8 @@ describe("automatic nflverse importer", () => {
     expect(readFileSync("worker/index.ts", "utf8")).toContain("async scheduled");
     expect(readFileSync("src/app/layout.tsx", "utf8")).toContain("@fontsource/roboto/900.css");
     expect(readFileSync("src/app/globals.css", "utf8")).toContain('--display: "Roboto"');
+    expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).toContain("refreshPlayerStatsSeason");
+    expect(readFileSync("src/server/providers/nflverse.ts", "utf8")).toContain("stats_player_week_");
   });
 
   it("automatically grades supported team-card contracts from nflverse finals", () => {

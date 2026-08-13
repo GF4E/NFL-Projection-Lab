@@ -1,4 +1,4 @@
-import type { NflverseGame, TeamGameFeature } from "./transform";
+import type { NflverseGame, PlayerWeekStat, TeamGameFeature } from "./transform";
 
 export type ImportFreshness = "current" | "stale" | "running" | "unavailable";
 
@@ -183,10 +183,56 @@ const schemaStatements = [
     pass_rate_over_expectation real,
     PRIMARY KEY (import_id, id)
   )`,
+  `CREATE TABLE IF NOT EXISTS nfl_player_week_stats (
+    id text PRIMARY KEY NOT NULL,
+    player_id text NOT NULL,
+    player_name text NOT NULL,
+    player_display_name text NOT NULL,
+    position text,
+    season integer NOT NULL,
+    week integer NOT NULL,
+    season_type text NOT NULL,
+    game_id text NOT NULL,
+    team text NOT NULL,
+    opponent_team text NOT NULL,
+    attempts integer NOT NULL,
+    passing_yards real NOT NULL,
+    carries integer NOT NULL,
+    rushing_yards real NOT NULL,
+    receptions integer NOT NULL,
+    targets integer NOT NULL,
+    receiving_yards real NOT NULL,
+    source_hash text NOT NULL,
+    imported_at text NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS nfl_player_week_stats_stage (
+    import_id text NOT NULL,
+    id text NOT NULL,
+    player_id text NOT NULL,
+    player_name text NOT NULL,
+    player_display_name text NOT NULL,
+    position text,
+    season integer NOT NULL,
+    week integer NOT NULL,
+    season_type text NOT NULL,
+    game_id text NOT NULL,
+    team text NOT NULL,
+    opponent_team text NOT NULL,
+    attempts integer NOT NULL,
+    passing_yards real NOT NULL,
+    carries integer NOT NULL,
+    rushing_yards real NOT NULL,
+    receptions integer NOT NULL,
+    targets integer NOT NULL,
+    receiving_yards real NOT NULL,
+    PRIMARY KEY (import_id, id)
+  )`,
   "CREATE INDEX IF NOT EXISTS idx_nfl_games_season_week ON nfl_games (season, season_type, week)",
   "CREATE INDEX IF NOT EXISTS idx_nfl_games_date ON nfl_games (game_date)",
   "CREATE INDEX IF NOT EXISTS idx_nfl_features_season_week ON nfl_team_game_features (season, season_type, week)",
   "CREATE INDEX IF NOT EXISTS idx_nfl_features_team ON nfl_team_game_features (team, season, week)",
+  "CREATE INDEX IF NOT EXISTS idx_nfl_player_stats_name ON nfl_player_week_stats (player_display_name, season, week)",
+  "CREATE INDEX IF NOT EXISTS idx_nfl_player_stats_game ON nfl_player_week_stats (game_id)",
   "CREATE INDEX IF NOT EXISTS idx_nfl_alerts_unresolved ON nflverse_import_alerts (resolved_at, created_at)"
 ] as const;
 
@@ -203,6 +249,12 @@ const featureColumns = [
   "id", "game_id", "season", "season_type", "week", "game_date", "team", "opponent", "home_away",
   "plays", "epa_per_play", "success_rate", "explosive_rate", "turnovers", "turnover_rate",
   "seconds_per_play", "dropbacks", "pass_rate", "expected_pass_rate", "pass_rate_over_expectation"
+] as const;
+
+const playerStatColumns = [
+  "id", "player_id", "player_name", "player_display_name", "position", "season", "week", "season_type",
+  "game_id", "team", "opponent_team", "attempts", "passing_yards", "carries", "rushing_yards",
+  "receptions", "targets", "receiving_yards"
 ] as const;
 
 function chunks<T>(values: readonly T[], size: number): T[][] {
@@ -396,6 +448,51 @@ export async function publishTeamGameFeatures(input: {
         input.importedAt, input.importedAt, input.dataset
       ),
     input.db.prepare("DELETE FROM nfl_team_game_features_stage WHERE import_id = ?").bind(importId),
+    input.db.prepare("UPDATE nflverse_import_alerts SET resolved_at = ? WHERE dataset = ? AND resolved_at IS NULL")
+      .bind(input.importedAt, input.dataset)
+  ]);
+}
+
+function playerStatValues(importId: string, stat: PlayerWeekStat): unknown[] {
+  return [
+    importId, stat.id, stat.playerId, stat.playerName, stat.playerDisplayName, stat.position,
+    stat.season, stat.week, stat.seasonType, stat.gameId, stat.team, stat.opponent,
+    stat.attempts, stat.passingYards, stat.carries, stat.rushingYards, stat.receptions,
+    stat.targets, stat.receivingYards
+  ];
+}
+
+export async function publishPlayerWeekStats(input: {
+  db: D1Database;
+  dataset: string;
+  stats: readonly PlayerWeekStat[];
+  sourceUrl: string;
+  sourceTag: string | null;
+  sourceHash: string;
+  importedAt: string;
+}): Promise<void> {
+  const importId = `${input.dataset}:${input.sourceHash.slice(0, 16)}`;
+  await input.db.prepare("DELETE FROM nfl_player_week_stats_stage WHERE import_id = ?").bind(importId).run();
+  const placeholders = Array.from({ length: playerStatColumns.length + 1 }, () => "?").join(", ");
+  const insert = `INSERT OR REPLACE INTO nfl_player_week_stats_stage (import_id, ${playerStatColumns.join(", ")}) VALUES (${placeholders})`;
+  for (const batch of chunks(input.stats, 150)) {
+    await input.db.batch(batch.map((stat) => input.db.prepare(insert).bind(...playerStatValues(importId, stat))));
+  }
+  const updateColumns = playerStatColumns.slice(1).map((column) => `${column} = excluded.${column}`).join(", ");
+  await input.db.batch([
+    input.db.prepare(`INSERT INTO nfl_player_week_stats (${playerStatColumns.join(", ")}, source_hash, imported_at)
+      SELECT ${playerStatColumns.join(", ")}, ?, ? FROM nfl_player_week_stats_stage WHERE import_id = ?
+      ON CONFLICT(id) DO UPDATE SET ${updateColumns}, source_hash = excluded.source_hash,
+      imported_at = excluded.imported_at
+      WHERE nfl_player_week_stats.source_hash <> excluded.source_hash`).bind(input.sourceHash, input.importedAt, importId),
+    input.db.prepare(`UPDATE nflverse_import_state SET
+      freshness = 'current', source_url = ?, source_tag = ?, source_hash = ?, row_count = ?,
+      last_checked_at = ?, last_success_at = ?, last_error = NULL, lease_expires_at = NULL
+      WHERE dataset = ?`).bind(
+        input.sourceUrl, input.sourceTag, input.sourceHash, input.stats.length,
+        input.importedAt, input.importedAt, input.dataset
+      ),
+    input.db.prepare("DELETE FROM nfl_player_week_stats_stage WHERE import_id = ?").bind(importId),
     input.db.prepare("UPDATE nflverse_import_alerts SET resolved_at = ? WHERE dataset = ? AND resolved_at IS NULL")
       .bind(input.importedAt, input.dataset)
   ]);

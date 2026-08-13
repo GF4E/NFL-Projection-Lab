@@ -27,7 +27,7 @@ import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
 import { addTeamApproval, approvalActorForEmail, estimatedEvFromEdge, isTeamApproved, storedLegMatchesQuote, trackerRecordSummaries, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
-import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
+import { buildPlayerPropEvidence, crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
@@ -334,6 +334,31 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(candidates.every((candidate) => candidate.edgeInterval[0] > 0)).toBe(true);
     const mismatched = exact.map((row) => row.book === "bovada" ? { ...row, point: 250.5 } : row);
     expect(scanMarketConfirmedProps(mismatched)).toEqual([]);
+  });
+
+  it("23b. requires independent player history and time-aligned references for production prop cards", () => {
+    const pair = (book: string, capturedAt = "2026-09-09T18:00:00Z"): RawPropQuote[] => ([
+      { id: `${book}:over`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player: "Quarterback Jr.", side: "Over", point: 249.5, americanPrice: book === "betmgm" ? 120 : -130, capturedAt, sourceHash: "hash" },
+      { id: `${book}:under`, gameId: "ne-sea", eventId: "event", book, market: "player_pass_yds", player: "Quarterback Jr.", side: "Under", point: 249.5, americanPrice: book === "betmgm" ? -150 : 100, capturedAt, sourceHash: "hash" }
+    ]);
+    const quotes = [...pair("betmgm"), ...pair("fanduel"), ...pair("draftkings"), ...pair("bovada")];
+    const history = [288, 274, 305, 260, 281, 267, 292, 255].map((value, index) => ({
+      player: "Quarterback",
+      market: "player_pass_yds" as const,
+      season: 2025,
+      week: 18 - index,
+      value,
+      opportunities: 30
+    }));
+    const evidence = buildPlayerPropEvidence(history, { player: "Quarterback Jr.", market: "player_pass_yds", side: "Over", point: 249.5 });
+    expect(evidence).toMatchObject({ sampleGames: 8, side: "Over" });
+    expect(evidence!.projectedValue).toBeGreaterThan(249.5);
+    const candidates = scanMarketConfirmedProps(quotes, { evidence: [evidence!], requireEvidence: true, maximumSnapshotSkewMs: 10 * 60_000 });
+    expect(candidates).toHaveLength(1);
+    expect(candidates[0]).toMatchObject({ executionBook: "betmgm", sampleGames: 8 });
+    expect(candidates[0].betProbability).toBeGreaterThan(candidates[0].consensusProbability);
+    const stale = [...pair("betmgm"), ...pair("fanduel"), ...pair("draftkings"), ...pair("bovada", "2026-09-09T17:00:00Z")];
+    expect(scanMarketConfirmedProps(stale, { evidence: [evidence!], requireEvidence: true, maximumSnapshotSkewMs: 10 * 60_000 })).toEqual([]);
   });
 
   it("24. identifies classic Wong paths and derives crossed key numbers", () => {

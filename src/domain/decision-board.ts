@@ -1,4 +1,5 @@
-import { americanToDecimal, impliedToAmerican, powerDevig } from "./odds";
+import { americanToDecimal, impliedToAmerican, powerDevig, shrinkProbability } from "./odds";
+import { bootstrapEdgeInterval } from "./bootstrap";
 import { structuralConfig } from "./config";
 import { sizeKelly } from "./sizing";
 
@@ -362,6 +363,11 @@ export interface PropCandidate {
   americanPrice: number;
   executionFairProbability: number;
   consensusProbability: number;
+  betProbability: number;
+  modelProbability: number | null;
+  projectedValue: number | null;
+  sampleGames: number | null;
+  hitRate: number | null;
   consensusInterval: [number, number];
   edge: number;
   edgeInterval: [number, number];
@@ -371,6 +377,27 @@ export interface PropCandidate {
   unitsGreyed: boolean;
   referenceBooks: number;
   capturedAt: string;
+}
+
+export interface PlayerPropHistoryRow {
+  player: string;
+  market: PropMarketKey;
+  season: number;
+  week: number;
+  value: number;
+  opportunities: number;
+}
+
+export interface PlayerPropEvidence {
+  player: string;
+  market: PropMarketKey;
+  side: "Over" | "Under";
+  point: number;
+  sampleGames: number;
+  projectedValue: number;
+  hitRate: number;
+  modelProbability: number;
+  probabilityInterval: [number, number];
 }
 
 export interface PlayerPropBoard {
@@ -410,13 +437,72 @@ function deviggedQuotes(quotes: readonly RawPropQuote[]): Map<string, number> {
   return fair;
 }
 
+function normalizedPlayerName(value: string): string {
+  return value.toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b/g, "").replace(/[^a-z0-9]/g, "");
+}
+
+export function playerPropEvidenceKey(input: Pick<PlayerPropEvidence, "player" | "market" | "side" | "point">): string {
+  return `${input.market}:${normalizedPlayerName(input.player)}:${input.side}:${input.point}`;
+}
+
+export function buildPlayerPropEvidence(
+  history: readonly PlayerPropHistoryRow[],
+  contract: { player: string; market: PropMarketKey; side: "Over" | "Under"; point: number },
+  options: { minimumGames?: number; windowGames?: number; priorGames?: number } = {}
+): PlayerPropEvidence | null {
+  const minimumGames = options.minimumGames ?? structuralConfig.props.minimumHistoryGames;
+  const windowGames = options.windowGames ?? structuralConfig.props.historyWindowGames;
+  const priorGames = options.priorGames ?? structuralConfig.props.priorGames;
+  const playerKey = normalizedPlayerName(contract.player);
+  const samples = history
+    .filter((row) => normalizedPlayerName(row.player) === playerKey && row.market === contract.market && row.opportunities > 0)
+    .sort((left, right) => right.season - left.season || right.week - left.week)
+    .slice(0, windowGames);
+  if (samples.length < minimumGames) return null;
+  const weighted = samples.map((row, index) => ({ row, weight: structuralConfig.props.recencyWeight ** index }));
+  const totalWeight = weighted.reduce((sum, item) => sum + item.weight, 0);
+  const projectedValue = weighted.reduce((sum, item) => sum + item.row.value * item.weight, 0) / totalWeight;
+  const hits = weighted.map((item) => ({
+    edge: item.row.value === contract.point ? 0.5 : contract.side === "Over" ? Number(item.row.value > contract.point) : Number(item.row.value < contract.point),
+    weight: item.weight
+  }));
+  const weightedHits = hits.reduce((sum, item) => sum + item.edge * item.weight, 0);
+  const modelProbability = (weightedHits + priorGames * 0.5) / (totalWeight + priorGames);
+  const bootstrapRows = [
+    ...hits,
+    ...Array.from({ length: priorGames }, () => ({ edge: 0.5, weight: 1 }))
+  ];
+  const bootstrap = bootstrapEdgeInterval(
+    bootstrapRows,
+    structuralConfig.model.bootstrapMembers,
+    structuralConfig.model.bootstrapSeedStart
+  );
+  return {
+    ...contract,
+    sampleGames: samples.length,
+    projectedValue,
+    hitRate: weightedHits / totalWeight,
+    modelProbability,
+    probabilityInterval: bootstrap.interval
+  };
+}
+
 export function scanMarketConfirmedProps(
   quotes: readonly RawPropQuote[],
-  options: { minimumReferenceBooks?: number; minimumExpectedValue?: number; maximumPerBook?: number } = {}
+  options: {
+    minimumReferenceBooks?: number;
+    minimumExpectedValue?: number;
+    maximumPerBook?: number;
+    maximumSnapshotSkewMs?: number;
+    evidence?: readonly PlayerPropEvidence[];
+    requireEvidence?: boolean;
+  } = {}
 ): PropCandidate[] {
-  const minimumReferenceBooks = options.minimumReferenceBooks ?? 3;
-  const minimumExpectedValue = options.minimumExpectedValue ?? 0.02;
-  const maximumPerBook = options.maximumPerBook ?? 3;
+  const minimumReferenceBooks = options.minimumReferenceBooks ?? structuralConfig.props.minimumReferenceBooks;
+  const minimumExpectedValue = options.minimumExpectedValue ?? structuralConfig.props.minimumExpectedValue;
+  const maximumPerBook = options.maximumPerBook ?? structuralConfig.props.maximumPerBook;
+  const maximumSnapshotSkewMs = options.maximumSnapshotSkewMs ?? Number.POSITIVE_INFINITY;
+  const evidence = new Map((options.evidence ?? []).map((item) => [playerPropEvidenceKey(item), item]));
   const fair = deviggedQuotes(quotes);
   const candidates: PropCandidate[] = [];
   for (const quote of quotes) {
@@ -430,6 +516,7 @@ export function scanMarketConfirmedProps(
         reference.player === quote.player &&
         reference.side === quote.side &&
         reference.point === quote.point &&
+        Math.abs(Date.parse(reference.capturedAt) - Date.parse(quote.capturedAt)) <= maximumSnapshotSkewMs &&
         fair.has(reference.id)
       )
       .map((reference) => ({ book: reference.book, probability: fair.get(reference.id)! }));
@@ -437,13 +524,28 @@ export function scanMarketConfirmedProps(
       .sort((left, right) => left - right);
     if (onePerBook.length < minimumReferenceBooks) continue;
     const consensusProbability = percentile(onePerBook, 0.5);
-    const low = percentile(onePerBook, 0.2);
-    const high = percentile(onePerBook, 0.8);
-    const expectedValue = consensusProbability * americanToDecimal(quote.americanPrice) - 1;
-    const lowerBoundExpectedValue = low * americanToDecimal(quote.americanPrice) - 1;
+    const low = onePerBook[0];
+    const high = onePerBook.at(-1)!;
+    const playerEvidence = evidence.get(playerPropEvidenceKey(quote));
+    if (options.requireEvidence && !playerEvidence) continue;
+    if (playerEvidence) {
+      const aligns = quote.side === "Over" ? playerEvidence.projectedValue > quote.point : playerEvidence.projectedValue < quote.point;
+      if (!aligns || playerEvidence.hitRate < structuralConfig.props.minimumHitRate) continue;
+    }
+    const betProbability = playerEvidence
+      ? shrinkProbability(playerEvidence.modelProbability, consensusProbability, structuralConfig.model.shrinkageWeight)
+      : consensusProbability;
+    const intervalLow = playerEvidence
+      ? shrinkProbability(playerEvidence.probabilityInterval[0], low, structuralConfig.model.shrinkageWeight)
+      : low;
+    const intervalHigh = playerEvidence
+      ? shrinkProbability(playerEvidence.probabilityInterval[1], high, structuralConfig.model.shrinkageWeight)
+      : high;
+    const expectedValue = betProbability * americanToDecimal(quote.americanPrice) - 1;
+    const lowerBoundExpectedValue = intervalLow * americanToDecimal(quote.americanPrice) - 1;
     if (expectedValue < minimumExpectedValue || lowerBoundExpectedValue <= 0) continue;
-    const edgeInterval = [low - executionFairProbability, high - executionFairProbability] as [number, number];
-    const sizing = sizeKelly(consensusProbability, quote.americanPrice, edgeInterval, {
+    const edgeInterval = [intervalLow - executionFairProbability, intervalHigh - executionFairProbability] as [number, number];
+    const sizing = sizeKelly(betProbability, quote.americanPrice, edgeInterval, {
       referenceBankrollUnits: structuralConfig.sizing.referenceBankrollUnits,
       kellyFraction: structuralConfig.sizing.kellyFraction,
       increment: structuralConfig.sizing.roundDownUnits,
@@ -463,8 +565,13 @@ export function scanMarketConfirmedProps(
       americanPrice: quote.americanPrice,
       executionFairProbability,
       consensusProbability,
+      betProbability,
+      modelProbability: playerEvidence?.modelProbability ?? null,
+      projectedValue: playerEvidence?.projectedValue ?? null,
+      sampleGames: playerEvidence?.sampleGames ?? null,
+      hitRate: playerEvidence?.hitRate ?? null,
       consensusInterval: [low, high],
-      edge: consensusProbability - executionFairProbability,
+      edge: betProbability - executionFairProbability,
       edgeInterval,
       expectedValue,
       lowerBoundExpectedValue,

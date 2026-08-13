@@ -67,6 +67,27 @@ export interface TeamGameFeature {
   passRateOverExpectation: number | null;
 }
 
+export interface PlayerWeekStat {
+  id: string;
+  playerId: string;
+  playerName: string;
+  playerDisplayName: string;
+  position: string | null;
+  season: number;
+  week: number;
+  seasonType: string;
+  gameId: string;
+  team: string;
+  opponent: string;
+  attempts: number;
+  passingYards: number;
+  carries: number;
+  rushingYards: number;
+  receptions: number;
+  targets: number;
+  receivingYards: number;
+}
+
 const scheduleColumns = [
   "game_id", "season", "game_type", "week", "gameday", "weekday", "gametime",
   "away_team", "away_score", "home_team", "home_score", "location", "result", "total",
@@ -81,6 +102,12 @@ const pbpColumns = [
   "defteam", "game_date", "epa", "success", "yards_gained", "qb_dropback", "qb_kneel",
   "qb_spike", "rush_attempt", "pass_attempt", "interception", "fumble_lost", "play", "xpass",
   "pass_oe", "fixed_drive", "drive_time_of_possession"
+] as const;
+
+const playerStatColumns = [
+  "player_id", "player_name", "player_display_name", "position", "season", "week", "season_type",
+  "game_id", "team", "opponent_team", "attempts", "passing_yards", "carries", "rushing_yards",
+  "receptions", "targets", "receiving_yards"
 ] as const;
 
 function value(row: readonly string[], indexes: Map<string, number>, name: string): string {
@@ -327,4 +354,53 @@ export async function aggregatePbpCsv(
       passRateOverExpectation: aggregate.passOeCount ? aggregate.passOe / aggregate.passOeCount : null
     };
   });
+}
+
+export async function parsePlayerStatsCsv(
+  stream: ReadableStream<Uint8Array>,
+  options: { season: number; currentSeason: number }
+): Promise<PlayerWeekStat[]> {
+  const iterator = parseCsvStream(stream);
+  const first = await iterator.next();
+  if (first.done) throw new Error(`nflverse player stats ${options.season} returned no header`);
+  const indexes = requireColumns(first.value, playerStatColumns);
+  const stats: PlayerWeekStat[] = [];
+  const ids = new Set<string>();
+  for await (const row of iterator) {
+    const season = integer(value(row, indexes, "season"), "season");
+    if (season !== options.season) throw new Error(`nflverse player stats season validation failed for ${options.season}`);
+    const playerId = value(row, indexes, "player_id");
+    const gameId = value(row, indexes, "game_id");
+    const team = value(row, indexes, "team");
+    const playerDisplayName = value(row, indexes, "player_display_name");
+    if (!playerId || !gameId || !team || !playerDisplayName) continue;
+    const id = `${gameId}:${playerId}`;
+    if (ids.has(id)) throw new Error(`nflverse player stats validation failed: duplicate ${id}`);
+    ids.add(id);
+    stats.push({
+      id,
+      playerId,
+      playerName: value(row, indexes, "player_name"),
+      playerDisplayName,
+      position: nullableString(value(row, indexes, "position")),
+      season,
+      week: integer(value(row, indexes, "week"), "week"),
+      seasonType: value(row, indexes, "season_type"),
+      gameId,
+      team,
+      opponent: value(row, indexes, "opponent_team"),
+      attempts: nullableNumber(value(row, indexes, "attempts")) ?? 0,
+      passingYards: nullableNumber(value(row, indexes, "passing_yards")) ?? 0,
+      carries: nullableNumber(value(row, indexes, "carries")) ?? 0,
+      rushingYards: nullableNumber(value(row, indexes, "rushing_yards")) ?? 0,
+      receptions: nullableNumber(value(row, indexes, "receptions")) ?? 0,
+      targets: nullableNumber(value(row, indexes, "targets")) ?? 0,
+      receivingYards: nullableNumber(value(row, indexes, "receiving_yards")) ?? 0
+    });
+  }
+  const minimumRows = options.season < options.currentSeason ? 1_000 : 1;
+  if (stats.length < minimumRows) {
+    throw new Error(`nflverse player stats ${options.season} row-count validation failed: ${stats.length}`);
+  }
+  return stats;
 }

@@ -8,11 +8,12 @@ import {
   getNflverseImportState,
   listNflverseImportStates,
   markImportUnavailable,
+  publishPlayerWeekStats,
   publishSchedules,
   publishTeamGameFeatures,
   recordImportSuccess
 } from "./store";
-import { aggregatePbpCsv, parseScheduleCsv } from "./transform";
+import { aggregatePbpCsv, parsePlayerStatsCsv, parseScheduleCsv } from "./transform";
 
 const LIVE_SCHEDULE_DATASET = "schedules:live";
 const HISTORY_SCHEDULE_DATASET = "schedules:history";
@@ -26,6 +27,9 @@ export interface NflverseAutomationResult {
   playByPlay: "updated" | "unchanged" | "unavailable" | "skipped";
   playByPlaySeason: number | null;
   teamGameRows: number;
+  playerStats: "updated" | "unchanged" | "unavailable" | "skipped";
+  playerStatsSeason: number | null;
+  playerStatRows: number;
 }
 
 function pacificParts(date: Date): { year: number; month: number; weekday: string; hour: number; dayKey: string } {
@@ -249,6 +253,69 @@ async function refreshPbpSeason(input: {
   }
 }
 
+async function refreshPlayerStatsSeason(input: {
+  db: D1Database;
+  season: number;
+  currentSeason: number;
+  now: Date;
+  fetcher: typeof fetch;
+}): Promise<{ state: "updated" | "unchanged" | "unavailable" | "skipped"; rows: number }> {
+  const dataset = `player_stats:${input.season}`;
+  const sourceUrl = NFLVERSE_URLS.playerStatsCsv(input.season);
+  const checkedAt = input.now.toISOString();
+  const previous = await getNflverseImportState(input.db, dataset);
+  const acquired = await acquireImportLease({
+    db: input.db,
+    dataset,
+    sourceUrl,
+    checkedAt,
+    leaseMilliseconds: 20 * 60_000
+  });
+  if (!acquired) return { state: "skipped", rows: 0 };
+  try {
+    const headers = new Headers();
+    if (previous?.sourceTag) headers.set("if-none-match", previous.sourceTag);
+    const response = await input.fetcher(sourceUrl, { cache: "no-store", headers });
+    if (response.status === 304) {
+      await completeUnchangedImport({ db: input.db, dataset, checkedAt, sourceTag: previous?.sourceTag ?? null });
+      return { state: "unchanged", rows: previous?.rowCount ?? 0 };
+    }
+    if (response.status === 404 && input.season === input.currentSeason) {
+      await markImportUnavailable({
+        db: input.db,
+        dataset,
+        checkedAt,
+        message: `Weekly player stats for ${input.season} have not been published by nflverse yet`
+      });
+      return { state: "unavailable", rows: 0 };
+    }
+    if (!response.ok) throw new Error(`nflverse player stats ${input.season} fetch failed with HTTP ${response.status}`);
+    if (!response.body) throw new Error(`nflverse player stats ${input.season} returned an empty body`);
+    const hash = createHash("sha256");
+    const stream = response.body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, controller) {
+        hash.update(chunk);
+        controller.enqueue(chunk);
+      }
+    }));
+    const stats = await parsePlayerStatsCsv(stream, { season: input.season, currentSeason: input.currentSeason });
+    await publishPlayerWeekStats({
+      db: input.db,
+      dataset,
+      stats,
+      sourceUrl,
+      sourceTag: etag(response),
+      sourceHash: hash.digest("hex"),
+      importedAt: checkedAt
+    });
+    return { state: "updated", rows: stats.length };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : `Unknown nflverse player stats ${input.season} failure`;
+    await failNflverseImport({ db: input.db, dataset, failedAt: checkedAt, message });
+    throw error;
+  }
+}
+
 function checkedToday(lastCheckedAt: string | null, dayKey: string): boolean {
   if (!lastCheckedAt) return false;
   const parsed = new Date(lastCheckedAt);
@@ -275,6 +342,9 @@ export async function runNflverseAutomation(input: {
   let playByPlay: NflverseAutomationResult["playByPlay"] = "skipped";
   let playByPlaySeason: number | null = null;
   let teamGameRows = 0;
+  let playerStats: NflverseAutomationResult["playerStats"] = "skipped";
+  let playerStatsSeason: number | null = null;
+  let playerStatRows = 0;
   const nightlyPbpIsDue = parts.hour >= 1;
   if ((input.allowPlayByPlay ?? true) && nightlyPbpIsDue) {
     const currentState = await getNflverseImportState(input.db, `pbp:${currentSeason}`);
@@ -297,6 +367,28 @@ export async function runNflverseAutomation(input: {
       playByPlaySeason = backfillSeason;
       teamGameRows = backfill.rows;
     }
+
+    const currentPlayerState = await getNflverseImportState(input.db, `player_stats:${currentSeason}`);
+    if (!checkedToday(currentPlayerState?.lastCheckedAt ?? null, parts.dayKey)) {
+      const current = await refreshPlayerStatsSeason({ db: input.db, season: currentSeason, currentSeason, now, fetcher });
+      playerStats = current.state;
+      playerStatsSeason = currentSeason;
+      playerStatRows = current.rows;
+    }
+    const refreshedStates = await listNflverseImportStates(input.db);
+    const importedPlayerStats = new Set(refreshedStates
+      .filter((state) => state.dataset.startsWith("player_stats:") && state.lastSuccessAt)
+      .map((state) => state.dataset));
+    const playerBackfillSeason = Array.from(
+      { length: Math.min(2, currentSeason - structuralConfig.model.trainingStartSeason) },
+      (_, index) => currentSeason - 1 - index
+    ).find((season) => !importedPlayerStats.has(`player_stats:${season}`));
+    if (playerBackfillSeason !== undefined) {
+      const backfill = await refreshPlayerStatsSeason({ db: input.db, season: playerBackfillSeason, currentSeason, now, fetcher });
+      playerStats = backfill.state;
+      playerStatsSeason = playerBackfillSeason;
+      playerStatRows = backfill.rows;
+    }
   }
 
   return {
@@ -305,6 +397,9 @@ export async function runNflverseAutomation(input: {
     scheduleRows: schedules.rows,
     playByPlay,
     playByPlaySeason,
-    teamGameRows
+    teamGameRows,
+    playerStats,
+    playerStatsSeason,
+    playerStatRows
   };
 }
