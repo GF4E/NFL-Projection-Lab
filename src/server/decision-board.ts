@@ -506,7 +506,8 @@ export async function buildDecisionBoard(
     db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line,
         roof, temperature, wind, away_moneyline, home_moneyline
-      FROM nfl_games WHERE season BETWEEN 2010 AND ? AND result IS NOT NULL AND spread_line IS NOT NULL
+      FROM nfl_games WHERE season BETWEEN 2010 AND ? AND season_type = 'REG'
+        AND result IS NOT NULL AND spread_line IS NOT NULL
         AND (season < ? OR week < ?)
       ORDER BY game_date, game_id`).bind(slate.season, slate.season, slate.week).all<GameRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, team, opponent, plays, epa_per_play, success_rate, explosive_rate,

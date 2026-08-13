@@ -733,6 +733,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const store = readFileSync("src/server/model-lifecycle/store.ts", "utf8");
     expect(store).toContain("team_strength_states_stage");
     expect(store).toContain("rolling_feature_states_stage");
+    const decisionBoard = readFileSync("src/server/decision-board.ts", "utf8");
+    expect(decisionBoard).toContain("season_type = 'REG'");
+    expect(decisionBoard).toContain("loopAStateMatchesRevision");
+    expect(decisionBoard).toContain("strengthStates(gameResult.results)");
     const weatherStore = readFileSync("src/server/weather/store.ts", "utf8");
     const weatherAutomation = readFileSync("src/server/weather/automation.ts", "utf8");
     expect(weatherStore).toContain("kickoff_weather_stage");
