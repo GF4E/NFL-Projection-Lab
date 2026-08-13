@@ -8,12 +8,13 @@ import {
   getNflverseImportState,
   listNflverseImportStates,
   markImportUnavailable,
+  publishPlayerSnapCounts,
   publishPlayerWeekStats,
   publishSchedules,
   publishTeamGameFeatures,
   recordImportSuccess
 } from "./store";
-import { aggregatePbpCsv, parsePlayerStatsCsv, parseScheduleCsv } from "./transform";
+import { aggregatePbpCsv, parsePlayerStatsCsv, parseScheduleCsv, parseSnapCountsCsv } from "./transform";
 
 const LIVE_SCHEDULE_DATASET = "schedules:live";
 const HISTORY_SCHEDULE_DATASET = "schedules:history";
@@ -30,6 +31,8 @@ export interface NflverseAutomationResult {
   playerStats: "updated" | "unchanged" | "unavailable" | "skipped";
   playerStatsSeason: number | null;
   playerStatRows: number;
+  snapCounts: "updated" | "unchanged" | "unavailable" | "skipped";
+  snapCountRows: number;
 }
 
 function pacificParts(date: Date): { year: number; month: number; weekday: string; hour: number; dayKey: string } {
@@ -316,6 +319,58 @@ async function refreshPlayerStatsSeason(input: {
   }
 }
 
+async function refreshSnapCountsSeason(input: {
+  db: D1Database;
+  season: number;
+  currentSeason: number;
+  now: Date;
+  fetcher: typeof fetch;
+}): Promise<{ state: "updated" | "unchanged" | "unavailable" | "skipped"; rows: number }> {
+  const dataset = `snap_counts:${input.season}`;
+  const sourceUrl = NFLVERSE_URLS.snapCountsCsv(input.season);
+  const checkedAt = input.now.toISOString();
+  const previous = await getNflverseImportState(input.db, dataset);
+  const acquired = await acquireImportLease({ db: input.db, dataset, sourceUrl, checkedAt, leaseMilliseconds: 20 * 60_000 });
+  if (!acquired) return { state: "skipped", rows: 0 };
+  try {
+    const headers = new Headers();
+    if (previous?.sourceTag) headers.set("if-none-match", previous.sourceTag);
+    const response = await input.fetcher(sourceUrl, { cache: "no-store", headers });
+    if (response.status === 304) {
+      await completeUnchangedImport({ db: input.db, dataset, checkedAt, sourceTag: previous?.sourceTag ?? null });
+      return { state: "unchanged", rows: previous?.rowCount ?? 0 };
+    }
+    if (response.status === 404 && input.season === input.currentSeason) {
+      await markImportUnavailable({ db: input.db, dataset, checkedAt, message: `Snap counts for ${input.season} have not been published by nflverse yet` });
+      return { state: "unavailable", rows: 0 };
+    }
+    if (!response.ok) throw new Error(`nflverse snap counts ${input.season} fetch failed with HTTP ${response.status}`);
+    if (!response.body) throw new Error(`nflverse snap counts ${input.season} returned an empty body`);
+    const hash = createHash("sha256");
+    const stream = response.body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
+      transform(chunk, controller) {
+        hash.update(chunk);
+        controller.enqueue(chunk);
+      }
+    }));
+    const counts = await parseSnapCountsCsv(stream, { season: input.season, currentSeason: input.currentSeason });
+    await publishPlayerSnapCounts({
+      db: input.db,
+      dataset,
+      counts,
+      sourceUrl,
+      sourceTag: etag(response),
+      sourceHash: hash.digest("hex"),
+      importedAt: checkedAt
+    });
+    return { state: "updated", rows: counts.length };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : `Unknown nflverse snap counts ${input.season} failure`;
+    await failNflverseImport({ db: input.db, dataset, failedAt: checkedAt, message });
+    throw error;
+  }
+}
+
 function checkedToday(lastCheckedAt: string | null, dayKey: string): boolean {
   if (!lastCheckedAt) return false;
   const parsed = new Date(lastCheckedAt);
@@ -345,6 +400,8 @@ export async function runNflverseAutomation(input: {
   let playerStats: NflverseAutomationResult["playerStats"] = "skipped";
   let playerStatsSeason: number | null = null;
   let playerStatRows = 0;
+  let snapCounts: NflverseAutomationResult["snapCounts"] = "skipped";
+  let snapCountRows = 0;
   const nightlyPbpIsDue = parts.hour >= 1;
   if ((input.allowPlayByPlay ?? true) && nightlyPbpIsDue) {
     const currentState = await getNflverseImportState(input.db, `pbp:${currentSeason}`);
@@ -389,6 +446,12 @@ export async function runNflverseAutomation(input: {
       playerStatsSeason = playerBackfillSeason;
       playerStatRows = backfill.rows;
     }
+    const currentSnapState = await getNflverseImportState(input.db, `snap_counts:${currentSeason}`);
+    if (!checkedToday(currentSnapState?.lastCheckedAt ?? null, parts.dayKey)) {
+      const current = await refreshSnapCountsSeason({ db: input.db, season: currentSeason, currentSeason, now, fetcher });
+      snapCounts = current.state;
+      snapCountRows = current.rows;
+    }
   }
 
   return {
@@ -400,6 +463,8 @@ export async function runNflverseAutomation(input: {
     teamGameRows,
     playerStats,
     playerStatsSeason,
-    playerStatRows
+    playerStatRows,
+    snapCounts,
+    snapCountRows
   };
 }

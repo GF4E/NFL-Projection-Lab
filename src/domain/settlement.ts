@@ -2,6 +2,7 @@ import type { SettledPick, TeamPickRevision } from "./types";
 import type { PlayResult, PlayType, StoredPlayLeg } from "./play-card";
 import { americanToDecimal } from "./odds";
 import { normalizeScheduleTeam } from "./weekly-slate";
+import type { PropMarketKey } from "./decision-board";
 
 export interface CompletedGame {
   gameId: string;
@@ -10,6 +11,16 @@ export interface CompletedGame {
   awayScore: number;
   homeScore: number;
   sourceHash?: string;
+}
+
+export interface CompletedPlayerProp {
+  sourceQuoteId: string;
+  gameId: string;
+  player: string;
+  market: PropMarketKey;
+  value: number | null;
+  sourceHash: string;
+  voided: boolean;
 }
 
 function selectedMargin(leg: StoredPlayLeg, game: CompletedGame): number | null {
@@ -21,9 +32,24 @@ function selectedMargin(leg: StoredPlayLeg, game: CompletedGame): number | null 
 
 export function gradeStoredLeg(
   leg: StoredPlayLeg,
-  game: CompletedGame
-): Exclude<PlayResult, "pending" | "void"> | null {
-  if (leg.gameId !== game.gameId || leg.market === "prop") return null;
+  game: CompletedGame,
+  propOutcomes: ReadonlyMap<string, CompletedPlayerProp> = new Map()
+): Exclude<PlayResult, "pending"> | null {
+  if (leg.gameId !== game.gameId) return null;
+  if (leg.market === "prop") {
+    if (!leg.sourceQuoteId || leg.point === null) return null;
+    const outcome = propOutcomes.get(leg.sourceQuoteId);
+    if (!outcome || outcome.gameId !== leg.gameId) return null;
+    if (outcome.voided) return "void";
+    if (outcome.value === null) return null;
+    const difference = outcome.value - leg.point;
+    const graded = leg.side.toLowerCase() === "over"
+      ? difference
+      : leg.side.toLowerCase() === "under"
+        ? -difference
+        : Number.NaN;
+    return !Number.isFinite(graded) ? null : graded > 0 ? "win" : graded < 0 ? "loss" : "push";
+  }
   if (leg.market === "total") {
     if (leg.point === null) return null;
     const difference = game.homeScore + game.awayScore - leg.point;
@@ -44,25 +70,28 @@ export function gradeStoredLeg(
 
 export function gradeStoredPlay(
   play: { playType: PlayType; americanOdds: number; stakeCents: number; contract: readonly StoredPlayLeg[] },
-  games: ReadonlyMap<string, CompletedGame>
-): { result: Exclude<PlayResult, "pending" | "void">; profitCents: number } | null {
+  games: ReadonlyMap<string, CompletedGame>,
+  propOutcomes: ReadonlyMap<string, CompletedPlayerProp> = new Map()
+): { result: Exclude<PlayResult, "pending">; profitCents: number } | null {
   const legs = [...play.contract];
   if (!legs.length) return null;
   const results = legs.map((leg) => {
     const game = games.get(leg.gameId);
-    return game ? gradeStoredLeg(leg, game) : null;
+    return game ? gradeStoredLeg(leg, game, propOutcomes) : null;
   });
   if (results.some((result) => result === null)) return null;
   if (results.some((result) => result === "loss")) return { result: "loss", profitCents: -play.stakeCents };
-  const pushIndexes = results.flatMap((result, index) => result === "push" ? [index] : []);
-  if (!pushIndexes.length) {
+  const excludedIndexes = results.flatMap((result, index) => result === "push" || result === "void" ? [index] : []);
+  if (!excludedIndexes.length) {
     return { result: "win", profitCents: Math.round(play.stakeCents * (americanToDecimal(play.americanOdds) - 1)) };
   }
-  if (pushIndexes.length === legs.length || legs.length === 1) return { result: "push", profitCents: 0 };
+  if (excludedIndexes.length === legs.length || legs.length === 1) {
+    return { result: results.some((result) => result === "void") ? "void" : "push", profitCents: 0 };
+  }
   if (play.playType === "teaser" && legs.length === 2) return { result: "push", profitCents: 0 };
   if (play.playType === "parlay") {
     const remainingDecimal = legs.reduce((product, leg, index) =>
-      pushIndexes.includes(index) ? product : product * americanToDecimal(leg.americanPrice), 1);
+      excludedIndexes.includes(index) ? product : product * americanToDecimal(leg.americanPrice), 1);
     return { result: "win", profitCents: Math.round(play.stakeCents * (remainingDecimal - 1)) };
   }
   return null;

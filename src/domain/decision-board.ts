@@ -437,12 +437,12 @@ function deviggedQuotes(quotes: readonly RawPropQuote[]): Map<string, number> {
   return fair;
 }
 
-function normalizedPlayerName(value: string): string {
+export function normalizePropPlayerName(value: string): string {
   return value.toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b/g, "").replace(/[^a-z0-9]/g, "");
 }
 
 export function playerPropEvidenceKey(input: Pick<PlayerPropEvidence, "player" | "market" | "side" | "point">): string {
-  return `${input.market}:${normalizedPlayerName(input.player)}:${input.side}:${input.point}`;
+  return `${input.market}:${normalizePropPlayerName(input.player)}:${input.side}:${input.point}`;
 }
 
 export function buildPlayerPropEvidence(
@@ -453,9 +453,9 @@ export function buildPlayerPropEvidence(
   const minimumGames = options.minimumGames ?? structuralConfig.props.minimumHistoryGames;
   const windowGames = options.windowGames ?? structuralConfig.props.historyWindowGames;
   const priorGames = options.priorGames ?? structuralConfig.props.priorGames;
-  const playerKey = normalizedPlayerName(contract.player);
+  const playerKey = normalizePropPlayerName(contract.player);
   const samples = history
-    .filter((row) => normalizedPlayerName(row.player) === playerKey && row.market === contract.market && row.opportunities > 0)
+    .filter((row) => normalizePropPlayerName(row.player) === playerKey && row.market === contract.market && row.opportunities > 0)
     .sort((left, right) => right.season - left.season || right.week - left.week)
     .slice(0, windowGames);
   if (samples.length < minimumGames) return null;

@@ -1,4 +1,4 @@
-import type { NflverseGame, PlayerWeekStat, TeamGameFeature } from "./transform";
+import type { NflverseGame, PlayerSnapCount, PlayerWeekStat, TeamGameFeature } from "./transform";
 
 export type ImportFreshness = "current" | "stale" | "running" | "unavailable";
 
@@ -227,12 +227,45 @@ const schemaStatements = [
     receiving_yards real NOT NULL,
     PRIMARY KEY (import_id, id)
   )`,
+  `CREATE TABLE IF NOT EXISTS nfl_player_snap_counts (
+    id text PRIMARY KEY NOT NULL,
+    game_id text NOT NULL,
+    season integer NOT NULL,
+    game_type text NOT NULL,
+    week integer NOT NULL,
+    player text NOT NULL,
+    position text,
+    team text NOT NULL,
+    opponent text NOT NULL,
+    offense_snaps integer NOT NULL,
+    defense_snaps integer NOT NULL,
+    special_teams_snaps integer NOT NULL,
+    source_hash text NOT NULL,
+    imported_at text NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS nfl_player_snap_counts_stage (
+    import_id text NOT NULL,
+    id text NOT NULL,
+    game_id text NOT NULL,
+    season integer NOT NULL,
+    game_type text NOT NULL,
+    week integer NOT NULL,
+    player text NOT NULL,
+    position text,
+    team text NOT NULL,
+    opponent text NOT NULL,
+    offense_snaps integer NOT NULL,
+    defense_snaps integer NOT NULL,
+    special_teams_snaps integer NOT NULL,
+    PRIMARY KEY (import_id, id)
+  )`,
   "CREATE INDEX IF NOT EXISTS idx_nfl_games_season_week ON nfl_games (season, season_type, week)",
   "CREATE INDEX IF NOT EXISTS idx_nfl_games_date ON nfl_games (game_date)",
   "CREATE INDEX IF NOT EXISTS idx_nfl_features_season_week ON nfl_team_game_features (season, season_type, week)",
   "CREATE INDEX IF NOT EXISTS idx_nfl_features_team ON nfl_team_game_features (team, season, week)",
   "CREATE INDEX IF NOT EXISTS idx_nfl_player_stats_name ON nfl_player_week_stats (player_display_name, season, week)",
   "CREATE INDEX IF NOT EXISTS idx_nfl_player_stats_game ON nfl_player_week_stats (game_id)",
+  "CREATE INDEX IF NOT EXISTS idx_nfl_snap_counts_game_player ON nfl_player_snap_counts (game_id, player)",
   "CREATE INDEX IF NOT EXISTS idx_nfl_alerts_unresolved ON nflverse_import_alerts (resolved_at, created_at)"
 ] as const;
 
@@ -255,6 +288,11 @@ const playerStatColumns = [
   "id", "player_id", "player_name", "player_display_name", "position", "season", "week", "season_type",
   "game_id", "team", "opponent_team", "attempts", "passing_yards", "carries", "rushing_yards",
   "receptions", "targets", "receiving_yards"
+] as const;
+
+const snapCountColumns = [
+  "id", "game_id", "season", "game_type", "week", "player", "position", "team", "opponent",
+  "offense_snaps", "defense_snaps", "special_teams_snaps"
 ] as const;
 
 function chunks<T>(values: readonly T[], size: number): T[][] {
@@ -493,6 +531,54 @@ export async function publishPlayerWeekStats(input: {
         input.importedAt, input.importedAt, input.dataset
       ),
     input.db.prepare("DELETE FROM nfl_player_week_stats_stage WHERE import_id = ?").bind(importId),
+    input.db.prepare("UPDATE nflverse_import_alerts SET resolved_at = ? WHERE dataset = ? AND resolved_at IS NULL")
+      .bind(input.importedAt, input.dataset)
+  ]);
+}
+
+function snapCountValues(importId: string, count: PlayerSnapCount): unknown[] {
+  return [
+    importId, count.id, count.gameId, count.season, count.gameType, count.week, count.player,
+    count.position, count.team, count.opponent, count.offenseSnaps, count.defenseSnaps, count.specialTeamsSnaps
+  ];
+}
+
+export async function publishPlayerSnapCounts(input: {
+  db: D1Database;
+  dataset: string;
+  counts: readonly PlayerSnapCount[];
+  sourceUrl: string;
+  sourceTag: string | null;
+  sourceHash: string;
+  importedAt: string;
+}): Promise<void> {
+  const importId = `${input.dataset}:${input.sourceHash.slice(0, 16)}`;
+  await input.db.prepare("DELETE FROM nfl_player_snap_counts_stage WHERE import_id = ?").bind(importId).run();
+  const placeholders = Array.from({ length: snapCountColumns.length + 1 }, () => "?").join(", ");
+  const insert = `INSERT OR REPLACE INTO nfl_player_snap_counts_stage (import_id, ${snapCountColumns.join(", ")}) VALUES (${placeholders})`;
+  for (const batch of chunks(input.counts, 175)) {
+    await input.db.batch(batch.map((count) => input.db.prepare(insert).bind(...snapCountValues(importId, count))));
+  }
+  const updateColumns = snapCountColumns.slice(1).map((column) => `${column} = excluded.${column}`).join(", ");
+  const season = input.counts[0]?.season;
+  if (season === undefined) throw new Error("Cannot publish an empty nflverse snap-count dataset");
+  await input.db.batch([
+    input.db.prepare(`DELETE FROM nfl_player_snap_counts WHERE season = ?
+      AND id NOT IN (SELECT id FROM nfl_player_snap_counts_stage WHERE import_id = ?)`)
+      .bind(season, importId),
+    input.db.prepare(`INSERT INTO nfl_player_snap_counts (${snapCountColumns.join(", ")}, source_hash, imported_at)
+      SELECT ${snapCountColumns.join(", ")}, ?, ? FROM nfl_player_snap_counts_stage WHERE import_id = ?
+      ON CONFLICT(id) DO UPDATE SET ${updateColumns}, source_hash = excluded.source_hash,
+      imported_at = excluded.imported_at
+      WHERE nfl_player_snap_counts.source_hash <> excluded.source_hash`).bind(input.sourceHash, input.importedAt, importId),
+    input.db.prepare(`UPDATE nflverse_import_state SET
+      freshness = 'current', source_url = ?, source_tag = ?, source_hash = ?, row_count = ?,
+      last_checked_at = ?, last_success_at = ?, last_error = NULL, lease_expires_at = NULL
+      WHERE dataset = ?`).bind(
+        input.sourceUrl, input.sourceTag, input.sourceHash, input.counts.length,
+        input.importedAt, input.importedAt, input.dataset
+      ),
+    input.db.prepare("DELETE FROM nfl_player_snap_counts_stage WHERE import_id = ?").bind(importId),
     input.db.prepare("UPDATE nflverse_import_alerts SET resolved_at = ? WHERE dataset = ? AND resolved_at IS NULL")
       .bind(input.importedAt, input.dataset)
   ]);

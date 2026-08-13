@@ -97,12 +97,21 @@ const schema = [
     american_price integer NOT NULL, captured_at text NOT NULL, source_hash text NOT NULL,
     PRIMARY KEY (import_id, id)
   )`,
+  `CREATE TABLE IF NOT EXISTS player_prop_quote_snapshots (
+    snapshot_key text NOT NULL, line_id text NOT NULL, game_id text NOT NULL, event_id text NOT NULL,
+    book text NOT NULL, market text NOT NULL, player text NOT NULL, side text NOT NULL,
+    point real NOT NULL, american_price integer NOT NULL, captured_at text NOT NULL,
+    source_hash text NOT NULL, fetched_at text NOT NULL,
+    PRIMARY KEY (snapshot_key, line_id)
+  )`,
   `CREATE TABLE IF NOT EXISTS player_prop_scan_state (
     game_id text PRIMARY KEY NOT NULL, event_id text, status text NOT NULL, last_checked_at text,
     last_success_at text, quota_used integer, quota_remaining integer, quota_last_cost integer, message text
   )`,
   "CREATE INDEX IF NOT EXISTS idx_prop_quotes_game_book ON player_prop_quotes (game_id, book)",
   "CREATE INDEX IF NOT EXISTS idx_prop_quotes_contract ON player_prop_quotes (game_id, market, player, point)",
+  "CREATE INDEX IF NOT EXISTS idx_prop_snapshots_game_time ON player_prop_quote_snapshots (game_id, fetched_at)",
+  "CREATE INDEX IF NOT EXISTS idx_prop_snapshots_line ON player_prop_quote_snapshots (line_id)",
   "CREATE INDEX IF NOT EXISTS idx_prop_stage_import ON player_prop_quotes_stage (import_id)"
 ] as const;
 
@@ -112,7 +121,7 @@ function chunks<T>(values: readonly T[], size: number): T[][] {
   return output;
 }
 
-async function ensureStore(db: D1Database): Promise<void> {
+export async function ensurePlayerPropStore(db: D1Database): Promise<void> {
   await db.batch(schema.map((statement) => db.prepare(statement)));
 }
 
@@ -203,7 +212,7 @@ async function board(db: D1Database, gameId: string, state: StateRow | null, quo
 }
 
 export async function getPlayerPropBoard(gameId: string, db: D1Database = getD1()): Promise<PlayerPropBoard> {
-  await Promise.all([ensureStore(db), ensureNflverseStore(db)]);
+  await Promise.all([ensurePlayerPropStore(db), ensureNflverseStore(db)]);
   return board(db, gameId, await stateForGame(db, gameId), await quotesForGame(db, gameId));
 }
 
@@ -252,7 +261,7 @@ export async function refreshPlayerPropBoard(input: {
 }): Promise<PlayerPropBoard> {
   const db = input.db ?? getD1();
   const fetcher = input.fetcher ?? fetch;
-  await ensureStore(db);
+  await ensurePlayerPropStore(db);
   const checkedAt = new Date().toISOString();
   const existing = await stateForGame(db, input.gameId);
   const cachedQuotes = await quotesForGame(db, input.gameId);
@@ -309,7 +318,8 @@ export async function refreshPlayerPropBoard(input: {
       await markState({ db, gameId: input.gameId, eventId, status: cachedQuotes.length ? "stale" : "unavailable", checkedAt, successAt: null, quota, message: "Player props are not posted yet; the last good board was preserved" });
       return getPlayerPropBoard(input.gameId, db);
     }
-    importId = crypto.randomUUID();
+    importId = `props:${input.gameId}:${sourceHash.slice(0, 16)}`;
+    await db.prepare("DELETE FROM player_prop_quotes_stage WHERE import_id = ?").bind(importId).run();
     for (const group of chunks(quotes, 75)) {
       await db.batch(group.map((quote) => db.prepare(`INSERT OR REPLACE INTO player_prop_quotes_stage (
           import_id, id, game_id, event_id, book, market, player, side, point, american_price, captured_at, source_hash
@@ -324,6 +334,12 @@ export async function refreshPlayerPropBoard(input: {
       db.prepare(`INSERT INTO player_prop_quotes (id, game_id, event_id, book, market, player, side, point, american_price, captured_at, source_hash)
         SELECT id, game_id, event_id, book, market, player, side, point, american_price, captured_at, source_hash
         FROM player_prop_quotes_stage WHERE import_id = ?`).bind(importId),
+      db.prepare(`INSERT OR IGNORE INTO player_prop_quote_snapshots (
+          snapshot_key, line_id, game_id, event_id, book, market, player, side, point,
+          american_price, captured_at, source_hash, fetched_at
+        ) SELECT ?, id, game_id, event_id, book, market, player, side, point,
+          american_price, captured_at, source_hash, ?
+        FROM player_prop_quotes_stage WHERE import_id = ?`).bind(importId, checkedAt, importId),
       db.prepare("DELETE FROM player_prop_quotes_stage WHERE import_id = ?").bind(importId),
       db.prepare(`INSERT INTO player_prop_scan_state (
           game_id, event_id, status, last_checked_at, last_success_at, quota_used, quota_remaining, quota_last_cost, message

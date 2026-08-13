@@ -1,13 +1,15 @@
 import { stableHash } from "@/domain/hash";
 import { structuralConfig } from "@/domain/config";
-import { nflverseExpectedMarginToHomePoint } from "@/domain/decision-board";
+import { nflverseExpectedMarginToHomePoint, normalizePropPlayerName, type PropMarketKey } from "@/domain/decision-board";
 import { buildDiscreteMarginArtifact } from "@/domain/margin";
 import type { StoredPlayLeg } from "@/domain/play-card";
 import type { HistoricalMarginRow } from "@/domain/types";
-import { gradeStoredPlay, type CompletedGame } from "@/domain/settlement";
+import { gradeStoredPlay, type CompletedGame, type CompletedPlayerProp } from "@/domain/settlement";
 import { boardGameId, easternScheduleTimeToIso, normalizeScheduleTeam } from "@/domain/weekly-slate";
-import { calculateStoredPlayClosingValue, type ClosingSnapshotRow } from "./closing-value";
+import { calculateStoredPlayClosingValue, type ClosingSnapshotRow, type PropClosingSnapshotRow } from "./closing-value";
 import { ensureLiveLineStore } from "./live-line-store";
+import { ensureNflverseStore, getNflverseImportState } from "./nflverse/store";
+import { ensurePlayerPropStore } from "./player-props";
 import { ensurePlayStore } from "./play-store";
 
 interface CompletedGameRow {
@@ -38,6 +40,31 @@ interface HistoricalGameRow {
   spread_line: number;
 }
 
+interface PlayerStatRow {
+  game_id: string;
+  player_display_name: string;
+  passing_yards: number;
+  rushing_yards: number;
+  receiving_yards: number;
+  source_hash: string;
+}
+
+interface PlayerSnapRow {
+  game_id: string;
+  player: string;
+  offense_snaps: number;
+  defense_snaps: number;
+  special_teams_snaps: number;
+  source_hash: string;
+}
+
+function propValue(row: PlayerStatRow | undefined, market: PropMarketKey): number {
+  if (!row) return 0;
+  if (market === "player_pass_yds") return row.passing_yards;
+  if (market === "player_rush_yds") return row.rushing_yards;
+  return row.receiving_yards;
+}
+
 function parseContract(raw: string): StoredPlayLeg[] {
   try {
     const parsed = JSON.parse(raw) as unknown;
@@ -50,6 +77,8 @@ function parseContract(raw: string): StoredPlayLeg[] {
 export async function settleCompletedTeamPlays(db: D1Database, now = new Date()): Promise<{ settled: number; deferred: number }> {
   await ensurePlayStore(db);
   await ensureLiveLineStore(db);
+  await ensureNflverseStore(db);
+  await ensurePlayerPropStore(db);
   await db.prepare(`CREATE TABLE IF NOT EXISTS play_settlement_audit (
     play_id text NOT NULL, final_hash text NOT NULL, result text NOT NULL,
     settled_at text NOT NULL, source text NOT NULL,
@@ -92,6 +121,10 @@ export async function settleCompletedTeamPlays(db: D1Database, now = new Date())
     };
     return [game.gameId, game] as const;
   }));
+  const sourceGameByBoard = new Map(finalRows.results.map((row) => [
+    boardGameId(normalizeScheduleTeam(row.away_team), normalizeScheduleTeam(row.home_team)),
+    row.game_id
+  ] as const));
   const kickoffByGame = new Map(finalRows.results.map((row) => {
     const gameId = boardGameId(normalizeScheduleTeam(row.away_team), normalizeScheduleTeam(row.home_team));
     return [gameId, easternScheduleTimeToIso(row.game_date, row.game_time ?? "13:00")] as const;
@@ -107,6 +140,67 @@ export async function settleCompletedTeamPlays(db: D1Database, now = new Date())
     keyMargins: structuralConfig.model.keyMargins,
     generatedAt: "2026-02-01T00:00:00.000Z"
   }) : null;
+  const sourceGameIds = [...new Set(sourceGameByBoard.values())];
+  const sourceGamePlaceholders = sourceGameIds.map(() => "?").join(", ");
+  const [propSnapshotResult, currentPropResult, playerStatResult, snapResult, snapState] = await Promise.all([
+    db.prepare(`SELECT snapshot_key, line_id, game_id, event_id, book, market, player, side, point,
+        american_price, captured_at, source_hash, fetched_at FROM player_prop_quote_snapshots
+      WHERE game_id IN (${placeholders}) ORDER BY fetched_at`).bind(...gameIds).all<PropClosingSnapshotRow>(),
+    db.prepare(`SELECT id AS line_id, game_id, event_id, book, market, player, side, point,
+        american_price, captured_at, source_hash FROM player_prop_quotes
+      WHERE game_id IN (${placeholders})`).bind(...gameIds).all<Omit<PropClosingSnapshotRow, "snapshot_key" | "fetched_at">>(),
+    sourceGameIds.length
+      ? db.prepare(`SELECT game_id, player_display_name, passing_yards, rushing_yards, receiving_yards, source_hash
+          FROM nfl_player_week_stats WHERE game_id IN (${sourceGamePlaceholders})`).bind(...sourceGameIds).all<PlayerStatRow>()
+      : Promise.resolve({ results: [] as PlayerStatRow[] }),
+    sourceGameIds.length
+      ? db.prepare(`SELECT game_id, player, offense_snaps, defense_snaps, special_teams_snaps, source_hash
+          FROM nfl_player_snap_counts WHERE game_id IN (${sourceGamePlaceholders})`).bind(...sourceGameIds).all<PlayerSnapRow>()
+      : Promise.resolve({ results: [] as PlayerSnapRow[] }),
+    getNflverseImportState(db, "snap_counts:2026")
+  ]);
+  const propRows: PropClosingSnapshotRow[] = [
+    ...propSnapshotResult.results,
+    ...currentPropResult.results.map((row) => ({
+      ...row,
+      snapshot_key: `current:${row.source_hash}`,
+      fetched_at: row.captured_at
+    }))
+  ];
+  const propIdentity = new Map(propRows.map((row) => [row.line_id, row]));
+  const statsByGamePlayer = new Map<string, PlayerStatRow>(playerStatResult.results.map((row) => [
+    `${row.game_id}:${normalizePropPlayerName(row.player_display_name)}`,
+    row
+  ] as const));
+  const snapsByGamePlayer = new Map<string, PlayerSnapRow>(snapResult.results.map((row) => [
+    `${row.game_id}:${normalizePropPlayerName(row.player)}`,
+    row
+  ] as const));
+  const snapGames = new Set(snapResult.results.map((row) => row.game_id));
+  const propOutcomes = new Map<string, CompletedPlayerProp>();
+  if (snapState?.freshness === "current") {
+    for (const contract of contracts.values()) {
+      for (const leg of contract) {
+        if (leg.market !== "prop" || !leg.sourceQuoteId) continue;
+        const identity = propIdentity.get(leg.sourceQuoteId);
+        const sourceGameId = sourceGameByBoard.get(leg.gameId);
+        if (!identity || !sourceGameId || !snapGames.has(sourceGameId)) continue;
+        const playerKey = `${sourceGameId}:${normalizePropPlayerName(identity.player)}`;
+        const snap = snapsByGamePlayer.get(playerKey);
+        const played = snap ? snap.offense_snaps + snap.defense_snaps + snap.special_teams_snaps > 0 : false;
+        const stat = statsByGamePlayer.get(playerKey);
+        propOutcomes.set(leg.sourceQuoteId, {
+          sourceQuoteId: leg.sourceQuoteId,
+          gameId: leg.gameId,
+          player: identity.player,
+          market: identity.market,
+          value: played ? propValue(stat, identity.market) : null,
+          sourceHash: stableHash({ snap: snap?.source_hash ?? null, stat: stat?.source_hash ?? null }),
+          voided: !played
+        });
+      }
+    }
+  }
   let settled = 0;
   let deferred = 0;
   for (const play of playRows.results) {
@@ -116,15 +210,16 @@ export async function settleCompletedTeamPlays(db: D1Database, now = new Date())
       americanOdds: play.american_odds,
       stakeCents: play.stake_cents,
       contract
-    }, games);
+    }, games, propOutcomes);
     if (!grade) {
       deferred += 1;
       continue;
     }
     const finalHash = stableHash(contract.map((leg) => {
       const game = games.get(leg.gameId);
+      const prop = leg.sourceQuoteId ? propOutcomes.get(leg.sourceQuoteId) : null;
       return game
-        ? { gameId: game.gameId, awayScore: game.awayScore, homeScore: game.homeScore, sourceHash: game.sourceHash }
+        ? { gameId: game.gameId, awayScore: game.awayScore, homeScore: game.homeScore, sourceHash: game.sourceHash, prop }
         : { gameId: leg.gameId };
     }));
     const settledAt = now.toISOString();
@@ -137,6 +232,7 @@ export async function settleCompletedTeamPlays(db: D1Database, now = new Date())
         contract
       },
       rows: snapshotRows.results,
+      propRows,
       kickoffByGame,
       artifact
     });
@@ -147,7 +243,13 @@ export async function settleCompletedTeamPlays(db: D1Database, now = new Date())
           grade.result, grade.profitCents, clv.cents, clv.points, clv.referenceBook, settledAt, play.id
         ),
       db.prepare(`INSERT OR IGNORE INTO play_settlement_audit (play_id, final_hash, result, settled_at, source)
-        VALUES (?, ?, ?, ?, 'nflverse_finals')`).bind(play.id, finalHash, grade.result, settledAt),
+        VALUES (?, ?, ?, ?, ?)`).bind(
+          play.id,
+          finalHash,
+          grade.result,
+          settledAt,
+          contract.some((leg) => leg.market === "prop") ? "nflverse_finals_player_stats_snap_counts" : "nflverse_finals"
+        ),
       db.prepare(`INSERT OR REPLACE INTO play_clv_audit
         (play_id, reference_book, clv_cents, clv_points, synthetic_closing_american, detail_json, calculated_at, source)
         VALUES (?, ?, ?, ?, ?, ?, ?, 'last_pre_kickoff_snapshot')`).bind(

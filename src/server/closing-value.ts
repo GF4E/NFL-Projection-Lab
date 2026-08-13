@@ -1,4 +1,5 @@
 import { calculateTranslatedClv } from "@/domain/clv";
+import { normalizePropPlayerName, type PropMarketKey } from "@/domain/decision-board";
 import { decimalToAmerican } from "@/domain/line-board";
 import { americanToDecimal, quoteCostCents } from "@/domain/odds";
 import type { StoredPlayLeg } from "@/domain/play-card";
@@ -12,6 +13,22 @@ export interface ClosingSnapshotRow {
   market: "spread" | "total" | "moneyline";
   side: string;
   point: number | null;
+  american_price: number;
+  captured_at: string;
+  source_hash: string;
+  fetched_at: string;
+}
+
+export interface PropClosingSnapshotRow {
+  snapshot_key: string;
+  line_id: string;
+  game_id: string;
+  event_id: string;
+  book: string;
+  market: PropMarketKey;
+  player: string;
+  side: "Over" | "Under";
+  point: number;
   american_price: number;
   captured_at: string;
   source_hash: string;
@@ -103,12 +120,45 @@ function consensusSelectedPoint(input: {
 
 function legClosingValue(input: {
   rows: readonly ClosingSnapshotRow[];
+  propRows: readonly PropClosingSnapshotRow[];
   leg: StoredPlayLeg;
   book: Book;
   kickoffAt: string;
   artifact: DiscreteMarginArtifact | null;
 }): { syntheticAmerican: number | null; cents: number | null; points: number | null } | null {
-  if (input.leg.market === "prop") return null;
+  if (input.leg.market === "prop") {
+    if (!input.leg.sourceQuoteId || input.leg.point === null) return null;
+    const identity = input.propRows.find((row) => row.line_id === input.leg.sourceQuoteId);
+    if (!identity) return null;
+    const kickoff = Date.parse(input.kickoffAt);
+    const groups = new Map<string, PropClosingSnapshotRow[]>();
+    for (const row of input.propRows) {
+      if (row.game_id !== input.leg.gameId || normalizedBook(row.book) !== input.book ||
+        row.market !== identity.market || normalizePropPlayerName(row.player) !== normalizePropPlayerName(identity.player) ||
+        Date.parse(row.fetched_at) > kickoff || Date.parse(row.captured_at) > kickoff) continue;
+      const current = groups.get(row.snapshot_key) ?? [];
+      current.push(row);
+      groups.set(row.snapshot_key, current);
+    }
+    const group = [...groups.values()]
+      .filter((rows) => {
+        const selected = rows.find((row) => row.side.toLowerCase() === input.leg.side.toLowerCase());
+        return selected !== undefined && rows.some((row) =>
+          row.side.toLowerCase() !== input.leg.side.toLowerCase() && row.point === selected.point);
+      })
+      .sort((left, right) => right[0].fetched_at.localeCompare(left[0].fetched_at))[0];
+    const selected = group?.find((row) => row.side.toLowerCase() === input.leg.side.toLowerCase());
+    if (!selected) return null;
+    const points = input.leg.side.toLowerCase() === "over"
+      ? selected.point - input.leg.point
+      : input.leg.point - selected.point;
+    if (selected.point !== input.leg.point) return { syntheticAmerican: null, cents: null, points };
+    return {
+      syntheticAmerican: selected.american_price,
+      cents: quoteCostCents(selected.american_price) - quoteCostCents(input.leg.americanPrice),
+      points: 0
+    };
+  }
   const market = input.leg.market === "teaser" ? "spread" : input.leg.market;
   const group = closingGroup({ rows: input.rows, gameId: input.leg.gameId, book: input.book, market, kickoffAt: input.kickoffAt });
   const selected = selectedRow(group, input.leg);
@@ -152,6 +202,7 @@ export function calculateStoredPlayClosingValue(input: {
     contract: readonly StoredPlayLeg[];
   };
   rows: readonly ClosingSnapshotRow[];
+  propRows?: readonly PropClosingSnapshotRow[];
   kickoffByGame: ReadonlyMap<string, string>;
   artifact: DiscreteMarginArtifact | null;
 }): PlayClosingValue {
@@ -163,7 +214,14 @@ export function calculateStoredPlayClosingValue(input: {
   for (const book of books) {
     const legValues = input.play.contract.map((leg) => {
       const kickoffAt = input.kickoffByGame.get(leg.gameId);
-      return kickoffAt ? legClosingValue({ rows: input.rows, leg, book, kickoffAt, artifact: input.artifact }) : null;
+      return kickoffAt ? legClosingValue({
+        rows: input.rows,
+        propRows: input.propRows ?? [],
+        leg,
+        book,
+        kickoffAt,
+        artifact: input.artifact
+      }) : null;
     });
     if (!legValues.length || legValues.some((value) => value === null)) continue;
     const values = legValues as Array<NonNullable<typeof legValues[number]>>;

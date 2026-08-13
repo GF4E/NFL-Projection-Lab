@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { nflSeasonForDate, shouldRetryUncompressedPbp } from "@/server/nflverse/automation";
 import { parseCsvStream, textStream } from "@/server/nflverse/csv";
-import { aggregatePbpCsv, parsePlayerStatsCsv, parseScheduleCsv } from "@/server/nflverse/transform";
+import { aggregatePbpCsv, parsePlayerStatsCsv, parseScheduleCsv, parseSnapCountsCsv } from "@/server/nflverse/transform";
 import { gradeStoredLeg } from "@/domain/settlement";
 
 const scheduleHeader = [
@@ -25,6 +25,11 @@ const playerStatsHeader = [
   "player_id", "player_name", "player_display_name", "position", "season", "week", "season_type",
   "game_id", "team", "opponent_team", "attempts", "passing_yards", "carries", "rushing_yards",
   "receptions", "targets", "receiving_yards"
+];
+
+const snapCountsHeader = [
+  "game_id", "season", "game_type", "week", "player", "position", "team", "opponent",
+  "offense_snaps", "defense_snaps", "st_snaps"
 ];
 
 function csvRow(header: readonly string[], values: Record<string, string | number>): string {
@@ -99,6 +104,22 @@ describe("automatic nflverse importer", () => {
     expect(stats[1]).toMatchObject({ playerDisplayName: "Jaxon Smith-Njigba", targets: 10, receivingYards: 96 });
   });
 
+  it("streams snap participation so zero-production props distinguish a participant from a DNP", async () => {
+    const rows = [
+      snapCountsHeader.join(","),
+      csvRow(snapCountsHeader, { game_id: "2026_01_NE_SEA", season: 2026, game_type: "REG", week: 1, player: "Sam Darnold", position: "QB", team: "SEA", opponent: "NE", offense_snaps: 62 }),
+      csvRow(snapCountsHeader, { game_id: "2026_01_NE_SEA", season: 2026, game_type: "REG", week: 1, player: "John Rhattigan", position: "LB", team: "SEA", opponent: "NE", st_snaps: 18 }),
+      ...Array.from({ length: 18 }, (_, index) => csvRow(snapCountsHeader, {
+        game_id: "2026_01_NE_SEA", season: 2026, game_type: "REG", week: 1,
+        player: `Player ${index}`, position: "OL", team: "SEA", opponent: "NE", offense_snaps: 10
+      }))
+    ];
+    const counts = await parseSnapCountsCsv(textStream(rows.join("\n"), 8), { season: 2026, currentSeason: 2026 });
+    expect(counts).toHaveLength(20);
+    expect(counts[0]).toMatchObject({ player: "Sam Darnold", offenseSnaps: 62, specialTeamsSnaps: 0 });
+    expect(counts[1]).toMatchObject({ player: "John Rhattigan", offenseSnaps: 0, specialTeamsSnaps: 18 });
+  });
+
   it("uses the NFL season year across the January boundary", () => {
     expect(nflSeasonForDate(new Date("2026-01-15T20:00:00Z"))).toBe(2025);
     expect(nflSeasonForDate(new Date("2026-08-11T20:00:00Z"))).toBe(2026);
@@ -115,7 +136,9 @@ describe("automatic nflverse importer", () => {
     expect(readFileSync("src/app/layout.tsx", "utf8")).toContain("@fontsource/roboto/900.css");
     expect(readFileSync("src/app/globals.css", "utf8")).toContain('--display: "Roboto"');
     expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).toContain("refreshPlayerStatsSeason");
+    expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).toContain("refreshSnapCountsSeason");
     expect(readFileSync("src/server/providers/nflverse.ts", "utf8")).toContain("stats_player_week_");
+    expect(readFileSync("src/server/providers/nflverse.ts", "utf8")).toContain("snap_counts_");
   });
 
   it("automatically grades supported team-card contracts from nflverse finals", () => {
@@ -142,7 +165,15 @@ describe("automatic nflverse importer", () => {
     expect(gradeStoredLeg(leg("total", "Under", 44), final)).toBe("push");
     expect(gradeStoredLeg(leg("moneyline", "ATL", null), final)).toBe("win");
     expect(gradeStoredLeg(leg("teaser", "ATL", 7.5), final)).toBe("win");
-    expect(gradeStoredLeg(leg("prop", "Player Over", 55.5), final)).toBeNull();
+    const propLeg = { ...leg("prop", "Over", 55.5), sourceQuoteId: "prop-1", selection: "DK Metcalf Over 55.5" };
+    expect(gradeStoredLeg(propLeg, final, new Map([["prop-1", {
+      sourceQuoteId: "prop-1", gameId: final.gameId, player: "DK Metcalf", market: "player_reception_yds",
+      value: 72, sourceHash: "stats-and-snaps", voided: false
+    }]]))).toBe("win");
+    expect(gradeStoredLeg(propLeg, final, new Map([["prop-1", {
+      sourceQuoteId: "prop-1", gameId: final.gameId, player: "DK Metcalf", market: "player_reception_yds",
+      value: null, sourceHash: "snaps", voided: true
+    }]]))).toBe("void");
 
     const worker = readFileSync("worker/index.ts", "utf8");
     const settlement = readFileSync("src/server/automatic-settlement.ts", "utf8");
@@ -151,5 +182,6 @@ describe("automatic nflverse importer", () => {
     expect(settlement).toContain("play_settlement_audit");
     expect(settlement).toContain("calculateStoredPlayClosingValue");
     expect(settlement).toContain("play_clv_audit");
+    expect(settlement).toContain("nflverse_finals_player_stats_snap_counts");
   });
 });

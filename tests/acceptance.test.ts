@@ -461,6 +461,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     ];
     expect(gradeStoredPlay({ playType: "teaser", americanOdds: -120, stakeCents: 10_000, contract }, games)).toEqual({ result: "push", profitCents: 0 });
     expect(gradeStoredPlay({ playType: "parlay", americanOdds: 264, stakeCents: 10_000, contract }, games)).toEqual({ result: "win", profitCents: 9091 });
+
+    const propLeg = { gameId: "g2", market: "prop" as const, side: "Over", point: 55.5, americanPrice: -110, selection: "Receiver Over 55.5", sourceQuoteId: "prop-void" };
+    const propOutcomes = new Map([["prop-void", {
+      sourceQuoteId: "prop-void", gameId: "g2", player: "Receiver", market: "player_reception_yds" as const,
+      value: null, sourceHash: "snap-hash", voided: true
+    }]]);
+    expect(gradeStoredPlay({ playType: "single", americanOdds: -110, stakeCents: 10_000, contract: [propLeg] }, games, propOutcomes))
+      .toEqual({ result: "void", profitCents: 0 });
+    expect(gradeStoredPlay({ playType: "parlay", americanOdds: 264, stakeCents: 10_000, contract: [contract[1], propLeg] }, games, propOutcomes))
+      .toEqual({ result: "win", profitCents: 9091 });
   });
 
   it("32. co-locates movement and rolling matchup evidence inside the existing Picks drawer", () => {
@@ -615,5 +625,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(server).toContain("consensusHomeProbability");
     expect(board).toContain("gameIntel?.moneylines.find");
     expect(board).toContain("pushProbability = moneylineProjection.tieProbability");
+  });
+
+  it("39. snapshots prop contracts idempotently and grades them only with current player and snap data", () => {
+    const props = readFileSync("src/server/player-props.ts", "utf8");
+    const settlement = readFileSync("src/server/automatic-settlement.ts", "utf8");
+    expect(props).toContain("player_prop_quote_snapshots");
+    expect(props).toContain("INSERT OR IGNORE INTO player_prop_quote_snapshots");
+    expect(props).toContain("props:${input.gameId}:${sourceHash.slice(0, 16)}");
+    expect(settlement).toContain('snapState?.freshness === "current"');
+    expect(settlement).toContain("offense_snaps + snap.defense_snaps + snap.special_teams_snaps > 0");
+    expect(settlement).toContain("propOutcomes");
   });
 });

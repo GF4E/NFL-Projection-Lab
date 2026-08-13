@@ -88,6 +88,21 @@ export interface PlayerWeekStat {
   receivingYards: number;
 }
 
+export interface PlayerSnapCount {
+  id: string;
+  gameId: string;
+  season: number;
+  gameType: string;
+  week: number;
+  player: string;
+  position: string | null;
+  team: string;
+  opponent: string;
+  offenseSnaps: number;
+  defenseSnaps: number;
+  specialTeamsSnaps: number;
+}
+
 const scheduleColumns = [
   "game_id", "season", "game_type", "week", "gameday", "weekday", "gametime",
   "away_team", "away_score", "home_team", "home_score", "location", "result", "total",
@@ -108,6 +123,11 @@ const playerStatColumns = [
   "player_id", "player_name", "player_display_name", "position", "season", "week", "season_type",
   "game_id", "team", "opponent_team", "attempts", "passing_yards", "carries", "rushing_yards",
   "receptions", "targets", "receiving_yards"
+] as const;
+
+const snapCountColumns = [
+  "game_id", "season", "game_type", "week", "player", "position", "team", "opponent",
+  "offense_snaps", "defense_snaps", "st_snaps"
 ] as const;
 
 function value(row: readonly string[], indexes: Map<string, number>, name: string): string {
@@ -403,4 +423,46 @@ export async function parsePlayerStatsCsv(
     throw new Error(`nflverse player stats ${options.season} row-count validation failed: ${stats.length}`);
   }
   return stats;
+}
+
+export async function parseSnapCountsCsv(
+  stream: ReadableStream<Uint8Array>,
+  options: { season: number; currentSeason: number }
+): Promise<PlayerSnapCount[]> {
+  const iterator = parseCsvStream(stream);
+  const first = await iterator.next();
+  if (first.done) throw new Error(`nflverse snap counts ${options.season} returned no header`);
+  const indexes = requireColumns(first.value, snapCountColumns);
+  const counts: PlayerSnapCount[] = [];
+  const ids = new Set<string>();
+  for await (const row of iterator) {
+    const season = integer(value(row, indexes, "season"), "season");
+    if (season !== options.season) throw new Error(`nflverse snap counts season validation failed for ${options.season}`);
+    const gameId = value(row, indexes, "game_id");
+    const player = value(row, indexes, "player");
+    const team = value(row, indexes, "team");
+    if (!gameId || !player || !team) continue;
+    const id = `${gameId}:${team}:${player.toLowerCase().replace(/[^a-z0-9]/g, "")}`;
+    if (ids.has(id)) throw new Error(`nflverse snap counts validation failed: duplicate ${id}`);
+    ids.add(id);
+    counts.push({
+      id,
+      gameId,
+      season,
+      gameType: value(row, indexes, "game_type"),
+      week: integer(value(row, indexes, "week"), "week"),
+      player,
+      position: nullableString(value(row, indexes, "position")),
+      team,
+      opponent: value(row, indexes, "opponent"),
+      offenseSnaps: nullableNumber(value(row, indexes, "offense_snaps")) ?? 0,
+      defenseSnaps: nullableNumber(value(row, indexes, "defense_snaps")) ?? 0,
+      specialTeamsSnaps: nullableNumber(value(row, indexes, "st_snaps")) ?? 0
+    });
+  }
+  const minimumRows = options.season < options.currentSeason ? 1_000 : 20;
+  if (counts.length < minimumRows) {
+    throw new Error(`nflverse snap counts ${options.season} row-count validation failed: ${counts.length}`);
+  }
+  return counts;
 }

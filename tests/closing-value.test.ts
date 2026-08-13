@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateStoredPlayClosingValue, type ClosingSnapshotRow } from "@/server/closing-value";
+import { calculateStoredPlayClosingValue, type ClosingSnapshotRow, type PropClosingSnapshotRow } from "@/server/closing-value";
 import { artifact } from "./fixtures";
 
 function marketRows(book: "betmgm" | "fanduel", prices: [number, number], points: [number, number] = [-3, 3]): ClosingSnapshotRow[] {
@@ -61,5 +61,45 @@ describe("book-specific closing line value", () => {
     });
     expect(value.points).toBe(1);
     expect(value.cents).toBeNull();
+  });
+
+  it("uses archived exact-contract prop quotes and withholds cents after a point move", () => {
+    const propRows: PropClosingSnapshotRow[] = [
+      { snapshot_key: "entry", line_id: "dk-over-55", game_id: "ne-sea", event_id: "event", book: "betmgm", market: "player_reception_yds", player: "DK Metcalf", side: "Over", point: 55.5, american_price: -110, captured_at: "2026-09-13T18:00:00Z", source_hash: "entry", fetched_at: "2026-09-13T18:00:01Z" },
+      { snapshot_key: "entry", line_id: "dk-under-55", game_id: "ne-sea", event_id: "event", book: "betmgm", market: "player_reception_yds", player: "DK Metcalf", side: "Under", point: 55.5, american_price: -110, captured_at: "2026-09-13T18:00:00Z", source_hash: "entry", fetched_at: "2026-09-13T18:00:01Z" },
+      { snapshot_key: "close", line_id: "dk-over-58", game_id: "ne-sea", event_id: "event", book: "betmgm", market: "player_reception_yds", player: "DK Metcalf", side: "Over", point: 58.5, american_price: -115, captured_at: "2026-09-13T19:50:00Z", source_hash: "close", fetched_at: "2026-09-13T19:50:01Z" },
+      { snapshot_key: "close", line_id: "dk-under-58", game_id: "ne-sea", event_id: "event", book: "betmgm", market: "player_reception_yds", player: "DK Metcalf", side: "Under", point: 58.5, american_price: -105, captured_at: "2026-09-13T19:50:00Z", source_hash: "close", fetched_at: "2026-09-13T19:50:01Z" }
+    ];
+    const value = calculateStoredPlayClosingValue({
+      play: { playType: "single", book: "BetMGM", americanOdds: -110, executionStatus: "executed", contract: [{
+        sourceQuoteId: "dk-over-55", gameId: "ne-sea", market: "prop", side: "Over", point: 55.5,
+        americanPrice: -110, selection: "DK Metcalf Over 55.5"
+      }] },
+      rows: [],
+      propRows,
+      kickoffByGame: kickoff,
+      artifact
+    });
+    expect(value.referenceBook).toBe("BetMGM");
+    expect(value.points).toBe(3);
+    expect(value.cents).toBeNull();
+  });
+
+  it("reports cents when the archived prop close stays at the entry point", () => {
+    const propRows: PropClosingSnapshotRow[] = [
+      { snapshot_key: "entry", line_id: "dk-over", game_id: "ne-sea", event_id: "event", book: "betmgm", market: "player_reception_yds", player: "DK Metcalf", side: "Over", point: 55.5, american_price: -110, captured_at: "2026-09-13T18:00:00Z", source_hash: "entry", fetched_at: "2026-09-13T18:00:01Z" },
+      { snapshot_key: "entry", line_id: "dk-under", game_id: "ne-sea", event_id: "event", book: "betmgm", market: "player_reception_yds", player: "DK Metcalf", side: "Under", point: 55.5, american_price: -110, captured_at: "2026-09-13T18:00:00Z", source_hash: "entry", fetched_at: "2026-09-13T18:00:01Z" },
+      { snapshot_key: "close", line_id: "dk-over-close", game_id: "ne-sea", event_id: "event", book: "betmgm", market: "player_reception_yds", player: "DK Metcalf", side: "Over", point: 55.5, american_price: -125, captured_at: "2026-09-13T19:50:00Z", source_hash: "close", fetched_at: "2026-09-13T19:50:01Z" },
+      { snapshot_key: "close", line_id: "dk-under-close", game_id: "ne-sea", event_id: "event", book: "betmgm", market: "player_reception_yds", player: "DK Metcalf", side: "Under", point: 55.5, american_price: 100, captured_at: "2026-09-13T19:50:00Z", source_hash: "close", fetched_at: "2026-09-13T19:50:01Z" }
+    ];
+    const value = calculateStoredPlayClosingValue({
+      play: { playType: "single", book: "BetMGM", americanOdds: -110, executionStatus: "executed", contract: [{
+        sourceQuoteId: "dk-over", gameId: "ne-sea", market: "prop", side: "Over", point: 55.5,
+        americanPrice: -110, selection: "DK Metcalf Over 55.5"
+      }] },
+      rows: [], propRows, kickoffByGame: kickoff, artifact
+    });
+    expect(value.points).toBe(0);
+    expect(value.cents).toBeGreaterThan(0);
   });
 });
