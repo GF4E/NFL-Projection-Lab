@@ -33,7 +33,7 @@ function baseline(team: string, ranks: Partial<TeamBaseline["ranks"]> = {}): Tea
 }
 
 describe("compact matchup evidence", () => {
-  it("ranks rest and market-adjusted form in the existing three-signal limit", () => {
+  it("ranks every threshold-clearing game signal before contract-specific filtering", () => {
     const signals = matchupSignals(
       baseline("SEA", { strength: 2 }),
       baseline("LAR", { strength: 25 }),
@@ -53,5 +53,24 @@ describe("compact matchup evidence", () => {
       id: "pass_rate",
       lean: "OVER"
     }));
+  });
+
+  it("does not let three stronger side signals crowd out total evidence", () => {
+    const signals = matchupSignals(
+      baseline("ATL", {
+        epa: 1, success: 2, explosive: 3,
+        defenseEpa: 16, defenseSuccess: 16, defenseExplosive: 16,
+        pace: 4, proe: 7
+      }),
+      baseline("TB", {
+        epa: 16, success: 16, explosive: 16,
+        defenseEpa: 31, defenseSuccess: 30, defenseExplosive: 29,
+        pace: 8, proe: 10
+      })
+    );
+
+    expect(signals.filter((signal) => ["efficiency", "success", "explosive"].includes(signal.id))).toHaveLength(3);
+    expect(signals).toContainEqual(expect.objectContaining({ id: "pace", lean: "OVER" }));
+    expect(signals).toContainEqual(expect.objectContaining({ id: "pass_rate", lean: "OVER" }));
   });
 });

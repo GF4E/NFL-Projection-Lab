@@ -18,6 +18,7 @@ Updated 2026-08-13. This is an internal product note; it is not rendered in the 
 - The sportsbook grid remains the primary surface.
 - `Analyze` is the only expansion point. It contains the best exact-price mainline contracts, teaser legs/pairs, confirmed +EV props, compact rolling matchup evidence, and material open-to-now movement.
 - Matchup evidence is capped at three signals and uses leakage-safe rolling 17-game ranks. It does not present unverified narrative conclusions.
+- Evidence is capped only after the exact contract is selected. Side/moneyline decisions consider team-direction signals; total decisions consider pace and pass-environment signals. This prevents unrelated high-strength metrics from crowding a relevant statistic off the card.
 - A teaser pair is surfaced only when two different games at the same book have non-negative empirical expected value at the displayed price. Betting against Seattle or Atlanta requires at least 5% expected value.
 - A prop is surfaced only when at least three other books quote the identical player, side, and point, its median no-vig consensus implies at least 2% EV, and the lower consensus bound remains positive.
 - The prop card distinguishes four states: not scanned, prices stale, prices posted but availability pending, and fully eligible. It never labels an unscanned market as though no +EV prop exists.

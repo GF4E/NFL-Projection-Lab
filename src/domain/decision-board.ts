@@ -245,9 +245,12 @@ export function matchupSignals(
       });
     }
   }
+  // Preserve every threshold-clearing candidate here. The screen chooses the
+  // exact contract first, then filters, ranks, and caps its relevant evidence.
+  // A game-level cap would let strong side signals crowd a pace/PROE cue off a
+  // total decision (and vice versa).
   return candidates.filter((signal): signal is MatchupSignal => signal !== null)
-    .sort((left, right) => right.strength - left.strength)
-    .slice(0, 3);
+    .sort((left, right) => right.strength - left.strength);
 }
 
 export interface LineMovementPoint {
