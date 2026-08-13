@@ -28,7 +28,7 @@ import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "@/domain/settlement";
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
-import { addTeamApproval, approvalActorForEmail, draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, exactContractApprovalRequest, isTeamApproved, storedLegMatchesQuote, trackerRecordSummaries, trackerSummary, validateTeamCardPortfolio } from "@/domain/play-card";
+import { addTeamApproval, approvalActorForEmail, draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, exactContractApprovalRequest, isTeamApproved, storedLegMatchesQuote, summarizeTeamCardPortfolio, teamCardPortfolioBatchConflicts, trackerRecordSummaries, trackerSummary, validateTeamCardPortfolio } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { buildPlayerPropEvidence, completeLeaguePropEfficiencyPrior, crossedKeyNumbers, isClassicWongPoint, isPropPlayerUnavailable, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
@@ -193,8 +193,15 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(validateTeamCardPortfolio([position("g1", "prop", 2)], position("g1", "prop", 1.5))).toContain("Game exposure cannot exceed 3u");
     expect(validateTeamCardPortfolio(Array.from({ length: 5 }, (_, index) => position(`g${index}`, "prop", 2)), position("g9", "prop", 0.5))).toContain("Weekly exposure cannot exceed 10u");
     expect(validateTeamCardPortfolio([], position("g1", "prop", 2.5))).toContain("A pick must be between 0.5u and 2u");
+    const summary = summarizeTeamCardPortfolio([position("g1", "spread", 1), position("g2", "prop", 2)], 1);
+    expect(summary).toMatchObject({ officialPicks: 2, usedUnits: 3, remainingUnits: 7 });
+    expect(summary.games.find((game) => game.gameId === "g1")).toMatchObject({ units: 1, sidePositions: 1, totalPositions: 0 });
+    const batch = teamCardPortfolioBatchConflicts([], [position("g1", "spread", 1), position("g1", "moneyline", 1)]);
+    expect(batch).toContainEqual(expect.objectContaining({ proposalIndex: 1, code: "side_slot", gameId: "g1" }));
     const store = readFileSync("src/server/play-store.ts", "utf8");
-    expect(readFileSync("src/domain/portfolio-trigger.ts", "utf8")).toContain("approval_portfolio_guard_v1");
+    expect(readFileSync("src/domain/portfolio-trigger.ts", "utf8")).toContain("approval_portfolio_guard_v2");
+    expect(store).toContain("status IN ('card', 'placed', 'settled')");
+    expect(store).toContain("DROP TRIGGER IF EXISTS approval_portfolio_guard_v1");
     expect(store).toContain("assertPortfolioAvailable");
     expect(readFileSync("src/app/api/plays/route.ts", "utf8")).toContain("stakeDollars: z.number().min(12.5).max(50)");
   });

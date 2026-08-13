@@ -341,20 +341,87 @@ function playGameMarkets(play: Pick<WeeklyPlay, "gameId" | "market" | "contract"
   return output;
 }
 
-export function validateTeamCardPortfolio(
-  existing: readonly Pick<WeeklyPlay, "week" | "gameId" | "market" | "contract" | "stakeCents">[],
-  proposed: Pick<WeeklyPlay, "week" | "gameId" | "market" | "contract" | "stakeCents">
-): string[] {
-  const errors: string[] = [];
+export type TeamCardPortfolioPosition = Pick<
+  WeeklyPlay,
+  "week" | "gameId" | "market" | "contract" | "stakeCents"
+>;
+
+export interface TeamCardGameExposure {
+  gameId: string;
+  units: number;
+  sidePositions: number;
+  totalPositions: number;
+}
+
+export interface TeamCardPortfolioSummary {
+  week: number;
+  officialPicks: number;
+  usedUnits: number;
+  remainingUnits: number;
+  games: TeamCardGameExposure[];
+}
+
+export type TeamCardPortfolioConflict = {
+  code: "unit_range" | "weekly_units" | "game_units" | "side_slot" | "total_slot";
+  message: string;
+  gameId: string | null;
+};
+
+export type TeamCardPortfolioBatchConflict = TeamCardPortfolioConflict & {
+  proposalIndex: number;
+};
+
+export function summarizeTeamCardPortfolio(
+  official: readonly TeamCardPortfolioPosition[],
+  week: number
+): TeamCardPortfolioSummary {
+  const weekPlays = official.filter((play) => play.week === week);
+  const gameIds = [...new Set(weekPlays.flatMap((play) => [...playGameMarkets(play).keys()]))].sort();
+  const games = gameIds.map((gameId) => {
+    let units = 0;
+    let sidePositions = 0;
+    let totalPositions = 0;
+    for (const play of weekPlays) {
+      const markets = playGameMarkets(play).get(gameId);
+      if (!markets) continue;
+      units += play.stakeCents / UNIT_CENTS;
+      sidePositions += markets.filter((market) => ["spread", "moneyline", "teaser"].includes(market)).length;
+      totalPositions += markets.filter((market) => market === "total").length;
+    }
+    return { gameId, units, sidePositions, totalPositions };
+  });
+  const usedUnits = weekPlays.reduce((sum, play) => sum + play.stakeCents / UNIT_CENTS, 0);
+  return {
+    week,
+    officialPicks: weekPlays.length,
+    usedUnits,
+    remainingUnits: Math.max(0, structuralConfig.sizing.maximumWeekUnits - usedUnits),
+    games
+  };
+}
+
+export function teamCardPortfolioConflicts(
+  existing: readonly TeamCardPortfolioPosition[],
+  proposed: TeamCardPortfolioPosition
+): TeamCardPortfolioConflict[] {
+  const conflicts: TeamCardPortfolioConflict[] = [];
   const units = proposed.stakeCents / UNIT_CENTS;
   if (units < structuralConfig.sizing.minimumUnits || units > structuralConfig.sizing.maximumUnits) {
-    errors.push(`A pick must be between ${structuralConfig.sizing.minimumUnits}u and ${structuralConfig.sizing.maximumUnits}u`);
+    conflicts.push({
+      code: "unit_range",
+      message: `A pick must be between ${structuralConfig.sizing.minimumUnits}u and ${structuralConfig.sizing.maximumUnits}u`,
+      gameId: null
+    });
   }
   const weeklyUnits = existing
     .filter((play) => play.week === proposed.week)
     .reduce((sum, play) => sum + play.stakeCents / UNIT_CENTS, units);
   if (weeklyUnits > structuralConfig.sizing.maximumWeekUnits) {
-    errors.push(`Weekly exposure cannot exceed ${structuralConfig.sizing.maximumWeekUnits}u`);
+    conflicts.push({
+      code: "weekly_units",
+      message: `Weekly exposure cannot exceed ${structuralConfig.sizing.maximumWeekUnits}u`,
+      gameId: null
+    });
   }
   const proposedMarkets = playGameMarkets(proposed);
   const existingMarkets = existing.map((play) => ({ play, markets: playGameMarkets(play) }));
@@ -363,7 +430,11 @@ export function validateTeamCardPortfolio(
       .filter((item) => item.markets.has(gameId))
       .reduce((sum, item) => sum + item.play.stakeCents / UNIT_CENTS, units);
     if (gameUnits > structuralConfig.sizing.maximumGameUnits) {
-      errors.push(`Game exposure cannot exceed ${structuralConfig.sizing.maximumGameUnits}u`);
+      conflicts.push({
+        code: "game_units",
+        message: `Game exposure cannot exceed ${structuralConfig.sizing.maximumGameUnits}u`,
+        gameId
+      });
     }
     const proposedSides = markets.filter((market) => ["spread", "moneyline", "teaser"].includes(market)).length;
     const existingSides = existingMarkets.reduce((count, item) => {
@@ -371,16 +442,41 @@ export function validateTeamCardPortfolio(
       return count + (values?.filter((market) => ["spread", "moneyline", "teaser"].includes(market)).length ?? 0);
     }, 0);
     if (proposedSides + existingSides > structuralConfig.sizing.maximumSidePositionsPerGame) {
-      errors.push("Only one side position is permitted per game");
+      conflicts.push({ code: "side_slot", message: "Only one side position is permitted per game", gameId });
     }
     const proposedTotals = markets.filter((market) => market === "total").length;
     const existingTotals = existingMarkets.reduce((count, item) =>
       count + (item.markets.get(gameId)?.filter((market) => market === "total").length ?? 0), 0);
     if (proposedTotals + existingTotals > structuralConfig.sizing.maximumTotalsPerGame) {
-      errors.push("Only one total is permitted per game");
+      conflicts.push({ code: "total_slot", message: "Only one total is permitted per game", gameId });
     }
   }
-  return [...new Set(errors)];
+  return conflicts.filter((conflict, index, all) => all.findIndex((candidate) =>
+    candidate.code === conflict.code && candidate.gameId === conflict.gameId
+  ) === index);
+}
+
+export function teamCardPortfolioBatchConflicts(
+  existing: readonly TeamCardPortfolioPosition[],
+  proposed: readonly TeamCardPortfolioPosition[]
+): TeamCardPortfolioBatchConflict[] {
+  const working = [...existing];
+  const conflicts: TeamCardPortfolioBatchConflict[] = [];
+  proposed.forEach((position, proposalIndex) => {
+    conflicts.push(...teamCardPortfolioConflicts(working, position).map((conflict) => ({
+      ...conflict,
+      proposalIndex
+    })));
+    working.push(position);
+  });
+  return conflicts;
+}
+
+export function validateTeamCardPortfolio(
+  existing: readonly TeamCardPortfolioPosition[],
+  proposed: TeamCardPortfolioPosition
+): string[] {
+  return [...new Set(teamCardPortfolioConflicts(existing, proposed).map((conflict) => conflict.message))];
 }
 
 export function stakeToUnits(stakeCents: number): number {

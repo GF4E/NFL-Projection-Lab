@@ -26,6 +26,7 @@ Updated 2026-08-13. This is an internal product note; it is not rendered in the 
 - Book coverage is stated beside the active snapshot and beneath an incomplete market heading. A missing price therefore reads as “not posted by this book,” not “the model has no opinion.”
 - A manually selected straight remains available for comparison, but its slip row states whether it clears the current 80% uncertainty and 0.5u Kelly gates. The shared-card action stays disabled when any straight is below the floor or lacks a supported model probability, matching the authoritative server approval boundary before the user clicks approve.
 - A five-contract weekly scan queue sits above the sportsbook grid. It is only a ranked view of the existing exact-price engine: one best side and one best total thesis per game, clear uncertainty intervals first, and the existing Seattle/Atlanta exception rule unchanged. Selecting an item loads its exact book contract into the straight slip.
+- The shared slip shows official weekly units used and the proposed post-approval total. It checks the entire proposed batch against the 10u week, 3u game, one-side, and one-total constraints before approval; settled picks remain part of the original week's allocation rather than reopening capacity after the result is known.
 
 ## Deliberate exclusions
 

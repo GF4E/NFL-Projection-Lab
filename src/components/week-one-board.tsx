@@ -18,7 +18,7 @@ import { alignMatchupEvidence, compactEvidenceLabel, evidenceDetail, materialEvi
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
 import { rankBestBookMainlineRecommendations, rankMainlineRecommendations, rankWeeklyMainlineRecommendations, type MainlineRecommendation } from "@/domain/mainline-recommendations";
 import { structuralConfig } from "@/domain/config";
-import { exactContractApprovalRequest, isTeamApproved, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
+import { exactContractApprovalRequest, isTeamApproved, summarizeTeamCardPortfolio, teamCardPortfolioBatchConflicts, type PickedBy, type TeamCardPortfolioPosition, type WeeklyPlay } from "@/domain/play-card";
 import { sizeKelly, type SizingResult } from "@/domain/sizing";
 import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
 import { pickReasons } from "@/lib/week-one-data";
@@ -240,6 +240,34 @@ export function WeekOneBoard() {
     ? slip.map(straightLegSizing)
     : [], [slip, slipMode]);
   const straightEligibleLegCount = straightSizing.filter((sizing) => sizing?.included).length;
+  const officialPlays = useMemo(() => plays.filter((play) => isTeamApproved(play.approvals)), [plays]);
+  const portfolio = useMemo(() => summarizeTeamCardPortfolio(officialPlays, slate?.week ?? 1), [officialPlays, slate?.week]);
+  const proposedPortfolioPositions = useMemo<TeamCardPortfolioPosition[]>(() => {
+    if (!slip.length || !slate) return [];
+    const position = (legs: readonly SelectedLeg[], market: string, gameId: string): TeamCardPortfolioPosition => ({
+      week: slate.week,
+      gameId,
+      market,
+      stakeCents: Math.round(stake * 100),
+      contract: legs.map((leg) => ({
+        sourceQuoteId: leg.sourceQuoteId,
+        gameId: leg.gameId,
+        market: leg.kind === "teaser" ? "teaser" : leg.market === "prop" ? "prop" : leg.market,
+        side: leg.side,
+        point: leg.point,
+        americanPrice: leg.americanPrice,
+        selection: leg.selection
+      }))
+    });
+    return slipMode === "straight"
+      ? slip.map((leg) => position([leg], leg.market, leg.gameId))
+      : [position(slip, slipMode, `multi-week-${slate.week}`)];
+  }, [slip, slipMode, slate, stake]);
+  const portfolioConflicts = useMemo(() => teamCardPortfolioBatchConflicts(
+    officialPlays,
+    proposedPortfolioPositions
+  ), [officialPlays, proposedPortfolioPositions]);
+  const proposedUnits = proposedPortfolioPositions.reduce((sum, position) => sum + position.stakeCents / 2_500, 0);
   const weeklyOpportunities = useMemo(() => rankWeeklyMainlineRecommendations(matchups.flatMap((game) => {
     const gameIntel = intelligence?.games.find((item) => item.gameId === game.id);
     if (!gameIntel) return [];
@@ -254,7 +282,25 @@ export function WeekOneBoard() {
       moneyline: gameIntel.moneylines.find((item) => item.book === executionBook) ?? null,
       preferredTeams
     }));
-  }), 5), [intelligence, lines, matchups]);
+  }), Math.max(1, matchups.length * 2)).filter((candidate) => {
+    if (!slate) return false;
+    const position: TeamCardPortfolioPosition = {
+      week: slate.week,
+      gameId: candidate.line.gameId,
+      market: candidate.line.market,
+      stakeCents: candidate.sizing.suggestedUnits * 2_500,
+      contract: [{
+        sourceQuoteId: candidate.line.id,
+        gameId: candidate.line.gameId,
+        market: candidate.line.market,
+        side: candidate.line.side,
+        point: candidate.line.point,
+        americanPrice: candidate.line.americanPrice,
+        selection: lineSelection(candidate.line)
+      }]
+    };
+    return teamCardPortfolioBatchConflicts(officialPlays, [position]).length === 0;
+  }).slice(0, 5), [intelligence, lines, matchups, officialPlays, slate]);
   const slipCanApprove = isPricedSlipApprovable({
     mode: slipMode,
     legCount: slip.length,
@@ -262,7 +308,8 @@ export function WeekOneBoard() {
     singleBook: new Set(slip.map((leg) => leg.book)).size <= 1,
     standardValue: slipValue,
     teaserExpectedValuePercent: teaserValue?.sizing.included ? teaserValue.evPercent : null
-  }) && (slipMode !== "parlay" || Boolean(parlayDecision?.sizing.included && parlayDecision.expectedValue >= 0));
+  }) && (slipMode !== "parlay" || Boolean(parlayDecision?.sizing.included && parlayDecision.expectedValue >= 0)) &&
+    portfolioConflicts.length === 0;
 
   useEffect(() => {
     let active = true;
@@ -466,6 +513,10 @@ export function WeekOneBoard() {
     }
     if (slipMode === "straight" && straightEligibleLegCount !== slip.length) {
       setMessage("Straight withheld: every contract must have a current model probability, an 80% interval, and at least a 0.5u Kelly result.");
+      return;
+    }
+    if (portfolioConflicts.length) {
+      setMessage(`Team-card limit: ${portfolioConflicts[0].message}.`);
       return;
     }
     if (slipMode === "teaser" && (!teaserValue || teaserValue.evPercent < 0 || !teaserValue.sizing.included)) {
@@ -792,6 +843,11 @@ export function WeekOneBoard() {
         {slipMode === "teaser" && <div className="teaser-price"><span>OFFERED 2-TEAM PRICE</span><div>{structuralConfig.teasers.selectableAmericanPrices.map((price) => <button className={teaserPrice === price ? "active" : ""} onClick={() => setTeaserPrice(price)} key={price}>{price}</button>)}</div><small>Confirm the live book price. A teaser is blocked when estimated EV is negative.</small></div>}
         <div className="reason-clicks"><span>WHY</span>{pickReasons.slice(0, 8).map((item) => <button className={reason === item.value ? "active" : ""} onClick={() => setReason(item.value)} key={item.value}>{item.label.replace("Model disagrees with market price", "Model edge").replace("Opponent-adjusted efficiency matchup", "Efficiency").replace("Turnover or scoring regression", "Regression").replace("Personnel or injury advantage", "Personnel").replace("Coaching or scheme matchup", "Scheme").replace("Role clarity / team chemistry", "Chemistry").replace("Better number / key-number value", "Key number").replace("Pace / scoring environment", "Pace")}</button>)}</div>
         <div className="stake-clicks"><span>STAKE</span>{[12.5, 25, 37.5, 50].map((value) => <button className={stake === value ? "active" : ""} onClick={() => setStake(value)} key={value}>{value / 25}u</button>)}</div>
+        <div className={`portfolio-meter ${portfolioConflicts.length ? "conflict" : ""}`}>
+          <div><span>WEEK CARD</span><b>{portfolio.usedUnits.toFixed(1)} / {structuralConfig.sizing.maximumWeekUnits}u</b></div>
+          <div><span>AFTER THIS</span><b>{(portfolio.usedUnits + proposedUnits).toFixed(1)}u</b></div>
+          <small>{portfolioConflicts.length ? portfolioConflicts[0].message : `${portfolio.remainingUnits.toFixed(1)}u remains before this slip · ${portfolio.officialPicks} official`}</small>
+        </div>
         <div className="value-meter">
           <div><span>BOOK PRICE</span><b>{!slip.length ? "—" : slipMode === "teaser" ? formatOdds(teaserPrice) : slipMode === "straight" ? slip.length === 1 ? formatOdds(slip[0].americanPrice) : "EACH" : slipValue ? formatOdds(combinedAmerican(slip)) : "—"}</b></div>
           <div><span>NO-VIG FAIR</span><b>{slipMode === "teaser" ? teaserValue ? formatOdds(teaserValue.fairAmerican) : "—" : slipMode === "straight" ? slip.length === 1 && slipValue ? formatOdds(slipValue.fairAmerican) : "—" : slipValue ? formatOdds(slipValue.fairAmerican) : "—"}</b></div>
@@ -805,7 +861,7 @@ export function WeekOneBoard() {
     </div>
 
     <section className="compact-shared-card">
-      <div><span>TEAM CARD</span><h2>{plays.filter((play) => isTeamApproved(play.approvals)).length ? `${plays.filter((play) => isTeamApproved(play.approvals)).length} official` : plays.length ? `${plays.length} awaiting` : "Empty"}</h2></div>
+      <div><span>TEAM CARD</span><h2>{officialPlays.length ? `${officialPlays.length} official` : plays.length ? `${plays.length} awaiting` : "Empty"}</h2><small>{portfolio.remainingUnits.toFixed(1)}u left this week</small></div>
       {plays.slice(-6).map((play) => {
         const awaitingMe = !isTeamApproved(play.approvals) && !play.approvals?.includes(picker);
         return <article key={play.id}>

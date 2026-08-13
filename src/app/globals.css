@@ -325,6 +325,13 @@ button:disabled { cursor: wait; opacity: .62; }
 .reason-clicks button, .stake-clicks button { min-height: 29px; padding: 0 8px; border: 1px solid #414c48; border-radius: 4px; background: transparent; color: #aeb7b3; font: 700 9px var(--display); }
 .reason-clicks button.active, .stake-clicks button.active { border-color: var(--book-accent); background: color-mix(in srgb, var(--book-accent) 18%, transparent); color: white; }
 .stake-clicks button { min-width: 54px; font-size: 11px; }
+.portfolio-meter { min-height: 57px; padding: 8px 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 10px; border-bottom: 1px solid #35403c; background: #111a18; }
+.portfolio-meter > div { display: flex; align-items: baseline; justify-content: space-between; gap: 7px; }
+.portfolio-meter span, .portfolio-meter small { color: #77847f; font: 800 7px var(--display); letter-spacing: .06em; text-transform: uppercase; }
+.portfolio-meter b { color: #e7ebe9; font: 900 12px var(--display); }
+.portfolio-meter small { grid-column: 1 / 3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.portfolio-meter.conflict { border-color: rgba(255,112,91,.38); background: rgba(255,112,91,.06); }
+.portfolio-meter.conflict small { color: var(--red); }
 .value-meter { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid #37413e; }
 .value-meter > div { min-height: 76px; padding: 13px 14px; display: flex; flex-direction: column; border-right: 1px solid #37413e; }
 .value-meter > div:nth-child(2) { border-right: 0; }
@@ -341,6 +348,7 @@ button:disabled { cursor: wait; opacity: .62; }
 .compact-shared-card > div { min-width: 145px; padding: 13px 16px; }
 .compact-shared-card > div span { color: var(--acid); font: 800 9px var(--display); }
 .compact-shared-card > div h2 { margin: 3px 0 0; font: 800 25px var(--display); text-transform: uppercase; }
+.compact-shared-card > div small { color: #7b8883; font: 700 8px var(--display); text-transform: uppercase; }
 .compact-shared-card article { min-width: 250px; max-width: 330px; padding: 12px 14px; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid #35403c; }
 .compact-shared-card article b { font: 800 15px var(--display); }
 .compact-shared-card article span { width: fit-content; margin: 3px 0; padding: 2px 5px; font: 800 8px var(--display); text-transform: uppercase; }

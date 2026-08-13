@@ -90,6 +90,16 @@ describe("atomic shared-card portfolio guard", () => {
     db.close();
   });
 
+  it("keeps settled picks inside the official weekly exposure ceiling", () => {
+    const db = database();
+    for (let index = 0; index < 5; index += 1) {
+      add(db, `settled-${index}`, "settled", 2, [{ gameId: `g${index}`, market: "prop" }]);
+    }
+    add(db, "late-over-cap", "research", 0.5, [{ gameId: "g9", market: "prop" }]);
+    expect(() => db.prepare("UPDATE plays SET status = 'card' WHERE id = 'late-over-cap'").run()).toThrow(/10u/);
+    db.close();
+  });
+
   it("atomically blocks same-game parlays and malformed teasers", () => {
     const db = database();
     add(db, "same-game", "research", 1, [

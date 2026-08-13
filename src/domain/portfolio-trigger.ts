@@ -6,13 +6,13 @@ export function portfolioTriggerSql(): string {
   const maximumGameCents = structuralConfig.sizing.maximumGameUnits * UNIT_CENTS;
   const maximumSidePositions = structuralConfig.sizing.maximumSidePositionsPerGame;
   const maximumTotals = structuralConfig.sizing.maximumTotalsPerGame;
-  return `CREATE TRIGGER IF NOT EXISTS approval_portfolio_guard_v1
+  return `CREATE TRIGGER IF NOT EXISTS approval_portfolio_guard_v2
     BEFORE UPDATE OF status ON plays
     WHEN OLD.status = 'research' AND NEW.status = 'card'
     BEGIN
       SELECT CASE WHEN (
         SELECT COALESCE(SUM(stake_cents), 0) FROM plays
-        WHERE id <> NEW.id AND season = NEW.season AND week = NEW.week AND status IN ('card', 'placed')
+        WHERE id <> NEW.id AND season = NEW.season AND week = NEW.week AND status IN ('card', 'placed', 'settled')
       ) + NEW.stake_cents > ${maximumWeekCents}
       THEN RAISE(ABORT, 'Weekly exposure cannot exceed ${structuralConfig.sizing.maximumWeekUnits}u') END;
 
@@ -23,7 +23,7 @@ export function portfolioTriggerSql(): string {
         WHERE (
           SELECT COALESCE(SUM(existing.stake_cents), 0) FROM plays AS existing
           WHERE existing.id <> NEW.id AND existing.season = NEW.season AND existing.week = NEW.week
-            AND existing.status IN ('card', 'placed')
+            AND existing.status IN ('card', 'placed', 'settled')
             AND EXISTS (
               SELECT 1 FROM json_each(existing.contract_json) AS existing_leg
               WHERE json_extract(existing_leg.value, '$.gameId') = proposed_games.game_id
@@ -40,7 +40,7 @@ export function portfolioTriggerSql(): string {
         WHERE proposed_games.side_count + (
           SELECT COUNT(*) FROM plays AS existing, json_each(existing.contract_json) AS existing_leg
           WHERE existing.id <> NEW.id AND existing.season = NEW.season AND existing.week = NEW.week
-            AND existing.status IN ('card', 'placed')
+            AND existing.status IN ('card', 'placed', 'settled')
             AND json_extract(existing_leg.value, '$.gameId') = proposed_games.game_id
             AND json_extract(existing_leg.value, '$.market') IN ('spread', 'moneyline', 'teaser')
         ) > ${maximumSidePositions}
@@ -55,7 +55,7 @@ export function portfolioTriggerSql(): string {
         WHERE proposed_games.total_count + (
           SELECT COUNT(*) FROM plays AS existing, json_each(existing.contract_json) AS existing_leg
           WHERE existing.id <> NEW.id AND existing.season = NEW.season AND existing.week = NEW.week
-            AND existing.status IN ('card', 'placed')
+            AND existing.status IN ('card', 'placed', 'settled')
             AND json_extract(existing_leg.value, '$.gameId') = proposed_games.game_id
             AND json_extract(existing_leg.value, '$.market') = 'total'
         ) > ${maximumTotals}

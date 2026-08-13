@@ -220,6 +220,7 @@ export async function ensurePlayStore(d1: D1Database = getD1()): Promise<void> {
   if (!names.has("clv_reference_book")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN clv_reference_book text"));
   if (upgrades.length) await d1.batch(upgrades);
   await d1.batch([
+    d1.prepare("DROP TRIGGER IF EXISTS approval_portfolio_guard_v1"),
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_season_week_status ON plays (season, week, status)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_created_at ON plays (created_at)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_play_state_audit_play ON play_state_audit (play_id, changed_at)"),
@@ -335,7 +336,7 @@ function assertForecastApprovalEligible(play: WeeklyPlay, snapshot: PlayForecast
 
 async function assertPortfolioAvailable(d1: D1Database, play: WeeklyPlay): Promise<void> {
   const result = await d1.prepare(`SELECT * FROM plays
-    WHERE id <> ? AND season = ? AND week = ? AND status IN ('card', 'placed')`)
+    WHERE id <> ? AND season = ? AND week = ? AND status IN ('card', 'placed', 'settled')`)
     .bind(play.id, play.season, play.week).all<PlayDatabaseRow>();
   const errors = validateTeamCardPortfolio(result.results.map(mapRow), play);
   if (errors.length) throw new Error(errors[0]);
