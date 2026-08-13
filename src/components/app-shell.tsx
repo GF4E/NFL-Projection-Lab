@@ -2,6 +2,7 @@ import Link from "next/link";
 import { FieldMark } from "./icons";
 import { NavLinks } from "./nav-links";
 import { NflverseRefreshBeacon } from "./nflverse-refresh-beacon";
+import { PushPermission } from "./push-permission";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
@@ -17,6 +18,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <span className="signal"><i /> Shared card live</span>
           <div className="member-stack"><b>G</b><b>J</b><span>Gabe + Jarrett</span></div>
           <p>Gabe · Seahawks / Jarrett · Auburn</p>
+          <PushPermission />
         </div>
       </aside>
       <div className="workspace">

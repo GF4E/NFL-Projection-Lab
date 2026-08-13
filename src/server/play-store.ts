@@ -11,6 +11,7 @@ import {
 } from "@/domain/play-card";
 import { contractGuardTriggerSql, portfolioTriggerSql } from "@/domain/portfolio-trigger";
 import { seasonSchedule } from "./weekly-slate";
+import { queueAndDispatchPush } from "./push/store";
 
 type PlayDatabaseRow = {
   id: string;
@@ -153,6 +154,25 @@ function mapRow(row: PlayDatabaseRow): WeeklyPlay {
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };
+}
+
+async function notifyMissingApprover(db: D1Database, play: WeeklyPlay): Promise<void> {
+  if (play.status !== "research" || play.approvals?.length !== 1) return;
+  const recipientId: PickedBy = play.approvals[0] === "gabe" ? "jarrett" : "gabe";
+  try {
+    await queueAndDispatchPush({
+      db,
+      type: "awaiting_you",
+      recipientId,
+      idempotencyKey: `awaiting_you:${play.id}:${recipientId}`,
+      title: "Awaiting you",
+      body: `${play.title} needs your approval on the exact ${play.book} contract.`,
+      now: play.updatedAt
+    });
+  } catch {
+    // Card persistence is authoritative. Push has its own durable retry state and
+    // must never make a jointly reviewed contract fail to save.
+  }
 }
 
 export async function ensurePlayStore(d1: D1Database = getD1()): Promise<void> {
@@ -327,7 +347,9 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
             play.createdAt, play.updatedAt, play.id
           )
       ]);
-      return (await getPlay(play.id))!;
+      const saved = (await getPlay(play.id))!;
+      await notifyMissingApprover(d1, saved);
+      return saved;
     }
     if (current.status !== "research") return current;
     assertStoredPlayContract(current);
@@ -339,7 +361,9 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
       status = CASE WHEN (gabe_approved = 1 OR ? = 'gabe') AND (jarrett_approved = 1 OR ? = 'jarrett') THEN 'card' ELSE 'research' END,
       updated_at = ? WHERE id = ? AND status = 'research'`)
       .bind(actor, actor, actor, actor, play.updatedAt, play.id).run();
-    return (await getPlay(play.id))!;
+    const saved = (await getPlay(play.id))!;
+    await notifyMissingApprover(d1, saved);
+    return saved;
   }
   await assertApprovalWindowOpen(d1, play, play.updatedAt);
   await d1.prepare(INSERT_PLAY_SQL).bind(
@@ -355,7 +379,9 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
     status = CASE WHEN (gabe_approved = 1 OR ? = 'gabe') AND (jarrett_approved = 1 OR ? = 'jarrett') THEN 'card' ELSE 'research' END,
     updated_at = ? WHERE id = ?`)
     .bind(actor, actor, actor, actor, play.updatedAt, play.id).run();
-  return (await getPlay(play.id))!;
+  const saved = (await getPlay(play.id))!;
+  await notifyMissingApprover(d1, saved);
+  return saved;
 }
 
 export async function confirmCashPlacement(id: string, updatedAt: string): Promise<WeeklyPlay> {

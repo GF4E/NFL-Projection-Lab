@@ -1053,4 +1053,23 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(lineBoard).toContain('if (mode === "straight") return');
     expect(lineBoard).toContain("withoutSameThesis.filter((item) => item.book === leg.book)");
   });
+
+  it("48. stores real subscriptions and emits only the two permitted idempotent push events", () => {
+    const route = readFileSync("src/app/api/push-subscription/route.ts", "utf8");
+    const store = readFileSync("src/server/push/store.ts", "utf8");
+    const edge = readFileSync("src/server/push/edge-notifications.ts", "utf8");
+    const serviceWorker = readFileSync("public/sw.js", "utf8");
+    const plays = readFileSync("src/server/play-store.ts", "utf8");
+    expect(route).toContain("requestTeamMember(request)");
+    expect(route).toContain("upsertPushSubscription");
+    expect(store).toContain("UNIQUE");
+    expect(store).toContain("CHECK (type IN ('awaiting_you', 'edge_threshold'))");
+    expect(store).toContain("prior?.state === \"sent\"");
+    expect(edge).toContain("edgeThresholdCrossed");
+    expect(edge).toContain("structuralConfig.monitoring.pushEdgeThreshold");
+    expect(plays).toContain('type: "awaiting_you"');
+    expect(plays).toContain('idempotencyKey: `awaiting_you:${play.id}:${recipientId}`');
+    expect(serviceWorker).toContain('["awaiting_you", "edge_threshold"]');
+    expect(serviceWorker).not.toContain("pipeline_failure");
+  });
 });

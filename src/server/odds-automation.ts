@@ -92,8 +92,31 @@ export async function refreshCompleteSlateMainlines(input: {
   const result = await fetchLiveOddsForSlate(input.apiKey, input.matchups, input.fetcher ?? fetch);
   await recordOddsQuota({ used: result.used, remaining: result.remaining, lastCost: result.lastCost }, db);
   validateCompleteSlateMainlines(result.lines, input.matchups);
+  const lines = await replaceLiveLines(result.lines, { db, snapshotKey: input.snapshotKey, fetchedAt: input.fetchedAt });
+  try {
+    const [{ buildDecisionBoard }, { publishEdgeThresholdNotifications }] = await Promise.all([
+      import("./decision-board"),
+      import("./push/edge-notifications")
+    ]);
+    const first = input.matchups[0];
+    if (first) {
+      const board = await buildDecisionBoard(db, { season: first.season, week: first.week });
+      await publishEdgeThresholdNotifications({
+        db,
+        board,
+        lines,
+        matchups: input.matchups,
+        snapshotKey: input.snapshotKey,
+        now: input.fetchedAt,
+        fetcher: input.fetcher
+      });
+    }
+  } catch {
+    // A notification transport failure never rolls back a validated odds snapshot.
+    // The delivery remains pending/failed in D1 for the isolated retry pass.
+  }
   return {
-    lines: await replaceLiveLines(result.lines, { db, snapshotKey: input.snapshotKey, fetchedAt: input.fetchedAt }),
+    lines,
     quota: { used: result.used, remaining: result.remaining, lastCost: result.lastCost }
   };
 }

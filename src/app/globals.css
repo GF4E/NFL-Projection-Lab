@@ -48,6 +48,9 @@ button:disabled { cursor: wait; opacity: .62; }
 .member-stack b + b { margin-left: -8px; border-color: var(--auburn-navy); background: var(--auburn-orange); color: white; }
 .member-stack span { margin-left: 8px; color: var(--muted); font-size: 10px; }
 .rail-foot p { margin: 11px 0 0; color: #5f6c66; font: 500 9px var(--display); letter-spacing: .08em; text-transform: uppercase; }
+.push-toggle { margin-top: 12px; padding: 0; border: 0; background: transparent; color: #6d7a74; font: 600 9px var(--display); letter-spacing: .06em; text-transform: uppercase; }
+.push-toggle:hover, .push-toggle.available, .push-toggle.error { color: var(--acid); }
+.push-toggle.enabled { color: var(--muted); cursor: default; }
 
 .workspace { min-width: 0; }
 .topbar { position: sticky; top: 0; z-index: 8; height: 68px; padding: 0 34px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); background: rgba(11, 23, 21, .88); backdrop-filter: blur(15px); }

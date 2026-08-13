@@ -7,6 +7,7 @@ import { runOfficialInjuryAutomation } from "./official-injuries/automation";
 import { expireStaleTeamDrafts } from "./play-store";
 import { runOfficialPregameContextAutomation } from "./pregame-context/automation";
 import { runKickoffWeatherAutomation } from "./weather/automation";
+import { dispatchPendingPushes } from "./push/store";
 
 /**
  * Runs every five minutes in production. The official pregame snapshot is resolved first so
@@ -19,7 +20,7 @@ export async function runBackgroundMaintenance(input: {
   now?: Date;
 }) {
   const now = input.now ?? new Date();
-  return orchestrateBackgroundMaintenance({
+  const result = await orchestrateBackgroundMaintenance({
     pregame: () => runOfficialPregameContextAutomation({ db: input.db, now }),
     odds: () => runScheduledOddsAutomation({ db: input.db, apiKey: input.apiKey, now }),
     weather: () => runKickoffWeatherAutomation({ db: input.db, now }),
@@ -29,4 +30,9 @@ export async function runBackgroundMaintenance(input: {
     lifecycle: () => runModelLifecycleAutomation({ db: input.db, now }),
     settlement: () => settleCompletedTeamPlays(input.db, now)
   }, now.toISOString());
+  try {
+    return { ...result, push: { status: "completed" as const, result: await dispatchPendingPushes({ db: input.db, now: now.toISOString() }) } };
+  } catch (error) {
+    return { ...result, push: { status: "failed" as const, error: error instanceof Error ? error.message : "push retry failed" } };
+  }
 }
