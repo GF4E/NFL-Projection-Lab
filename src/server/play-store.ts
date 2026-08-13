@@ -30,6 +30,8 @@ type PlayDatabaseRow = {
   result: WeeklyPlay["result"];
   profit_cents: number;
   closing_clv_cents: number | null;
+  closing_clv_points: number | null;
+  clv_reference_book: "BetMGM" | "FanDuel" | null;
   created_by: string;
   created_at: string;
   updated_at: string;
@@ -65,6 +67,8 @@ const CREATE_PLAYS_SQL = `
     result text DEFAULT 'pending' NOT NULL,
     profit_cents integer DEFAULT 0 NOT NULL,
     closing_clv_cents real,
+    closing_clv_points real,
+    clv_reference_book text,
     created_by text NOT NULL,
     created_at text NOT NULL,
     updated_at text NOT NULL,
@@ -81,8 +85,8 @@ const INSERT_PLAY_SQL = `
   INSERT OR IGNORE INTO plays (
     id, contract_key, contract_json, gabe_approved, jarrett_approved, season, week, game_id, play_type, market, primary_reason, picked_by, title, legs, book, american_odds, stake_cents,
     model_edge_pp, estimated_ev_percent, confidence, stats_case, football_case, execution_status, cash_placement_confirmed,
-    status, result, profit_cents, closing_clv_cents, created_by, created_at, updated_at
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    status, result, profit_cents, closing_clv_cents, closing_clv_points, clv_reference_book, created_by, created_at, updated_at
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `;
 
 function contractFor(row: PlayDatabaseRow): WeeklyPlay["contract"] {
@@ -132,6 +136,8 @@ function mapRow(row: PlayDatabaseRow): WeeklyPlay {
     result: row.result,
     profitCents: row.profit_cents,
     closingClvCents: row.closing_clv_cents,
+    closingClvPoints: row.closing_clv_points,
+    clvReferenceBook: row.clv_reference_book,
     createdBy: row.created_by,
     createdAt: row.created_at,
     updatedAt: row.updated_at
@@ -153,6 +159,8 @@ export async function ensurePlayStore(d1: D1Database = getD1()): Promise<void> {
   if (!names.has("jarrett_approved")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN jarrett_approved integer DEFAULT 0 NOT NULL"));
   if (!names.has("execution_status")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN execution_status text DEFAULT 'paper' NOT NULL"));
   if (!names.has("cash_placement_confirmed")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN cash_placement_confirmed integer DEFAULT 0 NOT NULL"));
+  if (!names.has("closing_clv_points")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN closing_clv_points real"));
+  if (!names.has("clv_reference_book")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN clv_reference_book text"));
   if (upgrades.length) await d1.batch(upgrades);
   await d1.batch([
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_season_week_status ON plays (season, week, status)"),
@@ -193,7 +201,7 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
     play.season, play.week, play.gameId, play.playType, play.market, play.primaryReason, play.pickedBy, play.title, play.legs, play.book,
     play.americanOdds, play.stakeCents, play.modelEdgePp, play.estimatedEvPercent,
     play.confidence, play.statsCase, play.footballCase, play.executionStatus, play.cashPlacementConfirmed ? 1 : 0, "research", play.result,
-    play.profitCents, play.closingClvCents, play.createdBy, play.createdAt, play.updatedAt
+    play.profitCents, play.closingClvCents, play.closingClvPoints, play.clvReferenceBook, play.createdBy, play.createdAt, play.updatedAt
   ).run();
   await getD1().prepare(`UPDATE plays SET
     gabe_approved = CASE WHEN ? = 'gabe' THEN 1 ELSE gabe_approved END,
@@ -206,7 +214,7 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
 
 export async function updatePlayResult(
   id: string,
-  update: Pick<WeeklyPlay, "status" | "result" | "profitCents" | "closingClvCents" | "updatedAt">
+  update: Pick<WeeklyPlay, "status" | "result" | "profitCents" | "closingClvCents" | "closingClvPoints" | "clvReferenceBook" | "updatedAt">
 ): Promise<WeeklyPlay | null> {
   await ensurePlayStore();
   await getD1().prepare(`
@@ -215,11 +223,14 @@ export async function updatePlayResult(
         result = ?,
         profit_cents = ?,
         closing_clv_cents = ?,
+        closing_clv_points = ?,
+        clv_reference_book = ?,
         execution_status = CASE WHEN ? = 'placed' THEN 'executed' ELSE execution_status END,
         cash_placement_confirmed = CASE WHEN ? = 'placed' THEN 1 ELSE cash_placement_confirmed END,
         updated_at = ?
     WHERE id = ?
-  `).bind(update.status, update.result, update.profitCents, update.closingClvCents, update.status, update.status, update.updatedAt, id).run();
+  `).bind(update.status, update.result, update.profitCents, update.closingClvCents, update.closingClvPoints,
+    update.clvReferenceBook, update.status, update.status, update.updatedAt, id).run();
   const row = await getD1().prepare("SELECT * FROM plays WHERE id = ?").bind(id).first<PlayDatabaseRow>();
   return row ? mapRow(row) : null;
 }

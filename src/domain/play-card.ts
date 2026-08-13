@@ -42,6 +42,8 @@ export type WeeklyPlay = {
   result: PlayResult;
   profitCents: number;
   closingClvCents: number | null;
+  closingClvPoints: number | null;
+  clvReferenceBook: "BetMGM" | "FanDuel" | null;
   createdBy: string;
   createdAt: string;
   updatedAt: string;
@@ -68,6 +70,7 @@ export function trackerSummary(plays: readonly WeeklyPlay[]) {
   const stakedCents = settled.reduce((sum, play) => sum + play.stakeCents, 0);
   const profitCents = settled.reduce((sum, play) => sum + play.profitCents, 0);
   const clvRows = settled.filter((play) => play.closingClvCents !== null);
+  const clvPointRows = settled.filter((play) => play.closingClvPoints !== null);
   const averageClvCents = clvRows.length
     ? clvRows.reduce((sum, play) => sum + (play.closingClvCents ?? 0), 0) / clvRows.length
     : 0;
@@ -85,6 +88,9 @@ export function trackerSummary(plays: readonly WeeklyPlay[]) {
     profitCents,
     roiPercent: stakedCents ? (profitCents / stakedCents) * 100 : 0,
     averageClvCents,
+    averageClvPoints: clvPointRows.length
+      ? clvPointRows.reduce((sum, play) => sum + (play.closingClvPoints ?? 0), 0) / clvPointRows.length
+      : 0,
     clvCount: clvRows.length,
     percentBeatingClose: clvRows.length
       ? clvRows.filter((play) => (play.closingClvCents ?? 0) > 0).length / clvRows.length * 100

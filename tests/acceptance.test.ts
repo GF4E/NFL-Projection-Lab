@@ -436,8 +436,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const tracker = readFileSync("src/components/play-tracker.tsx", "utf8");
     const store = readFileSync("src/server/play-store.ts", "utf8");
     expect(tracker).toContain('fetch("/api/plays")');
-    expect(tracker).toContain("closingClvCents: null");
+    expect(tracker).not.toContain("closingClvCents:");
     expect(tracker).not.toContain("closingClvCents: result ===");
+    expect(readFileSync("src/server/closing-value.ts", "utf8")).toContain("last complete pre-kickoff");
     expect(store).toContain("week === undefined");
     expect(store).toContain("ORDER BY week, created_at ASC");
   });

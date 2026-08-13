@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { isTeamApproved, stakeToUnits, trackerRecordSummaries, trackerSummary, type PlayResult, type WeeklyPlay } from "@/domain/play-card";
+import { isTeamApproved, stakeToUnits, trackerRecordSummaries, trackerSummary, type WeeklyPlay } from "@/domain/play-card";
 
 type Filter = "all" | "open" | "settled";
 
@@ -20,7 +20,7 @@ function RecordLane({ label, note, summary }: { label: string; note: string; sum
     <div className="record-lane-stats">
       <div><span>Profit</span><strong className={summary.profitCents >= 0 ? "positive" : "negative"}>{dollars(summary.profitCents)}</strong><small>{(summary.profitCents / 2500).toFixed(1)}u</small></div>
       <div><span>ROI</span><strong>{summary.roiPercent.toFixed(1)}%</strong><small>{summary.settledCount} graded</small></div>
-      <div><span>CLV</span><strong>{summary.clvCount ? `${summary.averageClvCents >= 0 ? "+" : ""}${summary.averageClvCents.toFixed(1)}¢` : "—"}</strong><small>{summary.percentBeatingClose === null ? "No closes" : `${summary.percentBeatingClose.toFixed(0)}% beat close`}</small></div>
+      <div><span>CLV</span><strong>{summary.clvCount ? `${summary.averageClvCents >= 0 ? "+" : ""}${summary.averageClvCents.toFixed(1)}¢` : "—"}</strong><small>{summary.percentBeatingClose === null ? "No closes" : `${summary.percentBeatingClose.toFixed(0)}% beat close${summary.averageClvPoints ? ` · ${summary.averageClvPoints > 0 ? "+" : ""}${summary.averageClvPoints.toFixed(1)} pt` : ""}`}</small></div>
       <div><span>Drawdown</span><strong>{dollars(-summary.maximumDrawdownCents)}</strong><small>{(summary.maximumDrawdownCents / 2500).toFixed(1)}u max</small></div>
     </div>
   </article>;
@@ -50,18 +50,18 @@ export function PlayTracker() {
     return () => { active = false; };
   }, []);
 
-  async function update(play: WeeklyPlay, status: "placed" | "settled", result: PlayResult) {
+  async function markPlaced(play: WeeklyPlay) {
     setMessage(`Updating ${play.title}…`);
     try {
       const response = await fetch(`/api/plays/${play.id}`, {
         method: "PATCH",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ status, result, closingClvCents: null })
+        body: JSON.stringify({ status: "placed", result: "pending" })
       });
       const data = await response.json() as { play?: WeeklyPlay; error?: string };
       if (!response.ok || !data.play) throw new Error(data.error ?? "Update failed");
       setPlays((current) => current.map((row) => row.id === play.id ? data.play! : row));
-      setMessage(`${play.title} is recorded as ${result === "pending" ? "cash placed" : result}.`);
+      setMessage(`${play.title} is recorded as cash placed.`);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Update failed");
     }
@@ -83,7 +83,7 @@ export function PlayTracker() {
           <span>{odds(play.americanOdds)}</span>
           <span><b>${(play.stakeCents / 100).toFixed(0)}</b><small>{stakeToUnits(play.stakeCents)}u</small></span>
           <span className={play.modelEdgePp > 0 ? "positive" : ""}>{play.modelEdgePp ? `${play.modelEdgePp > 0 ? "+" : ""}${play.modelEdgePp.toFixed(1)} pp` : "—"}</span>
-          <div className="result-cell">{play.status === "settled" ? <><b className={play.result === "win" ? "positive" : play.result === "loss" ? "negative" : ""}>{play.result}</b><small>{dollars(play.profitCents)} · {play.closingClvCents === null ? "CLV pending" : `${play.closingClvCents.toFixed(1)}¢ CLV`}</small></> : play.status === "placed" ? <div className="grade-buttons"><button onClick={() => update(play, "settled", "win")}>W</button><button onClick={() => update(play, "settled", "loss")}>L</button><button onClick={() => update(play, "settled", "push")}>P</button></div> : <button className="track-action" onClick={() => update(play, "placed", "pending")}>Cash placed</button>}</div>
+          <div className="result-cell">{play.status === "settled" ? <><b className={play.result === "win" ? "positive" : play.result === "loss" ? "negative" : ""}>{play.result}</b><small>{dollars(play.profitCents)} · {play.closingClvCents === null ? "CLV pending" : `${play.closingClvCents.toFixed(1)}¢ CLV${play.closingClvPoints === null ? "" : ` · ${play.closingClvPoints > 0 ? "+" : ""}${play.closingClvPoints.toFixed(1)} pt`}`}</small></> : play.status === "placed" ? <><b>placed</b><small>Awaiting nflverse final</small></> : <button className="track-action" onClick={() => markPlaced(play)}>Cash placed</button>}</div>
         </div>)}
       </div>
     </section>

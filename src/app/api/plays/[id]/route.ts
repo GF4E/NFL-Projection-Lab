@@ -5,9 +5,8 @@ import { getPlay, updatePlayResult } from "@/server/play-store";
 export const dynamic = "force-dynamic";
 
 const updateSchema = z.object({
-  status: z.enum(["card", "placed", "settled", "passed"]),
-  result: z.enum(["pending", "win", "loss", "push", "void"]).default("pending"),
-  closingClvCents: z.number().min(-100).max(100).nullable().default(null)
+  status: z.literal("placed"),
+  result: z.literal("pending").default("pending")
 });
 
 function profitFor(stakeCents: number, americanOdds: number, result: "pending" | "win" | "loss" | "push" | "void") {
@@ -26,7 +25,9 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       status: input.status,
       result: input.result,
       profitCents: profitFor(existing.stakeCents, existing.americanOdds, input.result),
-      closingClvCents: input.closingClvCents,
+      closingClvCents: existing.closingClvCents,
+      closingClvPoints: existing.closingClvPoints,
+      clvReferenceBook: existing.clvReferenceBook,
       updatedAt: new Date().toISOString()
     });
     return NextResponse.json({ play });

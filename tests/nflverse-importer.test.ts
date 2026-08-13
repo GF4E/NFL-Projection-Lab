@@ -129,6 +129,7 @@ describe("automatic nflverse importer", () => {
     expect(worker).toContain("settleCompletedTeamPlays(env.DB, scheduledAt)");
     expect(worker).toContain("runKickoffWeatherAutomation");
     expect(settlement).toContain("play_settlement_audit");
-    expect(settlement).not.toContain("closing_clv_cents =");
+    expect(settlement).toContain("calculateStoredPlayClosingValue");
+    expect(settlement).toContain("play_clv_audit");
   });
 });

@@ -91,6 +91,8 @@ export async function POST(request: Request) {
       result: "pending",
       profitCents: 0,
       closingClvCents: null,
+      closingClvPoints: null,
+      clvReferenceBook: null,
       createdBy: requestAuthor(request),
       createdAt: now,
       updatedAt: now

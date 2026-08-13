@@ -25,7 +25,7 @@ export const rehearsalPlays: WeeklyPlay[] = [
     status: "card",
     result: "pending",
     profitCents: 0,
-    closingClvCents: null,
+    closingClvCents: null, closingClvPoints: null, clvReferenceBook: null,
     createdBy: "gabe",
     createdAt: "2026-09-10T18:20:00Z",
     updatedAt: "2026-09-10T18:20:00Z"
@@ -54,7 +54,7 @@ export const rehearsalPlays: WeeklyPlay[] = [
     status: "card",
     result: "pending",
     profitCents: 0,
-    closingClvCents: null,
+    closingClvCents: null, closingClvPoints: null, clvReferenceBook: null,
     createdBy: "gabe",
     createdAt: "2026-09-10T19:10:00Z",
     updatedAt: "2026-09-10T19:10:00Z"
@@ -83,7 +83,7 @@ export const rehearsalPlays: WeeklyPlay[] = [
     status: "card",
     result: "pending",
     profitCents: 0,
-    closingClvCents: null,
+    closingClvCents: null, closingClvPoints: null, clvReferenceBook: null,
     createdBy: "gabe",
     createdAt: "2026-09-11T01:05:00Z",
     updatedAt: "2026-09-11T01:05:00Z"
@@ -112,7 +112,7 @@ export const rehearsalPlays: WeeklyPlay[] = [
     status: "card",
     result: "pending",
     profitCents: 0,
-    closingClvCents: null,
+    closingClvCents: null, closingClvPoints: null, clvReferenceBook: null,
     createdBy: "gabe",
     createdAt: "2026-09-11T02:40:00Z",
     updatedAt: "2026-09-11T02:40:00Z"
@@ -141,7 +141,7 @@ export const rehearsalPlays: WeeklyPlay[] = [
     status: "card",
     result: "pending",
     profitCents: 0,
-    closingClvCents: null,
+    closingClvCents: null, closingClvPoints: null, clvReferenceBook: null,
     createdBy: "gabe",
     createdAt: "2026-09-11T03:15:00Z",
     updatedAt: "2026-09-11T03:15:00Z"
@@ -170,7 +170,7 @@ export const rehearsalPlays: WeeklyPlay[] = [
     status: "card",
     result: "pending",
     profitCents: 0,
-    closingClvCents: null,
+    closingClvCents: null, closingClvPoints: null, clvReferenceBook: null,
     createdBy: "gabe",
     createdAt: "2026-09-11T04:00:00Z",
     updatedAt: "2026-09-11T04:00:00Z"
@@ -199,7 +199,7 @@ export const rehearsalPlays: WeeklyPlay[] = [
     status: "card",
     result: "pending",
     profitCents: 0,
-    closingClvCents: null,
+    closingClvCents: null, closingClvPoints: null, clvReferenceBook: null,
     createdBy: "gabe",
     createdAt: "2026-09-11T05:20:00Z",
     updatedAt: "2026-09-11T05:20:00Z"
@@ -228,7 +228,7 @@ export const rehearsalPlays: WeeklyPlay[] = [
     status: "card",
     result: "pending",
     profitCents: 0,
-    closingClvCents: null,
+    closingClvCents: null, closingClvPoints: null, clvReferenceBook: null,
     createdBy: "gabe",
     createdAt: "2026-09-11T06:15:00Z",
     updatedAt: "2026-09-11T06:15:00Z"
