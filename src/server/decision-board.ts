@@ -27,10 +27,11 @@ import { applyChampionMarketResidual, predictProbability, type FittedLogisticMod
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
 import type { HistoricalMarginRow } from "@/domain/types";
 import { fitWeatherTotalAdjustment } from "@/domain/weather-model";
+import { loopAStateMatchesRevision, loopAStateRevision, updateTeamStates } from "@/domain/model-lifecycle";
 import { weeklySlate } from "./weekly-slate";
 import { ensureOfficialInjuryStore, getOfficialInjuryImportState } from "./official-injuries/store";
 import { ensureKickoffWeatherStore, listKickoffWeather } from "./weather/store";
-import { ensureModelLifecycleStore, getActiveChampionHash, getModelArtifact, getTeamStrengthStates } from "./model-lifecycle/store";
+import { ensureModelLifecycleStore, getModelArtifact, getModelLifecycleState, getTeamStrengthStates } from "./model-lifecycle/store";
 import {
   buildLifecycleForecastRow,
   buildLifecycleTeamContexts,
@@ -466,18 +467,18 @@ async function loadMovementHistory(db: D1Database, gameIds: readonly string[]): 
   }
 }
 
-function strengthStates(games: GameRow[], latestSeason: number): Map<string, number> {
-  const states = new Map<string, number>();
-  for (const game of [...games].sort((left, right) => left.game_date.localeCompare(right.game_date) || left.week - right.week)) {
-    const timeWeight = 0.5 ** ((latestSeason - game.season) / structuralConfig.model.decayHalfLifeSeasons);
-    const residual = marginVersusConsensusResidual(game.result, game.spread_line);
-    const move = structuralConfig.model.strengthK * timeWeight * residual / 2;
-    const homeTeam = normalizeNflverseTeam(game.home_team);
-    const awayTeam = normalizeNflverseTeam(game.away_team);
-    states.set(homeTeam, (states.get(homeTeam) ?? 0) + move);
-    states.set(awayTeam, (states.get(awayTeam) ?? 0) - move);
-  }
-  return states;
+function strengthStates(games: GameRow[]): Map<string, number> {
+  const states = updateTeamStates([], games.map((game) => ({
+    gameId: game.game_id,
+    season: game.season,
+    week: game.week,
+    homeTeam: normalizeNflverseTeam(game.home_team),
+    awayTeam: normalizeNflverseTeam(game.away_team),
+    actualHomeMargin: game.result,
+    consensusHomeExpectedMargin: game.spread_line,
+    completedAt: game.game_date
+  })), structuralConfig.model.strengthK);
+  return new Map(states.map((state) => [state.team, state.mean]));
 }
 
 function rawLine(row: LineRow): Omit<LiveLine, "fairProbability" | "marketVigPercent"> {
@@ -501,7 +502,7 @@ export async function buildDecisionBoard(
   const activeGameIds = slate.games.map((game) => game.id);
   const activePlaceholders = activeGameIds.map(() => "?").join(", ");
   const injuryDataset = `official-injuries:${slate.season}:reg${slate.week}`;
-  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, inactiveResult, pregameStates, weatherRows, persistedStates, championHash] = await Promise.all([
+  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, inactiveResult, pregameStates, weatherRows, persistedStates, lifecycle] = await Promise.all([
     db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line,
         roof, temperature, wind, away_moneyline, home_moneyline
@@ -544,16 +545,19 @@ export async function buildDecisionBoard(
     getPregameContextStates(db, activeGameIds),
     listKickoffWeather(db, activeGameIds),
     getTeamStrengthStates(db, slate.season),
-    getActiveChampionHash(db, slate.season)
+    getModelLifecycleState(db, slate.season)
   ]);
+  const championHash = lifecycle?.championHash ?? null;
   const featureRows = featureResult.results;
   const latestTrainingSeason = Math.max(structuralConfig.model.trainingStartSeason, ...gameResult.results.map((row) => row.season));
   const leagueScoring = weightedLeagueScoring(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season);
   const basisSeason = featureRows.length ? Math.max(...featureRows.map((row) => row.season)) : null;
-  const persistedStrengths = persistedStates.length && persistedStates.every((state) => state.throughWeek >= slate.week - 1)
+  const loopARevision = loopAStateRevision(structuralConfig.version, structuralConfig.model.strengthK);
+  const persistedStrengths = loopAStateMatchesRevision(lifecycle?.loopAHash, loopARevision) &&
+    persistedStates.length && persistedStates.every((state) => state.throughWeek >= slate.week - 1)
     ? new Map(persistedStates.map((state) => [state.team, state.mean]))
     : null;
-  const strengths = persistedStrengths ?? (basisSeason === null ? new Map<string, number>() : strengthStates(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season));
+  const strengths = persistedStrengths ?? (basisSeason === null ? new Map<string, number>() : strengthStates(gameResult.results));
   const profiles = teamProfiles(featureRows, strengths);
   const lifecycleContexts = buildLifecycleTeamContexts(
     slate.games.map((game) => ({
@@ -836,6 +840,6 @@ export async function buildDecisionBoard(
     championHash,
     games,
     teaserPairs,
-    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); decay-weighted margin-versus-close strength; logged gated champion calibration; then 25% model and 75% power-de-vigged market shrinkage.`
+    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K cumulative margin-versus-close strength; logged gated champion calibration; then 25% model and 75% power-de-vigged market shrinkage.`
   };
 }

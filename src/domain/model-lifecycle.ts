@@ -8,6 +8,22 @@ import type {
   TeamState
 } from "./types";
 
+export function loopAStateRevision(configVersion: string, strengthK: number): string {
+  if (!configVersion || !Number.isFinite(strengthK) || strengthK < 0) {
+    throw new Error("Loop A state revision requires a config version and nonnegative K");
+  }
+  return `${configVersion}:strength-k-${strengthK}`;
+}
+
+export function versionLoopAStateHash(revision: string, stateHash: string): string {
+  if (!revision || !stateHash) throw new Error("Loop A state hash requires revision and data hash");
+  return `${revision}:${stateHash}`;
+}
+
+export function loopAStateMatchesRevision(stateHash: string | null | undefined, revision: string): boolean {
+  return Boolean(stateHash?.startsWith(`${revision}:`));
+}
+
 export function updateTeamStates(
   states: TeamState[],
   games: CompletedGame[],

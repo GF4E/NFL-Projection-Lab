@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { runPromotionGate, updateTeamStates } from "@/domain/model-lifecycle";
+import {
+  loopAStateMatchesRevision,
+  loopAStateRevision,
+  runPromotionGate,
+  updateTeamStates,
+  versionLoopAStateHash
+} from "@/domain/model-lifecycle";
 import { aggregateRollingFeatureStates, missingLifecycleFeatureSeasons } from "@/server/model-lifecycle/automation";
 import {
   buildLifecycleTeamContexts,
@@ -35,6 +41,16 @@ describe("persisted weekly model lifecycle", () => {
     expect(features).toHaveLength(1);
     expect(features[0]).toMatchObject({ team: "SEA", season: 2026, throughWeek: 0 });
     expect(features[0].epa).toBeGreaterThan(10);
+  });
+
+  it("invalidates persisted strength states when the frozen K/config revision changes", () => {
+    const current = loopAStateRevision("2026.preseason.9", 0.005);
+    const prior = loopAStateRevision("2026.preseason.8", 0.18);
+    const currentHash = versionLoopAStateHash(current, "data-hash");
+    expect(loopAStateMatchesRevision(currentHash, current)).toBe(true);
+    expect(loopAStateMatchesRevision(currentHash, prior)).toBe(false);
+    expect(loopAStateMatchesRevision("legacy-unversioned-hash", current)).toBe(false);
+    expect(loopAStateMatchesRevision(null, current)).toBe(false);
   });
 
   it("retains the champion until every training season has team-feature coverage", () => {

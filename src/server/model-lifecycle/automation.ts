@@ -1,6 +1,12 @@
 import { eraConfig, structuralConfig } from "@/domain/config";
 import { stableHash } from "@/domain/hash";
-import { runPromotionGate, updateTeamStates } from "@/domain/model-lifecycle";
+import {
+  loopAStateMatchesRevision,
+  loopAStateRevision,
+  runPromotionGate,
+  updateTeamStates,
+  versionLoopAStateHash
+} from "@/domain/model-lifecycle";
 import { designFeatureNames, fitWeightedLogistic, type FittedLogisticModel, type ModelTrainingRow } from "@/domain/model-fit";
 import { normalizeNflverseTeam } from "@/domain/decision-board";
 import type { CompletedGame, RollingFeatures, TeamState } from "@/domain/types";
@@ -171,7 +177,9 @@ export async function runModelLifecycleAutomation(input: {
   const clock = pacificParts(now);
   const initialize = !lifecycle?.championHash;
   const tuesday = clock.weekday === "Tue";
-  const loopADue = input.force || initialize || (tuesday && (clock.hour > 6 || clock.hour === 6 && clock.minute >= 30) && (lifecycle?.loopAThroughWeek ?? -1) < throughWeek);
+  const loopARevision = loopAStateRevision(structuralConfig.version, structuralConfig.model.strengthK);
+  const loopADue = input.force || initialize || !loopAStateMatchesRevision(lifecycle?.loopAHash, loopARevision) ||
+    (tuesday && (clock.hour > 6 || clock.hour === 6 && clock.minute >= 30) && (lifecycle?.loopAThroughWeek ?? -1) < throughWeek);
   const loopBDue = input.force || initialize || (tuesday && clock.hour >= 7 && (lifecycle?.loopBTargetWeek ?? -1) < targetWeek);
   let loopA: ModelLifecycleAutomationResult["loopA"] = "skipped";
   let loopB: ModelLifecycleAutomationResult["loopB"] = "skipped";
@@ -198,7 +206,10 @@ export async function runModelLifecycleAutomation(input: {
       .bind(season, season, throughWeek).all<FeatureRow>();
     const features = aggregateRollingFeatureStates(featuresResult.results, season, throughWeek);
     if (features.length < 28) throw new Error("Loop A aborted: rolling feature import is incomplete");
-    const stateHash = stableHash({ completedGames, features, k: structuralConfig.model.strengthK });
+    const stateHash = versionLoopAStateHash(
+      loopARevision,
+      stableHash({ completedGames, features, k: structuralConfig.model.strengthK })
+    );
     await publishLoopA({ db: input.db, season, throughWeek, states, features, stateHash, updatedAt: startedAt });
     loopA = "updated";
   }
