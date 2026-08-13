@@ -223,17 +223,23 @@ function mulberry32(seed: number): () => number {
 
 function weightedSample(rows: ModelTrainingRow[], seed: number): ModelTrainingRow[] {
   const random = mulberry32(seed);
-  const totalWeight = rows.reduce((sum, row) => sum + row.weight, 0);
+  const cumulativeWeights: number[] = [];
+  let totalWeight = 0;
+  for (const row of rows) {
+    totalWeight += row.weight;
+    cumulativeWeights.push(totalWeight);
+  }
   const counts = Array(rows.length).fill(0) as number[];
   for (let draw = 0; draw < rows.length; draw += 1) {
-    let target = random() * totalWeight;
-    for (let index = 0; index < rows.length; index += 1) {
-      target -= rows[index].weight;
-      if (target <= 0) {
-        counts[index] += 1;
-        break;
-      }
+    const target = random() * totalWeight;
+    let low = 0;
+    let high = cumulativeWeights.length - 1;
+    while (low < high) {
+      const middle = Math.floor((low + high) / 2);
+      if (target < cumulativeWeights[middle]) high = middle;
+      else low = middle + 1;
     }
+    counts[low] += 1;
   }
   return rows.flatMap((row, index) => counts[index] ? [{ ...row, weight: counts[index] }] : []);
 }
