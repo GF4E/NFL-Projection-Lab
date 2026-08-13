@@ -100,13 +100,31 @@ export function fitWeightedLogistic(
   const iterations = options.iterations ?? 600;
   const coefficients = Array(featureNames.length).fill(0) as number[];
   const totalWeight = eligible.reduce((sum, row) => sum + row.weight, 0);
+  // Model refits run in a CPU-bounded worker. Encode the immutable design matrix
+  // once and retain only non-zero cells; season/market indicator columns make the
+  // matrix deliberately sparse, so rebuilding dense vectors inside every gradient
+  // step wastes most of the lifecycle job's CPU budget.
+  const design = eligible.map((row) => {
+    const vector = encodeFeatures(row, featureNames);
+    const indices: number[] = [];
+    const values: number[] = [];
+    for (let index = 0; index < vector.length; index += 1) {
+      if (vector[index] === 0) continue;
+      indices.push(index);
+      values.push(vector[index]);
+    }
+    return { indices, values, outcome: row.outcome, weight: row.weight };
+  });
   for (let iteration = 0; iteration < iterations; iteration += 1) {
     const gradient = Array(featureNames.length).fill(0) as number[];
-    for (const row of eligible) {
-      const vector = encodeFeatures(row, featureNames);
-      const error = sigmoid(dot(coefficients, vector)) - row.outcome;
-      for (let index = 0; index < gradient.length; index += 1) {
-        gradient[index] += row.weight * error * vector[index];
+    for (const row of design) {
+      let linear = 0;
+      for (let cell = 0; cell < row.indices.length; cell += 1) {
+        linear += coefficients[row.indices[cell]] * row.values[cell];
+      }
+      const weightedError = row.weight * (sigmoid(linear) - row.outcome);
+      for (let cell = 0; cell < row.indices.length; cell += 1) {
+        gradient[row.indices[cell]] += weightedError * row.values[cell];
       }
     }
     for (let index = 0; index < coefficients.length; index += 1) {
