@@ -339,6 +339,27 @@ export interface DecisionBoardGame {
   movements: LineMovementSeries[];
   availability: GameAvailabilityContext;
   weather: GameWeatherContext;
+  quarterbacks: GameQuarterbackContext;
+}
+
+export interface TeamQuarterbackContext {
+  team: string;
+  referenceStarter: string | null;
+  referenceSource: "latest_completed_start" | "unavailable";
+  availability: "available" | "at_risk" | "inactive" | "unconfirmed";
+  backupTier: string | null;
+  learnedPointPrior: number | null;
+  ownerOverridePoints: number | null;
+  appliedTeamMarginPoints: number;
+  sourceTimestamp: string | null;
+  auditHash: string;
+}
+
+export interface GameQuarterbackContext {
+  home: TeamQuarterbackContext;
+  away: TeamQuarterbackContext;
+  configStatus: string;
+  forecastHandling: "validated_prior" | "market_only" | "owner_override";
 }
 
 export interface DecisionBoardPayload {

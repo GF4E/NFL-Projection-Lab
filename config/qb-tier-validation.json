@@ -1,0 +1,167 @@
+{
+  "generatedAt": "2026-08-13T14:55:32.224886+00:00",
+  "trainingSource": "nflverse schedules, closing consensus spreads, and weekly QB statistics",
+  "sourceUrls": [
+    "https://github.com/nflverse/nfldata/raw/master/data/games.csv",
+    "https://github.com/nflverse/nflverse-data/releases/tag/stats_player"
+  ],
+  "dataSnapshotHash": "9d2e0261f86ad193f0f2d70344cc64fb8497aa852f61071d28df00e85d613e5a",
+  "sourceSeasons": [
+    2010,
+    2025
+  ],
+  "tuningSeasons": [
+    2010,
+    2022
+  ],
+  "holdoutSeasons": [
+    2023,
+    2024,
+    2025
+  ],
+  "replacementDefinition": "Current starter differs from the modal starter over the prior 8 team starts; incumbent must have at least 2 starts.",
+  "qualityInputs": {
+    "volume": "career dropbacks completed strictly before the forecast game",
+    "efficiency": "career passing EPA/dropback adjusted by the opponent defense's leakage-safe prior rate and shrunk by 100 dropbacks",
+    "defensePriorDropbacks": 200
+  },
+  "target": "team-perspective actual margin minus closing-consensus expected margin",
+  "decayHalfLifeSeasons": 2.5,
+  "trainingEvents": 1919,
+  "holdoutEvents": 453,
+  "thresholdsLearnedOnTuningWindow": {
+    "priorDropbacksMedian": 453.0,
+    "adjustedEpaPerDropbackMedian": -0.002433
+  },
+  "candidateShrinkage": [
+    {
+      "priorEvents": 8,
+      "holdoutRmse": 12.670851,
+      "holdoutMae": 9.906021,
+      "rmseImprovementVersusNoAdjustment": -0.013694
+    },
+    {
+      "priorEvents": 16,
+      "holdoutRmse": 12.668452,
+      "holdoutMae": 9.903161,
+      "rmseImprovementVersusNoAdjustment": -0.011294
+    },
+    {
+      "priorEvents": 32,
+      "holdoutRmse": 12.665039,
+      "holdoutMae": 9.898602,
+      "rmseImprovementVersusNoAdjustment": -0.007881
+    },
+    {
+      "priorEvents": 64,
+      "holdoutRmse": 12.661227,
+      "holdoutMae": 9.893644,
+      "rmseImprovementVersusNoAdjustment": -0.004069
+    },
+    {
+      "priorEvents": 128,
+      "holdoutRmse": 12.658214,
+      "holdoutMae": 9.889285,
+      "rmseImprovementVersusNoAdjustment": -0.001057
+    },
+    {
+      "priorEvents": 256,
+      "holdoutRmse": 12.656725,
+      "holdoutMae": 9.88556,
+      "rmseImprovementVersusNoAdjustment": 0.000433
+    },
+    {
+      "priorEvents": 512,
+      "holdoutRmse": 12.656416,
+      "holdoutMae": 9.883208,
+      "rmseImprovementVersusNoAdjustment": 0.000742
+    }
+  ],
+  "selectedPriorEvents": 512,
+  "holdoutBaselineRmse": 12.657158,
+  "holdoutBaselineMae": 9.879691,
+  "holdoutSelectedRmse": 12.656416,
+  "holdoutSelectedMae": 9.883208,
+  "holdoutBySeason": [
+    {
+      "season": 2023,
+      "events": 144,
+      "baselineRmse": 12.544297,
+      "selectedRmse": 12.540067,
+      "baselineMae": 9.545139,
+      "selectedMae": 9.547113
+    },
+    {
+      "season": 2024,
+      "events": 154,
+      "baselineRmse": 12.335213,
+      "selectedRmse": 12.330766,
+      "baselineMae": 9.678571,
+      "selectedMae": 9.673294
+    },
+    {
+      "season": 2025,
+      "events": 155,
+      "baselineRmse": 13.07059,
+      "selectedRmse": 13.07643,
+      "baselineMae": 10.390323,
+      "selectedMae": 10.404011
+    }
+  ],
+  "decision": "withhold",
+  "definitions": [
+    {
+      "id": "proven_positive",
+      "minimumPriorDropbacks": 453.0,
+      "adjustedEpaPerDropback": {
+        "minimum": -0.002433
+      }
+    },
+    {
+      "id": "experienced_below_average",
+      "minimumPriorDropbacks": 453.0,
+      "adjustedEpaPerDropback": {
+        "maximumExclusive": -0.002433
+      }
+    },
+    {
+      "id": "limited_positive",
+      "priorDropbacks": {
+        "minimumExclusive": 0,
+        "maximumExclusive": 453.0
+      },
+      "adjustedEpaPerDropback": {
+        "minimum": -0.002433
+      }
+    },
+    {
+      "id": "unproven_or_below_average",
+      "fallback": true
+    }
+  ],
+  "candidatePointPriors": [
+    {
+      "tier": "proven_positive",
+      "teamMarginPoints": -0.086,
+      "events": 538
+    },
+    {
+      "tier": "experienced_below_average",
+      "teamMarginPoints": -0.178,
+      "events": 359
+    },
+    {
+      "tier": "limited_positive",
+      "teamMarginPoints": -0.1004,
+      "events": 311
+    },
+    {
+      "tier": "unproven_or_below_average",
+      "teamMarginPoints": -0.0985,
+      "events": 711
+    }
+  ],
+  "learnedPointPriors": [],
+  "leakageControl": "Starter history, QB volume, QB efficiency, defense adjustment, and league baseline all end before the forecast game.",
+  "application": "Apply only when the expected starter is confirmed unavailable and the replacement starter is identified; otherwise withhold the adjustment."
+}

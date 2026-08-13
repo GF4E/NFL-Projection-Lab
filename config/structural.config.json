@@ -1,5 +1,5 @@
 {
-  "version": "2026.preseason.9",
+  "version": "2026.preseason.10",
   "season": 2026,
   "frozen": true,
   "unitDollars": 25,
@@ -108,9 +108,28 @@
     "reserveCredits": 50
   },
   "qbTiers": {
-    "definitions": [],
+    "validationArtifact": "qb-tier-validation.json",
+    "definitions": [
+      {
+        "id": "proven_positive",
+        "minimumPriorDropbacks": 453.0,
+        "adjustedEpaPerDropback": { "minimum": -0.002433 }
+      },
+      {
+        "id": "experienced_below_average",
+        "minimumPriorDropbacks": 453.0,
+        "adjustedEpaPerDropback": { "maximumExclusive": -0.002433 }
+      },
+      {
+        "id": "limited_positive",
+        "priorDropbacks": { "minimumExclusive": 0, "maximumExclusive": 453.0 },
+        "adjustedEpaPerDropback": { "minimum": -0.002433 }
+      },
+      { "id": "unproven_or_below_average", "fallback": true }
+    ],
     "learnedPointPriors": [],
-    "status": "requires_offseason_estimation"
+    "status": "validated_withheld_no_holdout_improvement",
+    "fallbackBehavior": "preserve_market_anchored_forecast_and_flag_qb_uncertainty"
   },
   "dataSources": {
     "historicalInjuriesThrough": 2024,

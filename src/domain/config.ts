@@ -99,9 +99,11 @@ export interface StructuralConfig {
     reserveCredits: number;
   };
   qbTiers: {
+    validationArtifact: string;
     definitions: unknown[];
     learnedPointPriors: unknown[];
     status: string;
+    fallbackBehavior: string;
   };
   dataSources: Record<string, unknown>;
 }

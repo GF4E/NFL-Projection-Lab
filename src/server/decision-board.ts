@@ -12,6 +12,7 @@ import {
   type BaselineProjection,
   type DecisionBoardPayload,
   type GameAvailabilityContext,
+  type GameQuarterbackContext,
   type GameWeatherContext,
   type LineMovementSeries,
   type MoneylineProjection,
@@ -40,6 +41,8 @@ import {
 } from "./model-lifecycle/training";
 import { ensurePregameContextStore, getPregameContextStates } from "./pregame-context/store";
 import { getD1 } from "../../db";
+import { stableHash } from "@/domain/hash";
+import { ensureQbOverrideStore, latestQbModelOverrides } from "./qb-overrides/store";
 
 interface FeatureRow {
   game_id: string;
@@ -84,6 +87,8 @@ interface GameRow {
   wind: number | null;
   away_moneyline: number | null;
   home_moneyline: number | null;
+  away_qb_name: string | null;
+  home_qb_name: string | null;
 }
 
 interface LineRow {
@@ -101,6 +106,7 @@ interface LineRow {
 
 interface InjuryAggregateRow {
   game_id: string;
+  team: string;
   reported_players: number;
   out_count: number;
   doubtful_count: number;
@@ -112,9 +118,25 @@ interface InjuryAggregateRow {
 
 interface InactiveAggregateRow {
   game_id: string;
+  team: string;
   inactive_count: number;
   qb_inactive: number;
   source_timestamp: string | null;
+}
+
+interface QbReportRow {
+  game_id: string;
+  team: string;
+  player: string;
+  game_status: string | null;
+  source_timestamp: string;
+}
+
+interface QbInactiveRow {
+  game_id: string;
+  team: string;
+  player: string;
+  source_timestamp: string;
 }
 
 type Aggregate = {
@@ -495,15 +517,16 @@ export async function buildDecisionBoard(
     ensureOfficialInjuryStore(db),
     ensureKickoffWeatherStore(db),
     ensureModelLifecycleStore(db),
-    ensurePregameContextStore(db)
+    ensurePregameContextStore(db),
+    ensureQbOverrideStore(db)
   ]);
   const activeGameIds = slate.games.map((game) => game.id);
   const activePlaceholders = activeGameIds.map(() => "?").join(", ");
   const injuryDataset = `official-injuries:${slate.season}:reg${slate.week}`;
-  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, inactiveResult, pregameStates, weatherRows, persistedStates, lifecycle] = await Promise.all([
+  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, inactiveResult, qbReportResult, qbInactiveResult, pregameStates, weatherRows, persistedStates, lifecycle, qbOverrides] = await Promise.all([
     db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line,
-        roof, temperature, wind, away_moneyline, home_moneyline
+        roof, temperature, wind, away_moneyline, home_moneyline, away_qb_name, home_qb_name
       FROM nfl_games WHERE season BETWEEN 2010 AND ? AND season_type = 'REG'
         AND result IS NOT NULL AND spread_line IS NOT NULL
         AND (season < ? OR week < ?)
@@ -534,17 +557,26 @@ export async function buildDecisionBoard(
         MAX(source_timestamp) AS source_timestamp
       FROM official_injury_reports
       WHERE season = ? AND week = ? AND game_id IN (${activePlaceholders})
-      GROUP BY game_id`).bind(slate.season, slate.week, ...activeGameIds).all<InjuryAggregateRow>(),
+      GROUP BY game_id, team`).bind(slate.season, slate.week, ...activeGameIds).all<InjuryAggregateRow>(),
     getOfficialInjuryImportState(db, injuryDataset),
-    db.prepare(`SELECT game_id, COUNT(*) AS inactive_count,
+    db.prepare(`SELECT game_id, team, COUNT(*) AS inactive_count,
         SUM(CASE WHEN UPPER(COALESCE(position, '')) = 'QB' THEN 1 ELSE 0 END) AS qb_inactive,
         MAX(source_timestamp) AS source_timestamp
-      FROM official_inactives WHERE game_id IN (${activePlaceholders}) GROUP BY game_id`)
+      FROM official_inactives WHERE game_id IN (${activePlaceholders}) GROUP BY game_id, team`)
       .bind(...activeGameIds).all<InactiveAggregateRow>(),
+    db.prepare(`SELECT game_id, team, player, game_status, source_timestamp
+      FROM official_injury_reports
+      WHERE season = ? AND week = ? AND UPPER(COALESCE(position, '')) = 'QB'
+        AND game_id IN (${activePlaceholders})`).bind(slate.season, slate.week, ...activeGameIds).all<QbReportRow>(),
+    db.prepare(`SELECT game_id, team, player, source_timestamp
+      FROM official_inactives
+      WHERE UPPER(COALESCE(position, '')) = 'QB' AND game_id IN (${activePlaceholders})`)
+      .bind(...activeGameIds).all<QbInactiveRow>(),
     getPregameContextStates(db, activeGameIds),
     listKickoffWeather(db, activeGameIds),
     getTeamStrengthStates(db, slate.season),
-    getModelLifecycleState(db, slate.season)
+    getModelLifecycleState(db, slate.season),
+    latestQbModelOverrides(db, activeGameIds)
   ]);
   const championHash = lifecycle?.championHash ?? null;
   const featureRows = featureResult.results;
@@ -614,10 +646,21 @@ export async function buildDecisionBoard(
       return [];
     }
   }));
-  const injuryByGame = new Map(injuryResult.results.map((row) => [row.game_id, row]));
-  const inactiveByGame = new Map(inactiveResult.results.map((row) => [row.game_id, row]));
+  const injuryByTeam = new Map(injuryResult.results.map((row) => [`${row.game_id}:${normalizeNflverseTeam(row.team)}`, row]));
+  const inactiveByTeam = new Map(inactiveResult.results.map((row) => [`${row.game_id}:${normalizeNflverseTeam(row.team)}`, row]));
   const pregameByGame = new Map(pregameStates.map((state) => [state.gameId, state]));
   const weatherByGame = new Map(weatherRows.map((row) => [row.gameId, row]));
+  const qbOverrideByTeam = new Map(qbOverrides.map((override) => [`${override.gameId}:${override.team}`, override]));
+  const normalizePlayer = (name: string): string => name.toLowerCase().replace(/[^a-z0-9]/g, "");
+  const latestStarterByTeam = new Map<string, { name: string; gameDate: string }>();
+  for (const row of gameResult.results) {
+    if (row.away_qb_name && (!latestStarterByTeam.has(normalizeNflverseTeam(row.away_team)) || latestStarterByTeam.get(normalizeNflverseTeam(row.away_team))!.gameDate < row.game_date)) {
+      latestStarterByTeam.set(normalizeNflverseTeam(row.away_team), { name: row.away_qb_name, gameDate: row.game_date });
+    }
+    if (row.home_qb_name && (!latestStarterByTeam.has(normalizeNflverseTeam(row.home_team)) || latestStarterByTeam.get(normalizeNflverseTeam(row.home_team))!.gameDate < row.game_date)) {
+      latestStarterByTeam.set(normalizeNflverseTeam(row.home_team), { name: row.home_qb_name, gameDate: row.game_date });
+    }
+  }
   const games = slate.games.map((game) => {
     const teamContext = lifecycleContexts.get(game.id) ?? null;
     const gameLines = lines.filter((line) => line.gameId === game.id);
@@ -632,7 +675,65 @@ export async function buildDecisionBoard(
     const consensusTotalLine = totalPoints.length
       ? totalPoints.reduce((sum, point) => sum + point, 0) / totalPoints.length
       : game.totalLine;
-    const strengthDelta = (strengths.get(game.home) ?? 0) - (strengths.get(game.away) ?? 0);
+    const homeInjuries = injuryByTeam.get(`${game.id}:${game.home}`);
+    const awayInjuries = injuryByTeam.get(`${game.id}:${game.away}`);
+    const homeInactives = inactiveByTeam.get(`${game.id}:${game.home}`);
+    const awayInactives = inactiveByTeam.get(`${game.id}:${game.away}`);
+    const pregame = pregameByGame.get(game.id);
+    const quarterbackFor = (team: string): GameQuarterbackContext["home"] => {
+      const reference = latestStarterByTeam.get(team) ?? null;
+      const override = qbOverrideByTeam.get(`${game.id}:${team}`) ?? null;
+      const teamInjuries = team === game.home ? homeInjuries : awayInjuries;
+      const teamInactives = team === game.home ? homeInactives : awayInactives;
+      const referenceKey = reference ? normalizePlayer(reference.name) : null;
+      const reports = qbReportResult.results.filter((row) => row.game_id === game.id && normalizeNflverseTeam(row.team) === team);
+      const inactiveRows = qbInactiveResult.results.filter((row) => row.game_id === game.id && normalizeNflverseTeam(row.team) === team);
+      const starterInactive = Boolean(referenceKey && inactiveRows.some((row) => normalizePlayer(row.player) === referenceKey));
+      const starterAtRisk = Boolean(referenceKey && reports.some((row) =>
+        normalizePlayer(row.player) === referenceKey && ["out", "doubtful"].includes(row.game_status?.toLowerCase() ?? "")
+      ));
+      const teamAvailability = starterInactive ? "inactive" as const
+        : starterAtRisk ? "at_risk" as const
+          : reference && injuryState?.freshness === "current" ? "available" as const : "unconfirmed" as const;
+      const sourceTimestamp = [
+        ...reports.map((row) => row.source_timestamp),
+        ...inactiveRows.map((row) => row.source_timestamp)
+      ].sort().at(-1) ?? teamInjuries?.source_timestamp ?? teamInactives?.source_timestamp ?? null;
+      return {
+        team,
+        referenceStarter: reference?.name ?? null,
+        referenceSource: reference ? "latest_completed_start" : "unavailable",
+        availability: teamAvailability,
+        backupTier: null,
+        learnedPointPrior: null,
+        ownerOverridePoints: override?.value ?? null,
+        appliedTeamMarginPoints: override?.value ?? 0,
+        sourceTimestamp: override?.createdAt ?? sourceTimestamp,
+        auditHash: stableHash({
+          gameId: game.id,
+          team,
+          reference,
+          availability: teamAvailability,
+          configStatus: structuralConfig.qbTiers.status,
+          overrideHash: override?.auditHash ?? null
+        })
+      };
+    };
+    const homeQuarterback = quarterbackFor(game.home);
+    const awayQuarterback = quarterbackFor(game.away);
+    const qbUncertaintyWidening = [homeQuarterback, awayQuarterback]
+      .filter((quarterback) => quarterback.availability === "at_risk" || quarterback.availability === "inactive")
+      .length * 0.01;
+    const quarterbackMarginDelta = homeQuarterback.appliedTeamMarginPoints - awayQuarterback.appliedTeamMarginPoints;
+    const quarterbacks: GameQuarterbackContext = {
+      home: homeQuarterback,
+      away: awayQuarterback,
+      configStatus: structuralConfig.qbTiers.status,
+      forecastHandling: homeQuarterback.ownerOverridePoints !== null || awayQuarterback.ownerOverridePoints !== null
+        ? "owner_override"
+        : structuralConfig.qbTiers.learnedPointPriors.length ? "validated_prior" : "market_only"
+    };
+    const strengthDelta = (strengths.get(game.home) ?? 0) - (strengths.get(game.away) ?? 0) + quarterbackMarginDelta;
     const stateProjectedHomePoint = consensusHomePoint === null ? null : roundHalf(consensusHomePoint - strengthDelta);
     type ProjectionAnchor = { book: "betmgm" | "fanduel"; point: number; fairProbability: number; marketSource: BaselineProjection["marketSource"] };
     const projectionAnchors = (["betmgm", "fanduel"] as const).flatMap<ProjectionAnchor>((book) => {
@@ -681,7 +782,7 @@ export async function buildDecisionBoard(
         pushProbability: translated.pushProbability,
         edgeInterval: edgeCenter === null || sideEdgeNoise === null
           ? null
-          : [edgeCenter + sideEdgeNoise[0], edgeCenter + sideEdgeNoise[1]],
+          : [edgeCenter + sideEdgeNoise[0] - qbUncertaintyWidening, edgeCenter + sideEdgeNoise[1] + qbUncertaintyWidening],
         marketHomeProbability: anchor.fairProbability,
         marketSource: anchor.marketSource,
         translationWarning: translated.warning === "extrapolated" || inferredFairPoint.warning === "extrapolated"
@@ -722,28 +823,27 @@ export async function buildDecisionBoard(
     }) : [];
     const away = profiles.get(game.away) ?? null;
     const home = profiles.get(game.home) ?? null;
-    const injuries = injuryByGame.get(game.id);
-    const inactives = inactiveByGame.get(game.id);
-    const pregame = pregameByGame.get(game.id);
+    const injuries = injuryResult.results.filter((row) => row.game_id === game.id);
+    const inactives = inactiveResult.results.filter((row) => row.game_id === game.id);
     const availability: GameAvailabilityContext = summarizeGameAvailability({
       freshness: injuryState?.freshness ?? null,
       lastSuccessAt: injuryState?.lastSuccessAt ?? null,
-      counts: injuries ? {
-        reportedPlayers: injuries.reported_players,
-        out: injuries.out_count,
-        doubtful: injuries.doubtful_count,
-        questionable: injuries.questionable_count,
-        qbListed: injuries.qb_listed,
-        qbOutOrDoubtful: injuries.qb_out_or_doubtful,
-        sourceTimestamp: injuries.source_timestamp
+      counts: injuries.length ? {
+        reportedPlayers: injuries.reduce((sum, row) => sum + row.reported_players, 0),
+        out: injuries.reduce((sum, row) => sum + row.out_count, 0),
+        doubtful: injuries.reduce((sum, row) => sum + row.doubtful_count, 0),
+        questionable: injuries.reduce((sum, row) => sum + row.questionable_count, 0),
+        qbListed: injuries.reduce((sum, row) => sum + row.qb_listed, 0),
+        qbOutOrDoubtful: injuries.reduce((sum, row) => sum + row.qb_out_or_doubtful, 0),
+        sourceTimestamp: injuries.map((row) => row.source_timestamp).filter((value): value is string => Boolean(value)).sort().at(-1) ?? null
       } : null,
       pregame: pregame ? {
         freshness: pregame.freshness,
         lastSuccessAt: pregame.lastSuccessAt,
         inactivesConfirmed: pregame.inactivesConfirmed,
-        inactivePlayers: inactives?.inactive_count ?? pregame.inactiveCount,
-        qbInactive: inactives?.qb_inactive ?? 0,
-        sourceTimestamp: inactives?.source_timestamp ?? pregame.lastSuccessAt
+        inactivePlayers: inactives.length ? inactives.reduce((sum, row) => sum + row.inactive_count, 0) : pregame.inactiveCount,
+        qbInactive: inactives.reduce((sum, row) => sum + row.qb_inactive, 0),
+        sourceTimestamp: inactives.map((row) => row.source_timestamp).filter((value): value is string => Boolean(value)).sort().at(-1) ?? pregame.lastSuccessAt
       } : null
     });
     const storedWeather = weatherByGame.get(game.id);
@@ -836,7 +936,8 @@ export async function buildDecisionBoard(
       evidence,
       movements: lineMovements(game.id, movementHistory, gameLines),
       availability,
-      weather
+      weather,
+      quarterbacks
     };
   });
   const teaserPairs = rankTeaserPairs(games.flatMap((game) => game.teasers), {
@@ -853,6 +954,6 @@ export async function buildDecisionBoard(
     championHash,
     games,
     teaserPairs,
-    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K cumulative margin-versus-close strength; logged gated champion calibration; then 25% model and 75% power-de-vigged market shrinkage.`
+    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K cumulative margin-versus-close strength; logged gated champion calibration; QB risk widens uncertainty while the rejected residual tier adjustment stays withheld unless an audited owner override exists; then 25% model and 75% power-de-vigged market shrinkage.`
   };
 }

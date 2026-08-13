@@ -53,6 +53,12 @@ function board(homeEdge = 0.05): DecisionBoardPayload {
         status: "pending", roof: "unconfirmed", windMph: null, temperatureF: null,
         precipitationProbability: null, capturedAt: null, totalAdjustmentPoints: 0,
         trainingGames: null
+      },
+      quarterbacks: {
+        configStatus: "validated_withheld_no_holdout_improvement",
+        forecastHandling: "market_only",
+        away: { team: "SEA", referenceStarter: "Sam Darnold", referenceSource: "latest_completed_start", availability: "unconfirmed", backupTier: null, learnedPointPrior: null, ownerOverridePoints: null, appliedTeamMarginPoints: 0, sourceTimestamp: null, auditHash: "away-qb" },
+        home: { team: "LAR", referenceStarter: "Matthew Stafford", referenceSource: "latest_completed_start", availability: "unconfirmed", backupTier: null, learnedPointPrior: null, ownerOverridePoints: null, appliedTeamMarginPoints: 0, sourceTimestamp: null, auditHash: "home-qb" }
       }
     }]
   };
