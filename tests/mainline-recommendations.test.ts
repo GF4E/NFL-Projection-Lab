@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { BaselineProjection, MoneylineProjection, TotalProjection } from "@/domain/decision-board";
 import type { LineMarketKey, LiveLine } from "@/domain/line-board";
 import { bestCoveredExecutionBook } from "@/domain/line-board";
-import { rankMainlineRecommendations } from "@/domain/mainline-recommendations";
+import { rankBestBookMainlineRecommendations, rankMainlineRecommendations } from "@/domain/mainline-recommendations";
 
 const capturedAt = "2026-09-13T18:00:00.000Z";
 
@@ -122,5 +122,29 @@ describe("exact-price mainline recommendations", () => {
       moneyline: null, preferredTeams: new Set()
     });
     expect(candidates).toEqual([]);
+  });
+
+  it("surfaces the highest-EV exact side and total contracts across both books", () => {
+    const betmgm = rankMainlineRecommendations({
+      gameId: "sea-lar", awayTeam: "SEA", homeTeam: "LAR", book: "betmgm",
+      lines: [line("mgm-spread", "spread", "LAR", -2.5, -115, 0.5), line("mgm-total", "total", "Over", 45.5, -115, 0.5)],
+      spread: spread({ shrunkHomeProbability: 0.56 }), total: total({ shrunkProbability: 0.56 }), moneyline: null,
+      preferredTeams: new Set()
+    });
+    const fanduel = rankMainlineRecommendations({
+      gameId: "sea-lar", awayTeam: "SEA", homeTeam: "LAR", book: "fanduel",
+      lines: [
+        { ...line("fd-spread", "spread", "LAR", -3, -105, 0.49), book: "fanduel" },
+        { ...line("fd-total", "total", "Over", 46.5, -105, 0.49), book: "fanduel" }
+      ],
+      spread: spread({ book: "fanduel", marketHomePoint: -3, marketHomeProbability: 0.49, shrunkHomeProbability: 0.57 }),
+      total: total({ book: "fanduel", marketPoint: 46.5, fairProbability: 0.49, shrunkProbability: 0.57 }),
+      moneyline: null,
+      preferredTeams: new Set()
+    });
+    const best = rankBestBookMainlineRecommendations([...betmgm, ...fanduel]);
+    expect(best).toHaveLength(2);
+    expect(best.every((candidate) => candidate.line.book === "fanduel")).toBe(true);
+    expect(best.map((candidate) => candidate.line.point)).toEqual(expect.arrayContaining([-3, 46.5]));
   });
 });

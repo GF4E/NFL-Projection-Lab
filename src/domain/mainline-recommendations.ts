@@ -140,3 +140,26 @@ export function rankMainlineRecommendations(input: MainlineRecommendationInput):
     .sort((left, right) => Number(right.actionable) - Number(left.actionable) || right.expectedValue - left.expectedValue)
     .slice(0, 2);
 }
+
+function bestRecommendation(candidates: readonly MainlineRecommendation[]): MainlineRecommendation | null {
+  return [...candidates].sort((left, right) =>
+    Number(right.actionable) - Number(left.actionable) ||
+    right.expectedValue - left.expectedValue ||
+    right.probabilityEdge - left.probabilityEdge
+  )[0] ?? null;
+}
+
+/**
+ * Selects one side contract and one total contract across every execution book.
+ * Each candidate has already been priced at that book's posted point, so this
+ * compares contract EV rather than raw prices at potentially different points.
+ */
+export function rankBestBookMainlineRecommendations(
+  candidates: readonly MainlineRecommendation[]
+): MainlineRecommendation[] {
+  const side = bestRecommendation(candidates.filter((candidate) => candidate.market !== "total"));
+  const total = bestRecommendation(candidates.filter((candidate) => candidate.market === "total"));
+  return [side, total]
+    .filter((candidate): candidate is MainlineRecommendation => candidate !== null)
+    .sort((left, right) => Number(right.actionable) - Number(left.actionable) || right.expectedValue - left.expectedValue);
+}

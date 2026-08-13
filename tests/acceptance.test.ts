@@ -1010,4 +1010,15 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(alignment).not.toContain("expectedValue");
     expect(alignment).not.toContain("sizeKelly");
   });
+
+  it("44. surfaces no more than three props and the best exact mainline contracts across both books", () => {
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    const mainlines = readFileSync("src/domain/mainline-recommendations.ts", "utf8");
+    expect(board).toContain("rankBestBookMainlineRecommendations");
+    expect(board).toContain("rankBestExecutionProps");
+    expect(board).toContain("bookNames[candidate.line.book]");
+    expect(board).toContain("bookNames[prop.executionBook]");
+    expect(mainlines).toContain("compares contract EV rather than raw prices");
+    expect(mainlines).not.toContain("americanPrice -");
+  });
 });

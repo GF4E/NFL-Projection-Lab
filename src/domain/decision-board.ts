@@ -667,6 +667,27 @@ export function scanMarketConfirmedProps(
   });
 }
 
+/** Choose at most one exact execution contract for each player/market thesis. */
+export function rankBestExecutionProps(candidates: readonly PropCandidate[], maximum = 3): PropCandidate[] {
+  const limit = Math.max(0, Math.floor(maximum));
+  if (limit === 0) return [];
+  const ranked = [...candidates].sort((left, right) =>
+    right.lowerBoundExpectedValue - left.lowerBoundExpectedValue ||
+    right.expectedValue - left.expectedValue ||
+    right.edge - left.edge
+  );
+  const selected: PropCandidate[] = [];
+  const representedTheses = new Set<string>();
+  for (const candidate of ranked) {
+    const thesis = `${normalizePropPlayerName(candidate.player)}:${candidate.market}`;
+    if (representedTheses.has(thesis)) continue;
+    representedTheses.add(thesis);
+    selected.push(candidate);
+    if (selected.length === limit) break;
+  }
+  return selected;
+}
+
 export function fairAmericanFromProbability(probability: number): number {
   return Math.round(impliedToAmerican(probability));
 }

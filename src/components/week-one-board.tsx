@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { priceTwoTeamTeaser } from "@/domain/decision-board";
+import { priceTwoTeamTeaser, rankBestExecutionProps } from "@/domain/decision-board";
 import type {
   DecisionBoardPayload,
   PlayerPropBoard,
@@ -13,7 +13,7 @@ import type {
 import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
 import { alignMatchupEvidence, compactEvidenceLabel } from "@/domain/evidence-alignment";
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
-import { rankMainlineRecommendations } from "@/domain/mainline-recommendations";
+import { rankBestBookMainlineRecommendations, rankMainlineRecommendations } from "@/domain/mainline-recommendations";
 import { structuralConfig } from "@/domain/config";
 import { exactContractApprovalRequest, isTeamApproved, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
 import { sizeKelly, type SizingResult } from "@/domain/sizing";
@@ -454,10 +454,9 @@ export function WeekOneBoard() {
               Math.abs(weather.totalAdjustmentPoints) >= 0.5);
             const projection = gameIntel?.projections.find((item) => item.book === book);
             const totalProjection = gameIntel?.totals.find((item) => item.book === book);
-            const moneylineProjection = gameIntel?.moneylines.find((item) => item.book === book);
             const deskOpen = openGame === game.id;
             const propBoard = propBoards[game.id];
-            const currentProps = propBoard?.candidates.filter((item) => item.executionBook === book) ?? [];
+            const currentProps = rankBestExecutionProps(propBoard?.candidates ?? [], structuralConfig.props.maximumPerBook);
             const teaserCandidates = (gameIntel?.teasers.filter((item) => item.book === book && (item.classification !== "ordinary" || (item.fairProbability ?? 0) >= 0.68)) ?? [])
               .sort((left, right) => (left.classification === "classic_wong" ? -1 : 0) - (right.classification === "classic_wong" ? -1 : 0) || (right.fairProbability ?? 0) - (left.fairProbability ?? 0))
               .slice(0, 2);
@@ -483,17 +482,19 @@ export function WeekOneBoard() {
               ? null
               : bookLines.find((line) => line.market === "total" && line.side.toLowerCase() === totalProjection?.lean.toLowerCase());
             const totalSizing = recommendation(totalProjection?.shrunkProbability ?? null, totalLine?.americanPrice ?? null, totalProjection?.edgeInterval ?? null);
-            const mainlineRecommendations = rankMainlineRecommendations({
-              gameId: game.id,
-              awayTeam: game.away,
-              homeTeam: game.home,
-              book,
-              lines: bookLines,
-              spread: projection ?? null,
-              total: totalProjection ?? null,
-              moneyline: moneylineProjection ?? null,
-              preferredTeams
-            });
+            const mainlineRecommendations = rankBestBookMainlineRecommendations(
+              (["betmgm", "fanduel"] as const).flatMap((executionBook) => rankMainlineRecommendations({
+                gameId: game.id,
+                awayTeam: game.away,
+                homeTeam: game.home,
+                book: executionBook,
+                lines,
+                spread: gameIntel?.projections.find((item) => item.book === executionBook) ?? null,
+                total: gameIntel?.totals.find((item) => item.book === executionBook) ?? null,
+                moneyline: gameIntel?.moneylines.find((item) => item.book === executionBook) ?? null,
+                preferredTeams
+              }))
+            );
             const actionableMainlines = mainlineRecommendations.filter((candidate) => candidate.actionable).length;
             return <article className={`event-market ${deskOpen ? "desk-open" : ""}`} key={game.id}>
               <div className="event-time"><b>{formatKickoff(game, timeZone)}</b>{game.network && <span>{game.network}</span>}</div>
@@ -520,7 +521,7 @@ export function WeekOneBoard() {
               </div>
               {deskOpen && <div className="quick-picks">
                 <section className="quick-mainlines">
-                  <div className="quick-head"><span>MODEL BETS</span><small>{actionableMainlines ? `${actionableMainlines} priced ${actionableMainlines === 1 ? "play" : "plays"}` : "Price check"}</small></div>
+                  <div className="quick-head"><span>MODEL BETS</span><small>{actionableMainlines ? `${actionableMainlines} best-book ${actionableMainlines === 1 ? "play" : "plays"}` : "Price check"}</small></div>
                   {mainlineRecommendations.length ? mainlineRecommendations.map((candidate) => {
                     const context = alignMatchupEvidence(gameIntel?.signals ?? [], candidate.market, candidate.line.side);
                     return <button
@@ -531,7 +532,7 @@ export function WeekOneBoard() {
                     >
                       <div>
                         <b>{lineSelection(candidate.line)} <strong>{formatOdds(candidate.line.americanPrice)}</strong></b>
-                        <small>{marketTitle(candidate.market)} · BET {formatPercent(candidate.betProbability)} · BREAK-EVEN {formatPercent(candidate.breakEvenProbability)}</small>
+                        <small>{bookNames[candidate.line.book]} · {marketTitle(candidate.market)} · BET {formatPercent(candidate.betProbability)} · BREAK-EVEN {formatPercent(candidate.breakEvenProbability)}</small>
                         <small>{candidate.expectedValue >= 0 ? "+" : ""}{(candidate.expectedValue * 100).toFixed(1)}% EV · 80% {formatInterval(candidate.edgeInterval)} · <span className={`evidence-check ${context.verdict}`} title="Context explains the contract but is not added to EV or sizing twice.">{compactEvidenceLabel(context)}</span></small>
                       </div>
                       <em>{candidate.actionable ? `${candidate.sizing.suggestedUnits}u ADD` : candidate.preferenceConflict ? "PASS · TEAM" : "PASS"}</em>
@@ -557,7 +558,7 @@ export function WeekOneBoard() {
                 <section className="quick-props">
                   <div className="quick-head"><span>+EV PROPS</span><small>{propsLoading === game.id ? "Scanning…" : currentProps.length ? `${currentProps.length} found` : "None yet"}</small></div>
                   {propsLoading === game.id ? <p>Checking exact same-point prices across books…</p> : currentProps.length ? currentProps.map((prop) => <button className={prop.unitsGreyed ? "uncertain" : ""} onClick={() => addProp(prop, `${game.away} @ ${game.home}`)} key={prop.id}>
-                    <div><b>{prop.player}</b><small>{prop.side} {prop.point} {propMarketTitle(prop.market)} · {prop.referenceBooks} refs · {prop.sampleGames ? `L${prop.sampleGames} proj ${prop.projectedValue?.toFixed(1)} · ${((prop.hitRate ?? 0) * 100).toFixed(0)}% hit · ` : ""}floor +{(prop.lowerBoundExpectedValue * 100).toFixed(1)}% · {snapshotAge(prop.capturedAt)}</small></div>
+                    <div><b>{prop.player}</b><small>{bookNames[prop.executionBook]} · {prop.side} {prop.point} {propMarketTitle(prop.market)} · {prop.referenceBooks} refs · {prop.sampleGames ? `L${prop.sampleGames} proj ${prop.projectedValue?.toFixed(1)} · ${((prop.hitRate ?? 0) * 100).toFixed(0)}% hit · ` : ""}floor +{(prop.lowerBoundExpectedValue * 100).toFixed(1)}% · {snapshotAge(prop.capturedAt)}</small></div>
                     <strong>{formatOdds(prop.americanPrice)}</strong><em>+{(prop.expectedValue * 100).toFixed(1)}% · {prop.suggestedUnits}u</em>
                   </button>) : <p>{propBoard?.message ?? "Props are scanned when posted."}</p>}
                 </section>
