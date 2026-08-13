@@ -10,6 +10,14 @@ import { listPregameContextStates } from "../src/server/pregame-context/store";
 import { runBackgroundMaintenance } from "../src/server/background-maintenance";
 import { runModelLifecycleAutomation } from "../src/server/model-lifecycle/automation";
 import { scheduledMaintenanceLane } from "../src/domain/background-maintenance";
+import {
+  actorForTeamAccessToken,
+  createTeamSession,
+  expiredTeamSessionCookie,
+  serializedTeamSessionCookie,
+  teamSessionCookie,
+  verifyTeamSession
+} from "../src/domain/team-session";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -19,6 +27,10 @@ interface Env {
   ASSETS: AssetFetcher;
   DB: D1Database;
   ODDS_API_KEY?: string;
+  INTERNAL_TEAM_GATE_ENABLED?: string;
+  TEAM_SESSION_SECRET?: string;
+  GABE_ACCESS_TOKEN?: string;
+  JARRETT_ACCESS_TOKEN?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -90,9 +102,56 @@ async function handleModelLifecycleRequest(request: Request, env: Env): Promise<
   }
 }
 
+async function handleTeamSessionRequest(request: Request, env: Env): Promise<Response> {
+  if (request.method === "DELETE") {
+    return json({ signedOut: true }, 200, { "set-cookie": expiredTeamSessionCookie() });
+  }
+  if (request.method !== "POST") return json({ error: "Method not allowed" }, 405, { allow: "POST, DELETE" });
+  try {
+    const body = await request.json() as { token?: unknown };
+    const actor = await actorForTeamAccessToken({
+      token: typeof body.token === "string" ? body.token : null,
+      gabeToken: env.GABE_ACCESS_TOKEN,
+      jarrettToken: env.JARRETT_ACCESS_TOKEN
+    });
+    if (!actor || !env.TEAM_SESSION_SECRET) return json({ error: "That private access link is invalid" }, 401);
+    const session = await createTeamSession({ actor, secret: env.TEAM_SESSION_SECRET });
+    return json({ actor }, 200, { "set-cookie": serializedTeamSessionCookie(session) });
+  } catch {
+    return json({ error: "That private access link is invalid" }, 401);
+  }
+}
+
+function publicTeamGatePath(path: string): boolean {
+  return path === "/login" || path === "/api/team-session" || path === "/favicon.ico" ||
+    path === "/og.png" || path.startsWith("/_next/") || path.startsWith("/_vinext/") ||
+    /\.(?:css|js|woff2?|png|svg|jpg|jpeg|gif|webp|ico)$/i.test(path);
+}
+
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (env.INTERNAL_TEAM_GATE_ENABLED === "true") {
+      if (url.pathname === "/api/team-session") return handleTeamSessionRequest(request, env);
+      if (!publicTeamGatePath(url.pathname)) {
+        const session = await verifyTeamSession({
+          token: teamSessionCookie(request),
+          secret: env.TEAM_SESSION_SECRET
+        });
+        if (!session) {
+          return url.pathname.startsWith("/api/")
+            ? json({ error: "Private team sign-in required" }, 401)
+            : Response.redirect(new URL("/login", request.url), 302);
+        }
+        if (url.pathname === "/api/model-lifecycle" && session.actor !== "gabe") {
+          return json({ error: "Only the owner may run the model lifecycle" }, 403);
+        }
+        const headers = new Headers(request.headers);
+        headers.set("oai-authenticated-user-email", session.email);
+        headers.set("oai-authenticated-user-id", session.userId);
+        request = new Request(request, { headers });
+      }
+    }
     // Keep automation control outside the framework router so cron, browser wakeups,
     // and production deployments all reach the same Cloudflare-bound D1 database.
     if (url.pathname === "/api/nflverse") {
