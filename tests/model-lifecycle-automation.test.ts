@@ -19,6 +19,7 @@ import {
 describe("persisted weekly model lifecycle", () => {
   it("withholds a champion whose logged config differs from the forecast config", () => {
     expect(championConfigurationStatus("champion", "old", "current")).toBe("config_mismatch");
+    expect(championConfigurationStatus("champion", "old", "current", true)).toBe("compatible");
     expect(championConfigurationStatus("champion", "current", "current")).toBe("compatible");
     expect(championConfigurationStatus(null, null, "current")).toBe("unavailable");
   });

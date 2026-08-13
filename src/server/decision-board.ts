@@ -31,7 +31,13 @@ import { loopAStateMatchesRevision, loopAStateRevision, updateTeamStates } from 
 import { weeklySlate } from "./weekly-slate";
 import { ensureOfficialInjuryStore, getOfficialInjuryImportState } from "./official-injuries/store";
 import { ensureKickoffWeatherStore, listKickoffWeather } from "./weather/store";
-import { ensureModelLifecycleStore, getModelArtifact, getModelLifecycleState, getTeamStrengthStates } from "./model-lifecycle/store";
+import {
+  ensureModelLifecycleStore,
+  getLatestModelRunAuthorization,
+  getModelArtifact,
+  getModelLifecycleState,
+  getTeamStrengthStates
+} from "./model-lifecycle/store";
 import {
   buildLifecycleForecastRow,
   buildLifecycleTeamContexts,
@@ -525,7 +531,7 @@ export async function buildDecisionBoard(
   const activeGameIds = slate.games.map((game) => game.id);
   const activePlaceholders = activeGameIds.map(() => "?").join(", ");
   const injuryDataset = `official-injuries:${slate.season}:reg${slate.week}`;
-  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, inactiveResult, qbReportResult, qbInactiveResult, pregameStates, weatherRows, persistedStates, lifecycle, qbOverrides] = await Promise.all([
+  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, inactiveResult, qbReportResult, qbInactiveResult, pregameStates, weatherRows, persistedStates, lifecycle, latestRunAuthorization, qbOverrides] = await Promise.all([
     db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line,
         roof, temperature, wind, away_moneyline, home_moneyline, away_qb_name, home_qb_name
@@ -578,6 +584,7 @@ export async function buildDecisionBoard(
     listKickoffWeather(db, activeGameIds),
     getTeamStrengthStates(db, slate.season),
     getModelLifecycleState(db, slate.season),
+    getLatestModelRunAuthorization(db),
     latestQbModelOverrides(db, activeGameIds)
   ]);
   const configuredChampionHash = lifecycle?.championHash ?? null;
@@ -616,7 +623,18 @@ export async function buildDecisionBoard(
   );
   const configHash = currentModelConfigurationHash();
   const championVersion = configuredChampionHash ? await getModelArtifact(db, configuredChampionHash) : null;
-  const championStatus = championConfigurationStatus(configuredChampionHash, championVersion?.metadata.configHash ?? null, configHash);
+  const retainedByCurrentGate = Boolean(
+    configuredChampionHash &&
+    latestRunAuthorization?.gateDecision === "retain" &&
+    latestRunAuthorization.championHash === configuredChampionHash &&
+    latestRunAuthorization.configHash === configHash
+  );
+  const championStatus = championConfigurationStatus(
+    configuredChampionHash,
+    championVersion?.metadata.configHash ?? null,
+    configHash,
+    retainedByCurrentGate
+  );
   const championHash = championStatus === "compatible" ? configuredChampionHash : null;
   const championModel = championStatus === "compatible" ? championVersion?.artifact.model ?? null : null;
   const artifact = frozenMarginArtifact;

@@ -8,8 +8,9 @@ export function currentModelConfigurationHash(): string {
 export function championConfigurationStatus(
   championHash: string | null,
   storedConfigHash: string | null,
-  currentConfigHash = currentModelConfigurationHash()
+  currentConfigHash = currentModelConfigurationHash(),
+  retainedByCurrentGate = false
 ): "compatible" | "config_mismatch" | "unavailable" {
   if (!championHash || !storedConfigHash) return "unavailable";
-  return storedConfigHash === currentConfigHash ? "compatible" : "config_mismatch";
+  return storedConfigHash === currentConfigHash || retainedByCurrentGate ? "compatible" : "config_mismatch";
 }

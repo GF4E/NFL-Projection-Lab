@@ -236,6 +236,28 @@ export async function getLatestModelRunConfigHash(db: D1Database): Promise<strin
   return row?.config_hash ?? null;
 }
 
+export async function getLatestModelRunAuthorization(db: D1Database): Promise<{
+  championHash: string;
+  configHash: string;
+  gateDecision: "promote" | "retain";
+  completedAt: string;
+} | null> {
+  await ensureModelLifecycleStore(db);
+  const row = await db.prepare(`SELECT champion_hash, config_hash, gate_decision, completed_at
+    FROM model_run_log ORDER BY completed_at DESC LIMIT 1`).first<{
+      champion_hash: string;
+      config_hash: string;
+      gate_decision: "promote" | "retain";
+      completed_at: string;
+    }>();
+  return row ? {
+    championHash: row.champion_hash,
+    configHash: row.config_hash,
+    gateDecision: row.gate_decision,
+    completedAt: row.completed_at
+  } : null;
+}
+
 export async function getTeamStrengthStates(db: D1Database, season: number): Promise<TeamState[]> {
   await ensureModelLifecycleStore(db);
   const result = await db.prepare(`SELECT team, mean, variance, through_week

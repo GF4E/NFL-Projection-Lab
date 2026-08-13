@@ -14,6 +14,7 @@ import {
   ensureModelLifecycleStore,
   getModelArtifact,
   getModelLifecycleState,
+  getLatestModelRunAuthorization,
   getLatestModelRunConfigHash,
   publishModelSystemAlert,
   publishLoopA,
@@ -177,11 +178,20 @@ export async function runModelLifecycleAutomation(input: {
   const targetWeek = Math.min(18, throughWeek + 1);
   const lifecycle = await getModelLifecycleState(input.db, season);
   const currentConfigHash = currentModelConfigurationHash();
-  const [configuredChampion, latestRunConfigHash] = await Promise.all([
+  const [configuredChampion, latestRunConfigHash, latestRunAuthorization] = await Promise.all([
     lifecycle?.championHash ? getModelArtifact(input.db, lifecycle.championHash) : Promise.resolve(null),
-    getLatestModelRunConfigHash(input.db)
+    getLatestModelRunConfigHash(input.db),
+    getLatestModelRunAuthorization(input.db)
   ]);
-  const championConfigMismatch = Boolean(configuredChampion && configuredChampion.metadata.configHash !== currentConfigHash);
+  const retainedByCurrentGate = Boolean(
+    lifecycle?.championHash &&
+    latestRunAuthorization?.gateDecision === "retain" &&
+    latestRunAuthorization.championHash === lifecycle.championHash &&
+    latestRunAuthorization.configHash === currentConfigHash
+  );
+  const championConfigMismatch = Boolean(
+    configuredChampion && configuredChampion.metadata.configHash !== currentConfigHash && !retainedByCurrentGate
+  );
   const clock = pacificParts(now);
   const initialize = !lifecycle?.championHash;
   const tuesday = clock.weekday === "Tue";
