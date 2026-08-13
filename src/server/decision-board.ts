@@ -4,6 +4,7 @@ import {
   fairAmericanFromProbability,
   isClassicWongPoint,
   marginVersusConsensusResidual,
+  matchupSignals,
   nflverseExpectedMarginToHomePoint,
   normalizeNflverseTeam,
   rankTeaserPairs,
@@ -13,7 +14,6 @@ import {
   type GameAvailabilityContext,
   type GameWeatherContext,
   type LineMovementSeries,
-  type MatchupSignal,
   type TeamBaseline,
   type TeaserCandidate
 } from "@/domain/decision-board";
@@ -328,75 +328,6 @@ function teamProfiles(rows: FeatureRow[], strengths: Map<string, number>): Map<s
       turnovers: ranks.turnovers.get(item.team)!, pace: ranks.pace.get(item.team) ?? null, proe: ranks.proe.get(item.team) ?? null, strength: ranks.strength.get(item.team)!
     }
   }]));
-}
-
-function matchupMetricSignal(input: {
-  id: "efficiency" | "success" | "explosive";
-  label: string;
-  away: TeamBaseline;
-  home: TeamBaseline;
-  awayOffenseRank: number;
-  homeOffenseRank: number;
-  awayDefenseRank: number;
-  homeDefenseRank: number;
-}): MatchupSignal | null {
-  const awayScore = 33 - input.awayOffenseRank + input.homeDefenseRank;
-  const homeScore = 33 - input.homeOffenseRank + input.awayDefenseRank;
-  const difference = homeScore - awayScore;
-  if (Math.abs(difference) < 7) return null;
-  const team = difference > 0 ? input.home : input.away;
-  const opponent = difference > 0 ? input.away : input.home;
-  const offenseRank = difference > 0 ? input.homeOffenseRank : input.awayOffenseRank;
-  const opponentDefenseRank = difference > 0 ? input.awayDefenseRank : input.homeDefenseRank;
-  return {
-    id: input.id,
-    label: input.label,
-    lean: team.team,
-    detail: `${team.team} O #${offenseRank} vs ${opponent.team} D #${opponentDefenseRank}`,
-    strength: Math.abs(difference)
-  };
-}
-
-function matchupSignals(away: TeamBaseline | null, home: TeamBaseline | null): MatchupSignal[] {
-  if (!away || !home) return [];
-  const candidates: Array<MatchupSignal | null> = [
-    matchupMetricSignal({
-      id: "efficiency", label: "EPA EDGE", away, home,
-      awayOffenseRank: away.ranks.epa, homeOffenseRank: home.ranks.epa,
-      awayDefenseRank: away.ranks.defenseEpa, homeDefenseRank: home.ranks.defenseEpa
-    }),
-    matchupMetricSignal({
-      id: "success", label: "DOWN-TO-DOWN", away, home,
-      awayOffenseRank: away.ranks.success, homeOffenseRank: home.ranks.success,
-      awayDefenseRank: away.ranks.defenseSuccess, homeDefenseRank: home.ranks.defenseSuccess
-    }),
-    matchupMetricSignal({
-      id: "explosive", label: "EXPLOSIVE", away, home,
-      awayOffenseRank: away.ranks.explosive, homeOffenseRank: home.ranks.explosive,
-      awayDefenseRank: away.ranks.defenseExplosive, homeDefenseRank: home.ranks.defenseExplosive
-    })
-  ];
-  const turnoverDifference = away.regressedTurnoverRate - home.regressedTurnoverRate;
-  if (Math.abs(turnoverDifference) >= 0.003) {
-    const lean = turnoverDifference > 0 ? home : away;
-    candidates.push({
-      id: "turnovers",
-      label: "BALL SECURITY",
-      lean: lean.team,
-      detail: `${(lean.regressedTurnoverRate * 100).toFixed(1)}% regressed turnover rate`,
-      strength: Math.abs(turnoverDifference) * 1_000
-    });
-  }
-  if (away.ranks.pace !== null && home.ranks.pace !== null) {
-    if (away.ranks.pace <= 12 && home.ranks.pace <= 12) {
-      candidates.push({ id: "pace", label: "PACE", lean: "OVER", detail: `tempo #${away.ranks.pace} / #${home.ranks.pace}`, strength: 9 });
-    } else if (away.ranks.pace >= 21 && home.ranks.pace >= 21) {
-      candidates.push({ id: "pace", label: "PACE", lean: "UNDER", detail: `tempo #${away.ranks.pace} / #${home.ranks.pace}`, strength: 9 });
-    }
-  }
-  return candidates.filter((signal): signal is MatchupSignal => signal !== null)
-    .sort((left, right) => right.strength - left.strength)
-    .slice(0, 3);
 }
 
 function sampleMovement(points: LineMovementSeries["snapshots"]): LineMovementSeries["snapshots"] {
@@ -727,7 +658,7 @@ export async function buildDecisionBoard(
         }
       ),
       teasers,
-      signals: matchupSignals(away, home),
+      signals: matchupSignals(away, home, { awayRest: game.awayRest, homeRest: game.homeRest }),
       movements: lineMovements(game.id, movementHistory, gameLines),
       availability,
       weather

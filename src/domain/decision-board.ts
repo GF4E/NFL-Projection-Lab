@@ -99,11 +99,118 @@ export interface TwoTeamTeaserValue {
 }
 
 export interface MatchupSignal {
-  id: "efficiency" | "success" | "explosive" | "turnovers" | "pace";
+  id: "efficiency" | "success" | "explosive" | "turnovers" | "pace" | "pass_rate" | "rest" | "strength";
   label: string;
   lean: string;
   detail: string;
   strength: number;
+}
+
+function matchupMetricSignal(input: {
+  id: "efficiency" | "success" | "explosive";
+  label: string;
+  away: TeamBaseline;
+  home: TeamBaseline;
+  awayOffenseRank: number;
+  homeOffenseRank: number;
+  awayDefenseRank: number;
+  homeDefenseRank: number;
+}): MatchupSignal | null {
+  const awayScore = 33 - input.awayOffenseRank + input.homeDefenseRank;
+  const homeScore = 33 - input.homeOffenseRank + input.awayDefenseRank;
+  const difference = homeScore - awayScore;
+  if (Math.abs(difference) < 7) return null;
+  const team = difference > 0 ? input.home : input.away;
+  const opponent = difference > 0 ? input.away : input.home;
+  const offenseRank = difference > 0 ? input.homeOffenseRank : input.awayOffenseRank;
+  const opponentDefenseRank = difference > 0 ? input.awayDefenseRank : input.homeDefenseRank;
+  return {
+    id: input.id,
+    label: input.label,
+    lean: team.team,
+    detail: `${team.team} O #${offenseRank} vs ${opponent.team} D #${opponentDefenseRank}`,
+    strength: Math.abs(difference)
+  };
+}
+
+export function matchupSignals(
+  away: TeamBaseline | null,
+  home: TeamBaseline | null,
+  context: { awayRest: number | null; homeRest: number | null } = { awayRest: null, homeRest: null }
+): MatchupSignal[] {
+  if (!away || !home) return [];
+  const candidates: Array<MatchupSignal | null> = [
+    matchupMetricSignal({
+      id: "efficiency", label: "EPA EDGE", away, home,
+      awayOffenseRank: away.ranks.epa, homeOffenseRank: home.ranks.epa,
+      awayDefenseRank: away.ranks.defenseEpa, homeDefenseRank: home.ranks.defenseEpa
+    }),
+    matchupMetricSignal({
+      id: "success", label: "DOWN-TO-DOWN", away, home,
+      awayOffenseRank: away.ranks.success, homeOffenseRank: home.ranks.success,
+      awayDefenseRank: away.ranks.defenseSuccess, homeDefenseRank: home.ranks.defenseSuccess
+    }),
+    matchupMetricSignal({
+      id: "explosive", label: "EXPLOSIVE", away, home,
+      awayOffenseRank: away.ranks.explosive, homeOffenseRank: home.ranks.explosive,
+      awayDefenseRank: away.ranks.defenseExplosive, homeDefenseRank: home.ranks.defenseExplosive
+    })
+  ];
+  const turnoverDifference = away.regressedTurnoverRate - home.regressedTurnoverRate;
+  if (Math.abs(turnoverDifference) >= 0.003) {
+    const lean = turnoverDifference > 0 ? home : away;
+    candidates.push({
+      id: "turnovers",
+      label: "BALL SECURITY",
+      lean: lean.team,
+      detail: `${(lean.regressedTurnoverRate * 100).toFixed(1)}% regressed turnover rate`,
+      strength: Math.abs(turnoverDifference) * 1_000
+    });
+  }
+  if (away.ranks.pace !== null && home.ranks.pace !== null) {
+    if (away.ranks.pace <= 12 && home.ranks.pace <= 12) {
+      candidates.push({ id: "pace", label: "PACE", lean: "OVER", detail: `tempo #${away.ranks.pace} / #${home.ranks.pace}`, strength: 9 });
+    } else if (away.ranks.pace >= 21 && home.ranks.pace >= 21) {
+      candidates.push({ id: "pace", label: "PACE", lean: "UNDER", detail: `tempo #${away.ranks.pace} / #${home.ranks.pace}`, strength: 9 });
+    }
+  }
+  if (away.ranks.proe !== null && home.ranks.proe !== null) {
+    if (away.ranks.proe <= 12 && home.ranks.proe <= 12) {
+      candidates.push({ id: "pass_rate", label: "PASS TENDENCY", lean: "OVER", detail: `PROE #${away.ranks.proe} / #${home.ranks.proe}`, strength: 8 });
+    } else if (away.ranks.proe >= 21 && home.ranks.proe >= 21) {
+      candidates.push({ id: "pass_rate", label: "PASS TENDENCY", lean: "UNDER", detail: `PROE #${away.ranks.proe} / #${home.ranks.proe}`, strength: 8 });
+    }
+  }
+  const strengthRankGap = away.ranks.strength - home.ranks.strength;
+  if (Math.abs(strengthRankGap) >= 7) {
+    const lean = strengthRankGap > 0 ? home : away;
+    const opponent = strengthRankGap > 0 ? away : home;
+    candidates.push({
+      id: "strength",
+      label: "MARKET-ADJUSTED FORM",
+      lean: lean.team,
+      detail: `close-residual state #${lean.ranks.strength} vs ${opponent.team} #${opponent.ranks.strength}`,
+      strength: Math.abs(strengthRankGap) * 1.1
+    });
+  }
+  if (context.awayRest !== null && context.homeRest !== null) {
+    const restGap = context.homeRest - context.awayRest;
+    if (Math.abs(restGap) >= 2) {
+      const lean = restGap > 0 ? home : away;
+      const leanRest = restGap > 0 ? context.homeRest : context.awayRest;
+      const opponentRest = restGap > 0 ? context.awayRest : context.homeRest;
+      candidates.push({
+        id: "rest",
+        label: "REST",
+        lean: lean.team,
+        detail: `${leanRest} days vs ${opponentRest} days`,
+        strength: 7 + Math.abs(restGap)
+      });
+    }
+  }
+  return candidates.filter((signal): signal is MatchupSignal => signal !== null)
+    .sort((left, right) => right.strength - left.strength)
+    .slice(0, 3);
 }
 
 export interface LineMovementPoint {
