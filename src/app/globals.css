@@ -258,11 +258,11 @@ button:disabled { cursor: wait; opacity: .62; }
 .movement-mini > small { color: #899690; font: 700 8px var(--display); text-transform: uppercase; }
 .spread-sparkline { width: 90px; height: 22px; color: var(--book-accent); overflow: visible; }
 .evidence-signals { min-width: 0; padding-left: 12px; border-left: 1px solid #34403c; }
-.availability-inline { min-height: 24px; margin: 4px 0 1px; padding: 4px 7px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; border: 1px solid #3c4844; background: #17211e; }
-.availability-inline span, .availability-inline em { color: #7d8a85; font: 900 7px var(--display); font-style: normal; letter-spacing: .06em; }
-.availability-inline b { overflow: hidden; color: #cbd2cf; font: 800 8px var(--display); text-overflow: ellipsis; white-space: nowrap; }
-.availability-inline em { color: var(--book-accent); }
-.availability-inline.stale { opacity: .58; }
+.availability-inline, .weather-inline { min-height: 24px; margin: 4px 0 1px; padding: 4px 7px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; border: 1px solid #3c4844; background: #17211e; }
+.availability-inline span, .availability-inline em, .weather-inline span, .weather-inline em { color: #7d8a85; font: 900 7px var(--display); font-style: normal; letter-spacing: .06em; }
+.availability-inline b, .weather-inline b { overflow: hidden; color: #cbd2cf; font: 800 8px var(--display); text-overflow: ellipsis; white-space: nowrap; }
+.availability-inline em, .weather-inline em { color: var(--book-accent); }
+.availability-inline.stale, .weather-inline.stale { opacity: .58; }
 .evidence-signals > div:last-child { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
 .evidence-signals article { min-width: 0; margin-top: 5px; padding-left: 8px; display: grid; grid-template-columns: 1fr auto; gap: 2px 6px; border-left: 2px solid #43504b; }
 .evidence-signals article > span { overflow: hidden; color: #7d8a85; font: 900 7px var(--display); letter-spacing: .07em; text-overflow: ellipsis; white-space: nowrap; }

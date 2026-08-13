@@ -11,6 +11,7 @@ import {
   type BaselineProjection,
   type DecisionBoardPayload,
   type GameAvailabilityContext,
+  type GameWeatherContext,
   type LineMovementSeries,
   type MatchupSignal,
   type TeamBaseline,
@@ -23,8 +24,10 @@ import { shrinkProbability } from "@/domain/odds";
 import { americanToDecimal } from "@/domain/odds";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
 import type { HistoricalMarginRow } from "@/domain/types";
+import { fitWeatherTotalAdjustment } from "@/domain/weather-model";
 import { weeklySlate } from "./weekly-slate";
 import { ensureOfficialInjuryStore, getOfficialInjuryImportState } from "./official-injuries/store";
+import { ensureKickoffWeatherStore, listKickoffWeather } from "./weather/store";
 import { getD1 } from "../../db";
 
 interface FeatureRow {
@@ -62,6 +65,9 @@ interface GameRow {
   spread_line: number;
   total: number | null;
   total_line: number | null;
+  roof: string | null;
+  temperature: number | null;
+  wind: number | null;
 }
 
 interface LineRow {
@@ -165,10 +171,12 @@ function totalProjections(
   away: TeamBaseline | null,
   home: TeamBaseline | null,
   leagueScoring: number | null,
-  edgeNoiseInterval: [number, number] | null
+  edgeNoiseInterval: [number, number] | null,
+  weatherAdjustmentPoints = 0
 ): TotalProjection[] {
-  const projectedTotal = projectTotal(away, home, leagueScoring);
-  if (projectedTotal === null) return [];
+  const baselineTotal = projectTotal(away, home, leagueScoring);
+  if (baselineTotal === null) return [];
+  const projectedTotal = roundTotalHalf(baselineTotal + weatherAdjustmentPoints);
   return (["betmgm", "fanduel"] as const).flatMap<TotalProjection>((book) => {
     const over = gameLines.find((line) => line.book === book && line.market === "total" && line.side.toLowerCase() === "over" && line.point !== null);
     const under = gameLines.find((line) => line.book === book && line.market === "total" && line.side.toLowerCase() === "under" && line.point !== null);
@@ -411,13 +419,14 @@ export async function buildDecisionBoard(
   options: { season?: number; week?: number; now?: Date } = {}
 ): Promise<DecisionBoardPayload> {
   const slate = await weeklySlate({ db, season: options.season, week: options.week, now: options.now });
-  await ensureOfficialInjuryStore(db);
+  await Promise.all([ensureOfficialInjuryStore(db), ensureKickoffWeatherStore(db)]);
   const activeGameIds = slate.games.map((game) => game.id);
   const activePlaceholders = activeGameIds.map(() => "?").join(", ");
   const injuryDataset = `official-injuries:${slate.season}:reg${slate.week}`;
-  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState] = await Promise.all([
+  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, weatherRows] = await Promise.all([
     db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
-    db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line
+    db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line,
+        roof, temperature, wind
       FROM nfl_games WHERE season BETWEEN 2010 AND ? AND result IS NOT NULL AND spread_line IS NOT NULL
         AND (season < ? OR week < ?)
       ORDER BY game_date, game_id`).bind(slate.season, slate.season, slate.week).all<GameRow>(),
@@ -443,7 +452,8 @@ export async function buildDecisionBoard(
       FROM official_injury_reports
       WHERE season = ? AND week = ? AND game_id IN (${activePlaceholders})
       GROUP BY game_id`).bind(slate.season, slate.week, ...activeGameIds).all<InjuryAggregateRow>(),
-    getOfficialInjuryImportState(db, injuryDataset)
+    getOfficialInjuryImportState(db, injuryDataset),
+    listKickoffWeather(db, activeGameIds)
   ]);
   const featureRows = featureResult.results;
   const latestTrainingSeason = Math.max(structuralConfig.model.trainingStartSeason, ...gameResult.results.map((row) => row.season));
@@ -472,6 +482,7 @@ export async function buildDecisionBoard(
     weight: 0.5 ** ((latestTrainingSeason - row.season) / structuralConfig.model.decayHalfLifeSeasons)
   }]));
   const injuryByGame = new Map(injuryResult.results.map((row) => [row.game_id, row]));
+  const weatherByGame = new Map(weatherRows.map((row) => [row.gameId, row]));
   const games = slate.games.map((game) => {
     const gameLines = lines.filter((line) => line.gameId === game.id);
     const homeSpreads = gameLines.filter((line) => line.market === "spread" && line.side === game.home && line.point !== null);
@@ -555,16 +566,57 @@ export async function buildDecisionBoard(
         sourceTimestamp: injuries.source_timestamp
       } : null
     });
+    const storedWeather = weatherByGame.get(game.id);
+    const weatherFit = storedWeather &&
+      (storedWeather.freshness === "current" || storedWeather.freshness === "stale") &&
+      (storedWeather.roof === "outdoor" || storedWeather.roof === "open") &&
+      storedWeather.windMph !== null && storedWeather.temperatureF !== null
+      ? fitWeatherTotalAdjustment(
+          gameResult.results.map((row) => ({
+            season: row.season,
+            total: row.total,
+            totalLine: row.total_line,
+            roof: row.roof,
+            windMph: row.wind,
+            temperatureF: row.temperature
+          })),
+          { windMph: storedWeather.windMph, temperatureF: storedWeather.temperatureF },
+          latestTrainingSeason,
+          structuralConfig.model.decayHalfLifeSeasons
+        )
+      : null;
+    const weather: GameWeatherContext = storedWeather ? {
+      status: storedWeather.freshness === "unavailable" ? "pending"
+        : storedWeather.freshness === "unconfirmed" ? "unconfirmed"
+          : storedWeather.freshness,
+      roof: storedWeather.roof,
+      windMph: storedWeather.windMph,
+      temperatureF: storedWeather.temperatureF,
+      precipitationProbability: storedWeather.precipitationProbability,
+      capturedAt: storedWeather.forecastIssuedAt,
+      totalAdjustmentPoints: weatherFit?.points ?? 0,
+      trainingGames: weatherFit?.trainingGames ?? null
+    } : {
+      status: "pending",
+      roof: "unconfirmed",
+      windMph: null,
+      temperatureF: null,
+      precipitationProbability: null,
+      capturedAt: null,
+      totalAdjustmentPoints: 0,
+      trainingGames: null
+    };
     return {
       gameId: game.id,
       away,
       home,
       projections,
-      totals: totalProjections(game.id, gameLines, away, home, leagueScoring, totalEdgeNoise),
+      totals: totalProjections(game.id, gameLines, away, home, leagueScoring, totalEdgeNoise, weather.totalAdjustmentPoints),
       teasers,
       signals: matchupSignals(away, home),
       movements: lineMovements(game.id, movementHistory, gameLines),
-      availability
+      availability,
+      weather
     };
   });
   const teaserPairs = rankTeaserPairs(games.flatMap((game) => game.teasers));

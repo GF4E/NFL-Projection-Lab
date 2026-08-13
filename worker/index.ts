@@ -9,6 +9,7 @@ import { listOddsAutomationRuns, runScheduledOddsAutomation } from "../src/serve
 import { weeklySlate } from "../src/server/weekly-slate";
 import { runOfficialInjuryAutomation } from "../src/server/official-injuries/automation";
 import { listOfficialInjuryImportStates } from "../src/server/official-injuries/store";
+import { runKickoffWeatherAutomation } from "../src/server/weather/automation";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -70,8 +71,9 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
     if (request.method === "POST") {
       const result = await runNflverseAutomation({ db: env.DB, allowPlayByPlay: true });
       const injuries = await runOfficialInjuryAutomation({ db: env.DB });
+      const weather = await runKickoffWeatherAutomation({ db: env.DB });
       const settlement = await settleCompletedTeamPlays(env.DB);
-      return json({ result, injuries, settlement, states: await listNflverseImportStates(env.DB) });
+      return json({ result, injuries, weather, settlement, states: await listNflverseImportStates(env.DB) });
     }
     return json({ states: await listNflverseImportStates(env.DB) });
   } catch (error) {
@@ -140,7 +142,11 @@ const worker = {
         db: env.DB,
         now: scheduledAt,
         allowPlayByPlay: true
-      }).then(() => settleCompletedTeamPlays(env.DB, scheduledAt))
+      }).then(async () => {
+        const settlement = await settleCompletedTeamPlays(env.DB, scheduledAt);
+        const weather = await runKickoffWeatherAutomation({ db: env.DB, now: scheduledAt });
+        return { settlement, weather };
+      })
     );
     ctx.waitUntil(runScheduledOddsAutomation({
       db: env.DB,

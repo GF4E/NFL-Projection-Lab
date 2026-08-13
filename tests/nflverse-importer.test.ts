@@ -126,7 +126,8 @@ describe("automatic nflverse importer", () => {
 
     const worker = readFileSync("worker/index.ts", "utf8");
     const settlement = readFileSync("src/server/automatic-settlement.ts", "utf8");
-    expect(worker).toContain(".then(() => settleCompletedTeamPlays");
+    expect(worker).toContain("settleCompletedTeamPlays(env.DB, scheduledAt)");
+    expect(worker).toContain("runKickoffWeatherAutomation");
     expect(settlement).toContain("play_settlement_audit");
     expect(settlement).not.toContain("closing_clv_cents =");
   });

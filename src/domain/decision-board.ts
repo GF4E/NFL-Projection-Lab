@@ -130,6 +130,17 @@ export interface GameAvailabilityContext {
   capturedAt: string | null;
 }
 
+export interface GameWeatherContext {
+  status: "current" | "stale" | "pending" | "indoors" | "unconfirmed";
+  roof: "outdoor" | "open" | "closed" | "fixed" | "unconfirmed";
+  windMph: number | null;
+  temperatureF: number | null;
+  precipitationProbability: number | null;
+  capturedAt: string | null;
+  totalAdjustmentPoints: number;
+  trainingGames: number | null;
+}
+
 export function summarizeGameAvailability(input: {
   freshness: "current" | "stale" | "running" | "unavailable" | null;
   lastSuccessAt: string | null;
@@ -165,6 +176,7 @@ export interface DecisionBoardGame {
   signals: MatchupSignal[];
   movements: LineMovementSeries[];
   availability: GameAvailabilityContext;
+  weather: GameWeatherContext;
 }
 
 export interface DecisionBoardPayload {

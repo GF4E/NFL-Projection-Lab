@@ -477,7 +477,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(server).toContain("weightedLeagueScoring");
     expect(server).toContain("season < ? OR week < ?");
-    expect(server).toContain("totalProjections(game.id, gameLines, away, home, leagueScoring, totalEdgeNoise)");
+    expect(server).toContain("totalProjections(game.id, gameLines, away, home, leagueScoring, totalEdgeNoise, weather.totalAdjustmentPoints)");
     expect(board).toContain("MODEL TOTAL");
     expect(board).toContain('line.market === "total"');
     expect(board).toContain("estimatedEvPercent: legExpectedValuePercent(leg)");

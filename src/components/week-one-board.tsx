@@ -393,6 +393,11 @@ export function WeekOneBoard() {
             const vig = (["spread", "total", "moneyline"] as const).map((market) => bookmakerMarketVig(lines, game.id, book, market));
             const gameIntel = intelligence?.games.find((item) => item.gameId === game.id);
             const availability = gameIntel?.availability;
+            const weather = gameIntel?.weather;
+            const materialWeather = Boolean(weather &&
+              (weather.status === "current" || weather.status === "stale") &&
+              weather.windMph !== null && weather.temperatureF !== null &&
+              Math.abs(weather.totalAdjustmentPoints) >= 0.5);
             const projection = gameIntel?.projections.find((item) => item.book === book);
             const totalProjection = gameIntel?.totals.find((item) => item.book === book);
             const deskOpen = openGame === game.id;
@@ -473,7 +478,7 @@ export function WeekOneBoard() {
                     <strong>{formatOdds(prop.americanPrice)}</strong><em>+{(prop.expectedValue * 100).toFixed(1)}%</em>
                   </button>) : <p>{propBoard?.message ?? "Props are scanned when posted."}</p>}
                 </section>
-                {(gameIntel?.signals.length || (movementOpen && movementCurrent)) && <section className="quick-evidence">
+                {(gameIntel?.signals.length || (movementOpen && movementCurrent) || materialWeather) && <section className="quick-evidence">
                   {movementOpen && movementCurrent && <div className="movement-mini">
                     <span>OPEN → NOW</span>
                     <SpreadSparkline values={movement?.snapshots.map((snapshot) => snapshot.point) ?? []} />
@@ -482,6 +487,11 @@ export function WeekOneBoard() {
                   </div>}
                   <div className="evidence-signals">
                     <div className="quick-head"><span>MATCHUP EVIDENCE</span><small>{availability?.status === "current" ? `NFL REPORT ${availability.capturedAt ? snapshotAge(availability.capturedAt) : "LIVE"}` : "rolling 17 games"}</small></div>
+                    {materialWeather && weather && <div className={`weather-inline ${weather.status}`}>
+                      <span>WEATHER</span>
+                      <b>{Math.round(weather.windMph!)} mph · {Math.round(weather.temperatureF!)}°{weather.precipitationProbability === null ? "" : ` · ${Math.round(weather.precipitationProbability)}% rain`}</b>
+                      <em>TOTAL {weather.totalAdjustmentPoints > 0 ? "+" : ""}{weather.totalAdjustmentPoints.toFixed(1)} · {weather.capturedAt ? snapshotAge(weather.capturedAt) : "LIVE"}</em>
+                    </div>}
                     {availability && availability.status !== "pending" && <div className={`availability-inline ${availability.status}`}>
                       <span>AVAILABILITY</span>
                       <b>{availability.reportedPlayers} listed · {availability.out} out · {availability.questionable} questionable</b>
