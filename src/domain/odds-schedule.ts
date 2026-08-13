@@ -126,7 +126,7 @@ export function scheduledPropCandidates(now: Date, games: readonly ScheduledGame
       scheduledFor,
       gameId: game.id,
       cost: REQUEST_COST,
-      priority: 6
+      priority: 2
     }];
   });
 }

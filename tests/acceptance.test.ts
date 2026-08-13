@@ -31,7 +31,8 @@ import { buildPlayerPropEvidence, crossedKeyNumbers, isClassicWongPoint, marginV
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
-import { inspectMainlineCompleteness, scheduledMainlineCandidates, scheduledPropCandidates, type ScheduledGame } from "@/domain/odds-schedule";
+import { inspectMainlineCompleteness, scheduledMainlineCandidates, scheduledPropCandidates, type ScheduledGame, type ScheduledOddsCandidate } from "@/domain/odds-schedule";
+import { plannedOddsThrottleReason } from "@/domain/odds-credit-plan";
 import { boardGameId, chooseActiveWeek, easternScheduleTimeToIso, normalizeScheduleTeam } from "@/domain/weekly-slate";
 import type { BookEvaluation, JobState, PushDelivery, SettledPick } from "@/domain/types";
 import { artifact, forecast, history, metrics, pick, quote, settled } from "./fixtures";
@@ -154,7 +155,27 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(simulations.every((simulation) => simulation.withinCeiling)).toBe(true);
     expect(Math.max(...simulations.map((simulation) => simulation.projectedCredits))).toBe(450);
     expect(simulations.some((simulation) => simulation.alertAt400)).toBe(true);
-    expect(simulations.some((simulation) => simulation.throttled.includes("player_props"))).toBe(true);
+    expect(simulations.every((simulation, index) => simulation.allowedRequests.props === creditConfig.billingPeriods[index].propGames)).toBe(true);
+    expect(simulations.some((simulation) => simulation.throttled.includes("kickoff_minus_60"))).toBe(true);
+    expect(simulations.every((simulation) => !simulation.throttled.includes("player_props"))).toBe(true);
+    const novemberGames: ScheduledGame[] = Array.from({ length: 71 }, (_, index) => ({
+      id: `nov-${index}`,
+      away: "A",
+      home: "H",
+      kickoffAt: `2026-11-${String(index % 28 + 1).padStart(2, "0")}T${String(17 + Math.floor(index / 28) * 3).padStart(2, "0")}:00:00.000Z`
+    }));
+    const lastPropGame = [...novemberGames].sort((left, right) => left.kickoffAt.localeCompare(right.kickoffAt) || left.id.localeCompare(right.id)).at(-1)!;
+    const lastProp: ScheduledOddsCandidate = {
+      key: "last-prop", job: "props_minus_60", gameId: lastPropGame.id, cost: 3, priority: 2,
+      scheduledFor: new Date(Date.parse(lastPropGame.kickoffAt) - 60 * 60_000).toISOString()
+    };
+    expect(plannedOddsThrottleReason(lastProp, novemberGames, 399)).toBeNull();
+    const distinctSixtyWindows = [...new Set(novemberGames.map((game) => new Date(Date.parse(game.kickoffAt) - 60 * 60_000).toISOString()))].sort();
+    const lastSixty: ScheduledOddsCandidate = {
+      key: "last-60", job: "kickoff_minus_60", gameId: null, cost: 3, priority: 3,
+      scheduledFor: distinctSixtyWindows.at(-1)!
+    };
+    expect(plannedOddsThrottleReason(lastSixty, novemberGames, 399)).toMatch(/reservation plan/);
   });
 
   it("11. enforces historical/current injury boundaries, 90-minute flags, failure behavior, and QB audit", () => {
@@ -483,6 +504,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("slate.week");
     expect(board).not.toContain("Refresh lines");
     expect(board).not.toContain("weekOneMatchups");
+    expect(board).toContain('method: "GET"');
+    expect(board).not.toContain('fetch(`/api/props?gameId=${encodeURIComponent(next)}`, { method: "POST" })');
     expect(readFileSync("src/server/player-props.ts", "utf8")).toContain("seasonSchedule");
   });
 

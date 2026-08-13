@@ -7,13 +7,13 @@ import {
   type ScheduledGame,
   type ScheduledOddsCandidate
 } from "@/domain/odds-schedule";
+import { plannedOddsThrottleReason } from "@/domain/odds-credit-plan";
 import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
 import { getD1 } from "../../db";
 import { listLiveLines, replaceLiveLines } from "./live-line-store";
 import {
   assertOddsCreditsAvailable,
   getOddsQuotaState,
-  ODDS_CREDIT_ALERT,
   recordOddsQuota
 } from "./odds-quota";
 import { refreshPlayerPropBoard } from "./player-props";
@@ -128,14 +128,6 @@ async function finishRun(db: D1Database, key: string, status: OddsAutomationRunR
     WHERE snapshot_key = ?`).bind(status, new Date().toISOString(), message, quota?.used ?? null, key).run();
 }
 
-function throttled(candidate: ScheduledOddsCandidate, used: number): string | null {
-  if (used >= ODDS_CREDIT_ALERT && (candidate.job === "daily" || candidate.job === "kickoff_minus_120" || candidate.job === "props_minus_60")) {
-    return "Skipped by the 400-credit throttle";
-  }
-  if (used + candidate.cost > 450) return "Skipped to preserve the 50-credit reserve";
-  return null;
-}
-
 export async function runScheduledOddsAutomation(input: {
   db?: D1Database;
   apiKey: string | undefined;
@@ -153,7 +145,7 @@ export async function runScheduledOddsAutomation(input: {
   for (const candidate of due) {
     if (!await acquireRun(db, candidate, checkedAt)) continue;
     const quota = await getOddsQuotaState(db);
-    const throttleReason = throttled(candidate, quota?.used ?? 0);
+    const throttleReason = plannedOddsThrottleReason(candidate, schedule, quota?.used ?? 0);
     if (!input.apiKey || throttleReason) {
       const message = !input.apiKey ? "Private Odds API key is unavailable" : throttleReason!;
       await finishRun(db, candidate.key, "skipped", message);

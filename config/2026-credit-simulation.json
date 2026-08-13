@@ -2,6 +2,7 @@
   "source": "https://github.com/nflverse/nfldata/raw/master/data/games.csv",
   "retrievedAt": "2026-08-11",
   "method": "Distinct REG kickoff windows for three mainline markets plus one three-market player-prop request per regular-season game at kickoff minus 60; one US region",
+  "reservationPriority": ["openers", "kickoff_minus_15", "player_props", "kickoff_minus_60", "kickoff_minus_120", "ordinary_tuesday_saturday"],
   "billingPeriods": [
     { "month": "2026-09", "kickoffWindows": 18, "weeklySlates": 4, "ordinaryWeekdaySnapshots": 16, "propGames": 48 },
     { "month": "2026-10", "kickoffWindows": 29, "weeklySlates": 5, "ordinaryWeekdaySnapshots": 22, "propGames": 60 },

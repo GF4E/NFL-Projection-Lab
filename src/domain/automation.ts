@@ -63,6 +63,14 @@ export interface CreditSimulation {
   alertAt400: boolean;
   withinCeiling: boolean;
   essentialCredits: number;
+  allowedRequests: {
+    openers: number;
+    daily: number;
+    kickoffMinus120: number;
+    kickoffMinus60: number;
+    kickoffMinus15: number;
+    props: number;
+  };
 }
 
 /**
@@ -81,40 +89,46 @@ export function simulateCreditPeriod(input: {
   const startingUsage = input.startingUsage ?? 0;
   const openerRequests = input.weeklySlates * 2;
   const dailyRequests = input.weekdaysInSeason;
-  const kickoffRequests = input.kickoffWindows.length * 3;
+  const kickoffWindowRequests = input.kickoffWindows.length;
+  const kickoffRequests = kickoffWindowRequests * 3;
   const propRequests = input.propGames ?? 0;
   const scheduled = startingUsage + requestCost * (openerRequests + dailyRequests + kickoffRequests + propRequests);
-  let projected = scheduled;
-  const throttled: string[] = [];
   const ceiling = input.creditCeiling ?? 450;
-  if (projected > ceiling) {
-    const removableDaily = Math.min(dailyRequests * requestCost, projected - ceiling);
-    projected -= removableDaily;
-    if (removableDaily > 0) throttled.push("ordinary_tuesday_saturday");
-  }
-  if (projected > ceiling) {
-    const removable120 = Math.min(input.kickoffWindows.length * requestCost, projected - ceiling);
-    projected -= removable120;
-    if (removable120 > 0) throttled.push("kickoff_minus_120");
-  }
-  if (projected > ceiling) {
-    const removableProps = Math.min(propRequests * requestCost, projected - ceiling);
-    projected -= removableProps;
-    if (removableProps > 0) throttled.push("player_props");
-  }
-  if (projected > ceiling) {
-    const removable60 = Math.min(input.kickoffWindows.length * requestCost, projected - ceiling);
-    projected -= removable60;
-    if (removable60 > 0) throttled.push("kickoff_minus_60");
-  }
-  const essentialCredits = startingUsage + requestCost * (openerRequests + input.kickoffWindows.length);
+  let remainingRequests = Math.max(0, Math.floor((ceiling - startingUsage) / requestCost));
+  const allowedOpeners = Math.min(openerRequests, remainingRequests);
+  remainingRequests -= allowedOpeners;
+  const allowed15 = Math.min(kickoffWindowRequests, remainingRequests);
+  remainingRequests -= allowed15;
+  const allowedProps = Math.min(propRequests, remainingRequests);
+  remainingRequests -= allowedProps;
+  const allowed60 = Math.min(kickoffWindowRequests, remainingRequests);
+  remainingRequests -= allowed60;
+  const allowed120 = Math.min(kickoffWindowRequests, remainingRequests);
+  remainingRequests -= allowed120;
+  const allowedDaily = Math.min(dailyRequests, remainingRequests);
+  const allowedRequests = {
+    openers: allowedOpeners,
+    daily: allowedDaily,
+    kickoffMinus120: allowed120,
+    kickoffMinus60: allowed60,
+    kickoffMinus15: allowed15,
+    props: allowedProps
+  };
+  const projected = startingUsage + requestCost * Object.values(allowedRequests).reduce((sum, count) => sum + count, 0);
+  const throttled: string[] = [];
+  if (allowedDaily < dailyRequests) throttled.push("ordinary_tuesday_saturday");
+  if (allowed120 < kickoffWindowRequests) throttled.push("kickoff_minus_120");
+  if (allowed60 < kickoffWindowRequests) throttled.push("kickoff_minus_60");
+  if (allowedProps < propRequests) throttled.push("player_props");
+  const essentialCredits = startingUsage + requestCost * (openerRequests + kickoffWindowRequests);
   return {
     scheduledCredits: scheduled,
     projectedCredits: projected,
     throttled,
     alertAt400: scheduled >= 400,
-    withinCeiling: projected <= ceiling && essentialCredits <= ceiling,
-    essentialCredits
+    withinCeiling: projected <= ceiling && essentialCredits <= ceiling && allowedOpeners === openerRequests && allowed15 === kickoffWindowRequests,
+    essentialCredits,
+    allowedRequests
   };
 }
 

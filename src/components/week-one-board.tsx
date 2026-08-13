@@ -203,15 +203,15 @@ export function WeekOneBoard() {
   async function toggleDecisionDesk(gameId: string) {
     const next = openGame === gameId ? null : gameId;
     setOpenGame(next);
-    if (!next || propBoards[next]) return;
+    if (!next) return;
     setPropsLoading(next);
     try {
-      const response = await fetch(`/api/props?gameId=${encodeURIComponent(next)}`, { method: "POST" });
+      const response = await fetch(`/api/props?gameId=${encodeURIComponent(next)}`, { method: "GET" });
       const data = await response.json() as PlayerPropBoard & { error?: string };
-      if (!response.ok || data.error) throw new Error(data.error ?? "Player prop scan failed");
+      if (!response.ok || data.error) throw new Error(data.error ?? "Player prop board failed to load");
       setPropBoards((current) => ({ ...current, [next]: data }));
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Player prop scan failed");
+      setMessage(error instanceof Error ? error.message : "Player prop board failed to load");
     } finally {
       setPropsLoading(null);
     }
