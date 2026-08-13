@@ -1072,4 +1072,14 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(serviceWorker).toContain('["awaiting_you", "edge_threshold"]');
     expect(serviceWorker).not.toContain("pipeline_failure");
   });
+
+  it("49. labels the exact matchup-evidence window and withholds signals when it is stale", () => {
+    const server = readFileSync("src/server/decision-board.ts", "utf8");
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(server).toContain("matchupEvidenceProvenance");
+    expect(server).toContain('signals: evidence.status === "current"');
+    expect(board).toContain("NFLVERSE THROUGH ${gameIntel.evidence.throughSeason} W${gameIntel.evidence.throughWeek}");
+    expect(board).toContain("EVIDENCE STALE · WITHHELD");
+    expect(board).not.toContain('"rolling 17 games"');
+  });
 });

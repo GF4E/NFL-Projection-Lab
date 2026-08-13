@@ -43,6 +43,7 @@ function board(homeEdge = 0.05): DecisionBoardPayload {
         edgeInterval: [0.01, 0.07]
       }],
       moneylines: [], teasers: [], signals: [], movements: [],
+      evidence: { status: "current", provider: "nflverse", throughSeason: 2025, throughWeek: 18, throughDate: "2026-01-04", expectedThroughSeason: 2025, expectedThroughWeek: 18, featureGames: 544 },
       availability: {
         status: "pending", reportedPlayers: 0, inactivesConfirmed: false,
         inactivePlayers: 0, out: 0, doubtful: 0, questionable: 0,

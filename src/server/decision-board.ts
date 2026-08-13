@@ -25,6 +25,7 @@ import { fitOpponentAdjustedRatings } from "@/domain/opponent-adjustment";
 import { expectedValueWithPush, powerDevig, shrinkProbability } from "@/domain/odds";
 import { applyChampionMarketResidual, predictProbability, type FittedLogisticModel } from "@/domain/model-fit";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
+import { matchupEvidenceProvenance } from "@/domain/evidence-provenance";
 import type { HistoricalMarginRow } from "@/domain/types";
 import { fitWeatherTotalAdjustment } from "@/domain/weather-model";
 import { loopAStateMatchesRevision, loopAStateRevision, updateTeamStates } from "@/domain/model-lifecycle";
@@ -547,6 +548,17 @@ export async function buildDecisionBoard(
   ]);
   const championHash = lifecycle?.championHash ?? null;
   const featureRows = featureResult.results;
+  const evidence = matchupEvidenceProvenance({
+    rows: featureRows.map((row) => ({
+      season: row.season,
+      week: row.week,
+      gameDate: row.game_date,
+      team: normalizeNflverseTeam(row.team)
+    })),
+    forecastSeason: slate.season,
+    forecastWeek: slate.week,
+    completedGames: gameResult.results
+  });
   const latestTrainingSeason = Math.max(structuralConfig.model.trainingStartSeason, ...gameResult.results.map((row) => row.season));
   const leagueScoring = weightedLeagueScoring(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season);
   const basisSeason = featureRows.length ? Math.max(...featureRows.map((row) => row.season)) : null;
@@ -818,7 +830,10 @@ export async function buildDecisionBoard(
         }
       }),
       teasers,
-      signals: matchupSignals(away, home, { awayRest: game.awayRest, homeRest: game.homeRest }),
+      signals: evidence.status === "current"
+        ? matchupSignals(away, home, { awayRest: game.awayRest, homeRest: game.homeRest })
+        : [],
+      evidence,
       movements: lineMovements(game.id, movementHistory, gameLines),
       availability,
       weather

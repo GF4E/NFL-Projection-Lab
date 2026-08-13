@@ -272,6 +272,17 @@ export interface GameWeatherContext {
   trainingGames: number | null;
 }
 
+export interface MatchupEvidenceProvenance {
+  status: "current" | "stale" | "unavailable";
+  provider: "nflverse";
+  throughSeason: number | null;
+  throughWeek: number | null;
+  throughDate: string | null;
+  expectedThroughSeason: number;
+  expectedThroughWeek: number;
+  featureGames: number;
+}
+
 export function summarizeGameAvailability(input: {
   freshness: "current" | "stale" | "running" | "unavailable" | null;
   lastSuccessAt: string | null;
@@ -324,6 +335,7 @@ export interface DecisionBoardGame {
   moneylines: MoneylineProjection[];
   teasers: TeaserCandidate[];
   signals: MatchupSignal[];
+  evidence: MatchupEvidenceProvenance;
   movements: LineMovementSeries[];
   availability: GameAvailabilityContext;
   weather: GameWeatherContext;
