@@ -289,10 +289,7 @@ function moneylineProjections(input: {
   );
   if (stateAtMoneyline.probability === null || stateAtMoneyline.pushProbability === null) return [];
   const tieProbability = Math.max(0, Math.min(0.25, stateAtMoneyline.pushProbability));
-  const stateConditionalHomeProbability = Math.max(
-    0.01,
-    Math.min(0.99, stateAtMoneyline.probability / Math.max(1e-6, 1 - tieProbability))
-  );
+  const stateConditionalHomeProbability = Math.max(0.01, Math.min(0.99, stateAtMoneyline.probability));
   const championHomeProbability = input.championModel
     ? predictProbability(input.championModel, buildLifecycleForecastRow({
         ...input.forecastContext,
@@ -705,7 +702,7 @@ export async function buildDecisionBoard(
         pushProbability: translated.pushProbability,
         fairAmerican: translated.probability === null || translated.pushProbability === null
           ? null
-          : fairAmericanFromProbability(translated.probability / Math.max(1e-6, 1 - translated.pushProbability)),
+          : fairAmericanFromProbability(translated.probability),
         classification,
         crossedKeys,
         warning: translated.warning

@@ -74,6 +74,7 @@ export interface DiscreteMarginArtifact {
 }
 
 export interface TranslationResult {
+  /** Fair win probability conditional on the outcome not being a push. */
   probability: number | null;
   pushProbability: number | null;
   warning: "none" | "interpolated" | "extrapolated" | "unsupported";
@@ -115,6 +116,7 @@ export interface BookEvaluation {
   powerExponent: number;
   fairProbability: number;
   shrunkProbability: number | null;
+  pushProbability: number | null;
   expectedValue: number | null;
   edge: number | null;
   uncertaintyInterval: [number, number] | null;

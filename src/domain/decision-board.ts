@@ -676,16 +676,21 @@ export function playToAmericanFromProbability(probability: number): number {
 }
 
 export function priceTwoTeamTeaser(
-  legs: readonly { coverProbability: number; pushProbability: number }[],
+  legs: readonly { conditionalWinProbability: number; pushProbability: number }[],
   offeredAmerican: number
 ): TwoTeamTeaserValue | null {
   if (legs.length !== 2) return null;
   if (legs.some((leg) =>
-    !Number.isFinite(leg.coverProbability) || !Number.isFinite(leg.pushProbability) ||
-    leg.coverProbability < 0 || leg.pushProbability < 0 || leg.coverProbability + leg.pushProbability > 1
+    !Number.isFinite(leg.conditionalWinProbability) || !Number.isFinite(leg.pushProbability) ||
+    leg.conditionalWinProbability < 0 || leg.conditionalWinProbability > 1 ||
+    leg.pushProbability < 0 || leg.pushProbability >= 1
   )) return null;
-  const winProbability = legs.reduce((product, leg) => product * leg.coverProbability, 1);
-  const noLossProbability = legs.reduce((product, leg) => product * (leg.coverProbability + leg.pushProbability), 1);
+  const rawLegs = legs.map((leg) => ({
+    win: (1 - leg.pushProbability) * leg.conditionalWinProbability,
+    push: leg.pushProbability
+  }));
+  const winProbability = rawLegs.reduce((product, leg) => product * leg.win, 1);
+  const noLossProbability = rawLegs.reduce((product, leg) => product * (leg.win + leg.push), 1);
   const pushProbability = Math.max(0, noLossProbability - winProbability);
   const lossProbability = Math.max(0, 1 - winProbability - pushProbability);
   if (!(winProbability > 0) || !(winProbability + lossProbability > 0)) return null;
@@ -733,8 +738,8 @@ export function rankTeaserPairs(
       if (right.fairProbability === null || right.pushProbability === null || right.warning === "unsupported") continue;
       if (left.book !== right.book || left.gameId === right.gameId) continue;
       const priced = priceTwoTeamTeaser([
-        { coverProbability: left.fairProbability, pushProbability: left.pushProbability },
-        { coverProbability: right.fairProbability, pushProbability: right.pushProbability }
+        { conditionalWinProbability: left.fairProbability, pushProbability: left.pushProbability },
+        { conditionalWinProbability: right.fairProbability, pushProbability: right.pushProbability }
       ], offeredAmerican);
       if (!priced) continue;
       const fairProbability = priced.winProbability;

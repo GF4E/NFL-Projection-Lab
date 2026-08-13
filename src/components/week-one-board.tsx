@@ -175,7 +175,7 @@ export function WeekOneBoard() {
   const teaserValue = useMemo(() => {
     if (slipMode !== "teaser" || slip.length !== 2 || slip.some((leg) => leg.kind !== "teaser" || leg.fairProbability === null || leg.pushProbability === undefined)) return null;
     if (new Set(slip.map((leg) => leg.gameId)).size !== slip.length) return null;
-    const priced = priceTwoTeamTeaser(slip.map((leg) => ({ coverProbability: leg.fairProbability!, pushProbability: leg.pushProbability! })), teaserPrice);
+    const priced = priceTwoTeamTeaser(slip.map((leg) => ({ conditionalWinProbability: leg.fairProbability!, pushProbability: leg.pushProbability! })), teaserPrice);
     return priced ? { ...priced, evPercent: priced.expectedValue * 100 } : null;
   }, [slip, slipMode, teaserPrice]);
 

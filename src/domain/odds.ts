@@ -121,6 +121,7 @@ export function evaluateBook(input: BookEvaluationInput): BookEvaluation {
       powerExponent: devig.exponent,
       fairProbability: devig.probabilities[0],
       shrunkProbability: probability,
+      pushProbability: probability === null ? null : 0,
       expectedValue: probability === null ? null : expectedValue(probability, quote.americanPrice),
       edge: probability === null ? null : probability - devig.probabilities[0],
       uncertaintyInterval: probability === null ? null : input.uncertaintyInterval,
@@ -168,7 +169,10 @@ export function evaluateBook(input: BookEvaluationInput): BookEvaluation {
     powerExponent: devig.exponent,
     fairProbability: devig.probabilities[0],
     shrunkProbability: translatedShrunk,
-    expectedValue: translatedShrunk === null ? null : expectedValue(translatedShrunk, quote.americanPrice),
+    pushProbability: shrunkToBook.pushProbability,
+    expectedValue: translatedShrunk === null || shrunkToBook.pushProbability === null
+      ? null
+      : expectedValueWithPush(translatedShrunk, shrunkToBook.pushProbability, quote.americanPrice),
     edge: translatedShrunk === null ? null : translatedShrunk - devig.probabilities[0],
     uncertaintyInterval:
       intervalLow.probability === null || intervalHigh.probability === null

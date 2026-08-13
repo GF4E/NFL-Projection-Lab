@@ -9,6 +9,7 @@ import {
   translateFairProbability
 } from "@/domain/margin";
 import {
+  evaluateBook,
   expectedValueWithPush,
   powerDevig,
   shrinkProbability,
@@ -34,7 +35,7 @@ import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
 import { inspectMainlineCompleteness, scheduledMainlineCandidates, scheduledPropCandidates, type ScheduledGame, type ScheduledOddsCandidate } from "@/domain/odds-schedule";
 import { plannedOddsThrottleReason } from "@/domain/odds-credit-plan";
 import { boardGameId, chooseActiveWeek, easternScheduleTimeToIso, normalizeScheduleTeam } from "@/domain/weekly-slate";
-import type { BookEvaluation, JobState, PushDelivery, SettledPick } from "@/domain/types";
+import type { BookEvaluation, DiscreteMarginArtifact, JobState, PushDelivery, SettledPick } from "@/domain/types";
 import { artifact, forecast, history, metrics, pick, quote, settled } from "./fixtures";
 
 describe("NFL Projection Lab v1.1 acceptance suite", () => {
@@ -55,9 +56,45 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const evaluation = (canonicalPoint: number): BookEvaluation => ({
       book: "betmgm", rawQuote: quote(), opposingQuote: quote({ side: "NYJ +2.5" }), canonicalPoint,
       translatedAmericanPrice: -108, powerExponent: 1.1, fairProbability: 0.51,
-      shrunkProbability: 0.54, expectedValue: 0.03, edge: 0.03, uncertaintyInterval: [0.01, 0.05], translationWarning: "none"
+      shrunkProbability: 0.54, pushProbability: 0, expectedValue: 0.03, edge: 0.03, uncertaintyInterval: [0.01, 0.05], translationWarning: "none"
     });
     expect(() => translatedPriceDeltaCents(evaluation(-2.5), { ...evaluation(-3), book: "fanduel" })).toThrow(/prohibited/);
+  });
+
+  it("1b. keeps translated price probability conditional on no push and carries push mass separately", () => {
+    const pushArtifact: DiscreteMarginArtifact = {
+      version: "push-contract",
+      seasonRange: [2015, 2025],
+      boundarySeason: 2015,
+      decay: { halfLifeSeasons: 2.5, referenceSeason: 2025 },
+      spreadGrid: [-3, -2.5],
+      rows: [{
+        consensusSpread: 0,
+        outcomes: [
+          { postedPoint: -3, cover: 0.45, push: 0.1, loss: 0.45, effectiveWeight: 100 },
+          { postedPoint: -2.5, cover: 0.5, push: 0, loss: 0.5, effectiveWeight: 100 }
+        ]
+      }],
+      keyMarginMasses: { "3": 0.1 },
+      artifactHash: "push-contract-hash",
+      generatedAt: "2026-02-01T00:00:00.000Z"
+    };
+    const translated = translateFairProbability(pushArtifact, 0, -2.5, -3, 0.62);
+    expect(translated.probability).toBeCloseTo(0.62, 10);
+    expect(translated.pushProbability).toBeCloseTo(0.1, 10);
+
+    const evaluation = evaluateBook({
+      quote: quote({ point: -3, americanPrice: -110 }),
+      opposingQuote: quote({ id: "push-opp", side: "NYJ +3", point: 3, americanPrice: -110 }),
+      canonicalPoint: -3,
+      consensusSpread: 0,
+      canonicalShrunkProbability: 0.62,
+      canonicalMarketProbability: 0.5,
+      uncertaintyInterval: [0.58, 0.66],
+      artifact: pushArtifact
+    });
+    expect(evaluation.pushProbability).toBeCloseTo(0.1, 10);
+    expect(evaluation.expectedValue).toBeCloseTo(expectedValueWithPush(0.62, 0.1, -110), 10);
   });
 
   it("2. uses the power method for spread, total, favorite, underdog, and near-even markets", () => {
@@ -598,17 +635,17 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(ordinaryPair[0].expectedValue).toBeGreaterThan(0);
     expect(ordinaryPair[0].legs.every((leg) => leg.classification === "ordinary")).toBe(true);
     expect(rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.7), teaser("g2", "KC", "DEN", 0.7)], { offeredAmerican: -120 })).toEqual([]);
-    const pushAdjusted = rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.7, 0.08), teaser("g2", "KC", "DEN", 0.7, 0.08)], { offeredAmerican: -120 });
+    const pushAdjusted = rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.78, 0.08), teaser("g2", "KC", "DEN", 0.78, 0.08)], { offeredAmerican: -120 });
     expect(pushAdjusted).toHaveLength(1);
-    expect(pushAdjusted[0].pushProbability).toBeCloseTo(0.1184, 4);
+    expect(pushAdjusted[0].pushProbability).toBeCloseTo(0.121216, 6);
     expect(pushAdjusted[0].expectedValue).toBeGreaterThan(0);
     const exactBoundary = priceTwoTeamTeaser([
-      { coverProbability: 0.7, pushProbability: 0.08 },
-      { coverProbability: 0.7, pushProbability: 0.08 }
+      { conditionalWinProbability: 0.78, pushProbability: 0.08 },
+      { conditionalWinProbability: 0.78, pushProbability: 0.08 }
     ], pushAdjusted[0].playToAmerican);
     expect(exactBoundary?.expectedValue).toBeGreaterThanOrEqual(0);
-    expect(priceTwoTeamTeaser([{ coverProbability: 0.7, pushProbability: 0 }, { coverProbability: 0.7, pushProbability: 0 }], -120)?.expectedValue).toBeLessThan(0);
-    expect(priceTwoTeamTeaser([{ coverProbability: 0.7, pushProbability: 0.08 }], -120)).toBeNull();
+    expect(priceTwoTeamTeaser([{ conditionalWinProbability: 0.7, pushProbability: 0 }, { conditionalWinProbability: 0.7, pushProbability: 0 }], -120)?.expectedValue).toBeLessThan(0);
+    expect(priceTwoTeamTeaser([{ conditionalWinProbability: 0.7, pushProbability: 0.08 }], -120)).toBeNull();
     expect(rankTeaserPairs([teaser("g1", "NE", "SEA", 0.75), teaser("g2", "KC", "DEN", 0.74)], { offeredAmerican: -120 })).toEqual([]);
     const compactBoard = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(compactBoard).toContain("PLAY TO");

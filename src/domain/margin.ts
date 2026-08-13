@@ -124,6 +124,17 @@ function logistic(value: number): number {
   return 1 / (1 + Math.exp(-value));
 }
 
+/**
+ * Sportsbook prices are quoted conditional on the wager not pushing: a push
+ * refunds the stake rather than occupying one side of the two-way price. Keep
+ * every translated probability on that same decisive-outcome scale and carry
+ * push mass separately.
+ */
+function decisiveCoverProbability(cell: DiscreteOutcomeCell): number {
+  const decisiveMass = cell.cover + cell.loss;
+  return decisiveMass <= 0 ? 0.5 : cell.cover / decisiveMass;
+}
+
 interface LocatedCell {
   cell: DiscreteOutcomeCell | null;
   warning: TranslationResult["warning"];
@@ -216,7 +227,7 @@ export function translateFairProbability(
   if (!from.cell || !to.cell) {
     return { probability: null, pushProbability: null, warning: "unsupported", sourcePoints: [] };
   }
-  const shift = logit(to.cell.cover) - logit(from.cell.cover);
+  const shift = logit(decisiveCoverProbability(to.cell)) - logit(decisiveCoverProbability(from.cell));
   const warnings = [from.warning, to.warning];
   return {
     probability: logistic(logit(fairProbability) + shift),
