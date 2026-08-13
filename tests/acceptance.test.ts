@@ -971,10 +971,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
 
   it("37. connects the fixed-seed 80% interval and quarter-Kelly sizing to every live card", () => {
     const server = readFileSync("src/server/decision-board.ts", "utf8");
+    const lifecycle = readFileSync("src/server/model-lifecycle/automation.ts", "utf8");
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(server).toContain("bootstrapEdgeInterval");
-    expect(server).toContain("structuralConfig.model.bootstrapMembers");
-    expect(server).toContain("structuralConfig.model.bootstrapSeedStart");
+    expect(server).toContain("bootstrapResidualEdgeInterval");
+    expect(server).toContain("ensembleModels");
+    expect(lifecycle).toContain("fitWeightedBootstrapModelEnsemble");
+    expect(lifecycle).toContain("structuralConfig.model.bootstrapMembers");
+    expect(lifecycle).toContain("structuralConfig.model.bootstrapSeedStart");
+    expect(lifecycle).toContain("structuralConfig.model.bootstrapFitIterations");
+    expect(structuralConfig.model.bootstrapMembers).toBe(100);
+    expect(server).toContain("ensembleHash");
     expect(server).toContain("edgeInterval");
     expect(board).toContain("sizeKelly");
     expect(board).toContain("sideSizing.suggestedUnits");
@@ -993,7 +999,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(server).toContain('market: "moneyline"');
     expect(server).toContain("expectedValueWithPush");
-    expect(server).toContain("moneylineEdgeNoise");
+    expect(server).toContain("consensusEdgeInterval");
+    expect(server).toContain("bootstrapResidualEdgeInterval");
     expect(server).toContain("consensusHomeProbability");
     expect(board).toContain("gameIntel?.moneylines.find");
     expect(board).toContain("pushProbability = moneylineProjection.tieProbability");

@@ -26,7 +26,7 @@ const leg = (
 describe("stored shared-card contract integrity", () => {
   const snapshot = (overrides: Partial<WeeklyPlay["forecastSnapshot"] extends infer T ? NonNullable<T> : never> = {}) => ({
     generatedAt: "2026-09-13T18:00:00.000Z", boardGeneratedAt: "2026-09-13T18:00:00.000Z",
-    championHash: "champion", configHash: "config", dataHash: "data", artifactHash: "artifact",
+    championHash: "champion", ensembleHash: "ensemble", configHash: "config", dataHash: "data", artifactHash: "artifact",
     consensusSnapshotId: "snapshot", displayedExpectedValuePercent: 2,
     authoritativeExpectedValuePercent: null, displayedEdgePp: 2, legs: [], ...overrides
   });

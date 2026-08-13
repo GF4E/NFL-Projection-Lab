@@ -30,6 +30,7 @@ export type PlayForecastSnapshot = {
   generatedAt: string;
   boardGeneratedAt: string;
   championHash: string | null;
+  ensembleHash: string | null;
   configHash: string;
   dataHash: string;
   artifactHash: string | null;

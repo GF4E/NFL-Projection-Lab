@@ -3,7 +3,6 @@ import {
   crossedKeyNumbers,
   fairAmericanFromProbability,
   isClassicWongPoint,
-  marginVersusConsensusResidual,
   matchupSignals,
   normalizeNflverseTeam,
   rankTeaserPairs,
@@ -20,10 +19,9 @@ import {
 } from "@/domain/decision-board";
 import type { TotalProjection } from "@/domain/decision-board";
 import { fairSpreadPointForProbability, translateFairProbability } from "@/domain/margin";
-import { bootstrapEdgeInterval, type WeightedTrainingRow } from "@/domain/bootstrap";
 import { fitOpponentAdjustedRatings } from "@/domain/opponent-adjustment";
-import { expectedValueWithPush, powerDevig, shrinkProbability } from "@/domain/odds";
-import { applyChampionMarketResidual, predictProbability, type FittedLogisticModel } from "@/domain/model-fit";
+import { expectedValueWithPush, shrinkProbability } from "@/domain/odds";
+import { applyChampionMarketResidual, bootstrapResidualEdgeInterval, predictProbability, type FittedLogisticModel } from "@/domain/model-fit";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
 import { matchupEvidenceProvenance } from "@/domain/evidence-provenance";
 import { fitWeatherTotalAdjustment } from "@/domain/weather-model";
@@ -53,7 +51,7 @@ import { frozenTotalArtifact } from "@/domain/frozen-total";
 import { canonicalTotalMarket, translateCanonicalTotalForecast } from "@/domain/total-contracts";
 import { translateTotalFairProbability } from "@/domain/total";
 import type { DiscreteMarginArtifact, DiscreteTotalArtifact } from "@/domain/types";
-import { championConfigurationStatus, currentModelConfigurationHash } from "@/domain/model-version";
+import { championConfigurationStatus, currentModelCodeHash, currentModelConfigurationHash } from "@/domain/model-version";
 
 interface FeatureRow {
   game_id: string;
@@ -186,16 +184,6 @@ function roundTotalHalf(value: number): number {
   return Math.round(value * 2) / 2;
 }
 
-function historicalEdgeInterval(rows: readonly WeightedTrainingRow[], scale = 1): [number, number] | null {
-  if (rows.length < 32) return null;
-  const bootstrap = bootstrapEdgeInterval(
-    [...rows],
-    structuralConfig.model.bootstrapMembers,
-    structuralConfig.model.bootstrapSeedStart
-  );
-  return [bootstrap.interval[0] * scale, bootstrap.interval[1] * scale];
-}
-
 function weightedLeagueScoring(games: readonly GameRow[], latestSeason: number): number | null {
   let weight = 0;
   let total = 0;
@@ -227,9 +215,9 @@ function totalProjections(
   away: TeamBaseline | null,
   home: TeamBaseline | null,
   leagueScoring: number | null,
-  edgeNoiseInterval: [number, number] | null,
   weatherAdjustmentPoints = 0,
   championModel: FittedLogisticModel | null = null,
+  ensembleModels: readonly FittedLogisticModel[] = [],
   artifact: DiscreteTotalArtifact | null = null,
   forecastContext: {
     season: number;
@@ -280,10 +268,22 @@ function totalProjections(
     canonicalMarketOverProbability,
     structuralConfig.model.shrinkageWeight
   );
-  const canonicalEdgeCenter = canonicalShrunkOverProbability - canonicalMarketOverProbability;
-  const canonicalOverEdgeInterval: [number, number] | null = edgeNoiseInterval === null
-    ? null
-    : [canonicalEdgeCenter + edgeNoiseInterval[0], canonicalEdgeCenter + edgeNoiseInterval[1]];
+  const forecastRow = forecastContext ? buildLifecycleForecastRow({
+    ...forecastContext,
+    market: "total",
+    marketProbability: canonicalMarketOverProbability,
+    totalLine: canonical.point,
+    isHomeSide: false
+  }) : null;
+  const canonicalOverEdgeInterval = forecastRow && championOverProbability !== null
+    ? bootstrapResidualEdgeInterval({
+        models: ensembleModels,
+        forecastRow,
+        centralModelProbability: canonicalModelOverProbability,
+        marketProbability: canonicalMarketOverProbability,
+        shrinkageWeight: structuralConfig.model.shrinkageWeight
+      })?.interval ?? null
+    : null;
   return (["betmgm", "fanduel"] as const).flatMap<TotalProjection>((book) => {
     const over = gameLines.find((line) => line.book === book && line.market === "total" && line.side.toLowerCase() === "over" && line.point !== null);
     const under = gameLines.find((line) => line.book === book && line.market === "total" && line.side.toLowerCase() === "under" && line.point !== null);
@@ -335,8 +335,8 @@ function moneylineProjections(input: {
   artifact: DiscreteMarginArtifact | null;
   consensusHomePoint: number | null;
   stateProjectedHomePoint: number | null;
-  edgeNoiseInterval: [number, number] | null;
   championModel: FittedLogisticModel | null;
+  ensembleModels: readonly FittedLogisticModel[];
   forecastContext: {
     season: number;
     week: number;
@@ -382,6 +382,21 @@ function moneylineProjections(input: {
     consensusHomeProbability,
     structuralConfig.model.shrinkageWeight
   );
+  const forecastRow = buildLifecycleForecastRow({
+    ...input.forecastContext,
+    market: "moneyline",
+    marketProbability: consensusHomeProbability,
+    isHomeSide: true
+  });
+  const consensusEdgeInterval = championHomeProbability === null
+    ? null
+    : bootstrapResidualEdgeInterval({
+        models: input.ensembleModels,
+        forecastRow,
+        centralModelProbability: modelHomeProbability,
+        marketProbability: consensusHomeProbability,
+        shrinkageWeight: structuralConfig.model.shrinkageWeight
+      })?.interval ?? null;
   return bookPairs.map(({ book, home, away }) => {
     const edgeCenter = shrunkHomeProbability - home.fairProbability!;
     return {
@@ -395,9 +410,12 @@ function moneylineProjections(input: {
       tieProbability,
       homeExpectedValue: expectedValueWithPush(shrunkHomeProbability, tieProbability, home.americanPrice),
       awayExpectedValue: expectedValueWithPush(1 - shrunkHomeProbability, tieProbability, away.americanPrice),
-      edgeInterval: input.edgeNoiseInterval === null
+      edgeInterval: consensusEdgeInterval === null
         ? null
-        : [edgeCenter + input.edgeNoiseInterval[0], edgeCenter + input.edgeNoiseInterval[1]]
+        : [
+            edgeCenter + consensusEdgeInterval[0] - (shrunkHomeProbability - consensusHomeProbability),
+            edgeCenter + consensusEdgeInterval[1] - (shrunkHomeProbability - consensusHomeProbability)
+          ] as [number, number]
     };
   });
 }
@@ -672,7 +690,8 @@ export async function buildDecisionBoard(
     configuredChampionHash &&
     latestRunAuthorization?.gateDecision === "retain" &&
     latestRunAuthorization.championHash === configuredChampionHash &&
-    latestRunAuthorization.configHash === configHash
+    latestRunAuthorization.configHash === configHash &&
+    latestRunAuthorization.codeHash === currentModelCodeHash()
   );
   const championStatus = championConfigurationStatus(
     configuredChampionHash,
@@ -682,28 +701,19 @@ export async function buildDecisionBoard(
   );
   const championHash = championStatus === "compatible" ? configuredChampionHash : null;
   const championModel = championStatus === "compatible" ? championVersion?.artifact.model ?? null : null;
+  const ensembleVersion = latestRunAuthorization?.configHash === configHash &&
+    latestRunAuthorization.codeHash === currentModelCodeHash()
+    ? await getModelArtifact(db, latestRunAuthorization.challengerHash)
+    : null;
+  const ensembleModels = championStatus === "compatible" &&
+    ensembleVersion?.artifact.ensembleModels?.length === structuralConfig.model.bootstrapMembers
+    ? ensembleVersion.artifact.ensembleModels
+    : [];
+  const ensembleHash = ensembleModels.length === structuralConfig.model.bootstrapMembers
+    ? latestRunAuthorization?.challengerHash ?? null
+    : null;
   const artifact = frozenMarginArtifact;
   const lines = enrichWithPowerDevig(lineResult.results.map(rawLine));
-  const sideEdgeNoise = historicalEdgeInterval(gameResult.results.map((row) => ({
-    edge: Math.max(-0.25, Math.min(0.25, marginVersusConsensusResidual(row.result, row.spread_line) * 0.025)),
-    weight: 0.5 ** ((latestTrainingSeason - row.season) / structuralConfig.model.decayHalfLifeSeasons)
-  })));
-  const totalEdgeNoise = historicalEdgeInterval(gameResult.results.flatMap((row) => row.total === null || row.total_line === null ? [] : [{
-    edge: Math.max(-0.25, Math.min(0.25, (row.total - row.total_line) * 0.025)),
-    weight: 0.5 ** ((latestTrainingSeason - row.season) / structuralConfig.model.decayHalfLifeSeasons)
-  }]));
-  const moneylineEdgeNoise = historicalEdgeInterval(gameResult.results.flatMap((row) => {
-    if (row.result === 0 || row.home_moneyline === null || row.away_moneyline === null) return [];
-    try {
-      const marketHomeProbability = powerDevig(row.home_moneyline, row.away_moneyline).probabilities[0];
-      return [{
-        edge: (row.result > 0 ? 1 : 0) - marketHomeProbability,
-        weight: 0.5 ** ((latestTrainingSeason - row.season) / structuralConfig.model.decayHalfLifeSeasons)
-      }];
-    } catch {
-      return [];
-    }
-  }));
   const injuryByTeam = new Map(injuryResult.results.map((row) => [`${row.game_id}:${normalizeNflverseTeam(row.team)}`, row]));
   const inactiveByTeam = new Map(inactiveResult.results.map((row) => [`${row.game_id}:${normalizeNflverseTeam(row.team)}`, row]));
   const pregameByGame = new Map(pregameStates.map((state) => [state.gameId, state]));
@@ -835,12 +845,30 @@ export async function buildDecisionBoard(
     const canonicalShrunkProbability = canonicalModelProbability === null || canonicalMarketProbability === null
       ? null
       : shrinkProbability(canonicalModelProbability, canonicalMarketProbability, structuralConfig.model.shrinkageWeight);
-    const canonicalEdgeCenter = canonicalShrunkProbability === null || canonicalMarketProbability === null
+    const spreadForecastRow = consensusHomePoint === null || canonicalMarketProbability === null ? null : buildLifecycleForecastRow({
+      season: game.season,
+      week: game.week,
+      market: "spread",
+      marketProbability: canonicalMarketProbability,
+      expectedHomeMargin: -consensusHomePoint,
+      totalLine: consensusTotalLine,
+      awayRest: game.awayRest,
+      homeRest: game.homeRest,
+      isHomeSide: true,
+      teamContext
+    });
+    const ensembleSpreadInterval = spreadForecastRow && championProbability !== null && canonicalModelProbability !== null && canonicalMarketProbability !== null
+      ? bootstrapResidualEdgeInterval({
+          models: ensembleModels,
+          forecastRow: spreadForecastRow,
+          centralModelProbability: canonicalModelProbability,
+          marketProbability: canonicalMarketProbability,
+          shrinkageWeight: structuralConfig.model.shrinkageWeight
+        })?.interval ?? null
+      : null;
+    const canonicalEdgeInterval: [number, number] | null = ensembleSpreadInterval === null
       ? null
-      : canonicalShrunkProbability - canonicalMarketProbability;
-    const canonicalEdgeInterval: [number, number] | null = canonicalEdgeCenter === null || sideEdgeNoise === null
-      ? null
-      : [canonicalEdgeCenter + sideEdgeNoise[0] - qbUncertaintyWidening, canonicalEdgeCenter + sideEdgeNoise[1] + qbUncertaintyWidening];
+      : [ensembleSpreadInterval[0] - qbUncertaintyWidening, ensembleSpreadInterval[1] + qbUncertaintyWidening];
     const inferredFairPoint = artifact && consensusHomePoint !== null && canonicalModelProbability !== null
       ? fairSpreadPointForProbability(artifact, consensusHomePoint, consensusHomePoint, canonicalModelProbability)
       : { point: null, warning: "unsupported" as const };
@@ -979,9 +1007,9 @@ export async function buildDecisionBoard(
         away,
         home,
         leagueScoring,
-        totalEdgeNoise,
         weather.totalAdjustmentPoints,
         championModel,
+        ensembleModels,
         frozenTotalArtifact,
         {
           season: game.season,
@@ -1000,8 +1028,8 @@ export async function buildDecisionBoard(
         artifact,
         consensusHomePoint,
         stateProjectedHomePoint,
-        edgeNoiseInterval: moneylineEdgeNoise,
         championModel,
+        ensembleModels,
         forecastContext: {
           season: game.season,
           week: game.week,
@@ -1070,6 +1098,7 @@ export async function buildDecisionBoard(
     configHash,
     dataHash,
     championHash,
+    ensembleHash,
     championStatus,
     games,
     teaserPairs,

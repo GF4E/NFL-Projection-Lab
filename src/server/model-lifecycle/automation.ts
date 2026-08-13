@@ -7,7 +7,7 @@ import {
   updateTeamStates,
   versionLoopAStateHash
 } from "@/domain/model-lifecycle";
-import { designFeatureNames, fitWeightedLogistic, type FittedLogisticModel, type ModelTrainingRow } from "@/domain/model-fit";
+import { designFeatureNames, fitWeightedBootstrapModelEnsemble, fitWeightedLogistic, type FittedLogisticModel, type ModelTrainingRow } from "@/domain/model-fit";
 import { normalizeNflverseTeam } from "@/domain/decision-board";
 import type { CompletedGame, RollingFeatures, TeamState } from "@/domain/types";
 import {
@@ -22,7 +22,7 @@ import {
   resolveModelSystemAlerts,
   type StoredModelArtifact
 } from "./store";
-import { currentModelConfigurationHash } from "@/domain/model-version";
+import { currentModelCodeHash, currentModelConfigurationHash } from "@/domain/model-version";
 import {
   buildLifecycleTeamContexts,
   buildLifecycleTrainingRows,
@@ -187,7 +187,8 @@ export async function runModelLifecycleAutomation(input: {
     lifecycle?.championHash &&
     latestRunAuthorization?.gateDecision === "retain" &&
     latestRunAuthorization.championHash === lifecycle.championHash &&
-    latestRunAuthorization.configHash === currentConfigHash
+    latestRunAuthorization.configHash === currentConfigHash &&
+    latestRunAuthorization.codeHash === currentModelCodeHash()
   );
   const championConfigMismatch = Boolean(
     configuredChampion && configuredChampion.metadata.configHash !== currentConfigHash && !retainedByCurrentGate
@@ -198,7 +199,9 @@ export async function runModelLifecycleAutomation(input: {
   const loopARevision = loopAStateRevision(structuralConfig.version, structuralConfig.model.strengthK);
   const loopADue = input.force || initialize || !loopAStateMatchesRevision(lifecycle?.loopAHash, loopARevision) ||
     (tuesday && (clock.hour > 6 || clock.hour === 6 && clock.minute >= 30) && (lifecycle?.loopAThroughWeek ?? -1) < throughWeek);
-  const preseasonConfigRunDue = throughWeek === 0 && championConfigMismatch && latestRunConfigHash !== currentConfigHash;
+  const preseasonConfigRunDue = throughWeek === 0 && (
+    championConfigMismatch || latestRunAuthorization?.codeHash !== currentModelCodeHash()
+  );
   const loopBDue = input.force || initialize || preseasonConfigRunDue ||
     (tuesday && clock.hour >= 7 && ((lifecycle?.loopBTargetWeek ?? -1) < targetWeek || latestRunConfigHash !== currentConfigHash));
   let loopA: ModelLifecycleAutomationResult["loopA"] = "skipped";
@@ -286,10 +289,22 @@ export async function runModelLifecycleAutomation(input: {
     const dataHash = stableHash(rows.map((row) => ({ id: row.id, outcome: row.outcome, push: row.push, weight: row.weight, features: row.features })));
     const configHash = currentConfigHash;
     const featureSchemaHash = stableHash(designFeatureNames(rows));
-    const codeHash = stableHash("nfl-projection-lab:model-lifecycle:2026.2");
+    const codeHash = currentModelCodeHash();
+    const ensemble = fitWeightedBootstrapModelEnsemble({
+      rows,
+      featureNames: challenger.model.featureNames,
+      initialCoefficients: challenger.model.coefficients,
+      members: structuralConfig.model.bootstrapMembers,
+      seedStart: structuralConfig.model.bootstrapSeedStart,
+      regularization: challenger.model.regularization,
+      iterations: structuralConfig.model.bootstrapFitIterations
+    });
     const artifact: StoredModelArtifact = {
       model: challenger.model,
       walkForwardModels: challenger.walkForwardModels,
+      ensembleModels: ensemble.models,
+      ensembleSeeds: ensemble.seeds,
+      ensembleConfiguration: ensemble.configuration,
       trainingThroughSeason: latestCompletedSeason,
       trainingThroughWeek: latestCompletedSeason === season ? throughWeek : 18
     };
@@ -308,6 +323,14 @@ export async function runModelLifecycleAutomation(input: {
       const baselineArtifact: StoredModelArtifact = {
         model: baselineModel,
         walkForwardModels: Object.fromEntries(Object.keys(challenger.walkForwardModels).map((origin) => [origin, baselineModel])),
+        ensembleModels: Array.from({ length: structuralConfig.model.bootstrapMembers }, () => baselineModel),
+        ensembleSeeds: Array.from({ length: structuralConfig.model.bootstrapMembers }, (_, index) => structuralConfig.model.bootstrapSeedStart + index),
+        ensembleConfiguration: {
+          members: structuralConfig.model.bootstrapMembers,
+          seedStart: structuralConfig.model.bootstrapSeedStart,
+          regularization: 0,
+          iterations: structuralConfig.model.bootstrapFitIterations
+        },
         trainingThroughSeason: structuralConfig.model.trainingStartSeason - 1,
         trainingThroughWeek: 0
       };

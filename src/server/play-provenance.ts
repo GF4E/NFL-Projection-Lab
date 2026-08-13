@@ -176,6 +176,7 @@ export async function capturePlayForecastSnapshot(
   const consensusSnapshotId = stableHash({
     boardGeneratedAt: board.generatedAt,
     championHash: board.championHash,
+    ensembleHash: board.ensembleHash,
     configHash: board.configHash,
     dataHash: board.dataHash,
     artifactHash: board.artifactHash,
@@ -191,6 +192,7 @@ export async function capturePlayForecastSnapshot(
     generatedAt: new Date().toISOString(),
     boardGeneratedAt: board.generatedAt,
     championHash: board.championHash,
+    ensembleHash: board.ensembleHash,
     configHash: board.configHash,
     dataHash: board.dataHash,
     artifactHash: board.artifactHash,

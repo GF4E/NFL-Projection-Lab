@@ -4,6 +4,14 @@ import type { ModelMetrics, ModelRun, RollingFeatures, SystemAlert, TeamState } 
 export interface StoredModelArtifact {
   model: FittedLogisticModel;
   walkForwardModels: Record<string, FittedLogisticModel>;
+  ensembleModels?: FittedLogisticModel[];
+  ensembleSeeds?: number[];
+  ensembleConfiguration?: {
+    members: number;
+    seedStart: number;
+    regularization: number;
+    iterations: number;
+  };
   trainingThroughSeason: number;
   trainingThroughWeek: number;
 }
@@ -238,21 +246,27 @@ export async function getLatestModelRunConfigHash(db: D1Database): Promise<strin
 
 export async function getLatestModelRunAuthorization(db: D1Database): Promise<{
   championHash: string;
+  challengerHash: string;
   configHash: string;
+  codeHash: string;
   gateDecision: "promote" | "retain";
   completedAt: string;
 } | null> {
   await ensureModelLifecycleStore(db);
-  const row = await db.prepare(`SELECT champion_hash, config_hash, gate_decision, completed_at
+  const row = await db.prepare(`SELECT champion_hash, challenger_hash, config_hash, code_hash, gate_decision, completed_at
     FROM model_run_log ORDER BY completed_at DESC LIMIT 1`).first<{
       champion_hash: string;
+      challenger_hash: string;
       config_hash: string;
+      code_hash: string;
       gate_decision: "promote" | "retain";
       completed_at: string;
     }>();
   return row ? {
     championHash: row.champion_hash,
+    challengerHash: row.challenger_hash,
     configHash: row.config_hash,
+    codeHash: row.code_hash,
     gateDecision: row.gate_decision,
     completedAt: row.completed_at
   } : null;

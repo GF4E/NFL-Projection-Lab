@@ -26,7 +26,7 @@ const matchup: WeeklyMatchup = {
 function board(homeEdge = 0.05): DecisionBoardPayload {
   return {
     generatedAt: capturedAt, season: 2026, week: 1, basisSeason: 2025,
-    artifactHash: "artifact", configHash: "config", dataHash: "data", championHash: "champion", championStatus: "compatible", teaserPairs: [], marketCoverage: [], method: "test",
+    artifactHash: "artifact", configHash: "config", dataHash: "data", championHash: "champion", ensembleHash: "ensemble", championStatus: "compatible", teaserPairs: [], marketCoverage: [], method: "test",
     games: [{
       gameId: "sea-lar", away: null, home: null,
       projections: [{

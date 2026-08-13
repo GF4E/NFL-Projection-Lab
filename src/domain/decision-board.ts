@@ -373,6 +373,7 @@ export interface DecisionBoardPayload {
   configHash: string;
   dataHash: string;
   championHash: string | null;
+  ensembleHash: string | null;
   championStatus: "compatible" | "config_mismatch" | "unavailable";
   games: DecisionBoardGame[];
   teaserPairs: TeaserPairCandidate[];

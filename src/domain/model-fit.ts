@@ -90,6 +90,7 @@ export function fitWeightedLogistic(
     learningRate?: number;
     iterations?: number;
     featureNames?: string[];
+    initialCoefficients?: number[];
   } = {}
 ): FittedLogisticModel {
   const eligible = rows.filter((row) => !row.push && row.weight > 0);
@@ -98,7 +99,12 @@ export function fitWeightedLogistic(
   const regularization = options.regularization ?? 0.01;
   const learningRate = options.learningRate ?? 0.05;
   const iterations = options.iterations ?? 600;
-  const coefficients = Array(featureNames.length).fill(0) as number[];
+  if (options.initialCoefficients && options.initialCoefficients.length !== featureNames.length) {
+    throw new Error("Initial coefficient vector does not match the feature schema");
+  }
+  const coefficients = options.initialCoefficients
+    ? [...options.initialCoefficients]
+    : Array(featureNames.length).fill(0) as number[];
   const totalWeight = eligible.reduce((sum, row) => sum + row.weight, 0);
   // Model refits run in a CPU-bounded worker. Encode the immutable design matrix
   // once and retain only non-zero cells; season/market indicator columns make the
@@ -218,14 +224,18 @@ function mulberry32(seed: number): () => number {
 function weightedSample(rows: ModelTrainingRow[], seed: number): ModelTrainingRow[] {
   const random = mulberry32(seed);
   const totalWeight = rows.reduce((sum, row) => sum + row.weight, 0);
-  return Array.from({ length: rows.length }, () => {
+  const counts = Array(rows.length).fill(0) as number[];
+  for (let draw = 0; draw < rows.length; draw += 1) {
     let target = random() * totalWeight;
-    for (const row of rows) {
-      target -= row.weight;
-      if (target <= 0) return row;
+    for (let index = 0; index < rows.length; index += 1) {
+      target -= rows[index].weight;
+      if (target <= 0) {
+        counts[index] += 1;
+        break;
+      }
     }
-    return rows[rows.length - 1];
-  });
+  }
+  return rows.flatMap((row, index) => counts[index] ? [{ ...row, weight: counts[index] }] : []);
 }
 
 function percentile(sorted: number[], probability: number): number {
@@ -272,6 +282,55 @@ export function fitBootstrapEnsemble(input: {
     edgeInterval: [percentile(edges, 0.1), percentile(edges, 0.9)],
     configuration: { members, seedStart, regularization }
   };
+}
+
+export function fitWeightedBootstrapModelEnsemble(input: {
+  rows: ModelTrainingRow[];
+  featureNames: string[];
+  initialCoefficients: number[];
+  members?: number;
+  seedStart?: number;
+  regularization?: number;
+  iterations?: number;
+}): {
+  seeds: number[];
+  models: FittedLogisticModel[];
+  configuration: { members: number; seedStart: number; regularization: number; iterations: number };
+} {
+  const members = input.members ?? 100;
+  const seedStart = input.seedStart ?? 202600;
+  const regularization = input.regularization ?? 0.01;
+  const iterations = input.iterations ?? 25;
+  const eligible = input.rows.filter((row) => !row.push && row.weight > 0);
+  if (!eligible.length) throw new Error("Bootstrap ensemble requires non-push leakage-safe training rows");
+  const seeds = Array.from({ length: members }, (_, index) => seedStart + index);
+  const models = seeds.map((seed) => fitWeightedLogistic(weightedSample(eligible, seed), {
+    featureNames: input.featureNames,
+    initialCoefficients: input.initialCoefficients,
+    regularization,
+    iterations
+  }));
+  return { seeds, models, configuration: { members, seedStart, regularization, iterations } };
+}
+
+export function bootstrapResidualEdgeInterval(input: {
+  models: readonly FittedLogisticModel[];
+  forecastRow: Pick<ModelTrainingRow, "season" | "market" | "features">;
+  centralModelProbability: number;
+  marketProbability: number;
+  shrinkageWeight: number;
+}): { interval: [number, number]; memberEdges: number[] } | null {
+  if (!input.models.length) return null;
+  const memberLogits = input.models.map((model) => boundedLogit(predictProbability(model, input.forecastRow)));
+  const meanLogit = memberLogits.reduce((sum, value) => sum + value, 0) / memberLogits.length;
+  const centralLogit = boundedLogit(input.centralModelProbability);
+  const memberEdges = memberLogits.map((memberLogit) => {
+    const adjustedModel = sigmoid(centralLogit + memberLogit - meanLogit);
+    const shrunk = input.shrinkageWeight * adjustedModel + (1 - input.shrinkageWeight) * input.marketProbability;
+    return shrunk - input.marketProbability;
+  });
+  const sorted = [...memberEdges].sort((left, right) => left - right);
+  return { interval: [percentile(sorted, 0.1), percentile(sorted, 0.9)], memberEdges };
 }
 
 export function rollingOriginRows(

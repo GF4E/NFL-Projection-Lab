@@ -18,6 +18,7 @@ export interface StructuralConfig {
     promotionCalibrationSlope: number[];
     bootstrapMembers: number;
     bootstrapSeedStart: number;
+    bootstrapFitIterations: number;
     intervalPercentiles: number[];
     keyMargins: number[];
     keyMarginBoundarySeason: number;

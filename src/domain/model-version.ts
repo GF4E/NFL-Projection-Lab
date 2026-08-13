@@ -5,6 +5,10 @@ export function currentModelConfigurationHash(): string {
   return stableHash({ structuralConfig, eraConfig });
 }
 
+export function currentModelCodeHash(): string {
+  return stableHash("nfl-projection-lab:model-lifecycle:2026.3");
+}
+
 export function championConfigurationStatus(
   championHash: string | null,
   storedConfigHash: string | null,

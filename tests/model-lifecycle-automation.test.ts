@@ -9,6 +9,12 @@ import {
 import { aggregateRollingFeatureStates, missingLifecycleFeatureSeasons } from "@/server/model-lifecycle/automation";
 import { championConfigurationStatus } from "@/domain/model-version";
 import {
+  bootstrapResidualEdgeInterval,
+  fitWeightedBootstrapModelEnsemble,
+  fitWeightedLogistic,
+  type ModelTrainingRow
+} from "@/domain/model-fit";
+import {
   buildLifecycleTeamContexts,
   buildLifecycleTrainingRows,
   fitLifecycleChallenger,
@@ -17,6 +23,45 @@ import {
 } from "@/server/model-lifecycle/training";
 
 describe("persisted weekly model lifecycle", () => {
+  it("builds a deterministic fixed-seed coefficient ensemble and centers its interval on the live model edge", () => {
+    const rows: ModelTrainingRow[] = Array.from({ length: 160 }, (_, index) => ({
+      id: `row-${index}`,
+      season: 2023 + index % 3,
+      week: index % 18 + 1,
+      market: "total",
+      outcome: (index % 7 < 4 ? 1 : 0) as 0 | 1,
+      push: false,
+      weight: 0.5 + index % 5 / 5,
+      features: { marketLogit: (index % 9 - 4) / 8, totalEnvironment: (index % 5 - 2) / 2 }
+    }));
+    const central = fitWeightedLogistic(rows, { iterations: 80 });
+    const input = {
+      rows,
+      featureNames: central.featureNames,
+      initialCoefficients: central.coefficients,
+      members: 12,
+      seedStart: 202600,
+      regularization: central.regularization,
+      iterations: 15
+    };
+    const first = fitWeightedBootstrapModelEnsemble(input);
+    const repeated = fitWeightedBootstrapModelEnsemble(input);
+    expect(first.seeds).toEqual(Array.from({ length: 12 }, (_, index) => 202600 + index));
+    expect(first.models).toEqual(repeated.models);
+    const forecastRow = { season: 2026, market: "total" as const, features: { marketLogit: 0.1, totalEnvironment: 0.2 } };
+    const interval = bootstrapResidualEdgeInterval({
+      models: first.models,
+      forecastRow,
+      centralModelProbability: 0.56,
+      marketProbability: 0.51,
+      shrinkageWeight: 0.25
+    });
+    expect(interval).not.toBeNull();
+    expect(interval!.memberEdges).toHaveLength(12);
+    expect(interval!.interval[0]).toBeLessThan(interval!.interval[1]);
+    expect((interval!.interval[0] + interval!.interval[1]) / 2).toBeCloseTo(0.0125, 2);
+  });
+
   it("withholds a champion whose logged config differs from the forecast config", () => {
     expect(championConfigurationStatus("champion", "old", "current")).toBe("config_mismatch");
     expect(championConfigurationStatus("champion", "old", "current", true)).toBe("compatible");
