@@ -2,6 +2,8 @@ import { z } from "zod";
 import {
   PROP_MARKETS,
   buildPlayerPropEvidence,
+  normalizePropPlayerName,
+  propPlayerLookupPattern,
   scanMarketConfirmedProps,
   type PlayerPropEvidence,
   type PlayerPropHistoryRow,
@@ -74,6 +76,7 @@ interface QuoteRow {
 }
 
 interface PlayerStatRow {
+  game_id: string;
   player_display_name: string;
   season: number;
   week: number;
@@ -83,6 +86,14 @@ interface PlayerStatRow {
   rushing_yards: number;
   targets: number;
   receiving_yards: number;
+}
+
+interface PlayerSnapHistoryRow {
+  game_id: string;
+  player: string;
+  season: number;
+  week: number;
+  offense_snaps: number;
 }
 
 const schema = [
@@ -149,23 +160,58 @@ async function playerEvidenceForGame(db: D1Database, gameId: string, quotes: rea
   const players = [...new Set(quotes.map((quote) => quote.player))];
   if (!players.length) return [];
   const rows: PlayerStatRow[] = [];
+  const snapRows: PlayerSnapHistoryRow[] = [];
   for (const group of chunks(players, 60)) {
-    const placeholders = group.map(() => "?").join(", ");
-    const result = await db.prepare(`SELECT player_display_name, season, week, attempts, passing_yards,
-        carries, rushing_yards, targets, receiving_yards
-      FROM nfl_player_week_stats
-      WHERE season_type = 'REG' AND season >= ?
-        AND (season < ? OR (season = ? AND week < ?))
-        AND player_display_name IN (${placeholders})
-      ORDER BY season DESC, week DESC`)
-      .bind(matchup.season - 2, matchup.season, matchup.season, matchup.week, ...group).all<PlayerStatRow>();
-    rows.push(...result.results);
+    const allowedPlayers = new Set(group.map(normalizePropPlayerName));
+    const lookupPatterns = [...new Set(group.map(propPlayerLookupPattern))];
+    const lookupClause = lookupPatterns.map(() => "lower(player_display_name) LIKE ?").join(" OR ");
+    const snapLookupClause = lookupPatterns.map(() => "lower(player) LIKE ?").join(" OR ");
+    const [stats, snaps] = await Promise.all([
+      db.prepare(`SELECT game_id, player_display_name, season, week, attempts, passing_yards,
+          carries, rushing_yards, targets, receiving_yards
+        FROM nfl_player_week_stats
+        WHERE season_type = 'REG' AND season >= ?
+          AND (season < ? OR (season = ? AND week < ?))
+          AND (${lookupClause})
+        ORDER BY season DESC, week DESC`)
+        .bind(matchup.season - 2, matchup.season, matchup.season, matchup.week, ...lookupPatterns).all<PlayerStatRow>(),
+      db.prepare(`SELECT game_id, player, season, week, offense_snaps
+        FROM nfl_player_snap_counts
+        WHERE game_type = 'REG' AND offense_snaps > 0 AND season >= ?
+          AND (season < ? OR (season = ? AND week < ?))
+          AND (${snapLookupClause})
+        ORDER BY season DESC, week DESC`)
+        .bind(matchup.season - 2, matchup.season, matchup.season, matchup.week, ...lookupPatterns).all<PlayerSnapHistoryRow>()
+    ]);
+    rows.push(...stats.results.filter((row) => allowedPlayers.has(normalizePropPlayerName(row.player_display_name))));
+    snapRows.push(...snaps.results.filter((row) => allowedPlayers.has(normalizePropPlayerName(row.player))));
   }
-  const history: PlayerPropHistoryRow[] = rows.flatMap((row) => [
-    { player: row.player_display_name, market: "player_pass_yds" as const, season: row.season, week: row.week, value: row.passing_yards, opportunities: row.attempts },
-    { player: row.player_display_name, market: "player_rush_yds" as const, season: row.season, week: row.week, value: row.rushing_yards, opportunities: row.carries },
-    { player: row.player_display_name, market: "player_reception_yds" as const, season: row.season, week: row.week, value: row.receiving_yards, opportunities: row.targets }
-  ]);
+  const statByParticipation = new Map(rows.map((row) => [
+    `${row.game_id}:${normalizePropPlayerName(row.player_display_name)}`,
+    row
+  ]));
+  const snapParticipation = new Set(snapRows.map((row) => `${row.game_id}:${normalizePropPlayerName(row.player)}`));
+  const historyFrom = (input: {
+    player: string;
+    season: number;
+    week: number;
+    stat: PlayerStatRow | null;
+  }): PlayerPropHistoryRow[] => [
+    { player: input.player, market: "player_pass_yds", season: input.season, week: input.week, value: input.stat?.passing_yards ?? 0, opportunities: input.stat?.attempts ?? 0, participated: true },
+    { player: input.player, market: "player_rush_yds", season: input.season, week: input.week, value: input.stat?.rushing_yards ?? 0, opportunities: input.stat?.carries ?? 0, participated: true },
+    { player: input.player, market: "player_reception_yds", season: input.season, week: input.week, value: input.stat?.receiving_yards ?? 0, opportunities: input.stat?.targets ?? 0, participated: true }
+  ];
+  const history: PlayerPropHistoryRow[] = [
+    ...snapRows.flatMap((snap) => historyFrom({
+      player: snap.player,
+      season: snap.season,
+      week: snap.week,
+      stat: statByParticipation.get(`${snap.game_id}:${normalizePropPlayerName(snap.player)}`) ?? null
+    })),
+    ...rows
+      .filter((row) => !snapParticipation.has(`${row.game_id}:${normalizePropPlayerName(row.player_display_name)}`))
+      .flatMap((row) => historyFrom({ player: row.player_display_name, season: row.season, week: row.week, stat: row }))
+  ];
   const contracts = [...new Map(quotes.map((quote) => [
     `${quote.market}:${quote.player}:${quote.side}:${quote.point}`,
     { player: quote.player, market: quote.market, side: quote.side, point: quote.point }

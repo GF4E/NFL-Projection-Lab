@@ -32,6 +32,7 @@ export interface NflverseAutomationResult {
   playerStatsSeason: number | null;
   playerStatRows: number;
   snapCounts: "updated" | "unchanged" | "unavailable" | "skipped";
+  snapCountsSeason: number | null;
   snapCountRows: number;
 }
 
@@ -73,6 +74,18 @@ function etag(response: Response): string | null {
 export function shouldRetryUncompressedPbp(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
   return /compressed|decompress|gzip|trailing bytes/i.test(message);
+}
+
+export function nextMissingHistoricalSeason(
+  currentSeason: number,
+  datasetPrefix: string,
+  importedDatasets: ReadonlySet<string>,
+  depth = 2
+): number | null {
+  return Array.from(
+    { length: Math.min(depth, currentSeason - structuralConfig.model.trainingStartSeason) },
+    (_, index) => currentSeason - 1 - index
+  ).find((season) => !importedDatasets.has(`${datasetPrefix}:${season}`)) ?? null;
 }
 
 async function aggregatePbpResponse(input: {
@@ -401,6 +414,7 @@ export async function runNflverseAutomation(input: {
   let playerStatsSeason: number | null = null;
   let playerStatRows = 0;
   let snapCounts: NflverseAutomationResult["snapCounts"] = "skipped";
+  let snapCountsSeason: number | null = null;
   let snapCountRows = 0;
   const nightlyPbpIsDue = parts.hour >= 1;
   if ((input.allowPlayByPlay ?? true) && nightlyPbpIsDue) {
@@ -436,11 +450,8 @@ export async function runNflverseAutomation(input: {
     const importedPlayerStats = new Set(refreshedStates
       .filter((state) => state.dataset.startsWith("player_stats:") && state.lastSuccessAt)
       .map((state) => state.dataset));
-    const playerBackfillSeason = Array.from(
-      { length: Math.min(2, currentSeason - structuralConfig.model.trainingStartSeason) },
-      (_, index) => currentSeason - 1 - index
-    ).find((season) => !importedPlayerStats.has(`player_stats:${season}`));
-    if (playerBackfillSeason !== undefined) {
+    const playerBackfillSeason = nextMissingHistoricalSeason(currentSeason, "player_stats", importedPlayerStats);
+    if (playerBackfillSeason !== null) {
       const backfill = await refreshPlayerStatsSeason({ db: input.db, season: playerBackfillSeason, currentSeason, now, fetcher });
       playerStats = backfill.state;
       playerStatsSeason = playerBackfillSeason;
@@ -450,7 +461,19 @@ export async function runNflverseAutomation(input: {
     if (!checkedToday(currentSnapState?.lastCheckedAt ?? null, parts.dayKey)) {
       const current = await refreshSnapCountsSeason({ db: input.db, season: currentSeason, currentSeason, now, fetcher });
       snapCounts = current.state;
+      snapCountsSeason = currentSeason;
       snapCountRows = current.rows;
+    }
+    const snapStates = await listNflverseImportStates(input.db);
+    const importedSnapCounts = new Set(snapStates
+      .filter((state) => state.dataset.startsWith("snap_counts:") && state.lastSuccessAt)
+      .map((state) => state.dataset));
+    const snapBackfillSeason = nextMissingHistoricalSeason(currentSeason, "snap_counts", importedSnapCounts);
+    if (snapBackfillSeason !== null) {
+      const backfill = await refreshSnapCountsSeason({ db: input.db, season: snapBackfillSeason, currentSeason, now, fetcher });
+      snapCounts = backfill.state;
+      snapCountsSeason = snapBackfillSeason;
+      snapCountRows = backfill.rows;
     }
   }
 
@@ -465,6 +488,7 @@ export async function runNflverseAutomation(input: {
     playerStatsSeason,
     playerStatRows,
     snapCounts,
+    snapCountsSeason,
     snapCountRows
   };
 }

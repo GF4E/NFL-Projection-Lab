@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { nflSeasonForDate, shouldRetryUncompressedPbp } from "@/server/nflverse/automation";
+import { nextMissingHistoricalSeason, nflSeasonForDate, shouldRetryUncompressedPbp } from "@/server/nflverse/automation";
 import { parseCsvStream, textStream } from "@/server/nflverse/csv";
 import { aggregatePbpCsv, parsePlayerStatsCsv, parseScheduleCsv, parseSnapCountsCsv } from "@/server/nflverse/transform";
 import { gradeStoredLeg } from "@/domain/settlement";
@@ -130,6 +130,12 @@ describe("automatic nflverse importer", () => {
     expect(shouldRetryUncompressedPbp(new Error("nflverse schema is missing: epa"))).toBe(false);
   });
 
+  it("backfills the newest missing player participation season first", () => {
+    expect(nextMissingHistoricalSeason(2026, "snap_counts", new Set())).toBe(2025);
+    expect(nextMissingHistoricalSeason(2026, "snap_counts", new Set(["snap_counts:2025"]))).toBe(2024);
+    expect(nextMissingHistoricalSeason(2026, "snap_counts", new Set(["snap_counts:2025", "snap_counts:2024"]))).toBeNull();
+  });
+
   it("wires the five-minute schedule and Roboto into the deployed app", () => {
     expect(readFileSync("vite.config.ts", "utf8")).toContain('"*/5 * * * *"');
     expect(readFileSync("worker/index.ts", "utf8")).toContain("async scheduled");
@@ -137,6 +143,7 @@ describe("automatic nflverse importer", () => {
     expect(readFileSync("src/app/globals.css", "utf8")).toContain('--display: "Roboto"');
     expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).toContain("refreshPlayerStatsSeason");
     expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).toContain("refreshSnapCountsSeason");
+    expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).toContain("snapBackfillSeason");
     expect(readFileSync("src/server/providers/nflverse.ts", "utf8")).toContain("stats_player_week_");
     expect(readFileSync("src/server/providers/nflverse.ts", "utf8")).toContain("snap_counts_");
   });

@@ -388,6 +388,7 @@ export interface PlayerPropHistoryRow {
   week: number;
   value: number;
   opportunities: number;
+  participated?: boolean;
 }
 
 export interface PlayerPropEvidence {
@@ -443,6 +444,13 @@ export function normalizePropPlayerName(value: string): string {
   return value.toLowerCase().replace(/\b(jr|sr|ii|iii|iv)\b/g, "").replace(/[^a-z0-9]/g, "");
 }
 
+export function propPlayerLookupPattern(player: string): string {
+  const withoutSuffix = player.trim().replace(/\s+(?:jr\.?|sr\.?|ii|iii|iv)$/i, "");
+  const tokens = withoutSuffix.match(/[a-z0-9]+/gi) ?? [];
+  const surname = tokens.at(-1)?.toLowerCase() ?? normalizePropPlayerName(player);
+  return `%${surname}%`;
+}
+
 export function playerPropEvidenceKey(input: Pick<PlayerPropEvidence, "player" | "market" | "side" | "point">): string {
   return `${input.market}:${normalizePropPlayerName(input.player)}:${input.side}:${input.point}`;
 }
@@ -457,7 +465,11 @@ export function buildPlayerPropEvidence(
   const priorGames = options.priorGames ?? structuralConfig.props.priorGames;
   const playerKey = normalizePropPlayerName(contract.player);
   const samples = history
-    .filter((row) => normalizePropPlayerName(row.player) === playerKey && row.market === contract.market && row.opportunities > 0)
+    .filter((row) =>
+      normalizePropPlayerName(row.player) === playerKey &&
+      row.market === contract.market &&
+      (row.opportunities > 0 || row.participated === true)
+    )
     .sort((left, right) => right.season - left.season || right.week - left.week)
     .slice(0, windowGames);
   if (samples.length < minimumGames) return null;
@@ -583,10 +595,21 @@ export function scanMarketConfirmedProps(
       capturedAt: quote.capturedAt
     });
   }
-  return (["betmgm", "fanduel"] as const).flatMap((book) => candidates
-    .filter((candidate) => candidate.executionBook === book)
-    .sort((left, right) => right.lowerBoundExpectedValue - left.lowerBoundExpectedValue || right.expectedValue - left.expectedValue)
-    .slice(0, maximumPerBook));
+  return (["betmgm", "fanduel"] as const).flatMap((book) => {
+    const ranked = candidates
+      .filter((candidate) => candidate.executionBook === book)
+      .sort((left, right) => right.lowerBoundExpectedValue - left.lowerBoundExpectedValue || right.expectedValue - left.expectedValue);
+    const distinct: PropCandidate[] = [];
+    const representedTheses = new Set<string>();
+    for (const candidate of ranked) {
+      const thesis = `${normalizePropPlayerName(candidate.player)}:${candidate.market}`;
+      if (representedTheses.has(thesis)) continue;
+      representedTheses.add(thesis);
+      distinct.push(candidate);
+      if (distinct.length === maximumPerBook) break;
+    }
+    return distinct;
+  });
 }
 
 export function fairAmericanFromProbability(probability: number): number {

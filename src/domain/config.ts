@@ -43,6 +43,8 @@ export interface StructuralConfig {
     priorGames: number;
     recencyWeight: number;
     minimumHitRate: number;
+    participationSource: "nflverse_snap_counts";
+    distinctRecommendationKey: "player_market";
   };
   matchupEvidence: {
     windowGames: number;
