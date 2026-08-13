@@ -494,8 +494,8 @@ export function WeekOneBoard() {
                     </div>}
                     {availability && availability.status !== "pending" && <div className={`availability-inline ${availability.status}`}>
                       <span>AVAILABILITY</span>
-                      <b>{availability.reportedPlayers} listed · {availability.out} out · {availability.questionable} questionable</b>
-                      <em>{availability.qbOutOrDoubtful ? "QB OUT / DOUBTFUL" : availability.qbListed ? "QB ON REPORT" : "QB NOT LISTED"}</em>
+                      <b>{availability.inactivesConfirmed ? `${availability.inactivePlayers} inactive` : `${availability.reportedPlayers} listed · ${availability.out} out · ${availability.questionable} questionable`}</b>
+                      <em>{availability.qbInactive ? "QB INACTIVE" : availability.inactivesConfirmed ? "INACTIVES CONFIRMED" : availability.qbOutOrDoubtful ? "QB OUT / DOUBTFUL" : "INACTIVES PENDING"}</em>
                     </div>}
                     <div>{gameIntel?.signals.map((signal) => <article key={signal.id}>
                       <span>{signal.label}</span><b>{signal.lean}</b><small>{signal.detail}</small>

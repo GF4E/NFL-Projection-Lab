@@ -471,8 +471,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
         qbListed: 1, qbOutOrDoubtful: 0, sourceTimestamp: "2026-09-10T19:55:00.000Z"
       }
     })).toEqual({
-      status: "stale", reportedPlayers: 7, out: 1, doubtful: 0, questionable: 2,
-      qbListed: 1, qbOutOrDoubtful: 0, capturedAt: "2026-09-10T19:55:00.000Z"
+      status: "stale", reportedPlayers: 7, inactivesConfirmed: false, inactivePlayers: 0,
+      out: 1, doubtful: 0, questionable: 2, qbListed: 1, qbOutOrDoubtful: 0,
+      qbInactive: 0, capturedAt: "2026-09-10T19:55:00.000Z"
     });
   });
 

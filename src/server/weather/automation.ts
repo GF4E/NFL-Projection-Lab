@@ -1,7 +1,8 @@
 import { stableHash } from "@/domain/hash";
-import { normalizeRoof, resolveVenue, stadiumConfig } from "@/domain/stadiums";
+import { resolveVenue, stadiumConfig } from "@/domain/stadiums";
 import type { WeatherInput } from "@/domain/types";
 import { boardGameId, easternScheduleTimeToIso, normalizeScheduleTeam } from "@/domain/weekly-slate";
+import { getPregameContextStates } from "@/server/pregame-context/store";
 import { fetchKickoffWeather } from "@/server/providers/open-meteo";
 import {
   ensureKickoffWeatherStore,
@@ -16,7 +17,6 @@ interface ScheduledVenueRow {
   game_date: string;
   game_time: string | null;
   stadium: string | null;
-  roof: string | null;
   away_team: string;
   home_team: string;
 }
@@ -36,6 +36,16 @@ export function weatherRefreshIntervalMs(millisecondsToKickoff: number): number 
   return 24 * 60 * 60_000;
 }
 
+export function effectiveKickoffRoof(
+  defaultRoof: WeatherInput["roof"],
+  officialContext: { inactivesConfirmed: boolean; roof: WeatherInput["roof"] } | null
+): WeatherInput["roof"] {
+  if (defaultRoof !== "unconfirmed") return defaultRoof;
+  return officialContext?.inactivesConfirmed && (officialContext.roof === "open" || officialContext.roof === "closed")
+    ? officialContext.roof
+    : "unconfirmed";
+}
+
 function isDue(lastCheckedAt: string | null, now: Date, kickoffAt: string): boolean {
   if (!lastCheckedAt) return true;
   const elapsed = now.getTime() - Date.parse(lastCheckedAt);
@@ -51,12 +61,15 @@ export async function runKickoffWeatherAutomation(input: {
   const now = input.now ?? new Date();
   const checkedAt = now.toISOString();
   await ensureKickoffWeatherStore(input.db);
-  const schedule = await input.db.prepare(`SELECT game_id, game_date, game_time, stadium, roof, away_team, home_team
+  const schedule = await input.db.prepare(`SELECT game_id, game_date, game_time, stadium, away_team, home_team
     FROM nfl_games
     WHERE season = ? AND season_type = 'REG' AND game_date >= ?
     ORDER BY game_date, game_time, game_id`)
     .bind(stadiumConfig.season, checkedAt.slice(0, 10)).all<ScheduledVenueRow>();
   const checks = await lastWeatherChecks(input.db);
+  const contextStates = new Map((await getPregameContextStates(input.db, schedule.results.map((row) =>
+    boardGameId(normalizeScheduleTeam(row.away_team), normalizeScheduleTeam(row.home_team))
+  ))).map((state) => [state.gameId, state]));
   const eligible = schedule.results.flatMap((row) => {
     const gameId = boardGameId(normalizeScheduleTeam(row.away_team), normalizeScheduleTeam(row.home_team));
     const kickoffAt = easternScheduleTimeToIso(row.game_date, row.game_time ?? "13:00");
@@ -75,7 +88,8 @@ export async function runKickoffWeatherAutomation(input: {
       setupFailures.push({ gameId, roof: "unconfirmed", message: `No configured coordinates for ${row.stadium ?? "unknown stadium"}` });
       continue;
     }
-    const roof = normalizeRoof(row.roof, venue.defaultRoof);
+    const officialContext = contextStates.get(gameId);
+    const roof = effectiveKickoffRoof(venue.defaultRoof, officialContext ?? null);
     if (roof === "unconfirmed") {
       unconfirmed.push(gameId);
       continue;

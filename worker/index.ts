@@ -11,6 +11,8 @@ import { runOfficialInjuryAutomation } from "../src/server/official-injuries/aut
 import { listOfficialInjuryImportStates } from "../src/server/official-injuries/store";
 import { runKickoffWeatherAutomation } from "../src/server/weather/automation";
 import { runModelLifecycleAutomation } from "../src/server/model-lifecycle/automation";
+import { runOfficialPregameContextAutomation } from "../src/server/pregame-context/automation";
+import { listPregameContextStates } from "../src/server/pregame-context/store";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -72,10 +74,11 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
     if (request.method === "POST") {
       const result = await runNflverseAutomation({ db: env.DB, allowPlayByPlay: true });
       const injuries = await runOfficialInjuryAutomation({ db: env.DB });
+      const pregame = await runOfficialPregameContextAutomation({ db: env.DB });
       const weather = await runKickoffWeatherAutomation({ db: env.DB });
       const lifecycle = await runModelLifecycleAutomation({ db: env.DB });
       const settlement = await settleCompletedTeamPlays(env.DB);
-      return json({ result, injuries, weather, lifecycle, settlement, states: await listNflverseImportStates(env.DB) });
+      return json({ result, injuries, pregame, weather, lifecycle, settlement, states: await listNflverseImportStates(env.DB) });
     }
     return json({ states: await listNflverseImportStates(env.DB) });
   } catch (error) {
@@ -123,7 +126,10 @@ const worker = {
     }
     if (url.pathname === "/api/game-context") {
       if (request.method !== "GET") return json({ error: "Method not allowed" }, 405, { allow: "GET" });
-      return json({ injuryImports: await listOfficialInjuryImportStates(env.DB) });
+      return json({
+        injuryImports: await listOfficialInjuryImportStates(env.DB),
+        pregame: await listPregameContextStates(env.DB)
+      });
     }
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
@@ -146,9 +152,10 @@ const worker = {
         allowPlayByPlay: true
       }).then(async () => {
         const settlement = await settleCompletedTeamPlays(env.DB, scheduledAt);
+        const pregame = await runOfficialPregameContextAutomation({ db: env.DB, now: scheduledAt });
         const weather = await runKickoffWeatherAutomation({ db: env.DB, now: scheduledAt });
         const lifecycle = await runModelLifecycleAutomation({ db: env.DB, now: scheduledAt });
-        return { settlement, weather, lifecycle };
+        return { settlement, pregame, weather, lifecycle };
       })
     );
     ctx.waitUntil(runScheduledOddsAutomation({

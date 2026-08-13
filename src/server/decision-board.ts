@@ -29,6 +29,7 @@ import { weeklySlate } from "./weekly-slate";
 import { ensureOfficialInjuryStore, getOfficialInjuryImportState } from "./official-injuries/store";
 import { ensureKickoffWeatherStore, listKickoffWeather } from "./weather/store";
 import { ensureModelLifecycleStore, getActiveChampionHash, getTeamStrengthStates } from "./model-lifecycle/store";
+import { ensurePregameContextStore, getPregameContextStates } from "./pregame-context/store";
 import { getD1 } from "../../db";
 
 interface FeatureRow {
@@ -92,6 +93,13 @@ interface InjuryAggregateRow {
   questionable_count: number;
   qb_listed: number;
   qb_out_or_doubtful: number;
+  source_timestamp: string | null;
+}
+
+interface InactiveAggregateRow {
+  game_id: string;
+  inactive_count: number;
+  qb_inactive: number;
   source_timestamp: string | null;
 }
 
@@ -420,11 +428,16 @@ export async function buildDecisionBoard(
   options: { season?: number; week?: number; now?: Date } = {}
 ): Promise<DecisionBoardPayload> {
   const slate = await weeklySlate({ db, season: options.season, week: options.week, now: options.now });
-  await Promise.all([ensureOfficialInjuryStore(db), ensureKickoffWeatherStore(db), ensureModelLifecycleStore(db)]);
+  await Promise.all([
+    ensureOfficialInjuryStore(db),
+    ensureKickoffWeatherStore(db),
+    ensureModelLifecycleStore(db),
+    ensurePregameContextStore(db)
+  ]);
   const activeGameIds = slate.games.map((game) => game.id);
   const activePlaceholders = activeGameIds.map(() => "?").join(", ");
   const injuryDataset = `official-injuries:${slate.season}:reg${slate.week}`;
-  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, weatherRows, persistedStates, championHash] = await Promise.all([
+  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, inactiveResult, pregameStates, weatherRows, persistedStates, championHash] = await Promise.all([
     db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line,
         roof, temperature, wind
@@ -454,6 +467,12 @@ export async function buildDecisionBoard(
       WHERE season = ? AND week = ? AND game_id IN (${activePlaceholders})
       GROUP BY game_id`).bind(slate.season, slate.week, ...activeGameIds).all<InjuryAggregateRow>(),
     getOfficialInjuryImportState(db, injuryDataset),
+    db.prepare(`SELECT game_id, COUNT(*) AS inactive_count,
+        SUM(CASE WHEN UPPER(COALESCE(position, '')) = 'QB' THEN 1 ELSE 0 END) AS qb_inactive,
+        MAX(source_timestamp) AS source_timestamp
+      FROM official_inactives WHERE game_id IN (${activePlaceholders}) GROUP BY game_id`)
+      .bind(...activeGameIds).all<InactiveAggregateRow>(),
+    getPregameContextStates(db, activeGameIds),
     listKickoffWeather(db, activeGameIds),
     getTeamStrengthStates(db, slate.season),
     getActiveChampionHash(db, slate.season)
@@ -488,6 +507,8 @@ export async function buildDecisionBoard(
     weight: 0.5 ** ((latestTrainingSeason - row.season) / structuralConfig.model.decayHalfLifeSeasons)
   }]));
   const injuryByGame = new Map(injuryResult.results.map((row) => [row.game_id, row]));
+  const inactiveByGame = new Map(inactiveResult.results.map((row) => [row.game_id, row]));
+  const pregameByGame = new Map(pregameStates.map((state) => [state.gameId, state]));
   const weatherByGame = new Map(weatherRows.map((row) => [row.gameId, row]));
   const games = slate.games.map((game) => {
     const gameLines = lines.filter((line) => line.gameId === game.id);
@@ -559,6 +580,8 @@ export async function buildDecisionBoard(
     const away = profiles.get(game.away) ?? null;
     const home = profiles.get(game.home) ?? null;
     const injuries = injuryByGame.get(game.id);
+    const inactives = inactiveByGame.get(game.id);
+    const pregame = pregameByGame.get(game.id);
     const availability: GameAvailabilityContext = summarizeGameAvailability({
       freshness: injuryState?.freshness ?? null,
       lastSuccessAt: injuryState?.lastSuccessAt ?? null,
@@ -570,6 +593,14 @@ export async function buildDecisionBoard(
         qbListed: injuries.qb_listed,
         qbOutOrDoubtful: injuries.qb_out_or_doubtful,
         sourceTimestamp: injuries.source_timestamp
+      } : null,
+      pregame: pregame ? {
+        freshness: pregame.freshness,
+        lastSuccessAt: pregame.lastSuccessAt,
+        inactivesConfirmed: pregame.inactivesConfirmed,
+        inactivePlayers: inactives?.inactive_count ?? pregame.inactiveCount,
+        qbInactive: inactives?.qb_inactive ?? 0,
+        sourceTimestamp: inactives?.source_timestamp ?? pregame.lastSuccessAt
       } : null
     });
     const storedWeather = weatherByGame.get(game.id);

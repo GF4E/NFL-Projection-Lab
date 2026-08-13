@@ -28,6 +28,12 @@ The deployed Worker has an idempotent `*/5 * * * *` trigger and the app sends th
 
 The importer stages validated rows before publication. A schema, row-count, HTTP, decompression, or parsing failure marks the dataset stale, creates an idempotent data alert, releases the import lease, and leaves the prior production rows untouched.
 
+## Built-in pregame context automation
+
+The same five-minute Worker trigger begins the official pregame check 95 minutes before each distinct kickoff. It reads the NFL inactives landing page, discovers the current week’s official NFL inactive article through the league’s monthly article index, and accepts a game only when both teams have complete lists. Fixed and outdoor roofs come from the versioned venue configuration; retractable venues require an explicit `open` or `closed` field from the official game center. Missing, partial, or ambiguous responses create an in-app alert and preserve the last good inactives, roof, weather, and forecast.
+
+The site adds no pregame settings page. A confirmed list only replaces the existing compact availability line on the open game card, including an explicit inactive-QB cue when applicable.
+
 ## Failure contract
 
 1. Start or reuse the deterministic pipeline key.

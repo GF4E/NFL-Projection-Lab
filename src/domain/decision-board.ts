@@ -122,11 +122,14 @@ export interface LineMovementSeries {
 export interface GameAvailabilityContext {
   status: "current" | "stale" | "pending";
   reportedPlayers: number;
+  inactivesConfirmed: boolean;
+  inactivePlayers: number;
   out: number;
   doubtful: number;
   questionable: number;
   qbListed: number;
   qbOutOrDoubtful: number;
+  qbInactive: number;
   capturedAt: string | null;
 }
 
@@ -153,16 +156,34 @@ export function summarizeGameAvailability(input: {
     qbOutOrDoubtful: number;
     sourceTimestamp: string | null;
   } | null;
+  pregame?: {
+    freshness: "current" | "stale" | "running" | "unavailable";
+    lastSuccessAt: string | null;
+    inactivesConfirmed: boolean;
+    inactivePlayers: number;
+    qbInactive: number;
+    sourceTimestamp: string | null;
+  } | null;
 }): GameAvailabilityContext {
+  const hasCurrent = input.freshness === "current"
+    || (input.pregame?.inactivesConfirmed && input.pregame.freshness === "current");
+  const hasAny = Boolean(input.lastSuccessAt || input.pregame?.lastSuccessAt);
+  const sourceTimestamps = [input.counts?.sourceTimestamp, input.pregame?.sourceTimestamp]
+    .filter((value): value is string => Boolean(value)).sort();
+  const successTimestamps = [input.lastSuccessAt, input.pregame?.lastSuccessAt]
+    .filter((value): value is string => Boolean(value)).sort();
   return {
-    status: input.lastSuccessAt ? (input.freshness === "current" ? "current" : "stale") : "pending",
+    status: hasAny ? (hasCurrent ? "current" : "stale") : "pending",
     reportedPlayers: input.counts?.reportedPlayers ?? 0,
+    inactivesConfirmed: input.pregame?.inactivesConfirmed ?? false,
+    inactivePlayers: input.pregame?.inactivePlayers ?? 0,
     out: input.counts?.out ?? 0,
     doubtful: input.counts?.doubtful ?? 0,
     questionable: input.counts?.questionable ?? 0,
     qbListed: input.counts?.qbListed ?? 0,
-    qbOutOrDoubtful: input.counts?.qbOutOrDoubtful ?? 0,
-    capturedAt: input.counts?.sourceTimestamp ?? input.lastSuccessAt
+    qbOutOrDoubtful: (input.counts?.qbOutOrDoubtful ?? 0) + (input.pregame?.qbInactive ?? 0),
+    qbInactive: input.pregame?.qbInactive ?? 0,
+    capturedAt: sourceTimestamps.at(-1) ?? successTimestamps.at(-1) ?? null
   };
 }
 
