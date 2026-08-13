@@ -45,6 +45,8 @@ export interface StructuralConfig {
     minimumHitRate: number;
     participationSource: "nflverse_snap_counts";
     distinctRecommendationKey: "player_market";
+    matchupAdjustment: "market_consensus_only";
+    matchupValidationArtifact: string;
   };
   matchupEvidence: {
     windowGames: number;

@@ -25,7 +25,7 @@ import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "@/domain/settlement";
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
-import { addTeamApproval, approvalActorForEmail, estimatedEvFromEdge, isTeamApproved, storedLegMatchesQuote, trackerRecordSummaries, trackerSummary } from "@/domain/play-card";
+import { addTeamApproval, approvalActorForEmail, draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, isTeamApproved, storedLegMatchesQuote, trackerRecordSummaries, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { buildPlayerPropEvidence, crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
@@ -390,6 +390,18 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(betmgm[0]).toMatchObject({ player: "Quarterback", market: "player_pass_yds", point: 249.5 });
   });
 
+  it("23d. rejects an unvalidated second opponent adjustment for props", () => {
+    const validation = JSON.parse(readFileSync("config/prop-matchup-validation.json", "utf8")) as {
+      decision: string;
+      results: Array<{ relativeMaeImprovementPercent: number; seasonallyConsistent: boolean }>;
+    };
+    expect(validation.decision).toBe("rejected");
+    expect(validation.results.every((row) => row.relativeMaeImprovementPercent < 1)).toBe(true);
+    expect(validation.results.every((row) => !row.seasonallyConsistent)).toBe(true);
+    expect(structuralConfig.props.matchupAdjustment).toBe("market_consensus_only");
+    expect(structuralConfig.props.matchupValidationArtifact).toBe("prop-matchup-validation.json");
+  });
+
   it("24. identifies classic Wong paths and derives crossed key numbers", () => {
     expect(isClassicWongPoint(2.5)).toBe(true);
     expect(isClassicWongPoint(-8)).toBe(true);
@@ -632,6 +644,28 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(store).toContain("player_prop_quotes WHERE id = ?");
     expect(store).toContain("live_lines WHERE id = ?");
     expect(store).toContain("both approvals must restart");
+  });
+
+  it("36e. expires incomplete drafts after 12 hours and closes approval at the earliest kickoff", () => {
+    const play = {
+      gameId: "multi-week-1",
+      contract: [
+        { gameId: "late", market: "spread" as const, side: "KC", point: -2.5, americanPrice: -110, selection: "KC -2.5" },
+        { gameId: "early", market: "spread" as const, side: "SEA", point: -2.5, americanPrice: -110, selection: "SEA -2.5" }
+      ],
+      createdAt: "2026-09-13T06:00:00.000Z"
+    };
+    const kickoffs = new Map([["early", "2026-09-13T20:00:00.000Z"], ["late", "2026-09-14T00:00:00.000Z"]]);
+    expect(earliestPlayKickoff(play, kickoffs)).toBe("2026-09-13T20:00:00.000Z");
+    expect(draftExpirationReason(play, "2026-09-13T17:59:59.999Z", kickoffs)).toBeNull();
+    expect(draftExpirationReason(play, "2026-09-13T18:00:00.000Z", kickoffs)).toBe("stale");
+    expect(draftExpirationReason({ ...play, createdAt: "2026-09-13T19:30:00.000Z" }, "2026-09-13T20:00:00.000Z", kickoffs)).toBe("kickoff");
+    const store = readFileSync("src/server/play-store.ts", "utf8");
+    const worker = readFileSync("worker/index.ts", "utf8");
+    expect(store).toContain("play_state_audit");
+    expect(store).toContain("expireStaleTeamDrafts");
+    expect(store).toContain("Approval is closed because this contract has kicked off");
+    expect(worker).toContain("expireStaleTeamDrafts(env.DB, scheduledAt)");
   });
 
   it("37. connects the fixed-seed 80% interval and quarter-Kelly sizing to every live card", () => {

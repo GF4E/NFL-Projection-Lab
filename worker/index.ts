@@ -13,6 +13,7 @@ import { runKickoffWeatherAutomation } from "../src/server/weather/automation";
 import { runModelLifecycleAutomation } from "../src/server/model-lifecycle/automation";
 import { runOfficialPregameContextAutomation } from "../src/server/pregame-context/automation";
 import { listPregameContextStates } from "../src/server/pregame-context/store";
+import { expireStaleTeamDrafts } from "../src/server/play-store";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -145,6 +146,7 @@ const worker = {
   },
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     const scheduledAt = new Date(controller.scheduledTime);
+    ctx.waitUntil(expireStaleTeamDrafts(env.DB, scheduledAt));
     ctx.waitUntil(
       runNflverseAutomation({
         db: env.DB,

@@ -51,6 +51,7 @@ export type WeeklyPlay = {
 };
 
 export const UNIT_CENTS = 2_500;
+export const DRAFT_MAX_AGE_MS = 12 * 60 * 60 * 1_000;
 
 export function approvalActorForEmail(email: string | null | undefined, jarrettEmail: string): PickedBy {
   return email?.trim().toLowerCase() === jarrettEmail.trim().toLowerCase() ? "jarrett" : "gabe";
@@ -70,6 +71,33 @@ export function addTeamApproval(current: readonly PickedBy[], actor: PickedBy): 
 
 export function isTeamApproved(approvals: readonly PickedBy[] | undefined): boolean {
   return approvals?.includes("gabe") === true && approvals.includes("jarrett");
+}
+
+export function earliestPlayKickoff(
+  play: Pick<WeeklyPlay, "gameId" | "contract">,
+  kickoffByGame: ReadonlyMap<string, string>
+): string | null {
+  const gameIds = play.contract?.length
+    ? [...new Set(play.contract.map((leg) => leg.gameId))]
+    : [play.gameId];
+  const kickoffs = gameIds
+    .map((gameId) => kickoffByGame.get(gameId))
+    .filter((value): value is string => Boolean(value))
+    .sort();
+  return kickoffs[0] ?? null;
+}
+
+export function draftExpirationReason(
+  play: Pick<WeeklyPlay, "gameId" | "contract" | "createdAt">,
+  now: string,
+  kickoffByGame: ReadonlyMap<string, string>
+): "stale" | "kickoff" | null {
+  const nowMs = Date.parse(now);
+  const createdMs = Date.parse(play.createdAt);
+  if (!Number.isFinite(nowMs) || !Number.isFinite(createdMs)) throw new Error("Draft timestamps must be valid ISO dates");
+  const kickoff = earliestPlayKickoff(play, kickoffByGame);
+  if (kickoff && nowMs >= Date.parse(kickoff)) return "kickoff";
+  return nowMs - createdMs >= DRAFT_MAX_AGE_MS ? "stale" : null;
 }
 
 export function stakeToUnits(stakeCents: number): number {

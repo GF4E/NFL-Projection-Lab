@@ -1,5 +1,13 @@
 import { getD1 } from "../../db";
-import { isTeamApproved, storedLegMatchesQuote, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
+import {
+  draftExpirationReason,
+  earliestPlayKickoff,
+  isTeamApproved,
+  storedLegMatchesQuote,
+  type PickedBy,
+  type WeeklyPlay
+} from "@/domain/play-card";
+import { seasonSchedule } from "./weekly-slate";
 
 type PlayDatabaseRow = {
   id: string;
@@ -146,6 +154,16 @@ function mapRow(row: PlayDatabaseRow): WeeklyPlay {
 
 export async function ensurePlayStore(d1: D1Database = getD1()): Promise<void> {
   await d1.prepare(CREATE_PLAYS_SQL).run();
+  await d1.prepare(`CREATE TABLE IF NOT EXISTS play_state_audit (
+    id text PRIMARY KEY NOT NULL,
+    play_id text NOT NULL,
+    transition text NOT NULL,
+    reason text NOT NULL,
+    from_status text NOT NULL,
+    to_status text NOT NULL,
+    snapshot_json text NOT NULL,
+    changed_at text NOT NULL
+  )`).run();
   const columns = await d1.prepare("PRAGMA table_info(plays)").all<{ name: string }>();
   const names = new Set(columns.results.map((column) => column.name));
   const upgrades: D1PreparedStatement[] = [];
@@ -164,18 +182,68 @@ export async function ensurePlayStore(d1: D1Database = getD1()): Promise<void> {
   if (upgrades.length) await d1.batch(upgrades);
   await d1.batch([
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_season_week_status ON plays (season, week, status)"),
-    d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_created_at ON plays (created_at)")
+    d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_created_at ON plays (created_at)"),
+    d1.prepare("CREATE INDEX IF NOT EXISTS idx_play_state_audit_play ON play_state_audit (play_id, changed_at)")
   ]);
   await d1.prepare("PRAGMA optimize").run();
 }
 
 export async function listPlays(week?: number): Promise<WeeklyPlay[]> {
-  await ensurePlayStore();
+  const d1 = getD1();
+  await ensurePlayStore(d1);
+  await expireStaleTeamDrafts(d1, new Date(), true);
   const statement = week === undefined
-    ? getD1().prepare("SELECT * FROM plays WHERE season = 2026 AND game_id <> '' ORDER BY week, created_at ASC")
-    : getD1().prepare("SELECT * FROM plays WHERE season = 2026 AND week = ? AND game_id <> '' ORDER BY created_at ASC").bind(week);
+    ? d1.prepare("SELECT * FROM plays WHERE season = 2026 AND game_id <> '' AND status <> 'passed' ORDER BY week, created_at ASC")
+    : d1.prepare("SELECT * FROM plays WHERE season = 2026 AND week = ? AND game_id <> '' AND status <> 'passed' ORDER BY created_at ASC").bind(week);
   const result = await statement.all<PlayDatabaseRow>();
   return result.results.map(mapRow);
+}
+
+async function kickoffMap(d1: D1Database): Promise<Map<string, string>> {
+  const schedule = await seasonSchedule({ db: d1, season: 2026 });
+  return new Map(schedule.map((game) => [game.id, game.kickoffAt]));
+}
+
+export async function expireStaleTeamDrafts(
+  d1: D1Database = getD1(),
+  now = new Date(),
+  storeReady = false
+): Promise<{ expired: number }> {
+  if (!storeReady) await ensurePlayStore(d1);
+  const result = await d1.prepare("SELECT * FROM plays WHERE season = 2026 AND status = 'research'").all<PlayDatabaseRow>();
+  if (!result.results.length) return { expired: 0 };
+  const kickoffs = await kickoffMap(d1);
+  const changedAt = now.toISOString();
+  const statements: D1PreparedStatement[] = [];
+  let expired = 0;
+  for (const row of result.results) {
+    const play = mapRow(row);
+    const reason = draftExpirationReason(play, changedAt, kickoffs);
+    if (!reason) continue;
+    expired += 1;
+    statements.push(
+      d1.prepare(`INSERT OR IGNORE INTO play_state_audit
+        (id, play_id, transition, reason, from_status, to_status, snapshot_json, changed_at)
+        VALUES (?, ?, 'expired', ?, 'research', 'passed', ?, ?)`)
+        .bind(`${play.id}:expired:${changedAt}`, play.id, reason, JSON.stringify({
+          contractKey: play.contractKey,
+          contract: play.contract,
+          approvals: play.approvals,
+          createdAt: play.createdAt
+        }), changedAt),
+      d1.prepare(`UPDATE plays SET status = 'passed', gabe_approved = 0, jarrett_approved = 0, updated_at = ?
+        WHERE id = ? AND status = 'research'`).bind(changedAt, play.id)
+    );
+  }
+  if (statements.length) await d1.batch(statements);
+  return { expired };
+}
+
+async function assertApprovalWindowOpen(d1: D1Database, play: WeeklyPlay, now: string): Promise<void> {
+  const kickoff = earliestPlayKickoff(play, await kickoffMap(d1));
+  if (kickoff && Date.parse(now) >= Date.parse(kickoff)) {
+    throw new Error("Approval is closed because this contract has kicked off.");
+  }
 }
 
 export async function getPlay(id: string): Promise<WeeklyPlay | null> {
@@ -207,22 +275,46 @@ async function assertApprovalContractCurrent(d1: D1Database, play: WeeklyPlay): 
 }
 
 export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promise<WeeklyPlay> {
-  await ensurePlayStore();
   const d1 = getD1();
+  await ensurePlayStore(d1);
+  await expireStaleTeamDrafts(d1, new Date(play.updatedAt), true);
   const existing = await d1.prepare("SELECT * FROM plays WHERE id = ?").bind(play.id).first<PlayDatabaseRow>();
   if (existing) {
     const current = mapRow(existing);
-    if (!current.approvals?.includes(actor) && !isTeamApproved(current.approvals)) {
-      await assertApprovalContractCurrent(d1, current);
+    if (isTeamApproved(current.approvals) || current.approvals?.includes(actor)) return current;
+    await assertApprovalWindowOpen(d1, play, play.updatedAt);
+    if (current.status === "passed") {
+      await d1.batch([
+        d1.prepare(`INSERT OR IGNORE INTO play_state_audit
+          (id, play_id, transition, reason, from_status, to_status, snapshot_json, changed_at)
+          VALUES (?, ?, 'reactivated', 'fresh_selection', 'passed', 'research', ?, ?)`)
+          .bind(`${play.id}:reactivated:${play.updatedAt}`, play.id, JSON.stringify({ contractKey: play.contractKey, contract: play.contract }), play.updatedAt),
+        d1.prepare(`UPDATE plays SET contract_key = ?, contract_json = ?, primary_reason = ?, picked_by = ?,
+          title = ?, legs = ?, book = ?, american_odds = ?, stake_cents = ?, model_edge_pp = ?,
+          estimated_ev_percent = ?, confidence = ?, stats_case = ?, football_case = ?,
+          gabe_approved = ?, jarrett_approved = ?, status = 'research', created_by = ?, created_at = ?, updated_at = ?
+          WHERE id = ? AND status = 'passed'`)
+          .bind(
+            play.contractKey ?? "", JSON.stringify(play.contract ?? []), play.primaryReason, play.pickedBy,
+            play.title, play.legs, play.book, play.americanOdds, play.stakeCents, play.modelEdgePp,
+            play.estimatedEvPercent, play.confidence, play.statsCase, play.footballCase,
+            actor === "gabe" ? 1 : 0, actor === "jarrett" ? 1 : 0, play.createdBy,
+            play.createdAt, play.updatedAt, play.id
+          )
+      ]);
+      return (await getPlay(play.id))!;
     }
+    if (current.status !== "research") return current;
+    await assertApprovalContractCurrent(d1, current);
     await d1.prepare(`UPDATE plays SET
       gabe_approved = CASE WHEN ? = 'gabe' THEN 1 ELSE gabe_approved END,
       jarrett_approved = CASE WHEN ? = 'jarrett' THEN 1 ELSE jarrett_approved END,
       status = CASE WHEN (gabe_approved = 1 OR ? = 'gabe') AND (jarrett_approved = 1 OR ? = 'jarrett') THEN 'card' ELSE 'research' END,
-      updated_at = ? WHERE id = ?`)
+      updated_at = ? WHERE id = ? AND status = 'research'`)
       .bind(actor, actor, actor, actor, play.updatedAt, play.id).run();
     return (await getPlay(play.id))!;
   }
+  await assertApprovalWindowOpen(d1, play, play.updatedAt);
   await d1.prepare(INSERT_PLAY_SQL).bind(
     play.id, play.contractKey ?? "", JSON.stringify(play.contract ?? []), actor === "gabe" ? 1 : 0, actor === "jarrett" ? 1 : 0,
     play.season, play.week, play.gameId, play.playType, play.market, play.primaryReason, play.pickedBy, play.title, play.legs, play.book,

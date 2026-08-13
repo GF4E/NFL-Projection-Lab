@@ -1,0 +1,49 @@
+{
+  "generatedAt": "2026-08-12T19:45:00-07:00",
+  "trainingSource": "nflverse weekly player statistics",
+  "sourceUrls": [
+    "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2022.csv",
+    "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2023.csv",
+    "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2024.csv",
+    "https://github.com/nflverse/nflverse-data/releases/download/stats_player/stats_player_week_2025.csv"
+  ],
+  "validationSeasons": [2022, 2023, 2024, 2025],
+  "baseline": "Eight-game exponentially weighted player-yardage mean with 0.85 per-game recency weight",
+  "challenger": "Baseline multiplied by opponent yards-per-opportunity relative to league, shrunk with 300 league-average opportunities and capped to 0.85-1.15",
+  "leakageControl": "Every forecast uses only rows from earlier completed weeks",
+  "selectionMetric": "Mean absolute error; root mean squared error diagnostic",
+  "results": [
+    {
+      "market": "player_pass_yds",
+      "forecasts": 1903,
+      "baselineMae": 66.3163,
+      "challengerMae": 65.9721,
+      "relativeMaeImprovementPercent": 0.519,
+      "baselineRmse": 84.0294,
+      "challengerRmse": 83.7618,
+      "seasonallyConsistent": false
+    },
+    {
+      "market": "player_rush_yds",
+      "forecasts": 6247,
+      "baselineMae": 18.9311,
+      "challengerMae": 18.9114,
+      "relativeMaeImprovementPercent": 0.105,
+      "baselineRmse": 26.7955,
+      "challengerRmse": 26.7849,
+      "seasonallyConsistent": false
+    },
+    {
+      "market": "player_reception_yds",
+      "forecasts": 13116,
+      "baselineMae": 19.7484,
+      "challengerMae": 19.7352,
+      "relativeMaeImprovementPercent": 0.067,
+      "baselineRmse": 27.115,
+      "challengerRmse": 27.1047,
+      "seasonallyConsistent": false
+    }
+  ],
+  "decision": "rejected",
+  "reason": "The candidate improvement was below one percent for every market and reversed in at least one validation season. Matchup and game environment remain represented by the 75 percent power-de-vigged live market component rather than an unvalidated second adjustment."
+}
