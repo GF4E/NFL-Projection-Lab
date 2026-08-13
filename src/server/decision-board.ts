@@ -960,6 +960,22 @@ export async function buildDecisionBoard(
     minimumExpectedValue: structuralConfig.teasers.minimumExpectedValue,
     exceptionalEvThreshold: structuralConfig.teasers.preferredOpponentExceptionalEv
   });
+  const marketCoverage = (["betmgm", "fanduel"] as const).flatMap((book) =>
+    (["spread", "total", "moneyline"] as const).map((market) => {
+      const completeGames = slate.games.filter((game) => {
+        const pair = lines.filter((line) => line.gameId === game.id && line.book === book && line.market === market);
+        return pair.length === 2 && pair.every((line) => line.fairProbability !== null);
+      }).length;
+      return {
+        book,
+        market,
+        completeGames,
+        totalGames: slate.games.length,
+        status: completeGames === slate.games.length ? "complete" as const
+          : completeGames > 0 ? "partial" as const : "unavailable" as const
+      };
+    })
+  );
   return {
     generatedAt: new Date().toISOString(),
     season: slate.season,
@@ -969,6 +985,7 @@ export async function buildDecisionBoard(
     championHash,
     games,
     teaserPairs,
+    marketCoverage,
     method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K cumulative margin-versus-close strength; logged gated champion calibration; QB risk widens uncertainty while the rejected residual tier adjustment stays withheld unless an audited owner override exists; then 25% model and 75% power-de-vigged market shrinkage.`
   };
 }

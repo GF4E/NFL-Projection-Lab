@@ -128,6 +128,13 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(settlement).not.toContain("buildDiscreteMarginArtifact(marginRows");
   });
 
+  it("1e. publishes execution-book market coverage separately from consensus fallbacks", () => {
+    const board = readFileSync("src/server/decision-board.ts", "utf8");
+    expect(board).toContain("marketCoverage");
+    expect(board).toContain('status: completeGames === slate.games.length ? "complete"');
+    expect(board).toContain('marketSource: "nflverse_consensus"');
+  });
+
   it("2. uses the power method for spread, total, favorite, underdog, and near-even markets", () => {
     for (const pair of [[-110, -110], [-105, -115], [-200, 170], [170, -200], [-101, -101]] as const) {
       const result = powerDevig(pair[0], pair[1]);

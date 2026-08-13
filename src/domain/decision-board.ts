@@ -371,6 +371,13 @@ export interface DecisionBoardPayload {
   championHash: string | null;
   games: DecisionBoardGame[];
   teaserPairs: TeaserPairCandidate[];
+  marketCoverage: Array<{
+    book: "betmgm" | "fanduel";
+    market: "spread" | "total" | "moneyline";
+    completeGames: number;
+    totalGames: number;
+    status: "complete" | "partial" | "unavailable";
+  }>;
   method: string;
 }
 
