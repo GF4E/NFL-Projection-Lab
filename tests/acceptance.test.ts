@@ -717,11 +717,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
       gameId: "ne-sea", book: "betmgm", market, side: market === "total" ? "Over" : "SEA"
     }));
     expect(inspectMainlineCompleteness(oneSided, ["ne-sea"]).complete).toBe(false);
-    const paired = oneSided.flatMap((quote) => [quote, {
+    const betmgmPaired = oneSided.flatMap((quote) => [quote, {
       ...quote,
       side: quote.market === "total" ? "Under" : "NE"
     }]);
-    expect(inspectMainlineCompleteness(paired, ["ne-sea"]).complete).toBe(true);
+    expect(inspectMainlineCompleteness(betmgmPaired, ["ne-sea"]).complete).toBe(false);
+    const bothBooksPaired = [
+      ...betmgmPaired,
+      ...betmgmPaired.map((quote) => ({ ...quote, book: "fanduel" }))
+    ];
+    expect(inspectMainlineCompleteness(bothBooksPaired, ["ne-sea"]).complete).toBe(true);
   });
 
   it("29. derives the active week and Pacific-ready kickoff from the nflverse schedule", () => {

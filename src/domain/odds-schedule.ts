@@ -135,10 +135,10 @@ export function scheduledPropCandidates(now: Date, games: readonly ScheduledGame
 
 export function inspectMainlineCompleteness(lines: readonly MainlineCompletenessQuote[], gameIds: readonly string[]): MainlineValidationResult {
   const requiredMarkets = new Set(["spread", "total", "moneyline"]);
+  const requiredBooks = ["betmgm", "fanduel"] as const;
   const completeGames = new Set<string>();
   for (const gameId of gameIds) {
-    const books = [...new Set(lines.filter((line) => line.gameId === gameId).map((line) => line.book))];
-    if (books.some((book) => {
+    if (requiredBooks.every((book) => {
       const bookLines = lines.filter((line) => line.gameId === gameId && line.book === book);
       return [...requiredMarkets].every((market) => {
         const marketLines = bookLines.filter((line) => line.market === market);

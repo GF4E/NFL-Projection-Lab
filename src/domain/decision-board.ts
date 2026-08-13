@@ -2,6 +2,7 @@ import { americanToDecimal, impliedToAmerican, powerDevig, shrinkProbability } f
 import { bootstrapEdgeInterval } from "./bootstrap";
 import { structuralConfig } from "./config";
 import { sizeKelly } from "./sizing";
+import { PREFERRED_TEAM_CODES } from "./team-preferences";
 
 export const PROP_MARKETS = [
   "player_pass_yds",
@@ -894,7 +895,7 @@ export function rankTeaserPairs(
 ): TeaserPairCandidate[] {
   const offeredAmerican = options.offeredAmerican;
   const minimumExpectedValue = options.minimumExpectedValue ?? 0;
-  const preferred = new Set(options.preferredTeams ?? ["SEA", "ATL"]);
+  const preferred = new Set(options.preferredTeams ?? PREFERRED_TEAM_CODES);
   const exceptionalEvThreshold = options.exceptionalEvThreshold ?? 0.05;
   const pairs: TeaserPairCandidate[] = [];
   for (let leftIndex = 0; leftIndex < candidates.length; leftIndex += 1) {
