@@ -72,13 +72,22 @@ export function forecastApprovalEligibilityError(
       return "This player prop no longer clears the current multi-book, history, uncertainty, and availability gates.";
     }
   }
+  if (play.playType === "parlay" && snapshot.legs.some((leg) => leg.pushProbability !== 0)) {
+    return "Parlay approval is withheld when a leg can push; use the independently priced straights instead.";
+  }
+  if (play.playType === "parlay" && (
+    snapshot.authoritativeExpectedValuePercent === null ||
+    snapshot.authoritativeExpectedValuePercent < -1e-9
+  )) {
+    return "The exact independent-game parlay is negative EV; use the individually priced straights instead.";
+  }
   if (play.playType === "teaser" && (
     snapshot.authoritativeExpectedValuePercent === null ||
     snapshot.authoritativeExpectedValuePercent < -1e-9
   )) {
     return "The exact two-team teaser price is negative EV; refresh the price or choose another pair.";
   }
-  if ((play.playType === "single" || play.playType === "teaser") && (
+  if ((play.playType === "single" || play.playType === "parlay" || play.playType === "teaser") && (
     snapshot.authoritativeProbabilityInterval === null ||
     snapshot.suggestedUnits === null ||
     snapshot.suggestedUnits < structuralConfig.sizing.minimumUnits

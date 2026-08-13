@@ -11,6 +11,7 @@ import type {
   TeaserPairCandidate
 } from "@/domain/decision-board";
 import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, isPricedSlipApprovable, updateSlipSelections, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
+import { priceIndependentParlayDecision } from "@/domain/forecast-value";
 import { alignMatchupEvidence, compactEvidenceLabel, evidenceDetail } from "@/domain/evidence-alignment";
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
 import { rankBestBookMainlineRecommendations, rankMainlineRecommendations } from "@/domain/mainline-recommendations";
@@ -183,13 +184,18 @@ export function WeekOneBoard() {
     const priced = priceTwoTeamTeaserDecision(slip.map((leg) => ({ conditionalWinProbability: leg.fairProbability!, pushProbability: leg.pushProbability!, probabilityMembers: leg.probabilityMembers!, pushProbabilityMembers: leg.pushProbabilityMembers! })), teaserPrice);
     return priced ? { ...priced, evPercent: priced.expectedValue * 100 } : null;
   }, [slip, slipMode, teaserPrice]);
+  const parlayDecision = useMemo(() => slipMode === "parlay" ? priceIndependentParlayDecision(slip.map((leg) => ({
+    betProbability: legBetProbability(leg),
+    pushProbability: leg.pushProbability ?? null,
+    uncertaintyInterval: leg.probabilityInterval ?? null
+  })), slip.length > 1 ? combinedAmerican(slip) : -110) : null, [slip, slipMode]);
   const slipCanApprove = isPricedSlipApprovable({
     mode: slipMode,
     legCount: slip.length,
     singleBook: new Set(slip.map((leg) => leg.book)).size <= 1,
     standardValue: slipValue,
     teaserExpectedValuePercent: teaserValue?.sizing.included ? teaserValue.evPercent : null
-  });
+  }) && (slipMode !== "parlay" || Boolean(parlayDecision?.sizing.included && parlayDecision.expectedValue >= 0));
 
   useEffect(() => {
     let active = true;
@@ -282,6 +288,8 @@ export function WeekOneBoard() {
         : null;
       pushProbability = moneylineProjection.tieProbability ?? undefined;
     }
+    if (line.market === "spread") pushProbability = projection?.pushProbability ?? undefined;
+    if (line.market === "total") pushProbability = totalProjection?.pushProbability ?? undefined;
     const sized = recommendation(shrunkProbability, line.americanPrice, edgeInterval);
     if (sized?.included) setStake(sized.suggestedUnits * 25);
     addLeg({
@@ -289,7 +297,11 @@ export function WeekOneBoard() {
       point: line.point, americanPrice: line.americanPrice, fairProbability: line.fairProbability,
       matchup, selection: lineSelection(line), detail: `${marketTitle(line.market)} · ${formatOdds(line.americanPrice)}`,
       edge: shrunkProbability === null || line.fairProbability === null ? null : shrunkProbability - line.fairProbability,
-      pushProbability
+      pushProbability,
+      probabilityInterval: line.fairProbability === null || edgeInterval === null ? undefined : [
+        Math.max(0.001, line.fairProbability + edgeInterval[0]),
+        Math.min(0.999, line.fairProbability + edgeInterval[1])
+      ]
     });
   }
 
@@ -301,6 +313,10 @@ export function WeekOneBoard() {
       point: prop.point, americanPrice: prop.americanPrice, fairProbability: prop.executionFairProbability,
       matchup, selection: `${prop.player} ${prop.side} ${prop.point}`,
       detail: `${propMarketTitle(prop.market)} · ${prop.referenceBooks}-book confirmation`, edge: prop.edge
+      , pushProbability: 0, probabilityInterval: [
+        Math.max(0.001, prop.executionFairProbability + prop.edgeInterval[0]),
+        Math.min(0.999, prop.executionFairProbability + prop.edgeInterval[1])
+      ]
     }, "straight");
   }
 

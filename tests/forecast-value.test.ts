@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { authoritativeContractExpectedValue } from "@/domain/forecast-value";
+import { authoritativeContractExpectedValue, priceIndependentParlayDecision } from "@/domain/forecast-value";
 import { priceTwoTeamTeaserDecision } from "@/domain/decision-board";
 import type { PlayForecastLegSnapshot } from "@/domain/play-card";
 
@@ -19,8 +19,7 @@ describe("authoritative combined-contract EV", () => {
       playType: "parlay", americanOdds: 264,
       legs: [leg({ sourceQuoteId: "q1" }), leg({ sourceQuoteId: "q2", gameId: "g2" })]
     });
-    const oneLegReturn = 0.55 * (1 + 100 / 110);
-    expect(result).toBeCloseTo(oneLegReturn ** 2 - 1, 10);
+    expect(result).toBeCloseTo(0.55 ** 2 * (1 + 264 / 100) - 1, 10);
   });
 
   it("incorporates pushes and withholds incomplete parlay provenance", () => {
@@ -33,6 +32,24 @@ describe("authoritative combined-contract EV", () => {
       playType: "parlay", americanOdds: 264,
       legs: [leg({ sourceQuoteId: "q1", betProbability: null }), leg({ sourceQuoteId: "q2", gameId: "g2" })]
     })).toBeNull();
+  });
+
+  it("requires positive, uncertainty-qualified binary value before approving an independent parlay", () => {
+    const qualified = priceIndependentParlayDecision([
+      leg({ sourceQuoteId: "q1", betProbability: 0.58, uncertaintyInterval: [0.55, 0.61] }),
+      leg({ sourceQuoteId: "q2", gameId: "g2", betProbability: 0.58, uncertaintyInterval: [0.55, 0.61] })
+    ], 264);
+    expect(qualified?.expectedValue).toBeGreaterThan(0);
+    expect(qualified?.sizing.included).toBe(true);
+    expect(qualified?.probabilityInterval).toEqual([0.55 ** 2, 0.61 ** 2]);
+    expect(priceIndependentParlayDecision([
+      leg({ sourceQuoteId: "q1", pushProbability: 0.01 }),
+      leg({ sourceQuoteId: "q2", gameId: "g2" })
+    ], 264)).toBeNull();
+    expect(priceIndependentParlayDecision([
+      leg({ sourceQuoteId: "q1", betProbability: 0.51, uncertaintyInterval: [0.49, 0.53] }),
+      leg({ sourceQuoteId: "q2", gameId: "g2", betProbability: 0.51, uncertaintyInterval: [0.49, 0.53] })
+    ], 264)?.sizing.included).toBe(false);
   });
 
   it("recomputes teaser value from the saved combined price", () => {

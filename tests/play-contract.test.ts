@@ -95,6 +95,28 @@ describe("stored shared-card contract integrity", () => {
     )).toMatch(/Kelly inclusion/i);
   });
 
+  it("blocks unsupported, negative-EV, and sub-floor parlays at the approval boundary", () => {
+    const parlay = { playType: "parlay" as const, contract: [leg("g1"), leg("g2")] };
+    const legs = [
+      { ...snapshot().legs[0], sourceQuoteId: "g1:spread", pushProbability: 0, uncertaintyInterval: [0.55, 0.61] as [number, number] },
+      { ...snapshot().legs[0], sourceQuoteId: "g2:spread", gameId: "g2", pushProbability: 0, uncertaintyInterval: [0.55, 0.61] as [number, number] }
+    ];
+    const qualified = {
+      ...snapshot({ legs }), authoritativeExpectedValuePercent: 4,
+      authoritativeProbabilityInterval: [0.3025, 0.3721] as [number, number], suggestedUnits: 0.5
+    };
+    expect(forecastApprovalEligibilityError(parlay, qualified)).toBeNull();
+    expect(forecastApprovalEligibilityError(parlay, {
+      ...qualified, legs: [{ ...legs[0], pushProbability: 0.01 }, legs[1]]
+    })).toMatch(/leg can push/i);
+    expect(forecastApprovalEligibilityError(parlay, {
+      ...qualified, authoritativeExpectedValuePercent: -0.01
+    })).toMatch(/negative EV/i);
+    expect(forecastApprovalEligibilityError(parlay, {
+      ...qualified, suggestedUnits: 0
+    })).toMatch(/Kelly inclusion/i);
+  });
+
   it("binds a stored leg to the same source game, book, market and side", () => {
     const stored = leg("g1");
     const source = {

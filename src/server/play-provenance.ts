@@ -2,7 +2,7 @@ import { buildDecisionBoard } from "./decision-board";
 import { getPlayerPropBoard } from "./player-props";
 import { stableHash } from "@/domain/hash";
 import { expectedValueWithPush } from "@/domain/odds";
-import { authoritativeContractExpectedValue } from "@/domain/forecast-value";
+import { authoritativeContractExpectedValue, priceIndependentParlayDecision } from "@/domain/forecast-value";
 import { priceTwoTeamTeaserDecision } from "@/domain/decision-board";
 import { sizeKelly } from "@/domain/sizing";
 import { structuralConfig } from "@/domain/config";
@@ -228,12 +228,15 @@ export async function capturePlayForecastSnapshot(
       probabilityMembers: leg.uncertaintyMembers!,
       pushProbabilityMembers: leg.pushProbabilityMembers!
     })), play.americanOdds) : null;
-  const contractSizing = singleSizing ?? teaserDecision?.sizing ?? null;
+  const parlayDecision = play.playType === "parlay"
+    ? priceIndependentParlayDecision(legs, play.americanOdds)
+    : null;
+  const contractSizing = singleSizing ?? teaserDecision?.sizing ?? parlayDecision?.sizing ?? null;
   const authoritativeProbabilityInterval = single?.uncertaintyInterval ?? (
     teaserDecision ? [
       teaserDecision.edgeInterval[0] + 1 / (play.americanOdds > 0 ? 1 + play.americanOdds / 100 : 1 + 100 / Math.abs(play.americanOdds)),
       teaserDecision.edgeInterval[1] + 1 / (play.americanOdds > 0 ? 1 + play.americanOdds / 100 : 1 + 100 / Math.abs(play.americanOdds))
-    ] as [number, number] : null
+    ] as [number, number] : parlayDecision?.probabilityInterval ?? null
   );
   return {
     generatedAt: new Date().toISOString(),

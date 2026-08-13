@@ -6,7 +6,7 @@ export function currentModelConfigurationHash(): string {
 }
 
 export function currentModelCodeHash(): string {
-  return stableHash("nfl-projection-lab:model-lifecycle:2026.12");
+  return stableHash("nfl-projection-lab:model-lifecycle:2026.13");
 }
 
 export function championConfigurationStatus(

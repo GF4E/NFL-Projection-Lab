@@ -64,7 +64,7 @@ export function portfolioTriggerSql(): string {
 }
 
 export function contractGuardTriggerSql(): string {
-  return `CREATE TRIGGER IF NOT EXISTS approval_contract_guard_v4
+  return `CREATE TRIGGER IF NOT EXISTS approval_contract_guard_v5
     BEFORE UPDATE OF status ON plays
     WHEN OLD.status = 'research' AND NEW.status = 'card'
     BEGIN
@@ -125,7 +125,17 @@ export function contractGuardTriggerSql(): string {
         OR json_extract(NEW.forecast_json, '$.authoritativeExpectedValuePercent') < 0
       ) THEN RAISE(ABORT, 'The exact two-team teaser price must have nonnegative EV') END;
 
-      SELECT CASE WHEN NEW.play_type IN ('single', 'teaser') AND (
+      SELECT CASE WHEN NEW.play_type = 'parlay' AND EXISTS (
+        SELECT 1 FROM json_each(json_extract(NEW.forecast_json, '$.legs'))
+        WHERE COALESCE(json_extract(value, '$.pushProbability'), -1) <> 0
+      ) THEN RAISE(ABORT, 'Parlay approval is withheld when a leg can push') END;
+
+      SELECT CASE WHEN NEW.play_type = 'parlay' AND (
+        json_extract(NEW.forecast_json, '$.authoritativeExpectedValuePercent') IS NULL
+        OR json_extract(NEW.forecast_json, '$.authoritativeExpectedValuePercent') < 0
+      ) THEN RAISE(ABORT, 'The exact independent-game parlay must have nonnegative EV') END;
+
+      SELECT CASE WHEN NEW.play_type IN ('single', 'parlay', 'teaser') AND (
         json_extract(NEW.forecast_json, '$.authoritativeProbabilityInterval') IS NULL
         OR COALESCE(json_extract(NEW.forecast_json, '$.suggestedUnits'), 0) < ${structuralConfig.sizing.minimumUnits}
       ) THEN RAISE(ABORT, 'The contract must clear the uncertainty and ${structuralConfig.sizing.minimumUnits}u Kelly inclusion gates') END;
