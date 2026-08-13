@@ -65,6 +65,20 @@ export interface TotalProjection {
   edgeInterval: [number, number] | null;
 }
 
+export interface MoneylineProjection {
+  gameId: string;
+  book: "betmgm" | "fanduel";
+  homeTeam: string;
+  marketHomeProbability: number;
+  consensusHomeProbability: number;
+  modelHomeProbability: number | null;
+  shrunkHomeProbability: number | null;
+  tieProbability: number | null;
+  homeExpectedValue: number | null;
+  awayExpectedValue: number | null;
+  edgeInterval: [number, number] | null;
+}
+
 export interface TeaserCandidate {
   gameId: string;
   book: "betmgm" | "fanduel";
@@ -302,6 +316,7 @@ export interface DecisionBoardGame {
   home: TeamBaseline | null;
   projections: BaselineProjection[];
   totals: TotalProjection[];
+  moneylines: MoneylineProjection[];
   teasers: TeaserCandidate[];
   signals: MatchupSignal[];
   movements: LineMovementSeries[];

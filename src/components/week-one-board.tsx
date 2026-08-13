@@ -11,7 +11,7 @@ import type {
   TeaserPairCandidate
 } from "@/domain/decision-board";
 import { analyzeSlipValue, decimalToAmerican, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
-import { americanToDecimal } from "@/domain/odds";
+import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
 import { structuralConfig } from "@/domain/config";
 import { isTeamApproved, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
 import { sizeKelly, type SizingResult } from "@/domain/sizing";
@@ -86,7 +86,7 @@ function combinedAmerican(legs: readonly SelectedLeg[]): number {
 function legExpectedValuePercent(leg: SelectedLeg): number {
   if (leg.fairProbability === null) return 0;
   const probability = Math.min(0.99, Math.max(0.01, leg.fairProbability + (leg.edge ?? 0)));
-  return (probability * americanToDecimal(leg.americanPrice) - 1) * 100;
+  return expectedValueWithPush(probability, leg.pushProbability ?? 0, leg.americanPrice) * 100;
 }
 
 function legBetProbability(leg: SelectedLeg): number | null {
@@ -95,9 +95,12 @@ function legBetProbability(leg: SelectedLeg): number | null {
 
 function slipExpectedValuePercent(legs: readonly SelectedLeg[]): number {
   if (!legs.length || legs.some((leg) => leg.fairProbability === null)) return 0;
-  const probability = legs.reduce((product, leg) => product * Math.min(0.99, Math.max(0.01, (leg.fairProbability ?? 0) + (leg.edge ?? 0))), 1);
-  const offered = legs.reduce((product, leg) => product * americanToDecimal(leg.americanPrice), 1);
-  return (probability * offered - 1) * 100;
+  const expectedReturn = legs.reduce((product, leg) => {
+    const probability = Math.min(0.99, Math.max(0.01, (leg.fairProbability ?? 0) + (leg.edge ?? 0)));
+    const push = leg.pushProbability ?? 0;
+    return product * (push + (1 - push) * probability * americanToDecimal(leg.americanPrice));
+  }, 1);
+  return (expectedReturn - 1) * 100;
 }
 
 function recommendation(
@@ -230,27 +233,36 @@ export function WeekOneBoard() {
       setMessage("Use a highlighted six-point teaser leg under Picks.");
       return;
     }
-    const projection = intelligence?.games.find((game) => game.gameId === line.gameId)?.projections.find((item) => item.book === line.book);
-    const totalProjection = intelligence?.games.find((game) => game.gameId === line.gameId)?.totals.find((item) => item.book === line.book);
-    const shrunkProbability = line.market === "spread" && projection?.shrunkHomeProbability !== null && projection?.shrunkHomeProbability !== undefined
-      ? line.side === projection.homeTeam ? projection.shrunkHomeProbability : 1 - projection.shrunkHomeProbability
-      : line.market === "total" && totalProjection?.shrunkProbability !== null && totalProjection?.shrunkProbability !== undefined && totalProjection.lean.toLowerCase() === line.side.toLowerCase()
-        ? totalProjection.shrunkProbability
+    const gameIntel = intelligence?.games.find((game) => game.gameId === line.gameId);
+    const projection = gameIntel?.projections.find((item) => item.book === line.book);
+    const totalProjection = gameIntel?.totals.find((item) => item.book === line.book);
+    const moneylineProjection = gameIntel?.moneylines.find((item) => item.book === line.book);
+    let shrunkProbability: number | null = null;
+    let edgeInterval: [number, number] | null = null;
+    let pushProbability: number | undefined;
+    if (line.market === "spread" && projection?.shrunkHomeProbability !== null && projection?.shrunkHomeProbability !== undefined) {
+      shrunkProbability = line.side === projection.homeTeam ? projection.shrunkHomeProbability : 1 - projection.shrunkHomeProbability;
+      edgeInterval = projection.edgeInterval
+        ? line.side === projection.homeTeam ? projection.edgeInterval : [-projection.edgeInterval[1], -projection.edgeInterval[0]]
         : null;
-    const edgeInterval = line.market === "spread" && projection?.edgeInterval
-      ? line.side === projection.homeTeam
-        ? projection.edgeInterval
-        : [-projection.edgeInterval[1], -projection.edgeInterval[0]] as [number, number]
-      : line.market === "total" && totalProjection?.edgeInterval && totalProjection.lean.toLowerCase() === line.side.toLowerCase()
-        ? totalProjection.edgeInterval
+    } else if (line.market === "total" && totalProjection?.shrunkProbability !== null && totalProjection?.shrunkProbability !== undefined && totalProjection.lean.toLowerCase() === line.side.toLowerCase()) {
+      shrunkProbability = totalProjection.shrunkProbability;
+      edgeInterval = totalProjection.edgeInterval;
+    } else if (line.market === "moneyline" && moneylineProjection?.shrunkHomeProbability !== null && moneylineProjection?.shrunkHomeProbability !== undefined) {
+      shrunkProbability = line.side === moneylineProjection.homeTeam ? moneylineProjection.shrunkHomeProbability : 1 - moneylineProjection.shrunkHomeProbability;
+      edgeInterval = moneylineProjection.edgeInterval
+        ? line.side === moneylineProjection.homeTeam ? moneylineProjection.edgeInterval : [-moneylineProjection.edgeInterval[1], -moneylineProjection.edgeInterval[0]]
         : null;
+      pushProbability = moneylineProjection.tieProbability ?? undefined;
+    }
     const sized = recommendation(shrunkProbability, line.americanPrice, edgeInterval);
     if (sized?.included) setStake(sized.suggestedUnits * 25);
     addLeg({
       id: line.id, sourceQuoteId: line.id, kind: "mainline", gameId: line.gameId, book: line.book, market: line.market, side: line.side,
       point: line.point, americanPrice: line.americanPrice, fairProbability: line.fairProbability,
       matchup, selection: lineSelection(line), detail: `${marketTitle(line.market)} · ${formatOdds(line.americanPrice)}`,
-      edge: shrunkProbability === null || line.fairProbability === null ? null : shrunkProbability - line.fairProbability
+      edge: shrunkProbability === null || line.fairProbability === null ? null : shrunkProbability - line.fairProbability,
+      pushProbability
     });
   }
 

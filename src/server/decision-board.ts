@@ -14,14 +14,14 @@ import {
   type GameAvailabilityContext,
   type GameWeatherContext,
   type LineMovementSeries,
+  type MoneylineProjection,
   type TeamBaseline,
   type TeaserCandidate
 } from "@/domain/decision-board";
 import type { TotalProjection } from "@/domain/decision-board";
 import { buildDiscreteMarginArtifact, fairSpreadPointForProbability, translateFairProbability } from "@/domain/margin";
 import { bootstrapEdgeInterval, type WeightedTrainingRow } from "@/domain/bootstrap";
-import { shrinkProbability } from "@/domain/odds";
-import { americanToDecimal } from "@/domain/odds";
+import { americanToDecimal, expectedValueWithPush, powerDevig, shrinkProbability } from "@/domain/odds";
 import { applyChampionMarketResidual, predictProbability, type FittedLogisticModel } from "@/domain/model-fit";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
 import type { HistoricalMarginRow } from "@/domain/types";
@@ -72,6 +72,8 @@ interface GameRow {
   roof: string | null;
   temperature: number | null;
   wind: number | null;
+  away_moneyline: number | null;
+  home_moneyline: number | null;
 }
 
 interface LineRow {
@@ -237,6 +239,82 @@ function totalProjections(
   });
 }
 
+function moneylineProjections(input: {
+  gameId: string;
+  homeTeam: string;
+  gameLines: readonly LiveLine[];
+  artifact: ReturnType<typeof buildDiscreteMarginArtifact> | null;
+  consensusHomePoint: number | null;
+  stateProjectedHomePoint: number | null;
+  edgeNoiseInterval: [number, number] | null;
+  championModel: FittedLogisticModel | null;
+  forecastContext: {
+    season: number;
+    week: number;
+    expectedHomeMargin: number;
+    totalLine: number | null;
+    awayRest: number | null;
+    homeRest: number | null;
+  };
+}): MoneylineProjection[] {
+  const bookPairs = (["betmgm", "fanduel"] as const).flatMap((book) => {
+    const home = input.gameLines.find((line) => line.book === book && line.market === "moneyline" && line.side === input.homeTeam);
+    const away = input.gameLines.find((line) => line.book === book && line.market === "moneyline" && line.side !== input.homeTeam);
+    return home?.fairProbability !== null && home?.fairProbability !== undefined && away?.fairProbability !== null && away?.fairProbability !== undefined
+      ? [{ book, home, away }]
+      : [];
+  });
+  if (!bookPairs.length || !input.artifact || input.consensusHomePoint === null || input.stateProjectedHomePoint === null) return [];
+  const consensusHomeProbability = bookPairs.reduce((sum, pair) => sum + pair.home.fairProbability!, 0) / bookPairs.length;
+  const stateAtMoneyline = translateFairProbability(
+    input.artifact,
+    input.consensusHomePoint,
+    input.stateProjectedHomePoint,
+    0,
+    0.5
+  );
+  if (stateAtMoneyline.probability === null || stateAtMoneyline.pushProbability === null) return [];
+  const tieProbability = Math.max(0, Math.min(0.25, stateAtMoneyline.pushProbability));
+  const stateConditionalHomeProbability = Math.max(
+    0.01,
+    Math.min(0.99, stateAtMoneyline.probability / Math.max(1e-6, 1 - tieProbability))
+  );
+  const championHomeProbability = input.championModel
+    ? predictProbability(input.championModel, buildLifecycleForecastRow({
+        ...input.forecastContext,
+        market: "moneyline",
+        marketProbability: consensusHomeProbability,
+        isHomeSide: true
+      }))
+    : null;
+  const modelHomeProbability = championHomeProbability === null
+    ? stateConditionalHomeProbability
+    : applyChampionMarketResidual(stateConditionalHomeProbability, championHomeProbability, consensusHomeProbability);
+  const shrunkHomeProbability = shrinkProbability(
+    modelHomeProbability,
+    consensusHomeProbability,
+    structuralConfig.model.shrinkageWeight
+  );
+  return bookPairs.map(({ book, home, away }) => {
+    const edgeCenter = shrunkHomeProbability - home.fairProbability!;
+    return {
+      gameId: input.gameId,
+      book,
+      homeTeam: input.homeTeam,
+      marketHomeProbability: home.fairProbability!,
+      consensusHomeProbability,
+      modelHomeProbability,
+      shrunkHomeProbability,
+      tieProbability,
+      homeExpectedValue: expectedValueWithPush(shrunkHomeProbability, tieProbability, home.americanPrice),
+      awayExpectedValue: expectedValueWithPush(1 - shrunkHomeProbability, tieProbability, away.americanPrice),
+      edgeInterval: input.edgeNoiseInterval === null
+        ? null
+        : [edgeCenter + input.edgeNoiseInterval[0], edgeCenter + input.edgeNoiseInterval[1]]
+    };
+  });
+}
+
 function rank(values: Array<{ team: string; value: number | null }>, higherIsBetter: boolean): Map<string, number | null> {
   const eligible = values.filter((item): item is { team: string; value: number } => item.value !== null && Number.isFinite(item.value));
   eligible.sort((left, right) => higherIsBetter ? right.value - left.value : left.value - right.value);
@@ -398,7 +476,7 @@ export async function buildDecisionBoard(
   const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, inactiveResult, pregameStates, weatherRows, persistedStates, championHash] = await Promise.all([
     db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line,
-        roof, temperature, wind
+        roof, temperature, wind, away_moneyline, home_moneyline
       FROM nfl_games WHERE season BETWEEN 2010 AND ? AND result IS NOT NULL AND spread_line IS NOT NULL
         AND (season < ? OR week < ?)
       ORDER BY game_date, game_id`).bind(slate.season, slate.season, slate.week).all<GameRow>(),
@@ -466,6 +544,18 @@ export async function buildDecisionBoard(
     edge: Math.max(-0.25, Math.min(0.25, (row.total - row.total_line) * 0.025)),
     weight: 0.5 ** ((latestTrainingSeason - row.season) / structuralConfig.model.decayHalfLifeSeasons)
   }]));
+  const moneylineEdgeNoise = historicalEdgeInterval(gameResult.results.flatMap((row) => {
+    if (row.result === 0 || row.home_moneyline === null || row.away_moneyline === null) return [];
+    try {
+      const marketHomeProbability = powerDevig(row.home_moneyline, row.away_moneyline).probabilities[0];
+      return [{
+        edge: (row.result > 0 ? 1 : 0) - marketHomeProbability,
+        weight: 0.5 ** ((latestTrainingSeason - row.season) / structuralConfig.model.decayHalfLifeSeasons)
+      }];
+    } catch {
+      return [];
+    }
+  }));
   const injuryByGame = new Map(injuryResult.results.map((row) => [row.game_id, row]));
   const inactiveByGame = new Map(inactiveResult.results.map((row) => [row.game_id, row]));
   const pregameByGame = new Map(pregameStates.map((state) => [state.gameId, state]));
@@ -484,6 +574,7 @@ export async function buildDecisionBoard(
       ? totalPoints.reduce((sum, point) => sum + point, 0) / totalPoints.length
       : game.totalLine;
     const strengthDelta = (strengths.get(game.home) ?? 0) - (strengths.get(game.away) ?? 0);
+    const stateProjectedHomePoint = consensusHomePoint === null ? null : roundHalf(consensusHomePoint - strengthDelta);
     type ProjectionAnchor = { book: "betmgm" | "fanduel"; point: number; fairProbability: number; marketSource: BaselineProjection["marketSource"] };
     const projectionAnchors = (["betmgm", "fanduel"] as const).flatMap<ProjectionAnchor>((book) => {
       const line = homeSpreads.find((candidate) => candidate.book === book);
@@ -495,8 +586,8 @@ export async function buildDecisionBoard(
         : [{ book, point: scheduleHomePoint, fairProbability: 0.5, marketSource: "nflverse_consensus" as const }];
     });
     const projections: BaselineProjection[] = artifact && consensusHomePoint !== null ? projectionAnchors.map((anchor) => {
-      const stateProjectedHomePoint = roundHalf(anchor.point - strengthDelta);
-      const translated = translateFairProbability(artifact, consensusHomePoint, stateProjectedHomePoint, anchor.point, 0.5);
+      const bookStateProjectedHomePoint = roundHalf(anchor.point - strengthDelta);
+      const translated = translateFairProbability(artifact, consensusHomePoint, bookStateProjectedHomePoint, anchor.point, 0.5);
       const championProbability = championModel && translated.probability !== null
         ? predictProbability(championModel, buildLifecycleForecastRow({
             season: game.season,
@@ -516,7 +607,7 @@ export async function buildDecisionBoard(
       const inferredFairPoint = modelProbability === null
         ? { point: null, warning: "unsupported" as const }
         : fairSpreadPointForProbability(artifact, consensusHomePoint, anchor.point, modelProbability);
-      const projectedHomePoint = inferredFairPoint.point ?? stateProjectedHomePoint;
+      const projectedHomePoint = inferredFairPoint.point ?? bookStateProjectedHomePoint;
       const shrunkHomeProbability = modelProbability === null ? null : shrinkProbability(modelProbability, anchor.fairProbability, structuralConfig.model.shrinkageWeight);
       const edgeCenter = shrunkHomeProbability === null ? null : shrunkHomeProbability - anchor.fairProbability;
       return {
@@ -657,6 +748,24 @@ export async function buildDecisionBoard(
           homeRest: game.homeRest
         }
       ),
+      moneylines: moneylineProjections({
+        gameId: game.id,
+        homeTeam: game.home,
+        gameLines,
+        artifact,
+        consensusHomePoint,
+        stateProjectedHomePoint,
+        edgeNoiseInterval: moneylineEdgeNoise,
+        championModel,
+        forecastContext: {
+          season: game.season,
+          week: game.week,
+          expectedHomeMargin: consensusHomePoint === null ? 0 : -consensusHomePoint,
+          totalLine: consensusTotalLine,
+          awayRest: game.awayRest,
+          homeRest: game.homeRest
+        }
+      }),
       teasers,
       signals: matchupSignals(away, home, { awayRest: game.awayRest, homeRest: game.homeRest }),
       movements: lineMovements(game.id, movementHistory, gameLines),

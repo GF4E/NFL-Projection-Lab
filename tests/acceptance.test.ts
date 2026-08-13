@@ -9,6 +9,7 @@ import {
   translateFairProbability
 } from "@/domain/margin";
 import {
+  expectedValueWithPush,
   powerDevig,
   shrinkProbability,
   translatedPriceDeltaCents
@@ -573,5 +574,21 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("totalSizing.suggestedUnits");
     expect(board).toContain('sideSizing.greyed ? "uncertain"');
     expect(board).toContain('totalSizing.greyed ? "uncertain"');
+  });
+
+  it("38. models moneylines through the logged champion and prices NFL ties as pushes", () => {
+    const decisiveEv = 0.55 * (1 + 100 / 110) - 1;
+    expect(expectedValueWithPush(0.55, 0.05, -110)).toBeCloseTo(decisiveEv * 0.95, 10);
+    const noPush = analyzeSlipValue([{ gameId: "g1", americanPrice: -110, fairProbability: 0.5 }]);
+    const tieAware = analyzeSlipValue([{ gameId: "g1", americanPrice: -110, fairProbability: 0.5, pushProbability: 0.05 }]);
+    expect(tieAware!.vigDragPercent).toBeLessThan(noPush!.vigDragPercent);
+    const server = readFileSync("src/server/decision-board.ts", "utf8");
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(server).toContain('market: "moneyline"');
+    expect(server).toContain("expectedValueWithPush");
+    expect(server).toContain("moneylineEdgeNoise");
+    expect(server).toContain("consensusHomeProbability");
+    expect(board).toContain("gameIntel?.moneylines.find");
+    expect(board).toContain("pushProbability = moneylineProjection.tieProbability");
   });
 });

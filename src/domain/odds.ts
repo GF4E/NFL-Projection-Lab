@@ -77,6 +77,17 @@ export function expectedValue(probability: number, americanPrice: number): numbe
   return probability * americanToDecimal(americanPrice) - 1;
 }
 
+export function expectedValueWithPush(
+  conditionalWinProbability: number,
+  pushProbability: number,
+  americanPrice: number
+): number {
+  if (pushProbability < 0 || pushProbability >= 1) {
+    throw new Error("Push probability must be in [0, 1)");
+  }
+  return (1 - pushProbability) * expectedValue(conditionalWinProbability, americanPrice);
+}
+
 export function quoteCostCents(americanPrice: number): number {
   return americanToImplied(americanPrice) * 100;
 }

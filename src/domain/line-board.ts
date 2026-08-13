@@ -23,7 +23,9 @@ export type SlipLeg = Pick<LiveLine, "id" | "gameId" | "book" | "market" | "side
   selection: string;
 };
 
-export type ValueLeg = Pick<SlipLeg, "gameId" | "americanPrice" | "fairProbability">;
+export type ValueLeg = Pick<SlipLeg, "gameId" | "americanPrice" | "fairProbability"> & {
+  pushProbability?: number;
+};
 
 export function enrichWithPowerDevig(lines: readonly Omit<LiveLine, "fairProbability" | "marketVigPercent">[]): LiveLine[] {
   const groups = new Map<string, typeof lines>();
@@ -59,9 +61,12 @@ export type SlipValue = {
 
 function cumulativeDrag(legs: readonly ValueLeg[]): number | null {
   if (!legs.length || legs.some((leg) => leg.fairProbability === null)) return null;
-  const offeredDecimal = legs.reduce((product, leg) => product * americanToDecimal(leg.americanPrice), 1);
-  const fairWinProbability = legs.reduce((product, leg) => product * (leg.fairProbability ?? 0), 1);
-  return Math.max(0, 1 - offeredDecimal * fairWinProbability);
+  const expectedReturn = legs.reduce((product, leg) => {
+    const push = leg.pushProbability ?? 0;
+    const decisiveWin = (leg.fairProbability ?? 0) * (1 - push);
+    return product * (push + decisiveWin * americanToDecimal(leg.americanPrice));
+  }, 1);
+  return Math.max(0, 1 - expectedReturn);
 }
 
 export function analyzeSlipValue(legs: readonly ValueLeg[], unitDollars = 25): SlipValue | null {
