@@ -15,6 +15,7 @@ import {
 } from "@/domain/decision-board";
 import { stableHash } from "@/domain/hash";
 import { structuralConfig } from "@/domain/config";
+import { playerPropBoardMessage } from "@/domain/player-prop-status";
 import { getD1 } from "../../db";
 import {
   assertOddsCreditsAvailable,
@@ -346,17 +347,14 @@ async function board(
       remaining: state.quota_remaining ?? 0,
       lastCost: state.quota_last_cost ?? 0
     },
-    message: !freshQuotes.length && quotes.length
-      ? `Prop prices are older than ${structuralConfig.props.maximumQuoteAgeMinutes} minutes; suggestions are withheld until a fresh scan`
-      : !availability.confirmed
-      ? "Official inactives are not confirmed; prop suggestions are withheld"
-      : candidates.length
-      ? `Market and player-history confirmed · ${state?.message ?? "cached prices"}`
-      : quotes.length
-        ? evidence.length
-          ? "No prop cleared the market, player-history and worst-case EV gates"
-          : "Player-history baseline is not ready; market-only prop signals are withheld"
-        : state?.message ?? "Props have not been scanned for this game yet"
+    message: playerPropBoardMessage({
+      quotes: quotes.length,
+      freshQuotes: freshQuotes.length,
+      availabilityConfirmed: availability.confirmed,
+      candidates: candidates.length,
+      evidence: evidence.length,
+      stateMessage: state?.message ?? null
+    })
   };
 }
 

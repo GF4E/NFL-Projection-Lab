@@ -246,11 +246,16 @@ button:disabled { cursor: wait; opacity: .62; }
 .quick-mainline-recommendation.uncertain > em { color: #7d8985; }
 .quick-head { min-height: 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .quick-head small { color: var(--book-accent); font: 800 8px var(--display); text-transform: uppercase; }
-.quick-teasers > button { width: 100%; min-height: 29px; margin-top: 4px; padding: 0 7px; display: grid; grid-template-columns: 38px 1fr auto; gap: 7px; align-items: center; border: 1px solid #3c4844; border-radius: 3px; background: #1b2522; color: #f4f6f5; text-align: left; }
+.quick-teasers > button { width: 100%; min-height: 35px; margin-top: 4px; padding: 4px 7px; display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; gap: 7px; align-items: center; border: 1px solid #3c4844; border-radius: 3px; background: #1b2522; color: #f4f6f5; text-align: left; }
 .quick-teasers > button.teaser-pair { border-color: rgba(198,255,98,.5); background: rgba(198,255,98,.07); }
 .quick-teasers > button:hover, .quick-props > button:hover { border-color: var(--book-accent); }
-.quick-teasers b { font: 900 13px var(--display); }
+.quick-teasers > button > div { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.quick-teasers b { overflow: hidden; font: 900 12px var(--display); text-overflow: ellipsis; white-space: nowrap; }
 .quick-teasers small { color: #919d98; font: 800 8px var(--display); }
+.quick-teasers > button > em { color: var(--acid); font: 900 8px var(--display); font-style: normal; text-align: right; white-space: nowrap; }
+.quick-teasers > button > em.mixed { color: var(--gold); }
+.quick-teasers > button > em.contradicts { color: var(--red); }
+.quick-teasers > button > em.insufficient { color: #87948f; }
 .teaser-class { padding: 3px; border: 1px solid #5e6b66; color: #aab4b0; font: 900 7px var(--display); text-align: center; }
 .teaser-class.classic_wong { border-color: rgba(198,255,98,.52); color: var(--acid); }
 .quick-props > button { width: 100%; min-height: 37px; margin-top: 4px; padding: 4px 7px; display: grid; grid-template-columns: 1fr auto auto; gap: 9px; align-items: center; border: 1px solid #3c4844; border-radius: 3px; background: #1b2522; color: #f4f6f5; text-align: left; }

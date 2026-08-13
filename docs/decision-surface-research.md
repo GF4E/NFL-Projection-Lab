@@ -1,6 +1,6 @@
 # Decision-surface research
 
-Updated 2026-08-12. This is an internal product note; it is not rendered in the application.
+Updated 2026-08-13. This is an internal product note; it is not rendered in the application.
 
 ## Patterns worth keeping
 
@@ -9,14 +9,19 @@ Updated 2026-08-12. This is an internal product note; it is not rendered in the 
 - Show projected spreads/totals and line movement near the live market, but keep expert prose secondary: https://www.actionnetwork.com/general/action-pro-picks-tools-projections
 - Pair efficiency with success rate and explosive-play rate. EPA alone can obscure whether an offense is consistently efficient or dependent on a few large plays: https://www.pff.com/news/nfl-explosive-plays-and-re-thinking-offensive-success
 - Treat props as price-distribution problems, not player takes. Unabated describes converting projections into distributions and point-by-point fair prices: https://unabated.com/articles/your-next-steps-with-unabated
+- Keep a prop's projection, cover probability, recent hit rate, matchup context, edge, and best available price on one scan surface. PFF's 2026 player-prop product uses those primitives and ranks by cover probability, edge, hit rate, or vig: https://www.pff.com/betting/player-props
+- Label edge as a price comparison rather than a win prediction. PFF makes this distinction explicitly, and Action Network likewise places its model line, market line, grade, edge, and best odds in the same row: https://www.pff.com/news/pff-player-prop-tool-is-now-live-on-web-for-pff-subscribers and https://www.actionnetwork.com/projections/
+- Expect prop market coverage to change as kickoff approaches. The Odds API documents that event market keys appear as books open markets; the app therefore reports the actual scan/gate state rather than showing an empty recommendation as a negative conclusion: https://the-odds-api.com/liveapi/guides/v4/
 
 ## Product translation
 
 - The sportsbook grid remains the primary surface.
-- `Picks` is the only expansion point. It contains the best side signal, teaser legs/pairs, confirmed +EV props, compact rolling matchup evidence, and open-to-now spread movement.
+- `Analyze` is the only expansion point. It contains the best exact-price mainline contracts, teaser legs/pairs, confirmed +EV props, compact rolling matchup evidence, and material open-to-now movement.
 - Matchup evidence is capped at three signals and uses leakage-safe rolling 17-game ranks. It does not present unverified narrative conclusions.
 - A teaser pair is surfaced only when two different games at the same book have non-negative empirical expected value at the displayed price. Betting against Seattle or Atlanta requires at least 5% expected value.
 - A prop is surfaced only when at least three other books quote the identical player, side, and point, its median no-vig consensus implies at least 2% EV, and the lower consensus bound remains positive.
+- The prop card distinguishes four states: not scanned, prices stale, prices posted but availability pending, and fully eligible. It never labels an unscanned market as though no +EV prop exists.
+- A teaser pair shows the screening price assumption, estimated EV at that price, maximum playable price, crossed key numbers, and uncertainty-backed units. A positive hypothetical pair is not represented as a live book offer.
 
 ## Deliberate exclusions
 

@@ -537,6 +537,7 @@ export function WeekOneBoard() {
               .sort((left, right) => (left.classification === "classic_wong" ? -1 : 0) - (right.classification === "classic_wong" ? -1 : 0) || (right.fairProbability ?? 0) - (left.fairProbability ?? 0))
               .slice(0, 2);
             const teaserPair = intelligence?.teaserPairs.find((pair) => pair.book === book && pair.legs.some((leg) => leg.gameId === game.id));
+            const pairedTeaserLeg = teaserPair?.legs.find((leg) => leg.gameId !== game.id) ?? null;
             const movement = gameIntel?.movements.find((series) => series.book === book && series.side === game.home);
             const movementOpen = movement?.snapshots[0];
             const movementCurrent = movement?.snapshots.at(-1);
@@ -650,27 +651,27 @@ export function WeekOneBoard() {
                   }) : <p>No exact-price model edge at this book.</p>}
                 </section>
                 <section className="quick-teasers">
-                  <div className="quick-head"><span>TEASER LEGS</span><small>{teaserPair ? "Price check" : teaserCandidates.length ? "6 points" : "None"}</small></div>
+                  <div className="quick-head"><span>TEASER VALUE</span><small>{teaserPair ? `BEST PAIR +${(teaserPair.expectedValue * 100).toFixed(1)}%` : teaserCandidates.length ? "BUILD A PAIR" : "NO VIABLE LEG"}</small></div>
                   {teaserPair && <button className="teaser-pair" onClick={() => addTeaserPair(teaserPair)}>
                     <span className="teaser-class classic_wong">PAIR</span>
-                    <b>With {teaserPair.legs.find((leg) => leg.gameId !== game.id)?.team}</b>
-                    <small>PLAY TO {formatOdds(teaserPair.playToAmerican)}</small>
+                    <div><b>With {pairedTeaserLeg?.team} {pairedTeaserLeg ? formatPoint(pairedTeaserLeg.teasedPoint) : ""}</b><small>SCREEN {formatOdds(teaserPair.screeningAmerican)} · PLAY TO {formatOdds(teaserPair.playToAmerican)}</small></div>
+                    <em>+{(teaserPair.expectedValue * 100).toFixed(1)}% · {teaserPair.suggestedUnits}u</em>
                   </button>}
                   {teaserCandidates.length ? teaserCandidates.map((candidate) => {
                     const context = alignMatchupEvidence(gameIntel?.signals ?? [], "teaser", candidate.team);
                     return <button onClick={() => addTeaser(candidate, `${game.away} @ ${game.home}`)} key={`${candidate.book}:${candidate.team}:${candidate.originalPoint}`}>
                       <span className={`teaser-class ${candidate.classification}`}>{candidate.classification === "classic_wong" ? "WONG" : candidate.classification === "key_number" ? "KEY" : "EV"}</span>
-                      <b>{candidate.team} {formatPoint(candidate.teasedPoint)}</b>
-                      <small>{formatPercent(candidate.fairProbability)} · <span className={`evidence-check ${context.verdict}`} title={evidenceDetail(context)}>{compactEvidenceLabel(context)}</span></small>
+                      <div><b>{candidate.team} {formatPoint(candidate.originalPoint)} → {formatPoint(candidate.teasedPoint)}</b><small>{formatPercent(candidate.fairProbability)} fair · {candidate.crossedKeys.length ? `crosses ${candidate.crossedKeys.join("/")}` : "no key crossed"}</small></div>
+                      <em className={context.verdict} title={evidenceDetail(context)}>{compactEvidenceLabel(context)}</em>
                     </button>;
                   }) : <p>No viable path at this line.</p>}
                 </section>
                 <section className="quick-props">
-                  <div className="quick-head"><span>+EV PROPS</span><small>{propsLoading === game.id ? "Scanning…" : currentProps.length ? `${currentProps.length} found` : "None yet"}</small></div>
+                  <div className="quick-head"><span>{currentProps.length ? "FINAL +EV PROPS" : "PROP CHECK"}</span><small>{propsLoading === game.id ? "LOADING" : currentProps.length ? `${currentProps.length} CLEARED` : propBoard?.status === "stale" ? "STALE" : "GATED"}</small></div>
                   {propsLoading === game.id ? <p>Checking exact same-point prices across books…</p> : currentProps.length ? currentProps.map((prop) => <button className={prop.unitsGreyed ? "uncertain" : ""} onClick={() => addProp(prop, `${game.away} @ ${game.home}`)} key={prop.id}>
                     <div><b>{prop.player}</b><small>{bookNames[prop.executionBook]} · {prop.side} {prop.point} {propMarketTitle(prop.market)} · {prop.referenceBooks} refs · {prop.sampleGames ? `L${prop.sampleGames} proj ${prop.projectedValue?.toFixed(1)} · ${((prop.hitRate ?? 0) * 100).toFixed(0)}% hit · ` : ""}floor +{(prop.lowerBoundExpectedValue * 100).toFixed(1)}% · {snapshotAge(prop.capturedAt)}</small></div>
                     <strong>{formatOdds(prop.americanPrice)}</strong><em>+{(prop.expectedValue * 100).toFixed(1)}% · {prop.suggestedUnits}u</em>
-                  </button>) : <p>{propBoard?.message ?? "Props are scanned when posted."}</p>}
+                  </button>) : <p>{propBoard?.message ?? "Props are scanned when books post them closer to kickoff."}</p>}
                 </section>
                 {(meaningfulSignals.length || materialMovement || materialWeather || materialAvailability) && <section className="quick-evidence">
                   {materialMovement && movementOpen && movementCurrent && <div className="movement-mini">
