@@ -29,7 +29,7 @@ function RecordLane({ label, note, summary }: { label: string; note: string; sum
 export function PlayTracker() {
   const [plays, setPlays] = useState<WeeklyPlay[]>([]);
   const [filter, setFilter] = useState<Filter>("all");
-  const [message, setMessage] = useState("Jointly approved cards start as paper. Confirm cash placement here only after the exact contract is placed.");
+  const [message, setMessage] = useState("Paper or cash is bound to the jointly approved revision. The application never places anything automatically.");
   const official = useMemo(() => plays.filter((play) => isTeamApproved(play.approvals)), [plays]);
   const records = useMemo(() => trackerRecordSummaries(official), [official]);
   const rows = official.filter((play) => {
@@ -83,7 +83,7 @@ export function PlayTracker() {
           <span>{odds(play.americanOdds)}</span>
           <span><b>${(play.stakeCents / 100).toFixed(0)}</b><small>{stakeToUnits(play.stakeCents)}u</small></span>
           <span className={play.modelEdgePp > 0 ? "positive" : ""}>{play.modelEdgePp ? `${play.modelEdgePp > 0 ? "+" : ""}${play.modelEdgePp.toFixed(1)} pp` : "—"}</span>
-          <div className="result-cell">{play.status === "settled" ? <><b className={play.result === "win" ? "positive" : play.result === "loss" ? "negative" : ""}>{play.result}</b><small>{dollars(play.profitCents)} · {play.closingClvCents === null ? "CLV pending" : `${play.closingClvCents.toFixed(1)}¢ CLV${play.closingClvPoints === null ? "" : ` · ${play.closingClvPoints > 0 ? "+" : ""}${play.closingClvPoints.toFixed(1)} pt`}`}</small></> : play.status === "placed" ? <><b>placed</b><small>Awaiting nflverse final</small></> : <button className="track-action" onClick={() => markPlaced(play)}>Cash placed</button>}</div>
+          <div className="result-cell">{play.status === "settled" ? <><b className={play.result === "win" ? "positive" : play.result === "loss" ? "negative" : ""}>{play.result}</b><small>{dollars(play.profitCents)} · {play.closingClvCents === null ? "CLV pending" : `${play.closingClvCents.toFixed(1)}¢ CLV${play.closingClvPoints === null ? "" : ` · ${play.closingClvPoints > 0 ? "+" : ""}${play.closingClvPoints.toFixed(1)} pt`}`}</small></> : play.status === "placed" ? <><b>placed</b><small>Awaiting nflverse final</small></> : play.executionStatus === "executed" ? <button className="track-action" onClick={() => markPlaced(play)}>Confirm cash placed</button> : <><b>paper</b><small>Tracked in full record only</small></>}</div>
         </div>)}
       </div>
     </section>

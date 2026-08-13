@@ -174,3 +174,31 @@ export function contractGuardTriggerSql(): string {
       ) THEN RAISE(ABORT, 'Player props must retain current evidence-qualified positive EV') END;
     END`;
 }
+
+export function executionStateGuardTriggerSql(): string {
+  return `CREATE TRIGGER IF NOT EXISTS approval_execution_state_guard_v1
+    BEFORE UPDATE OF status, execution_status, cash_placement_confirmed ON plays
+    BEGIN
+      SELECT CASE WHEN OLD.execution_status <> NEW.execution_status
+      THEN RAISE(ABORT, 'Execution status is immutable; create a new jointly approved revision') END;
+
+      SELECT CASE WHEN OLD.cash_placement_confirmed = 1 AND NEW.cash_placement_confirmed <> 1
+      THEN RAISE(ABORT, 'Cash placement confirmation is immutable') END;
+
+      SELECT CASE WHEN OLD.cash_placement_confirmed = 0 AND NEW.cash_placement_confirmed = 1 AND (
+        NEW.execution_status <> 'executed'
+        OR NEW.gabe_approved <> 1
+        OR NEW.jarrett_approved <> 1
+        OR NEW.status <> 'placed'
+        OR NEW.result <> 'pending'
+      ) THEN RAISE(ABORT, 'Cash placement requires both approvals on a pending executed contract') END;
+
+      SELECT CASE WHEN NEW.status = 'placed' AND (
+        NEW.execution_status <> 'executed'
+        OR NEW.cash_placement_confirmed <> 1
+        OR NEW.gabe_approved <> 1
+        OR NEW.jarrett_approved <> 1
+        OR NEW.result <> 'pending'
+      ) THEN RAISE(ABORT, 'Placed status requires a jointly approved pending cash contract') END;
+    END`;
+}

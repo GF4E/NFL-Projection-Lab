@@ -2,6 +2,7 @@ import { getD1 } from "../../db";
 import {
   draftExpirationReason,
   earliestPlayKickoff,
+  executionApprovalConfirmationError,
   forecastApprovalEligibilityError,
   isTeamApproved,
   storedLegMatchesSource,
@@ -12,7 +13,7 @@ import {
   type PlayForecastSnapshot,
   type WeeklyPlay
 } from "@/domain/play-card";
-import { contractGuardTriggerSql, portfolioTriggerSql } from "@/domain/portfolio-trigger";
+import { contractGuardTriggerSql, executionStateGuardTriggerSql, portfolioTriggerSql } from "@/domain/portfolio-trigger";
 import { seasonSchedule } from "./weekly-slate";
 import { queueAndDispatchPush } from "./push/store";
 import { capturePlayForecastSnapshot } from "./play-provenance";
@@ -225,6 +226,7 @@ export async function ensurePlayStore(d1: D1Database = getD1()): Promise<void> {
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_created_at ON plays (created_at)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_play_state_audit_play ON play_state_audit (play_id, changed_at)"),
     d1.prepare(contractGuardTriggerSql()),
+    d1.prepare(executionStateGuardTriggerSql()),
     d1.prepare(portfolioTriggerSql())
   ]);
   await d1.prepare("PRAGMA optimize").run();
@@ -351,6 +353,9 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
   if (existing) {
     const current = mapRow(existing);
     if (isTeamApproved(current.approvals) || current.approvals?.includes(actor)) return current;
+    if (current.executionStatus !== play.executionStatus) {
+      throw new Error("Execution status changed. Create a new revision and restart both approvals.");
+    }
     await assertApprovalWindowOpen(d1, play, play.updatedAt);
     if (current.status === "passed") {
       await assertApprovalContractCurrent(d1, play);
@@ -364,12 +369,13 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
         d1.prepare(`UPDATE plays SET contract_key = ?, contract_json = ?, forecast_json = ?, primary_reason = ?, picked_by = ?,
           title = ?, legs = ?, book = ?, american_odds = ?, stake_cents = ?, model_edge_pp = ?,
           estimated_ev_percent = ?, confidence = ?, stats_case = ?, football_case = ?,
+          execution_status = ?, cash_placement_confirmed = 0,
           gabe_approved = ?, jarrett_approved = ?, status = 'research', created_by = ?, created_at = ?, updated_at = ?
           WHERE id = ? AND status = 'passed'`)
           .bind(
             play.contractKey ?? "", JSON.stringify(play.contract ?? []), JSON.stringify(forecastSnapshot), play.primaryReason, play.pickedBy,
             play.title, play.legs, play.book, play.americanOdds, play.stakeCents, play.modelEdgePp,
-            play.estimatedEvPercent, play.confidence, play.statsCase, play.footballCase,
+            play.estimatedEvPercent, play.confidence, play.statsCase, play.footballCase, play.executionStatus,
             actor === "gabe" ? 1 : 0, actor === "jarrett" ? 1 : 0, play.createdBy,
             play.createdAt, play.updatedAt, play.id
           )
@@ -380,20 +386,39 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
     }
     if (current.status !== "research") return current;
     assertStoredPlayContract(current);
+    const confirmationError = executionApprovalConfirmationError(
+      current.executionStatus,
+      play.cashPlacementConfirmed,
+      true
+    );
+    if (confirmationError) throw new Error(confirmationError);
     await assertApprovalContractCurrent(d1, current);
     await assertPortfolioAvailable(d1, current);
     const forecastSnapshot = await capturePlayForecastSnapshot(d1, current);
     assertForecastApprovalEligible(current, forecastSnapshot);
-    await d1.prepare(`UPDATE plays SET
+    const approval = d1.prepare(`UPDATE plays SET
       gabe_approved = CASE WHEN ? = 'gabe' THEN 1 ELSE gabe_approved END,
       jarrett_approved = CASE WHEN ? = 'jarrett' THEN 1 ELSE jarrett_approved END,
       status = CASE WHEN (gabe_approved = 1 OR ? = 'gabe') AND (jarrett_approved = 1 OR ? = 'jarrett') THEN 'card' ELSE 'research' END,
       forecast_json = ?, updated_at = ? WHERE id = ? AND status = 'research'`)
-      .bind(actor, actor, actor, actor, JSON.stringify(forecastSnapshot), play.updatedAt, play.id).run();
+      .bind(actor, actor, actor, actor, JSON.stringify(forecastSnapshot), play.updatedAt, play.id);
+    const statements = [approval];
+    if (current.executionStatus === "executed") {
+      statements.push(d1.prepare(`UPDATE plays SET status = 'placed', cash_placement_confirmed = 1, updated_at = ?
+        WHERE id = ? AND status = 'card' AND result = 'pending' AND execution_status = 'executed'
+          AND gabe_approved = 1 AND jarrett_approved = 1`).bind(play.updatedAt, play.id));
+    }
+    await d1.batch(statements);
     const saved = (await getPlay(play.id))!;
     await notifyMissingApprover(d1, saved);
     return saved;
   }
+  const confirmationError = executionApprovalConfirmationError(
+    play.executionStatus,
+    play.cashPlacementConfirmed,
+    false
+  );
+  if (confirmationError) throw new Error(confirmationError);
   await assertApprovalWindowOpen(d1, play, play.updatedAt);
   await assertApprovalContractCurrent(d1, play);
   const forecastSnapshot = await capturePlayForecastSnapshot(d1, play);
@@ -419,9 +444,9 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
 export async function confirmCashPlacement(id: string, updatedAt: string): Promise<WeeklyPlay> {
   const d1 = getD1();
   await ensurePlayStore(d1);
-  const updated = await d1.prepare(`UPDATE plays SET status = 'placed', execution_status = 'executed',
-      cash_placement_confirmed = 1, updated_at = ?
-    WHERE id = ? AND status = 'card' AND result = 'pending' AND gabe_approved = 1 AND jarrett_approved = 1`)
+  const updated = await d1.prepare(`UPDATE plays SET status = 'placed', cash_placement_confirmed = 1, updated_at = ?
+    WHERE id = ? AND status = 'card' AND result = 'pending' AND execution_status = 'executed'
+      AND gabe_approved = 1 AND jarrett_approved = 1`)
     .bind(updatedAt, id).run();
   const row = await d1.prepare("SELECT * FROM plays WHERE id = ?").bind(id).first<PlayDatabaseRow>();
   const play = row ? mapRow(row) : null;
@@ -445,12 +470,10 @@ export async function updatePlayResult(
         closing_clv_cents = ?,
         closing_clv_points = ?,
         clv_reference_book = ?,
-        execution_status = CASE WHEN ? = 'placed' THEN 'executed' ELSE execution_status END,
-        cash_placement_confirmed = CASE WHEN ? = 'placed' THEN 1 ELSE cash_placement_confirmed END,
         updated_at = ?
     WHERE id = ?
   `).bind(update.status, update.result, update.profitCents, update.closingClvCents, update.closingClvPoints,
-    update.clvReferenceBook, update.status, update.status, update.updatedAt, id).run();
+    update.clvReferenceBook, update.updatedAt, id).run();
   const row = await getD1().prepare("SELECT * FROM plays WHERE id = ?").bind(id).first<PlayDatabaseRow>();
   return row ? mapRow(row) : null;
 }

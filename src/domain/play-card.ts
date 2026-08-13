@@ -281,7 +281,7 @@ export function isTeamApproved(approvals: readonly PickedBy[] | undefined): bool
 }
 
 /** Replays the immutable saved contract through the authenticated approval API. */
-export function exactContractApprovalRequest(play: WeeklyPlay) {
+export function exactContractApprovalRequest(play: WeeklyPlay, cashPlacementConfirmed = false) {
   return {
     week: play.week,
     gameId: play.gameId,
@@ -299,6 +299,8 @@ export function exactContractApprovalRequest(play: WeeklyPlay) {
     confidence: play.confidence,
     statsCase: play.statsCase,
     footballCase: play.footballCase,
+    executionStatus: play.executionStatus,
+    cashPlacementConfirmed,
     status: "card" as const
   };
 }
@@ -337,6 +339,7 @@ export function cashPlacementEligibilityError(
 ): string | null {
   if (play.status === "placed" && play.executionStatus === "executed" && play.cashPlacementConfirmed) return null;
   if (!isTeamApproved(play.approvals)) return "Cash placement requires both teammates to approve the exact contract first";
+  if (play.executionStatus !== "executed") return "A paper card cannot be converted to cash without a new jointly approved executed revision";
   if (play.status !== "card" || play.result !== "pending") return "Only an open, jointly approved card can be marked as cash placed";
   const kickoff = earliestPlayKickoff(play, kickoffByGame);
   if (!kickoff) return "Cash placement is unavailable because kickoff could not be verified";
@@ -344,6 +347,42 @@ export function cashPlacementEligibilityError(
   const kickoffMs = Date.parse(kickoff);
   if (!Number.isFinite(nowMs) || !Number.isFinite(kickoffMs)) return "Cash placement timing is invalid";
   return nowMs >= kickoffMs ? "Cash placement must be confirmed before kickoff" : null;
+}
+
+export function executionApprovalConfirmationError(
+  executionStatus: PlayExecutionStatus,
+  cashPlacementConfirmed: boolean,
+  isSecondApproval: boolean
+): string | null {
+  if (cashPlacementConfirmed && executionStatus !== "executed") {
+    return "Cash confirmation is valid only for an executed revision";
+  }
+  if (cashPlacementConfirmed && !isSecondApproval) {
+    return "Cash placement is confirmed only with the second approval";
+  }
+  if (isSecondApproval && executionStatus === "executed" && !cashPlacementConfirmed) {
+    return "The second approval on an executed revision must confirm cash placement at the frozen contract";
+  }
+  return null;
+}
+
+export function higherEvPaperAlternative(
+  currentExpectedValue: number,
+  currentSourceQuoteIds: readonly string[],
+  alternatives: readonly {
+    book: "betmgm" | "fanduel";
+    expectedValue: number;
+    sourceQuoteIds: readonly string[];
+  }[]
+): { book: "betmgm" | "fanduel"; expectedValue: number; sourceQuoteIds: readonly string[] } | null {
+  const currentSources = [...currentSourceQuoteIds].sort().join("|");
+  return [...alternatives]
+    .filter((candidate) => Number.isFinite(candidate.expectedValue))
+    .sort((left, right) => right.expectedValue - left.expectedValue)
+    .find((candidate) =>
+      candidate.expectedValue > currentExpectedValue + 1e-9 &&
+      [...candidate.sourceQuoteIds].sort().join("|") !== currentSources
+    ) ?? null;
 }
 
 function playGameMarkets(play: Pick<WeeklyPlay, "gameId" | "market" | "contract">): Map<string, string[]> {

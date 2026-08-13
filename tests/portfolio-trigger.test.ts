@@ -1,6 +1,6 @@
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
-import { contractGuardTriggerSql, portfolioTriggerSql } from "@/domain/portfolio-trigger";
+import { contractGuardTriggerSql, executionStateGuardTriggerSql, portfolioTriggerSql } from "@/domain/portfolio-trigger";
 
 type Leg = { gameId: string; market: "spread" | "moneyline" | "total" | "prop" | "teaser" };
 
@@ -16,9 +16,15 @@ function database(): DatabaseSync {
     play_type text NOT NULL,
     market text NOT NULL,
     status text NOT NULL,
-    stake_cents integer NOT NULL
+    stake_cents integer NOT NULL,
+    execution_status text DEFAULT 'paper' NOT NULL,
+    cash_placement_confirmed integer DEFAULT 0 NOT NULL,
+    gabe_approved integer DEFAULT 0 NOT NULL,
+    jarrett_approved integer DEFAULT 0 NOT NULL,
+    result text DEFAULT 'pending' NOT NULL
   )`);
   db.exec(contractGuardTriggerSql());
+  db.exec(executionStateGuardTriggerSql());
   db.exec(portfolioTriggerSql());
   return db;
 }
@@ -30,7 +36,8 @@ function add(
   units: number,
   contract: Leg[],
   week = 1,
-  playType: "single" | "parlay" | "teaser" = "single"
+  playType: "single" | "parlay" | "teaser" = "single",
+  executionStatus: "paper" | "executed" = "paper"
 ): void {
   const storedContract = contract.map((item, index) => ({ ...item, sourceQuoteId: `${id}:quote:${index}` }));
   const market = playType === "single" ? contract[0]?.market ?? "spread" : playType;
@@ -45,12 +52,32 @@ function add(
     legs: storedContract
   };
   db.prepare(`INSERT INTO plays
-    (id, contract_json, forecast_json, season, week, game_id, play_type, market, status, stake_cents)
-    VALUES (?, ?, ?, 2026, ?, ?, ?, ?, ?, ?)`)
-    .run(id, JSON.stringify(storedContract), JSON.stringify(forecast), week, gameId, playType, market, status, units * 2_500);
+    (id, contract_json, forecast_json, season, week, game_id, play_type, market, status, stake_cents, execution_status)
+    VALUES (?, ?, ?, 2026, ?, ?, ?, ?, ?, ?, ?)`)
+    .run(id, JSON.stringify(storedContract), JSON.stringify(forecast), week, gameId, playType, market, status, units * 2_500, executionStatus);
 }
 
 describe("atomic shared-card portfolio guard", () => {
+  it("makes execution status immutable and cash confirmation approval-bound", () => {
+    const db = database();
+    add(db, "paper", "card", 1, [{ gameId: "g1", market: "spread" }]);
+    expect(() => db.prepare("UPDATE plays SET execution_status = 'executed' WHERE id = 'paper'").run())
+      .toThrow(/immutable/i);
+    expect(() => db.prepare("UPDATE plays SET status = 'placed', cash_placement_confirmed = 1 WHERE id = 'paper'").run())
+      .toThrow(/cash placement|placed status/i);
+
+    add(db, "cash", "research", 1, [{ gameId: "g2", market: "spread" }], 1, "single", "executed");
+    db.prepare("UPDATE plays SET gabe_approved = 1, jarrett_approved = 1, status = 'card' WHERE id = 'cash'").run();
+    db.prepare("UPDATE plays SET status = 'placed', cash_placement_confirmed = 1 WHERE id = 'cash'").run();
+    const saved = db.prepare("SELECT status, cash_placement_confirmed FROM plays WHERE id = 'cash'").get() as {
+      status: string; cash_placement_confirmed: number;
+    };
+    expect(saved).toEqual({ status: "placed", cash_placement_confirmed: 1 });
+    expect(() => db.prepare("UPDATE plays SET cash_placement_confirmed = 0 WHERE id = 'cash'").run())
+      .toThrow(/immutable/i);
+    db.close();
+  });
+
   it("blocks an approval without complete frozen forecast provenance", () => {
     const db = database();
     add(db, "missing-provenance", "research", 1, [{ gameId: "g1", market: "spread" }]);

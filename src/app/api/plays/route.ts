@@ -37,6 +37,8 @@ const createPlaySchema = z.object({
   confidence: z.enum(["watch", "lean", "play", "best"]),
   statsCase: z.string().trim().min(8).max(500),
   footballCase: z.string().trim().min(3).max(500),
+  executionStatus: z.enum(["paper", "executed"]),
+  cashPlacementConfirmed: z.boolean().default(false),
   status: z.enum(["research", "card"]).default("card")
 });
 
@@ -73,6 +75,7 @@ export async function POST(request: Request) {
       americanOdds: input.americanOdds, stakeDollars: input.stakeDollars,
       primaryReason: input.primaryReason, modelEdgePp: input.modelEdgePp,
       estimatedEvPercent: input.estimatedEvPercent ?? null,
+      executionStatus: input.executionStatus,
       contract: input.contract, statsCase: input.statsCase, footballCase: input.footballCase
     });
     const play: WeeklyPlay = {
@@ -97,8 +100,8 @@ export async function POST(request: Request) {
       confidence: input.confidence,
       statsCase: input.statsCase,
       footballCase: input.footballCase,
-      executionStatus: "paper",
-      cashPlacementConfirmed: false,
+      executionStatus: input.executionStatus,
+      cashPlacementConfirmed: input.cashPlacementConfirmed,
       status: "research",
       result: "pending",
       profitCents: 0,

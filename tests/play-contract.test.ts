@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   cashPlacementEligibilityError,
+  executionApprovalConfirmationError,
+  higherEvPaperAlternative,
   forecastApprovalEligibilityError,
   storedLegMatchesSource,
   validateStoredPlayContract,
@@ -174,10 +176,33 @@ describe("stored shared-card contract integrity", () => {
       contract: [leg("g1")]
     };
     const kickoffs = new Map([["g1", "2026-09-13T20:00:00.000Z"]]);
-    expect(cashPlacementEligibilityError(card, "2026-09-13T19:59:59.999Z", kickoffs)).toBeNull();
+    expect(cashPlacementEligibilityError(card, "2026-09-13T19:59:59.999Z", kickoffs)).toMatch(/paper card/i);
+    expect(cashPlacementEligibilityError({ ...card, executionStatus: "executed" }, "2026-09-13T19:59:59.999Z", kickoffs)).toBeNull();
     expect(cashPlacementEligibilityError({ ...card, approvals: ["gabe"] }, "2026-09-13T19:00:00.000Z", kickoffs)).toMatch(/both teammates/i);
-    expect(cashPlacementEligibilityError(card, "2026-09-13T20:00:00.000Z", kickoffs)).toMatch(/before kickoff/i);
-    expect(cashPlacementEligibilityError({ ...card, status: "settled", result: "win" }, "2026-09-13T19:00:00.000Z", kickoffs)).toMatch(/open/i);
+    expect(cashPlacementEligibilityError({ ...card, executionStatus: "executed" }, "2026-09-13T20:00:00.000Z", kickoffs)).toMatch(/before kickoff/i);
+    expect(cashPlacementEligibilityError({ ...card, executionStatus: "executed", status: "settled", result: "win" }, "2026-09-13T19:00:00.000Z", kickoffs)).toMatch(/open/i);
     expect(cashPlacementEligibilityError({ ...card, status: "placed", executionStatus: "executed", cashPlacementConfirmed: true }, "2026-09-13T21:00:00.000Z", kickoffs)).toBeNull();
+  });
+
+  it("binds paper versus executed status to the approval revision", () => {
+    expect(executionApprovalConfirmationError("paper", false, false)).toBeNull();
+    expect(executionApprovalConfirmationError("paper", false, true)).toBeNull();
+    expect(executionApprovalConfirmationError("paper", true, true)).toMatch(/only for an executed/i);
+    expect(executionApprovalConfirmationError("executed", true, false)).toMatch(/second approval/i);
+    expect(executionApprovalConfirmationError("executed", false, true)).toMatch(/must confirm cash/i);
+    expect(executionApprovalConfirmationError("executed", true, true)).toBeNull();
+  });
+
+  it("selects only a strictly higher-EV paper contract with a different frozen source", () => {
+    expect(higherEvPaperAlternative(0.04, ["mgm"], [
+      { book: "betmgm", expectedValue: 0.04, sourceQuoteIds: ["mgm"] },
+      { book: "fanduel", expectedValue: 0.06, sourceQuoteIds: ["fd"] }
+    ])).toMatchObject({ book: "fanduel", expectedValue: 0.06 });
+    expect(higherEvPaperAlternative(0.04, ["mgm"], [
+      { book: "fanduel", expectedValue: 0.04, sourceQuoteIds: ["fd"] }
+    ])).toBeNull();
+    expect(higherEvPaperAlternative(0.04, ["mgm"], [
+      { book: "fanduel", expectedValue: 0.07, sourceQuoteIds: ["mgm"] }
+    ])).toBeNull();
   });
 });

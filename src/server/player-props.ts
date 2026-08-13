@@ -321,7 +321,9 @@ async function board(
   const candidates = scanMarketConfirmedProps(quotes, {
     minimumReferenceBooks: structuralConfig.props.minimumReferenceBooks,
     minimumExpectedValue: structuralConfig.props.minimumExpectedValue,
-    maximumPerBook: structuralConfig.props.maximumPerBook,
+    // Preserve every qualified exact execution contract for authoritative
+    // paper-book comparison; the rendered board independently caps suggestions at three.
+    maximumPerBook: quotes.length,
     maximumSnapshotSkewMs: structuralConfig.props.maximumSnapshotSkewMinutes * 60_000,
     maximumQuoteAgeMs: structuralConfig.props.maximumQuoteAgeMinutes * 60_000,
     now,

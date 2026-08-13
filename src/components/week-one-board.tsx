@@ -205,6 +205,7 @@ export function WeekOneBoard() {
   const [slipMode, setSlipMode] = useState<SlipMode>("parlay");
   const [reason, setReason] = useState("model-price");
   const [stake, setStake] = useState(25);
+  const [executionStatus, setExecutionStatus] = useState<"paper" | "executed">("paper");
   const [plays, setPlays] = useState<WeeklyPlay[]>([]);
   const [message, setMessage] = useState("Select any price cell to add it to the slip.");
   const [intelligence, setIntelligence] = useState<DecisionBoardPayload | null>(null);
@@ -396,11 +397,7 @@ export function WeekOneBoard() {
     });
   }
 
-  function toggleLine(line: LiveLine, matchup: string, mode: SlipMode = slipMode) {
-    if (mode === "teaser") {
-      setMessage("Use a highlighted six-point teaser leg under Picks.");
-      return;
-    }
+  function mainlineLeg(line: LiveLine, matchup: string): SelectedLeg {
     const gameIntel = intelligence?.games.find((game) => game.gameId === line.gameId);
     const projection = gameIntel?.projections.find((item) => item.book === line.book);
     const totalProjection = gameIntel?.totals.find((item) => item.book === line.book);
@@ -413,9 +410,11 @@ export function WeekOneBoard() {
       edgeInterval = projection.edgeInterval
         ? line.side === projection.homeTeam ? projection.edgeInterval : [-projection.edgeInterval[1], -projection.edgeInterval[0]]
         : null;
+      pushProbability = projection.pushProbability ?? undefined;
     } else if (line.market === "total" && totalProjection?.shrunkProbability !== null && totalProjection?.shrunkProbability !== undefined && totalProjection.lean.toLowerCase() === line.side.toLowerCase()) {
       shrunkProbability = totalProjection.shrunkProbability;
       edgeInterval = totalProjection.edgeInterval;
+      pushProbability = totalProjection.pushProbability ?? undefined;
     } else if (line.market === "moneyline" && moneylineProjection?.shrunkHomeProbability !== null && moneylineProjection?.shrunkHomeProbability !== undefined) {
       shrunkProbability = line.side === moneylineProjection.homeTeam ? moneylineProjection.shrunkHomeProbability : 1 - moneylineProjection.shrunkHomeProbability;
       edgeInterval = moneylineProjection.edgeInterval
@@ -423,11 +422,7 @@ export function WeekOneBoard() {
         : null;
       pushProbability = moneylineProjection.tieProbability ?? undefined;
     }
-    if (line.market === "spread") pushProbability = projection?.pushProbability ?? undefined;
-    if (line.market === "total") pushProbability = totalProjection?.pushProbability ?? undefined;
-    const sized = recommendation(shrunkProbability, line.americanPrice, edgeInterval);
-    if (sized?.included) setStake(sized.suggestedUnits * 25);
-    addLeg({
+    return {
       id: line.id, sourceQuoteId: line.id, thesisKey: `${line.gameId}:${line.market}`, kind: "mainline", gameId: line.gameId, book: line.book, market: line.market, side: line.side,
       point: line.point, americanPrice: line.americanPrice, fairProbability: line.fairProbability,
       matchup, selection: lineSelection(line), detail: `${marketTitle(line.market)} · ${formatOdds(line.americanPrice)}`,
@@ -437,7 +432,18 @@ export function WeekOneBoard() {
         Math.max(0.001, line.fairProbability + edgeInterval[0]),
         Math.min(0.999, line.fairProbability + edgeInterval[1])
       ]
-    }, mode);
+    };
+  }
+
+  function toggleLine(line: LiveLine, matchup: string, mode: SlipMode = slipMode) {
+    if (mode === "teaser") {
+      setMessage("Use a highlighted six-point teaser leg under Picks.");
+      return;
+    }
+    const leg = mainlineLeg(line, matchup);
+    const sized = straightLegSizing(leg);
+    if (sized?.included) setStake(sized.suggestedUnits * 25);
+    addLeg(leg, mode);
   }
 
   function addWeeklyOpportunity(candidate: MainlineRecommendation) {
@@ -451,7 +457,11 @@ export function WeekOneBoard() {
   function addProp(prop: PropCandidate, matchup: string) {
     setSlipMode("straight");
     setStake(prop.suggestedUnits * 25);
-    addLeg({
+    addLeg(propLeg(prop, matchup), "straight");
+  }
+
+  function propLeg(prop: PropCandidate, matchup: string): SelectedLeg {
+    return {
       id: prop.id, sourceQuoteId: prop.sourceQuoteId, thesisKey: `${prop.gameId}:prop:${prop.market}:${prop.player.toLowerCase()}`, kind: "prop", gameId: prop.gameId, book: prop.executionBook, market: "prop", side: prop.side,
       point: prop.point, americanPrice: prop.americanPrice, fairProbability: prop.executionFairProbability,
       matchup, selection: `${prop.player} ${prop.side} ${prop.point}`,
@@ -460,7 +470,7 @@ export function WeekOneBoard() {
         Math.max(0.001, prop.executionFairProbability + prop.edgeInterval[0]),
         Math.min(0.999, prop.executionFairProbability + prop.edgeInterval[1])
       ]
-    }, "straight");
+    };
   }
 
   function addTeaser(candidate: TeaserCandidate, matchup: string) {
@@ -478,8 +488,8 @@ export function WeekOneBoard() {
     }, "teaser");
   }
 
-  function addTeaserPair(pair: TeaserPairCandidate) {
-    const legs = pair.legs.flatMap<SelectedLeg>((candidate) => {
+  function teaserPairLegs(pair: TeaserPairCandidate): SelectedLeg[] {
+    return pair.legs.flatMap<SelectedLeg>((candidate) => {
       const line = lines.find((item) => item.gameId === candidate.gameId && item.book === candidate.book && item.market === "spread" && item.side === candidate.team);
       const matchup = matchups.find((game) => game.id === candidate.gameId);
       if (!line || !matchup || candidate.fairProbability === null || candidate.pushProbability === null) return [];
@@ -494,6 +504,10 @@ export function WeekOneBoard() {
         pushProbabilityMembers: candidate.pushProbabilityMembers ?? undefined
       }];
     });
+  }
+
+  function addTeaserPair(pair: TeaserPairCandidate) {
+    const legs = teaserPairLegs(pair);
     if (legs.length !== 2) return;
     setSlipMode("teaser");
     setSlipOpen(true);
@@ -503,8 +517,65 @@ export function WeekOneBoard() {
     setMessage(`Push-adjusted ${bookNames[pair.book]} teaser pair loaded. Confirm the offered price before saving.`);
   }
 
+  function bestPaperEquivalent(leg: SelectedLeg, targetBook?: LineBookKey): SelectedLeg | null {
+    if (leg.kind === "mainline") {
+      const equivalent = lines
+        .filter((line) => line.gameId === leg.gameId && line.market === leg.market && line.side.toLowerCase() === leg.side.toLowerCase() && (!targetBook || line.book === targetBook))
+        .map((line) => mainlineLeg(line, leg.matchup))
+        .filter((candidate) => candidate.edge !== null && candidate.probabilityInterval)
+        .sort((left, right) => legExpectedValuePercent(right) - legExpectedValuePercent(left));
+      return equivalent[0] ?? null;
+    }
+    if (leg.kind === "prop") {
+      const equivalent = Object.values(propBoards).filter(playerPropBoardIsActionable).flatMap((board) => board.candidates)
+        .filter((candidate) => `${candidate.gameId}:prop:${candidate.market}:${candidate.player.toLowerCase()}` === leg.thesisKey && (!targetBook || candidate.executionBook === targetBook))
+        .sort((left, right) => right.lowerBoundExpectedValue - left.lowerBoundExpectedValue || right.expectedValue - left.expectedValue);
+      return equivalent[0] ? propLeg(equivalent[0], leg.matchup) : null;
+    }
+    return null;
+  }
+
+  function normalizedPaperSlip(): SelectedLeg[] {
+    if (slipMode === "straight") return slip.map((leg) => bestPaperEquivalent(leg) ?? leg);
+    if (slipMode === "parlay") {
+      const alternatives = (["betmgm", "fanduel"] as const).flatMap((candidateBook) => {
+        const candidate = slip.map((leg) => bestPaperEquivalent(leg, candidateBook));
+        return candidate.every((leg): leg is SelectedLeg => leg !== null)
+          ? [{ legs: candidate, ev: slipExpectedValuePercent(candidate) }]
+          : [];
+      }).sort((left, right) => right.ev - left.ev);
+      return alternatives[0]?.legs ?? slip;
+    }
+    const selectedTheses = [...slip.map((leg) => `${leg.gameId}:${leg.side}`)].sort().join("|");
+    const alternatives = (intelligence?.teaserPairs ?? []).flatMap((pair) => {
+      const pairTheses = [...pair.legs.map((leg) => `${leg.gameId}:${leg.team}`)].sort().join("|");
+      if (pairTheses !== selectedTheses) return [];
+      const decision = priceTwoTeamTeaserDecision(pair.legs.map((leg) => ({
+        conditionalWinProbability: leg.fairProbability!, pushProbability: leg.pushProbability!,
+        probabilityMembers: leg.probabilityMembers!, pushProbabilityMembers: leg.pushProbabilityMembers!
+      })), teaserPrice);
+      return decision ? [{ pair, expectedValue: decision.expectedValue }] : [];
+    }).sort((left, right) => right.expectedValue - left.expectedValue);
+    return alternatives[0] ? teaserPairLegs(alternatives[0].pair) : slip;
+  }
+
+  function sameSlipContract(left: readonly SelectedLeg[], right: readonly SelectedLeg[]): boolean {
+    return left.length === right.length && left.every((leg, index) =>
+      leg.sourceQuoteId === right[index]?.sourceQuoteId && leg.point === right[index]?.point && leg.americanPrice === right[index]?.americanPrice
+    );
+  }
+
   async function saveSlip() {
     if (!slip.length || !slate) return;
+    if (executionStatus === "paper") {
+      const normalized = normalizedPaperSlip();
+      if (!sameSlipContract(slip, normalized)) {
+        setSlip(normalized);
+        if (new Set(normalized.map((leg) => leg.book)).size === 1) setBook(normalized[0].book);
+        setMessage("Paper card moved to the highest-EV supported book contract. Review the changed point and price, then approve again.");
+        return;
+      }
+    }
     if (slipMode === "parlay" && slip.length < 2) {
       setMessage("A parlay needs at least two legs. Switch to Straights or add another line.");
       return;
@@ -561,6 +632,7 @@ export function WeekOneBoard() {
             ...entry,
             week: slate.week,
             primaryReason: reason, stakeDollars: stake,
+            executionStatus, cashPlacementConfirmed: false,
             confidence: "play", footballCase: "The team selected this exact contract from the shared decision board.", status: "card"
           })
         });
@@ -592,7 +664,7 @@ export function WeekOneBoard() {
       const response = await fetch("/api/plays", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(exactContractApprovalRequest(play))
+        body: JSON.stringify(exactContractApprovalRequest(play, play.executionStatus === "executed"))
       });
       const data = await response.json() as { play?: WeeklyPlay; error?: string };
       if (!response.ok || !data.play) throw new Error(data.error ?? "Approval failed");
@@ -845,6 +917,7 @@ export function WeekOneBoard() {
         })}</div>}
         {slipMode === "teaser" && <div className="teaser-price"><span>OFFERED 2-TEAM PRICE</span><div>{structuralConfig.teasers.selectableAmericanPrices.map((price) => <button className={teaserPrice === price ? "active" : ""} onClick={() => setTeaserPrice(price)} key={price}>{price}</button>)}</div><small>Confirm the live book price. A teaser is blocked when estimated EV is negative.</small></div>}
         <div className="reason-clicks"><span>WHY</span>{pickReasons.slice(0, 8).map((item) => <button className={reason === item.value ? "active" : ""} onClick={() => setReason(item.value)} key={item.value}>{item.label.replace("Model disagrees with market price", "Model edge").replace("Opponent-adjusted efficiency matchup", "Efficiency").replace("Turnover or scoring regression", "Regression").replace("Personnel or injury advantage", "Personnel").replace("Coaching or scheme matchup", "Scheme").replace("Role clarity / team chemistry", "Chemistry").replace("Better number / key-number value", "Key number").replace("Pace / scoring environment", "Pace")}</button>)}</div>
+        <div className="execution-clicks"><span>RECORD AS</span><button className={executionStatus === "paper" ? "active" : ""} onClick={() => setExecutionStatus("paper")}>Paper</button><button className={executionStatus === "executed" ? "active" : ""} onClick={() => setExecutionStatus("executed")}>Cash</button></div>
         <div className="stake-clicks"><span>STAKE</span>{[12.5, 25, 37.5, 50].map((value) => <button className={stake === value ? "active" : ""} onClick={() => setStake(value)} key={value}>{value / 25}u</button>)}</div>
         <div className={`portfolio-meter ${portfolioConflicts.length ? "conflict" : ""}`}>
           <div><span>WEEK CARD</span><b>{portfolio.usedUnits.toFixed(1)} / {structuralConfig.sizing.maximumWeekUnits}u</b></div>
@@ -872,9 +945,9 @@ export function WeekOneBoard() {
           <small className="contract-preview">{play.legs}</small>
           <div className="card-approval-row">
             <span className={isTeamApproved(play.approvals) ? "team-approved" : "team-awaiting"}>{play.approvals?.includes("gabe") ? "G✓" : "G—"} · {play.approvals?.includes("jarrett") ? "J✓" : "J—"}</span>
-            {awaitingMe && <button onClick={() => approvePending(play)}>Approve</button>}
+            {awaitingMe && <button onClick={() => approvePending(play)}>{play.executionStatus === "executed" ? "Cash placed + approve" : "Approve"}</button>}
           </div>
-          <small>{play.book} {formatOdds(play.americanOdds)} · ${(play.stakeCents / 100).toFixed(0)}</small>
+          <small>{play.executionStatus === "executed" ? "CASH" : "PAPER"} · {play.book} {formatOdds(play.americanOdds)} · ${(play.stakeCents / 100).toFixed(0)}</small>
         </article>;
       })}
       <Link href="/records">Season record →</Link>

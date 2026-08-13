@@ -1,7 +1,7 @@
 import { buildDecisionBoard } from "./decision-board";
 import { getPlayerPropBoard } from "./player-props";
 import { stableHash } from "@/domain/hash";
-import { expectedValueWithPush } from "@/domain/odds";
+import { americanToDecimal, expectedValueWithPush, impliedToAmerican } from "@/domain/odds";
 import { authoritativeContractExpectedValue, authoritativeEquivalentEdgeCents, priceIndependentParlayDecision } from "@/domain/forecast-value";
 import { priceTwoTeamTeaserDecision } from "@/domain/decision-board";
 import { sizeKelly } from "@/domain/sizing";
@@ -14,6 +14,8 @@ import type {
   StoredPlayLeg,
   WeeklyPlay
 } from "@/domain/play-card";
+import { higherEvPaperAlternative } from "@/domain/play-card";
+import type { PropCandidate, PropMarketKey } from "@/domain/decision-board";
 
 interface QuoteRow {
   id: string;
@@ -31,11 +33,136 @@ interface PropQuoteRow {
   id: string;
   game_id: string;
   book: "betmgm" | "fanduel";
+  market: PropMarketKey;
+  player: string;
   side: string;
   point: number;
   american_price: number;
   captured_at: string;
   source_hash: string;
+}
+
+function propSnapshot(candidate: PropCandidate, quote: PropQuoteRow): PlayForecastLegSnapshot {
+  return {
+    sourceQuoteId: quote.id,
+    gameId: quote.game_id,
+    market: "prop",
+    side: quote.side,
+    point: quote.point,
+    americanPrice: quote.american_price,
+    book: quote.book,
+    capturedAt: quote.captured_at,
+    sourceHash: quote.source_hash,
+    marketProbability: candidate.executionFairProbability,
+    modelProbability: candidate.modelProbability,
+    betProbability: candidate.betProbability,
+    pushProbability: 0,
+    uncertaintyInterval: probabilityInterval(candidate.executionFairProbability, candidate.edgeInterval),
+    uncertaintyMembers: null,
+    pushProbabilityMembers: null,
+    expectedValue: candidate.expectedValue,
+    preferenceConflict: false
+  };
+}
+
+function combinedAmericanPrice(legs: readonly PlayForecastLegSnapshot[]): number {
+  const decimal = legs.reduce((product, leg) => product * americanToDecimal(leg.americanPrice), 1);
+  return Math.round(impliedToAmerican(1 / decimal));
+}
+
+export function bestPaperContractError(input: {
+  play: Pick<WeeklyPlay, "playType" | "americanOdds" | "contract" | "executionStatus">;
+  legs: readonly PlayForecastLegSnapshot[];
+  board: Awaited<ReturnType<typeof buildDecisionBoard>>;
+  lineRows: readonly QuoteRow[];
+  propRows: readonly PropQuoteRow[];
+  propBoards: ReadonlyMap<string, Awaited<ReturnType<typeof getPlayerPropBoard>>>;
+}): string | null {
+  if (input.play.executionStatus !== "paper") return null;
+  const contract = input.play.contract ?? [];
+  const currentExpectedValue = authoritativeContractExpectedValue({
+    playType: input.play.playType,
+    americanOdds: input.play.americanOdds,
+    legs: input.legs
+  });
+  if (currentExpectedValue === null) return null;
+  const propById = new Map(input.propRows.map((quote) => [quote.id, quote]));
+  const equivalentAtBook = (leg: StoredPlayLeg, book: "betmgm" | "fanduel"): PlayForecastLegSnapshot | null => {
+    if (leg.market !== "prop") {
+      const quote = input.lineRows.find((row) =>
+        row.game_id === leg.gameId && row.book === book && row.market === leg.market &&
+        row.side.trim().toLowerCase() === leg.side.trim().toLowerCase()
+      );
+      if (!quote) return null;
+      return mainlineSnapshot({
+        leg: { ...leg, sourceQuoteId: quote.id, point: quote.point, americanPrice: quote.american_price },
+        quote,
+        board: input.board
+      });
+    }
+    const selectedQuote = leg.sourceQuoteId ? propById.get(leg.sourceQuoteId) : null;
+    const propBoard = input.propBoards.get(leg.gameId);
+    if (!selectedQuote || !playerPropBoardIsActionable(propBoard)) return null;
+    const candidate = propBoard?.candidates.find((item) => {
+      const quote = propById.get(item.sourceQuoteId);
+      return item.executionBook === book && quote?.market === selectedQuote.market &&
+        quote.player === selectedQuote.player && quote.side === selectedQuote.side && quote.point === selectedQuote.point;
+    });
+    const quote = candidate ? propById.get(candidate.sourceQuoteId) : null;
+    return candidate && quote ? propSnapshot(candidate, quote) : null;
+  };
+  if (input.play.playType === "teaser") {
+    const alternatives = (["betmgm", "fanduel"] as const).flatMap((book) => {
+      const teaserLegs = contract.map((leg) => input.board.games
+        .find((game) => game.gameId === leg.gameId)?.teasers
+        .find((candidate) => candidate.book === book && candidate.team === leg.side && candidate.teasedPoint === leg.point));
+      if (!teaserLegs.every((leg): leg is NonNullable<typeof leg> =>
+        leg !== undefined && leg.fairProbability !== null && leg.pushProbability !== null &&
+        leg.probabilityMembers?.length === structuralConfig.model.bootstrapMembers &&
+        leg.pushProbabilityMembers?.length === structuralConfig.model.bootstrapMembers
+      )) return [];
+      const sourceQuoteIds = teaserLegs.map((leg) => input.lineRows.find((quote) =>
+        quote.game_id === leg.gameId && quote.book === book && quote.market === "spread" && quote.side === leg.team
+      )?.id ?? "");
+      if (sourceQuoteIds.some((id) => !id)) return [];
+      const decision = priceTwoTeamTeaserDecision(teaserLegs.map((leg) => ({
+        conditionalWinProbability: leg.fairProbability!, pushProbability: leg.pushProbability!,
+        probabilityMembers: leg.probabilityMembers!, pushProbabilityMembers: leg.pushProbabilityMembers!
+      })), input.play.americanOdds);
+      return decision ? [{ book, expectedValue: decision.expectedValue, sourceQuoteIds }] : [];
+    });
+    const best = higherEvPaperAlternative(currentExpectedValue, input.legs.map((leg) => leg.sourceQuoteId), alternatives);
+    return best
+      ? `Paper entries use the higher-EV available ${best.book === "betmgm" ? "BetMGM" : "FanDuel"} teaser contract. Refresh the slip and approve the new revision.`
+      : null;
+  }
+  if (input.play.playType === "single") {
+    const alternatives = (["betmgm", "fanduel"] as const).flatMap((book) => {
+      const leg = equivalentAtBook(contract[0], book);
+      return leg?.expectedValue === null || leg?.expectedValue === undefined ? [] : [{ book, leg, expectedValue: leg.expectedValue }];
+    });
+    const selected = higherEvPaperAlternative(currentExpectedValue, input.legs.map((leg) => leg.sourceQuoteId), alternatives.map((item) => ({
+      book: item.book, expectedValue: item.expectedValue, sourceQuoteIds: [item.leg.sourceQuoteId]
+    })));
+    const best = selected ? alternatives.find((item) => item.book === selected.book && item.leg.sourceQuoteId === selected.sourceQuoteIds[0]) : null;
+    if (best) {
+      return `Paper entries use the higher-EV available ${best.book === "betmgm" ? "BetMGM" : "FanDuel"} contract. Refresh the slip and approve the new revision.`;
+    }
+    return null;
+  }
+  const alternatives = (["betmgm", "fanduel"] as const).flatMap((book) => {
+    const legs = contract.map((leg) => equivalentAtBook(leg, book));
+    if (!legs.every((leg): leg is PlayForecastLegSnapshot => leg !== null)) return [];
+    const americanOdds = combinedAmericanPrice(legs);
+    const expectedValue = authoritativeContractExpectedValue({ playType: "parlay", americanOdds, legs });
+    return expectedValue === null ? [] : [{ book, legs, expectedValue }];
+  });
+  const best = higherEvPaperAlternative(currentExpectedValue, input.legs.map((leg) => leg.sourceQuoteId), alternatives.map((item) => ({
+    book: item.book, expectedValue: item.expectedValue, sourceQuoteIds: item.legs.map((leg) => leg.sourceQuoteId)
+  })));
+  return best
+    ? `Paper entries use the higher-EV available ${best.book === "betmgm" ? "BetMGM" : "FanDuel"} parlay contract. Refresh the slip and approve the new revision.`
+    : null;
 }
 
 function clamp(value: number): number {
@@ -142,7 +269,7 @@ function mainlineSnapshot(input: {
 
 export async function capturePlayForecastSnapshot(
   db: D1Database,
-  play: Pick<WeeklyPlay, "week" | "playType" | "americanOdds" | "contract" | "estimatedEvPercent" | "modelEdgePp">
+  play: Pick<WeeklyPlay, "week" | "playType" | "americanOdds" | "contract" | "estimatedEvPercent" | "modelEdgePp" | "executionStatus">
 ): Promise<PlayForecastSnapshot> {
   const contract = play.contract ?? [];
   const board = await buildDecisionBoard(db, { week: play.week });
@@ -155,9 +282,9 @@ export async function capturePlayForecastSnapshot(
   const quoteById = new Map(lineResult.results.map((quote) => [quote.id, quote]));
   const propLegs = contract.filter((leg) => leg.market === "prop");
   const propResult = propLegs.length
-    ? await db.prepare(`SELECT id, game_id, book, side, point, american_price, captured_at, source_hash
-        FROM player_prop_quotes WHERE id IN (${propLegs.map(() => "?").join(", ")})`)
-      .bind(...propLegs.map((leg) => leg.sourceQuoteId)).all<PropQuoteRow>()
+    ? await db.prepare(`SELECT id, game_id, book, market, player, side, point, american_price, captured_at, source_hash
+        FROM player_prop_quotes WHERE game_id IN (${placeholders})`)
+      .bind(...gameIds).all<PropQuoteRow>()
     : { results: [] as PropQuoteRow[] };
   const propById = new Map(propResult.results.map((quote) => [quote.id, quote]));
   const propBoards = new Map<string, Awaited<ReturnType<typeof getPlayerPropBoard>>>();
@@ -176,29 +303,18 @@ export async function capturePlayForecastSnapshot(
     const candidate = playerPropBoardIsActionable(propBoard)
       ? propBoard?.candidates.find((item) => item.sourceQuoteId === quote.id)
       : undefined;
-    return {
-      sourceQuoteId: quote.id,
-      gameId: quote.game_id,
-      market: "prop",
-      side: quote.side,
-      point: quote.point,
-      americanPrice: quote.american_price,
-      book: quote.book,
-      capturedAt: quote.captured_at,
-      sourceHash: quote.source_hash,
-      marketProbability: candidate?.executionFairProbability ?? null,
-      modelProbability: candidate?.modelProbability ?? null,
-      betProbability: candidate?.betProbability ?? null,
-      pushProbability: 0,
-      uncertaintyInterval: candidate?.edgeInterval
-        ? probabilityInterval(candidate.executionFairProbability, candidate.edgeInterval)
-        : null,
-      uncertaintyMembers: null,
-      pushProbabilityMembers: null,
-      expectedValue: candidate?.expectedValue ?? null,
+    return candidate ? propSnapshot(candidate, quote) : {
+      sourceQuoteId: quote.id, gameId: quote.game_id, market: "prop", side: quote.side, point: quote.point,
+      americanPrice: quote.american_price, book: quote.book, capturedAt: quote.captured_at, sourceHash: quote.source_hash,
+      marketProbability: null, modelProbability: null, betProbability: null, pushProbability: 0,
+      uncertaintyInterval: null, uncertaintyMembers: null, pushProbabilityMembers: null, expectedValue: null,
       preferenceConflict: false
     };
   });
+  const paperError = bestPaperContractError({
+    play, legs, board, lineRows: lineResult.results, propRows: propResult.results, propBoards
+  });
+  if (paperError) throw new Error(paperError);
   const consensusSnapshotId = stableHash({
     boardGeneratedAt: board.generatedAt,
     championHash: board.championHash,

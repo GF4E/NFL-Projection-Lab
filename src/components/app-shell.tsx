@@ -22,10 +22,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
       <div className="workspace">
-        <header className="topbar">
-          <div><span className="eyebrow">2026 PROJECTION LAB</span><strong>Week 01 · shared board</strong></div>
-          <div className="top-status"><span>16 matchups</span><span>1u = $25</span><button aria-label="Two teammates">2</button></div>
-        </header>
         <main>{children}</main>
       </div>
     </div>

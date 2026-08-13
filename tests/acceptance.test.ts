@@ -1008,11 +1008,13 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
       americanOdds: pending.americanOdds,
       stakeDollars: pending.stakeCents / 100,
       contract: pending.contract,
+      executionStatus: pending.executionStatus,
+      cashPlacementConfirmed: false,
       status: "card"
     });
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(board).toContain("approvePending(play)");
-    expect(board).toContain("exactContractApprovalRequest(play)");
+    expect(board).toContain('exactContractApprovalRequest(play, play.executionStatus === "executed")');
     expect(board).toContain("awaitingMe &&");
   });
 
@@ -1185,15 +1187,32 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(route).toContain("seasonSchedule");
     expect(route).toContain("status: 409");
     expect(route).toContain("confirmCashPlacement");
-    expect(store).toContain("status = 'card' AND result = 'pending' AND gabe_approved = 1 AND jarrett_approved = 1");
+    expect(store).toContain("status = 'card' AND result = 'pending' AND execution_status = 'executed'");
+    expect(store).toContain("gabe_approved = 1 AND jarrett_approved = 1");
     expect(store).toContain("cash_placement_confirmed = 1");
+  });
+
+  it("46b. binds execution status and authoritative paper book selection to the shared revision", () => {
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    const route = readFileSync("src/app/api/plays/route.ts", "utf8");
+    const store = readFileSync("src/server/play-store.ts", "utf8");
+    const provenance = readFileSync("src/server/play-provenance.ts", "utf8");
+    expect(board).toContain('RECORD AS');
+    expect(board).toContain('executionStatus, cashPlacementConfirmed: false');
+    expect(board).toContain('Paper card moved to the highest-EV supported book contract');
+    expect(route).toContain('executionStatus: z.enum(["paper", "executed"])');
+    expect(route).toContain('executionStatus: input.executionStatus');
+    expect(store).toContain('executionApprovalConfirmationError');
+    expect(store).toContain('Execution status changed. Create a new revision');
+    expect(provenance).toContain('higherEvPaperAlternative');
+    expect(provenance).toContain('Paper entries use the higher-EV available');
   });
 
   it("47. preserves each best-book straight while keeping parlays and teasers single-book", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     const lineBoard = readFileSync("src/domain/line-board.ts", "utf8");
     expect(board).toContain("updateSlipSelections(current, leg, mode)");
-    expect(board).toContain('}, "straight")');
+    expect(board).toContain('addLeg(propLeg(prop, matchup), "straight")');
     expect(board).toContain("book: bookNames[leg.book]");
     expect(board).not.toContain("book: bookNames[slip[0].book], primaryReason");
     expect(lineBoard).toContain('if (mode === "straight") return');
