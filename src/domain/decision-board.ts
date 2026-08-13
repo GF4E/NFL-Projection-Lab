@@ -368,7 +368,9 @@ export interface DecisionBoardPayload {
   week: number;
   basisSeason: number | null;
   artifactHash: string | null;
+  configHash: string;
   championHash: string | null;
+  championStatus: "compatible" | "config_mismatch" | "unavailable";
   games: DecisionBoardGame[];
   teaserPairs: TeaserPairCandidate[];
   marketCoverage: Array<{

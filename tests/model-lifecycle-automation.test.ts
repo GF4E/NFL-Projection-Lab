@@ -7,6 +7,7 @@ import {
   versionLoopAStateHash
 } from "@/domain/model-lifecycle";
 import { aggregateRollingFeatureStates, missingLifecycleFeatureSeasons } from "@/server/model-lifecycle/automation";
+import { championConfigurationStatus } from "@/domain/model-version";
 import {
   buildLifecycleTeamContexts,
   buildLifecycleTrainingRows,
@@ -16,6 +17,11 @@ import {
 } from "@/server/model-lifecycle/training";
 
 describe("persisted weekly model lifecycle", () => {
+  it("withholds a champion whose logged config differs from the forecast config", () => {
+    expect(championConfigurationStatus("champion", "old", "current")).toBe("config_mismatch");
+    expect(championConfigurationStatus("champion", "current", "current")).toBe("compatible");
+    expect(championConfigurationStatus(null, null, "current")).toBe("unavailable");
+  });
   it("updates strength in season order and derives rolling state only through the completed week", () => {
     const states = updateTeamStates([], [
       { gameId: "new", season: 2025, week: 1, homeTeam: "SEA", awayTeam: "SF", actualHomeMargin: 8, consensusHomeExpectedMargin: 3, completedAt: "2025-09-01" },

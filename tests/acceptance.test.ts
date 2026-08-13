@@ -135,6 +135,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain('marketSource: "nflverse_consensus"');
   });
 
+  it("1f. never applies coefficient residuals from a champion logged under another config", () => {
+    const board = readFileSync("src/server/decision-board.ts", "utf8");
+    const automation = readFileSync("src/server/model-lifecycle/automation.ts", "utf8");
+    expect(board).toContain('championStatus === "compatible"');
+    expect(board).toContain("coefficient residual withheld pending a config-compatible logged champion");
+    expect(automation).toContain("preseasonConfigRunDue");
+    expect(automation).toContain("currentSeasonGames.length > 0 && championConfigMismatch");
+    expect(automation).toContain("frozen structural configuration changed after the regular season began");
+  });
+
   it("2. uses the power method for spread, total, favorite, underdog, and near-even markets", () => {
     for (const pair of [[-110, -110], [-105, -115], [-200, 170], [170, -200], [-101, -101]] as const) {
       const result = powerDevig(pair[0], pair[1]);

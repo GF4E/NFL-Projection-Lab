@@ -1,4 +1,4 @@
-import { eraConfig, structuralConfig } from "@/domain/config";
+import { structuralConfig } from "@/domain/config";
 import { stableHash } from "@/domain/hash";
 import {
   loopAStateMatchesRevision,
@@ -14,12 +14,14 @@ import {
   ensureModelLifecycleStore,
   getModelArtifact,
   getModelLifecycleState,
+  getLatestModelRunConfigHash,
   publishModelSystemAlert,
   publishLoopA,
   publishLoopB,
   resolveModelSystemAlerts,
   type StoredModelArtifact
 } from "./store";
+import { currentModelConfigurationHash } from "@/domain/model-version";
 import {
   buildLifecycleTeamContexts,
   buildLifecycleTrainingRows,
@@ -174,16 +176,38 @@ export async function runModelLifecycleAutomation(input: {
   const throughWeek = currentSeasonGames.length ? Math.max(...currentSeasonGames.map((game) => game.week)) : 0;
   const targetWeek = Math.min(18, throughWeek + 1);
   const lifecycle = await getModelLifecycleState(input.db, season);
+  const currentConfigHash = currentModelConfigurationHash();
+  const [configuredChampion, latestRunConfigHash] = await Promise.all([
+    lifecycle?.championHash ? getModelArtifact(input.db, lifecycle.championHash) : Promise.resolve(null),
+    getLatestModelRunConfigHash(input.db)
+  ]);
+  const championConfigMismatch = Boolean(configuredChampion && configuredChampion.metadata.configHash !== currentConfigHash);
   const clock = pacificParts(now);
   const initialize = !lifecycle?.championHash;
   const tuesday = clock.weekday === "Tue";
   const loopARevision = loopAStateRevision(structuralConfig.version, structuralConfig.model.strengthK);
   const loopADue = input.force || initialize || !loopAStateMatchesRevision(lifecycle?.loopAHash, loopARevision) ||
     (tuesday && (clock.hour > 6 || clock.hour === 6 && clock.minute >= 30) && (lifecycle?.loopAThroughWeek ?? -1) < throughWeek);
-  const loopBDue = input.force || initialize || (tuesday && clock.hour >= 7 && (lifecycle?.loopBTargetWeek ?? -1) < targetWeek);
+  const preseasonConfigRunDue = throughWeek === 0 && championConfigMismatch && latestRunConfigHash !== currentConfigHash;
+  const loopBDue = input.force || initialize || preseasonConfigRunDue ||
+    (tuesday && clock.hour >= 7 && ((lifecycle?.loopBTargetWeek ?? -1) < targetWeek || latestRunConfigHash !== currentConfigHash));
   let loopA: ModelLifecycleAutomationResult["loopA"] = "skipped";
   let loopB: ModelLifecycleAutomationResult["loopB"] = "skipped";
   let championHash = lifecycle?.championHash ?? null;
+
+  if (currentSeasonGames.length > 0 && championConfigMismatch) {
+    const message = "Model lifecycle aborted: frozen structural configuration changed after the regular season began";
+    await publishModelSystemAlert(input.db, {
+      id: `model-config-mismatch:${season}:${currentConfigHash.slice(0, 12)}`,
+      type: "pipeline_failure",
+      severity: "critical",
+      message,
+      idempotencyKey: `model-config-mismatch:${season}:${currentConfigHash}`,
+      createdAt: startedAt,
+      acknowledgedAt: null
+    });
+    return { status: "aborted", throughWeek, targetWeek, loopA: "skipped", loopB: "skipped", championHash, message };
+  }
 
   if (loopADue) {
     const completedGames: CompletedGame[] = completed.results.map((game) => ({
@@ -250,7 +274,7 @@ export async function runModelLifecycleAutomation(input: {
     if (rows.length < 3_000) throw new Error("Loop B aborted: model training rows are incomplete");
     const challenger = fitLifecycleChallenger(rows, Math.min(latestCompletedSeason, season - 1));
     const dataHash = stableHash(rows.map((row) => ({ id: row.id, outcome: row.outcome, push: row.push, weight: row.weight, features: row.features })));
-    const configHash = stableHash({ structuralConfig, eraConfig });
+    const configHash = currentConfigHash;
     const featureSchemaHash = stableHash(designFeatureNames(rows));
     const codeHash = stableHash("nfl-projection-lab:model-lifecycle:2026.2");
     const artifact: StoredModelArtifact = {

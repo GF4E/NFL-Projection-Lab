@@ -44,6 +44,7 @@ import { ensureQbOverrideStore, latestQbModelOverrides } from "./qb-overrides/st
 import { canonicalSpreadMarket, translateCanonicalSpreadForecast } from "@/domain/spread-contracts";
 import { frozenMarginArtifact } from "@/domain/frozen-margin";
 import type { DiscreteMarginArtifact } from "@/domain/types";
+import { championConfigurationStatus, currentModelConfigurationHash } from "@/domain/model-version";
 
 interface FeatureRow {
   game_id: string;
@@ -579,7 +580,7 @@ export async function buildDecisionBoard(
     getModelLifecycleState(db, slate.season),
     latestQbModelOverrides(db, activeGameIds)
   ]);
-  const championHash = lifecycle?.championHash ?? null;
+  const configuredChampionHash = lifecycle?.championHash ?? null;
   const featureRows = featureResult.results;
   const evidence = matchupEvidenceProvenance({
     rows: featureRows.map((row) => ({
@@ -613,8 +614,11 @@ export async function buildDecisionBoard(
     })),
     featureRows
   );
-  const championVersion = championHash ? await getModelArtifact(db, championHash) : null;
-  const championModel = championVersion?.artifact.model ?? null;
+  const configHash = currentModelConfigurationHash();
+  const championVersion = configuredChampionHash ? await getModelArtifact(db, configuredChampionHash) : null;
+  const championStatus = championConfigurationStatus(configuredChampionHash, championVersion?.metadata.configHash ?? null, configHash);
+  const championHash = championStatus === "compatible" ? configuredChampionHash : null;
+  const championModel = championStatus === "compatible" ? championVersion?.artifact.model ?? null : null;
   const artifact = frozenMarginArtifact;
   const lines = enrichWithPowerDevig(lineResult.results.map(rawLine));
   const sideEdgeNoise = historicalEdgeInterval(gameResult.results.map((row) => ({
@@ -982,10 +986,12 @@ export async function buildDecisionBoard(
     week: slate.week,
     basisSeason,
     artifactHash: artifact?.artifactHash ?? null,
+    configHash,
     championHash,
+    championStatus,
     games,
     teaserPairs,
     marketCoverage,
-    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K cumulative margin-versus-close strength; logged gated champion calibration; QB risk widens uncertainty while the rejected residual tier adjustment stays withheld unless an audited owner override exists; then 25% model and 75% power-de-vigged market shrinkage.`
+    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K cumulative margin-versus-close strength; ${championStatus === "compatible" ? "logged gated champion calibration" : "coefficient residual withheld pending a config-compatible logged champion"}; QB risk widens uncertainty while the rejected residual tier adjustment stays withheld unless an audited owner override exists; then 25% model and 75% power-de-vigged market shrinkage.`
   };
 }

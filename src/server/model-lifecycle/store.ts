@@ -31,6 +31,13 @@ interface LifecycleRow {
 interface ModelRow {
   model_json: string;
   metrics_json: string;
+  status: string;
+  data_hash: string;
+  config_hash: string;
+  feature_schema_hash: string;
+  code_hash: string;
+  created_at: string;
+  promoted_at: string | null;
 }
 
 const schema = [
@@ -191,12 +198,42 @@ export async function getActiveChampionHash(db: D1Database, season: number): Pro
 export async function getModelArtifact(db: D1Database, versionHash: string): Promise<{
   artifact: StoredModelArtifact;
   metrics: ModelMetrics;
+  metadata: {
+    status: string;
+    dataHash: string;
+    configHash: string;
+    featureSchemaHash: string;
+    codeHash: string;
+    createdAt: string;
+    promotedAt: string | null;
+  };
 } | null> {
   await ensureModelLifecycleStore(db);
-  const row = await db.prepare("SELECT model_json, metrics_json FROM model_versions WHERE version_hash = ?")
+  const row = await db.prepare(`SELECT model_json, metrics_json, status, data_hash, config_hash,
+      feature_schema_hash, code_hash, created_at, promoted_at
+    FROM model_versions WHERE version_hash = ?`)
     .bind(versionHash).first<ModelRow>();
   if (!row) return null;
-  return { artifact: JSON.parse(row.model_json) as StoredModelArtifact, metrics: JSON.parse(row.metrics_json) as ModelMetrics };
+  return {
+    artifact: JSON.parse(row.model_json) as StoredModelArtifact,
+    metrics: JSON.parse(row.metrics_json) as ModelMetrics,
+    metadata: {
+      status: row.status,
+      dataHash: row.data_hash,
+      configHash: row.config_hash,
+      featureSchemaHash: row.feature_schema_hash,
+      codeHash: row.code_hash,
+      createdAt: row.created_at,
+      promotedAt: row.promoted_at
+    }
+  };
+}
+
+export async function getLatestModelRunConfigHash(db: D1Database): Promise<string | null> {
+  await ensureModelLifecycleStore(db);
+  const row = await db.prepare("SELECT config_hash FROM model_run_log ORDER BY completed_at DESC LIMIT 1")
+    .first<{ config_hash: string }>();
+  return row?.config_hash ?? null;
 }
 
 export async function getTeamStrengthStates(db: D1Database, season: number): Promise<TeamState[]> {
