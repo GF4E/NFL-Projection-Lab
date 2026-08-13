@@ -1,15 +1,13 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import teamConfig from "../../../../config/team.config.json";
 import {
-  approvalActorForEmail,
   estimatedEvFromEdge,
   validateStoredPlayContract,
-  type PickedBy,
   type WeeklyPlay
 } from "@/domain/play-card";
 import { stableHash } from "@/domain/hash";
 import { addOrApprovePlay, listPlays } from "@/server/play-store";
+import { isTeamAuthenticationError, requestTeamMember } from "@/server/team-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -41,38 +39,30 @@ const createPlaySchema = z.object({
   status: z.enum(["research", "card"]).default("card")
 });
 
-function requestAuthor(request: Request): string {
-  return request.headers.get("oai-authenticated-user-email") ?? "owner-preview";
-}
-
-function requestActor(request: Request): PickedBy {
-  return approvalActorForEmail(
-    request.headers.get("oai-authenticated-user-email"),
-    teamConfig.members.jarrett.email
-  );
-}
-
 export async function GET(request: Request) {
   try {
+    const member = await requestTeamMember(request);
     const rawWeek = new URL(request.url).searchParams.get("week");
     const week = rawWeek === null ? undefined : Number(rawWeek);
     if (week !== undefined && (!Number.isInteger(week) || week < 1 || week > 18)) {
       return NextResponse.json({ error: "week must be an integer from 1 through 18" }, { status: 400 });
     }
-    return NextResponse.json({ plays: await listPlays(week), actor: requestActor(request) });
+    return NextResponse.json({ plays: await listPlays(week), actor: member.actor });
   } catch (error) {
+    if (isTeamAuthenticationError(error)) return NextResponse.json({ error: error.message }, { status: 401 });
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load plays" }, { status: 503 });
   }
 }
 
 export async function POST(request: Request) {
   try {
+    const member = await requestTeamMember(request);
     const input = createPlaySchema.parse(await request.json());
     const contractErrors = validateStoredPlayContract(input);
     if (contractErrors.length) {
       return NextResponse.json({ error: contractErrors[0] }, { status: 400 });
     }
-    const actor = requestActor(request);
+    const actor = member.actor;
     const now = new Date().toISOString();
     const contractKey = stableHash({
       season: 2026, week: input.week, gameId: input.gameId, playType: input.playType,
@@ -112,12 +102,13 @@ export async function POST(request: Request) {
       closingClvCents: null,
       closingClvPoints: null,
       clvReferenceBook: null,
-      createdBy: requestAuthor(request),
+      createdBy: member.email,
       createdAt: now,
       updatedAt: now
     };
     return NextResponse.json({ play: await addOrApprovePlay(play, actor) }, { status: 201 });
   } catch (error) {
+    if (isTeamAuthenticationError(error)) return NextResponse.json({ error: error.message }, { status: 401 });
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.issues[0]?.message ?? "Invalid play" }, { status: 400 });
     }

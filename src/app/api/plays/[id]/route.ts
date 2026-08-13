@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getPlay, updatePlayResult } from "@/server/play-store";
+import { isTeamAuthenticationError, requestTeamMember } from "@/server/team-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -17,6 +18,7 @@ function profitFor(stakeCents: number, americanOdds: number, result: "pending" |
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
+    await requestTeamMember(request);
     const { id } = await params;
     const input = updateSchema.parse(await request.json());
     const existing = await getPlay(id);
@@ -32,6 +34,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     });
     return NextResponse.json({ play });
   } catch (error) {
+    if (isTeamAuthenticationError(error)) return NextResponse.json({ error: error.message }, { status: 401 });
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.issues[0]?.message ?? "Invalid update" }, { status: 400 });
     }

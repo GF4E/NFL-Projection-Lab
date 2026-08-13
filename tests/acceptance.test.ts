@@ -703,11 +703,13 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   });
 
   it("36c. binds each approval to the authenticated teammate instead of a client-side toggle", () => {
-    expect(approvalActorForEmail("jwhi0802@YAHOO.com", "JWHI0802@yahoo.com")).toBe("jarrett");
-    expect(approvalActorForEmail("owner@example.com", "JWHI0802@yahoo.com")).toBe("gabe");
+    expect(approvalActorForEmail("jwhi0802@YAHOO.com", "owner@example.com", "JWHI0802@yahoo.com")).toBe("jarrett");
+    expect(approvalActorForEmail("OWNER@example.com", "owner@example.com", "JWHI0802@yahoo.com")).toBe("gabe");
+    expect(approvalActorForEmail("outsider@example.com", "owner@example.com", "JWHI0802@yahoo.com")).toBeNull();
+    expect(approvalActorForEmail(null, "owner@example.com", "JWHI0802@yahoo.com")).toBeNull();
     const route = readFileSync("src/app/api/plays/route.ts", "utf8");
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(route).toContain("requestActor(request)");
+    expect(route).toContain("requestTeamMember(request)");
     expect(route).not.toContain('pickedBy: z.enum(["gabe", "jarrett"])');
     expect(board).toContain('aria-label="Authenticated approver"');
     expect(board).not.toContain('onClick={() => setPicker("jarrett")}');
@@ -824,5 +826,29 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(recommendations).toContain("americanToImplied");
     expect(recommendations).toContain("sideCandidates.sort");
     expect(board).not.toContain("BEST SIDE SIGNAL");
+  });
+
+  it("42. fail-closes the fallback sign-in and approval identity to the two configured emails", () => {
+    const teamConfig = JSON.parse(readFileSync("config/team.config.json", "utf8")) as {
+      members: { gabe: { email: string }; jarrett: { email: string } };
+    };
+    const proxy = readFileSync("src/proxy.ts", "utf8");
+    const login = readFileSync("src/app/login/actions.ts", "utf8");
+    const auth = readFileSync("src/server/team-auth.ts", "utf8");
+    const plays = readFileSync("src/app/api/plays/route.ts", "utf8");
+    const play = readFileSync("src/app/api/plays/[id]/route.ts", "utf8");
+    expect(teamConfig.members.gabe.email).toBe("gabeforrey@gmail.com");
+    expect(teamConfig.members.jarrett.email.toLowerCase()).toBe("jwhi0802@yahoo.com");
+    expect(login).toContain("configuredTeamActor(email)");
+    expect(proxy).toContain("user && !actor");
+    expect(proxy).toContain("supabase.auth.signOut()");
+    expect(proxy).toContain("response.cookies.getAll()");
+    expect(auth).toContain('request.headers.get("oai-authenticated-user-email")');
+    expect(auth).toContain("supabase.auth.getUser()");
+    expect(auth).not.toContain('?? "owner-preview"');
+    expect(plays).toContain("requestTeamMember(request)");
+    expect(play).toContain("requestTeamMember(request)");
+    expect(plays).toContain("status: 401");
+    expect(play).toContain("status: 401");
   });
 });

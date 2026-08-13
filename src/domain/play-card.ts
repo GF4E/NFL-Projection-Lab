@@ -55,8 +55,16 @@ export type WeeklyPlay = {
 export const UNIT_CENTS = 2_500;
 export const DRAFT_MAX_AGE_MS = 12 * 60 * 60 * 1_000;
 
-export function approvalActorForEmail(email: string | null | undefined, jarrettEmail: string): PickedBy {
-  return email?.trim().toLowerCase() === jarrettEmail.trim().toLowerCase() ? "jarrett" : "gabe";
+export function approvalActorForEmail(
+  email: string | null | undefined,
+  gabeEmail: string,
+  jarrettEmail: string
+): PickedBy | null {
+  const normalized = email?.trim().toLowerCase();
+  if (!normalized) return null;
+  if (normalized === gabeEmail.trim().toLowerCase()) return "gabe";
+  if (normalized === jarrettEmail.trim().toLowerCase()) return "jarrett";
+  return null;
 }
 
 export function storedLegMatchesQuote(

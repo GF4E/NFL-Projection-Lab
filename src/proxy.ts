@@ -1,5 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import teamConfig from "../config/team.config.json";
+import { approvalActorForEmail } from "@/domain/play-card";
 
 const PUBLIC_PATHS = ["/login", "/auth/callback", "/setup"];
 
@@ -31,6 +33,13 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const isPublic = PUBLIC_PATHS.some((publicPath) => path.startsWith(publicPath));
   if (!user && !isPublic) return NextResponse.redirect(new URL("/login", request.url));
+  const actor = approvalActorForEmail(user?.email, teamConfig.members.gabe.email, teamConfig.members.jarrett.email);
+  if (user && !actor) {
+    await supabase.auth.signOut();
+    const redirect = NextResponse.redirect(new URL("/login?error=This%20email%20is%20not%20on%20the%20shared%20team", request.url));
+    response.cookies.getAll().forEach((cookie) => redirect.cookies.set(cookie));
+    return redirect;
+  }
   if (user && path === "/login") return NextResponse.redirect(new URL("/sunday", request.url));
   return response;
 }
