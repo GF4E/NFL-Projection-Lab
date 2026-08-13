@@ -1,6 +1,5 @@
 import { settleCompletedTeamPlays } from "./automatic-settlement";
 import { orchestrateBackgroundMaintenance } from "@/domain/background-maintenance";
-import { runModelLifecycleAutomation } from "./model-lifecycle/automation";
 import { runNflverseAutomation } from "./nflverse/automation";
 import { runScheduledOddsAutomation } from "./odds-automation";
 import { runOfficialInjuryAutomation } from "./official-injuries/automation";
@@ -13,6 +12,7 @@ import { dispatchPendingPushes } from "./push/store";
  * Runs every five minutes in production. The official pregame snapshot is resolved first so
  * prop eligibility and retractable-roof weather cannot race an inactive-list update. Each
  * remaining stage is isolated: one unavailable provider never suppresses the other refreshes.
+ * CPU-heavy coefficient work has its own scheduled invocation and is intentionally absent here.
  */
 export async function runBackgroundMaintenance(input: {
   db: D1Database;
@@ -27,7 +27,6 @@ export async function runBackgroundMaintenance(input: {
     injuries: () => runOfficialInjuryAutomation({ db: input.db, now }),
     nflverse: () => runNflverseAutomation({ db: input.db, now, allowPlayByPlay: true }),
     drafts: () => expireStaleTeamDrafts(input.db, now),
-    lifecycle: () => runModelLifecycleAutomation({ db: input.db, now }),
     settlement: () => settleCompletedTeamPlays(input.db, now)
   }, now.toISOString());
   try {

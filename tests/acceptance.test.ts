@@ -215,7 +215,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(failed.alert).not.toBeNull();
     expect(completeImport(failed, [4], "2026-09-16").freshness).toBe("current");
     expect(readFileSync("src/app/api/nflverse/route.ts", "utf8")).toContain("runBackgroundMaintenance");
-    expect(readFileSync("src/server/background-maintenance.ts", "utf8")).toContain("runModelLifecycleAutomation");
+    const worker = readFileSync("worker/index.ts", "utf8");
+    expect(worker).toContain("runModelLifecycleAutomation");
+    expect(worker).toContain("scheduledMaintenanceLane");
   });
 
   it("8. rejects W+ data and forecast-time source leakage", () => {
@@ -826,9 +828,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const weatherAutomation = readFileSync("src/server/weather/automation.ts", "utf8");
     expect(weatherStore).toContain("kickoff_weather_stage");
     expect(weatherAutomation).toContain("eligible.map(({ gameId }) => gameId)");
-    const maintenance = readFileSync("src/server/background-maintenance.ts", "utf8");
-    expect(readFileSync("worker/index.ts", "utf8")).toContain("runBackgroundMaintenance");
-    expect(maintenance).toContain("lifecycle: () => runModelLifecycleAutomation");
+    const worker = readFileSync("worker/index.ts", "utf8");
+    expect(worker).toContain("runBackgroundMaintenance");
+    expect(worker).toContain("runModelLifecycleAutomation");
+    expect(worker).toContain("scheduledMaintenanceLane(scheduledAt)");
   });
 
   it("36. highlights a better book only on an identical side and point", () => {

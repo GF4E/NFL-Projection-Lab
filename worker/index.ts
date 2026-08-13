@@ -8,6 +8,8 @@ import { weeklySlate } from "../src/server/weekly-slate";
 import { listOfficialInjuryImportStates } from "../src/server/official-injuries/store";
 import { listPregameContextStates } from "../src/server/pregame-context/store";
 import { runBackgroundMaintenance } from "../src/server/background-maintenance";
+import { runModelLifecycleAutomation } from "../src/server/model-lifecycle/automation";
+import { scheduledMaintenanceLane } from "../src/domain/background-maintenance";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -79,6 +81,15 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
   }
 }
 
+async function handleModelLifecycleRequest(request: Request, env: Env): Promise<Response> {
+  if (request.method !== "POST") return json({ error: "Method not allowed" }, 405, { allow: "POST" });
+  try {
+    return json({ lifecycle: await runModelLifecycleAutomation({ db: env.DB }) });
+  } catch (error) {
+    return json({ error: error instanceof Error ? error.message : "Model lifecycle aborted" }, 503);
+  }
+}
+
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
@@ -86,6 +97,9 @@ const worker = {
     // and production deployments all reach the same Cloudflare-bound D1 database.
     if (url.pathname === "/api/nflverse") {
       return handleNflverseRequest(request, env);
+    }
+    if (url.pathname === "/api/model-lifecycle") {
+      return handleModelLifecycleRequest(request, env);
     }
     if (url.pathname === "/api/decision-board") {
       try {
@@ -135,7 +149,9 @@ const worker = {
   },
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     const scheduledAt = new Date(controller.scheduledTime);
-    ctx.waitUntil(runBackgroundMaintenance({ db: env.DB, apiKey: env.ODDS_API_KEY, now: scheduledAt }));
+    ctx.waitUntil(scheduledMaintenanceLane(scheduledAt) === "lifecycle"
+      ? runModelLifecycleAutomation({ db: env.DB, now: scheduledAt })
+      : runBackgroundMaintenance({ db: env.DB, apiKey: env.ODDS_API_KEY, now: scheduledAt }));
   }
 };
 
