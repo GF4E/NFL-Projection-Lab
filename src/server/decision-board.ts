@@ -53,6 +53,7 @@ import { translateTotalFairProbability } from "@/domain/total";
 import type { DiscreteMarginArtifact, DiscreteTotalArtifact } from "@/domain/types";
 import { championConfigurationStatus, currentModelCodeHash, currentModelConfigurationHash } from "@/domain/model-version";
 import { bootstrapMarginTranslation, buildMarginBootstrapIndex } from "@/domain/margin-bootstrap";
+import { bootstrapTotalTranslation, buildTotalBootstrapIndex, type TotalBootstrapIndex } from "@/domain/total-bootstrap";
 
 interface FeatureRow {
   game_id: string;
@@ -245,6 +246,7 @@ function totalProjections(
   championModel: FittedLogisticModel | null = null,
   ensembleModels: readonly FittedLogisticModel[] = [],
   artifact: DiscreteTotalArtifact | null = null,
+  totalBootstrapIndex: TotalBootstrapIndex | null = null,
   forecastContext: {
     season: number;
     week: number;
@@ -301,14 +303,20 @@ function totalProjections(
     totalLine: canonical.point,
     isHomeSide: false
   }) : null;
-  const canonicalOverEdgeInterval = forecastRow && championOverProbability !== null
+  const ensembleTotal = forecastRow && championOverProbability !== null
     ? bootstrapResidualEdgeInterval({
         models: ensembleModels,
         forecastRow,
         centralModelProbability: canonicalModelOverProbability,
         marketProbability: canonicalMarketOverProbability,
         shrinkageWeight: structuralConfig.model.shrinkageWeight
-      })?.interval ?? null
+      }) ?? null
+    : null;
+  const canonicalOverEdgeInterval = ensembleTotal?.interval ?? null;
+  const baseCanonicalMembers = ensembleTotal?.memberEdges.length === structuralConfig.model.bootstrapMembers
+    ? ensembleTotal.memberEdges.map((edge) => Math.max(0.001, Math.min(0.999,
+        canonicalMarketOverProbability + edge
+      )))
     : null;
   return (["betmgm", "fanduel"] as const).flatMap<TotalProjection>((book) => {
     const over = gameLines.find((line) => line.book === book && line.market === "total" && line.side.toLowerCase() === "over" && line.point !== null);
@@ -331,6 +339,14 @@ function totalProjections(
           canonicalOverEdgeInterval,
           quote: { book, point: marketPoint, fairOverProbability: over.fairProbability }
         });
+    const bootstrapTranslated = totalBootstrapIndex && baseCanonicalMembers ? bootstrapTotalTranslation({
+      index: totalBootstrapIndex,
+      consensusTotal: canonical.point,
+      fromPoint: canonical.point,
+      toPoint: marketPoint,
+      baseProbabilityMembers: baseCanonicalMembers,
+      intervalPercentiles: structuralConfig.model.intervalPercentiles as [number, number]
+    }) : null;
     const shrunkProbability = lean === "Pass" || translated?.shrunkOverProbability === null || translated?.shrunkOverProbability === undefined
       ? null
       : lean === "Over" ? translated.shrunkOverProbability : 1 - translated.shrunkOverProbability;
@@ -338,11 +354,17 @@ function totalProjections(
     const expectedValue = selected && shrunkProbability !== null && pushProbability !== null
       ? expectedValueWithPush(shrunkProbability, pushProbability, selected.americanPrice)
       : null;
-    const edgeInterval = lean === "Pass" || translated?.overEdgeInterval === null || translated?.overEdgeInterval === undefined
+    const bootstrapOverEdgeInterval: [number, number] | null = bootstrapTranslated && over?.fairProbability !== null && over?.fairProbability !== undefined
+      ? [
+          bootstrapTranslated.probabilityInterval[0] - over.fairProbability,
+          bootstrapTranslated.probabilityInterval[1] - over.fairProbability
+        ]
+      : null;
+    const edgeInterval = lean === "Pass" || bootstrapOverEdgeInterval === null
       ? null
       : lean === "Over"
-        ? translated.overEdgeInterval
-        : [-translated.overEdgeInterval[1], -translated.overEdgeInterval[0]] as [number, number];
+        ? bootstrapOverEdgeInterval
+        : [-bootstrapOverEdgeInterval[1], -bootstrapOverEdgeInterval[0]] as [number, number];
     const warnings = [canonical.warning, stateAtCanonical.warning, translated?.warning ?? "unsupported"];
     const translationWarning: TotalProjection["translationWarning"] = warnings.includes("unsupported") ? "unsupported"
       : warnings.includes("extrapolated") ? "extrapolated"
@@ -761,6 +783,21 @@ export async function buildDecisionBoard(
       seedStart: structuralConfig.model.bootstrapSeedStart
     }
   );
+  const totalBootstrapIndex = buildTotalBootstrapIndex(
+    gameResult.results.flatMap((row) => row.total === null || row.total_line === null ? [] : [{
+      gameId: row.game_id,
+      season: row.season,
+      consensusTotal: row.total_line,
+      actualTotal: row.total
+    }]),
+    {
+      referenceSeason: frozenTotalArtifact.decay.referenceSeason,
+      halfLifeSeasons: frozenTotalArtifact.decay.halfLifeSeasons,
+      kernelBandwidth: frozenTotalArtifact.kernelBandwidth,
+      members: structuralConfig.model.bootstrapMembers,
+      seedStart: structuralConfig.model.bootstrapSeedStart
+    }
+  );
   const lines = enrichWithPowerDevig(lineResult.results.map(rawLine));
   const injuryByTeam = new Map(injuryResult.results.map((row) => [`${row.game_id}:${normalizeNflverseTeam(row.team)}`, row]));
   const inactiveByTeam = new Map(inactiveResult.results.map((row) => [`${row.game_id}:${normalizeNflverseTeam(row.team)}`, row]));
@@ -1114,6 +1151,7 @@ export async function buildDecisionBoard(
         championModel,
         ensembleModels,
         frozenTotalArtifact,
+        totalBootstrapIndex,
         {
           season: game.season,
           week: game.week,
