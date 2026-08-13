@@ -30,4 +30,20 @@ describe("fixed-seed total artifact bootstrap", () => {
     ], options);
     expect(bootstrapTotalTranslation({ index: changed, ...input })?.probabilityInterval).not.toEqual(one?.probabilityInterval);
   });
+
+  it("carries the same member from projected score through the exact book point", () => {
+    const options = { referenceSeason: 2025, halfLifeSeasons: 2.5, kernelBandwidth: 6, members: 100, seedStart: 202600 };
+    const index = buildTotalBootstrapIndex(history, options);
+    const state = bootstrapTotalTranslation({
+      index, consensusTotal: 45, fromPoint: 49, toPoint: 45,
+      baseProbabilityMembers: Array.from({ length: 100 }, () => 0.5),
+      intervalPercentiles: [0.1, 0.9]
+    })!;
+    const execution = bootstrapTotalTranslation({
+      index, consensusTotal: 45, fromPoint: 45, toPoint: 44.5,
+      baseProbabilityMembers: state.probabilityMembers,
+      intervalPercentiles: [0.1, 0.9]
+    })!;
+    expect(execution.probabilityInterval[1] - execution.probabilityInterval[0]).toBeGreaterThan(0.03);
+  });
 });

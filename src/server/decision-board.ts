@@ -313,10 +313,32 @@ function totalProjections(
       }) ?? null
     : null;
   const canonicalOverEdgeInterval = ensembleTotal?.interval ?? null;
-  const baseCanonicalMembers = ensembleTotal?.memberEdges.length === structuralConfig.model.bootstrapMembers
-    ? ensembleTotal.memberEdges.map((edge) => Math.max(0.001, Math.min(0.999,
-        canonicalMarketOverProbability + edge
-      )))
+  const stateBootstrap = totalBootstrapIndex ? bootstrapTotalTranslation({
+    index: totalBootstrapIndex,
+    consensusTotal: canonical.point,
+    fromPoint: projectedTotal,
+    toPoint: canonical.point,
+    baseProbabilityMembers: Array.from({ length: structuralConfig.model.bootstrapMembers }, () => 0.5),
+    intervalPercentiles: structuralConfig.model.intervalPercentiles as [number, number]
+  }) : null;
+  const baseCanonicalMembers = ensembleTotal?.memberEdges.length === structuralConfig.model.bootstrapMembers && stateBootstrap
+    ? (() => {
+        const coefficientCenter = ensembleTotal.memberEdges.reduce((sum, edge) => sum + edge, 0) /
+          ensembleTotal.memberEdges.length;
+        return stateBootstrap.probabilityMembers.map((stateProbability, member) => {
+          const modelProbability = championOverProbability === null
+            ? stateProbability
+            : applyChampionMarketResidual(stateProbability, championOverProbability, canonicalMarketOverProbability);
+          const shrunk = shrinkProbability(
+            modelProbability,
+            canonicalMarketOverProbability,
+            structuralConfig.model.shrinkageWeight
+          );
+          return Math.max(0.001, Math.min(0.999,
+            shrunk + ensembleTotal.memberEdges[member] - coefficientCenter
+          ));
+        });
+      })()
     : null;
   return (["betmgm", "fanduel"] as const).flatMap<TotalProjection>((book) => {
     const over = gameLines.find((line) => line.book === book && line.market === "total" && line.side.toLowerCase() === "over" && line.point !== null);
