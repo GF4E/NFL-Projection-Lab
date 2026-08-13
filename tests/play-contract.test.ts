@@ -28,7 +28,10 @@ describe("stored shared-card contract integrity", () => {
     generatedAt: "2026-09-13T18:00:00.000Z", boardGeneratedAt: "2026-09-13T18:00:00.000Z",
     championHash: "champion", ensembleHash: "ensemble", configHash: "config", dataHash: "data", artifactHash: "artifact",
     consensusSnapshotId: "snapshot", displayedExpectedValuePercent: 2,
-    authoritativeExpectedValuePercent: null, displayedEdgePp: 2, legs: [], ...overrides
+    authoritativeExpectedValuePercent: null, displayedEdgePp: 2, legs: [], ...overrides,
+    authoritativeProbabilityInterval: null,
+    uncertaintyConfiguration: { members: 100, seedStart: 202600, intervalPercentiles: [0.1, 0.9] as [number, number] },
+    suggestedUnits: null, unitsGreyed: false
   });
   it("accepts only one exact leg for a straight", () => {
     expect(validateStoredPlayContract({
@@ -73,14 +76,19 @@ describe("stored shared-card contract integrity", () => {
       sourceQuoteId: propLeg.sourceQuoteId!, gameId: "g1", market: "prop", side: "SEA", point: -2.5,
       americanPrice: -110, book: "betmgm", capturedAt: "2026-09-13T18:00:00.000Z", sourceHash: "hash",
       marketProbability: 0.5, modelProbability: 0.62, betProbability: 0.56, pushProbability: 0,
-      uncertaintyInterval: [0.53, 0.6], expectedValue: 0.069
+      uncertaintyInterval: [0.53, 0.6], uncertaintyMembers: null, expectedValue: 0.069
     }] });
-    expect(forecastApprovalEligibilityError(propPlay, qualifiedProp)).toBeNull();
+    const qualifiedPropDecision = { ...qualifiedProp, authoritativeProbabilityInterval: [0.53, 0.6] as [number, number], suggestedUnits: 1 };
+    expect(forecastApprovalEligibilityError(propPlay, qualifiedPropDecision)).toBeNull();
     expect(forecastApprovalEligibilityError(propPlay, snapshot())).toMatch(/no longer clears/i);
     expect(forecastApprovalEligibilityError(
       { playType: "teaser", contract: [leg("g1", "teaser"), leg("g2", "teaser")] },
       snapshot({ authoritativeExpectedValuePercent: -0.01 })
     )).toMatch(/negative EV/i);
+    expect(forecastApprovalEligibilityError(
+      { playType: "teaser", contract: [leg("g1", "teaser"), leg("g2", "teaser")] },
+      snapshot({ authoritativeExpectedValuePercent: 2, authoritativeProbabilityInterval: [0.54, 0.59], suggestedUnits: 0 })
+    )).toMatch(/Kelly inclusion/i);
   });
 
   it("binds a stored leg to the same source game, book, market and side", () => {

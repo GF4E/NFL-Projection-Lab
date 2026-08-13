@@ -180,6 +180,31 @@ function roundHalf(value: number): number {
   return Math.max(-14, Math.min(14, Math.round(value * 2) / 2));
 }
 
+function percentile(values: readonly number[], probability: number): number {
+  const sorted = [...values].sort((left, right) => left - right);
+  const position = (sorted.length - 1) * probability;
+  const lower = Math.floor(position);
+  const upper = Math.ceil(position);
+  return lower === upper
+    ? sorted[lower]
+    : sorted[lower] + (position - lower) * (sorted[upper] - sorted[lower]);
+}
+
+function calibrateMembersToInterval(
+  members: readonly number[],
+  interval: [number, number]
+): number[] | null {
+  if (members.length !== structuralConfig.model.bootstrapMembers) return null;
+  const [lowPercentile, highPercentile] = structuralConfig.model.intervalPercentiles;
+  const rawLow = percentile(members, lowPercentile);
+  const rawHigh = percentile(members, highPercentile);
+  if (!(rawHigh > rawLow)) return null;
+  const scale = (interval[1] - interval[0]) / (rawHigh - rawLow);
+  return members.map((probability) => Math.max(0.001, Math.min(0.999,
+    interval[0] + (probability - rawLow) * scale
+  )));
+}
+
 function roundTotalHalf(value: number): number {
   return Math.round(value * 2) / 2;
 }
@@ -857,15 +882,16 @@ export async function buildDecisionBoard(
       isHomeSide: true,
       teamContext
     });
-    const ensembleSpreadInterval = spreadForecastRow && championProbability !== null && canonicalModelProbability !== null && canonicalMarketProbability !== null
+    const ensembleSpread = spreadForecastRow && championProbability !== null && canonicalModelProbability !== null && canonicalMarketProbability !== null
       ? bootstrapResidualEdgeInterval({
           models: ensembleModels,
           forecastRow: spreadForecastRow,
           centralModelProbability: canonicalModelProbability,
           marketProbability: canonicalMarketProbability,
           shrinkageWeight: structuralConfig.model.shrinkageWeight
-        })?.interval ?? null
+        }) ?? null
       : null;
+    const ensembleSpreadInterval = ensembleSpread?.interval ?? null;
     const canonicalEdgeInterval: [number, number] | null = ensembleSpreadInterval === null
       ? null
       : [ensembleSpreadInterval[0] - qbUncertaintyWidening, ensembleSpreadInterval[1] + qbUncertaintyWidening];
@@ -908,7 +934,55 @@ export async function buildDecisionBoard(
       const sideLines = gameLines.filter((candidate) => candidate.market === "spread" && candidate.side === line.side && candidate.point !== null);
       const consensusPoint = sideLines.reduce((sum, candidate) => sum + (candidate.point ?? 0), 0) / Math.max(1, sideLines.length);
       const teasedPoint = (line.point ?? 0) + 6;
-      const translated = translateFairProbability(artifact, consensusPoint, line.point!, teasedPoint, line.fairProbability!);
+      const projection = projections.find((candidate) => candidate.book === line.book);
+      const isHome = projection?.homeTeam === line.side;
+      const originalBetProbability = projection?.shrunkHomeProbability === null || projection?.shrunkHomeProbability === undefined
+        ? null
+        : isHome ? projection.shrunkHomeProbability : 1 - projection.shrunkHomeProbability;
+      const originalEdgeInterval = projection?.edgeInterval === null || projection?.edgeInterval === undefined
+        ? null
+        : isHome ? projection.edgeInterval : [-projection.edgeInterval[1], -projection.edgeInterval[0]] as [number, number];
+      const translated = originalBetProbability === null
+        ? { probability: null, pushProbability: null, warning: "unsupported" as const, sourcePoints: [] }
+        : translateFairProbability(artifact, consensusPoint, line.point!, teasedPoint, originalBetProbability);
+      const translatedLow = originalEdgeInterval === null
+        ? null
+        : translateFairProbability(
+            artifact,
+            consensusPoint,
+            line.point!,
+            teasedPoint,
+            Math.max(0.001, Math.min(0.999, line.fairProbability! + originalEdgeInterval[0]))
+          );
+      const translatedHigh = originalEdgeInterval === null
+        ? null
+        : translateFairProbability(
+            artifact,
+            consensusPoint,
+            line.point!,
+            teasedPoint,
+            Math.max(0.001, Math.min(0.999, line.fairProbability! + originalEdgeInterval[1]))
+          );
+      const probabilityInterval = translatedLow?.probability === null || translatedLow?.probability === undefined ||
+        translatedHigh?.probability === null || translatedHigh?.probability === undefined
+        ? null
+        : [translatedLow.probability, translatedHigh.probability] as [number, number];
+      const rawProbabilityMembers = ensembleSpread?.memberEdges.length === structuralConfig.model.bootstrapMembers
+        ? ensembleSpread.memberEdges.map((edge) => {
+            const canonicalSideMarket = isHome ? canonicalMarketProbability! : 1 - canonicalMarketProbability!;
+            const canonicalMember = Math.max(0.001, Math.min(0.999, canonicalSideMarket + (isHome ? edge : -edge)));
+            return translateFairProbability(
+              artifact,
+              consensusPoint,
+              consensusPoint,
+              teasedPoint,
+              canonicalMember
+            ).probability;
+          })
+        : null;
+      const probabilityMembers = probabilityInterval && rawProbabilityMembers?.every((probability) => probability !== null)
+        ? calibrateMembersToInterval(rawProbabilityMembers as number[], probabilityInterval)
+        : null;
       const crossedKeys = crossedKeyNumbers(line.point!, teasedPoint, structuralConfig.model.keyMargins);
       const crossesZero = line.point! < 0 && teasedPoint > 0;
       const classification: TeaserCandidate["classification"] = isClassicWongPoint(line.point!)
@@ -923,6 +997,8 @@ export async function buildDecisionBoard(
         teasedPoint,
         fairProbability: translated.probability,
         pushProbability: translated.pushProbability,
+        probabilityInterval,
+        probabilityMembers,
         fairAmerican: translated.probability === null || translated.pushProbability === null
           ? null
           : fairAmericanFromProbability(translated.probability),

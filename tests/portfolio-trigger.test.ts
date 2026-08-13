@@ -39,6 +39,9 @@ function add(
     configHash: "config",
     dataHash: "data",
     consensusSnapshotId: "consensus",
+    authoritativeProbabilityInterval: [0.53, 0.6],
+    suggestedUnits: 1,
+    authoritativeExpectedValuePercent: playType === "teaser" ? 2 : null,
     legs: storedContract
   };
   db.prepare(`INSERT INTO plays
@@ -99,6 +102,29 @@ describe("atomic shared-card portfolio guard", () => {
       { gameId: "g3", market: "spread" }
     ], 1, "teaser");
     expect(() => db.prepare("UPDATE plays SET status = 'card' WHERE id = 'bad-teaser'").run()).toThrow(/two-game teaser/i);
+    db.close();
+  });
+
+  it("blocks below-floor singles and teasers even when browser EV is positive", () => {
+    const db = database();
+    add(db, "below-floor", "research", 0.5, [{ gameId: "g1", market: "spread" }]);
+    const stored = db.prepare("SELECT forecast_json FROM plays WHERE id = 'below-floor'").get() as { forecast_json: string };
+    const forecast = JSON.parse(stored.forecast_json) as Record<string, unknown>;
+    db.prepare("UPDATE plays SET forecast_json = ? WHERE id = 'below-floor'")
+      .run(JSON.stringify({ ...forecast, suggestedUnits: 0 }));
+    expect(() => db.prepare("UPDATE plays SET status = 'card' WHERE id = 'below-floor'").run())
+      .toThrow(/Kelly inclusion/i);
+
+    add(db, "teaser-floor", "research", 0.5, [
+      { gameId: "g2", market: "teaser" },
+      { gameId: "g3", market: "teaser" }
+    ], 1, "teaser");
+    const teaserStored = db.prepare("SELECT forecast_json FROM plays WHERE id = 'teaser-floor'").get() as { forecast_json: string };
+    const teaserForecast = JSON.parse(teaserStored.forecast_json) as Record<string, unknown>;
+    db.prepare("UPDATE plays SET forecast_json = ? WHERE id = 'teaser-floor'")
+      .run(JSON.stringify({ ...teaserForecast, authoritativeExpectedValuePercent: 5, suggestedUnits: 0 }));
+    expect(() => db.prepare("UPDATE plays SET status = 'card' WHERE id = 'teaser-floor'").run())
+      .toThrow(/Kelly inclusion/i);
     db.close();
   });
 });

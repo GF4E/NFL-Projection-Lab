@@ -64,7 +64,7 @@ export function portfolioTriggerSql(): string {
 }
 
 export function contractGuardTriggerSql(): string {
-  return `CREATE TRIGGER IF NOT EXISTS approval_contract_guard_v3
+  return `CREATE TRIGGER IF NOT EXISTS approval_contract_guard_v4
     BEFORE UPDATE OF status ON plays
     WHEN OLD.status = 'research' AND NEW.status = 'card'
     BEGIN
@@ -124,6 +124,11 @@ export function contractGuardTriggerSql(): string {
         json_extract(NEW.forecast_json, '$.authoritativeExpectedValuePercent') IS NULL
         OR json_extract(NEW.forecast_json, '$.authoritativeExpectedValuePercent') < 0
       ) THEN RAISE(ABORT, 'The exact two-team teaser price must have nonnegative EV') END;
+
+      SELECT CASE WHEN NEW.play_type IN ('single', 'teaser') AND (
+        json_extract(NEW.forecast_json, '$.authoritativeProbabilityInterval') IS NULL
+        OR COALESCE(json_extract(NEW.forecast_json, '$.suggestedUnits'), 0) < ${structuralConfig.sizing.minimumUnits}
+      ) THEN RAISE(ABORT, 'The contract must clear the uncertainty and ${structuralConfig.sizing.minimumUnits}u Kelly inclusion gates') END;
 
       SELECT CASE WHEN EXISTS (
         SELECT 1 FROM json_each(NEW.contract_json) AS contract_leg

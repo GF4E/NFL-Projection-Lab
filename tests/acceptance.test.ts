@@ -707,7 +707,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   it("31. ranks non-Wong teaser pairs only when push-adjusted EV clears the offered price", () => {
     const teaser = (gameId: string, team: string, opponent: string, fairProbability: number, pushProbability = 0): TeaserCandidate => ({
       gameId, book: "betmgm", team, opponent, originalPoint: 4.5, teasedPoint: 10.5,
-      fairProbability, pushProbability, fairAmerican: -300, classification: "ordinary", crossedKeys: [6, 7, 10], warning: "none"
+      fairProbability, pushProbability, probabilityInterval: [fairProbability - 0.02, fairProbability + 0.02],
+      probabilityMembers: Array.from({ length: 100 }, (_, index) => fairProbability - 0.02 + index * 0.0004),
+      fairAmerican: -300, classification: "ordinary", crossedKeys: [6, 7, 10], warning: "none"
     });
     const ordinaryPair = rankTeaserPairs([
       teaser("g1", "PIT", "BAL", 0.75),

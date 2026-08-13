@@ -3,6 +3,9 @@ import { getPlayerPropBoard } from "./player-props";
 import { stableHash } from "@/domain/hash";
 import { expectedValueWithPush } from "@/domain/odds";
 import { authoritativeContractExpectedValue } from "@/domain/forecast-value";
+import { priceTwoTeamTeaserDecision } from "@/domain/decision-board";
+import { sizeKelly } from "@/domain/sizing";
+import { structuralConfig } from "@/domain/config";
 import type {
   PlayForecastLegSnapshot,
   PlayForecastSnapshot,
@@ -58,6 +61,8 @@ function mainlineSnapshot(input: {
   let betProbability: number | null = null;
   let pushProbability: number | null = null;
   let edgeInterval: [number, number] | null = null;
+  let directUncertaintyInterval: [number, number] | null = null;
+  let directUncertaintyMembers: number[] | null = null;
   let expectedValue: number | null = null;
   if (leg.market === "spread") {
     const projection = game?.projections.find((candidate) => candidate.book === quote.book);
@@ -97,8 +102,10 @@ function mainlineSnapshot(input: {
     const candidate = game?.teasers.find((item) => item.book === quote.book && item.team === leg.side && item.teasedPoint === leg.point);
     betProbability = candidate?.fairProbability ?? null;
     pushProbability = candidate?.pushProbability ?? null;
+    directUncertaintyInterval = candidate?.probabilityInterval ?? null;
+    directUncertaintyMembers = candidate?.probabilityMembers ?? null;
   }
-  if (expectedValue === null && betProbability !== null && pushProbability !== null) {
+  if (leg.market !== "teaser" && expectedValue === null && betProbability !== null && pushProbability !== null) {
     expectedValue = expectedValueWithPush(betProbability, pushProbability, quote.american_price);
   }
   return {
@@ -115,7 +122,8 @@ function mainlineSnapshot(input: {
     modelProbability,
     betProbability,
     pushProbability,
-    uncertaintyInterval: probabilityInterval(marketProbability, edgeInterval),
+    uncertaintyInterval: directUncertaintyInterval ?? probabilityInterval(marketProbability, edgeInterval),
+    uncertaintyMembers: directUncertaintyMembers,
     expectedValue
   };
 }
@@ -170,6 +178,7 @@ export async function capturePlayForecastSnapshot(
       uncertaintyInterval: candidate?.edgeInterval
         ? probabilityInterval(candidate.executionFairProbability, candidate.edgeInterval)
         : null,
+      uncertaintyMembers: null,
       expectedValue: candidate?.expectedValue ?? null
     };
   });
@@ -188,6 +197,38 @@ export async function capturePlayForecastSnapshot(
     americanOdds: play.americanOdds,
     legs
   });
+  const sizingConfig = {
+    referenceBankrollUnits: structuralConfig.sizing.referenceBankrollUnits,
+    kellyFraction: structuralConfig.sizing.kellyFraction,
+    increment: structuralConfig.sizing.roundDownUnits,
+    minimum: structuralConfig.sizing.minimumUnits,
+    maximum: structuralConfig.sizing.maximumUnits
+  };
+  const single = play.playType === "single" && legs.length === 1 ? legs[0] : null;
+  const singleEdgeInterval: [number, number] | null = single?.marketProbability !== null && single?.marketProbability !== undefined && single.uncertaintyInterval
+    ? [
+        single.uncertaintyInterval[0] - single.marketProbability,
+        single.uncertaintyInterval[1] - single.marketProbability
+      ]
+    : null;
+  const singleSizing = single?.betProbability !== null && single?.betProbability !== undefined && singleEdgeInterval
+    ? sizeKelly(single.betProbability, play.americanOdds, singleEdgeInterval, sizingConfig)
+    : null;
+  const teaserDecision = play.playType === "teaser" && legs.length === 2 && legs.every((leg) =>
+    leg.betProbability !== null && leg.pushProbability !== null &&
+    leg.uncertaintyInterval !== null && leg.uncertaintyMembers?.length === structuralConfig.model.bootstrapMembers
+  ) ? priceTwoTeamTeaserDecision(legs.map((leg) => ({
+      conditionalWinProbability: leg.betProbability!,
+      pushProbability: leg.pushProbability!,
+      probabilityMembers: leg.uncertaintyMembers!
+    })), play.americanOdds) : null;
+  const contractSizing = singleSizing ?? teaserDecision?.sizing ?? null;
+  const authoritativeProbabilityInterval = single?.uncertaintyInterval ?? (
+    teaserDecision ? [
+      teaserDecision.edgeInterval[0] + 1 / (play.americanOdds > 0 ? 1 + play.americanOdds / 100 : 1 + 100 / Math.abs(play.americanOdds)),
+      teaserDecision.edgeInterval[1] + 1 / (play.americanOdds > 0 ? 1 + play.americanOdds / 100 : 1 + 100 / Math.abs(play.americanOdds))
+    ] as [number, number] : null
+  );
   return {
     generatedAt: new Date().toISOString(),
     boardGeneratedAt: board.generatedAt,
@@ -201,6 +242,14 @@ export async function capturePlayForecastSnapshot(
     authoritativeExpectedValuePercent: authoritativeExpectedValuePercent === null
       ? null
       : authoritativeExpectedValuePercent * 100,
+    authoritativeProbabilityInterval,
+    uncertaintyConfiguration: {
+      members: structuralConfig.model.bootstrapMembers,
+      seedStart: structuralConfig.model.bootstrapSeedStart,
+      intervalPercentiles: structuralConfig.model.intervalPercentiles as [number, number]
+    },
+    suggestedUnits: contractSizing?.included ? contractSizing.suggestedUnits : 0,
+    unitsGreyed: contractSizing?.greyed ?? false,
     displayedEdgePp: play.modelEdgePp,
     legs
   };

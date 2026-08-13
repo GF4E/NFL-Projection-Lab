@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { priceTwoTeamTeaser, rankBestExecutionProps } from "@/domain/decision-board";
+import { priceTwoTeamTeaserDecision, rankBestExecutionProps } from "@/domain/decision-board";
 import type {
   DecisionBoardPayload,
   PlayerPropBoard,
@@ -47,6 +47,8 @@ type SelectedLeg = ValueLeg & {
   detail: string;
   edge: number | null;
   pushProbability?: number;
+  probabilityInterval?: [number, number];
+  probabilityMembers?: number[];
 };
 
 function formatOdds(value: number): string { return value > 0 ? `+${value}` : `${value}`; }
@@ -175,9 +177,9 @@ export function WeekOneBoard() {
   const latestCapture = useMemo(() => lines.reduce<string | null>((latest, line) =>
     line.book === book && (!latest || line.capturedAt > latest) ? line.capturedAt : latest, null), [book, lines]);
   const teaserValue = useMemo(() => {
-    if (slipMode !== "teaser" || slip.length !== 2 || slip.some((leg) => leg.kind !== "teaser" || leg.fairProbability === null || leg.pushProbability === undefined)) return null;
+    if (slipMode !== "teaser" || slip.length !== 2 || slip.some((leg) => leg.kind !== "teaser" || leg.fairProbability === null || leg.pushProbability === undefined || leg.probabilityMembers?.length !== structuralConfig.model.bootstrapMembers)) return null;
     if (new Set(slip.map((leg) => leg.gameId)).size !== slip.length) return null;
-    const priced = priceTwoTeamTeaser(slip.map((leg) => ({ conditionalWinProbability: leg.fairProbability!, pushProbability: leg.pushProbability! })), teaserPrice);
+    const priced = priceTwoTeamTeaserDecision(slip.map((leg) => ({ conditionalWinProbability: leg.fairProbability!, pushProbability: leg.pushProbability!, probabilityMembers: leg.probabilityMembers! })), teaserPrice);
     return priced ? { ...priced, evPercent: priced.expectedValue * 100 } : null;
   }, [slip, slipMode, teaserPrice]);
   const slipCanApprove = isPricedSlipApprovable({
@@ -185,7 +187,7 @@ export function WeekOneBoard() {
     legCount: slip.length,
     singleBook: new Set(slip.map((leg) => leg.book)).size <= 1,
     standardValue: slipValue,
-    teaserExpectedValuePercent: teaserValue?.evPercent ?? null
+    teaserExpectedValuePercent: teaserValue?.sizing.included ? teaserValue.evPercent : null
   });
 
   useEffect(() => {
@@ -310,7 +312,8 @@ export function WeekOneBoard() {
       point: candidate.teasedPoint, americanPrice: line.americanPrice, fairProbability: candidate.fairProbability,
       matchup, selection: `${line.side} ${formatPoint(candidate.teasedPoint)}`,
       detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : candidate.classification === "key_number" ? "key-number" : "positive-EV"} leg`, edge: candidate.fairProbability - (line.fairProbability ?? 0),
-      pushProbability: candidate.pushProbability
+      pushProbability: candidate.pushProbability, probabilityInterval: candidate.probabilityInterval ?? undefined,
+      probabilityMembers: candidate.probabilityMembers ?? undefined
     }, "teaser");
   }
 
@@ -324,13 +327,16 @@ export function WeekOneBoard() {
         point: candidate.teasedPoint, americanPrice: line.americanPrice, fairProbability: candidate.fairProbability,
         matchup: `${matchup.away} @ ${matchup.home}`, selection: `${line.side} ${formatPoint(candidate.teasedPoint)}`,
         detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : candidate.classification === "key_number" ? "key-number" : "positive-EV"} leg`,
-        edge: candidate.fairProbability - (line.fairProbability ?? 0), pushProbability: candidate.pushProbability
+        edge: candidate.fairProbability - (line.fairProbability ?? 0), pushProbability: candidate.pushProbability,
+        probabilityInterval: candidate.probabilityInterval ?? undefined
+        , probabilityMembers: candidate.probabilityMembers ?? undefined
       }];
     });
     if (legs.length !== 2) return;
     setSlipMode("teaser");
     setSlip(legs);
     setTeaserPrice(pair.screeningAmerican);
+    setStake(pair.suggestedUnits * 25);
     setMessage(`Push-adjusted ${bookNames[pair.book]} teaser pair loaded. Confirm the offered price before saving.`);
   }
 
@@ -344,8 +350,8 @@ export function WeekOneBoard() {
       setMessage("Fair parlay value is withheld for same-game or incomplete-price legs.");
       return;
     }
-    if (slipMode === "teaser" && (!teaserValue || teaserValue.evPercent < 0)) {
-      setMessage("Teaser withheld: use two different games and an offered price that is at least break-even versus the empirical fair probability.");
+    if (slipMode === "teaser" && (!teaserValue || teaserValue.evPercent < 0 || !teaserValue.sizing.included)) {
+      setMessage("Teaser withheld: the exact price must clear the empirical uncertainty and 0.5u Kelly gates.");
       return;
     }
     setMessage(`Recording ${picker === "gabe" ? "Gabe" : "Jarrett"}'s Week ${slate.week} approval…`);

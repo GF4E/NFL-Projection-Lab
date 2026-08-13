@@ -23,6 +23,7 @@ export type PlayForecastLegSnapshot = {
   betProbability: number | null;
   pushProbability: number | null;
   uncertaintyInterval: [number, number] | null;
+  uncertaintyMembers: number[] | null;
   expectedValue: number | null;
 };
 
@@ -38,6 +39,16 @@ export type PlayForecastSnapshot = {
   displayedExpectedValuePercent: number;
   /** Server-recomputed from the frozen contract; null when the contract has no supported aggregate EV. */
   authoritativeExpectedValuePercent: number | null;
+  /** Contract-level 80% decisive-win probability interval. */
+  authoritativeProbabilityInterval: [number, number] | null;
+  uncertaintyConfiguration: {
+    members: number;
+    seedStart: number;
+    intervalPercentiles: [number, number];
+  };
+  /** Quarter-Kelly result at the exact frozen payout; null when unsupported. */
+  suggestedUnits: number | null;
+  unitsGreyed: boolean;
   displayedEdgePp: number;
   legs: PlayForecastLegSnapshot[];
 };
@@ -61,6 +72,13 @@ export function forecastApprovalEligibilityError(
     snapshot.authoritativeExpectedValuePercent < -1e-9
   )) {
     return "The exact two-team teaser price is negative EV; refresh the price or choose another pair.";
+  }
+  if ((play.playType === "single" || play.playType === "teaser") && (
+    snapshot.authoritativeProbabilityInterval === null ||
+    snapshot.suggestedUnits === null ||
+    snapshot.suggestedUnits < structuralConfig.sizing.minimumUnits
+  )) {
+    return "This contract does not clear the current uncertainty and 0.5u Kelly inclusion gates.";
   }
   return null;
 }

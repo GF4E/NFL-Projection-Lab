@@ -92,6 +92,10 @@ export interface TeaserCandidate {
   teasedPoint: number;
   fairProbability: number | null;
   pushProbability: number | null;
+  /** 80% interval for the decisive win probability at the teased point. */
+  probabilityInterval: [number, number] | null;
+  /** Fixed-seed member probabilities, retained in seed order for pair aggregation. */
+  probabilityMembers: number[] | null;
   fairAmerican: number | null;
   classification: "classic_wong" | "key_number" | "ordinary";
   crossedKeys: number[];
@@ -110,15 +114,24 @@ export interface TeaserPairCandidate {
   fairAmerican: number;
   playToAmerican: number;
   expectedValue: number;
+  edgeInterval: [number, number];
+  suggestedUnits: number;
+  unitsGreyed: boolean;
 }
 
 export interface TwoTeamTeaserValue {
   winProbability: number;
   pushProbability: number;
   lossProbability: number;
+  conditionalWinProbability: number;
   fairAmerican: number;
   playToAmerican: number;
   expectedValue: number;
+}
+
+export interface TwoTeamTeaserDecision extends TwoTeamTeaserValue {
+  edgeInterval: [number, number];
+  sizing: ReturnType<typeof sizeKelly>;
 }
 
 export interface MatchupSignal {
@@ -766,9 +779,58 @@ export function priceTwoTeamTeaser(
     winProbability,
     pushProbability,
     lossProbability,
+    conditionalWinProbability,
     fairAmerican: fairAmericanFromProbability(conditionalWinProbability),
     playToAmerican: playToAmericanFromProbability(conditionalWinProbability),
     expectedValue: winProbability * americanToDecimal(offeredAmerican) + pushProbability - 1
+  };
+}
+
+export function priceTwoTeamTeaserDecision(
+  legs: readonly {
+    conditionalWinProbability: number;
+    pushProbability: number;
+    probabilityMembers: readonly number[];
+  }[],
+  offeredAmerican: number
+): TwoTeamTeaserDecision | null {
+  const memberCount = legs[0]?.probabilityMembers.length ?? 0;
+  if (!memberCount || legs.some((leg) => leg.probabilityMembers.length !== memberCount)) return null;
+  const central = priceTwoTeamTeaser(legs, offeredAmerican);
+  if (!central) return null;
+  const memberProbabilities = Array.from({ length: memberCount }, (_, index) => priceTwoTeamTeaser(
+    legs.map((leg) => ({
+      conditionalWinProbability: leg.probabilityMembers[index],
+      pushProbability: leg.pushProbability
+    })),
+    offeredAmerican
+  )?.conditionalWinProbability ?? Number.NaN);
+  if (memberProbabilities.some((probability) => !Number.isFinite(probability))) return null;
+  const sorted = [...memberProbabilities].sort((left, right) => left - right);
+  const percentile = (probability: number): number => {
+    const position = (sorted.length - 1) * probability;
+    const lower = Math.floor(position);
+    const upper = Math.ceil(position);
+    return lower === upper
+      ? sorted[lower]
+      : sorted[lower] + (position - lower) * (sorted[upper] - sorted[lower]);
+  };
+  const [lowPercentile, highPercentile] = structuralConfig.model.intervalPercentiles;
+  const breakEvenProbability = 1 / americanToDecimal(offeredAmerican);
+  const edgeInterval: [number, number] = [
+    percentile(lowPercentile) - breakEvenProbability,
+    percentile(highPercentile) - breakEvenProbability
+  ];
+  return {
+    ...central,
+    edgeInterval,
+    sizing: sizeKelly(central.conditionalWinProbability, offeredAmerican, edgeInterval, {
+      referenceBankrollUnits: structuralConfig.sizing.referenceBankrollUnits,
+      kellyFraction: structuralConfig.sizing.kellyFraction,
+      increment: structuralConfig.sizing.roundDownUnits,
+      minimum: structuralConfig.sizing.minimumUnits,
+      maximum: structuralConfig.sizing.maximumUnits
+    })
   };
 }
 
@@ -799,17 +861,26 @@ export function rankTeaserPairs(
   const pairs: TeaserPairCandidate[] = [];
   for (let leftIndex = 0; leftIndex < candidates.length; leftIndex += 1) {
     const left = candidates[leftIndex];
-    if (left.fairProbability === null || left.pushProbability === null || left.warning === "unsupported") continue;
+    if (left.fairProbability === null || left.pushProbability === null || left.probabilityInterval === null || left.probabilityMembers?.length !== structuralConfig.model.bootstrapMembers || left.warning === "unsupported") continue;
     for (let rightIndex = leftIndex + 1; rightIndex < candidates.length; rightIndex += 1) {
       const right = candidates[rightIndex];
-      if (right.fairProbability === null || right.pushProbability === null || right.warning === "unsupported") continue;
+      if (right.fairProbability === null || right.pushProbability === null || right.probabilityInterval === null || right.probabilityMembers?.length !== structuralConfig.model.bootstrapMembers || right.warning === "unsupported") continue;
       if (left.book !== right.book || left.gameId === right.gameId) continue;
-      const priced = priceTwoTeamTeaser([
-        { conditionalWinProbability: left.fairProbability, pushProbability: left.pushProbability },
-        { conditionalWinProbability: right.fairProbability, pushProbability: right.pushProbability }
+      const priced = priceTwoTeamTeaserDecision([
+        {
+          conditionalWinProbability: left.fairProbability,
+          pushProbability: left.pushProbability,
+          probabilityMembers: left.probabilityMembers
+        },
+        {
+          conditionalWinProbability: right.fairProbability,
+          pushProbability: right.pushProbability,
+          probabilityMembers: right.probabilityMembers
+        }
       ], offeredAmerican);
       if (!priced) continue;
-      const fairProbability = priced.winProbability;
+      if (!priced.sizing.included) continue;
+      const fairProbability = priced.conditionalWinProbability;
       const expectedValue = priced.expectedValue;
       if (expectedValue < minimumExpectedValue) continue;
       const opposesPreferredTeam = preferred.has(left.opponent) || preferred.has(right.opponent);
@@ -825,7 +896,10 @@ export function rankTeaserPairs(
         lossProbability: priced.lossProbability,
         fairAmerican: priced.fairAmerican,
         playToAmerican: priced.playToAmerican,
-        expectedValue
+        expectedValue,
+        edgeInterval: priced.edgeInterval,
+        suggestedUnits: priced.sizing.suggestedUnits,
+        unitsGreyed: priced.sizing.greyed
       });
     }
   }
