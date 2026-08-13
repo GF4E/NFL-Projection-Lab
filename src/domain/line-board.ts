@@ -27,6 +27,29 @@ export type ValueLeg = Pick<SlipLeg, "gameId" | "americanPrice" | "fairProbabili
   pushProbability?: number;
 };
 
+export type SlipSelectionMode = "straight" | "parlay" | "teaser";
+export type SlipSelectionIdentity = {
+  id: string;
+  book: LineBookKey;
+  kind: "mainline" | "prop" | "teaser";
+  thesisKey: string;
+};
+
+export function updateSlipSelections<T extends SlipSelectionIdentity>(
+  current: readonly T[],
+  leg: T,
+  mode: SlipSelectionMode
+): { legs: T[]; switchedBook: boolean } {
+  if (current.some((item) => item.id === leg.id)) {
+    return { legs: current.filter((item) => item.id !== leg.id), switchedBook: false };
+  }
+  const withoutSameThesis = current.filter((item) => item.thesisKey !== leg.thesisKey);
+  if (mode === "straight") return { legs: [...withoutSameThesis, leg], switchedBook: false };
+  const sameBook = withoutSameThesis.filter((item) => item.book === leg.book);
+  const eligible = mode === "teaser" ? sameBook.filter((item) => item.kind === "teaser").slice(-1) : sameBook;
+  return { legs: [...eligible, leg], switchedBook: sameBook.length !== withoutSameThesis.length };
+}
+
 export function bestCoveredExecutionBook(
   lines: readonly LiveLine[],
   preferred: LineBookKey = "betmgm"
@@ -115,11 +138,13 @@ export function analyzeSlipValue(legs: readonly ValueLeg[], unitDollars = 25): S
 export function isPricedSlipApprovable(input: {
   mode: "straight" | "parlay" | "teaser";
   legCount: number;
+  singleBook: boolean;
   standardValue: SlipValue | null;
   teaserExpectedValuePercent: number | null;
 }): boolean {
   if (input.legCount < 1) return false;
   if (input.mode === "straight") return true;
+  if (!input.singleBook) return false;
   if (input.mode === "parlay") return input.legCount >= 2 && input.standardValue !== null;
   return input.legCount === 2 && input.teaserExpectedValuePercent !== null && input.teaserExpectedValuePercent >= 0;
 }

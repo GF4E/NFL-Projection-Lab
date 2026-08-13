@@ -1042,4 +1042,15 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(store).toContain("status = 'card' AND result = 'pending' AND gabe_approved = 1 AND jarrett_approved = 1");
     expect(store).toContain("cash_placement_confirmed = 1");
   });
+
+  it("47. preserves each best-book straight while keeping parlays and teasers single-book", () => {
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    const lineBoard = readFileSync("src/domain/line-board.ts", "utf8");
+    expect(board).toContain("updateSlipSelections(current, leg, mode)");
+    expect(board).toContain('}, "straight")');
+    expect(board).toContain("book: bookNames[leg.book]");
+    expect(board).not.toContain("book: bookNames[slip[0].book], primaryReason");
+    expect(lineBoard).toContain('if (mode === "straight") return');
+    expect(lineBoard).toContain("withoutSameThesis.filter((item) => item.book === leg.book)");
+  });
 });

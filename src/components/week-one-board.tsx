@@ -10,7 +10,7 @@ import type {
   TeaserCandidate,
   TeaserPairCandidate
 } from "@/domain/decision-board";
-import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, isPricedSlipApprovable, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
+import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, isPricedSlipApprovable, updateSlipSelections, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
 import { alignMatchupEvidence, compactEvidenceLabel } from "@/domain/evidence-alignment";
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
 import { rankBestBookMainlineRecommendations, rankMainlineRecommendations } from "@/domain/mainline-recommendations";
@@ -36,6 +36,7 @@ type DecisionResponse = DecisionBoardPayload & { error?: string };
 type SelectedLeg = ValueLeg & {
   id: string;
   sourceQuoteId: string;
+  thesisKey: string;
   kind: "mainline" | "prop" | "teaser";
   book: LineBookKey;
   market: LineMarketKey | "prop" | "teaser";
@@ -182,6 +183,7 @@ export function WeekOneBoard() {
   const slipCanApprove = isPricedSlipApprovable({
     mode: slipMode,
     legCount: slip.length,
+    singleBook: new Set(slip.map((leg) => leg.book)).size <= 1,
     standardValue: slipValue,
     teaserExpectedValuePercent: teaserValue?.evPercent ?? null
   });
@@ -242,14 +244,11 @@ export function WeekOneBoard() {
     }
   }
 
-  function addLeg(leg: SelectedLeg) {
+  function addLeg(leg: SelectedLeg, mode: SlipMode = slipMode) {
     setSlip((current) => {
-      if (current.some((item) => item.id === leg.id)) return current.filter((item) => item.id !== leg.id);
-      const sameContractRemoved = current.filter((item) => !(item.gameId === leg.gameId && item.book === leg.book && item.market === leg.market && item.kind === leg.kind));
-      const sameBook = sameContractRemoved.filter((item) => item.book === leg.book);
-      if (sameBook.length !== sameContractRemoved.length) setMessage(`Slip switched to ${bookNames[leg.book]}; contracts cannot cross books.`);
-      const capped = leg.kind === "teaser" ? sameBook.filter((item) => item.kind === "teaser").slice(-1) : sameBook;
-      return [...capped, leg];
+      const updated = updateSlipSelections(current, leg, mode);
+      if (updated.switchedBook) setMessage(`Slip switched to ${bookNames[leg.book]}; combined contracts cannot cross books.`);
+      return updated.legs;
     });
   }
 
@@ -283,7 +282,7 @@ export function WeekOneBoard() {
     const sized = recommendation(shrunkProbability, line.americanPrice, edgeInterval);
     if (sized?.included) setStake(sized.suggestedUnits * 25);
     addLeg({
-      id: line.id, sourceQuoteId: line.id, kind: "mainline", gameId: line.gameId, book: line.book, market: line.market, side: line.side,
+      id: line.id, sourceQuoteId: line.id, thesisKey: `${line.gameId}:${line.market}`, kind: "mainline", gameId: line.gameId, book: line.book, market: line.market, side: line.side,
       point: line.point, americanPrice: line.americanPrice, fairProbability: line.fairProbability,
       matchup, selection: lineSelection(line), detail: `${marketTitle(line.market)} · ${formatOdds(line.americanPrice)}`,
       edge: shrunkProbability === null || line.fairProbability === null ? null : shrunkProbability - line.fairProbability,
@@ -295,11 +294,11 @@ export function WeekOneBoard() {
     setSlipMode("straight");
     setStake(prop.suggestedUnits * 25);
     addLeg({
-      id: prop.id, sourceQuoteId: prop.sourceQuoteId, kind: "prop", gameId: prop.gameId, book: prop.executionBook, market: "prop", side: prop.side,
+      id: prop.id, sourceQuoteId: prop.sourceQuoteId, thesisKey: `${prop.gameId}:prop:${prop.market}:${prop.player.toLowerCase()}`, kind: "prop", gameId: prop.gameId, book: prop.executionBook, market: "prop", side: prop.side,
       point: prop.point, americanPrice: prop.americanPrice, fairProbability: prop.executionFairProbability,
       matchup, selection: `${prop.player} ${prop.side} ${prop.point}`,
       detail: `${propMarketTitle(prop.market)} · ${prop.referenceBooks}-book confirmation`, edge: prop.edge
-    });
+    }, "straight");
   }
 
   function addTeaser(candidate: TeaserCandidate, matchup: string) {
@@ -307,12 +306,12 @@ export function WeekOneBoard() {
     if (!line || candidate.fairProbability === null || candidate.pushProbability === null) return;
     setSlipMode("teaser");
     addLeg({
-      id: `teaser:${line.id}:${candidate.teasedPoint}`, sourceQuoteId: line.id, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
+      id: `teaser:${line.id}:${candidate.teasedPoint}`, sourceQuoteId: line.id, thesisKey: `${line.gameId}:teaser`, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
       point: candidate.teasedPoint, americanPrice: line.americanPrice, fairProbability: candidate.fairProbability,
       matchup, selection: `${line.side} ${formatPoint(candidate.teasedPoint)}`,
       detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : candidate.classification === "key_number" ? "key-number" : "positive-EV"} leg`, edge: candidate.fairProbability - (line.fairProbability ?? 0),
       pushProbability: candidate.pushProbability
-    });
+    }, "teaser");
   }
 
   function addTeaserPair(pair: TeaserPairCandidate) {
@@ -321,7 +320,7 @@ export function WeekOneBoard() {
       const matchup = matchups.find((game) => game.id === candidate.gameId);
       if (!line || !matchup || candidate.fairProbability === null || candidate.pushProbability === null) return [];
       return [{
-        id: `teaser:${line.id}:${candidate.teasedPoint}`, sourceQuoteId: line.id, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
+        id: `teaser:${line.id}:${candidate.teasedPoint}`, sourceQuoteId: line.id, thesisKey: `${line.gameId}:teaser`, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
         point: candidate.teasedPoint, americanPrice: line.americanPrice, fairProbability: candidate.fairProbability,
         matchup: `${matchup.away} @ ${matchup.home}`, selection: `${line.side} ${formatPoint(candidate.teasedPoint)}`,
         detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : candidate.classification === "key_number" ? "key-number" : "positive-EV"} leg`,
@@ -353,6 +352,7 @@ export function WeekOneBoard() {
     const selectedReason = pickReasons.find((item) => item.value === reason) ?? pickReasons[0];
     const entries = slipMode === "straight" ? slip.map((leg) => ({
       gameId: leg.gameId,
+      book: bookNames[leg.book],
       playType: "single" as const,
       market: leg.market === "prop" ? "prop" as const : leg.market as "spread" | "moneyline" | "total",
       title: leg.selection,
@@ -364,6 +364,7 @@ export function WeekOneBoard() {
       contract: [{ sourceQuoteId: leg.sourceQuoteId, gameId: leg.gameId, market: leg.market === "prop" ? "prop" as const : leg.market as "spread" | "total" | "moneyline", side: leg.side, point: leg.point, americanPrice: leg.americanPrice, selection: leg.selection }]
     })) : [{
       gameId: `multi-week-${slate.week}`,
+      book: bookNames[slip[0].book],
       playType: slipMode,
       market: slipMode,
       title: `${slip.length}-leg ${bookNames[slip[0].book]} ${slipMode}`,
@@ -382,7 +383,7 @@ export function WeekOneBoard() {
           body: JSON.stringify({
             ...entry,
             week: slate.week,
-            book: bookNames[slip[0].book], primaryReason: reason, stakeDollars: stake,
+            primaryReason: reason, stakeDollars: stake,
             confidence: "play", footballCase: "The team selected this exact contract from the shared decision board.", status: "card"
           })
         });
@@ -603,7 +604,7 @@ export function WeekOneBoard() {
         <div className="picker-switch" aria-label="Authenticated approver"><button className={`active ${picker}`} disabled>{picker === "gabe" ? "Gabe" : "Jarrett"}</button></div>
         <div className="slip-mode">
           <button className={slipMode === "straight" ? "active" : ""} onClick={() => { setSlipMode("straight"); setSlip((current) => current.filter((leg) => leg.kind !== "teaser")); }}>Straights</button>
-          <button className={slipMode === "parlay" ? "active" : ""} onClick={() => { setSlipMode("parlay"); setSlip((current) => current.filter((leg) => leg.kind !== "teaser")); }}>Parlay</button>
+          <button className={slipMode === "parlay" ? "active" : ""} onClick={() => { setSlipMode("parlay"); setSlip((current) => { const eligible = current.filter((leg) => leg.kind !== "teaser"); const activeBook = eligible.at(-1)?.book; const normalized = activeBook ? eligible.filter((leg) => leg.book === activeBook) : eligible; if (normalized.length !== eligible.length) setMessage(`Parlay kept ${bookNames[activeBook!]} selections; combined contracts cannot cross books.`); return normalized; }); }}>Parlay</button>
           <button className={slipMode === "teaser" ? "active" : ""} onClick={() => { setSlipMode("teaser"); setSlip((current) => current.filter((leg) => leg.kind === "teaser")); }}>Teaser</button>
         </div>
         {slip.length === 0 ? <div className="empty-slip"><b>Click a line.</b><p>The contract lands here. No typing, no dropdowns.</p></div> : <div className="slip-legs">{slip.map((leg, index) => <article key={leg.id}><button onClick={() => setSlip((current) => current.filter((item) => item.id !== leg.id))}>×</button><div><small>{leg.matchup} · {marketTitle(leg.market)}</small><b>{leg.selection}</b><span>{leg.detail} · {leg.kind === "teaser" || leg.edge === null ? "Fair" : "Bet"} {formatPercent(leg.kind === "teaser" ? leg.fairProbability : legBetProbability(leg))}</span></div><strong>{leg.kind === "teaser" ? "6 PT" : formatOdds(leg.americanPrice)}</strong><em>LEG {index + 1}</em></article>)}</div>}
