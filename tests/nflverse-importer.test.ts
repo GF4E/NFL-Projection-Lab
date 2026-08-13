@@ -134,6 +134,12 @@ describe("automatic nflverse importer", () => {
     expect(nextMissingHistoricalSeason(2026, "snap_counts", new Set())).toBe(2025);
     expect(nextMissingHistoricalSeason(2026, "snap_counts", new Set(["snap_counts:2025"]))).toBe(2024);
     expect(nextMissingHistoricalSeason(2026, "snap_counts", new Set(["snap_counts:2025", "snap_counts:2024"]))).toBeNull();
+    expect(nextMissingHistoricalSeason(
+      2026,
+      "player_stats",
+      new Set(["player_stats:2025", "player_stats:2024"]),
+      6
+    )).toBe(2023);
   });
 
   it("wires the five-minute schedule and Roboto into the deployed app", () => {

@@ -46,6 +46,13 @@ export interface StructuralConfig {
     minimumHitRate: number;
     participationSource: "nflverse_snap_counts";
     distinctRecommendationKey: "player_market";
+    usageProjectionTrainingStartSeason: number;
+    usageProjectionValidationArtifact: string;
+    projectionByMarket: Record<"player_pass_yds" | "player_rush_yds" | "player_reception_yds", {
+      method: "weighted_yardage_mean" | "usage_efficiency";
+      usageRecencyWeight: number;
+      efficiencyPriorOpportunities: number;
+    }>;
     matchupAdjustment: "market_consensus_only";
     matchupValidationArtifact: string;
   };

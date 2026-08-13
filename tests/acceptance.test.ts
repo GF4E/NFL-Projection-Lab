@@ -27,7 +27,7 @@ import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
 import { addTeamApproval, approvalActorForEmail, draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, isTeamApproved, storedLegMatchesQuote, trackerRecordSummaries, trackerSummary, validateTeamCardPortfolio } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
-import { buildPlayerPropEvidence, crossedKeyNumbers, isClassicWongPoint, isPropPlayerUnavailable, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
+import { buildPlayerPropEvidence, completeLeaguePropEfficiencyPrior, crossedKeyNumbers, isClassicWongPoint, isPropPlayerUnavailable, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
@@ -425,7 +425,11 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
         value, opportunities: 7
       }))
     ];
-    const evidence = buildPlayerPropEvidence(history, { player: "Receiver", market: "player_reception_yds", side: "Over", point: 60.5 });
+    const evidence = buildPlayerPropEvidence(
+      history,
+      { player: "Receiver", market: "player_reception_yds", side: "Over", point: 60.5 },
+      { leagueYardsPerOpportunity: { player_reception_yds: 10.8 } }
+    );
     expect(evidence).toMatchObject({ sampleGames: 8 });
     expect(evidence!.hitRate).toBeLessThan(1);
 
@@ -455,6 +459,58 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(validation.results.every((row) => !row.seasonallyConsistent)).toBe(true);
     expect(structuralConfig.props.matchupAdjustment).toBe("market_consensus_only");
     expect(structuralConfig.props.matchupValidationArtifact).toBe("prop-matchup-validation.json");
+  });
+
+  it("23e. promotes usage forecasts only where untouched holdout data passes the gate", () => {
+    const validation = JSON.parse(readFileSync("config/prop-usage-validation.json", "utf8")) as {
+      results: Array<{
+        market: string;
+        decision: string;
+        holdoutRelativeMaeImprovementPercent: number;
+        blockBootstrap80PercentMeanAbsoluteErrorImprovement: [number, number];
+      }>;
+    };
+    expect(validation.results.find((row) => row.market === "player_pass_yds")?.decision).toBe("rejected");
+    for (const market of ["player_rush_yds", "player_reception_yds"] as const) {
+      const result = validation.results.find((row) => row.market === market)!;
+      expect(result.decision).toBe("promoted");
+      expect(result.holdoutRelativeMaeImprovementPercent).toBeGreaterThan(0);
+      expect(result.blockBootstrap80PercentMeanAbsoluteErrorImprovement[0]).toBeGreaterThan(0);
+      expect(structuralConfig.props.projectionByMarket[market].method).toBe("usage_efficiency");
+    }
+    expect(structuralConfig.props.projectionByMarket.player_pass_yds.method).toBe("weighted_yardage_mean");
+    expect(structuralConfig.props.usageProjectionValidationArtifact).toBe("prop-usage-validation.json");
+
+    const leagueTotals = {
+      seasons: 6, passingYards: 150_000, attempts: 4_500,
+      rushingYards: 75_000, carries: 17_000, receivingYards: 145_000, targets: 13_500
+    };
+    expect(completeLeaguePropEfficiencyPrior({ ...leagueTotals, seasons: 5 }, 6)).toBeNull();
+    expect(completeLeaguePropEfficiencyPrior(leagueTotals, 6)).toEqual({
+      player_pass_yds: 150_000 / 4_500,
+      player_rush_yds: 75_000 / 17_000,
+      player_reception_yds: 145_000 / 13_500
+    });
+
+    const history = [
+      [18, 72, 15], [17, 48, 12], [16, 80, 16], [15, 30, 8],
+      [14, 55, 11], [13, 44, 10], [12, 68, 14], [11, 36, 9]
+    ].map(([week, value, opportunities]) => ({
+      player: "Runner", market: "player_rush_yds" as const, season: 2025, week, value, opportunities
+    }));
+    const contract = { player: "Runner", market: "player_rush_yds" as const, side: "Over" as const, point: 49.5 };
+    expect(buildPlayerPropEvidence(history, contract)).toBeNull();
+    const evidence = buildPlayerPropEvidence(history, contract, {
+      leagueYardsPerOpportunity: { player_rush_yds: 4.2 }
+    });
+    const valueWeights = history.map((_, index) => 0.85 ** index);
+    const usageWeights = history.map((_, index) => 0.75 ** index);
+    const weightedYards = history.reduce((sum, row, index) => sum + row.value * valueWeights[index], 0);
+    const weightedOpportunities = history.reduce((sum, row, index) => sum + row.opportunities * valueWeights[index], 0);
+    const projectedOpportunities = history.reduce((sum, row, index) => sum + row.opportunities * usageWeights[index], 0) /
+      usageWeights.reduce((sum, weight) => sum + weight, 0);
+    const expected = projectedOpportunities * (weightedYards + 40 * 4.2) / (weightedOpportunities + 40);
+    expect(evidence?.projectedValue).toBeCloseTo(expected, 10);
   });
 
   it("24. identifies classic Wong paths and derives crossed key numbers", () => {

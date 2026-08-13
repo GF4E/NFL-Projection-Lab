@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   PROP_MARKETS,
   buildPlayerPropEvidence,
+  completeLeaguePropEfficiencyPrior,
   isPropPlayerUnavailable,
   normalizePropPlayerName,
   propPlayerLookupPattern,
@@ -97,6 +98,16 @@ interface PlayerSnapHistoryRow {
   season: number;
   week: number;
   offense_snaps: number;
+}
+
+interface LeaguePropEfficiencyRow {
+  seasons: number;
+  passing_yards: number | null;
+  attempts: number | null;
+  rushing_yards: number | null;
+  carries: number | null;
+  receiving_yards: number | null;
+  targets: number | null;
 }
 
 interface InjuryAvailabilityRow {
@@ -210,6 +221,24 @@ async function playerEvidenceForGame(db: D1Database, gameId: string, quotes: rea
   if (!players.length) return [];
   const rows: PlayerStatRow[] = [];
   const snapRows: PlayerSnapHistoryRow[] = [];
+  const league = await db.prepare(`SELECT COUNT(DISTINCT season) AS seasons,
+      SUM(passing_yards) AS passing_yards, SUM(attempts) AS attempts,
+      SUM(rushing_yards) AS rushing_yards, SUM(carries) AS carries,
+      SUM(receiving_yards) AS receiving_yards, SUM(targets) AS targets
+    FROM nfl_player_week_stats
+    WHERE season_type = 'REG' AND season >= ?
+      AND (season < ? OR (season = ? AND week < ?))`)
+    .bind(structuralConfig.props.usageProjectionTrainingStartSeason, matchup.season, matchup.season, matchup.week)
+    .first<LeaguePropEfficiencyRow>();
+  const leagueYardsPerOpportunity = completeLeaguePropEfficiencyPrior(league ? {
+    seasons: league.seasons,
+    passingYards: league.passing_yards ?? 0,
+    attempts: league.attempts ?? 0,
+    rushingYards: league.rushing_yards ?? 0,
+    carries: league.carries ?? 0,
+    receivingYards: league.receiving_yards ?? 0,
+    targets: league.targets ?? 0
+  } : null, matchup.season - structuralConfig.props.usageProjectionTrainingStartSeason) ?? undefined;
   for (const group of chunks(players, 60)) {
     const allowedPlayers = new Set(group.map(normalizePropPlayerName));
     const lookupPatterns = [...new Set(group.map(propPlayerLookupPattern))];
@@ -269,7 +298,8 @@ async function playerEvidenceForGame(db: D1Database, gameId: string, quotes: rea
     const evidence = buildPlayerPropEvidence(history, contract, {
       minimumGames: structuralConfig.props.minimumHistoryGames,
       windowGames: structuralConfig.props.historyWindowGames,
-      priorGames: structuralConfig.props.priorGames
+      priorGames: structuralConfig.props.priorGames,
+      leagueYardsPerOpportunity
     });
     return evidence ? [evidence] : [];
   });

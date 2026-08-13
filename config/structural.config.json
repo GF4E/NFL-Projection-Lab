@@ -1,5 +1,5 @@
 {
-  "version": "2026.preseason.8",
+  "version": "2026.preseason.9",
   "season": 2026,
   "frozen": true,
   "unitDollars": 25,
@@ -43,6 +43,25 @@
     "minimumHitRate": 0.5,
     "participationSource": "nflverse_snap_counts",
     "distinctRecommendationKey": "player_market",
+    "usageProjectionTrainingStartSeason": 2020,
+    "usageProjectionValidationArtifact": "prop-usage-validation.json",
+    "projectionByMarket": {
+      "player_pass_yds": {
+        "method": "weighted_yardage_mean",
+        "usageRecencyWeight": 0.85,
+        "efficiencyPriorOpportunities": 0
+      },
+      "player_rush_yds": {
+        "method": "usage_efficiency",
+        "usageRecencyWeight": 0.75,
+        "efficiencyPriorOpportunities": 40
+      },
+      "player_reception_yds": {
+        "method": "usage_efficiency",
+        "usageRecencyWeight": 0.85,
+        "efficiencyPriorOpportunities": 20
+      }
+    },
     "matchupAdjustment": "market_consensus_only",
     "matchupValidationArtifact": "prop-matchup-validation.json"
   },

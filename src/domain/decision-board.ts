@@ -405,6 +405,28 @@ export interface PlayerPropEvidence {
   probabilityInterval: [number, number];
 }
 
+export function completeLeaguePropEfficiencyPrior(
+  totals: {
+    seasons: number;
+    passingYards: number;
+    attempts: number;
+    rushingYards: number;
+    carries: number;
+    receivingYards: number;
+    targets: number;
+  } | null,
+  requiredSeasons: number
+): Record<PropMarketKey, number> | null {
+  if (!totals || totals.seasons < requiredSeasons || totals.attempts <= 0 || totals.carries <= 0 || totals.targets <= 0) {
+    return null;
+  }
+  return {
+    player_pass_yds: totals.passingYards / totals.attempts,
+    player_rush_yds: totals.rushingYards / totals.carries,
+    player_reception_yds: totals.receivingYards / totals.targets
+  };
+}
+
 export interface PlayerPropBoard {
   gameId: string;
   status: "current" | "stale" | "unavailable";
@@ -464,7 +486,12 @@ export function playerPropEvidenceKey(input: Pick<PlayerPropEvidence, "player" |
 export function buildPlayerPropEvidence(
   history: readonly PlayerPropHistoryRow[],
   contract: { player: string; market: PropMarketKey; side: "Over" | "Under"; point: number },
-  options: { minimumGames?: number; windowGames?: number; priorGames?: number } = {}
+  options: {
+    minimumGames?: number;
+    windowGames?: number;
+    priorGames?: number;
+    leagueYardsPerOpportunity?: Partial<Record<PropMarketKey, number>>;
+  } = {}
 ): PlayerPropEvidence | null {
   const minimumGames = options.minimumGames ?? structuralConfig.props.minimumHistoryGames;
   const windowGames = options.windowGames ?? structuralConfig.props.historyWindowGames;
@@ -481,7 +508,23 @@ export function buildPlayerPropEvidence(
   if (samples.length < minimumGames) return null;
   const weighted = samples.map((row, index) => ({ row, weight: structuralConfig.props.recencyWeight ** index }));
   const totalWeight = weighted.reduce((sum, item) => sum + item.weight, 0);
-  const projectedValue = weighted.reduce((sum, item) => sum + item.row.value * item.weight, 0) / totalWeight;
+  const weightedYards = weighted.reduce((sum, item) => sum + item.row.value * item.weight, 0);
+  const projection = structuralConfig.props.projectionByMarket[contract.market];
+  let projectedValue = weightedYards / totalWeight;
+  if (projection.method === "usage_efficiency") {
+    const leagueEfficiency = options.leagueYardsPerOpportunity?.[contract.market];
+    if (leagueEfficiency === undefined || !Number.isFinite(leagueEfficiency) || leagueEfficiency <= 0) return null;
+    const usageWeighted = samples.map((row, index) => ({ row, weight: projection.usageRecencyWeight ** index }));
+    const usageWeight = usageWeighted.reduce((sum, item) => sum + item.weight, 0);
+    const projectedOpportunities = usageWeighted.reduce((sum, item) => sum + item.row.opportunities * item.weight, 0) / usageWeight;
+    const weightedOpportunities = weighted.reduce((sum, item) => sum + item.row.opportunities * item.weight, 0);
+    const efficiency = (
+      weightedYards + projection.efficiencyPriorOpportunities * leagueEfficiency
+    ) / (
+      weightedOpportunities + projection.efficiencyPriorOpportunities
+    );
+    projectedValue = projectedOpportunities * efficiency;
+  }
   const hits = weighted.map((item) => ({
     edge: item.row.value === contract.point ? 0.5 : contract.side === "Over" ? Number(item.row.value > contract.point) : Number(item.row.value < contract.point),
     weight: item.weight

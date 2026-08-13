@@ -450,7 +450,12 @@ export async function runNflverseAutomation(input: {
     const importedPlayerStats = new Set(refreshedStates
       .filter((state) => state.dataset.startsWith("player_stats:") && state.lastSuccessAt)
       .map((state) => state.dataset));
-    const playerBackfillSeason = nextMissingHistoricalSeason(currentSeason, "player_stats", importedPlayerStats);
+    const playerBackfillSeason = nextMissingHistoricalSeason(
+      currentSeason,
+      "player_stats",
+      importedPlayerStats,
+      currentSeason - structuralConfig.props.usageProjectionTrainingStartSeason
+    );
     if (playerBackfillSeason !== null) {
       const backfill = await refreshPlayerStatsSeason({ db: input.db, season: playerBackfillSeason, currentSeason, now, fetcher });
       playerStats = backfill.state;
