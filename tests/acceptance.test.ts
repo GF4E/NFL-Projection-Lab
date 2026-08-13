@@ -844,6 +844,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(proxy).toContain("supabase.auth.signOut()");
     expect(proxy).toContain("response.cookies.getAll()");
     expect(auth).toContain('request.headers.get("oai-authenticated-user-email")');
+    expect(auth).toContain('request.headers.get("oai-authenticated-user-id")');
     expect(auth).toContain("supabase.auth.getUser()");
     expect(auth).not.toContain('?? "owner-preview"');
     expect(plays).toContain("requestTeamMember(request)");
