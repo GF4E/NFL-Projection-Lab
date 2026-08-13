@@ -16,7 +16,7 @@ import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, isPriced
 import { priceIndependentParlayDecision } from "@/domain/forecast-value";
 import { alignMatchupEvidence, compactEvidenceLabel, evidenceDetail, materialEvidenceSignals } from "@/domain/evidence-alignment";
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
-import { rankBestBookMainlineRecommendations, rankMainlineRecommendations, type MainlineRecommendation } from "@/domain/mainline-recommendations";
+import { rankBestBookMainlineRecommendations, rankMainlineRecommendations, rankWeeklyMainlineRecommendations, type MainlineRecommendation } from "@/domain/mainline-recommendations";
 import { structuralConfig } from "@/domain/config";
 import { exactContractApprovalRequest, isTeamApproved, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
 import { sizeKelly, type SizingResult } from "@/domain/sizing";
@@ -240,6 +240,21 @@ export function WeekOneBoard() {
     ? slip.map(straightLegSizing)
     : [], [slip, slipMode]);
   const straightEligibleLegCount = straightSizing.filter((sizing) => sizing?.included).length;
+  const weeklyOpportunities = useMemo(() => rankWeeklyMainlineRecommendations(matchups.flatMap((game) => {
+    const gameIntel = intelligence?.games.find((item) => item.gameId === game.id);
+    if (!gameIntel) return [];
+    return (["betmgm", "fanduel"] as const).flatMap((executionBook) => rankMainlineRecommendations({
+      gameId: game.id,
+      awayTeam: game.away,
+      homeTeam: game.home,
+      book: executionBook,
+      lines,
+      spread: gameIntel.projections.find((item) => item.book === executionBook) ?? null,
+      total: gameIntel.totals.find((item) => item.book === executionBook) ?? null,
+      moneyline: gameIntel.moneylines.find((item) => item.book === executionBook) ?? null,
+      preferredTeams
+    }));
+  }), 5), [intelligence, lines, matchups]);
   const slipCanApprove = isPricedSlipApprovable({
     mode: slipMode,
     legCount: slip.length,
@@ -332,8 +347,8 @@ export function WeekOneBoard() {
     });
   }
 
-  function toggleLine(line: LiveLine, matchup: string) {
-    if (slipMode === "teaser") {
+  function toggleLine(line: LiveLine, matchup: string, mode: SlipMode = slipMode) {
+    if (mode === "teaser") {
       setMessage("Use a highlighted six-point teaser leg under Picks.");
       return;
     }
@@ -373,7 +388,15 @@ export function WeekOneBoard() {
         Math.max(0.001, line.fairProbability + edgeInterval[0]),
         Math.min(0.999, line.fairProbability + edgeInterval[1])
       ]
-    });
+    }, mode);
+  }
+
+  function addWeeklyOpportunity(candidate: MainlineRecommendation) {
+    const matchup = matchups.find((game) => game.id === candidate.line.gameId);
+    if (!matchup) return;
+    setBook(candidate.line.book);
+    setSlipMode("straight");
+    toggleLine(candidate.line, `${matchup.away} @ ${matchup.home}`, "straight");
   }
 
   function addProp(prop: PropCandidate, matchup: string) {
@@ -545,6 +568,19 @@ export function WeekOneBoard() {
 
     <div className={`sportsbook-layout ${slipOpen || slip.length ? "" : "slip-collapsed"}`}>
       <section className="event-board" aria-label={`Week ${slate?.week ?? 1} game lines`}>
+        <section className={`weekly-opportunity-queue ${weeklyOpportunities.length ? "has-opportunities" : "empty"}`} aria-label="Best executable model opportunities this week">
+          <header><span>BEST AVAILABLE</span><small>{weeklyOpportunities.length ? `${weeklyOpportunities.length} exact-price ${weeklyOpportunities.length === 1 ? "contract" : "contracts"}` : "No contract clears every gate"}</small></header>
+          {weeklyOpportunities.map((candidate, index) => {
+            const matchup = matchups.find((game) => game.id === candidate.line.gameId);
+            const gameIntel = intelligence?.games.find((game) => game.gameId === candidate.line.gameId);
+            const context = alignMatchupEvidence(gameIntel?.signals ?? [], candidate.market, candidate.line.side);
+            return <button className={candidate.sizing.greyed ? "uncertain" : ""} onClick={() => addWeeklyOpportunity(candidate)} key={candidate.line.id}>
+              <span>{index + 1}</span>
+              <div><small>{matchup ? `${matchup.away} @ ${matchup.home}` : candidate.line.gameId} · {bookNames[candidate.line.book]}</small><b>{lineSelection(candidate.line)} <strong>{formatOdds(candidate.line.americanPrice)}</strong></b><em className={context.verdict}>{compactEvidenceLabel(context)}</em></div>
+              <div><b>+{(candidate.expectedValue * 100).toFixed(1)}%</b><small>{candidate.sizing.suggestedUnits}u{candidate.sizing.greyed ? " · UNCERTAIN" : ""}</small></div>
+            </button>;
+          })}
+        </section>
         <div className="market-column-head"><span>Matchup</span>{(["spread", "total", "moneyline"] as const).map((market) => {
           const coverage = activeMarketCoverage.find((item) => item.market === market);
           return <span className={coverage?.status === "complete" ? "" : "coverage-gap"} key={market}><b>{marketShortTitle(market)}</b>{coverage && coverage.status !== "complete" && <small>{coverage.completeGames}/{coverage.totalGames} POSTED</small>}</span>;

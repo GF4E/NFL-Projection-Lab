@@ -166,3 +166,38 @@ export function rankBestBookMainlineRecommendations(
     .filter((candidate): candidate is MainlineRecommendation => candidate !== null)
     .sort((left, right) => Number(right.actionable) - Number(left.actionable));
 }
+
+function weeklyRecommendationOrder(left: MainlineRecommendation, right: MainlineRecommendation): number {
+  // A positive lower uncertainty bound earns the top of the queue. Contracts
+  // whose interval spans zero remain visible (and greyed) after the clearer
+  // decisions because the numerical Kelly floor is still authoritative.
+  return Number(left.sizing.greyed) - Number(right.sizing.greyed) ||
+    right.edgeInterval[0] - left.edgeInterval[0] ||
+    right.expectedValue - left.expectedValue ||
+    right.probabilityEdge - left.probabilityEdge;
+}
+
+function exactContractOrder(left: MainlineRecommendation, right: MainlineRecommendation): number {
+  return right.expectedValue - left.expectedValue ||
+    right.probabilityEdge - left.probabilityEdge ||
+    right.edgeInterval[0] - left.edgeInterval[0];
+}
+
+/**
+ * Produces one compact weekly scan queue without creating a second model.
+ * Inputs are exact-contract candidates from every execution book; the queue
+ * retains only the best side and best total thesis per game.
+ */
+export function rankWeeklyMainlineRecommendations(
+  candidates: readonly MainlineRecommendation[],
+  maximum = 5
+): MainlineRecommendation[] {
+  if (!Number.isInteger(maximum) || maximum < 1) return [];
+  const bestByThesis = new Map<string, MainlineRecommendation>();
+  for (const candidate of candidates.filter((item) => item.actionable)) {
+    const thesis = `${candidate.line.gameId}:${candidate.market === "total" ? "total" : "side"}`;
+    const current = bestByThesis.get(thesis);
+    if (!current || exactContractOrder(candidate, current) < 0) bestByThesis.set(thesis, candidate);
+  }
+  return [...bestByThesis.values()].sort(weeklyRecommendationOrder).slice(0, maximum);
+}

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { BaselineProjection, MoneylineProjection, TotalProjection } from "@/domain/decision-board";
 import type { LineMarketKey, LiveLine } from "@/domain/line-board";
 import { bestCoveredExecutionBook } from "@/domain/line-board";
-import { rankBestBookMainlineRecommendations, rankMainlineRecommendations } from "@/domain/mainline-recommendations";
+import { rankBestBookMainlineRecommendations, rankMainlineRecommendations, rankWeeklyMainlineRecommendations } from "@/domain/mainline-recommendations";
 
 const capturedAt = "2026-09-13T18:00:00.000Z";
 
@@ -155,6 +155,40 @@ describe("exact-price mainline recommendations", () => {
       .toEqual([betmgm]);
     expect(rankBestBookMainlineRecommendations([betmgm, fanduel]).map((candidate) => candidate.line.book))
       .toEqual(["fanduel"]);
+  });
+
+  it("builds a compact weekly queue from only the best actionable exact contracts", () => {
+    const sameGameMgm = buildCandidateForCrossBookTotal("betmgm", 45.5, 0.06);
+    const sameGameFanDuel = { ...buildCandidateForCrossBookTotal("fanduel", 46.5, 0.08), edgeInterval: [0.03, 0.1] as [number, number] };
+    const otherGame = {
+      ...buildCandidateForCrossBookTotal("betmgm", 42.5, 0.07),
+      line: { ...sameGameMgm.line, id: "other-game-total", gameId: "atl-tb", point: 42.5 },
+      edgeInterval: [-0.01, 0.09] as [number, number],
+      sizing: { ...sameGameMgm.sizing, greyed: true }
+    };
+    const blocked = {
+      ...buildCandidateForCrossBookTotal("betmgm", 40.5, 0.2),
+      line: { ...sameGameMgm.line, id: "blocked-total", gameId: "chi-gb", point: 40.5 },
+      actionable: false
+    };
+    const queue = rankWeeklyMainlineRecommendations([sameGameMgm, sameGameFanDuel, otherGame, blocked], 5);
+    expect(queue.map((candidate) => candidate.line.id)).toEqual([sameGameFanDuel.line.id, "other-game-total"]);
+    expect(queue.every((candidate) => candidate.actionable)).toBe(true);
+    expect(rankWeeklyMainlineRecommendations(queue, 1)).toEqual([sameGameFanDuel]);
+  });
+
+  it("keeps the highest-EV exact book contract within a thesis before uncertainty ordering", () => {
+    const higherEv = {
+      ...buildCandidateForCrossBookTotal("betmgm", 45.5, 0.09),
+      edgeInterval: [-0.01, 0.12] as [number, number],
+      sizing: { ...buildCandidateForCrossBookTotal("betmgm", 45.5, 0.09).sizing, greyed: true }
+    };
+    const clearerButWorse = {
+      ...buildCandidateForCrossBookTotal("fanduel", 46.5, 0.06),
+      edgeInterval: [0.03, 0.08] as [number, number]
+    };
+    expect(rankWeeklyMainlineRecommendations([clearerButWorse, higherEv]))
+      .toEqual([higherEv]);
   });
 });
 
