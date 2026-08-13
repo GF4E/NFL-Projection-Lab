@@ -48,6 +48,24 @@ export function alignMatchupEvidence(
   return { relevant, supporting, opposing, supportingStrength, opposingStrength, verdict };
 }
 
+/**
+ * Returns only contract-relevant evidence strong enough to earn screen space.
+ * This is deliberately separate from alignment so weak descriptive statistics
+ * cannot leak into the decision surface merely because they are available.
+ */
+export function materialEvidenceSignals(
+  signals: readonly MatchupSignal[],
+  market: LineMarketKey | "teaser",
+  selection: string,
+  minimumStrength = 8,
+  maximumSignals = 3
+): MatchupSignal[] {
+  return alignMatchupEvidence(signals, market, selection).relevant
+    .filter((signal) => signal.strength >= minimumStrength)
+    .sort((left, right) => right.strength - left.strength)
+    .slice(0, maximumSignals);
+}
+
 const shortSignalLabels: Record<MatchupSignal["id"], string> = {
   efficiency: "ADJ EPA",
   success: "SUCCESS",

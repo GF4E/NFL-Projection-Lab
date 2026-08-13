@@ -830,7 +830,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(server).toContain("totals: totalProjections(");
     expect(server).toContain("championModel");
     expect(server).toContain("applyChampionMarketResidual");
-    expect(board).toContain("MODEL TOTAL");
+    expect(board).toContain('`TOTAL ${totalProjection.projectedTotal}`');
     expect(board).toContain('line.market === "total"');
     expect(board).toContain("estimatedEvPercent: legExpectedValuePercent(leg)");
     expect(board).toContain("straightEv");
@@ -994,10 +994,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(server).toContain("ensembleHash");
     expect(server).toContain("edgeInterval");
     expect(board).toContain("sizeKelly");
-    expect(board).toContain("sideSizing.suggestedUnits");
-    expect(board).toContain("totalSizing.suggestedUnits");
-    expect(board).toContain('sideSizing.greyed ? "uncertain"');
-    expect(board).toContain('totalSizing.greyed ? "uncertain"');
+    expect(board).toContain("currentBookDecision.sizing");
+    expect(board).toContain("decisionUnit.suggestedUnits");
+    expect(board).toContain("decisionUnit?.greyed");
+    expect(board).toContain("total: gameIntel?.totals.find");
   });
 
   it("38. models moneylines through the logged champion and prices NFL ties as pushes", () => {

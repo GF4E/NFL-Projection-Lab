@@ -1,10 +1,12 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { priceTwoTeamTeaserDecision, rankBestExecutionProps } from "@/domain/decision-board";
 import type {
   DecisionBoardPayload,
+  MatchupSignal,
   PlayerPropBoard,
   PropCandidate,
   TeaserCandidate,
@@ -12,9 +14,9 @@ import type {
 } from "@/domain/decision-board";
 import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, isPricedSlipApprovable, updateSlipSelections, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
 import { priceIndependentParlayDecision } from "@/domain/forecast-value";
-import { alignMatchupEvidence, compactEvidenceLabel, evidenceDetail } from "@/domain/evidence-alignment";
+import { alignMatchupEvidence, compactEvidenceLabel, evidenceDetail, materialEvidenceSignals } from "@/domain/evidence-alignment";
 import { americanToDecimal, expectedValueWithPush } from "@/domain/odds";
-import { rankBestBookMainlineRecommendations, rankMainlineRecommendations } from "@/domain/mainline-recommendations";
+import { rankBestBookMainlineRecommendations, rankMainlineRecommendations, type MainlineRecommendation } from "@/domain/mainline-recommendations";
 import { structuralConfig } from "@/domain/config";
 import { exactContractApprovalRequest, isTeamApproved, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
 import { sizeKelly, type SizingResult } from "@/domain/sizing";
@@ -23,12 +25,6 @@ import { pickReasons } from "@/lib/week-one-data";
 
 const bookNames: Record<LineBookKey, string> = { betmgm: "BetMGM", fanduel: "FanDuel" };
 const preferredTeams = new Set(["SEA", "ATL"]);
-const teamColors: Record<string, string> = {
-  ARI: "#97233f", ATL: "#a71930", BAL: "#241773", BUF: "#00338d", CAR: "#0085ca", CHI: "#0b162a", CIN: "#fb4f14", CLE: "#311d00",
-  DAL: "#003594", DEN: "#fb4f14", DET: "#0076b6", GB: "#203731", HOU: "#03202f", IND: "#002c5f", JAX: "#006778", KC: "#e31837",
-  LV: "#a5acaf", LAC: "#0080c6", LAR: "#003594", MIA: "#008e97", MIN: "#4f2683", NE: "#c60c30", NO: "#d3bc8d", NYG: "#0b2265",
-  NYJ: "#125740", PHI: "#004c54", PIT: "#ffb612", SF: "#aa0000", SEA: "#69be28", TB: "#d50a0a", TEN: "#0c2340", WAS: "#5a1414"
-};
 
 type TimeZoneChoice = "PT" | "ET";
 type SlipMode = "straight" | "parlay" | "teaser";
@@ -137,6 +133,33 @@ function snapshotAge(capturedAt: string): string {
   return `${Math.round(minutes / 1_440)}D`;
 }
 
+function teamLogoPath(team: string): string {
+  return `/team-logos/${team === "WAS" ? "wsh" : team.toLowerCase()}.png`;
+}
+
+function signalInterpretation(signal: MatchupSignal): string {
+  if (signal.id === "efficiency") return `${signal.lean} owns the opponent-adjusted efficiency mismatch.`;
+  if (signal.id === "success") return `${signal.lean} has the steadier down-to-down path.`;
+  if (signal.id === "explosive") return `${signal.lean} has the clearer explosive-play mismatch.`;
+  if (signal.id === "turnovers") return `${signal.lean} has the cleaner regression-adjusted possession outlook.`;
+  if (signal.id === "pace") return `${signal.lean} pressure rises from the combined tempo.`;
+  if (signal.id === "pass_rate") return `${signal.lean} pressure rises from the combined pass tendency.`;
+  if (signal.id === "rest") return `${signal.lean} carries the preparation edge.`;
+  return `${signal.lean} leads the margin-versus-close strength state.`;
+}
+
+function edgeLabel(candidate: MainlineRecommendation | null): string {
+  if (!candidate) return "—";
+  const points = candidate.probabilityEdge * 100;
+  return `${points >= 0 ? "+" : ""}${points.toFixed(1)}pp`;
+}
+
+function evLabel(candidate: MainlineRecommendation | null): string {
+  if (!candidate) return "—";
+  const percent = candidate.expectedValue * 100;
+  return `${percent >= 0 ? "+" : ""}${percent.toFixed(1)}%`;
+}
+
 function SpreadSparkline({ values }: { values: readonly number[] }) {
   if (!values.length) return null;
   const minimum = Math.min(...values);
@@ -156,6 +179,7 @@ function SpreadSparkline({ values }: { values: readonly number[] }) {
 export function WeekOneBoard() {
   const [book, setBook] = useState<LineBookKey>("betmgm");
   const initialBookChosen = useRef(false);
+  const expandedGameRef = useRef<HTMLDivElement | null>(null);
   const [timeZone, setTimeZone] = useState<TimeZoneChoice>("PT");
   const [slate, setSlate] = useState<WeeklySlate | null>(null);
   const [lines, setLines] = useState<LiveLine[]>([]);
@@ -172,6 +196,7 @@ export function WeekOneBoard() {
   const [propBoards, setPropBoards] = useState<Record<string, PlayerPropBoard>>({});
   const [propsLoading, setPropsLoading] = useState<string | null>(null);
   const [teaserPrice, setTeaserPrice] = useState(structuralConfig.teasers.screeningAmerican);
+  const [slipOpen, setSlipOpen] = useState(false);
   const matchups = useMemo(() => slate?.games ?? [], [slate]);
   const days = useMemo(() => [...new Set(matchups.map((game) => game.day))], [matchups]);
   const slipValue = useMemo(() => slipMode === "teaser" ? null : analyzeSlipValue(slip), [slip, slipMode]);
@@ -236,6 +261,24 @@ export function WeekOneBoard() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!openGame) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (event.target instanceof Node && !expandedGameRef.current?.contains(event.target)) {
+        setOpenGame(null);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpenGame(null);
+    };
+    document.addEventListener("pointerdown", closeOnOutsidePointer);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePointer);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [openGame]);
+
   async function toggleDecisionDesk(gameId: string) {
     const next = openGame === gameId ? null : gameId;
     setOpenGame(next);
@@ -254,6 +297,7 @@ export function WeekOneBoard() {
   }
 
   function addLeg(leg: SelectedLeg, mode: SlipMode = slipMode) {
+    setSlipOpen(true);
     setSlip((current) => {
       const updated = updateSlipSelections(current, leg, mode);
       if (updated.switchedBook) setMessage(`Slip switched to ${bookNames[leg.book]}; combined contracts cannot cross books.`);
@@ -353,6 +397,7 @@ export function WeekOneBoard() {
     });
     if (legs.length !== 2) return;
     setSlipMode("teaser");
+    setSlipOpen(true);
     setSlip(legs);
     setTeaserPrice(pair.screeningAmerican);
     setStake(pair.suggestedUnits * 25);
@@ -455,7 +500,7 @@ export function WeekOneBoard() {
 
   return <div className={`sportsbook-board book-${book}`}>
     <header className="sportsbook-topline">
-      <div><span>{slate?.season ?? 2026} REGULAR SEASON</span><h1>Week {slate?.week ?? 1}</h1></div>
+      <div><h1>Week {slate?.week ?? 1}</h1><span>{matchups.length || 16} games</span></div>
       <div className="board-controls">
         <div className="click-toggle" role="group" aria-label="Sportsbook">{(["betmgm", "fanduel"] as const).map((value) => <button className={book === value ? "active" : ""} onClick={() => setBook(value)} key={value}>{bookNames[value]}</button>)}</div>
         <div className="click-toggle compact" role="group" aria-label="Time zone">{(["PT", "ET"] as const).map((value) => <button className={timeZone === value ? "active" : ""} onClick={() => setTimeZone(value)} key={value}>{value}</button>)}</div>
@@ -463,19 +508,18 @@ export function WeekOneBoard() {
     </header>
 
     <div className="line-status" data-ready={lines.length > 0}>
-      <span><i />{lines.length ? `${bookNames[book]} snapshot loaded` : configured ? "Feed connected · load the first snapshot" : "Live odds key needed"}</span>
-      <small>{latestCapture ? `UPDATED ${new Date(latestCapture).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}` : `${bookNames[book].toUpperCase()} IS CONNECTED THROUGH THE FREE US FEED`}{!configured && <> · <a href="https://the-odds-api.com/" target="_blank" rel="noreferrer">GET KEY ↗</a></>}</small>
+      <span><i />{lines.length ? "LINES LIVE" : configured ? "LINES PENDING" : "ODDS KEY NEEDED"}</span>
+      <small>{latestCapture ? `${bookNames[book].toUpperCase()} · ${snapshotAge(latestCapture)} OLD` : `${bookNames[book].toUpperCase()} · NO SNAPSHOT`}{!configured && <> · <a href="https://the-odds-api.com/" target="_blank" rel="noreferrer">GET KEY ↗</a></>}</small>
     </div>
 
-    <div className="sportsbook-layout">
+    <div className={`sportsbook-layout ${slipOpen || slip.length ? "" : "slip-collapsed"}`}>
       <section className="event-board" aria-label={`Week ${slate?.week ?? 1} game lines`}>
-        <div className="market-column-head"><span>Matchup</span><span>Spread</span><span>Total</span><span>Money</span></div>
+        <div className="market-column-head"><span>Matchup</span><span>Spread</span><span>Total</span><span>Money</span><span>Model / edge</span></div>
         {days.map((day) => <div className="event-day" key={day}>
           <div className="event-day-label"><b>{day}</b><span>{matchups.filter((game) => game.day === day).length} games</span></div>
           {matchups.filter((game) => game.day === day).map((game) => {
             const bookLines = lines.filter((line) => line.gameId === game.id && line.book === book);
             const rowData = [{ team: game.away, totalSide: "Over" }, { team: game.home, totalSide: "Under" }] as const;
-            const homeSpread = bookLines.find((line) => line.market === "spread" && line.side === game.home);
             const vig = (["spread", "total", "moneyline"] as const).map((market) => bookmakerMarketVig(lines, game.id, book, market));
             const gameIntel = intelligence?.games.find((item) => item.gameId === game.id);
             const availability = gameIntel?.availability;
@@ -496,26 +540,7 @@ export function WeekOneBoard() {
             const movement = gameIntel?.movements.find((series) => series.book === book && series.side === game.home);
             const movementOpen = movement?.snapshots[0];
             const movementCurrent = movement?.snapshots.at(-1);
-            const homeEdge = projection?.shrunkHomeProbability === null || projection?.shrunkHomeProbability === undefined
-              ? null
-              : projection.shrunkHomeProbability - projection.marketHomeProbability;
-            const leanTeam = homeEdge === null ? null : homeEdge >= 0 ? game.home : game.away;
-            const leanLine = leanTeam ? bookLines.find((line) => line.market === "spread" && line.side === leanTeam) : null;
-            const leanProbability = homeEdge === null || projection?.shrunkHomeProbability === null || projection?.shrunkHomeProbability === undefined
-              ? null
-              : homeEdge >= 0 ? projection.shrunkHomeProbability : 1 - projection.shrunkHomeProbability;
-            const leanInterval = projection?.edgeInterval
-              ? homeEdge !== null && homeEdge < 0
-                ? [-projection.edgeInterval[1], -projection.edgeInterval[0]] as [number, number]
-                : projection.edgeInterval
-              : null;
-            const sideSizing = recommendation(leanProbability, leanLine?.americanPrice ?? null, leanInterval);
-            const totalLine = totalProjection?.lean === "Pass"
-              ? null
-              : bookLines.find((line) => line.market === "total" && line.side.toLowerCase() === totalProjection?.lean.toLowerCase());
-            const totalSizing = recommendation(totalProjection?.shrunkProbability ?? null, totalLine?.americanPrice ?? null, totalProjection?.edgeInterval ?? null);
-            const mainlineRecommendations = rankBestBookMainlineRecommendations(
-              (["betmgm", "fanduel"] as const).flatMap((executionBook) => rankMainlineRecommendations({
+            const allBookRecommendations = (["betmgm", "fanduel"] as const).flatMap((executionBook) => rankMainlineRecommendations({
                 gameId: game.id,
                 awayTeam: game.away,
                 homeTeam: game.home,
@@ -525,33 +550,85 @@ export function WeekOneBoard() {
                 total: gameIntel?.totals.find((item) => item.book === executionBook) ?? null,
                 moneyline: gameIntel?.moneylines.find((item) => item.book === executionBook) ?? null,
                 preferredTeams
-              }))
+              }));
+            const mainlineRecommendations = rankBestBookMainlineRecommendations(allBookRecommendations);
+            const currentBookRecommendations = rankBestBookMainlineRecommendations(
+              allBookRecommendations.filter((candidate) => candidate.line.book === book)
             );
             const actionableMainlines = mainlineRecommendations.filter((candidate) => candidate.actionable).length;
+            const currentBookDecision = currentBookRecommendations.find((candidate) => candidate.actionable) ?? currentBookRecommendations[0] ?? null;
+            const decisionUnit = currentBookDecision?.actionable ? currentBookDecision.sizing : null;
+            const decisionContext = currentBookDecision
+              ? alignMatchupEvidence(gameIntel?.signals ?? [], currentBookDecision.market, currentBookDecision.line.side)
+              : null;
+            const decisionUncertain = Boolean(decisionUnit?.greyed || decisionContext?.verdict === "contradicts");
+            const gamePlays = plays.filter((play) => (play.contract ?? []).some((leg) => leg.gameId === game.id));
+            const approvedByGabe = gamePlays.some((play) => play.approvals?.includes("gabe"));
+            const approvedByJarrett = gamePlays.some((play) => play.approvals?.includes("jarrett"));
+            const evidenceContract = mainlineRecommendations.find((candidate) => candidate.actionable) ?? null;
+            const meaningfulSignals = gameIntel?.evidence.status === "current" && evidenceContract
+              ? materialEvidenceSignals(gameIntel.signals, evidenceContract.market, evidenceContract.line.side)
+              : [];
+            const materialMovement = Boolean(movementOpen && movementCurrent && (
+              movementOpen.point !== movementCurrent.point || movementOpen.americanPrice !== movementCurrent.americanPrice
+            ));
+            const materialAvailability = Boolean(availability && availability.status !== "pending" && (
+              availability.inactivesConfirmed || availability.out > 0 || availability.questionable > 0 ||
+              availability.qbInactive > 0 || availability.qbOutOrDoubtful > 0
+            ));
             return <article className={`event-market ${deskOpen ? "desk-open" : ""}`} key={game.id}>
-              <div className="event-time"><b>{formatKickoff(game, timeZone)}</b>{game.network && <span>{game.network}</span>}</div>
-              {rowData.map((row) => <div className="team-line" key={row.team}>
-                <div className="team-code"><i style={{ background: teamColors[row.team] ?? "#53615b" }}>{row.team.slice(0, 1)}</i><b>{row.team}</b>{preferredTeams.has(row.team) && <em title="Preferred team">★</em>}</div>
-                {(["spread", "total", "moneyline"] as const).map((market) => {
-                  const side = market === "total" ? row.totalSide : row.team;
-                  const line = bookLines.find((candidate) => candidate.market === market && candidate.side.toLowerCase() === side.toLowerCase());
-                  const active = Boolean(line && slip.some((leg) => leg.id === line.id));
-                  const againstPreference = Boolean(line && market !== "total" && [game.away, game.home].some((team) => preferredTeams.has(team) && team !== line.side));
-                  const comparable = line ? lines.find((candidate) => candidate.gameId === line.gameId && candidate.book !== line.book && candidate.market === line.market && candidate.side.toLowerCase() === line.side.toLowerCase() && candidate.point === line.point) : null;
-                  const bestExactPrice = Boolean(line && comparable && line.americanPrice > comparable.americanPrice);
-                  return <button className={`price-cell ${active ? "active" : ""} ${againstPreference ? "preference-conflict" : ""} ${bestExactPrice ? "best-exact-price" : ""}`} disabled={!line} onClick={() => line && toggleLine(line, `${game.away} @ ${game.home}`)} key={market} aria-label={line ? `Select ${lineSelection(line)} at ${formatOdds(line.americanPrice)}` : `${marketTitle(market)} unavailable`}>
-                    {line ? <>{bestExactPrice && <em>BEST</em>}<strong>{market === "moneyline" ? formatOdds(line.americanPrice) : market === "total" ? `${row.totalSide === "Over" ? "O" : "U"} ${line.point}` : formatPoint(line.point)}</strong>{market !== "moneyline" && <span>{formatOdds(line.americanPrice)}</span>}<small>{snapshotAge(line.capturedAt)}</small></> : <strong>—</strong>}
-                  </button>;
-                })}
-              </div>)}
-              <div className="model-ribbon">
-                <span>{projection?.marketSource === "nflverse_consensus" ? "CONSENSUS" : "MARKET"} <b>{homeSpread ? `${game.home} ${formatPoint(homeSpread.point)}` : projection ? `${game.home} ${formatPoint(projection.marketHomePoint)}` : "—"}</b></span>
-                <span>MODEL LINE <b>{projection ? `${game.home} ${formatPoint(projection.projectedHomePoint)}` : "—"}{sideSizing?.included && <em className={`unit-suggestion ${sideSizing.greyed ? "uncertain" : ""}`}> · {sideSizing.suggestedUnits}u</em>}</b></span>
-                <span>MODEL TOTAL <b>{totalProjection ? `${totalProjection.projectedTotal} · ${totalProjection.lean === "Pass" ? "PASS" : `${totalProjection.lean.toUpperCase()} ${Math.abs(totalProjection.pointEdge).toFixed(1)}`}` : "—"}{totalSizing?.included && <em className={`unit-suggestion ${totalSizing.greyed ? "uncertain" : ""}`}> · {totalSizing.suggestedUnits}u</em>}</b></span>
-                <span>VIG <b>{vig.map((value) => value === null ? "—" : value.toFixed(1)).join(" / ")}%</b></span>
-                <button onClick={() => toggleDecisionDesk(game.id)} aria-expanded={deskOpen}>{deskOpen ? "Close" : "Picks"} {deskOpen ? "↑" : "↓"}</button>
+              <div className="matchup-market-row">
+                <div className="matchup-cell">
+                  <div className="event-time">
+                    <b>{formatKickoff(game, timeZone)}</b>
+                    {game.network && <span>{game.network}</span>}
+                  </div>
+                  <div className="team-stack">
+                    {rowData.map((row) => <div className="team-code" key={row.team}>
+                      <Image className="team-logo" src={teamLogoPath(row.team)} alt="" width={38} height={38} aria-hidden="true" />
+                      <b>{row.team}</b>
+                      {preferredTeams.has(row.team) && <em title="Preferred team">★</em>}
+                    </div>)}
+                  </div>
+                  <div className="game-decision-state" aria-label={`Gabe ${approvedByGabe ? "has" : "has not"} selected; Jarrett ${approvedByJarrett ? "has" : "has not"} selected`}>
+                    <i className={approvedByGabe ? "gabe selected" : "gabe"}>G{approvedByGabe ? "✓" : ""}</i>
+                    <i className={approvedByJarrett ? "jarrett selected" : "jarrett"}>J{approvedByJarrett ? "✓" : ""}</i>
+                  </div>
+                </div>
+                {(["spread", "total", "moneyline"] as const).map((market) => <div className={`market-pair market-${market}`} key={market}>
+                  {rowData.map((row) => {
+                    const side = market === "total" ? row.totalSide : row.team;
+                    const line = bookLines.find((candidate) => candidate.market === market && candidate.side.toLowerCase() === side.toLowerCase());
+                    const active = Boolean(line && slip.some((leg) => leg.id === line.id));
+                    const againstPreference = Boolean(line && market !== "total" && [game.away, game.home].some((team) => preferredTeams.has(team) && team !== line.side));
+                    const comparable = line ? lines.find((candidate) => candidate.gameId === line.gameId && candidate.book !== line.book && candidate.market === line.market && candidate.side.toLowerCase() === line.side.toLowerCase() && candidate.point === line.point) : null;
+                    const bestExactPrice = Boolean(line && comparable && line.americanPrice > comparable.americanPrice);
+                    return <button className={`price-cell ${active ? "active" : ""} ${againstPreference ? "preference-conflict" : ""} ${bestExactPrice ? "best-exact-price" : ""}`} disabled={!line} onClick={() => line && toggleLine(line, `${game.away} @ ${game.home}`)} key={row.team} aria-label={line ? `Select ${lineSelection(line)} at ${formatOdds(line.americanPrice)}` : `${marketTitle(market)} unavailable`}>
+                      {line ? <>{bestExactPrice && <em>BEST</em>}<strong>{market === "moneyline" ? formatOdds(line.americanPrice) : market === "total" ? `${row.totalSide === "Over" ? "O" : "U"} ${line.point}` : formatPoint(line.point)}</strong>{market !== "moneyline" && <span>{formatOdds(line.americanPrice)}</span>}<small>{snapshotAge(line.capturedAt)}</small></> : <strong>—</strong>}
+                    </button>;
+                  })}
+                </div>)}
+                <div className={`row-decision ${currentBookDecision?.actionable ? "actionable" : ""}`}>
+                  <div className="decision-readout">
+                    <span>MODEL</span>
+                    <b>{projection ? `${game.home} ${formatPoint(projection.projectedHomePoint)}` : "—"}</b>
+                    <small>{totalProjection ? `TOTAL ${totalProjection.projectedTotal}` : "TOTAL —"}</small>
+                  </div>
+                  <div className="decision-readout edge-readout">
+                    <span>{currentBookDecision ? marketTitle(currentBookDecision.market) : "EDGE"}</span>
+                    <b>{edgeLabel(currentBookDecision)}</b>
+                    <small>{evLabel(currentBookDecision)} EV{decisionUnit?.included ? ` · ${decisionUnit.suggestedUnits}u` : ""}{decisionUncertain ? " · UNCERTAIN" : ""}</small>
+                  </div>
+                  <button onClick={() => toggleDecisionDesk(game.id)} aria-expanded={deskOpen}>{deskOpen ? "CLOSE" : actionableMainlines ? `${actionableMainlines} PICKS` : "ANALYZE"}<span>{deskOpen ? "↑" : "↓"}</span></button>
+                  <small className="row-vig">VIG {vig.map((value) => value === null ? "—" : value.toFixed(1)).join(" · ")}</small>
+                </div>
               </div>
-              {deskOpen && <div className="quick-picks">
+              {deskOpen && <div className="quick-picks" ref={expandedGameRef}>
+                <header className="expanded-desk-head">
+                  <div><span>DECISION WINDOW</span><b>{game.away} @ {game.home}</b></div>
+                  <small>Only material, timestamped evidence is shown.</small>
+                  <button onClick={() => setOpenGame(null)} aria-label={`Close ${game.away} at ${game.home} analysis`}>×</button>
+                </header>
                 <section className="quick-mainlines">
                   <div className="quick-head"><span>MODEL BETS</span><small>{actionableMainlines ? `${actionableMainlines} best-book ${actionableMainlines === 1 ? "play" : "plays"}` : "Price check"}</small></div>
                   {mainlineRecommendations.length ? mainlineRecommendations.map((candidate) => {
@@ -595,8 +672,8 @@ export function WeekOneBoard() {
                     <strong>{formatOdds(prop.americanPrice)}</strong><em>+{(prop.expectedValue * 100).toFixed(1)}% · {prop.suggestedUnits}u</em>
                   </button>) : <p>{propBoard?.message ?? "Props are scanned when posted."}</p>}
                 </section>
-                {(gameIntel?.signals.length || (movementOpen && movementCurrent) || materialWeather) && <section className="quick-evidence">
-                  {movementOpen && movementCurrent && <div className="movement-mini">
+                {(meaningfulSignals.length || materialMovement || materialWeather || materialAvailability) && <section className="quick-evidence">
+                  {materialMovement && movementOpen && movementCurrent && <div className="movement-mini">
                     <span>OPEN → NOW</span>
                     <SpreadSparkline values={movement?.snapshots.map((snapshot) => snapshot.point) ?? []} />
                     <b>{game.home} {formatPoint(movementOpen.point)} {formatOdds(movementOpen.americanPrice)} → {formatPoint(movementCurrent.point)} {formatOdds(movementCurrent.americanPrice)}</b>
@@ -609,13 +686,13 @@ export function WeekOneBoard() {
                       <b>{Math.round(weather.windMph!)} mph · {Math.round(weather.temperatureF!)}°{weather.precipitationProbability === null ? "" : ` · ${Math.round(weather.precipitationProbability)}% rain`}</b>
                       <em>TOTAL {weather.totalAdjustmentPoints > 0 ? "+" : ""}{weather.totalAdjustmentPoints.toFixed(1)} · {weather.capturedAt ? snapshotAge(weather.capturedAt) : "LIVE"}</em>
                     </div>}
-                    {availability && availability.status !== "pending" && <div className={`availability-inline ${availability.status}`}>
+                    {materialAvailability && availability && <div className={`availability-inline ${availability.status}`}>
                       <span>AVAILABILITY</span>
                       <b>{availability.inactivesConfirmed ? `${availability.inactivePlayers} inactive` : `${availability.reportedPlayers} listed · ${availability.out} out · ${availability.questionable} questionable`}</b>
                       <em>{availability.qbInactive ? "QB INACTIVE" : availability.inactivesConfirmed ? "INACTIVES CONFIRMED" : availability.qbOutOrDoubtful ? "QB OUT / DOUBTFUL" : "INACTIVES PENDING"}</em>
                     </div>}
-                    <div>{gameIntel?.signals.map((signal) => <article key={signal.id}>
-                      <span>{signal.label}</span><b>{signal.lean}</b><small>{signal.detail}</small>
+                    <div>{meaningfulSignals.map((signal) => <article key={signal.id}>
+                      <span>{signal.label}</span><b>{signal.lean}</b><small>{signal.detail}</small><p>{signalInterpretation(signal)}</p>
                     </article>)}</div>
                   </div>
                 </section>}
@@ -625,8 +702,9 @@ export function WeekOneBoard() {
         </div>)}
       </section>
 
-      <aside className="shared-slip">
-        <div className="slip-head"><div><span>BET SLIP</span><h2>{slip.length} {slip.length === 1 ? "selection" : "selections"}</h2></div>{slip.length > 0 && <button onClick={() => setSlip([])}>Clear</button>}</div>
+      <aside className={`shared-slip ${slipOpen || slip.length ? "open" : "collapsed"}`}>
+        <div className="slip-head"><button className="slip-toggle" onClick={() => setSlipOpen((current) => !current)} aria-expanded={slipOpen || slip.length > 0}><span>BET SLIP</span><h2>{slip.length} {slip.length === 1 ? "selection" : "selections"}</h2></button>{slip.length > 0 && <button onClick={() => setSlip([])}>Clear</button>}</div>
+        <div className="slip-body">
         <div className="picker-switch" aria-label="Authenticated approver"><button className={`active ${picker}`} disabled>{picker === "gabe" ? "Gabe" : "Jarrett"}</button></div>
         <div className="slip-mode">
           <button className={slipMode === "straight" ? "active" : ""} onClick={() => { setSlipMode("straight"); setSlip((current) => current.filter((leg) => leg.kind !== "teaser")); }}>Straights</button>
@@ -645,6 +723,7 @@ export function WeekOneBoard() {
         <button className="save-slip" disabled={!slipCanApprove} onClick={saveSlip}>Approve team card</button>
         <p className="slip-message" aria-live="polite">{message}</p>
         <p className="value-note">Estimated value only. Approval never places a wager.</p>
+        </div>
       </aside>
     </div>
 

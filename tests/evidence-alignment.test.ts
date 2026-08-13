@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { alignMatchupEvidence, compactEvidenceLabel, evidenceDetail } from "@/domain/evidence-alignment";
+import { alignMatchupEvidence, compactEvidenceLabel, evidenceDetail, materialEvidenceSignals } from "@/domain/evidence-alignment";
 import type { MatchupSignal } from "@/domain/decision-board";
 
 const signals: MatchupSignal[] = [
@@ -54,5 +54,26 @@ describe("contract-specific evidence alignment", () => {
     ], "spread", "SEA");
     expect(alignment.verdict).toBe("mixed");
     expect(compactEvidenceLabel(alignment)).toBe("MIXED · ADJ EPA / REST");
+  });
+
+  it("publishes only material statistics relevant to the exact contract", () => {
+    const material = materialEvidenceSignals([
+      ...signals,
+      { id: "success", label: "SUCCESS", lean: "SEA", detail: "small difference", strength: 7 },
+      { id: "pass_rate", label: "PROE", lean: "UNDER", detail: "pass tendency", strength: 8 }
+    ], "spread", "SEA");
+
+    expect(material.map((signal) => signal.id)).toEqual(["efficiency", "strength"]);
+  });
+
+  it("orders material evidence by strength and caps the expanded read", () => {
+    const material = materialEvidenceSignals([
+      { id: "pace", label: "PACE", lean: "OVER", detail: "tempo", strength: 9 },
+      { id: "pass_rate", label: "PROE", lean: "UNDER", detail: "pass rate", strength: 12 },
+      { id: "turnovers", label: "TURNOVERS", lean: "OVER", detail: "short fields", strength: 15 },
+      { id: "explosive", label: "EXPLOSIVE", lean: "UNDER", detail: "limited explosives", strength: 10 }
+    ], "total", "Over");
+
+    expect(material.map((signal) => signal.strength)).toEqual([15, 12, 10]);
   });
 });

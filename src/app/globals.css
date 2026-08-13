@@ -355,6 +355,89 @@ button:disabled { cursor: wait; opacity: .62; }
 .source-list b { margin-top: 4px; display: block; font: 700 15px var(--display); text-transform: uppercase; }
 .source-list p { margin: 5px 0; color: var(--muted); font-size: 10px; line-height: 1.45; }
 
+/* Compact decision surface: one game, one row, one contextual expansion. */
+.sportsbook-topline { min-height: 58px; }
+.sportsbook-topline > div:first-child { gap: 10px; }
+.sportsbook-topline h1 { font-size: 43px; }
+.sportsbook-topline > div:first-child > span { color: #73817c; font-size: 9px; text-transform: uppercase; }
+.line-status { min-height: 33px; }
+.sportsbook-layout { grid-template-columns: minmax(780px, 1fr) 318px; gap: 9px; margin-top: 9px; }
+.sportsbook-layout.slip-collapsed { grid-template-columns: minmax(0, 1fr) 210px; }
+.market-column-head { min-height: 33px; grid-template-columns: minmax(192px, 1.22fr) repeat(3, minmax(112px, .82fr)) minmax(190px, 1.08fr); gap: 5px; padding: 0 8px; }
+.market-column-head span { font-size: 9px; letter-spacing: .07em; }
+.event-day-label { min-height: 27px; padding-inline: 9px; }
+.event-day-label b { font-size: 11px; }
+.event-day-label span { font-size: 8px; }
+.event-market { padding: 5px 7px; overflow: visible; background: #121b19; }
+.event-market.desk-open { z-index: 4; background: #15201d; }
+.matchup-market-row { min-height: 92px; display: grid; grid-template-columns: minmax(192px, 1.22fr) repeat(3, minmax(112px, .82fr)) minmax(190px, 1.08fr); gap: 5px; align-items: stretch; }
+.matchup-cell { position: relative; min-width: 0; padding: 3px 8px 3px 2px; display: grid; grid-template-columns: 1fr auto; grid-template-rows: 18px 1fr; align-items: center; }
+.matchup-cell .event-time { min-height: 0; grid-column: 1 / 3; justify-content: flex-start; gap: 7px; }
+.matchup-cell .event-time b { font-size: 9px; letter-spacing: .055em; }
+.matchup-cell .event-time span { padding-left: 7px; border-left: 1px solid #34403c; font-size: 7px; }
+.team-stack { display: grid; gap: 1px; }
+.team-code { min-width: 0; gap: 9px; }
+.team-code .team-logo { width: 33px; height: 33px; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
+.team-code b { font-size: 19px; letter-spacing: .015em; }
+.team-code em { font-size: 10px; }
+.game-decision-state { display: grid; gap: 3px; }
+.game-decision-state i { width: 24px; height: 18px; display: grid; place-items: center; border: 1px solid #44514c; border-radius: 3px; color: #71807a; font: 900 8px var(--display); font-style: normal; }
+.game-decision-state i.gabe.selected { border-color: var(--seahawks-green); background: var(--seahawks-navy); color: white; }
+.game-decision-state i.jarrett.selected { border-color: var(--auburn-orange); background: var(--auburn-navy); color: white; }
+.market-pair { min-width: 0; display: grid; grid-template-rows: 1fr 1fr; gap: 4px; }
+.market-pair .price-cell { min-height: 0; padding: 2px 3px; flex-direction: row; gap: 7px; border-radius: 4px; }
+.market-pair .price-cell strong { font-size: 15px; line-height: 1; }
+.market-pair .price-cell span { margin: 0; font-size: 10px; }
+.market-pair .price-cell small { top: 3px; right: 4px; font-size: 6px; }
+.market-pair .price-cell > em { bottom: 2px; left: 4px; font-size: 5px; }
+.row-decision { position: relative; min-width: 0; padding: 7px 7px 5px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 27px; gap: 3px 6px; border: 1px solid #35413d; border-radius: 4px; background: #0e1715; }
+.row-decision.actionable { border-color: color-mix(in srgb, var(--acid) 32%, #35413d); background: linear-gradient(125deg, rgba(198,255,98,.055), #0e1715 66%); }
+.decision-readout { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.decision-readout span, .decision-readout small, .row-vig { overflow: hidden; color: #74827d; font: 800 6px var(--display); letter-spacing: .07em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
+.decision-readout b { overflow: hidden; margin: 1px 0; color: #f4f6f5; font: 900 13px var(--display); text-overflow: ellipsis; white-space: nowrap; }
+.edge-readout b { color: var(--acid); }
+.row-decision > button { grid-column: 1 / 3; min-width: 0; border: 1px solid color-mix(in srgb, var(--book-accent) 55%, #303b37); border-radius: 3px; background: color-mix(in srgb, var(--book-accent) 12%, transparent); color: var(--book-accent); font: 900 8px var(--display); letter-spacing: .04em; }
+.row-decision > button span { margin-left: 7px; }
+.row-vig { position: absolute; right: 6px; top: 4px; opacity: .65; }
+.quick-picks { position: absolute; z-index: 15; left: 7px; right: 7px; top: calc(100% + 4px); margin: 0; padding: 40px 8px 8px; grid-template-columns: 1.05fr .8fr 1.2fr; gap: 7px; border: 1px solid #56635e; background: #0b1412; box-shadow: 0 22px 52px rgba(0,0,0,.62); }
+.expanded-desk-head { position: absolute; inset: 0 0 auto; min-height: 34px; padding: 0 9px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; border-bottom: 1px solid #35413d; background: #17211f; }
+.expanded-desk-head > div { display: flex; align-items: baseline; gap: 8px; }
+.expanded-desk-head span { color: var(--book-accent); font: 900 7px var(--display); letter-spacing: .08em; }
+.expanded-desk-head b { font: 900 11px var(--display); }
+.expanded-desk-head small { overflow: hidden; color: #798681; font: 700 7px var(--display); text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+.expanded-desk-head button { width: 23px; height: 23px; border: 1px solid #4a5752; border-radius: 50%; background: transparent; color: #cbd1cf; font-size: 16px; line-height: 1; }
+.evidence-signals article { grid-template-columns: 1fr auto; }
+.evidence-signals article > p { grid-column: 1 / 3; margin: 2px 0 0; color: #c3cac7; font: 700 8px/1.25 var(--display); }
+.shared-slip.collapsed { overflow: hidden; }
+.shared-slip.collapsed .slip-body { display: none; }
+.shared-slip.collapsed .slip-head { min-height: 52px; }
+.shared-slip.collapsed .slip-head::after { content: "OPEN  →"; color: var(--book-accent); font: 900 8px var(--display); letter-spacing: .06em; }
+.slip-toggle { padding: 0; display: block; border: 0 !important; background: transparent !important; color: inherit !important; text-align: left; }
+.slip-toggle h2 { color: #f5f7f6; }
+
+@media (max-width: 1320px) {
+  .sportsbook-layout { grid-template-columns: minmax(730px, 1fr) 285px; }
+  .sportsbook-layout.slip-collapsed { grid-template-columns: minmax(0, 1fr) 184px; }
+  .market-column-head, .matchup-market-row { grid-template-columns: minmax(165px, 1.15fr) repeat(3, minmax(102px, .8fr)) minmax(175px, 1fr); }
+  .team-code .team-logo { width: 29px; height: 29px; }
+}
+
+@media (max-width: 900px) {
+  .sportsbook-layout, .sportsbook-layout.slip-collapsed { grid-template-columns: 1fr; }
+  .shared-slip.collapsed { position: static; }
+  .quick-picks { position: relative; left: auto; right: auto; top: auto; margin-top: 5px; }
+}
+
+@media (max-width: 720px) {
+  .market-column-head, .event-day-label, .event-market { min-width: 760px; }
+  .market-column-head, .matchup-market-row { grid-template-columns: 170px repeat(3, 112px) 190px; }
+  .matchup-market-row { min-height: 88px; }
+  .sportsbook-topline h1 { font-size: 39px; }
+  .quick-picks { grid-template-columns: 1fr; }
+  .expanded-desk-head { grid-template-columns: 1fr auto; }
+  .expanded-desk-head > small { display: none; }
+}
+
 .allocation-board { min-height: 138px; display: grid; grid-template-columns: 230px 1fr 250px; border: 1px solid rgba(198,255,98,.27); background: linear-gradient(120deg, rgba(198,255,98,.075), rgba(255,255,255,.012) 58%); }
 .allocation-board > div { padding: 21px 24px; }
 .allocation-board > div + div { border-left: 1px solid var(--line); }
@@ -657,4 +740,31 @@ button:disabled { cursor: wait; opacity: .62; }
   .handoff-flow > i { text-align: center; transform: rotate(90deg); }
   .handoff-price { grid-template-columns: 1fr; }
   .handoff-price div + div { border-left: 0; border-top: 1px solid var(--line); }
+}
+
+/* Keep the compact matchup geometry authoritative after legacy breakpoints. */
+@media (max-width: 1320px) {
+  .sportsbook-layout { grid-template-columns: minmax(730px, 1fr) 285px; }
+  .sportsbook-layout.slip-collapsed { grid-template-columns: minmax(0, 1fr) 184px; }
+  .market-column-head, .matchup-market-row { grid-template-columns: minmax(165px, 1.15fr) repeat(3, minmax(102px, .8fr)) minmax(175px, 1fr); }
+  .team-code .team-logo { width: 29px; height: 29px; }
+  .team-code b { font-size: 18px; }
+}
+
+@media (max-width: 900px) {
+  .sportsbook-layout, .sportsbook-layout.slip-collapsed { grid-template-columns: 1fr; }
+  .shared-slip.collapsed { position: static; }
+  .quick-picks { position: relative; left: auto; right: auto; top: auto; margin-top: 5px; grid-template-columns: 1fr 1fr 1.3fr; }
+  .quick-mainlines { grid-column: auto; }
+}
+
+@media (max-width: 720px) {
+  .market-column-head, .event-day-label, .event-market { min-width: 760px; }
+  .market-column-head, .matchup-market-row { grid-template-columns: 170px repeat(3, 112px) 190px; }
+  .matchup-market-row { min-height: 88px; }
+  .sportsbook-topline h1 { font-size: 39px; }
+  .team-code b { font-size: 18px; }
+  .quick-picks { grid-template-columns: 1fr; }
+  .expanded-desk-head { grid-template-columns: 1fr auto; }
+  .expanded-desk-head > small { display: none; }
 }
