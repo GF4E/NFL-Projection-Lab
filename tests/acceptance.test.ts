@@ -1031,4 +1031,15 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("Same-game or incomplete pair: withheld");
     expect(board).toContain("Multiple straights save as separate picks");
   });
+
+  it("46. confirms executed status only on a jointly approved contract before kickoff", () => {
+    const route = readFileSync("src/app/api/plays/[id]/route.ts", "utf8");
+    const store = readFileSync("src/server/play-store.ts", "utf8");
+    expect(route).toContain("cashPlacementEligibilityError");
+    expect(route).toContain("seasonSchedule");
+    expect(route).toContain("status: 409");
+    expect(route).toContain("confirmCashPlacement");
+    expect(store).toContain("status = 'card' AND result = 'pending' AND gabe_approved = 1 AND jarrett_approved = 1");
+    expect(store).toContain("cash_placement_confirmed = 1");
+  });
 });

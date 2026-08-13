@@ -358,6 +358,22 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
   return (await getPlay(play.id))!;
 }
 
+export async function confirmCashPlacement(id: string, updatedAt: string): Promise<WeeklyPlay> {
+  const d1 = getD1();
+  await ensurePlayStore(d1);
+  const updated = await d1.prepare(`UPDATE plays SET status = 'placed', execution_status = 'executed',
+      cash_placement_confirmed = 1, updated_at = ?
+    WHERE id = ? AND status = 'card' AND result = 'pending' AND gabe_approved = 1 AND jarrett_approved = 1`)
+    .bind(updatedAt, id).run();
+  const row = await d1.prepare("SELECT * FROM plays WHERE id = ?").bind(id).first<PlayDatabaseRow>();
+  const play = row ? mapRow(row) : null;
+  if (play?.status === "placed" && play.executionStatus === "executed" && play.cashPlacementConfirmed) return play;
+  if (Number(updated.meta.changes ?? 0) === 0) {
+    throw new Error("Cash placement requires an open, jointly approved card");
+  }
+  throw new Error("Cash placement could not be confirmed");
+}
+
 export async function updatePlayResult(
   id: string,
   update: Pick<WeeklyPlay, "status" | "result" | "profitCents" | "closingClvCents" | "closingClvPoints" | "clvReferenceBook" | "updatedAt">

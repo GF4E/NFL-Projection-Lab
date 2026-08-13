@@ -194,6 +194,22 @@ export function draftExpirationReason(
   return nowMs - createdMs >= DRAFT_MAX_AGE_MS ? "stale" : null;
 }
 
+export function cashPlacementEligibilityError(
+  play: Pick<WeeklyPlay, "approvals" | "status" | "result" | "executionStatus" | "cashPlacementConfirmed" | "gameId" | "contract">,
+  now: string,
+  kickoffByGame: ReadonlyMap<string, string>
+): string | null {
+  if (play.status === "placed" && play.executionStatus === "executed" && play.cashPlacementConfirmed) return null;
+  if (!isTeamApproved(play.approvals)) return "Cash placement requires both teammates to approve the exact contract first";
+  if (play.status !== "card" || play.result !== "pending") return "Only an open, jointly approved card can be marked as cash placed";
+  const kickoff = earliestPlayKickoff(play, kickoffByGame);
+  if (!kickoff) return "Cash placement is unavailable because kickoff could not be verified";
+  const nowMs = Date.parse(now);
+  const kickoffMs = Date.parse(kickoff);
+  if (!Number.isFinite(nowMs) || !Number.isFinite(kickoffMs)) return "Cash placement timing is invalid";
+  return nowMs >= kickoffMs ? "Cash placement must be confirmed before kickoff" : null;
+}
+
 function playGameMarkets(play: Pick<WeeklyPlay, "gameId" | "market" | "contract">): Map<string, string[]> {
   const output = new Map<string, string[]>();
   const legs = play.contract?.length

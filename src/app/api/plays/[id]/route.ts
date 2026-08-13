@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getPlay, updatePlayResult } from "@/server/play-store";
+import { cashPlacementEligibilityError } from "@/domain/play-card";
+import { confirmCashPlacement, getPlay } from "@/server/play-store";
 import { isTeamAuthenticationError, requestTeamMember } from "@/server/team-auth";
+import { seasonSchedule } from "@/server/weekly-slate";
 
 export const dynamic = "force-dynamic";
 
@@ -10,28 +12,23 @@ const updateSchema = z.object({
   result: z.literal("pending").default("pending")
 });
 
-function profitFor(stakeCents: number, americanOdds: number, result: "pending" | "win" | "loss" | "push" | "void") {
-  if (result === "loss") return -stakeCents;
-  if (result !== "win") return 0;
-  return Math.round(stakeCents * (americanOdds > 0 ? americanOdds / 100 : 100 / Math.abs(americanOdds)));
-}
-
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requestTeamMember(request);
     const { id } = await params;
-    const input = updateSchema.parse(await request.json());
+    updateSchema.parse(await request.json());
     const existing = await getPlay(id);
     if (!existing) return NextResponse.json({ error: "Play not found" }, { status: 404 });
-    const play = await updatePlayResult(id, {
-      status: input.status,
-      result: input.result,
-      profitCents: profitFor(existing.stakeCents, existing.americanOdds, input.result),
-      closingClvCents: existing.closingClvCents,
-      closingClvPoints: existing.closingClvPoints,
-      clvReferenceBook: existing.clvReferenceBook,
-      updatedAt: new Date().toISOString()
-    });
+    if (existing.status === "placed" && existing.executionStatus === "executed" && existing.cashPlacementConfirmed) {
+      return NextResponse.json({ play: existing });
+    }
+    const now = new Date().toISOString();
+    const schedule = await seasonSchedule({ season: existing.season });
+    const kickoffByGame = new Map(schedule.map((game) => [game.id, game.kickoffAt]));
+    const eligibilityError = cashPlacementEligibilityError(existing, now, kickoffByGame);
+    if (eligibilityError) return NextResponse.json({ error: eligibilityError }, { status: 409 });
+    // Preserve the immutable approved contract; this transition records only the external fact of placement.
+    const play = await confirmCashPlacement(id, now);
     return NextResponse.json({ play });
   } catch (error) {
     if (isTeamAuthenticationError(error)) return NextResponse.json({ error: error.message }, { status: 401 });
