@@ -25,7 +25,7 @@ import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "@/domain/settlement";
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
-import { addTeamApproval, approvalActorForEmail, draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, isTeamApproved, storedLegMatchesQuote, trackerRecordSummaries, trackerSummary } from "@/domain/play-card";
+import { addTeamApproval, approvalActorForEmail, draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, isTeamApproved, storedLegMatchesQuote, trackerRecordSummaries, trackerSummary, validateTeamCardPortfolio } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { buildPlayerPropEvidence, crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
@@ -76,6 +76,22 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(sizeKelly(0.523, -110, [0.001, 0.02], config).suggestedUnits).toBe(0);
     expect(sizeKelly(0.55, -110, [0.01, 0.05], config).suggestedUnits).toBeGreaterThanOrEqual(0.5);
     expect(sizeKelly(0.9, 100, [0.2, 0.4], config).suggestedUnits).toBe(2);
+  });
+
+  it("3b. enforces the 10u week, 3u game, one-side, and one-total limits on official cards", () => {
+    const position = (gameId: string, market: "spread" | "moneyline" | "total" | "prop" | "teaser", units: number, week = 1) => ({
+      week, gameId, market, stakeCents: units * 2_500,
+      contract: [{ gameId, market, side: market === "total" ? "Over" : "SEA", point: market === "moneyline" ? null : -2.5, americanPrice: -110, selection: "selection" }]
+    });
+    expect(validateTeamCardPortfolio([position("g1", "spread", 1)], position("g1", "moneyline", 1))).toContain("Only one side position is permitted per game");
+    expect(validateTeamCardPortfolio([position("g1", "total", 1)], position("g1", "total", 1))).toContain("Only one total is permitted per game");
+    expect(validateTeamCardPortfolio([position("g1", "prop", 2)], position("g1", "prop", 1.5))).toContain("Game exposure cannot exceed 3u");
+    expect(validateTeamCardPortfolio(Array.from({ length: 5 }, (_, index) => position(`g${index}`, "prop", 2)), position("g9", "prop", 0.5))).toContain("Weekly exposure cannot exceed 10u");
+    expect(validateTeamCardPortfolio([], position("g1", "prop", 2.5))).toContain("A pick must be between 0.5u and 2u");
+    const store = readFileSync("src/server/play-store.ts", "utf8");
+    expect(readFileSync("src/domain/portfolio-trigger.ts", "utf8")).toContain("approval_portfolio_guard_v1");
+    expect(store).toContain("assertPortfolioAvailable");
+    expect(readFileSync("src/app/api/plays/route.ts", "utf8")).toContain("stakeDollars: z.number().min(12.5).max(50)");
   });
 
   it("4. greys units when uncertainty spans zero without changing the numerical suggestion", () => {

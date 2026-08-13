@@ -17,7 +17,7 @@ const createPlaySchema = z.object({
   legs: z.string().trim().min(3).max(180),
   book: z.enum(["BetMGM", "Caesars", "FanDuel"]),
   americanOdds: z.number().int().refine((value) => value <= -100 || value >= 100, "Use valid American odds"),
-  stakeDollars: z.number().min(12.5).max(200),
+  stakeDollars: z.number().min(12.5).max(50),
   modelEdgePp: z.number().min(-10).max(20),
   estimatedEvPercent: z.number().min(-100).max(100).optional(),
   contract: z.array(z.object({

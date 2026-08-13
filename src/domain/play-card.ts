@@ -1,3 +1,5 @@
+import { structuralConfig } from "./config";
+
 export type PlayType = "single" | "parlay" | "teaser";
 export type PlayConfidence = "watch" | "lean" | "play" | "best";
 export type PlayStatus = "research" | "card" | "placed" | "settled" | "passed";
@@ -98,6 +100,61 @@ export function draftExpirationReason(
   const kickoff = earliestPlayKickoff(play, kickoffByGame);
   if (kickoff && nowMs >= Date.parse(kickoff)) return "kickoff";
   return nowMs - createdMs >= DRAFT_MAX_AGE_MS ? "stale" : null;
+}
+
+function playGameMarkets(play: Pick<WeeklyPlay, "gameId" | "market" | "contract">): Map<string, string[]> {
+  const output = new Map<string, string[]>();
+  const legs = play.contract?.length
+    ? play.contract
+    : [{ gameId: play.gameId, market: play.market }];
+  for (const leg of legs) {
+    const markets = output.get(leg.gameId) ?? [];
+    markets.push(leg.market);
+    output.set(leg.gameId, markets);
+  }
+  return output;
+}
+
+export function validateTeamCardPortfolio(
+  existing: readonly Pick<WeeklyPlay, "week" | "gameId" | "market" | "contract" | "stakeCents">[],
+  proposed: Pick<WeeklyPlay, "week" | "gameId" | "market" | "contract" | "stakeCents">
+): string[] {
+  const errors: string[] = [];
+  const units = proposed.stakeCents / UNIT_CENTS;
+  if (units < structuralConfig.sizing.minimumUnits || units > structuralConfig.sizing.maximumUnits) {
+    errors.push(`A pick must be between ${structuralConfig.sizing.minimumUnits}u and ${structuralConfig.sizing.maximumUnits}u`);
+  }
+  const weeklyUnits = existing
+    .filter((play) => play.week === proposed.week)
+    .reduce((sum, play) => sum + play.stakeCents / UNIT_CENTS, units);
+  if (weeklyUnits > structuralConfig.sizing.maximumWeekUnits) {
+    errors.push(`Weekly exposure cannot exceed ${structuralConfig.sizing.maximumWeekUnits}u`);
+  }
+  const proposedMarkets = playGameMarkets(proposed);
+  const existingMarkets = existing.map((play) => ({ play, markets: playGameMarkets(play) }));
+  for (const [gameId, markets] of proposedMarkets) {
+    const gameUnits = existingMarkets
+      .filter((item) => item.markets.has(gameId))
+      .reduce((sum, item) => sum + item.play.stakeCents / UNIT_CENTS, units);
+    if (gameUnits > structuralConfig.sizing.maximumGameUnits) {
+      errors.push(`Game exposure cannot exceed ${structuralConfig.sizing.maximumGameUnits}u`);
+    }
+    const proposedSides = markets.filter((market) => ["spread", "moneyline", "teaser"].includes(market)).length;
+    const existingSides = existingMarkets.reduce((count, item) => {
+      const values = item.markets.get(gameId);
+      return count + (values?.filter((market) => ["spread", "moneyline", "teaser"].includes(market)).length ?? 0);
+    }, 0);
+    if (proposedSides + existingSides > structuralConfig.sizing.maximumSidePositionsPerGame) {
+      errors.push("Only one side position is permitted per game");
+    }
+    const proposedTotals = markets.filter((market) => market === "total").length;
+    const existingTotals = existingMarkets.reduce((count, item) =>
+      count + (item.markets.get(gameId)?.filter((market) => market === "total").length ?? 0), 0);
+    if (proposedTotals + existingTotals > structuralConfig.sizing.maximumTotalsPerGame) {
+      errors.push("Only one total is permitted per game");
+    }
+  }
+  return [...new Set(errors)];
 }
 
 export function stakeToUnits(stakeCents: number): number {

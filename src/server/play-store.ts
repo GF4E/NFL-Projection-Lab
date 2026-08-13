@@ -4,9 +4,11 @@ import {
   earliestPlayKickoff,
   isTeamApproved,
   storedLegMatchesQuote,
+  validateTeamCardPortfolio,
   type PickedBy,
   type WeeklyPlay
 } from "@/domain/play-card";
+import { portfolioTriggerSql } from "@/domain/portfolio-trigger";
 import { seasonSchedule } from "./weekly-slate";
 
 type PlayDatabaseRow = {
@@ -183,7 +185,8 @@ export async function ensurePlayStore(d1: D1Database = getD1()): Promise<void> {
   await d1.batch([
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_season_week_status ON plays (season, week, status)"),
     d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_created_at ON plays (created_at)"),
-    d1.prepare("CREATE INDEX IF NOT EXISTS idx_play_state_audit_play ON play_state_audit (play_id, changed_at)")
+    d1.prepare("CREATE INDEX IF NOT EXISTS idx_play_state_audit_play ON play_state_audit (play_id, changed_at)"),
+    d1.prepare(portfolioTriggerSql())
   ]);
   await d1.prepare("PRAGMA optimize").run();
 }
@@ -274,6 +277,14 @@ async function assertApprovalContractCurrent(d1: D1Database, play: WeeklyPlay): 
   }
 }
 
+async function assertPortfolioAvailable(d1: D1Database, play: WeeklyPlay): Promise<void> {
+  const result = await d1.prepare(`SELECT * FROM plays
+    WHERE id <> ? AND season = ? AND week = ? AND status IN ('card', 'placed')`)
+    .bind(play.id, play.season, play.week).all<PlayDatabaseRow>();
+  const errors = validateTeamCardPortfolio(result.results.map(mapRow), play);
+  if (errors.length) throw new Error(errors[0]);
+}
+
 export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promise<WeeklyPlay> {
   const d1 = getD1();
   await ensurePlayStore(d1);
@@ -306,6 +317,7 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
     }
     if (current.status !== "research") return current;
     await assertApprovalContractCurrent(d1, current);
+    await assertPortfolioAvailable(d1, current);
     await d1.prepare(`UPDATE plays SET
       gabe_approved = CASE WHEN ? = 'gabe' THEN 1 ELSE gabe_approved END,
       jarrett_approved = CASE WHEN ? = 'jarrett' THEN 1 ELSE jarrett_approved END,
