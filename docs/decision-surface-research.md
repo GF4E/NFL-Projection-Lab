@@ -24,6 +24,7 @@ Updated 2026-08-13. This is an internal product note; it is not rendered in the 
 - The prop card distinguishes four states: not scanned, prices stale, prices posted but availability pending, and fully eligible. It never labels an unscanned market as though no +EV prop exists.
 - A teaser pair shows the screening price assumption, estimated EV at that price, maximum playable price, crossed key numbers, and uncertainty-backed units. A positive hypothetical pair is not represented as a live book offer.
 - Book coverage is stated beside the active snapshot and beneath an incomplete market heading. A missing price therefore reads as “not posted by this book,” not “the model has no opinion.”
+- A manually selected straight remains available for comparison, but its slip row states whether it clears the current 80% uncertainty and 0.5u Kelly gates. The shared-card action stays disabled when any straight is below the floor or lacks a supported model probability, matching the authoritative server approval boundary before the user clicks approve.
 
 ## Deliberate exclusions
 

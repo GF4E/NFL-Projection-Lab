@@ -13,8 +13,10 @@ describe("slip pricing support", () => {
     expect(isPricedSlipApprovable({ mode: "parlay", legCount: 2, singleBook: false, standardValue: independent, teaserExpectedValuePercent: null })).toBe(false);
   });
 
-  it("allows multiple straights because they save separately", () => {
-    expect(isPricedSlipApprovable({ mode: "straight", legCount: 3, singleBook: false, standardValue: null, teaserExpectedValuePercent: null })).toBe(true);
+  it("allows multiple straights only when each separately clears the decision gate", () => {
+    expect(isPricedSlipApprovable({ mode: "straight", legCount: 3, straightEligibleLegCount: 3, singleBook: false, standardValue: null, teaserExpectedValuePercent: null })).toBe(true);
+    expect(isPricedSlipApprovable({ mode: "straight", legCount: 3, straightEligibleLegCount: 2, singleBook: false, standardValue: null, teaserExpectedValuePercent: null })).toBe(false);
+    expect(isPricedSlipApprovable({ mode: "straight", legCount: 1, straightEligibleLegCount: 0, singleBook: true, standardValue: null, teaserExpectedValuePercent: null })).toBe(false);
   });
 
   it("requires exactly two nonnegative-EV teaser legs", () => {

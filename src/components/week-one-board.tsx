@@ -126,6 +126,15 @@ function recommendation(
   });
 }
 
+function straightLegSizing(leg: SelectedLeg): SizingResult | null {
+  const betProbability = legBetProbability(leg);
+  if (betProbability === null || leg.fairProbability === null || !leg.probabilityInterval) return null;
+  return recommendation(betProbability, leg.americanPrice, [
+    leg.probabilityInterval[0] - leg.fairProbability,
+    leg.probabilityInterval[1] - leg.fairProbability
+  ]);
+}
+
 function formatInterval(interval: [number, number] | null): string {
   return interval ? `${(interval[0] * 100).toFixed(1)} to ${(interval[1] * 100).toFixed(1)}pp` : "interval unavailable";
 }
@@ -227,9 +236,14 @@ export function WeekOneBoard() {
     pushProbability: leg.pushProbability ?? null,
     uncertaintyInterval: leg.probabilityInterval ?? null
   })), slip.length > 1 ? combinedAmerican(slip) : -110) : null, [slip, slipMode]);
+  const straightSizing = useMemo(() => slipMode === "straight"
+    ? slip.map(straightLegSizing)
+    : [], [slip, slipMode]);
+  const straightEligibleLegCount = straightSizing.filter((sizing) => sizing?.included).length;
   const slipCanApprove = isPricedSlipApprovable({
     mode: slipMode,
     legCount: slip.length,
+    straightEligibleLegCount,
     singleBook: new Set(slip.map((leg) => leg.book)).size <= 1,
     standardValue: slipValue,
     teaserExpectedValuePercent: teaserValue?.sizing.included ? teaserValue.evPercent : null
@@ -425,6 +439,10 @@ export function WeekOneBoard() {
     }
     if (slipMode === "parlay" && !slipValue) {
       setMessage("Fair parlay value is withheld for same-game or incomplete-price legs.");
+      return;
+    }
+    if (slipMode === "straight" && straightEligibleLegCount !== slip.length) {
+      setMessage("Straight withheld: every contract must have a current model probability, an 80% interval, and at least a 0.5u Kelly result.");
       return;
     }
     if (slipMode === "teaser" && (!teaserValue || teaserValue.evPercent < 0 || !teaserValue.sizing.included)) {
@@ -728,7 +746,13 @@ export function WeekOneBoard() {
           <button className={slipMode === "parlay" ? "active" : ""} onClick={() => { setSlipMode("parlay"); setSlip((current) => { const eligible = current.filter((leg) => leg.kind !== "teaser"); const activeBook = eligible.at(-1)?.book; const normalized = activeBook ? eligible.filter((leg) => leg.book === activeBook) : eligible; if (normalized.length !== eligible.length) setMessage(`Parlay kept ${bookNames[activeBook!]} selections; combined contracts cannot cross books.`); return normalized; }); }}>Parlay</button>
           <button className={slipMode === "teaser" ? "active" : ""} onClick={() => { setSlipMode("teaser"); setSlip((current) => current.filter((leg) => leg.kind === "teaser")); }}>Teaser</button>
         </div>
-        {slip.length === 0 ? <div className="empty-slip"><b>Click a line.</b><p>The contract lands here. No typing, no dropdowns.</p></div> : <div className="slip-legs">{slip.map((leg, index) => <article key={leg.id}><button onClick={() => setSlip((current) => current.filter((item) => item.id !== leg.id))}>×</button><div><small>{leg.matchup} · {marketTitle(leg.market)}</small><b>{leg.selection}</b><span>{leg.detail} · {leg.kind === "teaser" || leg.edge === null ? "Fair" : "Bet"} {formatPercent(leg.kind === "teaser" ? leg.fairProbability : legBetProbability(leg))}</span></div><strong>{leg.kind === "teaser" ? "6 PT" : formatOdds(leg.americanPrice)}</strong><em>LEG {index + 1}</em></article>)}</div>}
+        {slip.length === 0 ? <div className="empty-slip"><b>Click a line.</b><p>The contract lands here. No typing, no dropdowns.</p></div> : <div className="slip-legs">{slip.map((leg, index) => {
+          const sizing = slipMode === "straight" ? straightSizing[index] ?? null : null;
+          const decision = slipMode !== "straight" ? `LEG ${index + 1}` : sizing?.included
+            ? `${sizing.suggestedUnits}u READY${sizing.greyed ? " · UNCERTAIN" : ""}`
+            : sizing ? "PASS · BELOW 0.5u" : "PASS · MODEL WITHHELD";
+          return <article className={slipMode === "straight" && !sizing?.included ? "withheld" : sizing?.greyed ? "uncertain" : ""} key={leg.id}><button onClick={() => setSlip((current) => current.filter((item) => item.id !== leg.id))}>×</button><div><small>{leg.matchup} · {marketTitle(leg.market)}</small><b>{leg.selection}</b><span>{leg.detail} · {leg.kind === "teaser" || leg.edge === null ? "Fair" : "Bet"} {formatPercent(leg.kind === "teaser" ? leg.fairProbability : legBetProbability(leg))}</span></div><strong>{leg.kind === "teaser" ? "6 PT" : formatOdds(leg.americanPrice)}</strong><em>{decision}</em></article>;
+        })}</div>}
         {slipMode === "teaser" && <div className="teaser-price"><span>OFFERED 2-TEAM PRICE</span><div>{structuralConfig.teasers.selectableAmericanPrices.map((price) => <button className={teaserPrice === price ? "active" : ""} onClick={() => setTeaserPrice(price)} key={price}>{price}</button>)}</div><small>Confirm the live book price. A teaser is blocked when estimated EV is negative.</small></div>}
         <div className="reason-clicks"><span>WHY</span>{pickReasons.slice(0, 8).map((item) => <button className={reason === item.value ? "active" : ""} onClick={() => setReason(item.value)} key={item.value}>{item.label.replace("Model disagrees with market price", "Model edge").replace("Opponent-adjusted efficiency matchup", "Efficiency").replace("Turnover or scoring regression", "Regression").replace("Personnel or injury advantage", "Personnel").replace("Coaching or scheme matchup", "Scheme").replace("Role clarity / team chemistry", "Chemistry").replace("Better number / key-number value", "Key number").replace("Pace / scoring environment", "Pace")}</button>)}</div>
         <div className="stake-clicks"><span>STAKE</span>{[12.5, 25, 37.5, 50].map((value) => <button className={stake === value ? "active" : ""} onClick={() => setStake(value)} key={value}>{value / 25}u</button>)}</div>

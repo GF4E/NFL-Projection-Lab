@@ -138,12 +138,15 @@ export function analyzeSlipValue(legs: readonly ValueLeg[], unitDollars = 25): S
 export function isPricedSlipApprovable(input: {
   mode: "straight" | "parlay" | "teaser";
   legCount: number;
+  straightEligibleLegCount?: number;
   singleBook: boolean;
   standardValue: SlipValue | null;
   teaserExpectedValuePercent: number | null;
 }): boolean {
   if (input.legCount < 1) return false;
-  if (input.mode === "straight") return true;
+  // Straights save as separate records, but every record must independently
+  // clear the same uncertainty and Kelly floor enforced by the server.
+  if (input.mode === "straight") return input.straightEligibleLegCount === input.legCount;
   if (!input.singleBook) return false;
   if (input.mode === "parlay") return input.legCount >= 2 && input.standardValue !== null;
   return input.legCount === 2 && input.teaserExpectedValuePercent !== null && input.teaserExpectedValuePercent >= 0;
