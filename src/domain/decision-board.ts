@@ -71,6 +71,7 @@ export interface TeaserCandidate {
   originalPoint: number;
   teasedPoint: number;
   fairProbability: number | null;
+  pushProbability: number | null;
   fairAmerican: number | null;
   classification: "classic_wong" | "key_number" | "ordinary";
   crossedKeys: number[];
@@ -83,6 +84,17 @@ export interface TeaserPairCandidate {
   legs: [TeaserCandidate, TeaserCandidate];
   offeredAmerican: number;
   fairProbability: number;
+  pushProbability: number;
+  lossProbability: number;
+  fairAmerican: number;
+  expectedValue: number;
+}
+
+export interface TwoTeamTeaserValue {
+  winProbability: number;
+  pushProbability: number;
+  lossProbability: number;
+  fairAmerican: number;
   expectedValue: number;
 }
 
@@ -297,6 +309,30 @@ export function fairAmericanFromProbability(probability: number): number {
   return Math.round(impliedToAmerican(probability));
 }
 
+export function priceTwoTeamTeaser(
+  legs: readonly { coverProbability: number; pushProbability: number }[],
+  offeredAmerican: number
+): TwoTeamTeaserValue | null {
+  if (legs.length !== 2) return null;
+  if (legs.some((leg) =>
+    !Number.isFinite(leg.coverProbability) || !Number.isFinite(leg.pushProbability) ||
+    leg.coverProbability < 0 || leg.pushProbability < 0 || leg.coverProbability + leg.pushProbability > 1
+  )) return null;
+  const winProbability = legs.reduce((product, leg) => product * leg.coverProbability, 1);
+  const noLossProbability = legs.reduce((product, leg) => product * (leg.coverProbability + leg.pushProbability), 1);
+  const pushProbability = Math.max(0, noLossProbability - winProbability);
+  const lossProbability = Math.max(0, 1 - winProbability - pushProbability);
+  if (!(winProbability > 0) || !(winProbability + lossProbability > 0)) return null;
+  const conditionalWinProbability = winProbability / (winProbability + lossProbability);
+  return {
+    winProbability,
+    pushProbability,
+    lossProbability,
+    fairAmerican: fairAmericanFromProbability(conditionalWinProbability),
+    expectedValue: winProbability * americanToDecimal(offeredAmerican) + pushProbability - 1
+  };
+}
+
 export function isClassicWongPoint(point: number): boolean {
   return (point >= 1.5 && point <= 2.5) || (point >= -8.5 && point <= -7.5);
 }
@@ -312,19 +348,23 @@ export function rankTeaserPairs(
   options: { offeredAmerican?: number; maximum?: number; preferredTeams?: readonly string[]; exceptionalEvThreshold?: number } = {}
 ): TeaserPairCandidate[] {
   const offeredAmerican = options.offeredAmerican ?? -120;
-  const offeredDecimal = americanToDecimal(offeredAmerican);
   const preferred = new Set(options.preferredTeams ?? ["SEA", "ATL"]);
   const exceptionalEvThreshold = options.exceptionalEvThreshold ?? 0.05;
   const pairs: TeaserPairCandidate[] = [];
   for (let leftIndex = 0; leftIndex < candidates.length; leftIndex += 1) {
     const left = candidates[leftIndex];
-    if (left.fairProbability === null || left.warning === "unsupported") continue;
+    if (left.fairProbability === null || left.pushProbability === null || left.warning === "unsupported") continue;
     for (let rightIndex = leftIndex + 1; rightIndex < candidates.length; rightIndex += 1) {
       const right = candidates[rightIndex];
-      if (right.fairProbability === null || right.warning === "unsupported") continue;
+      if (right.fairProbability === null || right.pushProbability === null || right.warning === "unsupported") continue;
       if (left.book !== right.book || left.gameId === right.gameId) continue;
-      const fairProbability = left.fairProbability * right.fairProbability;
-      const expectedValue = fairProbability * offeredDecimal - 1;
+      const priced = priceTwoTeamTeaser([
+        { coverProbability: left.fairProbability, pushProbability: left.pushProbability },
+        { coverProbability: right.fairProbability, pushProbability: right.pushProbability }
+      ], offeredAmerican);
+      if (!priced) continue;
+      const fairProbability = priced.winProbability;
+      const expectedValue = priced.expectedValue;
       if (expectedValue < 0) continue;
       const opposesPreferredTeam = preferred.has(left.opponent) || preferred.has(right.opponent);
       if (opposesPreferredTeam && expectedValue < exceptionalEvThreshold) continue;
@@ -335,6 +375,9 @@ export function rankTeaserPairs(
         legs,
         offeredAmerican,
         fairProbability,
+        pushProbability: priced.pushProbability,
+        lossProbability: priced.lossProbability,
+        fairAmerican: priced.fairAmerican,
         expectedValue
       });
     }

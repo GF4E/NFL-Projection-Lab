@@ -530,7 +530,10 @@ export async function buildDecisionBoard(
         originalPoint: line.point!,
         teasedPoint,
         fairProbability: translated.probability,
-        fairAmerican: translated.probability === null ? null : fairAmericanFromProbability(translated.probability),
+        pushProbability: translated.pushProbability,
+        fairAmerican: translated.probability === null || translated.pushProbability === null
+          ? null
+          : fairAmericanFromProbability(translated.probability / Math.max(1e-6, 1 - translated.pushProbability)),
         classification,
         crossedKeys,
         warning: translated.warning

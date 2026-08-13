@@ -21,11 +21,11 @@ import { calculateTranslatedClv, chooseBetterPaperClose } from "@/domain/clv";
 import { dualRecordSummaries } from "@/domain/records";
 import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "@/domain/sunday-mode";
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
-import { correctSettlement, gradePick, profitForResult } from "@/domain/settlement";
+import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "@/domain/settlement";
 import { fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
 import { addTeamApproval, estimatedEvFromEdge, isTeamApproved, trackerRecordSummaries, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
-import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
+import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
@@ -385,10 +385,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(readFileSync("src/server/player-props.ts", "utf8")).toContain("seasonSchedule");
   });
 
-  it("31. ranks non-Wong teaser pairs only when their joint fair probability clears the offered price", () => {
-    const teaser = (gameId: string, team: string, opponent: string, fairProbability: number): TeaserCandidate => ({
+  it("31. ranks non-Wong teaser pairs only when push-adjusted EV clears the offered price", () => {
+    const teaser = (gameId: string, team: string, opponent: string, fairProbability: number, pushProbability = 0): TeaserCandidate => ({
       gameId, book: "betmgm", team, opponent, originalPoint: 4.5, teasedPoint: 10.5,
-      fairProbability, fairAmerican: -300, classification: "ordinary", crossedKeys: [6, 7, 10], warning: "none"
+      fairProbability, pushProbability, fairAmerican: -300, classification: "ordinary", crossedKeys: [6, 7, 10], warning: "none"
     });
     const ordinaryPair = rankTeaserPairs([
       teaser("g1", "PIT", "BAL", 0.75),
@@ -398,7 +398,26 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(ordinaryPair[0].expectedValue).toBeGreaterThan(0);
     expect(ordinaryPair[0].legs.every((leg) => leg.classification === "ordinary")).toBe(true);
     expect(rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.7), teaser("g2", "KC", "DEN", 0.7)])).toEqual([]);
+    const pushAdjusted = rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.7, 0.08), teaser("g2", "KC", "DEN", 0.7, 0.08)]);
+    expect(pushAdjusted).toHaveLength(1);
+    expect(pushAdjusted[0].pushProbability).toBeCloseTo(0.1184, 4);
+    expect(pushAdjusted[0].expectedValue).toBeGreaterThan(0);
+    expect(priceTwoTeamTeaser([{ coverProbability: 0.7, pushProbability: 0 }, { coverProbability: 0.7, pushProbability: 0 }], -120)?.expectedValue).toBeLessThan(0);
+    expect(priceTwoTeamTeaser([{ coverProbability: 0.7, pushProbability: 0.08 }], -120)).toBeNull();
     expect(rankTeaserPairs([teaser("g1", "NE", "SEA", 0.75), teaser("g2", "KC", "DEN", 0.74)])).toEqual([]);
+  });
+
+  it("31b. settles two-team teaser pushes and reduces parlay pushes using each stored leg price", () => {
+    const games = new Map([
+      ["g1", { gameId: "g1", awayTeam: "B", homeTeam: "A", awayScore: 17, homeScore: 20 }],
+      ["g2", { gameId: "g2", awayTeam: "D", homeTeam: "C", awayScore: 17, homeScore: 24 }]
+    ]);
+    const contract = [
+      { gameId: "g1", market: "teaser" as const, side: "A", point: -3, americanPrice: -110, selection: "A -3" },
+      { gameId: "g2", market: "teaser" as const, side: "C", point: -3, americanPrice: -110, selection: "C -3" }
+    ];
+    expect(gradeStoredPlay({ playType: "teaser", americanOdds: -120, stakeCents: 10_000, contract }, games)).toEqual({ result: "push", profitCents: 0 });
+    expect(gradeStoredPlay({ playType: "parlay", americanOdds: 264, stakeCents: 10_000, contract }, games)).toEqual({ result: "win", profitCents: 9091 });
   });
 
   it("32. co-locates movement and rolling matchup evidence inside the existing Picks drawer", () => {

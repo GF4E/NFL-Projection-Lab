@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { priceTwoTeamTeaser } from "@/domain/decision-board";
 import type {
   DecisionBoardPayload,
   PlayerPropBoard,
@@ -41,6 +42,7 @@ type SelectedLeg = ValueLeg & {
   selection: string;
   detail: string;
   edge: number | null;
+  pushProbability?: number;
 };
 
 function formatOdds(value: number): string { return value > 0 ? `+${value}` : `${value}`; }
@@ -164,11 +166,10 @@ export function WeekOneBoard() {
   const straightEv = useMemo(() => slipMode === "straight" && slip.length === 1 ? legExpectedValuePercent(slip[0]) : null, [slip, slipMode]);
   const latestCapture = useMemo(() => lines.reduce<string | null>((latest, line) => !latest || line.capturedAt > latest ? line.capturedAt : latest, null), [lines]);
   const teaserValue = useMemo(() => {
-    if (slipMode !== "teaser" || slip.length < 2 || slip.some((leg) => leg.kind !== "teaser" || leg.fairProbability === null)) return null;
+    if (slipMode !== "teaser" || slip.length !== 2 || slip.some((leg) => leg.kind !== "teaser" || leg.fairProbability === null || leg.pushProbability === undefined)) return null;
     if (new Set(slip.map((leg) => leg.gameId)).size !== slip.length) return null;
-    const fairProbability = slip.reduce((product, leg) => product * (leg.fairProbability ?? 0), 1);
-    const offeredDecimal = americanToDecimal(teaserPrice);
-    return { fairProbability, fairAmerican: decimalToAmerican(1 / fairProbability), evPercent: (fairProbability * offeredDecimal - 1) * 100 };
+    const priced = priceTwoTeamTeaser(slip.map((leg) => ({ coverProbability: leg.fairProbability!, pushProbability: leg.pushProbability! })), teaserPrice);
+    return priced ? { ...priced, evPercent: priced.expectedValue * 100 } : null;
   }, [slip, slipMode, teaserPrice]);
 
   useEffect(() => {
@@ -217,7 +218,8 @@ export function WeekOneBoard() {
       const sameContractRemoved = current.filter((item) => !(item.gameId === leg.gameId && item.book === leg.book && item.market === leg.market && item.kind === leg.kind));
       const sameBook = sameContractRemoved.filter((item) => item.book === leg.book);
       if (sameBook.length !== sameContractRemoved.length) setMessage(`Slip switched to ${bookNames[leg.book]}; contracts cannot cross books.`);
-      return [...sameBook, leg];
+      const capped = leg.kind === "teaser" ? sameBook.filter((item) => item.kind === "teaser").slice(-1) : sameBook;
+      return [...capped, leg];
     });
   }
 
@@ -262,13 +264,14 @@ export function WeekOneBoard() {
 
   function addTeaser(candidate: TeaserCandidate, matchup: string) {
     const line = lines.find((item) => item.gameId === candidate.gameId && item.book === candidate.book && item.market === "spread" && item.side === candidate.team);
-    if (!line || candidate.fairProbability === null) return;
+    if (!line || candidate.fairProbability === null || candidate.pushProbability === null) return;
     setSlipMode("teaser");
     addLeg({
       id: `teaser:${line.id}:${candidate.teasedPoint}`, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
       point: candidate.teasedPoint, americanPrice: line.americanPrice, fairProbability: candidate.fairProbability,
       matchup, selection: `${line.side} ${formatPoint(candidate.teasedPoint)}`,
-      detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : "key-number"} leg`, edge: candidate.fairProbability - (line.fairProbability ?? 0)
+      detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : "key-number"} leg`, edge: candidate.fairProbability - (line.fairProbability ?? 0),
+      pushProbability: candidate.pushProbability
     });
   }
 
@@ -276,20 +279,20 @@ export function WeekOneBoard() {
     const legs = pair.legs.flatMap<SelectedLeg>((candidate) => {
       const line = lines.find((item) => item.gameId === candidate.gameId && item.book === candidate.book && item.market === "spread" && item.side === candidate.team);
       const matchup = matchups.find((game) => game.id === candidate.gameId);
-      if (!line || !matchup || candidate.fairProbability === null) return [];
+      if (!line || !matchup || candidate.fairProbability === null || candidate.pushProbability === null) return [];
       return [{
         id: `teaser:${line.id}:${candidate.teasedPoint}`, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
         point: candidate.teasedPoint, americanPrice: line.americanPrice, fairProbability: candidate.fairProbability,
         matchup: `${matchup.away} @ ${matchup.home}`, selection: `${line.side} ${formatPoint(candidate.teasedPoint)}`,
         detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : candidate.classification === "key_number" ? "key-number" : "positive-EV"} leg`,
-        edge: candidate.fairProbability - (line.fairProbability ?? 0)
+        edge: candidate.fairProbability - (line.fairProbability ?? 0), pushProbability: candidate.pushProbability
       }];
     });
     if (legs.length !== 2) return;
     setSlipMode("teaser");
     setSlip(legs);
     setTeaserPrice(pair.offeredAmerican);
-    setMessage(`Positive-EV ${bookNames[pair.book]} teaser pair loaded. Confirm the offered price before saving.`);
+    setMessage(`Push-adjusted ${bookNames[pair.book]} teaser pair loaded. Confirm the offered price before saving.`);
   }
 
   async function saveSlip() {
@@ -328,7 +331,7 @@ export function WeekOneBoard() {
       americanOdds: slipMode === "teaser" ? teaserPrice : combinedAmerican(slip),
       modelEdgePp: 0,
       estimatedEvPercent: slipMode === "teaser" ? teaserValue?.evPercent ?? 0 : slipExpectedValuePercent(slip),
-      statsCase: `${selectedReason.label}. ${slipMode === "teaser" ? "Empirical teaser EV cleared the selected book price." : "Power-de-vigged independent-leg price check completed."}`,
+      statsCase: `${selectedReason.label}. ${slipMode === "teaser" ? "Push-adjusted empirical teaser EV cleared the selected book price." : "Power-de-vigged independent-leg price check completed."}`,
       contract: slip.map((leg) => ({ gameId: leg.gameId, market: leg.kind === "teaser" ? "teaser" as const : leg.market === "prop" ? "prop" as const : leg.market as "spread" | "total" | "moneyline", side: leg.side, point: leg.point, americanPrice: leg.americanPrice, selection: leg.selection }))
     }];
     try {
@@ -510,7 +513,7 @@ export function WeekOneBoard() {
         <div className="value-meter">
           <div><span>BOOK PRICE</span><b>{slip.length ? slipMode === "teaser" ? formatOdds(teaserPrice) : formatOdds(combinedAmerican(slip)) : "—"}</b></div>
           <div><span>NO-VIG FAIR</span><b>{slipMode === "teaser" ? teaserValue ? formatOdds(teaserValue.fairAmerican) : "—" : slipValue ? formatOdds(slipValue.fairAmerican) : "—"}</b></div>
-          <div className={`vig-loss ${(slipMode === "teaser" && teaserValue && teaserValue.evPercent >= 0) || (straightEv !== null && straightEv >= 0) ? "positive-value" : ""}`}><span>{slipMode === "teaser" || slipMode === "straight" ? "ESTIMATED EV" : "VALUE LOST"}</span><b>{slipMode === "teaser" ? teaserValue ? `${teaserValue.evPercent >= 0 ? "+" : ""}${teaserValue.evPercent.toFixed(1)}%` : "—" : slipMode === "straight" ? straightEv === null ? "—" : `${straightEv >= 0 ? "+" : ""}${straightEv.toFixed(1)}%` : slipValue ? `${slipValue.vigDragPercent.toFixed(1)}%` : "—"}</b><small>{slipMode === "teaser" ? teaserValue ? `${formatPercent(teaserValue.fairProbability)} joint fair probability` : "Add two priced teaser legs from different games" : slipMode === "straight" ? slip.length === 1 ? `${formatPercent(legBetProbability(slip[0]))} shrunk bet probability` : "Select one straight to inspect its EV" : slipValue ? `$${slipValue.lossPerUnitDollars.toFixed(2)} per 1u · latest leg +${slipValue.incrementalDragPercent.toFixed(1)}pp` : slip.length > 1 ? "Same-game or incomplete pair: withheld" : "Add a priced leg"}</small></div>
+          <div className={`vig-loss ${(slipMode === "teaser" && teaserValue && teaserValue.evPercent >= 0) || (straightEv !== null && straightEv >= 0) ? "positive-value" : ""}`}><span>{slipMode === "teaser" || slipMode === "straight" ? "ESTIMATED EV" : "VALUE LOST"}</span><b>{slipMode === "teaser" ? teaserValue ? `${teaserValue.evPercent >= 0 ? "+" : ""}${teaserValue.evPercent.toFixed(1)}%` : "—" : slipMode === "straight" ? straightEv === null ? "—" : `${straightEv >= 0 ? "+" : ""}${straightEv.toFixed(1)}%` : slipValue ? `${slipValue.vigDragPercent.toFixed(1)}%` : "—"}</b><small>{slipMode === "teaser" ? teaserValue ? `${formatPercent(teaserValue.winProbability)} win · ${formatPercent(teaserValue.pushProbability)} push` : "Add exactly two priced teaser legs from different games" : slipMode === "straight" ? slip.length === 1 ? `${formatPercent(legBetProbability(slip[0]))} shrunk bet probability` : "Select one straight to inspect its EV" : slipValue ? `$${slipValue.lossPerUnitDollars.toFixed(2)} per 1u · latest leg +${slipValue.incrementalDragPercent.toFixed(1)}pp` : slip.length > 1 ? "Same-game or incomplete pair: withheld" : "Add a priced leg"}</small></div>
         </div>
         <button className="save-slip" disabled={!slip.length || (slipMode === "teaser" && (!teaserValue || teaserValue.evPercent < 0))} onClick={saveSlip}>Approve team card</button>
         <p className="slip-message" aria-live="polite">{message}</p>

@@ -1,7 +1,6 @@
 import { stableHash } from "@/domain/hash";
-import { americanToDecimal } from "@/domain/odds";
-import type { PlayResult, StoredPlayLeg } from "@/domain/play-card";
-import { gradeStoredLeg, type CompletedGame } from "@/domain/settlement";
+import type { StoredPlayLeg } from "@/domain/play-card";
+import { gradeStoredPlay, type CompletedGame } from "@/domain/settlement";
 import { boardGameId, normalizeScheduleTeam } from "@/domain/weekly-slate";
 import { ensurePlayStore } from "./play-store";
 
@@ -29,25 +28,6 @@ function parseContract(raw: string): StoredPlayLeg[] {
   } catch {
     return [];
   }
-}
-
-function playResult(play: OpenPlayRow, games: ReadonlyMap<string, CompletedGame>): Exclude<PlayResult, "pending" | "void"> | null {
-  const legs = parseContract(play.contract_json);
-  if (!legs.length) return null;
-  const results = legs.map((leg) => {
-    const game = games.get(leg.gameId);
-    return game ? gradeStoredLeg(leg, game) : null;
-  });
-  if (results.some((result) => result === null)) return null;
-  if (results.some((result) => result === "loss")) return "loss";
-  if (results.some((result) => result === "push")) return legs.length === 1 ? "push" : null;
-  return "win";
-}
-
-function profitCents(play: OpenPlayRow, result: Exclude<PlayResult, "pending" | "void">): number {
-  if (result === "loss") return -play.stake_cents;
-  if (result === "push") return 0;
-  return Math.round(play.stake_cents * (americanToDecimal(play.american_odds) - 1));
 }
 
 export async function settleCompletedTeamPlays(db: D1Database, now = new Date()): Promise<{ settled: number; deferred: number }> {
@@ -81,12 +61,17 @@ export async function settleCompletedTeamPlays(db: D1Database, now = new Date())
   let settled = 0;
   let deferred = 0;
   for (const play of playRows.results) {
-    const result = playResult(play, games);
-    if (!result) {
+    const contract = parseContract(play.contract_json);
+    const grade = gradeStoredPlay({
+      playType: play.play_type,
+      americanOdds: play.american_odds,
+      stakeCents: play.stake_cents,
+      contract
+    }, games);
+    if (!grade) {
       deferred += 1;
       continue;
     }
-    const contract = parseContract(play.contract_json);
     const finalHash = stableHash(contract.map((leg) => {
       const game = games.get(leg.gameId);
       return game
@@ -96,9 +81,9 @@ export async function settleCompletedTeamPlays(db: D1Database, now = new Date())
     const settledAt = now.toISOString();
     await db.batch([
       db.prepare(`UPDATE plays SET status = 'settled', result = ?, profit_cents = ?, updated_at = ?
-        WHERE id = ? AND result = 'pending'`).bind(result, profitCents(play, result), settledAt, play.id),
+        WHERE id = ? AND result = 'pending'`).bind(grade.result, grade.profitCents, settledAt, play.id),
       db.prepare(`INSERT OR IGNORE INTO play_settlement_audit (play_id, final_hash, result, settled_at, source)
-        VALUES (?, ?, ?, ?, 'nflverse_finals')`).bind(play.id, finalHash, result, settledAt)
+        VALUES (?, ?, ?, ?, 'nflverse_finals')`).bind(play.id, finalHash, grade.result, settledAt)
     ]);
     settled += 1;
   }
