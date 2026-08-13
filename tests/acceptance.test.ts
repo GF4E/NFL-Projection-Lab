@@ -998,4 +998,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(plays).toContain("status: 401");
     expect(play).toContain("status: 401");
   });
+
+  it("43. ties compact matchup context to the exact model bet and teaser leg without double-counting it", () => {
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    const alignment = readFileSync("src/domain/evidence-alignment.ts", "utf8");
+    expect(board).toContain("alignMatchupEvidence(gameIntel?.signals ?? [], candidate.market, candidate.line.side)");
+    expect(board).toContain('alignMatchupEvidence(gameIntel?.signals ?? [], "teaser", candidate.team)');
+    expect(board).toContain("compactEvidenceLabel(context)");
+    expect(board).toContain("not added to EV or sizing twice");
+    expect(alignment).toContain("explanation layer only");
+    expect(alignment).not.toContain("expectedValue");
+    expect(alignment).not.toContain("sizeKelly");
+  });
 });

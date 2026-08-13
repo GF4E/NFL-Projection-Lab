@@ -235,6 +235,10 @@ button:disabled { cursor: wait; opacity: .62; }
 .quick-mainline-recommendation b { overflow: hidden; font: 900 12px var(--display); text-overflow: ellipsis; white-space: nowrap; }
 .quick-mainline-recommendation b strong { color: #b8c2be; font-size: 10px; }
 .quick-mainline-recommendation small { overflow: hidden; color: #939f9a; font: 700 8px var(--display); text-overflow: ellipsis; white-space: nowrap; }
+.evidence-check { color: #87948f; font-weight: 900; letter-spacing: .025em; }
+.evidence-check.supports { color: var(--acid); }
+.evidence-check.contradicts { color: var(--red); }
+.evidence-check.mixed { color: var(--gold); }
 .quick-mainline-recommendation > em { color: var(--acid); font: 900 9px var(--display); font-style: normal; white-space: nowrap; }
 .quick-mainline-recommendation.uncertain > em { color: #7d8985; }
 .quick-head { min-height: 20px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
