@@ -2,6 +2,7 @@ import { getD1 } from "../../db";
 import {
   draftExpirationReason,
   earliestPlayKickoff,
+  forecastApprovalEligibilityError,
   isTeamApproved,
   storedLegMatchesSource,
   validateTeamCardPortfolio,
@@ -324,6 +325,11 @@ function assertStoredPlayContract(play: WeeklyPlay): void {
   if (errors.length) throw new Error(errors[0]);
 }
 
+function assertForecastApprovalEligible(play: WeeklyPlay, snapshot: PlayForecastSnapshot): void {
+  const error = forecastApprovalEligibilityError(play, snapshot);
+  if (error) throw new Error(error);
+}
+
 async function assertPortfolioAvailable(d1: D1Database, play: WeeklyPlay): Promise<void> {
   const result = await d1.prepare(`SELECT * FROM plays
     WHERE id <> ? AND season = ? AND week = ? AND status IN ('card', 'placed')`)
@@ -345,6 +351,7 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
     if (current.status === "passed") {
       await assertApprovalContractCurrent(d1, play);
       const forecastSnapshot = await capturePlayForecastSnapshot(d1, play);
+      assertForecastApprovalEligible(play, forecastSnapshot);
       await d1.batch([
         d1.prepare(`INSERT OR IGNORE INTO play_state_audit
           (id, play_id, transition, reason, from_status, to_status, snapshot_json, changed_at)
@@ -372,6 +379,7 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
     await assertApprovalContractCurrent(d1, current);
     await assertPortfolioAvailable(d1, current);
     const forecastSnapshot = await capturePlayForecastSnapshot(d1, current);
+    assertForecastApprovalEligible(current, forecastSnapshot);
     await d1.prepare(`UPDATE plays SET
       gabe_approved = CASE WHEN ? = 'gabe' THEN 1 ELSE gabe_approved END,
       jarrett_approved = CASE WHEN ? = 'jarrett' THEN 1 ELSE jarrett_approved END,
@@ -385,6 +393,7 @@ export async function addOrApprovePlay(play: WeeklyPlay, actor: PickedBy): Promi
   await assertApprovalWindowOpen(d1, play, play.updatedAt);
   await assertApprovalContractCurrent(d1, play);
   const forecastSnapshot = await capturePlayForecastSnapshot(d1, play);
+  assertForecastApprovalEligible(play, forecastSnapshot);
   await d1.prepare(INSERT_PLAY_SQL).bind(
     play.id, play.contractKey ?? "", JSON.stringify(play.contract ?? []), JSON.stringify(forecastSnapshot), actor === "gabe" ? 1 : 0, actor === "jarrett" ? 1 : 0,
     play.season, play.week, play.gameId, play.playType, play.market, play.primaryReason, play.pickedBy, play.title, play.legs, play.book,

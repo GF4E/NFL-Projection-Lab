@@ -64,7 +64,7 @@ export function portfolioTriggerSql(): string {
 }
 
 export function contractGuardTriggerSql(): string {
-  return `CREATE TRIGGER IF NOT EXISTS approval_contract_guard_v2
+  return `CREATE TRIGGER IF NOT EXISTS approval_contract_guard_v3
     BEFORE UPDATE OF status ON plays
     WHEN OLD.status = 'research' AND NEW.status = 'card'
     BEGIN
@@ -119,5 +119,23 @@ export function contractGuardTriggerSql(): string {
         )
         OR (SELECT COUNT(DISTINCT json_extract(value, '$.gameId')) FROM json_each(NEW.contract_json)) <> 2
       ) THEN RAISE(ABORT, 'Teaser legs must be valid two-game teaser contracts') END;
+
+      SELECT CASE WHEN NEW.play_type = 'teaser' AND (
+        json_extract(NEW.forecast_json, '$.authoritativeExpectedValuePercent') IS NULL
+        OR json_extract(NEW.forecast_json, '$.authoritativeExpectedValuePercent') < 0
+      ) THEN RAISE(ABORT, 'The exact two-team teaser price must have nonnegative EV') END;
+
+      SELECT CASE WHEN EXISTS (
+        SELECT 1 FROM json_each(NEW.contract_json) AS contract_leg
+        WHERE json_extract(contract_leg.value, '$.market') = 'prop'
+          AND NOT EXISTS (
+            SELECT 1 FROM json_each(json_extract(NEW.forecast_json, '$.legs')) AS forecast_leg
+            WHERE json_extract(forecast_leg.value, '$.sourceQuoteId') = json_extract(contract_leg.value, '$.sourceQuoteId')
+              AND json_extract(forecast_leg.value, '$.market') = 'prop'
+              AND json_extract(forecast_leg.value, '$.betProbability') IS NOT NULL
+              AND json_extract(forecast_leg.value, '$.uncertaintyInterval') IS NOT NULL
+              AND json_extract(forecast_leg.value, '$.expectedValue') >= ${structuralConfig.props.minimumExpectedValue}
+          )
+      ) THEN RAISE(ABORT, 'Player props must retain current evidence-qualified positive EV') END;
     END`;
 }

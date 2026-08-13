@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   cashPlacementEligibilityError,
+  forecastApprovalEligibilityError,
   storedLegMatchesSource,
   validateStoredPlayContract,
   type StoredPlayLeg,
@@ -22,6 +23,12 @@ const leg = (
 });
 
 describe("stored shared-card contract integrity", () => {
+  const snapshot = (overrides: Partial<WeeklyPlay["forecastSnapshot"] extends infer T ? NonNullable<T> : never> = {}) => ({
+    generatedAt: "2026-09-13T18:00:00.000Z", boardGeneratedAt: "2026-09-13T18:00:00.000Z",
+    championHash: "champion", configHash: "config", dataHash: "data", artifactHash: "artifact",
+    consensusSnapshotId: "snapshot", displayedExpectedValuePercent: 2,
+    authoritativeExpectedValuePercent: null, displayedEdgePp: 2, legs: [], ...overrides
+  });
   it("accepts only one exact leg for a straight", () => {
     expect(validateStoredPlayContract({
       playType: "single", market: "spread", gameId: "g1", contract: [leg("g1")]
@@ -47,6 +54,23 @@ describe("stored shared-card contract integrity", () => {
     expect(validateStoredPlayContract({
       playType: "teaser", market: "teaser", gameId: "multi", contract: [leg("g1", "teaser"), leg("g1", "teaser", "g1:other")]
     })).toContain("Teaser legs must come from two different games");
+  });
+
+  it("blocks stale props and negative-EV teaser prices at the approval boundary", () => {
+    const propLeg = leg("g1", "prop");
+    const propPlay = { playType: "single" as const, contract: [propLeg] };
+    const qualifiedProp = snapshot({ legs: [{
+      sourceQuoteId: propLeg.sourceQuoteId!, gameId: "g1", market: "prop", side: "SEA", point: -2.5,
+      americanPrice: -110, book: "betmgm", capturedAt: "2026-09-13T18:00:00.000Z", sourceHash: "hash",
+      marketProbability: 0.5, modelProbability: 0.62, betProbability: 0.56, pushProbability: 0,
+      uncertaintyInterval: [0.53, 0.6], expectedValue: 0.069
+    }] });
+    expect(forecastApprovalEligibilityError(propPlay, qualifiedProp)).toBeNull();
+    expect(forecastApprovalEligibilityError(propPlay, snapshot())).toMatch(/no longer clears/i);
+    expect(forecastApprovalEligibilityError(
+      { playType: "teaser", contract: [leg("g1", "teaser"), leg("g2", "teaser")] },
+      snapshot({ authoritativeExpectedValuePercent: -0.01 })
+    )).toMatch(/negative EV/i);
   });
 
   it("binds a stored leg to the same source game, book, market and side", () => {

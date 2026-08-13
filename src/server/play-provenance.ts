@@ -2,6 +2,7 @@ import { buildDecisionBoard } from "./decision-board";
 import { getPlayerPropBoard } from "./player-props";
 import { stableHash } from "@/domain/hash";
 import { expectedValueWithPush } from "@/domain/odds";
+import { priceTwoTeamTeaser } from "@/domain/decision-board";
 import type {
   PlayForecastLegSnapshot,
   PlayForecastSnapshot,
@@ -121,7 +122,7 @@ function mainlineSnapshot(input: {
 
 export async function capturePlayForecastSnapshot(
   db: D1Database,
-  play: Pick<WeeklyPlay, "week" | "contract" | "estimatedEvPercent" | "modelEdgePp">
+  play: Pick<WeeklyPlay, "week" | "playType" | "americanOdds" | "contract" | "estimatedEvPercent" | "modelEdgePp">
 ): Promise<PlayForecastSnapshot> {
   const contract = play.contract ?? [];
   const board = await buildDecisionBoard(db, { week: play.week });
@@ -181,6 +182,14 @@ export async function capturePlayForecastSnapshot(
     liveLines: lineResult.results,
     playerProps: propResult.results
   });
+  const authoritativeExpectedValuePercent = play.playType === "teaser"
+    ? priceTwoTeamTeaser(legs.map((leg) => ({
+        conditionalWinProbability: leg.betProbability ?? Number.NaN,
+        pushProbability: leg.pushProbability ?? Number.NaN
+      })), play.americanOdds)?.expectedValue ?? null
+    : play.playType === "single" && legs.length === 1
+      ? legs[0].expectedValue
+      : null;
   return {
     generatedAt: new Date().toISOString(),
     boardGeneratedAt: board.generatedAt,
@@ -189,7 +198,10 @@ export async function capturePlayForecastSnapshot(
     dataHash: board.dataHash,
     artifactHash: board.artifactHash,
     consensusSnapshotId,
-    displayedExpectedValuePercent: play.estimatedEvPercent,
+    displayedExpectedValuePercent: (authoritativeExpectedValuePercent ?? play.estimatedEvPercent / 100) * 100,
+    authoritativeExpectedValuePercent: authoritativeExpectedValuePercent === null
+      ? null
+      : authoritativeExpectedValuePercent * 100,
     displayedEdgePp: play.modelEdgePp,
     legs
   };

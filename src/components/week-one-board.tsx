@@ -330,7 +330,7 @@ export function WeekOneBoard() {
     if (legs.length !== 2) return;
     setSlipMode("teaser");
     setSlip(legs);
-    setTeaserPrice(pair.offeredAmerican);
+    setTeaserPrice(pair.screeningAmerican);
     setMessage(`Push-adjusted ${bookNames[pair.book]} teaser pair loaded. Confirm the offered price before saving.`);
   }
 

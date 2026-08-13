@@ -34,9 +34,34 @@ export type PlayForecastSnapshot = {
   artifactHash: string | null;
   consensusSnapshotId: string;
   displayedExpectedValuePercent: number;
+  /** Server-recomputed from the frozen contract; null when the contract has no supported aggregate EV. */
+  authoritativeExpectedValuePercent: number | null;
   displayedEdgePp: number;
   legs: PlayForecastLegSnapshot[];
 };
+
+export function forecastApprovalEligibilityError(
+  play: Pick<WeeklyPlay, "playType" | "contract">,
+  snapshot: PlayForecastSnapshot
+): string | null {
+  const contract = play.contract ?? [];
+  const snapshotByQuote = new Map(snapshot.legs.map((leg) => [leg.sourceQuoteId, leg]));
+  for (const leg of contract.filter((item) => item.market === "prop")) {
+    const evidence = leg.sourceQuoteId ? snapshotByQuote.get(leg.sourceQuoteId) : null;
+    if (!evidence || evidence.market !== "prop" || evidence.betProbability === null ||
+      evidence.uncertaintyInterval === null || evidence.expectedValue === null ||
+      evidence.expectedValue < structuralConfig.props.minimumExpectedValue) {
+      return "This player prop no longer clears the current multi-book, history, uncertainty, and availability gates.";
+    }
+  }
+  if (play.playType === "teaser" && (
+    snapshot.authoritativeExpectedValuePercent === null ||
+    snapshot.authoritativeExpectedValuePercent < -1e-9
+  )) {
+    return "The exact two-team teaser price is negative EV; refresh the price or choose another pair.";
+  }
+  return null;
+}
 
 export type StoredPlayLeg = {
   sourceQuoteId?: string;

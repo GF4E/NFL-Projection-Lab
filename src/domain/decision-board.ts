@@ -101,7 +101,8 @@ export interface TeaserPairCandidate {
   id: string;
   book: "betmgm" | "fanduel";
   legs: [TeaserCandidate, TeaserCandidate];
-  offeredAmerican: number;
+  /** Hypothetical price used to screen the pair; approval must use a confirmed live price. */
+  screeningAmerican: number;
   fairProbability: number;
   pushProbability: number;
   lossProbability: number;
@@ -816,7 +817,7 @@ export function rankTeaserPairs(
         id: `teaser-pair:${left.book}:${left.gameId}:${left.team}:${right.gameId}:${right.team}`,
         book: left.book,
         legs,
-        offeredAmerican,
+        screeningAmerican: offeredAmerican,
         fairProbability,
         pushProbability: priced.pushProbability,
         lossProbability: priced.lossProbability,
