@@ -10,6 +10,7 @@ Updated 2026-08-13. This is an internal product note; it is not rendered in the 
 - Pair efficiency with success rate and explosive-play rate. EPA alone can obscure whether an offense is consistently efficient or dependent on a few large plays: https://www.pff.com/news/nfl-explosive-plays-and-re-thinking-offensive-success
 - Treat props as price-distribution problems, not player takes. Unabated describes converting projections into distributions and point-by-point fair prices: https://unabated.com/articles/your-next-steps-with-unabated
 - Keep a prop's projection, cover probability, recent hit rate, matchup context, edge, and best available price on one scan surface. PFF's 2026 player-prop product uses those primitives and ranks by cover probability, edge, hit rate, or vig: https://www.pff.com/betting/player-props
+- Keep exact-price value and the statistic that supports or challenges it in the same decision card. Unabated's odds screen elevates the best line, synthetic hold, fair line, and projected edge together; it also uses change highlighting to preserve movement context: https://www.unabated.com/articles/learn-about-the-game-odds-screen
 - Label edge as a price comparison rather than a win prediction. PFF makes this distinction explicitly, and Action Network likewise places its model line, market line, grade, edge, and best odds in the same row: https://www.pff.com/news/pff-player-prop-tool-is-now-live-on-web-for-pff-subscribers and https://www.actionnetwork.com/projections/
 - Expect prop market coverage to change as kickoff approaches. The Odds API documents that event market keys appear as books open markets; the app therefore reports the actual scan/gate state rather than showing an empty recommendation as a negative conclusion: https://the-odds-api.com/liveapi/guides/v4/
 
@@ -17,6 +18,7 @@ Updated 2026-08-13. This is an internal product note; it is not rendered in the 
 
 - The sportsbook grid remains the primary surface.
 - `Analyze` is the only expansion point. It contains the best exact-price mainline contracts, teaser legs/pairs, confirmed +EV props, compact rolling matchup evidence, and material open-to-now movement.
+- Each exact mainline recommendation carries up to two contract-relevant statistics and plain-language fragments directly beneath its probability and EV. Hover text is supplementary, not the only way to read the evidence.
 - Matchup evidence is capped at three signals and uses leakage-safe rolling 17-game ranks. It does not present unverified narrative conclusions.
 - Evidence is capped only after the exact contract is selected. Side/moneyline decisions consider team-direction signals; total decisions consider pace and pass-environment signals. This prevents unrelated high-strength metrics from crowding a relevant statistic off the card.
 - A teaser pair is surfaced only when two different games at the same book have non-negative empirical expected value at the displayed price. Betting against Seattle or Atlanta requires at least 5% expected value.

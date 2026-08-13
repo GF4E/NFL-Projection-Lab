@@ -1154,6 +1154,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain('alignMatchupEvidence(gameIntel?.signals ?? [], "teaser", candidate.team)');
     expect(board).toContain("compactEvidenceLabel(context)");
     expect(board).toContain("not added to EV or sizing twice");
+    expect(board).toContain("contractSignals.map");
+    expect(board).toContain('className="contract-signal"');
+    expect(board).toContain("signalInterpretation(signal)");
     expect(alignment).toContain("explanation layer only");
     expect(alignment).not.toContain("expectedValue");
     expect(alignment).not.toContain("sizeKelly");

@@ -831,6 +831,9 @@ export function WeekOneBoard() {
                   {mainlineRecommendations.length ? mainlineRecommendations.map((candidate) => {
                     // Matchup context explains the contract; it is not added to EV or sizing twice.
                     const context = alignMatchupEvidence(gameIntel?.signals ?? [], candidate.market, candidate.line.side);
+                    const contractSignals = gameIntel?.evidence.status === "current"
+                      ? materialEvidenceSignals(gameIntel.signals, candidate.market, candidate.line.side, 8, 2)
+                      : [];
                     return <button
                       className={`quick-mainline-recommendation ${candidate.sizing.greyed ? "uncertain" : ""}`}
                       disabled={!candidate.actionable}
@@ -841,6 +844,9 @@ export function WeekOneBoard() {
                         <b>{lineSelection(candidate.line)} <strong>{formatOdds(candidate.line.americanPrice)}</strong></b>
                         <small>{bookNames[candidate.line.book]} · {marketTitle(candidate.market)} · BET {formatPercent(candidate.betProbability)} · BREAK-EVEN {formatPercent(candidate.breakEvenProbability)}</small>
                         <small>{candidate.expectedValue >= 0 ? "+" : ""}{(candidate.expectedValue * 100).toFixed(1)}% EV · 80% {formatInterval(candidate.edgeInterval)} · <span className={`evidence-check ${context.verdict}`} title={evidenceDetail(context)}>{compactEvidenceLabel(context)}</span></small>
+                        {contractSignals.map((signal) => <small className="contract-signal" key={signal.id}>
+                          <span>{signal.label} · {signal.lean}</span> {signal.detail} · {signalInterpretation(signal)}
+                        </small>)}
                       </div>
                       <em>{candidate.actionable ? `${candidate.sizing.suggestedUnits}u ADD` : candidate.preferenceConflict ? "PASS · TEAM" : "PASS"}</em>
                     </button>;

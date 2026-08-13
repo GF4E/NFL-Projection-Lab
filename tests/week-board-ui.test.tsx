@@ -5,6 +5,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testi
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { WeekOneBoard } from "@/components/week-one-board";
 import type { DecisionBoardPayload, PlayerPropBoard } from "@/domain/decision-board";
+import type { LiveLine } from "@/domain/line-board";
 import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
 
 vi.mock("next/image", () => ({
@@ -143,5 +144,42 @@ describe("compact weekly decision board", () => {
     fireEvent.pointerDown(within(decisionWindow as HTMLElement).getByText("No viable path at this line."));
     await act(async () => {});
     expect(screen.getByText("NE @ SEA")).toBeTruthy();
+  });
+
+  it("co-locates only material contract evidence with an exact-price model bet", async () => {
+    const capturedAt = "2026-08-13T20:00:00.000Z";
+    const lines: LiveLine[] = [
+      { id: "mgm-ne", gameId: "ne-sea", book: "betmgm", market: "spread", side: "NE", point: 3.5, americanPrice: -110, capturedAt, sourceEventId: "event", sourceHash: "ne", fairProbability: 0.5, marketVigPercent: 4.55 },
+      { id: "mgm-sea", gameId: "ne-sea", book: "betmgm", market: "spread", side: "SEA", point: -3.5, americanPrice: -110, capturedAt, sourceEventId: "event", sourceHash: "sea", fairProbability: 0.5, marketVigPercent: 4.55 }
+    ];
+    const intelligence = board();
+    intelligence.games[0].projections = [{
+      gameId: "ne-sea", book: "betmgm", homeTeam: "SEA", marketHomePoint: -3.5,
+      projectedHomePoint: -5.5, homeCoverProbability: 0.7, shrunkHomeProbability: 0.6,
+      pushProbability: 0.02, edgeInterval: [0.04, 0.14], marketHomeProbability: 0.5,
+      marketSource: "book", translationWarning: "none"
+    }];
+    intelligence.games[0].signals = [
+      { id: "efficiency", label: "ADJ EPA", lean: "SEA", detail: "SEA O #4 vs NE D #24", strength: 20 },
+      { id: "success", label: "DOWN-TO-DOWN", lean: "SEA", detail: "SEA O #6 vs NE D #22", strength: 16 },
+      { id: "rest", label: "REST", lean: "NE", detail: "8 days vs 7 days", strength: 7 }
+    ];
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.startsWith("/api/weekly-slate")) return response(slate);
+      if (url.startsWith("/api/lines")) return response({ lines, configured: true });
+      if (url.startsWith("/api/plays")) return response({ plays: [], actor: "gabe" });
+      if (url.startsWith("/api/decision-board")) return response(intelligence);
+      if (url.startsWith("/api/props")) return response(propBoard("ne-sea"));
+      throw new Error(`Unexpected request ${url}`);
+    });
+
+    const { container } = render(<WeekOneBoard />);
+    fireEvent.click(await screen.findByRole("button", { name: /1 PICKS/ }));
+    await waitFor(() => expect(container.querySelectorAll(".contract-signal")).toHaveLength(2));
+    const evidence = [...container.querySelectorAll(".contract-signal")].map((node) => node.textContent);
+    expect(evidence.join(" ")).toContain("SEA O #4 vs NE D #24");
+    expect(evidence.join(" ")).toContain("SEA O #6 vs NE D #22");
+    expect(evidence.join(" ")).not.toContain("8 days vs 7 days");
   });
 });
