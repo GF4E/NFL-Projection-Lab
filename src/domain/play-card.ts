@@ -51,6 +51,10 @@ export type WeeklyPlay = {
 
 export const UNIT_CENTS = 2_500;
 
+export function approvalActorForEmail(email: string | null | undefined, jarrettEmail: string): PickedBy {
+  return email?.trim().toLowerCase() === jarrettEmail.trim().toLowerCase() ? "jarrett" : "gabe";
+}
+
 export function addTeamApproval(current: readonly PickedBy[], actor: PickedBy): PickedBy[] {
   return ([...new Set([...current, actor])] as PickedBy[]).sort((left, right) => left === "gabe" ? -1 : right === "gabe" ? 1 : 0);
 }

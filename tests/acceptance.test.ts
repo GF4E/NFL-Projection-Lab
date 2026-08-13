@@ -24,7 +24,7 @@ import { kickoffCountdown, refreshSundayDraft, snapshotAgeMs, todayOnly } from "
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "@/domain/settlement";
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
-import { addTeamApproval, estimatedEvFromEdge, isTeamApproved, trackerRecordSummaries, trackerSummary } from "@/domain/play-card";
+import { addTeamApproval, approvalActorForEmail, estimatedEvFromEdge, isTeamApproved, trackerRecordSummaries, trackerSummary } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { crossedKeyNumbers, isClassicWongPoint, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
@@ -530,6 +530,17 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("edge: prop.edge");
     expect(board).toContain("setStake(prop.suggestedUnits * 25)");
     expect(board).not.toContain("fairProbability: prop.consensusProbability");
+  });
+
+  it("36c. binds each approval to the authenticated teammate instead of a client-side toggle", () => {
+    expect(approvalActorForEmail("jwhi0802@YAHOO.com", "JWHI0802@yahoo.com")).toBe("jarrett");
+    expect(approvalActorForEmail("owner@example.com", "JWHI0802@yahoo.com")).toBe("gabe");
+    const route = readFileSync("src/app/api/plays/route.ts", "utf8");
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(route).toContain("requestActor(request)");
+    expect(route).not.toContain('pickedBy: z.enum(["gabe", "jarrett"])');
+    expect(board).toContain('aria-label="Authenticated approver"');
+    expect(board).not.toContain('onClick={() => setPicker("jarrett")}');
   });
 
   it("37. connects the fixed-seed 80% interval and quarter-Kelly sizing to every live card", () => {

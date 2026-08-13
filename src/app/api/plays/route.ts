@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { estimatedEvFromEdge, type WeeklyPlay } from "@/domain/play-card";
+import teamConfig from "../../../../config/team.config.json";
+import { approvalActorForEmail, estimatedEvFromEdge, type PickedBy, type WeeklyPlay } from "@/domain/play-card";
 import { stableHash } from "@/domain/hash";
 import { addOrApprovePlay, listPlays } from "@/server/play-store";
 
@@ -12,7 +13,6 @@ const createPlaySchema = z.object({
   playType: z.enum(["single", "parlay", "teaser"]),
   market: z.enum(["spread", "moneyline", "total", "prop", "teaser", "parlay"]),
   primaryReason: z.string().trim().min(3).max(60),
-  pickedBy: z.enum(["gabe", "jarrett"]),
   title: z.string().trim().min(3).max(120),
   legs: z.string().trim().min(3).max(180),
   book: z.enum(["BetMGM", "Caesars", "FanDuel"]),
@@ -38,6 +38,13 @@ function requestAuthor(request: Request): string {
   return request.headers.get("oai-authenticated-user-email") ?? "owner-preview";
 }
 
+function requestActor(request: Request): PickedBy {
+  return approvalActorForEmail(
+    request.headers.get("oai-authenticated-user-email"),
+    teamConfig.members.jarrett.email
+  );
+}
+
 export async function GET(request: Request) {
   try {
     const rawWeek = new URL(request.url).searchParams.get("week");
@@ -45,7 +52,7 @@ export async function GET(request: Request) {
     if (week !== undefined && (!Number.isInteger(week) || week < 1 || week > 18)) {
       return NextResponse.json({ error: "week must be an integer from 1 through 18" }, { status: 400 });
     }
-    return NextResponse.json({ plays: await listPlays(week) });
+    return NextResponse.json({ plays: await listPlays(week), actor: requestActor(request) });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load plays" }, { status: 503 });
   }
@@ -54,6 +61,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const input = createPlaySchema.parse(await request.json());
+    const actor = requestActor(request);
     const now = new Date().toISOString();
     const contractKey = stableHash({
       season: 2026, week: input.week, gameId: input.gameId, playType: input.playType,
@@ -66,7 +74,7 @@ export async function POST(request: Request) {
     const play: WeeklyPlay = {
       id: `team:${contractKey}`,
       contractKey,
-      approvals: [input.pickedBy],
+      approvals: [actor],
       contract: input.contract,
       season: 2026,
       week: input.week,
@@ -74,7 +82,7 @@ export async function POST(request: Request) {
       playType: input.playType,
       market: input.market,
       primaryReason: input.primaryReason,
-      pickedBy: input.pickedBy,
+      pickedBy: actor,
       title: input.title,
       legs: input.legs,
       book: input.book,
@@ -97,7 +105,7 @@ export async function POST(request: Request) {
       createdAt: now,
       updatedAt: now
     };
-    return NextResponse.json({ play: await addOrApprovePlay(play, input.pickedBy) }, { status: 201 });
+    return NextResponse.json({ play: await addOrApprovePlay(play, actor) }, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.issues[0]?.message ?? "Invalid play" }, { status: 400 });

@@ -181,7 +181,7 @@ export function WeekOneBoard() {
       const query = `?week=${slateData.week}`;
       const [lineData, playData, decisionData] = await Promise.all([
         fetch(`/api/lines${query}`).then((response) => response.json() as Promise<LinesResponse>),
-        fetch(`/api/plays${query}`).then((response) => response.json() as Promise<{ plays?: WeeklyPlay[] }>),
+        fetch(`/api/plays${query}`).then((response) => response.json() as Promise<{ plays?: WeeklyPlay[]; actor?: PickedBy }>),
         fetch(`/api/decision-board${query}`).then((response) => response.json() as Promise<DecisionResponse>)
       ]);
       if (!active) return;
@@ -189,6 +189,7 @@ export function WeekOneBoard() {
       setLines(lineData.lines ?? []);
       setConfigured(Boolean(lineData.configured));
       setPlays(playData.plays ?? []);
+      if (playData.actor) setPicker(playData.actor);
       if (!decisionData.error) setIntelligence(decisionData);
       if (!lineData.configured) setMessage("Live prices need the Odds API key. The board will not invent them.");
     })().catch((error) => active && setMessage(error instanceof Error ? error.message : "The last good board could not be loaded."));
@@ -343,7 +344,7 @@ export function WeekOneBoard() {
           body: JSON.stringify({
             ...entry,
             week: slate.week,
-            book: bookNames[slip[0].book], primaryReason: reason, pickedBy: picker, stakeDollars: stake,
+            book: bookNames[slip[0].book], primaryReason: reason, stakeDollars: stake,
             confidence: "play", footballCase: "The team selected this exact contract from the shared decision board.", status: "card"
           })
         });
@@ -511,7 +512,7 @@ export function WeekOneBoard() {
 
       <aside className="shared-slip">
         <div className="slip-head"><div><span>BET SLIP</span><h2>{slip.length} {slip.length === 1 ? "selection" : "selections"}</h2></div>{slip.length > 0 && <button onClick={() => setSlip([])}>Clear</button>}</div>
-        <div className="picker-switch"><button className={picker === "gabe" ? "active gabe" : ""} onClick={() => setPicker("gabe")}>Gabe</button><button className={picker === "jarrett" ? "active jarrett" : ""} onClick={() => setPicker("jarrett")}>Jarrett</button></div>
+        <div className="picker-switch" aria-label="Authenticated approver"><button className={`active ${picker}`} disabled>{picker === "gabe" ? "Gabe" : "Jarrett"}</button></div>
         <div className="slip-mode">
           <button className={slipMode === "straight" ? "active" : ""} onClick={() => { setSlipMode("straight"); setSlip((current) => current.filter((leg) => leg.kind !== "teaser")); }}>Straights</button>
           <button className={slipMode === "parlay" ? "active" : ""} onClick={() => { setSlipMode("parlay"); setSlip((current) => current.filter((leg) => leg.kind !== "teaser")); }}>Parlay</button>
