@@ -40,7 +40,6 @@ export interface ScheduledGame {
 
 const SLOT_WINDOW_MS = 15 * 60_000;
 const REQUEST_COST = 3;
-const preferredTeams = new Set(["SEA", "ATL"]);
 
 function pacificParts(date: Date): { dayKey: string; weekday: string; minuteOfDay: number } {
   const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
@@ -116,11 +115,10 @@ export function scheduledMainlineCandidates(now: Date, games: readonly Scheduled
   return candidates.sort((left, right) => left.priority - right.priority || left.scheduledFor.localeCompare(right.scheduledFor));
 }
 
-export function scheduledPropCandidates(now: Date, games: readonly ScheduledGame[], trackedGameIds: ReadonlySet<string>): ScheduledOddsCandidate[] {
+export function scheduledPropCandidates(now: Date, games: readonly ScheduledGame[]): ScheduledOddsCandidate[] {
   return games.flatMap((game) => {
     const target = Date.parse(game.kickoffAt) - 60 * 60_000;
     if (!isDue(now, target)) return [];
-    if (!trackedGameIds.has(game.id) && !preferredTeams.has(game.away) && !preferredTeams.has(game.home)) return [];
     const scheduledFor = new Date(target).toISOString();
     return [{
       key: deterministicSnapshotKey({ provider: "the-odds-api", job: "props_minus_60", scheduledFor, gameId: game.id }),

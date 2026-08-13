@@ -132,10 +132,11 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   });
 
   it("10. simulates the actual 2026 kickoff windows, alerts at 400, and remains at or below 450", () => {
-    const simulations = creditConfig.billingPeriods.map((period) => simulateCreditPeriod({ kickoffWindows: Array.from({ length: period.kickoffWindows }, (_, index) => ({ kickoffAt: `${period.month}-${String((index % 27) + 1).padStart(2, "0")}T20:00:00Z` })), weeklySlates: period.weeklySlates, weekdaysInSeason: period.ordinaryWeekdaySnapshots }));
+    const simulations = creditConfig.billingPeriods.map((period) => simulateCreditPeriod({ kickoffWindows: Array.from({ length: period.kickoffWindows }, (_, index) => ({ kickoffAt: `${period.month}-${String((index % 27) + 1).padStart(2, "0")}T20:00:00Z` })), weeklySlates: period.weeklySlates, weekdaysInSeason: period.ordinaryWeekdaySnapshots, propGames: period.propGames }));
     expect(simulations.every((simulation) => simulation.withinCeiling)).toBe(true);
-    expect(Math.max(...simulations.map((simulation) => simulation.projectedCredits))).toBe(408);
+    expect(Math.max(...simulations.map((simulation) => simulation.projectedCredits))).toBe(450);
     expect(simulations.some((simulation) => simulation.alertAt400)).toBe(true);
+    expect(simulations.some((simulation) => simulation.throttled.includes("player_props"))).toBe(true);
   });
 
   it("11. enforces historical/current injury boundaries, 90-minute flags, failure behavior, and QB audit", () => {
@@ -328,6 +329,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
       expect.objectContaining({ executionBook: "fanduel", side: "Over", point: 59.5, referenceBooks: 3 })
     ]));
     expect(candidates.every((candidate) => candidate.expectedValue > 0.02)).toBe(true);
+    expect(candidates.every((candidate) => candidate.suggestedUnits >= 0.5 && candidate.suggestedUnits <= 2)).toBe(true);
+    expect(candidates.every((candidate) => candidate.edgeInterval[0] > 0)).toBe(true);
     const mismatched = exact.map((row) => row.book === "bovada" ? { ...row, point: 250.5 } : row);
     expect(scanMarketConfirmedProps(mismatched)).toEqual([]);
   });
@@ -366,8 +369,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const oneHourBeforeSundayEarly = scheduledMainlineCandidates(new Date("2026-09-13T16:05:00.000Z"), games);
     expect(oneHourBeforeSundayEarly.filter((candidate) => candidate.job === "kickoff_minus_60")).toHaveLength(1);
     expect(new Set(oneHourBeforeSundayEarly.map((candidate) => candidate.key)).size).toBe(oneHourBeforeSundayEarly.length);
-    const props = scheduledPropCandidates(new Date("2026-09-13T16:05:00.000Z"), games, new Set(["chi-car", "atl-pit"]));
-    expect(props.map((candidate) => candidate.gameId).sort()).toEqual(["atl-pit", "chi-car"]);
+    const props = scheduledPropCandidates(new Date("2026-09-13T16:05:00.000Z"), games);
+    expect(props.map((candidate) => candidate.gameId).sort()).toEqual([
+      "atl-pit", "bal-ind", "buf-hou", "chi-car", "cle-jax", "no-det", "nyj-ten", "tb-cin"
+    ]);
   });
 
   it("28. rejects a partial mainline payload so stale complete prices survive", () => {
@@ -517,6 +522,14 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("line.americanPrice > comparable.americanPrice");
     expect(board).toContain("best-exact-price");
     expect(board).not.toContain("candidate.point !== line.point && candidate.americanPrice");
+  });
+
+  it("36b. carries a prop's execution baseline and consensus edge into the slip exactly once", () => {
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(board).toContain("fairProbability: prop.executionFairProbability");
+    expect(board).toContain("edge: prop.edge");
+    expect(board).toContain("setStake(prop.suggestedUnits * 25)");
+    expect(board).not.toContain("fairProbability: prop.consensusProbability");
   });
 
   it("37. connects the fixed-seed 80% interval and quarter-Kelly sizing to every live card", () => {

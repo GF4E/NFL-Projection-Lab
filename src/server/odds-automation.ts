@@ -114,15 +114,6 @@ async function targetSlateForCandidate(db: D1Database, now: Date, job: OddsAutom
   }
 }
 
-async function trackedPropGameIds(db: D1Database): Promise<Set<string>> {
-  try {
-    const result = await db.prepare("SELECT game_id FROM player_prop_scan_state").all<{ game_id: string }>();
-    return new Set(result.results.map((row) => row.game_id));
-  } catch {
-    return new Set();
-  }
-}
-
 async function acquireRun(db: D1Database, candidate: ScheduledOddsCandidate, startedAt: string): Promise<boolean> {
   const result = await db.prepare(`INSERT OR IGNORE INTO odds_automation_runs (
       snapshot_key, job, scheduled_for, game_id, status, started_at
@@ -138,7 +129,7 @@ async function finishRun(db: D1Database, key: string, status: OddsAutomationRunR
 }
 
 function throttled(candidate: ScheduledOddsCandidate, used: number): string | null {
-  if (used >= ODDS_CREDIT_ALERT && (candidate.job === "daily" || candidate.job === "kickoff_minus_120")) {
+  if (used >= ODDS_CREDIT_ALERT && (candidate.job === "daily" || candidate.job === "kickoff_minus_120" || candidate.job === "props_minus_60")) {
     return "Skipped by the 400-credit throttle";
   }
   if (used + candidate.cost > 450) return "Skipped to preserve the 50-credit reserve";
@@ -155,9 +146,8 @@ export async function runScheduledOddsAutomation(input: {
   const now = input.now ?? new Date();
   const checkedAt = now.toISOString();
   await ensureStore(db);
-  const tracked = await trackedPropGameIds(db);
   const schedule = asScheduledGames(await seasonSchedule({ db }));
-  const due = [...scheduledMainlineCandidates(now, schedule), ...scheduledPropCandidates(now, schedule, tracked)]
+  const due = [...scheduledMainlineCandidates(now, schedule), ...scheduledPropCandidates(now, schedule)]
     .sort((left, right) => left.priority - right.priority);
   const summary: OddsAutomationSummary = { checkedAt, due: due.length, completed: 0, failed: 0, skipped: 0, results: [] };
   for (const candidate of due) {

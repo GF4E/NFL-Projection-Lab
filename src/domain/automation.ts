@@ -73,6 +73,7 @@ export function simulateCreditPeriod(input: {
   kickoffWindows: KickoffWindow[];
   weeklySlates: number;
   weekdaysInSeason: number;
+  propGames?: number;
   startingUsage?: number;
   creditCeiling?: number;
 }): CreditSimulation {
@@ -81,7 +82,8 @@ export function simulateCreditPeriod(input: {
   const openerRequests = input.weeklySlates * 2;
   const dailyRequests = input.weekdaysInSeason;
   const kickoffRequests = input.kickoffWindows.length * 3;
-  const scheduled = startingUsage + requestCost * (openerRequests + dailyRequests + kickoffRequests);
+  const propRequests = input.propGames ?? 0;
+  const scheduled = startingUsage + requestCost * (openerRequests + dailyRequests + kickoffRequests + propRequests);
   let projected = scheduled;
   const throttled: string[] = [];
   const ceiling = input.creditCeiling ?? 450;
@@ -94,6 +96,11 @@ export function simulateCreditPeriod(input: {
     const removable120 = Math.min(input.kickoffWindows.length * requestCost, projected - ceiling);
     projected -= removable120;
     if (removable120 > 0) throttled.push("kickoff_minus_120");
+  }
+  if (projected > ceiling) {
+    const removableProps = Math.min(propRequests * requestCost, projected - ceiling);
+    projected -= removableProps;
+    if (removableProps > 0) throttled.push("player_props");
   }
   if (projected > ceiling) {
     const removable60 = Math.min(input.kickoffWindows.length * requestCost, projected - ceiling);

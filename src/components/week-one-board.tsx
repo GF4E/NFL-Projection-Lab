@@ -254,9 +254,10 @@ export function WeekOneBoard() {
 
   function addProp(prop: PropCandidate, matchup: string) {
     setSlipMode("straight");
+    setStake(prop.suggestedUnits * 25);
     addLeg({
       id: prop.id, kind: "prop", gameId: prop.gameId, book: prop.executionBook, market: "prop", side: prop.side,
-      point: prop.point, americanPrice: prop.americanPrice, fairProbability: prop.consensusProbability,
+      point: prop.point, americanPrice: prop.americanPrice, fairProbability: prop.executionFairProbability,
       matchup, selection: `${prop.player} ${prop.side} ${prop.point}`,
       detail: `${propMarketTitle(prop.market)} · ${prop.referenceBooks}-book confirmation`, edge: prop.edge
     });
@@ -473,9 +474,9 @@ export function WeekOneBoard() {
                 </section>
                 <section className="quick-props">
                   <div className="quick-head"><span>+EV PROPS</span><small>{propsLoading === game.id ? "Scanning…" : currentProps.length ? `${currentProps.length} found` : "None yet"}</small></div>
-                  {propsLoading === game.id ? <p>Checking exact same-point prices across books…</p> : currentProps.length ? currentProps.map((prop) => <button onClick={() => addProp(prop, `${game.away} @ ${game.home}`)} key={prop.id}>
-                    <div><b>{prop.player}</b><small>{prop.side} {prop.point} {propMarketTitle(prop.market)} · {prop.referenceBooks} refs · floor +{(prop.lowerBoundExpectedValue * 100).toFixed(1)}%</small></div>
-                    <strong>{formatOdds(prop.americanPrice)}</strong><em>+{(prop.expectedValue * 100).toFixed(1)}%</em>
+                  {propsLoading === game.id ? <p>Checking exact same-point prices across books…</p> : currentProps.length ? currentProps.map((prop) => <button className={prop.unitsGreyed ? "uncertain" : ""} onClick={() => addProp(prop, `${game.away} @ ${game.home}`)} key={prop.id}>
+                    <div><b>{prop.player}</b><small>{prop.side} {prop.point} {propMarketTitle(prop.market)} · {prop.referenceBooks} refs · floor +{(prop.lowerBoundExpectedValue * 100).toFixed(1)}% · {snapshotAge(prop.capturedAt)}</small></div>
+                    <strong>{formatOdds(prop.americanPrice)}</strong><em>+{(prop.expectedValue * 100).toFixed(1)}% · {prop.suggestedUnits}u</em>
                   </button>) : <p>{propBoard?.message ?? "Props are scanned when posted."}</p>}
                 </section>
                 {(gameIntel?.signals.length || (movementOpen && movementCurrent) || materialWeather) && <section className="quick-evidence">

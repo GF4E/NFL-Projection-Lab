@@ -1,4 +1,6 @@
 import { americanToDecimal, impliedToAmerican, powerDevig } from "./odds";
+import { structuralConfig } from "./config";
+import { sizeKelly } from "./sizing";
 
 export const PROP_MARKETS = [
   "player_pass_yds",
@@ -346,8 +348,11 @@ export interface PropCandidate {
   consensusProbability: number;
   consensusInterval: [number, number];
   edge: number;
+  edgeInterval: [number, number];
   expectedValue: number;
   lowerBoundExpectedValue: number;
+  suggestedUnits: number;
+  unitsGreyed: boolean;
   referenceBooks: number;
   capturedAt: string;
 }
@@ -421,6 +426,15 @@ export function scanMarketConfirmedProps(
     const expectedValue = consensusProbability * americanToDecimal(quote.americanPrice) - 1;
     const lowerBoundExpectedValue = low * americanToDecimal(quote.americanPrice) - 1;
     if (expectedValue < minimumExpectedValue || lowerBoundExpectedValue <= 0) continue;
+    const edgeInterval = [low - executionFairProbability, high - executionFairProbability] as [number, number];
+    const sizing = sizeKelly(consensusProbability, quote.americanPrice, edgeInterval, {
+      referenceBankrollUnits: structuralConfig.sizing.referenceBankrollUnits,
+      kellyFraction: structuralConfig.sizing.kellyFraction,
+      increment: structuralConfig.sizing.roundDownUnits,
+      minimum: structuralConfig.sizing.minimumUnits,
+      maximum: structuralConfig.sizing.maximumUnits
+    });
+    if (!sizing.included) continue;
     candidates.push({
       id: `prop:${quote.id}`,
       gameId: quote.gameId,
@@ -434,8 +448,11 @@ export function scanMarketConfirmedProps(
       consensusProbability,
       consensusInterval: [low, high],
       edge: consensusProbability - executionFairProbability,
+      edgeInterval,
       expectedValue,
       lowerBoundExpectedValue,
+      suggestedUnits: sizing.suggestedUnits,
+      unitsGreyed: sizing.greyed,
       referenceBooks: onePerBook.length,
       capturedAt: quote.capturedAt
     });
