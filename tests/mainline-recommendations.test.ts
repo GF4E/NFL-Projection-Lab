@@ -24,7 +24,8 @@ function spread(overrides: Partial<BaselineProjection> = {}): BaselineProjection
   return {
     gameId: "sea-lar", book: "betmgm", homeTeam: "LAR", marketHomePoint: -2.5,
     projectedHomePoint: -4, homeCoverProbability: 0.68, shrunkHomeProbability: 0.55,
-    pushProbability: 0.01, edgeInterval: [0.01, 0.08], marketHomeProbability: 0.5,
+    pushProbability: 0.01, edgeInterval: [0.01, 0.08], shrunkHomeProbabilityMembers: null,
+    pushProbabilityMembers: null, marketHomeProbability: 0.5,
     marketSource: "book", translationWarning: "none", ...overrides
   };
 }

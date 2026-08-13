@@ -407,6 +407,8 @@ function moneylineProjections(input: {
   stateProjectedHomePoint: number | null;
   championModel: FittedLogisticModel | null;
   ensembleModels: readonly FittedLogisticModel[];
+  marginBootstrapIndex: ReturnType<typeof buildMarginBootstrapIndex>;
+  uncertaintyWidening: number;
   forecastContext: {
     season: number;
     week: number;
@@ -458,7 +460,7 @@ function moneylineProjections(input: {
     marketProbability: consensusHomeProbability,
     isHomeSide: true
   });
-  const consensusEdgeInterval = championHomeProbability === null
+  const ensembleMoneyline = championHomeProbability === null
     ? null
     : bootstrapResidualEdgeInterval({
         models: input.ensembleModels,
@@ -466,9 +468,41 @@ function moneylineProjections(input: {
         centralModelProbability: modelHomeProbability,
         marketProbability: consensusHomeProbability,
         shrinkageWeight: structuralConfig.model.shrinkageWeight
-      })?.interval ?? null;
+      }) ?? null;
+  const stateBootstrap = bootstrapMarginTranslation({
+    index: input.marginBootstrapIndex,
+    consensusSpread: input.consensusHomePoint,
+    fromPoint: input.stateProjectedHomePoint,
+    toPoint: 0,
+    baseProbabilityMembers: Array.from({ length: structuralConfig.model.bootstrapMembers }, () => 0.5),
+    intervalPercentiles: structuralConfig.model.intervalPercentiles as [number, number]
+  });
+  const homeProbabilityMembers = ensembleMoneyline?.memberEdges.length === structuralConfig.model.bootstrapMembers && stateBootstrap
+    ? (() => {
+        const coefficientCenter = ensembleMoneyline.memberEdges.reduce((sum, edge) => sum + edge, 0) /
+          ensembleMoneyline.memberEdges.length;
+        return stateBootstrap.probabilityMembers.map((stateProbability, member) => {
+          const memberModel = championHomeProbability === null
+            ? stateProbability
+            : applyChampionMarketResidual(stateProbability, championHomeProbability, consensusHomeProbability);
+          const shrunk = shrinkProbability(memberModel, consensusHomeProbability, structuralConfig.model.shrinkageWeight);
+          return Math.max(0.001, Math.min(0.999,
+            shrunk + ensembleMoneyline.memberEdges[member] - coefficientCenter
+          ));
+        });
+      })()
+    : null;
   return bookPairs.map(({ book, home, away }) => {
-    const edgeCenter = shrunkHomeProbability - home.fairProbability!;
+    const memberInterval: [number, number] | null = homeProbabilityMembers
+      ? [
+          Math.max(0.001,
+            percentile(homeProbabilityMembers, structuralConfig.model.intervalPercentiles[0]) - input.uncertaintyWidening
+          ),
+          Math.min(0.999,
+            percentile(homeProbabilityMembers, structuralConfig.model.intervalPercentiles[1]) + input.uncertaintyWidening
+          )
+        ]
+      : null;
     return {
       gameId: input.gameId,
       book,
@@ -480,11 +514,11 @@ function moneylineProjections(input: {
       tieProbability,
       homeExpectedValue: expectedValueWithPush(shrunkHomeProbability, tieProbability, home.americanPrice),
       awayExpectedValue: expectedValueWithPush(1 - shrunkHomeProbability, tieProbability, away.americanPrice),
-      edgeInterval: consensusEdgeInterval === null
+      edgeInterval: memberInterval === null
         ? null
         : [
-            edgeCenter + consensusEdgeInterval[0] - (shrunkHomeProbability - consensusHomeProbability),
-            edgeCenter + consensusEdgeInterval[1] - (shrunkHomeProbability - consensusHomeProbability)
+            memberInterval[0] - home.fairProbability!,
+            memberInterval[1] - home.fairProbability!
           ] as [number, number]
     };
   });
@@ -973,10 +1007,56 @@ export async function buildDecisionBoard(
           shrinkageWeight: structuralConfig.model.shrinkageWeight
         }) ?? null
       : null;
-    const ensembleSpreadInterval = ensembleSpread?.interval ?? null;
-    const canonicalEdgeInterval: [number, number] | null = ensembleSpreadInterval === null
+    const stateBootstrap = consensusHomePoint === null || stateProjectedHomePoint === null
       ? null
-      : [ensembleSpreadInterval[0] - qbUncertaintyWidening, ensembleSpreadInterval[1] + qbUncertaintyWidening];
+      : bootstrapMarginTranslation({
+          index: marginBootstrapIndex,
+          consensusSpread: consensusHomePoint,
+          fromPoint: stateProjectedHomePoint,
+          toPoint: consensusHomePoint,
+          baseProbabilityMembers: Array.from({ length: structuralConfig.model.bootstrapMembers }, () => 0.5),
+          intervalPercentiles: structuralConfig.model.intervalPercentiles as [number, number]
+        });
+    const rawCanonicalHomeMembers = ensembleSpread?.memberEdges.length === structuralConfig.model.bootstrapMembers && stateBootstrap && canonicalMarketProbability !== null
+      ? (() => {
+          const coefficientCenter = ensembleSpread.memberEdges.reduce((sum, edge) => sum + edge, 0) /
+            ensembleSpread.memberEdges.length;
+          return stateBootstrap.probabilityMembers.map((stateProbability, member) => {
+            const modelProbability = championProbability === null
+              ? stateProbability
+              : applyChampionMarketResidual(stateProbability, championProbability, canonicalMarketProbability);
+            const shrunk = shrinkProbability(
+              modelProbability,
+              canonicalMarketProbability,
+              structuralConfig.model.shrinkageWeight
+            );
+            return Math.max(0.001, Math.min(0.999,
+              shrunk + ensembleSpread.memberEdges[member] - coefficientCenter
+            ));
+          });
+        })()
+      : null;
+    const canonicalMemberInterval: [number, number] | null = rawCanonicalHomeMembers
+      ? [
+          percentile(rawCanonicalHomeMembers, structuralConfig.model.intervalPercentiles[0]),
+          percentile(rawCanonicalHomeMembers, structuralConfig.model.intervalPercentiles[1])
+        ]
+      : null;
+    const widenedCanonicalProbabilityInterval: [number, number] | null = canonicalMemberInterval === null
+      ? null
+      : [
+          Math.max(0.001, canonicalMemberInterval[0] - qbUncertaintyWidening),
+          Math.min(0.999, canonicalMemberInterval[1] + qbUncertaintyWidening)
+        ];
+    const canonicalHomeMembers = rawCanonicalHomeMembers && widenedCanonicalProbabilityInterval
+      ? calibrateMembersToInterval(rawCanonicalHomeMembers, widenedCanonicalProbabilityInterval)
+      : null;
+    const canonicalEdgeInterval: [number, number] | null = widenedCanonicalProbabilityInterval === null || canonicalMarketProbability === null
+      ? null
+      : [
+          widenedCanonicalProbabilityInterval[0] - canonicalMarketProbability,
+          widenedCanonicalProbabilityInterval[1] - canonicalMarketProbability
+        ];
     const inferredFairPoint = artifact && consensusHomePoint !== null && canonicalModelProbability !== null
       ? fairSpreadPointForProbability(artifact, consensusHomePoint, consensusHomePoint, canonicalModelProbability)
       : { point: null, warning: "unsupported" as const };
@@ -994,6 +1074,20 @@ export async function buildDecisionBoard(
             quote: { book: anchor.book, point: anchor.point, fairProbability: anchor.fairProbability }
           });
           const warnings = [canonicalSpreadWarning, translated.warning, inferredFairPoint.warning];
+          const executionBootstrap = canonicalHomeMembers ? bootstrapMarginTranslation({
+            index: marginBootstrapIndex,
+            consensusSpread: consensusHomePoint,
+            fromPoint: consensusHomePoint,
+            toPoint: anchor.point,
+            baseProbabilityMembers: canonicalHomeMembers,
+            intervalPercentiles: structuralConfig.model.intervalPercentiles as [number, number]
+          }) : null;
+          const executionEdgeInterval: [number, number] | null = executionBootstrap
+            ? [
+                executionBootstrap.probabilityInterval[0] - anchor.fairProbability,
+                executionBootstrap.probabilityInterval[1] - anchor.fairProbability
+              ]
+            : null;
           return {
             gameId: game.id,
             book: anchor.book,
@@ -1003,7 +1097,9 @@ export async function buildDecisionBoard(
             homeCoverProbability: translated.modelProbability,
             shrunkHomeProbability: translated.shrunkProbability,
             pushProbability: translated.pushProbability,
-            edgeInterval: translated.edgeInterval,
+            edgeInterval: executionEdgeInterval,
+            shrunkHomeProbabilityMembers: executionBootstrap?.probabilityMembers ?? null,
+            pushProbabilityMembers: executionBootstrap?.pushProbabilityMembers ?? null,
             marketHomeProbability: anchor.fairProbability,
             marketSource: anchor.marketSource,
             translationWarning: warnings.includes("unsupported") ? "unsupported"
@@ -1027,20 +1123,6 @@ export async function buildDecisionBoard(
       const translated = originalBetProbability === null
         ? { probability: null, pushProbability: null, warning: "unsupported" as const, sourcePoints: [] }
         : translateFairProbability(artifact, consensusPoint, line.point!, teasedPoint, originalBetProbability);
-      const baseProbabilityMembers = ensembleSpread?.memberEdges.length === structuralConfig.model.bootstrapMembers
-        ? ensembleSpread.memberEdges.map((edge) => {
-            const canonicalSideMarket = isHome ? canonicalMarketProbability! : 1 - canonicalMarketProbability!;
-            return Math.max(0.001, Math.min(0.999, canonicalSideMarket + (isHome ? edge : -edge)));
-          })
-        : null;
-      const marginBootstrap = baseProbabilityMembers ? bootstrapMarginTranslation({
-        index: marginBootstrapIndex,
-        consensusSpread: consensusPoint,
-        fromPoint: consensusPoint,
-        toPoint: teasedPoint,
-        baseProbabilityMembers,
-        intervalPercentiles: structuralConfig.model.intervalPercentiles as [number, number]
-      }) : null;
       const qbLow = originalEdgeInterval === null
         ? null
         : translateFairProbability(
@@ -1059,14 +1141,25 @@ export async function buildDecisionBoard(
             teasedPoint,
             Math.max(0.001, Math.min(0.999, line.fairProbability! + originalEdgeInterval[1]))
           ).probability;
-      const probabilityInterval = marginBootstrap === null || qbLow === null || qbHigh === null
+      const sideExecutionMembers = projection?.shrunkHomeProbabilityMembers?.length === structuralConfig.model.bootstrapMembers
+        ? projection.shrunkHomeProbabilityMembers.map((probability) => isHome ? probability : 1 - probability)
+        : null;
+      const teaserBootstrap = sideExecutionMembers ? bootstrapMarginTranslation({
+        index: marginBootstrapIndex,
+        consensusSpread: consensusPoint,
+        fromPoint: line.point!,
+        toPoint: teasedPoint,
+        baseProbabilityMembers: sideExecutionMembers,
+        intervalPercentiles: structuralConfig.model.intervalPercentiles as [number, number]
+      }) : null;
+      const probabilityInterval = teaserBootstrap === null || qbLow === null || qbHigh === null
         ? null
         : [
-            Math.min(marginBootstrap.probabilityInterval[0], qbLow),
-            Math.max(marginBootstrap.probabilityInterval[1], qbHigh)
+            Math.min(teaserBootstrap.probabilityInterval[0], qbLow),
+            Math.max(teaserBootstrap.probabilityInterval[1], qbHigh)
           ] as [number, number];
-      const probabilityMembers = probabilityInterval && marginBootstrap
-        ? calibrateMembersToInterval(marginBootstrap.probabilityMembers, probabilityInterval)
+      const probabilityMembers = probabilityInterval && teaserBootstrap
+        ? calibrateMembersToInterval(teaserBootstrap.probabilityMembers, probabilityInterval)
         : null;
       const crossedKeys = crossedKeyNumbers(line.point!, teasedPoint, structuralConfig.model.keyMargins);
       const crossesZero = line.point! < 0 && teasedPoint > 0;
@@ -1084,7 +1177,7 @@ export async function buildDecisionBoard(
         pushProbability: translated.pushProbability,
         probabilityInterval,
         probabilityMembers,
-        pushProbabilityMembers: marginBootstrap?.pushProbabilityMembers ?? null,
+        pushProbabilityMembers: teaserBootstrap?.pushProbabilityMembers ?? null,
         fairAmerican: translated.probability === null || translated.pushProbability === null
           ? null
           : fairAmericanFromProbability(translated.probability),
@@ -1193,6 +1286,8 @@ export async function buildDecisionBoard(
         stateProjectedHomePoint,
         championModel,
         ensembleModels,
+        marginBootstrapIndex,
+        uncertaintyWidening: qbUncertaintyWidening,
         forecastContext: {
           season: game.season,
           week: game.week,

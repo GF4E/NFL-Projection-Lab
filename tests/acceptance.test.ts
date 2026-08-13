@@ -1002,8 +1002,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(server).toContain('market: "moneyline"');
     expect(server).toContain("expectedValueWithPush");
-    expect(server).toContain("consensusEdgeInterval");
+    expect(server).toContain("ensembleMoneyline");
     expect(server).toContain("bootstrapResidualEdgeInterval");
+    expect(server).toContain("bootstrapMarginTranslation");
+    expect(server).toContain("homeProbabilityMembers");
     expect(server).toContain("consensusHomeProbability");
     expect(board).toContain("gameIntel?.moneylines.find");
     expect(board).toContain("pushProbability = moneylineProjection.tieProbability");
