@@ -3,6 +3,7 @@ import { getD1 } from "../../../../db";
 import { runNflverseAutomation } from "@/server/nflverse/automation";
 import { listNflverseImportStates } from "@/server/nflverse/store";
 import { settleCompletedTeamPlays } from "@/server/automatic-settlement";
+import { runModelLifecycleAutomation } from "@/server/model-lifecycle/automation";
 
 export const dynamic = "force-dynamic";
 
@@ -21,8 +22,9 @@ export async function POST() {
   try {
     const db = getD1();
     const result = await runNflverseAutomation({ db, allowPlayByPlay: true });
+    const lifecycle = await runModelLifecycleAutomation({ db });
     const settlement = await settleCompletedTeamPlays(db);
-    return NextResponse.json({ result, settlement, states: await listNflverseImportStates(db) });
+    return NextResponse.json({ result, lifecycle, settlement, states: await listNflverseImportStates(db) });
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Automatic nflverse refresh aborted" },

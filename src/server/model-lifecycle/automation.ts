@@ -8,15 +8,19 @@ import {
   ensureModelLifecycleStore,
   getModelArtifact,
   getModelLifecycleState,
+  publishModelSystemAlert,
   publishLoopA,
   publishLoopB,
+  resolveModelSystemAlerts,
   type StoredModelArtifact
 } from "./store";
 import {
+  buildLifecycleTeamContexts,
   buildLifecycleTrainingRows,
   evaluateWalkForwardModels,
   fitLifecycleChallenger,
-  type LifecycleGameRow
+  type LifecycleGameRow,
+  type LifecycleTeamFeatureRow
 } from "./training";
 
 interface CompletedGameRow extends LifecycleGameRow {
@@ -25,18 +29,7 @@ interface CompletedGameRow extends LifecycleGameRow {
   home_team: string;
 }
 
-interface FeatureRow {
-  season: number;
-  week: number;
-  team: string;
-  plays: number;
-  epa_per_play: number;
-  success_rate: number;
-  explosive_rate: number;
-  turnover_rate: number;
-  seconds_per_play: number | null;
-  pass_rate_over_expectation: number | null;
-}
+type FeatureRow = LifecycleTeamFeatureRow;
 
 export interface ModelLifecycleAutomationResult {
   status: "updated" | "skipped" | "aborted";
@@ -104,6 +97,29 @@ export function aggregateRollingFeatureStates(rows: readonly FeatureRow[], seaso
       proe: proePlays ? proeRows.reduce((sum, game) => sum + game.pass_rate_over_expectation! * game.plays, 0) / proePlays : leagueProe
     };
   }).sort((left, right) => left.team.localeCompare(right.team));
+}
+
+export function missingLifecycleFeatureSeasons(
+  games: readonly Pick<LifecycleGameRow, "game_id" | "season" | "away_team" | "home_team">[],
+  features: readonly Pick<LifecycleTeamFeatureRow, "game_id" | "season" | "team">[]
+): number[] {
+  const expected = new Map<number, Set<string>>();
+  const covered = new Map<number, Set<string>>();
+  for (const game of games) {
+    const contracts = expected.get(game.season) ?? new Set<string>();
+    contracts.add(`${game.game_id}:${normalizeNflverseTeam(game.away_team)}`);
+    contracts.add(`${game.game_id}:${normalizeNflverseTeam(game.home_team)}`);
+    expected.set(game.season, contracts);
+  }
+  for (const feature of features) {
+    const contracts = covered.get(feature.season) ?? new Set<string>();
+    contracts.add(`${feature.game_id}:${normalizeNflverseTeam(feature.team)}`);
+    covered.set(feature.season, contracts);
+  }
+  return [...expected.entries()]
+    .filter(([season, contracts]) => [...contracts].some((contract) => !covered.get(season)?.has(contract)))
+    .map(([season]) => season)
+    .sort((left, right) => left - right);
 }
 
 function predictionMetricsForChampion(rows: ModelTrainingRow[], latestCompletedSeason: number, artifact: StoredModelArtifact) {
@@ -174,8 +190,8 @@ export async function runModelLifecycleAutomation(input: {
     }));
     const states: TeamState[] = updateTeamStates([], completedGames, structuralConfig.model.strengthK)
       .map((state) => ({ ...state, throughWeek }));
-    const featuresResult = await input.db.prepare(`SELECT season, week, team, plays, epa_per_play, success_rate,
-        explosive_rate, turnover_rate, seconds_per_play, pass_rate_over_expectation
+    const featuresResult = await input.db.prepare(`SELECT game_id, season, week, game_date, team, opponent, plays,
+        epa_per_play, success_rate, explosive_rate, turnover_rate, seconds_per_play, pass_rate_over_expectation
       FROM nfl_team_game_features
       WHERE season_type = 'REG' AND (season < ? OR (season = ? AND week <= ?))
       ORDER BY season DESC, week DESC, game_date DESC`)
@@ -189,13 +205,43 @@ export async function runModelLifecycleAutomation(input: {
 
   if (loopBDue) {
     const latestCompletedSeason = Math.max(...completed.results.map((game) => game.season));
-    const rows = buildLifecycleTrainingRows(completed.results, latestCompletedSeason);
+    const trainingFeatures = await input.db.prepare(`SELECT game_id, season, week, game_date, team, opponent, plays,
+        epa_per_play, success_rate, explosive_rate, turnover_rate, seconds_per_play, pass_rate_over_expectation
+      FROM nfl_team_game_features
+      WHERE season_type = 'REG' AND season BETWEEN ? AND ?
+        AND (season < ? OR (season = ? AND week <= ?))
+      ORDER BY season, week, game_date, game_id, team`)
+      .bind(structuralConfig.model.trainingStartSeason, season, season, season, throughWeek).all<FeatureRow>();
+    const missingFeatureSeasons = missingLifecycleFeatureSeasons(completed.results, trainingFeatures.results);
+    if (missingFeatureSeasons.length) {
+      const message = `Loop B retained the champion: leakage-safe team features are still backfilling for ${missingFeatureSeasons.join(", ")}`;
+      await publishModelSystemAlert(input.db, {
+        id: `model-feature-coverage:${season}:week${targetWeek}`,
+        type: "pipeline_failure",
+        severity: "warning",
+        message,
+        idempotencyKey: `model-feature-coverage:${season}:week${targetWeek}`,
+        createdAt: startedAt,
+        acknowledgedAt: null
+      });
+      return {
+        status: "aborted",
+        throughWeek,
+        targetWeek,
+        loopA,
+        loopB: "skipped",
+        championHash,
+        message
+      };
+    }
+    const teamContexts = buildLifecycleTeamContexts(completed.results, trainingFeatures.results);
+    const rows = buildLifecycleTrainingRows(completed.results, latestCompletedSeason, teamContexts);
     if (rows.length < 3_000) throw new Error("Loop B aborted: model training rows are incomplete");
     const challenger = fitLifecycleChallenger(rows, Math.min(latestCompletedSeason, season - 1));
     const dataHash = stableHash(rows.map((row) => ({ id: row.id, outcome: row.outcome, push: row.push, weight: row.weight, features: row.features })));
     const configHash = stableHash({ structuralConfig, eraConfig });
     const featureSchemaHash = stableHash(designFeatureNames(rows));
-    const codeHash = stableHash("nfl-projection-lab:model-lifecycle:2026.1");
+    const codeHash = stableHash("nfl-projection-lab:model-lifecycle:2026.2");
     const artifact: StoredModelArtifact = {
       model: challenger.model,
       walkForwardModels: challenger.walkForwardModels,
@@ -256,6 +302,7 @@ export async function runModelLifecycleAutomation(input: {
       retainedChampionHash: championHash,
       bootstrapVersion
     });
+    await resolveModelSystemAlerts(input.db, `model-feature-coverage:${season}:`, completedAt);
     if (gated.run.gateDecision === "promote") championHash = challengerHash;
     loopB = gated.run.gateDecision === "promote" ? "promoted" : "retained";
   }

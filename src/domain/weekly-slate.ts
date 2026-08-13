@@ -36,7 +36,7 @@ export interface WeeklySlate {
 }
 
 export function normalizeScheduleTeam(team: string): string {
-  return team === "LA" ? "LAR" : team;
+  return ({ LA: "LAR", STL: "LAR", SD: "LAC", OAK: "LV", JAC: "JAX" } as Record<string, string>)[team] ?? team;
 }
 
 export function boardGameId(away: string, home: string): string {

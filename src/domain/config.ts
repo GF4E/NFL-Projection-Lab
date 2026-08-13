@@ -50,9 +50,27 @@ export interface StructuralConfig {
   };
   matchupEvidence: {
     windowGames: number;
+    minimumTrainingGames: number;
     opponentAdjustmentMethod: "play_weighted_ridge";
     ridgePenalty: number;
     validationArtifact: string;
+    coefficientFeatureScaling: {
+      clip: number;
+      epaPerPlay: number;
+      successRate: number;
+      explosiveRate: number;
+      turnoverRate: number;
+      secondsPerPlay: number;
+      proe: number;
+      centers: {
+        epaPerPlay: number;
+        successRate: number;
+        explosiveRate: number;
+        turnoverRate: number;
+        secondsPerPlay: number;
+        proe: number;
+      };
+    };
   };
   teasers: {
     points: number;

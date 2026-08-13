@@ -128,6 +128,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(failed.freshness).toBe("stale");
     expect(failed.alert).not.toBeNull();
     expect(completeImport(failed, [4], "2026-09-16").freshness).toBe("current");
+    expect(readFileSync("src/app/api/nflverse/route.ts", "utf8")).toContain("runModelLifecycleAutomation");
   });
 
   it("8. rejects W+ data and forecast-time source leakage", () => {

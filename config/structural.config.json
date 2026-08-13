@@ -1,5 +1,5 @@
 {
-  "version": "2026.preseason.6",
+  "version": "2026.preseason.7",
   "season": 2026,
   "frozen": true,
   "unitDollars": 25,
@@ -47,9 +47,27 @@
   },
   "matchupEvidence": {
     "windowGames": 17,
+    "minimumTrainingGames": 4,
     "opponentAdjustmentMethod": "play_weighted_ridge",
     "ridgePenalty": 16,
-    "validationArtifact": "opponent-adjustment-validation.json"
+    "validationArtifact": "opponent-adjustment-validation.json",
+    "coefficientFeatureScaling": {
+      "clip": 4,
+      "epaPerPlay": 0.1,
+      "successRate": 0.05,
+      "explosiveRate": 0.03,
+      "turnoverRate": 0.01,
+      "secondsPerPlay": 3,
+      "proe": 0.05,
+      "centers": {
+        "epaPerPlay": 0,
+        "successRate": 0.44,
+        "explosiveRate": 0.1,
+        "turnoverRate": 0.02,
+        "secondsPerPlay": 28,
+        "proe": 0
+      }
+    }
   },
   "teasers": {
     "points": 6,

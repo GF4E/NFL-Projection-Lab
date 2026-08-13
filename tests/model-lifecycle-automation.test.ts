@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { runPromotionGate, updateTeamStates } from "@/domain/model-lifecycle";
-import { aggregateRollingFeatureStates } from "@/server/model-lifecycle/automation";
-import { buildLifecycleTrainingRows, fitLifecycleChallenger, type LifecycleGameRow } from "@/server/model-lifecycle/training";
+import { aggregateRollingFeatureStates, missingLifecycleFeatureSeasons } from "@/server/model-lifecycle/automation";
+import {
+  buildLifecycleTeamContexts,
+  buildLifecycleTrainingRows,
+  fitLifecycleChallenger,
+  type LifecycleGameRow,
+  type LifecycleTeamFeatureRow
+} from "@/server/model-lifecycle/training";
 
 describe("persisted weekly model lifecycle", () => {
   it("updates strength in season order and derives rolling state only through the completed week", () => {
@@ -12,9 +18,12 @@ describe("persisted weekly model lifecycle", () => {
     expect(states.find((state) => state.team === "SEA")?.mean).toBeCloseTo(0.2);
 
     const features = aggregateRollingFeatureStates(Array.from({ length: 20 }, (_, index) => ({
+      game_id: `game-${index}`,
       season: index < 3 ? 2024 : 2025,
       week: index + 1,
+      game_date: `2025-09-${String(index % 28 + 1).padStart(2, "0")}`,
       team: "SEA",
+      opponent: "SF",
       plays: 60,
       epa_per_play: index,
       success_rate: 0.4,
@@ -28,6 +37,24 @@ describe("persisted weekly model lifecycle", () => {
     expect(features[0].epa).toBeGreaterThan(10);
   });
 
+  it("retains the champion until every training season has team-feature coverage", () => {
+    const games = [
+      { game_id: "2024-game", season: 2024, away_team: "SF", home_team: "SEA" },
+      { game_id: "2025-game", season: 2025, away_team: "SEA", home_team: "SF" }
+    ];
+    expect(missingLifecycleFeatureSeasons(games, [
+      { game_id: "2024-game", season: 2024, team: "SF" },
+      { game_id: "2024-game", season: 2024, team: "SEA" },
+      { game_id: "2025-game", season: 2025, team: "SEA" }
+    ])).toEqual([2025]);
+    expect(missingLifecycleFeatureSeasons(games, [
+      { game_id: "2024-game", season: 2024, team: "SF" },
+      { game_id: "2024-game", season: 2024, team: "SEA" },
+      { game_id: "2025-game", season: 2025, team: "SEA" },
+      { game_id: "2025-game", season: 2025, team: "SF" }
+    ])).toEqual([]);
+  });
+
   it("builds all three non-pick outcome markets and fits leakage-safe season origins", () => {
     const games: LifecycleGameRow[] = [];
     for (let season = 2020; season <= 2025; season += 1) {
@@ -38,6 +65,9 @@ describe("persisted weekly model lifecycle", () => {
           game_id: `${season}-${index}`,
           season,
           week: index % 18 + 1,
+          game_date: `${season}-09-${String(index % 28 + 1).padStart(2, "0")}`,
+          away_team: "SF",
+          home_team: "SEA",
           result: expected + noise,
           total: 42 + (index % 8),
           spread_line: expected,
@@ -60,6 +90,42 @@ describe("persisted weekly model lifecycle", () => {
     expect(Object.keys(challenger.walkForwardModels)).toEqual(["2023", "2024", "2025"]);
     expect(challenger.metrics.byMarket.spread.observations).toBeGreaterThan(0);
     expect(Number.isFinite(challenger.metrics.pooledLogLoss)).toBe(true);
+  });
+
+  it("builds coefficient features only from team games completed before the forecast week", () => {
+    const target: LifecycleGameRow = {
+      game_id: "target", season: 2025, week: 5, game_date: "2025-10-01", away_team: "SF", home_team: "SEA",
+      result: 7, total: 48, spread_line: -2.5, total_line: 44.5, away_rest: 7, home_rest: 7,
+      away_moneyline: 120, home_moneyline: -140, away_spread_odds: -105, home_spread_odds: -115,
+      under_odds: -110, over_odds: -110
+    };
+    const features: LifecycleTeamFeatureRow[] = Array.from({ length: 5 }, (_, index) => {
+      const week = index + 1;
+      const currentWeekLeak = week === 5;
+      return [
+        {
+          game_id: `prior-${week}`, season: 2025, week, game_date: `2025-09-${String(week).padStart(2, "0")}`,
+          team: "SEA", opponent: "SF", plays: 60,
+          epa_per_play: currentWeekLeak ? -10 : 0.2, success_rate: 0.5, explosive_rate: 0.13,
+          turnover_rate: 0.01, seconds_per_play: 26, pass_rate_over_expectation: 0.05
+        },
+        {
+          game_id: `prior-${week}`, season: 2025, week, game_date: `2025-09-${String(week).padStart(2, "0")}`,
+          team: "SF", opponent: "SEA", plays: 60,
+          epa_per_play: currentWeekLeak ? 10 : -0.1, success_rate: 0.38, explosive_rate: 0.07,
+          turnover_rate: 0.03, seconds_per_play: 28, pass_rate_over_expectation: -0.03
+        }
+      ];
+    }).flat();
+    const contexts = buildLifecycleTeamContexts([target], features, { minimumGames: 4 });
+    const context = contexts.get("target");
+    expect(context).toBeDefined();
+    expect(context!.sideMatchupEpa).toBeGreaterThan(0);
+    expect(context!.sideBallSecurity).toBeGreaterThan(0);
+    const rows = buildLifecycleTrainingRows([target], 2025, contexts);
+    expect(rows.find((row) => row.market === "spread")!.features.sideMatchupEpa).toBe(context!.sideMatchupEpa);
+    expect(rows.find((row) => row.market === "total")!.features.sideMatchupEpa).toBe(0);
+    expect(rows.find((row) => row.market === "total")!.features.totalPaceEnvironment).toBeGreaterThan(0);
   });
 
   it("uses the configured calibration range as a hard promotion gate", () => {

@@ -31,12 +31,19 @@ import { weeklySlate } from "./weekly-slate";
 import { ensureOfficialInjuryStore, getOfficialInjuryImportState } from "./official-injuries/store";
 import { ensureKickoffWeatherStore, listKickoffWeather } from "./weather/store";
 import { ensureModelLifecycleStore, getActiveChampionHash, getModelArtifact, getTeamStrengthStates } from "./model-lifecycle/store";
-import { buildLifecycleForecastRow } from "./model-lifecycle/training";
+import {
+  buildLifecycleForecastRow,
+  buildLifecycleTeamContexts,
+  type LifecycleTeamContext
+} from "./model-lifecycle/training";
 import { ensurePregameContextStore, getPregameContextStates } from "./pregame-context/store";
 import { getD1 } from "../../db";
 
 interface FeatureRow {
+  game_id: string;
   season: number;
+  week: number;
+  game_date: string;
   team: string;
   opponent: string;
   plays: number;
@@ -195,6 +202,7 @@ function totalProjections(
     totalLine: number | null;
     awayRest: number | null;
     homeRest: number | null;
+    teamContext: LifecycleTeamContext | null;
   } | null = null
 ): TotalProjection[] {
   const baselineTotal = projectTotal(away, home, leagueScoring);
@@ -256,6 +264,7 @@ function moneylineProjections(input: {
     totalLine: number | null;
     awayRest: number | null;
     homeRest: number | null;
+    teamContext: LifecycleTeamContext | null;
   };
 }): MoneylineProjection[] {
   const bookPairs = (["betmgm", "fanduel"] as const).flatMap((book) => {
@@ -496,9 +505,9 @@ export async function buildDecisionBoard(
       FROM nfl_games WHERE season BETWEEN 2010 AND ? AND result IS NOT NULL AND spread_line IS NOT NULL
         AND (season < ? OR week < ?)
       ORDER BY game_date, game_id`).bind(slate.season, slate.season, slate.week).all<GameRow>(),
-    db.prepare(`SELECT season, team, opponent, plays, epa_per_play, success_rate, explosive_rate,
+    db.prepare(`SELECT game_id, season, week, game_date, team, opponent, plays, epa_per_play, success_rate, explosive_rate,
         turnover_rate, seconds_per_play, pass_rate_over_expectation FROM (
-          SELECT season, week, team, opponent, plays, epa_per_play, success_rate, explosive_rate,
+          SELECT game_id, season, week, game_date, team, opponent, plays, epa_per_play, success_rate, explosive_rate,
             turnover_rate, seconds_per_play, pass_rate_over_expectation,
             ROW_NUMBER() OVER (PARTITION BY team ORDER BY season DESC, week DESC, game_date DESC) AS recency_rank
           FROM nfl_team_game_features
@@ -543,6 +552,17 @@ export async function buildDecisionBoard(
     : null;
   const strengths = persistedStrengths ?? (basisSeason === null ? new Map<string, number>() : strengthStates(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season));
   const profiles = teamProfiles(featureRows, strengths);
+  const lifecycleContexts = buildLifecycleTeamContexts(
+    slate.games.map((game) => ({
+      game_id: game.id,
+      season: game.season,
+      week: game.week,
+      game_date: game.kickoffAt.slice(0, 10),
+      away_team: game.away,
+      home_team: game.home
+    })),
+    featureRows
+  );
   const championVersion = championHash ? await getModelArtifact(db, championHash) : null;
   const championModel = championVersion?.artifact.model ?? null;
   const historicalRows: HistoricalMarginRow[] = gameResult.results.filter((row) => row.season <= 2025).flatMap((row) => [
@@ -582,6 +602,7 @@ export async function buildDecisionBoard(
   const pregameByGame = new Map(pregameStates.map((state) => [state.gameId, state]));
   const weatherByGame = new Map(weatherRows.map((row) => [row.gameId, row]));
   const games = slate.games.map((game) => {
+    const teamContext = lifecycleContexts.get(game.id) ?? null;
     const gameLines = lines.filter((line) => line.gameId === game.id);
     const homeSpreads = gameLines.filter((line) => line.market === "spread" && line.side === game.home && line.point !== null);
     const scheduleHomePoint = game.consensusHomePoint;
@@ -619,7 +640,8 @@ export async function buildDecisionBoard(
             totalLine: consensusTotalLine,
             awayRest: game.awayRest,
             homeRest: game.homeRest,
-            isHomeSide: true
+            isHomeSide: true,
+            teamContext
           }))
         : null;
       const modelProbability = translated.probability === null || championProbability === null
@@ -766,7 +788,8 @@ export async function buildDecisionBoard(
           expectedHomeMargin: consensusHomePoint === null ? 0 : -consensusHomePoint,
           totalLine: consensusTotalLine,
           awayRest: game.awayRest,
-          homeRest: game.homeRest
+          homeRest: game.homeRest,
+          teamContext
         }
       ),
       moneylines: moneylineProjections({
@@ -784,7 +807,8 @@ export async function buildDecisionBoard(
           expectedHomeMargin: consensusHomePoint === null ? 0 : -consensusHomePoint,
           totalLine: consensusTotalLine,
           awayRest: game.awayRest,
-          homeRest: game.homeRest
+          homeRest: game.homeRest,
+          teamContext
         }
       }),
       teasers,

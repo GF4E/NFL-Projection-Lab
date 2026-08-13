@@ -125,6 +125,27 @@ export async function ensureModelLifecycleStore(db: D1Database): Promise<void> {
   await db.batch(schema.map((statement) => db.prepare(statement)));
 }
 
+export async function publishModelSystemAlert(db: D1Database, alert: SystemAlert): Promise<void> {
+  await ensureModelLifecycleStore(db);
+  await db.prepare(`INSERT OR IGNORE INTO model_system_alerts
+    (id, type, severity, message, idempotency_key, created_at, acknowledged_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?)`).bind(
+      alert.id, alert.type, alert.severity, alert.message, alert.idempotencyKey,
+      alert.createdAt, alert.acknowledgedAt
+    ).run();
+}
+
+export async function resolveModelSystemAlerts(
+  db: D1Database,
+  idempotencyPrefix: string,
+  resolvedAt: string
+): Promise<void> {
+  await ensureModelLifecycleStore(db);
+  await db.prepare(`UPDATE model_system_alerts SET acknowledged_at = ?
+    WHERE acknowledged_at IS NULL AND idempotency_key LIKE ?`)
+    .bind(resolvedAt, `${idempotencyPrefix}%`).run();
+}
+
 export async function getModelLifecycleState(db: D1Database, season: number): Promise<ModelLifecycleState | null> {
   await ensureModelLifecycleStore(db);
   const row = await db.prepare("SELECT * FROM model_lifecycle_state WHERE season = ?").bind(season).first<LifecycleRow>();
