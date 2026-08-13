@@ -11,6 +11,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "artifact:margin": "tsx scripts/generate_margin_artifact.ts",
     "db:generate": "drizzle-kit generate",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },

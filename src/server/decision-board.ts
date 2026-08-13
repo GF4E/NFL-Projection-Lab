@@ -5,7 +5,6 @@ import {
   isClassicWongPoint,
   marginVersusConsensusResidual,
   matchupSignals,
-  nflverseExpectedMarginToHomePoint,
   normalizeNflverseTeam,
   rankTeaserPairs,
   summarizeGameAvailability,
@@ -20,14 +19,13 @@ import {
   type TeaserCandidate
 } from "@/domain/decision-board";
 import type { TotalProjection } from "@/domain/decision-board";
-import { buildDiscreteMarginArtifact, fairSpreadPointForProbability, translateFairProbability } from "@/domain/margin";
+import { fairSpreadPointForProbability, translateFairProbability } from "@/domain/margin";
 import { bootstrapEdgeInterval, type WeightedTrainingRow } from "@/domain/bootstrap";
 import { fitOpponentAdjustedRatings } from "@/domain/opponent-adjustment";
 import { expectedValueWithPush, powerDevig, shrinkProbability } from "@/domain/odds";
 import { applyChampionMarketResidual, predictProbability, type FittedLogisticModel } from "@/domain/model-fit";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
 import { matchupEvidenceProvenance } from "@/domain/evidence-provenance";
-import type { HistoricalMarginRow } from "@/domain/types";
 import { fitWeatherTotalAdjustment } from "@/domain/weather-model";
 import { loopAStateMatchesRevision, loopAStateRevision, updateTeamStates } from "@/domain/model-lifecycle";
 import { weeklySlate } from "./weekly-slate";
@@ -43,6 +41,9 @@ import { ensurePregameContextStore, getPregameContextStates } from "./pregame-co
 import { getD1 } from "../../db";
 import { stableHash } from "@/domain/hash";
 import { ensureQbOverrideStore, latestQbModelOverrides } from "./qb-overrides/store";
+import { canonicalSpreadMarket, translateCanonicalSpreadForecast } from "@/domain/spread-contracts";
+import { frozenMarginArtifact } from "@/domain/frozen-margin";
+import type { DiscreteMarginArtifact } from "@/domain/types";
 
 interface FeatureRow {
   game_id: string;
@@ -279,7 +280,7 @@ function moneylineProjections(input: {
   gameId: string;
   homeTeam: string;
   gameLines: readonly LiveLine[];
-  artifact: ReturnType<typeof buildDiscreteMarginArtifact> | null;
+  artifact: DiscreteMarginArtifact | null;
   consensusHomePoint: number | null;
   stateProjectedHomePoint: number | null;
   edgeNoiseInterval: [number, number] | null;
@@ -614,17 +615,7 @@ export async function buildDecisionBoard(
   );
   const championVersion = championHash ? await getModelArtifact(db, championHash) : null;
   const championModel = championVersion?.artifact.model ?? null;
-  const historicalRows: HistoricalMarginRow[] = gameResult.results.filter((row) => row.season <= 2025).flatMap((row) => [
-    { gameId: `${row.game_id}:home`, season: row.season, consensusSpread: nflverseExpectedMarginToHomePoint(row.spread_line), actualMargin: row.result },
-    { gameId: `${row.game_id}:away`, season: row.season, consensusSpread: row.spread_line, actualMargin: -row.result }
-  ]);
-  const artifact = historicalRows.length ? buildDiscreteMarginArtifact(historicalRows, {
-    latestCompletedSeason: 2025,
-    halfLifeSeasons: structuralConfig.model.decayHalfLifeSeasons,
-    boundarySeason: structuralConfig.model.keyMarginBoundarySeason,
-    keyMargins: structuralConfig.model.keyMargins,
-    generatedAt: new Date().toISOString()
-  }) : null;
+  const artifact = frozenMarginArtifact;
   const lines = enrichWithPowerDevig(lineResult.results.map(rawLine));
   const sideEdgeNoise = historicalEdgeInterval(gameResult.results.map((row) => ({
     edge: Math.max(-0.25, Math.min(0.25, marginVersusConsensusResidual(row.result, row.spread_line) * 0.025)),
@@ -666,9 +657,14 @@ export async function buildDecisionBoard(
     const gameLines = lines.filter((line) => line.gameId === game.id);
     const homeSpreads = gameLines.filter((line) => line.market === "spread" && line.side === game.home && line.point !== null);
     const scheduleHomePoint = game.consensusHomePoint;
-    const consensusHomePoint = homeSpreads.length
-      ? homeSpreads.reduce((sum, line) => sum + (line.point ?? 0), 0) / homeSpreads.length
-      : scheduleHomePoint;
+    const canonicalSpread = artifact ? canonicalSpreadMarket(
+      artifact,
+      homeSpreads.flatMap((line) => line.point !== null && line.fairProbability !== null
+        ? [{ book: line.book, point: line.point, fairProbability: line.fairProbability }]
+        : []),
+      scheduleHomePoint
+    ) : null;
+    const consensusHomePoint = canonicalSpread?.point ?? scheduleHomePoint;
     const totalPoints = gameLines
       .filter((line) => line.market === "total" && line.point !== null)
       .map((line) => line.point!);
@@ -745,55 +741,74 @@ export async function buildDecisionBoard(
         ? []
         : [{ book, point: scheduleHomePoint, fairProbability: 0.5, marketSource: "nflverse_consensus" as const }];
     });
-    const projections: BaselineProjection[] = artifact && consensusHomePoint !== null ? projectionAnchors.map((anchor) => {
-      const bookStateProjectedHomePoint = roundHalf(anchor.point - strengthDelta);
-      const translated = translateFairProbability(artifact, consensusHomePoint, bookStateProjectedHomePoint, anchor.point, 0.5);
-      const championProbability = championModel && translated.probability !== null
-        ? predictProbability(championModel, buildLifecycleForecastRow({
-            season: game.season,
-            week: game.week,
-            market: "spread",
-            marketProbability: anchor.fairProbability,
-            expectedHomeMargin: -consensusHomePoint,
-            totalLine: consensusTotalLine,
-            awayRest: game.awayRest,
-            homeRest: game.homeRest,
-            isHomeSide: true,
-            teamContext
-          }))
-        : null;
-      const modelProbability = translated.probability === null || championProbability === null
-        ? translated.probability
-        : applyChampionMarketResidual(translated.probability, championProbability, anchor.fairProbability);
-      const inferredFairPoint = modelProbability === null
-        ? { point: null, warning: "unsupported" as const }
-        : fairSpreadPointForProbability(artifact, consensusHomePoint, anchor.point, modelProbability);
-      const projectedHomePoint = inferredFairPoint.point ?? bookStateProjectedHomePoint;
-      const shrunkHomeProbability = modelProbability === null ? null : shrinkProbability(modelProbability, anchor.fairProbability, structuralConfig.model.shrinkageWeight);
-      const edgeCenter = shrunkHomeProbability === null ? null : shrunkHomeProbability - anchor.fairProbability;
-      return {
-        gameId: game.id,
-        book: anchor.book,
-        homeTeam: game.home,
-        marketHomePoint: anchor.point,
-        projectedHomePoint,
-        homeCoverProbability: modelProbability,
-        shrunkHomeProbability,
-        pushProbability: translated.pushProbability,
-        edgeInterval: edgeCenter === null || sideEdgeNoise === null
-          ? null
-          : [edgeCenter + sideEdgeNoise[0] - qbUncertaintyWidening, edgeCenter + sideEdgeNoise[1] + qbUncertaintyWidening],
-        marketHomeProbability: anchor.fairProbability,
-        marketSource: anchor.marketSource,
-        translationWarning: translated.warning === "extrapolated" || inferredFairPoint.warning === "extrapolated"
-          ? "extrapolated"
-          : translated.warning === "interpolated" || inferredFairPoint.warning === "interpolated"
-            ? "interpolated"
-            : translated.warning === "unsupported" || inferredFairPoint.warning === "unsupported"
-              ? "unsupported"
-              : "none"
-      };
-    }) : [];
+    const canonicalMarketProbability = canonicalSpread?.fairProbability ?? null;
+    const canonicalSpreadWarning = canonicalSpread?.warning ?? "unsupported" as const;
+    const canonicalState = artifact && consensusHomePoint !== null && canonicalMarketProbability !== null
+      ? translateFairProbability(artifact, consensusHomePoint, stateProjectedHomePoint!, consensusHomePoint, 0.5)
+      : null;
+    const championProbability = championModel && canonicalState?.probability !== null && canonicalState?.probability !== undefined && canonicalMarketProbability !== null
+      ? predictProbability(championModel, buildLifecycleForecastRow({
+          season: game.season,
+          week: game.week,
+          market: "spread",
+          marketProbability: canonicalMarketProbability,
+          expectedHomeMargin: -consensusHomePoint!,
+          totalLine: consensusTotalLine,
+          awayRest: game.awayRest,
+          homeRest: game.homeRest,
+          isHomeSide: true,
+          teamContext
+        }))
+      : null;
+    const canonicalModelProbability = canonicalState?.probability === null || canonicalState?.probability === undefined || canonicalMarketProbability === null
+      ? canonicalState?.probability ?? null
+      : championProbability === null
+        ? canonicalState.probability
+        : applyChampionMarketResidual(canonicalState.probability, championProbability, canonicalMarketProbability);
+    const canonicalShrunkProbability = canonicalModelProbability === null || canonicalMarketProbability === null
+      ? null
+      : shrinkProbability(canonicalModelProbability, canonicalMarketProbability, structuralConfig.model.shrinkageWeight);
+    const canonicalEdgeCenter = canonicalShrunkProbability === null || canonicalMarketProbability === null
+      ? null
+      : canonicalShrunkProbability - canonicalMarketProbability;
+    const canonicalEdgeInterval: [number, number] | null = canonicalEdgeCenter === null || sideEdgeNoise === null
+      ? null
+      : [canonicalEdgeCenter + sideEdgeNoise[0] - qbUncertaintyWidening, canonicalEdgeCenter + sideEdgeNoise[1] + qbUncertaintyWidening];
+    const inferredFairPoint = artifact && consensusHomePoint !== null && canonicalModelProbability !== null
+      ? fairSpreadPointForProbability(artifact, consensusHomePoint, consensusHomePoint, canonicalModelProbability)
+      : { point: null, warning: "unsupported" as const };
+    const projectedHomePoint = inferredFairPoint.point ?? stateProjectedHomePoint;
+    const projections: BaselineProjection[] = artifact && consensusHomePoint !== null && canonicalMarketProbability !== null && canonicalModelProbability !== null && canonicalShrunkProbability !== null && canonicalEdgeInterval
+      ? projectionAnchors.map((anchor) => {
+          const translated = translateCanonicalSpreadForecast({
+            artifact,
+            consensusPoint: consensusHomePoint,
+            canonicalPoint: consensusHomePoint,
+            canonicalMarketProbability,
+            canonicalModelProbability,
+            canonicalShrunkProbability,
+            canonicalEdgeInterval,
+            quote: { book: anchor.book, point: anchor.point, fairProbability: anchor.fairProbability }
+          });
+          const warnings = [canonicalSpreadWarning, translated.warning, inferredFairPoint.warning];
+          return {
+            gameId: game.id,
+            book: anchor.book,
+            homeTeam: game.home,
+            marketHomePoint: anchor.point,
+            projectedHomePoint: projectedHomePoint!,
+            homeCoverProbability: translated.modelProbability,
+            shrunkHomeProbability: translated.shrunkProbability,
+            pushProbability: translated.pushProbability,
+            edgeInterval: translated.edgeInterval,
+            marketHomeProbability: anchor.fairProbability,
+            marketSource: anchor.marketSource,
+            translationWarning: warnings.includes("unsupported") ? "unsupported"
+              : warnings.includes("extrapolated") ? "extrapolated"
+                : warnings.includes("interpolated") ? "interpolated" : "none"
+          };
+        })
+      : [];
     const teasers: TeaserCandidate[] = artifact ? gameLines.filter((line) => line.market === "spread" && line.point !== null && line.fairProbability !== null).map((line) => {
       const sideLines = gameLines.filter((candidate) => candidate.market === "spread" && candidate.side === line.side && candidate.point !== null);
       const consensusPoint = sideLines.reduce((sum, candidate) => sum + (candidate.point ?? 0), 0) / Math.max(1, sideLines.length);

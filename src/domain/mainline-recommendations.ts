@@ -158,7 +158,11 @@ export function rankBestBookMainlineRecommendations(
   candidates: readonly MainlineRecommendation[]
 ): MainlineRecommendation[] {
   const side = bestRecommendation(candidates.filter((candidate) => candidate.market !== "total"));
-  const total = bestRecommendation(candidates.filter((candidate) => candidate.market === "total"));
+  const totalCandidates = candidates.filter((candidate) => candidate.market === "total");
+  const totalPoints = new Set(totalCandidates.map((candidate) => candidate.line.point));
+  // A validated total-score translation table does not yet exist. Do not call
+  // one book "best" when its total is a different contract.
+  const total = totalPoints.size <= 1 ? bestRecommendation(totalCandidates) : null;
   return [side, total]
     .filter((candidate): candidate is MainlineRecommendation => candidate !== null)
     .sort((left, right) => Number(right.actionable) - Number(left.actionable) || right.expectedValue - left.expectedValue);

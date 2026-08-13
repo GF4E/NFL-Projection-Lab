@@ -21,6 +21,7 @@ export interface StructuralConfig {
     intervalPercentiles: number[];
     keyMargins: number[];
     keyMarginBoundarySeason: number;
+    discreteMarginArtifact: string;
     seasonEffects: string;
   };
   sizing: {

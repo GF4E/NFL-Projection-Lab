@@ -32,6 +32,34 @@ export interface BuildMarginArtifactOptions {
   spreadGrid?: number[];
 }
 
+export function assertFrozenMarginArtifact(input: {
+  artifact: DiscreteMarginArtifact;
+  season: number;
+  halfLifeSeasons: number;
+  boundarySeason: number;
+  keyMargins: readonly number[];
+}): void {
+  const { artifact } = input;
+  const content = {
+    version: artifact.version,
+    seasonRange: artifact.seasonRange,
+    boundarySeason: artifact.boundarySeason,
+    decay: artifact.decay,
+    spreadGrid: artifact.spreadGrid,
+    rows: artifact.rows,
+    keyMarginMasses: artifact.keyMarginMasses
+  };
+  if (artifact.artifactHash !== stableHash(content)) throw new Error("Frozen margin artifact hash mismatch");
+  if (artifact.seasonRange[1] !== input.season - 1) throw new Error("Frozen margin artifact is not aligned to the target season");
+  if (artifact.decay.halfLifeSeasons !== input.halfLifeSeasons || artifact.decay.referenceSeason !== input.season - 1) {
+    throw new Error("Frozen margin artifact decay does not match structural configuration");
+  }
+  if (artifact.boundarySeason !== input.boundarySeason) throw new Error("Frozen margin artifact boundary does not match structural configuration");
+  const massKeys = Object.keys(artifact.keyMarginMasses).map(Number).sort((left, right) => left - right);
+  const expectedKeys = [...input.keyMargins].sort((left, right) => left - right);
+  if (massKeys.join(",") !== expectedKeys.join(",")) throw new Error("Frozen margin artifact key margins do not match structural configuration");
+}
+
 export function buildDiscreteMarginArtifact(
   history: HistoricalMarginRow[],
   options: BuildMarginArtifactOptions

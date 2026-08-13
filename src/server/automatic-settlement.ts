@@ -1,9 +1,7 @@
 import { stableHash } from "@/domain/hash";
-import { structuralConfig } from "@/domain/config";
-import { nflverseExpectedMarginToHomePoint, normalizePropPlayerName, type PropMarketKey } from "@/domain/decision-board";
-import { buildDiscreteMarginArtifact } from "@/domain/margin";
+import { normalizePropPlayerName, type PropMarketKey } from "@/domain/decision-board";
+import { frozenMarginArtifact } from "@/domain/frozen-margin";
 import type { StoredPlayLeg } from "@/domain/play-card";
-import type { HistoricalMarginRow } from "@/domain/types";
 import { gradeStoredPlay, type CompletedGame, type CompletedPlayerProp } from "@/domain/settlement";
 import { boardGameId, easternScheduleTimeToIso, normalizeScheduleTeam } from "@/domain/weekly-slate";
 import { calculateStoredPlayClosingValue, type ClosingSnapshotRow, type PropClosingSnapshotRow } from "./closing-value";
@@ -31,13 +29,6 @@ interface OpenPlayRow {
   contract_json: string;
   book: string;
   execution_status: "paper" | "executed";
-}
-
-interface HistoricalGameRow {
-  game_id: string;
-  season: number;
-  result: number;
-  spread_line: number;
 }
 
 interface PlayerStatRow {
@@ -97,13 +88,10 @@ export async function settleCompletedTeamPlays(db: D1Database, now = new Date())
   const gameIds = [...new Set([...contracts.values()].flatMap((contract) => contract.map((leg) => leg.gameId)))];
   if (!gameIds.length) return { settled: 0, deferred: playRows.results.length };
   const placeholders = gameIds.map(() => "?").join(", ");
-  const [finalRows, historicalRows, snapshotRows] = await Promise.all([
+  const [finalRows, snapshotRows] = await Promise.all([
     db.prepare(`SELECT game_id, away_team, home_team, away_score, home_score, source_row_hash, game_date, game_time
       FROM nfl_games WHERE season = 2026 AND season_type = 'REG' AND away_score IS NOT NULL AND home_score IS NOT NULL`)
       .all<CompletedGameRow>(),
-    db.prepare(`SELECT game_id, season, result, spread_line FROM nfl_games
-      WHERE season BETWEEN ? AND 2025 AND season_type = 'REG' AND result IS NOT NULL AND spread_line IS NOT NULL`)
-      .bind(structuralConfig.model.trainingStartSeason).all<HistoricalGameRow>(),
     db.prepare(`SELECT snapshot_key, line_id, game_id, book, market, side, point, american_price,
         captured_at, source_hash, fetched_at FROM live_line_snapshots
       WHERE game_id IN (${placeholders}) ORDER BY fetched_at`).bind(...gameIds).all<ClosingSnapshotRow>()
@@ -129,17 +117,7 @@ export async function settleCompletedTeamPlays(db: D1Database, now = new Date())
     const gameId = boardGameId(normalizeScheduleTeam(row.away_team), normalizeScheduleTeam(row.home_team));
     return [gameId, easternScheduleTimeToIso(row.game_date, row.game_time ?? "13:00")] as const;
   }));
-  const marginRows: HistoricalMarginRow[] = historicalRows.results.flatMap((row) => [
-    { gameId: `${row.game_id}:home`, season: row.season, consensusSpread: nflverseExpectedMarginToHomePoint(row.spread_line), actualMargin: row.result },
-    { gameId: `${row.game_id}:away`, season: row.season, consensusSpread: row.spread_line, actualMargin: -row.result }
-  ]);
-  const artifact = marginRows.length ? buildDiscreteMarginArtifact(marginRows, {
-    latestCompletedSeason: 2025,
-    halfLifeSeasons: structuralConfig.model.decayHalfLifeSeasons,
-    boundarySeason: structuralConfig.model.keyMarginBoundarySeason,
-    keyMargins: structuralConfig.model.keyMargins,
-    generatedAt: "2026-02-01T00:00:00.000Z"
-  }) : null;
+  const artifact = frozenMarginArtifact;
   const sourceGameIds = [...new Set(sourceGameByBoard.values())];
   const sourceGamePlaceholders = sourceGameIds.map(() => "?").join(", ");
   const [propSnapshotResult, currentPropResult, playerStatResult, snapResult, snapState] = await Promise.all([

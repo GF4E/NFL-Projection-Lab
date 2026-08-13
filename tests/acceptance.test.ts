@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import creditConfig from "../config/2026-credit-simulation.json";
 import eraConfig from "../config/era.config.json";
+import frozenMarginArtifact from "../config/discrete-margin-2026.json";
 import { structuralConfig } from "@/domain/config";
 import {
   buildDiscreteMarginArtifact,
@@ -112,6 +113,19 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(repeated.artifactHash).toBe(first.artifactHash);
     expect(changed.artifactHash).not.toBe(first.artifactHash);
     expect(repeated.generatedAt).not.toBe(first.generatedAt);
+  });
+
+  it("1d. freezes the offseason margin artifact for every in-season forecast and settlement", () => {
+    expect(frozenMarginArtifact.frozenForSeason).toBe(2026);
+    expect(frozenMarginArtifact.seasonRange).toEqual([2010, 2025]);
+    expect(frozenMarginArtifact.source.gameRows).toBe(4_175);
+    expect(structuralConfig.model.discreteMarginArtifact).toBe("discrete-margin-2026.json");
+    const board = readFileSync("src/server/decision-board.ts", "utf8");
+    const settlement = readFileSync("src/server/automatic-settlement.ts", "utf8");
+    expect(board).toContain("frozenMarginArtifact");
+    expect(settlement).toContain("frozenMarginArtifact");
+    expect(board).not.toContain("buildDiscreteMarginArtifact(historicalRows");
+    expect(settlement).not.toContain("buildDiscreteMarginArtifact(marginRows");
   });
 
   it("2. uses the power method for spread, total, favorite, underdog, and near-even markets", () => {

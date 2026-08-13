@@ -135,16 +135,37 @@ describe("exact-price mainline recommendations", () => {
       gameId: "sea-lar", awayTeam: "SEA", homeTeam: "LAR", book: "fanduel",
       lines: [
         { ...line("fd-spread", "spread", "LAR", -3, -105, 0.49), book: "fanduel" },
-        { ...line("fd-total", "total", "Over", 46.5, -105, 0.49), book: "fanduel" }
+        { ...line("fd-total", "total", "Over", 45.5, -105, 0.49), book: "fanduel" }
       ],
       spread: spread({ book: "fanduel", marketHomePoint: -3, marketHomeProbability: 0.49, shrunkHomeProbability: 0.57 }),
-      total: total({ book: "fanduel", marketPoint: 46.5, fairProbability: 0.49, shrunkProbability: 0.57 }),
+      total: total({ book: "fanduel", marketPoint: 45.5, fairProbability: 0.49, shrunkProbability: 0.57 }),
       moneyline: null,
       preferredTeams: new Set()
     });
     const best = rankBestBookMainlineRecommendations([...betmgm, ...fanduel]);
     expect(best).toHaveLength(2);
     expect(best.every((candidate) => candidate.line.book === "fanduel")).toBe(true);
-    expect(best.map((candidate) => candidate.line.point)).toEqual(expect.arrayContaining([-3, 46.5]));
+    expect(best.map((candidate) => candidate.line.point)).toEqual(expect.arrayContaining([-3, 45.5]));
+  });
+
+  it("withholds a best-book total when the books post different contracts", () => {
+    const candidates = [
+      buildCandidateForCrossBookTotal("betmgm", 45.5, 0.06),
+      buildCandidateForCrossBookTotal("fanduel", 46.5, 0.08)
+    ];
+    expect(rankBestBookMainlineRecommendations(candidates)).toEqual([]);
   });
 });
+
+function buildCandidateForCrossBookTotal(book: "betmgm" | "fanduel", point: number, expectedValue: number) {
+  const base = rankMainlineRecommendations({
+    gameId: "sea-lar", awayTeam: "SEA", homeTeam: "LAR", book,
+    lines: [{ ...line(`${book}-over`, "total", "Over", point, -110, 0.5), book }],
+    spread: null,
+    total: total({ book, marketPoint: point, shrunkProbability: 0.55 + expectedValue / 10 }),
+    moneyline: null,
+    preferredTeams: new Set()
+  })[0];
+  if (!base) throw new Error("expected total candidate");
+  return { ...base, expectedValue };
+}
