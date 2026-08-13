@@ -345,6 +345,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(marginVersusConsensusResidual(8, 3)).toBe(5);
     expect(marginVersusConsensusResidual(-4, -2.5)).toBe(-1.5);
     expect(normalizeNflverseTeam("LA")).toBe("LAR");
+    expect(normalizeNflverseTeam("STL")).toBe("LAR");
+    expect(normalizeNflverseTeam("SD")).toBe("LAC");
+    expect(normalizeNflverseTeam("OAK")).toBe("LV");
   });
 
   it("27. schedules idempotent opener and kickoff snapshots without duplicate kickoff windows", () => {

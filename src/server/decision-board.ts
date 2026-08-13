@@ -28,6 +28,7 @@ import { fitWeatherTotalAdjustment } from "@/domain/weather-model";
 import { weeklySlate } from "./weekly-slate";
 import { ensureOfficialInjuryStore, getOfficialInjuryImportState } from "./official-injuries/store";
 import { ensureKickoffWeatherStore, listKickoffWeather } from "./weather/store";
+import { ensureModelLifecycleStore, getActiveChampionHash, getTeamStrengthStates } from "./model-lifecycle/store";
 import { getD1 } from "../../db";
 
 interface FeatureRow {
@@ -419,11 +420,11 @@ export async function buildDecisionBoard(
   options: { season?: number; week?: number; now?: Date } = {}
 ): Promise<DecisionBoardPayload> {
   const slate = await weeklySlate({ db, season: options.season, week: options.week, now: options.now });
-  await Promise.all([ensureOfficialInjuryStore(db), ensureKickoffWeatherStore(db)]);
+  await Promise.all([ensureOfficialInjuryStore(db), ensureKickoffWeatherStore(db), ensureModelLifecycleStore(db)]);
   const activeGameIds = slate.games.map((game) => game.id);
   const activePlaceholders = activeGameIds.map(() => "?").join(", ");
   const injuryDataset = `official-injuries:${slate.season}:reg${slate.week}`;
-  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, weatherRows] = await Promise.all([
+  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, weatherRows, persistedStates, championHash] = await Promise.all([
     db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line,
         roof, temperature, wind
@@ -453,13 +454,18 @@ export async function buildDecisionBoard(
       WHERE season = ? AND week = ? AND game_id IN (${activePlaceholders})
       GROUP BY game_id`).bind(slate.season, slate.week, ...activeGameIds).all<InjuryAggregateRow>(),
     getOfficialInjuryImportState(db, injuryDataset),
-    listKickoffWeather(db, activeGameIds)
+    listKickoffWeather(db, activeGameIds),
+    getTeamStrengthStates(db, slate.season),
+    getActiveChampionHash(db, slate.season)
   ]);
   const featureRows = featureResult.results;
   const latestTrainingSeason = Math.max(structuralConfig.model.trainingStartSeason, ...gameResult.results.map((row) => row.season));
   const leagueScoring = weightedLeagueScoring(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season);
   const basisSeason = featureRows.length ? Math.max(...featureRows.map((row) => row.season)) : null;
-  const strengths = basisSeason === null ? new Map<string, number>() : strengthStates(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season);
+  const persistedStrengths = persistedStates.length && persistedStates.every((state) => state.throughWeek >= slate.week - 1)
+    ? new Map(persistedStates.map((state) => [state.team, state.mean]))
+    : null;
+  const strengths = persistedStrengths ?? (basisSeason === null ? new Map<string, number>() : strengthStates(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season));
   const profiles = teamProfiles(featureRows, strengths);
   const historicalRows: HistoricalMarginRow[] = gameResult.results.filter((row) => row.season <= 2025).flatMap((row) => [
     { gameId: `${row.game_id}:home`, season: row.season, consensusSpread: nflverseExpectedMarginToHomePoint(row.spread_line), actualMargin: row.result },
@@ -626,6 +632,7 @@ export async function buildDecisionBoard(
     week: slate.week,
     basisSeason,
     artifactHash: artifact?.artifactHash ?? null,
+    championHash,
     games,
     teaserPairs,
     method: "Leakage-safe rolling 17-game offense and defense evidence with decay-weighted margin-versus-close strength, shrunk 25% toward the model and 75% toward the power-de-vigged market."

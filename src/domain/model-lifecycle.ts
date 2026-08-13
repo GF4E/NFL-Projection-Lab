@@ -14,7 +14,7 @@ export function updateTeamStates(
   k: number
 ): TeamState[] {
   const next = new Map(states.map((state) => [state.team, { ...state }]));
-  for (const game of [...games].sort((a, b) => a.week - b.week)) {
+  for (const game of [...games].sort((a, b) => a.season - b.season || a.week - b.week)) {
     const home = next.get(game.homeTeam) ?? {
       team: game.homeTeam,
       mean: 0,
@@ -85,13 +85,15 @@ export function runPromotionGate(input: {
   startedAt: string;
   completedAt: string;
   tolerance?: number;
+  calibrationSlopeRange?: readonly [number, number];
 }): { run: ModelRun; alert: SystemAlert | null } {
   const tolerance = input.tolerance ?? 0.002;
+  const calibrationSlopeRange = input.calibrationSlopeRange ?? [0.8, 1.2];
   const promote =
     input.challengerMetrics.pooledLogLoss <=
       input.championMetrics.pooledLogLoss + tolerance &&
-    input.challengerMetrics.calibrationSlope >= 0.8 &&
-    input.challengerMetrics.calibrationSlope <= 1.2;
+    input.challengerMetrics.calibrationSlope >= calibrationSlopeRange[0] &&
+    input.challengerMetrics.calibrationSlope <= calibrationSlopeRange[1];
   const run: ModelRun = {
     id: input.runId,
     championVersionHash: input.championHash,

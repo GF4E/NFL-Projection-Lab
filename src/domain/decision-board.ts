@@ -185,6 +185,7 @@ export interface DecisionBoardPayload {
   week: number;
   basisSeason: number | null;
   artifactHash: string | null;
+  championHash: string | null;
   games: DecisionBoardGame[];
   teaserPairs: TeaserPairCandidate[];
   method: string;
@@ -409,5 +410,5 @@ export function marginVersusConsensusResidual(actualHomeMargin: number, expected
 }
 
 export function normalizeNflverseTeam(team: string): string {
-  return team === "LA" ? "LAR" : team;
+  return ({ LA: "LAR", STL: "LAR", SD: "LAC", OAK: "LV", JAC: "JAX" } as Record<string, string>)[team] ?? team;
 }

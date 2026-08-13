@@ -122,6 +122,35 @@ function calibrationSlope(rows: Array<{ probability: number; outcome: 0 | 1; wei
   return covariance / variance / Math.max(EPSILON, meanY * (1 - meanY));
 }
 
+export function evaluateProbabilityRows(rows: Array<{
+  market: MarketKey;
+  probability: number;
+  outcome: 0 | 1;
+  weight: number;
+}>): ModelMetrics {
+  if (!rows.length) throw new Error("Model evaluation requires non-push rows");
+  const weightedLogLoss = (items: typeof rows): number => {
+    const total = items.reduce((sum, item) => sum + item.weight, 0);
+    return items.reduce((sum, item) => {
+      const probability = Math.max(EPSILON, Math.min(1 - EPSILON, item.probability));
+      return sum - item.weight * (
+        item.outcome * Math.log(probability) + (1 - item.outcome) * Math.log(1 - probability)
+      );
+    }, 0) / total;
+  };
+  const byMarket = Object.fromEntries(
+    (["spread", "total", "moneyline"] as MarketKey[]).map((market) => {
+      const items = rows.filter((prediction) => prediction.market === market);
+      return [market, { logLoss: items.length ? weightedLogLoss(items) : 0, observations: items.length }];
+    })
+  ) as ModelMetrics["byMarket"];
+  return {
+    pooledLogLoss: weightedLogLoss(rows),
+    calibrationSlope: calibrationSlope(rows),
+    byMarket
+  };
+}
+
 export function evaluateFittedModel(
   model: FittedLogisticModel,
   rows: ModelTrainingRow[]
@@ -133,29 +162,7 @@ export function evaluateFittedModel(
     outcome: row.outcome,
     weight: row.weight
   }));
-  const weightedLogLoss = (items: typeof predictions): number => {
-    const total = items.reduce((sum, item) => sum + item.weight, 0);
-    return items.reduce((sum, item) => {
-      const probability = Math.max(EPSILON, Math.min(1 - EPSILON, item.probability));
-      return sum - item.weight * (
-        item.outcome * Math.log(probability) + (1 - item.outcome) * Math.log(1 - probability)
-      );
-    }, 0) / total;
-  };
-  const byMarket = Object.fromEntries(
-    (["spread", "total", "moneyline"] as MarketKey[]).map((market) => {
-      const items = predictions.filter((prediction) => prediction.market === market);
-      return [market, {
-        logLoss: items.length ? weightedLogLoss(items) : 0,
-        observations: items.length
-      }];
-    })
-  ) as ModelMetrics["byMarket"];
-  return {
-    pooledLogLoss: weightedLogLoss(predictions),
-    calibrationSlope: calibrationSlope(predictions),
-    byMarket
-  };
+  return evaluateProbabilityRows(predictions);
 }
 
 function mulberry32(seed: number): () => number {
