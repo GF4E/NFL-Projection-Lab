@@ -351,6 +351,11 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(() => correctSettlement(base, { result: "win", profitUnits: 1, reason: "Official correction", actorId: "future-teammate", correctedAt: "2026-09-14" }, "teammate")).toThrow(/owner/);
     const corrected = correctSettlement(base, { result: "win", profitUnits: 1, reason: "Official correction", actorId: "gabe", correctedAt: "2026-09-14" }, "owner");
     expect(corrected.audit.action).toBe("settlement_corrected");
+    const correctionRoute = readFileSync("src/app/api/plays/[id]/correction/route.ts", "utf8");
+    const correctionStore = readFileSync("src/server/settlement-corrections.ts", "utf8");
+    expect(correctionRoute).toContain('member.actor !== "gabe"');
+    expect(correctionStore).toContain("play_correction_audit");
+    expect(correctionStore).toContain("Only a settled play can be corrected");
     expect(editRevision(pick(), { frozenPrice: -105 }, "future-teammate", "2026-09-13T13:00:00Z").approvals).toEqual([]);
     const securityMigration = readFileSync("supabase/migrations/202608110002_operational_guards.sql", "utf8");
     expect(securityMigration).toContain("approval_contract_guard");
