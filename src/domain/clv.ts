@@ -1,10 +1,11 @@
-import type { DiscreteMarginArtifact, OddsSnapshot } from "./types";
+import type { DiscreteMarginArtifact, DiscreteTotalArtifact, OddsSnapshot } from "./types";
 import {
   powerDevig,
   quoteCostCents,
   reapplyPowerHold
 } from "./odds";
 import { translateFairProbability } from "./margin";
+import { translateTotalFairProbability } from "./total";
 
 export interface ClvResult {
   syntheticClosingAmerican: number | null;
@@ -20,6 +21,7 @@ export function calculateTranslatedClv(input: {
   closingOpponentQuote: OddsSnapshot;
   consensusSpread: number;
   artifact: DiscreteMarginArtifact;
+  totalArtifact?: DiscreteTotalArtifact;
 }): ClvResult {
   const { closingQuote, closingOpponentQuote } = input;
   const devig = powerDevig(closingQuote.americanPrice, closingOpponentQuote.americanPrice);
@@ -32,26 +34,47 @@ export function calculateTranslatedClv(input: {
       translationWarning: "none"
     };
   }
-  const translated = translateFairProbability(
-    input.artifact,
-    input.consensusSpread,
-    closingQuote.point,
-    input.entryPoint,
-    devig.probabilities[0]
-  );
+  const translated = closingQuote.market === "total" && input.totalArtifact
+    ? translateTotalFairProbability(
+        input.totalArtifact,
+        input.consensusSpread,
+        closingQuote.point,
+        input.entryPoint,
+        closingQuote.side.toLowerCase() === "over" ? devig.probabilities[0] : devig.probabilities[1]
+      )
+    : translateFairProbability(
+        input.artifact,
+        input.consensusSpread,
+        closingQuote.point,
+        input.entryPoint,
+        devig.probabilities[0]
+      );
   if (translated.probability === null) {
+    const pointClv = closingQuote.market === "total"
+      ? closingQuote.side.toLowerCase() === "over"
+        ? closingQuote.point - input.entryPoint
+        : input.entryPoint - closingQuote.point
+      : input.entryPoint - closingQuote.point;
     return {
       syntheticClosingAmerican: null,
       priceClvCents: null,
-      pointClv: input.entryPoint - closingQuote.point,
+      pointClv,
       translationWarning: "unsupported"
     };
   }
-  const synthetic = reapplyPowerHold(translated.probability, devig.exponent);
+  const selectedProbability = closingQuote.market === "total" && input.totalArtifact && closingQuote.side.toLowerCase() === "under"
+    ? 1 - translated.probability
+    : translated.probability;
+  const synthetic = reapplyPowerHold(selectedProbability, devig.exponent);
+  const pointClv = closingQuote.market === "total"
+    ? closingQuote.side.toLowerCase() === "over"
+      ? closingQuote.point - input.entryPoint
+      : input.entryPoint - closingQuote.point
+    : input.entryPoint - closingQuote.point;
   return {
     syntheticClosingAmerican: synthetic,
     priceClvCents: quoteCostCents(synthetic) - quoteCostCents(input.entryPrice),
-    pointClv: input.entryPoint - closingQuote.point,
+    pointClv,
     translationWarning: translated.warning
   };
 }

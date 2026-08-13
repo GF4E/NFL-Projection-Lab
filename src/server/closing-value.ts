@@ -3,7 +3,7 @@ import { normalizePropPlayerName, type PropMarketKey } from "@/domain/decision-b
 import { decimalToAmerican } from "@/domain/line-board";
 import { americanToDecimal, quoteCostCents } from "@/domain/odds";
 import type { StoredPlayLeg } from "@/domain/play-card";
-import type { DiscreteMarginArtifact, OddsSnapshot } from "@/domain/types";
+import type { DiscreteMarginArtifact, DiscreteTotalArtifact, OddsSnapshot } from "@/domain/types";
 
 export interface ClosingSnapshotRow {
   snapshot_key: string;
@@ -125,6 +125,7 @@ function legClosingValue(input: {
   book: Book;
   kickoffAt: string;
   artifact: DiscreteMarginArtifact | null;
+  totalArtifact: DiscreteTotalArtifact | null;
 }): { syntheticAmerican: number | null; cents: number | null; points: number | null } | null {
   if (input.leg.market === "prop") {
     if (!input.leg.sourceQuoteId || input.leg.point === null) return null;
@@ -177,7 +178,7 @@ function legClosingValue(input: {
       ? selected.point - input.leg.point
       : input.leg.point - selected.point
     : input.leg.point - selected.point;
-  if (market === "total" || !input.artifact) {
+  if (!input.artifact || (market === "total" && !input.totalArtifact)) {
     return { syntheticAmerican: null, cents: null, points: pointClv };
   }
   const consensusPoint = consensusSelectedPoint({ rows: input.rows, leg: input.leg, kickoffAt: input.kickoffAt });
@@ -188,7 +189,8 @@ function legClosingValue(input: {
     closingQuote: asSnapshot(selected),
     closingOpponentQuote: asSnapshot(opponent),
     consensusSpread: consensusPoint,
-    artifact: input.artifact
+    artifact: input.artifact,
+    totalArtifact: market === "total" ? input.totalArtifact ?? undefined : undefined
   });
   return { syntheticAmerican: clv.syntheticClosingAmerican, cents: clv.priceClvCents, points: clv.pointClv };
 }
@@ -205,6 +207,7 @@ export function calculateStoredPlayClosingValue(input: {
   propRows?: readonly PropClosingSnapshotRow[];
   kickoffByGame: ReadonlyMap<string, string>;
   artifact: DiscreteMarginArtifact | null;
+  totalArtifact?: DiscreteTotalArtifact | null;
 }): PlayClosingValue {
   const executedBook = normalizedBook(input.play.book);
   const books: Book[] = input.play.executionStatus === "executed"
@@ -220,7 +223,8 @@ export function calculateStoredPlayClosingValue(input: {
         leg,
         book,
         kickoffAt,
-        artifact: input.artifact
+        artifact: input.artifact,
+        totalArtifact: input.totalArtifact ?? null
       }) : null;
     });
     if (!legValues.length || legValues.some((value) => value === null)) continue;

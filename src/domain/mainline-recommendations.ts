@@ -158,17 +158,11 @@ export function rankBestBookMainlineRecommendations(
   candidates: readonly MainlineRecommendation[]
 ): MainlineRecommendation[] {
   const side = bestRecommendation(candidates.filter((candidate) => candidate.market !== "total"));
-  const totalCandidates = candidates.filter((candidate) => candidate.market === "total");
-  const totalPoints = new Set(totalCandidates.map((candidate) => candidate.line.point));
-  // A validated total-score translation table does not yet exist. When the
-  // points differ, retain each independently qualified exact contract without
-  // comparing or ranking those totals against one another.
-  const totals = totalPoints.size <= 1
-    ? [bestRecommendation(totalCandidates)]
-    : totalCandidates
-        .filter((candidate) => candidate.actionable)
-        .sort((left, right) => left.line.book.localeCompare(right.line.book));
-  return [side, ...totals]
+  // Every total probability has been translated from one canonical market
+  // state to the exact book contract, so unlike raw quotes these EVs are
+  // comparable even when the books post different points.
+  const total = bestRecommendation(candidates.filter((candidate) => candidate.market === "total"));
+  return [side, total]
     .filter((candidate): candidate is MainlineRecommendation => candidate !== null)
     .sort((left, right) => Number(right.actionable) - Number(left.actionable));
 }

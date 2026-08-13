@@ -66,6 +66,7 @@ export interface TotalProjection {
   pushProbability: number | null;
   expectedValue: number | null;
   edgeInterval: [number, number] | null;
+  translationWarning: "none" | "interpolated" | "extrapolated" | "unsupported";
 }
 
 export interface MoneylineProjection {

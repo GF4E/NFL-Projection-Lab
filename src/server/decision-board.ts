@@ -49,7 +49,10 @@ import { stableHash } from "@/domain/hash";
 import { ensureQbOverrideStore, latestQbModelOverrides } from "./qb-overrides/store";
 import { canonicalSpreadMarket, translateCanonicalSpreadForecast } from "@/domain/spread-contracts";
 import { frozenMarginArtifact } from "@/domain/frozen-margin";
-import type { DiscreteMarginArtifact } from "@/domain/types";
+import { frozenTotalArtifact } from "@/domain/frozen-total";
+import { canonicalTotalMarket, translateCanonicalTotalForecast } from "@/domain/total-contracts";
+import { translateTotalFairProbability } from "@/domain/total";
+import type { DiscreteMarginArtifact, DiscreteTotalArtifact } from "@/domain/types";
 import { championConfigurationStatus, currentModelConfigurationHash } from "@/domain/model-version";
 
 interface FeatureRow {
@@ -227,6 +230,7 @@ function totalProjections(
   edgeNoiseInterval: [number, number] | null,
   weatherAdjustmentPoints = 0,
   championModel: FittedLogisticModel | null = null,
+  artifact: DiscreteTotalArtifact | null = null,
   forecastContext: {
     season: number;
     week: number;
@@ -238,8 +242,48 @@ function totalProjections(
   } | null = null
 ): TotalProjection[] {
   const baselineTotal = projectTotal(away, home, leagueScoring);
-  if (baselineTotal === null) return [];
+  if (baselineTotal === null || !artifact) return [];
   const projectedTotal = roundTotalHalf(baselineTotal + weatherAdjustmentPoints);
+  const overQuotes = gameLines.flatMap((line) => line.market === "total" && line.side.toLowerCase() === "over" &&
+    line.point !== null && line.fairProbability !== null
+    ? [{ book: line.book, point: line.point, fairOverProbability: line.fairProbability }]
+    : []);
+  const canonical = canonicalTotalMarket(artifact, overQuotes, forecastContext?.totalLine ?? null);
+  if (!canonical || canonical.fairOverProbability === null) return [];
+  const canonicalMarketOverProbability = canonical.fairOverProbability;
+  const stateAtCanonical = translateTotalFairProbability(
+    artifact,
+    canonical.point,
+    projectedTotal,
+    canonical.point,
+    0.5
+  );
+  if (stateAtCanonical.probability === null) return [];
+  const championOverProbability = championModel && forecastContext
+    ? predictProbability(championModel, buildLifecycleForecastRow({
+        ...forecastContext,
+        market: "total",
+        marketProbability: canonicalMarketOverProbability,
+        totalLine: canonical.point,
+        isHomeSide: false
+      }))
+    : null;
+  const canonicalModelOverProbability = championOverProbability === null
+    ? stateAtCanonical.probability
+    : applyChampionMarketResidual(
+        stateAtCanonical.probability,
+        championOverProbability,
+        canonicalMarketOverProbability
+      );
+  const canonicalShrunkOverProbability = shrinkProbability(
+    canonicalModelOverProbability,
+    canonicalMarketOverProbability,
+    structuralConfig.model.shrinkageWeight
+  );
+  const canonicalEdgeCenter = canonicalShrunkOverProbability - canonicalMarketOverProbability;
+  const canonicalOverEdgeInterval: [number, number] | null = edgeNoiseInterval === null
+    ? null
+    : [canonicalEdgeCenter + edgeNoiseInterval[0], canonicalEdgeCenter + edgeNoiseInterval[1]];
   return (["betmgm", "fanduel"] as const).flatMap<TotalProjection>((book) => {
     const over = gameLines.find((line) => line.book === book && line.market === "total" && line.side.toLowerCase() === "over" && line.point !== null);
     const under = gameLines.find((line) => line.book === book && line.market === "total" && line.side.toLowerCase() === "under" && line.point !== null);
@@ -248,38 +292,39 @@ function totalProjections(
     const pointEdge = projectedTotal - marketPoint;
     const lean: TotalProjection["lean"] = Math.abs(pointEdge) < 1.5 ? "Pass" : pointEdge > 0 ? "Over" : "Under";
     const selected = lean === "Over" ? over : lean === "Under" ? under : null;
-    const stateProbability = lean === "Pass" ? null : Math.max(0.05, Math.min(0.95, 0.5 + Math.abs(pointEdge) * 0.025));
     const fairProbability = selected?.fairProbability ?? null;
-    const overMarketProbability = over?.fairProbability ?? null;
-    const championOverProbability = championModel && forecastContext && overMarketProbability !== null
-      ? predictProbability(championModel, buildLifecycleForecastRow({
-          ...forecastContext,
-          market: "total",
-          marketProbability: overMarketProbability,
-          totalLine: marketPoint,
-          isHomeSide: false
-        }))
-      : null;
-    const championSelectionProbability = championOverProbability === null || lean === "Pass"
+    const translated = over?.fairProbability === null || over?.fairProbability === undefined || canonicalOverEdgeInterval === null
       ? null
-      : lean === "Over" ? championOverProbability : 1 - championOverProbability;
-    const modelProbability = stateProbability === null || fairProbability === null || championSelectionProbability === null
-      ? stateProbability
-      : applyChampionMarketResidual(stateProbability, championSelectionProbability, fairProbability);
-    const shrunkProbability = modelProbability === null || fairProbability === null
+      : translateCanonicalTotalForecast({
+          artifact,
+          consensusPoint: canonical.point,
+          canonicalPoint: canonical.point,
+          canonicalMarketOverProbability,
+          canonicalModelOverProbability,
+          canonicalShrunkOverProbability,
+          canonicalOverEdgeInterval,
+          quote: { book, point: marketPoint, fairOverProbability: over.fairProbability }
+        });
+    const shrunkProbability = lean === "Pass" || translated?.shrunkOverProbability === null || translated?.shrunkOverProbability === undefined
       ? null
-      : shrinkProbability(modelProbability, fairProbability, structuralConfig.model.shrinkageWeight);
-    // Half-point totals cannot push. Integer-total EV is withheld until a
-    // validated total-score mass model is available.
-    const pushProbability = Number.isInteger(marketPoint) ? null : 0;
+      : lean === "Over" ? translated.shrunkOverProbability : 1 - translated.shrunkOverProbability;
+    const pushProbability = lean === "Pass" ? null : translated?.pushProbability ?? null;
     const expectedValue = selected && shrunkProbability !== null && pushProbability !== null
       ? expectedValueWithPush(shrunkProbability, pushProbability, selected.americanPrice)
       : null;
-    const center = shrunkProbability === null || fairProbability === null ? null : shrunkProbability - fairProbability;
-    const edgeInterval = edgeNoiseInterval === null || center === null || pushProbability === null
+    const edgeInterval = lean === "Pass" || translated?.overEdgeInterval === null || translated?.overEdgeInterval === undefined
       ? null
-      : [center + edgeNoiseInterval[0], center + edgeNoiseInterval[1]] as [number, number];
-    return [{ gameId, book, marketPoint, projectedTotal, lean, pointEdge, fairProbability, shrunkProbability, pushProbability, expectedValue, edgeInterval }];
+      : lean === "Over"
+        ? translated.overEdgeInterval
+        : [-translated.overEdgeInterval[1], -translated.overEdgeInterval[0]] as [number, number];
+    const warnings = [canonical.warning, stateAtCanonical.warning, translated?.warning ?? "unsupported"];
+    const translationWarning: TotalProjection["translationWarning"] = warnings.includes("unsupported") ? "unsupported"
+      : warnings.includes("extrapolated") ? "extrapolated"
+        : warnings.includes("interpolated") ? "interpolated" : "none";
+    return [{
+      gameId, book, marketPoint, projectedTotal, lean, pointEdge, fairProbability,
+      shrunkProbability, pushProbability, expectedValue, edgeInterval, translationWarning
+    }];
   });
 }
 
@@ -937,6 +982,7 @@ export async function buildDecisionBoard(
         totalEdgeNoise,
         weather.totalAdjustmentPoints,
         championModel,
+        frozenTotalArtifact,
         {
           season: game.season,
           week: game.week,
@@ -1017,7 +1063,10 @@ export async function buildDecisionBoard(
     season: slate.season,
     week: slate.week,
     basisSeason,
-    artifactHash: artifact?.artifactHash ?? null,
+    artifactHash: artifact ? stableHash({
+      marginArtifactHash: artifact.artifactHash,
+      totalArtifactHash: frozenTotalArtifact.artifactHash
+    }) : null,
     configHash,
     dataHash,
     championHash,
@@ -1025,6 +1074,6 @@ export async function buildDecisionBoard(
     games,
     teaserPairs,
     marketCoverage,
-    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K cumulative margin-versus-close strength; ${championStatus === "compatible" ? "logged gated champion calibration" : "coefficient residual withheld pending a config-compatible logged champion"}; QB risk widens uncertainty while the rejected residual tier adjustment stays withheld unless an audited owner override exists; then 25% model and 75% power-de-vigged market shrinkage.`
+    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K cumulative margin-versus-close strength; decay-weighted discrete spread and total-score translation with exact push mass; ${championStatus === "compatible" ? "logged gated champion calibration" : "coefficient residual withheld pending a config-compatible logged champion"}; QB risk widens uncertainty while the rejected residual tier adjustment stays withheld unless an audited owner override exists; then 25% model and 75% power-de-vigged market shrinkage.`
   };
 }

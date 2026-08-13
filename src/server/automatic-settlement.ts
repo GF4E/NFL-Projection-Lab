@@ -1,6 +1,7 @@
 import { stableHash } from "@/domain/hash";
 import { normalizePropPlayerName, type PropMarketKey } from "@/domain/decision-board";
 import { frozenMarginArtifact } from "@/domain/frozen-margin";
+import { frozenTotalArtifact } from "@/domain/frozen-total";
 import type { StoredPlayLeg } from "@/domain/play-card";
 import { gradeStoredPlay, type CompletedGame, type CompletedPlayerProp } from "@/domain/settlement";
 import { boardGameId, easternScheduleTimeToIso, normalizeScheduleTeam } from "@/domain/weekly-slate";
@@ -212,7 +213,8 @@ export async function settleCompletedTeamPlays(db: D1Database, now = new Date())
       rows: snapshotRows.results,
       propRows,
       kickoffByGame,
-      artifact
+      artifact,
+      totalArtifact: frozenTotalArtifact
     });
     await db.batch([
       db.prepare(`UPDATE plays SET status = 'settled', result = ?, profit_cents = ?, closing_clv_cents = ?,

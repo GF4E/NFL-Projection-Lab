@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import creditConfig from "../config/2026-credit-simulation.json";
 import eraConfig from "../config/era.config.json";
 import frozenMarginArtifact from "../config/discrete-margin-2026.json";
+import frozenTotalArtifact from "../config/discrete-total-2026.json";
 import { structuralConfig } from "@/domain/config";
 import {
   buildDiscreteMarginArtifact,
@@ -133,6 +134,20 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).toContain("marketCoverage");
     expect(board).toContain('status: completeGames === slate.games.length ? "complete"');
     expect(board).toContain('marketSource: "nflverse_consensus"');
+  });
+
+  it("1e2. freezes validated total translation and integer push mass for pricing and CLV", () => {
+    expect(frozenTotalArtifact.frozenForSeason).toBe(2026);
+    expect(frozenTotalArtifact.seasonRange).toEqual([2010, 2025]);
+    expect(frozenTotalArtifact.source.gameRows).toBe(4_175);
+    expect(structuralConfig.model.discreteTotalArtifact).toBe("discrete-total-2026.json");
+    expect(structuralConfig.model.totalTranslationValidationArtifact).toBe("total-translation-validation.json");
+    const board = readFileSync("src/server/decision-board.ts", "utf8");
+    const settlement = readFileSync("src/server/automatic-settlement.ts", "utf8");
+    const closing = readFileSync("src/server/closing-value.ts", "utf8");
+    expect(board).toContain("frozenTotalArtifact");
+    expect(settlement).toContain("frozenTotalArtifact");
+    expect(closing).toContain("totalArtifact");
   });
 
   it("1f. never applies coefficient residuals from a champion logged under another config", () => {

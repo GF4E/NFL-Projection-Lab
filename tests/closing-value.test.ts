@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { calculateStoredPlayClosingValue, type ClosingSnapshotRow, type PropClosingSnapshotRow } from "@/server/closing-value";
 import { artifact } from "./fixtures";
+import { frozenTotalArtifact } from "@/domain/frozen-total";
 
 function marketRows(book: "betmgm" | "fanduel", prices: [number, number], points: [number, number] = [-3, 3]): ClosingSnapshotRow[] {
   const snapshot = `${book}:close`;
@@ -48,7 +49,7 @@ describe("book-specific closing line value", () => {
     expect(value.cents).not.toBeNull();
   });
 
-  it("withholds cents when a total moves points without a total-residual artifact", () => {
+  it("translates a total point move and reports both cents and directional points", () => {
     const rows: ClosingSnapshotRow[] = [
       { snapshot_key: "mgm:total", line_id: "over", game_id: "ne-sea", book: "betmgm", market: "total", side: "Over", point: 45, american_price: -110, captured_at: "2026-09-13T19:50:00Z", source_hash: "hash", fetched_at: "2026-09-13T19:50:01Z" },
       { snapshot_key: "mgm:total", line_id: "under", game_id: "ne-sea", book: "betmgm", market: "total", side: "Under", point: 45, american_price: -110, captured_at: "2026-09-13T19:50:00Z", source_hash: "hash", fetched_at: "2026-09-13T19:50:01Z" }
@@ -57,10 +58,11 @@ describe("book-specific closing line value", () => {
       play: { playType: "single", book: "BetMGM", americanOdds: -110, executionStatus: "executed", contract: [{ gameId: "ne-sea", market: "total", side: "Over", point: 44, americanPrice: -110, selection: "Over 44" }] },
       rows,
       kickoffByGame: kickoff,
-      artifact
+      artifact,
+      totalArtifact: frozenTotalArtifact
     });
     expect(value.points).toBe(1);
-    expect(value.cents).toBeNull();
+    expect(value.cents).not.toBeNull();
   });
 
   it("uses archived exact-contract prop quotes and withholds cents after a point move", () => {

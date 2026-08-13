@@ -33,7 +33,7 @@ function total(overrides: Partial<TotalProjection> = {}): TotalProjection {
   return {
     gameId: "sea-lar", book: "betmgm", marketPoint: 45.5, projectedTotal: 48,
     lean: "Over", pointEdge: 2.5, fairProbability: 0.5, shrunkProbability: 0.55,
-    pushProbability: 0, expectedValue: 0.05, edgeInterval: [0.01, 0.08], ...overrides
+    pushProbability: 0, expectedValue: 0.05, edgeInterval: [0.01, 0.08], translationWarning: "none", ...overrides
   };
 }
 
@@ -148,13 +148,13 @@ describe("exact-price mainline recommendations", () => {
     expect(best.map((candidate) => candidate.line.point)).toEqual(expect.arrayContaining([-3, 45.5]));
   });
 
-  it("retains independently actionable totals without ranking different contracts", () => {
+  it("ranks translated exact total contracts even when the posted points differ", () => {
     const betmgm = buildCandidateForCrossBookTotal("betmgm", 45.5, 0.06);
     const fanduel = buildCandidateForCrossBookTotal("fanduel", 46.5, 0.08);
     expect(rankBestBookMainlineRecommendations([betmgm, { ...fanduel, actionable: false }]))
       .toEqual([betmgm]);
     expect(rankBestBookMainlineRecommendations([betmgm, fanduel]).map((candidate) => candidate.line.book))
-      .toEqual(["betmgm", "fanduel"]);
+      .toEqual(["fanduel"]);
   });
 });
 

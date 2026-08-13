@@ -22,6 +22,9 @@ export interface StructuralConfig {
     keyMargins: number[];
     keyMarginBoundarySeason: number;
     discreteMarginArtifact: string;
+    discreteTotalArtifact: string;
+    totalTranslationValidationArtifact: string;
+    totalTranslationKernelBandwidth: number;
     seasonEffects: string;
   };
   sizing: {

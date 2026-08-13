@@ -45,6 +45,13 @@ export interface HistoricalMarginRow {
   actualMargin: number;
 }
 
+export interface HistoricalTotalRow {
+  gameId: string;
+  season: number;
+  consensusTotal: number;
+  actualTotal: number;
+}
+
 export interface DiscreteOutcomeCell {
   postedPoint: number;
   cover: number;
@@ -69,6 +76,26 @@ export interface DiscreteMarginArtifact {
   spreadGrid: number[];
   rows: DiscreteMarginRow[];
   keyMarginMasses: Record<string, number>;
+  artifactHash: string;
+  generatedAt: string;
+}
+
+export interface DiscreteTotalRow {
+  consensusTotal: number;
+  outcomes: DiscreteOutcomeCell[];
+}
+
+export interface DiscreteTotalArtifact {
+  version: string;
+  seasonRange: [number, number];
+  decay: {
+    halfLifeSeasons: number;
+    referenceSeason: number;
+  };
+  kernelBandwidth: number;
+  consensusGrid: number[];
+  totalGrid: number[];
+  rows: DiscreteTotalRow[];
   artifactHash: string;
   generatedAt: string;
 }
