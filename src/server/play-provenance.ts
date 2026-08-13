@@ -2,7 +2,7 @@ import { buildDecisionBoard } from "./decision-board";
 import { getPlayerPropBoard } from "./player-props";
 import { stableHash } from "@/domain/hash";
 import { expectedValueWithPush } from "@/domain/odds";
-import { priceTwoTeamTeaser } from "@/domain/decision-board";
+import { authoritativeContractExpectedValue } from "@/domain/forecast-value";
 import type {
   PlayForecastLegSnapshot,
   PlayForecastSnapshot,
@@ -182,14 +182,11 @@ export async function capturePlayForecastSnapshot(
     liveLines: lineResult.results,
     playerProps: propResult.results
   });
-  const authoritativeExpectedValuePercent = play.playType === "teaser"
-    ? priceTwoTeamTeaser(legs.map((leg) => ({
-        conditionalWinProbability: leg.betProbability ?? Number.NaN,
-        pushProbability: leg.pushProbability ?? Number.NaN
-      })), play.americanOdds)?.expectedValue ?? null
-    : play.playType === "single" && legs.length === 1
-      ? legs[0].expectedValue
-      : null;
+  const authoritativeExpectedValuePercent = authoritativeContractExpectedValue({
+    playType: play.playType,
+    americanOdds: play.americanOdds,
+    legs
+  });
   return {
     generatedAt: new Date().toISOString(),
     boardGeneratedAt: board.generatedAt,

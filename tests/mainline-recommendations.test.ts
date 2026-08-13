@@ -148,12 +148,13 @@ describe("exact-price mainline recommendations", () => {
     expect(best.map((candidate) => candidate.line.point)).toEqual(expect.arrayContaining([-3, 45.5]));
   });
 
-  it("withholds a best-book total when the books post different contracts", () => {
-    const candidates = [
-      buildCandidateForCrossBookTotal("betmgm", 45.5, 0.06),
-      buildCandidateForCrossBookTotal("fanduel", 46.5, 0.08)
-    ];
-    expect(rankBestBookMainlineRecommendations(candidates)).toEqual([]);
+  it("retains independently actionable totals without ranking different contracts", () => {
+    const betmgm = buildCandidateForCrossBookTotal("betmgm", 45.5, 0.06);
+    const fanduel = buildCandidateForCrossBookTotal("fanduel", 46.5, 0.08);
+    expect(rankBestBookMainlineRecommendations([betmgm, { ...fanduel, actionable: false }]))
+      .toEqual([betmgm]);
+    expect(rankBestBookMainlineRecommendations([betmgm, fanduel]).map((candidate) => candidate.line.book))
+      .toEqual(["betmgm", "fanduel"]);
   });
 });
 

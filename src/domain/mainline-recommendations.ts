@@ -160,10 +160,15 @@ export function rankBestBookMainlineRecommendations(
   const side = bestRecommendation(candidates.filter((candidate) => candidate.market !== "total"));
   const totalCandidates = candidates.filter((candidate) => candidate.market === "total");
   const totalPoints = new Set(totalCandidates.map((candidate) => candidate.line.point));
-  // A validated total-score translation table does not yet exist. Do not call
-  // one book "best" when its total is a different contract.
-  const total = totalPoints.size <= 1 ? bestRecommendation(totalCandidates) : null;
-  return [side, total]
+  // A validated total-score translation table does not yet exist. When the
+  // points differ, retain each independently qualified exact contract without
+  // comparing or ranking those totals against one another.
+  const totals = totalPoints.size <= 1
+    ? [bestRecommendation(totalCandidates)]
+    : totalCandidates
+        .filter((candidate) => candidate.actionable)
+        .sort((left, right) => left.line.book.localeCompare(right.line.book));
+  return [side, ...totals]
     .filter((candidate): candidate is MainlineRecommendation => candidate !== null)
-    .sort((left, right) => Number(right.actionable) - Number(left.actionable) || right.expectedValue - left.expectedValue);
+    .sort((left, right) => Number(right.actionable) - Number(left.actionable));
 }
