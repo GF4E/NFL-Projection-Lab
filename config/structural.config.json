@@ -1,5 +1,5 @@
 {
-  "version": "2026.preseason.3",
+  "version": "2026.preseason.4",
   "season": 2026,
   "frozen": true,
   "unitDollars": 25,
@@ -46,6 +46,13 @@
     "opponentAdjustmentMethod": "play_weighted_ridge",
     "ridgePenalty": 16,
     "validationArtifact": "opponent-adjustment-validation.json"
+  },
+  "teasers": {
+    "points": 6,
+    "screeningAmerican": -130,
+    "selectableAmericanPrices": [-110, -120, -130, -140],
+    "minimumExpectedValue": 0,
+    "preferredOpponentExceptionalEv": 0.05
   },
   "monitoring": {
     "pushEdgeThreshold": 0.03,

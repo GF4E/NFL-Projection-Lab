@@ -436,18 +436,26 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const ordinaryPair = rankTeaserPairs([
       teaser("g1", "PIT", "BAL", 0.75),
       teaser("g2", "KC", "DEN", 0.74)
-    ]);
+    ], { offeredAmerican: -120 });
     expect(ordinaryPair).toHaveLength(1);
     expect(ordinaryPair[0].expectedValue).toBeGreaterThan(0);
     expect(ordinaryPair[0].legs.every((leg) => leg.classification === "ordinary")).toBe(true);
-    expect(rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.7), teaser("g2", "KC", "DEN", 0.7)])).toEqual([]);
-    const pushAdjusted = rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.7, 0.08), teaser("g2", "KC", "DEN", 0.7, 0.08)]);
+    expect(rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.7), teaser("g2", "KC", "DEN", 0.7)], { offeredAmerican: -120 })).toEqual([]);
+    const pushAdjusted = rankTeaserPairs([teaser("g1", "PIT", "BAL", 0.7, 0.08), teaser("g2", "KC", "DEN", 0.7, 0.08)], { offeredAmerican: -120 });
     expect(pushAdjusted).toHaveLength(1);
     expect(pushAdjusted[0].pushProbability).toBeCloseTo(0.1184, 4);
     expect(pushAdjusted[0].expectedValue).toBeGreaterThan(0);
+    const exactBoundary = priceTwoTeamTeaser([
+      { coverProbability: 0.7, pushProbability: 0.08 },
+      { coverProbability: 0.7, pushProbability: 0.08 }
+    ], pushAdjusted[0].playToAmerican);
+    expect(exactBoundary?.expectedValue).toBeGreaterThanOrEqual(0);
     expect(priceTwoTeamTeaser([{ coverProbability: 0.7, pushProbability: 0 }, { coverProbability: 0.7, pushProbability: 0 }], -120)?.expectedValue).toBeLessThan(0);
     expect(priceTwoTeamTeaser([{ coverProbability: 0.7, pushProbability: 0.08 }], -120)).toBeNull();
-    expect(rankTeaserPairs([teaser("g1", "NE", "SEA", 0.75), teaser("g2", "KC", "DEN", 0.74)])).toEqual([]);
+    expect(rankTeaserPairs([teaser("g1", "NE", "SEA", 0.75), teaser("g2", "KC", "DEN", 0.74)], { offeredAmerican: -120 })).toEqual([]);
+    const compactBoard = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(compactBoard).toContain("PLAY TO");
+    expect(compactBoard).not.toContain("PAIR READY");
   });
 
   it("31b. settles two-team teaser pushes and reduces parlay pushes using each stored leg price", () => {

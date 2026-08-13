@@ -163,7 +163,7 @@ export function WeekOneBoard() {
   const [openGame, setOpenGame] = useState<string | null>(null);
   const [propBoards, setPropBoards] = useState<Record<string, PlayerPropBoard>>({});
   const [propsLoading, setPropsLoading] = useState<string | null>(null);
-  const [teaserPrice, setTeaserPrice] = useState(-120);
+  const [teaserPrice, setTeaserPrice] = useState(structuralConfig.teasers.screeningAmerican);
   const matchups = useMemo(() => slate?.games ?? [], [slate]);
   const days = useMemo(() => [...new Set(matchups.map((game) => game.day))], [matchups]);
   const slipValue = useMemo(() => slipMode === "teaser" ? null : analyzeSlipValue(slip), [slip, slipMode]);
@@ -285,7 +285,7 @@ export function WeekOneBoard() {
       id: `teaser:${line.id}:${candidate.teasedPoint}`, sourceQuoteId: line.id, kind: "teaser", gameId: line.gameId, book: line.book, market: "teaser", side: line.side,
       point: candidate.teasedPoint, americanPrice: line.americanPrice, fairProbability: candidate.fairProbability,
       matchup, selection: `${line.side} ${formatPoint(candidate.teasedPoint)}`,
-      detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : "key-number"} leg`, edge: candidate.fairProbability - (line.fairProbability ?? 0),
+      detail: `6-point ${candidate.classification === "classic_wong" ? "Wong" : candidate.classification === "key_number" ? "key-number" : "positive-EV"} leg`, edge: candidate.fairProbability - (line.fairProbability ?? 0),
       pushProbability: candidate.pushProbability
     });
   }
@@ -474,14 +474,14 @@ export function WeekOneBoard() {
                   {preferenceConflict && homeEdge !== null && Math.abs(homeEdge) < 0.03 ? <em>PASS · preferred-team conflict</em> : leanActionable && leanLine ? <button onClick={() => toggleLine(leanLine, `${game.away} @ ${game.home}`)}>Add {sideSizing?.suggestedUnits}u</button> : <em>PASS</em>}
                 </section>
                 <section className="quick-teasers">
-                  <div className="quick-head"><span>TEASER LEGS</span><small>{teaserPair ? "Pair ready" : teaserCandidates.length ? "6 points" : "None"}</small></div>
+                  <div className="quick-head"><span>TEASER LEGS</span><small>{teaserPair ? "Price check" : teaserCandidates.length ? "6 points" : "None"}</small></div>
                   {teaserPair && <button className="teaser-pair" onClick={() => addTeaserPair(teaserPair)}>
                     <span className="teaser-class classic_wong">PAIR</span>
                     <b>With {teaserPair.legs.find((leg) => leg.gameId !== game.id)?.team}</b>
-                    <small>+{(teaserPair.expectedValue * 100).toFixed(1)}% @ {formatOdds(teaserPair.offeredAmerican)}</small>
+                    <small>PLAY TO {formatOdds(teaserPair.playToAmerican)}</small>
                   </button>}
                   {teaserCandidates.length ? teaserCandidates.map((candidate) => <button onClick={() => addTeaser(candidate, `${game.away} @ ${game.home}`)} key={`${candidate.book}:${candidate.team}:${candidate.originalPoint}`}>
-                    <span className={`teaser-class ${candidate.classification}`}>{candidate.classification === "classic_wong" ? "WONG" : "KEY"}</span>
+                    <span className={`teaser-class ${candidate.classification}`}>{candidate.classification === "classic_wong" ? "WONG" : candidate.classification === "key_number" ? "KEY" : "EV"}</span>
                     <b>{candidate.team} {formatPoint(candidate.teasedPoint)}</b>
                     <small>{formatPercent(candidate.fairProbability)} fair</small>
                   </button>) : <p>No viable path at this line.</p>}
@@ -532,7 +532,7 @@ export function WeekOneBoard() {
           <button className={slipMode === "teaser" ? "active" : ""} onClick={() => { setSlipMode("teaser"); setSlip((current) => current.filter((leg) => leg.kind === "teaser")); }}>Teaser</button>
         </div>
         {slip.length === 0 ? <div className="empty-slip"><b>Click a line.</b><p>The contract lands here. No typing, no dropdowns.</p></div> : <div className="slip-legs">{slip.map((leg, index) => <article key={leg.id}><button onClick={() => setSlip((current) => current.filter((item) => item.id !== leg.id))}>×</button><div><small>{leg.matchup} · {marketTitle(leg.market)}</small><b>{leg.selection}</b><span>{leg.detail} · {leg.kind === "teaser" || leg.edge === null ? "Fair" : "Bet"} {formatPercent(leg.kind === "teaser" ? leg.fairProbability : legBetProbability(leg))}</span></div><strong>{leg.kind === "teaser" ? "6 PT" : formatOdds(leg.americanPrice)}</strong><em>LEG {index + 1}</em></article>)}</div>}
-        {slipMode === "teaser" && <div className="teaser-price"><span>OFFERED 2-TEAM PRICE</span><div>{[-110, -120, -130, -140].map((price) => <button className={teaserPrice === price ? "active" : ""} onClick={() => setTeaserPrice(price)} key={price}>{price}</button>)}</div><small>Confirm the live book price. A teaser is blocked when estimated EV is negative.</small></div>}
+        {slipMode === "teaser" && <div className="teaser-price"><span>OFFERED 2-TEAM PRICE</span><div>{structuralConfig.teasers.selectableAmericanPrices.map((price) => <button className={teaserPrice === price ? "active" : ""} onClick={() => setTeaserPrice(price)} key={price}>{price}</button>)}</div><small>Confirm the live book price. A teaser is blocked when estimated EV is negative.</small></div>}
         <div className="reason-clicks"><span>WHY</span>{pickReasons.slice(0, 8).map((item) => <button className={reason === item.value ? "active" : ""} onClick={() => setReason(item.value)} key={item.value}>{item.label.replace("Model disagrees with market price", "Model edge").replace("Opponent-adjusted efficiency matchup", "Efficiency").replace("Turnover or scoring regression", "Regression").replace("Personnel or injury advantage", "Personnel").replace("Coaching or scheme matchup", "Scheme").replace("Role clarity / team chemistry", "Chemistry").replace("Better number / key-number value", "Key number").replace("Pace / scoring environment", "Pace")}</button>)}</div>
         <div className="stake-clicks"><span>STAKE</span>{[12.5, 25, 37.5, 50].map((value) => <button className={stake === value ? "active" : ""} onClick={() => setStake(value)} key={value}>{value / 25}u</button>)}</div>
         <div className="value-meter">

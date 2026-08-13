@@ -50,6 +50,13 @@ export interface StructuralConfig {
     ridgePenalty: number;
     validationArtifact: string;
   };
+  teasers: {
+    points: number;
+    screeningAmerican: number;
+    selectableAmericanPrices: number[];
+    minimumExpectedValue: number;
+    preferredOpponentExceptionalEv: number;
+  };
   monitoring: {
     pushEdgeThreshold: number;
     calibrationSlope: number[];

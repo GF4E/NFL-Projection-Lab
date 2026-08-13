@@ -794,7 +794,11 @@ export async function buildDecisionBoard(
       weather
     };
   });
-  const teaserPairs = rankTeaserPairs(games.flatMap((game) => game.teasers));
+  const teaserPairs = rankTeaserPairs(games.flatMap((game) => game.teasers), {
+    offeredAmerican: structuralConfig.teasers.screeningAmerican,
+    minimumExpectedValue: structuralConfig.teasers.minimumExpectedValue,
+    exceptionalEvThreshold: structuralConfig.teasers.preferredOpponentExceptionalEv
+  });
   return {
     generatedAt: new Date().toISOString(),
     season: slate.season,

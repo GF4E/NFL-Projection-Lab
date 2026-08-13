@@ -104,6 +104,7 @@ export interface TeaserPairCandidate {
   pushProbability: number;
   lossProbability: number;
   fairAmerican: number;
+  playToAmerican: number;
   expectedValue: number;
 }
 
@@ -112,6 +113,7 @@ export interface TwoTeamTeaserValue {
   pushProbability: number;
   lossProbability: number;
   fairAmerican: number;
+  playToAmerican: number;
   expectedValue: number;
 }
 
@@ -591,6 +593,10 @@ export function fairAmericanFromProbability(probability: number): number {
   return Math.round(impliedToAmerican(probability));
 }
 
+export function playToAmericanFromProbability(probability: number): number {
+  return Math.ceil(impliedToAmerican(probability));
+}
+
 export function priceTwoTeamTeaser(
   legs: readonly { coverProbability: number; pushProbability: number }[],
   offeredAmerican: number
@@ -611,6 +617,7 @@ export function priceTwoTeamTeaser(
     pushProbability,
     lossProbability,
     fairAmerican: fairAmericanFromProbability(conditionalWinProbability),
+    playToAmerican: playToAmericanFromProbability(conditionalWinProbability),
     expectedValue: winProbability * americanToDecimal(offeredAmerican) + pushProbability - 1
   };
 }
@@ -627,9 +634,16 @@ export function crossedKeyNumbers(fromPoint: number, toPoint: number, keys = [3,
 
 export function rankTeaserPairs(
   candidates: readonly TeaserCandidate[],
-  options: { offeredAmerican?: number; maximum?: number; preferredTeams?: readonly string[]; exceptionalEvThreshold?: number } = {}
+  options: {
+    offeredAmerican: number;
+    maximum?: number;
+    minimumExpectedValue?: number;
+    preferredTeams?: readonly string[];
+    exceptionalEvThreshold?: number;
+  }
 ): TeaserPairCandidate[] {
-  const offeredAmerican = options.offeredAmerican ?? -120;
+  const offeredAmerican = options.offeredAmerican;
+  const minimumExpectedValue = options.minimumExpectedValue ?? 0;
   const preferred = new Set(options.preferredTeams ?? ["SEA", "ATL"]);
   const exceptionalEvThreshold = options.exceptionalEvThreshold ?? 0.05;
   const pairs: TeaserPairCandidate[] = [];
@@ -647,7 +661,7 @@ export function rankTeaserPairs(
       if (!priced) continue;
       const fairProbability = priced.winProbability;
       const expectedValue = priced.expectedValue;
-      if (expectedValue < 0) continue;
+      if (expectedValue < minimumExpectedValue) continue;
       const opposesPreferredTeam = preferred.has(left.opponent) || preferred.has(right.opponent);
       if (opposesPreferredTeam && expectedValue < exceptionalEvThreshold) continue;
       const legs = [left, right] as [TeaserCandidate, TeaserCandidate];
@@ -660,6 +674,7 @@ export function rankTeaserPairs(
         pushProbability: priced.pushProbability,
         lossProbability: priced.lossProbability,
         fairAmerican: priced.fairAmerican,
+        playToAmerican: priced.playToAmerican,
         expectedValue
       });
     }
