@@ -1,5 +1,6 @@
 import {
   inspectMainlineCompleteness,
+  latestExpectedMainlineCandidate,
   scheduledMainlineCandidates,
   scheduledPropCandidates,
   type MainlineValidationResult,
@@ -41,6 +42,13 @@ export interface OddsAutomationSummary {
   failed: number;
   skipped: number;
   results: Array<{ key: string; status: OddsAutomationRunRow["status"]; message: string }>;
+}
+
+export interface MainlineRecoveryStatus {
+  stale: boolean;
+  expectedSnapshotKey: string | null;
+  expectedJob: OddsAutomationJob | null;
+  runStatus: OddsAutomationRunRow["status"] | null;
 }
 
 
@@ -156,14 +164,19 @@ export async function runScheduledOddsAutomation(input: {
   apiKey: string | undefined;
   now?: Date;
   fetcher?: typeof fetch;
+  allowCatchup?: boolean;
 }): Promise<OddsAutomationSummary> {
   const db = input.db ?? getD1();
   const now = input.now ?? new Date();
   const checkedAt = now.toISOString();
   await ensureStore(db);
   const schedule = asScheduledGames(await seasonSchedule({ db }));
-  const due = [...scheduledMainlineCandidates(now, schedule), ...scheduledPropCandidates(now, schedule)]
-    .sort((left, right) => left.priority - right.priority);
+  const due = [...scheduledMainlineCandidates(now, schedule), ...scheduledPropCandidates(now, schedule)];
+  if (input.allowCatchup && !due.some((candidate) => candidate.job !== "props_minus_60")) {
+    const catchup = latestExpectedMainlineCandidate(now, schedule);
+    if (catchup && !due.some((candidate) => candidate.key === catchup.key)) due.push(catchup);
+  }
+  due.sort((left, right) => left.priority - right.priority);
   const summary: OddsAutomationSummary = { checkedAt, due: due.length, completed: 0, failed: 0, skipped: 0, results: [] };
   for (const candidate of due) {
     if (candidate.job === "props_minus_60" && candidate.gameId) {
@@ -209,6 +222,33 @@ export async function runScheduledOddsAutomation(input: {
     }
   }
   return summary;
+}
+
+export async function getMainlineRecoveryStatus(input: {
+  db?: D1Database;
+  now?: Date;
+  lineCount: number;
+}): Promise<MainlineRecoveryStatus> {
+  const db = input.db ?? getD1();
+  const now = input.now ?? new Date();
+  await ensureStore(db);
+  const expected = latestExpectedMainlineCandidate(now, asScheduledGames(await seasonSchedule({ db })));
+  if (!expected) {
+    return {
+      stale: input.lineCount === 0,
+      expectedSnapshotKey: null,
+      expectedJob: null,
+      runStatus: null
+    };
+  }
+  const row = await db.prepare("SELECT status FROM odds_automation_runs WHERE snapshot_key = ? LIMIT 1")
+    .bind(expected.key).first<{ status: OddsAutomationRunRow["status"] }>();
+  return {
+    stale: input.lineCount === 0 || row?.status !== "succeeded",
+    expectedSnapshotKey: expected.key,
+    expectedJob: expected.job,
+    runStatus: row?.status ?? null
+  };
 }
 
 export async function listOddsAutomationRuns(db: D1Database = getD1()): Promise<OddsAutomationRunRow[]> {

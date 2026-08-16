@@ -42,6 +42,8 @@ export interface ScheduledGame {
 const SLOT_WINDOW_MS = 15 * 60_000;
 const PROP_RETRY_WINDOW_MS = 50 * 60_000;
 const REQUEST_COST = 3;
+const RECOVERY_LOOKBACK_MS = 8 * 86_400_000;
+const RECOVERY_PROBE_MS = 5 * 60_000;
 
 function pacificParts(date: Date): { dayKey: string; weekday: string; minuteOfDay: number } {
   const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
@@ -115,6 +117,30 @@ export function scheduledMainlineCandidates(now: Date, games: readonly Scheduled
     }
   }
   return candidates.sort((left, right) => left.priority - right.priority || left.scheduledFor.localeCompare(right.scheduledFor));
+}
+
+/**
+ * Finds the most recent mainline snapshot the production schedule should have
+ * completed. This lets an authenticated board visit repair a missed cron tick
+ * without creating a new polling cadence or spending duplicate credits.
+ */
+export function latestExpectedMainlineCandidate(
+  now: Date,
+  games: readonly ScheduledGame[]
+): ScheduledOddsCandidate | null {
+  if (!games.length) return null;
+  const firstKickoff = Math.min(...games.map((game) => Date.parse(game.kickoffAt)));
+  const lastKickoff = Math.max(...games.map((game) => Date.parse(game.kickoffAt)));
+  const nowMs = now.getTime();
+  if (nowMs < firstKickoff - 35 * 86_400_000 || nowMs > lastKickoff + 86_400_000) return null;
+
+  const earliest = Math.max(firstKickoff - 35 * 86_400_000, nowMs - RECOVERY_LOOKBACK_MS);
+  let probe = nowMs - nowMs % RECOVERY_PROBE_MS;
+  for (; probe >= earliest; probe -= RECOVERY_PROBE_MS) {
+    const candidates = scheduledMainlineCandidates(new Date(probe), games);
+    if (candidates.length) return candidates[0];
+  }
+  return null;
 }
 
 export function scheduledPropCandidates(now: Date, games: readonly ScheduledGame[]): ScheduledOddsCandidate[] {

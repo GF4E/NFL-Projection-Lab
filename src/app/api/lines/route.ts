@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { listLiveLines } from "@/server/live-line-store";
-import { refreshCompleteSlateMainlines } from "@/server/odds-automation";
+import { getMainlineRecoveryStatus, runScheduledOddsAutomation } from "@/server/odds-automation";
 import { weeklySlate } from "@/server/weekly-slate";
 
 export const dynamic = "force-dynamic";
@@ -15,12 +15,15 @@ function requestedWeek(request: Request): number | undefined {
 export async function GET(request: Request) {
   try {
     const slate = await weeklySlate({ week: requestedWeek(request) });
+    const lines = await listLiveLines(undefined, slate.games.map((game) => game.id));
+    const recovery = await getMainlineRecoveryStatus({ lineCount: lines.length });
     return NextResponse.json({
-      lines: await listLiveLines(undefined, slate.games.map((game) => game.id)),
+      lines,
       season: slate.season,
       week: slate.week,
       configured: configured(),
-      comparisonBooks: ["betmgm", "fanduel"]
+      comparisonBooks: ["betmgm", "fanduel"],
+      stale: recovery.stale
     });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load cached lines" }, { status: 503 });
@@ -35,24 +38,33 @@ export async function POST(request: Request) {
     }
     const slate = await weeklySlate({ week: requestedWeek(request) });
     const cached = await listLiveLines(undefined, slate.games.map((game) => game.id));
-    const newest = Math.max(0, ...cached.map((line) => new Date(line.capturedAt).getTime()));
-    if (Date.now() - newest < 60_000) {
-      return NextResponse.json({ lines: cached, configured: true, comparisonBooks: ["betmgm", "fanduel"], cached: true });
+    const before = await getMainlineRecoveryStatus({ lineCount: cached.length });
+    if (!before.stale) {
+      return NextResponse.json({ lines: cached, configured: true, comparisonBooks: ["betmgm", "fanduel"], cached: true, stale: false });
     }
-    const fetchedAt = new Date().toISOString();
-    const result = await refreshCompleteSlateMainlines({
+    const automation = await runScheduledOddsAutomation({
       apiKey,
-      matchups: slate.games,
-      snapshotKey: `the-odds-api:manual:${fetchedAt.slice(0, 16)}`,
-      fetchedAt
+      allowCatchup: true
     });
+    const lines = await listLiveLines(undefined, slate.games.map((game) => game.id));
+    const after = await getMainlineRecoveryStatus({ lineCount: lines.length });
+    if (after.stale) {
+      const failure = automation.results.find((result) => result.status === "failed" || result.status === "skipped");
+      return NextResponse.json({
+        lines,
+        configured: true,
+        comparisonBooks: ["betmgm", "fanduel"],
+        stale: true,
+        error: failure?.message ?? "The scheduled line refresh did not complete; last good prices were preserved."
+      }, { status: 503 });
+    }
     return NextResponse.json({
-      lines: result.lines,
+      lines,
       season: slate.season,
       week: slate.week,
       configured: true,
       comparisonBooks: ["betmgm", "fanduel"],
-      quota: result.quota
+      stale: false
     });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to refresh live lines" }, { status: 503 });

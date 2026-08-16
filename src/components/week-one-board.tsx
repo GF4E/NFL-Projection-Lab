@@ -31,7 +31,7 @@ const preferredTeams = new Set<string>(PREFERRED_TEAM_CODES);
 
 type TimeZoneChoice = "PT" | "ET";
 type SlipMode = "straight" | "parlay" | "teaser";
-type LinesResponse = { lines?: LiveLine[]; configured?: boolean; season?: number; week?: number; comparisonBooks?: LineBookKey[]; error?: string; cached?: boolean };
+type LinesResponse = { lines?: LiveLine[]; configured?: boolean; season?: number; week?: number; comparisonBooks?: LineBookKey[]; error?: string; cached?: boolean; stale?: boolean };
 type DecisionResponse = DecisionBoardPayload & { error?: string };
 type SelectedLeg = ValueLeg & {
   id: string;
@@ -216,6 +216,7 @@ export function WeekOneBoard() {
   const [timeZone, setTimeZone] = useState<TimeZoneChoice>("PT");
   const [slate, setSlate] = useState<WeeklySlate | null>(null);
   const [lines, setLines] = useState<LiveLine[]>([]);
+  const [linesStale, setLinesStale] = useState(false);
   const [configured, setConfigured] = useState(false);
   const [slip, setSlip] = useState<SelectedLeg[]>([]);
   const [picker, setPicker] = useState<PickedBy>("gabe");
@@ -233,10 +234,11 @@ export function WeekOneBoard() {
   const [slipOpen, setSlipOpen] = useState(false);
   const [now, setNow] = useState<string | null>(null);
   const matchups = useMemo(() => slate?.games ?? [], [slate]);
-  const sundayMode = now !== null && isPacificSunday(now);
-  const visibleMatchups = useMemo(() => sundayMode && now
+  const todayMatchups = useMemo(() => now
     ? todayOnly(matchups.map((game) => ({ kickoffAt: game.kickoffAt, payload: game })), now).map((row) => row.payload)
-    : matchups, [matchups, now, sundayMode]);
+    : [], [matchups, now]);
+  const sundayMode = now !== null && isPacificSunday(now) && todayMatchups.length > 0;
+  const visibleMatchups = sundayMode ? todayMatchups : matchups;
   const days = useMemo(() => [...new Set(visibleMatchups.map((game) => game.day))], [visibleMatchups]);
   const slipValue = useMemo(() => slipMode === "teaser" ? null : analyzeSlipValue(slip), [slip, slipMode]);
   const straightEv = useMemo(() => slipMode === "straight" && slip.length === 1 ? legExpectedValuePercent(slip[0]) : null, [slip, slipMode]);
@@ -374,6 +376,7 @@ export function WeekOneBoard() {
       setSlate(slateData);
       const nextLines = lineData.lines ?? [];
       setLines(nextLines);
+      setLinesStale(Boolean(lineData.stale));
       if (!initialBookChosen.current) {
         setBook(bestCoveredExecutionBook(nextLines));
         initialBookChosen.current = true;
@@ -383,6 +386,21 @@ export function WeekOneBoard() {
       if (playData.actor) setPicker(playData.actor);
       if (!decisionData.error) setIntelligence(decisionData);
       if (!lineData.configured) setMessage("Live prices need the Odds API key. The board will not invent them.");
+      if (lineData.configured && lineData.stale) {
+        const refreshResponse = await fetch(`/api/lines${query}`, { method: "POST" });
+        const refreshed = await refreshResponse.json() as LinesResponse;
+        if (!active) return;
+        if (!refreshResponse.ok || refreshed.error) {
+          setLinesStale(true);
+          setMessage(refreshed.error ?? "The latest prices are unavailable; the last good board is preserved.");
+          return;
+        }
+        const refreshedLines = refreshed.lines ?? nextLines;
+        setLines(refreshedLines);
+        setLinesStale(Boolean(refreshed.stale));
+        const refreshedDecision = await fetch(`/api/decision-board${query}`).then((response) => response.json() as Promise<DecisionResponse>);
+        if (active && !refreshedDecision.error) setIntelligence(refreshedDecision);
+      }
     };
     void load().catch((error) => active && setMessage(error instanceof Error ? error.message : "The last good board could not be loaded."));
     const refreshed = () => {
@@ -731,7 +749,7 @@ export function WeekOneBoard() {
     </header>
 
     <div className="line-status" data-ready={lines.length > 0}>
-      <span><i />{lines.length ? "LINES LIVE" : configured ? "LINES PENDING" : "ODDS KEY NEEDED"}</span>
+      <span><i />{lines.length ? linesStale ? "LINES STALE" : "LINES LIVE" : configured ? "LINES PENDING" : "ODDS KEY NEEDED"}</span>
       <small>{bookNames[book].toUpperCase()} · {coverageReadout ? `${coverageReadout} · ` : ""}{latestCapture ? `${snapshotAge(latestCapture)} OLD` : "NO SNAPSHOT"}{!configured && <> · <a href="https://the-odds-api.com/" target="_blank" rel="noreferrer">GET KEY ↗</a></>}</small>
     </div>
 

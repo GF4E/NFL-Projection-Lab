@@ -101,6 +101,25 @@ afterEach(() => {
 });
 
 describe("compact weekly decision board", () => {
+  it("repairs a missed scheduled snapshot once when the authenticated board opens", async () => {
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      if (url.startsWith("/api/weekly-slate")) return response(slate);
+      if (url.startsWith("/api/lines") && init?.method === "POST") return response({ lines: [], configured: true, stale: false });
+      if (url.startsWith("/api/lines")) return response({ lines: [], configured: true, stale: true });
+      if (url.startsWith("/api/plays")) return response({ plays: [], actor: "gabe" });
+      if (url.startsWith("/api/decision-board")) return response(board());
+      if (url.startsWith("/api/props")) return response(propBoard(new URL(url, "https://test.local").searchParams.get("gameId")!));
+      throw new Error(`Unexpected request ${url}`);
+    });
+
+    render(<WeekOneBoard />);
+    await screen.findByRole("heading", { name: "Week 1" });
+    await waitFor(() => expect(vi.mocked(fetch).mock.calls.some(([url, init]) =>
+      String(url).startsWith("/api/lines") && (init as RequestInit | undefined)?.method === "POST"
+    )).toBe(true));
+  });
+
   it("replaces every colored letter badge with the matching transparent team-logo image", async () => {
     const { container } = render(<WeekOneBoard />);
     await screen.findByRole("heading", { name: "Week 1" });
