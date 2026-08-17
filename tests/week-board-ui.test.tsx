@@ -101,6 +101,15 @@ afterEach(() => {
 });
 
 describe("compact weekly decision board", () => {
+  it("shows every kickoff in Pacific Time without a PT/ET switch", async () => {
+    render(<WeekOneBoard />);
+    await screen.findByRole("heading", { name: "Week 1" });
+    expect(screen.queryByRole("group", { name: "Time zone" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "ET" })).toBeNull();
+    expect(screen.getByText("SEP 9 · 5:20 PM PT")).toBeTruthy();
+    expect(screen.getByText("SEP 10 · 5:35 PM PT")).toBeTruthy();
+  });
+
   it("repairs a missed scheduled snapshot once when the authenticated board opens", async () => {
     vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
       const url = String(input);

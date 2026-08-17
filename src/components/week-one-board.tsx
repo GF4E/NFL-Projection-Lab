@@ -29,7 +29,6 @@ import { pickReasons } from "@/lib/week-one-data";
 const bookNames: Record<LineBookKey, string> = { betmgm: "BetMGM", fanduel: "FanDuel" };
 const preferredTeams = new Set<string>(PREFERRED_TEAM_CODES);
 
-type TimeZoneChoice = "PT" | "ET";
 type SlipMode = "straight" | "parlay" | "teaser";
 type LinesResponse = { lines?: LiveLine[]; configured?: boolean; season?: number; week?: number; comparisonBooks?: LineBookKey[]; error?: string; cached?: boolean; stale?: boolean };
 type DecisionResponse = DecisionBoardPayload & { error?: string };
@@ -71,13 +70,13 @@ function propMarketTitle(market: PropCandidate["market"]): string {
   return "Receiving yards";
 }
 
-function formatKickoff(game: WeeklyMatchup, choice: TimeZoneChoice): string {
+function formatKickoff(game: WeeklyMatchup): string {
   const date = new Date(game.kickoffAt);
   const formatted = new Intl.DateTimeFormat("en-US", {
-    timeZone: choice === "PT" ? "America/Los_Angeles" : "America/New_York",
+    timeZone: "America/Los_Angeles",
     month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
   }).format(date).replace(",", " ·");
-  return `${formatted} ${choice}`.toUpperCase();
+  return `${formatted} PT`.toUpperCase();
 }
 
 function lineSelection(line: LiveLine): string {
@@ -213,7 +212,6 @@ export function WeekOneBoard() {
   const [book, setBook] = useState<LineBookKey>("betmgm");
   const initialBookChosen = useRef(false);
   const expandedGameRef = useRef<HTMLDivElement | null>(null);
-  const [timeZone, setTimeZone] = useState<TimeZoneChoice>("PT");
   const [slate, setSlate] = useState<WeeklySlate | null>(null);
   const [lines, setLines] = useState<LiveLine[]>([]);
   const [linesStale, setLinesStale] = useState(false);
@@ -744,7 +742,6 @@ export function WeekOneBoard() {
       <div><h1>Week {slate?.week ?? 1}</h1><span>{sundayMode ? `${visibleMatchups.length} today` : `${matchups.length || 16} games`}</span></div>
       <div className="board-controls">
         <div className="click-toggle" role="group" aria-label="Sportsbook">{(["betmgm", "fanduel"] as const).map((value) => <button className={book === value ? "active" : ""} onClick={() => setBook(value)} key={value}>{bookNames[value]}</button>)}</div>
-        <div className="click-toggle compact" role="group" aria-label="Time zone">{(["PT", "ET"] as const).map((value) => <button className={timeZone === value ? "active" : ""} onClick={() => setTimeZone(value)} key={value}>{value}</button>)}</div>
       </div>
     </header>
 
@@ -843,7 +840,7 @@ export function WeekOneBoard() {
               <div className="matchup-market-row">
                 <div className="matchup-cell">
                   <div className="event-time">
-                    <b>{formatKickoff(game, timeZone)}</b>
+                    <b>{formatKickoff(game)}</b>
                     {game.network && <span>{game.network}</span>}
                     {sundayMode && now && <span className="kickoff-countdown">{compactKickoffCountdown(game.kickoffAt, now)}</span>}
                     {sundayMode && <span className={availability?.inactivesConfirmed ? "pregame-confirmed" : "pregame-pending"}>{availability?.inactivesConfirmed ? "INACTIVES ✓" : "INACTIVES —"}</span>}
