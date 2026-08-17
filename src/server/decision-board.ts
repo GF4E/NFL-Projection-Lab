@@ -55,6 +55,7 @@ import { championConfigurationStatus, currentModelCodeHash, currentModelConfigur
 import { bootstrapMarginTranslation, buildMarginBootstrapIndex } from "@/domain/margin-bootstrap";
 import { bootstrapTotalTranslation, buildTotalBootstrapIndex, type TotalBootstrapIndex } from "@/domain/total-bootstrap";
 import { buildMainlineContractEvaluations } from "@/domain/book-comparison";
+import { ensureMarketSentimentStore, listLatestMarketSentiment } from "./market-sentiment/store";
 
 interface FeatureRow {
   game_id: string;
@@ -697,13 +698,14 @@ export async function buildDecisionBoard(
     ensureOfficialInjuryStore(db),
     ensureKickoffWeatherStore(db),
     ensureModelLifecycleStore(db),
+    ensureMarketSentimentStore(db),
     ensurePregameContextStore(db),
     ensureQbOverrideStore(db)
   ]);
   const activeGameIds = slate.games.map((game) => game.id);
   const activePlaceholders = activeGameIds.map(() => "?").join(", ");
   const injuryDataset = `official-injuries:${slate.season}:reg${slate.week}`;
-  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, inactiveResult, qbReportResult, qbInactiveResult, pregameStates, weatherRows, persistedStates, lifecycle, latestRunAuthorization, qbOverrides] = await Promise.all([
+  const [lineResult, gameResult, featureResult, movementHistory, injuryResult, injuryState, inactiveResult, qbReportResult, qbInactiveResult, pregameStates, weatherRows, persistedStates, lifecycle, latestRunAuthorization, qbOverrides, sentimentRows] = await Promise.all([
     db.prepare(`SELECT * FROM live_lines WHERE game_id IN (${activePlaceholders}) ORDER BY game_id, book, market, side`).bind(...activeGameIds).all<LineRow>(),
     db.prepare(`SELECT game_id, season, week, game_date, away_team, home_team, result, spread_line, total, total_line,
         roof, temperature, wind, away_moneyline, home_moneyline, away_qb_name, home_qb_name
@@ -757,7 +759,8 @@ export async function buildDecisionBoard(
     getTeamStrengthStates(db, slate.season),
     getModelLifecycleState(db, slate.season),
     getLatestModelRunAuthorization(db),
-    latestQbModelOverrides(db, activeGameIds)
+    latestQbModelOverrides(db, activeGameIds),
+    listLatestMarketSentiment(db, activeGameIds)
   ]);
   const configuredChampionHash = lifecycle?.championHash ?? null;
   const featureRows = featureResult.results;
@@ -1328,6 +1331,7 @@ export async function buildDecisionBoard(
         : [],
       evidence,
       movements: lineMovements(game.id, movementHistory, gameLines),
+      sentiment: sentimentRows.filter((row) => row.gameId === game.id),
       availability,
       weather,
       quarterbacks
@@ -1385,6 +1389,6 @@ export async function buildDecisionBoard(
     games,
     teaserPairs,
     marketCoverage,
-    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K cumulative margin-versus-close strength; decay-weighted discrete spread and total-score translation with exact push mass; ${championStatus === "compatible" ? "logged gated champion calibration" : "coefficient residual withheld pending a config-compatible logged champion"}; QB risk widens uncertainty while the rejected residual tier adjustment stays withheld unless an audited owner override exists; then 25% model and 75% power-de-vigged market shrinkage.`
+    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K cumulative margin-versus-close strength; decay-weighted discrete spread and total-score translation with exact push mass; ${championStatus === "compatible" ? "logged gated champion calibration" : "coefficient residual withheld pending a config-compatible logged champion"}; QB risk widens uncertainty while the rejected residual tier adjustment stays withheld unless an audited owner override exists; then 25% model and 75% power-de-vigged market shrinkage. Public ticket and money flow is provenance-stamped advisory context only and is excluded from probability and sizing.`
   };
 }

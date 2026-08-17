@@ -8,6 +8,7 @@ export interface BackgroundMaintenanceTasks {
   weather(): Promise<unknown>;
   injuries(): Promise<unknown>;
   nflverse(): Promise<unknown>;
+  sentiment(): Promise<unknown>;
   drafts(): Promise<unknown>;
   lifecycle?(): Promise<unknown>;
   settlement(): Promise<unknown>;
@@ -27,11 +28,12 @@ export async function orchestrateBackgroundMaintenance(
   checkedAt: string
 ) {
   const pregame = await stage("official pregame context", tasks.pregame);
-  const [odds, weather, injuries, nflverse, drafts] = await Promise.all([
+  const [odds, weather, injuries, nflverse, sentiment, drafts] = await Promise.all([
     stage("scheduled odds", tasks.odds),
     stage("kickoff weather", tasks.weather),
     stage("official injuries", tasks.injuries),
     stage("nflverse importer", tasks.nflverse),
+    stage("market sentiment", tasks.sentiment),
     stage("draft expiry", tasks.drafts)
   ]);
   const [lifecycle, settlement] = await Promise.all([
@@ -40,7 +42,7 @@ export async function orchestrateBackgroundMaintenance(
       : Promise.resolve({ status: "completed" as const, result: { status: "delegated" as const } }),
     stage("automatic settlement", tasks.settlement)
   ]);
-  return { checkedAt, pregame, odds, weather, injuries, nflverse, drafts, lifecycle, settlement };
+  return { checkedAt, pregame, odds, weather, injuries, nflverse, sentiment, drafts, lifecycle, settlement };
 }
 
 export type MaintenanceLane = "routine" | "lifecycle";

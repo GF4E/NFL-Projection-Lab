@@ -3,6 +3,7 @@ import { bootstrapEdgeInterval } from "./bootstrap";
 import { structuralConfig } from "./config";
 import { sizeKelly } from "./sizing";
 import { PREFERRED_TEAM_CODES } from "./team-preferences";
+import type { MarketSentimentSnapshot } from "./market-sentiment";
 
 export const PROP_MARKETS = [
   "player_pass_yds",
@@ -384,6 +385,7 @@ export interface DecisionBoardGame {
   signals: MatchupSignal[];
   evidence: MatchupEvidenceProvenance;
   movements: LineMovementSeries[];
+  sentiment: MarketSentimentSnapshot[];
   availability: GameAvailabilityContext;
   weather: GameWeatherContext;
   quarterbacks: GameQuarterbackContext;

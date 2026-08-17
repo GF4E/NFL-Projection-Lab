@@ -8,6 +8,7 @@ import { runOfficialPregameContextAutomation } from "./pregame-context/automatio
 import { runKickoffWeatherAutomation } from "./weather/automation";
 import { dispatchPendingPushes } from "./push/store";
 import { generateWeeklyDigest } from "./weekly-digest";
+import { runMarketSentimentAutomation } from "./market-sentiment/automation";
 
 /**
  * Runs every five minutes in production. The official pregame snapshot is resolved first so
@@ -27,6 +28,7 @@ export async function runBackgroundMaintenance(input: {
     weather: () => runKickoffWeatherAutomation({ db: input.db, now }),
     injuries: () => runOfficialInjuryAutomation({ db: input.db, now }),
     nflverse: () => runNflverseAutomation({ db: input.db, now, allowPlayByPlay: true }),
+    sentiment: () => runMarketSentimentAutomation({ db: input.db, now }),
     drafts: () => expireStaleTeamDrafts(input.db, now),
     settlement: () => settleCompletedTeamPlays(input.db, now)
   }, now.toISOString());

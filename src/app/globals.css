@@ -279,10 +279,10 @@ button:disabled { cursor: wait; opacity: .62; }
 .movement-mini > small { color: #899690; font: 700 8px var(--display); text-transform: uppercase; }
 .spread-sparkline { width: 90px; height: 22px; color: var(--book-accent); overflow: visible; }
 .evidence-signals { min-width: 0; padding-left: 12px; border-left: 1px solid #34403c; }
-.availability-inline, .weather-inline { min-height: 24px; margin: 4px 0 1px; padding: 4px 7px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; border: 1px solid #3c4844; background: #17211e; }
-.availability-inline span, .availability-inline em, .weather-inline span, .weather-inline em { color: #7d8a85; font: 900 7px var(--display); font-style: normal; letter-spacing: .06em; }
-.availability-inline b, .weather-inline b { overflow: hidden; color: #cbd2cf; font: 800 8px var(--display); text-overflow: ellipsis; white-space: nowrap; }
-.availability-inline em, .weather-inline em { color: var(--book-accent); }
+.availability-inline, .weather-inline, .sentiment-inline { min-height: 24px; margin: 4px 0 1px; padding: 4px 7px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; border: 1px solid #3c4844; background: #17211e; }
+.availability-inline span, .availability-inline em, .weather-inline span, .weather-inline em, .sentiment-inline span, .sentiment-inline em { color: #7d8a85; font: 900 7px var(--display); font-style: normal; letter-spacing: .06em; }
+.availability-inline b, .weather-inline b, .sentiment-inline b { overflow: hidden; color: #cbd2cf; font: 800 8px var(--display); text-overflow: ellipsis; white-space: nowrap; }
+.availability-inline em, .weather-inline em, .sentiment-inline em { color: var(--book-accent); }
 .availability-inline.stale, .weather-inline.stale { opacity: .58; }
 .evidence-signals > div:last-child { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
 .evidence-signals article { min-width: 0; margin-top: 5px; padding-left: 8px; display: grid; grid-template-columns: 1fr auto; gap: 2px 6px; border-left: 2px solid #43504b; }
@@ -390,6 +390,8 @@ button:disabled { cursor: wait; opacity: .62; }
 .weekly-opportunity-queue > header span { color: var(--acid); font: 900 8px var(--display); letter-spacing: .08em; }
 .weekly-opportunity-queue > header small { margin-top: 2px; color: #77857f; font: 700 7px var(--display); text-transform: uppercase; }
 .weekly-opportunity-queue > button { min-width: 0; padding: 4px 5px; display: grid; grid-template-columns: 14px minmax(0, 1fr) auto; gap: 5px; align-items: center; border: 1px solid #3a4642; border-radius: 3px; background: #18221f; color: #f4f6f5; text-align: left; }
+.confidence-bet { background-image: linear-gradient(90deg, rgba(47, 211, 111, calc(var(--bet-confidence, 0) * .23)), rgba(47, 211, 111, calc(var(--bet-confidence, 0) * .05)) 68%, transparent); }
+.weekly-opportunity-queue > button.confidence-bet { border-color: color-mix(in srgb, #36d978 calc(var(--bet-confidence, 0) * 72%), #3a4642); }
 .weekly-opportunity-queue > button:hover { border-color: var(--book-accent); }
 .weekly-opportunity-queue > button > span { color: #68766f; font: 900 8px var(--display); }
 .weekly-opportunity-queue > button > div { min-width: 0; display: flex; flex-direction: column; }
@@ -420,6 +422,8 @@ button:disabled { cursor: wait; opacity: .62; }
 .team-code { min-width: 0; gap: 9px; }
 .team-code .team-logo { width: 33px; height: 33px; flex: 0 0 33px; display: block; border: 0; border-radius: 0; background: transparent; box-shadow: none; object-fit: contain; filter: drop-shadow(0 2px 3px rgba(0,0,0,.25)); }
 .team-code b { font-size: 19px; letter-spacing: .015em; }
+.team-identity { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; }
+.team-identity span { margin: 2px 0 0 9px; color: #8c9994; font: 400 9px/1 var(--display); letter-spacing: .08em; }
 .team-code em { font-size: 10px; }
 .game-decision-state { display: grid; gap: 3px; }
 .game-decision-state i { width: 24px; height: 18px; display: grid; place-items: center; border: 1px solid #44514c; border-radius: 3px; color: #71807a; font: 900 8px var(--display); font-style: normal; }
@@ -431,15 +435,17 @@ button:disabled { cursor: wait; opacity: .62; }
 .market-pair .price-cell span { margin: 0; font-size: 10px; }
 .market-pair .price-cell small { top: 3px; right: 4px; font-size: 6px; }
 .market-pair .price-cell > em { bottom: 2px; left: 4px; font-size: 5px; }
+.market-pair .price-cell.confidence-bet-cell { border-color: color-mix(in srgb, #36d978 calc(var(--bet-confidence, 0) * 76%), #444e4b); background-image: linear-gradient(90deg, rgba(47, 211, 111, calc(var(--bet-confidence, 0) * .24)), rgba(47, 211, 111, calc(var(--bet-confidence, 0) * .05)) 70%, transparent); }
 .row-decision { position: relative; min-width: 0; padding: 7px 7px 5px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 27px; gap: 3px 6px; border: 1px solid #35413d; border-radius: 4px; background: #0e1715; }
-.row-decision.actionable { border-color: color-mix(in srgb, var(--acid) 32%, #35413d); background: linear-gradient(125deg, rgba(198,255,98,.055), #0e1715 66%); }
+.row-decision { grid-template-columns: 1fr; }
+.row-decision.actionable { border-color: color-mix(in srgb, #36d978 calc(var(--bet-confidence, 0) * 74%), #35413d); }
 .event-market.edge-gone .row-decision { border-color: color-mix(in srgb, var(--red) 52%, #35413d); }
 .event-market.edge-gone .edge-readout b, .event-market.edge-gone .edge-readout small { color: var(--red); }
 .decision-readout { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
 .decision-readout span, .decision-readout small, .row-vig { overflow: hidden; color: #74827d; font: 800 6px var(--display); letter-spacing: .07em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
 .decision-readout b { overflow: hidden; margin: 1px 0; color: #f4f6f5; font: 900 13px var(--display); text-overflow: ellipsis; white-space: nowrap; }
 .edge-readout b { color: var(--acid); }
-.row-decision > button { grid-column: 1 / 3; min-width: 0; border: 1px solid color-mix(in srgb, var(--book-accent) 55%, #303b37); border-radius: 3px; background: color-mix(in srgb, var(--book-accent) 12%, transparent); color: var(--book-accent); font: 900 8px var(--display); letter-spacing: .04em; }
+.row-decision > button { grid-column: 1; min-width: 0; border: 1px solid color-mix(in srgb, var(--book-accent) 55%, #303b37); border-radius: 3px; background: color-mix(in srgb, var(--book-accent) 12%, transparent); color: var(--book-accent); font: 900 8px var(--display); letter-spacing: .04em; }
 .row-decision > button span { margin-left: 7px; }
 .row-vig { position: absolute; right: 6px; top: 4px; opacity: .65; }
 .quick-picks { position: absolute; z-index: 15; left: 7px; right: 7px; top: calc(100% + 4px); margin: 0; padding: 40px 8px 8px; grid-template-columns: 1.05fr .8fr 1.2fr; gap: 7px; border: 1px solid #56635e; background: #0b1412; box-shadow: 0 22px 52px rgba(0,0,0,.62); }
@@ -457,6 +463,10 @@ button:disabled { cursor: wait; opacity: .62; }
 .shared-slip.collapsed .slip-head::after { content: "OPEN  →"; color: var(--book-accent); font: 900 8px var(--display); letter-spacing: .06em; }
 .slip-toggle { padding: 0; display: block; border: 0 !important; background: transparent !important; color: inherit !important; text-align: left; }
 .slip-toggle h2 { color: #f5f7f6; }
+
+/* The board is a reading instrument: reserve heavier weight for prices and edges only. */
+.sportsbook-board :is(h1, h2, h3, b, strong, button, span, small, em, p, a, i) { font-weight: 500 !important; }
+.sportsbook-board :is(.price-cell strong, .edge-readout b, .weekly-opportunity-queue > header span, .weekly-opportunity-queue > button > div:last-child b) { font-weight: 600 !important; }
 
 @media (max-width: 1320px) {
   .sportsbook-layout { grid-template-columns: minmax(730px, 1fr) 285px; }

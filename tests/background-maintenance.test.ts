@@ -21,6 +21,7 @@ describe("background maintenance orchestration", () => {
       weather: completed("weather"),
       injuries: completed("injuries"),
       nflverse: completed("nflverse"),
+      sentiment: completed("sentiment"),
       drafts: completed("drafts"),
       lifecycle: async () => {
         expect(events).toContain("nflverse");
@@ -40,6 +41,7 @@ describe("background maintenance orchestration", () => {
     expect(events.indexOf("lifecycle")).toBeGreaterThan(events.indexOf("nflverse"));
     expect(result.odds).toEqual({ status: "failed", error: "scheduled odds: provider unavailable" });
     expect(result.weather.status).toBe("completed");
+    expect(result.sentiment.status).toBe("completed");
     expect(result.lifecycle.status).toBe("completed");
     expect(result.settlement.status).toBe("completed");
   });
@@ -60,6 +62,7 @@ describe("background maintenance orchestration", () => {
       weather: completed,
       injuries: completed,
       nflverse: completed,
+      sentiment: completed,
       drafts: completed,
       settlement: completed
     }, "2026-09-13T16:00:00.000Z");

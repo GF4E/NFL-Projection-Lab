@@ -47,7 +47,7 @@ function board(): DecisionBoardPayload {
     teaserPairs: [], marketCoverage: [], method: "test",
     games: games.map((game) => ({
       gameId: game.id, awayTeam: game.away, homeTeam: game.home, away: null, home: null,
-      projections: [], totals: [], moneylines: [], contractEvaluations: [], teasers: [], signals: [], movements: [],
+      projections: [], totals: [], moneylines: [], contractEvaluations: [], teasers: [], signals: [], movements: [], sentiment: [],
       evidence: {
         status: "current", provider: "nflverse", throughSeason: 2025, throughWeek: 18,
         throughDate: "2026-01-04", expectedThroughSeason: 2025, expectedThroughWeek: 18,
@@ -140,6 +140,37 @@ describe("compact weekly decision board", () => {
     expect(container.querySelector(".team-dot, .team-badge, .team-avatar")).toBeNull();
   });
 
+  it("places bracketed team score projections below each team code", async () => {
+    const intelligence = board();
+    intelligence.games[0].projections = [{
+      gameId: "ne-sea", book: "betmgm", homeTeam: "SEA", marketHomePoint: -3,
+      projectedHomePoint: -4, homeCoverProbability: 0.61, shrunkHomeProbability: 0.55,
+      pushProbability: 0.02, edgeInterval: [0.01, 0.08], marketHomeProbability: 0.5,
+      marketSource: "book", translationWarning: "none"
+    }];
+    intelligence.games[0].totals = [{
+      gameId: "ne-sea", book: "betmgm", canonicalPoint: 46, marketPoint: 46,
+      projectedTotal: 48, shrunkOverProbability: 0.54, marketPushProbability: 0,
+      overEdgeInterval: [0.01, 0.06], lean: "Over", pointEdge: 2,
+      fairProbability: 0.5, shrunkProbability: 0.54, pushProbability: 0,
+      expectedValue: 0.03, edgeInterval: [0.01, 0.06], translationWarning: "none"
+    }];
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.startsWith("/api/weekly-slate")) return response(slate);
+      if (url.startsWith("/api/lines")) return response({ lines: [], configured: true });
+      if (url.startsWith("/api/plays")) return response({ plays: [], actor: "gabe" });
+      if (url.startsWith("/api/decision-board")) return response(intelligence);
+      if (url.startsWith("/api/props")) return response(propBoard("ne-sea"));
+      throw new Error(`Unexpected request ${url}`);
+    });
+
+    const { container } = render(<WeekOneBoard />);
+    await screen.findByText("[22]");
+    expect(screen.getByText("[26]")).toBeTruthy();
+    expect(container.querySelector(".team-code")?.textContent).toBe("NE[22]");
+  });
+
   it("keeps one analysis window open and closes it by outside click or Escape", async () => {
     render(<WeekOneBoard />);
     const analyze = await screen.findAllByRole("button", { name: /ANALYZE/ });
@@ -196,6 +227,11 @@ describe("compact weekly decision board", () => {
       { sourceQuoteId: "mgm-sea", book: "betmgm", market: "spread", side: "SEA", point: -3.5, americanPrice: -110, capturedAt, canonicalPoint: -3.5, translatedAmericanPrice: -110, powerExponent: 1.1, fairProbability: 0.5, shrunkProbability: 0.6, pushProbability: 0.02, expectedValue: 0.12, edgeInterval: [0.04, 0.14], translationWarning: "none" },
       { sourceQuoteId: "fd-sea", book: "fanduel", market: "spread", side: "SEA", point: -3, americanPrice: -105, capturedAt, canonicalPoint: -3.5, translatedAmericanPrice: -118, powerExponent: 1.08, fairProbability: 0.49, shrunkProbability: 0.57, pushProbability: 0.02, expectedValue: 0.1, edgeInterval: [0.02, 0.12], translationWarning: "none" }
     ];
+    intelligence.games[0].sentiment = [{
+      gameId: "ne-sea", providerGameId: "291101", market: "spread", side: "SEA",
+      ticketsPercent: 55, moneyPercent: 66, sampleBets: 8840, capturedAt,
+      sourceUrl: "https://www.actionnetwork.com/nfl/public-betting", sourceHash: "sentiment"
+    }];
     vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.startsWith("/api/weekly-slate")) return response(slate);
@@ -216,5 +252,10 @@ describe("compact weekly decision board", () => {
     expect(container.querySelector(".book-compare")?.textContent).toContain("VS FanDuel -3 -105 · FAIR 49.0% · BET 57.0% · +10.0% EV");
     expect(container.querySelector(".book-compare")?.textContent).toContain("translated");
     expect(container.querySelector(".quick-mainline-recommendation small")?.textContent).toContain("FAIR 50.0% · BET 60.0% · BE 52.4%");
+    expect(container.querySelector(".row-decision.actionable")?.getAttribute("style")).toMatch(/--bet-confidence: (?:0\.[1-9]|1\.000)/);
+    expect(container.querySelector(".price-cell.confidence-bet-cell")).not.toBeNull();
+    expect(container.querySelector(".price-cell > em")).toBeNull();
+    expect(container.querySelector(".sentiment-inline")?.textContent).toContain("SEA · 55% tickets · 66% money · 8,840 bets");
+    expect(container.querySelector(".sentiment-inline")?.textContent).toContain("POSSIBLE SHARP PRESSURE +11PP");
   });
 });

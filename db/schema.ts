@@ -243,5 +243,38 @@ export const nflTeamGameFeatures = sqliteTable("nfl_team_game_features", {
   index("idx_nfl_features_team").on(table.team, table.season, table.week)
 ]);
 
+export const marketSentimentImportState = sqliteTable("market_sentiment_import_state", {
+  dataset: text("dataset").primaryKey(),
+  freshness: text("freshness", { enum: ["current", "stale", "running", "unavailable"] }).notNull(),
+  sourceUrl: text("source_url"),
+  sourceHash: text("source_hash"),
+  rowCount: integer("row_count").notNull().default(0),
+  lastCheckedAt: text("last_checked_at"),
+  lastSuccessAt: text("last_success_at"),
+  lastError: text("last_error"),
+  leaseExpiresAt: text("lease_expires_at")
+});
+
+export const marketSentimentSnapshots = sqliteTable("market_sentiment_snapshots", {
+  id: text("id").primaryKey(),
+  dataset: text("dataset").notNull(),
+  providerGameId: text("provider_game_id").notNull(),
+  gameId: text("game_id").notNull(),
+  season: integer("season").notNull(),
+  week: integer("week").notNull(),
+  market: text("market", { enum: ["spread", "total", "moneyline"] }).notNull(),
+  side: text("side").notNull(),
+  ticketsPercent: real("tickets_percent").notNull(),
+  moneyPercent: real("money_percent"),
+  sampleBets: integer("sample_bets").notNull(),
+  sourceUrl: text("source_url").notNull(),
+  sourceTimestamp: text("source_timestamp").notNull(),
+  sourceHash: text("source_hash").notNull(),
+  importedAt: text("imported_at").notNull()
+}, (table) => [
+  index("idx_market_sentiment_game_time").on(table.gameId, table.sourceTimestamp),
+  index("idx_market_sentiment_dataset_hash").on(table.dataset, table.sourceHash)
+]);
+
 export type PlayRow = typeof plays.$inferSelect;
 export type NewPlayRow = typeof plays.$inferInsert;

@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { priceTwoTeamTeaserDecision, rankBestExecutionProps } from "@/domain/decision-board";
 import type {
   DecisionBoardPayload,
@@ -25,6 +25,11 @@ import { sizeKelly, type SizingResult } from "@/domain/sizing";
 import { isPacificSunday, kickoffCountdown, todayOnly } from "@/domain/sunday-mode";
 import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
 import { pickReasons } from "@/lib/week-one-data";
+import {
+  interpretMarketSentiment,
+  marketSentimentConfig,
+  selectMaterialMarketSentiment
+} from "@/domain/market-sentiment";
 
 const bookNames: Record<LineBookKey, string> = { betmgm: "BetMGM", fanduel: "FanDuel" };
 const preferredTeams = new Set<string>(PREFERRED_TEAM_CODES);
@@ -77,6 +82,45 @@ function formatKickoff(game: WeeklyMatchup): string {
     month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
   }).format(date).replace(",", " ·");
   return `${formatted} PT`.toUpperCase();
+}
+
+type ConfidenceStyle = CSSProperties & { "--bet-confidence": string };
+
+function betConfidence(candidate: MainlineRecommendation | null): number {
+  if (!candidate?.actionable) return 0;
+  const unitStrength = Math.min(1, candidate.sizing.suggestedUnits / structuralConfig.sizing.maximumUnits);
+  const evStrength = Math.min(1, Math.max(0, candidate.expectedValue) / 0.1);
+  const uncertaintyStrength = candidate.sizing.greyed ? 0.28 : 1;
+  return Math.min(1, (0.25 + unitStrength * 0.45 + evStrength * 0.3) * uncertaintyStrength);
+}
+
+function confidenceStyle(candidate: MainlineRecommendation | null): ConfidenceStyle {
+  return { "--bet-confidence": betConfidence(candidate).toFixed(3) };
+}
+
+function projectedTeamScores(input: {
+  away: string;
+  home: string;
+  projectedHomePoint: number | null;
+  projectedTotal: number | null;
+}): Record<string, number> | null {
+  if (input.projectedHomePoint === null || input.projectedTotal === null) return null;
+  const projectedHomeMargin = -input.projectedHomePoint;
+  const homeScore = Math.max(0, Math.round((input.projectedTotal + projectedHomeMargin) / 2));
+  const awayScore = Math.max(0, Math.round(input.projectedTotal - homeScore));
+  return { [input.away]: awayScore, [input.home]: homeScore };
+}
+
+function materialCurrentSentiment(
+  snapshots: DecisionBoardPayload["games"][number]["sentiment"],
+  generatedAt: string
+) {
+  const generatedTime = Date.parse(generatedAt);
+  const current = snapshots.filter((snapshot) => {
+    const ageHours = (generatedTime - Date.parse(snapshot.capturedAt)) / 3_600_000;
+    return Number.isFinite(ageHours) && ageHours >= 0 && ageHours <= marketSentimentConfig.maximumAgeHours;
+  });
+  return selectMaterialMarketSentiment(current);
 }
 
 function lineSelection(line: LiveLine): string {
@@ -753,12 +797,12 @@ export function WeekOneBoard() {
     <div className={`sportsbook-layout ${slipOpen || slip.length ? "" : "slip-collapsed"}`}>
       <section className="event-board" aria-label={`Week ${slate?.week ?? 1} game lines`}>
         <section className={`weekly-opportunity-queue ${weeklyOpportunities.length ? "has-opportunities" : "empty"}`} aria-label="Best executable model opportunities this week">
-          <header><span>BEST AVAILABLE</span><small>{weeklyOpportunities.length ? `${weeklyOpportunities.length} exact-price ${weeklyOpportunities.length === 1 ? "contract" : "contracts"}` : "No contract clears every gate"}</small></header>
+          <header><span>BEST AVAILABLE</span><small>{weeklyOpportunities.length ? `${weeklyOpportunities.length} ${weeklyOpportunities.length === 1 ? "play" : "plays"}` : "No play"}</small></header>
           {weeklyOpportunities.map((candidate, index) => {
             const matchup = visibleMatchups.find((game) => game.id === candidate.line.gameId);
             const gameIntel = intelligence?.games.find((game) => game.gameId === candidate.line.gameId);
             const context = alignMatchupEvidence(gameIntel?.signals ?? [], candidate.market, candidate.line.side);
-            return <button className={candidate.sizing.greyed ? "uncertain" : ""} onClick={() => addWeeklyOpportunity(candidate)} key={candidate.line.id}>
+            return <button className={`confidence-bet ${candidate.sizing.greyed ? "uncertain" : ""}`} style={confidenceStyle(candidate)} onClick={() => addWeeklyOpportunity(candidate)} key={candidate.line.id}>
               <span>{index + 1}</span>
               <div><small>{matchup ? `${matchup.away} @ ${matchup.home}` : candidate.line.gameId} · {bookNames[candidate.line.book]}</small><b>{lineSelection(candidate.line)} <strong>{formatOdds(candidate.line.americanPrice)}</strong></b><em className={context.verdict}>{compactEvidenceLabel(context)}</em></div>
               <div><b>+{(candidate.expectedValue * 100).toFixed(1)}%</b><small>{candidate.sizing.suggestedUnits}u{candidate.sizing.greyed ? " · UNCERTAIN" : ""}</small></div>
@@ -768,7 +812,7 @@ export function WeekOneBoard() {
         <div className="market-column-head"><span>Matchup</span>{(["spread", "total", "moneyline"] as const).map((market) => {
           const coverage = activeMarketCoverage.find((item) => item.market === market);
           return <span className={coverage?.status === "complete" ? "" : "coverage-gap"} key={market}><b>{marketShortTitle(market)}</b>{coverage && coverage.status !== "complete" && <small>{coverage.completeGames}/{coverage.totalGames} POSTED</small>}</span>;
-        })}<span>Model / edge</span></div>
+        })}<span>Edge</span></div>
         {days.map((day) => <div className="event-day" key={day}>
           <div className="event-day-label"><b>{day}</b><span>{visibleMatchups.filter((game) => game.day === day).length} games</span></div>
           {visibleMatchups.filter((game) => game.day === day).map((game) => {
@@ -784,6 +828,13 @@ export function WeekOneBoard() {
               Math.abs(weather.totalAdjustmentPoints) >= 0.5);
             const projection = gameIntel?.projections.find((item) => item.book === book);
             const totalProjection = gameIntel?.totals.find((item) => item.book === book);
+            const projectedTotalLabel = totalProjection ? `TOTAL ${totalProjection.projectedTotal}` : undefined;
+            const scorePrediction = projectedTeamScores({
+              away: game.away,
+              home: game.home,
+              projectedHomePoint: projection?.projectedHomePoint ?? null,
+              projectedTotal: totalProjection?.projectedTotal ?? null
+            });
             const deskOpen = openGame === game.id;
             const propBoard = propBoards[game.id];
             const displayedProps = rankBestExecutionProps(propBoard?.candidates ?? [], structuralConfig.props.maximumPerBook);
@@ -836,6 +887,10 @@ export function WeekOneBoard() {
               availability.inactivesConfirmed || availability.out > 0 || availability.questionable > 0 ||
               availability.qbInactive > 0 || availability.qbOutOrDoubtful > 0
             ));
+            const materialSentiment = materialCurrentSentiment(
+              gameIntel?.sentiment ?? [],
+              intelligence?.generatedAt ?? new Date().toISOString()
+            );
             return <article className={`event-market ${deskOpen ? "desk-open" : ""} ${edgeGoneDraft ? "edge-gone" : ""}`} key={game.id}>
               <div className="matchup-market-row">
                 <div className="matchup-cell">
@@ -846,10 +901,10 @@ export function WeekOneBoard() {
                     {sundayMode && <span className={availability?.inactivesConfirmed ? "pregame-confirmed" : "pregame-pending"}>{availability?.inactivesConfirmed ? "INACTIVES ✓" : "INACTIVES —"}</span>}
                     {sundayMode && <span className={weather?.roof === "unconfirmed" ? "pregame-pending" : "pregame-confirmed"}>{compactRoofStatus(weather?.roof ?? "unconfirmed")}</span>}
                   </div>
-                  <div className="team-stack">
+                  <div className="team-stack" title={projectedTotalLabel}>
                     {rowData.map((row) => <div className="team-code" key={row.team}>
                       <Image className="team-logo" src={teamLogoPath(row.team)} alt="" width={38} height={38} priority unoptimized aria-hidden="true" />
-                      <b>{row.team}</b>
+                      <div className="team-identity"><b>{row.team}</b>{scorePrediction && <span>[{scorePrediction[row.team]}]</span>}</div>
                       {preferredTeams.has(row.team) && <em title="Preferred team">★</em>}
                     </div>)}
                   </div>
@@ -866,19 +921,15 @@ export function WeekOneBoard() {
                     const againstPreference = Boolean(line && market !== "total" && [game.away, game.home].some((team) => preferredTeams.has(team) && team !== line.side));
                     const comparable = line ? lines.find((candidate) => candidate.gameId === line.gameId && candidate.book !== line.book && candidate.market === line.market && candidate.side.toLowerCase() === line.side.toLowerCase() && candidate.point === line.point) : null;
                     const bestExactPrice = Boolean(line && comparable && line.americanPrice > comparable.americanPrice);
-                    return <button className={`price-cell ${active ? "active" : ""} ${againstPreference ? "preference-conflict" : ""} ${bestExactPrice ? "best-exact-price" : ""}`} disabled={!line} onClick={() => line && toggleLine(line, `${game.away} @ ${game.home}`)} key={row.team} aria-label={line ? `Select ${lineSelection(line)} at ${formatOdds(line.americanPrice)}` : `${marketTitle(market)} unavailable`}>
-                      {line ? <>{bestExactPrice && <em>BEST</em>}<strong>{market === "moneyline" ? formatOdds(line.americanPrice) : market === "total" ? `${row.totalSide === "Over" ? "O" : "U"} ${line.point}` : formatPoint(line.point)}</strong>{market !== "moneyline" && <span>{formatOdds(line.americanPrice)}</span>}<small>{snapshotAge(line.capturedAt)}</small></> : <strong>—</strong>}
+                    const highlightedBet = Boolean(line && currentBookDecision?.actionable && currentBookDecision.line.id === line.id);
+                    return <button className={`price-cell ${active ? "active" : ""} ${againstPreference ? "preference-conflict" : ""} ${bestExactPrice ? "best-exact-price" : ""} ${highlightedBet ? "confidence-bet-cell" : ""}`} style={highlightedBet ? confidenceStyle(currentBookDecision) : undefined} disabled={!line} onClick={() => line && toggleLine(line, `${game.away} @ ${game.home}`)} key={row.team} aria-label={line ? `Select ${lineSelection(line)} at ${formatOdds(line.americanPrice)}` : `${marketTitle(market)} unavailable`}>
+                      {line ? <><strong>{market === "moneyline" ? formatOdds(line.americanPrice) : market === "total" ? `${row.totalSide === "Over" ? "O" : "U"} ${line.point}` : formatPoint(line.point)}</strong>{market !== "moneyline" && <span>{formatOdds(line.americanPrice)}</span>}<small>{snapshotAge(line.capturedAt)}</small></> : <strong>—</strong>}
                     </button>;
                   })}
                 </div>)}
-                <div className={`row-decision ${currentBookDecision?.actionable ? "actionable" : ""}`}>
-                  <div className="decision-readout">
-                    <span>MODEL</span>
-                    <b>{projection ? `${game.home} ${formatPoint(projection.projectedHomePoint)}` : "—"}</b>
-                    <small>{totalProjection ? `TOTAL ${totalProjection.projectedTotal}` : "TOTAL —"}</small>
-                  </div>
+                <div className={`row-decision confidence-bet ${currentBookDecision?.actionable ? "actionable" : ""}`} style={confidenceStyle(currentBookDecision)}>
                   <div className="decision-readout edge-readout">
-                    <span>{currentBookDecision ? marketTitle(currentBookDecision.market) : "EDGE"}</span>
+                    <span>{currentBookDecision ? lineSelection(currentBookDecision.line) : "NO PLAY"}</span>
                     <b>{edgeLabel(currentBookDecision)}</b>
                     <small>{edgeGoneDraft ? "EDGE GONE · REFRESH" : `${evLabel(currentBookDecision)} EV${decisionUnit?.included ? ` · ${decisionUnit.suggestedUnits}u` : ""}${decisionUncertain ? " · UNCERTAIN" : ""}`}</small>
                   </div>
@@ -957,7 +1008,7 @@ export function WeekOneBoard() {
                     <strong>{formatOdds(prop.americanPrice)}</strong><em>+{(prop.expectedValue * 100).toFixed(1)}% · {prop.suggestedUnits}u</em>
                   </button>) : <p>{propBoard?.message ?? "Props are scanned when books post them closer to kickoff."}</p>}
                 </section>
-                {(meaningfulSignals.length || materialMovement || materialWeather || materialAvailability) && <section className="quick-evidence">
+                {(meaningfulSignals.length || materialMovement || materialWeather || materialAvailability || materialSentiment.length) && <section className="quick-evidence">
                   {materialMovement && movementOpen && movementCurrent && <div className="movement-mini">
                     <span>OPEN → NOW</span>
                     <SpreadSparkline values={movement?.snapshots.map((snapshot) => snapshot.point) ?? []} />
@@ -976,6 +1027,20 @@ export function WeekOneBoard() {
                       <b>{availability.inactivesConfirmed ? `${availability.inactivePlayers} inactive` : `${availability.reportedPlayers} listed · ${availability.out} out · ${availability.questionable} questionable`}</b>
                       <em>{availability.qbInactive ? "QB INACTIVE" : availability.inactivesConfirmed ? "INACTIVES CONFIRMED" : availability.qbOutOrDoubtful ? "QB OUT / DOUBTFUL" : "INACTIVES PENDING"}</em>
                     </div>}
+                    {materialSentiment.map((sentiment) => {
+                      const reading = interpretMarketSentiment(sentiment);
+                      const gap = reading.moneyTicketGap;
+                      const conclusion = reading.classification === "possible_sharp_pressure"
+                        ? `POSSIBLE SHARP PRESSURE +${gap!.toFixed(0)}PP`
+                        : reading.classification === "public_lean"
+                          ? "PUBLIC LEAN"
+                          : `MONEY LAGS TICKETS ${gap === null || gap >= 0 ? "+" : ""}${gap?.toFixed(0) ?? "—"}PP`;
+                      return <div className="sentiment-inline" key={`${sentiment.market}:${sentiment.side}`} title={`Action Network public betting · ${sentiment.sourceUrl}`}>
+                        <span>{sentiment.market.toUpperCase()} FLOW</span>
+                        <b>{sentiment.side} · {sentiment.ticketsPercent.toFixed(0)}% tickets · {sentiment.moneyPercent === null ? "—" : sentiment.moneyPercent.toFixed(0)}% money · {sentiment.sampleBets.toLocaleString("en-US")} bets</b>
+                        <em>{conclusion} · {snapshotAge(sentiment.capturedAt)}</em>
+                      </div>;
+                    })}
                     <div>{meaningfulSignals.map((signal) => <article key={signal.id}>
                       <span>{signal.label}</span><b>{signal.lean}</b><small>{signal.detail}</small><p>{signalInterpretation(signal)}</p>
                     </article>)}</div>
