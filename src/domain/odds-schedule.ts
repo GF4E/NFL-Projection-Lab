@@ -22,6 +22,7 @@ export interface MainlineValidationResult {
   complete: boolean;
   completeGames: number;
   totalGames: number;
+  completeGameIds: string[];
   missingGameIds: string[];
 }
 
@@ -38,6 +39,8 @@ export interface ScheduledGame {
   home: string;
   kickoffAt: string;
 }
+
+export type ScheduledRunStatus = "running" | "succeeded" | "failed" | "skipped";
 
 const SLOT_WINDOW_MS = 15 * 60_000;
 const PROP_RETRY_WINDOW_MS = 50 * 60_000;
@@ -121,8 +124,8 @@ export function scheduledMainlineCandidates(now: Date, games: readonly Scheduled
 
 /**
  * Finds the most recent mainline snapshot the production schedule should have
- * completed. This lets an authenticated board visit repair a missed cron tick
- * without creating a new polling cadence or spending duplicate credits.
+ * completed. The five-minute background runner uses this to repair a missed
+ * cron tick without creating a second polling cadence or duplicate requests.
  */
 export function latestExpectedMainlineCandidate(
   now: Date,
@@ -141,6 +144,14 @@ export function latestExpectedMainlineCandidate(
     if (candidates.length) return candidates[0];
   }
   return null;
+}
+
+export function deterministicRecoveryCandidate(
+  candidate: ScheduledOddsCandidate,
+  existingStatus: ScheduledRunStatus | null
+): ScheduledOddsCandidate | null {
+  if (existingStatus === "succeeded") return null;
+  return existingStatus === null ? candidate : { ...candidate, key: `${candidate.key}:recovery-v2` };
 }
 
 export function scheduledPropCandidates(now: Date, games: readonly ScheduledGame[]): ScheduledOddsCandidate[] {
@@ -176,6 +187,7 @@ export function inspectMainlineCompleteness(lines: readonly MainlineCompleteness
     complete: completeGames.size === gameIds.length,
     completeGames: completeGames.size,
     totalGames: gameIds.length,
+    completeGameIds: gameIds.filter((gameId) => completeGames.has(gameId)),
     missingGameIds: gameIds.filter((gameId) => !completeGames.has(gameId))
   };
 }

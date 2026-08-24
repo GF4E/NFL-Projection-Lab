@@ -145,6 +145,9 @@ describe("automatic nflverse importer", () => {
   it("wires the five-minute schedule and Roboto into the deployed app", () => {
     expect(readFileSync("vite.config.ts", "utf8")).toContain('"*/5 * * * *"');
     expect(readFileSync("worker/index.ts", "utf8")).toContain("async scheduled");
+    expect(readFileSync("src/components/nflverse-refresh-beacon.tsx", "utf8")).toContain('method: "GET"');
+    expect(readFileSync("src/components/nflverse-refresh-beacon.tsx", "utf8")).not.toContain('method: "POST"');
+    expect(readFileSync("src/server/background-maintenance.ts", "utf8")).toContain("allowCatchup: true");
     expect(readFileSync("src/app/layout.tsx", "utf8")).toContain("@fontsource/roboto/900.css");
     expect(readFileSync("src/app/globals.css", "utf8")).toContain('--display: "Roboto"');
     expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).toContain("refreshPlayerStatsSeason");
