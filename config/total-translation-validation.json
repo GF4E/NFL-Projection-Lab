@@ -1,0 +1,165 @@
+{
+  "generatedAt": "2026-08-13T10:15:00-07:00",
+  "trainingSource": "nflverse schedules, closing totals, and final scores",
+  "sourceUrl": "https://github.com/nflverse/nfldata/raw/master/data/games.csv",
+  "dataSnapshotHash": "e43c5a3b5223fae59a4c7258ea2898af4896f0ad53b5abdc806cb7680fa767bc",
+  "trainingSeasons": [
+    2010,
+    2025
+  ],
+  "validationSeasons": [
+    2023,
+    2024,
+    2025
+  ],
+  "trainingGames": 4175,
+  "translatedOffsets": [
+    -3,
+    -2,
+    -1,
+    0,
+    1,
+    2,
+    3
+  ],
+  "timeDecayHalfLifeSeasons": 2.5,
+  "season2020Multiplier": 0.5,
+  "candidateKernelBandwidths": [
+    1,
+    1.5,
+    2,
+    2.5,
+    3,
+    4,
+    6,
+    1000
+  ],
+  "selectionMetric": "minimum rolling-origin decisive-outcome log loss subject to calibration slope in [0.8, 1.2]",
+  "selectedKernelBandwidth": 6,
+  "selected": {
+    "bandwidth": 6,
+    "logLoss": 0.6849757196132217,
+    "brier": 0.2459317782257643,
+    "pushBrier": 0.008673810048816049,
+    "calibrationIntercept": 0.023201820824651928,
+    "calibrationSlope": 1.045126026565602,
+    "decisiveObservations": 5661,
+    "pushObservations": 5712,
+    "minimumEffectiveWeight": 55.871054194086085,
+    "p10EffectiveWeight": 492.4511716919252,
+    "medianEffectiveWeight": 757.6318721343976
+  },
+  "currentLinearBaseline": {
+    "method": "0.5 minus 0.025 per point",
+    "logLoss": 0.685036922854487,
+    "brier": 0.2459616233881003,
+    "decisiveObservations": 5661
+  },
+  "relativeLogLossImprovementPercent": 0.008934298170428876,
+  "results": [
+    {
+      "bandwidth": 1,
+      "logLoss": 0.6892592801309634,
+      "brier": 0.2464153743903628,
+      "pushBrier": 0.008890241176486366,
+      "calibrationIntercept": 0.020644266343643566,
+      "calibrationSlope": 0.719425048184428,
+      "decisiveObservations": 5661,
+      "pushObservations": 5712,
+      "minimumEffectiveWeight": 0.0021952454512300526,
+      "p10EffectiveWeight": 58.33864083327728,
+      "medianEffectiveWeight": 186.28679352797502
+    },
+    {
+      "bandwidth": 1.5,
+      "logLoss": 0.6874358530097076,
+      "brier": 0.2461735299008036,
+      "pushBrier": 0.00882322871033601,
+      "calibrationIntercept": 0.0214248852316577,
+      "calibrationSlope": 0.8586140398101029,
+      "decisiveObservations": 5661,
+      "pushObservations": 5712,
+      "minimumEffectiveWeight": 0.06945745259724469,
+      "p10EffectiveWeight": 87.63573014669475,
+      "medianEffectiveWeight": 272.0017842511408
+    },
+    {
+      "bandwidth": 2,
+      "logLoss": 0.6863537484626999,
+      "brier": 0.246104704000117,
+      "pushBrier": 0.008748788412628208,
+      "calibrationIntercept": 0.02193601832693588,
+      "calibrationSlope": 0.9408475105812589,
+      "decisiveObservations": 5661,
+      "pushObservations": 5712,
+      "minimumEffectiveWeight": 0.2750363477530093,
+      "p10EffectiveWeight": 126.36205959197244,
+      "medianEffectiveWeight": 352.22955017422765
+    },
+    {
+      "bandwidth": 2.5,
+      "logLoss": 0.6856229285369424,
+      "brier": 0.24605585072599892,
+      "pushBrier": 0.008700485299305926,
+      "calibrationIntercept": 0.022273278055033142,
+      "calibrationSlope": 0.9948365451890899,
+      "decisiveObservations": 5661,
+      "pushObservations": 5712,
+      "minimumEffectiveWeight": 0.7137964665284204,
+      "p10EffectiveWeight": 169.77066843224898,
+      "medianEffectiveWeight": 427.0399979066903
+    },
+    {
+      "bandwidth": 3,
+      "logLoss": 0.6852192736785947,
+      "brier": 0.24599910676357112,
+      "pushBrier": 0.008683327962900542,
+      "calibrationIntercept": 0.022589069072756703,
+      "calibrationSlope": 1.025509173676279,
+      "decisiveObservations": 5661,
+      "pushObservations": 5712,
+      "minimumEffectiveWeight": 1.744663443245912,
+      "p10EffectiveWeight": 216.54303236676014,
+      "medianEffectiveWeight": 495.23468258197795
+    },
+    {
+      "bandwidth": 4,
+      "logLoss": 0.6849949055398482,
+      "brier": 0.2459372072041927,
+      "pushBrier": 0.008676310614233197,
+      "calibrationIntercept": 0.023030553368653964,
+      "calibrationSlope": 1.0426176532764384,
+      "decisiveObservations": 5661,
+      "pushObservations": 5712,
+      "minimumEffectiveWeight": 8.150817216982928,
+      "p10EffectiveWeight": 313.9827865587152,
+      "medianEffectiveWeight": 609.1891064046022
+    },
+    {
+      "bandwidth": 6,
+      "logLoss": 0.6849757196132217,
+      "brier": 0.2459317782257643,
+      "pushBrier": 0.008673810048816049,
+      "calibrationIntercept": 0.023201820824651928,
+      "calibrationSlope": 1.045126026565602,
+      "decisiveObservations": 5661,
+      "pushObservations": 5712,
+      "minimumEffectiveWeight": 55.871054194086085,
+      "p10EffectiveWeight": 492.4511716919252,
+      "medianEffectiveWeight": 757.6318721343976
+    },
+    {
+      "bandwidth": 1000,
+      "logLoss": 0.685050739903174,
+      "brier": 0.24596914740406872,
+      "pushBrier": 0.008669897213586754,
+      "calibrationIntercept": 0.02307004042244493,
+      "calibrationSlope": 1.049061919701368,
+      "decisiveObservations": 5661,
+      "pushObservations": 5712,
+      "minimumEffectiveWeight": 981.9300335139069,
+      "p10EffectiveWeight": 982.0559348687682,
+      "medianEffectiveWeight": 1016.2629940004132
+    }
+  ]
+}

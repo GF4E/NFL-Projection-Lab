@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-08-13T04:37:09.885939+00:00",
+  "trainingSource": "nflverse weekly player statistics and snap-count participation",
+  "sourceSeasons": [2020, 2021, 2022, 2023, 2024, 2025],
+  "baseline": "Eight-game exponentially weighted yardage mean with 0.85 per-game recency weight",
+  "challenger": "Eight-game workload forecast multiplied by player yards per opportunity, shrunk toward the leakage-safe cumulative league rate",
+  "leakageControl": "Every forecast, player history and league prior uses only earlier completed weeks",
+  "parameterSelection": "35 candidates selected on 2022-2023 only; 2024-2025 untouched holdout",
+  "promotionGate": "Positive holdout MAE and RMSE, positive MAE in each holdout season, and player-season block-bootstrap 80% interval above zero",
+  "results": [
+    {
+      "market": "player_pass_yds",
+      "selectedUsageRecencyWeight": 0.75,
+      "selectedEfficiencyPriorOpportunities": 160,
+      "holdoutForecasts": 1167,
+      "holdoutBaselineMae": 65.4677,
+      "holdoutChallengerMae": 65.1516,
+      "holdoutRelativeMaeImprovementPercent": 0.483,
+      "holdoutBaselineRmse": 84.3101,
+      "holdoutChallengerRmse": 83.4705,
+      "blockBootstrap80PercentMeanAbsoluteErrorImprovement": [-0.2325, 0.8709],
+      "holdoutSeasonImprovementPercent": { "2024": 2.266, "2025": -1.414 },
+      "decision": "rejected"
+    },
+    {
+      "market": "player_rush_yds",
+      "selectedUsageRecencyWeight": 0.75,
+      "selectedEfficiencyPriorOpportunities": 40,
+      "holdoutForecasts": 3852,
+      "holdoutBaselineMae": 17.5724,
+      "holdoutChallengerMae": 17.4371,
+      "holdoutRelativeMaeImprovementPercent": 0.77,
+      "holdoutBaselineRmse": 25.9052,
+      "holdoutChallengerRmse": 25.7051,
+      "blockBootstrap80PercentMeanAbsoluteErrorImprovement": [0.055, 0.2147],
+      "holdoutSeasonImprovementPercent": { "2024": 0.742, "2025": 0.799 },
+      "decision": "promoted"
+    },
+    {
+      "market": "player_reception_yds",
+      "selectedUsageRecencyWeight": 0.85,
+      "selectedEfficiencyPriorOpportunities": 20,
+      "holdoutForecasts": 7600,
+      "holdoutBaselineMae": 18.701,
+      "holdoutChallengerMae": 18.3552,
+      "holdoutRelativeMaeImprovementPercent": 1.849,
+      "holdoutBaselineRmse": 26.284,
+      "holdoutChallengerRmse": 25.8061,
+      "blockBootstrap80PercentMeanAbsoluteErrorImprovement": [0.29, 0.4038],
+      "holdoutSeasonImprovementPercent": { "2024": 1.842, "2025": 1.857 },
+      "decision": "promoted"
+    }
+  ]
+}
