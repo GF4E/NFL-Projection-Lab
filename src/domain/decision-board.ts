@@ -4,6 +4,8 @@ import { structuralConfig } from "./config";
 import { sizeKelly } from "./sizing";
 import { PREFERRED_TEAM_CODES } from "./team-preferences";
 import type { MarketSentimentSnapshot } from "./market-sentiment";
+import type { JointScoreDistribution, MainlineProbabilities } from "./joint-score";
+import type { ScenarioDecisionDossier, ScenarioDecisionStatus } from "./scenarios";
 
 export const PROP_MARKETS = [
   "player_pass_yds",
@@ -373,6 +375,8 @@ export function summarizeGameAvailability(input: {
 
 export interface DecisionBoardGame {
   gameId: string;
+  sourceGameId?: string;
+  kickoffAt?: string;
   awayTeam?: string;
   homeTeam?: string;
   away: TeamBaseline | null;
@@ -389,6 +393,29 @@ export interface DecisionBoardGame {
   availability: GameAvailabilityContext;
   weather: GameWeatherContext;
   quarterbacks: GameQuarterbackContext;
+  scoreForecast?: JointScoreForecast;
+  /** Background-only archive material. Public requests omit these large probability grids. */
+  internalScoreArtifact?: {
+    distribution: JointScoreDistribution;
+    dossier: ScenarioDecisionDossier;
+  };
+}
+
+export interface JointScoreForecast {
+  status: "current" | "stale" | "withheld";
+  reason: string | null;
+  family: "market_anchored_discrete";
+  distributionHash: string | null;
+  trainingGames: number;
+  effectiveTrainingGames: number;
+  expectedHomeScore: number | null;
+  expectedAwayScore: number | null;
+  mainline: MainlineProbabilities | null;
+  scenarioStatus: ScenarioDecisionStatus | "withheld";
+  quoteFresh: boolean;
+  quoteAgeMinutes: number | null;
+  whatChangesTheView: string[];
+  generatedAt: string;
 }
 
 export interface TeamQuarterbackContext {

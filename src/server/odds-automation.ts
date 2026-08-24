@@ -116,7 +116,7 @@ export async function refreshCompleteSlateMainlines(input: {
     ]);
     const first = input.matchups[0];
     if (first) {
-      const board = await buildDecisionBoard(db, { season: first.season, week: first.week });
+      const board = await buildDecisionBoard(db, { season: first.season, week: first.week, initializeStores: true });
       await publishEdgeThresholdNotifications({
         db,
         board,

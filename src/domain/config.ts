@@ -27,6 +27,14 @@ export interface StructuralConfig {
     totalTranslationValidationArtifact: string;
     totalTranslationKernelBandwidth: number;
     seasonEffects: string;
+    scoreDistribution: {
+      maxScore: number;
+      minimumTrainingGames: number;
+      maximumQuoteAgeMinutes: number;
+      bakeoffCalibrationSlope: [number, number];
+      bakeoffCoverage80: [number, number];
+      maximumLogLossRegression: number;
+    };
   };
   sizing: {
     kellyFraction: number;

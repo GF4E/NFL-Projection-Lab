@@ -1,0 +1,17 @@
+{
+  "version": "2026.1",
+  "sources": [
+    { "id": "nflverse_pbp", "role": "play_by_play", "coverage": "1999-current", "regime": "historical_and_current", "license": "nflverse terms", "pointInTimeField": "published_at", "required": true },
+    { "id": "nflverse_schedules", "role": "schedule_finals", "coverage": "1999-current", "regime": "historical_and_current", "license": "nflverse terms", "pointInTimeField": "captured_at", "required": true },
+    { "id": "nflverse_rosters", "role": "rosters_depth", "coverage": "seasonal", "regime": "historical_and_current", "license": "nflverse terms", "pointInTimeField": "published_at", "required": true },
+    { "id": "nflverse_weekly_stats", "role": "player_aggregates", "coverage": "1999-current", "regime": "historical_and_current", "license": "nflverse terms", "pointInTimeField": "published_at", "required": true },
+    { "id": "nflverse_injuries", "role": "historical_injuries", "coverage": "2010-2024", "regime": "historical_only", "license": "nflverse terms", "pointInTimeField": "report_date", "required": false },
+    { "id": "official_nfl_injuries", "role": "current_injuries_inactives", "coverage": "2026-current", "regime": "current_only", "license": "source terms", "pointInTimeField": "source_timestamp", "required": true },
+    { "id": "the_odds_api", "role": "market_prices", "coverage": "subscription_dependent", "regime": "captured_snapshots", "license": "provider terms", "pointInTimeField": "captured_at", "required": true },
+    { "id": "open_meteo_forecast", "role": "weather_forecast", "coverage": "forecast_archive_dependent", "regime": "as_issued_only", "license": "CC BY 4.0", "pointInTimeField": "issued_at", "required": false },
+    { "id": "next_gen_stats", "role": "tracking_aggregates", "coverage": "published_aggregates_only", "regime": "shadow_candidate", "license": "NFL terms", "pointInTimeField": "published_at", "required": false },
+    { "id": "public_betting_splits", "role": "diagnostic_sentiment", "coverage": "source_dependent", "regime": "diagnostic_not_truth", "license": "source terms", "pointInTimeField": "captured_at", "required": false },
+    { "id": "raw_tracking_data", "role": "player_tracking", "coverage": "unavailable", "regime": "licensed_only", "license": "restricted", "pointInTimeField": null, "required": false }
+  ]
+}
+
