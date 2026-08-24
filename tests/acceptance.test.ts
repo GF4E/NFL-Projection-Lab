@@ -788,6 +788,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(automation).toContain("publishableCompleteGameLines");
     expect(automation).toContain("last good prices preserved for");
     expect(store).toContain("A single game is the publication boundary");
+    const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    expect(board).toContain("if (staleGameIds.has(game.id)) return []");
+    expect(board).toContain("const allBookRecommendations = staleGameIds.has(game.id) ? []");
   });
 
   it("29. derives the active week and Pacific-ready kickoff from the nflverse schedule", () => {
