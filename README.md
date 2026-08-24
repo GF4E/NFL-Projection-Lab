@@ -29,7 +29,7 @@ A public NFL analytics site for comparing live market prices with leakage-safe m
 - Official NFL/team sources for current injury reports and inactives.
 - Open-Meteo for outdoor or open-roof kickoff-hour weather.
 
-The Cloudflare Worker runs the refresh and model lifecycle on its schedule. Public HTTP access is read-only, so visitors cannot spend provider credits, trigger model refits, modify forecasts, or create records. A failed import preserves the last validated data. A partial odds board publishes only complete two-book games and marks each incomplete game stale.
+The Cloudflare Worker runs the refresh and model lifecycle on its schedule. Public HTTP access cannot choose provider requests, trigger model refits, modify forecasts, or create records. An authenticated stale-board read may claim only one deterministic scheduled recovery lease; repeated reads cannot spend twice. A failed import preserves the last validated data. A partial odds board publishes only complete two-book games and marks each incomplete game stale.
 
 ## Local preview
 

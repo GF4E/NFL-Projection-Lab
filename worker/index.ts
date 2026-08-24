@@ -3,7 +3,7 @@ import handler from "vinext/server/app-router-entry";
 import { listNflverseImportStates } from "../src/server/nflverse/store";
 import { buildDecisionBoard } from "../src/server/decision-board";
 import { getPlayerPropBoard } from "../src/server/player-props";
-import { listOddsAutomationRuns } from "../src/server/odds-automation";
+import { listOddsAutomationRuns, runScheduledOddsAutomation } from "../src/server/odds-automation";
 import { weeklySlate } from "../src/server/weekly-slate";
 import { listOfficialInjuryImportStates } from "../src/server/official-injuries/store";
 import { listPregameContextStates } from "../src/server/pregame-context/store";
@@ -77,6 +77,19 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (
+      url.pathname === "/api/lines" && request.method === "GET" && env.ODDS_API_KEY &&
+      request.headers.has("oai-authenticated-user-email")
+    ) {
+      // Sites does not guarantee that a packaged cron fires immediately after a
+      // deployment. An authenticated board read may claim only the deterministic
+      // scheduled recovery lease; it cannot choose a cadence or spend twice.
+      ctx.waitUntil(runScheduledOddsAutomation({
+        db: env.DB,
+        apiKey: env.ODDS_API_KEY,
+        allowCatchup: true
+      }).catch(() => undefined));
+    }
     // Keep automation control outside the framework router so cron, browser wakeups,
     // and production deployments all reach the same Cloudflare-bound D1 database.
     if (url.pathname === "/api/nflverse") {
