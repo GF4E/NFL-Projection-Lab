@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { priceTwoTeamTeaserDecision, rankBestExecutionProps } from "@/domain/decision-board";
 import type {
@@ -12,19 +11,15 @@ import type {
   TeaserCandidate,
   TeaserPairCandidate
 } from "@/domain/decision-board";
-import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, isPricedSlipApprovable, updateSlipSelections, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
-import { priceIndependentParlayDecision } from "@/domain/forecast-value";
+import { analyzeSlipValue, bestCoveredExecutionBook, decimalToAmerican, updateSlipSelections, type LineBookKey, type LineMarketKey, type LiveLine, type ValueLeg } from "@/domain/line-board";
 import { alignMatchupEvidence, compactEvidenceLabel, evidenceDetail, materialEvidenceSignals } from "@/domain/evidence-alignment";
 import { americanToDecimal, expectedValueWithPush, quoteCostCents } from "@/domain/odds";
 import { rankBestBookMainlineRecommendations, rankMainlineRecommendations, rankWeeklyMainlineRecommendations, type MainlineRecommendation } from "@/domain/mainline-recommendations";
 import { structuralConfig } from "@/domain/config";
 import { playerPropBoardIsActionable } from "@/domain/player-prop-status";
-import { PREFERRED_TEAM_CODES } from "@/domain/team-preferences";
-import { exactContractApprovalRequest, isTeamApproved, summarizeTeamCardPortfolio, teamCardPortfolioBatchConflicts, type PickedBy, type TeamCardPortfolioPosition, type WeeklyPlay } from "@/domain/play-card";
 import { sizeKelly, type SizingResult } from "@/domain/sizing";
 import { isPacificSunday, kickoffCountdown, todayOnly } from "@/domain/sunday-mode";
 import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
-import { pickReasons } from "@/lib/week-one-data";
 import {
   interpretMarketSentiment,
   marketSentimentConfig,
@@ -32,7 +27,7 @@ import {
 } from "@/domain/market-sentiment";
 
 const bookNames: Record<LineBookKey, string> = { betmgm: "BetMGM", fanduel: "FanDuel" };
-const preferredTeams = new Set<string>(PREFERRED_TEAM_CODES);
+const neutralPreferences = new Set<string>();
 
 type SlipMode = "straight" | "parlay" | "teaser";
 type LinesResponse = { lines?: LiveLine[]; configured?: boolean; season?: number; week?: number; comparisonBooks?: LineBookKey[]; error?: string; cached?: boolean; stale?: boolean };
@@ -147,16 +142,6 @@ function legBetProbability(leg: SelectedLeg): number | null {
   return leg.fairProbability === null ? null : Math.min(0.99, Math.max(0.01, leg.fairProbability + (leg.edge ?? 0)));
 }
 
-function slipExpectedValuePercent(legs: readonly SelectedLeg[]): number {
-  if (!legs.length || legs.some((leg) => leg.fairProbability === null)) return 0;
-  const expectedReturn = legs.reduce((product, leg) => {
-    const probability = Math.min(0.99, Math.max(0.01, (leg.fairProbability ?? 0) + (leg.edge ?? 0)));
-    const push = leg.pushProbability ?? 0;
-    return product * (push + (1 - push) * probability * americanToDecimal(leg.americanPrice));
-  }, 1);
-  return (expectedReturn - 1) * 100;
-}
-
 function recommendation(
   probability: number | null,
   americanPrice: number | null,
@@ -261,13 +246,8 @@ export function WeekOneBoard() {
   const [linesStale, setLinesStale] = useState(false);
   const [configured, setConfigured] = useState(false);
   const [slip, setSlip] = useState<SelectedLeg[]>([]);
-  const [picker, setPicker] = useState<PickedBy>("gabe");
   const [slipMode, setSlipMode] = useState<SlipMode>("parlay");
-  const [reason, setReason] = useState("model-price");
-  const [stake, setStake] = useState(25);
-  const [executionStatus, setExecutionStatus] = useState<"paper" | "executed">("paper");
-  const [plays, setPlays] = useState<WeeklyPlay[]>([]);
-  const [message, setMessage] = useState("Select any price cell to add it to the slip.");
+  const [message, setMessage] = useState("Select a price to analyze its probability, expected value, and vig drag.");
   const [intelligence, setIntelligence] = useState<DecisionBoardPayload | null>(null);
   const [openGame, setOpenGame] = useState<string | null>(null);
   const [propBoards, setPropBoards] = useState<Record<string, PlayerPropBoard>>({});
@@ -300,56 +280,9 @@ export function WeekOneBoard() {
     const priced = priceTwoTeamTeaserDecision(slip.map((leg) => ({ conditionalWinProbability: leg.fairProbability!, pushProbability: leg.pushProbability!, probabilityMembers: leg.probabilityMembers!, pushProbabilityMembers: leg.pushProbabilityMembers! })), teaserPrice);
     return priced ? { ...priced, evPercent: priced.expectedValue * 100 } : null;
   }, [slip, slipMode, teaserPrice]);
-  const parlayDecision = useMemo(() => slipMode === "parlay" ? priceIndependentParlayDecision(slip.map((leg) => ({
-    betProbability: legBetProbability(leg),
-    pushProbability: leg.pushProbability ?? null,
-    uncertaintyInterval: leg.probabilityInterval ?? null
-  })), slip.length > 1 ? combinedAmerican(slip) : -110) : null, [slip, slipMode]);
   const straightSizing = useMemo(() => slipMode === "straight"
     ? slip.map(straightLegSizing)
     : [], [slip, slipMode]);
-  const preferenceConflicts = useMemo(() => slip.map((leg) => {
-    if (leg.kind === "prop" || leg.market === "total") return false;
-    const matchup = matchups.find((game) => game.id === leg.gameId);
-    return Boolean(matchup && [matchup.away, matchup.home].some((team) => preferredTeams.has(team) && team !== leg.side));
-  }), [matchups, slip]);
-  const preferenceGateCleared = useMemo(() => preferenceConflicts.every((conflict, index) => {
-    if (!conflict) return true;
-    if (slipMode === "teaser") return Boolean(teaserValue && teaserValue.expectedValue >= structuralConfig.teasers.preferredOpponentExceptionalEv);
-    return (slip[index]?.edge ?? Number.NEGATIVE_INFINITY) >= structuralConfig.monitoring.pushEdgeThreshold;
-  }), [preferenceConflicts, slip, slipMode, teaserValue]);
-  const straightEligibleLegCount = straightSizing.filter((sizing, index) => sizing?.included && (
-    !preferenceConflicts[index] ||
-    (slip[index]?.edge ?? Number.NEGATIVE_INFINITY) >= structuralConfig.monitoring.pushEdgeThreshold
-  )).length;
-  const officialPlays = useMemo(() => plays.filter((play) => isTeamApproved(play.approvals)), [plays]);
-  const portfolio = useMemo(() => summarizeTeamCardPortfolio(officialPlays, slate?.week ?? 1), [officialPlays, slate?.week]);
-  const proposedPortfolioPositions = useMemo<TeamCardPortfolioPosition[]>(() => {
-    if (!slip.length || !slate) return [];
-    const position = (legs: readonly SelectedLeg[], market: string, gameId: string): TeamCardPortfolioPosition => ({
-      week: slate.week,
-      gameId,
-      market,
-      stakeCents: Math.round(stake * 100),
-      contract: legs.map((leg) => ({
-        sourceQuoteId: leg.sourceQuoteId,
-        gameId: leg.gameId,
-        market: leg.kind === "teaser" ? "teaser" : leg.market === "prop" ? "prop" : leg.market,
-        side: leg.side,
-        point: leg.point,
-        americanPrice: leg.americanPrice,
-        selection: leg.selection
-      }))
-    });
-    return slipMode === "straight"
-      ? slip.map((leg) => position([leg], leg.market, leg.gameId))
-      : [position(slip, slipMode, `multi-week-${slate.week}`)];
-  }, [slip, slipMode, slate, stake]);
-  const portfolioConflicts = useMemo(() => teamCardPortfolioBatchConflicts(
-    officialPlays,
-    proposedPortfolioPositions
-  ), [officialPlays, proposedPortfolioPositions]);
-  const proposedUnits = proposedPortfolioPositions.reduce((sum, position) => sum + position.stakeCents / 2_500, 0);
   const weeklyOpportunities = useMemo(() => rankWeeklyMainlineRecommendations(visibleMatchups.flatMap((game) => {
     const gameIntel = intelligence?.games.find((item) => item.gameId === game.id);
     if (!gameIntel) return [];
@@ -362,36 +295,9 @@ export function WeekOneBoard() {
       spread: gameIntel.projections.find((item) => item.book === executionBook) ?? null,
       total: gameIntel.totals.find((item) => item.book === executionBook) ?? null,
       moneyline: gameIntel.moneylines.find((item) => item.book === executionBook) ?? null,
-      preferredTeams
+      preferredTeams: neutralPreferences
     }));
-  }), Math.max(1, visibleMatchups.length * 2)).filter((candidate) => {
-    if (!slate) return false;
-    const position: TeamCardPortfolioPosition = {
-      week: slate.week,
-      gameId: candidate.line.gameId,
-      market: candidate.line.market,
-      stakeCents: candidate.sizing.suggestedUnits * 2_500,
-      contract: [{
-        sourceQuoteId: candidate.line.id,
-        gameId: candidate.line.gameId,
-        market: candidate.line.market,
-        side: candidate.line.side,
-        point: candidate.line.point,
-        americanPrice: candidate.line.americanPrice,
-        selection: lineSelection(candidate.line)
-      }]
-    };
-    return teamCardPortfolioBatchConflicts(officialPlays, [position]).length === 0;
-  }).slice(0, 5), [intelligence, lines, officialPlays, slate, visibleMatchups]);
-  const slipCanApprove = isPricedSlipApprovable({
-    mode: slipMode,
-    legCount: slip.length,
-    straightEligibleLegCount,
-    singleBook: new Set(slip.map((leg) => leg.book)).size <= 1,
-    standardValue: slipValue,
-    teaserExpectedValuePercent: teaserValue?.sizing.included ? teaserValue.evPercent : null
-  }) && (slipMode !== "parlay" || Boolean(parlayDecision?.sizing.included && parlayDecision.expectedValue >= 0)) && preferenceGateCleared &&
-    portfolioConflicts.length === 0;
+  }), Math.max(1, visibleMatchups.length * 2)).slice(0, 5), [intelligence, lines, visibleMatchups]);
 
   useEffect(() => {
     const initial = window.setTimeout(() => setNow(new Date().toISOString()), 0);
@@ -409,9 +315,8 @@ export function WeekOneBoard() {
       const slateData = await slateResponse.json() as WeeklySlate & { error?: string };
       if (!slateResponse.ok || slateData.error) throw new Error(slateData.error ?? "The weekly schedule is unavailable");
       const query = `?week=${slateData.week}`;
-      const [lineData, playData, decisionData] = await Promise.all([
+      const [lineData, decisionData] = await Promise.all([
         fetch(`/api/lines${query}`).then((response) => response.json() as Promise<LinesResponse>),
-        fetch(`/api/plays${query}`).then((response) => response.json() as Promise<{ plays?: WeeklyPlay[]; actor?: PickedBy }>),
         fetch(`/api/decision-board${query}`).then((response) => response.json() as Promise<DecisionResponse>)
       ]);
       if (!active) return;
@@ -424,25 +329,9 @@ export function WeekOneBoard() {
         initialBookChosen.current = true;
       }
       setConfigured(Boolean(lineData.configured));
-      setPlays(playData.plays ?? []);
-      if (playData.actor) setPicker(playData.actor);
       if (!decisionData.error) setIntelligence(decisionData);
       if (!lineData.configured) setMessage("Live prices need the Odds API key. The board will not invent them.");
-      if (lineData.configured && lineData.stale) {
-        const refreshResponse = await fetch(`/api/lines${query}`, { method: "POST" });
-        const refreshed = await refreshResponse.json() as LinesResponse;
-        if (!active) return;
-        if (!refreshResponse.ok || refreshed.error) {
-          setLinesStale(true);
-          setMessage(refreshed.error ?? "The latest prices are unavailable; the last good board is preserved.");
-          return;
-        }
-        const refreshedLines = refreshed.lines ?? nextLines;
-        setLines(refreshedLines);
-        setLinesStale(Boolean(refreshed.stale));
-        const refreshedDecision = await fetch(`/api/decision-board${query}`).then((response) => response.json() as Promise<DecisionResponse>);
-        if (active && !refreshedDecision.error) setIntelligence(refreshedDecision);
-      }
+      if (lineData.configured && lineData.stale) setMessage("The scheduled refresh is pending; the last validated prices remain visible.");
     };
     void load().catch((error) => active && setMessage(error instanceof Error ? error.message : "The last good board could not be loaded."));
     const refreshed = () => {
@@ -545,8 +434,6 @@ export function WeekOneBoard() {
       return;
     }
     const leg = mainlineLeg(line, matchup);
-    const sized = straightLegSizing(leg);
-    if (sized?.included) setStake(sized.suggestedUnits * 25);
     addLeg(leg, mode);
   }
 
@@ -560,7 +447,6 @@ export function WeekOneBoard() {
 
   function addProp(prop: PropCandidate, matchup: string) {
     setSlipMode("straight");
-    setStake(prop.suggestedUnits * 25);
     addLeg(propLeg(prop, matchup), "straight");
   }
 
@@ -617,168 +503,7 @@ export function WeekOneBoard() {
     setSlipOpen(true);
     setSlip(legs);
     setTeaserPrice(pair.screeningAmerican);
-    setStake(pair.suggestedUnits * 25);
-    setMessage(`Push-adjusted ${bookNames[pair.book]} teaser pair loaded. Confirm the offered price before saving.`);
-  }
-
-  function bestPaperEquivalent(leg: SelectedLeg, targetBook?: LineBookKey): SelectedLeg | null {
-    if (leg.kind === "mainline") {
-      const equivalent = lines
-        .filter((line) => line.gameId === leg.gameId && line.market === leg.market && line.side.toLowerCase() === leg.side.toLowerCase() && (!targetBook || line.book === targetBook))
-        .map((line) => mainlineLeg(line, leg.matchup))
-        .filter((candidate) => candidate.edge !== null && candidate.probabilityInterval)
-        .sort((left, right) => legExpectedValuePercent(right) - legExpectedValuePercent(left));
-      return equivalent[0] ?? null;
-    }
-    if (leg.kind === "prop") {
-      const equivalent = Object.values(propBoards).filter(playerPropBoardIsActionable).flatMap((board) => board.candidates)
-        .filter((candidate) => `${candidate.gameId}:prop:${candidate.market}:${candidate.player.toLowerCase()}` === leg.thesisKey && (!targetBook || candidate.executionBook === targetBook))
-        .sort((left, right) => right.lowerBoundExpectedValue - left.lowerBoundExpectedValue || right.expectedValue - left.expectedValue);
-      return equivalent[0] ? propLeg(equivalent[0], leg.matchup) : null;
-    }
-    return null;
-  }
-
-  function normalizedPaperSlip(): SelectedLeg[] {
-    if (slipMode === "straight") return slip.map((leg) => bestPaperEquivalent(leg) ?? leg);
-    if (slipMode === "parlay") {
-      const alternatives = (["betmgm", "fanduel"] as const).flatMap((candidateBook) => {
-        const candidate = slip.map((leg) => bestPaperEquivalent(leg, candidateBook));
-        return candidate.every((leg): leg is SelectedLeg => leg !== null)
-          ? [{ legs: candidate, ev: slipExpectedValuePercent(candidate) }]
-          : [];
-      }).sort((left, right) => right.ev - left.ev);
-      return alternatives[0]?.legs ?? slip;
-    }
-    const selectedTheses = [...slip.map((leg) => `${leg.gameId}:${leg.side}`)].sort().join("|");
-    const alternatives = (intelligence?.teaserPairs ?? []).flatMap((pair) => {
-      const pairTheses = [...pair.legs.map((leg) => `${leg.gameId}:${leg.team}`)].sort().join("|");
-      if (pairTheses !== selectedTheses) return [];
-      const decision = priceTwoTeamTeaserDecision(pair.legs.map((leg) => ({
-        conditionalWinProbability: leg.fairProbability!, pushProbability: leg.pushProbability!,
-        probabilityMembers: leg.probabilityMembers!, pushProbabilityMembers: leg.pushProbabilityMembers!
-      })), teaserPrice);
-      return decision ? [{ pair, expectedValue: decision.expectedValue }] : [];
-    }).sort((left, right) => right.expectedValue - left.expectedValue);
-    return alternatives[0] ? teaserPairLegs(alternatives[0].pair) : slip;
-  }
-
-  function sameSlipContract(left: readonly SelectedLeg[], right: readonly SelectedLeg[]): boolean {
-    return left.length === right.length && left.every((leg, index) =>
-      leg.sourceQuoteId === right[index]?.sourceQuoteId && leg.point === right[index]?.point && leg.americanPrice === right[index]?.americanPrice
-    );
-  }
-
-  async function saveSlip() {
-    if (!slip.length || !slate) return;
-    if (executionStatus === "paper") {
-      const normalized = normalizedPaperSlip();
-      if (!sameSlipContract(slip, normalized)) {
-        setSlip(normalized);
-        if (new Set(normalized.map((leg) => leg.book)).size === 1) setBook(normalized[0].book);
-        setMessage("Paper card moved to the highest-EV supported book contract. Review the changed point and price, then approve again.");
-        return;
-      }
-    }
-    if (slipMode === "parlay" && slip.length < 2) {
-      setMessage("A parlay needs at least two legs. Switch to Straights or add another line.");
-      return;
-    }
-    if (slipMode === "parlay" && !slipValue) {
-      setMessage("Fair parlay value is withheld for same-game or incomplete-price legs.");
-      return;
-    }
-    if (slipMode === "straight" && straightEligibleLegCount !== slip.length) {
-      setMessage("Straight withheld: every contract must have a current model probability, an 80% interval, and at least a 0.5u Kelly result.");
-      return;
-    }
-    if (portfolioConflicts.length) {
-      setMessage(`Team-card limit: ${portfolioConflicts[0].message}.`);
-      return;
-    }
-    if (slipMode === "teaser" && (!teaserValue || teaserValue.evPercent < 0 || !teaserValue.sizing.included)) {
-      setMessage("Teaser withheld: the exact price must clear the empirical uncertainty and 0.5u Kelly gates.");
-      return;
-    }
-    setMessage(`Recording ${picker === "gabe" ? "Gabe" : "Jarrett"}'s Week ${slate.week} approval…`);
-    const selectedReason = pickReasons.find((item) => item.value === reason) ?? pickReasons[0];
-    const entries = slipMode === "straight" ? slip.map((leg) => ({
-      gameId: leg.gameId,
-      book: bookNames[leg.book],
-      playType: "single" as const,
-      market: leg.market === "prop" ? "prop" as const : leg.market as "spread" | "moneyline" | "total",
-      title: leg.selection,
-      legs: `${leg.matchup} · ${leg.detail}`,
-      americanOdds: leg.americanPrice,
-      modelEdgePp: (leg.edge ?? 0) * 100,
-      estimatedEvPercent: legExpectedValuePercent(leg),
-      statsCase: `${selectedReason.label}. ${leg.detail}.`,
-      contract: [{ sourceQuoteId: leg.sourceQuoteId, gameId: leg.gameId, market: leg.market === "prop" ? "prop" as const : leg.market as "spread" | "total" | "moneyline", side: leg.side, point: leg.point, americanPrice: leg.americanPrice, selection: leg.selection }]
-    })) : [{
-      gameId: `multi-week-${slate.week}`,
-      book: bookNames[slip[0].book],
-      playType: slipMode,
-      market: slipMode,
-      title: `${slip.length}-leg ${bookNames[slip[0].book]} ${slipMode}`,
-      legs: slip.map((leg) => `${leg.selection} (${leg.matchup})`).join(" · "),
-      americanOdds: slipMode === "teaser" ? teaserPrice : combinedAmerican(slip),
-      modelEdgePp: 0,
-      estimatedEvPercent: slipMode === "teaser" ? teaserValue?.evPercent ?? 0 : slipExpectedValuePercent(slip),
-      statsCase: `${selectedReason.label}. ${slipMode === "teaser" ? "Push-adjusted empirical teaser EV cleared the selected book price." : "Power-de-vigged independent-leg price check completed."}`,
-      contract: slip.map((leg) => ({ sourceQuoteId: leg.sourceQuoteId, gameId: leg.gameId, market: leg.kind === "teaser" ? "teaser" as const : leg.market === "prop" ? "prop" as const : leg.market as "spread" | "total" | "moneyline", side: leg.side, point: leg.point, americanPrice: leg.americanPrice, selection: leg.selection }))
-    }];
-    try {
-      const saved = await Promise.all(entries.map(async (entry) => {
-        const response = await fetch("/api/plays", {
-          method: "POST",
-          headers: { "content-type": "application/json" },
-          body: JSON.stringify({
-            ...entry,
-            week: slate.week,
-            primaryReason: reason, stakeDollars: stake,
-            executionStatus, cashPlacementConfirmed: false,
-            confidence: "play", footballCase: "The team selected this exact contract from the shared decision board.", status: "card"
-          })
-        });
-        const data = await response.json() as { play?: WeeklyPlay; error?: string };
-        if (!response.ok || !data.play) throw new Error(data.error ?? "Could not save the slip");
-        return data.play;
-      }));
-      setPlays((current) => {
-        const next = new Map(current.map((play) => [play.id, play]));
-        for (const play of saved) next.set(play.id, play);
-        return [...next.values()];
-      });
-      if (saved.every((play) => isTeamApproved(play.approvals))) {
-        setSlip([]);
-        setMessage(`Team approved · ${saved.length} ${saved.length === 1 ? "pick is" : "picks are"} now official.`);
-      } else {
-        const missing = picker === "gabe" ? "Jarrett" : "Gabe";
-        setMessage(`${picker === "gabe" ? "Gabe" : "Jarrett"} approved. Awaiting ${missing} on this exact contract.`);
-      }
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Could not save the slip");
-    }
-  }
-
-  async function approvePending(play: WeeklyPlay) {
-    if (isTeamApproved(play.approvals) || play.approvals?.includes(picker)) return;
-    setMessage(`Rechecking ${play.title} at ${play.book} before ${picker === "gabe" ? "Gabe" : "Jarrett"} approves…`);
-    try {
-      const response = await fetch("/api/plays", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify(exactContractApprovalRequest(play, play.executionStatus === "executed"))
-      });
-      const data = await response.json() as { play?: WeeklyPlay; error?: string };
-      if (!response.ok || !data.play) throw new Error(data.error ?? "Approval failed");
-      setPlays((current) => current.map((row) => row.id === data.play!.id ? data.play! : row));
-      setMessage(isTeamApproved(data.play.approvals)
-        ? `Team approved · ${data.play.title} is now official.`
-        : `${picker === "gabe" ? "Gabe" : "Jarrett"} approved. Awaiting the other teammate.`);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Approval failed");
-    }
+    setMessage(`Push-adjusted ${bookNames[pair.book]} teaser pair loaded for price analysis.`);
   }
 
   return <div className={`sportsbook-board book-${book}`}>
@@ -797,7 +522,7 @@ export function WeekOneBoard() {
     <div className={`sportsbook-layout ${slipOpen || slip.length ? "" : "slip-collapsed"}`}>
       <section className="event-board" aria-label={`Week ${slate?.week ?? 1} game lines`}>
         <section className={`weekly-opportunity-queue ${weeklyOpportunities.length ? "has-opportunities" : "empty"}`} aria-label="Best executable model opportunities this week">
-          <header><span>BEST AVAILABLE</span><small>{weeklyOpportunities.length ? `${weeklyOpportunities.length} ${weeklyOpportunities.length === 1 ? "play" : "plays"}` : "No play"}</small></header>
+          <header><span>MODEL EDGE BOARD</span><small>{weeklyOpportunities.length ? `${weeklyOpportunities.length} ${weeklyOpportunities.length === 1 ? "signal" : "signals"}` : "No qualifying edge"}</small></header>
           {weeklyOpportunities.map((candidate, index) => {
             const matchup = visibleMatchups.find((game) => game.id === candidate.line.gameId);
             const gameIntel = intelligence?.games.find((game) => game.gameId === candidate.line.gameId);
@@ -856,7 +581,7 @@ export function WeekOneBoard() {
                 spread: gameIntel?.projections.find((item) => item.book === executionBook) ?? null,
                 total: gameIntel?.totals.find((item) => item.book === executionBook) ?? null,
                 moneyline: gameIntel?.moneylines.find((item) => item.book === executionBook) ?? null,
-                preferredTeams
+                preferredTeams: neutralPreferences
               }));
             const mainlineRecommendations = rankBestBookMainlineRecommendations(allBookRecommendations);
             const currentBookRecommendations = rankBestBookMainlineRecommendations(
@@ -869,13 +594,6 @@ export function WeekOneBoard() {
               ? alignMatchupEvidence(gameIntel?.signals ?? [], currentBookDecision.market, currentBookDecision.line.side)
               : null;
             const decisionUncertain = Boolean(decisionUnit?.greyed || decisionContext?.verdict === "contradicts");
-            const gamePlays = plays.filter((play) => (play.contract ?? []).some((leg) => leg.gameId === game.id));
-            const edgeGoneDraft = gamePlays.some((play) => play.status === "research" && play.forecastSnapshot?.legs.some((leg) => {
-              const liveEvaluation = gameIntel?.contractEvaluations.find((item) => item.sourceQuoteId === leg.sourceQuoteId);
-              return liveEvaluation?.expectedValue !== null && liveEvaluation?.expectedValue !== undefined && liveEvaluation.expectedValue <= 0;
-            }));
-            const approvedByGabe = gamePlays.some((play) => play.approvals?.includes("gabe"));
-            const approvedByJarrett = gamePlays.some((play) => play.approvals?.includes("jarrett"));
             const evidenceContract = mainlineRecommendations.find((candidate) => candidate.actionable) ?? null;
             const meaningfulSignals = gameIntel?.evidence.status === "current" && evidenceContract
               ? materialEvidenceSignals(gameIntel.signals, evidenceContract.market, evidenceContract.line.side)
@@ -891,7 +609,7 @@ export function WeekOneBoard() {
               gameIntel?.sentiment ?? [],
               intelligence?.generatedAt ?? new Date().toISOString()
             );
-            return <article className={`event-market ${deskOpen ? "desk-open" : ""} ${edgeGoneDraft ? "edge-gone" : ""}`} key={game.id}>
+            return <article className={`event-market ${deskOpen ? "desk-open" : ""}`} key={game.id}>
               <div className="matchup-market-row">
                 <div className="matchup-cell">
                   <div className="event-time">
@@ -905,12 +623,7 @@ export function WeekOneBoard() {
                     {rowData.map((row) => <div className="team-code" key={row.team}>
                       <Image className="team-logo" src={teamLogoPath(row.team)} alt="" width={38} height={38} priority unoptimized aria-hidden="true" />
                       <div className="team-identity"><b>{row.team}</b>{scorePrediction && <span>[{scorePrediction[row.team]}]</span>}</div>
-                      {preferredTeams.has(row.team) && <em title="Preferred team">★</em>}
                     </div>)}
-                  </div>
-                  <div className="game-decision-state" aria-label={`Gabe ${approvedByGabe ? "has" : "has not"} selected; Jarrett ${approvedByJarrett ? "has" : "has not"} selected`}>
-                    <i className={approvedByGabe ? "gabe selected" : "gabe"}>G{approvedByGabe ? "✓" : ""}</i>
-                    <i className={approvedByJarrett ? "jarrett selected" : "jarrett"}>J{approvedByJarrett ? "✓" : ""}</i>
                   </div>
                 </div>
                 {(["spread", "total", "moneyline"] as const).map((market) => <div className={`market-pair market-${market}`} key={market}>
@@ -918,11 +631,10 @@ export function WeekOneBoard() {
                     const side = market === "total" ? row.totalSide : row.team;
                     const line = bookLines.find((candidate) => candidate.market === market && candidate.side.toLowerCase() === side.toLowerCase());
                     const active = Boolean(line && slip.some((leg) => leg.id === line.id));
-                    const againstPreference = Boolean(line && market !== "total" && [game.away, game.home].some((team) => preferredTeams.has(team) && team !== line.side));
                     const comparable = line ? lines.find((candidate) => candidate.gameId === line.gameId && candidate.book !== line.book && candidate.market === line.market && candidate.side.toLowerCase() === line.side.toLowerCase() && candidate.point === line.point) : null;
                     const bestExactPrice = Boolean(line && comparable && line.americanPrice > comparable.americanPrice);
                     const highlightedBet = Boolean(line && currentBookDecision?.actionable && currentBookDecision.line.id === line.id);
-                    return <button className={`price-cell ${active ? "active" : ""} ${againstPreference ? "preference-conflict" : ""} ${bestExactPrice ? "best-exact-price" : ""} ${highlightedBet ? "confidence-bet-cell" : ""}`} style={highlightedBet ? confidenceStyle(currentBookDecision) : undefined} disabled={!line} onClick={() => line && toggleLine(line, `${game.away} @ ${game.home}`)} key={row.team} aria-label={line ? `Select ${lineSelection(line)} at ${formatOdds(line.americanPrice)}` : `${marketTitle(market)} unavailable`}>
+                    return <button className={`price-cell ${active ? "active" : ""} ${bestExactPrice ? "best-exact-price" : ""} ${highlightedBet ? "confidence-bet-cell" : ""}`} style={highlightedBet ? confidenceStyle(currentBookDecision) : undefined} disabled={!line} onClick={() => line && toggleLine(line, `${game.away} @ ${game.home}`)} key={row.team} aria-label={line ? `Analyze ${lineSelection(line)} at ${formatOdds(line.americanPrice)}` : `${marketTitle(market)} unavailable`}>
                       {line ? <><strong>{market === "moneyline" ? formatOdds(line.americanPrice) : market === "total" ? `${row.totalSide === "Over" ? "O" : "U"} ${line.point}` : formatPoint(line.point)}</strong>{market !== "moneyline" && <span>{formatOdds(line.americanPrice)}</span>}<small>{snapshotAge(line.capturedAt)}</small></> : <strong>—</strong>}
                     </button>;
                   })}
@@ -931,7 +643,7 @@ export function WeekOneBoard() {
                   <div className="decision-readout edge-readout">
                     <span>{currentBookDecision ? lineSelection(currentBookDecision.line) : "NO PLAY"}</span>
                     <b>{edgeLabel(currentBookDecision)}</b>
-                    <small>{edgeGoneDraft ? "EDGE GONE · REFRESH" : `${evLabel(currentBookDecision)} EV${decisionUnit?.included ? ` · ${decisionUnit.suggestedUnits}u` : ""}${decisionUncertain ? " · UNCERTAIN" : ""}`}</small>
+                    <small>{`${evLabel(currentBookDecision)} EV${decisionUnit?.included ? ` · ${decisionUnit.suggestedUnits}u` : ""}${decisionUncertain ? " · UNCERTAIN" : ""}`}</small>
                   </div>
                   <button onClick={() => toggleDecisionDesk(game.id)} aria-expanded={deskOpen}>{deskOpen ? "CLOSE" : actionableMainlines ? `${actionableMainlines} PICKS` : "ANALYZE"}<span>{deskOpen ? "↑" : "↓"}</span></button>
                   <small className="row-vig">VIG {vig.map((value) => value === null ? "—" : value.toFixed(1)).join(" · ")}</small>
@@ -981,7 +693,7 @@ export function WeekOneBoard() {
                           <span>{signal.label} · {signal.lean}</span> {signal.detail} · {signalInterpretation(signal)}
                         </small>)}
                       </div>
-                      <em>{candidate.actionable ? `${candidate.sizing.suggestedUnits}u ADD` : candidate.preferenceConflict ? "PASS · TEAM" : "PASS"}</em>
+                      <em>{candidate.actionable ? `${candidate.sizing.suggestedUnits}u ANALYZE` : "PASS"}</em>
                     </button>;
                   }) : <p>No exact-price model edge at this book.</p>}
                 </section>
@@ -1052,10 +764,9 @@ export function WeekOneBoard() {
         </div>)}
       </section>
 
-      <aside className={`shared-slip ${slipOpen || slip.length ? "open" : "collapsed"}`}>
-        <div className="slip-head"><button className="slip-toggle" onClick={() => setSlipOpen((current) => !current)} aria-expanded={slipOpen || slip.length > 0}><span>BET SLIP</span><h2>{slip.length} {slip.length === 1 ? "selection" : "selections"}</h2></button>{slip.length > 0 && <button onClick={() => setSlip([])}>Clear</button>}</div>
+      <aside className={`shared-slip analytics-slip ${slipOpen || slip.length ? "open" : "collapsed"}`}>
+        <div className="slip-head"><button className="slip-toggle" onClick={() => setSlipOpen((current) => !current)} aria-expanded={slipOpen || slip.length > 0}><span>VALUE LAB</span><h2>{slip.length} {slip.length === 1 ? "contract" : "contracts"}</h2></button>{slip.length > 0 && <button onClick={() => setSlip([])}>Clear</button>}</div>
         <div className="slip-body">
-        <div className="picker-switch" aria-label="Authenticated approver"><button className={`active ${picker}`} disabled>{picker === "gabe" ? "Gabe" : "Jarrett"}</button></div>
         <div className="slip-mode">
           <button className={slipMode === "straight" ? "active" : ""} onClick={() => { setSlipMode("straight"); setSlip((current) => current.filter((leg) => leg.kind !== "teaser")); }}>Straights</button>
           <button className={slipMode === "parlay" ? "active" : ""} onClick={() => { setSlipMode("parlay"); setSlip((current) => { const eligible = current.filter((leg) => leg.kind !== "teaser"); const activeBook = eligible.at(-1)?.book; const normalized = activeBook ? eligible.filter((leg) => leg.book === activeBook) : eligible; if (normalized.length !== eligible.length) setMessage(`Parlay kept ${bookNames[activeBook!]} selections; combined contracts cannot cross books.`); return normalized; }); }}>Parlay</button>
@@ -1063,51 +774,21 @@ export function WeekOneBoard() {
         </div>
         {slip.length === 0 ? <div className="empty-slip"><b>Click a line.</b><p>The contract lands here. No typing, no dropdowns.</p></div> : <div className="slip-legs">{slip.map((leg, index) => {
           const sizing = slipMode === "straight" ? straightSizing[index] ?? null : null;
-          const preferenceWithheld = preferenceConflicts[index] && (slipMode === "teaser"
-            ? !teaserValue || teaserValue.expectedValue < structuralConfig.teasers.preferredOpponentExceptionalEv
-            : (leg.edge ?? Number.NEGATIVE_INFINITY) < structuralConfig.monitoring.pushEdgeThreshold);
-          const decision = preferenceWithheld ? "PASS · TEAM" : slipMode !== "straight" ? `LEG ${index + 1}` : sizing?.included
+          const decision = slipMode !== "straight" ? `LEG ${index + 1}` : sizing?.included
             ? `${sizing.suggestedUnits}u READY${sizing.greyed ? " · UNCERTAIN" : ""}`
             : sizing ? "PASS · BELOW 0.5u" : "PASS · MODEL WITHHELD";
-          return <article className={preferenceWithheld || slipMode === "straight" && !sizing?.included ? "withheld" : sizing?.greyed ? "uncertain" : ""} key={leg.id}><button onClick={() => setSlip((current) => current.filter((item) => item.id !== leg.id))}>×</button><div><small>{leg.matchup} · {marketTitle(leg.market)}</small><b>{leg.selection}</b><span>{leg.detail} · {leg.kind === "teaser" || leg.edge === null ? "Fair" : "Bet"} {formatPercent(leg.kind === "teaser" ? leg.fairProbability : legBetProbability(leg))}</span></div><strong>{leg.kind === "teaser" ? "6 PT" : formatOdds(leg.americanPrice)}</strong><em>{decision}</em></article>;
+          return <article className={slipMode === "straight" && !sizing?.included ? "withheld" : sizing?.greyed ? "uncertain" : ""} key={leg.id}><button onClick={() => setSlip((current) => current.filter((item) => item.id !== leg.id))}>×</button><div><small>{leg.matchup} · {marketTitle(leg.market)}</small><b>{leg.selection}</b><span>{leg.detail} · {leg.kind === "teaser" || leg.edge === null ? "Fair" : "Blended"} {formatPercent(leg.kind === "teaser" ? leg.fairProbability : legBetProbability(leg))}</span></div><strong>{leg.kind === "teaser" ? "6 PT" : formatOdds(leg.americanPrice)}</strong><em>{decision}</em></article>;
         })}</div>}
         {slipMode === "teaser" && <div className="teaser-price"><span>OFFERED 2-TEAM PRICE</span><div>{structuralConfig.teasers.selectableAmericanPrices.map((price) => <button className={teaserPrice === price ? "active" : ""} onClick={() => setTeaserPrice(price)} key={price}>{price}</button>)}</div><small>Confirm the live book price. A teaser is blocked when estimated EV is negative.</small></div>}
-        <div className="reason-clicks"><span>WHY</span>{pickReasons.slice(0, 8).map((item) => <button className={reason === item.value ? "active" : ""} onClick={() => setReason(item.value)} key={item.value}>{item.label.replace("Model disagrees with market price", "Model edge").replace("Opponent-adjusted efficiency matchup", "Efficiency").replace("Turnover or scoring regression", "Regression").replace("Personnel or injury advantage", "Personnel").replace("Coaching or scheme matchup", "Scheme").replace("Role clarity / team chemistry", "Chemistry").replace("Better number / key-number value", "Key number").replace("Pace / scoring environment", "Pace")}</button>)}</div>
-        <div className="execution-clicks"><span>RECORD AS</span><button className={executionStatus === "paper" ? "active" : ""} onClick={() => setExecutionStatus("paper")}>Paper</button><button className={executionStatus === "executed" ? "active" : ""} onClick={() => setExecutionStatus("executed")}>Cash</button></div>
-        <div className="stake-clicks"><span>STAKE</span>{[12.5, 25, 37.5, 50].map((value) => <button className={stake === value ? "active" : ""} onClick={() => setStake(value)} key={value}>{value / 25}u</button>)}</div>
-        <div className={`portfolio-meter ${portfolioConflicts.length ? "conflict" : ""}`}>
-          <div><span>WEEK CARD</span><b>{portfolio.usedUnits.toFixed(1)} / {structuralConfig.sizing.maximumWeekUnits}u</b></div>
-          <div><span>AFTER THIS</span><b>{(portfolio.usedUnits + proposedUnits).toFixed(1)}u</b></div>
-          <small>{portfolioConflicts.length ? portfolioConflicts[0].message : `${portfolio.remainingUnits.toFixed(1)}u remains before this slip · ${portfolio.officialPicks} official`}</small>
-        </div>
         <div className="value-meter">
           <div><span>BOOK PRICE</span><b>{!slip.length ? "—" : slipMode === "teaser" ? formatOdds(teaserPrice) : slipMode === "straight" ? slip.length === 1 ? formatOdds(slip[0].americanPrice) : "EACH" : slipValue ? formatOdds(combinedAmerican(slip)) : "—"}</b></div>
           <div><span>NO-VIG FAIR</span><b>{slipMode === "teaser" ? teaserValue ? formatOdds(teaserValue.fairAmerican) : "—" : slipMode === "straight" ? slip.length === 1 && slipValue ? formatOdds(slipValue.fairAmerican) : "—" : slipValue ? formatOdds(slipValue.fairAmerican) : "—"}</b></div>
           <div className={`vig-loss ${(slipMode === "teaser" && teaserValue && teaserValue.evPercent >= 0) || (straightEv !== null && straightEv >= 0) ? "positive-value" : ""}`}><span>{slipMode === "teaser" || slipMode === "straight" ? "ESTIMATED EV" : "VALUE LOST"}</span><b>{slipMode === "teaser" ? teaserValue ? `${teaserValue.evPercent >= 0 ? "+" : ""}${teaserValue.evPercent.toFixed(1)}%` : "—" : slipMode === "straight" ? straightEv === null ? "—" : `${straightEv >= 0 ? "+" : ""}${straightEv.toFixed(1)}%` : slipValue ? `${slipValue.vigDragPercent.toFixed(1)}%` : "—"}</b><small>{slipMode === "teaser" ? teaserValue ? `${formatPercent(teaserValue.winProbability)} win · ${formatPercent(teaserValue.pushProbability)} push` : "Add exactly two priced teaser legs from different games" : slipMode === "straight" ? slip.length === 1 ? `${formatPercent(legBetProbability(slip[0]))} shrunk bet probability` : "Multiple straights save as separate picks" : slipValue ? `$${slipValue.lossPerUnitDollars.toFixed(2)} per 1u · latest leg +${slipValue.incrementalDragPercent.toFixed(1)}pp` : slip.length > 1 ? "Same-game or incomplete pair: withheld" : "Add a priced leg"}</small></div>
         </div>
-        <button className="save-slip" disabled={!slipCanApprove} onClick={saveSlip}>Approve team card</button>
         <p className="slip-message" aria-live="polite">{message}</p>
-        {!preferenceGateCleared && <p className="preference-note">SEA / ATL GATE · {slipMode === "teaser" ? `needs +${(structuralConfig.teasers.preferredOpponentExceptionalEv * 100).toFixed(0)}% combined EV` : `needs +${(structuralConfig.monitoring.pushEdgeThreshold * 100).toFixed(1)}pp edge`}</p>}
-        <p className="value-note">Estimated value only. Approval never places a wager.</p>
+        <p className="value-note">Educational estimates only. This public tool stores no selections and places no wagers.</p>
         </div>
       </aside>
     </div>
-
-    <section className="compact-shared-card">
-      <div><span>TEAM CARD</span><h2>{officialPlays.length ? `${officialPlays.length} official` : plays.length ? `${plays.length} awaiting` : "Empty"}</h2><small>{portfolio.remainingUnits.toFixed(1)}u left this week</small></div>
-      {plays.slice(-6).map((play) => {
-        const awaitingMe = !isTeamApproved(play.approvals) && !play.approvals?.includes(picker);
-        return <article key={play.id}>
-          <b>{play.title}</b>
-          <small className="contract-preview">{play.legs}</small>
-          <div className="card-approval-row">
-            <span className={isTeamApproved(play.approvals) ? "team-approved" : "team-awaiting"}>{play.approvals?.includes("gabe") ? "G✓" : "G—"} · {play.approvals?.includes("jarrett") ? "J✓" : "J—"}</span>
-            {awaitingMe && <button onClick={() => approvePending(play)}>{play.executionStatus === "executed" ? "Cash placed + approve" : "Approve"}</button>}
-          </div>
-          <small>{play.executionStatus === "executed" ? "CASH" : "PAPER"} · {play.book} {formatOdds(play.americanOdds)} · ${(play.stakeCents / 100).toFixed(0)}</small>
-        </article>;
-      })}
-      <Link href="/records">Season record →</Link>
-    </section>
   </div>;
 }

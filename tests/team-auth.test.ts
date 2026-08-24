@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { requestTeamMember, TeamAuthenticationError } from "@/server/team-auth";
 
-describe("two-member request authentication", () => {
+describe("retired shared-record authentication", () => {
   const previousMode = process.env.NEXT_PUBLIC_DEMO_MODE;
 
   beforeEach(() => {
@@ -13,24 +13,24 @@ describe("two-member request authentication", () => {
     else process.env.NEXT_PUBLIC_DEMO_MODE = previousMode;
   });
 
-  it("maps the Sites-authenticated owner and teammate emails", async () => {
+  it("contains no personal email addresses in the inert legacy mapping", async () => {
     const gabe = await requestTeamMember(new Request("https://example.com/api/plays", {
-      headers: { "oai-authenticated-user-id": "gabe-id", "oai-authenticated-user-email": "GABEFORREY@gmail.com" }
+      headers: { "oai-authenticated-user-id": "legacy-owner-id", "oai-authenticated-user-email": "OWNER@EXAMPLE.INVALID" }
     }));
     const jarrett = await requestTeamMember(new Request("https://example.com/api/plays", {
-      headers: { "oai-authenticated-user-id": "jarrett-id", "oai-authenticated-user-email": "jwhi0802@YAHOO.com" }
+      headers: { "oai-authenticated-user-id": "legacy-collaborator-id", "oai-authenticated-user-email": "COLLABORATOR@EXAMPLE.INVALID" }
     }));
-    expect(gabe).toEqual({ actor: "gabe", email: "gabeforrey@gmail.com", userId: "gabe-id" });
-    expect(jarrett).toEqual({ actor: "jarrett", email: "jwhi0802@yahoo.com", userId: "jarrett-id" });
+    expect(gabe).toEqual({ actor: "gabe", email: "owner@example.invalid", userId: "legacy-owner-id" });
+    expect(jarrett).toEqual({ actor: "jarrett", email: "collaborator@example.invalid", userId: "legacy-collaborator-id" });
   });
 
-  it("rejects missing and unrecognized identities instead of defaulting to Gabe", async () => {
+  it("rejects missing and unrecognized identities", async () => {
     await expect(requestTeamMember(new Request("https://example.com/api/plays"))).rejects.toBeInstanceOf(TeamAuthenticationError);
     await expect(requestTeamMember(new Request("https://example.com/api/plays", {
       headers: { "oai-authenticated-user-id": "outsider-id", "oai-authenticated-user-email": "outsider@example.com" }
     }))).rejects.toBeInstanceOf(TeamAuthenticationError);
     await expect(requestTeamMember(new Request("https://example.com/api/plays", {
-      headers: { "oai-authenticated-user-email": "gabeforrey@gmail.com" }
+      headers: { "oai-authenticated-user-email": "owner@example.invalid" }
     }))).rejects.toBeInstanceOf(TeamAuthenticationError);
   });
 });

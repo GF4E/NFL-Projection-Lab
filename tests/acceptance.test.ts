@@ -28,7 +28,7 @@ import { isPacificSunday, kickoffCountdown, refreshSundayDraft, snapshotAgeMs, t
 import { authorize, assertNoUnauthenticatedApi } from "@/domain/security";
 import { correctSettlement, gradePick, gradeStoredPlay, profitForResult } from "@/domain/settlement";
 import { applyChampionMarketResidual, fitWeightedLogistic, type ModelTrainingRow } from "@/domain/model-fit";
-import { addTeamApproval, approvalActorForEmail, draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, exactContractApprovalRequest, isTeamApproved, storedLegMatchesQuote, summarizeTeamCardPortfolio, teamCardPortfolioBatchConflicts, trackerRecordSummaries, trackerSummary, validateTeamCardPortfolio } from "@/domain/play-card";
+import { draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, exactContractApprovalRequest, storedLegMatchesQuote, summarizeTeamCardPortfolio, teamCardPortfolioBatchConflicts, trackerRecordSummaries, trackerSummary, validateTeamCardPortfolio } from "@/domain/play-card";
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { assertCompletePropQuotePairs, buildPlayerPropEvidence, completeLeaguePropEfficiencyPrior, crossedKeyNumbers, isClassicWongPoint, isPropPlayerUnavailable, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
@@ -253,7 +253,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(failed.freshness).toBe("stale");
     expect(failed.alert).not.toBeNull();
     expect(completeImport(failed, [4], "2026-09-16").freshness).toBe("current");
-    expect(readFileSync("src/app/api/nflverse/route.ts", "utf8")).toContain("runBackgroundMaintenance");
+    expect(readFileSync("src/app/api/nflverse/route.ts", "utf8")).toContain("Public access is read-only");
     const worker = readFileSync("worker/index.ts", "utf8");
     expect(worker).toContain("runModelLifecycleAutomation");
     expect(worker).toContain("scheduledMaintenanceLane");
@@ -386,7 +386,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const surface = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(surface).toContain("visibleMatchups");
     expect(surface).toContain("INACTIVES ✓");
-    expect(surface).toContain("EDGE GONE · REFRESH");
+    expect(surface).not.toContain("EDGE GONE · REFRESH");
+    expect(surface).toContain("stores no selections");
   });
 
   it("16. allows exactly two idempotent Web Push event types", () => {
@@ -747,7 +748,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(missedSaturday).toMatchObject({ job: "daily", scheduledFor: "2026-08-15T09:00:00[America/Los_Angeles]" });
     const sundayOpener = latestExpectedMainlineCandidate(new Date("2026-08-17T01:05:00.000Z"), games);
     expect(sundayOpener).toMatchObject({ job: "open_sunday", scheduledFor: "2026-08-16T18:00:00[America/Los_Angeles]" });
-    expect(readFileSync("src/app/api/lines/route.ts", "utf8")).toContain("allowCatchup: true");
+    expect(readFileSync("src/app/api/lines/route.ts", "utf8")).toContain("lines refresh automatically");
   });
 
   it("28. rejects a partial mainline payload so stale complete prices survive", () => {
@@ -785,7 +786,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   it("30. keeps the automatic rollover and refresh plumbing behind the compact card", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(board).toContain('fetch("/api/weekly-slate")');
-    expect(board).toContain("slate.week");
+    expect(board).toContain("slateData.week");
     expect(board).not.toContain("Refresh lines");
     expect(board).not.toContain("weekOneMatchups");
     expect(board).toContain('method: "GET"');
@@ -821,14 +822,14 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(exactBoundary?.expectedValue).toBeGreaterThanOrEqual(0);
     expect(priceTwoTeamTeaser([{ conditionalWinProbability: 0.7, pushProbability: 0 }, { conditionalWinProbability: 0.7, pushProbability: 0 }], -120)?.expectedValue).toBeLessThan(0);
     expect(priceTwoTeamTeaser([{ conditionalWinProbability: 0.7, pushProbability: 0.08 }], -120)).toBeNull();
-    expect(rankTeaserPairs([teaser("g1", "NE", "SEA", 0.75), teaser("g2", "KC", "DEN", 0.74)], { offeredAmerican: -120 })).toEqual([]);
+    expect(rankTeaserPairs([teaser("g1", "NE", "SEA", 0.75), teaser("g2", "KC", "DEN", 0.74)], { offeredAmerican: -120 })).toHaveLength(1);
     const compactBoard = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(compactBoard).toContain("PLAY TO");
     expect(compactBoard).toContain('teaserPairIsWong ? "WONG" : "EV PAIR"');
     expect(compactBoard).toContain('leg.teasedPoint)}`).join(" + ")');
     expect(compactBoard).toContain("teaserPair.unitsGreyed ? \" · UNCERTAIN\" : \"\"");
-    expect(compactBoard).toContain('preferenceWithheld ? "PASS · TEAM"');
-    expect(compactBoard).toContain("preferenceGateCleared");
+    expect(compactBoard).not.toContain("PASS · TEAM");
+    expect(compactBoard).toContain("neutralPreferences");
     expect(compactBoard).not.toContain("PAIR READY");
   });
 
@@ -881,20 +882,13 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(store).toContain("ORDER BY week, created_at ASC");
   });
 
-  it("34. requires both teammates on the same immutable contract before a pick enters the team record", () => {
-    const gabeOnly = addTeamApproval([], "gabe");
-    expect(addTeamApproval(gabeOnly, "gabe")).toEqual(["gabe"]);
-    expect(isTeamApproved(gabeOnly)).toBe(false);
-    expect(isTeamApproved(addTeamApproval(gabeOnly, "jarrett"))).toBe(true);
-    const route = readFileSync("src/app/api/plays/route.ts", "utf8");
-    const store = readFileSync("src/server/play-store.ts", "utf8");
+  it("34. exposes a read-only public board with no team record workflow", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(route).toContain("id: `team:${contractKey}`");
-    expect(store).toContain("gabe_approved = CASE");
-    expect(store).toContain("jarrett_approved = CASE");
-    expect(store).toContain("THEN 'card' ELSE 'research'");
-    expect(board).toContain("Awaiting ${missing} on this exact contract");
-    expect(board).toContain("Approve team card");
+    const worker = readFileSync("worker/index.ts", "utf8");
+    expect(board).not.toContain('fetch("/api/plays"');
+    expect(board).not.toContain("Approve team card");
+    expect(board).toContain("VALUE LAB");
+    expect(worker).toContain("This public analytics site has no accounts or shared records");
   });
 
   it("35. withholds unpublished availability and surfaces only complete last-good official snapshots", () => {
@@ -915,7 +909,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     });
   });
 
-  it("35. gives posted totals a leakage-safe projected number and carries its edge into the team card", () => {
+  it("35. gives posted totals a leakage-safe projected number and carries its edge into the value lab", () => {
     const server = readFileSync("src/server/decision-board.ts", "utf8");
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(server).toContain("weightedLeagueScoring");
@@ -925,15 +919,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(server).toContain("applyChampionMarketResidual");
     expect(board).toContain('`TOTAL ${totalProjection.projectedTotal}`');
     expect(board).toContain('line.market === "total"');
-    expect(board).toContain("estimatedEvPercent: legExpectedValuePercent(leg)");
+    expect(board).toContain("legExpectedValuePercent");
     expect(board).toContain("straightEv");
     expect(board).toContain("shrunk bet probability");
   });
 
-  it("36. keeps operational pages in the background and leaves only the weekly board and record visible", () => {
+  it("36. leaves only the public slate and methodology visible", () => {
     const navigation = readFileSync("src/components/nav-links.tsx", "utf8");
     expect(navigation).toContain('["/sunday"');
-    expect(navigation).toContain('["/records"');
+    expect(navigation).toContain('["/methodology"');
+    expect(navigation).not.toContain('["/records"');
     for (const route of ["digest", "settings", "model", "team"]) {
       expect(readFileSync(`src/app/(dashboard)/${route}/page.tsx`, "utf8")).toContain('redirect("/sunday")');
     }
@@ -982,21 +977,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     expect(board).toContain("fairProbability: prop.executionFairProbability");
     expect(board).toContain("edge: prop.edge");
-    expect(board).toContain("setStake(prop.suggestedUnits * 25)");
+    expect(board).not.toContain("setStake(prop.suggestedUnits * 25)");
     expect(board).not.toContain("fairProbability: prop.consensusProbability");
   });
 
-  it("36c. binds each approval to the authenticated teammate instead of a client-side toggle", () => {
-    expect(approvalActorForEmail("jwhi0802@YAHOO.com", "owner@example.com", "JWHI0802@yahoo.com")).toBe("jarrett");
-    expect(approvalActorForEmail("OWNER@example.com", "owner@example.com", "JWHI0802@yahoo.com")).toBe("gabe");
-    expect(approvalActorForEmail("outsider@example.com", "owner@example.com", "JWHI0802@yahoo.com")).toBeNull();
-    expect(approvalActorForEmail(null, "owner@example.com", "JWHI0802@yahoo.com")).toBeNull();
-    const route = readFileSync("src/app/api/plays/route.ts", "utf8");
+  it("36c. has no authenticated approver or personal picker", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(route).toContain("requestTeamMember(request)");
-    expect(route).not.toContain('pickedBy: z.enum(["gabe", "jarrett"])');
-    expect(board).toContain('aria-label="Authenticated approver"');
-    expect(board).not.toContain('onClick={() => setPicker("jarrett")}');
+    const proxy = readFileSync("src/proxy.ts", "utf8");
+    expect(board).not.toContain('aria-label="Authenticated approver"');
+    expect(board).not.toContain("setPicker");
+    expect(proxy).toContain("NextResponse.next");
   });
 
   it("36d. rechecks every source quote before a second approval can freeze the contract", () => {
@@ -1009,7 +999,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     const route = readFileSync("src/app/api/plays/route.ts", "utf8");
     const store = readFileSync("src/server/play-store.ts", "utf8");
-    expect(board).toContain("sourceQuoteId: leg.sourceQuoteId");
+    expect(board).toContain("sourceQuoteId: line.id");
     expect(route).toContain("sourceQuoteId: z.string()");
     expect(store).toContain("assertApprovalContractCurrent");
     expect(store).toContain("player_prop_quotes WHERE id = ?");
@@ -1046,9 +1036,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
       status: "card"
     });
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(board).toContain("approvePending(play)");
-    expect(board).toContain('exactContractApprovalRequest(play, play.executionStatus === "executed")');
-    expect(board).toContain("awaitingMe &&");
+    expect(board).not.toContain("approvePending(play)");
+    expect(board).not.toContain("exactContractApprovalRequest");
+    expect(board).not.toContain("awaitingMe &&");
   });
 
   it("36e. expires incomplete drafts after 12 hours and closes approval at the earliest kickoff", () => {
@@ -1155,29 +1145,19 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(board).not.toContain("BEST SIDE SIGNAL");
   });
 
-  it("42. fail-closes the fallback sign-in and approval identity to the two configured emails", () => {
+  it("42. removes personal identities and opens the analytics surface", () => {
     const teamConfig = JSON.parse(readFileSync("config/team.config.json", "utf8")) as {
       members: { gabe: { email: string }; jarrett: { email: string } };
     };
     const proxy = readFileSync("src/proxy.ts", "utf8");
-    const login = readFileSync("src/app/login/actions.ts", "utf8");
-    const auth = readFileSync("src/server/team-auth.ts", "utf8");
-    const plays = readFileSync("src/app/api/plays/route.ts", "utf8");
-    const play = readFileSync("src/app/api/plays/[id]/route.ts", "utf8");
-    expect(teamConfig.members.gabe.email).toBe("gabeforrey@gmail.com");
-    expect(teamConfig.members.jarrett.email.toLowerCase()).toBe("jwhi0802@yahoo.com");
-    expect(login).toContain("configuredTeamActor(email)");
-    expect(proxy).toContain("user && !actor");
-    expect(proxy).toContain("supabase.auth.signOut()");
-    expect(proxy).toContain("response.cookies.getAll()");
-    expect(auth).toContain('request.headers.get("oai-authenticated-user-email")');
-    expect(auth).toContain('request.headers.get("oai-authenticated-user-id")');
-    expect(auth).toContain("supabase.auth.getUser()");
-    expect(auth).not.toContain('?? "owner-preview"');
-    expect(plays).toContain("requestTeamMember(request)");
-    expect(play).toContain("requestTeamMember(request)");
-    expect(plays).toContain("status: 401");
-    expect(play).toContain("status: 401");
+    const login = readFileSync("src/app/login/page.tsx", "utf8");
+    const worker = readFileSync("worker/index.ts", "utf8");
+    expect(teamConfig.members.gabe.email).toBe("owner@example.invalid");
+    expect(teamConfig.members.jarrett.email).toBe("collaborator@example.invalid");
+    expect(proxy).not.toContain("supabase");
+    expect(login).toContain('redirect("/sunday")');
+    expect(worker).toContain('url.pathname === "/api/plays"');
+    expect(worker).toContain("Public access is read-only");
   });
 
   it("43. ties compact matchup context to the exact model bet and teaser leg without double-counting it", () => {
@@ -1217,14 +1197,14 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(importer).toContain("maximumPerBook: quotes.length");
   });
 
-  it("45. withholds synthetic same-game parlay pricing and labels multiple straights as separate", () => {
+  it("45. withholds synthetic same-game parlay pricing in the temporary value lab", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(board).toContain("isPricedSlipApprovable");
-    expect(board).toContain('disabled={!slipCanApprove}');
+    expect(board).not.toContain("isPricedSlipApprovable");
+    expect(board).not.toContain("Approve team card");
     expect(board).toContain('slipMode === "straight" ? slip.length === 1 ? formatOdds(slip[0].americanPrice) : "EACH"');
     expect(board).toContain('slipValue ? formatOdds(combinedAmerican(slip)) : "—"');
     expect(board).toContain("Same-game or incomplete pair: withheld");
-    expect(board).toContain("Multiple straights save as separate picks");
+    expect(board).toContain("This public tool stores no selections");
   });
 
   it("46. confirms executed status only on a jointly approved contract before kickoff", () => {
@@ -1239,14 +1219,16 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(store).toContain("cash_placement_confirmed = 1");
   });
 
-  it("46b. binds execution status and authoritative paper book selection to the shared revision", () => {
+  it("46b. removes execution status and saved-book selection from the public surface", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
     const route = readFileSync("src/app/api/plays/route.ts", "utf8");
     const store = readFileSync("src/server/play-store.ts", "utf8");
     const provenance = readFileSync("src/server/play-provenance.ts", "utf8");
-    expect(board).toContain('RECORD AS');
-    expect(board).toContain('executionStatus, cashPlacementConfirmed: false');
-    expect(board).toContain('Paper card moved to the highest-EV supported book contract');
+    const worker = readFileSync("worker/index.ts", "utf8");
+    expect(board).not.toContain('RECORD AS');
+    expect(board).not.toContain('executionStatus, cashPlacementConfirmed: false');
+    expect(board).not.toContain('Paper card moved to the highest-EV supported book contract');
+    expect(worker).toContain("This public analytics site has no accounts or shared records");
     expect(route).toContain('executionStatus: z.enum(["paper", "executed"])');
     expect(route).toContain('executionStatus: input.executionStatus');
     expect(store).toContain('executionApprovalConfirmationError');
@@ -1260,8 +1242,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const lineBoard = readFileSync("src/domain/line-board.ts", "utf8");
     expect(board).toContain("updateSlipSelections(current, leg, mode)");
     expect(board).toContain('addLeg(propLeg(prop, matchup), "straight")');
-    expect(board).toContain("book: bookNames[leg.book]");
-    expect(board).not.toContain("book: bookNames[slip[0].book], primaryReason");
+    expect(board).not.toContain("book: bookNames[leg.book]");
+    expect(board).not.toContain("primaryReason");
     expect(lineBoard).toContain('if (mode === "straight") return');
     expect(lineBoard).toContain("withoutSameThesis.filter((item) => item.book === leg.book)");
   });

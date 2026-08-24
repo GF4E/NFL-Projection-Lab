@@ -9,16 +9,18 @@ import { headers } from "next/headers";
 
 export async function generateMetadata() {
   const requestHeaders = await headers();
-  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "nfl-projection-lab-2026.psoiawesome.chatgpt.site";
-  const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.includes("localhost") ? "http" : "https");
-  const image = `${protocol}://${host}/og.png`;
-  const title = "NFL Projection Lab · Weekly Play Sheet";
-  const description = "A private weekly model-versus-market board with visible vig drag and a shared two-person card";
+  const requestHost = requestHeaders.get("host") ?? "";
+  const origin = requestHost.startsWith("localhost")
+    ? `http://${requestHost}`
+    : "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site";
+  const image = `${origin}/og.png`;
+  const title = "NFL Projection Lab · Public NFL Analytics";
+  const description = "Live NFL markets, model probabilities, uncertainty intervals, matchup evidence, and transparent price analysis.";
   return {
     title,
     description,
     icons: { icon: "/og.png" },
-    openGraph: { title, description, type: "website", images: [{ url: image, width: 1731, height: 909, alt: "NFL Projection Lab weekly model-versus-market board" }] },
+    openGraph: { title, description, type: "website", images: [{ url: image, width: 1735, height: 907, alt: "NFL Projection Lab public analytics board" }] },
     twitter: { card: "summary_large_image", title, description, images: [image] }
   };
 }

@@ -110,11 +110,10 @@ describe("compact weekly decision board", () => {
     expect(screen.getByText("SEP 10 · 5:35 PM PT")).toBeTruthy();
   });
 
-  it("repairs a missed scheduled snapshot once when the authenticated board opens", async () => {
-    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL, init?: RequestInit) => {
+  it("preserves stale data without letting a public visitor trigger a provider refresh", async () => {
+    vi.mocked(fetch).mockImplementation(async (input: RequestInfo | URL) => {
       const url = String(input);
       if (url.startsWith("/api/weekly-slate")) return response(slate);
-      if (url.startsWith("/api/lines") && init?.method === "POST") return response({ lines: [], configured: true, stale: false });
       if (url.startsWith("/api/lines")) return response({ lines: [], configured: true, stale: true });
       if (url.startsWith("/api/plays")) return response({ plays: [], actor: "gabe" });
       if (url.startsWith("/api/decision-board")) return response(board());
@@ -126,7 +125,8 @@ describe("compact weekly decision board", () => {
     await screen.findByRole("heading", { name: "Week 1" });
     await waitFor(() => expect(vi.mocked(fetch).mock.calls.some(([url, init]) =>
       String(url).startsWith("/api/lines") && (init as RequestInit | undefined)?.method === "POST"
-    )).toBe(true));
+    )).toBe(false));
+    expect(screen.getByText(/scheduled refresh is pending/i)).toBeTruthy();
   });
 
   it("replaces every colored letter badge with the matching transparent team-logo image", async () => {

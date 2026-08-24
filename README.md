@@ -1,94 +1,65 @@
-# NFL Projection Lab v1.1
+# NFL Projection Lab
 
-A private NFL research, weekly card-building, and bet-tracking workspace. The application records decisions and never places a wager.
+A public NFL analytics site for comparing live market prices with leakage-safe model probabilities, uncertainty, and matchup evidence. There are no user accounts, shared picks, personal records, or wagering actions.
 
-## Product workflow
+## Public experience
 
-- **Week 1 workspace:** all 16 official matchups are selectable by kickoff window, with a direct path from matchup research to the betting card.
-- **Simple intake:** a short form records the exact contract, book, price, model edge, stake, confidence, and one standardized primary reason.
-- **Research desk:** primary-data observations, trends, sample sizes, source freshness, uncertainty, and explicit warnings against treating descriptive patterns as causal.
-- **Team room:** Gabe owns the market/model read; Jarrett owns personnel, form, chemistry, and the football veto. The two roles are complementary, not competitive.
-- **Bet tracker:** a separate ledger for placed and settled plays, with stake, result, dollar and unit profit, ROI, and CLV.
-
-The Week 1 card starts empty. Matchup prompts are research questions, not live recommendations, and prices remain explicitly unloaded until a market feed is connected.
+- The current 2026 weekly slate, grouped by kickoff day and shown in Pacific time.
+- BetMGM and FanDuel spreads, totals, and moneylines with capture age and market vig.
+- Model-implied spreads and totals, shrunk bet probabilities, expected value, 80% uncertainty intervals, and quarter-Kelly reference sizing.
+- A neutral edge board with no favorite-team preferences or user-specific filtering.
+- Expandable game analysis showing only material, timestamped evidence: opponent-adjusted efficiency, availability, weather, market movement, and market sentiment.
+- A temporary value lab for analyzing straight, parlay, and teaser pricing. Selections stay in the browser session and are never saved.
+- A public methodology page explaining the model and its safeguards.
 
 ## Statistical engine
 
-- Discrete, decay-weighted NFL margin tables with data-derived mass at 3, 6, 7, 10, and 14. Different posted points must be translated to a canonical point before price or EV comparison.
-- Power-method de-vigging for moneylines, spreads, and totals; a frozen 25% model / 75% market blend; translated book EV; quarter-Kelly on a 100u reference bankroll; 0.5u floor and 2u cap.
-- Weighted logistic champion/challenger models with season-varying home-field and scoring effects, fixed structural configuration, a Tuesday promotion gate, deterministic model/data/config hashes, and a 100-member fixed-seed refit bootstrap.
-- Immutable team-card revisions, exact-contract approval hashes, quote rechecks, two-person approval, cash-placement confirmation, paper-book selection, kickoff locking, stale-draft expiry, and no automatic approval.
-- BetMGM/FanDuel comparison, power-method no-vig probabilities, translated price delta, uncertainty display, movement/edge-decay views, snapshot ages, current injury/QB/weather inputs, and Sunday Mode.
-- Push-aware two-team teaser pricing and settlement using data-derived key-margin mass; the slip requires exactly two legs and withholds negative-EV combinations.
-- Separate Full and Executed-only records with book-specific translated CLV in cents and points.
-- Provider adapters for The Odds API, nflverse, official current injury feeds, and Open-Meteo kickoff-hour forecasts.
-- Private Supabase authentication, two-person team membership, row-level access controls, owner-only overrides/corrections/configuration/access, operational ledgers, and database-level approval/quote guards.
-- Exactly two Web Push types: `awaiting_you` and `edge_threshold`.
-- A comprehensive acceptance suite covering the engine, live data, matchup board, no-vig pricing, bet slip, approvals, settlement, and record workflow.
+- Discrete, decay-weighted NFL margin tables with data-derived mass at 3, 6, 7, 10, and 14. Quotes at different posted points are translated before price or EV comparison.
+- Power-method de-vigging for moneylines, spreads, and totals.
+- A frozen 25% model / 75% market probability blend.
+- Quarter-Kelly reference sizing on a 100-unit bankroll, rounded down to 0.5 units and capped at 2 units.
+- Season-varying home-field and scoring effects, weekly team-state updates, a gated champion/challenger refit, and deterministic model/data/config hashes.
+- A 100-member fixed-seed weighted bootstrap; displayed suggestions are muted when the 80% edge interval spans zero.
+- BetMGM/FanDuel comparison, translated price deltas, line movement, edge decay, current injury/QB state, and kickoff-hour weather.
 
-The interface starts with the official 2026 Week 1 schedule and no picks so the workflow can be reviewed before credentials and live market feeds are enabled.
+## Automatic data
+
+- nflverse schedules, finals, rosters, and play-by-play aggregates.
+- The Odds API for BetMGM and FanDuel market snapshots.
+- Official NFL/team sources for current injury reports and inactives.
+- Open-Meteo for outdoor or open-roof kickoff-hour weather.
+
+The Cloudflare Worker runs the refresh and model lifecycle on its schedule. Public HTTP access is read-only, so visitors cannot spend provider credits, trigger model refits, modify forecasts, or create records. A failed or partial import preserves the last validated data and marks the public output stale.
 
 ## Local preview
 
-Use the bundled or a standard Node 22+ environment.
+Use Node 22+ and pnpm:
 
 ```bash
 pnpm install
-NEXT_PUBLIC_DEMO_MODE=true pnpm dev
+pnpm dev
 ```
 
 Open `http://localhost:3000/sunday`.
 
-## Persistent site storage
+## Environment
 
-The deployed card and tracker use a private D1 database. Generated migrations live in `drizzle/`; runtime initialization and schema upgrades are idempotent.
+Copy `.env.example` to `.env.local` for local provider-backed work. nflverse itself does not require an API key.
 
-The same database now carries the automatic nflverse warehouse:
-
-- `nfl_games` stores validated schedules, finals, game-level closing lines, rest, roof/weather metadata, quarterbacks, and stadium fields from 2010 forward.
-- `nfl_team_game_features` stores streamed team-game aggregates for EPA, success rate, explosive rate, turnovers, pace, pass rate, expected pass rate, and PROE. Raw play-by-play is not copied into D1.
-- `nflverse_import_state` and `nflverse_import_alerts` retain source hashes, freshness, leases, row counts, failures, and the last successful snapshot.
-
-The Worker checks schedules every five minutes. While the private site is open, it also runs the same idempotent check every five minutes. After 1:00am Pacific it checks the current play-by-play season once per day and backfills one missing historical season per trigger, newest first; a later trigger catches up if the overnight run was missed. A failed validation never replaces the last good rows.
-
-## Optional live-data setup
-
-1. Create a Supabase project.
-2. Run both SQL files in `supabase/migrations/` in filename order.
-3. Sign in once as the owner and update the placeholders in `supabase/seed.sql` before running it. The seed creates only the owner membership and no teammate invitation.
-4. Copy `.env.example` to `.env.local` and add Supabase, Odds API, cron, official-injury feed, and VAPID values. Keep `NEXT_PUBLIC_DEMO_MODE=false` in a deployed environment.
-5. Configure an America/Los_Angeles-aware scheduler against the authenticated `/api/jobs/[job]` endpoint. Every request must carry `Authorization: Bearer $CRON_SECRET` and a deterministic `x-scheduled-for` timestamp.
-6. Run `pnpm verify` before deployment.
-
-No unauthenticated application API is exposed. Provider jobs use the service role only after the cron bearer check; teammates use Supabase user sessions and RLS.
+The primary runtime value is `ODDS_API_KEY`. Scheduled administrative jobs use `CRON_SECRET`; those write paths are never exposed through the public interface.
 
 ## Frozen 2026 settings
 
-- `1u = $25`
 - Books: BetMGM and FanDuel
 - Shrinkage weight: `w = 0.25`
-- Strength-state update: `K = 0.005`, selected by pooled 2023–2025 rolling-origin residual RMSE and recorded in `config/strength-state-validation.json`
+- Strength-state update: `K = 0.005`
 - Bootstrap: 100 fixed-seed coefficient refits; 10th/90th edge percentiles
-- Suggested size: quarter-Kelly, 100u reference, floor down to 0.5u, cap 2u
-- Limits: one side and one total per game, 3u per game, 2u per play, and 10u per week
-- Edge push threshold: absolute 3.0 percentage points
+- Sizing display: quarter-Kelly, 100-unit reference, 0.5-unit floor, 2-unit cap
 - Credit alert / ceiling: 400 / 450
 
-Structural settings live in `config/structural.config.json`; era definitions and provenance live in `config/era.config.json`. Neither is a code constant. Changes are offseason-only.
+October, November, and December each reach the enforced 450-credit ceiling in the frozen reservation simulation, so lower-priority snapshots are withheld before essential windows.
 
-## Data and failure behavior
-
-- Historical training begins in 2010 and excludes no season. Time decay and season effects handle era drift.
-- Key-margin estimation starts in 2015.
-- nflverse injuries are rejected after 2024 until the feed is demonstrably restored. Current reports and 90-minute inactives come from an official NFL/team source.
-- Open-Meteo values must be valid for kickoff hour and are withheld for closed/fixed roofs.
-- A partial, stale, missing, or schema-invalid import aborts, creates an in-app alert, marks dependents stale, and preserves the last good values.
-- Finals come from nflverse, never The Odds API scores endpoint.
-- nflverse requires no API key. Schedule refreshes use the public `games.csv`; play-by-play uses the public compressed CSV release and is parsed as a stream. If the edge runtime rejects an older multi-member gzip archive, the importer retries nflverse's equivalent uncompressed CSV without weakening validation or publication guarantees.
-
-Roboto is bundled with the application at weights 400–900, so the deployed interface does not depend on a third-party font request.
-
-The actual published 2026 nflverse schedule was reduced to distinct kickoff windows in `config/2026-credit-simulation.json`. October, November, and December each reach the enforced 450-credit ceiling after the reservation plan preserves openers, 15-minute closes, and all scheduled player-prop calls; the alert fires at 400 and lower-priority snapshots are withheld.
+Structural settings live in `config/structural.config.json`; era definitions and provenance live in `config/era.config.json`. Structural changes are offseason-only.
 
 ## Verification
 
@@ -96,7 +67,7 @@ The actual published 2026 nflverse schedule was reduced to distinct kickoff wind
 pnpm lint
 pnpm typecheck
 pnpm test
-NEXT_PUBLIC_DEMO_MODE=true pnpm build
+pnpm build
 ```
 
-The acceptance test names cover the statistical engine and the deployed matchup, live-line, card, settlement, and record workflows in `tests/acceptance.test.ts`.
+This project is for education and analysis. Model estimates are uncertain and are not instructions to wager.

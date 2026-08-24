@@ -8,16 +8,15 @@ import type { WeeklySlate } from "@/domain/weekly-slate";
 export function NavLinks() {
   const pathname = usePathname();
   const [week, setWeek] = useState(1);
-  const [games, setGames] = useState(16);
   useEffect(() => {
     fetch("/api/weekly-slate")
       .then((response) => response.ok ? response.json() as Promise<WeeklySlate> : null)
-      .then((slate) => { if (slate) { setWeek(slate.week); setGames(slate.games.length); } })
+      .then((slate) => { if (slate) setWeek(slate.week); })
       .catch(() => undefined);
   }, []);
   const nav = [
-    ["/sunday", `Week ${week}`, String(games)],
-    ["/records", "Season record", ""]
+    ["/sunday", "Live slate", `W${week}`],
+    ["/methodology", "Methodology", ""]
   ] as const;
   return <nav aria-label="Primary navigation">
     {nav.map(([href, label, badge], index) => (

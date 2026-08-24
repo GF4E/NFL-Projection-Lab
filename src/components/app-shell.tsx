@@ -1,13 +1,10 @@
 import Link from "next/link";
 import { FieldMark } from "./icons";
 import { NavLinks } from "./nav-links";
-import { NflverseRefreshBeacon } from "./nflverse-refresh-beacon";
-import { PushPermission } from "./push-permission";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="app-frame">
-      <NflverseRefreshBeacon />
       <aside className="rail">
         <Link className="brand" href="/sunday" aria-label="NFL Projection Lab home">
           <FieldMark className="brand-mark" />
@@ -15,10 +12,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </Link>
         <NavLinks />
         <div className="rail-foot">
-          <span className="signal"><i /> Shared card live</span>
-          <div className="member-stack"><b>G</b><b>J</b><span>Gabe + Jarrett</span></div>
-          <p>Gabe · Seahawks / Jarrett · Auburn</p>
-          <PushPermission />
+          <span className="signal"><i /> Public analytics</span>
+          <p>Live markets · model probabilities · uncertainty</p>
         </div>
       </aside>
       <div className="workspace">
