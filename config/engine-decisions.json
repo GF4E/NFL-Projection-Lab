@@ -47,6 +47,31 @@
         "Publish pooled and per-market sample sizes and uncertainty so a small apparent difference is not presented as decisive evidence."
       ],
       "adr": "docs/decisions/ADR-0002-challenger-promotion-metric.md"
+    },
+    {
+      "questionId": "Q03",
+      "status": "accepted_design_hypothesis",
+      "answer": "Run a controlled comparison of a simple market-anchored discrete-score baseline, a correlated negative-binomial model, and a possession-level simulation. Complexity receives no preference and must pass the Q02 promotion gates.",
+      "rationale": "These model families are established foundations rather than product differentiation. A common leakage-safe evaluation determines which one is useful; the engine's distinctive value must come from turning validated forecasts into scenario-aware support for human judgment.",
+      "evidence": [
+        "docs/decisions/ADR-0003-score-model-bakeoff.md",
+        "docs/NOVELTY_CHARTER.md"
+      ],
+      "author": "owner",
+      "answeredAt": "2026-08-24T21:58:42.000Z",
+      "implementationEffects": [
+        "Implement one shared as-of dataset, outcome contract, market baseline, and evaluation harness before adding model-specific complexity.",
+        "Treat the market-anchored discrete model as the minimum viable benchmark rather than assuming the most detailed simulator is best.",
+        "Require every candidate to emit the same normalized score-outcome interface so downstream decision support does not depend on model family.",
+        "Keep commodity forecast machinery separate from the proposed distinctive decision dossier."
+      ],
+      "validationRequired": [
+        "Compare all candidates on identical rolling-origin rows using the Q02 pooled log-loss and calibration gates.",
+        "Report joint score likelihood, team-score error, spread/total/moneyline breakouts, runtime, failure rate, and uncertainty stability.",
+        "Run ablations showing whether possession mechanics add held-out value beyond the simpler count and market-anchored models.",
+        "Reject added complexity that improves narrative detail without improving forecast quality or decision-relevant uncertainty."
+      ],
+      "adr": "docs/decisions/ADR-0003-score-model-bakeoff.md"
     }
   ]
 }

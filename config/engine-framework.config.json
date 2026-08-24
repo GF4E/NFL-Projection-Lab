@@ -1,12 +1,34 @@
 {
   "version": "2026.08.24",
-  "mode": "one_question_at_a_time",
-  "purpose": "Turn engine choices into auditable hypotheses, data contracts, implementations, and out-of-sample gates.",
+  "mode": "high_leverage_questions_only",
+  "purpose": "Apply established modeling controls without ceremony, reserve owner questions for consequential trade-offs, and turn distinctive ideas into auditable hypotheses and out-of-sample gates.",
   "answerPolicy": {
     "requiredFields": ["answer", "rationale", "evidence", "author", "answeredAt"],
     "structuralChanges": "offseason_only",
     "inSeasonChanges": "state_and_gated_coefficients_only",
-    "pickOutcomesInTraining": false
+    "pickOutcomesInTraining": false,
+    "commodityDefaults": "record_provisionally_without_owner_prompt",
+    "ownerPromptRule": "Ask only when the choice changes the human decision contract, cost or data rights, acceptable uncertainty, release risk, or another difficult-to-reverse boundary."
+  },
+  "noveltyStandard": {
+    "foundationNotDifferentiation": [
+      "EPA and success-rate features",
+      "Elo or rolling team strength",
+      "count models and game simulation",
+      "injury, roster, weather, rest, and market inputs",
+      "calibration, walk-forward validation, CLV, and line shopping",
+      "generic feature-importance narration"
+    ],
+    "distinctiveOutcome": "A compact decision dossier that decomposes model-versus-market disagreement, carries unresolved scenarios through the forecast, measures edge fragility, and states what new fact or price would change the conclusion.",
+    "requiredDecisionSupport": [
+      "model and market implied outcome distributions",
+      "scenario-weighted uncertainty for unresolved inputs",
+      "counterfactual contribution of material evidence",
+      "edge-fragility and value-of-information thresholds",
+      "plain-language falsifiers and what-would-change-the-view conditions",
+      "source provenance, freshness, sample support, and applicable model diagnostics"
+    ],
+    "claimPolicy": "Treat differentiation as a research hypothesis until a documented landscape review and prospective user evaluation support it."
   },
   "workstreams": [
     {

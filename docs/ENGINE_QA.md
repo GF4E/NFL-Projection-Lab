@@ -1,17 +1,17 @@
 # Engine Q&A and decision ledger
 
-The engine is built through one auditable decision at a time. The authoritative workstreams, questions, defaults, dependencies, evidence requirements, and acceptance gates live in [`config/engine-framework.config.json`](../config/engine-framework.config.json). Accepted answers live in the machine-validated [`config/engine-decisions.json`](../config/engine-decisions.json) ledger. This document defines how those questions become code.
+The engine is built through auditable decisions without asking the owner to rubber-stamp commodity practice. The authoritative workstreams, questions, defaults, dependencies, evidence requirements, and acceptance gates live in [`config/engine-framework.config.json`](../config/engine-framework.config.json). Accepted answers live in the machine-validated [`config/engine-decisions.json`](../config/engine-decisions.json) ledger. The differentiation standard lives in the [`Novelty Charter`](NOVELTY_CHARTER.md).
 
 ## The loop
 
-1. Ask the next unanswered question in sequence.
-2. Record the answer, rationale, author, timestamp, and evidence. A preference without evidence may set a research direction, but it cannot promote a model.
-3. Convert the answer into a falsifiable implementation hypothesis.
-4. Freeze the comparison rows, market baseline, metrics, and leakage boundary before fitting.
-5. Implement the smallest challenger that can test the hypothesis.
-6. Run rolling-origin validation and required failure tests.
+1. Classify the choice as established foundation or consequential product/research trade-off.
+2. Apply an established default provisionally, document it, and test it without interrupting the owner.
+3. Ask the owner only when the choice changes the human decision contract, cost or data rights, acceptable uncertainty, release risk, or another difficult-to-reverse boundary.
+4. Record the answer, rationale, author, timestamp, and evidence. A preference may set a research direction, but it cannot promote a model.
+5. Convert the answer into a falsifiable implementation hypothesis and freeze comparison rows, baselines, metrics, and leakage boundaries.
+6. Implement the smallest challenger that can test the hypothesis, then run rolling-origin validation and required failure tests.
 7. Accept, reject, or defer the challenger. Record the result even when it fails.
-8. During the season, only weekly state and gated coefficients may update. Structural answers wait for the offseason review.
+8. During the season, only weekly state and gated coefficients may update. Structural changes wait for offseason review.
 
 The application UI remains compact. This ledger, experiment artifacts, hashes, and tests carry the complexity in the background.
 
@@ -36,6 +36,7 @@ An answer is not permission to skip validation. It defines what to test and what
 |---|---|---|---|
 | Q01 | Accepted design hypothesis; validation pending | Produce one joint home/away score distribution and derive all mainline probabilities from it. Use the result to facilitate human judgment by showing uncertainty, market disagreement, freshness, and material evidence. | [ADR-0001](decisions/ADR-0001-joint-score-decision-support.md) |
 | Q02 | Accepted design hypothesis; implementation verification pending | Use pooled non-push log loss as the promotion metric, with calibration as a hard gate and Brier, score, market-level, uncertainty, and CLV diagnostics. | [ADR-0002](decisions/ADR-0002-challenger-promotion-metric.md) |
+| Q03 | Accepted design hypothesis; bake-off pending | Compare a market-anchored discrete baseline, correlated negative-binomial model, and possession simulation under the same gates. Treat this machinery as foundation, not differentiation. | [ADR-0003](decisions/ADR-0003-score-model-bakeoff.md) |
 
 ## The ten workstreams
 
@@ -66,6 +67,6 @@ Every completed experiment records:
 
 No result from the site's temporary analysis slip or any personal selection is a training input.
 
-## Current question
+## Current direction
 
-Q01 and Q02 are recorded. The next open question is Q03: which first score-distribution family should earn the right to become champion? The recommended approach is to compare a correlated negative-binomial model and a possession-level simulation against a simple market-anchored discrete baseline on identical rolling-origin rows.
+Q01 through Q03 are recorded. Remaining established defaults advance provisionally without owner ceremony. The next owner prompt must concern the distinctive decision dossier or another consequential boundary—not an ordinary modeling checklist item.
