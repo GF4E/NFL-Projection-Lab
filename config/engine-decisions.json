@@ -1,0 +1,28 @@
+{
+  "version": "2026.08.24",
+  "answers": [
+    {
+      "questionId": "Q01",
+      "status": "accepted_design_hypothesis",
+      "answer": "Yes. The primary engine will produce a joint home/away score distribution and derive spread, total, and moneyline probabilities from the same possible game outcomes.",
+      "rationale": "The engine exists to produce meaningful, internally coherent results that facilitate and enhance human judgment. It must expose uncertainty and relevant evidence instead of replacing judgment with a single black-box pick.",
+      "evidence": [
+        "docs/decisions/ADR-0001-joint-score-decision-support.md"
+      ],
+      "author": "owner",
+      "answeredAt": "2026-08-24T21:51:34.000Z",
+      "implementationEffects": [
+        "Publish a central team-score forecast and a distribution around both teams' scores.",
+        "Derive spread, total, moneyline, push, and tie probabilities from the same normalized game-outcome distribution.",
+        "Show forecast uncertainty, market disagreement, source freshness, and the few evidence points that materially change the result.",
+        "Keep the model advisory: do not collapse the output into an unexplained recommendation or certainty claim."
+      ],
+      "validationRequired": [
+        "Compare the joint-distribution challenger with independent market models and a power-de-vigged market baseline on identical rolling-origin rows.",
+        "Require probability calibration, score-distribution fit, and derived-market log-loss diagnostics before promotion.",
+        "Verify that every published spread, total, and moneyline probability reconciles to the same normalized score outcomes."
+      ],
+      "adr": "docs/decisions/ADR-0001-joint-score-decision-support.md"
+    }
+  ]
+}
