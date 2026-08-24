@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  engineDecisions,
   engineFramework,
   nextEngineQuestion,
   validateEngineAnswer,
+  validateEngineDecisionLedger,
   validateEngineFramework
 } from "@/domain/engine-framework";
 
@@ -16,8 +18,21 @@ describe("ten-part engine Q&A framework", () => {
   it("asks one unanswered question at a time in a deterministic order", () => {
     expect(nextEngineQuestion([])?.question.id).toBe("Q01");
     expect(nextEngineQuestion([{ questionId: "Q01" }])?.question.id).toBe("Q02");
+    expect(validateEngineDecisionLedger()).toEqual([]);
+    expect(nextEngineQuestion(engineDecisions.answers)?.question.id).toBe("Q02");
     const allQuestions = engineFramework.workstreams.flatMap((item) => item.questions);
     expect(nextEngineQuestion(allQuestions.map((question) => ({ questionId: question.id })))).toBeNull();
+  });
+
+  it("keeps product choices distinct from empirically validated model decisions", () => {
+    expect(engineDecisions.answers).toHaveLength(1);
+    expect(engineDecisions.answers[0]).toMatchObject({
+      questionId: "Q01",
+      status: "accepted_design_hypothesis",
+      author: "owner"
+    });
+    expect(engineDecisions.answers[0].implementationEffects.join(" ")).toContain("advisory");
+    expect(engineDecisions.answers[0].validationRequired.length).toBeGreaterThanOrEqual(3);
   });
 
   it("rejects an undocumented answer and accepts a complete decision record", () => {

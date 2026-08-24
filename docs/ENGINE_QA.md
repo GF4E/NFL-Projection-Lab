@@ -1,6 +1,6 @@
 # Engine Q&A and decision ledger
 
-The engine is built through one auditable decision at a time. The authoritative workstreams, questions, defaults, dependencies, evidence requirements, and acceptance gates live in [`config/engine-framework.config.json`](../config/engine-framework.config.json). This document defines how those questions become code.
+The engine is built through one auditable decision at a time. The authoritative workstreams, questions, defaults, dependencies, evidence requirements, and acceptance gates live in [`config/engine-framework.config.json`](../config/engine-framework.config.json). Accepted answers live in the machine-validated [`config/engine-decisions.json`](../config/engine-decisions.json) ledger. This document defines how those questions become code.
 
 ## The loop
 
@@ -29,6 +29,12 @@ The application UI remains compact. This ledger, experiment artifacts, hashes, a
 ```
 
 An answer is not permission to skip validation. It defines what to test and what “done” means.
+
+## Recorded decisions
+
+| Question | Status | Decision | Architecture record |
+|---|---|---|---|
+| Q01 | Accepted design hypothesis; validation pending | Produce one joint home/away score distribution and derive all mainline probabilities from it. Use the result to facilitate human judgment by showing uncertainty, market disagreement, freshness, and material evidence. | [ADR-0001](decisions/ADR-0001-joint-score-decision-support.md) |
 
 ## The ten workstreams
 
@@ -59,6 +65,6 @@ Every completed experiment records:
 
 No result from the site's temporary analysis slip or any personal selection is a training input.
 
-## Starting point
+## Current question
 
-The first open question is Q01: should the primary engine predict a joint home/away score distribution and derive spread, total, and moneyline probabilities from it? The recommended default is yes, because it forces internally coherent predictions and exposes disagreements between the score model and each market.
+Q01 is recorded. The next open question is Q02: which metric decides whether a challenger is genuinely better? The recommended default is pooled non-push log loss as the promotion metric, with calibration as a hard gate and Brier score, score error, market-level results, and CLV as mandatory diagnostics.

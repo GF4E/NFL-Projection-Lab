@@ -1,4 +1,5 @@
 import frameworkJson from "../../config/engine-framework.config.json";
+import decisionsJson from "../../config/engine-decisions.json";
 
 export type EngineWorkstreamStatus =
   | "needs_answer"
@@ -46,7 +47,26 @@ export interface EngineAnswer {
   answeredAt: string;
 }
 
+export type EngineDecisionStatus =
+  | "accepted_design_hypothesis"
+  | "validated"
+  | "rejected"
+  | "deferred";
+
+export interface EngineDecision extends EngineAnswer {
+  status: EngineDecisionStatus;
+  implementationEffects: string[];
+  validationRequired: string[];
+  adr: string;
+}
+
+export interface EngineDecisionLedger {
+  version: string;
+  answers: EngineDecision[];
+}
+
 export const engineFramework = frameworkJson as unknown as EngineFramework;
+export const engineDecisions = decisionsJson as unknown as EngineDecisionLedger;
 
 export function validateEngineFramework(framework: EngineFramework = engineFramework): string[] {
   const errors: string[] = [];
@@ -96,5 +116,33 @@ export function validateEngineAnswer(answer: EngineAnswer, framework: EngineFram
   if (!answer.evidence.length || answer.evidence.some((item) => !item.trim())) errors.push("At least one evidence reference is required");
   if (!answer.author.trim()) errors.push("An author is required");
   if (!Number.isFinite(Date.parse(answer.answeredAt))) errors.push("A valid answer timestamp is required");
+  return errors;
+}
+
+export function validateEngineDecisionLedger(
+  ledger: EngineDecisionLedger = engineDecisions,
+  framework: EngineFramework = engineFramework
+): string[] {
+  const errors: string[] = [];
+  const seen = new Set<string>();
+  const statuses = new Set<EngineDecisionStatus>([
+    "accepted_design_hypothesis",
+    "validated",
+    "rejected",
+    "deferred"
+  ]);
+  for (const decision of ledger.answers) {
+    errors.push(...validateEngineAnswer(decision, framework).map((error) => `${decision.questionId}: ${error}`));
+    if (seen.has(decision.questionId)) errors.push(`Duplicate decision: ${decision.questionId}`);
+    seen.add(decision.questionId);
+    if (!statuses.has(decision.status)) errors.push(`${decision.questionId}: invalid decision status`);
+    if (!decision.implementationEffects.length || decision.implementationEffects.some((item) => !item.trim())) {
+      errors.push(`${decision.questionId}: at least one implementation effect is required`);
+    }
+    if (!decision.validationRequired.length || decision.validationRequired.some((item) => !item.trim())) {
+      errors.push(`${decision.questionId}: at least one validation requirement is required`);
+    }
+    if (!decision.adr.trim()) errors.push(`${decision.questionId}: an ADR reference is required`);
+  }
   return errors;
 }
