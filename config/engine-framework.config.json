@@ -79,6 +79,12 @@
           "prompt": "How much game mechanics should version one model explicitly?",
           "recommendedDefault": "Model possessions, pace, field position, touchdowns, field goals, two-point attempts, overtime rules, and end-game kneels/spikes; defer play-calling micro-simulation until it wins validation.",
           "evidenceRequired": "Ablation showing each mechanism improves held-out probability or calibration rather than narrative appeal."
+        },
+        {
+          "id": "Q19",
+          "prompt": "Should a positive average edge be labeled fragile or indeterminate when reasonable unresolved scenarios reverse it or push it below the decision threshold?",
+          "recommendedDefault": "Yes. Keep the scenario-weighted numerical estimate visible, label disagreement rather than averaging it away, and state the condition that changes the conclusion.",
+          "evidenceRequired": "Forecast-time scenario definitions, calibrated scenario weights, branch-level edge and sizing calculations, and prospective stability tests."
         }
       ],
       "acceptanceGates": [
