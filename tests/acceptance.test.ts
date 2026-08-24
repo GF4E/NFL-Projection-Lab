@@ -756,7 +756,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(worker).toContain('url.pathname === "/sunday"');
     expect(worker).toContain('request.method === "GET"');
     expect(worker).toContain("allowCatchup: true");
-    expect(worker).toContain('request.headers.has("oai-authenticated-user-email")');
+    expect(worker).not.toContain('request.headers.has("oai-authenticated-user-email")');
   });
 
   it("28. partitions a partial mainline payload at the whole-game boundary", () => {
