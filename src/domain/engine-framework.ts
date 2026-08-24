@@ -28,13 +28,21 @@ export interface EngineWorkstream {
 
 export interface EngineFramework {
   version: string;
-  mode: "one_question_at_a_time";
+  mode: "high_leverage_questions_only";
   purpose: string;
   answerPolicy: {
     requiredFields: string[];
     structuralChanges: "offseason_only";
     inSeasonChanges: "state_and_gated_coefficients_only";
     pickOutcomesInTraining: false;
+    commodityDefaults: "record_provisionally_without_owner_prompt";
+    ownerPromptRule: string;
+  };
+  noveltyStandard: {
+    foundationNotDifferentiation: string[];
+    distinctiveOutcome: string;
+    requiredDecisionSupport: string[];
+    claimPolicy: string;
   };
   workstreams: EngineWorkstream[];
 }
@@ -78,6 +86,12 @@ export function validateEngineFramework(framework: EngineFramework = engineFrame
     "verified"
   ]);
   if (framework.workstreams.length !== 10) errors.push("The framework must contain exactly ten workstreams");
+  if (framework.mode !== "high_leverage_questions_only") errors.push("The framework must reserve owner prompts for high-leverage questions");
+  if (!framework.answerPolicy.ownerPromptRule.trim()) errors.push("The owner prompt rule is required");
+  if (!framework.noveltyStandard.distinctiveOutcome.trim()) errors.push("The distinctive outcome is required");
+  if (!framework.noveltyStandard.foundationNotDifferentiation.length) errors.push("Commodity foundations must be explicit");
+  if (framework.noveltyStandard.requiredDecisionSupport.length < 4) errors.push("The novelty standard needs concrete decision-support requirements");
+  if (!framework.noveltyStandard.claimPolicy.trim()) errors.push("The novelty claim policy is required");
   const workstreamIds = new Set<string>();
   const questionIds = new Set<string>();
   for (const workstream of framework.workstreams) {

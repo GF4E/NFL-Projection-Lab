@@ -12,6 +12,9 @@ describe("ten-part engine Q&A framework", () => {
   it("keeps exactly ten auditable workstreams with questions, evidence, and acceptance gates", () => {
     expect(validateEngineFramework()).toEqual([]);
     expect(engineFramework.workstreams).toHaveLength(10);
+    expect(engineFramework.mode).toBe("high_leverage_questions_only");
+    expect(engineFramework.noveltyStandard.distinctiveOutcome).toContain("decision dossier");
+    expect(engineFramework.noveltyStandard.foundationNotDifferentiation).toContain("count models and game simulation");
     expect(engineFramework.workstreams.map((item) => item.sequence)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   });
 
@@ -19,13 +22,13 @@ describe("ten-part engine Q&A framework", () => {
     expect(nextEngineQuestion([])?.question.id).toBe("Q01");
     expect(nextEngineQuestion([{ questionId: "Q01" }])?.question.id).toBe("Q02");
     expect(validateEngineDecisionLedger()).toEqual([]);
-    expect(nextEngineQuestion(engineDecisions.answers)?.question.id).toBe("Q03");
+    expect(nextEngineQuestion(engineDecisions.answers)?.question.id).toBe("Q04");
     const allQuestions = engineFramework.workstreams.flatMap((item) => item.questions);
     expect(nextEngineQuestion(allQuestions.map((question) => ({ questionId: question.id })))).toBeNull();
   });
 
   it("keeps product choices distinct from empirically validated model decisions", () => {
-    expect(engineDecisions.answers).toHaveLength(2);
+    expect(engineDecisions.answers).toHaveLength(3);
     expect(engineDecisions.answers[0]).toMatchObject({
       questionId: "Q01",
       status: "accepted_design_hypothesis",
@@ -40,6 +43,12 @@ describe("ten-part engine Q&A framework", () => {
     });
     expect(engineDecisions.answers[1].answer).toContain("log loss");
     expect(engineDecisions.answers[1].implementationEffects.join(" ")).toContain("calibration slope");
+    expect(engineDecisions.answers[2]).toMatchObject({
+      questionId: "Q03",
+      status: "accepted_design_hypothesis",
+      author: "owner"
+    });
+    expect(engineDecisions.answers[2].rationale).toContain("established foundations");
     expect(engineFramework.workstreams[0].status).toBe("decisions_complete_implementation_pending");
   });
 
