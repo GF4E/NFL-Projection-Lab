@@ -272,7 +272,7 @@ export async function capturePlayForecastSnapshot(
   play: Pick<WeeklyPlay, "week" | "playType" | "americanOdds" | "contract" | "estimatedEvPercent" | "modelEdgePp" | "executionStatus">
 ): Promise<PlayForecastSnapshot> {
   const contract = play.contract ?? [];
-  const board = await buildDecisionBoard(db, { week: play.week });
+  const board = await buildDecisionBoard(db, { week: play.week, initializeStores: true });
   const gameIds = [...new Set(contract.map((leg) => leg.gameId))];
   const placeholders = gameIds.map(() => "?").join(", ");
   const lineResult = gameIds.length

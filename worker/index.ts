@@ -10,6 +10,7 @@ import { listPregameContextStates } from "../src/server/pregame-context/store";
 import { runBackgroundMaintenance } from "../src/server/background-maintenance";
 import { runModelLifecycleAutomation } from "../src/server/model-lifecycle/automation";
 import { scheduledMaintenanceLane } from "../src/domain/background-maintenance";
+import { getConfidenceEngineHealth } from "../src/server/confidence-engine/store";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -96,6 +97,14 @@ const worker = {
     }
     if (url.pathname === "/api/model-lifecycle") {
       return json({ error: "Public access is read-only" }, 405, { allow: "" });
+    }
+    if (url.pathname === "/api/confidence-engine") {
+      if (request.method !== "GET") return json({ error: "Public access is read-only" }, 405, { allow: "GET" });
+      try {
+        return json(await getConfidenceEngineHealth(env.DB));
+      } catch (error) {
+        return json({ error: error instanceof Error ? error.message : "Unable to load confidence-engine health" }, 503);
+      }
     }
     if (
       url.pathname === "/api/plays" || url.pathname.startsWith("/api/plays/") ||

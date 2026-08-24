@@ -21,6 +21,8 @@ A public NFL analytics site for comparing live market prices with leakage-safe m
 - Season-varying home-field and scoring effects, weekly team-state updates, a gated champion/challenger refit, and deterministic model/data/config hashes.
 - A 100-member fixed-seed weighted bootstrap; displayed suggestions are muted when the 80% edge interval spans zero.
 - BetMGM/FanDuel comparison, translated price deltas, line movement, edge decay, current injury/QB state, and kickoff-hour weather.
+- A data-fit joint home/away score distribution that reconciles team-score projections with moneyline, spread, total, tie, and push probabilities.
+- Prospective all-game scoring, scenario dossiers, and a registered market/count/possession model bakeoff. Human adjustments remain separate from model training.
 
 ## Automatic data
 
@@ -62,6 +64,8 @@ October, November, and December each reach the enforced 450-credit ceiling in th
 Structural settings live in `config/structural.config.json`; era definitions and provenance live in `config/era.config.json`. Structural changes are offseason-only.
 
 The ten-part research and build sequence lives in [`docs/ENGINE_QA.md`](docs/ENGINE_QA.md), backed by the machine-validated decision framework in `config/engine-framework.config.json` and answer ledger in `config/engine-decisions.json`. The [`Novelty Charter`](docs/NOVELTY_CHARTER.md) separates commodity forecast machinery from the scenario-aware decision dossier the project will test as its distinctive contribution, including explicit robust, fragile, and indeterminate states. Architecture records document each accepted boundary and its validation burden.
+
+The [`confidence-engine contract`](docs/CONFIDENCE_ENGINE.md) documents immutable point-in-time rows, the three-candidate score-model bakeoff, prospective evaluation, research lanes, the 52-question answer registry, and model-versus-human scorekeeping.
 
 ## Verification
 

@@ -9,6 +9,10 @@ import { runKickoffWeatherAutomation } from "./weather/automation";
 import { dispatchPendingPushes } from "./push/store";
 import { generateWeeklyDigest } from "./weekly-digest";
 import { runMarketSentimentAutomation } from "./market-sentiment/automation";
+import {
+  evaluateCompletedConfidenceForecasts,
+  runConfidenceEngineAutomation
+} from "./confidence-engine/automation";
 
 /**
  * Runs every five minutes in production. The official pregame snapshot is resolved first so
@@ -39,9 +43,22 @@ export async function runBackgroundMaintenance(input: {
       error: `weekly digest: ${error instanceof Error ? error.message : "unknown failure"}`
     })
   );
+  const confidenceEngine = (result.odds.status === "completed" && result.nflverse.status === "completed"
+    ? runConfidenceEngineAutomation({ db: input.db, now })
+    : evaluateCompletedConfidenceForecasts({ db: input.db, now }).then((evaluation) => ({
+        archive: { archived: 0, skipped: 0, withheld: 0, stale: 0 },
+        evaluation
+      })))
+    .then(
+      (value) => ({ status: "completed" as const, result: value }),
+      (error: unknown) => ({
+        status: "failed" as const,
+        error: `confidence engine: ${error instanceof Error ? error.message : "unknown failure"}`
+      })
+    );
   try {
-    return { ...result, digest, push: { status: "completed" as const, result: await dispatchPendingPushes({ db: input.db, now: now.toISOString() }) } };
+    return { ...result, confidenceEngine, digest, push: { status: "completed" as const, result: await dispatchPendingPushes({ db: input.db, now: now.toISOString() }) } };
   } catch (error) {
-    return { ...result, digest, push: { status: "failed" as const, error: error instanceof Error ? error.message : "push retry failed" } };
+    return { ...result, confidenceEngine, digest, push: { status: "failed" as const, error: error instanceof Error ? error.message : "push retry failed" } };
   }
 }

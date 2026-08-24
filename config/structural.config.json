@@ -1,5 +1,5 @@
 {
-  "version": "2026.preseason.13",
+  "version": "2026.preseason.14",
   "season": 2026,
   "frozen": true,
   "unitDollars": 25,
@@ -23,7 +23,15 @@
     "discreteTotalArtifact": "discrete-total-2026.json",
     "totalTranslationValidationArtifact": "total-translation-validation.json",
     "totalTranslationKernelBandwidth": 6,
-    "seasonEffects": "random_effects"
+    "seasonEffects": "random_effects",
+    "scoreDistribution": {
+      "maxScore": 70,
+      "minimumTrainingGames": 256,
+      "maximumQuoteAgeMinutes": 75,
+      "bakeoffCalibrationSlope": [0.8, 1.2],
+      "bakeoffCoverage80": [0.72, 0.88],
+      "maximumLogLossRegression": 0.002
+    }
   },
   "sizing": {
     "kellyFraction": 0.25,

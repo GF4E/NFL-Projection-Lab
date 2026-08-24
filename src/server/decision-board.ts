@@ -56,6 +56,14 @@ import { bootstrapMarginTranslation, buildMarginBootstrapIndex } from "@/domain/
 import { bootstrapTotalTranslation, buildTotalBootstrapIndex, type TotalBootstrapIndex } from "@/domain/total-bootstrap";
 import { buildMainlineContractEvaluations } from "@/domain/book-comparison";
 import { ensureMarketSentimentStore, listLatestMarketSentiment } from "./market-sentiment/store";
+import {
+  buildMarketAnchoredScoreDistribution,
+  deriveMainlineProbabilities,
+  fitJointScoreParameters,
+  type FittedJointScoreParameters
+} from "@/domain/joint-score";
+import { buildScenarioDecisionDossier, type ForecastScenarioBranch } from "@/domain/scenarios";
+import { sizeKelly } from "@/domain/sizing";
 
 interface FeatureRow {
   game_id: string;
@@ -691,17 +699,26 @@ function rawLine(row: LineRow): Omit<LiveLine, "fairProbability" | "marketVigPer
 
 export async function buildDecisionBoard(
   db: D1Database = getD1(),
-  options: { season?: number; week?: number; now?: Date } = {}
+  options: {
+    season?: number;
+    week?: number;
+    now?: Date;
+    includeInternalDistributions?: boolean;
+    initializeStores?: boolean;
+  } = {}
 ): Promise<DecisionBoardPayload> {
+  const generatedAt = (options.now ?? new Date()).toISOString();
   const slate = await weeklySlate({ db, season: options.season, week: options.week, now: options.now });
-  await Promise.all([
-    ensureOfficialInjuryStore(db),
-    ensureKickoffWeatherStore(db),
-    ensureModelLifecycleStore(db),
-    ensureMarketSentimentStore(db),
-    ensurePregameContextStore(db),
-    ensureQbOverrideStore(db)
-  ]);
+  if (options.initializeStores) {
+    await Promise.all([
+      ensureOfficialInjuryStore(db),
+      ensureKickoffWeatherStore(db),
+      ensureModelLifecycleStore(db),
+      ensureMarketSentimentStore(db),
+      ensurePregameContextStore(db),
+      ensureQbOverrideStore(db)
+    ]);
+  }
   const activeGameIds = slate.games.map((game) => game.id);
   const activePlaceholders = activeGameIds.map(() => "?").join(", ");
   const injuryDataset = `official-injuries:${slate.season}:reg${slate.week}`;
@@ -777,6 +794,25 @@ export async function buildDecisionBoard(
   });
   const latestTrainingSeason = Math.max(structuralConfig.model.trainingStartSeason, ...gameResult.results.map((row) => row.season));
   const leagueScoring = weightedLeagueScoring(gameResult.results.filter((row) => row.season >= slate.season - 3), slate.season);
+  const scoreTrainingRows = gameResult.results.flatMap((row) => {
+    if (row.total === null || row.total_line === null) return [];
+    const actualHomeScore = (row.total + row.result) / 2;
+    const actualAwayScore = (row.total - row.result) / 2;
+    if (!Number.isInteger(actualHomeScore) || !Number.isInteger(actualAwayScore)) return [];
+    return [{
+      gameId: row.game_id,
+      season: row.season,
+      actualHomeScore,
+      actualAwayScore,
+      expectedHomeMargin: row.spread_line,
+      expectedTotal: row.total_line,
+      weight: 0.5 ** ((slate.season - row.season) / structuralConfig.model.decayHalfLifeSeasons)
+    }];
+  });
+  const scoreParameters: FittedJointScoreParameters | null =
+    scoreTrainingRows.length >= structuralConfig.model.scoreDistribution.minimumTrainingGames
+      ? fitJointScoreParameters(scoreTrainingRows)
+      : null;
   const basisSeason = featureRows.length ? Math.max(...featureRows.map((row) => row.season)) : null;
   const loopARevision = loopAStateRevision(structuralConfig.version, structuralConfig.model.strengthK);
   const persistedStrengths = loopAStateMatchesRevision(lifecycle?.loopAHash, loopARevision) &&
@@ -1307,8 +1343,155 @@ export async function buildDecisionBoard(
         teamContext
       }
     });
+    const contractEvaluations = buildMainlineContractEvaluations({
+      lines: gameLines,
+      projections,
+      totals,
+      moneylines,
+      consensusHomePoint,
+      marginArtifact: artifact,
+      totalArtifact: frozenTotalArtifact
+    });
+    const projectedTotal = totals[0]?.projectedTotal ?? consensusTotalLine;
+    const projectedSpreadPoint = projections[0]?.projectedHomePoint ?? stateProjectedHomePoint;
+    const newestQuoteAt = gameLines.map((line) => line.capturedAt).sort().at(-1) ?? null;
+    const quoteAgeMinutes = newestQuoteAt === null ? null
+      : Math.max(0, (Date.parse(generatedAt) - Date.parse(newestQuoteAt)) / 60_000);
+    const quoteFresh = quoteAgeMinutes !== null &&
+      quoteAgeMinutes <= structuralConfig.model.scoreDistribution.maximumQuoteAgeMinutes;
+    const scoreReason = scoreParameters === null
+      ? `withheld until ${structuralConfig.model.scoreDistribution.minimumTrainingGames} valid historical market-score rows are available`
+      : consensusHomePoint === null || consensusTotalLine === null || projectedTotal === null || projectedSpreadPoint === null
+        ? "withheld because a complete spread and total contract is unavailable"
+        : null;
+    let internalScoreArtifact: DecisionBoardPayload["games"][number]["internalScoreArtifact"];
+    let scoreForecast: NonNullable<DecisionBoardPayload["games"][number]["scoreForecast"]> = {
+      status: "withheld",
+      reason: scoreReason,
+      family: "market_anchored_discrete",
+      distributionHash: null,
+      trainingGames: scoreParameters?.trainingGames ?? scoreTrainingRows.length,
+      effectiveTrainingGames: scoreParameters?.effectiveGames ?? 0,
+      expectedHomeScore: null,
+      expectedAwayScore: null,
+      mainline: null,
+      scenarioStatus: "withheld",
+      quoteFresh,
+      quoteAgeMinutes,
+      whatChangesTheView: scoreReason ? [scoreReason] : [],
+      generatedAt
+    };
+    if (scoreReason === null && scoreParameters && consensusHomePoint !== null && consensusTotalLine !== null && projectedTotal !== null && projectedSpreadPoint !== null) {
+      const provenanceHash = stableHash({
+        trainingHash: scoreParameters.trainingHash,
+        quoteHashes: gameLines.map((line) => line.sourceHash).sort(),
+        championHash,
+        configHash
+      });
+      const modelHash = stableHash({ family: "market_anchored_discrete", championHash, configHash, parameters: scoreParameters });
+      const distribution = buildMarketAnchoredScoreDistribution({
+        expectedHomeMargin: -projectedSpreadPoint,
+        expectedTotal: projectedTotal,
+        homeDispersion: scoreParameters.homeDispersion,
+        awayDispersion: scoreParameters.awayDispersion,
+        dependence: scoreParameters.dependence,
+        maxScore: structuralConfig.model.scoreDistribution.maxScore,
+        generatedAt,
+        modelHash,
+        provenanceHash
+      });
+      const best = contractEvaluations
+        .filter((evaluation) => evaluation.shrunkProbability !== null && evaluation.edgeInterval !== null)
+        .map((evaluation) => ({ evaluation, edge: evaluation.shrunkProbability! - evaluation.fairProbability }))
+        .sort((left, right) => right.edge - left.edge)[0] ?? null;
+      const bestInterval: [number, number] = best?.evaluation.edgeInterval ?? [0, 0];
+      const sizing = best ? sizeKelly(
+        best.evaluation.shrunkProbability!,
+        best.evaluation.americanPrice,
+        bestInterval,
+        {
+          referenceBankrollUnits: structuralConfig.sizing.referenceBankrollUnits,
+          kellyFraction: structuralConfig.sizing.kellyFraction,
+          increment: structuralConfig.sizing.roundDownUnits,
+          minimum: structuralConfig.sizing.minimumUnits,
+          maximum: structuralConfig.sizing.maximumUnits
+        }
+      ) : null;
+      const branches: ForecastScenarioBranch[] = [{
+        id: "current_information",
+        label: "Current information",
+        condition: "Current market, quarterback, injury, roof, and weather state remains valid",
+        weight: 1,
+        supported: true,
+        material: false,
+        observations: [],
+        distribution,
+        edge: best?.edge ?? 0,
+        edgeInterval: bestInterval,
+        suggestedUnits: sizing?.suggestedUnits ?? 0
+      }];
+      const unresolved = [
+        ["at_risk", "inactive", "unconfirmed"].includes(homeQuarterback.availability)
+          ? `${game.home} starting-quarterback availability and backup effect` : null,
+        ["at_risk", "inactive", "unconfirmed"].includes(awayQuarterback.availability)
+          ? `${game.away} starting-quarterback availability and backup effect` : null,
+        weather.status === "pending" || weather.status === "unconfirmed"
+          ? "kickoff-hour roof and weather state" : null,
+        best === null ? "coefficient and translation uncertainty interval" : null
+      ].filter((condition): condition is string => condition !== null);
+      unresolved.forEach((condition, index) => branches.push({
+        id: `unresolved_${index + 1}`,
+        label: "Unresolved material scenario",
+        condition,
+        weight: null,
+        supported: false,
+        material: true,
+        observations: [],
+        distribution,
+        edge: 0,
+        edgeInterval: [-1, 1],
+        suggestedUnits: 0
+      }));
+      const dossier = buildScenarioDecisionDossier({
+        branches,
+        aggregateEdgeInterval: bestInterval,
+        suggestedUnits: sizing?.suggestedUnits ?? 0,
+        kellyFloor: structuralConfig.sizing.minimumUnits,
+        homeSpreadPoint: consensusHomePoint,
+        totalPoint: consensusTotalLine,
+        lineMoveFalsifier: best?.evaluation.point === null || best?.evaluation.point === undefined
+          ? null : `Re-evaluate if ${best.evaluation.side} moves off ${best.evaluation.point}`,
+        generatedAt,
+        modelHash,
+        scenarioConfigHash: stableHash({ qb: structuralConfig.qbTiers, score: structuralConfig.model.scoreDistribution }),
+        provenanceHash
+      });
+      const mainline = deriveMainlineProbabilities(distribution, {
+        homeSpreadPoint: consensusHomePoint,
+        totalPoint: consensusTotalLine
+      });
+      scoreForecast = {
+        status: quoteFresh ? "current" : "stale",
+        reason: quoteFresh ? null : "market snapshot is stale; preserving the last calculated distribution",
+        family: "market_anchored_discrete",
+        distributionHash: distribution.distributionHash,
+        trainingGames: scoreParameters.trainingGames,
+        effectiveTrainingGames: scoreParameters.effectiveGames,
+        expectedHomeScore: mainline.expectedHomeScore,
+        expectedAwayScore: mainline.expectedAwayScore,
+        mainline,
+        scenarioStatus: dossier.status,
+        quoteFresh,
+        quoteAgeMinutes,
+        whatChangesTheView: dossier.whatChangesTheView,
+        generatedAt
+      };
+      if (options.includeInternalDistributions) internalScoreArtifact = { distribution, dossier };
+    }
     return {
       gameId: game.id,
+      sourceGameId: game.sourceGameId,
+      kickoffAt: game.kickoffAt,
       awayTeam: game.away,
       homeTeam: game.home,
       away,
@@ -1316,15 +1499,7 @@ export async function buildDecisionBoard(
       projections,
       totals,
       moneylines,
-      contractEvaluations: buildMainlineContractEvaluations({
-        lines: gameLines,
-        projections,
-        totals,
-        moneylines,
-        consensusHomePoint,
-        marginArtifact: artifact,
-        totalArtifact: frozenTotalArtifact
-      }),
+      contractEvaluations,
       teasers,
       signals: evidence.status === "current"
         ? matchupSignals(away, home, { awayRest: game.awayRest, homeRest: game.homeRest })
@@ -1334,7 +1509,9 @@ export async function buildDecisionBoard(
       sentiment: sentimentRows.filter((row) => row.gameId === game.id),
       availability,
       weather,
-      quarterbacks
+      quarterbacks,
+      scoreForecast,
+      ...(internalScoreArtifact ? { internalScoreArtifact } : {})
     };
   });
   const teaserPairs = rankTeaserPairs(games.flatMap((game) => game.teasers), {
@@ -1370,10 +1547,11 @@ export async function buildDecisionBoard(
     pregameStates,
     weather: weatherRows,
     strengthStateHash: lifecycle?.loopAHash ?? null,
-    quarterbackOverrides: qbOverrides
+    quarterbackOverrides: qbOverrides,
+    liveLines: lines
   });
   return {
-    generatedAt: new Date().toISOString(),
+    generatedAt,
     season: slate.season,
     week: slate.week,
     basisSeason,
