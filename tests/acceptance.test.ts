@@ -34,7 +34,7 @@ import { assertCompletePropQuotePairs, buildPlayerPropEvidence, completeLeaguePr
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
-import { inspectMainlineCompleteness, latestExpectedMainlineCandidate, scheduledMainlineCandidates, scheduledPropCandidates, type ScheduledGame, type ScheduledOddsCandidate } from "@/domain/odds-schedule";
+import { deterministicRecoveryCandidate, inspectMainlineCompleteness, latestExpectedMainlineCandidate, scheduledMainlineCandidates, scheduledPropCandidates, type ScheduledGame, type ScheduledOddsCandidate } from "@/domain/odds-schedule";
 import { plannedOddsThrottleReason } from "@/domain/odds-credit-plan";
 import { boardGameId, chooseActiveWeek, easternScheduleTimeToIso, normalizeScheduleTeam } from "@/domain/weekly-slate";
 import type { BookEvaluation, DiscreteMarginArtifact, JobState, PushDelivery, SettledPick } from "@/domain/types";
@@ -748,10 +748,13 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(missedSaturday).toMatchObject({ job: "daily", scheduledFor: "2026-08-15T09:00:00[America/Los_Angeles]" });
     const sundayOpener = latestExpectedMainlineCandidate(new Date("2026-08-17T01:05:00.000Z"), games);
     expect(sundayOpener).toMatchObject({ job: "open_sunday", scheduledFor: "2026-08-16T18:00:00[America/Los_Angeles]" });
+    expect(deterministicRecoveryCandidate(sundayOpener!, null)?.key).toBe(sundayOpener?.key);
+    expect(deterministicRecoveryCandidate(sundayOpener!, "failed")?.key).toBe(`${sundayOpener?.key}:recovery-v2`);
+    expect(deterministicRecoveryCandidate(sundayOpener!, "succeeded")).toBeNull();
     expect(readFileSync("src/app/api/lines/route.ts", "utf8")).toContain("lines refresh automatically");
   });
 
-  it("28. rejects a partial mainline payload so stale complete prices survive", () => {
+  it("28. partitions a partial mainline payload at the whole-game boundary", () => {
     const partial = [{ gameId: "ne-sea", book: "betmgm", market: "total" }] as Awaited<ReturnType<typeof fetchWeekOneLiveOdds>>["lines"];
     const result = inspectMainlineCompleteness(partial, weekOneMatchups.map((game) => game.id));
     expect(result).toMatchObject({ complete: false, completeGames: 0, totalGames: 16 });
@@ -769,7 +772,17 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
       ...betmgmPaired,
       ...betmgmPaired.map((quote) => ({ ...quote, book: "fanduel" }))
     ];
-    expect(inspectMainlineCompleteness(bothBooksPaired, ["ne-sea"]).complete).toBe(true);
+    expect(inspectMainlineCompleteness(bothBooksPaired, ["ne-sea", "sf-lar"])).toMatchObject({
+      complete: false,
+      completeGames: 1,
+      completeGameIds: ["ne-sea"],
+      missingGameIds: ["sf-lar"]
+    });
+    const automation = readFileSync("src/server/odds-automation.ts", "utf8");
+    const store = readFileSync("src/server/live-line-store.ts", "utf8");
+    expect(automation).toContain("publishableCompleteGameLines");
+    expect(automation).toContain("last good prices preserved for");
+    expect(store).toContain("A single game is the publication boundary");
   });
 
   it("29. derives the active week and Pacific-ready kickoff from the nflverse schedule", () => {

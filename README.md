@@ -29,7 +29,7 @@ A public NFL analytics site for comparing live market prices with leakage-safe m
 - Official NFL/team sources for current injury reports and inactives.
 - Open-Meteo for outdoor or open-roof kickoff-hour weather.
 
-The Cloudflare Worker runs the refresh and model lifecycle on its schedule. Public HTTP access is read-only, so visitors cannot spend provider credits, trigger model refits, modify forecasts, or create records. A failed or partial import preserves the last validated data and marks the public output stale.
+The Cloudflare Worker runs the refresh and model lifecycle on its schedule. Public HTTP access is read-only, so visitors cannot spend provider credits, trigger model refits, modify forecasts, or create records. A failed import preserves the last validated data. A partial odds board publishes only complete two-book games and marks each incomplete game stale.
 
 ## Local preview
 
@@ -60,6 +60,8 @@ The primary runtime value is `ODDS_API_KEY`. Scheduled administrative jobs use `
 October, November, and December each reach the enforced 450-credit ceiling in the frozen reservation simulation, so lower-priority snapshots are withheld before essential windows.
 
 Structural settings live in `config/structural.config.json`; era definitions and provenance live in `config/era.config.json`. Structural changes are offseason-only.
+
+The ten-part research and build sequence lives in [`docs/ENGINE_QA.md`](docs/ENGINE_QA.md), backed by the machine-validated decision framework in `config/engine-framework.config.json`.
 
 ## Verification
 

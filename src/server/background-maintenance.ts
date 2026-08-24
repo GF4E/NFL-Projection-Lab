@@ -24,7 +24,7 @@ export async function runBackgroundMaintenance(input: {
   const now = input.now ?? new Date();
   const result = await orchestrateBackgroundMaintenance({
     pregame: () => runOfficialPregameContextAutomation({ db: input.db, now }),
-    odds: () => runScheduledOddsAutomation({ db: input.db, apiKey: input.apiKey, now }),
+    odds: () => runScheduledOddsAutomation({ db: input.db, apiKey: input.apiKey, now, allowCatchup: true }),
     weather: () => runKickoffWeatherAutomation({ db: input.db, now }),
     injuries: () => runOfficialInjuryAutomation({ db: input.db, now }),
     nflverse: () => runNflverseAutomation({ db: input.db, now, allowPlayByPlay: true }),

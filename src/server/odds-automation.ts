@@ -1,4 +1,5 @@
 import {
+  deterministicRecoveryCandidate,
   inspectMainlineCompleteness,
   latestExpectedMainlineCandidate,
   scheduledMainlineCandidates,
@@ -79,12 +80,16 @@ export function inspectSlateMainlineCompleteness(
   return inspectMainlineCompleteness(lines, matchups.map((game) => game.id));
 }
 
-export function validateCompleteSlateMainlines(
+export function publishableCompleteGameLines(
   lines: Awaited<ReturnType<typeof fetchLiveOddsForSlate>>["lines"],
   matchups: readonly Pick<WeeklyMatchup, "id">[]
-): void {
-  const result = inspectSlateMainlineCompleteness(lines, matchups);
-  if (!result.complete) throw new Error(`Provider board is partial (${result.completeGames}/${result.totalGames} games have spread, total and moneyline); last good prices preserved`);
+) {
+  const validation = inspectSlateMainlineCompleteness(lines, matchups);
+  const completeGameIds = new Set(validation.completeGameIds);
+  return {
+    validation,
+    lines: lines.filter((line) => completeGameIds.has(line.gameId))
+  };
 }
 
 export async function refreshCompleteSlateMainlines(input: {
@@ -99,8 +104,11 @@ export async function refreshCompleteSlateMainlines(input: {
   await assertOddsCreditsAvailable(MAINLINE_COST, db);
   const result = await fetchLiveOddsForSlate(input.apiKey, input.matchups, input.fetcher ?? fetch);
   await recordOddsQuota({ used: result.used, remaining: result.remaining, lastCost: result.lastCost }, db);
-  validateCompleteSlateMainlines(result.lines, input.matchups);
-  const lines = await replaceLiveLines(result.lines, { db, snapshotKey: input.snapshotKey, fetchedAt: input.fetchedAt });
+  const publishable = publishableCompleteGameLines(result.lines, input.matchups);
+  if (publishable.validation.completeGames === 0) {
+    throw new Error("Provider board contains no complete two-book games; last good prices preserved");
+  }
+  const lines = await replaceLiveLines(publishable.lines, { db, snapshotKey: input.snapshotKey, fetchedAt: input.fetchedAt });
   try {
     const [{ buildDecisionBoard }, { publishEdgeThresholdNotifications }] = await Promise.all([
       import("./decision-board"),
@@ -125,6 +133,7 @@ export async function refreshCompleteSlateMainlines(input: {
   }
   return {
     lines,
+    validation: publishable.validation,
     quota: { used: result.used, remaining: result.remaining, lastCost: result.lastCost }
   };
 }
@@ -174,7 +183,14 @@ export async function runScheduledOddsAutomation(input: {
   const due = [...scheduledMainlineCandidates(now, schedule), ...scheduledPropCandidates(now, schedule)];
   if (input.allowCatchup && !due.some((candidate) => candidate.job !== "props_minus_60")) {
     const catchup = latestExpectedMainlineCandidate(now, schedule);
-    if (catchup && !due.some((candidate) => candidate.key === catchup.key)) due.push(catchup);
+    if (catchup && !due.some((candidate) => candidate.key === catchup.key)) {
+      const existing = await db.prepare("SELECT status FROM odds_automation_runs WHERE snapshot_key = ? LIMIT 1")
+        .bind(catchup.key).first<Pick<OddsAutomationRunRow, "status">>();
+      const recovery = deterministicRecoveryCandidate(catchup, existing?.status ?? null);
+      // A suffix makes exactly one idempotent recovery attempt for a failed
+      // scheduled snapshot. Successful runs are never fetched a second time.
+      if (recovery) due.push(recovery);
+    }
   }
   due.sort((left, right) => left.priority - right.priority);
   const summary: OddsAutomationSummary = { checkedAt, due: due.length, completed: 0, failed: 0, skipped: 0, results: [] };
@@ -209,7 +225,8 @@ export async function runScheduledOddsAutomation(input: {
       } else {
         const target = await targetSlateForCandidate(db, now, candidate.job);
         const refreshed = await refreshCompleteSlateMainlines({ apiKey: input.apiKey, matchups: target.games, db, fetcher: input.fetcher, snapshotKey: candidate.key, fetchedAt: checkedAt });
-        const message = `${refreshed.lines.length} complete mainline quotes published`;
+        const missing = refreshed.validation.missingGameIds;
+        const message = `${refreshed.lines.length} complete mainline quotes published for ${refreshed.validation.completeGames}/${refreshed.validation.totalGames} games${missing.length ? `; last good prices preserved for ${missing.join(", ")}` : ""}`;
         await finishRun(db, candidate.key, "succeeded", message);
         summary.completed += 1;
         summary.results.push({ key: candidate.key, status: "succeeded", message });
@@ -241,13 +258,20 @@ export async function getMainlineRecoveryStatus(input: {
       runStatus: null
     };
   }
-  const row = await db.prepare("SELECT status FROM odds_automation_runs WHERE snapshot_key = ? LIMIT 1")
-    .bind(expected.key).first<{ status: OddsAutomationRunRow["status"] }>();
+  const recoveryKey = `${expected.key}:recovery-v2`;
+  const rows = await db.prepare(`SELECT snapshot_key, status FROM odds_automation_runs
+    WHERE snapshot_key IN (?, ?)`)
+    .bind(expected.key, recoveryKey).all<Pick<OddsAutomationRunRow, "snapshot_key" | "status">>();
+  const recoveryRow = rows.results.find((row) => row.snapshot_key === recoveryKey);
+  const originalRow = rows.results.find((row) => row.snapshot_key === expected.key);
+  const succeeded = recoveryRow?.status === "succeeded" ? recoveryRow :
+    originalRow?.status === "succeeded" ? originalRow : undefined;
+  const latest = recoveryRow ?? originalRow;
   return {
-    stale: input.lineCount === 0 || row?.status !== "succeeded",
-    expectedSnapshotKey: expected.key,
+    stale: input.lineCount === 0 || !succeeded,
+    expectedSnapshotKey: succeeded?.snapshot_key ?? expected.key,
     expectedJob: expected.job,
-    runStatus: row?.status ?? null
+    runStatus: succeeded?.status ?? latest?.status ?? null
   };
 }
 

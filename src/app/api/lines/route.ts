@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listLiveLines } from "@/server/live-line-store";
+import { listLiveLines, listSnapshotGameIds } from "@/server/live-line-store";
 import { getMainlineRecoveryStatus } from "@/server/odds-automation";
 import { weeklySlate } from "@/server/weekly-slate";
 
@@ -15,15 +15,26 @@ function requestedWeek(request: Request): number | undefined {
 export async function GET(request: Request) {
   try {
     const slate = await weeklySlate({ week: requestedWeek(request) });
-    const lines = await listLiveLines(undefined, slate.games.map((game) => game.id));
+    const gameIds = slate.games.map((game) => game.id);
+    const lines = await listLiveLines(undefined, gameIds);
     const recovery = await getMainlineRecoveryStatus({ lineCount: lines.length });
+    const currentGameIds = recovery.runStatus === "succeeded" && recovery.expectedSnapshotKey
+      ? await listSnapshotGameIds(recovery.expectedSnapshotKey)
+      : [];
+    const currentGames = new Set(currentGameIds);
+    const staleGameIds = recovery.stale
+      ? gameIds
+      : gameIds.filter((gameId) => !currentGames.has(gameId));
     return NextResponse.json({
       lines,
       season: slate.season,
       week: slate.week,
       configured: configured(),
       comparisonBooks: ["betmgm", "fanduel"],
-      stale: recovery.stale
+      stale: staleGameIds.length > 0,
+      partial: currentGameIds.length > 0 && staleGameIds.length > 0,
+      currentGameIds,
+      staleGameIds
     });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to load cached lines" }, { status: 503 });

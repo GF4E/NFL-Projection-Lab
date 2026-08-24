@@ -11,11 +11,7 @@ export function NflverseRefreshBeacon() {
       const previous = Number(window.sessionStorage.getItem(SESSION_KEY) ?? "0");
       if (Date.now() - previous < FIVE_MINUTES) return;
       window.sessionStorage.setItem(SESSION_KEY, String(Date.now()));
-      void fetch("/api/nflverse", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: { "content-type": "application/json" }
-      }).then((response) => {
+      void fetch("/api/nflverse", { method: "GET", credentials: "same-origin" }).then((response) => {
         if (response.ok) window.dispatchEvent(new Event("projection-lab:data-refreshed"));
       }).catch(() => {
         // Each background runner preserves its last good snapshot and records its own stale state.

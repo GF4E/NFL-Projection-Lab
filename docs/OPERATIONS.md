@@ -41,6 +41,8 @@ The site adds no pregame settings page. A confirmed list only replaces the exist
 3. On any failure, abort the transaction, mark the run failed, create one idempotent in-app alert, mark dependent forecasts stale, and continue serving the last good forecast.
 4. Never update an approved revision. Never promote a challenger outside the atomic gate transaction.
 
+For live odds, one game is the atomic validation boundary. A game publishes only when both execution books provide both sides of spread, total, and moneyline. Complete games may publish from a partial provider slate; incomplete games retain their last validated snapshot, carry an explicit stale state, and are excluded from the new snapshot key.
+
 ## Credit throttle
 
 At a response-header usage of 400:

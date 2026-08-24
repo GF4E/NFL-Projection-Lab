@@ -30,7 +30,19 @@ const bookNames: Record<LineBookKey, string> = { betmgm: "BetMGM", fanduel: "Fan
 const neutralPreferences = new Set<string>();
 
 type SlipMode = "straight" | "parlay" | "teaser";
-type LinesResponse = { lines?: LiveLine[]; configured?: boolean; season?: number; week?: number; comparisonBooks?: LineBookKey[]; error?: string; cached?: boolean; stale?: boolean };
+type LinesResponse = {
+  lines?: LiveLine[];
+  configured?: boolean;
+  season?: number;
+  week?: number;
+  comparisonBooks?: LineBookKey[];
+  error?: string;
+  cached?: boolean;
+  stale?: boolean;
+  partial?: boolean;
+  currentGameIds?: string[];
+  staleGameIds?: string[];
+};
 type DecisionResponse = DecisionBoardPayload & { error?: string };
 type SelectedLeg = ValueLeg & {
   id: string;
@@ -244,6 +256,8 @@ export function WeekOneBoard() {
   const [slate, setSlate] = useState<WeeklySlate | null>(null);
   const [lines, setLines] = useState<LiveLine[]>([]);
   const [linesStale, setLinesStale] = useState(false);
+  const [lineCoverage, setLineCoverage] = useState<{ current: number; stale: number }>({ current: 0, stale: 0 });
+  const [staleGameIds, setStaleGameIds] = useState<Set<string>>(new Set());
   const [configured, setConfigured] = useState(false);
   const [slip, setSlip] = useState<SelectedLeg[]>([]);
   const [slipMode, setSlipMode] = useState<SlipMode>("parlay");
@@ -324,6 +338,11 @@ export function WeekOneBoard() {
       const nextLines = lineData.lines ?? [];
       setLines(nextLines);
       setLinesStale(Boolean(lineData.stale));
+      setLineCoverage({
+        current: lineData.currentGameIds?.length ?? 0,
+        stale: lineData.staleGameIds?.length ?? 0
+      });
+      setStaleGameIds(new Set(lineData.staleGameIds ?? []));
       if (!initialBookChosen.current) {
         setBook(bestCoveredExecutionBook(nextLines));
         initialBookChosen.current = true;
@@ -331,7 +350,8 @@ export function WeekOneBoard() {
       setConfigured(Boolean(lineData.configured));
       if (!decisionData.error) setIntelligence(decisionData);
       if (!lineData.configured) setMessage("Live prices need the Odds API key. The board will not invent them.");
-      if (lineData.configured && lineData.stale) setMessage("The scheduled refresh is pending; the last validated prices remain visible.");
+      if (lineData.configured && lineData.partial) setMessage(`${lineData.currentGameIds?.length ?? 0} games are current; incomplete games retain their last validated prices.`);
+      else if (lineData.configured && lineData.stale) setMessage("The scheduled refresh is pending; the last validated prices remain visible.");
     };
     void load().catch((error) => active && setMessage(error instanceof Error ? error.message : "The last good board could not be loaded."));
     const refreshed = () => {
@@ -515,8 +535,8 @@ export function WeekOneBoard() {
     </header>
 
     <div className="line-status" data-ready={lines.length > 0}>
-      <span><i />{lines.length ? linesStale ? "LINES STALE" : "LINES LIVE" : configured ? "LINES PENDING" : "ODDS KEY NEEDED"}</span>
-      <small>{bookNames[book].toUpperCase()} · {coverageReadout ? `${coverageReadout} · ` : ""}{latestCapture ? `${snapshotAge(latestCapture)} OLD` : "NO SNAPSHOT"}{!configured && <> · <a href="https://the-odds-api.com/" target="_blank" rel="noreferrer">GET KEY ↗</a></>}</small>
+      <span><i />{lines.length ? linesStale ? lineCoverage.current ? "LINES PARTIAL" : "LINES STALE" : "LINES LIVE" : configured ? "LINES PENDING" : "ODDS KEY NEEDED"}</span>
+      <small>{bookNames[book].toUpperCase()} · {lineCoverage.current && lineCoverage.stale ? `${lineCoverage.current}/${lineCoverage.current + lineCoverage.stale} GAMES CURRENT · ` : ""}{coverageReadout ? `${coverageReadout} · ` : ""}{latestCapture ? `${snapshotAge(latestCapture)} OLD` : "NO SNAPSHOT"}{!configured && <> · <a href="https://the-odds-api.com/" target="_blank" rel="noreferrer">GET KEY ↗</a></>}</small>
     </div>
 
     <div className={`sportsbook-layout ${slipOpen || slip.length ? "" : "slip-collapsed"}`}>
@@ -615,6 +635,7 @@ export function WeekOneBoard() {
                   <div className="event-time">
                     <b>{formatKickoff(game)}</b>
                     {game.network && <span>{game.network}</span>}
+                    {staleGameIds.has(game.id) && <span className="pregame-pending">LINES STALE</span>}
                     {sundayMode && now && <span className="kickoff-countdown">{compactKickoffCountdown(game.kickoffAt, now)}</span>}
                     {sundayMode && <span className={availability?.inactivesConfirmed ? "pregame-confirmed" : "pregame-pending"}>{availability?.inactivesConfirmed ? "INACTIVES ✓" : "INACTIVES —"}</span>}
                     {sundayMode && <span className={weather?.roof === "unconfirmed" ? "pregame-pending" : "pregame-confirmed"}>{compactRoofStatus(weather?.roof ?? "unconfirmed")}</span>}
