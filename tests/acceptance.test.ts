@@ -753,7 +753,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(deterministicRecoveryCandidate(sundayOpener!, "succeeded")).toBeNull();
     expect(readFileSync("src/app/api/lines/route.ts", "utf8")).toContain("lines refresh automatically");
     const worker = readFileSync("worker/index.ts", "utf8");
-    expect(worker).toContain('url.pathname === "/api/lines"');
+    expect(worker).toContain('url.pathname === "/sunday"');
     expect(worker).toContain('request.method === "GET"');
     expect(worker).toContain("allowCatchup: true");
     expect(worker).toContain('request.headers.has("oai-authenticated-user-email")');

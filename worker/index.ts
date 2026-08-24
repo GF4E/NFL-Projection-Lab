@@ -78,11 +78,11 @@ const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     if (
-      url.pathname === "/api/lines" && request.method === "GET" && env.ODDS_API_KEY &&
+      url.pathname === "/sunday" && request.method === "GET" && env.ODDS_API_KEY &&
       request.headers.has("oai-authenticated-user-email")
     ) {
       // Sites does not guarantee that a packaged cron fires immediately after a
-      // deployment. An authenticated board read may claim only the deterministic
+      // deployment. An authenticated board navigation may claim only the deterministic
       // scheduled recovery lease; it cannot choose a cadence or spend twice.
       ctx.waitUntil(runScheduledOddsAutomation({
         db: env.DB,
