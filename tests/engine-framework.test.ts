@@ -19,13 +19,13 @@ describe("ten-part engine Q&A framework", () => {
     expect(nextEngineQuestion([])?.question.id).toBe("Q01");
     expect(nextEngineQuestion([{ questionId: "Q01" }])?.question.id).toBe("Q02");
     expect(validateEngineDecisionLedger()).toEqual([]);
-    expect(nextEngineQuestion(engineDecisions.answers)?.question.id).toBe("Q02");
+    expect(nextEngineQuestion(engineDecisions.answers)?.question.id).toBe("Q03");
     const allQuestions = engineFramework.workstreams.flatMap((item) => item.questions);
     expect(nextEngineQuestion(allQuestions.map((question) => ({ questionId: question.id })))).toBeNull();
   });
 
   it("keeps product choices distinct from empirically validated model decisions", () => {
-    expect(engineDecisions.answers).toHaveLength(1);
+    expect(engineDecisions.answers).toHaveLength(2);
     expect(engineDecisions.answers[0]).toMatchObject({
       questionId: "Q01",
       status: "accepted_design_hypothesis",
@@ -33,6 +33,14 @@ describe("ten-part engine Q&A framework", () => {
     });
     expect(engineDecisions.answers[0].implementationEffects.join(" ")).toContain("advisory");
     expect(engineDecisions.answers[0].validationRequired.length).toBeGreaterThanOrEqual(3);
+    expect(engineDecisions.answers[1]).toMatchObject({
+      questionId: "Q02",
+      status: "accepted_design_hypothesis",
+      author: "owner"
+    });
+    expect(engineDecisions.answers[1].answer).toContain("log loss");
+    expect(engineDecisions.answers[1].implementationEffects.join(" ")).toContain("calibration slope");
+    expect(engineFramework.workstreams[0].status).toBe("decisions_complete_implementation_pending");
   });
 
   it("rejects an undocumented answer and accepts a complete decision record", () => {
