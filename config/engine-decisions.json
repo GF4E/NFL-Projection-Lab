@@ -72,6 +72,32 @@
         "Reject added complexity that improves narrative detail without improving forecast quality or decision-relevant uncertainty."
       ],
       "adr": "docs/decisions/ADR-0003-score-model-bakeoff.md"
+    },
+    {
+      "questionId": "Q19",
+      "status": "accepted_design_hypothesis",
+      "answer": "Yes. Preserve the scenario-weighted numerical forecast, but label a positive mean edge as fragile when any reasonable unresolved scenario reverses the edge or drops it below the decision threshold. Label it indeterminate when material scenario state or weights cannot be supported reliably.",
+      "rationale": "Averaging mutually important futures into one clean number hides the exact uncertainty a knowledgeable person needs to judge. The engine should distinguish a robust conclusion from a favorable average that depends on unresolved QB, lineup, roof, weather, or price conditions.",
+      "evidence": [
+        "docs/decisions/ADR-0004-scenario-fragility-status.md",
+        "docs/NOVELTY_CHARTER.md"
+      ],
+      "author": "owner",
+      "answeredAt": "2026-08-24T22:04:38.000Z",
+      "implementationEffects": [
+        "Define a reasonable scenario through versioned forecast-time evidence, inclusion, and materiality rules; never invent a branch merely to create a warning.",
+        "Generate a joint score distribution, contract edge, uncertainty interval, and suggested units for each retained scenario before calculating the weighted mean.",
+        "Use robust when material scenarios preserve the decision, fragile when supported scenarios cross zero edge or the 0.5-unit floor, and indeterminate when a material state or its weight lacks defensible support or the aggregate interval spans zero.",
+        "Keep the numerical estimate and branch conditions visible. A fragility label informs judgment but does not silently alter an approved pick or replace existing approval and sizing gates.",
+        "State the concrete QB, lineup, weather, roof, or price condition that changes the conclusion."
+      ],
+      "validationRequired": [
+        "Freeze scenario inclusion, materiality, and weighting rules during offseason validation and hash them with each forecast.",
+        "Measure scenario-probability and interval calibration prospectively without using human selections as labels.",
+        "Replay late QB, inactive, roof, weather, and line changes to verify deterministic status transitions and last-good behavior.",
+        "Verify that the compact dossier exposes the weighted mean, branch disagreement, source freshness, and change threshold without presenting an unsupported causal claim."
+      ],
+      "adr": "docs/decisions/ADR-0004-scenario-fragility-status.md"
     }
   ]
 }

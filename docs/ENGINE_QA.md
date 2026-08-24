@@ -37,6 +37,7 @@ An answer is not permission to skip validation. It defines what to test and what
 | Q01 | Accepted design hypothesis; validation pending | Produce one joint home/away score distribution and derive all mainline probabilities from it. Use the result to facilitate human judgment by showing uncertainty, market disagreement, freshness, and material evidence. | [ADR-0001](decisions/ADR-0001-joint-score-decision-support.md) |
 | Q02 | Accepted design hypothesis; implementation verification pending | Use pooled non-push log loss as the promotion metric, with calibration as a hard gate and Brier, score, market-level, uncertainty, and CLV diagnostics. | [ADR-0002](decisions/ADR-0002-challenger-promotion-metric.md) |
 | Q03 | Accepted design hypothesis; bake-off pending | Compare a market-anchored discrete baseline, correlated negative-binomial model, and possession simulation under the same gates. Treat this machinery as foundation, not differentiation. | [ADR-0003](decisions/ADR-0003-score-model-bakeoff.md) |
+| Q19 | Accepted decision-surface hypothesis; validation pending | Preserve the weighted estimate but label it fragile when material supported scenarios cross the edge or sizing boundary, and indeterminate when material state support is unreliable. | [ADR-0004](decisions/ADR-0004-scenario-fragility-status.md) |
 
 ## The ten workstreams
 
@@ -69,4 +70,4 @@ No result from the site's temporary analysis slip or any personal selection is a
 
 ## Current direction
 
-Q01 through Q03 are recorded. Remaining established defaults advance provisionally without owner ceremony. The next owner prompt must concern the distinctive decision dossier or another consequential boundary—not an ordinary modeling checklist item.
+Q01 through Q03 and the first distinctive decision-surface rule, Q19, are recorded. Remaining established defaults advance provisionally without owner ceremony. The next owner prompt must concern the distinctive decision dossier or another consequential boundary—not an ordinary modeling checklist item.

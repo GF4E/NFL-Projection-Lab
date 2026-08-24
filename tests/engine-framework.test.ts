@@ -28,7 +28,7 @@ describe("ten-part engine Q&A framework", () => {
   });
 
   it("keeps product choices distinct from empirically validated model decisions", () => {
-    expect(engineDecisions.answers).toHaveLength(3);
+    expect(engineDecisions.answers).toHaveLength(4);
     expect(engineDecisions.answers[0]).toMatchObject({
       questionId: "Q01",
       status: "accepted_design_hypothesis",
@@ -49,6 +49,14 @@ describe("ten-part engine Q&A framework", () => {
       author: "owner"
     });
     expect(engineDecisions.answers[2].rationale).toContain("established foundations");
+    expect(engineDecisions.answers[3]).toMatchObject({
+      questionId: "Q19",
+      status: "accepted_design_hypothesis",
+      author: "owner"
+    });
+    expect(engineDecisions.answers[3].answer).toContain("fragile");
+    expect(engineDecisions.answers[3].answer).toContain("indeterminate");
+    expect(engineFramework.workstreams[1].questions.some((question) => question.id === "Q19")).toBe(true);
     expect(engineFramework.workstreams[0].status).toBe("decisions_complete_implementation_pending");
   });
 

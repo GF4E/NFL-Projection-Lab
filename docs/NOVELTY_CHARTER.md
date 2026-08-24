@@ -48,3 +48,7 @@ The differentiation hypothesis remains provisional until:
 - the dossier improves decision understanding without altering or contaminating model training.
 
 The live board stays compact. This depth belongs in its single expansion surface and in background artifacts, not in permanent explanatory clutter.
+
+## Accepted decision-surface rules
+
+- **Scenario disagreement survives aggregation.** The weighted numerical forecast remains visible, but a favorable average is labeled fragile when a material supported scenario reverses the edge or drops below the sizing floor. It is indeterminate when material state evidence or weights are unreliable, or the aggregate interval spans zero. See [ADR-0004](decisions/ADR-0004-scenario-fragility-status.md).

@@ -61,7 +61,7 @@ October, November, and December each reach the enforced 450-credit ceiling in th
 
 Structural settings live in `config/structural.config.json`; era definitions and provenance live in `config/era.config.json`. Structural changes are offseason-only.
 
-The ten-part research and build sequence lives in [`docs/ENGINE_QA.md`](docs/ENGINE_QA.md), backed by the machine-validated decision framework in `config/engine-framework.config.json` and answer ledger in `config/engine-decisions.json`. The [`Novelty Charter`](docs/NOVELTY_CHARTER.md) separates commodity forecast machinery from the scenario-aware decision dossier the project will test as its distinctive contribution. Architecture records document each accepted boundary and its validation burden.
+The ten-part research and build sequence lives in [`docs/ENGINE_QA.md`](docs/ENGINE_QA.md), backed by the machine-validated decision framework in `config/engine-framework.config.json` and answer ledger in `config/engine-decisions.json`. The [`Novelty Charter`](docs/NOVELTY_CHARTER.md) separates commodity forecast machinery from the scenario-aware decision dossier the project will test as its distinctive contribution, including explicit robust, fragile, and indeterminate states. Architecture records document each accepted boundary and its validation burden.
 
 ## Verification
 
