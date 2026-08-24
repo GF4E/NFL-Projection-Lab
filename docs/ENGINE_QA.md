@@ -35,6 +35,7 @@ An answer is not permission to skip validation. It defines what to test and what
 | Question | Status | Decision | Architecture record |
 |---|---|---|---|
 | Q01 | Accepted design hypothesis; validation pending | Produce one joint home/away score distribution and derive all mainline probabilities from it. Use the result to facilitate human judgment by showing uncertainty, market disagreement, freshness, and material evidence. | [ADR-0001](decisions/ADR-0001-joint-score-decision-support.md) |
+| Q02 | Accepted design hypothesis; implementation verification pending | Use pooled non-push log loss as the promotion metric, with calibration as a hard gate and Brier, score, market-level, uncertainty, and CLV diagnostics. | [ADR-0002](decisions/ADR-0002-challenger-promotion-metric.md) |
 
 ## The ten workstreams
 
@@ -67,4 +68,4 @@ No result from the site's temporary analysis slip or any personal selection is a
 
 ## Current question
 
-Q01 is recorded. The next open question is Q02: which metric decides whether a challenger is genuinely better? The recommended default is pooled non-push log loss as the promotion metric, with calibration as a hard gate and Brier score, score error, market-level results, and CLV as mandatory diagnostics.
+Q01 and Q02 are recorded. The next open question is Q03: which first score-distribution family should earn the right to become champion? The recommended approach is to compare a correlated negative-binomial model and a possession-level simulation against a simple market-anchored discrete baseline on identical rolling-origin rows.

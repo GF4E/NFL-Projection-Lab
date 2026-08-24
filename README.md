@@ -79,7 +79,7 @@ October, November, and December each reach the enforced 450-credit ceiling in th
 
 Structural settings live in `config/structural.config.json`; era definitions and provenance live in `config/era.config.json`. Structural changes are offseason-only.
 
-The ten-part research and build sequence lives in [`docs/ENGINE_QA.md`](docs/ENGINE_QA.md), backed by the machine-validated decision framework in `config/engine-framework.config.json` and answer ledger in `config/engine-decisions.json`. Architecture decisions explain the alternatives and validation burden; the first is [`ADR-0001`](docs/decisions/ADR-0001-joint-score-decision-support.md).
+The ten-part research and build sequence lives in [`docs/ENGINE_QA.md`](docs/ENGINE_QA.md), backed by the machine-validated decision framework in `config/engine-framework.config.json` and answer ledger in `config/engine-decisions.json`. Architecture records explain the alternatives and validation burden, beginning with [`ADR-0001`](docs/decisions/ADR-0001-joint-score-decision-support.md) and [`ADR-0002`](docs/decisions/ADR-0002-challenger-promotion-metric.md).
 
 Only the non-production identity example in
 `config/team.config.example.json` is distributed. Any private deployment

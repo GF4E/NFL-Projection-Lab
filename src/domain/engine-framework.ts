@@ -3,6 +3,7 @@ import decisionsJson from "../../config/engine-decisions.json";
 
 export type EngineWorkstreamStatus =
   | "needs_answer"
+  | "decisions_complete_implementation_pending"
   | "implemented_pending_production_verification"
   | "verified";
 
@@ -70,12 +71,19 @@ export const engineDecisions = decisionsJson as unknown as EngineDecisionLedger;
 
 export function validateEngineFramework(framework: EngineFramework = engineFramework): string[] {
   const errors: string[] = [];
+  const statuses = new Set<EngineWorkstreamStatus>([
+    "needs_answer",
+    "decisions_complete_implementation_pending",
+    "implemented_pending_production_verification",
+    "verified"
+  ]);
   if (framework.workstreams.length !== 10) errors.push("The framework must contain exactly ten workstreams");
   const workstreamIds = new Set<string>();
   const questionIds = new Set<string>();
   for (const workstream of framework.workstreams) {
     if (workstreamIds.has(workstream.id)) errors.push(`Duplicate workstream id: ${workstream.id}`);
     workstreamIds.add(workstream.id);
+    if (!statuses.has(workstream.status)) errors.push(`${workstream.id} has an invalid status`);
     if (!workstream.questions.length) errors.push(`${workstream.id} has no decision questions`);
     if (!workstream.acceptanceGates.length) errors.push(`${workstream.id} has no acceptance gates`);
     if (!workstream.deliverable.trim()) errors.push(`${workstream.id} has no deliverable`);
