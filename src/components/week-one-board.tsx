@@ -298,6 +298,7 @@ export function WeekOneBoard() {
     ? slip.map(straightLegSizing)
     : [], [slip, slipMode]);
   const weeklyOpportunities = useMemo(() => rankWeeklyMainlineRecommendations(visibleMatchups.flatMap((game) => {
+    if (staleGameIds.has(game.id)) return [];
     const gameIntel = intelligence?.games.find((item) => item.gameId === game.id);
     if (!gameIntel) return [];
     return (["betmgm", "fanduel"] as const).flatMap((executionBook) => rankMainlineRecommendations({
@@ -311,7 +312,7 @@ export function WeekOneBoard() {
       moneyline: gameIntel.moneylines.find((item) => item.book === executionBook) ?? null,
       preferredTeams: neutralPreferences
     }));
-  }), Math.max(1, visibleMatchups.length * 2)).slice(0, 5), [intelligence, lines, visibleMatchups]);
+  }), Math.max(1, visibleMatchups.length * 2)).slice(0, 5), [intelligence, lines, staleGameIds, visibleMatchups]);
 
   useEffect(() => {
     const initial = window.setTimeout(() => setNow(new Date().toISOString()), 0);
@@ -592,7 +593,7 @@ export function WeekOneBoard() {
             const movement = gameIntel?.movements.find((series) => series.book === book && series.side === game.home);
             const movementOpen = movement?.snapshots[0];
             const movementCurrent = movement?.snapshots.at(-1);
-            const allBookRecommendations = (["betmgm", "fanduel"] as const).flatMap((executionBook) => rankMainlineRecommendations({
+            const allBookRecommendations = staleGameIds.has(game.id) ? [] : (["betmgm", "fanduel"] as const).flatMap((executionBook) => rankMainlineRecommendations({
                 gameId: game.id,
                 awayTeam: game.away,
                 homeTeam: game.home,

@@ -43,6 +43,8 @@ The site adds no pregame settings page. A confirmed list only replaces the exist
 
 For live odds, one game is the atomic validation boundary. A game publishes only when both execution books provide both sides of spread, total, and moneyline. Complete games may publish from a partial provider slate; incomplete games retain their last validated snapshot, carry an explicit stale state, and are excluded from the new snapshot key.
 
+Stale game prices remain visible for context but are excluded from the weekly opportunity queue, EV recommendations, and suggested units until that game receives a complete current snapshot.
+
 The scheduled Worker remains the primary control plane. Because a newly deployed Sites cron may not fire immediately, a navigation to the weekly board may claim the deterministic scheduled recovery lease in the background. The caller cannot choose a snapshot time, market, or book, and repeated visits cannot create duplicate provider requests.
 
 ## Credit throttle
