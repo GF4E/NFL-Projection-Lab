@@ -100,13 +100,14 @@
         {
           "id": "Q06",
           "prompt": "Where may automatic data writes originate?",
-          "recommendedDefault": "Only the scheduled worker. Browser traffic is read-only and may observe health but never spend provider credits.",
+          "recommendedDefault": "Use the scheduled worker plus a deterministic server-side recovery lease. A browser cannot choose cadence or markets, and repeated reads cannot spend twice.",
           "evidenceRequired": "Route audit, method tests, scheduled-run logs, and duplicate-request simulation."
         }
       ],
       "acceptanceGates": [
-        "Public routes reject writes.",
+        "Public routes reject user-selected writes.",
         "The browser health poll uses GET and causes no provider request.",
+        "An authenticated stale-board read may claim only the already-scheduled recovery lease.",
         "A missed or failed scheduled snapshot receives at most one deterministic recovery attempt."
       ]
     },
