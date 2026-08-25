@@ -58,6 +58,9 @@ describe("public runtime boundary", () => {
     const scheduledLane = source.slice(source.indexOf("async scheduled"));
 
     expect(fetchLane).toContain("readOnlyD1(env.DB)");
+    expect(fetchLane).toContain('url.pathname === "/__engine-os/operator/migrate-0013"');
+    expect(fetchLane).toContain("authorizedUrgentMigrationRequest");
+    expect(fetchLane).toContain('return json({ error: "Not found" }, 404)');
     expect(fetchLane).toContain('request.method !== "GET" && request.method !== "HEAD"');
     expect(fetchLane).toContain('url.pathname.startsWith("/api/")');
     expect(fetchLane).toContain('url.pathname === "/api/lines"');

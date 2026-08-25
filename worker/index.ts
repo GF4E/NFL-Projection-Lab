@@ -11,7 +11,10 @@ import { listPregameContextStates } from "../src/server/pregame-context/store";
 import { runBackgroundMaintenance } from "../src/server/background-maintenance";
 import { getConfidenceEngineHealth } from "../src/server/confidence-engine/store";
 import { readOnlyD1 } from "../src/server/read-only-d1";
-import { applyUrgentEngineOsMigration } from "../src/server/engine-os/urgent-migration";
+import {
+  applyUrgentEngineOsMigration,
+  authorizedUrgentMigrationRequest
+} from "../src/server/engine-os/urgent-migration";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -23,7 +26,7 @@ interface Env {
   EVIDENCE: R2Bucket;
   ODDS_API_KEY?: string;
   ENGINE_OS_CAPTURE_ENABLED?: string;
-  ENGINE_OS_MIGRATION_0013_ENABLED?: string;
+  ENGINE_OS_MIGRATION_0013_TOKEN?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -83,6 +86,20 @@ const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const readDb = readOnlyD1(env.DB);
+    if (url.pathname === "/__engine-os/operator/migrate-0013") {
+      // Sites currently exposes D1 inspection but no operator migration call.
+      // This short-lived, secret-authenticated bridge is deployed for one
+      // invocation and then removed from both source and environment.
+      if (!authorizedUrgentMigrationRequest(request, env.ENGINE_OS_MIGRATION_0013_TOKEN)) {
+        return json({ error: "Not found" }, 404);
+      }
+      try {
+        return json(await applyUrgentEngineOsMigration(env.DB));
+      } catch (error) {
+        console.error("urgent Engine OS migration failed", error);
+        return json({ error: "Urgent migration failed closed" }, 503);
+      }
+    }
     // Vinext resolves module-level Cloudflare bindings itself, so replacing DB
     // in its handler argument is not a security boundary. Deny every mutating
     // HTTP method before routing and handle every public API path explicitly.
@@ -203,13 +220,6 @@ const worker = {
     );
   },
   async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    // Temporary, exact-version bridge: Sites has no operator D1 migration
-    // command. This branch is independently gated, idempotent, and retired as
-    // soon as the append-only production receipt is verified.
-    if (env.ENGINE_OS_MIGRATION_0013_ENABLED === "true") {
-      ctx.waitUntil(applyUrgentEngineOsMigration(env.DB));
-      return;
-    }
     // OS-00 is deployed fail-closed. Capture/ledger activation is a separate
     // operator decision after credential rotation, quota bootstrap, migration
     // proof, and the remaining OS-02A/03A/13A gates. Never use the nominal cron

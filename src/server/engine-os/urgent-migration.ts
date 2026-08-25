@@ -16,6 +16,24 @@ export interface UrgentMigrationResult {
   statementCount: number;
 }
 
+function constantTimeEqual(left: string, right: string): boolean {
+  const encoder = new TextEncoder();
+  const leftBytes = encoder.encode(left);
+  const rightBytes = encoder.encode(right);
+  let difference = leftBytes.length ^ rightBytes.length;
+  const length = Math.max(leftBytes.length, rightBytes.length);
+  for (let index = 0; index < length; index += 1) {
+    difference |= (leftBytes[index] ?? 0) ^ (rightBytes[index] ?? 0);
+  }
+  return difference === 0;
+}
+
+export function authorizedUrgentMigrationRequest(request: Request, secret: string | undefined): boolean {
+  if (!secret || secret.length < 48 || request.method !== "POST") return false;
+  const authorization = request.headers.get("authorization");
+  return Boolean(authorization) && constantTimeEqual(authorization!, `Bearer ${secret}`);
+}
+
 function migrationStatements(): string[] {
   return migrationSql
     .split("--> statement-breakpoint")
@@ -57,7 +75,7 @@ function assertExpectedVersion(row: SchemaVersionRow): void {
 
 /**
  * One-shot production bridge for Sites, which exposes D1 inspection but no
- * operator migration command. The Worker gate that calls this function is
+ * operator migration command. The authenticated Worker gate that calls this function is
  * removed immediately after the receipt is independently verified.
  */
 export async function applyUrgentEngineOsMigration(db: D1Database): Promise<UrgentMigrationResult> {

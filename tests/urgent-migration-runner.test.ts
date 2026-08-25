@@ -2,6 +2,7 @@ import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it } from "vitest";
 import {
   applyUrgentEngineOsMigration,
+  authorizedUrgentMigrationRequest,
   URGENT_ENGINE_OS_MIGRATION_HASH,
   URGENT_ENGINE_OS_MIGRATION_VERSION
 } from "@/server/engine-os/urgent-migration";
@@ -50,6 +51,26 @@ function sqliteD1(db: DatabaseSync): D1Database {
 }
 
 describe("one-shot urgent D1 migration", () => {
+  it("authorizes only an exact POST bearer secret without a length oracle", () => {
+    const secret = "d".repeat(64);
+    expect(authorizedUrgentMigrationRequest(new Request("https://example.test", {
+      method: "POST",
+      headers: { authorization: `Bearer ${secret}` }
+    }), secret)).toBe(true);
+    expect(authorizedUrgentMigrationRequest(new Request("https://example.test", {
+      method: "POST",
+      headers: { authorization: `Bearer ${"d".repeat(63)}` }
+    }), secret)).toBe(false);
+    expect(authorizedUrgentMigrationRequest(new Request("https://example.test", {
+      method: "GET",
+      headers: { authorization: `Bearer ${secret}` }
+    }), secret)).toBe(false);
+    expect(authorizedUrgentMigrationRequest(new Request("https://example.test", { method: "POST" }), secret))
+      .toBe(false);
+    expect(authorizedUrgentMigrationRequest(new Request("https://example.test", { method: "POST" }), undefined))
+      .toBe(false);
+  });
+
   it("applies atomically, records the expected schema hash, and is idempotent", async () => {
     const sqlite = new DatabaseSync(":memory:");
     sqlite.exec("PRAGMA foreign_keys = ON");
