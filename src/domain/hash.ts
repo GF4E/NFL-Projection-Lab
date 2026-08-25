@@ -13,6 +13,15 @@ function canonicalize(value: unknown): unknown {
   return value;
 }
 
+export function canonicalJson(value: unknown): string {
+  return JSON.stringify(canonicalize(value));
+}
+
+export function sha256Hex(value: string | Uint8Array): string {
+  const bytes = typeof value === "string" ? new TextEncoder().encode(value) : value;
+  return bytesToHex(sha256(bytes));
+}
+
 export function stableHash(value: unknown): string {
-  return bytesToHex(sha256(new TextEncoder().encode(JSON.stringify(canonicalize(value)))));
+  return sha256Hex(canonicalJson(value));
 }

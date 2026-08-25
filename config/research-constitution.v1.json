@@ -1,0 +1,229 @@
+{
+  "version": "research-constitution.2026.1",
+  "status": "frozen_before_module2b",
+  "frozenOn": "2026-08-25",
+  "scope": "market_free_football_research",
+  "operatingContractVersion": "engine-operating-contract.2026.1",
+  "immutability": {
+    "mode": "append_new_version_only",
+    "negativeResultsMayBeRewritten": false,
+    "postRunConditionalRoutingAllowed": false,
+    "priorQualificationEvidenceReevaluation": "never_automatic"
+  },
+  "forecastContract": {
+    "seasonType": "REG",
+    "origin": "tuesday_0730_america_los_angeles",
+    "informationCutoff": "completed_games_through_week_w_minus_1_at_origin",
+    "sameWeekEarlierGamesAllowed": false,
+    "withinWeekRefreshAllowedForResearchRows": false,
+    "randomSplitAllowed": false,
+    "transformsFitInsideTrainingFold": true,
+    "identicalScoredGamesRequired": true,
+    "lateForecastEligible": false
+  },
+  "targets": {
+    "teamScore": {
+      "primary": [
+        "final_home_score_including_overtime",
+        "final_away_score_including_overtime"
+      ],
+      "status": "module1_reject_all"
+    },
+    "possession": {
+      "primary": [
+        "home_regulation_offensive_series",
+        "away_regulation_offensive_series"
+      ],
+      "storedSeparately": [
+        "overtime_occurred",
+        "home_overtime_offensive_series",
+        "away_overtime_offensive_series"
+      ],
+      "status": "module2_reject_all"
+    }
+  },
+  "seasonRoles": {
+    "trainingStartSeason": 2010,
+    "warmupSeasons": [2010, 2011, 2012],
+    "developmentSeasons": [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+    "researchExposedSeasons": [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025],
+    "nextProspectiveSeason": 2026,
+    "prospectiveEvidenceStartsAtActualActivation": true,
+    "preActivationBackfillAllowed": false,
+    "lateActivationLabel": "partial_season_shadow"
+  },
+  "candidateStatus": {
+    "module1": {
+      "terminalResult": "reject_all",
+      "retainedBenchmark": "c0_naive_points_only",
+      "benchmarkEligibleForProduction": false
+    },
+    "module2": {
+      "terminalResult": "reject_all",
+      "retainedBenchmark": "p0_league_season_naive",
+      "benchmarkEligibleForProduction": false,
+      "killedCandidate": "p2_regularized_joint_count"
+    },
+    "onlyAuthorizedNextExperiment": "module2b_residual_kernel_falsification_v1",
+    "driveOutcomeModuleAuthorized": false,
+    "marketComparisonAuthorized": false,
+    "productionForecastChangeAuthorized": false
+  },
+  "forbiddenFootballFeaturePatterns": [
+    "spread",
+    "total_line",
+    "moneyline",
+    "american_price",
+    "decimal_price",
+    "odds",
+    "vig",
+    "book",
+    "consensus",
+    "opening",
+    "closing",
+    "line_movement",
+    "ticket_percentage",
+    "money_percentage",
+    "public_betting",
+    "sharp_betting",
+    "clv",
+    "selection",
+    "pick_outcome",
+    "approval",
+    "units",
+    "rationale",
+    "human_adjustment",
+    "manual_override"
+  ],
+  "forbiddenTrainingSources": [
+    "sportsbook_market_evidence",
+    "site_recorded_selections",
+    "human_decision_reviews",
+    "manual_forecast_adjustments"
+  ],
+  "foldRules": {
+    "ordering": "season_then_week_then_game_id",
+    "originMode": "rolling_origin",
+    "minimumTrainingBoundary": "strictly_before_target_origin",
+    "sameWeekIsolationRequired": true,
+    "imputationFitInsideFold": true,
+    "scalingFitInsideFold": true,
+    "poolingFitInsideFold": true,
+    "calibrationFitInsideFold": true,
+    "featureSelectionInsideSeasonAllowed": false,
+    "favorableRowDeletionAllowed": false
+  },
+  "lossAndCalibrationRules": {
+    "teamScorePrimary": "multivariate_energy_score",
+    "possessionPrimary": "joint_negative_log_score",
+    "futureModulePrimaryMetricMustBePreregistered": true,
+    "endpointSubstitutionAfterScoringAllowed": false,
+    "requiredDiagnostics": [
+      "joint_negative_log_score",
+      "multivariate_energy_score",
+      "marginal_crps",
+      "count_mae",
+      "count_rmse",
+      "interval_coverage_and_width",
+      "randomized_discrete_pit",
+      "predicted_observed_covariance",
+      "runtime",
+      "failures"
+    ],
+    "confidenceFromCandidateDisagreementAllowed": false
+  },
+  "pairedUncertainty": {
+    "method": "hierarchical_paired_season_week_block_bootstrap",
+    "members": 10000,
+    "baseSeed": 20260824,
+    "bitGenerator": "numpy_Generator_PCG64",
+    "developmentBlockLengthsWeeks": [1, 3, 6],
+    "simultaneousIntervalLevel": 0.9,
+    "coverageIntervalLevel": 0.95,
+    "quantileMethod": "hyndman_fan_type_7_numpy_linear",
+    "pairedRowsRequired": true
+  },
+  "multiplicity": {
+    "discoveryEvidenceMayPromote": false,
+    "confirmationFamilyMustBeFrozenBeforeScoring": true,
+    "diagnosticSlicesMayPromote": false,
+    "newExperimentIdentityTriggers": [
+      "new_feature_family",
+      "new_candidate_family",
+      "new_kernel_or_distribution",
+      "new_hyperparameter_attempt",
+      "new_selecting_slice",
+      "new_primary_endpoint",
+      "changed_target",
+      "changed_fold",
+      "changed_threshold",
+      "changed_resampling_rule",
+      "changed_missing_data_rule"
+    ],
+    "exposedHistoryReuseRole": "discovery_only",
+    "failedConfirmatoryExperimentMayBeConditionallyRouted": false
+  },
+  "module2b": {
+    "experimentId": "module2b_residual_kernel_falsification_v1",
+    "parentProtocolVersion": "module2.2026-08-25.8",
+    "parentCodeHash": "6ea88ae5a609ef4dac85aa28e4f39785b86c2a32d456c34bf220ae17ed23efd6",
+    "parentConfigSha256": "ceb9cd5287fb2d2ecf4cbf0961d28e5b41f7b583282ff655cfe8d1a778686a3b",
+    "allowedKernelComparison": {
+      "d0": [0.15, 0.7, 0.15],
+      "d1": [0.0, 1.0, 0.0]
+    },
+    "allowedCandidates": [
+      "p0_league_season_naive",
+      "p1_partially_pooled_rates"
+    ],
+    "forbiddenCandidates": [
+      "p2_regularized_joint_count"
+    ],
+    "newFeaturesAllowed": false,
+    "frozenElements": [
+      "target",
+      "forecast_origin",
+      "week_w_minus_1_cutoff",
+      "same_week_isolation",
+      "scored_rows",
+      "p0",
+      "p1",
+      "residual_ledger",
+      "decay",
+      "support",
+      "pseudocount",
+      "losses",
+      "resampling",
+      "leakage_rules"
+    ],
+    "mechanismGates": {
+      "minimumAbsoluteDifferenceVarianceErrorReduction": 0.3,
+      "marginalCoverage80Range": [0.72, 0.88],
+      "clusteredCoverageIntervalsMustContain": 0.8
+    },
+    "forecastGates": {
+      "minimumDeltaNllNat": 0.01,
+      "minimumRelativeNllImprovement": 0.01,
+      "pairedLowerBoundsMustExceed": 0.0,
+      "maximumEnergyOrIndividualCrpsRegression": 0.005,
+      "maximumTeamMaeRegressionPossessions": 0.05,
+      "maximumForecastFailures": 0,
+      "requiredDiagnosticFailures": 0,
+      "requiredAblationFailures": 0,
+      "requiredLeakageFailures": 0
+    },
+    "terminalStatuses": [
+      "reject_all",
+      "shadow_eligible",
+      "protocol_invalid"
+    ],
+    "automaticProductionPromotion": false
+  },
+  "promotionLanguage": {
+    "retrospectivePassMeaning": "shadow_eligible_only",
+    "productionReadyFromRetrospectiveEvidenceAllowed": false,
+    "negativeResultRemainsTerminalForExperimentIdentity": true,
+    "simplerModelPreferredWhenGainUnstable": true,
+    "humanSelectionOutcomeMayQualifyModel": false
+  }
+}
