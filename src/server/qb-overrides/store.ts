@@ -105,7 +105,6 @@ export async function latestQbModelOverrides(
   db: D1Database,
   gameIds: readonly string[]
 ): Promise<StoredQbOverride[]> {
-  await ensureQbOverrideStore(db);
   if (!gameIds.length) return [];
   const placeholders = gameIds.map(() => "?").join(", ");
   const result = await db.prepare(`SELECT * FROM (

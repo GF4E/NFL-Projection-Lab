@@ -1,6 +1,8 @@
 import { z } from "zod";
 import type { WeatherInput } from "@/domain/types";
 import { validateKickoffWeather } from "@/domain/weather";
+import { redactHttpRequest } from "@/domain/engine-os";
+import { storeRawCapture } from "@/server/engine-os/capture";
 
 const responseSchema = z.object({
   hourly: z.object({
@@ -19,6 +21,11 @@ export async function fetchKickoffWeather(input: {
   roof: WeatherInput["roof"];
   kickoffAt: string;
   fetcher?: typeof fetch;
+  evidence?: {
+    db: D1Database;
+    bucket: R2Bucket;
+    idempotencyKey: string;
+  };
 }): Promise<WeatherInput> {
   if (input.roof === "closed" || input.roof === "fixed") {
     return validateKickoffWeather({
@@ -45,11 +52,34 @@ export async function fetchKickoffWeather(input: {
     start_date: date,
     end_date: date
   });
-  const response = await (input.fetcher ?? fetch)(`https://api.open-meteo.com/v1/forecast?${query}`, {
+  const requestUrl = `https://api.open-meteo.com/v1/forecast?${query}`;
+  const response = await (input.fetcher ?? fetch)(requestUrl, {
     cache: "no-store"
   });
   if (!response.ok) throw new Error(`Weather import failed with HTTP ${response.status}`);
-  const payload = responseSchema.parse(await response.json());
+  const rawBytes = new Uint8Array(await response.arrayBuffer());
+  const receivedAt = new Date().toISOString();
+  if (input.evidence) {
+    await storeRawCapture({
+      db: input.evidence.db,
+      bucket: input.evidence.bucket,
+      idempotencyKey: input.evidence.idempotencyKey,
+      provider: "open-meteo",
+      dataset: "weather",
+      request: redactHttpRequest({ url: requestUrl }),
+      responseBytes: rawBytes,
+      contentType: response.headers.get("content-type"),
+      etag: response.headers.get("etag"),
+      providerPublishedAt: response.headers.get("date"),
+      receivedAt,
+      validFrom: input.kickoffAt,
+      validTo: input.kickoffAt,
+      sourceSchemaVersion: "open-meteo.hourly-forecast.v1",
+      licenseId: "open-meteo-cc-by-4.0",
+      heartbeatSourceKey: `open-meteo:weather:${input.gameId}`
+    });
+  }
+  const payload = responseSchema.parse(JSON.parse(new TextDecoder().decode(rawBytes)));
   const kickoffHour = input.kickoffAt.slice(0, 13);
   const index = payload.hourly.time.findIndex((time) => time.slice(0, 13) === kickoffHour);
   if (index < 0) throw new Error("Open-Meteo response does not contain the stadium kickoff hour");

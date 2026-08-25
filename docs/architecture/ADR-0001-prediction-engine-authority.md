@@ -8,7 +8,7 @@
 
 ## Context
 
-The repository contains a live Cloudflare Worker/D1 path and a separate Supabase job path. It also mixes public reads with background maintenance, creates some D1 tables at runtime, assigns coefficient work to the Worker, and keeps large Model Lab evidence only in the local working copy. Those conditions make it impossible to answer four basic questions reliably: which store is authoritative, which scheduler may execute, what was known at a forecast origin, and whether a result can be reproduced from preserved bytes.
+The repository began with a live Cloudflare Worker/D1 path and a separate Supabase job and authentication path. It also mixed public reads with background maintenance, creates some D1 tables at runtime, assigns coefficient work to the Worker, and keeps large Model Lab evidence only in the local working copy. Those conditions made it impossible to answer four basic questions reliably: which store is authoritative, which scheduler may execute, what was known at a forecast origin, and whether a result can be reproduced from preserved bytes.
 
 The operating system needs a small architecture that fits a hobby project without giving up scientific provenance. It does not need a warehouse, event bus, hosted feature store, or second production database.
 
@@ -68,17 +68,19 @@ The content-addressed inventory at `.planning/engine-os/execution/os-00/evidence
 
 ## Supabase quarantine
 
-Supabase has no production authority. Its job runner, API route, clients, auth paths, environment variables, and migrations are legacy evidence pending removal or archival. They may not receive writes, schedule work, serve as fallback, or be used for dual-read reconciliation.
+Supabase has no production authority. The client packages and client source files have been removed. The job runner is an unimported no-I/O tombstone, its API returns HTTP 410, login and callback redirect to the public site, and shared-record authentication always fails closed. Historical migrations remain evidence only. None may receive writes, schedule work, serve as fallback, or be used for dual-read reconciliation.
 
-The legacy job endpoint now returns HTTP 410 and its runner is a no-I/O tombstone. The quarantine is complete only when all of the following are true:
+The active runtime quarantine requires all of the following:
 
 1. The active build cannot import `src/server/jobs/runner.ts` or either Supabase client.
 2. `/api/jobs/*`, login, and callback paths cannot invoke Supabase.
-3. Deployed environments contain no Supabase service-role, anonymous, pipeline-worker, or legacy cron credential.
+3. Repository deployment configuration contains no Supabase service-role, anonymous, pipeline-worker, or legacy cron credential.
 4. A one-time export decision is recorded for any row that must be retained.
 5. Any rollback is time-bounded to export only and cannot resume production writes.
 
-The exact legacy paths, tables, job names, and secret names are enumerated in the ownership registry. That registry deliberately records `owner: none-quarantined`; assigning those objects to D1 later requires an explicit migration rather than a dual write.
+Items 1 through 3 are now enforced by source, package, deployment-config, and post-build scans. External credential revocation and any one-time export remain operator actions under OS-18 because repository evidence cannot prove the state of an external Supabase project or hosting secret store. The exact legacy paths, tables, job names, and secret names are enumerated in the ownership registry. That registry deliberately records `owner: none-quarantined`; assigning those objects to D1 later requires an explicit migration rather than a dual write.
+
+The metadata-only Sites environment receipt at `.planning/engine-os/execution/os-00/sites-environment-receipt.v1.json` records that revision 8 has an empty key set, including no Supabase, team-gate, push, pipeline, cron, acquisition-switch, or Odds credential names. That is deployed-configuration key-set evidence for the next deployment, not evidence that an external provider credential has been revoked.
 
 ## Interfaces
 
@@ -107,7 +109,7 @@ The public API reads one versioned publication pointer and its precomputed paylo
 
 - `scripts/verify_os00_evidence.py` verifies the frozen Git files, large evidence objects, source-cache objects, nested artifact manifests, and terminal statuses.
 - OS-00 runtime tests must prove public GET requests cause zero writes, provider calls, or quota changes.
-- An import/build guard must reject the Supabase runner or clients from the active Worker dependency graph.
+- `scripts/verify_active_build_graph.py` rejects Supabase packages, imports, runtime credentials, client code, or the retired runner from the completed production bundle.
 - OS-01 must make a blank D1 migrate completely and remove production runtime DDL.
 - OS-15 must move heavy fitting behind the authenticated compute interface.
 - OS-03 must upload and verify the local Model Lab cache and large artifacts in R2 before local copies are treated as disposable.
@@ -118,13 +120,12 @@ This decision assigns authority; it does not disguise current failures as comple
 
 | Exception | Requirement | Closure task |
 |---|---|---|
-| Supabase login, callback, team-auth, and client sources remain; the job path itself is retired | ARC-02 | OS-00 runtime half / OS-18 |
+| External Supabase, pipeline, or legacy cron credential revocation cannot be proven from repository state | OPS-07 | OS-18 operator action |
 | D1 runtime `CREATE TABLE` statements coexist with migrations | ARC-03 | OS-01 |
-| Worker lifecycle still performs expensive coefficient work | ARC-04 / OPS-02 | OS-15 |
+| No authenticated external compute runner exists; retained heavy lifecycle source is unreachable | ARC-04 / OPS-02 | OS-15 |
 | Model Lab source cache and large outputs are not durably in R2 | DATA-01 | OS-03 |
-| Model Lab Git-designated files are currently untracked in this working tree | ARC-01 | integration commit after verification |
 
-The `/sunday` maintenance side effect has been removed, public Worker GET routes use a SELECT-only D1 capability, and focused request-boundary tests pass. OS-00 cannot be marked fully accepted while the remaining Supabase client/auth dependency is reachable from the active build. ARC-01 cannot be marked durable until the clean-checkout and restored-cache verification modes both pass.
+The `/sunday` maintenance side effect has been removed. The Worker rejects mutating HTTP methods before framework routing, handles every public API through an explicit SELECT-only path, and rejects unknown APIs; focused request-boundary tests pass. Supabase is absent from the active source, package, deployment-config, empty Sites revision 8 key inventory, and production-build graphs; the remaining credential-revocation statement is explicitly limited to what repository evidence cannot observe. The 17 Git-designated Model Lab files are tracked in integration commit `bbd77d3`. Full evidence durability still depends on the OS-03 R2 upload and restored-cache proof.
 
 ## Consequences and trade-offs
 

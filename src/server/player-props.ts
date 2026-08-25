@@ -362,12 +362,6 @@ async function board(
 }
 
 export async function getPlayerPropBoard(gameId: string, db: D1Database = getD1()): Promise<PlayerPropBoard> {
-  await Promise.all([
-    ensurePlayerPropStore(db),
-    ensureNflverseStore(db),
-    ensureOfficialInjuryStore(db),
-    ensurePregameContextStore(db)
-  ]);
   return board(db, gameId, await stateForGame(db, gameId), await quotesForGame(db, gameId));
 }
 
@@ -433,7 +427,7 @@ export async function refreshPlayerPropBoard(input: {
     return getPlayerPropBoard(input.gameId, db);
   }
   try {
-    await assertOddsCreditsAvailable(PROP_MARKETS.length, db);
+    await assertOddsCreditsAvailable(PROP_MARKETS.length, db, { essential: false, now: checkedAt });
   } catch {
     await markState({ db, gameId: input.gameId, eventId: existing?.event_id ?? null, status: cachedQuotes.length ? "stale" : "unavailable", checkedAt, successAt: null, quota: null, message: "Odds credit ceiling preserves the last good prop board" });
     return getPlayerPropBoard(input.gameId, db);
@@ -462,7 +456,11 @@ export async function refreshPlayerPropBoard(input: {
       remaining: Number(response.headers.get("x-requests-remaining") ?? existing?.quota_remaining ?? "0"),
       lastCost: Number(response.headers.get("x-requests-last") ?? "0")
     };
-    await recordOddsQuota(quota, db);
+    await recordOddsQuota({
+      ...quota,
+      updatedAt: checkedAt,
+      requestKey: `props:${input.gameId}:${eventId}:${checkedAt}`
+    }, db);
     if (quota.used > ODDS_CREDIT_CEILING) throw new Error("Odds credit ceiling exceeded; cached props were preserved");
     const quotes: RawPropQuote[] = event.bookmakers.flatMap((bookmaker) => bookmaker.markets.flatMap((market) => market.outcomes.map((outcome) => {
       const identity = { gameId: input.gameId, eventId, book: bookmaker.key, market: market.key, player: outcome.description, side: outcome.name, point: outcome.point };

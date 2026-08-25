@@ -278,3 +278,5 @@ export const marketSentimentSnapshots = sqliteTable("market_sentiment_snapshots"
 
 export type PlayRow = typeof plays.$inferSelect;
 export type NewPlayRow = typeof plays.$inferInsert;
+
+export * from "./engine-os-schema";

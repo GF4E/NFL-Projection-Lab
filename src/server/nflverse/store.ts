@@ -321,7 +321,6 @@ export async function ensureNflverseStore(db: D1Database): Promise<void> {
 }
 
 export async function listNflverseImportStates(db: D1Database): Promise<NflverseImportState[]> {
-  await ensureNflverseStore(db);
   const result = await db.prepare("SELECT * FROM nflverse_import_state ORDER BY dataset").all<ImportStateRow>();
   return result.results.map(mapState);
 }
@@ -330,7 +329,6 @@ export async function getNflverseImportState(
   db: D1Database,
   dataset: string
 ): Promise<NflverseImportState | null> {
-  await ensureNflverseStore(db);
   const row = await db.prepare("SELECT * FROM nflverse_import_state WHERE dataset = ?").bind(dataset).first<ImportStateRow>();
   return row ? mapState(row) : null;
 }

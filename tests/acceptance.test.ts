@@ -255,8 +255,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(completeImport(failed, [4], "2026-09-16").freshness).toBe("current");
     expect(readFileSync("src/app/api/nflverse/route.ts", "utf8")).toContain("Public access is read-only");
     const worker = readFileSync("worker/index.ts", "utf8");
-    expect(worker).toContain("runModelLifecycleAutomation");
-    expect(worker).toContain("scheduledMaintenanceLane");
+    expect(worker).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(worker).not.toContain("runModelLifecycleAutomation");
+    expect(worker).not.toContain("scheduledMaintenanceLane");
   });
 
   it("8. rejects W+ data and forecast-time source leakage", () => {
@@ -753,9 +754,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(deterministicRecoveryCandidate(sundayOpener!, "succeeded")).toBeNull();
     expect(readFileSync("src/app/api/lines/route.ts", "utf8")).toContain("lines refresh automatically");
     const worker = readFileSync("worker/index.ts", "utf8");
-    expect(worker).toContain('url.pathname === "/sunday"');
-    expect(worker).toContain('request.method === "GET"');
-    expect(worker).toContain("ctx.waitUntil(runBackgroundMaintenance");
+    const fetchLane = worker.slice(worker.indexOf("async fetch"), worker.indexOf("async scheduled"));
+    expect(fetchLane).toContain("readOnlyD1(env.DB)");
+    expect(fetchLane).not.toContain("runBackgroundMaintenance");
+    expect(worker.slice(worker.indexOf("async scheduled"))).toContain("runBackgroundMaintenance");
     expect(worker).not.toContain("ctx.waitUntil(runScheduledOddsAutomation");
     expect(worker).not.toContain('request.headers.has("oai-authenticated-user-email")');
   });
@@ -1015,8 +1017,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(weatherAutomation).toContain("eligible.map(({ gameId }) => gameId)");
     const worker = readFileSync("worker/index.ts", "utf8");
     expect(worker).toContain("runBackgroundMaintenance");
-    expect(worker).toContain("runModelLifecycleAutomation");
-    expect(worker).toContain("scheduledMaintenanceLane(scheduledAt)");
+    expect(worker).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(worker).not.toContain("runModelLifecycleAutomation");
+    expect(worker).not.toContain("scheduledMaintenanceLane");
   });
 
   it("36. highlights a better book only on an identical side and point", () => {
@@ -1116,7 +1119,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(store).toContain("expireStaleTeamDrafts");
     expect(store).toContain("Approval is closed because this contract has kicked off");
     expect(worker).toContain("runBackgroundMaintenance");
-    expect(maintenance).toContain("expireStaleTeamDrafts(input.db, now)");
+    expect(maintenance).not.toContain("expireStaleTeamDrafts");
   });
 
   it("37. connects the fixed-seed 80% interval and quarter-Kelly sizing to every live card", () => {

@@ -49,13 +49,13 @@ python3 scripts/security_scan.py \
 | Replacement key works only from the server environment | BLOCKED | replacement has not been generated or installed with a deployment receipt |
 | Old key returns an invalid/deactivated response | BLOCKED | must be checked by the provider account owner without sharing the value |
 
-The machine-readable local scan is `secret-scan.json`. At Git HEAD `624b783`,
-it contains 612
-personal-data findings but no credential findings:
+The machine-readable local scan is `secret-scan.json`. The latest
+predeployment scan contains 578 personal-data findings but no credential
+findings:
 
-- 305 non-example emails in reachable Git commit metadata;
+- 307 non-example emails in reachable Git commit metadata;
 - 268 non-example emails in reachable historical blobs; and
-- 39 absolute home-directory paths in current artifacts/build/test material.
+- 3 absolute home-directory paths in reachable history or test fixtures.
 
 Those personal-data findings do not prove an active credential, but they block
 the later OS-18B public-history/public-artifact gate. A separate metadata and
@@ -69,10 +69,13 @@ finding.
 1. Sign in to The Odds API dashboard and regenerate/revoke the exposed key.
 2. Confirm in the dashboard that the prior credential is inactive. Do not paste
    either credential into chat, source, issues, logs, or a URL.
-3. Add the replacement only to the deployed server-side `ODDS_API_KEY` secret.
-4. Record the provider rotation time and the deployment environment-revision
-   receipt without recording the key.
-5. Seed the current quota counters from the provider dashboard.
+3. Retain the replacement outside the repository and chat. Do not install it
+   until OS-19A proves atomic quota reservation and the actual-schedule budget.
+4. After that gate passes, add it only to the deployed server-side
+   `ODDS_API_KEY` secret while keeping acquisition disabled.
+5. Record the provider rotation time and the deployment environment-revision
+   receipt without recording the key, then seed current quota counters from the
+   provider dashboard.
 6. Run one server-side health check, confirm that the old key fails, rebuild,
    and rerun this scanner against the build and source maps.
 

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "engine-os-sites-environment-receipt-v1",
+  "checkedAt": "2026-08-25T20:08:50Z",
+  "sitesProjectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+  "environmentRevision": 8,
+  "valuesInspectedOrStored": false,
+  "requiredAbsentKeys": [
+    "CRON_SECRET",
+    "ENGINE_OS_CAPTURE_ENABLED",
+    "GABE_ACCESS_TOKEN",
+    "INTERNAL_TEAM_GATE_ENABLED",
+    "JARRETT_ACCESS_TOKEN",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_DEMO_MODE",
+    "ODDS_API_KEY",
+    "PIPELINE_WORKER_SECRET",
+    "PIPELINE_WORKER_URL",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "TEAM_SESSION_SECRET",
+    "VAPID_PRIVATE_KEY",
+    "VAPID_PUBLIC_KEY",
+    "VAPID_SUBJECT"
+  ],
+  "allRequiredKeysAbsent": true,
+  "limitations": [
+    "This receipt proves only the empty Sites environment key set at revision 8; secret values were not read or stored.",
+    "It does not prove provider-side revocation of the exposed Odds API credential.",
+    "Environment revision 8 takes effect on production only after a subsequent Sites deployment."
+  ]
+}

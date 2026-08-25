@@ -113,13 +113,11 @@ export async function ensureOfficialInjuryStore(db: D1Database): Promise<void> {
 }
 
 export async function listOfficialInjuryImportStates(db: D1Database): Promise<OfficialInjuryImportState[]> {
-  await ensureOfficialInjuryStore(db);
   const result = await db.prepare("SELECT * FROM official_injury_import_state ORDER BY dataset").all<StateRow>();
   return result.results.map(mapState);
 }
 
 export async function getOfficialInjuryImportState(db: D1Database, dataset: string): Promise<OfficialInjuryImportState | null> {
-  await ensureOfficialInjuryStore(db);
   const row = await db.prepare("SELECT * FROM official_injury_import_state WHERE dataset = ?").bind(dataset).first<StateRow>();
   return row ? mapState(row) : null;
 }

@@ -132,7 +132,6 @@ export async function getPregameContextStates(
   db: D1Database,
   gameIds: readonly string[]
 ): Promise<PregameContextState[]> {
-  await ensurePregameContextStore(db);
   if (!gameIds.length) return [];
   const placeholders = gameIds.map(() => "?").join(", ");
   const result = await db.prepare(`SELECT * FROM official_pregame_context_state
@@ -141,7 +140,6 @@ export async function getPregameContextStates(
 }
 
 export async function listPregameContextStates(db: D1Database): Promise<PregameContextState[]> {
-  await ensurePregameContextStore(db);
   const result = await db.prepare("SELECT * FROM official_pregame_context_state ORDER BY season, week, game_id").all<StateRow>();
   return result.results.map(mapState);
 }

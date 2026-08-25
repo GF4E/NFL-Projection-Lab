@@ -150,9 +150,9 @@ describe("automatic nflverse importer", () => {
     expect(readFileSync("src/server/background-maintenance.ts", "utf8")).toContain("allowCatchup: true");
     expect(readFileSync("src/app/layout.tsx", "utf8")).toContain("@fontsource/roboto/900.css");
     expect(readFileSync("src/app/globals.css", "utf8")).toContain('--display: "Roboto"');
-    expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).toContain("refreshPlayerStatsSeason");
-    expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).toContain("refreshSnapCountsSeason");
-    expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).toContain("snapBackfillSeason");
+    expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).not.toContain("refreshPlayerStatsSeason");
+    expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).not.toContain("refreshSnapCountsSeason");
+    expect(readFileSync("src/server/nflverse/automation.ts", "utf8")).toContain("publication remains disabled");
     expect(readFileSync("src/server/providers/nflverse.ts", "utf8")).toContain("stats_player_week_");
     expect(readFileSync("src/server/providers/nflverse.ts", "utf8")).toContain("snap_counts_");
   });
@@ -195,7 +195,7 @@ describe("automatic nflverse importer", () => {
     const maintenance = readFileSync("src/server/background-maintenance.ts", "utf8");
     const settlement = readFileSync("src/server/automatic-settlement.ts", "utf8");
     expect(worker).toContain("runBackgroundMaintenance");
-    expect(maintenance).toContain("settleCompletedTeamPlays(input.db, now)");
+    expect(maintenance).not.toContain("settleCompletedTeamPlays");
     expect(maintenance).toContain("runKickoffWeatherAutomation");
     expect(settlement).toContain("play_settlement_audit");
     expect(settlement).toContain("calculateStoredPlayClosingValue");

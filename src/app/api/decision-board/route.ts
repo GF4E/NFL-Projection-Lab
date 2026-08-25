@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildDecisionBoard } from "@/server/decision-board";
+import { readOnlyD1 } from "@/server/read-only-d1";
+import { getD1 } from "../../../../db";
 
 export const dynamic = "force-dynamic";
 
@@ -10,7 +12,7 @@ export async function GET(request: Request) {
     if (week !== undefined && (!Number.isInteger(week) || week < 1 || week > 18)) {
       return NextResponse.json({ error: "week must be an integer from 1 through 18" }, { status: 400 });
     }
-    return NextResponse.json(await buildDecisionBoard(undefined, { week }));
+    return NextResponse.json(await buildDecisionBoard(readOnlyD1(getD1()), { week }));
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Unable to build decision board" }, { status: 503 });
   }

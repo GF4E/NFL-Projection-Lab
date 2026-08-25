@@ -1,4 +1,3 @@
-import { getD1 } from "../../db";
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
 
 type RawLiveLine = Omit<LiveLine, "fairProbability" | "marketVigPercent">;
@@ -64,7 +63,7 @@ function mapRow(row: LiveLineRow): RawLiveLine {
   };
 }
 
-export async function ensureLiveLineStore(d1: D1Database = getD1()): Promise<void> {
+export async function ensureLiveLineStore(d1: D1Database): Promise<void> {
   await d1.batch([
     d1.prepare(CREATE_LIVE_LINES_SQL),
     d1.prepare(CREATE_LIVE_LINE_SNAPSHOTS_SQL)
@@ -78,8 +77,7 @@ export async function ensureLiveLineStore(d1: D1Database = getD1()): Promise<voi
   await d1.prepare("PRAGMA optimize").run();
 }
 
-export async function listLiveLines(d1: D1Database = getD1(), gameIds?: readonly string[]): Promise<LiveLine[]> {
-  await ensureLiveLineStore(d1);
+export async function listLiveLines(d1: D1Database, gameIds?: readonly string[]): Promise<LiveLine[]> {
   if (gameIds && !gameIds.length) return [];
   const statement = gameIds
     ? d1.prepare(`SELECT * FROM live_lines WHERE book IN ('betmgm', 'fanduel') AND game_id IN (${gameIds.map(() => "?").join(", ")}) ORDER BY game_id, book, market, side`).bind(...gameIds)
@@ -90,9 +88,8 @@ export async function listLiveLines(d1: D1Database = getD1(), gameIds?: readonly
 
 export async function listSnapshotGameIds(
   snapshotKey: string,
-  d1: D1Database = getD1()
+  d1: D1Database
 ): Promise<string[]> {
-  await ensureLiveLineStore(d1);
   const result = await d1.prepare(`SELECT DISTINCT game_id
     FROM live_line_snapshots WHERE snapshot_key = ? ORDER BY game_id`)
     .bind(snapshotKey).all<{ game_id: string }>();
@@ -101,9 +98,9 @@ export async function listSnapshotGameIds(
 
 export async function replaceLiveLines(
   lines: readonly RawLiveLine[],
-  options: { db?: D1Database; snapshotKey?: string; fetchedAt?: string } = {}
+  options: { db: D1Database; snapshotKey?: string; fetchedAt?: string }
 ): Promise<LiveLine[]> {
-  const d1 = options.db ?? getD1();
+  const d1 = options.db;
   await ensureLiveLineStore(d1);
   const now = new Date().toISOString();
   if (lines.length) {

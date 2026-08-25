@@ -95,7 +95,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 ### OS-00B — Freeze the numerical operating contract
 
-**Status:** NEXT after OS-00
+**Status:** FROZEN
 
 **Requirement contribution:** ARC-04, OPS-03, OPS-04, OPS-06, OPS-08
 
@@ -545,7 +545,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 ### R0 — Freeze the research constitution and prospective contract
 
-**Status:** NEXT after OS-00
+**Status:** FROZEN
 
 **Requirements:** LAB-01, LAB-08, LED-06
 
@@ -557,7 +557,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 ### R1 — Independently reconcile score and possession targets
 
-**Status:** NEXT after OS-00
+**Status:** TERMINAL `protocol_invalid` for R1-v1; successor audit not yet preregistered
 
 **Requirements:** DATA-07
 
@@ -567,11 +567,11 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 **Deliverables:** Before any gamebook review, hash a preregistration containing sampling strata, sample size, agreement statistic, severe-error definition, thresholds, reviewer independence, adjudication rules, and excluded cases. Then produce the double-entry review sheet, discrepancy taxonomy, adjudicated truth rows, agreement metrics, and target-definition decision.
 
-**Acceptance gate:** The frozen agreement and severe-error thresholds pass; otherwise R2 stops as `protocol_invalid` pending a target decision.
+**Acceptance gate:** The frozen agreement and severe-error thresholds pass; otherwise this experiment identity ends as `protocol_invalid`. R1-v1 ended for reviewer-independence failure. It cannot be edited or resumed; any new target audit requires a separately hashed successor preregistration and complete review/adjudication workflow.
 
 ### R2 — Run Module 2B residual-kernel falsification
 
-**Status:** PLANNED
+**Status:** BLOCKED by terminal R1-v1 `protocol_invalid`; no successor audit has passed
 
 **Requirements:** POS-01, POS-02, POS-03
 

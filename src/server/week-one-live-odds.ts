@@ -1,10 +1,26 @@
 import { z } from "zod";
-import { stableHash } from "@/domain/hash";
+import { redactHttpRequest, type RedactedHttpRequest } from "@/domain/engine-os";
+import { sha256Hex } from "@/domain/hash";
 import type { LineBookKey, LineMarketKey, LiveLine } from "@/domain/line-board";
 import type { WeeklyMatchup } from "@/domain/weekly-slate";
 import { weekOneMatchups } from "@/lib/week-one-data";
 
 type RawLiveLine = Omit<LiveLine, "fairProbability" | "marketVigPercent">;
+
+export interface RawLiveOddsResponse {
+  status: number;
+  statusText: string;
+  rawBytes: Uint8Array;
+  request: RedactedHttpRequest;
+  contentType: string | null;
+  etag: string | null;
+  receivedAt: string;
+  quota: {
+    used: number | null;
+    remaining: number | null;
+    lastCost: number | null;
+  };
+}
 
 const outcomeSchema = z.object({
   name: z.string(),
@@ -32,13 +48,17 @@ const eventSchema = z.object({
 const bookKey = (key: "betmgm" | "fanduel"): LineBookKey => key;
 const marketKey = (key: "h2h" | "spreads" | "totals"): LineMarketKey => key === "h2h" ? "moneyline" : key === "spreads" ? "spread" : "total";
 
-export async function fetchLiveOddsForSlate(apiKey: string, matchups: readonly Pick<WeeklyMatchup, "id" | "home" | "away" | "homeName" | "awayName">[], fetcher: typeof fetch = fetch): Promise<{
-  lines: RawLiveLine[];
-  used: number;
-  remaining: number;
-  lastCost: number;
-  sourceHash: string;
-}> {
+function quotaHeader(headers: Headers, name: string): number | null {
+  const raw = headers.get(name);
+  if (raw === null || raw.trim() === "") return null;
+  const value = Number(raw);
+  return Number.isInteger(value) && value >= 0 ? value : null;
+}
+
+export async function fetchRawLiveOddsResponse(
+  apiKey: string,
+  fetcher: typeof fetch = fetch
+): Promise<RawLiveOddsResponse> {
   const query = new URLSearchParams({
     apiKey,
     regions: "us",
@@ -47,14 +67,39 @@ export async function fetchLiveOddsForSlate(apiKey: string, matchups: readonly P
     bookmakers: "betmgm,fanduel",
     dateFormat: "iso"
   });
-  const response = await fetcher(`https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?${query}`, { cache: "no-store" });
-  if (!response.ok) throw new Error(`Live line refresh failed with HTTP ${response.status}`);
-  const raw: unknown = await response.json();
+  const requestUrl = `https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?${query}`;
+  let response: Response;
+  try {
+    response = await fetcher(requestUrl, { cache: "no-store" });
+  } catch {
+    throw new Error("Live line provider request failed before a response was received");
+  }
+  const rawBytes = new Uint8Array(await response.arrayBuffer());
+  const receivedAt = new Date().toISOString();
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    rawBytes,
+    request: redactHttpRequest({ url: requestUrl }),
+    contentType: response.headers.get("content-type"),
+    etag: response.headers.get("etag"),
+    receivedAt,
+    quota: {
+      used: quotaHeader(response.headers, "x-requests-used"),
+      remaining: quotaHeader(response.headers, "x-requests-remaining"),
+      lastCost: quotaHeader(response.headers, "x-requests-last")
+    }
+  };
+}
+
+export function normalizeLiveOddsForSlate(
+  response: RawLiveOddsResponse,
+  matchups: readonly Pick<WeeklyMatchup, "id" | "home" | "away" | "homeName" | "awayName">[]
+): { lines: RawLiveLine[]; sourceHash: string } {
+  const { rawBytes } = response;
+  const raw: unknown = JSON.parse(new TextDecoder().decode(rawBytes));
   const events = z.array(eventSchema).parse(raw);
-  const sourceHash = stableHash(raw);
-  const used = Number(response.headers.get("x-requests-used") ?? "0");
-  const remaining = Number(response.headers.get("x-requests-remaining") ?? "0");
-  const lastCost = Number(response.headers.get("x-requests-last") ?? "0");
+  const sourceHash = sha256Hex(rawBytes);
   const lines: RawLiveLine[] = [];
 
   for (const event of events) {
@@ -90,7 +135,41 @@ export async function fetchLiveOddsForSlate(apiKey: string, matchups: readonly P
     }
   }
   if (!lines.length) throw new Error("The provider returned no BetMGM or FanDuel lines for the active week");
-  return { lines, used, remaining, lastCost, sourceHash };
+  return { lines, sourceHash };
+}
+
+export async function fetchLiveOddsForSlate(apiKey: string, matchups: readonly Pick<WeeklyMatchup, "id" | "home" | "away" | "homeName" | "awayName">[], fetcher: typeof fetch = fetch): Promise<{
+  lines: RawLiveLine[];
+  used: number;
+  remaining: number;
+  lastCost: number;
+  sourceHash: string;
+  rawBytes: Uint8Array;
+  request: RedactedHttpRequest;
+  contentType: string | null;
+  etag: string | null;
+  receivedAt: string;
+}> {
+  const response = await fetchRawLiveOddsResponse(apiKey, fetcher);
+  const { used, remaining, lastCost } = response.quota;
+  if (used === null || remaining === null || lastCost === null) {
+    throw new Error("Live line provider returned invalid quota headers");
+  }
+  if (response.status < 200 || response.status >= 300) {
+    throw new Error(`Live line refresh failed with HTTP ${response.status}`);
+  }
+  const normalized = normalizeLiveOddsForSlate(response, matchups);
+  return {
+    ...normalized,
+    used,
+    remaining,
+    lastCost,
+    rawBytes: response.rawBytes,
+    request: response.request,
+    contentType: response.contentType,
+    etag: response.etag,
+    receivedAt: response.receivedAt
+  };
 }
 
 export async function fetchWeekOneLiveOdds(apiKey: string, fetcher: typeof fetch = fetch) {

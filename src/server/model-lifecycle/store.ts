@@ -197,7 +197,6 @@ export async function resolveModelSystemAlerts(
 }
 
 export async function getModelLifecycleState(db: D1Database, season: number): Promise<ModelLifecycleState | null> {
-  await ensureModelLifecycleStore(db);
   const row = await db.prepare("SELECT * FROM model_lifecycle_state WHERE season = ?").bind(season).first<LifecycleRow>();
   return row ? mapLifecycle(row) : null;
 }
@@ -219,7 +218,6 @@ export async function getModelArtifact(db: D1Database, versionHash: string): Pro
     promotedAt: string | null;
   };
 } | null> {
-  await ensureModelLifecycleStore(db);
   const row = await db.prepare(`SELECT model_json, metrics_json, status, data_hash, config_hash,
       feature_schema_hash, code_hash, created_at, promoted_at
     FROM model_versions WHERE version_hash = ?`)
@@ -255,7 +253,6 @@ export async function getLatestModelRunAuthorization(db: D1Database): Promise<{
   gateDecision: "promote" | "retain";
   completedAt: string;
 } | null> {
-  await ensureModelLifecycleStore(db);
   const row = await db.prepare(`SELECT champion_hash, challenger_hash, config_hash, code_hash, gate_decision, completed_at
     FROM model_run_log ORDER BY completed_at DESC LIMIT 1`).first<{
       champion_hash: string;
@@ -322,7 +319,6 @@ export async function getLatestModelRun(db: D1Database): Promise<ModelRun | null
 }
 
 export async function getTeamStrengthStates(db: D1Database, season: number): Promise<TeamState[]> {
-  await ensureModelLifecycleStore(db);
   const result = await db.prepare(`SELECT team, mean, variance, through_week
     FROM team_strength_states WHERE season = ? ORDER BY team`).bind(season)
     .all<{ team: string; mean: number; variance: number; through_week: number }>();

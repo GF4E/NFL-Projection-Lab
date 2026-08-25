@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { listLiveLines, listSnapshotGameIds } from "@/server/live-line-store";
 import { getMainlineRecoveryStatus } from "@/server/odds-automation";
 import { weeklySlate } from "@/server/weekly-slate";
+import { readOnlyD1 } from "@/server/read-only-d1";
+import { getD1 } from "../../../../db";
 
 export const dynamic = "force-dynamic";
 
@@ -14,12 +16,13 @@ function requestedWeek(request: Request): number | undefined {
 
 export async function GET(request: Request) {
   try {
-    const slate = await weeklySlate({ week: requestedWeek(request) });
+    const db = readOnlyD1(getD1());
+    const slate = await weeklySlate({ db, week: requestedWeek(request) });
     const gameIds = slate.games.map((game) => game.id);
-    const lines = await listLiveLines(undefined, gameIds);
-    const recovery = await getMainlineRecoveryStatus({ lineCount: lines.length });
+    const lines = await listLiveLines(db, gameIds);
+    const recovery = await getMainlineRecoveryStatus({ db, lineCount: lines.length });
     const currentGameIds = recovery.runStatus === "succeeded" && recovery.expectedSnapshotKey
-      ? await listSnapshotGameIds(recovery.expectedSnapshotKey)
+      ? await listSnapshotGameIds(recovery.expectedSnapshotKey, db)
       : [];
     const currentGames = new Set(currentGameIds);
     const staleGameIds = recovery.stale

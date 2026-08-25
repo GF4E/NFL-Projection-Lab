@@ -101,7 +101,6 @@ export async function ensureKickoffWeatherStore(db: D1Database): Promise<void> {
 }
 
 export async function listKickoffWeather(db: D1Database, gameIds: readonly string[]): Promise<StoredKickoffWeather[]> {
-  await ensureKickoffWeatherStore(db);
   if (!gameIds.length) return [];
   const placeholders = gameIds.map(() => "?").join(", ");
   const result = await db.prepare(`SELECT current.*, state.freshness, state.last_checked_at, state.last_success_at, state.last_error

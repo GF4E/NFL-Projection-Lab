@@ -16,6 +16,9 @@ CREATE_TABLE = re.compile(
     r"create\s+table\s+(?:if\s+not\s+exists\s+)?[`\"\[]?(?:public\.)?([a-zA-Z_][a-zA-Z0-9_]*)",
     re.IGNORECASE,
 )
+SUPABASE_IMPORT = re.compile(
+    r'''(?:from\s+|import\s*\()["']@supabase/|["']@/server/supabase/|\bcreate(?:Server|User|Admin)Client\b'''
+)
 
 
 @dataclass
@@ -146,6 +149,40 @@ def main(argv: Iterable[str] | None = None) -> int:
     else:
         result.errors.append("legacy job route is missing rather than explicitly retired")
 
+    package_path = root / "package.json"
+    try:
+        package = json.loads(package_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as error:
+        result.errors.append(f"package.json cannot be read: {error}")
+        package = {}
+    dependencies = set(package.get("dependencies", {})) | set(package.get("devDependencies", {}))
+    result.require("@supabase/ssr" not in dependencies, "active package graph contains @supabase/ssr")
+    result.require("@supabase/supabase-js" not in dependencies, "active package graph contains @supabase/supabase-js")
+
+    active_supabase_imports: list[str] = []
+    for relative_root in ("src", "worker"):
+        directory = root / relative_root
+        for path in directory.rglob("*"):
+            if path.is_file() and path.suffix in {".ts", ".tsx", ".js", ".jsx"}:
+                if SUPABASE_IMPORT.search(path.read_text(encoding="utf-8", errors="ignore")):
+                    active_supabase_imports.append(str(path.relative_to(root)))
+    result.require(not active_supabase_imports, f"active source imports Supabase clients: {active_supabase_imports}")
+
+    for relative in ("src/server/supabase/admin.ts", "src/server/supabase/server.ts"):
+        result.require(not (root / relative).exists(), f"retired Supabase client source remains: {relative}")
+
+    team_auth_path = root / "src/server/team-auth.ts"
+    team_auth = team_auth_path.read_text(encoding="utf-8") if team_auth_path.is_file() else ""
+    result.require(
+        "Shared-record authentication is retired" in team_auth and "throw new TeamAuthenticationError" in team_auth,
+        "legacy shared-record authentication is not fail-closed",
+    )
+    for relative in ("src/app/login/actions.ts", "src/app/auth/callback/route.ts"):
+        path = root / relative
+        source = path.read_text(encoding="utf-8") if path.is_file() else ""
+        result.require("/sunday" in source, f"retired auth path does not redirect to the public site: {relative}")
+        result.require(not SUPABASE_IMPORT.search(source), f"retired auth path can import Supabase: {relative}")
+
     payload = {
         "status": "pass" if not result.errors else "fail",
         "d1Tables": len(actual_d1),
@@ -154,6 +191,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         "jobs": len(jobs),
         "modules": len(registry.get("modules", [])),
         "secrets": len(registry.get("secrets", [])),
+        "activeSupabaseImports": active_supabase_imports,
         "errors": result.errors,
     }
     if args.json_output:

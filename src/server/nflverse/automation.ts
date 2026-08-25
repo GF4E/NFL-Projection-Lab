@@ -4,17 +4,23 @@ import { NFLVERSE_URLS } from "@/server/providers/nflverse";
 import {
   acquireImportLease,
   completeUnchangedImport,
+  ensureNflverseStore,
   failNflverseImport,
   getNflverseImportState,
   listNflverseImportStates,
   markImportUnavailable,
-  publishPlayerSnapCounts,
-  publishPlayerWeekStats,
   publishSchedules,
   publishTeamGameFeatures,
   recordImportSuccess
 } from "./store";
-import { aggregatePbpCsv, parsePlayerStatsCsv, parseScheduleCsv, parseSnapCountsCsv } from "./transform";
+import { aggregatePbpCsv, parseScheduleCsv } from "./transform";
+import { redactHttpRequest } from "@/domain/engine-os";
+import {
+  recordCaptureFailure,
+  recordCaptureFreshnessConfirmation,
+  storeRawCapture,
+  storeRawCaptureStream
+} from "@/server/engine-os/capture";
 
 const LIVE_SCHEDULE_DATASET = "schedules:live";
 const HISTORY_SCHEDULE_DATASET = "schedules:history";
@@ -34,6 +40,7 @@ export interface NflverseAutomationResult {
   snapCounts: "updated" | "unchanged" | "unavailable" | "skipped";
   snapCountsSeason: number | null;
   snapCountRows: number;
+  rosterCapture: "updated" | "unavailable" | "skipped";
 }
 
 function pacificParts(date: Date): { year: number; month: number; weekday: string; hour: number; dayKey: string } {
@@ -69,6 +76,23 @@ function elapsed(iso: string | null, now: Date): number {
 
 function etag(response: Response): string | null {
   return response.headers.get("etag") ?? response.headers.get("last-modified");
+}
+
+function captureFailureCode(error: unknown): "provider_unavailable" | "schema_invalid" | "storage_failure" {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/evidence|r2|storage|capture|durably|object|sidecar/i.test(message)) return "storage_failure";
+  if (/empty|schema|parse|column|csv|gzip|decompress/i.test(message)) return "schema_invalid";
+  return "provider_unavailable";
+}
+
+async function hasCapturedSource(
+  db: D1Database,
+  dataset: "schedule" | "play_by_play" | "roster",
+  sourceKey = `nflverse:${dataset}`
+): Promise<boolean> {
+  const row = await db.prepare(`SELECT latest_capture_id FROM source_capture_heartbeats
+    WHERE source_key = ? LIMIT 1`).bind(sourceKey).first<{ latest_capture_id: string | null }>();
+  return Boolean(row?.latest_capture_id);
 }
 
 export function shouldRetryUncompressedPbp(error: unknown): boolean {
@@ -113,14 +137,65 @@ async function aggregatePbpResponse(input: {
   return { features, sourceHash: hash.digest("hex") };
 }
 
+async function aggregateAndCapturePbp(input: {
+  response: Response;
+  compressed: boolean;
+  season: number;
+  currentSeason: number;
+  sourceUrl: string;
+  idempotencyKey: string;
+  db: D1Database;
+  evidenceBucket: R2Bucket;
+}): Promise<{ features: Awaited<ReturnType<typeof aggregatePbpCsv>>; sourceHash: string }> {
+  if (!input.response.body) throw new Error(`nflverse play-by-play ${input.season} returned an empty body`);
+  const [modelBody, evidenceBody] = input.response.body.tee();
+  const responseForModel = new Response(modelBody, {
+    status: input.response.status,
+    statusText: input.response.statusText,
+    headers: input.response.headers
+  });
+  const [aggregate, capture] = await Promise.allSettled([
+    aggregatePbpResponse({
+      response: responseForModel,
+      compressed: input.compressed,
+      season: input.season,
+      currentSeason: input.currentSeason
+    }),
+    storeRawCaptureStream({
+      db: input.db,
+      bucket: input.evidenceBucket,
+      idempotencyKey: input.idempotencyKey,
+      provider: "nflverse",
+      dataset: "play_by_play",
+      request: redactHttpRequest({ url: input.sourceUrl }),
+      responseStream: evidenceBody,
+      contentType: input.response.headers.get("content-type"),
+      etag: input.response.headers.get("etag"),
+      providerPublishedAt: input.response.headers.get("last-modified"),
+      validFromAtReceipt: true,
+      sourceSchemaVersion: input.compressed ? "nflverse.pbp-csv-gzip.v1" : "nflverse.pbp-csv.v1",
+      licenseId: "nflverse-source-terms",
+      heartbeatSourceKey: `nflverse:play_by_play:${input.season}`
+    })
+  ]);
+  if (capture.status === "rejected") throw capture.reason;
+  if (aggregate.status === "rejected") throw aggregate.reason;
+  if (capture.value.manifest.responseSha256 !== aggregate.value.sourceHash) {
+    throw new Error("Play-by-play parser and immutable capture hashes disagree");
+  }
+  return aggregate.value;
+}
+
 async function refreshSchedules(input: {
   db: D1Database;
   now: Date;
   currentSeason: number;
   includeHistory: boolean;
   fetcher: typeof fetch;
+  evidenceBucket?: R2Bucket;
 }): Promise<{ state: "updated" | "unchanged" | "skipped"; rows: number }> {
   const checkedAt = input.now.toISOString();
+  const captureKey = `nflverse:schedules:${checkedAt}`;
   const sourceUrl = NFLVERSE_URLS.schedules;
   const liveState = await getNflverseImportState(input.db, LIVE_SCHEDULE_DATASET);
   const acquireLive = elapsed(liveState?.lastCheckedAt ?? null, input.now) >= SCHEDULE_INTERVAL_MS
@@ -130,18 +205,45 @@ async function refreshSchedules(input: {
   if (!acquireLive && !acquireHistory) return { state: "skipped", rows: 0 };
 
   try {
+    if (!input.evidenceBucket) throw new Error("Immutable evidence storage is unavailable for nflverse schedules");
     const headers = new Headers();
-    if (!acquireHistory && liveState?.sourceTag) headers.set("if-none-match", liveState.sourceTag);
+    if (!acquireHistory && liveState?.sourceTag && await hasCapturedSource(input.db, "schedule")) {
+      headers.set("if-none-match", liveState.sourceTag);
+    }
     const response = await input.fetcher(sourceUrl, { cache: "no-store", headers });
     if (response.status === 304) {
+      await recordCaptureFreshnessConfirmation({
+        db: input.db,
+        provider: "nflverse",
+        dataset: "schedule",
+        confirmedAt: new Date().toISOString()
+      });
       if (acquireLive) await completeUnchangedImport({ db: input.db, dataset: LIVE_SCHEDULE_DATASET, checkedAt, sourceTag: liveState?.sourceTag ?? null });
       if (acquireHistory) await completeUnchangedImport({ db: input.db, dataset: HISTORY_SCHEDULE_DATASET, checkedAt, sourceTag: null });
       return { state: "unchanged", rows: liveState?.rowCount ?? 0 };
     }
     if (!response.ok) throw new Error(`nflverse schedules fetch failed with HTTP ${response.status}`);
-    const csv = await response.text();
+    const rawBytes = new Uint8Array(await response.arrayBuffer());
+    const receivedAt = new Date().toISOString();
+    const csv = new TextDecoder().decode(rawBytes);
     if (!csv.length) throw new Error("nflverse schedules import returned an empty response");
-    const sourceHash = createHash("sha256").update(csv).digest("hex");
+    await storeRawCapture({
+      db: input.db,
+      bucket: input.evidenceBucket,
+      idempotencyKey: captureKey,
+      provider: "nflverse",
+      dataset: "schedule",
+      request: redactHttpRequest({ url: sourceUrl, headers }),
+      responseBytes: rawBytes,
+      contentType: response.headers.get("content-type"),
+      etag: response.headers.get("etag"),
+      providerPublishedAt: response.headers.get("last-modified"),
+      receivedAt,
+      validFrom: receivedAt,
+      sourceSchemaVersion: "nflverse.schedules.csv.v1",
+      licenseId: "nflverse-source-terms"
+    });
+    const sourceHash = createHash("sha256").update(rawBytes).digest("hex");
     const games = await parseScheduleCsv(csv, {
       trainingStartSeason: structuralConfig.model.trainingStartSeason,
       currentSeason: input.currentSeason
@@ -183,6 +285,14 @@ async function refreshSchedules(input: {
     return { state: "updated", rows: currentGames.length };
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown nflverse schedules failure";
+    await recordCaptureFailure({
+      db: input.db,
+      provider: "nflverse",
+      dataset: "schedule",
+      attemptedAt: new Date().toISOString(),
+      failureCode: captureFailureCode(error),
+      idempotencyKey: captureKey
+    });
     if (acquireLive) await failNflverseImport({ db: input.db, dataset: LIVE_SCHEDULE_DATASET, failedAt: checkedAt, message });
     if (acquireHistory) await failNflverseImport({ db: input.db, dataset: HISTORY_SCHEDULE_DATASET, failedAt: checkedAt, message });
     throw error;
@@ -195,6 +305,7 @@ async function refreshPbpSeason(input: {
   currentSeason: number;
   now: Date;
   fetcher: typeof fetch;
+  evidenceBucket?: R2Bucket;
 }): Promise<{ state: "updated" | "unchanged" | "unavailable" | "skipped"; rows: number }> {
   const dataset = `pbp:${input.season}`;
   const sourceUrl = NFLVERSE_URLS.pbpCsv(input.season);
@@ -208,12 +319,24 @@ async function refreshPbpSeason(input: {
     leaseMilliseconds: 30 * 60_000
   });
   if (!acquired) return { state: "skipped", rows: 0 };
+  const compressedCaptureKey = `nflverse:pbp:${input.season}:gzip:${checkedAt}`;
 
   try {
+    if (!input.evidenceBucket) throw new Error("Immutable evidence storage is unavailable for nflverse play-by-play");
     const headers = new Headers();
-    if (previous?.sourceTag) headers.set("if-none-match", previous.sourceTag);
+    const heartbeatSourceKey = `nflverse:play_by_play:${input.season}`;
+    if (previous?.sourceTag && await hasCapturedSource(input.db, "play_by_play", heartbeatSourceKey)) {
+      headers.set("if-none-match", previous.sourceTag);
+    }
     const response = await input.fetcher(sourceUrl, { cache: "no-store", headers });
     if (response.status === 304) {
+      await recordCaptureFreshnessConfirmation({
+        db: input.db,
+        provider: "nflverse",
+        dataset: "play_by_play",
+        confirmedAt: new Date().toISOString(),
+        sourceKey: heartbeatSourceKey
+      });
       await completeUnchangedImport({ db: input.db, dataset, checkedAt, sourceTag: previous?.sourceTag ?? null });
       return { state: "unchanged", rows: previous?.rowCount ?? 0 };
     }
@@ -224,6 +347,15 @@ async function refreshPbpSeason(input: {
         checkedAt,
         message: `Play-by-play for ${input.season} has not been published by nflverse yet`
       });
+      await recordCaptureFailure({
+        db: input.db,
+        provider: "nflverse",
+        dataset: "play_by_play",
+        attemptedAt: new Date().toISOString(),
+        failureCode: "provider_unavailable",
+        idempotencyKey: compressedCaptureKey,
+        sourceKey: heartbeatSourceKey
+      });
       return { state: "unavailable", rows: 0 };
     }
     if (!response.ok) throw new Error(`nflverse play-by-play ${input.season} fetch failed with HTTP ${response.status}`);
@@ -232,11 +364,15 @@ async function refreshPbpSeason(input: {
     let usedSourceUrl = sourceUrl;
     let aggregate;
     try {
-      aggregate = await aggregatePbpResponse({
+      aggregate = await aggregateAndCapturePbp({
         response,
         compressed: true,
         season: input.season,
-        currentSeason: input.currentSeason
+        currentSeason: input.currentSeason,
+        sourceUrl,
+        idempotencyKey: compressedCaptureKey,
+        db: input.db,
+        evidenceBucket: input.evidenceBucket
       });
     } catch (error) {
       if (!shouldRetryUncompressedPbp(error)) throw error;
@@ -245,11 +381,15 @@ async function refreshPbpSeason(input: {
       if (!usedResponse.ok) {
         throw new Error(`nflverse uncompressed play-by-play ${input.season} fallback failed with HTTP ${usedResponse.status}`);
       }
-      aggregate = await aggregatePbpResponse({
+      aggregate = await aggregateAndCapturePbp({
         response: usedResponse,
         compressed: false,
         season: input.season,
-        currentSeason: input.currentSeason
+        currentSeason: input.currentSeason,
+        sourceUrl: usedSourceUrl,
+        idempotencyKey: `nflverse:pbp:${input.season}:plain:${checkedAt}`,
+        db: input.db,
+        evidenceBucket: input.evidenceBucket
       });
     }
     await publishTeamGameFeatures({
@@ -264,123 +404,64 @@ async function refreshPbpSeason(input: {
     return { state: "updated", rows: aggregate.features.length };
   } catch (error) {
     const message = error instanceof Error ? error.message : `Unknown nflverse play-by-play ${input.season} failure`;
+    await recordCaptureFailure({
+      db: input.db,
+      provider: "nflverse",
+      dataset: "play_by_play",
+      attemptedAt: new Date().toISOString(),
+      failureCode: captureFailureCode(error),
+      idempotencyKey: compressedCaptureKey,
+      sourceKey: `nflverse:play_by_play:${input.season}`
+    });
     await failNflverseImport({ db: input.db, dataset, failedAt: checkedAt, message });
     throw error;
   }
 }
 
-async function refreshPlayerStatsSeason(input: {
+async function refreshRosterCapture(input: {
   db: D1Database;
   season: number;
-  currentSeason: number;
   now: Date;
   fetcher: typeof fetch;
-}): Promise<{ state: "updated" | "unchanged" | "unavailable" | "skipped"; rows: number }> {
-  const dataset = `player_stats:${input.season}`;
-  const sourceUrl = NFLVERSE_URLS.playerStatsCsv(input.season);
-  const checkedAt = input.now.toISOString();
-  const previous = await getNflverseImportState(input.db, dataset);
-  const acquired = await acquireImportLease({
-    db: input.db,
-    dataset,
-    sourceUrl,
-    checkedAt,
-    leaseMilliseconds: 20 * 60_000
-  });
-  if (!acquired) return { state: "skipped", rows: 0 };
+  evidenceBucket?: R2Bucket;
+}): Promise<"updated" | "unavailable" | "skipped"> {
+  const sourceUrl = NFLVERSE_URLS.rosters(input.season);
+  const dayKey = pacificParts(input.now).dayKey;
+  const idempotencyKey = `nflverse:roster:${input.season}:${dayKey}`;
+  const heartbeat = await input.db.prepare(`SELECT last_success_at FROM source_capture_heartbeats
+    WHERE source_key = 'nflverse:roster' LIMIT 1`).first<{ last_success_at: string | null }>();
+  if (checkedToday(heartbeat?.last_success_at ?? null, dayKey)) return "skipped";
   try {
-    const headers = new Headers();
-    if (previous?.sourceTag) headers.set("if-none-match", previous.sourceTag);
-    const response = await input.fetcher(sourceUrl, { cache: "no-store", headers });
-    if (response.status === 304) {
-      await completeUnchangedImport({ db: input.db, dataset, checkedAt, sourceTag: previous?.sourceTag ?? null });
-      return { state: "unchanged", rows: previous?.rowCount ?? 0 };
-    }
-    if (response.status === 404 && input.season === input.currentSeason) {
-      await markImportUnavailable({
-        db: input.db,
-        dataset,
-        checkedAt,
-        message: `Weekly player stats for ${input.season} have not been published by nflverse yet`
-      });
-      return { state: "unavailable", rows: 0 };
-    }
-    if (!response.ok) throw new Error(`nflverse player stats ${input.season} fetch failed with HTTP ${response.status}`);
-    if (!response.body) throw new Error(`nflverse player stats ${input.season} returned an empty body`);
-    const hash = createHash("sha256");
-    const stream = response.body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
-      transform(chunk, controller) {
-        hash.update(chunk);
-        controller.enqueue(chunk);
-      }
-    }));
-    const stats = await parsePlayerStatsCsv(stream, { season: input.season, currentSeason: input.currentSeason });
-    await publishPlayerWeekStats({
+    if (!input.evidenceBucket) throw new Error("Immutable evidence storage is unavailable for nflverse rosters");
+    const response = await input.fetcher(sourceUrl, { cache: "no-store" });
+    if (!response.ok) throw new Error(`nflverse rosters ${input.season} fetch failed with HTTP ${response.status}`);
+    if (!response.body) throw new Error(`nflverse rosters ${input.season} returned an empty body`);
+    await storeRawCaptureStream({
       db: input.db,
-      dataset,
-      stats,
-      sourceUrl,
-      sourceTag: etag(response),
-      sourceHash: hash.digest("hex"),
-      importedAt: checkedAt
+      bucket: input.evidenceBucket,
+      idempotencyKey,
+      provider: "nflverse",
+      dataset: "roster",
+      request: redactHttpRequest({ url: sourceUrl }),
+      responseStream: response.body,
+      contentType: response.headers.get("content-type"),
+      etag: response.headers.get("etag"),
+      providerPublishedAt: response.headers.get("last-modified"),
+      validFromAtReceipt: true,
+      sourceSchemaVersion: "nflverse.roster-csv.v1",
+      licenseId: "nflverse-source-terms"
     });
-    return { state: "updated", rows: stats.length };
+    return "updated";
   } catch (error) {
-    const message = error instanceof Error ? error.message : `Unknown nflverse player stats ${input.season} failure`;
-    await failNflverseImport({ db: input.db, dataset, failedAt: checkedAt, message });
-    throw error;
-  }
-}
-
-async function refreshSnapCountsSeason(input: {
-  db: D1Database;
-  season: number;
-  currentSeason: number;
-  now: Date;
-  fetcher: typeof fetch;
-}): Promise<{ state: "updated" | "unchanged" | "unavailable" | "skipped"; rows: number }> {
-  const dataset = `snap_counts:${input.season}`;
-  const sourceUrl = NFLVERSE_URLS.snapCountsCsv(input.season);
-  const checkedAt = input.now.toISOString();
-  const previous = await getNflverseImportState(input.db, dataset);
-  const acquired = await acquireImportLease({ db: input.db, dataset, sourceUrl, checkedAt, leaseMilliseconds: 20 * 60_000 });
-  if (!acquired) return { state: "skipped", rows: 0 };
-  try {
-    const headers = new Headers();
-    if (previous?.sourceTag) headers.set("if-none-match", previous.sourceTag);
-    const response = await input.fetcher(sourceUrl, { cache: "no-store", headers });
-    if (response.status === 304) {
-      await completeUnchangedImport({ db: input.db, dataset, checkedAt, sourceTag: previous?.sourceTag ?? null });
-      return { state: "unchanged", rows: previous?.rowCount ?? 0 };
-    }
-    if (response.status === 404 && input.season === input.currentSeason) {
-      await markImportUnavailable({ db: input.db, dataset, checkedAt, message: `Snap counts for ${input.season} have not been published by nflverse yet` });
-      return { state: "unavailable", rows: 0 };
-    }
-    if (!response.ok) throw new Error(`nflverse snap counts ${input.season} fetch failed with HTTP ${response.status}`);
-    if (!response.body) throw new Error(`nflverse snap counts ${input.season} returned an empty body`);
-    const hash = createHash("sha256");
-    const stream = response.body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
-      transform(chunk, controller) {
-        hash.update(chunk);
-        controller.enqueue(chunk);
-      }
-    }));
-    const counts = await parseSnapCountsCsv(stream, { season: input.season, currentSeason: input.currentSeason });
-    await publishPlayerSnapCounts({
+    await recordCaptureFailure({
       db: input.db,
-      dataset,
-      counts,
-      sourceUrl,
-      sourceTag: etag(response),
-      sourceHash: hash.digest("hex"),
-      importedAt: checkedAt
+      provider: "nflverse",
+      dataset: "roster",
+      attemptedAt: new Date().toISOString(),
+      failureCode: captureFailureCode(error),
+      idempotencyKey
     });
-    return { state: "updated", rows: counts.length };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : `Unknown nflverse snap counts ${input.season} failure`;
-    await failNflverseImport({ db: input.db, dataset, failedAt: checkedAt, message });
-    throw error;
+    return "unavailable";
   }
 }
 
@@ -395,8 +476,10 @@ export async function runNflverseAutomation(input: {
   now?: Date;
   fetcher?: typeof fetch;
   allowPlayByPlay?: boolean;
+  evidenceBucket?: R2Bucket;
 }): Promise<NflverseAutomationResult> {
   const now = input.now ?? new Date();
+  await ensureNflverseStore(input.db);
   const fetcher: typeof fetch = input.fetcher
     ? (request, init) => input.fetcher!(request, init)
     : (request, init) => fetch(request, init);
@@ -405,22 +488,33 @@ export async function runNflverseAutomation(input: {
   const historyState = await getNflverseImportState(input.db, HISTORY_SCHEDULE_DATASET);
   const includeHistory = !historyState?.lastSuccessAt
     || (parts.weekday === "Tue" && parts.hour >= 6 && elapsed(historyState.lastSuccessAt, now) >= HISTORY_INTERVAL_MS);
-  const schedules = await refreshSchedules({ db: input.db, now, currentSeason, includeHistory, fetcher });
+  const schedules = await refreshSchedules({
+    db: input.db,
+    now,
+    currentSeason,
+    includeHistory,
+    fetcher,
+    evidenceBucket: input.evidenceBucket
+  });
 
   let playByPlay: NflverseAutomationResult["playByPlay"] = "skipped";
   let playByPlaySeason: number | null = null;
   let teamGameRows = 0;
-  let playerStats: NflverseAutomationResult["playerStats"] = "skipped";
-  let playerStatsSeason: number | null = null;
-  let playerStatRows = 0;
-  let snapCounts: NflverseAutomationResult["snapCounts"] = "skipped";
-  let snapCountsSeason: number | null = null;
-  let snapCountRows = 0;
+  const playerStats: NflverseAutomationResult["playerStats"] = "skipped";
+  const playerStatsSeason: number | null = null;
+  const playerStatRows = 0;
+  const snapCounts: NflverseAutomationResult["snapCounts"] = "skipped";
+  const snapCountsSeason: number | null = null;
+  const snapCountRows = 0;
+  let rosterCapture: NflverseAutomationResult["rosterCapture"] = "skipped";
   const nightlyPbpIsDue = parts.hour >= 1;
   if ((input.allowPlayByPlay ?? true) && nightlyPbpIsDue) {
     const currentState = await getNflverseImportState(input.db, `pbp:${currentSeason}`);
     if (!checkedToday(currentState?.lastCheckedAt ?? null, parts.dayKey)) {
-      const current = await refreshPbpSeason({ db: input.db, season: currentSeason, currentSeason, now, fetcher });
+      const current = await refreshPbpSeason({
+        db: input.db, season: currentSeason, currentSeason, now, fetcher,
+        evidenceBucket: input.evidenceBucket
+      });
       playByPlay = current.state;
       playByPlaySeason = currentSeason;
       teamGameRows = current.rows;
@@ -433,53 +527,26 @@ export async function runNflverseAutomation(input: {
       (_, index) => currentSeason - 1 - index
     ).find((season) => !imported.has(`pbp:${season}`));
     if (backfillSeason !== undefined) {
-      const backfill = await refreshPbpSeason({ db: input.db, season: backfillSeason, currentSeason, now, fetcher });
+      const backfill = await refreshPbpSeason({
+        db: input.db, season: backfillSeason, currentSeason, now, fetcher,
+        evidenceBucket: input.evidenceBucket
+      });
       playByPlay = backfill.state;
       playByPlaySeason = backfillSeason;
       teamGameRows = backfill.rows;
     }
 
-    const currentPlayerState = await getNflverseImportState(input.db, `player_stats:${currentSeason}`);
-    if (!checkedToday(currentPlayerState?.lastCheckedAt ?? null, parts.dayKey)) {
-      const current = await refreshPlayerStatsSeason({ db: input.db, season: currentSeason, currentSeason, now, fetcher });
-      playerStats = current.state;
-      playerStatsSeason = currentSeason;
-      playerStatRows = current.rows;
-    }
-    const refreshedStates = await listNflverseImportStates(input.db);
-    const importedPlayerStats = new Set(refreshedStates
-      .filter((state) => state.dataset.startsWith("player_stats:") && state.lastSuccessAt)
-      .map((state) => state.dataset));
-    const playerBackfillSeason = nextMissingHistoricalSeason(
-      currentSeason,
-      "player_stats",
-      importedPlayerStats,
-      currentSeason - structuralConfig.props.usageProjectionTrainingStartSeason
-    );
-    if (playerBackfillSeason !== null) {
-      const backfill = await refreshPlayerStatsSeason({ db: input.db, season: playerBackfillSeason, currentSeason, now, fetcher });
-      playerStats = backfill.state;
-      playerStatsSeason = playerBackfillSeason;
-      playerStatRows = backfill.rows;
-    }
-    const currentSnapState = await getNflverseImportState(input.db, `snap_counts:${currentSeason}`);
-    if (!checkedToday(currentSnapState?.lastCheckedAt ?? null, parts.dayKey)) {
-      const current = await refreshSnapCountsSeason({ db: input.db, season: currentSeason, currentSeason, now, fetcher });
-      snapCounts = current.state;
-      snapCountsSeason = currentSeason;
-      snapCountRows = current.rows;
-    }
-    const snapStates = await listNflverseImportStates(input.db);
-    const importedSnapCounts = new Set(snapStates
-      .filter((state) => state.dataset.startsWith("snap_counts:") && state.lastSuccessAt)
-      .map((state) => state.dataset));
-    const snapBackfillSeason = nextMissingHistoricalSeason(currentSeason, "snap_counts", importedSnapCounts);
-    if (snapBackfillSeason !== null) {
-      const backfill = await refreshSnapCountsSeason({ db: input.db, season: snapBackfillSeason, currentSeason, now, fetcher });
-      snapCounts = backfill.state;
-      snapCountsSeason = snapBackfillSeason;
-      snapCountRows = backfill.rows;
-    }
+    rosterCapture = await refreshRosterCapture({
+      db: input.db,
+      season: currentSeason,
+      now,
+      fetcher,
+      evidenceBucket: input.evidenceBucket
+    });
+
+    // Player-stat and snap-count publication remains disabled until those
+    // provider responses use the same exact-byte R2 contract. Publishing an
+    // uncaptured derivative would make later replay unverifiable.
   }
 
   return {
@@ -494,6 +561,7 @@ export async function runNflverseAutomation(input: {
     playerStatRows,
     snapCounts,
     snapCountsSeason,
-    snapCountRows
+    snapCountRows,
+    rosterCapture
   };
 }

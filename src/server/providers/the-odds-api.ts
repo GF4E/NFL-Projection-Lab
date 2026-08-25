@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { BookKey, MarketKey, OddsSnapshot } from "@/domain/types";
-import { stableHash } from "@/domain/hash";
+import { redactHttpRequest, type RedactedHttpRequest } from "@/domain/engine-os";
+import { sha256Hex } from "@/domain/hash";
 
 const outcomeSchema = z.object({
   name: z.string(),
@@ -35,6 +36,8 @@ export interface OddsImport {
   remaining: number;
   lastCost: number;
   rawHash: string;
+  rawBytes: Uint8Array;
+  request: RedactedHttpRequest;
 }
 
 export async function fetchOddsSnapshots(input: {
@@ -51,12 +54,14 @@ export async function fetchOddsSnapshots(input: {
     bookmakers: "betmgm,fanduel",
     dateFormat: "iso"
   });
+  const requestUrl = `https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?${query}`;
   const response = await fetcher(
-    `https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?${query}`,
+    requestUrl,
     { cache: "no-store" }
   );
   if (!response.ok) throw new Error(`Odds import failed with HTTP ${response.status}`);
-  const raw: unknown = await response.json();
+  const rawBytes = new Uint8Array(await response.arrayBuffer());
+  const raw: unknown = JSON.parse(new TextDecoder().decode(rawBytes));
   const games = z.array(gameSchema).parse(raw);
   const used = Number(response.headers.get("x-requests-used") ?? "0");
   const remaining = Number(response.headers.get("x-requests-remaining") ?? "0");
@@ -64,7 +69,7 @@ export async function fetchOddsSnapshots(input: {
   if (![used, remaining, lastCost].every(Number.isFinite)) {
     throw new Error("Odds quota response headers are invalid");
   }
-  const rawHash = stableHash(raw);
+  const rawHash = sha256Hex(rawBytes);
   const snapshots = games.flatMap((game) =>
     game.bookmakers.flatMap((bookmaker) =>
       bookmaker.markets.flatMap((market) =>
@@ -84,5 +89,13 @@ export async function fetchOddsSnapshots(input: {
     )
   );
   if (!snapshots.length) throw new Error("Odds provider returned no eligible BetMGM/FanDuel quotes");
-  return { snapshots, used, remaining, lastCost, rawHash };
+  return {
+    snapshots,
+    used,
+    remaining,
+    lastCost,
+    rawHash,
+    rawBytes,
+    request: redactHttpRequest({ url: requestUrl })
+  };
 }

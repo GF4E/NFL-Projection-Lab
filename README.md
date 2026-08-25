@@ -1,18 +1,22 @@
 # NFL Projection Lab
 
-A public NFL analytics site for comparing live market prices with leakage-safe model probabilities, uncertainty, and matchup evidence. There are no user accounts, shared picks, personal records, or wagering actions.
+A public, read-only NFL analytics prototype. There are no active user accounts or wagering actions.
+
+## Current qualification state
+
+The deployed interface and many analytics components predate the Prediction Engine OS audit. They are retained as a demo and research evidence, not as a validated production forecast. Legacy teammate labels and storage types also remain, so OS-18B's personal-state-free public-release gate has not passed. Live acquisition is intentionally disabled, no Odds API credential is installed, lines may be stale or absent, and no prospective 2026 forecast stream has started. Module 1 and Module 2 remain `reject_all`; Module 2B and every downstream drive, quarterback, and player experiment are blocked by the terminal-invalid R1-v1 target audit. See [the execution state](.planning/engine-os/STATE.md) for the authoritative status.
 
 ## Public experience
 
 - The current 2026 weekly slate, grouped by kickoff day and shown in Pacific time.
-- BetMGM and FanDuel spreads, totals, and moneylines with capture age and market vig.
-- Model-implied spreads and totals, shrunk bet probabilities, expected value, 80% uncertainty intervals, and quarter-Kelly reference sizing.
+- Cached BetMGM and FanDuel spreads, totals, and moneylines when qualified snapshots exist; otherwise the interface must show stale or unavailable.
+- Legacy model-implied fields and research displays that are not yet prospectively qualified.
 - A neutral edge board with no favorite-team preferences or user-specific filtering.
 - Expandable game analysis showing only material, timestamped evidence: opponent-adjusted efficiency, availability, weather, market movement, and market sentiment.
 - A temporary value lab for analyzing straight, parlay, and teaser pricing. Selections stay in the browser session and are never saved.
 - A public methodology page explaining the model and its safeguards.
 
-## Statistical engine
+## Retained statistical research
 
 - Discrete, decay-weighted NFL margin tables with data-derived mass at 3, 6, 7, 10, and 14. Quotes at different posted points are translated before price or EV comparison.
 - Power-method de-vigging for moneylines, spreads, and totals.
@@ -22,16 +26,18 @@ A public NFL analytics site for comparing live market prices with leakage-safe m
 - A 100-member fixed-seed season-week block bootstrap that preserves time-decay weights; displayed suggestions are muted when the 80% edge interval spans zero.
 - BetMGM/FanDuel comparison, translated price deltas, line movement, edge decay, current injury/QB state, and kickoff-hour weather.
 - A data-fit joint home/away score distribution that reconciles team-score projections with moneyline, spread, total, tie, and push probabilities.
-- Prospective all-game scoring, scenario dossiers, and a registered market/count/possession model bakeoff. Human adjustments remain separate from model training.
+- Contracts and prototypes for prospective all-game scoring, scenario dossiers, and registered model bakeoffs. Human adjustments remain separate from model training.
 
-## Automatic data
+These components describe preserved work and intended contracts. Their presence in source or the interface does not make a candidate accepted, calibrated prospectively, or eligible to populate a production prediction endpoint.
+
+## Data connectors
 
 - nflverse schedules, finals, rosters, and play-by-play aggregates.
 - The Odds API for BetMGM and FanDuel market snapshots.
 - Official NFL/team sources for current injury reports and inactives.
 - Open-Meteo for outdoor or open-roof kickoff-hour weather.
 
-The Cloudflare Worker runs the refresh and model lifecycle on its schedule. Public HTTP access cannot choose provider requests, trigger model refits, modify forecasts, or create records. A weekly-board navigation may claim only one deterministic scheduled recovery lease; repeated visits cannot spend twice. A failed import preserves the last validated data. A partial odds board publishes only complete two-book games and marks each incomplete game stale.
+The connectors are present, but the scheduled acquisition switch defaults off while evidence, origin, quota, and package-activation gates remain open. The active Worker does not run coefficient refits. Public HTTP rejects every mutating method before framework routing and exposes only explicit read APIs. When acquisition is eventually qualified, a failed import must preserve the last validated data and partial boards must remain stale rather than silently publish.
 
 ## Local preview
 
@@ -46,9 +52,9 @@ Open `http://localhost:3000/sunday`.
 
 ## Environment
 
-Copy `.env.example` to `.env.local` for local provider-backed work. nflverse itself does not require an API key.
+Copy `.env.example` to `.env.local` for local, non-production development. nflverse itself does not require an API key.
 
-The primary runtime value is `ODDS_API_KEY`. Scheduled administrative jobs use `CRON_SECRET`; those write paths are never exposed through the public interface.
+Do not install `ODDS_API_KEY` yet. The previously exposed credential must first be revoked by the account owner; its replacement stays outside source and chat until OS-19A proves atomic quota reservation and the actual-schedule budget. Even after secret installation, `ENGINE_OS_CAPTURE_ENABLED` must remain false until every activation gate passes. Cloudflare cron invokes the scheduled Worker handler directly, but it exits without acquisition unless that switch is exactly `true`.
 
 ## Frozen 2026 settings
 
