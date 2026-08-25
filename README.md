@@ -37,7 +37,7 @@ These components describe preserved work and intended contracts. Their presence 
 - Official NFL/team sources for current injury reports and inactives.
 - Open-Meteo for outdoor or open-roof kickoff-hour weather.
 
-The connectors are present, but the scheduled acquisition switch defaults off while evidence, origin, quota, and package-activation gates remain open. The active Worker does not run coefficient refits. Public HTTP rejects every mutating method before framework routing and exposes only explicit read APIs. When acquisition is eventually qualified, a failed import must preserve the last validated data and partial boards must remain stale rather than silently publish.
+The urgent D1 evidence/forecast-ledger schema is deployed with an append-only migration receipt, but the connectors remain inactive while evidence, origin, quota, and package-activation gates are open. The scheduled acquisition switch and Odds credential are absent. The active Worker does not run coefficient refits. Public HTTP rejects every mutating method before framework routing and exposes only explicit read APIs. When acquisition is eventually qualified, a failed import must preserve the last validated data and partial boards must remain stale rather than silently publish.
 
 ## Local preview
 

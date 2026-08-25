@@ -1,12 +1,14 @@
 {
   "schemaVersion": "engine-os-sites-environment-receipt-v1",
-  "checkedAt": "2026-08-25T20:08:50Z",
+  "checkedAt": "2026-08-25T20:34:08Z",
   "sitesProjectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
-  "environmentRevision": 8,
+  "environmentRevision": 11,
   "valuesInspectedOrStored": false,
   "requiredAbsentKeys": [
     "CRON_SECRET",
     "ENGINE_OS_CAPTURE_ENABLED",
+    "ENGINE_OS_MIGRATION_0013_ENABLED",
+    "ENGINE_OS_MIGRATION_0013_TOKEN",
     "GABE_ACCESS_TOKEN",
     "INTERNAL_TEAM_GATE_ENABLED",
     "JARRETT_ACCESS_TOKEN",
@@ -24,8 +26,8 @@
   ],
   "allRequiredKeysAbsent": true,
   "limitations": [
-    "This receipt proves only the empty Sites environment key set at revision 8; secret values were not read or stored.",
+    "This receipt proves only the empty Sites environment key set at revision 11; secret values were not read or stored.",
     "It does not prove provider-side revocation of the exposed Odds API credential.",
-    "Environment revision 8 takes effect on production only after a subsequent Sites deployment."
+    "Environment revision 11 takes effect on production only with the final fail-closed Sites deployment."
   ]
 }

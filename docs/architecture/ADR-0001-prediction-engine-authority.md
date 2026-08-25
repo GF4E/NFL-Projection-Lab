@@ -80,7 +80,7 @@ The active runtime quarantine requires all of the following:
 
 Items 1 through 3 are now enforced by source, package, deployment-config, and post-build scans. External credential revocation and any one-time export remain operator actions under OS-18 because repository evidence cannot prove the state of an external Supabase project or hosting secret store. The exact legacy paths, tables, job names, and secret names are enumerated in the ownership registry. That registry deliberately records `owner: none-quarantined`; assigning those objects to D1 later requires an explicit migration rather than a dual write.
 
-The metadata-only Sites environment receipt at `.planning/engine-os/execution/os-00/sites-environment-receipt.v1.json` records that revision 8 has an empty key set, including no Supabase, team-gate, push, pipeline, cron, acquisition-switch, or Odds credential names. That is deployed-configuration key-set evidence for the next deployment, not evidence that an external provider credential has been revoked.
+The metadata-only Sites environment receipt at `.planning/engine-os/execution/os-00/sites-environment-receipt.v1.json` records that revision 11 has an empty key set, including no Supabase, team-gate, push, pipeline, cron, acquisition-switch, migration-bridge, or Odds credential names. That is deployed-configuration key-set evidence, not evidence that an external provider credential has been revoked.
 
 ## Interfaces
 
@@ -125,7 +125,7 @@ This decision assigns authority; it does not disguise current failures as comple
 | No authenticated external compute runner exists; retained heavy lifecycle source is unreachable | ARC-04 / OPS-02 | OS-15 |
 | Model Lab source cache and large outputs are not durably in R2 | DATA-01 | OS-03 |
 
-The `/sunday` maintenance side effect has been removed. The Worker rejects mutating HTTP methods before framework routing, handles every public API through an explicit SELECT-only path, and rejects unknown APIs; focused request-boundary tests pass. Supabase is absent from the active source, package, deployment-config, empty Sites revision 8 key inventory, and production-build graphs; the remaining credential-revocation statement is explicitly limited to what repository evidence cannot observe. The 17 Git-designated Model Lab files are tracked in integration commit `bbd77d3`. Full evidence durability still depends on the OS-03 R2 upload and restored-cache proof.
+The `/sunday` maintenance side effect has been removed. The Worker rejects mutating HTTP methods before framework routing, handles every public API through an explicit SELECT-only path, and rejects unknown APIs; focused request-boundary tests pass. Supabase is absent from the active source, package, deployment-config, empty Sites revision 11 key inventory, and production-build graphs; the remaining credential-revocation statement is explicitly limited to what repository evidence cannot observe. The 17 Git-designated Model Lab files are tracked in integration commit `bbd77d3`. Full evidence durability still depends on the OS-03 R2 upload and restored-cache proof.
 
 ## Consequences and trade-offs
 

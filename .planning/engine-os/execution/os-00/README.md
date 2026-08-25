@@ -66,12 +66,12 @@ On 2026-08-25, the working-copy verification passed:
 - Every HTTP method now receives a SELECT-only D1 capability. Scheduled acquisition and ledger activation are fail-closed until the separate Engine OS activation flag is explicitly installed after its dependency gates pass.
 - Supabase packages and client sources are removed; login and callback redirect publicly; shared-record authentication fails closed; the completed production bundle contains no Supabase runtime marker.
 - The 17 Git-designated Model Lab files are tracked in integration commit `bbd77d3`; the checkout tracking gate passes.
-- Sites environment revision 8 has an empty key set, including no known Supabase, team-gate, push, pipeline, cron, acquisition-switch, or Odds credential names. The metadata-only receipt is `sites-environment-receipt.v1.json`; the revision takes effect on the next deployment.
+- Sites environment revision 11 has an empty key set, including no known Supabase, team-gate, push, pipeline, cron, acquisition-switch, migration-bridge, or Odds credential names. The metadata-only receipt is `sites-environment-receipt.v1.json`; revision 11 is attached to the final fail-closed deployment.
 
 ## Open preservation and quarantine gates
 
 - The 502,101,912-byte source cache and 117,991,406 bytes of scored outputs are verified locally but are not yet durably uploaded to R2. OS-03 owns that upload and restore proof.
-- Supabase is absent from repository source, package, deployment-config, Sites revision 8's empty key-name inventory, and production-build graphs. Revoking any credential that still exists in an external provider or another hosting secret store remains an OS-18 operator action and is not claimed by this receipt. Sites revision 8 applies on the next deployment.
+- Supabase is absent from repository source, package, deployment-config, Sites revision 11's empty key-name inventory, and production-build graphs. Revoking any credential that still exists in an external provider or another hosting secret store remains an OS-18 operator action and is not claimed by this receipt.
 - Runtime DDL remains until OS-01 makes migrations authoritative.
 - Heavy lifecycle source remains preserved but is unreachable from the Worker; OS-15 must establish the compute runner before fitting can resume.
 
