@@ -3,7 +3,7 @@ import handler from "vinext/server/app-router-entry";
 import { listNflverseImportStates } from "../src/server/nflverse/store";
 import { buildDecisionBoard } from "../src/server/decision-board";
 import { getPlayerPropBoard } from "../src/server/player-props";
-import { listOddsAutomationRuns, runScheduledOddsAutomation } from "../src/server/odds-automation";
+import { listOddsAutomationRuns } from "../src/server/odds-automation";
 import { weeklySlate } from "../src/server/weekly-slate";
 import { listOfficialInjuryImportStates } from "../src/server/official-injuries/store";
 import { listPregameContextStates } from "../src/server/pregame-context/store";
@@ -82,12 +82,11 @@ const worker = {
       url.pathname === "/sunday" && request.method === "GET" && env.ODDS_API_KEY
     ) {
       // Sites does not guarantee that a packaged cron fires immediately after a
-      // deployment. A board navigation may claim only the deterministic
-      // scheduled recovery lease; it cannot choose a cadence or spend twice.
-      ctx.waitUntil(runScheduledOddsAutomation({
+      // deployment. A board navigation may run the same idempotent maintenance
+      // lane in the background; snapshot leases prevent duplicate provider spend.
+      ctx.waitUntil(runBackgroundMaintenance({
         db: env.DB,
-        apiKey: env.ODDS_API_KEY,
-        allowCatchup: true
+        apiKey: env.ODDS_API_KEY
       }).catch(() => undefined));
     }
     // Keep automation control outside the framework router so cron, browser wakeups,
