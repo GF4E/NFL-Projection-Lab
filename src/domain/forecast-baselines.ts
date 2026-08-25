@@ -174,7 +174,6 @@ export interface MarketBaselineInput {
   provenanceHash: string;
   homeDispersion: number;
   awayDispersion: number;
-  dependence: number;
 }
 
 export function buildPowerDeviggedMarketBaseline(input: MarketBaselineInput): {
@@ -193,7 +192,6 @@ export function buildPowerDeviggedMarketBaseline(input: MarketBaselineInput): {
       expectedTotal: input.totalPoint,
       homeDispersion: input.homeDispersion,
       awayDispersion: input.awayDispersion,
-      dependence: input.dependence,
       generatedAt: input.generatedAt,
       modelHash: input.modelHash,
       provenanceHash: input.provenanceHash
@@ -226,7 +224,6 @@ export function buildScoreModelCandidateSet(input: {
     expectedTotal: input.expectedMarketTotal,
     homeDispersion: input.fittedCountParameters.homeDispersion,
     awayDispersion: input.fittedCountParameters.awayDispersion,
-    dependence: input.fittedCountParameters.dependence,
     maxScore: input.maxScore,
     generatedAt: input.generatedAt,
     modelHash: input.modelHashes.marketAnchored,

@@ -4,6 +4,7 @@ const MIN_PROBABILITY = 1e-15;
 
 export type ScoreModelFamily =
   | "market_anchored_discrete"
+  | "market_anchored_independent_negative_binomial"
   | "correlated_negative_binomial"
   | "possession_simulation";
 
@@ -78,9 +79,8 @@ export function fitJointScoreParameters(
   let awayExcessVariance = 0;
   let homeMeanSquared = 0;
   let awayMeanSquared = 0;
-  let residualProduct = 0;
-  let homeResidualSquared = 0;
-  let awayResidualSquared = 0;
+  let weightedHomeResidual = 0;
+  let weightedAwayResidual = 0;
   eligible.forEach((row) => {
     const homeMean = (row.expectedTotal + row.expectedHomeMargin) / 2;
     const awayMean = (row.expectedTotal - row.expectedHomeMargin) / 2;
@@ -90,11 +90,10 @@ export function fitJointScoreParameters(
     squaredWeight += row.weight ** 2;
     homeMeanSquared += row.weight * homeMean ** 2;
     awayMeanSquared += row.weight * awayMean ** 2;
-    homeExcessVariance += row.weight * Math.max(0, homeResidual ** 2 - homeMean);
-    awayExcessVariance += row.weight * Math.max(0, awayResidual ** 2 - awayMean);
-    residualProduct += row.weight * homeResidual * awayResidual;
-    homeResidualSquared += row.weight * homeResidual ** 2;
-    awayResidualSquared += row.weight * awayResidual ** 2;
+    homeExcessVariance += row.weight * (homeResidual ** 2 - homeMean);
+    awayExcessVariance += row.weight * (awayResidual ** 2 - awayMean);
+    weightedHomeResidual += row.weight * homeResidual;
+    weightedAwayResidual += row.weight * awayResidual;
   });
   const maximumFiniteDispersion = 1_000_000;
   const homeDispersion = homeExcessVariance > 0
@@ -103,8 +102,22 @@ export function fitJointScoreParameters(
   const awayDispersion = awayExcessVariance > 0
     ? Math.max(0.1, Math.min(maximumFiniteDispersion, awayMeanSquared / awayExcessVariance))
     : maximumFiniteDispersion;
-  const residualCorrelation = residualProduct /
-    Math.max(Number.EPSILON, Math.sqrt(homeResidualSquared * awayResidualSquared));
+  const meanHomeResidual = weightedHomeResidual / totalWeight;
+  const meanAwayResidual = weightedAwayResidual / totalWeight;
+  let residualCovariance = 0;
+  let homeResidualVariance = 0;
+  let awayResidualVariance = 0;
+  eligible.forEach((row) => {
+    const homeMean = (row.expectedTotal + row.expectedHomeMargin) / 2;
+    const awayMean = (row.expectedTotal - row.expectedHomeMargin) / 2;
+    const centeredHomeResidual = row.actualHomeScore - homeMean - meanHomeResidual;
+    const centeredAwayResidual = row.actualAwayScore - awayMean - meanAwayResidual;
+    residualCovariance += row.weight * centeredHomeResidual * centeredAwayResidual;
+    homeResidualVariance += row.weight * centeredHomeResidual ** 2;
+    awayResidualVariance += row.weight * centeredAwayResidual ** 2;
+  });
+  const residualCorrelation = residualCovariance /
+    Math.max(Number.EPSILON, Math.sqrt(homeResidualVariance * awayResidualVariance));
   const dependence = Math.max(-0.35, Math.min(0.35, residualCorrelation));
   return {
     homeDispersion,
@@ -224,7 +237,7 @@ export function validateJointScoreDistribution(distribution: JointScoreDistribut
 }
 
 export function buildCorrelatedNegativeBinomialDistribution(input: {
-  family?: "market_anchored_discrete" | "correlated_negative_binomial";
+  family?: "market_anchored_discrete" | "market_anchored_independent_negative_binomial" | "correlated_negative_binomial";
   expectedHomeScore: number;
   expectedAwayScore: number;
   homeDispersion: number;
@@ -285,7 +298,6 @@ export function buildMarketAnchoredScoreDistribution(input: {
   expectedTotal: number;
   homeDispersion: number;
   awayDispersion: number;
-  dependence: number;
   maxScore?: number;
   generatedAt: string;
   modelHash: string;
@@ -296,7 +308,8 @@ export function buildMarketAnchoredScoreDistribution(input: {
   const expectedAwayScore = (input.expectedTotal - input.expectedHomeMargin) / 2;
   return buildCorrelatedNegativeBinomialDistribution({
     ...input,
-    family: "market_anchored_discrete",
+    family: "market_anchored_independent_negative_binomial",
+    dependence: 0,
     expectedHomeScore,
     expectedAwayScore
   });

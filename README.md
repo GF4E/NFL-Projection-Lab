@@ -24,7 +24,7 @@ trademarked logo assets are intentionally maintained outside GitHub. See
 - A frozen 25% model / 75% market probability blend.
 - Quarter-Kelly reference sizing on a 100-unit bankroll, rounded down to 0.5 units and capped at 2 units.
 - Season-varying home-field and scoring effects, weekly team-state updates, a gated champion/challenger refit, and deterministic model/data/config hashes.
-- A 100-member fixed-seed weighted bootstrap; displayed suggestions are muted when the 80% edge interval spans zero.
+- A 100-member fixed-seed season-week block bootstrap that preserves time-decay weights; displayed suggestions are muted when the 80% edge interval spans zero.
 - BetMGM/FanDuel comparison, translated price deltas, line movement, edge decay, current injury/QB state, and kickoff-hour weather.
 - A data-fit joint home/away score distribution that reconciles team-score projections with moneyline, spread, total, tie, and push probabilities.
 - Prospective all-game scoring, scenario dossiers, and a registered market/count/possession model bakeoff. Human adjustments remain separate from model training.
@@ -72,8 +72,8 @@ The primary runtime value is `ODDS_API_KEY`. Scheduled administrative jobs use `
 
 - Books: BetMGM and FanDuel
 - Shrinkage weight: `w = 0.25`
-- Strength-state update: `K = 0.005`
-- Bootstrap: 100 fixed-seed coefficient refits; 10th/90th edge percentiles
+- Strength-state update: `K = 0.005`, maintained in shadow and withheld from production pending stable validation
+- Bootstrap: 100 fixed-seed season-week block coefficient refits; 10th/90th edge percentiles
 - Sizing display: quarter-Kelly, 100-unit reference, 0.5-unit floor, 2-unit cap
 - Credit alert / ceiling: 400 / 450
 

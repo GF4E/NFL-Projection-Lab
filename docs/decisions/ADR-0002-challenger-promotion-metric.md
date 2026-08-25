@@ -12,10 +12,12 @@ The engine forecasts a distribution rather than a single score. A challenger can
 
 Pooled mean log loss over non-push moneyline, spread, and total Bernoulli outcomes is the primary champion/challenger promotion metric. Champion, challenger, and power-de-vigged market baseline must be scored on identical rolling-origin rows. Each eligible game-market contributes one outcome; pushes are excluded from the pooled Bernoulli score and reported separately.
 
-A challenger is eligible for atomic promotion only when both frozen gates pass:
+A challenger is eligible for atomic promotion only when all frozen gates pass:
 
-1. challenger pooled mean log loss is no worse than champion log loss plus `0.002`; and
-2. challenger calibration slope is within `[0.8, 1.2]`.
+1. challenger pooled mean log loss is lower than champion log loss;
+2. the lower bound of the paired season-week block-bootstrap 90% interval for champion-minus-challenger log loss is above zero;
+3. no individual market's log loss is worse than champion by more than `0.002`; and
+4. challenger calibration slope is within `[0.8, 1.2]`.
 
 Brier score, joint score likelihood, team-score error, calibration plots, pooled and market-level sample sizes, uncertainty intervals, and CLV are required diagnostics. They explain the decision but cannot override a failed hard gate. Model-run hashes and the promotion or rejection result remain immutable.
 
@@ -78,7 +80,7 @@ Option A best matches the objective of improving human judgment because it evalu
 - Evaluation-row membership, outcome encoding, probability bounds, push handling, and market weighting must be versioned and frozen before comparison.
 - Pooled results must always be accompanied by moneyline, spread, and total breakouts and sample sizes.
 - A lower team-score error, better CLV, or favorable win record cannot rescue a challenger that fails log-loss or calibration gates.
-- The `0.002` tolerance and `[0.8, 1.2]` slope range are structural configuration and may change only during offseason validation.
+- The `0.002` protected-market tolerance, paired interval rule, season-week resampling unit, and `[0.8, 1.2]` slope range are structural configuration and may change only during offseason validation.
 - Personal selections and their outcomes remain outside model training.
 
 ## Action items

@@ -128,6 +128,9 @@ const schema = [
     challenger_hash text NOT NULL,
     champion_metrics_json text NOT NULL,
     challenger_metrics_json text NOT NULL,
+    paired_improvement real NOT NULL,
+    paired_interval_json text NOT NULL,
+    paired_blocks integer NOT NULL,
     gate_decision text NOT NULL,
     data_hash text NOT NULL,
     config_hash text NOT NULL,
@@ -275,7 +278,8 @@ export async function getLatestModelRunAuthorization(db: D1Database): Promise<{
 export async function getLatestModelRun(db: D1Database): Promise<ModelRun | null> {
   await ensureModelLifecycleStore(db);
   const row = await db.prepare(`SELECT id, champion_hash, challenger_hash, champion_metrics_json,
-      challenger_metrics_json, gate_decision, data_hash, config_hash, feature_schema_hash,
+      challenger_metrics_json, paired_improvement, paired_interval_json, paired_blocks,
+      gate_decision, data_hash, config_hash, feature_schema_hash,
       code_hash, started_at, completed_at, promoted_at
     FROM model_run_log ORDER BY completed_at DESC LIMIT 1`).first<{
       id: string;
@@ -283,6 +287,9 @@ export async function getLatestModelRun(db: D1Database): Promise<ModelRun | null
       challenger_hash: string;
       champion_metrics_json: string;
       challenger_metrics_json: string;
+      paired_improvement: number;
+      paired_interval_json: string;
+      paired_blocks: number;
       gate_decision: "promote" | "retain";
       data_hash: string;
       config_hash: string;
@@ -300,6 +307,9 @@ export async function getLatestModelRun(db: D1Database): Promise<ModelRun | null
     status: row.gate_decision === "promote" ? "challenger" : "rejected",
     championMetrics: JSON.parse(row.champion_metrics_json) as ModelMetrics,
     challengerMetrics: JSON.parse(row.challenger_metrics_json) as ModelMetrics,
+    pairedLogLossImprovement: row.paired_improvement,
+    pairedLogLossImprovementInterval90: JSON.parse(row.paired_interval_json) as [number, number],
+    pairedEvaluationBlocks: row.paired_blocks,
     gateDecision: row.gate_decision,
     dataSnapshotHash: row.data_hash,
     configHash: row.config_hash,
@@ -405,11 +415,13 @@ export async function publishLoopB(input: {
         input.run.featureSchemaHash, input.run.codeHash, input.run.startedAt, input.run.promotedAt),
     input.db.prepare(`INSERT OR REPLACE INTO model_run_log
       (id, champion_hash, challenger_hash, champion_metrics_json, challenger_metrics_json,
-       gate_decision, data_hash, config_hash, feature_schema_hash, code_hash, started_at, completed_at, promoted_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+       paired_improvement, paired_interval_json, paired_blocks, gate_decision, data_hash, config_hash,
+       feature_schema_hash, code_hash, started_at, completed_at, promoted_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
       .bind(input.run.id, input.run.championVersionHash, input.run.challengerVersionHash,
         JSON.stringify(input.run.championMetrics), JSON.stringify(input.run.challengerMetrics),
-        input.run.gateDecision, input.run.dataSnapshotHash, input.run.configHash,
+        input.run.pairedLogLossImprovement, JSON.stringify(input.run.pairedLogLossImprovementInterval90),
+        input.run.pairedEvaluationBlocks, input.run.gateDecision, input.run.dataSnapshotHash, input.run.configHash,
         input.run.featureSchemaHash, input.run.codeHash, input.run.startedAt,
         input.run.completedAt, input.run.promotedAt),
     input.db.prepare(`INSERT INTO model_lifecycle_state

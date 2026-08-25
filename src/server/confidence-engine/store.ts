@@ -48,7 +48,11 @@ const schema = [
     source_record_id text NOT NULL,
     observation_kind text NOT NULL,
     published_at text NOT NULL,
+    provider_updated_at text,
+    requested_at text NOT NULL,
+    received_at text NOT NULL,
     captured_at text NOT NULL,
+    availability_basis text NOT NULL,
     valid_at text NOT NULL,
     valid_to text,
     schema_version text NOT NULL,
@@ -191,12 +195,14 @@ export async function publishSourceObservations(
       jsonColumn: "observation_json", expectedJson: json
     });
     await db.prepare(`INSERT OR IGNORE INTO source_snapshot_manifest
-      (source_hash, provider, dataset, source_record_id, observation_kind, published_at, captured_at,
-       valid_at, valid_to, schema_version, import_run_id, license, freshness, source_url, observation_json, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      (source_hash, provider, dataset, source_record_id, observation_kind, published_at, provider_updated_at,
+       requested_at, received_at, captured_at, availability_basis, valid_at, valid_to, schema_version,
+       import_run_id, license, freshness, source_url, observation_json, created_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
       .bind(
         observation.sourceHash, observation.provider, observation.dataset, observation.sourceRecordId,
-        observation.kind, observation.publishedAt, observation.capturedAt, observation.validAt,
+        observation.kind, observation.publishedAt, observation.providerUpdatedAt, observation.requestedAt,
+        observation.receivedAt, observation.capturedAt, observation.availabilityBasis, observation.validAt,
         observation.validTo, observation.schemaVersion, observation.importRunId, observation.licenseTag, observation.freshness,
         observation.sourceUrl ?? null, json, createdAt
       ).run();

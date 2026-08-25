@@ -2,6 +2,7 @@ import { stableHash } from "./hash";
 import type { DataFreshness } from "./types";
 
 export type ObservationKind = "observed" | "forecast" | "market" | "manual";
+export type AvailabilityBasis = "source_published" | "provider_updated" | "received_only";
 
 export interface SourceObservation {
   id: string;
@@ -11,8 +12,15 @@ export interface SourceObservation {
   kind: ObservationKind;
   /** Time the source says the observation was published or issued. */
   publishedAt: string;
-  /** Time our importer captured the source. */
+  /** Provider-supplied last-update time, when one exists. */
+  providerUpdatedAt: string | null;
+  /** Time our importer requested the source. */
+  requestedAt: string;
+  /** Time our importer completed receipt of the source. */
+  receivedAt: string;
+  /** Compatibility alias for receivedAt. */
   capturedAt: string;
+  availabilityBasis: AvailabilityBasis;
   /** Event time for observations, or forecast-valid time for forecasts. */
   validAt: string;
   validTo: string | null;
@@ -54,11 +62,19 @@ export function assertObservationAvailableAt(
 ): void {
   const forecastTime = timestamp(forecastGeneratedAt, "forecast generatedAt");
   const published = timestamp(observation.publishedAt, `${observation.id} publishedAt`);
+  const providerUpdated = observation.providerUpdatedAt === null
+    ? null : timestamp(observation.providerUpdatedAt, `${observation.id} providerUpdatedAt`);
+  const requested = timestamp(observation.requestedAt, `${observation.id} requestedAt`);
+  const received = timestamp(observation.receivedAt, `${observation.id} receivedAt`);
   const captured = timestamp(observation.capturedAt, `${observation.id} capturedAt`);
   timestamp(observation.validAt, `${observation.id} validAt`);
   if (observation.validTo !== null) timestamp(observation.validTo, `${observation.id} validTo`);
-  if (published > forecastTime || captured > forecastTime) {
+  if (published > forecastTime || providerUpdated !== null && providerUpdated > forecastTime ||
+      requested > forecastTime || received > forecastTime || captured > forecastTime) {
     throw new Error(`Point-in-time leakage: ${observation.id} was unavailable at ${forecastGeneratedAt}`);
+  }
+  if (requested > received || received !== captured) {
+    throw new Error(`Point-in-time input ${observation.id} has inconsistent request and receipt timing`);
   }
   if (observation.freshness === "partial" || observation.freshness === "unavailable") {
     throw new Error(`Point-in-time input ${observation.id} is ${observation.freshness}`);
@@ -85,7 +101,11 @@ export function assertFeatureRowLeakageSafe(row: PointInTimeFeatureRow): void {
         id: observation.id,
         sourceHash: observation.sourceHash,
         publishedAt: observation.publishedAt,
+        providerUpdatedAt: observation.providerUpdatedAt,
+        requestedAt: observation.requestedAt,
+        receivedAt: observation.receivedAt,
         capturedAt: observation.capturedAt,
+        availabilityBasis: observation.availabilityBasis,
         schemaVersion: observation.schemaVersion,
         importRunId: observation.importRunId,
         validAt: observation.validAt,
@@ -122,7 +142,11 @@ export function createPointInTimeFeatureRow(input: Omit<
     id: observation.id,
     sourceHash: observation.sourceHash,
     publishedAt: observation.publishedAt,
+    providerUpdatedAt: observation.providerUpdatedAt,
+    requestedAt: observation.requestedAt,
+    receivedAt: observation.receivedAt,
     capturedAt: observation.capturedAt,
+    availabilityBasis: observation.availabilityBasis,
     schemaVersion: observation.schemaVersion,
     importRunId: observation.importRunId,
     validAt: observation.validAt,
@@ -152,7 +176,12 @@ export function createPointInTimeFeatureRow(input: Omit<
 export function maximumAvailableAt(observations: readonly SourceObservation[]): string | null {
   if (!observations.length) return null;
   return observations
-    .flatMap((observation) => [observation.publishedAt, observation.capturedAt])
+    .flatMap((observation) => [
+      observation.publishedAt,
+      observation.providerUpdatedAt,
+      observation.requestedAt,
+      observation.receivedAt
+    ].filter((value): value is string => value !== null))
     .sort()
     .at(-1) ?? null;
 }

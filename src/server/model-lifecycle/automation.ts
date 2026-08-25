@@ -28,6 +28,8 @@ import {
   buildLifecycleTrainingRows,
   evaluateWalkForwardModels,
   fitLifecycleChallenger,
+  pairedWalkForwardLogLossEvidence,
+  walkForwardPredictions,
   type LifecycleGameRow,
   type LifecycleTeamFeatureRow
 } from "./training";
@@ -131,7 +133,7 @@ export function missingLifecycleFeatureSeasons(
     .sort((left, right) => left - right);
 }
 
-function predictionMetricsForChampion(rows: ModelTrainingRow[], latestCompletedSeason: number, artifact: StoredModelArtifact) {
+function walkForwardModelsForChampion(rows: ModelTrainingRow[], latestCompletedSeason: number, artifact: StoredModelArtifact) {
   const origins = [latestCompletedSeason - 2, latestCompletedSeason - 1, latestCompletedSeason]
     .filter((season) => rows.some((row) => row.season === season));
   const models = { ...artifact.walkForwardModels };
@@ -145,7 +147,7 @@ function predictionMetricsForChampion(rows: ModelTrainingRow[], latestCompletedS
       iterations: 60
     });
   }
-  return evaluateWalkForwardModels(rows, latestCompletedSeason, models);
+  return models;
 }
 
 export async function runModelLifecycleAutomation(input: {
@@ -341,22 +343,30 @@ export async function runModelLifecycleAutomation(input: {
     }
     const champion = existingChampion ?? (bootstrapVersion ? { artifact: bootstrapVersion.artifact, metrics: bootstrapVersion.metrics } : null);
     if (!champion || !championHash) throw new Error("Loop B could not establish a logged champion");
-    const championMetrics = await predictionMetricsForChampion(rows, Math.min(latestCompletedSeason, season - 1), champion.artifact);
+    const evaluationThroughSeason = Math.min(latestCompletedSeason, season - 1);
+    const championWalkForwardModels = walkForwardModelsForChampion(rows, evaluationThroughSeason, champion.artifact);
+    const pairedEvidence = pairedWalkForwardLogLossEvidence({
+      champion: walkForwardPredictions(rows, evaluationThroughSeason, championWalkForwardModels),
+      challenger: walkForwardPredictions(rows, evaluationThroughSeason, challenger.walkForwardModels)
+    });
     const completedAt = new Date().toISOString();
     const gated = runPromotionGate({
       runId: `model:${season}:week${targetWeek}:${dataHash.slice(0, 12)}`,
       championHash: championHash ?? challengerHash,
       challengerHash,
-      championMetrics,
-      challengerMetrics: challenger.metrics,
+      championMetrics: pairedEvidence.championMetrics,
+      challengerMetrics: pairedEvidence.challengerMetrics,
       dataHash,
       configHash,
       featureSchemaHash,
       codeHash,
       startedAt,
       completedAt,
-      tolerance: structuralConfig.model.promotionLogLossTolerance,
-      calibrationSlopeRange: structuralConfig.model.promotionCalibrationSlope as [number, number]
+      tolerance: structuralConfig.model.promotionProtectedMarketLogLossTolerance,
+      calibrationSlopeRange: structuralConfig.model.promotionCalibrationSlope as [number, number],
+      pairedLogLossImprovement: pairedEvidence.improvement,
+      pairedLogLossImprovementInterval90: pairedEvidence.interval90,
+      pairedEvaluationBlocks: pairedEvidence.blocks
     });
     await publishLoopB({
       db: input.db,
@@ -364,7 +374,7 @@ export async function runModelLifecycleAutomation(input: {
       targetWeek,
       challengerHash,
       artifact,
-      challengerMetrics: challenger.metrics,
+      challengerMetrics: pairedEvidence.challengerMetrics,
       run: gated.run,
       alert: gated.alert,
       retainedChampionHash: championHash,

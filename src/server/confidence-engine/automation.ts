@@ -2,6 +2,7 @@ import { stableHash } from "@/domain/hash";
 import { createPointInTimeFeatureRow, type SourceObservation } from "@/domain/point-in-time";
 import { evaluateScoreDistribution } from "@/domain/probabilistic-evaluation";
 import { buildDecisionBoard } from "../decision-board";
+import { listNflverseImportStates } from "../nflverse/store";
 import {
   createForecastArtifact,
   hasForecastInputVersion,
@@ -38,6 +39,12 @@ export async function archiveCurrentConfidenceForecasts(input: {
     now: input.now,
     includeInternalDistributions: true,
     initializeStores: true
+  });
+  const featureSourceStates = (await listNflverseImportStates(input.db)).filter((state) => {
+    if (!state.sourceHash || !state.lastSuccessAt || state.freshness !== "current") return false;
+    if (state.dataset === "schedules:history") return true;
+    const match = /^pbp:(\d{4})$/.exec(state.dataset);
+    return match !== null && Number(match[1]) <= (board.basisSeason ?? board.season - 1);
   });
   let archived = 0;
   let skipped = 0;
@@ -82,29 +89,29 @@ export async function archiveCurrentConfidenceForecasts(input: {
         price: item.americanPrice,
         capturedAt: item.capturedAt
       }));
+      if (!featureSourceStates.length) throw new Error("No successful nflverse source manifests support this forecast");
       const observations: SourceObservation[] = [
-        observation({
-          id: `data:${board.dataHash}`,
-          provider: "nflverse_and_official_sources",
-          dataset: "forecast_feature_snapshot",
-          sourceRecordId: `${board.season}:${board.week}:${game.gameId}`,
+        ...featureSourceStates.map((state) => observation({
+          id: `nflverse:${state.dataset}:${state.sourceHash}`,
+          provider: "nflverse",
+          dataset: state.dataset,
+          sourceRecordId: state.sourceHash!,
           kind: "observed",
-          publishedAt: board.generatedAt,
-          capturedAt: board.generatedAt,
-          validAt: board.generatedAt,
+          publishedAt: state.lastSuccessAt!,
+          providerUpdatedAt: null,
+          requestedAt: state.lastSuccessAt!,
+          receivedAt: state.lastSuccessAt!,
+          capturedAt: state.lastSuccessAt!,
+          availabilityBasis: "received_only",
+          validAt: state.lastSuccessAt!,
           validTo: null,
-          schemaVersion: "confidence-engine.1",
-          importRunId: `confidence:${board.dataHash}`,
-          licenseTag: "mixed-source manifest; see source-regimes.config.json",
+          schemaVersion: "nflverse-import-state.1",
+          importRunId: `nflverse:${state.dataset}:${state.sourceHash}`,
+          licenseTag: "nflverse source terms",
           freshness: "current",
-          sourceUrl: null,
-          sourceHash: stableHash({
-            rawDataHash: board.dataHash,
-            gameId: game.gameId,
-            horizon,
-            generatedAt: board.generatedAt
-          })
-        }),
+          sourceUrl: state.sourceUrl,
+          sourceHash: state.sourceHash!
+        })),
         observation({
           id: `odds:${game.gameId}:${latestQuoteAt}`,
           provider: "the_odds_api",
@@ -112,7 +119,11 @@ export async function archiveCurrentConfidenceForecasts(input: {
           sourceRecordId: game.gameId,
           kind: "market",
           publishedAt: latestQuoteAt,
-          capturedAt: latestQuoteAt,
+          providerUpdatedAt: latestQuoteAt,
+          requestedAt: board.generatedAt,
+          receivedAt: board.generatedAt,
+          capturedAt: board.generatedAt,
+          availabilityBasis: "provider_updated",
           validAt: game.kickoffAt ?? board.generatedAt,
           validTo: game.kickoffAt ?? null,
           schemaVersion: "live-lines.1",
@@ -130,7 +141,11 @@ export async function archiveCurrentConfidenceForecasts(input: {
         sourceRecordId: game.sourceGameId ?? game.gameId,
         kind: "observed",
         publishedAt: game.availability.capturedAt,
+        providerUpdatedAt: game.availability.capturedAt,
+        requestedAt: board.generatedAt,
+        receivedAt: board.generatedAt,
         capturedAt: board.generatedAt,
+        availabilityBasis: "provider_updated",
         validAt: game.kickoffAt ?? board.generatedAt,
         validTo: game.kickoffAt ?? null,
         schemaVersion: "official-injuries.1",
@@ -146,7 +161,11 @@ export async function archiveCurrentConfidenceForecasts(input: {
         sourceRecordId: game.sourceGameId ?? game.gameId,
         kind: "forecast",
         publishedAt: game.weather.capturedAt,
+        providerUpdatedAt: game.weather.capturedAt,
+        requestedAt: board.generatedAt,
+        receivedAt: board.generatedAt,
         capturedAt: board.generatedAt,
+        availabilityBasis: "provider_updated",
         validAt: game.kickoffAt ?? board.generatedAt,
         validTo: game.kickoffAt ?? null,
         schemaVersion: "kickoff-weather.1",

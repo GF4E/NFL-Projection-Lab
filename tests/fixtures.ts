@@ -76,6 +76,7 @@ export function pick(overrides: Partial<TeamPickRevision> = {}): TeamPickRevisio
 
 export const metrics: ModelMetrics = {
   pooledLogLoss: 0.67,
+  calibrationIntercept: 0,
   calibrationSlope: 1,
   byMarket: {
     spread: { logLoss: 0.67, observations: 100 },
