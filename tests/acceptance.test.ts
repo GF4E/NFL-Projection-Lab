@@ -755,7 +755,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const worker = readFileSync("worker/index.ts", "utf8");
     expect(worker).toContain('url.pathname === "/sunday"');
     expect(worker).toContain('request.method === "GET"');
-    expect(worker).toContain("allowCatchup: true");
+    expect(worker).toContain("ctx.waitUntil(runBackgroundMaintenance");
+    expect(worker).not.toContain("ctx.waitUntil(runScheduledOddsAutomation");
     expect(worker).not.toContain('request.headers.has("oai-authenticated-user-email")');
   });
 
