@@ -44,7 +44,7 @@ python3 scripts/security_scan.py \
 | Current tree and ignored build outputs: credential patterns | PASS | zero credential findings |
 | Reachable Git blobs and commit objects: credential patterns | PASS | zero credential findings |
 | Built browser/server output: embedded credential patterns | PASS locally | included in the zero-finding scan; remote deployment is not proven by this result |
-| Incident note records removal of the deployed `ODDS_API_KEY` | PASS as documentation only | `docs/security/INCIDENT-2026-08-25-ODDS-KEY.md` |
+| Sites inventory omits `ODDS_API_KEY`, and the active bundle cannot read it | PASS for application quarantine only | `docs/security/INCIDENT-2026-08-25-ODDS-KEY.md`; live `configured=false` check required after deployment |
 | Provider-side revocation of the exposed key | BLOCKED | requires account-owner login |
 | Replacement key works only from the server environment | BLOCKED | replacement has not been generated or installed with a deployment receipt |
 | Old key returns an invalid/deactivated response | BLOCKED | must be checked by the provider account owner without sharing the value |

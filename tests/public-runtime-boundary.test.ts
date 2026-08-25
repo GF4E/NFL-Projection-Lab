@@ -61,12 +61,15 @@ describe("public runtime boundary", () => {
     expect(fetchLane).toContain('request.method !== "GET" && request.method !== "HEAD"');
     expect(fetchLane).toContain('url.pathname.startsWith("/api/")');
     expect(fetchLane).toContain('url.pathname === "/api/lines"');
+    expect(fetchLane).toContain("configured: false");
+    expect(source).not.toContain("env.ODDS_API_KEY");
     expect(fetchLane).not.toContain("runBackgroundMaintenance");
     expect(fetchLane).not.toContain("runModelLifecycleAutomation");
     expect(fetchLane).toContain("DB: readDb");
     expect(scheduledLane).toContain("runBackgroundMaintenance");
     expect(scheduledLane).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
     expect(scheduledLane).toContain("now: new Date()");
+    expect(scheduledLane).toContain("apiKey: undefined");
     expect(scheduledLane).not.toContain("runModelLifecycleAutomation");
     expect(scheduledLane).not.toContain("scheduledTime");
 

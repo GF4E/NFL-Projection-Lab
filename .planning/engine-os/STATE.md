@@ -18,7 +18,7 @@
 - **OS-00B:** Numerical operating contract frozen with no required `TBD` values.
 - **R0:** Research constitution frozen and hashed before any R2 work. The 2025 season is exposed and 2026 is the next prospective stream.
 - **R18A:** Preseason football lifecycle frozen and receipted. No package or prospective stream is activated by that receipt.
-- **OS-18A:** Repository and Sites-environment quarantine completed, but provider-side revocation and replacement are not verified. The Odds API integration remains fail-closed.
+- **OS-18A:** Repository quarantine and application credential-lane severance are complete, but a hidden legacy binding was observed after the Sites inventory became empty; provider-side revocation and replacement are not verified. The Odds API integration remains fail-closed and the active bundle does not read a credential.
 - **OS-01A:** The urgent migration, rollback fixture, append-only guards, and journal entry pass focused tests. D1 contains the append-only `0013_engine_os_urgent` receipt with schema hash `sha256:6205a3dfe09c2d663bb8c50378f295accd266ff2b2018668ca5353436a6797bb`; this proves only the urgent slice, not OS-01 acceptance.
 - **OS-02A / OS-03A / OS-13A / OS-19A:** Partial implementation and focused tests only. Missing all-horizon origin completeness, final reschedule semantics, Tuesday-origin market capture, atomic quota reservation, actual-schedule credit simulation, and deployed D1/R2/scheduler proof prevent acceptance.
 - **R1:** Terminal status is `protocol_invalid`, reason `reviewer_independence_blocked`. The sample and 64 official gamebooks are frozen; no reviewer evidence was fabricated. R2 authorization is false.
@@ -97,7 +97,7 @@ These assets should be preserved and tested against the new contracts. Their exi
 7. Player, roster, injury, snap, venue, and provider identities lack one as-of service.
 8. No authenticated external compute runner exists; retained heavy lifecycle/refit source is unreachable from the active Worker.
 9. Some monitoring still uses selected plays rather than the all-game forecast ledger.
-10. The Odds API credential previously pasted in chat must be revoked and rotated by the account owner before authenticated 2026 market capture.
+10. The Odds API credential previously pasted in chat must be revoked and rotated by the account owner before authenticated 2026 market capture. The Sites inventory is empty, but a hidden legacy binding was observed at runtime, so the active bundle deliberately severs every credential read until the incident closes.
 11. The urgent capture lane's non-atomic quota guard, idempotency, provenance, and late-run controls have focused local coverage, but atomic reservation and live D1/R2/scheduler qualification remain absent.
 12. A failed staging-object cleanup can leave an unreferenced R2 object; pointer integrity is preserved, but OS-03 still needs garbage collection.
 13. HTTP 304 checks refresh the heartbeat without creating a separate append-only check-event row; OS-03 must decide whether that evidence is required.

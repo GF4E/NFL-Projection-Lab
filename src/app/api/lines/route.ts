@@ -7,8 +7,6 @@ import { getD1 } from "../../../../db";
 
 export const dynamic = "force-dynamic";
 
-function configured(): boolean { return Boolean(process.env.ODDS_API_KEY); }
-
 function requestedWeek(request: Request): number | undefined {
   const value = Number(new URL(request.url).searchParams.get("week"));
   return Number.isInteger(value) && value >= 1 && value <= 18 ? value : undefined;
@@ -32,7 +30,7 @@ export async function GET(request: Request) {
       lines,
       season: slate.season,
       week: slate.week,
-      configured: configured(),
+      configured: false,
       comparisonBooks: ["betmgm", "fanduel"],
       stale: staleGameIds.length > 0,
       partial: currentGameIds.length > 0 && staleGameIds.length > 0,

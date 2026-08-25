@@ -20,7 +20,6 @@ interface Env {
   ASSETS: AssetFetcher;
   DB: D1Database;
   EVIDENCE: R2Bucket;
-  ODDS_API_KEY?: string;
   ENGINE_OS_CAPTURE_ENABLED?: string;
   IMAGES: {
     input(stream: ReadableStream): {
@@ -157,7 +156,9 @@ const worker = {
           lines,
           season: slate.season,
           week: slate.week,
-          configured: Boolean(env.ODDS_API_KEY),
+          // The credential lane is severed until OS-18A/OS-19A are accepted.
+          // A hidden provider secret must not make cached reads look active.
+          configured: false,
           comparisonBooks: ["betmgm", "fanduel"],
           stale: staleGameIds.length > 0,
           partial: currentGameIds.length > 0 && staleGameIds.length > 0,
@@ -209,7 +210,7 @@ const worker = {
     ctx.waitUntil(runBackgroundMaintenance({
       db: env.DB,
       evidenceBucket: env.EVIDENCE,
-      apiKey: env.ODDS_API_KEY,
+      apiKey: undefined,
       now: new Date()
     }));
   }

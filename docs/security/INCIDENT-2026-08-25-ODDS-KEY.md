@@ -1,10 +1,11 @@
 # Odds API credential exposure response
 
-Status: provider rotation blocked on account-owner action; deployed secret removed.
+Status: provider rotation blocked on account-owner action; application credential lane severed.
 
 ## Actions completed
 
-- Removed `ODDS_API_KEY` from the Sites production environment on 2026-08-25.
+- Removed `ODDS_API_KEY` from the visible Sites production-environment inventory on 2026-08-25.
+- A post-deployment probe still observed the legacy Worker binding as truthy despite the empty Sites inventory. The final Worker therefore removes every `ODDS_API_KEY` read and always passes `undefined` to acquisition until OS-18A/OS-19A are accepted.
 - Disabled authenticated market ingestion when the key, immutable R2 evidence binding, or current quota state is absent.
 - Added request redaction that excludes query credentials, authorization headers, and cookies from source manifests.
 - Added fail-closed quota preflight and append-only response-header usage events.
@@ -26,4 +27,4 @@ Until those steps pass, market capture remains intentionally disabled and the la
 - Old-key negative check.
 - Replacement-key server-side health check.
 - Post-build source-map and client-bundle scan.
-- Deployment receipt for the environment revision that contains only the replacement secret.
+- Deployment receipt for a later environment revision that contains only the replacement secret after OS-19A acceptance.
