@@ -11,6 +11,7 @@ import { listPregameContextStates } from "../src/server/pregame-context/store";
 import { runBackgroundMaintenance } from "../src/server/background-maintenance";
 import { getConfidenceEngineHealth } from "../src/server/confidence-engine/store";
 import { readOnlyD1 } from "../src/server/read-only-d1";
+import { applyUrgentEngineOsMigration } from "../src/server/engine-os/urgent-migration";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -22,6 +23,7 @@ interface Env {
   EVIDENCE: R2Bucket;
   ODDS_API_KEY?: string;
   ENGINE_OS_CAPTURE_ENABLED?: string;
+  ENGINE_OS_MIGRATION_0013_ENABLED?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -201,6 +203,13 @@ const worker = {
     );
   },
   async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    // Temporary, exact-version bridge: Sites has no operator D1 migration
+    // command. This branch is independently gated, idempotent, and retired as
+    // soon as the append-only production receipt is verified.
+    if (env.ENGINE_OS_MIGRATION_0013_ENABLED === "true") {
+      ctx.waitUntil(applyUrgentEngineOsMigration(env.DB));
+      return;
+    }
     // OS-00 is deployed fail-closed. Capture/ledger activation is a separate
     // operator decision after credential rotation, quota bootstrap, migration
     // proof, and the remaining OS-02A/03A/13A gates. Never use the nominal cron
