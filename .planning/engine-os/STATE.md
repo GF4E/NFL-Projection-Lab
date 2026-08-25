@@ -93,7 +93,7 @@ These assets should be preserved and tested against the new contracts. Their exi
 3. Exact player-stat and snap-count source capture remains outside the narrow OS-03A slice.
 4. The Python laboratory has no verified TypeScript package bridge.
 5. Football forecast archival is coupled to odds freshness and decision-board construction.
-6. Mutating HTTP methods and unknown APIs are rejected locally before framework routing, but this boundary still needs live deployment verification.
+6. The live mutating-HTTP boundary is verified, but legacy read APIs still expose demo/research analytics that are not prospectively qualified.
 7. Player, roster, injury, snap, venue, and provider identities lack one as-of service.
 8. No authenticated external compute runner exists; retained heavy lifecycle/refit source is unreachable from the active Worker.
 9. Some monitoring still uses selected plays rather than the all-game forecast ledger.

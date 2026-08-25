@@ -19,7 +19,7 @@ Status: provider rotation blocked on account-owner action; application credentia
 4. Confirm the old key returns the provider's invalid/deactivated-key response.
 5. Seed current quota usage from the provider dashboard before re-enabling scheduled capture.
 
-Until those steps pass, market capture remains intentionally disabled and the last-good published lines may be served only with a stale label.
+Until those steps pass, market capture remains intentionally disabled and the API reports `configured=false`. Existing last-good cached lines may remain visible with their actual snapshot age and independent freshness status.
 
 ## Evidence still required to close the incident
 
