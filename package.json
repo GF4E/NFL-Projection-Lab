@@ -14,6 +14,8 @@
     "artifact:margin": "tsx scripts/generate_margin_artifact.ts",
     "artifact:total": "tsx scripts/generate_total_artifact.ts",
     "audit:score": "tsx scripts/audit_score_engine.ts",
+    "model-lab:module1": "python3 scripts/model_lab_module_one.py",
+    "model-lab:module1:self-test": "python3 scripts/model_lab_module_one.py --self-test",
     "db:generate": "drizzle-kit generate",
     "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build"
   },

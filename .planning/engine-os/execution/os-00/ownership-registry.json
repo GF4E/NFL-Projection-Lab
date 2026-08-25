@@ -1,0 +1,391 @@
+{
+  "schemaVersion": "prediction-engine-os-ownership-registry-v1",
+  "decisionId": "ADR-0001",
+  "effectiveOn": "2026-08-25",
+  "authoritativePlanes": {
+    "git": "Code, protocols, configuration, migrations, feature definitions, ADRs, and small content-addressed manifests.",
+    "r2": "Immutable raw bytes, versioned columnar datasets, large experiment outputs, model packages, forecast distributions, and publication payloads.",
+    "d1": "Canonical identities, object manifests, compact point-in-time rows, leases, job state, registries, forecast summaries, evaluations, alerts, and serving pointers.",
+    "worker": "Scheduled lightweight coordination, bounded acquisition, validation, verified inference, atomic publication, and read-only serving.",
+    "computeRunner": "Authenticated historical replay, fitting, bootstrap or ensemble work, evaluation, and model-package publication."
+  },
+  "d1Tables": [
+    "canonical_games",
+    "confidence_engine_alerts",
+    "confidence_experiment_decisions",
+    "confidence_experiment_registry",
+    "confidence_forecast_artifacts",
+    "confidence_forecast_evaluations",
+    "confidence_human_adjustments",
+    "confidence_model_registry",
+    "confidence_research_answers",
+    "edge_notification_state",
+    "engine_activations",
+    "engine_job_runs",
+    "engine_schema_versions",
+    "engine_system_alerts",
+    "forecast_origin_records",
+    "forecast_origins",
+    "game_context_alerts",
+    "game_kickoff_revisions",
+    "game_provider_aliases",
+    "kickoff_weather_alerts",
+    "kickoff_weather_current",
+    "kickoff_weather_snapshots",
+    "kickoff_weather_stage",
+    "kickoff_weather_state",
+    "live_line_snapshots",
+    "live_lines",
+    "market_sentiment_import_state",
+    "market_sentiment_snapshots",
+    "model_lifecycle_state",
+    "model_run_log",
+    "model_system_alerts",
+    "model_versions",
+    "nfl_games",
+    "nfl_games_stage",
+    "nfl_player_snap_counts",
+    "nfl_player_snap_counts_stage",
+    "nfl_player_week_stats",
+    "nfl_player_week_stats_stage",
+    "nfl_team_game_features",
+    "nfl_team_game_features_stage",
+    "nflverse_import_alerts",
+    "nflverse_import_state",
+    "odds_automation_runs",
+    "odds_quota_events",
+    "odds_quota_state",
+    "official_inactives",
+    "official_inactives_stage",
+    "official_injury_import_state",
+    "official_injury_reports",
+    "official_injury_reports_stage",
+    "official_pregame_context_snapshots",
+    "official_pregame_context_state",
+    "play_clv_audit",
+    "play_correction_audit",
+    "play_settlement_audit",
+    "play_state_audit",
+    "player_prop_quote_snapshots",
+    "player_prop_quotes",
+    "player_prop_quotes_stage",
+    "player_prop_scan_state",
+    "plays",
+    "point_in_time_feature_rows",
+    "qb_model_overrides",
+    "rolling_feature_states",
+    "rolling_feature_states_stage",
+    "source_capture_heartbeats",
+    "source_capture_manifests",
+    "source_snapshot_manifest",
+    "team_strength_states",
+    "team_strength_states_stage",
+    "web_push_attempts",
+    "web_push_deliveries",
+    "web_push_subscriptions",
+    "weekly_digests"
+  ],
+  "d1TablePolicy": {
+    "owner": "d1",
+    "schemaOwner": "git:drizzle",
+    "currentException": "Runtime CREATE TABLE statements still exist and remain noncompliant until OS-01 removes them.",
+    "legacyPersonalState": [
+      "plays",
+      "play_clv_audit",
+      "play_correction_audit",
+      "play_settlement_audit",
+      "play_state_audit",
+      "qb_model_overrides",
+      "web_push_attempts",
+      "web_push_deliveries",
+      "web_push_subscriptions"
+    ],
+    "legacyPersonalStateDisposition": "No public mutation or engine training dependency; export if required, then remove under OS-18. It does not move to another production database."
+  },
+  "r2ObjectFamilies": [
+    {
+      "family": "raw-source-response",
+      "keyTemplate": "raw/{provider}/{dataset}/sha256/{sha256}",
+      "immutability": "write-once"
+    },
+    {
+      "family": "model-lab-source",
+      "keyTemplate": "model-lab/raw/sha256/{sha256}",
+      "immutability": "write-once"
+    },
+    {
+      "family": "as-of-dataset",
+      "keyTemplate": "datasets/{definitionVersion}/{origin}/sha256/{sha256}.parquet",
+      "immutability": "write-once"
+    },
+    {
+      "family": "experiment-artifact",
+      "keyTemplate": "experiments/{experimentId}/sha256/{sha256}",
+      "immutability": "write-once"
+    },
+    {
+      "family": "model-package",
+      "keyTemplate": "models/{packageCapability}/sha256/{sha256}",
+      "immutability": "write-once"
+    },
+    {
+      "family": "forecast-distribution",
+      "keyTemplate": "forecasts/{originId}/{gameId}/sha256/{sha256}",
+      "immutability": "write-once"
+    },
+    {
+      "family": "publication-payload",
+      "keyTemplate": "publications/sha256/{sha256}",
+      "immutability": "write-once; D1 pointer changes atomically"
+    }
+  ],
+  "jobs": [
+    {
+      "job": "routine-background-maintenance",
+      "currentEntrypoint": "worker/index.ts#scheduled -> runBackgroundMaintenance",
+      "owner": "worker",
+      "status": "active-needs-os-15-dag",
+      "contains": [
+        "official-pregame-context",
+        "odds-snapshot",
+        "kickoff-weather",
+        "official-injuries",
+        "nflverse-import",
+        "market-sentiment",
+        "legacy-draft-expiry",
+        "legacy-settlement",
+        "confidence-forecast-and-evaluation",
+        "legacy-weekly-digest",
+        "legacy-push-retry"
+      ]
+    },
+    {
+      "job": "model-lifecycle",
+      "currentEntrypoint": "worker/index.ts#scheduled -> runModelLifecycleAutomation",
+      "owner": "worker",
+      "status": "active-needs-compute-split",
+      "transition": "Worker retains leases and atomic promotion; fitting and walk-forward evaluation move to computeRunner."
+    },
+    {
+      "job": "model-lab-module-one",
+      "currentEntrypoint": "scripts/model_lab_module_one.py",
+      "owner": "computeRunner",
+      "status": "frozen-reject-all"
+    },
+    {
+      "job": "model-lab-module-two",
+      "currentEntrypoint": "scripts/model_lab_module_two.py",
+      "owner": "computeRunner",
+      "status": "frozen-reject-all"
+    },
+    {
+      "job": "legacy-supabase-job-api",
+      "currentEntrypoint": "src/app/api/jobs/[job]/route.ts -> src/server/jobs/runner.ts",
+      "owner": "none-quarantined",
+      "status": "must-be-unreachable",
+      "legacyJobNames": [
+        "data-refresh",
+        "loop-a",
+        "loop-b",
+        "forecast-refresh",
+        "odds-snapshot",
+        "inactives-roof",
+        "settlement",
+        "credit-meter",
+        "weekly-digest"
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "module": "source-connectors-and-validation",
+      "definitionOwner": "git",
+      "executionOwner": "worker",
+      "largeOutputOwner": "r2",
+      "metadataOwner": "d1"
+    },
+    {
+      "module": "identity-and-point-in-time-replay",
+      "definitionOwner": "git",
+      "executionOwner": "worker",
+      "largeOutputOwner": "r2",
+      "metadataOwner": "d1"
+    },
+    {
+      "module": "research-laboratory",
+      "definitionOwner": "git",
+      "executionOwner": "computeRunner",
+      "largeOutputOwner": "r2",
+      "metadataOwner": "d1"
+    },
+    {
+      "module": "model-packaging-and-gates",
+      "definitionOwner": "git",
+      "executionOwner": "computeRunner",
+      "largeOutputOwner": "r2",
+      "metadataOwner": "d1"
+    },
+    {
+      "module": "verified-inference-and-publication",
+      "definitionOwner": "git",
+      "executionOwner": "worker",
+      "largeOutputOwner": "r2",
+      "metadataOwner": "d1"
+    },
+    {
+      "module": "settlement-and-evaluation",
+      "definitionOwner": "git",
+      "executionOwner": "worker",
+      "largeOutputOwner": "r2",
+      "metadataOwner": "d1"
+    },
+    {
+      "module": "read-serving",
+      "definitionOwner": "git",
+      "executionOwner": "worker",
+      "largeOutputOwner": "r2",
+      "metadataOwner": "d1",
+      "requestSideEffectsAllowed": false
+    }
+  ],
+  "secrets": [
+    {
+      "name": "ODDS_API_KEY",
+      "owner": "worker-secret-store",
+      "status": "rotate-under-OS-18A",
+      "allowedReaders": [
+        "scheduled-odds-connector"
+      ],
+      "forbidden": [
+        "git",
+        "r2-raw-objects",
+        "d1-payload-columns",
+        "browser-bundle",
+        "logs"
+      ]
+    },
+    {
+      "name": "COMPUTE_RUNNER_TOKEN",
+      "owner": "worker-and-compute-secret-stores",
+      "status": "future-required",
+      "allowedReaders": [
+        "worker-job-dispatch",
+        "compute-runner-auth"
+      ]
+    },
+    {
+      "name": "SUPABASE_SERVICE_ROLE_KEY",
+      "owner": "none-quarantined",
+      "status": "revoke-after-export-decision"
+    },
+    {
+      "name": "NEXT_PUBLIC_SUPABASE_URL",
+      "owner": "none-quarantined",
+      "status": "remove-from-active-build"
+    },
+    {
+      "name": "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "owner": "none-quarantined",
+      "status": "remove-from-active-build"
+    },
+    {
+      "name": "PIPELINE_WORKER_SECRET",
+      "owner": "none-quarantined",
+      "status": "revoke-with-legacy-supabase-job-api"
+    },
+    {
+      "name": "CRON_SECRET",
+      "owner": "none-quarantined",
+      "status": "remove-with-legacy-supabase-job-api"
+    },
+    {
+      "name": "VAPID_PRIVATE_KEY",
+      "owner": "none-legacy-personal-feature",
+      "status": "revoke-or-remove-under-OS-18"
+    }
+  ],
+  "supabaseQuarantine": {
+    "authority": "none",
+    "executionAllowed": false,
+    "networkAccessAllowedFromActiveEngine": false,
+    "paths": [
+      "src/server/jobs/runner.ts",
+      "src/server/supabase/admin.ts",
+      "src/server/supabase/server.ts",
+      "src/app/api/jobs/[job]/route.ts",
+      "src/app/login/actions.ts",
+      "src/app/auth/callback/route.ts",
+      "src/server/team-auth.ts",
+      "supabase/migrations"
+    ],
+    "legacyTables": [
+      "audit_log",
+      "book_evaluations",
+      "config_versions",
+      "credit_usage",
+      "discrete_margin_artifacts",
+      "forecasts",
+      "model_runs",
+      "normalized_injuries",
+      "odds_snapshots",
+      "pick_approvals",
+      "pipeline_runs",
+      "push_deliveries",
+      "push_subscriptions",
+      "qb_overrides",
+      "raw_data_snapshots",
+      "rolling_features",
+      "settled_picks",
+      "system_alerts",
+      "team_members",
+      "team_pick_revisions",
+      "team_picks",
+      "team_strength_states",
+      "teams",
+      "weather_inputs",
+      "weekly_digests"
+    ],
+    "retirementSequence": [
+      "Record whether any legacy row requires a one-time export; never dual-write it.",
+      "Make the job API and all imports from src/server/jobs/runner.ts unreachable from the active build.",
+      "Remove Supabase variables from the deployed Worker and public build.",
+      "Revoke service-role, anonymous, pipeline, and legacy cron credentials.",
+      "Archive migrations as historical evidence or delete them only after the export and rollback window closes."
+    ],
+    "rollback": "Restore from a tagged pre-quarantine release only for time-bounded data export; do not resume production writes."
+  },
+  "knownNoncompliance": [
+    {
+      "requirement": "ARC-03",
+      "finding": "D1 tables are still created by both Drizzle migrations and runtime CREATE TABLE statements.",
+      "ownerTask": "OS-01"
+    },
+    {
+      "requirement": "ARC-02",
+      "finding": "The legacy job route is HTTP 410 and its runner is a no-I/O tombstone, but login, callback, team-auth, and Supabase client sources remain; full quarantine still requires removing them from the active dependency graph and deployed environment.",
+      "ownerTask": "OS-00-runtime-half"
+    },
+    {
+      "requirement": "ARC-04",
+      "finding": "The current Worker lifecycle path performs coefficient work; heavy fitting still needs the compute-runner boundary.",
+      "ownerTask": "OS-15"
+    },
+    {
+      "requirement": "DATA-01",
+      "finding": "No R2 binding or durable upload is present for the 502,101,912-byte Model Lab source cache.",
+      "ownerTask": "OS-03"
+    }
+  ],
+  "verifiedControls": [
+    {
+      "requirement": "ARC-05",
+      "control": "The /sunday request-side maintenance dispatch was removed, and public Worker GET routes receive a SELECT-only D1 capability.",
+      "evidence": "tests/public-runtime-boundary.test.ts"
+    },
+    {
+      "requirement": "ARC-02",
+      "control": "POST /api/jobs/:job returns 410 and src/server/jobs/runner.ts performs no provider or database I/O.",
+      "evidence": "tests/public-runtime-boundary.test.ts"
+    }
+  ]
+}
