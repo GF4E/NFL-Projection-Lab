@@ -43,7 +43,7 @@ export async function runBackgroundMaintenance(input: {
       error: `weekly digest: ${error instanceof Error ? error.message : "unknown failure"}`
     })
   );
-  const confidenceEngine = (result.odds.status === "completed" && result.nflverse.status === "completed"
+  const confidenceEngine = await (result.odds.status === "completed" && result.nflverse.status === "completed"
     ? runConfidenceEngineAutomation({ db: input.db, now })
     : evaluateCompletedConfidenceForecasts({ db: input.db, now }).then((evaluation) => ({
         archive: { archived: 0, skipped: 0, withheld: 0, stale: 0 },
