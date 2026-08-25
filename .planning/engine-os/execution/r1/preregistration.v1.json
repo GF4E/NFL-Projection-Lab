@@ -1,0 +1,230 @@
+{
+  "protocolId": "engine-os-r1-target-reconciliation.2026-08-25.1",
+  "frozenAtUtc": "2026-08-25T19:15:13Z",
+  "status": "preregistered_before_sampled_gamebook_review",
+  "question": "Do the frozen Module 1 paired final-score labels and Module 2 regulation-offensive-series and separate overtime labels agree exactly with independently double-entered official NFL gamebooks?",
+  "scope": {
+    "includedTargets": [
+      "Module 1 official final home and away score, including overtime",
+      "Module 2 home and away regulation offensive-series counts",
+      "Module 2 overtime occurrence",
+      "Module 2 home and away overtime offensive-series counts",
+      "Module 2 edge-case treatment and offense attribution"
+    ],
+    "excludedTargets": [
+      "drive outcomes or drive-state labels reserved for R4",
+      "model predictions, features, coefficients, losses, or promotion results",
+      "market data"
+    ],
+    "truthSource": "Exact official NFL gamebook PDF bytes from an nfl.com or static.www.nfl.com origin. nflverse, model artifacts, game-center summaries, media reports, and third-party stat sites are not truth sources.",
+    "comparisonSources": [
+      "Frozen Module 1 score labels",
+      "Frozen Module 2 v8 regulation and overtime target labels"
+    ]
+  },
+  "targetDefinitions": {
+    "finalScore": "The gamebook final home and away points, including overtime, matching the frozen Module 1 estimand.",
+    "regulationOffensiveSeries": "For each team, count a series only when quarters 1 through 4 contain at least one live pass, run, quarterback kneel, quarterback spike, punt, field-goal attempt, or qualifying live aborted snap by that offense. Kicks, returns, tries, penalty-only and no-play records do not create a series. A punt or field-goal attempt counts for the offense taking the snap. Defensive and special-teams scores do not create a series for the scoring team. Kneel-only terminal series count.",
+    "overtime": "Record overtime occurrence and each team's overtime offensive-series count separately. No overtime series may enter the regulation count.",
+    "edgeTreatment": "For the sampled event, record whether it creates a series, the attributed offense if it does, the quarter, and the official gamebook play/drive reference."
+  },
+  "sampling": {
+    "universe": "All 4,175 completed NFL regular-season games in the frozen 2010-2025 schedule/source manifest used by Module 2 v8.",
+    "sampleSizeUniqueGamebooks": 64,
+    "rankingSeed": "engine-os-r1.2026-08-25.sample.v1",
+    "rankingRule": "Within each eligible stratum, rank ascending by SHA-256 of UTF-8 seed + NUL + stratum_id + NUL + game_id; take the first not already selected. No outcome or discrepancy may alter the order.",
+    "priorityOrder": [
+      {
+        "stratum": "fixed_multi_offense_envelope_census",
+        "n": 6,
+        "games": [
+          "2015_01_IND_BUF",
+          "2016_15_CLE_BUF",
+          "2018_01_TEN_MIA",
+          "2018_09_CHI_BUF",
+          "2019_02_TB_CAR",
+          "2023_12_PIT_CIN"
+        ]
+      },
+      {
+        "stratum": "overtime_era_stratified",
+        "n": 12,
+        "allocation": {
+          "2010-2013": 3,
+          "2014-2017": 3,
+          "2018-2021": 3,
+          "2022-2025": 3
+        }
+      },
+      {
+        "stratum": "ontology_edge_instances",
+        "n": 14,
+        "oneUniqueGamePerSelector": [
+          "kickoff_touchback",
+          "punt",
+          "first_qualifying_play_field_goal_attempt",
+          "blocked_field_goal_attempt",
+          "offensive_turnover",
+          "defensive_touchdown",
+          "special_teams_return_touchdown",
+          "safety",
+          "onside_kick",
+          "kneel_only_terminal_series",
+          "penalty_or_no_play_record",
+          "qualifying_live_aborted_snap",
+          "half_ending_series",
+          "regulation_ending_series"
+        ]
+      },
+      {
+        "stratum": "season_week_probability_sample",
+        "n": 32,
+        "allocation": "For each season 2010-2025, one game from weeks 1-9 and one game from weeks 10 through the season's final regular-season week. Previously selected and pilot-excluded games are skipped by the frozen ranking."
+      }
+    ],
+    "edgeSelectorContract": "A standalone sampling script may use only the frozen schedule and play-by-play comparison cache to identify selector candidates. It may not import or call Module 1 or Module 2 reconstruction/modeling code. The selected event reference is for sampling and later comparison, never official truth.",
+    "pilotExclusions": [
+      {
+        "gameId": "2010_01_MIN_NO",
+        "reason": "NFL game-center URL-format pilot exposed its public score before preregistration; it cannot enter the audit sample."
+      },
+      {
+        "gameId": "2024_01_BAL_KC",
+        "reason": "NFL game-center URL-format pilot exposed its public score before preregistration; it cannot enter the audit sample."
+      }
+    ],
+    "otherExclusions": [
+      "Preseason and postseason games",
+      "Canceled or no-contest games",
+      "Any game outside the frozen 2010-2025 completed regular-season universe"
+    ],
+    "replacementRule": "There is no outcome-based replacement. If a nonmandatory ranked candidate lacks an official NFL gamebook before review, take the next ranked candidate in the same frozen stratum and retain a source-unavailable audit row. If a mandatory six-game census item lacks an official gamebook, or a stratum cannot reach its allocation, the protocol is invalid. Once either reviewer opens a selected gamebook, that game cannot be replaced or excluded.",
+    "deduplicationRule": "The priority order produces 64 unique games. A game already selected is skipped for later strata; its earlier stratum flags remain."
+  },
+  "reviewerIndependence": {
+    "requiredPeople": 3,
+    "roles": [
+      "Reviewer A",
+      "Reviewer B",
+      "Adjudicator"
+    ],
+    "rules": [
+      "Reviewer A and Reviewer B must be distinct natural persons and must enter all 64 gamebooks independently.",
+      "Neither reviewer may inspect nflverse target values, model artifacts, the other reviewer's entries, discrepancy output, or adjudication before both complete entry files are frozen and hashed.",
+      "The adjudicator must be a third natural person who did not make either initial entry. The adjudicator sees anonymized disagreements only after both entry hashes are frozen.",
+      "An AI assistant may prepare manifests, retrieve and hash official gamebooks, validate blank schemas, and compute agreement after unblinding, but cannot impersonate an independent human reviewer or adjudicator.",
+      "Reviewer identities may be pseudonymous in the public artifact, but a private signed role-attestation hash must bind one person to one role before review."
+    ],
+    "blockedRule": "If three independent natural-person roles are not available, R1 stops at reviewer_independence_blocked and R2 is protocol_invalid. Automated agreement or repeated entry by one person cannot substitute."
+  },
+  "doubleEntry": {
+    "blindedFieldsPerGame": [
+      "game_id",
+      "official_gamebook_sha256",
+      "official_gamebook_page_references",
+      "final_home_score",
+      "final_away_score",
+      "regulation_home_series",
+      "regulation_away_series",
+      "overtime_occurred",
+      "overtime_home_series",
+      "overtime_away_series",
+      "edge_selector",
+      "edge_event_reference",
+      "edge_creates_series",
+      "edge_offense",
+      "notes_limited_to_source_ambiguity"
+    ],
+    "rules": [
+      "Use only the hashed official gamebook assigned in the sample manifest.",
+      "Enter integer counts; blanks are incomplete, not zero.",
+      "For non-overtime games, enter overtime_occurred=0 and both overtime counts=0.",
+      "For edge fields not assigned to the game, enter NOT_ASSIGNED.",
+      "Raw entry files are append-frozen after hashing and are never edited during reconciliation."
+    ]
+  },
+  "adjudication": {
+    "trigger": "Any Reviewer A versus Reviewer B field disagreement or either reviewer's explicit AMBIGUOUS flag.",
+    "rules": [
+      "Create an anonymized discrepancy row preserving both raw values and their hashes.",
+      "The third adjudicator re-reads the same hashed official gamebook and records truth, page/play support, and a discrepancy taxonomy.",
+      "No majority vote and no consultation of nflverse/model labels is allowed during adjudication.",
+      "If the official gamebook cannot resolve the target under the frozen definition, mark official_truth_unresolved; do not drop or impute the row.",
+      "Only after adjudicated truth is frozen and hashed may a separate script reveal and compare the existing source/model labels."
+    ],
+    "taxonomy": [
+      "reviewer_transcription",
+      "reviewer_series_boundary",
+      "official_gamebook_editorial_ambiguity",
+      "source_fixed_drive_boundary",
+      "offense_attribution",
+      "overtime_contamination",
+      "score_mismatch",
+      "edge_treatment_mismatch",
+      "source_unavailable",
+      "other_preregistered_definition_conflict"
+    ]
+  },
+  "statistics": {
+    "preadjudicationReviewerAgreement": [
+      "Exact match rate by target family",
+      "Mean and maximum absolute difference for count fields",
+      "Cohen kappa for overtime occurrence when defined",
+      "Wilson 95 percent interval for each exact match rate"
+    ],
+    "adjudicatedTargetAgreement": [
+      "Exact match rate by target family",
+      "Mean and maximum absolute error for count fields",
+      "Cohen kappa for overtime occurrence when defined",
+      "Wilson 95 percent interval for each exact match rate",
+      "Discrepancy and severe-error counts by frozen taxonomy"
+    ],
+    "unitOfAnalysis": {
+      "finalScore": "128 team-game score cells",
+      "regulationSeries": "128 team-game count cells",
+      "overtimeOccurrence": "64 game cells",
+      "overtimeSeries": "128 team-game count cells, with zero for non-overtime games",
+      "edgeTreatment": "20 assigned edge instances: 14 ontology selectors plus the six multi-offense census games"
+    }
+  },
+  "severeError": {
+    "definition": [
+      "Any adjudicated final-score mismatch",
+      "Any adjudicated regulation-series mismatch of two or more for either team",
+      "Any overtime series merged into regulation or any regulation series assigned to overtime",
+      "Any overtime-occurrence mismatch",
+      "Any overtime-series count mismatch",
+      "Any edge instance assigned to the wrong offense or treated as creating/dropping a series contrary to the frozen ontology",
+      "Any unresolved official-truth row",
+      "Any reviewer-independence, blinding, source-hash, sample-allocation, or post-review replacement violation"
+    ]
+  },
+  "thresholds": {
+    "reviewProcessPass": {
+      "reviewerABExactFinalScore": 1.0,
+      "reviewerABExactRegulationSeriesMinimum": 0.98,
+      "reviewerABExactOvertimeOccurrence": 1.0,
+      "reviewerABExactOvertimeSeriesMinimum": 0.98,
+      "reviewerABExactEdgeTreatmentMinimum": 0.95,
+      "reviewerABSevereDisagreementsMaximum": 0
+    },
+    "targetPassAfterAdjudication": {
+      "exactFinalScore": 1.0,
+      "exactRegulationSeries": 1.0,
+      "exactOvertimeOccurrence": 1.0,
+      "exactOvertimeSeries": 1.0,
+      "exactEdgeTreatment": 1.0,
+      "severeErrorsMaximum": 0,
+      "sourceUnavailableOrUnresolvedMaximum": 0
+    },
+    "decisionRule": "R1 passes only if both the review-process gate and every adjudicated target gate pass. Any failure returns protocol_invalid and blocks R2 until a new target/review decision is preregistered. No correction may be made in place and no favorable subset may be reported as a pass."
+  },
+  "terminalStatuses": [
+    "pass",
+    "protocol_invalid"
+  ],
+  "knownPreFreezeSourceDiscovery": {
+    "statement": "Before this hash, URL-format discovery exposed game-center scores for the two pilot-excluded regular-season games above and a search snippet for a 2009-season postseason-excluded gamebook. No selected regular-season gamebook was manually reviewed, no possession count was extracted, and no comparison discrepancy was computed.",
+    "effect": "The two regular-season pilots are frozen out of sampling; the postseason game was outside the universe before discovery."
+  }
+}
