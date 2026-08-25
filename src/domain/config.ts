@@ -33,6 +33,7 @@ export interface StructuralConfig {
       maxScore: number;
       minimumTrainingGames: number;
       maximumQuoteAgeMinutes: number;
+      maximumScheduledQuoteAgeMinutes: number;
       bakeoffCalibrationSlope: [number, number];
       bakeoffCoverage80: [number, number];
       maximumLogLossRegression: number;

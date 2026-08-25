@@ -64,6 +64,9 @@ import {
 } from "@/domain/joint-score";
 import { buildScenarioDecisionDossier, type ForecastScenarioBranch } from "@/domain/scenarios";
 import { sizeKelly } from "@/domain/sizing";
+import { scheduledSnapshotQuoteFresh } from "@/domain/odds-schedule";
+import { getMainlineRecoveryStatus } from "./odds-automation";
+import { listSnapshotGameIds } from "./live-line-store";
 
 interface FeatureRow {
   game_id: string;
@@ -899,6 +902,10 @@ export async function buildDecisionBoard(
     }
   );
   const lines = enrichWithPowerDevig(lineResult.results.map(rawLine));
+  const recovery = await getMainlineRecoveryStatus({ db, now: options.now, lineCount: lines.length });
+  const latestScheduledGameIds = recovery.runStatus === "succeeded" && recovery.expectedSnapshotKey
+    ? new Set(await listSnapshotGameIds(recovery.expectedSnapshotKey, db))
+    : null;
   const injuryByTeam = new Map(injuryResult.results.map((row) => [`${row.game_id}:${normalizeNflverseTeam(row.team)}`, row]));
   const inactiveByTeam = new Map(inactiveResult.results.map((row) => [`${row.game_id}:${normalizeNflverseTeam(row.team)}`, row]));
   const pregameByGame = new Map(pregameStates.map((state) => [state.gameId, state]));
@@ -1359,8 +1366,17 @@ export async function buildDecisionBoard(
     const newestQuoteAt = gameLines.map((line) => line.capturedAt).sort().at(-1) ?? null;
     const quoteAgeMinutes = newestQuoteAt === null ? null
       : Math.max(0, (Date.parse(generatedAt) - Date.parse(newestQuoteAt)) / 60_000);
-    const quoteFresh = quoteAgeMinutes !== null &&
-      quoteAgeMinutes <= structuralConfig.model.scoreDistribution.maximumQuoteAgeMinutes;
+    const includedInLatestScheduledSnapshot = latestScheduledGameIds === null
+      ? recovery.expectedSnapshotKey === null
+      : latestScheduledGameIds.has(game.id);
+    const quoteFresh = scheduledSnapshotQuoteFresh({
+      capturedAt: newestQuoteAt,
+      generatedAt,
+      kickoffAt: game.kickoffAt,
+      latestSnapshotIncludesGame: includedInLatestScheduledSnapshot,
+      nearKickoffMaximumAgeMinutes: structuralConfig.model.scoreDistribution.maximumQuoteAgeMinutes,
+      betweenSnapshotsMaximumAgeMinutes: structuralConfig.model.scoreDistribution.maximumScheduledQuoteAgeMinutes
+    });
     const scoreReason = scoreParameters === null
       ? `withheld until ${structuralConfig.model.scoreDistribution.minimumTrainingGames} valid historical market-score rows are available`
       : consensusHomePoint === null || consensusTotalLine === null || projectedTotal === null || projectedSpreadPoint === null

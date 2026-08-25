@@ -34,7 +34,7 @@ import { assertCompletePropQuotePairs, buildPlayerPropEvidence, completeLeaguePr
 import { rehearsalPlays } from "@/lib/play-data";
 import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
-import { deterministicRecoveryCandidate, inspectMainlineCompleteness, latestExpectedMainlineCandidate, scheduledMainlineCandidates, scheduledPropCandidates, type ScheduledGame, type ScheduledOddsCandidate } from "@/domain/odds-schedule";
+import { deterministicRecoveryCandidate, inspectMainlineCompleteness, latestExpectedMainlineCandidate, scheduledMainlineCandidates, scheduledPropCandidates, scheduledSnapshotQuoteFresh, type ScheduledGame, type ScheduledOddsCandidate } from "@/domain/odds-schedule";
 import { plannedOddsThrottleReason } from "@/domain/odds-credit-plan";
 import { boardGameId, chooseActiveWeek, easternScheduleTimeToIso, normalizeScheduleTeam } from "@/domain/weekly-slate";
 import type { BookEvaluation, DiscreteMarginArtifact, JobState, PushDelivery, SettledPick } from "@/domain/types";
@@ -757,6 +757,38 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(worker).toContain('request.method === "GET"');
     expect(worker).toContain("allowCatchup: true");
     expect(worker).not.toContain('request.headers.has("oai-authenticated-user-email")');
+  });
+
+  it("27a. keeps a complete scheduled snapshot current between polls and tightens freshness near kickoff", () => {
+    const common = {
+      kickoffAt: "2026-09-10T00:20:00.000Z",
+      nearKickoffMaximumAgeMinutes: 75,
+      betweenSnapshotsMaximumAgeMinutes: 2_160
+    };
+    expect(scheduledSnapshotQuoteFresh({
+      ...common,
+      capturedAt: "2026-08-24T16:00:00.000Z",
+      generatedAt: "2026-08-25T00:00:00.000Z",
+      latestSnapshotIncludesGame: true
+    })).toBe(true);
+    expect(scheduledSnapshotQuoteFresh({
+      ...common,
+      capturedAt: "2026-08-24T16:00:00.000Z",
+      generatedAt: "2026-08-25T00:00:00.000Z",
+      latestSnapshotIncludesGame: false
+    })).toBe(false);
+    expect(scheduledSnapshotQuoteFresh({
+      ...common,
+      capturedAt: "2026-09-09T21:00:00.000Z",
+      generatedAt: "2026-09-09T22:20:01.000Z",
+      latestSnapshotIncludesGame: true
+    })).toBe(false);
+    expect(scheduledSnapshotQuoteFresh({
+      ...common,
+      capturedAt: "2026-09-09T21:30:00.000Z",
+      generatedAt: "2026-09-09T22:20:00.000Z",
+      latestSnapshotIncludesGame: true
+    })).toBe(true);
   });
 
   it("28. partitions a partial mainline payload at the whole-game boundary", () => {
