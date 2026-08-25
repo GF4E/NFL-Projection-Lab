@@ -31,7 +31,8 @@ export function summarizeSourceObservability(
   });
   return [...groups.values()].map((rows) => {
     const lags = rows.map((row) => {
-      const lag = (Date.parse(row.capturedAt) - Date.parse(row.publishedAt)) / 1_000;
+      const sourceTime = row.providerUpdatedAt ?? row.publishedAt;
+      const lag = (Date.parse(row.receivedAt) - Date.parse(sourceTime)) / 1_000;
       if (!Number.isFinite(lag) || lag < 0) throw new Error(`Invalid provider capture lag for ${row.id}`);
       return lag;
     });
@@ -44,7 +45,7 @@ export function summarizeSourceObservability(
       medianCaptureLagSeconds: quantile(lags, 0.5),
       maximumCaptureLagSeconds: Math.max(...lags),
       earliestPublishedAt: rows.map((row) => row.publishedAt).sort()[0],
-      latestCapturedAt: rows.map((row) => row.capturedAt).sort().at(-1)!,
+      latestCapturedAt: rows.map((row) => row.receivedAt).sort().at(-1)!,
       distinctRecords: new Set(rows.map((row) => row.sourceRecordId)).size
     };
   }).sort((left, right) => left.provider.localeCompare(right.provider) || left.dataset.localeCompare(right.dataset));
@@ -74,7 +75,8 @@ export function latencyNormalizedMovementOrder(
   observations: readonly SourceObservation[]
 ): Array<{ id: string; provider: string; effectivePublishedAt: string; captureLagSeconds: number }> {
   return observations.map((row) => {
-    const captureLagSeconds = (Date.parse(row.capturedAt) - Date.parse(row.publishedAt)) / 1_000;
+    const sourceTime = row.providerUpdatedAt ?? row.publishedAt;
+    const captureLagSeconds = (Date.parse(row.receivedAt) - Date.parse(sourceTime)) / 1_000;
     if (!Number.isFinite(captureLagSeconds) || captureLagSeconds < 0) throw new Error(`Invalid market latency for ${row.id}`);
     return { id: row.id, provider: row.provider, effectivePublishedAt: row.publishedAt, captureLagSeconds };
   }).sort((left, right) => left.effectivePublishedAt.localeCompare(right.effectivePublishedAt) || left.id.localeCompare(right.id));

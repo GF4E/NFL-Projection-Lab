@@ -148,25 +148,57 @@ export function predictProbability(
   return sigmoid(dot(model.coefficients, encodeFeatures(row, model.featureNames)));
 }
 
-function calibrationSlope(rows: Array<{ probability: number; outcome: 0 | 1; weight: number }>): number {
-  const logits = rows.map((row) => Math.log(
-    Math.max(EPSILON, Math.min(1 - EPSILON, row.probability)) /
-      (1 - Math.max(EPSILON, Math.min(1 - EPSILON, row.probability)))
-  ));
-  const totalWeight = rows.reduce((sum, row) => sum + row.weight, 0);
-  const meanX = rows.reduce((sum, row, index) => sum + row.weight * logits[index], 0) / totalWeight;
-  const meanY = rows.reduce((sum, row) => sum + row.weight * row.outcome, 0) / totalWeight;
-  const covariance = rows.reduce(
-    (sum, row, index) => sum + row.weight * (logits[index] - meanX) * (row.outcome - meanY),
-    0
-  );
-  const variance = rows.reduce(
-    (sum, row, index) => sum + row.weight * (logits[index] - meanX) ** 2,
-    0
-  );
-  if (variance < EPSILON) return 0;
-  // The Bernoulli variance correction maps the weighted linear slope to the logistic scale.
-  return covariance / variance / Math.max(EPSILON, meanY * (1 - meanY));
+/**
+ * Fits the standard weighted logistic recalibration model
+ * logit(P(Y=1)) = intercept + slope * logit(forecast).
+ */
+export function fitLogisticCalibration(rows: Array<{
+  probability: number;
+  outcome: 0 | 1;
+  weight: number;
+}>): { intercept: number; slope: number } {
+  if (!rows.length) throw new Error("Calibration requires forecast rows");
+  const eligible = rows.filter((row) => row.weight > 0 && Number.isFinite(row.probability));
+  if (!eligible.length) throw new Error("Calibration requires positive-weight forecast rows");
+  const totalWeight = eligible.reduce((sum, row) => sum + row.weight, 0);
+  const eventRate = eligible.reduce((sum, row) => sum + row.weight * row.outcome, 0) / totalWeight;
+  if (eventRate <= EPSILON || eventRate >= 1 - EPSILON) {
+    return { intercept: boundedLogit(eventRate), slope: 0 };
+  }
+  const design = eligible.map((row) => ({
+    x: boundedLogit(row.probability),
+    outcome: row.outcome,
+    weight: row.weight
+  }));
+  let intercept = 0;
+  let slope = 1;
+  for (let iteration = 0; iteration < 100; iteration += 1) {
+    let scoreIntercept = 0;
+    let scoreSlope = 0;
+    let informationIntercept = 0;
+    let informationCross = 0;
+    let informationSlope = 0;
+    for (const row of design) {
+      const probability = sigmoid(intercept + slope * row.x);
+      const residual = row.outcome - probability;
+      const variance = Math.max(EPSILON, probability * (1 - probability));
+      scoreIntercept += row.weight * residual;
+      scoreSlope += row.weight * residual * row.x;
+      informationIntercept += row.weight * variance;
+      informationCross += row.weight * variance * row.x;
+      informationSlope += row.weight * variance * row.x ** 2;
+    }
+    const determinant = informationIntercept * informationSlope - informationCross ** 2;
+    if (Math.abs(determinant) < EPSILON) break;
+    const interceptStep = (informationSlope * scoreIntercept - informationCross * scoreSlope) / determinant;
+    const slopeStep = (-informationCross * scoreIntercept + informationIntercept * scoreSlope) / determinant;
+    const boundedInterceptStep = Math.max(-2, Math.min(2, interceptStep));
+    const boundedSlopeStep = Math.max(-2, Math.min(2, slopeStep));
+    intercept += boundedInterceptStep;
+    slope += boundedSlopeStep;
+    if (Math.max(Math.abs(boundedInterceptStep), Math.abs(boundedSlopeStep)) < 1e-8) break;
+  }
+  return { intercept, slope };
 }
 
 export function evaluateProbabilityRows(rows: Array<{
@@ -176,6 +208,7 @@ export function evaluateProbabilityRows(rows: Array<{
   weight: number;
 }>): ModelMetrics {
   if (!rows.length) throw new Error("Model evaluation requires non-push rows");
+  const calibration = fitLogisticCalibration(rows);
   const weightedLogLoss = (items: typeof rows): number => {
     const total = items.reduce((sum, item) => sum + item.weight, 0);
     return items.reduce((sum, item) => {
@@ -193,7 +226,8 @@ export function evaluateProbabilityRows(rows: Array<{
   ) as ModelMetrics["byMarket"];
   return {
     pooledLogLoss: weightedLogLoss(rows),
-    calibrationSlope: calibrationSlope(rows),
+    calibrationIntercept: calibration.intercept,
+    calibrationSlope: calibration.slope,
     byMarket
   };
 }
@@ -221,27 +255,24 @@ function mulberry32(seed: number): () => number {
   };
 }
 
-function weightedSample(rows: ModelTrainingRow[], seed: number): ModelTrainingRow[] {
+export function seasonWeekBlockSample(rows: ModelTrainingRow[], seed: number): ModelTrainingRow[] {
+  if (!rows.length) return [];
   const random = mulberry32(seed);
-  const cumulativeWeights: number[] = [];
-  let totalWeight = 0;
+  const blocks = new Map<string, ModelTrainingRow[]>();
   for (const row of rows) {
-    totalWeight += row.weight;
-    cumulativeWeights.push(totalWeight);
+    const key = `${row.season}:week${row.week}`;
+    blocks.set(key, [...(blocks.get(key) ?? []), row]);
   }
-  const counts = Array(rows.length).fill(0) as number[];
-  for (let draw = 0; draw < rows.length; draw += 1) {
-    const target = random() * totalWeight;
-    let low = 0;
-    let high = cumulativeWeights.length - 1;
-    while (low < high) {
-      const middle = Math.floor((low + high) / 2);
-      if (target < cumulativeWeights[middle]) high = middle;
-      else low = middle + 1;
-    }
-    counts[low] += 1;
+  const entries = [...blocks.entries()].sort(([left], [right]) => left.localeCompare(right));
+  const counts = new Map<string, number>();
+  for (let draw = 0; draw < entries.length; draw += 1) {
+    const key = entries[Math.floor(random() * entries.length)][0];
+    counts.set(key, (counts.get(key) ?? 0) + 1);
   }
-  return rows.flatMap((row, index) => counts[index] ? [{ ...row, weight: counts[index] }] : []);
+  return entries.flatMap(([key, block]) => {
+    const count = counts.get(key) ?? 0;
+    return count ? block.map((row) => ({ ...row, weight: row.weight * count })) : [];
+  });
 }
 
 function percentile(sorted: number[], probability: number): number {
@@ -272,7 +303,7 @@ export function fitBootstrapEnsemble(input: {
   const featureNames = designFeatureNames(input.rows);
   const seeds = Array.from({ length: members }, (_, index) => seedStart + index);
   const modelProbabilities = seeds.map((seed) => {
-    const fitted = fitWeightedLogistic(weightedSample(input.rows, seed), {
+    const fitted = fitWeightedLogistic(seasonWeekBlockSample(input.rows, seed), {
       featureNames,
       regularization,
       iterations: 250
@@ -310,7 +341,7 @@ export function fitWeightedBootstrapModelEnsemble(input: {
   const eligible = input.rows.filter((row) => !row.push && row.weight > 0);
   if (!eligible.length) throw new Error("Bootstrap ensemble requires non-push leakage-safe training rows");
   const seeds = Array.from({ length: members }, (_, index) => seedStart + index);
-  const models = seeds.map((seed) => fitWeightedLogistic(weightedSample(eligible, seed), {
+  const models = seeds.map((seed) => fitWeightedLogistic(seasonWeekBlockSample(eligible, seed), {
     featureNames: input.featureNames,
     initialCoefficients: input.initialCoefficients,
     regularization,

@@ -16,7 +16,7 @@ function rows(family: string, gameCount = 20): PrequentialForecastRow[] {
     const total = 42.5 + index % 6;
     const distribution = buildMarketAnchoredScoreDistribution({
       expectedHomeMargin: spread, expectedTotal: total,
-      homeDispersion: 18, awayDispersion: 17, dependence: 0.08, maxScore: 55,
+      homeDispersion: 18, awayDispersion: 17, maxScore: 55,
       generatedAt: "2026-09-10T17:00:00.000Z", modelHash: family, provenanceHash: `p-${index}`
     });
     const actualHomeScore = 18 + index % 15;
@@ -45,7 +45,7 @@ describe("prequential forecast evaluation", () => {
       modelHashes: { marketAnchored: "market", correlatedCount: "count", possession: "possession" }
     });
     expect(candidates.map((candidate) => candidate.family)).toEqual([
-      "market_anchored_discrete", "correlated_negative_binomial", "possession_simulation"
+      "market_anchored_independent_negative_binomial", "correlated_negative_binomial", "possession_simulation"
     ]);
     candidates.forEach((candidate) => expect(candidate.cells.reduce((sum, cell) => sum + cell.probability, 0)).toBeCloseTo(1, 10));
   });

@@ -22,7 +22,11 @@ function source(overrides: Partial<SourceObservation> = {}): SourceObservation {
     sourceRecordId: "game",
     kind: "market",
     publishedAt: "2026-09-10T16:00:00.000Z",
+    providerUpdatedAt: "2026-09-10T16:00:00.000Z",
+    requestedAt: "2026-09-10T16:00:00.500Z",
+    receivedAt: "2026-09-10T16:00:01.000Z",
     capturedAt: "2026-09-10T16:00:01.000Z",
+    availabilityBasis: "provider_updated",
     validAt: "2026-09-13T20:00:00.000Z",
     validTo: null,
     schemaVersion: "1",
@@ -66,7 +70,10 @@ describe("immutable point-in-time confidence contracts", () => {
   });
 
   it("reports provider latency and fails incomplete required coverage", () => {
-    const rows = [source(), source({ id: "odds-2", sourceRecordId: "game-2", sourceHash: "source-2", capturedAt: "2026-09-10T16:00:05.000Z" })];
+    const rows = [source(), source({
+      id: "odds-2", sourceRecordId: "game-2", sourceHash: "source-2",
+      receivedAt: "2026-09-10T16:00:05.000Z", capturedAt: "2026-09-10T16:00:05.000Z"
+    })];
     const summary = summarizeSourceObservability(rows)[0];
     expect(summary.distinctRecords).toBe(2);
     expect(summary.maximumCaptureLagSeconds).toBe(5);
@@ -94,6 +101,28 @@ describe("data-derived joint score and scenario engine", () => {
     };
   });
 
+  it("does not manufacture overdispersion by truncating negative row contributions", () => {
+    const underdispersed = Array.from({ length: 40 }, (_, index) => ({
+      gameId: `under-${index}`, season: 2025,
+      actualHomeScore: 24 + (index % 2 ? 1 : -1),
+      actualAwayScore: 20 + (index % 2 ? -1 : 1),
+      expectedHomeMargin: 4, expectedTotal: 44, weight: 1
+    }));
+    const fit = fitJointScoreParameters(underdispersed);
+    expect(fit.homeDispersion).toBe(1_000_000);
+    expect(fit.awayDispersion).toBe(1_000_000);
+  });
+
+  it("centers score residuals before estimating dependence", () => {
+    const commonBias = Array.from({ length: 40 }, (_, index) => ({
+      gameId: `bias-${index}`, season: 2025,
+      actualHomeScore: 27,
+      actualAwayScore: 23,
+      expectedHomeMargin: 4, expectedTotal: 44, weight: 1
+    }));
+    expect(fitJointScoreParameters(commonBias).dependence).toBe(0);
+  });
+
   it("learns dispersion and dependence from rows and reconciles all markets", () => {
     const fit = fitJointScoreParameters(training);
     expect(fit.trainingGames).toBe(320);
@@ -102,7 +131,7 @@ describe("data-derived joint score and scenario engine", () => {
     const distribution = buildMarketAnchoredScoreDistribution({
       expectedHomeMargin: 3.5, expectedTotal: 45.5,
       homeDispersion: fit.homeDispersion, awayDispersion: fit.awayDispersion,
-      dependence: fit.dependence, maxScore: 60,
+      maxScore: 60,
       generatedAt: "2026-09-10T17:00:00.000Z", modelHash: "model", provenanceHash: fit.trainingHash
     });
     validateJointScoreDistribution(distribution);
@@ -117,7 +146,7 @@ describe("data-derived joint score and scenario engine", () => {
     const fit = fitJointScoreParameters(training);
     const distribution = buildMarketAnchoredScoreDistribution({
       expectedHomeMargin: 2, expectedTotal: 44, homeDispersion: fit.homeDispersion,
-      awayDispersion: fit.awayDispersion, dependence: fit.dependence, maxScore: 55,
+      awayDispersion: fit.awayDispersion, maxScore: 55,
       generatedAt: "2026-09-10T17:00:00.000Z", modelHash: "model", provenanceHash: "data"
     });
     const dossier = buildScenarioDecisionDossier({

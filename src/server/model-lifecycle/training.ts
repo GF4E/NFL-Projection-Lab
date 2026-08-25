@@ -317,6 +317,16 @@ function evaluationSeasons(rows: readonly ModelTrainingRow[], latestCompletedSea
     .filter((season) => observed.has(season));
 }
 
+export interface WalkForwardPrediction {
+  id: string;
+  season: number;
+  week: number;
+  market: ModelTrainingRow["market"];
+  probability: number;
+  outcome: 0 | 1;
+  weight: number;
+}
+
 export function fitWalkForwardModels(
   rows: ModelTrainingRow[],
   latestCompletedSeason: number,
@@ -329,22 +339,104 @@ export function fitWalkForwardModels(
   }));
 }
 
-export function evaluateWalkForwardModels(
+export function walkForwardPredictions(
   rows: ModelTrainingRow[],
   latestCompletedSeason: number,
   models: Record<string, FittedLogisticModel>
-): ModelMetrics {
-  const predictions = evaluationSeasons(rows, latestCompletedSeason).flatMap((season) => {
+): WalkForwardPrediction[] {
+  return evaluationSeasons(rows, latestCompletedSeason).flatMap((season) => {
     const model = models[String(season)];
     if (!model) throw new Error(`Champion is missing walk-forward origin ${season}`);
     return rows.filter((row) => row.season === season && !row.push).map((row) => ({
+      id: row.id,
+      season: row.season,
+      week: row.week,
       market: row.market,
       probability: predictProbability(model, row),
       outcome: row.outcome,
       weight: row.weight
     }));
   });
-  return evaluateProbabilityRows(predictions);
+}
+
+export function evaluateWalkForwardModels(
+  rows: ModelTrainingRow[],
+  latestCompletedSeason: number,
+  models: Record<string, FittedLogisticModel>
+): ModelMetrics {
+  return evaluateProbabilityRows(walkForwardPredictions(rows, latestCompletedSeason, models));
+}
+
+function deterministicRandom(seed: number): () => number {
+  return () => {
+    let value = (seed += 0x6d2b79f5);
+    value = Math.imul(value ^ (value >>> 15), value | 1);
+    value ^= value + Math.imul(value ^ (value >>> 7), value | 61);
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function logLossContribution(probability: number, outcome: 0 | 1): number {
+  const bounded = Math.max(1e-9, Math.min(1 - 1e-9, probability));
+  return -(outcome * Math.log(bounded) + (1 - outcome) * Math.log(1 - bounded));
+}
+
+function percentile(sorted: readonly number[], probability: number): number {
+  const index = (sorted.length - 1) * probability;
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  return lower === upper
+    ? sorted[lower]
+    : sorted[lower] + (index - lower) * (sorted[upper] - sorted[lower]);
+}
+
+export function pairedWalkForwardLogLossEvidence(input: {
+  champion: readonly WalkForwardPrediction[];
+  challenger: readonly WalkForwardPrediction[];
+  seed?: number;
+  samples?: number;
+}): {
+  championMetrics: ModelMetrics;
+  challengerMetrics: ModelMetrics;
+  improvement: number;
+  interval90: [number, number];
+  blocks: number;
+} {
+  const challengerById = new Map(input.challenger.map((row) => [row.id, row]));
+  const pairs = input.champion.map((champion) => {
+    const challenger = challengerById.get(champion.id);
+    if (!challenger || challenger.outcome !== champion.outcome || challenger.market !== champion.market) {
+      throw new Error(`Walk-forward challenger is not paired for ${champion.id}`);
+    }
+    return {
+      key: `${champion.season}:week${champion.week}`,
+      weight: champion.weight,
+      difference: logLossContribution(champion.probability, champion.outcome) -
+        logLossContribution(challenger.probability, challenger.outcome)
+    };
+  });
+  if (pairs.length !== input.challenger.length || !pairs.length) {
+    throw new Error("Paired walk-forward evaluation requires identical nonempty forecast rows");
+  }
+  const blockMap = new Map<string, typeof pairs>();
+  for (const pair of pairs) blockMap.set(pair.key, [...(blockMap.get(pair.key) ?? []), pair]);
+  const blocks = [...blockMap.values()];
+  const weightedMean = (sampled: readonly (typeof pairs)[number][]) => {
+    const weight = sampled.reduce((sum, row) => sum + row.weight, 0);
+    return sampled.reduce((sum, row) => sum + row.weight * row.difference, 0) / weight;
+  };
+  const random = deterministicRandom(input.seed ?? 20260824);
+  const draws = Array.from({ length: input.samples ?? 5_000 }, () => {
+    const sampled = Array.from({ length: blocks.length }, () => blocks[Math.floor(random() * blocks.length)]).flat();
+    return weightedMean(sampled);
+  }).sort((left, right) => left - right);
+  return {
+    championMetrics: evaluateProbabilityRows([...input.champion]),
+    challengerMetrics: evaluateProbabilityRows([...input.challenger]),
+    improvement: weightedMean(pairs),
+    interval90: [percentile(draws, 0.05), percentile(draws, 0.95)],
+    blocks: blocks.length
+  };
 }
 
 export function fitLifecycleChallenger(rows: ModelTrainingRow[], latestCompletedSeason: number): {

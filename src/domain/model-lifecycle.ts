@@ -102,12 +102,20 @@ export function runPromotionGate(input: {
   completedAt: string;
   tolerance?: number;
   calibrationSlopeRange?: readonly [number, number];
+  pairedLogLossImprovement?: number;
+  pairedLogLossImprovementInterval90?: readonly [number, number];
+  pairedEvaluationBlocks?: number;
 }): { run: ModelRun; alert: SystemAlert | null } {
   const tolerance = input.tolerance ?? 0.002;
   const calibrationSlopeRange = input.calibrationSlopeRange ?? [0.8, 1.2];
+  const interval = input.pairedLogLossImprovementInterval90 ?? [Number.NEGATIVE_INFINITY, Number.POSITIVE_INFINITY];
+  const protectedMarketsPass = (Object.keys(input.challengerMetrics.byMarket) as Array<keyof ModelMetrics["byMarket"]>)
+    .every((market) => input.challengerMetrics.byMarket[market].logLoss <=
+      input.championMetrics.byMarket[market].logLoss + tolerance);
   const promote =
-    input.challengerMetrics.pooledLogLoss <=
-      input.championMetrics.pooledLogLoss + tolerance &&
+    input.challengerMetrics.pooledLogLoss < input.championMetrics.pooledLogLoss &&
+    interval[0] > 0 &&
+    protectedMarketsPass &&
     input.challengerMetrics.calibrationSlope >= calibrationSlopeRange[0] &&
     input.challengerMetrics.calibrationSlope <= calibrationSlopeRange[1];
   const run: ModelRun = {
@@ -117,6 +125,10 @@ export function runPromotionGate(input: {
     status: promote ? "challenger" : "rejected",
     championMetrics: input.championMetrics,
     challengerMetrics: input.challengerMetrics,
+    pairedLogLossImprovement: input.pairedLogLossImprovement ??
+      input.championMetrics.pooledLogLoss - input.challengerMetrics.pooledLogLoss,
+    pairedLogLossImprovementInterval90: [interval[0], interval[1]],
+    pairedEvaluationBlocks: input.pairedEvaluationBlocks ?? 0,
     gateDecision: promote ? "promote" : "retain",
     dataSnapshotHash: input.dataHash,
     configHash: input.configHash,
@@ -134,7 +146,7 @@ export function runPromotionGate(input: {
           id: `alert:${input.runId}`,
           type: "gate_rejection",
           severity: "warning",
-          message: "Challenger retained behind the champion because it failed the Tuesday promotion gate.",
+          message: "Challenger retained because paired evidence, calibration, or protected-market performance failed the Tuesday promotion gate.",
           idempotencyKey: `gate_rejection:${input.runId}`,
           createdAt: input.completedAt,
           acknowledgedAt: null

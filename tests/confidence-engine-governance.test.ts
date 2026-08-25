@@ -59,7 +59,7 @@ describe("confidence-engine research governance", () => {
   it("scores human judgment separately without changing training eligibility", () => {
     const distribution = buildMarketAnchoredScoreDistribution({
       expectedHomeMargin: 2.5, expectedTotal: 45, homeDispersion: 18, awayDispersion: 17,
-      dependence: 0.05, maxScore: 55, generatedAt: "2026-09-10T17:00:00.000Z",
+      maxScore: 55, generatedAt: "2026-09-10T17:00:00.000Z",
       modelHash: "model", provenanceHash: "data"
     });
     const forecast = {
@@ -80,4 +80,3 @@ describe("confidence-engine research governance", () => {
     expect(scored.modelOnly.jointLogScore).toBe(scored.humanAdjusted?.jointLogScore);
   });
 });
-

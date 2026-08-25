@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { metrics as fixtureMetrics } from "./fixtures";
 import {
   loopAStateMatchesRevision,
   loopAStateRevision,
@@ -10,19 +11,60 @@ import { aggregateRollingFeatureStates, missingLifecycleFeatureSeasons } from "@
 import { championConfigurationStatus } from "@/domain/model-version";
 import {
   bootstrapResidualEdgeInterval,
+  fitLogisticCalibration,
   fitWeightedBootstrapModelEnsemble,
   fitWeightedLogistic,
+  seasonWeekBlockSample,
   type ModelTrainingRow
 } from "@/domain/model-fit";
 import {
   buildLifecycleTeamContexts,
   buildLifecycleTrainingRows,
   fitLifecycleChallenger,
+  pairedWalkForwardLogLossEvidence,
   type LifecycleGameRow,
   type LifecycleTeamFeatureRow
 } from "@/server/model-lifecycle/training";
 
 describe("persisted weekly model lifecycle", () => {
+  it("fits the standard logistic calibration intercept and slope", () => {
+    const rows = [0.2, 0.5, 0.8].flatMap((probability) =>
+      Array.from({ length: 100 }, (_, index) => ({
+        probability,
+        outcome: (index < probability * 100 ? 1 : 0) as 0 | 1,
+        weight: 1
+      }))
+    );
+    const calibration = fitLogisticCalibration(rows);
+    expect(calibration.intercept).toBeCloseTo(0, 6);
+    expect(calibration.slope).toBeCloseTo(1, 6);
+  });
+
+  it("resamples complete season-week blocks and preserves decay weights", () => {
+    const rows: ModelTrainingRow[] = [1, 2].flatMap((week) => (["spread", "total", "moneyline"] as const).map((market, index) => ({
+      id: `${week}:${market}`, season: 2025, week, market, outcome: index % 2 as 0 | 1,
+      push: false, weight: 0.4 + week / 10, features: { marketLogit: 0 }
+    })));
+    const sampled = seasonWeekBlockSample(rows, 20260824);
+    for (const week of new Set(sampled.map((row) => row.week))) {
+      const block = sampled.filter((row) => row.week === week);
+      expect(block.map((row) => row.market).sort()).toEqual(["moneyline", "spread", "total"]);
+      const multipliers = block.map((row) => row.weight / rows.find((source) => source.id === row.id)!.weight);
+      expect(new Set(multipliers).size).toBe(1);
+    }
+  });
+
+  it("uses paired season-week evidence for challenger uncertainty", () => {
+    const champion = Array.from({ length: 12 }, (_, index) => ({
+      id: `row-${index}`, season: 2025, week: index % 4 + 1, market: "spread" as const,
+      probability: index % 2 ? 0.55 : 0.45, outcome: index % 2 as 0 | 1, weight: 1
+    }));
+    const challenger = champion.map((row) => ({ ...row, probability: row.outcome ? 0.65 : 0.35 }));
+    const evidence = pairedWalkForwardLogLossEvidence({ champion, challenger, samples: 500 });
+    expect(evidence.improvement).toBeGreaterThan(0);
+    expect(evidence.interval90[0]).toBeGreaterThan(0);
+    expect(evidence.blocks).toBe(4);
+  });
   it("builds a deterministic fixed-seed coefficient ensemble and centers its interval on the live model edge", () => {
     const rows: ModelTrainingRow[] = Array.from({ length: 160 }, (_, index) => ({
       id: `row-${index}`,
@@ -199,6 +241,7 @@ describe("persisted weekly model lifecycle", () => {
   it("uses the configured calibration range as a hard promotion gate", () => {
     const metrics = {
       pooledLogLoss: 0.68,
+      calibrationIntercept: 0,
       calibrationSlope: 0.79,
       byMarket: {
         spread: { logLoss: 0.68, observations: 10 },
@@ -215,5 +258,39 @@ describe("persisted weekly model lifecycle", () => {
     });
     expect(result.run.gateDecision).toBe("retain");
     expect(result.alert?.type).toBe("gate_rejection");
+  });
+
+  it("does not promote a challenger merely because its loss is within tolerance", () => {
+    const champion = { ...fixtureMetrics, calibrationSlope: 1 };
+    const challenger = {
+      ...champion,
+      pooledLogLoss: 0.681,
+      byMarket: Object.fromEntries(Object.entries(champion.byMarket).map(([market, value]) => [market, { ...value, logLoss: value.logLoss + 0.001 }])) as typeof champion.byMarket
+    };
+    const result = runPromotionGate({
+      runId: "worse", championHash: "champion", challengerHash: "challenger",
+      championMetrics: champion, challengerMetrics: challenger,
+      pairedLogLossImprovement: -0.001, pairedLogLossImprovementInterval90: [-0.003, 0.001], pairedEvaluationBlocks: 54,
+      dataHash: "data", configHash: "config", featureSchemaHash: "features", codeHash: "code",
+      startedAt: "2026-09-15T14:00:00Z", completedAt: "2026-09-15T14:01:00Z"
+    });
+    expect(result.run.gateDecision).toBe("retain");
+  });
+
+  it("promotes only when paired evidence and protected markets pass", () => {
+    const champion = { ...fixtureMetrics, calibrationIntercept: 0, calibrationSlope: 1 };
+    const challenger = {
+      ...champion,
+      pooledLogLoss: 0.66,
+      byMarket: Object.fromEntries(Object.entries(champion.byMarket).map(([market, value]) => [market, { ...value, logLoss: value.logLoss - 0.01 }])) as typeof champion.byMarket
+    };
+    const result = runPromotionGate({
+      runId: "better", championHash: "champion", challengerHash: "challenger",
+      championMetrics: champion, challengerMetrics: challenger,
+      pairedLogLossImprovement: 0.01, pairedLogLossImprovementInterval90: [0.003, 0.017], pairedEvaluationBlocks: 54,
+      dataHash: "data", configHash: "config", featureSchemaHash: "features", codeHash: "code",
+      startedAt: "2026-09-15T14:00:00Z", completedAt: "2026-09-15T14:01:00Z"
+    });
+    expect(result.run.gateDecision).toBe("promote");
   });
 });

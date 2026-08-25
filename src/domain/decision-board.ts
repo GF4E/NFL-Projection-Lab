@@ -404,7 +404,7 @@ export interface DecisionBoardGame {
 export interface JointScoreForecast {
   status: "current" | "stale" | "withheld";
   reason: string | null;
-  family: "market_anchored_discrete";
+  family: "market_anchored_independent_negative_binomial";
   distributionHash: string | null;
   trainingGames: number;
   effectiveTrainingGames: number;

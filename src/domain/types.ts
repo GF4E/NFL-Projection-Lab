@@ -184,6 +184,7 @@ export interface TeamPickRevision {
 
 export interface ModelMetrics {
   pooledLogLoss: number;
+  calibrationIntercept: number;
   calibrationSlope: number;
   byMarket: Record<MarketKey, { logLoss: number; observations: number }>;
 }
@@ -195,6 +196,9 @@ export interface ModelRun {
   status: ModelStatus;
   championMetrics: ModelMetrics;
   challengerMetrics: ModelMetrics;
+  pairedLogLossImprovement: number;
+  pairedLogLossImprovementInterval90: [number, number];
+  pairedEvaluationBlocks: number;
   gateDecision: "promote" | "retain";
   dataSnapshotHash: string;
   configHash: string;

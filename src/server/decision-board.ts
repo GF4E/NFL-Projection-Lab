@@ -991,7 +991,9 @@ export async function buildDecisionBoard(
         ? "owner_override"
         : structuralConfig.qbTiers.learnedPointPriors.length ? "validated_prior" : "market_only"
     };
-    const strengthDelta = (strengths.get(game.home) ?? 0) - (strengths.get(game.away) ?? 0) + quarterbackMarginDelta;
+    const shadowStrengthDelta = (strengths.get(game.home) ?? 0) - (strengths.get(game.away) ?? 0);
+    const validatedStrengthDelta = structuralConfig.model.strengthProductionStatus === "active" ? shadowStrengthDelta : 0;
+    const strengthDelta = validatedStrengthDelta + quarterbackMarginDelta;
     const stateProjectedHomePoint = consensusHomePoint === null ? null : roundHalf(consensusHomePoint - strengthDelta);
     type ProjectionAnchor = { book: "betmgm" | "fanduel"; point: number; fairProbability: number; marketSource: BaselineProjection["marketSource"] };
     const projectionAnchors = (["betmgm", "fanduel"] as const).flatMap<ProjectionAnchor>((book) => {
@@ -1368,7 +1370,7 @@ export async function buildDecisionBoard(
     let scoreForecast: NonNullable<DecisionBoardPayload["games"][number]["scoreForecast"]> = {
       status: "withheld",
       reason: scoreReason,
-      family: "market_anchored_discrete",
+      family: "market_anchored_independent_negative_binomial",
       distributionHash: null,
       trainingGames: scoreParameters?.trainingGames ?? scoreTrainingRows.length,
       effectiveTrainingGames: scoreParameters?.effectiveGames ?? 0,
@@ -1388,13 +1390,19 @@ export async function buildDecisionBoard(
         championHash,
         configHash
       });
-      const modelHash = stableHash({ family: "market_anchored_discrete", championHash, configHash, parameters: scoreParameters });
+      const modelHash = stableHash({
+        family: "market_anchored_independent_negative_binomial",
+        championHash,
+        configHash,
+        homeDispersion: scoreParameters.homeDispersion,
+        awayDispersion: scoreParameters.awayDispersion,
+        dependence: 0
+      });
       const distribution = buildMarketAnchoredScoreDistribution({
         expectedHomeMargin: -projectedSpreadPoint,
         expectedTotal: projectedTotal,
         homeDispersion: scoreParameters.homeDispersion,
         awayDispersion: scoreParameters.awayDispersion,
-        dependence: scoreParameters.dependence,
         maxScore: structuralConfig.model.scoreDistribution.maxScore,
         generatedAt,
         modelHash,
@@ -1473,7 +1481,7 @@ export async function buildDecisionBoard(
       scoreForecast = {
         status: quoteFresh ? "current" : "stale",
         reason: quoteFresh ? null : "market snapshot is stale; preserving the last calculated distribution",
-        family: "market_anchored_discrete",
+        family: "market_anchored_independent_negative_binomial",
         distributionHash: distribution.distributionHash,
         trainingGames: scoreParameters.trainingGames,
         effectiveTrainingGames: scoreParameters.effectiveGames,
@@ -1567,6 +1575,6 @@ export async function buildDecisionBoard(
     games,
     teaserPairs,
     marketCoverage,
-    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K cumulative margin-versus-close strength; decay-weighted discrete spread and total-score translation with exact push mass; ${championStatus === "compatible" ? "logged gated champion calibration" : "coefficient residual withheld pending a config-compatible logged champion"}; QB risk widens uncertainty while the rejected residual tier adjustment stays withheld unless an audited owner override exists; then 25% model and 75% power-de-vigged market shrinkage. Public ticket and money flow is provenance-stamped advisory context only and is excluded from probability and sizing.`
+    method: `Leakage-safe rolling ${structuralConfig.matchupEvidence.windowGames}-game play-weighted ridge opponent adjustment for EPA, success and explosiveness (frozen penalty ${structuralConfig.matchupEvidence.ridgePenalty}); frozen-K margin-versus-close strength maintained as a shadow signal and withheld from production until stable out-of-sample gain is shown; decay-weighted discrete spread and total-score translation with exact push mass; ${championStatus === "compatible" ? "logged gated champion calibration" : "coefficient residual withheld pending a config-compatible logged champion"}; QB risk widens uncertainty while the rejected residual tier adjustment stays withheld unless an audited owner override exists; then 25% model and 75% power-de-vigged market shrinkage. Public ticket and money flow is provenance-stamped advisory context only and is excluded from probability and sizing.`
   };
 }

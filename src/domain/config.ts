@@ -14,9 +14,11 @@ export interface StructuralConfig {
     shrinkageWeight: number;
     strengthK: number;
     strengthValidationArtifact: string;
-    promotionLogLossTolerance: number;
+    strengthProductionStatus: "active" | "shadow_withheld_no_stable_gain";
+    promotionProtectedMarketLogLossTolerance: number;
     promotionCalibrationSlope: number[];
     bootstrapMembers: number;
+    bootstrapUnit: "season_week";
     bootstrapSeedStart: number;
     bootstrapFitIterations: number;
     intervalPercentiles: number[];
