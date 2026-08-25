@@ -48,6 +48,26 @@ const REQUEST_COST = 3;
 const RECOVERY_LOOKBACK_MS = 8 * 86_400_000;
 const RECOVERY_PROBE_MS = 5 * 60_000;
 
+export function scheduledSnapshotQuoteFresh(input: {
+  capturedAt: string | null;
+  generatedAt: string;
+  kickoffAt: string;
+  latestSnapshotIncludesGame: boolean;
+  nearKickoffMaximumAgeMinutes: number;
+  betweenSnapshotsMaximumAgeMinutes: number;
+}): boolean {
+  if (!input.latestSnapshotIncludesGame || input.capturedAt === null) return false;
+  const generated = Date.parse(input.generatedAt);
+  const captured = Date.parse(input.capturedAt);
+  const kickoff = Date.parse(input.kickoffAt);
+  if (![generated, captured, kickoff].every(Number.isFinite) || captured > generated) return false;
+  const minutesToKickoff = (kickoff - generated) / 60_000;
+  const maximumAge = minutesToKickoff <= 180
+    ? input.nearKickoffMaximumAgeMinutes
+    : input.betweenSnapshotsMaximumAgeMinutes;
+  return (generated - captured) / 60_000 <= maximumAge;
+}
+
 function pacificParts(date: Date): { dayKey: string; weekday: string; minuteOfDay: number } {
   const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
     timeZone: "America/Los_Angeles",
