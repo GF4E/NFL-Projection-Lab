@@ -1,5 +1,12 @@
-import { engineOperatingContract, footballLifecycle2026 } from "@/domain/engine-os-contracts";
-import { tuesdayForecastOrigin, type ForecastOriginIdentity } from "@/domain/engine-os";
+import {
+  engineOperatingContract,
+  engineOsContractHashes,
+  footballLifecycle2026
+} from "@/domain/engine-os-contracts";
+import {
+  requiredForecastOriginsForSchedule,
+  type ForecastOriginIdentity
+} from "@/domain/engine-os";
 import { stableHash } from "@/domain/hash";
 import { easternScheduleTimeToIso } from "@/domain/weekly-slate";
 import {
@@ -9,6 +16,7 @@ import {
   recordForecastOrWithholding,
   seedCanonicalGameOrigin
 } from "./ledger";
+import { reconcileCanonicalGameSchedule } from "./origin-identity";
 
 interface ScheduleGameRow {
   game_id: string;
@@ -19,6 +27,7 @@ interface ScheduleGameRow {
   game_time: string | null;
   away_team: string;
   home_team: string;
+  source_row_hash: string;
 }
 
 interface DueOriginRow {
@@ -34,6 +43,7 @@ interface DueOriginRow {
 export interface EngineOsAutomationResult {
   activationId: string | null;
   seededOrigins: number;
+  reconciledOriginVersions: number;
   dueOrigins: number;
   withheld: number;
   late: number;
@@ -113,7 +123,7 @@ export async function runEngineOsUrgentAutomation(input: {
   const now = input.now ?? new Date();
   const nowIso = now.toISOString();
   const schedule = await input.db.prepare(`SELECT game_id, season, season_type, week,
-      game_date, game_time, away_team, home_team
+      game_date, game_time, away_team, home_team, source_row_hash
     FROM nfl_games
     WHERE season = 2026 AND season_type = 'REG'
     ORDER BY week, game_date, game_time, game_id`).all<ScheduleGameRow>();
@@ -126,10 +136,25 @@ export async function runEngineOsUrgentAutomation(input: {
       late: 0,
       skipped: 0,
       unresolvedGames: 0,
+      reconciledOriginVersions: 0,
       status: "waiting_for_schedule"
     };
   }
 
+  const scheduleEvidence = await input.db.prepare(`SELECT s.source_hash, h.latest_capture_id,
+      m.response_sha256
+    FROM nflverse_import_state s
+    LEFT JOIN source_capture_heartbeats h ON h.source_key = 'nflverse:schedule'
+    LEFT JOIN source_capture_manifests m ON m.capture_id = h.latest_capture_id
+    WHERE s.dataset = 'schedules:live' LIMIT 1`).first<{
+      source_hash: string | null;
+      latest_capture_id: string | null;
+      response_sha256: string | null;
+    }>();
+  if (!scheduleEvidence?.source_hash || !scheduleEvidence.latest_capture_id ||
+    scheduleEvidence.response_sha256 !== scheduleEvidence.source_hash) {
+    throw new Error("Canonical schedule reconciliation requires immutable schedule evidence");
+  }
   const resolvedSchedule: Array<{ game: ScheduleGameRow; kickoffUtc: string }> = [];
   for (const game of schedule.results) {
     const kickoffUtc = kickoffFor(game);
@@ -137,6 +162,29 @@ export async function runEngineOsUrgentAutomation(input: {
     else await alertUnresolvedKickoff(input.db, game.game_id, nowIso);
   }
   const unresolvedGames = schedule.results.length - resolvedSchedule.length;
+  let reconciledOriginVersions = 0;
+  for (const game of schedule.results.filter((row) => kickoffFor(row) === null)) {
+    const reconciled = await reconcileCanonicalGameSchedule({
+      db: input.db,
+      gameId: game.game_id,
+      season: game.season,
+      seasonType: game.season_type,
+      week: game.week,
+      homeTeam: game.home_team,
+      awayTeam: game.away_team,
+      provider: "nflverse",
+      providerGameId: game.game_id,
+      scheduleStatus: "kickoff_unresolved",
+      kickoffUtc: null,
+      observedAt: nowIso,
+      activatedAt: nowIso,
+      activationBoundary: `engine-os.identity-only:${engineOsContractHashes.operating}`,
+      sourceCaptureId: scheduleEvidence.latest_capture_id,
+      sourceEvidenceHash: scheduleEvidence.source_hash,
+      sourceRowHash: game.source_row_hash
+    });
+    reconciledOriginVersions += reconciled.originVersions.length;
+  }
   if (!resolvedSchedule.length) {
     return {
       activationId: null,
@@ -146,12 +194,19 @@ export async function runEngineOsUrgentAutomation(input: {
       late: 0,
       skipped: 0,
       unresolvedGames,
+      reconciledOriginVersions,
       status: "waiting_for_schedule"
     };
   }
 
   const firstOriginUtc = resolvedSchedule
-    .map(({ game, kickoffUtc }) => tuesdayForecastOrigin(game.game_id, kickoffUtc).scheduledForUtc)
+    .map(({ game, kickoffUtc }) => requiredForecastOriginsForSchedule({
+      gameId: game.game_id,
+      week: game.week,
+      kickoffUtc,
+      observedAt: nowIso,
+      activatedAt: nowIso
+    }).find((origin) => origin.horizonId === "weekly_tuesday_0730")!.scheduledForUtc)
     .sort()[0]!;
   const activation = await activateForecastLedger({
     db: input.db,
@@ -161,6 +216,26 @@ export async function runEngineOsUrgentAutomation(input: {
 
   let seededOrigins = 0;
   for (const { game, kickoffUtc } of resolvedSchedule) {
+    const reconciled = await reconcileCanonicalGameSchedule({
+      db: input.db,
+      gameId: game.game_id,
+      season: game.season,
+      seasonType: game.season_type,
+      week: game.week,
+      homeTeam: game.home_team,
+      awayTeam: game.away_team,
+      provider: "nflverse",
+      providerGameId: game.game_id,
+      scheduleStatus: "scheduled",
+      kickoffUtc,
+      observedAt: nowIso,
+      activatedAt: activation.activatedAt,
+      activationBoundary: activation.activationBoundary,
+      sourceCaptureId: scheduleEvidence.latest_capture_id,
+      sourceEvidenceHash: scheduleEvidence.source_hash,
+      sourceRowHash: game.source_row_hash
+    });
+    reconciledOriginVersions += reconciled.originVersions.length;
     await seedCanonicalGameOrigin({
       gameId: game.game_id,
       season: game.season,
@@ -264,6 +339,7 @@ export async function runEngineOsUrgentAutomation(input: {
   return {
     activationId: activation.activationId,
     seededOrigins,
+    reconciledOriginVersions,
     dueOrigins: due.results.length,
     withheld,
     late,

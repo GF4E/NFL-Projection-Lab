@@ -93,6 +93,53 @@ export const gameKickoffRevisions = sqliteTable("game_kickoff_revisions", {
   index("idx_game_kickoff_revision_latest").on(table.gameId, table.observedAt)
 ]);
 
+export const gameScheduleRevisions = sqliteTable("game_schedule_revisions", {
+  revisionId: text("revision_id").primaryKey(),
+  gameId: text("game_id").notNull().references(() => canonicalGames.gameId),
+  week: integer("week").notNull(),
+  scheduleStatus: text("schedule_status", {
+    enum: ["scheduled", "kickoff_unresolved", "postponed", "cancelled"]
+  }).notNull(),
+  kickoffUtc: text("kickoff_utc"),
+  localTimeZone: text("local_time_zone").notNull(),
+  observedAt: text("observed_at").notNull(),
+  sourceCaptureId: text("source_capture_id").references(() => sourceCaptureManifests.captureId),
+  sourceEvidenceHash: text("source_evidence_hash"),
+  sourceRowHash: text("source_row_hash").notNull(),
+  supersedesRevisionId: text("supersedes_revision_id")
+}, (table) => [
+  uniqueIndex("game_schedule_revision_identity_unique").on(table.revisionId, table.gameId),
+  uniqueIndex("game_schedule_revision_observation_unique").on(table.gameId, table.observedAt),
+  uniqueIndex("idx_game_schedule_revision_single_successor")
+    .on(table.supersedesRevisionId)
+    .where(sql`${table.supersedesRevisionId} IS NOT NULL`),
+  index("idx_game_schedule_revision_latest").on(table.gameId, table.observedAt),
+  check("game_schedule_revision_week_check", sql`${table.week} >= 1 AND ${table.week} <= 25`),
+  check(
+    "game_schedule_revision_status_check",
+    sql`${table.scheduleStatus} IN ('scheduled', 'kickoff_unresolved', 'postponed', 'cancelled')`
+  ),
+  check(
+    "game_schedule_revision_kickoff_check",
+    sql`(
+      (${table.scheduleStatus} = 'scheduled' AND ${table.kickoffUtc} IS NOT NULL AND length(${table.kickoffUtc}) > 0) OR
+      (${table.scheduleStatus} IN ('kickoff_unresolved', 'postponed', 'cancelled') AND ${table.kickoffUtc} IS NULL)
+    )`
+  ),
+  check(
+    "game_schedule_revision_source_check",
+    sql`(${table.sourceCaptureId} IS NOT NULL AND length(${table.sourceCaptureId}) > 0) OR
+      (${table.sourceEvidenceHash} IS NOT NULL AND length(${table.sourceEvidenceHash}) = 64)`
+  ),
+  check("game_schedule_revision_zone_check", sql`length(${table.localTimeZone}) > 0`),
+  check("game_schedule_revision_observed_check", sql`length(${table.observedAt}) > 0`),
+  check(
+    "game_schedule_revision_evidence_hash_check",
+    sql`${table.sourceEvidenceHash} IS NULL OR length(${table.sourceEvidenceHash}) = 64`
+  ),
+  check("game_schedule_revision_row_hash_check", sql`length(${table.sourceRowHash}) = 64`)
+]);
+
 export const engineActivations = sqliteTable("engine_activations", {
   activationId: text("activation_id").primaryKey(),
   activatedAt: text("activated_at").notNull(),
@@ -127,6 +174,101 @@ export const forecastOrigins = sqliteTable("forecast_origins", {
   uniqueIndex("forecast_origin_unique").on(table.gameId, table.originKind, table.scheduledForUtc),
   uniqueIndex("forecast_origin_record_identity_unique").on(table.originId, table.gameId, table.activationBoundary),
   index("idx_forecast_origins_due").on(table.scheduledForUtc, table.eligible)
+]);
+
+export const forecastOriginVersions = sqliteTable("forecast_origin_versions", {
+  originVersionId: text("origin_version_id").primaryKey(),
+  logicalOriginId: text("logical_origin_id").notNull(),
+  gameId: text("game_id").notNull().references(() => canonicalGames.gameId),
+  horizonId: text("horizon_id", {
+    enum: [
+      "weekly_tuesday_0730",
+      "kickoff_minus_120",
+      "kickoff_minus_90",
+      "kickoff_minus_60",
+      "kickoff_minus_15"
+    ]
+  }).notNull(),
+  scheduledForUtc: text("scheduled_for_utc"),
+  scheduledForLocal: text("scheduled_for_local"),
+  kickoffRevisionId: text("kickoff_revision_id").notNull().references(() => gameScheduleRevisions.revisionId),
+  scientificEligibility: integer("scientific_eligibility", { mode: "boolean" }).notNull(),
+  informationCutoff: text("information_cutoff").notNull(),
+  eligible: integer("eligible", { mode: "boolean" }).notNull(),
+  eligibilityReason: text("eligibility_reason", {
+    enum: [
+      "eligible",
+      "schedule_unresolved",
+      "known_after_origin",
+      "pre_activation",
+      "after_kickoff",
+      "prior_origin_elapsed",
+      "earlier_origin_prohibited"
+    ]
+  }).notNull(),
+  activationBoundary: text("activation_boundary").notNull(),
+  supersedesOriginVersionId: text("supersedes_origin_version_id"),
+  createdAt: text("created_at").notNull()
+}, (table) => [
+  uniqueIndex("forecast_origin_version_identity_unique").on(
+    table.originVersionId,
+    table.logicalOriginId,
+    table.gameId
+  ),
+  uniqueIndex("idx_forecast_origin_version_single_successor")
+    .on(table.supersedesOriginVersionId)
+    .where(sql`${table.supersedesOriginVersionId} IS NOT NULL`),
+  index("idx_forecast_origin_version_head").on(table.gameId, table.horizonId, table.createdAt),
+  index("idx_forecast_origin_version_due").on(table.scheduledForUtc, table.eligible),
+  check(
+    "forecast_origin_version_horizon_check",
+    sql`${table.horizonId} IN (
+      'weekly_tuesday_0730', 'kickoff_minus_120', 'kickoff_minus_90', 'kickoff_minus_60', 'kickoff_minus_15'
+    )`
+  ),
+  check(
+    "forecast_origin_version_boolean_check",
+    sql`${table.scientificEligibility} IN (0, 1) AND ${table.eligible} IN (0, 1)`
+  ),
+  check(
+    "forecast_origin_version_scientific_check",
+    sql`(
+      ${table.horizonId} = 'weekly_tuesday_0730' AND
+      ${table.scientificEligibility} = 1 AND
+      ${table.informationCutoff} = 'completed_games_through_week_w_minus_1_at_origin'
+    ) OR (
+      ${table.horizonId} IN ('kickoff_minus_120', 'kickoff_minus_90', 'kickoff_minus_60', 'kickoff_minus_15') AND
+      ${table.scientificEligibility} = 0 AND
+      ${table.informationCutoff} = 'forecast_time'
+    )`
+  ),
+  check(
+    "forecast_origin_version_reason_check",
+    sql`${table.eligibilityReason} IN (
+      'eligible', 'schedule_unresolved', 'known_after_origin', 'pre_activation', 'after_kickoff',
+      'prior_origin_elapsed', 'earlier_origin_prohibited'
+    )`
+  ),
+  check(
+    "forecast_origin_version_eligibility_check",
+    sql`(${table.eligible} = 1 AND ${table.eligibilityReason} = 'eligible') OR
+      (${table.eligible} = 0 AND ${table.eligibilityReason} <> 'eligible')`
+  ),
+  check(
+    "forecast_origin_version_schedule_time_check",
+    sql`(
+      ${table.eligibilityReason} = 'schedule_unresolved' AND ${table.eligible} = 0 AND
+      ${table.scheduledForUtc} IS NULL AND ${table.scheduledForLocal} IS NULL
+    ) OR (
+      ${table.eligibilityReason} <> 'schedule_unresolved' AND
+      ${table.scheduledForUtc} IS NOT NULL AND length(${table.scheduledForUtc}) > 0 AND
+      ${table.scheduledForLocal} IS NOT NULL AND length(${table.scheduledForLocal}) > 0
+    )`
+  ),
+  check("forecast_origin_version_id_check", sql`length(${table.originVersionId}) > 0`),
+  check("forecast_origin_version_logical_id_check", sql`length(${table.logicalOriginId}) > 0`),
+  check("forecast_origin_version_activation_check", sql`length(${table.activationBoundary}) > 0`),
+  check("forecast_origin_version_created_check", sql`length(${table.createdAt}) > 0`)
 ]);
 
 export const engineJobRuns = sqliteTable("engine_job_runs", {

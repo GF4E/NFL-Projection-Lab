@@ -1,4 +1,5 @@
 import { canonicalJson, sha256Hex, stableHash } from "./hash";
+import { engineOperatingContract, footballLifecycle2026 } from "./engine-os-contracts";
 
 export const ENGINE_OS_TIME_ZONE = "America/Los_Angeles";
 
@@ -328,6 +329,130 @@ export function tuesdayForecastOrigin(gameId: string, kickoffUtc: string): Forec
     timeZone: ENGINE_OS_TIME_ZONE,
     eligible: scheduled.getTime() < kickoff.getTime()
   };
+}
+
+export type RequiredForecastHorizonId =
+  | "weekly_tuesday_0730"
+  | "kickoff_minus_120"
+  | "kickoff_minus_90"
+  | "kickoff_minus_60"
+  | "kickoff_minus_15";
+
+export type OriginEligibilityReason =
+  | "eligible"
+  | "schedule_unresolved"
+  | "known_after_origin"
+  | "pre_activation"
+  | "after_kickoff"
+  | "prior_origin_elapsed"
+  | "earlier_origin_prohibited";
+
+export interface RequiredForecastOriginIdentity {
+  logicalOriginId: string;
+  gameId: string;
+  horizonId: RequiredForecastHorizonId;
+  scheduledForUtc: string;
+  scheduledForLocal: string;
+  kickoffUtc: string;
+  timeZone: typeof ENGINE_OS_TIME_ZONE;
+  scientificEligibility: boolean;
+  informationCutoff: string;
+  eligible: boolean;
+  eligibilityReason: OriginEligibilityReason;
+}
+
+function localTimestamp(date: Date): string {
+  const local = zonedParts(date, ENGINE_OS_TIME_ZONE);
+  return `${local.year}-${String(local.month).padStart(2, "0")}-${String(local.day).padStart(2, "0")}` +
+    `T${String(local.hour).padStart(2, "0")}:${String(local.minute).padStart(2, "0")}:` +
+    `${String(local.second).padStart(2, "0")}[${ENGINE_OS_TIME_ZONE}]`;
+}
+
+function weekTuesdayOrigin(week: number): Date {
+  if (!Number.isInteger(week) || week < 1 || week > footballLifecycle2026.seasonBoundary.regularSeasonWeeks) {
+    throw new Error("Forecast week is outside the frozen 2026 regular season");
+  }
+  const weekOne = zonedParts(
+    new Date(footballLifecycle2026.seasonBoundary.fullSeasonActivationDeadline),
+    ENGINE_OS_TIME_ZONE
+  );
+  const localDate = new Date(Date.UTC(weekOne.year, weekOne.month - 1, weekOne.day + 7 * (week - 1)));
+  return localDateTimeToUtc({
+    year: localDate.getUTCFullYear(),
+    month: localDate.getUTCMonth() + 1,
+    day: localDate.getUTCDate(),
+    hour: 7,
+    minute: 30,
+    second: 0
+  }, ENGINE_OS_TIME_ZONE);
+}
+
+function requiredHorizonTime(horizonId: RequiredForecastHorizonId, week: number, kickoff: Date): Date {
+  if (horizonId === "weekly_tuesday_0730") return weekTuesdayOrigin(week);
+  const minutes = Number(horizonId.slice("kickoff_minus_".length));
+  if (!Number.isFinite(minutes) || minutes <= 0) throw new Error(`Unsupported forecast horizon: ${horizonId}`);
+  return new Date(kickoff.getTime() - minutes * 60_000);
+}
+
+/**
+ * Builds the five frozen origin identities for one immutable schedule revision.
+ * The scientific Tuesday origin is anchored to NFL Week W, never to a revised
+ * kickoff date. A schedule learned after an origin, or a postponed game whose
+ * prior version already elapsed, cannot manufacture prospective evidence.
+ */
+export function requiredForecastOriginsForSchedule(input: {
+  gameId: string;
+  week: number;
+  kickoffUtc: string;
+  observedAt: string;
+  activatedAt: string;
+  priorElapsedHorizons?: readonly RequiredForecastHorizonId[];
+  priorScheduledForByHorizon?: Partial<Record<RequiredForecastHorizonId, string>>;
+}): RequiredForecastOriginIdentity[] {
+  const kickoff = new Date(input.kickoffUtc);
+  const observedAt = new Date(input.observedAt);
+  const activatedAt = new Date(input.activatedAt);
+  if (![kickoff, observedAt, activatedAt].every((date) => Number.isFinite(date.getTime()))) {
+    throw new Error("Schedule, observation, and activation timestamps must be valid");
+  }
+  const priorElapsed = new Set(input.priorElapsedHorizons ?? []);
+  return engineOperatingContract.forecastHorizons.map((contract) => {
+    const horizonId = contract.id as RequiredForecastHorizonId;
+    const scheduled = requiredHorizonTime(horizonId, input.week, kickoff);
+    const priorScheduledValue = input.priorScheduledForByHorizon?.[horizonId];
+    const priorScheduled = priorScheduledValue ? new Date(priorScheduledValue) : null;
+    if (priorScheduled && !Number.isFinite(priorScheduled.getTime())) {
+      throw new Error(`Prior ${horizonId} origin must be a valid timestamp`);
+    }
+    let eligibilityReason: OriginEligibilityReason = "eligible";
+    if (priorElapsed.has(horizonId)) eligibilityReason = "prior_origin_elapsed";
+    else if (priorScheduled && scheduled.getTime() < priorScheduled.getTime()) {
+      eligibilityReason = "earlier_origin_prohibited";
+    }
+    else if (scheduled.getTime() >= kickoff.getTime()) eligibilityReason = "after_kickoff";
+    else if (observedAt.getTime() > scheduled.getTime()) eligibilityReason = "known_after_origin";
+    else if (activatedAt.getTime() > scheduled.getTime()) eligibilityReason = "pre_activation";
+    const scheduledForUtc = scheduled.toISOString();
+    const logicalOriginId = stableHash({
+      contract: "engine-os.required-origin.v1",
+      gameId: input.gameId,
+      horizonId,
+      scheduledForUtc
+    });
+    return {
+      logicalOriginId,
+      gameId: input.gameId,
+      horizonId,
+      scheduledForUtc,
+      scheduledForLocal: localTimestamp(scheduled),
+      kickoffUtc: kickoff.toISOString(),
+      timeZone: ENGINE_OS_TIME_ZONE,
+      scientificEligibility: contract.scientificEligibility,
+      informationCutoff: contract.informationCutoff,
+      eligible: eligibilityReason === "eligible",
+      eligibilityReason
+    };
+  });
 }
 
 export function priorWeekEvidenceOnly(input: {
