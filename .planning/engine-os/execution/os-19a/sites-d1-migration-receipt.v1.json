@@ -10,7 +10,12 @@
     "migrationDeploymentId": "appgdep_6a8e42c7e14081919f70605558d1ee24",
     "migrationDeploymentStatus": "succeeded",
     "migrationEnvironmentRevision": 13,
-    "productionUrl": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site"
+    "productionUrl": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site",
+    "cleanVersionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_351ff94167148191ba1589676f5efd62",
+    "cleanVersionNumber": 142,
+    "cleanDeploymentId": "appgdep_6a8e454d92fc8191a28975a757e64fc3",
+    "cleanDeploymentStatus": "succeeded",
+    "cleanDeploymentEnvironmentRevision": 14
   },
   "migration": {
     "version": "0014_odds_quota_reservations",
@@ -39,7 +44,9 @@
     "environmentRevisionAfterRemoval": 14,
     "temporaryEndpointRemovedFromSource": true,
     "temporaryScheduledBranchRemovedFromSource": true,
-    "cleanSourceDeploymentVerified": false
+    "cleanSourceDeploymentVerified": true,
+    "retiredEndpointPostStatus": 405,
+    "retiredEndpointPostResponse": "Public access is read-only"
   },
   "credentialHandling": {
     "replacementOddsKeyStagedByOwner": true,
