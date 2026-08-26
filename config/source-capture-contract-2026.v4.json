@@ -1,0 +1,168 @@
+{
+  "version": "source-capture-contract.2026.4",
+  "status": "frozen",
+  "frozenOn": "2026-08-26",
+  "supersedes": "source-capture-contract.2026.3",
+  "baseContracts": [
+    {
+      "path": "config/source-capture-contract-2026.v1.json",
+      "byteSha256": "6b685c480adff6ea9dc655d1065f48a9bee90b120b869c0ee0839c816710eba8",
+      "canonicalContentSha256": "168f59411370af79a5303f03f9901989c5ebc324b6b6b88141e94c48ee4fe7ee"
+    },
+    {
+      "path": "config/source-capture-contract-2026.v2.json",
+      "byteSha256": "6109e1d1dc2e9c038200ecfa90bbaad2ee7a23b81153d6c4a3002ec5bd854bdc",
+      "canonicalContentSha256": "4ee911763aa4573dabfd984e4ac1890ad25303ae3cfa8440aba16151c4a9f587"
+    },
+    {
+      "path": "config/source-capture-contract-2026.v3.json",
+      "byteSha256": "c45d7955897e90ddc01cdc5fc759e19e2264f4d4c6979cf2c3ab88428785906c",
+      "canonicalContentSha256": "847feaa7dac17e57d3a2b20aadee60b186faeb36e768ff9e3216d911d6266ff2"
+    }
+  ],
+  "identityFormulas": {
+    "canonicalFunction": "src/domain/hash.ts canonicalJson and stableHash",
+    "captureId": {
+      "function": "stableHash",
+      "input": {
+        "contractVersion": "engine-os.os-03a-capture.v1",
+        "provider": "{provider}",
+        "dataset": "{dataset}",
+        "idempotencyKey": "{idempotencyKey}"
+      }
+    },
+    "requestHash": {
+      "function": "stableHash",
+      "input": "canonical redacted request object"
+    },
+    "usageRightsHash": {
+      "function": "stableHash",
+      "input": "complete usageRights object"
+    },
+    "laterImportHash": {
+      "function": "stableHash",
+      "input": "complete laterImport object"
+    },
+    "evidenceHash": {
+      "function": "stableHash",
+      "inputFields": [
+        "contractVersion",
+        "captureId",
+        "profileId",
+        "requestHash",
+        "responseSha256",
+        "responseBytes",
+        "contentType",
+        "etag",
+        "sourceObservedAt",
+        "providerPublishedAt",
+        "validFrom",
+        "validTo",
+        "sourceSchemaVersion",
+        "usageRightsHash",
+        "validationState",
+        "laterImportHash"
+      ],
+      "excludedRetryFields": [
+        "attemptToken",
+        "receiptCompletedAt",
+        "persistenceRequestedAt",
+        "responsePersistedAt",
+        "sidecarPersistedAt",
+        "manifestPersistedAt"
+      ]
+    },
+    "sidecarSha256": {
+      "function": "sha256Hex",
+      "input": "canonicalJson of complete sidecar without sidecarSha256, sidecarPersistedAt, or manifestPersistedAt"
+    },
+    "extensionHash": {
+      "function": "stableHash",
+      "input": "all immutable extension fields except extensionHash and manifestPersistedAt"
+    },
+    "eventPayloadHash": {
+      "function": "stableHash",
+      "input": "canonical secret-free event payload"
+    },
+    "eventId": {
+      "function": "stableHash",
+      "inputFields": ["contractVersion", "eventType", "attemptToken", "captureId", "eventPayloadHash"]
+    },
+    "alertId": {
+      "function": "stableHash",
+      "inputFields": ["contractVersion", "sourceKey", "failureCode", "idempotencyKey"]
+    }
+  },
+  "freshness": {
+    "thresholdSource": "engine-operating-contract.2026.1.maximumSourceAgeSeconds",
+    "freshnessClock": "latest successful verification event occurredAt",
+    "successfulVerificationEvents": ["capture_committed_usable", "not_modified_confirmed"],
+    "captureVerificationTime": "manifestPersistedAt",
+    "notModifiedConfirmation": {
+      "requiresPriorUsableCapture": true,
+      "requiresMatchingRegisteredProfile": true,
+      "requiresSourceKeyBinding": true,
+      "writesAppendOnlyEvent": true,
+      "changesLatestGoodPointer": false,
+      "advancesFreshnessClock": true
+    },
+    "semanticSourceTimeRule": "OS-03A records source and publication times but does not qualify their source-specific meaning; real connector semantic validation remains OS-03 and OS-04",
+    "staleWatchdogAge": "now minus latest successful verification event occurredAt",
+    "stalePayloadClaimAllowed": false
+  },
+  "orphanSafety": {
+    "immediateObjectDeletionAfterFailedAttempt": false,
+    "minimumAgeSeconds": 86400,
+    "requiredChecksBeforeDeletion": [
+      "object key belongs to an OS-03A response or sidecar prefix",
+      "object age is at least minimumAgeSeconds",
+      "no base manifest references the object",
+      "no extension references the object",
+      "no nonterminal attempt event inside minimumAgeSeconds references the object"
+    ],
+    "requiredCheckAfterDeletion": "R2 head returns missing",
+    "referenceCheckFailure": "preserve object and append no removed event",
+    "raceDisposition": "a concurrent publisher must reverify R2 immediately before D1 publication and fail closed if the sweeper removed its unreferenced object",
+    "productionSweeperQualified": false
+  },
+  "migrationAndCutover": {
+    "migrationVersion": "0017_engine_os_source_capture",
+    "mode": "additive",
+    "acceptedMigration0013RewriteAllowed": false,
+    "acceptedTablesRetained": [
+      "source_capture_manifests",
+      "source_capture_heartbeats",
+      "engine_system_alerts"
+    ],
+    "newTables": ["source_capture_manifest_extensions", "source_capture_events"],
+    "appendOnlyNewTables": true,
+    "rollback": {
+      "allowedOnlyWhenBothNewTablesEmpty": true,
+      "dropsOnlyMigration0017TablesIndexesAndTriggers": true,
+      "deletesR2Objects": false,
+      "rewritesMigration0013": false
+    },
+    "productionQualificationState": {
+      "newTablesEmpty": true,
+      "captureEnvironmentKeyAbsent": true,
+      "activationRows": 0,
+      "replayMissedEvidence": false
+    },
+    "successorImports": {
+      "owners": ["OS-03", "OS-04"],
+      "mode": "append_relation_to_capture_id_or_evidence_hash",
+      "rewriteSourceBytes": false,
+      "rewriteSidecar": false,
+      "rewriteTimes": false,
+      "rewriteHashes": false
+    }
+  },
+  "scopeCorrection": {
+    "strongestPermittedResult": "accepted_bounded_provider_independent_OS-03A_storage_mechanism_slice",
+    "fullOS03AAccepted": false,
+    "realConnectorQualification": false,
+    "prospectiveCaptureStarted": false
+  },
+  "effectiveContract": "source-capture-contract.2026.1 plus v2, v3, and every formula and amendment in this file",
+  "implementationMayBegin": true
+}

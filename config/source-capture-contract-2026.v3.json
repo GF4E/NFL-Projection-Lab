@@ -1,0 +1,148 @@
+{
+  "version": "source-capture-contract.2026.3",
+  "status": "frozen",
+  "frozenOn": "2026-08-26",
+  "supersedes": "source-capture-contract.2026.2",
+  "baseContracts": [
+    {
+      "path": "config/source-capture-contract-2026.v1.json",
+      "byteSha256": "6b685c480adff6ea9dc655d1065f48a9bee90b120b869c0ee0839c816710eba8",
+      "canonicalContentSha256": "168f59411370af79a5303f03f9901989c5ebc324b6b6b88141e94c48ee4fe7ee"
+    },
+    {
+      "path": "config/source-capture-contract-2026.v2.json",
+      "byteSha256": "6109e1d1dc2e9c038200ecfa90bbaad2ee7a23b81153d6c4a3002ec5bd854bdc",
+      "canonicalContentSha256": "4ee911763aa4573dabfd984e4ac1890ad25303ae3cfa8440aba16151c4a9f587"
+    }
+  ],
+  "qualificationProfiles": [
+    {
+      "profileId": "fixture_nflverse_schedule_v1",
+      "provider": "nflverse-fixture",
+      "dataset": "schedule",
+      "origin": "https://fixtures.invalid",
+      "pathTemplate": "/nflverse/schedule.csv",
+      "allowedMethods": ["GET"],
+      "allowedPublicQueryKeys": [],
+      "allowedPublicHeaderKeys": ["accept", "content-type", "if-none-match"],
+      "allowedContentTypes": ["text/csv"],
+      "requestCredentialMode": "none"
+    },
+    {
+      "profileId": "fixture_nflverse_pbp_v1",
+      "provider": "nflverse-fixture",
+      "dataset": "play_by_play",
+      "origin": "https://fixtures.invalid",
+      "pathTemplate": "/nflverse/play-by-play.csv.gz",
+      "allowedMethods": ["GET"],
+      "allowedPublicQueryKeys": [],
+      "allowedPublicHeaderKeys": ["accept", "content-type", "if-none-match"],
+      "allowedContentTypes": ["application/gzip", "application/x-gzip", "application/octet-stream"],
+      "requestCredentialMode": "none"
+    },
+    {
+      "profileId": "fixture_nflverse_roster_v1",
+      "provider": "nflverse-fixture",
+      "dataset": "roster",
+      "origin": "https://fixtures.invalid",
+      "pathTemplate": "/nflverse/roster.csv",
+      "allowedMethods": ["GET"],
+      "allowedPublicQueryKeys": [],
+      "allowedPublicHeaderKeys": ["accept", "content-type", "if-none-match"],
+      "allowedContentTypes": ["text/csv"],
+      "requestCredentialMode": "none"
+    },
+    {
+      "profileId": "fixture_official_injury_v1",
+      "provider": "official-nfl-fixture",
+      "dataset": "injury",
+      "origin": "https://fixtures.invalid",
+      "pathTemplate": "/official/injury.json",
+      "allowedMethods": ["GET"],
+      "allowedPublicQueryKeys": [],
+      "allowedPublicHeaderKeys": ["accept", "content-type", "if-none-match"],
+      "allowedContentTypes": ["application/json"],
+      "requestCredentialMode": "none"
+    },
+    {
+      "profileId": "fixture_official_inactive_roof_v1",
+      "provider": "official-nfl-fixture",
+      "dataset": "inactive_roof",
+      "origin": "https://fixtures.invalid",
+      "pathTemplate": "/official/inactive-roof.html",
+      "allowedMethods": ["GET"],
+      "allowedPublicQueryKeys": [],
+      "allowedPublicHeaderKeys": ["accept", "content-type", "if-none-match"],
+      "allowedContentTypes": ["text/html"],
+      "requestCredentialMode": "none"
+    },
+    {
+      "profileId": "fixture_open_meteo_weather_v1",
+      "provider": "open-meteo-fixture",
+      "dataset": "weather",
+      "origin": "https://fixtures.invalid",
+      "pathTemplate": "/open-meteo/weather.json",
+      "allowedMethods": ["GET"],
+      "allowedPublicQueryKeys": [],
+      "allowedPublicHeaderKeys": ["accept", "content-type", "if-none-match"],
+      "allowedContentTypes": ["application/json"],
+      "requestCredentialMode": "none"
+    },
+    {
+      "profileId": "fixture_market_odds_v1",
+      "provider": "market-fixture",
+      "dataset": "odds",
+      "origin": "https://fixtures.invalid",
+      "pathTemplate": "/market/odds.json",
+      "allowedMethods": ["GET"],
+      "allowedPublicQueryKeys": [],
+      "allowedPublicHeaderKeys": ["accept", "content-type"],
+      "allowedContentTypes": ["application/json"],
+      "requestCredentialMode": "fixture_only"
+    }
+  ],
+  "amendments": {
+    "binaryQualification": {
+      "allowedOnlyForProfile": "fixture_nflverse_pbp_v1",
+      "allowedContentTypes": ["application/gzip", "application/x-gzip", "application/octet-stream"],
+      "requestCredentialModeMustEqual": "none",
+      "allOtherBinaryResponses": "reject"
+    },
+    "missingSourceTime": {
+      "sourceObservedAtMissing": {
+        "validationState": "raw_only_schema_invalid",
+        "failureCode": "source_time_missing",
+        "latestGoodPointer": "preserve"
+      },
+      "providerPublishedAtMissing": {
+        "validationState": "raw_only_schema_invalid",
+        "failureCode": "publication_time_missing",
+        "latestGoodPointer": "preserve"
+      },
+      "qualificationUsableCaptureRequiresBoth": true
+    },
+    "errorBodyPolicy": {
+      "credentialModeNoneOrFixtureOnly": "textual body may be preserved only after complete pre-persistence secret scan",
+      "futureAuthenticatedProvider": "do not persist error body unless a later OS-18A contract explicitly proves a secret-safe policy",
+      "os03aAuthenticatedProviderBodies": "prohibited"
+    },
+    "conditionalHeadPublication": {
+      "sameAtomicBatch": [
+        "base manifest insert",
+        "manifest extension insert",
+        "append-only event insert",
+        "conditional latest-good pointer update"
+      ],
+      "pointerPredicate": "exact base capture identity, extension evidence hash, usable validation state, source-key binding, and deterministic ordering tuple all match",
+      "insertIgnoreThenUnconditionalHeartbeat": "prohibited",
+      "postCommitReadback": "required"
+    },
+    "freshnessWatchdog": {
+      "networkCalls": 0,
+      "onStale": "append deduplicated stale event and alert",
+      "latestGoodPointerMutation": "prohibited"
+    }
+  },
+  "effectiveContract": "source-capture-contract.2026.1 plus v2 and every amendment and qualification profile in this file",
+  "implementationMayBegin": true
+}
