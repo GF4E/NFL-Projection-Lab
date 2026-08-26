@@ -9,12 +9,13 @@ This is the execution register. A work package is complete only when its accepta
 - **CONDITIONAL** — cannot start until a statistical decision authorizes it
 - **VERIFY EXISTING** — substantial code exists, but it has not passed the OS acceptance gate
 - **BLOCKED** — a named gate prevents work
+- **ACCEPTED** — the acceptance gate has reproducible, immutable evidence
 
 ## Immediate execution queue
 
-1. Finish **OS-00** R2 durability and clean-clone restoration; its architecture and local runtime contract are already frozen.
-2. Preserve frozen **OS-00B** targets. Finish **OS-18A** provider authentication and final scans; rotation and dormant server-secret installation are complete.
-3. Preserve frozen **R0**, terminal R1-v1, and deployed **OS-01A** evidence. Complete R1-v2's independent human review and the disabled non-market portion of **OS-03A**.
+1. Preserve accepted **OS-00**, frozen **OS-00B**, terminal R1-v1, frozen **R0**, and deployed **OS-01A** evidence.
+2. Finish **OS-18A** provider authentication and final scans; rotation and dormant server-secret installation are complete.
+3. Complete R1-v2's independent human review and the disabled non-market portion of **OS-03A**.
 4. **OS-19A**'s urgent slice is accepted. Execute **OS-02A** and **OS-15A**, then finish **OS-03A**, **OS-13A**, and the remaining OS-18A gates before authenticated capture. Full OS-01/OS-02/OS-03 proceed behind them.
 5. **R2** may execute only the Module 2B residual-kernel falsification and only after R1-v2 passes, followed by **R3**.
 6. Continue the platform spine through **OS-14** regardless of whether the possession branch survives.
@@ -75,7 +76,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 ### OS-00 — Freeze the operating-system contract
 
-**Status:** NEXT
+**Status:** ACCEPTED
 
 **Requirements:** ARC-01, ARC-02, ARC-04, ARC-05
 
@@ -92,6 +93,8 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 - Research status record preserving `reject_all`, the C0/P0 benchmark roles, exposed seasons, and the authorized Module 2B question.
 
 **Acceptance gate:** A clean clone verifies every retained scientific hash; no state or scheduler has dual authority; public GET tests show zero writes, provider calls, or quota changes; the Supabase execution path is unreachable in the active build.
+
+**Acceptance evidence:** `.planning/engine-os/execution/os-00/r2-durability-receipt.v1.json` binds the exact source and manifest hashes to 117 private R2 objects (630,716,255 bytes), a clean remote-clone reconstruction, full verification/build results, corruption drills, and retirement of the temporary operator with unchanged Odds quota.
 
 ### OS-00B — Freeze the numerical operating contract
 

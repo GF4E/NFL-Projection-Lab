@@ -36,7 +36,7 @@ Phase numbers describe capability layers, not a forced serial queue. Secret-reda
 
 | Phase | Status | Primary task set | Exit decision |
 |---|---|---|---|
-| 1 | Ready | OS-00, OS-00B, OS-01A/OS-01, OS-18A, R0, R18A | One authoritative, preserved, numerically governed engine kernel |
+| 1 | In progress: OS-00 accepted; ARC-03 and OS-18A remain open | OS-00, OS-00B, OS-01A/OS-01, OS-18A, R0, R18A | One authoritative, preserved, numerically governed engine kernel |
 | 2 | Urgent capture plus queued canonicalization | OS-02A, OS-03A, OS-19A, OS-02–OS-08, R1 | Replayable point-in-time evidence and verified targets |
 | 3 | Queued | OS-09–OS-12 | Deterministic experiment and portable model packages |
 | 4 | OS-13A urgent; full integration queued | OS-15A, OS-13A, OS-13B, OS-14 | Independent prospective ledgers and all-game grading |
@@ -57,7 +57,7 @@ Phase numbers describe capability layers, not a forced serial queue. Secret-reda
 
 **Plans:**
 
-1. Execute OS-00 to inventory every stateful object and job, preserve the frozen Model Lab evidence, choose D1/R2 as the production authority, quarantine the Supabase path, and remove maintenance side effects from public reads.
+1. Preserve accepted OS-00 evidence: every frozen object is content-addressed in private R2, D1/R2 are the production authority, Supabase is quarantined, and public reads are inert. The permanent recovery workflow remains OS-16 work and does not reopen OS-00.
 2. Execute OS-00B and R0 to freeze numerical operating targets, the research constitution, multiplicity policy, candidate statuses, exposed seasons, forecast origins, losses, and prospective confirmation rule; then execute R18A before the first activated shadow forecast.
 3. Execute OS-18A to revoke the exposed Odds API key, rotate the deployed secret, and scan repository history, artifacts, logs, and client bundles.
 4. Execute urgent OS-01A first, then complete OS-01 to migrate all persistent tables into one ordered migration history and forbid runtime production DDL.

@@ -12,11 +12,11 @@ Status notation:
 
 ## 1. Canonical engine kernel
 
-- [ ] **ARC-01 — Preserve the evidence base.** Freeze the Module 1 and Module 2 protocols, code, manifests, inputs, negative results, and hashes without relabeling a rejected model as a candidate.
-- [ ] **ARC-02 — One operational authority.** D1 and R2 are the only production state stores; the Supabase job path is retired or isolated so it cannot execute.
+- [x] **ARC-01 — Preserve the evidence base.** Freeze the Module 1 and Module 2 protocols, code, manifests, inputs, negative results, and hashes without relabeling a rejected model as a candidate.
+- [x] **ARC-02 — One operational authority.** D1 and R2 are the only production state stores; the Supabase job path is retired or isolated so it cannot execute.
 - [ ] **ARC-03 — Migration-only schema.** Every persistent D1 object is created and changed by ordered migrations; production stores cannot create tables at runtime.
-- [ ] **ARC-04 — Explicit execution planes.** Source ingestion, research, model packaging, forecast publication, evaluation, and serving have written interfaces and one owner each; expensive fitting is outside the public Worker.
-- [ ] **ARC-05 — Read paths are inert.** A public read cannot trigger ingestion, fitting, archival, provider requests, writes, or quota spend.
+- [x] **ARC-04 — Explicit execution planes.** Source ingestion, research, model packaging, forecast publication, evaluation, and serving have written interfaces and one owner each; expensive fitting is outside the public Worker.
+- [x] **ARC-05 — Read paths are inert.** A public read cannot trigger ingestion, fitting, archival, provider requests, writes, or quota spend.
 
 ## 2. Point-in-time evidence spine
 

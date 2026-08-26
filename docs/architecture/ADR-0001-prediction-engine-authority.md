@@ -112,7 +112,7 @@ The public API reads one versioned publication pointer and its precomputed paylo
 - `scripts/verify_active_build_graph.py` rejects Supabase packages, imports, runtime credentials, client code, or the retired runner from the completed production bundle.
 - OS-01 must make a blank D1 migrate completely and remove production runtime DDL.
 - OS-15 must move heavy fitting behind the authenticated compute interface.
-- OS-03 must upload and verify the local Model Lab cache and large artifacts in R2 before local copies are treated as disposable.
+- The OS-00 successor receipt proves the frozen Model Lab and R1 bytes can be restored from R2. OS-03 still owns the complete prospective DATA-01 capture contract and recovery integration.
 
 ## Current exceptions and their owners
 
@@ -122,10 +122,10 @@ This decision assigns authority; it does not disguise current failures as comple
 |---|---|---|
 | External Supabase, pipeline, or legacy cron credential revocation cannot be proven from repository state | OPS-07 | OS-18 operator action |
 | D1 runtime `CREATE TABLE` statements coexist with migrations | ARC-03 | OS-01 |
-| No authenticated external compute runner exists; retained heavy lifecycle source is unreachable | ARC-04 / OPS-02 | OS-15 |
-| Model Lab source cache and large outputs are not durably in R2 | DATA-01 | OS-03 |
+| No authenticated external compute runner exists; retained heavy lifecycle source is unreachable | OPS-02 | OS-15 |
+| Frozen evidence is durable, but the complete prospective raw-capture metadata, rights, and recovery contract is not qualified | DATA-01 / OPS-06 | OS-03 / OS-16 |
 
-The `/sunday` maintenance side effect has been removed. The Worker rejects mutating HTTP methods before framework routing, handles every public API through an explicit SELECT-only path, and rejects unknown APIs; focused request-boundary tests pass. Supabase is absent from the active source, package, deployment-config, empty Sites revision 11 key inventory, and production-build graphs; the remaining credential-revocation statement is explicitly limited to what repository evidence cannot observe. The 17 Git-designated Model Lab files are tracked in integration commit `bbd77d3`. Full evidence durability still depends on the OS-03 R2 upload and restored-cache proof.
+The `/sunday` maintenance side effect has been removed. The Worker rejects mutating HTTP methods before framework routing, handles every public API through an explicit SELECT-only path, and rejects unknown APIs; focused request-boundary tests pass. Supabase is absent from the active source, package, deployment configuration, and production-build graphs; the remaining credential-revocation statement is explicitly limited to what repository evidence cannot observe. The 17 Git-designated Model Lab files are tracked. The OS-00 R2 successor receipt proves all 117 frozen objects can be uploaded, verified, restored into a clean remote clone, and rebuilt without changing any scientific conclusion. That is evidence durability, not full DATA-01 or disaster-recovery qualification.
 
 ## Consequences and trade-offs
 
@@ -133,7 +133,7 @@ The `/sunday` maintenance side effect has been removed. The Worker rejects mutat
 - Content addressing duplicates changed objects rather than updating them, trading storage for auditability and safe rollback.
 - Eliminating Supabase removes a convenient auth/database path, but the public analytics scope no longer needs personal accounts and dual authority is a larger risk.
 - The Worker remains a good scheduler and serving edge but is intentionally not the research computer.
-- Large evidence does not belong in Git. Until R2 upload exists, the local cache is a single-host preservation risk that the verifier reports rather than hiding.
+- Large evidence does not belong in Git. The frozen bytes are now content-addressed in private R2; controlled restore still requires an explicitly reactivated, authenticated operator until OS-16 implements the permanent recovery path.
 
 ## Revisit conditions
 
