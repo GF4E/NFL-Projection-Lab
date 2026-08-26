@@ -101,11 +101,11 @@ describe("OS-03A frozen source-capture contract", () => {
     })).toThrow(/credential-bearing/i);
     expect(() => canonicalizeCaptureRequest({
       profileId: "fixture_nflverse_schedule_v1",
-      url: "https://fixtures.invalid/nflverse/schedule.csv?apiKey=must-not-survive"
+      url: "https://fixtures.invalid/nflverse/schedule.csv?apiKey=must-not-survive" // secret-scan: allow-fixture
     })).toThrow(/redacted query keys/i);
     expect(() => canonicalizeCaptureRequest({
       profileId: "fixture_nflverse_schedule_v1",
-      url: "https://user:pass@fixtures.invalid/nflverse/schedule.csv"
+      url: "https://user:pass@fixtures.invalid/nflverse/schedule.csv" // secret-scan: allow-fixture
     })).toThrow(/userinfo/i);
   });
 
