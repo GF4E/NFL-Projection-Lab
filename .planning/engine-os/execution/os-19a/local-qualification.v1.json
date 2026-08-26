@@ -1,7 +1,7 @@
 {
   "schemaVersion": "engine-os.os-19a-local-qualification.v1",
   "generatedAt": "2026-08-25T18:03:20-07:00",
-  "status": "local_pass_live_schema_pass_deployed_d1_falsification_pending",
+  "status": "local_pass_live_schema_bootstrap_and_primitives_pass_exact_isolated_path_pending",
   "scope": "Atomic The Odds API quota reservation and exact 2026 schedule budget only",
   "credentialHandling": {
     "ownerAttestation": "replacement_key_regenerated_and_staged",
@@ -9,7 +9,10 @@
     "secretStoredInRepository": false,
     "workerReadsSecret": false,
     "captureEnabled": false,
-    "freshDashboardCounterBootstrapComplete": false
+    "freshDashboardCounterBootstrapComplete": true,
+    "dashboardUsed": 38,
+    "dashboardRemaining": 462,
+    "credentialGenerationId": "oddsapi-20260825-owner-rotation-01"
   },
   "scheduleEvidence": {
     "artifact": "config/2026-nfl-schedule.v1.json",
@@ -59,6 +62,7 @@
     "liveMigrationApplied": true,
     "liveMigrationAppliedAt": "2026-08-26T01:35:48.026Z",
     "liveMigrationReceipt": ".planning/engine-os/execution/os-19a/sites-d1-migration-receipt.v1.json",
+    "liveBootstrapReceipt": ".planning/engine-os/execution/os-19a/sites-quota-bootstrap-receipt.v1.json",
     "atomicReservation": true,
     "oneHolderDispatchToken": true,
     "appendOnlyTransitionEvents": true,
@@ -80,10 +84,7 @@
     "testsFailed": 0
   },
   "remainingActivationGates": [
-    "repeat overlapping reservation and rollback falsification against deployed D1 with provider dispatch disabled",
-    "attest the staged credential generation and current provider-dashboard used/remaining counters",
-    "bootstrap the fresh quota epoch without making an Odds API request",
-    "rerun the exact schedule simulation with the attested current usage and outstanding-reservation count",
+    "repeat the exact production reserveOddsQuota contention path against an isolated deployed D1 clone with provider dispatch disabled; the production D1 primitive probe is not a substitute",
     "keep ENGINE_OS_CAPTURE_ENABLED false and keep the Worker from reading the staged key until all OS-02A, OS-03A, OS-13A, and OS-19A activation gates pass"
   ]
 }
