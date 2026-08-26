@@ -16,9 +16,13 @@ All scheduled timestamps are evaluated in `America/Los_Angeles`; use an aware sc
 | Credit meter | Daily | `credit-meter` |
 | Digest | After settlement | `weekly-digest` |
 
-## Built-in nflverse automation
+## Interim scheduler status
 
-The deployed Worker has an idempotent `*/5 * * * *` trigger and the app sends the same refresh request when the private workspace opens.
+OS-15A installs two deterministic, provider-free scheduler entrypoints: a one-minute dispatcher (`* * * * *`) and an independent odd-minute watchdog (`1-59/2 * * * *`). Both return before database access unless `ENGINE_OS_CAPTURE_ENABLED=true`. That key is absent in production, no activation row exists, and the scheduler tables are empty. Public page or API requests never claim jobs, perform recovery, fetch a provider, or cause writes.
+
+The scheduler qualification covers only forecast-or-withholding coordination over the five OS-02A origins. The legacy source automations below are retained code awaiting OS-03A/OS-15 integration and are not active production instructions.
+
+## Legacy nflverse automation — disabled
 
 - Live schedules: checked every five minutes; unchanged ETags produce no data writes.
 - Schedule history: loaded on first run and revalidated after Tuesday 06:00 Pacific once the prior refresh is at least six days old.
@@ -28,9 +32,9 @@ The deployed Worker has an idempotent `*/5 * * * *` trigger and the app sends th
 
 The importer stages validated rows before publication. A schema, row-count, HTTP, decompression, or parsing failure marks the dataset stale, creates an idempotent data alert, releases the import lease, and leaves the prior production rows untouched.
 
-## Built-in pregame context automation
+## Legacy pregame context automation — disabled
 
-The same five-minute Worker trigger begins the official pregame check 95 minutes before each distinct kickoff. It reads the NFL inactives landing page, discovers the current week’s official NFL inactive article through the league’s monthly article index, and accepts a game only when both teams have complete lists. Fixed and outdoor roofs come from the versioned venue configuration; retractable venues require an explicit `open` or `closed` field from the official game center. Missing, partial, or ambiguous responses create an in-app alert and preserve the last good inactives, roof, weather, and forecast.
+The retained legacy design begins the official pregame check 95 minutes before each distinct kickoff. It reads the NFL inactives landing page, discovers the current week’s official NFL inactive article through the league’s monthly article index, and accepts a game only when both teams have complete lists. Fixed and outdoor roofs come from the versioned venue configuration; retractable venues require an explicit `open` or `closed` field from the official game center. Missing, partial, or ambiguous responses create an in-app alert and preserve the last good inactives, roof, weather, and forecast. OS-03A and the later full OS-15 DAG must qualify this lane before activation.
 
 The site adds no pregame settings page. A confirmed list only replaces the existing compact availability line on the open game card, including an explicit inactive-QB cue when applicable.
 
@@ -45,7 +49,7 @@ For live odds, one game is the atomic validation boundary. A game publishes only
 
 Stale game prices remain visible for context but are excluded from the weekly opportunity queue, EV recommendations, and suggested units until that game receives a complete current snapshot.
 
-The scheduled Worker remains the primary control plane. Because a newly deployed Sites cron may not fire immediately, a navigation to the weekly board may claim the deterministic scheduled recovery lease in the background. The caller cannot choose a snapshot time, market, or book, and repeated visits cannot create duplicate provider requests.
+The scheduled Worker is the intended control plane. Recovery is scheduler-only: navigation and other public reads cannot claim a lease or trigger provider work. The independent watchdog records missed ticks under the frozen OS-15A bounds; it cannot replay a missed origin as prospective.
 
 ## Credit throttle
 

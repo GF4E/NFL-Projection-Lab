@@ -29,6 +29,12 @@ The system is not one expanding model. It is a controlled graph of data, experim
 - joint-score, market translation, power de-vig, scenario, probabilistic evaluation, and model-gate libraries
 - governance configs, 52 research questions, ADRs, and the Novelty Charter
 
+## Accepted operational foundations
+
+- OS-15A qualifies the dormant, provider-free interim scheduler for the five accepted OS-02A horizons. Deterministic trigger and job identities, fenced renewable leases, duplicate convergence, strict pre-deadline persistence, contemporaneous withholding, heartbeat/watchdog recovery, reschedule handling, and a versioned OS-15 cutover contract passed local and isolated hosted qualification.
+- A separate authenticated direct-D1 acceptance audit verified the preserved OS-01A/OS-19A schema objects, append-only guards, exact 38/462 bootstrap, zero outstanding reservations, and empty OS-02A/OS-15A production tables. It overruled a stale bounded database-viewer projection without changing the database.
+- This bounded result starts no prospective stream and accepts neither immutable source capture nor the complete forecast ledger. OS-03A and OS-13A remain required, full OS-15 still owns the durable cross-job graph and scheduler retirement, and authenticated provider work remains disabled.
+
 ## Gaps the operating system must close
 
 1. The active Worker and D1 control plane coexists with a second Supabase job path.

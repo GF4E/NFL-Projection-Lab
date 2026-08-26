@@ -14,9 +14,9 @@ This is the execution register. A work package is complete only when its accepta
 ## Immediate execution queue
 
 1. Preserve accepted **OS-00**, frozen **OS-00B**, terminal R1-v1, frozen **R0**, and deployed **OS-01A** evidence.
-2. Finish **OS-18A** provider authentication and final scans; rotation and dormant server-secret installation are complete.
-3. Complete R1-v2's independent human review and the disabled non-market portion of **OS-03A**.
-4. **OS-19A** and **OS-02A** are accepted. Execute **OS-15A**, then finish **OS-03A**, **OS-13A**, and the remaining OS-18A gates before authenticated capture. Full OS-01/OS-02/OS-03 proceed behind them.
+2. Execute the provider-independent portion of **OS-03A** next.
+3. Finish **OS-18A** provider authentication and final scans; complete R1-v2's independent human review on its separate research lane.
+4. **OS-19A**, **OS-02A**, and bounded provider-free **OS-15A** are accepted. After OS-03A, execute **OS-13A** and finish the remaining OS-18A gates before authenticated capture. Full OS-01/OS-02/OS-03 proceed behind them.
 5. **R2** may execute only the Module 2B residual-kernel falsification and only after R1-v2 passes, followed by **R3**.
 6. Continue the platform spine through **OS-14** regardless of whether the possession branch survives.
 7. Start **R4 through R12** only for the decomposition branch authorized by R3; use **R3A** or **R3B** for the other branches.
@@ -170,7 +170,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 ### OS-03A — Start immutable 2026 evidence capture
 
-**Status:** NEXT after OS-00
+**Status:** NEXT; provider-independent slice follows accepted OS-15A
 
 **Requirement contribution:** DATA-01, MKT-01, LED-06
 
@@ -340,7 +340,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-13A — Start the append-only forecast-or-withheld ledger
 
-**Status:** NEXT after OS-01A, OS-02A, and OS-15A
+**Status:** PLANNED immediately after OS-03A; scheduler dependency OS-15A is accepted
 
 **Requirement contribution:** LED-01, LED-03, LED-06
 
@@ -382,7 +382,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 ### OS-15 — Introduce one durable orchestration DAG
 
-**Status:** EPIC; OS-15A is urgent
+**Status:** EPIC; bounded OS-15A slice accepted, full DAG queued
 
 **Requirements:** OPS-01, OPS-02, OPS-03
 
@@ -396,7 +396,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-15A — Qualify the interim 2026 capture scheduler
 
-**Status:** NEXT after OS-01A, OS-02A, and OS-00B
+**Status:** ACCEPTED — bounded provider-free scheduler qualification
 
 **Requirement contribution:** OPS-01, OPS-03, LED-03
 
@@ -404,9 +404,13 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 **Outcome:** Run the urgent raw-capture and forecast-or-withheld jobs at frozen origins without waiting for the full DAG cutover.
 
-**Deliverables:** Deterministic schedule keys, lease, idempotent retry, heartbeat, quota preflight, late-run exclusion, missed-origin alert, no-backfill rule, and a cutover contract into OS-15.
+**Deliverables:** Deterministic schedule keys, lease, idempotent retry, heartbeat, provider-free dispatch boundary, late-run exclusion, missed-origin alert, no-backfill rule, and a cutover contract into OS-15. Authenticated quota preflight integration remains deferred.
 
 **Acceptance gate:** Duplicate triggers create one record; expired leases recover safely; jobs after origin/kickoff cannot write a timely forecast; a missed job produces a contemporaneous failure/withholding; market jobs stop before violating OS-19A; full OS-15 later imports state without replaying history.
+
+**Acceptance evidence:** `.planning/engine-os/execution/os-15a/acceptance-receipt.v1.json`, `sites-staging-proof-receipt.v1.json`, and `production-foundation-direct-audit-receipt.v1.json` bind the frozen v5 scheduler and cutover contracts to all five current OS-02A heads, distinct scheduled/invocation/evidence/persistence clocks, unique attempts, fenced renewable leases, strict deadline exclusion, duplicate and externally overlapping invocation convergence, bounded watchdog recovery, reschedule and unresolved-schedule cases, and qualification-only withholding on isolated owner-only D1. Production migration 0016 is deployed with empty scheduler tables, no activation, capture disabled, zero provider calls, and unchanged 38-used/462-remaining quota. A guarded direct-D1 audit also verified the accepted foundation objects and bootstrap after the bounded database-viewer projection proved stale; it made no repair or data mutation.
+
+**Scope boundary:** This accepts OS-15A only. It does not accept OS-03A, OS-13A, LED-03, OPS-01, OPS-03, full OS-15, prospective capture, provider dispatch, authenticated OS-19A integration, or a model package. OS-03A is the exact next platform task.
 
 ### OS-16 — Add chaos, backup, restore, and rollback qualification
 
@@ -506,7 +510,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-19A — Enforce the urgent odds quota and reserve guard
 
-**Status:** ACCEPTED urgent slice; authenticated capture remains blocked by OS-02A/OS-03A/OS-13A/OS-15A/OS-18A
+**Status:** ACCEPTED urgent slice; authenticated capture remains blocked by OS-03A/OS-13A/OS-18A
 
 **Requirement contribution:** OPS-08, MKT-01
 

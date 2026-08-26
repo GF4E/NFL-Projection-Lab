@@ -44,6 +44,7 @@ Status notation:
 - [ ] **LED-01 — Market-free forecast ledger.** Football forecasts can be generated and stored when odds are absent or stale; market inputs cannot change the archived football distribution.
 - [ ] **LED-02 — Separate market and comparison ledgers.** Exact quotes are immutable evidence and football-versus-market comparisons are derived artifacts, never overwrites.
 - [ ] **LED-03 — Complete pre-kickoff archive.** Every scheduled game and required horizon has a timestamped forecast or an explicit withholding record before kickoff.
+  - OS-15A contribution: the dormant provider-free scheduler can produce exactly one timely qualification-only withholding for each of the five OS-02A horizons under duplicate, overlap, lease-loss, reschedule, and missed-tick tests. The requirement remains open until OS-13A proves complete activated production coverage with immutable provenance.
 - [ ] **LED-04 — Correction-safe settlement.** Regulation scores, overtime, pushes, voids, source corrections, and grading changes retain append-only lineage.
 - [ ] **LED-05 — All-game evaluation is authoritative.** Model quality is measured on all eligible forecasts, not site selections or human adjustments.
 - [ ] **LED-06 — Prospective 2026 confirmation stream.** Every activated 2026 shadow forecast is stored before kickoff under a frozen package and scored without retroactive replacement; activation after Week 1 is labeled partial-season shadow evidence and is never backfilled or called full-season confirmation.
@@ -93,8 +94,10 @@ Status notation:
 ## 10. Operations, serving, and public release
 
 - [ ] **OPS-01 — One durable job graph.** Ingestion, canonicalization, features, fitting, packaging, forecasting, settlement, evaluation, and publication use deterministic keys, leases, checkpoints, retries, and explicit dependencies.
+  - OS-15A contribution: deterministic scheduler ticks/jobs, fenced renewable leases, retries, bounded watchdog recovery, and a versioned no-replay cutover contract are qualified for the interim forecast-or-withholding node only. Full graph ownership, compute isolation, checkpoints, and scheduler retirement remain OS-15 work.
 - [ ] **OPS-02 — Isolated batch compute.** Full-history refits, bootstraps, and large replays run in an authenticated compute environment with bounded resources, not on public requests.
 - [ ] **OPS-03 — Atomic last-good publication.** A failed or partial job cannot replace valid inputs, forecasts, model pointers, or site snapshots.
+  - OS-15A contribution: lease-losing and stale workers cannot publish an origin record, deadline failures become explicit nonprospective or withheld outcomes, and the dormant production schema is empty. Cross-store source, package, forecast-output, and site-snapshot atomicity remain open under OS-03A, OS-13A, OS-15, and OS-20.
 - [ ] **OPS-04 — Precomputed read-only API.** The site reads versioned publication snapshots with no fitting, source fetch, large join, or mutation in the request path.
 - [ ] **OPS-05 — Monitoring without silent adaptation.** Freshness, schema, latency, quota, calibration, coverage, drift, job, and package failures create observable alerts and never trigger unlogged retuning.
 - [ ] **OPS-06 — Recovery qualification.** Backup, restore, rollback, provider-outage, stale-source, corrupt-object, partial-import, and degraded-model drills pass before release.
