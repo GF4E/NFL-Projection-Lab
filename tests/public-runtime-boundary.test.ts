@@ -91,6 +91,13 @@ describe("public runtime boundary", () => {
     expect(scheduler).not.toMatch(/odds|apiKey|fetch\(|R2Bucket|runBackgroundMaintenance|provider\//i);
     expect(scheduler).toContain("providerDispatches: 0");
 
+    const captureRuntime = readFileSync("src/server/engine-os/source-capture-runtime.ts", "utf8");
+    expect(source).not.toContain("source-capture-runtime");
+    expect(captureRuntime).not.toMatch(/\bfetch\s*\(/);
+    expect(captureRuntime).not.toMatch(/ODDS_API_KEY|the-odds-api\.com/i);
+    expect(captureRuntime).toContain("providerSecretReads: 0");
+    expect(captureRuntime).toContain("networkDispatches: 0");
+
     const vite = readFileSync("vite.config.ts", "utf8");
     expect(vite).toContain('"* * * * *"');
     expect(vite).toContain('"1-59/2 * * * *"');
