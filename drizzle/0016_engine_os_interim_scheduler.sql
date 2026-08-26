@@ -566,7 +566,7 @@ CREATE TRIGGER `engine_origin_records_v2_publication_guard`
             (
               NEW.`withholding_reason` = 'late_origin_excluded' AND
               (
-                julianday(NEW.`persisted_at`) > julianday(NEW.`persistence_deadline_at`) OR
+                julianday(NEW.`persisted_at`) >= julianday(NEW.`persistence_deadline_at`) OR
                 (
                   origin.`eligible` = 0 AND origin.`eligibility_reason` IN (
                     'pre_activation', 'after_kickoff', 'prior_origin_elapsed',
@@ -612,6 +612,6 @@ CREATE TRIGGER `engine_origin_records_v2_no_delete`
 INSERT INTO `engine_schema_versions` (`version`, `migration_hash`, `applied_at`)
 VALUES (
   '0016_engine_os_interim_scheduler',
-  'sha256:8eb51b2ddfe4368e68a7843f7c32d24382abaaa8b403bccef8b549479a983e71',
+  'sha256:3e6da5c8f0d8150a79f600d381516b8c36ed8a6c04f853f7af42fdeb8c6fab1a',
   strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
 );

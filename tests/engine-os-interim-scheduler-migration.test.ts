@@ -314,6 +314,38 @@ describe("OS-15A additive scheduler migration", () => {
     db.close();
   });
 
+  it("permits eligible nonprospective closure at the exact persistence deadline", () => {
+    const db = database();
+    seedOrigin(db);
+    insertJob(db);
+    const token = "5".repeat(64);
+    acquire(db, {
+      token,
+      acquiredAt: "2026-09-13T18:15:00Z",
+      expiresAt: "2026-09-13T18:16:30Z"
+    });
+    insertRecord(db, {
+      recordId: "exact-deadline-record",
+      token,
+      fence: 1,
+      invokedAt: "2026-09-13T18:15:00Z",
+      evidenceAt: "2026-09-13T18:15:00Z",
+      generatedAt: "2026-09-13T18:15:00Z",
+      persistedAt: "2026-09-13T18:15:00Z",
+      reason: "late_origin_excluded",
+      timing: "late",
+      prospective: 0
+    });
+    expect(db.prepare(`SELECT timing, prospective_eligible, persisted_at, persistence_deadline_at
+      FROM engine_origin_records_v2`).get()).toEqual({
+      timing: "late",
+      prospective_eligible: 0,
+      persisted_at: "2026-09-13T18:15:00Z",
+      persistence_deadline_at: "2026-09-13T18:15:00Z"
+    });
+    db.close();
+  });
+
   it("rejects unresolved jobs, superseded-head publication, unfenced updates, and forecasts", () => {
     const db = database();
     seedOrigin(db, {
@@ -434,6 +466,29 @@ describe("OS-15A additive scheduler migration", () => {
     expect(db.prepare(`SELECT name FROM sqlite_master
       WHERE type = 'table' AND name = 'forecast_origins'`).get())
       .toEqual({ name: "forecast_origins" });
+    db.close();
+  });
+
+  it("refuses rollback after any scheduler evidence exists", () => {
+    const db = database();
+    const token = "6".repeat(64);
+    db.prepare(`INSERT INTO engine_scheduler_ticks_v2 (
+      tick_key, scheduler_contract_version, scheduler_contract_hash, tick_key_version,
+      lane, nominal_scheduled_at, invoked_at, evidence_at, persisted_at, state,
+      attempt_token_hash, fence_token, lease_owner, lease_acquired_at, lease_expires_at,
+      heartbeat_at
+    ) VALUES ('tick:retained', 'interim-scheduler-contract.2026.4', ?,
+      'engine-os.scheduler-tick.v1', 'dispatcher', '2026-09-13T18:05:00Z',
+      '2026-09-13T18:05:01Z', '2026-09-13T18:05:01Z', '2026-09-13T18:05:01Z',
+      'running', ?, 1, 'worker', '2026-09-13T18:05:01Z',
+      '2026-09-13T18:06:31Z', '2026-09-13T18:05:01Z')`)
+      .run(contractHash, token);
+    expect(() => applySql(db, "drizzle/rollback/0016_engine_os_interim_scheduler.down.sql"))
+      .toThrow(/requires every interim scheduler table to be empty/);
+    expect(db.prepare(`SELECT tick_key FROM engine_scheduler_ticks_v2`).get())
+      .toEqual({ tick_key: "tick:retained" });
+    expect(db.prepare(`SELECT migration_hash FROM engine_schema_versions
+      WHERE version = '0016_engine_os_interim_scheduler'`).get()).toBeDefined();
     db.close();
   });
 });

@@ -1,3 +1,22 @@
+CREATE TEMP TABLE IF NOT EXISTS `_os15a_rollback_guard` (`guard` integer NOT NULL);
+DROP TRIGGER IF EXISTS `_os15a_rollback_requires_empty`;
+CREATE TEMP TRIGGER `_os15a_rollback_requires_empty`
+  BEFORE INSERT ON `_os15a_rollback_guard`
+  WHEN
+    EXISTS (SELECT 1 FROM `engine_scheduler_ticks_v2` LIMIT 1) OR
+    EXISTS (SELECT 1 FROM `engine_scheduler_events_v2` LIMIT 1) OR
+    EXISTS (SELECT 1 FROM `engine_origin_jobs_v2` LIMIT 1) OR
+    EXISTS (SELECT 1 FROM `engine_origin_attempts_v2` LIMIT 1) OR
+    EXISTS (SELECT 1 FROM `engine_origin_records_v2` LIMIT 1)
+  BEGIN
+    SELECT RAISE(ABORT, 'OS-15A rollback requires every interim scheduler table to be empty');
+  END;
+INSERT INTO `_os15a_rollback_guard` (`guard`) VALUES (1);
+DROP TRIGGER `_os15a_rollback_requires_empty`;
+DROP TABLE `_os15a_rollback_guard`;
+
+BEGIN IMMEDIATE;
+
 DROP TRIGGER IF EXISTS `engine_origin_records_v2_no_delete`;
 DROP TRIGGER IF EXISTS `engine_origin_records_v2_no_update`;
 DROP TRIGGER IF EXISTS `engine_origin_records_v2_finalize_job`;
@@ -33,3 +52,5 @@ DELETE FROM `engine_schema_versions` WHERE `version` = '0016_engine_os_interim_s
 CREATE TRIGGER `engine_schema_versions_no_delete`
   BEFORE DELETE ON `engine_schema_versions`
   BEGIN SELECT RAISE(ABORT, 'engine_schema_versions is append-only'); END;
+
+COMMIT;

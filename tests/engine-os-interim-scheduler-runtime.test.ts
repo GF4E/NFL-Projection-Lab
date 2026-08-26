@@ -119,7 +119,7 @@ function seedSchedulerActivation(
     );
 }
 
-function database(activatedAt?: string): {
+function database(activatedAt: string | null = "2026-01-01T00:00:30Z"): {
   sqlite: DatabaseSync;
   db: D1Database;
   queryCounter: D1QueryCounter;
@@ -129,7 +129,7 @@ function database(activatedAt?: string): {
   applySql(sqlite, "drizzle/0013_engine_os_urgent.sql");
   applySql(sqlite, "drizzle/0015_engine_os_origin_identity.sql");
   applySql(sqlite, "drizzle/0016_engine_os_interim_scheduler.sql");
-  if (activatedAt) seedSchedulerActivation(sqlite, activatedAt);
+  if (activatedAt !== null) seedSchedulerActivation(sqlite, activatedAt);
   const queryCounter = { queries: 0 };
   return { sqlite, db: sqliteD1(sqlite, queryCounter), queryCounter };
 }
@@ -582,7 +582,7 @@ describe("OS-15A provider-free scheduler runtime", () => {
   });
 
   it("requires an activation cursor and recovers an outage before the first successful watchdog", async () => {
-    const missing = database();
+    const missing = database(null);
     await expect(runInterimSchedulerInvocation({
       db: missing.db,
       lane: "watchdog",
@@ -591,6 +591,8 @@ describe("OS-15A provider-free scheduler runtime", () => {
       tokenFactory: tokenFactory("cursor-missing"),
       owner: "watchdog:cursor-missing"
     })).rejects.toThrow(/activation cursor is missing/);
+    expect(missing.sqlite.prepare(`SELECT count(*) AS count FROM engine_scheduler_ticks_v2`).get())
+      .toEqual({ count: 0 });
     expect(missing.sqlite.prepare(`SELECT count(*) AS count FROM engine_scheduler_events_v2
       WHERE event_type = 'watchdog_recovery_checkpoint'`).get()).toEqual({ count: 0 });
     missing.sqlite.close();
@@ -612,6 +614,28 @@ describe("OS-15A provider-free scheduler runtime", () => {
       FROM engine_scheduler_events_v2 WHERE event_type = 'watchdog_recovery_checkpoint'`).get())
       .toEqual({ through_at: "2026-09-13T18:12:00.000Z" });
     recovered.sqlite.close();
+  });
+
+  it("blocks the dispatcher before any write when the exact activation triple is absent", async () => {
+    const missing = database(null);
+    seedSchedulerActivation(
+      missing.sqlite,
+      "2026-09-13T18:00:30Z",
+      stableHash({ contract: "wrong-research-constitution" })
+    );
+    await expect(runInterimSchedulerInvocation({
+      db: missing.db,
+      lane: "dispatcher",
+      nominalScheduledAt: new Date("2026-09-13T18:05:00Z"),
+      clock: monotonicClock("2026-09-13T18:05:00Z"),
+      tokenFactory: tokenFactory("dispatcher-missing-cursor"),
+      owner: "dispatcher:missing-cursor"
+    })).rejects.toThrow(/activation cursor is missing/);
+    expect(missing.sqlite.prepare(`SELECT count(*) AS count FROM engine_scheduler_ticks_v2`).get())
+      .toEqual({ count: 0 });
+    expect(missing.sqlite.prepare(`SELECT count(*) AS count FROM engine_origin_jobs_v2`).get())
+      .toEqual({ count: 0 });
+    missing.sqlite.close();
   });
 
   it("binds the watchdog cursor to the complete operating, research, and lifecycle identity", async () => {
@@ -740,6 +764,40 @@ describe("OS-15A provider-free scheduler runtime", () => {
       timing: "late",
       prospective_eligible: 0,
       after_deadline: 1
+    });
+    sqlite.close();
+  });
+
+  it("closes an origin nonprospectively at the exact persistence deadline", async () => {
+    const { sqlite, db } = database();
+    seedSchedule(sqlite, { gameId: "exact-deadline", horizons: ["kickoff_minus_120"] });
+    const jobKey = insertPendingJob(sqlite, { gameId: "exact-deadline" });
+    const exactDeadline = new Date("2026-09-13T18:15:00Z");
+    const lease = await claimInterimSchedulerJob({
+      db,
+      job: job(sqlite, jobKey),
+      prospective: false,
+      invokedAt: exactDeadline,
+      tokenFactory: () => "exact-deadline-attempt",
+      owner: "worker:exact-deadline"
+    });
+    expect(lease).not.toBeNull();
+    await expect(publishInterimSchedulerWithholding({
+      db,
+      lease: lease!,
+      reason: "late_origin_excluded",
+      prospective: false,
+      evidenceAt: exactDeadline,
+      generatedAt: exactDeadline,
+      persistedAt: exactDeadline
+    })).resolves.toMatchObject({ duplicate: false });
+    expect(sqlite.prepare(`SELECT timing, prospective_eligible, withholding_reason,
+      persisted_at = persistence_deadline_at AS at_deadline
+      FROM engine_origin_records_v2`).get()).toEqual({
+      timing: "late",
+      prospective_eligible: 0,
+      withholding_reason: "late_origin_excluded",
+      at_deadline: 1
     });
     sqlite.close();
   });
@@ -1020,6 +1078,7 @@ describe("OS-15A provider-free scheduler runtime", () => {
 
   it("records all-unresolved schedules without fabricating jobs, times, or activation", async () => {
     const { sqlite, db } = database();
+    const activationCountBefore = sqlite.prepare(`SELECT count(*) AS count FROM engine_activations`).get();
     seedSchedule(sqlite, {
       gameId: "all-unresolved",
       horizons: [
@@ -1039,7 +1098,8 @@ describe("OS-15A provider-free scheduler runtime", () => {
     expect(result).toMatchObject({ unresolvedOrigins: 5, dueOrigins: 0, providerDispatches: 0 });
     expect(sqlite.prepare(`SELECT count(*) AS count FROM engine_origin_jobs_v2`).get()).toEqual({ count: 0 });
     expect(sqlite.prepare(`SELECT count(*) AS count FROM engine_origin_records_v2`).get()).toEqual({ count: 0 });
-    expect(sqlite.prepare(`SELECT count(*) AS count FROM engine_activations`).get()).toEqual({ count: 0 });
+    expect(sqlite.prepare(`SELECT count(*) AS count FROM engine_activations`).get())
+      .toEqual(activationCountBefore);
     expect(sqlite.prepare(`SELECT count(*) AS count FROM engine_scheduler_events_v2
       WHERE event_type = 'schedule_unresolved_observed'`).get()).toEqual({ count: 1 });
     expect(sqlite.prepare(`SELECT json_extract(payload_json, '$.originCount') AS count

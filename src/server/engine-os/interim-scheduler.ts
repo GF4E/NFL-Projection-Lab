@@ -846,6 +846,7 @@ async function detectMissedDispatcherTick(input: {
   watchdogTickKey: string;
   nominalScheduledAt: string;
   observedAt: string;
+  activationCursorAt: string;
 }): Promise<number> {
   const dispatcherIntervalMs = interimSchedulerContract.clock.dispatcherNominalIntervalSeconds * 1_000;
   const dueCutoffMs = Date.parse(input.nominalScheduledAt) -
@@ -863,20 +864,7 @@ async function detectMissedDispatcherTick(input: {
   if (Number.isFinite(checkpointAtMs)) {
     scanStartMs = Math.min(checkpointAtMs + dispatcherIntervalMs, dueCutoffMs + dispatcherIntervalMs);
   } else {
-    const activation = await input.db.prepare(`SELECT activated_at
-      FROM engine_activations
-      WHERE operating_contract_hash = ? AND research_contract_hash = ? AND lifecycle_hash = ?
-      ORDER BY activated_at DESC LIMIT 1`)
-      .bind(
-        engineOsContractHashes.operating,
-        engineOsContractHashes.research,
-        engineOsContractHashes.lifecycle
-      )
-      .first<{ activated_at: string }>();
-    if (!activation || !Number.isFinite(Date.parse(activation.activated_at))) {
-      throw new Error("OS-15A watchdog activation cursor is missing");
-    }
-    const activationMs = Date.parse(activation.activated_at);
+    const activationMs = Date.parse(input.activationCursorAt);
     scanStartMs = Math.floor(activationMs / dispatcherIntervalMs) * dispatcherIntervalMs +
       dispatcherIntervalMs;
   }
@@ -978,6 +966,23 @@ async function detectMissedDispatcherTick(input: {
     }
   }
   return missed.length;
+}
+
+async function requireInterimSchedulerActivationCursor(db: D1Database): Promise<string> {
+  const activation = await db.prepare(`SELECT activated_at
+    FROM engine_activations
+    WHERE operating_contract_hash = ? AND research_contract_hash = ? AND lifecycle_hash = ?
+    ORDER BY activated_at DESC LIMIT 1`)
+    .bind(
+      engineOsContractHashes.operating,
+      engineOsContractHashes.research,
+      engineOsContractHashes.lifecycle
+    )
+    .first<{ activated_at: string }>();
+  if (!activation || !Number.isFinite(Date.parse(activation.activated_at))) {
+    throw new Error("OS-15A scheduler activation cursor is missing");
+  }
+  return new Date(activation.activated_at).toISOString();
 }
 
 interface OriginBatchPlan {
@@ -1413,6 +1418,10 @@ export async function runInterimSchedulerInvocation(
   const owner = input.owner ?? `${input.lane}:${crypto.randomUUID()}`;
   const budget = budgetedD1(input.db);
   const db = budget.db;
+  // Both lanes fail before their first coordination write unless the exact
+  // operating/research/lifecycle activation identity exists. The watchdog
+  // reuses this cursor so the preflight does not add a second D1 query.
+  const activationCursorAt = await requireInterimSchedulerActivationCursor(db);
   const tick = await claimInterimSchedulerTick({
     db,
     lane: input.lane,
@@ -1464,7 +1473,8 @@ export async function runInterimSchedulerInvocation(
         db,
         watchdogTickKey: tick.tickKey,
         nominalScheduledAt,
-        observedAt
+        observedAt,
+        activationCursorAt
       });
     }
     const rows = await loadCurrentHeads(db);

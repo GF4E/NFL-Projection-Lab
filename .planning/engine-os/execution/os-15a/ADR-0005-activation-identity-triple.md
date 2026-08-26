@@ -12,4 +12,6 @@ The v3 watchdog cursor selected an activation by operating-contract and lifecycl
 
 The v4 scheduler and cutover contracts bind all three activation hashes. A missing match aborts without advancing a checkpoint. A later activation that shares the operating and lifecycle hashes but carries another research-constitution hash is ignored.
 
+Both dispatcher and watchdog lanes enforce the matching activation preflight before their first coordination write. Setting the runtime flag without the exact activation triple therefore cannot create a tick, job, attempt, or terminal record.
+
 The adversarial regression seeds both identities and proves recovery begins at the matching triple's first dispatcher minute. The v5 contract manifest freezes exact v4 scheduler and cutover bytes and canonical hashes. Qualification still creates no production activation and cannot enable capture.
