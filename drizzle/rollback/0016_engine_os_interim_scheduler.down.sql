@@ -15,8 +15,6 @@ INSERT INTO `_os15a_rollback_guard` (`guard`) VALUES (1);
 DROP TRIGGER `_os15a_rollback_requires_empty`;
 DROP TABLE `_os15a_rollback_guard`;
 
-BEGIN IMMEDIATE;
-
 DROP TRIGGER IF EXISTS `engine_origin_records_v2_no_delete`;
 DROP TRIGGER IF EXISTS `engine_origin_records_v2_no_update`;
 DROP TRIGGER IF EXISTS `engine_origin_records_v2_finalize_job`;
@@ -52,5 +50,3 @@ DELETE FROM `engine_schema_versions` WHERE `version` = '0016_engine_os_interim_s
 CREATE TRIGGER `engine_schema_versions_no_delete`
   BEFORE DELETE ON `engine_schema_versions`
   BEGIN SELECT RAISE(ABORT, 'engine_schema_versions is append-only'); END;
-
-COMMIT;

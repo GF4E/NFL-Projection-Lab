@@ -453,6 +453,11 @@ describe("OS-15A additive scheduler migration", () => {
   it("registers the exact migration definition and rolls back only v2 tables", () => {
     const db = database();
     const migration = readFileSync(resolve(process.cwd(), "drizzle/0016_engine_os_interim_scheduler.sql"), "utf8");
+    const rollback = readFileSync(resolve(
+      process.cwd(), "drizzle/rollback/0016_engine_os_interim_scheduler.down.sql"
+    ), "utf8");
+    expect(rollback).not.toMatch(/^\s*(?:BEGIN(?:\s+TRANSACTION|\s+IMMEDIATE)?|COMMIT);\s*$/im);
+    expect(rollback).toContain("OS-15A rollback requires every interim scheduler table to be empty");
     const definition = migration.split("INSERT INTO `engine_schema_versions`")[0]!;
     expect(db.prepare(`SELECT migration_hash FROM engine_schema_versions
       WHERE version = '0016_engine_os_interim_scheduler'`).get())
