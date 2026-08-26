@@ -11,6 +11,7 @@ import { listPregameContextStates } from "../src/server/pregame-context/store";
 import { runBackgroundMaintenance } from "../src/server/background-maintenance";
 import { getConfidenceEngineHealth } from "../src/server/confidence-engine/store";
 import { readOnlyD1 } from "../src/server/read-only-d1";
+import { applyOddsQuotaMigration } from "../src/server/engine-os/quota-migration";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -21,6 +22,7 @@ interface Env {
   DB: D1Database;
   EVIDENCE: R2Bucket;
   ENGINE_OS_CAPTURE_ENABLED?: string;
+  ENGINE_OS_MIGRATION_0014_ENABLED?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -202,6 +204,13 @@ const worker = {
     );
   },
   async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    // Temporary one-shot bridge. Sites exposes read-only D1 inspection but no
+    // operator migration command. This branch is removed after live receipt
+    // verification; it never reads a provider credential or starts capture.
+    if (env.ENGINE_OS_MIGRATION_0014_ENABLED === "true") {
+      ctx.waitUntil(applyOddsQuotaMigration(env.DB));
+      return;
+    }
     // OS-00 is deployed fail-closed. Capture/ledger activation is a separate
     // operator decision after credential rotation, quota bootstrap, migration
     // proof, and the remaining OS-02A/03A/13A gates. Never use the nominal cron
