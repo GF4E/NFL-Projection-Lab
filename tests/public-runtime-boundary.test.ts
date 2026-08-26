@@ -52,7 +52,7 @@ describe("public runtime boundary", () => {
     expect(spies.exec).not.toHaveBeenCalled();
   });
 
-  it("keeps browser fetches read-only and scheduled maintenance authoritative", () => {
+  it("keeps browser fetches read-only and the provider-free scheduler fail-closed", () => {
     const source = readFileSync("worker/index.ts", "utf8");
     const fetchLane = source.slice(source.indexOf("async fetch"), source.indexOf("async scheduled"));
     const scheduledLane = source.slice(source.indexOf("async scheduled"));
@@ -66,12 +66,21 @@ describe("public runtime boundary", () => {
     expect(fetchLane).not.toContain("runBackgroundMaintenance");
     expect(fetchLane).not.toContain("runModelLifecycleAutomation");
     expect(fetchLane).toContain("DB: readDb");
-    expect(scheduledLane).toContain("runBackgroundMaintenance");
+    expect(scheduledLane).toContain("runInterimSchedulerInvocation");
     expect(scheduledLane).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
-    expect(scheduledLane).toContain("now: new Date()");
-    expect(scheduledLane).toContain("apiKey: undefined");
+    expect(scheduledLane).toContain("controller.scheduledTime");
+    expect(scheduledLane).toContain("controller.cron");
+    expect(scheduledLane).not.toContain("runBackgroundMaintenance");
+    expect(scheduledLane).not.toContain("apiKey");
     expect(scheduledLane).not.toContain("runModelLifecycleAutomation");
-    expect(scheduledLane).not.toContain("scheduledTime");
+
+    const scheduler = readFileSync("src/server/engine-os/interim-scheduler.ts", "utf8");
+    expect(scheduler).not.toMatch(/odds|apiKey|fetch\(|R2Bucket|runBackgroundMaintenance|provider\//i);
+    expect(scheduler).toContain("providerDispatches: 0");
+
+    const vite = readFileSync("vite.config.ts", "utf8");
+    expect(vite).toContain('"* * * * *"');
+    expect(vite).toContain('"1-59/2 * * * *"');
 
     const maintenance = readFileSync("src/server/background-maintenance.ts", "utf8");
     expect(maintenance).not.toContain("expireStaleTeamDrafts");

@@ -142,9 +142,16 @@ describe("automatic nflverse importer", () => {
     )).toBe(2023);
   });
 
-  it("wires the five-minute schedule and Roboto into the deployed app", () => {
-    expect(readFileSync("vite.config.ts", "utf8")).toContain('"*/5 * * * *"');
-    expect(readFileSync("worker/index.ts", "utf8")).toContain("async scheduled");
+  it("keeps Roboto while quarantining the legacy importer behind the dormant OS scheduler", () => {
+    const viteConfig = readFileSync("vite.config.ts", "utf8");
+    const worker = readFileSync("worker/index.ts", "utf8");
+    expect(viteConfig).toContain('"* * * * *"');
+    expect(viteConfig).toContain('"1-59/2 * * * *"');
+    expect(viteConfig).not.toContain('"*/5 * * * *"');
+    expect(worker).toContain("async scheduled");
+    expect(worker).toContain("runInterimSchedulerInvocation");
+    expect(worker).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(worker).not.toContain("runBackgroundMaintenance");
     expect(readFileSync("src/components/nflverse-refresh-beacon.tsx", "utf8")).toContain('method: "GET"');
     expect(readFileSync("src/components/nflverse-refresh-beacon.tsx", "utf8")).not.toContain('method: "POST"');
     expect(readFileSync("src/server/background-maintenance.ts", "utf8")).toContain("allowCatchup: true");
@@ -194,7 +201,8 @@ describe("automatic nflverse importer", () => {
     const worker = readFileSync("worker/index.ts", "utf8");
     const maintenance = readFileSync("src/server/background-maintenance.ts", "utf8");
     const settlement = readFileSync("src/server/automatic-settlement.ts", "utf8");
-    expect(worker).toContain("runBackgroundMaintenance");
+    expect(worker).toContain("runInterimSchedulerInvocation");
+    expect(worker).not.toContain("runBackgroundMaintenance");
     expect(maintenance).not.toContain("settleCompletedTeamPlays");
     expect(maintenance).toContain("runKickoffWeatherAutomation");
     expect(settlement).toContain("play_settlement_audit");

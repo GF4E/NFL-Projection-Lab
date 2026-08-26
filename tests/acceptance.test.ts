@@ -747,7 +747,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const fetchLane = worker.slice(worker.indexOf("async fetch"), worker.indexOf("async scheduled"));
     expect(fetchLane).toContain("readOnlyD1(env.DB)");
     expect(fetchLane).not.toContain("runBackgroundMaintenance");
-    expect(worker.slice(worker.indexOf("async scheduled"))).toContain("runBackgroundMaintenance");
+    const scheduledLane = worker.slice(worker.indexOf("async scheduled"));
+    expect(scheduledLane).toContain("runInterimSchedulerInvocation");
+    expect(scheduledLane).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(scheduledLane).not.toContain("runBackgroundMaintenance");
     expect(worker).not.toContain("ctx.waitUntil(runScheduledOddsAutomation");
     expect(worker).not.toContain('request.headers.has("oai-authenticated-user-email")');
   });
@@ -1006,8 +1009,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(weatherStore).toContain("kickoff_weather_stage");
     expect(weatherAutomation).toContain("eligible.map(({ gameId }) => gameId)");
     const worker = readFileSync("worker/index.ts", "utf8");
-    expect(worker).toContain("runBackgroundMaintenance");
+    expect(worker).toContain("runInterimSchedulerInvocation");
     expect(worker).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(worker).not.toContain("runBackgroundMaintenance");
     expect(worker).not.toContain("runModelLifecycleAutomation");
     expect(worker).not.toContain("scheduledMaintenanceLane");
   });
@@ -1108,7 +1112,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(store).toContain("play_state_audit");
     expect(store).toContain("expireStaleTeamDrafts");
     expect(store).toContain("Approval is closed because this contract has kicked off");
-    expect(worker).toContain("runBackgroundMaintenance");
+    expect(worker).toContain("runInterimSchedulerInvocation");
+    expect(worker).not.toContain("runBackgroundMaintenance");
     expect(maintenance).not.toContain("expireStaleTeamDrafts");
   });
 

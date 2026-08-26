@@ -8,9 +8,13 @@ import { listLiveLines, listSnapshotGameIds } from "../src/server/live-line-stor
 import { weeklySlate } from "../src/server/weekly-slate";
 import { listOfficialInjuryImportStates } from "../src/server/official-injuries/store";
 import { listPregameContextStates } from "../src/server/pregame-context/store";
-import { runBackgroundMaintenance } from "../src/server/background-maintenance";
 import { getConfidenceEngineHealth } from "../src/server/confidence-engine/store";
 import { readOnlyD1 } from "../src/server/read-only-d1";
+import {
+  interimSchedulerContract,
+  type InterimSchedulerLane
+} from "../src/server/engine-os/interim-scheduler-kernel";
+import { runInterimSchedulerInvocation } from "../src/server/engine-os/interim-scheduler";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -201,17 +205,21 @@ const worker = {
       ctx
     );
   },
-  async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    // OS-00 is deployed fail-closed. Capture/ledger activation is a separate
-    // operator decision after credential rotation, quota bootstrap, migration
-    // proof, and the remaining OS-02A/03A/13A gates. Never use the nominal cron
-    // timestamp as a generation or persistence time.
+  async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    // OS-15A remains dormant in production. Even after a future explicit gate,
+    // this entrypoint can run only the provider-free qualification scheduler;
+    // provider acquisition and model execution are absent from its source graph.
     if (env.ENGINE_OS_CAPTURE_ENABLED !== "true") return;
-    ctx.waitUntil(runBackgroundMaintenance({
+    const lane: InterimSchedulerLane | null =
+      controller.cron === interimSchedulerContract.clock.dispatcherCron ? "dispatcher" :
+        controller.cron === interimSchedulerContract.clock.watchdogCron ? "watchdog" : null;
+    if (!lane) return;
+    ctx.waitUntil(runInterimSchedulerInvocation({
       db: env.DB,
-      evidenceBucket: env.EVIDENCE,
-      apiKey: undefined,
-      now: new Date()
+      lane,
+      // Controller time identifies the deterministic trigger only. Invocation,
+      // evidence, generation, and persistence are sampled separately in service.
+      nominalScheduledAt: new Date(controller.scheduledTime)
     }));
   }
 };

@@ -77,11 +77,13 @@ describe("official NFL injury importer", () => {
     })).toThrow("Official NFL injury reports are not published for Week 1");
   });
 
-  it("keeps the feed in the background instead of adding another site tab", () => {
+  it("keeps the feed off the site and quarantined from the interim scheduler", () => {
     const worker = readFileSync("worker/index.ts", "utf8");
     const maintenance = readFileSync("src/server/background-maintenance.ts", "utf8");
     const navigation = readFileSync("src/components/nav-links.tsx", "utf8");
-    expect(worker).toContain("runBackgroundMaintenance");
+    expect(worker).toContain("runInterimSchedulerInvocation");
+    expect(worker).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(worker).not.toContain("runBackgroundMaintenance");
     expect(maintenance).toContain("runOfficialInjuryAutomation");
     expect(worker).toContain('/api/game-context');
     expect(navigation).not.toContain('"Research"');

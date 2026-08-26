@@ -271,6 +271,136 @@ export const forecastOriginVersions = sqliteTable("forecast_origin_versions", {
   check("forecast_origin_version_created_check", sql`length(${table.createdAt}) > 0`)
 ]);
 
+export const engineSchedulerTicksV2 = sqliteTable("engine_scheduler_ticks_v2", {
+  tickKey: text("tick_key").primaryKey(),
+  schedulerContractVersion: text("scheduler_contract_version").notNull(),
+  schedulerContractHash: text("scheduler_contract_hash").notNull(),
+  tickKeyVersion: text("tick_key_version").notNull(),
+  lane: text("lane", { enum: ["dispatcher", "watchdog"] }).notNull(),
+  nominalScheduledAt: text("nominal_scheduled_at").notNull(),
+  invokedAt: text("invoked_at").notNull(),
+  evidenceAt: text("evidence_at").notNull(),
+  persistedAt: text("persisted_at").notNull(),
+  state: text("state", { enum: ["running", "completed", "failed"] }).notNull(),
+  attemptTokenHash: text("attempt_token_hash"),
+  fenceToken: integer("fence_token").notNull(),
+  leaseOwner: text("lease_owner"),
+  leaseAcquiredAt: text("lease_acquired_at"),
+  leaseExpiresAt: text("lease_expires_at"),
+  heartbeatAt: text("heartbeat_at"),
+  completedAt: text("completed_at"),
+  failureCode: text("failure_code")
+}, (table) => [
+  uniqueIndex("engine_scheduler_tick_identity_unique").on(
+    table.schedulerContractHash,
+    table.lane,
+    table.nominalScheduledAt
+  ),
+  index("idx_engine_scheduler_ticks_v2_watchdog").on(table.lane, table.nominalScheduledAt, table.state),
+  index("idx_engine_scheduler_ticks_v2_lease").on(table.state, table.leaseExpiresAt),
+  check("engine_scheduler_tick_contract_hash_check", sql`length(${table.schedulerContractHash}) = 64`),
+  check("engine_scheduler_tick_fence_check", sql`${table.fenceToken} >= 1`)
+]);
+
+export const engineOriginJobsV2 = sqliteTable("engine_origin_jobs_v2", {
+  jobKey: text("job_key").primaryKey(),
+  schedulerContractVersion: text("scheduler_contract_version").notNull(),
+  schedulerContractHash: text("scheduler_contract_hash").notNull(),
+  jobKeyVersion: text("job_key_version").notNull(),
+  jobType: text("job_type").notNull(),
+  originVersionId: text("origin_version_id").notNull().unique()
+    .references(() => forecastOriginVersions.originVersionId),
+  scheduledTriggerAt: text("scheduled_trigger_at").notNull(),
+  kickoffAt: text("kickoff_at").notNull(),
+  persistenceDeadlineAt: text("persistence_deadline_at").notNull(),
+  activationBoundary: text("activation_boundary").notNull(),
+  state: text("state", { enum: ["pending", "running", "completed", "invalidated"] }).notNull(),
+  fenceToken: integer("fence_token").notNull().default(0),
+  activeAttemptTokenHash: text("active_attempt_token_hash"),
+  leaseOwner: text("lease_owner"),
+  leaseAcquiredAt: text("lease_acquired_at"),
+  leaseExpiresAt: text("lease_expires_at"),
+  heartbeatAt: text("heartbeat_at"),
+  completedAt: text("completed_at"),
+  createdAt: text("created_at").notNull()
+}, (table) => [
+  index("idx_engine_origin_jobs_v2_due").on(table.state, table.scheduledTriggerAt, table.persistenceDeadlineAt),
+  index("idx_engine_origin_jobs_v2_lease").on(table.state, table.leaseExpiresAt),
+  check("engine_origin_job_contract_hash_check", sql`length(${table.schedulerContractHash}) = 64`),
+  check("engine_origin_job_fence_check", sql`${table.fenceToken} >= 0`)
+]);
+
+export const engineOriginAttemptsV2 = sqliteTable("engine_origin_attempts_v2", {
+  attemptId: text("attempt_id").primaryKey(),
+  jobKey: text("job_key").notNull().references(() => engineOriginJobsV2.jobKey),
+  originVersionId: text("origin_version_id").notNull()
+    .references(() => forecastOriginVersions.originVersionId),
+  attemptTokenHash: text("attempt_token_hash").notNull(),
+  fenceToken: integer("fence_token").notNull(),
+  leaseOwner: text("lease_owner").notNull(),
+  invokedAt: text("invoked_at").notNull(),
+  leaseAcquiredAt: text("lease_acquired_at").notNull(),
+  leaseExpiresAt: text("lease_expires_at").notNull(),
+  persistedAt: text("persisted_at").notNull()
+}, (table) => [
+  uniqueIndex("engine_origin_attempt_job_fence_unique").on(table.jobKey, table.fenceToken),
+  uniqueIndex("engine_origin_attempt_job_token_unique").on(table.jobKey, table.attemptTokenHash),
+  index("idx_engine_origin_attempts_v2_origin").on(table.originVersionId, table.fenceToken),
+  check("engine_origin_attempt_token_check", sql`length(${table.attemptTokenHash}) = 64`),
+  check("engine_origin_attempt_fence_check", sql`${table.fenceToken} >= 1`)
+]);
+
+export const engineSchedulerEventsV2 = sqliteTable("engine_scheduler_events_v2", {
+  eventId: text("event_id").primaryKey(),
+  eventType: text("event_type").notNull(),
+  tickKey: text("tick_key").references(() => engineSchedulerTicksV2.tickKey),
+  jobKey: text("job_key").references(() => engineOriginJobsV2.jobKey),
+  originVersionId: text("origin_version_id").references(() => forecastOriginVersions.originVersionId),
+  attemptTokenHash: text("attempt_token_hash"),
+  fenceToken: integer("fence_token"),
+  occurredAt: text("occurred_at").notNull(),
+  evidenceAt: text("evidence_at").notNull(),
+  persistedAt: text("persisted_at").notNull(),
+  payloadJson: text("payload_json").notNull()
+}, (table) => [
+  index("idx_engine_scheduler_events_v2_tick").on(table.tickKey, table.occurredAt),
+  index("idx_engine_scheduler_events_v2_job").on(table.jobKey, table.occurredAt),
+  check("engine_scheduler_event_payload_check", sql`json_valid(${table.payloadJson})`)
+]);
+
+export const engineOriginRecordsV2 = sqliteTable("engine_origin_records_v2", {
+  recordId: text("record_id").primaryKey(),
+  decisionHash: text("decision_hash").notNull().unique(),
+  jobKey: text("job_key").notNull().unique().references(() => engineOriginJobsV2.jobKey),
+  originVersionId: text("origin_version_id").notNull().unique()
+    .references(() => forecastOriginVersions.originVersionId),
+  schedulerContractVersion: text("scheduler_contract_version").notNull(),
+  schedulerContractHash: text("scheduler_contract_hash").notNull(),
+  status: text("status", { enum: ["withheld"] }).notNull(),
+  withholdingReason: text("withholding_reason").notNull(),
+  scheduledTriggerAt: text("scheduled_trigger_at").notNull(),
+  invokedAt: text("invoked_at").notNull(),
+  evidenceAt: text("evidence_at").notNull(),
+  generatedAt: text("generated_at").notNull(),
+  persistenceRequestedAt: text("persistence_requested_at").notNull(),
+  persistedAt: text("persisted_at").notNull(),
+  persistenceDeadlineAt: text("persistence_deadline_at").notNull(),
+  kickoffAt: text("kickoff_at").notNull(),
+  timing: text("timing", { enum: ["timely", "late"] }).notNull(),
+  prospectiveEligible: integer("prospective_eligible", { mode: "boolean" }).notNull(),
+  captureHealth: text("capture_health", { enum: ["current", "stale", "partial", "unavailable"] }).notNull(),
+  activationBoundary: text("activation_boundary").notNull(),
+  attemptTokenHash: text("attempt_token_hash").notNull(),
+  fenceToken: integer("fence_token").notNull(),
+  qualificationOnly: integer("qualification_only", { mode: "boolean" }).notNull().default(true),
+  payloadJson: text("payload_json").notNull()
+}, (table) => [
+  index("idx_engine_origin_records_v2_origin").on(table.originVersionId, table.persistedAt),
+  check("engine_origin_record_contract_hash_check", sql`length(${table.schedulerContractHash}) = 64`),
+  check("engine_origin_record_attempt_check", sql`length(${table.attemptTokenHash}) = 64 AND ${table.fenceToken} >= 1`),
+  check("engine_origin_record_payload_check", sql`json_valid(${table.payloadJson})`)
+]);
+
 export const engineJobRuns = sqliteTable("engine_job_runs", {
   jobKey: text("job_key").primaryKey(),
   jobType: text("job_type").notNull(),

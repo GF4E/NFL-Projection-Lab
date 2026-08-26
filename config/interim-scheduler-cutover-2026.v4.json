@@ -1,0 +1,52 @@
+{
+  "version": "interim-scheduler-cutover.2026.4",
+  "status": "frozen_pre_cutover_contract",
+  "effectiveSeason": 2026,
+  "frozenOn": "2026-08-26",
+  "supersedes": "interim-scheduler-cutover.2026.3",
+  "sourceSchedulerContractVersion": "interim-scheduler-contract.2026.4",
+  "targetWorkPackage": "OS-15",
+  "retainedLegacyTables": [
+    "engine_activations", "forecast_origins", "forecast_origin_records", "engine_job_runs"
+  ],
+  "retainedInterimTables": [
+    "engine_scheduler_ticks_v2", "engine_scheduler_events_v2", "engine_origin_jobs_v2",
+    "engine_origin_attempts_v2", "engine_origin_records_v2"
+  ],
+  "deterministicKeyVersions": {
+    "tick": "engine-os.scheduler-tick.v1",
+    "job": "engine-os.scheduler-job.v2"
+  },
+  "requiredManifestFields": [
+    "scheduler_contract_version", "scheduler_contract_hash", "migration_version",
+    "migration_hash", "activation_boundary", "exact_cutover_at",
+    "last_completed_dispatcher_tick", "last_completed_watchdog_tick", "table_row_counts",
+    "table_content_hashes", "outstanding_lease_inventory", "provider_dispatch_enabled"
+  ],
+  "leaseBoundary": {
+    "nonexpiredLeaseBehavior": "block_cutover",
+    "expiredLeaseBehavior": "target_may_reclaim_with_strictly_greater_fence",
+    "priorAttemptPublicationAfterCutoverAllowed": false
+  },
+  "recordBoundary": {
+    "terminalRowsImportedUnchanged": true,
+    "terminalRowsReplayed": false,
+    "terminalRowsReopened": false,
+    "onlyFuturePendingCurrentHeadsTransfer": true,
+    "elapsedOrMissedOriginsReplayed": false,
+    "elapsedOrMissedOriginsProspective": false,
+    "activationBoundaryMustRemainIdentical": true
+  },
+  "activationBoundary": {
+    "qualificationCreatesProductionActivation": false,
+    "captureMustRemainDisabledUntilSeparateApproval": true,
+    "twoPublishingSchedulersAllowed": false,
+    "watchdogCursorMustExistBeforeEnable": true,
+    "watchdogCursorSource": "engine_activations.activated_at",
+    "watchdogCursorIdentityFields": [
+      "operating_contract_hash", "research_contract_hash", "lifecycle_hash"
+    ],
+    "firstRecoverableDispatcherSlot": "strictly_after_activated_at",
+    "missingCursorBehavior": "block_enable"
+  }
+}
