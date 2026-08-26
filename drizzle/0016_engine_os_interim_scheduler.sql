@@ -283,7 +283,7 @@ CREATE TABLE `engine_origin_records_v2` (
     (
       `timing` = 'timely' AND `prospective_eligible` = 1 AND
       `withholding_reason` NOT IN ('late_origin_excluded', 'schedule_unavailable_at_origin') AND
-      julianday(`persisted_at`) <= julianday(`persistence_deadline_at`) AND
+      julianday(`persisted_at`) < julianday(`persistence_deadline_at`) AND
       julianday(`persisted_at`) < julianday(`kickoff_at`)
     ) OR
     (
@@ -558,7 +558,8 @@ CREATE TRIGGER `engine_origin_records_v2_publication_guard`
       AND (
         (
           NEW.`timing` = 'timely' AND NEW.`prospective_eligible` = 1 AND
-          origin.`eligible` = 1 AND origin.`eligibility_reason` = 'eligible'
+          origin.`eligible` = 1 AND origin.`eligibility_reason` = 'eligible' AND
+          julianday(NEW.`persisted_at`) < julianday(NEW.`persistence_deadline_at`)
         ) OR
         (
           NEW.`timing` = 'late' AND NEW.`prospective_eligible` = 0 AND
@@ -612,6 +613,6 @@ CREATE TRIGGER `engine_origin_records_v2_no_delete`
 INSERT INTO `engine_schema_versions` (`version`, `migration_hash`, `applied_at`)
 VALUES (
   '0016_engine_os_interim_scheduler',
-  'sha256:3e6da5c8f0d8150a79f600d381516b8c36ed8a6c04f853f7af42fdeb8c6fab1a',
+  'sha256:bad6665a2976440b108e1c0223d01dab3a0313283b8d2e08f0eb509ef57edcb2',
   strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
 );

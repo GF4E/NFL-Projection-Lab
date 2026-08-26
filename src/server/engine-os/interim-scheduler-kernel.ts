@@ -1,5 +1,5 @@
-import schedulerContractJson from "../../../config/interim-scheduler-contract-2026.v4.json";
-import cutoverContractJson from "../../../config/interim-scheduler-cutover-2026.v4.json";
+import schedulerContractJson from "../../../config/interim-scheduler-contract-2026.v5.json";
+import cutoverContractJson from "../../../config/interim-scheduler-cutover-2026.v5.json";
 import {
   engineOperatingContract,
   engineOsContractHashes,
@@ -70,7 +70,7 @@ const PUBLICATION_ORDERING = [
   "evidence_at_lte_generated_at",
   "generated_at_lte_persistence_requested_at",
   "persistence_requested_at_lte_database_persisted_at",
-  "persisted_at_lte_persistence_deadline_at",
+  "persisted_at_lt_persistence_deadline_at",
   "persisted_at_lte_kickoff_minus_1_second"
 ] as const;
 const ACTIVATION_CURSOR_IDENTITY_FIELDS = [
@@ -197,7 +197,7 @@ export function validateInterimSchedulerContract(): InterimSchedulerValidation {
   const lifecycleReasons = footballLifecycle2026.dataFailureAndWithholding.approvedWithholdingCodes;
 
   if (
-    contract.version !== "interim-scheduler-contract.2026.4" ||
+    contract.version !== "interim-scheduler-contract.2026.5" ||
     contract.status !== "frozen_qualification" ||
     contract.effectiveSeason !== 2026 ||
     !/^\d{4}-\d{2}-\d{2}$/.test(contract.frozenOn)
@@ -289,6 +289,9 @@ export function validateInterimSchedulerContract(): InterimSchedulerValidation {
     !contract.publication.atomicTerminalInsertAndJobFinalizeRequired ||
     !sameValues(contract.publication.requiredSeparateTimes, PUBLICATION_TIMES) ||
     !sameValues(contract.publication.requiredOrdering, PUBLICATION_ORDERING) ||
+    contract.publication.prospectiveDeadlineBoundary !== "strict_open_upper_bound" ||
+    contract.publication.exactDeadlineBehavior !==
+      "late_nonprospective_late_origin_excluded" ||
     contract.publication.persistenceClock !== "max_of_application_request_and_database_statement" ||
     contract.publication.qualificationForecastStatusAllowed ||
     contract.publication.qualificationTerminalStatus !== "withheld" ||
@@ -376,8 +379,8 @@ export function validateInterimSchedulerContract(): InterimSchedulerValidation {
   const cutover = cutoverContractJson;
   if (
     schedulerContractJson.cutover.contractPath !==
-      "config/interim-scheduler-cutover-2026.v4.json" ||
-    cutover.version !== "interim-scheduler-cutover.2026.4" ||
+      "config/interim-scheduler-cutover-2026.v5.json" ||
+    cutover.version !== "interim-scheduler-cutover.2026.5" ||
     cutover.status !== "frozen_pre_cutover_contract" ||
     cutover.effectiveSeason !== 2026 ||
     cutover.sourceSchedulerContractVersion !== schedulerContractJson.version ||
@@ -398,6 +401,9 @@ export function validateInterimSchedulerContract(): InterimSchedulerValidation {
     cutover.recordBoundary.elapsedOrMissedOriginsReplayed ||
     cutover.recordBoundary.elapsedOrMissedOriginsProspective ||
     !cutover.recordBoundary.activationBoundaryMustRemainIdentical ||
+    cutover.recordBoundary.prospectiveDeadlineComparator !==
+      "persisted_at_strictly_before_persistence_deadline_at" ||
+    cutover.recordBoundary.exactDeadlineClassification !== "late_nonprospective" ||
     cutover.activationBoundary.qualificationCreatesProductionActivation ||
     !cutover.activationBoundary.captureMustRemainDisabledUntilSeparateApproval ||
     cutover.activationBoundary.twoPublishingSchedulersAllowed ||
@@ -638,7 +644,7 @@ export function mayRenewLease(input: {
   const now = timestampMilliseconds(input.now, "Lease renewal");
   const expiresAt = timestampMilliseconds(input.state.leaseExpiresAt, "Lease expiry");
   const deadline = timestampMilliseconds(input.persistenceDeadlineAt, "Persistence deadline");
-  return now < expiresAt && now <= deadline;
+  return now < expiresAt && now < deadline;
 }
 
 export function evaluatePublicationTiming(times: PublicationTimes): PublicationTimingResult {
@@ -655,7 +661,7 @@ export function evaluatePublicationTiming(times: PublicationTimes): PublicationT
   if (scheduled > generated) violations.push("generation_precedes_scheduled_trigger");
   if (evidence > generated) violations.push("evidence_postdates_generation");
   if (generated > persisted) violations.push("generation_postdates_persistence");
-  if (persisted > deadline) violations.push("persistence_missed_deadline");
+  if (persisted >= deadline) violations.push("persistence_missed_deadline");
   if (persisted > kickoff - schedulerContractJson.clock.forecastMustPrecedeKickoffSeconds * 1_000) {
     violations.push("persistence_not_before_kickoff");
   }

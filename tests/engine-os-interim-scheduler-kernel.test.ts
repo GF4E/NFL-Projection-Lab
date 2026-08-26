@@ -87,9 +87,9 @@ describe("OS-15A frozen interim scheduler kernel", () => {
     ]);
   });
 
-  it("binds the frozen cutover contract and v4 amendment manifest to exact bytes and canonical content", () => {
+  it("binds the frozen cutover contract and v5 deadline amendment manifest to exact bytes and canonical content", () => {
     const manifest = JSON.parse(readFileSync(resolve(
-      process.cwd(), "config/engine-os-contract-manifest.v5.json"
+      process.cwd(), "config/engine-os-contract-manifest.v6.json"
     ), "utf8")) as {
       version: string;
       artifacts: Array<{
@@ -100,7 +100,7 @@ describe("OS-15A frozen interim scheduler kernel", () => {
         canonicalContentSha256: string;
       }>;
     };
-    expect(manifest.version).toBe("engine-os-contract-manifest.2026.5");
+    expect(manifest.version).toBe("engine-os-contract-manifest.2026.6");
     expect(manifest.artifacts.map((artifact) => artifact.task)).toEqual([
       "OS-00B", "R0", "R18A", "OS-15A", "OS-15A-CUTOVER"
     ]);
@@ -111,7 +111,7 @@ describe("OS-15A frozen interim scheduler kernel", () => {
       expect(stableHash(parsed)).toBe(artifact.canonicalContentSha256);
     }
     expect(interimSchedulerCutoverContract.version)
-      .toBe("interim-scheduler-cutover.2026.4");
+      .toBe("interim-scheduler-cutover.2026.5");
     expect(interimSchedulerCutoverContractHash)
       .toBe(manifest.artifacts.find((artifact) => artifact.task === "OS-15A-CUTOVER")!
         .canonicalContentSha256);
@@ -122,7 +122,9 @@ describe("OS-15A frozen interim scheduler kernel", () => {
       onlyFuturePendingCurrentHeadsTransfer: true,
       elapsedOrMissedOriginsReplayed: false,
       elapsedOrMissedOriginsProspective: false,
-      activationBoundaryMustRemainIdentical: true
+      activationBoundaryMustRemainIdentical: true,
+      prospectiveDeadlineComparator: "persisted_at_strictly_before_persistence_deadline_at",
+      exactDeadlineClassification: "late_nonprospective"
     });
     expect(interimSchedulerCutoverContract.leaseBoundary).toEqual({
       nonexpiredLeaseBehavior: "block_cutover",
@@ -374,6 +376,12 @@ describe("OS-15A frozen interim scheduler kernel", () => {
       now: "2026-09-13T19:06:30Z",
       persistenceDeadlineAt: "2026-09-13T19:15:00Z"
     })).toBe(false);
+    expect(mayRenewLease({
+      state: lease({ leaseExpiresAt: "2026-09-13T19:16:30Z" }),
+      authority,
+      now: "2026-09-13T19:15:00Z",
+      persistenceDeadlineAt: "2026-09-13T19:15:00Z"
+    })).toBe(false);
 
     expect(mayPublishTerminalRecord({
       state,
@@ -417,6 +425,9 @@ describe("OS-15A frozen interim scheduler kernel", () => {
       "evidence_postdates_generation",
       "persistence_missed_deadline"
     ]);
+    expect(evaluatePublicationTiming(times({
+      persistedAt: "2026-09-13T19:15:00Z"
+    })).violations).toContain("persistence_missed_deadline");
     expect(evaluatePublicationTiming(times({
       persistenceDeadlineAt: "2026-09-13T20:05:00Z",
       persistedAt: "2026-09-13T20:05:00Z"

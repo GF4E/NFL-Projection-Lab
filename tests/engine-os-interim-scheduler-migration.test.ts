@@ -80,7 +80,7 @@ function insertJob(db: DatabaseSync, input: {
     job_key, scheduler_contract_version, scheduler_contract_hash, job_key_version, job_type,
     origin_version_id, scheduled_trigger_at, kickoff_at, persistence_deadline_at,
     activation_boundary, state, created_at
-  ) VALUES (?, 'interim-scheduler-contract.2026.3', ?, 'engine-os.scheduler-job.v2',
+  ) VALUES (?, 'interim-scheduler-contract.2026.5', ?, 'engine-os.scheduler-job.v2',
     'forecast_or_withholding', ?, ?, ?, ?, 'os15a-test', 'pending', ?)`)
     .run(
       input.jobKey ?? "job:base",
@@ -131,7 +131,7 @@ function insertRecord(db: DatabaseSync, input: {
     persistence_deadline_at, kickoff_at, timing,
     prospective_eligible, capture_health, activation_boundary, attempt_token_hash,
     fence_token, qualification_only, payload_json
-  ) VALUES (?, ?, ?, ?, 'interim-scheduler-contract.2026.3', ?, 'withheld', ?,
+  ) VALUES (?, ?, ?, ?, 'interim-scheduler-contract.2026.5', ?, 'withheld', ?,
     '2026-09-13T18:05:00Z', ?, ?, ?, ?, ?, ?, '2026-09-13T20:05:00Z', ?, ?,
     'unavailable', 'os15a-test', ?, ?, 1, '{}')`)
     .run(
@@ -162,7 +162,7 @@ describe("OS-15A additive scheduler migration", () => {
       tick_key, scheduler_contract_version, scheduler_contract_hash, tick_key_version,
       lane, nominal_scheduled_at, invoked_at, evidence_at, persisted_at, state,
       fence_token, heartbeat_at, completed_at
-    ) VALUES ('fabricated', 'interim-scheduler-contract.2026.3', ?,
+    ) VALUES ('fabricated', 'interim-scheduler-contract.2026.5', ?,
       'engine-os.scheduler-tick.v1', 'dispatcher', '2026-09-13T18:05:00Z',
       '2026-09-13T18:05:01Z', '2026-09-13T18:05:01Z', '2026-09-13T18:05:01Z',
       'completed', 1, '2026-09-13T18:05:01Z', '2026-09-13T18:05:01Z')`)
@@ -173,7 +173,7 @@ describe("OS-15A additive scheduler migration", () => {
       lane, nominal_scheduled_at, invoked_at, evidence_at, persisted_at, state,
       attempt_token_hash, fence_token, lease_owner, lease_acquired_at, lease_expires_at,
       heartbeat_at
-    ) VALUES ('tick:valid', 'interim-scheduler-contract.2026.3', ?,
+    ) VALUES ('tick:valid', 'interim-scheduler-contract.2026.5', ?,
       'engine-os.scheduler-tick.v1', 'dispatcher', '2026-09-13T18:05:00Z',
       '2026-09-13T18:05:01Z', '2026-09-13T18:05:01Z', '2026-09-13T18:05:01Z',
       'running', ?, 1, 'worker', '2026-09-13T18:05:01Z',
@@ -197,7 +197,7 @@ describe("OS-15A additive scheduler migration", () => {
       persistence_deadline_at, activation_boundary, state, fence_token,
       active_attempt_token_hash, lease_owner, lease_acquired_at, lease_expires_at,
       heartbeat_at, created_at
-    ) VALUES ('job:fabricated', 'interim-scheduler-contract.2026.3', ?,
+    ) VALUES ('job:fabricated', 'interim-scheduler-contract.2026.5', ?,
       'engine-os.scheduler-job.v2', 'forecast_or_withholding',
       '2026_01_NE_SEA:kickoff_minus_120:v1', '2026-09-13T18:05:00Z',
       '2026-09-13T20:05:00Z', '2026-09-13T18:15:00Z', 'os15a-test',
@@ -314,7 +314,7 @@ describe("OS-15A additive scheduler migration", () => {
     db.close();
   });
 
-  it("permits eligible nonprospective closure at the exact persistence deadline", () => {
+  it("rejects timely equality and permits only eligible nonprospective closure at the exact deadline", () => {
     const db = database();
     seedOrigin(db);
     insertJob(db);
@@ -324,6 +324,18 @@ describe("OS-15A additive scheduler migration", () => {
       acquiredAt: "2026-09-13T18:15:00Z",
       expiresAt: "2026-09-13T18:16:30Z"
     });
+    expect(() => insertRecord(db, {
+      recordId: "exact-deadline-timely-record",
+      token,
+      fence: 1,
+      invokedAt: "2026-09-13T18:15:00Z",
+      evidenceAt: "2026-09-13T18:15:00Z",
+      generatedAt: "2026-09-13T18:15:00Z",
+      persistedAt: "2026-09-13T18:15:00Z",
+      reason: "no_eligible_package",
+      timing: "timely",
+      prospective: 1
+    })).toThrow(/CHECK constraint|live fenced lease/);
     insertRecord(db, {
       recordId: "exact-deadline-record",
       token,
@@ -402,7 +414,7 @@ describe("OS-15A additive scheduler migration", () => {
       prospective_eligible, capture_health, activation_boundary, attempt_token_hash,
       fence_token, qualification_only, payload_json
     ) VALUES ('forecast', ?, 'job:base', '2026_01_NE_SEA:kickoff_minus_120:v1',
-      'interim-scheduler-contract.2026.3', ?, 'forecast', 'no_eligible_package',
+      'interim-scheduler-contract.2026.5', ?, 'forecast', 'no_eligible_package',
       '2026-09-13T18:05:00Z', '2026-09-13T18:05:10Z', '2026-09-13T18:05:20Z',
       '2026-09-13T18:05:25Z', '2026-09-13T18:05:30Z', '2026-09-13T18:05:30Z',
       '2026-09-13T18:15:00Z',
@@ -418,7 +430,7 @@ describe("OS-15A additive scheduler migration", () => {
       lane, nominal_scheduled_at, invoked_at, evidence_at, persisted_at, state,
       attempt_token_hash, fence_token, lease_owner, lease_acquired_at, lease_expires_at,
       heartbeat_at
-    ) VALUES ('tick:malformed', 'interim-scheduler-contract.2026.3', ?,
+    ) VALUES ('tick:malformed', 'interim-scheduler-contract.2026.5', ?,
       'engine-os.scheduler-tick.v1', 'dispatcher', 'not-a-time',
       '2026-09-13T18:05:01Z', '2026-09-13T18:05:01Z', '2026-09-13T18:05:01Z',
       'running', ?, 1, 'worker', '2026-09-13T18:05:01Z',
@@ -484,7 +496,7 @@ describe("OS-15A additive scheduler migration", () => {
       lane, nominal_scheduled_at, invoked_at, evidence_at, persisted_at, state,
       attempt_token_hash, fence_token, lease_owner, lease_acquired_at, lease_expires_at,
       heartbeat_at
-    ) VALUES ('tick:retained', 'interim-scheduler-contract.2026.4', ?,
+    ) VALUES ('tick:retained', 'interim-scheduler-contract.2026.5', ?,
       'engine-os.scheduler-tick.v1', 'dispatcher', '2026-09-13T18:05:00Z',
       '2026-09-13T18:05:01Z', '2026-09-13T18:05:01Z', '2026-09-13T18:05:01Z',
       'running', ?, 1, 'worker', '2026-09-13T18:05:01Z',

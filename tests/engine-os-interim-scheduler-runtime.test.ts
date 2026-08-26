@@ -255,7 +255,7 @@ function insertPendingJob(sqlite: DatabaseSync, input: {
     job_key, scheduler_contract_version, scheduler_contract_hash, job_key_version, job_type,
     origin_version_id, scheduled_trigger_at, kickoff_at, persistence_deadline_at,
     activation_boundary, state, created_at
-  ) VALUES (?, 'interim-scheduler-contract.2026.4', ?, 'engine-os.scheduler-job.v2',
+  ) VALUES (?, 'interim-scheduler-contract.2026.5', ?, 'engine-os.scheduler-job.v2',
     'forecast_or_withholding', ?, ?, ?, ?, ?, 'pending', ?)`)
     .run(
       jobKey,
@@ -765,6 +765,35 @@ describe("OS-15A provider-free scheduler runtime", () => {
       prospective_eligible: 0,
       after_deadline: 1
     });
+    sqlite.close();
+  });
+
+  it("rejects the opposite timely form when persistence equals the exact deadline", async () => {
+    const { sqlite, db } = database();
+    seedSchedule(sqlite, { gameId: "exact-deadline-timely", horizons: ["kickoff_minus_120"] });
+    const jobKey = insertPendingJob(sqlite, { gameId: "exact-deadline-timely" });
+    const beforeDeadline = new Date("2026-09-13T18:14:59Z");
+    const exactDeadline = new Date("2026-09-13T18:15:00Z");
+    const lease = await claimInterimSchedulerJob({
+      db,
+      job: job(sqlite, jobKey),
+      prospective: true,
+      invokedAt: beforeDeadline,
+      tokenFactory: () => "exact-deadline-timely-attempt",
+      owner: "worker:exact-deadline-timely"
+    });
+    expect(lease).not.toBeNull();
+    await expect(publishInterimSchedulerWithholding({
+      db,
+      lease: lease!,
+      reason: "no_eligible_package",
+      prospective: true,
+      evidenceAt: beforeDeadline,
+      generatedAt: beforeDeadline,
+      persistedAt: exactDeadline
+    })).rejects.toThrow();
+    expect(sqlite.prepare(`SELECT count(*) AS count FROM engine_origin_records_v2`).get())
+      .toEqual({ count: 0 });
     sqlite.close();
   });
 
