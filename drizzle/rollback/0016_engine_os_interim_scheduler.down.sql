@@ -1,6 +1,9 @@
-CREATE TEMP TABLE IF NOT EXISTS `_os15a_rollback_guard` (`guard` integer NOT NULL);
+-- Cloudflare D1 rejects ephemeral schema writes with SQLITE_AUTH.  Use an
+-- ordinary guard table inside D1's implicit file transaction instead.  A
+-- refused rollback unwinds its creation; a permitted rollback drops it below.
+CREATE TABLE IF NOT EXISTS `_os15a_rollback_guard` (`guard` integer NOT NULL);
 DROP TRIGGER IF EXISTS `_os15a_rollback_requires_empty`;
-CREATE TEMP TRIGGER `_os15a_rollback_requires_empty`
+CREATE TRIGGER `_os15a_rollback_requires_empty`
   BEFORE INSERT ON `_os15a_rollback_guard`
   WHEN
     EXISTS (SELECT 1 FROM `engine_scheduler_ticks_v2` LIMIT 1) OR

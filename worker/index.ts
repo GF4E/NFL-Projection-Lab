@@ -15,26 +15,16 @@ import {
   type InterimSchedulerLane
 } from "../src/server/engine-os/interim-scheduler-kernel";
 import { runInterimSchedulerInvocation } from "../src/server/engine-os/interim-scheduler";
+import {
+  readCaptureGate,
+  readDatabaseBinding,
+  selectFrameworkAssetBindings,
+  selectImageBindings,
+  type PublicDataEnv,
+  type WorkerRuntimeEnv
+} from "./env-boundary";
 
-interface AssetFetcher {
-  fetch(request: Request): Promise<Response>;
-}
-
-interface Env {
-  ASSETS: AssetFetcher;
-  DB: D1Database;
-  EVIDENCE: R2Bucket;
-  ENGINE_OS_CAPTURE_ENABLED?: string;
-  IMAGES: {
-    input(stream: ReadableStream): {
-      transform(options: Record<string, unknown>): {
-        output(options: { format: string; quality: number }): Promise<{ response(): Response }>;
-      };
-    };
-  };
-}
-
-async function handlePropsRequest(request: Request, env: Env): Promise<Response> {
+async function handlePropsRequest(request: Request, env: PublicDataEnv): Promise<Response> {
   if (request.method !== "GET") return json({ error: "Public access is read-only" }, 405, { allow: "GET" });
   const gameId = new URL(request.url).searchParams.get("gameId");
   if (!gameId) return json({ error: "gameId is required" }, 400);
@@ -65,7 +55,7 @@ function json(payload: unknown, status = 200, headers?: HeadersInit): Response {
   });
 }
 
-async function handleNflverseRequest(request: Request, env: Env): Promise<Response> {
+async function handleNflverseRequest(request: Request, env: PublicDataEnv): Promise<Response> {
   if (request.method !== "GET") {
     return json({ error: "Public access is read-only" }, 405, { allow: "GET" });
   }
@@ -81,9 +71,9 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
 }
 
 const worker = {
-  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+  async fetch(request: Request, env: WorkerRuntimeEnv, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
-    const readDb = readOnlyD1(env.DB);
+    const readDb = readOnlyD1(readDatabaseBinding(env));
     // Vinext resolves module-level Cloudflare bindings itself, so replacing DB
     // in its handler argument is not a security boundary. Deny every mutating
     // HTTP method before routing and handle every public API path explicitly.
@@ -93,7 +83,7 @@ const worker = {
     // Keep automation control outside the framework router so cron, browser wakeups,
     // and production deployments all reach the same Cloudflare-bound D1 database.
     if (url.pathname === "/api/nflverse") {
-      return handleNflverseRequest(request, { ...env, DB: readDb });
+      return handleNflverseRequest(request, { DB: readDb });
     }
     if (url.pathname === "/api/model-lifecycle") {
       return json({ error: "Public access is read-only" }, 405, { allow: "" });
@@ -136,7 +126,7 @@ const worker = {
       }
     }
     if (url.pathname === "/api/props") {
-      return handlePropsRequest(request, { ...env, DB: readDb });
+      return handlePropsRequest(request, { DB: readDb });
     }
     if (url.pathname === "/api/lines") {
       try {
@@ -185,11 +175,12 @@ const worker = {
       });
     }
     if (url.pathname === "/_vinext/image") {
+      const imageBindings = selectImageBindings(env);
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
       return handleImageOptimization(request, {
-        fetchAsset: (path) => env.ASSETS.fetch(new Request(new URL(path, request.url))),
+        fetchAsset: (path) => imageBindings.ASSETS.fetch(new Request(new URL(path, request.url))),
         transformImage: async (body, { width, format, quality }) => {
-          const result = await env.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format, quality });
+          const result = await imageBindings.IMAGES.input(body).transform(width > 0 ? { width } : {}).output({ format, quality });
           return result.response();
         }
       }, allowedWidths);
@@ -201,21 +192,21 @@ const worker = {
     // every mutating method have already been terminated above.
     return handler.fetch(
       request,
-      { ...env, DB: readDb } as unknown as Parameters<typeof handler.fetch>[1],
+      selectFrameworkAssetBindings(env),
       ctx
     );
   },
-  async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+  async scheduled(controller: ScheduledController, env: WorkerRuntimeEnv, ctx: ExecutionContext): Promise<void> {
     // OS-15A remains dormant in production. Even after a future explicit gate,
     // this entrypoint can run only the provider-free qualification scheduler;
     // provider acquisition and model execution are absent from its source graph.
-    if (env.ENGINE_OS_CAPTURE_ENABLED !== "true") return;
+    if (readCaptureGate(env) !== "true") return;
     const lane: InterimSchedulerLane | null =
       controller.cron === interimSchedulerContract.clock.dispatcherCron ? "dispatcher" :
         controller.cron === interimSchedulerContract.clock.watchdogCron ? "watchdog" : null;
     if (!lane) return;
     ctx.waitUntil(runInterimSchedulerInvocation({
-      db: env.DB,
+      db: readDatabaseBinding(env),
       lane,
       // Controller time identifies the deterministic trigger only. Invocation,
       // evidence, generation, and persistence are sampled separately in service.

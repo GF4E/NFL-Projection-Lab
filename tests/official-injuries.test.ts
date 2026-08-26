@@ -82,7 +82,7 @@ describe("official NFL injury importer", () => {
     const maintenance = readFileSync("src/server/background-maintenance.ts", "utf8");
     const navigation = readFileSync("src/components/nav-links.tsx", "utf8");
     expect(worker).toContain("runInterimSchedulerInvocation");
-    expect(worker).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(worker).toContain('readCaptureGate(env) !== "true"');
     expect(worker).not.toContain("runBackgroundMaintenance");
     expect(maintenance).toContain("runOfficialInjuryAutomation");
     expect(worker).toContain('/api/game-context');

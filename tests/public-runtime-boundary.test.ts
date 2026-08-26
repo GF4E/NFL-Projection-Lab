@@ -2,6 +2,13 @@ import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it, vi } from "vitest";
 import { readOnlyD1 } from "@/server/read-only-d1";
 import { runJob } from "@/server/jobs/runner";
+import {
+  readCaptureGate,
+  readDatabaseBinding,
+  selectFrameworkAssetBindings,
+  selectImageBindings,
+  type WorkerRuntimeEnv
+} from "../worker/env-boundary";
 
 function fakeStatement(): D1PreparedStatement {
   const statement = {
@@ -57,7 +64,7 @@ describe("public runtime boundary", () => {
     const fetchLane = source.slice(source.indexOf("async fetch"), source.indexOf("async scheduled"));
     const scheduledLane = source.slice(source.indexOf("async scheduled"));
 
-    expect(fetchLane).toContain("readOnlyD1(env.DB)");
+    expect(fetchLane).toContain("readOnlyD1(readDatabaseBinding(env))");
     expect(fetchLane).toContain('request.method !== "GET" && request.method !== "HEAD"');
     expect(fetchLane).toContain('url.pathname.startsWith("/api/")');
     expect(fetchLane).toContain('url.pathname === "/api/lines"');
@@ -67,12 +74,18 @@ describe("public runtime boundary", () => {
     expect(fetchLane).not.toContain("runModelLifecycleAutomation");
     expect(fetchLane).toContain("DB: readDb");
     expect(scheduledLane).toContain("runInterimSchedulerInvocation");
-    expect(scheduledLane).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(scheduledLane).toContain('readCaptureGate(env) !== "true"');
     expect(scheduledLane).toContain("controller.scheduledTime");
     expect(scheduledLane).toContain("controller.cron");
     expect(scheduledLane).not.toContain("runBackgroundMaintenance");
     expect(scheduledLane).not.toContain("apiKey");
     expect(scheduledLane).not.toContain("runModelLifecycleAutomation");
+
+    const forbiddenEnvSpread = /\.\.\.\s*env\b/;
+    expect(source).not.toMatch(forbiddenEnvSpread);
+    const buildVerifier = readFileSync("scripts/verify_active_build_graph.py", "utf8");
+    expect(buildVerifier).toContain("WHOLE_ENV_SPREAD_PATTERN");
+    expect(buildVerifier.match(/WHOLE_ENV_SPREAD_PATTERN\.search\(data\)/g)).toHaveLength(2);
 
     const scheduler = readFileSync("src/server/engine-os/interim-scheduler.ts", "utf8");
     expect(scheduler).not.toMatch(/odds|apiKey|fetch\(|R2Bucket|runBackgroundMaintenance|provider\//i);
@@ -86,6 +99,45 @@ describe("public runtime boundary", () => {
     expect(maintenance).not.toContain("expireStaleTeamDrafts");
     expect(maintenance).not.toContain("settleCompletedTeamPlays");
     expect(maintenance).not.toContain("runModelLifecycleAutomation");
+  });
+
+  it("selects only named public and scheduler bindings without touching a hidden provider secret", () => {
+    const { database } = fakeDatabase();
+    const assets = { fetch: vi.fn(async () => new Response("asset")) };
+    const images = {
+      input: vi.fn(() => ({
+        transform: vi.fn(() => ({
+          output: vi.fn(async () => ({ response: () => new Response("image") }))
+        }))
+      }))
+    };
+    const target = {
+      ASSETS: assets,
+      DB: database,
+      ENGINE_OS_CAPTURE_ENABLED: undefined,
+      IMAGES: images
+    };
+    Object.defineProperty(target, "ODDS_API_KEY", {
+      configurable: false,
+      enumerable: true,
+      get(): never {
+        throw new Error("hidden ODDS_API_KEY binding was read");
+      }
+    });
+    const accessed = new Set<PropertyKey>();
+    const env = new Proxy(target, {
+      get(object, property, receiver) {
+        accessed.add(property);
+        return Reflect.get(object, property, receiver);
+      }
+    }) as unknown as WorkerRuntimeEnv;
+
+    expect(readDatabaseBinding(env)).toBe(database);
+    expect(readCaptureGate(env)).toBeUndefined();
+    expect(selectFrameworkAssetBindings(env)).toEqual({ ASSETS: assets });
+    expect(selectImageBindings(env)).toEqual({ ASSETS: assets, IMAGES: images });
+    expect(accessed).toEqual(new Set(["DB", "ENGINE_OS_CAPTURE_ENABLED", "ASSETS", "IMAGES"]));
+    expect(() => Reflect.get(env as object, "ODDS_API_KEY")).toThrow(/hidden ODDS_API_KEY/);
   });
 
   it("quarantines the obsolete Supabase orchestration path before I/O", async () => {

@@ -256,7 +256,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(completeImport(failed, [4], "2026-09-16").freshness).toBe("current");
     expect(readFileSync("src/app/api/nflverse/route.ts", "utf8")).toContain("Public access is read-only");
     const worker = readFileSync("worker/index.ts", "utf8");
-    expect(worker).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(worker).toContain('readCaptureGate(env) !== "true"');
     expect(worker).not.toContain("runModelLifecycleAutomation");
     expect(worker).not.toContain("scheduledMaintenanceLane");
   });
@@ -745,11 +745,11 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(readFileSync("src/app/api/lines/route.ts", "utf8")).toContain("lines refresh automatically");
     const worker = readFileSync("worker/index.ts", "utf8");
     const fetchLane = worker.slice(worker.indexOf("async fetch"), worker.indexOf("async scheduled"));
-    expect(fetchLane).toContain("readOnlyD1(env.DB)");
+    expect(fetchLane).toContain("readOnlyD1(readDatabaseBinding(env))");
     expect(fetchLane).not.toContain("runBackgroundMaintenance");
     const scheduledLane = worker.slice(worker.indexOf("async scheduled"));
     expect(scheduledLane).toContain("runInterimSchedulerInvocation");
-    expect(scheduledLane).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(scheduledLane).toContain('readCaptureGate(env) !== "true"');
     expect(scheduledLane).not.toContain("runBackgroundMaintenance");
     expect(worker).not.toContain("ctx.waitUntil(runScheduledOddsAutomation");
     expect(worker).not.toContain('request.headers.has("oai-authenticated-user-email")');
@@ -1010,7 +1010,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(weatherAutomation).toContain("eligible.map(({ gameId }) => gameId)");
     const worker = readFileSync("worker/index.ts", "utf8");
     expect(worker).toContain("runInterimSchedulerInvocation");
-    expect(worker).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(worker).toContain('readCaptureGate(env) !== "true"');
     expect(worker).not.toContain("runBackgroundMaintenance");
     expect(worker).not.toContain("runModelLifecycleAutomation");
     expect(worker).not.toContain("scheduledMaintenanceLane");

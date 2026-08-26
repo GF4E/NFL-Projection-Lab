@@ -19,6 +19,11 @@ SOURCE_PATTERNS = {
     ),
 }
 
+# A whole-environment spread enumerates and reads every binding, including
+# credentials which the active lane did not ask for. Public and scheduled code
+# must instead construct narrow allowlisted binding objects.
+WHOLE_ENV_SPREAD_PATTERN = re.compile(rb"\.\.\.\s*env\b")
+
 BUILD_MARKERS = (
     b"@supabase/",
     b"supabase-js",
@@ -93,6 +98,8 @@ def main() -> int:
             for label, pattern in SOURCE_PATTERNS.items():
                 if pattern.search(data):
                     errors.append(f"{label} in active source: {path.relative_to(root)}")
+            if WHOLE_ENV_SPREAD_PATTERN.search(data):
+                errors.append(f"whole environment spread in active source: {path.relative_to(root)}")
 
     for relative in (".env.example", ".openai/hosting.json", "wrangler.json", "wrangler.jsonc", "wrangler.toml"):
         path = root / relative
@@ -112,6 +119,8 @@ def main() -> int:
             for marker in BUILD_MARKERS:
                 if marker in data:
                     errors.append(f"retired runtime marker {marker.decode()} bundled in {path.relative_to(root)}")
+            if WHOLE_ENV_SPREAD_PATTERN.search(data):
+                errors.append(f"whole environment spread bundled in {path.relative_to(root)}")
 
     payload = {
         "status": "pass" if not errors else "fail",

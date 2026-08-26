@@ -150,7 +150,7 @@ describe("automatic nflverse importer", () => {
     expect(viteConfig).not.toContain('"*/5 * * * *"');
     expect(worker).toContain("async scheduled");
     expect(worker).toContain("runInterimSchedulerInvocation");
-    expect(worker).toContain('ENGINE_OS_CAPTURE_ENABLED !== "true"');
+    expect(worker).toContain('readCaptureGate(env) !== "true"');
     expect(worker).not.toContain("runBackgroundMaintenance");
     expect(readFileSync("src/components/nflverse-refresh-beacon.tsx", "utf8")).toContain('method: "GET"');
     expect(readFileSync("src/components/nflverse-refresh-beacon.tsx", "utf8")).not.toContain('method: "POST"');
