@@ -667,6 +667,17 @@ async function commitCapture(input: {
         WHERE capture_id = ? AND provider = ? AND dataset = ? AND idempotency_key = ?
           AND request_hash = ? AND response_sha256 = ? AND response_bytes = ?
           AND sidecar_object_key = ? AND sidecar_sha256 = ? AND evidence_hash = ?
+      ) AND NOT EXISTS (
+        SELECT 1 FROM source_capture_events detected
+        WHERE detected.event_type = 'orphan_detected'
+          AND json_extract(detected.payload_json, '$.objectKey') IN (?, ?)
+          AND NOT EXISTS (
+            SELECT 1 FROM source_capture_events removed
+            WHERE removed.event_type = 'orphan_removed'
+              AND json_extract(removed.payload_json, '$.objectKey') =
+                json_extract(detected.payload_json, '$.objectKey')
+              AND removed.occurred_at >= detected.occurred_at
+          )
       )`).bind(
       input.extension.captureId,
       OS03A_EFFECTIVE_CONTRACT_VERSION,
@@ -698,7 +709,9 @@ async function commitCapture(input: {
       sidecar.responseBytes,
       input.sidecarObjectKey,
       input.sidecarSha256,
-      sidecar.evidenceHash
+      sidecar.evidenceHash,
+      sidecar.responseObjectKey,
+      input.sidecarObjectKey
     ),
     eventInsertStatement({
       db: input.db,

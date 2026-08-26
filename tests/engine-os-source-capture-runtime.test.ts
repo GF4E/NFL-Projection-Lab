@@ -88,6 +88,7 @@ class MemoryR2 {
   failOnPutNumber: number | null = null;
   puts = 0;
   deletes = 0;
+  beforeDelete: (() => Promise<void>) | null = null;
   clock = new Date("2026-08-20T00:00:00.000Z");
 
   async head(key: string) {
@@ -138,6 +139,7 @@ class MemoryR2 {
 
   async delete(key: string) {
     this.deletes += 1;
+    if (this.beforeDelete) await this.beforeDelete();
     this.objects.delete(key);
   }
 }
@@ -622,6 +624,44 @@ describe("OS-03A provider-independent immutable capture runtime", () => {
     expect(bucket.objects.has(orphanKey)).toBe(false);
     expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_events WHERE event_type LIKE 'orphan_%'"))
       .toBe(2);
+    sqlite.close();
+  });
+
+  it("fences a publisher that races an active orphan tombstone before deletion", async () => {
+    const { sqlite, db } = database();
+    const bucket = new MemoryR2();
+    const input = captureInput(db, bucket, {
+      attemptToken: "attempt-racing-publisher",
+      idempotencyKey: "schedule:racing-publisher"
+    });
+    const responseKey = `raw/nflverse-fixture/schedule/sha256/${sha256Hex(input.responseBytes)}`;
+    await bucket.put(responseKey, input.responseBytes);
+    bucket.objects.get(responseKey)!.uploaded = new Date("2026-08-20T00:00:00.000Z");
+    let publisherError: unknown = null;
+    bucket.beforeDelete = async () => {
+      bucket.beforeDelete = null;
+      try {
+        await storeOs03aCapture(input);
+      } catch (error) {
+        publisherError = error;
+      }
+    };
+
+    await expect(sweepOs03aQualificationOrphan({
+      db,
+      bucket: bucket as unknown as R2Bucket,
+      qualificationOnly: true,
+      profileId: "fixture_nflverse_schedule_v1",
+      idempotencyKey: "orphan:racing-publisher",
+      attemptToken: "attempt-orphan-race",
+      objectKey: responseKey,
+      checkedAt: "2026-08-26T00:00:00.000Z"
+    })).resolves.toMatchObject({ status: "removed" });
+    expect(publisherError).toBeInstanceOf(Error);
+    expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_manifests")).toBe(0);
+    expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_manifest_extensions")).toBe(0);
+    expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_events WHERE event_type = 'capture_failed'"))
+      .toBe(1);
     sqlite.close();
   });
 });
