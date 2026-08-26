@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "engine-os.os-19a-sites-d1-migration-receipt.v1",
+  "generatedAt": "2026-08-26T01:41:40Z",
+  "status": "live_schema_pass_remaining_os19a_gates_pending",
+  "scope": "Exact migration 0014 application and fail-closed retirement evidence only",
+  "sites": {
+    "projectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+    "databaseBinding": "DB",
+    "migrationVersionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_4e5a3e42d518819193c56938f69709ba",
+    "migrationDeploymentId": "appgdep_6a8e42c7e14081919f70605558d1ee24",
+    "migrationDeploymentStatus": "succeeded",
+    "migrationEnvironmentRevision": 13,
+    "productionUrl": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site"
+  },
+  "migration": {
+    "version": "0014_odds_quota_reservations",
+    "source": "drizzle/0014_odds_quota_reservations.sql",
+    "definitionHash": "sha256:91bc1571f8873ccaeb8a2b8a9a8c2425370b4eec3c0931f1fa3ae02ffae56da1",
+    "statementCount": 11,
+    "appliedAt": "2026-08-26T01:35:48.026Z",
+    "invocation": "authenticated_one_shot_exact_migration",
+    "schedulerBridgeAttempted": true,
+    "schedulerBridgeObserved": false,
+    "schedulerBridgeConclusion": "No scheduled event was observed across two expected cron windows; it is not accepted as deployment evidence."
+  },
+  "verifiedLiveObjects": [
+    "odds_quota_control",
+    "odds_quota_epochs",
+    "odds_quota_events",
+    "odds_quota_reservation_events",
+    "odds_quota_reservations",
+    "odds_quota_state"
+  ],
+  "retirement": {
+    "migrationEnvironmentKeysRemoved": [
+      "ENGINE_OS_MIGRATION_0014_ENABLED",
+      "ENGINE_OS_MIGRATION_0014_TOKEN"
+    ],
+    "environmentRevisionAfterRemoval": 14,
+    "temporaryEndpointRemovedFromSource": true,
+    "temporaryScheduledBranchRemovedFromSource": true,
+    "cleanSourceDeploymentVerified": false
+  },
+  "credentialHandling": {
+    "replacementOddsKeyStagedByOwner": true,
+    "replacementOddsKeyInspectedByBuild": false,
+    "replacementOddsKeyBoundToSites": false,
+    "replacementOddsKeyUsed": false,
+    "captureEnabled": false,
+    "providerRequestMade": false
+  },
+  "claims": {
+    "liveMigrationReceiptVerified": true,
+    "requiredTableSetVerified": true,
+    "deployedContentionAndRollbackVerified": false,
+    "freshDashboardCounterBootstrapVerified": false,
+    "os19aAccepted": false,
+    "captureAuthorized": false
+  }
+}

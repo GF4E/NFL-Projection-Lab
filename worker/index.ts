@@ -11,7 +11,6 @@ import { listPregameContextStates } from "../src/server/pregame-context/store";
 import { runBackgroundMaintenance } from "../src/server/background-maintenance";
 import { getConfidenceEngineHealth } from "../src/server/confidence-engine/store";
 import { readOnlyD1 } from "../src/server/read-only-d1";
-import { applyOddsQuotaMigration } from "../src/server/engine-os/quota-migration";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -22,8 +21,6 @@ interface Env {
   DB: D1Database;
   EVIDENCE: R2Bucket;
   ENGINE_OS_CAPTURE_ENABLED?: string;
-  ENGINE_OS_MIGRATION_0014_ENABLED?: string;
-  ENGINE_OS_MIGRATION_0014_TOKEN?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -64,21 +61,6 @@ function json(payload: unknown, status = 200, headers?: HeadersInit): Response {
   });
 }
 
-async function migrationBearerMatches(request: Request, expected: string): Promise<boolean> {
-  const authorization = request.headers.get("authorization") ?? "";
-  const supplied = authorization.startsWith("Bearer ") ? authorization.slice("Bearer ".length) : "";
-  const encoder = new TextEncoder();
-  const [suppliedHash, expectedHash] = await Promise.all([
-    crypto.subtle.digest("SHA-256", encoder.encode(supplied)),
-    crypto.subtle.digest("SHA-256", encoder.encode(expected))
-  ]);
-  const left = new Uint8Array(suppliedHash);
-  const right = new Uint8Array(expectedHash);
-  let difference = supplied.length === expected.length ? 0 : 1;
-  for (let index = 0; index < left.length; index += 1) difference |= left[index]! ^ right[index]!;
-  return difference === 0;
-}
-
 async function handleNflverseRequest(request: Request, env: Env): Promise<Response> {
   if (request.method !== "GET") {
     return json({ error: "Public access is read-only" }, 405, { allow: "GET" });
@@ -98,21 +80,6 @@ const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const readDb = readOnlyD1(env.DB);
-    if (url.pathname === "/_ops/engine-os/migrate-0014") {
-      if (
-        request.method !== "POST" ||
-        env.ENGINE_OS_MIGRATION_0014_ENABLED !== "true" ||
-        !env.ENGINE_OS_MIGRATION_0014_TOKEN ||
-        !await migrationBearerMatches(request, env.ENGINE_OS_MIGRATION_0014_TOKEN)
-      ) {
-        return json({ error: "Not found" }, 404);
-      }
-      try {
-        return json(await applyOddsQuotaMigration(env.DB));
-      } catch (error) {
-        return json({ error: error instanceof Error ? error.message : "Migration failed" }, 503);
-      }
-    }
     // Vinext resolves module-level Cloudflare bindings itself, so replacing DB
     // in its handler argument is not a security boundary. Deny every mutating
     // HTTP method before routing and handle every public API path explicitly.
@@ -235,13 +202,6 @@ const worker = {
     );
   },
   async scheduled(_controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    // Temporary one-shot bridge. Sites exposes read-only D1 inspection but no
-    // operator migration command. This branch is removed after live receipt
-    // verification; it never reads a provider credential or starts capture.
-    if (env.ENGINE_OS_MIGRATION_0014_ENABLED === "true") {
-      ctx.waitUntil(applyOddsQuotaMigration(env.DB));
-      return;
-    }
     // OS-00 is deployed fail-closed. Capture/ledger activation is a separate
     // operator decision after credential rotation, quota bootstrap, migration
     // proof, and the remaining OS-02A/03A/13A gates. Never use the nominal cron

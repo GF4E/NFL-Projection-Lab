@@ -1,7 +1,7 @@
 {
   "schemaVersion": "engine-os.os-19a-local-qualification.v1",
   "generatedAt": "2026-08-25T18:03:20-07:00",
-  "status": "local_pass_deployed_d1_proof_pending",
+  "status": "local_pass_live_schema_pass_deployed_d1_falsification_pending",
   "scope": "Atomic The Odds API quota reservation and exact 2026 schedule budget only",
   "credentialHandling": {
     "ownerAttestation": "replacement_key_regenerated_and_staged",
@@ -56,6 +56,9 @@
   "database": {
     "migration": "drizzle/0014_odds_quota_reservations.sql",
     "migrationDefinitionSha256": "91bc1571f8873ccaeb8a2b8a9a8c2425370b4eec3c0931f1fa3ae02ffae56da1",
+    "liveMigrationApplied": true,
+    "liveMigrationAppliedAt": "2026-08-26T01:35:48.026Z",
+    "liveMigrationReceipt": ".planning/engine-os/execution/os-19a/sites-d1-migration-receipt.v1.json",
     "atomicReservation": true,
     "oneHolderDispatchToken": true,
     "appendOnlyTransitionEvents": true,
@@ -77,7 +80,6 @@
     "testsFailed": 0
   },
   "remainingActivationGates": [
-    "apply migration 0014 to deployed D1 before deploying dependent code",
     "repeat overlapping reservation and rollback falsification against deployed D1 with provider dispatch disabled",
     "attest the staged credential generation and current provider-dashboard used/remaining counters",
     "bootstrap the fresh quota epoch without making an Odds API request",
