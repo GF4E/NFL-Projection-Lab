@@ -65,7 +65,7 @@ export function oddsQuotaRequestClass(job: OddsAutomationJob): OddsQuotaRequestC
   }
 }
 
-function periodKeyAt(instant: string, resetOffsetMinutes: number): string {
+export function oddsQuotaPeriodKeyAt(instant: string, resetOffsetMinutes: number): string {
   const parsed = Date.parse(instant);
   if (!Number.isFinite(parsed)) throw new Error(`Invalid quota request instant: ${instant}`);
   return new Date(parsed + resetOffsetMinutes * 60_000).toISOString().slice(0, 7);
@@ -76,7 +76,7 @@ function alwaysPreserved(job: OddsAutomationJob): boolean {
     job === "tuesday_origin" || job === "kickoff_minus_15";
 }
 
-function requestPriority(job: OddsAutomationJob): number {
+export function oddsQuotaRequestPriority(job: OddsAutomationJob): number {
   switch (job) {
     case "open_sunday":
     case "open_monday":
@@ -108,13 +108,13 @@ function simulatePeriod(
   const unique = new Map(requests.map((request) => [request.key, request]));
   if (unique.size !== requests.length) throw new Error(`Duplicate quota request identity in ${periodKey}`);
   const ordered = [...requests].sort((left, right) =>
-    requestPriority(left.job) - requestPriority(right.job) ||
+    oddsQuotaRequestPriority(left.job) - oddsQuotaRequestPriority(right.job) ||
     left.scheduledFor.localeCompare(right.scheduledFor) || left.key.localeCompare(right.key));
   const allowedRequestKeys: string[] = [];
   const throttledRequestKeys: string[] = [];
   let projectedCredits = startingUsage;
   for (const request of ordered) {
-    const classCeiling = requestPriority(request.job) >= 2
+    const classCeiling = oddsQuotaRequestPriority(request.job) >= 2
       ? budget.alertAtCredits
       : budget.hardCeilingCredits;
     if (projectedCredits + request.cost <= classCeiling) {
@@ -153,7 +153,7 @@ export function simulateQuotaSchedule(input: {
     if (request.job === "props_minus_60") {
       throw new Error("Player props are excluded from the urgent OS-19A quota plan");
     }
-    const periodKey = periodKeyAt(request.scheduledFor, input.resetOffsetMinutes);
+    const periodKey = oddsQuotaPeriodKeyAt(request.scheduledFor, input.resetOffsetMinutes);
     const rows = periods.get(periodKey) ?? [];
     rows.push(request);
     periods.set(periodKey, rows);
@@ -191,7 +191,7 @@ export function requestAllowedAcrossResetScenarios(input: {
   if (!canonical) return false;
   return RESET_TIMEZONE_OFFSETS_MINUTES.every((resetOffsetMinutes) => {
     const simulation = simulateQuotaSchedule({ plan, resetOffsetMinutes });
-    const periodKey = periodKeyAt(canonical.scheduledFor, resetOffsetMinutes);
+    const periodKey = oddsQuotaPeriodKeyAt(canonical.scheduledFor, resetOffsetMinutes);
     return simulation.periods.find((period) => period.periodKey === periodKey)
       ?.allowedRequestKeys.includes(canonical.key) === true;
   });
@@ -210,14 +210,14 @@ export function futurePriorityReserveCredits(input: {
   const plan = scheduledSeasonMainlinePlan(input.games);
   const canonical = plan.find((request) => sameCandidateContract(request, input.candidate));
   if (!canonical) throw new Error("Unplanned Odds API request cannot consume reserved capacity");
-  const candidatePriority = requestPriority(input.candidate.job);
+  const candidatePriority = oddsQuotaRequestPriority(input.candidate.job);
   let maximum = 0;
   for (const resetOffsetMinutes of RESET_TIMEZONE_OFFSETS_MINUTES) {
-    const periodKey = periodKeyAt(input.candidate.scheduledFor, resetOffsetMinutes);
+    const periodKey = oddsQuotaPeriodKeyAt(input.candidate.scheduledFor, resetOffsetMinutes);
     const reserve = plan.filter((request) =>
-      periodKeyAt(request.scheduledFor, resetOffsetMinutes) === periodKey &&
+      oddsQuotaPeriodKeyAt(request.scheduledFor, resetOffsetMinutes) === periodKey &&
       request.scheduledFor > input.candidate.scheduledFor &&
-      requestPriority(request.job) < candidatePriority)
+      oddsQuotaRequestPriority(request.job) < candidatePriority)
       .reduce((sum, request) => sum + request.cost, 0);
     maximum = Math.max(maximum, reserve);
   }

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "engine-os.os-19a-local-qualification.v1",
-  "generatedAt": "2026-08-25T17:22:26-07:00",
+  "generatedAt": "2026-08-25T18:03:20-07:00",
   "status": "local_pass_deployed_d1_proof_pending",
   "scope": "Atomic The Odds API quota reservation and exact 2026 schedule budget only",
   "credentialHandling": {
@@ -63,12 +63,17 @@
     "ambiguousChargesConsumeCapacity": true,
     "laterCumulativeHeaderReconciliation": true,
     "monthlyResetEpochDetection": true,
-    "schedulePlanHashBoundToReservation": true
+    "schedulePlanHashBoundToReservation": true,
+    "normalizedScheduleHashVerifiedAtRuntime": true,
+    "exactApprovedRequestContractEnforced": true,
+    "providerWideSingleFlightDispatch": true,
+    "supersededEpochDispatchBlocked": true,
+    "lateUnknownResponseSettlementBlocked": true
   },
   "verifiedTests": {
     "command": "pnpm exec vitest run tests/odds-quota-reservation.test.ts tests/engine-os-urgent.test.ts tests/acceptance.test.ts",
     "filesPassed": 3,
-    "testsPassed": 98,
+    "testsPassed": 101,
     "testsFailed": 0
   },
   "remainingActivationGates": [

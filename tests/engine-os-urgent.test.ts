@@ -2,7 +2,6 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it, vi } from "vitest";
-import scheduleManifest from "../config/2026-nfl-schedule.v1.json";
 
 vi.mock("../db", () => ({
   getD1: () => {
@@ -19,6 +18,7 @@ import {
   tuesdayForecastOrigin,
   type ForecastProvenance
 } from "@/domain/engine-os";
+import { approvedOddsQuotaPlan } from "@/domain/odds-approved-plan";
 import { sha256Hex } from "@/domain/hash";
 import { storeRawCapture, storeRawCaptureStream, verifyStoredRawCapture } from "@/server/engine-os/capture";
 import {
@@ -391,6 +391,10 @@ describe("Engine OS urgent evidence and origin contracts", () => {
     }, sqliteD1(db));
     const rawBytes = new Uint8Array([0xef, 0xbb, 0xbf, 0x7b, 0x22, 0x62, 0x61, 0x64, 0x22, 0x3a, 0x7d]);
     const bucket = new MemoryR2();
+    const quotaContracts = approvedOddsQuotaPlan()
+      .filter((item) => item.candidate.job === "kickoff_minus_15");
+    const malformedContract = quotaContracts[0]!;
+    const httpErrorContract = quotaContracts[1]!;
 
     await expect(refreshCompleteSlateMainlines({
       apiKey: "redacted-test-key",
@@ -405,16 +409,16 @@ describe("Engine OS urgent evidence and origin contracts", () => {
           "x-requests-last": "3"
         }
       }),
-      snapshotKey: "charged-but-malformed",
+      snapshotKey: malformedContract.requestKey,
       fetchedAt: observedAt,
-      requestClass: "kickoff_minus_15",
-      futureReserveCredits: 0,
-      quotaPlanHash: scheduleManifest.quotaPlanSha256,
+      requestClass: malformedContract.requestClass,
+      futureReserveCredits: malformedContract.futureReserve,
+      quotaPlanHash: malformedContract.quotaPlanHash,
       evidenceBucket: bucket as unknown as R2Bucket
     })).rejects.toThrow();
 
     const manifest = db.prepare(`SELECT response_object_key, response_sha256, response_bytes
-      FROM source_capture_manifests WHERE idempotency_key = 'charged-but-malformed'`).get() as {
+      FROM source_capture_manifests WHERE idempotency_key = ?`).get(malformedContract.requestKey) as {
         response_object_key: string;
         response_sha256: string;
         response_bytes: number;
@@ -423,7 +427,7 @@ describe("Engine OS urgent evidence and origin contracts", () => {
     expect(manifest.response_bytes).toBe(rawBytes.byteLength);
     expect(bucket.objects.get(manifest.response_object_key)).toEqual(rawBytes);
     expect(db.prepare(`SELECT used, remaining, last_cost, response_capture_id IS NOT NULL AS linked
-      FROM odds_quota_events WHERE request_key = 'charged-but-malformed'`).get())
+      FROM odds_quota_events WHERE request_key = ?`).get(malformedContract.requestKey))
       .toEqual({ used: 12, remaining: 488, last_cost: 3, linked: 1 });
     expect(db.prepare(`SELECT status, failure_code FROM source_capture_heartbeats
       WHERE source_key = 'the-odds-api:odds'`).get())
@@ -443,30 +447,30 @@ describe("Engine OS urgent evidence and origin contracts", () => {
           "x-requests-last": "3"
         }
       }),
-      snapshotKey: "charged-http-error",
+      snapshotKey: httpErrorContract.requestKey,
       fetchedAt: new Date(Date.now() + 1_000).toISOString(),
-      requestClass: "kickoff_minus_15",
-      futureReserveCredits: 0,
-      quotaPlanHash: scheduleManifest.quotaPlanSha256,
+      requestClass: httpErrorContract.requestClass,
+      futureReserveCredits: httpErrorContract.futureReserve,
+      quotaPlanHash: httpErrorContract.quotaPlanHash,
       evidenceBucket: bucket as unknown as R2Bucket
     })).rejects.toThrow(/HTTP 429/);
     expect(db.prepare(`SELECT response_sha256 FROM source_capture_manifests
-      WHERE idempotency_key = 'charged-http-error'`).get())
+      WHERE idempotency_key = ?`).get(httpErrorContract.requestKey))
       .toEqual({ response_sha256: sha256Hex(errorBytes) });
     expect(db.prepare(`SELECT used, remaining, last_cost, response_capture_id IS NOT NULL AS linked
-      FROM odds_quota_events WHERE request_key = 'charged-http-error'`).get())
+      FROM odds_quota_events WHERE request_key = ?`).get(httpErrorContract.requestKey))
       .toEqual({ used: 15, remaining: 485, last_cost: 3, linked: 1 });
     expect(db.prepare(`SELECT status, failure_code FROM source_capture_heartbeats
       WHERE source_key = 'the-odds-api:odds'`).get())
       .toEqual({ status: "stale", failure_code: "provider_unavailable" });
     const immutableEvent = db.prepare(`SELECT captured_at, response_capture_id FROM odds_quota_events
-      WHERE request_key = 'charged-http-error'`).get() as { captured_at: string; response_capture_id: string };
+      WHERE request_key = ?`).get(httpErrorContract.requestKey) as { captured_at: string; response_capture_id: string };
     await expect(recordOddsQuota({
       used: 16,
       remaining: 484,
       lastCost: 1,
       updatedAt: immutableEvent.captured_at,
-      requestKey: "charged-http-error",
+      requestKey: httpErrorContract.requestKey,
       responseCaptureId: immutableEvent.response_capture_id
     }, sqliteD1(db))).rejects.toThrow(/collided/);
     expect(db.prepare("SELECT used, remaining FROM odds_quota_state WHERE provider = 'the-odds-api'").get())

@@ -1,6 +1,7 @@
 import { assessOddsQuota, type OddsQuotaPolicy } from "@/domain/engine-os";
 import { engineOperatingContract } from "@/domain/engine-os-contracts";
 import { stableHash } from "@/domain/hash";
+import { assertApprovedOddsQuotaReservation } from "@/domain/odds-approved-plan";
 import type { OddsQuotaRequestClass } from "@/domain/odds-quota-budget";
 
 const frozenBudget = engineOperatingContract.providerBudgets.theOddsApi;
@@ -200,9 +201,7 @@ export async function reserveOddsQuota(input: {
     !Number.isInteger(input.futureReserve) || input.futureReserve < 0) {
     throw new Error("Odds quota reservation costs must be non-negative integers");
   }
-  if (!/^[a-f0-9]{64}$/.test(input.quotaPlanHash)) {
-    throw new Error("Odds quota reservation requires the verified season-plan hash");
-  }
+  assertApprovedOddsQuotaReservation(input);
   const dispatchToken = crypto.randomUUID();
   const dispatchTokenHash = stableHash(dispatchToken);
   const cutoff = new Date(Date.parse(now) - ODDS_QUOTA_POLICY.stateMaxAgeMinutes * 60_000).toISOString();
@@ -331,15 +330,30 @@ async function transitionReservation(input: {
   const dispatchedAt = input.to === "dispatched" ? input.at : null;
   const completedAt = ["settled", "released_before_dispatch", "charge_unknown"].includes(input.to) ? input.at : null;
   const terminal = ["settled", "released_before_dispatch", "charge_unknown"].includes(input.to);
+  const exclusiveDispatch = input.to === "dispatched";
   const [updateResult] = await db.batch([
     db.prepare(`UPDATE odds_quota_reservations SET
         state = ?,
         dispatched_at = COALESCE(dispatched_at, ?),
         completed_at = ?,
         quota_event_request_key = COALESCE(?, quota_event_request_key)
-      WHERE request_key = ? AND dispatch_token_hash = ? AND state = ?`)
+      WHERE request_key = ? AND dispatch_token_hash = ? AND state = ?
+        AND (? = 0 OR EXISTS (
+          SELECT 1 FROM odds_quota_control c
+          WHERE c.provider = odds_quota_reservations.provider
+            AND c.quota_epoch = odds_quota_reservations.quota_epoch
+            AND c.credential_generation_id = odds_quota_reservations.credential_generation_id
+        ))
+        AND (? = 0 OR NOT EXISTS (
+          SELECT 1 FROM odds_quota_reservations active
+          WHERE active.provider = 'the-odds-api' AND active.state = 'dispatched'
+            AND active.request_key <> ?
+        ))`)
       .bind(input.to, dispatchedAt, completedAt, input.quotaEventRequestKey ?? null,
-        input.requestKey, tokenHash, input.from),
+        input.requestKey, tokenHash, input.from,
+        exclusiveDispatch ? 1 : 0,
+        exclusiveDispatch ? 1 : 0,
+        input.requestKey),
     db.prepare(`INSERT INTO odds_quota_reservation_events (
         event_id, request_key, event_type, occurred_at, payload_json
       ) SELECT ?, request_key, ?, ?, ? FROM odds_quota_reservations
@@ -433,7 +447,8 @@ export async function recordOddsQuota(input: {
   const responseCaptureId = input.responseCaptureId ?? null;
 
   if (input.used < current.used) {
-    if (quotaEpoch !== current.quotaEpoch || !providerMonthlyResetWindow(updatedAt)) {
+    if (quotaEpoch !== current.quotaEpoch || updatedAt <= current.updatedAt ||
+      !providerMonthlyResetWindow(updatedAt)) {
       throw new Error("Odds API quota counters regressed outside a plausible monthly reset window");
     }
     const resetEpoch = stableHash({
@@ -641,7 +656,7 @@ export async function settleOddsQuotaReservation(input: {
       reserved_at, dispatched_at, completed_at
     FROM odds_quota_reservations WHERE request_key = ? AND dispatch_token_hash = ?`)
     .bind(input.requestKey, tokenHash).first<ReservationRow>();
-  if (!reservation || !["dispatched", "charge_unknown"].includes(reservation.state)) {
+  if (!reservation || reservation.state !== "dispatched") {
     throw new Error("A dispatched quota reservation is required to reconcile provider headers");
   }
   const stateBefore = await getOddsQuotaState(db);
