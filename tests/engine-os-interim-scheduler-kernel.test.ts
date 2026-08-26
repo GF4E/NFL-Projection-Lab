@@ -427,7 +427,11 @@ describe("OS-15A frozen interim scheduler kernel", () => {
     ]);
     expect(evaluatePublicationTiming(times({
       persistedAt: "2026-09-13T19:15:00Z"
-    })).violations).toContain("persistence_missed_deadline");
+    }))).toEqual({
+      allowed: false,
+      prospective: false,
+      violations: ["persistence_missed_deadline"]
+    });
     expect(evaluatePublicationTiming(times({
       persistenceDeadlineAt: "2026-09-13T20:05:00Z",
       persistedAt: "2026-09-13T20:05:00Z"
