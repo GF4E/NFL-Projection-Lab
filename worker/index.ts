@@ -11,7 +11,6 @@ import { listPregameContextStates } from "../src/server/pregame-context/store";
 import { runBackgroundMaintenance } from "../src/server/background-maintenance";
 import { getConfidenceEngineHealth } from "../src/server/confidence-engine/store";
 import { readOnlyD1 } from "../src/server/read-only-d1";
-import { handleEvidenceArchiveOperator } from "../src/server/engine-os/evidence-archive-operator";
 
 interface AssetFetcher {
   fetch(request: Request): Promise<Response>;
@@ -22,9 +21,6 @@ interface Env {
   DB: D1Database;
   EVIDENCE: R2Bucket;
   ENGINE_OS_CAPTURE_ENABLED?: string;
-  ENGINE_OS_EVIDENCE_ARCHIVE_ENABLED?: string;
-  ENGINE_OS_EVIDENCE_ARCHIVE_EXPIRES_AT?: string;
-  ENGINE_OS_EVIDENCE_ARCHIVE_TOKEN?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -84,14 +80,6 @@ const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const readDb = readOnlyD1(env.DB);
-    const archiveResponse = await handleEvidenceArchiveOperator({
-      request,
-      bucket: env.EVIDENCE,
-      enabled: env.ENGINE_OS_EVIDENCE_ARCHIVE_ENABLED === "true",
-      expiresAt: env.ENGINE_OS_EVIDENCE_ARCHIVE_EXPIRES_AT,
-      token: env.ENGINE_OS_EVIDENCE_ARCHIVE_TOKEN
-    });
-    if (archiveResponse) return archiveResponse;
     // Vinext resolves module-level Cloudflare bindings itself, so replacing DB
     // in its handler argument is not a security boundary. Deny every mutating
     // HTTP method before routing and handle every public API path explicitly.
