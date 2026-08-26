@@ -4,9 +4,9 @@
 
 - **Roadmap status:** Executing; contracts are frozen and the urgent fail-closed spine is deployed
 - **Current phase:** Phase 1 — Canonical engine kernel and prospective-evidence activation
-- **Next platform task:** Complete OS-00 R2 durability and clean-clone restore, then finish OS-02A/OS-03A/OS-13A/OS-19A before any activation
+- **Next platform task:** Complete OS-00 R2 durability and clean-clone restore, then finish OS-02A/OS-03A/OS-13A/OS-15A and OS-18A server authentication before any activation
 - **Statistical next task:** Preserve terminal R1-v1 as `protocol_invalid`; R1-v2 is separately frozen and now waits for two independent human reviewers, a distinct adjudicator, and a non-reviewing identity coordinator; R2 Module 2B remains unauthorized
-- **Evidence-capture urgency:** Exact-byte connector and forecast-ledger slices exist, but scheduled acquisition is deliberately disabled pending the remaining identity, quota, origin, and infrastructure gates
+- **Evidence-capture urgency:** Exact-byte connector and forecast-ledger slices exist, but scheduled acquisition is deliberately disabled pending the remaining identity, origin, storage/infrastructure, and provider-authentication gates
 - **Production model status:** No validated market-free candidate
 - **Interface status:** Out of scope
 - **Deployment status:** The fail-closed Worker and D1 migrations 0013 and 0014 are deployed and receipted; acquisition is disabled and no broader infrastructure acceptance is claimed
@@ -18,9 +18,9 @@
 - **OS-00B:** Numerical operating contract frozen with no required `TBD` values.
 - **R0:** Research constitution frozen and hashed before any R2 work. The 2025 season is exposed and 2026 is the next prospective stream.
 - **R18A:** Preseason football lifecycle frozen and receipted. No package or prospective stream is activated by that receipt.
-- **OS-18A:** The owner attests that the exposed Odds API key was regenerated and the replacement was staged. Repository quarantine and application credential-lane severance are complete. The owner-reported 38-used/462-remaining dashboard counters are bootstrapped, but the replacement key has deliberately not been read or exercised by this build, so server-only provider authentication remains unverified. The active Worker does not bind a credential and acquisition remains disabled.
+- **OS-18A:** The owner attests that the exposed Odds API key was regenerated. Repository quarantine and application credential-lane severance are complete. After OS-19A's exact isolated proof passed, the replacement was transferred directly from ignored local staging into the production Sites secret store at environment revision 17 without printing or committing it. The active Worker still does not read that secret, acquisition remains disabled, and provider authentication plus final secret scans remain unverified.
 - **OS-01A:** The urgent migration, rollback fixture, append-only guards, and journal entry pass focused tests. D1 contains the append-only `0013_engine_os_urgent` receipt with schema hash `sha256:6205a3dfe09c2d663bb8c50378f295accd266ff2b2018668ca5353436a6797bb`; this proves only the urgent slice, not OS-01 acceptance.
-- **OS-19A:** Atomic one-holder reservation, provider-wide single-flight dispatch, append-only quota epochs and transitions, ambiguous-charge reconciliation, reset detection, exact frozen-request enforcement, and the pinned actual-2026-schedule simulation pass locally. Runtime recomputes both the normalized schedule hash and quota-plan hash before admitting any of the 480 registered requests; arbitrary hashes, shifted schedules, synthetic retries, overlapping responses, delayed lower counters, and superseded-epoch tokens fail closed. Migration 0014 is applied to live D1 with the exact frozen hash and verified table set. The owner-attested 38-used/462-remaining counters are bootstrapped without a provider request, and both the actual-period and conservative no-reset simulations stay below the ceiling while preserving essential snapshots. An isolated live-D1 shadow probe admitted exactly one of two contenders and fully rolled back a forced batch failure, then removed every probe object without touching a production request key. That probe verifies deployed D1 primitives, not the exact `reserveOddsQuota` path on an isolated production-schema clone. OS-19A remains unaccepted until that exact live-path gate passes; capture is disabled and the Odds key remains unbound and unused.
+- **OS-19A:** The urgent quota slice is accepted. Migration 0014 is live and hash-verified; the owner-attested 38-used/462-remaining counters reconcile; all 105 reset-offset simulations stay below the frozen ceiling while preserving essential snapshots. The exact production `reserveOddsQuota` application path was then run on a distinct owner-only Sites D1 staging resource with provider dispatch disabled. At projected use 446, two concurrent atomic D1 batches produced exactly one 3-credit winner at 449 and one `future_reserve` rejection that would have reached 452; duplicate retry created no event, all 138 pre-dispatch reservations were released, final liability was zero, and no provider credential or request was involved. The immutable successor receipt records proof hash `968bedd467064f1cb40c8822979991a4868055409fb72f95d0136b75dd452171`. The temporary site is owner-only, empty of secrets and runtime bindings, and serves an inert 410 tombstone; physical project deletion was unavailable through the Sites connector. This accepts OS-19A only, not full OS-19 or OPS-08. Capture remains disabled.
 - **OS-02A / OS-03A / OS-13A:** Partial implementation and focused tests only. Missing all-horizon origin completeness, final reschedule semantics, full capture/package qualification, and deployed D1/R2/scheduler proof prevent acceptance.
 - **R1-v1:** Terminal status is `protocol_invalid`, reason `reviewer_independence_blocked`. It remains immutable.
 - **R1-v2:** A separately hashed commit-reveal protocol and executable workflow are frozen over the same 64 official gamebooks. It enforces four distinct natural people, blind double review, separate adjudication, truth freeze, and fail-closed unblinding. No identities or evidence were fabricated; status is `awaiting_human_review` and R2 authorization is false.
@@ -51,7 +51,7 @@ OS-00 contract/runtime-local
   |
   +--> OS-00 R2 durability + clean-clone restore
   +--> OS-00B [frozen] --> R18A
-  +--> OS-18A [owner-attested rotation; runtime use unverified] --> OS-19A deploy proof --> OS-03A market capture
+  +--> OS-18A [secret installed; provider auth unverified] --> OS-19A [urgent slice accepted] --> OS-03A market capture
   +--> OS-03A non-market [partial, disabled] --> complete/deploy/capture proof
   +--> OS-01A [deployed urgent slice] --> OS-02A [partial] --> OS-15A --> OS-13A [partial]
   |       +--> OS-01 --> OS-02 ----------------------+--> OS-06 --> OS-07 --> OS-08
@@ -66,7 +66,7 @@ OS-07 --> OS-09 --> OS-10 --> OS-11 --> OS-12 --> OS-13B --> OS-14
 R3 --> decomposition: R4 onward | target redesign: R3A | direct score: R3B
 ```
 
-The next safe OS-19A execution unit is the exact production `reserveOddsQuota` contention path against an isolated deployed D1 clone with provider dispatch disabled. Migration, dashboard bootstrap, current-usage simulation, and deployed D1 primitive checks are complete. Authenticated market capture remains disabled until the remaining origin, identity, capture, package, and infrastructure gates pass. R1-v1 remains immutable. R1-v2 is ready for two independent reviewers, a separate adjudicator, and a non-reviewing identity coordinator; only a verified pass can authorize R2. R2 changes one distribution mechanism only after that audit passes. R3 is the decision boundary and does not silently fall through to drive modeling.
+OS-19A's exact isolated contention gate is complete and its urgent slice is accepted. The next platform work is OS-00 durability plus OS-02A/OS-03A/OS-13A/OS-15A and OS-18A provider-authentication qualification. Authenticated market capture remains disabled until those origin, identity, capture, package, storage, and infrastructure gates pass. R1-v1 remains immutable. R1-v2 is ready for two independent reviewers, a separate adjudicator, and a non-reviewing identity coordinator; only a verified pass can authorize R2. R2 changes one distribution mechanism only after that audit passes. R3 is the decision boundary and does not silently fall through to drive modeling.
 
 ## Kill gates in force
 
@@ -100,13 +100,13 @@ These assets should be preserved and tested against the new contracts. Their exi
 7. Player, roster, injury, snap, venue, and provider identities lack one as-of service.
 8. No authenticated external compute runner exists; retained heavy lifecycle/refit source is unreachable from the active Worker.
 9. Some monitoring still uses selected plays rather than the all-game forecast ledger.
-10. The owner attests that the Odds API credential previously pasted in chat was regenerated and its replacement staged. The 38-used/462-remaining dashboard counters are bootstrapped without a provider request. The replacement remains uninspected and unused by the active bundle; server-only credential binding and live-operation verification are still required before capture.
-11. The urgent capture lane now has locally verified atomic reservations, exact schedule-plan binding, ambiguous-charge handling, and reset reconciliation. Migration 0014 is live and hash-verified; deployed-D1 concurrency, rollback, R2, and scheduler qualification remain absent.
+10. The owner attests that the Odds API credential previously pasted in chat was regenerated. The 38-used/462-remaining dashboard counters are bootstrapped without a provider request, and the replacement is now stored only as a production Sites secret. The active Worker does not read it; server-side provider authentication, old-key failure, and final repository/bundle scans are still required before capture.
+11. The urgent capture lane has verified atomic reservations, exact schedule-plan binding, ambiguous-charge handling, reset reconciliation, and exact-path deployed-D1 contention on an isolated owner-only resource. OS-19A is accepted, but full OS-19 still lacks R2, scheduler, storage/egress/compute, and batch-capacity qualification.
 12. A failed staging-object cleanup can leave an unreferenced R2 object; pointer integrity is preserved, but OS-03 still needs garbage collection.
 13. HTTP 304 checks refresh the heartbeat without creating a separate append-only check-event row; OS-03 must decide whether that evidence is required.
 14. OS-02A still needs immutable supersession semantics for schedule revisions and every frozen forecast horizon.
 15. The Tuesday 7:30 a.m. market origin and actual 2026 reset-offset simulation now exist in the registered quota plan, but OS-03A still lacks live immutable-capture and schedule-supersession qualification.
-16. OS-19A now has a live counter bootstrap and deployed-D1 primitive proof, but it still needs the exact production reservation path repeated against an isolated deployed D1 clone. The Worker must keep acquisition disabled and must not read the staged key until the remaining activation gates pass.
+16. OS-19A's exact isolated deployed-D1 path passed and the replacement key is installed as a dormant production secret. The Worker must keep acquisition disabled and must not read or exercise that key until OS-02A/OS-03A/OS-13A/OS-15A and OS-18A provider-authentication gates pass.
 17. Forecast origins are not yet bound to captured schedule evidence, and only the Tuesday horizon is represented.
 18. Roster capture lacks schema validation, per-game pregame freshness is incomplete, and actual forecast outputs lack a fully qualified immutable package/output-pointer boundary.
 19. The activation table is contract-scoped rather than package-scoped and cannot yet open the frozen lifecycle's independent prospective stream for a later eligible package.
@@ -121,10 +121,10 @@ These assets should be preserved and tested against the new contracts. Their exi
 | Module 2B kernel falsification | Blocked, not run | R0 is frozen; R1 is `protocol_invalid` with `r2Authorized=false` |
 | Drive-outcome module | Blocked | Requires R3 decomposition branch |
 | Target redesign/direct score | Conditional | R3A or R3B only if selected by R3 |
-| Prospective capture | Partial and disabled | Urgent D1 schema is deployed; finish OS-02A/OS-03A/OS-13A/OS-19A and verify D1/R2/scheduler before activation |
-| Market comparison | Blocked | Requires R13 `shadow_eligible`; exact quote acquisition starts only after OS-18A rotation and OS-19A bootstrap |
+| Prospective capture | Partial and disabled | OS-19A is accepted; finish OS-02A/OS-03A/OS-13A/OS-15A and OS-18A provider authentication, then verify D1/R2/scheduler before activation |
+| Market comparison | Blocked | Requires R13 `shadow_eligible`; exact quote acquisition remains disabled pending the remaining capture and provider-authentication gates |
 | Production promotion | Blocked | Requires prospective and operational qualification |
-| Security response | Partially complete | Owner attests regeneration and staging; code quarantine and dashboard-counter bootstrap pass, but the replacement remains deliberately unused pending server-only authentication and the remaining activation gates |
+| Security response | Partially complete | Owner attests regeneration; the replacement is installed as a dormant server secret, but remains deliberately unused pending provider authentication, final scans, and the remaining activation gates |
 | Engine OS implementation | In progress | Urgent spine is deployed fail-closed; complete R2 evidence durability and remaining gates; keep R2 statistical work blocked |
 
 ## Completion rule

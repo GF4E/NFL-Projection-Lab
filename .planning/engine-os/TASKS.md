@@ -12,14 +12,14 @@ This is the execution register. A work package is complete only when its accepta
 
 ## Immediate execution queue
 
-1. **OS-00** — freeze the current operating-system contract and evidence.
-2. Immediately after OS-00: **OS-00B** freezes numerical operating targets and **OS-18A** rotates the exposed credential and scans history.
-3. In parallel: **R0**, **R1**, **OS-01A**, and the non-market portion of temporary **OS-03A** 2026 raw capture.
-4. Execute **OS-02A**, **OS-15A**, and **OS-19A**; then start OS-13A and authenticated market capture. Full OS-01/OS-02/OS-03 proceed behind them.
-5. **R2** executes only the Module 2B residual-kernel falsification, followed by **R3**.
+1. Finish **OS-00** R2 durability and clean-clone restoration; its architecture and local runtime contract are already frozen.
+2. Preserve frozen **OS-00B** targets. Finish **OS-18A** provider authentication and final scans; rotation and dormant server-secret installation are complete.
+3. Preserve frozen **R0**, terminal R1-v1, and deployed **OS-01A** evidence. Complete R1-v2's independent human review and the disabled non-market portion of **OS-03A**.
+4. **OS-19A**'s urgent slice is accepted. Execute **OS-02A** and **OS-15A**, then finish **OS-03A**, **OS-13A**, and the remaining OS-18A gates before authenticated capture. Full OS-01/OS-02/OS-03 proceed behind them.
+5. **R2** may execute only the Module 2B residual-kernel falsification and only after R1-v2 passes, followed by **R3**.
 6. Continue the platform spine through **OS-14** regardless of whether the possession branch survives.
 7. Start **R4 through R12** only for the decomposition branch authorized by R3; use **R3A** or **R3B** for the other branches.
-8. Start **R16 and R17** only after R13 returns `shadow_eligible`; acquisition of exact quotes begins now under OS-03A and is not deferred to R16.
+8. Start **R16 and R17** only after R13 returns `shadow_eligible`; exact quote acquisition remains disabled until the OS-03A and provider-authentication gates pass and is not deferred to R16.
 
 ## Primary requirement ownership
 
@@ -123,7 +123,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-01A — Migrate the urgent capture and origin ledger
 
-**Status:** OWNER-ATTESTED ROTATION; server-only verification blocked behind OS-19A
+**Status:** DEPLOYED urgent slice; OS-01 full-schema acceptance remains pending
 
 **Requirement contribution:** ARC-03, LED-03
 
@@ -459,7 +459,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-18A — Rotate exposed credentials and scan history
 
-**Status:** NEXT after OS-00
+**Status:** PARTIAL PASS; replacement secret is installed server-side, but provider authentication and final secret/client/history scans remain pending
 
 **Requirement contribution:** OPS-07
 
@@ -501,7 +501,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-19A — Enforce the urgent odds quota and reserve guard
 
-**Status:** LOCAL PASS; migration and deployed-D1 proof pending before authenticated OS-03A capture
+**Status:** ACCEPTED urgent slice; authenticated capture remains blocked by OS-02A/OS-03A/OS-13A/OS-15A/OS-18A
 
 **Requirement contribution:** OPS-08, MKT-01
 
