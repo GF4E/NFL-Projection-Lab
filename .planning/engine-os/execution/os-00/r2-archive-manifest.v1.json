@@ -1,0 +1,856 @@
+{
+  "categoryTotals": {
+    "model_lab_artifact": {
+      "bytes": 117991406,
+      "objects": 19
+    },
+    "model_lab_source_index": {
+      "bytes": 13227,
+      "objects": 1
+    },
+    "model_lab_source_object": {
+      "bytes": 502101912,
+      "objects": 33
+    },
+    "r1_official_gamebook": {
+      "bytes": 10609710,
+      "objects": 64
+    }
+  },
+  "contracts": {
+    "evidenceInventory": {
+      "path": ".planning/engine-os/execution/os-00/evidence-inventory.json",
+      "sha256": "1f13332c0f40953fdfe0b8f94a0522c87c9783405d8849a95357c1c2e0e4678d"
+    },
+    "r1GamebookLedger": {
+      "path": "artifacts/engine-os/r1/official-source-capture.csv",
+      "sha256": "21a3ea54c359c1acca68788c5af531144535d745485b8d6a54da1b32924d5b15"
+    },
+    "sourceIndexSha256": "0a49ed9a11a31acfd2629496b1b86ba63206ddaebe0d809f3c2c1b27e19dc9c6"
+  },
+  "hashAlgorithm": "sha256",
+  "objectCount": 117,
+  "objects": [
+    {
+      "bytes": 1079,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-one/artifact-manifest.json",
+      "r2Key": "experiments/module1.2026-08-24.4/sha256/93d0b4b08eefde88781b706491104a14bbd60e3a00e077b5efecc0687ab9f82c",
+      "sha256": "93d0b4b08eefde88781b706491104a14bbd60e3a00e077b5efecc0687ab9f82c"
+    },
+    {
+      "bytes": 79613454,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-one/forecasts.jsonl.gz",
+      "r2Key": "experiments/module1.2026-08-24.4/sha256/d9646c3b368570cc140d5ad3fae760377d8adfaded851e89d4f553842176eb07",
+      "sha256": "d9646c3b368570cc140d5ad3fae760377d8adfaded851e89d4f553842176eb07"
+    },
+    {
+      "bytes": 855763,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-one/scorecard.json",
+      "r2Key": "experiments/module1.2026-08-24.4/sha256/bf7e954f562c28bfa8043f0e95a718e577d67f261d83a07098cfb75a52a7c59e",
+      "sha256": "bf7e954f562c28bfa8043f0e95a718e577d67f261d83a07098cfb75a52a7c59e"
+    },
+    {
+      "bytes": 1696,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-one/scorecard.md",
+      "r2Key": "experiments/module1.2026-08-24.4/sha256/dbf9dfc6be643a56be1412d23234d71d17370c05dc67be262e6959ba16f15af1",
+      "sha256": "dbf9dfc6be643a56be1412d23234d71d17370c05dc67be262e6959ba16f15af1"
+    },
+    {
+      "bytes": 1701,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two-v8/RESULT.md",
+      "r2Key": "experiments/module2.2026-08-25.8/sha256/e1dafda157c115bb00adec32baae2bcbfd0d11539f1c297a7068e4ee39e0e52d",
+      "sha256": "e1dafda157c115bb00adec32baae2bcbfd0d11539f1c297a7068e4ee39e0e52d"
+    },
+    {
+      "bytes": 849,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two-v8/artifact-hashes.json",
+      "r2Key": "experiments/module2.2026-08-25.8/sha256/779dcda4540621adfcc52039744a07e9c1b94d650e70085798e9fcc1f306eb2b",
+      "sha256": "779dcda4540621adfcc52039744a07e9c1b94d650e70085798e9fcc1f306eb2b"
+    },
+    {
+      "bytes": 249525,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two-v8/audit.json",
+      "r2Key": "experiments/module2.2026-08-25.8/sha256/517c23e499d73b6cf0cf1ca2d8cc4874c4e973c9bfd15f1f9107f9bf5a69ba54",
+      "sha256": "517c23e499d73b6cf0cf1ca2d8cc4874c4e973c9bfd15f1f9107f9bf5a69ba54"
+    },
+    {
+      "bytes": 24503973,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two-v8/metric-rows.jsonl.gz",
+      "r2Key": "experiments/module2.2026-08-25.8/sha256/55772218d88fe97ba1e6aa6b7a7602f116acaa8317508be6370ae38d13673f13",
+      "sha256": "55772218d88fe97ba1e6aa6b7a7602f116acaa8317508be6370ae38d13673f13"
+    },
+    {
+      "bytes": 38978,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two-v8/paired-uncertainty.json",
+      "r2Key": "experiments/module2.2026-08-25.8/sha256/ded1acceb55b907ca144687e119be4f141f40c46b30c9f58aea5eef32ba4bff4",
+      "sha256": "ded1acceb55b907ca144687e119be4f141f40c46b30c9f58aea5eef32ba4bff4"
+    },
+    {
+      "bytes": 44983,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two-v8/pre-replay-manifest.json",
+      "r2Key": "experiments/module2.2026-08-25.8/sha256/eecd6bfd47f648159770356ddac7357911ea879971fc3c41e4fe3df720efab9c",
+      "sha256": "eecd6bfd47f648159770356ddac7357911ea879971fc3c41e4fe3df720efab9c"
+    },
+    {
+      "bytes": 13735,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two-v8/result.json",
+      "r2Key": "experiments/module2.2026-08-25.8/sha256/58bc028eaf0d24c441829ae6de8abca57c06064bc4bbbdf7bcdeca730a7db2e3",
+      "sha256": "58bc028eaf0d24c441829ae6de8abca57c06064bc4bbbdf7bcdeca730a7db2e3"
+    },
+    {
+      "bytes": 10907194,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two-v8/retrospective-forecasts.jsonl.gz",
+      "r2Key": "experiments/module2.2026-08-25.8/sha256/66789eb97c70b813bc4574fd52aeaa5e3dc28717ea1658a4216782895dc6ee4c",
+      "sha256": "66789eb97c70b813bc4574fd52aeaa5e3dc28717ea1658a4216782895dc6ee4c"
+    },
+    {
+      "bytes": 288822,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two-v8/rolling-origin-scorecard.json",
+      "r2Key": "experiments/module2.2026-08-25.8/sha256/649881159109b344571add933c48725ed7731f3e102d60dca8d846e0f1b80846",
+      "sha256": "649881159109b344571add933c48725ed7731f3e102d60dca8d846e0f1b80846"
+    },
+    {
+      "bytes": 609,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two-v8/scientific-hashes.json",
+      "r2Key": "experiments/module2.2026-08-25.8/sha256/30603524d0e11ef073cc92024210ad58baa03d67826902f8da3aba1412964bcd",
+      "sha256": "30603524d0e11ef073cc92024210ad58baa03d67826902f8da3aba1412964bcd"
+    },
+    {
+      "bytes": 1300,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two/RESULT.md",
+      "r2Key": "experiments/module2.2026-08-24.7/sha256/9349a3b028235a9e3b514ec18d91cdc2957401f44117e40568a3417093432ee8",
+      "sha256": "9349a3b028235a9e3b514ec18d91cdc2957401f44117e40568a3417093432ee8"
+    },
+    {
+      "bytes": 353,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two/artifact-hashes.json",
+      "r2Key": "experiments/module2.2026-08-24.7/sha256/dce4ebe49dedaf8efcd3dd84896bebeb026cbdc6501aa9d35cd5b10a353dda9f",
+      "sha256": "dce4ebe49dedaf8efcd3dd84896bebeb026cbdc6501aa9d35cd5b10a353dda9f"
+    },
+    {
+      "bytes": 1421375,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two/audit.json",
+      "r2Key": "experiments/module2.2026-08-24.7/sha256/dec9ef1f55b23d61dfeabd7a8a82f9debd128bd080448461c73a9b16cfc88fea",
+      "sha256": "dec9ef1f55b23d61dfeabd7a8a82f9debd128bd080448461c73a9b16cfc88fea"
+    },
+    {
+      "bytes": 44937,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two/pre-replay-manifest.json",
+      "r2Key": "experiments/module2.2026-08-24.7/sha256/194864b038235c1ad933a58dca6c0bb03ed5bc9b8fadfc94534c46d2a269cf3b",
+      "sha256": "194864b038235c1ad933a58dca6c0bb03ed5bc9b8fadfc94534c46d2a269cf3b"
+    },
+    {
+      "bytes": 1080,
+      "category": "model_lab_artifact",
+      "localPath": "artifacts/model-lab/module-two/result.json",
+      "r2Key": "experiments/module2.2026-08-24.7/sha256/ea580f320eebd3737dfea9697ed728fe6b22d3620556913afd9670d3e1e76104",
+      "sha256": "ea580f320eebd3737dfea9697ed728fe6b22d3620556913afd9670d3e1e76104"
+    },
+    {
+      "bytes": 13227,
+      "category": "model_lab_source_index",
+      "localPath": ".model-lab-cache/module-one/source-index.json",
+      "r2Key": "model-lab/raw/index/sha256/0a49ed9a11a31acfd2629496b1b86ba63206ddaebe0d809f3c2c1b27e19dc9c6",
+      "sha256": "0a49ed9a11a31acfd2629496b1b86ba63206ddaebe0d809f3c2c1b27e19dc9c6"
+    },
+    {
+      "bytes": 14926918,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/074ecaeb9325de943c11f7bbc941425626985090ef8386f90cd837fa5cb5d4b3.csv",
+      "r2Key": "model-lab/raw/sha256/074ecaeb9325de943c11f7bbc941425626985090ef8386f90cd837fa5cb5d4b3",
+      "sha256": "074ecaeb9325de943c11f7bbc941425626985090ef8386f90cd837fa5cb5d4b3"
+    },
+    {
+      "bytes": 14333971,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/0b948cca8735a2417cbda14464f4532aeee58d871e2fcd8464a23e969e45789e.csv",
+      "r2Key": "model-lab/raw/sha256/0b948cca8735a2417cbda14464f4532aeee58d871e2fcd8464a23e969e45789e",
+      "sha256": "0b948cca8735a2417cbda14464f4532aeee58d871e2fcd8464a23e969e45789e"
+    },
+    {
+      "bytes": 19093961,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/0c69a71eb39498956c7b1d5c1ca52ce7fe679934a95d1af249facb5ea9829ea4.csv.gz",
+      "r2Key": "model-lab/raw/sha256/0c69a71eb39498956c7b1d5c1ca52ce7fe679934a95d1af249facb5ea9829ea4",
+      "sha256": "0c69a71eb39498956c7b1d5c1ca52ce7fe679934a95d1af249facb5ea9829ea4"
+    },
+    {
+      "bytes": 14612235,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/1433f1f239784dde7fcb35349d211a9b83abfc0156337b72ec4f923abf715bd3.csv",
+      "r2Key": "model-lab/raw/sha256/1433f1f239784dde7fcb35349d211a9b83abfc0156337b72ec4f923abf715bd3",
+      "sha256": "1433f1f239784dde7fcb35349d211a9b83abfc0156337b72ec4f923abf715bd3"
+    },
+    {
+      "bytes": 9955118,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/198904f48eeebafc1f34028a00c1b8c0fc135aba04fc4b276e636ef87709751a.csv",
+      "r2Key": "model-lab/raw/sha256/198904f48eeebafc1f34028a00c1b8c0fc135aba04fc4b276e636ef87709751a",
+      "sha256": "198904f48eeebafc1f34028a00c1b8c0fc135aba04fc4b276e636ef87709751a"
+    },
+    {
+      "bytes": 2177174,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/1a3571799c3932a383a4d5c50cc5b7bf2669715b7f8372bc84272408359d5bb0.csv",
+      "r2Key": "model-lab/raw/sha256/1a3571799c3932a383a4d5c50cc5b7bf2669715b7f8372bc84272408359d5bb0",
+      "sha256": "1a3571799c3932a383a4d5c50cc5b7bf2669715b7f8372bc84272408359d5bb0"
+    },
+    {
+      "bytes": 19362351,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/23370d5d10f8104d80d46a1fc5e61f4f6f5a3263fe96fe2dd629913cfcb08c06.csv.gz",
+      "r2Key": "model-lab/raw/sha256/23370d5d10f8104d80d46a1fc5e61f4f6f5a3263fe96fe2dd629913cfcb08c06",
+      "sha256": "23370d5d10f8104d80d46a1fc5e61f4f6f5a3263fe96fe2dd629913cfcb08c06"
+    },
+    {
+      "bytes": 9045702,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/262fd2f9a862c3b97275d91c60951f940a4e82989503b8359ac11b12a76c0e2f.csv",
+      "r2Key": "model-lab/raw/sha256/262fd2f9a862c3b97275d91c60951f940a4e82989503b8359ac11b12a76c0e2f",
+      "sha256": "262fd2f9a862c3b97275d91c60951f940a4e82989503b8359ac11b12a76c0e2f"
+    },
+    {
+      "bytes": 19105296,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/2f135887790a013fd004e609e37096bb4816d5cc80b9f19122e1bad478961978.csv.gz",
+      "r2Key": "model-lab/raw/sha256/2f135887790a013fd004e609e37096bb4816d5cc80b9f19122e1bad478961978",
+      "sha256": "2f135887790a013fd004e609e37096bb4816d5cc80b9f19122e1bad478961978"
+    },
+    {
+      "bytes": 9638161,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/331022cd3b0c69d99c581f02b6fde6853e87ac431739c4b49841ee6e02893d6c.csv",
+      "r2Key": "model-lab/raw/sha256/331022cd3b0c69d99c581f02b6fde6853e87ac431739c4b49841ee6e02893d6c",
+      "sha256": "331022cd3b0c69d99c581f02b6fde6853e87ac431739c4b49841ee6e02893d6c"
+    },
+    {
+      "bytes": 19169807,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/4649804ee0f0a40b41e51ec75a1ce921949d7fab5459213488656b92f78560e8.csv.gz",
+      "r2Key": "model-lab/raw/sha256/4649804ee0f0a40b41e51ec75a1ce921949d7fab5459213488656b92f78560e8",
+      "sha256": "4649804ee0f0a40b41e51ec75a1ce921949d7fab5459213488656b92f78560e8"
+    },
+    {
+      "bytes": 18202391,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/4ab286d2873a7eab28e11120f1fe1bd1f0a6bbb6be452f86a76092bd49b2ee4a.csv.gz",
+      "r2Key": "model-lab/raw/sha256/4ab286d2873a7eab28e11120f1fe1bd1f0a6bbb6be452f86a76092bd49b2ee4a",
+      "sha256": "4ab286d2873a7eab28e11120f1fe1bd1f0a6bbb6be452f86a76092bd49b2ee4a"
+    },
+    {
+      "bytes": 17960191,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/6d4f519b4821f06ffe2285faadad8cee718f464eeb9a310a8276753da10bee2e.csv.gz",
+      "r2Key": "model-lab/raw/sha256/6d4f519b4821f06ffe2285faadad8cee718f464eeb9a310a8276753da10bee2e",
+      "sha256": "6d4f519b4821f06ffe2285faadad8cee718f464eeb9a310a8276753da10bee2e"
+    },
+    {
+      "bytes": 17973428,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/74032964ca6bdfc5bbe186253231a533d2d82aa531fac02b9382da01b3a8b34e.csv.gz",
+      "r2Key": "model-lab/raw/sha256/74032964ca6bdfc5bbe186253231a533d2d82aa531fac02b9382da01b3a8b34e",
+      "sha256": "74032964ca6bdfc5bbe186253231a533d2d82aa531fac02b9382da01b3a8b34e"
+    },
+    {
+      "bytes": 9377446,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/76c47a629075ffd75f9c4ee49fadb6dad45396be486af897078fee5722969781.csv",
+      "r2Key": "model-lab/raw/sha256/76c47a629075ffd75f9c4ee49fadb6dad45396be486af897078fee5722969781",
+      "sha256": "76c47a629075ffd75f9c4ee49fadb6dad45396be486af897078fee5722969781"
+    },
+    {
+      "bytes": 8797631,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/80de7a110233fa7569c26e298d6393b48349263f4dd117cf047612239801bc19.csv",
+      "r2Key": "model-lab/raw/sha256/80de7a110233fa7569c26e298d6393b48349263f4dd117cf047612239801bc19",
+      "sha256": "80de7a110233fa7569c26e298d6393b48349263f4dd117cf047612239801bc19"
+    },
+    {
+      "bytes": 18392969,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/837811471df06c43d55faede7a363274484da11e71f49d8e0801baede3a5965d.csv.gz",
+      "r2Key": "model-lab/raw/sha256/837811471df06c43d55faede7a363274484da11e71f49d8e0801baede3a5965d",
+      "sha256": "837811471df06c43d55faede7a363274484da11e71f49d8e0801baede3a5965d"
+    },
+    {
+      "bytes": 15242660,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/88adfe0fba5cbedd260d7928ad373476d4fb168d0213cb52ef1163ed5d3056b7.csv",
+      "r2Key": "model-lab/raw/sha256/88adfe0fba5cbedd260d7928ad373476d4fb168d0213cb52ef1163ed5d3056b7",
+      "sha256": "88adfe0fba5cbedd260d7928ad373476d4fb168d0213cb52ef1163ed5d3056b7"
+    },
+    {
+      "bytes": 18146399,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/8f8be4e1f53aa8b504b52b1a4f38559b4d9a6bf5885a4e70bb50fba4228f4838.csv.gz",
+      "r2Key": "model-lab/raw/sha256/8f8be4e1f53aa8b504b52b1a4f38559b4d9a6bf5885a4e70bb50fba4228f4838",
+      "sha256": "8f8be4e1f53aa8b504b52b1a4f38559b4d9a6bf5885a4e70bb50fba4228f4838"
+    },
+    {
+      "bytes": 10803214,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/ab05dfeffe6f9a1d969133cd6740f1625d135bfad672aaa916adb609ab662883.csv",
+      "r2Key": "model-lab/raw/sha256/ab05dfeffe6f9a1d969133cd6740f1625d135bfad672aaa916adb609ab662883",
+      "sha256": "ab05dfeffe6f9a1d969133cd6740f1625d135bfad672aaa916adb609ab662883"
+    },
+    {
+      "bytes": 16588230,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/af6aa7b8aa7850c47fe307d548d66fa7c1cac88fe11e5951c781974cb6909e03.csv",
+      "r2Key": "model-lab/raw/sha256/af6aa7b8aa7850c47fe307d548d66fa7c1cac88fe11e5951c781974cb6909e03",
+      "sha256": "af6aa7b8aa7850c47fe307d548d66fa7c1cac88fe11e5951c781974cb6909e03"
+    },
+    {
+      "bytes": 18339628,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/b4cd0dc48697ec44a2041d57dfc1c7210a792d1b5be497c161ef20a5b7fb9942.csv.gz",
+      "r2Key": "model-lab/raw/sha256/b4cd0dc48697ec44a2041d57dfc1c7210a792d1b5be497c161ef20a5b7fb9942",
+      "sha256": "b4cd0dc48697ec44a2041d57dfc1c7210a792d1b5be497c161ef20a5b7fb9942"
+    },
+    {
+      "bytes": 17992849,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/b764668137052be23745953cbc33fa17e537a70c81e9b73785a19a15e7288216.csv.gz",
+      "r2Key": "model-lab/raw/sha256/b764668137052be23745953cbc33fa17e537a70c81e9b73785a19a15e7288216",
+      "sha256": "b764668137052be23745953cbc33fa17e537a70c81e9b73785a19a15e7288216"
+    },
+    {
+      "bytes": 14790824,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/bd6a50de334473c10f8058afa948fd0c6adc8a8b081da41c500cc0aa069c5312.csv",
+      "r2Key": "model-lab/raw/sha256/bd6a50de334473c10f8058afa948fd0c6adc8a8b081da41c500cc0aa069c5312",
+      "sha256": "bd6a50de334473c10f8058afa948fd0c6adc8a8b081da41c500cc0aa069c5312"
+    },
+    {
+      "bytes": 15385661,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/c2f7a1ffebe06058400af1989d1cd2900cc5c9659f084623708a06d4e28de35b.csv",
+      "r2Key": "model-lab/raw/sha256/c2f7a1ffebe06058400af1989d1cd2900cc5c9659f084623708a06d4e28de35b",
+      "sha256": "c2f7a1ffebe06058400af1989d1cd2900cc5c9659f084623708a06d4e28de35b"
+    },
+    {
+      "bytes": 16566753,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/c3bca1ee53e63e21b964f1bb42c251e25b7b4b8c55210730dd4ded2f9d4a709a.csv",
+      "r2Key": "model-lab/raw/sha256/c3bca1ee53e63e21b964f1bb42c251e25b7b4b8c55210730dd4ded2f9d4a709a",
+      "sha256": "c3bca1ee53e63e21b964f1bb42c251e25b7b4b8c55210730dd4ded2f9d4a709a"
+    },
+    {
+      "bytes": 8785543,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/c415397ed98cbf9b5e038cb9415b9ed0d0b1d2611b09d39a7be521893b7c6533.csv",
+      "r2Key": "model-lab/raw/sha256/c415397ed98cbf9b5e038cb9415b9ed0d0b1d2611b09d39a7be521893b7c6533",
+      "sha256": "c415397ed98cbf9b5e038cb9415b9ed0d0b1d2611b09d39a7be521893b7c6533"
+    },
+    {
+      "bytes": 17920627,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/d37899610b397b96a90da6902827de5b46c5457b93e0e16d5f95a8eb524e4a7d.csv.gz",
+      "r2Key": "model-lab/raw/sha256/d37899610b397b96a90da6902827de5b46c5457b93e0e16d5f95a8eb524e4a7d",
+      "sha256": "d37899610b397b96a90da6902827de5b46c5457b93e0e16d5f95a8eb524e4a7d"
+    },
+    {
+      "bytes": 18230362,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/dc1703d9aae3ec697ac2787617f82b6f074d0c151e1a54f8217f570a63dcb5ed.csv.gz",
+      "r2Key": "model-lab/raw/sha256/dc1703d9aae3ec697ac2787617f82b6f074d0c151e1a54f8217f570a63dcb5ed",
+      "sha256": "dc1703d9aae3ec697ac2787617f82b6f074d0c151e1a54f8217f570a63dcb5ed"
+    },
+    {
+      "bytes": 19022201,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/e8743a568f99667a8bdcd29ba12224ee1782ad2b7916bee78ee335c099383739.csv.gz",
+      "r2Key": "model-lab/raw/sha256/e8743a568f99667a8bdcd29ba12224ee1782ad2b7916bee78ee335c099383739",
+      "sha256": "e8743a568f99667a8bdcd29ba12224ee1782ad2b7916bee78ee335c099383739"
+    },
+    {
+      "bytes": 15945119,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/fd3fe005b676fe0ad8d88c50701d71adef4287501397c33f479c9765cd8c45d4.csv",
+      "r2Key": "model-lab/raw/sha256/fd3fe005b676fe0ad8d88c50701d71adef4287501397c33f479c9765cd8c45d4",
+      "sha256": "fd3fe005b676fe0ad8d88c50701d71adef4287501397c33f479c9765cd8c45d4"
+    },
+    {
+      "bytes": 18195788,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/ff1cda2e26610ef8720324e442d1e5ebc24918e08fd1d2933590b7b91a7068cd.csv.gz",
+      "r2Key": "model-lab/raw/sha256/ff1cda2e26610ef8720324e442d1e5ebc24918e08fd1d2933590b7b91a7068cd",
+      "sha256": "ff1cda2e26610ef8720324e442d1e5ebc24918e08fd1d2933590b7b91a7068cd"
+    },
+    {
+      "bytes": 18021304,
+      "category": "model_lab_source_object",
+      "localPath": ".model-lab-cache/module-one/objects/ffa0bfb803f0c30a4b765af5e621b0f601d695efdba7d6d396fb067d6a0c89b2.csv.gz",
+      "r2Key": "model-lab/raw/sha256/ffa0bfb803f0c30a4b765af5e621b0f601d695efdba7d6d396fb067d6a0c89b2",
+      "sha256": "ffa0bfb803f0c30a4b765af5e621b0f601d695efdba7d6d396fb067d6a0c89b2"
+    },
+    {
+      "bytes": 143502,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/0644c5e4d74ac9bd40830bbaa9b0d585444dd60798dbafae33b918e8497e5de2.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/0644c5e4d74ac9bd40830bbaa9b0d585444dd60798dbafae33b918e8497e5de2",
+      "sha256": "0644c5e4d74ac9bd40830bbaa9b0d585444dd60798dbafae33b918e8497e5de2"
+    },
+    {
+      "bytes": 148108,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/0e1b411851444aabbef4a3ff42fe5e350d708f2b18b9ae2070f819f492796708.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/0e1b411851444aabbef4a3ff42fe5e350d708f2b18b9ae2070f819f492796708",
+      "sha256": "0e1b411851444aabbef4a3ff42fe5e350d708f2b18b9ae2070f819f492796708"
+    },
+    {
+      "bytes": 162666,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/0f7d688713c697e12240443209f5c4ba23fb2725e7ef700b620e1983929627ee.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/0f7d688713c697e12240443209f5c4ba23fb2725e7ef700b620e1983929627ee",
+      "sha256": "0f7d688713c697e12240443209f5c4ba23fb2725e7ef700b620e1983929627ee"
+    },
+    {
+      "bytes": 170892,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/0fa50bd2528c3c911ba75f8a959ad9fe9b9d35946d0b3a98297ce2515c04c28f.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/0fa50bd2528c3c911ba75f8a959ad9fe9b9d35946d0b3a98297ce2515c04c28f",
+      "sha256": "0fa50bd2528c3c911ba75f8a959ad9fe9b9d35946d0b3a98297ce2515c04c28f"
+    },
+    {
+      "bytes": 150977,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/135b8e00cdbbe82610643c10d1171ae5938e536c12bca2c2795020bea8e71d99.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/135b8e00cdbbe82610643c10d1171ae5938e536c12bca2c2795020bea8e71d99",
+      "sha256": "135b8e00cdbbe82610643c10d1171ae5938e536c12bca2c2795020bea8e71d99"
+    },
+    {
+      "bytes": 334426,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/13e7be0af0f76b40937df487cd731dc87ce76e534c997330c8d392f73c3e000f.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/13e7be0af0f76b40937df487cd731dc87ce76e534c997330c8d392f73c3e000f",
+      "sha256": "13e7be0af0f76b40937df487cd731dc87ce76e534c997330c8d392f73c3e000f"
+    },
+    {
+      "bytes": 152490,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/149033d4f63039246c01a5c559ea5801ca2668cc14f237cc285e8659357e3ceb.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/149033d4f63039246c01a5c559ea5801ca2668cc14f237cc285e8659357e3ceb",
+      "sha256": "149033d4f63039246c01a5c559ea5801ca2668cc14f237cc285e8659357e3ceb"
+    },
+    {
+      "bytes": 156454,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/1b4ed9bea9b5d1bf30faa660275c3da6ddbd86151a5588f0e3bd29e013835f97.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/1b4ed9bea9b5d1bf30faa660275c3da6ddbd86151a5588f0e3bd29e013835f97",
+      "sha256": "1b4ed9bea9b5d1bf30faa660275c3da6ddbd86151a5588f0e3bd29e013835f97"
+    },
+    {
+      "bytes": 154309,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/253cec4f39af6953a2c2fbe7fbfd363caf8ae13f66a36af9da234522b233d7c2.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/253cec4f39af6953a2c2fbe7fbfd363caf8ae13f66a36af9da234522b233d7c2",
+      "sha256": "253cec4f39af6953a2c2fbe7fbfd363caf8ae13f66a36af9da234522b233d7c2"
+    },
+    {
+      "bytes": 148950,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/2862b04686a179b24dbddb921b737f2b2a5f3bce4e7c58e9cc9b3a217d10b248.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/2862b04686a179b24dbddb921b737f2b2a5f3bce4e7c58e9cc9b3a217d10b248",
+      "sha256": "2862b04686a179b24dbddb921b737f2b2a5f3bce4e7c58e9cc9b3a217d10b248"
+    },
+    {
+      "bytes": 160817,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/28889f6403a04e59b2b3d3cad2b4551b9e678b5637b0537b11731cd3fab4cf48.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/28889f6403a04e59b2b3d3cad2b4551b9e678b5637b0537b11731cd3fab4cf48",
+      "sha256": "28889f6403a04e59b2b3d3cad2b4551b9e678b5637b0537b11731cd3fab4cf48"
+    },
+    {
+      "bytes": 156055,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/2c7b18e2ff17542629d9690acc9057796f21a1a118b61839d24b017aa27e9f9c.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/2c7b18e2ff17542629d9690acc9057796f21a1a118b61839d24b017aa27e9f9c",
+      "sha256": "2c7b18e2ff17542629d9690acc9057796f21a1a118b61839d24b017aa27e9f9c"
+    },
+    {
+      "bytes": 149981,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/2f8b272582f6cecee3625da37b41c54ebb6f6b4b27e255e60d7121387b9c6538.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/2f8b272582f6cecee3625da37b41c54ebb6f6b4b27e255e60d7121387b9c6538",
+      "sha256": "2f8b272582f6cecee3625da37b41c54ebb6f6b4b27e255e60d7121387b9c6538"
+    },
+    {
+      "bytes": 127430,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/3360f2a12e97d8d326fe1cd99be95201be12730f9d9b4cc9da97d27170ec95b1.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/3360f2a12e97d8d326fe1cd99be95201be12730f9d9b4cc9da97d27170ec95b1",
+      "sha256": "3360f2a12e97d8d326fe1cd99be95201be12730f9d9b4cc9da97d27170ec95b1"
+    },
+    {
+      "bytes": 143649,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/34202caf167f87996915940c41814748c348b985b27d22e9daacef6e830b0330.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/34202caf167f87996915940c41814748c348b985b27d22e9daacef6e830b0330",
+      "sha256": "34202caf167f87996915940c41814748c348b985b27d22e9daacef6e830b0330"
+    },
+    {
+      "bytes": 158856,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/34be3d54ee713e034225851cc19a1083bda528887ba856eccc420c2e4f76a4f7.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/34be3d54ee713e034225851cc19a1083bda528887ba856eccc420c2e4f76a4f7",
+      "sha256": "34be3d54ee713e034225851cc19a1083bda528887ba856eccc420c2e4f76a4f7"
+    },
+    {
+      "bytes": 160962,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/359c38790b9f240780bb2b4525df522431dc732526187fe9df743a251fb012a3.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/359c38790b9f240780bb2b4525df522431dc732526187fe9df743a251fb012a3",
+      "sha256": "359c38790b9f240780bb2b4525df522431dc732526187fe9df743a251fb012a3"
+    },
+    {
+      "bytes": 155699,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/36c36ff788bcfba263d44dc21599934467dd98b7e975acf93196b22482e7b678.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/36c36ff788bcfba263d44dc21599934467dd98b7e975acf93196b22482e7b678",
+      "sha256": "36c36ff788bcfba263d44dc21599934467dd98b7e975acf93196b22482e7b678"
+    },
+    {
+      "bytes": 161391,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/3b6d783d49de499775113f2f318d5fc4b2883c251308e7d0e110abb6010b855a.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/3b6d783d49de499775113f2f318d5fc4b2883c251308e7d0e110abb6010b855a",
+      "sha256": "3b6d783d49de499775113f2f318d5fc4b2883c251308e7d0e110abb6010b855a"
+    },
+    {
+      "bytes": 155807,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/40bbfac14d35944f5bce6d02d05366bb0830dba7a727d2c93e9dcfdbba7b4a6a.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/40bbfac14d35944f5bce6d02d05366bb0830dba7a727d2c93e9dcfdbba7b4a6a",
+      "sha256": "40bbfac14d35944f5bce6d02d05366bb0830dba7a727d2c93e9dcfdbba7b4a6a"
+    },
+    {
+      "bytes": 151677,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/49ac471b5695ae5bd45375f413505c6a87cdb4bf779fd60db7fb3a7f1253d86c.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/49ac471b5695ae5bd45375f413505c6a87cdb4bf779fd60db7fb3a7f1253d86c",
+      "sha256": "49ac471b5695ae5bd45375f413505c6a87cdb4bf779fd60db7fb3a7f1253d86c"
+    },
+    {
+      "bytes": 361692,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/4c16ba717dca19a44b87a97637c2981db7fad11f2fc13978f7a6c67851ab55f6.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/4c16ba717dca19a44b87a97637c2981db7fad11f2fc13978f7a6c67851ab55f6",
+      "sha256": "4c16ba717dca19a44b87a97637c2981db7fad11f2fc13978f7a6c67851ab55f6"
+    },
+    {
+      "bytes": 127773,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/4fce1e96d1fb04bbeb82b459591a2ba15b818e11436ebba43a57b1083348ab7b.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/4fce1e96d1fb04bbeb82b459591a2ba15b818e11436ebba43a57b1083348ab7b",
+      "sha256": "4fce1e96d1fb04bbeb82b459591a2ba15b818e11436ebba43a57b1083348ab7b"
+    },
+    {
+      "bytes": 151613,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/53aa8fc2a3c72586bad50dbcdcfb764046cc3e8992284eb37df7fdc1982f71b7.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/53aa8fc2a3c72586bad50dbcdcfb764046cc3e8992284eb37df7fdc1982f71b7",
+      "sha256": "53aa8fc2a3c72586bad50dbcdcfb764046cc3e8992284eb37df7fdc1982f71b7"
+    },
+    {
+      "bytes": 151525,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/5989760774c56235c05a69754574b81d3f076c79a2770f0a143719270300cf2c.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/5989760774c56235c05a69754574b81d3f076c79a2770f0a143719270300cf2c",
+      "sha256": "5989760774c56235c05a69754574b81d3f076c79a2770f0a143719270300cf2c"
+    },
+    {
+      "bytes": 153680,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/5c74e29496d286c5ee57db6c30fa0e58ac7167b9527aeefcf5f8928019b8d6bb.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/5c74e29496d286c5ee57db6c30fa0e58ac7167b9527aeefcf5f8928019b8d6bb",
+      "sha256": "5c74e29496d286c5ee57db6c30fa0e58ac7167b9527aeefcf5f8928019b8d6bb"
+    },
+    {
+      "bytes": 152782,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/60f00f85b6c94974daf9bba79d77881d9736e26e5b041fb40f21e302a94aeba2.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/60f00f85b6c94974daf9bba79d77881d9736e26e5b041fb40f21e302a94aeba2",
+      "sha256": "60f00f85b6c94974daf9bba79d77881d9736e26e5b041fb40f21e302a94aeba2"
+    },
+    {
+      "bytes": 149988,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/61e6b21c443d556afefc157ed3e54974fa4cde56cd120ee5e5f053b6b9cc374e.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/61e6b21c443d556afefc157ed3e54974fa4cde56cd120ee5e5f053b6b9cc374e",
+      "sha256": "61e6b21c443d556afefc157ed3e54974fa4cde56cd120ee5e5f053b6b9cc374e"
+    },
+    {
+      "bytes": 163552,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/6583df842ce1b6d5f3dacb4dbbe434e72e580dafae5cd585ff4eb1c3ff1592ae.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/6583df842ce1b6d5f3dacb4dbbe434e72e580dafae5cd585ff4eb1c3ff1592ae",
+      "sha256": "6583df842ce1b6d5f3dacb4dbbe434e72e580dafae5cd585ff4eb1c3ff1592ae"
+    },
+    {
+      "bytes": 163499,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/6bb353c7794c1b9db763ed3b4640627b3b8d456f5283bb888c3a9b23c5800392.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/6bb353c7794c1b9db763ed3b4640627b3b8d456f5283bb888c3a9b23c5800392",
+      "sha256": "6bb353c7794c1b9db763ed3b4640627b3b8d456f5283bb888c3a9b23c5800392"
+    },
+    {
+      "bytes": 144249,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/6d355c4a2188bc87f6f15429c218f577804b7a291515d1412b036d9cc9fb5e67.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/6d355c4a2188bc87f6f15429c218f577804b7a291515d1412b036d9cc9fb5e67",
+      "sha256": "6d355c4a2188bc87f6f15429c218f577804b7a291515d1412b036d9cc9fb5e67"
+    },
+    {
+      "bytes": 154509,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/6f202966652d9d341e6be97c78741969481c2751a39628bbb8faf9727739f3e8.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/6f202966652d9d341e6be97c78741969481c2751a39628bbb8faf9727739f3e8",
+      "sha256": "6f202966652d9d341e6be97c78741969481c2751a39628bbb8faf9727739f3e8"
+    },
+    {
+      "bytes": 153346,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/743f3fa669a899347ad0e84adc7b9beb179143aefb1dcb4c21348dfbb15717cd.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/743f3fa669a899347ad0e84adc7b9beb179143aefb1dcb4c21348dfbb15717cd",
+      "sha256": "743f3fa669a899347ad0e84adc7b9beb179143aefb1dcb4c21348dfbb15717cd"
+    },
+    {
+      "bytes": 147506,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/7583b3ff3b440bb340c3d05ea2bd6d19a77366f7e804f0a21725227e57400d28.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/7583b3ff3b440bb340c3d05ea2bd6d19a77366f7e804f0a21725227e57400d28",
+      "sha256": "7583b3ff3b440bb340c3d05ea2bd6d19a77366f7e804f0a21725227e57400d28"
+    },
+    {
+      "bytes": 333940,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/792dec2b2e0aa449ba09055571f36ca403f389f36df13dea67f99e75cddc9730.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/792dec2b2e0aa449ba09055571f36ca403f389f36df13dea67f99e75cddc9730",
+      "sha256": "792dec2b2e0aa449ba09055571f36ca403f389f36df13dea67f99e75cddc9730"
+    },
+    {
+      "bytes": 154987,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/79399b481ac2961c3f742c6fb4453643f8a64d42903fc80fd392682ffe55dab8.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/79399b481ac2961c3f742c6fb4453643f8a64d42903fc80fd392682ffe55dab8",
+      "sha256": "79399b481ac2961c3f742c6fb4453643f8a64d42903fc80fd392682ffe55dab8"
+    },
+    {
+      "bytes": 159747,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/7ab4025b7ebd0d03f03e71316224498ad8319b015e13766d13d2c3618a4bb23c.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/7ab4025b7ebd0d03f03e71316224498ad8319b015e13766d13d2c3618a4bb23c",
+      "sha256": "7ab4025b7ebd0d03f03e71316224498ad8319b015e13766d13d2c3618a4bb23c"
+    },
+    {
+      "bytes": 156266,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/7bcd087760ab01587fcd342ccf9d15555619be15812697b1c6f0f87f3fef73f2.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/7bcd087760ab01587fcd342ccf9d15555619be15812697b1c6f0f87f3fef73f2",
+      "sha256": "7bcd087760ab01587fcd342ccf9d15555619be15812697b1c6f0f87f3fef73f2"
+    },
+    {
+      "bytes": 158116,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/8100983967371084e5fa7a9c0666784ed68a0e1ec7d97393e37f7b3a5165675c.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/8100983967371084e5fa7a9c0666784ed68a0e1ec7d97393e37f7b3a5165675c",
+      "sha256": "8100983967371084e5fa7a9c0666784ed68a0e1ec7d97393e37f7b3a5165675c"
+    },
+    {
+      "bytes": 142608,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/87c34a5dcbae702abb0a4d83f76befb78a18a82d898aca103347eadf96eaafe7.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/87c34a5dcbae702abb0a4d83f76befb78a18a82d898aca103347eadf96eaafe7",
+      "sha256": "87c34a5dcbae702abb0a4d83f76befb78a18a82d898aca103347eadf96eaafe7"
+    },
+    {
+      "bytes": 132470,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/9b162c3c026ab8df1a4a57e722cf89e07ac58ddfcddcd91bffde28707a497fa7.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/9b162c3c026ab8df1a4a57e722cf89e07ac58ddfcddcd91bffde28707a497fa7",
+      "sha256": "9b162c3c026ab8df1a4a57e722cf89e07ac58ddfcddcd91bffde28707a497fa7"
+    },
+    {
+      "bytes": 144421,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/9fb6af331b56a1ed99c7ae1791e736357dae32e19b66c7ecb451b75c367eed04.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/9fb6af331b56a1ed99c7ae1791e736357dae32e19b66c7ecb451b75c367eed04",
+      "sha256": "9fb6af331b56a1ed99c7ae1791e736357dae32e19b66c7ecb451b75c367eed04"
+    },
+    {
+      "bytes": 149030,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/a1c33b4b61382c265d3fd614af80be1250d323f2a961e1b1d6807e08a2d6621e.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/a1c33b4b61382c265d3fd614af80be1250d323f2a961e1b1d6807e08a2d6621e",
+      "sha256": "a1c33b4b61382c265d3fd614af80be1250d323f2a961e1b1d6807e08a2d6621e"
+    },
+    {
+      "bytes": 156843,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/a42a936ef2ccf5a5f77884318a1288bb1818e3308ca1b64847cb93d8956dd152.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/a42a936ef2ccf5a5f77884318a1288bb1818e3308ca1b64847cb93d8956dd152",
+      "sha256": "a42a936ef2ccf5a5f77884318a1288bb1818e3308ca1b64847cb93d8956dd152"
+    },
+    {
+      "bytes": 157141,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/a5f502274b79af8d0c287305c0076c5747facebba3a4a6eff6d2a6e2035fb4e5.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/a5f502274b79af8d0c287305c0076c5747facebba3a4a6eff6d2a6e2035fb4e5",
+      "sha256": "a5f502274b79af8d0c287305c0076c5747facebba3a4a6eff6d2a6e2035fb4e5"
+    },
+    {
+      "bytes": 131814,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/afbc35feaf2c4461cee8188b6916ea305d56a3acf649badfa88308693cf8d53c.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/afbc35feaf2c4461cee8188b6916ea305d56a3acf649badfa88308693cf8d53c",
+      "sha256": "afbc35feaf2c4461cee8188b6916ea305d56a3acf649badfa88308693cf8d53c"
+    },
+    {
+      "bytes": 123141,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/b15e687f58906c2e9d8bd6e57f510ca8fdaa2bb8082b919996689ca48f8ac3d2.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/b15e687f58906c2e9d8bd6e57f510ca8fdaa2bb8082b919996689ca48f8ac3d2",
+      "sha256": "b15e687f58906c2e9d8bd6e57f510ca8fdaa2bb8082b919996689ca48f8ac3d2"
+    },
+    {
+      "bytes": 174864,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/b9036d7646a894df7a73a7dc98b28ea67faa29c134b2170e2c91001600da134e.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/b9036d7646a894df7a73a7dc98b28ea67faa29c134b2170e2c91001600da134e",
+      "sha256": "b9036d7646a894df7a73a7dc98b28ea67faa29c134b2170e2c91001600da134e"
+    },
+    {
+      "bytes": 149328,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/b941479501c5192944d62e8c17d7d0328946150d0422ba0ae006b9f405aa6e13.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/b941479501c5192944d62e8c17d7d0328946150d0422ba0ae006b9f405aa6e13",
+      "sha256": "b941479501c5192944d62e8c17d7d0328946150d0422ba0ae006b9f405aa6e13"
+    },
+    {
+      "bytes": 153335,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/bc25d8a20f418435001e097a61987bdf6a2ee7b467a97d375c599198c691f26b.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/bc25d8a20f418435001e097a61987bdf6a2ee7b467a97d375c599198c691f26b",
+      "sha256": "bc25d8a20f418435001e097a61987bdf6a2ee7b467a97d375c599198c691f26b"
+    },
+    {
+      "bytes": 152635,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/beacfc3cf66cd019e336ae7a7fa9ac4ae5559ef44a58c68b110647188ce0e7a5.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/beacfc3cf66cd019e336ae7a7fa9ac4ae5559ef44a58c68b110647188ce0e7a5",
+      "sha256": "beacfc3cf66cd019e336ae7a7fa9ac4ae5559ef44a58c68b110647188ce0e7a5"
+    },
+    {
+      "bytes": 149283,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/c16dd44c098c57d074d290272ff302166091e67ea39b631c016082497e92565c.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/c16dd44c098c57d074d290272ff302166091e67ea39b631c016082497e92565c",
+      "sha256": "c16dd44c098c57d074d290272ff302166091e67ea39b631c016082497e92565c"
+    },
+    {
+      "bytes": 152877,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/c99d47752d5230693e72894559e8757d23f2361c50633cea5f4ad70ce956c1c6.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/c99d47752d5230693e72894559e8757d23f2361c50633cea5f4ad70ce956c1c6",
+      "sha256": "c99d47752d5230693e72894559e8757d23f2361c50633cea5f4ad70ce956c1c6"
+    },
+    {
+      "bytes": 155900,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/c9e05b54fe14d2cc50973dad26c08003b6daa65cf0b66f62d10558a834df12aa.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/c9e05b54fe14d2cc50973dad26c08003b6daa65cf0b66f62d10558a834df12aa",
+      "sha256": "c9e05b54fe14d2cc50973dad26c08003b6daa65cf0b66f62d10558a834df12aa"
+    },
+    {
+      "bytes": 160899,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/cdbff753026cc6c82954a1be69b877d7b84dbaf9f575eed0e77250325b30b76f.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/cdbff753026cc6c82954a1be69b877d7b84dbaf9f575eed0e77250325b30b76f",
+      "sha256": "cdbff753026cc6c82954a1be69b877d7b84dbaf9f575eed0e77250325b30b76f"
+    },
+    {
+      "bytes": 143569,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/d2fa06b5c4bbf398b6ba95acf7c0edb4617cdd47934e6f4ebeacb715da03ab48.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/d2fa06b5c4bbf398b6ba95acf7c0edb4617cdd47934e6f4ebeacb715da03ab48",
+      "sha256": "d2fa06b5c4bbf398b6ba95acf7c0edb4617cdd47934e6f4ebeacb715da03ab48"
+    },
+    {
+      "bytes": 143349,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/e0477f0e7d0c5ffea88b47594ed53387b48052737688cad5ed9ef04e44f73510.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/e0477f0e7d0c5ffea88b47594ed53387b48052737688cad5ed9ef04e44f73510",
+      "sha256": "e0477f0e7d0c5ffea88b47594ed53387b48052737688cad5ed9ef04e44f73510"
+    },
+    {
+      "bytes": 149324,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/e1e60aa581675870e53f47e0f2036e8fb8992a790618313018fa166667282bfe.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/e1e60aa581675870e53f47e0f2036e8fb8992a790618313018fa166667282bfe",
+      "sha256": "e1e60aa581675870e53f47e0f2036e8fb8992a790618313018fa166667282bfe"
+    },
+    {
+      "bytes": 332768,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/e3fd0efac1594f7c5b242557819b2f22e27572ad53377b690c669c197b549a8b.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/e3fd0efac1594f7c5b242557819b2f22e27572ad53377b690c669c197b549a8b",
+      "sha256": "e3fd0efac1594f7c5b242557819b2f22e27572ad53377b690c669c197b549a8b"
+    },
+    {
+      "bytes": 156448,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/e7ceef644cb614fe7e6b18c22c9fd299f9199929ff4885018ff03d75d84f1be6.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/e7ceef644cb614fe7e6b18c22c9fd299f9199929ff4885018ff03d75d84f1be6",
+      "sha256": "e7ceef644cb614fe7e6b18c22c9fd299f9199929ff4885018ff03d75d84f1be6"
+    },
+    {
+      "bytes": 339872,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/e7fb69b08509f17f3de2ce3065d0a140bf8f14106bd4b183e923052c9becd490.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/e7fb69b08509f17f3de2ce3065d0a140bf8f14106bd4b183e923052c9becd490",
+      "sha256": "e7fb69b08509f17f3de2ce3065d0a140bf8f14106bd4b183e923052c9becd490"
+    },
+    {
+      "bytes": 132976,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/f105f3ef32041e65aa4d533a7c9d7c81e1c95c490384e9eaf24deaa93065ae3c.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/f105f3ef32041e65aa4d533a7c9d7c81e1c95c490384e9eaf24deaa93065ae3c",
+      "sha256": "f105f3ef32041e65aa4d533a7c9d7c81e1c95c490384e9eaf24deaa93065ae3c"
+    },
+    {
+      "bytes": 155639,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/f68bd347c57fb153d98fc2512018e4b0f8063ed52eeb5ab79c8a56c60c2d2171.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/f68bd347c57fb153d98fc2512018e4b0f8063ed52eeb5ab79c8a56c60c2d2171",
+      "sha256": "f68bd347c57fb153d98fc2512018e4b0f8063ed52eeb5ab79c8a56c60c2d2171"
+    },
+    {
+      "bytes": 125308,
+      "category": "r1_official_gamebook",
+      "localPath": ".model-lab-cache/engine-os-r1/official-gamebooks/ff85283aa379b00e0d032d70fec0f991fca6ef86c723d0d3150a8d0d38d24772.pdf",
+      "r2Key": "raw/nfl/official-gamebook/sha256/ff85283aa379b00e0d032d70fec0f991fca6ef86c723d0d3150a8d0d38d24772",
+      "sha256": "ff85283aa379b00e0d032d70fec0f991fca6ef86c723d0d3150a8d0d38d24772"
+    }
+  ],
+  "schemaVersion": "engine-os.os-00-r2-archive-manifest.v1",
+  "totalBytes": 630716255
+}

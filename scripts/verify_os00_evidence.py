@@ -77,6 +77,7 @@ def resolve_evidence_object(
 ) -> Path:
     relative = Path(str(item["path"]))
     digest = str(item["sha256"])
+    expected_bytes = int(item["bytes"])
     candidates = [repo_root / relative]
     if artifact_cache_root is not None:
         candidates.extend(
@@ -88,10 +89,17 @@ def resolve_evidence_object(
                 artifact_cache_root / digest,
             ]
         )
+    for candidate in candidates:
+        if (
+            candidate.is_file()
+            and candidate.stat().st_size == expected_bytes
+            and sha256_file(candidate) == digest
+        ):
+            return candidate
     return next((candidate for candidate in candidates if candidate.is_file()), candidates[0])
 
 
-def resolve_source_object(source_root: Path, object_name: str, digest: str) -> Path:
+def resolve_source_object(source_root: Path, object_name: str, digest: str, expected_bytes: int) -> Path:
     candidates = [
         source_root / "objects" / object_name,
         source_root / "sha256" / digest,
@@ -99,6 +107,13 @@ def resolve_source_object(source_root: Path, object_name: str, digest: str) -> P
         source_root / "model-lab" / "raw" / "sha256" / digest,
         source_root / digest,
     ]
+    for candidate in candidates:
+        if (
+            candidate.is_file()
+            and candidate.stat().st_size == expected_bytes
+            and sha256_file(candidate) == digest
+        ):
+            return candidate
     return next((candidate for candidate in candidates if candidate.is_file()), candidates[0])
 
 
@@ -292,7 +307,7 @@ def verify_sources(
         if object_name != digest and not object_name.startswith(digest + "."):
             result.error(f"source object is not content-addressed: {logical_name}: {object_name}")
             continue
-        path = resolve_source_object(source_cache_root, object_name, digest)
+        path = resolve_source_object(source_cache_root, object_name, digest, int(entry["byte_count"]))
         if result.verify_file(path, digest, int(entry["byte_count"]), f"source object {logical_name}"):
             result.checked_source_objects += 1
     return dict(sources)

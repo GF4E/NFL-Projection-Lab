@@ -53,7 +53,11 @@
     "nflverse_import_alerts",
     "nflverse_import_state",
     "odds_automation_runs",
+    "odds_quota_control",
+    "odds_quota_epochs",
     "odds_quota_events",
+    "odds_quota_reservation_events",
+    "odds_quota_reservations",
     "odds_quota_state",
     "official_inactives",
     "official_inactives_stage",
@@ -111,6 +115,11 @@
     {
       "family": "model-lab-source",
       "keyTemplate": "model-lab/raw/sha256/{sha256}",
+      "immutability": "write-once"
+    },
+    {
+      "family": "model-lab-source-index",
+      "keyTemplate": "model-lab/raw/index/sha256/{sha256}",
       "immutability": "write-once"
     },
     {
