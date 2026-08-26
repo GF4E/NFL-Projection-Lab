@@ -16,7 +16,7 @@ This is the execution register. A work package is complete only when its accepta
 1. Preserve accepted **OS-00**, frozen **OS-00B**, terminal R1-v1, frozen **R0**, and deployed **OS-01A** evidence.
 2. Finish **OS-18A** provider authentication and final scans; rotation and dormant server-secret installation are complete.
 3. Complete R1-v2's independent human review and the disabled non-market portion of **OS-03A**.
-4. **OS-19A**'s urgent slice is accepted. Execute **OS-02A** and **OS-15A**, then finish **OS-03A**, **OS-13A**, and the remaining OS-18A gates before authenticated capture. Full OS-01/OS-02/OS-03 proceed behind them.
+4. **OS-19A** and **OS-02A** are accepted. Execute **OS-15A**, then finish **OS-03A**, **OS-13A**, and the remaining OS-18A gates before authenticated capture. Full OS-01/OS-02/OS-03 proceed behind them.
 5. **R2** may execute only the Module 2B residual-kernel falsification and only after R1-v2 passes, followed by **R3**.
 6. Continue the platform spine through **OS-14** regardless of whether the possession branch survives.
 7. Start **R4 through R12** only for the decomposition branch authorized by R3; use **R3A** or **R3B** for the other branches.
@@ -154,7 +154,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-02A — Establish game, kickoff, reschedule, and origin identity
 
-**Status:** NEXT after OS-01A
+**Status:** ACCEPTED
 
 **Requirement contribution:** DATA-02, LED-03
 
@@ -165,6 +165,8 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 **Deliverables:** Canonical game key, provider-game aliases, kickoff UTC/local zone, reschedule history, Week W membership, required forecast origins, eligibility, and same-week exclusion fixtures.
 
 **Acceptance gate:** Every scheduled 2026 game resolves or is explicitly unresolved; reschedules append rather than overwrite; origins obey OS-00B and DST rules; a late or postponed game cannot be assigned an earlier eligible origin.
+
+**Acceptance evidence:** `.planning/engine-os/execution/os-02a/acceptance-receipt.v1.json` binds the pinned 272-game schedule to 1,360 five-horizon origin identities, append-only reschedule and provider-alias guards, DST/same-week/late-game fixtures, the three-revision eligibility ratchet, an independent pass, live D1 migration 0015, and a clean fail-closed Sites deployment with unchanged Odds quota.
 
 ### OS-03A — Start immutable 2026 evidence capture
 

@@ -1,0 +1,110 @@
+{
+  "schemaVersion": "engine-os.os-02a-acceptance-receipt.v1",
+  "generatedAt": "2026-08-26T17:52:18Z",
+  "status": "accepted",
+  "scope": "Canonical 2026 game, kickoff revision, provider alias, and five-horizon forecast-origin identity only",
+  "source": {
+    "implementationCommit": "e691f01aba9571b9e15ed2896c6aa46bbccf5e29",
+    "cleanDeploymentCommit": "78043ca883ade6b6c64d0b2aacb64073ca2692fb",
+    "scheduleSnapshot": "config/2026-nfl-schedule.v1.json",
+    "scheduleSnapshotFileSha256": "9df8588f1baf73038c4e2cb941f332f25a6f81366d6a5ec660b133fa8eaf46c7",
+    "normalizedGamesSha256": "3d7e7ac2761f36e93a9734b693e43f861152ad7dee5ddb06f098ea935ba94801",
+    "gameCount": 272,
+    "sourceUrl": "https://raw.githubusercontent.com/nflverse/nfldata/66abff2fb404bb3a77fcb4886910d901d32b8e51/data/games.csv",
+    "sourceCommit": "66abff2fb404bb3a77fcb4886910d901d32b8e51",
+    "sourceCsvSha256": "ee90aae773984ae143426294b2724988f7f65e6d21e031212731f622e977b580"
+  },
+  "migration": {
+    "version": "0015_engine_os_origin_identity",
+    "source": "drizzle/0015_engine_os_origin_identity.sql",
+    "sourceFileSha256": "96a161205f0d5966a337f47dc3a5ca662afb0dfe3dc1df29f07b6fe5fec7ea76",
+    "definitionHash": "sha256:622fb472f959273563f3dd139b7dde676e27b370a52c0241d6ee4d3726e3444a",
+    "statementCount": 16,
+    "appliedAt": "2026-08-26T17:49:54.165Z",
+    "verifiedTables": [
+      "game_schedule_revisions",
+      "forecast_origin_versions"
+    ],
+    "verifiedTriggerCount": 8
+  },
+  "qualification": {
+    "canonicalGames": 272,
+    "resolvedGames": 272,
+    "requiredOrigins": 1360,
+    "originsPerGame": 5,
+    "horizons": [
+      "weekly_tuesday_0730",
+      "kickoff_minus_120",
+      "kickoff_minus_90",
+      "kickoff_minus_60",
+      "kickoff_minus_15"
+    ],
+    "dstWeek8TuesdayUtc": "2026-10-27T14:30:00.000Z",
+    "dstWeek9TuesdayUtc": "2026-11-03T15:30:00.000Z",
+    "appendOnlyReschedules": true,
+    "unresolvedKickoffProducesFiveExplicitIneligibleOrigins": true,
+    "postponedOriginBackfillProhibited": true,
+    "earlierKickoffEligibilityRatchet": true,
+    "sameWeekIsolation": true,
+    "providerAliasReassignmentProhibited": true,
+    "rollbackFixture": "drizzle/rollback/0015_engine_os_origin_identity.down.sql",
+    "fullSuite": {
+      "testFilesPassed": 44,
+      "testFilesSkipped": 1,
+      "testsPassed": 297,
+      "testsSkipped": 1,
+      "typecheck": "pass",
+      "lint": "pass",
+      "build": "pass",
+      "diffCheck": "pass"
+    },
+    "independentAudit": {
+      "result": "pass",
+      "remainingBlockers": 0,
+      "requiredRatchetCounterexampleAdded": true
+    }
+  },
+  "sites": {
+    "projectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+    "productionUrl": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site",
+    "initialSavedVersion": 151,
+    "initialDeploymentId": "appgdep_6a8f26527b0c8191badf072c64401e47",
+    "initialReadback": "migration_not_applied_gate_remained_open",
+    "migrationSavedVersion": 152,
+    "migrationDeploymentId": "appgdep_6a8f272c387081919f0d818480d86682",
+    "cleanSavedVersion": 153,
+    "cleanVersionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_554a736303288191b3e4e040ee2fb9bd",
+    "cleanDeploymentId": "appgdep_6a8f2791509081918cba16bab585c074",
+    "cleanDeploymentStatus": "succeeded",
+    "cleanEnvironmentRevision": 21,
+    "migrationBridgeRetired": true,
+    "migrationEnvironmentKeysRemoved": true,
+    "retiredEndpointPostStatus": 405
+  },
+  "failClosedProof": {
+    "captureEnabledEnvironmentKeyPresent": false,
+    "newScheduleRevisionRows": 0,
+    "newOriginVersionRows": 0,
+    "engineActivationCreated": false,
+    "oddsApiProviderRequestMade": false,
+    "oddsCreditsUsed": 38,
+    "oddsCreditsRemaining": 462,
+    "outstandingOddsReservations": 0,
+    "linesConfigured": false,
+    "linesStale": true
+  },
+  "claims": {
+    "os02aAccepted": true,
+    "data02Accepted": false,
+    "os02Accepted": false,
+    "prospectiveCaptureStarted": false,
+    "os15aAccepted": false,
+    "r2Authorized": false,
+    "driveQuarterbackOrPlayerModuleAuthorized": false
+  },
+  "limitations": [
+    "OS-02A qualifies only the urgent 2026 game, schedule, alias, and forecast-origin identity slice; full OS-02 still owns player, venue, franchise, provider-event, and market-contract temporal identity.",
+    "The interim scheduler still consumes the legacy Tuesday-only ledger; OS-15A must adopt forecast_origin_versions and prove fenced delivery for every horizon before activation.",
+    "The production identity tables are intentionally empty because prospective capture remains disabled; this receipt verifies deployed schema and fail-closed readiness, not a started evidence stream."
+  ]
+}

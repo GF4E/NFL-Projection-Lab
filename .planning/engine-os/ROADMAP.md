@@ -37,7 +37,7 @@ Phase numbers describe capability layers, not a forced serial queue. Secret-reda
 | Phase | Status | Primary task set | Exit decision |
 |---|---|---|---|
 | 1 | In progress: OS-00 accepted; ARC-03 and OS-18A remain open | OS-00, OS-00B, OS-01A/OS-01, OS-18A, R0, R18A | One authoritative, preserved, numerically governed engine kernel |
-| 2 | Urgent capture plus queued canonicalization | OS-02A, OS-03A, OS-19A, OS-02–OS-08, R1 | Replayable point-in-time evidence and verified targets |
+| 2 | OS-02A and OS-19A accepted; capture and full canonicalization still queued | OS-02A, OS-03A, OS-19A, OS-02–OS-08, R1 | Replayable point-in-time evidence and verified targets |
 | 3 | Queued | OS-09–OS-12 | Deterministic experiment and portable model packages |
 | 4 | OS-13A urgent; full integration queued | OS-15A, OS-13A, OS-13B, OS-14 | Independent prospective ledgers and all-game grading |
 | 5 | Blocked: R1-v1 terminal `protocol_invalid`; R1-v2 awaiting human review | Complete R1-v2, then R2 and R3 only on a verified pass | Continue possessions, redesign target, or kill branch |
@@ -81,7 +81,7 @@ Phase numbers describe capability layers, not a forced serial queue. Secret-reda
 **Plans:**
 
 1. Execute OS-03A immediately for non-market evidence; execute OS-15A, OS-18A, and OS-19A before scheduled authenticated quote capture so timing, secrets, and quota reserves are protected.
-2. Execute OS-02A after OS-01A, then complete OS-02 and OS-03 in parallel to establish full temporal identities and canonical raw-object manifests; source bytes are preserved before identity resolution.
+2. Preserve accepted OS-02A after OS-01A, then complete OS-02 and OS-03 in parallel to establish full temporal identities and canonical raw-object manifests; source bytes are preserved before identity resolution.
 3. Execute OS-04 and OS-05 to route each provider through one connector, validation, quarantine, and atomic publication contract.
 4. Execute OS-06, OS-07, and OS-08 to reconstruct as-of views, register definitions, and produce origin-keyed offline and online rows.
 5. Execute R1 only after preregistering its audit, reconciling the frozen score, regulation-possession, overtime, and Module 2 edge targets; drives receive their own audit in R4.
