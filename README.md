@@ -4,7 +4,7 @@ A public, read-only NFL analytics prototype. There are no active user accounts o
 
 ## Current qualification state
 
-The deployed interface and many analytics components predate the Prediction Engine OS audit. They are retained as a demo and research evidence, not as a validated production forecast. Legacy teammate labels and storage types also remain, so OS-18B's personal-state-free public-release gate has not passed. Live acquisition is intentionally disabled, no Odds API credential is installed, lines may be stale or absent, and no prospective 2026 forecast stream has started. Module 1 and Module 2 remain `reject_all`; Module 2B and every downstream drive, quarterback, and player experiment are blocked by the terminal-invalid R1-v1 target audit. See [the execution state](.planning/engine-os/STATE.md) for the authoritative status.
+The deployed interface and many analytics components predate the Prediction Engine OS audit. They are retained as a demo and research evidence, not as a validated production forecast. Legacy teammate labels and storage types also remain, so OS-18B's personal-state-free public-release gate has not passed. Live acquisition is intentionally disabled. A rotated Odds API secret may be staged in the host, but the active Worker does not read it; lines may be stale or absent, and no prospective 2026 forecast stream has started. Module 1 and Module 2 remain `reject_all`; Module 2B and every downstream drive, quarterback, and player experiment are blocked by the terminal-invalid R1-v1 target audit. See [the execution state](.planning/engine-os/STATE.md) for the authoritative status.
 
 ## Public experience
 
@@ -37,7 +37,7 @@ These components describe preserved work and intended contracts. Their presence 
 - Official NFL/team sources for current injury reports and inactives.
 - Open-Meteo for outdoor or open-roof kickoff-hour weather.
 
-The urgent D1 evidence/forecast-ledger schema is deployed with an append-only migration receipt, but the connectors remain inactive while evidence, origin, quota, and package-activation gates are open. The scheduled acquisition switch and Odds credential are absent. The active Worker does not run coefficient refits. Public HTTP rejects every mutating method before framework routing and exposes only explicit read APIs. When acquisition is eventually qualified, a failed import must preserve the last validated data and partial boards must remain stale rather than silently publish.
+The urgent D1 evidence/forecast-ledger schema is deployed with an append-only migration receipt, but the connectors remain inactive while evidence, origin, quota, and package-activation gates are open. The scheduled acquisition switch is off and the active Worker does not read the staged Odds credential. The active Worker does not run coefficient refits. Public HTTP rejects every mutating method before framework routing and exposes only explicit read APIs. When acquisition is eventually qualified, a failed import must preserve the last validated data and partial boards must remain stale rather than silently publish.
 
 ## Local preview
 
@@ -54,7 +54,7 @@ Open `http://localhost:3000/sunday`.
 
 Copy `.env.example` to `.env.local` for local, non-production development. nflverse itself does not require an API key.
 
-Do not install `ODDS_API_KEY` yet. The previously exposed credential must first be revoked by the account owner; its replacement stays outside source and chat until OS-19A proves atomic quota reservation and the actual-schedule budget. Even after secret installation, `ENGINE_OS_CAPTURE_ENABLED` must remain false until every activation gate passes. Cloudflare cron invokes the scheduled Worker handler directly, but it exits without acquisition unless that switch is exactly `true`.
+Keep `ODDS_API_KEY` outside source and chat. The rotated replacement may remain staged in the host, but the Worker deliberately does not bind or read it until OS-19A has deployed-D1 contention proof, a fresh dashboard-counter bootstrap, and the remaining capture gates. `ENGINE_OS_CAPTURE_ENABLED` must remain false until every activation gate passes. Cloudflare cron invokes the scheduled Worker handler directly, but it exits without acquisition unless that switch is exactly `true`.
 
 ## Frozen 2026 settings
 
@@ -65,7 +65,7 @@ Do not install `ODDS_API_KEY` yet. The previously exposed credential must first 
 - Sizing display: quarter-Kelly, 100-unit reference, 0.5-unit floor, 2-unit cap
 - Credit alert / ceiling: 400 / 450
 
-October, November, and December each reach the enforced 450-credit ceiling in the frozen reservation simulation, so lower-priority snapshots are withheld before essential windows.
+The 480-request exact 2026 schedule plan is simulated across 105 plausible first-of-month reset offsets. Before any staged-key usage is added, the maximum allowed monthly use is 399 credits; lower-priority work is withheld while openers, Tuesday origins, 60-minute snapshots, and 15-minute snapshots remain preserved below the 450-credit hard ceiling.
 
 Structural settings live in `config/structural.config.json`; era definitions and provenance live in `config/era.config.json`. Structural changes are offseason-only.
 

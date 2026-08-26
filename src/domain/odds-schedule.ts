@@ -1,8 +1,11 @@
 import { deterministicSnapshotKey } from "./automation";
+import { tuesdayForecastOrigin } from "./engine-os";
+import { stableHash } from "./hash";
 
 export type OddsAutomationJob =
   | "open_sunday"
   | "open_monday"
+  | "tuesday_origin"
   | "daily"
   | "kickoff_minus_120"
   | "kickoff_minus_60"
@@ -35,6 +38,7 @@ export interface MainlineCompletenessQuote {
 
 export interface ScheduledGame {
   id: string;
+  week: number;
   away: string;
   home: string;
   kickoffAt: string;
@@ -46,7 +50,7 @@ const SLOT_WINDOW_MS = 15 * 60_000;
 const PROP_RETRY_WINDOW_MS = 50 * 60_000;
 const REQUEST_COST = 3;
 const RECOVERY_LOOKBACK_MS = 8 * 86_400_000;
-const RECOVERY_PROBE_MS = 5 * 60_000;
+const PACIFIC_TIME_ZONE = "America/Los_Angeles";
 
 export function scheduledSnapshotQuoteFresh(input: {
   capturedAt: string | null;
@@ -70,7 +74,7 @@ export function scheduledSnapshotQuoteFresh(input: {
 
 function pacificParts(date: Date): { dayKey: string; weekday: string; minuteOfDay: number } {
   const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
-    timeZone: "America/Los_Angeles",
+    timeZone: PACIFIC_TIME_ZONE,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -86,28 +90,131 @@ function pacificParts(date: Date): { dayKey: string; weekday: string; minuteOfDa
   };
 }
 
-function recurringCandidate(now: Date, games: readonly ScheduledGame[]): ScheduledOddsCandidate | null {
-  const firstKickoff = Math.min(...games.map((game) => Date.parse(game.kickoffAt)));
-  const lastKickoff = Math.max(...games.map((game) => Date.parse(game.kickoffAt)));
-  if (now.getTime() < firstKickoff - 35 * 86_400_000 || now.getTime() > lastKickoff + 86_400_000) return null;
-  const pacific = pacificParts(now);
-  const definition = pacific.weekday === "Sun"
-    ? { job: "open_sunday" as const, minute: 18 * 60 }
-    : pacific.weekday === "Mon"
-      ? { job: "open_monday" as const, minute: 9 * 60 }
-      : ["Tue", "Wed", "Thu", "Fri", "Sat"].includes(pacific.weekday)
-        ? { job: "daily" as const, minute: 9 * 60 }
-        : null;
-  if (!definition || pacific.minuteOfDay < definition.minute || pacific.minuteOfDay >= definition.minute + 15) return null;
-  const scheduledFor = `${pacific.dayKey}T${String(Math.floor(definition.minute / 60)).padStart(2, "0")}:${String(definition.minute % 60).padStart(2, "0")}:00[America/Los_Angeles]`;
+function localDateTimeToUtc(dayKey: string, hour: number, minute: number): string {
+  const [year, month, day] = dayKey.split("-").map(Number);
+  const target = Date.UTC(year, month - 1, day, hour, minute, 0);
+  let candidate = target;
+  for (let iteration = 0; iteration < 3; iteration += 1) {
+    const represented = pacificParts(new Date(candidate));
+    const [representedYear, representedMonth, representedDay] = represented.dayKey.split("-").map(Number);
+    const representedAsUtc = Date.UTC(
+      representedYear,
+      representedMonth - 1,
+      representedDay,
+      Math.floor(represented.minuteOfDay / 60),
+      represented.minuteOfDay % 60,
+      0
+    );
+    candidate += target - representedAsUtc;
+  }
+  return new Date(candidate).toISOString();
+}
+
+function shiftDay(dayKey: string, days: number): string {
+  const [year, month, day] = dayKey.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+}
+
+function mainlineCandidate(
+  job: Exclude<OddsAutomationJob, "props_minus_60">,
+  scheduledFor: string,
+  priority: number
+): ScheduledOddsCandidate {
   return {
-    key: deterministicSnapshotKey({ provider: "the-odds-api", job: definition.job, scheduledFor }),
-    job: definition.job,
+    key: deterministicSnapshotKey({ provider: "the-odds-api", job, scheduledFor }),
+    job,
     scheduledFor,
     gameId: null,
     cost: REQUEST_COST,
-    priority: definition.job === "daily" ? 5 : 1
+    priority
   };
+}
+
+/**
+ * Expands the exact season schedule into one deterministic mainline request
+ * manifest. Tuesday's 07:30 scientific-origin snapshot replaces that day's
+ * ordinary 09:00 poll; it is not an additional request. Openers are tied to
+ * the 18 NFL week origins, preventing the former pre-season pseudo-openers.
+ */
+export function scheduledSeasonMainlinePlan(games: readonly ScheduledGame[]): ScheduledOddsCandidate[] {
+  if (!games.length) return [];
+  const byWeek = new Map<number, ScheduledGame[]>();
+  const gameIds = new Set<string>();
+  for (const game of games) {
+    if (!game.id.trim() || gameIds.has(game.id)) throw new Error(`Duplicate or blank scheduled game ID: ${game.id}`);
+    gameIds.add(game.id);
+    if (!Number.isInteger(game.week) || game.week < 1 || game.week > 18) {
+      throw new Error(`Invalid regular-season week for ${game.id}`);
+    }
+    if (!game.away.trim() || !game.home.trim() || game.away === game.home) {
+      throw new Error(`Invalid team identity for ${game.id}`);
+    }
+    const kickoff = Date.parse(game.kickoffAt);
+    if (!Number.isFinite(kickoff) || new Date(kickoff).toISOString() !== game.kickoffAt) {
+      throw new Error(`Invalid canonical kickoff for ${game.id}`);
+    }
+    const group = byWeek.get(game.week) ?? [];
+    group.push(game);
+    byWeek.set(game.week, group);
+  }
+  const plan: ScheduledOddsCandidate[] = [];
+  const originDays = new Set<string>();
+  for (const [week, weekGames] of [...byWeek.entries()].sort(([left], [right]) => left - right)) {
+    const origins = new Set(weekGames.map((game) => tuesdayForecastOrigin(game.id, game.kickoffAt).scheduledForUtc));
+    if (origins.size !== 1) throw new Error(`NFL Week ${week} does not resolve to one Tuesday origin`);
+    const origin = [...origins][0]!;
+    const originDay = pacificParts(new Date(origin)).dayKey;
+    originDays.add(originDay);
+    plan.push(
+      mainlineCandidate("open_sunday", localDateTimeToUtc(shiftDay(originDay, -2), 18, 0), 0),
+      mainlineCandidate("open_monday", localDateTimeToUtc(shiftDay(originDay, -1), 9, 0), 0),
+      mainlineCandidate("tuesday_origin", origin, 0)
+    );
+  }
+
+  const firstOriginDay = [...originDays].sort()[0]!;
+  const lastKickoffDay = pacificParts(new Date(Math.max(...games.map((game) => Date.parse(game.kickoffAt))))).dayKey;
+  for (let dayKey = firstOriginDay; dayKey <= lastKickoffDay; dayKey = shiftDay(dayKey, 1)) {
+    const weekday = new Intl.DateTimeFormat("en-US", {
+      timeZone: "UTC",
+      weekday: "short"
+    }).format(new Date(`${dayKey}T12:00:00.000Z`));
+    if (!["Tue", "Wed", "Thu", "Fri", "Sat"].includes(weekday)) continue;
+    if (weekday === "Tue" && originDays.has(dayKey)) continue;
+    plan.push(mainlineCandidate("daily", localDateTimeToUtc(dayKey, 9, 0), 4));
+  }
+
+  for (const definition of [
+    { minutes: 120, job: "kickoff_minus_120" as const, priority: 3 },
+    { minutes: 60, job: "kickoff_minus_60" as const, priority: 2 },
+    { minutes: 15, job: "kickoff_minus_15" as const, priority: 0 }
+  ]) {
+    const targets = [...new Set(games.map((game) => Date.parse(game.kickoffAt) - definition.minutes * 60_000))];
+    for (const target of targets) {
+      plan.push(mainlineCandidate(definition.job, new Date(target).toISOString(), definition.priority));
+    }
+  }
+
+  const unique = new Set<string>();
+  for (const candidate of plan) {
+    if (unique.has(candidate.key)) throw new Error(`Duplicate mainline request identity: ${candidate.key}`);
+    unique.add(candidate.key);
+  }
+  return plan.sort((left, right) =>
+    left.scheduledFor.localeCompare(right.scheduledFor) || left.priority - right.priority || left.key.localeCompare(right.key));
+}
+
+export function scheduledSeasonQuotaPlanHash(games: readonly ScheduledGame[]): string {
+  const scheduleIdentity = [...games].map((game) => ({
+    id: game.id,
+    week: game.week,
+    kickoffAt: game.kickoffAt
+  })).sort((left, right) => left.id.localeCompare(right.id));
+  return stableHash({
+    contract: "engine-os.2026-odds-quota-plan.v1",
+    scheduleIdentity,
+    requests: scheduledSeasonMainlinePlan(games)
+  });
 }
 
 function isDue(now: Date, target: number, windowMs = SLOT_WINDOW_MS): boolean {
@@ -116,29 +223,8 @@ function isDue(now: Date, target: number, windowMs = SLOT_WINDOW_MS): boolean {
 }
 
 export function scheduledMainlineCandidates(now: Date, games: readonly ScheduledGame[]): ScheduledOddsCandidate[] {
-  const candidates: ScheduledOddsCandidate[] = [];
-  const recurring = recurringCandidate(now, games);
-  if (recurring) candidates.push(recurring);
-  const windows = [
-    { minutes: 120, job: "kickoff_minus_120" as const, priority: 4 },
-    { minutes: 60, job: "kickoff_minus_60" as const, priority: 3 },
-    { minutes: 15, job: "kickoff_minus_15" as const, priority: 0 }
-  ];
-  for (const window of windows) {
-    const targets = [...new Set(games.map((game) => Date.parse(game.kickoffAt) - window.minutes * 60_000))];
-    for (const target of targets) {
-      if (!isDue(now, target)) continue;
-      const scheduledFor = new Date(target).toISOString();
-      candidates.push({
-        key: deterministicSnapshotKey({ provider: "the-odds-api", job: window.job, scheduledFor }),
-        job: window.job,
-        scheduledFor,
-        gameId: null,
-        cost: REQUEST_COST,
-        priority: window.priority
-      });
-    }
-  }
+  const candidates = scheduledSeasonMainlinePlan(games)
+    .filter((candidate) => isDue(now, Date.parse(candidate.scheduledFor)));
   return candidates.sort((left, right) => left.priority - right.priority || left.scheduledFor.localeCompare(right.scheduledFor));
 }
 
@@ -158,20 +244,23 @@ export function latestExpectedMainlineCandidate(
   if (nowMs < firstKickoff - 35 * 86_400_000 || nowMs > lastKickoff + 86_400_000) return null;
 
   const earliest = Math.max(firstKickoff - 35 * 86_400_000, nowMs - RECOVERY_LOOKBACK_MS);
-  let probe = nowMs - nowMs % RECOVERY_PROBE_MS;
-  for (; probe >= earliest; probe -= RECOVERY_PROBE_MS) {
-    const candidates = scheduledMainlineCandidates(new Date(probe), games);
-    if (candidates.length) return candidates[0];
-  }
-  return null;
+  return scheduledSeasonMainlinePlan(games)
+    .filter((candidate) => {
+      const scheduled = Date.parse(candidate.scheduledFor);
+      return scheduled >= earliest && scheduled <= nowMs;
+    })
+    .sort((left, right) => right.scheduledFor.localeCompare(left.scheduledFor) ||
+      left.priority - right.priority || left.key.localeCompare(right.key))[0] ?? null;
 }
 
 export function deterministicRecoveryCandidate(
   candidate: ScheduledOddsCandidate,
   existingStatus: ScheduledRunStatus | null
 ): ScheduledOddsCandidate | null {
-  if (existingStatus === "succeeded") return null;
-  return existingStatus === null ? candidate : { ...candidate, key: `${candidate.key}:recovery-v2` };
+  // A never-started canonical slot may be caught up under its original key.
+  // Failed/ambiguous requests are not retried in the urgent lane because an
+  // alternate key is absent from the frozen 2026 quota simulation.
+  return existingStatus === null ? candidate : null;
 }
 
 export function scheduledPropCandidates(now: Date, games: readonly ScheduledGame[]): ScheduledOddsCandidate[] {

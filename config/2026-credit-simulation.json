@@ -1,13 +1,25 @@
 {
-  "source": "https://github.com/nflverse/nfldata/raw/master/data/games.csv",
-  "retrievedAt": "2026-08-11",
-  "method": "Distinct REG kickoff windows for three mainline markets plus one three-market player-prop request per regular-season game at kickoff minus 60; one US region",
-  "reservationPriority": ["openers", "kickoff_minus_15", "player_props", "kickoff_minus_60", "kickoff_minus_120", "ordinary_tuesday_saturday"],
-  "billingPeriods": [
-    { "month": "2026-09", "kickoffWindows": 18, "weeklySlates": 4, "ordinaryWeekdaySnapshots": 16, "propGames": 48 },
-    { "month": "2026-10", "kickoffWindows": 29, "weeklySlates": 5, "ordinaryWeekdaySnapshots": 22, "propGames": 60 },
-    { "month": "2026-11", "kickoffWindows": 35, "weeklySlates": 5, "ordinaryWeekdaySnapshots": 21, "propGames": 71 },
-    { "month": "2026-12", "kickoffWindows": 30, "weeklySlates": 5, "ordinaryWeekdaySnapshots": 23, "propGames": 62 },
-    { "month": "2027-01", "kickoffWindows": 6, "weeklySlates": 2, "ordinaryWeekdaySnapshots": 7, "propGames": 31 }
-  ]
+  "schemaVersion": "engine-os.odds-credit-simulation.v2",
+  "status": "superseded_by_executable_exact_schedule_simulation",
+  "authoritativeScheduleArtifact": "config/2026-nfl-schedule.v1.json",
+  "sourceCommit": "66abff2fb404bb3a77fcb4886910d901d32b8e51",
+  "sourceCsvSha256": "ee90aae773984ae143426294b2724988f7f65e6d21e031212731f622e977b580",
+  "quotaPlanSha256": "a7e125f8f09ed3e373d9370fda58a0053036ca50100c7f05c5cedb8f5b28a200",
+  "method": "The executable planner expands all 272 regular-season games into exact opener, Tuesday-origin, daily, and distinct kickoff-window requests, then simulates first-of-month reset offsets from UTC-12 through UTC+14 in 15-minute increments.",
+  "requestCounts": {
+    "open_sunday": 18,
+    "open_monday": 18,
+    "tuesday_origin": 18,
+    "daily": 72,
+    "kickoff_minus_120": 118,
+    "kickoff_minus_60": 118,
+    "kickoff_minus_15": 118,
+    "total": 480
+  },
+  "excludedFromUrgentPlan": ["player_props", "unregistered_retries", "pseudo_openers"],
+  "resetOffsetScenarios": 105,
+  "maximumScheduledCredits": 405,
+  "maximumAllowedCredits": 399,
+  "hardCeilingCredits": 450,
+  "allEssentialRequestsPreserved": true
 }

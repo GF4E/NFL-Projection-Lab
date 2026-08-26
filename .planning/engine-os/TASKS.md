@@ -123,7 +123,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-01A — Migrate the urgent capture and origin ledger
 
-**Status:** NEXT after OS-00
+**Status:** OWNER-ATTESTED ROTATION; server-only verification blocked behind OS-19A
 
 **Requirement contribution:** ARC-03, LED-03
 
@@ -501,7 +501,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-19A — Enforce the urgent odds quota and reserve guard
 
-**Status:** NEXT after OS-00B and before authenticated OS-03A capture
+**Status:** LOCAL PASS; migration and deployed-D1 proof pending before authenticated OS-03A capture
 
 **Requirement contribution:** OPS-08, MKT-01
 
@@ -557,7 +557,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 ### R1 — Independently reconcile score and possession targets
 
-**Status:** TERMINAL `protocol_invalid` for R1-v1; successor audit not yet preregistered
+**Status:** TERMINAL `protocol_invalid` for R1-v1; R1-v2 frozen and awaiting four distinct natural-person roles
 
 **Requirements:** DATA-07
 
@@ -567,11 +567,11 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 **Deliverables:** Before any gamebook review, hash a preregistration containing sampling strata, sample size, agreement statistic, severe-error definition, thresholds, reviewer independence, adjudication rules, and excluded cases. Then produce the double-entry review sheet, discrepancy taxonomy, adjudicated truth rows, agreement metrics, and target-definition decision.
 
-**Acceptance gate:** The frozen agreement and severe-error thresholds pass; otherwise this experiment identity ends as `protocol_invalid`. R1-v1 ended for reviewer-independence failure. It cannot be edited or resumed; any new target audit requires a separately hashed successor preregistration and complete review/adjudication workflow.
+**Acceptance gate:** The frozen agreement and severe-error thresholds pass; otherwise this experiment identity ends as `protocol_invalid`. R1-v1 ended for reviewer-independence failure and cannot be edited or resumed. R1-v2 is the separately hashed successor; it requires two independent reviewers, a separate adjudicator, a non-reviewing identity coordinator, commit-reveal identity and entry freezes, blinded discrepancy handling, truth freeze, and verified unblinding before it can pass.
 
 ### R2 — Run Module 2B residual-kernel falsification
 
-**Status:** BLOCKED by terminal R1-v1 `protocol_invalid`; no successor audit has passed
+**Status:** BLOCKED; R1-v2 is frozen but no successor audit has passed
 
 **Requirements:** POS-01, POS-02, POS-03
 

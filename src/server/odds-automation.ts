@@ -4,18 +4,30 @@ import {
   latestExpectedMainlineCandidate,
   scheduledMainlineCandidates,
   scheduledPropCandidates,
+  scheduledSeasonQuotaPlanHash,
   type MainlineValidationResult,
   type OddsAutomationJob,
   type ScheduledGame,
   type ScheduledOddsCandidate
 } from "@/domain/odds-schedule";
-import { plannedOddsThrottleReason } from "@/domain/odds-credit-plan";
+import {
+  plannedOddsFutureReserveCredits,
+  plannedOddsThrottleReason
+} from "@/domain/odds-credit-plan";
+import {
+  oddsQuotaRequestClass,
+  type OddsQuotaRequestClass
+} from "@/domain/odds-quota-budget";
 import type { WeeklyMatchup, WeeklySlate } from "@/domain/weekly-slate";
 import { listLiveLines, replaceLiveLines } from "./live-line-store";
 import {
-  assertOddsCreditsAvailable,
   getOddsQuotaState,
-  recordOddsQuota
+  listOutstandingOddsQuotaReservations,
+  markOddsQuotaChargeUnknown,
+  markOddsQuotaDispatched,
+  releaseOddsQuotaBeforeDispatch,
+  reserveOddsQuota,
+  settleOddsQuotaReservation
 } from "./odds-quota";
 import {
   fetchLiveOddsForSlate,
@@ -103,42 +115,154 @@ export async function refreshCompleteSlateMainlines(input: {
   fetcher?: typeof fetch;
   snapshotKey: string;
   fetchedAt?: string;
-  essential?: boolean;
+  requestClass: OddsQuotaRequestClass;
+  futureReserveCredits: number;
+  quotaPlanHash: string;
   evidenceBucket: R2Bucket;
 }) {
   const db = input.db;
   const attemptedAt = input.fetchedAt ?? new Date().toISOString();
+  let reservation: Awaited<ReturnType<typeof reserveOddsQuota>>;
   try {
-    await assertOddsCreditsAvailable(MAINLINE_COST, db, {
-      essential: input.essential ?? true,
+    reservation = await reserveOddsQuota({
+      requestKey: input.snapshotKey,
+      requestClass: input.requestClass,
+      reservedCost: MAINLINE_COST,
+      futureReserve: input.futureReserveCredits,
+      quotaPlanHash: input.quotaPlanHash,
       now: attemptedAt
-    });
+    }, db);
   } catch (error) {
     await recordCaptureFailure({
       db,
       provider: "the-odds-api",
       dataset: "odds",
-      attemptedAt: new Date().toISOString(),
+      attemptedAt,
       failureCode: "quota_blocked",
       idempotencyKey: input.snapshotKey
     });
     throw error;
   }
-  let transport: Awaited<ReturnType<typeof fetchRawLiveOddsResponse>>;
-  try {
-    transport = await fetchRawLiveOddsResponse(input.apiKey, input.fetcher ?? fetch);
-  } catch (error) {
+  if (!reservation.acquired) {
     await recordCaptureFailure({
       db,
       provider: "the-odds-api",
       dataset: "odds",
-      attemptedAt: new Date().toISOString(),
+      attemptedAt,
+      failureCode: "quota_blocked",
+      idempotencyKey: input.snapshotKey
+    });
+    throw new Error("Duplicate Odds API request blocked before provider dispatch");
+  }
+
+  const dispatchToken = reservation.dispatchToken;
+  let transport: Awaited<ReturnType<typeof fetchRawLiveOddsResponse>>;
+  try {
+    await markOddsQuotaDispatched({
+      requestKey: input.snapshotKey,
+      dispatchToken,
+      dispatchedAt: attemptedAt
+    }, db);
+  } catch (error) {
+    let releaseError: unknown;
+    try {
+      await releaseOddsQuotaBeforeDispatch({
+        requestKey: input.snapshotKey,
+        dispatchToken,
+        releasedAt: attemptedAt
+      }, db);
+    } catch (caught) {
+      releaseError = caught;
+    }
+    await recordCaptureFailure({
+      db,
+      provider: "the-odds-api",
+      dataset: "odds",
+      attemptedAt,
+      failureCode: "quota_blocked",
+      idempotencyKey: input.snapshotKey
+    });
+    if (releaseError) {
+      throw new AggregateError([error, releaseError], "Quota dispatch failed before the provider call and release was inconclusive");
+    }
+    throw error;
+  }
+  try {
+    transport = await fetchRawLiveOddsResponse(input.apiKey, input.fetcher ?? fetch);
+  } catch (error) {
+    let transitionError: unknown;
+    try {
+      await markOddsQuotaChargeUnknown({
+        requestKey: input.snapshotKey,
+        dispatchToken,
+        markedAt: new Date().toISOString()
+      }, db);
+    } catch (caught) {
+      transitionError = caught;
+    }
+    await recordCaptureFailure({
+      db,
+      provider: "the-odds-api",
+      dataset: "odds",
+      attemptedAt,
       failureCode: "provider_unavailable",
       idempotencyKey: input.snapshotKey
     });
+    if (transitionError) {
+      throw new AggregateError(
+        [error, transitionError],
+        "Provider dispatch failed and its quota charge could not be marked unknown"
+      );
+    }
     throw error;
   }
   const receivedAt = transport.receivedAt;
+  const quotaHeaders = transport.quota.used !== null &&
+    transport.quota.remaining !== null &&
+    transport.quota.lastCost !== null
+    ? {
+        used: transport.quota.used,
+        remaining: transport.quota.remaining,
+        lastCost: transport.quota.lastCost
+      }
+    : null;
+  const reconcileQuota = async (responseCaptureId: string | null): Promise<boolean> => {
+    if (!quotaHeaders) {
+      await markOddsQuotaChargeUnknown({
+        requestKey: input.snapshotKey,
+        dispatchToken,
+        markedAt: receivedAt
+      }, db);
+      return false;
+    }
+    try {
+      await settleOddsQuotaReservation({
+        requestKey: input.snapshotKey,
+        dispatchToken,
+        ...quotaHeaders,
+        updatedAt: receivedAt,
+        responseCaptureId
+      }, db);
+    } catch (error) {
+      let transitionError: unknown;
+      try {
+        await markOddsQuotaChargeUnknown({
+          requestKey: input.snapshotKey,
+          dispatchToken,
+          markedAt: receivedAt
+        }, db);
+      } catch (caught) {
+        const unresolved = (await listOutstandingOddsQuotaReservations(db))
+          .find((item) => item.requestKey === input.snapshotKey);
+        if (unresolved?.state === "dispatched") transitionError = caught;
+      }
+      if (transitionError) {
+        throw new AggregateError([error, transitionError], "Quota headers were invalid and the dispatched charge could not be marked unknown");
+      }
+      throw error;
+    }
+    return true;
+  };
   let responseCaptureId: string | null = null;
   try {
     const capture = await storeRawCapture({
@@ -158,6 +282,12 @@ export async function refreshCompleteSlateMainlines(input: {
     });
     responseCaptureId = capture.manifest.captureId;
   } catch (error) {
+    let reconciliationError: unknown;
+    try {
+      await reconcileQuota(null);
+    } catch (caught) {
+      reconciliationError = caught;
+    }
     await recordCaptureFailure({
       db,
       provider: "the-odds-api",
@@ -166,14 +296,18 @@ export async function refreshCompleteSlateMainlines(input: {
       failureCode: "storage_failure",
       idempotencyKey: input.snapshotKey
     });
-    const { used, remaining, lastCost } = transport.quota;
-    if (used !== null && remaining !== null && lastCost !== null) {
-      await recordOddsQuota({ used, remaining, lastCost, updatedAt: receivedAt, requestKey: input.snapshotKey }, db);
+    if (reconciliationError) {
+      throw new AggregateError([error, reconciliationError], "Raw response storage and quota reconciliation both failed");
     }
     throw error;
   }
-  const { used, remaining, lastCost } = transport.quota;
-  if (used === null || remaining === null || lastCost === null) {
+  if (!quotaHeaders) {
+    let reconciliationError: unknown;
+    try {
+      await reconcileQuota(responseCaptureId);
+    } catch (caught) {
+      reconciliationError = caught;
+    }
     await recordCaptureFailure({
       db,
       provider: "the-odds-api",
@@ -182,16 +316,27 @@ export async function refreshCompleteSlateMainlines(input: {
       failureCode: "schema_invalid",
       idempotencyKey: input.snapshotKey
     });
+    if (reconciliationError) {
+      throw new AggregateError(
+        [new Error("Live line provider returned invalid quota headers"), reconciliationError],
+        "Raw response was preserved but the ambiguous quota charge could not be recorded"
+      );
+    }
     throw new Error("Live line provider returned invalid quota headers; raw response preserved and publication blocked");
   }
-  await recordOddsQuota({
-    used,
-    remaining,
-    lastCost,
-    updatedAt: receivedAt,
-    requestKey: input.snapshotKey,
-    responseCaptureId
-  }, db);
+  try {
+    await reconcileQuota(responseCaptureId);
+  } catch (error) {
+    await recordCaptureFailure({
+      db,
+      provider: "the-odds-api",
+      dataset: "odds",
+      attemptedAt: receivedAt,
+      failureCode: "schema_invalid",
+      idempotencyKey: input.snapshotKey
+    });
+    throw error;
+  }
   if (transport.status < 200 || transport.status >= 300) {
     await recordCaptureFailure({
       db,
@@ -217,7 +362,7 @@ export async function refreshCompleteSlateMainlines(input: {
     });
     throw error;
   }
-  const result = { ...normalized, used, remaining, lastCost };
+  const result = { ...normalized, ...quotaHeaders };
   const publishable = publishableCompleteGameLines(result.lines, input.matchups);
   if (!publishable.validation.complete) {
     await recordCaptureFailure({
@@ -239,7 +384,13 @@ export async function refreshCompleteSlateMainlines(input: {
 }
 
 function asScheduledGames(matchups: readonly WeeklyMatchup[]): ScheduledGame[] {
-  return matchups.map((game) => ({ id: game.id, away: game.away, home: game.home, kickoffAt: game.kickoffAt }));
+  return matchups.map((game) => ({
+    id: game.sourceGameId ?? game.id,
+    week: game.week,
+    away: game.away,
+    home: game.home,
+    kickoffAt: game.kickoffAt
+  }));
 }
 
 async function targetSlateForCandidate(db: D1Database, now: Date, job: OddsAutomationJob): Promise<WeeklySlate> {
@@ -281,6 +432,7 @@ export async function runScheduledOddsAutomation(input: {
   const checkedAt = now.toISOString();
   await ensureStore(db);
   const schedule = asScheduledGames(await seasonSchedule({ db }));
+  const quotaPlanHash = scheduledSeasonQuotaPlanHash(schedule);
   const due = [...scheduledMainlineCandidates(now, schedule), ...scheduledPropCandidates(now, schedule)];
   if (input.allowCatchup && !due.some((candidate) => candidate.job !== "props_minus_60")) {
     const catchup = latestExpectedMainlineCandidate(now, schedule);
@@ -288,8 +440,8 @@ export async function runScheduledOddsAutomation(input: {
       const existing = await db.prepare("SELECT status FROM odds_automation_runs WHERE snapshot_key = ? LIMIT 1")
         .bind(catchup.key).first<Pick<OddsAutomationRunRow, "status">>();
       const recovery = deterministicRecoveryCandidate(catchup, existing?.status ?? null);
-      // A suffix makes exactly one idempotent recovery attempt for a failed
-      // scheduled snapshot. Successful runs are never fetched a second time.
+      // Only a never-started canonical request may be repaired. Failed or
+      // ambiguous provider calls are not assigned an unbudgeted retry key.
       if (recovery) due.push(recovery);
     }
   }
@@ -354,8 +506,9 @@ export async function runScheduledOddsAutomation(input: {
           fetcher: input.fetcher,
           snapshotKey: candidate.key,
           evidenceBucket: input.evidenceBucket,
-          essential: candidate.job === "open_sunday" || candidate.job === "open_monday" ||
-            candidate.job === "kickoff_minus_60" || candidate.job === "kickoff_minus_15"
+          requestClass: oddsQuotaRequestClass(candidate.job),
+          futureReserveCredits: plannedOddsFutureReserveCredits(candidate, schedule),
+          quotaPlanHash
         });
         const missing = refreshed.validation.missingGameIds;
         const message = `${refreshed.lines.length} complete mainline quotes published for ${refreshed.validation.completeGames}/${refreshed.validation.totalGames} games${missing.length ? `; last good prices preserved for ${missing.join(", ")}` : ""}`;

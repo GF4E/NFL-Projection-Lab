@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { describe, expect, it, vi } from "vitest";
+import scheduleManifest from "../config/2026-nfl-schedule.v1.json";
 
 vi.mock("../db", () => ({
   getD1: () => {
@@ -301,19 +302,22 @@ describe("Engine OS urgent evidence and origin contracts", () => {
       last_cost integer NOT NULL, updated_at text NOT NULL
     )`);
     applySql(db, "drizzle/0013_engine_os_urgent.sql");
+    applySql(db, "drizzle/0014_odds_quota_reservations.sql");
     const observedAt = new Date().toISOString();
     await expect(bootstrapOddsQuotaState({
       used: 12,
       remaining: 488,
       observedAt,
+      credentialGenerationId: "rotation-2026-08-25-r2",
       operatorAttestation: "verified_against_provider_dashboard"
     }, sqliteD1(db))).resolves.toMatchObject({ used: 12, remaining: 488, lastCost: 0 });
     await expect(bootstrapOddsQuotaState({
       used: 12,
       remaining: 488,
       observedAt,
+      credentialGenerationId: "rotation-2026-08-25-r2",
       operatorAttestation: "verified_against_provider_dashboard"
-    }, sqliteD1(db))).rejects.toThrow(/already exists/);
+    }, sqliteD1(db))).rejects.toThrow(/did not establish/);
     expect(db.prepare("SELECT count(*) AS count FROM odds_quota_events").get()).toEqual({ count: 1 });
     db.close();
   });
@@ -376,9 +380,15 @@ describe("Engine OS urgent evidence and origin contracts", () => {
     const db = new DatabaseSync(":memory:");
     applySql(db, "drizzle/0004_player_prop_decision_board.sql");
     applySql(db, "drizzle/0013_engine_os_urgent.sql");
+    applySql(db, "drizzle/0014_odds_quota_reservations.sql");
     const observedAt = new Date().toISOString();
-    db.prepare(`INSERT INTO odds_quota_state (provider, used, remaining, last_cost, updated_at)
-      VALUES ('the-odds-api', 9, 491, 3, ?)`).run(observedAt);
+    await bootstrapOddsQuotaState({
+      used: 9,
+      remaining: 491,
+      observedAt,
+      credentialGenerationId: "rotation-2026-08-25-r2",
+      operatorAttestation: "verified_against_provider_dashboard"
+    }, sqliteD1(db));
     const rawBytes = new Uint8Array([0xef, 0xbb, 0xbf, 0x7b, 0x22, 0x62, 0x61, 0x64, 0x22, 0x3a, 0x7d]);
     const bucket = new MemoryR2();
 
@@ -397,7 +407,9 @@ describe("Engine OS urgent evidence and origin contracts", () => {
       }),
       snapshotKey: "charged-but-malformed",
       fetchedAt: observedAt,
-      essential: true,
+      requestClass: "kickoff_minus_15",
+      futureReserveCredits: 0,
+      quotaPlanHash: scheduleManifest.quotaPlanSha256,
       evidenceBucket: bucket as unknown as R2Bucket
     })).rejects.toThrow();
 
@@ -433,7 +445,9 @@ describe("Engine OS urgent evidence and origin contracts", () => {
       }),
       snapshotKey: "charged-http-error",
       fetchedAt: new Date(Date.now() + 1_000).toISOString(),
-      essential: true,
+      requestClass: "kickoff_minus_15",
+      futureReserveCredits: 0,
+      quotaPlanHash: scheduleManifest.quotaPlanSha256,
       evidenceBucket: bucket as unknown as R2Bucket
     })).rejects.toThrow(/HTTP 429/);
     expect(db.prepare(`SELECT response_sha256 FROM source_capture_manifests
@@ -563,12 +577,19 @@ describe("Engine OS urgent evidence and origin contracts", () => {
       "drizzle/0010_confidence_engine.sql",
       "drizzle/0011_model_gate_evidence.sql",
       "drizzle/0012_source_snapshot_timing.sql",
-      "drizzle/0013_engine_os_urgent.sql"
+      "drizzle/0013_engine_os_urgent.sql",
+      "drizzle/0014_odds_quota_reservations.sql"
     ]) applySql(db, migration);
-    const schemaVersion = db.prepare("SELECT migration_hash FROM engine_schema_versions").get() as { migration_hash: string };
+    const schemaVersion = db.prepare(`SELECT migration_hash FROM engine_schema_versions
+      WHERE version = '0013_engine_os_urgent'`).get() as { migration_hash: string };
     const urgentMigration = readFileSync(resolve(process.cwd(), "drizzle/0013_engine_os_urgent.sql"), "utf8");
     const schemaDefinition = urgentMigration.split("INSERT INTO `engine_schema_versions`")[0]!;
     expect(schemaVersion.migration_hash).toBe(`sha256:${sha256Hex(schemaDefinition)}`);
+    const quotaMigration = readFileSync(resolve(process.cwd(), "drizzle/0014_odds_quota_reservations.sql"), "utf8");
+    const quotaDefinition = quotaMigration.split("INSERT INTO `engine_schema_versions`")[0]!;
+    const quotaVersion = db.prepare(`SELECT migration_hash FROM engine_schema_versions
+      WHERE version = '0014_odds_quota_reservations'`).get() as { migration_hash: string };
+    expect(quotaVersion.migration_hash).toBe(`sha256:${sha256Hex(quotaDefinition)}`);
     db.exec(`
       INSERT INTO canonical_games VALUES ('g', 2026, 'REG', 1, 'SEA', 'SF', 'resolved', '2026-08-25T00:00:00Z', NULL);
       INSERT INTO canonical_games VALUES ('g2', 2026, 'REG', 1, 'LAR', 'ARI', 'resolved', '2026-08-25T00:00:00Z', NULL);
@@ -608,6 +629,7 @@ describe("Engine OS urgent evidence and origin contracts", () => {
     ) VALUES ('wrong-game', 'wrong-game-hash', 'o', 'g2', 'withheld', 'no_eligible_package',
       '2026-09-08T14:31:00Z', '2026-09-08T14:31:00Z', 'late', 0, 'current', 'a', 'full_season_shadow')`))
       .toThrow(/FOREIGN KEY constraint failed/);
+    applySql(db, "drizzle/rollback/0014_odds_quota_reservations.down.sql");
     applySql(db, "drizzle/rollback/0013_engine_os_urgent.down.sql");
     const table = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='forecast_origin_records'").get();
     expect(table).toBeUndefined();

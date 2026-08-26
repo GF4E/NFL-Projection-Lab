@@ -1,0 +1,141 @@
+{
+  "protocolId": "engine-os-r1-target-reconciliation.2026-08-25.2",
+  "protocolVersion": "R1-v2",
+  "status": "frozen_before_human_role_registration",
+  "purpose": "Run the already-frozen 64-game target audit through an independently administered human commit-reveal workflow without altering terminal R1-v1 evidence.",
+  "parentEvidence": {
+    "r1V1Status": "protocol_invalid",
+    "r1V1Reason": "reviewer_independence_blocked",
+    "r1V1PreregistrationSha256": "21142d8a45a2e7e9421d5b20b4ecbd2e803657cda7e9bcf832db9fb2fd447866",
+    "sampleManifestSha256": "5182984aa57765f536e3d4dd537e8f34e8c3a9d5b7debf0950ea9000e6d4bf83",
+    "officialSourceCaptureSha256": "21a3ea54c359c1acca68788c5af531144535d745485b8d6a54da1b32924d5b15",
+    "comparisonSourceIndexSha256": "0a49ed9a11a31acfd2629496b1b86ba63206ddaebe0d809f3c2c1b27e19dc9c6",
+    "sampleSize": 64,
+    "reuseRule": "R1-v2 reuses the frozen sample and exact official-gamebook hashes. It never edits, resumes, or reclassifies R1-v1."
+  },
+  "roles": {
+    "required": [
+      "identity_coordinator",
+      "reviewer_a",
+      "reviewer_b",
+      "adjudicator"
+    ],
+    "rules": [
+      "All four roles must be occupied by distinct natural persons bound by distinct salted person-commitment hashes.",
+      "The identity coordinator verifies role uniqueness and natural-person attestations but performs no review, adjudication, target extraction, or gate computation.",
+      "Reviewer A and Reviewer B independently review all 64 assigned official gamebooks and cannot inspect comparison labels, the other reviewer's entries, discrepancies, or adjudication before both entry commitments are frozen.",
+      "The adjudicator is neither reviewer nor the identity coordinator and receives only anonymized disagreement rows after both reviewer reveals have verified against their frozen commitments.",
+      "An automated agent may verify hashes, schemas, completeness, state transitions, and arithmetic. It cannot occupy or attest a human role."
+    ],
+    "publicArtifactRule": "Public artifacts contain pseudonyms and one-way commitments only. The coordinator retains the private identity-to-role ledger outside this repository."
+  },
+  "sourceAndBlinding": {
+    "truthSource": "Only the 64 exact official NFL gamebook PDF objects bound by the frozen source-capture ledger.",
+    "reviewBundleIncludes": [
+      "frozen game identity and assignment",
+      "official gamebook SHA-256",
+      "official gamebook object locator",
+      "blank target fields and frozen definitions"
+    ],
+    "reviewBundleExcludes": [
+      "nflverse target values",
+      "Module 1 or Module 2 target values",
+      "model outputs and market data",
+      "the other reviewer's work",
+      "discrepancy or adjudication output"
+    ],
+    "comparisonRevealRule": "Existing source/model labels may be supplied to the workflow only after the complete official-truth artifact and its hash manifest are frozen. The export must bind the preregistered frozen source-index SHA-256 and use a separately verified deterministic exporter."
+  },
+  "commitReveal": {
+    "entryCommitment": "Each reviewer commits SHA-256(entry bytes) plus a reviewer-controlled 256-bit salt commitment before either entry may be revealed.",
+    "jointFreeze": "Both immutable entry commitments are registered in one hash manifest before either entry file is accepted for reveal.",
+    "reveal": "Both revealed byte streams must exactly match their preregistered SHA-256 values and must pass the complete 64-row schema and source-hash checks.",
+    "mutationRule": "Any changed committed byte stream, replaced commitment, duplicate game, incomplete field, wrong source hash, or post-freeze mutation terminates R1-v2 as protocol_invalid.",
+    "earlyRevealRule": "Any attempted reveal before the joint commitment manifest exists terminates R1-v2 as protocol_invalid."
+  },
+  "workflowStages": [
+    "protocol_frozen",
+    "review_bundles_prepared",
+    "roles_verified",
+    "entry_commitments_frozen",
+    "entries_revealed",
+    "discrepancies_frozen",
+    "adjudication_frozen",
+    "official_truth_frozen",
+    "comparison_unblinded",
+    "gate_computed"
+  ],
+  "adjudication": {
+    "trigger": "Every reviewer disagreement or explicit AMBIGUOUS value.",
+    "inputRule": "The adjudicator receives game, field, both anonymized values, exact official-gamebook hash, and no comparison/model label.",
+    "requiredFields": [
+      "discrepancy_id",
+      "game_id",
+      "field",
+      "adjudicated_truth",
+      "official_gamebook_sha256",
+      "page_play_support",
+      "taxonomy",
+      "adjudicator_person_commitment_sha256"
+    ],
+    "unresolvedRule": "If the gamebook cannot resolve a target under the frozen definition, record official_truth_unresolved; do not drop, replace, or impute it."
+  },
+  "reviewFields": [
+    "final_home_score",
+    "final_away_score",
+    "regulation_home_series",
+    "regulation_away_series",
+    "overtime_occurred",
+    "overtime_home_series",
+    "overtime_away_series",
+    "official_gamebook_page_references",
+    "edge_event_reference",
+    "edge_creates_series",
+    "edge_offense",
+    "notes_limited_to_source_ambiguity"
+  ],
+  "thresholds": {
+    "reviewProcessPass": {
+      "reviewerABExactFinalScore": 1.0,
+      "reviewerABExactRegulationSeriesMinimum": 0.98,
+      "reviewerABExactOvertimeOccurrence": 1.0,
+      "reviewerABExactOvertimeSeriesMinimum": 0.98,
+      "reviewerABExactEdgeTreatmentMinimum": 0.95,
+      "reviewerABSevereDisagreementsMaximum": 0
+    },
+    "targetPassAfterAdjudication": {
+      "exactFinalScore": 1.0,
+      "exactRegulationSeries": 1.0,
+      "exactOvertimeOccurrence": 1.0,
+      "exactOvertimeSeries": 1.0,
+      "exactEdgeTreatment": 1.0,
+      "severeErrorsMaximum": 0,
+      "sourceUnavailableOrUnresolvedMaximum": 0
+    },
+    "decisionRule": "Only complete evidence satisfying every frozen review-process and target threshold may produce pass and r2Authorized=true. Any protocol violation produces terminal protocol_invalid. A valid completed audit missing a threshold produces reject_all."
+  },
+  "stateRules": {
+    "initialStatus": "awaiting_human_review",
+    "initialR2Authorized": false,
+    "nonterminalStatuses": [
+      "awaiting_human_review"
+    ],
+    "terminalStatuses": [
+      "pass",
+      "reject_all",
+      "protocol_invalid"
+    ],
+    "failClosed": [
+      "role collision",
+      "role evidence asserting a non-natural-person participant",
+      "reviewer or adjudicator acting as identity coordinator",
+      "early reveal",
+      "commitment or frozen-artifact mutation",
+      "incomplete or duplicate-row manifest",
+      "comparison-label access before official truth is frozen",
+      "missing adjudication for any disagreement",
+      "source-hash or parent-evidence mismatch"
+    ],
+    "authorizationRule": "r2Authorized remains false at every nonterminal stage and for reject_all or protocol_invalid. It may become true atomically only with a verified terminal pass."
+  }
+}

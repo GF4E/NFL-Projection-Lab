@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
-import creditConfig from "../config/2026-credit-simulation.json";
+import scheduleManifest from "../config/2026-nfl-schedule.v1.json";
 import eraConfig from "../config/era.config.json";
 import frozenMarginArtifact from "../config/discrete-margin-2026.json";
 import frozenTotalArtifact from "../config/discrete-total-2026.json";
@@ -19,7 +19,7 @@ import {
 } from "@/domain/odds";
 import { sizeKelly } from "@/domain/sizing";
 import { updateTeamStates, runPromotionGate, validateForecastLeakage } from "@/domain/model-lifecycle";
-import { completeImport, createPushDelivery, deduplicatePushes, failImport, simulateCreditPeriod } from "@/domain/automation";
+import { completeImport, createPushDelivery, deduplicatePushes, failImport } from "@/domain/automation";
 import { createQuarterbackOverride, normalizeOfficialInjuries, validateHistoricalInjurySeason, validateInactivesTiming } from "@/domain/injuries";
 import { approveRevision, applyKickoffLock, editRevision, revisionHash } from "@/domain/approval";
 import { calculateTranslatedClv, chooseBetterPaperClose } from "@/domain/clv";
@@ -32,10 +32,11 @@ import { draftExpirationReason, earliestPlayKickoff, estimatedEvFromEdge, exactC
 import { analyzeSlipValue, enrichWithPowerDevig, type SlipLeg } from "@/domain/line-board";
 import { assertCompletePropQuotePairs, buildPlayerPropEvidence, completeLeaguePropEfficiencyPrior, crossedKeyNumbers, isClassicWongPoint, isPropPlayerUnavailable, marginVersusConsensusResidual, nflverseExpectedMarginToHomePoint, normalizeNflverseTeam, priceTwoTeamTeaser, propPlayerLookupPattern, rankTeaserPairs, scanMarketConfirmedProps, summarizeGameAvailability, type RawPropQuote, type TeaserCandidate } from "@/domain/decision-board";
 import { rehearsalPlays } from "@/lib/play-data";
-import { pickReasons, weekOneKickoffs, weekOneMatchups } from "@/lib/week-one-data";
+import { pickReasons, weekOneMatchups } from "@/lib/week-one-data";
 import { fetchWeekOneLiveOdds } from "@/server/week-one-live-odds";
-import { deterministicRecoveryCandidate, inspectMainlineCompleteness, latestExpectedMainlineCandidate, scheduledMainlineCandidates, scheduledPropCandidates, scheduledSnapshotQuoteFresh, type ScheduledGame, type ScheduledOddsCandidate } from "@/domain/odds-schedule";
+import { deterministicRecoveryCandidate, inspectMainlineCompleteness, latestExpectedMainlineCandidate, scheduledMainlineCandidates, scheduledPropCandidates, scheduledSeasonMainlinePlan, scheduledSeasonQuotaPlanHash, scheduledSnapshotQuoteFresh, type ScheduledGame } from "@/domain/odds-schedule";
 import { plannedOddsThrottleReason } from "@/domain/odds-credit-plan";
+import { simulateAllPublishedResetScenarios } from "@/domain/odds-quota-budget";
 import { boardGameId, chooseActiveWeek, easternScheduleTimeToIso, normalizeScheduleTeam } from "@/domain/weekly-slate";
 import type { BookEvaluation, DiscreteMarginArtifact, JobState, PushDelivery, SettledPick } from "@/domain/types";
 import { artifact, forecast, history, metrics, pick, quote, settled } from "./fixtures";
@@ -279,44 +280,35 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   });
 
   it("10. simulates the actual 2026 kickoff windows, alerts at 400, and remains at or below 450", () => {
-    const simulations = creditConfig.billingPeriods.map((period) => simulateCreditPeriod({ kickoffWindows: Array.from({ length: period.kickoffWindows }, (_, index) => ({ kickoffAt: `${period.month}-${String((index % 27) + 1).padStart(2, "0")}T20:00:00Z` })), weeklySlates: period.weeklySlates, weekdaysInSeason: period.ordinaryWeekdaySnapshots, propGames: period.propGames }));
-    expect(simulations.every((simulation) => simulation.withinCeiling)).toBe(true);
-    expect(Math.max(...simulations.map((simulation) => simulation.projectedCredits))).toBe(450);
-    expect(simulations.some((simulation) => simulation.alertAt400)).toBe(true);
-    expect(simulations.every((simulation, index) => simulation.allowedRequests.props === creditConfig.billingPeriods[index].propGames)).toBe(true);
-    expect(simulations.some((simulation) => simulation.throttled.includes("kickoff_minus_60"))).toBe(true);
-    expect(simulations.every((simulation) => !simulation.throttled.includes("player_props"))).toBe(true);
-    const novemberGames: ScheduledGame[] = Array.from({ length: 71 }, (_, index) => ({
-      id: `nov-${index}`,
-      away: "A",
-      home: "H",
-      kickoffAt: `2026-11-${String(index % 28 + 1).padStart(2, "0")}T${String(17 + Math.floor(index / 28) * 3).padStart(2, "0")}:00:00.000Z`
-    }));
-    const lastPropGame = [...novemberGames].sort((left, right) => left.kickoffAt.localeCompare(right.kickoffAt) || left.id.localeCompare(right.id)).at(-1)!;
-    const lastProp: ScheduledOddsCandidate = {
-      key: "last-prop", job: "props_minus_60", gameId: lastPropGame.id, cost: 3, priority: 2,
-      scheduledFor: new Date(Date.parse(lastPropGame.kickoffAt) - 60 * 60_000).toISOString()
-    };
-    expect(plannedOddsThrottleReason(lastProp, novemberGames, 399)).toBeNull();
-    const distinctSixtyWindows = [...new Set(novemberGames.map((game) => new Date(Date.parse(game.kickoffAt) - 60 * 60_000).toISOString()))].sort();
-    const lastSixty: ScheduledOddsCandidate = {
-      key: "last-60", job: "kickoff_minus_60", gameId: null, cost: 3, priority: 3,
-      scheduledFor: distinctSixtyWindows.at(-1)!
-    };
-    expect(plannedOddsThrottleReason(lastSixty, novemberGames, 399)).toMatch(/reservation plan/);
+    const games = scheduleManifest.games;
+    const plan = scheduledSeasonMainlinePlan(games);
+    const simulations = simulateAllPublishedResetScenarios(games);
+    expect(plan).toHaveLength(480);
+    expect(scheduledSeasonQuotaPlanHash(games)).toBe(scheduleManifest.quotaPlanSha256);
+    expect(simulations.every((simulation) => simulation.withinCeiling && simulation.allAlwaysPreserved)).toBe(true);
+    expect(Math.max(...simulations.flatMap((simulation) => simulation.periods.map((period) => period.projectedCredits))))
+      .toBe(399);
+    expect(Math.max(...simulations.flatMap((simulation) => simulation.periods.map((period) => period.scheduledCredits))))
+      .toBe(405);
+    expect(simulations.some((simulation) => simulation.periods.some((period) => period.alertRequired))).toBe(true);
+    const daily = plan.find((candidate) => candidate.job === "daily")!;
+    const minus120 = plan.find((candidate) => candidate.job === "kickoff_minus_120")!;
+    const minus60 = plan.find((candidate) => candidate.job === "kickoff_minus_60")!;
+    const minus15 = plan.find((candidate) => candidate.job === "kickoff_minus_15")!;
+    expect(plannedOddsThrottleReason(daily, games, 400)).toMatch(/400-credit throttle/);
+    expect(plannedOddsThrottleReason(minus120, games, 400)).toMatch(/400-credit throttle/);
+    expect(plannedOddsThrottleReason(minus60, games, 400)).toBeNull();
+    expect(plannedOddsThrottleReason(minus15, games, 400)).toBeNull();
+    expect(plannedOddsThrottleReason({ ...minus60, job: "props_minus_60" }, games, 0)).toMatch(/outside/);
   });
 
   it("10b. keeps the documented busiest-period ceiling aligned with the executable reservation plan", async () => {
     const readme = await import("node:fs/promises").then(({ readFile }) => readFile(new URL("../README.md", import.meta.url), "utf8"));
-    const projected = creditConfig.billingPeriods.map((period) => simulateCreditPeriod({
-      kickoffWindows: Array.from({ length: period.kickoffWindows }, () => ({ kickoffAt: `${period.month}-01T20:00:00Z` })),
-      weeklySlates: period.weeklySlates,
-      weekdaysInSeason: period.ordinaryWeekdaySnapshots,
-      propGames: period.propGames
-    }).projectedCredits);
-    expect(Math.max(...projected)).toBe(450);
-    expect(readme).toContain("October, November, and December each reach the enforced 450-credit ceiling");
-    expect(readme).not.toContain("busiest projected billing period at 408 credits");
+    const simulations = simulateAllPublishedResetScenarios(scheduleManifest.games);
+    expect(Math.max(...simulations.flatMap((simulation) => simulation.periods.map((period) => period.projectedCredits))))
+      .toBe(399);
+    expect(readme).toContain("480-request exact 2026 schedule plan");
+    expect(readme).toContain("maximum allowed monthly use is 399 credits");
   });
 
   it("11. enforces historical/current injury boundaries, 90-minute flags, failure behavior, and QB audit", () => {
@@ -732,25 +724,23 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   });
 
   it("27. schedules idempotent opener and kickoff snapshots without duplicate kickoff windows", () => {
-    const games: ScheduledGame[] = weekOneMatchups.map((game) => ({ id: game.id, away: game.away, home: game.home, kickoffAt: weekOneKickoffs[game.id] }));
+    const games: ScheduledGame[] = scheduleManifest.games;
     const sundayOpen = scheduledMainlineCandidates(new Date("2026-09-07T01:05:00.000Z"), games);
     expect(sundayOpen.map((candidate) => candidate.job)).toEqual(["open_sunday"]);
     const oneHourBeforeSundayEarly = scheduledMainlineCandidates(new Date("2026-09-13T16:05:00.000Z"), games);
     expect(oneHourBeforeSundayEarly.filter((candidate) => candidate.job === "kickoff_minus_60")).toHaveLength(1);
     expect(new Set(oneHourBeforeSundayEarly.map((candidate) => candidate.key)).size).toBe(oneHourBeforeSundayEarly.length);
     const props = scheduledPropCandidates(new Date("2026-09-13T16:05:00.000Z"), games);
-    expect(props.map((candidate) => candidate.gameId).sort()).toEqual([
-      "atl-pit", "bal-ind", "buf-hou", "chi-car", "cle-jax", "no-det", "nyj-ten", "tb-cin"
-    ]);
-    expect(scheduledPropCandidates(new Date("2026-09-13T16:40:00.000Z"), games).map((candidate) => candidate.gameId)).toContain("atl-pit");
-    expect(scheduledPropCandidates(new Date("2026-09-13T16:51:00.000Z"), games).map((candidate) => candidate.gameId)).not.toContain("atl-pit");
+    expect(props).toHaveLength(8);
+    expect(scheduledPropCandidates(new Date("2026-09-13T16:40:00.000Z"), games)).toHaveLength(8);
+    expect(scheduledPropCandidates(new Date("2026-09-13T16:51:00.000Z"), games)).toHaveLength(0);
     expect(readFileSync("src/server/odds-automation.ts", "utf8")).toContain("getPlayerPropAvailability");
     const missedSaturday = latestExpectedMainlineCandidate(new Date("2026-08-16T23:50:00.000Z"), games);
-    expect(missedSaturday).toMatchObject({ job: "daily", scheduledFor: "2026-08-15T09:00:00[America/Los_Angeles]" });
-    const sundayOpener = latestExpectedMainlineCandidate(new Date("2026-08-17T01:05:00.000Z"), games);
-    expect(sundayOpener).toMatchObject({ job: "open_sunday", scheduledFor: "2026-08-16T18:00:00[America/Los_Angeles]" });
+    expect(missedSaturday).toBeNull();
+    const sundayOpener = latestExpectedMainlineCandidate(new Date("2026-09-07T01:05:00.000Z"), games);
+    expect(sundayOpener).toMatchObject({ job: "open_sunday", scheduledFor: "2026-09-07T01:00:00.000Z" });
     expect(deterministicRecoveryCandidate(sundayOpener!, null)?.key).toBe(sundayOpener?.key);
-    expect(deterministicRecoveryCandidate(sundayOpener!, "failed")?.key).toBe(`${sundayOpener?.key}:recovery-v2`);
+    expect(deterministicRecoveryCandidate(sundayOpener!, "failed")).toBeNull();
     expect(deterministicRecoveryCandidate(sundayOpener!, "succeeded")).toBeNull();
     expect(readFileSync("src/app/api/lines/route.ts", "utf8")).toContain("lines refresh automatically");
     const worker = readFileSync("worker/index.ts", "utf8");

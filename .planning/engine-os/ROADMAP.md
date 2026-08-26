@@ -40,7 +40,7 @@ Phase numbers describe capability layers, not a forced serial queue. Secret-reda
 | 2 | Urgent capture plus queued canonicalization | OS-02A, OS-03A, OS-19A, OS-02–OS-08, R1 | Replayable point-in-time evidence and verified targets |
 | 3 | Queued | OS-09–OS-12 | Deterministic experiment and portable model packages |
 | 4 | OS-13A urgent; full integration queued | OS-15A, OS-13A, OS-13B, OS-14 | Independent prospective ledgers and all-game grading |
-| 5 | Blocked: R1-v1 terminal `protocol_invalid` | Successor R1 audit, then R2 and R3 | Continue possessions, redesign target, or kill branch |
+| 5 | Blocked: R1-v1 terminal `protocol_invalid`; R1-v2 awaiting human review | Complete R1-v2, then R2 and R3 only on a verified pass | Continue possessions, redesign target, or kill branch |
 | 6 | Blocked by R3 branch | R3A or R3B, or R4–R12 | Selected architecture produces accepted modules/candidate or rejection |
 | 7 | Blocked by selected architecture | R13 | Frozen football-only engine or `reject_all` |
 | 8 | Blocked by R13 `shadow_eligible` | R16, R17 | Valid model-market and value evidence |

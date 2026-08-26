@@ -185,3 +185,63 @@ export const oddsQuotaEvents = sqliteTable("odds_quota_events", {
 }, (table) => [
   check("odds_quota_event_values_check", sql`${table.used} >= 0 AND ${table.remaining} >= 0 AND ${table.lastCost} >= 0`)
 ]);
+
+export const oddsQuotaEpochs = sqliteTable("odds_quota_epochs", {
+  quotaEpoch: text("quota_epoch").primaryKey(),
+  provider: text("provider").notNull(),
+  credentialGenerationId: text("credential_generation_id").notNull(),
+  openedAt: text("opened_at").notNull(),
+  reason: text("reason", {
+    enum: ["credential_bootstrap", "stale_reconciliation", "provider_monthly_reset"]
+  }).notNull(),
+  initialUsed: integer("initial_used").notNull(),
+  initialRemaining: integer("initial_remaining").notNull(),
+  sourceRequestKey: text("source_request_key")
+}, (table) => [
+  check("odds_quota_epoch_provider_check", sql`${table.provider} = 'the-odds-api'`),
+  check("odds_quota_epoch_counters_check", sql`${table.initialUsed} >= 0 AND ${table.initialRemaining} >= 0 AND ${table.initialUsed} + ${table.initialRemaining} = 500`)
+]);
+
+export const oddsQuotaControl = sqliteTable("odds_quota_control", {
+  provider: text("provider").primaryKey(),
+  quotaEpoch: text("quota_epoch").notNull().references(() => oddsQuotaEpochs.quotaEpoch),
+  credentialGenerationId: text("credential_generation_id").notNull(),
+  observedAt: text("observed_at").notNull()
+}, (table) => [
+  check("odds_quota_control_provider_check", sql`${table.provider} = 'the-odds-api'`)
+]);
+
+export const oddsQuotaReservations = sqliteTable("odds_quota_reservations", {
+  requestKey: text("request_key").primaryKey(),
+  provider: text("provider").notNull(),
+  quotaEpoch: text("quota_epoch").notNull().references(() => oddsQuotaEpochs.quotaEpoch),
+  credentialGenerationId: text("credential_generation_id").notNull(),
+  requestClass: text("request_class", {
+    enum: ["opener", "scientific_origin", "kickoff_minus_15", "kickoff_minus_60", "kickoff_minus_120", "ordinary"]
+  }).notNull(),
+  reservedCost: integer("reserved_cost").notNull(),
+  futureReserve: integer("future_reserve").notNull(),
+  quotaPlanHash: text("quota_plan_hash").notNull(),
+  dispatchTokenHash: text("dispatch_token_hash").notNull(),
+  state: text("state", {
+    enum: ["reserved", "dispatched", "settled", "released_before_dispatch", "charge_unknown"]
+  }).notNull(),
+  reservedAt: text("reserved_at").notNull(),
+  dispatchedAt: text("dispatched_at"),
+  completedAt: text("completed_at"),
+  quotaEventRequestKey: text("quota_event_request_key").references(() => oddsQuotaEvents.requestKey)
+}, (table) => [
+  index("idx_odds_quota_reservations_outstanding").on(table.provider, table.quotaEpoch, table.state, table.reservedAt),
+  check("odds_quota_reservation_provider_check", sql`${table.provider} = 'the-odds-api'`),
+  check("odds_quota_reservation_cost_check", sql`${table.reservedCost} > 0 AND ${table.futureReserve} >= 0`)
+]);
+
+export const oddsQuotaReservationEvents = sqliteTable("odds_quota_reservation_events", {
+  eventId: text("event_id").primaryKey(),
+  requestKey: text("request_key").notNull().references(() => oddsQuotaReservations.requestKey),
+  eventType: text("event_type", {
+    enum: ["reserved", "dispatched", "settled", "released_before_dispatch", "charge_unknown"]
+  }).notNull(),
+  occurredAt: text("occurred_at").notNull(),
+  payloadJson: text("payload_json").notNull()
+}, (table) => [index("idx_odds_quota_reservation_events_request").on(table.requestKey, table.occurredAt)]);
