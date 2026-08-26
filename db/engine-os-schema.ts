@@ -32,6 +32,174 @@ export const sourceCaptureManifests = sqliteTable("source_capture_manifests", {
   check("source_capture_response_bytes_check", sql`${table.responseBytes} >= 0`)
 ]);
 
+export const sourceCaptureManifestExtensions = sqliteTable("source_capture_manifest_extensions", {
+  captureId: text("capture_id").primaryKey()
+    .references(() => sourceCaptureManifests.captureId),
+  contractVersion: text("contract_version").notNull(),
+  contractHash: text("contract_hash").notNull(),
+  profileId: text("profile_id").notNull(),
+  captureClass: text("capture_class").notNull(),
+  sourceKey: text("source_key").notNull(),
+  sourceObservedAt: text("source_observed_at"),
+  receiptCompletedAt: text("receipt_completed_at").notNull(),
+  persistenceRequestedAt: text("persistence_requested_at").notNull(),
+  responsePersistedAt: text("response_persisted_at").notNull(),
+  sidecarPersistedAt: text("sidecar_persisted_at").notNull(),
+  manifestPersistedAt: text("manifest_persisted_at").notNull(),
+  contentType: text("content_type").notNull(),
+  etag: text("etag"),
+  usageRightsJson: text("usage_rights_json").notNull(),
+  usageRightsHash: text("usage_rights_hash").notNull(),
+  validationState: text("validation_state", {
+    enum: ["usable", "raw_only_schema_invalid", "raw_only_partial", "raw_only_http_error"]
+  }).notNull(),
+  failureCodesJson: text("failure_codes_json").notNull(),
+  laterImportJson: text("later_import_json").notNull(),
+  laterImportHash: text("later_import_hash").notNull(),
+  extensionHash: text("extension_hash").notNull()
+}, (table) => [
+  index("idx_source_capture_extension_source").on(
+    table.sourceKey,
+    table.validationState,
+    table.receiptCompletedAt,
+    table.captureId
+  ),
+  index("idx_source_capture_extension_evidence").on(table.extensionHash),
+  check(
+    "source_capture_extension_contract_check",
+    sql`${table.contractVersion} = 'source-capture-contract.2026.4' AND
+      ${table.contractHash} = 'a16138cd9577c91bbea8cd1dee94bdb9384cf0bc385f2bb24d4b311270750e78'`
+  ),
+  check(
+    "source_capture_extension_hash_check",
+    sql`length(${table.captureId}) = 64 AND lower(${table.captureId}) = ${table.captureId} AND
+      ${table.captureId} NOT GLOB '*[^0-9a-f]*' AND
+      length(${table.usageRightsHash}) = 64 AND lower(${table.usageRightsHash}) = ${table.usageRightsHash} AND
+      ${table.usageRightsHash} NOT GLOB '*[^0-9a-f]*' AND
+      length(${table.laterImportHash}) = 64 AND lower(${table.laterImportHash}) = ${table.laterImportHash} AND
+      ${table.laterImportHash} NOT GLOB '*[^0-9a-f]*' AND
+      length(${table.extensionHash}) = 64 AND lower(${table.extensionHash}) = ${table.extensionHash} AND
+      ${table.extensionHash} NOT GLOB '*[^0-9a-f]*'`
+  ),
+  check(
+    "source_capture_extension_identity_check",
+    sql`length(${table.profileId}) > 0 AND length(${table.captureClass}) > 0 AND length(${table.sourceKey}) > 0`
+  ),
+  check(
+    "source_capture_extension_validation_check",
+    sql`${table.validationState} IN (
+      'usable', 'raw_only_schema_invalid', 'raw_only_partial', 'raw_only_http_error'
+    )`
+  ),
+  check(
+    "source_capture_extension_json_check",
+    sql`json_valid(${table.usageRightsJson}) AND json_type(${table.usageRightsJson}) = 'object' AND
+      json_valid(${table.failureCodesJson}) AND json_type(${table.failureCodesJson}) = 'array' AND
+      json_valid(${table.laterImportJson}) AND json_type(${table.laterImportJson}) = 'object'`
+  ),
+  check(
+    "source_capture_extension_rights_check",
+    sql`json_extract(${table.usageRightsJson}, '$.licenseId') IS NOT NULL AND
+      json_extract(${table.usageRightsJson}, '$.rightsUri') IS NOT NULL AND
+      json_extract(${table.usageRightsJson}, '$.retrievedFor') IS NOT NULL AND
+      json_extract(${table.usageRightsJson}, '$.redistribution') IS NOT NULL AND
+      json_extract(${table.usageRightsJson}, '$.retentionClass') = 'raw_source_3650_days' AND
+      json_extract(${table.usageRightsJson}, '$.reviewStatus') IS NOT NULL`
+  ),
+  check(
+    "source_capture_extension_import_check",
+    sql`json_extract(${table.laterImportJson}, '$.owner') IN ('OS-03', 'OS-04') AND
+      length(json_extract(${table.laterImportJson}, '$.target')) > 0`
+  ),
+  check(
+    "source_capture_extension_time_check",
+    sql`julianday(${table.receiptCompletedAt}) IS NOT NULL AND
+      julianday(${table.persistenceRequestedAt}) IS NOT NULL AND
+      julianday(${table.responsePersistedAt}) IS NOT NULL AND
+      julianday(${table.sidecarPersistedAt}) IS NOT NULL AND
+      julianday(${table.manifestPersistedAt}) IS NOT NULL AND
+      julianday(${table.receiptCompletedAt}) <= julianday(${table.persistenceRequestedAt}) AND
+      julianday(${table.persistenceRequestedAt}) <= julianday(${table.responsePersistedAt}) AND
+      julianday(${table.responsePersistedAt}) <= julianday(${table.sidecarPersistedAt}) AND
+      julianday(${table.sidecarPersistedAt}) <= julianday(${table.manifestPersistedAt})`
+  ),
+  check(
+    "source_capture_extension_source_time_check",
+    sql`(${table.sourceObservedAt} IS NOT NULL AND julianday(${table.sourceObservedAt}) IS NOT NULL) OR
+      (${table.sourceObservedAt} IS NULL AND ${table.validationState} = 'raw_only_schema_invalid')`
+  ),
+  check(
+    "source_capture_extension_usable_check",
+    sql`${table.validationState} <> 'usable' OR ${table.sourceObservedAt} IS NOT NULL`
+  )
+]);
+
+export const sourceCaptureEvents = sqliteTable("source_capture_events", {
+  eventId: text("event_id").primaryKey(),
+  attemptToken: text("attempt_token").notNull(),
+  eventType: text("event_type", {
+    enum: [
+      "capture_committed",
+      "capture_committed_usable",
+      "capture_committed_raw_only",
+      "capture_deduplicated",
+      "capture_failed",
+      "not_modified_confirmed",
+      "replay_verified",
+      "freshness_stale",
+      "orphan_detected",
+      "orphan_removed"
+    ]
+  }).notNull(),
+  captureId: text("capture_id").references(() => sourceCaptureManifests.captureId),
+  sourceKey: text("source_key").notNull(),
+  provider: text("provider").notNull(),
+  dataset: text("dataset").notNull(),
+  idempotencyKey: text("idempotency_key").notNull(),
+  occurredAt: text("occurred_at").notNull(),
+  eventPayloadHash: text("event_payload_hash").notNull(),
+  payloadJson: text("payload_json").notNull()
+}, (table) => [
+  uniqueIndex("source_capture_event_attempt_unique").on(table.attemptToken),
+  index("idx_source_capture_events_source").on(table.sourceKey, table.occurredAt, table.eventType),
+  index("idx_source_capture_events_capture").on(table.captureId, table.occurredAt),
+  check(
+    "source_capture_event_token_check",
+    sql`length(${table.attemptToken}) BETWEEN 1 AND 200 AND
+      ${table.attemptToken} NOT GLOB '*[^A-Za-z0-9._:-]*'`
+  ),
+  check(
+    "source_capture_event_type_check",
+    sql`${table.eventType} IN (
+      'capture_committed', 'capture_committed_usable', 'capture_committed_raw_only',
+      'capture_deduplicated', 'capture_failed', 'not_modified_confirmed',
+      'replay_verified', 'freshness_stale', 'orphan_detected', 'orphan_removed'
+    )`
+  ),
+  check(
+    "source_capture_event_identity_check",
+    sql`length(${table.sourceKey}) > 0 AND length(${table.provider}) > 0 AND
+      length(${table.dataset}) > 0 AND length(${table.idempotencyKey}) > 0`
+  ),
+  check(
+    "source_capture_event_capture_check",
+    sql`${table.eventType} NOT IN (
+      'capture_committed', 'capture_committed_usable', 'capture_committed_raw_only',
+      'capture_deduplicated', 'not_modified_confirmed', 'replay_verified'
+    ) OR ${table.captureId} IS NOT NULL`
+  ),
+  check(
+    "source_capture_event_evidence_check",
+    sql`length(${table.eventId}) = 64 AND lower(${table.eventId}) = ${table.eventId} AND
+      ${table.eventId} NOT GLOB '*[^0-9a-f]*' AND
+      length(${table.eventPayloadHash}) = 64 AND
+      lower(${table.eventPayloadHash}) = ${table.eventPayloadHash} AND
+      ${table.eventPayloadHash} NOT GLOB '*[^0-9a-f]*' AND json_valid(${table.payloadJson}) AND
+      json_type(${table.payloadJson}) = 'object'`
+  ),
+  check("source_capture_event_time_check", sql`julianday(${table.occurredAt}) IS NOT NULL`)
+]);
+
 export const sourceCaptureHeartbeats = sqliteTable("source_capture_heartbeats", {
   sourceKey: text("source_key").primaryKey(),
   provider: text("provider").notNull(),

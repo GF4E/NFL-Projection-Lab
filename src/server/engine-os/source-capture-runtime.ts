@@ -1,0 +1,1462 @@
+import type { CaptureDataset, RedactedHttpRequest } from "@/domain/engine-os";
+import { canonicalJson, sha256Hex } from "@/domain/hash";
+import {
+  OS03A_EFFECTIVE_CONTRACT_HASH,
+  OS03A_EFFECTIVE_CONTRACT_VERSION,
+  assertRegisteredCaptureRequest,
+  assertSecretFreeCanonicalValue,
+  assertSecretFreeCaptureResponse,
+  buildCaptureAlertId,
+  buildCaptureEventId,
+  buildEventPayloadHash,
+  buildLaterImportHash,
+  buildManifestExtensionHash,
+  buildOs03aCaptureEvidence,
+  buildOs03aManifestExtension,
+  buildSidecarSha256,
+  buildUsageRightsHash,
+  getQualificationSourceProfile,
+  sourceCaptureKey,
+  verifyOs03aCaptureSidecar,
+  type CaptureEventType,
+  type CaptureFailureCode,
+  type CaptureValidationState,
+  type Os03aCaptureSidecar,
+  type Os03aManifestExtension,
+  type UsageRightsMetadata
+} from "@/domain/source-capture-contract";
+
+const OBJECT_MAX_BYTES = 100_000_000;
+const QUALIFICATION_ORPHAN_MINIMUM_AGE_SECONDS = 86_400;
+const SAFE_OBJECT_PREFIXES = ["raw/", "manifests/os03a/"] as const;
+
+type Clock = () => Date;
+
+function canonicalTimestamp(value: string | Date, label: string): string {
+  const milliseconds = value instanceof Date ? value.getTime() : Date.parse(value);
+  if (!Number.isFinite(milliseconds)) throw new Error(`${label} must be a valid timestamp`);
+  return new Date(milliseconds).toISOString();
+}
+
+function now(clock: Clock | undefined, label: string): string {
+  return canonicalTimestamp((clock ?? (() => new Date()))(), label);
+}
+
+function bytesEqual(left: Uint8Array, right: Uint8Array): boolean {
+  if (left.byteLength !== right.byteLength) return false;
+  let difference = 0;
+  for (let index = 0; index < left.byteLength; index += 1) {
+    difference |= left[index]! ^ right[index]!;
+  }
+  return difference === 0;
+}
+
+async function objectBytes(bucket: R2Bucket, key: string): Promise<Uint8Array | null> {
+  const object = await bucket.get(key);
+  if (!object) return null;
+  return new Uint8Array(await object.arrayBuffer());
+}
+
+async function verifyExactObject(bucket: R2Bucket, key: string, expected: Uint8Array): Promise<void> {
+  const recovered = await objectBytes(bucket, key);
+  if (!recovered || !bytesEqual(recovered, expected)) {
+    throw new Error(`Immutable evidence object failed exact-byte verification: ${key}`);
+  }
+}
+
+async function publishExactObject(input: {
+  bucket: R2Bucket;
+  key: string;
+  bytes: Uint8Array;
+  contentType: string;
+  metadata: Record<string, string>;
+}): Promise<boolean> {
+  if (input.bytes.byteLength < 1 || input.bytes.byteLength > OBJECT_MAX_BYTES) {
+    throw new Error("Immutable evidence object is outside the frozen byte limits");
+  }
+  const prior = await objectBytes(input.bucket, input.key);
+  if (prior) {
+    if (!bytesEqual(prior, input.bytes)) {
+      throw new Error(`Immutable evidence object key contains different bytes: ${input.key}`);
+    }
+    return true;
+  }
+  await input.bucket.put(input.key, input.bytes, {
+    httpMetadata: { contentType: input.contentType },
+    customMetadata: {
+      ...input.metadata,
+      sha256: sha256Hex(input.bytes),
+      state: "immutable"
+    }
+  });
+  await verifyExactObject(input.bucket, input.key, input.bytes);
+  return false;
+}
+
+interface BaseCaptureRow {
+  capture_id: string;
+  idempotency_key: string;
+  provider: string;
+  dataset: CaptureDataset;
+  request_hash: string;
+  response_object_key: string;
+  response_sha256: string;
+  response_bytes: number;
+  sidecar_object_key: string;
+  sidecar_sha256: string;
+  provider_published_at: string | null;
+  received_at: string;
+  valid_from: string | null;
+  valid_to: string | null;
+  source_schema_version: string;
+  license_id: string;
+  evidence_hash: string;
+}
+
+interface ExtensionRow {
+  capture_id: string;
+  contract_version: string;
+  contract_hash: string;
+  profile_id: string;
+  capture_class: string;
+  source_key: string;
+  source_observed_at: string | null;
+  receipt_completed_at: string;
+  persistence_requested_at: string;
+  response_persisted_at: string;
+  sidecar_persisted_at: string;
+  manifest_persisted_at: string;
+  content_type: string;
+  etag: string | null;
+  usage_rights_json: string;
+  usage_rights_hash: string;
+  validation_state: CaptureValidationState;
+  failure_codes_json: string;
+  later_import_json: string;
+  later_import_hash: string;
+  extension_hash: string;
+}
+
+interface EventRow {
+  event_id: string;
+  attempt_token: string;
+  event_type: CaptureEventType;
+  capture_id: string | null;
+  source_key: string;
+  provider: string;
+  dataset: CaptureDataset;
+  idempotency_key: string;
+  occurred_at: string;
+  event_payload_hash: string;
+  payload_json: string;
+}
+
+interface CaptureRows {
+  base: BaseCaptureRow;
+  extension: ExtensionRow;
+}
+
+async function captureRowsByIdentity(input: {
+  db: D1Database;
+  provider: string;
+  dataset: CaptureDataset;
+  idempotencyKey: string;
+}): Promise<CaptureRows | null> {
+  const row = await input.db.prepare(`SELECT
+      base.capture_id, base.idempotency_key, base.provider, base.dataset,
+      base.request_hash, base.response_object_key, base.response_sha256,
+      base.response_bytes, base.sidecar_object_key, base.sidecar_sha256,
+      base.provider_published_at, base.received_at, base.valid_from, base.valid_to,
+      base.source_schema_version, base.license_id, base.evidence_hash,
+      extension.contract_version AS extension_contract_version,
+      extension.contract_hash AS extension_contract_hash,
+      extension.profile_id, extension.capture_class, extension.source_key,
+      extension.source_observed_at, extension.receipt_completed_at,
+      extension.persistence_requested_at, extension.response_persisted_at,
+      extension.sidecar_persisted_at, extension.manifest_persisted_at,
+      extension.content_type AS extension_content_type, extension.etag AS extension_etag,
+      extension.usage_rights_json, extension.usage_rights_hash,
+      extension.validation_state, extension.failure_codes_json,
+      extension.later_import_json, extension.later_import_hash, extension.extension_hash
+    FROM source_capture_manifests base
+    LEFT JOIN source_capture_manifest_extensions extension
+      ON extension.capture_id = base.capture_id
+    WHERE base.provider = ? AND base.dataset = ? AND base.idempotency_key = ?
+    LIMIT 1`)
+    .bind(input.provider, input.dataset, input.idempotencyKey)
+    .first<Record<string, unknown>>();
+  if (!row) return null;
+  if (!row.extension_contract_version) {
+    throw new Error("OS-03A base manifest exists without its immutable extension");
+  }
+  return {
+    base: {
+      capture_id: row.capture_id as string,
+      idempotency_key: row.idempotency_key as string,
+      provider: row.provider as string,
+      dataset: row.dataset as CaptureDataset,
+      request_hash: row.request_hash as string,
+      response_object_key: row.response_object_key as string,
+      response_sha256: row.response_sha256 as string,
+      response_bytes: Number(row.response_bytes),
+      sidecar_object_key: row.sidecar_object_key as string,
+      sidecar_sha256: row.sidecar_sha256 as string,
+      provider_published_at: row.provider_published_at as string | null,
+      received_at: row.received_at as string,
+      valid_from: row.valid_from as string | null,
+      valid_to: row.valid_to as string | null,
+      source_schema_version: row.source_schema_version as string,
+      license_id: row.license_id as string,
+      evidence_hash: row.evidence_hash as string
+    },
+    extension: {
+      capture_id: row.capture_id as string,
+      contract_version: row.extension_contract_version as string,
+      contract_hash: row.extension_contract_hash as string,
+      profile_id: row.profile_id as string,
+      capture_class: row.capture_class as string,
+      source_key: row.source_key as string,
+      source_observed_at: row.source_observed_at as string | null,
+      receipt_completed_at: row.receipt_completed_at as string,
+      persistence_requested_at: row.persistence_requested_at as string,
+      response_persisted_at: row.response_persisted_at as string,
+      sidecar_persisted_at: row.sidecar_persisted_at as string,
+      manifest_persisted_at: row.manifest_persisted_at as string,
+      content_type: row.extension_content_type as string,
+      etag: row.extension_etag as string | null,
+      usage_rights_json: row.usage_rights_json as string,
+      usage_rights_hash: row.usage_rights_hash as string,
+      validation_state: row.validation_state as CaptureValidationState,
+      failure_codes_json: row.failure_codes_json as string,
+      later_import_json: row.later_import_json as string,
+      later_import_hash: row.later_import_hash as string,
+      extension_hash: row.extension_hash as string
+    }
+  };
+}
+
+async function captureRowsById(db: D1Database, captureId: string): Promise<CaptureRows | null> {
+  const identity = await db.prepare(`SELECT provider, dataset, idempotency_key
+    FROM source_capture_manifests WHERE capture_id = ? LIMIT 1`)
+    .bind(captureId)
+    .first<{ provider: string; dataset: CaptureDataset; idempotency_key: string }>();
+  if (!identity) return null;
+  return captureRowsByIdentity({
+    db,
+    provider: identity.provider,
+    dataset: identity.dataset,
+    idempotencyKey: identity.idempotency_key
+  });
+}
+
+function parseSidecar(bytes: Uint8Array): Os03aCaptureSidecar {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
+  } catch {
+    throw new Error("Capture sidecar is not valid canonical UTF-8 JSON");
+  }
+  assertSecretFreeCanonicalValue(parsed, "Stored capture sidecar");
+  return parsed as Os03aCaptureSidecar;
+}
+
+function extensionFromRow(row: ExtensionRow): Os03aManifestExtension {
+  return {
+    captureId: row.capture_id,
+    contractVersion: row.contract_version as Os03aManifestExtension["contractVersion"],
+    contractHash: row.contract_hash,
+    profileId: row.profile_id,
+    captureClass: row.capture_class as "qualification_fixture",
+    sourceKey: row.source_key,
+    sourceObservedAt: row.source_observed_at,
+    receiptCompletedAt: row.receipt_completed_at,
+    persistenceRequestedAt: row.persistence_requested_at,
+    responsePersistedAt: row.response_persisted_at,
+    sidecarPersistedAt: row.sidecar_persisted_at,
+    manifestPersistedAt: row.manifest_persisted_at,
+    contentType: row.content_type,
+    etag: row.etag,
+    usageRights: JSON.parse(row.usage_rights_json) as UsageRightsMetadata,
+    usageRightsHash: row.usage_rights_hash,
+    validationState: row.validation_state,
+    failureCodes: JSON.parse(row.failure_codes_json) as CaptureFailureCode[],
+    laterImport: JSON.parse(row.later_import_json) as Os03aManifestExtension["laterImport"],
+    laterImportHash: row.later_import_hash,
+    extensionHash: row.extension_hash
+  };
+}
+
+function assertRowsMatchSidecar(rows: CaptureRows, sidecar: Os03aCaptureSidecar): void {
+  const { base, extension } = rows;
+  const checks: Array<[unknown, unknown]> = [
+    [base.capture_id, sidecar.captureId],
+    [base.idempotency_key, sidecar.idempotencyKey],
+    [base.provider, sidecar.provider],
+    [base.dataset, sidecar.dataset],
+    [base.request_hash, sidecar.requestHash],
+    [base.response_object_key, sidecar.responseObjectKey],
+    [base.response_sha256, sidecar.responseSha256],
+    [base.response_bytes, sidecar.responseBytes],
+    [base.provider_published_at, sidecar.providerPublishedAt],
+    [base.received_at, sidecar.receiptCompletedAt],
+    [base.valid_from, sidecar.validFrom],
+    [base.valid_to, sidecar.validTo],
+    [base.source_schema_version, sidecar.sourceSchemaVersion],
+    [base.license_id, sidecar.usageRights.licenseId],
+    [base.evidence_hash, sidecar.evidenceHash],
+    [extension.capture_id, sidecar.captureId],
+    [extension.contract_hash, OS03A_EFFECTIVE_CONTRACT_HASH],
+    [extension.profile_id, sidecar.profileId],
+    [extension.capture_class, sidecar.captureClass],
+    [extension.source_key, sidecar.sourceKey],
+    [extension.source_observed_at, sidecar.sourceObservedAt],
+    [extension.receipt_completed_at, sidecar.receiptCompletedAt],
+    [extension.persistence_requested_at, sidecar.persistenceRequestedAt],
+    [extension.response_persisted_at, sidecar.responsePersistedAt],
+    [extension.content_type, sidecar.contentType],
+    [extension.etag, sidecar.etag],
+    [extension.usage_rights_hash, sidecar.usageRightsHash],
+    [extension.validation_state, sidecar.validationState],
+    [extension.later_import_hash, sidecar.laterImportHash]
+  ];
+  if (checks.some(([left, right]) => left !== right)) {
+    throw new Error("Stored D1 pointer does not match its immutable OS-03A sidecar");
+  }
+  if (
+    canonicalJson(JSON.parse(extension.usage_rights_json)) !== canonicalJson(sidecar.usageRights) ||
+    canonicalJson(JSON.parse(extension.failure_codes_json)) !== canonicalJson(sidecar.failureCodes) ||
+    canonicalJson(JSON.parse(extension.later_import_json)) !== canonicalJson(sidecar.laterImport)
+  ) {
+    throw new Error("Stored OS-03A extension JSON does not match its sidecar");
+  }
+  if (
+    buildUsageRightsHash(sidecar.usageRights) !== sidecar.usageRightsHash ||
+    buildLaterImportHash(sidecar.laterImport) !== sidecar.laterImportHash ||
+    buildManifestExtensionHash(extensionFromRow(extension)) !== extension.extension_hash
+  ) {
+    throw new Error("Stored OS-03A extension hash failed verification");
+  }
+}
+
+async function verifyCaptureRows(bucket: R2Bucket, rows: CaptureRows): Promise<Os03aCaptureSidecar> {
+  const response = await objectBytes(bucket, rows.base.response_object_key);
+  const sidecarBytes = await objectBytes(bucket, rows.base.sidecar_object_key);
+  if (!response || !sidecarBytes) throw new Error("Stored OS-03A evidence object is missing");
+  if (
+    response.byteLength !== rows.base.response_bytes ||
+    sha256Hex(response) !== rows.base.response_sha256 ||
+    sha256Hex(sidecarBytes) !== rows.base.sidecar_sha256
+  ) {
+    throw new Error("Stored OS-03A evidence object is corrupt");
+  }
+  const sidecar = parseSidecar(sidecarBytes);
+  verifyOs03aCaptureSidecar(sidecar);
+  if (buildSidecarSha256(sidecar) !== rows.base.sidecar_sha256) {
+    throw new Error("Stored OS-03A sidecar self-hash failed verification");
+  }
+  assertRowsMatchSidecar(rows, sidecar);
+  if (sidecar.responseSha256 !== sha256Hex(response)) {
+    throw new Error("Stored response bytes do not match their OS-03A sidecar");
+  }
+  return sidecar;
+}
+
+function eventIdentity(input: {
+  eventType: CaptureEventType;
+  attemptToken: string;
+  captureId: string | null;
+  payload: Record<string, unknown>;
+}): {
+  eventId: string;
+  eventType: CaptureEventType;
+  attemptToken: string;
+  captureId: string | null;
+  payloadHash: string;
+  payloadJson: string;
+} {
+  const payloadHash = buildEventPayloadHash(input.payload);
+  return {
+    payloadHash,
+    payloadJson: canonicalJson(input.payload),
+    eventType: input.eventType,
+    attemptToken: input.attemptToken,
+    captureId: input.captureId,
+    eventId: buildCaptureEventId({
+      eventType: input.eventType,
+      attemptToken: input.attemptToken,
+      captureId: input.captureId,
+      eventPayloadHash: payloadHash
+    })
+  };
+}
+
+async function eventByAttempt(db: D1Database, attemptToken: string): Promise<EventRow | null> {
+  return db.prepare(`SELECT * FROM source_capture_events
+    WHERE attempt_token = ? LIMIT 1`)
+    .bind(attemptToken)
+    .first<EventRow>();
+}
+
+function assertExactEvent(row: EventRow | null, expected: {
+  eventId: string;
+  eventType: CaptureEventType;
+  attemptToken: string;
+  captureId: string | null;
+  payloadHash: string;
+  payloadJson: string;
+}): void {
+  if (!row || row.event_id !== expected.eventId || row.event_type !== expected.eventType ||
+      row.attempt_token !== expected.attemptToken || row.capture_id !== expected.captureId ||
+      row.event_payload_hash !== expected.payloadHash ||
+      row.payload_json !== expected.payloadJson) {
+    throw new Error("Capture attempt token resolved to a different immutable event");
+  }
+}
+
+async function executeExactEventBatch(input: {
+  db: D1Database;
+  attemptToken: string;
+  event: ReturnType<typeof eventIdentity>;
+  statements: D1PreparedStatement[];
+}): Promise<void> {
+  try {
+    await input.db.batch(input.statements);
+  } catch (error) {
+    const concurrent = await eventByAttempt(input.db, input.attemptToken);
+    try {
+      assertExactEvent(concurrent, input.event);
+      return;
+    } catch {
+      throw error;
+    }
+  }
+  assertExactEvent(await eventByAttempt(input.db, input.attemptToken), input.event);
+}
+
+function eventInsertStatement(input: {
+  db: D1Database;
+  eventId: string;
+  attemptToken: string;
+  eventType: CaptureEventType;
+  captureId: string | null;
+  sourceKey: string;
+  provider: string;
+  dataset: CaptureDataset;
+  idempotencyKey: string;
+  occurredAt: string;
+  payloadHash: string;
+  payloadJson: string;
+}): D1PreparedStatement {
+  const values: unknown[] = [
+    input.eventId,
+    input.attemptToken,
+    input.eventType,
+    input.captureId,
+    input.sourceKey,
+    input.provider,
+    input.dataset,
+    input.idempotencyKey,
+    input.occurredAt,
+    input.payloadHash,
+    input.payloadJson
+  ];
+  return input.db.prepare(`INSERT INTO source_capture_events (
+      event_id, attempt_token, event_type, capture_id, source_key, provider, dataset,
+      idempotency_key, occurred_at, event_payload_hash, payload_json
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(...values);
+}
+
+export interface StoreOs03aCaptureInput {
+  db: D1Database;
+  bucket: R2Bucket;
+  profileId: string;
+  attemptToken: string;
+  idempotencyKey: string;
+  request: RedactedHttpRequest;
+  responseBytes: Uint8Array;
+  contentType: string;
+  etag?: string | null;
+  sourceObservedAt?: string | null;
+  providerPublishedAt?: string | null;
+  receiptCompletedAt: string;
+  persistenceRequestedAt: string;
+  validFrom?: string | null;
+  validTo?: string | null;
+  sourceSchemaVersion: string;
+  usageRights: UsageRightsMetadata;
+  validationState: CaptureValidationState;
+  failureCodes?: readonly CaptureFailureCode[];
+  clock?: Clock;
+}
+
+export interface StoredOs03aCapture {
+  status: "committed" | "deduplicated";
+  captureId: string;
+  responseObjectKey: string;
+  responseSha256: string;
+  sidecarObjectKey: string;
+  sidecarSha256: string;
+  validationState: CaptureValidationState;
+  deduplicatedResponse: boolean;
+  providerDispatches: 0;
+}
+
+function rowsMatchCandidate(rows: CaptureRows, sidecar: Os03aCaptureSidecar): boolean {
+  return rows.base.capture_id === sidecar.captureId &&
+    rows.base.request_hash === sidecar.requestHash &&
+    rows.base.response_sha256 === sidecar.responseSha256 &&
+    rows.base.evidence_hash === sidecar.evidenceHash &&
+    rows.extension.profile_id === sidecar.profileId &&
+    rows.extension.source_key === sidecar.sourceKey &&
+    rows.extension.validation_state === sidecar.validationState &&
+    rows.extension.usage_rights_hash === sidecar.usageRightsHash &&
+    rows.extension.later_import_hash === sidecar.laterImportHash;
+}
+
+async function appendDeduplicationEvent(input: {
+  db: D1Database;
+  rows: CaptureRows;
+  sidecar: Os03aCaptureSidecar;
+  attemptToken: string;
+  occurredAt: string;
+}): Promise<void> {
+  const payload = {
+    captureId: input.sidecar.captureId,
+    evidenceHash: input.sidecar.evidenceHash,
+    responseSha256: input.sidecar.responseSha256,
+    sidecarSha256: input.rows.base.sidecar_sha256,
+    outcome: "deduplicated"
+  } as const;
+  const event = eventIdentity({
+    eventType: "capture_deduplicated",
+    attemptToken: input.attemptToken,
+    captureId: input.sidecar.captureId,
+    payload
+  });
+  const prior = await eventByAttempt(input.db, input.attemptToken);
+  if (prior) {
+    assertExactEvent(prior, event);
+    return;
+  }
+  await executeExactEventBatch({
+    db: input.db,
+    attemptToken: input.attemptToken,
+    event,
+    statements: [
+    eventInsertStatement({
+      db: input.db,
+      ...event,
+      attemptToken: input.attemptToken,
+      eventType: "capture_deduplicated",
+      captureId: input.sidecar.captureId,
+      sourceKey: input.sidecar.sourceKey,
+      provider: input.sidecar.provider,
+      dataset: input.sidecar.dataset,
+      idempotencyKey: input.sidecar.idempotencyKey,
+      occurredAt: input.occurredAt
+    }),
+    input.db.prepare(`UPDATE source_capture_heartbeats
+      SET last_attempt_at = max(last_attempt_at, ?)
+      WHERE source_key = ? AND latest_capture_id = ?
+        AND EXISTS (SELECT 1 FROM source_capture_events WHERE event_id = ? AND event_payload_hash = ?)`)
+      .bind(
+        input.occurredAt,
+        input.sidecar.sourceKey,
+        input.sidecar.captureId,
+        event.eventId,
+        event.payloadHash
+      )
+    ]
+  });
+}
+
+async function commitCapture(input: {
+  db: D1Database;
+  bucket: R2Bucket;
+  built: ReturnType<typeof buildOs03aCaptureEvidence>;
+  extension: Os03aManifestExtension;
+  attemptToken: string;
+  sidecarSha256: string;
+  sidecarObjectKey: string;
+  deduplicatedResponse: boolean;
+}): Promise<StoredOs03aCapture> {
+  const { sidecar } = input.built;
+  const eventType: CaptureEventType = sidecar.validationState === "usable"
+    ? "capture_committed_usable"
+    : "capture_committed_raw_only";
+  const payload = {
+    captureId: sidecar.captureId,
+    evidenceHash: sidecar.evidenceHash,
+    extensionHash: input.extension.extensionHash,
+    responseSha256: sidecar.responseSha256,
+    sidecarSha256: input.sidecarSha256,
+    validationState: sidecar.validationState
+  };
+  const event = eventIdentity({
+    eventType,
+    attemptToken: input.attemptToken,
+    captureId: sidecar.captureId,
+    payload
+  });
+  const priorEvent = await eventByAttempt(input.db, input.attemptToken);
+  if (priorEvent) {
+    assertExactEvent(priorEvent, event);
+    const rows = await captureRowsByIdentity({
+      db: input.db,
+      provider: sidecar.provider,
+      dataset: sidecar.dataset,
+      idempotencyKey: sidecar.idempotencyKey
+    });
+    if (!rows || !rowsMatchCandidate(rows, sidecar)) {
+      throw new Error("Committed event exists without matching immutable capture evidence");
+    }
+    await verifyCaptureRows(input.bucket, rows);
+    return {
+      status: "deduplicated",
+      captureId: sidecar.captureId,
+      responseObjectKey: rows.base.response_object_key,
+      responseSha256: rows.base.response_sha256,
+      sidecarObjectKey: rows.base.sidecar_object_key,
+      sidecarSha256: rows.base.sidecar_sha256,
+      validationState: rows.extension.validation_state,
+      deduplicatedResponse: true,
+      providerDispatches: 0
+    };
+  }
+
+  const rightsJson = canonicalJson(input.extension.usageRights);
+  const failureCodesJson = canonicalJson(input.extension.failureCodes);
+  const laterImportJson = canonicalJson(input.extension.laterImport);
+  const isUsable = sidecar.validationState === "usable";
+  const heartbeatStatus = isUsable ? "current" : "partial";
+
+  const statements: D1PreparedStatement[] = [
+    input.db.prepare(`INSERT OR IGNORE INTO source_capture_manifests (
+      capture_id, idempotency_key, provider, dataset, request_hash,
+      response_object_key, response_sha256, response_bytes, sidecar_object_key,
+      sidecar_sha256, provider_published_at, received_at, valid_from, valid_to,
+      source_schema_version, license_id, evidence_hash
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`).bind(
+      sidecar.captureId,
+      sidecar.idempotencyKey,
+      sidecar.provider,
+      sidecar.dataset,
+      sidecar.requestHash,
+      sidecar.responseObjectKey,
+      sidecar.responseSha256,
+      sidecar.responseBytes,
+      input.sidecarObjectKey,
+      input.sidecarSha256,
+      sidecar.providerPublishedAt,
+      sidecar.receiptCompletedAt,
+      sidecar.validFrom,
+      sidecar.validTo,
+      sidecar.sourceSchemaVersion,
+      sidecar.usageRights.licenseId,
+      sidecar.evidenceHash
+    ),
+    input.db.prepare(`INSERT OR IGNORE INTO source_capture_manifest_extensions (
+      capture_id, contract_version, contract_hash, profile_id, capture_class, source_key,
+      source_observed_at, receipt_completed_at, persistence_requested_at,
+      response_persisted_at, sidecar_persisted_at, manifest_persisted_at,
+      content_type, etag, usage_rights_json, usage_rights_hash, validation_state,
+      failure_codes_json, later_import_json, later_import_hash, extension_hash
+    ) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+      WHERE EXISTS (
+        SELECT 1 FROM source_capture_manifests
+        WHERE capture_id = ? AND provider = ? AND dataset = ? AND idempotency_key = ?
+          AND request_hash = ? AND response_sha256 = ? AND response_bytes = ?
+          AND sidecar_object_key = ? AND sidecar_sha256 = ? AND evidence_hash = ?
+      )`).bind(
+      input.extension.captureId,
+      OS03A_EFFECTIVE_CONTRACT_VERSION,
+      input.extension.contractHash,
+      input.extension.profileId,
+      input.extension.captureClass,
+      input.extension.sourceKey,
+      input.extension.sourceObservedAt,
+      input.extension.receiptCompletedAt,
+      input.extension.persistenceRequestedAt,
+      input.extension.responsePersistedAt,
+      input.extension.sidecarPersistedAt,
+      input.extension.manifestPersistedAt,
+      input.extension.contentType,
+      input.extension.etag,
+      rightsJson,
+      input.extension.usageRightsHash,
+      input.extension.validationState,
+      failureCodesJson,
+      laterImportJson,
+      input.extension.laterImportHash,
+      input.extension.extensionHash,
+      sidecar.captureId,
+      sidecar.provider,
+      sidecar.dataset,
+      sidecar.idempotencyKey,
+      sidecar.requestHash,
+      sidecar.responseSha256,
+      sidecar.responseBytes,
+      input.sidecarObjectKey,
+      input.sidecarSha256,
+      sidecar.evidenceHash
+    ),
+    eventInsertStatement({
+      db: input.db,
+      ...event,
+      attemptToken: input.attemptToken,
+      eventType,
+      captureId: sidecar.captureId,
+      sourceKey: sidecar.sourceKey,
+      provider: sidecar.provider,
+      dataset: sidecar.dataset,
+      idempotencyKey: sidecar.idempotencyKey,
+      occurredAt: input.extension.manifestPersistedAt
+    }),
+    input.db.prepare(`INSERT INTO source_capture_heartbeats (
+      source_key, provider, dataset, status, last_attempt_at, last_success_at,
+      last_failure_at, failure_code, latest_capture_id
+    ) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?
+      WHERE EXISTS (
+        SELECT 1 FROM source_capture_events event
+        JOIN source_capture_manifests base ON base.capture_id = event.capture_id
+        JOIN source_capture_manifest_extensions extension ON extension.capture_id = base.capture_id
+        WHERE event.event_id = ? AND event.event_payload_hash = ?
+          AND base.evidence_hash = ? AND extension.extension_hash = ?
+          AND extension.source_key = ? AND extension.validation_state = ?
+      )
+      ON CONFLICT(source_key) DO UPDATE SET
+        status = CASE
+          WHEN excluded.last_attempt_at >= source_capture_heartbeats.last_attempt_at
+          THEN excluded.status ELSE source_capture_heartbeats.status END,
+        last_attempt_at = max(source_capture_heartbeats.last_attempt_at, excluded.last_attempt_at),
+        last_success_at = CASE
+          WHEN excluded.last_success_at IS NULL THEN source_capture_heartbeats.last_success_at
+          WHEN source_capture_heartbeats.last_success_at IS NULL OR excluded.last_success_at > source_capture_heartbeats.last_success_at
+          THEN excluded.last_success_at ELSE source_capture_heartbeats.last_success_at END,
+        last_failure_at = CASE
+          WHEN excluded.last_attempt_at >= source_capture_heartbeats.last_attempt_at
+          THEN excluded.last_failure_at ELSE source_capture_heartbeats.last_failure_at END,
+        failure_code = CASE
+          WHEN excluded.last_attempt_at >= source_capture_heartbeats.last_attempt_at
+          THEN excluded.failure_code ELSE source_capture_heartbeats.failure_code END,
+        latest_capture_id = CASE
+          WHEN excluded.latest_capture_id IS NULL THEN source_capture_heartbeats.latest_capture_id
+          WHEN source_capture_heartbeats.latest_capture_id IS NULL THEN excluded.latest_capture_id
+          WHEN EXISTS (
+            SELECT 1 FROM source_capture_manifest_extensions candidate
+            JOIN source_capture_manifest_extensions incumbent
+              ON incumbent.capture_id = source_capture_heartbeats.latest_capture_id
+            WHERE candidate.capture_id = excluded.latest_capture_id
+              AND (
+                candidate.receipt_completed_at > incumbent.receipt_completed_at OR
+                (candidate.receipt_completed_at = incumbent.receipt_completed_at AND
+                  candidate.capture_id > incumbent.capture_id)
+              )
+          ) THEN excluded.latest_capture_id
+          ELSE source_capture_heartbeats.latest_capture_id END`).bind(
+      sidecar.sourceKey,
+      sidecar.provider,
+      sidecar.dataset,
+      heartbeatStatus,
+      input.extension.manifestPersistedAt,
+      isUsable ? input.extension.manifestPersistedAt : null,
+      isUsable ? null : input.extension.manifestPersistedAt,
+      isUsable ? null : sidecar.failureCodes[0] ?? "schema_invalid",
+      isUsable ? sidecar.captureId : null,
+      event.eventId,
+      event.payloadHash,
+      sidecar.evidenceHash,
+      input.extension.extensionHash,
+      sidecar.sourceKey,
+      sidecar.validationState
+    )
+  ];
+
+  if (!isUsable) {
+    const failureCode = sidecar.failureCodes[0] ?? "schema_invalid";
+    const alertId = buildCaptureAlertId({
+      sourceKey: sidecar.sourceKey,
+      failureCode,
+      idempotencyKey: sidecar.idempotencyKey
+    });
+    statements.push(input.db.prepare(`INSERT OR IGNORE INTO engine_system_alerts (
+      alert_id, alert_type, deduplication_key, severity, state, created_at, payload_json
+    ) SELECT ?, 'source_capture_failure', ?, 'error', 'open', ?, ?
+      WHERE EXISTS (SELECT 1 FROM source_capture_events WHERE event_id = ? AND event_payload_hash = ?)`)
+      .bind(
+        alertId,
+        `os03a:${sidecar.sourceKey}:${sidecar.idempotencyKey}:${failureCode}`,
+        input.extension.manifestPersistedAt,
+        canonicalJson({
+          contractVersion: OS03A_EFFECTIVE_CONTRACT_VERSION,
+          sourceKey: sidecar.sourceKey,
+          failureCode,
+          idempotencyKey: sidecar.idempotencyKey,
+          captureId: sidecar.captureId
+        }),
+        event.eventId,
+        event.payloadHash
+      ));
+  }
+
+  try {
+    await input.db.batch(statements);
+  } catch (error) {
+    // A concurrent identical invocation can win the globally unique attempt
+    // token while this transaction rolls back. Only an exact immutable winner
+    // is allowed to converge; every other conflict remains loud.
+    const concurrent = await eventByAttempt(input.db, input.attemptToken);
+    try {
+      assertExactEvent(concurrent, event);
+      const winner = await captureRowsByIdentity({
+        db: input.db,
+        provider: sidecar.provider,
+        dataset: sidecar.dataset,
+        idempotencyKey: sidecar.idempotencyKey
+      });
+      if (!winner || !rowsMatchCandidate(winner, sidecar)) throw error;
+      await verifyCaptureRows(input.bucket, winner);
+      return {
+        status: "deduplicated",
+        captureId: sidecar.captureId,
+        responseObjectKey: winner.base.response_object_key,
+        responseSha256: winner.base.response_sha256,
+        sidecarObjectKey: winner.base.sidecar_object_key,
+        sidecarSha256: winner.base.sidecar_sha256,
+        validationState: winner.extension.validation_state,
+        deduplicatedResponse: true,
+        providerDispatches: 0
+      };
+    } catch {
+      throw error;
+    }
+  }
+  const rows = await captureRowsByIdentity({
+    db: input.db,
+    provider: sidecar.provider,
+    dataset: sidecar.dataset,
+    idempotencyKey: sidecar.idempotencyKey
+  });
+  if (!rows || !rowsMatchCandidate(rows, sidecar)) {
+    throw new Error("OS-03A manifest transaction lost an immutable identity collision");
+  }
+  assertExactEvent(await eventByAttempt(input.db, input.attemptToken), event);
+  const persisted = await verifyCaptureRows(input.bucket, rows);
+  if (persisted.evidenceHash !== sidecar.evidenceHash) {
+    throw new Error("Post-commit immutable capture verification resolved different evidence");
+  }
+  if (isUsable) {
+    const pointer = await input.db.prepare(`SELECT latest_capture_id FROM source_capture_heartbeats
+      WHERE source_key = ? LIMIT 1`).bind(sidecar.sourceKey)
+      .first<{ latest_capture_id: string | null }>();
+    if (!pointer?.latest_capture_id) throw new Error("Usable capture did not establish a last-good pointer");
+  }
+  return {
+    status: "committed",
+    captureId: sidecar.captureId,
+    responseObjectKey: sidecar.responseObjectKey,
+    responseSha256: sidecar.responseSha256,
+    sidecarObjectKey: input.sidecarObjectKey,
+    sidecarSha256: input.sidecarSha256,
+    validationState: sidecar.validationState,
+    deduplicatedResponse: input.deduplicatedResponse,
+    providerDispatches: 0
+  };
+}
+
+function classifyStorageFailure(error: unknown, phase: "response" | "sidecar" | "manifest"): CaptureFailureCode {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/secret|credential/i.test(message)) return "secret_filtered";
+  if (/corrupt|different bytes|verification/i.test(message)) return "corrupt_object";
+  return phase === "manifest" ? "manifest_failure" : "storage_failure";
+}
+
+export async function storeOs03aCapture(input: StoreOs03aCaptureInput): Promise<StoredOs03aCapture> {
+  const profile = getQualificationSourceProfile(input.profileId);
+  let phase: "response" | "sidecar" | "manifest" = "response";
+  let built: ReturnType<typeof buildOs03aCaptureEvidence> | null = null;
+  try {
+    assertRegisteredCaptureRequest(profile, input.request);
+    assertSecretFreeCaptureResponse(profile, input.contentType, input.responseBytes);
+    const responseSha256 = sha256Hex(input.responseBytes);
+    const responseObjectKey = `raw/${profile.provider}/${profile.dataset}/sha256/${responseSha256}`;
+    const persistenceRequestedAt = canonicalTimestamp(input.persistenceRequestedAt, "Persistence request time");
+    const priorIdentity = await captureRowsByIdentity({
+      db: input.db,
+      provider: profile.provider,
+      dataset: profile.dataset,
+      idempotencyKey: input.idempotencyKey
+    });
+    if (priorIdentity) {
+      const preliminary = buildOs03aCaptureEvidence({
+        ...input,
+        persistenceRequestedAt,
+        responsePersistedAt: persistenceRequestedAt
+      });
+      if (!rowsMatchCandidate(priorIdentity, preliminary.sidecar)) {
+        throw new Error("OS-03A idempotency key resolved to different immutable evidence");
+      }
+      const winner = await verifyCaptureRows(input.bucket, priorIdentity);
+      const priorAttempt = await eventByAttempt(input.db, input.attemptToken);
+      if (priorAttempt) {
+        if (
+          priorAttempt.capture_id !== winner.captureId ||
+          priorAttempt.source_key !== winner.sourceKey ||
+          priorAttempt.provider !== winner.provider ||
+          priorAttempt.dataset !== winner.dataset ||
+          priorAttempt.idempotency_key !== winner.idempotencyKey ||
+          !["capture_committed_usable", "capture_committed_raw_only", "capture_deduplicated"].includes(
+            priorAttempt.event_type
+          )
+        ) {
+          throw new Error("Capture attempt token was already consumed by a different terminal event");
+        }
+      } else {
+        await appendDeduplicationEvent({
+          db: input.db,
+          rows: priorIdentity,
+          sidecar: winner,
+          attemptToken: input.attemptToken,
+          occurredAt: now(input.clock, "Capture deduplication time")
+        });
+      }
+      return {
+        status: "deduplicated",
+        captureId: winner.captureId,
+        responseObjectKey: priorIdentity.base.response_object_key,
+        responseSha256: priorIdentity.base.response_sha256,
+        sidecarObjectKey: priorIdentity.base.sidecar_object_key,
+        sidecarSha256: priorIdentity.base.sidecar_sha256,
+        validationState: priorIdentity.extension.validation_state,
+        deduplicatedResponse: true,
+        providerDispatches: 0
+      };
+    }
+
+    const deduplicatedResponse = await publishExactObject({
+      bucket: input.bucket,
+      key: responseObjectKey,
+      bytes: input.responseBytes,
+      contentType: input.contentType,
+      metadata: { provider: profile.provider, dataset: profile.dataset, contract: OS03A_EFFECTIVE_CONTRACT_VERSION }
+    });
+    const responsePersistedAt = now(input.clock, "Response persistence time");
+    built = buildOs03aCaptureEvidence({
+      ...input,
+      persistenceRequestedAt,
+      responsePersistedAt
+    });
+    if (built.responseObjectKey !== responseObjectKey) {
+      throw new Error("Response identity changed after immutable publication");
+    }
+
+    phase = "sidecar";
+    await publishExactObject({
+      bucket: input.bucket,
+      key: built.sidecarObjectKey,
+      bytes: built.sidecarBytes,
+      contentType: "application/json",
+      metadata: { captureId: built.sidecar.captureId, contract: OS03A_EFFECTIVE_CONTRACT_VERSION }
+    });
+    const sidecarPersistedAt = now(input.clock, "Sidecar persistence time");
+    const manifestPersistedAt = now(input.clock, "Manifest persistence time");
+    const extension = buildOs03aManifestExtension({
+      sidecar: built.sidecar,
+      sidecarPersistedAt,
+      manifestPersistedAt
+    });
+
+    // The final R2 readback immediately precedes the D1 publication boundary.
+    await Promise.all([
+      verifyExactObject(input.bucket, built.responseObjectKey, input.responseBytes),
+      verifyExactObject(input.bucket, built.sidecarObjectKey, built.sidecarBytes)
+    ]);
+    phase = "manifest";
+    return await commitCapture({
+      db: input.db,
+      bucket: input.bucket,
+      built,
+      extension,
+      attemptToken: input.attemptToken,
+      sidecarSha256: built.sidecarSha256,
+      sidecarObjectKey: built.sidecarObjectKey,
+      deduplicatedResponse
+    });
+  } catch (error) {
+    const failureCode = classifyStorageFailure(error, phase);
+    const failureMessage = error instanceof Error ? error.message : String(error);
+    const updateHeartbeat = !/(?:idempotency key|attempt token|immutable identity collision)/i.test(failureMessage);
+    try {
+      await recordOs03aCaptureFailure({
+        db: input.db,
+        profileId: input.profileId,
+        attemptToken: input.attemptToken,
+        idempotencyKey: input.idempotencyKey,
+        failedAt: now(input.clock, "Capture failure time"),
+        failureCode,
+        updateHeartbeat,
+        safeContext: built ? {
+          captureId: built.sidecar.captureId,
+          responseObjectKey: built.responseObjectKey,
+          sidecarObjectKey: phase === "response" ? null : built.sidecarObjectKey
+        } : undefined
+      });
+    } catch (journalError) {
+      throw new AggregateError(
+        [error, journalError],
+        "Capture failed and its required failure event/alert could not be persisted"
+      );
+    }
+    throw error;
+  }
+}
+
+export async function recordOs03aCaptureFailure(input: {
+  db: D1Database;
+  profileId: string;
+  attemptToken: string;
+  idempotencyKey: string;
+  failedAt: string;
+  failureCode: CaptureFailureCode;
+  updateHeartbeat?: boolean;
+  safeContext?: Record<string, string | number | boolean | null>;
+}): Promise<void> {
+  const profile = getQualificationSourceProfile(input.profileId);
+  const sourceKey = sourceCaptureKey(profile);
+  const failedAt = canonicalTimestamp(input.failedAt, "Capture failure time");
+  const payload = {
+    contractVersion: OS03A_EFFECTIVE_CONTRACT_VERSION,
+    sourceKey,
+    failureCode: input.failureCode,
+    idempotencyKey: input.idempotencyKey,
+    ...(input.safeContext ? { context: input.safeContext } : {})
+  };
+  assertSecretFreeCanonicalValue(payload, "Capture failure payload");
+  const event = eventIdentity({
+    eventType: "capture_failed",
+    attemptToken: input.attemptToken,
+    captureId: null,
+    payload
+  });
+  const prior = await eventByAttempt(input.db, input.attemptToken);
+  if (prior) {
+    assertExactEvent(prior, event);
+    return;
+  }
+  const alertId = buildCaptureAlertId({
+    sourceKey,
+    failureCode: input.failureCode,
+    idempotencyKey: input.idempotencyKey
+  });
+  const statements: D1PreparedStatement[] = [
+    eventInsertStatement({
+      db: input.db,
+      ...event,
+      attemptToken: input.attemptToken,
+      eventType: "capture_failed",
+      captureId: null,
+      sourceKey,
+      provider: profile.provider,
+      dataset: profile.dataset,
+      idempotencyKey: input.idempotencyKey,
+      occurredAt: failedAt
+    }),
+    input.db.prepare(`INSERT OR IGNORE INTO engine_system_alerts (
+      alert_id, alert_type, deduplication_key, severity, state, created_at, payload_json
+    ) SELECT ?, 'source_capture_failure', ?, 'error', 'open', ?, ?
+      WHERE EXISTS (SELECT 1 FROM source_capture_events WHERE event_id = ? AND event_payload_hash = ?)`)
+      .bind(
+        alertId,
+        `os03a:${sourceKey}:${input.idempotencyKey}:${input.failureCode}`,
+        failedAt,
+        canonicalJson(payload),
+        event.eventId,
+        event.payloadHash
+      )
+  ];
+  if (input.updateHeartbeat !== false) {
+    statements.push(input.db.prepare(`INSERT INTO source_capture_heartbeats (
+        source_key, provider, dataset, status, last_attempt_at, last_success_at,
+        last_failure_at, failure_code, latest_capture_id
+      ) SELECT ?, ?, ?, 'stale', ?, NULL, ?, ?, NULL
+        WHERE EXISTS (SELECT 1 FROM source_capture_events WHERE event_id = ? AND event_payload_hash = ?)
+        ON CONFLICT(source_key) DO UPDATE SET
+          status = CASE WHEN excluded.last_attempt_at >= source_capture_heartbeats.last_attempt_at
+            THEN 'stale' ELSE source_capture_heartbeats.status END,
+          last_attempt_at = max(source_capture_heartbeats.last_attempt_at, excluded.last_attempt_at),
+          last_failure_at = CASE WHEN excluded.last_failure_at >= source_capture_heartbeats.last_attempt_at
+            THEN excluded.last_failure_at ELSE source_capture_heartbeats.last_failure_at END,
+          failure_code = CASE WHEN excluded.last_attempt_at >= source_capture_heartbeats.last_attempt_at
+            THEN excluded.failure_code ELSE source_capture_heartbeats.failure_code END`)
+      .bind(
+        sourceKey,
+        profile.provider,
+        profile.dataset,
+        failedAt,
+        failedAt,
+        input.failureCode,
+        event.eventId,
+        event.payloadHash
+      ));
+  }
+  await executeExactEventBatch({
+    db: input.db,
+    attemptToken: input.attemptToken,
+    event,
+    statements
+  });
+}
+
+export async function recordOs03aNotModified(input: {
+  db: D1Database;
+  bucket: R2Bucket;
+  profileId: string;
+  attemptToken: string;
+  idempotencyKey: string;
+  confirmedAt: string;
+}): Promise<{ captureId: string; providerDispatches: 0 }> {
+  const profile = getQualificationSourceProfile(input.profileId);
+  const sourceKey = sourceCaptureKey(profile);
+  const confirmedAt = canonicalTimestamp(input.confirmedAt, "Not-modified confirmation time");
+  const head = await input.db.prepare(`SELECT heartbeat.latest_capture_id AS capture_id
+    FROM source_capture_heartbeats heartbeat
+    JOIN source_capture_manifest_extensions extension
+      ON extension.capture_id = heartbeat.latest_capture_id
+    WHERE heartbeat.source_key = ? AND extension.source_key = ?
+      AND extension.profile_id = ? AND extension.validation_state = 'usable'
+    LIMIT 1`).bind(sourceKey, sourceKey, profile.profileId)
+    .first<{ capture_id: string }>();
+  if (!head?.capture_id) {
+    throw new Error("A not-modified confirmation requires a prior usable capture");
+  }
+  const rows = await captureRowsById(input.db, head.capture_id);
+  if (!rows) throw new Error("Not-modified head is missing its immutable manifest");
+  await verifyCaptureRows(input.bucket, rows);
+  const payload = {
+    captureId: head.capture_id,
+    evidenceHash: rows.base.evidence_hash,
+    profileId: profile.profileId,
+    sourceKey,
+    outcome: "not_modified_confirmed"
+  } as const;
+  const event = eventIdentity({
+    eventType: "not_modified_confirmed",
+    attemptToken: input.attemptToken,
+    captureId: head.capture_id,
+    payload
+  });
+  const prior = await eventByAttempt(input.db, input.attemptToken);
+  if (prior) {
+    assertExactEvent(prior, event);
+    return { captureId: head.capture_id, providerDispatches: 0 };
+  }
+  await executeExactEventBatch({
+    db: input.db,
+    attemptToken: input.attemptToken,
+    event,
+    statements: [
+    eventInsertStatement({
+      db: input.db,
+      ...event,
+      attemptToken: input.attemptToken,
+      eventType: "not_modified_confirmed",
+      captureId: head.capture_id,
+      sourceKey,
+      provider: profile.provider,
+      dataset: profile.dataset,
+      idempotencyKey: input.idempotencyKey,
+      occurredAt: confirmedAt
+    }),
+    input.db.prepare(`UPDATE source_capture_heartbeats SET
+      status = 'current', last_attempt_at = max(last_attempt_at, ?),
+      last_success_at = CASE WHEN last_success_at IS NULL OR ? > last_success_at
+        THEN ? ELSE last_success_at END,
+      last_failure_at = CASE WHEN ? >= last_attempt_at THEN NULL ELSE last_failure_at END,
+      failure_code = CASE WHEN ? >= last_attempt_at THEN NULL ELSE failure_code END
+      WHERE source_key = ? AND latest_capture_id = ?
+        AND EXISTS (SELECT 1 FROM source_capture_events WHERE event_id = ? AND event_payload_hash = ?)`)
+      .bind(
+        confirmedAt,
+        confirmedAt,
+        confirmedAt,
+        confirmedAt,
+        confirmedAt,
+        sourceKey,
+        head.capture_id,
+        event.eventId,
+        event.payloadHash
+      )
+    ]
+  });
+  return { captureId: head.capture_id, providerDispatches: 0 };
+}
+
+export async function verifyOs03aCaptureOffline(input: {
+  db: D1Database;
+  bucket: R2Bucket;
+  captureId: string;
+  attemptToken?: string;
+  verifiedAt?: string;
+}): Promise<{ sidecar: Os03aCaptureSidecar; providerDispatches: 0 }> {
+  const rows = await captureRowsById(input.db, input.captureId);
+  if (!rows) throw new Error("OS-03A capture manifest does not exist");
+  const sidecar = await verifyCaptureRows(input.bucket, rows);
+  if (input.attemptToken || input.verifiedAt) {
+    if (!input.attemptToken || !input.verifiedAt) {
+      throw new Error("Offline replay event requires both attempt token and verification time");
+    }
+    const occurredAt = canonicalTimestamp(input.verifiedAt, "Offline replay verification time");
+    const payload = {
+      captureId: sidecar.captureId,
+      evidenceHash: sidecar.evidenceHash,
+      responseSha256: sidecar.responseSha256,
+      sidecarSha256: rows.base.sidecar_sha256,
+      outcome: "replay_verified"
+    } as const;
+    const event = eventIdentity({
+      eventType: "replay_verified",
+      attemptToken: input.attemptToken,
+      captureId: sidecar.captureId,
+      payload
+    });
+    const prior = await eventByAttempt(input.db, input.attemptToken);
+    if (prior) assertExactEvent(prior, event);
+    else {
+      await executeExactEventBatch({
+        db: input.db,
+        attemptToken: input.attemptToken,
+        event,
+        statements: [eventInsertStatement({
+        db: input.db,
+        ...event,
+        attemptToken: input.attemptToken,
+        eventType: "replay_verified",
+        captureId: sidecar.captureId,
+        sourceKey: sidecar.sourceKey,
+        provider: sidecar.provider,
+        dataset: sidecar.dataset,
+        idempotencyKey: sidecar.idempotencyKey,
+        occurredAt
+        })]
+      });
+    }
+  }
+  return { sidecar, providerDispatches: 0 };
+}
+
+export async function runOs03aFreshnessWatchdog(input: {
+  db: D1Database;
+  profileId: string;
+  attemptToken: string;
+  checkedAt: string;
+  maximumAgeSeconds: number;
+}): Promise<{ status: "current" | "stale" | "unavailable"; ageSeconds: number | null; providerDispatches: 0 }> {
+  if (!Number.isSafeInteger(input.maximumAgeSeconds) || input.maximumAgeSeconds < 1) {
+    throw new Error("Freshness maximum age must be a positive integer");
+  }
+  const profile = getQualificationSourceProfile(input.profileId);
+  const sourceKey = sourceCaptureKey(profile);
+  const checkedAt = canonicalTimestamp(input.checkedAt, "Freshness watchdog time");
+  const latest = await input.db.prepare(`SELECT occurred_at FROM source_capture_events
+    WHERE source_key = ? AND event_type IN ('capture_committed_usable', 'not_modified_confirmed')
+    ORDER BY occurred_at DESC, event_id DESC LIMIT 1`).bind(sourceKey)
+    .first<{ occurred_at: string }>();
+  const ageSeconds = latest
+    ? Math.max(0, Math.floor((Date.parse(checkedAt) - Date.parse(latest.occurred_at)) / 1000))
+    : null;
+  if (ageSeconds !== null && ageSeconds <= input.maximumAgeSeconds) {
+    return { status: "current", ageSeconds, providerDispatches: 0 };
+  }
+  const status = latest ? "stale" : "unavailable";
+  const idempotencyKey = `watchdog:${sourceKey}:${latest?.occurred_at ?? "never"}`;
+  const payload = {
+    sourceKey,
+    checkedAt,
+    lastSuccessfulVerificationAt: latest?.occurred_at ?? null,
+    maximumAgeSeconds: input.maximumAgeSeconds,
+    ageSeconds,
+    status
+  };
+  const event = eventIdentity({
+    eventType: "freshness_stale",
+    attemptToken: input.attemptToken,
+    captureId: null,
+    payload
+  });
+  const prior = await eventByAttempt(input.db, input.attemptToken);
+  if (prior) assertExactEvent(prior, event);
+  else {
+    const failureCode: CaptureFailureCode = "provider_unavailable";
+    const alertId = buildCaptureAlertId({ sourceKey, failureCode, idempotencyKey });
+    await executeExactEventBatch({
+      db: input.db,
+      attemptToken: input.attemptToken,
+      event,
+      statements: [
+      eventInsertStatement({
+        db: input.db,
+        ...event,
+        attemptToken: input.attemptToken,
+        eventType: "freshness_stale",
+        captureId: null,
+        sourceKey,
+        provider: profile.provider,
+        dataset: profile.dataset,
+        idempotencyKey,
+        occurredAt: checkedAt
+      }),
+      input.db.prepare(`INSERT OR IGNORE INTO engine_system_alerts (
+        alert_id, alert_type, deduplication_key, severity, state, created_at, payload_json
+      ) SELECT ?, 'source_capture_stale', ?, 'error', 'open', ?, ?
+        WHERE EXISTS (SELECT 1 FROM source_capture_events WHERE event_id = ? AND event_payload_hash = ?)`)
+        .bind(
+          alertId,
+          `os03a:${sourceKey}:freshness:${latest?.occurred_at ?? "never"}`,
+          checkedAt,
+          canonicalJson(payload),
+          event.eventId,
+          event.payloadHash
+        ),
+      input.db.prepare(`INSERT INTO source_capture_heartbeats (
+        source_key, provider, dataset, status, last_attempt_at, last_success_at,
+        last_failure_at, failure_code, latest_capture_id
+      ) SELECT ?, ?, ?, ?, ?, NULL, ?, 'provider_unavailable', NULL
+        WHERE EXISTS (SELECT 1 FROM source_capture_events WHERE event_id = ? AND event_payload_hash = ?)
+        ON CONFLICT(source_key) DO UPDATE SET
+          status = CASE WHEN excluded.last_attempt_at >= source_capture_heartbeats.last_attempt_at
+            THEN excluded.status ELSE source_capture_heartbeats.status END,
+          last_attempt_at = max(source_capture_heartbeats.last_attempt_at, excluded.last_attempt_at),
+          last_failure_at = CASE WHEN excluded.last_failure_at >= source_capture_heartbeats.last_attempt_at
+            THEN excluded.last_failure_at ELSE source_capture_heartbeats.last_failure_at END,
+          failure_code = CASE WHEN excluded.last_attempt_at >= source_capture_heartbeats.last_attempt_at
+            THEN excluded.failure_code ELSE source_capture_heartbeats.failure_code END`)
+        .bind(
+          sourceKey,
+          profile.provider,
+          profile.dataset,
+          status,
+          checkedAt,
+          checkedAt,
+          event.eventId,
+          event.payloadHash
+        )
+      ]
+    });
+  }
+  return { status, ageSeconds, providerDispatches: 0 };
+}
+
+async function objectIsReferenced(db: D1Database, key: string): Promise<boolean> {
+  const row = await db.prepare(`SELECT 1 AS referenced FROM source_capture_manifests
+    WHERE response_object_key = ? OR sidecar_object_key = ? LIMIT 1`).bind(key, key)
+    .first<{ referenced: number }>();
+  return row?.referenced === 1;
+}
+
+async function appendOrphanEvent(input: {
+  db: D1Database;
+  eventType: "orphan_detected" | "orphan_removed";
+  attemptToken: string;
+  profileId: string;
+  idempotencyKey: string;
+  occurredAt: string;
+  objectKey: string;
+}): Promise<void> {
+  const profile = getQualificationSourceProfile(input.profileId);
+  const sourceKey = sourceCaptureKey(profile);
+  const payload = { objectKey: input.objectKey, qualificationOnly: true };
+  const event = eventIdentity({
+    eventType: input.eventType,
+    attemptToken: input.attemptToken,
+    captureId: null,
+    payload
+  });
+  const prior = await eventByAttempt(input.db, input.attemptToken);
+  if (prior) {
+    assertExactEvent(prior, event);
+    return;
+  }
+  await executeExactEventBatch({
+    db: input.db,
+    attemptToken: input.attemptToken,
+    event,
+    statements: [eventInsertStatement({
+    db: input.db,
+    ...event,
+    attemptToken: input.attemptToken,
+    eventType: input.eventType,
+    captureId: null,
+    sourceKey,
+    provider: profile.provider,
+    dataset: profile.dataset,
+    idempotencyKey: input.idempotencyKey,
+    occurredAt: input.occurredAt
+    })]
+  });
+}
+
+export async function sweepOs03aQualificationOrphan(input: {
+  db: D1Database;
+  bucket: R2Bucket;
+  qualificationOnly: true;
+  profileId: string;
+  idempotencyKey: string;
+  attemptToken: string;
+  objectKey: string;
+  checkedAt: string;
+}): Promise<{ status: "missing" | "too_young" | "referenced" | "removed"; providerDispatches: 0 }> {
+  if (!input.qualificationOnly) throw new Error("OS-03A orphan sweeping is qualification-only");
+  if (!SAFE_OBJECT_PREFIXES.some((prefix) => input.objectKey.startsWith(prefix))) {
+    throw new Error("Object key is outside the frozen OS-03A orphan prefixes");
+  }
+  const checkedAt = canonicalTimestamp(input.checkedAt, "Orphan sweep time");
+  const object = await input.bucket.head(input.objectKey);
+  if (!object) return { status: "missing", providerDispatches: 0 };
+  const uploaded = (object as R2Object & { uploaded?: Date }).uploaded;
+  if (!(uploaded instanceof Date) || !Number.isFinite(uploaded.getTime())) {
+    return { status: "too_young", providerDispatches: 0 };
+  }
+  const ageSeconds = Math.floor((Date.parse(checkedAt) - uploaded.getTime()) / 1000);
+  if (ageSeconds < QUALIFICATION_ORPHAN_MINIMUM_AGE_SECONDS) {
+    return { status: "too_young", providerDispatches: 0 };
+  }
+  if (await objectIsReferenced(input.db, input.objectKey)) {
+    return { status: "referenced", providerDispatches: 0 };
+  }
+  await appendOrphanEvent({
+    db: input.db,
+    eventType: "orphan_detected",
+    attemptToken: `${input.attemptToken}:detected`,
+    profileId: input.profileId,
+    idempotencyKey: input.idempotencyKey,
+    occurredAt: checkedAt,
+    objectKey: input.objectKey
+  });
+  if (await objectIsReferenced(input.db, input.objectKey)) {
+    return { status: "referenced", providerDispatches: 0 };
+  }
+  await input.bucket.delete(input.objectKey);
+  if (await input.bucket.head(input.objectKey)) {
+    throw new Error("Qualification orphan remained after deletion");
+  }
+  await appendOrphanEvent({
+    db: input.db,
+    eventType: "orphan_removed",
+    attemptToken: `${input.attemptToken}:removed`,
+    profileId: input.profileId,
+    idempotencyKey: input.idempotencyKey,
+    occurredAt: checkedAt,
+    objectKey: input.objectKey
+  });
+  return { status: "removed", providerDispatches: 0 };
+}
+
+export const os03aProviderIndependentRuntimeBoundary = {
+  acceptsSuppliedBytesOnly: true,
+  networkDispatches: 0,
+  providerSecretReads: 0,
+  productionSweeperQualified: false,
+  marketQualification: "fixture_only",
+  permittedObjectPrefixes: SAFE_OBJECT_PREFIXES,
+  orphanMinimumAgeSeconds: QUALIFICATION_ORPHAN_MINIMUM_AGE_SECONDS
+} as const;
