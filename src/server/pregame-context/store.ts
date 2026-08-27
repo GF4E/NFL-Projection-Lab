@@ -1,5 +1,6 @@
 import type { WeatherInput } from "@/domain/types";
 import type { ParsedGameInactives } from "./parser";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 
 export type PregameContextFreshness = "current" | "stale" | "running" | "unavailable";
 
@@ -35,70 +36,6 @@ interface StateRow {
   lease_expires_at: string | null;
 }
 
-const schema = [
-  `CREATE TABLE IF NOT EXISTS official_pregame_context_state (
-    game_id text PRIMARY KEY NOT NULL,
-    season integer NOT NULL,
-    week integer NOT NULL,
-    freshness text NOT NULL,
-    source_url text,
-    source_hash text,
-    roof text NOT NULL DEFAULT 'unconfirmed',
-    inactives_confirmed integer NOT NULL DEFAULT 0,
-    inactive_count integer NOT NULL DEFAULT 0,
-    last_checked_at text,
-    last_success_at text,
-    last_error text,
-    lease_expires_at text
-  )`,
-  `CREATE TABLE IF NOT EXISTS official_inactives (
-    id text PRIMARY KEY NOT NULL,
-    game_id text NOT NULL,
-    season integer NOT NULL,
-    week integer NOT NULL,
-    team text NOT NULL,
-    player text NOT NULL,
-    position text,
-    source_url text NOT NULL,
-    source_timestamp text NOT NULL,
-    raw_snapshot_hash text NOT NULL,
-    imported_at text NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS official_inactives_stage (
-    import_id text NOT NULL,
-    id text NOT NULL,
-    game_id text NOT NULL,
-    season integer NOT NULL,
-    week integer NOT NULL,
-    team text NOT NULL,
-    player text NOT NULL,
-    position text,
-    source_url text NOT NULL,
-    source_timestamp text NOT NULL,
-    raw_snapshot_hash text NOT NULL,
-    PRIMARY KEY (import_id, id)
-  )`,
-  `CREATE TABLE IF NOT EXISTS official_pregame_context_snapshots (
-    id text PRIMARY KEY NOT NULL,
-    game_id text NOT NULL,
-    roof text NOT NULL,
-    inactive_count integer NOT NULL,
-    source_url text NOT NULL,
-    source_timestamp text NOT NULL,
-    raw_snapshot_hash text NOT NULL,
-    imported_at text NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS game_context_alerts (
-    id text PRIMARY KEY NOT NULL,
-    dataset text NOT NULL,
-    message text NOT NULL,
-    created_at text NOT NULL,
-    resolved_at text
-  )`,
-  "CREATE INDEX IF NOT EXISTS idx_official_inactives_game ON official_inactives (game_id, team)",
-  "CREATE INDEX IF NOT EXISTS idx_pregame_context_week ON official_pregame_context_state (season, week, game_id)",
-  "CREATE INDEX IF NOT EXISTS idx_pregame_snapshots_game ON official_pregame_context_snapshots (game_id, imported_at)"
-] as const;
 
 function mapState(row: StateRow): PregameContextState {
   return {
@@ -125,7 +62,7 @@ function chunks<T>(values: readonly T[], size: number): T[][] {
 }
 
 export async function ensurePregameContextStore(db: D1Database): Promise<void> {
-  await db.batch(schema.map((statement) => db.prepare(statement)));
+  await assertD1SchemaAuthority(db);
 }
 
 export async function getPregameContextStates(

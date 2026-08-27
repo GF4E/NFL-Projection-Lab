@@ -241,8 +241,10 @@ def _walk_selected_root(root: Path, relative: str) -> Iterable[Path]:
     return found
 
 
-def working_tree_paths(root: Path) -> list[Path]:
+def working_tree_paths(root: Path, *, include_ignored_outputs: bool = True) -> list[Path]:
     relative_paths = set(_git_lines(root, ["ls-files", "-co", "--exclude-standard"]))
+    if not include_ignored_outputs:
+        return [root / path for path in sorted(relative_paths)]
     for build_root in BUILD_ROOTS:
         for path in _walk_selected_root(root, build_root):
             relative_paths.add(str(path.relative_to(root)))
@@ -253,9 +255,9 @@ def working_tree_paths(root: Path) -> list[Path]:
     return [root / path for path in sorted(relative_paths)]
 
 
-def scan_working_tree(root: Path) -> list[Finding]:
+def scan_working_tree(root: Path, *, include_ignored_outputs: bool = True) -> list[Finding]:
     findings: list[Finding] = []
-    for path in working_tree_paths(root):
+    for path in working_tree_paths(root, include_ignored_outputs=include_ignored_outputs):
         data = _read_text_payload(path)
         if data is None:
             continue
@@ -381,6 +383,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--skip-working-tree", action="store_true")
+    parser.add_argument(
+        "--tracked-working-tree-only",
+        action="store_true",
+        help="scan tracked and non-ignored untracked files without opening ignored outputs or credential stores",
+    )
     parser.add_argument("--skip-history", action="store_true")
     parser.add_argument("--json-output", type=Path)
     parser.add_argument(
@@ -393,7 +400,12 @@ def main() -> int:
 
     findings: list[Finding] = []
     if not args.skip_working_tree:
-        findings.extend(scan_working_tree(root))
+        findings.extend(
+            scan_working_tree(
+                root,
+                include_ignored_outputs=not args.tracked_working_tree_only,
+            )
+        )
     if not args.skip_history:
         findings.extend(scan_git_history(root))
         findings.extend(scan_git_commits(root))

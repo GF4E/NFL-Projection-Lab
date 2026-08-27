@@ -1,4 +1,5 @@
 import { stableHash } from "@/domain/hash";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 
 export interface StoredQbOverride {
   id: string;
@@ -24,20 +25,6 @@ interface OverrideRow {
   audit_hash: string;
 }
 
-const schema = [
-  `CREATE TABLE IF NOT EXISTS qb_model_overrides (
-    id text PRIMARY KEY NOT NULL,
-    game_id text NOT NULL,
-    team text NOT NULL,
-    value real NOT NULL,
-    source_url text NOT NULL,
-    rationale text NOT NULL,
-    author_id text NOT NULL,
-    created_at text NOT NULL,
-    audit_hash text NOT NULL UNIQUE
-  )`,
-  "CREATE INDEX IF NOT EXISTS idx_qb_overrides_game_time ON qb_model_overrides (game_id, team, created_at)"
-] as const;
 
 function mapOverride(row: OverrideRow): StoredQbOverride {
   return {
@@ -54,7 +41,7 @@ function mapOverride(row: OverrideRow): StoredQbOverride {
 }
 
 export async function ensureQbOverrideStore(db: D1Database): Promise<void> {
-  await db.batch(schema.map((statement) => db.prepare(statement)));
+  await assertD1SchemaAuthority(db);
 }
 
 export async function createQbModelOverride(input: {

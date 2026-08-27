@@ -1,0 +1,22 @@
+{
+  "version": "os01-invalid-workspace-build.2026.1",
+  "status": "invalid_non_evidence",
+  "recordedOn": "2026-08-27",
+  "workPackage": "OS-01",
+  "event": {
+    "commandClass": "standard_workspace_verify_including_build",
+    "cause": "The ordinary workspace build was invoked even though ignored local environment files may be loaded by that build path.",
+    "secretValuePrintedOrInspected": false,
+    "providerRequestDispatched": false,
+    "quotaReservationPerformed": false,
+    "buildOutputAcceptedAsEvidence": false,
+    "buildOutputInspectedAfterInvalidation": false
+  },
+  "containment": {
+    "sourceChangesDiscarded": false,
+    "reasonSourceRemainsUsable": "The incident affected only the build-verification process. Source changes were not derived from environment values and retain separate tests and hashes.",
+    "qualificationRestart": "Build qualification restarted from a fresh archive containing only tracked and nonignored candidate source, with no ignored environment or Wrangler directory.",
+    "providerAndActivationBoundaryRemainsClosed": true
+  },
+  "claimBoundary": "This receipt preserves a process failure. It is not qualification evidence and cannot be cited as a passed build, secret scan, provider boundary, or OS-01 acceptance."
+}

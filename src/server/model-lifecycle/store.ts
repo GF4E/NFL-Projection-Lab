@@ -1,5 +1,6 @@
 import type { FittedLogisticModel } from "@/domain/model-fit";
 import type { ModelMetrics, ModelRun, RollingFeatures, SystemAlert, TeamState } from "@/domain/types";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 
 export interface StoredModelArtifact {
   model: FittedLogisticModel;
@@ -48,110 +49,6 @@ interface ModelRow {
   promoted_at: string | null;
 }
 
-const schema = [
-  `CREATE TABLE IF NOT EXISTS model_lifecycle_state (
-    season integer PRIMARY KEY NOT NULL,
-    loop_a_through_week integer NOT NULL DEFAULT -1,
-    loop_a_hash text,
-    loop_b_target_week integer NOT NULL DEFAULT -1,
-    champion_hash text,
-    last_loop_a_at text,
-    last_loop_b_at text
-  )`,
-  `CREATE TABLE IF NOT EXISTS team_strength_states (
-    season integer NOT NULL,
-    team text NOT NULL,
-    mean real NOT NULL,
-    variance real NOT NULL,
-    through_week integer NOT NULL,
-    state_hash text NOT NULL,
-    updated_at text NOT NULL,
-    PRIMARY KEY (season, team)
-  )`,
-  `CREATE TABLE IF NOT EXISTS team_strength_states_stage (
-    run_id text NOT NULL,
-    season integer NOT NULL,
-    team text NOT NULL,
-    mean real NOT NULL,
-    variance real NOT NULL,
-    through_week integer NOT NULL,
-    state_hash text NOT NULL,
-    updated_at text NOT NULL,
-    PRIMARY KEY (run_id, season, team)
-  )`,
-  `CREATE TABLE IF NOT EXISTS rolling_feature_states (
-    season integer NOT NULL,
-    team text NOT NULL,
-    through_week integer NOT NULL,
-    epa real NOT NULL,
-    success_rate real NOT NULL,
-    explosive_rate real NOT NULL,
-    regressed_turnovers real NOT NULL,
-    pace real NOT NULL,
-    proe real NOT NULL,
-    state_hash text NOT NULL,
-    updated_at text NOT NULL,
-    PRIMARY KEY (season, team)
-  )`,
-  `CREATE TABLE IF NOT EXISTS rolling_feature_states_stage (
-    run_id text NOT NULL,
-    season integer NOT NULL,
-    team text NOT NULL,
-    through_week integer NOT NULL,
-    epa real NOT NULL,
-    success_rate real NOT NULL,
-    explosive_rate real NOT NULL,
-    regressed_turnovers real NOT NULL,
-    pace real NOT NULL,
-    proe real NOT NULL,
-    state_hash text NOT NULL,
-    updated_at text NOT NULL,
-    PRIMARY KEY (run_id, season, team)
-  )`,
-  `CREATE TABLE IF NOT EXISTS model_versions (
-    version_hash text PRIMARY KEY NOT NULL,
-    status text NOT NULL,
-    model_json text NOT NULL,
-    metrics_json text NOT NULL,
-    training_through_season integer NOT NULL,
-    training_through_week integer NOT NULL,
-    data_hash text NOT NULL,
-    config_hash text NOT NULL,
-    feature_schema_hash text NOT NULL,
-    code_hash text NOT NULL,
-    created_at text NOT NULL,
-    promoted_at text
-  )`,
-  `CREATE TABLE IF NOT EXISTS model_run_log (
-    id text PRIMARY KEY NOT NULL,
-    champion_hash text NOT NULL,
-    challenger_hash text NOT NULL,
-    champion_metrics_json text NOT NULL,
-    challenger_metrics_json text NOT NULL,
-    paired_improvement real NOT NULL,
-    paired_interval_json text NOT NULL,
-    paired_blocks integer NOT NULL,
-    gate_decision text NOT NULL,
-    data_hash text NOT NULL,
-    config_hash text NOT NULL,
-    feature_schema_hash text NOT NULL,
-    code_hash text NOT NULL,
-    started_at text NOT NULL,
-    completed_at text NOT NULL,
-    promoted_at text
-  )`,
-  `CREATE TABLE IF NOT EXISTS model_system_alerts (
-    id text PRIMARY KEY NOT NULL,
-    type text NOT NULL,
-    severity text NOT NULL,
-    message text NOT NULL,
-    idempotency_key text UNIQUE NOT NULL,
-    created_at text NOT NULL,
-    acknowledged_at text
-  )`,
-  "CREATE INDEX IF NOT EXISTS idx_model_versions_status ON model_versions (status, promoted_at)",
-  "CREATE INDEX IF NOT EXISTS idx_model_runs_completed ON model_run_log (completed_at)"
-] as const;
 
 function chunks<T>(values: readonly T[], size: number): T[][] {
   const output: T[][] = [];
@@ -172,7 +69,7 @@ function mapLifecycle(row: LifecycleRow): ModelLifecycleState {
 }
 
 export async function ensureModelLifecycleStore(db: D1Database): Promise<void> {
-  await db.batch(schema.map((statement) => db.prepare(statement)));
+  await assertD1SchemaAuthority(db);
 }
 
 export async function publishModelSystemAlert(db: D1Database, alert: SystemAlert): Promise<void> {

@@ -6,6 +6,7 @@ import { rankMainlineRecommendations } from "@/domain/mainline-recommendations";
 import type { PickedBy } from "@/domain/play-card";
 import type { WeeklyMatchup } from "@/domain/weekly-slate";
 import { PREFERRED_TEAM_CODES } from "@/domain/team-preferences";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 import { queueAndDispatchPush } from "./store";
 
 const recipients: readonly PickedBy[] = ["gabe", "jarrett"];
@@ -29,25 +30,9 @@ interface EdgeStateRow {
   probability_edge: number;
 }
 
-const schema = [
-  `CREATE TABLE IF NOT EXISTS edge_notification_state (
-    observation_key text PRIMARY KEY NOT NULL,
-    game_id text NOT NULL,
-    book text NOT NULL,
-    market text NOT NULL,
-    side text NOT NULL,
-    point real,
-    american_price integer NOT NULL,
-    probability_edge real NOT NULL,
-    snapshot_key text NOT NULL,
-    captured_at text NOT NULL,
-    updated_at text NOT NULL
-  )`,
-  "CREATE INDEX IF NOT EXISTS idx_edge_notification_game ON edge_notification_state (game_id, market, book)"
-] as const;
 
 async function ensureEdgeNotificationStore(db: D1Database): Promise<void> {
-  await db.batch(schema.map((statement) => db.prepare(statement)));
+  await assertD1SchemaAuthority(db);
 }
 
 export function collectMainlineEdgeObservations(input: {

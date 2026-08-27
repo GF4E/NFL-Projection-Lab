@@ -1,4 +1,5 @@
 import type { MarketSentimentSnapshot } from "@/domain/market-sentiment";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 
 export type MarketSentimentFreshness = "current" | "stale" | "running" | "unavailable";
 
@@ -27,41 +28,9 @@ interface MarketSentimentRow {
   source_hash: string;
 }
 
-const schema = [
-  `CREATE TABLE IF NOT EXISTS market_sentiment_import_state (
-    dataset text PRIMARY KEY NOT NULL,
-    freshness text NOT NULL,
-    source_url text,
-    source_hash text,
-    row_count integer NOT NULL DEFAULT 0,
-    last_checked_at text,
-    last_success_at text,
-    last_error text,
-    lease_expires_at text
-  )`,
-  `CREATE TABLE IF NOT EXISTS market_sentiment_snapshots (
-    id text PRIMARY KEY NOT NULL,
-    dataset text NOT NULL,
-    provider_game_id text NOT NULL,
-    game_id text NOT NULL,
-    season integer NOT NULL,
-    week integer NOT NULL,
-    market text NOT NULL,
-    side text NOT NULL,
-    tickets_percent real NOT NULL,
-    money_percent real,
-    sample_bets integer NOT NULL,
-    source_url text NOT NULL,
-    source_timestamp text NOT NULL,
-    source_hash text NOT NULL,
-    imported_at text NOT NULL
-  )`,
-  "CREATE INDEX IF NOT EXISTS idx_market_sentiment_game_time ON market_sentiment_snapshots (game_id, source_timestamp)",
-  "CREATE INDEX IF NOT EXISTS idx_market_sentiment_dataset_hash ON market_sentiment_snapshots (dataset, source_hash)"
-];
 
 export async function ensureMarketSentimentStore(db: D1Database): Promise<void> {
-  await db.batch(schema.map((statement) => db.prepare(statement)));
+  await assertD1SchemaAuthority(db);
 }
 
 export async function getMarketSentimentState(

@@ -1,4 +1,5 @@
 import type { WeatherInput } from "@/domain/types";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 
 export type WeatherFreshness = "current" | "stale" | "unavailable" | "unconfirmed" | "indoors";
 
@@ -27,68 +28,6 @@ interface WeatherRow {
   last_error: string | null;
 }
 
-const schema = [
-  `CREATE TABLE IF NOT EXISTS kickoff_weather_current (
-    game_id text PRIMARY KEY NOT NULL,
-    stadium text NOT NULL,
-    roof text NOT NULL,
-    kickoff_at text NOT NULL,
-    forecast_issued_at text NOT NULL,
-    valid_at text NOT NULL,
-    wind_mph real,
-    temperature_f real,
-    precipitation_probability real,
-    source_hash text NOT NULL,
-    imported_at text NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS kickoff_weather_snapshots (
-    id text PRIMARY KEY NOT NULL,
-    game_id text NOT NULL,
-    stadium text NOT NULL,
-    roof text NOT NULL,
-    kickoff_at text NOT NULL,
-    forecast_issued_at text NOT NULL,
-    valid_at text NOT NULL,
-    wind_mph real,
-    temperature_f real,
-    precipitation_probability real,
-    source_hash text NOT NULL,
-    imported_at text NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS kickoff_weather_stage (
-    run_id text NOT NULL,
-    game_id text NOT NULL,
-    stadium text NOT NULL,
-    roof text NOT NULL,
-    kickoff_at text NOT NULL,
-    forecast_issued_at text NOT NULL,
-    valid_at text NOT NULL,
-    wind_mph real,
-    temperature_f real,
-    precipitation_probability real,
-    source_hash text NOT NULL,
-    imported_at text NOT NULL,
-    PRIMARY KEY (run_id, game_id)
-  )`,
-  `CREATE TABLE IF NOT EXISTS kickoff_weather_state (
-    game_id text PRIMARY KEY NOT NULL,
-    freshness text NOT NULL,
-    roof text NOT NULL,
-    source_hash text,
-    last_checked_at text,
-    last_success_at text,
-    last_error text
-  )`,
-  `CREATE TABLE IF NOT EXISTS kickoff_weather_alerts (
-    id text PRIMARY KEY NOT NULL,
-    game_id text NOT NULL,
-    message text NOT NULL,
-    created_at text NOT NULL,
-    resolved_at text
-  )`,
-  "CREATE INDEX IF NOT EXISTS idx_weather_snapshots_game ON kickoff_weather_snapshots (game_id, imported_at)",
-  "CREATE INDEX IF NOT EXISTS idx_weather_alerts_unresolved ON kickoff_weather_alerts (resolved_at, created_at)"
-] as const;
 
 function chunks<T>(values: readonly T[], size: number): T[][] {
   const output: T[][] = [];
@@ -97,7 +36,7 @@ function chunks<T>(values: readonly T[], size: number): T[][] {
 }
 
 export async function ensureKickoffWeatherStore(db: D1Database): Promise<void> {
-  await db.batch(schema.map((statement) => db.prepare(statement)));
+  await assertD1SchemaAuthority(db);
 }
 
 export async function listKickoffWeather(db: D1Database, gameIds: readonly string[]): Promise<StoredKickoffWeather[]> {

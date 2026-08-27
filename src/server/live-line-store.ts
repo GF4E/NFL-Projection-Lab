@@ -1,4 +1,5 @@
 import { enrichWithPowerDevig, type LiveLine } from "@/domain/line-board";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 
 type RawLiveLine = Omit<LiveLine, "fairProbability" | "marketVigPercent">;
 type LiveLineRow = {
@@ -13,40 +14,6 @@ type LiveLineRow = {
   source_event_id: string;
   source_hash: string;
 };
-
-const CREATE_LIVE_LINES_SQL = `
-  CREATE TABLE IF NOT EXISTS live_lines (
-    id text PRIMARY KEY NOT NULL,
-    game_id text NOT NULL,
-    book text NOT NULL,
-    market text NOT NULL,
-    side text NOT NULL,
-    point real,
-    american_price integer NOT NULL,
-    captured_at text NOT NULL,
-    source_event_id text NOT NULL,
-    source_hash text NOT NULL,
-    updated_at text NOT NULL
-  )
-`;
-
-const CREATE_LIVE_LINE_SNAPSHOTS_SQL = `
-  CREATE TABLE IF NOT EXISTS live_line_snapshots (
-    snapshot_key text NOT NULL,
-    line_id text NOT NULL,
-    game_id text NOT NULL,
-    book text NOT NULL,
-    market text NOT NULL,
-    side text NOT NULL,
-    point real,
-    american_price integer NOT NULL,
-    captured_at text NOT NULL,
-    source_event_id text NOT NULL,
-    source_hash text NOT NULL,
-    fetched_at text NOT NULL,
-    PRIMARY KEY (snapshot_key, line_id)
-  )
-`;
 
 function mapRow(row: LiveLineRow): RawLiveLine {
   return {
@@ -64,17 +31,7 @@ function mapRow(row: LiveLineRow): RawLiveLine {
 }
 
 export async function ensureLiveLineStore(d1: D1Database): Promise<void> {
-  await d1.batch([
-    d1.prepare(CREATE_LIVE_LINES_SQL),
-    d1.prepare(CREATE_LIVE_LINE_SNAPSHOTS_SQL)
-  ]);
-  await d1.batch([
-    d1.prepare("CREATE INDEX IF NOT EXISTS idx_live_lines_game_book_market ON live_lines (game_id, book, market)"),
-    d1.prepare("CREATE INDEX IF NOT EXISTS idx_live_lines_captured_at ON live_lines (captured_at)"),
-    d1.prepare("CREATE INDEX IF NOT EXISTS idx_line_snapshots_game_time ON live_line_snapshots (game_id, fetched_at)"),
-    d1.prepare("CREATE INDEX IF NOT EXISTS idx_line_snapshots_key ON live_line_snapshots (snapshot_key)")
-  ]);
-  await d1.prepare("PRAGMA optimize").run();
+  await assertD1SchemaAuthority(d1);
 }
 
 export async function listLiveLines(d1: D1Database, gameIds?: readonly string[]): Promise<LiveLine[]> {

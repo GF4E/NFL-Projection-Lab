@@ -213,9 +213,11 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const batch = teamCardPortfolioBatchConflicts([], [position("g1", "spread", 1), position("g1", "moneyline", 1)]);
     expect(batch).toContainEqual(expect.objectContaining({ proposalIndex: 1, code: "side_slot", gameId: "g1" }));
     const store = readFileSync("src/server/play-store.ts", "utf8");
-    expect(readFileSync("src/domain/portfolio-trigger.ts", "utf8")).toContain("approval_portfolio_guard_v2");
-    expect(store).toContain("status IN ('card', 'placed', 'settled')");
-    expect(store).toContain("DROP TRIGGER IF EXISTS approval_portfolio_guard_v1");
+    const migration = readFileSync("drizzle/0020_engine_os_plays_reconciliation.sql", "utf8");
+    expect(migration).toContain("approval_portfolio_guard_v2");
+    expect(migration).toContain("status` IN ('card', 'placed', 'settled')");
+    expect(migration).toContain("DROP TRIGGER IF EXISTS `approval_portfolio_guard_v1`");
+    expect(store).not.toMatch(/CREATE\s+(?:TABLE|TRIGGER)/iu);
     expect(store).toContain("assertPortfolioAvailable");
     expect(readFileSync("src/app/api/plays/route.ts", "utf8")).toContain("stakeDollars: z.number().min(12.5).max(50)");
   });
@@ -336,7 +338,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   it("12b. freezes server-derived forecast and consensus provenance at approval", () => {
     const store = readFileSync("src/server/play-store.ts", "utf8");
     const provenance = readFileSync("src/server/play-provenance.ts", "utf8");
-    const trigger = readFileSync("src/domain/portfolio-trigger.ts", "utf8");
+    const trigger = readFileSync("drizzle/0020_engine_os_plays_reconciliation.sql", "utf8");
     expect(store).toContain("capturePlayForecastSnapshot");
     expect(store).toContain("forecast_json = ?");
     expect(provenance).toContain("buildDecisionBoard(db");
@@ -1303,13 +1305,14 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   it("48. stores real subscriptions and emits only the two permitted idempotent push events", () => {
     const route = readFileSync("src/app/api/push-subscription/route.ts", "utf8");
     const store = readFileSync("src/server/push/store.ts", "utf8");
+    const schema = readFileSync("drizzle/0019_engine_os_schema_closure.sql", "utf8");
     const edge = readFileSync("src/server/push/edge-notifications.ts", "utf8");
     const serviceWorker = readFileSync("public/sw.js", "utf8");
     const plays = readFileSync("src/server/play-store.ts", "utf8");
     expect(route).toContain("requestTeamMember(request)");
     expect(route).toContain("upsertPushSubscription");
-    expect(store).toContain("UNIQUE");
-    expect(store).toContain("CHECK (type IN ('awaiting_you', 'edge_threshold'))");
+    expect(schema).toContain("`endpoint` text UNIQUE NOT NULL");
+    expect(schema).toContain("CHECK (`type` IN ('awaiting_you', 'edge_threshold'))");
     expect(store).toContain("prior?.state === \"sent\"");
     expect(edge).toContain("edgeThresholdCrossed");
     expect(edge).toContain("structuralConfig.monitoring.pushEdgeThreshold");

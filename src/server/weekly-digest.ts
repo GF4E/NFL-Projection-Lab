@@ -13,6 +13,7 @@ import { getLatestModelRun, publishModelSystemAlert } from "./model-lifecycle/st
 import { getOddsQuotaState } from "./odds-quota";
 import { listNflverseImportStates } from "./nflverse/store";
 import { listOfficialInjuryImportStates } from "./official-injuries/store";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 
 interface SettledPlayRow {
   id: string;
@@ -111,14 +112,7 @@ function scoringSummary(rows: ScoringRow[], season: number, throughWeek: number)
 }
 
 export async function ensureWeeklyDigestStore(db: D1Database): Promise<void> {
-  await db.batch([
-    db.prepare(`CREATE TABLE IF NOT EXISTS weekly_digests (
-      id text PRIMARY KEY NOT NULL, season integer NOT NULL, week integer NOT NULL,
-      digest_json text NOT NULL, digest_hash text NOT NULL, generated_at text NOT NULL,
-      UNIQUE(season, week)
-    )`),
-    db.prepare("CREATE INDEX IF NOT EXISTS idx_weekly_digests_season_week ON weekly_digests (season, week)")
-  ]);
+  await assertD1SchemaAuthority(db);
 }
 
 export async function generateWeeklyDigest(input: {

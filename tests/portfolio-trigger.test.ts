@@ -1,31 +1,49 @@
 import { DatabaseSync } from "node:sqlite";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { contractGuardTriggerSql, executionStateGuardTriggerSql, portfolioTriggerSql } from "@/domain/portfolio-trigger";
 
 type Leg = { gameId: string; market: "spread" | "moneyline" | "total" | "prop" | "teaser" };
 
+const MIGRATIONS_THROUGH_0020 = [
+  "drizzle/0000_keen_red_shift.sql",
+  "drizzle/0001_parched_hedge_knight.sql",
+  "drizzle/0002_watery_patriot.sql",
+  "drizzle/0003_hesitant_bloodstorm.sql",
+  "drizzle/0004_player_prop_decision_board.sql",
+  "drizzle/0005_structured_contract_settlement.sql",
+  "drizzle/0006_execution_tracking.sql",
+  "drizzle/0008_play_forecast_provenance.sql",
+  "drizzle/0009_market_sentiment.sql",
+  "drizzle/0010_confidence_engine.sql",
+  "drizzle/0011_model_gate_evidence.sql",
+  "drizzle/0012_source_snapshot_timing.sql",
+  "drizzle/0013_engine_os_urgent.sql",
+  "drizzle/0014_odds_quota_reservations.sql",
+  "drizzle/0015_engine_os_origin_identity.sql",
+  "drizzle/0016_engine_os_interim_scheduler.sql",
+  "drizzle/0017_engine_os_source_capture.sql",
+  "drizzle/0018_engine_os_forecast_ledger.sql",
+  "drizzle/0019_engine_os_schema_closure.sql",
+  "drizzle/0020_engine_os_plays_reconciliation.sql"
+] as const;
+
 function database(): DatabaseSync {
   const db = new DatabaseSync(":memory:");
-  db.exec(`CREATE TABLE plays (
-    id text PRIMARY KEY NOT NULL,
-    contract_json text NOT NULL,
-    forecast_json text,
-    season integer NOT NULL,
-    week integer NOT NULL,
-    game_id text NOT NULL,
-    play_type text NOT NULL,
-    market text NOT NULL,
-    status text NOT NULL,
-    stake_cents integer NOT NULL,
-    execution_status text DEFAULT 'paper' NOT NULL,
-    cash_placement_confirmed integer DEFAULT 0 NOT NULL,
-    gabe_approved integer DEFAULT 0 NOT NULL,
-    jarrett_approved integer DEFAULT 0 NOT NULL,
-    result text DEFAULT 'pending' NOT NULL
-  )`);
-  db.exec(contractGuardTriggerSql());
-  db.exec(executionStateGuardTriggerSql());
-  db.exec(portfolioTriggerSql());
+  db.exec("PRAGMA foreign_keys = ON");
+  for (const migrationPath of MIGRATIONS_THROUGH_0020) {
+    db.exec(readFileSync(resolve(process.cwd(), migrationPath), "utf8"));
+  }
+  const triggerNames = db.prepare(`
+    SELECT name FROM sqlite_master
+    WHERE type = 'trigger' AND tbl_name = 'plays'
+    ORDER BY name
+  `).all().map((row) => (row as { name: string }).name);
+  expect(triggerNames).toEqual([
+    "approval_contract_guard_v6",
+    "approval_execution_state_guard_v1",
+    "approval_portfolio_guard_v2"
+  ]);
   return db;
 }
 
@@ -51,10 +69,29 @@ function add(
     authoritativeExpectedValuePercent: playType === "teaser" ? 2 : null,
     legs: storedContract
   };
-  db.prepare(`INSERT INTO plays
-    (id, contract_json, forecast_json, season, week, game_id, play_type, market, status, stake_cents, execution_status)
-    VALUES (?, ?, ?, 2026, ?, ?, ?, ?, ?, ?, ?)`)
-    .run(id, JSON.stringify(storedContract), JSON.stringify(forecast), week, gameId, playType, market, status, units * 2_500, executionStatus);
+  db.prepare(`INSERT INTO plays (
+    id, contract_json, forecast_json, season, week, game_id, play_type, market,
+    title, book, american_odds, stake_cents, model_edge_pp,
+    estimated_ev_percent, confidence, stats_case, execution_status, status,
+    created_by, created_at, updated_at
+  ) VALUES (
+    ?, ?, ?, 2026, ?, ?, ?, ?,
+    ?, 'betmgm', -110, ?, 0,
+    0, 'watch', 'migration trigger test', ?, ?,
+    'test', '2026-08-27T00:00:00.000Z', '2026-08-27T00:00:00.000Z'
+  )`).run(
+    id,
+    JSON.stringify(storedContract),
+    JSON.stringify(forecast),
+    week,
+    gameId,
+    playType,
+    market,
+    id,
+    units * 2_500,
+    executionStatus,
+    status
+  );
 }
 
 describe("atomic shared-card portfolio guard", () => {

@@ -1,4 +1,5 @@
 import { getD1 } from "../../db";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 import {
   draftExpirationReason,
   earliestPlayKickoff,
@@ -13,7 +14,6 @@ import {
   type PlayForecastSnapshot,
   type WeeklyPlay
 } from "@/domain/play-card";
-import { contractGuardTriggerSql, executionStateGuardTriggerSql, portfolioTriggerSql } from "@/domain/portfolio-trigger";
 import { seasonSchedule } from "./weekly-slate";
 import { queueAndDispatchPush } from "./push/store";
 import { capturePlayForecastSnapshot } from "./play-provenance";
@@ -54,51 +54,6 @@ type PlayDatabaseRow = {
   created_at: string;
   updated_at: string;
 };
-
-const CREATE_PLAYS_SQL = `
-  CREATE TABLE IF NOT EXISTS plays (
-    id text PRIMARY KEY NOT NULL,
-    contract_key text DEFAULT '' NOT NULL,
-    contract_json text DEFAULT '[]' NOT NULL,
-    forecast_json text,
-    gabe_approved integer DEFAULT 0 NOT NULL,
-    jarrett_approved integer DEFAULT 0 NOT NULL,
-    season integer DEFAULT 2026 NOT NULL,
-    week integer NOT NULL,
-    game_id text DEFAULT '' NOT NULL,
-    play_type text NOT NULL,
-    market text DEFAULT 'spread' NOT NULL,
-    primary_reason text DEFAULT 'other' NOT NULL,
-    picked_by text DEFAULT 'gabe' NOT NULL,
-    title text NOT NULL,
-    legs text DEFAULT '' NOT NULL,
-    book text NOT NULL,
-    american_odds integer NOT NULL,
-    stake_cents integer NOT NULL,
-    model_edge_pp real NOT NULL,
-    estimated_ev_percent real NOT NULL,
-    confidence text NOT NULL,
-    stats_case text NOT NULL,
-    football_case text DEFAULT 'Awaiting football read' NOT NULL,
-    execution_status text DEFAULT 'paper' NOT NULL,
-    cash_placement_confirmed integer DEFAULT 0 NOT NULL,
-    status text DEFAULT 'card' NOT NULL,
-    result text DEFAULT 'pending' NOT NULL,
-    profit_cents integer DEFAULT 0 NOT NULL,
-    closing_clv_cents real,
-    closing_clv_points real,
-    clv_reference_book text,
-    created_by text NOT NULL,
-    created_at text NOT NULL,
-    updated_at text NOT NULL,
-    CHECK (play_type IN ('single', 'parlay', 'teaser')),
-    CHECK (confidence IN ('watch', 'lean', 'play', 'best')),
-    CHECK (execution_status IN ('paper', 'executed')),
-    CHECK (status IN ('research', 'card', 'placed', 'settled', 'passed')),
-    CHECK (result IN ('pending', 'win', 'loss', 'push', 'void')),
-    CHECK (stake_cents >= 1250)
-  )
-`;
 
 const INSERT_PLAY_SQL = `
   INSERT OR IGNORE INTO plays (
@@ -192,44 +147,7 @@ async function notifyMissingApprover(db: D1Database, play: WeeklyPlay): Promise<
 }
 
 export async function ensurePlayStore(d1: D1Database = getD1()): Promise<void> {
-  await d1.prepare(CREATE_PLAYS_SQL).run();
-  await d1.prepare(`CREATE TABLE IF NOT EXISTS play_state_audit (
-    id text PRIMARY KEY NOT NULL,
-    play_id text NOT NULL,
-    transition text NOT NULL,
-    reason text NOT NULL,
-    from_status text NOT NULL,
-    to_status text NOT NULL,
-    snapshot_json text NOT NULL,
-    changed_at text NOT NULL
-  )`).run();
-  const columns = await d1.prepare("PRAGMA table_info(plays)").all<{ name: string }>();
-  const names = new Set(columns.results.map((column) => column.name));
-  const upgrades: D1PreparedStatement[] = [];
-  if (!names.has("game_id")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN game_id text DEFAULT '' NOT NULL"));
-  if (!names.has("market")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN market text DEFAULT 'spread' NOT NULL"));
-  if (!names.has("primary_reason")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN primary_reason text DEFAULT 'other' NOT NULL"));
-  if (!names.has("picked_by")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN picked_by text DEFAULT 'gabe' NOT NULL"));
-  if (!names.has("contract_key")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN contract_key text DEFAULT '' NOT NULL"));
-  if (!names.has("contract_json")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN contract_json text DEFAULT '[]' NOT NULL"));
-  if (!names.has("forecast_json")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN forecast_json text"));
-  if (!names.has("gabe_approved")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN gabe_approved integer DEFAULT 0 NOT NULL"));
-  if (!names.has("jarrett_approved")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN jarrett_approved integer DEFAULT 0 NOT NULL"));
-  if (!names.has("execution_status")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN execution_status text DEFAULT 'paper' NOT NULL"));
-  if (!names.has("cash_placement_confirmed")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN cash_placement_confirmed integer DEFAULT 0 NOT NULL"));
-  if (!names.has("closing_clv_points")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN closing_clv_points real"));
-  if (!names.has("clv_reference_book")) upgrades.push(d1.prepare("ALTER TABLE plays ADD COLUMN clv_reference_book text"));
-  if (upgrades.length) await d1.batch(upgrades);
-  await d1.batch([
-    d1.prepare("DROP TRIGGER IF EXISTS approval_portfolio_guard_v1"),
-    d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_season_week_status ON plays (season, week, status)"),
-    d1.prepare("CREATE INDEX IF NOT EXISTS idx_plays_created_at ON plays (created_at)"),
-    d1.prepare("CREATE INDEX IF NOT EXISTS idx_play_state_audit_play ON play_state_audit (play_id, changed_at)"),
-    d1.prepare(contractGuardTriggerSql()),
-    d1.prepare(executionStateGuardTriggerSql()),
-    d1.prepare(portfolioTriggerSql())
-  ]);
-  await d1.prepare("PRAGMA optimize").run();
+  await assertD1SchemaAuthority(d1);
 }
 
 export async function listPlays(week?: number): Promise<WeeklyPlay[]> {

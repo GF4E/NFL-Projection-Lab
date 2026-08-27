@@ -37,6 +37,7 @@ import {
 import { seasonSchedule, weeklySlate } from "./weekly-slate";
 import { recordCaptureFailure, storeRawCapture } from "./engine-os/capture";
 import { getPlayerPropAvailability } from "./player-props";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 
 const MAINLINE_COST = 3;
 
@@ -69,24 +70,9 @@ export interface MainlineRecoveryStatus {
 }
 
 
-const schema = [
-  `CREATE TABLE IF NOT EXISTS odds_automation_runs (
-    snapshot_key text PRIMARY KEY NOT NULL,
-    job text NOT NULL,
-    scheduled_for text NOT NULL,
-    game_id text,
-    status text NOT NULL,
-    started_at text NOT NULL,
-    completed_at text,
-    message text,
-    quota_used integer
-  )`,
-  "CREATE INDEX IF NOT EXISTS idx_odds_runs_schedule ON odds_automation_runs (scheduled_for, status)",
-  "CREATE INDEX IF NOT EXISTS idx_odds_runs_game ON odds_automation_runs (game_id, scheduled_for)"
-] as const;
 
 async function ensureStore(db: D1Database): Promise<void> {
-  await db.batch(schema.map((statement) => db.prepare(statement)));
+  await assertD1SchemaAuthority(db);
 }
 
 export function inspectSlateMainlineCompleteness(

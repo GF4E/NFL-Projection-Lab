@@ -3,6 +3,7 @@ import { createPushDelivery } from "@/domain/automation";
 import { stableHash } from "@/domain/hash";
 import type { PushEventType } from "@/domain/types";
 import type { PickedBy } from "@/domain/play-card";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 
 export interface PushMessageData {
   type: PushEventType;
@@ -37,44 +38,9 @@ interface PushDeliveryRow {
   sent_at: string | null;
 }
 
-const schema = [
-  `CREATE TABLE IF NOT EXISTS web_push_subscriptions (
-    id text PRIMARY KEY NOT NULL,
-    recipient_id text NOT NULL CHECK (recipient_id IN ('gabe', 'jarrett')),
-    endpoint text NOT NULL UNIQUE,
-    expiration_time real,
-    p256dh text NOT NULL,
-    auth text NOT NULL,
-    created_at text NOT NULL,
-    updated_at text NOT NULL,
-    revoked_at text
-  )`,
-  `CREATE TABLE IF NOT EXISTS web_push_deliveries (
-    id text PRIMARY KEY NOT NULL,
-    type text NOT NULL CHECK (type IN ('awaiting_you', 'edge_threshold')),
-    recipient_id text NOT NULL CHECK (recipient_id IN ('gabe', 'jarrett')),
-    idempotency_key text NOT NULL UNIQUE,
-    state text NOT NULL CHECK (state IN ('pending', 'sent', 'failed')),
-    payload_json text NOT NULL,
-    created_at text NOT NULL,
-    sent_at text,
-    last_error text
-  )`,
-  `CREATE TABLE IF NOT EXISTS web_push_attempts (
-    delivery_id text NOT NULL,
-    subscription_id text NOT NULL,
-    state text NOT NULL CHECK (state IN ('sent', 'failed')),
-    attempted_at text NOT NULL,
-    response_status integer,
-    error_message text,
-    PRIMARY KEY (delivery_id, subscription_id)
-  )`,
-  "CREATE INDEX IF NOT EXISTS idx_web_push_recipient ON web_push_subscriptions (recipient_id, revoked_at)",
-  "CREATE INDEX IF NOT EXISTS idx_web_push_delivery_state ON web_push_deliveries (recipient_id, state, created_at)"
-] as const;
 
 export async function ensurePushStore(db: D1Database): Promise<void> {
-  await db.batch(schema.map((statement) => db.prepare(statement)));
+  await assertD1SchemaAuthority(db);
 }
 
 export function assertSafePushEndpoint(endpoint: string): URL {

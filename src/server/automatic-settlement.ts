@@ -71,16 +71,6 @@ export async function settleCompletedTeamPlays(db: D1Database, now = new Date())
   await ensureLiveLineStore(db);
   await ensureNflverseStore(db);
   await ensurePlayerPropStore(db);
-  await db.prepare(`CREATE TABLE IF NOT EXISTS play_settlement_audit (
-    play_id text NOT NULL, final_hash text NOT NULL, result text NOT NULL,
-    settled_at text NOT NULL, source text NOT NULL,
-    PRIMARY KEY (play_id, final_hash)
-  )`).run();
-  await db.prepare(`CREATE TABLE IF NOT EXISTS play_clv_audit (
-    play_id text PRIMARY KEY NOT NULL, reference_book text, clv_cents real, clv_points real,
-    synthetic_closing_american real, detail_json text NOT NULL, calculated_at text NOT NULL,
-    source text NOT NULL
-  )`).run();
   const playRows = await db.prepare(`SELECT id, play_type, american_odds, stake_cents, contract_json, book, execution_status
     FROM plays WHERE season = 2026 AND status IN ('card', 'placed') AND result = 'pending'`)
     .all<OpenPlayRow>();

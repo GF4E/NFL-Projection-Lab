@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { structuralConfig } from "@/domain/config";
 import { createQbModelOverride, latestQbModelOverrides } from "@/server/qb-overrides/store";
+import { schemaAuthorityHistory } from "@/server/schema-authority";
 import { sizeKelly } from "@/domain/sizing";
 
 class MemoryStatement {
@@ -19,6 +20,11 @@ class MemoryStatement {
     return { meta: { changes: 1 } };
   }
   async all<T>() {
+    if (this.sql.includes("FROM engine_schema_versions ORDER BY version")) {
+      return {
+        results: schemaAuthorityHistory.map(([version, migration_hash]) => ({ version, migration_hash })) as T[]
+      };
+    }
     if (!this.sql.includes("ROW_NUMBER() OVER")) return { results: [] as T[] };
     const allowed = new Set(this.values);
     const latest = new Map<string, Record<string, unknown>>();

@@ -1,5 +1,14 @@
 import { sql } from "drizzle-orm";
-import { check, index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import {
+  check,
+  foreignKey,
+  index,
+  integer,
+  sqliteTable,
+  text,
+  unique,
+  uniqueIndex
+} from "drizzle-orm/sqlite-core";
 
 export const engineSchemaVersions = sqliteTable("engine_schema_versions", {
   version: text("version").primaryKey(),
@@ -26,7 +35,7 @@ export const sourceCaptureManifests = sqliteTable("source_capture_manifests", {
   licenseId: text("license_id").notNull(),
   evidenceHash: text("evidence_hash").notNull()
 }, (table) => [
-  uniqueIndex("source_capture_idempotency_unique").on(table.provider, table.dataset, table.idempotencyKey),
+  unique("source_capture_idempotency_unique").on(table.provider, table.dataset, table.idempotencyKey),
   index("idx_source_capture_evidence_hash").on(table.evidenceHash),
   index("idx_source_capture_received").on(table.provider, table.dataset, table.receivedAt),
   check("source_capture_response_bytes_check", sql`${table.responseBytes} >= 0`)
@@ -67,8 +76,8 @@ export const sourceCaptureManifestExtensions = sqliteTable("source_capture_manif
   index("idx_source_capture_extension_evidence").on(table.extensionHash),
   check(
     "source_capture_extension_contract_check",
-    sql`${table.contractVersion} = 'source-capture-contract.2026.7' AND
-      ${table.contractHash} = '9de33c9635ac8ded218bc9f774234e653135964204b5e3699b171536be99e867'`
+    sql`${table.contractVersion} = 'source-capture-contract.2026.9' AND
+      ${table.contractHash} = '7c8e041f701e3fd7cb44d7aecef3e51204fa6570e61b90e37b2b5fb016a29642'`
   ),
   check(
     "source_capture_extension_hash_check",
@@ -160,7 +169,7 @@ export const sourceCaptureEvents = sqliteTable("source_capture_events", {
   eventPayloadHash: text("event_payload_hash").notNull(),
   payloadJson: text("payload_json").notNull()
 }, (table) => [
-  uniqueIndex("source_capture_event_attempt_unique").on(table.attemptToken),
+  unique("source_capture_event_attempt_unique").on(table.attemptToken),
   index("idx_source_capture_events_source").on(table.sourceKey, table.occurredAt, table.eventType),
   index("idx_source_capture_events_capture").on(table.captureId, table.occurredAt),
   check(
@@ -209,19 +218,29 @@ export const sourceCaptureHeartbeats = sqliteTable("source_capture_heartbeats", 
   lastSuccessAt: text("last_success_at"),
   lastFailureAt: text("last_failure_at"),
   failureCode: text("failure_code"),
-  latestCaptureId: text("latest_capture_id")
-});
+  latestCaptureId: text("latest_capture_id").references(() => sourceCaptureManifests.captureId)
+}, (table) => [
+  check(
+    "source_capture_heartbeat_status_check",
+    sql`${table.status} IN ('current', 'stale', 'partial', 'unavailable')`
+  )
+]);
 
 export const engineSystemAlerts = sqliteTable("engine_system_alerts", {
   alertId: text("alert_id").primaryKey(),
   alertType: text("alert_type").notNull(),
-  deduplicationKey: text("deduplication_key").notNull().unique(),
+  deduplicationKey: text("deduplication_key").notNull(),
   severity: text("severity", { enum: ["warning", "error", "critical"] }).notNull(),
   state: text("state", { enum: ["open", "resolved"] }).notNull(),
   createdAt: text("created_at").notNull(),
   resolvedAt: text("resolved_at"),
   payloadJson: text("payload_json").notNull()
-}, (table) => [index("idx_engine_alert_state").on(table.state, table.createdAt)]);
+}, (table) => [
+  unique().on(table.deduplicationKey),
+  index("idx_engine_alert_state").on(table.state, table.createdAt),
+  check("engine_alert_severity_check", sql`${table.severity} IN ('warning', 'error', 'critical')`),
+  check("engine_alert_state_check", sql`${table.state} IN ('open', 'resolved')`)
+]);
 
 export const canonicalGames = sqliteTable("canonical_games", {
   gameId: text("game_id").primaryKey(),
@@ -232,32 +251,37 @@ export const canonicalGames = sqliteTable("canonical_games", {
   awayTeam: text("away_team").notNull(),
   identityStatus: text("identity_status", { enum: ["resolved", "unresolved"] }).notNull(),
   createdAt: text("created_at").notNull(),
-  sourceCaptureId: text("source_capture_id")
+  sourceCaptureId: text("source_capture_id").references(() => sourceCaptureManifests.captureId)
 }, (table) => [
   index("idx_canonical_games_season_week").on(table.season, table.seasonType, table.week),
-  check("canonical_game_week_check", sql`${table.week} >= 1 AND ${table.week} <= 25`)
+  check("canonical_game_week_check", sql`${table.week} >= 1 AND ${table.week} <= 25`),
+  check("canonical_game_identity_check", sql`${table.identityStatus} IN ('resolved', 'unresolved')`)
 ]);
 
 export const gameProviderAliases = sqliteTable("game_provider_aliases", {
   aliasId: text("alias_id").primaryKey(),
   provider: text("provider").notNull(),
   providerGameId: text("provider_game_id").notNull(),
-  gameId: text("game_id"),
+  gameId: text("game_id").references(() => canonicalGames.gameId),
   validFrom: text("valid_from").notNull(),
   observedAt: text("observed_at").notNull(),
-  sourceCaptureId: text("source_capture_id")
-}, (table) => [uniqueIndex("game_provider_alias_unique").on(table.provider, table.providerGameId, table.validFrom)]);
+  sourceCaptureId: text("source_capture_id").references(() => sourceCaptureManifests.captureId)
+}, (table) => [unique("game_provider_alias_unique").on(table.provider, table.providerGameId, table.validFrom)]);
 
 export const gameKickoffRevisions = sqliteTable("game_kickoff_revisions", {
   revisionId: text("revision_id").primaryKey(),
-  gameId: text("game_id").notNull(),
+  gameId: text("game_id").notNull().references(() => canonicalGames.gameId),
   kickoffUtc: text("kickoff_utc").notNull(),
   localTimeZone: text("local_time_zone").notNull(),
   observedAt: text("observed_at").notNull(),
   supersedesRevisionId: text("supersedes_revision_id"),
-  sourceCaptureId: text("source_capture_id")
+  sourceCaptureId: text("source_capture_id").references(() => sourceCaptureManifests.captureId)
 }, (table) => [
-  uniqueIndex("game_kickoff_revision_unique").on(table.gameId, table.kickoffUtc, table.observedAt),
+  unique("game_kickoff_revision_unique").on(table.gameId, table.kickoffUtc, table.observedAt),
+  foreignKey({
+    columns: [table.supersedesRevisionId],
+    foreignColumns: [table.revisionId]
+  }),
   index("idx_game_kickoff_revision_latest").on(table.gameId, table.observedAt)
 ]);
 
@@ -276,8 +300,12 @@ export const gameScheduleRevisions = sqliteTable("game_schedule_revisions", {
   sourceRowHash: text("source_row_hash").notNull(),
   supersedesRevisionId: text("supersedes_revision_id")
 }, (table) => [
-  uniqueIndex("game_schedule_revision_identity_unique").on(table.revisionId, table.gameId),
-  uniqueIndex("game_schedule_revision_observation_unique").on(table.gameId, table.observedAt),
+  unique("game_schedule_revision_identity_unique").on(table.revisionId, table.gameId),
+  unique("game_schedule_revision_observation_unique").on(table.gameId, table.observedAt),
+  foreignKey({
+    columns: [table.supersedesRevisionId],
+    foreignColumns: [table.revisionId]
+  }),
   uniqueIndex("idx_game_schedule_revision_single_successor")
     .on(table.supersedesRevisionId)
     .where(sql`${table.supersedesRevisionId} IS NOT NULL`),
@@ -321,27 +349,32 @@ export const engineActivations = sqliteTable("engine_activations", {
   lifecycleHash: text("lifecycle_hash").notNull(),
   firstOriginUtc: text("first_origin_utc").notNull()
 }, (table) => [
-  uniqueIndex("engine_activation_contract_unique").on(
+  unique("engine_activation_contract_unique").on(
     table.operatingContractHash,
     table.researchContractHash,
     table.lifecycleHash
+  ),
+  check(
+    "engine_activation_scope_check",
+    sql`${table.evidenceScope} IN ('full_season_shadow', 'partial_season_shadow')`
   )
 ]);
 
 export const forecastOrigins = sqliteTable("forecast_origins", {
   originId: text("origin_id").primaryKey(),
-  gameId: text("game_id").notNull(),
+  gameId: text("game_id").notNull().references(() => canonicalGames.gameId),
   originKind: text("origin_kind").notNull(),
   scheduledForUtc: text("scheduled_for_utc").notNull(),
   scheduledForLocal: text("scheduled_for_local").notNull(),
-  kickoffRevisionId: text("kickoff_revision_id").notNull(),
+  kickoffRevisionId: text("kickoff_revision_id").notNull().references(() => gameKickoffRevisions.revisionId),
   eligible: integer("eligible", { mode: "boolean" }).notNull(),
   activationBoundary: text("activation_boundary").notNull(),
   createdAt: text("created_at").notNull()
 }, (table) => [
-  uniqueIndex("forecast_origin_unique").on(table.gameId, table.originKind, table.scheduledForUtc),
-  uniqueIndex("forecast_origin_record_identity_unique").on(table.originId, table.gameId, table.activationBoundary),
-  index("idx_forecast_origins_due").on(table.scheduledForUtc, table.eligible)
+  unique("forecast_origin_unique").on(table.gameId, table.originKind, table.scheduledForUtc),
+  unique("forecast_origin_record_identity_unique").on(table.originId, table.gameId, table.activationBoundary),
+  index("idx_forecast_origins_due").on(table.scheduledForUtc, table.eligible),
+  check("forecast_origin_eligible_check", sql`${table.eligible} IN (0, 1)`)
 ]);
 
 export const forecastOriginVersions = sqliteTable("forecast_origin_versions", {
@@ -359,7 +392,7 @@ export const forecastOriginVersions = sqliteTable("forecast_origin_versions", {
   }).notNull(),
   scheduledForUtc: text("scheduled_for_utc"),
   scheduledForLocal: text("scheduled_for_local"),
-  kickoffRevisionId: text("kickoff_revision_id").notNull().references(() => gameScheduleRevisions.revisionId),
+  kickoffRevisionId: text("kickoff_revision_id").notNull(),
   scientificEligibility: integer("scientific_eligibility", { mode: "boolean" }).notNull(),
   informationCutoff: text("information_cutoff").notNull(),
   eligible: integer("eligible", { mode: "boolean" }).notNull(),
@@ -378,11 +411,19 @@ export const forecastOriginVersions = sqliteTable("forecast_origin_versions", {
   supersedesOriginVersionId: text("supersedes_origin_version_id"),
   createdAt: text("created_at").notNull()
 }, (table) => [
-  uniqueIndex("forecast_origin_version_identity_unique").on(
+  unique("forecast_origin_version_identity_unique").on(
     table.originVersionId,
     table.logicalOriginId,
     table.gameId
   ),
+  foreignKey({
+    columns: [table.kickoffRevisionId, table.gameId],
+    foreignColumns: [gameScheduleRevisions.revisionId, gameScheduleRevisions.gameId]
+  }),
+  foreignKey({
+    columns: [table.supersedesOriginVersionId],
+    foreignColumns: [table.originVersionId]
+  }),
   uniqueIndex("idx_forecast_origin_version_single_successor")
     .on(table.supersedesOriginVersionId)
     .where(sql`${table.supersedesOriginVersionId} IS NOT NULL`),
@@ -459,7 +500,7 @@ export const engineSchedulerTicksV2 = sqliteTable("engine_scheduler_ticks_v2", {
   completedAt: text("completed_at"),
   failureCode: text("failure_code")
 }, (table) => [
-  uniqueIndex("engine_scheduler_tick_identity_unique").on(
+  unique("engine_scheduler_tick_identity_unique").on(
     table.schedulerContractHash,
     table.lane,
     table.nominalScheduledAt
@@ -467,7 +508,53 @@ export const engineSchedulerTicksV2 = sqliteTable("engine_scheduler_ticks_v2", {
   index("idx_engine_scheduler_ticks_v2_watchdog").on(table.lane, table.nominalScheduledAt, table.state),
   index("idx_engine_scheduler_ticks_v2_lease").on(table.state, table.leaseExpiresAt),
   check("engine_scheduler_tick_contract_hash_check", sql`length(${table.schedulerContractHash}) = 64`),
-  check("engine_scheduler_tick_fence_check", sql`${table.fenceToken} >= 1`)
+  check("engine_scheduler_tick_key_version_check", sql`${table.tickKeyVersion} = 'engine-os.scheduler-tick.v1'`),
+  check("engine_scheduler_tick_lane_check", sql`${table.lane} IN ('dispatcher', 'watchdog')`),
+  check("engine_scheduler_tick_state_check", sql`${table.state} IN ('running', 'completed', 'failed')`),
+  check("engine_scheduler_tick_fence_check", sql`${table.fenceToken} >= 1`),
+  check(
+    "engine_scheduler_tick_time_check",
+    sql`length(${table.nominalScheduledAt}) > 0 AND
+      length(${table.invokedAt}) > 0 AND
+      length(${table.evidenceAt}) > 0 AND
+      length(${table.persistedAt}) > 0 AND
+      julianday(${table.nominalScheduledAt}) IS NOT NULL AND
+      julianday(${table.invokedAt}) IS NOT NULL AND
+      julianday(${table.evidenceAt}) IS NOT NULL AND
+      julianday(${table.persistedAt}) IS NOT NULL AND
+      julianday(${table.nominalScheduledAt}) <= julianday(${table.invokedAt}) AND
+      julianday(${table.evidenceAt}) <= julianday(${table.persistedAt}) AND
+      julianday(${table.invokedAt}) <= julianday(${table.persistedAt})`
+  ),
+  check(
+    "engine_scheduler_tick_lease_check",
+    sql`(
+      ${table.state} = 'running' AND
+      ${table.attemptTokenHash} IS NOT NULL AND length(${table.attemptTokenHash}) = 64 AND
+      ${table.leaseOwner} IS NOT NULL AND length(${table.leaseOwner}) > 0 AND
+      ${table.leaseAcquiredAt} IS NOT NULL AND ${table.leaseExpiresAt} IS NOT NULL AND
+      ${table.heartbeatAt} IS NOT NULL AND
+      julianday(${table.leaseAcquiredAt}) IS NOT NULL AND
+      julianday(${table.leaseExpiresAt}) IS NOT NULL AND
+      julianday(${table.heartbeatAt}) IS NOT NULL AND
+      julianday(${table.leaseAcquiredAt}) <= julianday(${table.heartbeatAt}) AND
+      julianday(${table.heartbeatAt}) < julianday(${table.leaseExpiresAt}) AND
+      ${table.completedAt} IS NULL
+    ) OR (
+      ${table.state} IN ('completed', 'failed') AND
+      ${table.attemptTokenHash} IS NULL AND ${table.leaseOwner} IS NULL AND
+      ${table.leaseAcquiredAt} IS NULL AND ${table.leaseExpiresAt} IS NULL AND
+      ${table.heartbeatAt} IS NOT NULL AND ${table.completedAt} IS NOT NULL AND
+      julianday(${table.heartbeatAt}) IS NOT NULL AND
+      julianday(${table.completedAt}) IS NOT NULL AND
+      julianday(${table.heartbeatAt}) <= julianday(${table.completedAt})
+    )`
+  ),
+  check(
+    "engine_scheduler_tick_failure_check",
+    sql`(${table.state} = 'failed' AND ${table.failureCode} IS NOT NULL AND length(${table.failureCode}) > 0) OR
+      (${table.state} <> 'failed' AND ${table.failureCode} IS NULL)`
+  )
 ]);
 
 export const engineOriginJobsV2 = sqliteTable("engine_origin_jobs_v2", {
@@ -476,7 +563,7 @@ export const engineOriginJobsV2 = sqliteTable("engine_origin_jobs_v2", {
   schedulerContractHash: text("scheduler_contract_hash").notNull(),
   jobKeyVersion: text("job_key_version").notNull(),
   jobType: text("job_type").notNull(),
-  originVersionId: text("origin_version_id").notNull().unique()
+  originVersionId: text("origin_version_id").notNull()
     .references(() => forecastOriginVersions.originVersionId),
   scheduledTriggerAt: text("scheduled_trigger_at").notNull(),
   kickoffAt: text("kickoff_at").notNull(),
@@ -492,10 +579,49 @@ export const engineOriginJobsV2 = sqliteTable("engine_origin_jobs_v2", {
   completedAt: text("completed_at"),
   createdAt: text("created_at").notNull()
 }, (table) => [
+  unique().on(table.originVersionId),
   index("idx_engine_origin_jobs_v2_due").on(table.state, table.scheduledTriggerAt, table.persistenceDeadlineAt),
   index("idx_engine_origin_jobs_v2_lease").on(table.state, table.leaseExpiresAt),
   check("engine_origin_job_contract_hash_check", sql`length(${table.schedulerContractHash}) = 64`),
-  check("engine_origin_job_fence_check", sql`${table.fenceToken} >= 0`)
+  check("engine_origin_job_key_version_check", sql`${table.jobKeyVersion} = 'engine-os.scheduler-job.v2'`),
+  check("engine_origin_job_type_check", sql`${table.jobType} = 'forecast_or_withholding'`),
+  check("engine_origin_job_state_check", sql`${table.state} IN ('pending', 'running', 'completed', 'invalidated')`),
+  check("engine_origin_job_fence_check", sql`${table.fenceToken} >= 0`),
+  check(
+    "engine_origin_job_time_check",
+    sql`length(${table.scheduledTriggerAt}) > 0 AND length(${table.kickoffAt}) > 0 AND
+      length(${table.persistenceDeadlineAt}) > 0 AND length(${table.activationBoundary}) > 0 AND
+      length(${table.createdAt}) > 0 AND
+      julianday(${table.scheduledTriggerAt}) IS NOT NULL AND julianday(${table.kickoffAt}) IS NOT NULL AND
+      julianday(${table.persistenceDeadlineAt}) IS NOT NULL AND julianday(${table.createdAt}) IS NOT NULL AND
+      julianday(${table.persistenceDeadlineAt}) < julianday(${table.kickoffAt})`
+  ),
+  check(
+    "engine_origin_job_lease_check",
+    sql`(
+      ${table.state} = 'pending' AND ${table.fenceToken} = 0 AND
+      ${table.activeAttemptTokenHash} IS NULL AND ${table.leaseOwner} IS NULL AND
+      ${table.leaseAcquiredAt} IS NULL AND ${table.leaseExpiresAt} IS NULL AND
+      ${table.heartbeatAt} IS NULL AND ${table.completedAt} IS NULL
+    ) OR (
+      ${table.state} = 'running' AND ${table.fenceToken} >= 1 AND
+      ${table.activeAttemptTokenHash} IS NOT NULL AND length(${table.activeAttemptTokenHash}) = 64 AND
+      ${table.leaseOwner} IS NOT NULL AND length(${table.leaseOwner}) > 0 AND
+      ${table.leaseAcquiredAt} IS NOT NULL AND ${table.leaseExpiresAt} IS NOT NULL AND
+      ${table.heartbeatAt} IS NOT NULL AND
+      julianday(${table.leaseAcquiredAt}) IS NOT NULL AND julianday(${table.leaseExpiresAt}) IS NOT NULL AND
+      julianday(${table.heartbeatAt}) IS NOT NULL AND
+      julianday(${table.leaseAcquiredAt}) <= julianday(${table.heartbeatAt}) AND
+      julianday(${table.heartbeatAt}) < julianday(${table.leaseExpiresAt}) AND ${table.completedAt} IS NULL
+    ) OR (
+      ${table.state} IN ('completed', 'invalidated') AND
+      ${table.activeAttemptTokenHash} IS NULL AND ${table.leaseOwner} IS NULL AND
+      ${table.leaseAcquiredAt} IS NULL AND ${table.leaseExpiresAt} IS NULL AND
+      ${table.heartbeatAt} IS NOT NULL AND ${table.completedAt} IS NOT NULL AND
+      julianday(${table.heartbeatAt}) IS NOT NULL AND julianday(${table.completedAt}) IS NOT NULL AND
+      julianday(${table.heartbeatAt}) <= julianday(${table.completedAt})
+    )`
+  )
 ]);
 
 export const engineOriginAttemptsV2 = sqliteTable("engine_origin_attempts_v2", {
@@ -511,11 +637,22 @@ export const engineOriginAttemptsV2 = sqliteTable("engine_origin_attempts_v2", {
   leaseExpiresAt: text("lease_expires_at").notNull(),
   persistedAt: text("persisted_at").notNull()
 }, (table) => [
-  uniqueIndex("engine_origin_attempt_job_fence_unique").on(table.jobKey, table.fenceToken),
-  uniqueIndex("engine_origin_attempt_job_token_unique").on(table.jobKey, table.attemptTokenHash),
+  unique("engine_origin_attempt_job_fence_unique").on(table.jobKey, table.fenceToken),
+  unique("engine_origin_attempt_job_token_unique").on(table.jobKey, table.attemptTokenHash),
   index("idx_engine_origin_attempts_v2_origin").on(table.originVersionId, table.fenceToken),
   check("engine_origin_attempt_token_check", sql`length(${table.attemptTokenHash}) = 64`),
-  check("engine_origin_attempt_fence_check", sql`${table.fenceToken} >= 1`)
+  check("engine_origin_attempt_fence_check", sql`${table.fenceToken} >= 1`),
+  check("engine_origin_attempt_owner_check", sql`length(${table.leaseOwner}) > 0`),
+  check(
+    "engine_origin_attempt_time_check",
+    sql`julianday(${table.invokedAt}) IS NOT NULL AND
+      julianday(${table.leaseAcquiredAt}) IS NOT NULL AND
+      julianday(${table.leaseExpiresAt}) IS NOT NULL AND
+      julianday(${table.persistedAt}) IS NOT NULL AND
+      julianday(${table.invokedAt}) <= julianday(${table.persistedAt}) AND
+      julianday(${table.leaseAcquiredAt}) <= julianday(${table.persistedAt}) AND
+      julianday(${table.persistedAt}) < julianday(${table.leaseExpiresAt})`
+  )
 ]);
 
 export const engineSchedulerEventsV2 = sqliteTable("engine_scheduler_events_v2", {
@@ -533,14 +670,41 @@ export const engineSchedulerEventsV2 = sqliteTable("engine_scheduler_events_v2",
 }, (table) => [
   index("idx_engine_scheduler_events_v2_tick").on(table.tickKey, table.occurredAt),
   index("idx_engine_scheduler_events_v2_job").on(table.jobKey, table.occurredAt),
+  check(
+    "engine_scheduler_event_type_check",
+    sql`${table.eventType} IN (
+      'tick_claimed', 'tick_reclaimed', 'tick_renewed', 'tick_completed', 'tick_failed',
+      'job_claimed', 'job_reclaimed', 'job_renewed', 'job_completed', 'job_invalidated',
+      'missed_tick_detected', 'watchdog_recovery_checkpoint',
+      'schedule_unresolved_observed', 'operational_alert'
+    )`
+  ),
+  check(
+    "engine_scheduler_event_subject_check",
+    sql`(${table.tickKey} IS NOT NULL AND ${table.jobKey} IS NULL) OR
+      (${table.tickKey} IS NULL AND ${table.jobKey} IS NOT NULL)`
+  ),
+  check(
+    "engine_scheduler_event_attempt_check",
+    sql`(${table.attemptTokenHash} IS NULL AND ${table.fenceToken} IS NULL) OR
+      (${table.attemptTokenHash} IS NOT NULL AND length(${table.attemptTokenHash}) = 64 AND ${table.fenceToken} >= 1)`
+  ),
+  check(
+    "engine_scheduler_event_time_check",
+    sql`length(${table.occurredAt}) > 0 AND length(${table.evidenceAt}) > 0 AND
+      length(${table.persistedAt}) > 0 AND julianday(${table.occurredAt}) IS NOT NULL AND
+      julianday(${table.evidenceAt}) IS NOT NULL AND julianday(${table.persistedAt}) IS NOT NULL AND
+      julianday(${table.occurredAt}) <= julianday(${table.persistedAt}) AND
+      julianday(${table.evidenceAt}) <= julianday(${table.persistedAt})`
+  ),
   check("engine_scheduler_event_payload_check", sql`json_valid(${table.payloadJson})`)
 ]);
 
 export const engineOriginRecordsV2 = sqliteTable("engine_origin_records_v2", {
   recordId: text("record_id").primaryKey(),
-  decisionHash: text("decision_hash").notNull().unique(),
-  jobKey: text("job_key").notNull().unique().references(() => engineOriginJobsV2.jobKey),
-  originVersionId: text("origin_version_id").notNull().unique()
+  decisionHash: text("decision_hash").notNull(),
+  jobKey: text("job_key").notNull().references(() => engineOriginJobsV2.jobKey),
+  originVersionId: text("origin_version_id").notNull()
     .references(() => forecastOriginVersions.originVersionId),
   schedulerContractVersion: text("scheduler_contract_version").notNull(),
   schedulerContractHash: text("scheduler_contract_hash").notNull(),
@@ -560,12 +724,62 @@ export const engineOriginRecordsV2 = sqliteTable("engine_origin_records_v2", {
   activationBoundary: text("activation_boundary").notNull(),
   attemptTokenHash: text("attempt_token_hash").notNull(),
   fenceToken: integer("fence_token").notNull(),
-  qualificationOnly: integer("qualification_only", { mode: "boolean" }).notNull().default(true),
+  qualificationOnly: integer("qualification_only", { mode: "boolean" }).notNull().default(sql`1`),
   payloadJson: text("payload_json").notNull()
 }, (table) => [
+  unique().on(table.decisionHash),
+  unique().on(table.jobKey),
+  unique().on(table.originVersionId),
   index("idx_engine_origin_records_v2_origin").on(table.originVersionId, table.persistedAt),
-  check("engine_origin_record_contract_hash_check", sql`length(${table.schedulerContractHash}) = 64`),
+  check(
+    "engine_origin_record_contract_hash_check",
+    sql`length(${table.schedulerContractHash}) = 64 AND length(${table.decisionHash}) = 64`
+  ),
+  check("engine_origin_record_status_check", sql`${table.status} = 'withheld'`),
+  check(
+    "engine_origin_record_reason_check",
+    sql`${table.withholdingReason} IN (
+      'no_eligible_package', 'schedule_unavailable_at_origin', 'required_source_stale',
+      'required_source_partial', 'required_source_unavailable', 'schema_invalid',
+      'provenance_incomplete', 'package_hash_mismatch', 'late_origin_excluded', 'compute_failure'
+    )`
+  ),
+  check(
+    "engine_origin_record_timing_check",
+    sql`(
+      ${table.timing} = 'timely' AND ${table.prospectiveEligible} = 1 AND
+      ${table.withholdingReason} NOT IN ('late_origin_excluded', 'schedule_unavailable_at_origin') AND
+      julianday(${table.persistedAt}) < julianday(${table.persistenceDeadlineAt}) AND
+      julianday(${table.persistedAt}) < julianday(${table.kickoffAt})
+    ) OR (
+      ${table.timing} = 'late' AND ${table.prospectiveEligible} = 0 AND
+      (${table.withholdingReason} = 'late_origin_excluded' OR
+        ${table.withholdingReason} = 'schedule_unavailable_at_origin')
+    )`
+  ),
+  check(
+    "engine_origin_record_time_check",
+    sql`julianday(${table.scheduledTriggerAt}) IS NOT NULL AND
+      julianday(${table.invokedAt}) IS NOT NULL AND julianday(${table.evidenceAt}) IS NOT NULL AND
+      julianday(${table.generatedAt}) IS NOT NULL AND
+      julianday(${table.persistenceRequestedAt}) IS NOT NULL AND
+      julianday(${table.persistedAt}) IS NOT NULL AND
+      julianday(${table.persistenceDeadlineAt}) IS NOT NULL AND
+      julianday(${table.kickoffAt}) IS NOT NULL AND
+      julianday(${table.scheduledTriggerAt}) <= julianday(${table.invokedAt}) AND
+      julianday(${table.scheduledTriggerAt}) <= julianday(${table.generatedAt}) AND
+      julianday(${table.invokedAt}) <= julianday(${table.persistedAt}) AND
+      julianday(${table.evidenceAt}) <= julianday(${table.generatedAt}) AND
+      julianday(${table.generatedAt}) <= julianday(${table.persistenceRequestedAt}) AND
+      julianday(${table.persistenceRequestedAt}) <= julianday(${table.persistedAt}) AND
+      julianday(${table.persistenceDeadlineAt}) < julianday(${table.kickoffAt})`
+  ),
+  check(
+    "engine_origin_record_capture_check",
+    sql`${table.captureHealth} IN ('current', 'stale', 'partial', 'unavailable')`
+  ),
   check("engine_origin_record_attempt_check", sql`length(${table.attemptTokenHash}) = 64 AND ${table.fenceToken} >= 1`),
+  check("engine_origin_record_qualification_check", sql`${table.qualificationOnly} = 1`),
   check("engine_origin_record_payload_check", sql`json_valid(${table.payloadJson})`)
 ]);
 
@@ -574,7 +788,7 @@ export const forecastLedgerQualificationsV1 = sqliteTable("forecast_ledger_quali
   ledgerContractVersion: text("ledger_contract_version").notNull(),
   ledgerContractHash: text("ledger_contract_hash").notNull(),
   activationBoundary: text("activation_boundary").notNull(),
-  qualificationKey: text("qualification_key").notNull().unique(),
+  qualificationKey: text("qualification_key").notNull(),
   qualificationKeyVersion: text("qualification_key_version").notNull(),
   qualificationStream: text("qualification_stream", {
     enum: ["eligible_package", "no_eligible_package"]
@@ -589,6 +803,7 @@ export const forecastLedgerQualificationsV1 = sqliteTable("forecast_ledger_quali
   qualifiedAt: text("qualified_at").notNull(),
   qualificationEvidenceHash: text("qualification_evidence_hash").notNull()
 }, (table) => [
+  unique().on(table.qualificationKey),
   index("idx_forecast_ledger_qualifications_v1_status")
     .on(table.qualificationStatus, table.qualifiedAt),
   uniqueIndex("forecast_ledger_one_boundary_per_eligible_package_v1")
@@ -661,8 +876,8 @@ export const forecastLedgerActivationsV1 = sqliteTable("forecast_ledger_activati
   activationId: text("activation_id").primaryKey(),
   ledgerContractVersion: text("ledger_contract_version").notNull(),
   ledgerContractHash: text("ledger_contract_hash").notNull(),
-  activationBoundary: text("activation_boundary").notNull().unique(),
-  qualificationId: text("qualification_id").notNull().unique()
+  activationBoundary: text("activation_boundary").notNull(),
+  qualificationId: text("qualification_id").notNull()
     .references(() => forecastLedgerQualificationsV1.qualificationId),
   evidenceScope: text("evidence_scope", {
     enum: ["full_season_shadow", "partial_season_shadow"]
@@ -672,8 +887,10 @@ export const forecastLedgerActivationsV1 = sqliteTable("forecast_ledger_activati
   activatedAt: text("activated_at").notNull(),
   firstOriginUtc: text("first_origin_utc").notNull(),
   weekOneOriginComplete: integer("week_one_origin_complete", { mode: "boolean" }).notNull(),
-  qualificationOnly: integer("qualification_only", { mode: "boolean" }).notNull().default(true)
+  qualificationOnly: integer("qualification_only", { mode: "boolean" }).notNull().default(sql`1`)
 }, (table) => [
+  unique().on(table.activationBoundary),
+  unique().on(table.qualificationId),
   index("idx_forecast_ledger_activations_v1_boundary").on(table.season, table.firstOriginUtc),
   check(
     "forecast_ledger_activation_scope_check",
@@ -740,7 +957,7 @@ export const forecastLedgerJobsV1 = sqliteTable("forecast_ledger_jobs_v1", {
   completedAt: text("completed_at"),
   createdAt: text("created_at").notNull()
 }, (table) => [
-  uniqueIndex("forecast_ledger_job_origin_unique").on(table.activationId, table.originVersionId),
+  unique("forecast_ledger_job_origin_unique").on(table.activationId, table.originVersionId),
   index("idx_forecast_ledger_jobs_v1_due")
     .on(table.state, table.scheduledTriggerAt, table.persistenceDeadlineAt),
   index("idx_forecast_ledger_jobs_v1_lease").on(table.state, table.leaseExpiresAt),
@@ -780,7 +997,7 @@ export const forecastLedgerAttemptsV1 = sqliteTable("forecast_ledger_attempts_v1
   jobKey: text("job_key").notNull().references(() => forecastLedgerJobsV1.jobKey),
   originVersionId: text("origin_version_id").notNull()
     .references(() => forecastOriginVersions.originVersionId),
-  attemptTokenHash: text("attempt_token_hash").notNull().unique(),
+  attemptTokenHash: text("attempt_token_hash").notNull(),
   fenceToken: integer("fence_token").notNull(),
   leaseOwner: text("lease_owner").notNull(),
   invokedAt: text("invoked_at").notNull(),
@@ -788,7 +1005,8 @@ export const forecastLedgerAttemptsV1 = sqliteTable("forecast_ledger_attempts_v1
   leaseExpiresAt: text("lease_expires_at").notNull(),
   persistedAt: text("persisted_at").notNull()
 }, (table) => [
-  uniqueIndex("forecast_ledger_attempt_job_fence_unique").on(table.jobKey, table.fenceToken),
+  unique().on(table.attemptTokenHash),
+  unique("forecast_ledger_attempt_job_fence_unique").on(table.jobKey, table.fenceToken),
   index("idx_forecast_ledger_attempts_v1_origin").on(table.originVersionId, table.fenceToken),
   check(
     "forecast_ledger_attempt_identity_check",
@@ -815,11 +1033,11 @@ export const forecastLedgerAttemptsV1 = sqliteTable("forecast_ledger_attempts_v1
 
 export const forecastLedgerRecordsV1 = sqliteTable("forecast_ledger_records_v1", {
   recordId: text("record_id").primaryKey(),
-  recordHash: text("record_hash").notNull().unique(),
+  recordHash: text("record_hash").notNull(),
   recordKeyVersion: text("record_key_version").notNull(),
   activationId: text("activation_id").notNull()
     .references(() => forecastLedgerActivationsV1.activationId),
-  jobKey: text("job_key").notNull().unique().references(() => forecastLedgerJobsV1.jobKey),
+  jobKey: text("job_key").notNull().references(() => forecastLedgerJobsV1.jobKey),
   originVersionId: text("origin_version_id").notNull()
     .references(() => forecastOriginVersions.originVersionId),
   qualificationId: text("qualification_id").notNull()
@@ -879,8 +1097,9 @@ export const forecastLedgerRecordsV1 = sqliteTable("forecast_ledger_records_v1",
   payloadJson: text("payload_json").notNull(),
   payloadHash: text("payload_hash").notNull()
 }, (table) => [
-  uniqueIndex("forecast_ledger_record_activation_origin_unique")
-    .on(table.activationId, table.originVersionId),
+  unique().on(table.recordHash),
+  unique().on(table.jobKey),
+  unique("forecast_ledger_record_activation_origin_unique").on(table.activationId, table.originVersionId),
   index("idx_forecast_ledger_records_v1_origin").on(table.originVersionId, table.persistedAt),
   index("idx_forecast_ledger_records_v1_prospective")
     .on(table.prospectiveEligible, table.status, table.persistedAt),
@@ -1110,8 +1329,8 @@ export const forecastLedgerEventsV1 = sqliteTable("forecast_ledger_events_v1", {
 export const engineJobRuns = sqliteTable("engine_job_runs", {
   jobKey: text("job_key").primaryKey(),
   jobType: text("job_type").notNull(),
-  gameId: text("game_id"),
-  originId: text("origin_id"),
+  gameId: text("game_id").references(() => canonicalGames.gameId),
+  originId: text("origin_id").references(() => forecastOrigins.originId),
   scheduledFor: text("scheduled_for").notNull(),
   state: text("state", { enum: ["pending", "running", "succeeded", "failed", "skipped", "late"] }).notNull(),
   attempt: integer("attempt").notNull().default(1),
@@ -1121,11 +1340,18 @@ export const engineJobRuns = sqliteTable("engine_job_runs", {
   completedAt: text("completed_at"),
   heartbeatAt: text("heartbeat_at"),
   failureCode: text("failure_code")
-}, (table) => [index("idx_engine_job_due").on(table.scheduledFor, table.state)]);
+}, (table) => [
+  index("idx_engine_job_due").on(table.scheduledFor, table.state),
+  check(
+    "engine_job_state_check",
+    sql`${table.state} IN ('pending', 'running', 'succeeded', 'failed', 'skipped', 'late')`
+  ),
+  check("engine_job_attempt_check", sql`${table.attempt} >= 1`)
+]);
 
 export const forecastOriginRecords = sqliteTable("forecast_origin_records", {
   recordId: text("record_id").primaryKey(),
-  recordHash: text("record_hash").notNull().unique(),
+  recordHash: text("record_hash").notNull(),
   originId: text("origin_id").notNull(),
   gameId: text("game_id").notNull(),
   status: text("status", { enum: ["forecast", "withheld"] }).notNull(),
@@ -1148,8 +1374,50 @@ export const forecastOriginRecords = sqliteTable("forecast_origin_records", {
   outputObjectKey: text("output_object_key"),
   outputObjectHash: text("output_object_hash")
 }, (table) => [
+  unique().on(table.recordHash),
+  foreignKey({
+    columns: [table.originId, table.gameId, table.activationBoundary],
+    foreignColumns: [forecastOrigins.originId, forecastOrigins.gameId, forecastOrigins.activationBoundary]
+  }),
+  uniqueIndex("idx_forecast_origin_one_timely")
+    .on(table.originId)
+    .where(sql`${table.timing} = 'timely'`),
   index("idx_forecast_records_game_origin").on(table.gameId, table.generatedAt),
-  check("forecast_record_status_check", sql`${table.status} in ('forecast', 'withheld')`)
+  check("forecast_record_status_check", sql`${table.status} IN ('forecast', 'withheld')`),
+  check(
+    "forecast_record_reason_check",
+    sql`(${table.status} = 'forecast' AND ${table.withholdingReason} IS NULL) OR
+      (${table.status} = 'withheld' AND ${table.withholdingReason} IS NOT NULL)`
+  ),
+  check("forecast_record_timing_check", sql`${table.timing} IN ('early', 'timely', 'late')`),
+  check(
+    "forecast_record_eligibility_check",
+    sql`(${table.timing} = 'timely' AND ${table.prospectiveEligible} = 1) OR
+      (${table.timing} <> 'timely' AND ${table.prospectiveEligible} = 0)`
+  ),
+  check(
+    "forecast_record_capture_check",
+    sql`${table.captureHealth} IN ('current', 'stale', 'partial', 'unavailable')`
+  ),
+  check(
+    "forecast_record_scope_check",
+    sql`${table.evidenceScope} IN ('full_season_shadow', 'partial_season_shadow')`
+  ),
+  check(
+    "forecast_record_provenance_check",
+    sql`${table.status} = 'withheld' OR (
+      ${table.qualificationKey} IS NOT NULL AND length(${table.qualificationKey}) > 0 AND
+      ${table.runnerHash} IS NOT NULL AND length(${table.runnerHash}) > 0 AND
+      ${table.codeHash} IS NOT NULL AND length(${table.codeHash}) > 0 AND
+      ${table.packageHash} IS NOT NULL AND length(${table.packageHash}) > 0 AND
+      ${table.configHash} IS NOT NULL AND length(${table.configHash}) > 0 AND
+      ${table.inputManifestHash} IS NOT NULL AND length(${table.inputManifestHash}) > 0 AND
+      ${table.featureSchemaHash} IS NOT NULL AND length(${table.featureSchemaHash}) > 0 AND
+      ${table.targetSchemaHash} IS NOT NULL AND length(${table.targetSchemaHash}) > 0 AND
+      ${table.outputObjectKey} IS NOT NULL AND length(${table.outputObjectKey}) > 0 AND
+      ${table.outputObjectHash} IS NOT NULL AND length(${table.outputObjectHash}) > 0
+    )`
+  )
 ]);
 
 export const oddsQuotaEvents = sqliteTable("odds_quota_events", {
@@ -1159,7 +1427,7 @@ export const oddsQuotaEvents = sqliteTable("odds_quota_events", {
   remaining: integer("remaining").notNull(),
   lastCost: integer("last_cost").notNull(),
   capturedAt: text("captured_at").notNull(),
-  responseCaptureId: text("response_capture_id")
+  responseCaptureId: text("response_capture_id").references(() => sourceCaptureManifests.captureId)
 }, (table) => [
   check("odds_quota_event_values_check", sql`${table.used} >= 0 AND ${table.remaining} >= 0 AND ${table.lastCost} >= 0`)
 ]);
@@ -1177,6 +1445,12 @@ export const oddsQuotaEpochs = sqliteTable("odds_quota_epochs", {
   sourceRequestKey: text("source_request_key")
 }, (table) => [
   check("odds_quota_epoch_provider_check", sql`${table.provider} = 'the-odds-api'`),
+  check("odds_quota_epoch_generation_check", sql`length(${table.credentialGenerationId}) > 0`),
+  check("odds_quota_epoch_opened_check", sql`length(${table.openedAt}) > 0`),
+  check(
+    "odds_quota_epoch_reason_check",
+    sql`${table.reason} IN ('credential_bootstrap', 'stale_reconciliation', 'provider_monthly_reset')`
+  ),
   check("odds_quota_epoch_counters_check", sql`${table.initialUsed} >= 0 AND ${table.initialRemaining} >= 0 AND ${table.initialUsed} + ${table.initialRemaining} = 500`)
 ]);
 
@@ -1186,7 +1460,10 @@ export const oddsQuotaControl = sqliteTable("odds_quota_control", {
   credentialGenerationId: text("credential_generation_id").notNull(),
   observedAt: text("observed_at").notNull()
 }, (table) => [
-  check("odds_quota_control_provider_check", sql`${table.provider} = 'the-odds-api'`)
+  check("odds_quota_control_provider_check", sql`${table.provider} = 'the-odds-api'`),
+  check("odds_quota_control_epoch_check", sql`length(${table.quotaEpoch}) > 0`),
+  check("odds_quota_control_generation_check", sql`length(${table.credentialGenerationId}) > 0`),
+  check("odds_quota_control_observed_check", sql`length(${table.observedAt}) > 0`)
 ]);
 
 export const oddsQuotaReservations = sqliteTable("odds_quota_reservations", {
@@ -1211,7 +1488,33 @@ export const oddsQuotaReservations = sqliteTable("odds_quota_reservations", {
 }, (table) => [
   index("idx_odds_quota_reservations_outstanding").on(table.provider, table.quotaEpoch, table.state, table.reservedAt),
   check("odds_quota_reservation_provider_check", sql`${table.provider} = 'the-odds-api'`),
-  check("odds_quota_reservation_cost_check", sql`${table.reservedCost} > 0 AND ${table.futureReserve} >= 0`)
+  check(
+    "odds_quota_reservation_class_check",
+    sql`${table.requestClass} IN (
+      'opener', 'scientific_origin', 'kickoff_minus_15', 'kickoff_minus_60', 'kickoff_minus_120', 'ordinary'
+    )`
+  ),
+  check("odds_quota_reservation_cost_check", sql`${table.reservedCost} > 0 AND ${table.futureReserve} >= 0`),
+  check("odds_quota_reservation_plan_hash_check", sql`length(${table.quotaPlanHash}) = 64`),
+  check("odds_quota_reservation_token_check", sql`length(${table.dispatchTokenHash}) = 64`),
+  check(
+    "odds_quota_reservation_state_check",
+    sql`${table.state} IN ('reserved', 'dispatched', 'settled', 'released_before_dispatch', 'charge_unknown')`
+  ),
+  check(
+    "odds_quota_reservation_timestamps_check",
+    sql`(${table.state} = 'reserved' AND ${table.dispatchedAt} IS NULL AND ${table.completedAt} IS NULL AND
+        ${table.quotaEventRequestKey} IS NULL) OR
+      (${table.state} = 'dispatched' AND ${table.dispatchedAt} IS NOT NULL AND ${table.completedAt} IS NULL AND
+        ${table.quotaEventRequestKey} IS NULL) OR
+      (${table.state} = 'charge_unknown' AND ${table.dispatchedAt} IS NOT NULL AND
+        ${table.completedAt} IS NOT NULL AND ${table.quotaEventRequestKey} IS NULL) OR
+      (${table.state} = 'released_before_dispatch' AND ${table.dispatchedAt} IS NULL AND
+        ${table.completedAt} IS NOT NULL AND ${table.quotaEventRequestKey} IS NULL) OR
+      (${table.state} = 'settled' AND ${table.dispatchedAt} IS NOT NULL AND
+        ${table.completedAt} IS NOT NULL AND ${table.quotaEventRequestKey} IS NOT NULL)`
+  ),
+  check("odds_quota_reservation_reserved_at_check", sql`length(${table.reservedAt}) > 0`)
 ]);
 
 export const oddsQuotaReservationEvents = sqliteTable("odds_quota_reservation_events", {
@@ -1222,4 +1525,12 @@ export const oddsQuotaReservationEvents = sqliteTable("odds_quota_reservation_ev
   }).notNull(),
   occurredAt: text("occurred_at").notNull(),
   payloadJson: text("payload_json").notNull()
-}, (table) => [index("idx_odds_quota_reservation_events_request").on(table.requestKey, table.occurredAt)]);
+}, (table) => [
+  index("idx_odds_quota_reservation_events_request").on(table.requestKey, table.occurredAt),
+  check(
+    "odds_quota_reservation_event_type_check",
+    sql`${table.eventType} IN ('reserved', 'dispatched', 'settled', 'released_before_dispatch', 'charge_unknown')`
+  ),
+  check("odds_quota_reservation_event_time_check", sql`length(${table.occurredAt}) > 0`),
+  check("odds_quota_reservation_event_payload_check", sql`json_valid(${table.payloadJson})`)
+]);

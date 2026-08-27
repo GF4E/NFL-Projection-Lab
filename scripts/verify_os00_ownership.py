@@ -20,6 +20,17 @@ SUPABASE_IMPORT = re.compile(
     r'''(?:from\s+|import\s*\()["']@supabase/|["']@/server/supabase/|\bcreate(?:Server|User|Admin)Client\b'''
 )
 
+MIGRATION_TRANSIENT_TABLES = {
+    "_os01_plays_rollback_guard",
+    "_os01_plays_copy_guard",
+    "_os01_schema_closure_rollback_guard",
+    "_os03a_rollback_guard",
+    "_os13a_rollback_guard",
+    "_os15a_rollback_guard",
+    "plays__os01_next",
+    "plays__os01_prior",
+}
+
 
 @dataclass
 class Result:
@@ -61,7 +72,7 @@ def parse_args(argv: Iterable[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--registry",
         type=Path,
-        default=Path(".planning/engine-os/execution/os-00/ownership-registry.json"),
+        default=Path(".planning/engine-os/execution/os-00/ownership-registry.v2.json"),
     )
     parser.add_argument("--json", action="store_true", dest="json_output")
     return parser.parse_args(argv)
@@ -84,6 +95,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     declared_d1 = [str(value) for value in registry.get("d1Tables", [])]
     result.require(len(declared_d1) == len(set(declared_d1)), "D1 table registry contains duplicates")
     actual_d1 = discovered_tables(root, ("drizzle", "src/server"), {".sql", ".ts"})
+    actual_d1 -= MIGRATION_TRANSIENT_TABLES
     compare_registry(actual_d1, set(declared_d1), result, "D1 tables")
 
     quarantine = registry.get("supabaseQuarantine", {})
@@ -128,7 +140,10 @@ def main(argv: Iterable[str] | None = None) -> int:
             fetch_body = fetch_match.group("body")
             result.require("runBackgroundMaintenance" not in fetch_body, "public fetch invokes background maintenance")
             result.require("runModelLifecycleAutomation" not in fetch_body, "public fetch invokes model lifecycle")
-            result.require("readOnlyD1(env.DB)" in fetch_body, "public fetch lacks the SELECT-only D1 capability")
+            result.require(
+                "readOnlyD1(readDatabaseBinding(env))" in fetch_body,
+                "public fetch lacks the SELECT-only D1 capability",
+            )
     else:
         result.errors.append("worker/index.ts is missing")
 

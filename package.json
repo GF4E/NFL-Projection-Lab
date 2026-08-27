@@ -17,7 +17,8 @@
     "model-lab:module1": "python3 scripts/model_lab_module_one.py",
     "model-lab:module1:self-test": "python3 scripts/model_lab_module_one.py --self-test",
     "db:generate": "drizzle-kit generate",
-    "verify": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && python3 scripts/verify_active_build_graph.py"
+    "db:check": "tsx scripts/verify_drizzle_schema.ts && tsx scripts/verify_d1_schema_authority.ts",
+    "verify": "pnpm lint && pnpm typecheck && pnpm db:check && pnpm test && pnpm build && python3 scripts/verify_active_build_graph.py"
   },
   "dependencies": {
     "@block65/webcrypto-web-push": "1.0.2",

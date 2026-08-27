@@ -10,6 +10,7 @@ import { listOfficialInjuryImportStates } from "../src/server/official-injuries/
 import { listPregameContextStates } from "../src/server/pregame-context/store";
 import { getConfidenceEngineHealth } from "../src/server/confidence-engine/store";
 import { readOnlyD1 } from "../src/server/read-only-d1";
+import { assertD1SchemaAuthority } from "../src/server/schema-authority";
 import {
   interimSchedulerContract,
   type InterimSchedulerLane
@@ -55,6 +56,17 @@ function json(payload: unknown, status = 200, headers?: HeadersInit): Response {
   });
 }
 
+const DATABASE_READ_PATHS = new Set([
+  "/api/nflverse",
+  "/api/confidence-engine",
+  "/api/decision-board",
+  "/api/weekly-slate",
+  "/api/props",
+  "/api/lines",
+  "/api/odds-automation",
+  "/api/game-context"
+]);
+
 async function handleNflverseRequest(request: Request, env: PublicDataEnv): Promise<Response> {
   if (request.method !== "GET") {
     return json({ error: "Public access is read-only" }, 405, { allow: "GET" });
@@ -79,6 +91,15 @@ const worker = {
     // HTTP method before routing and handle every public API path explicitly.
     if (request.method !== "GET" && request.method !== "HEAD") {
       return json({ error: "Public access is read-only" }, 405, { allow: "GET, HEAD" });
+    }
+    if (DATABASE_READ_PATHS.has(url.pathname)) {
+      try {
+        await assertD1SchemaAuthority(readDb);
+      } catch (error) {
+        return json({
+          error: error instanceof Error ? error.message : "D1 schema authority is unavailable"
+        }, 503);
+      }
     }
     // Keep automation control outside the framework router so cron, browser wakeups,
     // and production deployments all reach the same Cloudflare-bound D1 database.
@@ -201,6 +222,7 @@ const worker = {
     // this entrypoint can run only the provider-free qualification scheduler;
     // provider acquisition and model execution are absent from its source graph.
     if (readCaptureGate(env) !== "true") return;
+    await assertD1SchemaAuthority(readDatabaseBinding(env));
     const lane: InterimSchedulerLane | null =
       controller.cron === interimSchedulerContract.clock.dispatcherCron ? "dispatcher" :
         controller.cron === interimSchedulerContract.clock.watchdogCron ? "watchdog" : null;

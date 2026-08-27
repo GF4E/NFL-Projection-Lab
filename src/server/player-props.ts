@@ -18,6 +18,7 @@ import { stableHash } from "@/domain/hash";
 import { structuralConfig } from "@/domain/config";
 import { playerPropBoardMessage } from "@/domain/player-prop-status";
 import { getD1 } from "../../db";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 import {
   assertOddsCreditsAvailable,
   ODDS_CREDIT_ALERT,
@@ -131,35 +132,6 @@ interface PlayerAvailability {
   unavailablePlayers: string[];
 }
 
-const schema = [
-  `CREATE TABLE IF NOT EXISTS player_prop_quotes (
-    id text PRIMARY KEY NOT NULL, game_id text NOT NULL, event_id text NOT NULL, book text NOT NULL,
-    market text NOT NULL, player text NOT NULL, side text NOT NULL, point real NOT NULL,
-    american_price integer NOT NULL, captured_at text NOT NULL, source_hash text NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS player_prop_quotes_stage (
-    import_id text NOT NULL, id text NOT NULL, game_id text NOT NULL, event_id text NOT NULL, book text NOT NULL,
-    market text NOT NULL, player text NOT NULL, side text NOT NULL, point real NOT NULL,
-    american_price integer NOT NULL, captured_at text NOT NULL, source_hash text NOT NULL,
-    PRIMARY KEY (import_id, id)
-  )`,
-  `CREATE TABLE IF NOT EXISTS player_prop_quote_snapshots (
-    snapshot_key text NOT NULL, line_id text NOT NULL, game_id text NOT NULL, event_id text NOT NULL,
-    book text NOT NULL, market text NOT NULL, player text NOT NULL, side text NOT NULL,
-    point real NOT NULL, american_price integer NOT NULL, captured_at text NOT NULL,
-    source_hash text NOT NULL, fetched_at text NOT NULL,
-    PRIMARY KEY (snapshot_key, line_id)
-  )`,
-  `CREATE TABLE IF NOT EXISTS player_prop_scan_state (
-    game_id text PRIMARY KEY NOT NULL, event_id text, status text NOT NULL, last_checked_at text,
-    last_success_at text, quota_used integer, quota_remaining integer, quota_last_cost integer, message text
-  )`,
-  "CREATE INDEX IF NOT EXISTS idx_prop_quotes_game_book ON player_prop_quotes (game_id, book)",
-  "CREATE INDEX IF NOT EXISTS idx_prop_quotes_contract ON player_prop_quotes (game_id, market, player, point)",
-  "CREATE INDEX IF NOT EXISTS idx_prop_snapshots_game_time ON player_prop_quote_snapshots (game_id, fetched_at)",
-  "CREATE INDEX IF NOT EXISTS idx_prop_snapshots_line ON player_prop_quote_snapshots (line_id)",
-  "CREATE INDEX IF NOT EXISTS idx_prop_stage_import ON player_prop_quotes_stage (import_id)"
-] as const;
 
 function chunks<T>(values: readonly T[], size: number): T[][] {
   const output: T[][] = [];
@@ -168,7 +140,7 @@ function chunks<T>(values: readonly T[], size: number): T[][] {
 }
 
 export async function ensurePlayerPropStore(db: D1Database): Promise<void> {
-  await db.batch(schema.map((statement) => db.prepare(statement)));
+  await assertD1SchemaAuthority(db);
 }
 
 function mapQuote(row: QuoteRow): RawPropQuote {

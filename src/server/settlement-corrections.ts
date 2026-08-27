@@ -35,11 +35,6 @@ export async function correctStoredPlaySettlement(input: {
   const profitCents = correctedProfitCents(input.result, current.stake_cents, current.american_odds);
   const auditId = `${input.playId}:correction:${correctedAt}`;
   await input.db.batch([
-    input.db.prepare(`CREATE TABLE IF NOT EXISTS play_correction_audit (
-      id text PRIMARY KEY NOT NULL, play_id text NOT NULL, actor_id text NOT NULL,
-      reason text NOT NULL, before_result text NOT NULL, before_profit_cents integer NOT NULL,
-      after_result text NOT NULL, after_profit_cents integer NOT NULL, corrected_at text NOT NULL
-    )`),
     input.db.prepare(`INSERT INTO play_correction_audit
       (id, play_id, actor_id, reason, before_result, before_profit_cents,
        after_result, after_profit_cents, corrected_at)

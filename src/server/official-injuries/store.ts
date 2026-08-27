@@ -1,4 +1,5 @@
 import type { ParsedOfficialInjuryReport } from "./parser";
+import { assertD1SchemaAuthority } from "@/server/schema-authority";
 
 export type OfficialInjuryFreshness = "current" | "stale" | "running" | "unavailable";
 
@@ -28,64 +29,6 @@ interface StateRow {
   lease_expires_at: string | null;
 }
 
-const schema = [
-  `CREATE TABLE IF NOT EXISTS official_injury_import_state (
-    dataset text PRIMARY KEY NOT NULL,
-    freshness text NOT NULL,
-    source_url text NOT NULL,
-    source_tag text,
-    source_hash text,
-    row_count integer NOT NULL DEFAULT 0,
-    last_checked_at text,
-    last_success_at text,
-    last_error text,
-    lease_expires_at text
-  )`,
-  `CREATE TABLE IF NOT EXISTS official_injury_reports (
-    id text PRIMARY KEY NOT NULL,
-    season integer NOT NULL,
-    week integer NOT NULL,
-    game_id text NOT NULL,
-    team text NOT NULL,
-    player text NOT NULL,
-    position text,
-    injuries text,
-    practice_status text,
-    game_status text,
-    inactive integer,
-    source_url text NOT NULL,
-    source_timestamp text NOT NULL,
-    raw_snapshot_hash text NOT NULL,
-    imported_at text NOT NULL
-  )`,
-  `CREATE TABLE IF NOT EXISTS official_injury_reports_stage (
-    import_id text NOT NULL,
-    id text NOT NULL,
-    season integer NOT NULL,
-    week integer NOT NULL,
-    game_id text NOT NULL,
-    team text NOT NULL,
-    player text NOT NULL,
-    position text,
-    injuries text,
-    practice_status text,
-    game_status text,
-    source_url text NOT NULL,
-    source_timestamp text NOT NULL,
-    raw_snapshot_hash text NOT NULL,
-    PRIMARY KEY (import_id, id)
-  )`,
-  `CREATE TABLE IF NOT EXISTS game_context_alerts (
-    id text PRIMARY KEY NOT NULL,
-    dataset text NOT NULL,
-    message text NOT NULL,
-    created_at text NOT NULL,
-    resolved_at text
-  )`,
-  "CREATE INDEX IF NOT EXISTS idx_official_injuries_week ON official_injury_reports (season, week, game_id)",
-  "CREATE INDEX IF NOT EXISTS idx_official_injuries_team ON official_injury_reports (team, season, week)",
-  "CREATE INDEX IF NOT EXISTS idx_context_alerts_unresolved ON game_context_alerts (resolved_at, created_at)"
-] as const;
 
 function chunks<T>(values: readonly T[], size: number): T[][] {
   const output: T[][] = [];
@@ -109,7 +52,7 @@ function mapState(row: StateRow): OfficialInjuryImportState {
 }
 
 export async function ensureOfficialInjuryStore(db: D1Database): Promise<void> {
-  await db.batch(schema.map((statement) => db.prepare(statement)));
+  await assertD1SchemaAuthority(db);
 }
 
 export async function listOfficialInjuryImportStates(db: D1Database): Promise<OfficialInjuryImportState[]> {

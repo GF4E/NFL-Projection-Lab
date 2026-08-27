@@ -1,0 +1,402 @@
+{
+  "version": "d1-schema-authority.2026.1",
+  "status": "frozen_contract_not_qualified",
+  "frozenOn": "2026-08-27",
+  "workPackage": "OS-01",
+  "requirement": "ARC-03",
+  "baseCommit": "636c419777a09380fe38dce804e6df5c4e374110",
+  "scope": {
+    "executionAuthority": "ordered_sql_migrations",
+    "typedDeclaration": "db/schema.ts",
+    "physicalState": "cloudflare_d1",
+    "packageMayChange": [
+      "migration_contracts",
+      "migration_verifiers",
+      "schema_declarations",
+      "ordered_migrations",
+      "runtime_schema_guards"
+    ],
+    "packageMayNotChange": [
+      "statistical_models",
+      "research_status",
+      "forecast_values",
+      "interface",
+      "provider_credentials",
+      "capture_activation"
+    ]
+  },
+  "frozenBaseline": {
+    "journal": {
+      "path": ".planning/engine-os/execution/os-01/frozen-journal-through-0018.json",
+      "byteSha256": "d701dabe7625572abe24d69d330e9e9940adb0bd96a94dbc48b12cf1e212830d",
+      "activePath": "drizzle/meta/_journal.json",
+      "activeJournalPolicy": "archived_entries_must_be_an_exact_immutable_prefix_successors_may_append_only",
+      "dialect": "sqlite",
+      "journalVersion": "7",
+      "entryCount": 18
+    },
+    "orderedMigrations": [
+      {
+        "order": 0,
+        "path": "drizzle/0000_keen_red_shift.sql",
+        "byteSha256": "95d155204514f9acad8e06eaffdced88fc58d7a152d242f1694fd5cd4ed7668f"
+      },
+      {
+        "order": 1,
+        "path": "drizzle/0001_parched_hedge_knight.sql",
+        "byteSha256": "ba6a0602c62700a05637e331cfd918823fe17a16e0e37398aabac761ff6b4d47"
+      },
+      {
+        "order": 2,
+        "path": "drizzle/0002_watery_patriot.sql",
+        "byteSha256": "d604c66a3cf2ea5b7eaa2b97c5f0ff88aeab13adfce5abbf5bdc1c987f85bfd4"
+      },
+      {
+        "order": 3,
+        "path": "drizzle/0003_hesitant_bloodstorm.sql",
+        "byteSha256": "39e03dad4e9f4535a2e10e2da26be135d55e67b78a9498e7eee3d1d7ad2d4823"
+      },
+      {
+        "order": 4,
+        "path": "drizzle/0004_player_prop_decision_board.sql",
+        "byteSha256": "658662124f2180c96e3676bbacc4931e3f9561cb975d3a7f9ddd8b88bb6866f3"
+      },
+      {
+        "order": 5,
+        "path": "drizzle/0005_structured_contract_settlement.sql",
+        "byteSha256": "6f84a08bde4b1229bd2dbaa34063f7ec8a06db28f8d77beba3ca39fc9c6e4146"
+      },
+      {
+        "order": 6,
+        "path": "drizzle/0006_execution_tracking.sql",
+        "byteSha256": "a7163a21cde47d11da1bdcac7d5856d7f83641393c0dcb462fe70db5412c7009"
+      },
+      {
+        "order": 7,
+        "path": "drizzle/0008_play_forecast_provenance.sql",
+        "byteSha256": "5126c77eb8614211e131b63f178755e9e5829ec423bc4043870214d7860fa216"
+      },
+      {
+        "order": 8,
+        "path": "drizzle/0009_market_sentiment.sql",
+        "byteSha256": "5af41485ca67fed363738c968eaeaeba44bab9ba321436a3b9489dc3411ed100"
+      },
+      {
+        "order": 9,
+        "path": "drizzle/0010_confidence_engine.sql",
+        "byteSha256": "ebdbfc422aaab63c57271c21a40acf65e1a9400746514ade4250c543c6f1bc00"
+      },
+      {
+        "order": 10,
+        "path": "drizzle/0011_model_gate_evidence.sql",
+        "byteSha256": "b57e98b24b93f10bd52d6e1a2ab98668e8f5a0a2bf15743810fa06e80bca49bb"
+      },
+      {
+        "order": 11,
+        "path": "drizzle/0012_source_snapshot_timing.sql",
+        "byteSha256": "1e147eea83396253ec8ed41404dc81c393878b4971d13bd0c6500494cbc75812"
+      },
+      {
+        "order": 12,
+        "path": "drizzle/0013_engine_os_urgent.sql",
+        "byteSha256": "39d6695a24d1fdb66b70ab831af1bcc9e061e523080d9a07239aa3583e3c9df9"
+      },
+      {
+        "order": 13,
+        "path": "drizzle/0014_odds_quota_reservations.sql",
+        "byteSha256": "614147e88b73360636781ff826716f4db2b6f075136d175b5c70483cc33adab9"
+      },
+      {
+        "order": 14,
+        "path": "drizzle/0015_engine_os_origin_identity.sql",
+        "byteSha256": "96a161205f0d5966a337f47dc3a5ca662afb0dfe3dc1df29f07b6fe5fec7ea76"
+      },
+      {
+        "order": 15,
+        "path": "drizzle/0016_engine_os_interim_scheduler.sql",
+        "byteSha256": "c121be1514510dedb2b5b1f6caef2e61d9b5999afc1a2f61a3f7477df7f74930"
+      },
+      {
+        "order": 16,
+        "path": "drizzle/0017_engine_os_source_capture.sql",
+        "byteSha256": "5ab272cdd5fccc79664c1b3fcdcbc9ee451bb4e64a5afd2b3c5fd3a9692f3358"
+      },
+      {
+        "order": 17,
+        "path": "drizzle/0018_engine_os_forecast_ledger.sql",
+        "byteSha256": "356eabfa9ca55b821bab9e50c04321d04657d09483b64139e1b620e61d1272d2"
+      }
+    ],
+    "historyPolicy": {
+      "priorMigrationBytesMutable": false,
+      "priorJournalEntriesMutable": false,
+      "squashAllowed": false,
+      "renumberAllowed": false,
+      "retroactiveAppliedAtSynthesisAllowed": false,
+      "successorMigrationRequiresSuccessorContract": true,
+      "unknownMissingDuplicateReorderedOrHashChangedEntryBehavior": "abort_before_schema_write"
+    }
+  },
+  "supportedPrestates": [
+    {
+      "id": "blank_ordered_chain",
+      "qualificationOnly": true,
+      "precondition": "no_noninternal_schema_objects",
+      "action": "apply_the_exact_frozen_ordered_chain",
+      "onMismatch": "abort"
+    },
+    {
+      "id": "exact_production_census",
+      "qualificationOnly": false,
+      "precondition": "read_only_semantic_census_and_row_preservation_manifest_exactly_match_the_migration_plan_prestate",
+      "censusArtifactStatus": "required_not_yet_recorded",
+      "finalSchemaFingerprintStatus": "not_computed",
+      "action": "apply_only_a_successor_forward_migration_qualified_against_this_exact_census",
+      "onMismatch": "abort_without_repair_or_schema_write"
+    }
+  ],
+  "acceptedProductionFoundation": {
+    "authorityReceiptPath": ".planning/engine-os/execution/os-15a/production-foundation-direct-audit-receipt.v1.json",
+    "authorityReceiptByteSha256": "157f8ee4a41737df1de3f9bb6ed3cd690e66af1209e674ce49ba653c5902da4c",
+    "schemaFingerprint": "sha256:353b1ad01eb414389d895b70ef58ccf56d2aeae4ca5fa4081d044d0e1fa2f88a",
+    "schemaObjectCounts": {
+      "tables": 8,
+      "indexes": 4,
+      "appendOnlyTriggers": 8
+    },
+    "foreignKeyViolationCount": 0,
+    "preservedReceipts": [
+      {
+        "version": "0013_engine_os_urgent",
+        "migrationHash": "sha256:6205a3dfe09c2d663bb8c50378f295accd266ff2b2018668ca5353436a6797bb"
+      },
+      {
+        "version": "0014_odds_quota_reservations",
+        "migrationHash": "sha256:91bc1571f8873ccaeb8a2b8a9a8c2425370b4eec3c0931f1fa3ae02ffae56da1"
+      },
+      {
+        "version": "0015_engine_os_origin_identity",
+        "migrationHash": "sha256:622fb472f959273563f3dd139b7dde676e27b370a52c0241d6ee4d3726e3444a"
+      },
+      {
+        "version": "0016_engine_os_interim_scheduler",
+        "migrationHash": "sha256:bad6665a2976440b108e1c0223d01dab3a0313283b8d2e08f0eb509ef57edcb2"
+      }
+    ],
+    "quotaBootstrap": {
+      "used": 38,
+      "remaining": 462,
+      "outstandingReservations": 0,
+      "reservationEvents": 0
+    },
+    "preservationRule": "receipt_rows_object_definitions_append_only_guards_and_all_existing_rows_must_remain_unchanged"
+  },
+  "semanticManifest": {
+    "executionProjection": "blank_database_after_exact_ordered_migration_replay",
+    "typedProjection": "all_tables_exported_by_db_schema_ts",
+    "productionProjection": "read_only_exact_production_census",
+    "finalPhysicalManifestStatus": "not_generated",
+    "finalPhysicalSchemaFingerprintStatus": "not_computed",
+    "hashAlgorithm": "sha256",
+    "serialization": "stable_utf8_json_sorted_keys_no_insignificant_whitespace",
+    "objectOrdering": "type_then_name",
+    "tableIntrospection": [
+      "pragma_table_list",
+      "pragma_table_xinfo",
+      "pragma_foreign_key_list",
+      "pragma_index_list",
+      "pragma_index_xinfo"
+    ],
+    "tableFields": [
+      "name",
+      "strict",
+      "without_rowid",
+      "column_ordinal",
+      "column_name",
+      "declared_type",
+      "affinity",
+      "not_null",
+      "default_expression",
+      "primary_key_ordinal",
+      "hidden_or_generated_state",
+      "unique_constraints",
+      "check_expressions",
+      "generated_expressions",
+      "foreign_keys_and_actions"
+    ],
+    "indexFields": [
+      "name",
+      "table",
+      "unique",
+      "origin",
+      "partial",
+      "ordered_key_columns_or_expressions",
+      "collation",
+      "descending",
+      "where_expression"
+    ],
+    "triggerAndViewFields": [
+      "type",
+      "name",
+      "table",
+      "timing",
+      "event",
+      "when_expression",
+      "body_or_select_ast"
+    ],
+    "sqlNormalization": {
+      "method": "sqlite_parser_ast_or_equivalent_token_stream",
+      "whitespaceOrQuoteStyleSemantic": false,
+      "regexParsingNestedExpressionsAllowed": false,
+      "preserveCheckGeneratedDeferrablePartialIndexAndTriggerSemantics": true
+    },
+    "explicitInternalObjectExclusions": {
+      "exactNames": [
+        "_cf_KV",
+        "d1_migrations",
+        "sqlite_sequence",
+        "sqlite_stat1",
+        "sqlite_stat4"
+      ],
+      "prefixes": [
+        "sqlite_autoindex_"
+      ],
+      "unknownObjectBehavior": "drift_failure"
+    },
+    "parityRules": {
+      "migrationProjectionMustEqualFinalPhysicalManifest": true,
+      "typedProjectionMustCoverEveryApplicationTable": true,
+      "productionProjectionMustEqualQualifiedPrestateBeforeWrite": true,
+      "postMigrationProductionProjectionMustEqualFinalPhysicalManifest": true,
+      "missingOrExtraApplicationObjectAllowed": false,
+      "perObjectHashesRequired": true,
+      "aggregateHashRequired": true
+    }
+  },
+  "runtimeDdlPolicy": {
+    "mode": "fail_closed",
+    "forbiddenOperations": [
+      "CREATE",
+      "ALTER",
+      "DROP",
+      "TRUNCATE",
+      "PRAGMA_WRITE",
+      "VACUUM",
+      "REINDEX",
+      "ATTACH",
+      "DETACH"
+    ],
+    "deployableSourceScopes": [
+      "src/**",
+      "worker/**"
+    ],
+    "builtOutputScopes": [
+      ".worker-next/**",
+      ".open-next/**",
+      ".vercel/output/**",
+      "dist/**"
+    ],
+    "allowedDdlLocations": [
+      "drizzle/*.sql",
+      "drizzle/rollback/*.sql",
+      "tests/**",
+      "isolated_offline_os01_migration_verifier"
+    ],
+    "runtimeSchemaCheck": {
+      "operation": "select_only_terminal_version_and_hash_assertion",
+      "missingOldUnknownOrMismatchedSchemaBehavior": "fail_without_write",
+      "runtimeRepairAllowed": false,
+      "publicReadMayWrite": false
+    },
+    "deployableGraphMayImportMigrationSql": false,
+    "initializerMayCreateAlterDropOrRepairSchema": false
+  },
+  "driftAndNegativeControls": {
+    "requiredSemanticDriftFailures": [
+      "missing_migration",
+      "reordered_migration",
+      "duplicate_migration",
+      "unknown_migration",
+      "historical_byte_change",
+      "journal_hash_change",
+      "extra_or_missing_table",
+      "extra_or_missing_or_renamed_column",
+      "changed_type_default_nullability_primary_key_unique_or_check",
+      "changed_foreign_key_action",
+      "changed_index_order_predicate_collation_or_direction",
+      "changed_trigger_when_or_body",
+      "changed_strict_without_rowid_or_generated_expression",
+      "partial_apply_or_unknown_receipt",
+      "accepted_foundation_receipt_or_object_mutation",
+      "runtime_ddl_in_source_or_built_output"
+    ],
+    "requiredEquivalencePasses": [
+      "insignificant_sql_whitespace",
+      "equivalent_identifier_quoting"
+    ],
+    "failedMigrationBehavior": "atomic_no_partial_objects_no_success_receipt",
+    "runtimeAgainstBlankOldOrDriftedDatabase": "fail_without_write",
+    "populatedDownMigrationBehavior": "refuse",
+    "unknownProductionObjectBehavior": "block"
+  },
+  "recovery": {
+    "operatingContractPath": "config/engine-operating-contract.v1.json",
+    "operatingContractByteSha256": "f1691e0c39237a5397b79a81c004cfd6801808a5a946b89c28dea0ce5c9d7f5d",
+    "d1MetadataRpoSeconds": 900,
+    "serviceRtoSeconds": 14400,
+    "d1BackupFrequencySeconds": 21600,
+    "restoreDrillFrequencyDays": 30,
+    "recoverableBackupRetentionDays": 35,
+    "productionMigrationMode": "forward_only",
+    "downMigrationScope": "empty_isolated_qualification_only",
+    "preMigrationSnapshotRequired": true,
+    "restoreMustVerify": [
+      "semantic_schema_fingerprint",
+      "per_object_hashes",
+      "row_counts_and_content_hashes",
+      "migration_receipts",
+      "foreign_key_check",
+      "accepted_foundation"
+    ],
+    "tableRebuildProtocol": "transactional_shadow_copy_validate_rows_hashes_constraints_then_swap",
+    "mismatchBehavior": "abort_before_destructive_action",
+    "r2MutationAllowed": false
+  },
+  "providerAndActivationBoundary": {
+    "providerSecretAccessAllowed": false,
+    "providerDispatchAllowed": false,
+    "quotaReservationAllowed": false,
+    "captureActivationAllowed": false,
+    "productionForecastChangeAllowed": false,
+    "expectedProviderCalls": 0,
+    "expectedQuotaReservations": 0,
+    "engineOsCaptureEnabledMustRemainAbsent": true
+  },
+  "qualification": {
+    "requiredPlanes": [
+      "local_blank_replay",
+      "isolated_hosted_blank_replay",
+      "production_read_only_preflight",
+      "production_dormant_forward_migration",
+      "runtime_without_ddl",
+      "post_migration_semantic_parity",
+      "backup_restore_drill",
+      "independent_acceptance_audit"
+    ],
+    "allowedResults": [
+      "accepted",
+      "rejected",
+      "blocked"
+    ],
+    "currentResult": "not_run",
+    "os01Accepted": false,
+    "arc03Accepted": false,
+    "contractFreezeIsAcceptanceEvidence": false,
+    "mechanismOnlyProofMayClaimArc03": false,
+    "finalSchemaFingerprintRecorded": false,
+    "productionCensusRecorded": false,
+    "productionMigrationApplied": false,
+    "runtimeDdlRemoved": false,
+    "claimBoundary": "This file freezes the OS-01 acceptance contract only. It does not qualify or deploy a migration, record a final schema fingerprint, accept ARC-03, activate capture, call a provider, or change a forecast."
+  }
+}
