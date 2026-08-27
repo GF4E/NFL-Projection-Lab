@@ -46,6 +46,7 @@ Status notation:
 - [ ] **LED-02 — Separate market and comparison ledgers.** Exact quotes are immutable evidence and football-versus-market comparisons are derived artifacts, never overwrites.
 - [ ] **LED-03 — Complete pre-kickoff archive.** Every scheduled game and required horizon has a timestamped forecast or an explicit withholding record before kickoff.
   - OS-15A contribution: the dormant provider-free scheduler can produce exactly one timely qualification-only withholding for each of the five OS-02A horizons under duplicate, overlap, lease-loss, reschedule, and missed-tick tests. The requirement remains open until OS-13A proves complete activated production coverage with immutable provenance.
+  - Rejected OS-13A attempt: the 2026-08-27 run stopped before implementation after a credential-boundary violation in an independent audit. It contributes no evidence toward LED-03.
 - [ ] **LED-04 — Correction-safe settlement.** Regulation scores, overtime, pushes, voids, source corrections, and grading changes retain append-only lineage.
 - [ ] **LED-05 — All-game evaluation is authoritative.** Model quality is measured on all eligible forecasts, not site selections or human adjustments.
 - [ ] **LED-06 — Prospective 2026 confirmation stream.** Every activated 2026 shadow forecast is stored before kickoff under a frozen package and scored without retroactive replacement; activation after Week 1 is labeled partial-season shadow evidence and is never backfilled or called full-season confirmation.
@@ -106,6 +107,7 @@ Status notation:
 - [ ] **OPS-05 — Monitoring without silent adaptation.** Freshness, schema, latency, quota, calibration, coverage, drift, job, and package failures create observable alerts and never trigger unlogged retuning.
 - [ ] **OPS-06 — Recovery qualification.** Backup, restore, rollback, provider-outage, stale-source, corrupt-object, partial-import, and degraded-model drills pass before release.
 - [ ] **OPS-07 — Public security and licensing.** Secrets are rotated and scanned, personal access and pick state are removed, routes are least-privilege, and every published dataset and logo has a documented usage basis.
+  - OS-13A incident: a read-only audit accessed the dormant provider credential through an overbroad environment inventory. No provider request, quota mutation, repository secret write, or activation occurred, but the credential must be rotated and the clean successor must prohibit environment-secret access in delegated audits.
 - [ ] **OPS-08 — Cost and capacity controls.** Storage, compute, egress, provider quota, and schedule simulations have budgets, alerts, throttling rules, and an essential-work reserve.
 - [ ] **OPS-09 — Reproducible public repository.** A clean clone can migrate, test, replay a fixture, verify preserved artifacts, and build the engine from documented locked dependencies.
 - [ ] **OPS-10 — Separate readiness gate.** Scientific promotion, operational qualification, and public-serving release are independent decisions; passing one never implies the others.

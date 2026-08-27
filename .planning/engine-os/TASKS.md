@@ -14,8 +14,8 @@ This is the execution register. A work package is complete only when its accepta
 ## Immediate execution queue
 
 1. Preserve accepted **OS-00**, frozen **OS-00B**, terminal R1-v1, frozen **R0**, and deployed **OS-01A** evidence.
-2. Preserve the accepted bounded provider-independent storage-mechanism slice of **OS-03A** and execute **OS-13A** next.
-3. Finish **OS-18A** provider authentication and final scans; complete R1-v2's independent human review on its separate research lane.
+2. Preserve the accepted bounded provider-independent storage-mechanism slice of **OS-03A**. Rotate the dormant provider credential exposed to the rejected OS-13A pre-implementation audit, then restart **OS-13A** from the accepted base.
+3. Finish **OS-18A** provider authentication and final scans only after the replacement credential is restaged without repository or transcript exposure; complete R1-v2's independent human review on its separate research lane.
 4. **OS-19A**, **OS-02A**, bounded provider-free **OS-15A**, and the provider-independent OS-03A storage mechanism are accepted. Finish **OS-13A** and the remaining OS-18A gates before authenticated capture. Full OS-01/OS-02/OS-03 proceed behind them.
 5. **R2** may execute only the Module 2B residual-kernel falsification and only after R1-v2 passes, followed by **R3**.
 6. Continue the platform spine through **OS-14** regardless of whether the possession branch survives.
@@ -344,7 +344,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-13A — Start the append-only forecast-or-withheld ledger
 
-**Status:** NEXT; bounded provider-independent OS-03A storage and scheduler dependency OS-15A are accepted
+**Status:** BLOCKED pending credential rotation and a clean successor attempt; bounded provider-independent OS-03A storage and scheduler dependency OS-15A remain accepted
 
 **Requirement contribution:** LED-01, LED-03, LED-06
 
@@ -355,6 +355,8 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 **Deliverables:** Minimal append-only rows for game, origin, generated-at time, `forecast | withheld`, enumerated withholding reason, capture health, activation boundary, package-scoped qualification key, and immutable R2 output pointer. A `forecast` requires non-null runner/code, model or package, configuration, input-manifest, feature/target schema, and output-object hashes. Missing provenance produces `withheld:provenance_incomplete`. A later job cannot backfill a pre-kickoff claim.
 
 **Acceptance gate:** Every activated origin produces a pre-kickoff record or a contemporaneous withholding such as `no_eligible_package`; a forecast with any null or mismatched provenance field is rejected into withholding; its output pointer resolves to matching immutable bytes; records after kickoff are marked late and excluded; starting after Week 1 is labeled partial-season shadow evidence; no odds state can block the write.
+
+**Rejected attempt:** `.planning/engine-os/execution/os-13a/rejected-attempt-receipt.v1.json` records that the 2026-08-27 attempt stopped before contract freeze or implementation because an independent audit accessed the dormant provider credential through an overbroad environment inventory. No provider call, quota reservation, code change, migration, or activation occurred. The attempt supplies no OS-13A acceptance evidence and may not be resumed; a successor starts from the accepted base after credential rotation.
 
 #### OS-13B — Integrate verified packages and full distributions
 
