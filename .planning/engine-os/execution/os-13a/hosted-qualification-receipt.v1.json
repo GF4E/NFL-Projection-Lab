@@ -1,0 +1,126 @@
+{
+  "schemaVersion": "engine-os.os-13a-hosted-qualification-receipt.v1",
+  "generatedAt": "2026-08-27T09:03:49Z",
+  "status": "accepted_bounded_mechanism_only",
+  "scope": "Provider-independent hosted qualification of append-only OS-13A D1/R2 ledger storage, deterministic concurrency, lease fencing, exact-byte publication and recovery, corruption refusal, and empty-only rollback. This is synthetic qualification evidence, not a production or prospective scientific stream.",
+  "project": {
+    "projectId": "appgprj_6a8ffac59dfc81918bb92065b2c08e5e",
+    "slug": "nfl-os13a-proof-b-20260827",
+    "url": "https://nfl-os13a-proof-b-20260827.psoiawesome.chatgpt.site",
+    "distinctFromProductionProjectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+    "accessMode": "custom",
+    "ownerOnly": true,
+    "allowedAccountUsers": 1,
+    "allowedGroups": 0,
+    "externalVisitors": 0,
+    "anonymousPostStatus": 401,
+    "environmentRevision": 0,
+    "environmentEntries": 0
+  },
+  "source": {
+    "cleanSuccessorCommit": "02f1931fa8c3dc90c1d14bc1ebcaa269c7074990",
+    "mainImplementationCommit": "a61ae235b9962dea3f476baf6406fa10de864d7a",
+    "mainHardeningCommit": "97924bc6489807a534f8922022c4e4cc97453442",
+    "hardenedRuntimeByteIdenticalToMain": true,
+    "hardenedMigrationByteIdenticalToMain": true,
+    "versionId": "appgprj_6a8ffac59dfc81918bb92065b2c08e5e~appgver_65c01ac450c081918383dcfc44266184",
+    "versionNumber": 1,
+    "deploymentId": "appgdep_6a8ffaff8ba0819196aacb1391bd04db",
+    "deploymentStatus": "succeeded",
+    "archiveContentHash": "sha256:bc6b5a1345fd88ad17c00f0b732da92bd2125f3eb66e8f77fd5b88f16d30e273",
+    "archiveSizeBytes": 3348480,
+    "archiveFileCount": 40,
+    "localArchiveSha256": "8207cfc35882241e7f0566c9b17618ba297dc4a687091fc5443ab0dde8fd9971"
+  },
+  "runtimeBoundary": {
+    "workerModuleCount": 25,
+    "workerHasOnlyD1AndR2Bindings": true,
+    "workerHasNoProviderBinding": true,
+    "workerHasNoProviderImport": true,
+    "workerHasNoCronTrigger": true,
+    "workerHasNoServiceBinding": true,
+    "workerHasNoQueueBinding": true,
+    "workerHasNoProductionSchedulerPath": true,
+    "captureEnabled": false,
+    "providerBindingReads": 0,
+    "providerDispatches": 0,
+    "quotaReservations": 0
+  },
+  "migrationRows": {
+    "0013_engine_os_urgent": "sha256:6205a3dfe09c2d663bb8c50378f295accd266ff2b2018668ca5353436a6797bb",
+    "0015_engine_os_origin_identity": "sha256:622fb472f959273563f3dd139b7dde676e27b370a52c0241d6ee4d3726e3444a",
+    "0018_engine_os_forecast_ledger": "sha256:851f66b3ad07afe61be346b09f853875e675d25512f989b0f4337f6c64a1c293"
+  },
+  "phaseReceipts": {
+    "bootstrap": "e10098e10946e15892bf65f79aa7d3e7795d5b10c078187faef1fc478cd84ded",
+    "setup_plan": "af65c8f207c0981fa45f69f906d0e94cc7112728ebeb05a57bf8adea0b613799",
+    "setup": "ff0bb42594141ffe4b64706dd64d25510075fcccc479b2d4add04193f9643c81",
+    "partial": "c2e1dafe4bd27a6680e815c3e07e15009a9db939d1fde64e74772aeba0ad244f",
+    "execute": "4f67c5696d3ce1d4cfb87740e14af6df7572899070300fddb1dff61dabd80a90",
+    "verify": "0dd7231c8cf9d4c1125b3c7fc1d99a9278c23a9660ffd2122f89241c67ebce4f"
+  },
+  "qualifiedBehavior": {
+    "horizonIdentities": [
+      "weekly_tuesday_0730",
+      "kickoff_minus_120",
+      "kickoff_minus_90",
+      "kickoff_minus_60",
+      "kickoff_minus_15"
+    ],
+    "weeklyTimingScope": "synthetic_horizon_identity_only",
+    "qualifications": 2,
+    "activations": 2,
+    "jobs": 10,
+    "completedJobs": 10,
+    "attempts": 11,
+    "leaseReclaims": 1,
+    "events": 35,
+    "terminalRecords": 10,
+    "forecastFixtureRecords": 5,
+    "withheldNoEligiblePackageRecords": 5,
+    "exactBytesRecovered": 5,
+    "forecastObjectSizeBytes": 167,
+    "duplicateCallsConverged": 10,
+    "overlapWinnerCount": 1,
+    "publicationOverlapPairs": 2,
+    "corruptionRejected": true,
+    "corruptionRestoredToExactBytes": true,
+    "nonemptyRollbackRefused": true,
+    "emptyOnlyRollbackPassedBeforeEvidence": true,
+    "r2PublishedAndVerifiedBeforeD1Pointer": true
+  },
+  "independentAudits": [
+    {
+      "role": "hosted_integration_audit",
+      "status": "accepted_bounded",
+      "verifiedLiveD1Rows": true,
+      "verifiedOwnerOnlyAccess": true,
+      "verifiedDeploymentAndArchive": true
+    },
+    {
+      "role": "post_proof_adversarial_audit",
+      "status": "accepted_bounded",
+      "foundMechanismBlocker": false,
+      "verifiedCoreByteIdentity": true
+    }
+  ],
+  "cleanup": {
+    "stagingRetiredToInertTombstone": false,
+    "stagingPhysicallyDeleted": false,
+    "disposition": "pending_after_receipt_and_final_validation"
+  },
+  "explicitExclusions": [
+    "production activation",
+    "actual 2026 origin coverage",
+    "prospective scientific evidence",
+    "canonical Tuesday-clock hosted timing",
+    "portable-package qualification or execution",
+    "OS-13B",
+    "full OS-13",
+    "LED-01 completion",
+    "LED-03 completion",
+    "LED-06 completion",
+    "authenticated provider acquisition",
+    "production forecast serving"
+  ]
+}

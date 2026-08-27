@@ -14,13 +14,14 @@ This is the execution register. A work package is complete only when its accepta
 ## Immediate execution queue
 
 1. Preserve accepted **OS-00**, frozen **OS-00B**, terminal R1-v1, frozen **R0**, and deployed **OS-01A** evidence.
-2. Preserve the accepted bounded provider-independent storage-mechanism slice of **OS-03A**. Rotate the dormant provider credential exposed to the rejected OS-13A pre-implementation audit, then restart **OS-13A** from the accepted base.
-3. Finish **OS-18A** provider authentication and final scans only after the replacement credential is restaged without repository or transcript exposure; complete R1-v2's independent human review on its separate research lane.
-4. **OS-19A**, **OS-02A**, bounded provider-free **OS-15A**, and the provider-independent OS-03A storage mechanism are accepted. Finish **OS-13A** and the remaining OS-18A gates before authenticated capture. Full OS-01/OS-02/OS-03 proceed behind them.
-5. **R2** may execute only the Module 2B residual-kernel falsification and only after R1-v2 passes, followed by **R3**.
-6. Continue the platform spine through **OS-14** regardless of whether the possession branch survives.
-7. Start **R4 through R12** only for the decomposition branch authorized by R3; use **R3A** or **R3B** for the other branches.
-8. Start **R16 and R17** only after R13 returns `shadow_eligible`; exact quote acquisition remains disabled until OS-13A, the live OS-03A connector slice, and provider-authentication gates pass and is not deferred to R16.
+2. Preserve the accepted bounded provider-independent **OS-03A** storage mechanism and the accepted bounded **OS-13A** append-only ledger mechanism. Neither starts a production or prospective stream.
+3. Execute **OS-01** next under the provider-free boundary, then continue the platform dependency spine through full OS-02/OS-03 where no provider authentication is required.
+4. Finish **OS-18A** credential rotation, provider authentication, and final scans only in a separately authorized secret-handling run; complete R1-v2's independent human review on its separate research lane.
+5. **OS-19A**, **OS-02A**, bounded provider-free **OS-15A**, bounded provider-independent **OS-03A**, and bounded mechanism-only **OS-13A** are accepted. The remaining OS-18A and live-connector gates still block authenticated capture and production activation.
+6. **R2** may execute only the Module 2B residual-kernel falsification and only after R1-v2 passes, followed by **R3**.
+7. Continue the platform spine through **OS-14** regardless of whether the possession branch survives.
+8. Start **R4 through R12** only for the decomposition branch authorized by R3; use **R3A** or **R3B** for the other branches.
+9. Start **R16 and R17** only after R13 returns `shadow_eligible`; exact quote acquisition remains disabled until the live OS-03A connector slice and provider-authentication gates pass and is not deferred to R16.
 
 ## Primary requirement ownership
 
@@ -344,7 +345,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-13A — Start the append-only forecast-or-withheld ledger
 
-**Status:** BLOCKED pending credential rotation and a clean successor attempt; bounded provider-independent OS-03A storage and scheduler dependency OS-15A remain accepted
+**Status:** ACCEPTED — bounded provider-independent ledger mechanism only; production activation and complete prospective coverage remain open
 
 **Requirement contribution:** LED-01, LED-03, LED-06
 
@@ -356,7 +357,11 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 **Acceptance gate:** Every activated origin produces a pre-kickoff record or a contemporaneous withholding such as `no_eligible_package`; a forecast with any null or mismatched provenance field is rejected into withholding; its output pointer resolves to matching immutable bytes; records after kickoff are marked late and excluded; starting after Week 1 is labeled partial-season shadow evidence; no odds state can block the write.
 
-**Rejected attempt:** `.planning/engine-os/execution/os-13a/rejected-attempt-receipt.v1.json` records that the 2026-08-27 attempt stopped before contract freeze or implementation because an independent audit accessed the dormant provider credential through an overbroad environment inventory. No provider call, quota reservation, code change, migration, or activation occurred. The attempt supplies no OS-13A acceptance evidence and may not be resumed; a successor starts from the accepted base after credential rotation.
+**Rejected attempt:** `.planning/engine-os/execution/os-13a/rejected-attempt-receipt.v1.json` records that the 2026-08-27 attempt stopped before contract freeze or implementation because an independent audit accessed the dormant provider credential through an overbroad environment inventory. No provider call, quota reservation, code change, migration, or activation occurred. The attempt supplies no OS-13A acceptance evidence and may not be resumed. The clean successor started separately from commit `9747d5c` under a stricter no-secret boundary; its evidence is independent of the rejected attempt.
+
+**Clean-successor evidence:** `.planning/engine-os/execution/os-13a/hosted-qualification-receipt.v1.json` binds commits `a61ae235` and `97924bc6`, migration 0018, exact local artifact hashes, the clean owner-only hosted source/deployment, six append-only phase receipts, 11 attempts with one fenced reclaim, and 10 terminal fixture records split into five verified forecasts and five `withheld:no_eligible_package` records across all five horizon identities. Independent hosted and adversarial audits passed. The predecessor hosted environment is separately preserved as rejected non-evidence.
+
+**Scope boundary:** This accepts the dormant ledger storage/concurrency mechanism only. It does not accept production activation, actual-season completeness, prospective scientific evidence, canonical Tuesday hosted timing, a portable package, OS-13B, full OS-13, LED-01, LED-03, LED-06, authenticated acquisition, or forecast serving.
 
 #### OS-13B — Integrate verified packages and full distributions
 
@@ -416,7 +421,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 **Acceptance evidence:** `.planning/engine-os/execution/os-15a/acceptance-receipt.v1.json`, `sites-staging-proof-receipt.v1.json`, and `production-foundation-direct-audit-receipt.v1.json` bind the frozen v5 scheduler and cutover contracts to all five current OS-02A heads, distinct scheduled/invocation/evidence/persistence clocks, unique attempts, fenced renewable leases, strict deadline exclusion, duplicate and externally overlapping invocation convergence, bounded watchdog recovery, reschedule and unresolved-schedule cases, and qualification-only withholding on isolated owner-only D1. Production migration 0016 is deployed with empty scheduler tables, no activation, capture disabled, zero provider calls, and unchanged 38-used/462-remaining quota. A guarded direct-D1 audit also verified the accepted foundation objects and bootstrap after the bounded database-viewer projection proved stale; it made no repair or data mutation.
 
-**Scope boundary:** This accepts OS-15A only. The bounded provider-independent OS-03A storage mechanism is separately accepted, but neither package accepts OS-13A, LED-03, OPS-01, OPS-03, full OS-15, prospective capture, provider dispatch, authenticated OS-19A integration, or a model package. OS-13A is the exact next platform task.
+**Scope boundary:** This accepts OS-15A only. Bounded provider-independent OS-03A storage and bounded mechanism-only OS-13A are separately accepted, but none accepts LED-03, OPS-01, OPS-03, full OS-15, prospective capture, provider dispatch, authenticated integration, or a model package. Full OS-01 is the next provider-free platform dependency.
 
 ### OS-16 — Add chaos, backup, restore, and rollback qualification
 

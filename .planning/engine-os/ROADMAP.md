@@ -36,10 +36,10 @@ Phase numbers describe capability layers, not a forced serial queue. Secret-reda
 
 | Phase | Status | Primary task set | Exit decision |
 |---|---|---|---|
-| 1 | In progress: OS-00 accepted; ARC-03 and OS-18A remain open; dormant provider credential rotation is required after the rejected OS-13A pre-implementation audit | OS-00, OS-00B, OS-01A/OS-01, OS-18A, R0, R18A | One authoritative, preserved, numerically governed engine kernel |
+| 1 | In progress: OS-00 accepted; ARC-03 and OS-18A remain open; OS-01 is the next provider-free platform package | OS-00, OS-00B, OS-01A/OS-01, OS-18A, R0, R18A | One authoritative, preserved, numerically governed engine kernel |
 | 2 | OS-02A and OS-19A accepted; bounded provider-independent OS-03A storage qualified; live capture and full canonicalization still queued | OS-02A, OS-03A, OS-19A, OS-02–OS-08, R1 | Replayable point-in-time evidence and verified targets |
 | 3 | Queued | OS-09–OS-12 | Deterministic experiment and portable model packages |
-| 4 | OS-15A accepted; the first OS-13A attempt was rejected before implementation and must restart cleanly after credential rotation; full integration queued | OS-15A, OS-13A, OS-13B, OS-14 | Independent prospective ledgers and all-game grading |
+| 4 | OS-15A accepted; the clean OS-13A successor accepts only the dormant append-only ledger mechanism; production activation, OS-13B, complete coverage, and grading remain queued | OS-15A, OS-13A, OS-13B, OS-14 | Independent prospective ledgers and all-game grading |
 | 5 | Blocked: R1-v1 terminal `protocol_invalid`; R1-v2 awaiting human review | Complete R1-v2, then R2 and R3 only on a verified pass | Continue possessions, redesign target, or kill branch |
 | 6 | Blocked by R3 branch | R3A or R3B, or R4–R12 | Selected architecture produces accepted modules/candidate or rejection |
 | 7 | Blocked by selected architecture | R13 | Frozen football-only engine or `reject_all` |
@@ -80,7 +80,7 @@ Phase numbers describe capability layers, not a forced serial queue. Secret-reda
 
 **Plans:**
 
-1. Preserve the accepted bounded provider-independent OS-03A storage mechanism. Execute OS-13A next; live non-market connectors, authenticated quote capture, full OS-03A, and prospective activation still wait for OS-13A and the remaining OS-18A provider-authentication gate.
+1. Preserve the accepted bounded provider-independent OS-03A storage mechanism and the bounded mechanism-only OS-13A ledger. Live non-market connectors, authenticated quote capture, full OS-03A, and prospective activation still wait for full platform integration and the remaining OS-18A provider-authentication gate.
 2. Preserve accepted OS-02A after OS-01A, then complete OS-02 and OS-03 in parallel to establish full temporal identities and canonical raw-object manifests; source bytes are preserved before identity resolution.
 3. Execute OS-04 and OS-05 to route each provider through one connector, validation, quarantine, and atomic publication contract.
 4. Execute OS-06, OS-07, and OS-08 to reconstruct as-of views, register definitions, and produce origin-keyed offline and online rows.
@@ -127,7 +127,7 @@ Phase numbers describe capability layers, not a forced serial queue. Secret-reda
 
 **Plans:**
 
-1. Preserve accepted OS-15A and the bounded provider-independent OS-03A storage mechanism. Rotate the credential exposed to the rejected pre-implementation audit, then restart OS-13A from a clean base; record every activated origin as a provenance-complete pre-kickoff forecast or contemporaneous withholding, never as a late backfill.
+1. Preserve accepted OS-15A, bounded provider-independent OS-03A storage, and the bounded mechanism-only clean OS-13A successor. Production activation must later prove every actual origin as a provenance-complete pre-kickoff forecast or contemporaneous withholding, never as a late backfill.
 2. Execute OS-13B after OS-12 to bind verified packages, point-in-time inputs, large distributions, market evidence, and comparisons without rewriting OS-13A history.
 3. Execute OS-14 to settle regulation and overtime outcomes with correction lineage and score all eligible forecasts.
 
@@ -263,7 +263,7 @@ Phase numbers describe capability layers, not a forced serial queue. Secret-reda
 
 **Plans:**
 
-1. Preserve the accepted provider-free OS-15A scheduler boundary, qualify OS-03A and OS-13A before activation, then execute OS-15 to import interim state without replay and replace overlapping schedulers with one durable DAG.
+1. Preserve the accepted provider-free OS-15A scheduler boundary and bounded OS-03A/OS-13A mechanisms; finish their live integration gates before activation, then execute OS-15 to import interim state without replay and replace overlapping schedulers with one durable DAG.
 2. Execute OS-16 and OS-17 for chaos, backup, restore, rollback, freshness, calibration, coverage, drift, quota, and package monitoring; execute OS-16B after OS-20 to prove serving-layer recovery.
 3. Complete OS-18B and OS-19 after the urgent OS-18A rotation to harden public routes, document data rights, remove personal state, and enforce frozen capacity budgets.
 4. Execute OS-20 to publish one atomic, versioned, cacheable read model consumed by the site.

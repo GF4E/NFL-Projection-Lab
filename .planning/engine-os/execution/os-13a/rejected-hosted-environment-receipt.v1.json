@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "engine-os.os-13a-rejected-hosted-environment-receipt.v1",
+  "generatedAt": "2026-08-27T09:03:49Z",
+  "status": "rejected_non_evidence",
+  "project": {
+    "projectId": "appgprj_6a8ff875ab64819189ca828ae3509622",
+    "slug": "nfl-os13a-proof-20260827",
+    "distinctFromProduction": true
+  },
+  "reason": "The first deployment's automatic migration package failed before the qualification route because engine_schema_versions was absent. A successor deployment then encountered the inherited partial schema and failed owner bootstrap because game_schedule_revisions already existed. The environment was not repaired or reused as acceptance evidence.",
+  "observedFailures": [
+    "automatic_migration_package_missing_engine_schema_versions",
+    "partial_schema_preserved_after_failed_import",
+    "owner_bootstrap_aborted_on_existing_game_schedule_revisions"
+  ],
+  "qualifiedEvidenceContributed": false,
+  "providerBindingReads": 0,
+  "providerDispatches": 0,
+  "quotaReservations": 0,
+  "cleanup": {
+    "stagingRetiredToInertTombstone": false,
+    "stagingPhysicallyDeleted": false,
+    "disposition": "pending_after_receipt_and_final_validation"
+  }
+}
