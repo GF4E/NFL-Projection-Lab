@@ -14,13 +14,13 @@ This is the execution register. A work package is complete only when its accepta
 ## Immediate execution queue
 
 1. Preserve accepted **OS-00**, frozen **OS-00B**, terminal R1-v1, frozen **R0**, and deployed **OS-01A** evidence.
-2. Execute the provider-independent portion of **OS-03A** next.
+2. Preserve the accepted bounded provider-independent storage-mechanism slice of **OS-03A** and execute **OS-13A** next.
 3. Finish **OS-18A** provider authentication and final scans; complete R1-v2's independent human review on its separate research lane.
-4. **OS-19A**, **OS-02A**, and bounded provider-free **OS-15A** are accepted. After OS-03A, execute **OS-13A** and finish the remaining OS-18A gates before authenticated capture. Full OS-01/OS-02/OS-03 proceed behind them.
+4. **OS-19A**, **OS-02A**, bounded provider-free **OS-15A**, and the provider-independent OS-03A storage mechanism are accepted. Finish **OS-13A** and the remaining OS-18A gates before authenticated capture. Full OS-01/OS-02/OS-03 proceed behind them.
 5. **R2** may execute only the Module 2B residual-kernel falsification and only after R1-v2 passes, followed by **R3**.
 6. Continue the platform spine through **OS-14** regardless of whether the possession branch survives.
 7. Start **R4 through R12** only for the decomposition branch authorized by R3; use **R3A** or **R3B** for the other branches.
-8. Start **R16 and R17** only after R13 returns `shadow_eligible`; exact quote acquisition remains disabled until the OS-03A and provider-authentication gates pass and is not deferred to R16.
+8. Start **R16 and R17** only after R13 returns `shadow_eligible`; exact quote acquisition remains disabled until OS-13A, the live OS-03A connector slice, and provider-authentication gates pass and is not deferred to R16.
 
 ## Primary requirement ownership
 
@@ -170,7 +170,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 ### OS-03A — Start immutable 2026 evidence capture
 
-**Status:** NEXT; provider-independent slice follows accepted OS-15A
+**Status:** ACCEPTED — bounded provider-independent storage-mechanism slice only; live connectors and prospective capture remain open
 
 **Requirement contribution:** DATA-01, MKT-01, LED-06
 
@@ -183,6 +183,10 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 **Security rule:** Persist exact response bytes but only a canonical redacted request. Never retain query-string API keys, authorization headers, cookies, credential-bearing headers, or secret-bearing error bodies. The object hash covers response evidence and the redacted request contract, not a secret.
 
 **Acceptance gate:** A captured object and sidecar verify by hash; repeated responses deduplicate; capture failure alerts before the next required horizon; canonical identity may be linked later without changing original bytes or capture time; no secret scan finding exists in stored objects or manifests.
+
+**Acceptance evidence:** `.planning/engine-os/execution/os-03a/acceptance-receipt.v1.json`, `local-qualification-receipt.v1.json`, and `sites-staging-proof-receipt.v1.json` bind contract v9, migration 0017, the provider-independent runtime, and 23 hosted phases to exact-byte recovery, deterministic deduplication, secret filtering, append-only manifests, pointer atomicity, corruption exclusion, failure alerts, last-good preservation, orphan handling, and provider-offline replay. The complete hosted protocol replayed twice with an identical receipt, 13 manifests, 48 events, 7 heartbeats, 16 alerts, 38/462 quota state, and zero provider calls, secret reads, reservations, or reservation events.
+
+**Scope boundary:** This accepts only the provider-independent D1/R2 storage mechanism. The market phase used fixtures; no live connector or provider credential was exercised, migration 0017 was not applied to production, and no prospective capture stream started. Full OS-03A, DATA-01, MKT-01, LED-06, OS-03, and OS-04 remain open.
 
 ### OS-03 — Build the immutable raw-snapshot store
 
@@ -340,7 +344,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-13A — Start the append-only forecast-or-withheld ledger
 
-**Status:** PLANNED immediately after OS-03A; scheduler dependency OS-15A is accepted
+**Status:** NEXT; bounded provider-independent OS-03A storage and scheduler dependency OS-15A are accepted
 
 **Requirement contribution:** LED-01, LED-03, LED-06
 
@@ -410,7 +414,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 **Acceptance evidence:** `.planning/engine-os/execution/os-15a/acceptance-receipt.v1.json`, `sites-staging-proof-receipt.v1.json`, and `production-foundation-direct-audit-receipt.v1.json` bind the frozen v5 scheduler and cutover contracts to all five current OS-02A heads, distinct scheduled/invocation/evidence/persistence clocks, unique attempts, fenced renewable leases, strict deadline exclusion, duplicate and externally overlapping invocation convergence, bounded watchdog recovery, reschedule and unresolved-schedule cases, and qualification-only withholding on isolated owner-only D1. Production migration 0016 is deployed with empty scheduler tables, no activation, capture disabled, zero provider calls, and unchanged 38-used/462-remaining quota. A guarded direct-D1 audit also verified the accepted foundation objects and bootstrap after the bounded database-viewer projection proved stale; it made no repair or data mutation.
 
-**Scope boundary:** This accepts OS-15A only. It does not accept OS-03A, OS-13A, LED-03, OPS-01, OPS-03, full OS-15, prospective capture, provider dispatch, authenticated OS-19A integration, or a model package. OS-03A is the exact next platform task.
+**Scope boundary:** This accepts OS-15A only. The bounded provider-independent OS-03A storage mechanism is separately accepted, but neither package accepts OS-13A, LED-03, OPS-01, OPS-03, full OS-15, prospective capture, provider dispatch, authenticated OS-19A integration, or a model package. OS-13A is the exact next platform task.
 
 ### OS-16 — Add chaos, backup, restore, and rollback qualification
 
@@ -510,7 +514,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 #### OS-19A — Enforce the urgent odds quota and reserve guard
 
-**Status:** ACCEPTED urgent slice; authenticated capture remains blocked by OS-03A/OS-13A/OS-18A
+**Status:** ACCEPTED urgent slice; authenticated capture remains blocked by the live OS-03A connector slice, OS-13A, and OS-18A
 
 **Requirement contribution:** OPS-08, MKT-01
 

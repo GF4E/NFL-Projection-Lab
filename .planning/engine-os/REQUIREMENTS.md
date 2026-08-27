@@ -21,6 +21,7 @@ Status notation:
 ## 2. Point-in-time evidence spine
 
 - [ ] **DATA-01 — Immutable raw evidence.** Exact source response bytes, secret-redacted request metadata, source and receipt times, validity interval, schema, content hash, and usage rights are retained in content-addressed storage; credentials, cookies, authorization headers, and secret-bearing error bodies are never persisted.
+  - OS-03A contribution: the provider-independent D1/R2 mechanism passed exact-byte recovery, canonical secret-redacted request identity, content-addressed response and sidecar storage, deterministic deduplication, append-only manifest/event history, usage-rights metadata, corruption quarantine, failure atomicity, last-good preservation, and provider-offline replay. DATA-01 remains open until OS-03 imports and qualifies the live source population and production retention/recovery path.
 - [ ] **DATA-02 — Temporal identity registry.** Games, teams, franchises, players, venues, provider events, and market contracts resolve through canonical, append-only, as-of identities.
 - [ ] **DATA-03 — Unified connector contract.** Every source follows `fetch -> preserve -> parse -> validate -> stage -> publish` with idempotent snapshot keys.
 - [ ] **DATA-04 — Validation and quarantine.** Stale, partial, schema-invalid, corrupt, or incomplete inputs are quarantined; dependent products preserve their last good version and expose why they are stale.
@@ -48,6 +49,7 @@ Status notation:
 - [ ] **LED-04 — Correction-safe settlement.** Regulation scores, overtime, pushes, voids, source corrections, and grading changes retain append-only lineage.
 - [ ] **LED-05 — All-game evaluation is authoritative.** Model quality is measured on all eligible forecasts, not site selections or human adjustments.
 - [ ] **LED-06 — Prospective 2026 confirmation stream.** Every activated 2026 shadow forecast is stored before kickoff under a frozen package and scored without retroactive replacement; activation after Week 1 is labeled partial-season shadow evidence and is never backfilled or called full-season confirmation.
+  - OS-03A contribution: immutable evidence and later-import mechanics are qualified for provider-independent fixtures, but no activation or prospective forecast exists. LED-06 remains wholly gated by OS-13A, an eligible frozen package or explicit withholding contract, and the package-scoped prospective gates.
 
 ## 5. Possession architecture decision
 
@@ -78,6 +80,7 @@ Status notation:
 ## 8. Market and value measurement
 
 - [ ] **MKT-01 — Exact contract archive.** Opener, forecast-time, and last valid pre-kickoff quotes retain book, market, selection, point, price, capture time, source time, and availability.
+  - OS-03A contribution: a market-response fixture passed exact-byte storage, redacted request identity, deduplication, manifest, failure, and replay behavior without dispatching a provider request. MKT-01 remains open because no authenticated live quote or normalized exact contract was captured.
 - [ ] **MKT-02 — Valid market math.** Two-way markets use power de-vigging and different points are translated with data-derived discrete margin probabilities before price or EV comparison.
 - [ ] **MKT-03 — Post-freeze benchmark.** The frozen football model and frozen market baseline are compared on identical games and timestamps only after the football decision.
 - [ ] **MKT-04 — Separate blend and value research.** Shrinkage, CLV, EV, and sizing are offseason experiments; they do not redefine football confidence or train on selected outcomes.
@@ -98,6 +101,7 @@ Status notation:
 - [ ] **OPS-02 — Isolated batch compute.** Full-history refits, bootstraps, and large replays run in an authenticated compute environment with bounded resources, not on public requests.
 - [ ] **OPS-03 — Atomic last-good publication.** A failed or partial job cannot replace valid inputs, forecasts, model pointers, or site snapshots.
   - OS-15A contribution: lease-losing and stale workers cannot publish an origin record, deadline failures become explicit nonprospective or withheld outcomes, and the dormant production schema is empty. Cross-store source, package, forecast-output, and site-snapshot atomicity remain open under OS-03A, OS-13A, OS-15, and OS-20.
+  - OS-03A contribution: response and sidecar objects publish before a verified manifest pointer; failed uploads, failed manifests, partial input, stale confirmations, and corrupt pointed objects preserve or explicitly stale the last-good source head. Package, forecast-output, and site-snapshot atomicity remain open under OS-13A, OS-15, and OS-20.
 - [ ] **OPS-04 — Precomputed read-only API.** The site reads versioned publication snapshots with no fitting, source fetch, large join, or mutation in the request path.
 - [ ] **OPS-05 — Monitoring without silent adaptation.** Freshness, schema, latency, quota, calibration, coverage, drift, job, and package failures create observable alerts and never trigger unlogged retuning.
 - [ ] **OPS-06 — Recovery qualification.** Backup, restore, rollback, provider-outage, stale-source, corrupt-object, partial-import, and degraded-model drills pass before release.

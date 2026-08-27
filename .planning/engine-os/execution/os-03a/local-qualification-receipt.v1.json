@@ -1,0 +1,128 @@
+{
+  "schemaVersion": "engine-os.os-03a-local-qualification-receipt.v1",
+  "generatedAt": "2026-08-27T03:52:13Z",
+  "status": "accepted_bounded_provider_independent_storage_mechanism",
+  "scope": "Local qualification of the provider-independent OS-03A exact-byte D1/R2 storage mechanism, immutable manifests, sidecars, freshness state, alerts, corruption handling, and offline replay. It does not qualify a live connector, authenticated market capture, prospective capture, a production sweeper, full OS-03A, OS-03, OS-04, or any statistical model.",
+  "preservedFoundations": [
+    "OS-00 architecture and evidence",
+    "OS-00B numerical operating contract",
+    "OS-01A migrations",
+    "OS-02A canonical game and five-horizon origin identities",
+    "OS-15A provider-free scheduler qualification",
+    "OS-19A quota controls",
+    "R0",
+    "R1-v1",
+    "R1-v2"
+  ],
+  "source": {
+    "qualifiedRuntimeCommit": "787e46833f29984345db7c8d4200d43d4a509308",
+    "hostedHarnessBaseCommit": "a2be1f2262cb89b5c918398ca25322de09b38da5",
+    "d1CompatibilityCorrectionCommit": "325546887516adc45473b70115834626815d3e05",
+    "finalHostedBindingCommit": "5ab65a3a7ea21f0758528e41b978bd22938ae979",
+    "sourceGraphHash": "bd8db43290a45c73643de2d583e4e0152a72fe3a596b4567790d449bb5dd1593",
+    "sourceEdgeHash": "2051b099da9f0fadcbba746a7e15ab9ed89984e36c88f607a9267c7697826d7c"
+  },
+  "contracts": {
+    "effectiveVersion": "source-capture-contract.2026.9",
+    "effectiveSource": "config/source-capture-contract-2026.v9.json",
+    "effectiveSourceFileSha256": "f8c761e2c048fbdc7ee7cb69e5fb6494522efa860739ef7f86535f8e5f34141a",
+    "effectiveCanonicalSha256": "7c8e041f701e3fd7cb44d7aecef3e51204fa6570e61b90e37b2b5fb016a29642",
+    "manifestVersion": "engine-os-contract-manifest.2026.13",
+    "manifestSource": "config/engine-os-contract-manifest.v13.json",
+    "manifestSourceFileSha256": "b2801246fc5b98106bc7f23319026a811c1143e8c437538a3e0a3afa74dc660a",
+    "manifestCanonicalSha256": "a048467f04e9b3af11515a7206022f7c9fa30641e4031c6f74ca28903b940b65"
+  },
+  "migration": {
+    "version": "0017_engine_os_source_capture",
+    "source": "drizzle/0017_engine_os_source_capture.sql",
+    "sourceFileSha256": "5ab272cdd5fccc79664c1b3fcdcbc9ee451bb4e64a5afd2b3c5fd3a9692f3358",
+    "definitionHash": "sha256:d25f6119f4d0735247489623e5775cb185c866d7a3f1ebbb791c5f5cfaeac0e7",
+    "productionApplied": false,
+    "rollbackQualified": true
+  },
+  "qualifiedBehavior": {
+    "canonicalSecretRedactedRequestIdentity": true,
+    "exactResponseBytesPreserved": true,
+    "sourcePublicationReceiptAndValidityTimesSeparated": true,
+    "contentAddressedResponseAndSidecarKeys": true,
+    "deterministicDeduplication": true,
+    "appendOnlyManifestAndEventHistory": true,
+    "usageRightsAndRetentionMetadata": true,
+    "publishBeforePointerOrdering": true,
+    "failedUploadAndFailedManifestFailClosed": true,
+    "partialImportCannotReplaceLastGood": true,
+    "corruptObjectQuarantined": true,
+    "corruptHeadCannotReactivate": true,
+    "providerOfflineReplay": true,
+    "heartbeatAndFailureAlerts": true,
+    "orphanCleanupMinimumAgeSeconds": 86400,
+    "notModifiedEvidenceJournaled": true,
+    "verificationObservationClockSeparated": true,
+    "laterImportOwners": [
+      "OS-03",
+      "OS-04"
+    ],
+    "marketBranch": "fixture_only",
+    "providerDispatches": 0,
+    "providerBindingReads": 0
+  },
+  "verification": {
+    "qualifiedRuntimeFullSuite": {
+      "testsPassed": 406,
+      "testsSkipped": 1,
+      "lint": "pass",
+      "typecheck": "pass",
+      "build": "pass",
+      "activeBuildGraph": "pass"
+    },
+    "hostedHarnessFullSuite": {
+      "testsPassed": 409,
+      "testsSkipped": 1,
+      "lint": "pass",
+      "typecheck": "pass",
+      "build": "pass",
+      "activeBuildGraph": "pass"
+    },
+    "focusedContractMigrationRuntimeIntegrityTestsPassed": 62,
+    "d1CompatibilityHarnessTestsPassed": 3,
+    "reverseUnorderedD1DeliveryProducesIdenticalReceipt": true,
+    "securityScannerSelfTestsPassed": 7,
+    "workingTreeSecretScan": {
+      "credentialFindings": 0,
+      "reviewFindings": 2,
+      "reviewFindingPaths": [
+        "dist/server/index.js",
+        "tests/test_security_scan.py"
+      ]
+    },
+    "repositoryWideKnownFindings": "The full scanner still reports the pre-existing ignored local .env.local credential assignment, historical fixture credential blob, commit-metadata personal-data findings, and review-only path findings. No matched value was emitted, persisted in an OS-03A receipt, or used by the OS-03A runtime; the agent did not inspect the value. The OS-03A working-tree diff introduced zero findings. Repository-wide OS-18A acceptance is not claimed."
+  },
+  "defectDisposition": {
+    "caughtBeforeAcceptance": "A delayed older HTTP 304 verification could previously use evidence time as local observation time and fail to journal a later corruption result without regressing chronology.",
+    "correction": "Contract v9 separates provider confirmation time from the local verification observation clock, journals transient and permanent failures, preserves the last-good success clock, and prevents an older confirmation from healing a newer failure.",
+    "hostedOnlyCompatibilityCorrection": "Cloudflare D1 rejects pragma_table_info from the Worker. The finalizer now derives the frozen seven JSON columns from hashed migration and qualification schema source, validates every identifier and table, and scans all stored JSON without PRAGMA access."
+  },
+  "independentAudit": {
+    "runtimeAndSecurityCommit": "787e46833f29984345db7c8d4200d43d4a509308",
+    "result": "accepted_bounded_provider_independent_only",
+    "d1FinalizerReview": "pass",
+    "limitations": [
+      "No live connector or provider authentication was exercised.",
+      "No prospective production stream was started.",
+      "Migration 0017 remains absent from production."
+    ]
+  },
+  "claims": {
+    "providerIndependentStorageMechanismQualified": true,
+    "liveConnectorsQualified": false,
+    "authenticatedMarketCaptureQualified": false,
+    "prospectiveCaptureAccepted": false,
+    "productionSweeperQualified": false,
+    "fullOs03aAccepted": false,
+    "data01Complete": false,
+    "mkt01Complete": false,
+    "led06Complete": false,
+    "statisticalModelChanged": false,
+    "interfaceChanged": false
+  }
+}
