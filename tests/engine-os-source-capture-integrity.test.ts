@@ -564,6 +564,53 @@ describe("OS-03A integrity hardening", () => {
     sqlite.close();
   });
 
+  it("does not regress the heartbeat clock while recovering a stranded publication", async () => {
+    const faults: D1Faults = {
+      skipStatementNumbersByBatch: new Map([[4, new Set([3])]])
+    };
+    const { sqlite, db } = database(faults);
+    const bucket = new RaceR2();
+    await storeOs03aCapture(captureInput(db, bucket));
+    const candidateInput = captureInput(db, bucket, {
+      attemptToken: "integrity-stranded-publication-clock",
+      idempotencyKey: "schedule:integrity:stranded-publication-clock",
+      responseBytes: new TextEncoder().encode(
+        "game_id,kickoff\n2026_02_STRANDED_CLOCK,2026-09-17T00:00:00Z\n"
+      ),
+      sourceObservedAt: "2026-08-26T11:00:00.000Z",
+      providerPublishedAt: "2026-08-26T11:00:00.000Z",
+      receiptCompletedAt: "2026-08-26T11:00:01.000Z",
+      persistenceRequestedAt: "2026-08-26T11:00:02.000Z",
+      clock: sequenceClock(
+        "2026-08-26T11:00:03.000Z", "2026-08-26T11:00:04.000Z",
+        "2026-08-26T11:00:05.000Z", "2026-08-26T11:00:06.000Z",
+        "2026-08-26T11:00:07.000Z"
+      )
+    });
+
+    await expect(storeOs03aCapture(candidateInput)).rejects.toThrow(/latest-good remains fail-closed/);
+    expect(sqlite.prepare(`SELECT status, last_attempt_at, last_failure_at, failure_code
+      FROM source_capture_heartbeats`).get()).toEqual({
+      status: "stale",
+      last_attempt_at: "2026-08-26T11:00:07.000Z",
+      last_failure_at: "2026-08-26T11:00:07.000Z",
+      failure_code: "manifest_failure"
+    });
+
+    await expect(storeOs03aCapture({
+      ...candidateInput,
+      clock: sequenceClock("2026-08-26T11:00:06.500Z")
+    })).rejects.toThrow(/latest-good remains fail-closed/);
+    expect(sqlite.prepare(`SELECT status, last_attempt_at, last_failure_at, failure_code
+      FROM source_capture_heartbeats`).get()).toEqual({
+      status: "stale",
+      last_attempt_at: "2026-08-26T11:00:07.000Z",
+      last_failure_at: "2026-08-26T11:00:07.000Z",
+      failure_code: "manifest_failure"
+    });
+    sqlite.close();
+  });
+
   it("preserves a causally newer provider failure after pointer commit and before postcondition", async () => {
     const faults: D1Faults = { afterCommitBatchNumbers: new Map() };
     const { sqlite, db } = database(faults);

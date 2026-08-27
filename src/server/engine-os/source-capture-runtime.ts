@@ -997,6 +997,7 @@ async function publishVerifiedUsablePointer(input: {
           THEN ? ELSE last_success_at END,
         last_failure_at = NULL, failure_code = NULL
       WHERE source_key = ? AND latest_capture_id = ? AND ${exactEventPredicate}
+        AND ? >= last_attempt_at
         AND (
           ? >= last_attempt_at OR (
             failure_code = 'manifest_failure' AND last_failure_at IS NOT NULL AND EXISTS (
@@ -1019,6 +1020,7 @@ async function publishVerifiedUsablePointer(input: {
       extension.source_key,
       base.capture_id,
       ...exactEventBindings,
+      verifiedAt,
       publicationObservedAt,
       base.capture_id
     ));
