@@ -105,6 +105,7 @@ function insertEvent(db: DatabaseSync, overrides: {
   provider?: string;
   dataset?: string;
   idempotencyKey?: string;
+  occurredAt?: string;
   payload?: Record<string, unknown>;
 } = {}): void {
   const eventType = overrides.eventType ?? "capture_committed_usable";
@@ -121,7 +122,7 @@ function insertEvent(db: DatabaseSync, overrides: {
   db.prepare(`INSERT INTO source_capture_events (
     event_id, attempt_token, event_type, capture_id, source_key, provider, dataset,
     idempotency_key, occurred_at, event_payload_hash, payload_json
-  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, '2026-08-26T16:00:05.000Z', ?, ?)`)
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
     .run(
       overrides.eventId ?? "e".repeat(64),
       overrides.attemptToken ?? "attempt-1",
@@ -131,6 +132,7 @@ function insertEvent(db: DatabaseSync, overrides: {
       overrides.provider ?? "nflverse-fixture",
       overrides.dataset ?? "schedule",
       overrides.idempotencyKey ?? "schedule:2026-08-26",
+      overrides.occurredAt ?? "2026-08-26T16:00:05.000Z",
       hash,
       JSON.stringify(payload)
     );
@@ -316,6 +318,47 @@ describe("OS-03A additive source-capture migration", () => {
       "nflverse-fixture:schedule:fixture_nflverse_schedule_v1"
     )).toThrow(/move backward/);
     db.close();
+  });
+
+  it("rejects pre-manifest verification events and permanently failed pointer candidates", () => {
+    const early = database();
+    seedBase(early);
+    insertExtension(early);
+    expect(() => insertEvent(early, {
+      occurredAt: "2026-08-26T16:00:03.000Z"
+    })).toThrow(/exact immutable capture identity/);
+    early.close();
+
+    const failed = database();
+    seedBase(failed);
+    insertExtension(failed);
+    insertEvent(failed);
+    insertEvent(failed, {
+      eventId: "c".repeat(64),
+      attemptToken: "postcommit-permanent-failure",
+      eventType: "capture_failed",
+      captureId: null,
+      payload: {
+        sourceKey: "nflverse-fixture:schedule:fixture_nflverse_schedule_v1",
+        failureCode: "corrupt_object",
+        idempotencyKey: "schedule:2026-08-26",
+        context: {
+          captureId,
+          phase: "post_manifest_pre_pointer_r2_verification"
+        }
+      }
+    });
+    expect(() => failed.prepare(`INSERT INTO source_capture_heartbeats (
+      source_key, provider, dataset, status, last_attempt_at, last_success_at,
+      last_failure_at, failure_code, latest_capture_id
+    ) VALUES (?, 'nflverse-fixture', 'schedule', 'current', ?, ?, NULL, NULL, ?)`)
+      .run(
+        "nflverse-fixture:schedule:fixture_nflverse_schedule_v1",
+        "2026-08-26T16:00:06.000Z",
+        "2026-08-26T16:00:06.000Z",
+        captureId
+      )).toThrow(/exact usable immutable capture/);
+    failed.close();
   });
 
   it("rolls back only empty 0017 tables and never contains an R2 deletion operation", () => {
