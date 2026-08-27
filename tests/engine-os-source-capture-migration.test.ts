@@ -17,7 +17,7 @@ function database(): DatabaseSync {
   return db;
 }
 
-const contractHash = "9de33c9635ac8ded218bc9f774234e653135964204b5e3699b171536be99e867";
+const contractHash = "4829d2dc5713a802210a3e80ad8edb8c1fcf874b41a46414ae6596b701e0951f";
 const hash = "a".repeat(64);
 const captureId = "c".repeat(64);
 const rights = JSON.stringify({
@@ -74,7 +74,7 @@ function insertExtension(db: DatabaseSync, overrides: {
     response_persisted_at, sidecar_persisted_at, manifest_persisted_at, content_type,
     etag, usage_rights_json, usage_rights_hash, validation_state, failure_codes_json,
     later_import_json, later_import_hash, extension_hash
-  ) VALUES (?, 'source-capture-contract.2026.7', ?, 'fixture_nflverse_schedule_v1',
+  ) VALUES (?, 'source-capture-contract.2026.8', ?, 'fixture_nflverse_schedule_v1',
     'qualification_fixture', ?, ?, ?, '2026-08-26T16:00:02.000Z',
     '2026-08-26T16:00:03.000Z', '2026-08-26T16:00:04.000Z',
     '2026-08-26T16:00:05.000Z', 'text/csv', 'fixture-etag', ?, ?, ?, ?, ?, ?, ?)`)
@@ -423,6 +423,56 @@ describe("OS-03A additive source-capture migration", () => {
       idempotencyKey: "schedule:corrupt-not-modified",
       occurredAt: "2026-08-26T16:00:07.000Z"
     })).toThrow(/exact immutable capture identity/);
+    db.close();
+  });
+
+  it("blocks not-modified publication and current status for an older deterministic head", () => {
+    const db = database();
+    seedBase(db);
+    insertExtension(db);
+    insertEvent(db);
+    db.prepare(`INSERT INTO source_capture_heartbeats (
+      source_key, provider, dataset, status, last_attempt_at, last_success_at,
+      last_failure_at, failure_code, latest_capture_id
+    ) VALUES (?, 'nflverse-fixture', 'schedule', 'stale', ?, ?, ?, 'manifest_failure', ?)`).run(
+      "nflverse-fixture:schedule:fixture_nflverse_schedule_v1",
+      "2026-08-26T16:00:07.000Z",
+      "2026-08-26T16:00:05.000Z",
+      "2026-08-26T16:00:07.000Z",
+      captureId
+    );
+
+    const newerCaptureId = "d".repeat(64);
+    seedBase(db, {
+      captureId: newerCaptureId,
+      idempotencyKey: "schedule:2026-08-26:newer"
+    });
+    insertExtension(db, { captureId: newerCaptureId });
+    insertEvent(db, {
+      eventId: "d".repeat(64),
+      attemptToken: "newer-publication",
+      captureId: newerCaptureId,
+      idempotencyKey: "schedule:2026-08-26:newer",
+      occurredAt: "2026-08-26T17:00:06.000Z"
+    });
+
+    expect(() => insertEvent(db, {
+      eventId: "7".repeat(64),
+      attemptToken: "older-not-modified",
+      eventType: "not_modified_confirmed",
+      idempotencyKey: "schedule:older-not-modified",
+      occurredAt: "2026-08-26T17:00:08.000Z"
+    })).toThrow(/exact immutable capture identity/);
+    expect(() => db.exec(`UPDATE source_capture_heartbeats
+      SET status = 'current', last_attempt_at = '2026-08-26T17:00:08.000Z',
+        last_success_at = '2026-08-26T17:00:08.000Z', last_failure_at = NULL,
+        failure_code = NULL`)).toThrow(/move backward|cross-wire/);
+    expect(db.prepare(`SELECT status, latest_capture_id, failure_code
+      FROM source_capture_heartbeats`).get()).toEqual({
+      status: "stale",
+      latest_capture_id: captureId,
+      failure_code: "manifest_failure"
+    });
     db.close();
   });
 

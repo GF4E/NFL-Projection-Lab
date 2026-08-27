@@ -443,6 +443,12 @@ function eventIdentity(input: {
   payloadHash: string;
   payloadJson: string;
 } {
+  assertSecretFreeCanonicalValue({
+    attemptToken: input.attemptToken,
+    eventType: input.eventType,
+    captureId: input.captureId,
+    payload: input.payload
+  }, "Capture event identity metadata");
   const payloadHash = buildEventPayloadHash(input.payload);
   return {
     payloadHash,
@@ -516,6 +522,19 @@ function eventInsertStatement(input: {
   payloadHash: string;
   payloadJson: string;
 }): D1PreparedStatement {
+  assertSecretFreeCanonicalValue({
+    eventId: input.eventId,
+    attemptToken: input.attemptToken,
+    eventType: input.eventType,
+    captureId: input.captureId,
+    sourceKey: input.sourceKey,
+    provider: input.provider,
+    dataset: input.dataset,
+    idempotencyKey: input.idempotencyKey,
+    occurredAt: input.occurredAt,
+    payloadHash: input.payloadHash,
+    payloadJson: input.payloadJson
+  }, "Capture event persistence metadata");
   const values: unknown[] = [
     input.eventId,
     input.attemptToken,
@@ -1010,6 +1029,17 @@ async function publishVerifiedUsablePointer(input: {
                 AND json_extract(failed.payload_json, '$.context.phase') =
                   'verified_usable_pointer_publication'
             )
+          ) OR (
+            failure_code = 'manifest_failure' AND last_failure_at IS NOT NULL AND EXISTS (
+              SELECT 1 FROM source_capture_events failed
+              WHERE failed.source_key = source_capture_heartbeats.source_key
+                AND failed.event_type = 'capture_failed'
+                AND failed.occurred_at = source_capture_heartbeats.last_failure_at
+                AND json_extract(failed.payload_json, '$.failureCode') = 'manifest_failure'
+                AND json_extract(failed.payload_json, '$.context.expectedCaptureId') = ?
+                AND json_extract(failed.payload_json, '$.context.phase') =
+                  'not_modified_deterministic_head_verification'
+            )
           )
         )`).bind(
       base.provider,
@@ -1022,6 +1052,7 @@ async function publishVerifiedUsablePointer(input: {
       ...exactEventBindings,
       verifiedAt,
       publicationObservedAt,
+      base.capture_id,
       base.capture_id
     ));
 
@@ -1723,9 +1754,36 @@ export async function recordOs03aNotModified(input: {
   if (!head?.capture_id) {
     throw new Error("A not-modified confirmation requires a prior usable capture");
   }
+  const publicationHead = await readPublicationHead(input.db, sourceKey);
+  if (
+    !publicationHead?.expected_capture_id ||
+    publicationHead.expected_capture_id !== head.capture_id
+  ) {
+    await recordOs03aCaptureFailure({
+      db: input.db,
+      profileId: input.profileId,
+      attemptToken: input.attemptToken,
+      idempotencyKey: input.idempotencyKey,
+      failedAt: confirmedAt,
+      failureCode: "manifest_failure",
+      safeContext: {
+        captureId: head.capture_id,
+        expectedCaptureId: publicationHead?.expected_capture_id ?? null,
+        phase: "not_modified_deterministic_head_verification"
+      }
+    });
+    throw new Error("A not-modified confirmation cannot mask a newer unresolved publication");
+  }
   const rows = await captureRowsById(input.db, head.capture_id);
   if (!rows) throw new Error("Not-modified head is missing its immutable manifest");
-  await verifyCaptureRows(input.bucket, rows);
+  await verifyCommittedCaptureOrFailClosed({
+    db: input.db,
+    bucket: input.bucket,
+    rows,
+    committedAttemptToken: input.attemptToken,
+    expectedEvidenceHash: rows.base.evidence_hash,
+    clock: () => new Date(confirmedAt)
+  });
   const payload = {
     captureId: head.capture_id,
     evidenceHash: rows.base.evidence_hash,
