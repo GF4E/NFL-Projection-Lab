@@ -1,16 +1,20 @@
 {
-  "version": "os01-census-attestation.2026.1",
+  "version": "os01-census-attestation.2026.2",
   "sourceTreeIdentityVersion": "os01-census-source-tree.2026.1",
-  "sourceAnchorInputVersion": "os01-census-source-anchor.2026.4",
+  "sourceAnchorInputVersion": "os01-census-source-anchor.2026.5",
   "generatedAnchorPath": "worker/os01-census-source-anchor.ts",
   "requiredImplementationToDeploymentDiff": [
     "worker/os01-census-source-anchor.ts"
   ],
   "bridgeFoundation": {
-    "version": "os01-census-bridge-foundation.2026.1",
+    "version": "os01-census-bridge-foundation.2026.2",
     "liveBaseCommit": "e8c3b23dc0bd59b66099fd08c52dd39ae23f65bd",
     "implementationCommitCount": 1,
     "requiredLiveBaseToImplementationNameStatus": [
+      { "status": "M", "path": "next.config.ts" },
+      { "status": "A", "path": "patches/vinext@1.0.0-beta.2.patch" },
+      { "status": "M", "path": "pnpm-lock.yaml" },
+      { "status": "M", "path": "pnpm-workspace.yaml" },
       { "status": "M", "path": "tests/acceptance.test.ts" },
       { "status": "M", "path": "tests/nflverse-importer.test.ts" },
       { "status": "M", "path": "tests/official-injuries.test.ts" },
@@ -26,8 +30,10 @@
     "retainedRuntimeBridgePath": "worker/site-runtime.ts"
   },
   "authorityBridgeCodeRelation": {
-    "version": "os01-census-authority-bridge-code-relation.2026.1",
+    "version": "os01-census-authority-bridge-code-relation.2026.2",
     "exactEqualPaths": [
+      "patches/vinext@1.0.0-beta.2.patch",
+      "pnpm-workspace.yaml",
       "worker/env-boundary.ts",
       "worker/os01-census-operator.ts",
       "worker/os01-census-source-anchor.ts"
@@ -41,7 +47,7 @@
     "requiredNameStatus": "M"
   },
   "buildIdentity": {
-    "version": "os01-census-build-identity.2026.2",
+    "version": "os01-census-build-identity.2026.3",
     "distPath": "dist",
     "builtWorkerPath": "dist/server/index.js",
     "serverManifestPath": "dist/server/.vite/manifest.json",
@@ -57,7 +63,33 @@
     ],
     "sitesArchiveHashPrefix": "sha256:",
     "localArchiveFormat": "tar.gz",
-    "sitesArchiveFormat": "tar"
+    "sitesArchiveFormat": "tar",
+    "qualificationBuild": {
+      "version": "os01-vinext-qualification-build.2026.1",
+      "modeFlag": "--internal-qualification-build-context-stdin",
+      "contextDerivation": "sha256_stable_json_public_owner_only_context_v1",
+      "contextDomain": "nfl-projection-lab/os01-vinext-qualification-build/v1",
+      "patchPath": "patches/vinext@1.0.0-beta.2.patch",
+      "patchSha256": "c4024d3c75af62888e0842ac583fb9bd6e4088ecf9e84eda45e2c0ed8b409958",
+      "pnpmPatchHash": "c4024d3c75af62888e0842ac583fb9bd6e4088ecf9e84eda45e2c0ed8b409958",
+      "vinextVersion": "1.0.0-beta.2",
+      "patchedRuntimeRoot": "99dbb137540346e3c6549db1291beda4a3f5b4fc6014e1d022dd28a125702527",
+      "patchedRuntimePaths": [
+        "package.json",
+        "dist/build/qualification-entropy.js",
+        "dist/build/preview-credentials.js",
+        "dist/cli.js",
+        "dist/entries/app-rsc-entry.js",
+        "dist/index.js"
+      ],
+      "deterministicBuildId": "os01-census-2026-1",
+      "deterministicDeploymentId": "os01-census-2026-1",
+      "targetAccessRequired": "owner_only",
+      "publicOrProductionDeploymentAllowed": false,
+      "contextEncodingInOutputAllowed": false,
+      "normalBuildScriptsMayUseModeFlag": false,
+      "retirementRequiredBeforeAcceptance": true
+    }
   },
   "deploymentProofVersion": "os01-census-deployment-proof.2026.1",
   "deploymentProofStatus": "ready_for_census",

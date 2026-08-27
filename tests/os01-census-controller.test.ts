@@ -48,13 +48,26 @@ const testImplementationBuild = {
   activeBuildFilesScanned: 1,
   compiledAnchorCarrierRoot: "5".repeat(64),
   entryStaticClosureRoot: "6".repeat(64),
-  entryStaticFileCount: 1
+  entryStaticFileCount: 1,
+  qualificationBuild: {
+    version: "os01-vinext-qualification-build.2026.1",
+    role: "implementation" as const,
+    contextHash: "7".repeat(64),
+    toolchainRoot: "8".repeat(64),
+    nodeVersion: "v24.13.0",
+    vinextVersion: "1.0.0-beta.2",
+    patchSha256: "c4024d3c75af62888e0842ac583fb9bd6e4088ecf9e84eda45e2c0ed8b409958",
+    targetProjectId: "test-project",
+    targetAccessMode: "owner_only"
+  }
 };
 const testAuthorityBridgeCodeRelation = {
-  version: "os01-census-authority-bridge-code-relation.2026.1",
+  version: "os01-census-authority-bridge-code-relation.2026.2",
   authorityCommit: "2".repeat(40),
   implementationCommit,
   files: [
+    { path: "patches/vinext@1.0.0-beta.2.patch", bytes: 1, sha256: "7".repeat(64) },
+    { path: "pnpm-workspace.yaml", bytes: 1, sha256: "9".repeat(64) },
     { path: "worker/env-boundary.ts", bytes: 1, sha256: "a".repeat(64) },
     { path: "worker/os01-census-operator.ts", bytes: 1, sha256: "b".repeat(64) },
     { path: "worker/os01-census-source-anchor.ts", bytes: 1, sha256: "c".repeat(64) }
@@ -74,6 +87,10 @@ const testSourceIdentity = {
   liveBaseCommit: "e8c3b23dc0bd59b66099fd08c52dd39ae23f65bd",
   liveBaseTreeObjectId: "2".repeat(40),
   liveBaseToImplementationNameStatus: [
+    { status: "M", path: "next.config.ts" },
+    { status: "A", path: "patches/vinext@1.0.0-beta.2.patch" },
+    { status: "M", path: "pnpm-lock.yaml" },
+    { status: "M", path: "pnpm-workspace.yaml" },
     { status: "M", path: "tests/acceptance.test.ts" },
     { status: "M", path: "tests/nflverse-importer.test.ts" },
     { status: "M", path: "tests/official-injuries.test.ts" },
@@ -195,6 +212,10 @@ function deploymentProof(origin: string): Record<string, unknown> {
       packageContentRoot: "2".repeat(64),
       packageFileListRoot: "3".repeat(64),
       packageFileCount: 1,
+      qualificationBuild: {
+        ...testImplementationBuild.qualificationBuild,
+        role: "deployment"
+      },
       sitesArchiveContentHash: `sha256:${testArchiveHash}`
     },
     sitesVersion: {

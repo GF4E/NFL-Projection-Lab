@@ -82,6 +82,17 @@ export type LocalBuildEvidence = {
   compiledAnchorCarrierRoot: string;
   entryStaticClosureRoot: string;
   entryStaticFileCount: number;
+  qualificationBuild: {
+    version: string;
+    role: "implementation" | "deployment";
+    contextHash: string;
+    toolchainRoot: string;
+    nodeVersion: string;
+    vinextVersion: string;
+    patchSha256: string;
+    targetProjectId: string;
+    targetAccessMode: string;
+  };
 };
 
 export type PackageManifestEvidence = {
@@ -229,6 +240,25 @@ const attestationContract = JSON.parse(
     sitesArchiveHashPrefix: string;
     localArchiveFormat: string;
     sitesArchiveFormat: string;
+    qualificationBuild: {
+      version: string;
+      modeFlag: string;
+      contextDerivation: string;
+      contextDomain: string;
+      patchPath: string;
+      patchSha256: string;
+      pnpmPatchHash: string;
+      vinextVersion: string;
+      patchedRuntimeRoot: string;
+      patchedRuntimePaths: string[];
+      deterministicBuildId: string;
+      deterministicDeploymentId: string;
+      targetAccessRequired: string;
+      publicOrProductionDeploymentAllowed: boolean;
+      contextEncodingInOutputAllowed: boolean;
+      normalBuildScriptsMayUseModeFlag: boolean;
+      retirementRequiredBeforeAcceptance: boolean;
+    };
   };
   deploymentProofVersion: string;
   deploymentProofStatus: string;
@@ -289,6 +319,132 @@ function stableJson(value: unknown): string {
 
 function sha256(value: string | Uint8Array): string {
   return createHash("sha256").update(value).digest("hex");
+}
+
+type QualificationBuildRole = "implementation" | "deployment";
+
+function exactOccurrenceCount(source: string, expected: string): number {
+  if (expected.length === 0) throw new Error("empty exact-occurrence marker");
+  let count = 0;
+  let offset = 0;
+  while (true) {
+    const index = source.indexOf(expected, offset);
+    if (index < 0) return count;
+    count += 1;
+    offset = index + expected.length;
+  }
+}
+
+export function qualificationBuildContext(input: {
+  repositoryRoot: string;
+  expectedCommit: string;
+  role: QualificationBuildRole;
+  target: TrustedTarget;
+}): {
+  context: Buffer;
+  evidence: LocalBuildEvidence["qualificationBuild"];
+} {
+  const qualification = attestationContract.buildIdentity.qualificationBuild;
+  if (
+    qualification.publicOrProductionDeploymentAllowed ||
+    qualification.contextEncodingInOutputAllowed ||
+    qualification.normalBuildScriptsMayUseModeFlag ||
+    !qualification.retirementRequiredBeforeAcceptance ||
+    input.target.loopbackFixture ||
+    input.target.accessMode !== qualification.targetAccessRequired
+  ) throw new Error("qualification build is restricted to the retired owner-only census lane");
+  const canonicalRoot = realpathSync(input.repositoryRoot);
+  const patchPath = resolve(canonicalRoot, qualification.patchPath);
+  if (!patchPath.startsWith(`${canonicalRoot}${sep}`)) throw new Error("qualification patch escapes its worktree");
+  const patchMetadata = lstatSync(patchPath);
+  if (!patchMetadata.isFile() || patchMetadata.isSymbolicLink()) {
+    throw new Error("qualification patch is not a regular tracked file");
+  }
+  const patchSha256 = sha256(readFileSync(patchPath));
+  if (patchSha256 !== qualification.patchSha256 || patchSha256 !== qualification.pnpmPatchHash) {
+    throw new Error("qualification patch hash does not match the frozen contract");
+  }
+  const workspaceSource = readFileSync(resolve(canonicalRoot, "pnpm-workspace.yaml"), "utf8");
+  const lockSource = readFileSync(resolve(canonicalRoot, "pnpm-lock.yaml"), "utf8");
+  const workspaceMapping = `vinext@${qualification.vinextVersion}: ${qualification.patchPath}`;
+  const lockMapping = `vinext@${qualification.vinextVersion}: ${qualification.pnpmPatchHash}`;
+  if (
+    exactOccurrenceCount(workspaceSource, workspaceMapping) !== 1 ||
+    exactOccurrenceCount(lockSource, lockMapping) !== 1
+  ) throw new Error("qualification patch mapping is not uniquely frozen");
+  const packageSource = readFileSync(resolve(canonicalRoot, "package.json"), "utf8");
+  if (packageSource.includes(qualification.modeFlag)) {
+    throw new Error("normal package scripts enable the qualification build mode");
+  }
+  const nextConfigSource = readFileSync(resolve(canonicalRoot, "next.config.ts"), "utf8");
+  if (
+    exactOccurrenceCount(
+      nextConfigSource,
+      `generateBuildId: async () => "${qualification.deterministicBuildId}"`
+    ) !== 1 ||
+    exactOccurrenceCount(
+      nextConfigSource,
+      `deploymentId: "${qualification.deterministicDeploymentId}"`
+    ) !== 1
+  ) throw new Error("qualification bridge does not freeze supported build identities");
+  const installedRoot = realpathSync(resolve(canonicalRoot, "node_modules/vinext"));
+  const runtimeRecords = qualification.patchedRuntimePaths.map((relativePath) => {
+    const path = resolve(installedRoot, relativePath);
+    if (!path.startsWith(`${installedRoot}${sep}`)) throw new Error("patched runtime path escapes Vinext");
+    const metadata = lstatSync(path);
+    if (!metadata.isFile() || metadata.isSymbolicLink()) throw new Error("patched runtime path is not a regular file");
+    const bytes = readFileSync(path);
+    return { path: relativePath, bytes: bytes.byteLength, sha256: sha256(bytes) };
+  });
+  const patchedRuntimeRoot = sha256(stableJson(runtimeRecords));
+  if (patchedRuntimeRoot !== qualification.patchedRuntimeRoot) {
+    throw new Error("installed Vinext qualification runtime differs from the pinned patch");
+  }
+  const installedPackage = JSON.parse(readFileSync(resolve(installedRoot, "package.json"), "utf8")) as {
+    name?: unknown;
+    version?: unknown;
+  };
+  if (installedPackage.name !== "vinext" || installedPackage.version !== qualification.vinextVersion) {
+    throw new Error("installed Vinext package identity mismatch");
+  }
+  const toolchainRoot = sha256(stableJson({
+    version: qualification.version,
+    nodeVersion: process.version,
+    vinextVersion: qualification.vinextVersion,
+    patchSha256,
+    patchedRuntimeRoot,
+    pnpmPatchHash: qualification.pnpmPatchHash
+  }));
+  const contextHash = sha256(stableJson({
+    version: qualification.version,
+    derivation: qualification.contextDerivation,
+    domain: qualification.contextDomain,
+    role: input.role,
+    expectedCommit: input.expectedCommit,
+    authorityAttestationHash: sha256(readFileSync(resolve(root, "config/os01-census-attestation.v1.json"))),
+    target: {
+      projectId: input.target.projectId,
+      origin: input.target.origin,
+      accessMode: input.target.accessMode
+    },
+    deterministicBuildId: qualification.deterministicBuildId,
+    deterministicDeploymentId: qualification.deterministicDeploymentId,
+    toolchainRoot
+  }));
+  return {
+    context: Buffer.from(contextHash, "hex"),
+    evidence: {
+      version: qualification.version,
+      role: input.role,
+      contextHash,
+      toolchainRoot,
+      nodeVersion: process.version,
+      vinextVersion: qualification.vinextVersion,
+      patchSha256,
+      targetProjectId: input.target.projectId,
+      targetAccessMode: input.target.accessMode
+    }
+  };
 }
 
 function readStableFile(path: string, maximumBytes: number, label: string): Uint8Array {
@@ -698,7 +854,8 @@ function localBuildEvidence(
     buildFilesScanned: number;
   },
   compiledAnchorCarrierRoot: string,
-  entryStaticClosure: { root: string; fileCount: number }
+  entryStaticClosure: { root: string; fileCount: number },
+  qualificationBuild: LocalBuildEvidence["qualificationBuild"]
 ): LocalBuildEvidence {
   const distRootPath = resolve(repositoryRoot, attestationContract.buildIdentity.distPath);
   const records: Array<{ path: string; bytes: number; sha256: string }> = [];
@@ -713,6 +870,12 @@ function localBuildEvidence(
         const relativePath = relative(distRootPath, path).split(sep).join("/");
         if (relativePath.startsWith("../") || relativePath === "") throw new Error("invalid build output path");
         const bytes = readFileSync(path);
+        const contextBytes = Buffer.from(qualificationBuild.contextHash, "hex");
+        const contextHexBytes = Buffer.from(qualificationBuild.contextHash, "utf8");
+        const contextBase64Bytes = Buffer.from(contextBytes.toString("base64"), "utf8");
+        if (
+          bytes.includes(contextBytes) || bytes.includes(contextHexBytes) || bytes.includes(contextBase64Bytes)
+        ) throw new Error("qualification build context leaked into output bytes");
         records.push({ path: relativePath, bytes: bytes.byteLength, sha256: sha256(bytes) });
       } else {
         throw new Error("build output contains a non-file entry");
@@ -735,7 +898,8 @@ function localBuildEvidence(
     activeBuildFilesScanned: activeBuildGraph.buildFilesScanned,
     compiledAnchorCarrierRoot,
     entryStaticClosureRoot: entryStaticClosure.root,
-    entryStaticFileCount: entryStaticClosure.fileCount
+    entryStaticFileCount: entryStaticClosure.fileCount,
+    qualificationBuild
   };
 }
 
@@ -882,7 +1046,9 @@ export function freshBuildEvidence(
   expectedCommit: string,
   label: string,
   expectedSourceAnchor: string,
-  expectedReady: boolean
+  expectedReady: boolean,
+  target: TrustedTarget,
+  role: QualificationBuildRole
 ): LocalBuildEvidence {
   const canonicalRoot = realpathSync(repositoryRoot);
   const gitRoot = realpathSync(gitText(canonicalRoot, ["rev-parse", "--show-toplevel"]));
@@ -901,18 +1067,33 @@ export function freshBuildEvidence(
   const distPath = resolve(canonicalRoot, attestationContract.buildIdentity.distPath);
   if (!distPath.startsWith(`${canonicalRoot}${sep}`)) throw new Error(`${label} dist path escapes its worktree`);
   rmSync(distPath, { recursive: true, force: true });
-  execFileSync(resolve(canonicalRoot, "node_modules/.bin/vinext"), ["build"], {
-    cwd: canonicalRoot,
-    encoding: "utf8",
-    maxBuffer: 64 * 1024 * 1024,
-    stdio: ["pipe", "pipe", "pipe"],
-    env: {
-      PATH: `${dirname(process.execPath)}:/usr/bin:/bin`,
-      NODE_ENV: "production",
-      CI: "1",
-      WRANGLER_LOG_PATH: ".wrangler/wrangler.log"
-    }
+  const qualification = qualificationBuildContext({
+    repositoryRoot: canonicalRoot,
+    expectedCommit,
+    role,
+    target
   });
+  try {
+    execFileSync(
+      resolve(canonicalRoot, "node_modules/.bin/vinext"),
+      ["build", attestationContract.buildIdentity.qualificationBuild.modeFlag],
+      {
+        cwd: canonicalRoot,
+        input: qualification.context,
+        encoding: "utf8",
+        maxBuffer: 64 * 1024 * 1024,
+        stdio: ["pipe", "pipe", "pipe"],
+        env: {
+          PATH: `${dirname(process.execPath)}:/usr/bin:/bin`,
+          NODE_ENV: "production",
+          CI: "1",
+          WRANGLER_LOG_PATH: ".wrangler/wrangler.log"
+        }
+      }
+    );
+  } finally {
+    qualification.context.fill(0);
+  }
   if (gitText(canonicalRoot, ["status", "--porcelain=v1", "--untracked-files=all"]) !== "") {
     throw new Error(`${label} build changed tracked or untracked source state`);
   }
@@ -955,7 +1136,7 @@ export function freshBuildEvidence(
     hash: sha256(activeBuildGraphBytes),
     sourceFilesScanned,
     buildFilesScanned
-  }, sha256(stableJson(entryCarrier)), entryStaticClosure);
+  }, sha256(stableJson(entryCarrier)), entryStaticClosure, qualification.evidence);
 }
 
 export function computeSourceAnchor(
@@ -978,6 +1159,7 @@ export function prepareSourceAnchorEvidence(input: {
   authorityCommit: string;
   implementationRepositoryRoots: readonly [string, string];
   implementationCommit: string;
+  target: TrustedTarget;
 }): {
   authorityEvidence: AuthorityEvidence;
   authorityBridgeCodeRelation: AuthorityBridgeCodeRelationEvidence;
@@ -1009,14 +1191,18 @@ export function prepareSourceAnchorEvidence(input: {
     input.implementationCommit,
     "first C0 preparation build",
     placeholderAnchor,
-    false
+    false,
+    input.target,
+    "implementation"
   );
   const secondBuild = freshBuildEvidence(
     secondRoot,
     input.implementationCommit,
     "second C0 preparation build",
     placeholderAnchor,
-    false
+    false,
+    input.target,
+    "implementation"
   );
   if (stableJson(firstBuild) !== stableJson(secondBuild)) {
     throw new Error("independent C0 preparation build manifests differ");
@@ -1335,6 +1521,42 @@ function exactKeys(value: Record<string, unknown>, allowed: readonly string[], c
   if (stableJson(actual) !== stableJson(expected)) throw new Error(`${context} contains unexpected fields`);
 }
 
+function validateQualificationBuildEvidence(
+  value: unknown,
+  context: string,
+  expectedRole: QualificationBuildRole,
+  expectedTarget?: TrustedTarget
+): LocalBuildEvidence["qualificationBuild"] {
+  const evidence = requireRecord(value, context);
+  exactKeys(evidence, [
+    "contextHash", "nodeVersion", "patchSha256", "role", "targetAccessMode",
+    "targetProjectId", "toolchainRoot", "version", "vinextVersion"
+  ], context);
+  const qualification = attestationContract.buildIdentity.qualificationBuild;
+  const parsed = {
+    version: requireString(evidence.version, `${context} version`),
+    role: requireString(evidence.role, `${context} role`) as QualificationBuildRole,
+    contextHash: requireHex(evidence.contextHash, `${context} context hash`),
+    toolchainRoot: requireHex(evidence.toolchainRoot, `${context} toolchain root`),
+    nodeVersion: requireString(evidence.nodeVersion, `${context} Node version`),
+    vinextVersion: requireString(evidence.vinextVersion, `${context} Vinext version`),
+    patchSha256: requireHex(evidence.patchSha256, `${context} patch hash`),
+    targetProjectId: requireString(evidence.targetProjectId, `${context} target project`),
+    targetAccessMode: requireString(evidence.targetAccessMode, `${context} target access`)
+  };
+  if (
+    parsed.version !== qualification.version || parsed.role !== expectedRole ||
+    parsed.vinextVersion !== qualification.vinextVersion ||
+    parsed.patchSha256 !== qualification.patchSha256 ||
+    parsed.targetAccessMode !== qualification.targetAccessRequired ||
+    (expectedTarget !== undefined && (
+      parsed.targetProjectId !== expectedTarget.projectId ||
+      parsed.targetAccessMode !== expectedTarget.accessMode
+    ))
+  ) throw new Error(`${context} does not match the frozen owner-only qualification build`);
+  return parsed;
+}
+
 function readSecretInput(expectedOriginInput: string): SecretInput {
   const raw = readBoundedStdin(MAX_SECRET_INPUT_BYTES);
   const value = JSON.parse(raw) as Record<string, unknown>;
@@ -1525,8 +1747,12 @@ function validateDeploymentProof(input: {
       .map((path) => realpathSync(path)) as [string, string];
     if (firstRoot === secondRoot) throw new Error("implementation reproducibility worktrees must be distinct");
     const placeholderAnchor = "0".repeat(64);
-    const firstBuild = freshBuildEvidence(firstRoot, implementationCommit, "first C0 build", placeholderAnchor, false);
-    const secondBuild = freshBuildEvidence(secondRoot, implementationCommit, "second C0 build", placeholderAnchor, false);
+    const firstBuild = freshBuildEvidence(
+      firstRoot, implementationCommit, "first C0 build", placeholderAnchor, false, input.target, "implementation"
+    );
+    const secondBuild = freshBuildEvidence(
+      secondRoot, implementationCommit, "second C0 build", placeholderAnchor, false, input.target, "implementation"
+    );
     if (stableJson(firstBuild) !== stableJson(secondBuild)) {
       throw new Error("independent C0 build manifests differ");
     }
@@ -1603,10 +1829,9 @@ function validateDeploymentProof(input: {
     exactKeys(loopbackImplementationBuild, [
       "activeBuildFilesScanned", "activeBuildGraphHash", "activeSourceFilesScanned",
       "archiveFileListRoot", "builtWorkerHash", "compiledAnchorCarrierRoot", "distRoot",
-      "entryStaticClosureRoot", "entryStaticFileCount", "fileCount"
+      "entryStaticClosureRoot", "entryStaticFileCount", "fileCount", "qualificationBuild"
     ], "loopback implementation build");
     for (const key of [
-      "activeBuildGraphHash", "archiveFileListRoot", "builtWorkerHash", "compiledAnchorCarrierRoot", "distRoot",
       "entryStaticClosureRoot"
     ] as const) {
       requireHex(loopbackImplementationBuild[key], `loopback implementation build ${key}`);
@@ -1615,6 +1840,11 @@ function validateDeploymentProof(input: {
     requireSafeInteger(loopbackImplementationBuild.activeSourceFilesScanned, "loopback active source files", 1);
     requireSafeInteger(loopbackImplementationBuild.activeBuildFilesScanned, "loopback active build files", 1);
     requireSafeInteger(loopbackImplementationBuild.entryStaticFileCount, "loopback entry static files", 1);
+    validateQualificationBuildEvidence(
+      loopbackImplementationBuild.qualificationBuild,
+      "loopback implementation qualification build",
+      "implementation"
+    );
     requireSafeInteger(sourceIdentity.implementationArchiveBytes, "implementation archive bytes", 1);
     requireSafeInteger(sourceIdentity.deploymentArchiveBytes, "deployment archive bytes", 1);
   }
@@ -1638,7 +1868,7 @@ function validateDeploymentProof(input: {
     "entryStaticClosureRoot", "entryStaticFileCount",
     "localArchiveBytes", "localArchiveFileCount", "localArchiveFileListRoot", "localArchiveFormat",
     "localArchiveContentRoot", "localArchiveSha256", "packageContentRoot", "packageFileCount",
-    "packageFileListRoot", "sitesArchiveContentHash"
+    "packageFileListRoot", "qualificationBuild", "sitesArchiveContentHash"
   ], "deployment build proof");
   for (const key of [
     "activeBuildGraphHash", "buildInputRoot", "builtWorkerHash", "compiledAnchorCarrierRoot", "distFileListRoot", "distRoot",
@@ -1651,6 +1881,12 @@ function validateDeploymentProof(input: {
   const activeSourceFilesScanned = requireSafeInteger(build.activeSourceFilesScanned, "deployment active source files", 1);
   const activeBuildFilesScanned = requireSafeInteger(build.activeBuildFilesScanned, "deployment active build files", 1);
   const entryStaticFileCount = requireSafeInteger(build.entryStaticFileCount, "deployment entry static files", 1);
+  const proofQualificationBuild = validateQualificationBuildEvidence(
+    build.qualificationBuild,
+    "deployment qualification build",
+    "deployment",
+    input.target.loopbackFixture ? undefined : input.target
+  );
   requireSafeInteger(build.localArchiveBytes, "local deployment archive bytes", 1);
   const localArchiveFileCount = requireSafeInteger(build.localArchiveFileCount, "local deployment archive file count", 1);
   const packageFileCount = requireSafeInteger(build.packageFileCount, "deployment package file count", 1);
@@ -1664,8 +1900,12 @@ function validateDeploymentProof(input: {
     const [firstRoot, secondRoot] = input.repositoryRoots
       .map((path) => realpathSync(path)) as [string, string];
     if (firstRoot === secondRoot) throw new Error("deployment reproducibility worktrees must be distinct");
-    const localBuild = freshBuildEvidence(firstRoot, deploymentCommit, "first C1 build", qualifiedSourceAnchor, true);
-    const replicaBuild = freshBuildEvidence(secondRoot, deploymentCommit, "second C1 build", qualifiedSourceAnchor, true);
+    const localBuild = freshBuildEvidence(
+      firstRoot, deploymentCommit, "first C1 build", qualifiedSourceAnchor, true, input.target, "deployment"
+    );
+    const replicaBuild = freshBuildEvidence(
+      secondRoot, deploymentCommit, "second C1 build", qualifiedSourceAnchor, true, input.target, "deployment"
+    );
     if (stableJson(localBuild) !== stableJson(replicaBuild)) {
       throw new Error("independent C1 build manifests differ");
     }
@@ -1691,7 +1931,8 @@ function validateDeploymentProof(input: {
       activeBuildFilesScanned !== localBuild.activeBuildFilesScanned ||
       build.compiledAnchorCarrierRoot !== localBuild.compiledAnchorCarrierRoot ||
       build.entryStaticClosureRoot !== localBuild.entryStaticClosureRoot ||
-      entryStaticFileCount !== localBuild.entryStaticFileCount
+      entryStaticFileCount !== localBuild.entryStaticFileCount ||
+      stableJson(proofQualificationBuild) !== stableJson(localBuild.qualificationBuild)
     ) throw new Error("deployment build proof does not match local build outputs");
   }
   return { proof, proofHash: sha256(bytes), gitEvidence };
