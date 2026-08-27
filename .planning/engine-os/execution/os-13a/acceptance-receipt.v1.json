@@ -153,10 +153,12 @@
     "interfaceChanged": false
   },
   "cleanup": {
-    "acceptedHostedProjectTombstoned": false,
-    "rejectedHostedProjectTombstoned": false,
+    "acceptedHostedProjectTombstoned": true,
+    "rejectedHostedProjectTombstoned": true,
     "physicalDeletionAvailable": false,
-    "disposition": "pending_immediate_retirement_after_receipt_commit"
+    "authenticatedTombstoneStatus": 410,
+    "runtimeBindingsRetained": 0,
+    "disposition": "both_owner_only_projects_retired_to_inert_410_workers"
   },
   "explicitExclusions": [
     "OS-13B",
