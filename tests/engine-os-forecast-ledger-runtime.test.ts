@@ -30,6 +30,20 @@ interface D1Faults {
   databaseReceiptTimes: string[];
   databaseClockObservations: string[];
   databaseClockAdvanceAfter: Partial<Record<string, string>>;
+  activationReadBarrier: {
+    arrivals: number;
+    target: number;
+    gate: Promise<void>;
+    release(): void;
+    active: boolean;
+  } | null;
+  recordReadBarrier: {
+    arrivals: number;
+    target: number;
+    gate: Promise<void>;
+    release(): void;
+    active: boolean;
+  } | null;
 }
 
 const D1_FAULTS = new WeakMap<object, D1Faults>();
@@ -60,12 +74,36 @@ function sqliteD1(db: DatabaseSync, faults: D1Faults): D1Database {
         if (sql.includes("os13a-database-clock")) {
           const observation = /os13a-database-clock:([a-z_]+)/.exec(sql)?.[1] ?? "unknown";
           faults.databaseClockObservations.push(observation);
-          const databaseReceiptAt = faults.databaseReceiptTimes.shift() ?? faults.databaseReceiptAt;
+          const queuedReceiptAt = faults.databaseReceiptTimes.shift();
+          const databaseReceiptAt = queuedReceiptAt ?? faults.databaseReceiptAt;
+          if (queuedReceiptAt) faults.databaseReceiptAt = queuedReceiptAt;
           const advanceTo = faults.databaseClockAdvanceAfter[observation];
           if (advanceTo) faults.databaseReceiptAt = advanceTo;
           return { database_receipt_at: databaseReceiptAt } as T;
         }
-        return (db.prepare(sql).get(...parameters) ?? null) as T | null;
+        const row = (db.prepare(sql).get(...parameters) ?? null) as T | null;
+        const barrier = faults.activationReadBarrier;
+        if (barrier?.active && sql.includes("FROM forecast_ledger_activations_v1")) {
+          barrier.arrivals += 1;
+          if (barrier.arrivals >= barrier.target) {
+            barrier.active = false;
+            barrier.release();
+          }
+          await barrier.gate;
+        }
+        const recordBarrier = faults.recordReadBarrier;
+        if (
+          recordBarrier?.active &&
+          sql.includes("FROM forecast_ledger_records_v1 WHERE job_key = ?")
+        ) {
+          recordBarrier.arrivals += 1;
+          if (recordBarrier.arrivals >= recordBarrier.target) {
+            recordBarrier.active = false;
+            recordBarrier.release();
+          }
+          await recordBarrier.gate;
+        }
+        return row;
       },
       async all<T>() {
         return { results: db.prepare(sql).all(...parameters) as T[], success: true, meta: {} };
@@ -175,7 +213,9 @@ function database(): {
     databaseReceiptAt: plus(HORIZON_TIMES.kickoff_minus_60, 4_000),
     databaseReceiptTimes: [],
     databaseClockObservations: [],
-    databaseClockAdvanceAfter: {}
+    databaseClockAdvanceAfter: {},
+    activationReadBarrier: null,
+    recordReadBarrier: null
   };
   sqlite.function("os13a_test_now", () => faults.databaseReceiptAt);
   for (const migration of [
@@ -418,6 +458,18 @@ function publication(input: {
   };
 }
 
+function blockOverlappingRecordReads(faults: D1Faults): void {
+  let release!: () => void;
+  const gate = new Promise<void>((resolveGate) => { release = resolveGate; });
+  faults.recordReadBarrier = {
+    arrivals: 0,
+    target: 2,
+    gate,
+    release,
+    active: true
+  };
+}
+
 describe("OS-13A isolated D1/R2 forecast-ledger runtime", () => {
   it("materializes exactly five current heads and commits one timely no-package record per horizon without R2", async () => {
     const { sqlite, db, faults } = database();
@@ -562,6 +614,61 @@ describe("OS-13A isolated D1/R2 forecast-ledger runtime", () => {
     sqlite.close();
   });
 
+  it("converges identical overlapping activation calls on the stored D1 winner clock", async () => {
+    const { sqlite, db, faults } = database();
+    const boundary = "os13a-package:overlap-activation";
+    const qualifiedAt = plus(HORIZON_TIMES.kickoff_minus_120, -40_000);
+    faults.databaseReceiptAt = qualifiedAt;
+    const qualification = await registerOs13aFixtureQualification({
+      db,
+      activationBoundary: boundary,
+      packageId: "fixture-overlap-activation",
+      packageHash: HASHES.package,
+      runnerHash: HASHES.runner,
+      codeHash: HASHES.code,
+      modelHash: HASHES.package,
+      configHash: HASHES.config,
+      featureSchemaHash: HASHES.feature,
+      targetSchemaHash: HASHES.target,
+      qualifiedAt,
+      qualificationEvidenceHash: "8".repeat(64)
+    });
+    let release!: () => void;
+    const gate = new Promise<void>((resolveGate) => { release = resolveGate; });
+    faults.activationReadBarrier = {
+      arrivals: 0,
+      target: 2,
+      gate,
+      release,
+      active: true
+    };
+    faults.databaseReceiptTimes = [
+      plus(HORIZON_TIMES.kickoff_minus_120, -30_000),
+      plus(HORIZON_TIMES.kickoff_minus_120, -29_000)
+    ];
+    const activationInput = {
+      db,
+      activationBoundary: boundary,
+      mode: "qualified_package" as const,
+      qualificationId: qualification.qualification_id,
+      season: 2026,
+      firstWeek: 1,
+      activatedAt: qualifiedAt,
+      firstOriginUtc: HORIZON_TIMES.kickoff_minus_120,
+      weekOneOriginComplete: false
+    };
+    const [left, right] = await Promise.all([
+      createOs13aQualificationActivation(activationInput),
+      createOs13aQualificationActivation(activationInput)
+    ]);
+    expect(left).toEqual(right);
+    expect(left.activated_at).toBe(plus(HORIZON_TIMES.kickoff_minus_120, -30_000));
+    expect(scalar(sqlite, "SELECT count(*) AS value FROM forecast_ledger_activations_v1")).toBe(1);
+    expect(scalar(sqlite, `SELECT count(*) AS value FROM forecast_ledger_events_v1
+      WHERE event_type = 'activation_created'`)).toBe(1);
+    sqlite.close();
+  });
+
   it("rejects a pre-due caller-future claim without poisoning lease state", async () => {
     const { sqlite, db, faults } = database();
     const scheduled = plus(HORIZON_TIMES.kickoff_minus_15, 300_000);
@@ -627,6 +734,172 @@ describe("OS-13A isolated D1/R2 forecast-ledger runtime", () => {
       FROM forecast_ledger_jobs_v1 WHERE job_key = ?`).get(jobKey)).toEqual(before);
     expect(scalar(sqlite, `SELECT count(*) AS value FROM forecast_ledger_events_v1
       WHERE event_type = 'lease_renewed'`)).toBe(0);
+    sqlite.close();
+  });
+
+  it("publishes with a valid renewed lease while retaining the immutable attempt expiry", async () => {
+    const { sqlite, db, faults } = database();
+    seedGame(sqlite, { suffix: "renew-publish", horizons: ["kickoff_minus_60"] });
+    const { activation } = await packageActivation(
+      db,
+      "renew-publish",
+      HORIZON_TIMES.kickoff_minus_60
+    );
+    const [jobKey] = (await materializeOs13aLedgerJobs({
+      db,
+      activationId: activation.activation_id,
+      createdAt: "2026-08-26T00:00:02.000Z",
+      expectedInputManifestHash: HASHES.input
+    })).jobKeys;
+    if (!jobKey) throw new Error("Missing renewed publication job");
+    const initial = await leaseFor({
+      db,
+      jobKey,
+      invokedAt: HORIZON_TIMES.kickoff_minus_60,
+      token: "renew-publish-attempt"
+    });
+    faults.databaseReceiptAt = plus(initial.invokedAt, 60_000);
+    const renewed = await renewOs13aLedgerLease({
+      db,
+      lease: initial,
+      renewedAt: plus(initial.invokedAt, 60_000)
+    });
+    if (!renewed) throw new Error("Expected renewed lease");
+    expect(renewed.leaseExpiresAt).toBe(plus(initial.invokedAt, 180_000));
+    expect(sqlite.prepare(`SELECT lease_expires_at FROM forecast_ledger_attempts_v1
+      WHERE job_key = ?`).get(jobKey)).toEqual({ lease_expires_at: initial.leaseExpiresAt });
+
+    const bytes = new TextEncoder().encode("renewed-authority");
+    const bucket = new MemoryR2();
+    const request = publication({
+      db,
+      faults,
+      bucket,
+      lease: renewed,
+      generatedAt: plus(initial.invokedAt, 61_000),
+      receiptAt: plus(initial.invokedAt, 64_000),
+      overrides: {
+        requestedStatus: "forecast",
+        requestedWithholdingReason: null,
+        outputBytes: bytes,
+        provenance: fixtureProvenance(bytes)
+      }
+    });
+    const committed = await publishOs13aLedgerRecord(request);
+    expect(committed).toMatchObject({ status: "committed", objectPublished: true });
+    expect(bucket.puts).toBe(1);
+    await expect(publishOs13aLedgerRecord({
+      ...request,
+      lease: { ...renewed, activationId: `${renewed.activationId}-forged` }
+    })).rejects.toThrow(ForecastLedgerAuthorityError);
+    await expect(publishOs13aLedgerRecord({
+      ...request,
+      lease: { ...renewed, leaseExpiresAt: plus(renewed.leaseExpiresAt, 1_000) }
+    })).rejects.toThrow(ForecastLedgerAuthorityError);
+    expect(bucket.puts).toBe(1);
+    sqlite.close();
+  });
+
+  it("rejects forged mutable or redundant fields on a renewed lease before R2", async () => {
+    const { sqlite, db, faults } = database();
+    seedGame(sqlite, { suffix: "forged-renew", horizons: ["kickoff_minus_60"] });
+    const { activation } = await packageActivation(
+      db,
+      "forged-renew",
+      HORIZON_TIMES.kickoff_minus_60
+    );
+    const [jobKey] = (await materializeOs13aLedgerJobs({
+      db,
+      activationId: activation.activation_id,
+      createdAt: "2026-08-26T00:00:02.000Z",
+      expectedInputManifestHash: HASHES.input
+    })).jobKeys;
+    if (!jobKey) throw new Error("Missing forged renewed publication job");
+    const initial = await leaseFor({
+      db,
+      jobKey,
+      invokedAt: HORIZON_TIMES.kickoff_minus_60,
+      token: "forged-renew-attempt"
+    });
+    faults.databaseReceiptAt = plus(initial.invokedAt, 60_000);
+    const renewed = await renewOs13aLedgerLease({
+      db,
+      lease: initial,
+      renewedAt: plus(initial.invokedAt, 60_000)
+    });
+    if (!renewed) throw new Error("Expected renewed lease");
+
+    faults.databaseReceiptAt = plus(initial.invokedAt, 61_000);
+    await expect(renewOs13aLedgerLease({
+      db,
+      lease: { ...renewed, leaseExpiresAt: plus(renewed.leaseExpiresAt, 1_000) },
+      renewedAt: plus(initial.invokedAt, 61_000)
+    })).rejects.toThrow(ForecastLedgerAuthorityError);
+
+    const bytes = new TextEncoder().encode("forged-renewed-authority");
+    const bucket = new MemoryR2();
+    const forgedLeases: ForecastLedgerJobLease[] = [
+      { ...renewed, leaseExpiresAt: plus(renewed.leaseExpiresAt, 1_000) },
+      { ...renewed, activationId: `${renewed.activationId}-forged` },
+      { ...renewed, originVersionId: `${renewed.originVersionId}-forged` },
+      { ...renewed, reclaimed: !renewed.reclaimed }
+    ];
+    for (const forged of forgedLeases) {
+      await expect(publishOs13aLedgerRecord(publication({
+        db,
+        faults,
+        bucket,
+        lease: forged,
+        generatedAt: plus(initial.invokedAt, 62_000),
+        receiptAt: plus(initial.invokedAt, 64_000),
+        overrides: {
+          requestedStatus: "forecast",
+          requestedWithholdingReason: null,
+          outputBytes: bytes,
+          provenance: fixtureProvenance(bytes)
+        }
+      }))).rejects.toThrow(ForecastLedgerAuthorityError);
+    }
+    expect(bucket.puts).toBe(0);
+    expect(scalar(sqlite, "SELECT count(*) AS value FROM forecast_ledger_records_v1")).toBe(0);
+    sqlite.close();
+  });
+
+  it("rejects a mutated lease clock against the immutable attempt before publication", async () => {
+    const { sqlite, db, faults } = database();
+    seedGame(sqlite, { suffix: "mutated-lease-clock", horizons: ["kickoff_minus_60"] });
+    const activation = await withholdingActivation(db, "mutated-lease-clock", {
+      firstOriginUtc: HORIZON_TIMES.kickoff_minus_60
+    });
+    const [jobKey] = (await materializeOs13aLedgerJobs({
+      db,
+      activationId: activation.activation_id,
+      createdAt: "2026-08-26T00:00:02.000Z"
+    })).jobKeys;
+    if (!jobKey) throw new Error("Missing mutated-lease job");
+    const lease = await leaseFor({
+      db,
+      jobKey,
+      invokedAt: HORIZON_TIMES.kickoff_minus_60,
+      token: "mutated-lease-attempt"
+    });
+    const mutatedLease = {
+      ...lease,
+      invokedAt: plus(lease.invokedAt, 20_000)
+    };
+    const bucket = new MemoryR2();
+    await expect(publishOs13aLedgerRecord(publication({
+      db,
+      faults,
+      bucket,
+      lease: mutatedLease,
+      generatedAt: plus(lease.invokedAt, 21_000),
+      receiptAt: plus(lease.invokedAt, 22_000)
+    }))).rejects.toThrow("differs from its immutable persisted attempt");
+    expect(scalar(sqlite, "SELECT count(*) AS value FROM forecast_ledger_records_v1")).toBe(0);
+    expect(bucket.puts).toBe(0);
+    expect(sqlite.prepare(`SELECT invoked_at FROM forecast_ledger_attempts_v1
+      WHERE job_key = ?`).get(jobKey)).toEqual({ invoked_at: lease.invokedAt });
     sqlite.close();
   });
 
@@ -795,6 +1068,109 @@ describe("OS-13A isolated D1/R2 forecast-ledger runtime", () => {
     expect(scalar(sqlite, "SELECT count(*) AS value FROM forecast_ledger_attempts_v1")).toBe(1);
     expect(scalar(sqlite, `SELECT count(*) AS value FROM forecast_ledger_events_v1
       WHERE event_type = 'lease_acquired'`)).toBe(1);
+    sqlite.close();
+  });
+
+  it("converges overlapping identical withholding publications on one terminal record", async () => {
+    const { sqlite, db, faults } = database();
+    seedGame(sqlite, { suffix: "overlap-withheld", horizons: ["kickoff_minus_60"] });
+    const activation = await withholdingActivation(db, "overlap-withheld", {
+      firstOriginUtc: HORIZON_TIMES.kickoff_minus_60
+    });
+    const [jobKey] = (await materializeOs13aLedgerJobs({
+      db,
+      activationId: activation.activation_id,
+      createdAt: "2026-08-26T00:00:02.000Z"
+    })).jobKeys;
+    if (!jobKey) throw new Error("Missing overlapping withholding job");
+    const lease = await leaseFor({
+      db,
+      jobKey,
+      invokedAt: HORIZON_TIMES.kickoff_minus_60,
+      token: "overlap-withheld-attempt"
+    });
+    const bucket = new MemoryR2();
+    const request = publication({
+      db,
+      faults,
+      bucket,
+      lease,
+      generatedAt: plus(lease.invokedAt, 1_000),
+      receiptAt: plus(lease.invokedAt, 4_000)
+    });
+    blockOverlappingRecordReads(faults);
+    const results = await Promise.all([
+      publishOs13aLedgerRecord(request),
+      publishOs13aLedgerRecord(request)
+    ]);
+    expect(results.map((result) => result.status).sort()).toEqual([
+      "committed",
+      "deduplicated"
+    ]);
+    expect(results[0]?.record.recordId).toBe(results[1]?.record.recordId);
+    expect(scalar(sqlite, "SELECT count(*) AS value FROM forecast_ledger_records_v1")).toBe(1);
+    expect(scalar(sqlite, `SELECT count(*) AS value FROM forecast_ledger_events_v1
+      WHERE event_type = 'record_committed'`)).toBe(1);
+    expect(bucket.puts).toBe(0);
+    sqlite.close();
+  });
+
+  it("converges overlapping identical forecast publications on one pointer and exact bytes", async () => {
+    const { sqlite, db, faults } = database();
+    seedGame(sqlite, { suffix: "overlap-forecast", horizons: ["kickoff_minus_60"] });
+    const { activation } = await packageActivation(
+      db,
+      "overlap-forecast",
+      HORIZON_TIMES.kickoff_minus_60
+    );
+    const [jobKey] = (await materializeOs13aLedgerJobs({
+      db,
+      activationId: activation.activation_id,
+      createdAt: "2026-08-26T00:00:02.000Z",
+      expectedInputManifestHash: HASHES.input
+    })).jobKeys;
+    if (!jobKey) throw new Error("Missing overlapping forecast job");
+    const lease = await leaseFor({
+      db,
+      jobKey,
+      invokedAt: HORIZON_TIMES.kickoff_minus_60,
+      token: "overlap-forecast-attempt"
+    });
+    const bytes = new TextEncoder().encode("overlapping-exact-output");
+    const bucket = new MemoryR2();
+    const request = publication({
+      db,
+      faults,
+      bucket,
+      lease,
+      generatedAt: plus(lease.invokedAt, 1_000),
+      receiptAt: plus(lease.invokedAt, 4_000),
+      overrides: {
+        requestedStatus: "forecast",
+        requestedWithholdingReason: null,
+        outputBytes: bytes,
+        provenance: fixtureProvenance(bytes)
+      }
+    });
+    blockOverlappingRecordReads(faults);
+    const results = await Promise.all([
+      publishOs13aLedgerRecord(request),
+      publishOs13aLedgerRecord(request)
+    ]);
+    expect(results.map((result) => result.status).sort()).toEqual([
+      "committed",
+      "deduplicated"
+    ]);
+    expect(results[0]?.record.recordId).toBe(results[1]?.record.recordId);
+    expect(scalar(sqlite, "SELECT count(*) AS value FROM forecast_ledger_records_v1")).toBe(1);
+    expect(scalar(sqlite, `SELECT count(*) AS value FROM forecast_ledger_events_v1
+      WHERE event_type = 'record_committed'`)).toBe(1);
+    expect(bucket.objects.size).toBe(1);
+    expect(await recoverOs13aForecastOutput({
+      db,
+      bucket: bucket as unknown as R2Bucket,
+      recordId: results[0]!.record.recordId
+    })).toEqual(bytes);
     sqlite.close();
   });
 

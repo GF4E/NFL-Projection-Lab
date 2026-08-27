@@ -703,6 +703,11 @@ CREATE TRIGGER `forecast_ledger_records_v1_publication_guard`
       ON activation.`activation_id` = job.`activation_id`
     JOIN `forecast_origin_versions` origin
       ON origin.`origin_version_id` = job.`origin_version_id`
+    JOIN `forecast_ledger_attempts_v1` attempt
+      ON attempt.`job_key` = job.`job_key`
+      AND attempt.`origin_version_id` = job.`origin_version_id`
+      AND attempt.`attempt_token_hash` = NEW.`attempt_token_hash`
+      AND attempt.`fence_token` = NEW.`fence_token`
     LEFT JOIN `forecast_ledger_qualifications_v1` qualification
       ON qualification.`qualification_id` = activation.`qualification_id`
     WHERE job.`job_key` = NEW.`job_key`
@@ -716,6 +721,10 @@ CREATE TRIGGER `forecast_ledger_records_v1_publication_guard`
       AND job.`state` = 'running'
       AND job.`active_attempt_token_hash` = NEW.`attempt_token_hash`
       AND job.`fence_token` = NEW.`fence_token`
+      AND attempt.`lease_owner` = job.`lease_owner`
+      AND attempt.`lease_acquired_at` = job.`lease_acquired_at`
+      AND julianday(attempt.`lease_expires_at`) <= julianday(job.`lease_expires_at`)
+      AND NEW.`invoked_at` = attempt.`invoked_at`
       AND julianday('now' /* os13a-authoritative-clock */) >=
         julianday(NEW.`scheduled_trigger_at`)
       AND julianday(NEW.`persisted_at`) <=
@@ -856,6 +865,6 @@ CREATE TRIGGER `forecast_ledger_events_v1_no_delete`
 INSERT INTO `engine_schema_versions` (`version`, `migration_hash`, `applied_at`)
 VALUES (
   '0018_engine_os_forecast_ledger',
-  'sha256:5791d0fab231152fc34a8a04c132585899f36c8098f8e562e518bc7b1b920319',
+  'sha256:851f66b3ad07afe61be346b09f853875e675d25512f989b0f4337f6c64a1c293',
   strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
 );

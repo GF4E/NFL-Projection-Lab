@@ -371,13 +371,14 @@ function insertWithheld(db: DatabaseSync, input: {
   reason?: string;
   timing?: "timely" | "late";
   prospective?: 0 | 1;
+  invokedAt?: string;
   persistedAt?: string;
   databaseClockAt?: string;
 }): void {
   const suffix = input.suffix ?? "withheld";
   const lease = db.prepare(`SELECT lease_acquired_at FROM forecast_ledger_jobs_v1
     WHERE job_key = ?`).get(input.jobKey) as { lease_acquired_at: string | null };
-  const invokedAt = lease.lease_acquired_at ?? at(-30);
+  const invokedAt = input.invokedAt ?? lease.lease_acquired_at ?? at(-30);
   const evidenceAt = invokedAt;
   const generatedAt = new Date(Date.parse(invokedAt) + 10_000).toISOString();
   const persistenceRequestedAt = new Date(Date.parse(invokedAt) + 20_000).toISOString();
@@ -957,6 +958,38 @@ describe("OS-13A additive forecast ledger migration", () => {
       WHERE job_key = ?`).get(jobKey)).toEqual({ state: "completed", fence_token: 2 });
     expect(() => db.prepare(`UPDATE forecast_ledger_records_v1
       SET capture_health = 'current' WHERE job_key = ?`).run(jobKey)).toThrow(/append-only/);
+    db.close();
+  });
+
+  it("rejects a record invocation time not bound to its immutable fenced attempt", () => {
+    const db = database();
+    const originVersionId = seedOrigin(db, "kickoff_minus_120", "mutated-invocation");
+    const activationId = insertActivation(db, { suffix: "mutated-invocation" });
+    const jobKey = insertJob(db, {
+      activationId,
+      originVersionId,
+      suffix: "mutated-invocation"
+    });
+    const token = sha256Hex("mutated-invocation-attempt");
+    const fence = acquire(db, {
+      jobKey,
+      token,
+      acquiredAt: at(-60),
+      expiresAt: at(60)
+    });
+    expect(() => insertWithheld(db, {
+      activationId,
+      jobKey,
+      originVersionId,
+      token,
+      fence,
+      invokedAt: at(-50),
+      suffix: "mutated-invocation"
+    })).toThrow(/live fenced origin claim/);
+    expect(db.prepare(`SELECT count(*) AS count FROM forecast_ledger_records_v1
+      WHERE job_key = ?`).get(jobKey)).toEqual({ count: 0 });
+    expect(db.prepare(`SELECT state FROM forecast_ledger_jobs_v1 WHERE job_key = ?`)
+      .get(jobKey)).toEqual({ state: "running" });
     db.close();
   });
 

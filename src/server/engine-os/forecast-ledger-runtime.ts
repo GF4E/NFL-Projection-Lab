@@ -111,6 +111,19 @@ interface JobRow {
   created_at: string;
 }
 
+interface AttemptRow {
+  attempt_id: string;
+  job_key: string;
+  origin_version_id: string;
+  attempt_token_hash: string;
+  fence_token: number;
+  lease_owner: string;
+  invoked_at: string;
+  lease_acquired_at: string;
+  lease_expires_at: string;
+  persisted_at: string;
+}
+
 interface StoredRecordRow {
   record_id: string;
   job_key: string;
@@ -539,6 +552,102 @@ async function exactActivation(db: D1Database, activationId: string): Promise<Ac
   return row;
 }
 
+async function exactLeaseAttempt(
+  db: D1Database,
+  lease: ForecastLedgerJobLease
+): Promise<AttemptRow> {
+  const attempt = await db.prepare(`SELECT * FROM forecast_ledger_attempts_v1
+    WHERE job_key = ? AND attempt_token_hash = ? AND fence_token = ?`)
+    .bind(lease.jobKey, lease.attemptTokenHash, lease.fence).first<AttemptRow>();
+  if (!attempt) throw new ForecastLedgerAuthorityError("Persisted fenced attempt does not exist");
+  const suppliedLeaseExpiry = iso(lease.leaseExpiresAt, "Supplied lease expiry");
+  let renewalMatches = attempt.lease_expires_at === suppliedLeaseExpiry;
+  if (!renewalMatches) {
+    const renewalPayload = canonicalJson({
+      owner: lease.owner,
+      leaseExpiresAt: suppliedLeaseExpiry
+    });
+    const renewal = await db.prepare(`SELECT payload_json, payload_hash
+      FROM forecast_ledger_events_v1
+      WHERE event_type = 'lease_renewed' AND job_key = ? AND origin_version_id = ?
+        AND attempt_token_hash = ? AND fence_token = ? AND payload_json = ?
+      LIMIT 1`).bind(
+      lease.jobKey,
+      lease.originVersionId,
+      lease.attemptTokenHash,
+      lease.fence,
+      renewalPayload
+    ).first<{ payload_json: string; payload_hash: string }>();
+    renewalMatches = Boolean(
+      renewal && renewal.payload_hash === sha256Hex(renewal.payload_json)
+    );
+  }
+  if (
+    attempt.job_key !== lease.jobKey ||
+    attempt.origin_version_id !== lease.originVersionId ||
+    attempt.attempt_token_hash !== lease.attemptTokenHash ||
+    attempt.fence_token !== lease.fence ||
+    attempt.lease_owner !== lease.owner ||
+    attempt.invoked_at !== lease.invokedAt ||
+    attempt.lease_acquired_at !== lease.invokedAt ||
+    !renewalMatches ||
+    (attempt.fence_token > 1) !== lease.reclaimed
+  ) {
+    throw new ForecastLedgerAuthorityError(
+      "Supplied lease differs from its immutable persisted attempt"
+    );
+  }
+  return attempt;
+}
+
+async function exactLeaseJobIdentity(
+  db: D1Database,
+  lease: ForecastLedgerJobLease
+): Promise<JobRow> {
+  const job = await db.prepare(`SELECT * FROM forecast_ledger_jobs_v1
+    WHERE job_key = ?`).bind(lease.jobKey).first<JobRow>();
+  if (
+    !job ||
+    job.job_key !== lease.jobKey ||
+    job.origin_version_id !== lease.originVersionId ||
+    job.activation_id !== lease.activationId
+  ) {
+    throw new ForecastLedgerAuthorityError(
+      "Supplied lease identifies a different persisted job"
+    );
+  }
+  return job;
+}
+
+async function exactLiveLeaseAuthority(
+  db: D1Database,
+  lease: ForecastLedgerJobLease,
+  staleReturnsNull = false
+): Promise<{ attempt: AttemptRow; job: JobRow } | null> {
+  const attempt = await exactLeaseAttempt(db, lease);
+  const job = await exactLeaseJobIdentity(db, lease);
+  if (
+    job.state !== "running" ||
+    job.active_attempt_token_hash !== lease.attemptTokenHash ||
+    job.fence_token !== lease.fence ||
+    job.lease_owner !== lease.owner
+  ) {
+    if (staleReturnsNull) return null;
+    throw new ForecastLedgerAuthorityError(
+      "Supplied lease no longer holds the current fenced job authority"
+    );
+  }
+  if (
+    job.lease_acquired_at !== lease.invokedAt ||
+    job.lease_expires_at !== lease.leaseExpiresAt
+  ) {
+    throw new ForecastLedgerAuthorityError(
+      "Supplied lease does not match the current fenced job authority"
+    );
+  }
+  return { attempt, job };
+}
+
 /** Registers only an isolated, synthetic qualification fixture; it cannot activate production. */
 export async function registerOs13aFixtureQualification(
   input: Os13aFixtureQualificationInput
@@ -835,7 +944,16 @@ export async function createOs13aQualificationActivation(
   });
   await input.db.batch([insert, event.statement]);
   const stored = await exactActivation(input.db, activationId);
-  if (canonicalJson(stored) !== canonicalJson(row)) {
+  const expectedStored = {
+    ...row,
+    activated_at: stored.activated_at,
+    evidence_scope: classifyForecastEvidenceScope({
+      activatedAt: stored.activated_at,
+      firstOriginUtc,
+      weekOneOriginComplete: input.weekOneOriginComplete
+    })
+  };
+  if (canonicalJson(stored) !== canonicalJson(expectedStored)) {
     throw new ForecastLedgerIntegrityError("Activation identity collision changed immutable data");
   }
   await assertExactEvent(input.db, event.expectedAt(stored.activated_at));
@@ -1234,6 +1352,7 @@ export async function renewOs13aLedgerLease(input: {
   lease: ForecastLedgerJobLease;
   renewedAt: string;
 }): Promise<ForecastLedgerJobLease | null> {
+  if (!await exactLiveLeaseAuthority(input.db, input.lease, true)) return null;
   const requestedRenewedAt = iso(input.renewedAt, "Requested lease renewal");
   const renewedAt = await databaseReceiptTime(input.db, "lease_renewal");
   if (Date.parse(requestedRenewedAt) > Date.parse(renewedAt)) {
@@ -1333,6 +1452,12 @@ async function publicationContext(input: {
   const job = await input.db.prepare(`SELECT * FROM forecast_ledger_jobs_v1
     WHERE job_key = ?`).bind(input.lease.jobKey).first<JobRow>();
   if (!job) throw new ForecastLedgerAuthorityError("Ledger job does not exist");
+  if (
+    job.activation_id !== input.lease.activationId ||
+    job.origin_version_id !== input.lease.originVersionId
+  ) {
+    throw new ForecastLedgerAuthorityError("Supplied lease identifies a different ledger job");
+  }
   const activation = await exactActivation(input.db, job.activation_id);
   const origin = await input.db.prepare(`SELECT
       origin.origin_version_id, origin.logical_origin_id, origin.game_id, origin.horizon_id,
@@ -1437,6 +1562,9 @@ async function verifyExistingRetry(input: {
 export async function publishOs13aLedgerRecord(
   input: ForecastLedgerPublicationInput
 ): Promise<ForecastLedgerPublicationResult> {
+  const persistedAttempt = await exactLeaseAttempt(input.db, input.lease);
+  await exactLeaseJobIdentity(input.db, input.lease);
+  const authoritativeInvokedAt = persistedAttempt.invoked_at;
   const requestedStatus = input.requestedStatus ?? "withheld";
   const requestedReason = input.requestedWithholdingReason ??
     (requestedStatus === "withheld" ? "no_eligible_package" : null);
@@ -1452,7 +1580,7 @@ export async function publishOs13aLedgerRecord(
     requestedStatus,
     requestedReason,
     captureHealth,
-    invokedAt: input.lease.invokedAt,
+    invokedAt: authoritativeInvokedAt,
     evidenceAt,
     generatedAt,
     publicationRequestedAt,
@@ -1486,8 +1614,8 @@ export async function publishOs13aLedgerRecord(
   let context = await publicationContext({ db: input.db, lease: input.lease });
   const preflightAt = await databaseReceiptTime(input.db, "preflight");
   if (
-    Date.parse(context.job.scheduled_trigger_at) > Date.parse(input.lease.invokedAt) ||
-    Date.parse(input.lease.invokedAt) > Date.parse(generatedAt) ||
+    Date.parse(context.job.scheduled_trigger_at) > Date.parse(authoritativeInvokedAt) ||
+    Date.parse(authoritativeInvokedAt) > Date.parse(generatedAt) ||
     Date.parse(evidenceAt) > Date.parse(generatedAt) ||
     Date.parse(generatedAt) > Date.parse(publicationRequestedAt) ||
     Date.parse(publicationRequestedAt) > Date.parse(preflightAt)
@@ -1548,7 +1676,7 @@ export async function publishOs13aLedgerRecord(
       requestedStatus,
       requestedWithholdingReason: requestedReason,
       captureHealth,
-      invokedAt: input.lease.invokedAt,
+      invokedAt: authoritativeInvokedAt,
       evidenceAt,
       generatedAt,
       outputPublishedAt: clocks.outputPublishedAt,
@@ -1590,6 +1718,7 @@ export async function publishOs13aLedgerRecord(
       `Forecast-ledger publication rejected: ${preflight.violations.join(",")}`
     );
   }
+  await exactLiveLeaseAuthority(input.db, input.lease);
 
   let objectPublished = false;
   let outputPublishedAt: string | null = null;
@@ -1634,7 +1763,7 @@ export async function publishOs13aLedgerRecord(
   const qualificationKey = context.qualification.qualification_key;
   const payloadJson = canonicalJson({
     record,
-    invokedAt: input.lease.invokedAt,
+    invokedAt: authoritativeInvokedAt,
     evidenceAt,
     publicationRequestedAt,
     intentHash
@@ -1715,7 +1844,41 @@ export async function publishOs13aLedgerRecord(
     },
     identity: { recordId: record.recordId, recordHash: record.recordHash }
   });
-  await input.db.batch([recordStatement, event.statement]);
+  try {
+    await input.db.batch([recordStatement, event.statement]);
+  } catch (cause) {
+    // An exact overlapping worker can lose the terminal insert race only after
+    // the winner has atomically completed the same job. Converge on that
+    // immutable winner; any differing intent or absent winner preserves the
+    // original failure.
+    const winner = await input.db.prepare(`SELECT record_id, job_key, status, withholding_reason,
+        attempt_token_hash, fence_token, output_object_key, output_object_hash,
+        output_object_bytes, evidence_at, generated_at, persistence_requested_at, persisted_at,
+        capture_health, payload_json, payload_hash
+      FROM forecast_ledger_records_v1 WHERE job_key = ?`).bind(input.lease.jobKey)
+      .first<StoredRecordRow>();
+    if (!winner) throw cause;
+    const winnerRecord = await verifyExistingRetry({
+      bucket: input.bucket,
+      row: winner,
+      lease: input.lease,
+      requestedStatus,
+      requestedReason,
+      outputBytes,
+      provenance: input.provenance ?? null,
+      evidenceAt,
+      generatedAt,
+      publicationRequestedAt,
+      captureHealth,
+      intentHash
+    });
+    return {
+      status: "deduplicated",
+      record: winnerRecord,
+      objectPublished,
+      providerDispatches: 0
+    };
+  }
   await assertExactEvent(input.db, event.expected);
   const stored = await input.db.prepare(`SELECT record_id, job_key, status, withholding_reason,
       attempt_token_hash, fence_token, output_object_key, output_object_hash,
