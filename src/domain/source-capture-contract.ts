@@ -3,7 +3,8 @@ import contractV2Json from "../../config/source-capture-contract-2026.v2.json";
 import contractV3Json from "../../config/source-capture-contract-2026.v3.json";
 import contractV4Json from "../../config/source-capture-contract-2026.v4.json";
 import contractV5Json from "../../config/source-capture-contract-2026.v5.json";
-import contractManifestV9Json from "../../config/engine-os-contract-manifest.v9.json";
+import contractV6Json from "../../config/source-capture-contract-2026.v6.json";
+import contractManifestV10Json from "../../config/engine-os-contract-manifest.v10.json";
 import type { CaptureDataset, RedactedHttpRequest } from "./engine-os";
 import { redactHttpRequest } from "./engine-os";
 import { canonicalJson, sha256Hex, stableHash } from "./hash";
@@ -11,13 +12,13 @@ import { canonicalJson, sha256Hex, stableHash } from "./hash";
 export const OS03A_CAPTURE_CONTRACT_VERSION = "engine-os.os-03a-capture.v1" as const;
 export const OS03A_SIDECAR_SCHEMA = "engine-os.os-03a-capture-sidecar.v1" as const;
 
-const effectiveArtifact = contractManifestV9Json.artifacts.find(
+const effectiveArtifact = contractManifestV10Json.artifacts.find(
   (artifact) => artifact.task === "OS-03A" && artifact.status === "effective"
 );
-if (!effectiveArtifact) throw new Error("The effective OS-03A contract is not bound by manifest v9");
+if (!effectiveArtifact) throw new Error("The effective OS-03A contract is not bound by manifest v10");
 
-export const OS03A_EFFECTIVE_CONTRACT_VERSION = "source-capture-contract.2026.5" as const;
-if (contractV5Json.version !== OS03A_EFFECTIVE_CONTRACT_VERSION) {
+export const OS03A_EFFECTIVE_CONTRACT_VERSION = "source-capture-contract.2026.6" as const;
+if (contractV6Json.version !== OS03A_EFFECTIVE_CONTRACT_VERSION) {
   throw new Error("The effective OS-03A source-capture contract version changed");
 }
 export const OS03A_EFFECTIVE_CONTRACT_HASH = effectiveArtifact.canonicalContentSha256;
@@ -369,19 +370,19 @@ export function validateFrozenSourceCaptureContracts(): {
   errors: string[];
   canonicalHashes: Record<string, string>;
 } {
-  const contracts = [contractV1Json, contractV2Json, contractV3Json, contractV4Json, contractV5Json];
+  const contracts = [contractV1Json, contractV2Json, contractV3Json, contractV4Json, contractV5Json, contractV6Json];
   const errors: string[] = [];
   const canonicalHashes = Object.fromEntries(contracts.map((contract) => [contract.version, stableHash(contract)]));
   for (const contract of contracts) {
     if (contract.status !== "frozen") errors.push(`${contract.version} is not frozen`);
-    const artifact = contractManifestV9Json.artifacts.find((entry) => entry.contractVersion === contract.version);
-    if (!artifact) errors.push(`${contract.version} is not bound by manifest v9`);
+    const artifact = contractManifestV10Json.artifacts.find((entry) => entry.contractVersion === contract.version);
+    if (!artifact) errors.push(`${contract.version} is not bound by manifest v10`);
     else if (artifact.canonicalContentSha256 !== canonicalHashes[contract.version]) {
-      errors.push(`${contract.version} canonical hash does not match manifest v9`);
+      errors.push(`${contract.version} canonical hash does not match manifest v10`);
     }
   }
-  if (!contractV5Json.effectiveContract.includes("every correction in this file")) {
-    errors.push("OS-03A v5 effective-contract chain changed");
+  if (!contractV6Json.effectiveContract.includes("every clarification in this file")) {
+    errors.push("OS-03A v6 effective-contract chain changed");
   }
   const profileIds = sourceCaptureQualificationProfiles.map((profile) => profile.profileId);
   if (profileIds.length !== 7 || new Set(profileIds).size !== profileIds.length) {

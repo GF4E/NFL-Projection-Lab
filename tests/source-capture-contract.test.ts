@@ -61,7 +61,7 @@ function scheduleInput(
 }
 
 describe("OS-03A frozen source-capture contract", () => {
-  it("binds the complete v1-v5 chain and exactly seven fixture-only profiles", () => {
+  it("binds the complete v1-v6 chain and exactly seven fixture-only profiles", () => {
     const validation = validateFrozenSourceCaptureContracts();
     expect(validation.errors).toEqual([]);
     expect(validation.canonicalHashes).toMatchObject({
@@ -69,7 +69,8 @@ describe("OS-03A frozen source-capture contract", () => {
       "source-capture-contract.2026.2": "4ee911763aa4573dabfd984e4ac1890ad25303ae3cfa8440aba16151c4a9f587",
       "source-capture-contract.2026.3": "847feaa7dac17e57d3a2b20aadee60b186faeb36e768ff9e3216d911d6266ff2",
       "source-capture-contract.2026.4": "a16138cd9577c91bbea8cd1dee94bdb9384cf0bc385f2bb24d4b311270750e78",
-      "source-capture-contract.2026.5": OS03A_EFFECTIVE_CONTRACT_HASH
+      "source-capture-contract.2026.5": "2e69bfc5a0cfcb0be613af4d165e2e9f60f3b4183a07c7f52dcd7c6930740e38",
+      "source-capture-contract.2026.6": OS03A_EFFECTIVE_CONTRACT_HASH
     });
     expect(sourceCaptureQualificationProfiles).toHaveLength(7);
     expect(sourceCaptureQualificationProfiles.every((profile) => profile.origin === "https://fixtures.invalid")).toBe(true);
@@ -264,7 +265,7 @@ describe("OS-03A frozen source-capture contract", () => {
       manifestPersistedAt: "2026-08-26T23:00:00.400Z"
     });
     expect(extension.contractHash).toBe(OS03A_EFFECTIVE_CONTRACT_HASH);
-    expect(extension.contractVersion).toBe("source-capture-contract.2026.5");
+    expect(extension.contractVersion).toBe("source-capture-contract.2026.6");
     expect(extension.extensionHash).toBe(buildManifestExtensionHash(extension));
     expect(buildManifestExtensionHash({
       ...extension,

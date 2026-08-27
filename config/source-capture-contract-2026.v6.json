@@ -1,0 +1,72 @@
+{
+  "version": "source-capture-contract.2026.6",
+  "status": "frozen",
+  "frozenOn": "2026-08-26",
+  "supersedes": "source-capture-contract.2026.5",
+  "supersessionReason": "Pre-implementation review found that v5 did not distinguish an evidence-verification failure from an atomic pointer-batch failure after successful evidence verification.",
+  "baseContracts": [
+    {
+      "path": "config/source-capture-contract-2026.v1.json",
+      "byteSha256": "6b685c480adff6ea9dc655d1065f48a9bee90b120b869c0ee0839c816710eba8",
+      "canonicalContentSha256": "168f59411370af79a5303f03f9901989c5ebc324b6b6b88141e94c48ee4fe7ee"
+    },
+    {
+      "path": "config/source-capture-contract-2026.v2.json",
+      "byteSha256": "6109e1d1dc2e9c038200ecfa90bbaad2ee7a23b81153d6c4a3002ec5bd854bdc",
+      "canonicalContentSha256": "4ee911763aa4573dabfd984e4ac1890ad25303ae3cfa8440aba16151c4a9f587"
+    },
+    {
+      "path": "config/source-capture-contract-2026.v3.json",
+      "byteSha256": "c45d7955897e90ddc01cdc5fc759e19e2264f4d4c6979cf2c3ab88428785906c",
+      "canonicalContentSha256": "847feaa7dac17e57d3a2b20aadee60b186faeb36e768ff9e3216d911d6266ff2"
+    },
+    {
+      "path": "config/source-capture-contract-2026.v4.json",
+      "byteSha256": "fe590bb57af4a8cba94640bb7d669b3cd195b818d3870e10504de475b45c8412",
+      "canonicalContentSha256": "a16138cd9577c91bbea8cd1dee94bdb9384cf0bc385f2bb24d4b311270750e78"
+    },
+    {
+      "path": "config/source-capture-contract-2026.v5.json",
+      "byteSha256": "d7a26f17bb38f860f24ef5bcb8e5eb69fa23699379b1cd98e913639062fce146",
+      "canonicalContentSha256": "2e69bfc5a0cfcb0be613af4d165e2e9f60f3b4183a07c7f52dcd7c6930740e38"
+    }
+  ],
+  "postManifestFailureCorrection": {
+    "evidenceVerificationFailure": {
+      "meaning": "committed response or sidecar bytes, hashes, identity, or semantic binding did not verify",
+      "candidateEligibility": "permanently ineligible for latest good",
+      "retry": "may only converge on the immutable failure or fail verification again; it may not rewrite the object, manifest, sidecar, or pointer"
+    },
+    "pointerBatchFailureAfterSuccessfulVerification": {
+      "meaning": "both committed-row R2 objects verified, but the atomic verification-event and pointer batch failed or returned an unknown result",
+      "candidateEligibility": "remains eligible",
+      "retry": [
+        "read the committed manifest and extension",
+        "re-read and verify both R2 objects and all hashes",
+        "converge on the deterministic capture-derived publication event token",
+        "advance the pointer forward only in the same batch as that event"
+      ],
+      "immutableFailureHistory": "preserve any prior pointer-publication failure event and alert",
+      "heartbeatRecovery": "a later successful verification may restore current only when its verification time is not older than the latest recorded attempt"
+    },
+    "manifestBatchFailure": {
+      "candidateEligibility": "none until a later invocation commits the complete atomic manifest-candidate batch",
+      "partialManifestVisibility": false
+    }
+  },
+  "attemptIdentityCorrection": {
+    "manifestCandidateEvent": "caller attempt token",
+    "verifiedPublicationEvent": "deterministic token derived from contract version, captureId, and verified-publication phase so all workers converge",
+    "postManifestFailureEvent": "deterministic distinct token derived from original attempt, captureId, and failed phase",
+    "tokenCollisionWithDifferentPayload": "reject"
+  },
+  "freshnessBinding": {
+    "profileThresholdSource": "source-capture-contract.2026.5.profileFreshnessThresholds",
+    "operatingThresholdSource": "engine-operating-contract.2026.1.maximumSourceAgeSeconds",
+    "runtimeLookup": "registered profile ID",
+    "startupValidation": "every profile threshold must equal its named operating-contract value or frozen minimum",
+    "callerOverride": "absent or exactly equal only"
+  },
+  "effectiveContract": "source-capture-contract.2026.1 plus v2, v3 except its superseded same-batch pointer clause, v4 except its superseded manifest-time verification clause, v5, and every clarification in this file",
+  "implementationMayBegin": true
+}

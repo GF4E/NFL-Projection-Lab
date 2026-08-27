@@ -67,8 +67,8 @@ export const sourceCaptureManifestExtensions = sqliteTable("source_capture_manif
   index("idx_source_capture_extension_evidence").on(table.extensionHash),
   check(
     "source_capture_extension_contract_check",
-    sql`${table.contractVersion} = 'source-capture-contract.2026.5' AND
-      ${table.contractHash} = '2e69bfc5a0cfcb0be613af4d165e2e9f60f3b4183a07c7f52dcd7c6930740e38'`
+    sql`${table.contractVersion} = 'source-capture-contract.2026.6' AND
+      ${table.contractHash} = 'baa7a206973039de395ce79e33165fe842ffbff124e5a3c806f283815dde10b2'`
   ),
   check(
     "source_capture_extension_hash_check",
