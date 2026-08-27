@@ -180,7 +180,7 @@ const forbiddenHeaderNames = new Set(
 );
 const secretNamePattern = /(?:api[-_]?key|authorization|cookie|credential|password|secret|access[-_]?token|refresh[-_]?token|session[-_]?token|auth[-_]?token|id[-_]?token|csrf[-_]?token|client[-_]?token|(?:^|[-_])token(?:$|[-_]))/i;
 const secretAssignmentPatterns = [
-  /(?:api[-_]?key|authorization|cookie|proxy-authorization|set-cookie|credential|password|secret|access[-_]?token|refresh[-_]?token|session[-_]?token|\btoken)[\s"']*(?::|=)[\s"']*[^\s"',;&}]+/i,
+  /(?:api[-_]?key|authorization|cookie|proxy-authorization|set-cookie|credential|password|secret|access[-_]?token|refresh[-_]?token|session[-_]?token|auth[-_]?token|id[-_]?token|csrf[-_]?token|client[-_]?token|\btoken)[\s"']*(?::|=)[\s"']*[^\s"',;&}]+/i,
   /\bbearer\s+[a-z0-9._~+/=-]{6,}/i,
   /\bbasic\s+[a-z0-9+/=]{6,}/i
 ];

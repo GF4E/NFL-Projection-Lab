@@ -162,6 +162,11 @@ describe("OS-03A frozen source-capture contract", () => {
         "text/csv",
         encoder.encode(JSON.stringify({ nested: { [key]: "must-not-persist" } }))
       )).toThrow(/credential-bearing/i);
+      expect(() => assertSecretFreeCaptureResponse(
+        schedule,
+        "text/csv",
+        encoder.encode(`${key}=must-not-persist`)
+      )).toThrow(/credential-bearing/i);
     }
 
     const pbp = getQualificationSourceProfile("fixture_nflverse_pbp_v1");
