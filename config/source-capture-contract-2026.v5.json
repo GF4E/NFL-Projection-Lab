@@ -1,0 +1,155 @@
+{
+  "version": "source-capture-contract.2026.5",
+  "status": "frozen",
+  "frozenOn": "2026-08-26",
+  "supersedes": "source-capture-contract.2026.4",
+  "supersessionReason": "Independent pre-qualification review proved that a single D1 manifest-and-pointer batch can transiently advertise evidence that fails the required post-manifest R2 readback.",
+  "baseContracts": [
+    {
+      "path": "config/source-capture-contract-2026.v1.json",
+      "byteSha256": "6b685c480adff6ea9dc655d1065f48a9bee90b120b869c0ee0839c816710eba8",
+      "canonicalContentSha256": "168f59411370af79a5303f03f9901989c5ebc324b6b6b88141e94c48ee4fe7ee"
+    },
+    {
+      "path": "config/source-capture-contract-2026.v2.json",
+      "byteSha256": "6109e1d1dc2e9c038200ecfa90bbaad2ee7a23b81153d6c4a3002ec5bd854bdc",
+      "canonicalContentSha256": "4ee911763aa4573dabfd984e4ac1890ad25303ae3cfa8440aba16151c4a9f587"
+    },
+    {
+      "path": "config/source-capture-contract-2026.v3.json",
+      "byteSha256": "c45d7955897e90ddc01cdc5fc759e19e2264f4d4c6979cf2c3ab88428785906c",
+      "canonicalContentSha256": "847feaa7dac17e57d3a2b20aadee60b186faeb36e768ff9e3216d911d6266ff2"
+    },
+    {
+      "path": "config/source-capture-contract-2026.v4.json",
+      "byteSha256": "fe590bb57af4a8cba94640bb7d669b3cd195b818d3870e10504de475b45c8412",
+      "canonicalContentSha256": "a16138cd9577c91bbea8cd1dee94bdb9384cf0bc385f2bb24d4b311270750e78"
+    }
+  ],
+  "correctiveOrdering": {
+    "supersedesV1PublicationOrdering": true,
+    "supersedesV3ConditionalHeadPublicationSameAtomicBatch": true,
+    "preservesV2TransientPointerAdvanceAllowedFalse": true,
+    "usableCapturePhases": [
+      {
+        "phase": "publish_objects",
+        "required": [
+          "write exact response bytes to the content-addressed R2 key",
+          "write the canonical sidecar to its content-addressed R2 key",
+          "read back and hash-verify both objects"
+        ],
+        "latestGoodPointerMutation": false
+      },
+      {
+        "phase": "commit_manifest_candidate",
+        "atomicD1Batch": [
+          "base manifest insert",
+          "manifest extension insert",
+          "capture_committed event insert"
+        ],
+        "captureCommittedMeaning": "immutable usable candidate exists but is not yet a successful verification event",
+        "latestGoodPointerMutation": false
+      },
+      {
+        "phase": "verify_committed_objects",
+        "required": [
+          "resolve response and sidecar keys only from committed D1 rows",
+          "read back exact bytes from both R2 objects",
+          "verify response, sidecar, evidence, extension, identity, and semantic hashes"
+        ],
+        "latestGoodPointerMutation": false
+      },
+      {
+        "phase": "publish_verified_head",
+        "atomicD1Batch": [
+          "capture_committed_usable verification event insert",
+          "forward-only latest-good pointer and heartbeat upsert"
+        ],
+        "pointerPredicate": "the verification event, base manifest, extension, source key, usable state, evidence hashes, and deterministic ordering tuple all match",
+        "verificationTime": "actual post-manifest R2 verification completion time",
+        "latestGoodPointerMutation": "forward only"
+      }
+    ],
+    "rawOnlyCapture": {
+      "atomicD1Batch": [
+        "base manifest insert",
+        "manifest extension insert",
+        "capture_committed_raw_only event insert",
+        "partial heartbeat upsert without latest-good replacement"
+      ],
+      "latestGoodPointerMutation": false
+    },
+    "postManifestFailure": {
+      "attemptToken": "deterministic distinct token derived from original attempt, capture, and failed phase",
+      "atomicD1Batch": [
+        "capture_failed event insert",
+        "failure alert insert",
+        "stale or unavailable heartbeat update that preserves any prior latest-good pointer"
+      ],
+      "pointerRollbackOrDelete": "prohibited",
+      "failedCandidateMayBecomeLatestGood": false
+    },
+    "retryAndCrashRecovery": {
+      "manifestCommittedBeforeVerification": "re-read committed rows and both R2 objects before any pointer publication retry",
+      "pointerBatchUnknownOrFailed": "re-read and verify committed rows and both R2 objects before an idempotent forward-only pointer publication retry",
+      "corruptOrMissingObject": "append or converge on the deterministic failure event and preserve the prior pointer",
+      "missedHistoricalPointerPublication": "never converts a missed source capture into prospective evidence"
+    }
+  },
+  "freshnessCorrection": {
+    "successfulVerificationEvents": [
+      "capture_committed_usable",
+      "not_modified_confirmed"
+    ],
+    "captureVerificationTime": "capture_committed_usable occurredAt",
+    "heartbeatStatePrecedence": "stale, partial, or unavailable heartbeat state can never be returned as current even when the retained last-good success is younger than its age threshold",
+    "ageClockWhenLatestGoodExists": "latest successful verification event for the heartbeat latest_capture_id",
+    "noLatestGood": "unavailable",
+    "callerThresholdOverride": "prohibited unless exactly equal to the frozen profile threshold"
+  },
+  "profileFreshnessThresholds": {
+    "fixture_nflverse_schedule_v1": {
+      "operatingContractKey": "schedule",
+      "maximumAgeSeconds": 600
+    },
+    "fixture_nflverse_pbp_v1": {
+      "operatingContractKey": "current_season_play_by_play",
+      "maximumAgeSeconds": 43200
+    },
+    "fixture_nflverse_roster_v1": {
+      "operatingContractKey": "weekly_roster",
+      "maximumAgeSeconds": 604800
+    },
+    "fixture_official_injury_v1": {
+      "operatingContractKey": "official_injury_report",
+      "maximumAgeSeconds": 129600
+    },
+    "fixture_official_inactive_roof_v1": {
+      "operatingContractKeys": [
+        "official_inactives_at_kickoff_minus_90",
+        "roof_status_at_kickoff_minus_90"
+      ],
+      "combination": "minimum",
+      "maximumAgeSeconds": 1200
+    },
+    "fixture_open_meteo_weather_v1": {
+      "operatingContractKey": "kickoff_hour_weather_issue",
+      "maximumAgeSeconds": 21600
+    },
+    "fixture_market_odds_v1": {
+      "operatingContractKey": "odds_kickoff_minus_15",
+      "maximumAgeSeconds": 600,
+      "qualificationOnly": true,
+      "realMarketRule": "OS-04 must register horizon-specific profiles before authenticated capture"
+    }
+  },
+  "scope": {
+    "strongestPermittedResult": "accepted_bounded_provider_independent_OS-03A_storage_mechanism_slice",
+    "productionActivation": false,
+    "realConnectorQualification": false,
+    "marketQualification": "fixture_only",
+    "productionSweeperQualification": false
+  },
+  "effectiveContract": "source-capture-contract.2026.1 plus v2, v3 except its superseded same-batch pointer clause, v4 except its superseded manifest-time verification clause, and every correction in this file",
+  "implementationMayBegin": true
+}
