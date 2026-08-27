@@ -1,0 +1,74 @@
+{
+  "version": "os01-production-census.2026.1",
+  "scope": "temporary-read-only-production-prestate-census",
+  "route": "/_ops/engine-os/os01-census-v1",
+  "authentication": {
+    "tokenEntropyBits": 256,
+    "storedBinding": "sha256-digest-only",
+    "comparison": "constant-time",
+    "expiryRequired": true,
+    "maximumLifetimeSeconds": 7200,
+    "responseAuthentication": "hmac-sha256-derived-from-ephemeral-token",
+    "endpointPolicy": "controller-pins-exact-origin-and-route"
+  },
+  "deploymentAttestation": {
+    "binding": "OS01_CENSUS_BUILD_ATTESTATION",
+    "format": "compiled-noncircular-source-anchor-v1",
+    "operatorRequiresBindingToEqualCompiledAnchor": true,
+    "controllerMustMatch": true,
+    "sitesDeploymentReceiptRequired": true
+  },
+  "consistency": {
+    "initialConstraint": "first-primary",
+    "continuation": "aes-gcm-encrypted-d1-bookmark",
+    "minimumIndependentPasses": 2,
+    "acceptOnlyIdenticalPassRoots": true
+  },
+  "readOnlySql": [
+    "SELECT",
+    "PRAGMA table_xinfo",
+    "PRAGMA foreign_key_list",
+    "PRAGMA index_list",
+    "PRAGMA index_xinfo",
+    "PRAGMA foreign_key_check",
+    "PRAGMA quick_check",
+    "PRAGMA schema_version"
+  ],
+  "canonicalCells": {
+    "null": "n:",
+    "integer": "i:<printf('%lld', value)>",
+    "real": "r:<printf('%!.17g', value)>",
+    "text": "t:<hex UTF-8 bytes>",
+    "blob": "b:<hex bytes>"
+  },
+  "limits": {
+    "requestBytes": 4096,
+    "identifierBytes": 255,
+    "pageRows": 128,
+    "canonicalPageBytes": 1800000,
+    "canonicalRowBytes": 1800000,
+    "operatorResponseBytes": 1048576
+  },
+  "hardStops": [
+    "unknown-schema-object",
+    "unsupported-virtual-table-hidden-column",
+    "schema-version-change",
+    "row-count-change",
+    "pass-root-mismatch",
+    "foreign-key-violation",
+    "quick-check-failure",
+    "any-write-metadata",
+    "unrecognized-nonempty-data",
+    "unsupported-plays-shape"
+  ],
+  "retirement": {
+    "removeOnlyBindings": [
+      "OS01_CENSUS_AUTH_SHA256",
+      "OS01_CENSUS_BUILD_ATTESTATION",
+      "OS01_CENSUS_EXPIRES_AT"
+    ],
+    "deployCleanWorkerWithoutOperator": true,
+    "verifyRouteUnavailable": true,
+    "preserveReceipts": true
+  }
+}

@@ -17,8 +17,13 @@ import {
 } from "../src/server/engine-os/interim-scheduler-kernel";
 import { runInterimSchedulerInvocation } from "../src/server/engine-os/interim-scheduler";
 import {
+  handleOs01CensusRequest,
+  isOs01CensusRoute
+} from "./os01-census-operator";
+import {
   readCaptureGate,
   readDatabaseBinding,
+  readOs01CensusControlBindings,
   selectFrameworkAssetBindings,
   selectImageBindings,
   type PublicDataEnv,
@@ -85,6 +90,16 @@ async function handleNflverseRequest(request: Request, env: PublicDataEnv): Prom
 const worker = {
   async fetch(request: Request, env: WorkerRuntimeEnv, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (isOs01CensusRoute(request)) {
+      return handleOs01CensusRequest(
+        request,
+        readOs01CensusControlBindings(env),
+        () => readDatabaseBinding(env)
+      );
+    }
+    if (url.pathname.startsWith("/_ops/")) {
+      return json({ error: "Not found" }, 404);
+    }
     const readDb = readOnlyD1(readDatabaseBinding(env));
     // Vinext resolves module-level Cloudflare bindings itself, so replacing DB
     // in its handler argument is not a security boundary. Deny every mutating

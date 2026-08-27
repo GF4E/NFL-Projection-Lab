@@ -1,0 +1,69 @@
+{
+  "version": "os01-census-attestation.2026.1",
+  "sourceTreeIdentityVersion": "os01-census-source-tree.2026.1",
+  "sourceAnchorInputVersion": "os01-census-source-anchor.2026.4",
+  "generatedAnchorPath": "worker/os01-census-source-anchor.ts",
+  "requiredImplementationToDeploymentDiff": [
+    "worker/os01-census-source-anchor.ts"
+  ],
+  "bridgeFoundation": {
+    "version": "os01-census-bridge-foundation.2026.1",
+    "liveBaseCommit": "e8c3b23dc0bd59b66099fd08c52dd39ae23f65bd",
+    "implementationCommitCount": 1,
+    "requiredLiveBaseToImplementationNameStatus": [
+      { "status": "M", "path": "tests/acceptance.test.ts" },
+      { "status": "M", "path": "tests/nflverse-importer.test.ts" },
+      { "status": "M", "path": "tests/official-injuries.test.ts" },
+      { "status": "A", "path": "tests/os01-census-bridge.test.ts" },
+      { "status": "M", "path": "tests/public-runtime-boundary.test.ts" },
+      { "status": "M", "path": "worker/env-boundary.ts" },
+      { "status": "M", "path": "worker/index.ts" },
+      { "status": "A", "path": "worker/os01-census-operator.ts" },
+      { "status": "A", "path": "worker/os01-census-source-anchor.ts" },
+      { "status": "A", "path": "worker/site-runtime.ts" }
+    ],
+    "retainedRuntimeSourcePath": "worker/index.ts",
+    "retainedRuntimeBridgePath": "worker/site-runtime.ts"
+  },
+  "authorityBridgeCodeRelation": {
+    "version": "os01-census-authority-bridge-code-relation.2026.1",
+    "exactEqualPaths": [
+      "worker/env-boundary.ts",
+      "worker/os01-census-operator.ts",
+      "worker/os01-census-source-anchor.ts"
+    ]
+  },
+  "fullTrackedTreeIdentity": {
+    "version": "os01-census-full-tree.2026.1",
+    "gitObjectFormat": "sha1",
+    "archiveFormat": "tar",
+    "successorCommitCount": 1,
+    "requiredNameStatus": "M"
+  },
+  "buildIdentity": {
+    "version": "os01-census-build-identity.2026.2",
+    "distPath": "dist",
+    "builtWorkerPath": "dist/server/index.js",
+    "serverManifestPath": "dist/server/.vite/manifest.json",
+    "requiredServerEntry": "virtual:cloudflare/worker-entry",
+    "requiredDynamicEntry": "worker/site-runtime.ts",
+    "requiredDirectStaticImportNames": ["env-boundary"],
+    "forbiddenStaticMarkers": [
+      "api.the-odds-api.com",
+      "ODDS_API_KEY",
+      "week-one-live-odds",
+      "odds-automation",
+      "odds-quota"
+    ],
+    "sitesArchiveHashPrefix": "sha256:",
+    "localArchiveFormat": "tar.gz",
+    "sitesArchiveFormat": "tar"
+  },
+  "deploymentProofVersion": "os01-census-deployment-proof.2026.1",
+  "deploymentProofStatus": "ready_for_census",
+  "deploymentProofFreshness": {
+    "maximumAgeSeconds": 600,
+    "maximumFutureSkewSeconds": 120
+  },
+  "trustedTargetConfig": "config/os01-census-trusted-targets.v1.json"
+}

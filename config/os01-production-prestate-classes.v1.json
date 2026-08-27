@@ -1,0 +1,66 @@
+{
+  "version": "os01-production-prestate-classes.2026.1",
+  "plays": {
+    "ownedObjectKeys": [
+      "index:idx_plays_created_at",
+      "index:idx_plays_season_week_status",
+      "table:plays"
+    ],
+    "explicitIndexes": {
+      "idx_plays_created_at": "c961437f9238b58c766e03254359dd1a7ef74ef395e05c9c305d7829c2dd8890",
+      "idx_plays_season_week_status": "60eb0fbc9fc9e0dfd0b23b047a2fe9a37680fdc91d8d4b5e892efe0117e660bb"
+    },
+    "shapes": {
+      "legacy_29": {
+        "fullHash": "867c097e8eb974399a500c0c5424c76a566417d4383263a8e6d7408816c69026",
+        "coreHash": "9f3f69dbd2f991c0d09180edb9bc0465e868d882727b2807ab16bf59ea2489db",
+        "decision": "supported"
+      },
+      "runtime_mutated_gabe_jarrett_34": {
+        "fullHash": "ab307f5ae3d98b27aef1fe583f519515c39cfc71ced0b9d399d6d4004ede702d",
+        "coreHash": "46f1fc3da25a50899c19b7751385baa2f3699a9d8b6539cd98fab9091e794ad2",
+        "decision": "hard_stop_information_loss"
+      },
+      "runtime_created_gabe_jarrett_34": {
+        "fullHash": "6fecf56c179c40d01ac05138889038c520e8add73460b20062083c926c40d12d",
+        "coreHash": "ca337495e39285b8036081124a45ecf8c4b803abf4b7c848478f9f8b9dc3bed7",
+        "decision": "hard_stop_information_loss"
+      },
+      "canonical_0020": {
+        "fullHash": "9a84e9f9f4e06cf2b4ed3507e27df2a6bc26149adcef6474dcff1f754deb2b3b",
+        "coreHash": "a5fa0efaa1d8a75202727ba18c30cdb92e77703a91b7b3d46421d9e0c07a958f",
+        "decision": "hard_stop_unreceipted_future_state"
+      },
+      "runtime_mutated_public_analyst_34": {
+        "fullHash": "b8b36af049aaeb0013b380e4728c9c30b7eaf43d4da75a3129b1703aa7fe1876",
+        "coreHash": "15581dc9270ce2b35c4fc4cedc7b6ec9ae9c4b11f060ec2a6436d75d0b885412",
+        "decision": "hard_stop_incompatible_identity_policy"
+      },
+      "runtime_created_public_analyst_34": {
+        "fullHash": "e5106ca1d859e27b9a4b463147e282e2b1379475dbeff227b7d24df49f2a6b1e",
+        "coreHash": "d7391c10bd97a056686a8748a056a599e1c103713654ee953d2f80879ce5763e",
+        "decision": "hard_stop_incompatible_identity_policy"
+      }
+    }
+  },
+  "historicalTriggers": {
+    "recognizedHardStopMainLine": {
+      "approval_contract_guard_v1": "67b2e2e39e3c98def84723128a6f166c5fe565f751db9b78d7a729df5103f3ea",
+      "approval_contract_guard_v2": "c4665180784007e2a74ec597d50e540029ff478b5e3c7ade03fda2c9ba045773",
+      "approval_contract_guard_v3": "c4ddd675e05aa5d2df073b9f81dde993cf1222567e11393060d6e3420427db55",
+      "approval_contract_guard_v4": "5cfbb6d090a55800840139524529fa098bbf13b63e429e68b34b6b02933f72db",
+      "approval_contract_guard_v5": "1d8757f3569156ccf62ebdaad5a1dd0be423f5c4c80ce9eab9e0da9d0c790004",
+      "approval_contract_guard_v6": "51678b8f6774715630f244024bedad0bff8d45ff4d060fd29534aaf8c9706406",
+      "approval_execution_state_guard_v1": "06d5850aed2ae4e24159e31144cb5d4de67daa4f4e3bea38e6e8f30ca255c82d",
+      "approval_portfolio_guard_v1": "63aaea20e8d570945ed90525fc4cdc390db6ab12bf92a9ceeec694ccd513a6d8",
+      "approval_portfolio_guard_v2": "bd30996814408a8f11c1a8073fb39c1779ca3bdaf320ec782fb57333b5cd80bd"
+    },
+    "trackedIncompatible": {
+      "approval_execution_state_guard_v1": [
+        "10b4b7d8b02bbd607c79db7dcd1d418c6374524d09e39720ea728904468e6347"
+      ]
+    },
+    "requiredTableName": "plays",
+    "portfolioVersionsMutuallyExclusive": true
+  }
+}

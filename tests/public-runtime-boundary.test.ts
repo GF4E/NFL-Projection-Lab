@@ -5,6 +5,7 @@ import { runJob } from "@/server/jobs/runner";
 import {
   readCaptureGate,
   readDatabaseBinding,
+  readOs01CensusControlBindings,
   selectFrameworkAssetBindings,
   selectImageBindings,
   type WorkerRuntimeEnv
@@ -122,7 +123,10 @@ describe("public runtime boundary", () => {
       ASSETS: assets,
       DB: database,
       ENGINE_OS_CAPTURE_ENABLED: undefined,
-      IMAGES: images
+      IMAGES: images,
+      OS01_CENSUS_AUTH_SHA256: "digest",
+      OS01_CENSUS_BUILD_ATTESTATION: "b".repeat(64),
+      OS01_CENSUS_EXPIRES_AT: "2099-01-01T00:00:00.000Z"
     };
     Object.defineProperty(target, "ODDS_API_KEY", {
       configurable: false,
@@ -141,9 +145,22 @@ describe("public runtime boundary", () => {
 
     expect(readDatabaseBinding(env)).toBe(database);
     expect(readCaptureGate(env)).toBeUndefined();
+    expect(readOs01CensusControlBindings(env)).toEqual({
+      authSha256: "digest",
+      buildAttestation: "b".repeat(64),
+      expiresAt: "2099-01-01T00:00:00.000Z"
+    });
     expect(selectFrameworkAssetBindings(env)).toEqual({ ASSETS: assets });
     expect(selectImageBindings(env)).toEqual({ ASSETS: assets, IMAGES: images });
-    expect(accessed).toEqual(new Set(["DB", "ENGINE_OS_CAPTURE_ENABLED", "ASSETS", "IMAGES"]));
+    expect(accessed).toEqual(new Set([
+      "DB",
+      "ENGINE_OS_CAPTURE_ENABLED",
+      "OS01_CENSUS_AUTH_SHA256",
+      "OS01_CENSUS_BUILD_ATTESTATION",
+      "OS01_CENSUS_EXPIRES_AT",
+      "ASSETS",
+      "IMAGES"
+    ]));
     expect(() => Reflect.get(env as object, "ODDS_API_KEY")).toThrow(/hidden ODDS_API_KEY/);
   });
 
