@@ -1,0 +1,21 @@
+{
+  "version": "source-capture-contract.2026.9",
+  "status": "frozen",
+  "frozenOn": "2026-08-26",
+  "supersedes": "source-capture-contract.2026.8",
+  "supersessionReason": "Independent adversarial review found that v8 reused a delayed not-modified confirmation timestamp as the local exact-byte verification-failure observation time, which could regress heartbeat journaling and roll back permanent-corruption evidence.",
+  "baseContract": {
+    "path": "config/source-capture-contract-2026.v8.json",
+    "byteSha256": "df2ebe8354e0be6d0bbc6c9cdd1f6500f940f2bceebcd70935773a0481912186",
+    "canonicalContentSha256": "4829d2dc5713a802210a3e80ad8edb8c1fcf874b41a46414ae6596b701e0951f"
+  },
+  "notModifiedVerificationObservation": {
+    "confirmationTimeRule": "confirmedAt is immutable source-confirmation evidence time and remains the occurred_at value of a successful not_modified_confirmed event",
+    "verificationObservationTimeRule": "exact-byte verification failure is observed on a separate local monotonic clock at verification time; an implementation must never substitute confirmedAt for that observation",
+    "failureJournalRule": "permanent or transient exact-byte failure appends its deterministic failure event and alert at verification-observation time, advances last_attempt_at and last_failure_at to that observation, preserves last_success_at, and retains the forensic pointer only as stale",
+    "delayedResponseRule": "a delayed or replayed not-modified response whose confirmedAt predates a later heartbeat cannot regress or roll back failure evidence discovered by the later verification observation",
+    "successRule": "a successful older confirmation remains append-only evidence but cannot clear a newer failure or regress heartbeat clocks"
+  },
+  "effectiveContract": "source-capture-contract.2026.1 plus v2, v3 except its superseded same-batch pointer clause, v4 except its superseded manifest-time verification clause, v5, v6, v7, v8, and every clarification in this file",
+  "implementationMayResume": true
+}

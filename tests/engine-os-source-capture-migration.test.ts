@@ -17,7 +17,7 @@ function database(): DatabaseSync {
   return db;
 }
 
-const contractHash = "4829d2dc5713a802210a3e80ad8edb8c1fcf874b41a46414ae6596b701e0951f";
+const contractHash = "7c8e041f701e3fd7cb44d7aecef3e51204fa6570e61b90e37b2b5fb016a29642";
 const hash = "a".repeat(64);
 const captureId = "c".repeat(64);
 const rights = JSON.stringify({
@@ -74,7 +74,7 @@ function insertExtension(db: DatabaseSync, overrides: {
     response_persisted_at, sidecar_persisted_at, manifest_persisted_at, content_type,
     etag, usage_rights_json, usage_rights_hash, validation_state, failure_codes_json,
     later_import_json, later_import_hash, extension_hash
-  ) VALUES (?, 'source-capture-contract.2026.8', ?, 'fixture_nflverse_schedule_v1',
+  ) VALUES (?, 'source-capture-contract.2026.9', ?, 'fixture_nflverse_schedule_v1',
     'qualification_fixture', ?, ?, ?, '2026-08-26T16:00:02.000Z',
     '2026-08-26T16:00:03.000Z', '2026-08-26T16:00:04.000Z',
     '2026-08-26T16:00:05.000Z', 'text/csv', 'fixture-etag', ?, ?, ?, ?, ?, ?, ?)`)

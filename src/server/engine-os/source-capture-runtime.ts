@@ -1730,6 +1730,7 @@ export async function recordOs03aNotModified(input: {
   attemptToken: string;
   idempotencyKey: string;
   confirmedAt: string;
+  clock?: Clock;
 }): Promise<{ captureId: string; providerDispatches: 0 }> {
   const profile = getQualificationSourceProfile(input.profileId);
   const sourceKey = sourceCaptureKey(profile);
@@ -1782,7 +1783,7 @@ export async function recordOs03aNotModified(input: {
     rows,
     committedAttemptToken: input.attemptToken,
     expectedEvidenceHash: rows.base.evidence_hash,
-    clock: () => new Date(confirmedAt)
+    clock: input.clock
   });
   const payload = {
     captureId: head.capture_id,

@@ -896,7 +896,8 @@ describe("OS-03A integrity hardening", () => {
       profileId: "fixture_nflverse_schedule_v1",
       attemptToken: "integrity-304-corrupt",
       idempotencyKey: "schedule:integrity:304-corrupt",
-      confirmedAt: "2026-08-26T10:01:00.000Z"
+      confirmedAt: "2026-08-26T10:01:00.000Z",
+      clock: sequenceClock("2026-08-26T10:01:00.000Z")
     })).rejects.toThrow(/latest-good was not advanced/);
     expect(permanent.sqlite.prepare(`SELECT status, latest_capture_id, last_success_at,
       failure_code FROM source_capture_heartbeats`).get()).toEqual({
@@ -934,7 +935,8 @@ describe("OS-03A integrity hardening", () => {
       profileId: "fixture_nflverse_schedule_v1",
       attemptToken: "integrity-304-transient",
       idempotencyKey: "schedule:integrity:304-transient",
-      confirmedAt: "2026-08-26T10:01:00.000Z"
+      confirmedAt: "2026-08-26T10:01:00.000Z",
+      clock: sequenceClock("2026-08-26T10:01:00.000Z")
     })).rejects.toThrow(/unavailable/);
     expect(transient.sqlite.prepare(`SELECT status, latest_capture_id, failure_code
       FROM source_capture_heartbeats`).get()).toEqual({
@@ -958,6 +960,121 @@ describe("OS-03A integrity hardening", () => {
       FROM source_capture_heartbeats`).get()).toEqual({
       status: "current",
       latest_capture_id: transientStored.captureId,
+      failure_code: null
+    });
+    transient.sqlite.close();
+  });
+
+  it("uses verification-observation time when an older 304 discovers evidence failure", async () => {
+    const permanent = database();
+    const permanentBucket = new RaceR2();
+    const stored = await storeOs03aCapture(captureInput(permanent.db, permanentBucket));
+    await recordOs03aNotModified({
+      db: permanent.db,
+      bucket: permanentBucket as unknown as R2Bucket,
+      profileId: "fixture_nflverse_schedule_v1",
+      attemptToken: "integrity-304-current-at-t9",
+      idempotencyKey: "schedule:integrity:304-current-at-t9",
+      confirmedAt: "2026-08-26T10:00:09.000Z",
+      clock: sequenceClock("2026-08-26T10:00:09.500Z")
+    });
+    const originalBytes = permanentBucket.objects.get(stored.responseObjectKey)!.bytes.slice();
+    permanentBucket.objects.get(stored.responseObjectKey)!.bytes[0] ^= 1;
+
+    await expect(recordOs03aNotModified({
+      db: permanent.db,
+      bucket: permanentBucket as unknown as R2Bucket,
+      profileId: "fixture_nflverse_schedule_v1",
+      attemptToken: "integrity-304-old-corrupt-at-t10",
+      idempotencyKey: "schedule:integrity:304-old-corrupt-at-t10",
+      confirmedAt: "2026-08-26T10:00:08.000Z",
+      clock: sequenceClock("2026-08-26T10:00:10.000Z")
+    })).rejects.toThrow(/latest-good was not advanced/);
+    expect(permanent.sqlite.prepare(`SELECT status, latest_capture_id, last_attempt_at,
+      last_success_at, last_failure_at, failure_code FROM source_capture_heartbeats`).get())
+      .toEqual({
+        status: "stale",
+        latest_capture_id: stored.captureId,
+        last_attempt_at: "2026-08-26T10:00:10.000Z",
+        last_success_at: "2026-08-26T10:00:09.000Z",
+        last_failure_at: "2026-08-26T10:00:10.000Z",
+        failure_code: "corrupt_object"
+      });
+    expect(permanent.sqlite.prepare(`SELECT count(*) AS count FROM source_capture_events
+      WHERE event_type = 'capture_failed' AND occurred_at = '2026-08-26T10:00:10.000Z'
+        AND json_extract(payload_json, '$.failureCode') = 'corrupt_object'
+        AND json_extract(payload_json, '$.context.captureId') = ?`).get(stored.captureId))
+      .toEqual({ count: 1 });
+    expect(permanent.sqlite.prepare(`SELECT count(*) AS count FROM engine_system_alerts
+      WHERE alert_type = 'source_capture_failure'`).get()).toEqual({ count: 1 });
+    expect(permanent.sqlite.prepare(`SELECT count(*) AS count FROM source_capture_events
+      WHERE attempt_token = 'integrity-304-old-corrupt-at-t10'
+        AND event_type = 'not_modified_confirmed'`).get()).toEqual({ count: 0 });
+    permanentBucket.objects.get(stored.responseObjectKey)!.bytes = originalBytes;
+    await expect(recordOs03aNotModified({
+      db: permanent.db,
+      bucket: permanentBucket as unknown as R2Bucket,
+      profileId: "fixture_nflverse_schedule_v1",
+      attemptToken: "integrity-304-corrupt-restored-after-t10",
+      idempotencyKey: "schedule:integrity:304-corrupt-restored-after-t10",
+      confirmedAt: "2026-08-26T10:00:11.000Z",
+      clock: sequenceClock("2026-08-26T10:00:11.500Z")
+    })).rejects.toThrow(/prior usable capture/);
+    permanent.sqlite.close();
+
+    const transient = database();
+    const transientBucket = new RaceR2();
+    const transientStored = await storeOs03aCapture(captureInput(transient.db, transientBucket));
+    await recordOs03aNotModified({
+      db: transient.db,
+      bucket: transientBucket as unknown as R2Bucket,
+      profileId: "fixture_nflverse_schedule_v1",
+      attemptToken: "integrity-304-transient-current-at-t9",
+      idempotencyKey: "schedule:integrity:304-transient-current-at-t9",
+      confirmedAt: "2026-08-26T10:00:09.000Z",
+      clock: sequenceClock("2026-08-26T10:00:09.500Z")
+    });
+    transientBucket.throwKey = transientStored.responseObjectKey;
+    transientBucket.throwOnRead =
+      (transientBucket.reads.get(transientStored.responseObjectKey) ?? 0) + 1;
+    await expect(recordOs03aNotModified({
+      db: transient.db,
+      bucket: transientBucket as unknown as R2Bucket,
+      profileId: "fixture_nflverse_schedule_v1",
+      attemptToken: "integrity-304-old-transient-at-t10",
+      idempotencyKey: "schedule:integrity:304-old-transient-at-t10",
+      confirmedAt: "2026-08-26T10:00:08.000Z",
+      clock: sequenceClock("2026-08-26T10:00:10.000Z")
+    })).rejects.toThrow(/unavailable/);
+    expect(transient.sqlite.prepare(`SELECT status, latest_capture_id, last_attempt_at,
+      last_success_at, last_failure_at, failure_code FROM source_capture_heartbeats`).get())
+      .toEqual({
+        status: "stale",
+        latest_capture_id: transientStored.captureId,
+        last_attempt_at: "2026-08-26T10:00:10.000Z",
+        last_success_at: "2026-08-26T10:00:09.000Z",
+        last_failure_at: "2026-08-26T10:00:10.000Z",
+        failure_code: "storage_failure"
+      });
+    expect(transient.sqlite.prepare(`SELECT count(*) AS count FROM source_capture_events
+      WHERE event_type = 'capture_failed' AND occurred_at = '2026-08-26T10:00:10.000Z'
+        AND json_extract(payload_json, '$.failureCode') = 'storage_failure'`).get())
+      .toEqual({ count: 1 });
+    await expect(recordOs03aNotModified({
+      db: transient.db,
+      bucket: transientBucket as unknown as R2Bucket,
+      profileId: "fixture_nflverse_schedule_v1",
+      attemptToken: "integrity-304-transient-retry-after-t10",
+      idempotencyKey: "schedule:integrity:304-transient-retry-after-t10",
+      confirmedAt: "2026-08-26T10:00:11.000Z",
+      clock: sequenceClock("2026-08-26T10:00:11.500Z")
+    })).resolves.toEqual({ captureId: transientStored.captureId, providerDispatches: 0 });
+    expect(transient.sqlite.prepare(`SELECT status, last_attempt_at, last_success_at,
+      last_failure_at, failure_code FROM source_capture_heartbeats`).get()).toEqual({
+      status: "current",
+      last_attempt_at: "2026-08-26T10:00:11.000Z",
+      last_success_at: "2026-08-26T10:00:11.000Z",
+      last_failure_at: null,
       failure_code: null
     });
     transient.sqlite.close();

@@ -21,8 +21,8 @@ CREATE TABLE `source_capture_manifest_extensions` (
   `later_import_hash` text NOT NULL,
   `extension_hash` text NOT NULL,
   CONSTRAINT `source_capture_extension_contract_check` CHECK (
-    `contract_version` = 'source-capture-contract.2026.8' AND
-    `contract_hash` = '4829d2dc5713a802210a3e80ad8edb8c1fcf874b41a46414ae6596b701e0951f'
+    `contract_version` = 'source-capture-contract.2026.9' AND
+    `contract_hash` = '7c8e041f701e3fd7cb44d7aecef3e51204fa6570e61b90e37b2b5fb016a29642'
   ),
   CONSTRAINT `source_capture_extension_hash_check` CHECK (
     length(`capture_id`) = 64 AND lower(`capture_id`) = `capture_id` AND
@@ -438,6 +438,6 @@ CREATE TRIGGER `source_capture_heartbeats_os03a_update_guard`
 INSERT INTO `engine_schema_versions` (`version`, `migration_hash`, `applied_at`)
 VALUES (
   '0017_engine_os_source_capture',
-  'sha256:5a85d4e1847926f82bd0bd7d9c1691840aa49b8a880c65afddd2fcd8e6e7284e',
+  'sha256:d25f6119f4d0735247489623e5775cb185c866d7a3f1ebbb791c5f5cfaeac0e7',
   strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
 );
