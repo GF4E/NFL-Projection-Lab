@@ -25,6 +25,8 @@ interface D1Faults {
   failBeforeBatchNumbers?: Set<number>;
   throwAfterCommitBatchNumbers?: Set<number>;
   failNextEventRead?: boolean;
+  afterCommitBatchNumbers?: Map<number, () => Promise<void>>;
+  skipStatementNumbersByBatch?: Map<number, Set<number>>;
 }
 
 function sqliteD1(db: DatabaseSync, faults: D1Faults = {}): D1Database {
@@ -66,9 +68,18 @@ function sqliteD1(db: DatabaseSync, faults: D1Faults = {}): D1Database {
       let committed = false;
       db.exec("BEGIN IMMEDIATE");
       try {
-        for (const statement of statements) results.push(await statement.run());
+        for (const [statementIndex, statement] of statements.entries()) {
+          if (!faults.skipStatementNumbersByBatch?.get(batchNumber)?.has(statementIndex + 1)) {
+            results.push(await statement.run());
+          }
+        }
         db.exec("COMMIT");
         committed = true;
+        const afterCommit = faults.afterCommitBatchNumbers?.get(batchNumber);
+        if (afterCommit) {
+          faults.afterCommitBatchNumbers?.delete(batchNumber);
+          await afterCommit();
+        }
         if (faults.throwAfterCommitBatchNumbers?.has(batchNumber)) {
           faults.failNextEventRead = true;
           throw new Error(`injected unknown D1 batch outcome ${batchNumber}`);
@@ -410,6 +421,47 @@ describe("OS-03A integrity hardening", () => {
     sqlite.close();
   });
 
+  it("permanently stales an already-current capture that later fails exact-byte recovery", async () => {
+    const { sqlite, db } = database();
+    const bucket = new RaceR2();
+    const originalInput = captureInput(db, bucket);
+    const stored = await storeOs03aCapture(originalInput);
+    const originalBytes = bucket.objects.get(stored.responseObjectKey)!.bytes.slice();
+    bucket.objects.get(stored.responseObjectKey)!.bytes[0] ^= 1;
+
+    await expect(storeOs03aCapture(captureInput(db, bucket, {
+      clock: sequenceClock("2026-08-26T10:01:00.000Z")
+    }))).rejects.toThrow(/latest-good was not advanced/);
+    expect(sqlite.prepare(`SELECT status, latest_capture_id, last_success_at, failure_code
+      FROM source_capture_heartbeats`).get()).toEqual({
+      status: "stale",
+      latest_capture_id: stored.captureId,
+      last_success_at: "2026-08-26T10:00:05.000Z",
+      failure_code: "corrupt_object"
+    });
+    expect(sqlite.prepare(`SELECT count(*) AS count FROM source_capture_events
+      WHERE event_type = 'capture_failed'
+        AND json_extract(payload_json, '$.failureCode') = 'corrupt_object'`).get())
+      .toEqual({ count: 1 });
+
+    bucket.objects.get(stored.responseObjectKey)!.bytes = originalBytes;
+    await expect(recordOs03aNotModified({
+      db,
+      bucket: bucket as unknown as R2Bucket,
+      profileId: "fixture_nflverse_schedule_v1",
+      attemptToken: "integrity-corrupt-current-304",
+      idempotencyKey: "schedule:integrity:corrupt-current-304",
+      confirmedAt: "2026-08-26T10:02:00.000Z"
+    })).rejects.toThrow(/prior usable capture/);
+    expect(sqlite.prepare(`SELECT status, latest_capture_id, failure_code
+      FROM source_capture_heartbeats`).get()).toEqual({
+      status: "stale",
+      latest_capture_id: stored.captureId,
+      failure_code: "corrupt_object"
+    });
+    sqlite.close();
+  });
+
   it("re-verifies committed rows and completes a failed pointer batch idempotently", async () => {
     const { sqlite, db } = database({ failBeforeBatchNumbers: new Set([4]) });
     const bucket = new RaceR2();
@@ -459,6 +511,112 @@ describe("OS-03A integrity hardening", () => {
       .toEqual({ count: 1 });
     expect(sqlite.prepare(`SELECT count(*) AS count FROM source_capture_events
       WHERE event_type = 'capture_failed'`).get()).toEqual({ count: 1 });
+    sqlite.close();
+  });
+
+  it("recovers a stranded deterministic publication event instead of accepting an older pointer", async () => {
+    const faults: D1Faults = {
+      skipStatementNumbersByBatch: new Map([[4, new Set([3])]])
+    };
+    const { sqlite, db } = database(faults);
+    const bucket = new RaceR2();
+    const prior = await storeOs03aCapture(captureInput(db, bucket));
+    const candidateInput = captureInput(db, bucket, {
+      attemptToken: "integrity-stranded-publication",
+      idempotencyKey: "schedule:integrity:stranded-publication",
+      responseBytes: new TextEncoder().encode(
+        "game_id,kickoff\n2026_02_STRANDED,2026-09-17T00:00:00Z\n"
+      ),
+      sourceObservedAt: "2026-08-26T11:00:00.000Z",
+      providerPublishedAt: "2026-08-26T11:00:00.000Z",
+      receiptCompletedAt: "2026-08-26T11:00:01.000Z",
+      persistenceRequestedAt: "2026-08-26T11:00:02.000Z",
+      clock: sequenceClock(
+        "2026-08-26T11:00:03.000Z", "2026-08-26T11:00:04.000Z",
+        "2026-08-26T11:00:05.000Z", "2026-08-26T11:00:06.000Z",
+        "2026-08-26T11:00:07.000Z"
+      )
+    });
+
+    await expect(storeOs03aCapture(candidateInput)).rejects.toThrow(/latest-good remains fail-closed/);
+    const candidate = sqlite.prepare(`SELECT capture_id FROM source_capture_manifests
+      WHERE idempotency_key = 'schedule:integrity:stranded-publication'`).get() as { capture_id: string };
+    expect(sqlite.prepare(`SELECT status, latest_capture_id, failure_code
+      FROM source_capture_heartbeats`).get()).toEqual({
+      status: "stale",
+      latest_capture_id: prior.captureId,
+      failure_code: "manifest_failure"
+    });
+    expect(sqlite.prepare(`SELECT count(*) AS count FROM source_capture_events
+      WHERE capture_id = ? AND event_type = 'capture_committed_usable'`).get(candidate.capture_id))
+      .toEqual({ count: 1 });
+
+    await expect(storeOs03aCapture(candidateInput)).resolves.toMatchObject({
+      status: "deduplicated",
+      captureId: candidate.capture_id
+    });
+    expect(sqlite.prepare(`SELECT status, latest_capture_id, failure_code
+      FROM source_capture_heartbeats`).get()).toEqual({
+      status: "current",
+      latest_capture_id: candidate.capture_id,
+      failure_code: null
+    });
+    sqlite.close();
+  });
+
+  it("preserves a causally newer provider failure after pointer commit and before postcondition", async () => {
+    const faults: D1Faults = { afterCommitBatchNumbers: new Map() };
+    const { sqlite, db } = database(faults);
+    const bucket = new RaceR2();
+    await storeOs03aCapture(captureInput(db, bucket));
+    faults.afterCommitBatchNumbers!.set(4, async () => {
+      await recordOs03aCaptureFailure({
+        db,
+        profileId: "fixture_nflverse_schedule_v1",
+        attemptToken: "integrity-causal-provider-failure",
+        idempotencyKey: "schedule:integrity:causal-provider-failure",
+        failedAt: "2026-08-26T12:00:00.000Z",
+        failureCode: "provider_unavailable"
+      });
+    });
+    const candidateInput = captureInput(db, bucket, {
+      attemptToken: "integrity-pointer-before-causal-failure",
+      idempotencyKey: "schedule:integrity:pointer-before-causal-failure",
+      responseBytes: new TextEncoder().encode(
+        "game_id,kickoff\n2026_02_CAUSAL,2026-09-17T00:00:00Z\n"
+      ),
+      sourceObservedAt: "2026-08-26T11:00:00.000Z",
+      providerPublishedAt: "2026-08-26T11:00:00.000Z",
+      receiptCompletedAt: "2026-08-26T11:00:01.000Z",
+      persistenceRequestedAt: "2026-08-26T11:00:02.000Z",
+      clock: sequenceClock(
+        "2026-08-26T11:00:03.000Z", "2026-08-26T11:00:04.000Z",
+        "2026-08-26T11:00:05.000Z", "2026-08-26T11:00:06.000Z"
+      )
+    });
+    const stored = await storeOs03aCapture(candidateInput);
+    expect(sqlite.prepare(`SELECT status, latest_capture_id, last_failure_at, failure_code
+      FROM source_capture_heartbeats`).get()).toEqual({
+      status: "stale",
+      latest_capture_id: stored.captureId,
+      last_failure_at: "2026-08-26T12:00:00.000Z",
+      failure_code: "provider_unavailable"
+    });
+    expect(sqlite.prepare(`SELECT count(*) AS count FROM source_capture_events
+      WHERE event_type = 'capture_failed'
+        AND json_extract(payload_json, '$.failureCode') = 'manifest_failure'`).get())
+      .toEqual({ count: 0 });
+
+    await expect(storeOs03aCapture(candidateInput)).resolves.toMatchObject({
+      status: "deduplicated",
+      captureId: stored.captureId
+    });
+    expect(sqlite.prepare(`SELECT status, last_failure_at, failure_code
+      FROM source_capture_heartbeats`).get()).toEqual({
+      status: "stale",
+      last_failure_at: "2026-08-26T12:00:00.000Z",
+      failure_code: "provider_unavailable"
+    });
     sqlite.close();
   });
 

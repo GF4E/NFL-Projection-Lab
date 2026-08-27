@@ -17,7 +17,7 @@ function database(): DatabaseSync {
   return db;
 }
 
-const contractHash = "baa7a206973039de395ce79e33165fe842ffbff124e5a3c806f283815dde10b2";
+const contractHash = "9de33c9635ac8ded218bc9f774234e653135964204b5e3699b171536be99e867";
 const hash = "a".repeat(64);
 const captureId = "c".repeat(64);
 const rights = JSON.stringify({
@@ -74,7 +74,7 @@ function insertExtension(db: DatabaseSync, overrides: {
     response_persisted_at, sidecar_persisted_at, manifest_persisted_at, content_type,
     etag, usage_rights_json, usage_rights_hash, validation_state, failure_codes_json,
     later_import_json, later_import_hash, extension_hash
-  ) VALUES (?, 'source-capture-contract.2026.6', ?, 'fixture_nflverse_schedule_v1',
+  ) VALUES (?, 'source-capture-contract.2026.7', ?, 'fixture_nflverse_schedule_v1',
     'qualification_fixture', ?, ?, ?, '2026-08-26T16:00:02.000Z',
     '2026-08-26T16:00:03.000Z', '2026-08-26T16:00:04.000Z',
     '2026-08-26T16:00:05.000Z', 'text/csv', 'fixture-etag', ?, ?, ?, ?, ?, ?, ?)`)
@@ -359,6 +359,71 @@ describe("OS-03A additive source-capture migration", () => {
         captureId
       )).toThrow(/exact usable immutable capture/);
     failed.close();
+  });
+
+  it("retains an already-pointed corrupt capture only as a non-current forensic pointer", () => {
+    const db = database();
+    seedBase(db);
+    insertExtension(db);
+    insertEvent(db);
+    db.prepare(`INSERT INTO source_capture_heartbeats (
+      source_key, provider, dataset, status, last_attempt_at, last_success_at,
+      last_failure_at, failure_code, latest_capture_id
+    ) VALUES (?, 'nflverse-fixture', 'schedule', 'current', ?, ?, NULL, NULL, ?)`)
+      .run(
+        "nflverse-fixture:schedule:fixture_nflverse_schedule_v1",
+        "2026-08-26T16:00:05.000Z",
+        "2026-08-26T16:00:05.000Z",
+        captureId
+      );
+    insertEvent(db, {
+      eventId: "c".repeat(64),
+      attemptToken: "postcommit-current-corruption",
+      eventType: "capture_failed",
+      captureId: null,
+      occurredAt: "2026-08-26T16:00:06.000Z",
+      payload: {
+        sourceKey: "nflverse-fixture:schedule:fixture_nflverse_schedule_v1",
+        failureCode: "corrupt_object",
+        idempotencyKey: "schedule:2026-08-26",
+        context: {
+          captureId,
+          phase: "post_manifest_pre_pointer_r2_verification"
+        }
+      }
+    });
+
+    db.prepare(`UPDATE source_capture_heartbeats
+      SET status = 'stale', last_attempt_at = ?, last_failure_at = ?,
+        failure_code = 'corrupt_object'
+      WHERE source_key = ?`).run(
+      "2026-08-26T16:00:06.000Z",
+      "2026-08-26T16:00:06.000Z",
+      "nflverse-fixture:schedule:fixture_nflverse_schedule_v1"
+    );
+    expect(db.prepare(`SELECT status, latest_capture_id, last_success_at, failure_code
+      FROM source_capture_heartbeats`).get()).toEqual({
+      status: "stale",
+      latest_capture_id: captureId,
+      last_success_at: "2026-08-26T16:00:05.000Z",
+      failure_code: "corrupt_object"
+    });
+    expect(() => db.exec(`UPDATE source_capture_heartbeats SET status = 'current'`))
+      .toThrow(/move backward|cross-wire/);
+    expect(() => db.exec(`UPDATE source_capture_heartbeats
+      SET last_success_at = '2026-08-26T16:00:07.000Z'`))
+      .toThrow(/move backward|cross-wire/);
+    expect(() => db.exec(`UPDATE source_capture_heartbeats
+      SET last_attempt_at = '2026-08-26T16:00:04.000Z'`))
+      .toThrow(/move backward|cross-wire/);
+    expect(() => insertEvent(db, {
+      eventId: "7".repeat(64),
+      attemptToken: "corrupt-not-modified",
+      eventType: "not_modified_confirmed",
+      idempotencyKey: "schedule:corrupt-not-modified",
+      occurredAt: "2026-08-26T16:00:07.000Z"
+    })).toThrow(/exact immutable capture identity/);
+    db.close();
   });
 
   it("rolls back only empty 0017 tables and never contains an R2 deletion operation", () => {

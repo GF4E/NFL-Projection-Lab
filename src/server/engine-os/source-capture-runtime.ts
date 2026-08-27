@@ -707,20 +707,82 @@ async function hasPermanentEvidenceVerificationFailure(
   return row?.found === 1;
 }
 
-async function hasRetryablePointerPublicationFailure(
+async function hasPointerPublicationFailure(
   db: D1Database,
   sourceKey: string,
   captureId: string,
-  lastFailureAt: string | null
+  occurredAt?: string | null
 ): Promise<boolean> {
-  if (!lastFailureAt) return false;
+  if (occurredAt === null) return false;
   const row = await db.prepare(`SELECT 1 AS found FROM source_capture_events
-    WHERE source_key = ? AND event_type = 'capture_failed' AND occurred_at = ?
+    WHERE source_key = ? AND event_type = 'capture_failed'
+      AND (? IS NULL OR occurred_at = ?)
       AND json_extract(payload_json, '$.failureCode') = 'manifest_failure'
       AND json_extract(payload_json, '$.context.captureId') = ?
       AND json_extract(payload_json, '$.context.phase') = 'verified_usable_pointer_publication'
-    LIMIT 1`).bind(sourceKey, lastFailureAt, captureId).first<{ found: number }>();
+    LIMIT 1`).bind(sourceKey, occurredAt ?? null, occurredAt ?? null, captureId)
+    .first<{ found: number }>();
   return row?.found === 1;
+}
+
+interface PublicationHeadState {
+  status: string;
+  failure_code: string | null;
+  last_attempt_at: string;
+  last_failure_at: string | null;
+  latest_capture_id: string | null;
+  expected_capture_id: string | null;
+}
+
+async function readPublicationHead(
+  db: D1Database,
+  sourceKey: string
+): Promise<PublicationHeadState | null> {
+  return db.prepare(`SELECT heartbeat.status, heartbeat.failure_code,
+      heartbeat.last_attempt_at, heartbeat.last_failure_at, heartbeat.latest_capture_id,
+      (
+        SELECT published.capture_id
+        FROM source_capture_events published
+        JOIN source_capture_manifest_extensions eligible
+          ON eligible.capture_id = published.capture_id
+        WHERE published.source_key = heartbeat.source_key
+          AND published.event_type = 'capture_committed_usable'
+          AND NOT EXISTS (
+            SELECT 1 FROM source_capture_events failed
+            WHERE failed.source_key = published.source_key
+              AND failed.event_type = 'capture_failed'
+              AND json_extract(failed.payload_json, '$.failureCode') = 'corrupt_object'
+              AND json_extract(failed.payload_json, '$.context.captureId') = published.capture_id
+              AND json_extract(failed.payload_json, '$.context.phase') =
+                'post_manifest_pre_pointer_r2_verification'
+          )
+        ORDER BY julianday(eligible.receipt_completed_at) DESC, eligible.capture_id DESC
+        LIMIT 1
+      ) AS expected_capture_id
+    FROM source_capture_heartbeats heartbeat
+    WHERE heartbeat.source_key = ? LIMIT 1`).bind(sourceKey).first<PublicationHeadState>();
+}
+
+async function publicationOutcomeIsSafe(input: {
+  db: D1Database;
+  sourceKey: string;
+  candidateCaptureId: string;
+  publicationObservedAt: string;
+}): Promise<boolean> {
+  const head = await readPublicationHead(input.db, input.sourceKey);
+  if (!head?.expected_capture_id) return false;
+  if (head.expected_capture_id !== input.candidateCaptureId) {
+    return head.latest_capture_id === head.expected_capture_id;
+  }
+  if (head.latest_capture_id !== input.candidateCaptureId) return false;
+  if (head.status === "current" && head.failure_code === null) return true;
+  if (Date.parse(head.last_attempt_at) <= Date.parse(input.publicationObservedAt)) return false;
+  return !(await hasPointerPublicationFailure(
+    input.db,
+    input.sourceKey,
+    input.candidateCaptureId,
+    head.last_failure_at
+  ));
 }
 
 async function verifyCommittedCaptureOrFailClosed(input: {
@@ -798,26 +860,46 @@ async function publishVerifiedUsablePointer(input: {
     payload
   });
   const prior = await eventByAttempt(input.db, attemptToken);
-  let requiresCurrentPublication = !prior;
+  let publicationObservedAt: string | null = prior?.occurred_at ?? null;
   if (prior) {
     assertExactEvent(prior, event);
-    const heartbeat = await input.db.prepare(`SELECT status, last_failure_at, latest_capture_id
-      FROM source_capture_heartbeats WHERE source_key = ? LIMIT 1`)
-      .bind(extension.source_key)
-      .first<{ status: string; last_failure_at: string | null; latest_capture_id: string | null }>();
-    const retryableRecovery = heartbeat?.latest_capture_id === base.capture_id &&
-      heartbeat.status !== "current" &&
-      await hasRetryablePointerPublicationFailure(
+    const head = await readPublicationHead(input.db, extension.source_key);
+    if (!head?.expected_capture_id) {
+      throw new PostCommitCaptureVerificationError(
+        "Prior publication event has no deterministic eligible head",
+        { cause: new Error("Inconsistent prior pointer-publication outcome") }
+      );
+    }
+    if (head.expected_capture_id !== base.capture_id) {
+      if (head.latest_capture_id === head.expected_capture_id) return;
+      throw new PostCommitCaptureVerificationError(
+        "Prior publication event is not the head and the newer head is unresolved",
+        { cause: new Error("Inconsistent deterministic latest-good pointer") }
+      );
+    }
+    if (head.latest_capture_id === base.capture_id) {
+      if (head.status === "current" && head.failure_code === null) return;
+      const currentPointerFailure = await hasPointerPublicationFailure(
         input.db,
         extension.source_key,
         base.capture_id,
-        heartbeat.last_failure_at
+        head.last_failure_at
       );
-    if (heartbeat?.latest_capture_id && !retryableRecovery) return;
-    requiresCurrentPublication = retryableRecovery || !heartbeat?.latest_capture_id;
+      if (!currentPointerFailure) return;
+    } else if (!(await hasPointerPublicationFailure(
+      input.db,
+      extension.source_key,
+      base.capture_id
+    ))) {
+      throw new PostCommitCaptureVerificationError(
+        "Prior publication event exists without its pointer or matching failure record",
+        { cause: new Error("Inconsistent prior pointer-publication outcome") }
+      );
+    }
   }
 
   const verifiedAt = now(input.clock, "Verified usable pointer publication time");
+  publicationObservedAt ??= verifiedAt;
   if (Date.parse(verifiedAt) < Date.parse(extension.manifest_persisted_at)) {
     const failure = new Error("Verified usable time cannot predate manifest persistence");
     await recordPostCommitFailure({
@@ -887,48 +969,45 @@ async function publishVerifiedUsablePointer(input: {
       ...exactEventBindings
     ));
     statements.push(input.db.prepare(`UPDATE source_capture_heartbeats
+      SET provider = ?, dataset = ?, latest_capture_id = ?
+      WHERE source_key = ? AND ${exactEventPredicate}
+        AND (
+          latest_capture_id IS NULL OR latest_capture_id = ? OR EXISTS (
+            SELECT 1 FROM source_capture_manifest_extensions candidate
+            JOIN source_capture_manifest_extensions incumbent
+              ON incumbent.capture_id = source_capture_heartbeats.latest_capture_id
+            WHERE candidate.capture_id = ? AND (
+              julianday(candidate.receipt_completed_at) > julianday(incumbent.receipt_completed_at) OR
+              (candidate.receipt_completed_at = incumbent.receipt_completed_at AND
+                candidate.capture_id > incumbent.capture_id)
+            )
+          )
+        )`).bind(
+      base.provider,
+      base.dataset,
+      base.capture_id,
+      extension.source_key,
+      ...exactEventBindings,
+      base.capture_id,
+      base.capture_id
+    ));
+    statements.push(input.db.prepare(`UPDATE source_capture_heartbeats
       SET provider = ?, dataset = ?, status = 'current', last_attempt_at = ?,
         last_success_at = CASE WHEN last_success_at IS NULL OR ? > last_success_at
           THEN ? ELSE last_success_at END,
-        last_failure_at = NULL, failure_code = NULL,
-        latest_capture_id = CASE
-          WHEN latest_capture_id IS NULL THEN ?
-          WHEN EXISTS (
-            SELECT 1 FROM source_capture_manifest_extensions candidate
-            JOIN source_capture_manifest_extensions incumbent
-              ON incumbent.capture_id = source_capture_heartbeats.latest_capture_id
-            WHERE candidate.capture_id = ? AND (
-              julianday(candidate.receipt_completed_at) > julianday(incumbent.receipt_completed_at) OR
-              (candidate.receipt_completed_at = incumbent.receipt_completed_at AND
-                candidate.capture_id > incumbent.capture_id)
-            )
-          ) THEN ? ELSE latest_capture_id END
-      WHERE source_key = ? AND ? >= last_attempt_at AND ${exactEventPredicate}
+        last_failure_at = NULL, failure_code = NULL
+      WHERE source_key = ? AND latest_capture_id = ? AND ${exactEventPredicate}
         AND (
-          latest_capture_id IS NULL OR
-          EXISTS (
-            SELECT 1 FROM source_capture_manifest_extensions candidate
-            JOIN source_capture_manifest_extensions incumbent
-              ON incumbent.capture_id = source_capture_heartbeats.latest_capture_id
-            WHERE candidate.capture_id = ? AND (
-              julianday(candidate.receipt_completed_at) > julianday(incumbent.receipt_completed_at) OR
-              (candidate.receipt_completed_at = incumbent.receipt_completed_at AND
-                candidate.capture_id > incumbent.capture_id)
-            )
-          ) OR (
-            latest_capture_id = ? AND (
-              status = 'current' OR (
-                failure_code = 'manifest_failure' AND last_failure_at IS NOT NULL AND EXISTS (
-                  SELECT 1 FROM source_capture_events failed
-                  WHERE failed.source_key = source_capture_heartbeats.source_key
-                    AND failed.event_type = 'capture_failed'
-                    AND failed.occurred_at = source_capture_heartbeats.last_failure_at
-                    AND json_extract(failed.payload_json, '$.failureCode') = 'manifest_failure'
-                    AND json_extract(failed.payload_json, '$.context.captureId') = ?
-                    AND json_extract(failed.payload_json, '$.context.phase') =
-                      'verified_usable_pointer_publication'
-                )
-              )
+          ? >= last_attempt_at OR (
+            failure_code = 'manifest_failure' AND last_failure_at IS NOT NULL AND EXISTS (
+              SELECT 1 FROM source_capture_events failed
+              WHERE failed.source_key = source_capture_heartbeats.source_key
+                AND failed.event_type = 'capture_failed'
+                AND failed.occurred_at = source_capture_heartbeats.last_failure_at
+                AND json_extract(failed.payload_json, '$.failureCode') = 'manifest_failure'
+                AND json_extract(failed.payload_json, '$.context.captureId') = ?
+                AND json_extract(failed.payload_json, '$.context.phase') =
+                  'verified_usable_pointer_publication'
             )
           )
         )`).bind(
@@ -937,14 +1016,10 @@ async function publishVerifiedUsablePointer(input: {
       verifiedAt,
       verifiedAt,
       verifiedAt,
-      base.capture_id,
-      base.capture_id,
-      base.capture_id,
       extension.source_key,
-      verifiedAt,
+      base.capture_id,
       ...exactEventBindings,
-      base.capture_id,
-      base.capture_id,
+      publicationObservedAt,
       base.capture_id
     ));
 
@@ -953,37 +1028,12 @@ async function publishVerifiedUsablePointer(input: {
     } catch (batchFailure) {
       try {
         assertExactEvent(await eventByAttempt(input.db, attemptToken), event);
-        const head = await input.db.prepare(`SELECT heartbeat.status, heartbeat.failure_code,
-            heartbeat.latest_capture_id,
-            expected.capture_id AS expected_capture_id
-          FROM source_capture_heartbeats heartbeat
-          JOIN (
-            SELECT published.capture_id
-            FROM source_capture_events published
-            JOIN source_capture_manifest_extensions eligible
-              ON eligible.capture_id = published.capture_id
-            WHERE published.source_key = ? AND published.event_type = 'capture_committed_usable'
-              AND NOT EXISTS (
-                SELECT 1 FROM source_capture_events failed
-                WHERE failed.source_key = published.source_key AND failed.event_type = 'capture_failed'
-                  AND json_extract(failed.payload_json, '$.failureCode') = 'corrupt_object'
-                  AND json_extract(failed.payload_json, '$.context.captureId') = published.capture_id
-                  AND json_extract(failed.payload_json, '$.context.phase') =
-                    'post_manifest_pre_pointer_r2_verification'
-              )
-            ORDER BY julianday(eligible.receipt_completed_at) DESC, eligible.capture_id DESC
-            LIMIT 1
-          ) expected
-          WHERE heartbeat.source_key = ? LIMIT 1`).bind(extension.source_key, extension.source_key)
-          .first<{
-            status: string;
-            failure_code: string | null;
-            latest_capture_id: string | null;
-            expected_capture_id: string;
-          }>();
-        if (!head || head.latest_capture_id !== head.expected_capture_id ||
-            (requiresCurrentPublication && head.expected_capture_id === base.capture_id &&
-              (head.status !== "current" || head.failure_code !== null))) {
+        if (!(await publicationOutcomeIsSafe({
+          db: input.db,
+          sourceKey: extension.source_key,
+          candidateCaptureId: base.capture_id,
+          publicationObservedAt
+        }))) {
           throw batchFailure;
         }
         return;
@@ -992,35 +1042,12 @@ async function publishVerifiedUsablePointer(input: {
       }
     }
     assertExactEvent(await eventByAttempt(input.db, attemptToken), event);
-    const head = await input.db.prepare(`SELECT heartbeat.status, heartbeat.failure_code,
-        heartbeat.latest_capture_id,
-        expected.capture_id AS expected_capture_id
-      FROM source_capture_heartbeats heartbeat
-      JOIN (
-        SELECT published.capture_id
-        FROM source_capture_events published
-        JOIN source_capture_manifest_extensions eligible ON eligible.capture_id = published.capture_id
-        WHERE published.source_key = ? AND published.event_type = 'capture_committed_usable'
-          AND NOT EXISTS (
-            SELECT 1 FROM source_capture_events failed
-            WHERE failed.source_key = published.source_key AND failed.event_type = 'capture_failed'
-              AND json_extract(failed.payload_json, '$.failureCode') = 'corrupt_object'
-              AND json_extract(failed.payload_json, '$.context.captureId') = published.capture_id
-              AND json_extract(failed.payload_json, '$.context.phase') =
-                'post_manifest_pre_pointer_r2_verification'
-          )
-        ORDER BY julianday(eligible.receipt_completed_at) DESC, eligible.capture_id DESC LIMIT 1
-      ) expected
-      WHERE heartbeat.source_key = ? LIMIT 1`).bind(extension.source_key, extension.source_key)
-      .first<{
-        status: string;
-        failure_code: string | null;
-        latest_capture_id: string | null;
-        expected_capture_id: string;
-      }>();
-    if (!head || head.latest_capture_id !== head.expected_capture_id ||
-        (requiresCurrentPublication && head.expected_capture_id === base.capture_id &&
-          (head.status !== "current" || head.failure_code !== null))) {
+    if (!(await publicationOutcomeIsSafe({
+      db: input.db,
+      sourceKey: extension.source_key,
+      candidateCaptureId: base.capture_id,
+      publicationObservedAt
+    }))) {
       throw new Error("Verified usable capture did not establish the deterministic latest-good pointer");
     }
   } catch (failure) {
@@ -1680,6 +1707,15 @@ export async function recordOs03aNotModified(input: {
       ON extension.capture_id = heartbeat.latest_capture_id
     WHERE heartbeat.source_key = ? AND extension.source_key = ?
       AND extension.profile_id = ? AND extension.validation_state = 'usable'
+      AND NOT EXISTS (
+        SELECT 1 FROM source_capture_events failed
+        WHERE failed.source_key = extension.source_key
+          AND failed.event_type = 'capture_failed'
+          AND json_extract(failed.payload_json, '$.failureCode') = 'corrupt_object'
+          AND json_extract(failed.payload_json, '$.context.captureId') = heartbeat.latest_capture_id
+          AND json_extract(failed.payload_json, '$.context.phase') =
+            'post_manifest_pre_pointer_r2_verification'
+      )
     LIMIT 1`).bind(sourceKey, sourceKey, profile.profileId)
     .first<{ capture_id: string }>();
   if (!head?.capture_id) {
