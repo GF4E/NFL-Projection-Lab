@@ -1,5 +1,7 @@
 import type { CaptureDataset, RedactedHttpRequest } from "@/domain/engine-os";
 import { canonicalJson, sha256Hex } from "@/domain/hash";
+import engineOperatingContractJson from "../../../config/engine-operating-contract.v1.json";
+import sourceCaptureContractV5Json from "../../../config/source-capture-contract-2026.v5.json";
 import {
   OS03A_EFFECTIVE_CONTRACT_HASH,
   OS03A_EFFECTIVE_CONTRACT_VERSION,
@@ -16,6 +18,7 @@ import {
   buildSidecarSha256,
   buildUsageRightsHash,
   getQualificationSourceProfile,
+  sourceCaptureQualificationProfiles,
   sourceCaptureKey,
   verifyOs03aCaptureSidecar,
   type CaptureEventType,
@@ -29,6 +32,44 @@ import {
 const OBJECT_MAX_BYTES = 100_000_000;
 const QUALIFICATION_ORPHAN_MINIMUM_AGE_SECONDS = 86_400;
 const SAFE_OBJECT_PREFIXES = ["raw/", "manifests/os03a/"] as const;
+
+const sourceMaximumAgeSeconds = Object.freeze({
+  schedule: engineOperatingContractJson.maximumSourceAgeSeconds.schedule,
+  play_by_play: engineOperatingContractJson.maximumSourceAgeSeconds.current_season_play_by_play,
+  roster: engineOperatingContractJson.maximumSourceAgeSeconds.weekly_roster,
+  injury: engineOperatingContractJson.maximumSourceAgeSeconds.official_injury_report,
+  inactive_roof: Math.min(
+    engineOperatingContractJson.maximumSourceAgeSeconds.official_inactives_at_kickoff_minus_90,
+    engineOperatingContractJson.maximumSourceAgeSeconds.roof_status_at_kickoff_minus_90
+  ),
+  weather: engineOperatingContractJson.maximumSourceAgeSeconds.kickoff_hour_weather_issue,
+  odds: Math.min(
+    engineOperatingContractJson.maximumSourceAgeSeconds.odds_opener,
+    engineOperatingContractJson.maximumSourceAgeSeconds.odds_ordinary,
+    engineOperatingContractJson.maximumSourceAgeSeconds.odds_kickoff_minus_120,
+    engineOperatingContractJson.maximumSourceAgeSeconds.odds_kickoff_minus_60,
+    engineOperatingContractJson.maximumSourceAgeSeconds.odds_kickoff_minus_15
+  )
+} satisfies Record<CaptureDataset, number>);
+
+for (const [dataset, maximumAgeSeconds] of Object.entries(sourceMaximumAgeSeconds)) {
+  if (!Number.isSafeInteger(maximumAgeSeconds) || maximumAgeSeconds < 1) {
+    throw new Error(`Frozen OS-00B maximum source age is invalid for ${dataset}`);
+  }
+}
+
+const profileMaximumAgeSeconds = Object.freeze(Object.fromEntries(
+  Object.entries(sourceCaptureContractV5Json.profileFreshnessThresholds)
+    .map(([profileId, threshold]) => [profileId, threshold.maximumAgeSeconds])
+) as Record<string, number>);
+
+for (const profile of sourceCaptureQualificationProfiles) {
+  const profileAge = profileMaximumAgeSeconds[profile.profileId];
+  const operatingAge = sourceMaximumAgeSeconds[profile.dataset as CaptureDataset];
+  if (!Number.isSafeInteger(profileAge) || profileAge !== operatingAge) {
+    throw new Error(`Frozen OS-03A profile freshness threshold diverges from OS-00B: ${profile.profileId}`);
+  }
+}
 
 type Clock = () => Date;
 
@@ -57,10 +98,19 @@ async function objectBytes(bucket: R2Bucket, key: string): Promise<Uint8Array | 
   return new Uint8Array(await object.arrayBuffer());
 }
 
+class ImmutableEvidenceMismatchError extends Error {
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = "ImmutableEvidenceMismatchError";
+  }
+}
+
 async function verifyExactObject(bucket: R2Bucket, key: string, expected: Uint8Array): Promise<void> {
   const recovered = await objectBytes(bucket, key);
   if (!recovered || !bytesEqual(recovered, expected)) {
-    throw new Error(`Immutable evidence object failed exact-byte verification: ${key}`);
+    throw new ImmutableEvidenceMismatchError(
+      `Immutable evidence object failed exact-byte verification: ${key}`
+    );
   }
 }
 
@@ -254,7 +304,7 @@ function parseSidecar(bytes: Uint8Array): Os03aCaptureSidecar {
   try {
     parsed = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
   } catch {
-    throw new Error("Capture sidecar is not valid canonical UTF-8 JSON");
+    throw new ImmutableEvidenceMismatchError("Capture sidecar is not valid canonical UTF-8 JSON");
   }
   assertSecretFreeCanonicalValue(parsed, "Stored capture sidecar");
   return parsed as Os03aCaptureSidecar;
@@ -320,43 +370,62 @@ function assertRowsMatchSidecar(rows: CaptureRows, sidecar: Os03aCaptureSidecar)
     [extension.later_import_hash, sidecar.laterImportHash]
   ];
   if (checks.some(([left, right]) => left !== right)) {
-    throw new Error("Stored D1 pointer does not match its immutable OS-03A sidecar");
+    throw new ImmutableEvidenceMismatchError(
+      "Stored D1 pointer does not match its immutable OS-03A sidecar"
+    );
   }
   if (
     canonicalJson(JSON.parse(extension.usage_rights_json)) !== canonicalJson(sidecar.usageRights) ||
     canonicalJson(JSON.parse(extension.failure_codes_json)) !== canonicalJson(sidecar.failureCodes) ||
     canonicalJson(JSON.parse(extension.later_import_json)) !== canonicalJson(sidecar.laterImport)
   ) {
-    throw new Error("Stored OS-03A extension JSON does not match its sidecar");
+    throw new ImmutableEvidenceMismatchError(
+      "Stored OS-03A extension JSON does not match its sidecar"
+    );
   }
   if (
     buildUsageRightsHash(sidecar.usageRights) !== sidecar.usageRightsHash ||
     buildLaterImportHash(sidecar.laterImport) !== sidecar.laterImportHash ||
     buildManifestExtensionHash(extensionFromRow(extension)) !== extension.extension_hash
   ) {
-    throw new Error("Stored OS-03A extension hash failed verification");
+    throw new ImmutableEvidenceMismatchError("Stored OS-03A extension hash failed verification");
   }
 }
 
 async function verifyCaptureRows(bucket: R2Bucket, rows: CaptureRows): Promise<Os03aCaptureSidecar> {
   const response = await objectBytes(bucket, rows.base.response_object_key);
   const sidecarBytes = await objectBytes(bucket, rows.base.sidecar_object_key);
-  if (!response || !sidecarBytes) throw new Error("Stored OS-03A evidence object is missing");
+  if (!response || !sidecarBytes) {
+    throw new ImmutableEvidenceMismatchError("Stored OS-03A evidence object is missing");
+  }
   if (
     response.byteLength !== rows.base.response_bytes ||
     sha256Hex(response) !== rows.base.response_sha256 ||
     sha256Hex(sidecarBytes) !== rows.base.sidecar_sha256
   ) {
-    throw new Error("Stored OS-03A evidence object is corrupt");
+    throw new ImmutableEvidenceMismatchError("Stored OS-03A evidence object is corrupt");
   }
   const sidecar = parseSidecar(sidecarBytes);
-  verifyOs03aCaptureSidecar(sidecar);
+  try {
+    verifyOs03aCaptureSidecar(sidecar);
+  } catch (cause) {
+    throw new ImmutableEvidenceMismatchError(
+      `Stored OS-03A sidecar semantic verification failed: ${
+        cause instanceof Error ? cause.message : String(cause)
+      }`,
+      { cause }
+    );
+  }
   if (buildSidecarSha256(sidecar) !== rows.base.sidecar_sha256) {
-    throw new Error("Stored OS-03A sidecar self-hash failed verification");
+    throw new ImmutableEvidenceMismatchError(
+      "Stored OS-03A sidecar self-hash failed verification"
+    );
   }
   assertRowsMatchSidecar(rows, sidecar);
   if (sidecar.responseSha256 !== sha256Hex(response)) {
-    throw new Error("Stored response bytes do not match their OS-03A sidecar");
+    throw new ImmutableEvidenceMismatchError(
+      "Stored response bytes do not match their OS-03A sidecar"
+    );
   }
   return sidecar;
 }
@@ -570,6 +639,413 @@ async function appendDeduplicationEvent(input: {
   });
 }
 
+class PostCommitCaptureVerificationError extends Error {
+  constructor(message: string, options: { cause: unknown }) {
+    super(message, options);
+    this.name = "PostCommitCaptureVerificationError";
+  }
+}
+
+function deterministicPostCommitAttemptToken(input: {
+  committedAttemptToken: string;
+  captureId: string;
+  phase: string;
+}): string {
+  return `postcommit:${sha256Hex(canonicalJson({
+    contractVersion: OS03A_EFFECTIVE_CONTRACT_VERSION,
+    committedAttemptToken: input.committedAttemptToken,
+    captureId: input.captureId,
+    phase: input.phase
+  }))}`;
+}
+
+async function recordPostCommitFailure(input: {
+  db: D1Database;
+  rows: CaptureRows;
+  committedAttemptToken: string;
+  failedAt: string;
+  failureCode: CaptureFailureCode;
+  phase: string;
+}): Promise<void> {
+  const { base, extension } = input.rows;
+  const observedFailureAt = canonicalTimestamp(input.failedAt, "Post-commit failure time");
+  const failedAt = Date.parse(observedFailureAt) >= Date.parse(extension.manifest_persisted_at)
+    ? observedFailureAt
+    : canonicalTimestamp(extension.manifest_persisted_at, "Manifest persistence time");
+  await recordOs03aCaptureFailure({
+    db: input.db,
+    profileId: extension.profile_id,
+    attemptToken: deterministicPostCommitAttemptToken({
+      committedAttemptToken: input.committedAttemptToken,
+      captureId: base.capture_id,
+      phase: input.phase
+    }),
+    idempotencyKey: base.idempotency_key,
+    failedAt,
+    failureCode: input.failureCode,
+    safeContext: {
+      captureId: base.capture_id,
+      evidenceHash: base.evidence_hash,
+      phase: input.phase,
+      pointerDisposition: "preserved_prior_only"
+    }
+  });
+}
+
+async function hasPermanentEvidenceVerificationFailure(
+  db: D1Database,
+  sourceKey: string,
+  captureId: string
+): Promise<boolean> {
+  const row = await db.prepare(`SELECT 1 AS found FROM source_capture_events
+    WHERE source_key = ? AND event_type = 'capture_failed'
+      AND json_extract(payload_json, '$.failureCode') = 'corrupt_object'
+      AND json_extract(payload_json, '$.context.captureId') = ?
+      AND json_extract(payload_json, '$.context.phase') =
+        'post_manifest_pre_pointer_r2_verification'
+    LIMIT 1`).bind(sourceKey, captureId).first<{ found: number }>();
+  return row?.found === 1;
+}
+
+async function hasRetryablePointerPublicationFailure(
+  db: D1Database,
+  sourceKey: string,
+  captureId: string,
+  lastFailureAt: string | null
+): Promise<boolean> {
+  if (!lastFailureAt) return false;
+  const row = await db.prepare(`SELECT 1 AS found FROM source_capture_events
+    WHERE source_key = ? AND event_type = 'capture_failed' AND occurred_at = ?
+      AND json_extract(payload_json, '$.failureCode') = 'manifest_failure'
+      AND json_extract(payload_json, '$.context.captureId') = ?
+      AND json_extract(payload_json, '$.context.phase') = 'verified_usable_pointer_publication'
+    LIMIT 1`).bind(sourceKey, lastFailureAt, captureId).first<{ found: number }>();
+  return row?.found === 1;
+}
+
+async function verifyCommittedCaptureOrFailClosed(input: {
+  db: D1Database;
+  bucket: R2Bucket;
+  rows: CaptureRows;
+  committedAttemptToken: string;
+  expectedEvidenceHash: string;
+  clock?: Clock;
+}): Promise<Os03aCaptureSidecar> {
+  if (await hasPermanentEvidenceVerificationFailure(
+    input.db,
+    input.rows.extension.source_key,
+    input.rows.base.capture_id
+  )) {
+    throw new PostCommitCaptureVerificationError(
+      "Post-commit immutable capture is permanently ineligible after evidence verification failure",
+      { cause: new Error("Immutable evidence failure is append-only") }
+    );
+  }
+  try {
+    const persisted = await verifyCaptureRows(input.bucket, input.rows);
+    if (persisted.evidenceHash !== input.expectedEvidenceHash) {
+      throw new ImmutableEvidenceMismatchError(
+        "Post-commit immutable capture verification resolved different evidence"
+      );
+    }
+    return persisted;
+  } catch (failure) {
+    const failureCode: CaptureFailureCode = failure instanceof ImmutableEvidenceMismatchError
+      ? "corrupt_object"
+      : "storage_failure";
+    await recordPostCommitFailure({
+      db: input.db,
+      rows: input.rows,
+      committedAttemptToken: input.committedAttemptToken,
+      failedAt: now(input.clock, "Post-commit verification failure observation time"),
+      failureCode,
+      phase: "post_manifest_pre_pointer_r2_verification"
+    });
+    throw new PostCommitCaptureVerificationError(
+      failureCode === "corrupt_object"
+        ? "Post-commit immutable capture verification failed; latest-good was not advanced"
+        : "Post-commit immutable capture verification was unavailable; latest-good was not advanced",
+      { cause: failure }
+    );
+  }
+}
+
+async function publishVerifiedUsablePointer(input: {
+  db: D1Database;
+  rows: CaptureRows;
+  committedAttemptToken: string;
+  clock?: Clock;
+}): Promise<void> {
+  const { base, extension } = input.rows;
+  if (extension.validation_state !== "usable") return;
+  const attemptToken = `publication:${sha256Hex(canonicalJson({
+    contractVersion: OS03A_EFFECTIVE_CONTRACT_VERSION,
+    captureId: base.capture_id,
+    phase: "verified_usable_pointer_publication"
+  }))}`;
+  const payload = {
+    captureId: base.capture_id,
+    evidenceHash: base.evidence_hash,
+    extensionHash: extension.extension_hash,
+    responseSha256: base.response_sha256,
+    sidecarSha256: base.sidecar_sha256,
+    validationState: extension.validation_state
+  };
+  const event = eventIdentity({
+    eventType: "capture_committed_usable",
+    attemptToken,
+    captureId: base.capture_id,
+    payload
+  });
+  const prior = await eventByAttempt(input.db, attemptToken);
+  let requiresCurrentPublication = !prior;
+  if (prior) {
+    assertExactEvent(prior, event);
+    const heartbeat = await input.db.prepare(`SELECT status, last_failure_at, latest_capture_id
+      FROM source_capture_heartbeats WHERE source_key = ? LIMIT 1`)
+      .bind(extension.source_key)
+      .first<{ status: string; last_failure_at: string | null; latest_capture_id: string | null }>();
+    const retryableRecovery = heartbeat?.latest_capture_id === base.capture_id &&
+      heartbeat.status !== "current" &&
+      await hasRetryablePointerPublicationFailure(
+        input.db,
+        extension.source_key,
+        base.capture_id,
+        heartbeat.last_failure_at
+      );
+    if (heartbeat?.latest_capture_id && !retryableRecovery) return;
+    requiresCurrentPublication = retryableRecovery || !heartbeat?.latest_capture_id;
+  }
+
+  const verifiedAt = now(input.clock, "Verified usable pointer publication time");
+  if (Date.parse(verifiedAt) < Date.parse(extension.manifest_persisted_at)) {
+    const failure = new Error("Verified usable time cannot predate manifest persistence");
+    await recordPostCommitFailure({
+      db: input.db,
+      rows: input.rows,
+      committedAttemptToken: input.committedAttemptToken,
+      failedAt: extension.manifest_persisted_at,
+      failureCode: "manifest_failure",
+      phase: "verified_usable_time_regression"
+    });
+    throw new PostCommitCaptureVerificationError(
+      "Verified pointer publication failed; verification time regressed",
+      { cause: failure }
+    );
+  }
+  try {
+    const statements: D1PreparedStatement[] = [];
+    if (!prior) {
+      statements.push(eventInsertStatement({
+        db: input.db,
+        ...event,
+        attemptToken,
+        eventType: "capture_committed_usable",
+        captureId: base.capture_id,
+        sourceKey: extension.source_key,
+        provider: base.provider,
+        dataset: base.dataset,
+        idempotencyKey: base.idempotency_key,
+        occurredAt: verifiedAt
+      }));
+    }
+    const exactEventPredicate = `EXISTS (
+      SELECT 1 FROM source_capture_events event
+      JOIN source_capture_manifests manifest ON manifest.capture_id = event.capture_id
+      JOIN source_capture_manifest_extensions candidate ON candidate.capture_id = manifest.capture_id
+      WHERE event.event_id = ? AND event.event_payload_hash = ?
+        AND event.event_type = 'capture_committed_usable'
+        AND manifest.evidence_hash = ? AND candidate.extension_hash = ?
+        AND candidate.source_key = ? AND candidate.validation_state = 'usable'
+        AND NOT EXISTS (
+          SELECT 1 FROM source_capture_events failed
+          WHERE failed.source_key = candidate.source_key AND failed.event_type = 'capture_failed'
+            AND json_extract(failed.payload_json, '$.failureCode') = 'corrupt_object'
+            AND json_extract(failed.payload_json, '$.context.captureId') = candidate.capture_id
+            AND json_extract(failed.payload_json, '$.context.phase') =
+              'post_manifest_pre_pointer_r2_verification'
+        )
+    )`;
+    const exactEventBindings = [
+      event.eventId,
+      event.payloadHash,
+      base.evidence_hash,
+      extension.extension_hash,
+      extension.source_key
+    ] as const;
+    statements.push(input.db.prepare(`INSERT OR IGNORE INTO source_capture_heartbeats (
+        source_key, provider, dataset, status, last_attempt_at, last_success_at,
+        last_failure_at, failure_code, latest_capture_id
+      ) SELECT ?, ?, ?, 'current', ?, ?, NULL, NULL, ?
+        WHERE ${exactEventPredicate}`).bind(
+      extension.source_key,
+      base.provider,
+      base.dataset,
+      verifiedAt,
+      verifiedAt,
+      base.capture_id,
+      ...exactEventBindings
+    ));
+    statements.push(input.db.prepare(`UPDATE source_capture_heartbeats
+      SET provider = ?, dataset = ?, status = 'current', last_attempt_at = ?,
+        last_success_at = CASE WHEN last_success_at IS NULL OR ? > last_success_at
+          THEN ? ELSE last_success_at END,
+        last_failure_at = NULL, failure_code = NULL,
+        latest_capture_id = CASE
+          WHEN latest_capture_id IS NULL THEN ?
+          WHEN EXISTS (
+            SELECT 1 FROM source_capture_manifest_extensions candidate
+            JOIN source_capture_manifest_extensions incumbent
+              ON incumbent.capture_id = source_capture_heartbeats.latest_capture_id
+            WHERE candidate.capture_id = ? AND (
+              julianday(candidate.receipt_completed_at) > julianday(incumbent.receipt_completed_at) OR
+              (candidate.receipt_completed_at = incumbent.receipt_completed_at AND
+                candidate.capture_id > incumbent.capture_id)
+            )
+          ) THEN ? ELSE latest_capture_id END
+      WHERE source_key = ? AND ? >= last_attempt_at AND ${exactEventPredicate}
+        AND (
+          latest_capture_id IS NULL OR
+          EXISTS (
+            SELECT 1 FROM source_capture_manifest_extensions candidate
+            JOIN source_capture_manifest_extensions incumbent
+              ON incumbent.capture_id = source_capture_heartbeats.latest_capture_id
+            WHERE candidate.capture_id = ? AND (
+              julianday(candidate.receipt_completed_at) > julianday(incumbent.receipt_completed_at) OR
+              (candidate.receipt_completed_at = incumbent.receipt_completed_at AND
+                candidate.capture_id > incumbent.capture_id)
+            )
+          ) OR (
+            latest_capture_id = ? AND (
+              status = 'current' OR (
+                failure_code = 'manifest_failure' AND last_failure_at IS NOT NULL AND EXISTS (
+                  SELECT 1 FROM source_capture_events failed
+                  WHERE failed.source_key = source_capture_heartbeats.source_key
+                    AND failed.event_type = 'capture_failed'
+                    AND failed.occurred_at = source_capture_heartbeats.last_failure_at
+                    AND json_extract(failed.payload_json, '$.failureCode') = 'manifest_failure'
+                    AND json_extract(failed.payload_json, '$.context.captureId') = ?
+                    AND json_extract(failed.payload_json, '$.context.phase') =
+                      'verified_usable_pointer_publication'
+                )
+              )
+            )
+          )
+        )`).bind(
+      base.provider,
+      base.dataset,
+      verifiedAt,
+      verifiedAt,
+      verifiedAt,
+      base.capture_id,
+      base.capture_id,
+      base.capture_id,
+      extension.source_key,
+      verifiedAt,
+      ...exactEventBindings,
+      base.capture_id,
+      base.capture_id,
+      base.capture_id
+    ));
+
+    try {
+      await input.db.batch(statements);
+    } catch (batchFailure) {
+      try {
+        assertExactEvent(await eventByAttempt(input.db, attemptToken), event);
+        const head = await input.db.prepare(`SELECT heartbeat.status, heartbeat.failure_code,
+            heartbeat.latest_capture_id,
+            expected.capture_id AS expected_capture_id
+          FROM source_capture_heartbeats heartbeat
+          JOIN (
+            SELECT published.capture_id
+            FROM source_capture_events published
+            JOIN source_capture_manifest_extensions eligible
+              ON eligible.capture_id = published.capture_id
+            WHERE published.source_key = ? AND published.event_type = 'capture_committed_usable'
+              AND NOT EXISTS (
+                SELECT 1 FROM source_capture_events failed
+                WHERE failed.source_key = published.source_key AND failed.event_type = 'capture_failed'
+                  AND json_extract(failed.payload_json, '$.failureCode') = 'corrupt_object'
+                  AND json_extract(failed.payload_json, '$.context.captureId') = published.capture_id
+                  AND json_extract(failed.payload_json, '$.context.phase') =
+                    'post_manifest_pre_pointer_r2_verification'
+              )
+            ORDER BY julianday(eligible.receipt_completed_at) DESC, eligible.capture_id DESC
+            LIMIT 1
+          ) expected
+          WHERE heartbeat.source_key = ? LIMIT 1`).bind(extension.source_key, extension.source_key)
+          .first<{
+            status: string;
+            failure_code: string | null;
+            latest_capture_id: string | null;
+            expected_capture_id: string;
+          }>();
+        if (!head || head.latest_capture_id !== head.expected_capture_id ||
+            (requiresCurrentPublication && head.expected_capture_id === base.capture_id &&
+              (head.status !== "current" || head.failure_code !== null))) {
+          throw batchFailure;
+        }
+        return;
+      } catch {
+        throw batchFailure;
+      }
+    }
+    assertExactEvent(await eventByAttempt(input.db, attemptToken), event);
+    const head = await input.db.prepare(`SELECT heartbeat.status, heartbeat.failure_code,
+        heartbeat.latest_capture_id,
+        expected.capture_id AS expected_capture_id
+      FROM source_capture_heartbeats heartbeat
+      JOIN (
+        SELECT published.capture_id
+        FROM source_capture_events published
+        JOIN source_capture_manifest_extensions eligible ON eligible.capture_id = published.capture_id
+        WHERE published.source_key = ? AND published.event_type = 'capture_committed_usable'
+          AND NOT EXISTS (
+            SELECT 1 FROM source_capture_events failed
+            WHERE failed.source_key = published.source_key AND failed.event_type = 'capture_failed'
+              AND json_extract(failed.payload_json, '$.failureCode') = 'corrupt_object'
+              AND json_extract(failed.payload_json, '$.context.captureId') = published.capture_id
+              AND json_extract(failed.payload_json, '$.context.phase') =
+                'post_manifest_pre_pointer_r2_verification'
+          )
+        ORDER BY julianday(eligible.receipt_completed_at) DESC, eligible.capture_id DESC LIMIT 1
+      ) expected
+      WHERE heartbeat.source_key = ? LIMIT 1`).bind(extension.source_key, extension.source_key)
+      .first<{
+        status: string;
+        failure_code: string | null;
+        latest_capture_id: string | null;
+        expected_capture_id: string;
+      }>();
+    if (!head || head.latest_capture_id !== head.expected_capture_id ||
+        (requiresCurrentPublication && head.expected_capture_id === base.capture_id &&
+          (head.status !== "current" || head.failure_code !== null))) {
+      throw new Error("Verified usable capture did not establish the deterministic latest-good pointer");
+    }
+  } catch (failure) {
+    try {
+      await recordPostCommitFailure({
+        db: input.db,
+        rows: input.rows,
+        committedAttemptToken: input.committedAttemptToken,
+        failedAt: now(input.clock, "Pointer publication failure observation time"),
+        failureCode: "manifest_failure",
+        phase: "verified_usable_pointer_publication"
+      });
+    } catch (journalFailure) {
+      throw new AggregateError(
+        [failure, journalFailure],
+        "Verified pointer publication failed and its failure could not be journaled"
+      );
+    }
+    throw new PostCommitCaptureVerificationError(
+      "Verified pointer publication failed; latest-good remains fail-closed",
+      { cause: failure }
+    );
+  }
+}
+
 async function commitCapture(input: {
   db: D1Database;
   bucket: R2Bucket;
@@ -579,10 +1055,11 @@ async function commitCapture(input: {
   sidecarSha256: string;
   sidecarObjectKey: string;
   deduplicatedResponse: boolean;
+  clock?: Clock;
 }): Promise<StoredOs03aCapture> {
   const { sidecar } = input.built;
   const eventType: CaptureEventType = sidecar.validationState === "usable"
-    ? "capture_committed_usable"
+    ? "capture_committed"
     : "capture_committed_raw_only";
   const payload = {
     captureId: sidecar.captureId,
@@ -610,7 +1087,20 @@ async function commitCapture(input: {
     if (!rows || !rowsMatchCandidate(rows, sidecar)) {
       throw new Error("Committed event exists without matching immutable capture evidence");
     }
-    await verifyCaptureRows(input.bucket, rows);
+    await verifyCommittedCaptureOrFailClosed({
+      db: input.db,
+      bucket: input.bucket,
+      rows,
+      committedAttemptToken: input.attemptToken,
+      expectedEvidenceHash: sidecar.evidenceHash,
+      clock: input.clock
+    });
+    await publishVerifiedUsablePointer({
+      db: input.db,
+      rows,
+      committedAttemptToken: input.attemptToken,
+      clock: input.clock
+    });
     return {
       status: "deduplicated",
       captureId: sidecar.captureId,
@@ -729,7 +1219,7 @@ async function commitCapture(input: {
       source_key, provider, dataset, status, last_attempt_at, last_success_at,
       last_failure_at, failure_code, latest_capture_id
     ) SELECT ?, ?, ?, ?, ?, ?, ?, ?, ?
-      WHERE EXISTS (
+      WHERE ? <> 'usable' AND EXISTS (
         SELECT 1 FROM source_capture_events event
         JOIN source_capture_manifests base ON base.capture_id = event.capture_id
         JOIN source_capture_manifest_extensions extension ON extension.capture_id = base.capture_id
@@ -776,6 +1266,7 @@ async function commitCapture(input: {
       isUsable ? null : input.extension.manifestPersistedAt,
       isUsable ? null : sidecar.failureCodes[0] ?? "schema_invalid",
       isUsable ? sidecar.captureId : null,
+      sidecar.validationState,
       event.eventId,
       event.payloadHash,
       sidecar.evidenceHash,
@@ -815,34 +1306,52 @@ async function commitCapture(input: {
   try {
     await input.db.batch(statements);
   } catch (error) {
-    // A concurrent identical invocation can win the globally unique attempt
-    // token while this transaction rolls back. Only an exact immutable winner
-    // is allowed to converge; every other conflict remains loud.
+    // Same-attempt duplicate delivery requires an exact event. A deliberate
+    // retry with another attempt token may instead lose the manifest race to
+    // equivalent evidence whose retry-only persistence clocks differ.
+    const winner = await captureRowsByIdentity({
+      db: input.db,
+      provider: sidecar.provider,
+      dataset: sidecar.dataset,
+      idempotencyKey: sidecar.idempotencyKey
+    });
+    if (!winner || !rowsMatchCandidate(winner, sidecar)) throw error;
     const concurrent = await eventByAttempt(input.db, input.attemptToken);
-    try {
-      assertExactEvent(concurrent, event);
-      const winner = await captureRowsByIdentity({
+    if (concurrent) assertExactEvent(concurrent, event);
+    const verifiedWinner = await verifyCommittedCaptureOrFailClosed({
+      db: input.db,
+      bucket: input.bucket,
+      rows: winner,
+      committedAttemptToken: input.attemptToken,
+      expectedEvidenceHash: sidecar.evidenceHash,
+      clock: input.clock
+    });
+    await publishVerifiedUsablePointer({
+      db: input.db,
+      rows: winner,
+      committedAttemptToken: input.attemptToken,
+      clock: input.clock
+    });
+    if (!concurrent) {
+      await appendDeduplicationEvent({
         db: input.db,
-        provider: sidecar.provider,
-        dataset: sidecar.dataset,
-        idempotencyKey: sidecar.idempotencyKey
+        rows: winner,
+        sidecar: verifiedWinner,
+        attemptToken: input.attemptToken,
+        occurredAt: now(input.clock, "Concurrent capture deduplication time")
       });
-      if (!winner || !rowsMatchCandidate(winner, sidecar)) throw error;
-      await verifyCaptureRows(input.bucket, winner);
-      return {
-        status: "deduplicated",
-        captureId: sidecar.captureId,
-        responseObjectKey: winner.base.response_object_key,
-        responseSha256: winner.base.response_sha256,
-        sidecarObjectKey: winner.base.sidecar_object_key,
-        sidecarSha256: winner.base.sidecar_sha256,
-        validationState: winner.extension.validation_state,
-        deduplicatedResponse: true,
-        providerDispatches: 0
-      };
-    } catch {
-      throw error;
     }
+    return {
+      status: "deduplicated",
+      captureId: sidecar.captureId,
+      responseObjectKey: winner.base.response_object_key,
+      responseSha256: winner.base.response_sha256,
+      sidecarObjectKey: winner.base.sidecar_object_key,
+      sidecarSha256: winner.base.sidecar_sha256,
+      validationState: winner.extension.validation_state,
+      deduplicatedResponse: true,
+      providerDispatches: 0
+    };
   }
   const rows = await captureRowsByIdentity({
     db: input.db,
@@ -854,10 +1363,20 @@ async function commitCapture(input: {
     throw new Error("OS-03A manifest transaction lost an immutable identity collision");
   }
   assertExactEvent(await eventByAttempt(input.db, input.attemptToken), event);
-  const persisted = await verifyCaptureRows(input.bucket, rows);
-  if (persisted.evidenceHash !== sidecar.evidenceHash) {
-    throw new Error("Post-commit immutable capture verification resolved different evidence");
-  }
+  await verifyCommittedCaptureOrFailClosed({
+    db: input.db,
+    bucket: input.bucket,
+    rows,
+    committedAttemptToken: input.attemptToken,
+    expectedEvidenceHash: sidecar.evidenceHash,
+    clock: input.clock
+  });
+  await publishVerifiedUsablePointer({
+    db: input.db,
+    rows,
+    committedAttemptToken: input.attemptToken,
+    clock: input.clock
+  });
   if (isUsable) {
     const pointer = await input.db.prepare(`SELECT latest_capture_id FROM source_capture_heartbeats
       WHERE source_key = ? LIMIT 1`).bind(sidecar.sourceKey)
@@ -889,6 +1408,10 @@ export async function storeOs03aCapture(input: StoreOs03aCaptureInput): Promise<
   let phase: "response" | "sidecar" | "manifest" = "response";
   let built: ReturnType<typeof buildOs03aCaptureEvidence> | null = null;
   try {
+    assertSecretFreeCanonicalValue({
+      attemptToken: input.attemptToken,
+      idempotencyKey: input.idempotencyKey
+    }, "Capture identity metadata");
     assertRegisteredCaptureRequest(profile, input.request);
     assertSecretFreeCaptureResponse(profile, input.contentType, input.responseBytes);
     const responseSha256 = sha256Hex(input.responseBytes);
@@ -909,22 +1432,36 @@ export async function storeOs03aCapture(input: StoreOs03aCaptureInput): Promise<
       if (!rowsMatchCandidate(priorIdentity, preliminary.sidecar)) {
         throw new Error("OS-03A idempotency key resolved to different immutable evidence");
       }
-      const winner = await verifyCaptureRows(input.bucket, priorIdentity);
       const priorAttempt = await eventByAttempt(input.db, input.attemptToken);
       if (priorAttempt) {
         if (
-          priorAttempt.capture_id !== winner.captureId ||
-          priorAttempt.source_key !== winner.sourceKey ||
-          priorAttempt.provider !== winner.provider ||
-          priorAttempt.dataset !== winner.dataset ||
-          priorAttempt.idempotency_key !== winner.idempotencyKey ||
-          !["capture_committed_usable", "capture_committed_raw_only", "capture_deduplicated"].includes(
+          priorAttempt.capture_id !== priorIdentity.base.capture_id ||
+          priorAttempt.source_key !== priorIdentity.extension.source_key ||
+          priorAttempt.provider !== priorIdentity.base.provider ||
+          priorAttempt.dataset !== priorIdentity.base.dataset ||
+          priorAttempt.idempotency_key !== priorIdentity.base.idempotency_key ||
+          !["capture_committed", "capture_committed_raw_only", "capture_deduplicated"].includes(
             priorAttempt.event_type
           )
         ) {
           throw new Error("Capture attempt token was already consumed by a different terminal event");
         }
-      } else {
+      }
+      const winner = await verifyCommittedCaptureOrFailClosed({
+        db: input.db,
+        bucket: input.bucket,
+        rows: priorIdentity,
+        committedAttemptToken: input.attemptToken,
+        expectedEvidenceHash: preliminary.sidecar.evidenceHash,
+        clock: input.clock
+      });
+      await publishVerifiedUsablePointer({
+        db: input.db,
+        rows: priorIdentity,
+        committedAttemptToken: input.attemptToken,
+        clock: input.clock
+      });
+      if (!priorAttempt) {
         await appendDeduplicationEvent({
           db: input.db,
           rows: priorIdentity,
@@ -993,9 +1530,11 @@ export async function storeOs03aCapture(input: StoreOs03aCaptureInput): Promise<
       attemptToken: input.attemptToken,
       sidecarSha256: built.sidecarSha256,
       sidecarObjectKey: built.sidecarObjectKey,
-      deduplicatedResponse
+      deduplicatedResponse,
+      clock: input.clock
     });
   } catch (error) {
+    if (error instanceof PostCommitCaptureVerificationError) throw error;
     const failureCode = classifyStorageFailure(error, phase);
     const failureMessage = error instanceof Error ? error.message : String(error);
     const updateHeartbeat = !/(?:idempotency key|attempt token|immutable identity collision)/i.test(failureMessage);
@@ -1035,6 +1574,10 @@ export async function recordOs03aCaptureFailure(input: {
   safeContext?: Record<string, string | number | boolean | null>;
 }): Promise<void> {
   const profile = getQualificationSourceProfile(input.profileId);
+  assertSecretFreeCanonicalValue({
+    attemptToken: input.attemptToken,
+    idempotencyKey: input.idempotencyKey
+  }, "Capture failure identity metadata");
   const sourceKey = sourceCaptureKey(profile);
   const failedAt = canonicalTimestamp(input.failedAt, "Capture failure time");
   const payload = {
@@ -1262,22 +1805,38 @@ export async function runOs03aFreshnessWatchdog(input: {
   profileId: string;
   attemptToken: string;
   checkedAt: string;
-  maximumAgeSeconds: number;
+  maximumAgeSeconds?: number;
 }): Promise<{ status: "current" | "stale" | "unavailable"; ageSeconds: number | null; providerDispatches: 0 }> {
-  if (!Number.isSafeInteger(input.maximumAgeSeconds) || input.maximumAgeSeconds < 1) {
-    throw new Error("Freshness maximum age must be a positive integer");
-  }
   const profile = getQualificationSourceProfile(input.profileId);
+  const maximumAgeSeconds = profileMaximumAgeSeconds[profile.profileId];
+  if (!maximumAgeSeconds) {
+    throw new Error(`Freshness threshold is not frozen for source profile ${profile.profileId}`);
+  }
+  if (input.maximumAgeSeconds !== undefined && input.maximumAgeSeconds !== maximumAgeSeconds) {
+    throw new Error(
+      `Freshness maximum age for ${profile.dataset} must equal frozen OS-00B value ${maximumAgeSeconds}`
+    );
+  }
   const sourceKey = sourceCaptureKey(profile);
   const checkedAt = canonicalTimestamp(input.checkedAt, "Freshness watchdog time");
-  const latest = await input.db.prepare(`SELECT occurred_at FROM source_capture_events
-    WHERE source_key = ? AND event_type IN ('capture_committed_usable', 'not_modified_confirmed')
-    ORDER BY occurred_at DESC, event_id DESC LIMIT 1`).bind(sourceKey)
-    .first<{ occurred_at: string }>();
-  const ageSeconds = latest
-    ? Math.max(0, Math.floor((Date.parse(checkedAt) - Date.parse(latest.occurred_at)) / 1000))
+  const heartbeat = await input.db.prepare(`SELECT status, latest_capture_id
+    FROM source_capture_heartbeats WHERE source_key = ? LIMIT 1`).bind(sourceKey)
+    .first<{ status: string; latest_capture_id: string | null }>();
+  const latest = heartbeat?.latest_capture_id
+    ? await input.db.prepare(`SELECT occurred_at FROM source_capture_events
+        WHERE source_key = ? AND capture_id = ?
+          AND event_type IN ('capture_committed_usable', 'not_modified_confirmed')
+        ORDER BY occurred_at DESC, event_id DESC LIMIT 1`)
+      .bind(sourceKey, heartbeat.latest_capture_id)
+      .first<{ occurred_at: string }>()
     : null;
-  if (ageSeconds !== null && ageSeconds <= input.maximumAgeSeconds) {
+  if (latest && Date.parse(latest.occurred_at) > Date.parse(checkedAt)) {
+    throw new Error("Freshness watchdog time predates the latest successful verification event");
+  }
+  const ageSeconds = latest
+    ? Math.floor((Date.parse(checkedAt) - Date.parse(latest.occurred_at)) / 1000)
+    : null;
+  if (heartbeat?.status === "current" && ageSeconds !== null && ageSeconds <= maximumAgeSeconds) {
     return { status: "current", ageSeconds, providerDispatches: 0 };
   }
   const status = latest ? "stale" : "unavailable";
@@ -1286,7 +1845,7 @@ export async function runOs03aFreshnessWatchdog(input: {
     sourceKey,
     checkedAt,
     lastSuccessfulVerificationAt: latest?.occurred_at ?? null,
-    maximumAgeSeconds: input.maximumAgeSeconds,
+    maximumAgeSeconds,
     ageSeconds,
     status
   };
@@ -1374,7 +1933,7 @@ async function appendOrphanEvent(input: {
   idempotencyKey: string;
   occurredAt: string;
   objectKey: string;
-}): Promise<void> {
+}): Promise<{ eventId: string; occurredAt: string }> {
   const profile = getQualificationSourceProfile(input.profileId);
   const sourceKey = sourceCaptureKey(profile);
   const payload = { objectKey: input.objectKey, qualificationOnly: true };
@@ -1387,7 +1946,7 @@ async function appendOrphanEvent(input: {
   const prior = await eventByAttempt(input.db, input.attemptToken);
   if (prior) {
     assertExactEvent(prior, event);
-    return;
+    return { eventId: event.eventId, occurredAt: input.occurredAt };
   }
   await executeExactEventBatch({
     db: input.db,
@@ -1406,6 +1965,54 @@ async function appendOrphanEvent(input: {
     occurredAt: input.occurredAt
     })]
   });
+  return { eventId: event.eventId, occurredAt: input.occurredAt };
+}
+
+async function activeOrphanTombstone(input: {
+  db: D1Database;
+  profileId: string;
+  objectKey: string;
+}): Promise<{ eventId: string; occurredAt: string } | null> {
+  const profile = getQualificationSourceProfile(input.profileId);
+  const sourceKey = sourceCaptureKey(profile);
+  const row = await input.db.prepare(`SELECT detected.event_id, detected.occurred_at
+    FROM source_capture_events detected
+    WHERE detected.event_type = 'orphan_detected'
+      AND detected.source_key = ?
+      AND json_extract(detected.payload_json, '$.objectKey') = ?
+      AND NOT EXISTS (
+        SELECT 1 FROM source_capture_events removed
+        WHERE removed.event_type = 'orphan_removed'
+          AND removed.source_key = detected.source_key
+          AND json_extract(removed.payload_json, '$.objectKey') = ?
+          AND removed.occurred_at >= detected.occurred_at
+      )
+    ORDER BY detected.occurred_at DESC, detected.event_id DESC
+    LIMIT 1`).bind(sourceKey, input.objectKey, input.objectKey)
+    .first<{ event_id: string; occurred_at: string }>();
+  return row ? { eventId: row.event_id, occurredAt: row.occurred_at } : null;
+}
+
+async function closeOrphanTombstone(input: {
+  db: D1Database;
+  profileId: string;
+  idempotencyKey: string;
+  objectKey: string;
+  checkedAt: string;
+  tombstone: { eventId: string; occurredAt: string };
+}): Promise<void> {
+  const occurredAt = Date.parse(input.checkedAt) >= Date.parse(input.tombstone.occurredAt)
+    ? input.checkedAt
+    : input.tombstone.occurredAt;
+  await appendOrphanEvent({
+    db: input.db,
+    eventType: "orphan_removed",
+    attemptToken: `orphan-removal:${input.tombstone.eventId}`,
+    profileId: input.profileId,
+    idempotencyKey: input.idempotencyKey,
+    occurredAt,
+    objectKey: input.objectKey
+  });
 }
 
 export async function sweepOs03aQualificationOrphan(input: {
@@ -1423,8 +2030,24 @@ export async function sweepOs03aQualificationOrphan(input: {
     throw new Error("Object key is outside the frozen OS-03A orphan prefixes");
   }
   const checkedAt = canonicalTimestamp(input.checkedAt, "Orphan sweep time");
+  let tombstone = await activeOrphanTombstone({
+    db: input.db,
+    profileId: input.profileId,
+    objectKey: input.objectKey
+  });
   const object = await input.bucket.head(input.objectKey);
-  if (!object) return { status: "missing", providerDispatches: 0 };
+  if (!object) {
+    if (!tombstone) return { status: "missing", providerDispatches: 0 };
+    await closeOrphanTombstone({
+      db: input.db,
+      profileId: input.profileId,
+      idempotencyKey: input.idempotencyKey,
+      objectKey: input.objectKey,
+      checkedAt,
+      tombstone
+    });
+    return { status: "removed", providerDispatches: 0 };
+  }
   const uploaded = (object as R2Object & { uploaded?: Date }).uploaded;
   if (!(uploaded instanceof Date) || !Number.isFinite(uploaded.getTime())) {
     return { status: "too_young", providerDispatches: 0 };
@@ -1436,15 +2059,15 @@ export async function sweepOs03aQualificationOrphan(input: {
   if (await objectIsReferenced(input.db, input.objectKey)) {
     return { status: "referenced", providerDispatches: 0 };
   }
-  await appendOrphanEvent({
-    db: input.db,
-    eventType: "orphan_detected",
-    attemptToken: `${input.attemptToken}:detected`,
-    profileId: input.profileId,
-    idempotencyKey: input.idempotencyKey,
-    occurredAt: checkedAt,
-    objectKey: input.objectKey
-  });
+  tombstone ??= await appendOrphanEvent({
+      db: input.db,
+      eventType: "orphan_detected",
+      attemptToken: `${input.attemptToken}:detected`,
+      profileId: input.profileId,
+      idempotencyKey: input.idempotencyKey,
+      occurredAt: checkedAt,
+      objectKey: input.objectKey
+    });
   if (await objectIsReferenced(input.db, input.objectKey)) {
     return { status: "referenced", providerDispatches: 0 };
   }
@@ -1452,14 +2075,13 @@ export async function sweepOs03aQualificationOrphan(input: {
   if (await input.bucket.head(input.objectKey)) {
     throw new Error("Qualification orphan remained after deletion");
   }
-  await appendOrphanEvent({
+  await closeOrphanTombstone({
     db: input.db,
-    eventType: "orphan_removed",
-    attemptToken: `${input.attemptToken}:removed`,
     profileId: input.profileId,
     idempotencyKey: input.idempotencyKey,
-    occurredAt: checkedAt,
-    objectKey: input.objectKey
+    objectKey: input.objectKey,
+    checkedAt,
+    tombstone
   });
   return { status: "removed", providerDispatches: 0 };
 }

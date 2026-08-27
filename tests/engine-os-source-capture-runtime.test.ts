@@ -208,7 +208,7 @@ function scalar(sqlite: DatabaseSync, sql: string): number {
 }
 
 describe("OS-03A provider-independent immutable capture runtime", () => {
-  it("publishes exact response and sidecar bytes before one atomic D1 pointer and replays offline", async () => {
+  it("publishes exact bytes, commits immutable D1 rows, then atomically publishes a verified pointer", async () => {
     const { sqlite, db } = database();
     const bucket = new MemoryR2();
     const expected = captureInput(db, bucket).responseBytes;
@@ -218,7 +218,7 @@ describe("OS-03A provider-independent immutable capture runtime", () => {
     expect(bucket.objects.get(stored.responseObjectKey)?.bytes).toEqual(expected);
     expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_manifests")).toBe(1);
     expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_manifest_extensions")).toBe(1);
-    expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_events")).toBe(1);
+    expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_events")).toBe(2);
     expect(sqlite.prepare("SELECT latest_capture_id, status FROM source_capture_heartbeats").get())
       .toEqual({ latest_capture_id: stored.captureId, status: "current" });
 
@@ -247,7 +247,7 @@ describe("OS-03A provider-independent immutable capture runtime", () => {
     }));
     expect(duplicate.status).toBe("deduplicated");
     expect(duplicate.captureId).toBe(first.captureId);
-    expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_events")).toBe(2);
+    expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_events")).toBe(3);
 
     const secondOrigin = await storeOs03aCapture(captureInput(db, bucket, {
       attemptToken: "attempt-schedule-origin-2",
@@ -264,12 +264,14 @@ describe("OS-03A provider-independent immutable capture runtime", () => {
     expect(secondOrigin.responseObjectKey).toBe(first.responseObjectKey);
     expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_manifests")).toBe(2);
 
-    const pointerBefore = sqlite.prepare("SELECT latest_capture_id, last_success_at FROM source_capture_heartbeats").get();
+    const pointerBefore = sqlite.prepare(`SELECT latest_capture_id, status, last_attempt_at,
+      last_success_at, last_failure_at, failure_code FROM source_capture_heartbeats`).get();
     await expect(storeOs03aCapture(captureInput(db, bucket, {
       attemptToken: "attempt-schedule-collision",
       responseBytes: new TextEncoder().encode("different bytes\n")
     }))).rejects.toThrow(/idempotency key resolved to different immutable evidence/);
-    expect(sqlite.prepare("SELECT latest_capture_id, last_success_at FROM source_capture_heartbeats").get())
+    expect(sqlite.prepare(`SELECT latest_capture_id, status, last_attempt_at,
+      last_success_at, last_failure_at, failure_code FROM source_capture_heartbeats`).get())
       .toEqual(pointerBefore);
     sqlite.close();
   });
@@ -341,11 +343,10 @@ describe("OS-03A provider-independent immutable capture runtime", () => {
     sqlite.close();
   });
 
-  it("makes overlapping identical workers converge on one manifest, event, and pointer", async () => {
+  it("makes overlapping equivalent workers with distinct attempts converge without staling", async () => {
     const { sqlite, db } = database();
     const bucket = new MemoryR2();
     const common = {
-      attemptToken: "attempt-overlapping-workers",
       clock: sequenceClock(
         "2026-08-26T10:00:03.000Z",
         "2026-08-26T10:00:04.000Z",
@@ -354,14 +355,18 @@ describe("OS-03A provider-independent immutable capture runtime", () => {
       )
     };
     const results = await Promise.all([
-      storeOs03aCapture(captureInput(db, bucket, common)),
       storeOs03aCapture(captureInput(db, bucket, {
         ...common,
+        attemptToken: "attempt-overlapping-worker-a"
+      })),
+      storeOs03aCapture(captureInput(db, bucket, {
+        ...common,
+        attemptToken: "attempt-overlapping-worker-b",
         clock: sequenceClock(
-          "2026-08-26T10:00:03.000Z",
-          "2026-08-26T10:00:04.000Z",
-          "2026-08-26T10:00:05.000Z",
-          "2026-08-26T10:00:06.000Z"
+          "2026-08-26T10:00:03.100Z",
+          "2026-08-26T10:00:04.100Z",
+          "2026-08-26T10:00:05.100Z",
+          "2026-08-26T10:00:06.100Z"
         )
       }))
     ]);
@@ -369,8 +374,10 @@ describe("OS-03A provider-independent immutable capture runtime", () => {
     expect(new Set(results.map((result) => result.captureId)).size).toBe(1);
     expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_manifests")).toBe(1);
     expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_manifest_extensions")).toBe(1);
-    expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_events")).toBe(1);
+    expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_events")).toBe(3);
     expect(scalar(sqlite, "SELECT count(*) AS value FROM source_capture_heartbeats")).toBe(1);
+    expect(sqlite.prepare(`SELECT status, failure_code FROM source_capture_heartbeats`).get())
+      .toEqual({ status: "current", failure_code: null });
     sqlite.close();
   });
 

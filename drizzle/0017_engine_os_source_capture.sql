@@ -197,7 +197,19 @@ CREATE TRIGGER `source_capture_events_insert_guard`
       )
       AND (
         NEW.`event_type` <> 'capture_committed_usable' OR
-        extension.`validation_state` = 'usable'
+        (
+          extension.`validation_state` = 'usable' AND
+          julianday(NEW.`occurred_at`) >= julianday(extension.`manifest_persisted_at`) AND
+          NOT EXISTS (
+            SELECT 1 FROM `source_capture_events` failed
+            WHERE failed.`source_key` = extension.`source_key`
+              AND failed.`event_type` = 'capture_failed'
+              AND json_extract(failed.`payload_json`, '$.failureCode') = 'corrupt_object'
+              AND json_extract(failed.`payload_json`, '$.context.captureId') = base.`capture_id`
+              AND json_extract(failed.`payload_json`, '$.context.phase') =
+                'post_manifest_pre_pointer_r2_verification'
+          )
+        )
       )
       AND (
         NEW.`event_type` <> 'capture_committed_raw_only' OR
@@ -228,6 +240,15 @@ CREATE TRIGGER `source_capture_heartbeats_os03a_insert_guard`
       AND base.`dataset` = NEW.`dataset`
       AND extension.`source_key` = NEW.`source_key`
       AND extension.`validation_state` = 'usable'
+      AND NOT EXISTS (
+        SELECT 1 FROM `source_capture_events` failed
+        WHERE failed.`source_key` = extension.`source_key`
+          AND failed.`event_type` = 'capture_failed'
+          AND json_extract(failed.`payload_json`, '$.failureCode') = 'corrupt_object'
+          AND json_extract(failed.`payload_json`, '$.context.captureId') = base.`capture_id`
+          AND json_extract(failed.`payload_json`, '$.context.phase') =
+            'post_manifest_pre_pointer_r2_verification'
+      )
       AND EXISTS (
         SELECT 1 FROM `source_capture_events` event
         WHERE event.`capture_id` = base.`capture_id`
@@ -257,6 +278,15 @@ CREATE TRIGGER `source_capture_heartbeats_os03a_update_guard`
           AND candidate_base.`dataset` = NEW.`dataset`
           AND candidate_extension.`source_key` = NEW.`source_key`
           AND candidate_extension.`validation_state` = 'usable'
+          AND NOT EXISTS (
+            SELECT 1 FROM `source_capture_events` failed
+            WHERE failed.`source_key` = candidate_extension.`source_key`
+              AND failed.`event_type` = 'capture_failed'
+              AND json_extract(failed.`payload_json`, '$.failureCode') = 'corrupt_object'
+              AND json_extract(failed.`payload_json`, '$.context.captureId') = candidate_base.`capture_id`
+              AND json_extract(failed.`payload_json`, '$.context.phase') =
+                'post_manifest_pre_pointer_r2_verification'
+          )
           AND EXISTS (
             SELECT 1 FROM `source_capture_events` event
             WHERE event.`capture_id` = candidate_base.`capture_id`
@@ -292,6 +322,6 @@ CREATE TRIGGER `source_capture_heartbeats_os03a_update_guard`
 INSERT INTO `engine_schema_versions` (`version`, `migration_hash`, `applied_at`)
 VALUES (
   '0017_engine_os_source_capture',
-  'sha256:ace74ab22e4a28cc43da48a5370e250636baa04c41c2c5902641a01d4a4c28b0',
+  'sha256:7c386d0e68e1919b8bfb5f9345a2e215ea1f82a20092c7a59327c2c69cba91be',
   strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
 );
