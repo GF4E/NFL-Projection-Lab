@@ -1,0 +1,186 @@
+{
+  "version": "forecast-ledger-contract.2026.1",
+  "status": "frozen_qualification",
+  "effectiveSeason": 2026,
+  "frozenOn": "2026-08-26",
+  "scope": {
+    "workPackage": "OS-13A",
+    "qualificationOnly": true,
+    "productionActivationAllowed": false,
+    "providerDependencyAllowed": false,
+    "providerDispatchAllowed": false,
+    "marketInputAllowed": false,
+    "modelExecutionAllowed": false,
+    "productionForecastMutationAllowed": false,
+    "originSource": "forecast_origin_versions_current_heads"
+  },
+  "bindings": {
+    "operatingContractVersion": "engine-operating-contract.2026.1",
+    "operatingContractCanonicalSha256": "b9c71c8d7c2339de7c229b3073572df9d0a566e9f9e72f6e02938ed6e5022917",
+    "researchConstitutionVersion": "research-constitution.2026.1",
+    "researchConstitutionCanonicalSha256": "ecbce3c59e91014ad9806476d696b20db3752d8729b3a8762367e7d4a4148203",
+    "lifecycleContractVersion": "football-lifecycle.2026.1",
+    "lifecycleContractCanonicalSha256": "3e7f5a4d5b824162694994b923708c35b6ff3ef69287ace054122c24a7b6aee7",
+    "schedulerContractVersion": "interim-scheduler-contract.2026.5",
+    "schedulerContractCanonicalSha256": "b00222c7aac57640278a64cc027dffd2d26d988375be20d0fbe87497aa06549f",
+    "sourceCaptureContractVersion": "source-capture-contract.2026.9",
+    "sourceCaptureContractCanonicalSha256": "7c8e041f701e3fd7cb44d7aecef3e51204fa6570e61b90e37b2b5fb016a29642",
+    "originIdentityMigrationVersion": "0015_engine_os_origin_identity"
+  },
+  "horizons": [
+    { "id": "weekly_tuesday_0730", "maximumPersistenceDelaySeconds": 600 },
+    { "id": "kickoff_minus_120", "maximumPersistenceDelaySeconds": 600 },
+    { "id": "kickoff_minus_90", "maximumPersistenceDelaySeconds": 600 },
+    { "id": "kickoff_minus_60", "maximumPersistenceDelaySeconds": 600 },
+    { "id": "kickoff_minus_15", "maximumPersistenceDelaySeconds": 300 }
+  ],
+  "activation": {
+    "boundaryRequired": true,
+    "oneBoundaryPerPackage": true,
+    "fullSeasonActivationDeadline": "2026-09-08T07:30:00-07:00",
+    "fullSeasonFirstOriginUtc": "2026-09-08T14:30:00.000Z",
+    "weekOneOriginCompleteRequiredForFullSeason": true,
+    "fullSeasonEvidenceLabel": "full_season_shadow",
+    "lateActivationEvidenceLabel": "partial_season_shadow",
+    "qualificationStreams": ["eligible_package", "no_eligible_package"],
+    "productionActivationCreatedByQualification": false
+  },
+  "identity": {
+    "recordKeyVersion": "engine-os.forecast-ledger-record.v2",
+    "recordKeyFields": [
+      "ledger_contract_hash",
+      "origin_version_id",
+      "activation_boundary"
+    ],
+    "recordKeyExcludes": [
+      "status",
+      "withholding_reason",
+      "qualification_key",
+      "generated_at",
+      "persisted_at",
+      "output_object_hash"
+    ],
+    "qualificationKeyVersion": "engine-os.forecast-qualification.v1",
+    "qualificationKeyFields": [
+      "ledger_contract_hash",
+      "activation_boundary",
+      "qualification_stream",
+      "model_or_package_hash"
+    ],
+    "noPackageSentinel": "none_no_eligible_package",
+    "oneTerminalRecordPerActivatedOrigin": true,
+    "terminalRecordMayBeReopened": false
+  },
+  "timing": {
+    "requiredSeparateTimes": [
+      "scheduled_for_utc",
+      "invoked_at",
+      "evidence_at",
+      "generated_at",
+      "persistence_requested_at",
+      "persisted_at",
+      "persistence_deadline_at",
+      "kickoff_at"
+    ],
+    "forecastOnlySeparateTimes": [
+      "output_published_at",
+      "output_verified_at"
+    ],
+    "requiredOrdering": [
+      "activation_at_lte_scheduled_for_utc",
+      "scheduled_for_utc_lte_invoked_at",
+      "invoked_at_lte_generated_at",
+      "evidence_at_lte_generated_at",
+      "generated_at_lte_output_published_at_for_forecast",
+      "output_published_at_lte_output_verified_at_for_forecast",
+      "output_verified_at_lte_persistence_requested_at_for_forecast",
+      "generated_at_lte_persistence_requested_at",
+      "persistence_requested_at_lte_persisted_at",
+      "persisted_at_lt_persistence_deadline_at",
+      "persisted_at_lte_kickoff_minus_1_second"
+    ],
+    "deadlineFormula": "min(scheduled_for_utc_plus_horizon_cap,kickoff_at_minus_1_second)",
+    "prospectiveDeadlineComparator": "strict_open_upper_bound",
+    "exactDeadlineClassification": "late_nonprospective",
+    "forecastMustPrecedeKickoffSeconds": 1,
+    "retrospectiveBackfillAllowed": false,
+    "lateRecordProspectiveEligible": false
+  },
+  "publication": {
+    "r2ObjectMustExistBeforeD1Pointer": true,
+    "r2ObjectMustVerifyBeforeD1Pointer": true,
+    "outputHashAlgorithm": "sha256",
+    "outputObjectKeyPrefix": "forecast-output/sha256",
+    "contentAddressedOutputRequired": true,
+    "currentHeadRecheckRequired": true,
+    "exactLeaseAttemptAndFenceRequired": true,
+    "unexpiredLeaseRequired": true,
+    "atomicTerminalInsertRequired": true,
+    "duplicateAndRetryBehavior": "converge_on_record_key",
+    "failedObjectWriteMayPublishPointer": false,
+    "failedPointerWriteMayReplaceLastGood": false,
+    "corruptObjectMayPublishPointer": false
+  },
+  "provenance": {
+    "requiredForecastFields": [
+      "runner_hash",
+      "code_hash",
+      "model_or_package_hash",
+      "config_hash",
+      "input_manifest_hash",
+      "feature_schema_hash",
+      "target_schema_hash",
+      "output_object_hash",
+      "output_object_key"
+    ],
+    "hashEncoding": "lowercase_sha256_hex",
+    "allFieldsMustMatchExpectedQualification": true,
+    "missingFieldReason": "provenance_incomplete",
+    "mismatchedFieldReason": "package_hash_mismatch",
+    "forecastWithoutVerifiedOutputAllowed": false,
+    "withholdingCarriesForecastProvenance": false
+  },
+  "withholding": {
+    "approvedReasons": [
+      "no_eligible_package",
+      "schedule_unavailable_at_origin",
+      "required_source_stale",
+      "required_source_partial",
+      "required_source_unavailable",
+      "schema_invalid",
+      "provenance_incomplete",
+      "package_hash_mismatch",
+      "late_origin_excluded",
+      "compute_failure"
+    ],
+    "unknownReasonAllowed": false,
+    "noEligiblePackageDefault": true,
+    "missingProvenancePrecedesRequestedReason": true,
+    "mismatchedProvenancePrecedesRequestedReason": true,
+    "lateTimingPrecedesAllOtherReasons": true
+  },
+  "immutability": {
+    "appendOnly": true,
+    "historicalMutationAllowed": false,
+    "correctionMode": "append_relation_only",
+    "os13bMigrationMode": "append_relation_preserve_original",
+    "missedOriginReplayAllowed": false,
+    "lateRecordMayBecomeProspective": false
+  },
+  "security": {
+    "providerSecretMayBeRead": false,
+    "providerBindingMayBeRead": false,
+    "networkDispatchAllowed": false,
+    "oddsMayBlockFootballRecord": false,
+    "forbiddenInputKeyPatterns": [
+      "odds",
+      "spread",
+      "total",
+      "moneyline",
+      "price",
+      "line_movement",
+      "public_betting",
+      "recorded_selection"
+    ]
+  }
+}

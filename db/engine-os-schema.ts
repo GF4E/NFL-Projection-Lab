@@ -569,6 +569,544 @@ export const engineOriginRecordsV2 = sqliteTable("engine_origin_records_v2", {
   check("engine_origin_record_payload_check", sql`json_valid(${table.payloadJson})`)
 ]);
 
+export const forecastLedgerQualificationsV1 = sqliteTable("forecast_ledger_qualifications_v1", {
+  qualificationId: text("qualification_id").primaryKey(),
+  ledgerContractVersion: text("ledger_contract_version").notNull(),
+  ledgerContractHash: text("ledger_contract_hash").notNull(),
+  activationBoundary: text("activation_boundary").notNull(),
+  qualificationKey: text("qualification_key").notNull().unique(),
+  qualificationKeyVersion: text("qualification_key_version").notNull(),
+  qualificationStream: text("qualification_stream", {
+    enum: ["eligible_package", "no_eligible_package"]
+  }).notNull(),
+  runnerHash: text("runner_hash"),
+  codeHash: text("code_hash"),
+  modelOrPackageHash: text("model_or_package_hash"),
+  configHash: text("config_hash"),
+  featureSchemaHash: text("feature_schema_hash"),
+  targetSchemaHash: text("target_schema_hash"),
+  qualificationStatus: text("qualification_status", { enum: ["eligible", "rejected"] }).notNull(),
+  qualifiedAt: text("qualified_at").notNull(),
+  qualificationEvidenceHash: text("qualification_evidence_hash").notNull()
+}, (table) => [
+  index("idx_forecast_ledger_qualifications_v1_status")
+    .on(table.qualificationStatus, table.qualifiedAt),
+  uniqueIndex("forecast_ledger_one_boundary_per_eligible_package_v1")
+    .on(table.modelOrPackageHash)
+    .where(sql`${table.qualificationStream} = 'eligible_package' AND ${table.qualificationStatus} = 'eligible'`),
+  check(
+    "forecast_ledger_qualification_stream_check",
+    sql`(${table.qualificationStream} = 'eligible_package' AND ${table.runnerHash} IS NOT NULL AND
+      ${table.codeHash} IS NOT NULL AND ${table.modelOrPackageHash} IS NOT NULL AND
+      ${table.configHash} IS NOT NULL AND ${table.featureSchemaHash} IS NOT NULL AND
+      ${table.targetSchemaHash} IS NOT NULL) OR
+      (${table.qualificationStream} = 'no_eligible_package' AND ${table.runnerHash} IS NULL AND
+      ${table.codeHash} IS NULL AND ${table.modelOrPackageHash} IS NULL AND
+      ${table.configHash} IS NULL AND ${table.featureSchemaHash} IS NULL AND
+      ${table.targetSchemaHash} IS NULL)`
+  ),
+  check(
+    "forecast_ledger_qualification_status_check",
+    sql`${table.qualificationStatus} IN ('eligible', 'rejected')`
+  ),
+  check(
+    "forecast_ledger_qualification_identity_check",
+    sql`length(${table.qualificationId}) = 64 AND lower(${table.qualificationId}) = ${table.qualificationId} AND
+      ${table.qualificationId} NOT GLOB '*[^0-9a-f]*' AND
+      ${table.ledgerContractVersion} = 'forecast-ledger-contract.2026.1' AND
+      ${table.ledgerContractHash} = '8f6e9856512b7b14b0fba8e2367b9d09ebee3edc26a10f3660f9171ae2f3241a' AND
+      length(${table.activationBoundary}) BETWEEN 1 AND 200 AND
+      length(${table.qualificationKey}) = 64 AND
+      lower(${table.qualificationKey}) = ${table.qualificationKey} AND
+      ${table.qualificationKey} NOT GLOB '*[^0-9a-f]*' AND
+      ${table.qualificationKeyVersion} = 'engine-os.forecast-qualification.v1'`
+  ),
+  check(
+    "forecast_ledger_qualification_hash_check",
+    sql`(${table.runnerHash} IS NULL OR (
+        length(${table.runnerHash}) = 64 AND lower(${table.runnerHash}) = ${table.runnerHash} AND
+        ${table.runnerHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.codeHash} IS NULL OR (
+        length(${table.codeHash}) = 64 AND lower(${table.codeHash}) = ${table.codeHash} AND
+        ${table.codeHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.modelOrPackageHash} IS NULL OR (
+        length(${table.modelOrPackageHash}) = 64 AND
+        lower(${table.modelOrPackageHash}) = ${table.modelOrPackageHash} AND
+        ${table.modelOrPackageHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.configHash} IS NULL OR (
+        length(${table.configHash}) = 64 AND lower(${table.configHash}) = ${table.configHash} AND
+        ${table.configHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.featureSchemaHash} IS NULL OR (
+        length(${table.featureSchemaHash}) = 64 AND
+        lower(${table.featureSchemaHash}) = ${table.featureSchemaHash} AND
+        ${table.featureSchemaHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.targetSchemaHash} IS NULL OR (
+        length(${table.targetSchemaHash}) = 64 AND
+        lower(${table.targetSchemaHash}) = ${table.targetSchemaHash} AND
+        ${table.targetSchemaHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      length(${table.qualificationEvidenceHash}) = 64 AND
+      lower(${table.qualificationEvidenceHash}) = ${table.qualificationEvidenceHash} AND
+      ${table.qualificationEvidenceHash} NOT GLOB '*[^0-9a-f]*'`
+  ),
+  check("forecast_ledger_qualification_time_check", sql`julianday(${table.qualifiedAt}) IS NOT NULL`)
+]);
+
+export const forecastLedgerActivationsV1 = sqliteTable("forecast_ledger_activations_v1", {
+  activationId: text("activation_id").primaryKey(),
+  ledgerContractVersion: text("ledger_contract_version").notNull(),
+  ledgerContractHash: text("ledger_contract_hash").notNull(),
+  activationBoundary: text("activation_boundary").notNull().unique(),
+  qualificationId: text("qualification_id").notNull().unique()
+    .references(() => forecastLedgerQualificationsV1.qualificationId),
+  evidenceScope: text("evidence_scope", {
+    enum: ["full_season_shadow", "partial_season_shadow"]
+  }).notNull(),
+  season: integer("season").notNull(),
+  firstWeek: integer("first_week").notNull(),
+  activatedAt: text("activated_at").notNull(),
+  firstOriginUtc: text("first_origin_utc").notNull(),
+  weekOneOriginComplete: integer("week_one_origin_complete", { mode: "boolean" }).notNull(),
+  qualificationOnly: integer("qualification_only", { mode: "boolean" }).notNull().default(true)
+}, (table) => [
+  index("idx_forecast_ledger_activations_v1_boundary").on(table.season, table.firstOriginUtc),
+  check(
+    "forecast_ledger_activation_scope_check",
+    sql`(
+      ${table.evidenceScope} = 'full_season_shadow' AND ${table.firstWeek} = 1 AND
+      ${table.firstOriginUtc} = '2026-09-08T14:30:00.000Z' AND
+      ${table.weekOneOriginComplete} = 1 AND
+      julianday(${table.activatedAt}) <= julianday('2026-09-08T14:30:00Z')
+    ) OR (
+      ${table.evidenceScope} = 'partial_season_shadow' AND
+      (${table.firstWeek} > 1 OR ${table.firstOriginUtc} <> '2026-09-08T14:30:00.000Z' OR
+        ${table.weekOneOriginComplete} = 0 OR
+        julianday(${table.activatedAt}) > julianday('2026-09-08T14:30:00Z'))
+    )`
+  ),
+  check(
+    "forecast_ledger_activation_season_check",
+    sql`${table.season} >= 2026 AND ${table.firstWeek} BETWEEN 1 AND 25`
+  ),
+  check(
+    "forecast_ledger_activation_qualification_only_check",
+    sql`${table.qualificationOnly} = 1 AND ${table.weekOneOriginComplete} IN (0, 1)`
+  ),
+  check(
+    "forecast_ledger_activation_time_check",
+    sql`julianday(${table.activatedAt}) IS NOT NULL AND
+      julianday(${table.firstOriginUtc}) IS NOT NULL AND
+      julianday(${table.activatedAt}) <= julianday(${table.firstOriginUtc})`
+  ),
+  check(
+    "forecast_ledger_activation_identity_check",
+    sql`length(${table.activationId}) = 64 AND lower(${table.activationId}) = ${table.activationId} AND
+      ${table.activationId} NOT GLOB '*[^0-9a-f]*' AND
+      ${table.ledgerContractVersion} = 'forecast-ledger-contract.2026.1' AND
+      ${table.ledgerContractHash} = '8f6e9856512b7b14b0fba8e2367b9d09ebee3edc26a10f3660f9171ae2f3241a' AND
+      length(${table.activationBoundary}) BETWEEN 1 AND 200`
+  )
+]);
+
+export const forecastLedgerJobsV1 = sqliteTable("forecast_ledger_jobs_v1", {
+  jobKey: text("job_key").primaryKey(),
+  jobKeyVersion: text("job_key_version").notNull(),
+  ledgerContractVersion: text("ledger_contract_version").notNull(),
+  ledgerContractHash: text("ledger_contract_hash").notNull(),
+  activationId: text("activation_id").notNull()
+    .references(() => forecastLedgerActivationsV1.activationId),
+  originVersionId: text("origin_version_id").notNull()
+    .references(() => forecastOriginVersions.originVersionId),
+  qualificationId: text("qualification_id").notNull()
+    .references(() => forecastLedgerQualificationsV1.qualificationId),
+  expectedInputManifestHash: text("expected_input_manifest_hash"),
+  scheduledTriggerAt: text("scheduled_trigger_at").notNull(),
+  persistenceDeadlineAt: text("persistence_deadline_at").notNull(),
+  kickoffAt: text("kickoff_at").notNull(),
+  state: text("state", {
+    enum: ["pending", "running", "completed", "invalidated"]
+  }).notNull(),
+  fenceToken: integer("fence_token").notNull().default(0),
+  activeAttemptTokenHash: text("active_attempt_token_hash"),
+  leaseOwner: text("lease_owner"),
+  leaseAcquiredAt: text("lease_acquired_at"),
+  leaseExpiresAt: text("lease_expires_at"),
+  heartbeatAt: text("heartbeat_at"),
+  completedAt: text("completed_at"),
+  createdAt: text("created_at").notNull()
+}, (table) => [
+  uniqueIndex("forecast_ledger_job_origin_unique").on(table.activationId, table.originVersionId),
+  index("idx_forecast_ledger_jobs_v1_due")
+    .on(table.state, table.scheduledTriggerAt, table.persistenceDeadlineAt),
+  index("idx_forecast_ledger_jobs_v1_lease").on(table.state, table.leaseExpiresAt),
+  check(
+    "forecast_ledger_job_state_check",
+    sql`${table.state} IN ('pending', 'running', 'completed', 'invalidated')`
+  ),
+  check(
+    "forecast_ledger_job_input_hash_check",
+    sql`${table.expectedInputManifestHash} IS NULL OR (
+      length(${table.expectedInputManifestHash}) = 64 AND
+      lower(${table.expectedInputManifestHash}) = ${table.expectedInputManifestHash} AND
+      ${table.expectedInputManifestHash} NOT GLOB '*[^0-9a-f]*'
+    )`
+  ),
+  check(
+    "forecast_ledger_job_identity_check",
+    sql`length(${table.jobKey}) = 64 AND lower(${table.jobKey}) = ${table.jobKey} AND
+      ${table.jobKey} NOT GLOB '*[^0-9a-f]*' AND
+      ${table.jobKeyVersion} = 'engine-os.forecast-ledger-job.v1' AND
+      ${table.ledgerContractVersion} = 'forecast-ledger-contract.2026.1' AND
+      ${table.ledgerContractHash} = '8f6e9856512b7b14b0fba8e2367b9d09ebee3edc26a10f3660f9171ae2f3241a'`
+  ),
+  check(
+    "forecast_ledger_job_time_check",
+    sql`julianday(${table.scheduledTriggerAt}) IS NOT NULL AND
+      julianday(${table.persistenceDeadlineAt}) IS NOT NULL AND
+      julianday(${table.kickoffAt}) IS NOT NULL AND
+      julianday(${table.createdAt}) IS NOT NULL AND
+      julianday(${table.persistenceDeadlineAt}) < julianday(${table.kickoffAt})`
+  ),
+  check("forecast_ledger_job_fence_check", sql`${table.fenceToken} >= 0`)
+]);
+
+export const forecastLedgerAttemptsV1 = sqliteTable("forecast_ledger_attempts_v1", {
+  attemptId: text("attempt_id").primaryKey(),
+  jobKey: text("job_key").notNull().references(() => forecastLedgerJobsV1.jobKey),
+  originVersionId: text("origin_version_id").notNull()
+    .references(() => forecastOriginVersions.originVersionId),
+  attemptTokenHash: text("attempt_token_hash").notNull().unique(),
+  fenceToken: integer("fence_token").notNull(),
+  leaseOwner: text("lease_owner").notNull(),
+  invokedAt: text("invoked_at").notNull(),
+  leaseAcquiredAt: text("lease_acquired_at").notNull(),
+  leaseExpiresAt: text("lease_expires_at").notNull(),
+  persistedAt: text("persisted_at").notNull()
+}, (table) => [
+  uniqueIndex("forecast_ledger_attempt_job_fence_unique").on(table.jobKey, table.fenceToken),
+  index("idx_forecast_ledger_attempts_v1_origin").on(table.originVersionId, table.fenceToken),
+  check(
+    "forecast_ledger_attempt_identity_check",
+    sql`length(${table.attemptId}) = 64 AND lower(${table.attemptId}) = ${table.attemptId} AND
+      ${table.attemptId} NOT GLOB '*[^0-9a-f]*' AND
+      length(${table.attemptTokenHash}) = 64 AND
+      lower(${table.attemptTokenHash}) = ${table.attemptTokenHash} AND
+      ${table.attemptTokenHash} NOT GLOB '*[^0-9a-f]*' AND
+      ${table.fenceToken} >= 1 AND length(${table.leaseOwner}) BETWEEN 1 AND 200`
+  ),
+  check(
+    "forecast_ledger_attempt_time_check",
+    sql`julianday(${table.invokedAt}) IS NOT NULL AND
+      julianday(${table.leaseAcquiredAt}) IS NOT NULL AND
+      julianday(${table.leaseExpiresAt}) IS NOT NULL AND
+      julianday(${table.persistedAt}) IS NOT NULL AND
+      julianday(${table.invokedAt}) <= julianday(${table.leaseAcquiredAt}) AND
+      julianday(${table.leaseAcquiredAt}) < julianday(${table.leaseExpiresAt}) AND
+      julianday(${table.leaseAcquiredAt}) <= julianday(${table.persistedAt}) AND
+      abs((julianday(${table.leaseExpiresAt}) - julianday(${table.leaseAcquiredAt})) *
+        86400.0 - 120.0) < 0.001`
+  )
+]);
+
+export const forecastLedgerRecordsV1 = sqliteTable("forecast_ledger_records_v1", {
+  recordId: text("record_id").primaryKey(),
+  recordHash: text("record_hash").notNull().unique(),
+  recordKeyVersion: text("record_key_version").notNull(),
+  activationId: text("activation_id").notNull()
+    .references(() => forecastLedgerActivationsV1.activationId),
+  jobKey: text("job_key").notNull().unique().references(() => forecastLedgerJobsV1.jobKey),
+  originVersionId: text("origin_version_id").notNull()
+    .references(() => forecastOriginVersions.originVersionId),
+  qualificationId: text("qualification_id").notNull()
+    .references(() => forecastLedgerQualificationsV1.qualificationId),
+  qualificationKey: text("qualification_key").notNull(),
+  qualificationStream: text("qualification_stream", {
+    enum: ["eligible_package", "no_eligible_package"]
+  }).notNull(),
+  ledgerContractVersion: text("ledger_contract_version").notNull(),
+  ledgerContractHash: text("ledger_contract_hash").notNull(),
+  status: text("status", { enum: ["forecast", "withheld"] }).notNull(),
+  withholdingReason: text("withholding_reason", {
+    enum: [
+      "no_eligible_package",
+      "schedule_unavailable_at_origin",
+      "required_source_stale",
+      "required_source_partial",
+      "required_source_unavailable",
+      "schema_invalid",
+      "provenance_incomplete",
+      "package_hash_mismatch",
+      "late_origin_excluded",
+      "compute_failure"
+    ]
+  }),
+  scheduledTriggerAt: text("scheduled_trigger_at").notNull(),
+  invokedAt: text("invoked_at").notNull(),
+  evidenceAt: text("evidence_at").notNull(),
+  generatedAt: text("generated_at").notNull(),
+  outputPublishedAt: text("output_published_at"),
+  outputVerifiedAt: text("output_verified_at"),
+  persistenceRequestedAt: text("persistence_requested_at").notNull(),
+  persistedAt: text("persisted_at").notNull(),
+  persistenceDeadlineAt: text("persistence_deadline_at").notNull(),
+  kickoffAt: text("kickoff_at").notNull(),
+  timing: text("timing", { enum: ["timely", "late"] }).notNull(),
+  prospectiveEligible: integer("prospective_eligible", { mode: "boolean" }).notNull(),
+  captureHealth: text("capture_health", {
+    enum: ["current", "stale", "partial", "unavailable"]
+  }).notNull(),
+  activationBoundary: text("activation_boundary").notNull(),
+  evidenceScope: text("evidence_scope", {
+    enum: ["full_season_shadow", "partial_season_shadow"]
+  }).notNull(),
+  attemptTokenHash: text("attempt_token_hash").notNull(),
+  fenceToken: integer("fence_token").notNull(),
+  runnerHash: text("runner_hash"),
+  codeHash: text("code_hash"),
+  modelOrPackageHash: text("model_or_package_hash"),
+  configHash: text("config_hash"),
+  inputManifestHash: text("input_manifest_hash"),
+  featureSchemaHash: text("feature_schema_hash"),
+  targetSchemaHash: text("target_schema_hash"),
+  outputObjectKey: text("output_object_key"),
+  outputObjectHash: text("output_object_hash"),
+  outputObjectBytes: integer("output_object_bytes"),
+  payloadJson: text("payload_json").notNull(),
+  payloadHash: text("payload_hash").notNull()
+}, (table) => [
+  uniqueIndex("forecast_ledger_record_activation_origin_unique")
+    .on(table.activationId, table.originVersionId),
+  index("idx_forecast_ledger_records_v1_origin").on(table.originVersionId, table.persistedAt),
+  index("idx_forecast_ledger_records_v1_prospective")
+    .on(table.prospectiveEligible, table.status, table.persistedAt),
+  check(
+    "forecast_ledger_record_identity_check",
+    sql`length(${table.recordId}) = 64 AND lower(${table.recordId}) = ${table.recordId} AND
+      ${table.recordId} NOT GLOB '*[^0-9a-f]*' AND
+      length(${table.recordHash}) = 64 AND lower(${table.recordHash}) = ${table.recordHash} AND
+      ${table.recordHash} NOT GLOB '*[^0-9a-f]*' AND
+      ${table.recordKeyVersion} = 'engine-os.forecast-ledger-record.v2' AND
+      ${table.ledgerContractVersion} = 'forecast-ledger-contract.2026.1' AND
+      ${table.ledgerContractHash} = '8f6e9856512b7b14b0fba8e2367b9d09ebee3edc26a10f3660f9171ae2f3241a' AND
+      length(${table.attemptTokenHash}) = 64 AND
+      lower(${table.attemptTokenHash}) = ${table.attemptTokenHash} AND
+      ${table.attemptTokenHash} NOT GLOB '*[^0-9a-f]*' AND ${table.fenceToken} >= 1`
+  ),
+  check(
+    "forecast_ledger_record_status_check",
+    sql`${table.status} IN ('forecast', 'withheld')`
+  ),
+  check(
+    "forecast_ledger_record_reason_check",
+    sql`${table.withholdingReason} IS NULL OR ${table.withholdingReason} IN (
+      'no_eligible_package', 'schedule_unavailable_at_origin', 'required_source_stale',
+      'required_source_partial', 'required_source_unavailable', 'schema_invalid',
+      'provenance_incomplete', 'package_hash_mismatch', 'late_origin_excluded',
+      'compute_failure'
+    )`
+  ),
+  check(
+    "forecast_ledger_record_shape_check",
+    sql`(
+      ${table.status} = 'forecast' AND ${table.withholdingReason} IS NULL AND
+      ${table.qualificationStream} = 'eligible_package' AND
+      ${table.runnerHash} IS NOT NULL AND ${table.codeHash} IS NOT NULL AND
+      ${table.modelOrPackageHash} IS NOT NULL AND ${table.configHash} IS NOT NULL AND
+      ${table.inputManifestHash} IS NOT NULL AND ${table.featureSchemaHash} IS NOT NULL AND
+      ${table.targetSchemaHash} IS NOT NULL AND ${table.outputObjectKey} IS NOT NULL AND
+      ${table.outputObjectHash} IS NOT NULL AND ${table.outputObjectBytes} IS NOT NULL AND
+      ${table.outputPublishedAt} IS NOT NULL AND ${table.outputVerifiedAt} IS NOT NULL AND
+      ${table.timing} = 'timely' AND ${table.prospectiveEligible} = 1
+    ) OR (
+      ${table.status} = 'withheld' AND ${table.withholdingReason} IS NOT NULL AND
+      ${table.runnerHash} IS NULL AND ${table.codeHash} IS NULL AND
+      ${table.modelOrPackageHash} IS NULL AND ${table.configHash} IS NULL AND
+      ${table.inputManifestHash} IS NULL AND ${table.featureSchemaHash} IS NULL AND
+      ${table.targetSchemaHash} IS NULL AND ${table.outputObjectKey} IS NULL AND
+      ${table.outputObjectHash} IS NULL AND ${table.outputObjectBytes} IS NULL AND
+      ${table.outputPublishedAt} IS NULL AND ${table.outputVerifiedAt} IS NULL
+    )`
+  ),
+  check(
+    "forecast_ledger_record_qualification_shape_check",
+    sql`${table.qualificationStream} IN ('eligible_package', 'no_eligible_package')`
+  ),
+  check(
+    "forecast_ledger_record_hash_check",
+    sql`(${table.runnerHash} IS NULL OR (
+        length(${table.runnerHash}) = 64 AND lower(${table.runnerHash}) = ${table.runnerHash} AND
+        ${table.runnerHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.codeHash} IS NULL OR (
+        length(${table.codeHash}) = 64 AND lower(${table.codeHash}) = ${table.codeHash} AND
+        ${table.codeHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.modelOrPackageHash} IS NULL OR (
+        length(${table.modelOrPackageHash}) = 64 AND
+        lower(${table.modelOrPackageHash}) = ${table.modelOrPackageHash} AND
+        ${table.modelOrPackageHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.configHash} IS NULL OR (
+        length(${table.configHash}) = 64 AND lower(${table.configHash}) = ${table.configHash} AND
+        ${table.configHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.inputManifestHash} IS NULL OR (
+        length(${table.inputManifestHash}) = 64 AND
+        lower(${table.inputManifestHash}) = ${table.inputManifestHash} AND
+        ${table.inputManifestHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.featureSchemaHash} IS NULL OR (
+        length(${table.featureSchemaHash}) = 64 AND
+        lower(${table.featureSchemaHash}) = ${table.featureSchemaHash} AND
+        ${table.featureSchemaHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.targetSchemaHash} IS NULL OR (
+        length(${table.targetSchemaHash}) = 64 AND
+        lower(${table.targetSchemaHash}) = ${table.targetSchemaHash} AND
+        ${table.targetSchemaHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      (${table.outputObjectHash} IS NULL OR (
+        length(${table.outputObjectHash}) = 64 AND
+        lower(${table.outputObjectHash}) = ${table.outputObjectHash} AND
+        ${table.outputObjectHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND
+      length(${table.payloadHash}) = 64 AND lower(${table.payloadHash}) = ${table.payloadHash} AND
+      ${table.payloadHash} NOT GLOB '*[^0-9a-f]*'`
+  ),
+  check(
+    "forecast_ledger_record_output_check",
+    sql`${table.outputObjectKey} IS NULL OR (
+      ${table.outputObjectKey} = 'forecast-output/sha256/' || ${table.outputObjectHash} AND
+      ${table.outputObjectBytes} >= 0
+    )`
+  ),
+  check(
+    "forecast_ledger_record_time_check",
+    sql`julianday(${table.scheduledTriggerAt}) IS NOT NULL AND
+      julianday(${table.invokedAt}) IS NOT NULL AND
+      julianday(${table.evidenceAt}) IS NOT NULL AND
+      julianday(${table.generatedAt}) IS NOT NULL AND
+      julianday(${table.persistenceRequestedAt}) IS NOT NULL AND
+      julianday(${table.persistedAt}) IS NOT NULL AND
+      julianday(${table.persistenceDeadlineAt}) IS NOT NULL AND
+      julianday(${table.kickoffAt}) IS NOT NULL AND
+      julianday(${table.scheduledTriggerAt}) <= julianday(${table.invokedAt}) AND
+      julianday(${table.invokedAt}) <= julianday(${table.generatedAt}) AND
+      julianday(${table.evidenceAt}) <= julianday(${table.generatedAt}) AND
+      julianday(${table.generatedAt}) <= julianday(${table.persistenceRequestedAt}) AND
+      julianday(${table.persistenceRequestedAt}) <= julianday(${table.persistedAt}) AND
+      julianday(${table.persistenceDeadlineAt}) < julianday(${table.kickoffAt}) AND
+      (${table.outputPublishedAt} IS NULL OR (
+        julianday(${table.outputPublishedAt}) IS NOT NULL AND
+        julianday(${table.outputVerifiedAt}) IS NOT NULL AND
+        julianday(${table.generatedAt}) <= julianday(${table.outputPublishedAt}) AND
+        julianday(${table.outputPublishedAt}) <= julianday(${table.outputVerifiedAt}) AND
+        julianday(${table.outputVerifiedAt}) <= julianday(${table.persistenceRequestedAt})
+      ))`
+  ),
+  check(
+    "forecast_ledger_record_timing_check",
+    sql`(
+      ${table.timing} = 'timely' AND ${table.prospectiveEligible} = 1 AND
+      julianday(${table.persistedAt}) < julianday(${table.persistenceDeadlineAt}) AND
+      julianday(${table.persistedAt}) <= julianday(${table.kickoffAt}, '-1 second') AND
+      (${table.withholdingReason} IS NULL OR ${table.withholdingReason} NOT IN (
+        'late_origin_excluded', 'schedule_unavailable_at_origin'
+      ))
+    ) OR (
+      ${table.timing} = 'late' AND ${table.prospectiveEligible} = 0 AND
+      ${table.withholdingReason} IN ('late_origin_excluded', 'schedule_unavailable_at_origin')
+    )`
+  ),
+  check(
+    "forecast_ledger_record_capture_check",
+    sql`${table.captureHealth} IN ('current', 'stale', 'partial', 'unavailable')`
+  ),
+  check(
+    "forecast_ledger_record_scope_check",
+    sql`${table.evidenceScope} IN ('full_season_shadow', 'partial_season_shadow')`
+  ),
+  check(
+    "forecast_ledger_record_payload_check",
+    sql`json_valid(${table.payloadJson}) AND json_type(${table.payloadJson}) = 'object'`
+  )
+]);
+
+export const forecastLedgerEventsV1 = sqliteTable("forecast_ledger_events_v1", {
+  eventId: text("event_id").primaryKey(),
+  eventType: text("event_type", {
+    enum: [
+      "qualification_registered",
+      "activation_created",
+      "job_created",
+      "lease_acquired",
+      "lease_renewed",
+      "lease_reclaimed",
+      "lease_lost",
+      "record_committed",
+      "record_deduplicated",
+      "output_publish_failed",
+      "output_integrity_failed",
+      "origin_superseded"
+    ]
+  }).notNull(),
+  activationId: text("activation_id")
+    .references(() => forecastLedgerActivationsV1.activationId),
+  qualificationId: text("qualification_id")
+    .references(() => forecastLedgerQualificationsV1.qualificationId),
+  jobKey: text("job_key").references(() => forecastLedgerJobsV1.jobKey),
+  originVersionId: text("origin_version_id")
+    .references(() => forecastOriginVersions.originVersionId),
+  attemptTokenHash: text("attempt_token_hash"),
+  fenceToken: integer("fence_token"),
+  occurredAt: text("occurred_at").notNull(),
+  evidenceAt: text("evidence_at").notNull(),
+  persistedAt: text("persisted_at").notNull(),
+  payloadJson: text("payload_json").notNull(),
+  payloadHash: text("payload_hash").notNull()
+}, (table) => [
+  index("idx_forecast_ledger_events_v1_origin").on(table.originVersionId, table.occurredAt),
+  index("idx_forecast_ledger_events_v1_job").on(table.jobKey, table.occurredAt),
+  check(
+    "forecast_ledger_event_type_check",
+    sql`${table.eventType} IN (
+      'qualification_registered', 'activation_created', 'job_created', 'lease_acquired',
+      'lease_renewed', 'lease_reclaimed', 'lease_lost', 'record_committed',
+      'record_deduplicated', 'output_publish_failed', 'output_integrity_failed',
+      'origin_superseded'
+    )`
+  ),
+  check(
+    "forecast_ledger_event_identity_check",
+    sql`length(${table.eventId}) = 64 AND lower(${table.eventId}) = ${table.eventId} AND
+      ${table.eventId} NOT GLOB '*[^0-9a-f]*' AND
+      (${table.attemptTokenHash} IS NULL OR (
+        length(${table.attemptTokenHash}) = 64 AND
+        lower(${table.attemptTokenHash}) = ${table.attemptTokenHash} AND
+        ${table.attemptTokenHash} NOT GLOB '*[^0-9a-f]*'
+      )) AND (${table.fenceToken} IS NULL OR ${table.fenceToken} >= 1)`
+  ),
+  check(
+    "forecast_ledger_event_time_check",
+    sql`julianday(${table.occurredAt}) IS NOT NULL AND
+      julianday(${table.evidenceAt}) IS NOT NULL AND
+      julianday(${table.persistedAt}) IS NOT NULL AND
+      julianday(${table.occurredAt}) <= julianday(${table.persistedAt}) AND
+      julianday(${table.evidenceAt}) <= julianday(${table.persistedAt})`
+  ),
+  check(
+    "forecast_ledger_event_payload_check",
+    sql`json_valid(${table.payloadJson}) AND json_type(${table.payloadJson}) = 'object' AND
+      length(${table.payloadHash}) = 64 AND lower(${table.payloadHash}) = ${table.payloadHash} AND
+      ${table.payloadHash} NOT GLOB '*[^0-9a-f]*'`
+  )
+]);
+
 export const engineJobRuns = sqliteTable("engine_job_runs", {
   jobKey: text("job_key").primaryKey(),
   jobType: text("job_type").notNull(),
