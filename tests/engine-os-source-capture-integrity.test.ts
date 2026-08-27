@@ -7,6 +7,7 @@ import { sha256Hex } from "@/domain/hash";
 import { canonicalizeCaptureRequest } from "@/domain/source-capture-contract";
 import {
   recordOs03aCaptureFailure,
+  recordOs03aNotModified,
   runOs03aFreshnessWatchdog,
   storeOs03aCapture,
   sweepOs03aQualificationOrphan,
@@ -577,6 +578,38 @@ describe("OS-03A integrity hardening", () => {
       latest_capture_id: newer.captureId,
       last_failure_at: "2026-08-26T12:00:00.000Z",
       failure_code: "provider_unavailable"
+    });
+    sqlite.close();
+  });
+
+  it("does not let an older not-modified confirmation clear a newer source failure", async () => {
+    const { sqlite, db } = database();
+    const bucket = new RaceR2();
+    const stored = await storeOs03aCapture(captureInput(db, bucket));
+    await recordOs03aCaptureFailure({
+      db,
+      profileId: "fixture_nflverse_schedule_v1",
+      attemptToken: "integrity-provider-failure-before-old-304",
+      idempotencyKey: "schedule:integrity:provider-failure-before-old-304",
+      failedAt: "2026-08-26T12:00:00.000Z",
+      failureCode: "provider_unavailable"
+    });
+
+    await expect(recordOs03aNotModified({
+      db,
+      bucket: bucket as unknown as R2Bucket,
+      profileId: "fixture_nflverse_schedule_v1",
+      attemptToken: "integrity-old-304",
+      idempotencyKey: "schedule:integrity:old-304",
+      confirmedAt: "2026-08-26T11:00:00.000Z"
+    })).resolves.toEqual({ captureId: stored.captureId, providerDispatches: 0 });
+    expect(sqlite.prepare(`SELECT status, last_attempt_at, last_failure_at, failure_code,
+      latest_capture_id FROM source_capture_heartbeats`).get()).toEqual({
+      status: "stale",
+      last_attempt_at: "2026-08-26T12:00:00.000Z",
+      last_failure_at: "2026-08-26T12:00:00.000Z",
+      failure_code: "provider_unavailable",
+      latest_capture_id: stored.captureId
     });
     sqlite.close();
   });

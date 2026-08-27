@@ -4,6 +4,7 @@ import {
   OS03A_CAPTURE_CONTRACT_VERSION,
   OS03A_EFFECTIVE_CONTRACT_HASH,
   assertRegisteredCaptureRequest,
+  assertSecretFreeCanonicalValue,
   assertSecretFreeCaptureResponse,
   buildCaptureAlertId,
   buildCaptureEventId,
@@ -153,6 +154,15 @@ describe("OS-03A frozen source-capture contract", () => {
       "text/csv",
       encoder.encode("Authorization: Bearer abcdefghijkl")
     )).toThrow(/credential-bearing/i);
+    for (const key of ["authToken", "idToken", "csrfToken", "clientToken"]) {
+      expect(() => assertSecretFreeCanonicalValue({ nested: { [key]: "must-not-persist" } }))
+        .toThrow(/credential-bearing/i);
+      expect(() => assertSecretFreeCaptureResponse(
+        schedule,
+        "text/csv",
+        encoder.encode(JSON.stringify({ nested: { [key]: "must-not-persist" } }))
+      )).toThrow(/credential-bearing/i);
+    }
 
     const pbp = getQualificationSourceProfile("fixture_nflverse_pbp_v1");
     expect(() => assertSecretFreeCaptureResponse(

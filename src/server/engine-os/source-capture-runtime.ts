@@ -1724,14 +1724,18 @@ export async function recordOs03aNotModified(input: {
       occurredAt: confirmedAt
     }),
     input.db.prepare(`UPDATE source_capture_heartbeats SET
-      status = 'current', last_attempt_at = max(last_attempt_at, ?),
-      last_success_at = CASE WHEN last_success_at IS NULL OR ? > last_success_at
+      status = CASE WHEN ? >= last_attempt_at THEN 'current' ELSE status END,
+      last_attempt_at = max(last_attempt_at, ?),
+      last_success_at = CASE WHEN ? >= last_attempt_at AND
+        (last_success_at IS NULL OR ? > last_success_at)
         THEN ? ELSE last_success_at END,
       last_failure_at = CASE WHEN ? >= last_attempt_at THEN NULL ELSE last_failure_at END,
       failure_code = CASE WHEN ? >= last_attempt_at THEN NULL ELSE failure_code END
       WHERE source_key = ? AND latest_capture_id = ?
         AND EXISTS (SELECT 1 FROM source_capture_events WHERE event_id = ? AND event_payload_hash = ?)`)
       .bind(
+        confirmedAt,
+        confirmedAt,
         confirmedAt,
         confirmedAt,
         confirmedAt,
