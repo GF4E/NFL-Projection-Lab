@@ -1106,8 +1106,9 @@ export function recoverRejectedOs01ProductionSession(
         entry: { path: lockPath, device: snapshots.lock.device, inode: snapshots.lock.inode },
         afterOwnershipCheck: () => {
           input.faultInjection?.afterLockOwnershipCheck?.();
-          snapshots.cleanup.assertUnchanged("OS-01R manual-cleanup commit-boundary evidence");
-          snapshots.http.assertUnchanged("OS-01R manual HTTP commit-boundary evidence");
+          for (const [label, snapshot] of Object.entries(snapshots)) {
+            snapshot.assertUnchanged(`OS-01R ${label} commit-boundary evidence`);
+          }
           validateCleanupEvidenceAt(Date.now());
         },
         afterDetach: input.faultInjection?.afterLockDetach,

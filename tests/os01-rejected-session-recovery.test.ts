@@ -469,6 +469,11 @@ function detachedPaths(root: string): string[] {
   return readdirSync(root).filter((name) => name.endsWith(".detached"));
 }
 
+function stagedRecoveryReceiptPaths(root: string): string[] {
+  return readdirSync(root).filter((name) =>
+    name.startsWith(".recovery-receipt.json.") && name.endsWith(".partial"));
+}
+
 beforeEach(() => {
   vi.useFakeTimers();
   vi.setSystemTime(new Date("2026-08-28T14:00:00.000Z"));
@@ -870,6 +875,30 @@ describe("OS-01R rejected-session lock recovery", () => {
     expect(existsSync(fixture.paths.recoveryReceiptPath)).toBe(false);
   });
 
+  it.each([
+    ["rejection", "rejectionReceiptPath"],
+    ["ledger", "phaseLedgerPath"],
+    ["intent", "externalMutationIntentPath"],
+    ["cleanup", "manualCleanupPath"],
+    ["HTTP", "manualHttpPath"]
+  ] as const)("revalidates exact %s bytes after receipt staging and before detach", (label, pathKey) => {
+    const fixture = makeFixture(`commit-boundary-${label}`);
+    const originalLock = readFileSync(fixture.paths.lockPath);
+    expect(() => recoverRejectedOs01ProductionSession({
+      ...recoveryInput(fixture),
+      faultInjection: {
+        afterReceiptStaged: () => {
+          writeFileSync(fixture.paths[pathKey], Buffer.from("x", "utf8"), { flag: "a" });
+        }
+      }
+    })).toThrow(/changed after inspection/u);
+    expect(readFileSync(fixture.paths.lockPath)).toEqual(originalLock);
+    expect(existsSync(fixture.paths.recoveryReceiptPath)).toBe(false);
+    expect(existsSync(guardPath(fixture.paths.lockPath))).toBe(true);
+    expect(stagedRecoveryReceiptPaths(fixture.root)).toHaveLength(1);
+    originalLock.fill(0);
+  });
+
   it("rechecks freshness after guard acquisition and refuses detach when evidence ages past 600 seconds", () => {
     const fixture = makeFixture("guard-freshness-race");
     expect(() => recoverRejectedOs01ProductionSession({
@@ -911,11 +940,10 @@ describe("OS-01R rejected-session lock recovery", () => {
           writePrivate(fixture.paths.lockPath, replacement);
         }
       }
-    })).toThrow(/ownership changed during recovery/u);
+    })).toThrow(/lock commit-boundary evidence changed/u);
     expect(existsSync(guardPath(fixture.paths.lockPath))).toBe(true);
-    const detached = detachedPaths(fixture.root);
-    expect(detached).toHaveLength(1);
-    expect(readFileSync(resolve(fixture.root, detached[0]!))).toEqual(replacement);
+    expect(readFileSync(fixture.paths.lockPath)).toEqual(replacement);
+    expect(detachedPaths(fixture.root)).toHaveLength(0);
     expect(existsSync(fixture.paths.recoveryReceiptPath)).toBe(false);
     replacement.fill(0);
   });
