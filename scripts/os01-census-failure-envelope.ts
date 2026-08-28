@@ -297,7 +297,12 @@ export async function readCanonicalCensusJson(
       scanTail = scanWindow.slice(Math.max(0, scanWindow.byteLength - scanOverlapBytes));
     }
     if (total > maximumBytes) {
-      await reader.cancel();
+      try {
+        await reader.cancel();
+      } catch {
+        // Cancellation is best-effort cleanup. Preserve the closed diagnostic
+        // outcome even when the underlying stream rejects cancellation.
+      }
       throw new CensusResponseFailure("response_body", "response_body_failure", {
         ...base,
         responseByteLength: total,

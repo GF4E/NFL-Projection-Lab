@@ -3,7 +3,7 @@ import { createServer, type Server } from "node:http";
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   CensusFailureEnvelopePublisher,
@@ -71,6 +71,7 @@ function diagnosticClient(endpoint: string, output: string, passNumber: 1 | 2 = 
 }
 
 afterEach(() => {
+  vi.unstubAllGlobals();
   for (const directory of temporaryDirectories.splice(0)) rmSync(directory, { recursive: true, force: true });
 });
 
@@ -185,6 +186,39 @@ describe("OS-01 census failure envelope", () => {
         await server.close();
       }
     }
+  });
+
+  it("preserves the closed oversize failure when stream cancellation rejects", async () => {
+    const rawCancellation = "RAW_CANCEL_EXCEPTION_SENTINEL";
+    const oversizedBody = new Uint8Array(1_048_577);
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(oversizedBody);
+      },
+      cancel() {
+        return Promise.reject(new Error(rawCancellation));
+      }
+    });
+    vi.stubGlobal("fetch", async () => new Response(stream, {
+      status: 200,
+      headers: { "content-type": "application/json" }
+    }));
+    const output = outputPath();
+
+    await expect(diagnosticClient("https://example.invalid/census", output).call({
+      operation: "begin",
+      passNonce: "9".repeat(32)
+    })).rejects.toThrow(/byte limit/u);
+
+    const envelope = readEnvelope(output);
+    expect(envelope.failure).toMatchObject({
+      stage: "response_body",
+      outcomeCategory: "response_body_failure",
+      httpStatus: 200,
+      responseByteLength: oversizedBody.byteLength,
+      responseSha256: sha256(oversizedBody)
+    });
+    expect(JSON.stringify(envelope)).not.toContain(rawCancellation);
   });
 
   it("records a successful-HTTP protocol mismatch without exposing response fields", async () => {
