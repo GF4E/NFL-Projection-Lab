@@ -1,0 +1,33 @@
+{
+  "version": "os01-rejected-session-recovery-audit-receipt.2026.1",
+  "status": "terminally_rejected_without_external_action",
+  "rejectedCommit": "ab1bf1770c254c6b4d2c2d86addba7480760cad0",
+  "rejectedTree": "f80a145c0711bb424ccd083f405bb479af924755",
+  "scope": "OS-01R retained-lock recovery mechanism only",
+  "blockingCounterexamples": [
+    {
+      "id": "caller_controlled_recovery_clock",
+      "finding": "A caller-supplied future recoveredAt value could satisfy the lock-expiry comparison while the process wall clock remained before expiry."
+    },
+    {
+      "id": "cleanup_observation_chronology_incomplete",
+      "finding": "Source, environment, deployment, binding, provider-state, and HTTP observations could predate cleanup and still authorize recovery."
+    }
+  ],
+  "requiredSuccessorControls": [
+    "single_internal_wall_clock_capture",
+    "unexpected_caller_clock_rejection",
+    "strict_post_expiry_observations",
+    "maximum_600_second_observation_age",
+    "source_environment_deployment_then_binding_provider_http_chronology",
+    "adversarial_clock_and_ordering_tests",
+    "fresh_independent_reaudit"
+  ],
+  "qualificationEvidenceReusable": false,
+  "realLockAccessed": false,
+  "productionAccessed": false,
+  "providerSecretAccessed": false,
+  "providerRequestAttempted": false,
+  "quotaReservationAttempted": false,
+  "recordedAt": "2026-08-28T23:50:07.300Z"
+}
