@@ -24,9 +24,11 @@ import {
 import { publishEvidenceBytesExclusive } from "./os01-atomic-evidence";
 import { Os01ProductionSessionLock } from "./os01-production-session-lock";
 import {
+  os01SessionFinalizationTrustRoot,
   os01SessionAcceptanceTrustRoot,
   validateOs01SessionAcceptance,
-  type Os01SessionAcceptanceTrust
+  type Os01SessionAcceptanceTrust,
+  type Os01SessionFinalizationTrust
 } from "./os01-session-acceptance";
 import { Os01SessionPhaseLedger } from "./os01-session-phase-ledger";
 import { writeDeploymentProofExclusive } from "./build_os01_deployment_proof";
@@ -668,6 +670,7 @@ async function main(): Promise<void> {
     let externalMutationIntentHash: string | null = null;
     let externalMutationIntent: Record<string, unknown> | null = null;
     let acceptanceTrust: Os01SessionAcceptanceTrust | null = null;
+    let finalizationTrust: Os01SessionFinalizationTrust | null = null;
     let controlsStaged = false;
     let cleanupVerified = false;
     let terminalFailure = false;
@@ -1279,20 +1282,53 @@ async function main(): Promise<void> {
         const receiptBytes = Buffer.from(`${JSON.stringify({ ...receipt, receiptHash }, null, 2)}\n`, "utf8");
         coordinator.assertActive();
         coordinator.assertEvidenceBytesSafe(receiptBytes, "private-seed session receipt");
-        publishEvidenceBytesExclusive(resolve(qualificationDirectory, "session-receipt.json"), receiptBytes);
         acceptanceCommitStarted = true;
         requireSessionLock().assertOwned();
         requirePhaseLedger().advance("session_complete", cleanupObservedAt);
         const finalPhaseLedger = requirePhaseLedger().snapshot();
+        const phaseLedgerBytes = readFileSync(requirePhaseLedger().path);
+        const censusReceiptBytes = readFileSync(censusResult.output);
+        coordinator.assertEvidenceBytesSafe(phaseLedgerBytes, "private-seed terminal phase ledger");
+        coordinator.assertEvidenceBytesSafe(censusReceiptBytes, "private-seed bound census receipt");
+        const censusReceipt = record(
+          JSON.parse(Buffer.from(censusReceiptBytes).toString("utf8")) as unknown,
+          "private-seed bound census receipt"
+        );
+        const censusStartedAt = timestamp(censusReceipt.startedAt, "census receipt start");
+        const censusCompletedAt = timestamp(censusReceipt.completedAt, "census receipt completion");
         const trustBoundaryRoot = os01SessionAcceptanceTrustRoot(acceptanceTrust);
+        finalizationTrust = Object.freeze({
+          version: "os01-session-finalization-trust.2026.1",
+          acceptanceTrustRoot: trustBoundaryRoot,
+          runId: coordinator.runId,
+          seedCommitment: coordinator.seedCommitment,
+          targetProjectId: target.projectId,
+          sourceAnchor: sourceAnchorEvidence.sourceAnchor,
+          productionSessionLockIdentityHash: requireSessionLock().evidence.lockIdentityHash,
+          censusReceiptBytesSha256: sha256(censusReceiptBytes),
+          censusReceiptHash: censusResult.receiptHash,
+          sessionReceiptBytesSha256: sha256(receiptBytes),
+          sessionReceiptHash: receiptHash,
+          phaseLedgerBytesSha256: sha256(phaseLedgerBytes),
+          phaseLedgerEntryCount: finalPhaseLedger.entryCount,
+          phaseLedgerLastEntryHash: finalPhaseLedger.lastEntryHash,
+          censusStartedAt,
+          censusCompletedAt,
+          completedAt: cleanupObservedAt
+        });
+        const finalizationTrustRoot = os01SessionFinalizationTrustRoot(
+          finalizationTrust,
+          acceptanceTrust
+        );
         const acceptance = {
-          version: "os01-private-seed-session-acceptance.2026.3",
+          version: "os01-private-seed-session-acceptance.2026.4",
           status: "clean_public_production_census_session_accepted",
           runId: coordinator.runId,
           seedCommitment: coordinator.seedCommitment,
           sourceAnchor: sourceAnchorEvidence.sourceAnchor,
           sessionReceiptHash: receiptHash,
           trustBoundaryRoot,
+          finalizationTrustRoot,
           productionSessionLockIdentityHash: requireSessionLock().evidence.lockIdentityHash,
           phaseLedger: finalPhaseLedger,
           acceptedAt: cleanupObservedAt
@@ -1304,54 +1340,56 @@ async function main(): Promise<void> {
         );
         coordinator.assertActive();
         coordinator.assertEvidenceBytesSafe(acceptanceBytes, "private-seed session acceptance marker");
-        const phaseLedgerBytes = readFileSync(requirePhaseLedger().path);
-        const censusReceiptBytes = readFileSync(censusResult.output);
-        coordinator.assertEvidenceBytesSafe(phaseLedgerBytes, "private-seed terminal phase ledger");
-        coordinator.assertEvidenceBytesSafe(censusReceiptBytes, "private-seed bound census receipt");
-        validateOs01SessionAcceptance({
-          sessionReceiptBytes: receiptBytes,
-          censusReceiptBytes,
-          externalMutationIntentBytes,
-          acceptanceBytes,
-          phaseLedgerBytes,
-          trustedBoundary: acceptanceTrust,
-          rejectionReceiptPresent: existsSync(resolve(qualificationDirectory, "session-rejection-receipt.json")),
-          acceptanceFailureReceiptPresent: existsSync(
-            resolve(qualificationDirectory, "session-acceptance-failure.json")
-          )
-        });
-        requireSessionLock().publishAcceptanceMarkerExclusive(
-          resolve(qualificationDirectory, "session-acceptance.json"),
-          acceptanceBytes
-        );
-        const recoveredReceipt = readFileSync(resolve(qualificationDirectory, "session-receipt.json"));
-        const recoveredCensusReceipt = readFileSync(censusResult.output);
-        const recoveredAcceptance = readFileSync(resolve(qualificationDirectory, "session-acceptance.json"));
-        const recoveredPhaseLedger = readFileSync(requirePhaseLedger().path);
-        const recoveredExternalMutationIntent = readFileSync(
-          resolve(qualificationDirectory, "external-mutation-intent.json")
-        );
         try {
           validateOs01SessionAcceptance({
-            sessionReceiptBytes: recoveredReceipt,
-            censusReceiptBytes: recoveredCensusReceipt,
-            externalMutationIntentBytes: recoveredExternalMutationIntent,
-            acceptanceBytes: recoveredAcceptance,
-            phaseLedgerBytes: recoveredPhaseLedger,
+            sessionReceiptBytes: receiptBytes,
+            censusReceiptBytes,
+            externalMutationIntentBytes,
+            acceptanceBytes,
+            phaseLedgerBytes,
             trustedBoundary: acceptanceTrust,
+            trustedFinalization: finalizationTrust,
             rejectionReceiptPresent: existsSync(resolve(qualificationDirectory, "session-rejection-receipt.json")),
             acceptanceFailureReceiptPresent: existsSync(
               resolve(qualificationDirectory, "session-acceptance-failure.json")
             )
           });
+          publishEvidenceBytesExclusive(resolve(qualificationDirectory, "session-receipt.json"), receiptBytes);
+          requireSessionLock().publishAcceptanceMarkerExclusive(
+            resolve(qualificationDirectory, "session-acceptance.json"),
+            acceptanceBytes
+          );
+          const recoveredReceipt = readFileSync(resolve(qualificationDirectory, "session-receipt.json"));
+          const recoveredCensusReceipt = readFileSync(censusResult.output);
+          const recoveredAcceptance = readFileSync(resolve(qualificationDirectory, "session-acceptance.json"));
+          const recoveredPhaseLedger = readFileSync(requirePhaseLedger().path);
+          const recoveredExternalMutationIntent = readFileSync(
+            resolve(qualificationDirectory, "external-mutation-intent.json")
+          );
+          try {
+            validateOs01SessionAcceptance({
+              sessionReceiptBytes: recoveredReceipt,
+              censusReceiptBytes: recoveredCensusReceipt,
+              externalMutationIntentBytes: recoveredExternalMutationIntent,
+              acceptanceBytes: recoveredAcceptance,
+              phaseLedgerBytes: recoveredPhaseLedger,
+              trustedBoundary: acceptanceTrust,
+              trustedFinalization: finalizationTrust,
+              rejectionReceiptPresent: existsSync(resolve(qualificationDirectory, "session-rejection-receipt.json")),
+              acceptanceFailureReceiptPresent: existsSync(
+                resolve(qualificationDirectory, "session-acceptance-failure.json")
+              )
+            });
+          } finally {
+            recoveredReceipt.fill(0);
+            recoveredCensusReceipt.fill(0);
+            recoveredAcceptance.fill(0);
+            recoveredPhaseLedger.fill(0);
+            recoveredExternalMutationIntent.fill(0);
+          }
         } finally {
           phaseLedgerBytes.fill(0);
           censusReceiptBytes.fill(0);
-          recoveredReceipt.fill(0);
-          recoveredCensusReceipt.fill(0);
-          recoveredAcceptance.fill(0);
-          recoveredPhaseLedger.fill(0);
-          recoveredExternalMutationIntent.fill(0);
           externalMutationIntentBytes.fill(0);
         }
         acceptancePublished = true;

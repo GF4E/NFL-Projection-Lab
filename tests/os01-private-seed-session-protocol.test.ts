@@ -228,18 +228,24 @@ describe("OS-01 private-seed session lifecycle protocol", () => {
     expect(objectPropertyText(census[0]!, "productionCoordinator")).toBe("coordinator");
   });
 
-  it("freezes one pre-census trust boundary and reuses it for both terminal validations", () => {
+  it("freezes pre-census and terminal trust boundaries and reuses both for terminal validation", () => {
     const proofWriteIndex = sessionSource.indexOf("writeDeploymentProofExclusive(");
     const trustFreezeIndex = sessionSource.indexOf("acceptanceTrust = Object.freeze({");
     const censusIndex = sessionSource.indexOf("await executeQualifiedCensus({");
+    const terminalLedgerIndex = sessionSource.indexOf('requirePhaseLedger().advance("session_complete"');
+    const finalizationFreezeIndex = sessionSource.indexOf("finalizationTrust = Object.freeze({");
+    const firstValidationIndex = sessionSource.indexOf("validateOs01SessionAcceptance({", finalizationFreezeIndex);
     expect(proofWriteIndex).toBeGreaterThan(-1);
     expect(trustFreezeIndex).toBeGreaterThan(proofWriteIndex);
     expect(censusIndex).toBeGreaterThan(trustFreezeIndex);
+    expect(finalizationFreezeIndex).toBeGreaterThan(terminalLedgerIndex);
+    expect(firstValidationIndex).toBeGreaterThan(finalizationFreezeIndex);
 
     const validations = callsNamed("validateOs01SessionAcceptance");
     expect(validations).toHaveLength(2);
     for (const validation of validations) {
       expect(objectPropertyText(validation, "trustedBoundary")).toBe("acceptanceTrust");
+      expect(objectPropertyText(validation, "trustedFinalization")).toBe("finalizationTrust");
     }
     expect(objectPropertyText(validations[0]!, "externalMutationIntentBytes"))
       .toBe("externalMutationIntentBytes");
@@ -359,8 +365,8 @@ describe("OS-01 private-seed session lifecycle protocol", () => {
     expect(proofIndex).toBeGreaterThan(armedEventIndex);
     expect(sessionSource).toContain('"mutationIntentHash", "observedAt", "sitesVersion", "uploader"');
     expect(sessionSource).toContain("assertExternalMutationIntent(externalMutationIntentHash)");
-    expect(cleanupReceiptIndex).toBeGreaterThan(lifecycleIndex);
-    expect(terminalLedgerIndex).toBeGreaterThan(cleanupReceiptIndex);
+    expect(terminalLedgerIndex).toBeGreaterThan(lifecycleIndex);
+    expect(cleanupReceiptIndex).toBeGreaterThan(terminalLedgerIndex);
     expect(acceptanceIndex).toBeGreaterThan(terminalLedgerIndex);
     expect(releaseIndex).toBeGreaterThan(acceptanceIndex);
   });

@@ -1,0 +1,41 @@
+{
+  "version": "os01-authority-independent-audit-receipt.2026.1",
+  "authorityCommit": "59c7e47fd6e18864deb60188b55ca2bed938fc01",
+  "authorityTree": "fda2d0891d8cdcbbf1e41af2a5f636bce2633576",
+  "status": "rejected_before_external_mutation",
+  "terminalIntegrityAudit": {
+    "decision": "reject",
+    "finding": "pre_census_trust_did_not_anchor_terminal_artifacts",
+    "acceptedCounterexamples": [
+      "census_completion_after_phase_four",
+      "cleanup_http_after_acceptance",
+      "provider_state_before_lock",
+      "source_restoration_before_census",
+      "classification_substitution",
+      "contract_hash_substitution",
+      "migration_hash_substitution",
+      "coordinated_pass_root_substitution"
+    ],
+    "requiredSuccessorControls": [
+      "independently_retained_finalization_trust",
+      "exact_census_receipt_byte_hash",
+      "exact_cleanup_receipt_byte_hash",
+      "exact_terminal_ledger_byte_hash",
+      "closed_terminal_chronology",
+      "coordinated_forgery_regressions"
+    ]
+  },
+  "archiveAndSecurityAudit": {
+    "decision": "accept_bounded_authority_only",
+    "testsPassed": 749,
+    "testsSkipped": 1,
+    "installedToolchainClosureRoot": "139a4448086f6e955de8ff32cfe26fa11464b89cd9597e2bc8c7b367e79eb6fc",
+    "installedToolchainPackageCount": 580,
+    "historyCredentialStatus": "quarantined_unknown_not_clean"
+  },
+  "externalMutationAttempted": false,
+  "providerSecretAccessed": false,
+  "providerRequestAttempted": false,
+  "quotaReservationAttempted": false,
+  "recordedAt": "2026-08-28T22:35:28Z"
+}

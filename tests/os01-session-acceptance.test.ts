@@ -2,9 +2,11 @@ import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
 
 import {
+  os01SessionFinalizationTrustRoot,
   os01SessionAcceptanceTrustRoot,
   validateOs01SessionAcceptance,
-  type Os01SessionAcceptanceTrust
+  type Os01SessionAcceptanceTrust,
+  type Os01SessionFinalizationTrust
 } from "../scripts/os01-session-acceptance";
 
 type JsonRecord = Record<string, unknown>;
@@ -40,6 +42,7 @@ type Evidence = {
   acceptance: JsonRecord;
   phaseLedgerBytes: Buffer;
   trustedBoundary: Os01SessionAcceptanceTrust;
+  trustedFinalization: Os01SessionFinalizationTrust;
 };
 
 function evidence(): Evidence {
@@ -502,14 +505,34 @@ function evidence(): Evidence {
     localPackageContentRoot: proofBuild.packageContentRoot,
     productionSessionLockIdentityHash: lock.lockIdentityHash
   };
+  const trustedFinalization: Os01SessionFinalizationTrust = {
+    version: "os01-session-finalization-trust.2026.1",
+    acceptanceTrustRoot: os01SessionAcceptanceTrustRoot(trustedBoundary),
+    runId,
+    seedCommitment,
+    targetProjectId: projectId,
+    sourceAnchor,
+    productionSessionLockIdentityHash: lock.lockIdentityHash,
+    censusReceiptBytesSha256: createHash("sha256").update(bytes(censusReceipt)).digest("hex"),
+    censusReceiptHash: censusReceipt.receiptHash as string,
+    sessionReceiptBytesSha256: createHash("sha256").update(bytes(receipt)).digest("hex"),
+    sessionReceiptHash: receipt.receiptHash as string,
+    phaseLedgerBytesSha256: createHash("sha256").update(phaseLedgerBytes).digest("hex"),
+    phaseLedgerEntryCount: 7,
+    phaseLedgerLastEntryHash: previousEntryHash,
+    censusStartedAt,
+    censusCompletedAt,
+    completedAt
+  };
   const acceptanceUnsigned: JsonRecord = {
-    version: "os01-private-seed-session-acceptance.2026.3",
+    version: "os01-private-seed-session-acceptance.2026.4",
     status: "clean_public_production_census_session_accepted",
     runId,
     seedCommitment,
     sourceAnchor,
     sessionReceiptHash: receipt.receiptHash,
     trustBoundaryRoot: os01SessionAcceptanceTrustRoot(trustedBoundary),
+    finalizationTrustRoot: os01SessionFinalizationTrustRoot(trustedFinalization, trustedBoundary),
     productionSessionLockIdentityHash: lock.lockIdentityHash,
     phaseLedger: {
       version: "os01-session-phase-ledger.2026.1",
@@ -522,7 +545,10 @@ function evidence(): Evidence {
     acceptedAt: completedAt
   };
   const acceptance = hashed(acceptanceUnsigned, "acceptanceHash");
-  return { receipt, censusReceipt, externalMutationIntent, acceptance, phaseLedgerBytes, trustedBoundary };
+  return {
+    receipt, censusReceipt, externalMutationIntent, acceptance, phaseLedgerBytes,
+    trustedBoundary, trustedFinalization
+  };
 }
 
 function validate(value: Evidence, neighbors = { rejection: false, failure: false }): void {
@@ -533,6 +559,7 @@ function validate(value: Evidence, neighbors = { rejection: false, failure: fals
     acceptanceBytes: bytes(value.acceptance),
     phaseLedgerBytes: value.phaseLedgerBytes,
     trustedBoundary: value.trustedBoundary,
+    trustedFinalization: value.trustedFinalization,
     rejectionReceiptPresent: neighbors.rejection,
     acceptanceFailureReceiptPresent: neighbors.failure
   });
@@ -554,6 +581,86 @@ function bindCensus(value: Evidence, censusUnsigned: JsonRecord): Evidence {
   return bindReceipt({ ...value, censusReceipt }, receiptUnsigned);
 }
 
+function refreshFinalizationTrust(value: Evidence): Evidence {
+  const ledgerLines: string[] = new TextDecoder().decode(value.phaseLedgerBytes).trimEnd().split("\n");
+  const lastLedgerEntry = JSON.parse(ledgerLines.at(-1)!) as JsonRecord;
+  const trustedFinalization: Os01SessionFinalizationTrust = {
+    ...value.trustedFinalization,
+    acceptanceTrustRoot: os01SessionAcceptanceTrustRoot(value.trustedBoundary),
+    censusReceiptBytesSha256: createHash("sha256").update(bytes(value.censusReceipt)).digest("hex"),
+    censusReceiptHash: value.censusReceipt.receiptHash as string,
+    sessionReceiptBytesSha256: createHash("sha256").update(bytes(value.receipt)).digest("hex"),
+    sessionReceiptHash: value.receipt.receiptHash as string,
+    phaseLedgerBytesSha256: createHash("sha256").update(value.phaseLedgerBytes).digest("hex"),
+    phaseLedgerEntryCount: ledgerLines.length,
+    phaseLedgerLastEntryHash: lastLedgerEntry.entryHash as string,
+    censusStartedAt: value.censusReceipt.startedAt as string,
+    censusCompletedAt: value.censusReceipt.completedAt as string,
+    completedAt: value.receipt.completedAt as string
+  };
+  const acceptanceUnsigned = structuredClone(value.acceptance);
+  delete acceptanceUnsigned.acceptanceHash;
+  acceptanceUnsigned.finalizationTrustRoot = os01SessionFinalizationTrustRoot(
+    trustedFinalization,
+    value.trustedBoundary
+  );
+  return {
+    ...value,
+    acceptance: hashed(acceptanceUnsigned, "acceptanceHash"),
+    trustedFinalization
+  };
+}
+
+function rewriteTerminalLedger(
+  value: Evidence,
+  mutate: (entries: JsonRecord[]) => void
+): Evidence {
+  const entries: JsonRecord[] = new TextDecoder().decode(value.phaseLedgerBytes).trimEnd().split("\n")
+    .map((line: string) => JSON.parse(line) as JsonRecord);
+  mutate(entries);
+  let previousEntryHash = "0".repeat(64);
+  const lines = entries.map((entry, sequence) => {
+    const unsigned = structuredClone(entry);
+    delete unsigned.entryHash;
+    unsigned.sequence = sequence;
+    unsigned.previousEntryHash = previousEntryHash;
+    const rebuilt = { ...unsigned, entryHash: hash(unsigned) };
+    previousEntryHash = rebuilt.entryHash;
+    return JSON.stringify(stable(rebuilt));
+  });
+  const phaseLedgerBytes = Buffer.from(`${lines.join("\n")}\n`, "utf8");
+  const cleanupBytes = Buffer.from(`${lines.slice(0, 6).join("\n")}\n`, "utf8");
+  const cleanupLast = JSON.parse(lines[5]!) as JsonRecord;
+  const receiptUnsigned = structuredClone(value.receipt);
+  delete receiptUnsigned.receiptHash;
+  receiptUnsigned.phaseLedgerAtCleanup = {
+    version: "os01-session-phase-ledger.2026.1",
+    runId: value.trustedBoundary.runId,
+    entryCount: 6,
+    terminalPhase: null,
+    ledgerSha256: createHash("sha256").update(cleanupBytes).digest("hex"),
+    lastEntryHash: cleanupLast.entryHash
+  };
+  const receipt = hashed(receiptUnsigned, "receiptHash");
+  const acceptanceUnsigned = structuredClone(value.acceptance);
+  delete acceptanceUnsigned.acceptanceHash;
+  acceptanceUnsigned.sessionReceiptHash = receipt.receiptHash;
+  acceptanceUnsigned.phaseLedger = {
+    version: "os01-session-phase-ledger.2026.1",
+    runId: value.trustedBoundary.runId,
+    entryCount: 7,
+    terminalPhase: "session_complete",
+    ledgerSha256: createHash("sha256").update(phaseLedgerBytes).digest("hex"),
+    lastEntryHash: previousEntryHash
+  };
+  return {
+    ...value,
+    receipt,
+    acceptance: hashed(acceptanceUnsigned, "acceptanceHash"),
+    phaseLedgerBytes
+  };
+}
+
 describe("OS-01 live-trust terminal acceptance", () => {
   it("accepts a complete cleanup receipt, bound census, exact cleanup prefix, and terminal marker", () => {
     const value = evidence();
@@ -567,7 +674,8 @@ describe("OS-01 live-trust terminal acceptance", () => {
       const unsigned = structuredClone(value.receipt);
       delete unsigned.receiptHash;
       delete unsigned[field];
-      expect(() => validate(bindReceipt(value, unsigned)), field).toThrow(/unexpected fields/u);
+      expect(() => validate(refreshFinalizationTrust(bindReceipt(value, unsigned))), field)
+        .toThrow(/unexpected fields|finalization completion is invalid/u);
     }
   });
 
@@ -580,14 +688,16 @@ describe("OS-01 live-trust terminal acceptance", () => {
       acceptanceBytes: bytes(value.acceptance),
       phaseLedgerBytes: value.phaseLedgerBytes,
       trustedBoundary: value.trustedBoundary,
+      trustedFinalization: value.trustedFinalization,
       rejectionReceiptPresent: false,
       acceptanceFailureReceiptPresent: false
-    })).toThrow(/not valid JSON/u);
+    })).toThrow(/terminal evidence bytes|not valid JSON/u);
     const other = evidence();
     const alteredCensus = structuredClone(other.censusReceipt);
     alteredCensus.startedAt = "2026-08-28T12:20:01.000Z";
     const substituted = hashed(alteredCensus, "receiptHash");
-    expect(() => validate({ ...value, censusReceipt: substituted })).toThrow(/does not match/u);
+    expect(() => validate({ ...value, censusReceipt: substituted }))
+      .toThrow(/terminal evidence bytes|does not match/u);
     expect(() => validate(value, { rejection: true, failure: false })).toThrow(/rejection or acceptance-failure/u);
     expect(() => validate(value, { rejection: false, failure: true })).toThrow(/rejection or acceptance-failure/u);
   });
@@ -619,7 +729,7 @@ describe("OS-01 live-trust terminal acceptance", () => {
         marker.productionSessionLockIdentityHash = unsigned.productionSessionLockIdentityHash;
         changed.acceptance = hashed(marker, "acceptanceHash");
       }
-      expect(() => validate(changed)).toThrow();
+      expect(() => validate(refreshFinalizationTrust(changed))).toThrow();
     }
   });
 
@@ -628,19 +738,22 @@ describe("OS-01 live-trust terminal acceptance", () => {
     const alteredRestoration = structuredClone(value.receipt);
     delete alteredRestoration.receiptHash;
     (alteredRestoration.sourceRestoration as JsonRecord).preRestoreTreeObjectId = "5".repeat(40);
-    expect(() => validate(bindReceipt(value, alteredRestoration))).toThrow(/source restoration/u);
+    expect(() => validate(refreshFinalizationTrust(bindReceipt(value, alteredRestoration))))
+      .toThrow(/source restoration/u);
 
     const alteredProofBytes = structuredClone(value.censusReceipt);
     delete alteredProofBytes.receiptHash;
     const proof = alteredProofBytes.deploymentProof as JsonRecord;
     const sourceIdentity = proof.sourceIdentity as JsonRecord;
     sourceIdentity.deploymentTreeObjectId = "5".repeat(40);
-    expect(() => validate(bindCensus(value, alteredProofBytes))).toThrow(/proof hash/u);
+    expect(() => validate(refreshFinalizationTrust(bindCensus(value, alteredProofBytes))))
+      .toThrow(/proof hash/u);
 
     alteredProofBytes.deploymentProofHash = createHash("sha256")
       .update(bytes(alteredProofBytes.deploymentProof))
       .digest("hex");
-    expect(() => validate(bindCensus(value, alteredProofBytes))).toThrow(/live trust boundary/u);
+    expect(() => validate(refreshFinalizationTrust(bindCensus(value, alteredProofBytes))))
+      .toThrow(/live trust boundary/u);
   });
 
   it("cross-binds authority, uploader, archive, and closed proof identities", () => {
@@ -655,7 +768,8 @@ describe("OS-01 live-trust terminal acceptance", () => {
       const receiptUnsigned = structuredClone(value.receipt);
       delete receiptUnsigned.receiptHash;
       mutate(receiptUnsigned);
-      expect(() => validate(bindReceipt(value, receiptUnsigned))).toThrow(/not bound|live acceptance trust boundary/u);
+      expect(() => validate(refreshFinalizationTrust(bindReceipt(value, receiptUnsigned))))
+        .toThrow(/not bound|live acceptance trust boundary/u);
     }
 
     for (const location of ["proof", "sourceIdentity"] as const) {
@@ -667,7 +781,8 @@ describe("OS-01 live-trust terminal acceptance", () => {
       censusUnsigned.deploymentProofHash = createHash("sha256")
         .update(bytes(proof))
         .digest("hex");
-      expect(() => validate(bindCensus(value, censusUnsigned))).toThrow(/unexpected fields|live trust boundary/u);
+      expect(() => validate(refreshFinalizationTrust(bindCensus(value, censusUnsigned))))
+        .toThrow(/unexpected fields|live trust boundary/u);
     }
   });
 
@@ -683,7 +798,8 @@ describe("OS-01 live-trust terminal acceptance", () => {
     const receiptUnsigned = structuredClone(rewritten.receipt);
     delete receiptUnsigned.receiptHash;
     (receiptUnsigned.sourceRestoration as JsonRecord).preRestoreTreeObjectId = "5".repeat(40);
-    expect(() => validate(bindReceipt(rewritten, receiptUnsigned))).toThrow(/live trust boundary/u);
+    expect(() => validate(bindReceipt(rewritten, receiptUnsigned)))
+      .toThrow(/finalization trust boundary|live trust boundary/u);
   });
 
   it("rejects coordinated intent, uploader, proof, census, receipt, and marker rewrites", () => {
@@ -709,7 +825,8 @@ describe("OS-01 live-trust terminal acceptance", () => {
     receiptUnsigned.externalMutationIntentHash = externalMutationIntent.intentHash;
     receiptUnsigned.externalMutationIntentRoot = externalMutationIntent.intentHash;
     const rewritten = bindReceipt({ ...value, censusReceipt, externalMutationIntent }, receiptUnsigned);
-    expect(() => validate(rewritten)).toThrow(/live acceptance trust boundary/u);
+    expect(() => validate(rewritten))
+      .toThrow(/finalization trust boundary|live acceptance trust boundary/u);
   });
 
   it("rejects noncanonical intent bytes and a substituted acceptance trust fingerprint", () => {
@@ -721,9 +838,10 @@ describe("OS-01 live-trust terminal acceptance", () => {
       acceptanceBytes: bytes(value.acceptance),
       phaseLedgerBytes: value.phaseLedgerBytes,
       trustedBoundary: value.trustedBoundary,
+      trustedFinalization: value.trustedFinalization,
       rejectionReceiptPresent: false,
       acceptanceFailureReceiptPresent: false
-    })).toThrow(/not canonical/u);
+    })).toThrow(/terminal evidence bytes|not canonical/u);
 
     const reorderedIntent = Object.fromEntries(Object.entries(value.externalMutationIntent).reverse());
     expect(() => validateOs01SessionAcceptance({
@@ -733,6 +851,7 @@ describe("OS-01 live-trust terminal acceptance", () => {
       acceptanceBytes: bytes(value.acceptance),
       phaseLedgerBytes: value.phaseLedgerBytes,
       trustedBoundary: value.trustedBoundary,
+      trustedFinalization: value.trustedFinalization,
       rejectionReceiptPresent: false,
       acceptanceFailureReceiptPresent: false
     })).toThrow(/live trust boundary/u);
@@ -762,7 +881,7 @@ describe("OS-01 live-trust terminal acceptance", () => {
       ...value,
       acceptance: hashed(markerUnsigned, "acceptanceHash"),
       trustedBoundary: altered
-    })).toThrow(/production target/u);
+    })).toThrow(/finalization trust|production target/u);
   });
 
   it("rejects a forged cleanup-ledger prefix and a noncanonical or altered terminal ledger", () => {
@@ -770,11 +889,13 @@ describe("OS-01 live-trust terminal acceptance", () => {
     const unsigned = structuredClone(value.receipt);
     delete unsigned.receiptHash;
     (unsigned.phaseLedgerAtCleanup as JsonRecord).ledgerSha256 = "0".repeat(64);
-    expect(() => validate(bindReceipt(value, unsigned))).toThrow(/six-entry prefix/u);
+    expect(() => validate(refreshFinalizationTrust(bindReceipt(value, unsigned))))
+      .toThrow(/six-entry prefix/u);
 
     const changedLedger = Buffer.from(value.phaseLedgerBytes);
     changedLedger[0] = 0x5b;
-    expect(() => validate({ ...value, phaseLedgerBytes: changedLedger })).toThrow(/not valid JSON|invalid|does not match/u);
+    expect(() => validate({ ...value, phaseLedgerBytes: changedLedger }))
+      .toThrow(/terminal evidence bytes|not valid JSON|invalid|does not match/u);
 
     expect(() => validateOs01SessionAcceptance({
       sessionReceiptBytes: Buffer.from(JSON.stringify(value.receipt), "utf8"),
@@ -783,8 +904,96 @@ describe("OS-01 live-trust terminal acceptance", () => {
       acceptanceBytes: bytes(value.acceptance),
       phaseLedgerBytes: value.phaseLedgerBytes,
       trustedBoundary: value.trustedBoundary,
+      trustedFinalization: value.trustedFinalization,
       rejectionReceiptPresent: false,
       acceptanceFailureReceiptPresent: false
-    })).toThrow(/not canonical/u);
+    })).toThrow(/terminal evidence bytes|not canonical/u);
+  });
+
+  it("rejects coordinated census-semantic rewrites while the original finalization trust stays fixed", () => {
+    const value = evidence();
+    const mutations: Array<(receipt: JsonRecord) => void> = [
+      (receipt) => { receipt.contractHash = "d".repeat(64); },
+      (receipt) => {
+        ((receipt.migrationByteHashes as JsonRecord[])[0]!).sha256 = "d".repeat(64);
+      },
+      (receipt) => { receipt.classification = { accepted: true, substituted: true }; },
+      (receipt) => {
+        receipt.commonPassRoot = "d".repeat(64);
+        (receipt.firstPass as JsonRecord).passRoot = "d".repeat(64);
+        (receipt.secondPass as JsonRecord).passRoot = "d".repeat(64);
+      }
+    ];
+    for (const mutate of mutations) {
+      const censusUnsigned = structuredClone(value.censusReceipt);
+      delete censusUnsigned.receiptHash;
+      mutate(censusUnsigned);
+      expect(() => validate(bindCensus(value, censusUnsigned)))
+        .toThrow(/terminal evidence bytes do not match the live finalization trust boundary/u);
+    }
+  });
+
+  it("enforces terminal chronology even when a substitute finalization trust is supplied", () => {
+    const value = evidence();
+    const censusUnsigned = structuredClone(value.censusReceipt);
+    delete censusUnsigned.receiptHash;
+    censusUnsigned.completedAt = "2026-08-28T12:26:00.000Z";
+    const censusAfterPhase = refreshFinalizationTrust(bindCensus(value, censusUnsigned));
+    expect(() => validate(censusAfterPhase)).toThrow(/cleanup phase-ledger summary/u);
+
+    for (const mutate of [
+      (receipt: JsonRecord) => {
+        ((receipt.cleanHttp as JsonRecord[])[0]!).observedAt = "2099-01-01T00:00:00.000Z";
+      },
+      (receipt: JsonRecord) => {
+        (receipt.providerState as JsonRecord).observedAt = "2000-01-01T00:00:00.000Z";
+      },
+      (receipt: JsonRecord) => {
+        (receipt.sourceRestoration as JsonRecord).observedAt = "2026-08-28T12:24:59.000Z";
+      }
+    ]) {
+      const receiptUnsigned = structuredClone(value.receipt);
+      delete receiptUnsigned.receiptHash;
+      mutate(receiptUnsigned);
+      const changed = refreshFinalizationTrust(bindReceipt(value, receiptUnsigned));
+      expect(() => validate(changed)).toThrow(/outside the accepted lifecycle/u);
+    }
+  });
+
+  it("rejects a full census, cleanup, ledger, and marker forgery under the original finalization trust", () => {
+    const value = evidence();
+    const censusUnsigned = structuredClone(value.censusReceipt);
+    delete censusUnsigned.receiptHash;
+    censusUnsigned.contractHash = "d".repeat(64);
+    censusUnsigned.migrationByteHashes = [{ tag: "forged", sha256: "d".repeat(64) }];
+    censusUnsigned.classification = { accepted: true, forged: true };
+    censusUnsigned.commonPassRoot = "d".repeat(64);
+    (censusUnsigned.firstPass as JsonRecord).passRoot = "d".repeat(64);
+    (censusUnsigned.secondPass as JsonRecord).passRoot = "d".repeat(64);
+    let rewritten = bindCensus(value, censusUnsigned);
+    rewritten = rewriteTerminalLedger(rewritten, (entries) => {
+      entries[0]!.observedAt = "2026-08-28T12:00:30.000Z";
+      entries[1]!.observedAt = "2026-08-28T12:01:30.000Z";
+    });
+    expect(() => validate(rewritten))
+      .toThrow(/terminal evidence bytes do not match the live finalization trust boundary/u);
+  });
+
+  it("rejects a substituted finalization trust fingerprint when the retained trust stays fixed", () => {
+    const value = evidence();
+    const substituted = {
+      ...value.trustedFinalization,
+      sessionReceiptBytesSha256: "f".repeat(64)
+    };
+    const markerUnsigned = structuredClone(value.acceptance);
+    delete markerUnsigned.acceptanceHash;
+    markerUnsigned.finalizationTrustRoot = os01SessionFinalizationTrustRoot(
+      substituted,
+      value.trustedBoundary
+    );
+    expect(() => validate({
+      ...value,
+      acceptance: hashed(markerUnsigned, "acceptanceHash")
+    })).toThrow(/identity does not match/u);
   });
 });

@@ -10,13 +10,14 @@ import {
 type JsonRecord = Record<string, unknown>;
 
 export type Os01SessionAcceptanceEvidence = {
-  version: "os01-private-seed-session-acceptance.2026.3";
+  version: "os01-private-seed-session-acceptance.2026.4";
   status: "clean_public_production_census_session_accepted";
   runId: string;
   seedCommitment: string;
   sourceAnchor: string;
   sessionReceiptHash: string;
   trustBoundaryRoot: string;
+  finalizationTrustRoot: string;
   productionSessionLockIdentityHash: string;
   phaseLedger: {
     version: "os01-session-phase-ledger.2026.1";
@@ -50,6 +51,32 @@ export type Os01SessionAcceptanceTrust = {
   archiveFileCount: number;
   localPackageContentRoot: string;
   productionSessionLockIdentityHash: string;
+};
+
+/**
+ * A second, terminal trust anchor frozen by the live controller only after the
+ * census, verified cleanup, and terminal phase entry exist in memory. It must
+ * be retained independently of the persisted evidence bundle and must never be
+ * reconstructed from the receipt, ledger, or marker being validated.
+ */
+export type Os01SessionFinalizationTrust = {
+  version: "os01-session-finalization-trust.2026.1";
+  acceptanceTrustRoot: string;
+  runId: string;
+  seedCommitment: string;
+  targetProjectId: string;
+  sourceAnchor: string;
+  productionSessionLockIdentityHash: string;
+  censusReceiptBytesSha256: string;
+  censusReceiptHash: string;
+  sessionReceiptBytesSha256: string;
+  sessionReceiptHash: string;
+  phaseLedgerBytesSha256: string;
+  phaseLedgerEntryCount: number;
+  phaseLedgerLastEntryHash: string;
+  censusStartedAt: string;
+  censusCompletedAt: string;
+  completedAt: string;
 };
 
 const CONTROL_PLANE_VERSION = "os01-sites-control-plane.2026.3";
@@ -178,6 +205,19 @@ function timestamp(value: unknown, label: string): string {
   return result;
 }
 
+function assertTimestampRange(
+  value: unknown,
+  label: string,
+  notBefore: string,
+  notAfter: string
+): string {
+  const observedAt = timestamp(value, label);
+  if (Date.parse(observedAt) < Date.parse(notBefore) || Date.parse(observedAt) > Date.parse(notAfter)) {
+    throw new Error(`${label} is outside the accepted lifecycle`);
+  }
+  return observedAt;
+}
+
 function nullableTimestamp(value: unknown, label: string): string | null {
   return value === null ? null : timestamp(value, label);
 }
@@ -233,6 +273,58 @@ function validateTrustBoundary(value: Os01SessionAcceptanceTrust): Os01SessionAc
 
 export function os01SessionAcceptanceTrustRoot(value: Os01SessionAcceptanceTrust): string {
   return sha256(stableJson(validateTrustBoundary(value)));
+}
+
+function validateFinalizationTrust(
+  value: Os01SessionFinalizationTrust,
+  acceptanceTrust: Os01SessionAcceptanceTrust
+): Os01SessionFinalizationTrust {
+  const trust = object(value, "OS-01 live finalization trust boundary") as Os01SessionFinalizationTrust;
+  exactKeys(trust as unknown as JsonRecord, [
+    "acceptanceTrustRoot", "censusCompletedAt", "censusReceiptBytesSha256", "censusReceiptHash",
+    "censusStartedAt", "completedAt", "phaseLedgerBytesSha256", "phaseLedgerEntryCount",
+    "phaseLedgerLastEntryHash", "productionSessionLockIdentityHash", "runId", "seedCommitment",
+    "sessionReceiptBytesSha256", "sessionReceiptHash", "sourceAnchor", "targetProjectId", "version"
+  ], "OS-01 live finalization trust boundary");
+  if (trust.version !== "os01-session-finalization-trust.2026.1") {
+    throw new Error("OS-01 live finalization trust boundary version is invalid");
+  }
+  hex(trust.acceptanceTrustRoot, "OS-01 finalization acceptance-trust root");
+  uuid(trust.runId, "OS-01 finalization run identity");
+  hex(trust.seedCommitment, "OS-01 finalization seed commitment");
+  text(trust.targetProjectId, "OS-01 finalization target project");
+  hex(trust.sourceAnchor, "OS-01 finalization source anchor");
+  hex(trust.productionSessionLockIdentityHash, "OS-01 finalization lock identity");
+  hex(trust.censusReceiptBytesSha256, "OS-01 finalization census-receipt byte hash");
+  hex(trust.censusReceiptHash, "OS-01 finalization census-receipt hash");
+  hex(trust.sessionReceiptBytesSha256, "OS-01 finalization session-receipt byte hash");
+  hex(trust.sessionReceiptHash, "OS-01 finalization session-receipt hash");
+  hex(trust.phaseLedgerBytesSha256, "OS-01 finalization phase-ledger byte hash");
+  if (integer(trust.phaseLedgerEntryCount, "OS-01 finalization phase-ledger entry count", 1) !== 7) {
+    throw new Error("OS-01 finalization phase-ledger entry count is invalid");
+  }
+  hex(trust.phaseLedgerLastEntryHash, "OS-01 finalization phase-ledger last-entry hash");
+  const censusStartedAt = timestamp(trust.censusStartedAt, "OS-01 finalization census start");
+  const censusCompletedAt = timestamp(trust.censusCompletedAt, "OS-01 finalization census completion");
+  const completedAt = timestamp(trust.completedAt, "OS-01 finalization completion");
+  if (
+    trust.acceptanceTrustRoot !== os01SessionAcceptanceTrustRoot(acceptanceTrust) ||
+    trust.runId !== acceptanceTrust.runId || trust.seedCommitment !== acceptanceTrust.seedCommitment ||
+    trust.targetProjectId !== acceptanceTrust.targetProjectId || trust.sourceAnchor !== acceptanceTrust.sourceAnchor ||
+    trust.productionSessionLockIdentityHash !== acceptanceTrust.productionSessionLockIdentityHash
+  ) throw new Error("OS-01 finalization trust is not bound to the pre-census trust boundary");
+  if (
+    Date.parse(censusStartedAt) > Date.parse(censusCompletedAt) ||
+    Date.parse(censusCompletedAt) > Date.parse(completedAt)
+  ) throw new Error("OS-01 finalization chronology is invalid");
+  return trust;
+}
+
+export function os01SessionFinalizationTrustRoot(
+  value: Os01SessionFinalizationTrust,
+  acceptanceTrust: Os01SessionAcceptanceTrust
+): string {
+  return sha256(stableJson(validateFinalizationTrust(value, validateTrustBoundary(acceptanceTrust))));
 }
 
 function validateExternalMutationIntent(
@@ -612,6 +704,7 @@ function validateCensusReceipt(
   startedAt: string;
   completedAt: string;
   proofObservedAt: string;
+  uploaderObservedAt: string;
   deploymentTreeObjectId: string;
   liveBaseTreeObjectId: string;
 } {
@@ -826,6 +919,7 @@ function validateCensusReceipt(
     startedAt,
     completedAt,
     proofObservedAt: timestamp(deploymentProof.observedAt, "OS-01 census deployment-proof observation"),
+    uploaderObservedAt: timestamp(uploader.observedAt, "OS-01 census uploader observation"),
     deploymentTreeObjectId,
     liveBaseTreeObjectId
   };
@@ -844,7 +938,8 @@ function validatePhaseLedgerBytes(
   completedAt: string,
   lockStartedAt: string,
   lockExpiresAt: string,
-  externalMutationIntentObservedAt: string
+  externalMutationIntentObservedAt: string,
+  censusCompletedAt: string
 ): void {
   const raw = Buffer.from(bytes);
   if (raw.byteLength === 0 || raw.at(-1) !== 0x0a || raw.includes(0x0d) || raw.includes(0x00)) {
@@ -890,6 +985,7 @@ function validatePhaseLedgerBytes(
     cleanupSummary.entryCount !== 6 || cleanupSummary.runId !== runId ||
     cleanupSummary.ledgerSha256 !== sha256(cleanupPrefix) || cleanupSummary.lastEntryHash !== parsedLines[5]!.entryHash ||
     parsedLines[3]!.observedAt !== externalMutationIntentObservedAt ||
+    Date.parse(String(parsedLines[4]!.observedAt)) < Date.parse(censusCompletedAt) ||
     parsedLines[5]!.observedAt !== completedAt || parsedLines[6]!.observedAt !== completedAt
   ) throw new Error("OS-01 cleanup phase-ledger summary does not match the exact six-entry prefix");
 }
@@ -907,6 +1003,7 @@ export function validateOs01SessionAcceptance(input: {
   acceptanceBytes: Uint8Array;
   phaseLedgerBytes: Uint8Array;
   trustedBoundary: Os01SessionAcceptanceTrust;
+  trustedFinalization: Os01SessionFinalizationTrust;
   rejectionReceiptPresent: boolean;
   acceptanceFailureReceiptPresent: boolean;
 }): Os01SessionAcceptanceEvidence {
@@ -915,6 +1012,13 @@ export function validateOs01SessionAcceptance(input: {
   }
   const trust = validateTrustBoundary(input.trustedBoundary);
   const trustBoundaryRoot = os01SessionAcceptanceTrustRoot(trust);
+  const finalizationTrust = validateFinalizationTrust(input.trustedFinalization, trust);
+  const finalizationTrustRoot = os01SessionFinalizationTrustRoot(finalizationTrust, trust);
+  if (
+    sha256(input.censusReceiptBytes) !== finalizationTrust.censusReceiptBytesSha256 ||
+    sha256(input.sessionReceiptBytes) !== finalizationTrust.sessionReceiptBytesSha256 ||
+    sha256(input.phaseLedgerBytes) !== finalizationTrust.phaseLedgerBytesSha256
+  ) throw new Error("OS-01 terminal evidence bytes do not match the live finalization trust boundary");
   const receipt = parseObject(input.sessionReceiptBytes, "OS-01 cleanup receipt");
   exactKeys(receipt, [
     "access", "archive", "authorityCommit", "bindings", "censusReceiptHash", "censusStatus",
@@ -935,6 +1039,9 @@ export function validateOs01SessionAcceptance(input: {
   ) throw new Error("OS-01 cleanup receipt is not the complete non-accepting terminal candidate");
   const receiptHash = hex(receipt.receiptHash, "OS-01 cleanup receipt hash");
   if (canonicalHash(receipt, "receiptHash") !== receiptHash) throw new Error("OS-01 cleanup receipt hash does not verify");
+  if (receiptHash !== finalizationTrust.sessionReceiptHash) {
+    throw new Error("OS-01 cleanup receipt hash does not match the live finalization trust boundary");
+  }
   const runId = uuid(receipt.runId, "OS-01 cleanup run identity");
   const seedCommitment = hex(receipt.seedCommitment, "OS-01 cleanup seed commitment");
   const sourceAnchor = hex(receipt.sourceAnchor, "OS-01 cleanup source anchor");
@@ -943,7 +1050,13 @@ export function validateOs01SessionAcceptance(input: {
   const deploymentCommit = commit(receipt.deploymentCommit, "OS-01 deployment commit");
   const deploymentVersion = text(receipt.temporaryDeploymentVersionId, "OS-01 temporary deployment version");
   const completedAt = timestamp(receipt.completedAt, "OS-01 cleanup completion");
-  hex(receipt.censusReceiptHash, "OS-01 bound census receipt hash");
+  if (completedAt !== finalizationTrust.completedAt) {
+    throw new Error("OS-01 cleanup completion does not match the live finalization trust boundary");
+  }
+  const boundCensusReceiptHash = hex(receipt.censusReceiptHash, "OS-01 bound census receipt hash");
+  if (boundCensusReceiptHash !== finalizationTrust.censusReceiptHash) {
+    throw new Error("OS-01 census receipt hash does not match the live finalization trust boundary");
+  }
   const uploaderAssertionRoot = hex(receipt.uploaderAssertionRoot, "OS-01 uploader assertion root");
   const externalMutationIntentHash = hex(
     receipt.externalMutationIntentHash,
@@ -1030,6 +1143,10 @@ export function validateOs01SessionAcceptance(input: {
     externalMutationIntent,
     localPackageContentRoot: trust.localPackageContentRoot
   });
+  if (
+    censusLifecycle.startedAt !== finalizationTrust.censusStartedAt ||
+    censusLifecycle.completedAt !== finalizationTrust.censusCompletedAt
+  ) throw new Error("OS-01 census chronology does not match the live finalization trust boundary");
   validateSourceRestoration(
     receipt.sourceRestoration,
     deploymentCommit,
@@ -1048,15 +1165,68 @@ export function validateOs01SessionAcceptance(input: {
     Date.parse(intentObservedAt) > Date.parse(censusLifecycle.proofObservedAt) ||
     Date.parse(censusLifecycle.proofObservedAt) > Date.parse(censusLifecycle.startedAt)
   ) throw new Error("OS-01 mutation intent, deployment proof, and census order is invalid");
+  const environmentBeforeProjection = object(receiptEnvironment.before, "OS-01 environment before");
+  const environmentStagedProjection = object(receiptEnvironment.staged, "OS-01 environment staged");
+  const environmentAfterProjection = object(receiptEnvironment.after, "OS-01 environment after");
+  const accessBeforeProjection = object(receiptAccess.before, "OS-01 access before");
+  const accessAfterProjection = object(receiptAccess.after, "OS-01 access after");
+  assertTimestampRange(
+    environmentBeforeProjection.observedAt, "OS-01 environment prestate observation",
+    lockStartedAt, intentObservedAt
+  );
+  assertTimestampRange(
+    accessBeforeProjection.observedAt, "OS-01 access prestate observation",
+    lockStartedAt, intentObservedAt
+  );
+  const stagedAt = assertTimestampRange(
+    environmentStagedProjection.observedAt, "OS-01 staged environment observation",
+    intentObservedAt, censusLifecycle.proofObservedAt
+  );
+  if (environmentStagedProjection.updatedAt !== null) {
+    assertTimestampRange(
+      environmentStagedProjection.updatedAt, "OS-01 staged environment update",
+      intentObservedAt, censusLifecycle.proofObservedAt
+    );
+  }
+  assertTimestampRange(
+    censusLifecycle.uploaderObservedAt, "OS-01 trusted uploader observation",
+    stagedAt, censusLifecycle.proofObservedAt
+  );
+  const cleanupObservationTimes: Array<[unknown, string]> = [
+    [environmentAfterProjection.observedAt, "OS-01 restored environment observation"],
+    [accessAfterProjection.observedAt, "OS-01 restored access observation"],
+    [object(receipt.cleanVersion, "OS-01 clean version").observedAt, "OS-01 clean version observation"],
+    [object(receipt.cleanDeployment, "OS-01 clean deployment").observedAt, "OS-01 clean deployment observation"],
+    [object(receipt.cleanDeployment, "OS-01 clean deployment").updatedAt, "OS-01 clean deployment update"],
+    [object(receipt.sourceRestoration, "OS-01 source restoration").observedAt, "OS-01 source restoration observation"],
+    [object(receipt.bindings, "OS-01 clean bindings").observedAt, "OS-01 binding observation"],
+    [object(receipt.providerState, "OS-01 provider state").observedAt, "OS-01 provider-state observation"]
+  ];
+  if (environmentAfterProjection.updatedAt !== null) {
+    cleanupObservationTimes.push([
+      environmentAfterProjection.updatedAt,
+      "OS-01 restored environment update"
+    ]);
+  }
+  for (const [index, item] of array(receipt.cleanHttp, "OS-01 clean HTTP observations").entries()) {
+    cleanupObservationTimes.push([
+      object(item, `OS-01 clean HTTP observation ${index}`).observedAt,
+      `OS-01 clean HTTP observation ${index} time`
+    ]);
+  }
+  for (const [value, label] of cleanupObservationTimes) {
+    assertTimestampRange(value, label, censusLifecycle.completedAt, completedAt);
+  }
 
   const acceptance = parseObject(input.acceptanceBytes, "OS-01 acceptance marker");
   exactKeys(acceptance, [
-    "acceptanceHash", "acceptedAt", "phaseLedger", "productionSessionLockIdentityHash", "runId",
-    "seedCommitment", "sessionReceiptHash", "sourceAnchor", "status", "trustBoundaryRoot", "version"
+    "acceptanceHash", "acceptedAt", "finalizationTrustRoot", "phaseLedger",
+    "productionSessionLockIdentityHash", "runId", "seedCommitment", "sessionReceiptHash", "sourceAnchor",
+    "status", "trustBoundaryRoot", "version"
   ], "OS-01 acceptance marker");
   requirePrettyJson(input.acceptanceBytes, acceptance, "OS-01 acceptance marker");
   if (
-    acceptance.version !== "os01-private-seed-session-acceptance.2026.3" ||
+    acceptance.version !== "os01-private-seed-session-acceptance.2026.4" ||
     acceptance.status !== "clean_public_production_census_session_accepted"
   ) throw new Error("OS-01 acceptance marker identity is invalid");
   const acceptanceHash = hex(acceptance.acceptanceHash, "OS-01 acceptance hash");
@@ -1070,6 +1240,7 @@ export function validateOs01SessionAcceptance(input: {
     acceptance.runId !== runId || acceptance.seedCommitment !== seedCommitment ||
     acceptance.sourceAnchor !== sourceAnchor ||
     acceptance.trustBoundaryRoot !== trustBoundaryRoot ||
+    acceptance.finalizationTrustRoot !== finalizationTrustRoot ||
     acceptance.productionSessionLockIdentityHash !== receipt.productionSessionLockIdentityHash ||
     timestamp(acceptance.acceptedAt, "OS-01 acceptance time") !== completedAt
   ) throw new Error("OS-01 acceptance marker identity does not match its cleanup receipt");
@@ -1077,6 +1248,11 @@ export function validateOs01SessionAcceptance(input: {
   if (ledger.runId !== runId || ledger.entryCount !== 7) {
     throw new Error("OS-01 final phase ledger is not terminal for the accepted run");
   }
+  if (
+    ledger.ledgerSha256 !== finalizationTrust.phaseLedgerBytesSha256 ||
+    ledger.entryCount !== finalizationTrust.phaseLedgerEntryCount ||
+    ledger.lastEntryHash !== finalizationTrust.phaseLedgerLastEntryHash
+  ) throw new Error("OS-01 final phase ledger does not match the live finalization trust boundary");
   validatePhaseLedgerBytes(
     input.phaseLedgerBytes,
     ledger,
@@ -1085,7 +1261,8 @@ export function validateOs01SessionAcceptance(input: {
     completedAt,
     lockStartedAt,
     lockExpiresAt,
-    intentObservedAt
+    intentObservedAt,
+    censusLifecycle.completedAt
   );
   return acceptance as Os01SessionAcceptanceEvidence;
 }

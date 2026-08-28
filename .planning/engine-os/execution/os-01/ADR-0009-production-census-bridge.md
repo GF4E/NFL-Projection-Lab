@@ -178,21 +178,33 @@ TypeScript regressions bind that identical policy.
 
 The terminal success verifier consumes the exact deployment proof, exact external-
 mutation intent, census receipt, cleanup receipt, terminal phase ledger, acceptance
-marker, and an independently retained in-memory controller trust boundary. The live
-boundary pins the target, commits, source anchor, exact proof and intent bytes, archive
-and package roots, and production-session lock. Receipt v4 and acceptance marker v3
-supersede the earlier internally consistent but forgeable v3/v2 relationship check.
-A coordinated rewrite of every unsigned evidence artifact cannot qualify while the
-live boundary remains fixed.
+marker, and two independently retained in-memory controller trust boundaries. The
+pre-census boundary pins the target, commits, source anchor, exact proof and intent
+bytes, archive and package roots, and production-session lock. After cleanup is
+validated and the seventh ledger entry is durably read, a second frozen finalization
+boundary pins the exact census-receipt bytes, cleanup-receipt bytes, terminal-ledger
+bytes, their canonical hashes and ledger summary, terminal times, and the first trust
+root. Receipt v4 and acceptance marker v4 supersede the earlier incomplete v4/v3
+relationship check. A coordinated rewrite of every unsigned evidence artifact cannot
+qualify while both original live boundaries remain fixed.
 
-The marker's `trustBoundaryRoot` is only a fingerprint of that caller-supplied live
-boundary; it is not a signature or standalone authentication. The terminal verifier
-is authoritative only inside the one live controller process, where the frozen trust
-object is retained independently and never reconstructed from the evidence bundle.
-Offline arbitrary-bundle authenticity remains unproved unless a future design stores
-that trust root in an independent authenticated channel. The source-restoration proof
-must still name the exact deployment and live-base tree objects pinned by the trusted
-deployment proof.
+The marker's `trustBoundaryRoot` and `finalizationTrustRoot` are only fingerprints of
+those caller-supplied live boundaries; neither is a signature or standalone
+authentication. The terminal verifier is authoritative only inside the one live
+controller process, where both frozen trust objects are retained independently and
+never reconstructed from the evidence bundle. Supplying an attacker-substituted trust
+object together with a rewritten bundle is outside this bounded threat model and
+cannot be distinguished without an independent authenticated channel. Offline
+arbitrary-bundle authenticity therefore remains unproved. The source-restoration
+proof must still name the exact deployment and live-base tree objects pinned by the
+trusted deployment proof.
+
+Terminal chronology is closed as `intent <= proof <= census start <= census completion
+<= proof_and_census_complete <= every cleanup observation <= completedAt`, with the
+cleanup and terminal ledger entries exactly equal to `completedAt`. Prestate
+observations must precede intent, while staged-environment and uploader observations
+must fall between intent and proof. This prevents self-consistent terminal receipts
+from moving cleanup evidence outside the live session.
 
 The controller verifies the inspected archive immediately before and after the upload
 request, but the Sites connector reopens the supplied absolute path. Binding that path

@@ -373,6 +373,25 @@ describe("OS-01 target-global production-session lock", () => {
           localPackageContentRoot: "0".repeat(64),
           productionSessionLockIdentityHash: "0".repeat(64)
         },
+        trustedFinalization: {
+          version: "os01-session-finalization-trust.2026.1",
+          acceptanceTrustRoot: "0".repeat(64),
+          runId: "11111111-1111-4111-8111-111111111111",
+          seedCommitment: "0".repeat(64),
+          targetProjectId: "unused",
+          sourceAnchor: "0".repeat(64),
+          productionSessionLockIdentityHash: "0".repeat(64),
+          censusReceiptBytesSha256: "0".repeat(64),
+          censusReceiptHash: "0".repeat(64),
+          sessionReceiptBytesSha256: "0".repeat(64),
+          sessionReceiptHash: "0".repeat(64),
+          phaseLedgerBytesSha256: "0".repeat(64),
+          phaseLedgerEntryCount: 7,
+          phaseLedgerLastEntryHash: "0".repeat(64),
+          censusStartedAt: "2026-08-28T12:00:00.000Z",
+          censusCompletedAt: "2026-08-28T12:00:00.000Z",
+          completedAt: "2026-08-28T12:00:00.000Z"
+        },
         rejectionReceiptPresent: false,
         acceptanceFailureReceiptPresent: existsSync(failurePath)
       })).toThrow(/rejection or acceptance-failure/u);
