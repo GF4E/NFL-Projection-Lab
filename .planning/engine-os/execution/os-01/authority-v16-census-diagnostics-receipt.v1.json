@@ -1,0 +1,42 @@
+{
+  "version": "os01-census-failure-diagnostics-audit-receipt.2026.1",
+  "status": "accepted_local_secret_safe_diagnostic_mechanism",
+  "acceptedCommit": "de3c523c1696200232bf320a450b1d08009c2cfe",
+  "acceptedTree": "52cbeb036278e69eaa96bbbb3163184e10b0314e",
+  "scope": "Closed, append-only failure diagnostics for the OS-01 production census after reservation",
+  "rejectedPredecessors": [
+    {
+      "commit": "5887655898c5c621d150012c9695558b8dee4294",
+      "finding": "A rejected stream-cancellation promise could escape the closed failure type and leave no envelope."
+    },
+    {
+      "commit": "b3feff7dbd6d78d81c87819ade780a7fa3099ba1",
+      "finding": "A never-settling stream-cancellation promise could block the closed failure indefinitely and leave no envelope."
+    }
+  ],
+  "acceptedControls": [
+    "closed_stage_and_outcome_vocabulary",
+    "canonical_and_exact_byte_hash_binding",
+    "exclusive_first_write_publication",
+    "best_effort_nonblocking_stream_cancellation",
+    "raw_response_and_exception_exclusion",
+    "rejection_receipt_binding",
+    "unchanged_provider_independent_transport"
+  ],
+  "verification": {
+    "focusedTestsPassed": 128,
+    "fullTestsPassed": 827,
+    "fullTestsSkipped": 1,
+    "typecheck": "passed",
+    "lint": "passed",
+    "diffCheck": "passed",
+    "independentAudit": "accepted"
+  },
+  "productionQualificationEffect": "none_until_a_new_clean_session_succeeds",
+  "providerSecretAccessed": false,
+  "providerRequestAttempted": false,
+  "quotaReservationAttempted": false,
+  "productionAccessed": false,
+  "realLockAccessed": false,
+  "recordedAt": "2026-08-28T23:55:09.300Z"
+}
