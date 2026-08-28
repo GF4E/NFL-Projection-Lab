@@ -958,6 +958,17 @@ describe("OS-01 live-trust terminal acceptance", () => {
       const changed = refreshFinalizationTrust(bindReceipt(value, receiptUnsigned));
       expect(() => validate(changed)).toThrow(/outside the accepted lifecycle/u);
     }
+
+    const cleanupBeforePhaseFourUnsigned = structuredClone(value.receipt);
+    delete cleanupBeforePhaseFourUnsigned.receiptHash;
+    ((cleanupBeforePhaseFourUnsigned.cleanHttp as JsonRecord[])[0]!).observedAt =
+      "2026-08-28T12:25:15.000Z";
+    let cleanupBeforePhaseFour = bindReceipt(value, cleanupBeforePhaseFourUnsigned);
+    cleanupBeforePhaseFour = rewriteTerminalLedger(cleanupBeforePhaseFour, (entries) => {
+      entries[4]!.observedAt = "2026-08-28T12:25:30.000Z";
+    });
+    cleanupBeforePhaseFour = refreshFinalizationTrust(cleanupBeforePhaseFour);
+    expect(() => validate(cleanupBeforePhaseFour)).toThrow(/outside the accepted lifecycle/u);
   });
 
   it("rejects a full census, cleanup, ledger, and marker forgery under the original finalization trust", () => {

@@ -664,7 +664,7 @@ async function main(): Promise<void> {
     let accessBefore: AccessProjection | null = null;
     let uploaderAssertion: TrustedUploaderAssertion | null = null;
     let censusResult: { status: string; receiptHash: string; output: string } | null = null;
-    let censusCompletedAtMs: number | null = null;
+    let cleanupNotBeforeMs: number | null = null;
     let deploymentVersionId: string | null = null;
     let deploymentRoots: readonly [string, string] | null = null;
     let externalMutationIntentHash: string | null = null;
@@ -1146,9 +1146,10 @@ async function main(): Promise<void> {
         accessBefore = access;
         uploaderAssertion = uploader;
         censusResult = result;
-        censusCompletedAtMs = Date.now();
         deploymentVersionId = sitesVersion.versionId;
-        requirePhaseLedger().advance("proof_and_census_complete");
+        const proofAndCensusCompletedAt = new Date().toISOString();
+        requirePhaseLedger().advance("proof_and_census_complete", proofAndCensusCompletedAt);
+        cleanupNotBeforeMs = Date.parse(proofAndCensusCompletedAt);
         emit({ event: "census_complete", status: result.status, receiptHash: result.receiptHash });
         return;
       }
@@ -1166,7 +1167,7 @@ async function main(): Promise<void> {
         if (!censusResult || !environmentBefore || !environmentStaged || !accessBefore || !deploymentVersionId ||
           !gitEvidence || !deploymentBuild || !packageManifest || !localArchive || !archiveSnapshot ||
           !qualificationArchiveBoundary ||
-          !uploaderAssertion || censusCompletedAtMs === null || externalMutationIntentHash === null ||
+          !uploaderAssertion || cleanupNotBeforeMs === null || externalMutationIntentHash === null ||
           externalMutationIntent === null || externalMutationIntentBytes === null || acceptanceTrust === null) {
           throw new Error("census is not complete");
         }
@@ -1175,7 +1176,7 @@ async function main(): Promise<void> {
         const cleanupObservedAt = timestamp(command.observedAt, "cleanup observation time");
         const cleanupObservedAtMs = Date.parse(cleanupObservedAt);
         assertContemporaneous(cleanupObservedAt, "cleanup", {
-          notBeforeMs: censusCompletedAtMs,
+          notBeforeMs: cleanupNotBeforeMs,
           notAfterMs: Date.now() + os01ControlPlaneContract.observationMaximumFutureSkewSeconds * 1000
         });
         const environmentAfter = command.environmentAfter as EnvironmentProjection;
@@ -1197,36 +1198,36 @@ async function main(): Promise<void> {
           ["clean deployment", cleanDeployment.observedAt],
           ["clean deployment update", cleanDeployment.updatedAt]
         ] as const) assertContemporaneous(projectedAt, label, {
-          notBeforeMs: censusCompletedAtMs,
+          notBeforeMs: cleanupNotBeforeMs,
           notAfterMs: cleanupObservedAtMs
         });
         if (environmentAfter.updatedAt === null) throw new Error("clean environment update time is absent");
         assertContemporaneous(environmentAfter.updatedAt, "clean environment update", {
-          notBeforeMs: censusCompletedAtMs,
+          notBeforeMs: cleanupNotBeforeMs,
           notAfterMs: cleanupObservedAtMs
         });
         const cleanHttp = validateCleanupHttpObservations({
           value: command.http,
           origin: target.origin,
           censusRoute: routeContract.route,
-          notBeforeMs: censusCompletedAtMs,
+          notBeforeMs: cleanupNotBeforeMs,
           notAfterMs: cleanupObservedAtMs,
           scan: (bytes, label) => coordinator.assertEvidenceBytesSafe(bytes, label)
         });
         const bindings = validateBindingObservation(command.bindings, {
           projectId: target.projectId,
-          notBeforeMs: censusCompletedAtMs,
+          notBeforeMs: cleanupNotBeforeMs,
           notAfterMs: cleanupObservedAtMs
         });
         const providerState = validateProviderStateObservation(command.providerState, {
-          notBeforeMs: censusCompletedAtMs,
+          notBeforeMs: cleanupNotBeforeMs,
           notAfterMs: cleanupObservedAtMs
         });
         const sourceRestoration = validateSourceRestorationObservation(command.sourceRestoration, {
           deploymentCommit: gitEvidence.deploymentCommit,
           deploymentTreeObjectId: gitEvidence.deploymentTreeObjectId,
           cleanTreeObjectId: gitEvidence.liveBaseTreeObjectId,
-          notBeforeMs: censusCompletedAtMs,
+          notBeforeMs: cleanupNotBeforeMs,
           notAfterMs: cleanupObservedAtMs
         });
         if (

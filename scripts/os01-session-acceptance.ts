@@ -940,7 +940,7 @@ function validatePhaseLedgerBytes(
   lockExpiresAt: string,
   externalMutationIntentObservedAt: string,
   censusCompletedAt: string
-): void {
+): { proofAndCensusCompletedAt: string } {
   const raw = Buffer.from(bytes);
   if (raw.byteLength === 0 || raw.at(-1) !== 0x0a || raw.includes(0x0d) || raw.includes(0x00)) {
     throw new Error("OS-01 phase-ledger bytes are not canonical JSONL");
@@ -988,6 +988,12 @@ function validatePhaseLedgerBytes(
     Date.parse(String(parsedLines[4]!.observedAt)) < Date.parse(censusCompletedAt) ||
     parsedLines[5]!.observedAt !== completedAt || parsedLines[6]!.observedAt !== completedAt
   ) throw new Error("OS-01 cleanup phase-ledger summary does not match the exact six-entry prefix");
+  return {
+    proofAndCensusCompletedAt: timestamp(
+      parsedLines[4]!.observedAt,
+      "OS-01 proof-and-census-complete phase time"
+    )
+  };
 }
 
 /**
@@ -1214,10 +1220,6 @@ export function validateOs01SessionAcceptance(input: {
       `OS-01 clean HTTP observation ${index} time`
     ]);
   }
-  for (const [value, label] of cleanupObservationTimes) {
-    assertTimestampRange(value, label, censusLifecycle.completedAt, completedAt);
-  }
-
   const acceptance = parseObject(input.acceptanceBytes, "OS-01 acceptance marker");
   exactKeys(acceptance, [
     "acceptanceHash", "acceptedAt", "finalizationTrustRoot", "phaseLedger",
@@ -1253,7 +1255,7 @@ export function validateOs01SessionAcceptance(input: {
     ledger.entryCount !== finalizationTrust.phaseLedgerEntryCount ||
     ledger.lastEntryHash !== finalizationTrust.phaseLedgerLastEntryHash
   ) throw new Error("OS-01 final phase ledger does not match the live finalization trust boundary");
-  validatePhaseLedgerBytes(
+  const phaseLedgerLifecycle = validatePhaseLedgerBytes(
     input.phaseLedgerBytes,
     ledger,
     cleanupSummary,
@@ -1264,5 +1266,13 @@ export function validateOs01SessionAcceptance(input: {
     intentObservedAt,
     censusLifecycle.completedAt
   );
+  for (const [value, label] of cleanupObservationTimes) {
+    assertTimestampRange(
+      value,
+      label,
+      phaseLedgerLifecycle.proofAndCensusCompletedAt,
+      completedAt
+    );
+  }
   return acceptance as Os01SessionAcceptanceEvidence;
 }

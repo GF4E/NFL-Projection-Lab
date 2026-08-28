@@ -409,6 +409,26 @@ describe("OS-01 private-seed session lifecycle protocol", () => {
     expect(cleanupIndex).toBeGreaterThan(assignmentIndex);
   });
 
+  it("uses the actual proof-and-census phase time as every cleanup lower bound", () => {
+    const phaseTimeIndex = sessionSource.indexOf(
+      "const proofAndCensusCompletedAt = new Date().toISOString();"
+    );
+    const phaseAdvanceIndex = sessionSource.indexOf(
+      'requirePhaseLedger().advance("proof_and_census_complete", proofAndCensusCompletedAt);'
+    );
+    const cleanupBoundaryIndex = sessionSource.indexOf(
+      "cleanupNotBeforeMs = Date.parse(proofAndCensusCompletedAt);"
+    );
+    const cleanupIndex = sessionSource.indexOf('if (name === "cleanup")');
+
+    expect(phaseTimeIndex).toBeGreaterThan(-1);
+    expect(phaseAdvanceIndex).toBeGreaterThan(phaseTimeIndex);
+    expect(cleanupBoundaryIndex).toBeGreaterThan(phaseAdvanceIndex);
+    expect(cleanupIndex).toBeGreaterThan(cleanupBoundaryIndex);
+    expect(sessionSource).not.toContain("censusCompletedAtMs");
+    expect(sessionSource.match(/notBeforeMs: cleanupNotBeforeMs/gu)).toHaveLength(7);
+  });
+
   it("makes every unaccepted terminal path nonzero and persists its final event synchronously", () => {
     expect(sessionSource).toContain('writeFileSync(1, `${stableJson(value)}\\n`, { encoding: "utf8" })');
     expect(sessionSource).toContain('if (!acceptancePublished) {');
