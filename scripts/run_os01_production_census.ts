@@ -27,6 +27,16 @@ import {
 } from "./os01-control-plane-evidence";
 import { publishEvidenceBytesExclusive } from "./os01-atomic-evidence";
 import {
+  CENSUS_FAILURE_OPERATIONS,
+  CensusFailureEnvelopePublisher,
+  CensusResponseFailure,
+  censusFailurePath,
+  readCanonicalCensusJson,
+  type CensusFailureOperation,
+  type CensusPassNumber,
+  type CensusResponseEvidence
+} from "./os01-census-failure-envelope";
+import {
   assertBuildToolchainEvidenceUnchanged,
   assertFrozenAuthorityLoaderProcess,
   buildInstalledToolchainEvidence,
@@ -2801,6 +2811,7 @@ export function resolveQualificationPaths(directoryInput: string): Qualification
   const deploymentArchive = resolve(directory, "deployment.tar.gz");
   const output = resolve(directory, "census-receipt.json");
   const reservation = censusReservationPath(output);
+  const failure = censusFailurePath(output);
   for (const [label, path] of [
     ["deployment proof", deploymentProof],
     ["deployment archive", deploymentArchive]
@@ -2812,6 +2823,7 @@ export function resolveQualificationPaths(directoryInput: string): Qualification
   }
   if (existsSync(output)) throw new Error("qualification receipt path already exists");
   if (existsSync(reservation)) throw new Error("qualification receipt reservation already exists");
+  if (existsSync(failure)) throw new Error("qualification failure envelope already exists");
   return { directory, deploymentProof, deploymentArchive, output };
 }
 
@@ -3764,53 +3776,6 @@ function equalHex(left: string, right: string): boolean {
   return timingSafeEqual(Buffer.from(left, "hex"), Buffer.from(right, "hex"));
 }
 
-async function boundedJson(
-  response: Response,
-  evidenceScanner?: (bytes: Uint8Array, label: string) => void
-): Promise<Record<string, unknown>> {
-  const contentType = response.headers.get("content-type")?.trim().toLowerCase() ?? "";
-  if (!response.body) throw new Error("operator response body missing");
-  const reader = response.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let total = 0;
-  let scanTail = new Uint8Array(0);
-  const scanOverlapBytes = 8_192;
-  while (true) {
-    const result = await reader.read();
-    if (result.done) break;
-    if (evidenceScanner) {
-      const scanWindow = new Uint8Array(scanTail.byteLength + result.value.byteLength);
-      scanWindow.set(scanTail, 0);
-      scanWindow.set(result.value, scanTail.byteLength);
-      evidenceScanner(scanWindow, "public census response chunk");
-      scanTail = scanWindow.slice(Math.max(0, scanWindow.byteLength - scanOverlapBytes));
-    }
-    total += result.value.byteLength;
-    if (total > MAX_OPERATOR_RESPONSE_BYTES) {
-      await reader.cancel();
-      throw new Error("operator response exceeded byte limit");
-    }
-    chunks.push(result.value);
-  }
-  const joined = new Uint8Array(total);
-  let offset = 0;
-  for (const chunk of chunks) {
-    joined.set(chunk, offset);
-    offset += chunk.byteLength;
-  }
-  evidenceScanner?.(joined, "public census response");
-  if (!/^application\/json(?:\s*;\s*charset=utf-8)?$/u.test(contentType)) {
-    throw new Error("operator response content type is not canonical JSON");
-  }
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(joined));
-  } catch {
-    throw new Error("operator returned invalid UTF-8 JSON");
-  }
-  return requireRecord(parsed, "operator response");
-}
-
 export class OperatorClient {
   private continuation: string | null = null;
   private passId: string | null = null;
@@ -3823,11 +3788,19 @@ export class OperatorClient {
     private readonly secrets: SecretInput,
     private readonly expectedBuildAttestation: string,
     private readonly evidenceScanner?: (bytes: Uint8Array, label: string) => void,
-    private readonly deadlineMs?: number
+    private readonly deadlineMs?: number,
+    private readonly failureDiagnostics?: {
+      publisher: CensusFailureEnvelopePublisher;
+      passNumber: CensusPassNumber;
+    }
   ) {}
 
   async call(input: Record<string, unknown>): Promise<OperatorResponse> {
     const operation = requireString(input.operation, "operator request operation");
+    if (!(CENSUS_FAILURE_OPERATIONS as readonly string[]).includes(operation)) {
+      throw new Error("operator request operation is unsupported");
+    }
+    const diagnosticOperation = operation as CensusFailureOperation;
     if (this.continuation === null) {
       if (operation !== "begin") throw new Error("first operator request must begin a pass");
       const passNonce = requireString(input.passNonce, "operator pass nonce");
@@ -3843,27 +3816,84 @@ export class OperatorClient {
     if (this.secrets.siteAuthorizationToken) {
       headers["OAI-Sites-Authorization"] = this.secrets.siteAuthorizationToken;
     }
+    const requestContext = this.failureDiagnostics?.publisher.beginRequest(
+      this.failureDiagnostics.passNumber,
+      diagnosticOperation
+    );
     const remainingMs = this.deadlineMs === undefined
       ? OPERATOR_REQUEST_MAX_MS
       : Math.min(OPERATOR_REQUEST_MAX_MS, this.deadlineMs - Date.now());
-    if (remainingMs <= 0) throw new Error("operator request deadline expired");
+    if (remainingMs <= 0) {
+      if (requestContext) {
+        this.failureDiagnostics!.publisher.publishRequestFailure({
+          context: requestContext,
+          stage: "transport",
+          outcomeCategory: "transport_failure"
+        });
+      }
+      throw new Error("operator request deadline expired");
+    }
     const abort = new AbortController();
     const timeout = setTimeout(() => abort.abort(), remainingMs);
     let response: Response;
     let json: Record<string, unknown>;
+    let responseEvidence: CensusResponseEvidence;
     try {
-      response = await fetch(this.secrets.endpoint, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(body),
-        redirect: "error",
-        signal: abort.signal
-      });
-      json = await boundedJson(response, this.evidenceScanner);
+      try {
+        response = await fetch(this.secrets.endpoint, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(body),
+          redirect: "error",
+          signal: abort.signal
+        });
+      } catch (error) {
+        if (requestContext) {
+          this.failureDiagnostics!.publisher.publishRequestFailure({
+            context: requestContext,
+            stage: "transport",
+            outcomeCategory: "transport_failure"
+          });
+        }
+        throw error;
+      }
+      try {
+        const decoded = await readCanonicalCensusJson(
+          response,
+          MAX_OPERATOR_RESPONSE_BYTES,
+          this.evidenceScanner
+        );
+        json = decoded.json;
+        responseEvidence = decoded.evidence;
+      } catch (error) {
+        if (requestContext && error instanceof CensusResponseFailure) {
+          this.failureDiagnostics!.publisher.publishRequestFailure({
+            context: requestContext,
+            stage: error.stage,
+            outcomeCategory: error.outcomeCategory,
+            responseEvidence: error.responseEvidence
+          });
+        }
+        throw error;
+      }
     } finally {
       clearTimeout(timeout);
     }
-    if (!response.ok) throw new Error(`operator_${response.status}_${String(json.error ?? "unknown")}`);
+    if (requestContext) this.failureDiagnostics!.publisher.observeResponse(requestContext, responseEvidence);
+    if (!response.ok) {
+      if (requestContext) {
+        this.failureDiagnostics!.publisher.publishRequestFailure({
+          context: requestContext,
+          stage: "http_status",
+          outcomeCategory: "http_error",
+          responseEvidence
+        });
+      }
+      throw new Error(
+        `operator_${response.status}_${responseEvidence.canonicalJsonErrorCode ?? "absent"}`
+      );
+    }
+    try {
     exactKeys(json, [
       "buildAttestation",
       "continuation",
@@ -3944,6 +3974,17 @@ export class OperatorClient {
     this.queryStats.changes += value.queryStats.changes;
     this.queryStats.changedDb ||= value.queryStats.changedDb;
     return value;
+    } catch (error) {
+      if (requestContext) {
+        this.failureDiagnostics!.publisher.publishRequestFailure({
+          context: requestContext,
+          stage: "response_protocol",
+          outcomeCategory: "protocol_mismatch",
+          responseEvidence
+        });
+      }
+      throw error;
+    }
   }
 }
 
@@ -4005,7 +4046,11 @@ async function schemaPass(
   stages: ExpectedStages,
   expectedBuildAttestation: string,
   evidenceScanner?: (bytes: Uint8Array, label: string) => void,
-  deadlineMs?: number
+  deadlineMs?: number,
+  failureDiagnostics?: {
+    publisher: CensusFailureEnvelopePublisher;
+    passNumber: CensusPassNumber;
+  }
 ): Promise<{
   client: OperatorClient;
   catalog: CatalogEntry[];
@@ -4014,7 +4059,13 @@ async function schemaPass(
   schema: SchemaEvidence[];
   classification: ReturnType<typeof classifySchema>;
 }> {
-  const client = new OperatorClient(secrets, expectedBuildAttestation, evidenceScanner, deadlineMs);
+  const client = new OperatorClient(
+    secrets,
+    expectedBuildAttestation,
+    evidenceScanner,
+    deadlineMs,
+    failureDiagnostics
+  );
   const begin = await client.call({ operation: "begin", passNonce: randomUUID().replaceAll("-", "") });
   const beginPayload = requireRecord(begin.payload, "begin payload") as {
     operation: string;
@@ -4320,89 +4371,129 @@ export async function executeQualifiedCensus(input: {
   const evidenceScanner = input.productionCoordinator
     ? (bytes: Uint8Array, label: string): void => input.productionCoordinator!.assertEvidenceBytesSafe(bytes, label)
     : undefined;
+  const failurePublisher = new CensusFailureEnvelopePublisher({
+    output,
+    reservationHash,
+    assertEvidence: evidenceScanner
+  });
   input.productionCoordinator?.assertActive();
   const deadlineMs = input.productionCoordinator ? Date.parse(input.productionCoordinator.expiresAt) : undefined;
-  const first = await schemaPass(secrets, stages, expectedBuildAttestation, evidenceScanner, deadlineMs);
-  const firstClassification = first.classification;
   let receipt: Record<string, unknown>;
-  if (!firstClassification.accepted) {
-    receipt = {
-      version: "os01-production-census-receipt.2026.1",
-      status: "blocked_before_content_scan",
-      startedAt,
-      completedAt: new Date().toISOString(),
-      sourceCommit,
-      deploymentVersion,
-      target: {
-        name: target.name,
-        projectId: target.projectId,
-        origin: target.origin,
-        accessMode: target.accessMode,
-        loopbackFixture: target.loopbackFixture
-      },
-      reservationHash,
-      buildAttestation: expectedBuildAttestation,
-      attestationContractHash,
-      trustedTargetContractHash,
-      deploymentProofHash: deploymentEvidence.proofHash,
-      deploymentProof: deploymentEvidence.proof,
-      contractVersion: contract.version,
-      contractHash,
-      prestateClassHash,
-      operatorSourceHash,
-      deployedOperatorSourceHash,
-      migrationByteHashes: stages.migrationByteHashes,
-      catalogHash: first.catalogHash,
-      schemaVersion: first.schemaVersion,
-      objectCount: first.catalog.length,
-      schema: first.schema,
-      classification: firstClassification,
-      queryStats: first.client.queryStats,
-      providerSecretReads: 0,
-      providerRequests: 0,
-      quotaReservations: 0,
-      contentTablesScanned: 0
-    };
-  } else {
-    const firstPass = await completePass(first, 1);
-    const second = await schemaPass(secrets, stages, expectedBuildAttestation, evidenceScanner, deadlineMs);
-    if (!second.classification.accepted) throw new Error("second-pass classification changed");
-    const secondPass = await completePass(second, 2);
-    if (firstPass.passRoot !== secondPass.passRoot) throw new Error("independent census pass roots differ");
-    receipt = {
-      version: "os01-production-census-receipt.2026.1",
-      status: "accepted_two_identical_read_only_passes",
-      startedAt,
-      completedAt: new Date().toISOString(),
-      sourceCommit,
-      deploymentVersion,
-      target: {
-        name: target.name,
-        projectId: target.projectId,
-        origin: target.origin,
-        accessMode: target.accessMode,
-        loopbackFixture: target.loopbackFixture
-      },
-      reservationHash,
-      buildAttestation: expectedBuildAttestation,
-      attestationContractHash,
-      trustedTargetContractHash,
-      deploymentProofHash: deploymentEvidence.proofHash,
-      deploymentProof: deploymentEvidence.proof,
-      contractVersion: contract.version,
-      contractHash,
-      prestateClassHash,
-      operatorSourceHash,
-      deployedOperatorSourceHash,
-      migrationByteHashes: stages.migrationByteHashes,
-      classification: firstClassification,
-      firstPass,
-      secondPass,
-      commonPassRoot: firstPass.passRoot,
-      providerSecretReads: 0,
-      providerRequests: 0,
-      quotaReservations: 0
-    };
+  let failureStage: "first_pass_schema" | "first_pass_content" | "second_pass_schema" |
+    "second_pass_content" | "pass_comparison" = "first_pass_schema";
+  try {
+    const first = await schemaPass(
+      secrets,
+      stages,
+      expectedBuildAttestation,
+      evidenceScanner,
+      deadlineMs,
+      { publisher: failurePublisher, passNumber: 1 }
+    );
+    const firstClassification = first.classification;
+    if (!firstClassification.accepted) {
+      receipt = {
+        version: "os01-production-census-receipt.2026.1",
+        status: "blocked_before_content_scan",
+        startedAt,
+        completedAt: new Date().toISOString(),
+        sourceCommit,
+        deploymentVersion,
+        target: {
+          name: target.name,
+          projectId: target.projectId,
+          origin: target.origin,
+          accessMode: target.accessMode,
+          loopbackFixture: target.loopbackFixture
+        },
+        reservationHash,
+        buildAttestation: expectedBuildAttestation,
+        attestationContractHash,
+        trustedTargetContractHash,
+        deploymentProofHash: deploymentEvidence.proofHash,
+        deploymentProof: deploymentEvidence.proof,
+        contractVersion: contract.version,
+        contractHash,
+        prestateClassHash,
+        operatorSourceHash,
+        deployedOperatorSourceHash,
+        migrationByteHashes: stages.migrationByteHashes,
+        catalogHash: first.catalogHash,
+        schemaVersion: first.schemaVersion,
+        objectCount: first.catalog.length,
+        schema: first.schema,
+        classification: firstClassification,
+        queryStats: first.client.queryStats,
+        providerSecretReads: 0,
+        providerRequests: 0,
+        quotaReservations: 0,
+        contentTablesScanned: 0
+      };
+    } else {
+      failureStage = "first_pass_content";
+      const firstPass = await completePass(first, 1);
+      failureStage = "second_pass_schema";
+      const second = await schemaPass(
+        secrets,
+        stages,
+        expectedBuildAttestation,
+        evidenceScanner,
+        deadlineMs,
+        { publisher: failurePublisher, passNumber: 2 }
+      );
+      if (!second.classification.accepted) throw new Error("second-pass classification changed");
+      failureStage = "second_pass_content";
+      const secondPass = await completePass(second, 2);
+      failureStage = "pass_comparison";
+      if (firstPass.passRoot !== secondPass.passRoot) throw new Error("independent census pass roots differ");
+      receipt = {
+        version: "os01-production-census-receipt.2026.1",
+        status: "accepted_two_identical_read_only_passes",
+        startedAt,
+        completedAt: new Date().toISOString(),
+        sourceCommit,
+        deploymentVersion,
+        target: {
+          name: target.name,
+          projectId: target.projectId,
+          origin: target.origin,
+          accessMode: target.accessMode,
+          loopbackFixture: target.loopbackFixture
+        },
+        reservationHash,
+        buildAttestation: expectedBuildAttestation,
+        attestationContractHash,
+        trustedTargetContractHash,
+        deploymentProofHash: deploymentEvidence.proofHash,
+        deploymentProof: deploymentEvidence.proof,
+        contractVersion: contract.version,
+        contractHash,
+        prestateClassHash,
+        operatorSourceHash,
+        deployedOperatorSourceHash,
+        migrationByteHashes: stages.migrationByteHashes,
+        classification: firstClassification,
+        firstPass,
+        secondPass,
+        commonPassRoot: firstPass.passRoot,
+        providerSecretReads: 0,
+        providerRequests: 0,
+        quotaReservations: 0
+      };
+    }
+  } catch (error) {
+    if (failurePublisher.currentBinding() === null) {
+      const passNumber: CensusPassNumber = failureStage.startsWith("second") || failureStage === "pass_comparison"
+        ? 2
+        : 1;
+      const outcomeCategory = failureStage.endsWith("schema")
+        ? "schema_validation_failure" as const
+        : failureStage === "pass_comparison"
+          ? "pass_mismatch" as const
+          : "content_validation_failure" as const;
+      failurePublisher.publishAfterValidatedResponse({ passNumber, stage: failureStage, outcomeCategory });
+    }
+    throw error;
   }
   const receiptHash = sha256(stableJson(receipt));
   const receiptBytes = Buffer.from(`${JSON.stringify({ ...receipt, receiptHash }, null, 2)}\n`, "utf8");

@@ -456,6 +456,12 @@ describe("OS-01 private-seed session lifecycle protocol", () => {
     expect(sessionSource).toContain("coordinator.assertActive();");
     expect(sessionSource).toContain('"session-rejection-receipt.json"');
     expect(sessionSource).toContain('event: disposition.cleanupRequired ? "cleanup_required" : "session_rejected"');
+    expect(sessionSource).toContain("readCensusFailureEnvelopeBinding(");
+    expect(sessionSource).toContain("censusFailureEnvelopeHash: censusFailureEnvelope?.failureEnvelopeHash ?? null");
+    expect(sessionSource).toContain(
+      "censusFailureEnvelopeBytesSha256: censusFailureEnvelope?.failureEnvelopeBytesSha256 ?? null"
+    );
+    expect(sessionSource).toContain("OS01_CENSUS_FAILURE_FILENAME");
     expect(sessionSource).toMatch(/interface_\.close\(\);\s*closeSecrets\(\);/u);
     expect(sessionSource).toContain("validateCleanupHttpObservations({");
     expect(sessionSource).toContain("coordinator.assertEvidenceBytesSafe(receiptBytes, \"private-seed session receipt\")");

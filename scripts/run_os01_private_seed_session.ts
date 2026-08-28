@@ -22,6 +22,10 @@ import {
   type VersionProjection
 } from "./os01-control-plane-evidence";
 import { publishEvidenceBytesExclusive } from "./os01-atomic-evidence";
+import {
+  OS01_CENSUS_FAILURE_FILENAME,
+  readCensusFailureEnvelopeBinding
+} from "./os01-census-failure-envelope";
 import { Os01ProductionSessionLock } from "./os01-production-session-lock";
 import {
   os01SessionFinalizationTrustRoot,
@@ -580,7 +584,8 @@ async function main(): Promise<void> {
     "deployment-proof.json", "deployment.tar.gz", "deployment-a.tar.gz", "deployment-b.tar.gz",
     "census-receipt-reservation.json", "census-receipt.json", "session-receipt.json",
     "session-acceptance.json", "session-acceptance-failure.json", "session-lock-release.json",
-    "session-rejection-receipt.json", "external-mutation-intent.json", "session-phase-ledger.jsonl"
+    "session-rejection-receipt.json", "external-mutation-intent.json", "session-phase-ledger.jsonl",
+    OS01_CENSUS_FAILURE_FILENAME
   ]) {
     if (existsSync(resolve(qualificationDirectory, name))) throw new Error(`qualification output already exists: ${name}`);
   }
@@ -707,6 +712,17 @@ async function main(): Promise<void> {
           : cleanupVerified
             ? "rejected_after_verified_cleanup"
             : "rejected_before_external_mutation";
+        const censusFailureEnvelope = readCensusFailureEnvelopeBinding(
+          resolve(qualificationDirectory, "census-receipt.json")
+        );
+        if (censusFailureEnvelope !== null) {
+          coordinator.assertEvidenceBytesSafe(
+            readFileSync(censusFailureEnvelope.path),
+            "private-seed bound census failure envelope",
+            Date.now(),
+            { allowExpired: true }
+          );
+        }
         const receipt = {
           version: "os01-private-seed-session-rejection.2026.1",
           status,
@@ -725,6 +741,8 @@ async function main(): Promise<void> {
           productionSessionLockDisposition: disposition.lockDisposition,
           productionSessionLockRelease: disposition.release,
           phaseLedger: phaseLedgerEvidence,
+          censusFailureEnvelopeHash: censusFailureEnvelope?.failureEnvelopeHash ?? null,
+          censusFailureEnvelopeBytesSha256: censusFailureEnvelope?.failureEnvelopeBytesSha256 ?? null,
           providerSecretReads: 0,
           providerRequests: 0,
           quotaReservations: 0,

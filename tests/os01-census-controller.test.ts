@@ -1,5 +1,5 @@
 import { execFileSync, spawn, spawnSync } from "node:child_process";
-import { createHash } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 import { createServer, type Server } from "node:http";
 import {
   existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync
@@ -34,6 +34,7 @@ import {
   validateTrackedHostingTarget,
   verifyCensusEntryClosure
 } from "../scripts/run_os01_production_census";
+import { censusFailurePath } from "../scripts/os01-census-failure-envelope";
 import { writeDeploymentProofExclusive } from "../scripts/build_os01_deployment_proof";
 import type { SchemaObject } from "../scripts/verify_d1_schema_authority";
 
@@ -212,6 +213,24 @@ function recomputePayloadHash(value: Record<string, unknown>): Record<string, un
   delete protectedFields.payloadHash;
   delete protectedFields.payloadMac;
   return { ...value, payloadHash: sha256(JSON.stringify(stable(protectedFields))) };
+}
+
+function recomputeAuthenticatedPayload(
+  value: Record<string, unknown>,
+  token: string
+): Record<string, unknown> {
+  const protectedFields = { ...value };
+  delete protectedFields.continuation;
+  delete protectedFields.payloadHash;
+  delete protectedFields.payloadMac;
+  const key = createHash("sha256")
+    .update(`${os01CensusContract.version}\u0000payload-mac\u0000${token}`)
+    .digest();
+  return {
+    ...value,
+    payloadHash: sha256(JSON.stringify(stable(protectedFields))),
+    payloadMac: createHmac("sha256", key).update(JSON.stringify(stable(protectedFields))).digest("hex")
+  };
 }
 
 function deploymentProof(origin: string): Record<string, unknown> {
@@ -1516,6 +1535,7 @@ describe("OS-01 production census controller", () => {
       expect(receipt.providerSecretReads).toBe(0);
       expect(receipt.providerRequests).toBe(0);
       expect(receipt.quotaReservations).toBe(0);
+      expect(existsSync(censusFailurePath(output))).toBe(false);
       expect(JSON.stringify(receipt)).not.toContain("the-odds-api', 38");
       expect(JSON.stringify(receipt)).not.toContain("continuation");
       expect(JSON.stringify(receipt)).not.toContain("rowHashes");
@@ -1590,6 +1610,7 @@ describe("OS-01 production census controller", () => {
       };
       expect(receipt.status).toBe("blocked_before_content_scan");
       expect(receipt.contentTablesScanned).toBe(0);
+      expect(existsSync(censusFailurePath(output))).toBe(false);
       expect(receipt.classification.expectedSummary).toMatchObject({
         playsShape: "runtime_mutated_gabe_jarrett_34",
         playsDecision: "hard_stop_information_loss"
@@ -1615,11 +1636,69 @@ describe("OS-01 production census controller", () => {
       expect(result.stderr).toContain("operator payload hash mismatch");
       expect(existsSync(output)).toBe(false);
       expect(existsSync(censusReservationPath(output))).toBe(true);
+      const failure = JSON.parse(readFileSync(censusFailurePath(output), "utf8")) as {
+        reservationHash: string;
+        failure: { operation: string; stage: string; outcomeCategory: string };
+      };
+      expect(failure).toMatchObject({
+        reservationHash: expect.stringMatching(/^[a-f0-9]{64}$/u),
+        failure: {
+          operation: "begin",
+          stage: "response_protocol",
+          outcomeCategory: "protocol_mismatch"
+        }
+      });
       const requestCountAfterFailure = server.requestCount();
       const retry = await runController({ endpoint: server.endpoint, token, output });
       expect(retry.code).not.toBe(0);
       expect(retry.stderr).toContain("qualification receipt reservation already exists");
       expect(server.requestCount()).toBe(requestCountAfterFailure);
+    } finally {
+      await server.close();
+      database.close();
+    }
+  });
+
+  it("records a later authenticated schema-object validation failure against that exact request", async () => {
+    const database = migratedDatabase();
+    const token = sha256("schema-object-envelope-fixture");
+    let mutated = false;
+    const server = await operatorServer({
+      database,
+      token,
+      mutate: (value) => {
+        const payload = value.payload as Record<string, unknown>;
+        if (mutated || payload.operation !== "schema_object") return value;
+        mutated = true;
+        payload.semanticHash = "0".repeat(64);
+        return recomputeAuthenticatedPayload(value, token);
+      }
+    });
+    try {
+      const output = temporaryOutput("later-schema-object.json");
+      const result = await runController({ endpoint: server.endpoint, token, output });
+      expect(mutated).toBe(true);
+      expect(result.code).not.toBe(0);
+      expect(result.stderr).toContain("schema semantic hash mismatch");
+      expect(existsSync(output)).toBe(false);
+      const failure = JSON.parse(readFileSync(censusFailurePath(output), "utf8")) as {
+        failure: {
+          requestOrdinal: number;
+          passNumber: number;
+          operation: string;
+          stage: string;
+          outcomeCategory: string;
+          httpStatus: number;
+        };
+      };
+      expect(failure.failure).toMatchObject({
+        requestOrdinal: 2,
+        passNumber: 1,
+        operation: "schema_object",
+        stage: "first_pass_schema",
+        outcomeCategory: "schema_validation_failure",
+        httpStatus: 200
+      });
     } finally {
       await server.close();
       database.close();
