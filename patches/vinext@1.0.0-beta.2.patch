@@ -1,5 +1,5 @@
 diff --git a/dist/build/preview-credentials.js b/dist/build/preview-credentials.js
-index ad4f2caade228f2699c1a9df270ef6575188d81d..5c9b5782f98c97cc3d62e7f90cfb114ad297f412 100644
+index ad4f2ca..5c9b578 100644
 --- a/dist/build/preview-credentials.js
 +++ b/dist/build/preview-credentials.js
 @@ -1,8 +1,15 @@
@@ -20,14 +20,24 @@ index ad4f2caade228f2699c1a9df270ef6575188d81d..5c9b5782f98c97cc3d62e7f90cfb114a
  		signingKey: randomBytes(32).toString("hex"),
 diff --git a/dist/build/qualification-entropy.d.ts b/dist/build/qualification-entropy.d.ts
 new file mode 100644
-index 0000000000000000000000000000000000000000..c89d32669be16ffd1c665d91ab6a287cdfd6e704
+index 0000000..1c1e95d
 --- /dev/null
 +++ b/dist/build/qualification-entropy.d.ts
-@@ -0,0 +1,14 @@
+@@ -0,0 +1,29 @@
 +declare function runWithQualificationBuildContext<T>(
 +  context: Buffer,
 +  callback: () => T | Promise<T>
 +): Promise<T>;
++type QualificationBuildZeroizationObservation = {
++  inputContext: Buffer;
++  retainedContext: Buffer;
++};
++declare function runWithQualificationBuildContextForTest<T>(
++  context: Buffer,
++  callback: () => T | Promise<T>,
++  observeZeroized: (observation: QualificationBuildZeroizationObservation) => void
++): Promise<T>;
++declare function qualificationBuildActive(): boolean;
 +declare function qualificationBuildHex(
 +  domain:
 +    | "pages-client-assets-build-session"
@@ -37,13 +47,18 @@ index 0000000000000000000000000000000000000000..c89d32669be16ffd1c665d91ab6a287c
 +    | "preview-mode-signing-key"
 +    | "shared-revalidate-secret"
 +): string | undefined;
-+export { qualificationBuildHex, runWithQualificationBuildContext };
++export {
++  qualificationBuildActive,
++  qualificationBuildHex,
++  runWithQualificationBuildContext,
++  runWithQualificationBuildContextForTest
++};
 diff --git a/dist/build/qualification-entropy.js b/dist/build/qualification-entropy.js
 new file mode 100644
-index 0000000000000000000000000000000000000000..e4cefdf8693b3ada62d7d994821f6cfe82fac5f0
+index 0000000..6811428
 --- /dev/null
 +++ b/dist/build/qualification-entropy.js
-@@ -0,0 +1,44 @@
+@@ -0,0 +1,64 @@
 +import { AsyncLocalStorage } from "node:async_hooks";
 +import { createHmac } from "node:crypto";
 +
@@ -59,19 +74,39 @@ index 0000000000000000000000000000000000000000..e4cefdf8693b3ada62d7d994821f6cfe
 +]);
 +const qualificationDomainPrefix = Buffer.from("vinext/qualification-build/v1\0", "utf8");
 +
-+async function runWithQualificationBuildContext(context, callback) {
++async function runWithQualificationBuildContextInternal(context, callback, observeZeroized) {
 +	if (!Buffer.isBuffer(context) || context.length !== 32) {
 +		throw new Error("internal qualification build context must contain exactly 32 bytes");
 +	}
-+	if (qualificationBuildContextStorage.getStore()) {
-+		throw new Error("internal qualification build context is already active");
-+	}
-+	const retainedContext = Buffer.from(context);
++	let retainedContext;
 +	try {
++		if (qualificationBuildContextStorage.getStore()) {
++			throw new Error("internal qualification build context is already active");
++		}
++		retainedContext = Buffer.from(context);
 +		return await qualificationBuildContextStorage.run(retainedContext, callback);
 +	} finally {
-+		retainedContext.fill(0);
++		context.fill(0);
++		if (retainedContext) {
++			retainedContext.fill(0);
++			observeZeroized?.({ inputContext: context, retainedContext });
++		}
 +	}
++}
++
++function runWithQualificationBuildContext(context, callback) {
++	return runWithQualificationBuildContextInternal(context, callback);
++}
++
++function runWithQualificationBuildContextForTest(context, callback, observeZeroized) {
++	if (typeof observeZeroized !== "function") {
++		throw new Error("internal qualification build zeroization observer must be a function");
++	}
++	return runWithQualificationBuildContextInternal(context, callback, observeZeroized);
++}
++
++function qualificationBuildActive() {
++	return qualificationBuildContextStorage.getStore() !== void 0;
 +}
 +
 +function qualificationBuildHex(domain) {
@@ -87,16 +122,16 @@ index 0000000000000000000000000000000000000000..e4cefdf8693b3ada62d7d994821f6cfe
 +		.toString("hex");
 +}
 +//#endregion
-+export { qualificationBuildHex, runWithQualificationBuildContext };
++export { qualificationBuildActive, qualificationBuildHex, runWithQualificationBuildContext, runWithQualificationBuildContextForTest };
 diff --git a/dist/cli.js b/dist/cli.js
-index 8d4777454467f52e0c257aac4f09a7ad315670e9..886e0a5aa123dc0194684da16d826547afa0dbd0 100755
+index 8d47774..b9e9969 100755
 --- a/dist/cli.js
 +++ b/dist/cli.js
 @@ -9,6 +9,7 @@ import { createRscCompatibilityId, findVinextNextConfigInPlugins, loadNextConfig
  import { generateRouteTypes } from "./typegen.js";
  import { clearPagesClientAssetsBuildMetadata } from "./build/pages-client-assets-module.js";
  import { runWithPreviewBuildCredentials } from "./build/preview-credentials.js";
-+import { qualificationBuildHex, runWithQualificationBuildContext } from "./build/qualification-entropy.js";
++import { qualificationBuildActive, qualificationBuildHex, runWithQualificationBuildContext } from "./build/qualification-entropy.js";
  import { findVinextPrerenderConfigInPlugins, findVinextRouteRootConfigInPlugins, formatVinextPrerenderLabel, resolveVinextPrerenderDecision } from "./config/prerender.js";
  import vinext from "./index.js";
  import { runPrerender } from "./build/run-prerender.js";
@@ -132,27 +167,127 @@ index 8d4777454467f52e0c257aac4f09a7ad315670e9..886e0a5aa123dc0194684da16d826547
  	if (pagesClientAssetsBuildSession) process.env.__VINEXT_PAGES_CLIENT_ASSETS_BUILD_SESSION = pagesClientAssetsBuildSession;
  	await runWithPreviewBuildCredentials(async () => {
  		try {
-@@ -405,6 +411,19 @@ async function buildApp() {
- 	console.log("\n  Build complete. Run `vinext start` to start the production server.\n");
- 	process.exit(0);
- }
+@@ -365,44 +371,76 @@ async function buildApp() {
+-	if (outputMode === "standalone") {
+-		const standalone = emitStandaloneOutput({
+-			root: process.cwd(),
+-			outDir: distDir
+-		});
+-		console.log(`  Generated standalone output in ${path.relative(process.cwd(), standalone.standaloneDir)}/`);
+-		console.log("  Start it with: node dist/standalone/server.js\n");
+-		return process.exit(0);
+-	}
+-	let prerenderResult;
+-	const prerenderDecision = resolveVinextPrerenderDecision({
+-		prerenderAllFlag: parsed.prerenderAll,
+-		vinextPrerenderConfig: buildConfigMetadata.prerenderConfig,
+-		nextOutput: resolvedNextConfig.output
+-	});
+-	if (prerenderDecision) {
+-		if (resolvedNextConfig.enablePrerenderSourceMaps) {
+-			process.setSourceMapsEnabled(true);
+-			Error.stackTraceLimit = Math.max(Error.stackTraceLimit, 50);
+-		}
+-		process.stdout.write("\x1B[0m");
+-		console.log(`  ${formatVinextPrerenderLabel(prerenderDecision)}`);
+-		prerenderResult = await runPrerender({
+-			root,
+-			concurrency: parsed.prerenderConcurrency,
+-			nextConfig: resolvedNextConfig
+-		});
+-		await emitPrerenderPathManifest({
+-			root,
+-			nextConfig: resolvedNextConfig,
+-			routeRootConfig: buildConfigMetadata.routeRootConfig
+-		});
+-	}
+-	process.stdout.write("\x1B[0m");
+-	const { printBuildReport } = await import("./build/report.js");
+-	await printBuildReport({
+-		root,
+-		pageExtensions: resolvedNextConfig.pageExtensions,
+-		prerenderResult: prerenderResult ?? void 0
+-	});
+-	console.log("\n  Build complete. Run `vinext start` to start the production server.\n");
+-	process.exit(0);
+-}
++	if (outputMode === "standalone") {
++		const standalone = emitStandaloneOutput({
++			root: process.cwd(),
++			outDir: distDir
++		});
++		console.log(`  Generated standalone output in ${path.relative(process.cwd(), standalone.standaloneDir)}/`);
++		console.log("  Start it with: node dist/standalone/server.js\n");
++		if (qualificationBuildActive()) return;
++		return process.exit(0);
++	}
++	let prerenderResult;
++	const prerenderDecision = resolveVinextPrerenderDecision({
++		prerenderAllFlag: parsed.prerenderAll,
++		vinextPrerenderConfig: buildConfigMetadata.prerenderConfig,
++		nextOutput: resolvedNextConfig.output
++	});
++	if (prerenderDecision) {
++		if (resolvedNextConfig.enablePrerenderSourceMaps) {
++			process.setSourceMapsEnabled(true);
++			Error.stackTraceLimit = Math.max(Error.stackTraceLimit, 50);
++		}
++		process.stdout.write("\x1B[0m");
++		console.log(`  ${formatVinextPrerenderLabel(prerenderDecision)}`);
++		prerenderResult = await runPrerender({
++			root,
++			concurrency: parsed.prerenderConcurrency,
++			nextConfig: resolvedNextConfig
++		});
++		await emitPrerenderPathManifest({
++			root,
++			nextConfig: resolvedNextConfig,
++			routeRootConfig: buildConfigMetadata.routeRootConfig
++		});
++	}
++	process.stdout.write("\x1B[0m");
++	const { printBuildReport } = await import("./build/report.js");
++	await printBuildReport({
++		root,
++		pageExtensions: resolvedNextConfig.pageExtensions,
++		prerenderResult: prerenderResult ?? void 0
++	});
++	console.log("\n  Build complete. Run `vinext start` to start the production server.\n");
++	if (qualificationBuildActive()) return;
++	process.exit(0);
++}
++
++function readQualificationBuildContext() {
++	const boundedInput = Buffer.alloc(33);
++	let byteLength = 0;
++	try {
++		while (byteLength < boundedInput.length) {
++			const bytesRead = fs.readSync(0, boundedInput, byteLength, boundedInput.length - byteLength, null);
++			if (bytesRead === 0) break;
++			byteLength += bytesRead;
++		}
++		if (byteLength !== 32) {
++			throw new Error("internal qualification build context must contain exactly 32 bytes");
++		}
++		return Buffer.from(boundedInput.subarray(0, byteLength));
++	} finally {
++		boundedInput.fill(0);
++	}
++}
 +
 +async function runBuildCommand() {
 +	if (qualificationBuildFlagCount === 0) return buildApp();
 +	if (qualificationBuildFlagCount !== 1) throw new Error("internal qualification build flag must appear exactly once");
 +	if (rawArgs.includes("--help") || rawArgs.includes("-h")) return buildApp();
-+	const context = fs.readFileSync(0);
++	const context = readQualificationBuildContext();
 +	try {
-+		if (context.length !== 32) throw new Error("internal qualification build context must contain exactly 32 bytes");
 +		return await runWithQualificationBuildContext(context, buildApp);
 +	} finally {
 +		context.fill(0);
 +	}
 +}
  async function start() {
- 	const parsed = parseArgs(rawArgs);
- 	if (parsed.help) return printHelp("start");
-@@ -691,6 +710,10 @@ if (command === "--help" || command === "-h" || !command) {
+@@ -691,6 +729,10 @@ if (command === "--help" || command === "-h" || !command) {
  	printHelp();
  	process.exit(0);
  }
@@ -163,7 +298,7 @@ index 8d4777454467f52e0c257aac4f09a7ad315670e9..886e0a5aa123dc0194684da16d826547
  switch (command) {
  	case "dev":
  		dev().catch((e) => {
-@@ -699,7 +722,7 @@ switch (command) {
+@@ -699,7 +741,7 @@ switch (command) {
  		});
  		break;
  	case "build":
@@ -173,7 +308,7 @@ index 8d4777454467f52e0c257aac4f09a7ad315670e9..886e0a5aa123dc0194684da16d826547
  			process.exit(1);
  		});
 diff --git a/dist/entries/app-rsc-entry.js b/dist/entries/app-rsc-entry.js
-index 301a3871e22ea48f8009904f13277310302c26c3..2a9914d0f5ec90ff1364a496e89e20c4231a9000 100644
+index 301a387..2a9914d 100644
 --- a/dist/entries/app-rsc-entry.js
 +++ b/dist/entries/app-rsc-entry.js
 @@ -5,6 +5,7 @@ import { DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "../server/image-optim
@@ -202,7 +337,7 @@ index 301a3871e22ea48f8009904f13277310302c26c3..2a9914d0f5ec90ff1364a496e89e20c4
        isDataRequest,
        isProxy: ${JSON.stringify(isProxyFile(middlewarePath))},
 diff --git a/dist/index.js b/dist/index.js
-index 17e5e14c9a8e4e58dd9e242130bafda41e40ab16..b85c61aa3c0b4a2197ad80a4b447ccd318fd0aab 100644
+index 17e5e14..b85c61a 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -38,6 +38,7 @@ import { VIRTUAL_IMAGE_ADAPTERS, generateImageAdaptersModule } from "./image/ima

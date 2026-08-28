@@ -1,17 +1,21 @@
 {
-  "version": "os01-census-trusted-targets.2026.1",
+  "version": "os01-census-trusted-targets.2026.2",
   "targets": {
     "production": {
       "enabled": true,
       "projectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
       "origin": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site",
-      "accessMode": "production"
+      "accessMode": "production",
+      "d1Binding": "DB",
+      "r2Binding": "EVIDENCE"
     },
     "staging": {
       "enabled": true,
       "projectId": "appgprj_6a90219f9cb081918f5123f29c82bcbf",
       "origin": "https://nfl-engine-os01-census-20260827.psoiawesome.chatgpt.site",
-      "accessMode": "owner_only"
+      "accessMode": "owner_only",
+      "d1Binding": "DB",
+      "r2Binding": null
     }
   }
 }

@@ -95,21 +95,21 @@ function sqliteD1(sqlite: DatabaseSync): D1Database {
 function database(): { sqlite: DatabaseSync; d1: D1Database } {
   const sqlite = new DatabaseSync(":memory:");
   sqlite.exec(`
-    CREATE TABLE sample (
+    CREATE TABLE plays (
       id INTEGER NOT NULL,
       nullable TEXT,
       real_value REAL,
       text_value TEXT,
       blob_value BLOB
     );
-    CREATE INDEX sample_id_index ON sample (id);
-    CREATE TRIGGER sample_no_update BEFORE UPDATE ON sample BEGIN SELECT RAISE(ABORT, 'append-only'); END;
-    CREATE VIEW sample_view AS SELECT id FROM sample;
+    CREATE INDEX plays_id_index ON plays (id);
+    CREATE TRIGGER plays_no_update BEFORE UPDATE ON plays BEGIN SELECT RAISE(ABORT, 'append-only'); END;
+    CREATE VIEW plays_view AS SELECT id FROM plays;
     CREATE TABLE engine_schema_versions (version TEXT PRIMARY KEY, migration_hash TEXT NOT NULL, applied_at TEXT NOT NULL);
     CREATE TABLE odds_quota_state (provider TEXT PRIMARY KEY, used INTEGER NOT NULL, remaining INTEGER NOT NULL, last_cost INTEGER NOT NULL, updated_at TEXT NOT NULL);
     CREATE TABLE odds_quota_reservations (request_key TEXT PRIMARY KEY, state TEXT NOT NULL);
     CREATE TABLE odds_quota_reservation_events (event_id TEXT PRIMARY KEY);
-    INSERT INTO sample VALUES
+    INSERT INTO plays VALUES
       (1, NULL, 1.25, 'DO_NOT_EXPOSE_SENTINEL', X'00FF'),
       (1, NULL, 1.25, 'DO_NOT_EXPOSE_SENTINEL', X'00FF'),
       (2, 'present', -0.0, 'snowman ☃', X'');
@@ -251,8 +251,8 @@ describe("OS-01 production census operator", () => {
     expect(json.payloadMac).toMatch(/^[a-f0-9]{64}$/u);
     const payload = json.payload as { catalog: Array<{ name: string }> };
     expect(payload.catalog.length).toBeGreaterThan(50);
-    expect(payload.catalog.some((entry) => entry.name === "sample")).toBe(true);
-    expect(payload.catalog.some((entry) => entry.name === "sample_view")).toBe(true);
+    expect(payload.catalog.some((entry) => entry.name === "plays")).toBe(true);
+    expect(payload.catalog.some((entry) => entry.name === "plays_view")).toBe(true);
     expect(JSON.stringify(json)).not.toContain("CREATE TABLE");
     expect(json.queryStats).toMatchObject({ rowsWritten: 0, changes: 0, changedDb: false });
   });
@@ -264,7 +264,7 @@ describe("OS-01 production census operator", () => {
       operation: "schema_object",
       continuation: continuation(begin.json),
       type: "table",
-      name: "sample"
+      name: "plays"
     });
     expect(schema.response.status).toBe(200);
     expect((schema.json.payload as { semanticHash: string }).semanticHash).toMatch(/^[a-f0-9]{64}$/u);
@@ -272,24 +272,22 @@ describe("OS-01 production census operator", () => {
     const start = await invoke(d1, {
       operation: "table_start",
       continuation: continuation(schema.json),
-      table: "sample"
+      table: "plays"
     });
     const startPayload = start.json.payload as { columnsHash: string; rowCount: number };
     expect(startPayload.rowCount).toBe(3);
     const page = await invoke(d1, {
       operation: "table_page",
       continuation: continuation(start.json),
-      table: "sample",
+      table: "plays",
       columnsHash: startPayload.columnsHash,
       offset: 0,
       limit: 128
     });
     expect(page.response.status).toBe(200);
     expect(page.json.payload).toMatchObject({ rowCount: 3, done: true });
-    const pagePayload = page.json.payload as { pageHash: string; rowHashes: string[] };
-    expect(pagePayload.pageHash).toMatch(/^[a-f0-9]{64}$/u);
-    expect(pagePayload.rowHashes).toHaveLength(3);
-    expect(pagePayload.rowHashes.every((value) => /^[a-f0-9]{64}$/u.test(value))).toBe(true);
+    const pagePayload = page.json.payload as { pageMac: string };
+    expect(pagePayload.pageMac).toMatch(/^[a-f0-9]{64}$/u);
     const serialized = JSON.stringify(page.json);
     expect(serialized).not.toContain("DO_NOT_EXPOSE_SENTINEL");
     expect(serialized).not.toContain("snowman");
@@ -298,7 +296,7 @@ describe("OS-01 production census operator", () => {
     const finish = await invoke(d1, {
       operation: "table_finish",
       continuation: continuation(page.json),
-      table: "sample",
+      table: "plays",
       columnsHash: startPayload.columnsHash
     });
     expect(finish.json.payload).toMatchObject({ rowCount: 3, columnsHash: startPayload.columnsHash });
@@ -311,13 +309,13 @@ describe("OS-01 production census operator", () => {
     const start = await invoke(d1, {
       operation: "table_start",
       continuation: continuation(begin.json),
-      table: "sample"
+      table: "plays"
     });
     const columnsHash = String((start.json.payload as Record<string, unknown>).columnsHash);
     const pageRequest = {
       operation: "table_page",
       continuation: continuation(start.json),
-      table: "sample",
+      table: "plays",
       columnsHash,
       offset: 0,
       limit: 2
@@ -342,7 +340,7 @@ describe("OS-01 production census operator", () => {
       (value.payload as Record<string, unknown>).offset = 1;
     });
     expectRehashedMutationFailsMac(page.json, (value) => {
-      (value.payload as Record<string, unknown>).pageHash = "0".repeat(64);
+      (value.payload as Record<string, unknown>).pageMac = "0".repeat(64);
     });
 
     const changedContinuation = structuredClone(page.json);
@@ -361,13 +359,13 @@ describe("OS-01 production census operator", () => {
     const start = await invoke(d1, {
       operation: "table_start",
       continuation: continuation(begin.json),
-      table: "sample"
+      table: "plays"
     });
     const columnsHash = String((start.json.payload as Record<string, unknown>).columnsHash);
     const base = {
       operation: "table_page",
       continuation: continuation(start.json),
-      table: "sample",
+      table: "plays",
       columnsHash
     };
     for (const offset of [-1, 0.5, "0", Number.MAX_SAFE_INTEGER + 1]) {
@@ -384,19 +382,19 @@ describe("OS-01 production census operator", () => {
 
   it("fails closed when one canonical row or aggregate page exceeds its byte boundary", async () => {
     const { sqlite, d1 } = database();
-    sqlite.exec("CREATE TABLE oversized_rows (id INTEGER NOT NULL, payload BLOB NOT NULL)");
-    sqlite.prepare("INSERT INTO oversized_rows VALUES (?, ?)")
+    sqlite.exec("DROP VIEW plays_view; DROP TRIGGER plays_no_update; DROP INDEX plays_id_index; DELETE FROM plays");
+    sqlite.prepare("INSERT INTO plays (id, nullable, real_value, text_value, blob_value) VALUES (?, NULL, 0, '', ?)")
       .run(1, new Uint8Array(900_001));
     let begin = await invoke(d1, { operation: "begin", passNonce: "c".repeat(32) });
     let start = await invoke(d1, {
       operation: "table_start",
       continuation: continuation(begin.json),
-      table: "oversized_rows"
+      table: "plays"
     });
     let result = await invoke(d1, {
       operation: "table_page",
       continuation: continuation(start.json),
-      table: "oversized_rows",
+      table: "plays",
       columnsHash: String((start.json.payload as Record<string, unknown>).columnsHash),
       offset: 0,
       limit: 1
@@ -404,20 +402,22 @@ describe("OS-01 production census operator", () => {
     expect(result.response.status).toBe(413);
     expect(result.json).toEqual({ error: "canonical_row_too_large" });
 
-    sqlite.exec("DELETE FROM oversized_rows");
-    const insert = sqlite.prepare("INSERT INTO oversized_rows VALUES (?, ?)");
+    sqlite.exec("DELETE FROM plays");
+    const insert = sqlite.prepare(
+      "INSERT INTO plays (id, nullable, real_value, text_value, blob_value) VALUES (?, NULL, 0, '', ?)"
+    );
     insert.run(1, new Uint8Array(500_000));
     insert.run(2, new Uint8Array(500_000));
     begin = await invoke(d1, { operation: "begin", passNonce: "d".repeat(32) });
     start = await invoke(d1, {
       operation: "table_start",
       continuation: continuation(begin.json),
-      table: "oversized_rows"
+      table: "plays"
     });
     result = await invoke(d1, {
       operation: "table_page",
       continuation: continuation(start.json),
-      table: "oversized_rows",
+      table: "plays",
       columnsHash: String((start.json.payload as Record<string, unknown>).columnsHash),
       offset: 0,
       limit: 2
@@ -513,43 +513,60 @@ describe("OS-01 production census operator", () => {
     expect((await invoke(d1, {
       operation: "table_start",
       continuation: tampered,
-      table: "sample"
+      table: "plays"
     })).response.status).toBe(400);
     expect((await invoke(d1, {
       operation: "table_start",
       continuation: original,
-      table: 'sample"; DROP TABLE sample;--'
-    })).response.status).toBe(409);
-    expect(sqlite.prepare("SELECT COUNT(*) AS count FROM sample").get()).toMatchObject({ count: 3 });
+      table: 'plays"; DROP TABLE plays;--'
+    })).response.status).toBe(403);
+    expect(sqlite.prepare("SELECT COUNT(*) AS count FROM plays").get()).toMatchObject({ count: 3 });
   });
 
   it("hashes generated columns but rejects virtual-table implementation columns", async () => {
     const { sqlite, d1 } = database();
     sqlite.exec(`
-      CREATE TABLE generated_sample (
+      DROP VIEW plays_view;
+      DROP TRIGGER plays_no_update;
+      DROP INDEX plays_id_index;
+      DROP TABLE plays;
+      CREATE TABLE plays (
         source INTEGER NOT NULL,
         doubled INTEGER GENERATED ALWAYS AS (source * 2) STORED
       );
-      INSERT INTO generated_sample (source) VALUES (4);
-      CREATE VIRTUAL TABLE virtual_sample USING fts5(content);
+      INSERT INTO plays (source) VALUES (4);
     `);
     const begin = await invoke(d1, { operation: "begin", passNonce: "9".repeat(32) });
     const generated = await invoke(d1, {
       operation: "table_start",
       continuation: continuation(begin.json),
-      table: "generated_sample"
+      table: "plays"
     });
     expect(generated.response.status).toBe(200);
     expect((generated.json.payload as { columns: Array<{ hidden: number }> }).columns)
       .toEqual(expect.arrayContaining([expect.objectContaining({ hidden: 3 })]));
-    const virtual = await invoke(d1, {
+    sqlite.close();
+
+    const virtualDatabase = database();
+    virtualDatabase.sqlite.exec(`
+      DROP VIEW plays_view;
+      DROP TRIGGER plays_no_update;
+      DROP INDEX plays_id_index;
+      DROP TABLE plays;
+      CREATE VIRTUAL TABLE plays USING fts5(content);
+    `);
+    const virtualBegin = await invoke(
+      virtualDatabase.d1,
+      { operation: "begin", passNonce: "8".repeat(32) }
+    );
+    const virtual = await invoke(virtualDatabase.d1, {
       operation: "table_start",
-      continuation: continuation(generated.json),
-      table: "virtual_sample"
+      continuation: continuation(virtualBegin.json),
+      table: "plays"
     });
     expect(virtual.response.status).toBe(409);
     expect(virtual.json).toEqual({ error: "unsupported_table_shape" });
-    sqlite.close();
+    virtualDatabase.sqlite.close();
   });
 
   it("contains no write, provider, scheduler, R2, network, or whole-environment capability", () => {

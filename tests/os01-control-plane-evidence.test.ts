@@ -7,6 +7,7 @@ import {
   projectEnvironmentMetadata,
   projectLogicalDatabase,
   projectOwnerOnlyAccess,
+  projectPublicProductionAccess,
   projectSavedVersion,
   validateControlPlaneEnvelope,
   validateEnvironmentLifecycle,
@@ -24,6 +25,13 @@ const origin = "https://os01-owner-only.example.test";
 const sourceCommit = "a".repeat(40);
 const sourceAnchor = "b".repeat(64);
 const now = Date.parse("2026-08-27T12:00:00.000Z");
+const lifecycleRunId = "os01-control-run-0001";
+const lifecycleBoundary = {
+  runId: lifecycleRunId,
+  startedAt: "2026-08-27T11:49:00.000Z",
+  expiresAt: "2026-08-27T12:01:00.000Z",
+  nowMs: now
+};
 
 function trap(target: Record<string, unknown>, key: string): void {
   Object.defineProperty(target, key, {
@@ -132,6 +140,7 @@ function environmentProjections(): {
 function lifecycle(): LifecycleEvent[] {
   return os01ControlPlaneContract.phases.map((phase, index) => ({
     phase,
+    runId: lifecycleRunId,
     observedAt: new Date(Date.parse("2026-08-27T11:50:00.000Z") + index * 30_000).toISOString()
   }));
 }
@@ -159,15 +168,39 @@ function projections(): {
     { observedAt: observedAt(10), projectId, versionId: "tombstone-version", origin, nowMs: now }
   );
   const uploader: TrustedUploaderAssertion = {
-    version: os01ControlPlaneContract.version,
+    version: os01ControlPlaneContract.trustedUploaderAssertionVersion,
     observedAt: observedAt(55),
     sourceCommit,
     versionId: version.versionId,
     localArchiveSha256: "d".repeat(64),
+    localArchiveBytes: 100,
+    localArchiveFileListRoot: "f".repeat(64),
+    localArchiveFileCount: 3,
     localPackageContentRoot: "e".repeat(64),
     sitesArchiveContentHash: version.archiveContentHash,
+    uploadMethod: "sites_save_site_version_exact_local_archive",
+    remoteBuildRequested: false,
+    sourceBranch: "main",
+    sourceHeadBefore: "c".repeat(40),
+    sourcePushExpectedOld: "c".repeat(40),
+    sourceHeadAfter: sourceCommit,
+    sourceCompareAndSwapApplied: true,
+    mutationIntentHash: "9".repeat(64),
+    temporaryControlExpiresAt: observedAt(5),
+    temporaryControlAuthSha256: "a".repeat(64),
+    temporaryControlBuildAttestation: "b".repeat(64),
+    temporaryControlEnvironmentRevisionBefore: 1,
+    temporaryControlEnvironmentRevisionStaged: 2,
+    temporaryControlsSingleUpdate: true,
+    externalMutationSequence: [
+      "source_compare_and_swap",
+      "environment_controls_single_update",
+      "sites_save_exact_local_archive",
+      "temporary_publish"
+    ],
     trustBoundary: os01ControlPlaneContract.trustBoundary,
-    canonicalizationClaim: os01ControlPlaneContract.archiveCanonicalization
+    canonicalizationClaim: os01ControlPlaneContract.archiveCanonicalization,
+    archivePathBinding: os01ControlPlaneContract.archivePathBinding
   };
   return { access, environments, version, deployment, cleanupDeployment, uploader };
 }
@@ -206,7 +239,7 @@ describe("OS-01 Sites control-plane evidence", () => {
       },
       (raw: Record<string, unknown>) => {
         const policy = raw.access_policy as Record<string, unknown>;
-        policy.allowed_editors = [{ account_user_id: "editor-id", role: "editor" }];
+        policy.allowed_editors = [{ account_user_id: "editor-id", is_external: false, role: "editor" }];
       },
       (raw: Record<string, unknown>) => {
         const policy = raw.access_policy as Record<string, unknown>;
@@ -221,7 +254,68 @@ describe("OS-01 Sites control-plane evidence", () => {
       mutate(raw);
       expect(() => projectOwnerOnlyAccess(raw, {
         observedAt: observedAt(1), projectId, origin, nowMs: now
-      })).toThrow(/owner-only/u);
+      })).toThrow(/owner-only|principal identity/u);
+    }
+  });
+
+  it("rejects mismatched, duplicate, or external detailed owner principals", () => {
+    for (const mutate of [
+      (raw: Record<string, unknown>) => {
+        const policy = raw.access_policy as Record<string, unknown>;
+        policy.allowed_account_user_ids = ["different-owner-id"];
+      },
+      (raw: Record<string, unknown>) => {
+        const policy = raw.access_policy as Record<string, unknown>;
+        policy.allowed_account_user_ids = ["owner-account-id", "owner-account-id"];
+        policy.allowed_users = [
+          { account_user_id: "owner-account-id", is_external: false, role: "owner" },
+          { account_user_id: "owner-account-id", is_external: false, role: "owner" }
+        ];
+      },
+      (raw: Record<string, unknown>) => {
+        const policy = raw.access_policy as Record<string, unknown>;
+        policy.allowed_users = [
+          { account_user_id: "owner-account-id", is_external: true, role: "owner" }
+        ];
+      }
+    ]) {
+      const raw = accessRaw();
+      mutate(raw);
+      expect(() => projectOwnerOnlyAccess(raw, {
+        observedAt: observedAt(1), projectId, origin, nowMs: now
+      })).toThrow(/principal identity|external allowed owner/u);
+      expect(() => projectPublicProductionAccess(raw, {
+        observedAt: observedAt(1), projectId, origin, nowMs: now
+      })).toThrow(/principal identity|external allowed owner/u);
+    }
+  });
+
+  it("rejects missing or non-boolean external evidence and omitted editor or visitor fields", () => {
+    for (const mutate of [
+      (raw: Record<string, unknown>) => {
+        const policy = raw.access_policy as Record<string, unknown>;
+        const [owner] = policy.allowed_users as Array<Record<string, unknown>>;
+        delete owner!.is_external;
+      },
+      (raw: Record<string, unknown>) => {
+        const policy = raw.access_policy as Record<string, unknown>;
+        const [owner] = policy.allowed_users as Array<Record<string, unknown>>;
+        owner!.is_external = "false";
+      },
+      (raw: Record<string, unknown>) => {
+        const policy = raw.access_policy as Record<string, unknown>;
+        delete policy.allowed_editors;
+      },
+      (raw: Record<string, unknown>) => {
+        const policy = raw.access_policy as Record<string, unknown>;
+        delete policy.external_visitor_count;
+      }
+    ]) {
+      const raw = accessRaw();
+      mutate(raw);
+      expect(() => projectOwnerOnlyAccess(raw, {
+        observedAt: observedAt(1), projectId, origin, nowMs: now
+      })).toThrow(/invalid|not an array/u);
     }
   });
 
@@ -243,6 +337,21 @@ describe("OS-01 Sites control-plane evidence", () => {
     expect(() => validateEnvironmentLifecycle(valid.before, valid.staged, {
       ...valid.after, revision: valid.staged.revision
     })).toThrow(/environment lifecycle/u);
+  });
+
+  it("rejects projections that omit or alter the value-observation trust boundary", () => {
+    const valid = environmentProjections();
+    expect(() => validateEnvironmentLifecycle(valid.before, {
+      ...valid.staged,
+      valueObservation: "observed" as never
+    }, valid.after)).toThrow(/environment lifecycle is invalid/u);
+    const missing = { ...valid.after } as Record<string, unknown>;
+    delete missing.unrelatedValuePreservationBasis;
+    expect(() => validateEnvironmentLifecycle(
+      valid.before,
+      valid.staged,
+      missing as EnvironmentProjection
+    )).toThrow(/environment lifecycle is invalid/u);
   });
 
   it("binds saved versions and deployments to source, project, origin, version, and environment revision", () => {
@@ -294,7 +403,14 @@ describe("OS-01 Sites control-plane evidence", () => {
 
   it("keeps local package identity separate from opaque Sites canonicalization", () => {
     const value = projections();
-    expect(() => validateTrustedUploaderAssertion(value.uploader, value.version)).not.toThrow();
+    const local = {
+      archiveSha256: value.uploader.localArchiveSha256,
+      archiveBytes: value.uploader.localArchiveBytes,
+      fileListRoot: value.uploader.localArchiveFileListRoot,
+      fileCount: value.uploader.localArchiveFileCount,
+      packageContentRoot: value.uploader.localPackageContentRoot
+    };
+    expect(() => validateTrustedUploaderAssertion(value.uploader, value.version, local)).not.toThrow();
     expect(() => validateTrustedUploaderAssertion({
       ...value.uploader,
       canonicalizationClaim: "local_hash_equals_sites_hash"
@@ -303,21 +419,41 @@ describe("OS-01 Sites control-plane evidence", () => {
       ...value.uploader,
       sitesArchiveContentHash: `sha256:${value.uploader.localArchiveSha256}`
     }, value.version)).toThrow(/uploader assertion/u);
+    expect(() => validateTrustedUploaderAssertion({
+      ...value.uploader,
+      remoteBuildRequested: true as false
+    }, value.version)).toThrow(/uploader assertion/u);
+    expect(() => validateTrustedUploaderAssertion(value.uploader, value.version, {
+      ...local,
+      archiveSha256: "0".repeat(64)
+    })).toThrow(/inspected local archive/u);
+    expect(() => validateTrustedUploaderAssertion({
+      ...value.uploader,
+      unexpected: true
+    } as unknown as TrustedUploaderAssertion, value.version)).toThrow(/unexpected fields/u);
   });
 
   it("classifies every incomplete post-control crash as cleanup-required", () => {
     const complete = lifecycle();
-    expect(classifyLifecycle(complete)).toBe("accepted");
-    expect(classifyLifecycle(complete.slice(0, 2))).toBe("incomplete");
+    expect(classifyLifecycle(complete, lifecycleBoundary)).toBe("accepted");
+    expect(classifyLifecycle(complete.slice(0, 2), lifecycleBoundary)).toBe("incomplete");
     for (let length = 3; length < complete.length; length += 1) {
-      expect(classifyLifecycle(complete.slice(0, length))).toBe("rejected_cleanup_required");
+      expect(classifyLifecycle(complete.slice(0, length), lifecycleBoundary)).toBe("rejected_cleanup_required");
     }
     expect(() => classifyLifecycle([
       complete[0]!, complete[2]!
-    ])).toThrow(/out of order/u);
+    ], lifecycleBoundary)).toThrow(/out of order/u);
     expect(() => classifyLifecycle([
       complete[0]!, { ...complete[1]!, observedAt: "2026-08-27T11:49:00.000Z" }
-    ])).toThrow(/moved backward/u);
+    ], lifecycleBoundary)).toThrow(/outside its boundary/u);
+    expect(() => classifyLifecycle(complete, {
+      ...lifecycleBoundary,
+      startedAt: "1970-01-01T00:00:00.000Z",
+      expiresAt: "1970-01-01T01:00:00.000Z"
+    })).toThrow(/expired/u);
+    expect(() => classifyLifecycle(complete.map((event, index) => index === 1
+      ? { ...event, runId: "os01-control-run-replayed" }
+      : event), lifecycleBoundary)).toThrow(/run identity/u);
   });
 
   it("accepts only a closed owner-only bridge, census, and tombstone cleanup envelope", () => {
@@ -346,6 +482,7 @@ describe("OS-01 Sites control-plane evidence", () => {
       database,
       uploader: value.uploader,
       lifecycle: lifecycle(),
+      lifecycleBoundary,
       operator: {
         status: "accepted_two_identical_read_only_passes",
         buildAttestation: sourceAnchor,

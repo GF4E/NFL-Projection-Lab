@@ -1,0 +1,23 @@
+{
+  "version": "os01-history-quarantine.2026.1",
+  "scannerVersion": "security-scan.2026.2",
+  "scannerSha256": "4d4c47940d6fbb3236d35ead1e77c4da4cf4ab44117529470ddab235b6eb5eca",
+  "status": "bounded_quarantined_unknown",
+  "packageBoundary": "OS-01_provider_free_only",
+  "providerUseAllowed": false,
+  "qualifiesGitHistoryCredentialClean": false,
+  "ownerRotationContext": "owner_attested_replacement_key_rotated_before_os01",
+  "ownerRotationContextIsBlobProof": false,
+  "entries": [
+    {
+      "blob": "a9b792dff54534a2b3998d51cbda5e8af7353fd6",
+      "scope": "git_history",
+      "path": "tests/source-capture-contract.test.ts",
+      "line": 104,
+      "rule": "query_string_credential",
+      "category": "credential",
+      "severity": "blocker",
+      "status": "quarantined_unknown"
+    }
+  ]
+}

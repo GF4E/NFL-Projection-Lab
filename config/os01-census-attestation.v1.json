@@ -1,17 +1,22 @@
 {
-  "version": "os01-census-attestation.2026.2",
+  "version": "os01-census-attestation.2026.14",
   "sourceTreeIdentityVersion": "os01-census-source-tree.2026.1",
-  "sourceAnchorInputVersion": "os01-census-source-anchor.2026.5",
+  "sourceAnchorInputVersion": "os01-census-source-anchor.2026.17",
   "generatedAnchorPath": "worker/os01-census-source-anchor.ts",
   "requiredImplementationToDeploymentDiff": [
     "worker/os01-census-source-anchor.ts"
   ],
   "bridgeFoundation": {
-    "version": "os01-census-bridge-foundation.2026.2",
+    "version": "os01-census-bridge-foundation.2026.4",
     "liveBaseCommit": "e8c3b23dc0bd59b66099fd08c52dd39ae23f65bd",
     "implementationCommitCount": 1,
+    "requiredImplementationCommit": "2977c9e8cb6ead16b37ec926e35c93d5fb89c04f",
+    "requiredImplementationTreeObjectId": "aa44004fe32eec464d543aa337560f46fe4faf36",
+    "requiredImplementationArchiveSha256": "42e26efccc5d97c79c595171b90875408e469fe58a56cb5fea331cbeb0612be7",
+    "requiredImplementationArchiveBytes": 9820160,
     "requiredLiveBaseToImplementationNameStatus": [
       { "status": "M", "path": "next.config.ts" },
+      { "status": "M", "path": "package.json" },
       { "status": "A", "path": "patches/vinext@1.0.0-beta.2.patch" },
       { "status": "M", "path": "pnpm-lock.yaml" },
       { "status": "M", "path": "pnpm-workspace.yaml" },
@@ -30,7 +35,7 @@
     "retainedRuntimeBridgePath": "worker/site-runtime.ts"
   },
   "authorityBridgeCodeRelation": {
-    "version": "os01-census-authority-bridge-code-relation.2026.2",
+    "version": "os01-census-authority-bridge-code-relation.2026.3",
     "exactEqualPaths": [
       "patches/vinext@1.0.0-beta.2.patch",
       "pnpm-workspace.yaml",
@@ -47,7 +52,7 @@
     "requiredNameStatus": "M"
   },
   "buildIdentity": {
-    "version": "os01-census-build-identity.2026.3",
+    "version": "os01-census-build-identity.2026.13",
     "distPath": "dist",
     "builtWorkerPath": "dist/server/index.js",
     "serverManifestPath": "dist/server/.vite/manifest.json",
@@ -64,16 +69,126 @@
     "sitesArchiveHashPrefix": "sha256:",
     "localArchiveFormat": "tar.gz",
     "sitesArchiveFormat": "tar",
+    "localArchivePackaging": {
+      "version": "os01-local-archive-packaging.2026.2",
+      "scriptPath": "scripts/package_os01_site_archive.py",
+      "scriptSha256": "005a34eda541ee347cfd1cff844336e52e3f5a03f48b7fec6eb007ba26ea6918",
+      "tarFormat": "pax",
+      "gzipMtime": 0,
+      "independentBuildCount": 2,
+      "exactByteMatchRequired": true
+    },
     "qualificationBuild": {
-      "version": "os01-vinext-qualification-build.2026.1",
+      "version": "os01-vinext-qualification-build.2026.2",
       "modeFlag": "--internal-qualification-build-context-stdin",
-      "contextDerivation": "sha256_stable_json_public_owner_only_context_v1",
-      "contextDomain": "nfl-projection-lab/os01-vinext-qualification-build/v1",
+      "contextDerivation": "owner_only_sha256_or_production_hmac_sha256_v2",
+      "contextDomain": "nfl-projection-lab/os01/build-context/v2",
+      "seedCommitmentDomain": "nfl-projection-lab/os01/master-seed-commitment/v1",
+      "contextCommitmentDomain": "nfl-projection-lab/os01/context-commitment/v1",
+      "vinextCredentialDomainPrefix": "vinext/qualification-build/v1",
+      "derivedCredentialDomains": [
+        { "domain": "pages-client-assets-build-session", "bytes": 16 },
+        { "domain": "prerender-secret", "bytes": 32 },
+        { "domain": "preview-mode-encryption-key", "bytes": 32 },
+        { "domain": "preview-mode-id", "bytes": 16 },
+        { "domain": "preview-mode-signing-key", "bytes": 32 },
+        { "domain": "shared-revalidate-secret", "bytes": 32 }
+      ],
       "patchPath": "patches/vinext@1.0.0-beta.2.patch",
-      "patchSha256": "c4024d3c75af62888e0842ac583fb9bd6e4088ecf9e84eda45e2c0ed8b409958",
-      "pnpmPatchHash": "c4024d3c75af62888e0842ac583fb9bd6e4088ecf9e84eda45e2c0ed8b409958",
+      "patchSha256": "2ad276eb7bcc894f98c12e28c9614a790ab9771b697071971b441c7d5ef58ba8",
+      "pnpmPatchHash": "2ad276eb7bcc894f98c12e28c9614a790ab9771b697071971b441c7d5ef58ba8",
       "vinextVersion": "1.0.0-beta.2",
-      "patchedRuntimeRoot": "99dbb137540346e3c6549db1291beda4a3f5b4fc6014e1d022dd28a125702527",
+      "installedToolchainClosureVersion": "os01-build-toolchain-evidence.v4",
+      "installedToolchainClosureRoot": "139a4448086f6e955de8ff32cfe26fa11464b89cd9597e2bc8c7b367e79eb6fc",
+      "installedToolchainPackageCount": 580,
+      "platformIdentity": {
+        "architecture": "arm64",
+        "bytes": 603,
+        "darwinRelease": "25.6.0",
+        "darwinVersion": "Darwin Kernel Version 25.6.0: Fri Jul 31 19:18:53 PDT 2026; root:xnu-12377.161.14~5/RELEASE_ARM64_T6031",
+        "platform": "darwin",
+        "productBuildVersion": "25G82",
+        "productVersion": "26.6.2",
+        "sha256": "0986ce2fece7ecdff3be7dd191878aefff8256f0a55b4daaf9aacd56de48acbf",
+        "systemVersionPath": "/System/Library/CoreServices/SystemVersion.plist"
+      },
+      "authorityLoader": {
+        "fileCount": 4,
+        "files": [
+          {
+            "bytes": 121808,
+            "executable": true,
+            "path": "dist/cli.mjs",
+            "sha256": "fd00586b96028510c228365a4eeb1f163dac5245f1d0e40649969cf9560d376b"
+          },
+          {
+            "bytes": 743,
+            "executable": true,
+            "path": "dist/loader.mjs",
+            "sha256": "49fb46730ddeb226ac4fa9fb990d3573ac8f18fa4de02f1bf723c61d715710c2"
+          },
+          {
+            "bytes": 1169,
+            "executable": true,
+            "path": "dist/preflight.cjs",
+            "sha256": "20adebaefdd1f81383dabfc73db95630dbc11cb80144c092b1f2be4f64e99e81"
+          },
+          {
+            "bytes": 1601,
+            "executable": false,
+            "path": "package.json",
+            "sha256": "96aee9fd252d0cc31f3c01468250961f5b338c797bc208700d7db926450c7659"
+          }
+        ],
+        "packageName": "tsx",
+        "root": "8d41a89debd8a722ab8c5575f9114142e4ce316f68ab15fb4101cbf8936dac42",
+        "version": "4.23.12"
+      },
+      "systemExecutables": [
+        {
+          "bytes": 274448,
+          "executable": true,
+          "id": "bsdtar",
+          "path": "/usr/bin/bsdtar",
+          "resourceTrees": [],
+          "sha256": "f96200d5be4a3f99cdbc88892a2e26f14d501d354c72b224472462cc67fa271d",
+          "version": "bsdtar 3.5.3 - libarchive 3.7.4 zlib/1.2.12 liblzma/5.4.3 bz2lib/1.0.8"
+        },
+        {
+          "bytes": 3837392,
+          "executable": true,
+          "id": "git",
+          "path": "/Library/Developer/CommandLineTools/usr/bin/git",
+          "resourceTrees": [],
+          "sha256": "24d10c6f5ee9d5eb463273269d3bc30fa8dcbffda30841112480dea950d0c55a",
+          "version": "git version 2.54.0 (Apple Git-156)"
+        },
+        {
+          "bytes": 53200,
+          "executable": true,
+          "id": "python3",
+          "path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/bin/python3.9",
+          "resourceTrees": [
+            {
+              "bytes": 36715194,
+              "fileCount": 1810,
+              "id": "python3-framework",
+              "path": "/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9",
+              "root": "e3691d807caad74e16cd919c9348650050d3e0f1bfcd0508402090153aac4427",
+              "symlinkCount": 10
+            }
+          ],
+          "sha256": "a7dbed8b592e5d04056bef90860903d6677c5f265e82c4cb9f5798734a8d43a8",
+          "version": "Python 3.9.6"
+        }
+      ],
+      "nodeVersion": "v24.19.0",
+      "nodeExecutableSha256": "27db838bb204ef7c21df2931f5656e4c8fb32e6e947f363a402b49714d32b5b1",
+      "pnpmVersion": "11.16.0",
+      "pnpmExecutableSha256": "65cb7439d9b023b95d0e19d843adf14e0654426ef85ad4ecd33d58849315f669",
+      "lockfileSha256": "daf4dac4be7acca701141ec59050ab7d309ea9573109f567bcf01100c03965e2",
+      "workspaceSha256": "f309c3c526eb2f4b6da28ddcebb819d9781683da959e0f63d249bd467abf2447",
+      "patchedRuntimeRoot": "eddcb329bcd624115906ebaf8134fe97011ed80b2241f696055542d2c7c432fa",
       "patchedRuntimePaths": [
         "package.json",
         "dist/build/qualification-entropy.js",
@@ -84,14 +199,20 @@
       ],
       "deterministicBuildId": "os01-census-2026-1",
       "deterministicDeploymentId": "os01-census-2026-1",
-      "targetAccessRequired": "owner_only",
-      "publicOrProductionDeploymentAllowed": false,
+      "ownerOnlyAccessMode": "owner_only",
+      "productionAccessMode": "production",
+      "productionPrivateSeedBytes": 32,
+      "ownerOnlyPublicContextAllowed": true,
+      "productionPrivateSeedRequired": true,
+      "remoteBuildAllowed": false,
+      "rawSeedOrContextPersistenceAllowed": false,
       "contextEncodingInOutputAllowed": false,
+      "archiveBoundaryVersion": "os01-qualification-archive-boundary.2026.6",
       "normalBuildScriptsMayUseModeFlag": false,
       "retirementRequiredBeforeAcceptance": true
     }
   },
-  "deploymentProofVersion": "os01-census-deployment-proof.2026.1",
+  "deploymentProofVersion": "os01-census-deployment-proof.2026.3",
   "deploymentProofStatus": "ready_for_census",
   "deploymentProofFreshness": {
     "maximumAgeSeconds": 600,

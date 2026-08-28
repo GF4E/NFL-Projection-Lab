@@ -20,6 +20,15 @@ function sha256(path: string): string {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
 }
 
+function archivedSha256(localPath: string): string {
+  const archiveManifest = JSON.parse(
+    readFileSync(".planning/engine-os/execution/os-00/r2-archive-manifest.v1.json", "utf8")
+  ) as { objects: Array<{ localPath: string; sha256: string }> };
+  const archived = archiveManifest.objects.find((object) => object.localPath === localPath);
+  if (!archived) throw new Error(`Missing archived evidence object: ${localPath}`);
+  return archived.sha256;
+}
+
 const expectedConfigSha256 = "ceb9cd5287fb2d2ecf4cbf0961d28e5b41f7b583282ff655cfe8d1a778686a3b";
 const expectedInvalidV7FreezeManifestSha256 = "194864b038235c1ad933a58dca6c0bb03ed5bc9b8fadfc94534c46d2a269cf3b";
 const expectedV8FreezeManifestSha256 = "eecd6bfd47f648159770356ddac7357911ea879971fc3c41e4fe3df720efab9c";
@@ -27,10 +36,10 @@ const expectedV8FreezeManifestSha256 = "eecd6bfd47f648159770356ddac7357911ea8799
 describe("Model Laboratory Module 2 contract", () => {
   it("anchors the v8 config and preserves the invalid v7 freeze", () => {
     expect(sha256("config/model-lab-module-two.config.json")).toBe(expectedConfigSha256);
-    expect(sha256("artifacts/model-lab/module-two/pre-replay-manifest.json")).toBe(
+    expect(archivedSha256("artifacts/model-lab/module-two/pre-replay-manifest.json")).toBe(
       expectedInvalidV7FreezeManifestSha256
     );
-    expect(sha256("artifacts/model-lab/module-two-v8/pre-replay-manifest.json")).toBe(
+    expect(archivedSha256("artifacts/model-lab/module-two-v8/pre-replay-manifest.json")).toBe(
       expectedV8FreezeManifestSha256
     );
   });

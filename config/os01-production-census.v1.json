@@ -41,6 +41,13 @@
     "text": "t:<hex UTF-8 bytes>",
     "blob": "b:<hex bytes>"
   },
+  "contentEvidence": {
+    "allowedTables": ["plays"],
+    "pageFingerprint": "ephemeral-token-keyed-hmac-sha256",
+    "persistRawRows": false,
+    "persistUnkeyedRowHashes": false,
+    "unknownTableBehavior": "refuse-before-content-read"
+  },
   "limits": {
     "requestBytes": 4096,
     "identifierBytes": 255,

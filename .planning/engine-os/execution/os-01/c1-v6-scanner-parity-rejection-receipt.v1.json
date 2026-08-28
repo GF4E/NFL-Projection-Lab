@@ -1,0 +1,36 @@
+{
+  "version": "os01-private-seed-session-rejection.2026.1",
+  "status": "rejected_before_external_mutation",
+  "runId": "ed1d8b22-9afb-4e5c-bde4-329666bbef52",
+  "seedCommitment": "3f899c8e34f0d72a948a537d334d837c2a8acdabafe9d0484664860497c67bc9",
+  "sourceAnchor": "a3c59c9651a14452e17731f2fda91b1164892f270ef041cf8d734f1b0164d67a",
+  "authorityCommit": "ba14690b714daf57a69160da3801fd5638bc0cb8",
+  "implementationCommit": "2977c9e8cb6ead16b37ec926e35c93d5fb89c04f",
+  "failurePhase": "input_closed_before_verified_cleanup",
+  "lastCommandHash": "c99c0db9d27c57b7308088f45d27de6ac70682a56704e7411ff8c989746d524a",
+  "controlsStaged": false,
+  "externalMutationArmed": false,
+  "externalMutationIntentHash": null,
+  "cleanupVerified": false,
+  "productionSessionLockIdentityHash": "582153ab1e748be9506e0cd4edff3670f75acf6e5909480eafc4836f4fa2fe08",
+  "productionSessionLockDisposition": "released_before_external_mutation",
+  "productionSessionLockRelease": {
+    "version": "os01-production-session-lock-release.2026.1",
+    "lockIdentityHash": "582153ab1e748be9506e0cd4edff3670f75acf6e5909480eafc4836f4fa2fe08",
+    "releasedAt": "2026-08-28T21:07:23.081Z",
+    "releaseReason": "rejected_before_external_mutation"
+  },
+  "phaseLedger": {
+    "version": "os01-session-phase-ledger.2026.1",
+    "runId": "ed1d8b22-9afb-4e5c-bde4-329666bbef52",
+    "entryCount": 4,
+    "terminalPhase": "session_rejected_before_external_mutation",
+    "ledgerSha256": "c1cf03f2ee7125c0b8100d54f3a718e682b9ed21149b12a827cbf20afbeb65bd",
+    "lastEntryHash": "cc4032927799caac1329e7beca681b7d654431cdcfd909f82fd906c61a31f54a"
+  },
+  "providerSecretReads": 0,
+  "providerRequests": 0,
+  "quotaReservations": 0,
+  "rejectedAt": "2026-08-28T21:07:23.133Z",
+  "receiptHash": "f946efeb1f569b67274e8e60752bf870c51a0546860212a8cd94c508b8f50fa0"
+}

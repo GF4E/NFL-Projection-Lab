@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
-import { execFileSync } from "node:child_process";
+import { createHash, createHmac, randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
+import { execFileSync, spawnSync } from "node:child_process";
 import {
-  closeSync, existsSync, fstatSync, lstatSync, openSync, readFileSync, readSync,
-  readdirSync, realpathSync, rmSync, writeFileSync
+  closeSync, constants, existsSync, fstatSync, lstatSync, openSync, readFileSync, readSync,
+  readdirSync, realpathSync, rmSync
 } from "node:fs";
 import { dirname, relative, resolve, sep } from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -15,11 +15,34 @@ import {
   type CommittedManifest,
   type SchemaObject
 } from "./verify_d1_schema_authority";
+import {
+  os01ControlPlaneContract,
+  validateTrustedUploaderAssertion,
+  validateOwnerOnlyAccess,
+  validatePublicProductionAccess,
+  type AccessProjection,
+  type DeploymentProjection,
+  type TrustedUploaderAssertion,
+  type VersionProjection
+} from "./os01-control-plane-evidence";
+import { publishEvidenceBytesExclusive } from "./os01-atomic-evidence";
+import {
+  assertBuildToolchainEvidenceUnchanged,
+  assertFrozenAuthorityLoaderProcess,
+  buildInstalledToolchainEvidence,
+  measureSystemExecutable,
+  OS01_BUILD_TOOLCHAIN_EVIDENCE_VERSION,
+  OS01_QUALIFICATION_SYSTEM_EXECUTABLES,
+  type BuildToolchainAuthorityLoaderEvidence,
+  type BuildToolchainEvidence,
+  type BuildToolchainPlatformIdentityEvidence,
+  type BuildToolchainSystemExecutableEvidence
+} from "./os01-build-toolchain-evidence";
 
 type JsonScalar = boolean | number | string | null;
 type JsonValue = JsonScalar | JsonValue[] | { [key: string]: JsonValue };
 
-type SecretInput = {
+export type SecretInput = {
   endpoint: string;
   censusToken: string;
   siteAuthorizationToken?: string;
@@ -30,7 +53,15 @@ export type TrustedTarget = {
   projectId: string;
   origin: string;
   accessMode: string;
+  d1Binding: string | null;
+  r2Binding: string | null;
   loopbackFixture: boolean;
+};
+
+export type HostingTargetEvidence = {
+  projectId: string;
+  d1Binding: string | null;
+  r2Binding: string | null;
 };
 
 export type GitSuccessorEvidence = {
@@ -85,9 +116,20 @@ export type LocalBuildEvidence = {
   qualificationBuild: {
     version: string;
     role: "implementation" | "deployment";
-    contextHash: string;
+    mode: "owner_only_public_context" | "public_production_private_seed";
+    runId: string | null;
+    seedCommitment: string | null;
+    contextCommitment: string;
+    transcriptHash: string;
     toolchainRoot: string;
+    installedToolchainClosureRoot: string;
+    installedToolchainPackageCount: number;
     nodeVersion: string;
+    nodeExecutableSha256: string;
+    pnpmVersion: string;
+    pnpmExecutableSha256: string;
+    lockfileSha256: string;
+    workspaceSha256: string;
     vinextVersion: string;
     patchSha256: string;
     targetProjectId: string;
@@ -109,12 +151,57 @@ export type LocalArchiveEvidence = {
   fileCount: number;
 };
 
+type LocalArchiveFileIdentity = {
+  dev: bigint;
+  ino: bigint;
+  size: bigint;
+  mtimeNs: bigint;
+  ctimeNs: bigint;
+};
+
+export type QualificationArchiveBoundaryEvidence = {
+  version: string;
+  archiveSha256: string;
+  qualificationMode: LocalBuildEvidence["qualificationBuild"]["mode"];
+  runId: string | null;
+  seedCommitment: string | null;
+  contextCommitment: string;
+  fileCount: number;
+  nonServerFileCount: number;
+  rawContextLeakCount: 0;
+  nonServerDerivedCredentialLeakCount: 0;
+  scanRoot: string;
+};
+
 export type AuthorityBridgeCodeRelationEvidence = {
   version: string;
   authorityCommit: string;
   implementationCommit: string;
   files: Array<{ path: string; bytes: number; sha256: string }>;
   relationRoot: string;
+};
+
+export type SourceAnchorEvidence = {
+  authorityEvidence: AuthorityEvidence;
+  authorityBridgeCodeRelation: AuthorityBridgeCodeRelationEvidence;
+  bridgeImplementation: BridgeImplementationEvidence;
+  implementationBuild: LocalBuildEvidence;
+  sourceAnchor: string;
+};
+
+export type DeploymentProofConstructionInput = {
+  target: TrustedTarget;
+  observedAt: string;
+  sourceAnchorEvidence: SourceAnchorEvidence;
+  gitEvidence: GitSuccessorEvidence;
+  deploymentBuild: LocalBuildEvidence;
+  packageManifest: PackageManifestEvidence;
+  localArchive: LocalArchiveEvidence;
+  qualificationArchiveBoundary: QualificationArchiveBoundaryEvidence;
+  sitesVersion: VersionProjection;
+  deployment: DeploymentProjection;
+  access: AccessProjection;
+  uploader: TrustedUploaderAssertion;
 };
 
 type CatalogEntry = {
@@ -176,15 +263,29 @@ type TableEvidence = {
   columnsHash: string;
   schemaVersion: number;
   pageCount: number;
-  pageHashes: string[];
-  dataHash: string;
+  pageMacs: string[];
+  dataMacRoot: string;
 };
 
 const root = process.cwd();
 const contract = JSON.parse(readFileSync(resolve(root, "config/os01-production-census.v1.json"), "utf8")) as {
   version: string;
   route: string;
+  contentEvidence: {
+    allowedTables: string[];
+    pageFingerprint: string;
+    persistRawRows: boolean;
+    persistUnkeyedRowHashes: boolean;
+    unknownTableBehavior: string;
+  };
 };
+if (
+  stableJson(contract.contentEvidence.allowedTables) !== stableJson(["plays"]) ||
+  contract.contentEvidence.pageFingerprint !== "ephemeral-token-keyed-hmac-sha256" ||
+  contract.contentEvidence.persistRawRows ||
+  contract.contentEvidence.persistUnkeyedRowHashes ||
+  contract.contentEvidence.unknownTableBehavior !== "refuse-before-content-read"
+) throw new Error("production census content-evidence policy is not fail closed");
 const prestateClasses = JSON.parse(
   readFileSync(resolve(root, "config/os01-production-prestate-classes.v1.json"), "utf8")
 ) as {
@@ -220,6 +321,10 @@ const attestationContract = JSON.parse(
     version: string;
     liveBaseCommit: string;
     implementationCommitCount: number;
+    requiredImplementationCommit: string;
+    requiredImplementationTreeObjectId: string;
+    requiredImplementationArchiveSha256: string;
+    requiredImplementationArchiveBytes: number;
     requiredLiveBaseToImplementationNameStatus: Array<{ status: string; path: string }>;
     retainedRuntimeSourcePath: string;
     retainedRuntimeBridgePath: string;
@@ -240,22 +345,53 @@ const attestationContract = JSON.parse(
     sitesArchiveHashPrefix: string;
     localArchiveFormat: string;
     sitesArchiveFormat: string;
+    localArchivePackaging: {
+      version: string;
+      scriptPath: string;
+      scriptSha256: string;
+      tarFormat: string;
+      gzipMtime: number;
+      independentBuildCount: number;
+      exactByteMatchRequired: boolean;
+    };
     qualificationBuild: {
       version: string;
       modeFlag: string;
       contextDerivation: string;
       contextDomain: string;
+      seedCommitmentDomain: string;
+      contextCommitmentDomain: string;
+      vinextCredentialDomainPrefix: string;
+      derivedCredentialDomains: Array<{ domain: string; bytes: number }>;
       patchPath: string;
       patchSha256: string;
       pnpmPatchHash: string;
       vinextVersion: string;
+      installedToolchainClosureVersion: string;
+      installedToolchainClosureRoot: string;
+      installedToolchainPackageCount: number;
+      systemExecutables: BuildToolchainSystemExecutableEvidence[];
+      platformIdentity: BuildToolchainPlatformIdentityEvidence;
+      authorityLoader: BuildToolchainAuthorityLoaderEvidence;
+      nodeVersion: string;
+      nodeExecutableSha256: string;
+      pnpmVersion: string;
+      pnpmExecutableSha256: string;
+      lockfileSha256: string;
+      workspaceSha256: string;
       patchedRuntimeRoot: string;
       patchedRuntimePaths: string[];
       deterministicBuildId: string;
       deterministicDeploymentId: string;
-      targetAccessRequired: string;
-      publicOrProductionDeploymentAllowed: boolean;
+      ownerOnlyAccessMode: string;
+      productionAccessMode: string;
+      productionPrivateSeedBytes: number;
+      ownerOnlyPublicContextAllowed: boolean;
+      productionPrivateSeedRequired: boolean;
+      remoteBuildAllowed: boolean;
+      rawSeedOrContextPersistenceAllowed: boolean;
       contextEncodingInOutputAllowed: boolean;
+      archiveBoundaryVersion: string;
       normalBuildScriptsMayUseModeFlag: boolean;
       retirementRequiredBeforeAcceptance: boolean;
     };
@@ -277,6 +413,8 @@ const trustedTargetContract = JSON.parse(
     projectId: string;
     origin: string | null;
     accessMode: string;
+    d1Binding: string | null;
+    r2Binding: string | null;
   }>;
 };
 const authorityFoundation = (JSON.parse(
@@ -299,13 +437,14 @@ const MAX_OPERATOR_RESPONSE_BYTES = 1_048_576;
 const MAX_TABLE_ROWS = 100_000_000;
 const MAX_DEPLOYMENT_PROOF_BYTES = 131_072;
 const MAX_DEPLOYMENT_ARCHIVE_BYTES = 512 * 1024 * 1024;
+const OPERATOR_REQUEST_MAX_MS = 60_000;
 const MAX_SECRET_INPUT_BYTES = 16_384;
 
 function stable(value: unknown): JsonValue {
   if (Array.isArray(value)) return value.map(stable);
   if (value && typeof value === "object") {
     return Object.fromEntries(Object.entries(value as Record<string, unknown>)
-      .sort(([left], [right]) => left.localeCompare(right))
+      .sort(([left], [right]) => compareUnicodeCodePoints(left, right))
       .map(([key, item]) => [key, stable(item)])) as { [key: string]: JsonValue };
   }
   if (typeof value === "bigint") return value.toString();
@@ -321,7 +460,360 @@ function sha256(value: string | Uint8Array): string {
   return createHash("sha256").update(value).digest("hex");
 }
 
+export function compareUnicodeCodePoints(left: string, right: string): number {
+  const leftPoints = [...left].map((value) => value.codePointAt(0)!);
+  const rightPoints = [...right].map((value) => value.codePointAt(0)!);
+  const sharedLength = Math.min(leftPoints.length, rightPoints.length);
+  for (let index = 0; index < sharedLength; index += 1) {
+    const difference = leftPoints[index]! - rightPoints[index]!;
+    if (difference !== 0) return difference;
+  }
+  return leftPoints.length - rightPoints.length;
+}
+
 type QualificationBuildRole = "implementation" | "deployment";
+
+const PRODUCTION_QUALIFICATION_MAX_LIFETIME_MS = 2 * 60 * 60 * 1000;
+
+export function productionQualificationSeedCommitment(seed: Uint8Array): string {
+  const qualification = attestationContract.buildIdentity.qualificationBuild;
+  if (seed.byteLength !== qualification.productionPrivateSeedBytes) {
+    throw new Error("production qualification seed has the wrong length");
+  }
+  return createHash("sha256")
+    .update(qualification.seedCommitmentDomain, "utf8")
+    .update(Buffer.from([0]))
+    .update(seed)
+    .digest("hex");
+}
+
+export function deriveProductionQualificationContext(
+  seed: Uint8Array,
+  transcriptHash: string
+): Buffer {
+  const qualification = attestationContract.buildIdentity.qualificationBuild;
+  if (seed.byteLength !== qualification.productionPrivateSeedBytes || !/^[a-f0-9]{64}$/u.test(transcriptHash)) {
+    throw new Error("production qualification context input is invalid");
+  }
+  return createHmac("sha256", seed)
+    .update(Buffer.from(`${qualification.contextDomain}\0`, "utf8"))
+    .update(Buffer.from(transcriptHash, "hex"))
+    .digest();
+}
+
+export function qualificationContextCommitment(context: Uint8Array): string {
+  const qualification = attestationContract.buildIdentity.qualificationBuild;
+  if (context.byteLength !== 32) throw new Error("qualification context has the wrong length");
+  return createHash("sha256")
+    .update(qualification.contextCommitmentDomain, "utf8")
+    .update(Buffer.from([0]))
+    .update(context)
+    .digest("hex");
+}
+
+function encodeHexBytes(value: Uint8Array): Buffer {
+  const alphabet = Buffer.from("0123456789abcdef", "ascii");
+  const output = Buffer.alloc(value.byteLength * 2);
+  for (let index = 0; index < value.byteLength; index += 1) {
+    const byte = value[index]!;
+    output[index * 2] = alphabet[byte >>> 4]!;
+    output[index * 2 + 1] = alphabet[byte & 0x0f]!;
+  }
+  return output;
+}
+
+function encodeBase64Bytes(value: Uint8Array): Buffer {
+  const alphabet = Buffer.from("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/", "ascii");
+  const output = Buffer.alloc(Math.ceil(value.byteLength / 3) * 4, "=".charCodeAt(0));
+  let sourceOffset = 0;
+  let outputOffset = 0;
+  while (sourceOffset < value.byteLength) {
+    const first = value[sourceOffset++]!;
+    const hasSecond = sourceOffset < value.byteLength;
+    const second = hasSecond ? value[sourceOffset++]! : 0;
+    const hasThird = sourceOffset < value.byteLength;
+    const third = hasThird ? value[sourceOffset++]! : 0;
+    output[outputOffset++] = alphabet[first >>> 2]!;
+    output[outputOffset++] = alphabet[((first & 0x03) << 4) | (second >>> 4)]!;
+    if (hasSecond) output[outputOffset] = alphabet[((second & 0x0f) << 2) | (third >>> 6)]!;
+    outputOffset += 1;
+    if (hasThird) output[outputOffset] = alphabet[third & 0x3f]!;
+    outputOffset += 1;
+  }
+  return output;
+}
+
+function encodeBase64UrlBytes(value: Uint8Array): Buffer {
+  const standard = encodeBase64Bytes(value);
+  let length = standard.byteLength;
+  while (length > 0 && standard[length - 1] === "=".charCodeAt(0)) length -= 1;
+  const output = Buffer.alloc(length);
+  for (let index = 0; index < length; index += 1) {
+    const byte = standard[index]!;
+    output[index] = byte === "+".charCodeAt(0)
+      ? "-".charCodeAt(0)
+      : byte === "/".charCodeAt(0)
+        ? "_".charCodeAt(0)
+        : byte;
+  }
+  standard.fill(0);
+  return output;
+}
+
+function upperAsciiHex(value: Uint8Array): Buffer | null {
+  if (value.byteLength === 0) return null;
+  const output = Buffer.alloc(value.byteLength);
+  for (let index = 0; index < value.byteLength; index += 1) {
+    const byte = value[index]!;
+    if (byte >= 0x30 && byte <= 0x39) output[index] = byte;
+    else if (byte >= 0x61 && byte <= 0x66) output[index] = byte - 0x20;
+    else {
+      output.fill(0);
+      return null;
+    }
+  }
+  return output;
+}
+
+function sensitiveMaterialMarkers(value: Uint8Array): Buffer[] {
+  const raw = Buffer.from(value);
+  const lowerHex = encodeHexBytes(value);
+  const upperHex = Buffer.from(lowerHex);
+  for (let index = 0; index < upperHex.byteLength; index += 1) {
+    const byte = upperHex[index]!;
+    if (byte >= 0x61 && byte <= 0x66) upperHex[index] = byte - 0x20;
+  }
+  const markers = [raw, lowerHex, upperHex, encodeBase64Bytes(value), encodeBase64UrlBytes(value)];
+  const encodedAsciiUpper = upperAsciiHex(value);
+  if (encodedAsciiUpper) markers.push(encodedAsciiUpper);
+  return markers;
+}
+
+function qualificationDerivedCredentialMarkers(context: Buffer): Buffer[] {
+  const qualification = attestationContract.buildIdentity.qualificationBuild;
+  const prefix = Buffer.from(`${qualification.vinextCredentialDomainPrefix}\0`, "utf8");
+  return qualification.derivedCredentialDomains.map(({ domain, bytes }) => {
+    if (!Number.isSafeInteger(bytes) || bytes < 1 || bytes > 32 || domain.length === 0) {
+      throw new Error("qualification credential-domain contract is invalid");
+    }
+    const digest = Buffer.from(createHmac("sha256", context)
+      .update(prefix)
+      .update(domain, "utf8")
+      .digest());
+    try {
+      return encodeHexBytes(digest.subarray(0, bytes));
+    } finally {
+      digest.fill(0);
+    }
+  });
+}
+
+function containsByteSequence(haystack: Uint8Array, needle: Uint8Array): boolean {
+  if (needle.byteLength === 0 || needle.byteLength > haystack.byteLength) return false;
+  const finalOffset = haystack.byteLength - needle.byteLength;
+  for (let offset = 0; offset <= finalOffset; offset += 1) {
+    let matches = true;
+    for (let index = 0; index < needle.byteLength; index += 1) {
+      if (haystack[offset + index] !== needle[index]) {
+        matches = false;
+        break;
+      }
+    }
+    if (matches) return true;
+  }
+  return false;
+}
+
+export class ProductionQualificationCoordinator {
+  readonly runId: string;
+  readonly startedAt: string;
+  readonly expiresAt: string;
+  readonly seedCommitment: string;
+  #seed: Buffer | null;
+  readonly #transcriptHashes = new Set<string>();
+  readonly #additionalSensitiveMaterial: Buffer[] = [];
+
+  private constructor(seed: Buffer, now: Date, lifetimeMs: number) {
+    if (!Number.isSafeInteger(lifetimeMs) || lifetimeMs <= 0 || lifetimeMs > PRODUCTION_QUALIFICATION_MAX_LIFETIME_MS) {
+      seed.fill(0);
+      throw new Error("production qualification lifetime is invalid");
+    }
+    this.#seed = seed;
+    this.runId = randomUUID();
+    this.startedAt = now.toISOString();
+    this.expiresAt = new Date(now.getTime() + lifetimeMs).toISOString();
+    this.seedCommitment = productionQualificationSeedCommitment(seed);
+  }
+
+  static start(input: { now?: Date; lifetimeMs?: number } = {}): ProductionQualificationCoordinator {
+    return new ProductionQualificationCoordinator(
+      randomBytes(attestationContract.buildIdentity.qualificationBuild.productionPrivateSeedBytes),
+      input.now ?? new Date(),
+      input.lifetimeMs ?? PRODUCTION_QUALIFICATION_MAX_LIFETIME_MS
+    );
+  }
+
+  deriveContext(transcriptHash: string, nowMs = Date.now()): Buffer {
+    this.assertActive(nowMs);
+    this.#transcriptHashes.add(transcriptHash);
+    const seed = this.#seed!;
+    return deriveProductionQualificationContext(seed, transcriptHash);
+  }
+
+  registerSensitiveMaterial(value: Uint8Array, nowMs = Date.now()): void {
+    this.assertActive(nowMs);
+    if (value.byteLength < 16 || value.byteLength > 4096) {
+      throw new Error("production qualification sensitive material has an invalid length");
+    }
+    this.#additionalSensitiveMaterial.push(Buffer.from(value));
+  }
+
+  assertActive(nowMs = Date.now()): void {
+    if (this.#seed === null) throw new Error("production qualification coordinator is closed");
+    if (nowMs >= Date.parse(this.expiresAt)) throw new Error("production qualification coordinator expired");
+  }
+
+  assertEvidenceBytesSafe(
+    bytes: Uint8Array,
+    label: string,
+    nowMs = Date.now(),
+    options: { allowExpired?: boolean; allowDerivedQualificationCredential?: boolean } = {}
+  ): void {
+    if (options.allowExpired) {
+      if (this.#seed === null) throw new Error("production qualification coordinator is closed");
+    } else {
+      this.assertActive(nowMs);
+    }
+    const seed = this.#seed!;
+    const markers: Buffer[] = sensitiveMaterialMarkers(seed);
+    try {
+      for (const material of this.#additionalSensitiveMaterial) {
+        markers.push(...sensitiveMaterialMarkers(material));
+      }
+      for (const transcriptHash of this.#transcriptHashes) {
+        const context = deriveProductionQualificationContext(seed, transcriptHash);
+        const contextMarkers = sensitiveMaterialMarkers(context);
+        const derivedMarkers = options.allowDerivedQualificationCredential
+          ? []
+          : qualificationDerivedCredentialMarkers(context)
+            .flatMap((marker) => {
+              const encoded = sensitiveMaterialMarkers(marker);
+              marker.fill(0);
+              return encoded;
+            });
+        context.fill(0);
+        markers.push(...contextMarkers, ...derivedMarkers);
+      }
+      if (markers.some((marker) => containsByteSequence(bytes, marker))) {
+        throw new Error(`${label} exposes qualification material`);
+      }
+    } finally {
+      markers.forEach((marker) => marker.fill(0));
+    }
+  }
+
+  close(): void {
+    this.#seed?.fill(0);
+    this.#seed = null;
+    this.#additionalSensitiveMaterial.forEach((material) => material.fill(0));
+    this.#additionalSensitiveMaterial.length = 0;
+    this.#transcriptHashes.clear();
+  }
+}
+
+function isCanonicalTarChecksumField(
+  checksumField: Uint8Array,
+  digitCount: 6 | 7
+): boolean {
+  if (checksumField.byteLength !== 8) return false;
+  const digits = checksumField.subarray(0, digitCount);
+  if (!digits.every(
+    (byte: number) => byte === 0x20 || (byte >= 0x30 && byte <= 0x37)
+  )) return false;
+  if (checksumField[digitCount] !== 0) return false;
+  return digitCount === 7 || checksumField[7] === 0 || checksumField[7] === 0x20;
+}
+
+function looksLikeTarHeaderAt(bytes: Uint8Array, offset: number): boolean {
+  if (offset < 0 || offset + 512 > bytes.byteLength) return false;
+  const header = bytes.subarray(offset, offset + 512);
+  if (!header.some((byte) => byte !== 0)) return false;
+  const checksumField = Buffer.from(header.subarray(148, 156));
+  if (
+    !isCanonicalTarChecksumField(checksumField, 6) &&
+    !isCanonicalTarChecksumField(checksumField, 7)
+  ) return false;
+  const checksumText = checksumField
+    .toString("ascii")
+    .replace(/^[\0 ]+|[\0 ]+$/gu, "");
+  if (!/^[0-7]+$/u.test(checksumText)) return false;
+  const recorded = Number.parseInt(checksumText, 8);
+  let unsigned = 8 * 0x20;
+  let signed = 8 * 0x20;
+  for (let index = 0; index < header.byteLength; index += 1) {
+    if (index >= 148 && index < 156) continue;
+    const byte = header[index] ?? 0;
+    unsigned += byte;
+    signed += byte < 128 ? byte : byte - 256;
+  }
+  return recorded === unsigned || recorded === signed;
+}
+
+function containsTarHeader(bytes: Uint8Array): boolean {
+  if (bytes.byteLength < 512) return false;
+  const buffer = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  let cursor = 148;
+  let candidates = 0;
+  while (cursor < buffer.byteLength) {
+    const terminator = buffer.indexOf(0, cursor);
+    if (terminator < 0) break;
+    for (const digitCount of [6, 7]) {
+      const checksumStart = terminator - digitCount;
+      const headerOffset = checksumStart - 148;
+      if (headerOffset < 0 || headerOffset + 512 > buffer.byteLength) continue;
+      if (!isCanonicalTarChecksumField(
+        buffer.subarray(checksumStart, checksumStart + 8),
+        digitCount as 6 | 7
+      )) continue;
+      candidates += 1;
+      if (candidates > 4096) return true;
+      if (looksLikeTarHeaderAt(buffer, headerOffset)) return true;
+    }
+    cursor = terminator + 1;
+  }
+  return false;
+}
+
+export function nestedArchiveKind(path: string, bytes: Uint8Array): string | null {
+  const lowerPath = path.replace(/[A-Z]/gu, (character) => character.toLowerCase());
+  const suffixes = [
+    ".7z", ".br", ".bz2", ".gz", ".rar", ".tar", ".tgz", ".txz", ".xz", ".zip", ".zst", ".zstd"
+  ];
+  const suffix = suffixes.find((value) => lowerPath.endsWith(value));
+  if (suffix) return suffix.slice(1);
+  if (containsTarHeader(bytes)) return "tar";
+  const signatures: ReadonlyArray<readonly [kind: string, signature: Uint8Array]> = [
+    // A gzip member includes the fixed DEFLATE compression-method byte.  A
+    // two-byte prefix alone occurs naturally in compressed fonts and images.
+    ["gzip", Buffer.from([0x1f, 0x8b, 0x08])],
+    ["zip", Buffer.from([0x50, 0x4b, 0x03, 0x04])],
+    ["zip", Buffer.from([0x50, 0x4b, 0x05, 0x06])],
+    ["zip", Buffer.from([0x50, 0x4b, 0x07, 0x08])],
+    ...Array.from({ length: 9 }, (_unused, index) => [
+      "bzip2",
+      Buffer.from([0x42, 0x5a, 0x68, 0x31 + index])
+    ] as const),
+    ["xz", Buffer.from([0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00])],
+    ["7z", Buffer.from([0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c])],
+    ["rar", Buffer.from([0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x00])],
+    ["rar", Buffer.from([0x52, 0x61, 0x72, 0x21, 0x1a, 0x07, 0x01, 0x00])],
+    ["zstd", Buffer.from([0x28, 0xb5, 0x2f, 0xfd])]
+  ];
+  for (const [kind, signature] of signatures) {
+    if (containsByteSequence(bytes, signature)) return kind;
+  }
+  return null;
+}
 
 function exactOccurrenceCount(source: string, expected: string): number {
   if (expected.length === 0) throw new Error("empty exact-occurrence marker");
@@ -335,25 +827,86 @@ function exactOccurrenceCount(source: string, expected: string): number {
   }
 }
 
+export function validateHostingTargetDocument(
+  value: unknown,
+  target: TrustedTarget
+): HostingTargetEvidence {
+  const hosting = requireRecord(value, "Sites hosting document");
+  exactKeys(hosting, ["d1", "project_id", "r2"], "Sites hosting document");
+  const projectId = requireString(hosting.project_id, "Sites hosting project id");
+  const d1Binding = hosting.d1 === null ? null : requireString(hosting.d1, "Sites D1 binding");
+  const r2Binding = hosting.r2 === null ? null : requireString(hosting.r2, "Sites R2 binding");
+  if (
+    projectId !== target.projectId ||
+    d1Binding !== target.d1Binding ||
+    r2Binding !== target.r2Binding
+  ) throw new Error("Sites hosting document does not match the trusted target");
+  return { projectId, d1Binding, r2Binding };
+}
+
+export function validateTrackedHostingTarget(
+  repositoryRoot: string,
+  target: TrustedTarget
+): HostingTargetEvidence {
+  const canonicalRoot = realpathSync(repositoryRoot);
+  const hostingRelativePath = ".openai/hosting.json";
+  const hostingPath = resolve(canonicalRoot, hostingRelativePath);
+  if (!hostingPath.startsWith(`${canonicalRoot}${sep}`)) {
+    throw new Error("Sites hosting path escapes its worktree");
+  }
+  const metadata = lstatSync(hostingPath);
+  if (!metadata.isFile() || metadata.isSymbolicLink() || realpathSync(hostingPath) !== hostingPath) {
+    throw new Error("Sites hosting document is not a canonical regular file");
+  }
+  let trackedPath: string;
+  try {
+    trackedPath = gitText(canonicalRoot, ["ls-files", "--error-unmatch", "--", hostingRelativePath]);
+  } catch {
+    throw new Error("Sites hosting document is not tracked");
+  }
+  if (trackedPath !== hostingRelativePath) {
+    throw new Error("Sites hosting document is not tracked");
+  }
+  return validateHostingTargetDocument(
+    JSON.parse(readFileSync(hostingPath, "utf8")) as unknown,
+    target
+  );
+}
+
 export function qualificationBuildContext(input: {
   repositoryRoot: string;
+  pnpmExecutablePath: string;
   expectedCommit: string;
+  expectedSourceAnchor: string;
+  expectedReady: boolean;
   role: QualificationBuildRole;
   target: TrustedTarget;
+  productionCoordinator?: ProductionQualificationCoordinator;
 }): {
   context: Buffer;
   evidence: LocalBuildEvidence["qualificationBuild"];
+  installedToolchain: BuildToolchainEvidence;
 } {
   const qualification = attestationContract.buildIdentity.qualificationBuild;
   if (
-    qualification.publicOrProductionDeploymentAllowed ||
+    !qualification.ownerOnlyPublicContextAllowed ||
+    !qualification.productionPrivateSeedRequired ||
+    qualification.remoteBuildAllowed ||
+    qualification.rawSeedOrContextPersistenceAllowed ||
     qualification.contextEncodingInOutputAllowed ||
     qualification.normalBuildScriptsMayUseModeFlag ||
     !qualification.retirementRequiredBeforeAcceptance ||
-    input.target.loopbackFixture ||
-    input.target.accessMode !== qualification.targetAccessRequired
-  ) throw new Error("qualification build is restricted to the retired owner-only census lane");
+    input.target.loopbackFixture
+  ) throw new Error("qualification build policy is not fail closed");
+  const ownerOnlyMode = input.target.accessMode === qualification.ownerOnlyAccessMode &&
+    input.productionCoordinator === undefined;
+  const productionMode = input.target.accessMode === qualification.productionAccessMode &&
+    input.productionCoordinator !== undefined;
+  if (!ownerOnlyMode && !productionMode) {
+    throw new Error("qualification build target and entropy mode do not match");
+  }
   const canonicalRoot = realpathSync(input.repositoryRoot);
+  validateTrackedHostingTarget(canonicalRoot, input.target);
   const patchPath = resolve(canonicalRoot, qualification.patchPath);
   if (!patchPath.startsWith(`${canonicalRoot}${sep}`)) throw new Error("qualification patch escapes its worktree");
   const patchMetadata = lstatSync(patchPath);
@@ -407,20 +960,51 @@ export function qualificationBuildContext(input: {
   if (installedPackage.name !== "vinext" || installedPackage.version !== qualification.vinextVersion) {
     throw new Error("installed Vinext package identity mismatch");
   }
+  const vinextCliPath = resolve(installedRoot, "dist/cli.js");
+  const vinextCliMetadata = lstatSync(vinextCliPath);
+  if (!vinextCliMetadata.isFile() || vinextCliMetadata.isSymbolicLink()) {
+    throw new Error("installed Vinext CLI is not a regular file");
+  }
+  const installedToolchain = buildInstalledToolchainEvidence({
+    root: canonicalRoot,
+    nodeExecutablePath: process.execPath,
+    pnpmExecutablePath: input.pnpmExecutablePath,
+    expectedSystemExecutables: qualification.systemExecutables,
+    expectedPlatformIdentity: qualification.platformIdentity
+  });
+  if (
+    qualification.installedToolchainClosureVersion !== OS01_BUILD_TOOLCHAIN_EVIDENCE_VERSION ||
+    installedToolchain.version !== qualification.installedToolchainClosureVersion ||
+    installedToolchain.closureRoot !== qualification.installedToolchainClosureRoot ||
+    installedToolchain.packageCount !== qualification.installedToolchainPackageCount ||
+    stableJson(installedToolchain.systemExecutables) !== stableJson(qualification.systemExecutables) ||
+    stableJson(installedToolchain.platformIdentity) !== stableJson(qualification.platformIdentity) ||
+    stableJson(installedToolchain.authorityLoader) !== stableJson(qualification.authorityLoader) ||
+    installedToolchain.node.version !== qualification.nodeVersion ||
+    installedToolchain.node.sha256 !== qualification.nodeExecutableSha256 ||
+    installedToolchain.pnpm.version !== qualification.pnpmVersion ||
+    installedToolchain.pnpm.sha256 !== qualification.pnpmExecutableSha256 ||
+    installedToolchain.lockfile.sha256 !== qualification.lockfileSha256 ||
+    installedToolchain.workspace.sha256 !== qualification.workspaceSha256 ||
+    installedToolchain.patches.length !== 1 ||
+    installedToolchain.patches[0]?.sha256 !== patchSha256
+  ) throw new Error("installed build-toolchain closure differs from the frozen contract");
   const toolchainRoot = sha256(stableJson({
     version: qualification.version,
-    nodeVersion: process.version,
+    installedToolchainClosureRoot: installedToolchain.closureRoot,
     vinextVersion: qualification.vinextVersion,
     patchSha256,
     patchedRuntimeRoot,
     pnpmPatchHash: qualification.pnpmPatchHash
   }));
-  const contextHash = sha256(stableJson({
+  const transcriptHash = sha256(stableJson({
     version: qualification.version,
     derivation: qualification.contextDerivation,
     domain: qualification.contextDomain,
     role: input.role,
     expectedCommit: input.expectedCommit,
+    expectedSourceAnchor: input.expectedSourceAnchor,
+    expectedReady: input.expectedReady,
     authorityAttestationHash: sha256(readFileSync(resolve(root, "config/os01-census-attestation.v1.json"))),
     target: {
       projectId: input.target.projectId,
@@ -429,16 +1013,37 @@ export function qualificationBuildContext(input: {
     },
     deterministicBuildId: qualification.deterministicBuildId,
     deterministicDeploymentId: qualification.deterministicDeploymentId,
-    toolchainRoot
+    toolchainRoot,
+    coordinatorRunId: input.productionCoordinator?.runId ?? null
   }));
+  const context = productionMode
+    ? input.productionCoordinator!.deriveContext(transcriptHash)
+    : createHash("sha256")
+      .update(qualification.contextDomain, "utf8")
+      .update(Buffer.from([0]))
+      .update(Buffer.from(transcriptHash, "hex"))
+      .digest();
+  const mode = productionMode ? "public_production_private_seed" : "owner_only_public_context";
   return {
-    context: Buffer.from(contextHash, "hex"),
+    context,
+    installedToolchain,
     evidence: {
       version: qualification.version,
       role: input.role,
-      contextHash,
+      mode,
+      runId: input.productionCoordinator?.runId ?? null,
+      seedCommitment: input.productionCoordinator?.seedCommitment ?? null,
+      contextCommitment: qualificationContextCommitment(context),
+      transcriptHash,
       toolchainRoot,
-      nodeVersion: process.version,
+      installedToolchainClosureRoot: installedToolchain.closureRoot,
+      installedToolchainPackageCount: installedToolchain.packageCount,
+      nodeVersion: installedToolchain.node.version,
+      nodeExecutableSha256: installedToolchain.node.sha256,
+      pnpmVersion: installedToolchain.pnpm.version,
+      pnpmExecutableSha256: installedToolchain.pnpm.sha256,
+      lockfileSha256: installedToolchain.lockfile.sha256,
+      workspaceSha256: installedToolchain.workspace.sha256,
       vinextVersion: qualification.vinextVersion,
       patchSha256,
       targetProjectId: input.target.projectId,
@@ -466,6 +1071,211 @@ function readStableFile(path: string, maximumBytes: number, label: string): Uint
   }
 }
 
+function localArchiveIdentity(metadata: {
+  dev: bigint;
+  ino: bigint;
+  size: bigint;
+  mtimeNs: bigint;
+  ctimeNs: bigint;
+}): LocalArchiveFileIdentity {
+  return {
+    dev: metadata.dev,
+    ino: metadata.ino,
+    size: metadata.size,
+    mtimeNs: metadata.mtimeNs,
+    ctimeNs: metadata.ctimeNs
+  };
+}
+
+function sameLocalArchiveIdentity(
+  left: LocalArchiveFileIdentity,
+  right: LocalArchiveFileIdentity
+): boolean {
+  return left.dev === right.dev && left.ino === right.ino && left.size === right.size &&
+    left.mtimeNs === right.mtimeNs && left.ctimeNs === right.ctimeNs;
+}
+
+function readExactDescriptorBytes(
+  descriptor: number,
+  expectedBytes: number,
+  label: string
+): Buffer {
+  const bytes = Buffer.allocUnsafe(expectedBytes);
+  let offset = 0;
+  while (offset < bytes.byteLength) {
+    const count = readSync(descriptor, bytes, offset, bytes.byteLength - offset, offset);
+    if (count === 0) {
+      bytes.fill(0);
+      throw new Error(`${label} ended before its bound size`);
+    }
+    offset += count;
+  }
+  const trailing = Buffer.alloc(1);
+  try {
+    if (readSync(descriptor, trailing, 0, 1, expectedBytes) !== 0) {
+      bytes.fill(0);
+      throw new Error(`${label} grew beyond its bound size`);
+    }
+  } finally {
+    trailing.fill(0);
+  }
+  return bytes;
+}
+
+function equalLocalArchiveBytes(left: Uint8Array, right: Uint8Array): boolean {
+  return left.byteLength === right.byteLength && timingSafeEqual(left, right);
+}
+
+/**
+ * One process-held archive object. All qualification consumers receive copies
+ * of these exact bytes, while pathname and descriptor identity remain fenced.
+ */
+export class ImmutableLocalArchiveSnapshot {
+  readonly path: string;
+  readonly archiveBytes: number;
+  readonly archiveSha256: string;
+  readonly #identity: LocalArchiveFileIdentity;
+  readonly #snapshotBytes: Buffer;
+  #descriptor: number;
+
+  private constructor(input: {
+    path: string;
+    descriptor: number;
+    identity: LocalArchiveFileIdentity;
+    bytes: Buffer;
+  }) {
+    this.path = input.path;
+    this.#descriptor = input.descriptor;
+    this.#identity = input.identity;
+    this.#snapshotBytes = input.bytes;
+    this.archiveBytes = input.bytes.byteLength;
+    this.archiveSha256 = sha256(input.bytes);
+  }
+
+  static open(pathInput: string): ImmutableLocalArchiveSnapshot {
+    const requestedInput = resolve(pathInput);
+    const inputMetadata = lstatSync(requestedInput, { bigint: true });
+    if (!inputMetadata.isFile() || inputMetadata.isSymbolicLink()) {
+      throw new Error("deployment archive is not a canonical regular file");
+    }
+    const requested = realpathSync(requestedInput);
+    const before = lstatSync(requested, { bigint: true });
+    if (
+      !before.isFile() || before.isSymbolicLink() ||
+      !sameLocalArchiveIdentity(localArchiveIdentity(inputMetadata), localArchiveIdentity(before))
+    ) {
+      throw new Error("deployment archive is not a canonical regular file");
+    }
+    const descriptor = openSync(requested, constants.O_RDONLY | constants.O_NOFOLLOW);
+    try {
+      const opened = fstatSync(descriptor, { bigint: true });
+      const beforeIdentity = localArchiveIdentity(before);
+      const openedIdentity = localArchiveIdentity(opened);
+      if (
+        !opened.isFile() || !sameLocalArchiveIdentity(beforeIdentity, openedIdentity) ||
+        opened.size <= 0n || opened.size > BigInt(MAX_DEPLOYMENT_ARCHIVE_BYTES)
+      ) throw new Error("deployment archive changed while it was opened");
+      const firstRead = readExactDescriptorBytes(descriptor, Number(opened.size), "deployment archive");
+      const secondRead = readExactDescriptorBytes(descriptor, Number(opened.size), "deployment archive");
+      if (!equalLocalArchiveBytes(firstRead, secondRead)) {
+        firstRead.fill(0);
+        secondRead.fill(0);
+        throw new Error("deployment archive changed while it was snapshotted");
+      }
+      secondRead.fill(0);
+      const after = fstatSync(descriptor, { bigint: true });
+      const pathAfter = lstatSync(requested, { bigint: true });
+      if (
+        !sameLocalArchiveIdentity(openedIdentity, localArchiveIdentity(after)) ||
+        !sameLocalArchiveIdentity(openedIdentity, localArchiveIdentity(pathAfter)) ||
+        realpathSync(requested) !== requested
+      ) {
+        firstRead.fill(0);
+        throw new Error("deployment archive changed while it was snapshotted");
+      }
+      return new ImmutableLocalArchiveSnapshot({
+        path: requested,
+        descriptor,
+        identity: openedIdentity,
+        bytes: firstRead
+      });
+    } catch (error: unknown) {
+      closeSync(descriptor);
+      throw error;
+    }
+  }
+
+  assertUnchanged(): void {
+    if (this.#descriptor < 0) throw new Error("deployment archive snapshot is closed");
+    const opened = fstatSync(this.#descriptor, { bigint: true });
+    const pathname = lstatSync(this.path, { bigint: true });
+    if (
+      !opened.isFile() || !pathname.isFile() || pathname.isSymbolicLink() ||
+      !sameLocalArchiveIdentity(this.#identity, localArchiveIdentity(opened)) ||
+      !sameLocalArchiveIdentity(this.#identity, localArchiveIdentity(pathname)) ||
+      realpathSync(this.path) !== this.path
+    ) throw new Error("deployment archive snapshot path or file identity changed");
+    const current = readExactDescriptorBytes(this.#descriptor, this.archiveBytes, "deployment archive snapshot");
+    try {
+      if (!equalLocalArchiveBytes(current, this.#snapshotBytes)) {
+        throw new Error("deployment archive snapshot bytes changed");
+      }
+    } finally {
+      current.fill(0);
+    }
+  }
+
+  consumeExactBytes<T>(consumer: (bytes: Buffer) => T): T {
+    this.assertUnchanged();
+    const bytes = Buffer.from(this.#snapshotBytes);
+    try {
+      return consumer(bytes);
+    } finally {
+      bytes.fill(0);
+      this.assertUnchanged();
+    }
+  }
+
+  sameFileObject(other: ImmutableLocalArchiveSnapshot): boolean {
+    if (this.#descriptor < 0 || other.#descriptor < 0) {
+      throw new Error("deployment archive snapshot is closed");
+    }
+    const left = localArchiveIdentity(fstatSync(this.#descriptor, { bigint: true }));
+    const right = localArchiveIdentity(fstatSync(other.#descriptor, { bigint: true }));
+    return left.dev === right.dev && left.ino === right.ino;
+  }
+
+  hasExactBytes(other: ImmutableLocalArchiveSnapshot): boolean {
+    if (this.#descriptor < 0 || other.#descriptor < 0) {
+      throw new Error("deployment archive snapshot is closed");
+    }
+    return equalLocalArchiveBytes(this.#snapshotBytes, other.#snapshotBytes);
+  }
+
+  close(): void {
+    if (this.#descriptor < 0) return;
+    closeSync(this.#descriptor);
+    this.#descriptor = -1;
+    this.#snapshotBytes.fill(0);
+  }
+}
+
+function withLocalArchiveSnapshot<T>(
+  input: string | ImmutableLocalArchiveSnapshot,
+  consumer: (snapshot: ImmutableLocalArchiveSnapshot) => T
+): T {
+  if (input instanceof ImmutableLocalArchiveSnapshot) {
+    input.assertUnchanged();
+    return consumer(input);
+  }
+  const snapshot = ImmutableLocalArchiveSnapshot.open(input);
+  try {
+    return consumer(snapshot);
+  } finally {
+    snapshot.close();
+  }
+}
+
 function readBoundedStdin(maximumBytes: number): string {
   const chunks: Buffer[] = [];
   let total = 0;
@@ -480,19 +1290,98 @@ function readBoundedStdin(maximumBytes: number): string {
   return Buffer.concat(chunks).toString("utf8");
 }
 
+export function assertFrozenQualificationSystemExecutable(
+  id: (typeof OS01_QUALIFICATION_SYSTEM_EXECUTABLES)[number]["id"]
+): string {
+  const specification = OS01_QUALIFICATION_SYSTEM_EXECUTABLES.find((entry) => entry.id === id);
+  const frozen = attestationContract.buildIdentity.qualificationBuild.systemExecutables.find(
+    (entry) => entry.id === id
+  );
+  if (
+    specification === undefined ||
+    frozen === undefined ||
+    stableJson(
+      attestationContract.buildIdentity.qualificationBuild.systemExecutables.map(
+        (entry) => ({
+          id: entry.id,
+          path: entry.path,
+          resourceTrees: entry.resourceTrees.map((resource) => ({ id: resource.id, path: resource.path }))
+        })
+      )
+    ) !== stableJson(OS01_QUALIFICATION_SYSTEM_EXECUTABLES.map((entry) => ({
+      id: entry.id,
+      path: entry.path,
+      resourceTrees: [...entry.resourceTrees]
+    }))) ||
+    stableJson(measureSystemExecutable(specification, frozen)) !== stableJson(frozen)
+  ) {
+    throw new Error(`${id} system executable differs from the frozen qualification contract`);
+  }
+  return specification.path;
+}
+
+export function assertFrozenQualificationAuthorityProcess(repositoryRoot: string): void {
+  const qualification = attestationContract.buildIdentity.qualificationBuild;
+  assertFrozenAuthorityLoaderProcess({
+    root: repositoryRoot,
+    nodeExecutableSha256: qualification.nodeExecutableSha256,
+    authorityLoader: qualification.authorityLoader
+  });
+}
+
+export const OS01_QUALIFICATION_PYTHON_FLAGS = Object.freeze([
+  "-I", "-S", "-B", "-X", "utf8"
+]);
+
+const QUALIFICATION_GIT_ENVIRONMENT = Object.freeze({
+  GIT_ATTR_NOSYSTEM: "1",
+  GIT_CONFIG_GLOBAL: "/dev/null",
+  GIT_CONFIG_NOSYSTEM: "1",
+  GIT_CONFIG_SYSTEM: "/dev/null",
+  GIT_EXEC_PATH: "/dev/null/os01-no-git-helpers",
+  GIT_OPTIONAL_LOCKS: "0",
+  GIT_PAGER: "",
+  GIT_TERMINAL_PROMPT: "0",
+  HOME: "/var/empty",
+  LANG: "C",
+  LC_ALL: "C",
+  NODE_ENV: "production",
+  PATH: "/dev/null",
+  TZ: "UTC",
+  XDG_CONFIG_HOME: "/var/empty"
+});
+
+const QUALIFICATION_GIT_ARGUMENT_PREFIX = Object.freeze([
+  "--exec-path=/dev/null/os01-no-git-helpers",
+  "--no-pager",
+  "-c", "core.fsmonitor=false",
+  "-c", "core.hooksPath=/dev/null"
+]);
+
+function qualificationGitArguments(args: string[]): string[] {
+  const commandArguments = args[0] === "diff"
+    ? ["diff", "--no-ext-diff", ...args.slice(1)]
+    : args;
+  return [...QUALIFICATION_GIT_ARGUMENT_PREFIX, ...commandArguments];
+}
+
 function gitText(repositoryRoot: string, args: string[]): string {
-  return execFileSync("git", args, {
+  const gitExecutable = assertFrozenQualificationSystemExecutable("git");
+  return execFileSync(gitExecutable, qualificationGitArguments(args), {
     cwd: repositoryRoot,
     encoding: "utf8",
+    env: QUALIFICATION_GIT_ENVIRONMENT,
     maxBuffer: 16 * 1024 * 1024,
     stdio: ["ignore", "pipe", "pipe"]
   }).trim();
 }
 
 function gitBytes(repositoryRoot: string, args: string[]): Uint8Array {
-  return execFileSync("git", args, {
+  const gitExecutable = assertFrozenQualificationSystemExecutable("git");
+  return execFileSync(gitExecutable, qualificationGitArguments(args), {
     cwd: repositoryRoot,
     encoding: "buffer",
+    env: QUALIFICATION_GIT_ENVIRONMENT,
     maxBuffer: 512 * 1024 * 1024,
     stdio: ["ignore", "pipe", "pipe"]
   });
@@ -522,7 +1411,10 @@ export function validateBridgeImplementation(
     gitText(repositoryRoot, ["rev-parse", "--verify", `${implementationCommitInput}^{commit}`]),
     "implementation commit"
   );
-  if (implementationCommit !== implementationCommitInput) throw new Error("implementation commit input is not canonical");
+  if (
+    implementationCommit !== implementationCommitInput ||
+    implementationCommit !== bridgeFoundation.requiredImplementationCommit
+  ) throw new Error("implementation commit is not the exact frozen C0 bridge");
   const implementationCommitCount = Number(gitText(repositoryRoot, [
     "rev-list", "--count", `${liveBaseCommit}..${implementationCommit}`
   ]));
@@ -575,6 +1467,11 @@ export function validateBridgeImplementation(
     "archive", `--format=${attestationContract.fullTrackedTreeIdentity.archiveFormat}`, implementationCommit
   ]);
   const implementationArchiveSha256 = sha256(implementationArchive);
+  if (
+    implementationTreeObjectId !== bridgeFoundation.requiredImplementationTreeObjectId ||
+    implementationArchiveSha256 !== bridgeFoundation.requiredImplementationArchiveSha256 ||
+    implementationArchive.byteLength !== bridgeFoundation.requiredImplementationArchiveBytes
+  ) throw new Error("implementation tree bytes are not the exact frozen C0 bridge");
   const sourceTreeAnchor = sha256(stableJson({
     version: attestationContract.sourceTreeIdentityVersion,
     bridgeFoundationVersion: bridgeFoundation.version,
@@ -620,8 +1517,12 @@ export function validateGitSuccessor(
     gitText(repositoryRoot, ["rev-parse", "--verify", `${deploymentCommitInput}^{commit}`]),
     "deployment commit"
   );
-  if (implementationCommit !== implementationCommitInput || deploymentCommit !== deploymentCommitInput) {
-    throw new Error("Git commit input is not canonical");
+  if (
+    implementationCommit !== implementationCommitInput ||
+    implementationCommit !== bridgeFoundation.requiredImplementationCommit ||
+    deploymentCommit !== deploymentCommitInput
+  ) {
+    throw new Error("Git commit input is not the exact frozen C0/C1 chain");
   }
   const implementationCommitCount = Number(gitText(repositoryRoot, [
     "rev-list", "--count", `${liveBaseCommit}..${implementationCommit}`
@@ -713,6 +1614,11 @@ export function validateGitSuccessor(
     "archive", `--format=${attestationContract.fullTrackedTreeIdentity.archiveFormat}`, deploymentCommit
   ]);
   const implementationArchiveSha256 = sha256(implementationArchive);
+  if (
+    implementationTreeObjectId !== bridgeFoundation.requiredImplementationTreeObjectId ||
+    implementationArchiveSha256 !== bridgeFoundation.requiredImplementationArchiveSha256 ||
+    implementationArchive.byteLength !== bridgeFoundation.requiredImplementationArchiveBytes
+  ) throw new Error("implementation tree bytes are not the exact frozen C0 bridge");
   const deploymentArchiveSha256 = sha256(deploymentArchive);
   const sourceTreeAnchor = sha256(stableJson({
     version: attestationContract.sourceTreeIdentityVersion,
@@ -855,7 +1761,9 @@ function localBuildEvidence(
   },
   compiledAnchorCarrierRoot: string,
   entryStaticClosure: { root: string; fileCount: number },
-  qualificationBuild: LocalBuildEvidence["qualificationBuild"]
+  qualificationBuild: LocalBuildEvidence["qualificationBuild"],
+  forbiddenContextMarkers: readonly Buffer[],
+  clientForbiddenDerivedMarkers: readonly Buffer[]
 ): LocalBuildEvidence {
   const distRootPath = resolve(repositoryRoot, attestationContract.buildIdentity.distPath);
   const records: Array<{ path: string; bytes: number; sha256: string }> = [];
@@ -870,12 +1778,13 @@ function localBuildEvidence(
         const relativePath = relative(distRootPath, path).split(sep).join("/");
         if (relativePath.startsWith("../") || relativePath === "") throw new Error("invalid build output path");
         const bytes = readFileSync(path);
-        const contextBytes = Buffer.from(qualificationBuild.contextHash, "hex");
-        const contextHexBytes = Buffer.from(qualificationBuild.contextHash, "utf8");
-        const contextBase64Bytes = Buffer.from(contextBytes.toString("base64"), "utf8");
-        if (
-          bytes.includes(contextBytes) || bytes.includes(contextHexBytes) || bytes.includes(contextBase64Bytes)
-        ) throw new Error("qualification build context leaked into output bytes");
+        if (forbiddenContextMarkers.some((marker) => containsByteSequence(bytes, marker))) {
+          throw new Error("qualification build context leaked into output bytes");
+        }
+        if (relativePath.startsWith("client/") &&
+          clientForbiddenDerivedMarkers.some((marker) => containsByteSequence(bytes, marker))) {
+          throw new Error("qualification-derived server credential leaked into public client bytes");
+        }
         records.push({ path: relativePath, bytes: bytes.byteLength, sha256: sha256(bytes) });
       } else {
         throw new Error("build output contains a non-file entry");
@@ -924,8 +1833,23 @@ export function validateExactSourceAnchor(
   }
 }
 
-export function expectedPackageManifest(repositoryRoot: string): PackageManifestEvidence {
+export function expectedPackageManifest(
+  repositoryRoot: string,
+  target?: TrustedTarget
+): PackageManifestEvidence {
+  if (target !== undefined) validateTrackedHostingTarget(repositoryRoot, target);
   const records = new Map<string, { path: string; bytes: number; sha256: string }>();
+  const addRecord = (outputPath: string, bytes: Buffer): void => {
+    const record = { path: outputPath, bytes: bytes.byteLength, sha256: sha256(bytes) };
+    const existing = records.get(outputPath);
+    if (existing !== undefined) {
+      if (stableJson(existing) !== stableJson(record)) {
+        throw new Error(`package path collision contains different bytes: ${outputPath}`);
+      }
+      return;
+    }
+    records.set(outputPath, record);
+  };
   const addTree = (treeRoot: string, outputPrefix: string): void => {
     const visit = (directory: string): void => {
       for (const name of readdirSync(directory).sort()) {
@@ -938,7 +1862,7 @@ export function expectedPackageManifest(repositoryRoot: string): PackageManifest
           if (localPath.startsWith("../") || localPath === "") throw new Error("invalid package input path");
           const outputPath = outputPrefix === "" ? localPath : `${outputPrefix}/${localPath}`;
           const bytes = readFileSync(path);
-          records.set(outputPath, { path: outputPath, bytes: bytes.byteLength, sha256: sha256(bytes) });
+          addRecord(outputPath, bytes);
         } else {
           throw new Error("package input contains a non-file entry");
         }
@@ -950,14 +1874,10 @@ export function expectedPackageManifest(repositoryRoot: string): PackageManifest
   addTree(distRoot, "");
   const hostingPath = resolve(repositoryRoot, ".openai/hosting.json");
   const hostingBytes = readFileSync(hostingPath);
-  records.set(".openai/hosting.json", {
-    path: ".openai/hosting.json",
-    bytes: hostingBytes.byteLength,
-    sha256: sha256(hostingBytes)
-  });
+  addRecord(".openai/hosting.json", hostingBytes);
   const drizzleRoot = resolve(repositoryRoot, "drizzle");
   if (existsSync(drizzleRoot)) addTree(drizzleRoot, ".openai/drizzle");
-  const sorted = [...records.values()].sort((left, right) => left.path.localeCompare(right.path));
+  const sorted = [...records.values()].sort((left, right) => compareUnicodeCodePoints(left.path, right.path));
   for (const requiredPath of [
     "server/index.js",
     ".openai/hosting.json",
@@ -1048,7 +1968,9 @@ export function freshBuildEvidence(
   expectedSourceAnchor: string,
   expectedReady: boolean,
   target: TrustedTarget,
-  role: QualificationBuildRole
+  role: QualificationBuildRole,
+  pnpmExecutablePath: string,
+  productionCoordinator?: ProductionQualificationCoordinator
 ): LocalBuildEvidence {
   const canonicalRoot = realpathSync(repositoryRoot);
   const gitRoot = realpathSync(gitText(canonicalRoot, ["rev-parse", "--show-toplevel"]));
@@ -1069,74 +1991,125 @@ export function freshBuildEvidence(
   rmSync(distPath, { recursive: true, force: true });
   const qualification = qualificationBuildContext({
     repositoryRoot: canonicalRoot,
+    pnpmExecutablePath,
     expectedCommit,
+    expectedSourceAnchor,
+    expectedReady,
     role,
-    target
+    target,
+    productionCoordinator
   });
+  const vinextCliPath = resolve(canonicalRoot, "node_modules/vinext/dist/cli.js");
+  const contextMarkers = [
+    Buffer.from(qualification.context),
+    encodeHexBytes(qualification.context),
+    encodeBase64Bytes(qualification.context)
+  ];
+  const derivedCredentialMarkers = qualificationDerivedCredentialMarkers(qualification.context);
   try {
-    execFileSync(
-      resolve(canonicalRoot, "node_modules/.bin/vinext"),
-      ["build", attestationContract.buildIdentity.qualificationBuild.modeFlag],
+    const installedToolchainBeforeBuild = buildInstalledToolchainEvidence({
+      root: canonicalRoot,
+      nodeExecutablePath: process.execPath,
+      pnpmExecutablePath,
+      expectedSystemExecutables:
+        attestationContract.buildIdentity.qualificationBuild.systemExecutables,
+      expectedPlatformIdentity:
+        attestationContract.buildIdentity.qualificationBuild.platformIdentity
+    });
+    assertBuildToolchainEvidenceUnchanged(
+      qualification.installedToolchain,
+      installedToolchainBeforeBuild
+    );
+    const build = spawnSync(
+      process.execPath,
+      [vinextCliPath, "build", attestationContract.buildIdentity.qualificationBuild.modeFlag],
       {
         cwd: canonicalRoot,
         input: qualification.context,
-        encoding: "utf8",
         maxBuffer: 64 * 1024 * 1024,
         stdio: ["pipe", "pipe", "pipe"],
         env: {
           PATH: `${dirname(process.execPath)}:/usr/bin:/bin`,
           NODE_ENV: "production",
           CI: "1",
-          WRANGLER_LOG_PATH: ".wrangler/wrangler.log"
+          WRANGLER_LOG_PATH: "/dev/null"
         }
       }
     );
+    qualification.context.fill(0);
+    const installedToolchainAfterBuild = buildInstalledToolchainEvidence({
+      root: canonicalRoot,
+      nodeExecutablePath: process.execPath,
+      pnpmExecutablePath,
+      expectedSystemExecutables:
+        attestationContract.buildIdentity.qualificationBuild.systemExecutables,
+      expectedPlatformIdentity:
+        attestationContract.buildIdentity.qualificationBuild.platformIdentity
+    });
+    assertBuildToolchainEvidenceUnchanged(
+      installedToolchainBeforeBuild,
+      installedToolchainAfterBuild
+    );
+    const stdout = build.stdout instanceof Uint8Array ? build.stdout : Buffer.alloc(0);
+    const stderr = build.stderr instanceof Uint8Array ? build.stderr : Buffer.alloc(0);
+    const persistedMarkers = [...contextMarkers, ...derivedCredentialMarkers];
+    if (persistedMarkers.some((marker) =>
+      containsByteSequence(stdout, marker) || containsByteSequence(stderr, marker))) {
+      throw new Error(`${label} build log exposed qualification entropy`);
+    }
+    if (build.error || build.status !== 0 || build.signal !== null) {
+      throw new Error(`${label} qualification build failed without publishing its captured output`);
+    }
+    if (gitText(canonicalRoot, ["status", "--porcelain=v1", "--untracked-files=all"]) !== "") {
+      throw new Error(`${label} build changed tracked or untracked source state`);
+    }
+    const pythonExecutable = assertFrozenQualificationSystemExecutable("python3");
+    const activeBuildGraphBytes = execFileSync(pythonExecutable, [...OS01_QUALIFICATION_PYTHON_FLAGS,
+      resolve(canonicalRoot, "scripts/verify_active_build_graph.py"),
+      "--repo-root", canonicalRoot,
+      "--build-root", distPath,
+      "--json"
+    ], {
+      cwd: canonicalRoot,
+      encoding: "utf8",
+      maxBuffer: 16 * 1024 * 1024,
+      stdio: ["ignore", "pipe", "pipe"],
+      env: { PATH: "/usr/bin:/bin", NODE_ENV: "production", PYTHONNOUSERSITE: "1" }
+    });
+    const activeBuildGraph = requireRecord(JSON.parse(activeBuildGraphBytes), `${label} active build graph`);
+    exactKeys(activeBuildGraph, ["buildFilesScanned", "errors", "sourceFilesScanned", "status"], `${label} active build graph`);
+    if (activeBuildGraph.status !== "pass" || !Array.isArray(activeBuildGraph.errors) || activeBuildGraph.errors.length !== 0) {
+      throw new Error(`${label} active build graph failed`);
+    }
+    const sourceFilesScanned = requireSafeInteger(activeBuildGraph.sourceFilesScanned, `${label} active source files`, 1);
+    const buildFilesScanned = requireSafeInteger(activeBuildGraph.buildFilesScanned, `${label} active build files`, 1);
+    const distPathRoot = resolve(canonicalRoot, attestationContract.buildIdentity.distPath);
+    const builtWorkerPath = resolve(canonicalRoot, attestationContract.buildIdentity.builtWorkerPath);
+    const builtWorkerBytes = readFileSync(builtWorkerPath);
+    if (!builtWorkerBytes.includes(Buffer.from(expectedSourceAnchor, "utf8"))) {
+      throw new Error(`${label} compiled worker entry omits the source anchor`);
+    }
+    if (expectedReady && builtWorkerBytes.includes(Buffer.from("0".repeat(64), "utf8"))) {
+      throw new Error(`${label} compiled worker entry retains the unready placeholder`);
+    }
+    const entryCarrier = {
+      path: relative(distPathRoot, builtWorkerPath).split(sep).join("/"),
+      sha256: sha256(builtWorkerBytes),
+      sourceAnchor: expectedSourceAnchor,
+      ready: expectedReady
+    };
+    const entryStaticClosure = verifyCensusEntryClosure(canonicalRoot);
+    return localBuildEvidence(canonicalRoot, {
+      hash: sha256(activeBuildGraphBytes),
+      sourceFilesScanned,
+      buildFilesScanned
+    }, sha256(stableJson(entryCarrier)), entryStaticClosure, qualification.evidence,
+    contextMarkers, derivedCredentialMarkers);
   } finally {
     qualification.context.fill(0);
+    contextMarkers.forEach((marker) => marker.fill(0));
+    derivedCredentialMarkers.forEach((marker) => marker.fill(0));
   }
-  if (gitText(canonicalRoot, ["status", "--porcelain=v1", "--untracked-files=all"]) !== "") {
-    throw new Error(`${label} build changed tracked or untracked source state`);
-  }
-  const activeBuildGraphBytes = execFileSync("/usr/bin/python3", [
-    resolve(canonicalRoot, "scripts/verify_active_build_graph.py"),
-    "--repo-root", canonicalRoot,
-    "--build-root", distPath,
-    "--json"
-  ], {
-    cwd: canonicalRoot,
-    encoding: "utf8",
-    maxBuffer: 16 * 1024 * 1024,
-    stdio: ["ignore", "pipe", "pipe"],
-    env: { PATH: "/usr/bin:/bin", NODE_ENV: "production", PYTHONNOUSERSITE: "1" }
-  });
-  const activeBuildGraph = requireRecord(JSON.parse(activeBuildGraphBytes), `${label} active build graph`);
-  exactKeys(activeBuildGraph, ["buildFilesScanned", "errors", "sourceFilesScanned", "status"], `${label} active build graph`);
-  if (activeBuildGraph.status !== "pass" || !Array.isArray(activeBuildGraph.errors) || activeBuildGraph.errors.length !== 0) {
-    throw new Error(`${label} active build graph failed`);
-  }
-  const sourceFilesScanned = requireSafeInteger(activeBuildGraph.sourceFilesScanned, `${label} active source files`, 1);
-  const buildFilesScanned = requireSafeInteger(activeBuildGraph.buildFilesScanned, `${label} active build files`, 1);
-  const distPathRoot = resolve(canonicalRoot, attestationContract.buildIdentity.distPath);
-  const builtWorkerPath = resolve(canonicalRoot, attestationContract.buildIdentity.builtWorkerPath);
-  const builtWorkerBytes = readFileSync(builtWorkerPath);
-  if (!builtWorkerBytes.includes(Buffer.from(expectedSourceAnchor, "utf8"))) {
-    throw new Error(`${label} compiled worker entry omits the source anchor`);
-  }
-  if (expectedReady && builtWorkerBytes.includes(Buffer.from("0".repeat(64), "utf8"))) {
-    throw new Error(`${label} compiled worker entry retains the unready placeholder`);
-  }
-  const entryCarrier = {
-    path: relative(distPathRoot, builtWorkerPath).split(sep).join("/"),
-    sha256: sha256(builtWorkerBytes),
-    sourceAnchor: expectedSourceAnchor,
-    ready: expectedReady
-  };
-  const entryStaticClosure = verifyCensusEntryClosure(canonicalRoot);
-  return localBuildEvidence(canonicalRoot, {
-    hash: sha256(activeBuildGraphBytes),
-    sourceFilesScanned,
-    buildFilesScanned
-  }, sha256(stableJson(entryCarrier)), entryStaticClosure, qualification.evidence);
 }
 
 export function computeSourceAnchor(
@@ -1159,7 +2132,9 @@ export function prepareSourceAnchorEvidence(input: {
   authorityCommit: string;
   implementationRepositoryRoots: readonly [string, string];
   implementationCommit: string;
+  pnpmExecutablePath: string;
   target: TrustedTarget;
+  productionCoordinator?: ProductionQualificationCoordinator;
 }): {
   authorityEvidence: AuthorityEvidence;
   authorityBridgeCodeRelation: AuthorityBridgeCodeRelationEvidence;
@@ -1193,7 +2168,9 @@ export function prepareSourceAnchorEvidence(input: {
     placeholderAnchor,
     false,
     input.target,
-    "implementation"
+    "implementation",
+    input.pnpmExecutablePath,
+    input.productionCoordinator
   );
   const secondBuild = freshBuildEvidence(
     secondRoot,
@@ -1202,7 +2179,9 @@ export function prepareSourceAnchorEvidence(input: {
     placeholderAnchor,
     false,
     input.target,
-    "implementation"
+    "implementation",
+    input.pnpmExecutablePath,
+    input.productionCoordinator
   );
   if (stableJson(firstBuild) !== stableJson(secondBuild)) {
     throw new Error("independent C0 preparation build manifests differ");
@@ -1356,10 +2335,264 @@ export function validateArchivePackageBinding(input: {
   ) throw new Error("deployment archive and package manifest mismatch");
 }
 
-export function localArchiveEvidence(path: string): LocalArchiveEvidence {
-  const canonicalPath = realpathSync(path);
-  const bytes = readStableFile(canonicalPath, MAX_DEPLOYMENT_ARCHIVE_BYTES, "deployment archive");
-  const inspectionBytes = execFileSync("/usr/bin/python3", [
+export function constructDeploymentProof(
+  input: DeploymentProofConstructionInput
+): Record<string, unknown> {
+  exactKeys(requireRecord(input, "deployment proof input"), [
+    "access", "deployment", "deploymentBuild", "gitEvidence", "localArchive",
+    "observedAt", "packageManifest", "qualificationArchiveBoundary", "sitesVersion",
+    "sourceAnchorEvidence", "target", "uploader"
+  ], "deployment proof input");
+  exactKeys(requireRecord(input.access, "access projection"), [
+    "accessMode", "allowedAccountUserCount", "allowedUserCount", "currentUserRole",
+    "editorCount", "externalVisitorCount", "groupCount", "nonOwnerUserCount",
+    "observedAt", "origin", "ownerRoleCount", "principalRoot", "projectId", "revision",
+    "tenantGroupCount", "version", "workspaceGroupCount"
+  ], "access projection");
+  exactKeys(requireRecord(input.sitesVersion, "version projection"), [
+    "archiveContentHash", "archiveFileCount", "archiveFormat", "archiveSizeBytes",
+    "observedAt", "projectId", "sourceCommit", "version", "versionId", "versionNumber"
+  ], "version projection");
+  exactKeys(requireRecord(input.deployment, "deployment projection"), [
+    "deploymentId", "environmentRevision", "observedAt", "origin", "projectId", "status",
+    "type", "updatedAt", "version", "versionId"
+  ], "deployment projection");
+  exactKeys(requireRecord(input.sourceAnchorEvidence, "source-anchor evidence"), [
+    "authorityBridgeCodeRelation", "authorityEvidence", "bridgeImplementation",
+    "implementationBuild", "sourceAnchor"
+  ], "source-anchor evidence");
+
+  const observedAt = requireString(input.observedAt, "deployment proof observation time");
+  const observedMs = Date.parse(observedAt);
+  if (!Number.isFinite(observedMs)) throw new Error("deployment proof observation time is invalid");
+  for (const [label, projectedAt] of [
+    ["access", input.access.observedAt],
+    ["version", input.sitesVersion.observedAt],
+    ["deployment", input.deployment.observedAt],
+    ["uploader", input.uploader.observedAt]
+  ] as const) {
+    try {
+      validateDeploymentProofFreshness(projectedAt, observedMs);
+    } catch {
+      throw new Error(`${label} projection is not contemporaneous with the deployment proof`);
+    }
+  }
+  if (input.target.loopbackFixture) {
+    throw new Error("deployment proof target cannot be a loopback fixture");
+  }
+  const qualificationPolicy = attestationContract.buildIdentity.qualificationBuild;
+  if (input.target.accessMode === qualificationPolicy.ownerOnlyAccessMode) {
+    validateOwnerOnlyAccess(input.access);
+  } else if (input.target.accessMode === qualificationPolicy.productionAccessMode) {
+    validatePublicProductionAccess(input.access);
+  } else {
+    throw new Error("deployment proof target has an unsupported access mode");
+  }
+  if (
+    input.access.version !== os01ControlPlaneContract.version ||
+    input.sitesVersion.version !== os01ControlPlaneContract.version ||
+    input.deployment.version !== os01ControlPlaneContract.version ||
+    input.access.projectId !== input.target.projectId ||
+    input.access.origin !== input.target.origin ||
+    input.sitesVersion.projectId !== input.target.projectId ||
+    input.deployment.projectId !== input.target.projectId ||
+    input.deployment.origin !== input.target.origin ||
+    input.sitesVersion.sourceCommit !== input.gitEvidence.deploymentCommit ||
+    input.deployment.versionId !== input.sitesVersion.versionId ||
+    input.deployment.status !== "succeeded" ||
+    input.deployment.type !== "publish"
+  ) throw new Error("sanitized control-plane projections do not match the trusted deployment");
+
+  const expectedBridgeImplementation: BridgeImplementationEvidence = {
+    liveBaseCommit: input.gitEvidence.liveBaseCommit,
+    liveBaseTreeObjectId: input.gitEvidence.liveBaseTreeObjectId,
+    liveBaseToImplementationNameStatus: input.gitEvidence.liveBaseToImplementationNameStatus,
+    implementationCommit: input.gitEvidence.implementationCommit,
+    implementationTreeObjectId: input.gitEvidence.implementationTreeObjectId,
+    implementationArchiveSha256: input.gitEvidence.implementationArchiveSha256,
+    implementationArchiveBytes: input.gitEvidence.implementationArchiveBytes,
+    sourceTreeAnchor: input.gitEvidence.sourceTreeAnchor
+  };
+  if (stableJson(input.sourceAnchorEvidence.bridgeImplementation) !== stableJson(expectedBridgeImplementation)) {
+    throw new Error("source-anchor bridge evidence does not match the deployment successor");
+  }
+  const computedSourceAnchor = computeSourceAnchor(
+    input.gitEvidence,
+    input.sourceAnchorEvidence.implementationBuild,
+    input.sourceAnchorEvidence.authorityEvidence,
+    input.sourceAnchorEvidence.authorityBridgeCodeRelation
+  );
+  if (computedSourceAnchor !== input.sourceAnchorEvidence.sourceAnchor) {
+    throw new Error("source-anchor evidence does not recompute");
+  }
+  if (stableJson(input.gitEvidence.implementationToDeploymentDiff) !== stableJson(
+    attestationContract.requiredImplementationToDeploymentDiff
+  )) throw new Error("deployment successor diff does not match the frozen contract");
+
+  validateQualificationBuildEvidence(
+    input.sourceAnchorEvidence.implementationBuild.qualificationBuild,
+    "implementation qualification build",
+    "implementation",
+    input.target
+  );
+  validateQualificationBuildEvidence(
+    input.deploymentBuild.qualificationBuild,
+    "deployment qualification build",
+    "deployment",
+    input.target
+  );
+  const implementationQualification = input.sourceAnchorEvidence.implementationBuild.qualificationBuild;
+  const deploymentQualification = input.deploymentBuild.qualificationBuild;
+  const qualificationArchiveBoundary = validateQualificationArchiveBoundaryEvidence(
+    input.qualificationArchiveBoundary,
+    input.localArchive,
+    deploymentQualification
+  );
+  if (deploymentQualification.contextCommitment === implementationQualification.contextCommitment) {
+    throw new Error("implementation and deployment qualification contexts are not domain-separated");
+  }
+  if (
+    deploymentQualification.mode !== implementationQualification.mode ||
+    deploymentQualification.runId !== implementationQualification.runId ||
+    deploymentQualification.seedCommitment !== implementationQualification.seedCommitment
+  ) throw new Error("implementation and deployment builds do not share one qualification session");
+  if (deploymentQualification.transcriptHash === implementationQualification.transcriptHash) {
+    throw new Error("implementation and deployment transcripts are not role-separated");
+  }
+  if (input.deploymentBuild.fileCount < 1 || input.packageManifest.fileCount < 1 || input.localArchive.fileCount < 1) {
+    throw new Error("deployment build or package evidence is empty");
+  }
+  for (const [label, value] of [
+    ["deployment build input root", input.gitEvidence.buildInputRoot],
+    ["deployment dist root", input.deploymentBuild.distRoot],
+    ["deployment dist file-list root", input.deploymentBuild.archiveFileListRoot],
+    ["local archive hash", input.localArchive.archiveSha256],
+    ["local archive content root", input.localArchive.contentRoot],
+    ["local archive file-list root", input.localArchive.fileListRoot],
+    ["package content root", input.packageManifest.contentRoot],
+    ["package file-list root", input.packageManifest.fileListRoot]
+  ] as const) requireHex(value, label);
+
+  const sourceIdentity = {
+    authorityEvidence: input.sourceAnchorEvidence.authorityEvidence,
+    authorityBridgeCodeRelation: input.sourceAnchorEvidence.authorityBridgeCodeRelation,
+    fullTreeIdentityVersion: attestationContract.fullTrackedTreeIdentity.version,
+    liveBaseCommit: input.gitEvidence.liveBaseCommit,
+    liveBaseTreeObjectId: input.gitEvidence.liveBaseTreeObjectId,
+    liveBaseToImplementationNameStatus: input.gitEvidence.liveBaseToImplementationNameStatus,
+    implementationCommit: input.gitEvidence.implementationCommit,
+    deploymentCommit: input.gitEvidence.deploymentCommit,
+    implementationTreeObjectId: input.gitEvidence.implementationTreeObjectId,
+    deploymentTreeObjectId: input.gitEvidence.deploymentTreeObjectId,
+    implementationArchiveSha256: input.gitEvidence.implementationArchiveSha256,
+    implementationArchiveBytes: input.gitEvidence.implementationArchiveBytes,
+    deploymentArchiveSha256: input.gitEvidence.deploymentArchiveSha256,
+    deploymentArchiveBytes: input.gitEvidence.deploymentArchiveBytes,
+    implementationToDeploymentNameStatus: input.gitEvidence.implementationToDeploymentNameStatus,
+    successorCommitCount: input.gitEvidence.successorCommitCount,
+    sourceTreeAnchor: input.gitEvidence.sourceTreeAnchor,
+    implementationBuild: input.sourceAnchorEvidence.implementationBuild,
+    sourceAnchor: computedSourceAnchor,
+    buildInputRoot: input.gitEvidence.buildInputRoot
+  };
+  validateHostedSourceIdentity({
+    sourceIdentity,
+    gitEvidence: input.gitEvidence,
+    implementationBuild: input.sourceAnchorEvidence.implementationBuild,
+    authorityEvidence: input.sourceAnchorEvidence.authorityEvidence,
+    authorityBridgeCodeRelation: input.sourceAnchorEvidence.authorityBridgeCodeRelation
+  });
+
+  const build = {
+    activeBuildGraphHash: input.deploymentBuild.activeBuildGraphHash,
+    activeSourceFilesScanned: input.deploymentBuild.activeSourceFilesScanned,
+    activeBuildFilesScanned: input.deploymentBuild.activeBuildFilesScanned,
+    buildInputRoot: input.gitEvidence.buildInputRoot,
+    builtWorkerHash: input.deploymentBuild.builtWorkerHash,
+    compiledAnchorCarrierRoot: input.deploymentBuild.compiledAnchorCarrierRoot,
+    entryStaticClosureRoot: input.deploymentBuild.entryStaticClosureRoot,
+    entryStaticFileCount: input.deploymentBuild.entryStaticFileCount,
+    distRoot: input.deploymentBuild.distRoot,
+    distFileListRoot: input.deploymentBuild.archiveFileListRoot,
+    distFileCount: input.deploymentBuild.fileCount,
+    localArchiveFormat: attestationContract.buildIdentity.localArchiveFormat,
+    localArchiveSha256: input.localArchive.archiveSha256,
+    localArchiveBytes: input.localArchive.archiveBytes,
+    localArchiveFileListRoot: input.localArchive.fileListRoot,
+    localArchiveContentRoot: input.localArchive.contentRoot,
+    localArchiveFileCount: input.localArchive.fileCount,
+    packageContentRoot: input.packageManifest.contentRoot,
+    packageFileListRoot: input.packageManifest.fileListRoot,
+    packageFileCount: input.packageManifest.fileCount,
+    qualificationBuild: input.deploymentBuild.qualificationBuild,
+    qualificationArchiveBoundary,
+    sitesArchiveContentHash: input.sitesVersion.archiveContentHash
+  };
+  validateArchivePackageBinding({
+    archive: input.localArchive,
+    packageManifest: input.packageManifest,
+    proofBuild: build
+  });
+  if (
+    input.sitesVersion.archiveFileCount !== input.packageManifest.fileCount ||
+    input.sitesVersion.archiveFormat !== attestationContract.buildIdentity.sitesArchiveFormat
+  ) throw new Error("Sites archive projection does not match the local package manifest");
+  validateTrustedUploaderAssertion(input.uploader, input.sitesVersion, {
+    archiveSha256: input.localArchive.archiveSha256,
+    archiveBytes: input.localArchive.archiveBytes,
+    fileListRoot: input.localArchive.fileListRoot,
+    fileCount: input.localArchive.fileCount,
+    packageContentRoot: input.packageManifest.contentRoot
+  });
+  if (
+    input.uploader.sourceHeadBefore !== input.gitEvidence.liveBaseCommit ||
+    input.uploader.sourcePushExpectedOld !== input.gitEvidence.liveBaseCommit ||
+    input.uploader.sourceHeadAfter !== input.gitEvidence.deploymentCommit
+  ) throw new Error("trusted uploader assertion does not bind the source-head compare-and-swap");
+
+  const proof: Record<string, unknown> = {
+    version: attestationContract.deploymentProofVersion,
+    status: attestationContract.deploymentProofStatus,
+    projectId: input.target.projectId,
+    implementationCommit: input.gitEvidence.implementationCommit,
+    deploymentCommit: input.gitEvidence.deploymentCommit,
+    sourceAnchor: computedSourceAnchor,
+    sourceIdentity,
+    implementationToDeploymentDiff: input.gitEvidence.implementationToDeploymentDiff,
+    build,
+    sitesVersion: {
+      versionId: input.sitesVersion.versionId,
+      versionNumber: input.sitesVersion.versionNumber,
+      sourceCommit: input.sitesVersion.sourceCommit,
+      archiveContentHash: input.sitesVersion.archiveContentHash,
+      archiveFormat: input.sitesVersion.archiveFormat,
+      archiveFileCount: input.sitesVersion.archiveFileCount,
+      archiveSizeBytes: input.sitesVersion.archiveSizeBytes
+    },
+    uploader: input.uploader,
+    deployment: {
+      deploymentId: input.deployment.deploymentId,
+      status: input.deployment.status,
+      versionId: input.deployment.versionId,
+      environmentRevision: input.deployment.environmentRevision,
+      accessPolicyRevision: input.access.revision,
+      origin: input.deployment.origin
+    },
+    observedAt
+  };
+  validateSitesDeploymentIdentity({
+    proof,
+    target: input.target,
+    deploymentCommit: input.gitEvidence.deploymentCommit,
+    deploymentVersion: input.sitesVersion.versionId,
+    nowMs: observedMs
+  });
+  return proof;
+}
+
+function localArchiveEvidenceFromBytes(bytes: Uint8Array): LocalArchiveEvidence {
+  const pythonExecutable = assertFrozenQualificationSystemExecutable("python3");
+  const inspectionBytes = execFileSync(pythonExecutable, [...OS01_QUALIFICATION_PYTHON_FLAGS,
     resolve(root, "scripts/inspect_site_archive.py"),
     "--stdin"
   ], {
@@ -1392,6 +2625,140 @@ export function localArchiveEvidence(path: string): LocalArchiveEvidence {
   };
 }
 
+export function localArchiveEvidence(
+  input: string | ImmutableLocalArchiveSnapshot
+): LocalArchiveEvidence {
+  return withLocalArchiveSnapshot(input, (snapshot) =>
+    snapshot.consumeExactBytes(localArchiveEvidenceFromBytes));
+}
+
+export function verifyQualificationArchiveBoundary(input: {
+  path: string;
+  snapshot?: ImmutableLocalArchiveSnapshot;
+  qualificationBuild: LocalBuildEvidence["qualificationBuild"];
+  productionCoordinator?: ProductionQualificationCoordinator;
+}): QualificationArchiveBoundaryEvidence {
+  const qualification = validateQualificationBuildEvidence(
+    input.qualificationBuild,
+    "qualification archive build evidence",
+    "deployment"
+  );
+  let context: Buffer;
+  if (qualification.mode === "public_production_private_seed") {
+    if (
+      input.productionCoordinator === undefined ||
+      qualification.runId !== input.productionCoordinator.runId ||
+      qualification.seedCommitment !== input.productionCoordinator.seedCommitment
+    ) throw new Error("qualification archive is outside the live production session");
+    context = input.productionCoordinator.deriveContext(qualification.transcriptHash);
+  } else {
+    if (input.productionCoordinator !== undefined) {
+      throw new Error("owner-only qualification archive cannot use a production coordinator");
+    }
+    context = createHash("sha256")
+      .update(attestationContract.buildIdentity.qualificationBuild.contextDomain, "utf8")
+      .update(Buffer.from([0]))
+      .update(Buffer.from(qualification.transcriptHash, "hex"))
+      .digest();
+  }
+  if (qualificationContextCommitment(context) !== qualification.contextCommitment) {
+    context.fill(0);
+    throw new Error("qualification archive context commitment does not verify");
+  }
+  const contextMarkers = sensitiveMaterialMarkers(context);
+  const derivedMarkers = qualificationDerivedCredentialMarkers(context).flatMap((marker) => {
+    const encoded = sensitiveMaterialMarkers(marker);
+    marker.fill(0);
+    return encoded;
+  });
+  try {
+    const source = input.snapshot ?? input.path;
+    if (input.snapshot !== undefined && input.snapshot.path !== realpathSync(input.path)) {
+      throw new Error("qualification archive snapshot path mismatch");
+    }
+    return withLocalArchiveSnapshot(source, (snapshot) =>
+      snapshot.consumeExactBytes((archiveBytes) => {
+    const archive = localArchiveEvidenceFromBytes(archiveBytes);
+    const bsdtarExecutable = assertFrozenQualificationSystemExecutable("bsdtar");
+    const listing = execFileSync(bsdtarExecutable, ["-tzf", "-"], {
+      encoding: "utf8",
+      input: archiveBytes,
+      maxBuffer: 32 * 1024 * 1024,
+      stdio: ["pipe", "pipe", "pipe"],
+      env: { PATH: "/usr/bin:/bin", NODE_ENV: "production" }
+    });
+    const paths = listing.split("\n").filter((path) => path.length > 0 && !path.endsWith("/"));
+    if (new Set(paths).size !== paths.length || paths.length !== archive.fileCount) {
+      throw new Error("qualification archive file listing is not canonical");
+    }
+    let nonServerFileCount = 0;
+    const scanRecords = paths.map((path, index) => {
+      const memberLabel = `qualification archive member ${index}`;
+      if (
+        !path.startsWith("dist/") || path.includes("../") || path.includes("\0") ||
+        /[*?[\]\\]/u.test(path)
+      ) {
+        throw new Error("qualification archive contains an invalid path");
+      }
+      const pathBytes = Buffer.from(path, "utf8");
+      if (input.productionCoordinator) {
+        input.productionCoordinator.assertEvidenceBytesSafe(pathBytes, `${memberLabel} path`);
+      } else if (
+        contextMarkers.some((marker) => containsByteSequence(pathBytes, marker)) ||
+        derivedMarkers.some((marker) => containsByteSequence(pathBytes, marker))
+      ) {
+        throw new Error("qualification material leaked into an archive member path");
+      }
+      const bsdtarExecutable = assertFrozenQualificationSystemExecutable("bsdtar");
+      const bytes = execFileSync(bsdtarExecutable, ["-xOzf", "-", path], {
+        encoding: "buffer",
+        input: archiveBytes,
+        maxBuffer: MAX_DEPLOYMENT_ARCHIVE_BYTES,
+        stdio: ["pipe", "pipe", "pipe"],
+        env: { PATH: "/usr/bin:/bin", NODE_ENV: "production" }
+      });
+      const serverOnly = path.startsWith("dist/server/");
+      const nestedKind = nestedArchiveKind(path, bytes);
+      if (nestedKind !== null) {
+        throw new Error(`${memberLabel} is a forbidden nested ${nestedKind} container`);
+      }
+      if (input.productionCoordinator) {
+        input.productionCoordinator.assertEvidenceBytesSafe(bytes, memberLabel, Date.now(), {
+          allowDerivedQualificationCredential: serverOnly
+        });
+      }
+      if (contextMarkers.some((marker) => containsByteSequence(bytes, marker))) {
+        throw new Error("qualification context leaked into an archive member");
+      }
+      if (!serverOnly) {
+        nonServerFileCount += 1;
+        if (derivedMarkers.some((marker) => containsByteSequence(bytes, marker))) {
+          throw new Error("qualification-derived server credential leaked outside the server archive");
+        }
+      }
+      return { path, bytes: bytes.byteLength, sha256: sha256(bytes), serverOnly };
+    }).sort((left, right) => compareUnicodeCodePoints(left.path, right.path));
+    return {
+      version: attestationContract.buildIdentity.qualificationBuild.archiveBoundaryVersion,
+      archiveSha256: archive.archiveSha256,
+      qualificationMode: qualification.mode,
+      runId: qualification.runId,
+      seedCommitment: qualification.seedCommitment,
+      contextCommitment: qualification.contextCommitment,
+      fileCount: scanRecords.length,
+      nonServerFileCount,
+      rawContextLeakCount: 0,
+      nonServerDerivedCredentialLeakCount: 0,
+      scanRoot: sha256(stableJson(scanRecords))
+    };
+      }));
+  } finally {
+    context.fill(0);
+    contextMarkers.forEach((marker) => marker.fill(0));
+    derivedMarkers.forEach((marker) => marker.fill(0));
+  }
+}
+
 function argument(name: string): string {
   const index = process.argv.indexOf(name);
   const value = index >= 0 ? process.argv[index + 1] : undefined;
@@ -1407,12 +2774,18 @@ function optionalArgument(name: string): string | null {
   return value;
 }
 
-type QualificationPaths = {
+export type QualificationPaths = {
   directory: string;
   deploymentProof: string;
   deploymentArchive: string;
   output: string;
 };
+
+export function censusReservationPath(outputInput: string): string {
+  const output = resolve(outputInput);
+  const parent = realpathSync(dirname(output));
+  return resolve(parent, "census-receipt-reservation.json");
+}
 
 export function resolveQualificationPaths(directoryInput: string): QualificationPaths {
   if (!["--deployment-proof", "--deployment-archive", "--output"].every((name) => !process.argv.includes(name))) {
@@ -1427,6 +2800,7 @@ export function resolveQualificationPaths(directoryInput: string): Qualification
   const deploymentProof = resolve(directory, "deployment-proof.json");
   const deploymentArchive = resolve(directory, "deployment.tar.gz");
   const output = resolve(directory, "census-receipt.json");
+  const reservation = censusReservationPath(output);
   for (const [label, path] of [
     ["deployment proof", deploymentProof],
     ["deployment archive", deploymentArchive]
@@ -1437,6 +2811,7 @@ export function resolveQualificationPaths(directoryInput: string): Qualification
     }
   }
   if (existsSync(output)) throw new Error("qualification receipt path already exists");
+  if (existsSync(reservation)) throw new Error("qualification receipt reservation already exists");
   return { directory, deploymentProof, deploymentArchive, output };
 }
 
@@ -1456,6 +2831,8 @@ export function configuredTrustedTarget(targetName: string): TrustedTarget {
     projectId: configured.projectId,
     origin: origin.origin,
     accessMode: configured.accessMode,
+    d1Binding: configured.d1Binding,
+    r2Binding: configured.r2Binding,
     loopbackFixture: false
   };
 }
@@ -1480,6 +2857,8 @@ function resolveTrustedTarget(): TrustedTarget {
       projectId: "test-project",
       origin: origin.origin,
       accessMode: "explicit_loopback_fixture",
+      d1Binding: null,
+      r2Binding: null,
       loopbackFixture: true
     };
   }
@@ -1529,31 +2908,135 @@ function validateQualificationBuildEvidence(
 ): LocalBuildEvidence["qualificationBuild"] {
   const evidence = requireRecord(value, context);
   exactKeys(evidence, [
-    "contextHash", "nodeVersion", "patchSha256", "role", "targetAccessMode",
-    "targetProjectId", "toolchainRoot", "version", "vinextVersion"
+    "contextCommitment", "installedToolchainClosureRoot", "installedToolchainPackageCount",
+    "lockfileSha256", "mode", "nodeExecutableSha256", "nodeVersion", "patchSha256",
+    "pnpmExecutableSha256", "pnpmVersion", "role", "runId", "seedCommitment",
+    "targetAccessMode", "targetProjectId", "toolchainRoot", "transcriptHash", "version",
+    "vinextVersion", "workspaceSha256"
   ], context);
   const qualification = attestationContract.buildIdentity.qualificationBuild;
+  const runId = evidence.runId === null
+    ? null
+    : requireString(evidence.runId, `${context} run id`);
+  if (runId !== null && !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu.test(runId)) {
+    throw new Error(`${context} run id is invalid`);
+  }
+  const seedCommitment = evidence.seedCommitment === null
+    ? null
+    : requireHex(evidence.seedCommitment, `${context} seed commitment`);
   const parsed = {
     version: requireString(evidence.version, `${context} version`),
     role: requireString(evidence.role, `${context} role`) as QualificationBuildRole,
-    contextHash: requireHex(evidence.contextHash, `${context} context hash`),
+    mode: requireString(evidence.mode, `${context} mode`) as LocalBuildEvidence["qualificationBuild"]["mode"],
+    runId,
+    seedCommitment,
+    contextCommitment: requireHex(evidence.contextCommitment, `${context} context commitment`),
+    transcriptHash: requireHex(evidence.transcriptHash, `${context} transcript hash`),
     toolchainRoot: requireHex(evidence.toolchainRoot, `${context} toolchain root`),
+    installedToolchainClosureRoot: requireHex(
+      evidence.installedToolchainClosureRoot,
+      `${context} installed toolchain closure root`
+    ),
+    installedToolchainPackageCount: requireSafeInteger(
+      evidence.installedToolchainPackageCount,
+      `${context} installed toolchain package count`,
+      1
+    ),
     nodeVersion: requireString(evidence.nodeVersion, `${context} Node version`),
+    nodeExecutableSha256: requireHex(evidence.nodeExecutableSha256, `${context} Node executable hash`),
+    pnpmVersion: requireString(evidence.pnpmVersion, `${context} pnpm version`),
+    pnpmExecutableSha256: requireHex(evidence.pnpmExecutableSha256, `${context} pnpm executable hash`),
+    lockfileSha256: requireHex(evidence.lockfileSha256, `${context} lockfile hash`),
+    workspaceSha256: requireHex(evidence.workspaceSha256, `${context} workspace hash`),
     vinextVersion: requireString(evidence.vinextVersion, `${context} Vinext version`),
     patchSha256: requireHex(evidence.patchSha256, `${context} patch hash`),
     targetProjectId: requireString(evidence.targetProjectId, `${context} target project`),
     targetAccessMode: requireString(evidence.targetAccessMode, `${context} target access`)
   };
+  const ownerOnlyEvidence =
+    parsed.mode === "owner_only_public_context" &&
+    parsed.runId === null &&
+    parsed.seedCommitment === null &&
+    parsed.targetAccessMode === qualification.ownerOnlyAccessMode;
+  const productionEvidence =
+    parsed.mode === "public_production_private_seed" &&
+    parsed.runId !== null &&
+    parsed.seedCommitment !== null &&
+    parsed.targetAccessMode === qualification.productionAccessMode;
   if (
     parsed.version !== qualification.version || parsed.role !== expectedRole ||
     parsed.vinextVersion !== qualification.vinextVersion ||
     parsed.patchSha256 !== qualification.patchSha256 ||
-    parsed.targetAccessMode !== qualification.targetAccessRequired ||
+    parsed.installedToolchainClosureRoot !== qualification.installedToolchainClosureRoot ||
+    parsed.installedToolchainPackageCount !== qualification.installedToolchainPackageCount ||
+    parsed.nodeVersion !== qualification.nodeVersion ||
+    parsed.nodeExecutableSha256 !== qualification.nodeExecutableSha256 ||
+    parsed.pnpmVersion !== qualification.pnpmVersion ||
+    parsed.pnpmExecutableSha256 !== qualification.pnpmExecutableSha256 ||
+    parsed.lockfileSha256 !== qualification.lockfileSha256 ||
+    parsed.workspaceSha256 !== qualification.workspaceSha256 ||
+    (!ownerOnlyEvidence && !productionEvidence) ||
     (expectedTarget !== undefined && (
       parsed.targetProjectId !== expectedTarget.projectId ||
       parsed.targetAccessMode !== expectedTarget.accessMode
     ))
-  ) throw new Error(`${context} does not match the frozen owner-only qualification build`);
+  ) throw new Error(`${context} does not match the frozen qualification build policy`);
+  return parsed;
+}
+
+function validateQualificationArchiveBoundaryEvidence(
+  value: unknown,
+  archive: LocalArchiveEvidence,
+  qualificationBuild: LocalBuildEvidence["qualificationBuild"]
+): QualificationArchiveBoundaryEvidence {
+  const evidence = requireRecord(value, "qualification archive boundary evidence");
+  exactKeys(evidence, [
+    "archiveSha256", "contextCommitment", "fileCount", "nonServerDerivedCredentialLeakCount",
+    "nonServerFileCount", "qualificationMode", "rawContextLeakCount", "runId",
+    "scanRoot", "seedCommitment", "version"
+  ], "qualification archive boundary evidence");
+  const parsed: QualificationArchiveBoundaryEvidence = {
+    version: requireString(evidence.version, "qualification archive boundary version"),
+    archiveSha256: requireHex(evidence.archiveSha256, "qualification archive hash"),
+    qualificationMode: requireString(
+      evidence.qualificationMode,
+      "qualification archive mode"
+    ) as QualificationArchiveBoundaryEvidence["qualificationMode"],
+    runId: evidence.runId === null ? null : requireString(evidence.runId, "qualification archive run id"),
+    seedCommitment: evidence.seedCommitment === null
+      ? null
+      : requireHex(evidence.seedCommitment, "qualification archive seed commitment"),
+    contextCommitment: requireHex(evidence.contextCommitment, "qualification archive context commitment"),
+    fileCount: requireSafeInteger(evidence.fileCount, "qualification archive file count", 1),
+    nonServerFileCount: requireSafeInteger(
+      evidence.nonServerFileCount,
+      "qualification archive non-server file count",
+      1
+    ),
+    rawContextLeakCount: requireSafeInteger(
+      evidence.rawContextLeakCount,
+      "qualification archive raw-context leak count",
+      0,
+      0
+    ) as 0,
+    nonServerDerivedCredentialLeakCount: requireSafeInteger(
+      evidence.nonServerDerivedCredentialLeakCount,
+      "qualification archive derived-credential leak count",
+      0,
+      0
+    ) as 0,
+    scanRoot: requireHex(evidence.scanRoot, "qualification archive scan root")
+  };
+  if (
+    parsed.version !== attestationContract.buildIdentity.qualificationBuild.archiveBoundaryVersion ||
+    parsed.archiveSha256 !== archive.archiveSha256 ||
+    parsed.fileCount !== archive.fileCount ||
+    parsed.nonServerFileCount > parsed.fileCount ||
+    parsed.qualificationMode !== qualificationBuild.mode ||
+    parsed.runId !== qualificationBuild.runId ||
+    parsed.seedCommitment !== qualificationBuild.seedCommitment ||
+    parsed.contextCommitment !== qualificationBuild.contextCommitment
+  ) throw new Error("qualification archive boundary does not match the build and archive");
   return parsed;
 }
 
@@ -1660,18 +3143,21 @@ export function migrationStages(): ExpectedStages {
   };
 }
 
-function validateDeploymentProof(input: {
+export function validateDeploymentProof(input: {
   path: string;
   target: TrustedTarget;
   authorityRepositoryRoot: string;
   implementationRepositoryRoots: readonly [string, string];
   repositoryRoots: readonly [string, string];
   archivePath: string;
+  archiveSnapshot?: ImmutableLocalArchiveSnapshot;
   authorityEvidence: AuthorityEvidence | null;
   expectedBuildAttestation: string;
   expectedImplementationCommit: string;
   sourceCommit: string;
   deploymentVersion: string;
+  pnpmExecutablePath: string;
+  productionCoordinator?: ProductionQualificationCoordinator;
 }): { proof: Record<string, unknown>; proofHash: string; gitEvidence: GitSuccessorEvidence | null } {
   const bytes = readStableFile(input.path, MAX_DEPLOYMENT_PROOF_BYTES, "deployment proof");
   const proof = requireRecord(JSON.parse(new TextDecoder().decode(bytes)), "deployment proof");
@@ -1687,6 +3173,7 @@ function validateDeploymentProof(input: {
     "sourceAnchor",
     "sourceIdentity",
     "status",
+    "uploader",
     "version"
   ], "deployment proof");
   if (proof.version !== attestationContract.deploymentProofVersion || proof.status !== attestationContract.deploymentProofStatus) {
@@ -1748,10 +3235,14 @@ function validateDeploymentProof(input: {
     if (firstRoot === secondRoot) throw new Error("implementation reproducibility worktrees must be distinct");
     const placeholderAnchor = "0".repeat(64);
     const firstBuild = freshBuildEvidence(
-      firstRoot, implementationCommit, "first C0 build", placeholderAnchor, false, input.target, "implementation"
+      firstRoot, implementationCommit, "first C0 build", placeholderAnchor, false, input.target, "implementation",
+      input.pnpmExecutablePath,
+      input.productionCoordinator
     );
     const secondBuild = freshBuildEvidence(
-      secondRoot, implementationCommit, "second C0 build", placeholderAnchor, false, input.target, "implementation"
+      secondRoot, implementationCommit, "second C0 build", placeholderAnchor, false, input.target, "implementation",
+      input.pnpmExecutablePath,
+      input.productionCoordinator
     );
     if (stableJson(firstBuild) !== stableJson(secondBuild)) {
       throw new Error("independent C0 build manifests differ");
@@ -1860,6 +3351,47 @@ function validateDeploymentProof(input: {
     deploymentCommit,
     deploymentVersion: input.deploymentVersion
   });
+  const sitesVersionRecord = requireRecord(proof.sitesVersion, "Sites version projection");
+  const sitesVersionId = requireString(sitesVersion.versionId, "Sites version id");
+  const sitesArchiveContentHash = requireString(sitesVersion.archiveContentHash, "Sites archive content hash");
+  const sitesArchiveFileCount = requireSafeInteger(sitesVersion.archiveFileCount, "Sites archive file count", 1);
+  const uploader = proof.uploader as TrustedUploaderAssertion;
+  validateDeploymentProofFreshness(
+    uploader.observedAt,
+    Date.parse(requireString(proof.observedAt, "deployment proof observation time"))
+  );
+  validateTrustedUploaderAssertion(uploader, {
+    version: os01ControlPlaneContract.version,
+    observedAt: requireString(proof.observedAt, "Sites version observation time"),
+    projectId: input.target.projectId,
+    versionId: sitesVersionId,
+    versionNumber: requireSafeInteger(
+      sitesVersionRecord.versionNumber,
+      "Sites version number",
+      1
+    ),
+    sourceCommit: deploymentCommit,
+    archiveContentHash: sitesArchiveContentHash,
+    archiveFormat: requireString(
+      sitesVersionRecord.archiveFormat,
+      "Sites archive format"
+    ),
+    archiveFileCount: requireSafeInteger(
+      sitesVersionRecord.archiveFileCount,
+      "Sites archive file count",
+      1
+    ),
+    archiveSizeBytes: requireSafeInteger(
+      sitesVersionRecord.archiveSizeBytes,
+      "Sites archive bytes",
+      1
+    )
+  });
+  if (gitEvidence !== null && (
+    uploader.sourceHeadBefore !== gitEvidence.liveBaseCommit ||
+    uploader.sourcePushExpectedOld !== gitEvidence.liveBaseCommit ||
+    uploader.sourceHeadAfter !== gitEvidence.deploymentCommit
+  )) throw new Error("trusted uploader source compare-and-swap does not reproduce");
 
   const build = requireRecord(proof.build, "deployment build proof");
   exactKeys(build, [
@@ -1868,7 +3400,7 @@ function validateDeploymentProof(input: {
     "entryStaticClosureRoot", "entryStaticFileCount",
     "localArchiveBytes", "localArchiveFileCount", "localArchiveFileListRoot", "localArchiveFormat",
     "localArchiveContentRoot", "localArchiveSha256", "packageContentRoot", "packageFileCount",
-    "packageFileListRoot", "qualificationBuild", "sitesArchiveContentHash"
+    "packageFileListRoot", "qualificationArchiveBoundary", "qualificationBuild", "sitesArchiveContentHash"
   ], "deployment build proof");
   for (const key of [
     "activeBuildGraphHash", "buildInputRoot", "builtWorkerHash", "compiledAnchorCarrierRoot", "distFileListRoot", "distRoot",
@@ -1892,8 +3424,8 @@ function validateDeploymentProof(input: {
   const packageFileCount = requireSafeInteger(build.packageFileCount, "deployment package file count", 1);
   if (
     build.localArchiveFormat !== attestationContract.buildIdentity.localArchiveFormat ||
-    build.sitesArchiveContentHash !== sitesVersion.archiveContentHash ||
-    localArchiveFileCount !== sitesVersion.archiveFileCount || packageFileCount !== localArchiveFileCount ||
+    build.sitesArchiveContentHash !== sitesArchiveContentHash ||
+    localArchiveFileCount !== sitesArchiveFileCount || packageFileCount !== localArchiveFileCount ||
     build.buildInputRoot !== sourceIdentity.buildInputRoot
   ) throw new Error("deployment build and Sites archive are not cross-linked");
   if (gitEvidence !== null) {
@@ -1901,24 +3433,78 @@ function validateDeploymentProof(input: {
       .map((path) => realpathSync(path)) as [string, string];
     if (firstRoot === secondRoot) throw new Error("deployment reproducibility worktrees must be distinct");
     const localBuild = freshBuildEvidence(
-      firstRoot, deploymentCommit, "first C1 build", qualifiedSourceAnchor, true, input.target, "deployment"
+      firstRoot, deploymentCommit, "first C1 build", qualifiedSourceAnchor, true, input.target, "deployment",
+      input.pnpmExecutablePath,
+      input.productionCoordinator
     );
     const replicaBuild = freshBuildEvidence(
-      secondRoot, deploymentCommit, "second C1 build", qualifiedSourceAnchor, true, input.target, "deployment"
+      secondRoot, deploymentCommit, "second C1 build", qualifiedSourceAnchor, true, input.target, "deployment",
+      input.pnpmExecutablePath,
+      input.productionCoordinator
     );
     if (stableJson(localBuild) !== stableJson(replicaBuild)) {
       throw new Error("independent C1 build manifests differ");
     }
-    const localPackage = expectedPackageManifest(firstRoot);
-    const replicaPackage = expectedPackageManifest(secondRoot);
+    const localPackage = expectedPackageManifest(firstRoot, input.target);
+    const replicaPackage = expectedPackageManifest(secondRoot, input.target);
     if (stableJson(localPackage) !== stableJson(replicaPackage)) {
       throw new Error("independent C1 package manifests differ");
     }
-    const localArchive = localArchiveEvidence(input.archivePath);
+    const ownsArchiveSnapshot = input.archiveSnapshot === undefined;
+    const archiveSnapshot = input.archiveSnapshot ?? ImmutableLocalArchiveSnapshot.open(input.archivePath);
+    if (archiveSnapshot.path !== realpathSync(input.archivePath)) {
+      if (ownsArchiveSnapshot) archiveSnapshot.close();
+      throw new Error("deployment proof archive snapshot path mismatch");
+    }
+    try {
+    const localArchive = localArchiveEvidence(archiveSnapshot);
+    const proofArchiveBoundary = validateQualificationArchiveBoundaryEvidence(
+      build.qualificationArchiveBoundary,
+      localArchive,
+      proofQualificationBuild
+    );
+    const recomputedArchiveBoundary = verifyQualificationArchiveBoundary({
+      path: input.archivePath,
+      snapshot: archiveSnapshot,
+      qualificationBuild: localBuild.qualificationBuild,
+      productionCoordinator: input.productionCoordinator
+    });
+    if (stableJson(proofArchiveBoundary) !== stableJson(recomputedArchiveBoundary)) {
+      throw new Error("deployment proof qualification archive boundary does not reproduce");
+    }
     validateArchivePackageBinding({
       archive: localArchive,
       packageManifest: localPackage,
       proofBuild: build
+    });
+    validateTrustedUploaderAssertion(uploader, {
+      version: os01ControlPlaneContract.version,
+      observedAt: requireString(proof.observedAt, "deployment proof observation time"),
+      projectId: input.target.projectId,
+      versionId: sitesVersionId,
+      versionNumber: requireSafeInteger(
+        sitesVersionRecord.versionNumber,
+        "Sites version number",
+        1
+      ),
+      sourceCommit: deploymentCommit,
+      archiveContentHash: sitesArchiveContentHash,
+      archiveFormat: requireString(
+        sitesVersionRecord.archiveFormat,
+        "Sites archive format"
+      ),
+      archiveFileCount: sitesArchiveFileCount,
+      archiveSizeBytes: requireSafeInteger(
+        sitesVersionRecord.archiveSizeBytes,
+        "Sites archive bytes",
+        1
+      )
+    }, {
+      archiveSha256: localArchive.archiveSha256,
+      archiveBytes: localArchive.archiveBytes,
+      fileListRoot: localArchive.fileListRoot,
+      fileCount: localArchive.fileCount,
+      packageContentRoot: localPackage.contentRoot
     });
     if (
       build.buildInputRoot !== gitEvidence.buildInputRoot ||
@@ -1934,6 +3520,9 @@ function validateDeploymentProof(input: {
       entryStaticFileCount !== localBuild.entryStaticFileCount ||
       stableJson(proofQualificationBuild) !== stableJson(localBuild.qualificationBuild)
     ) throw new Error("deployment build proof does not match local build outputs");
+    } finally {
+      if (ownsArchiveSnapshot) archiveSnapshot.close();
+    }
   }
   return { proof, proofHash: sha256(bytes), gitEvidence };
 }
@@ -2175,14 +3764,27 @@ function equalHex(left: string, right: string): boolean {
   return timingSafeEqual(Buffer.from(left, "hex"), Buffer.from(right, "hex"));
 }
 
-async function boundedJson(response: Response): Promise<Record<string, unknown>> {
+async function boundedJson(
+  response: Response,
+  evidenceScanner?: (bytes: Uint8Array, label: string) => void
+): Promise<Record<string, unknown>> {
+  const contentType = response.headers.get("content-type")?.trim().toLowerCase() ?? "";
   if (!response.body) throw new Error("operator response body missing");
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
   let total = 0;
+  let scanTail = new Uint8Array(0);
+  const scanOverlapBytes = 8_192;
   while (true) {
     const result = await reader.read();
     if (result.done) break;
+    if (evidenceScanner) {
+      const scanWindow = new Uint8Array(scanTail.byteLength + result.value.byteLength);
+      scanWindow.set(scanTail, 0);
+      scanWindow.set(result.value, scanTail.byteLength);
+      evidenceScanner(scanWindow, "public census response chunk");
+      scanTail = scanWindow.slice(Math.max(0, scanWindow.byteLength - scanOverlapBytes));
+    }
     total += result.value.byteLength;
     if (total > MAX_OPERATOR_RESPONSE_BYTES) {
       await reader.cancel();
@@ -2196,16 +3798,20 @@ async function boundedJson(response: Response): Promise<Record<string, unknown>>
     joined.set(chunk, offset);
     offset += chunk.byteLength;
   }
+  evidenceScanner?.(joined, "public census response");
+  if (!/^application\/json(?:\s*;\s*charset=utf-8)?$/u.test(contentType)) {
+    throw new Error("operator response content type is not canonical JSON");
+  }
   let parsed: unknown;
   try {
-    parsed = JSON.parse(new TextDecoder().decode(joined));
+    parsed = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(joined));
   } catch {
-    throw new Error("operator returned invalid JSON");
+    throw new Error("operator returned invalid UTF-8 JSON");
   }
   return requireRecord(parsed, "operator response");
 }
 
-class OperatorClient {
+export class OperatorClient {
   private continuation: string | null = null;
   private passId: string | null = null;
   private passNonceHash: string | null = null;
@@ -2215,7 +3821,9 @@ class OperatorClient {
 
   constructor(
     private readonly secrets: SecretInput,
-    private readonly expectedBuildAttestation: string
+    private readonly expectedBuildAttestation: string,
+    private readonly evidenceScanner?: (bytes: Uint8Array, label: string) => void,
+    private readonly deadlineMs?: number
   ) {}
 
   async call(input: Record<string, unknown>): Promise<OperatorResponse> {
@@ -2235,13 +3843,26 @@ class OperatorClient {
     if (this.secrets.siteAuthorizationToken) {
       headers["OAI-Sites-Authorization"] = this.secrets.siteAuthorizationToken;
     }
-    const response = await fetch(this.secrets.endpoint, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(body),
-      redirect: "error"
-    });
-    const json = await boundedJson(response);
+    const remainingMs = this.deadlineMs === undefined
+      ? OPERATOR_REQUEST_MAX_MS
+      : Math.min(OPERATOR_REQUEST_MAX_MS, this.deadlineMs - Date.now());
+    if (remainingMs <= 0) throw new Error("operator request deadline expired");
+    const abort = new AbortController();
+    const timeout = setTimeout(() => abort.abort(), remainingMs);
+    let response: Response;
+    let json: Record<string, unknown>;
+    try {
+      response = await fetch(this.secrets.endpoint, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+        redirect: "error",
+        signal: abort.signal
+      });
+      json = await boundedJson(response, this.evidenceScanner);
+    } finally {
+      clearTimeout(timeout);
+    }
     if (!response.ok) throw new Error(`operator_${response.status}_${String(json.error ?? "unknown")}`);
     exactKeys(json, [
       "buildAttestation",
@@ -2354,9 +3975,9 @@ function validateFoundation(payload: Record<string, unknown>): void {
   const actualReceipts = receipts.map((row) => ({
     version: row.version,
     migrationHash: row.migration_hash
-  })).sort((left, right) => left.version.localeCompare(right.version));
+  })).sort((left, right) => compareUnicodeCodePoints(left.version, right.version));
   const expectedReceipts = [...authorityFoundation.preservedReceipts]
-    .sort((left, right) => left.version.localeCompare(right.version));
+    .sort((left, right) => compareUnicodeCodePoints(left.version, right.version));
   if (stableJson(actualReceipts) !== stableJson(expectedReceipts)) {
     throw new Error("accepted production receipt foundation mismatch");
   }
@@ -2382,7 +4003,9 @@ function validateFoundation(payload: Record<string, unknown>): void {
 async function schemaPass(
   secrets: SecretInput,
   stages: ExpectedStages,
-  expectedBuildAttestation: string
+  expectedBuildAttestation: string,
+  evidenceScanner?: (bytes: Uint8Array, label: string) => void,
+  deadlineMs?: number
 ): Promise<{
   client: OperatorClient;
   catalog: CatalogEntry[];
@@ -2391,7 +4014,7 @@ async function schemaPass(
   schema: SchemaEvidence[];
   classification: ReturnType<typeof classifySchema>;
 }> {
-  const client = new OperatorClient(secrets, expectedBuildAttestation);
+  const client = new OperatorClient(secrets, expectedBuildAttestation, evidenceScanner, deadlineMs);
   const begin = await client.call({ operation: "begin", passNonce: randomUUID().replaceAll("-", "") });
   const beginPayload = requireRecord(begin.payload, "begin payload") as {
     operation: string;
@@ -2419,7 +4042,7 @@ async function schemaPass(
     seenCatalogKeys.add(key);
   }
   const sortedCatalog = [...beginPayload.catalog].sort((left, right) =>
-    left.type.localeCompare(right.type) || left.name.localeCompare(right.name)
+    compareUnicodeCodePoints(left.type, right.type) || compareUnicodeCodePoints(left.name, right.name)
   );
   if (stableJson(sortedCatalog) !== stableJson(beginPayload.catalog)) throw new Error("catalog order is not canonical");
   if (!equalHex(requireHex(beginPayload.catalogHash, "catalog hash"), sha256(stableJson(beginPayload.catalog)))) {
@@ -2458,7 +4081,7 @@ async function schemaPass(
       tableCoreHash: payload.type === "table" ? tableCoreHash(payload.semantics) : null
     });
   }
-  schema.sort((left, right) => left.key.localeCompare(right.key));
+  schema.sort((left, right) => compareUnicodeCodePoints(left.key, right.key));
   return {
     client,
     catalog: beginPayload.catalog,
@@ -2474,7 +4097,9 @@ async function completePass(
   passNumber: number
 ): Promise<Record<string, unknown>> {
   const tables = initial.catalog
-    .filter((entry) => entry.type === "table" && !entry.internal)
+    .filter((entry) =>
+      entry.type === "table" && !entry.internal && contract.contentEvidence.allowedTables.includes(entry.name)
+    )
     .map((entry) => entry.name)
     .sort();
   const tableEvidence: TableEvidence[] = [];
@@ -2499,11 +4124,11 @@ async function completePass(
     if (requireSafeInteger(startPayload.schemaVersion, `table schema version ${table}`) !== initial.schemaVersion) {
       throw new Error(`schema version changed before ${table}`);
     }
-    const pageHashes: string[] = [];
+    const pageMacs: string[] = [];
     let offset = 0;
     const maximumPages = Math.floor(tableRowCount / 128) + 1;
     while (true) {
-      if (pageHashes.length >= maximumPages) throw new Error(`page limit exceeded for ${table}`);
+      if (pageMacs.length >= maximumPages) throw new Error(`page limit exceeded for ${table}`);
       const page = await initial.client.call({
         operation: "table_page",
         table,
@@ -2520,31 +4145,26 @@ async function completePass(
         done: boolean;
         columnsHash: string;
         canonicalBytes: number;
-        rowHashes: string[];
-        pageHash: string;
+        pageMac: string;
       };
       exactKeys(payload, [
         "canonicalBytes", "columnsHash", "done", "limit", "offset", "operation",
-        "pageHash", "rowCount", "rowHashes", "table"
+        "pageMac", "rowCount", "table"
       ], "table page payload");
       if (
         payload.operation !== "table_page" || payload.table !== table || payload.offset !== offset ||
         payload.limit !== 128 || payload.columnsHash !== startPayload.columnsHash ||
-        typeof payload.done !== "boolean" || !Array.isArray(payload.rowHashes)
+        typeof payload.done !== "boolean"
       ) throw new Error(`table page echo mismatch: ${table}`);
       const pageRowCount = requireSafeInteger(payload.rowCount, `page row count ${table}`, 0, 128);
       requireSafeInteger(payload.canonicalBytes, `page canonical bytes ${table}`, 0, 1_800_000);
-      if (payload.rowHashes.length !== pageRowCount) throw new Error(`page row-hash count mismatch: ${table}`);
-      for (const rowHash of payload.rowHashes) requireHex(rowHash, `page row hash ${table}`);
-      if (!equalHex(requireHex(payload.pageHash, `page hash ${table}`), sha256(stableJson(payload.rowHashes)))) {
-        throw new Error(`page hash mismatch: ${table}`);
-      }
+      requireHex(payload.pageMac, `page MAC ${table}`);
       const remaining = tableRowCount - offset;
       const expectedPageRows = Math.min(128, remaining);
       if (pageRowCount !== expectedPageRows || payload.done !== (pageRowCount < 128)) {
         throw new Error(`page cardinality mismatch: ${table}`);
       }
-      pageHashes.push(payload.pageHash);
+      pageMacs.push(payload.pageMac);
       offset += pageRowCount;
       if (payload.done) break;
     }
@@ -2576,13 +4196,13 @@ async function completePass(
       rowCount: tableRowCount,
       columnsHash: startPayload.columnsHash,
       schemaVersion: Number(startPayload.schemaVersion),
-      pageCount: pageHashes.length,
-      pageHashes,
-      dataHash: sha256(stableJson({
+      pageCount: pageMacs.length,
+      pageMacs,
+      dataMacRoot: sha256(stableJson({
         table,
         rowCount: tableRowCount,
         columnsHash: startPayload.columnsHash,
-        pageHashes
+        pageMacs
       }))
     });
   }
@@ -2605,53 +4225,104 @@ async function completePass(
   };
 }
 
-async function main(): Promise<void> {
-  const target = resolveTrustedTarget();
-  const qualificationPaths = resolveQualificationPaths(argument("--qualification-dir"));
+export async function executeQualifiedCensus(input: {
+  target: TrustedTarget;
+  qualificationPaths: QualificationPaths;
+  authorityRepositoryRoot: string;
+  implementationRepositoryRoots: readonly [string, string];
+  repositoryRoots: readonly [string, string];
+  archivePath: string;
+  archiveSnapshot?: ImmutableLocalArchiveSnapshot;
+  authorityCommit: string;
+  implementationCommit: string;
+  sourceCommit: string;
+  deploymentVersion: string;
+  expectedBuildAttestation: string;
+  pnpmExecutablePath: string;
+  secrets: SecretInput;
+  productionCoordinator?: ProductionQualificationCoordinator;
+}): Promise<{ status: string; receiptHash: string; output: string }> {
+  const target = input.target;
+  const qualificationPaths = input.qualificationPaths;
   const output = qualificationPaths.output;
-  const implementationRepositoryRoots = target.loopbackFixture
-    ? [root, root] as const
-    : [resolve(argument("--implementation-worktree-a")), resolve(argument("--implementation-worktree-b"))] as const;
-  const repositoryRoots = target.loopbackFixture
-    ? [root, root] as const
-    : [resolve(argument("--deployment-worktree-a")), resolve(argument("--deployment-worktree-b"))] as const;
-  const archivePath = target.loopbackFixture ? root : qualificationPaths.deploymentArchive;
-  const authorityCommit = argument("--authority-commit");
-  const implementationCommit = argument("--implementation-commit");
-  const sourceCommit = argument("--source-commit");
-  const authorityEvidence = target.loopbackFixture ? null : validateAuthorityExecutionRoot(root, authorityCommit);
-  const deploymentVersion = argument("--deployment-version");
+  const implementationRepositoryRoots = input.implementationRepositoryRoots;
+  const repositoryRoots = input.repositoryRoots;
+  const archivePath = input.archivePath;
+  const authorityCommit = input.authorityCommit;
+  const implementationCommit = input.implementationCommit;
+  const sourceCommit = input.sourceCommit;
+  const authorityRepositoryRoot = realpathSync(input.authorityRepositoryRoot);
+  const authorityEvidence = target.loopbackFixture
+    ? null
+    : validateAuthorityExecutionRoot(authorityRepositoryRoot, authorityCommit);
+  const deploymentVersion = input.deploymentVersion;
   const expectedBuildAttestation = requireHex(
-    argument("--expected-build-attestation").toLowerCase(),
+    input.expectedBuildAttestation.toLowerCase(),
     "expected build attestation"
   );
+  if (
+    target.accessMode === attestationContract.buildIdentity.qualificationBuild.productionAccessMode &&
+    input.productionCoordinator === undefined
+  ) throw new Error("production census execution requires the live private-seed coordinator");
   const deploymentEvidence = validateDeploymentProof({
     path: qualificationPaths.deploymentProof,
     target,
-    authorityRepositoryRoot: root,
+    authorityRepositoryRoot,
     implementationRepositoryRoots,
     repositoryRoots,
     archivePath,
+    archiveSnapshot: input.archiveSnapshot,
     authorityEvidence,
     expectedBuildAttestation,
     expectedImplementationCommit: implementationCommit,
     sourceCommit,
-    deploymentVersion
+    deploymentVersion,
+    pnpmExecutablePath: input.pnpmExecutablePath,
+    productionCoordinator: input.productionCoordinator
   });
-  const operatorSourceHash = sha256(readFileSync(resolve(root, "worker/os01-census-operator.ts")));
+  const operatorSourceHash = sha256(readFileSync(resolve(authorityRepositoryRoot, "worker/os01-census-operator.ts")));
   const deployedOperatorSourceHash = sha256(readFileSync(resolve(repositoryRoots[0], "worker/os01-census-operator.ts")));
   if (!target.loopbackFixture && deployedOperatorSourceHash !== operatorSourceHash) {
     throw new Error("deployed census operator source differs from the qualified controller source");
   }
-  const outputFile = openSync(output, "wx", 0o600);
-  const secrets = readSecretInput(target.origin);
+  const secrets = input.secrets;
   const stages = migrationStages();
   const contractHash = sha256(readFileSync(resolve(root, "config/os01-production-census.v1.json")));
   const attestationContractHash = sha256(readFileSync(resolve(root, "config/os01-census-attestation.v1.json")));
   const trustedTargetContractHash = sha256(readFileSync(resolve(root, attestationContract.trustedTargetConfig)));
   const prestateClassHash = sha256(readFileSync(resolve(root, "config/os01-production-prestate-classes.v1.json")));
   const startedAt = new Date().toISOString();
-  const first = await schemaPass(secrets, stages, expectedBuildAttestation);
+  const reservation = {
+    version: "os01-production-census-reservation.2026.1",
+    status: "reserved_before_network",
+    targetName: target.name,
+    projectId: target.projectId,
+    origin: target.origin,
+    authorityCommit,
+    implementationCommit,
+    sourceCommit,
+    deploymentVersion,
+    buildAttestation: expectedBuildAttestation,
+    coordinatorRunId: input.productionCoordinator?.runId ?? null,
+    startedAt
+  };
+  const reservationHash = sha256(stableJson(reservation));
+  const reservationBytes = Buffer.from(
+    `${JSON.stringify({ ...reservation, reservationHash }, null, 2)}\n`,
+    "utf8"
+  );
+  input.productionCoordinator?.assertActive();
+  input.productionCoordinator?.assertEvidenceBytesSafe(
+    reservationBytes,
+    "production census receipt reservation"
+  );
+  publishEvidenceBytesExclusive(censusReservationPath(output), reservationBytes);
+  const evidenceScanner = input.productionCoordinator
+    ? (bytes: Uint8Array, label: string): void => input.productionCoordinator!.assertEvidenceBytesSafe(bytes, label)
+    : undefined;
+  input.productionCoordinator?.assertActive();
+  const deadlineMs = input.productionCoordinator ? Date.parse(input.productionCoordinator.expiresAt) : undefined;
+  const first = await schemaPass(secrets, stages, expectedBuildAttestation, evidenceScanner, deadlineMs);
   const firstClassification = first.classification;
   let receipt: Record<string, unknown>;
   if (!firstClassification.accepted) {
@@ -2669,6 +4340,7 @@ async function main(): Promise<void> {
         accessMode: target.accessMode,
         loopbackFixture: target.loopbackFixture
       },
+      reservationHash,
       buildAttestation: expectedBuildAttestation,
       attestationContractHash,
       trustedTargetContractHash,
@@ -2693,7 +4365,7 @@ async function main(): Promise<void> {
     };
   } else {
     const firstPass = await completePass(first, 1);
-    const second = await schemaPass(secrets, stages, expectedBuildAttestation);
+    const second = await schemaPass(secrets, stages, expectedBuildAttestation, evidenceScanner, deadlineMs);
     if (!second.classification.accepted) throw new Error("second-pass classification changed");
     const secondPass = await completePass(second, 2);
     if (firstPass.passRoot !== secondPass.passRoot) throw new Error("independent census pass roots differ");
@@ -2711,6 +4383,7 @@ async function main(): Promise<void> {
         accessMode: target.accessMode,
         loopbackFixture: target.loopbackFixture
       },
+      reservationHash,
       buildAttestation: expectedBuildAttestation,
       attestationContractHash,
       trustedTargetContractHash,
@@ -2732,12 +4405,50 @@ async function main(): Promise<void> {
     };
   }
   const receiptHash = sha256(stableJson(receipt));
-  writeFileSync(outputFile, `${JSON.stringify({ ...receipt, receiptHash }, null, 2)}\n`, {
-    encoding: "utf8",
-    mode: 0o600
+  const receiptBytes = Buffer.from(`${JSON.stringify({ ...receipt, receiptHash }, null, 2)}\n`, "utf8");
+  input.productionCoordinator?.assertActive();
+  input.productionCoordinator?.assertEvidenceBytesSafe(receiptBytes, "production census receipt");
+  publishEvidenceBytesExclusive(output, receiptBytes);
+  return { status: String(receipt.status), receiptHash, output };
+}
+
+async function main(): Promise<void> {
+  const target = resolveTrustedTarget();
+  if (
+    !target.loopbackFixture &&
+    target.accessMode === attestationContract.buildIdentity.qualificationBuild.productionAccessMode
+  ) {
+    throw new Error("production census must run through the private-seed session coordinator");
+  }
+  const qualificationPaths = resolveQualificationPaths(argument("--qualification-dir"));
+  const implementationRepositoryRoots = target.loopbackFixture
+    ? [root, root] as const
+    : [resolve(argument("--implementation-worktree-a")), resolve(argument("--implementation-worktree-b"))] as const;
+  const repositoryRoots = target.loopbackFixture
+    ? [root, root] as const
+    : [resolve(argument("--deployment-worktree-a")), resolve(argument("--deployment-worktree-b"))] as const;
+  const archivePath = target.loopbackFixture ? root : qualificationPaths.deploymentArchive;
+  const expectedBuildAttestation = requireHex(
+    argument("--expected-build-attestation").toLowerCase(),
+    "expected build attestation"
+  );
+  const secrets = readSecretInput(target.origin);
+  const result = await executeQualifiedCensus({
+    target,
+    qualificationPaths,
+    authorityRepositoryRoot: root,
+    implementationRepositoryRoots,
+    repositoryRoots,
+    archivePath,
+    authorityCommit: argument("--authority-commit"),
+    implementationCommit: argument("--implementation-commit"),
+    sourceCommit: argument("--source-commit"),
+    deploymentVersion: argument("--deployment-version"),
+    expectedBuildAttestation,
+    pnpmExecutablePath: target.loopbackFixture ? process.execPath : realpathSync(argument("--pnpm-executable")),
+    secrets
   });
-  closeSync(outputFile);
-  process.stdout.write(`${String(receipt.status)} ${receiptHash}\n`);
+  process.stdout.write(`${result.status} ${result.receiptHash}\n`);
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

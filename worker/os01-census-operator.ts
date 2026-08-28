@@ -13,6 +13,7 @@ const MAX_PAGE_ROWS = 128;
 const MAX_CANONICAL_PAGE_BYTES = 1_800_000;
 const MAX_CANONICAL_ROW_BYTES = 1_800_000;
 const MAX_OPERATOR_LIFETIME_MS = 2 * 60 * 60 * 1000;
+const CONTENT_TABLE = "plays";
 const INTERNAL_OBJECTS = new Set([
   "_cf_KV",
   "d1_migrations",
@@ -164,6 +165,21 @@ async function payloadMac(value: unknown, token: string): Promise<string> {
     await payloadMacKey(token),
     bytes(stableJson(value))
   ));
+}
+
+async function contentPageMac(value: unknown, token: string): Promise<string> {
+  const material = await crypto.subtle.digest(
+    "SHA-256",
+    bytes(`${CONTRACT_VERSION}\u0000content-page-mac\u0000${token}`)
+  );
+  const key = await crypto.subtle.importKey(
+    "raw",
+    material,
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  return hex(await crypto.subtle.sign("HMAC", key, bytes(stableJson(value))));
 }
 
 async function encryptCursor(state: CursorState, token: string): Promise<string> {
@@ -517,7 +533,8 @@ function canonicalExpression(tableAlias: string, column: string): string {
 
 async function operationPayload(
   request: CensusRequest,
-  reader: ReadOnlySession
+  reader: ReadOnlySession,
+  token: string
 ): Promise<Record<string, unknown>> {
   if (request.operation === "begin") {
     const schemaVersion = await reader.one<{ schema_version: number }>(
@@ -550,6 +567,12 @@ async function operationPayload(
       semantics,
       semanticHash: await sha256Hex(stableJson(semantics))
     };
+  }
+  if (
+    (request.operation === "table_start" || request.operation === "table_page" ||
+      request.operation === "table_finish") && request.table !== CONTENT_TABLE
+  ) {
+    throw new CensusError("content_table_not_authorized", 403);
   }
   if (request.operation === "table_start" || request.operation === "table_finish") {
     const columns = await tableColumns(reader, request.table);
@@ -592,7 +615,7 @@ async function operationPayload(
       `ORDER BY ${order.join(", ")} LIMIT ? OFFSET ?`,
       [limit, request.offset]
     );
-    const rowHashes: string[] = [];
+    const canonicalRows: string[] = [];
     let canonicalBytes = 0;
     for (const row of rows) {
       const values = columns.map((_, index) => row[`c${index}`]!);
@@ -601,8 +624,14 @@ async function operationPayload(
       if (rowBytes > MAX_CANONICAL_ROW_BYTES) throw new CensusError("canonical_row_too_large", 413);
       canonicalBytes += rowBytes;
       if (canonicalBytes > MAX_CANONICAL_PAGE_BYTES) throw new CensusError("canonical_page_too_large", 413);
-      rowHashes.push(await sha256Hex(rowJson));
+      canonicalRows.push(rowJson);
     }
+    const pageMac = await contentPageMac({
+      table: request.table,
+      columnsHash,
+      offset: request.offset,
+      rows: canonicalRows
+    }, token);
     return {
       operation: request.operation,
       table: request.table,
@@ -612,8 +641,7 @@ async function operationPayload(
       done: rows.length < limit,
       columnsHash,
       canonicalBytes,
-      rowHashes,
-      pageHash: await sha256Hex(stableJson(rowHashes))
+      pageMac
     };
   }
   const receipts = await reader.all<{
@@ -779,7 +807,7 @@ export async function handleOs01CensusRequest(
     const d1 = database();
     const session = d1.withSession(cursor?.bookmark ?? "first-primary");
     const reader = new ReadOnlySession(session);
-    const payload = await operationPayload(input, reader);
+    const payload = await operationPayload(input, reader, authentication.token);
     const bookmark = session.getBookmark();
     if (!bookmark) throw new CensusError("bookmark_unavailable", 503);
     let state: CursorState;
@@ -845,5 +873,7 @@ export const os01CensusContract = Object.freeze({
     "table_page",
     "table_finish",
     "foundation"
-  ])
+  ]),
+  contentTables: Object.freeze([CONTENT_TABLE]),
+  contentEvidence: "ephemeral-token-keyed-hmac-sha256"
 });

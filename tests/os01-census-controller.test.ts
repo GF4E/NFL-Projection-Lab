@@ -1,7 +1,9 @@
-import { execFileSync, spawn } from "node:child_process";
+import { execFileSync, spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { createServer, type Server } from "node:http";
-import { mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import {
+  existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
@@ -9,12 +11,16 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { handleOs01CensusRequest, os01CensusContract } from "../worker/os01-census-operator";
 import {
+  censusReservationPath,
   classifySchema,
+  constructDeploymentProof,
   computeSourceAnchor,
   configuredTrustedTarget,
   expectedAnchorSource,
+  expectedPackageManifest,
   localArchiveEvidence,
   migrationStages,
+  OperatorClient,
   resolveQualificationPaths,
   validateArchivePackageBinding,
   validateAuthorityBridgeCodeRelation,
@@ -22,10 +28,13 @@ import {
   validateDeploymentProofFreshness,
   validateExactSourceAnchor,
   validateGitSuccessor,
+  validateHostingTargetDocument,
   validateHostedSourceIdentity,
   validateSitesDeploymentIdentity,
+  validateTrackedHostingTarget,
   verifyCensusEntryClosure
 } from "../scripts/run_os01_production_census";
+import { writeDeploymentProofExclusive } from "../scripts/build_os01_deployment_proof";
 import type { SchemaObject } from "../scripts/verify_d1_schema_authority";
 
 type SqlValue = string | number | bigint | Uint8Array | null;
@@ -33,6 +42,18 @@ const temporaryDirectories: string[] = [];
 const implementationCommit = "3".repeat(40);
 const deploymentCommit = "4".repeat(40);
 const deploymentVersion = "test-version";
+
+function packageSiteArchive(repositoryRoot: string, output: string): void {
+  execFileSync("/usr/bin/python3", [
+    resolve("scripts/package_os01_site_archive.py"),
+    "--repository-root", repositoryRoot,
+    "--output", output
+  ], {
+    cwd: resolve("."),
+    env: { PATH: "/usr/bin:/bin", NODE_ENV: "test", PYTHONNOUSERSITE: "1" },
+    stdio: ["ignore", "pipe", "pipe"]
+  });
+}
 
 const testSourceAnchor = "7".repeat(64);
 const testSourceTreeAnchor = "6".repeat(64);
@@ -50,19 +71,30 @@ const testImplementationBuild = {
   entryStaticClosureRoot: "6".repeat(64),
   entryStaticFileCount: 1,
   qualificationBuild: {
-    version: "os01-vinext-qualification-build.2026.1",
+    version: "os01-vinext-qualification-build.2026.2",
     role: "implementation" as const,
-    contextHash: "7".repeat(64),
+    mode: "owner_only_public_context" as const,
+    runId: null,
+    seedCommitment: null,
+    contextCommitment: "7".repeat(64),
+    transcriptHash: "6".repeat(64),
     toolchainRoot: "8".repeat(64),
-    nodeVersion: "v24.13.0",
+    installedToolchainClosureRoot: "139a4448086f6e955de8ff32cfe26fa11464b89cd9597e2bc8c7b367e79eb6fc",
+    installedToolchainPackageCount: 580,
+    nodeVersion: "v24.19.0",
+    nodeExecutableSha256: "27db838bb204ef7c21df2931f5656e4c8fb32e6e947f363a402b49714d32b5b1",
+    pnpmVersion: "11.16.0",
+    pnpmExecutableSha256: "65cb7439d9b023b95d0e19d843adf14e0654426ef85ad4ecd33d58849315f669",
+    lockfileSha256: "daf4dac4be7acca701141ec59050ab7d309ea9573109f567bcf01100c03965e2",
+    workspaceSha256: "f309c3c526eb2f4b6da28ddcebb819d9781683da959e0f63d249bd467abf2447",
     vinextVersion: "1.0.0-beta.2",
-    patchSha256: "c4024d3c75af62888e0842ac583fb9bd6e4088ecf9e84eda45e2c0ed8b409958",
+    patchSha256: "2ad276eb7bcc894f98c12e28c9614a790ab9771b697071971b441c7d5ef58ba8",
     targetProjectId: "test-project",
     targetAccessMode: "owner_only"
   }
 };
 const testAuthorityBridgeCodeRelation = {
-  version: "os01-census-authority-bridge-code-relation.2026.2",
+  version: "os01-census-authority-bridge-code-relation.2026.3",
   authorityCommit: "2".repeat(40),
   implementationCommit,
   files: [
@@ -88,6 +120,7 @@ const testSourceIdentity = {
   liveBaseTreeObjectId: "2".repeat(40),
   liveBaseToImplementationNameStatus: [
     { status: "M", path: "next.config.ts" },
+    { status: "M", path: "package.json" },
     { status: "A", path: "patches/vinext@1.0.0-beta.2.patch" },
     { status: "M", path: "pnpm-lock.yaml" },
     { status: "M", path: "pnpm-workspace.yaml" },
@@ -183,7 +216,7 @@ function recomputePayloadHash(value: Record<string, unknown>): Record<string, un
 
 function deploymentProof(origin: string): Record<string, unknown> {
   return {
-    version: "os01-census-deployment-proof.2026.1",
+    version: "os01-census-deployment-proof.2026.3",
     status: "ready_for_census",
     projectId: "test-project",
     implementationCommit,
@@ -216,6 +249,19 @@ function deploymentProof(origin: string): Record<string, unknown> {
         ...testImplementationBuild.qualificationBuild,
         role: "deployment"
       },
+      qualificationArchiveBoundary: {
+        version: "os01-qualification-archive-boundary.2026.6",
+        archiveSha256: "f".repeat(64),
+        qualificationMode: testImplementationBuild.qualificationBuild.mode,
+        runId: null,
+        seedCommitment: null,
+        contextCommitment: testImplementationBuild.qualificationBuild.contextCommitment,
+        fileCount: 1,
+        nonServerFileCount: 1,
+        rawContextLeakCount: 0,
+        nonServerDerivedCredentialLeakCount: 0,
+        scanRoot: "4".repeat(64)
+      },
       sitesArchiveContentHash: `sha256:${testArchiveHash}`
     },
     sitesVersion: {
@@ -227,6 +273,41 @@ function deploymentProof(origin: string): Record<string, unknown> {
       archiveFileCount: 1,
       archiveSizeBytes: 1
     },
+    uploader: {
+      version: "os01-trusted-uploader-assertion.2026.3",
+      observedAt: new Date().toISOString(),
+      sourceCommit: deploymentCommit,
+      versionId: deploymentVersion,
+      localArchiveSha256: "f".repeat(64),
+      localArchiveBytes: 1,
+      localArchiveFileListRoot: "0".repeat(64),
+      localArchiveFileCount: 1,
+      localPackageContentRoot: "2".repeat(64),
+      sitesArchiveContentHash: `sha256:${testArchiveHash}`,
+      uploadMethod: "sites_save_site_version_exact_local_archive",
+      remoteBuildRequested: false,
+      sourceBranch: "main",
+      sourceHeadBefore: testSourceIdentity.liveBaseCommit,
+      sourcePushExpectedOld: testSourceIdentity.liveBaseCommit,
+      sourceHeadAfter: deploymentCommit,
+      sourceCompareAndSwapApplied: true,
+      mutationIntentHash: "9".repeat(64),
+      temporaryControlExpiresAt: new Date(Date.now() + 60_000).toISOString(),
+      temporaryControlAuthSha256: "a".repeat(64),
+      temporaryControlBuildAttestation: "b".repeat(64),
+      temporaryControlEnvironmentRevisionBefore: 1,
+      temporaryControlEnvironmentRevisionStaged: 2,
+      temporaryControlsSingleUpdate: true,
+      externalMutationSequence: [
+        "source_compare_and_swap",
+        "environment_controls_single_update",
+        "sites_save_exact_local_archive",
+        "temporary_publish"
+      ],
+      trustBoundary: "trusted_sites_connector_plus_trusted_controller_plus_exclusive_qualification_host",
+      canonicalizationClaim: "sites_archive_hash_is_opaque_and_not_a_local_tar_hash",
+      archivePathBinding: "connector_path_read_is_trusted_not_kernel_attested"
+    },
     deployment: {
       deploymentId: "test-deployment",
       status: "succeeded",
@@ -236,6 +317,185 @@ function deploymentProof(origin: string): Record<string, unknown> {
       origin
     },
     observedAt: new Date().toISOString()
+  };
+}
+
+function proofConstructorInput(origin: string) {
+  const observedAt = "2026-08-27T20:00:00.000Z";
+  const target = {
+    name: "test",
+    projectId: "test-project",
+    origin,
+    accessMode: "owner_only",
+    d1Binding: "DB",
+    r2Binding: null,
+    loopbackFixture: false
+  };
+  const authorityEvidence = testSourceIdentity.authorityEvidence;
+  const gitEvidence = {
+    liveBaseCommit: testSourceIdentity.liveBaseCommit,
+    liveBaseTreeObjectId: testSourceIdentity.liveBaseTreeObjectId,
+    liveBaseToImplementationNameStatus: testSourceIdentity.liveBaseToImplementationNameStatus,
+    implementationCommit,
+    deploymentCommit,
+    implementationTreeObjectId: testSourceIdentity.implementationTreeObjectId,
+    deploymentTreeObjectId: testSourceIdentity.deploymentTreeObjectId,
+    implementationArchiveSha256: testSourceIdentity.implementationArchiveSha256,
+    implementationArchiveBytes: testSourceIdentity.implementationArchiveBytes,
+    deploymentArchiveSha256: testSourceIdentity.deploymentArchiveSha256,
+    deploymentArchiveBytes: testSourceIdentity.deploymentArchiveBytes,
+    implementationToDeploymentNameStatus: testSourceIdentity.implementationToDeploymentNameStatus,
+    implementationToDeploymentDiff: ["worker/os01-census-source-anchor.ts"],
+    successorCommitCount: 1,
+    sourceTreeAnchor: testSourceTreeAnchor,
+    buildInputRoot: testBuildInputRoot
+  };
+  const sourceAnchor = computeSourceAnchor(
+    gitEvidence,
+    testImplementationBuild,
+    authorityEvidence,
+    testAuthorityBridgeCodeRelation
+  );
+  const deploymentBuild = {
+    ...testImplementationBuild,
+    qualificationBuild: {
+      ...testImplementationBuild.qualificationBuild,
+      role: "deployment" as const,
+      contextCommitment: "f".repeat(64),
+      transcriptHash: "e".repeat(64)
+    }
+  };
+  const packageManifest = {
+    contentRoot: "a".repeat(64),
+    fileListRoot: "b".repeat(64),
+    fileCount: 3
+  };
+  const localArchive = {
+    archiveSha256: "c".repeat(64),
+    archiveBytes: 100,
+    contentRoot: packageManifest.contentRoot,
+    fileListRoot: packageManifest.fileListRoot,
+    fileCount: packageManifest.fileCount
+  };
+  return {
+    target,
+    observedAt,
+    sourceAnchorEvidence: {
+      authorityEvidence,
+      authorityBridgeCodeRelation: testAuthorityBridgeCodeRelation,
+      bridgeImplementation: {
+        liveBaseCommit: gitEvidence.liveBaseCommit,
+        liveBaseTreeObjectId: gitEvidence.liveBaseTreeObjectId,
+        liveBaseToImplementationNameStatus: gitEvidence.liveBaseToImplementationNameStatus,
+        implementationCommit,
+        implementationTreeObjectId: gitEvidence.implementationTreeObjectId,
+        implementationArchiveSha256: gitEvidence.implementationArchiveSha256,
+        implementationArchiveBytes: gitEvidence.implementationArchiveBytes,
+        sourceTreeAnchor: gitEvidence.sourceTreeAnchor
+      },
+      implementationBuild: testImplementationBuild,
+      sourceAnchor
+    },
+    gitEvidence,
+    deploymentBuild,
+    packageManifest,
+    localArchive,
+    qualificationArchiveBoundary: {
+      version: "os01-qualification-archive-boundary.2026.6",
+      archiveSha256: localArchive.archiveSha256,
+      qualificationMode: deploymentBuild.qualificationBuild.mode,
+      runId: deploymentBuild.qualificationBuild.runId,
+      seedCommitment: deploymentBuild.qualificationBuild.seedCommitment,
+      contextCommitment: deploymentBuild.qualificationBuild.contextCommitment,
+      fileCount: localArchive.fileCount,
+      nonServerFileCount: 1,
+      rawContextLeakCount: 0 as const,
+      nonServerDerivedCredentialLeakCount: 0 as const,
+      scanRoot: "d".repeat(64)
+    },
+    sitesVersion: {
+      version: "os01-sites-control-plane.2026.3",
+      observedAt,
+      projectId: target.projectId,
+      versionId: deploymentVersion,
+      versionNumber: 2,
+      sourceCommit: deploymentCommit,
+      archiveFormat: "tar",
+      archiveContentHash: `sha256:${testArchiveHash}`,
+      archiveFileCount: packageManifest.fileCount,
+      archiveSizeBytes: 101
+    },
+    deployment: {
+      version: "os01-sites-control-plane.2026.3",
+      observedAt,
+      projectId: target.projectId,
+      deploymentId: "test-deployment",
+      versionId: deploymentVersion,
+      status: "succeeded",
+      type: "publish",
+      environmentRevision: 2,
+      origin,
+      updatedAt: observedAt
+    },
+    access: {
+      version: "os01-sites-control-plane.2026.3",
+      observedAt,
+      projectId: target.projectId,
+      origin,
+      currentUserRole: "owner",
+      accessMode: "custom",
+      revision: 3,
+      principalRoot: "d".repeat(64),
+      allowedAccountUserCount: 1,
+      allowedUserCount: 1,
+      ownerRoleCount: 1,
+      nonOwnerUserCount: 0,
+      editorCount: 0,
+      groupCount: 0,
+      workspaceGroupCount: 0,
+      tenantGroupCount: 0,
+      externalVisitorCount: 0
+    },
+    uploader: {
+      version: "os01-trusted-uploader-assertion.2026.3",
+      observedAt,
+      sourceCommit: deploymentCommit,
+      versionId: deploymentVersion,
+      localArchiveSha256: localArchive.archiveSha256,
+      localArchiveBytes: localArchive.archiveBytes,
+      localArchiveFileListRoot: localArchive.fileListRoot,
+      localArchiveFileCount: localArchive.fileCount,
+      localPackageContentRoot: packageManifest.contentRoot,
+      sitesArchiveContentHash: `sha256:${testArchiveHash}`,
+      uploadMethod: "sites_save_site_version_exact_local_archive" as const,
+      remoteBuildRequested: false as const,
+      sourceBranch: "main" as const,
+      sourceHeadBefore: gitEvidence.liveBaseCommit,
+      sourcePushExpectedOld: gitEvidence.liveBaseCommit,
+      sourceHeadAfter: deploymentCommit,
+      sourceCompareAndSwapApplied: true as const,
+      mutationIntentHash: "9".repeat(64),
+      temporaryControlExpiresAt: "2026-08-27T20:05:00.000Z",
+      temporaryControlAuthSha256: "a".repeat(64),
+      temporaryControlBuildAttestation: "b".repeat(64),
+      temporaryControlEnvironmentRevisionBefore: 1,
+      temporaryControlEnvironmentRevisionStaged: 2,
+      temporaryControlsSingleUpdate: true as const,
+      externalMutationSequence: [
+        "source_compare_and_swap",
+        "environment_controls_single_update",
+        "sites_save_exact_local_archive",
+        "temporary_publish"
+      ] as [
+        "source_compare_and_swap",
+        "environment_controls_single_update",
+        "sites_save_exact_local_archive",
+        "temporary_publish"
+      ],
+      trustBoundary: "trusted_sites_connector_plus_trusted_controller_plus_exclusive_qualification_host",
+      canonicalizationClaim: "sites_archive_hash_is_opaque_and_not_a_local_tar_hash",
+      archivePathBinding: "connector_path_read_is_trusted_not_kernel_attested"
+    }
   };
 }
 
@@ -259,7 +519,7 @@ function migratedDatabase(): DatabaseSync {
   return database;
 }
 
-function d1(database: DatabaseSync): D1Database {
+function d1(database: DatabaseSync, onSql?: (sql: string) => void): D1Database {
   let bookmark = 0;
   return {
     prepare() { throw new Error("database.prepare must not be called"); },
@@ -269,6 +529,7 @@ function d1(database: DatabaseSync): D1Database {
       let current: string | null = null;
       return {
         prepare(sql: string) {
+          onSql?.(sql);
           let values: SqlValue[] = [];
           return {
             bind(...input: unknown[]) {
@@ -341,13 +602,16 @@ async function operatorServer(input: {
   database: DatabaseSync;
   token: string;
   mutate?: (value: Record<string, unknown>) => Record<string, unknown>;
+  onRequest?: () => void;
+  onSql?: (sql: string) => void;
 }): Promise<{ endpoint: string; requestCount: () => number; close: () => Promise<void> }> {
-  const binding = d1(input.database);
+  const binding = d1(input.database, input.onSql);
   const digestBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input.token));
   const digest = [...new Uint8Array(digestBuffer)].map((value) => value.toString(16).padStart(2, "0")).join("");
   let requests = 0;
   const server: Server = createServer(async (incoming, outgoing) => {
     requests += 1;
+    input.onRequest?.();
     const chunks: Uint8Array[] = [];
     for await (const chunk of incoming) {
       chunks.push(typeof chunk === "string" ? new TextEncoder().encode(chunk) : chunk);
@@ -523,10 +787,19 @@ function entryClosureRepository(): string {
 }
 
 function testBridgeFoundation(repository: ReturnType<typeof successorRepository>) {
+  const implementationArchive = execFileSync("git", ["archive", "--format=tar", repository.implementation], {
+    cwd: repository.directory,
+    encoding: "buffer",
+    stdio: ["ignore", "pipe", "pipe"]
+  });
   return {
     version: "test-bridge-foundation",
     liveBaseCommit: repository.liveBase,
     implementationCommitCount: 1,
+    requiredImplementationCommit: repository.implementation,
+    requiredImplementationTreeObjectId: git(repository.directory, ["rev-parse", `${repository.implementation}^{tree}`]),
+    requiredImplementationArchiveSha256: sha256(implementationArchive),
+    requiredImplementationArchiveBytes: implementationArchive.byteLength,
     requiredLiveBaseToImplementationNameStatus: [
       { status: "A", path: "worker/os01-census-source-anchor.ts" },
       { status: "A", path: "worker/site-runtime.ts" }
@@ -537,6 +810,22 @@ function testBridgeFoundation(repository: ReturnType<typeof successorRepository>
 }
 
 describe("OS-01 production census controller", () => {
+  it("routes production through the private-seed session before paths or input are read", () => {
+    const result = spawnSync(resolve("node_modules/.bin/tsx"), [
+      "scripts/run_os01_production_census.ts",
+      "--target", "production"
+    ], {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      input: "",
+      timeout: 20_000
+    });
+    expect(result.status).toBe(1);
+    expect(result.stdout).toBe("");
+    expect(result.stderr).toContain("production census must run through the private-seed session coordinator");
+    expect(result.stderr).not.toContain("--qualification-dir");
+  });
+
   it("requires the exact source-anchor file and rejects executable text smuggled beside the literal", () => {
     const anchor = "a".repeat(64);
     const exact = expectedAnchorSource(anchor, true);
@@ -580,15 +869,13 @@ describe("OS-01 production census controller", () => {
     temporaryDirectories.push(directory);
     const packageRoot = join(directory, "package");
     mkdirSync(join(packageRoot, "dist/server"), { recursive: true });
-    mkdirSync(join(packageRoot, "dist/.openai/drizzle/meta"), { recursive: true });
+    mkdirSync(join(packageRoot, ".openai"), { recursive: true });
+    mkdirSync(join(packageRoot, "drizzle/meta"), { recursive: true });
     writeFileSync(join(packageRoot, "dist/server/index.js"), "worker-bytes", "utf8");
-    writeFileSync(join(packageRoot, "dist/.openai/hosting.json"), "{}", "utf8");
-    writeFileSync(join(packageRoot, "dist/.openai/drizzle/meta/_journal.json"), "{}", "utf8");
+    writeFileSync(join(packageRoot, ".openai/hosting.json"), "{}", "utf8");
+    writeFileSync(join(packageRoot, "drizzle/meta/_journal.json"), "{}", "utf8");
     const archive = join(directory, "deployment.tar.gz");
-    execFileSync("/usr/bin/tar", ["-czf", archive, "dist"], {
-      cwd: packageRoot,
-      env: { COPYFILE_DISABLE: "1", NODE_ENV: "test" }
-    });
+    packageSiteArchive(packageRoot, archive);
 
     const evidence = localArchiveEvidence(archive);
     const records = [
@@ -599,6 +886,31 @@ describe("OS-01 production census controller", () => {
     expect(evidence.fileCount).toBe(3);
     expect(evidence.fileListRoot).toBe(sha256(JSON.stringify(records.map(({ path }) => path))));
     expect(evidence.contentRoot).toBe(sha256(JSON.stringify(stable(records))));
+  });
+
+  it("uses Python-compatible code-point ordering for package and archive manifests", () => {
+    const directory = mkdtempSync(join(tmpdir(), "os01-package-order-"));
+    temporaryDirectories.push(directory);
+    const projectRoot = join(directory, "project");
+    mkdirSync(join(projectRoot, "dist/server"), { recursive: true });
+    mkdirSync(join(projectRoot, ".openai"), { recursive: true });
+    mkdirSync(join(projectRoot, "drizzle/meta"), { recursive: true });
+    writeFileSync(join(projectRoot, "dist/server/index.js"), "worker", "utf8");
+    writeFileSync(join(projectRoot, ".openai/hosting.json"), "{}", "utf8");
+    writeFileSync(join(projectRoot, "drizzle/meta/_journal.json"), "journal", "utf8");
+    writeFileSync(join(projectRoot, "drizzle/_journal.json"), "underscore", "utf8");
+    writeFileSync(join(projectRoot, "drizzle/0000.sql"), "zero", "utf8");
+
+    const archivePath = join(directory, "deployment.tar.gz");
+    packageSiteArchive(projectRoot, archivePath);
+
+    const packageManifest = expectedPackageManifest(projectRoot);
+    const archiveManifest = localArchiveEvidence(archivePath);
+    expect(packageManifest).toEqual({
+      contentRoot: archiveManifest.contentRoot,
+      fileListRoot: archiveManifest.fileListRoot,
+      fileCount: archiveManifest.fileCount
+    });
   });
 
   it("rejects any archive/package byte-manifest mismatch", () => {
@@ -658,42 +970,139 @@ describe("OS-01 production census controller", () => {
     temporaryDirectories.push(directory);
     const missingRoot = join(directory, "missing");
     mkdirSync(join(missingRoot, "dist/server"), { recursive: true });
+    mkdirSync(join(missingRoot, ".openai"), { recursive: true });
     writeFileSync(join(missingRoot, "dist/server/index.js"), "worker", "utf8");
+    writeFileSync(join(missingRoot, ".openai/hosting.json"), "{}", "utf8");
     const missingArchive = join(directory, "missing.tar.gz");
-    execFileSync("/usr/bin/tar", ["-czf", missingArchive, "dist"], {
-      cwd: missingRoot,
-      env: { COPYFILE_DISABLE: "1", NODE_ENV: "test" }
-    });
+    packageSiteArchive(missingRoot, missingArchive);
     expect(() => localArchiveEvidence(missingArchive)).toThrow(/omits required build entries/u);
 
     const linkRoot = join(directory, "link");
     mkdirSync(join(linkRoot, "dist/server"), { recursive: true });
-    mkdirSync(join(linkRoot, "dist/.openai/drizzle/meta"), { recursive: true });
+    mkdirSync(join(linkRoot, ".openai"), { recursive: true });
+    mkdirSync(join(linkRoot, "drizzle/meta"), { recursive: true });
     writeFileSync(join(linkRoot, "dist/server/index.js"), "worker", "utf8");
-    writeFileSync(join(linkRoot, "dist/.openai/hosting.json"), "{}", "utf8");
-    writeFileSync(join(linkRoot, "dist/.openai/drizzle/meta/_journal.json"), "{}", "utf8");
+    writeFileSync(join(linkRoot, ".openai/hosting.json"), "{}", "utf8");
+    writeFileSync(join(linkRoot, "drizzle/meta/_journal.json"), "{}", "utf8");
     execFileSync("/bin/ln", ["-s", "index.js", join(linkRoot, "dist/server/link.js")]);
     const linkArchive = join(directory, "link.tar.gz");
-    execFileSync("/usr/bin/tar", ["-czf", linkArchive, "dist"], {
-      cwd: linkRoot,
-      env: { COPYFILE_DISABLE: "1", NODE_ENV: "test" }
-    });
-    expect(() => localArchiveEvidence(linkArchive)).toThrow(/link or special/u);
+    expect(() => packageSiteArchive(linkRoot, linkArchive)).toThrow(/non-regular/u);
+
+    const specialRoot = join(directory, "special");
+    mkdirSync(join(specialRoot, "dist/server"), { recursive: true });
+    mkdirSync(join(specialRoot, ".openai"), { recursive: true });
+    mkdirSync(join(specialRoot, "drizzle/meta"), { recursive: true });
+    writeFileSync(join(specialRoot, "dist/server/index.js"), "worker", "utf8");
+    writeFileSync(join(specialRoot, ".openai/hosting.json"), "{}", "utf8");
+    writeFileSync(join(specialRoot, "drizzle/meta/_journal.json"), "{}", "utf8");
+    execFileSync("/usr/bin/mkfifo", [join(specialRoot, "dist/server/special")]);
+    expect(() => packageSiteArchive(specialRoot, join(directory, "special.tar.gz"))).toThrow(
+      /non-regular/u
+    );
   });
 
   it("trust-roots both hosted destinations in versioned configuration", () => {
     expect(configuredTrustedTarget("production")).toMatchObject({
       projectId: "appgprj_6a7ba1bc638c819197788ab281abfbc3",
       origin: "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site",
+      d1Binding: "DB",
+      r2Binding: "EVIDENCE",
       loopbackFixture: false
     });
     expect(configuredTrustedTarget("staging")).toMatchObject({
       projectId: "appgprj_6a90219f9cb081918f5123f29c82bcbf",
       origin: "https://nfl-engine-os01-census-20260827.psoiawesome.chatgpt.site",
       accessMode: "owner_only",
+      d1Binding: "DB",
+      r2Binding: null,
       loopbackFixture: false
     });
     expect(() => configuredTrustedTarget("caller-controlled")).toThrow("trusted census target is unavailable");
+  });
+
+  it("binds tracked hosting metadata to the selected project and exact storage bindings", () => {
+    const production = configuredTrustedTarget("production");
+    expect(validateTrackedHostingTarget(realpathSync("."), production)).toEqual({
+      projectId: production.projectId,
+      d1Binding: "DB",
+      r2Binding: "EVIDENCE"
+    });
+    expect(() => validateTrackedHostingTarget(
+      realpathSync("."),
+      configuredTrustedTarget("staging")
+    )).toThrow(/does not match the trusted target/u);
+    expect(() => validateHostingTargetDocument({
+      project_id: production.projectId,
+      d1: "DB",
+      r2: "EVIDENCE",
+      unexpected: true
+    }, production)).toThrow(/unexpected fields/u);
+
+    const untracked = mkdtempSync(join(tmpdir(), "os01-untracked-hosting-"));
+    temporaryDirectories.push(untracked);
+    execFileSync("git", ["init", "--quiet"], { cwd: untracked });
+    mkdirSync(join(untracked, ".openai"), { recursive: true });
+    writeFileSync(join(untracked, ".openai/hosting.json"), JSON.stringify({
+      project_id: production.projectId,
+      d1: "DB",
+      r2: "EVIDENCE"
+    }), "utf8");
+    expect(() => validateTrackedHostingTarget(untracked, production)).toThrow(/not tracked/u);
+  });
+
+  it("constructs deployment proof only from closed sanitized projections", () => {
+    const input = proofConstructorInput("https://trusted.example.invalid");
+    const proof = constructDeploymentProof(input);
+    expect(proof).toMatchObject({
+      version: "os01-census-deployment-proof.2026.3",
+      status: "ready_for_census",
+      projectId: input.target.projectId,
+      sourceAnchor: input.sourceAnchorEvidence.sourceAnchor,
+      deployment: {
+        accessPolicyRevision: input.access.revision,
+        environmentRevision: input.deployment.environmentRevision
+      }
+    });
+    expect(() => constructDeploymentProof({
+      ...input,
+      sitesVersion: {
+        ...input.sitesVersion,
+        value: "raw-control-plane-value"
+      } as unknown as typeof input.sitesVersion
+    })).toThrow(/unexpected fields/u);
+  });
+
+  it("writes deployment proof once with mode 0600 and the CLI refuses overwrite", () => {
+    const createdDirectory = mkdtempSync(join(tmpdir(), "os01-proof-writer-"));
+    temporaryDirectories.push(createdDirectory);
+    const directory = realpathSync(createdDirectory);
+    const output = join(directory, "deployment-proof.json");
+    const input = proofConstructorInput("https://trusted.example.invalid");
+    expect(writeDeploymentProofExclusive(output, input)).toBe(output);
+    expect(statSync(output).mode & 0o777).toBe(0o600);
+    expect(() => writeDeploymentProofExclusive(output, input)).toThrow(/EEXIST/u);
+
+    const cliOutput = join(directory, "deployment-proof-cli.json");
+    const cli = spawnSync(resolve("node_modules/.bin/tsx"), [
+      "scripts/build_os01_deployment_proof.ts", "--output", cliOutput
+    ], {
+      cwd: realpathSync("."),
+      input: JSON.stringify(input),
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"]
+    });
+    expect(cli.status, cli.stderr).toBe(0);
+    expect(statSync(cliOutput).mode & 0o777).toBe(0o600);
+    const retry = spawnSync(resolve("node_modules/.bin/tsx"), [
+      "scripts/build_os01_deployment_proof.ts", "--output", cliOutput
+    ], {
+      cwd: realpathSync("."),
+      input: JSON.stringify(input),
+      encoding: "utf8",
+      stdio: ["pipe", "pipe", "pipe"]
+    });
+    expect(retry.status).not.toBe(0);
+    expect(retry.stderr).toMatch(/EEXIST/u);
   });
 
   it("requires fresh Sites proof bound to the exact project, version, deployment, and origin", () => {
@@ -703,6 +1112,8 @@ describe("OS-01 production census controller", () => {
       projectId: "test-project",
       origin,
       accessMode: "owner_only",
+      d1Binding: "DB",
+      r2Binding: null,
       loopbackFixture: false
     };
     const proof = deploymentProof(origin);
@@ -1079,12 +1490,26 @@ describe("OS-01 production census controller", () => {
   it("requires two identical read-only passes and emits only hashed row evidence", async () => {
     const database = migratedDatabase();
     const token = "c".repeat(64);
-    const server = await operatorServer({ database, token });
+    const output = temporaryOutput("receipt.json");
+    const reservationObservations: boolean[] = [];
+    const server = await operatorServer({
+      database,
+      token,
+      onRequest: () => reservationObservations.push(existsSync(censusReservationPath(output)))
+    });
     try {
-      const output = temporaryOutput("receipt.json");
       const result = await runController({ endpoint: server.endpoint, token, output });
       expect(result, result.stderr).toMatchObject({ code: 0, stderr: "" });
+      expect(reservationObservations.length).toBeGreaterThan(0);
+      expect(reservationObservations.every(Boolean)).toBe(true);
+      const reservation = JSON.parse(readFileSync(censusReservationPath(output), "utf8")) as {
+        status: string;
+        reservationHash: string;
+      };
       const receipt = JSON.parse(readFileSync(output, "utf8")) as Record<string, unknown>;
+      expect(reservation.status).toBe("reserved_before_network");
+      expect(reservation.reservationHash).toMatch(/^[a-f0-9]{64}$/u);
+      expect(receipt.reservationHash).toBe(reservation.reservationHash);
       expect(receipt.status).toBe("accepted_two_identical_read_only_passes");
       expect(receipt.commonPassRoot).toMatch(/^[a-f0-9]{64}$/u);
       expect(receipt.buildAttestation).toBe(testSourceAnchor);
@@ -1099,6 +1524,28 @@ describe("OS-01 production census controller", () => {
       database.close();
     }
   }, 120_000);
+
+  it("refuses content for every table except plays before issuing any content query", async () => {
+    const database = migratedDatabase();
+    const token = "f".repeat(64);
+    const sql: string[] = [];
+    const server = await operatorServer({ database, token, onSql: (statement) => sql.push(statement) });
+    try {
+      const client = new OperatorClient(
+        { endpoint: server.endpoint, censusToken: token },
+        testSourceAnchor
+      );
+      await client.call({ operation: "begin", passNonce: "a".repeat(32) });
+      const queryCountAfterBegin = sql.length;
+      await expect(client.call({ operation: "table_start", table: "users" }))
+        .rejects.toThrow(/operator_403_content_table_not_authorized/u);
+      expect(sql).toHaveLength(queryCountAfterBegin);
+      expect(sql.slice(queryCountAfterBegin)).toEqual([]);
+    } finally {
+      await server.close();
+      database.close();
+    }
+  });
 
   it("supports only the all-or-nothing absent plays prestate", async () => {
     const database = migratedDatabase();
@@ -1166,7 +1613,13 @@ describe("OS-01 production census controller", () => {
       const result = await runController({ endpoint: server.endpoint, token, output });
       expect(result.code).not.toBe(0);
       expect(result.stderr).toContain("operator payload hash mismatch");
-      expect(readFileSync(output)).toHaveLength(0);
+      expect(existsSync(output)).toBe(false);
+      expect(existsSync(censusReservationPath(output))).toBe(true);
+      const requestCountAfterFailure = server.requestCount();
+      const retry = await runController({ endpoint: server.endpoint, token, output });
+      expect(retry.code).not.toBe(0);
+      expect(retry.stderr).toContain("qualification receipt reservation already exists");
+      expect(server.requestCount()).toBe(requestCountAfterFailure);
     } finally {
       await server.close();
       database.close();
@@ -1195,7 +1648,7 @@ describe("OS-01 production census controller", () => {
       expect(mutated).toBe(true);
       expect(result.code).not.toBe(0);
       expect(result.stderr).toContain("operator payload MAC mismatch");
-      expect(readFileSync(output)).toHaveLength(0);
+      expect(existsSync(output)).toBe(false);
     } finally {
       await server.close();
       database.close();
@@ -1248,7 +1701,7 @@ describe("OS-01 production census controller", () => {
         mutate: (value) => {
           const payload = value.payload as Record<string, unknown>;
           if (payload.operation !== "table_page") return false;
-          payload.pageHash = "0".repeat(64);
+          payload.pageMac = "0".repeat(64);
           return true;
         }
       }
@@ -1273,7 +1726,7 @@ describe("OS-01 production census controller", () => {
         const result = await runController({ endpoint: server.endpoint, token, output });
         expect(mutated, tamper.name).toBe(true);
         expect(result.code, `${tamper.name}: ${result.stderr}`).not.toBe(0);
-        expect(readFileSync(output), tamper.name).toHaveLength(0);
+        expect(existsSync(output), tamper.name).toBe(false);
       } finally {
         await server.close();
         database.close();
@@ -1291,7 +1744,122 @@ describe("OS-01 production census controller", () => {
     });
     expect(result.code).not.toBe(0);
     expect(result.stderr).toContain("invalid secret input");
-    expect(readFileSync(output)).toHaveLength(0);
+    expect(existsSync(output)).toBe(false);
+  });
+
+  it("keeps the abort deadline armed through response-body recovery", async () => {
+    const server: Server = createServer((_incoming, outgoing) => {
+      outgoing.writeHead(200, { "content-type": "application/json" });
+      outgoing.flushHeaders();
+    });
+    await new Promise<void>((resolveListen) => server.listen(0, "127.0.0.1", resolveListen));
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("test server address unavailable");
+    const client = new OperatorClient(
+      {
+        endpoint: `http://127.0.0.1:${address.port}${os01CensusContract.route}`,
+        censusToken: "3".repeat(64)
+      },
+      testSourceAnchor,
+      undefined,
+      Date.now() + 150
+    );
+    const startedAt = Date.now();
+    try {
+      await expect(client.call({ operation: "begin", passNonce: "5".repeat(32) })).rejects.toThrow();
+      expect(Date.now() - startedAt).toBeLessThan(2_000);
+    } finally {
+      await new Promise<void>((resolveClose, reject) =>
+        server.close((error) => error ? reject(error) : resolveClose())
+      );
+    }
+  });
+
+  it("rejects non-JSON content types and invalid UTF-8 before authentication parsing", async () => {
+    const cases = [
+      {
+        name: "content type",
+        contentType: "text/plain",
+        body: Buffer.from("{}", "utf8"),
+        message: /content type is not canonical JSON/u
+      },
+      {
+        name: "UTF-8",
+        contentType: "application/json",
+        body: Buffer.from([0xc3, 0x28]),
+        message: /invalid UTF-8 JSON/u
+      }
+    ];
+    for (const testCase of cases) {
+      let scanCount = 0;
+      let scannedBytes = 0;
+      const server: Server = createServer((_incoming, outgoing) => {
+        outgoing.writeHead(200, { "content-type": testCase.contentType });
+        outgoing.end(testCase.body);
+      });
+      await new Promise<void>((resolveListen) => server.listen(0, "127.0.0.1", resolveListen));
+      const address = server.address();
+      if (!address || typeof address === "string") throw new Error("test server address unavailable");
+      const client = new OperatorClient(
+        {
+          endpoint: `http://127.0.0.1:${address.port}${os01CensusContract.route}`,
+          censusToken: "4".repeat(64)
+        },
+        testSourceAnchor,
+        (bytes) => {
+          scanCount += 1;
+          scannedBytes += bytes.byteLength;
+        },
+        Date.now() + 2_000
+      );
+      try {
+        await expect(
+          client.call({ operation: "begin", passNonce: "6".repeat(32) }),
+          testCase.name
+        ).rejects.toThrow(testCase.message);
+        expect(scanCount, testCase.name).toBeGreaterThan(0);
+        expect(scannedBytes, testCase.name).toBeGreaterThanOrEqual(testCase.body.byteLength);
+      } finally {
+        await new Promise<void>((resolveClose, reject) =>
+          server.close((error) => error ? reject(error) : resolveClose())
+        );
+      }
+    }
+  });
+
+  it("scans public response bytes before rejecting an oversized body", async () => {
+    const body = Buffer.alloc(1_048_577, 0x61);
+    let scanCount = 0;
+    let scannedBytes = 0;
+    const server: Server = createServer((_incoming, outgoing) => {
+      outgoing.writeHead(200, { "content-type": "application/json" });
+      outgoing.end(body);
+    });
+    await new Promise<void>((resolveListen) => server.listen(0, "127.0.0.1", resolveListen));
+    const address = server.address();
+    if (!address || typeof address === "string") throw new Error("test server address unavailable");
+    const client = new OperatorClient(
+      {
+        endpoint: `http://127.0.0.1:${address.port}${os01CensusContract.route}`,
+        censusToken: "4".repeat(64)
+      },
+      testSourceAnchor,
+      (bytes) => {
+        scanCount += 1;
+        scannedBytes += bytes.byteLength;
+      },
+      Date.now() + 5_000
+    );
+    try {
+      await expect(client.call({ operation: "begin", passNonce: "7".repeat(32) }))
+        .rejects.toThrow(/exceeded byte limit/u);
+      expect(scanCount).toBeGreaterThan(0);
+      expect(scannedBytes).toBeGreaterThan(1_048_576);
+    } finally {
+      await new Promise<void>((resolveClose, reject) =>
+        server.close((error) => error ? reject(error) : resolveClose())
+      );
+    }
   });
 
   it("reserves receipt identity before any network call and never overwrites", async () => {
