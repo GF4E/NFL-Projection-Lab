@@ -12,7 +12,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, resolve } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { os01ControlPlaneContract } from "../scripts/os01-control-plane-evidence";
 import { Os01ProductionSessionLock } from "../scripts/os01-production-session-lock";
@@ -90,7 +90,7 @@ const lastCommandHash = "d".repeat(64);
 
 type Fixture = {
   root: string;
-  paths: Omit<Os01RejectedSessionRecoveryInput, "authority" | "recoveredAt" | "faultInjection">;
+  paths: Omit<Os01RejectedSessionRecoveryInput, "authority" | "faultInjection">;
   authority: Os01RejectedSessionRecoveryAuthority;
   intent: JsonRecord;
   cleanup: Os01RejectedSessionManualCleanupEvidence;
@@ -182,10 +182,10 @@ function makeFixture(label: string): Fixture {
     "2026-08-28T12:11:30.000Z"
   );
   const afterEnvironment = environment(
-    "2026-08-28T12:46:00.000Z", 27, [], cleanMetadataRoot, 1, "2026-08-28T12:45:30.000Z"
+    "2026-08-28T13:51:00.000Z", 27, [], cleanMetadataRoot, 1, "2026-08-28T12:45:30.000Z"
   );
   const beforeAccess = access("2026-08-28T12:04:30.000Z");
-  const afterAccess = access("2026-08-28T12:47:00.000Z");
+  const afterAccess = access("2026-08-28T13:52:00.000Z");
   const intentUnsigned = {
     version: "os01-external-mutation-intent.2026.1",
     status: "armed_cleanup_required_before_external_mutation",
@@ -288,7 +288,7 @@ function makeFixture(label: string): Fixture {
     { name: "census_post", method: "POST", url: `${targetOrigin}/_ops/engine-os/os01-census-v1`, status: 405 }
   ].map((value, index) => ({
     ...value,
-    observedAt: `2026-08-28T12:5${index}:00.000Z`,
+    observedAt: `2026-08-28T13:5${index + 5}:00.000Z`,
     bodyBase64: httpBodies[index]!.toString("base64"),
     bodySha256: sha256(httpBodies[index]!)
   }));
@@ -324,13 +324,13 @@ function makeFixture(label: string): Fixture {
       compareAndSwapApplied: true,
       projectionComplete: true,
       observedAt: "2026-08-28T12:40:00.000Z",
-      remoteReadbackObservedAt: "2026-08-28T12:41:00.000Z"
+      remoteReadbackObservedAt: "2026-08-28T13:50:00.000Z"
     },
     environment: { before: beforeEnvironment, staged: stagedEnvironment, after: afterEnvironment },
     access: { before: beforeAccess, after: afterAccess },
     cleanVersion: {
       version: os01ControlPlaneContract.version,
-      observedAt: "2026-08-28T12:48:00.000Z",
+      observedAt: "2026-08-28T13:53:00.000Z",
       projectId: targetProjectId,
       versionId: cleanVersionId,
       versionNumber: 165,
@@ -342,7 +342,7 @@ function makeFixture(label: string): Fixture {
     },
     cleanDeployment: {
       version: os01ControlPlaneContract.version,
-      observedAt: "2026-08-28T12:49:00.000Z",
+      observedAt: "2026-08-28T13:54:00.000Z",
       projectId: targetProjectId,
       deploymentId: cleanDeploymentId,
       versionId: cleanVersionId,
@@ -357,16 +357,16 @@ function makeFixture(label: string): Fixture {
       d1Bindings: ["DB"],
       r2Bindings: ["EVIDENCE"],
       projectionComplete: true,
-      observedAt: "2026-08-28T12:49:30.000Z"
+      observedAt: "2026-08-28T13:58:00.000Z"
     },
     providerState: {
       ...committedProviderState,
       stateRoot: sha256(stableJson(committedProviderState)),
-      observedAt: "2026-08-28T12:49:40.000Z"
+      observedAt: "2026-08-28T13:58:30.000Z"
     },
     providerActivity: { providerSecretReads: 0, providerRequests: 0, quotaReservations: 0 },
     manualHttpBytesSha256: sha256(httpBytes),
-    observedAt: "2026-08-28T13:10:00.000Z"
+    observedAt: "2026-08-28T13:59:00.000Z"
   } as const;
   const cleanup = hashed(cleanupUnsigned as unknown as JsonRecord, "receiptHash") as unknown as
     Os01RejectedSessionManualCleanupEvidence;
@@ -448,8 +448,7 @@ function makeFixture(label: string): Fixture {
 function recoveryInput(fixture: Fixture): Os01RejectedSessionRecoveryInput {
   return {
     ...fixture.paths,
-    authority: fixture.authority,
-    recoveredAt: "2026-08-28T14:00:00.000Z"
+    authority: fixture.authority
   };
 }
 
@@ -470,7 +469,13 @@ function detachedPaths(root: string): string[] {
   return readdirSync(root).filter((name) => name.endsWith(".detached"));
 }
 
+beforeEach(() => {
+  vi.useFakeTimers();
+  vi.setSystemTime(new Date("2026-08-28T14:00:00.000Z"));
+});
+
 afterEach(() => {
+  vi.useRealTimers();
   while (temporaryRoots.length > 0) {
     const root = temporaryRoots.pop();
     if (root) rmSync(root, { recursive: true, force: true });
@@ -512,11 +517,178 @@ describe("OS-01R rejected-session lock recovery", () => {
 
   it("refuses recovery at or before expiry without creating a guard", () => {
     const fixture = makeFixture("expiry");
-    expect(() => recoverRejectedOs01ProductionSession({
-      ...recoveryInput(fixture), recoveredAt: "2026-08-28T13:00:00.000Z"
-    })).toThrow(/strictly after lock expiry/u);
+    vi.setSystemTime(new Date("2026-08-28T13:00:00.000Z"));
+    expect(() => recoverRejectedOs01ProductionSession(recoveryInput(fixture)))
+      .toThrow(/strictly after lock expiry/u);
     expect(existsSync(fixture.paths.lockPath)).toBe(true);
     expect(existsSync(guardPath(fixture.paths.lockPath))).toBe(false);
+  });
+
+  it("rejects a caller-supplied future recovery time instead of using it", () => {
+    const fixture = makeFixture("caller-clock");
+    const input = {
+      ...recoveryInput(fixture),
+      recoveredAt: "2099-01-01T00:00:00.000Z"
+    } as unknown as Os01RejectedSessionRecoveryInput;
+    expect(() => recoverRejectedOs01ProductionSession(input)).toThrow(/unexpected fields/u);
+    expect(existsSync(guardPath(fixture.paths.lockPath))).toBe(false);
+  });
+
+  it("accepts an observation exactly at the frozen 600-second freshness boundary", () => {
+    const fixture = makeFixture("freshness-boundary");
+    const cleanup = JSON.parse(readFileSync(fixture.paths.manualCleanupPath, "utf8")) as JsonRecord;
+    expect(((cleanup.sourceRestoration as JsonRecord).remoteReadbackObservedAt))
+      .toBe("2026-08-28T13:50:00.000Z");
+    expect(recoverRejectedOs01ProductionSession(recoveryInput(fixture)).status).toContain("recovered");
+  });
+
+  it.each([
+    ["source remote readback", (value: JsonRecord, at: string) => {
+      (value.sourceRestoration as JsonRecord).remoteReadbackObservedAt = at;
+    }],
+    ["environment after", (value: JsonRecord, at: string) => {
+      ((value.environment as JsonRecord).after as JsonRecord).observedAt = at;
+    }],
+    ["access after", (value: JsonRecord, at: string) => {
+      ((value.access as JsonRecord).after as JsonRecord).observedAt = at;
+    }],
+    ["clean version", (value: JsonRecord, at: string) => {
+      (value.cleanVersion as JsonRecord).observedAt = at;
+    }],
+    ["clean deployment", (value: JsonRecord, at: string) => {
+      (value.cleanDeployment as JsonRecord).observedAt = at;
+    }],
+    ["bindings", (value: JsonRecord, at: string) => {
+      (value.bindings as JsonRecord).observedAt = at;
+    }],
+    ["provider state", (value: JsonRecord, at: string) => {
+      (value.providerState as JsonRecord).observedAt = at;
+    }],
+    ["manual-cleanup envelope", (value: JsonRecord, at: string) => {
+      value.observedAt = at;
+    }]
+  ] as const)("rejects a non-post-expiry %s observation", (label, mutate) => {
+    const fixture = makeFixture(`pre-expiry-${label.replaceAll(" ", "-")}`);
+    rewriteHashedJson(fixture.paths.manualCleanupPath, "receiptHash", (value) => {
+      mutate(value, "2026-08-28T13:00:00.000Z");
+    });
+    fixture.refreshAuthority();
+    expect(() => recoverRejectedOs01ProductionSession(recoveryInput(fixture))).toThrow();
+    expect(existsSync(guardPath(fixture.paths.lockPath))).toBe(false);
+  });
+
+  it.each([0, 1, 2])("rejects pre-expiry HTTP observation %i", (index) => {
+    const fixture = makeFixture(`pre-expiry-http-${index}`);
+    const http = JSON.parse(readFileSync(fixture.paths.manualHttpPath, "utf8")) as JsonRecord[];
+    http[index]!.observedAt = "2026-08-28T13:00:00.000Z";
+    rmSync(fixture.paths.manualHttpPath);
+    writePrivate(fixture.paths.manualHttpPath, pretty(http));
+    rewriteHashedJson(fixture.paths.manualCleanupPath, "receiptHash", (value) => {
+      value.manualHttpBytesSha256 = sha256(readFileSync(fixture.paths.manualHttpPath));
+    });
+    fixture.refreshAuthority();
+    expect(() => recoverRejectedOs01ProductionSession(recoveryInput(fixture))).toThrow(/HTTP evidence/u);
+  });
+
+  it.each([
+    ["source remote readback", (value: JsonRecord) => {
+      (value.sourceRestoration as JsonRecord).remoteReadbackObservedAt = "2026-08-28T13:49:59.999Z";
+    }],
+    ["environment after", (value: JsonRecord) => {
+      ((value.environment as JsonRecord).after as JsonRecord).observedAt = "2026-08-28T13:49:59.999Z";
+    }],
+    ["access after", (value: JsonRecord) => {
+      ((value.access as JsonRecord).after as JsonRecord).observedAt = "2026-08-28T13:49:59.999Z";
+    }],
+    ["clean version", (value: JsonRecord) => {
+      (value.cleanVersion as JsonRecord).observedAt = "2026-08-28T13:49:59.999Z";
+    }],
+    ["clean deployment", (value: JsonRecord) => {
+      (value.cleanDeployment as JsonRecord).observedAt = "2026-08-28T13:49:59.999Z";
+    }],
+    ["bindings", (value: JsonRecord) => {
+      (value.bindings as JsonRecord).observedAt = "2026-08-28T13:49:59.999Z";
+    }],
+    ["provider state", (value: JsonRecord) => {
+      (value.providerState as JsonRecord).observedAt = "2026-08-28T13:49:59.999Z";
+    }],
+    ["manual-cleanup envelope", (value: JsonRecord) => {
+      value.observedAt = "2026-08-28T13:49:59.999Z";
+    }]
+  ] as const)("rejects a %s observation one millisecond beyond the freshness window", (label, mutate) => {
+    const fixture = makeFixture(`stale-${label.replaceAll(" ", "-")}`);
+    rewriteHashedJson(fixture.paths.manualCleanupPath, "receiptHash", mutate);
+    fixture.refreshAuthority();
+    expect(() => recoverRejectedOs01ProductionSession(recoveryInput(fixture))).toThrow(/stale|invalid/u);
+  });
+
+  it("rejects a future post-clean observation using only wall-clock time", () => {
+    const fixture = makeFixture("future-observation");
+    rewriteHashedJson(fixture.paths.manualCleanupPath, "receiptHash", (value) => {
+      value.observedAt = "2026-08-28T14:00:00.001Z";
+    });
+    fixture.refreshAuthority();
+    expect(() => recoverRejectedOs01ProductionSession(recoveryInput(fixture))).toThrow(/future/u);
+  });
+
+  it.each([
+    ["source CAS before rejection", (value: JsonRecord) => {
+      (value.sourceRestoration as JsonRecord).observedAt = "2026-08-28T12:31:00.000Z";
+    }, /source restoration/u],
+    ["source readback before CAS", (value: JsonRecord) => {
+      (value.sourceRestoration as JsonRecord).observedAt = "2026-08-28T13:51:00.000Z";
+    }, /source restoration/u],
+    ["environment update before rejection", (value: JsonRecord) => {
+      ((value.environment as JsonRecord).after as JsonRecord).updatedAt = "2026-08-28T12:31:00.000Z";
+    }, /environment cleanup/u],
+    ["environment readback before update", (value: JsonRecord) => {
+      ((value.environment as JsonRecord).after as JsonRecord).updatedAt = "2026-08-28T13:52:00.000Z";
+    }, /environment cleanup/u],
+    ["deployment update before rejection", (value: JsonRecord) => {
+      (value.cleanDeployment as JsonRecord).updatedAt = "2026-08-28T12:31:00.000Z";
+    }, /clean deployment/u],
+    ["deployment readback before update", (value: JsonRecord) => {
+      (value.cleanDeployment as JsonRecord).updatedAt = "2026-08-28T13:55:00.000Z";
+    }, /clean deployment/u]
+  ] as const)("rejects inverted cleanup chronology: %s", (label, mutate, expected) => {
+    const fixture = makeFixture(`ordering-${label.replaceAll(" ", "-")}`);
+    rewriteHashedJson(fixture.paths.manualCleanupPath, "receiptHash", mutate);
+    fixture.refreshAuthority();
+    expect(() => recoverRejectedOs01ProductionSession(recoveryInput(fixture))).toThrow(expected);
+  });
+
+  it("requires every HTTP observation to follow the clean deployment readback", () => {
+    const fixture = makeFixture("http-before-deployment");
+    const http = JSON.parse(readFileSync(fixture.paths.manualHttpPath, "utf8")) as JsonRecord[];
+    http[0]!.observedAt = "2026-08-28T13:53:59.999Z";
+    rmSync(fixture.paths.manualHttpPath);
+    writePrivate(fixture.paths.manualHttpPath, pretty(http));
+    rewriteHashedJson(fixture.paths.manualCleanupPath, "receiptHash", (value) => {
+      value.manualHttpBytesSha256 = sha256(readFileSync(fixture.paths.manualHttpPath));
+    });
+    fixture.refreshAuthority();
+    expect(() => recoverRejectedOs01ProductionSession(recoveryInput(fixture)))
+      .toThrow(/sunday HTTP evidence is invalid/u);
+  });
+
+  it.each([
+    ["clean deployment before source readback", (value: JsonRecord) => {
+      (value.sourceRestoration as JsonRecord).remoteReadbackObservedAt = "2026-08-28T13:55:00.000Z";
+    }, /clean deployment/u],
+    ["clean deployment before environment readback", (value: JsonRecord) => {
+      ((value.environment as JsonRecord).after as JsonRecord).observedAt = "2026-08-28T13:55:00.000Z";
+    }, /clean deployment/u],
+    ["bindings before clean deployment", (value: JsonRecord) => {
+      (value.bindings as JsonRecord).observedAt = "2026-08-28T13:53:59.999Z";
+    }, /post-deployment cleanup interval/u],
+    ["provider state before clean deployment", (value: JsonRecord) => {
+      (value.providerState as JsonRecord).observedAt = "2026-08-28T13:53:59.999Z";
+    }, /post-deployment cleanup interval/u]
+  ] as const)("rejects prerequisite inversion: %s", (label, mutate, expected) => {
+    const fixture = makeFixture(`prerequisite-${label.replaceAll(" ", "-")}`);
+    rewriteHashedJson(fixture.paths.manualCleanupPath, "receiptHash", mutate);
+    fixture.refreshAuthority();
+    expect(() => recoverRejectedOs01ProductionSession(recoveryInput(fixture))).toThrow(expected);
   });
 
   it("rejects a forged authority before touching the lock", () => {

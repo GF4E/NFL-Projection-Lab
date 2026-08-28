@@ -212,7 +212,6 @@ export type Os01RejectedSessionRecoveryInput = {
   manualCleanupPath: string;
   manualHttpPath: string;
   authority: Os01RejectedSessionRecoveryAuthority;
-  recoveredAt?: string;
   faultInjection?: Os01RejectedSessionRecoveryFaultInjection;
 };
 
@@ -260,6 +259,15 @@ function record(value: unknown, label: string): JsonRecord {
 function exactKeys(value: unknown, expected: readonly string[], label: string): JsonRecord {
   const result = record(value, label);
   if (stableJson(Object.keys(result).sort(compareCodePoints)) !== stableJson([...expected].sort(compareCodePoints))) {
+    throw new Error(`${label} contains unexpected fields`);
+  }
+  return result;
+}
+
+function allowedKeys(value: unknown, allowed: readonly string[], label: string): JsonRecord {
+  const result = record(value, label);
+  const allowedSet = new Set(allowed);
+  if (Object.keys(result).some((key) => !allowedSet.has(key))) {
     throw new Error(`${label} contains unexpected fields`);
   }
   return result;
@@ -671,8 +679,10 @@ function observationsEqualExceptTime(left: JsonRecord, right: JsonRecord): boole
 function validateManualHttp(
   bytes: Uint8Array,
   authority: Os01RejectedSessionRecoveryAuthority,
-  notBeforeMs: number,
-  notAfterMs: number
+  expiresAtMs: number,
+  recoveryTimeMs: number,
+  cleanupObservedAtMs: number,
+  cleanDeploymentObservedAtMs: number
 ): void {
   const value = parseJson(bytes, "OS-01R manual HTTP evidence");
   if (!Array.isArray(value) || value.length !== 3) throw new Error("OS-01R manual HTTP evidence is incomplete");
@@ -697,8 +707,9 @@ function validateManualHttp(
         body.byteLength === 0 || body.toString("base64") !== bodyBase64 || observation.name !== contract.name ||
         observation.method !== contract.method || observation.url !== contract.url || observation.status !== contract.status ||
         observation.bodySha256 !== sha256(body) || observation.bodySha256 !== contract.digest ||
-        Date.parse(observedAt) < notBeforeMs || Date.parse(observedAt) > notAfterMs
+        Date.parse(observedAt) < cleanDeploymentObservedAtMs || Date.parse(observedAt) > cleanupObservedAtMs
       ) throw new Error(`OS-01R ${contract.name} HTTP evidence is invalid`);
+      assertFreshPostExpiry(observedAt, `OS-01R ${contract.name} HTTP evidence`, expiresAtMs, recoveryTimeMs);
     } finally {
       body.fill(0);
     }
@@ -711,8 +722,9 @@ function validateManualCleanup(
   intent: JsonRecord,
   rejectedAt: string,
   manualHttpBytesSha256: string,
-  recoveredAt: string
-): { observedAt: string; receiptHash: string } {
+  expiresAtMs: number,
+  recoveryTimeMs: number
+): { observedAt: string; receiptHash: string; cleanDeploymentObservedAt: string } {
   const evidence = exactKeys(parseJson(bytes, "OS-01R manual-cleanup evidence"), [
     "access", "bindings", "cleanDeployment", "cleanVersion", "environment", "externalMutationIntentHash",
     "manualHttpBytesSha256", "observedAt", "productionSessionLockIdentityHash", "providerActivity",
@@ -721,7 +733,6 @@ function validateManualCleanup(
   ], "OS-01R manual-cleanup evidence");
   const { receiptHash, ...unsigned } = evidence;
   const observedAt = timestamp(evidence.observedAt, "OS-01R manual-cleanup observation");
-  const intentObservedAt = timestamp(intent.observedAt, "OS-01R mutation-intent observation");
   if (
     evidence.version !== "os01-rejected-session-manual-cleanup.2026.1" ||
     evidence.status !== "verified_manual_cleanup_provider_zero" || evidence.runId !== authority.runId ||
@@ -729,8 +740,9 @@ function validateManualCleanup(
     evidence.productionSessionLockIdentityHash !== authority.productionSessionLockIdentityHash ||
     evidence.externalMutationIntentHash !== intent.intentHash ||
     evidence.manualHttpBytesSha256 !== manualHttpBytesSha256 || receiptHash !== sha256(stableJson(unsigned)) ||
-    Date.parse(observedAt) < Date.parse(rejectedAt) || Date.parse(observedAt) > Date.parse(recoveredAt)
+    Date.parse(observedAt) < Date.parse(rejectedAt)
   ) throw new Error("OS-01R manual-cleanup envelope is invalid");
+  assertFreshPostExpiry(observedAt, "OS-01R manual-cleanup observation", expiresAtMs, recoveryTimeMs);
 
   const source = exactKeys(evidence.sourceRestoration, [
     "branch", "compareAndSwapApplied", "expectedOldHead", "observedAt", "postRestoreHead",
@@ -748,9 +760,10 @@ function validateManualCleanup(
     source.postRestoreTreeObjectId !== authority.source.cleanTreeObjectId ||
     source.remoteReadbackHead !== authority.source.cleanCommit ||
     source.remoteReadbackTreeObjectId !== authority.source.cleanTreeObjectId ||
-    Date.parse(sourceObservedAt) < Date.parse(intentObservedAt) || Date.parse(sourceObservedAt) > Date.parse(observedAt) ||
+    Date.parse(sourceObservedAt) <= Date.parse(rejectedAt) || Date.parse(sourceObservedAt) > Date.parse(observedAt) ||
     Date.parse(sourceReadbackAt) < Date.parse(sourceObservedAt) || Date.parse(sourceReadbackAt) > Date.parse(observedAt)
   ) throw new Error("OS-01R source restoration is invalid");
+  assertFreshPostExpiry(sourceReadbackAt, "OS-01R source remote readback", expiresAtMs, recoveryTimeMs);
 
   const environment = exactKeys(evidence.environment, ["after", "before", "staged"], "OS-01R environment lifecycle");
   const before = validateEnvironment(environment.before, "OS-01R environment before");
@@ -765,8 +778,10 @@ function validateManualCleanup(
     after.allMetadataRoot !== authority.environment.cleanAllMetadataRoot ||
     stableJson(before) !== stableJson(intent.environmentBefore) ||
     after.controlsPresent.length !== 0 || after.captureGatePresent ||
-    Date.parse(after.observedAt) < Date.parse(intentObservedAt) || Date.parse(after.observedAt) > Date.parse(observedAt)
+    Date.parse(after.observedAt) > Date.parse(observedAt) || after.updatedAt === null ||
+    Date.parse(after.updatedAt) <= Date.parse(rejectedAt) || Date.parse(after.updatedAt) > Date.parse(after.observedAt)
   ) throw new Error("OS-01R environment cleanup is invalid");
+  assertFreshPostExpiry(after.observedAt, "OS-01R environment-after readback", expiresAtMs, recoveryTimeMs);
 
   const access = exactKeys(evidence.access, ["after", "before"], "OS-01R access lifecycle");
   const accessBefore = validateAccess(access.before, "OS-01R access before");
@@ -776,8 +791,9 @@ function validateManualCleanup(
     accessAfter.origin !== authority.targetOrigin || accessAfter.revision !== authority.access.revision ||
     accessAfter.principalRoot !== authority.access.principalRoot ||
     !observationsEqualExceptTime(accessBefore as unknown as JsonRecord, accessAfter as unknown as JsonRecord) ||
-    Date.parse(accessAfter.observedAt) < Date.parse(intentObservedAt) || Date.parse(accessAfter.observedAt) > Date.parse(observedAt)
+    Date.parse(accessAfter.observedAt) > Date.parse(observedAt)
   ) throw new Error("OS-01R access cleanup is invalid");
+  assertFreshPostExpiry(accessAfter.observedAt, "OS-01R access-after readback", expiresAtMs, recoveryTimeMs);
 
   const cleanVersion = validateVersion(evidence.cleanVersion, "OS-01R clean version");
   const cleanDeployment = validateDeployment(evidence.cleanDeployment, "OS-01R clean deployment");
@@ -787,8 +803,16 @@ function validateManualCleanup(
     cleanVersion.sourceCommit !== authority.source.cleanCommit || cleanDeployment.projectId !== authority.targetProjectId ||
     cleanDeployment.origin !== authority.targetOrigin || cleanDeployment.versionId !== authority.cleanVersion.versionId ||
     cleanDeployment.deploymentId !== authority.cleanDeploymentId ||
-    cleanDeployment.environmentRevision !== authority.environment.afterRevision
+    cleanDeployment.environmentRevision !== authority.environment.afterRevision ||
+    Date.parse(cleanVersion.observedAt) > Date.parse(observedAt) ||
+    Date.parse(cleanDeployment.observedAt) > Date.parse(observedAt) ||
+    Date.parse(cleanDeployment.observedAt) < Date.parse(sourceReadbackAt) ||
+    Date.parse(cleanDeployment.observedAt) < Date.parse(after.observedAt) ||
+    Date.parse(cleanDeployment.updatedAt) <= Date.parse(rejectedAt) ||
+    Date.parse(cleanDeployment.updatedAt) > Date.parse(cleanDeployment.observedAt)
   ) throw new Error("OS-01R clean deployment is invalid");
+  assertFreshPostExpiry(cleanVersion.observedAt, "OS-01R clean-version readback", expiresAtMs, recoveryTimeMs);
+  assertFreshPostExpiry(cleanDeployment.observedAt, "OS-01R clean-deployment readback", expiresAtMs, recoveryTimeMs);
 
   const bindings = exactKeys(evidence.bindings, [
     "d1Bindings", "observedAt", "projectId", "projectionComplete", "r2Bindings"
@@ -798,7 +822,14 @@ function validateManualCleanup(
     stableJson(bindings.d1Bindings) !== stableJson(["DB"]) ||
     stableJson(bindings.r2Bindings) !== stableJson(["EVIDENCE"])
   ) throw new Error("OS-01R clean bindings are invalid");
-  timestamp(bindings.observedAt, "OS-01R binding observation");
+  const bindingsObservedAt = timestamp(bindings.observedAt, "OS-01R binding observation");
+  assertFreshPostExpiry(bindingsObservedAt, "OS-01R binding observation", expiresAtMs, recoveryTimeMs);
+  if (
+    Date.parse(bindingsObservedAt) < Date.parse(cleanDeployment.observedAt) ||
+    Date.parse(bindingsObservedAt) > Date.parse(observedAt)
+  ) {
+    throw new Error("OS-01R clean bindings are outside the post-deployment cleanup interval");
+  }
 
   const providerState = exactKeys(evidence.providerState, [
     "lastCost", "observedAt", "outstandingReservations", "projectionComplete", "remaining", "source",
@@ -818,14 +849,35 @@ function validateManualCleanup(
     providerState.outstandingReservations !== 0 || providerState.stateRoot !== authority.providerStateRoot ||
     providerState.stateRoot !== sha256(stableJson(committedProviderState))
   ) throw new Error("OS-01R provider state is invalid");
-  timestamp(providerState.observedAt, "OS-01R provider-state observation");
+  const providerObservedAt = timestamp(providerState.observedAt, "OS-01R provider-state observation");
+  assertFreshPostExpiry(providerObservedAt, "OS-01R provider-state observation", expiresAtMs, recoveryTimeMs);
+  if (
+    Date.parse(providerObservedAt) < Date.parse(cleanDeployment.observedAt) ||
+    Date.parse(providerObservedAt) > Date.parse(observedAt)
+  ) {
+    throw new Error("OS-01R provider state is outside the post-deployment cleanup interval");
+  }
   const activity = exactKeys(evidence.providerActivity, [
     "providerRequests", "providerSecretReads", "quotaReservations"
   ], "OS-01R provider activity");
   if (activity.providerSecretReads !== 0 || activity.providerRequests !== 0 || activity.quotaReservations !== 0) {
     throw new Error("OS-01R provider activity is nonzero");
   }
-  return { observedAt, receiptHash: String(receiptHash) };
+  return { observedAt, receiptHash: String(receiptHash), cleanDeploymentObservedAt: cleanDeployment.observedAt };
+}
+
+function assertFreshPostExpiry(
+  observedAt: string,
+  label: string,
+  expiresAtMs: number,
+  recoveryTimeMs: number
+): void {
+  const observedAtMs = Date.parse(observedAt);
+  if (observedAtMs <= expiresAtMs) throw new Error(`${label} is not post-lock-expiry`);
+  if (observedAtMs > recoveryTimeMs) throw new Error(`${label} is in the future`);
+  if (recoveryTimeMs - observedAtMs > os01ControlPlaneContract.observationMaximumAgeSeconds * 1000) {
+    throw new Error(`${label} is stale`);
+  }
 }
 
 function conflictGuardPath(lockPath: string): string {
@@ -921,8 +973,13 @@ function publishStagedReceipt(staged: OwnedEntry, finalPath: string): void {
 export function recoverRejectedOs01ProductionSession(
   input: Os01RejectedSessionRecoveryInput
 ): Os01RejectedSessionRecoveryReceipt {
+  allowedKeys(input, [
+    "authority", "externalMutationIntentPath", "faultInjection", "lockPath", "manualCleanupPath",
+    "manualHttpPath", "phaseLedgerPath", "recoveryReceiptPath", "rejectionReceiptPath"
+  ], "OS-01R recovery input");
   validateAuthority(input.authority);
-  const recoveredAt = timestamp(input.recoveredAt ?? new Date().toISOString(), "OS-01R recovery time");
+  const recoveryTimeMs = Date.now();
+  const recoveredAt = new Date(recoveryTimeMs).toISOString();
   const lockPath = canonicalPath(input.lockPath, "OS-01R lock");
   const receiptPath = canonicalPath(input.recoveryReceiptPath, "OS-01R recovery receipt");
   if (pathExists(receiptPath)) throw new Error("OS-01R recovery receipt already exists");
@@ -969,13 +1026,16 @@ export function recoverRejectedOs01ProductionSession(
       intent,
       rejection.rejectedAt,
       hashes.manualHttpBytesSha256,
-      recoveredAt
+      Date.parse(expiresAt),
+      recoveryTimeMs
     );
     validateManualHttp(
       snapshots.http.bytes,
       input.authority,
-      Date.parse(String(intent.observedAt)),
-      Date.parse(manualCleanup.observedAt)
+      Date.parse(expiresAt),
+      recoveryTimeMs,
+      Date.parse(manualCleanup.observedAt),
+      Date.parse(manualCleanup.cleanDeploymentObservedAt)
     );
 
     const recoveryId = sha256(stableJson({
