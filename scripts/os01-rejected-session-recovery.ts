@@ -809,6 +809,8 @@ function validateManualCleanup(
     Date.parse(cleanDeployment.observedAt) < Date.parse(sourceReadbackAt) ||
     Date.parse(cleanDeployment.observedAt) < Date.parse(after.observedAt) ||
     Date.parse(cleanDeployment.updatedAt) <= Date.parse(rejectedAt) ||
+    Date.parse(cleanDeployment.updatedAt) < Date.parse(sourceObservedAt) ||
+    Date.parse(cleanDeployment.updatedAt) < Date.parse(after.updatedAt) ||
     Date.parse(cleanDeployment.updatedAt) > Date.parse(cleanDeployment.observedAt)
   ) throw new Error("OS-01R clean deployment is invalid");
   assertFreshPostExpiry(cleanVersion.observedAt, "OS-01R clean-version readback", expiresAtMs, recoveryTimeMs);
@@ -1020,23 +1022,27 @@ export function recoverRejectedOs01ProductionSession(
     if (Date.parse(recoveredAt) < Date.parse(rejection.rejectedAt)) {
       throw new Error("OS-01R recovery predates the rejected session");
     }
-    const manualCleanup = validateManualCleanup(
-      snapshots.cleanup.bytes,
-      input.authority,
-      intent,
-      rejection.rejectedAt,
-      hashes.manualHttpBytesSha256,
-      Date.parse(expiresAt),
-      recoveryTimeMs
-    );
-    validateManualHttp(
-      snapshots.http.bytes,
-      input.authority,
-      Date.parse(expiresAt),
-      recoveryTimeMs,
-      Date.parse(manualCleanup.observedAt),
-      Date.parse(manualCleanup.cleanDeploymentObservedAt)
-    );
+    const validateCleanupEvidenceAt = (observedNowMs: number) => {
+      const cleanup = validateManualCleanup(
+        snapshots.cleanup.bytes,
+        input.authority,
+        intent,
+        rejection.rejectedAt,
+        hashes.manualHttpBytesSha256,
+        Date.parse(expiresAt),
+        observedNowMs
+      );
+      validateManualHttp(
+        snapshots.http.bytes,
+        input.authority,
+        Date.parse(expiresAt),
+        observedNowMs,
+        Date.parse(cleanup.observedAt),
+        Date.parse(cleanup.cleanDeploymentObservedAt)
+      );
+      return cleanup;
+    };
+    const manualCleanup = validateCleanupEvidenceAt(recoveryTimeMs);
 
     const recoveryId = sha256(stableJson({
       authorityHash: input.authority.authorityHash,
@@ -1098,7 +1104,12 @@ export function recoverRejectedOs01ProductionSession(
       snapshots.lock.assertUnchanged("OS-01R production-session lock");
       detachOwnedEntry({
         entry: { path: lockPath, device: snapshots.lock.device, inode: snapshots.lock.inode },
-        afterOwnershipCheck: input.faultInjection?.afterLockOwnershipCheck,
+        afterOwnershipCheck: () => {
+          input.faultInjection?.afterLockOwnershipCheck?.();
+          snapshots.cleanup.assertUnchanged("OS-01R manual-cleanup commit-boundary evidence");
+          snapshots.http.assertUnchanged("OS-01R manual HTTP commit-boundary evidence");
+          validateCleanupEvidenceAt(Date.now());
+        },
         afterDetach: input.faultInjection?.afterLockDetach,
         mismatchMessage: "OS-01R production-session lock ownership changed during recovery"
       });

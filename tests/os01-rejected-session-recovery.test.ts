@@ -649,6 +649,12 @@ describe("OS-01R rejected-session lock recovery", () => {
     }, /clean deployment/u],
     ["deployment readback before update", (value: JsonRecord) => {
       (value.cleanDeployment as JsonRecord).updatedAt = "2026-08-28T13:55:00.000Z";
+    }, /clean deployment/u],
+    ["deployment update before source restoration", (value: JsonRecord) => {
+      (value.sourceRestoration as JsonRecord).observedAt = "2026-08-28T12:49:00.000Z";
+    }, /clean deployment/u],
+    ["deployment update before environment restoration", (value: JsonRecord) => {
+      ((value.environment as JsonRecord).after as JsonRecord).updatedAt = "2026-08-28T12:49:00.000Z";
     }, /clean deployment/u]
   ] as const)("rejects inverted cleanup chronology: %s", (label, mutate, expected) => {
     const fixture = makeFixture(`ordering-${label.replaceAll(" ", "-")}`);
@@ -862,6 +868,36 @@ describe("OS-01R rejected-session lock recovery", () => {
     expect(existsSync(fixture.paths.lockPath)).toBe(true);
     expect(existsSync(guardPath(fixture.paths.lockPath))).toBe(true);
     expect(existsSync(fixture.paths.recoveryReceiptPath)).toBe(false);
+  });
+
+  it("rechecks freshness after guard acquisition and refuses detach when evidence ages past 600 seconds", () => {
+    const fixture = makeFixture("guard-freshness-race");
+    expect(() => recoverRejectedOs01ProductionSession({
+      ...recoveryInput(fixture),
+      faultInjection: {
+        afterConflictGuardAcquired: () => {
+          vi.setSystemTime(new Date("2026-08-28T14:10:00.001Z"));
+        }
+      }
+    })).toThrow(/stale/u);
+    expect(existsSync(fixture.paths.lockPath)).toBe(true);
+    expect(existsSync(fixture.paths.recoveryReceiptPath)).toBe(false);
+    expect(existsSync(guardPath(fixture.paths.lockPath))).toBe(true);
+  });
+
+  it("runs the lock-ownership hook before final freshness validation and before unlink", () => {
+    const fixture = makeFixture("detach-freshness-race");
+    expect(() => recoverRejectedOs01ProductionSession({
+      ...recoveryInput(fixture),
+      faultInjection: {
+        afterLockOwnershipCheck: () => {
+          vi.setSystemTime(new Date("2026-08-28T14:10:00.001Z"));
+        }
+      }
+    })).toThrow(/stale/u);
+    expect(existsSync(fixture.paths.lockPath)).toBe(true);
+    expect(existsSync(fixture.paths.recoveryReceiptPath)).toBe(false);
+    expect(existsSync(guardPath(fixture.paths.lockPath))).toBe(true);
   });
 
   it("inode-fences lock detachment and preserves a racing replacement under the guard", () => {
