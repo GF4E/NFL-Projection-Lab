@@ -298,7 +298,7 @@ export async function readCanonicalCensusJson(
     }
     if (total > maximumBytes) {
       try {
-        await reader.cancel();
+        void reader.cancel().catch(() => undefined);
       } catch {
         // Cancellation is best-effort cleanup. Preserve the closed diagnostic
         // outcome even when the underlying stream rejects cancellation.

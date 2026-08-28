@@ -221,6 +221,39 @@ describe("OS-01 census failure envelope", () => {
     expect(JSON.stringify(envelope)).not.toContain(rawCancellation);
   });
 
+  it("publishes the closed oversize failure without waiting for cancellation to settle", async () => {
+    const oversizedBody = new Uint8Array(1_048_577);
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(oversizedBody);
+      },
+      cancel() {
+        return new Promise<void>(() => undefined);
+      }
+    });
+    vi.stubGlobal("fetch", async () => new Response(stream, {
+      status: 200,
+      headers: { "content-type": "application/json" }
+    }));
+    const output = outputPath();
+    const outcome = await Promise.race([
+      diagnosticClient("https://example.invalid/census", output).call({
+        operation: "begin",
+        passNonce: "8".repeat(32)
+      }).then(() => "resolved", (error: unknown) => error instanceof Error ? error.message : "rejected"),
+      new Promise<string>((resolveTimeout) => setTimeout(() => resolveTimeout("timed_out"), 250))
+    ]);
+
+    expect(outcome).toMatch(/byte limit/u);
+    expect(readEnvelope(output).failure).toMatchObject({
+      stage: "response_body",
+      outcomeCategory: "response_body_failure",
+      httpStatus: 200,
+      responseByteLength: oversizedBody.byteLength,
+      responseSha256: sha256(oversizedBody)
+    });
+  });
+
   it("records a successful-HTTP protocol mismatch without exposing response fields", async () => {
     const rawBody = JSON.stringify({ unexpected: "RAW_PROTOCOL_SENTINEL" });
     const server = await serverFor(() => ({
