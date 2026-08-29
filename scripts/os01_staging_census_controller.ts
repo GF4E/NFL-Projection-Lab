@@ -422,6 +422,7 @@ export function createOs01StagingCensusControlPlaneObservation(
     version: "engine-os.os01-staging-census-control-plane-observation.v1",
     phase: input.phase,
     qualificationId: STAGING_CENSUS_ID,
+    controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
     projectId: STAGING_CENSUS_SEMANTIC_CONTRACT.projectId,
     origin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
     source: {
@@ -474,14 +475,16 @@ function validateObservation(value: unknown, phase: ObservationPhase): value is 
   if (!value || typeof value !== "object" || Array.isArray(value)) return false;
   const observation = value as Record<string, unknown>;
   if (!hasExactKeys(observation, [
-    "access", "bindings", "deployment", "environment", "exclusiveHostAssumption", "observationHash",
-    "origin", "package", "phase", "projectId", "qualificationId", "recordedAt", "source", "version"
+    "access", "bindings", "controllerAuthorityId", "deployment", "environment", "exclusiveHostAssumption",
+    "observationHash", "origin", "package", "phase", "projectId", "qualificationId", "recordedAt", "source",
+    "version"
   ]) || !validHex(observation.observationHash)) return false;
   const body = { ...observation };
   delete body.observationHash;
   if (sha256(canonicalJson(body)) !== observation.observationHash ||
       observation.version !== "engine-os.os01-staging-census-control-plane-observation.v1" ||
       observation.phase !== phase || observation.qualificationId !== STAGING_CENSUS_ID ||
+      observation.controllerAuthorityId !== STAGING_CENSUS_CONTROLLER_ID ||
       observation.projectId !== STAGING_CENSUS_SEMANTIC_CONTRACT.projectId ||
       observation.origin !== STAGING_CENSUS_SEMANTIC_CONTRACT.origin ||
       observation.exclusiveHostAssumption !== "single_owner_no_concurrent_writer_during_controller_window" ||
@@ -1176,6 +1179,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         version: "engine-os.os01-staging-census-terminal-fence.v1",
         status: "terminal_artifact_authority_violation",
         qualificationId: STAGING_CENSUS_ID,
+        controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
         qualificationEligible: input.qualificationEligible,
         attemptId,
         intentBytesSha256: sha256(intentBytes),

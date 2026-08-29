@@ -179,6 +179,9 @@ describe("OS-01 staging census controller", () => {
     );
     const preResult = os01StagingCensusControllerTestOnly.writeObservation(root, preInput);
     expect(preResult).toMatchObject({ phase: "pre", observationHash: expect.any(String) });
+    expect(JSON.parse(readFileSync(artifacts.preObservation, "utf8"))).toMatchObject({
+      controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID
+    });
     expect(statSync(artifacts.preObservation).mode & 0o777).toBe(0o600);
     expect(statSync(artifacts.preObservation).nlink).toBe(1);
     expect(() => os01StagingCensusControllerTestOnly.writeObservation(root, preInput)).toThrow();
@@ -396,6 +399,7 @@ describe("OS-01 staging census controller", () => {
     })).rejects.toThrow();
     expect(JSON.parse(readFileSync(artifacts.terminalFence, "utf8"))).toMatchObject({
       status: "terminal_artifact_authority_violation",
+      controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
       retryAllowed: false
     });
     expect(statSync(artifacts.dispatchCompletion).size).toBe(0);
