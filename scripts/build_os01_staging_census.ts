@@ -7,6 +7,7 @@ import { pathToFileURL } from "node:url";
 import { build } from "vite";
 
 import {
+  STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT,
   STAGING_CENSUS_ARTIFACT_NAMES,
   STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS,
   STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES,
@@ -78,9 +79,10 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
     "engine-os.os01-staging-census-failure.v1",
     STAGING_CENSUS_COUNT_DIAGNOSTIC_VERSION,
-    "closed_user_table_count_match",
     "closed_user_table_count_mismatch",
-    "terminal_read_only_count_diagnostic_not_census_receipt"
+    "terminal_read_only_count_diagnostic_not_census_receipt",
+    "read_only_schema_census_captured",
+    "isolated_staging_read_only_census_only"
   ]) if (!text.includes(required)) throw new Error(`census package omits ${required}`);
 
   const metadata = join(outDir, ".openai");
@@ -102,7 +104,7 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     qualificationId: STAGING_CENSUS_ID,
     expectedCatalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
     expectedCatalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
-    expectedUserTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount,
+    expectedUserTableCount: STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT,
     request: {
       method: STAGING_CENSUS_SEMANTIC_CONTRACT.method,
       origin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
@@ -124,15 +126,19 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
       fixedArtifactNames: STAGING_CENSUS_ARTIFACT_NAMES,
       receiptMustBindOwnerOnlyNoWriterBoundaryBeforeAndAfter: true,
       secondInvocationProhibitedByOperatorContract: true,
-      onlyPersistableWorkerResponseStatuses: STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES,
-      finalAcceptanceStatus: null,
-      dispatchCompletionWritten: false,
-      finalizationAllowed: false,
+      onlyPersistableWorkerResponseStatuses: [
+        "read_only_schema_census_captured",
+        STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES[1]
+      ],
+      finalAcceptanceStatus: "accepted_read_only_census_after_control_plane_postcheck",
+      dispatchCompletionWrittenForFullCensus: true,
+      finalizationAllowedForFullCensus: true,
+      countDiagnosticFinalizationAllowed: false,
       maximumResponseBytes: 2097152,
       reflectedCredentialPersistenceAllowed: false
     },
-    consistencyClaim: "single_validated_catalog_read_only_no_census_snapshot_claim",
-    viewEvidence: "none_count_only",
+    consistencyClaim: STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
+    viewEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.viewEvidence,
     failureContract: {
       version: "engine-os.os01-staging-census-failure.v1",
       status: "read_only_census_failed",
@@ -146,15 +152,33 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     },
     countDiagnosticContract: {
       version: STAGING_CENSUS_COUNT_DIAGNOSTIC_VERSION,
-      statuses: STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES,
-      expectedUserTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount,
+      statuses: [STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES[1]],
+      expectedUserTableCount: STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT,
       maximumRawTableRows: STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS,
       aggregateCountsOnly: true,
       identifiersOrSqlAllowed: false,
       selfHashed: true,
       persistenceRequiresControllerValidation: true,
       terminalAndNonFinalizable: true,
-      fullCensusResponseAccepted: false
+      matchingCountProducesFullCensus: true
+    },
+    fullCensusContract: {
+      version: STAGING_CENSUS_SEMANTIC_CONTRACT.responseVersion,
+      status: "read_only_schema_census_captured",
+      expectedUserTableCount: STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT,
+      maximumD1QueriesPerInvocation: 5,
+      queryPlan: [
+        "catalog_pre",
+        "foreign_keys_compound",
+        "row_counts_pre_compound",
+        "row_counts_post_compound",
+        "catalog_post"
+      ],
+      identifiersAndCreateSqlAllowed: true,
+      viewSqlAllowed: false,
+      prePostCatalogAndRowCountsRequired: true,
+      controllerValidationRequired: true,
+      controlPlanePostcheckRequired: true
     },
     databaseMutationAllowed: false,
     productionAllowed: false,

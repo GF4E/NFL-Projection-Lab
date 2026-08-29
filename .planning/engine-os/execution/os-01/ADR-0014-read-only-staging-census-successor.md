@@ -118,3 +118,32 @@ authority, and pre-observation are preserved, and its self-hashed rejection rece
 rewrite or retry. Generation 7 derives a new controller authority from that receipt and retains the
 identical count-only worker, response, persistence, and non-finalization contracts. Operationally,
 the successor must initialize authority first and only then capture and write the pre-observation.
+
+## Authority generation 8
+
+Generation 7 completed its one authorized hosted invocation and returned the exact aggregate-only
+count diagnostic `closed_user_table_count_mismatch`: 96 raw table rows, two excluded internal
+tables, and 94 post-filter user tables. That terminal receipt does not disclose or establish any
+table identity, DDL, foreign key, row count, or view evidence, and generation 7 remains rejected
+and non-finalizable. It does, however, invalidate the prior expected count of 50. Because the
+expected user-table count is part of the hashed semantic contract, generation 8 advances that
+contract from v2 to v3, sets the expected count to 94, and derives a new semantic qualification
+identity. The v2 route and request/response wire versions remain unchanged.
+
+Generation 8 is limited to one full read-only census attempt against the same isolated staging
+project and already-pinned 377-row catalog identity. Exactly 94 user tables is the sole path that
+may inspect and return the full bounded census. Any other observed count returns only the exact
+self-hashed mismatch diagnostic over HTTP 500 and is terminal and non-finalizable. A valid full
+census is returned over HTTP 200, must pass the controller's independent exact-schema and evidence-
+root validation, and remains pending until a fresh owner-only/no-writer post-observation verifies
+the control-plane boundary. The generation-8 controller authority is chained to the immutable
+generation-7 rejection receipt. No earlier authority, artifact, or receipt may be rewritten or
+retried, and this successor still authorizes no mutation, cleanup, production access, provider
+request, quota operation, capture activation, or OS-01 acceptance.
+
+The full path uses exactly five D1 statements per invocation: catalog before, one compound
+foreign-key read, one compound pre-count read, one compound post-count read, and catalog after.
+This keeps the package below the Free-plan limit of 50 D1 queries per Worker invocation while
+preserving the pre/post checks. The 94 table names are validated before interpolation into the
+read-only compound statements, and every returned source-table identity and count is independently
+checked against the canonical sorted table set.

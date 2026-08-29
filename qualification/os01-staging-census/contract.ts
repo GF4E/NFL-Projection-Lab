@@ -44,7 +44,7 @@ export const STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES = Object.freeze([
 export const STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS = 1_000;
 
 export const STAGING_CENSUS_SEMANTIC_CONTRACT = Object.freeze({
-  version: "engine-os.os01-staging-census-contract.v2",
+  version: "engine-os.os01-staging-census-contract.v3",
   projectId: "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
   origin: "https://os01-d1-capacity-probe-two-20260829.psoiawesome.chatgpt.site",
   route: "/__engine-os/os01-staging-census/v2",
@@ -52,7 +52,7 @@ export const STAGING_CENSUS_SEMANTIC_CONTRACT = Object.freeze({
   contentType: "application/json",
   expectedCatalogRows: 377,
   expectedCatalogHash: "3b261b773327b5e6d0923dd22b5c9407db05d92ee3494f8be664afd1cb273eea",
-  expectedUserTableCount: 50,
+  expectedUserTableCount: 94,
   responseVersion: "engine-os.os01-staging-census-receipt.v2",
   invocationControl: Object.freeze({
     mode: "controller_enforced_single_invocation",
@@ -70,21 +70,23 @@ export const STAGING_CENSUS_SEMANTIC_CONTRACT = Object.freeze({
   captureActivationAllowed: false
 });
 
-export const STAGING_CENSUS_ID = "471001d7f8ad783dbabc1c03c4e7a022799466a20afba70e1eaf087a4761ec29";
+export const STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT =
+  STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount;
+export const STAGING_CENSUS_ID = "63542b54dcbb72ffb5d317004779d685cb3b32f42ce519e75beed621c894d7e1";
 export const STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT = Object.freeze({
-  version: "engine-os.os01-staging-census-controller-authority-contract.v7",
+  version: "engine-os.os01-staging-census-controller-authority-contract.v8",
   semanticQualificationId: STAGING_CENSUS_ID,
-  generation: 7,
-  predecessorReceiptHash: "3119037594e3b166d1bc90f3ca4d89d93ed02558efa02ccefa47077ceb32483c",
-  predecessorStatus: "rejected_pre_observation_timestamp_precedes_authority_before_dispatch"
+  generation: 8,
+  predecessorReceiptHash: "d715fd7ee68e3269c5ebcbcfc769e2a67311d2027ef701b266bac133f4edbdbd",
+  predecessorStatus: "rejected_expected_user_table_count_mismatch_after_count_diagnostic"
 });
 export const STAGING_CENSUS_CONTROLLER_ID =
-  "2e16d79bcd353e8effac75adad54b73c8cc536089dee6e54fd25a289c8e54c99";
+  "32f0feb8306c355d9761e319ca4bdcefecc47ff230433281cddf7f6e587e2b9f";
 export const STAGING_CENSUS_REQUEST_VERSION = "engine-os.os01-staging-census-request.v2";
 export const STAGING_CENSUS_EXACT_BODY =
   `{"version":"${STAGING_CENSUS_REQUEST_VERSION}","censusId":"${STAGING_CENSUS_ID}"}`;
 export const STAGING_CENSUS_EXACT_BODY_SHA256 =
-  "41ebcdd5650da64705e811190bdfaaa737790eadf2ffe650286bf7fde2f7f182";
+  "d2721fd17aaa9728658eea99068f46211a3ef9b181c35bd6004126fa552d191b";
 export const STAGING_CENSUS_CONTROLLER_ROOT =
   `/private/tmp/engine-os-os01-staging-census-${STAGING_CENSUS_CONTROLLER_ID}`;
 export const STAGING_CENSUS_ARTIFACT_NAMES = Object.freeze({
@@ -104,5 +106,5 @@ export const DEFAULT_STAGING_CENSUS_OPTIONS = Object.freeze({
   expectedOrigin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
   expectedCatalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
   expectedCatalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
-  expectedUserTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount
+  expectedUserTableCount: STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT
 });

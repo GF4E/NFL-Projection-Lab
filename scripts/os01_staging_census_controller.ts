@@ -20,6 +20,7 @@ import { pathToFileURL } from "node:url";
 import {
   canonicalJson,
   codePointCompare,
+  STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT,
   STAGING_CENSUS_ARTIFACT_NAMES,
   STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS,
   STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES,
@@ -625,13 +626,15 @@ function compareForeignKeys(left: Record<string, unknown>, right: Record<string,
 
 function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentity): boolean {
   let parsed: unknown;
+  const text = new TextDecoder().decode(bytes);
   try {
-    parsed = JSON.parse(new TextDecoder().decode(bytes));
+    parsed = JSON.parse(text);
   } catch {
     return false;
   }
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return false;
   const receipt = parsed as Record<string, unknown>;
+  if (text !== JSON.stringify(receipt)) return false;
   if (!hasExactKeys(receipt, [
     "captureActivations", "catalogHash", "catalogRows", "censusId", "claimBoundary",
     "databaseMutationAttempted", "ddlRoot", "foreignKeyRoot", "prePostCatalogMatch",
@@ -653,6 +656,7 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
       receipt.userTableCount !== expected.userTableCount ||
       !Number.isSafeInteger(receipt.userObjectCount) ||
       (receipt.userObjectCount as number) < expected.userTableCount ||
+      (receipt.userObjectCount as number) > expected.catalogRows ||
       receipt.prePostCatalogMatch !== true || receipt.prePostRowCountsMatch !== true ||
       receipt.snapshotClaim !== STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim ||
       receipt.requestBudgetClaim !== "controller_enforced_single_invocation_not_runtime_durable" ||
@@ -684,6 +688,8 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
           typeof row.on_delete !== "string" || typeof row.match !== "string") return false;
     }
     const foreignKeys = table.foreignKeys as Array<Record<string, unknown>>;
+    const foreignKeyIdentities = foreignKeys.map((row) => `${String(row.id)}:${String(row.seq)}`);
+    if (new Set(foreignKeyIdentities).size !== foreignKeyIdentities.length) return false;
     if ([...foreignKeys].sort(compareForeignKeys).some((row, index) => row !== foreignKeys[index])) return false;
     normalizedTables.push({
       name: table.name,
@@ -693,11 +699,16 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
     });
   }
   const tableNames = normalizedTables.map((table) => table.name);
-  if (new Set(tableNames).size !== tableNames.length ||
+  const tableNameSet = new Set(tableNames);
+  if (tableNameSet.size !== tableNames.length ||
       [...tableNames].sort(codePointCompare).some((name, index) => name !== tableNames[index])) return false;
   const viewNames = receipt.viewNames as unknown[];
+  if ((receipt.userObjectCount as number) < expected.userTableCount + (receipt.userViewCount as number)) {
+    return false;
+  }
   if (viewNames.some((name) => typeof name !== "string" || !/^[A-Za-z0-9_]+$/u.test(name)) ||
       new Set(viewNames).size !== viewNames.length ||
+      viewNames.some((name) => tableNameSet.has(String(name))) ||
       [...viewNames].sort((left, right) => codePointCompare(String(left), String(right)))
         .some((name, index) => name !== viewNames[index])) return false;
   return validHex(receipt.tableSetHash) && validHex(receipt.viewSetHash) && validHex(receipt.ddlRoot) &&
@@ -741,9 +752,9 @@ function validateCountDiagnosticResponse(bytes: Uint8Array): boolean {
   delete body.receiptHash;
   return sha256(canonicalJson(body)) === receipt.receiptHash &&
     receipt.version === STAGING_CENSUS_COUNT_DIAGNOSTIC_VERSION &&
-    (STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES as readonly unknown[]).includes(receipt.status) &&
+    receipt.status === STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES[1] &&
     receipt.censusId === STAGING_CENSUS_ID &&
-    receipt.expectedUserTableCount === STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount &&
+    receipt.expectedUserTableCount === STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT &&
     (receipt.rawTableRowCount as number) >= 0 &&
     (receipt.rawTableRowCount as number) <= STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS &&
     (receipt.excludedInternalTableRowCount as number) >= 0 &&
@@ -752,10 +763,7 @@ function validateCountDiagnosticResponse(bytes: Uint8Array): boolean {
     (receipt.observedUserTableCount as number) <= (receipt.rawTableRowCount as number) &&
     receipt.rawTableRowCount === (receipt.excludedInternalTableRowCount as number) +
       (receipt.observedUserTableCount as number) &&
-    ((receipt.status === STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES[0] &&
-      receipt.observedUserTableCount === receipt.expectedUserTableCount) ||
-      (receipt.status === STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES[1] &&
-        receipt.observedUserTableCount !== receipt.expectedUserTableCount)) &&
+    receipt.observedUserTableCount !== receipt.expectedUserTableCount &&
     receipt.databaseMutationAttempted === false &&
     receipt.claimBoundary === "terminal_read_only_count_diagnostic_not_census_receipt";
 }
@@ -835,6 +843,30 @@ function resultWithHash(
   body: Omit<CensusControllerResult, "resultHash">
 ): CensusControllerResult {
   return { ...body, resultHash: sha256(canonicalJson(body)) };
+}
+
+function createDispatchCompletion(input: {
+  qualificationEligible: boolean;
+  attemptId: string;
+  intentBytesSha256: string;
+  responseBytesSha256: string;
+  resultBytesSha256: string;
+  recordedAt: string;
+}): Record<string, unknown> {
+  const body = {
+    version: "engine-os.os01-staging-census-dispatch-completion.v1",
+    status: "sealed_after_authority_verification",
+    qualificationId: STAGING_CENSUS_ID,
+    controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
+    qualificationEligible: input.qualificationEligible,
+    attemptId: input.attemptId,
+    intentBytesSha256: input.intentBytesSha256,
+    responseBytesSha256: input.responseBytesSha256,
+    resultBytesSha256: input.resultBytesSha256,
+    retryAllowed: false,
+    recordedAt: input.recordedAt
+  };
+  return hashedBody(body, "completionHash");
 }
 
 function validateDispatchCompletion(
@@ -1138,12 +1170,15 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
     const reflectionScan = credentialReflectionScan(bytes, input.authorizationToken);
     const reflected = reflectionScan.reflected;
     const jsonContentType = response.headers.get("content-type")?.toLowerCase() === "application/json";
+    const valid = reflectionScan.complete && !reflected && response.status === 200 && jsonContentType &&
+      validateResponse(bytes, input.responseValidation);
     const countDiagnosticValid = reflectionScan.complete && !reflected && response.status === 500 &&
       jsonContentType && validateCountDiagnosticResponse(bytes);
-    const persistResponse = countDiagnosticValid;
+    const persistResponse = valid || countDiagnosticValid;
     if (persistResponse) writeDescriptor(responseReserved.descriptor, bytes);
     const status = reflected ? "terminal_credential_reflection" :
-      countDiagnosticValid ? "terminal_worker_failure" : "terminal_invalid_response";
+      valid ? "pending_control_plane_postcheck" :
+        countDiagnosticValid ? "terminal_worker_failure" : "terminal_invalid_response";
     const result = resultWithHash({
       version: "engine-os.os01-staging-census-controller-result.v2",
       status,
@@ -1184,6 +1219,35 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
       completionReserved,
       completionHash: sha256(new Uint8Array()),
       completionSize: 0
+    });
+    if (!valid) return result;
+    const completion = createDispatchCompletion({
+      qualificationEligible: input.qualificationEligible,
+      attemptId,
+      intentBytesSha256: sha256(intentBytes),
+      responseBytesSha256: responseHash,
+      resultBytesSha256: sha256(resultBytes),
+      recordedAt: input.now().toISOString()
+    });
+    const completionBytes = new TextEncoder().encode(JSON.stringify(completion, null, 2) + "\n");
+    writeDescriptor(completionReserved.descriptor, completionBytes);
+    syncDirectory(paths.root);
+    verifyRunAuthority({
+      paths,
+      rootBefore,
+      authority: authorityArtifact,
+      pre: preArtifact,
+      intentReserved,
+      intentBytes,
+      responseReserved,
+      responseHash,
+      responseSize: bytes.byteLength,
+      resultReserved,
+      resultHash: sha256(resultBytes),
+      resultSize: resultBytes.byteLength,
+      completionReserved,
+      completionHash: sha256(completionBytes),
+      completionSize: completionBytes.byteLength
     });
     return result;
   } catch (error) {
@@ -1517,7 +1581,7 @@ export async function runOs01StagingCensusController(input: {
     responseValidation: {
       catalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
       catalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
-      userTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount
+      userTableCount: STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT
     }
   });
 }
@@ -1526,7 +1590,7 @@ export function finalizeOs01StagingCensusController(): Record<string, unknown> {
   return finalizeCore(STAGING_CENSUS_CONTROLLER_ROOT, true, () => new Date(), {
     catalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
     catalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
-    userTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount
+    userTableCount: STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT
   });
 }
 
@@ -1613,7 +1677,7 @@ export const os01StagingCensusControllerTestOnly = Object.freeze({
     responseValidation: ResponseValidationIdentity = {
       catalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
       catalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
-      userTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount
+      userTableCount: STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT
     }
   ): Record<string, unknown> {
     return finalizeCore(root, false, now, responseValidation);
