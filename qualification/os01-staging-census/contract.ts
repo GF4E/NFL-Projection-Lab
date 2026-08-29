@@ -49,6 +49,16 @@ export const STAGING_CENSUS_EXACT_BODY =
   `{"version":"${STAGING_CENSUS_REQUEST_VERSION}","censusId":"${STAGING_CENSUS_ID}"}`;
 export const STAGING_CENSUS_EXACT_BODY_SHA256 =
   "41ebcdd5650da64705e811190bdfaaa737790eadf2ffe650286bf7fde2f7f182";
+export const STAGING_CENSUS_CONTROLLER_ROOT =
+  `/private/tmp/engine-os-os01-staging-census-${STAGING_CENSUS_ID}`;
+export const STAGING_CENSUS_ARTIFACT_NAMES = Object.freeze({
+  preObservation: "control-plane-pre.json",
+  intent: "intent.json",
+  response: "response.json",
+  attemptResult: "attempt-result.json",
+  postObservation: "control-plane-post.json",
+  finalReceipt: "final-receipt.json"
+});
 
 export const DEFAULT_STAGING_CENSUS_OPTIONS = Object.freeze({
   expectedOrigin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,

@@ -1,65 +1,101 @@
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";
+import { mkdtempSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   canonicalJson,
+  STAGING_CENSUS_ARTIFACT_NAMES,
+  STAGING_CENSUS_CONTROLLER_ROOT,
   STAGING_CENSUS_EXACT_BODY,
   STAGING_CENSUS_EXACT_BODY_SHA256,
   STAGING_CENSUS_ID,
   STAGING_CENSUS_SEMANTIC_CONTRACT
 } from "../qualification/os01-staging-census/contract";
-import { runOs01StagingCensusController } from "../scripts/os01_staging_census_controller";
+import { handleOs01StagingCensus } from "../qualification/os01-staging-census/entry";
+import {
+  createOs01StagingCensusControlPlaneObservation,
+  os01StagingCensusControllerTestOnly,
+  runOs01StagingCensusController,
+  type ResponseValidationIdentity
+} from "../scripts/os01_staging_census_controller";
 
 const created: string[] = [];
 afterEach(() => {
   for (const path of created.splice(0)) rmSync(path, { recursive: true, force: true });
 });
 
-function sha256(value: string): string {
+function sha256(value: Uint8Array | string): string {
   return createHash("sha256").update(value).digest("hex");
 }
 
 function privateDirectory(): string {
   const directory = mkdtempSync(resolve(tmpdir(), "os01-staging-census-controller-"));
-  created.push(directory);
-  expect(statSync(directory).mode & 0o777).toBe(0o700);
-  return directory;
+  const canonical = realpathSync(directory);
+  created.push(canonical);
+  expect(statSync(canonical).mode & 0o777).toBe(0o700);
+  return canonical;
 }
 
-function paths(directory: string, suffix = "") {
-  return {
-    intentPath: resolve(directory, `intent${suffix}.json`),
-    responsePath: resolve(directory, `response${suffix}.json`),
-    resultPath: resolve(directory, `result${suffix}.json`)
-  };
+function paths(directory: string) {
+  return Object.fromEntries(Object.entries(STAGING_CENSUS_ARTIFACT_NAMES)
+    .map(([key, name]) => [key, resolve(directory, name)])) as Record<
+      keyof typeof STAGING_CENSUS_ARTIFACT_NAMES,
+      string
+    >;
 }
 
-function validReceipt(): Record<string, unknown> {
-  const tables = Array.from({ length: 50 }, (_, index) => ({
-    name: `table_${String(index).padStart(2, "0")}`,
-    createSql: `CREATE TABLE table_${String(index).padStart(2, "0")}(id INTEGER)`,
-    createSqlHash: sha256(`CREATE TABLE table_${String(index).padStart(2, "0")}(id INTEGER)`),
-    rowCount: 0,
-    foreignKeys: []
-  }));
+function observation(phase: "pre" | "post") {
+  return createOs01StagingCensusControlPlaneObservation({
+    phase,
+    sourceCommit: "a".repeat(40),
+    sourceTree: "b".repeat(40),
+    versionId: "staging-version-id",
+    versionNumber: 11,
+    deploymentId: "staging-deployment-id",
+    deploymentStatus: "succeeded",
+    deploymentUrl: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
+    workerSha256: "c".repeat(64),
+    manifestSha256: "d".repeat(64),
+    archiveSha256: "e".repeat(64),
+    accessRevision: 1,
+    ownerIdentityHash: "f".repeat(64),
+    environmentRevision: 0,
+    environmentKeyNames: [],
+    recordedAt: phase === "pre" ? "2026-08-29T08:00:00.000Z" : "2026-08-29T08:01:00.000Z"
+  });
+}
+
+function writeJson(path: string, value: unknown): void {
+  writeFileSync(path, JSON.stringify(value, null, 2) + "\n", { encoding: "utf8", flag: "wx", mode: 0o600 });
+}
+
+function prepareRoot(): { root: string; artifacts: ReturnType<typeof paths> } {
+  const root = privateDirectory();
+  const artifacts = paths(root);
+  writeJson(artifacts.preObservation, observation("pre"));
+  return { root, artifacts };
+}
+
+function validReceipt(identity: ResponseValidationIdentity): Record<string, unknown> {
+  const tables = Array.from({ length: identity.userTableCount }, (_, index) => {
+    const name = "table_" + String(index).padStart(2, "0");
+    const createSql = "CREATE TABLE " + name + "(id INTEGER)";
+    return { name, createSql, createSqlHash: sha256(createSql), rowCount: 0, foreignKeys: [] };
+  });
   const body = {
     version: STAGING_CENSUS_SEMANTIC_CONTRACT.responseVersion,
     status: "read_only_schema_census_captured",
     censusId: STAGING_CENSUS_ID,
-    catalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
-    catalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
-    userObjectCount: 50,
-    userTableCount: 50,
+    catalogRows: identity.catalogRows,
+    catalogHash: identity.catalogHash,
+    userObjectCount: identity.userTableCount,
+    userTableCount: identity.userTableCount,
     userViewCount: 0,
     tableSetHash: sha256(canonicalJson(tables.map((table) => table.name))),
     viewSetHash: sha256(canonicalJson([])),
-    ddlRoot: sha256(canonicalJson(tables.map((table) => ({
-      name: table.name,
-      createSql: table.createSql
-    })))),
+    ddlRoot: sha256(canonicalJson(tables.map((table) => ({ name: table.name, createSql: table.createSql })))),
     foreignKeyRoot: sha256(canonicalJson(tables.map((table) => ({
       name: table.name,
       foreignKeys: table.foreignKeys
@@ -87,50 +123,74 @@ function validReceipt(): Record<string, unknown> {
   return { ...body, receiptHash: sha256(canonicalJson(body)) };
 }
 
-function acceptedResponse(): Response {
-  return Response.json(validReceipt(), { status: 200 });
+const defaultValidation: ResponseValidationIdentity = {
+  catalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
+  catalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
+  userTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount
+};
+
+function acceptedResponse(identity = defaultValidation): Response {
+  return Response.json(validReceipt(identity), { status: 200 });
 }
 
 describe("OS-01 staging census controller", () => {
-  it("reserves one append-only intent before one byte-exact transport call", async () => {
-    const directory = privateDirectory();
-    const artifacts = paths(directory);
+  it("has one canonical qualification root and exposes no public path override", () => {
+    expect(STAGING_CENSUS_CONTROLLER_ROOT).toBe(
+      "/private/tmp/engine-os-os01-staging-census-" + STAGING_CENSUS_ID
+    );
+    type PublicInput = Parameters<typeof runOs01StagingCensusController>[0];
+    expectTypeOf<PublicInput>().toEqualTypeOf<{
+      authorizationToken: string;
+      transport?: (request: Request) => Promise<Response>;
+      now?: () => Date;
+    }>();
+  });
+
+  it("reserves intent, response, and result before one exact transport call and remains pending", async () => {
+    const { root, artifacts } = prepareRoot();
     const token = "ephemeral-sites-token-for-test";
     let calls = 0;
-    const result = await runOs01StagingCensusController({
-      ...artifacts,
+    const result = await os01StagingCensusControllerTestOnly.run({
+      root,
       authorizationToken: token,
-      now: () => new Date("2026-08-29T08:00:00.000Z"),
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
       transport: async (request) => {
         calls += 1;
-        expect(request.url).toBe(`${STAGING_CENSUS_SEMANTIC_CONTRACT.origin}${STAGING_CENSUS_SEMANTIC_CONTRACT.route}`);
+        expect(request.url).toBe(STAGING_CENSUS_SEMANTIC_CONTRACT.origin + STAGING_CENSUS_SEMANTIC_CONTRACT.route);
         expect(request.method).toBe("POST");
         expect(request.redirect).toBe("error");
         expect(request.headers.get("content-type")).toBe("application/json");
-        expect(request.headers.get("authorization")).toBe(`Bearer ${token}`);
+        expect(request.headers.get("authorization")).toBe("Bearer " + token);
         expect(await request.text()).toBe(STAGING_CENSUS_EXACT_BODY);
         return acceptedResponse();
       }
     });
     expect(calls).toBe(1);
-    expect(result.status).toBe("accepted_read_only_census");
+    expect(result.status).toBe("pending_control_plane_postcheck");
+    expect(result.qualificationEligible).toBe(false);
     expect(result.requestBodySha256).toBe(STAGING_CENSUS_EXACT_BODY_SHA256);
-    for (const path of Object.values(artifacts)) {
+    for (const path of [artifacts.intent, artifacts.response, artifacts.attemptResult]) {
       expect(statSync(path).mode & 0o777).toBe(0o600);
       expect(statSync(path).nlink).toBe(1);
       expect(readFileSync(path, "utf8")).not.toContain(token);
     }
-    expect(JSON.parse(readFileSync(artifacts.intentPath, "utf8"))).toMatchObject({
+    expect(JSON.parse(readFileSync(artifacts.intent, "utf8"))).toMatchObject({
       status: "reserved_before_transport_no_retry",
       retryAllowedAfterReservation: false,
       credentialKind: "ephemeral_sites_siwe_not_persisted"
     });
+    expect(() => os01StagingCensusControllerTestOnly.finalize(root)).toThrow();
+    writeJson(artifacts.postObservation, observation("post"));
+    expect(os01StagingCensusControllerTestOnly.finalize(root)).toMatchObject({
+      status: "test_only_postcheck_verified",
+      identitiesMatch: true,
+      workerReadOnlyReceiptVerified: true
+    });
   });
 
-  it("allows only one of two concurrent controllers to dispatch", async () => {
-    const directory = privateDirectory();
-    const first = paths(directory, "-first");
-    const second = { ...paths(directory, "-second"), intentPath: first.intentPath };
+  it("allows only one concurrent dispatch for one authority root", async () => {
+    const { root } = prepareRoot();
     let calls = 0;
     const transport = async () => {
       calls += 1;
@@ -138,8 +198,18 @@ describe("OS-01 staging census controller", () => {
       return acceptedResponse();
     };
     const results = await Promise.allSettled([
-      runOs01StagingCensusController({ ...first, authorizationToken: "token-one", transport }),
-      runOs01StagingCensusController({ ...second, authorizationToken: "token-two", transport })
+      os01StagingCensusControllerTestOnly.run({
+        root,
+        authorizationToken: "token-one",
+        transport,
+        responseValidation: defaultValidation
+      }),
+      os01StagingCensusControllerTestOnly.run({
+        root,
+        authorizationToken: "token-two",
+        transport,
+        responseValidation: defaultValidation
+      })
     ]);
     expect(calls).toBe(1);
     expect(results.filter((result) => result.status === "fulfilled")).toHaveLength(1);
@@ -147,11 +217,11 @@ describe("OS-01 staging census controller", () => {
   });
 
   it("consumes the intent after transport uncertainty and prohibits a retry", async () => {
-    const directory = privateDirectory();
-    const artifacts = paths(directory);
-    const first = await runOs01StagingCensusController({
-      ...artifacts,
+    const { root } = prepareRoot();
+    const first = await os01StagingCensusControllerTestOnly.run({
+      root,
       authorizationToken: "token-one",
+      responseValidation: defaultValidation,
       transport: async () => {
         throw new Error("uncertain transport");
       }
@@ -159,11 +229,10 @@ describe("OS-01 staging census controller", () => {
     expect(first.status).toBe("terminal_transport_uncertain");
     expect(first.retryAllowed).toBe(false);
     let retryCalls = 0;
-    await expect(runOs01StagingCensusController({
-      intentPath: artifacts.intentPath,
-      responsePath: resolve(directory, "retry-response.json"),
-      resultPath: resolve(directory, "retry-result.json"),
+    await expect(os01StagingCensusControllerTestOnly.run({
+      root,
       authorizationToken: "token-two",
+      responseValidation: defaultValidation,
       transport: async () => {
         retryCalls += 1;
         return acceptedResponse();
@@ -172,21 +241,89 @@ describe("OS-01 staging census controller", () => {
     expect(retryCalls).toBe(0);
   });
 
-  it("makes an invalid response terminal and preserves its exact bytes", async () => {
-    const directory = privateDirectory();
-    const artifacts = paths(directory);
-    const responseBytes = JSON.stringify({ error: "not-a-census" });
-    const result = await runOs01StagingCensusController({
-      ...artifacts,
+  it("does not dispatch when a reserved output path already exists", async () => {
+    const { root, artifacts } = prepareRoot();
+    writeFileSync(artifacts.response, "", { flag: "wx", mode: 0o600 });
+    let calls = 0;
+    await expect(os01StagingCensusControllerTestOnly.run({
+      root,
       authorizationToken: "token",
-      transport: async () => new Response(responseBytes, {
+      responseValidation: defaultValidation,
+      transport: async () => {
+        calls += 1;
+        return acceptedResponse();
+      }
+    })).rejects.toThrow();
+    expect(calls).toBe(0);
+  });
+
+  it("never persists a response that reflects the ephemeral credential", async () => {
+    const { root, artifacts } = prepareRoot();
+    const token = "credential-must-not-be-written";
+    const result = await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: token,
+      responseValidation: defaultValidation,
+      transport: async () => new Response(JSON.stringify({ reflected: token }), {
         status: 200,
         headers: { "Content-Type": "application/json" }
       })
     });
-    expect(result.status).toBe("terminal_invalid_response");
-    expect(result.retryAllowed).toBe(false);
-    expect(readFileSync(artifacts.responsePath, "utf8")).toBe(responseBytes);
-    expect(result.responseBytesSha256).toBe(sha256(responseBytes));
+    expect(result.status).toBe("terminal_credential_reflection");
+    expect(statSync(artifacts.response).size).toBe(0);
+    expect(readFileSync(artifacts.attemptResult, "utf8")).not.toContain(token);
+  });
+
+  it("passes an actual worker response through controller validation and postcheck finalization", async () => {
+    const { root, artifacts } = prepareRoot();
+    const tables = Array.from({ length: 50 }, (_, index) => {
+      const name = "table_" + String(index).padStart(2, "0");
+      return { type: "table", name, tbl_name: name, sql: "CREATE TABLE " + name + "(id INTEGER)" };
+    });
+    const indexes = Array.from({ length: 326 }, (_, index) => ({
+      type: "index",
+      name: "idx_" + String(index).padStart(3, "0"),
+      tbl_name: "table_00",
+      sql: "CREATE INDEX idx_" + String(index).padStart(3, "0") + " ON table_00(id)"
+    }));
+    const catalog = [
+      ...indexes,
+      { type: "table", name: "d1_migrations", tbl_name: "d1_migrations", sql: "CREATE TABLE d1_migrations(id INTEGER)" },
+      ...tables
+    ].sort((left, right) => left.type < right.type ? -1 : left.type > right.type ? 1 :
+      left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
+    expect(catalog).toHaveLength(377);
+    const catalogHash = sha256(canonicalJson(catalog));
+    const db = {
+      prepare(sql: string) {
+        return {
+          async all() {
+            if (sql.includes("FROM sqlite_schema")) return { success: true, results: catalog };
+            if (sql.includes("foreign_key_list")) return { success: true, results: [] };
+            if (sql.includes("COUNT(*)")) return { success: true, results: [{ exact_count: 0 }] };
+            throw new Error("unexpected SQL");
+          }
+        };
+      }
+    };
+    const validation = { catalogHash, catalogRows: 377, userTableCount: 50 };
+    const result = await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "integration-token",
+      responseValidation: validation,
+      transport: async (request) => handleOs01StagingCensus(request, db as never, {
+        expectedOrigin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
+        expectedCatalogHash: catalogHash,
+        expectedCatalogRows: 377,
+        expectedUserTableCount: 50
+      })
+    });
+    expect(result.status).toBe("pending_control_plane_postcheck");
+    expect(result.responseBytesSha256).toBe(sha256(readFileSync(artifacts.response)));
+    writeJson(artifacts.postObservation, observation("post"));
+    expect(os01StagingCensusControllerTestOnly.finalize(root)).toMatchObject({
+      status: "test_only_postcheck_verified",
+      identitiesMatch: true
+    });
   });
 });
