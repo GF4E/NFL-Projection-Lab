@@ -1,0 +1,78 @@
+{
+  "version": "os01-migration-qualification.2026.1",
+  "status": "local_sqlite_d1_equivalent_candidate",
+  "workPackage": "OS-01",
+  "authorityContract": "d1-schema-authority.2026.2",
+  "executionBoundary": {
+    "offlineOnly": true,
+    "workerReachable": false,
+    "productionAllowed": false,
+    "providerAccessAllowed": false,
+    "captureActivationAllowed": false
+  },
+  "supportedPrestates": [
+    {
+      "id": "blank_ordered_chain",
+      "applicationRange": "0000_through_0020",
+      "schemaFingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "objectCounts": {
+        "table": 0,
+        "index": 0,
+        "trigger": 0,
+        "view": 0
+      }
+    },
+    {
+      "id": "ordered_through_0016_legacy_29",
+      "applicationRange": "0017_through_0020",
+      "schemaFingerprint": "25069f7ac7b40a7708748dc1d2318cb2cb5dd9b8fdb72a91d7694cd3d99c4c2f",
+      "objectCounts": {
+        "table": 48,
+        "index": 44,
+        "trigger": 46,
+        "view": 0
+      },
+      "playsShape": "legacy_29",
+      "scope": "deterministic_production_shaped_fixture_not_a_substitute_for_the_live_census"
+    }
+  ],
+  "prewriteProtocol": {
+    "preflightClaimVersion": "os01.migration-preflight.v1",
+    "quiescence": "begin_immediate",
+    "revalidation": "schema_fingerprint_rows_hash_and_foreign_keys_inside_the_write_lock_before_first_statement",
+    "mismatchBehavior": "rollback_without_schema_write"
+  },
+  "atomicityProtocol": {
+    "migrationUnit": "entire_authorized_range_in_one_transaction",
+    "partialFailureBehavior": "rollback_entire_range",
+    "terminalReceiptFailureBehavior": "rollback_entire_range"
+  },
+  "backupRestoreProtocol": {
+    "qualificationResource": "isolated_file_backed_sqlite",
+    "backupMode": "sqlite_online_backup_api",
+    "restoreProof": "schema_fingerprint_rows_hash_foreign_key_check_and_exact_original_row_projection",
+    "corruptBackupBehavior": "reject"
+  },
+  "terminalProjection": {
+    "schemaFingerprint": "4d78fd8de47ababbf6d809575a55275a166e8c99b332344b91c885f27eedafd2",
+    "objectCounts": {
+      "table": 93,
+      "index": 80,
+      "trigger": 76,
+      "view": 0
+    },
+    "foreignKeyViolationCount": 0
+  },
+  "remainingExternalGates": [
+    "fresh_exact_production_semantic_census",
+    "fresh_exact_production_row_preservation_manifest",
+    "isolated_hosted_blank_replay",
+    "isolated_hosted_exact_live_prestate_replay",
+    "hosted_actual_path_partial_failure_proof",
+    "pre_migration_production_backup_and_restore_drill",
+    "dormant_production_forward_migration",
+    "postmigration_production_semantic_row_and_foreign_key_parity",
+    "independent_final_acceptance_audit"
+  ],
+  "claimBoundary": "This contract can qualify only the local SQLite D1-equivalent execution mechanism and deterministic fixture prestates. It does not accept OS-01 or ARC-03, does not establish the live production prestate, and does not authorize a hosted or production migration."
+}
