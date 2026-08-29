@@ -420,6 +420,29 @@ describe("OS-01 staging census controller", () => {
     });
   });
 
+  it("rejects a self-hashed authority replacement after dispatch", async () => {
+    const { root, artifacts } = prepareRoot();
+    await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => acceptedResponse()
+    });
+    replaceHashedJson(artifacts.authority, "authorityHash", (authority) => {
+      authority.initializedAt = "2026-08-29T07:59:58.000Z";
+    });
+    writeJson(artifacts.postObservation, observation("post"));
+    expect(os01StagingCensusControllerTestOnly.finalize(
+      root,
+      () => new Date("2026-08-29T08:02:00.000Z")
+    )).toMatchObject({
+      status: "test_only_postcheck_rejected",
+      authorityVerified: false,
+      crossRecordBindingsVerified: false
+    });
+  });
+
   it("rejects reversed control-plane observation time", async () => {
     const { root, artifacts } = prepareRoot();
     await os01StagingCensusControllerTestOnly.run({

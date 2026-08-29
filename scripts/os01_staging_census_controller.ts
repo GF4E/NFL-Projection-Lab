@@ -70,6 +70,9 @@ export type CensusControllerResult = {
   qualificationId: string;
   qualificationEligible: boolean;
   attemptId: string;
+  authorityBytesSha256: string;
+  authorityRootIdentitySha256: string;
+  authorityFileIdentitySha256: string;
   preObservationBytesSha256: string;
   requestBodySha256: string;
   responseBytesSha256: string | null;
@@ -172,6 +175,24 @@ function sameSnapshotIdentity(left: ArtifactIdentity, right: ArtifactIdentity): 
 
 function sameRootIdentity(left: ArtifactIdentity, right: ArtifactIdentity): boolean {
   return left.device === right.device && left.inode === right.inode && left.mode === right.mode;
+}
+
+function rootIdentitySha256(identity: ArtifactIdentity): string {
+  return sha256(canonicalJson({
+    device: identity.device,
+    inode: identity.inode,
+    mode: identity.mode
+  }));
+}
+
+function fileIdentitySha256(identity: ArtifactIdentity): string {
+  return sha256(canonicalJson({
+    device: identity.device,
+    inode: identity.inode,
+    mode: identity.mode,
+    links: identity.links,
+    size: identity.size
+  }));
 }
 
 function privateFileIdentity(path: string): ArtifactIdentity {
@@ -762,6 +783,9 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
     qualificationId: STAGING_CENSUS_ID,
     qualificationEligible: input.qualificationEligible,
     attemptId,
+    authorityBytesSha256: sha256(authorityArtifact.bytes),
+    authorityRootIdentitySha256: rootIdentitySha256(rootBefore),
+    authorityFileIdentitySha256: fileIdentitySha256(authorityArtifact.identity),
     projectId: STAGING_CENSUS_SEMANTIC_CONTRACT.projectId,
     origin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
     method: STAGING_CENSUS_SEMANTIC_CONTRACT.method,
@@ -833,6 +857,9 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         qualificationId: STAGING_CENSUS_ID,
         qualificationEligible: input.qualificationEligible,
         attemptId,
+        authorityBytesSha256: sha256(authorityArtifact.bytes),
+        authorityRootIdentitySha256: rootIdentitySha256(rootBefore),
+        authorityFileIdentitySha256: fileIdentitySha256(authorityArtifact.identity),
         preObservationBytesSha256: sha256(preArtifact.bytes),
         requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
         responseBytesSha256: null,
@@ -876,6 +903,9 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         qualificationId: STAGING_CENSUS_ID,
         qualificationEligible: input.qualificationEligible,
         attemptId,
+        authorityBytesSha256: sha256(authorityArtifact.bytes),
+        authorityRootIdentitySha256: rootIdentitySha256(rootBefore),
+        authorityFileIdentitySha256: fileIdentitySha256(authorityArtifact.identity),
         preObservationBytesSha256: sha256(preArtifact.bytes),
         requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
         responseBytesSha256: null,
@@ -940,6 +970,9 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
       qualificationId: STAGING_CENSUS_ID,
       qualificationEligible: input.qualificationEligible,
       attemptId,
+      authorityBytesSha256: sha256(authorityArtifact.bytes),
+      authorityRootIdentitySha256: rootIdentitySha256(rootBefore),
+      authorityFileIdentitySha256: fileIdentitySha256(authorityArtifact.identity),
       preObservationBytesSha256: sha256(preArtifact.bytes),
       requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
       responseBytesSha256: responseHash,
@@ -1009,6 +1042,9 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         qualificationId: STAGING_CENSUS_ID,
         qualificationEligible: input.qualificationEligible,
         attemptId,
+        authorityBytesSha256: sha256(authorityArtifact.bytes),
+        authorityRootIdentitySha256: rootIdentitySha256(rootBefore),
+        authorityFileIdentitySha256: fileIdentitySha256(authorityArtifact.identity),
         preObservationBytesSha256: sha256(preArtifact.bytes),
         requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
         responseBytesSha256: null,
@@ -1087,7 +1123,8 @@ function validateIntentRecord(
 ): Record<string, unknown> | null {
   const intent = parseHashedRecord(bytes, "intentHash");
   if (!intent || !hasExactKeys(intent, [
-    "attemptId", "contentType", "controlPlanePostcheckRequired", "credentialKind",
+    "attemptId", "authorityBytesSha256", "authorityFileIdentitySha256", "authorityRootIdentitySha256",
+    "contentType", "controlPlanePostcheckRequired", "credentialKind",
     "exclusiveHostAssumption", "intentHash", "method", "origin", "preObservationBytesSha256",
     "projectId", "qualificationEligible", "qualificationId", "recordedAt", "requestBodySha256",
     "retryAllowedAfterReservation", "route", "status", "version"
@@ -1096,6 +1133,8 @@ function validateIntentRecord(
     intent.status === "reserved_before_transport_no_retry" && intent.qualificationId === STAGING_CENSUS_ID &&
     intent.qualificationEligible === qualificationEligible && typeof intent.attemptId === "string" &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(intent.attemptId) &&
+    validHex(intent.authorityBytesSha256) && validHex(intent.authorityRootIdentitySha256) &&
+    validHex(intent.authorityFileIdentitySha256) &&
     intent.projectId === STAGING_CENSUS_SEMANTIC_CONTRACT.projectId &&
     intent.origin === STAGING_CENSUS_SEMANTIC_CONTRACT.origin &&
     intent.method === STAGING_CENSUS_SEMANTIC_CONTRACT.method &&
@@ -1115,7 +1154,8 @@ function validateResultRecord(
 ): Record<string, unknown> | null {
   const result = parseHashedRecord(bytes, "resultHash");
   if (!result || !hasExactKeys(result, [
-    "attemptId", "controlPlanePostcheckRequired", "controllerDatabaseMutationAttempted", "httpStatus",
+    "attemptId", "authorityBytesSha256", "authorityFileIdentitySha256", "authorityRootIdentitySha256",
+    "controlPlanePostcheckRequired", "controllerDatabaseMutationAttempted", "httpStatus",
     "oddsProviderPathInvoked", "preObservationBytesSha256", "qualificationEligible", "qualificationId",
     "quotaPathInvoked", "recordedAt", "requestBodySha256", "responseBytesSha256", "resultHash",
     "retryAllowed", "status", "version"
@@ -1128,6 +1168,8 @@ function validateResultRecord(
     statuses.has(String(result.status)) && result.qualificationId === STAGING_CENSUS_ID &&
     result.qualificationEligible === qualificationEligible && typeof result.attemptId === "string" &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(result.attemptId) &&
+    validHex(result.authorityBytesSha256) && validHex(result.authorityRootIdentitySha256) &&
+    validHex(result.authorityFileIdentitySha256) &&
     validHex(result.preObservationBytesSha256) && result.requestBodySha256 === STAGING_CENSUS_EXACT_BODY_SHA256 &&
     (result.responseBytesSha256 === null || validHex(result.responseBytesSha256)) &&
     (result.httpStatus === null || (Number.isSafeInteger(result.httpStatus) &&
@@ -1205,8 +1247,18 @@ function finalizeCore(
     finalMilliseconds - authorityMilliseconds <= QUALIFICATION_WINDOW_MILLISECONDS;
   const preHash = sha256(preArtifact.bytes);
   const responseHash = sha256(responseArtifact.bytes);
+  const authorityHash = sha256(authorityArtifact.bytes);
+  const liveRootIdentityHash = rootIdentitySha256(rootBefore);
+  const liveAuthorityFileIdentityHash = fileIdentitySha256(authorityArtifact.identity);
+  const authorityBindingVerified = intent.authorityBytesSha256 === authorityHash &&
+    result.authorityBytesSha256 === authorityHash &&
+    intent.authorityRootIdentitySha256 === liveRootIdentityHash &&
+    result.authorityRootIdentitySha256 === liveRootIdentityHash &&
+    intent.authorityFileIdentitySha256 === liveAuthorityFileIdentityHash &&
+    result.authorityFileIdentitySha256 === liveAuthorityFileIdentityHash;
   const crossRecordBindingsVerified = intent.attemptId === result.attemptId &&
     intent.qualificationId === result.qualificationId &&
+    authorityBindingVerified &&
     intent.requestBodySha256 === result.requestBodySha256 &&
     intent.requestBodySha256 === STAGING_CENSUS_EXACT_BODY_SHA256 &&
     intent.preObservationBytesSha256 === preHash && result.preObservationBytesSha256 === preHash &&
@@ -1227,7 +1279,7 @@ function finalizeCore(
         evidenceValid ? "test_only_postcheck_verified" : "test_only_postcheck_rejected",
     qualificationId: STAGING_CENSUS_ID,
     qualificationEligible,
-    authorityVerified: true,
+    authorityVerified: authorityBindingVerified,
     identitiesMatch,
     temporalOrderValid,
     crossRecordBindingsVerified,
