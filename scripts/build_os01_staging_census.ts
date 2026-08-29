@@ -6,7 +6,14 @@ import { basename, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "vite";
 
-const EXACT_STAGING_PROJECT_ID = "appgprj_6a92435d1d788191b4d6bcaff0a1525d";
+import {
+  STAGING_CENSUS_EXACT_BODY_SHA256,
+  STAGING_CENSUS_ID,
+  STAGING_CENSUS_REQUEST_VERSION,
+  STAGING_CENSUS_SEMANTIC_CONTRACT
+} from "../qualification/os01-staging-census/contract";
+
+const EXACT_STAGING_PROJECT_ID = STAGING_CENSUS_SEMANTIC_CONTRACT.projectId;
 const sha256 = (value: Uint8Array | string) => createHash("sha256").update(value).digest("hex");
 
 function argument(name: string): string {
@@ -56,9 +63,12 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     "source_capture_provider_request"
   ]) if (text.includes(prohibited)) throw new Error(`census package contains ${prohibited}`);
   for (const required of [
-    "/__engine-os/os01-staging-census/v1",
-    "e1f160c7b5c53d59896bccd269caaebd95113190670fabe325ac336ce3b7d4c6",
-    "3b261b773327b5e6d0923dd22b5c9407db05d92ee3494f8be664afd1cb273eea",
+    STAGING_CENSUS_SEMANTIC_CONTRACT.route,
+    STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
+    STAGING_CENSUS_ID,
+    STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
+    "controller_enforced_single_invocation_not_runtime_durable",
+    "bounded_consistency_not_transactional_snapshot",
     "isolated_staging_read_only_census_only"
   ]) if (!text.includes(required)) throw new Error(`census package omits ${required}`);
 
@@ -72,36 +82,57 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     throw new Error("census package contains an automatic migration path");
   }
   const manifest = {
-    version: "engine-os.os01-staging-census-package.v1",
+    version: "engine-os.os01-staging-census-package.v2",
     status: "isolated_read_only_diagnostic",
     projectId: input.projectId,
     entrySha256: sha256(entry),
-    expectedCatalogHash: "3b261b773327b5e6d0923dd22b5c9407db05d92ee3494f8be664afd1cb273eea",
-    expectedCatalogRows: 377,
+    semanticContract: STAGING_CENSUS_SEMANTIC_CONTRACT,
+    qualificationId: STAGING_CENSUS_ID,
+    expectedCatalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
+    expectedCatalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
+    expectedUserTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount,
     request: {
-      method: "POST",
-      route: "/__engine-os/os01-staging-census/v1",
-      version: "engine-os.os01-staging-census-request.v1",
-      censusId: "e1f160c7b5c53d59896bccd269caaebd95113190670fabe325ac336ce3b7d4c6",
-      exactKeys: ["censusId", "version"]
+      method: STAGING_CENSUS_SEMANTIC_CONTRACT.method,
+      origin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
+      route: STAGING_CENSUS_SEMANTIC_CONTRACT.route,
+      query: "",
+      contentType: STAGING_CENSUS_SEMANTIC_CONTRACT.contentType,
+      version: STAGING_CENSUS_REQUEST_VERSION,
+      censusId: STAGING_CENSUS_ID,
+      exactBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256
     },
     runtimeBindings: ["DB"],
     providerBindings: [],
     scheduledTriggers: [],
     automaticMigrations: false,
-    maximumRequests: 1,
+    invocationControl: {
+      ...STAGING_CENSUS_SEMANTIC_CONTRACT.invocationControl,
+      receiptMustBindOwnerOnlyNoWriterBoundaryBeforeAndAfter: true,
+      secondInvocationProhibitedByOperatorContract: true
+    },
+    consistencyClaim: STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
+    viewEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.viewEvidence,
     databaseMutationAllowed: false,
     productionAllowed: false,
     captureActivationAllowed: false
   };
   const manifestBytes = `${JSON.stringify(manifest, null, 2)}\n`;
   const manifestSha256 = sha256(manifestBytes);
-  writeFileSync(join(metadata, "os01-staging-census-package.v1.json"), manifestBytes, {
+  writeFileSync(join(metadata, "os01-staging-census-package.v2.json"), manifestBytes, {
     encoding: "utf8",
     flag: "wx"
   });
-  writeFileSync(join(metadata, "os01-staging-census-package.v1.sha256"),
-    `${manifestSha256}  os01-staging-census-package.v1.json\n`, { encoding: "utf8", flag: "wx" });
+  writeFileSync(join(metadata, "os01-staging-census-package.v2.sha256"),
+    `${manifestSha256}  os01-staging-census-package.v2.json\n`, { encoding: "utf8", flag: "wx" });
+  const finalPayloadFiles = files(outDir).map((path) => path.slice(outDir.length + 1));
+  if (JSON.stringify(finalPayloadFiles) !== JSON.stringify([
+    ".openai/hosting.json",
+    ".openai/os01-staging-census-package.v2.json",
+    ".openai/os01-staging-census-package.v2.sha256",
+    "server/index.js"
+  ])) {
+    throw new Error("census package final payload is not exact");
+  }
   return { entrySha256: sha256(entry), manifestSha256 };
 }
 

@@ -1,8 +1,12 @@
-const ROUTE = "/__engine-os/os01-staging-census/v1";
-const REQUEST_VERSION = "engine-os.os01-staging-census-request.v1";
-const CENSUS_ID = "e1f160c7b5c53d59896bccd269caaebd95113190670fabe325ac336ce3b7d4c6";
-const EXPECTED_CATALOG_HASH = "3b261b773327b5e6d0923dd22b5c9407db05d92ee3494f8be664afd1cb273eea";
-const EXPECTED_CATALOG_ROWS = 377;
+import {
+  canonicalJson,
+  codePointCompare,
+  DEFAULT_STAGING_CENSUS_OPTIONS,
+  STAGING_CENSUS_EXACT_BODY,
+  STAGING_CENSUS_ID,
+  STAGING_CENSUS_SEMANTIC_CONTRACT
+} from "./contract";
+
 const INTERNAL_OBJECTS = new Set([
   "_cf_KV",
   "d1_migrations",
@@ -18,25 +22,49 @@ type CatalogRow = {
   sql: string | null;
 };
 
+type ForeignKeyRow = {
+  id: number;
+  seq: number;
+  table: string;
+  from: string;
+  to: string | null;
+  on_update: string;
+  on_delete: string;
+  match: string;
+};
+
+type TableEvidence = {
+  name: string;
+  createSql: string;
+  createSqlHash: string;
+  rowCount: number;
+  foreignKeys: ForeignKeyRow[];
+};
+
 type CensusDatabase = Pick<D1Database, "prepare">;
 
 type CensusOptions = {
+  expectedOrigin: string;
   expectedCatalogHash: string;
   expectedCatalogRows: number;
+  expectedUserTableCount: number;
 };
 
-function stable(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(stable);
-  if (value && typeof value === "object") {
-    return Object.fromEntries(Object.entries(value as Record<string, unknown>)
-      .sort(([left], [right]) => left.localeCompare(right))
-      .map(([key, item]) => [key, stable(item)]));
-  }
-  return typeof value === "bigint" ? value.toString() : value;
-}
+type FailureReason =
+  | "catalog_read_failed"
+  | "catalog_row_invalid"
+  | "catalog_changed_during_census"
+  | "foreign_key_read_failed"
+  | "foreign_key_row_invalid"
+  | "row_count_read_failed"
+  | "row_count_invalid"
+  | "row_count_changed_during_census"
+  | "user_table_catalog_invalid";
 
-function stableJson(value: unknown): string {
-  return JSON.stringify(stable(value));
+class CensusFailure extends Error {
+  constructor(readonly reason: FailureReason) {
+    super(reason);
+  }
 }
 
 async function sha256(value: string): Promise<string> {
@@ -45,7 +73,7 @@ async function sha256(value: string): Promise<string> {
 }
 
 function quoteIdentifier(value: string): string {
-  if (!/^[A-Za-z0-9_]+$/u.test(value)) throw new Error("unsafe_catalog_identifier");
+  if (!/^[A-Za-z0-9_]+$/u.test(value)) throw new CensusFailure("user_table_catalog_invalid");
   return `"${value}"`;
 }
 
@@ -54,113 +82,193 @@ function isInternal(row: CatalogRow): boolean {
     row.name.startsWith("sqlite_") || row.name.startsWith("sqlite_autoindex_");
 }
 
-async function all<T extends Record<string, unknown>>(db: CensusDatabase, sql: string): Promise<T[]> {
-  const result = await db.prepare(sql).all<T>();
-  if (!result.success || !Array.isArray(result.results)) throw new Error("d1_read_failed");
-  return result.results;
+async function all<T extends Record<string, unknown>>(
+  db: CensusDatabase,
+  sql: string,
+  failure: FailureReason
+): Promise<T[]> {
+  try {
+    const result = await db.prepare(sql).all<T>();
+    if (!result.success || !Array.isArray(result.results)) throw new CensusFailure(failure);
+    return result.results;
+  } catch (error) {
+    if (error instanceof CensusFailure) throw error;
+    throw new CensusFailure(failure);
+  }
 }
 
 function json(value: unknown, status = 200): Response {
   return Response.json(value, { status, headers: { "Cache-Control": "no-store" } });
 }
 
+function validCatalogRow(value: unknown): value is CatalogRow {
+  if (!value || typeof value !== "object") return false;
+  const row = value as Record<string, unknown>;
+  return typeof row.type === "string" && typeof row.name === "string" &&
+    typeof row.tbl_name === "string" && (typeof row.sql === "string" || row.sql === null);
+}
+
+function normalizeForeignKey(value: Record<string, unknown>): ForeignKeyRow {
+  const id = value.id;
+  const seq = value.seq;
+  const table = value.table;
+  const from = value.from;
+  const to = value.to;
+  const onUpdate = value.on_update;
+  const onDelete = value.on_delete;
+  const match = value.match;
+  if (!Number.isSafeInteger(id) || (id as number) < 0 || !Number.isSafeInteger(seq) || (seq as number) < 0 ||
+      typeof table !== "string" || typeof from !== "string" ||
+      (typeof to !== "string" && to !== null) || typeof onUpdate !== "string" ||
+      typeof onDelete !== "string" || typeof match !== "string") {
+    throw new CensusFailure("foreign_key_row_invalid");
+  }
+  return {
+    id: id as number,
+    seq: seq as number,
+    table,
+    from,
+    to,
+    on_update: onUpdate,
+    on_delete: onDelete,
+    match
+  };
+}
+
+function foreignKeyCompare(left: ForeignKeyRow, right: ForeignKeyRow): number {
+  return left.id - right.id || left.seq - right.seq || codePointCompare(left.table, right.table) ||
+    codePointCompare(left.from, right.from) || codePointCompare(left.to ?? "", right.to ?? "") ||
+    codePointCompare(left.on_update, right.on_update) || codePointCompare(left.on_delete, right.on_delete) ||
+    codePointCompare(left.match, right.match);
+}
+
+async function readCatalog(db: CensusDatabase): Promise<CatalogRow[]> {
+  const rows = await all<Record<string, unknown>>(db, `SELECT type, name, tbl_name, sql FROM sqlite_schema
+    WHERE type IN ('table', 'index', 'trigger', 'view')
+    ORDER BY type COLLATE BINARY, name COLLATE BINARY`, "catalog_read_failed");
+  if (!rows.every(validCatalogRow)) throw new CensusFailure("catalog_row_invalid");
+  return rows.sort((left, right) => codePointCompare(left.type, right.type) ||
+    codePointCompare(left.name, right.name) || codePointCompare(left.tbl_name, right.tbl_name));
+}
+
+async function readRowCount(db: CensusDatabase, tableName: string): Promise<number> {
+  const counts = await all<{ exact_count: number }>(
+    db,
+    `SELECT COUNT(*) AS exact_count FROM ${quoteIdentifier(tableName)}`,
+    "row_count_read_failed"
+  );
+  if (counts.length !== 1 || !Number.isSafeInteger(counts[0]?.exact_count) || counts[0]!.exact_count < 0) {
+    throw new CensusFailure("row_count_invalid");
+  }
+  return counts[0]!.exact_count;
+}
+
 export async function handleOs01StagingCensus(
   request: Request,
   db: CensusDatabase,
-  options: CensusOptions = {
-    expectedCatalogHash: EXPECTED_CATALOG_HASH,
-    expectedCatalogRows: EXPECTED_CATALOG_ROWS
-  }
+  options: CensusOptions = DEFAULT_STAGING_CENSUS_OPTIONS
 ): Promise<Response> {
   const url = new URL(request.url);
-  if (url.pathname !== ROUTE) return json({ error: "not_found" }, 404);
+  if (url.pathname !== STAGING_CENSUS_SEMANTIC_CONTRACT.route) return json({ error: "not_found" }, 404);
   if (request.method !== "POST") return json({ error: "method_not_allowed" }, 405);
-  let input: unknown;
+  if (url.origin !== options.expectedOrigin || url.search !== "" || url.hash !== "" ||
+      request.headers.get("content-type") !== "application/json") {
+    return json({ error: "invalid_request" }, 400);
+  }
+  let requestBody: string;
   try {
-    input = await request.json();
+    requestBody = await request.text();
   } catch {
     return json({ error: "invalid_request" }, 400);
   }
-  if (!input || typeof input !== "object") return json({ error: "invalid_request" }, 400);
-  const record = input as Record<string, unknown>;
-  if (Object.keys(record).sort().join(",") !== "censusId,version" ||
-      record.version !== REQUEST_VERSION || record.censusId !== CENSUS_ID) {
-    return json({ error: "invalid_request" }, 400);
-  }
+  if (requestBody !== STAGING_CENSUS_EXACT_BODY) return json({ error: "invalid_request" }, 400);
 
   try {
-    const catalog = await all<CatalogRow>(db, `SELECT type, name, tbl_name, sql FROM sqlite_schema
-      WHERE type IN ('table', 'index', 'trigger', 'view')
-      ORDER BY type COLLATE BINARY, name COLLATE BINARY`);
-    const catalogHash = await sha256(stableJson(catalog));
-    if (catalog.length !== options.expectedCatalogRows || catalogHash !== options.expectedCatalogHash) {
+    const catalogBefore = await readCatalog(db);
+    const catalogHash = await sha256(canonicalJson(catalogBefore));
+    if (catalogBefore.length !== options.expectedCatalogRows || catalogHash !== options.expectedCatalogHash) {
       return json({
         error: "staging_prestate_mismatch",
-        catalogRows: catalog.length,
+        catalogRows: catalogBefore.length,
         catalogHash,
         databaseMutationAttempted: false
       }, 409);
     }
-    const userObjects = catalog.filter((row) => !isInternal(row));
+    const userObjects = catalogBefore.filter((row) => !isInternal(row));
     const userTables = userObjects
       .filter((row) => row.type === "table")
-      .sort((left, right) => left.name.localeCompare(right.name));
-    if (userTables.length === 0 || userTables.some((row) =>
+      .sort((left, right) => codePointCompare(left.name, right.name));
+    if (userTables.length !== options.expectedUserTableCount || userTables.some((row) =>
       !/^[A-Za-z0-9_]+$/u.test(row.name) || row.name !== row.tbl_name || typeof row.sql !== "string")) {
-      throw new Error("user_table_catalog_invalid");
+      throw new CensusFailure("user_table_catalog_invalid");
     }
-    const tables = [];
+
+    const tables: TableEvidence[] = [];
     for (const table of userTables) {
       const createSql = table.sql;
-      if (typeof createSql !== "string") throw new Error("user_table_ddl_invalid");
-      const foreignKeys = await all<Record<string, unknown>>(
+      if (typeof createSql !== "string") throw new CensusFailure("user_table_catalog_invalid");
+      const foreignKeys = (await all<Record<string, unknown>>(
         db,
-        `PRAGMA foreign_key_list(${quoteIdentifier(table.name)})`
-      );
-      const counts = await all<{ exact_count: number }>(
-        db,
-        `SELECT COUNT(*) AS exact_count FROM ${quoteIdentifier(table.name)}`
-      );
-      if (counts.length !== 1 || !Number.isSafeInteger(counts[0]?.exact_count) || counts[0]!.exact_count < 0) {
-        throw new Error("table_count_invalid");
-      }
+        `PRAGMA foreign_key_list(${quoteIdentifier(table.name)})`,
+        "foreign_key_read_failed"
+      )).map(normalizeForeignKey).sort(foreignKeyCompare);
       tables.push({
         name: table.name,
         createSql,
         createSqlHash: await sha256(createSql),
-        rowCount: counts[0]!.exact_count,
+        rowCount: await readRowCount(db, table.name),
         foreignKeys
       });
     }
-    const views = userObjects.filter((row) => row.type === "view");
-    const tableSetHash = await sha256(stableJson(tables.map((table) => table.name)));
-    const ddlRoot = await sha256(stableJson(tables.map((table) => ({
+
+    const rowCountsAfter = [];
+    for (const table of userTables) rowCountsAfter.push({ name: table.name, rowCount: await readRowCount(db, table.name) });
+    if (rowCountsAfter.some((row, index) => row.rowCount !== tables[index]!.rowCount)) {
+      throw new CensusFailure("row_count_changed_during_census");
+    }
+    const catalogAfter = await readCatalog(db);
+    if (await sha256(canonicalJson(catalogAfter)) !== catalogHash || catalogAfter.length !== catalogBefore.length) {
+      throw new CensusFailure("catalog_changed_during_census");
+    }
+
+    const views = userObjects
+      .filter((row) => row.type === "view")
+      .map((row) => row.name)
+      .sort(codePointCompare);
+    const tableSetHash = await sha256(canonicalJson(tables.map((table) => table.name)));
+    const viewSetHash = await sha256(canonicalJson(views));
+    const ddlRoot = await sha256(canonicalJson(tables.map((table) => ({
       name: table.name,
       createSql: table.createSql
     }))));
-    const foreignKeyRoot = await sha256(stableJson(tables.map((table) => ({
+    const foreignKeyRoot = await sha256(canonicalJson(tables.map((table) => ({
       name: table.name,
       foreignKeys: table.foreignKeys
     }))));
-    const rowCountRoot = await sha256(stableJson(tables.map((table) => ({
+    const rowCountRoot = await sha256(canonicalJson(tables.map((table) => ({
       name: table.name,
       rowCount: table.rowCount
     }))));
     const body = {
-      version: "engine-os.os01-staging-census-receipt.v1",
+      version: STAGING_CENSUS_SEMANTIC_CONTRACT.responseVersion,
       status: "read_only_schema_census_captured",
-      censusId: CENSUS_ID,
-      catalogRows: catalog.length,
+      censusId: STAGING_CENSUS_ID,
+      catalogRows: catalogBefore.length,
       catalogHash,
       userObjectCount: userObjects.length,
       userTableCount: tables.length,
       userViewCount: views.length,
       tableSetHash,
+      viewSetHash,
       ddlRoot,
       foreignKeyRoot,
       rowCountRoot,
       tables,
-      views,
+      viewNames: views,
+      prePostCatalogMatch: true,
+      prePostRowCountsMatch: true,
+      snapshotClaim: "bounded_consistency_not_transactional_snapshot",
+      requestBudgetClaim: "controller_enforced_single_invocation_not_runtime_durable",
       databaseMutationAttempted: false,
       providerBindings: 0,
       providerSecretReads: 0,
@@ -171,11 +279,11 @@ export async function handleOs01StagingCensus(
       productionMutations: 0,
       claimBoundary: "isolated_staging_read_only_census_only"
     } as const;
-    return json({ ...body, receiptHash: await sha256(stableJson(body)) });
+    return json({ ...body, receiptHash: await sha256(canonicalJson(body)) });
   } catch (error) {
     return json({
       error: "staging_census_failed",
-      detail: error instanceof Error ? error.message : "unknown",
+      reason: error instanceof CensusFailure ? error.reason : "catalog_read_failed",
       databaseMutationAttempted: false,
       claimBoundary: "no_success_receipt"
     }, 500);

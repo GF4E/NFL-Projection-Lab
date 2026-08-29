@@ -1,0 +1,38 @@
+{
+  "version": "engine-os.os01-staging-census-v1-audit-rejection-receipt.2026.1",
+  "status": "terminally_rejected_no_reusable_live_evidence",
+  "scope": "read-only staging census candidate at commit 8d29fd1dd283e2027a993d386ea0b82a3fdbe808",
+  "candidate": {
+    "commit": "8d29fd1dd283e2027a993d386ea0b82a3fdbe808",
+    "workerSha256": "ea7fae9b61c74e89b23d2d1e9a289b66a7901885bb01ec6b8e56f37cadc728b6",
+    "manifestSha256": "2f5fb9a5c16bcf7c4624a5849811994ce0f551138bc9d5b94f6f8cbd0ec69c10",
+    "archiveSha256": "6838b1a3b8df8faf84dc5ef695d7e585e27d7985b399aa3f606179fb7998de23"
+  },
+  "blockingFindings": [
+    "The manifest falsely described a stateless read-only runtime as enforcing one request.",
+    "The success response exported raw view SQL outside the table-DDL census boundary.",
+    "Request admission was semantic rather than exact across origin, query, content type, and body bytes.",
+    "Default 377-row catalog, frozen hash, and 50-table boundaries lacked complete tests.",
+    "Failure output exposed arbitrary D1 error text.",
+    "Canonical ordering was locale-dependent and foreign-key rows were not normalized.",
+    "The multi-read census lacked bounded pre/post consistency evidence."
+  ],
+  "successorRequirements": [
+    "new semantic contract and qualification identity",
+    "controller-reserved one-dispatch intent with no retry after reservation",
+    "byte-exact staging-origin-bound request",
+    "table DDL and normalized foreign keys with view names only",
+    "closed error vocabulary",
+    "code-point ordering",
+    "pre/post catalog and row-count equality under owner-only no-writer staging"
+  ],
+  "deploymentOccurred": false,
+  "stagingDatabaseRead": false,
+  "stagingDatabaseMutation": false,
+  "productionAccessed": false,
+  "providerSecretRead": false,
+  "providerRequest": false,
+  "quotaReservation": false,
+  "qualificationEvidenceReusable": false,
+  "recordedAt": "2026-08-29T08:06:00Z"
+}
