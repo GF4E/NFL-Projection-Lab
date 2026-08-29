@@ -54,10 +54,11 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
       outDir,
       ssr: resolve("qualification/os01-staging-census/entry.ts"),
       target: "es2022",
-      rollupOptions: { output: { entryFileNames: "server/index.js", format: "es" } }
+      rollupOptions: { output: { entryFileNames: "dist/server/index.js", format: "es" } }
     }
   });
-  const entry = readFileSync(join(outDir, "server/index.js"));
+  const entryPath = "dist/server/index.js";
+  const entry = readFileSync(join(outDir, entryPath));
   const text = new TextDecoder().decode(entry);
   for (const prohibited of [
     "ODDS_API_KEY",
@@ -81,7 +82,7 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
   const hosting = `${JSON.stringify({ project_id: input.projectId, d1: "DB", r2: null }, null, 2)}\n`;
   writeFileSync(join(metadata, "hosting.json"), hosting, { encoding: "utf8", flag: "wx" });
   const payloadFiles = files(outDir).map((path) => path.slice(outDir.length + 1));
-  if (JSON.stringify(payloadFiles) !== JSON.stringify([".openai/hosting.json", "server/index.js"]) ||
+  if (JSON.stringify(payloadFiles) !== JSON.stringify([".openai/hosting.json", entryPath]) ||
       payloadFiles.some((path) => path.includes("drizzle") || path.endsWith(".sql"))) {
     throw new Error("census package contains an automatic migration path");
   }
@@ -89,6 +90,7 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     version: "engine-os.os01-staging-census-package.v2",
     status: "isolated_read_only_diagnostic",
     projectId: input.projectId,
+    entryPath,
     entrySha256: sha256(entry),
     semanticContract: STAGING_CENSUS_SEMANTIC_CONTRACT,
     qualificationId: STAGING_CENSUS_ID,
@@ -140,7 +142,7 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     ".openai/hosting.json",
     ".openai/os01-staging-census-package.v2.json",
     ".openai/os01-staging-census-package.v2.sha256",
-    "server/index.js"
+    entryPath
   ])) {
     throw new Error("census package final payload is not exact");
   }

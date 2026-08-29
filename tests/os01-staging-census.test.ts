@@ -262,7 +262,7 @@ describe("OS-01 staging DDL census", () => {
       projectId: "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
       outDir
     });
-    const worker = readFileSync(resolve(outDir, "server/index.js"), "utf8");
+    const worker = readFileSync(resolve(outDir, "dist/server/index.js"), "utf8");
     const hosting = JSON.parse(readFileSync(resolve(outDir, ".openai/hosting.json"), "utf8"));
     const manifest = JSON.parse(readFileSync(
       resolve(outDir, ".openai/os01-staging-census-package.v2.json"),
@@ -274,7 +274,7 @@ describe("OS-01 staging DDL census", () => {
       ".openai/hosting.json",
       ".openai/os01-staging-census-package.v2.json",
       ".openai/os01-staging-census-package.v2.sha256",
-      "server/index.js"
+      "dist/server/index.js"
     ]);
     expect(manifest).not.toHaveProperty("maximumRequests");
     expect(manifest.invocationControl).toMatchObject({
@@ -283,6 +283,7 @@ describe("OS-01 staging DDL census", () => {
       runtimeDurableFence: false
     });
     expect(manifest).toMatchObject({
+      entryPath: "dist/server/index.js",
       expectedCatalogRows: 377,
       expectedUserTableCount: 50,
       viewEvidence: "names_and_hash_only_no_view_sql"
