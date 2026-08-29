@@ -1,0 +1,109 @@
+{
+  "version": "engine-os.os01-staging-census-hosted-attempt-rejection.v1",
+  "status": "rejected_hosted_row_count_read_failed",
+  "qualificationId": "8acabdd225af3530825d5ddd65b78fdf0735b638fb38f587fcad40efd378f06d",
+  "controllerAuthorityId": "195fcbfc0fac28ae7cdb58ef838172bc572e2069397a3be4d6d724bf07e51b0e",
+  "sourceCommit": "d6810532ad1bb0ee0089610322bba5341c87d1be",
+  "sourceTree": "ab3d4a837942dd0962c725b8825ea30b58bcd925",
+  "stagingProjectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "savedVersionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_aa20e5ea2ce48191a8943dead4ae9aa5",
+  "savedVersionNumber": 19,
+  "deploymentId": "appgdep_6a92bf4204a48191ac9980aa912d5e0c",
+  "deploymentStatus": "succeeded",
+  "workerSha256": "d8f7b4dc101e65ada475893bdae11c1acbb15bec069838eba2216a8f53a7af8e",
+  "manifestSha256": "1bbdde237cff5f54bc5a8b491c76f0a04170cc30956f370f9ec5b861b117018e",
+  "localArchiveSha256": "656e57f2e30f7bf58d9b28b30ce3553ca1d0dc38af0b9103ab0e55a9cad2b625",
+  "storedArchiveContentHash": "sha256:36a923c0b0deb6b6aeb8526ba02990299b04b8835bb1a88ea56e8c52da32ebf6",
+  "authorityRoot": "/private/tmp/engine-os-os01-staging-census-195fcbfc0fac28ae7cdb58ef838172bc572e2069397a3be4d6d724bf07e51b0e",
+  "artifacts": {
+    "authority": {
+      "sha256": "38db4c6048b4b4b61ef293084bb334d40c4d30a70ef4e2dd9bb099be87a9ff99",
+      "bytes": 928,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179081128
+    },
+    "preObservation": {
+      "sha256": "4ddff6eb00b09c7ad6ff45c23655df310cfab42e3623353f8d3ae3f6e77792bc",
+      "bytes": 1980,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179081146
+    },
+    "intent": {
+      "sha256": "f7e9dc307b19dbec67fa06dae60e93860fbd10d1b9a10630024de5e1ad965d4f",
+      "bytes": 1487,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179081156
+    },
+    "response": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179081157
+    },
+    "attemptResult": {
+      "sha256": "91bd5cab7a47fd958fdbe84c3f6cc4be50d9e64a1960d66976701bf55ad93c70",
+      "bytes": 1290,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179081158
+    },
+    "reservedDispatchCompletion": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179081159
+    }
+  },
+  "failure": {
+    "stage": "hosted_worker_row_count_read",
+    "reason": "compound_row_count_read_failed",
+    "responseBytesSha256": "cbcc1f063a803678b88325398d30739c123199b6d5865a059b4c929d43d264f1",
+    "responseHashMatchedClosedFailureCategory": "row_count_read_failed",
+    "responseHashMatchMethod": "exhaustive_reconstruction_of_the_closed_self_hashed_failure_vocabulary",
+    "attemptResultHash": "91bd5cab7a47fd958fdbe84c3f6cc4be50d9e64a1960d66976701bf55ad93c70",
+    "workerLogRequestId": "500f31513ca872dcfed71176e250ef0c",
+    "workerLogHttpStatus": 500,
+    "workerLogOutcome": "ok",
+    "workerLogCpuTimeMs": 11,
+    "workerLogWallTimeMs": 520,
+    "controllerRunInvoked": true,
+    "hostRequestDispatched": true,
+    "httpStatus": 500,
+    "workerRequestDispatched": true,
+    "genericFailureResponsePersisted": false,
+    "databaseReadAttempted": true,
+    "databaseMutationAttempted": false,
+    "providerPathInvoked": false,
+    "quotaPathInvoked": false,
+    "retryAllowedOnConsumedAuthority": false,
+    "postObservationWritten": false,
+    "finalizationAttempted": false
+  },
+  "disposition": {
+    "originalAuthorityPreserved": true,
+    "artifactRewriteAllowed": false,
+    "artifactDeletionAllowed": false,
+    "cleanSuccessorRequired": true,
+    "sameAuthorityRetryAllowed": false,
+    "ddlOnlyCatalogSuccessorMayBeQualifiedSeparately": true,
+    "foreignKeyEvidenceAccepted": false,
+    "rowCountEvidenceAccepted": false,
+    "cleanupAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthorized": false,
+    "os01Accepted": false
+  },
+  "recordedAt": "2026-08-29T11:19:55.000Z",
+  "receiptHash": "23d7928251a73669ec0a03496b717e6f6c99643544e3cd96f236bef268873d29"
+}

@@ -184,6 +184,21 @@ full schema census, authorize cleanup or migration, access production, activate 
 a prospective claim. Its exact DDL response bytes and accepted final receipt are prerequisites for
 offline replay; neither one alone is foreign-key evidence.
 
+The sole generation-9 hosted request was terminally rejected. The controller received HTTP 500,
+and exhaustive reconstruction of the closed failure envelope proves its response-byte hash is
+exactly `row_count_read_failed`. The worker log records the v3 POST as an otherwise successful
+invocation, so the failure is confined to the first 94-table compound row-count statement. The
+empty response and dispatch-completion reservations, attempt result, request identifier, and
+self-hashed rejection receipt are preserved. No DDL, row-count, or foreign-key evidence was
+accepted; generation 9 cannot be retried or finalized.
+
+A clean successor must not repeat that compound statement. It may first capture exact catalog and
+DDL evidence with only catalog-before and catalog-after reads while explicitly withholding both
+row-count and foreign-key evidence. Any later row-count evidence must use separately authorized,
+deterministically partitioned direct-count shards that remain below the per-invocation statement
+ceiling. Neither successor is authorized by this paragraph; each requires a new hashed contract,
+authority chain, isolated proof, and independent audit.
+
 ## Planned authority generation 10: frozen-candidate foreign-key completion
 
 Only after generation 9 succeeds may an offline verifier reconstruct the captured 94-table schema
