@@ -4,8 +4,6 @@ import { join } from "node:path";
 import { DatabaseSync, backup } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
 
-import authorityV1 from "../config/d1-schema-authority.v1.json";
-import authorityV2 from "../config/d1-schema-authority.v2.json";
 import terminalManifest from "../config/d1-schema-manifest.v1.json";
 import qualificationContract from "../config/os01-migration-qualification.v1.json";
 import {
@@ -15,6 +13,7 @@ import {
   migrationPaths,
   preflightClaim,
   stableJson,
+  validateAuthorizedRangeContract,
   type DatabaseEvidence,
   type MigrationRunOptions
 } from "../scripts/os01-migration-qualification";
@@ -30,52 +29,11 @@ afterEach(() => {
 const paths = migrationPaths();
 const through0016 = paths.slice(0, 16);
 const successors = paths.slice(16);
-const expectedHashes = Object.fromEntries([
-  ...authorityV1.frozenBaseline.orderedMigrations.map((migration) => [
-    migration.path,
-    migration.byteSha256
-  ]),
-  ...authorityV2.orderedHistory.successorMigrations.map((migration) => [
-    migration.path,
-    migration.byteSha256
-  ])
-]);
-const allReceiptAdditions = [
-  ...authorityV1.acceptedProductionFoundation.preservedReceipts,
-  {
-    version: "0017_engine_os_source_capture",
-    migrationHash: "sha256:d25f6119f4d0735247489623e5775cb185c866d7a3f1ebbb791c5f5cfaeac0e7"
-  },
-  {
-    version: "0018_engine_os_forecast_ledger",
-    migrationHash: "sha256:851f66b3ad07afe61be346b09f853875e675d25512f989b0f4337f6c64a1c293"
-  },
-  ...authorityV2.orderedHistory.successorMigrations.map((migration) => ({
-    version: migration.receiptVersion,
-    migrationHash: `sha256:${migration.receiptDefinitionSha256}`
-  }))
-];
-const successorReceiptAdditions = allReceiptAdditions.slice(-4);
 const blankPrestate = qualificationContract.supportedPrestates[0]!;
 const legacyPrestate = qualificationContract.supportedPrestates[1]!;
 
-function options(
-  prestate: typeof blankPrestate | typeof legacyPrestate,
-  receiptAdditions: MigrationRunOptions["expectedReceiptAdditions"],
-  overrides: Partial<MigrationRunOptions> = {}
-): MigrationRunOptions {
-  return {
-    expectedPrestate: {
-      id: prestate.id,
-      schemaFingerprint: prestate.schemaFingerprint,
-      objectCounts: prestate.objectCounts
-    },
-    expectedFinalManifest: terminalManifest,
-    expectedMigrationPaths: prestate.id === "blank_ordered_chain" ? paths : successors,
-    expectedMigrationByteHashes: expectedHashes,
-    expectedReceiptAdditions: receiptAdditions,
-    ...overrides
-  } as MigrationRunOptions;
+function options(overrides: MigrationRunOptions = {}): MigrationRunOptions {
+  return overrides;
 }
 
 function legacyDatabase(path = ":memory:"): DatabaseSync {
@@ -150,8 +108,7 @@ describe("OS-01 isolated migration qualification path", () => {
     const result = applyQualifiedMigrationRange(
       db,
       preflightClaim(before, "blank_ordered_chain"),
-      paths,
-      options(blankPrestate, allReceiptAdditions)
+      options()
     );
     expect(result.appliedMigrationPaths).toEqual(paths);
     expect(result.appliedStatementCount).toBeGreaterThan(100);
@@ -170,8 +127,7 @@ describe("OS-01 isolated migration qualification path", () => {
     const result = applyQualifiedMigrationRange(
       db,
       preflightClaim(before, "ordered_through_0016_legacy_29"),
-      successors,
-      options(legacyPrestate, successorReceiptAdditions)
+      options()
     );
     const migratedPlay = db.prepare("SELECT * FROM plays WHERE id = 'legacy-preserved'").get() as
       Record<string, unknown>;
@@ -200,8 +156,7 @@ describe("OS-01 isolated migration qualification path", () => {
     expect(() => applyQualifiedMigrationRange(
       db,
       claim,
-      successors,
-      options(legacyPrestate, successorReceiptAdditions)
+      options()
     )).toThrow(/preflight claim does not match/u);
     expect(schemaAndRows(db, "mutated")).toBe(before);
     expect(db.prepare(`SELECT name FROM sqlite_schema
@@ -209,20 +164,22 @@ describe("OS-01 isolated migration qualification path", () => {
     db.close();
   });
 
-  it("rejects a reordered migration range before BEGIN IMMEDIATE", () => {
-    const db = legacyDatabase();
-    const before = evidence(db, "legacy");
-    const beforeState = schemaAndRows(db, "legacy");
+  it("rejects a reordered migration range in the internal contract", () => {
+    const candidate = structuredClone(qualificationContract);
     const reordered = [successors[1]!, successors[0]!, ...successors.slice(2)];
-    expect(() => applyQualifiedMigrationRange(
-      db,
-      preflightClaim(before, "ordered_through_0016_legacy_29"),
-      reordered,
-      options(legacyPrestate, successorReceiptAdditions)
-    )).toThrow(/missing, duplicated, or out of order/u);
-    expect(schemaAndRows(db, "legacy")).toBe(beforeState);
-    expect(db.isTransaction).toBe(false);
-    db.close();
+    candidate.authorizedRanges[1]!.migrationPaths = reordered;
+    expect(() => validateAuthorizedRangeContract(candidate, paths))
+      .toThrow(/differs from the append-only journal/u);
+  });
+
+  it.each([
+    ["unknown", "drizzle/unknown.sql"],
+    ["absolute", "/private/tmp/os01-unknown.sql"],
+    ["out-of-root", "drizzle/../../os01-unknown.sql"]
+  ])("rejects an %s migration path in the internal contract", (_label, path) => {
+    const candidate = structuredClone(qualificationContract);
+    candidate.authorizedRanges[1]!.migrationPaths[0] = path;
+    expect(() => validateAuthorizedRangeContract(candidate, paths)).toThrow();
   });
 
   it("revalidates under BEGIN IMMEDIATE and rolls back a just-in-time prestate mutation", () => {
@@ -232,8 +189,7 @@ describe("OS-01 isolated migration qualification path", () => {
     expect(() => applyQualifiedMigrationRange(
       db,
       preflightClaim(before, "ordered_through_0016_legacy_29"),
-      successors,
-      options(legacyPrestate, successorReceiptAdditions, {
+      options({
         afterQuiesce: () => db.exec("CREATE TABLE raced_object (id integer)")
       })
     )).toThrow(/immediate pre-write revalidation failed|exact supported prestate/u);
@@ -255,8 +211,7 @@ describe("OS-01 isolated migration qualification path", () => {
     applyQualifiedMigrationRange(
       db,
       preflightClaim(before, "ordered_through_0016_legacy_29"),
-      successors,
-      options(legacyPrestate, successorReceiptAdditions, {
+      options({
         afterQuiesce: () => {
           try {
             contender.exec("CREATE TABLE concurrent_writer (id integer)");
@@ -282,8 +237,7 @@ describe("OS-01 isolated migration qualification path", () => {
     expect(() => applyQualifiedMigrationRange(
       db,
       preflightClaim(before, "ordered_through_0016_legacy_29"),
-      successors,
-      options(legacyPrestate, successorReceiptAdditions, {
+      options({
         afterStatement: ({ migrationPath, statementIndex }) => {
           if (migrationPath.endsWith("0019_engine_os_schema_closure.sql") && statementIndex === 12) {
             throw new Error("injected isolated D1-equivalent failure");
@@ -315,11 +269,42 @@ describe("OS-01 isolated migration qualification path", () => {
     const result = applyQualifiedMigrationRange(
       db,
       preflightClaim(before, "ordered_through_0016_legacy_29"),
-      successors,
-      options(legacyPrestate, successorReceiptAdditions)
+      options()
     );
     expect(result.finalSchemaFingerprint).toBe(terminalManifest.schemaFingerprint);
     expect(result.finalCounts).toEqual({ table: 93, index: 80, trigger: 76, view: 0 });
+  });
+
+  it.each([
+    ["existing table", `INSERT INTO plays (
+      id, week, play_type, title, book, american_odds, stake_cents, model_edge_pp,
+      estimated_ev_percent, confidence, stats_case, created_by, created_at, updated_at
+    ) VALUES ('unapproved-extra', 1, 'single', 'extra', 'fixture', -110, 2500, 0,
+      0, 'watch', 'extra', 'fixture', '2026-08-28T00:00:00Z', '2026-08-28T00:00:00Z')`],
+    ["new table", `INSERT INTO model_system_alerts (
+      id, type, severity, message, idempotency_key, created_at
+    ) VALUES ('unapproved-extra', 'fixture', 'warning', 'extra', 'extra-key',
+      '2026-08-28T00:00:00Z')`],
+    ["receipt table", `INSERT INTO engine_schema_versions (
+      version, migration_hash, applied_at
+    ) VALUES ('unapproved_extra', 'sha256:extra', '2026-08-28T00:00:00Z')`]
+  ])("rolls back an unapproved additional row in an %s", (_label, injectedSql) => {
+    const db = legacyDatabase();
+    seedLegacyRows(db);
+    const before = evidence(db, "legacy");
+    const beforeState = schemaAndRows(db, "legacy");
+    expect(() => applyQualifiedMigrationRange(
+      db,
+      preflightClaim(before, "ordered_through_0016_legacy_29"),
+      options({
+        afterStatement: ({ migrationPath, statementIndex }) => {
+          if (migrationPath.endsWith("0020_engine_os_plays_reconciliation.sql") &&
+            statementIndex === 21) db.exec(injectedSql);
+        }
+      })
+    )).toThrow(/row preservation|unapproved row|receipt additions/u);
+    expect(schemaAndRows(db, "legacy")).toBe(beforeState);
+    db.close();
   });
 
   it("proves an online backup restores the exact prestate and rejects corrupt backup bytes", async () => {
@@ -338,8 +323,7 @@ describe("OS-01 isolated migration qualification path", () => {
     applyQualifiedMigrationRange(
       db,
       preflightClaim(before, "ordered_through_0016_legacy_29"),
-      successors,
-      options(legacyPrestate, successorReceiptAdditions)
+      options()
     );
     db.close();
 

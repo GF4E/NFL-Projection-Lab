@@ -36,6 +36,58 @@
       "scope": "deterministic_production_shaped_fixture_not_a_substitute_for_the_live_census"
     }
   ],
+  "authorizedRanges": [
+    {
+      "prestateId": "blank_ordered_chain",
+      "migrationPaths": [
+        "drizzle/0000_keen_red_shift.sql",
+        "drizzle/0001_parched_hedge_knight.sql",
+        "drizzle/0002_watery_patriot.sql",
+        "drizzle/0003_hesitant_bloodstorm.sql",
+        "drizzle/0004_player_prop_decision_board.sql",
+        "drizzle/0005_structured_contract_settlement.sql",
+        "drizzle/0006_execution_tracking.sql",
+        "drizzle/0008_play_forecast_provenance.sql",
+        "drizzle/0009_market_sentiment.sql",
+        "drizzle/0010_confidence_engine.sql",
+        "drizzle/0011_model_gate_evidence.sql",
+        "drizzle/0012_source_snapshot_timing.sql",
+        "drizzle/0013_engine_os_urgent.sql",
+        "drizzle/0014_odds_quota_reservations.sql",
+        "drizzle/0015_engine_os_origin_identity.sql",
+        "drizzle/0016_engine_os_interim_scheduler.sql",
+        "drizzle/0017_engine_os_source_capture.sql",
+        "drizzle/0018_engine_os_forecast_ledger.sql",
+        "drizzle/0019_engine_os_schema_closure.sql",
+        "drizzle/0020_engine_os_plays_reconciliation.sql"
+      ],
+      "receiptAdditions": [
+        { "version": "0013_engine_os_urgent", "migrationHash": "sha256:6205a3dfe09c2d663bb8c50378f295accd266ff2b2018668ca5353436a6797bb" },
+        { "version": "0014_odds_quota_reservations", "migrationHash": "sha256:91bc1571f8873ccaeb8a2b8a9a8c2425370b4eec3c0931f1fa3ae02ffae56da1" },
+        { "version": "0015_engine_os_origin_identity", "migrationHash": "sha256:622fb472f959273563f3dd139b7dde676e27b370a52c0241d6ee4d3726e3444a" },
+        { "version": "0016_engine_os_interim_scheduler", "migrationHash": "sha256:bad6665a2976440b108e1c0223d01dab3a0313283b8d2e08f0eb509ef57edcb2" },
+        { "version": "0017_engine_os_source_capture", "migrationHash": "sha256:d25f6119f4d0735247489623e5775cb185c866d7a3f1ebbb791c5f5cfaeac0e7" },
+        { "version": "0018_engine_os_forecast_ledger", "migrationHash": "sha256:851f66b3ad07afe61be346b09f853875e675d25512f989b0f4337f6c64a1c293" },
+        { "version": "0019_engine_os_schema_closure", "migrationHash": "sha256:9655dbc30cc725ed1b358cdcac3fcd3a441678e7a3d45bd31fa2c2a3f124b336" },
+        { "version": "0020_engine_os_plays_reconciliation", "migrationHash": "sha256:ad9cdf8d26293ecc3720bb08c8c1bd8a04df14d72159f4a04684b19debc83247" }
+      ]
+    },
+    {
+      "prestateId": "ordered_through_0016_legacy_29",
+      "migrationPaths": [
+        "drizzle/0017_engine_os_source_capture.sql",
+        "drizzle/0018_engine_os_forecast_ledger.sql",
+        "drizzle/0019_engine_os_schema_closure.sql",
+        "drizzle/0020_engine_os_plays_reconciliation.sql"
+      ],
+      "receiptAdditions": [
+        { "version": "0017_engine_os_source_capture", "migrationHash": "sha256:d25f6119f4d0735247489623e5775cb185c866d7a3f1ebbb791c5f5cfaeac0e7" },
+        { "version": "0018_engine_os_forecast_ledger", "migrationHash": "sha256:851f66b3ad07afe61be346b09f853875e675d25512f989b0f4337f6c64a1c293" },
+        { "version": "0019_engine_os_schema_closure", "migrationHash": "sha256:9655dbc30cc725ed1b358cdcac3fcd3a441678e7a3d45bd31fa2c2a3f124b336" },
+        { "version": "0020_engine_os_plays_reconciliation", "migrationHash": "sha256:ad9cdf8d26293ecc3720bb08c8c1bd8a04df14d72159f4a04684b19debc83247" }
+      ]
+    }
+  ],
   "prewriteProtocol": {
     "preflightClaimVersion": "os01.migration-preflight.v1",
     "quiescence": "begin_immediate",
