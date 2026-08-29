@@ -1,0 +1,57 @@
+{
+  "version": "os01-hosted-migration-diagnostic-v6-operator-packaging-rejection.2026.1",
+  "status": "terminally_rejected_no_reusable_qualification_evidence",
+  "scope": "isolated owner-only staging deployment created from the application archive instead of the no-migration diagnostic archive",
+  "target": {
+    "projectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+    "production": false,
+    "ownerOnly": true,
+    "bindings": ["DB"]
+  },
+  "source": {
+    "commit": "515e8fd4492c219d34bc7b2e3ce7720d45e8afe9",
+    "tree": "dd353eac84325c891d8f83bfd5f809c41d1bc758"
+  },
+  "incorrectArchive": {
+    "localTarGzSha256": "ccf5da5a3d81908f66c371534cc3e3cd0bbcd945a494eefe2266ace95845d1e9",
+    "localTarGzBytes": 6522809,
+    "includedApplicationDrizzleDirectory": true
+  },
+  "savedVersion": {
+    "versionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_6d96da42bd208191a426fba05359aa0f",
+    "versionNumber": 9,
+    "storedArchiveContentHash": "sha256:cf96236119e3d6962edb183eecb6e8bae8002546358507786f6095a2cee72ea1",
+    "storedArchiveBytes": 10178560,
+    "storedArchiveFileCount": 395
+  },
+  "deployment": {
+    "deploymentId": "appgdep_6a928af17f9c8191a9c19c541c81cfd9",
+    "status": "failed",
+    "failure": "incomplete input: SQLITE_ERROR",
+    "published": false
+  },
+  "observedPostFailureState": {
+    "userTableCount": 50,
+    "predecessorUserTableCount": 0,
+    "classification": "partial_automatic_migration_side_effect_requires_isolated_staging_recovery",
+    "productionChanged": false
+  },
+  "correctSuccessorArchive": {
+    "localTarGzSha256": "41af49afd6c5a5b8e38152376fba3cc19f7c1ac11f118aec23014aa351eb195a",
+    "workerSha256": "5da69ef6eb613c7457502ca76a527539e5e8c9330f360850a17879e1bfa725a2",
+    "includesDrizzle": false,
+    "runtimeAuthorizedActions": ["blank_prestate_component_probe"]
+  },
+  "providerBoundary": {
+    "providerSecretRead": false,
+    "providerRequest": false,
+    "quotaReservation": false,
+    "captureActivation": false
+  },
+  "nonClaims": [
+    "The failed deployment supplies no hosted diagnostic or migration qualification evidence.",
+    "The resulting 50-table staging state is not a valid blank prestate.",
+    "No production database, production deployment, or production source state changed."
+  ],
+  "recordedAt": "2026-08-29T07:35:08Z"
+}
