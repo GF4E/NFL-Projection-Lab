@@ -60,6 +60,7 @@ function fixture(options: FixtureOptions = {}) {
   const catalogAfter = options.catalogAfter ?? catalogBefore;
   const statements: string[] = [];
   let calls = 0;
+  let batchCalls = 0;
   let catalogReads = 0;
   const db = {
     prepare(sql: string) {
@@ -68,6 +69,7 @@ function fixture(options: FixtureOptions = {}) {
       return { sql };
     },
     async batch(prepared: Array<{ sql: string }>) {
+      batchCalls += 1;
       if (options.failWhen === "catalog") throw new Error("sensitive catalog detail");
       return prepared.map(({ sql }) => {
         if (!sql.includes("FROM sqlite_schema")) throw new Error("unexpected SQL");
@@ -77,7 +79,13 @@ function fixture(options: FixtureOptions = {}) {
       });
     }
   };
-  return { db, catalogBefore, calls: () => calls, statements: () => [...statements] };
+  return {
+    db,
+    catalogBefore,
+    calls: () => calls,
+    batchCalls: () => batchCalls,
+    statements: () => [...statements]
+  };
 }
 
 function options(value: ReturnType<typeof fixture>) {
@@ -114,7 +122,7 @@ function files(root: string, current = root): string[] {
   return result.sort(compare);
 }
 
-describe("OS-01 staging DDL and row census", () => {
+describe("OS-01 staging DDL-only catalog census", () => {
   it("pins semantic v5, the 94-table gate, and the bridged generation-10 authority", () => {
     expect(DEFAULT_STAGING_CENSUS_OPTIONS).toEqual({
       expectedOrigin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
@@ -127,7 +135,7 @@ describe("OS-01 staging DDL and row census", () => {
     expect(STAGING_CENSUS_ID)
       .toBe("525370dfc8d64ef549f8c76186c2846fe97ac5beca48d3671cda25a0a0fa5f74");
     expect(STAGING_CENSUS_CONTROLLER_ID)
-      .toBe("120d38a090ace807c2c220de24424a8adbf3ffe891d02867dedf0b730c1a244f");
+      .toBe("379588dc6e7ed0e7445e2fe78788b3f7143a4947ad524c066191cdd336a002aa");
     expect(STAGING_CENSUS_EXACT_BODY_SHA256)
       .toBe("e946e6493cf8d6e53c8013ca51d27ddc47c9168809eee9684558227eea89f00c");
     expect(hash(STAGING_CENSUS_SEMANTIC_CONTRACT)).toBe(STAGING_CENSUS_ID);
@@ -258,7 +266,10 @@ describe("OS-01 staging DDL and row census", () => {
       semanticQualificationId: STAGING_CENSUS_ID,
       generation: 10,
       predecessorReceiptHash: ninthPredecessorHash,
-      predecessorStatus: "rejected_hosted_row_count_read_failed"
+      predecessorStatus: "rejected_hosted_row_count_read_failed",
+      artifactIdentityPreregistration:
+        "authority_hash_commits_exact_source_commit_tree_worker_manifest_archive_hashes_archive_roots_file_count_archive_bytes_upload_method_and_remote_build_identity_before_any_observation",
+      observationArtifactIdentityPolicy: "pre_and_post_must_match_preregistered_identity_exactly"
     });
     expect(createHash("sha256").update(STAGING_CENSUS_EXACT_BODY).digest("hex"))
       .toBe(STAGING_CENSUS_EXACT_BODY_SHA256);
@@ -307,6 +318,9 @@ describe("OS-01 staging DDL and row census", () => {
     delete body.receiptHash;
     expect(hash(body)).toBe(receiptHash);
     expect(value.calls()).toBe(2);
+    expect(value.batchCalls()).toBe(1);
+    expect(value.statements()).toHaveLength(2);
+    expect(value.statements()[0]).toBe(value.statements()[1]);
   });
 
   it("canonicalizes catalog result order independently of the mock result order", async () => {
@@ -488,6 +502,14 @@ describe("OS-01 staging DDL and row census", () => {
       {
         row: { type: "index", name: "sqlite_autoindex_missing_1", tbl_name: "missing", sql: null },
         category: "user_object_name_binding_invalid"
+      },
+      {
+        row: { type: "index", name: "sqlite_autoindex_wrong_1", tbl_name: "sample", sql: null },
+        category: "derived_autoindex_shape_invalid"
+      },
+      {
+        row: { type: "index", name: "sqlite_autoindex_sample_wrong_1", tbl_name: "sample", sql: null },
+        category: "derived_autoindex_shape_invalid"
       }
     ];
     for (const item of cases) {

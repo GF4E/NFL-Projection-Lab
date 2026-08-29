@@ -35,6 +35,7 @@ import {
 
 const RESPONSE_LIMIT_BYTES = 2 * 1024 * 1024;
 const QUALIFICATION_WINDOW_MILLISECONDS = 30 * 60 * 1000;
+export const STAGING_CENSUS_UPLOAD_METHOD_IDENTITY = "sites_save_site_version_exact_local_archive";
 
 type CensusTransport = (request: Request) => Promise<Response>;
 type ObservationPhase = "pre" | "post";
@@ -57,11 +58,31 @@ export type ControlPlaneObservationInput = {
   workerSha256: string;
   manifestSha256: string;
   archiveSha256: string;
+  archiveFileListRoot: string;
+  archiveContentRoot: string;
+  archiveFileCount: number;
+  archiveBytes: number;
+  uploadMethodIdentity: typeof STAGING_CENSUS_UPLOAD_METHOD_IDENTITY;
+  remoteBuildRequested: false;
   accessRevision: number;
   ownerIdentityHash: string;
   environmentRevision: number;
   environmentKeyNames: string[];
   recordedAt: string;
+};
+
+export type PreregisteredArtifactIdentity = {
+  sourceCommit: string;
+  sourceTree: string;
+  workerSha256: string;
+  manifestSha256: string;
+  archiveSha256: string;
+  archiveFileListRoot: string;
+  archiveContentRoot: string;
+  archiveFileCount: number;
+  archiveBytes: number;
+  uploadMethodIdentity: typeof STAGING_CENSUS_UPLOAD_METHOD_IDENTITY;
+  remoteBuildRequested: false;
 };
 
 export type ControlPlaneObservationWriteResult = {
@@ -86,6 +107,7 @@ export type CensusControllerResult = {
   authorityBytesSha256: string;
   authorityRootIdentitySha256: string;
   authorityFileIdentitySha256: string;
+  preregisteredArtifactIdentityHash: string;
   preObservationBytesSha256: string;
   requestBodySha256: string;
   responseBytesSha256: string | null;
@@ -324,14 +346,60 @@ function timestampMilliseconds(value: unknown): number | null {
   return milliseconds;
 }
 
+function validatePreregisteredArtifactIdentity(
+  value: unknown
+): value is PreregisteredArtifactIdentity {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const identity = value as Record<string, unknown>;
+  return hasExactKeys(identity, [
+    "archiveBytes", "archiveContentRoot", "archiveFileCount", "archiveFileListRoot", "archiveSha256",
+    "manifestSha256", "remoteBuildRequested", "sourceCommit", "sourceTree", "uploadMethodIdentity",
+    "workerSha256"
+  ]) && validHex(identity.sourceCommit, 40) && validHex(identity.sourceTree, 40) &&
+    validHex(identity.workerSha256) && validHex(identity.manifestSha256) &&
+    validHex(identity.archiveSha256) && validHex(identity.archiveFileListRoot) &&
+    validHex(identity.archiveContentRoot) && Number.isSafeInteger(identity.archiveFileCount) &&
+    (identity.archiveFileCount as number) >= 1 &&
+    Number.isSafeInteger(identity.archiveBytes) && (identity.archiveBytes as number) >= 1 &&
+    identity.uploadMethodIdentity === STAGING_CENSUS_UPLOAD_METHOD_IDENTITY &&
+    identity.remoteBuildRequested === false;
+}
+
+function parsePreregisteredArtifactIdentity(
+  bytes: Uint8Array | string
+): PreregisteredArtifactIdentity {
+  const encoded = typeof bytes === "string" ? Buffer.from(bytes, "utf8") : bytes;
+  if (encoded.byteLength === 0 || encoded.byteLength > 16 * 1024) {
+    throw new Error("preregistered artifact identity must be between 1 byte and 16 KiB");
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(Buffer.from(encoded).toString("utf8"));
+  } catch {
+    throw new Error("preregistered artifact identity is not valid JSON");
+  }
+  if (!validatePreregisteredArtifactIdentity(parsed)) {
+    throw new Error("preregistered artifact identity does not match the closed schema");
+  }
+  return parsed;
+}
+
+function artifactIdentityHash(identity: PreregisteredArtifactIdentity): string {
+  return sha256(canonicalJson(identity));
+}
+
 function createAuthorityRecord(
   root: string,
   qualificationEligible: boolean,
+  expectedArtifactIdentity: PreregisteredArtifactIdentity,
   initializedAt: string
 ): Record<string, unknown> {
   if (timestampMilliseconds(initializedAt) === null) throw new Error("authority timestamp is not canonical UTC");
+  if (!validatePreregisteredArtifactIdentity(expectedArtifactIdentity)) {
+    throw new Error("controller artifact identity preregistration is invalid");
+  }
   const body = {
-    version: "engine-os.os01-staging-census-controller-authority.v1",
+    version: "engine-os.os01-staging-census-controller-authority.v2",
     status: "initialized_no_dispatch",
     qualificationId: STAGING_CENSUS_ID,
     controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
@@ -342,6 +410,8 @@ function createAuthorityRecord(
     retryAfterAnyIntentOrOutputArtifact: false,
     maximumQualificationWindowMilliseconds: QUALIFICATION_WINDOW_MILLISECONDS,
     exclusiveHostAssumption: "single_owner_no_concurrent_writer_during_controller_window",
+    expectedArtifactIdentity: { ...expectedArtifactIdentity },
+    preregisteredArtifactIdentityHash: artifactIdentityHash(expectedArtifactIdentity),
     initializedAt
   };
   return hashedBody(body, "authorityHash");
@@ -356,13 +426,16 @@ function validateAuthority(
   const authority = value as Record<string, unknown>;
   if (!hasExactKeys(authority, [
     "authorityHash", "canonicalRoot", "controllerAuthorityId", "exclusiveHostAssumption", "initializedAt",
-    "maximumQualificationWindowMilliseconds", "origin", "projectId", "qualificationEligible",
+    "expectedArtifactIdentity", "maximumQualificationWindowMilliseconds", "preregisteredArtifactIdentityHash",
+    "origin", "projectId", "qualificationEligible",
     "qualificationId", "retryAfterAnyIntentOrOutputArtifact", "status", "version"
-  ]) || !validHex(authority.authorityHash)) return false;
+  ]) || !validHex(authority.authorityHash) ||
+      !validatePreregisteredArtifactIdentity(authority.expectedArtifactIdentity) ||
+      !validHex(authority.preregisteredArtifactIdentityHash)) return false;
   const body = { ...authority };
   delete body.authorityHash;
   return sha256(canonicalJson(body)) === authority.authorityHash &&
-    authority.version === "engine-os.os01-staging-census-controller-authority.v1" &&
+    authority.version === "engine-os.os01-staging-census-controller-authority.v2" &&
     authority.status === "initialized_no_dispatch" && authority.qualificationId === STAGING_CENSUS_ID &&
     authority.controllerAuthorityId === STAGING_CENSUS_CONTROLLER_ID &&
     authority.qualificationEligible === qualificationEligible && authority.canonicalRoot === resolve(root) &&
@@ -371,13 +444,23 @@ function validateAuthority(
     authority.retryAfterAnyIntentOrOutputArtifact === false &&
     authority.maximumQualificationWindowMilliseconds === QUALIFICATION_WINDOW_MILLISECONDS &&
     authority.exclusiveHostAssumption === "single_owner_no_concurrent_writer_during_controller_window" &&
+    authority.preregisteredArtifactIdentityHash ===
+      artifactIdentityHash(authority.expectedArtifactIdentity as PreregisteredArtifactIdentity) &&
     timestampMilliseconds(authority.initializedAt) !== null;
 }
 
-function initializeAuthorityArtifact(root: string, qualificationEligible: boolean, now: () => Date): void {
+function initializeAuthorityArtifact(
+  root: string,
+  qualificationEligible: boolean,
+  expectedArtifactIdentity: PreregisteredArtifactIdentity,
+  now: () => Date
+): void {
   const paths = artifactPaths(root);
   const recordedAt = now().toISOString();
-  durableExclusiveJson(paths.authority, createAuthorityRecord(root, qualificationEligible, recordedAt));
+  durableExclusiveJson(
+    paths.authority,
+    createAuthorityRecord(root, qualificationEligible, expectedArtifactIdentity, recordedAt)
+  );
 }
 
 function parseControlPlaneObservationInput(
@@ -399,15 +482,20 @@ function parseControlPlaneObservationInput(
   }
   const value = parsed as Record<string, unknown>;
   if (!hasExactKeys(value, [
-    "accessRevision", "archiveSha256", "deploymentId", "deploymentStatus", "deploymentUrl",
-    "environmentKeyNames", "environmentRevision", "manifestSha256", "ownerIdentityHash", "phase",
-    "recordedAt", "sourceCommit", "sourceTree", "versionId", "versionNumber", "workerSha256"
+    "accessRevision", "archiveBytes", "archiveContentRoot", "archiveFileCount", "archiveFileListRoot", "archiveSha256",
+    "deploymentId", "deploymentStatus", "deploymentUrl", "environmentKeyNames", "environmentRevision",
+    "manifestSha256", "ownerIdentityHash", "phase", "recordedAt", "remoteBuildRequested", "sourceCommit",
+    "sourceTree", "uploadMethodIdentity", "versionId", "versionNumber", "workerSha256"
   ]) || value.phase !== requiredPhase || typeof value.sourceCommit !== "string" ||
       typeof value.sourceTree !== "string" || typeof value.versionId !== "string" ||
       !Number.isSafeInteger(value.versionNumber) || typeof value.deploymentId !== "string" ||
       value.deploymentStatus !== "succeeded" || typeof value.deploymentUrl !== "string" ||
       typeof value.workerSha256 !== "string" || typeof value.manifestSha256 !== "string" ||
-      typeof value.archiveSha256 !== "string" || !Number.isSafeInteger(value.accessRevision) ||
+      typeof value.archiveSha256 !== "string" || typeof value.archiveFileListRoot !== "string" ||
+      typeof value.archiveContentRoot !== "string" || !Number.isSafeInteger(value.archiveFileCount) ||
+      !Number.isSafeInteger(value.archiveBytes) || value.remoteBuildRequested !== false ||
+      value.uploadMethodIdentity !== STAGING_CENSUS_UPLOAD_METHOD_IDENTITY ||
+      !Number.isSafeInteger(value.accessRevision) ||
       typeof value.ownerIdentityHash !== "string" || !Number.isSafeInteger(value.environmentRevision) ||
       !Array.isArray(value.environmentKeyNames) ||
       value.environmentKeyNames.some((key) => typeof key !== "string") ||
@@ -445,6 +533,12 @@ export function createOs01StagingCensusControlPlaneObservation(
       workerSha256: input.workerSha256,
       manifestSha256: input.manifestSha256,
       archiveSha256: input.archiveSha256,
+      archiveFileListRoot: input.archiveFileListRoot,
+      archiveContentRoot: input.archiveContentRoot,
+      archiveFileCount: input.archiveFileCount,
+      archiveBytes: input.archiveBytes,
+      uploadMethodIdentity: input.uploadMethodIdentity,
+      remoteBuildRequested: input.remoteBuildRequested,
       censusRoute: STAGING_CENSUS_SEMANTIC_CONTRACT.route,
       mutationRoutes: 0
     },
@@ -526,9 +620,19 @@ function validateObservation(value: unknown, phase: ObservationPhase): value is 
         .test(deploymentRow.versionId) ||
       !Number.isSafeInteger(deploymentRow.versionNumber) ||
       (deploymentRow.versionNumber as number) < 1 ||
-      !hasExactKeys(packageRow, ["archiveSha256", "censusRoute", "manifestSha256", "mutationRoutes", "workerSha256"]) ||
+      !hasExactKeys(packageRow, [
+        "archiveBytes", "archiveContentRoot", "archiveFileCount", "archiveFileListRoot", "archiveSha256",
+        "censusRoute", "manifestSha256", "mutationRoutes", "remoteBuildRequested", "uploadMethodIdentity",
+        "workerSha256"
+      ]) ||
       !validHex(packageRow.archiveSha256) || !validHex(packageRow.manifestSha256) ||
-      !validHex(packageRow.workerSha256) || packageRow.censusRoute !== STAGING_CENSUS_SEMANTIC_CONTRACT.route ||
+      !validHex(packageRow.workerSha256) || !validHex(packageRow.archiveFileListRoot) ||
+      !validHex(packageRow.archiveContentRoot) || !Number.isSafeInteger(packageRow.archiveFileCount) ||
+      (packageRow.archiveFileCount as number) < 1 ||
+      !Number.isSafeInteger(packageRow.archiveBytes) || (packageRow.archiveBytes as number) < 1 ||
+      packageRow.uploadMethodIdentity !== STAGING_CENSUS_UPLOAD_METHOD_IDENTITY ||
+      packageRow.remoteBuildRequested !== false ||
+      packageRow.censusRoute !== STAGING_CENSUS_SEMANTIC_CONTRACT.route ||
       packageRow.mutationRoutes !== 0 ||
       !hasExactKeys(accessRow, [
         "currentUserRole", "editorCount", "externalVisitorCount", "groupCount", "mode", "ownerCount",
@@ -552,6 +656,28 @@ function validateObservation(value: unknown, phase: ObservationPhase): value is 
     return false;
   }
   return true;
+}
+
+function observationMatchesPreregisteredArtifactIdentity(
+  observation: Record<string, unknown>,
+  expected: PreregisteredArtifactIdentity
+): boolean {
+  const source = observation.source;
+  const pkg = observation.package;
+  if (!source || typeof source !== "object" || Array.isArray(source) ||
+      !pkg || typeof pkg !== "object" || Array.isArray(pkg)) return false;
+  const sourceRow = source as Record<string, unknown>;
+  const packageRow = pkg as Record<string, unknown>;
+  return sourceRow.commit === expected.sourceCommit && sourceRow.tree === expected.sourceTree &&
+    packageRow.workerSha256 === expected.workerSha256 &&
+    packageRow.manifestSha256 === expected.manifestSha256 &&
+    packageRow.archiveSha256 === expected.archiveSha256 &&
+    packageRow.archiveFileListRoot === expected.archiveFileListRoot &&
+    packageRow.archiveContentRoot === expected.archiveContentRoot &&
+    packageRow.archiveFileCount === expected.archiveFileCount &&
+    packageRow.archiveBytes === expected.archiveBytes &&
+    packageRow.uploadMethodIdentity === expected.uploadMethodIdentity &&
+    packageRow.remoteBuildRequested === expected.remoteBuildRequested;
 }
 
 function observationIdentity(value: Record<string, unknown>): string {
@@ -590,6 +716,10 @@ function writeControlPlaneObservationCore(
   const observation = createOs01StagingCensusControlPlaneObservation(input);
   if (!validateObservation(observation, input.phase)) {
     throw new Error("control-plane observation input failed semantic validation");
+  }
+  const expectedArtifactIdentity = authority.expectedArtifactIdentity as PreregisteredArtifactIdentity;
+  if (!observationMatchesPreregisteredArtifactIdentity(observation, expectedArtifactIdentity)) {
+    throw new Error("control-plane observation does not match the preregistered artifact identity");
   }
   if (input.phase === "post") {
     const preArtifact = readPrivateArtifact(paths.preObservation);
@@ -697,8 +827,13 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
       sha256(canonicalJson(catalog)) !== receipt.catalogHash) return false;
   const isInternalCatalogRow = (row: { type: string; name: string; tbl_name: string }) =>
     row.type === "table" && row.name === row.tbl_name && internalNames.has(row.name);
-  const isDerivedCatalogAutoIndex = (row: { type: string; name: string; sql: string | null }) =>
-    row.type === "index" && row.sql === null && /^sqlite_autoindex_[A-Za-z0-9_]+_[0-9]+$/u.test(row.name);
+  const isDerivedCatalogAutoIndex = (row: {
+    type: string; name: string; tbl_name: string; sql: string | null;
+  }) => {
+    const prefix = `sqlite_autoindex_${row.tbl_name}_`;
+    return row.type === "index" && row.sql === null && row.name.startsWith(prefix) &&
+      /^[0-9]+$/u.test(row.name.slice(prefix.length));
+  };
   if (catalog.some((row) => !isInternalCatalogRow(row) &&
     ((row.name.startsWith("sqlite_") && !row.name.startsWith("sqlite_autoindex_")) ||
       row.tbl_name.startsWith("sqlite_")))) {
@@ -748,11 +883,15 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
   for (const value of receipt.derivedAutoIndexes) {
     if (!value || typeof value !== "object" || Array.isArray(value)) return false;
     const autoIndex = value as Record<string, unknown>;
+    const autoIndexPrefix = typeof autoIndex.tblName === "string"
+      ? `sqlite_autoindex_${autoIndex.tblName}_`
+      : "";
     if (!hasExactKeys(autoIndex, ["createSql", "createSqlHash", "name", "tblName", "type"]) ||
         autoIndex.type !== "index" || autoIndex.createSql !== null ||
         autoIndex.createSqlHash !== sha256("") || typeof autoIndex.name !== "string" ||
-        !/^sqlite_autoindex_[A-Za-z0-9_]+_[0-9]+$/u.test(autoIndex.name) ||
-        typeof autoIndex.tblName !== "string" || !tableNameSet.has(autoIndex.tblName)) return false;
+        typeof autoIndex.tblName !== "string" || !tableNameSet.has(autoIndex.tblName) ||
+        !autoIndex.name.startsWith(autoIndexPrefix) ||
+        !/^[0-9]+$/u.test(autoIndex.name.slice(autoIndexPrefix.length))) return false;
     autoIndexes.push({
       type: "index",
       name: autoIndex.name,
@@ -886,20 +1025,45 @@ function validateCountDiagnosticResponse(bytes: Uint8Array): boolean {
     receipt.claimBoundary === "terminal_read_only_count_diagnostic_not_census_receipt";
 }
 
+function credentialReflectionVariants(token: string): Set<string> {
+  const variants = [
+    token,
+    "Bearer " + token,
+    Buffer.from(token, "utf8").toString("base64"),
+    encodeURIComponent(token)
+  ];
+  return new Set([...variants, ...variants.map((value) => value.toLowerCase())]);
+}
+
+function containsCredentialReflection(value: string, variants: Set<string>): boolean {
+  return [...variants].some((variant) => variant.length > 0 && value.includes(variant));
+}
+
+function credentialHeaderReflectionScan(headers: Headers, token: string): {
+  complete: boolean;
+  reflected: boolean;
+} {
+  const variants = credentialReflectionVariants(token);
+  let count = 0;
+  let bytes = 0;
+  for (const [name, value] of headers) {
+    count += 1;
+    bytes += Buffer.byteLength(name, "utf8") + Buffer.byteLength(value, "utf8");
+    if (count > 1_000 || bytes > 256 * 1024) return { complete: false, reflected: false };
+    if (containsCredentialReflection(name, variants) || containsCredentialReflection(value, variants)) {
+      return { complete: true, reflected: true };
+    }
+  }
+  return { complete: true, reflected: false };
+}
+
 function credentialReflectionScan(bytes: Uint8Array, token: string): {
   complete: boolean;
   reflected: boolean;
 } {
   const text = new TextDecoder().decode(bytes);
-  const variants = new Set([
-    token,
-    "Bearer " + token,
-    Buffer.from(token, "utf8").toString("base64"),
-    encodeURIComponent(token)
-  ]);
-  const containsVariant = (value: string) => [...variants]
-    .some((variant) => variant.length > 0 && value.includes(variant));
-  if (containsVariant(text)) return { complete: true, reflected: true };
+  const variants = credentialReflectionVariants(token);
+  if (containsCredentialReflection(text, variants)) return { complete: true, reflected: true };
   let parsed: unknown;
   try {
     parsed = JSON.parse(text);
@@ -913,7 +1077,7 @@ function credentialReflectionScan(bytes: Uint8Array, token: string): {
     visited += 1;
     if (visited > 100_000 || current.depth > 128) return { complete: false, reflected: false };
     if (typeof current.value === "string") {
-      if (containsVariant(current.value)) return { complete: true, reflected: true };
+      if (containsCredentialReflection(current.value, variants)) return { complete: true, reflected: true };
       continue;
     }
     if (!current.value || typeof current.value !== "object") continue;
@@ -922,6 +1086,7 @@ function credentialReflectionScan(bytes: Uint8Array, token: string): {
       continue;
     }
     for (const [key, value] of Object.entries(current.value as Record<string, unknown>)) {
+      if (containsCredentialReflection(key, variants)) return { complete: true, reflected: true };
       pending.push({ depth: current.depth + 1, value: key });
       pending.push({ depth: current.depth + 1, value });
     }
@@ -966,6 +1131,7 @@ function resultWithHash(
 function createDispatchCompletion(input: {
   qualificationEligible: boolean;
   attemptId: string;
+  preregisteredArtifactIdentityHash: string;
   intentBytesSha256: string;
   responseBytesSha256: string;
   resultBytesSha256: string;
@@ -978,6 +1144,7 @@ function createDispatchCompletion(input: {
     controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
     qualificationEligible: input.qualificationEligible,
     attemptId: input.attemptId,
+    preregisteredArtifactIdentityHash: input.preregisteredArtifactIdentityHash,
     intentBytesSha256: input.intentBytesSha256,
     responseBytesSha256: input.responseBytesSha256,
     resultBytesSha256: input.resultBytesSha256,
@@ -994,7 +1161,8 @@ function validateDispatchCompletion(
   const completion = parseHashedRecord(bytes, "completionHash");
   if (!completion || !hasExactKeys(completion, [
     "attemptId", "completionHash", "controllerAuthorityId", "intentBytesSha256", "qualificationEligible", "qualificationId",
-    "recordedAt", "responseBytesSha256", "resultBytesSha256", "retryAllowed", "status", "version"
+    "preregisteredArtifactIdentityHash", "recordedAt", "responseBytesSha256", "resultBytesSha256", "retryAllowed",
+    "status", "version"
   ])) return null;
   return completion.version === "engine-os.os01-staging-census-dispatch-completion.v1" &&
     completion.status === "sealed_after_authority_verification" &&
@@ -1002,7 +1170,8 @@ function validateDispatchCompletion(
     completion.controllerAuthorityId === STAGING_CENSUS_CONTROLLER_ID &&
     completion.qualificationEligible === qualificationEligible && typeof completion.attemptId === "string" &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(completion.attemptId) &&
-    validHex(completion.intentBytesSha256) && validHex(completion.responseBytesSha256) &&
+    validHex(completion.preregisteredArtifactIdentityHash) && validHex(completion.intentBytesSha256) &&
+    validHex(completion.responseBytesSha256) &&
     validHex(completion.resultBytesSha256) && completion.retryAllowed === false &&
     timestampMilliseconds(completion.recordedAt) !== null ? completion : null;
 }
@@ -1080,7 +1249,12 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
   }
   const preArtifact = readPrivateArtifact(paths.preObservation);
   const pre = parseJson(preArtifact.bytes, "control-plane pre-observation");
-  if (!validateObservation(pre, "pre")) throw new Error("control-plane pre-observation is invalid");
+  if (!validateObservation(pre, "pre") || !observationMatchesPreregisteredArtifactIdentity(
+    pre,
+    authority.expectedArtifactIdentity as PreregisteredArtifactIdentity
+  )) {
+    throw new Error("control-plane pre-observation is invalid or not preregistered");
+  }
   if ([
     paths.intent, paths.response, paths.attemptResult, paths.dispatchCompletion, paths.terminalFence,
     paths.postObservation, paths.finalizationIntent, paths.finalReceipt
@@ -1112,6 +1286,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
     authorityBytesSha256: sha256(authorityArtifact.bytes),
     authorityRootIdentitySha256: rootIdentitySha256(rootBefore),
     authorityFileIdentitySha256: fileIdentitySha256(authorityArtifact.identity),
+    preregisteredArtifactIdentityHash: String(authority.preregisteredArtifactIdentityHash),
     projectId: STAGING_CENSUS_SEMANTIC_CONTRACT.projectId,
     origin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
     method: STAGING_CENSUS_SEMANTIC_CONTRACT.method,
@@ -1187,10 +1362,62 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         authorityBytesSha256: sha256(authorityArtifact.bytes),
         authorityRootIdentitySha256: rootIdentitySha256(rootBefore),
         authorityFileIdentitySha256: fileIdentitySha256(authorityArtifact.identity),
+        preregisteredArtifactIdentityHash: String(authority.preregisteredArtifactIdentityHash),
         preObservationBytesSha256: sha256(preArtifact.bytes),
         requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
         responseBytesSha256: null,
         httpStatus: null,
+        retryAllowed: false,
+        controllerDatabaseMutationAttempted: false,
+        oddsProviderPathInvoked: false,
+        quotaPathInvoked: false,
+        controlPlanePostcheckRequired: true,
+        recordedAt: input.now().toISOString()
+      });
+      const terminalBytes = new TextEncoder().encode(JSON.stringify(terminal, null, 2) + "\n");
+      writeDescriptor(resultReserved.descriptor, terminalBytes);
+      syncDirectory(paths.root);
+      verifyRunAuthority({
+        paths,
+        rootBefore,
+        authority: authorityArtifact,
+        pre: preArtifact,
+        intentReserved,
+        intentBytes,
+        responseReserved,
+        responseHash: sha256(new Uint8Array()),
+        responseSize: 0,
+        resultReserved,
+        resultHash: sha256(terminalBytes),
+        resultSize: terminalBytes.byteLength,
+        completionReserved,
+        completionHash: sha256(new Uint8Array()),
+        completionSize: 0
+      });
+      return terminal;
+    }
+    const headerReflectionScan = credentialHeaderReflectionScan(response.headers, input.authorizationToken);
+    if (!headerReflectionScan.complete || headerReflectionScan.reflected) {
+      try {
+        await response.body?.cancel();
+      } catch {
+        // Header evidence already makes the response terminal and nonpersistable.
+      }
+      const terminal = resultWithHash({
+        version: "engine-os.os01-staging-census-controller-result.v2",
+        status: headerReflectionScan.reflected ? "terminal_credential_reflection" : "terminal_invalid_response",
+        qualificationId: STAGING_CENSUS_ID,
+        qualificationEligible: input.qualificationEligible,
+        attemptId,
+        controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
+        authorityBytesSha256: sha256(authorityArtifact.bytes),
+        authorityRootIdentitySha256: rootIdentitySha256(rootBefore),
+        authorityFileIdentitySha256: fileIdentitySha256(authorityArtifact.identity),
+        preregisteredArtifactIdentityHash: String(authority.preregisteredArtifactIdentityHash),
+        preObservationBytesSha256: sha256(preArtifact.bytes),
+        requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
+        responseBytesSha256: null,
+        httpStatus: response.status,
         retryAllowed: false,
         controllerDatabaseMutationAttempted: false,
         oddsProviderPathInvoked: false,
@@ -1234,6 +1461,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         authorityBytesSha256: sha256(authorityArtifact.bytes),
         authorityRootIdentitySha256: rootIdentitySha256(rootBefore),
         authorityFileIdentitySha256: fileIdentitySha256(authorityArtifact.identity),
+        preregisteredArtifactIdentityHash: String(authority.preregisteredArtifactIdentityHash),
         preObservationBytesSha256: sha256(preArtifact.bytes),
         requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
         responseBytesSha256: null,
@@ -1307,6 +1535,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
       authorityBytesSha256: sha256(authorityArtifact.bytes),
       authorityRootIdentitySha256: rootIdentitySha256(rootBefore),
       authorityFileIdentitySha256: fileIdentitySha256(authorityArtifact.identity),
+      preregisteredArtifactIdentityHash: String(authority.preregisteredArtifactIdentityHash),
       preObservationBytesSha256: sha256(preArtifact.bytes),
       requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
       responseBytesSha256: responseHash,
@@ -1342,6 +1571,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
     const completion = createDispatchCompletion({
       qualificationEligible: input.qualificationEligible,
       attemptId,
+      preregisteredArtifactIdentityHash: String(authority.preregisteredArtifactIdentityHash),
       intentBytesSha256: sha256(intentBytes),
       responseBytesSha256: responseHash,
       resultBytesSha256: sha256(resultBytes),
@@ -1380,6 +1610,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         authorityBytesSha256: sha256(authorityArtifact.bytes),
         authorityRootIdentitySha256: rootIdentitySha256(rootBefore),
         authorityFileIdentitySha256: fileIdentitySha256(authorityArtifact.identity),
+        preregisteredArtifactIdentityHash: String(authority.preregisteredArtifactIdentityHash),
         preObservationBytesSha256: sha256(preArtifact.bytes),
         requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
         responseBytesSha256: null,
@@ -1462,7 +1693,7 @@ function validateIntentRecord(
     "attemptId", "authorityBytesSha256", "authorityFileIdentitySha256", "authorityRootIdentitySha256",
     "contentType", "controlPlanePostcheckRequired", "controllerAuthorityId", "credentialKind",
     "exclusiveHostAssumption", "intentHash", "method", "origin", "preObservationBytesSha256",
-    "projectId", "qualificationEligible", "qualificationId", "recordedAt", "requestBodySha256",
+    "preregisteredArtifactIdentityHash", "projectId", "qualificationEligible", "qualificationId", "recordedAt", "requestBodySha256",
     "retryAllowedAfterReservation", "route", "status", "version"
   ])) return null;
   return intent.version === "engine-os.os01-staging-census-controller-intent.v2" &&
@@ -1471,7 +1702,7 @@ function validateIntentRecord(
     intent.qualificationEligible === qualificationEligible && typeof intent.attemptId === "string" &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(intent.attemptId) &&
     validHex(intent.authorityBytesSha256) && validHex(intent.authorityRootIdentitySha256) &&
-    validHex(intent.authorityFileIdentitySha256) &&
+    validHex(intent.authorityFileIdentitySha256) && validHex(intent.preregisteredArtifactIdentityHash) &&
     intent.projectId === STAGING_CENSUS_SEMANTIC_CONTRACT.projectId &&
     intent.origin === STAGING_CENSUS_SEMANTIC_CONTRACT.origin &&
     intent.method === STAGING_CENSUS_SEMANTIC_CONTRACT.method &&
@@ -1493,7 +1724,8 @@ function validateResultRecord(
   if (!result || !hasExactKeys(result, [
     "attemptId", "authorityBytesSha256", "authorityFileIdentitySha256", "authorityRootIdentitySha256",
     "controlPlanePostcheckRequired", "controllerAuthorityId", "controllerDatabaseMutationAttempted", "httpStatus",
-    "oddsProviderPathInvoked", "preObservationBytesSha256", "qualificationEligible", "qualificationId",
+    "oddsProviderPathInvoked", "preObservationBytesSha256", "preregisteredArtifactIdentityHash",
+    "qualificationEligible", "qualificationId",
     "quotaPathInvoked", "recordedAt", "requestBodySha256", "responseBytesSha256", "resultHash",
     "retryAllowed", "status", "version"
   ])) return null;
@@ -1507,7 +1739,7 @@ function validateResultRecord(
     result.qualificationEligible === qualificationEligible && typeof result.attemptId === "string" &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(result.attemptId) &&
     validHex(result.authorityBytesSha256) && validHex(result.authorityRootIdentitySha256) &&
-    validHex(result.authorityFileIdentitySha256) &&
+    validHex(result.authorityFileIdentitySha256) && validHex(result.preregisteredArtifactIdentityHash) &&
     validHex(result.preObservationBytesSha256) && result.requestBodySha256 === STAGING_CENSUS_EXACT_BODY_SHA256 &&
     (result.responseBytesSha256 === null || validHex(result.responseBytesSha256)) &&
     (result.httpStatus === null || (Number.isSafeInteger(result.httpStatus) &&
@@ -1528,6 +1760,12 @@ function finalizeCore(
   if (existsSync(paths.finalizationIntent) || existsSync(paths.finalReceipt)) {
     throw new Error("staging census finalization authority already consumed");
   }
+  const authorityArtifact = readPrivateArtifact(paths.authority);
+  const authority = parseJson(authorityArtifact.bytes, "controller authority");
+  if (!validateAuthority(authority, root, qualificationEligible)) {
+    throw new Error("staging census finalization authority is invalid");
+  }
+  const preregisteredArtifactIdentityHash = String(authority.preregisteredArtifactIdentityHash);
   const finalizationRecordedAt = now().toISOString();
   const finalizationBody = {
     version: "engine-os.os01-staging-census-finalization-intent.v1",
@@ -1536,6 +1774,7 @@ function finalizeCore(
     controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
     qualificationEligible,
     canonicalRoot: resolve(root),
+    preregisteredArtifactIdentityHash,
     retryAllowed: false,
     recordedAt: finalizationRecordedAt
   };
@@ -1549,14 +1788,12 @@ function finalizeCore(
   if (existsSync(paths.terminalFence)) {
     throw new Error("staging census dispatch is terminally fenced");
   }
-  const authorityArtifact = readPrivateArtifact(paths.authority);
   const preArtifact = readPrivateArtifact(paths.preObservation);
   const postArtifact = readPrivateArtifact(paths.postObservation);
   const intentArtifact = readPrivateArtifact(paths.intent);
   const responseArtifact = readPrivateArtifact(paths.response);
   const resultArtifact = readPrivateArtifact(paths.attemptResult);
   const completionArtifact = readPrivateArtifact(paths.dispatchCompletion);
-  const authority = parseJson(authorityArtifact.bytes, "controller authority");
   const pre = parseJson(preArtifact.bytes, "control-plane pre-observation");
   const post = parseJson(postArtifact.bytes, "control-plane post-observation");
   const intent = validateIntentRecord(intentArtifact.bytes, qualificationEligible);
@@ -1567,6 +1804,10 @@ function finalizeCore(
       !completion) {
     throw new Error("staging census finalization evidence is invalid");
   }
+  const expectedArtifactIdentity = authority.expectedArtifactIdentity as PreregisteredArtifactIdentity;
+  const observationsMatchPreregisteredArtifactIdentity =
+    observationMatchesPreregisteredArtifactIdentity(pre, expectedArtifactIdentity) &&
+    observationMatchesPreregisteredArtifactIdentity(post, expectedArtifactIdentity);
   const identitiesMatch = observationIdentity(pre) === observationIdentity(post);
   const finalRecordedAt = finalizationRecordedAt;
   const authorityMilliseconds = timestampMilliseconds(authority.initializedAt);
@@ -1607,9 +1848,14 @@ function finalizeCore(
     completion.intentBytesSha256 === sha256(intentArtifact.bytes) &&
     completion.responseBytesSha256 === responseHash &&
     completion.resultBytesSha256 === sha256(resultArtifact.bytes) && completion.retryAllowed === false;
+  const artifactIdentityBindingVerified = observationsMatchPreregisteredArtifactIdentity &&
+    intent.preregisteredArtifactIdentityHash === preregisteredArtifactIdentityHash &&
+    result.preregisteredArtifactIdentityHash === preregisteredArtifactIdentityHash &&
+    completion.preregisteredArtifactIdentityHash === preregisteredArtifactIdentityHash &&
+    finalizationIntent.preregisteredArtifactIdentityHash === preregisteredArtifactIdentityHash;
   const workerReceiptVerified = validateResponse(responseArtifact.bytes, responseIdentity);
-  const evidenceValid = identitiesMatch && temporalOrderValid && crossRecordBindingsVerified &&
-    workerReceiptVerified;
+  const evidenceValid = identitiesMatch && artifactIdentityBindingVerified && temporalOrderValid &&
+    crossRecordBindingsVerified && workerReceiptVerified;
   const accepted = qualificationEligible && evidenceValid;
   const body = {
     version: STAGING_CENSUS_SEMANTIC_CONTRACT.finalReceiptVersion,
@@ -1620,6 +1866,8 @@ function finalizeCore(
     controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
     qualificationEligible,
     authorityVerified: authorityBindingVerified,
+    artifactIdentityBindingVerified,
+    preregisteredArtifactIdentityHash,
     identitiesMatch,
     temporalOrderValid,
     crossRecordBindingsVerified,
@@ -1669,12 +1917,22 @@ function finalizeCore(
   return receipt;
 }
 
-export function initializeOs01StagingCensusControllerAuthority(): string {
+export function initializeOs01StagingCensusControllerAuthority(
+  expectedArtifactIdentity: PreregisteredArtifactIdentity
+): string {
+  if (!validatePreregisteredArtifactIdentity(expectedArtifactIdentity)) {
+    throw new Error("controller artifact identity preregistration is invalid");
+  }
   if (existsSync(STAGING_CENSUS_CONTROLLER_ROOT)) throw new Error("canonical census controller root already exists");
   mkdirSync(STAGING_CENSUS_CONTROLLER_ROOT, { mode: 0o700 });
   rootIdentity(STAGING_CENSUS_CONTROLLER_ROOT);
   syncDirectory(dirname(STAGING_CENSUS_CONTROLLER_ROOT));
-  initializeAuthorityArtifact(STAGING_CENSUS_CONTROLLER_ROOT, true, () => new Date());
+  initializeAuthorityArtifact(
+    STAGING_CENSUS_CONTROLLER_ROOT,
+    true,
+    expectedArtifactIdentity,
+    () => new Date()
+  );
   return STAGING_CENSUS_CONTROLLER_ROOT;
 }
 
@@ -1720,7 +1978,7 @@ export function finalizeOs01StagingCensusController(): Record<string, unknown> {
 }
 
 type ControllerCliOperations = {
-  initialize: () => string;
+  initialize: (expectedArtifactIdentity: PreregisteredArtifactIdentity) => string;
   writeObservation: (input: ControlPlaneObservationInput) => ControlPlaneObservationWriteResult;
   run: (input: { authorizationToken: string }) => Promise<CensusControllerResult>;
   finalize: () => Record<string, unknown>;
@@ -1731,7 +1989,10 @@ async function executeControllerCli(
   readStdin: () => Uint8Array | string,
   operations: ControllerCliOperations
 ): Promise<{ stdout: string; exitCode: number }> {
-  if (action === "init") return { stdout: operations.initialize() + "\n", exitCode: 0 };
+  if (action === "init") {
+    const identity = parsePreregisteredArtifactIdentity(readStdin());
+    return { stdout: operations.initialize(identity) + "\n", exitCode: 0 };
+  }
   if (action === "write-pre-observation" || action === "write-post-observation") {
     const phase = action === "write-pre-observation" ? "pre" : "post";
     const input = parseControlPlaneObservationInput(readStdin(), phase);
@@ -1760,9 +2021,16 @@ async function executeControllerCli(
 }
 
 export const os01StagingCensusControllerTestOnly = Object.freeze({
-  initialize(root: string, now: () => Date = () => new Date()): void {
+  initialize(
+    root: string,
+    expectedArtifactIdentity: PreregisteredArtifactIdentity,
+    now: () => Date = () => new Date()
+  ): void {
     rootIdentity(root);
-    initializeAuthorityArtifact(root, false, now);
+    initializeAuthorityArtifact(root, false, expectedArtifactIdentity, now);
+  },
+  parsePreregisteredArtifactIdentity(bytes: Uint8Array | string): PreregisteredArtifactIdentity {
+    return parsePreregisteredArtifactIdentity(bytes);
   },
   parseObservationInput(
     bytes: Uint8Array | string,

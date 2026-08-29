@@ -74,7 +74,9 @@ function isInternal(row: CatalogRow): boolean {
 }
 
 function isDerivedAutoIndex(row: CatalogRow): boolean {
-  return row.type === "index" && row.sql === null && /^sqlite_autoindex_[A-Za-z0-9_]+_[0-9]+$/u.test(row.name);
+  const prefix = `sqlite_autoindex_${row.tbl_name}_`;
+  return row.type === "index" && row.sql === null && row.name.startsWith(prefix) &&
+    /^[0-9]+$/u.test(row.name.slice(prefix.length));
 }
 
 function json(value: unknown, status = 200): Response {

@@ -6,6 +6,7 @@ import { afterEach, describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   canonicalJson,
+  codePointCompare,
   STAGING_CENSUS_ARTIFACT_NAMES,
   STAGING_CENSUS_CONTROLLER_ID,
   STAGING_CENSUS_CONTROLLER_ROOT,
@@ -20,6 +21,7 @@ import {
   os01StagingCensusControllerTestOnly,
   runOs01StagingCensusController,
   type ControlPlaneObservationInput,
+  type PreregisteredArtifactIdentity,
   type ResponseValidationIdentity
 } from "../scripts/os01_staging_census_controller";
 
@@ -61,11 +63,35 @@ function observationInput(phase: "pre" | "post"): ControlPlaneObservationInput {
     workerSha256: "c".repeat(64),
     manifestSha256: "d".repeat(64),
     archiveSha256: "e".repeat(64),
+    archiveFileListRoot: "1".repeat(64),
+    archiveContentRoot: "2".repeat(64),
+    archiveFileCount: 2,
+    archiveBytes: 4_905,
+    uploadMethodIdentity: "sites_save_site_version_exact_local_archive",
+    remoteBuildRequested: false,
     accessRevision: 1,
     ownerIdentityHash: "f".repeat(64),
     environmentRevision: 0,
     environmentKeyNames: [],
     recordedAt: phase === "pre" ? "2026-08-29T08:00:00.000Z" : "2026-08-29T08:01:00.000Z"
+  };
+}
+
+function preregisteredArtifactIdentity(
+  input: ControlPlaneObservationInput = observationInput("pre")
+): PreregisteredArtifactIdentity {
+  return {
+    sourceCommit: input.sourceCommit,
+    sourceTree: input.sourceTree,
+    workerSha256: input.workerSha256,
+    manifestSha256: input.manifestSha256,
+    archiveSha256: input.archiveSha256,
+    archiveFileListRoot: input.archiveFileListRoot,
+    archiveContentRoot: input.archiveContentRoot,
+    archiveFileCount: input.archiveFileCount,
+    archiveBytes: input.archiveBytes,
+    uploadMethodIdentity: input.uploadMethodIdentity,
+    remoteBuildRequested: input.remoteBuildRequested
   };
 }
 
@@ -90,13 +116,16 @@ function prepareRoot(): { root: string; artifacts: ReturnType<typeof paths> } {
   const artifacts = paths(root);
   os01StagingCensusControllerTestOnly.initialize(
     root,
+    preregisteredArtifactIdentity(),
     () => new Date("2026-08-29T07:59:59.000Z")
   );
   writeJson(artifacts.preObservation, observation("pre"));
   return { root, artifacts };
 }
 
-function receiptCatalog(userTableCount: number, catalogRows: number) {
+type ReceiptCatalogRow = { type: string; name: string; tbl_name: string; sql: string | null };
+
+function receiptCatalog(userTableCount: number, catalogRows: number): ReceiptCatalogRow[] {
   const tables = Array.from({ length: userTableCount }, (_, index) => {
     const name = "table_" + String(index).padStart(2, "0");
     return { type: "table", name, tbl_name: name, sql: "CREATE TABLE " + name + "(id INTEGER)" };
@@ -119,28 +148,42 @@ function receiptCatalog(userTableCount: number, catalogRows: number) {
         left.tbl_name < right.tbl_name ? -1 : left.tbl_name > right.tbl_name ? 1 : 0);
 }
 
-function validReceipt(identity: ResponseValidationIdentity): Record<string, unknown> {
-  const catalog = receiptCatalog(identity.userTableCount, identity.catalogRows);
+function validReceipt(
+  identity: ResponseValidationIdentity,
+  catalog: ReceiptCatalogRow[] = receiptCatalog(identity.userTableCount, identity.catalogRows)
+): Record<string, unknown> {
   const internalNames = new Set(STAGING_CENSUS_SEMANTIC_CONTRACT.internalTableNames);
   const userRows = catalog.filter((row) => !(row.type === "table" && row.name === row.tbl_name &&
     internalNames.has(row.name)));
-  const objects = userRows.map((row) => ({
+  const objects = userRows.filter((row) => row.sql !== null).map((row) => ({
     type: row.type,
     name: row.name,
     tblName: row.tbl_name,
     createSql: row.sql,
-    createSqlHash: sha256(row.sql)
-  }));
-  const derivedAutoIndexes: Array<Record<string, unknown>> = [];
+    createSqlHash: sha256(row.sql as string)
+  })).sort((left, right) => codePointCompare(left.type, right.type) ||
+    codePointCompare(left.name, right.name) || codePointCompare(left.tblName, right.tblName));
+  const derivedAutoIndexes = userRows.filter((row) => row.type === "index" && row.sql === null)
+    .map((row) => ({
+      type: "index",
+      name: row.name,
+      tblName: row.tbl_name,
+      createSql: null,
+      createSqlHash: sha256("")
+    })).sort((left, right) => codePointCompare(left.name, right.name) ||
+      codePointCompare(left.tblName, right.tblName));
   const internalObjects = catalog.filter((row) => row.type === "table" && row.name === row.tbl_name &&
     internalNames.has(row.name)).map((row) => ({
     type: row.type,
     name: row.name,
     tblName: row.tbl_name,
     createSql: row.sql,
-    createSqlHash: sha256(row.sql)
-  }));
-  const physicalObjects = [...objects, ...derivedAutoIndexes];
+    createSqlHash: typeof row.sql === "string" ? sha256(row.sql) : null
+  })).sort((left, right) => codePointCompare(left.type, right.type) ||
+    codePointCompare(left.name, right.name) || codePointCompare(left.tblName, right.tblName));
+  const physicalObjects = [...objects, ...derivedAutoIndexes].sort((left, right) =>
+    codePointCompare(left.type, right.type) || codePointCompare(left.name, right.name) ||
+    codePointCompare(left.tblName, right.tblName));
   const objectTypeCounts = Object.fromEntries(STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectTypes
     .map((type) => [type, physicalObjects.filter((object) => object.type === type).length]));
   const perTypeRoots = Object.fromEntries(STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectTypes
@@ -154,7 +197,7 @@ function validReceipt(identity: ResponseValidationIdentity): Record<string, unkn
     firstCatalogHash: identity.catalogHash,
     secondCatalogHash: identity.catalogHash,
     catalog,
-    userObjectCount: objects.length,
+    userObjectCount: userRows.length,
     userTableCount: identity.userTableCount,
     replayableObjectCount: objects.length,
     objectTypeCounts,
@@ -166,7 +209,7 @@ function validReceipt(identity: ResponseValidationIdentity): Record<string, unkn
     replayableDdlRoot: sha256(canonicalJson(objects)),
     perTypeRoots,
     objects,
-    derivedAutoIndexCount: 0,
+    derivedAutoIndexCount: derivedAutoIndexes.length,
     derivedAutoIndexSetHash: sha256(canonicalJson(derivedAutoIndexes)),
     derivedAutoIndexes,
     excludedInternalObjectCount: internalObjects.length,
@@ -281,6 +324,7 @@ describe("OS-01 staging census controller", () => {
     const artifacts = paths(root);
     os01StagingCensusControllerTestOnly.initialize(
       root,
+      preregisteredArtifactIdentity(),
       () => new Date("2026-08-29T07:59:59.000Z")
     );
     const preInput = os01StagingCensusControllerTestOnly.parseObservationInput(
@@ -307,6 +351,7 @@ describe("OS-01 staging census controller", () => {
       const invalidRoot = privateDirectory();
       os01StagingCensusControllerTestOnly.initialize(
         invalidRoot,
+        preregisteredArtifactIdentity(),
         () => new Date("2026-08-29T07:59:59.000Z")
       );
       expect(() => os01StagingCensusControllerTestOnly.writeObservation(invalidRoot, invalid))
@@ -328,6 +373,93 @@ describe("OS-01 staging census controller", () => {
     expect(postResult).toMatchObject({ phase: "post", observationHash: expect.any(String) });
     expect(statSync(artifacts.postObservation).mode & 0o777).toBe(0o600);
     expect(() => os01StagingCensusControllerTestOnly.writeObservation(root, postInput)).toThrow();
+  });
+
+  it("requires one closed artifact identity at init and binds it into authority", async () => {
+    const expected = preregisteredArtifactIdentity();
+    let initialized: PreregisteredArtifactIdentity | null = null;
+    const result = await os01StagingCensusControllerTestOnly.executeCli({
+      action: "init",
+      stdin: JSON.stringify(expected) + "\n",
+      operations: {
+        initialize: (identity) => {
+          initialized = identity;
+          return "/private/tmp/preregistered-controller";
+        },
+        writeObservation: () => { throw new Error("unexpected observation"); },
+        run: async () => { throw new Error("unexpected run"); },
+        finalize: () => { throw new Error("unexpected finalize"); }
+      }
+    });
+    expect(initialized).toEqual(expected);
+    expect(result).toEqual({ stdout: "/private/tmp/preregistered-controller\n", exitCode: 0 });
+    await expect(os01StagingCensusControllerTestOnly.executeCli({
+      action: "init",
+      stdin: JSON.stringify({ ...expected, extra: "not-closed" }),
+      operations: {
+        initialize: () => { throw new Error("must not initialize"); },
+        writeObservation: () => { throw new Error("unexpected observation"); },
+        run: async () => { throw new Error("unexpected run"); },
+        finalize: () => { throw new Error("unexpected finalize"); }
+      }
+    })).rejects.toThrow("closed schema");
+  });
+
+  it("rejects every artifact-identity substitution before transport", async () => {
+    const substitutions: Array<[keyof PreregisteredArtifactIdentity, unknown]> = [
+      ["sourceCommit", "9".repeat(40)],
+      ["sourceTree", "8".repeat(40)],
+      ["workerSha256", "7".repeat(64)],
+      ["manifestSha256", "6".repeat(64)],
+      ["archiveSha256", "5".repeat(64)],
+      ["archiveFileListRoot", "4".repeat(64)],
+      ["archiveContentRoot", "3".repeat(64)],
+      ["archiveFileCount", 3],
+      ["archiveBytes", 4_906],
+      ["uploadMethodIdentity", "different_upload_method"],
+      ["remoteBuildRequested", true]
+    ];
+    for (const [field, replacement] of substitutions) {
+      const root = privateDirectory();
+      const artifacts = paths(root);
+      os01StagingCensusControllerTestOnly.initialize(
+        root,
+        preregisteredArtifactIdentity(),
+        () => new Date("2026-08-29T07:59:59.000Z")
+      );
+      const substituted = {
+        ...observationInput("pre"),
+        [field]: replacement
+      } as unknown as ControlPlaneObservationInput;
+      expect(() => os01StagingCensusControllerTestOnly.writeObservation(root, substituted)).toThrow();
+      expect(existsSync(artifacts.preObservation)).toBe(false);
+      expect(existsSync(artifacts.intent)).toBe(false);
+    }
+  });
+
+  it("rejects coordinated substituted observations against authority A", async () => {
+    const root = privateDirectory();
+    const artifacts = paths(root);
+    os01StagingCensusControllerTestOnly.initialize(
+      root,
+      preregisteredArtifactIdentity(),
+      () => new Date("2026-08-29T07:59:59.000Z")
+    );
+    const substituted = { ...observationInput("pre"), archiveSha256: "5".repeat(64) };
+    writeJson(artifacts.preObservation, createOs01StagingCensusControlPlaneObservation(substituted));
+    let calls = 0;
+    await expect(os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "ephemeral-sites-token-for-test",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => {
+        calls += 1;
+        return acceptedResponse();
+      }
+    })).rejects.toThrow("not preregistered");
+    expect(calls).toBe(0);
+    expect(existsSync(artifacts.intent)).toBe(false);
   });
 
   it("routes newline-terminated observation JSON through the actual CLI action core", async () => {
@@ -421,6 +553,7 @@ describe("OS-01 staging census controller", () => {
       const artifacts = paths(root);
       os01StagingCensusControllerTestOnly.initialize(
         root,
+        preregisteredArtifactIdentity(invalid),
         () => new Date("2026-08-29T07:59:59.000Z")
       );
       writeJson(artifacts.preObservation, createOs01StagingCensusControlPlaneObservation(invalid));
@@ -478,15 +611,81 @@ describe("OS-01 staging census controller", () => {
     expect(statSync(artifacts.response).size).toBeGreaterThan(0);
     expect(statSync(artifacts.dispatchCompletion).size).toBeGreaterThan(0);
     writeJson(artifacts.postObservation, observation("post"));
-    expect(os01StagingCensusControllerTestOnly.finalize(
+    const finalReceipt = os01StagingCensusControllerTestOnly.finalize(
       root,
       () => new Date("2026-08-29T08:02:00.000Z"),
       defaultValidation
-    )).toMatchObject({
+    );
+    expect(finalReceipt).toMatchObject({
       status: "test_only_postcheck_verified",
       workerReadOnlyReceiptVerified: true,
+      artifactIdentityBindingVerified: true,
       crossRecordBindingsVerified: true
     });
+    const expectedIdentityHash = sha256(canonicalJson(preregisteredArtifactIdentity()));
+    for (const path of [
+      artifacts.authority,
+      artifacts.intent,
+      artifacts.attemptResult,
+      artifacts.dispatchCompletion,
+      artifacts.finalizationIntent,
+      artifacts.finalReceipt
+    ]) {
+      expect(JSON.parse(readFileSync(path, "utf8"))).toMatchObject({
+        preregisteredArtifactIdentityHash: expectedIdentityHash
+      });
+    }
+  });
+
+  it("rejects a post-dispatch artifact substitution against the preregistered identity", async () => {
+    const { root, artifacts } = prepareRoot();
+    await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "ephemeral-sites-token-for-test",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => acceptedResponse()
+    });
+    expect(() => os01StagingCensusControllerTestOnly.writeObservation(root, {
+      ...observationInput("post"),
+      archiveContentRoot: "3".repeat(64)
+    })).toThrow("preregistered artifact identity");
+    expect(existsSync(artifacts.postObservation)).toBe(false);
+  });
+
+  it("treats credential reflection in any response header representation as terminal", async () => {
+    const token = "reflection-token/7";
+    const cases: Array<{ token: string; headerName: string; headerValue: string }> = [
+      { token: "reflection-token", headerName: "x-reflection-token-proof", headerValue: "present" },
+      { token: "MixedCaseToken", headerName: "x-mixedcasetoken-proof", headerValue: "present" },
+      ...[
+        token,
+        "Bearer " + token,
+        Buffer.from(token, "utf8").toString("base64"),
+        encodeURIComponent(token)
+      ].map((headerValue) => ({ token, headerName: "x-reflected-credential", headerValue }))
+    ];
+    for (const item of cases) {
+      const { root, artifacts } = prepareRoot();
+      const result = await os01StagingCensusControllerTestOnly.run({
+        root,
+        authorizationToken: item.token,
+        now: () => new Date("2026-08-29T08:00:01.000Z"),
+        responseValidation: defaultValidation,
+        transport: async () => new Response(JSON.stringify(validReceipt(defaultValidation)), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            [item.headerName]: item.headerValue
+          }
+        })
+      });
+      expect(result.status).toBe("terminal_credential_reflection");
+      expect(result.responseBytesSha256).toBeNull();
+      expect(statSync(artifacts.response).size).toBe(0);
+      expect(statSync(artifacts.dispatchCompletion).size).toBe(0);
+      expect(readFileSync(artifacts.attemptResult, "utf8")).not.toContain(item.token);
+    }
   });
 
   it("rejects a count diagnostic delivered with HTTP 200 and a full census delivered with HTTP 500", async () => {
@@ -598,6 +797,36 @@ describe("OS-01 staging census controller", () => {
           status: 200,
           headers: { "Content-Type": "application/json" }
         })
+      });
+      expect(result.status).toBe("terminal_invalid_response");
+      expect(statSync(artifacts.response).size).toBe(0);
+      expect(statSync(artifacts.dispatchCompletion).size).toBe(0);
+    }
+  });
+
+  it("rejects fully self-consistent autoindexes whose names are misbound to their table", async () => {
+    for (const autoIndexName of ["sqlite_autoindex_wrong_1", "sqlite_autoindex_sample_wrong_1"]) {
+      const catalog: ReceiptCatalogRow[] = [
+        { type: "index", name: autoIndexName, tbl_name: "sample", sql: null },
+        {
+          type: "table",
+          name: "sample",
+          tbl_name: "sample",
+          sql: "CREATE TABLE sample(id INTEGER PRIMARY KEY)"
+        }
+      ];
+      const identity = {
+        catalogHash: sha256(canonicalJson(catalog)),
+        catalogRows: catalog.length,
+        userTableCount: 1
+      };
+      const { root, artifacts } = prepareRoot();
+      const result = await os01StagingCensusControllerTestOnly.run({
+        root,
+        authorizationToken: "misbound-autoindex-token",
+        now: () => new Date("2026-08-29T08:00:01.000Z"),
+        responseValidation: identity,
+        transport: async () => Response.json(validReceipt(identity, catalog), { status: 200 })
       });
       expect(result.status).toBe("terminal_invalid_response");
       expect(statSync(artifacts.response).size).toBe(0);
@@ -1007,6 +1236,32 @@ describe("OS-01 staging census controller", () => {
     )).toMatchObject({
       status: "test_only_postcheck_rejected",
       crossRecordBindingsVerified: false
+    });
+  });
+
+  it("rejects a consistently rehashed lifecycle artifact-identity substitution", async () => {
+    const { root, artifacts } = prepareRoot();
+    await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => acceptedResponse()
+    });
+    replaceHashedJson(artifacts.intent, "intentHash", (intent) => {
+      intent.preregisteredArtifactIdentityHash = "0".repeat(64);
+    });
+    replaceHashedJson(artifacts.dispatchCompletion, "completionHash", (completion) => {
+      completion.intentBytesSha256 = sha256(readFileSync(artifacts.intent));
+    });
+    writeJson(artifacts.postObservation, observation("post"));
+    expect(os01StagingCensusControllerTestOnly.finalize(
+      root,
+      () => new Date("2026-08-29T08:02:00.000Z")
+    )).toMatchObject({
+      status: "test_only_postcheck_rejected",
+      artifactIdentityBindingVerified: false,
+      crossRecordBindingsVerified: true
     });
   });
 
