@@ -512,9 +512,13 @@ function validateObservation(value: unknown, phase: ObservationPhase): value is 
   if (!hasExactKeys(sourceRow, ["commit", "tree"]) ||
       !validHex(sourceRow.commit, 40) || !validHex(sourceRow.tree, 40) ||
       !hasExactKeys(deploymentRow, ["deploymentId", "status", "url", "versionId", "versionNumber"]) ||
-      typeof deploymentRow.deploymentId !== "string" || deploymentRow.status !== "succeeded" ||
+      typeof deploymentRow.deploymentId !== "string" ||
+      !/^appgdep_[a-f0-9]{32}$/u.test(deploymentRow.deploymentId) ||
+      deploymentRow.status !== "succeeded" ||
       deploymentRow.url !== STAGING_CENSUS_SEMANTIC_CONTRACT.origin ||
-      typeof deploymentRow.versionId !== "string" || !Number.isSafeInteger(deploymentRow.versionNumber) ||
+      typeof deploymentRow.versionId !== "string" ||
+      !/^appgprj_[a-f0-9]{32}~appgver_[a-f0-9]{32}$/u.test(deploymentRow.versionId) ||
+      !Number.isSafeInteger(deploymentRow.versionNumber) ||
       (deploymentRow.versionNumber as number) < 1 ||
       !hasExactKeys(packageRow, ["archiveSha256", "censusRoute", "manifestSha256", "mutationRoutes", "workerSha256"]) ||
       !validHex(packageRow.archiveSha256) || !validHex(packageRow.manifestSha256) ||
@@ -1486,6 +1490,45 @@ export function finalizeOs01StagingCensusController(): Record<string, unknown> {
   });
 }
 
+type ControllerCliOperations = {
+  initialize: () => string;
+  writeObservation: (input: ControlPlaneObservationInput) => ControlPlaneObservationWriteResult;
+  run: (input: { authorizationToken: string }) => Promise<CensusControllerResult>;
+  finalize: () => Record<string, unknown>;
+};
+
+async function executeControllerCli(
+  action: string | undefined,
+  readStdin: () => Uint8Array | string,
+  operations: ControllerCliOperations
+): Promise<{ stdout: string; exitCode: number }> {
+  if (action === "init") return { stdout: operations.initialize() + "\n", exitCode: 0 };
+  if (action === "write-pre-observation" || action === "write-post-observation") {
+    const phase = action === "write-pre-observation" ? "pre" : "post";
+    const input = parseControlPlaneObservationInput(readStdin(), phase);
+    const result = operations.writeObservation(input);
+    return { stdout: result.phase + ":" + result.observationHash + "\n", exitCode: 0 };
+  }
+  if (action === "run") {
+    const tokenBytes = readStdin();
+    const token = (typeof tokenBytes === "string" ? tokenBytes : Buffer.from(tokenBytes).toString("utf8"))
+      .trimEnd();
+    const result = await operations.run({ authorizationToken: token });
+    return {
+      stdout: result.status + "\n",
+      exitCode: result.status === "pending_control_plane_postcheck" ? 0 : 1
+    };
+  }
+  if (action === "finalize") {
+    const receipt = operations.finalize();
+    return {
+      stdout: String(receipt.status) + "\n",
+      exitCode: receipt.status === "accepted_read_only_census_after_control_plane_postcheck" ? 0 : 1
+    };
+  }
+  throw new Error("expected --action init, write-pre-observation, run, write-post-observation, or finalize");
+}
+
 export const os01StagingCensusControllerTestOnly = Object.freeze({
   initialize(root: string, now: () => Date = () => new Date()): void {
     rootIdentity(root);
@@ -1502,6 +1545,13 @@ export const os01StagingCensusControllerTestOnly = Object.freeze({
     input: ControlPlaneObservationInput
   ): ControlPlaneObservationWriteResult {
     return writeControlPlaneObservationCore(root, false, input);
+  },
+  async executeCli(input: {
+    action: string | undefined;
+    stdin: Uint8Array | string;
+    operations: ControllerCliOperations;
+  }): Promise<{ stdout: string; exitCode: number }> {
+    return executeControllerCli(input.action, () => input.stdin, input.operations);
   },
   async run(input: {
     root: string;
@@ -1531,23 +1581,12 @@ export const os01StagingCensusControllerTestOnly = Object.freeze({
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const action = process.argv[process.argv.indexOf("--action") + 1];
-  if (action === "init") {
-    process.stdout.write(initializeOs01StagingCensusControllerAuthority() + "\n");
-  } else if (action === "write-pre-observation" || action === "write-post-observation") {
-    const phase = action === "write-pre-observation" ? "pre" : "post";
-    const input = parseControlPlaneObservationInput(readFileSync(0), phase);
-    const result = writeOs01StagingCensusControlPlaneObservation(input);
-    process.stdout.write(result.phase + ":" + result.observationHash + "\n");
-  } else if (action === "run") {
-    const token = readFileSync(0, "utf8").trimEnd();
-    const result = await runOs01StagingCensusController({ authorizationToken: token });
-    process.stdout.write(result.status + "\n");
-    if (result.status !== "pending_control_plane_postcheck") process.exitCode = 1;
-  } else if (action === "finalize") {
-    const receipt = finalizeOs01StagingCensusController();
-    process.stdout.write(String(receipt.status) + "\n");
-    if (receipt.status !== "accepted_read_only_census_after_control_plane_postcheck") process.exitCode = 1;
-  } else {
-    throw new Error("expected --action init, write-pre-observation, run, write-post-observation, or finalize");
-  }
+  const result = await executeControllerCli(action, () => readFileSync(0), {
+    initialize: initializeOs01StagingCensusControllerAuthority,
+    writeObservation: writeOs01StagingCensusControlPlaneObservation,
+    run: runOs01StagingCensusController,
+    finalize: finalizeOs01StagingCensusController
+  });
+  process.stdout.write(result.stdout);
+  if (result.exitCode !== 0) process.exitCode = result.exitCode;
 }

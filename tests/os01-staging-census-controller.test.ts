@@ -53,9 +53,9 @@ function observationInput(phase: "pre" | "post"): ControlPlaneObservationInput {
     phase,
     sourceCommit: "a".repeat(40),
     sourceTree: "b".repeat(40),
-    versionId: "staging-version-id",
+    versionId: "appgprj_" + "1".repeat(32) + "~appgver_" + "2".repeat(32),
     versionNumber: 11,
-    deploymentId: "staging-deployment-id",
+    deploymentId: "appgdep_" + "3".repeat(32),
     deploymentStatus: "succeeded",
     deploymentUrl: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
     workerSha256: "c".repeat(64),
@@ -189,6 +189,18 @@ describe("OS-01 staging census controller", () => {
       JSON.stringify({ ...observationInput("pre"), phase: "post" }),
       "pre"
     )).toThrow();
+    for (const invalid of [
+      { ...observationInput("pre"), versionId: "" },
+      { ...observationInput("pre"), deploymentId: "" }
+    ]) {
+      const invalidRoot = privateDirectory();
+      os01StagingCensusControllerTestOnly.initialize(
+        invalidRoot,
+        () => new Date("2026-08-29T07:59:59.000Z")
+      );
+      expect(() => os01StagingCensusControllerTestOnly.writeObservation(invalidRoot, invalid))
+        .toThrow("semantic validation");
+    }
 
     await os01StagingCensusControllerTestOnly.run({
       root,
@@ -205,6 +217,35 @@ describe("OS-01 staging census controller", () => {
     expect(postResult).toMatchObject({ phase: "post", observationHash: expect.any(String) });
     expect(statSync(artifacts.postObservation).mode & 0o777).toBe(0o600);
     expect(() => os01StagingCensusControllerTestOnly.writeObservation(root, postInput)).toThrow();
+  });
+
+  it("routes newline-terminated observation JSON through the actual CLI action core", async () => {
+    let written: ControlPlaneObservationInput | null = null;
+    const result = await os01StagingCensusControllerTestOnly.executeCli({
+      action: "write-pre-observation",
+      stdin: JSON.stringify(observationInput("pre")) + "\n",
+      operations: {
+        initialize: () => { throw new Error("unexpected init"); },
+        writeObservation: (input) => {
+          written = input;
+          return { phase: input.phase, observationHash: "9".repeat(64), bytesSha256: "8".repeat(64) };
+        },
+        run: async () => { throw new Error("unexpected run"); },
+        finalize: () => { throw new Error("unexpected finalize"); }
+      }
+    });
+    expect(written).toEqual(observationInput("pre"));
+    expect(result).toEqual({ stdout: "pre:" + "9".repeat(64) + "\n", exitCode: 0 });
+    await expect(os01StagingCensusControllerTestOnly.executeCli({
+      action: "write-post-observation",
+      stdin: JSON.stringify(observationInput("pre")),
+      operations: {
+        initialize: () => { throw new Error("unexpected init"); },
+        writeObservation: () => { throw new Error("must not write"); },
+        run: async () => { throw new Error("unexpected run"); },
+        finalize: () => { throw new Error("unexpected finalize"); }
+      }
+    })).rejects.toThrow("closed schema");
   });
 
   it("reserves intent, response, and result before one exact transport call and remains pending", async () => {
