@@ -1,0 +1,122 @@
+{
+  "version": "os01-hosted-migration-qualification.2026.1",
+  "status": "local_harness_ready_not_deployed",
+  "workPackage": "OS-01",
+  "requirement": "ARC-03",
+  "authority": {
+    "sourceCommit": "d24db5632410894d4f82c12e7f1d0c4c256a208d",
+    "acceptedContract": {
+      "path": "config/os01-migration-qualification.v1.json",
+      "sha256": "9b5da72706f18670c3ecb67763d18f109cf228b2a56c83f1ea52ff8582882e51"
+    },
+    "predecessor": {
+      "path": "config/d1-schema-authority.v1.json",
+      "sha256": "948dbfd5657c169c01d15d6a6fea08524a321d71852cc3148355c0d4210fcc0d"
+    },
+    "successor": {
+      "path": "config/d1-schema-authority.v2.json",
+      "sha256": "87db50ad848bdd3ee11a6bc8895b2647b5cda7ad43bc9f49f9954276ead2d04e"
+    },
+    "journal": {
+      "path": "drizzle/meta/_journal.json",
+      "sha256": "c2f4c41e680cc92e3eb21cb02869e45dae4862e7296e0a72880e5f1026fbe77f"
+    },
+    "terminalManifest": {
+      "path": "config/d1-schema-manifest.v1.json",
+      "sha256": "4ca77b123faeeb7f5287994548f969bed35e2be9c6efcf4d88c509fb3d89b47d"
+    },
+    "orderedMigrationBundleSha256": "b72fae202662ae4cf689c4656bc762944264e9a59e637582b9fa0b4e0a31e122",
+    "legacyMigrationBundleSha256": "ba75205577b97fc97db5b9b4eea9f8351a077390994bf6b5e2a4642a062f9a79"
+  },
+  "executionBoundary": {
+    "ownerOnlyTemporarySitesProjects": true,
+    "isolatedD1Only": true,
+    "productionAllowed": false,
+    "automaticMigrationsIncluded": false,
+    "providerBindings": [],
+    "providerAccessAllowed": false,
+    "captureActivationAllowed": false,
+    "scheduledTriggers": [],
+    "realRetainedLockAllowed": false,
+    "d1ExecutionPrerequisite": {
+      "minimumQueriesPerWorkerInvocation": 470,
+      "blankReplayMigrationBatchStatements": 276,
+      "successorMigrationBatchStatements": 137,
+      "batchMaximumDurationSeconds": 30,
+      "activePredeployProbeIncluded": false,
+      "capabilityProof": "read-only Sites plan and binding metadata observed before deployment",
+      "failureBehavior": "if the temporary project tier or binding cannot prove this capacity, hosted qualification is blocked before deployment"
+    }
+  },
+  "profiles": [
+    {
+      "id": "blank_range_replay",
+      "resource": "fresh isolated D1 A",
+      "actions": ["blank_replay", "verify_blank_terminal"],
+      "range": "0000_through_0020",
+      "expectedTerminalCounts": { "table": 93, "index": 80, "trigger": 76, "view": 0 },
+      "fixtureRowsAllowed": false
+    },
+    {
+      "id": "legacy_forward_and_backup",
+      "resource": "fresh isolated D1 B",
+      "actions": ["legacy_prepare_export", "legacy_forward", "verify_legacy_terminal"],
+      "range": "0000_through_0016_then_0017_through_0020",
+      "legacyFixture": "one deterministic legacy_29 plays row",
+      "preservation": "exact projection of every legacy plays column and all semantic migration receipt fields"
+    },
+    {
+      "id": "restore_block_and_partial_failure",
+      "resource": "fresh isolated D1 C",
+      "actions": ["restore_import", "legacy_prepare_export", "failure_probe", "legacy_forward", "verify_legacy_terminal"],
+      "range": "blocked_distinct_restore_then_fixture_0016_then_failed_and_successful_0017_through_0020",
+      "restoreExpectedResult": "blocked_exact_distinct_restore_unavailable_before_any_write",
+      "failureInjection": {
+        "migrationPath": "drizzle/0019_engine_os_schema_closure.sql",
+        "globalStatementIndexWithinSuccessorRange": 70,
+        "statement": "qualification-only read from an intentionally missing table"
+      }
+    }
+  ],
+  "atomicity": {
+    "migrationUnit": "one D1 batch for the entire requested migration range",
+    "prewriteGuard": "schema version, exact catalog, exact row projection, and accepted ordered byte authority are revalidated inside the batch",
+    "terminalGuard": "exact terminal catalog, expected row cardinalities, semantic receipts, fixture row, and integrity preconditions must pass before the guard table can be dropped",
+    "retry": "an already verified target state returns the same deterministic receipt",
+    "partialFailure": "any injected or natural statement failure must reject the D1 batch and preserve the exact prestate",
+    "noRetrospectiveRepair": true
+  },
+  "schemaClaimBoundary": {
+    "acceptedByHarness": "same object names, types, owning tables, exact raw sqlite_schema SQL, normalized SQL tokens, object counts, exact expected rows, valid semantic migration receipts, foreign-key check, and quick-check",
+    "physicalManifestParityAccepted": false,
+    "unacceptedProof": "the hosted harness does not recompute the d24 physical manifest over table_xinfo, index_xinfo, foreign_key_list, collations, key flags, hidden columns, defaults, and related engine-interpreted details",
+    "consequence": "a passing hosted run remains raw-catalog and DDL parity evidence; D1 physical-manifest parity requires a separate proof before OS-01 or ARC-03 acceptance"
+  },
+  "logicalBackup": {
+    "format": "engine-os.os01-hosted-logical-backup.v1",
+    "sourceRows": "all legacy tables, explicit columns, ordered rows, per-row hashes, per-table hashes, and one whole-manifest hash",
+    "corruptionBehavior": "reject before the first database write",
+    "exactRestoreRequired": true,
+    "currentRestoreStatus": "blocked",
+    "blockedReason": "accepted migrations create append-only receipt rows with D1-generated applied_at values; replaying into a distinct D1 changes exact receipt rows, and the qualification harness refuses to normalize, exempt, update, drop, disable, or bypass that append-only evidence",
+    "requiredSuccessorProof": "an exact distinct-resource export/import or platform backup/restore path preserving every receipt byte and whole rows hash",
+    "negativeControl": "restore_import returns exact_distinct_restore_unavailable before the first database write"
+  },
+  "package": {
+    "entry": "qualification/os01-hosted-migration/entry.ts",
+    "route": "/__engine-os/os01-hosted-migration/v1",
+    "runtimeBindings": ["DB"],
+    "manifest": ".openai/os01-hosted-migration-package.v1.json",
+    "manifestDigest": ".openai/os01-hosted-migration-package.v1.sha256",
+    "reproducibility": "two empty output directories with the same staging project id must produce identical entry, authority, and manifest hashes",
+    "productionReachability": "worker/index.ts does not import or route to this entry"
+  },
+  "receiptProtocol": {
+    "responseVersion": "engine-os.os01-hosted-migration-receipt.v1",
+    "requestIdentity": "256-bit qualification id plus one closed action",
+    "response": "stable JSON with a self hash and zero provider, binding-read, and capture counters",
+    "operatorRetention": "preserve exact request bytes, response bytes, HTTP status, package manifest bytes, manifest digest, project access observation, D1 observations, and retirement observation under exclusive immutable filenames",
+    "duplicateBehavior": "never overwrite an existing hosted receipt directory"
+  },
+  "claimBoundary": "This contract prepares a qualification-only owner-gated isolated-D1 harness. Local tests do not qualify a hosted path. Even a passing hosted run proves only the named isolated blank, legacy-forward, deterministic legacy-row-preservation, rollback, export, restore-block, and raw-catalog/DDL parity mechanisms. Exact distinct-resource restoration and D1 physical-manifest parity remain unaccepted. It does not establish a production prestate, accept OS-01 or ARC-03, authorize or apply a production migration, activate capture, access a provider, or access the real retained lock."
+}

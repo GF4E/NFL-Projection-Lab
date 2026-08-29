@@ -16,6 +16,7 @@
     "audit:score": "tsx scripts/audit_score_engine.ts",
     "model-lab:module1": "python3 scripts/model_lab_module_one.py",
     "model-lab:module1:self-test": "python3 scripts/model_lab_module_one.py --self-test",
+    "build:os01-hosted-migration": "tsx scripts/build_os01_hosted_migration_harness.ts",
     "db:generate": "drizzle-kit generate",
     "db:check": "tsx scripts/verify_drizzle_schema.ts && tsx scripts/verify_d1_schema_authority.ts",
     "verify": "pnpm lint && pnpm typecheck && pnpm db:check && pnpm test && pnpm build && python3 scripts/verify_active_build_graph.py"
