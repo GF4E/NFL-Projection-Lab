@@ -1,0 +1,34 @@
+{
+  "version": "engine-os.os01-hosted-migration-v4-live-rejection-receipt.v1",
+  "status": "rejected",
+  "scope": "isolated_owner_only_blank_d1_replay",
+  "sourceCommit": "f39eac8cd7651dfc6f9b640200bb0f869d5c7b70",
+  "candidateCommit": "486b1287430efab9b3e3d8ee2627f5d697316980",
+  "projectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "versionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_6dd2bec87f188191887ad700144ddf1e",
+  "deploymentId": "appgdep_6a9254b75cd48191b7d66f9694921ede",
+  "request": {
+    "action": "blank_replay",
+    "qualificationId": "f0288cc056cd934b5ddaa57625274763bffd0b9f4d61f8d0863aadb978714e27",
+    "httpStatus": 500,
+    "workerRequestId": "093cde56bd955272acac5684603dd9b5",
+    "wallTimeMilliseconds": 557,
+    "responseSha256": "02bc538377738a19dda7d8c6bfabb2cf6e56be98008e976c216a470e9055a98a",
+    "responseBytes": 32
+  },
+  "preconditions": {
+    "accessMode": "custom",
+    "ownerCount": 1,
+    "groupCount": 0,
+    "externalVisitorCount": 0,
+    "bindings": ["DB"],
+    "preReplayUserTables": []
+  },
+  "observedResult": "atomic_batch_rolled_back_with_generic_qualification_failed",
+  "acceptedEvidence": false,
+  "providerDispatches": 0,
+  "providerBindingReads": 0,
+  "captureActivations": 0,
+  "productionMutations": 0,
+  "successorBoundary": "diagnostic_only_source_bound_retry_may_log_the_blank_fixture_d1_error_after_a_fresh_zero_table_check"
+}

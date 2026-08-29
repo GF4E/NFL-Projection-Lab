@@ -731,6 +731,15 @@ async function executeAtomicBatch(db: D1Database, statements: readonly Migration
     if (isD1MultipleStatementFailure(error)) {
       throw new HarnessError("qualification_failed", 500, "d1_prepare_multiple_statements");
     }
+    // Diagnostic-only successor for the isolated owner-only harness. The v4
+    // response deliberately collapsed batch failures to a generic code, which
+    // made the second atomic rollback impossible to reduce. This log contains
+    // only the D1-generated SQL error for the blank fixture; the staging worker
+    // has no provider bindings or credential inputs.
+    globalThis.console.error(stableHostedJson({
+      event: "os01_hosted_blank_batch_rejected",
+      message: d1FailureText(error).slice(0, 2_048)
+    }));
     throw error;
   }
 }
