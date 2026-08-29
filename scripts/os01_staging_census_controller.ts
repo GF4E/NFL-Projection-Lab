@@ -614,16 +614,6 @@ function writeControlPlaneObservationCore(
   };
 }
 
-function compareForeignKeys(left: Record<string, unknown>, right: Record<string, unknown>): number {
-  return (left.id as number) - (right.id as number) || (left.seq as number) - (right.seq as number) ||
-    codePointCompare(left.table as string, right.table as string) ||
-    codePointCompare(left.from as string, right.from as string) ||
-    codePointCompare((left.to as string | null) ?? "", (right.to as string | null) ?? "") ||
-    codePointCompare(left.on_update as string, right.on_update as string) ||
-    codePointCompare(left.on_delete as string, right.on_delete as string) ||
-    codePointCompare(left.match as string, right.match as string);
-}
-
 function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentity): boolean {
   let parsed: unknown;
   const text = new TextDecoder().decode(bytes);
@@ -637,7 +627,8 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
   if (text !== JSON.stringify(receipt)) return false;
   if (!hasExactKeys(receipt, [
     "captureActivations", "catalogHash", "catalogRows", "censusId", "claimBoundary",
-    "databaseMutationAttempted", "ddlRoot", "foreignKeyRoot", "prePostCatalogMatch",
+    "d1QueryCount", "databaseMutationAttempted", "ddlRoot", "foreignKeyClaimsAccepted", "foreignKeyEvidence",
+    "foreignKeyEvidenceWithheld", "prePostCatalogMatch",
     "prePostRowCountsMatch", "productionMutations", "productionReads", "providerBindings",
     "providerDispatches", "providerSecretReads", "quotaReservations", "receiptHash",
     "requestBudgetClaim", "rowCountRoot", "snapshotClaim", "status", "tableSetHash",
@@ -650,7 +641,7 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
   delete body.receiptHash;
   if (sha256(canonicalJson(body)) !== claimedHash ||
       receipt.version !== STAGING_CENSUS_SEMANTIC_CONTRACT.responseVersion ||
-      receipt.status !== "read_only_schema_census_captured" ||
+      receipt.status !== STAGING_CENSUS_SEMANTIC_CONTRACT.responseStatus ||
       receipt.censusId !== STAGING_CENSUS_ID ||
       receipt.catalogRows !== expected.catalogRows || receipt.catalogHash !== expected.catalogHash ||
       receipt.userTableCount !== expected.userTableCount ||
@@ -659,43 +650,31 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
       (receipt.userObjectCount as number) > expected.catalogRows ||
       receipt.prePostCatalogMatch !== true || receipt.prePostRowCountsMatch !== true ||
       receipt.snapshotClaim !== STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim ||
+      receipt.d1QueryCount !== STAGING_CENSUS_SEMANTIC_CONTRACT.maximumD1QueriesPerInvocation ||
+      receipt.foreignKeyEvidence !== STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence ||
+      receipt.foreignKeyEvidenceWithheld !== true ||
+      receipt.foreignKeyClaimsAccepted !== STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyClaimsAccepted ||
       receipt.requestBudgetClaim !== "controller_enforced_single_invocation_not_runtime_durable" ||
       receipt.databaseMutationAttempted !== false || receipt.providerBindings !== 0 ||
       receipt.providerSecretReads !== 0 || receipt.providerDispatches !== 0 ||
       receipt.quotaReservations !== 0 || receipt.captureActivations !== 0 ||
       receipt.productionReads !== 0 || receipt.productionMutations !== 0 ||
-      receipt.claimBoundary !== "isolated_staging_read_only_census_only") return false;
+      receipt.claimBoundary !== "isolated_staging_read_only_ddl_row_census_only_no_foreign_key_claim") return false;
   if (!Array.isArray(receipt.tables) || receipt.tables.length !== expected.userTableCount ||
       !Array.isArray(receipt.viewNames) || receipt.userViewCount !== receipt.viewNames.length) return false;
 
-  const normalizedTables: Array<{ name: string; createSql: string; rowCount: number; foreignKeys: unknown[] }> = [];
+  const normalizedTables: Array<{ name: string; createSql: string; rowCount: number }> = [];
   for (const value of receipt.tables) {
     if (!value || typeof value !== "object" || Array.isArray(value)) return false;
     const table = value as Record<string, unknown>;
-    if (!hasExactKeys(table, ["createSql", "createSqlHash", "foreignKeys", "name", "rowCount"]) ||
+    if (!hasExactKeys(table, ["createSql", "createSqlHash", "name", "rowCount"]) ||
         typeof table.name !== "string" || !/^[A-Za-z0-9_]+$/u.test(table.name) ||
         typeof table.createSql !== "string" || table.createSqlHash !== sha256(table.createSql) ||
-        !Number.isSafeInteger(table.rowCount) || (table.rowCount as number) < 0 ||
-        !Array.isArray(table.foreignKeys)) return false;
-    for (const foreignKey of table.foreignKeys) {
-      if (!foreignKey || typeof foreignKey !== "object" || Array.isArray(foreignKey)) return false;
-      const row = foreignKey as Record<string, unknown>;
-      if (!hasExactKeys(row, ["from", "id", "match", "on_delete", "on_update", "seq", "table", "to"]) ||
-          !Number.isSafeInteger(row.id) || (row.id as number) < 0 ||
-          !Number.isSafeInteger(row.seq) || (row.seq as number) < 0 ||
-          typeof row.table !== "string" || typeof row.from !== "string" ||
-          (typeof row.to !== "string" && row.to !== null) || typeof row.on_update !== "string" ||
-          typeof row.on_delete !== "string" || typeof row.match !== "string") return false;
-    }
-    const foreignKeys = table.foreignKeys as Array<Record<string, unknown>>;
-    const foreignKeyIdentities = foreignKeys.map((row) => `${String(row.id)}:${String(row.seq)}`);
-    if (new Set(foreignKeyIdentities).size !== foreignKeyIdentities.length) return false;
-    if ([...foreignKeys].sort(compareForeignKeys).some((row, index) => row !== foreignKeys[index])) return false;
+        !Number.isSafeInteger(table.rowCount) || (table.rowCount as number) < 0) return false;
     normalizedTables.push({
       name: table.name,
       createSql: table.createSql,
-      rowCount: table.rowCount as number,
-      foreignKeys: table.foreignKeys
+      rowCount: table.rowCount as number
     });
   }
   const tableNames = normalizedTables.map((table) => table.name);
@@ -712,16 +691,12 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
       [...viewNames].sort((left, right) => codePointCompare(String(left), String(right)))
         .some((name, index) => name !== viewNames[index])) return false;
   return validHex(receipt.tableSetHash) && validHex(receipt.viewSetHash) && validHex(receipt.ddlRoot) &&
-    validHex(receipt.foreignKeyRoot) && validHex(receipt.rowCountRoot) &&
+    validHex(receipt.rowCountRoot) &&
     receipt.tableSetHash === sha256(canonicalJson(tableNames)) &&
     receipt.viewSetHash === sha256(canonicalJson(viewNames)) &&
     receipt.ddlRoot === sha256(canonicalJson(normalizedTables.map((table) => ({
       name: table.name,
       createSql: table.createSql
-    })))) &&
-    receipt.foreignKeyRoot === sha256(canonicalJson(normalizedTables.map((table) => ({
-      name: table.name,
-      foreignKeys: table.foreignKeys
     })))) &&
     receipt.rowCountRoot === sha256(canonicalJson(normalizedTables.map((table) => ({
       name: table.name,
@@ -1494,8 +1469,8 @@ function finalizeCore(
     workerReceiptVerified;
   const accepted = qualificationEligible && evidenceValid;
   const body = {
-    version: "engine-os.os01-staging-census-final-receipt.v1",
-    status: accepted ? "accepted_read_only_census_after_control_plane_postcheck" :
+    version: STAGING_CENSUS_SEMANTIC_CONTRACT.finalReceiptVersion,
+    status: accepted ? STAGING_CENSUS_SEMANTIC_CONTRACT.finalAcceptanceStatus :
       qualificationEligible ? "terminal_control_plane_or_evidence_mismatch" :
         evidenceValid ? "test_only_postcheck_verified" : "test_only_postcheck_rejected",
     qualificationId: STAGING_CENSUS_ID,
@@ -1517,12 +1492,16 @@ function finalizeCore(
     },
     exactSourceDeploymentAccessEnvironmentAndBindingsMatch: identitiesMatch,
     workerReadOnlyReceiptVerified: workerReceiptVerified,
+    boundedDdlRowReceiptVerified: workerReceiptVerified,
+    foreignKeyEvidenceWithheld: true,
+    foreignKeyClaimsAccepted: false,
+    offlineDdlReplayEligible: accepted,
     retryAllowed: false,
     providerSecretRead: false,
     oddsProviderPathInvoked: false,
     quotaPathInvoked: false,
     databaseMutationAuthorized: false,
-    claimBoundary: "isolated_staging_read_only_census_only_not_os01_acceptance",
+    claimBoundary: "bounded_isolated_staging_ddl_row_evidence_only_no_foreign_key_or_os01_acceptance",
     recordedAt: finalRecordedAt
   };
   const receipt = hashedBody(body, "finalReceiptHash");
@@ -1628,7 +1607,7 @@ async function executeControllerCli(
     const receipt = operations.finalize();
     return {
       stdout: String(receipt.status) + "\n",
-      exitCode: receipt.status === "accepted_read_only_census_after_control_plane_postcheck" ? 0 : 1
+      exitCode: receipt.status === STAGING_CENSUS_SEMANTIC_CONTRACT.finalAcceptanceStatus ? 0 : 1
     };
   }
   throw new Error("expected --action init, write-pre-observation, run, write-post-observation, or finalize");

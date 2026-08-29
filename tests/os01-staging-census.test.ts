@@ -49,8 +49,9 @@ type FixtureOptions = {
   catalogAfter?: typeof baseCatalog;
   counts?: number[];
   rowCountRows?: Record<string, unknown>[][];
-  foreignKeys?: Record<string, unknown>[];
-  failWhen?: "catalog" | "foreign_key" | "count";
+  failWhen?: "catalog" | "count";
+  failCatalogRead?: number;
+  failCountRead?: number;
 };
 
 function fixture(options: FixtureOptions = {}) {
@@ -68,26 +69,19 @@ function fixture(options: FixtureOptions = {}) {
       return {
         async all() {
           if (sql.includes("FROM sqlite_schema")) {
-            if (options.failWhen === "catalog") throw new Error("sensitive catalog detail");
-            return { success: true, results: catalogReads++ === 0 ? catalogBefore : catalogAfter };
-          }
-          if (sql.includes("foreign_key_list")) {
-            if (options.failWhen === "foreign_key") throw new Error("sensitive foreign-key detail");
-            const sourceTables = Array.from(sql.matchAll(/SELECT '([A-Za-z0-9_]+)' AS source_table/gu),
-              (match) => match[1]!);
-            return {
-              success: true,
-              results: (options.foreignKeys ?? []).map((row) => ({
-                ...row,
-                source_table: row.source_table ?? sourceTables[0]
-              }))
-            };
+            const read = catalogReads++;
+            if (options.failWhen === "catalog" || options.failCatalogRead === read) {
+              throw new Error("sensitive catalog detail");
+            }
+            return { success: true, results: read === 0 ? catalogBefore : catalogAfter };
           }
           if (sql.includes("COUNT(*)")) {
-            if (options.failWhen === "count") throw new Error("sensitive count detail");
             const tableNames = Array.from(sql.matchAll(/SELECT '([A-Za-z0-9_]+)' AS table_name/gu),
               (match) => match[1]!);
             const read = countReads++;
+            if (options.failWhen === "count" || options.failCountRead === read) {
+              throw new Error("sensitive count detail");
+            }
             const configured = options.rowCountRows?.[read];
             if (configured) return { success: true, results: configured };
             const exactCount = counts[read] ?? counts.at(-1) ?? 0;
@@ -138,8 +132,8 @@ function files(root: string, current = root): string[] {
   return result.sort(compare);
 }
 
-describe("OS-01 staging DDL census", () => {
-  it("pins semantic v3, the 94-table gate, and the bridged generation-8 authority", () => {
+describe("OS-01 staging DDL and row census", () => {
+  it("pins semantic v4, the 94-table gate, and the bridged generation-9 authority", () => {
     expect(DEFAULT_STAGING_CENSUS_OPTIONS).toEqual({
       expectedOrigin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
       expectedCatalogHash: "3b261b773327b5e6d0923dd22b5c9407db05d92ee3494f8be664afd1cb273eea",
@@ -147,13 +141,13 @@ describe("OS-01 staging DDL census", () => {
       expectedUserTableCount: 94
     });
     expect(STAGING_CENSUS_SEMANTIC_CONTRACT.version)
-      .toBe("engine-os.os01-staging-census-contract.v3");
+      .toBe("engine-os.os01-staging-census-contract.v4");
     expect(STAGING_CENSUS_ID)
-      .toBe("63542b54dcbb72ffb5d317004779d685cb3b32f42ce519e75beed621c894d7e1");
+      .toBe("8acabdd225af3530825d5ddd65b78fdf0735b638fb38f587fcad40efd378f06d");
     expect(STAGING_CENSUS_CONTROLLER_ID)
-      .toBe("32f0feb8306c355d9761e319ca4bdcefecc47ff230433281cddf7f6e587e2b9f");
+      .toBe("195fcbfc0fac28ae7cdb58ef838172bc572e2069397a3be4d6d724bf07e51b0e");
     expect(STAGING_CENSUS_EXACT_BODY_SHA256)
-      .toBe("d2721fd17aaa9728658eea99068f46211a3ef9b181c35bd6004126fa552d191b");
+      .toBe("7b5280076089b7f782c2d5921043882033fa9e35928345e81ed148416d9276ab");
     expect(hash(STAGING_CENSUS_SEMANTIC_CONTRACT)).toBe(STAGING_CENSUS_ID);
     expect(hash(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT)).toBe(STAGING_CENSUS_CONTROLLER_ID);
     const firstPredecessor = JSON.parse(readFileSync(resolve(
@@ -247,35 +241,49 @@ describe("OS-01 staging DDL census", () => {
       predecessorStatus: "rejected_pre_observation_timestamp_precedes_authority_before_dispatch"
     })).toBe(seventhPredecessor.controllerAuthorityId);
     expect(seventhPredecessor.qualificationId).toBe(LEGACY_STAGING_CENSUS_ID);
-    expect(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT).toEqual({
+    const eighthPredecessor = JSON.parse(readFileSync(resolve(
+      ".planning/engine-os/execution/os-01/staging-census-v2-hosted-attempt8-rejection-receipt.v1.json"
+    ), "utf8")) as Record<string, unknown>;
+    const eighthPredecessorHash = eighthPredecessor.receiptHash;
+    delete eighthPredecessor.receiptHash;
+    expect(hash(eighthPredecessor)).toBe(eighthPredecessorHash);
+    expect(eighthPredecessor.qualificationId)
+      .toBe("63542b54dcbb72ffb5d317004779d685cb3b32f42ce519e75beed621c894d7e1");
+    expect(hash({
       version: "engine-os.os01-staging-census-controller-authority-contract.v8",
-      semanticQualificationId: STAGING_CENSUS_ID,
+      semanticQualificationId: eighthPredecessor.qualificationId,
       generation: 8,
       predecessorReceiptHash: seventhPredecessorHash,
       predecessorStatus: "rejected_expected_user_table_count_mismatch_after_count_diagnostic"
+    })).toBe(eighthPredecessor.controllerAuthorityId);
+    expect(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT).toEqual({
+      version: "engine-os.os01-staging-census-controller-authority-contract.v9",
+      semanticQualificationId: STAGING_CENSUS_ID,
+      generation: 9,
+      predecessorReceiptHash: eighthPredecessorHash,
+      predecessorStatus: "rejected_hosted_foreign_key_read_failed"
     });
     expect(createHash("sha256").update(STAGING_CENSUS_EXACT_BODY).digest("hex"))
       .toBe(STAGING_CENSUS_EXACT_BODY_SHA256);
   });
 
-  it("captures the complete self-hashed census only at the exact expected count", async () => {
-    const value = fixture({
-      foreignKeys: [
-        { id: 1, seq: 0, table: "z", from: "z_id", to: "id", on_update: "NO ACTION", on_delete: "CASCADE", match: "NONE" },
-        { id: 0, seq: 0, table: "a", from: "a_id", to: "id", on_update: "NO ACTION", on_delete: "CASCADE", match: "NONE" }
-      ]
-    });
+  it("captures the complete self-hashed bounded census only at the exact expected count", async () => {
+    const value = fixture();
     const response = await handleOs01StagingCensus(request(), value.db as never, options(value));
     expect(response.status).toBe(200);
     const body = await response.json() as Record<string, unknown>;
-    expect(body.status).toBe("read_only_schema_census_captured");
+    expect(body.status).toBe("read_only_ddl_row_census_captured");
     expect(body.censusId).toBe(STAGING_CENSUS_ID);
     expect(body.userTableCount).toBe(1);
     expect(body.userViewCount).toBe(1);
     expect(body.viewNames).toEqual(["sample_view"]);
     expect(JSON.stringify(body)).not.toContain("CREATE VIEW");
-    expect((body.tables as Array<{ foreignKeys: Array<{ id: number }> }>)[0]!.foreignKeys.map((row) => row.id))
-      .toEqual([0, 1]);
+    expect((body.tables as Array<Record<string, unknown>>)[0]).not.toHaveProperty("foreignKeys");
+    expect(body).not.toHaveProperty("foreignKeyRoot");
+    expect(body.foreignKeyEvidenceWithheld).toBe(true);
+    expect(body.foreignKeyEvidence).toBe(STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence);
+    expect(body.foreignKeyClaimsAccepted).toBe(false);
+    expect(body.d1QueryCount).toBe(4);
     expect(body.prePostCatalogMatch).toBe(true);
     expect(body.prePostRowCountsMatch).toBe(true);
     expect(body.snapshotClaim).toBe(STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim);
@@ -284,7 +292,7 @@ describe("OS-01 staging DDL census", () => {
     const receiptHash = body.receiptHash;
     delete body.receiptHash;
     expect(hash(body)).toBe(receiptHash);
-    expect(value.calls()).toBe(5);
+    expect(value.calls()).toBe(4);
   });
 
   it("canonicalizes catalog result order independently of the mock result order", async () => {
@@ -301,7 +309,7 @@ describe("OS-01 staging DDL census", () => {
       expectedUserTableCount: 1
     });
     expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({ status: "read_only_schema_census_captured" });
+    expect(await response.json()).toMatchObject({ status: "read_only_ddl_row_census_captured" });
   });
 
   it("stops after one read when the exact catalog identity differs", async () => {
@@ -323,8 +331,8 @@ describe("OS-01 staging DDL census", () => {
       request({ query: "?again=true" }),
       request({ query: "#fragment" }),
       request({ contentType: "application/json; charset=utf-8" }),
-      request({ body: `{ "version": "engine-os.os01-staging-census-request.v2", "censusId": "${STAGING_CENSUS_ID}" }` }),
-      request({ body: `{"censusId":"${STAGING_CENSUS_ID}","version":"engine-os.os01-staging-census-request.v2"}` })
+      request({ body: `{ "version": "engine-os.os01-staging-census-request.v3", "censusId": "${STAGING_CENSUS_ID}" }` }),
+      request({ body: `{"censusId":"${STAGING_CENSUS_ID}","version":"engine-os.os01-staging-census-request.v3"}` })
     ];
     for (const candidate of invalid) {
       expect((await handleOs01StagingCensus(candidate, value.db as never, options(value))).status)
@@ -380,7 +388,7 @@ describe("OS-01 staging DDL census", () => {
     expect(response.status).toBe(200);
     const body = await response.json() as Record<string, unknown>;
     expect(body).toMatchObject({
-      status: "read_only_schema_census_captured",
+      status: "read_only_ddl_row_census_captured",
       censusId: STAGING_CENSUS_ID,
       catalogRows: 94,
       userTableCount: 94,
@@ -393,14 +401,13 @@ describe("OS-01 staging DDL census", () => {
     const receiptHash = body.receiptHash;
     delete body.receiptHash;
     expect(hash(body)).toBe(receiptHash);
-    expect(value.calls()).toBe(5);
+    expect(value.calls()).toBe(4);
     const statements = value.statements();
-    expect(statements).toHaveLength(5);
-    expect(statements.filter((sql) => sql.includes("foreign_key_list"))).toHaveLength(1);
+    expect(statements).toHaveLength(4);
+    expect(statements.filter((sql) => sql.includes("foreign_key_list"))).toHaveLength(0);
     expect(statements.filter((sql) => sql.includes("COUNT(*)"))).toHaveLength(2);
     expect(statements[1]!.match(/UNION ALL/gu)).toHaveLength(93);
     expect(statements[2]!.match(/UNION ALL/gu)).toHaveLength(93);
-    expect(statements[3]!.match(/UNION ALL/gu)).toHaveLength(93);
   });
 
   it("classifies identifier and SQL failures without returning their details", async () => {
@@ -449,31 +456,15 @@ describe("OS-01 staging DDL census", () => {
     }
   });
 
-  it("classifies compound foreign-key and row-count failures without returning details", async () => {
+  it("classifies compound row-count failures without returning details", async () => {
     const cases = [
       {
-        value: fixture({ failWhen: "foreign_key" }),
-        category: "foreign_key_read_failed",
-        calls: 2
-      },
-      {
-        value: fixture({
-          foreignKeys: [{
-            id: "sensitive-invalid-id",
-            seq: 0,
-            table: "target",
-            from: "target_id",
-            to: "id",
-            on_update: "NO ACTION",
-            on_delete: "NO ACTION",
-            match: "NONE"
-          }]
-        }),
-        category: "foreign_key_shape_invalid",
-        calls: 2
-      },
-      {
         value: fixture({ failWhen: "count" }),
+        category: "row_count_read_failed",
+        calls: 2
+      },
+      {
+        value: fixture({ failCountRead: 1 }),
         category: "row_count_read_failed",
         calls: 3
       },
@@ -482,7 +473,7 @@ describe("OS-01 staging DDL census", () => {
           rowCountRows: [[{ table_name: "sample", exact_count: "sensitive-invalid-count" }]]
         }),
         category: "row_count_shape_invalid",
-        calls: 3
+        calls: 2
       }
     ] as const;
     for (const item of cases) {
@@ -506,7 +497,7 @@ describe("OS-01 staging DDL census", () => {
     }
   });
 
-  it("fails closed when row counts or catalog identity change during the five-read census", async () => {
+  it("fails closed when row counts or catalog identity change during the four-read census", async () => {
     const changedCatalog = [
       ...baseCatalog,
       { type: "view", name: "late_view", tbl_name: "late_view", sql: "CREATE VIEW late_view AS SELECT 1" }
@@ -521,12 +512,17 @@ describe("OS-01 staging DDL census", () => {
       {
         value: fixture({ counts: [10, 11] }),
         category: "row_count_changed",
-        calls: 4
+        calls: 3
       },
       {
         value: fixture({ catalogAfter: changedCatalog }),
         category: "catalog_changed",
-        calls: 5
+        calls: 4
+      },
+      {
+        value: fixture({ failCatalogRead: 1 }),
+        category: "catalog_read_failed",
+        calls: 4
       },
       {
         value: fixture({ failWhen: "catalog" }),
@@ -565,7 +561,7 @@ describe("OS-01 staging DDL census", () => {
     expect(first.status).toBe(200);
     expect(second.status).toBe(200);
     expect(await first.text()).toBe(await second.text());
-    expect(value.calls()).toBe(10);
+    expect(value.calls()).toBe(8);
   });
 
   it("fails closed above the versioned raw-table bound without returning catalog detail", async () => {
@@ -611,7 +607,7 @@ describe("OS-01 staging DDL census", () => {
     const workerBytes = readFileSync(workerPath);
     const worker = new TextDecoder().decode(workerBytes);
     const hosting = JSON.parse(readFileSync(resolve(outDir, ".openai/hosting.json"), "utf8"));
-    const manifestPath = resolve(outDir, ".openai/os01-staging-census-package.v2.json");
+    const manifestPath = resolve(outDir, ".openai/os01-staging-ddl-row-census-package.v1.json");
     const manifestBytes = readFileSync(manifestPath);
     const manifest = JSON.parse(new TextDecoder().decode(manifestBytes)) as Record<string, unknown>;
     expect(result.entrySha256).toMatch(/^[a-f0-9]{64}$/u);
@@ -621,16 +617,16 @@ describe("OS-01 staging DDL census", () => {
     expect(readFileSync(workerPath))
       .toEqual(readFileSync(resolve(secondOutDir, "dist/server/index.js")));
     expect(readFileSync(manifestPath))
-      .toEqual(readFileSync(resolve(secondOutDir, ".openai/os01-staging-census-package.v2.json")));
-    expect(readFileSync(resolve(outDir, ".openai/os01-staging-census-package.v2.sha256"), "utf8"))
-      .toBe(`${result.manifestSha256}  os01-staging-census-package.v2.json\n`);
-    expect(readFileSync(resolve(outDir, ".openai/os01-staging-census-package.v2.sha256")))
-      .toEqual(readFileSync(resolve(secondOutDir, ".openai/os01-staging-census-package.v2.sha256")));
+      .toEqual(readFileSync(resolve(secondOutDir, ".openai/os01-staging-ddl-row-census-package.v1.json")));
+    expect(readFileSync(resolve(outDir, ".openai/os01-staging-ddl-row-census-package.v1.sha256"), "utf8"))
+      .toBe(`${result.manifestSha256}  os01-staging-ddl-row-census-package.v1.json\n`);
+    expect(readFileSync(resolve(outDir, ".openai/os01-staging-ddl-row-census-package.v1.sha256")))
+      .toEqual(readFileSync(resolve(secondOutDir, ".openai/os01-staging-ddl-row-census-package.v1.sha256")));
     expect(hosting).toEqual({ project_id: "appgprj_6a92435d1d788191b4d6bcaff0a1525d", d1: "DB", r2: null });
     expect(files(outDir)).toEqual([
       ".openai/hosting.json",
-      ".openai/os01-staging-census-package.v2.json",
-      ".openai/os01-staging-census-package.v2.sha256",
+      ".openai/os01-staging-ddl-row-census-package.v1.json",
+      ".openai/os01-staging-ddl-row-census-package.v1.sha256",
       "dist/server/index.js"
     ]);
     expect(manifest).not.toHaveProperty("maximumRequests");
@@ -650,13 +646,13 @@ describe("OS-01 staging DDL census", () => {
     });
     expect(manifest.invocationControl).toMatchObject({
       onlyPersistableWorkerResponseStatuses: [
-        "read_only_schema_census_captured",
+        "read_only_ddl_row_census_captured",
         "closed_user_table_count_mismatch"
       ],
       controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
-      finalAcceptanceStatus: "accepted_read_only_census_after_control_plane_postcheck",
-      dispatchCompletionWrittenForFullCensus: true,
-      finalizationAllowedForFullCensus: true,
+      finalAcceptanceStatus: "accepted_bounded_read_only_ddl_row_census_after_control_plane_postcheck",
+      dispatchCompletionWrittenForBoundedDdlRowCensus: true,
+      finalizationAllowedForBoundedDdlRowCensus: true,
       countDiagnosticFinalizationAllowed: false
     });
     const failureContract = manifest.failureContract as Record<string, unknown>;
@@ -675,29 +671,41 @@ describe("OS-01 staging DDL census", () => {
       aggregateCountsOnly: true,
       identifiersOrSqlAllowed: false,
       terminalAndNonFinalizable: true,
-      matchingCountProducesFullCensus: true
+      matchingCountProducesBoundedDdlRowCensus: true
     });
-    expect(manifest.fullCensusContract).toEqual({
+    expect(manifest.foreignKeyEvidence).toBe(
+      "withheld_pending_independent_offline_ddl_replay_and_generation_10"
+    );
+    expect(manifest.boundedDdlRowCensusContract).toEqual({
       version: STAGING_CENSUS_SEMANTIC_CONTRACT.responseVersion,
-      status: "read_only_schema_census_captured",
+      status: "read_only_ddl_row_census_captured",
       expectedUserTableCount: 94,
-      maximumD1QueriesPerInvocation: 5,
+      maximumD1QueriesPerInvocation: 4,
       queryPlan: [
         "catalog_pre",
-        "foreign_keys_compound",
         "row_counts_pre_compound",
         "row_counts_post_compound",
         "catalog_post"
       ],
       identifiersAndCreateSqlAllowed: true,
       viewSqlAllowed: false,
+      foreignKeyEvidenceWithheld: true,
+      foreignKeyFieldsAllowed: false,
       prePostCatalogAndRowCountsRequired: true,
       controllerValidationRequired: true,
-      controlPlanePostcheckRequired: true
+      controlPlanePostcheckRequired: true,
+      claimBoundary: "bounded_partial_schema_evidence_not_os01_acceptance"
     });
     expect((manifest.request as Record<string, unknown>).exactBodySha256)
       .toBe(STAGING_CENSUS_EXACT_BODY_SHA256);
-    expect(worker).toContain("read_only_schema_census_captured");
+    expect(worker).toContain("read_only_ddl_row_census_captured");
+    for (const prohibited of [
+      "pragma_foreign_key_list",
+      "foreignKeyRoot",
+      "foreignKeys",
+      '"foreign_key_read_failed"',
+      "read_only_schema_census_captured"
+    ]) expect(worker).not.toContain(prohibited);
     expect(worker).toContain("closed_user_table_count_mismatch");
     expect(worker).not.toMatch(/ODDS_API_KEY|ENGINE_OS_CAPTURE_ENABLED|the-odds-api\.com/u);
   });

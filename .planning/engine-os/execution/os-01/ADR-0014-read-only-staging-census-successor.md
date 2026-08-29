@@ -161,3 +161,36 @@ immutable source evidence and independently replays that DDL in a local SQLite v
 normalized foreign keys. Such a change must advance the semantic and response contracts, receive
 a new qualification and controller authority identity chained to the generation-8 rejection
 receipt, and pass independent evidence-root and parser/replay audits before any hosted request.
+
+## Authority generation 9: bounded DDL and row census
+
+Generation 9 is the first stage of that clean successor. It advances the semantic contract to v4,
+the exact request to v3, and the response to
+`engine-os.os01-staging-ddl-row-census-receipt.v1`. Its controller authority is chained to the
+self-hashed generation-8 rejection receipt. The worker executes exactly four D1 statements:
+catalog before, one compound row-count statement before, the same compound row-count statement
+after, and catalog after.
+
+Generation 9 makes no foreign-key claim. It neither executes a foreign-key PRAGMA nor returns a
+`foreignKeys` field, `foreignKeyRoot`, count, empty placeholder, or equivalent assertion. Its exact
+response instead records that foreign-key evidence is withheld pending an independent offline DDL
+replay and a separately authorized generation 10. The controller rejects any additional top-level
+or per-table field, so even a self-hashed `foreignKeys: []` response is invalid. The package build
+also rejects legacy foreign-key query and response symbols.
+
+A controller-finalized generation-9 receipt may accept only bounded, isolated-staging DDL and row-
+count evidence after the owner-only/no-writer post-observation. It cannot accept OS-01, establish a
+full schema census, authorize cleanup or migration, access production, activate capture, or support
+a prospective claim. Its exact DDL response bytes and accepted final receipt are prerequisites for
+offline replay; neither one alone is foreign-key evidence.
+
+## Planned authority generation 10: frozen-candidate foreign-key completion
+
+Only after generation 9 succeeds may an offline verifier reconstruct the captured 94-table schema
+with a pinned SQLite runtime. That replay must emit a deterministic sorted candidate allowlist
+bound to both table names and captured CREATE-SQL hashes, plus independently audited roots. A new
+generation-10 semantic contract may then execute direct `PRAGMA foreign_key_list` reads for exactly
+that frozen allowlist in canonical order. The preregistered ceiling is 45 candidates and 49 total
+D1 statements; a changed allowlist, mismatched DDL binding, excess candidate count, malformed DDL,
+or any PRAGMA failure blocks before qualification. Generation 10 remains unauthorized until the
+generation-9 hosted evidence exists and that replay is accepted.

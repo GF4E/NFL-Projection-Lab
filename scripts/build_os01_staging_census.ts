@@ -70,7 +70,12 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     "ENGINE_OS_CAPTURE_ENABLED",
     "the-odds-api.com",
     "api.the-odds-api.com",
-    "source_capture_provider_request"
+    "source_capture_provider_request",
+    "pragma_foreign_key_list",
+    "foreignKeyRoot",
+    "foreignKeys",
+    '"foreign_key_read_failed"',
+    "read_only_schema_census_captured"
   ]) if (text.includes(prohibited)) throw new Error(`census package contains ${prohibited}`);
   for (const required of [
     STAGING_CENSUS_SEMANTIC_CONTRACT.route,
@@ -81,8 +86,9 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     STAGING_CENSUS_COUNT_DIAGNOSTIC_VERSION,
     "closed_user_table_count_mismatch",
     "terminal_read_only_count_diagnostic_not_census_receipt",
-    "read_only_schema_census_captured",
-    "isolated_staging_read_only_census_only"
+    STAGING_CENSUS_SEMANTIC_CONTRACT.responseStatus,
+    "isolated_staging_read_only_ddl_row_census_only_no_foreign_key_claim",
+    STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence
   ]) if (!text.includes(required)) throw new Error(`census package omits ${required}`);
 
   const metadata = join(outDir, ".openai");
@@ -95,8 +101,8 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     throw new Error("census package contains an automatic migration path");
   }
   const manifest = {
-    version: "engine-os.os01-staging-census-package.v2",
-    status: "isolated_read_only_diagnostic",
+    version: "engine-os.os01-staging-ddl-row-census-package.v1",
+    status: "isolated_bounded_read_only_ddl_row_diagnostic",
     projectId: input.projectId,
     entryPath,
     entrySha256: sha256(entry),
@@ -127,18 +133,19 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
       receiptMustBindOwnerOnlyNoWriterBoundaryBeforeAndAfter: true,
       secondInvocationProhibitedByOperatorContract: true,
       onlyPersistableWorkerResponseStatuses: [
-        "read_only_schema_census_captured",
+        STAGING_CENSUS_SEMANTIC_CONTRACT.responseStatus,
         STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES[1]
       ],
-      finalAcceptanceStatus: "accepted_read_only_census_after_control_plane_postcheck",
-      dispatchCompletionWrittenForFullCensus: true,
-      finalizationAllowedForFullCensus: true,
+      finalAcceptanceStatus: STAGING_CENSUS_SEMANTIC_CONTRACT.finalAcceptanceStatus,
+      dispatchCompletionWrittenForBoundedDdlRowCensus: true,
+      finalizationAllowedForBoundedDdlRowCensus: true,
       countDiagnosticFinalizationAllowed: false,
       maximumResponseBytes: 2097152,
       reflectedCredentialPersistenceAllowed: false
     },
     consistencyClaim: STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
     viewEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.viewEvidence,
+    foreignKeyEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence,
     failureContract: {
       version: "engine-os.os01-staging-census-failure.v1",
       status: "read_only_census_failed",
@@ -160,25 +167,22 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
       selfHashed: true,
       persistenceRequiresControllerValidation: true,
       terminalAndNonFinalizable: true,
-      matchingCountProducesFullCensus: true
+      matchingCountProducesBoundedDdlRowCensus: true
     },
-    fullCensusContract: {
+    boundedDdlRowCensusContract: {
       version: STAGING_CENSUS_SEMANTIC_CONTRACT.responseVersion,
-      status: "read_only_schema_census_captured",
+      status: STAGING_CENSUS_SEMANTIC_CONTRACT.responseStatus,
       expectedUserTableCount: STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT,
-      maximumD1QueriesPerInvocation: 5,
-      queryPlan: [
-        "catalog_pre",
-        "foreign_keys_compound",
-        "row_counts_pre_compound",
-        "row_counts_post_compound",
-        "catalog_post"
-      ],
+      maximumD1QueriesPerInvocation: STAGING_CENSUS_SEMANTIC_CONTRACT.maximumD1QueriesPerInvocation,
+      queryPlan: STAGING_CENSUS_SEMANTIC_CONTRACT.queryPlan,
       identifiersAndCreateSqlAllowed: true,
       viewSqlAllowed: false,
+      foreignKeyEvidenceWithheld: true,
+      foreignKeyFieldsAllowed: false,
       prePostCatalogAndRowCountsRequired: true,
       controllerValidationRequired: true,
-      controlPlanePostcheckRequired: true
+      controlPlanePostcheckRequired: true,
+      claimBoundary: "bounded_partial_schema_evidence_not_os01_acceptance"
     },
     databaseMutationAllowed: false,
     productionAllowed: false,
@@ -186,17 +190,17 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
   };
   const manifestBytes = `${JSON.stringify(manifest, null, 2)}\n`;
   const manifestSha256 = sha256(manifestBytes);
-  writeFileSync(join(metadata, "os01-staging-census-package.v2.json"), manifestBytes, {
+  writeFileSync(join(metadata, "os01-staging-ddl-row-census-package.v1.json"), manifestBytes, {
     encoding: "utf8",
     flag: "wx"
   });
-  writeFileSync(join(metadata, "os01-staging-census-package.v2.sha256"),
-    `${manifestSha256}  os01-staging-census-package.v2.json\n`, { encoding: "utf8", flag: "wx" });
+  writeFileSync(join(metadata, "os01-staging-ddl-row-census-package.v1.sha256"),
+    `${manifestSha256}  os01-staging-ddl-row-census-package.v1.json\n`, { encoding: "utf8", flag: "wx" });
   const finalPayloadFiles = files(outDir).map((path) => path.slice(outDir.length + 1));
   if (JSON.stringify(finalPayloadFiles) !== JSON.stringify([
     ".openai/hosting.json",
-    ".openai/os01-staging-census-package.v2.json",
-    ".openai/os01-staging-census-package.v2.sha256",
+    ".openai/os01-staging-ddl-row-census-package.v1.json",
+    ".openai/os01-staging-ddl-row-census-package.v1.sha256",
     entryPath
   ])) {
     throw new Error("census package final payload is not exact");

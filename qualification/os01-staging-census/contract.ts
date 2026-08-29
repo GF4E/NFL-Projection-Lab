@@ -24,8 +24,6 @@ export const STAGING_CENSUS_FAILURE_CATEGORIES = Object.freeze([
   "user_table_identifier_shape_invalid",
   "user_table_name_binding_invalid",
   "user_table_create_sql_missing",
-  "foreign_key_read_failed",
-  "foreign_key_shape_invalid",
   "row_count_read_failed",
   "row_count_shape_invalid",
   "row_count_changed",
@@ -44,16 +42,19 @@ export const STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES = Object.freeze([
 export const STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS = 1_000;
 
 export const STAGING_CENSUS_SEMANTIC_CONTRACT = Object.freeze({
-  version: "engine-os.os01-staging-census-contract.v3",
+  version: "engine-os.os01-staging-census-contract.v4",
   projectId: "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
   origin: "https://os01-d1-capacity-probe-two-20260829.psoiawesome.chatgpt.site",
-  route: "/__engine-os/os01-staging-census/v2",
+  route: "/__engine-os/os01-staging-census/v3",
   method: "POST",
   contentType: "application/json",
   expectedCatalogRows: 377,
   expectedCatalogHash: "3b261b773327b5e6d0923dd22b5c9407db05d92ee3494f8be664afd1cb273eea",
   expectedUserTableCount: 94,
-  responseVersion: "engine-os.os01-staging-census-receipt.v2",
+  responseVersion: "engine-os.os01-staging-ddl-row-census-receipt.v1",
+  responseStatus: "read_only_ddl_row_census_captured",
+  finalReceiptVersion: "engine-os.os01-staging-ddl-row-census-final-receipt.v1",
+  finalAcceptanceStatus: "accepted_bounded_read_only_ddl_row_census_after_control_plane_postcheck",
   invocationControl: Object.freeze({
     mode: "controller_enforced_single_invocation",
     requestBudget: 1,
@@ -63,6 +64,15 @@ export const STAGING_CENSUS_SEMANTIC_CONTRACT = Object.freeze({
   }),
   consistencyClaim: "pre_post_catalog_and_row_counts_only_not_transactional_snapshot",
   viewEvidence: "names_and_hash_only_no_view_sql",
+  foreignKeyEvidence: "withheld_pending_independent_offline_ddl_replay_and_generation_10",
+  foreignKeyClaimsAccepted: false,
+  maximumD1QueriesPerInvocation: 4,
+  queryPlan: Object.freeze([
+    "catalog_pre",
+    "row_counts_pre_compound",
+    "row_counts_post_compound",
+    "catalog_post"
+  ]),
   runtimeBindings: Object.freeze(["DB"]),
   providerBindings: Object.freeze([]),
   databaseMutationAllowed: false,
@@ -72,21 +82,21 @@ export const STAGING_CENSUS_SEMANTIC_CONTRACT = Object.freeze({
 
 export const STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT =
   STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount;
-export const STAGING_CENSUS_ID = "63542b54dcbb72ffb5d317004779d685cb3b32f42ce519e75beed621c894d7e1";
+export const STAGING_CENSUS_ID = "8acabdd225af3530825d5ddd65b78fdf0735b638fb38f587fcad40efd378f06d";
 export const STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT = Object.freeze({
-  version: "engine-os.os01-staging-census-controller-authority-contract.v8",
+  version: "engine-os.os01-staging-census-controller-authority-contract.v9",
   semanticQualificationId: STAGING_CENSUS_ID,
-  generation: 8,
-  predecessorReceiptHash: "d715fd7ee68e3269c5ebcbcfc769e2a67311d2027ef701b266bac133f4edbdbd",
-  predecessorStatus: "rejected_expected_user_table_count_mismatch_after_count_diagnostic"
+  generation: 9,
+  predecessorReceiptHash: "826cbc7df6c71ebf678b8dce0279acec087813399abc35d90fbb9d5e3e69711c",
+  predecessorStatus: "rejected_hosted_foreign_key_read_failed"
 });
 export const STAGING_CENSUS_CONTROLLER_ID =
-  "32f0feb8306c355d9761e319ca4bdcefecc47ff230433281cddf7f6e587e2b9f";
-export const STAGING_CENSUS_REQUEST_VERSION = "engine-os.os01-staging-census-request.v2";
+  "195fcbfc0fac28ae7cdb58ef838172bc572e2069397a3be4d6d724bf07e51b0e";
+export const STAGING_CENSUS_REQUEST_VERSION = "engine-os.os01-staging-census-request.v3";
 export const STAGING_CENSUS_EXACT_BODY =
   `{"version":"${STAGING_CENSUS_REQUEST_VERSION}","censusId":"${STAGING_CENSUS_ID}"}`;
 export const STAGING_CENSUS_EXACT_BODY_SHA256 =
-  "d2721fd17aaa9728658eea99068f46211a3ef9b181c35bd6004126fa552d191b";
+  "7b5280076089b7f782c2d5921043882033fa9e35928345e81ed148416d9276ab";
 export const STAGING_CENSUS_CONTROLLER_ROOT =
   `/private/tmp/engine-os-os01-staging-census-${STAGING_CENSUS_CONTROLLER_ID}`;
 export const STAGING_CENSUS_ARTIFACT_NAMES = Object.freeze({

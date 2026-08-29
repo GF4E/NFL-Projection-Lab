@@ -27,17 +27,6 @@ type CatalogRow = {
   sql: string | null;
 };
 
-type ForeignKeyRow = {
-  id: number;
-  seq: number;
-  table: string;
-  from: string;
-  to: string | null;
-  on_update: string;
-  on_delete: string;
-  match: string;
-};
-
 type RowCountEvidenceRow = {
   table_name: string;
   exact_count: number;
@@ -48,7 +37,6 @@ type TableEvidence = {
   createSql: string;
   createSqlHash: string;
   rowCount: number;
-  foreignKeys: ForeignKeyRow[];
 };
 
 type CensusDatabase = Pick<D1Database, "prepare">;
@@ -111,40 +99,6 @@ function validCatalogRow(value: unknown): value is CatalogRow {
     typeof row.tbl_name === "string" && (typeof row.sql === "string" || row.sql === null);
 }
 
-function normalizeForeignKey(value: Record<string, unknown>): ForeignKeyRow {
-  const id = value.id;
-  const seq = value.seq;
-  const table = value.table;
-  const from = value.from;
-  const to = value.to;
-  const onUpdate = value.on_update;
-  const onDelete = value.on_delete;
-  const match = value.match;
-  if (!Number.isSafeInteger(id) || (id as number) < 0 || !Number.isSafeInteger(seq) || (seq as number) < 0 ||
-      typeof table !== "string" || typeof from !== "string" ||
-      (typeof to !== "string" && to !== null) || typeof onUpdate !== "string" ||
-      typeof onDelete !== "string" || typeof match !== "string") {
-    throw new CensusFailure("foreign_key_shape_invalid");
-  }
-  return {
-    id: id as number,
-    seq: seq as number,
-    table,
-    from,
-    to,
-    on_update: onUpdate,
-    on_delete: onDelete,
-    match
-  };
-}
-
-function foreignKeyCompare(left: ForeignKeyRow, right: ForeignKeyRow): number {
-  return left.id - right.id || left.seq - right.seq || codePointCompare(left.table, right.table) ||
-    codePointCompare(left.from, right.from) || codePointCompare(left.to ?? "", right.to ?? "") ||
-    codePointCompare(left.on_update, right.on_update) || codePointCompare(left.on_delete, right.on_delete) ||
-    codePointCompare(left.match, right.match);
-}
-
 async function readCatalog(db: CensusDatabase): Promise<CatalogRow[]> {
   const rows = await all<Record<string, unknown>>(db, `SELECT type, name, tbl_name, sql FROM sqlite_schema
     WHERE type IN ('table', 'index', 'trigger', 'view')
@@ -179,30 +133,6 @@ async function readRowCounts(db: CensusDatabase, tableNames: string[]): Promise<
     throw new CensusFailure("row_count_shape_invalid");
   }
   return normalized;
-}
-
-async function readForeignKeys(
-  db: CensusDatabase,
-  tableNames: string[]
-): Promise<Map<string, ForeignKeyRow[]>> {
-  const sql = tableNames.map((tableName) => `SELECT ${quotedLiteral(tableName)} AS source_table,
-    id, seq, "table", "from", "to", on_update, on_delete, "match"
-    FROM pragma_foreign_key_list(${quotedLiteral(tableName)})`).join("\nUNION ALL\n");
-  const rows = await all<Record<string, unknown>>(db, sql, "foreign_key_read_failed");
-  const byTable = new Map(tableNames.map((tableName) => [tableName, [] as ForeignKeyRow[]]));
-  const seen = new Set<string>();
-  for (const row of rows) {
-    if (typeof row.source_table !== "string" || !byTable.has(row.source_table)) {
-      throw new CensusFailure("foreign_key_shape_invalid");
-    }
-    const normalized = normalizeForeignKey(row);
-    const key = canonicalJson({ source_table: row.source_table, ...normalized });
-    if (seen.has(key)) throw new CensusFailure("foreign_key_shape_invalid");
-    seen.add(key);
-    byTable.get(row.source_table)!.push(normalized);
-  }
-  for (const foreignKeys of byTable.values()) foreignKeys.sort(foreignKeyCompare);
-  return byTable;
 }
 
 export async function handleOs01StagingCensus(
@@ -267,7 +197,6 @@ export async function handleOs01StagingCensus(
     }
 
     const tableNames = userTables.map((table) => table.name);
-    const foreignKeysByTable = await readForeignKeys(db, tableNames);
     const rowCountsBefore = await readRowCounts(db, tableNames);
     const tables: TableEvidence[] = [];
     for (const [index, table] of userTables.entries()) {
@@ -277,8 +206,7 @@ export async function handleOs01StagingCensus(
         name: table.name,
         createSql,
         createSqlHash: await sha256(createSql),
-        rowCount: rowCountsBefore[index]!.exact_count,
-        foreignKeys: foreignKeysByTable.get(table.name)!
+        rowCount: rowCountsBefore[index]!.exact_count
       });
     }
 
@@ -301,17 +229,13 @@ export async function handleOs01StagingCensus(
       name: table.name,
       createSql: table.createSql
     }))));
-    const foreignKeyRoot = await sha256(canonicalJson(tables.map((table) => ({
-      name: table.name,
-      foreignKeys: table.foreignKeys
-    }))));
     const rowCountRoot = await sha256(canonicalJson(tables.map((table) => ({
       name: table.name,
       rowCount: table.rowCount
     }))));
     const body = {
       version: STAGING_CENSUS_SEMANTIC_CONTRACT.responseVersion,
-      status: "read_only_schema_census_captured",
+      status: STAGING_CENSUS_SEMANTIC_CONTRACT.responseStatus,
       censusId: STAGING_CENSUS_ID,
       catalogRows: catalogBefore.length,
       catalogHash,
@@ -321,13 +245,16 @@ export async function handleOs01StagingCensus(
       tableSetHash,
       viewSetHash,
       ddlRoot,
-      foreignKeyRoot,
       rowCountRoot,
       tables,
       viewNames: views,
       prePostCatalogMatch: true,
       prePostRowCountsMatch: true,
       snapshotClaim: STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
+      d1QueryCount: STAGING_CENSUS_SEMANTIC_CONTRACT.maximumD1QueriesPerInvocation,
+      foreignKeyEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence,
+      foreignKeyEvidenceWithheld: true,
+      foreignKeyClaimsAccepted: STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyClaimsAccepted,
       requestBudgetClaim: "controller_enforced_single_invocation_not_runtime_durable",
       databaseMutationAttempted: false,
       providerBindings: 0,
@@ -337,7 +264,7 @@ export async function handleOs01StagingCensus(
       captureActivations: 0,
       productionReads: 0,
       productionMutations: 0,
-      claimBoundary: "isolated_staging_read_only_census_only"
+      claimBoundary: "isolated_staging_read_only_ddl_row_census_only_no_foreign_key_claim"
     } as const;
     return json({ ...body, receiptHash: await sha256(canonicalJson(body)) });
   } catch (error) {

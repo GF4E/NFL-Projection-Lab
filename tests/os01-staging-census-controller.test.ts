@@ -100,11 +100,11 @@ function validReceipt(identity: ResponseValidationIdentity): Record<string, unkn
   const tables = Array.from({ length: identity.userTableCount }, (_, index) => {
     const name = "table_" + String(index).padStart(2, "0");
     const createSql = "CREATE TABLE " + name + "(id INTEGER)";
-    return { name, createSql, createSqlHash: sha256(createSql), rowCount: 0, foreignKeys: [] };
+    return { name, createSql, createSqlHash: sha256(createSql), rowCount: 0 };
   });
   const body = {
     version: STAGING_CENSUS_SEMANTIC_CONTRACT.responseVersion,
-    status: "read_only_schema_census_captured",
+    status: STAGING_CENSUS_SEMANTIC_CONTRACT.responseStatus,
     censusId: STAGING_CENSUS_ID,
     catalogRows: identity.catalogRows,
     catalogHash: identity.catalogHash,
@@ -114,10 +114,6 @@ function validReceipt(identity: ResponseValidationIdentity): Record<string, unkn
     tableSetHash: sha256(canonicalJson(tables.map((table) => table.name))),
     viewSetHash: sha256(canonicalJson([])),
     ddlRoot: sha256(canonicalJson(tables.map((table) => ({ name: table.name, createSql: table.createSql })))),
-    foreignKeyRoot: sha256(canonicalJson(tables.map((table) => ({
-      name: table.name,
-      foreignKeys: table.foreignKeys
-    })))),
     rowCountRoot: sha256(canonicalJson(tables.map((table) => ({
       name: table.name,
       rowCount: table.rowCount
@@ -127,6 +123,10 @@ function validReceipt(identity: ResponseValidationIdentity): Record<string, unkn
     prePostCatalogMatch: true,
     prePostRowCountsMatch: true,
     snapshotClaim: STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
+    d1QueryCount: STAGING_CENSUS_SEMANTIC_CONTRACT.maximumD1QueriesPerInvocation,
+    foreignKeyEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence,
+    foreignKeyEvidenceWithheld: true,
+    foreignKeyClaimsAccepted: false,
     requestBudgetClaim: "controller_enforced_single_invocation_not_runtime_durable",
     databaseMutationAttempted: false,
     providerBindings: 0,
@@ -136,7 +136,7 @@ function validReceipt(identity: ResponseValidationIdentity): Record<string, unkn
     captureActivations: 0,
     productionReads: 0,
     productionMutations: 0,
-    claimBoundary: "isolated_staging_read_only_census_only"
+    claimBoundary: "isolated_staging_read_only_ddl_row_census_only_no_foreign_key_claim"
   };
   return { ...body, receiptHash: sha256(canonicalJson(body)) };
 }
@@ -459,7 +459,7 @@ describe("OS-01 staging census controller", () => {
     }
   });
 
-  it("rejects noncanonical, extended, self-hash-invalid, and root-invalid full census responses", async () => {
+  it("rejects noncanonical, extended, self-hash-invalid, root-invalid, and FK-bearing responses", async () => {
     const rehashed = (mutate: (value: Record<string, unknown>) => void): string => {
       const value = structuredClone(validReceipt(defaultValidation));
       delete value.receiptHash;
@@ -479,6 +479,16 @@ describe("OS-01 staging census controller", () => {
         tables[0]!.createSqlHash = "0".repeat(64);
       }),
       rehashed((value) => { value.ddlRoot = "0".repeat(64); }),
+      rehashed((value) => { value.d1QueryCount = 3; }),
+      rehashed((value) => { value.d1QueryCount = 5; }),
+      rehashed((value) => { value.foreignKeyEvidence = "not_withheld"; }),
+      rehashed((value) => { value.foreignKeyEvidenceWithheld = false; }),
+      rehashed((value) => { value.foreignKeyClaimsAccepted = true; }),
+      rehashed((value) => { value.version = "engine-os.os01-staging-census-receipt.v2"; }),
+      rehashed((value) => { value.status = "read_only_schema_census_captured"; }),
+      rehashed((value) => { delete value.foreignKeyEvidence; }),
+      rehashed((value) => { delete value.foreignKeyEvidenceWithheld; }),
+      rehashed((value) => { delete value.foreignKeyClaimsAccepted; }),
       rehashed((value) => { value.userObjectCount = 378; }),
       rehashed((value) => {
         value.viewNames = ["table_00"];
@@ -488,22 +498,9 @@ describe("OS-01 staging census controller", () => {
       }),
       rehashed((value) => {
         const tables = value.tables as Array<Record<string, unknown>>;
-        const duplicate = {
-          id: 0,
-          seq: 0,
-          table: "table_01",
-          from: "id",
-          to: "id",
-          on_update: "NO ACTION",
-          on_delete: "NO ACTION",
-          match: "NONE"
-        };
-        tables[0]!.foreignKeys = [duplicate, { ...duplicate }];
-        value.foreignKeyRoot = sha256(canonicalJson(tables.map((table) => ({
-          name: table.name,
-          foreignKeys: table.foreignKeys
-        }))));
+        tables[0]!.foreignKeys = [];
       }),
+      rehashed((value) => { value.foreignKeyRoot = sha256(canonicalJson([])); }),
       JSON.stringify(validReceipt(defaultValidation)) + "\n"
     ];
     for (const body of bodies) {
@@ -1019,7 +1016,6 @@ describe("OS-01 staging census controller", () => {
         return {
           async all() {
             if (sql.includes("FROM sqlite_schema")) return { success: true, results: catalog };
-            if (sql.includes("FROM pragma_foreign_key_list")) return { success: true, results: [] };
             if (sql.includes("AS table_name") && sql.includes("COUNT(*)")) {
               return {
                 success: true,
@@ -1048,7 +1044,7 @@ describe("OS-01 staging census controller", () => {
     expect(result.responseBytesSha256).toBe(sha256(readFileSync(artifacts.response)));
     const receipt = JSON.parse(readFileSync(artifacts.response, "utf8")) as Record<string, unknown>;
     expect(receipt).toMatchObject({
-      status: "read_only_schema_census_captured",
+      status: "read_only_ddl_row_census_captured",
       catalogRows: 377,
       userTableCount: 94,
       userObjectCount: 376,
@@ -1056,7 +1052,7 @@ describe("OS-01 staging census controller", () => {
       prePostRowCountsMatch: true
     });
     expect(receipt.tables).toHaveLength(94);
-    expect(queryCount).toBe(5);
+    expect(queryCount).toBe(4);
     expect(statSync(artifacts.dispatchCompletion).size).toBeGreaterThan(0);
     writeJson(artifacts.postObservation, observation("post"));
     expect(os01StagingCensusControllerTestOnly.finalize(
@@ -1066,6 +1062,10 @@ describe("OS-01 staging census controller", () => {
     )).toMatchObject({
       status: "test_only_postcheck_verified",
       workerReadOnlyReceiptVerified: true,
+      boundedDdlRowReceiptVerified: true,
+      foreignKeyEvidenceWithheld: true,
+      foreignKeyClaimsAccepted: false,
+      offlineDdlReplayEligible: false,
       crossRecordBindingsVerified: true
     });
   });
