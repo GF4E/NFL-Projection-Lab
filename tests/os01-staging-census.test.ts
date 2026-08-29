@@ -124,18 +124,31 @@ describe("OS-01 staging DDL census", () => {
     const firstPredecessorHash = firstPredecessor.receiptHash;
     delete firstPredecessor.receiptHash;
     expect(hash(firstPredecessor)).toBe(firstPredecessorHash);
-    const predecessor = JSON.parse(readFileSync(resolve(
+    const secondPredecessor = JSON.parse(readFileSync(resolve(
       ".planning/engine-os/execution/os-01/staging-census-v2-hosted-attempt2-rejection-receipt.v1.json"
     ), "utf8")) as Record<string, unknown>;
-    const predecessorHash = predecessor.receiptHash;
-    delete predecessor.receiptHash;
-    expect(hash(predecessor)).toBe(predecessorHash);
+    const secondPredecessorHash = secondPredecessor.receiptHash;
+    delete secondPredecessor.receiptHash;
+    expect(hash(secondPredecessor)).toBe(secondPredecessorHash);
     expect(hash({
       version: "engine-os.os01-staging-census-controller-authority-contract.v2",
       semanticQualificationId: STAGING_CENSUS_ID,
       generation: 2,
       predecessorReceiptHash: firstPredecessorHash,
       predecessorStatus: "rejected_invalid_pre_observation_persistence_before_dispatch"
+    })).toBe(secondPredecessor.controllerAuthorityId);
+    const predecessor = JSON.parse(readFileSync(resolve(
+      ".planning/engine-os/execution/os-01/staging-census-v2-hosted-attempt3-rejection-receipt.v1.json"
+    ), "utf8")) as Record<string, unknown>;
+    const predecessorHash = predecessor.receiptHash;
+    delete predecessor.receiptHash;
+    expect(hash(predecessor)).toBe(predecessorHash);
+    expect(hash({
+      version: "engine-os.os01-staging-census-controller-authority-contract.v3",
+      semanticQualificationId: STAGING_CENSUS_ID,
+      generation: 3,
+      predecessorReceiptHash: secondPredecessorHash,
+      predecessorStatus: "rejected_invalid_site_authorization_header_before_worker"
     })).toBe(predecessor.controllerAuthorityId);
     expect(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT.predecessorReceiptHash).toBe(predecessorHash);
     expect(createHash("sha256").update(STAGING_CENSUS_EXACT_BODY).digest("hex"))

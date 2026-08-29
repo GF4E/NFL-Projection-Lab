@@ -953,7 +953,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         {
           method: STAGING_CENSUS_SEMANTIC_CONTRACT.method,
           headers: {
-            "OAI-Sites-Authorization": input.authorizationToken,
+            "OAI-Sites-Authorization": "Bearer " + input.authorizationToken,
             "Content-Type": STAGING_CENSUS_SEMANTIC_CONTRACT.contentType
           },
           body: STAGING_CENSUS_EXACT_BODY,

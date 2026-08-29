@@ -1,0 +1,93 @@
+{
+  "version": "engine-os.os01-staging-census-hosted-attempt-rejection.v1",
+  "status": "rejected_invalid_site_authorization_value_before_worker",
+  "qualificationId": "471001d7f8ad783dbabc1c03c4e7a022799466a20afba70e1eaf087a4761ec29",
+  "controllerAuthorityId": "112fbe028cc5d26cf273c8f5c4fff87861a9638ba8baf4cd405e96108668dc38",
+  "sourceCommit": "1de0a4170fe1a424fc3120acdbc7888597f3dcdb",
+  "sourceTree": "c2a570f190d9f5f3e0720cc9980c261ec4f2559f",
+  "stagingProjectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "savedVersionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_ca160868b8848191935befc327d8d889",
+  "savedVersionNumber": 13,
+  "deploymentId": "appgdep_6a92a4c1641c81919a78aa53a9962ff4",
+  "deploymentStatus": "succeeded",
+  "workerSha256": "bdc06fea48dad93b29e7ade7466a44c9611aaed358cc5899ae52b51476d00960",
+  "manifestSha256": "57bab4246a28cd8a443a9e73ea5bb018a27b8c6639808334b4d253d4c03573bc",
+  "localArchiveSha256": "18675bc464e0ed6113b31e5b78f4962b178cac5d8c0e11c0072bfb89b18103f9",
+  "authorityRoot": "/private/tmp/engine-os-os01-staging-census-112fbe028cc5d26cf273c8f5c4fff87861a9638ba8baf4cd405e96108668dc38",
+  "artifacts": {
+    "authority": {
+      "sha256": "31822872c1e27c4370c382c34d3055406c9a658f2f673037bd4573670f371cbd",
+      "bytes": 928,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179024955
+    },
+    "preObservation": {
+      "sha256": "23c5adf15eb9d4a492e888065d866b10786b685813b5bbbcb3c9fbd30bec371e",
+      "bytes": 1980,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179024956
+    },
+    "intent": {
+      "sha256": "8fa61080a4f6e8d4cc5559840ce5028554f46822aa400125131d597892f8b818",
+      "bytes": 1487,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179024962
+    },
+    "reservedResponse": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179024963
+    },
+    "attemptResult": {
+      "sha256": "bc5f372fe4275806a43b31b8cc7ac1a15cbf9c155e8efb36cfbd45004927b05e",
+      "bytes": 1290,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179024964
+    },
+    "reservedDispatchCompletion": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179024965
+    }
+  },
+  "failure": {
+    "stage": "hosted_dispatch_authentication",
+    "reason": "oai_sites_authorization_value_omitted_bearer_scheme",
+    "controllerRunInvoked": true,
+    "hostRequestDispatched": true,
+    "httpStatus": 401,
+    "workerRequestDispatched": false,
+    "rawInvalidResponsePersisted": false,
+    "databaseReadAttempted": false,
+    "databaseMutationAttempted": false,
+    "providerPathInvoked": false,
+    "quotaPathInvoked": false,
+    "retryAllowedOnConsumedAuthority": false
+  },
+  "disposition": {
+    "originalAuthorityPreserved": true,
+    "artifactRewriteAllowed": false,
+    "artifactDeletionAllowed": false,
+    "cleanSuccessorRequired": true,
+    "cleanupAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthorized": false,
+    "os01Accepted": false
+  },
+  "recordedAt": "2026-08-29T09:24:00.000Z",
+  "receiptHash": "b474905efd81b73de2516687b467cf6cc17cda49b5abefe0c56be3aadafa0cd7"
+}

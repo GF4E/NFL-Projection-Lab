@@ -61,3 +61,12 @@ a new authority identity from that rejection receipt and follows the Sites dispa
 raw ephemeral token appears only in `OAI-Sites-Authorization`, is never persisted, and is still
 checked for reflection before any response can be stored. Rewriting or deleting either earlier
 generation remains prohibited.
+
+## Authority generation 4
+
+Generation 3 used the correct Sites header name but passed the token without the required bearer
+scheme, so the isolated dispatcher again returned HTTP 401 before the worker or D1. Its terminal
+evidence is preserved. Generation 4 derives a new authority identity from that rejection receipt
+and sends `OAI-Sites-Authorization: Bearer <ephemeral-token>`. The token remains stdin-only,
+unlogged, unpersisted, and covered by the response-reflection rejection. No generic Authorization
+header is sent.

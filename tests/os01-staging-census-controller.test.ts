@@ -294,7 +294,7 @@ describe("OS-01 staging census controller", () => {
         expect(request.redirect).toBe("error");
         expect(request.headers.get("content-type")).toBe("application/json");
         expect(request.headers.get("authorization")).toBeNull();
-        expect(request.headers.get("oai-sites-authorization")).toBe(token);
+        expect(request.headers.get("oai-sites-authorization")).toBe("Bearer " + token);
         expect(await request.text()).toBe(STAGING_CENSUS_EXACT_BODY);
         return acceptedResponse();
       }
