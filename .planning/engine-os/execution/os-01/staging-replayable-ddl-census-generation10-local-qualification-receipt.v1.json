@@ -1,0 +1,101 @@
+{
+  "version": "engine-os.os01-staging-replayable-ddl-census-local-qualification-receipt.v1",
+  "status": "accepted_bounded_local_mechanism_only",
+  "semanticQualificationId": "525370dfc8d64ef549f8c76186c2846fe97ac5beca48d3671cda25a0a0fa5f74",
+  "controllerAuthorityId": "379588dc6e7ed0e7445e2fe78788b3f7143a4947ad524c066191cdd336a002aa",
+  "predecessor": {
+    "implementationCommit": "221a527d3c8e4fee393a4564e34e2afc89c3e796",
+    "implementationTree": "429e43226684b4cec901784294bbddbd49a143d3",
+    "auditVerdict": "rejected_unbound_package_identity"
+  },
+  "implementation": {
+    "commit": "f7a61642b78f1fccf3d197ef7bc99d1d9dfbc9b7",
+    "tree": "bef9de5f958f5732e5b247cfee1b7576cb33991f",
+    "artifactIdentityPreregisteredBeforeObservation": true,
+    "consistentSubstitutionRejected": true,
+    "responseHeaderAndBodyCredentialReflectionRejected": true,
+    "singleBatchCall": true,
+    "identicalCatalogStatements": 2,
+    "exactAutoIndexTableBinding": true
+  },
+  "verification": {
+    "focusedTests": {
+      "passed": 48,
+      "failed": 0
+    },
+    "fullTests": {
+      "passed": 929,
+      "failed": 0,
+      "skipped": 1
+    },
+    "typecheck": "passed",
+    "lint": "passed",
+    "schemaAuthority": {
+      "status": "passed",
+      "tables": 93,
+      "indexes": 80,
+      "triggers": 76,
+      "views": 0,
+      "schemaFingerprint": "4d78fd8de47ababbf6d809575a55275a166e8c99b332344b91c885f27eedafd2"
+    },
+    "productionBuild": "passed_against_production_binding_fixture_without_deployment",
+    "activeBuildGraph": {
+      "status": "passed",
+      "sourceFiles": 167,
+      "buildFiles": 361
+    },
+    "independentImplementationAudit": "accepted_bounded_local_generation10_mechanism_after_adversarial_repairs"
+  },
+  "deterministicPackage": {
+    "workerSha256": "7c8c0d171182959e4df9fe5f278200039f4b4a13b272adc1c11ec8ca7da12d94",
+    "manifestSha256": "b20cc102cde9d3d1caaf2cd2104a0000848c7372ddd7680dc27450a992fac9fb",
+    "siteArchiveSha256": "48eebe9ff440811101aacdd3c56639ce1fc5201ed792000e40a4cccd842afb64",
+    "archiveBytes": 5061,
+    "archiveFileCount": 2,
+    "archiveFileListRoot": "a94a7adf24d59819d1caff2fec9fc1c4e221aec3e7ab9326b1235c1935874f39",
+    "archiveContentRoot": "273a48f63bc819f7e07dd58082dd5b6b4caac6c8967b16b02d1a89db88b149a1",
+    "uploadMethodIdentity": "sites_save_site_version_exact_local_archive",
+    "remoteBuildRequested": false,
+    "twoIndependentBuildsByteIdentical": true,
+    "archiveEntries": [
+      "dist/.openai/hosting.json",
+      "dist/server/index.js"
+    ],
+    "maximumD1QueriesPerInvocation": 2,
+    "foreignKeyEvidenceWithheld": true,
+    "rowCountEvidenceWithheld": true
+  },
+  "securityScans": {
+    "trackedCurrent": {
+      "sha256": "297bde75c35f53766aab164cee9ada932ee4dd6f58085d12852ffc04b518068a",
+      "findingCount": 0
+    },
+    "buildOutputs": {
+      "sha256": "297bde75c35f53766aab164cee9ada932ee4dd6f58085d12852ffc04b518068a",
+      "findingCount": 0
+    },
+    "reachableHistory": {
+      "sha256": "763678a7210827fbab54fa8e101aecf08ba954dadfea7804404ae7782f46996c",
+      "findingCount": 586,
+      "quarantinedCredentialFindingCount": 1,
+      "credentialStatus": "quarantined_unknown_not_clean",
+      "providerUseAllowed": false
+    }
+  },
+  "boundaries": {
+    "hostedEvidenceAccepted": false,
+    "offlineDdlReplayAccepted": false,
+    "foreignKeyEvidenceAccepted": false,
+    "rowCountEvidenceAccepted": false,
+    "os01Accepted": false,
+    "cleanupAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthorized": false,
+    "providerSecretRead": false,
+    "providerPathInvoked": false,
+    "quotaPathInvoked": false,
+    "captureActivated": false
+  },
+  "recordedAt": "2026-08-29T12:42:25.000Z",
+  "receiptHash": "7b574d8a9e978a08d95ab7f95767ee89b263ad7c52b0e1cdc23f912721b38ae8"
+}
