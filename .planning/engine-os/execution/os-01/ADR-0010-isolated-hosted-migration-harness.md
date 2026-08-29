@@ -1,6 +1,6 @@
 # ADR-0010: Isolated owner-only hosted migration qualification harness
 
-- **Status:** Locally implemented and verified; no hosted run or deployment has occurred
+- **Status:** Terminally rejected for capacity accounting; do not deploy
 - **Date:** 2026-08-28
 - **Scope:** Staging-only OS-01 migration-path qualification
 - **Machine-readable contract:** `config/os01-hosted-migration-qualification.v1.json`
@@ -57,17 +57,23 @@ read of an intentionally absent table after successor statement 70, within migra
 0019. It is safe only on fresh isolated D1 C. Passing requires the batch to reject and
 the complete post-failure state evidence to equal the prestate evidence.
 
-The blank request requires 276 statements in its atomic migration batch and at most
-470 D1 queries in the Worker invocation after prestate and terminal evidence reads.
-The successor batch has 137 statements. Cloudflare's published D1 limits currently
-allow 50 queries per invocation on Free and 1,000 on Paid, with a 30-second maximum
-batch duration: <https://developers.cloudflare.com/d1/platform/limits/>. The operator
-must prove that the temporary Sites D1 execution tier supports at least 470 queries
-per invocation before deployment. The package contains no active pre-deploy probe:
-such a Worker probe would require deployment and a bound resource. Capability proof
-must therefore come from read-only Sites plan and binding metadata. If those metadata
-do not prove the limit, the run is blocked before deployment. A platform-limit or
-timeout error is a blocker, not migration or rollback evidence.
+The original 470-query estimate was invalid. It counted one
+`--> statement-breakpoint` entry as one D1 statement, but migrations 0010, 0011, and
+0012 respectively contain entries with 13, 4, and 5 executable semicolon statements.
+Semicolon-aware accounting that respects comments, quoted values, identifiers, and
+trigger bodies proves 291 migration statements, four qualification guards, and a
+295-statement atomic blank batch. Adding four blank-prestate queries and 190 terminal
+queries produces exactly 489 D1 queries in one Worker invocation. The successor batch
+remains 137 statements.
+
+Cloudflare's official D1 limits page currently documents 50 queries per Worker
+invocation on Free, 1,000 on Workers Paid, and a 30-second maximum applying to the
+entire batch: <https://developers.cloudflare.com/d1/platform/limits/>. No
+authoritative evidence establishes the effective Sites D1 plan/limit, and no evidence
+proves that this 295-statement batch completes within 30 seconds. There is no atomic
+successor that fits the documented 50-query Free limit. A platform-limit or timeout
+error would not prove migration behavior. The harness is therefore capacity-blocked
+and must not be deployed.
 
 ## Backup and restoration block
 
@@ -86,57 +92,20 @@ Corrupt backups are rejected separately. Exact restore remains blocked until a
 platform export/import or backup/restore path preserves every receipt byte and the
 complete rows hash on a distinct isolated D1.
 
-## Exact hosted action sequence
+## Permitted next actions
 
-1. Start from the exact harness implementation commit and verify its parent is d24.
-   Build and test locally from tracked files only. Do not open ignored credential
-   files or enumerate the environment.
-2. Verify from the temporary Sites project's current D1 plan/binding metadata that a
-   Worker invocation supports at least 470 D1 queries and that the 276-statement
-   blank batch can run within the platform's 30-second batch cap. If this cannot be
-   proved, record `BLOCKED` and do not deploy the harness.
-3. Create three temporary Sites projects named for blank, legacy, and restore/failure.
-   Before saving code, set each project to owner-only, verify one owner and no other
-   principal, and verify that its D1 is a new isolated resource. Add no R2, runtime
-   key, secret, schedule, or provider binding.
-4. For each project, build into a different new empty directory with
-   `pnpm build:os01-hosted-migration -- --project-id <that staging project id>
-   --out-dir <new empty directory>`. Verify the manifest digest sidecar, entry hash,
-   authority hash, contract hash, DB-only hosting file, and absence of SQL files.
-5. Save and deploy only that package to its matching temporary project. Re-observe
-   owner-only access and the isolated `DB` binding immediately before the first
-   request. If either differs, stop and retire the project without a request.
-6. On D1 A, call `blank_replay`, repeat the same request, then call
-   `verify_blank_terminal`. Preserve every exact request and response byte. Require
-   identical retry receipts, counts 93/80/76/0, no legacy row, `quick_check=ok`, and
-   zero foreign-key violations.
-7. On D1 B, call `legacy_prepare_export`, repeat it, and preserve the exact backup.
-   Require identical retry receipts and through-0016 counts 48/44/46/0. Call
-   `legacy_forward` with that backup, then `verify_legacy_terminal` with the same
-   backup. Require 93/80/76/0 and exact preservation of all 29 source `plays`
-   columns.
-8. On fresh D1 C, call `restore_import` with the exact D1 B backup. Require
-   `exact_distinct_restore_unavailable` and independently verify that D1 C is still
-   blank. This is a negative control, not restore acceptance. Then call
-   `legacy_prepare_export` on D1 C and use D1 C's own exact backup for
-   `failure_probe`. Require exact pre/post state hashes, no 0017-0020 receipts, no
-   qualification guard, and no partial successor object. Call `legacy_forward` and
-   `verify_legacy_terminal` with D1 C's backup to prove the resource remains usable
-   after rollback.
-9. For every step, publish exact request bytes, response bytes, status, package
-   manifest bytes/digest, project-access observation, binding observation, and
-   independent D1 observation under new exclusive filenames. Any collision,
-   incomplete observation, non-2xx response, hash mismatch, or unexpected database
-   state rejects that resource and the entire hosted qualification.
-10. Retire all three projects to an owner-only inert 410 build, remove every binding
-   and runtime key from those projects, verify the qualification route is gone, then
-   physically delete the temporary resources if the platform exposes deletion.
-   Preserve the retirement evidence. Do not reuse any D1 resource.
-11. Obtain an independent review of the exact implementation commit and hosted
-    evidence. A passing result remains a bounded isolated-hosted-mechanism result;
-    production migration remains blocked on the production census, production row
-    manifest, production backup/restore drill, dormant forward migration, post-checks,
-    and final acceptance audit.
+1. Preserve commit `031826519736016ee3223c0f943506edefc7c245` and its local receipt
+   as terminally rejected capacity evidence.
+2. Retain the semicolon-aware counter and its frozen 489-query test as the sole local
+   capacity authority for this harness.
+3. Do not create a staging project, bind D1, save the package, deploy, or issue a
+   hosted request.
+4. Resume hosted design only after an authoritative channel proves the effective
+   Sites query limit and a non-mutating qualification proves the 295-statement batch
+   fits the 30-second cap, or after a separately reviewed atomic design fits within
+   every applicable documented limit.
+5. Continue to require the independent physical-manifest and exact-distinct-restore
+   gates even if capacity is later resolved.
 
 ## Request bodies
 
@@ -151,16 +120,16 @@ recorded, new 64-hex values. Do not derive them from or store them in a credenti
 {"version":"engine-os.os01-hosted-migration-request.v1","action":"legacy_prepare_export","qualificationId":"<64 hex>"}
 ```
 
-For `restore_import`, `failure_probe`, `legacy_forward`, and
-`verify_legacy_terminal`, add the exact `"backup": { ... }` returned by D1 B.
+These bodies are retained as design documentation only. They are not authorized for
+hosted execution while the capacity block remains.
 
 ## Claim boundary
 
 No Sites call, hosted save, hosted deployment, provider call, provider-secret read,
 quota reservation, capture activation, production access, or real-lock access occurred
-while creating this harness. Local tests qualify only the package mechanism. Hosted
-execution can at most qualify the named isolated blank, legacy-forward,
-row-preservation, rollback, logical-export, restore-block, and raw-catalog/DDL paths.
+while creating this harness. Commit 0318265 and its local acceptance receipt are
+terminally rejected because their 470-query premise was false. The corrected count is
+489, with 295 statements in one atomic batch. No hosted execution is authorized.
 Exact distinct-resource restoration and D1 physical-manifest parity remain
 unaccepted. The result cannot establish a production prestate, accept OS-01 or
 ARC-03, or authorize production migration.

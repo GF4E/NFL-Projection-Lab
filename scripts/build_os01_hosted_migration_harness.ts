@@ -6,6 +6,7 @@ import { basename, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { build, type Plugin } from "vite";
 
+import { calculateHostedMigrationCapacity } from "./os01-hosted-migration-capacity";
 import { loadOs01HostedMigrationAuthority } from "./os01-hosted-migration-authority";
 
 const VIRTUAL_ID = "virtual:os01-hosted-migration-authority";
@@ -64,6 +65,10 @@ export async function buildOs01HostedMigrationHarness(input: {
     throw new Error("OS-01 hosted qualification contract is not the frozen staging contract");
   }
   const authority = loadOs01HostedMigrationAuthority(workspaceRoot);
+  const capacity = calculateHostedMigrationCapacity(authority);
+  if (capacity.blankReplayInvocationQueries !== 489 || capacity.blankReplayBatchStatements !== 295) {
+    throw new Error("OS-01 hosted harness capacity accounting no longer matches the frozen migration set");
+  }
   const authorityJson = JSON.stringify(authority);
   const authoritySha256 = sha256(authorityJson);
   const authorityPlugin: Plugin = {
@@ -142,12 +147,18 @@ export async function buildOs01HostedMigrationHarness(input: {
     scheduledTriggers: [],
     terminalPhysicalManifestParityAccepted: false,
     d1QualificationBudget: {
-      minimumQueriesPerWorkerInvocation: 470,
-      blankReplayMigrationBatchStatements: 276,
-      successorMigrationBatchStatements: 137,
+      accountingVersion: capacity.version,
+      requiredQueriesPerWorkerInvocation: capacity.blankReplayInvocationQueries,
+      blankReplayMigrationStatements: capacity.migrationStatements,
+      blankReplayBatchStatements: capacity.blankReplayBatchStatements,
+      blankPrestateQueries: capacity.blankPrestateQueries,
+      blankTerminalQueries: capacity.blankTerminalQueries,
+      successorMigrationBatchStatements: capacity.successorBatchStatements,
       maximumBatchDurationSeconds: 30,
-      activePredeployProbeIncluded: false
+      activePredeployProbeIncluded: false,
+      capacityQualificationStatus: "blocked_no_authoritative_sites_effective_limit_or_duration_proof"
     },
+    deploymentAllowed: false,
     ownerOnlyAccessRequiredBeforeDeploy: true,
     captureActivationAllowed: false,
     productionAllowed: false,

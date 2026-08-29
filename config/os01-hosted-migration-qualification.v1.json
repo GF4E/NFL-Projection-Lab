@@ -1,6 +1,6 @@
 {
   "version": "os01-hosted-migration-qualification.2026.1",
-  "status": "local_harness_ready_not_deployed",
+  "status": "terminal_capacity_blocked_not_deployable",
   "workPackage": "OS-01",
   "requirement": "ARC-03",
   "authority": {
@@ -39,13 +39,19 @@
     "scheduledTriggers": [],
     "realRetainedLockAllowed": false,
     "d1ExecutionPrerequisite": {
-      "minimumQueriesPerWorkerInvocation": 470,
-      "blankReplayMigrationBatchStatements": 276,
+      "accountingVersion": "engine-os.os01-hosted-migration-capacity.v1",
+      "requiredQueriesPerWorkerInvocation": 489,
+      "blankReplayMigrationStatements": 291,
+      "blankReplayBatchStatements": 295,
+      "blankPrestateQueries": 4,
+      "blankTerminalQueries": 190,
       "successorMigrationBatchStatements": 137,
       "batchMaximumDurationSeconds": 30,
       "activePredeployProbeIncluded": false,
-      "capabilityProof": "read-only Sites plan and binding metadata observed before deployment",
-      "failureBehavior": "if the temporary project tier or binding cannot prove this capacity, hosted qualification is blocked before deployment"
+      "authoritativeSitesEffectiveLimitProof": "unavailable",
+      "underThirtySecondExecutionProof": "unavailable",
+      "atomicFreeTierSuccessorExists": false,
+      "failureBehavior": "hosted qualification and deployment remain blocked; a platform-limit or timeout response is not migration evidence"
     }
   },
   "profiles": [
@@ -109,7 +115,8 @@
     "manifest": ".openai/os01-hosted-migration-package.v1.json",
     "manifestDigest": ".openai/os01-hosted-migration-package.v1.sha256",
     "reproducibility": "two empty output directories with the same staging project id must produce identical entry, authority, and manifest hashes",
-    "productionReachability": "worker/index.ts does not import or route to this entry"
+    "productionReachability": "worker/index.ts does not import or route to this entry",
+    "deploymentAllowed": false
   },
   "receiptProtocol": {
     "responseVersion": "engine-os.os01-hosted-migration-receipt.v1",
@@ -118,5 +125,5 @@
     "operatorRetention": "preserve exact request bytes, response bytes, HTTP status, package manifest bytes, manifest digest, project access observation, D1 observations, and retirement observation under exclusive immutable filenames",
     "duplicateBehavior": "never overwrite an existing hosted receipt directory"
   },
-  "claimBoundary": "This contract prepares a qualification-only owner-gated isolated-D1 harness. Local tests do not qualify a hosted path. Even a passing hosted run proves only the named isolated blank, legacy-forward, deterministic legacy-row-preservation, rollback, export, restore-block, and raw-catalog/DDL parity mechanisms. Exact distinct-resource restoration and D1 physical-manifest parity remain unaccepted. It does not establish a production prestate, accept OS-01 or ARC-03, authorize or apply a production migration, activate capture, access a provider, or access the real retained lock."
+  "claimBoundary": "This contract is terminally capacity-blocked. Semicolon-aware accounting proves that blank replay requires 291 migration statements, 295 statements in one atomic batch, and 489 D1 queries in one Worker invocation. No authoritative Sites effective query-limit proof or under-30-second execution proof exists, and no atomic successor fits the documented 50-query Free limit. Do not deploy. Local tests do not qualify a hosted path. Exact distinct-resource restoration and D1 physical-manifest parity remain unaccepted. It does not establish a production prestate, accept OS-01 or ARC-03, authorize or apply a production migration, activate capture, access a provider, or access the real retained lock."
 }

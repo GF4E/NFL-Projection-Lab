@@ -404,12 +404,18 @@ describe("OS-01 standalone hosted migration harness", () => {
       scheduledTriggers: [],
       terminalPhysicalManifestParityAccepted: false,
       d1QualificationBudget: {
-        minimumQueriesPerWorkerInvocation: 470,
-        blankReplayMigrationBatchStatements: 276,
+        accountingVersion: "engine-os.os01-hosted-migration-capacity.v1",
+        requiredQueriesPerWorkerInvocation: 489,
+        blankReplayMigrationStatements: 291,
+        blankReplayBatchStatements: 295,
+        blankPrestateQueries: 4,
+        blankTerminalQueries: 190,
         successorMigrationBatchStatements: 137,
         maximumBatchDurationSeconds: 30,
-        activePredeployProbeIncluded: false
+        activePredeployProbeIncluded: false,
+        capacityQualificationStatus: "blocked_no_authoritative_sites_effective_limit_or_duration_proof"
       },
+      deploymentAllowed: false,
       ownerOnlyAccessRequiredBeforeDeploy: true,
       qualificationContract: {
         path: "config/os01-hosted-migration-qualification.v1.json",
