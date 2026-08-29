@@ -10,6 +10,8 @@ import {
 import {
   canonicalJson,
   DEFAULT_STAGING_CENSUS_OPTIONS,
+  STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT,
+  STAGING_CENSUS_CONTROLLER_ID,
   STAGING_CENSUS_EXACT_BODY,
   STAGING_CENSUS_EXACT_BODY_SHA256,
   STAGING_CENSUS_ID,
@@ -115,6 +117,14 @@ describe("OS-01 staging DDL census", () => {
       expectedUserTableCount: 50
     });
     expect(hash(STAGING_CENSUS_SEMANTIC_CONTRACT)).toBe(STAGING_CENSUS_ID);
+    expect(hash(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT)).toBe(STAGING_CENSUS_CONTROLLER_ID);
+    const predecessor = JSON.parse(readFileSync(resolve(
+      ".planning/engine-os/execution/os-01/staging-census-v2-hosted-attempt1-rejection-receipt.v1.json"
+    ), "utf8")) as Record<string, unknown>;
+    const predecessorHash = predecessor.receiptHash;
+    delete predecessor.receiptHash;
+    expect(hash(predecessor)).toBe(predecessorHash);
+    expect(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT.predecessorReceiptHash).toBe(predecessorHash);
     expect(createHash("sha256").update(STAGING_CENSUS_EXACT_BODY).digest("hex"))
       .toBe(STAGING_CENSUS_EXACT_BODY_SHA256);
   });

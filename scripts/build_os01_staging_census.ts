@@ -8,6 +8,7 @@ import { build } from "vite";
 
 import {
   STAGING_CENSUS_ARTIFACT_NAMES,
+  STAGING_CENSUS_CONTROLLER_ID,
   STAGING_CENSUS_CONTROLLER_ROOT,
   STAGING_CENSUS_EXACT_BODY_SHA256,
   STAGING_CENSUS_ID,
@@ -110,6 +111,7 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     automaticMigrations: false,
     invocationControl: {
       ...STAGING_CENSUS_SEMANTIC_CONTRACT.invocationControl,
+      controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
       canonicalControllerRoot: STAGING_CENSUS_CONTROLLER_ROOT,
       fixedArtifactNames: STAGING_CENSUS_ARTIFACT_NAMES,
       receiptMustBindOwnerOnlyNoWriterBoundaryBeforeAndAfter: true,

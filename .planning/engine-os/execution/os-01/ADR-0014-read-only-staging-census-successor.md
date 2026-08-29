@@ -41,3 +41,13 @@ The package remains DB-only, contains no migration payload, exposes no scheduled
 no provider, quota, capture, production, or secret binding. A passing hosted receipt is evidence
 for constructing and auditing a separate static cleanup candidate only. It does not itself permit
 cleanup, migration replay, production census, or OS-01 acceptance.
+
+## Authority generation 2
+
+The first hosted authority generation was terminally consumed before dispatch when an operator
+helper appended literal backslash-n bytes after the pre-observation JSON document. The invalid
+artifact and rejection receipt are preserved; no request or D1 read occurred. Generation 2 derives
+a new controller-authority identity from the unchanged semantic census identity, generation number,
+and predecessor rejection-receipt hash. The worker request and response contract remain v2, but the
+controller root and every controller record bind the new authority identity. Rewriting or deleting
+generation 1 evidence is prohibited.

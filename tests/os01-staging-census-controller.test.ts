@@ -7,6 +7,7 @@ import { afterEach, describe, expect, expectTypeOf, it } from "vitest";
 import {
   canonicalJson,
   STAGING_CENSUS_ARTIFACT_NAMES,
+  STAGING_CENSUS_CONTROLLER_ID,
   STAGING_CENSUS_CONTROLLER_ROOT,
   STAGING_CENSUS_EXACT_BODY,
   STAGING_CENSUS_EXACT_BODY_SHA256,
@@ -153,7 +154,7 @@ function acceptedResponse(identity = defaultValidation): Response {
 describe("OS-01 staging census controller", () => {
   it("has one canonical qualification root and exposes no public path override", () => {
     expect(STAGING_CENSUS_CONTROLLER_ROOT).toBe(
-      "/private/tmp/engine-os-os01-staging-census-" + STAGING_CENSUS_ID
+      "/private/tmp/engine-os-os01-staging-census-" + STAGING_CENSUS_CONTROLLER_ID
     );
     type PublicInput = Parameters<typeof runOs01StagingCensusController>[0];
     expectTypeOf<PublicInput>().toEqualTypeOf<{
@@ -163,6 +164,44 @@ describe("OS-01 staging census controller", () => {
       ...observationInput("pre"),
       environmentKeyNames: ["ENGINE_OS_CAPTURE_ENABLED"]
     })).toThrow();
+  });
+
+  it("parses and durably writes each observation once in controller order", async () => {
+    const root = privateDirectory();
+    const artifacts = paths(root);
+    os01StagingCensusControllerTestOnly.initialize(
+      root,
+      () => new Date("2026-08-29T07:59:59.000Z")
+    );
+    const preInput = os01StagingCensusControllerTestOnly.parseObservationInput(
+      JSON.stringify(observationInput("pre")) + "\n",
+      "pre"
+    );
+    const preResult = os01StagingCensusControllerTestOnly.writeObservation(root, preInput);
+    expect(preResult).toMatchObject({ phase: "pre", observationHash: expect.any(String) });
+    expect(statSync(artifacts.preObservation).mode & 0o777).toBe(0o600);
+    expect(statSync(artifacts.preObservation).nlink).toBe(1);
+    expect(() => os01StagingCensusControllerTestOnly.writeObservation(root, preInput)).toThrow();
+    expect(() => os01StagingCensusControllerTestOnly.parseObservationInput(
+      JSON.stringify({ ...observationInput("pre"), phase: "post" }),
+      "pre"
+    )).toThrow();
+
+    await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "ephemeral-sites-token-for-test",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => acceptedResponse()
+    });
+    const postInput = os01StagingCensusControllerTestOnly.parseObservationInput(
+      JSON.stringify(observationInput("post")) + "\n",
+      "post"
+    );
+    const postResult = os01StagingCensusControllerTestOnly.writeObservation(root, postInput);
+    expect(postResult).toMatchObject({ phase: "post", observationHash: expect.any(String) });
+    expect(statSync(artifacts.postObservation).mode & 0o777).toBe(0o600);
+    expect(() => os01StagingCensusControllerTestOnly.writeObservation(root, postInput)).toThrow();
   });
 
   it("reserves intent, response, and result before one exact transport call and remains pending", async () => {

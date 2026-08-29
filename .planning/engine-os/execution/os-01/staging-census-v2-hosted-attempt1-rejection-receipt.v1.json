@@ -1,0 +1,57 @@
+{
+  "version": "engine-os.os01-staging-census-hosted-attempt-rejection.v1",
+  "status": "rejected_invalid_pre_observation_persistence_before_dispatch",
+  "qualificationId": "471001d7f8ad783dbabc1c03c4e7a022799466a20afba70e1eaf087a4761ec29",
+  "sourceCommit": "ab45f7dc2cd34ea80abd92088086938060cf9ed3",
+  "sourceTree": "b9a92e138c177936a764f8c872a5e60c84f13033",
+  "stagingProjectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "savedVersionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_039dec0a7514819199d5df209480d9f3",
+  "savedVersionNumber": 11,
+  "deploymentId": "appgdep_6a929d62d5508191a776c68994aae81b",
+  "deploymentStatus": "succeeded",
+  "workerSha256": "c0b8d019a509246041b25526ed479348af7fc203e4fe8628a406d2e1ff0d3dce",
+  "manifestSha256": "0ce07be24ef1e0b75e6e98a6a4ef01e2d4328268df928d0cbaccd3db77e3bd26",
+  "localArchiveSha256": "80ea52a570806ce48bbe00e9832be72499894c2c7966f477e4fedca0db9fb39e",
+  "authorityRoot": "/private/tmp/engine-os-os01-staging-census-471001d7f8ad783dbabc1c03c4e7a022799466a20afba70e1eaf087a4761ec29",
+  "artifacts": {
+    "authority": {
+      "sha256": "038b3bd9be421c2fd8f7b9d77a388fae2726f98c55eb6397bb28390c3c2e7643",
+      "bytes": 833,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179007977
+    },
+    "invalidPreObservation": {
+      "sha256": "eea800e5fc91409e7a11911f3c2a1bb6c324bbeb01426fdfc6b20477764c9c68",
+      "bytes": 1886,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179008004
+    }
+  },
+  "failure": {
+    "stage": "pre_observation_persistence",
+    "reason": "operator_helper_appended_literal_backslash_n_after_json_document",
+    "controllerRunInvoked": false,
+    "workerRequestDispatched": false,
+    "databaseReadAttempted": false,
+    "databaseMutationAttempted": false,
+    "providerPathInvoked": false,
+    "quotaPathInvoked": false,
+    "retryAllowedOnConsumedAuthority": false
+  },
+  "disposition": {
+    "originalAuthorityPreserved": true,
+    "artifactRewriteAllowed": false,
+    "artifactDeletionAllowed": false,
+    "cleanSuccessorRequired": true,
+    "cleanupAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthorized": false,
+    "os01Accepted": false
+  },
+  "recordedAt": "2026-08-29T08:53:04.000Z",
+  "receiptHash": "91e3cf90621c82ecf04c12c0c1efc805d4b37aa2820b1266c139d3045601085a"
+}
