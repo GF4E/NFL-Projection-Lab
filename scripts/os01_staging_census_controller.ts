@@ -626,14 +626,17 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
   const receipt = parsed as Record<string, unknown>;
   if (text !== JSON.stringify(receipt)) return false;
   if (!hasExactKeys(receipt, [
-    "captureActivations", "catalogHash", "catalogRows", "censusId", "claimBoundary",
-    "d1QueryCount", "databaseMutationAttempted", "ddlRoot", "foreignKeyClaimsAccepted", "foreignKeyEvidence",
-    "foreignKeyEvidenceWithheld", "prePostCatalogMatch",
-    "prePostRowCountsMatch", "productionMutations", "productionReads", "providerBindings",
+    "captureActivations", "catalog", "catalogHash", "catalogRows", "censusId", "claimBoundary",
+    "d1QueryCount", "databaseMutationAttempted", "derivedAutoIndexCount", "derivedAutoIndexes",
+    "derivedAutoIndexSetHash", "excludedInternalObjectCount", "excludedInternalObjects",
+    "excludedInternalObjectSetHash", "foreignKeyClaimsAccepted", "foreignKeyEvidence",
+    "firstCatalogHash", "foreignKeyEvidenceWithheld", "objectSetHash", "objectTypeCounts", "objects",
+    "perTypeRoots", "batchCatalogPairMatch",
+    "productionMutations", "productionReads", "providerBindings",
     "providerDispatches", "providerSecretReads", "quotaReservations", "receiptHash",
-    "requestBudgetClaim", "rowCountRoot", "snapshotClaim", "status", "tableSetHash",
-    "tables", "userObjectCount", "userTableCount", "userViewCount", "version",
-    "viewNames", "viewSetHash"
+    "replayableDdlRoot", "replayableObjectCount", "requestBudgetClaim", "rowCountClaimsAccepted",
+    "rowCountEvidence", "rowCountEvidenceWithheld", "secondCatalogHash", "snapshotClaim", "status", "userObjectCount",
+    "userTableCount", "version"
   ])) return false;
   const claimedHash = receipt.receiptHash;
   if (!validHex(claimedHash)) return false;
@@ -644,64 +647,204 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
       receipt.status !== STAGING_CENSUS_SEMANTIC_CONTRACT.responseStatus ||
       receipt.censusId !== STAGING_CENSUS_ID ||
       receipt.catalogRows !== expected.catalogRows || receipt.catalogHash !== expected.catalogHash ||
+      receipt.firstCatalogHash !== expected.catalogHash || receipt.secondCatalogHash !== expected.catalogHash ||
       receipt.userTableCount !== expected.userTableCount ||
       !Number.isSafeInteger(receipt.userObjectCount) ||
+      !Number.isSafeInteger(receipt.replayableObjectCount) ||
+      !Number.isSafeInteger(receipt.derivedAutoIndexCount) ||
+      !Number.isSafeInteger(receipt.excludedInternalObjectCount) ||
       (receipt.userObjectCount as number) < expected.userTableCount ||
       (receipt.userObjectCount as number) > expected.catalogRows ||
-      receipt.prePostCatalogMatch !== true || receipt.prePostRowCountsMatch !== true ||
+      receipt.batchCatalogPairMatch !== true ||
       receipt.snapshotClaim !== STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim ||
       receipt.d1QueryCount !== STAGING_CENSUS_SEMANTIC_CONTRACT.maximumD1QueriesPerInvocation ||
       receipt.foreignKeyEvidence !== STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence ||
       receipt.foreignKeyEvidenceWithheld !== true ||
       receipt.foreignKeyClaimsAccepted !== STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyClaimsAccepted ||
+      receipt.rowCountEvidence !== STAGING_CENSUS_SEMANTIC_CONTRACT.rowCountEvidence ||
+      receipt.rowCountEvidenceWithheld !== true ||
+      receipt.rowCountClaimsAccepted !== STAGING_CENSUS_SEMANTIC_CONTRACT.rowCountClaimsAccepted ||
       receipt.requestBudgetClaim !== "controller_enforced_single_invocation_not_runtime_durable" ||
       receipt.databaseMutationAttempted !== false || receipt.providerBindings !== 0 ||
       receipt.providerSecretReads !== 0 || receipt.providerDispatches !== 0 ||
       receipt.quotaReservations !== 0 || receipt.captureActivations !== 0 ||
       receipt.productionReads !== 0 || receipt.productionMutations !== 0 ||
-      receipt.claimBoundary !== "isolated_staging_read_only_ddl_row_census_only_no_foreign_key_claim") return false;
-  if (!Array.isArray(receipt.tables) || receipt.tables.length !== expected.userTableCount ||
-      !Array.isArray(receipt.viewNames) || receipt.userViewCount !== receipt.viewNames.length) return false;
+      receipt.claimBoundary !==
+        "isolated_staging_read_only_ddl_catalog_census_only_no_row_count_or_foreign_key_claim") return false;
+  if (!Array.isArray(receipt.catalog) || !Array.isArray(receipt.objects) ||
+      !Array.isArray(receipt.derivedAutoIndexes) ||
+      !Array.isArray(receipt.excludedInternalObjects) ||
+      !receipt.objectTypeCounts || typeof receipt.objectTypeCounts !== "object" ||
+      Array.isArray(receipt.objectTypeCounts) || !receipt.perTypeRoots ||
+      typeof receipt.perTypeRoots !== "object" || Array.isArray(receipt.perTypeRoots)) return false;
 
-  const normalizedTables: Array<{ name: string; createSql: string; rowCount: number }> = [];
-  for (const value of receipt.tables) {
+  const allowedTypes = [...STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectTypes];
+  const internalNames = new Set<string>(STAGING_CENSUS_SEMANTIC_CONTRACT.internalTableNames);
+  const catalog: Array<{ type: string; name: string; tbl_name: string; sql: string | null }> = [];
+  for (const value of receipt.catalog) {
     if (!value || typeof value !== "object" || Array.isArray(value)) return false;
-    const table = value as Record<string, unknown>;
-    if (!hasExactKeys(table, ["createSql", "createSqlHash", "name", "rowCount"]) ||
-        typeof table.name !== "string" || !/^[A-Za-z0-9_]+$/u.test(table.name) ||
-        typeof table.createSql !== "string" || table.createSqlHash !== sha256(table.createSql) ||
-        !Number.isSafeInteger(table.rowCount) || (table.rowCount as number) < 0) return false;
-    normalizedTables.push({
-      name: table.name,
-      createSql: table.createSql,
-      rowCount: table.rowCount as number
-    });
+    const row = value as Record<string, unknown>;
+    if (!hasExactKeys(row, ["name", "sql", "tbl_name", "type"]) || typeof row.type !== "string" ||
+        !allowedTypes.includes(row.type) ||
+        typeof row.name !== "string" || typeof row.tbl_name !== "string" ||
+        !(typeof row.sql === "string" || row.sql === null)) return false;
+    catalog.push({ type: row.type, name: row.name, tbl_name: row.tbl_name, sql: row.sql });
   }
-  const tableNames = normalizedTables.map((table) => table.name);
-  const tableNameSet = new Set(tableNames);
-  if (tableNameSet.size !== tableNames.length ||
-      [...tableNames].sort(codePointCompare).some((name, index) => name !== tableNames[index])) return false;
-  const viewNames = receipt.viewNames as unknown[];
-  if ((receipt.userObjectCount as number) < expected.userTableCount + (receipt.userViewCount as number)) {
+  const orderedCatalog = [...catalog].sort((left, right) => codePointCompare(left.type, right.type) ||
+    codePointCompare(left.name, right.name) || codePointCompare(left.tbl_name, right.tbl_name));
+  if (catalog.length !== receipt.catalogRows ||
+      orderedCatalog.some((row, index) => canonicalJson(row) !== canonicalJson(catalog[index])) ||
+      sha256(canonicalJson(catalog)) !== receipt.catalogHash) return false;
+  const isInternalCatalogRow = (row: { type: string; name: string; tbl_name: string }) =>
+    row.type === "table" && row.name === row.tbl_name && internalNames.has(row.name);
+  const isDerivedCatalogAutoIndex = (row: { type: string; name: string; sql: string | null }) =>
+    row.type === "index" && row.sql === null && /^sqlite_autoindex_[A-Za-z0-9_]+_[0-9]+$/u.test(row.name);
+  if (catalog.some((row) => !isInternalCatalogRow(row) &&
+    ((row.name.startsWith("sqlite_") && !row.name.startsWith("sqlite_autoindex_")) ||
+      row.tbl_name.startsWith("sqlite_")))) {
     return false;
   }
-  if (viewNames.some((name) => typeof name !== "string" || !/^[A-Za-z0-9_]+$/u.test(name)) ||
-      new Set(viewNames).size !== viewNames.length ||
-      viewNames.some((name) => tableNameSet.has(String(name))) ||
-      [...viewNames].sort((left, right) => codePointCompare(String(left), String(right)))
-        .some((name, index) => name !== viewNames[index])) return false;
-  return validHex(receipt.tableSetHash) && validHex(receipt.viewSetHash) && validHex(receipt.ddlRoot) &&
-    validHex(receipt.rowCountRoot) &&
-    receipt.tableSetHash === sha256(canonicalJson(tableNames)) &&
-    receipt.viewSetHash === sha256(canonicalJson(viewNames)) &&
-    receipt.ddlRoot === sha256(canonicalJson(normalizedTables.map((table) => ({
-      name: table.name,
-      createSql: table.createSql
-    })))) &&
-    receipt.rowCountRoot === sha256(canonicalJson(normalizedTables.map((table) => ({
-      name: table.name,
-      rowCount: table.rowCount
-    }))));
+
+  const normalizedObjects: Array<{
+    type: string; name: string; tblName: string; createSql: string; createSqlHash: string;
+  }> = [];
+  for (const value of receipt.objects) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+    const object = value as Record<string, unknown>;
+    if (!hasExactKeys(object, ["createSql", "createSqlHash", "name", "tblName", "type"]) ||
+        typeof object.type !== "string" || !allowedTypes.includes(object.type) ||
+        typeof object.name !== "string" || !/^[A-Za-z0-9_]+$/u.test(object.name) ||
+        typeof object.tblName !== "string" || !/^[A-Za-z0-9_]+$/u.test(object.tblName) ||
+        typeof object.createSql !== "string" || object.createSqlHash !== sha256(object.createSql)) return false;
+    normalizedObjects.push({
+      type: object.type,
+      name: object.name,
+      tblName: object.tblName,
+      createSql: object.createSql,
+      createSqlHash: object.createSqlHash as string
+    });
+  }
+  if (normalizedObjects.length !== receipt.replayableObjectCount) return false;
+  const sortedObjects = [...normalizedObjects].sort((left, right) => codePointCompare(left.type, right.type) ||
+    codePointCompare(left.name, right.name) || codePointCompare(left.tblName, right.tblName));
+  if (sortedObjects.some((object, index) => canonicalJson(object) !== canonicalJson(normalizedObjects[index]))) {
+    return false;
+  }
+  const objectKeys = normalizedObjects.map((object) => `${object.type}\u0000${object.name}\u0000${object.tblName}`);
+  if (new Set(objectKeys).size !== objectKeys.length) return false;
+  const tableNames = normalizedObjects.filter((object) => object.type === "table").map((object) => object.name);
+  const tableNameSet = new Set(tableNames);
+  if (tableNameSet.size !== expected.userTableCount || normalizedObjects.some((object) =>
+    ((object.type === "table" || object.type === "view") && object.name !== object.tblName) ||
+    ((object.type === "index" || object.type === "trigger") && !tableNameSet.has(object.tblName)))) return false;
+
+  const typeCounts = receipt.objectTypeCounts as Record<string, unknown>;
+  const perTypeRoots = receipt.perTypeRoots as Record<string, unknown>;
+  if (!hasExactKeys(typeCounts, allowedTypes) || !hasExactKeys(perTypeRoots, allowedTypes)) return false;
+
+  const autoIndexes: Array<{
+    type: "index"; name: string; tblName: string; createSql: null; createSqlHash: string;
+  }> = [];
+  for (const value of receipt.derivedAutoIndexes) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+    const autoIndex = value as Record<string, unknown>;
+    if (!hasExactKeys(autoIndex, ["createSql", "createSqlHash", "name", "tblName", "type"]) ||
+        autoIndex.type !== "index" || autoIndex.createSql !== null ||
+        autoIndex.createSqlHash !== sha256("") || typeof autoIndex.name !== "string" ||
+        !/^sqlite_autoindex_[A-Za-z0-9_]+_[0-9]+$/u.test(autoIndex.name) ||
+        typeof autoIndex.tblName !== "string" || !tableNameSet.has(autoIndex.tblName)) return false;
+    autoIndexes.push({
+      type: "index",
+      name: autoIndex.name,
+      tblName: autoIndex.tblName,
+      createSql: null,
+      createSqlHash: autoIndex.createSqlHash
+    });
+  }
+  if (autoIndexes.length !== receipt.derivedAutoIndexCount ||
+      new Set(autoIndexes.map((value) => `${value.name}\u0000${value.tblName}`)).size !== autoIndexes.length ||
+      [...autoIndexes].sort((left, right) => codePointCompare(left.name, right.name) ||
+        codePointCompare(left.tblName, right.tblName))
+        .some((value, index) => canonicalJson(value) !== canonicalJson(autoIndexes[index]))) return false;
+
+  const internalObjects: Array<{
+    type: string; name: string; tblName: string; createSql: string | null; createSqlHash: string | null;
+  }> = [];
+  for (const value of receipt.excludedInternalObjects) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+    const object = value as Record<string, unknown>;
+    if (!hasExactKeys(object, ["createSql", "createSqlHash", "name", "tblName", "type"]) ||
+        object.type !== "table" || typeof object.name !== "string" || object.name !== object.tblName ||
+        !internalNames.has(object.name) ||
+        !(typeof object.createSql === "string" || object.createSql === null) ||
+        (typeof object.createSql === "string" ? object.createSqlHash !== sha256(object.createSql) :
+          object.createSqlHash !== null)) return false;
+    internalObjects.push({
+      type: object.type,
+      name: object.name,
+      tblName: object.tblName,
+      createSql: object.createSql,
+      createSqlHash: object.createSqlHash as string | null
+    });
+  }
+  if (internalObjects.length !== receipt.excludedInternalObjectCount ||
+      new Set(internalObjects.map((value) => `${value.type}\u0000${value.name}\u0000${value.tblName}`)).size !==
+        internalObjects.length ||
+      [...internalObjects].sort((left, right) => codePointCompare(left.type, right.type) ||
+        codePointCompare(left.name, right.name) || codePointCompare(left.tblName, right.tblName))
+        .some((value, index) => canonicalJson(value) !== canonicalJson(internalObjects[index]))) return false;
+
+  const physicalObjects = [...normalizedObjects, ...autoIndexes].sort((left, right) =>
+    codePointCompare(left.type, right.type) || codePointCompare(left.name, right.name) ||
+    codePointCompare(left.tblName, right.tblName));
+  for (const type of allowedTypes) {
+    const subset = physicalObjects.filter((object) => object.type === type);
+    if (typeCounts[type] !== subset.length || !validHex(perTypeRoots[type]) ||
+        perTypeRoots[type] !== sha256(canonicalJson(subset))) return false;
+  }
+  if (typeCounts.table !== expected.userTableCount) return false;
+  const objectProjection = physicalObjects.map((object) => ({
+    type: object.type,
+    name: object.name,
+    tblName: object.tblName
+  }));
+  const userCatalog = catalog.filter((row) => !isInternalCatalogRow(row));
+  const expectedObjects = userCatalog.filter((row) => typeof row.sql === "string" &&
+    !row.name.startsWith("sqlite_autoindex_")).map((row) => ({
+    type: row.type,
+    name: row.name,
+    tblName: row.tbl_name,
+    createSql: row.sql as string,
+    createSqlHash: sha256(row.sql as string)
+  }));
+  const expectedAutoIndexes = userCatalog.filter(isDerivedCatalogAutoIndex).map((row) => ({
+    type: "index" as const,
+    name: row.name,
+    tblName: row.tbl_name,
+    createSql: null,
+    createSqlHash: sha256("")
+  }));
+  const expectedInternalObjects = catalog.filter(isInternalCatalogRow).map((row) => ({
+    type: row.type,
+    name: row.name,
+    tblName: row.tbl_name,
+    createSql: row.sql,
+    createSqlHash: typeof row.sql === "string" ? sha256(row.sql) : null
+  }));
+  if (userCatalog.some((row) => (row.sql === null && !isDerivedCatalogAutoIndex(row)) ||
+      (typeof row.sql === "string" && row.name.startsWith("sqlite_autoindex_"))) ||
+      canonicalJson(expectedObjects) !== canonicalJson(normalizedObjects) ||
+      canonicalJson(expectedAutoIndexes) !== canonicalJson(autoIndexes) ||
+      canonicalJson(expectedInternalObjects) !== canonicalJson(internalObjects)) return false;
+
+  return receipt.userObjectCount === normalizedObjects.length + autoIndexes.length &&
+    receipt.catalogRows === (receipt.userObjectCount as number) + internalObjects.length &&
+    validHex(receipt.objectSetHash) && validHex(receipt.replayableDdlRoot) &&
+    validHex(receipt.derivedAutoIndexSetHash) && validHex(receipt.excludedInternalObjectSetHash) &&
+    receipt.objectSetHash === sha256(canonicalJson(objectProjection)) &&
+    receipt.replayableDdlRoot === sha256(canonicalJson(normalizedObjects)) &&
+    receipt.derivedAutoIndexSetHash === sha256(canonicalJson(autoIndexes)) &&
+    receipt.excludedInternalObjectSetHash === sha256(canonicalJson(internalObjects));
 }
 
 function validateCountDiagnosticResponse(bytes: Uint8Array): boolean {
@@ -1492,16 +1635,19 @@ function finalizeCore(
     },
     exactSourceDeploymentAccessEnvironmentAndBindingsMatch: identitiesMatch,
     workerReadOnlyReceiptVerified: workerReceiptVerified,
-    boundedDdlRowReceiptVerified: workerReceiptVerified,
+    boundedDdlCatalogReceiptVerified: workerReceiptVerified,
     foreignKeyEvidenceWithheld: true,
     foreignKeyClaimsAccepted: false,
+    rowCountEvidenceWithheld: true,
+    rowCountClaimsAccepted: false,
     offlineDdlReplayEligible: accepted,
     retryAllowed: false,
     providerSecretRead: false,
     oddsProviderPathInvoked: false,
     quotaPathInvoked: false,
     databaseMutationAuthorized: false,
-    claimBoundary: "bounded_isolated_staging_ddl_row_evidence_only_no_foreign_key_or_os01_acceptance",
+    claimBoundary:
+      "bounded_isolated_staging_ddl_catalog_evidence_only_no_row_count_foreign_key_or_os01_acceptance",
     recordedAt: finalRecordedAt
   };
   const receipt = hashedBody(body, "finalReceiptHash");

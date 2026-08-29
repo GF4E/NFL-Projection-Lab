@@ -12,13 +12,9 @@ import {
 } from "./contract";
 import type { StagingCensusFailureCategory } from "./contract";
 
-const INTERNAL_OBJECTS = new Set([
-  "_cf_KV",
-  "d1_migrations",
-  "sqlite_sequence",
-  "sqlite_stat1",
-  "sqlite_stat4"
-]);
+const INTERNAL_TABLES = new Set<string>(STAGING_CENSUS_SEMANTIC_CONTRACT.internalTableNames);
+const REPLAYABLE_OBJECT_TYPES = new Set<string>(STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectTypes);
+const SAFE_IDENTIFIER = /^[A-Za-z0-9_]+$/u;
 
 type CatalogRow = {
   type: string;
@@ -27,19 +23,31 @@ type CatalogRow = {
   sql: string | null;
 };
 
-type RowCountEvidenceRow = {
-  table_name: string;
-  exact_count: number;
-};
-
-type TableEvidence = {
+type ReplayableObjectEvidence = {
+  type: "table" | "index" | "trigger" | "view";
   name: string;
+  tblName: string;
   createSql: string;
   createSqlHash: string;
-  rowCount: number;
 };
 
-type CensusDatabase = Pick<D1Database, "prepare">;
+type DerivedAutoIndexEvidence = {
+  type: "index";
+  name: string;
+  tblName: string;
+  createSql: null;
+  createSqlHash: string;
+};
+
+type InternalObjectEvidence = {
+  type: string;
+  name: string;
+  tblName: string;
+  createSql: string | null;
+  createSqlHash: string | null;
+};
+
+type CensusDatabase = Pick<D1Database, "prepare" | "batch">;
 
 type CensusOptions = {
   expectedOrigin: string;
@@ -61,31 +69,12 @@ async function sha256(value: string): Promise<string> {
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
-function quoteIdentifier(value: string): string {
-  if (!/^[A-Za-z0-9_]+$/u.test(value)) {
-    throw new CensusFailure("user_table_identifier_shape_invalid");
-  }
-  return `"${value}"`;
-}
-
 function isInternal(row: CatalogRow): boolean {
-  return INTERNAL_OBJECTS.has(row.name) || INTERNAL_OBJECTS.has(row.tbl_name) ||
-    row.name.startsWith("sqlite_") || row.name.startsWith("sqlite_autoindex_");
+  return row.type === "table" && row.name === row.tbl_name && INTERNAL_TABLES.has(row.name);
 }
 
-async function all<T extends Record<string, unknown>>(
-  db: CensusDatabase,
-  sql: string,
-  failure: FailureReason
-): Promise<T[]> {
-  try {
-    const result = await db.prepare(sql).all<T>();
-    if (!result.success || !Array.isArray(result.results)) throw new CensusFailure(failure);
-    return result.results;
-  } catch (error) {
-    if (error instanceof CensusFailure) throw error;
-    throw new CensusFailure(failure);
-  }
+function isDerivedAutoIndex(row: CatalogRow): boolean {
+  return row.type === "index" && row.sql === null && /^sqlite_autoindex_[A-Za-z0-9_]+_[0-9]+$/u.test(row.name);
 }
 
 function json(value: unknown, status = 200): Response {
@@ -99,40 +88,31 @@ function validCatalogRow(value: unknown): value is CatalogRow {
     typeof row.tbl_name === "string" && (typeof row.sql === "string" || row.sql === null);
 }
 
-async function readCatalog(db: CensusDatabase): Promise<CatalogRow[]> {
-  const rows = await all<Record<string, unknown>>(db, `SELECT type, name, tbl_name, sql FROM sqlite_schema
+const CATALOG_SQL = `SELECT type, name, tbl_name, sql FROM sqlite_schema
     WHERE type IN ('table', 'index', 'trigger', 'view')
-    ORDER BY type COLLATE BINARY, name COLLATE BINARY`, "catalog_read_failed");
+    ORDER BY type COLLATE BINARY, name COLLATE BINARY`;
+
+function normalizeCatalog(value: unknown): CatalogRow[] {
+  if (!value || typeof value !== "object") throw new CensusFailure("catalog_read_failed");
+  const result = value as { success?: unknown; results?: unknown };
+  if (result.success !== true || !Array.isArray(result.results)) {
+    throw new CensusFailure("catalog_read_failed");
+  }
+  const rows = result.results;
   if (!rows.every(validCatalogRow)) throw new CensusFailure("catalog_shape_invalid");
   return rows.sort((left, right) => codePointCompare(left.type, right.type) ||
     codePointCompare(left.name, right.name) || codePointCompare(left.tbl_name, right.tbl_name));
 }
 
-function quotedLiteral(value: string): string {
-  if (!/^[A-Za-z0-9_]+$/u.test(value)) {
-    throw new CensusFailure("user_table_identifier_shape_invalid");
+async function readCatalogPair(db: CensusDatabase): Promise<[CatalogRow[], CatalogRow[]]> {
+  try {
+    const results = await db.batch([db.prepare(CATALOG_SQL), db.prepare(CATALOG_SQL)]);
+    if (!Array.isArray(results) || results.length !== 2) throw new CensusFailure("catalog_read_failed");
+    return [normalizeCatalog(results[0]), normalizeCatalog(results[1])];
+  } catch (error) {
+    if (error instanceof CensusFailure) throw error;
+    throw new CensusFailure("catalog_read_failed");
   }
-  return `'${value}'`;
-}
-
-async function readRowCounts(db: CensusDatabase, tableNames: string[]): Promise<RowCountEvidenceRow[]> {
-  const sql = tableNames.map((tableName) =>
-    `SELECT ${quotedLiteral(tableName)} AS table_name, COUNT(*) AS exact_count FROM ${quoteIdentifier(tableName)}`
-  ).join("\nUNION ALL\n");
-  const rows = await all<Record<string, unknown>>(db, sql, "row_count_read_failed");
-  if (rows.length !== tableNames.length) throw new CensusFailure("row_count_shape_invalid");
-  const normalized = rows.map((row): RowCountEvidenceRow => {
-    if (typeof row.table_name !== "string" || !Number.isSafeInteger(row.exact_count) ||
-        (row.exact_count as number) < 0) {
-      throw new CensusFailure("row_count_shape_invalid");
-    }
-    return { table_name: row.table_name, exact_count: row.exact_count as number };
-  }).sort((left, right) => codePointCompare(left.table_name, right.table_name));
-  if (new Set(normalized.map((row) => row.table_name)).size !== tableNames.length ||
-      normalized.some((row, index) => row.table_name !== tableNames[index])) {
-    throw new CensusFailure("row_count_shape_invalid");
-  }
-  return normalized;
 }
 
 export async function handleOs01StagingCensus(
@@ -156,14 +136,19 @@ export async function handleOs01StagingCensus(
   if (requestBody !== STAGING_CENSUS_EXACT_BODY) return json({ error: "invalid_request" }, 400);
 
   try {
-    const catalogBefore = await readCatalog(db);
-    const catalogHash = await sha256(canonicalJson(catalogBefore));
-    if (catalogBefore.length !== options.expectedCatalogRows || catalogHash !== options.expectedCatalogHash) {
+    const [catalogBefore, catalogAfter] = await readCatalogPair(db);
+    const firstCatalogHash = await sha256(canonicalJson(catalogBefore));
+    const secondCatalogHash = await sha256(canonicalJson(catalogAfter));
+    if (catalogBefore.length !== options.expectedCatalogRows || firstCatalogHash !== options.expectedCatalogHash) {
       throw new CensusFailure("catalog_identity_mismatch");
     }
-    const userObjects = catalogBefore.filter((row) => !isInternal(row));
+    if (catalogAfter.length !== catalogBefore.length || secondCatalogHash !== firstCatalogHash) {
+      throw new CensusFailure("catalog_changed");
+    }
+    const internalRows = catalogBefore.filter(isInternal);
+    const userRows = catalogBefore.filter((row) => !isInternal(row));
     const rawTables = catalogBefore.filter((row) => row.type === "table");
-    const userTables = userObjects
+    const userTables = userRows
       .filter((row) => row.type === "table")
       .sort((left, right) => codePointCompare(left.name, right.name));
     if (rawTables.length > STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS) {
@@ -183,78 +168,124 @@ export async function handleOs01StagingCensus(
       } as const;
       return json({ ...diagnostic, receiptHash: await sha256(canonicalJson(diagnostic)) }, 500);
     }
-    if (userTables.some((row) => !/^[A-Za-z0-9_]+$/u.test(row.name))) {
-      throw new CensusFailure("user_table_identifier_shape_invalid");
+    if (userRows.some((row) => !REPLAYABLE_OBJECT_TYPES.has(row.type))) {
+      throw new CensusFailure("user_object_type_invalid");
     }
-    if (new Set(userTables.map((row) => row.name)).size !== userTables.length) {
-      throw new CensusFailure("user_table_identifier_shape_invalid");
+    if (userRows.some((row) =>
+      (row.name.startsWith("sqlite_") && !row.name.startsWith("sqlite_autoindex_")) ||
+      row.tbl_name.startsWith("sqlite_"))) {
+      throw new CensusFailure("unknown_internal_object");
     }
-    if (userTables.some((row) => row.name !== row.tbl_name)) {
-      throw new CensusFailure("user_table_name_binding_invalid");
+    if (userRows.some((row) => !SAFE_IDENTIFIER.test(row.name) || !SAFE_IDENTIFIER.test(row.tbl_name))) {
+      throw new CensusFailure("user_object_identifier_shape_invalid");
     }
-    if (userTables.some((row) => typeof row.sql !== "string")) {
-      throw new CensusFailure("user_table_create_sql_missing");
+    if (new Set(userRows.map((row) => `${row.type}\u0000${row.name}\u0000${row.tbl_name}`)).size !==
+        userRows.length) {
+      throw new CensusFailure("user_object_identifier_shape_invalid");
+    }
+    const tableNames = new Set(userTables.map((row) => row.name));
+    if (userTables.some((row) => row.name !== row.tbl_name) || userRows.some((row) =>
+      (row.type === "view" && row.name !== row.tbl_name) ||
+      ((row.type === "index" || row.type === "trigger") && !tableNames.has(row.tbl_name)))) {
+      throw new CensusFailure("user_object_name_binding_invalid");
     }
 
-    const tableNames = userTables.map((table) => table.name);
-    const rowCountsBefore = await readRowCounts(db, tableNames);
-    const tables: TableEvidence[] = [];
-    for (const [index, table] of userTables.entries()) {
-      const createSql = table.sql;
-      if (typeof createSql !== "string") throw new CensusFailure("user_table_create_sql_missing");
-      tables.push({
-        name: table.name,
+    const objects: ReplayableObjectEvidence[] = [];
+    const autoIndexes: DerivedAutoIndexEvidence[] = [];
+    for (const row of userRows) {
+      if (isDerivedAutoIndex(row)) {
+        if (!SAFE_IDENTIFIER.test(row.name) || !tableNames.has(row.tbl_name)) {
+          throw new CensusFailure("derived_autoindex_shape_invalid");
+        }
+        autoIndexes.push({
+          type: "index",
+          name: row.name,
+          tblName: row.tbl_name,
+          createSql: null,
+          createSqlHash: await sha256("")
+        });
+        continue;
+      }
+      if (row.name.startsWith("sqlite_autoindex_")) {
+        throw new CensusFailure("derived_autoindex_shape_invalid");
+      }
+      const createSql = row.sql;
+      if (typeof createSql !== "string") throw new CensusFailure("user_object_create_sql_missing");
+      objects.push({
+        type: row.type as ReplayableObjectEvidence["type"],
+        name: row.name,
+        tblName: row.tbl_name,
         createSql,
-        createSqlHash: await sha256(createSql),
-        rowCount: rowCountsBefore[index]!.exact_count
+        createSqlHash: await sha256(createSql)
       });
     }
+    objects.sort((left, right) => codePointCompare(left.type, right.type) ||
+      codePointCompare(left.name, right.name) || codePointCompare(left.tblName, right.tblName));
+    autoIndexes.sort((left, right) => codePointCompare(left.name, right.name) ||
+      codePointCompare(left.tblName, right.tblName));
 
-    const rowCountsAfter = await readRowCounts(db, tableNames);
-    if (rowCountsAfter.some((row, index) => row.exact_count !== tables[index]!.rowCount)) {
-      throw new CensusFailure("row_count_changed");
+    const internalObjects: InternalObjectEvidence[] = [];
+    for (const row of internalRows) {
+      internalObjects.push({
+        type: row.type,
+        name: row.name,
+        tblName: row.tbl_name,
+        createSql: row.sql,
+        createSqlHash: typeof row.sql === "string" ? await sha256(row.sql) : null
+      });
     }
-    const catalogAfter = await readCatalog(db);
-    if (await sha256(canonicalJson(catalogAfter)) !== catalogHash || catalogAfter.length !== catalogBefore.length) {
-      throw new CensusFailure("catalog_changed");
-    }
+    internalObjects.sort((left, right) => codePointCompare(left.type, right.type) ||
+      codePointCompare(left.name, right.name) || codePointCompare(left.tblName, right.tblName));
 
-    const views = userObjects
-      .filter((row) => row.type === "view")
-      .map((row) => row.name)
-      .sort(codePointCompare);
-    const tableSetHash = await sha256(canonicalJson(tables.map((table) => table.name)));
-    const viewSetHash = await sha256(canonicalJson(views));
-    const ddlRoot = await sha256(canonicalJson(tables.map((table) => ({
-      name: table.name,
-      createSql: table.createSql
+    const physicalObjects = [...objects, ...autoIndexes].sort((left, right) =>
+      codePointCompare(left.type, right.type) || codePointCompare(left.name, right.name) ||
+      codePointCompare(left.tblName, right.tblName));
+    const objectTypeCounts = Object.fromEntries(STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectTypes
+      .map((type) => [type, physicalObjects.filter((object) => object.type === type).length]));
+    const perTypeRoots: Record<string, string> = {};
+    for (const type of STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectTypes) {
+      perTypeRoots[type] = await sha256(canonicalJson(physicalObjects.filter((object) => object.type === type)));
+    }
+    const objectSetHash = await sha256(canonicalJson(physicalObjects.map((object) => ({
+      type: object.type,
+      name: object.name,
+      tblName: object.tblName
     }))));
-    const rowCountRoot = await sha256(canonicalJson(tables.map((table) => ({
-      name: table.name,
-      rowCount: table.rowCount
-    }))));
+    const replayableDdlRoot = await sha256(canonicalJson(objects));
+    const autoIndexSetHash = await sha256(canonicalJson(autoIndexes));
+    const internalObjectSetHash = await sha256(canonicalJson(internalObjects));
     const body = {
       version: STAGING_CENSUS_SEMANTIC_CONTRACT.responseVersion,
       status: STAGING_CENSUS_SEMANTIC_CONTRACT.responseStatus,
       censusId: STAGING_CENSUS_ID,
       catalogRows: catalogBefore.length,
-      catalogHash,
-      userObjectCount: userObjects.length,
-      userTableCount: tables.length,
-      userViewCount: views.length,
-      tableSetHash,
-      viewSetHash,
-      ddlRoot,
-      rowCountRoot,
-      tables,
-      viewNames: views,
-      prePostCatalogMatch: true,
-      prePostRowCountsMatch: true,
+      catalogHash: firstCatalogHash,
+      firstCatalogHash,
+      secondCatalogHash,
+      catalog: catalogBefore,
+      userObjectCount: userRows.length,
+      userTableCount: userTables.length,
+      replayableObjectCount: objects.length,
+      objectTypeCounts,
+      objectSetHash,
+      replayableDdlRoot,
+      perTypeRoots,
+      objects,
+      derivedAutoIndexCount: autoIndexes.length,
+      derivedAutoIndexSetHash: autoIndexSetHash,
+      derivedAutoIndexes: autoIndexes,
+      excludedInternalObjectCount: internalObjects.length,
+      excludedInternalObjectSetHash: internalObjectSetHash,
+      excludedInternalObjects: internalObjects,
+      batchCatalogPairMatch: true,
       snapshotClaim: STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
       d1QueryCount: STAGING_CENSUS_SEMANTIC_CONTRACT.maximumD1QueriesPerInvocation,
       foreignKeyEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence,
       foreignKeyEvidenceWithheld: true,
       foreignKeyClaimsAccepted: STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyClaimsAccepted,
+      rowCountEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.rowCountEvidence,
+      rowCountEvidenceWithheld: true,
+      rowCountClaimsAccepted: STAGING_CENSUS_SEMANTIC_CONTRACT.rowCountClaimsAccepted,
       requestBudgetClaim: "controller_enforced_single_invocation_not_runtime_durable",
       databaseMutationAttempted: false,
       providerBindings: 0,
@@ -264,7 +295,7 @@ export async function handleOs01StagingCensus(
       captureActivations: 0,
       productionReads: 0,
       productionMutations: 0,
-      claimBoundary: "isolated_staging_read_only_ddl_row_census_only_no_foreign_key_claim"
+      claimBoundary: "isolated_staging_read_only_ddl_catalog_census_only_no_row_count_or_foreign_key_claim"
     } as const;
     return json({ ...body, receiptHash: await sha256(canonicalJson(body)) });
   } catch (error) {

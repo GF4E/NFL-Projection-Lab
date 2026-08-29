@@ -96,37 +96,91 @@ function prepareRoot(): { root: string; artifacts: ReturnType<typeof paths> } {
   return { root, artifacts };
 }
 
-function validReceipt(identity: ResponseValidationIdentity): Record<string, unknown> {
-  const tables = Array.from({ length: identity.userTableCount }, (_, index) => {
+function receiptCatalog(userTableCount: number, catalogRows: number) {
+  const tables = Array.from({ length: userTableCount }, (_, index) => {
     const name = "table_" + String(index).padStart(2, "0");
-    const createSql = "CREATE TABLE " + name + "(id INTEGER)";
-    return { name, createSql, createSqlHash: sha256(createSql), rowCount: 0 };
+    return { type: "table", name, tbl_name: name, sql: "CREATE TABLE " + name + "(id INTEGER)" };
   });
+  const additional = catalogRows - userTableCount;
+  if (additional < 0) throw new Error("catalog rows cannot be smaller than the user table count");
+  const internal = additional > 0
+    ? [{ type: "table", name: "d1_migrations", tbl_name: "d1_migrations", sql: "CREATE TABLE d1_migrations(id INTEGER)" }]
+    : [];
+  const indexes = Array.from({ length: Math.max(0, additional - internal.length) }, (_, index) => ({
+    type: "index",
+    name: "idx_" + String(index).padStart(3, "0"),
+    tbl_name: tables[0]?.name ?? "missing_table",
+    sql: "CREATE INDEX idx_" + String(index).padStart(3, "0") + " ON " +
+      (tables[0]?.name ?? "missing_table") + "(id)"
+  }));
+  return [...indexes, ...internal, ...tables].sort((left, right) =>
+    left.type < right.type ? -1 : left.type > right.type ? 1 :
+      left.name < right.name ? -1 : left.name > right.name ? 1 :
+        left.tbl_name < right.tbl_name ? -1 : left.tbl_name > right.tbl_name ? 1 : 0);
+}
+
+function validReceipt(identity: ResponseValidationIdentity): Record<string, unknown> {
+  const catalog = receiptCatalog(identity.userTableCount, identity.catalogRows);
+  const internalNames = new Set(STAGING_CENSUS_SEMANTIC_CONTRACT.internalTableNames);
+  const userRows = catalog.filter((row) => !(row.type === "table" && row.name === row.tbl_name &&
+    internalNames.has(row.name)));
+  const objects = userRows.map((row) => ({
+    type: row.type,
+    name: row.name,
+    tblName: row.tbl_name,
+    createSql: row.sql,
+    createSqlHash: sha256(row.sql)
+  }));
+  const derivedAutoIndexes: Array<Record<string, unknown>> = [];
+  const internalObjects = catalog.filter((row) => row.type === "table" && row.name === row.tbl_name &&
+    internalNames.has(row.name)).map((row) => ({
+    type: row.type,
+    name: row.name,
+    tblName: row.tbl_name,
+    createSql: row.sql,
+    createSqlHash: sha256(row.sql)
+  }));
+  const physicalObjects = [...objects, ...derivedAutoIndexes];
+  const objectTypeCounts = Object.fromEntries(STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectTypes
+    .map((type) => [type, physicalObjects.filter((object) => object.type === type).length]));
+  const perTypeRoots = Object.fromEntries(STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectTypes
+    .map((type) => [type, sha256(canonicalJson(physicalObjects.filter((object) => object.type === type)))]));
   const body = {
     version: STAGING_CENSUS_SEMANTIC_CONTRACT.responseVersion,
     status: STAGING_CENSUS_SEMANTIC_CONTRACT.responseStatus,
     censusId: STAGING_CENSUS_ID,
     catalogRows: identity.catalogRows,
     catalogHash: identity.catalogHash,
-    userObjectCount: identity.userTableCount,
+    firstCatalogHash: identity.catalogHash,
+    secondCatalogHash: identity.catalogHash,
+    catalog,
+    userObjectCount: objects.length,
     userTableCount: identity.userTableCount,
-    userViewCount: 0,
-    tableSetHash: sha256(canonicalJson(tables.map((table) => table.name))),
-    viewSetHash: sha256(canonicalJson([])),
-    ddlRoot: sha256(canonicalJson(tables.map((table) => ({ name: table.name, createSql: table.createSql })))),
-    rowCountRoot: sha256(canonicalJson(tables.map((table) => ({
-      name: table.name,
-      rowCount: table.rowCount
+    replayableObjectCount: objects.length,
+    objectTypeCounts,
+    objectSetHash: sha256(canonicalJson(physicalObjects.map((object) => ({
+      type: object.type,
+      name: object.name,
+      tblName: object.tblName
     })))),
-    tables,
-    viewNames: [],
-    prePostCatalogMatch: true,
-    prePostRowCountsMatch: true,
+    replayableDdlRoot: sha256(canonicalJson(objects)),
+    perTypeRoots,
+    objects,
+    derivedAutoIndexCount: 0,
+    derivedAutoIndexSetHash: sha256(canonicalJson(derivedAutoIndexes)),
+    derivedAutoIndexes,
+    excludedInternalObjectCount: internalObjects.length,
+    excludedInternalObjectSetHash: sha256(canonicalJson(internalObjects)),
+    excludedInternalObjects: internalObjects,
+    batchCatalogPairMatch: true,
     snapshotClaim: STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
     d1QueryCount: STAGING_CENSUS_SEMANTIC_CONTRACT.maximumD1QueriesPerInvocation,
     foreignKeyEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence,
     foreignKeyEvidenceWithheld: true,
     foreignKeyClaimsAccepted: false,
+    rowCountEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.rowCountEvidence,
+    rowCountEvidenceWithheld: true,
+    rowCountClaimsAccepted: false,
     requestBudgetClaim: "controller_enforced_single_invocation_not_runtime_durable",
     databaseMutationAttempted: false,
     providerBindings: 0,
@@ -136,13 +190,17 @@ function validReceipt(identity: ResponseValidationIdentity): Record<string, unkn
     captureActivations: 0,
     productionReads: 0,
     productionMutations: 0,
-    claimBoundary: "isolated_staging_read_only_ddl_row_census_only_no_foreign_key_claim"
+    claimBoundary: "isolated_staging_read_only_ddl_catalog_census_only_no_row_count_or_foreign_key_claim"
   };
   return { ...body, receiptHash: sha256(canonicalJson(body)) };
 }
 
+const DEFAULT_CATALOG = receiptCatalog(
+  STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount,
+  STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows
+);
 const defaultValidation: ResponseValidationIdentity = {
-  catalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
+  catalogHash: sha256(canonicalJson(DEFAULT_CATALOG)),
   catalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
   userTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount
 };
@@ -152,8 +210,8 @@ function acceptedResponse(identity = defaultValidation): Response {
 }
 
 function closedFailureResponse(
-  failureCategory: "user_table_count_mismatch" | "user_table_identifier_shape_invalid" |
-    "user_table_name_binding_invalid" | "user_table_create_sql_missing" | "catalog_read_failed"
+  failureCategory: "user_table_count_mismatch" | "user_object_identifier_shape_invalid" |
+    "user_object_name_binding_invalid" | "user_object_create_sql_missing" | "catalog_read_failed"
 ): Response {
   const body = {
     version: "engine-os.os01-staging-census-failure.v1",
@@ -195,13 +253,9 @@ function countDiagnosticResponse(input: {
 
 function successReceiptContaining(value: string): Record<string, unknown> {
   const receipt = validReceipt(defaultValidation);
-  const tables = receipt.tables as Array<Record<string, unknown>>;
-  tables[0]!.createSql = value;
-  tables[0]!.createSqlHash = sha256(value);
-  receipt.ddlRoot = sha256(canonicalJson(tables.map((table) => ({
-    name: table.name,
-    createSql: table.createSql
-  }))));
+  const objects = receipt.objects as Array<Record<string, unknown>>;
+  objects[0]!.createSql = value;
+  objects[0]!.createSqlHash = sha256(value);
   delete receipt.receiptHash;
   receipt.receiptHash = sha256(canonicalJson(receipt));
   return receipt;
@@ -426,7 +480,8 @@ describe("OS-01 staging census controller", () => {
     writeJson(artifacts.postObservation, observation("post"));
     expect(os01StagingCensusControllerTestOnly.finalize(
       root,
-      () => new Date("2026-08-29T08:02:00.000Z")
+      () => new Date("2026-08-29T08:02:00.000Z"),
+      defaultValidation
     )).toMatchObject({
       status: "test_only_postcheck_verified",
       workerReadOnlyReceiptVerified: true,
@@ -475,32 +530,61 @@ describe("OS-01 staging census controller", () => {
       JSON.stringify(extended),
       JSON.stringify(badHash),
       rehashed((value) => {
-        const tables = value.tables as Array<Record<string, unknown>>;
-        tables[0]!.createSqlHash = "0".repeat(64);
+        const objects = value.objects as Array<Record<string, unknown>>;
+        objects[0]!.createSqlHash = "0".repeat(64);
       }),
-      rehashed((value) => { value.ddlRoot = "0".repeat(64); }),
+      rehashed((value) => { value.replayableDdlRoot = "0".repeat(64); }),
+      rehashed((value) => { value.objectSetHash = "0".repeat(64); }),
+      rehashed((value) => {
+        (value.perTypeRoots as Record<string, unknown>).index = "0".repeat(64);
+      }),
+      rehashed((value) => { value.firstCatalogHash = "0".repeat(64); }),
+      rehashed((value) => { value.secondCatalogHash = "0".repeat(64); }),
+      rehashed((value) => {
+        const catalog = value.catalog as Array<Record<string, unknown>>;
+        catalog[0]!.sql = "CREATE INDEX changed ON table_00(id)";
+      }),
+      rehashed((value) => { value.d1QueryCount = 1; }),
       rehashed((value) => { value.d1QueryCount = 3; }),
-      rehashed((value) => { value.d1QueryCount = 5; }),
       rehashed((value) => { value.foreignKeyEvidence = "not_withheld"; }),
       rehashed((value) => { value.foreignKeyEvidenceWithheld = false; }),
       rehashed((value) => { value.foreignKeyClaimsAccepted = true; }),
-      rehashed((value) => { value.version = "engine-os.os01-staging-census-receipt.v2"; }),
-      rehashed((value) => { value.status = "read_only_schema_census_captured"; }),
+      rehashed((value) => { value.rowCountEvidence = "not_withheld"; }),
+      rehashed((value) => { value.rowCountEvidenceWithheld = false; }),
+      rehashed((value) => { value.rowCountClaimsAccepted = true; }),
+      rehashed((value) => { value.version = "engine-os.os01-staging-ddl-row-census-receipt.v1"; }),
+      rehashed((value) => { value.status = "read_only_ddl_row_census_captured"; }),
       rehashed((value) => { delete value.foreignKeyEvidence; }),
       rehashed((value) => { delete value.foreignKeyEvidenceWithheld; }),
       rehashed((value) => { delete value.foreignKeyClaimsAccepted; }),
+      rehashed((value) => { delete value.rowCountEvidence; }),
+      rehashed((value) => { delete value.rowCountEvidenceWithheld; }),
+      rehashed((value) => { delete value.rowCountClaimsAccepted; }),
       rehashed((value) => { value.userObjectCount = 378; }),
       rehashed((value) => {
-        value.viewNames = ["table_00"];
-        value.userViewCount = 1;
-        value.userObjectCount = 95;
-        value.viewSetHash = sha256(canonicalJson(value.viewNames));
+        const objects = value.objects as Array<Record<string, unknown>>;
+        objects.pop();
+        value.replayableObjectCount = objects.length;
+        value.userObjectCount = objects.length;
+        value.replayableDdlRoot = sha256(canonicalJson(objects));
+        const physical = objects;
+        value.objectSetHash = sha256(canonicalJson(physical.map((object) => ({
+          type: object.type, name: object.name, tblName: object.tblName
+        }))));
       }),
       rehashed((value) => {
-        const tables = value.tables as Array<Record<string, unknown>>;
-        tables[0]!.foreignKeys = [];
+        const objects = value.objects as Array<Record<string, unknown>>;
+        objects[0]!.foreignKeys = [];
       }),
       rehashed((value) => { value.foreignKeyRoot = sha256(canonicalJson([])); }),
+      rehashed((value) => {
+        const objects = value.objects as Array<Record<string, unknown>>;
+        objects[0]!.rowCount = 0;
+      }),
+      rehashed((value) => { value.rowCountRoot = sha256(canonicalJson([])); }),
+      rehashed((value) => { value.prePostRowCountsMatch = true; }),
+      rehashed((value) => { value.tables = []; }),
+      rehashed((value) => { value.viewNames = []; }),
       JSON.stringify(validReceipt(defaultValidation)) + "\n"
     ];
     for (const body of bodies) {
@@ -1013,18 +1097,13 @@ describe("OS-01 staging census controller", () => {
     const db = {
       prepare(sql: string) {
         queryCount += 1;
-        return {
-          async all() {
-            if (sql.includes("FROM sqlite_schema")) return { success: true, results: catalog };
-            if (sql.includes("AS table_name") && sql.includes("COUNT(*)")) {
-              return {
-                success: true,
-                results: tables.map((table) => ({ table_name: table.name, exact_count: 0 }))
-              };
-            }
-            throw new Error("unexpected SQL");
-          }
-        };
+        return { sql };
+      },
+      async batch(statements: Array<{ sql: string }>) {
+        return statements.map(({ sql }) => {
+          if (!sql.includes("FROM sqlite_schema")) throw new Error("unexpected SQL");
+          return { success: true, results: catalog };
+        });
       }
     };
     const validation = { catalogHash, catalogRows: 377, userTableCount: 94 };
@@ -1044,15 +1123,16 @@ describe("OS-01 staging census controller", () => {
     expect(result.responseBytesSha256).toBe(sha256(readFileSync(artifacts.response)));
     const receipt = JSON.parse(readFileSync(artifacts.response, "utf8")) as Record<string, unknown>;
     expect(receipt).toMatchObject({
-      status: "read_only_ddl_row_census_captured",
+      status: "read_only_ddl_catalog_census_captured",
       catalogRows: 377,
       userTableCount: 94,
       userObjectCount: 376,
-      prePostCatalogMatch: true,
-      prePostRowCountsMatch: true
+      replayableObjectCount: 376,
+      batchCatalogPairMatch: true
     });
-    expect(receipt.tables).toHaveLength(94);
-    expect(queryCount).toBe(4);
+    expect(receipt.objects).toHaveLength(376);
+    expect((receipt.objectTypeCounts as Record<string, unknown>).index).toBe(282);
+    expect(queryCount).toBe(2);
     expect(statSync(artifacts.dispatchCompletion).size).toBeGreaterThan(0);
     writeJson(artifacts.postObservation, observation("post"));
     expect(os01StagingCensusControllerTestOnly.finalize(
@@ -1062,7 +1142,7 @@ describe("OS-01 staging census controller", () => {
     )).toMatchObject({
       status: "test_only_postcheck_verified",
       workerReadOnlyReceiptVerified: true,
-      boundedDdlRowReceiptVerified: true,
+      boundedDdlCatalogReceiptVerified: true,
       foreignKeyEvidenceWithheld: true,
       foreignKeyClaimsAccepted: false,
       offlineDdlReplayEligible: false,

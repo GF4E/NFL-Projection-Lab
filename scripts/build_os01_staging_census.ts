@@ -75,7 +75,13 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     "foreignKeyRoot",
     "foreignKeys",
     '"foreign_key_read_failed"',
-    "read_only_schema_census_captured"
+    "read_only_schema_census_captured",
+    "COUNT(*)",
+    "rowCountRoot",
+    '"rowCount"',
+    '"row_count_read_failed"',
+    "prePostRowCountsMatch",
+    "read_only_ddl_row_census_captured"
   ]) if (text.includes(prohibited)) throw new Error(`census package contains ${prohibited}`);
   for (const required of [
     STAGING_CENSUS_SEMANTIC_CONTRACT.route,
@@ -87,8 +93,12 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     "closed_user_table_count_mismatch",
     "terminal_read_only_count_diagnostic_not_census_receipt",
     STAGING_CENSUS_SEMANTIC_CONTRACT.responseStatus,
-    "isolated_staging_read_only_ddl_row_census_only_no_foreign_key_claim",
-    STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence
+    "isolated_staging_read_only_ddl_catalog_census_only_no_row_count_or_foreign_key_claim",
+    STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectEvidence,
+    STAGING_CENSUS_SEMANTIC_CONTRACT.derivedAutoIndexEvidence,
+    STAGING_CENSUS_SEMANTIC_CONTRACT.wholeCatalogEvidence,
+    STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence,
+    STAGING_CENSUS_SEMANTIC_CONTRACT.rowCountEvidence
   ]) if (!text.includes(required)) throw new Error(`census package omits ${required}`);
 
   const metadata = join(outDir, ".openai");
@@ -101,8 +111,8 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     throw new Error("census package contains an automatic migration path");
   }
   const manifest = {
-    version: "engine-os.os01-staging-ddl-row-census-package.v1",
-    status: "isolated_bounded_read_only_ddl_row_diagnostic",
+    version: "engine-os.os01-staging-ddl-only-census-package.v1",
+    status: "isolated_bounded_read_only_ddl_catalog_diagnostic",
     projectId: input.projectId,
     entryPath,
     entrySha256: sha256(entry),
@@ -137,15 +147,25 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
         STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES[1]
       ],
       finalAcceptanceStatus: STAGING_CENSUS_SEMANTIC_CONTRACT.finalAcceptanceStatus,
-      dispatchCompletionWrittenForBoundedDdlRowCensus: true,
-      finalizationAllowedForBoundedDdlRowCensus: true,
+      dispatchCompletionWrittenForBoundedDdlCatalogCensus: true,
+      finalizationAllowedForBoundedDdlCatalogCensus: true,
       countDiagnosticFinalizationAllowed: false,
       maximumResponseBytes: 2097152,
       reflectedCredentialPersistenceAllowed: false
     },
     consistencyClaim: STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
+    wholeCatalogEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.wholeCatalogEvidence,
+    replayableObjectTypes: STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectTypes,
+    replayableObjectEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectEvidence,
+    replayableObjectOrder: STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectOrder,
+    replayableObjectHashRules: STAGING_CENSUS_SEMANTIC_CONTRACT.replayableObjectHashRules,
+    derivedAutoIndexEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.derivedAutoIndexEvidence,
+    internalTableNames: STAGING_CENSUS_SEMANTIC_CONTRACT.internalTableNames,
+    internalObjectClassification: STAGING_CENSUS_SEMANTIC_CONTRACT.internalObjectClassification,
+    unknownInternalObjectPolicy: STAGING_CENSUS_SEMANTIC_CONTRACT.unknownInternalObjectPolicy,
     viewEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.viewEvidence,
     foreignKeyEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.foreignKeyEvidence,
+    rowCountEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.rowCountEvidence,
     failureContract: {
       version: "engine-os.os01-staging-census-failure.v1",
       status: "read_only_census_failed",
@@ -167,22 +187,33 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
       selfHashed: true,
       persistenceRequiresControllerValidation: true,
       terminalAndNonFinalizable: true,
-      matchingCountProducesBoundedDdlRowCensus: true
+      matchingCountProducesBoundedDdlCatalogCensus: true
     },
-    boundedDdlRowCensusContract: {
+    boundedDdlCatalogCensusContract: {
       version: STAGING_CENSUS_SEMANTIC_CONTRACT.responseVersion,
       status: STAGING_CENSUS_SEMANTIC_CONTRACT.responseStatus,
       expectedUserTableCount: STAGING_CENSUS_ACTIVE_EXPECTED_USER_TABLE_COUNT,
       maximumD1QueriesPerInvocation: STAGING_CENSUS_SEMANTIC_CONTRACT.maximumD1QueriesPerInvocation,
       queryPlan: STAGING_CENSUS_SEMANTIC_CONTRACT.queryPlan,
+      exactCanonicalCatalogProjectionRequired: true,
+      independentlyHashedCatalogPairRequired: true,
+      singleTransactionalBatchRequired: true,
+      replayableObjectsRequired: ["table", "index", "trigger", "view"],
       identifiersAndCreateSqlAllowed: true,
-      viewSqlAllowed: false,
+      viewSqlAllowed: true,
+      derivedAutoIndexesSeparated: true,
+      excludedInternalObjectsSeparated: true,
+      wholeCatalogAndPerTypeRootsRequired: true,
+      exhaustivePartitionEquation:
+        "catalogRows=replayableObjectCount+derivedAutoIndexCount+excludedInternalObjectCount",
       foreignKeyEvidenceWithheld: true,
       foreignKeyFieldsAllowed: false,
-      prePostCatalogAndRowCountsRequired: true,
+      rowCountEvidenceWithheld: true,
+      rowCountFieldsAllowed: false,
+      batchCatalogPairRequired: true,
       controllerValidationRequired: true,
       controlPlanePostcheckRequired: true,
-      claimBoundary: "bounded_partial_schema_evidence_not_os01_acceptance"
+      claimBoundary: "bounded_ddl_catalog_evidence_not_full_schema_or_os01_acceptance"
     },
     databaseMutationAllowed: false,
     productionAllowed: false,
@@ -190,17 +221,17 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
   };
   const manifestBytes = `${JSON.stringify(manifest, null, 2)}\n`;
   const manifestSha256 = sha256(manifestBytes);
-  writeFileSync(join(metadata, "os01-staging-ddl-row-census-package.v1.json"), manifestBytes, {
+  writeFileSync(join(metadata, "os01-staging-ddl-only-census-package.v1.json"), manifestBytes, {
     encoding: "utf8",
     flag: "wx"
   });
-  writeFileSync(join(metadata, "os01-staging-ddl-row-census-package.v1.sha256"),
-    `${manifestSha256}  os01-staging-ddl-row-census-package.v1.json\n`, { encoding: "utf8", flag: "wx" });
+  writeFileSync(join(metadata, "os01-staging-ddl-only-census-package.v1.sha256"),
+    `${manifestSha256}  os01-staging-ddl-only-census-package.v1.json\n`, { encoding: "utf8", flag: "wx" });
   const finalPayloadFiles = files(outDir).map((path) => path.slice(outDir.length + 1));
   if (JSON.stringify(finalPayloadFiles) !== JSON.stringify([
     ".openai/hosting.json",
-    ".openai/os01-staging-ddl-row-census-package.v1.json",
-    ".openai/os01-staging-ddl-row-census-package.v1.sha256",
+    ".openai/os01-staging-ddl-only-census-package.v1.json",
+    ".openai/os01-staging-ddl-only-census-package.v1.sha256",
     entryPath
   ])) {
     throw new Error("census package final payload is not exact");

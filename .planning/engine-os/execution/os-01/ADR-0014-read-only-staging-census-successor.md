@@ -31,11 +31,14 @@ post-observation with identical source, deployment, access, empty environment-ke
 and package identities. A malformed or premature finalization cannot be repaired and retried. The
 controller rejects noncanonical roots as qualification evidence and bounds response bytes.
 
-The response contains table names, table DDL, DDL hashes, normalized foreign keys, exact row
-counts, and canonically sorted view names. It never returns view SQL. It re-reads the full catalog
-and every table count and accepts only if the pre/post evidence matches. This is bounded
-consistency evidence, not an atomic database snapshot; it is acceptable only while the isolated
-staging project has no other writer.
+The currently authorized clean successor is narrower than the original response design. It
+captures the exact canonical `sqlite_schema` projection in one two-statement D1 batch, partitions
+every row into replayable SQL-bearing objects, derived null-SQL autoindexes, or exact-allowlisted
+platform tables, and publishes independently recomputable whole-catalog, object-set, replayable-
+DDL, and per-type roots. View, trigger, and explicit-index SQL are included. Foreign-key semantics
+and table cardinalities are explicitly withheld for later, separately authorized generations.
+The batch pair is a transactional consistency check for that invocation; it is not row-content,
+production, or migration-preservation evidence.
 
 The package remains DB-only, contains no migration payload, exposes no scheduled trigger, and has
 no provider, quota, capture, production, or secret binding. A passing hosted receipt is evidence
@@ -199,13 +202,39 @@ deterministically partitioned direct-count shards that remain below the per-invo
 ceiling. Neither successor is authorized by this paragraph; each requires a new hashed contract,
 authority chain, isolated proof, and independent audit.
 
-## Planned authority generation 10: frozen-candidate foreign-key completion
+## Planned authority generation 10: exact DDL-only catalog capture
 
-Only after generation 9 succeeds may an offline verifier reconstruct the captured 94-table schema
-with a pinned SQLite runtime. That replay must emit a deterministic sorted candidate allowlist
-bound to both table names and captured CREATE-SQL hashes, plus independently audited roots. A new
-generation-10 semantic contract may then execute direct `PRAGMA foreign_key_list` reads for exactly
-that frozen allowlist in canonical order. The preregistered ceiling is 45 candidates and 49 total
-D1 statements; a changed allowlist, mismatched DDL binding, excess candidate count, malformed DDL,
-or any PRAGMA failure blocks before qualification. Generation 10 remains unauthorized until the
-generation-9 hosted evidence exists and that replay is accepted.
+Generation 9 did not succeed and therefore cannot authorize the previously described foreign-key
+completion. Generation 10 is instead a clean, independently hashed successor chained to the
+terminal generation-9 rejection receipt. It executes exactly two identical catalog statements in
+one D1 batch. The response preserves the complete canonical catalog and an exhaustive, disjoint
+partition of every row:
+
+1. every non-internal SQL-bearing table, explicit index, trigger, and view, including exact SQL and
+   its SHA-256;
+2. every derived null-SQL `sqlite_autoindex_*` row, bound to an observed user table; and
+3. only exact platform-table identities in the frozen allowlist, with SQL or null plus its hash.
+
+The controller reconstructs the complete catalog, requires the pinned 377-row hash and exactly 94
+user tables, recomputes all counts and roots, rejects extra keys and unknown `sqlite_*` objects,
+and preserves the existing one-shot/no-retry authority boundary. Generation 10 explicitly returns
+no foreign-key result and no table row count. Its best possible outcome is bounded isolated-
+staging replayable-DDL evidence after a fresh owner-only/no-writer post-observation; it cannot
+accept OS-01, ARC-03, production state, row preservation, or a migration.
+
+## Planned authority generation 11: frozen-candidate foreign-key completion
+
+Only after an accepted generation-10 hosted receipt may an offline verifier replay the captured
+DDL twice with a pinned SQLite runtime and derive a deterministic foreign-key candidate allowlist
+using both a real token scanner and replayed `foreign_key_list` results. Generation 11 may then use
+one direct quoted `PRAGMA foreign_key_list` statement per frozen candidate, surrounded by the
+catalog pair in one batch. An allowlist above 40 candidates blocks and requires a sharded design.
+
+## Planned authority generation 12: deterministic row-count shards
+
+Row cardinality remains required and is deferred, not waived. Bind deterministic shards to the
+accepted generation-10 catalog and DDL roots, keep each invocation below the D1 statement ceiling,
+require complete nonoverlapping coverage and two equal passes, and label the aggregate as bounded
+multi-transaction consistency evidence. Row counts alone do not establish row-content or migration
+preservation; later rehearsal must also prove canonical content roots, backup/restore, exact forward
+migration, integrity, failure atomicity, and post-migration parity.
