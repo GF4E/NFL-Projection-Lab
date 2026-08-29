@@ -1,0 +1,84 @@
+{
+  "schemaVersion": "os01-hosted-capacity-terminal-rejection-receipt.v1",
+  "recordedAt": "2026-08-29T01:45:31Z",
+  "result": "terminally_rejected_capacity_blocked_no_deployment",
+  "supersedes": {
+    "commit": "031826519736016ee3223c0f943506edefc7c245",
+    "receipt": ".planning/engine-os/execution/os-01/hosted-migration-harness-local-receipt.v1.json",
+    "receiptSha256": "3cba5b3ccd972d952be5f921b1c9af7b700f9b87cfde2f4ef36da3a665051b41",
+    "preservation": "The commit and receipt remain immutable evidence, but their 470-query capacity claim and bounded-local acceptance are terminally rejected."
+  },
+  "successor": {
+    "implementationCommit": "b3a2ca899a6a19d5e87c5a13483590b2957a18a4",
+    "tree": "d0c8a03fa675ae9c8a0c6101882da5760855a968",
+    "accountingVersion": "os01-hosted-migration-capacity.v1",
+    "runtimeDeploymentBehaviorChanged": false,
+    "migrationBytesChanged": false
+  },
+  "capacityAccounting": {
+    "naiveBreakpointEntries": 272,
+    "migrationStatements": 291,
+    "statementDeltaPreviouslyMissed": 19,
+    "guardStatements": 4,
+    "blankReplayBatchStatements": 295,
+    "blankPrestateQueries": 4,
+    "blankTerminalVerificationQueries": 190,
+    "requiredQueriesPerBlankReplayInvocation": 489,
+    "successorForwardMigrationStatements": 133,
+    "successorForwardBatchStatements": 137,
+    "embeddedMultiStatementEntries": [
+      { "migration": "0010", "breakpointEntry": 0, "statements": 13 },
+      { "migration": "0011", "breakpointEntry": 0, "statements": 4 },
+      { "migration": "0012", "breakpointEntry": 0, "statements": 5 }
+    ],
+    "method": "Semicolon-aware lexical parsing for comments, SQL quoting, strings, CASE blocks, and CREATE TRIGGER bodies, followed by SQLite complete-statement replay inside one rolled-back transaction."
+  },
+  "externalCapacityGates": {
+    "officialPrimarySource": "https://developers.cloudflare.com/d1/platform/limits/",
+    "officialSourceObservedDate": "2026-08-28",
+    "documentedWorkerInvocationQueryLimitPaid": 1000,
+    "documentedWorkerInvocationQueryLimitFree": 50,
+    "documentedBatchDurationLimitSeconds": 30,
+    "individualBatchStatementsCountAsQueries": true,
+    "authoritativeSitesEffectivePlanAndLimitKnown": false,
+    "nonMutatingUnderThirtySecondProofAvailable": false,
+    "atomicSuccessorAtOrBelowFiftyQueriesAvailable": false,
+    "predeployPlatformCapabilityProbeIncluded": false,
+    "status": "blocked"
+  },
+  "immutablePackageHashes": {
+    "capacityCounterSha256": "f870ae05f15d94c0e64c6ad11511792f268e16fb47e42771e2dcca8d05d16a4f",
+    "capacityTestsSha256": "d2b37f4c3f552d54dd4d6ddf1031c2b0172210b5f9cf54b568ec1f3e96d43907",
+    "qualificationConfigSha256": "d411116582a982bdbf9a86d797bfd8346ee72115b87602bf6b204c5eadc59270",
+    "harnessBuilderSha256": "07dfa3015261514e903ad11233cf9ffbc09f983d846619c3ffafb8f43942f96a",
+    "runbookSha256": "614143837028fb7e2fb55c35aae5428b34a74b08fe041308bd1ba74e99106dfc"
+  },
+  "verification": {
+    "focusedCapacityAndHarnessTests": "15 passed",
+    "typecheck": "passed",
+    "lint": "passed",
+    "trackedSourceCredentialScan": "passed",
+    "diffCheck": "passed",
+    "fullVerify": "passed: 81 test files passed, 1 skipped; 870 tests passed, 1 skipped; build and active build graph passed"
+  },
+  "forbiddenActivity": {
+    "sitesCalls": 0,
+    "deployments": 0,
+    "providerRequests": 0,
+    "quotaReservations": 0,
+    "productionAccesses": 0,
+    "realRetainedLockAccesses": 0,
+    "providerSecretReads": 0
+  },
+  "claims": {
+    "localAccountingSuccessorVerified": true,
+    "hostedMigrationQualified": false,
+    "os01Accepted": false,
+    "arc03Accepted": false,
+    "deploymentAllowed": false,
+    "physicalManifestQualified": false,
+    "exactReceiptRestoreQualified": false,
+    "productionChanged": false
+  },
+  "nextHostedAction": "None is authorized. Resume only after an authoritative, non-mutating determination of the Sites-backed D1 effective query limit and a non-mutating proof that the 489-query blank replay completes within the documented 30-second batch limit, or after qualification of a new atomic design that stays within the proven effective limit."
+}
