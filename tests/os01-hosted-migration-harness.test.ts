@@ -208,6 +208,72 @@ async function invokeComponentProbe(
 }
 
 describe("OS-01 standalone hosted migration harness", () => {
+  it("isolates each read-only blank prestate component before migration or shared-state work", async () => {
+    const { sqlite, d1 } = database();
+    const invalidAuthority = {
+      ...authority,
+      sourceCommit: "0".repeat(40)
+    } as Os01HostedMigrationAuthority;
+    const probed = await invoke(
+      d1,
+      "blank_prestate_component_probe",
+      qualificationId,
+      undefined,
+      invalidAuthority
+    );
+    expect(probed.response.status).toBe(200);
+    expect(probed.body).toMatchObject({
+      result: "blank_prestate_component_probe_completed",
+      allComponentsAllowed: true,
+      databaseMutationAttempted: false,
+      sharedPrestateCaptureInvoked: false,
+      migrationVerificationInvoked: false,
+      claimBoundary: "diagnostic_only_not_qualification_evidence"
+    });
+    expect(probed.body.components).toEqual([
+      expect.objectContaining({ component: "select_literal", status: "allowed", rowCount: 1 }),
+      expect.objectContaining({ component: "sqlite_schema_catalog", status: "allowed", rowCount: 0 }),
+      expect.objectContaining({ component: "pragma_schema_version", status: "allowed", rowCount: 1 }),
+      expect.objectContaining({ component: "pragma_foreign_key_check", status: "allowed", rowCount: 0 }),
+      expect.objectContaining({ component: "pragma_quick_check", status: "allowed", rowCount: 1 })
+    ]);
+    expect(sqlite.prepare("SELECT count(*) AS count FROM sqlite_schema WHERE type = 'table'").get())
+      .toEqual({ count: 0 });
+    sqlite.close();
+  });
+
+  it("returns one closed result per prestate read when a component is unauthorized", async () => {
+    const { sqlite, d1 } = database();
+    const rejectingD1 = {
+      ...d1,
+      prepare(sql: string) {
+        if (sql.includes("pragma_schema_version")) {
+          throw new Error("D1_ERROR: not authorized: SQLITE_AUTH");
+        }
+        return d1.prepare(sql);
+      }
+    } as D1Database;
+    const probed = await invoke(rejectingD1, "blank_prestate_component_probe");
+    expect(probed.response.status).toBe(200);
+    expect(probed.body).toMatchObject({
+      result: "blank_prestate_component_probe_completed",
+      allComponentsAllowed: false,
+      databaseMutationAttempted: false,
+      sharedPrestateCaptureInvoked: false,
+      migrationVerificationInvoked: false
+    });
+    expect(probed.body.components).toEqual([
+      expect.objectContaining({ component: "select_literal", status: "allowed" }),
+      expect.objectContaining({ component: "sqlite_schema_catalog", status: "allowed" }),
+      { component: "pragma_schema_version", status: "rejected", failureClass: "sqlite_auth" },
+      expect.objectContaining({ component: "pragma_foreign_key_check", status: "allowed" }),
+      expect.objectContaining({ component: "pragma_quick_check", status: "allowed" })
+    ]);
+    expect(sqlite.prepare("SELECT count(*) AS count FROM sqlite_schema WHERE type = 'table'").get())
+      .toEqual({ count: 0 });
+    sqlite.close();
+  });
+
   it("keeps every bounded zero-migration component probe diagnostic and state-neutral", async () => {
     const phases = [
       "sentinel_only",
@@ -625,7 +691,7 @@ describe("OS-01 standalone hosted migration harness", () => {
       deploymentTargetRestriction: `exact_project:${exactStagingProjectId}`,
       freshOwnerOnlyAndBindingRefreshRequiredBeforeDeploy: true,
       ownerOnlyAccessRequiredBeforeDeploy: true,
-      authorizedHostedAction: "bounded_zero_migration_component_probe_only",
+      authorizedHostedAction: "one_read_only_prestate_component_probe_only",
       acceptedEvidenceAllowed: false,
       migrationQualificationAllowed: false,
       predecessorPostFailureD1TableCount: 0,
@@ -638,21 +704,27 @@ describe("OS-01 standalone hosted migration harness", () => {
         ))
       },
       diagnosticContract: {
-        path: "config/os01-hosted-migration-diagnostic.v5.json",
+        path: "config/os01-hosted-migration-diagnostic.v6.json",
         sha256: await hostedSha256(readFileSync(
-          "config/os01-hosted-migration-diagnostic.v5.json",
+          "config/os01-hosted-migration-diagnostic.v6.json",
           "utf8"
         )),
         status: "diagnostic_only_not_qualification_evidence",
-        componentPhases: [
-          "sentinel_only",
-          "reserved_create_then_sentinel",
-          "plain_create_then_sentinel",
-          "reserved_simple_then_sentinel",
-          "reserved_schema_then_sentinel",
-          "reserved_catalog_then_sentinel",
-          "reserved_full_guard_then_sentinel"
+        authorizedAction: "blank_prestate_component_probe",
+        readOnlyComponents: [
+          "select_literal",
+          "sqlite_schema_catalog",
+          "pragma_schema_version",
+          "pragma_foreign_key_check",
+          "pragma_quick_check"
         ]
+      },
+      rejectedDiagnosticPredecessor: {
+        contractPath: "config/os01-hosted-migration-diagnostic.v5.json",
+        contractSha256: "bb81743e4b3bbe8cb73e285690e04eafda32a136a386e959b0cd10d38307a897",
+        receiptPath: ".planning/engine-os/execution/os-01/hosted-migration-diagnostic-v5-live-rejection-receipt.v1.json",
+        receiptSha256: "3962e97a65b2077f46ab2d3c84383c1fca7acfc0cdd72be7e2356a9fcd544223",
+        status: "shared_prestate_path_rejected_before_component_isolation"
       },
       rejectedPredecessorContract: {
         path: "config/os01-hosted-migration-qualification.v3.json",

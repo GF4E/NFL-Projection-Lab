@@ -45,6 +45,7 @@ const EXPECTED_PATHS = Object.freeze([
 type Scalar = string | number | null;
 type ObjectType = "index" | "table" | "trigger" | "view";
 type HostedAction =
+  | "blank_prestate_component_probe"
   | "blank_replay"
   | "blank_prefix_probe"
   | "blank_component_probe"
@@ -1100,6 +1101,7 @@ function parseQualificationRequest(value: unknown): QualificationRequest {
   if (!value || typeof value !== "object") throw new HarnessError("invalid_request", 400);
   const record = value as Record<string, unknown>;
   const actions: HostedAction[] = [
+    "blank_prestate_component_probe",
     "blank_replay",
     "blank_prefix_probe",
     "blank_component_probe",
@@ -1191,6 +1193,48 @@ async function performAction(
   request: QualificationRequest,
   authority: Os01HostedMigrationAuthority
 ): Promise<Record<string, unknown>> {
+  if (request.action === "blank_prestate_component_probe") {
+    const probes = [
+      { component: "select_literal", sql: "SELECT 1 AS exact" },
+      {
+        component: "sqlite_schema_catalog",
+        sql: `SELECT type, name, tbl_name, sql FROM sqlite_schema
+          WHERE type IN ('table', 'index', 'trigger', 'view')
+          ORDER BY type COLLATE BINARY, name COLLATE BINARY`
+      },
+      { component: "pragma_schema_version", sql: "SELECT schema_version FROM pragma_schema_version" },
+      { component: "pragma_foreign_key_check", sql: "SELECT * FROM pragma_foreign_key_check" },
+      { component: "pragma_quick_check", sql: "SELECT quick_check FROM pragma_quick_check" }
+    ] as const;
+    const components: Array<Record<string, unknown>> = [];
+    for (const probe of probes) {
+      try {
+        const rows = await all<Record<string, unknown>>(db, probe.sql);
+        components.push({
+          component: probe.component,
+          status: "allowed",
+          rowCount: rows.length,
+          resultHash: await hostedSha256(stableHostedJson(rows))
+        });
+      } catch (error) {
+        const failure = d1FailureText(error);
+        components.push({
+          component: probe.component,
+          status: "rejected",
+          failureClass: failure.includes("sqlite_auth") ? "sqlite_auth" : "d1_read_rejected"
+        });
+      }
+    }
+    return receipt(request, {
+      result: "blank_prestate_component_probe_completed",
+      components,
+      allComponentsAllowed: components.every((component) => component.status === "allowed"),
+      databaseMutationAttempted: false,
+      sharedPrestateCaptureInvoked: false,
+      migrationVerificationInvoked: false,
+      claimBoundary: "diagnostic_only_not_qualification_evidence"
+    });
+  }
   const migrations = await verifiedMigrations(authority);
   const initial = await captureHostedState(db);
   const state = classifyState(initial, authority);
@@ -1475,6 +1519,7 @@ export const os01HostedMigrationHarnessContract = Object.freeze({
   requestVersion: "engine-os.os01-hosted-migration-request.v1",
   receiptVersion: "engine-os.os01-hosted-migration-receipt.v1",
   actions: Object.freeze([
+    "blank_prestate_component_probe",
     "blank_replay",
     "blank_prefix_probe",
     "blank_component_probe",

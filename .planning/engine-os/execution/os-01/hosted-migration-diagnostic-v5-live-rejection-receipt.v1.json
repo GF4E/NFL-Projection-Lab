@@ -1,0 +1,36 @@
+{
+  "version": "engine-os.os01-hosted-migration-diagnostic-v5-live-rejection-receipt.v1",
+  "status": "shared_prestate_path_rejected_before_component_isolation",
+  "scope": "isolated_owner_only_blank_d1_zero_migration_component_diagnostic",
+  "observedAt": "2026-08-29T04:37:36Z",
+  "sourceCommit": "36ee949dd1d71bc06d4deb1784a93133bb21763e",
+  "sourceTree": "ebe5acfc788ed8a953e4f2f9ba93f1c905b52e06",
+  "projectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "versionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_6e9087d446c88191b2172da81053ddfc",
+  "deploymentId": "appgdep_6a92619d1f2481919eddb4ddc970adf9",
+  "archiveSha256": "bad4a1baf568cfc5247c62deb285959cdb71462797c2c9e0246c209e586a1d67",
+  "builtWorkerSha256": "dc89ba3958d99815c0c0f26c6d41e84b5ac2546decd5a6d32047dc726fbf011b",
+  "probes": [
+    {"phase":"sentinel_only","qualificationId":"8b149d4ec00b6ac7eea37edc29e4597cf159f7c023420d2bce2b42c41c177e0a","requestSha256":"957a5328163bb461948caeb86d1ac79c5e92f90ce1aee42e9a8767a0aba79b40"},
+    {"phase":"reserved_create_then_sentinel","qualificationId":"4522f919258124bb816487e345b30370ddc22468652cd996cf617090124830b3","requestSha256":"f74c9e6c1327b8d25caa37395d117cc485027bcc6feb1e23ac7db66263f818a9"},
+    {"phase":"plain_create_then_sentinel","qualificationId":"d11b9f4eaacb0bc3a8e579c21229514d41f7400c8728aaa3a0fd7c3ba8ca52a7","requestSha256":"ea96dd5106404c2c0b4bf2b92aad31f32dd3e535895437c40cdd7fde9eae4be1"},
+    {"phase":"reserved_simple_then_sentinel","qualificationId":"31079873eae2d6332f67cb816f88f0a959b2b54e49044c628f18e752678f2d77","requestSha256":"948e3d08f6a2150d2ff83866b9e29af3421dc2cc48b70d63c7ab687818ea6851"},
+    {"phase":"reserved_schema_then_sentinel","qualificationId":"e19ee69af61f1a8d030a2b46ab5a0c36905fd504671d71eab9ad2755a065a82a","requestSha256":"f59b735342f970e143cec0e1e0111b1f02f09d8425eaccebfb15a42071e6bafa"},
+    {"phase":"reserved_catalog_then_sentinel","qualificationId":"dc3e8f38bf45b9b2e81d5a0b28b0e235104a0860247db84b4bc98e7d90bbf457","requestSha256":"f75630e6c3454b8b0f684898282b9aa141726c283ae960a666f47cc19956cdc5"},
+    {"phase":"reserved_full_guard_then_sentinel","qualificationId":"131760600a26498a0164e6a7e929ca979d56fa70bfb45a2bbc284eb830524c25","requestSha256":"113fe4d4ff751dbc6a80e6a0e1645dea7d52db5cf125d39e6399a1a5bba368da"}
+  ],
+  "commonResponse": {
+    "httpStatus": 500,
+    "responseSha256": "187b807db37eb524878fb2312c2c3143ded0b6c971cfee4284c85a237481e68a",
+    "responseBytes": 91,
+    "diagnosticDetail": "d1_error: not authorized: sqlite_auth"
+  },
+  "inference": "Every action failed before its action-specific catch could return a diagnostic receipt, so the shared prestate-capture path must be isolated with one read-only successor request.",
+  "postcondition": {"binding":"DB","userTables":[],"tableCount":0},
+  "acceptedEvidence": false,
+  "providerDispatches": 0,
+  "providerBindingReads": 0,
+  "quotaReservations": 0,
+  "captureActivations": 0,
+  "productionMutations": 0
+}

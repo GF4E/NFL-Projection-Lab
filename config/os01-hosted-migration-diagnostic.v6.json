@@ -1,0 +1,29 @@
+{
+  "version": "os01-hosted-migration-diagnostic.2026.6",
+  "status": "diagnostic_only_not_qualification_evidence",
+  "predecessorSourceCommit": "36ee949dd1d71bc06d4deb1784a93133bb21763e",
+  "predecessorReceipt": ".planning/engine-os/execution/os-01/hosted-migration-diagnostic-v5-live-rejection-receipt.v1.json",
+  "predecessorReceiptSha256": "3962e97a65b2077f46ab2d3c84383c1fca7acfc0cdd72be7e2356a9fcd544223",
+  "exactTemporarySitesProjectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "authorizedAction": "one_read_only_prestate_component_probe_after_fresh_owner_only_db_only_zero_table_refresh",
+  "requestIdentity": {
+    "method": "POST",
+    "route": "/__engine-os/os01-hosted-migration/v1",
+    "version": "engine-os.os01-hosted-migration-request.v1",
+    "action": "blank_prestate_component_probe",
+    "exactKeys": ["action", "qualificationId", "version"]
+  },
+  "maximumHostedProbeRequests": 1,
+  "readOnlyComponents": [
+    "select_literal",
+    "sqlite_schema_catalog",
+    "pragma_schema_version",
+    "pragma_foreign_key_check",
+    "pragma_quick_check"
+  ],
+  "acceptedEvidenceAllowed": false,
+  "databaseMutationAllowed": false,
+  "providerAccessAllowed": false,
+  "captureActivationAllowed": false,
+  "productionAllowed": false
+}

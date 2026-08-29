@@ -16,9 +16,13 @@ const V1_CONTRACT_SHA256 = "d411116582a982bdbf9a86d797bfd8346ee72115b87602bf6b20
 const V2_CONTRACT_SHA256 = "cd025216b156946404b5606e824575ff00e1d023f3fa40f4fa45e068a041cde6";
 const V3_CONTRACT_SHA256 = "eaddbab1dd84325eac82846446fa49a1c38359abce60283341886208c87f5a9d";
 const V3_FAILURE_RECEIPT_SHA256 = "d42f6829a21e02d368354a3bbd851fb4e99a77adb7a32dc5086ce25b8a76497b";
+const V5_DIAGNOSTIC_CONTRACT_SHA256 = "bb81743e4b3bbe8cb73e285690e04eafda32a136a386e959b0cd10d38307a897";
+const V5_DIAGNOSTIC_REJECTION_RECEIPT_SHA256 = "3962e97a65b2077f46ab2d3c84383c1fca7acfc0cdd72be7e2356a9fcd544223";
 const SHARED_STATEMENT_PARSER_SHA256 = "419f97cba53ee0e95fdad8ddd29edf0a1a2a64cc359f34f85746c6ab02b43c46";
 const V3_FAILURE_RECEIPT_PATH =
   ".planning/engine-os/execution/os-01/hosted-migration-v3-runtime-boundary-rejection-receipt.v1.json";
+const V5_DIAGNOSTIC_REJECTION_RECEIPT_PATH =
+  ".planning/engine-os/execution/os-01/hosted-migration-diagnostic-v5-live-rejection-receipt.v1.json";
 const SHARED_STATEMENT_PARSER_PATH = "qualification/os01-hosted-migration/sql-statements.ts";
 const CAPACITY_RECEIPT_SHA256 = "91e61351ba23848cc76e2d10f386c6a38690b9e41681f2d2387a206d0a70955c";
 const CAPACITY_RESPONSE_RECEIPT_HASH = "cb7c00a83a66304430c0c61385328568b752a7122069e5cc8c170e849193ed55";
@@ -165,9 +169,18 @@ export async function buildOs01HostedMigrationHarness(input: {
     };
     package?: { deploymentAllowed?: unknown };
   };
-  const diagnosticContractBytes = readFileSync(resolve(
+  const predecessorDiagnosticContractBytes = readFileSync(resolve(
     workspaceRoot,
     "config/os01-hosted-migration-diagnostic.v5.json"
+  ));
+  if (sha256(predecessorDiagnosticContractBytes) !== V5_DIAGNOSTIC_CONTRACT_SHA256 ||
+      sha256(readFileSync(resolve(workspaceRoot, V5_DIAGNOSTIC_REJECTION_RECEIPT_PATH))) !==
+        V5_DIAGNOSTIC_REJECTION_RECEIPT_SHA256) {
+    throw new Error("OS-01 hosted v5 diagnostic rejection evidence changed");
+  }
+  const diagnosticContractBytes = readFileSync(resolve(
+    workspaceRoot,
+    "config/os01-hosted-migration-diagnostic.v6.json"
   ));
   const diagnosticContract = JSON.parse(
     new TextDecoder().decode(diagnosticContractBytes)
@@ -175,10 +188,15 @@ export async function buildOs01HostedMigrationHarness(input: {
     version?: unknown;
     status?: unknown;
     predecessorSourceCommit?: unknown;
+    predecessorReceipt?: unknown;
+    predecessorReceiptSha256?: unknown;
     exactTemporarySitesProjectId?: unknown;
-    maximumHostedProbeRequestsAcrossV4AndV5?: unknown;
-    componentPhases?: unknown;
+    authorizedAction?: unknown;
+    requestIdentity?: unknown;
+    maximumHostedProbeRequests?: unknown;
+    readOnlyComponents?: unknown;
     acceptedEvidenceAllowed?: unknown;
+    databaseMutationAllowed?: unknown;
     providerAccessAllowed?: unknown;
     captureActivationAllowed?: unknown;
     productionAllowed?: unknown;
@@ -221,26 +239,36 @@ export async function buildOs01HostedMigrationHarness(input: {
       qualificationContract.package?.deploymentAllowed !== true) {
     throw new Error("OS-01 hosted qualification v4 contract is not the frozen candidate contract");
   }
-  const expectedComponentPhases = [
-    "sentinel_only",
-    "reserved_create_then_sentinel",
-    "plain_create_then_sentinel",
-    "reserved_simple_then_sentinel",
-    "reserved_schema_then_sentinel",
-    "reserved_catalog_then_sentinel",
-    "reserved_full_guard_then_sentinel"
+  const expectedReadOnlyComponents = [
+    "select_literal",
+    "sqlite_schema_catalog",
+    "pragma_schema_version",
+    "pragma_foreign_key_check",
+    "pragma_quick_check"
   ];
-  if (diagnosticContract.version !== "os01-hosted-migration-diagnostic.2026.5" ||
+  if (diagnosticContract.version !== "os01-hosted-migration-diagnostic.2026.6" ||
       diagnosticContract.status !== "diagnostic_only_not_qualification_evidence" ||
-      diagnosticContract.predecessorSourceCommit !== "3b9a7e5d02a932bfa43d6640d3ae16b7dfef4a72" ||
+      diagnosticContract.predecessorSourceCommit !== "36ee949dd1d71bc06d4deb1784a93133bb21763e" ||
+      diagnosticContract.predecessorReceipt !== V5_DIAGNOSTIC_REJECTION_RECEIPT_PATH ||
+      diagnosticContract.predecessorReceiptSha256 !== V5_DIAGNOSTIC_REJECTION_RECEIPT_SHA256 ||
       diagnosticContract.exactTemporarySitesProjectId !== EXACT_STAGING_PROJECT_ID ||
-      diagnosticContract.maximumHostedProbeRequestsAcrossV4AndV5 !== 10 ||
-      JSON.stringify(diagnosticContract.componentPhases) !== JSON.stringify(expectedComponentPhases) ||
+      diagnosticContract.authorizedAction !==
+        "one_read_only_prestate_component_probe_after_fresh_owner_only_db_only_zero_table_refresh" ||
+      JSON.stringify(diagnosticContract.requestIdentity) !== JSON.stringify({
+        method: "POST",
+        route: "/__engine-os/os01-hosted-migration/v1",
+        version: "engine-os.os01-hosted-migration-request.v1",
+        action: "blank_prestate_component_probe",
+        exactKeys: ["action", "qualificationId", "version"]
+      }) ||
+      diagnosticContract.maximumHostedProbeRequests !== 1 ||
+      JSON.stringify(diagnosticContract.readOnlyComponents) !== JSON.stringify(expectedReadOnlyComponents) ||
       diagnosticContract.acceptedEvidenceAllowed !== false ||
+      diagnosticContract.databaseMutationAllowed !== false ||
       diagnosticContract.providerAccessAllowed !== false ||
       diagnosticContract.captureActivationAllowed !== false ||
       diagnosticContract.productionAllowed !== false) {
-    throw new Error("OS-01 hosted v5 diagnostic contract is invalid");
+    throw new Error("OS-01 hosted v6 diagnostic contract is invalid");
   }
   const v1ContractBytes = readFileSync(resolve(
     workspaceRoot,
@@ -521,10 +549,18 @@ export async function buildOs01HostedMigrationHarness(input: {
       sha256: sha256(qualificationContractBytes)
     },
     diagnosticContract: {
-      path: "config/os01-hosted-migration-diagnostic.v5.json",
+      path: "config/os01-hosted-migration-diagnostic.v6.json",
       sha256: sha256(diagnosticContractBytes),
       status: "diagnostic_only_not_qualification_evidence",
-      componentPhases: expectedComponentPhases
+      authorizedAction: "blank_prestate_component_probe",
+      readOnlyComponents: expectedReadOnlyComponents
+    },
+    rejectedDiagnosticPredecessor: {
+      contractPath: "config/os01-hosted-migration-diagnostic.v5.json",
+      contractSha256: V5_DIAGNOSTIC_CONTRACT_SHA256,
+      receiptPath: V5_DIAGNOSTIC_REJECTION_RECEIPT_PATH,
+      receiptSha256: V5_DIAGNOSTIC_REJECTION_RECEIPT_SHA256,
+      status: "shared_prestate_path_rejected_before_component_isolation"
     },
     rejectedPredecessorContract: {
       path: "config/os01-hosted-migration-qualification.v3.json",
@@ -610,7 +646,7 @@ export async function buildOs01HostedMigrationHarness(input: {
     },
     deploymentAllowed: true,
     deploymentTargetRestriction: `exact_project:${EXACT_STAGING_PROJECT_ID}`,
-    authorizedHostedAction: "bounded_zero_migration_component_probe_only",
+    authorizedHostedAction: "one_read_only_prestate_component_probe_only",
     acceptedEvidenceAllowed: false,
     migrationQualificationAllowed: false,
     predecessorPostFailureD1TableCount: 0,
