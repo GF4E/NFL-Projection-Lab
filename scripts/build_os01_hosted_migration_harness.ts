@@ -165,6 +165,24 @@ export async function buildOs01HostedMigrationHarness(input: {
     };
     package?: { deploymentAllowed?: unknown };
   };
+  const diagnosticContractBytes = readFileSync(resolve(
+    workspaceRoot,
+    "config/os01-hosted-migration-diagnostic.v5.json"
+  ));
+  const diagnosticContract = JSON.parse(
+    new TextDecoder().decode(diagnosticContractBytes)
+  ) as {
+    version?: unknown;
+    status?: unknown;
+    predecessorSourceCommit?: unknown;
+    exactTemporarySitesProjectId?: unknown;
+    maximumHostedProbeRequestsAcrossV4AndV5?: unknown;
+    componentPhases?: unknown;
+    acceptedEvidenceAllowed?: unknown;
+    providerAccessAllowed?: unknown;
+    captureActivationAllowed?: unknown;
+    productionAllowed?: unknown;
+  };
   if (qualificationContract.version !== "os01-hosted-migration-qualification.2026.4" ||
       qualificationContract.authority?.sourceCommit !== "d24db5632410894d4f82c12e7f1d0c4c256a208d" ||
       qualificationContract.predecessor?.sha256 !== V3_CONTRACT_SHA256 ||
@@ -202,6 +220,27 @@ export async function buildOs01HostedMigrationHarness(input: {
       ]) ||
       qualificationContract.package?.deploymentAllowed !== true) {
     throw new Error("OS-01 hosted qualification v4 contract is not the frozen candidate contract");
+  }
+  const expectedComponentPhases = [
+    "sentinel_only",
+    "reserved_create_then_sentinel",
+    "plain_create_then_sentinel",
+    "reserved_simple_then_sentinel",
+    "reserved_schema_then_sentinel",
+    "reserved_catalog_then_sentinel",
+    "reserved_full_guard_then_sentinel"
+  ];
+  if (diagnosticContract.version !== "os01-hosted-migration-diagnostic.2026.5" ||
+      diagnosticContract.status !== "diagnostic_only_not_qualification_evidence" ||
+      diagnosticContract.predecessorSourceCommit !== "3b9a7e5d02a932bfa43d6640d3ae16b7dfef4a72" ||
+      diagnosticContract.exactTemporarySitesProjectId !== EXACT_STAGING_PROJECT_ID ||
+      diagnosticContract.maximumHostedProbeRequestsAcrossV4AndV5 !== 10 ||
+      JSON.stringify(diagnosticContract.componentPhases) !== JSON.stringify(expectedComponentPhases) ||
+      diagnosticContract.acceptedEvidenceAllowed !== false ||
+      diagnosticContract.providerAccessAllowed !== false ||
+      diagnosticContract.captureActivationAllowed !== false ||
+      diagnosticContract.productionAllowed !== false) {
+    throw new Error("OS-01 hosted v5 diagnostic contract is invalid");
   }
   const v1ContractBytes = readFileSync(resolve(
     workspaceRoot,
@@ -481,6 +520,12 @@ export async function buildOs01HostedMigrationHarness(input: {
       path: "config/os01-hosted-migration-qualification.v4.json",
       sha256: sha256(qualificationContractBytes)
     },
+    diagnosticContract: {
+      path: "config/os01-hosted-migration-diagnostic.v5.json",
+      sha256: sha256(diagnosticContractBytes),
+      status: "diagnostic_only_not_qualification_evidence",
+      componentPhases: expectedComponentPhases
+    },
     rejectedPredecessorContract: {
       path: "config/os01-hosted-migration-qualification.v3.json",
       sha256: V3_CONTRACT_SHA256,
@@ -565,7 +610,9 @@ export async function buildOs01HostedMigrationHarness(input: {
     },
     deploymentAllowed: true,
     deploymentTargetRestriction: `exact_project:${EXACT_STAGING_PROJECT_ID}`,
-    authorizedHostedAction: "one_blank_replay_with_new_qualification_id",
+    authorizedHostedAction: "bounded_zero_migration_component_probe_only",
+    acceptedEvidenceAllowed: false,
+    migrationQualificationAllowed: false,
     predecessorPostFailureD1TableCount: 0,
     stillBlankRefreshRequiredBeforeDeploy: true,
     freshOwnerOnlyAndBindingRefreshRequiredBeforeDeploy: true,

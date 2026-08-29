@@ -625,7 +625,9 @@ describe("OS-01 standalone hosted migration harness", () => {
       deploymentTargetRestriction: `exact_project:${exactStagingProjectId}`,
       freshOwnerOnlyAndBindingRefreshRequiredBeforeDeploy: true,
       ownerOnlyAccessRequiredBeforeDeploy: true,
-      authorizedHostedAction: "one_blank_replay_with_new_qualification_id",
+      authorizedHostedAction: "bounded_zero_migration_component_probe_only",
+      acceptedEvidenceAllowed: false,
+      migrationQualificationAllowed: false,
       predecessorPostFailureD1TableCount: 0,
       stillBlankRefreshRequiredBeforeDeploy: true,
       qualificationContract: {
@@ -634,6 +636,23 @@ describe("OS-01 standalone hosted migration harness", () => {
           "config/os01-hosted-migration-qualification.v4.json",
           "utf8"
         ))
+      },
+      diagnosticContract: {
+        path: "config/os01-hosted-migration-diagnostic.v5.json",
+        sha256: await hostedSha256(readFileSync(
+          "config/os01-hosted-migration-diagnostic.v5.json",
+          "utf8"
+        )),
+        status: "diagnostic_only_not_qualification_evidence",
+        componentPhases: [
+          "sentinel_only",
+          "reserved_create_then_sentinel",
+          "plain_create_then_sentinel",
+          "reserved_simple_then_sentinel",
+          "reserved_schema_then_sentinel",
+          "reserved_catalog_then_sentinel",
+          "reserved_full_guard_then_sentinel"
+        ]
       },
       rejectedPredecessorContract: {
         path: "config/os01-hosted-migration-qualification.v3.json",
