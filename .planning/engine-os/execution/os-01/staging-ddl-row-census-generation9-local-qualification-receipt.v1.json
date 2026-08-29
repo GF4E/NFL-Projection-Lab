@@ -1,0 +1,78 @@
+{
+  "version": "engine-os.os01-staging-ddl-row-census-local-qualification-receipt.v1",
+  "status": "accepted_bounded_local_mechanism_only",
+  "semanticQualificationId": "8acabdd225af3530825d5ddd65b78fdf0735b638fb38f587fcad40efd378f06d",
+  "controllerAuthorityId": "195fcbfc0fac28ae7cdb58ef838172bc572e2069397a3be4d6d724bf07e51b0e",
+  "sourceCommit": "fe9eef3648b06ee52e9b41cdd8d19827b84722e2",
+  "sourceTree": "0624970d9ae645d992cdc908e078ac56cdc4dbcc",
+  "verification": {
+    "focusedTests": {
+      "passed": 41,
+      "failed": 0
+    },
+    "fullTests": {
+      "passed": 922,
+      "failed": 0,
+      "skipped": 1
+    },
+    "typecheck": "passed",
+    "lint": "passed",
+    "schemaAuthority": {
+      "status": "passed",
+      "tables": 93,
+      "indexes": 80,
+      "triggers": 76,
+      "views": 0,
+      "schemaFingerprint": "4d78fd8de47ababbf6d809575a55275a166e8c99b332344b91c885f27eedafd2"
+    },
+    "productionBuild": "passed",
+    "activeBuildGraph": {
+      "status": "passed",
+      "sourceFiles": 167,
+      "buildFiles": 361
+    },
+    "independentArchitectureAudit": "accepted_bounded_generation9_design",
+    "independentImplementationAudit": "accepted_bounded_local_generation9_mechanism"
+  },
+  "deterministicPackage": {
+    "workerSha256": "d8f7b4dc101e65ada475893bdae11c1acbb15bec069838eba2216a8f53a7af8e",
+    "manifestSha256": "1bbdde237cff5f54bc5a8b491c76f0a04170cc30956f370f9ec5b861b117018e",
+    "siteArchiveSha256": "656e57f2e30f7bf58d9b28b30ce3553ca1d0dc38af0b9103ab0e55a9cad2b625",
+    "twoIndependentBuildsByteIdentical": true,
+    "maximumD1QueriesPerInvocation": 4,
+    "foreignKeyQueryPresent": false,
+    "foreignKeyEvidenceWithheld": true,
+    "foreignKeyClaimsAccepted": false
+  },
+  "securityScans": {
+    "trackedCurrent": {
+      "sha256": "297bde75c35f53766aab164cee9ada932ee4dd6f58085d12852ffc04b518068a",
+      "credentialFindings": 0
+    },
+    "buildOutputs": {
+      "sha256": "2682d3c6a8ea0fae39ae82b0f25787a02b43a6c3ff9ecd78d0f23c1835892280",
+      "credentialFindings": 0,
+      "personalDataReviewFindings": 221
+    },
+    "reachableHistory": {
+      "sha256": "763678a7210827fbab54fa8e101aecf08ba954dadfea7804404ae4992b34cf57",
+      "preExistingCredentialShapedFixtureFindings": 1,
+      "quarantinedCredentialFindings": 1,
+      "generation9CredentialFindings": 0
+    }
+  },
+  "boundaries": {
+    "hostedEvidenceAccepted": false,
+    "foreignKeyEvidenceAccepted": false,
+    "generation10Authorized": false,
+    "os01Accepted": false,
+    "cleanupAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthorized": false,
+    "providerSecretRead": false,
+    "providerPathInvoked": false,
+    "quotaPathInvoked": false,
+    "captureActivated": false
+  },
+  "receiptHash": "c084e0d1d362d163a7c297dd09e7a5e8379fa47ef1e4540b18b632dae1f8d042"
+}
