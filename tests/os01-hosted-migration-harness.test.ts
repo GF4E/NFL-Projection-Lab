@@ -1,6 +1,7 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { DatabaseSync } from "node:sqlite";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 
@@ -692,6 +693,7 @@ describe("OS-01 standalone hosted migration harness", () => {
       freshOwnerOnlyAndBindingRefreshRequiredBeforeDeploy: true,
       ownerOnlyAccessRequiredBeforeDeploy: true,
       authorizedHostedAction: "one_read_only_prestate_component_probe_only",
+      runtimeAuthorizedActions: ["blank_prestate_component_probe"],
       acceptedEvidenceAllowed: false,
       migrationQualificationAllowed: false,
       predecessorPostFailureD1TableCount: 0,
@@ -784,6 +786,8 @@ describe("OS-01 standalone hosted migration harness", () => {
     expect(readFileSync(join(directory, ".openai/os01-hosted-migration-package.v4.sha256"), "utf8"))
       .toBe(`${result.manifestSha256}  os01-hosted-migration-package.v4.json\n`);
     expect(entry).toContain("/__engine-os/os01-hosted-migration/v1");
+    expect(entry).toContain("action_not_authorized");
+    expect(entry).toContain('Object.freeze(["blank_prestate_component_probe"])');
     expect(entry).not.toMatch(/ODDS_API_KEY|ENGINE_OS_CAPTURE_ENABLED|the-odds-api\.com/u);
     expect(readFileSync("worker/index.ts", "utf8")).not.toContain("os01-hosted-migration");
     writeFileSync(join(occupiedDirectory, "existing"), "preserve", "utf8");
@@ -791,6 +795,56 @@ describe("OS-01 standalone hosted migration harness", () => {
       projectId: exactStagingProjectId,
       outDir: occupiedDirectory
     })).rejects.toThrow("output directory must be empty");
+  });
+
+  it("runtime-binds the built worker to the single read-only diagnostic action", async () => {
+    const directory = mkdtempSync(join(tmpdir(), "os01-hosted-runtime-allowlist-"));
+    temporaryDirectories.push(directory);
+    await buildOs01HostedMigrationHarness({
+      projectId: exactStagingProjectId,
+      outDir: directory
+    });
+    const workerModule = await import(
+      `${pathToFileURL(join(directory, "server/index.js")).href}?test=${Date.now()}`
+    );
+    const worker = workerModule.default as {
+      fetch(request: Request, environment: { DB: D1Database }): Promise<Response>;
+    };
+    let databaseTouches = 0;
+    const forbiddenD1 = new Proxy({} as D1Database, {
+      get() {
+        databaseTouches += 1;
+        throw new Error("unauthorized action touched D1");
+      }
+    });
+    const unauthorizedActions = [
+      "blank_replay",
+      "blank_prefix_probe",
+      "blank_component_probe",
+      "legacy_prepare_export",
+      "legacy_forward",
+      "restore_import",
+      "failure_probe",
+      "verify_blank_terminal",
+      "verify_legacy_terminal"
+    ];
+    for (const action of unauthorizedActions) {
+      const response = await worker.fetch(new Request(
+        "https://owner-only.example.test/__engine-os/os01-hosted-migration/v1",
+        {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            version: "engine-os.os01-hosted-migration-request.v1",
+            action,
+            qualificationId
+          })
+        }
+      ), { DB: forbiddenD1 });
+      expect(response.status, action).toBe(403);
+      expect(await response.json(), action).toEqual({ error: "action_not_authorized" });
+    }
+    expect(databaseTouches).toBe(0);
   });
 
   it("preserves every rejected predecessor and rejects every non-qualified deployment target", async () => {

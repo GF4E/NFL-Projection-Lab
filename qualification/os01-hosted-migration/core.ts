@@ -44,7 +44,7 @@ const EXPECTED_PATHS = Object.freeze([
 
 type Scalar = string | number | null;
 type ObjectType = "index" | "table" | "trigger" | "view";
-type HostedAction =
+export type HostedAction =
   | "blank_prestate_component_probe"
   | "blank_replay"
   | "blank_prefix_probe"
@@ -55,6 +55,19 @@ type HostedAction =
   | "failure_probe"
   | "verify_blank_terminal"
   | "verify_legacy_terminal";
+
+export const ALL_HOSTED_ACTIONS = Object.freeze([
+  "blank_prestate_component_probe",
+  "blank_replay",
+  "blank_prefix_probe",
+  "blank_component_probe",
+  "legacy_prepare_export",
+  "legacy_forward",
+  "restore_import",
+  "failure_probe",
+  "verify_blank_terminal",
+  "verify_legacy_terminal"
+] as const satisfies readonly HostedAction[]);
 
 type BlankComponentProbePhase =
   | "sentinel_only"
@@ -1097,27 +1110,21 @@ function requestKeys(action: HostedAction): readonly string[] {
   return base;
 }
 
-function parseQualificationRequest(value: unknown): QualificationRequest {
+function parseQualificationRequest(
+  value: unknown,
+  authorizedActions: readonly HostedAction[] = ALL_HOSTED_ACTIONS
+): QualificationRequest {
   if (!value || typeof value !== "object") throw new HarnessError("invalid_request", 400);
   const record = value as Record<string, unknown>;
-  const actions: HostedAction[] = [
-    "blank_prestate_component_probe",
-    "blank_replay",
-    "blank_prefix_probe",
-    "blank_component_probe",
-    "legacy_prepare_export",
-    "legacy_forward",
-    "restore_import",
-    "failure_probe",
-    "verify_blank_terminal",
-    "verify_legacy_terminal"
-  ];
   if (record.version !== "engine-os.os01-hosted-migration-request.v1" ||
-      typeof record.action !== "string" || !actions.includes(record.action as HostedAction) ||
+      typeof record.action !== "string" || !ALL_HOSTED_ACTIONS.includes(record.action as HostedAction) ||
       typeof record.qualificationId !== "string" || !/^[a-f0-9]{64}$/u.test(record.qualificationId)) {
     throw new HarnessError("invalid_request", 400);
   }
   const action = record.action as HostedAction;
+  if (!authorizedActions.includes(action)) {
+    throw new HarnessError("action_not_authorized", 403);
+  }
   if (!exactKeys(record, requestKeys(action))) throw new HarnessError("invalid_request", 400);
   if (action === "blank_prefix_probe" &&
       (!Number.isInteger(record.prefixStatementCount) ||
@@ -1488,7 +1495,8 @@ function errorResponse(error: unknown): Response {
 export async function handleOs01HostedMigrationQualification(
   request: Request,
   db: D1Database,
-  authority: Os01HostedMigrationAuthority
+  authority: Os01HostedMigrationAuthority,
+  authorizedActions: readonly HostedAction[] = ALL_HOSTED_ACTIONS
 ): Promise<Response> {
   try {
     const url = new URL(request.url);
@@ -1507,7 +1515,11 @@ export async function handleOs01HostedMigrationQualification(
     } catch {
       throw new HarnessError("invalid_request", 400);
     }
-    const body = stableHostedJson(await performAction(db, parseQualificationRequest(parsed), authority));
+    const body = stableHostedJson(await performAction(
+      db,
+      parseQualificationRequest(parsed, authorizedActions),
+      authority
+    ));
     return new Response(body, { status: 200, headers: headers() });
   } catch (error) {
     return errorResponse(error);
@@ -1518,18 +1530,7 @@ export const os01HostedMigrationHarnessContract = Object.freeze({
   route: ROUTE,
   requestVersion: "engine-os.os01-hosted-migration-request.v1",
   receiptVersion: "engine-os.os01-hosted-migration-receipt.v1",
-  actions: Object.freeze([
-    "blank_prestate_component_probe",
-    "blank_replay",
-    "blank_prefix_probe",
-    "blank_component_probe",
-    "legacy_prepare_export",
-    "legacy_forward",
-    "restore_import",
-    "failure_probe",
-    "verify_blank_terminal",
-    "verify_legacy_terminal"
-  ]),
+  actions: ALL_HOSTED_ACTIONS,
   maxRequestBytes: MAX_REQUEST_BYTES,
   qualificationOnly: true,
   providerBindings: Object.freeze([]),

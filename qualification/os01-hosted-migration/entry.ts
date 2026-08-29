@@ -1,4 +1,4 @@
-import authority from "virtual:os01-hosted-migration-authority";
+import authority, { authorizedActions } from "virtual:os01-hosted-migration-authority";
 import { handleOs01HostedMigrationQualification } from "./core";
 
 interface QualificationEnvironment {
@@ -12,7 +12,12 @@ interface QualificationEnvironment {
  */
 const worker = {
   fetch(request: Request, environment: QualificationEnvironment): Promise<Response> {
-    return handleOs01HostedMigrationQualification(request, environment.DB, authority);
+    return handleOs01HostedMigrationQualification(
+      request,
+      environment.DB,
+      authority,
+      authorizedActions
+    );
   }
 };
 

@@ -487,7 +487,9 @@ export async function buildOs01HostedMigrationHarness(input: {
       return id === VIRTUAL_ID ? RESOLVED_VIRTUAL_ID : null;
     },
     load(id) {
-      return id === RESOLVED_VIRTUAL_ID ? `export default ${authorityJson};` : null;
+      return id === RESOLVED_VIRTUAL_ID
+        ? `export const authorizedActions = Object.freeze(["blank_prestate_component_probe"]); export default ${authorityJson};`
+        : null;
     }
   };
   await build({
@@ -522,6 +524,10 @@ export async function buildOs01HostedMigrationHarness(input: {
   }
   if (!entryText.includes("/__engine-os/os01-hosted-migration/v1")) {
     throw new Error("OS-01 hosted bundle does not contain the qualification route");
+  }
+  if (!entryText.includes("action_not_authorized") ||
+      !entryText.includes('Object.freeze(["blank_prestate_component_probe"])')) {
+    throw new Error("OS-01 hosted bundle does not enforce the singleton runtime action allowlist");
   }
   const metadataRoot = join(outDir, ".openai");
   mkdirSync(metadataRoot, { recursive: true });
@@ -647,6 +653,7 @@ export async function buildOs01HostedMigrationHarness(input: {
     deploymentAllowed: true,
     deploymentTargetRestriction: `exact_project:${EXACT_STAGING_PROJECT_ID}`,
     authorizedHostedAction: "one_read_only_prestate_component_probe_only",
+    runtimeAuthorizedActions: ["blank_prestate_component_probe"],
     acceptedEvidenceAllowed: false,
     migrationQualificationAllowed: false,
     predecessorPostFailureD1TableCount: 0,
