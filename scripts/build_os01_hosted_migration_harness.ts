@@ -14,6 +14,12 @@ const RESOLVED_VIRTUAL_ID = `\0${VIRTUAL_ID}`;
 const EXACT_STAGING_PROJECT_ID = "appgprj_6a92435d1d788191b4d6bcaff0a1525d";
 const V1_CONTRACT_SHA256 = "d411116582a982bdbf9a86d797bfd8346ee72115b87602bf6b204c5eadc59270";
 const V2_CONTRACT_SHA256 = "cd025216b156946404b5606e824575ff00e1d023f3fa40f4fa45e068a041cde6";
+const V3_CONTRACT_SHA256 = "eaddbab1dd84325eac82846446fa49a1c38359abce60283341886208c87f5a9d";
+const V3_FAILURE_RECEIPT_SHA256 = "d42f6829a21e02d368354a3bbd851fb4e99a77adb7a32dc5086ce25b8a76497b";
+const SHARED_STATEMENT_PARSER_SHA256 = "419f97cba53ee0e95fdad8ddd29edf0a1a2a64cc359f34f85746c6ab02b43c46";
+const V3_FAILURE_RECEIPT_PATH =
+  ".planning/engine-os/execution/os-01/hosted-migration-v3-runtime-boundary-rejection-receipt.v1.json";
+const SHARED_STATEMENT_PARSER_PATH = "qualification/os01-hosted-migration/sql-statements.ts";
 const CAPACITY_RECEIPT_SHA256 = "91e61351ba23848cc76e2d10f386c6a38690b9e41681f2d2387a206d0a70955c";
 const CAPACITY_RESPONSE_RECEIPT_HASH = "cb7c00a83a66304430c0c61385328568b752a7122069e5cc8c170e849193ed55";
 const CAPACITY_SOURCE_COMMIT = "f161104783f13ad15009fc2da4ac8f11f513c4fd";
@@ -91,7 +97,7 @@ export async function buildOs01HostedMigrationHarness(input: {
   manifestSha256: string;
 }> {
   if (input.projectId !== EXACT_STAGING_PROJECT_ID) {
-    throw new Error("OS-01 hosted harness v3 is restricted to the capacity-qualified staging Sites project");
+    throw new Error("OS-01 hosted harness v4 is restricted to the capacity-qualified staging Sites project");
   }
   const workspaceRoot = resolve(input.workspaceRoot ?? process.cwd());
   const outDir = resolve(input.outDir);
@@ -100,7 +106,7 @@ export async function buildOs01HostedMigrationHarness(input: {
   }
   const qualificationContractPath = resolve(
     workspaceRoot,
-    "config/os01-hosted-migration-qualification.v3.json"
+    "config/os01-hosted-migration-qualification.v4.json"
   );
   const qualificationContractBytes = readFileSync(qualificationContractPath);
   const qualificationContract = JSON.parse(
@@ -109,7 +115,8 @@ export async function buildOs01HostedMigrationHarness(input: {
     version?: unknown;
     authority?: { sourceCommit?: unknown };
     predecessor?: { sha256?: unknown };
-    historicalRejection?: { sha256?: unknown };
+    predecessorRejectionReceipt?: { path?: unknown; sha256?: unknown };
+    historicalRejections?: Array<{ sha256?: unknown; status?: unknown }>;
     capacityQualification?: {
       receipt?: { path?: unknown; sha256?: unknown };
       sourceSnapshot?: { path?: unknown; sha256?: unknown };
@@ -141,22 +148,60 @@ export async function buildOs01HostedMigrationHarness(input: {
       providerAccessAllowed?: unknown;
       captureActivationAllowed?: unknown;
       freshOwnerOnlyAndBindingRefreshRequiredBeforeDeploy?: unknown;
-      d1ExecutionPrerequisite?: { activePredeployProbeIncluded?: unknown };
+      authorizedActionAfterLocalAcceptanceAndFreshRefresh?: unknown;
+      underThirtySecondMutatingMigrationProof?: unknown;
+      predecessorPostFailureD1Observation?: { tableCount?: unknown; tables?: unknown };
+    };
+    runtimeStatementBoundary?: {
+      parser?: { path?: unknown; sha256?: unknown; consumers?: unknown };
+      statementBreakpointEntries?: unknown;
+      migrationStatements?: unknown;
+      guardStatements?: unknown;
+      blankReplayBatchStatements?: unknown;
+      blankReplayInvocationQueries?: unknown;
+      singleBatchRequired?: unknown;
+      singleStatementPerPrepareRequired?: unknown;
+      diagnosticVocabulary?: unknown;
     };
     package?: { deploymentAllowed?: unknown };
   };
-  if (qualificationContract.version !== "os01-hosted-migration-qualification.2026.3" ||
+  if (qualificationContract.version !== "os01-hosted-migration-qualification.2026.4" ||
       qualificationContract.authority?.sourceCommit !== "d24db5632410894d4f82c12e7f1d0c4c256a208d" ||
-      qualificationContract.predecessor?.sha256 !== V2_CONTRACT_SHA256 ||
-      qualificationContract.historicalRejection?.sha256 !== V1_CONTRACT_SHA256 ||
+      qualificationContract.predecessor?.sha256 !== V3_CONTRACT_SHA256 ||
+      qualificationContract.predecessorRejectionReceipt?.path !== V3_FAILURE_RECEIPT_PATH ||
+      qualificationContract.predecessorRejectionReceipt?.sha256 !== V3_FAILURE_RECEIPT_SHA256 ||
+      qualificationContract.historicalRejections?.[0]?.sha256 !== V2_CONTRACT_SHA256 ||
+      qualificationContract.historicalRejections?.[1]?.sha256 !== V1_CONTRACT_SHA256 ||
       qualificationContract.executionBoundary?.exactTemporarySitesProjectId !== EXACT_STAGING_PROJECT_ID ||
       qualificationContract.executionBoundary?.freshOwnerOnlyAndBindingRefreshRequiredBeforeDeploy !== true ||
       qualificationContract.executionBoundary?.productionAllowed !== false ||
       qualificationContract.executionBoundary?.providerAccessAllowed !== false ||
       qualificationContract.executionBoundary?.captureActivationAllowed !== false ||
-      qualificationContract.executionBoundary?.d1ExecutionPrerequisite?.activePredeployProbeIncluded !== true ||
+      qualificationContract.executionBoundary?.authorizedActionAfterLocalAcceptanceAndFreshRefresh !==
+        "one blank_replay request using a newly generated qualification id" ||
+      qualificationContract.executionBoundary?.underThirtySecondMutatingMigrationProof !==
+        "pending_hosted_blank_replay_v4" ||
+      qualificationContract.executionBoundary?.predecessorPostFailureD1Observation?.tableCount !== 0 ||
+      JSON.stringify(qualificationContract.executionBoundary?.predecessorPostFailureD1Observation?.tables) !== "[]" ||
+      qualificationContract.runtimeStatementBoundary?.parser?.path !== SHARED_STATEMENT_PARSER_PATH ||
+      qualificationContract.runtimeStatementBoundary?.parser?.sha256 !== SHARED_STATEMENT_PARSER_SHA256 ||
+      JSON.stringify(qualificationContract.runtimeStatementBoundary?.parser?.consumers) !== JSON.stringify([
+        "qualification/os01-hosted-migration/core.ts",
+        "scripts/os01-hosted-migration-capacity.ts"
+      ]) ||
+      qualificationContract.runtimeStatementBoundary?.statementBreakpointEntries !== 272 ||
+      qualificationContract.runtimeStatementBoundary?.migrationStatements !== 291 ||
+      qualificationContract.runtimeStatementBoundary?.guardStatements !== 4 ||
+      qualificationContract.runtimeStatementBoundary?.blankReplayBatchStatements !== 295 ||
+      qualificationContract.runtimeStatementBoundary?.blankReplayInvocationQueries !== 489 ||
+      qualificationContract.runtimeStatementBoundary?.singleBatchRequired !== true ||
+      qualificationContract.runtimeStatementBoundary?.singleStatementPerPrepareRequired !== true ||
+      JSON.stringify(qualificationContract.runtimeStatementBoundary?.diagnosticVocabulary) !== JSON.stringify([
+        "d1_prepare_multiple_statements",
+        "d1_prepare_rejected"
+      ]) ||
       qualificationContract.package?.deploymentAllowed !== true) {
-    throw new Error("OS-01 hosted qualification v3 contract is not the frozen candidate contract");
+    throw new Error("OS-01 hosted qualification v4 contract is not the frozen candidate contract");
   }
   const v1ContractBytes = readFileSync(resolve(
     workspaceRoot,
@@ -172,6 +217,77 @@ export async function buildOs01HostedMigrationHarness(input: {
   if (sha256(v2ContractBytes) !== V2_CONTRACT_SHA256) {
     throw new Error("OS-01 hosted qualification v2 rejection contract changed");
   }
+  const v3ContractBytes = readFileSync(resolve(
+    workspaceRoot,
+    "config/os01-hosted-migration-qualification.v3.json"
+  ));
+  if (sha256(v3ContractBytes) !== V3_CONTRACT_SHA256) {
+    throw new Error("OS-01 hosted qualification v3 rejection contract changed");
+  }
+  const v3FailureReceiptBytes = readFileSync(resolve(workspaceRoot, V3_FAILURE_RECEIPT_PATH));
+  if (sha256(v3FailureReceiptBytes) !== V3_FAILURE_RECEIPT_SHA256) {
+    throw new Error("OS-01 hosted qualification v3 rejection receipt changed");
+  }
+  const v3FailureReceipt = JSON.parse(new TextDecoder().decode(v3FailureReceiptBytes)) as {
+    result?: unknown;
+    hostedAttempt?: {
+      projectId?: unknown;
+      response?: { httpStatus?: unknown; sha256?: unknown };
+      postFailureD1Observation?: { tableCount?: unknown; tables?: unknown };
+    };
+    defect?: {
+      capacityParserMigrationStatements?: unknown;
+      runtimeBreakpointEntries?: unknown;
+      missingRuntimeStatementBoundaries?: unknown;
+    };
+    securityAndActivation?: {
+      providerCalls?: unknown;
+      providerSecretReads?: unknown;
+      quotaReservations?: unknown;
+      captureActivations?: unknown;
+      productionMutations?: unknown;
+    };
+    claims?: { v3Accepted?: unknown; v3RetryAuthorized?: unknown };
+  };
+  if (v3FailureReceipt.result !== "rejected_runtime_statement_boundary_mismatch" ||
+      v3FailureReceipt.hostedAttempt?.projectId !== EXACT_STAGING_PROJECT_ID ||
+      v3FailureReceipt.hostedAttempt?.response?.httpStatus !== 500 ||
+      v3FailureReceipt.hostedAttempt?.response?.sha256 !==
+        "02bc538377738a19dda7d8c6bfabb2cf6e56be98008e976c216a470e9055a98a" ||
+      v3FailureReceipt.hostedAttempt?.postFailureD1Observation?.tableCount !== 0 ||
+      JSON.stringify(v3FailureReceipt.hostedAttempt?.postFailureD1Observation?.tables) !== "[]" ||
+      v3FailureReceipt.defect?.capacityParserMigrationStatements !== 291 ||
+      v3FailureReceipt.defect?.runtimeBreakpointEntries !== 272 ||
+      v3FailureReceipt.defect?.missingRuntimeStatementBoundaries !== 19 ||
+      v3FailureReceipt.securityAndActivation?.providerCalls !== 0 ||
+      v3FailureReceipt.securityAndActivation?.providerSecretReads !== 0 ||
+      v3FailureReceipt.securityAndActivation?.quotaReservations !== 0 ||
+      v3FailureReceipt.securityAndActivation?.captureActivations !== 0 ||
+      v3FailureReceipt.securityAndActivation?.productionMutations !== 0 ||
+      v3FailureReceipt.claims?.v3Accepted !== false ||
+      v3FailureReceipt.claims?.v3RetryAuthorized !== false) {
+    throw new Error("OS-01 hosted qualification v3 rejection receipt is not the exact failed attempt");
+  }
+  const sharedParserBytes = readFileSync(resolve(workspaceRoot, SHARED_STATEMENT_PARSER_PATH));
+  if (sha256(sharedParserBytes) !== SHARED_STATEMENT_PARSER_SHA256) {
+    throw new Error("OS-01 hosted shared SQL statement parser changed");
+  }
+  const runtimeCore = readFileSync(resolve(
+    workspaceRoot,
+    "qualification/os01-hosted-migration/core.ts"
+  ), "utf8");
+  const capacityCounter = readFileSync(resolve(
+    workspaceRoot,
+    "scripts/os01-hosted-migration-capacity.ts"
+  ), "utf8");
+  if (!runtimeCore.includes('import { splitHostedSqlStatements } from "./sql-statements";') ||
+      !runtimeCore.includes(".flatMap((entry) => splitHostedSqlStatements(entry))") ||
+      !capacityCounter.includes(
+        'import { splitHostedSqlStatements } from "../qualification/os01-hosted-migration/sql-statements";'
+      ) ||
+      !capacityCounter.includes("const parsed = splitHostedSqlStatements(entry);")) {
+    throw new Error("OS-01 hosted runtime and capacity accounting do not share the frozen SQL parser");
+  }
   const capacityReceiptPath = resolve(
     workspaceRoot,
     ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v3.json"
@@ -181,13 +297,13 @@ export async function buildOs01HostedMigrationHarness(input: {
       qualificationContract.capacityQualification?.receipt?.path !==
         ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v3.json" ||
       qualificationContract.capacityQualification?.receipt?.sha256 !== CAPACITY_RECEIPT_SHA256) {
-    throw new Error("OS-01 hosted capacity receipt does not match the frozen v3 contract");
+    throw new Error("OS-01 hosted capacity receipt does not match the frozen v4 contract");
   }
   const capacitySourceSnapshotBytes = readFileSync(resolve(workspaceRoot, CAPACITY_SOURCE_SNAPSHOT_PATH));
   if (sha256(capacitySourceSnapshotBytes) !== CAPACITY_WORKER_SHA256 ||
       qualificationContract.capacityQualification?.sourceSnapshot?.path !== CAPACITY_SOURCE_SNAPSHOT_PATH ||
       qualificationContract.capacityQualification?.sourceSnapshot?.sha256 !== CAPACITY_WORKER_SHA256) {
-    throw new Error("OS-01 hosted capacity source snapshot does not match the frozen v3 contract");
+    throw new Error("OS-01 hosted capacity source snapshot does not match the frozen v4 contract");
   }
   const sourceRequestIdentity = extractCapacityProbeRequestIdentity(
     new TextDecoder().decode(capacitySourceSnapshotBytes)
@@ -284,7 +400,16 @@ export async function buildOs01HostedMigrationHarness(input: {
   }
   const authority = loadOs01HostedMigrationAuthority(workspaceRoot);
   const capacity = calculateHostedMigrationCapacity(authority);
-  if (capacity.blankReplayInvocationQueries !== 489 || capacity.blankReplayBatchStatements !== 295) {
+  const statementBreakpointEntries = authority.migrations.reduce((total, migration) =>
+    total + migration.source.split("--> statement-breakpoint")
+      .map((entry) => entry.trim())
+      .filter(Boolean).length,
+  0);
+  if (statementBreakpointEntries !== 272 ||
+      capacity.migrationStatements !== 291 ||
+      capacity.guardStatements !== 4 ||
+      capacity.blankReplayInvocationQueries !== 489 ||
+      capacity.blankReplayBatchStatements !== 295) {
     throw new Error("OS-01 hosted harness capacity accounting no longer matches the frozen migration set");
   }
   const authorityJson = JSON.stringify(authority);
@@ -345,7 +470,7 @@ export async function buildOs01HostedMigrationHarness(input: {
     throw new Error("OS-01 hosted bundle contains an automatic migration path");
   }
   const manifest = {
-    version: "engine-os.os01-hosted-migration-package.v3",
+    version: "engine-os.os01-hosted-migration-package.v4",
     qualificationOnly: true,
     projectId: input.projectId,
     entryPath: "server/index.js",
@@ -353,10 +478,22 @@ export async function buildOs01HostedMigrationHarness(input: {
     hostingSha256: sha256(hostingBytes),
     authoritySha256,
     qualificationContract: {
-      path: "config/os01-hosted-migration-qualification.v3.json",
+      path: "config/os01-hosted-migration-qualification.v4.json",
       sha256: sha256(qualificationContractBytes)
     },
     rejectedPredecessorContract: {
+      path: "config/os01-hosted-migration-qualification.v3.json",
+      sha256: V3_CONTRACT_SHA256,
+      status: "rejected_runtime_statement_boundary_mismatch"
+    },
+    rejectedPredecessorReceipt: {
+      path: V3_FAILURE_RECEIPT_PATH,
+      sha256: V3_FAILURE_RECEIPT_SHA256,
+      hostedHttpStatus: 500,
+      hostedResponseSha256: "02bc538377738a19dda7d8c6bfabb2cf6e56be98008e976c216a470e9055a98a",
+      postFailureD1TableCount: 0
+    },
+    rejectedRequestIdentityPredecessorContract: {
       path: "config/os01-hosted-migration-qualification.v2.json",
       sha256: V2_CONTRACT_SHA256,
       status: "rejected_request_identity_mismatch"
@@ -395,6 +532,19 @@ export async function buildOs01HostedMigrationHarness(input: {
     sourceAuthorityCommit: authority.sourceCommit,
     migrationBundleHash: authority.migrationBundleHash,
     legacyMigrationBundleHash: authority.legacyMigrationBundleHash,
+    runtimeStatementBoundary: {
+      parserPath: SHARED_STATEMENT_PARSER_PATH,
+      parserSha256: SHARED_STATEMENT_PARSER_SHA256,
+      consumers: [
+        "qualification/os01-hosted-migration/core.ts",
+        "scripts/os01-hosted-migration-capacity.ts"
+      ],
+      statementBreakpointEntries,
+      migrationStatements: capacity.migrationStatements,
+      embeddedStatementDifference: capacity.migrationStatements - statementBreakpointEntries,
+      singleStatementPerPrepareRequired: true,
+      diagnosticVocabulary: ["d1_prepare_multiple_statements", "d1_prepare_rejected"]
+    },
     deploymentArchiveIncludesDrizzle: false,
     runtimeBindings: ["DB"],
     providerBindings: [],
@@ -411,27 +561,30 @@ export async function buildOs01HostedMigrationHarness(input: {
       maximumBatchDurationSeconds: 30,
       activePredeployProbeIncluded: true,
       capacityQualificationStatus: "passed_489_read_only_queries_in_one_batch_588ms_source_bound_request_identity",
-      mutatingMigrationDurationQualificationStatus: "pending_hosted_blank_replay"
+      mutatingMigrationDurationQualificationStatus: "pending_hosted_blank_replay_v4"
     },
     deploymentAllowed: true,
     deploymentTargetRestriction: `exact_project:${EXACT_STAGING_PROJECT_ID}`,
+    authorizedHostedAction: "one_blank_replay_with_new_qualification_id",
+    predecessorPostFailureD1TableCount: 0,
+    stillBlankRefreshRequiredBeforeDeploy: true,
     freshOwnerOnlyAndBindingRefreshRequiredBeforeDeploy: true,
     ownerOnlyAccessRequiredBeforeDeploy: true,
     captureActivationAllowed: false,
     productionAllowed: false,
     outputFiles: [
       ...outputFiles,
-      ".openai/os01-hosted-migration-package.v3.json",
-      ".openai/os01-hosted-migration-package.v3.sha256"
+      ".openai/os01-hosted-migration-package.v4.json",
+      ".openai/os01-hosted-migration-package.v4.sha256"
     ].sort()
   };
-  const manifestPath = join(metadataRoot, "os01-hosted-migration-package.v3.json");
+  const manifestPath = join(metadataRoot, "os01-hosted-migration-package.v4.json");
   const manifestBytes = `${JSON.stringify(manifest, null, 2)}\n`;
   const manifestSha256 = sha256(manifestBytes);
   writeFileSync(manifestPath, manifestBytes, { encoding: "utf8", flag: "wx" });
   writeFileSync(
-    join(metadataRoot, "os01-hosted-migration-package.v3.sha256"),
-    `${manifestSha256}  os01-hosted-migration-package.v3.json\n`,
+    join(metadataRoot, "os01-hosted-migration-package.v4.sha256"),
+    `${manifestSha256}  os01-hosted-migration-package.v4.json\n`,
     { encoding: "utf8", flag: "wx" }
   );
   return { entrySha256: manifest.entrySha256, authoritySha256, manifestPath, manifestSha256 };
