@@ -37,6 +37,7 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
   await build({
     configFile: false,
     logLevel: "warn",
+    publicDir: false,
     build: {
       emptyOutDir: false,
       outDir,
@@ -65,7 +66,9 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
   mkdirSync(metadata, { recursive: true });
   const hosting = `${JSON.stringify({ project_id: input.projectId, d1: "DB", r2: null }, null, 2)}\n`;
   writeFileSync(join(metadata, "hosting.json"), hosting, { encoding: "utf8", flag: "wx" });
-  if (files(outDir).some((path) => path.includes("drizzle") || path.endsWith(".sql"))) {
+  const payloadFiles = files(outDir).map((path) => path.slice(outDir.length + 1));
+  if (JSON.stringify(payloadFiles) !== JSON.stringify([".openai/hosting.json", "server/index.js"]) ||
+      payloadFiles.some((path) => path.includes("drizzle") || path.endsWith(".sql"))) {
     throw new Error("census package contains an automatic migration path");
   }
   const manifest = {
