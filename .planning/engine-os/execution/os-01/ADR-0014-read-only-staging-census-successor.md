@@ -70,3 +70,14 @@ evidence is preserved. Generation 4 derives a new authority identity from that r
 and sends `OAI-Sites-Authorization: Bearer <ephemeral-token>`. The token remains stdin-only,
 unlogged, unpersisted, and covered by the response-reflection rejection. No generic Authorization
 header is sent.
+
+## Authority generation 5
+
+Generation 4 authenticated successfully and reached the isolated worker. The worker read the
+staging catalog and then failed one closed `user_table_catalog_invalid` invariant. The reserved
+response remained empty and the terminal attempt evidence is preserved. Generation 5 is limited
+to refining that single aggregate failure into non-identifying categories for table-count,
+identifier, table-name equivalence, and CREATE-SQL availability. It may not return table names,
+SQL, provider information, or arbitrary runtime detail. It derives a new authority identity from
+the generation-4 rejection receipt; the generation-4 root and artifacts remain immutable and may
+not be retried.

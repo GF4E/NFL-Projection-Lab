@@ -1,0 +1,98 @@
+{
+  "version": "engine-os.os01-staging-census-hosted-attempt-rejection.v1",
+  "status": "rejected_user_table_catalog_invariant_after_worker_read",
+  "qualificationId": "471001d7f8ad783dbabc1c03c4e7a022799466a20afba70e1eaf087a4761ec29",
+  "controllerAuthorityId": "33b8fc16f102a6c377edaee7c0eeaadcb832be4a3127a636d1050a1e27a41a2c",
+  "sourceCommit": "4632547a9e35ef24856d78e664cfda1359c9424c",
+  "sourceTree": "39b69ce0e9c72c0ee83794db22e4345a3f3ec5c2",
+  "stagingProjectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "savedVersionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_18df5936ac548191b3aa167d0de2a1cd",
+  "savedVersionNumber": 14,
+  "deploymentId": "appgdep_6a92a5d9d3948191b0783b5f2b3272c9",
+  "deploymentStatus": "succeeded",
+  "workerSha256": "b7d4a77a155d5dbbe1e5afb57470e43a52229756a07612ccc15ea1566d5049f1",
+  "manifestSha256": "7ebfa26258cb76594f45dc28c4aadc4ec69b7c32ca94edfc23e07fec40d3b23a",
+  "localArchiveSha256": "0b86210726235e178196795e68d5777aaefd0dc75450efe35f1758a2e1ca6341",
+  "authorityRoot": "/private/tmp/engine-os-os01-staging-census-33b8fc16f102a6c377edaee7c0eeaadcb832be4a3127a636d1050a1e27a41a2c",
+  "artifacts": {
+    "authority": {
+      "sha256": "dada3c378422f869d359d3c575121aba1bd51f3de86772d51bd12590348b21d9",
+      "bytes": 928,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179027307
+    },
+    "preObservation": {
+      "sha256": "0ef8ea4554049c63945b050e97d62e0fb6dd1ebc3ce308627b3e1231cb1d7eac",
+      "bytes": 1980,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179027308
+    },
+    "intent": {
+      "sha256": "337a0cd28258ef6978ac172595bb49f10f8c95e552780f1a401f849bbc7d05c9",
+      "bytes": 1487,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179027356
+    },
+    "reservedResponse": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179027357
+    },
+    "attemptResult": {
+      "sha256": "b1910f1e922c8cd4113c535a65e0860240673240c34cfbfeaf4eb3237528c321",
+      "bytes": 1290,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179027358
+    },
+    "reservedDispatchCompletion": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179027359
+    }
+  },
+  "failure": {
+    "stage": "hosted_worker_catalog_validation",
+    "reason": "closed_user_table_catalog_invariant_failed",
+    "closedResponseReason": "user_table_catalog_invalid",
+    "closedResponseReasonEvidence": "exact_sha256_match_against_the_finite_worker_failure_vocabulary",
+    "responseBytesSha256": "d096901363fbdef93877ab287e7c778af8b145515732c692c8b7d946fd88c308",
+    "attemptResultHash": "de992e12f8bdb142f439daa1dd0ceb61bfa582e2ede82bf96b6b9489120663b5",
+    "controllerRunInvoked": true,
+    "hostRequestDispatched": true,
+    "httpStatus": 500,
+    "workerRequestDispatched": true,
+    "rawInvalidResponsePersisted": false,
+    "databaseReadAttempted": true,
+    "databaseMutationAttempted": false,
+    "providerPathInvoked": false,
+    "quotaPathInvoked": false,
+    "retryAllowedOnConsumedAuthority": false
+  },
+  "disposition": {
+    "originalAuthorityPreserved": true,
+    "artifactRewriteAllowed": false,
+    "artifactDeletionAllowed": false,
+    "cleanSuccessorRequired": true,
+    "diagnosticVocabularyRefinementAllowed": true,
+    "cleanupAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthorized": false,
+    "os01Accepted": false
+  },
+  "recordedAt": "2026-08-29T09:31:50.000Z",
+  "receiptHash": "6999a3b7164dbbf7ca2f60ce30d5c24af85a7e6e315b87205dfdd91dabda81c7"
+}
