@@ -7,8 +7,11 @@ import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import acceptedContract from "../config/os01-migration-qualification.v1.json";
 import predecessorAuthority from "../config/d1-schema-authority.v1.json";
 import successorAuthority from "../config/d1-schema-authority.v2.json";
-import hostedContract from "../config/os01-hosted-migration-qualification.v2.json";
-import { buildOs01HostedMigrationHarness } from "../scripts/build_os01_hosted_migration_harness";
+import hostedContract from "../config/os01-hosted-migration-qualification.v3.json";
+import {
+  buildOs01HostedMigrationHarness,
+  extractCapacityProbeRequestIdentity
+} from "../scripts/build_os01_hosted_migration_harness";
 import { loadOs01HostedMigrationAuthority } from "../scripts/os01-hosted-migration-authority";
 import {
   handleOs01HostedMigrationQualification,
@@ -398,7 +401,7 @@ describe("OS-01 standalone hosted migration harness", () => {
     const entry = readFileSync(join(directory, "server/index.js"), "utf8");
     expect(hosting).toEqual({ project_id: exactStagingProjectId, d1: "DB", r2: null });
     expect(manifest).toMatchObject({
-      version: "engine-os.os01-hosted-migration-package.v2",
+      version: "engine-os.os01-hosted-migration-package.v3",
       qualificationOnly: true,
       projectId: exactStagingProjectId,
       deploymentArchiveIncludesDrizzle: false,
@@ -416,18 +419,29 @@ describe("OS-01 standalone hosted migration harness", () => {
         successorMigrationBatchStatements: 137,
         maximumBatchDurationSeconds: 30,
         activePredeployProbeIncluded: true,
-        capacityQualificationStatus: "passed_489_read_only_queries_in_one_batch_588ms",
+        capacityQualificationStatus: "passed_489_read_only_queries_in_one_batch_588ms_source_bound_request_identity",
         mutatingMigrationDurationQualificationStatus: "pending_hosted_blank_replay"
       },
       capacityProbe: {
-        path: ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v2.json",
-        sha256: "d24b4f3d68c1b34e6852779b538fe40331f2b4714df18b2e6c91d63e7ec68b47",
+        path: ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v3.json",
+        sha256: "91e61351ba23848cc76e2d10f386c6a38690b9e41681f2d2387a206d0a70955c",
         exactProjectId: exactStagingProjectId,
         deploymentId: "appgdep_6a9243901a808191ad9f6c099bc90331",
         sourceCommit: "f161104783f13ad15009fc2da4ac8f11f513c4fd",
         workerSha256: "8969879cc4c233d92d3a53d3202300b13b6e491e57dc3db031e12f309d983b05",
         builtWorkerSha256: "e08e0c035405223072ec7c35bc6430e1e1a252cab161005f4dc5b6cde755fd84",
         archiveSha256: "f0720062fe21c926d367520560728a2b5d077c1b0ece017bef0155862b5565c2",
+        sourceSnapshot: {
+          path: ".planning/engine-os/execution/os-01/hosted-capacity-probe-worker.f161104.js.txt",
+          sha256: "8969879cc4c233d92d3a53d3202300b13b6e491e57dc3db031e12f309d983b05"
+        },
+        requestIdentity: {
+          method: "POST",
+          route: "/__engine-os/os01-capacity/v1",
+          version: "engine-os.os01-d1-capacity-probe-request.v1",
+          qualificationId: "os01-capacity-20260829-489-readonly",
+          exactKeys: ["qualificationId", "version"]
+        },
         queryCount: 489,
         batchCount: 1,
         resultCount: 489,
@@ -438,19 +452,25 @@ describe("OS-01 standalone hosted migration harness", () => {
         providerSecretReads: 0,
         captureActivations: 0,
         responseReceiptHash: "cb7c00a83a66304430c0c61385328568b752a7122069e5cc8c170e849193ed55",
-        status: "passed_bounded_read_only_probe"
+        status: "passed_bounded_read_only_probe_with_source_bound_request_identity"
       },
       deploymentAllowed: true,
       deploymentTargetRestriction: `exact_project:${exactStagingProjectId}`,
+      freshOwnerOnlyAndBindingRefreshRequiredBeforeDeploy: true,
       ownerOnlyAccessRequiredBeforeDeploy: true,
       qualificationContract: {
-        path: "config/os01-hosted-migration-qualification.v2.json",
+        path: "config/os01-hosted-migration-qualification.v3.json",
         sha256: await hostedSha256(readFileSync(
-          "config/os01-hosted-migration-qualification.v2.json",
+          "config/os01-hosted-migration-qualification.v3.json",
           "utf8"
         ))
       },
       rejectedPredecessorContract: {
+        path: "config/os01-hosted-migration-qualification.v2.json",
+        sha256: "cd025216b156946404b5606e824575ff00e1d023f3fa40f4fa45e068a041cde6",
+        status: "rejected_request_identity_mismatch"
+      },
+      historicalCapacityRejectionContract: {
         path: "config/os01-hosted-migration-qualification.v1.json",
         sha256: "d411116582a982bdbf9a86d797bfd8346ee72115b87602bf6b204c5eadc59270",
         status: "terminal_capacity_blocked_not_deployable"
@@ -458,8 +478,8 @@ describe("OS-01 standalone hosted migration harness", () => {
       productionAllowed: false,
       outputFiles: [
         ".openai/hosting.json",
-        ".openai/os01-hosted-migration-package.v2.json",
-        ".openai/os01-hosted-migration-package.v2.sha256",
+        ".openai/os01-hosted-migration-package.v3.json",
+        ".openai/os01-hosted-migration-package.v3.sha256",
         "server/index.js"
       ]
     });
@@ -475,8 +495,8 @@ describe("OS-01 standalone hosted migration harness", () => {
     });
     expect(readFileSync(result.manifestPath, "utf8"))
       .toBe(readFileSync(second.manifestPath, "utf8"));
-    expect(readFileSync(join(directory, ".openai/os01-hosted-migration-package.v2.sha256"), "utf8"))
-      .toBe(`${result.manifestSha256}  os01-hosted-migration-package.v2.json\n`);
+    expect(readFileSync(join(directory, ".openai/os01-hosted-migration-package.v3.sha256"), "utf8"))
+      .toBe(`${result.manifestSha256}  os01-hosted-migration-package.v3.json\n`);
     expect(entry).toContain("/__engine-os/os01-hosted-migration/v1");
     expect(entry).not.toMatch(/ODDS_API_KEY|ENGINE_OS_CAPTURE_ENABLED|the-odds-api\.com/u);
     expect(readFileSync("worker/index.ts", "utf8")).not.toContain("os01-hosted-migration");
@@ -492,18 +512,61 @@ describe("OS-01 standalone hosted migration harness", () => {
       "config/os01-hosted-migration-qualification.v1.json",
       "utf8"
     ))).toBe("d411116582a982bdbf9a86d797bfd8346ee72115b87602bf6b204c5eadc59270");
-    expect(hostedContract.status).toBe("candidate_capacity_probe_passed_staging_deployable");
+    expect(await hostedSha256(readFileSync(
+      "config/os01-hosted-migration-qualification.v2.json",
+      "utf8"
+    ))).toBe("cd025216b156946404b5606e824575ff00e1d023f3fa40f4fa45e068a041cde6");
+    expect(await hostedSha256(readFileSync(
+      ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v2.json",
+      "utf8"
+    ))).toBe("d24b4f3d68c1b34e6852779b538fe40331f2b4714df18b2e6c91d63e7ec68b47");
+    expect(hostedContract.status).toBe("candidate_corrected_request_identity_staging_deployable");
     expect(hostedContract.executionBoundary.exactTemporarySitesProjectId).toBe(exactStagingProjectId);
     expect(hostedContract.executionBoundary.productionAllowed).toBe(false);
     expect(hostedContract.executionBoundary.providerAccessAllowed).toBe(false);
     expect(hostedContract.executionBoundary.captureActivationAllowed).toBe(false);
     expect(hostedContract.package.deploymentAllowed).toBe(true);
+    expect(hostedContract.executionBoundary.freshOwnerOnlyAndBindingRefreshRequiredBeforeDeploy).toBe(true);
     const directory = mkdtempSync(join(tmpdir(), "os01-hosted-build-wrong-target-"));
     temporaryDirectories.push(directory);
     await expect(buildOs01HostedMigrationHarness({
       projectId: `appgprj_${"0".repeat(32)}`,
       outDir: directory
     })).rejects.toThrow("restricted to the capacity-qualified staging Sites project");
+  });
+
+  it("binds the corrected capacity receipt request identity to the exact frozen probe source", async () => {
+    const sourcePath =
+      ".planning/engine-os/execution/os-01/hosted-capacity-probe-worker.f161104.js.txt";
+    const source = readFileSync(sourcePath, "utf8");
+    const receipt = JSON.parse(readFileSync(
+      ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v3.json",
+      "utf8"
+    ));
+    const rejectedReceipt = JSON.parse(readFileSync(
+      ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v2.json",
+      "utf8"
+    ));
+    expect(await hostedSha256(source)).toBe(
+      "8969879cc4c233d92d3a53d3202300b13b6e491e57dc3db031e12f309d983b05"
+    );
+    const identity = extractCapacityProbeRequestIdentity(source);
+    expect(identity).toEqual({
+      method: receipt.request.method,
+      route: receipt.request.route,
+      version: receipt.request.version,
+      qualificationId: receipt.request.qualificationId,
+      exactKeys: receipt.request.exactKeys
+    });
+    expect(identity).toEqual({
+      method: "POST",
+      route: "/__engine-os/os01-capacity/v1",
+      version: "engine-os.os01-d1-capacity-probe-request.v1",
+      qualificationId: "os01-capacity-20260829-489-readonly",
+      exactKeys: ["qualificationId", "version"]
+    });
+    expect(rejectedReceipt.request.route).not.toBe(identity.route);
+    expect(receipt.source.snapshotPath).toBe(sourcePath);
   });
 
   it("rejects non-POST, extra request keys, and wrong routes without touching D1", async () => {
