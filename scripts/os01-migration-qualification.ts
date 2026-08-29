@@ -43,6 +43,10 @@ export type MigrationRunOptions = {
   };
   expectedFinalManifest: CommittedManifest;
   expectedMigrationByteHashes: Readonly<Record<string, string>>;
+  expectedReceiptAdditions: ReadonlyArray<{
+    version: string;
+    migrationHash: string;
+  }>;
   afterQuiesce?: () => void;
   afterStatement?: (input: {
     migrationPath: string;
@@ -177,7 +181,9 @@ function verifyPreflightClaim(
 
 function assertPreserved(
   before: DatabaseEvidence,
-  after: DatabaseEvidence
+  after: DatabaseEvidence,
+  db: DatabaseSync,
+  expectedReceiptAdditions: MigrationRunOptions["expectedReceiptAdditions"]
 ): void {
   for (const [table, expected] of Object.entries(before.rows)) {
     const actual = after.rows[table];
@@ -185,12 +191,44 @@ function assertPreserved(
     if (actual.columns.join("\0") !== expected.columns.join("\0")) {
       throw new Error(`OS-01 row preservation failed: changed projection ${table}`);
     }
-    const available = new Map<string, number>();
+    if (table !== "engine_schema_versions") {
+      if (stableJson(actual.rowHashes) !== stableJson(expected.rowHashes)) {
+        throw new Error(`OS-01 row preservation failed: ${table}`);
+      }
+      continue;
+    }
+    const available = new Map(actual.rowHashes.map((hash) => [hash, 0]));
     for (const hash of actual.rowHashes) available.set(hash, (available.get(hash) ?? 0) + 1);
     for (const hash of expected.rowHashes) {
       const count = available.get(hash) ?? 0;
-      if (count === 0) throw new Error(`OS-01 row preservation failed: ${table}`);
+      if (count === 0) throw new Error("OS-01 historical migration receipt changed");
       available.set(hash, count - 1);
+    }
+  }
+
+  const receiptProjection = after.rows.engine_schema_versions;
+  if (!receiptProjection) throw new Error("OS-01 terminal engine_schema_versions table is missing");
+  const priorReceiptCount = before.rows.engine_schema_versions?.count ?? 0;
+  if (receiptProjection.count !== priorReceiptCount + expectedReceiptAdditions.length) {
+    throw new Error("OS-01 migration receipt additions are not exact");
+  }
+  const receiptRows = db.prepare(`SELECT version, migration_hash, applied_at
+    FROM engine_schema_versions ORDER BY version`).all() as Array<{
+      version: string;
+      migration_hash: string;
+      applied_at: string;
+    }>;
+  for (const expected of expectedReceiptAdditions) {
+    const row = receiptRows.find((candidate) => candidate.version === expected.version);
+    if (!row || row.migration_hash !== expected.migrationHash ||
+      !db.prepare("SELECT julianday(?) AS value").get(row.applied_at)?.value) {
+      throw new Error(`OS-01 migration receipt is missing or invalid: ${expected.version}`);
+    }
+  }
+
+  for (const [table, projection] of Object.entries(after.rows)) {
+    if (table !== "engine_schema_versions" && !(table in before.rows) && projection.count !== 0) {
+      throw new Error(`OS-01 migration inserted an unapproved row into ${table}`);
     }
   }
 }
@@ -280,7 +318,7 @@ export function applyQualifiedMigrationRange(
     if (after.foreignKeyViolations.length !== 0) {
       throw new Error("OS-01 terminal database contains foreign-key violations");
     }
-    assertPreserved(before, after);
+    assertPreserved(before, after, db, options.expectedReceiptAdditions);
     db.exec("COMMIT");
     const committed = captureDatabaseEvidence(db, options.expectedFinalManifest.migrationSetHash);
     return {

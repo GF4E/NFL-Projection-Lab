@@ -50,7 +50,8 @@
   "backupRestoreProtocol": {
     "qualificationResource": "isolated_file_backed_sqlite",
     "backupMode": "sqlite_online_backup_api",
-    "restoreProof": "schema_fingerprint_rows_hash_foreign_key_check_and_exact_original_row_projection",
+    "restoreOperation": "copy_verified_backup_bytes_into_a_distinct_database_resource",
+    "restoreProof": "distinct_restored_database_schema_fingerprint_rows_hash_foreign_key_check_and_exact_original_row_projection",
     "corruptBackupBehavior": "reject"
   },
   "terminalProjection": {

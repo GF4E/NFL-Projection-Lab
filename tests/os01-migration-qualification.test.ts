@@ -40,11 +40,28 @@ const expectedHashes = Object.fromEntries([
     migration.byteSha256
   ])
 ]);
+const allReceiptAdditions = [
+  ...authorityV1.acceptedProductionFoundation.preservedReceipts,
+  {
+    version: "0017_engine_os_source_capture",
+    migrationHash: "sha256:d25f6119f4d0735247489623e5775cb185c866d7a3f1ebbb791c5f5cfaeac0e7"
+  },
+  {
+    version: "0018_engine_os_forecast_ledger",
+    migrationHash: "sha256:851f66b3ad07afe61be346b09f853875e675d25512f989b0f4337f6c64a1c293"
+  },
+  ...authorityV2.orderedHistory.successorMigrations.map((migration) => ({
+    version: migration.receiptVersion,
+    migrationHash: `sha256:${migration.receiptDefinitionSha256}`
+  }))
+];
+const successorReceiptAdditions = allReceiptAdditions.slice(-4);
 const blankPrestate = qualificationContract.supportedPrestates[0]!;
 const legacyPrestate = qualificationContract.supportedPrestates[1]!;
 
 function options(
   prestate: typeof blankPrestate | typeof legacyPrestate,
+  receiptAdditions: MigrationRunOptions["expectedReceiptAdditions"],
   overrides: Partial<MigrationRunOptions> = {}
 ): MigrationRunOptions {
   return {
@@ -55,6 +72,7 @@ function options(
     },
     expectedFinalManifest: terminalManifest,
     expectedMigrationByteHashes: expectedHashes,
+    expectedReceiptAdditions: receiptAdditions,
     ...overrides
   } as MigrationRunOptions;
 }
@@ -132,7 +150,7 @@ describe("OS-01 isolated migration qualification path", () => {
       db,
       preflightClaim(before, "blank_ordered_chain"),
       paths,
-      options(blankPrestate)
+      options(blankPrestate, allReceiptAdditions)
     );
     expect(result.appliedMigrationPaths).toEqual(paths);
     expect(result.appliedStatementCount).toBeGreaterThan(100);
@@ -152,7 +170,7 @@ describe("OS-01 isolated migration qualification path", () => {
       db,
       preflightClaim(before, "ordered_through_0016_legacy_29"),
       successors,
-      options(legacyPrestate)
+      options(legacyPrestate, successorReceiptAdditions)
     );
     const migratedPlay = db.prepare("SELECT * FROM plays WHERE id = 'legacy-preserved'").get() as
       Record<string, unknown>;
@@ -182,7 +200,7 @@ describe("OS-01 isolated migration qualification path", () => {
       db,
       claim,
       successors,
-      options(legacyPrestate)
+      options(legacyPrestate, successorReceiptAdditions)
     )).toThrow(/preflight claim does not match/u);
     expect(schemaAndRows(db, "mutated")).toBe(before);
     expect(db.prepare(`SELECT name FROM sqlite_schema
@@ -198,7 +216,7 @@ describe("OS-01 isolated migration qualification path", () => {
       db,
       preflightClaim(before, "ordered_through_0016_legacy_29"),
       successors,
-      options(legacyPrestate, {
+      options(legacyPrestate, successorReceiptAdditions, {
         afterQuiesce: () => db.exec("CREATE TABLE raced_object (id integer)")
       })
     )).toThrow(/immediate pre-write revalidation failed|exact supported prestate/u);
@@ -221,7 +239,7 @@ describe("OS-01 isolated migration qualification path", () => {
       db,
       preflightClaim(before, "ordered_through_0016_legacy_29"),
       successors,
-      options(legacyPrestate, {
+      options(legacyPrestate, successorReceiptAdditions, {
         afterQuiesce: () => {
           try {
             contender.exec("CREATE TABLE concurrent_writer (id integer)");
@@ -248,7 +266,7 @@ describe("OS-01 isolated migration qualification path", () => {
       db,
       preflightClaim(before, "ordered_through_0016_legacy_29"),
       successors,
-      options(legacyPrestate, {
+      options(legacyPrestate, successorReceiptAdditions, {
         afterStatement: ({ migrationPath, statementIndex }) => {
           if (migrationPath.endsWith("0019_engine_os_schema_closure.sql") && statementIndex === 12) {
             throw new Error("injected isolated D1-equivalent failure");
@@ -271,6 +289,7 @@ describe("OS-01 isolated migration qualification path", () => {
     temporaryDirectories.push(directory);
     const databasePath = join(directory, "source.sqlite");
     const backupPath = join(directory, "backup.sqlite");
+    const restoredPath = join(directory, "restored.sqlite");
     const corruptPath = join(directory, "corrupt.sqlite");
     const db = legacyDatabase(databasePath);
     seedLegacyRows(db);
@@ -282,11 +301,12 @@ describe("OS-01 isolated migration qualification path", () => {
       db,
       preflightClaim(before, "ordered_through_0016_legacy_29"),
       successors,
-      options(legacyPrestate)
+      options(legacyPrestate, successorReceiptAdditions)
     );
     db.close();
 
-    const restored = new DatabaseSync(backupPath, { readOnly: true });
+    copyFileSync(backupPath, restoredPath);
+    const restored = new DatabaseSync(restoredPath);
     expect(schemaAndRows(restored, "legacy")).toBe(beforeComparable);
     expect(restored.prepare("PRAGMA foreign_key_check").all()).toEqual([]);
     restored.close();
@@ -303,4 +323,3 @@ describe("OS-01 isolated migration qualification path", () => {
     }).toThrow();
   });
 });
-
