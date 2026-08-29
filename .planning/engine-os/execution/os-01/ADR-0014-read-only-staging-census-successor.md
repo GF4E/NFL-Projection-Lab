@@ -81,3 +81,9 @@ identifier, table-name equivalence, and CREATE-SQL availability. It may not retu
 SQL, provider information, or arbitrary runtime detail. It derives a new authority identity from
 the generation-4 rejection receipt; the generation-4 root and artifacts remain immutable and may
 not be retried.
+
+The worker also replaces earlier detail-bearing prestate errors and ambiguous catch-all labels with
+a finite, aggregate-only failure envelope. Those broader categories are never persisted by the
+generation-5 controller. Only the four user-table invariant categories above are eligible for
+diagnostic persistence; every other failure response consumes the authority with an empty response
+artifact. This hardening does not expand the generation-5 diagnostic scope.

@@ -16,6 +16,32 @@ export function canonicalJson(value: unknown): string {
   return JSON.stringify(canonicalize(value));
 }
 
+export const STAGING_CENSUS_FAILURE_CATEGORIES = Object.freeze([
+  "catalog_read_failed",
+  "catalog_shape_invalid",
+  "catalog_identity_mismatch",
+  "user_table_count_mismatch",
+  "user_table_identifier_shape_invalid",
+  "user_table_name_binding_invalid",
+  "user_table_create_sql_missing",
+  "foreign_key_read_failed",
+  "foreign_key_shape_invalid",
+  "row_count_read_failed",
+  "row_count_shape_invalid",
+  "row_count_changed",
+  "catalog_changed",
+  "internal_worker_failure"
+] as const);
+
+export type StagingCensusFailureCategory = typeof STAGING_CENSUS_FAILURE_CATEGORIES[number];
+
+export const STAGING_CENSUS_PERSISTABLE_DIAGNOSTIC_CATEGORIES = Object.freeze([
+  "user_table_count_mismatch",
+  "user_table_identifier_shape_invalid",
+  "user_table_name_binding_invalid",
+  "user_table_create_sql_missing"
+] as const);
+
 export const STAGING_CENSUS_SEMANTIC_CONTRACT = Object.freeze({
   version: "engine-os.os01-staging-census-contract.v2",
   projectId: "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
@@ -45,14 +71,14 @@ export const STAGING_CENSUS_SEMANTIC_CONTRACT = Object.freeze({
 
 export const STAGING_CENSUS_ID = "471001d7f8ad783dbabc1c03c4e7a022799466a20afba70e1eaf087a4761ec29";
 export const STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT = Object.freeze({
-  version: "engine-os.os01-staging-census-controller-authority-contract.v4",
+  version: "engine-os.os01-staging-census-controller-authority-contract.v5",
   semanticQualificationId: STAGING_CENSUS_ID,
-  generation: 4,
-  predecessorReceiptHash: "b474905efd81b73de2516687b467cf6cc17cda49b5abefe0c56be3aadafa0cd7",
-  predecessorStatus: "rejected_invalid_site_authorization_value_before_worker"
+  generation: 5,
+  predecessorReceiptHash: "6999a3b7164dbbf7ca2f60ce30d5c24af85a7e6e315b87205dfdd91dabda81c7",
+  predecessorStatus: "rejected_user_table_catalog_invariant_after_worker_read"
 });
 export const STAGING_CENSUS_CONTROLLER_ID =
-  "33b8fc16f102a6c377edaee7c0eeaadcb832be4a3127a636d1050a1e27a41a2c";
+  "ff1138558b4cb56f43648224344009bfd80c3e75293526f0280f80b15ab6c71a";
 export const STAGING_CENSUS_REQUEST_VERSION = "engine-os.os01-staging-census-request.v2";
 export const STAGING_CENSUS_EXACT_BODY =
   `{"version":"${STAGING_CENSUS_REQUEST_VERSION}","censusId":"${STAGING_CENSUS_ID}"}`;

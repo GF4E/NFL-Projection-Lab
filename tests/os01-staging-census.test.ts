@@ -137,20 +137,34 @@ describe("OS-01 staging DDL census", () => {
       predecessorReceiptHash: firstPredecessorHash,
       predecessorStatus: "rejected_invalid_pre_observation_persistence_before_dispatch"
     })).toBe(secondPredecessor.controllerAuthorityId);
-    const predecessor = JSON.parse(readFileSync(resolve(
+    const thirdPredecessor = JSON.parse(readFileSync(resolve(
       ".planning/engine-os/execution/os-01/staging-census-v2-hosted-attempt3-rejection-receipt.v1.json"
     ), "utf8")) as Record<string, unknown>;
-    const predecessorHash = predecessor.receiptHash;
-    delete predecessor.receiptHash;
-    expect(hash(predecessor)).toBe(predecessorHash);
+    const thirdPredecessorHash = thirdPredecessor.receiptHash;
+    delete thirdPredecessor.receiptHash;
+    expect(hash(thirdPredecessor)).toBe(thirdPredecessorHash);
     expect(hash({
       version: "engine-os.os01-staging-census-controller-authority-contract.v3",
       semanticQualificationId: STAGING_CENSUS_ID,
       generation: 3,
       predecessorReceiptHash: secondPredecessorHash,
       predecessorStatus: "rejected_invalid_site_authorization_header_before_worker"
-    })).toBe(predecessor.controllerAuthorityId);
-    expect(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT.predecessorReceiptHash).toBe(predecessorHash);
+    })).toBe(thirdPredecessor.controllerAuthorityId);
+    const fourthPredecessor = JSON.parse(readFileSync(resolve(
+      ".planning/engine-os/execution/os-01/staging-census-v2-hosted-attempt4-rejection-receipt.v1.json"
+    ), "utf8")) as Record<string, unknown>;
+    const fourthPredecessorHash = fourthPredecessor.receiptHash;
+    delete fourthPredecessor.receiptHash;
+    expect(hash(fourthPredecessor)).toBe(fourthPredecessorHash);
+    expect(hash({
+      version: "engine-os.os01-staging-census-controller-authority-contract.v4",
+      semanticQualificationId: STAGING_CENSUS_ID,
+      generation: 4,
+      predecessorReceiptHash: thirdPredecessorHash,
+      predecessorStatus: "rejected_invalid_site_authorization_value_before_worker"
+    })).toBe(fourthPredecessor.controllerAuthorityId);
+    expect(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT.predecessorReceiptHash)
+      .toBe(fourthPredecessorHash);
     expect(createHash("sha256").update(STAGING_CENSUS_EXACT_BODY).digest("hex"))
       .toBe(STAGING_CENSUS_EXACT_BODY_SHA256);
   });
@@ -203,7 +217,8 @@ describe("OS-01 staging DDL census", () => {
       ...options(value),
       expectedCatalogHash: "0".repeat(64)
     });
-    expect(response.status).toBe(409);
+    expect(response.status).toBe(500);
+    expect(await response.json()).toMatchObject({ failureCategory: "catalog_identity_mismatch" });
     expect(value.calls()).toBe(1);
   });
 
@@ -241,8 +256,50 @@ describe("OS-01 staging DDL census", () => {
         expectedUserTableCount: 50
       });
       expect(response.status).toBe(500);
-      expect(await response.json()).toMatchObject({ reason: "user_table_catalog_invalid" });
+      expect(await response.json()).toMatchObject({ failureCategory: "user_table_count_mismatch" });
       expect(value.calls()).toBe(1);
+    }
+  });
+
+  it("classifies user-table catalog invariants without returning names or SQL", async () => {
+    const cases = [
+      {
+        catalog: [{ type: "table", name: "bad-name", tbl_name: "bad-name", sql: "CREATE TABLE secret_name(id INTEGER)" }],
+        category: "user_table_identifier_shape_invalid"
+      },
+      {
+        catalog: [{ type: "table", name: "safe_name", tbl_name: "other_name", sql: "CREATE TABLE secret_name(id INTEGER)" }],
+        category: "user_table_name_binding_invalid"
+      },
+      {
+        catalog: [{ type: "table", name: "safe_name", tbl_name: "safe_name", sql: null }],
+        category: "user_table_create_sql_missing"
+      }
+    ] as const;
+    for (const item of cases) {
+      const value = fixture({
+        catalogBefore: item.catalog as unknown as typeof baseCatalog,
+        catalogAfter: item.catalog as unknown as typeof baseCatalog
+      });
+      const response = await handleOs01StagingCensus(request(), value.db as never, {
+        expectedOrigin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
+        expectedCatalogHash: hash(item.catalog),
+        expectedCatalogRows: 1,
+        expectedUserTableCount: 1
+      });
+      const body = await response.json() as Record<string, unknown>;
+      expect(response.status).toBe(500);
+      expect(body.failureCategory).toBe(item.category);
+      expect(Object.keys(body).sort(compare)).toEqual([
+        "censusId", "claimBoundary", "databaseMutationAttempted", "failureCategory",
+        "receiptHash", "status", "version"
+      ].sort(compare));
+      const receiptHash = body.receiptHash;
+      delete body.receiptHash;
+      expect(hash(body)).toBe(receiptHash);
+      expect(JSON.stringify(body)).not.toContain("bad-name");
+      expect(JSON.stringify(body)).not.toContain("other_name");
+      expect(JSON.stringify(body)).not.toContain("secret_name");
     }
   });
 
@@ -260,14 +317,14 @@ describe("OS-01 staging DDL census", () => {
     const countChange = fixture({ counts: [1, 2] });
     const countResponse = await handleOs01StagingCensus(request(), countChange.db as never, options(countChange));
     expect(countResponse.status).toBe(500);
-    expect(await countResponse.json()).toMatchObject({ reason: "row_count_changed_during_census" });
+    expect(await countResponse.json()).toMatchObject({ failureCategory: "row_count_changed" });
 
     const catalogChange = fixture({
       catalogAfter: baseCatalog.map((row) => row.name === "sample_view" ? { ...row, name: "changed_view" } : row)
     });
     const catalogResponse = await handleOs01StagingCensus(request(), catalogChange.db as never, options(catalogChange));
     expect(catalogResponse.status).toBe(500);
-    expect(await catalogResponse.json()).toMatchObject({ reason: "catalog_changed_during_census" });
+    expect(await catalogResponse.json()).toMatchObject({ failureCategory: "catalog_changed" });
   });
 
   it("uses a closed failure vocabulary and never returns D1 error detail", async () => {
@@ -275,9 +332,13 @@ describe("OS-01 staging DDL census", () => {
     const response = await handleOs01StagingCensus(request(), value.db as never, options(value));
     const body = await response.json() as Record<string, unknown>;
     expect(response.status).toBe(500);
-    expect(body.reason).toBe("foreign_key_read_failed");
+    expect(body.failureCategory).toBe("foreign_key_read_failed");
     expect(JSON.stringify(body)).not.toContain("sensitive");
     expect(body).not.toHaveProperty("detail");
+    expect(Object.keys(body).sort(compare)).toEqual([
+      "censusId", "claimBoundary", "databaseMutationAttempted", "failureCategory",
+      "receiptHash", "status", "version"
+    ].sort(compare));
   });
 
   it("builds a DB-only archive and declares controller-enforced invocation scope", async () => {
@@ -314,6 +375,19 @@ describe("OS-01 staging DDL census", () => {
       expectedUserTableCount: 50,
       viewEvidence: "names_and_hash_only_no_view_sql"
     });
+    const failureContract = manifest.failureContract as Record<string, unknown>;
+    expect(failureContract).toMatchObject({
+      version: "engine-os.os01-staging-census-failure.v1",
+      exactAggregateOnlySchema: true,
+      schemaNamesOrSqlAllowed: false,
+      terminalAndNonFinalizable: true
+    });
+    expect(failureContract.controllerPersistableCategories).toEqual([
+      "user_table_count_mismatch",
+      "user_table_identifier_shape_invalid",
+      "user_table_name_binding_invalid",
+      "user_table_create_sql_missing"
+    ]);
     expect(worker).not.toMatch(/ODDS_API_KEY|ENGINE_OS_CAPTURE_ENABLED|the-odds-api\.com/u);
   });
 });

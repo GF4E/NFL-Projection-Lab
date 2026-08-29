@@ -3,9 +3,11 @@ import {
   codePointCompare,
   DEFAULT_STAGING_CENSUS_OPTIONS,
   STAGING_CENSUS_EXACT_BODY,
+  STAGING_CENSUS_FAILURE_CATEGORIES,
   STAGING_CENSUS_ID,
   STAGING_CENSUS_SEMANTIC_CONTRACT
 } from "./contract";
+import type { StagingCensusFailureCategory } from "./contract";
 
 const INTERNAL_OBJECTS = new Set([
   "_cf_KV",
@@ -50,16 +52,7 @@ type CensusOptions = {
   expectedUserTableCount: number;
 };
 
-type FailureReason =
-  | "catalog_read_failed"
-  | "catalog_row_invalid"
-  | "catalog_changed_during_census"
-  | "foreign_key_read_failed"
-  | "foreign_key_row_invalid"
-  | "row_count_read_failed"
-  | "row_count_invalid"
-  | "row_count_changed_during_census"
-  | "user_table_catalog_invalid";
+type FailureReason = StagingCensusFailureCategory;
 
 class CensusFailure extends Error {
   constructor(readonly reason: FailureReason) {
@@ -73,7 +66,9 @@ async function sha256(value: string): Promise<string> {
 }
 
 function quoteIdentifier(value: string): string {
-  if (!/^[A-Za-z0-9_]+$/u.test(value)) throw new CensusFailure("user_table_catalog_invalid");
+  if (!/^[A-Za-z0-9_]+$/u.test(value)) {
+    throw new CensusFailure("user_table_identifier_shape_invalid");
+  }
   return `"${value}"`;
 }
 
@@ -121,7 +116,7 @@ function normalizeForeignKey(value: Record<string, unknown>): ForeignKeyRow {
       typeof table !== "string" || typeof from !== "string" ||
       (typeof to !== "string" && to !== null) || typeof onUpdate !== "string" ||
       typeof onDelete !== "string" || typeof match !== "string") {
-    throw new CensusFailure("foreign_key_row_invalid");
+    throw new CensusFailure("foreign_key_shape_invalid");
   }
   return {
     id: id as number,
@@ -146,7 +141,7 @@ async function readCatalog(db: CensusDatabase): Promise<CatalogRow[]> {
   const rows = await all<Record<string, unknown>>(db, `SELECT type, name, tbl_name, sql FROM sqlite_schema
     WHERE type IN ('table', 'index', 'trigger', 'view')
     ORDER BY type COLLATE BINARY, name COLLATE BINARY`, "catalog_read_failed");
-  if (!rows.every(validCatalogRow)) throw new CensusFailure("catalog_row_invalid");
+  if (!rows.every(validCatalogRow)) throw new CensusFailure("catalog_shape_invalid");
   return rows.sort((left, right) => codePointCompare(left.type, right.type) ||
     codePointCompare(left.name, right.name) || codePointCompare(left.tbl_name, right.tbl_name));
 }
@@ -158,7 +153,7 @@ async function readRowCount(db: CensusDatabase, tableName: string): Promise<numb
     "row_count_read_failed"
   );
   if (counts.length !== 1 || !Number.isSafeInteger(counts[0]?.exact_count) || counts[0]!.exact_count < 0) {
-    throw new CensusFailure("row_count_invalid");
+    throw new CensusFailure("row_count_shape_invalid");
   }
   return counts[0]!.exact_count;
 }
@@ -187,26 +182,29 @@ export async function handleOs01StagingCensus(
     const catalogBefore = await readCatalog(db);
     const catalogHash = await sha256(canonicalJson(catalogBefore));
     if (catalogBefore.length !== options.expectedCatalogRows || catalogHash !== options.expectedCatalogHash) {
-      return json({
-        error: "staging_prestate_mismatch",
-        catalogRows: catalogBefore.length,
-        catalogHash,
-        databaseMutationAttempted: false
-      }, 409);
+      throw new CensusFailure("catalog_identity_mismatch");
     }
     const userObjects = catalogBefore.filter((row) => !isInternal(row));
     const userTables = userObjects
       .filter((row) => row.type === "table")
       .sort((left, right) => codePointCompare(left.name, right.name));
-    if (userTables.length !== options.expectedUserTableCount || userTables.some((row) =>
-      !/^[A-Za-z0-9_]+$/u.test(row.name) || row.name !== row.tbl_name || typeof row.sql !== "string")) {
-      throw new CensusFailure("user_table_catalog_invalid");
+    if (userTables.length !== options.expectedUserTableCount) {
+      throw new CensusFailure("user_table_count_mismatch");
+    }
+    if (userTables.some((row) => !/^[A-Za-z0-9_]+$/u.test(row.name))) {
+      throw new CensusFailure("user_table_identifier_shape_invalid");
+    }
+    if (userTables.some((row) => row.name !== row.tbl_name)) {
+      throw new CensusFailure("user_table_name_binding_invalid");
+    }
+    if (userTables.some((row) => typeof row.sql !== "string")) {
+      throw new CensusFailure("user_table_create_sql_missing");
     }
 
     const tables: TableEvidence[] = [];
     for (const table of userTables) {
       const createSql = table.sql;
-      if (typeof createSql !== "string") throw new CensusFailure("user_table_catalog_invalid");
+      if (typeof createSql !== "string") throw new CensusFailure("user_table_create_sql_missing");
       const foreignKeys = (await all<Record<string, unknown>>(
         db,
         `PRAGMA foreign_key_list(${quoteIdentifier(table.name)})`,
@@ -224,11 +222,11 @@ export async function handleOs01StagingCensus(
     const rowCountsAfter = [];
     for (const table of userTables) rowCountsAfter.push({ name: table.name, rowCount: await readRowCount(db, table.name) });
     if (rowCountsAfter.some((row, index) => row.rowCount !== tables[index]!.rowCount)) {
-      throw new CensusFailure("row_count_changed_during_census");
+      throw new CensusFailure("row_count_changed");
     }
     const catalogAfter = await readCatalog(db);
     if (await sha256(canonicalJson(catalogAfter)) !== catalogHash || catalogAfter.length !== catalogBefore.length) {
-      throw new CensusFailure("catalog_changed_during_census");
+      throw new CensusFailure("catalog_changed");
     }
 
     const views = userObjects
@@ -281,12 +279,19 @@ export async function handleOs01StagingCensus(
     } as const;
     return json({ ...body, receiptHash: await sha256(canonicalJson(body)) });
   } catch (error) {
-    return json({
-      error: "staging_census_failed",
-      reason: error instanceof CensusFailure ? error.reason : "catalog_read_failed",
+    const failureCategory: StagingCensusFailureCategory = error instanceof CensusFailure &&
+      STAGING_CENSUS_FAILURE_CATEGORIES.includes(error.reason)
+      ? error.reason
+      : "internal_worker_failure";
+    const body = {
+      version: "engine-os.os01-staging-census-failure.v1",
+      status: "read_only_census_failed",
+      censusId: STAGING_CENSUS_ID,
+      failureCategory,
       databaseMutationAttempted: false,
-      claimBoundary: "no_success_receipt"
-    }, 500);
+      claimBoundary: "terminal_read_only_diagnostic_not_census_receipt"
+    } as const;
+    return json({ ...body, receiptHash: await sha256(canonicalJson(body)) }, 500);
   }
 }
 

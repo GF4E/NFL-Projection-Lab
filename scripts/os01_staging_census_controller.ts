@@ -25,9 +25,12 @@ import {
   STAGING_CENSUS_CONTROLLER_ROOT,
   STAGING_CENSUS_EXACT_BODY,
   STAGING_CENSUS_EXACT_BODY_SHA256,
+  STAGING_CENSUS_FAILURE_CATEGORIES,
   STAGING_CENSUS_ID,
+  STAGING_CENSUS_PERSISTABLE_DIAGNOSTIC_CATEGORIES,
   STAGING_CENSUS_SEMANTIC_CONTRACT
 } from "../qualification/os01-staging-census/contract";
+import type { StagingCensusFailureCategory } from "../qualification/os01-staging-census/contract";
 
 const RESPONSE_LIMIT_BYTES = 2 * 1024 * 1024;
 const QUALIFICATION_WINDOW_MILLISECONDS = 30 * 60 * 1000;
@@ -70,6 +73,7 @@ export type CensusControllerResult = {
   version: "engine-os.os01-staging-census-controller-result.v2";
   status:
     | "pending_control_plane_postcheck"
+    | "terminal_worker_failure"
     | "terminal_transport_uncertain"
     | "terminal_invalid_response"
     | "terminal_credential_reflection"
@@ -714,6 +718,80 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
     }))));
 }
 
+function validateFailureResponse(bytes: Uint8Array): StagingCensusFailureCategory | null {
+  let parsed: unknown;
+  const text = new TextDecoder().decode(bytes);
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return null;
+  }
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+  const receipt = parsed as Record<string, unknown>;
+  if (!hasExactKeys(receipt, [
+    "censusId", "claimBoundary", "databaseMutationAttempted", "failureCategory",
+    "receiptHash", "status", "version"
+  ]) || text !== JSON.stringify(receipt) || !validHex(receipt.receiptHash) ||
+      typeof receipt.failureCategory !== "string" ||
+      !(STAGING_CENSUS_FAILURE_CATEGORIES as readonly string[]).includes(receipt.failureCategory) ||
+      !(STAGING_CENSUS_PERSISTABLE_DIAGNOSTIC_CATEGORIES as readonly string[])
+        .includes(receipt.failureCategory)) {
+    return null;
+  }
+  const body = { ...receipt };
+  delete body.receiptHash;
+  return sha256(canonicalJson(body)) === receipt.receiptHash &&
+    receipt.version === "engine-os.os01-staging-census-failure.v1" &&
+    receipt.status === "read_only_census_failed" && receipt.censusId === STAGING_CENSUS_ID &&
+    receipt.databaseMutationAttempted === false &&
+    receipt.claimBoundary === "terminal_read_only_diagnostic_not_census_receipt"
+    ? receipt.failureCategory as StagingCensusFailureCategory
+    : null;
+}
+
+function credentialReflectionScan(bytes: Uint8Array, token: string): {
+  complete: boolean;
+  reflected: boolean;
+} {
+  const text = new TextDecoder().decode(bytes);
+  const variants = new Set([
+    token,
+    "Bearer " + token,
+    Buffer.from(token, "utf8").toString("base64"),
+    encodeURIComponent(token)
+  ]);
+  const containsVariant = (value: string) => [...variants]
+    .some((variant) => variant.length > 0 && value.includes(variant));
+  if (containsVariant(text)) return { complete: true, reflected: true };
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return { complete: true, reflected: false };
+  }
+  const pending: Array<{ depth: number; value: unknown }> = [{ depth: 0, value: parsed }];
+  let visited = 0;
+  while (pending.length > 0) {
+    const current = pending.pop()!;
+    visited += 1;
+    if (visited > 100_000 || current.depth > 128) return { complete: false, reflected: false };
+    if (typeof current.value === "string") {
+      if (containsVariant(current.value)) return { complete: true, reflected: true };
+      continue;
+    }
+    if (!current.value || typeof current.value !== "object") continue;
+    if (Array.isArray(current.value)) {
+      for (const item of current.value) pending.push({ depth: current.depth + 1, value: item });
+      continue;
+    }
+    for (const [key, value] of Object.entries(current.value as Record<string, unknown>)) {
+      pending.push({ depth: current.depth + 1, value: key });
+      pending.push({ depth: current.depth + 1, value });
+    }
+  }
+  return { complete: true, reflected: false };
+}
+
 async function readBoundedResponse(response: Response): Promise<Uint8Array> {
   const length = response.headers.get("content-length");
   if (length !== null && (!/^\d+$/u.test(length) || Number(length) > RESPONSE_LIMIT_BYTES)) {
@@ -873,7 +951,8 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
     .some((path) => existsSync(path))) {
     throw new Error("canonical controller authority has already been consumed or postchecked");
   }
-  if (!input.authorizationToken || /[\r\n]/u.test(input.authorizationToken)) {
+  if (!input.authorizationToken || input.authorizationToken.trim() !== input.authorizationToken ||
+      /[\u0000-\u0020\u007f]/u.test(input.authorizationToken)) {
     throw new Error("one ephemeral Sites authorization token is required");
   }
   const attemptId = randomUUID();
@@ -1069,13 +1148,19 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
       completionSize: 0
     });
     const responseHash = sha256(bytes);
-    const reflected = new TextDecoder().decode(bytes).includes(input.authorizationToken);
-    const valid = !reflected && response.status === 200 &&
-      response.headers.get("content-type")?.toLowerCase() === "application/json" &&
+    const reflectionScan = credentialReflectionScan(bytes, input.authorizationToken);
+    const reflected = reflectionScan.reflected;
+    const jsonContentType = response.headers.get("content-type")?.toLowerCase() === "application/json";
+    const valid = reflectionScan.complete && !reflected && response.status === 200 && jsonContentType &&
       validateResponse(bytes, input.responseValidation);
-    if (valid) writeDescriptor(responseReserved.descriptor, bytes);
+    const failureCategory = reflectionScan.complete && !reflected && response.status === 500 && jsonContentType
+      ? validateFailureResponse(bytes)
+      : null;
+    const persistResponse = valid || failureCategory !== null;
+    if (persistResponse) writeDescriptor(responseReserved.descriptor, bytes);
     const status = reflected ? "terminal_credential_reflection" :
-      valid ? "pending_control_plane_postcheck" : "terminal_invalid_response";
+      valid ? "pending_control_plane_postcheck" :
+        failureCategory !== null ? "terminal_worker_failure" : "terminal_invalid_response";
     const result = resultWithHash({
       version: "engine-os.os01-staging-census-controller-result.v2",
       status,
@@ -1108,8 +1193,8 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
       intentReserved,
       intentBytes,
       responseReserved,
-      responseHash: valid ? responseHash : sha256(new Uint8Array()),
-      responseSize: valid ? bytes.byteLength : 0,
+      responseHash: persistResponse ? responseHash : sha256(new Uint8Array()),
+      responseSize: persistResponse ? bytes.byteLength : 0,
       resultReserved,
       resultHash: sha256(resultBytes),
       resultSize: resultBytes.byteLength,
@@ -1277,7 +1362,7 @@ function validateResultRecord(
     "retryAllowed", "status", "version"
   ])) return null;
   const statuses = new Set([
-    "pending_control_plane_postcheck", "terminal_transport_uncertain", "terminal_invalid_response",
+    "pending_control_plane_postcheck", "terminal_worker_failure", "terminal_transport_uncertain", "terminal_invalid_response",
     "terminal_credential_reflection", "terminal_artifact_authority_violation"
   ]);
   return result.version === "engine-os.os01-staging-census-controller-result.v2" &&
@@ -1512,8 +1597,9 @@ async function executeControllerCli(
   }
   if (action === "run") {
     const tokenBytes = readStdin();
-    const token = (typeof tokenBytes === "string" ? tokenBytes : Buffer.from(tokenBytes).toString("utf8"))
-      .trimEnd();
+    const rawToken = typeof tokenBytes === "string" ? tokenBytes : Buffer.from(tokenBytes).toString("utf8");
+    const token = rawToken.endsWith("\r\n") ? rawToken.slice(0, -2) :
+      rawToken.endsWith("\n") ? rawToken.slice(0, -1) : rawToken;
     const result = await operations.run({ authorizationToken: token });
     return {
       stdout: result.status + "\n",

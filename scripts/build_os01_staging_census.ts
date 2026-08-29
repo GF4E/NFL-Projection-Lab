@@ -11,7 +11,9 @@ import {
   STAGING_CENSUS_CONTROLLER_ID,
   STAGING_CENSUS_CONTROLLER_ROOT,
   STAGING_CENSUS_EXACT_BODY_SHA256,
+  STAGING_CENSUS_FAILURE_CATEGORIES,
   STAGING_CENSUS_ID,
+  STAGING_CENSUS_PERSISTABLE_DIAGNOSTIC_CATEGORIES,
   STAGING_CENSUS_REQUEST_VERSION,
   STAGING_CENSUS_SEMANTIC_CONTRACT
 } from "../qualification/os01-staging-census/contract";
@@ -74,7 +76,9 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
     "controller_enforced_single_invocation_not_runtime_durable",
     STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
-    "isolated_staging_read_only_census_only"
+    "isolated_staging_read_only_census_only",
+    "engine-os.os01-staging-census-failure.v1",
+    "terminal_read_only_diagnostic_not_census_receipt"
   ]) if (!text.includes(required)) throw new Error(`census package omits ${required}`);
 
   const metadata = join(outDir, ".openai");
@@ -125,6 +129,17 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     },
     consistencyClaim: STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
     viewEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.viewEvidence,
+    failureContract: {
+      version: "engine-os.os01-staging-census-failure.v1",
+      status: "read_only_census_failed",
+      workerCategories: STAGING_CENSUS_FAILURE_CATEGORIES,
+      controllerPersistableCategories: STAGING_CENSUS_PERSISTABLE_DIAGNOSTIC_CATEGORIES,
+      exactAggregateOnlySchema: true,
+      selfHashed: true,
+      schemaNamesOrSqlAllowed: false,
+      persistenceRequiresControllerValidation: true,
+      terminalAndNonFinalizable: true
+    },
     databaseMutationAllowed: false,
     productionAllowed: false,
     captureActivationAllowed: false

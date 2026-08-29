@@ -151,6 +151,38 @@ function acceptedResponse(identity = defaultValidation): Response {
   return Response.json(validReceipt(identity), { status: 200 });
 }
 
+function closedFailureResponse(
+  failureCategory: "user_table_count_mismatch" | "user_table_identifier_shape_invalid" |
+    "user_table_name_binding_invalid" | "user_table_create_sql_missing" | "catalog_read_failed"
+): Response {
+  const body = {
+    version: "engine-os.os01-staging-census-failure.v1",
+    status: "read_only_census_failed",
+    censusId: STAGING_CENSUS_ID,
+    failureCategory,
+    databaseMutationAttempted: false,
+    claimBoundary: "terminal_read_only_diagnostic_not_census_receipt"
+  } as const;
+  return new Response(JSON.stringify({ ...body, receiptHash: sha256(canonicalJson(body)) }), {
+    status: 500,
+    headers: { "Content-Type": "application/json" }
+  });
+}
+
+function successReceiptContaining(value: string): Record<string, unknown> {
+  const receipt = validReceipt(defaultValidation);
+  const tables = receipt.tables as Array<Record<string, unknown>>;
+  tables[0]!.createSql = value;
+  tables[0]!.createSqlHash = sha256(value);
+  receipt.ddlRoot = sha256(canonicalJson(tables.map((table) => ({
+    name: table.name,
+    createSql: table.createSql
+  }))));
+  delete receipt.receiptHash;
+  receipt.receiptHash = sha256(canonicalJson(receipt));
+  return receipt;
+}
+
 describe("OS-01 staging census controller", () => {
   it("has one canonical qualification root and exposes no public path override", () => {
     expect(STAGING_CENSUS_CONTROLLER_ROOT).toBe(
@@ -247,6 +279,58 @@ describe("OS-01 staging census controller", () => {
         finalize: () => { throw new Error("unexpected finalize"); }
       }
     })).rejects.toThrow("closed schema");
+  });
+
+  it("preserves credential bytes through the CLI except for one line delimiter", async () => {
+    for (const stdin of [" token\n", "token \n", "token\t\n", "to\u0000ken\n", "to\rken\n", "to\nken\n"]) {
+      const { root, artifacts } = prepareRoot();
+      let calls = 0;
+      await expect(os01StagingCensusControllerTestOnly.executeCli({
+        action: "run",
+        stdin,
+        operations: {
+          initialize: () => { throw new Error("unexpected init"); },
+          writeObservation: () => { throw new Error("unexpected observation"); },
+          run: ({ authorizationToken }) => os01StagingCensusControllerTestOnly.run({
+            root,
+            authorizationToken,
+            now: () => new Date("2026-08-29T08:00:01.000Z"),
+            responseValidation: defaultValidation,
+            transport: async () => {
+              calls += 1;
+              return acceptedResponse();
+            }
+          }),
+          finalize: () => { throw new Error("unexpected finalize"); }
+        }
+      })).rejects.toThrow("one ephemeral Sites authorization token is required");
+      expect(calls).toBe(0);
+      expect(existsSync(artifacts.intent)).toBe(false);
+    }
+
+    const { root } = prepareRoot();
+    let receivedToken = "";
+    const valid = await os01StagingCensusControllerTestOnly.executeCli({
+      action: "run",
+      stdin: "exact-token\n",
+      operations: {
+        initialize: () => { throw new Error("unexpected init"); },
+        writeObservation: () => { throw new Error("unexpected observation"); },
+        run: ({ authorizationToken }) => {
+          receivedToken = authorizationToken;
+          return os01StagingCensusControllerTestOnly.run({
+            root,
+            authorizationToken,
+            now: () => new Date("2026-08-29T08:00:01.000Z"),
+            responseValidation: defaultValidation,
+            transport: async () => acceptedResponse()
+          });
+        },
+        finalize: () => { throw new Error("unexpected finalize"); }
+      }
+    });
+    expect(receivedToken).toBe("exact-token");
+    expect(valid).toEqual({ stdout: "pending_control_plane_postcheck\n", exitCode: 0 });
   });
 
   it("rejects blank hosted deployment identities on the full controller path before transport", async () => {
@@ -509,8 +593,131 @@ describe("OS-01 staging census controller", () => {
       responseValidation: defaultValidation,
       transport: async () => Response.json({ encoded: Buffer.from(token).toString("base64") })
     });
+    expect(result.status).toBe("terminal_credential_reflection");
+    expect(statSync(artifacts.response).size).toBe(0);
+  });
+
+  it("detects credentials after JSON quote, backslash, and Unicode escape decoding", async () => {
+    const cases = [
+      { token: "credential\"quoted", encode: (value: unknown) => JSON.stringify(value) },
+      { token: "credential\\backslash", encode: (value: unknown) => JSON.stringify(value) },
+      {
+        token: "credential-unicode",
+        encode: (value: unknown) => JSON.stringify(value)
+          .replaceAll("credential-unicode", "\\u0063redential-unicode")
+      }
+    ];
+    for (const item of cases) {
+      const { root, artifacts } = prepareRoot();
+      const responseBytes = item.encode(successReceiptContaining(item.token));
+      expect(responseBytes.includes(item.token)).toBe(false);
+      const result = await os01StagingCensusControllerTestOnly.run({
+        root,
+        authorizationToken: item.token,
+        now: () => new Date("2026-08-29T08:00:01.000Z"),
+        responseValidation: defaultValidation,
+        transport: async () => new Response(responseBytes, {
+          status: 200,
+          headers: { "Content-Type": "application/json" }
+        })
+      });
+      expect(result.status).toBe("terminal_credential_reflection");
+      expect(statSync(artifacts.response).size).toBe(0);
+    }
+  });
+
+  it("persists only a self-hashed closed worker failure and consumes the authority", async () => {
+    const { root, artifacts } = prepareRoot();
+    const result = await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "diagnostic-token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => closedFailureResponse("user_table_create_sql_missing")
+    });
+    expect(result.status).toBe("terminal_worker_failure");
+    expect(result.retryAllowed).toBe(false);
+    expect(JSON.parse(readFileSync(artifacts.response, "utf8"))).toMatchObject({
+      status: "read_only_census_failed",
+      failureCategory: "user_table_create_sql_missing",
+      databaseMutationAttempted: false
+    });
+    expect(statSync(artifacts.dispatchCompletion).size).toBe(0);
+    let calls = 0;
+    await expect(os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "retry-token",
+      now: () => new Date("2026-08-29T08:00:02.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => {
+        calls += 1;
+        return acceptedResponse();
+      }
+    })).rejects.toThrow();
+    expect(calls).toBe(0);
+    expect(() => os01StagingCensusControllerTestOnly.finalize(
+      root,
+      () => new Date("2026-08-29T08:02:00.000Z")
+    )).toThrow();
+  });
+
+  it("does not persist a closed worker failure outside generation 5 diagnostic scope", async () => {
+    const { root, artifacts } = prepareRoot();
+    const result = await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "diagnostic-token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => closedFailureResponse("catalog_read_failed")
+    });
     expect(result.status).toBe("terminal_invalid_response");
     expect(statSync(artifacts.response).size).toBe(0);
+    expect(statSync(artifacts.dispatchCompletion).size).toBe(0);
+  });
+
+  it("leaves altered, extended, and noncanonical worker failure bodies unpersisted", async () => {
+    const validFailure = await closedFailureResponse("user_table_count_mismatch").json() as
+      Record<string, unknown>;
+    const bodies = [
+      { ...validFailure, extra: true },
+      { ...validFailure, receiptHash: "0".repeat(64) },
+      JSON.stringify(validFailure) + "\n"
+    ];
+    for (const body of bodies) {
+      const { root, artifacts } = prepareRoot();
+      const responseBody = typeof body === "string" ? body : JSON.stringify(body);
+      const result = await os01StagingCensusControllerTestOnly.run({
+        root,
+        authorizationToken: "diagnostic-token",
+        now: () => new Date("2026-08-29T08:00:01.000Z"),
+        responseValidation: defaultValidation,
+        transport: async () => new Response(responseBody, {
+          status: 500,
+          headers: { "Content-Type": "application/json" }
+        })
+      });
+      expect(result.status).toBe("terminal_invalid_response");
+      expect(statSync(artifacts.response).size).toBe(0);
+    }
+  });
+
+  it("rejects whitespace and control-bearing credentials before reserving intent", async () => {
+    for (const authorizationToken of [" token", "token ", "to\tken", "to\u0000ken"]) {
+      const { root, artifacts } = prepareRoot();
+      let calls = 0;
+      await expect(os01StagingCensusControllerTestOnly.run({
+        root,
+        authorizationToken,
+        now: () => new Date("2026-08-29T08:00:01.000Z"),
+        responseValidation: defaultValidation,
+        transport: async () => {
+          calls += 1;
+          return acceptedResponse();
+        }
+      })).rejects.toThrow("one ephemeral Sites authorization token is required");
+      expect(calls).toBe(0);
+      expect(existsSync(artifacts.intent)).toBe(false);
+    }
   });
 
   it("rejects a self-hashed but cross-record-inconsistent intent", async () => {
