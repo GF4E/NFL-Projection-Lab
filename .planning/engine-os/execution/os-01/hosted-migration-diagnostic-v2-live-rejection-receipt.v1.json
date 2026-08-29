@@ -1,0 +1,28 @@
+{
+  "version": "engine-os.os01-hosted-migration-diagnostic-v2-live-rejection-receipt.v1",
+  "status": "rejected_diagnostic_scope_too_narrow",
+  "scope": "isolated_owner_only_blank_d1_replay",
+  "sourceCommit": "8a6b5e985bb264f1a8d01e4b0b102d7f782161e1",
+  "projectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "versionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_6f00b1e783148191bf6229cadeb9f3da",
+  "deploymentId": "appgdep_6a9257b96fac8191a31db1c911e77847",
+  "request": {
+    "action": "blank_replay",
+    "qualificationId": "7b84e25892d5d8c6d96d26ebf5afa2f6e7178593d88c3a9cd17772148967ae94",
+    "httpStatus": 500,
+    "workerRequestId": "857dc0d67cf19d53ea5c4d52bb03eeeb",
+    "wallTimeMilliseconds": 302,
+    "responseSha256": "02bc538377738a19dda7d8c6bfabb2cf6e56be98008e976c216a470e9055a98a",
+    "responseBytes": 32
+  },
+  "postcondition": {
+    "userTables": [],
+    "atomicRollbackPreserved": true
+  },
+  "reason": "failure_occurs_outside_the_batch_specific_catch",
+  "acceptedEvidence": false,
+  "providerDispatches": 0,
+  "providerBindingReads": 0,
+  "captureActivations": 0,
+  "productionMutations": 0
+}

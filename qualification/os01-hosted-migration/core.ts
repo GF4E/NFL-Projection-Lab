@@ -1275,7 +1275,9 @@ function errorResponse(error: unknown): Response {
   const status = error instanceof HarnessError ? error.status : 500;
   const code = error instanceof HarnessError ? error.code : "qualification_failed";
   const diagnostic = error instanceof HarnessError ? error.diagnostic : undefined;
-  const diagnosticDetail = error instanceof HarnessError ? error.diagnosticDetail : undefined;
+  const diagnosticDetail = error instanceof HarnessError
+    ? error.diagnosticDetail
+    : d1FailureText(error).slice(0, 2_048);
   return new Response(stableHostedJson({
     error: code,
     ...(diagnostic ? { diagnostic } : {}),
