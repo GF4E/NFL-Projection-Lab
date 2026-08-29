@@ -108,3 +108,13 @@ every HTTP-200 full-census response is rejected and left unpersisted. The raw ta
 bounded by the versioned maximum of 1,000, inclusive. Counts below zero, above that maximum, or
 violating `raw = excluded + observed` are invalid. No generation-6 path writes a dispatch-completion
 or can create a census acceptance receipt.
+
+## Authority generation 7
+
+Generation 6 was stopped by the controller before intent reservation or transport because the
+pre-observation timestamp preceded authority initialization by 194 milliseconds. No hosted
+request, worker invocation, D1 read, provider path, or quota path occurred. The generation-6 root,
+authority, and pre-observation are preserved, and its self-hashed rejection receipt prohibits any
+rewrite or retry. Generation 7 derives a new controller authority from that receipt and retains the
+identical count-only worker, response, persistence, and non-finalization contracts. Operationally,
+the successor must initialize authority first and only then capture and write the pre-observation.

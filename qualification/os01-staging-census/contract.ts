@@ -72,14 +72,14 @@ export const STAGING_CENSUS_SEMANTIC_CONTRACT = Object.freeze({
 
 export const STAGING_CENSUS_ID = "471001d7f8ad783dbabc1c03c4e7a022799466a20afba70e1eaf087a4761ec29";
 export const STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT = Object.freeze({
-  version: "engine-os.os01-staging-census-controller-authority-contract.v6",
+  version: "engine-os.os01-staging-census-controller-authority-contract.v7",
   semanticQualificationId: STAGING_CENSUS_ID,
-  generation: 6,
-  predecessorReceiptHash: "e8764856a45995ba9f1fc22bd9abf314ff0e1d48c97e94a837bf864ee74bbd50",
-  predecessorStatus: "rejected_user_table_count_mismatch_after_worker_read"
+  generation: 7,
+  predecessorReceiptHash: "3119037594e3b166d1bc90f3ca4d89d93ed02558efa02ccefa47077ceb32483c",
+  predecessorStatus: "rejected_pre_observation_timestamp_precedes_authority_before_dispatch"
 });
 export const STAGING_CENSUS_CONTROLLER_ID =
-  "08728af1d945ab44827a2bb0dd69641b2025f9414854baead79cf077ae511ff0";
+  "2e16d79bcd353e8effac75adad54b73c8cc536089dee6e54fd25a289c8e54c99";
 export const STAGING_CENSUS_REQUEST_VERSION = "engine-os.os01-staging-census-request.v2";
 export const STAGING_CENSUS_EXACT_BODY =
   `{"version":"${STAGING_CENSUS_REQUEST_VERSION}","censusId":"${STAGING_CENSUS_ID}"}`;

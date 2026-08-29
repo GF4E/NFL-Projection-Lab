@@ -176,8 +176,21 @@ describe("OS-01 staging DDL census", () => {
       predecessorReceiptHash: fourthPredecessorHash,
       predecessorStatus: "rejected_user_table_catalog_invariant_after_worker_read"
     })).toBe(fifthPredecessor.controllerAuthorityId);
+    const sixthPredecessor = JSON.parse(readFileSync(resolve(
+      ".planning/engine-os/execution/os-01/staging-census-v2-hosted-attempt6-rejection-receipt.v1.json"
+    ), "utf8")) as Record<string, unknown>;
+    const sixthPredecessorHash = sixthPredecessor.receiptHash;
+    delete sixthPredecessor.receiptHash;
+    expect(hash(sixthPredecessor)).toBe(sixthPredecessorHash);
+    expect(hash({
+      version: "engine-os.os01-staging-census-controller-authority-contract.v6",
+      semanticQualificationId: STAGING_CENSUS_ID,
+      generation: 6,
+      predecessorReceiptHash: fifthPredecessorHash,
+      predecessorStatus: "rejected_user_table_count_mismatch_after_worker_read"
+    })).toBe(sixthPredecessor.controllerAuthorityId);
     expect(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT.predecessorReceiptHash)
-      .toBe(fifthPredecessorHash);
+      .toBe(sixthPredecessorHash);
     expect(createHash("sha256").update(STAGING_CENSUS_EXACT_BODY).digest("hex"))
       .toBe(STAGING_CENSUS_EXACT_BODY_SHA256);
   });
