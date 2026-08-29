@@ -267,7 +267,7 @@ export async function handleOs01StagingCensus(
       viewNames: views,
       prePostCatalogMatch: true,
       prePostRowCountsMatch: true,
-      snapshotClaim: "bounded_consistency_not_transactional_snapshot",
+      snapshotClaim: STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
       requestBudgetClaim: "controller_enforced_single_invocation_not_runtime_durable",
       databaseMutationAttempted: false,
       providerBindings: 0,

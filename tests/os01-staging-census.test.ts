@@ -138,7 +138,7 @@ describe("OS-01 staging DDL census", () => {
       .toEqual([0, 1]);
     expect(body.prePostCatalogMatch).toBe(true);
     expect(body.prePostRowCountsMatch).toBe(true);
-    expect(body.snapshotClaim).toBe("bounded_consistency_not_transactional_snapshot");
+    expect(body.snapshotClaim).toBe(STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim);
     expect(body.requestBudgetClaim).toBe("controller_enforced_single_invocation_not_runtime_durable");
     expect(body.databaseMutationAttempted).toBe(false);
     expect(body.providerDispatches).toBe(0);

@@ -107,6 +107,22 @@ function validHex(value: unknown): value is string {
   return typeof value === "string" && /^[a-f0-9]{64}$/u.test(value);
 }
 
+function hasExactKeys(value: Record<string, unknown>, expected: string[]): boolean {
+  const actual = Object.keys(value).sort(codePointCompare);
+  return actual.length === expected.length &&
+    [...expected].sort(codePointCompare).every((key, index) => key === actual[index]);
+}
+
+function compareForeignKeys(left: Record<string, unknown>, right: Record<string, unknown>): number {
+  return (left.id as number) - (right.id as number) || (left.seq as number) - (right.seq as number) ||
+    codePointCompare(left.table as string, right.table as string) ||
+    codePointCompare(left.from as string, right.from as string) ||
+    codePointCompare((left.to as string | null) ?? "", (right.to as string | null) ?? "") ||
+    codePointCompare(left.on_update as string, right.on_update as string) ||
+    codePointCompare(left.on_delete as string, right.on_delete as string) ||
+    codePointCompare(left.match as string, right.match as string);
+}
+
 function validateResponse(bytes: Uint8Array): boolean {
   let parsed: unknown;
   try {
@@ -116,6 +132,15 @@ function validateResponse(bytes: Uint8Array): boolean {
   }
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return false;
   const receipt = parsed as Record<string, unknown>;
+  if (!hasExactKeys(receipt, [
+    "captureActivations", "catalogHash", "catalogRows", "censusId", "claimBoundary",
+    "databaseMutationAttempted", "ddlRoot", "foreignKeyRoot", "prePostCatalogMatch",
+    "prePostRowCountsMatch", "productionMutations", "productionReads", "providerBindings",
+    "providerDispatches", "providerSecretReads", "quotaReservations", "receiptHash",
+    "requestBudgetClaim", "rowCountRoot", "snapshotClaim", "status", "tableSetHash",
+    "tables", "userObjectCount", "userTableCount", "userViewCount", "version",
+    "viewNames", "viewSetHash"
+  ])) return false;
   const claimedHash = receipt.receiptHash;
   if (!validHex(claimedHash)) return false;
   const body = { ...receipt };
@@ -152,7 +177,8 @@ function validateResponse(bytes: Uint8Array): boolean {
   for (const value of tables) {
     if (!value || typeof value !== "object" || Array.isArray(value)) return false;
     const table = value as Record<string, unknown>;
-    if (typeof table.name !== "string" || typeof table.createSql !== "string" ||
+    if (!hasExactKeys(table, ["createSql", "createSqlHash", "foreignKeys", "name", "rowCount"]) ||
+        typeof table.name !== "string" || typeof table.createSql !== "string" ||
         table.createSqlHash !== sha256(table.createSql) ||
         !Number.isSafeInteger(table.rowCount) || (table.rowCount as number) < 0 ||
         !Array.isArray(table.foreignKeys)) {
@@ -161,7 +187,8 @@ function validateResponse(bytes: Uint8Array): boolean {
     for (const foreignKey of table.foreignKeys) {
       if (!foreignKey || typeof foreignKey !== "object" || Array.isArray(foreignKey)) return false;
       const row = foreignKey as Record<string, unknown>;
-      if (!Number.isSafeInteger(row.id) || (row.id as number) < 0 ||
+      if (!hasExactKeys(row, ["from", "id", "match", "on_delete", "on_update", "seq", "table", "to"]) ||
+          !Number.isSafeInteger(row.id) || (row.id as number) < 0 ||
           !Number.isSafeInteger(row.seq) || (row.seq as number) < 0 ||
           typeof row.table !== "string" || typeof row.from !== "string" ||
           (typeof row.to !== "string" && row.to !== null) ||
@@ -170,6 +197,8 @@ function validateResponse(bytes: Uint8Array): boolean {
         return false;
       }
     }
+    const foreignKeys = table.foreignKeys as Array<Record<string, unknown>>;
+    if ([...foreignKeys].sort(compareForeignKeys).some((row, index) => row !== foreignKeys[index])) return false;
     normalizedTables.push({
       name: table.name,
       createSql: table.createSql,

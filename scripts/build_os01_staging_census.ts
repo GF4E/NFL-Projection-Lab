@@ -68,7 +68,7 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     STAGING_CENSUS_ID,
     STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
     "controller_enforced_single_invocation_not_runtime_durable",
-    "bounded_consistency_not_transactional_snapshot",
+    STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
     "isolated_staging_read_only_census_only"
   ]) if (!text.includes(required)) throw new Error(`census package omits ${required}`);
 
