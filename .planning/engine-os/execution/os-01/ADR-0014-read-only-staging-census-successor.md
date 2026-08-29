@@ -87,3 +87,14 @@ a finite, aggregate-only failure envelope. Those broader categories are never pe
 generation-5 controller. Only the four user-table invariant categories above are eligible for
 diagnostic persistence; every other failure response consumes the authority with an empty response
 artifact. This hardening does not expand the generation-5 diagnostic scope.
+
+## Authority generation 6
+
+Generation 5 returned the exact closed category `user_table_count_mismatch`. The Sites database
+overview reports 50 non-omitted table names, while tracked replay shows the isolated staging state
+is an incomplete 50-table subset of the 93-table terminal schema. Neither fact proves the worker's
+post-filter count. Generation 6 is therefore limited to one count-only refinement: expected table
+count, raw table-row count, excluded-internal table-row count, and post-filter table count. It may
+not return any identifier, SQL, hash, row count, foreign key, provider detail, or exception text.
+The generation-5 authority is terminal and may not be retried, and the aggregate result may not by
+itself change the expected census count.

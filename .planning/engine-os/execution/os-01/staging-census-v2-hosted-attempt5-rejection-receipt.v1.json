@@ -1,0 +1,109 @@
+{
+  "version": "engine-os.os01-staging-census-hosted-attempt-rejection.v1",
+  "status": "rejected_user_table_count_mismatch_after_worker_read",
+  "qualificationId": "471001d7f8ad783dbabc1c03c4e7a022799466a20afba70e1eaf087a4761ec29",
+  "controllerAuthorityId": "ff1138558b4cb56f43648224344009bfd80c3e75293526f0280f80b15ab6c71a",
+  "sourceCommit": "c331ea490df6661c0a463ad9cff6c6ad9b9a4caf",
+  "sourceTree": "05b52c32ad2db7c5259fc183ba8bc6f12b8f753f",
+  "stagingProjectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "savedVersionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_3784f545c5c88191acc382d10d24d991",
+  "savedVersionNumber": 15,
+  "deploymentId": "appgdep_6a92aab645a88191852308c95a31425a",
+  "deploymentStatus": "succeeded",
+  "workerSha256": "bd57e2fda374cd09b14655dc819438c6926283734fef24275c19917dde20840a",
+  "manifestSha256": "8af16d17ee0e772e710fb35bdfb96bca8de8118ba2d149ab85dcbafea9c14483",
+  "localArchiveSha256": "dee83c75d47d740f874ba2ad704508b77bc8382573fb0de4241ad9b47e836b4a",
+  "authorityRoot": "/private/tmp/engine-os-os01-staging-census-ff1138558b4cb56f43648224344009bfd80c3e75293526f0280f80b15ab6c71a",
+  "artifacts": {
+    "authority": {
+      "sha256": "70728d32aa7b1e2fc965d435bf294c04916d6ebafe4713425c68bac4107e74d7",
+      "bytes": 928,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179038610
+    },
+    "preObservation": {
+      "sha256": "8f8658fc8278cf83b9157bfd75aeca127088ec40afd8b2d7e396145b486e31ce",
+      "bytes": 1980,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179038614
+    },
+    "intent": {
+      "sha256": "b9705090081e7e6d05a747317868cc38b8bfb81e8a618c329c15bb2a2e636556",
+      "bytes": 1487,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179038624
+    },
+    "response": {
+      "sha256": "403221d30fa842d01568deafa2e544b776522785dfded148b7fe3ec20da02bb6",
+      "bytes": 395,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179038625
+    },
+    "attemptResult": {
+      "sha256": "b582d0c4fa9d9c08dea3a9f73e51c88e715d5b81cdf5caaf13ab99107fb14957",
+      "bytes": 1288,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179038626
+    },
+    "reservedDispatchCompletion": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179038627
+    }
+  },
+  "failure": {
+    "stage": "hosted_worker_user_table_count_validation",
+    "reason": "user_table_count_mismatch",
+    "workerFailureReceiptHash": "185ced33ffd2e8fb8fb6f4ca1b4ae1202c97a70387b13b8da768bc46f864b6fc",
+    "responseBytesSha256": "403221d30fa842d01568deafa2e544b776522785dfded148b7fe3ec20da02bb6",
+    "attemptResultHash": "622f6baffa0cd8bcaefea452ec0bd6c03bb76656930dbc22666125c0245c0711",
+    "controllerRunInvoked": true,
+    "hostRequestDispatched": true,
+    "httpStatus": 500,
+    "workerRequestDispatched": true,
+    "closedDiagnosticPersisted": true,
+    "databaseReadAttempted": true,
+    "databaseMutationAttempted": false,
+    "providerPathInvoked": false,
+    "quotaPathInvoked": false,
+    "retryAllowedOnConsumedAuthority": false
+  },
+  "boundedReconciliation": {
+    "sitesOverviewTableCount": 50,
+    "sitesOverviewOmittedTables": 0,
+    "sitesOverviewTruncated": false,
+    "trackedLegacyReplayTableCount": 48,
+    "trackedTerminalReplayTableCount": 93,
+    "stagingTablesPresentInTerminalReplay": 50,
+    "stagingTablesOutsideTerminalReplay": 0,
+    "observedWorkerFilteredCountKnown": false,
+    "countOnlySuccessorRequired": true
+  },
+  "disposition": {
+    "originalAuthorityPreserved": true,
+    "artifactRewriteAllowed": false,
+    "artifactDeletionAllowed": false,
+    "cleanSuccessorRequired": true,
+    "aggregateCountDiagnosticAllowed": true,
+    "expectedCountChangeAllowedFromThisReceiptAlone": false,
+    "cleanupAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthorized": false,
+    "os01Accepted": false
+  },
+  "recordedAt": "2026-08-29T09:51:12.000Z",
+  "receiptHash": "e8764856a45995ba9f1fc22bd9abf314ff0e1d48c97e94a837bf864ee74bbd50"
+}
