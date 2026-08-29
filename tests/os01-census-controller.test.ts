@@ -1041,13 +1041,23 @@ describe("OS-01 production census controller", () => {
 
   it("binds tracked hosting metadata to the selected project and exact storage bindings", () => {
     const production = configuredTrustedTarget("production");
-    expect(validateTrackedHostingTarget(realpathSync("."), production)).toEqual({
+    const tracked = mkdtempSync(join(tmpdir(), "os01-tracked-hosting-"));
+    temporaryDirectories.push(tracked);
+    execFileSync("git", ["init", "--quiet"], { cwd: tracked });
+    mkdirSync(join(tracked, ".openai"), { recursive: true });
+    writeFileSync(join(tracked, ".openai/hosting.json"), JSON.stringify({
+      project_id: production.projectId,
+      d1: "DB",
+      r2: "EVIDENCE"
+    }), "utf8");
+    execFileSync("git", ["add", "--", ".openai/hosting.json"], { cwd: tracked });
+    expect(validateTrackedHostingTarget(realpathSync(tracked), production)).toEqual({
       projectId: production.projectId,
       d1Binding: "DB",
       r2Binding: "EVIDENCE"
     });
     expect(() => validateTrackedHostingTarget(
-      realpathSync("."),
+      realpathSync(tracked),
       configuredTrustedTarget("staging")
     )).toThrow(/does not match the trusted target/u);
     expect(() => validateHostingTargetDocument({
