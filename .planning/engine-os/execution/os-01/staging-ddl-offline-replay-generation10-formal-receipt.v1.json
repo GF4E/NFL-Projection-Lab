@@ -1,0 +1,545 @@
+{
+  "version": "engine-os.os01-staging-ddl-offline-replay-receipt.v1",
+  "status": "accepted_bounded_two_pass_offline_ddl_replay_and_fk_candidate_freeze",
+  "contractVersion": "engine-os.os01-staging-ddl-offline-replay-contract.v1",
+  "source": {
+    "hostedResponseBytesSha256": "3fdcac828cad28ab70e274565856141a50ac5382964e04bb0047ace2854fb032",
+    "hostedResponseReceiptHash": "c62008d294736799865622c360ac7e581636f7f6472f5dc4efe75ee6a8b7f3a6",
+    "hostedFinalReceiptBytesSha256": "9253a4802a777f5a1b26fbbe1987382cf2db398f4f7d3c1c619588db15e4ec80",
+    "hostedFinalReceiptHash": "72e7232ae1f3abae8810976bebf2330ce5da13060a37fb0d8d16559e75618bc8",
+    "controllerAuthorityId": "379588dc6e7ed0e7445e2fe78788b3f7143a4947ad524c066191cdd336a002aa",
+    "runnerSourceSha256": "bffd91932f464072d75e31fbb6875a2c6ad317ed4c283c04b0c6cf7e67490fae",
+    "testSourceSha256": "49887592890713fdbc71a171e4c6181765bee921d6e5a52c36e9c2cac3d68c89"
+  },
+  "runtime": {
+    "node": "v24.19.0",
+    "sqlite": "3.53.3",
+    "sqliteSourceId": "2026-06-26 20:14:12 d4c0e51e4aeb96955b99185ab9cde75c339e2c29c3f3f12428d364a10d782c62",
+    "compileOptionsRoot": "016d81120806d6a894113dadfa48d294be1d5e6a2983bbdd630bc4aa5ac2fe8a",
+    "nodeExecutableSha256": "27db838bb204ef7c21df2931f5656e4c8fb32e6e947f363a402b49714d32b5b1",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "passes": [
+    {
+      "pass": 1,
+      "replayOrderRoot": "a0cd79fa613e4af6e1ccd706d94a0cd861526e223a28562a04707cf51422e925",
+      "replayCatalogRows": 376,
+      "replayCatalogHash": "1d1c7f401292c88b3ff814cb9e283788cd100a8f78713236430b10f2195ca847",
+      "derivedAutoIndexCount": 128,
+      "derivedAutoIndexSetHash": "3f9de132a92b64f8588135b3b4265f7926e31a3e0f5732e788cebd4dfba0d4fc",
+      "integrityCheck": "ok",
+      "foreignKeyCheckViolationCount": 0,
+      "scannerCandidates": [
+        "canonical_games",
+        "confidence_experiment_decisions",
+        "confidence_forecast_artifacts",
+        "confidence_forecast_evaluations",
+        "confidence_human_adjustments",
+        "engine_job_runs",
+        "engine_origin_attempts_v2",
+        "engine_origin_jobs_v2",
+        "engine_origin_records_v2",
+        "engine_scheduler_events_v2",
+        "forecast_ledger_activations_v1",
+        "forecast_ledger_attempts_v1",
+        "forecast_ledger_events_v1",
+        "forecast_ledger_jobs_v1",
+        "forecast_ledger_records_v1",
+        "forecast_origin_records",
+        "forecast_origin_versions",
+        "forecast_origins",
+        "game_kickoff_revisions",
+        "game_provider_aliases",
+        "game_schedule_revisions",
+        "odds_quota_control",
+        "odds_quota_events",
+        "odds_quota_reservation_events",
+        "odds_quota_reservations",
+        "source_capture_events",
+        "source_capture_heartbeats",
+        "source_capture_manifest_extensions"
+      ],
+      "candidateIdentities": [
+        {
+          "sourceTable": "canonical_games",
+          "sourceCreateSqlHash": "77429516bb940a554c7ff25ae398d8289c9d9d2d1f1c7d3df7abaf6ec89ea702"
+        },
+        {
+          "sourceTable": "confidence_experiment_decisions",
+          "sourceCreateSqlHash": "e25d4e89a9e96d059a145181bc2ceb4318bf73a9fdc77189df26795ce65f2b96"
+        },
+        {
+          "sourceTable": "confidence_forecast_artifacts",
+          "sourceCreateSqlHash": "2471ddd5b4845697e20801e44bc7b8a9b2f54830b17c01edd5f682052fa02e36"
+        },
+        {
+          "sourceTable": "confidence_forecast_evaluations",
+          "sourceCreateSqlHash": "a0815b48b520e939d60c2ab6ac6834995b40f06a9f7d518a8b63440c5319ae10"
+        },
+        {
+          "sourceTable": "confidence_human_adjustments",
+          "sourceCreateSqlHash": "02f161aa004c76d9afe6f2722478bd32ded8c5708695e1563083da303a883ecc"
+        },
+        {
+          "sourceTable": "engine_job_runs",
+          "sourceCreateSqlHash": "23cee241cd9a6e5868df346ffa908755e35335442352607f1aa9f08d587eded9"
+        },
+        {
+          "sourceTable": "engine_origin_attempts_v2",
+          "sourceCreateSqlHash": "d46e11efe72b04d0f81e0cbeaefaca77a675e3a06d6877b22744e531acefceef"
+        },
+        {
+          "sourceTable": "engine_origin_jobs_v2",
+          "sourceCreateSqlHash": "fae69d43dbf6a9cfdbd84fc9330fca2604094ed6d7019918832f535c24727d87"
+        },
+        {
+          "sourceTable": "engine_origin_records_v2",
+          "sourceCreateSqlHash": "4ffe37ff91d30ceec1fd006897fe61169dd7851ead4e64667efe26385618318b"
+        },
+        {
+          "sourceTable": "engine_scheduler_events_v2",
+          "sourceCreateSqlHash": "c6c6578fb3df8ab5e8e155e3ab17fe043e71eb381b8f88626c1d91d9ff4941c1"
+        },
+        {
+          "sourceTable": "forecast_ledger_activations_v1",
+          "sourceCreateSqlHash": "fa531bad7e1fb094d049b829950e0172ef2f09366dc7ce14a21a7be18ea1d986"
+        },
+        {
+          "sourceTable": "forecast_ledger_attempts_v1",
+          "sourceCreateSqlHash": "a03b6e20a85ff09aa2ebecf3ba8dcf846ca9840ee59d59e188260641ac0b788b"
+        },
+        {
+          "sourceTable": "forecast_ledger_events_v1",
+          "sourceCreateSqlHash": "7a285edd842a7c88c7d82a3911eb7ea6511a383c196788b90e4e3011738a5751"
+        },
+        {
+          "sourceTable": "forecast_ledger_jobs_v1",
+          "sourceCreateSqlHash": "75132c71477bc8f5b29704e298003ea81215ef6def88093c9e14d41fd635a633"
+        },
+        {
+          "sourceTable": "forecast_ledger_records_v1",
+          "sourceCreateSqlHash": "a34c24b0dcd7009b91669ec46c2fbc8db4f851f03b64608826970a8597ddb0c9"
+        },
+        {
+          "sourceTable": "forecast_origin_records",
+          "sourceCreateSqlHash": "ce348975ad092c0b89b7a91343a7fd9392b3226c6b39d855c9f853be0f3e122a"
+        },
+        {
+          "sourceTable": "forecast_origin_versions",
+          "sourceCreateSqlHash": "61e2363f9e0357e62b34ec7f32b1286cf34f0b8191cc15d5e21312ccd99c66ff"
+        },
+        {
+          "sourceTable": "forecast_origins",
+          "sourceCreateSqlHash": "42956a59d6ad0ddec3b9f32374f7aea9de5e713e104e83263bb803d77b648643"
+        },
+        {
+          "sourceTable": "game_kickoff_revisions",
+          "sourceCreateSqlHash": "1a787cff6dd8b1a31819c97f784a716bca1659cbbe8a7d8e0c568c010ce8787a"
+        },
+        {
+          "sourceTable": "game_provider_aliases",
+          "sourceCreateSqlHash": "4b67bb5532af1e04bb56debb431d6537e1818ba3ad1420ea99ae524e4aac1b31"
+        },
+        {
+          "sourceTable": "game_schedule_revisions",
+          "sourceCreateSqlHash": "7a6d78e9ce3d4730de3f4b97ec8bf188a06b6012e7198268bb803a6c4b3b565a"
+        },
+        {
+          "sourceTable": "odds_quota_control",
+          "sourceCreateSqlHash": "3f7a5851a067535616c146e66a45261964b839bd02d55f4a299037e29d92a8b3"
+        },
+        {
+          "sourceTable": "odds_quota_events",
+          "sourceCreateSqlHash": "758f4d30dc5042fbc48899e54542457e7ab781160eb8b4d2a0734071a236d828"
+        },
+        {
+          "sourceTable": "odds_quota_reservation_events",
+          "sourceCreateSqlHash": "0e5bf12fdbd2dc5e422df86336a0fc717a012b82af885f3d16729be6900a47fd"
+        },
+        {
+          "sourceTable": "odds_quota_reservations",
+          "sourceCreateSqlHash": "6cd60706b5d5dcf0a69b6785a1f857b59356fbd4c9823e1a7f3c7a1f303e2231"
+        },
+        {
+          "sourceTable": "source_capture_events",
+          "sourceCreateSqlHash": "1b6399381f4733c6c2e415d30a7b64228833c34ed54193984a0d120e6f9d06a6"
+        },
+        {
+          "sourceTable": "source_capture_heartbeats",
+          "sourceCreateSqlHash": "e4a7df51d3d81ced9731575a4bd3314c70b96e96cf60a297e7de5594439f1e79"
+        },
+        {
+          "sourceTable": "source_capture_manifest_extensions",
+          "sourceCreateSqlHash": "397007b1b55a215ca5ff6c554ec9918917b2c5156c118a223baf280bfac3fd02"
+        }
+      ],
+      "candidateRoot": "09e6a26e0c2f3d6029e34a2fb42a8b3b550e45eab7d8e8da1aaefb69af62a09e",
+      "lexicalReferenceTokenCount": 51,
+      "foreignKeyConstraintCount": 51,
+      "foreignKeyColumnRowCount": 54,
+      "normalizedForeignKeyRoot": "bad8738dceb23141a6781540308bbd7d287ce8d7f5119913b7f3986e7e724622",
+      "foreignKeyStructureProbeCount": 51,
+      "foreignKeyStructureRoot": "09b272f6546ee78eb52b8bcb0988144003a2856861a17ac1c7a297262593168c",
+      "triggerProbeCount": 73,
+      "triggerValidationRoot": "0876fbc11e0e9dfeabbfb0306f7e6da764a483ea34ee3633a3022868fb37a66b",
+      "viewCount": 0,
+      "platformOnlyInternalObjects": [
+        "_cf_KV"
+      ],
+      "regeneratedInternalObjects": [
+        "sqlite_sequence"
+      ],
+      "passRoot": "d6b5a667b202d64e19c93f663c83748e80883cc6a3984bd75e94843642fd50b0"
+    },
+    {
+      "pass": 2,
+      "replayOrderRoot": "a0cd79fa613e4af6e1ccd706d94a0cd861526e223a28562a04707cf51422e925",
+      "replayCatalogRows": 376,
+      "replayCatalogHash": "1d1c7f401292c88b3ff814cb9e283788cd100a8f78713236430b10f2195ca847",
+      "derivedAutoIndexCount": 128,
+      "derivedAutoIndexSetHash": "3f9de132a92b64f8588135b3b4265f7926e31a3e0f5732e788cebd4dfba0d4fc",
+      "integrityCheck": "ok",
+      "foreignKeyCheckViolationCount": 0,
+      "scannerCandidates": [
+        "canonical_games",
+        "confidence_experiment_decisions",
+        "confidence_forecast_artifacts",
+        "confidence_forecast_evaluations",
+        "confidence_human_adjustments",
+        "engine_job_runs",
+        "engine_origin_attempts_v2",
+        "engine_origin_jobs_v2",
+        "engine_origin_records_v2",
+        "engine_scheduler_events_v2",
+        "forecast_ledger_activations_v1",
+        "forecast_ledger_attempts_v1",
+        "forecast_ledger_events_v1",
+        "forecast_ledger_jobs_v1",
+        "forecast_ledger_records_v1",
+        "forecast_origin_records",
+        "forecast_origin_versions",
+        "forecast_origins",
+        "game_kickoff_revisions",
+        "game_provider_aliases",
+        "game_schedule_revisions",
+        "odds_quota_control",
+        "odds_quota_events",
+        "odds_quota_reservation_events",
+        "odds_quota_reservations",
+        "source_capture_events",
+        "source_capture_heartbeats",
+        "source_capture_manifest_extensions"
+      ],
+      "candidateIdentities": [
+        {
+          "sourceTable": "canonical_games",
+          "sourceCreateSqlHash": "77429516bb940a554c7ff25ae398d8289c9d9d2d1f1c7d3df7abaf6ec89ea702"
+        },
+        {
+          "sourceTable": "confidence_experiment_decisions",
+          "sourceCreateSqlHash": "e25d4e89a9e96d059a145181bc2ceb4318bf73a9fdc77189df26795ce65f2b96"
+        },
+        {
+          "sourceTable": "confidence_forecast_artifacts",
+          "sourceCreateSqlHash": "2471ddd5b4845697e20801e44bc7b8a9b2f54830b17c01edd5f682052fa02e36"
+        },
+        {
+          "sourceTable": "confidence_forecast_evaluations",
+          "sourceCreateSqlHash": "a0815b48b520e939d60c2ab6ac6834995b40f06a9f7d518a8b63440c5319ae10"
+        },
+        {
+          "sourceTable": "confidence_human_adjustments",
+          "sourceCreateSqlHash": "02f161aa004c76d9afe6f2722478bd32ded8c5708695e1563083da303a883ecc"
+        },
+        {
+          "sourceTable": "engine_job_runs",
+          "sourceCreateSqlHash": "23cee241cd9a6e5868df346ffa908755e35335442352607f1aa9f08d587eded9"
+        },
+        {
+          "sourceTable": "engine_origin_attempts_v2",
+          "sourceCreateSqlHash": "d46e11efe72b04d0f81e0cbeaefaca77a675e3a06d6877b22744e531acefceef"
+        },
+        {
+          "sourceTable": "engine_origin_jobs_v2",
+          "sourceCreateSqlHash": "fae69d43dbf6a9cfdbd84fc9330fca2604094ed6d7019918832f535c24727d87"
+        },
+        {
+          "sourceTable": "engine_origin_records_v2",
+          "sourceCreateSqlHash": "4ffe37ff91d30ceec1fd006897fe61169dd7851ead4e64667efe26385618318b"
+        },
+        {
+          "sourceTable": "engine_scheduler_events_v2",
+          "sourceCreateSqlHash": "c6c6578fb3df8ab5e8e155e3ab17fe043e71eb381b8f88626c1d91d9ff4941c1"
+        },
+        {
+          "sourceTable": "forecast_ledger_activations_v1",
+          "sourceCreateSqlHash": "fa531bad7e1fb094d049b829950e0172ef2f09366dc7ce14a21a7be18ea1d986"
+        },
+        {
+          "sourceTable": "forecast_ledger_attempts_v1",
+          "sourceCreateSqlHash": "a03b6e20a85ff09aa2ebecf3ba8dcf846ca9840ee59d59e188260641ac0b788b"
+        },
+        {
+          "sourceTable": "forecast_ledger_events_v1",
+          "sourceCreateSqlHash": "7a285edd842a7c88c7d82a3911eb7ea6511a383c196788b90e4e3011738a5751"
+        },
+        {
+          "sourceTable": "forecast_ledger_jobs_v1",
+          "sourceCreateSqlHash": "75132c71477bc8f5b29704e298003ea81215ef6def88093c9e14d41fd635a633"
+        },
+        {
+          "sourceTable": "forecast_ledger_records_v1",
+          "sourceCreateSqlHash": "a34c24b0dcd7009b91669ec46c2fbc8db4f851f03b64608826970a8597ddb0c9"
+        },
+        {
+          "sourceTable": "forecast_origin_records",
+          "sourceCreateSqlHash": "ce348975ad092c0b89b7a91343a7fd9392b3226c6b39d855c9f853be0f3e122a"
+        },
+        {
+          "sourceTable": "forecast_origin_versions",
+          "sourceCreateSqlHash": "61e2363f9e0357e62b34ec7f32b1286cf34f0b8191cc15d5e21312ccd99c66ff"
+        },
+        {
+          "sourceTable": "forecast_origins",
+          "sourceCreateSqlHash": "42956a59d6ad0ddec3b9f32374f7aea9de5e713e104e83263bb803d77b648643"
+        },
+        {
+          "sourceTable": "game_kickoff_revisions",
+          "sourceCreateSqlHash": "1a787cff6dd8b1a31819c97f784a716bca1659cbbe8a7d8e0c568c010ce8787a"
+        },
+        {
+          "sourceTable": "game_provider_aliases",
+          "sourceCreateSqlHash": "4b67bb5532af1e04bb56debb431d6537e1818ba3ad1420ea99ae524e4aac1b31"
+        },
+        {
+          "sourceTable": "game_schedule_revisions",
+          "sourceCreateSqlHash": "7a6d78e9ce3d4730de3f4b97ec8bf188a06b6012e7198268bb803a6c4b3b565a"
+        },
+        {
+          "sourceTable": "odds_quota_control",
+          "sourceCreateSqlHash": "3f7a5851a067535616c146e66a45261964b839bd02d55f4a299037e29d92a8b3"
+        },
+        {
+          "sourceTable": "odds_quota_events",
+          "sourceCreateSqlHash": "758f4d30dc5042fbc48899e54542457e7ab781160eb8b4d2a0734071a236d828"
+        },
+        {
+          "sourceTable": "odds_quota_reservation_events",
+          "sourceCreateSqlHash": "0e5bf12fdbd2dc5e422df86336a0fc717a012b82af885f3d16729be6900a47fd"
+        },
+        {
+          "sourceTable": "odds_quota_reservations",
+          "sourceCreateSqlHash": "6cd60706b5d5dcf0a69b6785a1f857b59356fbd4c9823e1a7f3c7a1f303e2231"
+        },
+        {
+          "sourceTable": "source_capture_events",
+          "sourceCreateSqlHash": "1b6399381f4733c6c2e415d30a7b64228833c34ed54193984a0d120e6f9d06a6"
+        },
+        {
+          "sourceTable": "source_capture_heartbeats",
+          "sourceCreateSqlHash": "e4a7df51d3d81ced9731575a4bd3314c70b96e96cf60a297e7de5594439f1e79"
+        },
+        {
+          "sourceTable": "source_capture_manifest_extensions",
+          "sourceCreateSqlHash": "397007b1b55a215ca5ff6c554ec9918917b2c5156c118a223baf280bfac3fd02"
+        }
+      ],
+      "candidateRoot": "09e6a26e0c2f3d6029e34a2fb42a8b3b550e45eab7d8e8da1aaefb69af62a09e",
+      "lexicalReferenceTokenCount": 51,
+      "foreignKeyConstraintCount": 51,
+      "foreignKeyColumnRowCount": 54,
+      "normalizedForeignKeyRoot": "bad8738dceb23141a6781540308bbd7d287ce8d7f5119913b7f3986e7e724622",
+      "foreignKeyStructureProbeCount": 51,
+      "foreignKeyStructureRoot": "09b272f6546ee78eb52b8bcb0988144003a2856861a17ac1c7a297262593168c",
+      "triggerProbeCount": 73,
+      "triggerValidationRoot": "0876fbc11e0e9dfeabbfb0306f7e6da764a483ea34ee3633a3022868fb37a66b",
+      "viewCount": 0,
+      "platformOnlyInternalObjects": [
+        "_cf_KV"
+      ],
+      "regeneratedInternalObjects": [
+        "sqlite_sequence"
+      ],
+      "passRoot": "d6b5a667b202d64e19c93f663c83748e80883cc6a3984bd75e94843642fd50b0"
+    }
+  ],
+  "crossPassEqual": true,
+  "candidateTables": [
+    "canonical_games",
+    "confidence_experiment_decisions",
+    "confidence_forecast_artifacts",
+    "confidence_forecast_evaluations",
+    "confidence_human_adjustments",
+    "engine_job_runs",
+    "engine_origin_attempts_v2",
+    "engine_origin_jobs_v2",
+    "engine_origin_records_v2",
+    "engine_scheduler_events_v2",
+    "forecast_ledger_activations_v1",
+    "forecast_ledger_attempts_v1",
+    "forecast_ledger_events_v1",
+    "forecast_ledger_jobs_v1",
+    "forecast_ledger_records_v1",
+    "forecast_origin_records",
+    "forecast_origin_versions",
+    "forecast_origins",
+    "game_kickoff_revisions",
+    "game_provider_aliases",
+    "game_schedule_revisions",
+    "odds_quota_control",
+    "odds_quota_events",
+    "odds_quota_reservation_events",
+    "odds_quota_reservations",
+    "source_capture_events",
+    "source_capture_heartbeats",
+    "source_capture_manifest_extensions"
+  ],
+  "candidateIdentities": [
+    {
+      "sourceTable": "canonical_games",
+      "sourceCreateSqlHash": "77429516bb940a554c7ff25ae398d8289c9d9d2d1f1c7d3df7abaf6ec89ea702"
+    },
+    {
+      "sourceTable": "confidence_experiment_decisions",
+      "sourceCreateSqlHash": "e25d4e89a9e96d059a145181bc2ceb4318bf73a9fdc77189df26795ce65f2b96"
+    },
+    {
+      "sourceTable": "confidence_forecast_artifacts",
+      "sourceCreateSqlHash": "2471ddd5b4845697e20801e44bc7b8a9b2f54830b17c01edd5f682052fa02e36"
+    },
+    {
+      "sourceTable": "confidence_forecast_evaluations",
+      "sourceCreateSqlHash": "a0815b48b520e939d60c2ab6ac6834995b40f06a9f7d518a8b63440c5319ae10"
+    },
+    {
+      "sourceTable": "confidence_human_adjustments",
+      "sourceCreateSqlHash": "02f161aa004c76d9afe6f2722478bd32ded8c5708695e1563083da303a883ecc"
+    },
+    {
+      "sourceTable": "engine_job_runs",
+      "sourceCreateSqlHash": "23cee241cd9a6e5868df346ffa908755e35335442352607f1aa9f08d587eded9"
+    },
+    {
+      "sourceTable": "engine_origin_attempts_v2",
+      "sourceCreateSqlHash": "d46e11efe72b04d0f81e0cbeaefaca77a675e3a06d6877b22744e531acefceef"
+    },
+    {
+      "sourceTable": "engine_origin_jobs_v2",
+      "sourceCreateSqlHash": "fae69d43dbf6a9cfdbd84fc9330fca2604094ed6d7019918832f535c24727d87"
+    },
+    {
+      "sourceTable": "engine_origin_records_v2",
+      "sourceCreateSqlHash": "4ffe37ff91d30ceec1fd006897fe61169dd7851ead4e64667efe26385618318b"
+    },
+    {
+      "sourceTable": "engine_scheduler_events_v2",
+      "sourceCreateSqlHash": "c6c6578fb3df8ab5e8e155e3ab17fe043e71eb381b8f88626c1d91d9ff4941c1"
+    },
+    {
+      "sourceTable": "forecast_ledger_activations_v1",
+      "sourceCreateSqlHash": "fa531bad7e1fb094d049b829950e0172ef2f09366dc7ce14a21a7be18ea1d986"
+    },
+    {
+      "sourceTable": "forecast_ledger_attempts_v1",
+      "sourceCreateSqlHash": "a03b6e20a85ff09aa2ebecf3ba8dcf846ca9840ee59d59e188260641ac0b788b"
+    },
+    {
+      "sourceTable": "forecast_ledger_events_v1",
+      "sourceCreateSqlHash": "7a285edd842a7c88c7d82a3911eb7ea6511a383c196788b90e4e3011738a5751"
+    },
+    {
+      "sourceTable": "forecast_ledger_jobs_v1",
+      "sourceCreateSqlHash": "75132c71477bc8f5b29704e298003ea81215ef6def88093c9e14d41fd635a633"
+    },
+    {
+      "sourceTable": "forecast_ledger_records_v1",
+      "sourceCreateSqlHash": "a34c24b0dcd7009b91669ec46c2fbc8db4f851f03b64608826970a8597ddb0c9"
+    },
+    {
+      "sourceTable": "forecast_origin_records",
+      "sourceCreateSqlHash": "ce348975ad092c0b89b7a91343a7fd9392b3226c6b39d855c9f853be0f3e122a"
+    },
+    {
+      "sourceTable": "forecast_origin_versions",
+      "sourceCreateSqlHash": "61e2363f9e0357e62b34ec7f32b1286cf34f0b8191cc15d5e21312ccd99c66ff"
+    },
+    {
+      "sourceTable": "forecast_origins",
+      "sourceCreateSqlHash": "42956a59d6ad0ddec3b9f32374f7aea9de5e713e104e83263bb803d77b648643"
+    },
+    {
+      "sourceTable": "game_kickoff_revisions",
+      "sourceCreateSqlHash": "1a787cff6dd8b1a31819c97f784a716bca1659cbbe8a7d8e0c568c010ce8787a"
+    },
+    {
+      "sourceTable": "game_provider_aliases",
+      "sourceCreateSqlHash": "4b67bb5532af1e04bb56debb431d6537e1818ba3ad1420ea99ae524e4aac1b31"
+    },
+    {
+      "sourceTable": "game_schedule_revisions",
+      "sourceCreateSqlHash": "7a6d78e9ce3d4730de3f4b97ec8bf188a06b6012e7198268bb803a6c4b3b565a"
+    },
+    {
+      "sourceTable": "odds_quota_control",
+      "sourceCreateSqlHash": "3f7a5851a067535616c146e66a45261964b839bd02d55f4a299037e29d92a8b3"
+    },
+    {
+      "sourceTable": "odds_quota_events",
+      "sourceCreateSqlHash": "758f4d30dc5042fbc48899e54542457e7ab781160eb8b4d2a0734071a236d828"
+    },
+    {
+      "sourceTable": "odds_quota_reservation_events",
+      "sourceCreateSqlHash": "0e5bf12fdbd2dc5e422df86336a0fc717a012b82af885f3d16729be6900a47fd"
+    },
+    {
+      "sourceTable": "odds_quota_reservations",
+      "sourceCreateSqlHash": "6cd60706b5d5dcf0a69b6785a1f857b59356fbd4c9823e1a7f3c7a1f303e2231"
+    },
+    {
+      "sourceTable": "source_capture_events",
+      "sourceCreateSqlHash": "1b6399381f4733c6c2e415d30a7b64228833c34ed54193984a0d120e6f9d06a6"
+    },
+    {
+      "sourceTable": "source_capture_heartbeats",
+      "sourceCreateSqlHash": "e4a7df51d3d81ced9731575a4bd3314c70b96e96cf60a297e7de5594439f1e79"
+    },
+    {
+      "sourceTable": "source_capture_manifest_extensions",
+      "sourceCreateSqlHash": "397007b1b55a215ca5ff6c554ec9918917b2c5156c118a223baf280bfac3fd02"
+    }
+  ],
+  "candidateCount": 28,
+  "candidateRoot": "09e6a26e0c2f3d6029e34a2fb42a8b3b550e45eab7d8e8da1aaefb69af62a09e",
+  "normalizedForeignKeyRoot": "bad8738dceb23141a6781540308bbd7d287ce8d7f5119913b7f3986e7e724622",
+  "foreignKeyConstraintCount": 51,
+  "foreignKeyColumnRowCount": 54,
+  "generation11": {
+    "status": "eligible_for_preregistered_single_batch_candidate",
+    "maximumCandidateTables": 40,
+    "candidateCount": 28,
+    "plannedD1StatementCount": 30,
+    "catalogStatements": 2,
+    "directForeignKeyListStatements": 28,
+    "statementArrayRoot": "69b92c28b8ef4f318cfd3d1eff15276197df695c08caa6e3e0dd61eb1c86d250",
+    "statementPlanRoot": "ea060788210674b616e441f790aa148e4596d9bfb485bc410aeace405f854183"
+  },
+  "boundaries": {
+    "exactDdlReplayAccepted": true,
+    "foreignKeyCandidateFreezeAccepted": true,
+    "hostedForeignKeyEvidenceAccepted": false,
+    "rowCountEvidenceAccepted": false,
+    "rowContentPreservationAccepted": false,
+    "productionSemanticParityAccepted": false,
+    "os01Accepted": false,
+    "cleanupAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthorized": false,
+    "providerSecretRead": false,
+    "providerPathInvoked": false,
+    "quotaPathInvoked": false,
+    "captureActivated": false
+  },
+  "recordedAt": "2026-08-29T13:32:55.239Z",
+  "receiptHash": "50021d5310782e4d9f0cbece4882bfa950fe189e2e123255e50ae388221bc3e4"
+}

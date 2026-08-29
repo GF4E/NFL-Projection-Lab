@@ -15,6 +15,7 @@ Status notation:
 - [x] **ARC-01 — Preserve the evidence base.** Freeze the Module 1 and Module 2 protocols, code, manifests, inputs, negative results, and hashes without relabeling a rejected model as a candidate.
 - [x] **ARC-02 — One operational authority.** D1 and R2 are the only production state stores; the Supabase job path is retired or isolated so it cannot execute.
 - [ ] **ARC-03 — Migration-only schema.** Every persistent D1 object is created and changed by ordered migrations; production stores cannot create tables at runtime.
+  - OS-01 Generation 10 contribution: the owner-only hosted catalog and pinned two-pass offline replay preserved 247 replayable DDL objects, reconstructed the same 376-row SQLite catalog with 128 derived autoindexes, validated 51 foreign-key constraints and 73 trigger probes, and froze 28 direct hosted foreign-key queries for the next bounded gate. ARC-03 remains open pending hosted foreign-key and row-count evidence, complete migration-only reconstruction, drift proof, runtime-DDL removal, rollback, and production acceptance.
 - [x] **ARC-04 — Explicit execution planes.** Source ingestion, research, model packaging, forecast publication, evaluation, and serving have written interfaces and one owner each; expensive fitting is outside the public Worker.
 - [x] **ARC-05 — Read paths are inert.** A public read cannot trigger ingestion, fitting, archival, provider requests, writes, or quota spend.
 

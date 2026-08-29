@@ -36,7 +36,7 @@ Phase numbers describe capability layers, not a forced serial queue. Secret-reda
 
 | Phase | Status | Primary task set | Exit decision |
 |---|---|---|---|
-| 1 | In progress: OS-00 accepted; ARC-03 and OS-18A remain open; OS-01 is the next provider-free platform package | OS-00, OS-00B, OS-01A/OS-01, OS-18A, R0, R18A | One authoritative, preserved, numerically governed engine kernel |
+| 1 | In progress: OS-00 accepted; OS-01 Generation 10 hosted DDL and offline replay are bounded accepted; ARC-03 and OS-18A remain open | OS-00, OS-00B, OS-01A/OS-01, OS-18A, R0, R18A | One authoritative, preserved, numerically governed engine kernel |
 | 2 | OS-02A and OS-19A accepted; bounded provider-independent OS-03A storage qualified; live capture and full canonicalization still queued | OS-02A, OS-03A, OS-19A, OS-02–OS-08, R1 | Replayable point-in-time evidence and verified targets |
 | 3 | Queued | OS-09–OS-12 | Deterministic experiment and portable model packages |
 | 4 | OS-15A accepted; the clean OS-13A successor accepts only the dormant append-only ledger mechanism; production activation, OS-13B, complete coverage, and grading remain queued | OS-15A, OS-13A, OS-13B, OS-14 | Independent prospective ledgers and all-game grading |
@@ -60,7 +60,7 @@ Phase numbers describe capability layers, not a forced serial queue. Secret-reda
 1. Preserve accepted OS-00 evidence: every frozen object is content-addressed in private R2, D1/R2 are the production authority, Supabase is quarantined, and public reads are inert. The permanent recovery workflow remains OS-16 work and does not reopen OS-00.
 2. Execute OS-00B and R0 to freeze numerical operating targets, the research constitution, multiplicity policy, candidate statuses, exposed seasons, forecast origins, losses, and prospective confirmation rule; then execute R18A before the first activated shadow forecast.
 3. Execute OS-18A to revoke the exposed Odds API key, rotate the deployed secret, and scan repository history, artifacts, logs, and client bundles.
-4. Execute urgent OS-01A first, then complete OS-01 to migrate all persistent tables into one ordered migration history and forbid runtime production DDL.
+4. Preserve accepted urgent OS-01A and bounded OS-01 Generation 10 hosted-DDL/offline-replay evidence. Continue OS-01 with the frozen 28-table hosted foreign-key census, then row-count shards and the remaining schema-authority gates before migrating all persistent tables into one ordered history and forbidding runtime production DDL.
 
 **Observable success criteria:**
 

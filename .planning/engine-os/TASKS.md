@@ -15,7 +15,7 @@ This is the execution register. A work package is complete only when its accepta
 
 1. Preserve accepted **OS-00**, frozen **OS-00B**, terminal R1-v1, frozen **R0**, and deployed **OS-01A** evidence.
 2. Preserve the accepted bounded provider-independent **OS-03A** storage mechanism and the accepted bounded **OS-13A** append-only ledger mechanism. Neither starts a production or prospective stream.
-3. Execute **OS-01** next under the provider-free boundary, then continue the platform dependency spine through full OS-02/OS-03 where no provider authentication is required.
+3. Continue **OS-01** under the provider-free boundary from the bounded accepted Generation 10 hosted-DDL/offline-replay milestone: execute the frozen 28-table hosted foreign-key census next, then row-count shards and the remaining schema-authority gates. Continue through full OS-02/OS-03 only after OS-01 accepts.
 4. Finish **OS-18A** credential rotation, provider authentication, and final scans only in a separately authorized secret-handling run; complete R1-v2's independent human review on its separate research lane.
 5. **OS-19A**, **OS-02A**, bounded provider-free **OS-15A**, bounded provider-independent **OS-03A**, and bounded mechanism-only **OS-13A** are accepted. The remaining OS-18A and live-connector gates still block authenticated capture and production activation.
 6. **R2** may execute only the Module 2B residual-kernel falsification and only after R1-v2 passes, followed by **R3**.
@@ -113,7 +113,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 ### OS-01 — Establish migration-only schema authority
 
-**Status:** EPIC; OS-01A is urgent
+**Status:** EPIC; OS-01A is deployed and bounded Generation 10 hosted-DDL/offline-replay evidence is accepted; full OS-01 remains pending
 
 **Requirements:** ARC-03
 
@@ -124,6 +124,8 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 **Deliverables:** Complete migrations, schema-version check, schema-drift test, forward migration rehearsal, rollback/restore procedure, and removal of runtime production `CREATE TABLE` statements.
 
 **Acceptance gate:** A blank D1 reaches the full schema through migrations; its schema matches the declared schema; CI catches drift; `rg "CREATE TABLE"` finds no production runtime DDL outside migrations or test fixtures.
+
+**Generation 10 bounded evidence:** The owner-only hosted census captured 247 replayable DDL objects from 94 user tables. Commit `ee179832f2093037f8db6c3ff384305494f6dd77` then replayed the exact DDL twice in pinned Node SQLite, reproduced a 376-row catalog and 128 derived autoindexes, validated 51 foreign-key constraints and 73 trigger probes, and froze exactly 28 tables for Generation 11. Receipt: `.planning/engine-os/execution/os-01/staging-ddl-offline-replay-generation10-acceptance-receipt.v1.json`. This authorizes no cleanup, migration, production change, or full OS-01 acceptance.
 
 #### OS-01A — Migrate the urgent capture and origin ledger
 
@@ -873,7 +875,7 @@ Prospective evidence is non-transferable. Every package-specific R14, R15, and R
 
 ### R18A — Freeze the preseason football lifecycle
 
-**Status:** NEXT after R0 and OS-00B
+**Status:** ACCEPTED — 2026 lifecycle frozen; no package or forecast stream activated
 
 **Requirements:** CONF-05
 

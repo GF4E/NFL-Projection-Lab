@@ -1,0 +1,87 @@
+{
+  "version": "engine-os.os01-staging-ddl-offline-replay-generation10-acceptance-receipt.v1",
+  "status": "accepted_bounded_generation10_offline_ddl_replay_and_fk_candidate_freeze",
+  "source": {
+    "implementationCommit": "ee179832f2093037f8db6c3ff384305494f6dd77",
+    "implementationTree": "697fe233a9a120869055bbb7286e6aa3c1891cdb",
+    "formalReceiptPath": ".planning/engine-os/execution/os-01/staging-ddl-offline-replay-generation10-formal-receipt.v1.json",
+    "formalReceiptBytesSha256": "338502edae051d087b324135682f0558a3efb704d0cab4f95b27dff32f1cab76",
+    "formalReceiptHash": "50021d5310782e4d9f0cbece4882bfa950fe189e2e123255e50ae388221bc3e4",
+    "runnerSourceRoot": "bffd91932f464072d75e31fbb6875a2c6ad317ed4c283c04b0c6cf7e67490fae",
+    "testSourceRoot": "49887592890713fdbc71a171e4c6181765bee921d6e5a52c36e9c2cac3d68c89"
+  },
+  "freshProcessReproduction": {
+    "processCount": 2,
+    "stableBodySha256": "f6c921fe16a2360a9a8edf03a0e4c786f369193fbd88acfe53b0bac21d0d088e",
+    "stableBodiesEqual": true,
+    "formalProcessReceiptHash": "50021d5310782e4d9f0cbece4882bfa950fe189e2e123255e50ae388221bc3e4",
+    "independentProcessReceiptHash": "273774708040729e5f19d8317663882f5f5906a46b1f81121c078472e8454901",
+    "recordedAtAndReceiptHashExcludedFromStableBody": true
+  },
+  "replay": {
+    "candidateTableCount": 28,
+    "candidateRoot": "09e6a26e0c2f3d6029e34a2fb42a8b3b550e45eab7d8e8da1aaefb69af62a09e",
+    "foreignKeyConstraintCount": 51,
+    "foreignKeyColumnRowCount": 54,
+    "normalizedForeignKeyRoot": "bad8738dceb23141a6781540308bbd7d287ce8d7f5119913b7f3986e7e724622",
+    "replayCatalogRows": 376,
+    "replayCatalogHash": "1d1c7f401292c88b3ff814cb9e283788cd100a8f78713236430b10f2195ca847",
+    "replayOrderRoot": "a0cd79fa613e4af6e1ccd706d94a0cd861526e223a28562a04707cf51422e925",
+    "derivedAutoIndexCount": 128,
+    "derivedAutoIndexRoot": "3f9de132a92b64f8588135b3b4265f7926e31a3e0f5732e788cebd4dfba0d4fc",
+    "foreignKeyStructureRoot": "09b272f6546ee78eb52b8bcb0988144003a2856861a17ac1c7a297262593168c",
+    "triggerProbeCount": 73,
+    "triggerValidationRoot": "0876fbc11e0e9dfeabbfb0306f7e6da764a483ea34ee3633a3022868fb37a66b",
+    "passRoot": "d6b5a667b202d64e19c93f663c83748e80883cc6a3984bd75e94843642fd50b0",
+    "crossPassEqual": true,
+    "integrityCheck": "ok",
+    "foreignKeyCheckViolationCount": 0
+  },
+  "generation11Freeze": {
+    "candidateCount": 28,
+    "maximumCandidateTables": 40,
+    "plannedD1StatementCount": 30,
+    "statementArrayRoot": "69b92c28b8ef4f318cfd3d1eff15276197df695c08caa6e3e0dd61eb1c86d250",
+    "statementPlanRoot": "ea060788210674b616e441f790aa148e4596d9bfb485bc410aeace405f854183",
+    "hostedDispatchAuthorizedByThisReceipt": false
+  },
+  "verification": {
+    "formalReceiptSelfHashVerified": true,
+    "independentProcessReceiptSelfHashVerified": true,
+    "sourceRootsRecomputedFromImplementationCommit": true,
+    "freshProcessStableBodiesMatch": true,
+    "focusedTestsPassed": 10,
+    "focusedTestsFailed": 0,
+    "typecheckPassed": true,
+    "scopedLintPassed": true,
+    "trackedSourceAndBuildCredentialFindings": 0,
+    "historyCredentialFindings": 1,
+    "historyFindingMetadata": {
+      "scope": "git_history",
+      "path": "tests/source-capture-contract.test.ts",
+      "line": 104,
+      "rule": "query_string_credential",
+      "blob": "a9b792dff54534a2b3998d51cbda5e8af7353fd6"
+    },
+    "historyCleanClaim": false,
+    "ignoredSecretStorageRead": false
+  },
+  "boundaries": {
+    "exactOfflineDdlReplayAccepted": true,
+    "foreignKeyCandidateFreezeAccepted": true,
+    "hostedForeignKeyEvidenceAccepted": false,
+    "rowCountEvidenceAccepted": false,
+    "rowContentPreservationAccepted": false,
+    "productionSemanticParityAccepted": false,
+    "os01Accepted": false,
+    "cleanupAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthorized": false,
+    "providerSecretRead": false,
+    "providerPathInvoked": false,
+    "quotaPathInvoked": false,
+    "captureActivated": false
+  },
+  "recordedAt": "2026-08-29T13:37:18Z",
+  "receiptHash": "126cc74880f4773844de8d4d185b2f7bf16f6dda2fddb6dc841c7c55810941b1"
+}
