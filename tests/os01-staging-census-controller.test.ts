@@ -169,6 +169,30 @@ function closedFailureResponse(
   });
 }
 
+function countDiagnosticResponse(input: {
+  status?: "closed_user_table_count_match" | "closed_user_table_count_mismatch";
+  expected?: number;
+  raw?: number;
+  excluded?: number;
+  observed?: number;
+} = {}): Response {
+  const body = {
+    version: "engine-os.os01-staging-census-table-count-diagnostic.v1",
+    status: input.status ?? "closed_user_table_count_mismatch",
+    censusId: STAGING_CENSUS_ID,
+    expectedUserTableCount: input.expected ?? 50,
+    rawTableRowCount: input.raw ?? 51,
+    excludedInternalTableRowCount: input.excluded ?? 0,
+    observedUserTableCount: input.observed ?? 51,
+    databaseMutationAttempted: false,
+    claimBoundary: "terminal_read_only_count_diagnostic_not_census_receipt"
+  } as const;
+  return new Response(JSON.stringify({ ...body, receiptHash: sha256(canonicalJson(body)) }), {
+    status: 500,
+    headers: { "Content-Type": "application/json" }
+  });
+}
+
 function successReceiptContaining(value: string): Record<string, unknown> {
   const receipt = validReceipt(defaultValidation);
   const tables = receipt.tables as Array<Record<string, unknown>>;
@@ -330,7 +354,7 @@ describe("OS-01 staging census controller", () => {
       }
     });
     expect(receivedToken).toBe("exact-token");
-    expect(valid).toEqual({ stdout: "pending_control_plane_postcheck\n", exitCode: 0 });
+    expect(valid).toEqual({ stdout: "terminal_invalid_response\n", exitCode: 1 });
   });
 
   it("rejects blank hosted deployment identities on the full controller path before transport", async () => {
@@ -362,7 +386,7 @@ describe("OS-01 staging census controller", () => {
     }
   });
 
-  it("reserves intent, response, and result before one exact transport call and remains pending", async () => {
+  it("rejects a legacy full-census response after one exact transport call", async () => {
     const { root, artifacts } = prepareRoot();
     const token = "ephemeral-sites-token-for-test";
     let calls = 0;
@@ -384,7 +408,7 @@ describe("OS-01 staging census controller", () => {
       }
     });
     expect(calls).toBe(1);
-    expect(result.status).toBe("pending_control_plane_postcheck");
+    expect(result.status).toBe("terminal_invalid_response");
     expect(result.qualificationEligible).toBe(false);
     expect(result.requestBodySha256).toBe(STAGING_CENSUS_EXACT_BODY_SHA256);
     for (const path of [artifacts.intent, artifacts.response, artifacts.attemptResult]) {
@@ -397,16 +421,13 @@ describe("OS-01 staging census controller", () => {
       retryAllowedAfterReservation: false,
       credentialKind: "ephemeral_sites_siwc_not_persisted"
     });
-    expect(statSync(artifacts.dispatchCompletion).size).toBeGreaterThan(0);
+    expect(statSync(artifacts.response).size).toBe(0);
+    expect(statSync(artifacts.dispatchCompletion).size).toBe(0);
     writeJson(artifacts.postObservation, observation("post"));
-    expect(os01StagingCensusControllerTestOnly.finalize(
+    expect(() => os01StagingCensusControllerTestOnly.finalize(
       root,
       () => new Date("2026-08-29T08:02:00.000Z")
-    )).toMatchObject({
-      status: "test_only_postcheck_verified",
-      identitiesMatch: true,
-      workerReadOnlyReceiptVerified: true
-    });
+    )).toThrow("staging census finalization evidence is invalid");
   });
 
   it("allows only one concurrent dispatch for one authority root", async () => {
@@ -626,20 +647,22 @@ describe("OS-01 staging census controller", () => {
     }
   });
 
-  it("persists only a self-hashed closed worker failure and consumes the authority", async () => {
+  it("persists only a self-hashed count diagnostic and consumes the authority", async () => {
     const { root, artifacts } = prepareRoot();
     const result = await os01StagingCensusControllerTestOnly.run({
       root,
       authorizationToken: "diagnostic-token",
       now: () => new Date("2026-08-29T08:00:01.000Z"),
       responseValidation: defaultValidation,
-      transport: async () => closedFailureResponse("user_table_create_sql_missing")
+      transport: async () => countDiagnosticResponse({ raw: 52, excluded: 1, observed: 51 })
     });
     expect(result.status).toBe("terminal_worker_failure");
     expect(result.retryAllowed).toBe(false);
     expect(JSON.parse(readFileSync(artifacts.response, "utf8"))).toMatchObject({
-      status: "read_only_census_failed",
-      failureCategory: "user_table_create_sql_missing",
+      status: "closed_user_table_count_mismatch",
+      rawTableRowCount: 52,
+      excludedInternalTableRowCount: 1,
+      observedUserTableCount: 51,
       databaseMutationAttempted: false
     });
     expect(statSync(artifacts.dispatchCompletion).size).toBe(0);
@@ -661,7 +684,30 @@ describe("OS-01 staging census controller", () => {
     )).toThrow();
   });
 
-  it("does not persist a closed worker failure outside generation 5 diagnostic scope", async () => {
+  it("accepts the exact zero and maximum raw-table boundaries", async () => {
+    for (const diagnostic of [
+      { raw: 0, excluded: 0, observed: 0 },
+      { raw: 1_000, excluded: 949, observed: 51 }
+    ]) {
+      const { root, artifacts } = prepareRoot();
+      const result = await os01StagingCensusControllerTestOnly.run({
+        root,
+        authorizationToken: "diagnostic-token",
+        now: () => new Date("2026-08-29T08:00:01.000Z"),
+        responseValidation: defaultValidation,
+        transport: async () => countDiagnosticResponse(diagnostic)
+      });
+      expect(result.status).toBe("terminal_worker_failure");
+      expect(JSON.parse(readFileSync(artifacts.response, "utf8"))).toMatchObject({
+        rawTableRowCount: diagnostic.raw,
+        excludedInternalTableRowCount: diagnostic.excluded,
+        observedUserTableCount: diagnostic.observed
+      });
+      expect(statSync(artifacts.dispatchCompletion).size).toBe(0);
+    }
+  });
+
+  it("does not persist a closed worker failure outside generation 6 count-only scope", async () => {
     const { root, artifacts } = prepareRoot();
     const result = await os01StagingCensusControllerTestOnly.run({
       root,
@@ -676,11 +722,58 @@ describe("OS-01 staging census controller", () => {
   });
 
   it("leaves altered, extended, and noncanonical worker failure bodies unpersisted", async () => {
-    const validFailure = await closedFailureResponse("user_table_count_mismatch").json() as
+    const validFailure = await countDiagnosticResponse().json() as
       Record<string, unknown>;
+    const rehashed = (mutate: (value: Record<string, unknown>) => void) => {
+      const value = { ...validFailure };
+      delete value.receiptHash;
+      mutate(value);
+      return { ...value, receiptHash: sha256(canonicalJson(value)) };
+    };
     const bodies = [
       { ...validFailure, extra: true },
       { ...validFailure, receiptHash: "0".repeat(64) },
+      rehashed((value) => {
+        value.rawTableRowCount = 1_001;
+        value.excludedInternalTableRowCount = 950;
+        value.observedUserTableCount = 51;
+      }),
+      rehashed((value) => {
+        value.rawTableRowCount = -1;
+        value.excludedInternalTableRowCount = 0;
+        value.observedUserTableCount = -1;
+      }),
+      rehashed((value) => {
+        value.rawTableRowCount = 1;
+        value.excludedInternalTableRowCount = 2;
+        value.observedUserTableCount = 0;
+      }),
+      rehashed((value) => {
+        value.rawTableRowCount = 1;
+        value.excludedInternalTableRowCount = 0;
+        value.observedUserTableCount = 2;
+      }),
+      rehashed((value) => {
+        value.rawTableRowCount = 51;
+        value.excludedInternalTableRowCount = 1;
+        value.observedUserTableCount = 49;
+      }),
+      rehashed((value) => {
+        value.rawTableRowCount = 50;
+        value.excludedInternalTableRowCount = 0;
+        value.observedUserTableCount = 50;
+      }),
+      rehashed((value) => {
+        value.status = "closed_user_table_count_match";
+      }),
+      rehashed((value) => {
+        value.expectedUserTableCount = 49;
+      }),
+      rehashed((value) => {
+        value.rawTableRowCount = 51;
+        value.excludedInternalTableRowCount = 1;
+        value.observedUserTableCount = 51;
+      }),
       JSON.stringify(validFailure) + "\n"
     ];
     for (const body of bodies) {
@@ -733,13 +826,10 @@ describe("OS-01 staging census controller", () => {
       intent.attemptId = "11111111-1111-4111-8111-111111111111";
     });
     writeJson(artifacts.postObservation, observation("post"));
-    expect(os01StagingCensusControllerTestOnly.finalize(
+    expect(() => os01StagingCensusControllerTestOnly.finalize(
       root,
       () => new Date("2026-08-29T08:02:00.000Z")
-    )).toMatchObject({
-      status: "test_only_postcheck_rejected",
-      crossRecordBindingsVerified: false
-    });
+    )).toThrow("staging census finalization evidence is invalid");
   });
 
   it("rejects a self-hashed authority replacement after dispatch", async () => {
@@ -755,14 +845,10 @@ describe("OS-01 staging census controller", () => {
       authority.initializedAt = "2026-08-29T07:59:58.000Z";
     });
     writeJson(artifacts.postObservation, observation("post"));
-    expect(os01StagingCensusControllerTestOnly.finalize(
+    expect(() => os01StagingCensusControllerTestOnly.finalize(
       root,
       () => new Date("2026-08-29T08:02:00.000Z")
-    )).toMatchObject({
-      status: "test_only_postcheck_rejected",
-      authorityVerified: false,
-      crossRecordBindingsVerified: false
-    });
+    )).toThrow("staging census finalization evidence is invalid");
   });
 
   it("rejects reversed control-plane observation time", async () => {
@@ -778,13 +864,10 @@ describe("OS-01 staging census controller", () => {
       ...observationInput("post"),
       recordedAt: "2026-08-29T07:59:58.000Z"
     }));
-    expect(os01StagingCensusControllerTestOnly.finalize(
+    expect(() => os01StagingCensusControllerTestOnly.finalize(
       root,
       () => new Date("2026-08-29T08:02:00.000Z")
-    )).toMatchObject({
-      status: "test_only_postcheck_rejected",
-      temporalOrderValid: false
-    });
+    )).toThrow("staging census finalization evidence is invalid");
   });
 
   it("rejects an exact-schema violation even when its self-hash is recomputed", async () => {
@@ -806,7 +889,7 @@ describe("OS-01 staging census controller", () => {
     )).toThrow("staging census finalization evidence is invalid");
   });
 
-  it("passes an actual worker response through controller validation and postcheck finalization", async () => {
+  it("persists an actual worker count diagnostic but never finalizes it as a census", async () => {
     const { root, artifacts } = prepareRoot();
     const tables = Array.from({ length: 50 }, (_, index) => {
       const name = "table_" + String(index).padStart(2, "0");
@@ -851,20 +934,23 @@ describe("OS-01 staging census controller", () => {
         expectedUserTableCount: 50
       })
     });
-    expect(result.status).toBe("pending_control_plane_postcheck");
+    expect(result.status).toBe("terminal_worker_failure");
     expect(result.responseBytesSha256).toBe(sha256(readFileSync(artifacts.response)));
+    const diagnostic = JSON.parse(readFileSync(artifacts.response, "utf8")) as Record<string, unknown>;
+    expect(diagnostic).toMatchObject({
+      status: "closed_user_table_count_match",
+      rawTableRowCount: 51,
+      excludedInternalTableRowCount: 1,
+      observedUserTableCount: 50
+    });
+    expect(diagnostic).not.toHaveProperty("tables");
+    expect(diagnostic).not.toHaveProperty("viewNames");
+    expect(statSync(artifacts.dispatchCompletion).size).toBe(0);
     writeJson(artifacts.postObservation, observation("post"));
-    const finalReceipt = os01StagingCensusControllerTestOnly.finalize(
+    expect(() => os01StagingCensusControllerTestOnly.finalize(
       root,
       () => new Date("2026-08-29T08:02:00.000Z"),
       validation
-    );
-    expect(finalReceipt).toMatchObject({
-      status: "test_only_postcheck_verified",
-      identitiesMatch: true,
-      temporalOrderValid: true,
-      crossRecordBindingsVerified: true,
-      workerReadOnlyReceiptVerified: true
-    });
+    )).toThrow("staging census finalization evidence is invalid");
   });
 });

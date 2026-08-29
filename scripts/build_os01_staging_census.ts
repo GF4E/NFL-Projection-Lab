@@ -8,12 +8,14 @@ import { build } from "vite";
 
 import {
   STAGING_CENSUS_ARTIFACT_NAMES,
+  STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS,
+  STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES,
+  STAGING_CENSUS_COUNT_DIAGNOSTIC_VERSION,
   STAGING_CENSUS_CONTROLLER_ID,
   STAGING_CENSUS_CONTROLLER_ROOT,
   STAGING_CENSUS_EXACT_BODY_SHA256,
   STAGING_CENSUS_FAILURE_CATEGORIES,
   STAGING_CENSUS_ID,
-  STAGING_CENSUS_PERSISTABLE_DIAGNOSTIC_CATEGORIES,
   STAGING_CENSUS_REQUEST_VERSION,
   STAGING_CENSUS_SEMANTIC_CONTRACT
 } from "../qualification/os01-staging-census/contract";
@@ -74,11 +76,11 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
     STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
     STAGING_CENSUS_ID,
     STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
-    "controller_enforced_single_invocation_not_runtime_durable",
-    STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
-    "isolated_staging_read_only_census_only",
     "engine-os.os01-staging-census-failure.v1",
-    "terminal_read_only_diagnostic_not_census_receipt"
+    STAGING_CENSUS_COUNT_DIAGNOSTIC_VERSION,
+    "closed_user_table_count_match",
+    "closed_user_table_count_mismatch",
+    "terminal_read_only_count_diagnostic_not_census_receipt"
   ]) if (!text.includes(required)) throw new Error(`census package omits ${required}`);
 
   const metadata = join(outDir, ".openai");
@@ -122,23 +124,37 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
       fixedArtifactNames: STAGING_CENSUS_ARTIFACT_NAMES,
       receiptMustBindOwnerOnlyNoWriterBoundaryBeforeAndAfter: true,
       secondInvocationProhibitedByOperatorContract: true,
-      validWorkerResponseStatus: "pending_control_plane_postcheck",
-      finalAcceptanceStatus: "accepted_read_only_census_after_control_plane_postcheck",
+      onlyPersistableWorkerResponseStatuses: STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES,
+      finalAcceptanceStatus: null,
+      dispatchCompletionWritten: false,
+      finalizationAllowed: false,
       maximumResponseBytes: 2097152,
       reflectedCredentialPersistenceAllowed: false
     },
-    consistencyClaim: STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim,
-    viewEvidence: STAGING_CENSUS_SEMANTIC_CONTRACT.viewEvidence,
+    consistencyClaim: "single_validated_catalog_read_only_no_census_snapshot_claim",
+    viewEvidence: "none_count_only",
     failureContract: {
       version: "engine-os.os01-staging-census-failure.v1",
       status: "read_only_census_failed",
       workerCategories: STAGING_CENSUS_FAILURE_CATEGORIES,
-      controllerPersistableCategories: STAGING_CENSUS_PERSISTABLE_DIAGNOSTIC_CATEGORIES,
+      controllerPersistableCategories: [],
       exactAggregateOnlySchema: true,
       selfHashed: true,
       schemaNamesOrSqlAllowed: false,
       persistenceRequiresControllerValidation: true,
       terminalAndNonFinalizable: true
+    },
+    countDiagnosticContract: {
+      version: STAGING_CENSUS_COUNT_DIAGNOSTIC_VERSION,
+      statuses: STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES,
+      expectedUserTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount,
+      maximumRawTableRows: STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS,
+      aggregateCountsOnly: true,
+      identifiersOrSqlAllowed: false,
+      selfHashed: true,
+      persistenceRequiresControllerValidation: true,
+      terminalAndNonFinalizable: true,
+      fullCensusResponseAccepted: false
     },
     databaseMutationAllowed: false,
     productionAllowed: false,

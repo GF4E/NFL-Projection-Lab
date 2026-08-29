@@ -98,3 +98,13 @@ count, raw table-row count, excluded-internal table-row count, and post-filter t
 not return any identifier, SQL, hash, row count, foreign key, provider detail, or exception text.
 The generation-5 authority is terminal and may not be retried, and the aggregate result may not by
 itself change the expected census count.
+
+For generation 6, this count-only boundary supersedes the earlier full-census response path. The
+worker always terminates after the first validated catalog read, including when the observed count
+equals the expected count. Its exact self-hashed response distinguishes only
+`closed_user_table_count_match` from `closed_user_table_count_mismatch`, is returned with HTTP 500,
+and is terminal and non-finalizable. The controller persists only this exact aggregate response;
+every HTTP-200 full-census response is rejected and left unpersisted. The raw table-row count is
+bounded by the versioned maximum of 1,000, inclusive. Counts below zero, above that maximum, or
+violating `raw = excluded + observed` are invalid. No generation-6 path writes a dispatch-completion
+or can create a census acceptance receipt.

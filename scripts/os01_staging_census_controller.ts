@@ -21,16 +21,16 @@ import {
   canonicalJson,
   codePointCompare,
   STAGING_CENSUS_ARTIFACT_NAMES,
+  STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS,
+  STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES,
+  STAGING_CENSUS_COUNT_DIAGNOSTIC_VERSION,
   STAGING_CENSUS_CONTROLLER_ID,
   STAGING_CENSUS_CONTROLLER_ROOT,
   STAGING_CENSUS_EXACT_BODY,
   STAGING_CENSUS_EXACT_BODY_SHA256,
-  STAGING_CENSUS_FAILURE_CATEGORIES,
   STAGING_CENSUS_ID,
-  STAGING_CENSUS_PERSISTABLE_DIAGNOSTIC_CATEGORIES,
   STAGING_CENSUS_SEMANTIC_CONTRACT
 } from "../qualification/os01-staging-census/contract";
-import type { StagingCensusFailureCategory } from "../qualification/os01-staging-census/contract";
 
 const RESPONSE_LIMIT_BYTES = 2 * 1024 * 1024;
 const QUALIFICATION_WINDOW_MILLISECONDS = 30 * 60 * 1000;
@@ -718,35 +718,46 @@ function validateResponse(bytes: Uint8Array, expected: ResponseValidationIdentit
     }))));
 }
 
-function validateFailureResponse(bytes: Uint8Array): StagingCensusFailureCategory | null {
+function validateCountDiagnosticResponse(bytes: Uint8Array): boolean {
   let parsed: unknown;
   const text = new TextDecoder().decode(bytes);
   try {
     parsed = JSON.parse(text);
   } catch {
-    return null;
+    return false;
   }
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return null;
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return false;
   const receipt = parsed as Record<string, unknown>;
   if (!hasExactKeys(receipt, [
-    "censusId", "claimBoundary", "databaseMutationAttempted", "failureCategory",
-    "receiptHash", "status", "version"
+    "censusId", "claimBoundary", "databaseMutationAttempted", "excludedInternalTableRowCount",
+    "expectedUserTableCount", "observedUserTableCount", "rawTableRowCount", "receiptHash",
+    "status", "version"
   ]) || text !== JSON.stringify(receipt) || !validHex(receipt.receiptHash) ||
-      typeof receipt.failureCategory !== "string" ||
-      !(STAGING_CENSUS_FAILURE_CATEGORIES as readonly string[]).includes(receipt.failureCategory) ||
-      !(STAGING_CENSUS_PERSISTABLE_DIAGNOSTIC_CATEGORIES as readonly string[])
-        .includes(receipt.failureCategory)) {
-    return null;
-  }
+      !Number.isSafeInteger(receipt.expectedUserTableCount) ||
+      !Number.isSafeInteger(receipt.rawTableRowCount) ||
+      !Number.isSafeInteger(receipt.excludedInternalTableRowCount) ||
+      !Number.isSafeInteger(receipt.observedUserTableCount)) return false;
   const body = { ...receipt };
   delete body.receiptHash;
   return sha256(canonicalJson(body)) === receipt.receiptHash &&
-    receipt.version === "engine-os.os01-staging-census-failure.v1" &&
-    receipt.status === "read_only_census_failed" && receipt.censusId === STAGING_CENSUS_ID &&
+    receipt.version === STAGING_CENSUS_COUNT_DIAGNOSTIC_VERSION &&
+    (STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES as readonly unknown[]).includes(receipt.status) &&
+    receipt.censusId === STAGING_CENSUS_ID &&
+    receipt.expectedUserTableCount === STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount &&
+    (receipt.rawTableRowCount as number) >= 0 &&
+    (receipt.rawTableRowCount as number) <= STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS &&
+    (receipt.excludedInternalTableRowCount as number) >= 0 &&
+    (receipt.excludedInternalTableRowCount as number) <= (receipt.rawTableRowCount as number) &&
+    (receipt.observedUserTableCount as number) >= 0 &&
+    (receipt.observedUserTableCount as number) <= (receipt.rawTableRowCount as number) &&
+    receipt.rawTableRowCount === (receipt.excludedInternalTableRowCount as number) +
+      (receipt.observedUserTableCount as number) &&
+    ((receipt.status === STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES[0] &&
+      receipt.observedUserTableCount === receipt.expectedUserTableCount) ||
+      (receipt.status === STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES[1] &&
+        receipt.observedUserTableCount !== receipt.expectedUserTableCount)) &&
     receipt.databaseMutationAttempted === false &&
-    receipt.claimBoundary === "terminal_read_only_diagnostic_not_census_receipt"
-    ? receipt.failureCategory as StagingCensusFailureCategory
-    : null;
+    receipt.claimBoundary === "terminal_read_only_count_diagnostic_not_census_receipt";
 }
 
 function credentialReflectionScan(bytes: Uint8Array, token: string): {
@@ -824,30 +835,6 @@ function resultWithHash(
   body: Omit<CensusControllerResult, "resultHash">
 ): CensusControllerResult {
   return { ...body, resultHash: sha256(canonicalJson(body)) };
-}
-
-function createDispatchCompletion(input: {
-  qualificationEligible: boolean;
-  attemptId: string;
-  intentBytesSha256: string;
-  responseBytesSha256: string;
-  resultBytesSha256: string;
-  recordedAt: string;
-}): Record<string, unknown> {
-  const body = {
-    version: "engine-os.os01-staging-census-dispatch-completion.v1",
-    status: "sealed_after_authority_verification",
-    qualificationId: STAGING_CENSUS_ID,
-    controllerAuthorityId: STAGING_CENSUS_CONTROLLER_ID,
-    qualificationEligible: input.qualificationEligible,
-    attemptId: input.attemptId,
-    intentBytesSha256: input.intentBytesSha256,
-    responseBytesSha256: input.responseBytesSha256,
-    resultBytesSha256: input.resultBytesSha256,
-    retryAllowed: false,
-    recordedAt: input.recordedAt
-  };
-  return hashedBody(body, "completionHash");
 }
 
 function validateDispatchCompletion(
@@ -1151,16 +1138,12 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
     const reflectionScan = credentialReflectionScan(bytes, input.authorizationToken);
     const reflected = reflectionScan.reflected;
     const jsonContentType = response.headers.get("content-type")?.toLowerCase() === "application/json";
-    const valid = reflectionScan.complete && !reflected && response.status === 200 && jsonContentType &&
-      validateResponse(bytes, input.responseValidation);
-    const failureCategory = reflectionScan.complete && !reflected && response.status === 500 && jsonContentType
-      ? validateFailureResponse(bytes)
-      : null;
-    const persistResponse = valid || failureCategory !== null;
+    const countDiagnosticValid = reflectionScan.complete && !reflected && response.status === 500 &&
+      jsonContentType && validateCountDiagnosticResponse(bytes);
+    const persistResponse = countDiagnosticValid;
     if (persistResponse) writeDescriptor(responseReserved.descriptor, bytes);
     const status = reflected ? "terminal_credential_reflection" :
-      valid ? "pending_control_plane_postcheck" :
-        failureCategory !== null ? "terminal_worker_failure" : "terminal_invalid_response";
+      countDiagnosticValid ? "terminal_worker_failure" : "terminal_invalid_response";
     const result = resultWithHash({
       version: "engine-os.os01-staging-census-controller-result.v2",
       status,
@@ -1201,35 +1184,6 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
       completionReserved,
       completionHash: sha256(new Uint8Array()),
       completionSize: 0
-    });
-    if (!valid) return result;
-    const completion = createDispatchCompletion({
-      qualificationEligible: input.qualificationEligible,
-      attemptId,
-      intentBytesSha256: sha256(intentBytes),
-      responseBytesSha256: responseHash,
-      resultBytesSha256: sha256(resultBytes),
-      recordedAt: input.now().toISOString()
-    });
-    const completionBytes = new TextEncoder().encode(JSON.stringify(completion, null, 2) + "\n");
-    writeDescriptor(completionReserved.descriptor, completionBytes);
-    syncDirectory(paths.root);
-    verifyRunAuthority({
-      paths,
-      rootBefore,
-      authority: authorityArtifact,
-      pre: preArtifact,
-      intentReserved,
-      intentBytes,
-      responseReserved,
-      responseHash,
-      responseSize: bytes.byteLength,
-      resultReserved,
-      resultHash: sha256(resultBytes),
-      resultSize: resultBytes.byteLength,
-      completionReserved,
-      completionHash: sha256(completionBytes),
-      completionSize: completionBytes.byteLength
     });
     return result;
   } catch (error) {

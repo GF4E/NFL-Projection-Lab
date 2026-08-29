@@ -35,12 +35,13 @@ export const STAGING_CENSUS_FAILURE_CATEGORIES = Object.freeze([
 
 export type StagingCensusFailureCategory = typeof STAGING_CENSUS_FAILURE_CATEGORIES[number];
 
-export const STAGING_CENSUS_PERSISTABLE_DIAGNOSTIC_CATEGORIES = Object.freeze([
-  "user_table_count_mismatch",
-  "user_table_identifier_shape_invalid",
-  "user_table_name_binding_invalid",
-  "user_table_create_sql_missing"
+export const STAGING_CENSUS_COUNT_DIAGNOSTIC_VERSION =
+  "engine-os.os01-staging-census-table-count-diagnostic.v1";
+export const STAGING_CENSUS_COUNT_DIAGNOSTIC_STATUSES = Object.freeze([
+  "closed_user_table_count_match",
+  "closed_user_table_count_mismatch"
 ] as const);
+export const STAGING_CENSUS_COUNT_DIAGNOSTIC_MAX_TABLE_ROWS = 1_000;
 
 export const STAGING_CENSUS_SEMANTIC_CONTRACT = Object.freeze({
   version: "engine-os.os01-staging-census-contract.v2",
@@ -71,14 +72,14 @@ export const STAGING_CENSUS_SEMANTIC_CONTRACT = Object.freeze({
 
 export const STAGING_CENSUS_ID = "471001d7f8ad783dbabc1c03c4e7a022799466a20afba70e1eaf087a4761ec29";
 export const STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT = Object.freeze({
-  version: "engine-os.os01-staging-census-controller-authority-contract.v5",
+  version: "engine-os.os01-staging-census-controller-authority-contract.v6",
   semanticQualificationId: STAGING_CENSUS_ID,
-  generation: 5,
-  predecessorReceiptHash: "6999a3b7164dbbf7ca2f60ce30d5c24af85a7e6e315b87205dfdd91dabda81c7",
-  predecessorStatus: "rejected_user_table_catalog_invariant_after_worker_read"
+  generation: 6,
+  predecessorReceiptHash: "e8764856a45995ba9f1fc22bd9abf314ff0e1d48c97e94a837bf864ee74bbd50",
+  predecessorStatus: "rejected_user_table_count_mismatch_after_worker_read"
 });
 export const STAGING_CENSUS_CONTROLLER_ID =
-  "ff1138558b4cb56f43648224344009bfd80c3e75293526f0280f80b15ab6c71a";
+  "08728af1d945ab44827a2bb0dd69641b2025f9414854baead79cf077ae511ff0";
 export const STAGING_CENSUS_REQUEST_VERSION = "engine-os.os01-staging-census-request.v2";
 export const STAGING_CENSUS_EXACT_BODY =
   `{"version":"${STAGING_CENSUS_REQUEST_VERSION}","censusId":"${STAGING_CENSUS_ID}"}`;

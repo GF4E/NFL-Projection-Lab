@@ -163,36 +163,46 @@ describe("OS-01 staging DDL census", () => {
       predecessorReceiptHash: thirdPredecessorHash,
       predecessorStatus: "rejected_invalid_site_authorization_value_before_worker"
     })).toBe(fourthPredecessor.controllerAuthorityId);
+    const fifthPredecessor = JSON.parse(readFileSync(resolve(
+      ".planning/engine-os/execution/os-01/staging-census-v2-hosted-attempt5-rejection-receipt.v1.json"
+    ), "utf8")) as Record<string, unknown>;
+    const fifthPredecessorHash = fifthPredecessor.receiptHash;
+    delete fifthPredecessor.receiptHash;
+    expect(hash(fifthPredecessor)).toBe(fifthPredecessorHash);
+    expect(hash({
+      version: "engine-os.os01-staging-census-controller-authority-contract.v5",
+      semanticQualificationId: STAGING_CENSUS_ID,
+      generation: 5,
+      predecessorReceiptHash: fourthPredecessorHash,
+      predecessorStatus: "rejected_user_table_catalog_invariant_after_worker_read"
+    })).toBe(fifthPredecessor.controllerAuthorityId);
     expect(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT.predecessorReceiptHash)
-      .toBe(fourthPredecessorHash);
+      .toBe(fifthPredecessorHash);
     expect(createHash("sha256").update(STAGING_CENSUS_EXACT_BODY).digest("hex"))
       .toBe(STAGING_CENSUS_EXACT_BODY_SHA256);
   });
 
-  it("captures only table DDL, normalized foreign keys, counts, and view names", async () => {
-    const value = fixture({
-      foreignKeys: [
-        { id: 1, seq: 0, table: "z", from: "z_id", to: "id", on_update: "NO ACTION", on_delete: "CASCADE", match: "NONE" },
-        { id: 0, seq: 0, table: "a", from: "a_id", to: "id", on_update: "NO ACTION", on_delete: "CASCADE", match: "NONE" }
-      ]
-    });
+  it("always terminates with an aggregate-only matching-count diagnostic", async () => {
+    const value = fixture();
     const response = await handleOs01StagingCensus(request(), value.db as never, options(value));
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(500);
     const body = await response.json() as Record<string, unknown>;
-    expect(body.status).toBe("read_only_schema_census_captured");
-    expect(body.userTableCount).toBe(1);
-    expect(body.userViewCount).toBe(1);
-    expect(body.viewNames).toEqual(["sample_view"]);
-    expect(JSON.stringify(body)).not.toContain("CREATE VIEW");
-    expect((body.tables as Array<{ foreignKeys: Array<{ id: number }> }>)[0]!.foreignKeys.map((row) => row.id))
-      .toEqual([0, 1]);
-    expect(body.prePostCatalogMatch).toBe(true);
-    expect(body.prePostRowCountsMatch).toBe(true);
-    expect(body.snapshotClaim).toBe(STAGING_CENSUS_SEMANTIC_CONTRACT.consistencyClaim);
-    expect(body.requestBudgetClaim).toBe("controller_enforced_single_invocation_not_runtime_durable");
-    expect(body.databaseMutationAttempted).toBe(false);
-    expect(body.providerDispatches).toBe(0);
-    expect(value.calls()).toBe(5);
+    expect(body).toMatchObject({
+      status: "closed_user_table_count_match",
+      expectedUserTableCount: 1,
+      rawTableRowCount: 2,
+      excludedInternalTableRowCount: 1,
+      observedUserTableCount: 1,
+      databaseMutationAttempted: false
+    });
+    expect(Object.keys(body).sort(compare)).toEqual([
+      "censusId", "claimBoundary", "databaseMutationAttempted", "excludedInternalTableRowCount",
+      "expectedUserTableCount", "observedUserTableCount", "rawTableRowCount", "receiptHash",
+      "status", "version"
+    ].sort(compare));
+    expect(JSON.stringify(body)).not.toContain("sample_table");
+    expect(JSON.stringify(body)).not.toContain("CREATE TABLE");
+    expect(value.calls()).toBe(1);
   });
 
   it("canonicalizes catalog result order independently of the mock result order", async () => {
@@ -208,7 +218,8 @@ describe("OS-01 staging DDL census", () => {
       expectedCatalogRows: ordered.length,
       expectedUserTableCount: 1
     });
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(500);
+    expect(await response.json()).toMatchObject({ status: "closed_user_table_count_match" });
   });
 
   it("stops after one read when the exact catalog identity differs", async () => {
@@ -240,8 +251,8 @@ describe("OS-01 staging DDL census", () => {
     expect(value.calls()).toBe(0);
   });
 
-  it("rejects 49 or 51 user tables immediately after the first catalog read", async () => {
-    for (const count of [49, 51]) {
+  it("returns only the exact count diagnostic for 49, 50, or 51 user tables", async () => {
+    for (const count of [49, 50, 51]) {
       const catalog = Array.from({ length: count }, (_, index) => ({
         type: "table",
         name: `table_${String(index).padStart(2, "0")}`,
@@ -256,24 +267,37 @@ describe("OS-01 staging DDL census", () => {
         expectedUserTableCount: 50
       });
       expect(response.status).toBe(500);
-      expect(await response.json()).toMatchObject({ failureCategory: "user_table_count_mismatch" });
+      const body = await response.json() as Record<string, unknown>;
+      expect(body).toMatchObject({
+        version: "engine-os.os01-staging-census-table-count-diagnostic.v1",
+        status: count === 50 ? "closed_user_table_count_match" : "closed_user_table_count_mismatch",
+        expectedUserTableCount: 50,
+        rawTableRowCount: count,
+        excludedInternalTableRowCount: 0,
+        observedUserTableCount: count,
+        databaseMutationAttempted: false
+      });
+      expect(Object.keys(body).sort(compare)).toEqual([
+        "censusId", "claimBoundary", "databaseMutationAttempted", "excludedInternalTableRowCount",
+        "expectedUserTableCount", "observedUserTableCount", "rawTableRowCount", "receiptHash",
+        "status", "version"
+      ].sort(compare));
+      expect(JSON.stringify(body)).not.toContain("table_00");
+      expect(JSON.stringify(body)).not.toContain("CREATE TABLE");
       expect(value.calls()).toBe(1);
     }
   });
 
-  it("classifies user-table catalog invariants without returning names or SQL", async () => {
+  it("does not inspect or disclose identifier and SQL details after counting", async () => {
     const cases = [
       {
         catalog: [{ type: "table", name: "bad-name", tbl_name: "bad-name", sql: "CREATE TABLE secret_name(id INTEGER)" }],
-        category: "user_table_identifier_shape_invalid"
       },
       {
         catalog: [{ type: "table", name: "safe_name", tbl_name: "other_name", sql: "CREATE TABLE secret_name(id INTEGER)" }],
-        category: "user_table_name_binding_invalid"
       },
       {
         catalog: [{ type: "table", name: "safe_name", tbl_name: "safe_name", sql: null }],
-        category: "user_table_create_sql_missing"
       }
     ] as const;
     for (const item of cases) {
@@ -289,10 +313,11 @@ describe("OS-01 staging DDL census", () => {
       });
       const body = await response.json() as Record<string, unknown>;
       expect(response.status).toBe(500);
-      expect(body.failureCategory).toBe(item.category);
+      expect(body.status).toBe("closed_user_table_count_match");
       expect(Object.keys(body).sort(compare)).toEqual([
-        "censusId", "claimBoundary", "databaseMutationAttempted", "failureCategory",
-        "receiptHash", "status", "version"
+        "censusId", "claimBoundary", "databaseMutationAttempted", "excludedInternalTableRowCount",
+        "expectedUserTableCount", "observedUserTableCount", "rawTableRowCount", "receiptHash",
+        "status", "version"
       ].sort(compare));
       const receiptHash = body.receiptHash;
       delete body.receiptHash;
@@ -303,37 +328,34 @@ describe("OS-01 staging DDL census", () => {
     }
   });
 
-  it("reports the controller boundary instead of making a false durable one-shot claim", async () => {
+  it("is deterministic but leaves durable one-shot enforcement to the controller", async () => {
     const value = fixture();
     const first = await handleOs01StagingCensus(request(), value.db as never, options(value));
     const second = await handleOs01StagingCensus(request(), value.db as never, options(value));
-    expect(first.status).toBe(200);
-    expect(second.status).toBe(200);
-    expect((await first.json() as Record<string, unknown>).requestBudgetClaim)
-      .toBe("controller_enforced_single_invocation_not_runtime_durable");
+    expect(first.status).toBe(500);
+    expect(second.status).toBe(500);
+    expect(await first.text()).toBe(await second.text());
+    expect(value.calls()).toBe(2);
   });
 
-  it("fails closed when table counts or the catalog change during the census", async () => {
-    const countChange = fixture({ counts: [1, 2] });
-    const countResponse = await handleOs01StagingCensus(request(), countChange.db as never, options(countChange));
-    expect(countResponse.status).toBe(500);
-    expect(await countResponse.json()).toMatchObject({ failureCategory: "row_count_changed" });
-
-    const catalogChange = fixture({
-      catalogAfter: baseCatalog.map((row) => row.name === "sample_view" ? { ...row, name: "changed_view" } : row)
+  it("fails closed above the versioned raw-table bound without returning catalog detail", async () => {
+    const catalog = Array.from({ length: 1_001 }, (_, index) => ({
+      type: "table",
+      name: `table_${String(index).padStart(4, "0")}`,
+      tbl_name: `table_${String(index).padStart(4, "0")}`,
+      sql: `CREATE TABLE table_${String(index).padStart(4, "0")}(id INTEGER)`
+    }));
+    const value = fixture({ catalogBefore: catalog, catalogAfter: catalog });
+    const response = await handleOs01StagingCensus(request(), value.db as never, {
+      expectedOrigin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
+      expectedCatalogHash: hash(catalog),
+      expectedCatalogRows: catalog.length,
+      expectedUserTableCount: 50
     });
-    const catalogResponse = await handleOs01StagingCensus(request(), catalogChange.db as never, options(catalogChange));
-    expect(catalogResponse.status).toBe(500);
-    expect(await catalogResponse.json()).toMatchObject({ failureCategory: "catalog_changed" });
-  });
-
-  it("uses a closed failure vocabulary and never returns D1 error detail", async () => {
-    const value = fixture({ failWhen: "foreign_key" });
-    const response = await handleOs01StagingCensus(request(), value.db as never, options(value));
     const body = await response.json() as Record<string, unknown>;
     expect(response.status).toBe(500);
-    expect(body.failureCategory).toBe("foreign_key_read_failed");
-    expect(JSON.stringify(body)).not.toContain("sensitive");
+    expect(body.failureCategory).toBe("catalog_shape_invalid");
+    expect(JSON.stringify(body)).not.toContain("table_1000");
     expect(body).not.toHaveProperty("detail");
     expect(Object.keys(body).sort(compare)).toEqual([
       "censusId", "claimBoundary", "databaseMutationAttempted", "failureCategory",
@@ -373,7 +395,17 @@ describe("OS-01 staging DDL census", () => {
       entryPath: "dist/server/index.js",
       expectedCatalogRows: 377,
       expectedUserTableCount: 50,
-      viewEvidence: "names_and_hash_only_no_view_sql"
+      viewEvidence: "none_count_only",
+      consistencyClaim: "single_validated_catalog_read_only_no_census_snapshot_claim"
+    });
+    expect(manifest.invocationControl).toMatchObject({
+      onlyPersistableWorkerResponseStatuses: [
+        "closed_user_table_count_match",
+        "closed_user_table_count_mismatch"
+      ],
+      finalAcceptanceStatus: null,
+      dispatchCompletionWritten: false,
+      finalizationAllowed: false
     });
     const failureContract = manifest.failureContract as Record<string, unknown>;
     expect(failureContract).toMatchObject({
@@ -382,12 +414,17 @@ describe("OS-01 staging DDL census", () => {
       schemaNamesOrSqlAllowed: false,
       terminalAndNonFinalizable: true
     });
-    expect(failureContract.controllerPersistableCategories).toEqual([
-      "user_table_count_mismatch",
-      "user_table_identifier_shape_invalid",
-      "user_table_name_binding_invalid",
-      "user_table_create_sql_missing"
-    ]);
+    expect(failureContract.controllerPersistableCategories).toEqual([]);
+    expect(manifest.countDiagnosticContract).toMatchObject({
+      version: "engine-os.os01-staging-census-table-count-diagnostic.v1",
+      expectedUserTableCount: 50,
+      statuses: ["closed_user_table_count_match", "closed_user_table_count_mismatch"],
+      maximumRawTableRows: 1_000,
+      aggregateCountsOnly: true,
+      identifiersOrSqlAllowed: false,
+      terminalAndNonFinalizable: true,
+      fullCensusResponseAccepted: false
+    });
     expect(worker).not.toMatch(/ODDS_API_KEY|ENGINE_OS_CAPTURE_ENABLED|the-odds-api\.com/u);
   });
 });
