@@ -1,0 +1,65 @@
+{
+  "version": "engine-os.os01-staging-census-hosted-attempt-rejection.v1",
+  "status": "rejected_pre_observation_timestamp_precedes_authority_before_dispatch",
+  "qualificationId": "471001d7f8ad783dbabc1c03c4e7a022799466a20afba70e1eaf087a4761ec29",
+  "controllerAuthorityId": "08728af1d945ab44827a2bb0dd69641b2025f9414854baead79cf077ae511ff0",
+  "sourceCommit": "dc8fa0dcac3e74ee3e95ce9b0d7fefbbd3ba6a7d",
+  "sourceTree": "d05216916d9f793e2b711ed23e0c981cc174b0d8",
+  "stagingProjectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "savedVersionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_d1b03ba6925481918e68642776558e0c",
+  "savedVersionNumber": 16,
+  "deploymentId": "appgdep_6a92afae978c81919402dbf99794bed2",
+  "deploymentStatus": "succeeded",
+  "workerSha256": "e104c7ac508f9a5922ebd06e9ab0dd4b08b7d86fa81ad148f361eb0c02a0ec12",
+  "manifestSha256": "c2845c7378ca482657ebd335eeaa68f33ab1b50c2083aac1cdae3e560036c7bd",
+  "localArchiveSha256": "472320dfa64e01bd07c32c38d88761143fb37defda7d28d78061872d3120f4f4",
+  "authorityRoot": "/private/tmp/engine-os-os01-staging-census-08728af1d945ab44827a2bb0dd69641b2025f9414854baead79cf077ae511ff0",
+  "artifacts": {
+    "authority": {
+      "sha256": "6a0c04eb2f22a387b861b1ba67ad1104b6aa83bbbd51af1a35ccf6683e641c3c",
+      "bytes": 928,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179044601
+    },
+    "preObservation": {
+      "sha256": "abcf7ca9baa07646df1db531a0c3f7b08982da2da42883069dcf3503b96a6c4a",
+      "bytes": 1980,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179044603
+    }
+  },
+  "failure": {
+    "stage": "controller_pre_dispatch_temporal_validation",
+    "reason": "pre_observation_recorded_before_authority_initialization",
+    "authorityInitializedAt": "2026-08-29T10:10:48.186Z",
+    "preObservationRecordedAt": "2026-08-29T10:10:47.992Z",
+    "orderingDeltaMilliseconds": -194,
+    "controllerRunInvoked": true,
+    "intentReserved": false,
+    "hostRequestDispatched": false,
+    "workerRequestDispatched": false,
+    "databaseReadAttempted": false,
+    "databaseMutationAttempted": false,
+    "providerPathInvoked": false,
+    "quotaPathInvoked": false,
+    "ephemeralSitesTokenPersisted": false,
+    "retryAllowedOnConsumedAuthority": false
+  },
+  "disposition": {
+    "originalAuthorityPreserved": true,
+    "artifactRewriteAllowed": false,
+    "artifactDeletionAllowed": false,
+    "cleanSuccessorRequired": true,
+    "countOnlyContractChangeAllowed": false,
+    "cleanupAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthorized": false,
+    "os01Accepted": false
+  },
+  "recordedAt": "2026-08-29T10:11:26.000Z",
+  "receiptHash": "3119037594e3b166d1bc90f3ca4d89d93ed02558efa02ccefa47077ceb32483c"
+}
