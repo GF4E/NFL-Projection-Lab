@@ -1,0 +1,39 @@
+{
+  "version": "source-capture-contract.2026.8",
+  "status": "frozen",
+  "frozenOn": "2026-08-26",
+  "supersedes": "source-capture-contract.2026.7",
+  "supersessionReason": "Independent acceptance review found that v7 did not apply exact-byte failure journaling and deterministic-head ordering to not-modified confirmations, and did not centrally filter every persisted event-identity column.",
+  "baseContract": {
+    "path": "config/source-capture-contract-2026.v7.json",
+    "byteSha256": "fe83706694d513ac9fff34ada5828fbd93672510f5e8a8a287ce7a63b0364b30",
+    "canonicalContentSha256": "9de33c9635ac8ded218bc9f774234e653135964204b5e3699b171536be99e867"
+  },
+  "notModifiedIntegrity": {
+    "deterministicHeadRule": "a not-modified confirmation may publish only when its retained pointer is also the deterministic newest eligible usable publication; a newer stranded publication keeps the source stale and records a manifest failure",
+    "exactByteRule": "the retained response and sidecar must be recovered and verified before a not-modified event can publish",
+    "permanentFailureRule": "missing or corrupt retained evidence appends one deterministic corrupt_object failure and alert, keeps the forensic pointer non-current, and permanently excludes that capture from later not-modified confirmation",
+    "transientFailureRule": "a transient read failure appends one deterministic storage_failure and alert, keeps the pointer stale, and remains retryable after exact bytes recover",
+    "clockRule": "a not-modified event may clear failure state only when its confirmation time is not older than the latest attempt",
+    "recoveryRule": "a later exact-byte verification of the named deterministic newer head may resolve the ordering failure without refetching or relabeling the immutable publication"
+  },
+  "eventIdentitySecretFiltering": {
+    "rule": "every event identity and persistence column is secret-scanned before any insert statement is prepared",
+    "columns": [
+      "event_id",
+      "attempt_token",
+      "event_type",
+      "capture_id",
+      "source_key",
+      "provider",
+      "dataset",
+      "idempotency_key",
+      "occurred_at",
+      "event_payload_hash",
+      "payload_json"
+    ],
+    "failureRule": "a rejected identity writes no event, alert, manifest, pointer, or object"
+  },
+  "effectiveContract": "source-capture-contract.2026.1 plus v2, v3 except its superseded same-batch pointer clause, v4 except its superseded manifest-time verification clause, v5, v6, v7, and every clarification in this file",
+  "implementationMayResume": true
+}

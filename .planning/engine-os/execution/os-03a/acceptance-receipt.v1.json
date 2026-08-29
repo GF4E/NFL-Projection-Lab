@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "engine-os.os-03a-acceptance-receipt.v1",
+  "generatedAt": "2026-08-27T03:52:13Z",
+  "status": "accepted_bounded_provider_independent_storage_mechanism",
+  "scope": "Acceptance of the provider-independent OS-03A D1/R2 storage-mechanism slice only. This is not full OS-03A acceptance and does not start a prospective capture stream.",
+  "preservedFoundations": [
+    "OS-00",
+    "OS-00B",
+    "OS-01A",
+    "OS-02A",
+    "OS-15A",
+    "OS-19A",
+    "R0",
+    "R1-v1",
+    "R1-v2"
+  ],
+  "evidence": {
+    "localQualificationReceipt": ".planning/engine-os/execution/os-03a/local-qualification-receipt.v1.json",
+    "sitesStagingProofReceipt": ".planning/engine-os/execution/os-03a/sites-staging-proof-receipt.v1.json",
+    "qualifiedRuntimeCommit": "787e46833f29984345db7c8d4200d43d4a509308",
+    "hostedProofCommit": "5ab65a3a7ea21f0758528e41b978bd22938ae979",
+    "finalHostedReceiptHash": "0262a36736aa39c52aeaa142d842a29a421fb1b39548c48bf907ef482fb088c0",
+    "hostedDuplicateReplayIdentical": true,
+    "independentReview": "accepted_bounded_provider_independent_only"
+  },
+  "acceptedMechanism": [
+    "canonical secret-redacted request identity",
+    "exact response-byte preservation in content-addressed R2",
+    "append-only D1 base manifests, extensions, and events, with guarded heartbeat and alert state",
+    "usage-rights and retention metadata",
+    "deterministic deduplication",
+    "publish-before-pointer ordering",
+    "failure withholding and last-good preservation",
+    "corruption detection, quarantine, and non-reactivation",
+    "provider-offline replay",
+    "retry and orphan-cleanup behavior",
+    "later-import mapping to OS-03 and OS-04"
+  ],
+  "production": {
+    "unchanged": true,
+    "captureEnabledEnvironmentKeyPresent": false,
+    "migration0017Applied": false,
+    "providerRequests": 0,
+    "providerSecretsRead": 0,
+    "quotaReservations": 0,
+    "quotaReservationEvents": 0,
+    "oddsCreditsUsed": 38,
+    "oddsCreditsRemaining": 462,
+    "prospectiveCaptureStarted": false
+  },
+  "openGates": [
+    "OS-13A provenance-complete forecast-or-withheld ledger",
+    "OS-18A provider authentication and final security scans",
+    "live non-market connector qualification",
+    "authenticated market connector qualification",
+    "production application of the canonical OS-03 importer and migration",
+    "full OS-03A and prospective capture activation"
+  ],
+  "nextPlatformTask": "OS-13A",
+  "claims": {
+    "boundedProviderIndependentOs03aStorageMechanismAccepted": true,
+    "fullOs03aAccepted": false,
+    "data01Complete": false,
+    "mkt01Complete": false,
+    "led06Complete": false,
+    "os03Complete": false,
+    "os04Complete": false,
+    "prospectiveCaptureAccepted": false,
+    "productionActivationCreated": false,
+    "module2bRun": false,
+    "statisticalModelChanged": false,
+    "interfaceChanged": false
+  }
+}

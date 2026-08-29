@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "engine-os-r0-receipt-v1",
+  "task": "R0",
+  "status": "accepted",
+  "recordedAt": "2026-08-25T19:23:02Z",
+  "recordedBeforeModule2bFitOrScore": true,
+  "gitCommit": "e71f7b2dbbeea43b502b63ab2870e95adb314bc1",
+  "researchConstitution": {
+    "path": "config/research-constitution.v1.json",
+    "version": "research-constitution.2026.1",
+    "byteSha256": "78cef33e1a291e19277c35cdc7d5c68e31a3e02d070607b251f4bd7fe58f25bc",
+    "canonicalContentSha256": "ecbce3c59e91014ad9806476d696b20db3752d8729b3a8762367e7d4a4148203"
+  },
+  "operatingContract": {
+    "path": "config/engine-operating-contract.v1.json",
+    "version": "engine-operating-contract.2026.1",
+    "byteSha256": "f1691e0c39237a5397b79a81c004cfd6801808a5a946b89c28dea0ce5c9d7f5d"
+  },
+  "lifecycleContract": {
+    "path": "config/football-lifecycle-2026.v1.json",
+    "version": "football-lifecycle.2026.1",
+    "byteSha256": "c1fe6738e4ac5413ac7c17ee14a8ae954a0b14b97097fd0094fc58000f2edfdf"
+  },
+  "acceptanceAssertions": {
+    "tuesdayOriginAndWeekMinusOneFrozen": true,
+    "marketSelectionAndHumanInputsForbiddenFromFootballFeatures": true,
+    "foldLocalTransformsAndChronologicalEvaluationRequired": true,
+    "pairedSeasonWeekBlockInferenceFrozen": true,
+    "module1Status": "reject_all",
+    "module1RetainedRole": "c0_naive_points_benchmark_only",
+    "module2Status": "reject_all",
+    "module2RetainedRole": "p0_league_season_naive_benchmark_only",
+    "researchExposedThroughSeason": 2025,
+    "nextProspectiveSeason": 2026,
+    "negativeResultsImmutable": true,
+    "changedFamilySliceHyperparameterOrEndpointRequiresNewExperimentIdentity": true,
+    "onlyAuthorizedNextExperiment": "module2b_residual_kernel_falsification_v1",
+    "productionPromotionAuthorized": false
+  }
+}

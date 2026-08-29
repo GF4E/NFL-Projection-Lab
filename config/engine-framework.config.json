@@ -1,0 +1,311 @@
+{
+  "version": "2026.08.24",
+  "mode": "high_leverage_questions_only",
+  "purpose": "Apply established modeling controls without ceremony, reserve owner questions for consequential trade-offs, and turn distinctive ideas into auditable hypotheses and out-of-sample gates.",
+  "answerPolicy": {
+    "requiredFields": ["answer", "rationale", "evidence", "author", "answeredAt"],
+    "structuralChanges": "offseason_only",
+    "inSeasonChanges": "state_and_gated_coefficients_only",
+    "pickOutcomesInTraining": false,
+    "commodityDefaults": "record_provisionally_without_owner_prompt",
+    "ownerPromptRule": "Ask only when the choice changes the human decision contract, cost or data rights, acceptable uncertainty, release risk, or another difficult-to-reverse boundary."
+  },
+  "noveltyStandard": {
+    "foundationNotDifferentiation": [
+      "EPA and success-rate features",
+      "Elo or rolling team strength",
+      "count models and game simulation",
+      "injury, roster, weather, rest, and market inputs",
+      "calibration, walk-forward validation, CLV, and line shopping",
+      "generic feature-importance narration"
+    ],
+    "distinctiveOutcome": "A compact decision dossier that decomposes model-versus-market disagreement, carries unresolved scenarios through the forecast, measures edge fragility, and states what new fact or price would change the conclusion.",
+    "requiredDecisionSupport": [
+      "model and market implied outcome distributions",
+      "scenario-weighted uncertainty for unresolved inputs",
+      "counterfactual contribution of material evidence",
+      "edge-fragility and value-of-information thresholds",
+      "plain-language falsifiers and what-would-change-the-view conditions",
+      "source provenance, freshness, sample support, and applicable model diagnostics"
+    ],
+    "claimPolicy": "Treat differentiation as a research hypothesis until a documented landscape review and prospective user evaluation support it."
+  },
+  "workstreams": [
+    {
+      "id": "W01",
+      "sequence": 1,
+      "title": "Champion baseline and objective",
+      "problem": "A model cannot improve coherently until its forecast target, baseline, scoring rules, and promotion metric are fixed.",
+      "deliverable": "Leakage-safe champion benchmark with frozen targets, market baselines, and reproducible rolling-origin scorecard.",
+      "dependsOn": [],
+      "status": "decisions_complete_implementation_pending",
+      "questions": [
+        {
+          "id": "Q01",
+          "prompt": "Should the primary engine predict a joint home/away score distribution and derive spread, total, and moneyline probabilities from it?",
+          "recommendedDefault": "Yes. Use one coherent joint score distribution, then derive every mainline market from the same simulated outcomes.",
+          "evidenceRequired": "Rolling-origin comparison against independent spread, total, and moneyline models plus the de-vigged market baseline."
+        },
+        {
+          "id": "Q02",
+          "prompt": "Which metric decides whether a challenger is genuinely better?",
+          "recommendedDefault": "Pooled non-push log loss is the promotion metric; calibration, Brier score, score error, and CLV are mandatory diagnostics.",
+          "evidenceRequired": "Same-row champion/challenger evaluation with confidence intervals and market-level breakouts."
+        }
+      ],
+      "acceptanceGates": [
+        "Every target has a written as-of timestamp and leakage boundary.",
+        "Champion and market baseline are scored on identical rolling-origin rows.",
+        "A full run reproduces the same hashes and metrics from the same snapshot."
+      ]
+    },
+    {
+      "id": "W02",
+      "sequence": 2,
+      "title": "Coherent team-score distribution",
+      "problem": "Point estimates alone cannot price spreads, totals, moneylines, pushes, overtime, or correlated score outcomes.",
+      "deliverable": "Joint discrete score distribution with explicit regulation, overtime, key-score, and clock-state behavior.",
+      "dependsOn": ["W01"],
+      "status": "needs_answer",
+      "questions": [
+        {
+          "id": "Q03",
+          "prompt": "Which first score-distribution family should earn the right to become champion?",
+          "recommendedDefault": "Compare correlated negative-binomial and possession-level simulation challengers against a simple market-anchored discrete baseline.",
+          "evidenceRequired": "Out-of-sample score log likelihood, calibration by spread/total bucket, and derived-market log loss."
+        },
+        {
+          "id": "Q04",
+          "prompt": "How much game mechanics should version one model explicitly?",
+          "recommendedDefault": "Model possessions, pace, field position, touchdowns, field goals, two-point attempts, overtime rules, and end-game kneels/spikes; defer play-calling micro-simulation until it wins validation.",
+          "evidenceRequired": "Ablation showing each mechanism improves held-out probability or calibration rather than narrative appeal."
+        },
+        {
+          "id": "Q19",
+          "prompt": "Should a positive average edge be labeled fragile or indeterminate when reasonable unresolved scenarios reverse it or push it below the decision threshold?",
+          "recommendedDefault": "Yes. Keep the scenario-weighted numerical estimate visible, label disagreement rather than averaging it away, and state the condition that changes the conclusion.",
+          "evidenceRequired": "Forecast-time scenario definitions, calibrated scenario weights, branch-level edge and sizing calculations, and prospective stability tests."
+        }
+      ],
+      "acceptanceGates": [
+        "All market probabilities come from one normalized outcome distribution.",
+        "Derived probabilities reconcile across moneyline, spread, total, push, and tie outcomes.",
+        "The challenger beats or matches the frozen baseline under the promotion gate."
+      ]
+    },
+    {
+      "id": "W03",
+      "sequence": 3,
+      "title": "Live-line reliability",
+      "problem": "A partial provider board must not freeze valid games or silently mix incomplete contracts.",
+      "deliverable": "Per-game atomic snapshots, deterministic catch-up, book/market completeness, quota control, and explicit freshness.",
+      "dependsOn": [],
+      "status": "implemented_pending_production_verification",
+      "questions": [
+        {
+          "id": "Q05",
+          "prompt": "What is the smallest safe publication boundary for live odds?",
+          "recommendedDefault": "One game, only when BetMGM and FanDuel each contain both sides of spread, total, and moneyline; preserve the last good snapshot for incomplete games.",
+          "evidenceRequired": "Injected 15-of-16 provider response plus an incomplete two-way market."
+        }
+      ],
+      "acceptanceGates": [
+        "Complete games publish even when another game is incomplete.",
+        "No game publishes a one-sided or one-book mainline set.",
+        "Incomplete games display a stale flag and retain their last validated prices.",
+        "Catch-up retries are idempotent and respect the 450-credit ceiling."
+      ]
+    },
+    {
+      "id": "W04",
+      "sequence": 4,
+      "title": "Automation control plane",
+      "problem": "Browser visits must not mutate provider state, spend credits, or call methods rejected by the public worker.",
+      "deliverable": "Background-only imports with read-only browser health polling, run history, failure isolation, and recovery leases.",
+      "dependsOn": ["W03"],
+      "status": "implemented_pending_production_verification",
+      "questions": [
+        {
+          "id": "Q06",
+          "prompt": "Where may automatic data writes originate?",
+          "recommendedDefault": "Use the scheduled worker plus a deterministic server-side recovery lease. A visitor cannot choose cadence or markets, and repeated reads cannot spend twice.",
+          "evidenceRequired": "Route audit, method tests, scheduled-run logs, and duplicate-request simulation."
+        }
+      ],
+      "acceptanceGates": [
+        "Public routes reject user-selected writes.",
+        "The browser health poll uses GET and causes no provider request.",
+        "A board navigation may claim only the already-scheduled recovery lease.",
+        "A missed or failed scheduled snapshot receives at most one deterministic recovery attempt."
+      ]
+    },
+    {
+      "id": "W05",
+      "sequence": 5,
+      "title": "Current roster and depth state",
+      "problem": "Team aggregates become misleading when starters, roles, snap shares, or position groups change.",
+      "deliverable": "As-of roster, depth, participation, transaction, and starter-state snapshots linked to every forecast.",
+      "dependsOn": ["W01"],
+      "status": "needs_answer",
+      "questions": [
+        {
+          "id": "Q07",
+          "prompt": "Which sources may define the current depth chart and starting roles?",
+          "recommendedDefault": "Use official team rosters/transactions as authority and nflverse participation as evidence; treat unofficial depth charts as timestamped, lower-confidence hints.",
+          "evidenceRequired": "Coverage, update latency, identity resolution, and historical replay for starter changes."
+        },
+        {
+          "id": "Q08",
+          "prompt": "How should uncertain roles enter a forecast?",
+          "recommendedDefault": "Represent role probabilities and widen forecast uncertainty; never force a single starter when evidence is unresolved.",
+          "evidenceRequired": "Calibration of role probabilities and forecast intervals around late changes."
+        }
+      ],
+      "acceptanceGates": [
+        "Every active player resolves to one stable identifier and team as of forecast time.",
+        "Starter and participation state cannot use post-kickoff evidence.",
+        "Missing role data widens uncertainty and is visible in provenance."
+      ]
+    },
+    {
+      "id": "W06",
+      "sequence": 6,
+      "title": "Player-level contribution model",
+      "problem": "Player stats are not yet a validated bridge from role and opponent to team scoring or prop distributions.",
+      "deliverable": "Position-aware player value, usage, efficiency, matchup, and availability layers that aggregate without double counting team effects.",
+      "dependsOn": ["W02", "W05"],
+      "status": "needs_answer",
+      "questions": [
+        {
+          "id": "Q09",
+          "prompt": "Which player groups should enter the first validated model?",
+          "recommendedDefault": "Start with QB, offensive line as a unit, primary receivers, and high-volume rushers; add defense and special teams only after stable participation/value estimates exist.",
+          "evidenceRequired": "Position-group ablations on held-out team-score and market forecasts."
+        },
+        {
+          "id": "Q10",
+          "prompt": "How should player and team features coexist?",
+          "recommendedDefault": "Player inputs explain deviations from a regressed team baseline; regularize heavily and test removal to prevent double counting.",
+          "evidenceRequired": "Nested-model ablations, stability across seasons, and calibration under personnel changes."
+        }
+      ],
+      "acceptanceGates": [
+        "All inputs are available at forecast time and linked to role certainty.",
+        "Player layers improve held-out results beyond team and market baselines.",
+        "No position group is promoted solely from in-sample fit."
+      ]
+    },
+    {
+      "id": "W07",
+      "sequence": 7,
+      "title": "Public-versus-sharp evidence",
+      "problem": "Ticket and money splits are noisy vendor labels, not proof of informed action.",
+      "deliverable": "Timestamped sentiment evidence separated from sharp-price movement, with source reliability and no causal overclaim.",
+      "dependsOn": ["W03"],
+      "status": "needs_answer",
+      "questions": [
+        {
+          "id": "Q11",
+          "prompt": "What may the engine call sharp evidence?",
+          "recommendedDefault": "Only price movement at a validated sharper reference market; label ticket/money divergence as public sentiment, never as sharp certainty.",
+          "evidenceRequired": "Source methodology, sample size, timestamp alignment, and prospective relationship to later reference prices."
+        },
+        {
+          "id": "Q12",
+          "prompt": "Should sentiment affect the probability model?",
+          "recommendedDefault": "Keep it diagnostic until prospective rolling-origin tests improve calibration or log loss after controlling for current price.",
+          "evidenceRequired": "Incremental out-of-sample test over a price-only market baseline."
+        }
+      ],
+      "acceptanceGates": [
+        "Every sentiment observation stores source, sample, method, and capture time.",
+        "The UI distinguishes public sentiment from reference-market movement.",
+        "No sentiment feature enters production without incremental prospective value."
+      ]
+    },
+    {
+      "id": "W08",
+      "sequence": 8,
+      "title": "Historical market archive",
+      "problem": "Closing lines alone cannot reconstruct opener-to-close movement, forecast-time baselines, or honest CLV.",
+      "deliverable": "Licensed, point-in-time multi-book snapshots with contract identity, capture time, closing rules, and coverage metadata.",
+      "dependsOn": ["W03"],
+      "status": "needs_answer",
+      "questions": [
+        {
+          "id": "Q13",
+          "prompt": "Do we buy historical The Odds API snapshots or build a prospective archive first?",
+          "recommendedDefault": "Build the prospective archive now; evaluate paid history only if its coverage, license, and timestamp granularity support the planned validation.",
+          "evidenceRequired": "Coverage matrix by season/book/market, missingness audit, license review, and cost."
+        },
+        {
+          "id": "Q14",
+          "prompt": "What exactly counts as the close?",
+          "recommendedDefault": "The last complete two-sided quote from the named book before kickoff, with a separately stored consensus close.",
+          "evidenceRequired": "Replay tests for late suspensions, point changes, and absent books."
+        }
+      ],
+      "acceptanceGates": [
+        "Every snapshot is immutable and keyed by provider, contract, book, and capture time.",
+        "Opening, forecast-time, entry-equivalent, and closing prices are reproducible.",
+        "Coverage gaps never masquerade as unchanged lines."
+      ]
+    },
+    {
+      "id": "W09",
+      "sequence": 9,
+      "title": "Shadow season and failure testing",
+      "problem": "Backtests cannot reveal every 2026 data delay, roster ambiguity, weather miss, suspension, or operational failure.",
+      "deliverable": "Prospective shadow forecasts, frozen before games, plus replayable chaos tests and weekly calibration/CLV diagnostics.",
+      "dependsOn": ["W01", "W02", "W03", "W05", "W08"],
+      "status": "needs_answer",
+      "questions": [
+        {
+          "id": "Q15",
+          "prompt": "How long must a challenger run in shadow before structural promotion?",
+          "recommendedDefault": "At least one complete regular season for structural changes, with weekly diagnostics but no in-season feature or hyperparameter tuning.",
+          "evidenceRequired": "Immutable pregame forecasts, source snapshots, failure logs, calibration, log loss, Brier score, and CLV."
+        },
+        {
+          "id": "Q16",
+          "prompt": "Which failures must be rehearsed before Week 1?",
+          "recommendedDefault": "Partial odds, quota exhaustion, stale nflverse, unresolved player IDs, late QB changes, missing inactives, roof ambiguity, weather failure, D1 write failure, and model-gate rejection.",
+          "evidenceRequired": "Automated fault-injection results proving last-good preservation and explicit stale states."
+        }
+      ],
+      "acceptanceGates": [
+        "Forecasts are frozen and hashed before kickoff.",
+        "No own-pick outcome enters training or tuning.",
+        "Every rehearsed failure preserves last good output and emits the correct status."
+      ]
+    },
+    {
+      "id": "W10",
+      "sequence": 10,
+      "title": "Public release and operations governance",
+      "problem": "Production, public source, credentials, artifacts, and deployment history can drift or expose private state.",
+      "deliverable": "One reviewed release path that sanitizes public source, verifies artifacts, protects secrets, publishes reproducibly, and supports rollback.",
+      "dependsOn": ["W04", "W09"],
+      "status": "needs_answer",
+      "questions": [
+        {
+          "id": "Q17",
+          "prompt": "What should be public and what must remain deployment-only?",
+          "recommendedDefault": "Publish source, methodology, schemas, tests, and non-proprietary artifacts; keep credentials, D1 contents, deployment metadata, and licensed data private.",
+          "evidenceRequired": "Release manifest, secret scan, license inventory, and public-clone build."
+        },
+        {
+          "id": "Q18",
+          "prompt": "What blocks a production release?",
+          "recommendedDefault": "Lint, types, tests, production build, data-contract checks, secret scan, public-source sync, versioned deployment, and post-deploy health verification.",
+          "evidenceRequired": "A release report tied to exact private, public, and deployed commit/version identifiers."
+        }
+      ],
+      "acceptanceGates": [
+        "No credential or personal record exists in public source or history.",
+        "Public clone passes the same verification suite.",
+        "Production version maps to an exact reviewed source commit and has a rollback target."
+      ]
+    }
+  ]
+}

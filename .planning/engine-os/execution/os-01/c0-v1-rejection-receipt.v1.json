@@ -1,0 +1,28 @@
+{
+  "version": "os01-c0-rejection-receipt.2026.1",
+  "status": "rejected",
+  "recordedAt": "2026-08-28T19:05:00.000Z",
+  "scope": "OS-01 production-census bridge C0 v1 only",
+  "rejectedIdentity": {
+    "commit": "b9ec7abad68e4d634ab79315bf91525e22b19b89",
+    "tree": "8381071d03b66b55ca38018d96ec2acaf7a615af",
+    "archiveSha256": "23408e937ef10d8e5adfd987e83faec5f50e92c22ea8f88ac1066d629c2cd92a",
+    "archiveBytes": 9820160
+  },
+  "terminalReasons": [
+    "The frozen census operator permitted arbitrary content-table scans instead of authorizing only plays.",
+    "The frozen census operator exposed unkeyed per-row hashes instead of token-keyed aggregate page evidence.",
+    "The recorded installed-toolchain closure root did not reproduce in two clean worktrees after the required native postinstall artifacts were rebuilt."
+  ],
+  "evidenceReuse": "identity_and_rejection_only",
+  "productionAuthority": false,
+  "providerAuthority": false,
+  "replacementCandidate": {
+    "ref": "refs/os01/candidate-c0-v2",
+    "commit": "2977c9e8cb6ead16b37ec926e35c93d5fb89c04f",
+    "tree": "aa44004fe32eec464d543aa337560f46fe4faf36",
+    "archiveSha256": "42e26efccc5d97c79c595171b90875408e469fe58a56cb5fea331cbeb0612be7",
+    "archiveBytes": 9820160,
+    "status": "candidate_not_yet_qualified"
+  }
+}

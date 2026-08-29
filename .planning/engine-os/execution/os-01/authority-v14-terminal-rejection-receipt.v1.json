@@ -1,0 +1,30 @@
+{
+  "version": "os01-authority-independent-audit-receipt.2026.1",
+  "authorityCommit": "1332da7078b3c0aa2a376c57f7c3fbfbaadab390",
+  "authorityTree": "6cc242d90a545738d3f3a540fbcdcbde44f8b87c",
+  "status": "rejected_before_external_mutation",
+  "terminalIntegrityAudit": {
+    "decision": "reject",
+    "finding": "cleanup_observations_were_bounded_from_census_completion_instead_of_phase_four",
+    "acceptedCounterexample": {
+      "censusCompletion": "2026-08-28T12:25:00.000Z",
+      "cleanupObservation": "2026-08-28T12:25:15.000Z",
+      "proofAndCensusComplete": "2026-08-28T12:25:30.000Z",
+      "cleanupAndSessionComplete": "2026-08-28T12:30:00.000Z"
+    },
+    "requiredSuccessorControls": [
+      "producer_cleanup_lower_bound_is_actual_phase_four_time",
+      "terminal_validator_cleanup_lower_bound_is_actual_phase_four_time",
+      "exact_cleanup_before_phase_four_regression"
+    ]
+  },
+  "producerTrustAudit": {
+    "decision": "accept_except_for_terminal_chronology_counterexample",
+    "finding": "frozen_terminal_byte_trust_and_dual_validation_boundary_qualified"
+  },
+  "externalMutationAttempted": false,
+  "providerSecretAccessed": false,
+  "providerRequestAttempted": false,
+  "quotaReservationAttempted": false,
+  "recordedAt": "2026-08-28T22:45:35Z"
+}

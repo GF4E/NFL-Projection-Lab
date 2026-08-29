@@ -1,0 +1,71 @@
+{
+  "version": "2026.1",
+  "trainingStartSeason": 2010,
+  "targetSeason": 2026,
+  "keyMarginBoundarySeason": 2015,
+  "eras": [
+    {
+      "season": 2011,
+      "change": "Kickoff moved to the 35-yard line",
+      "handling": ["time_decay"],
+      "source": "https://operations.nfl.com/media/2245/2016-kickoff-guide.pdf",
+      "verification": "NFL Kickoff guide states that the kicking-team restraining line moved from the 30 to the 35 in 2011"
+    },
+    {
+      "season": 2015,
+      "change": "Try kick line of scrimmage moved to the defensive 15-yard line",
+      "handling": ["key_margin_boundary"],
+      "source": "https://operations.nfl.com/media/1807/2015_nfl_rule_book_final.pdf",
+      "verification": "2015 rulebook Rules Changes, Rule 11-3-1–3"
+    },
+    {
+      "season": 2017,
+      "change": "Regular-season overtime reduced to 10 minutes",
+      "handling": ["era_indicator"],
+      "source": "https://operations.nfl.com/media/2700/nfl-2017-kickoff-guide.pdf"
+    },
+    {
+      "season": 2018,
+      "change": "Helmet and roughing enforcement environment",
+      "handling": ["season_scoring_effect"],
+      "source": "https://operations.nfl.com/rules-officiating/rules-changes/2018-rules-changes-and-points-of-emphasis/"
+    },
+    {
+      "season": 2020,
+      "change": "No or limited crowds",
+      "handling": ["season_home_field_effect"],
+      "trainingMultiplier": 0.5,
+      "source": "https://operations.nfl.com/updates/football-ops/2020-nfl-season/"
+    },
+    {
+      "season": 2021,
+      "change": "17-game regular-season schedule",
+      "handling": ["era_indicator", "rest_schedule_schema"],
+      "source": "https://operations.nfl.com/updates/the-game/2021-nfl-schedule-announced/"
+    },
+    {
+      "season": 2023,
+      "change": "Kickoff fair catch placed at the 25-yard line",
+      "handling": ["time_decay"],
+      "source": "https://operations.nfl.com/updates/the-rules/adopted-playing-rules-change-proposal-putting-ball-in-play-after-fair-catch/"
+    },
+    {
+      "season": 2024,
+      "change": "Dynamic kickoff; touchback at the 30-yard line",
+      "handling": ["era_indicator", "season_scoring_effect"],
+      "source": "https://www.nfl.com/news/2024-nfl-season-explaining-rules-for-new-dynamic-kickoff"
+    },
+    {
+      "season": 2025,
+      "change": "Dynamic kickoff permanent; touchback at the 35; both teams receive a regular-season overtime possession",
+      "handling": ["era_indicator", "season_scoring_effect"],
+      "source": "https://operations.nfl.com/rules-officiating/featured-rules"
+    },
+    {
+      "season": 2026,
+      "change": "Current target rules",
+      "handling": ["full_weight"],
+      "source": "https://operations.nfl.com/rules-officiating/2026-nfl-rulebook"
+    }
+  ]
+}

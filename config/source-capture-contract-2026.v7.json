@@ -1,0 +1,43 @@
+{
+  "version": "source-capture-contract.2026.7",
+  "status": "frozen",
+  "frozenOn": "2026-08-26",
+  "supersedes": "source-capture-contract.2026.6",
+  "supersessionReason": "Independent acceptance review found that v6 did not define fail-closed behavior when an already-published latest pointer later fails exact-byte verification, prevent an older not-modified confirmation from reviving it, or define recovery when a publication event commits before its pointer while a concurrent newer failure advances the heartbeat clock.",
+  "baseContract": {
+    "path": "config/source-capture-contract-2026.v6.json",
+    "byteSha256": "d602bd3d74c383095b40b397a69c2d57003c0893d0b5010cf6dc8298c73ec441",
+    "canonicalContentSha256": "baa7a206973039de395ce79e33165fe842ffbff124e5a3c806f283815dde10b2"
+  },
+  "postPublicationCorruption": {
+    "event": "append one deterministic corrupt_object failure event and alert",
+    "heartbeat": "transition to a non-current status and retain the immutable last-known pointer for auditability",
+    "pointerRule": "an unchanged pointer may remain after permanent ineligibility only when the update is non-current, does not advance last success, and does not change source, provider, or dataset identity",
+    "selectionRule": "a permanently ineligible capture may never be selected as a new pointer or transition back to current",
+    "notModifiedRule": "a not-modified confirmation must exclude permanently ineligible heads and may clear a failure only when it is not older than the latest attempt"
+  },
+  "publicationRetryRecovery": {
+    "precondition": "the deterministic publication event and a pointer-publication failure event for the same capture both exist",
+    "orderingRule": "retry publishes only when the candidate is the deterministic eligible head; it returns without mutation only when the retained pointer is the same capture or is deterministically newer",
+    "concurrentFailureRule": "a newer unrelated heartbeat failure clock cannot strand an otherwise deterministic eligible head",
+    "unknownOutcomeRule": "a prior publication event without a matching pointer-publication failure and without its pointer is an inconsistent outcome that fails closed",
+    "postconditionRule": "when the deterministic pointer is installed but a causally newer attempt has already made the heartbeat non-current, publication succeeded and must not overwrite, relabel, or heal that newer failure",
+    "failureJournalRule": "journal pointer-publication failure only when the required pointer or current state is absent and no causally newer attempt explains the postcondition"
+  },
+  "credentialFieldHardening": {
+    "scope": [
+      "canonical metadata",
+      "JSON response keys",
+      "non-JSON textual assignments"
+    ],
+    "compoundNames": [
+      "auth token",
+      "id token",
+      "csrf token",
+      "client token"
+    ],
+    "redactedSentinel": "[redacted]"
+  },
+  "effectiveContract": "source-capture-contract.2026.1 plus v2, v3 except its superseded same-batch pointer clause, v4 except its superseded manifest-time verification clause, v5, v6, and every clarification in this file",
+  "implementationMayResume": true
+}

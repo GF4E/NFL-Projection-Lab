@@ -1,0 +1,213 @@
+{
+  "schemaVersion": "engine-os.os-19a-sites-exact-staging-proof-receipt.v1",
+  "generatedAt": "2026-08-26T15:57:45Z",
+  "status": "os19a_urgent_slice_accepted_capture_not_authorized",
+  "scope": "Successor evidence for the exact reserveOddsQuota application path on a distinct owner-only staging D1, cleanup, staging retirement, and dormant server-side secret installation. This does not accept full OS-19, OPS-08, authenticated capture, provider authentication, scheduler or R2 qualification, or broader activation.",
+  "predecessorReceipts": {
+    "preservedImmutable": true,
+    "successorEffect": "Both predecessors accurately recorded the exact-path gate as pending when generated. This successor closes only that gate.",
+    "receipts": [
+      ".planning/engine-os/execution/os-19a/sites-d1-migration-receipt.v1.json",
+      ".planning/engine-os/execution/os-19a/sites-quota-bootstrap-receipt.v1.json"
+    ]
+  },
+  "staging": {
+    "projectId": "appgprj_6a8eff7517448191bbf37478d3d1f3c0",
+    "url": "https://nfl-lab-os19a-staging-20260826.psoiawesome.chatgpt.site",
+    "distinctFromProduction": true,
+    "accessModeDuringProof": "custom_owner_only",
+    "allowedAccountUserCount": 1,
+    "externalVisitorCount": 0,
+    "workspaceGroupCount": 0,
+    "tenantGroupCount": 0,
+    "invitesEnabled": false,
+    "proofVersionNumber": 4,
+    "proofVersionId": "appgprj_6a8eff7517448191bbf37478d3d1f3c0~appgver_c725ef17cda0819187018389792b64ab",
+    "proofDeploymentId": "appgdep_6a8f094d03c48191eebd1bd9f58a0df",
+    "proofDeploymentStatus": "succeeded",
+    "proofEnvironmentRevision": 1,
+    "proofSourceCommit": "c61163a0406d6cbc7ef6334c25738edac1dffe0a",
+    "proofArchiveContentHash": "sha256:8498949e54f861ae4d41c9b606a50f8dcd5400f53de26fdc7744b5b5548ad981",
+    "proofEnvironmentKeys": [
+      "ENGINE_OS_STAGING_PROOF_ENABLED",
+      "ENGINE_OS_STAGING_PROOF_TOKEN"
+    ],
+    "oddsApiKeyBoundDuringProof": false,
+    "captureCredentialBoundDuringProof": false
+  },
+  "schema": {
+    "mode": "verified_existing_exact_relevant_migration_set",
+    "completeProductionDatabaseClone": false,
+    "migrationStatementCounts": {
+      "migration0004": 11,
+      "migration0013": 41,
+      "migration0014": 11
+    },
+    "migrationVersions": [
+      {
+        "version": "0013_engine_os_urgent",
+        "definitionHash": "sha256:6205a3dfe09c2d663bb8c50378f295accd266ff2b2018668ca5353436a6797bb"
+      },
+      {
+        "version": "0014_odds_quota_reservations",
+        "definitionHash": "sha256:91bc1571f8873ccaeb8a2b8a9a8c2425370b4eec3c0931f1fa3ae02ffae56da1"
+      }
+    ],
+    "requiredTables": [
+      "engine_schema_versions",
+      "odds_quota_control",
+      "odds_quota_epochs",
+      "odds_quota_events",
+      "odds_quota_reservation_events",
+      "odds_quota_reservations",
+      "odds_quota_state"
+    ],
+    "recoveredTables": []
+  },
+  "applicationHashes": {
+    "src/server/odds-quota.ts": "sha256:4465c7d404e3367951693893e03833eb9bdfadad36aabc684f97a722946c90a2",
+    "src/domain/odds-approved-plan.ts": "sha256:3dc8b9a621f03771bcc2a98ae11de550d93223feac5e3073869f5aa4ebac02c7",
+    "src/domain/odds-quota-budget.ts": "sha256:4addadea887be27c1c597e1163cf7bb14c624f71a3ff4f86f094df4aeff1f9f7",
+    "config/2026-nfl-schedule.v1.json": "sha256:9df8588f1baf73038c4e2cb941f332f25a6f81366d6a5ec660b133fa8eaf46c7"
+  },
+  "proof": {
+    "contract": "engine-os.os-19a-exact-staging-proof.v1",
+    "status": "pass",
+    "startedAt": "2026-08-26T15:42:41.596Z",
+    "completedAt": "2026-08-26T15:43:37.168Z",
+    "proofHash": "968bedd467064f1cb40c8822979991a4868055409fb72f95d0136b75dd452171",
+    "executionShape": "two_concurrent_d1_batches_within_one_worker_request",
+    "crossWorkerIsolateRaceVerified": false,
+    "retryReset": {
+      "performed": true,
+      "priorReservations": 138,
+      "priorEvents": 276,
+      "priorBootstrapEvents": 1,
+      "reason": "The first terminal run completed without a retained HTTP response. Reset was allowed only after verifying the exact terminal no-dispatch shape, then the proof was repeated and captured."
+    },
+    "bootstrap": {
+      "used": 38,
+      "remaining": 462,
+      "planCredits": 500,
+      "reconciles": true,
+      "quotaEpoch": "24b446b79da0bdf402fbe2a0a25a298ea694dd27d23dc4c5bd76531141dd4432",
+      "credentialGenerationId": "os19a-isolated-staging-20260826"
+    },
+    "plan": {
+      "approvedRequestCount": 480,
+      "eligibleZeroReserveCount": 172,
+      "fillerCount": 136,
+      "projectedBeforeRace": 446,
+      "projectedAfterWinner": 449,
+      "projectedAfterBothIfIncorrectlyAdmitted": 452,
+      "hardCeiling": 450
+    },
+    "contention": {
+      "contenders": 2,
+      "acquired": 1,
+      "blocked": 1,
+      "winnerRequestKey": "the-odds-api:kickoff_minus_15:2026-12-15T01:00:00.000Z:slate",
+      "loserRequestKey": "the-odds-api:open_monday:2026-12-14T17:00:00.000Z:slate",
+      "loserError": "Odds quota reservation blocked: future_reserve"
+    },
+    "duplicate": {
+      "acquired": false,
+      "eventCountBefore": 1,
+      "eventCountAfter": 1
+    },
+    "cleanup": {
+      "releasedBeforeDispatch": 138,
+      "outstandingReservations": 0,
+      "dispatchedReservations": 0,
+      "dispatchedEvents": 0,
+      "finalUsed": 38,
+      "finalRemaining": 462
+    },
+    "provider": {
+      "apiKeyBound": false,
+      "providerCalls": 0
+    }
+  },
+  "validation": {
+    "focusedTests": {
+      "passed": 14,
+      "failed": 0
+    },
+    "typecheckPassed": true,
+    "lintPassed": true,
+    "buildPassed": true,
+    "isolatedStagingCleanWorktreeSuite": {
+      "passed": 283,
+      "failed": 1,
+      "skipped": 1,
+      "failure": "artifacts/model-lab/module-two/pre-replay-manifest.json is absent from a clean clone",
+      "disposition": "Existing OS-00 durability defect; OS-19A does not waive it."
+    },
+    "productionWorkingTreeSuiteAfterReceipt": {
+      "passed": 283,
+      "failed": 0,
+      "skipped": 1,
+      "note": "The ignored Module 2 pre-replay manifest is present in this working tree; this passing run does not close the clean-clone durability defect."
+    }
+  },
+  "productionCredentialInstallation": {
+    "projectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+    "productionUrl": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site",
+    "environmentRevision": 17,
+    "versionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_84aea02c5bdc8191b653ab1a05e8f0d2",
+    "deploymentId": "appgdep_6a8f0b3d70548191b0cd32fda6a95f94",
+    "installedEnvironmentKeys": [
+      "ODDS_API_KEY"
+    ],
+    "oddsApiKeyStoredAsSecret": true,
+    "captureEnableKeyInstalled": false,
+    "activeWorkerReadsOddsApiKey": false,
+    "activeWorkerCaptureEnabled": false,
+    "providerAuthenticationVerified": false,
+    "providerRequestMade": false,
+    "postInstallLinesStatus": {
+      "configured": false,
+      "stale": true,
+      "partial": false
+    }
+  },
+  "retirement": {
+    "proofEnvironmentKeysRemoved": true,
+    "environmentRevisionAfterRemoval": 2,
+    "retirementMode": "owner_only_inert_tombstone",
+    "physicalProjectDeletionAvailableThroughConnector": false,
+    "physicallyDeleted": false,
+    "historicalD1DataMayRemainAccessibleThroughOwnerAdministrativeTools": true,
+    "tombstoneVersionNumber": 5,
+    "tombstoneVersionId": "appgprj_6a8eff7517448191bbf37478d3d1f3c0~appgver_7de0d2614d78819197cbf39de150b3d2",
+    "tombstoneDeploymentId": "appgdep_6a8f0ac426a48191b219b3106006bbff",
+    "tombstoneDeploymentStatus": "succeeded",
+    "tombstoneSourceCommit": "55361264bdbda978b8c5a78068a23ad188335432",
+    "tombstoneArchiveContentHash": "sha256:64aef9530a3f27be17e20e00a9fc12c7dc4ed910d7808edc91c82a81baf2e71a",
+    "runtimeD1Binding": false,
+    "runtimeR2Binding": false,
+    "remainingEnvironmentKeys": [],
+    "httpStatus": 410,
+    "responseStatus": "retired"
+  },
+  "claims": {
+    "exactProductionReservationApplicationPathVerifiedOnIsolatedSitesD1": true,
+    "atomicOneWinnerContentionVerified": true,
+    "duplicateIdempotencyVerified": true,
+    "preDispatchReleaseVerified": true,
+    "providerQuotaUnchanged": true,
+    "urgentOs19aAccepted": true,
+    "fullOs19Accepted": false,
+    "ops08Complete": false,
+    "os18aAccepted": false,
+    "captureAuthorized": false,
+    "captureEnabled": false,
+    "providerAuthenticationVerified": false,
+    "productionProviderRequestMade": false,
+    "productionContentionTested": false,
+    "stagingRetiredAndInert": true,
+    "stagingPhysicallyDeleted": false,
+    "schedulerQualified": false,
+    "r2DurabilityQualified": false
+  }
+}

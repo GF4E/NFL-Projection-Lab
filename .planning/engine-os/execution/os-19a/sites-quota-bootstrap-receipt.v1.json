@@ -1,0 +1,93 @@
+{
+  "schemaVersion": "engine-os.os-19a-sites-quota-bootstrap-receipt.v1",
+  "generatedAt": "2026-08-26T02:27:42Z",
+  "status": "dashboard_bootstrap_and_d1_primitives_pass_exact_live_path_pending",
+  "scope": "Owner-attested counter bootstrap, current-usage budget simulation, and isolated deployed-D1 primitive falsification",
+  "ownerAttestation": {
+    "used": 38,
+    "remaining": 462,
+    "planCredits": 500,
+    "reconciles": true,
+    "reportChannel": "interactive_owner_report",
+    "exactDashboardObservationTimestampRecorded": false,
+    "freshnessHandling": "The one-shot operator invocation followed the owner's active counter reply in the same turn; no reusable freshness claim is made."
+  },
+  "preBootstrapLiveState": {
+    "legacyUsed": 39,
+    "legacyRemaining": 461,
+    "controlRows": 0,
+    "epochRows": 0,
+    "reservationRows": 0,
+    "outstandingReservations": 0
+  },
+  "bootstrap": {
+    "status": "applied",
+    "credentialGenerationId": "oddsapi-20260825-owner-rotation-01",
+    "quotaEpoch": "2af18312d58955cbffc3bfe09694608ad60f509bf1c93834217a8395c57359ef",
+    "observedAt": "2026-08-26T02:24:13.471Z",
+    "used": 38,
+    "remaining": 462,
+    "lastCost": 0,
+    "providerRequestMade": false
+  },
+  "budgetSimulation": {
+    "resetOffsetScenarioCount": 105,
+    "actualObservedPeriod": {
+      "maximumScheduledCredits": 405,
+      "maximumAllowedCredits": 399,
+      "withinCeilingEverywhere": true,
+      "allEssentialSnapshotsPreserved": true
+    },
+    "conservativeCarry38IntoEveryFuturePeriod": {
+      "maximumScheduledCredits": 443,
+      "maximumAllowedCredits": 398,
+      "withinCeilingEverywhere": true,
+      "allEssentialSnapshotsPreserved": true
+    },
+    "onlyThrottledJobClass": "daily"
+  },
+  "deployedD1Probe": {
+    "namespace": "temporary_shadow_tables",
+    "providerDispatchEnabled": false,
+    "productionRequestKeysConsumed": 0,
+    "contenders": 2,
+    "acquired": 1,
+    "reservationRows": 1,
+    "eventRows": 1,
+    "rollbackFailureObserved": true,
+    "rollbackRows": 0,
+    "temporaryObjectsRemoved": true,
+    "productionReservationRowsAfterProbe": 0,
+    "limitation": "This proves deployed D1 uniqueness and batch rollback primitives. It does not execute reserveOddsQuota against an isolated copy of the production reservation schema; the exact-path live contention gate remains pending."
+  },
+  "temporaryOperatorPath": {
+    "versionNumber": 144,
+    "versionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_df9b045cf6d08191aeb3ff6958e11215",
+    "deploymentId": "appgdep_6a8e4e375ad481919f7cc2910df74867",
+    "environmentRevision": 15,
+    "environmentKeysRemoved": true,
+    "environmentRevisionAfterRemoval": 16,
+    "sourceRetirementPendingCleanDeployment": false,
+    "cleanVersionNumber": 145,
+    "cleanVersionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_295510b0c4088191b2c27d8fdcc46063",
+    "cleanDeploymentId": "appgdep_6a8e503b77f48191b2d175033b54c759",
+    "cleanDeploymentStatus": "succeeded",
+    "retiredEndpointPostStatus": 405,
+    "retiredEndpointPostResponse": "Public access is read-only"
+  },
+  "credentialHandling": {
+    "replacementOddsKeyInspectedByBuild": false,
+    "replacementOddsKeyBoundToSites": false,
+    "replacementOddsKeyUsed": false,
+    "captureEnabled": false,
+    "productionEnvironmentKeysAfterRetirement": []
+  },
+  "claims": {
+    "freshDashboardCounterBootstrapVerified": true,
+    "currentUsageBudgetVerified": true,
+    "deployedD1AtomicPrimitivesVerified": true,
+    "exactProductionReservationPathVerifiedOnIsolatedD1": false,
+    "os19aAccepted": false,
+    "captureAuthorized": false
+  }
+}

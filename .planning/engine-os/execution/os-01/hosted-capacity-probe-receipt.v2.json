@@ -1,0 +1,71 @@
+{
+  "schemaVersion": "os01-hosted-capacity-probe-receipt.v2",
+  "recordedAt": "2026-08-29T02:31:32Z",
+  "result": "passed_bounded_read_only_capacity_probe",
+  "qualificationId": "os01-capacity-20260829-489-readonly",
+  "scope": "One owner-only temporary Sites project with one fresh isolated D1 binding; no production, provider, secret, quota, capture, model, or schedule path.",
+  "sites": {
+    "projectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+    "url": "https://os01-d1-capacity-probe-two-20260829.psoiawesome.chatgpt.site",
+    "deploymentId": "appgdep_6a9243901a808191ad9f6c099bc90331",
+    "access": {
+      "mode": "custom",
+      "ownerOnly": true,
+      "ownerCount": 1,
+      "groupCount": 0,
+      "editorCount": 0,
+      "externalPrincipalCount": 0
+    },
+    "bindings": {
+      "d1": "DB",
+      "r2": null,
+      "providerBindings": [],
+      "scheduledTriggers": []
+    }
+  },
+  "source": {
+    "commit": "f161104783f13ad15009fc2da4ac8f11f513c4fd",
+    "workerSha256": "8969879cc4c233d92d3a53d3202300b13b6e491e57dc3db031e12f309d983b05",
+    "builtWorkerSha256": "e08e0c035405223072ec7c35bc6430e1e1a252cab161005f4dc5b6cde755fd84",
+    "archiveSha256": "f0720062fe21c926d367520560728a2b5d077c1b0ece017bef0155862b5565c2"
+  },
+  "request": {
+    "method": "POST",
+    "route": "/__engine-os/os01-d1-capacity-probe/v1",
+    "queryCount": 489,
+    "batchCount": 1,
+    "readOnly": true
+  },
+  "response": {
+    "httpStatus": 200,
+    "version": "engine-os.os01-d1-capacity-probe-response.v1",
+    "qualificationId": "os01-capacity-20260829-489-readonly",
+    "queryCount": 489,
+    "batchCount": 1,
+    "resultCount": 489,
+    "firstOrdinal": 0,
+    "lastOrdinal": 488,
+    "elapsedMilliseconds": 588,
+    "underThirtySeconds": true,
+    "databaseMutations": 0,
+    "providerCalls": 0,
+    "providerSecretReads": 0,
+    "captureActivations": 0,
+    "receiptHash": "cb7c00a83a66304430c0c61385328568b752a7122069e5cc8c170e849193ed55"
+  },
+  "acceptedProofs": [
+    "the exact isolated Sites D1 accepted one batch containing 489 read-only statements",
+    "the Worker returned exactly 489 ordered results in 588 milliseconds",
+    "the probe recorded zero database mutations, provider calls, provider-secret reads, and capture activations",
+    "the temporary Sites project was owner-only at qualification time"
+  ],
+  "unacceptedProofs": [
+    "the 295-statement mutating blank migration batch completes within 30 seconds",
+    "the hosted migration harness produces terminal schema parity",
+    "D1 physical-manifest parity",
+    "exact distinct-resource backup and restore",
+    "OS-01 or ARC-03 acceptance",
+    "production migration authorization or production activation"
+  ],
+  "claimBoundary": "This receipt qualifies only the effective capacity and duration of the exact 489-statement read-only probe on the named owner-only temporary Sites project and isolated D1. It authorizes deployment of the qualification-only v2 harness solely to that same project so the real hosted migration path can be tested. It does not qualify migration behavior, mutating-batch duration, restoration, physical parity, OS-01, ARC-03, production, provider access, quota use, capture, or models."
+}

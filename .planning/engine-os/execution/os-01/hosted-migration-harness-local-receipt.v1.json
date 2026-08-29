@@ -1,0 +1,128 @@
+{
+  "version": "os01-hosted-migration-harness-local-receipt.2026.1",
+  "recordedAt": "2026-08-29T01:00:35Z",
+  "workPackage": "OS-01",
+  "requirement": "ARC-03",
+  "result": "accepted_bounded_local_harness_ready_no_hosted_execution",
+  "implementationCommit": "8863d38be5c50ba7c7a2c4289cf27c2b75f0071f",
+  "implementationTree": "fe59d66427ddad34568355e6e9cfe03f5a3eb0e6",
+  "acceptedParentCommit": "d24db5632410894d4f82c12e7f1d0c4c256a208d",
+  "artifacts": {
+    "contract": {
+      "path": "config/os01-hosted-migration-qualification.v1.json",
+      "sha256": "3162284c2af26a57e0aadc168b5c3b44ddfb1f6e0a6d87719138bee49d05e04e"
+    },
+    "core": {
+      "path": "qualification/os01-hosted-migration/core.ts",
+      "sha256": "e058883a6ffe70df92c75d78bf119cecf2d2008ef28fc2db0b8e9d812796c159"
+    },
+    "entry": {
+      "path": "qualification/os01-hosted-migration/entry.ts",
+      "sha256": "26c5a51f2eedfb4a645593a4d37fb63039762079e3bf5c58576984af8820f733"
+    },
+    "authorityLoader": {
+      "path": "scripts/os01-hosted-migration-authority.ts",
+      "sha256": "6753458a4196906579d8833490f22b3c0c25e54083cf82e0cf3d95bd0da5616e"
+    },
+    "builder": {
+      "path": "scripts/build_os01_hosted_migration_harness.ts",
+      "sha256": "0ef3e23b87ce431548df466aec4b9a8470e33b938aeb6062a9406de9517b6a53"
+    },
+    "tests": {
+      "path": "tests/os01-hosted-migration-harness.test.ts",
+      "sha256": "cf29b8012285ab2973e2aeef3b846a07dbcc7dda0434abb5ff75c47ea1b58096"
+    },
+    "runbook": {
+      "path": ".planning/engine-os/execution/os-01/ADR-0010-isolated-hosted-migration-harness.md",
+      "sha256": "ef499fbe4eec499eb7192cbee29f90c6ee93e74e06aed6dce3173921b9ace868"
+    },
+    "unchangedAcceptedLoader": {
+      "path": "scripts/os01-migration-qualification.ts",
+      "sha256": "0504d32ed3d08ee0cb8303b9559487e323a68f63cdce3e4f9e01763b07291e3a"
+    }
+  },
+  "authority": {
+    "acceptedContractSha256": "9b5da72706f18670c3ecb67763d18f109cf228b2a56c83f1ea52ff8582882e51",
+    "predecessorAuthoritySha256": "948dbfd5657c169c01d15d6a6fea08524a321d71852cc3148355c0d4210fcc0d",
+    "successorAuthoritySha256": "87db50ad848bdd3ee11a6bc8895b2647b5cda7ad43bc9f49f9954276ead2d04e",
+    "journalSha256": "c2f4c41e680cc92e3eb21cb02869e45dae4862e7296e0a72880e5f1026fbe77f",
+    "terminalManifestSha256": "4ca77b123faeeb7f5287994548f969bed35e2be9c6efcf4d88c509fb3d89b47d",
+    "orderedMigrationBundleSha256": "b72fae202662ae4cf689c4656bc762944264e9a59e637582b9fa0b4e0a31e122",
+    "legacyMigrationBundleSha256": "ba75205577b97fc97db5b9b4eea9f8351a077390994bf6b5e2a4642a062f9a79"
+  },
+  "acceptedLocalProofs": [
+    "build_time_single_read_no_follow_d24_authority_and_exact_embedded_migration_bytes",
+    "runtime_rejects_reordered_or_substituted_migration_bytes_before_d1_write",
+    "blank_0000_through_0020_atomic_batch_and_deterministic_retry",
+    "legacy_0016_fixture_export_and_exact_0017_through_0020_row_preservation",
+    "same_name_raw_ddl_divergence_rolls_back_before_commit",
+    "foreign_key_and_quick_check_are_in_the_terminal_guard",
+    "retry_paths_reject_unexpected_rows_or_receipts",
+    "failure_probe_requires_the_exact_intentional_missing_table_error_identity",
+    "earlier_platform_failure_cannot_be_misreported_as_the_failure_probe",
+    "logical_export_corruption_rejected_before_write",
+    "distinct_resource_restore_blocked_before_write",
+    "reproducible_db_only_sites_package_with_immutable_manifest_digest",
+    "production_worker_and_active_build_graph_do_not_reach_the_harness"
+  ],
+  "verification": {
+    "fullRepositoryGate": "passed",
+    "testFilesPassed": 80,
+    "testFilesSkipped": 1,
+    "testsPassed": 867,
+    "testsSkipped": 1,
+    "focusedFilesPassed": 2,
+    "focusedTestsPassed": 15,
+    "typecheck": "passed",
+    "lint": "passed",
+    "schemaAuthority": "passed_93_80_76_0",
+    "productionBuild": "passed",
+    "activeBuildGraph": "passed_167_source_361_build_files",
+    "trackedWorkingTreeSecretScan": "passed_zero_findings",
+    "independentAudit": "accepted_bounded_local_harness_only"
+  },
+  "hostedCapacity": {
+    "estimatedMaximumD1QueriesPerInvocation": 470,
+    "blankReplayBatchStatements": 276,
+    "successorBatchStatements": 137,
+    "maximumBatchDurationSeconds": 30,
+    "activePredeployCapabilityProbeIncluded": false,
+    "requiredCapabilityProof": "read-only Sites plan and binding metadata before deployment",
+    "failClosedBehavior": "if capacity cannot be proved, hosted qualification is blocked before deployment"
+  },
+  "forbiddenActivity": {
+    "sitesCalls": 0,
+    "hostedDeployments": 0,
+    "productionAccess": 0,
+    "providerSecretReads": 0,
+    "providerCalls": 0,
+    "quotaReservations": 0,
+    "captureActivation": 0,
+    "realRetainedLockAccess": 0
+  },
+  "remainingExternalGates": [
+    "read_only_proof_that_the_temporary_sites_d1_tier_supports_470_queries_per_invocation",
+    "isolated_hosted_blank_replay",
+    "isolated_hosted_legacy_forward_and_row_preservation",
+    "hosted_actual_path_partial_failure_proof",
+    "d1_physical_manifest_parity",
+    "exact_distinct_resource_backup_and_restore",
+    "fresh_exact_production_semantic_census",
+    "fresh_exact_production_row_preservation_manifest",
+    "dormant_production_forward_migration",
+    "postmigration_production_semantic_row_and_foreign_key_parity",
+    "independent_final_acceptance_audit"
+  ],
+  "claims": {
+    "localHarnessAccepted": true,
+    "hostedQualificationAccepted": false,
+    "physicalManifestParityAccepted": false,
+    "exactDistinctRestoreAccepted": false,
+    "os01Accepted": false,
+    "arc03Accepted": false,
+    "productionMigrationAuthorized": false,
+    "productionMigrationApplied": false
+  },
+  "claimBoundary": "This receipt accepts only the bounded local construction and verification of a standalone owner-only Sites-compatible D1 harness at implementation commit 8863d38. No hosted call or deployment occurred. Exact distinct-resource restoration and D1 physical-manifest parity remain unaccepted. Even a future passing hosted run would prove only the named isolated raw-catalog/DDL, blank, legacy-forward, row-preservation, rollback, export, and restore-block mechanisms; it would not establish production prestate, accept OS-01 or ARC-03, or authorize production migration.",
+  "receiptHash": "112330e7064f10dd3407731291363cae567aa94756306b209e7a276655fed865"
+}

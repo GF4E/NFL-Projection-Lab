@@ -1,0 +1,19 @@
+{
+  "version": "2026.1",
+  "foundation": [
+    "market_anchor", "opponent_adjusted_efficiency", "qb_availability", "rest_travel", "kickoff_weather", "discrete_nfl_scoring"
+  ],
+  "shadow": [
+    "coverage_pressure_matchup", "pass_rush_protection_matchup", "personnel_usage_change", "coach_clock_profile", "market_microstructure", "public_sharp_divergence"
+  ],
+  "quarantined": [
+    "narrative_sentiment", "referee_effect", "travel_body_clock", "coach_tendency_small_sample", "social_signal"
+  ],
+  "rules": {
+    "shadowRequiresPreregistration": true,
+    "quarantinedCannotPromoteDirectly": true,
+    "structuralPromotionOffseasonOnly": true,
+    "humanAdjustmentsTrainingEligible": false,
+    "teamPickOutcomesTrainingEligible": false
+  }
+}

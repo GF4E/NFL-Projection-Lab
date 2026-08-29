@@ -1,0 +1,284 @@
+import { spawnSync } from "node:child_process";
+import { createHash, createHmac } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+import { describe, expect, it } from "vitest";
+
+import {
+  configuredTrustedTarget,
+  qualificationBuildContext
+} from "../scripts/run_os01_production_census";
+
+type QualificationEntropyModule = {
+  qualificationBuildActive(): boolean;
+  qualificationBuildHex(domain: string): string | undefined;
+  runWithQualificationBuildContext<T>(context: Buffer, callback: () => T | Promise<T>): Promise<T>;
+  runWithQualificationBuildContextForTest<T>(
+    context: Buffer,
+    callback: () => T | Promise<T>,
+    observeZeroized: (observation: {
+      inputContext: Buffer;
+      retainedContext: Buffer;
+    }) => void
+  ): Promise<T>;
+};
+
+type PreviewCredentialsModule = {
+  createPreviewBuildCredentials(): { id: string; signingKey: string; encryptionKey: string };
+};
+
+const contract = JSON.parse(readFileSync("config/os01-census-attestation.v1.json", "utf8")) as {
+  buildIdentity: {
+    qualificationBuild: {
+      modeFlag: string;
+      patchPath: string;
+      patchSha256: string;
+      pnpmPatchHash: string;
+      vinextVersion: string;
+      patchedRuntimeRoot: string;
+      patchedRuntimePaths: string[];
+      normalBuildScriptsMayUseModeFlag: boolean;
+      ownerOnlyAccessMode: string;
+      productionAccessMode: string;
+      ownerOnlyPublicContextAllowed: boolean;
+      productionPrivateSeedRequired: boolean;
+      remoteBuildAllowed: boolean;
+      rawSeedOrContextPersistenceAllowed: boolean;
+    };
+  };
+};
+
+const qualification = contract.buildIdentity.qualificationBuild;
+
+function sha256(value: string | Uint8Array): string {
+  return createHash("sha256").update(value).digest("hex");
+}
+
+async function loadQualificationEntropy(): Promise<QualificationEntropyModule> {
+  const path = resolve("node_modules/vinext/dist/build/qualification-entropy.js");
+  return await import(pathToFileURL(path).href) as QualificationEntropyModule;
+}
+
+async function loadPreviewCredentials(): Promise<PreviewCredentialsModule> {
+  const path = resolve("node_modules/vinext/dist/build/preview-credentials.js");
+  return await import(pathToFileURL(path).href) as PreviewCredentialsModule;
+}
+
+describe("pinned Vinext qualification build mode", () => {
+  it("binds the exact patch, lock mapping, runtime closure, and fail-closed entropy policy", () => {
+    const patch = readFileSync(qualification.patchPath);
+    expect(sha256(patch)).toBe(qualification.patchSha256);
+    expect(qualification.pnpmPatchHash).toBe(qualification.patchSha256);
+    const workspace = readFileSync("pnpm-workspace.yaml", "utf8");
+    const lock = readFileSync("pnpm-lock.yaml", "utf8");
+    expect(workspace.match(new RegExp(
+      `vinext@${qualification.vinextVersion.replaceAll(".", "\\.")}: ${qualification.patchPath.replaceAll(".", "\\.")}`,
+      "gu"
+    ))).toHaveLength(1);
+    expect(lock.match(new RegExp(
+      `vinext@${qualification.vinextVersion.replaceAll(".", "\\.")}: ${qualification.pnpmPatchHash}`,
+      "gu"
+    ))).toHaveLength(1);
+    const installedRoot = resolve("node_modules/vinext");
+    const runtimeRecords = qualification.patchedRuntimePaths.map((path) => {
+      const bytes = readFileSync(resolve(installedRoot, path));
+      return { path, bytes: bytes.byteLength, sha256: sha256(bytes) };
+    });
+    const stableRecords = runtimeRecords.map((record) => ({
+      bytes: record.bytes,
+      path: record.path,
+      sha256: record.sha256
+    }));
+    expect(sha256(JSON.stringify(stableRecords))).toBe(qualification.patchedRuntimeRoot);
+    expect(qualification.ownerOnlyAccessMode).toBe("owner_only");
+    expect(qualification.productionAccessMode).toBe("production");
+    expect(qualification.ownerOnlyPublicContextAllowed).toBe(true);
+    expect(qualification.productionPrivateSeedRequired).toBe(true);
+    expect(qualification.remoteBuildAllowed).toBe(false);
+    expect(qualification.rawSeedOrContextPersistenceAllowed).toBe(false);
+    expect(qualification.normalBuildScriptsMayUseModeFlag).toBe(false);
+    expect(readFileSync("package.json", "utf8")).not.toContain(qualification.modeFlag);
+  });
+
+  it("derives six separated domains and leaves ordinary calls random", async () => {
+    const entropy = await loadQualificationEntropy();
+    const preview = await loadPreviewCredentials();
+    const context = createHash("sha256").update("qualification-fixture-a", "utf8").digest();
+    const domains = [
+      ["pages-client-assets-build-session", 16],
+      ["prerender-secret", 32],
+      ["preview-mode-encryption-key", 32],
+      ["preview-mode-id", 16],
+      ["preview-mode-signing-key", 32],
+      ["shared-revalidate-secret", 32]
+    ] as const;
+    const expectedByDomain = Object.fromEntries(domains.map(([domain, length]) => [
+      domain,
+      Buffer.from(createHmac("sha256", context)
+        .update(Buffer.from("vinext/qualification-build/v1\0", "utf8"))
+        .update(domain, "utf8")
+        .digest())
+        .subarray(0, length)
+        .toString("hex")
+    ]));
+    const derived = await entropy.runWithQualificationBuildContext(context, () => Object.fromEntries(
+      domains.map(([domain]) => [domain, entropy.qualificationBuildHex(domain)])
+    ));
+    for (const [domain, length] of domains) {
+      expect(derived[domain]).toBe(expectedByDomain[domain]);
+      expect(derived[domain]).toHaveLength(length * 2);
+    }
+    expect(new Set(Object.values(derived)).size).toBe(domains.length);
+    expect(entropy.qualificationBuildHex("preview-mode-id")).toBeUndefined();
+    const ordinaryA = preview.createPreviewBuildCredentials();
+    const ordinaryB = preview.createPreviewBuildCredentials();
+    expect(ordinaryA).not.toEqual(ordinaryB);
+    expect(ordinaryA.id).toMatch(/^[a-f0-9]{32}$/u);
+    expect(ordinaryA.signingKey).toMatch(/^[a-f0-9]{64}$/u);
+    expect(ordinaryA.encryptionKey).toMatch(/^[a-f0-9]{64}$/u);
+  });
+
+  it("changes every derived domain when the public package context changes", async () => {
+    const entropy = await loadQualificationEntropy();
+    const domains = [
+      "pages-client-assets-build-session",
+      "prerender-secret",
+      "preview-mode-encryption-key",
+      "preview-mode-id",
+      "preview-mode-signing-key",
+      "shared-revalidate-secret"
+    ];
+    const first = await entropy.runWithQualificationBuildContext(
+      createHash("sha256").update("qualification-fixture-a", "utf8").digest(),
+      () => domains.map((domain) => entropy.qualificationBuildHex(domain))
+    );
+    const second = await entropy.runWithQualificationBuildContext(
+      createHash("sha256").update("qualification-fixture-b", "utf8").digest(),
+      () => domains.map((domain) => entropy.qualificationBuildHex(domain))
+    );
+    expect(first.every((value, index) => value !== second[index])).toBe(true);
+  });
+
+  it("zeroes caller and retained contexts after successful and failed callbacks", async () => {
+    const entropy = await loadQualificationEntropy();
+    const successfulInput = Buffer.alloc(32, 0x5a);
+    let callbackCompleted = false;
+    let successfulObservation: {
+      inputContext: Buffer;
+      retainedContext: Buffer;
+    } | undefined;
+
+    await entropy.runWithQualificationBuildContextForTest(successfulInput, async () => {
+      expect(entropy.qualificationBuildActive()).toBe(true);
+      expect(entropy.qualificationBuildHex("preview-mode-id")).toMatch(/^[a-f0-9]{32}$/u);
+      expect(successfulObservation).toBeUndefined();
+      callbackCompleted = true;
+    }, (observation) => {
+      expect(callbackCompleted).toBe(true);
+      successfulObservation = observation;
+    });
+
+    expect(entropy.qualificationBuildActive()).toBe(false);
+    expect(successfulObservation?.inputContext).toBe(successfulInput);
+    expect(successfulObservation?.retainedContext).not.toBe(successfulInput);
+    expect([...successfulInput].every((value) => value === 0)).toBe(true);
+    expect([...successfulObservation!.inputContext].every((value) => value === 0)).toBe(true);
+    expect([...successfulObservation!.retainedContext].every((value) => value === 0)).toBe(true);
+
+    const failedInput = Buffer.alloc(32, 0xa5);
+    let failedObservation: {
+      inputContext: Buffer;
+      retainedContext: Buffer;
+    } | undefined;
+    await expect(entropy.runWithQualificationBuildContextForTest(failedInput, async () => {
+      throw new Error("qualification failure fixture");
+    }, (observation) => {
+      failedObservation = observation;
+    })).rejects.toThrow("qualification failure fixture");
+    expect([...failedInput].every((value) => value === 0)).toBe(true);
+    expect([...failedObservation!.inputContext].every((value) => value === 0)).toBe(true);
+    expect([...failedObservation!.retainedContext].every((value) => value === 0)).toBe(true);
+  });
+
+  it("rejects malformed, duplicate, nested, and non-build activation", async () => {
+    const entropy = await loadQualificationEntropy();
+    await expect(entropy.runWithQualificationBuildContext(Buffer.alloc(31), () => undefined))
+      .rejects.toThrow("exactly 32 bytes");
+    await expect(entropy.runWithQualificationBuildContext(Buffer.alloc(32), async () => {
+      await entropy.runWithQualificationBuildContext(Buffer.alloc(32), () => undefined);
+    })).rejects.toThrow("already active");
+
+    const cli = resolve("node_modules/vinext/dist/cli.js");
+    const minimalEnvironment = {
+      PATH: `${resolve(process.execPath, "..")}:/usr/bin:/bin`,
+      NODE_ENV: "production",
+      CI: "1"
+    } as const;
+    const malformed = spawnSync(process.execPath, [cli, "build", qualification.modeFlag], {
+      cwd: resolve("."),
+      input: Buffer.alloc(31),
+      encoding: "utf8",
+      env: minimalEnvironment
+    });
+    expect(malformed.status).not.toBe(0);
+    expect(malformed.stderr).toContain("exactly 32 bytes");
+
+    const oversized = spawnSync(process.execPath, [cli, "build", qualification.modeFlag], {
+      cwd: resolve("."),
+      input: Buffer.alloc(33),
+      encoding: "utf8",
+      env: minimalEnvironment
+    });
+    expect(oversized.status).not.toBe(0);
+    expect(oversized.stderr).toContain("exactly 32 bytes");
+
+    const duplicate = spawnSync(process.execPath, [
+      cli, "build", qualification.modeFlag, qualification.modeFlag
+    ], {
+      cwd: resolve("."),
+      input: Buffer.alloc(32),
+      encoding: "utf8",
+      env: minimalEnvironment
+    });
+    expect(duplicate.status).not.toBe(0);
+    expect(duplicate.stderr).toContain("exactly once");
+
+    const wrongCommand = spawnSync(process.execPath, [cli, "check", qualification.modeFlag], {
+      cwd: resolve("."),
+      input: Buffer.alloc(32),
+      encoding: "utf8",
+      env: minimalEnvironment
+    });
+    expect(wrongCommand.status).not.toBe(0);
+    expect(wrongCommand.stderr).toContain("valid only for the build command");
+  });
+
+  it("bounds qualification stdin and unwinds before qualification build exits", () => {
+    const cli = readFileSync(resolve("node_modules/vinext/dist/cli.js"), "utf8");
+    expect(cli).not.toContain("fs.readFileSync(0)");
+    expect(cli.match(/Buffer\.alloc\(33\)/gu)).toHaveLength(1);
+    expect(cli.match(/if \(qualificationBuildActive\(\)\) return;/gu)).toHaveLength(2);
+    expect(cli).toContain("if (qualificationBuildActive()) return;\n\t\treturn process.exit(0);");
+    expect(cli).toContain("if (qualificationBuildActive()) return;\n\tprocess.exit(0);");
+  });
+
+  it("executes the hashed Vinext CLI with the attested Node binary and never a mutable package shim", () => {
+    const controller = readFileSync(resolve("scripts/run_os01_production_census.ts"), "utf8");
+    expect(controller).toContain('const vinextCliPath = resolve(canonicalRoot, "node_modules/vinext/dist/cli.js")');
+    expect(controller).toMatch(/spawnSync\(\s*process\.execPath,\s*\[vinextCliPath, "build"/u);
+    expect(controller).not.toContain('node_modules/.bin/vinext');
+  });
+
+  it("requires a live private-seed coordinator for the public production target", () => {
+    expect(() => qualificationBuildContext({
+      repositoryRoot: resolve("."),
+      pnpmExecutablePath: process.execPath,
+      expectedCommit: "0".repeat(40),
+      expectedSourceAnchor: "0".repeat(64),
+      expectedReady: false,
+      role: "deployment",
+      target: configuredTrustedTarget("production")
+    })).toThrow("target and entropy mode do not match");
+  });
+});

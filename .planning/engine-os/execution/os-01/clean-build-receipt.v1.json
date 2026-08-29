@@ -1,0 +1,47 @@
+{
+  "version": "os01-clean-build.2026.1",
+  "status": "passed_local_clean_build",
+  "recordedOn": "2026-08-27",
+  "workPackage": "OS-01",
+  "sourceIsolation": {
+    "copyRule": "git_tracked_and_nonignored_untracked_existing_files_only",
+    "ignoredEnvironmentPresent": false,
+    "ignoredWranglerStatePresentBeforeBuild": false,
+    "sharedNodeModulesReadOnlySymlinked": true,
+    "archiveSnapshotAtBuildSha256": "46b2a91171fdbb0ac135f0cea73dc60d34e5046bdbd062cab649b2d51e1f772d",
+    "buildRelevantInputHashAlgorithm": "sha256_of_sorted_sha256sum_lines_using_relative_paths",
+    "buildRelevantInputPaths": [
+      "src/**",
+      "worker/**",
+      "db/**",
+      "public/**",
+      "package.json",
+      "pnpm-lock.yaml",
+      "vite.config.ts",
+      "next.config.ts",
+      "tsconfig.json",
+      ".openai/hosting.json"
+    ],
+    "buildRelevantInputSha256": "789fbc456790cd9dedbb944f487ce7cf0c1005c2d21eee2a098ab7a7dcad0b8a",
+    "workspaceAndCleanArchiveBuildRelevantInputsMatched": true
+  },
+  "verification": {
+    "vinextBuild": "passed",
+    "activeBuildGraph": "passed",
+    "activeSourceFiles": 165,
+    "activeBuildFiles": 361,
+    "runtimeDdlMatchedFiles": 0,
+    "providerEndpointMatchedFiles": 0,
+    "providerSecretNameMatchedFiles": 0,
+    "terminalMigrationIdentityMatchedFiles": 1,
+    "terminalMigrationIdentityExplanation": "The Worker intentionally embeds the exact 0020 terminal receipt version and definition hash for its read-only authority assertion. No migration SQL or DDL is bundled.",
+    "buildAggregateSha256": "48d39b0e69d470cf438fe9cda729f8f0607b21c73e68e07ca8c31840df05376a"
+  },
+  "providerAndActivationBoundary": {
+    "providerSecretRead": false,
+    "providerRequest": false,
+    "quotaReservation": false,
+    "captureActivation": false
+  },
+  "claimBoundary": "This receipt qualifies only a local credential-free build and built-output DDL boundary. It does not qualify hosted D1 behavior, production prestate, backup/restore, production migration, OS-01, or ARC-03."
+}

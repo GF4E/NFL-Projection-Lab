@@ -1,0 +1,242 @@
+{
+  "schemaVersion": "engine-os.os-15a-production-foundation-direct-audit.v1",
+  "generatedAt": "2026-08-26T21:25:30Z",
+  "status": "verified_no_repair_required",
+  "scope": "Authenticated, provider-free, read-only verification that accepted OS-01A, OS-02A, OS-19A, and OS-15A production foundations remain present and fail closed. This receipt neither activates capture nor accepts any source, ledger, model, or prospective-evidence package.",
+  "auditHistory": {
+    "initialDatabaseViewerProjection": "The bounded Sites database-viewer projection omitted eight foundation table names and caused the first independent review to reject OS-15A preservation.",
+    "guardedOperatorFirstResponse": {
+      "httpStatus": 503,
+      "body": {
+        "error": "Foundation repair refused: exact 0017 receipt is absent or changed"
+      },
+      "disposition": "No schema or data mutation occurred. The first guard was intentionally narrower than the live accepted legacy boundary."
+    },
+    "resolution": "Direct authenticated D1 inspection proved that the viewer projection was stale: all accepted objects and the exact bootstrap state were present. Candidate migration 0017 was never applied and was reverted from the final source."
+  },
+  "temporaryOperator": {
+    "projectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+    "path": "/_ops/engine-os/foundation-repair-20260826",
+    "sourceCommit": "182e9ea6aa52748a8acc35ff9ad20ba5cec5b21e",
+    "versionNumber": 163,
+    "versionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_23fca5037b6881919e5612a22d8f78cc",
+    "deploymentId": "appgdep_6a8f592612708191976d4df3b273f120",
+    "deploymentStatus": "succeeded",
+    "localArchiveSha256": "ca6d34ff0bbc06b6d88db1433efb34278157493bbadc3eb541d2287bb18c995c",
+    "sitesArchiveContentHash": "sha256:9a02f264db42f75b67e39f696008866b0477b75fa3b4781bcaedbae8e0eec0a6",
+    "archiveIncludedDrizzle": false,
+    "operatorOnlyFailClosed": true,
+    "allowedMethod": "POST",
+    "constantTimeBearerDigestComparison": true,
+    "schedulerImports": false,
+    "captureImports": false,
+    "providerImports": false,
+    "providerSecretImports": false,
+    "r2Imports": false,
+    "environmentRevisionEnabled": 24,
+    "environmentRevisionRetired": 25,
+    "operatorKeysRemoved": true,
+    "retiredOperatorPostStatus": 405
+  },
+  "preservedReceipts": [
+    {
+      "version": "0013_engine_os_urgent",
+      "migrationHash": "sha256:6205a3dfe09c2d663bb8c50378f295accd266ff2b2018668ca5353436a6797bb",
+      "appliedAt": "2026-08-25T20:33:02.114Z"
+    },
+    {
+      "version": "0014_odds_quota_reservations",
+      "migrationHash": "sha256:91bc1571f8873ccaeb8a2b8a9a8c2425370b4eec3c0931f1fa3ae02ffae56da1",
+      "appliedAt": "2026-08-26T01:35:48.026Z"
+    },
+    {
+      "version": "0015_engine_os_origin_identity",
+      "migrationHash": "sha256:622fb472f959273563f3dd139b7dde676e27b370a52c0241d6ee4d3726e3444a",
+      "appliedAt": "2026-08-26T17:49:54.165Z"
+    },
+    {
+      "version": "0016_engine_os_interim_scheduler",
+      "migrationHash": "sha256:bad6665a2976440b108e1c0223d01dab3a0313283b8d2e08f0eb509ef57edcb2",
+      "appliedAt": "2026-08-26T20:39:49.109Z"
+    }
+  ],
+  "directVerification": {
+    "foundationBoundary": "accepted_legacy_0013_0014",
+    "schemaFingerprint": "sha256:353b1ad01eb414389d895b70ef58ccf56d2aeae4ca5fa4081d044d0e1fa2f88a",
+    "schemaObjectCounts": {
+      "tables": 8,
+      "indexes": 4,
+      "appendOnlyTriggers": 8
+    },
+    "foreignKeyViolationCount": 0,
+    "tableCounts": {
+      "source_capture_manifests": 0,
+      "source_capture_heartbeats": 0,
+      "odds_quota_events": 1,
+      "odds_quota_state": 1,
+      "odds_quota_epochs": 1,
+      "odds_quota_control": 1,
+      "odds_quota_reservations": 0,
+      "odds_quota_reservation_events": 0
+    },
+    "bootstrap": {
+      "quotaEpoch": "2af18312d58955cbffc3bfe09694608ad60f509bf1c93834217a8395c57359ef",
+      "credentialGenerationId": "oddsapi-20260825-owner-rotation-01",
+      "requestKey": "bootstrap:2af18312d58955cbffc3bfe09694608ad60f509bf1c93834217a8395c57359ef",
+      "observedAt": "2026-08-26T02:24:13.471Z",
+      "used": 38,
+      "remaining": 462,
+      "lastCost": 0
+    },
+    "preservedAlertId": "a5514f45beb8ad9c90efb03bed10bfcc2d056cc238f310187f9e91fa9370c1a0",
+    "downstreamOperationalTableCounts": {
+      "canonical_games": 0,
+      "game_provider_aliases": 0,
+      "game_kickoff_revisions": 0,
+      "forecast_origins": 0,
+      "game_schedule_revisions": 0,
+      "forecast_origin_versions": 0,
+      "engine_activations": 0,
+      "engine_scheduler_ticks_v2": 0,
+      "engine_scheduler_events_v2": 0,
+      "engine_origin_jobs_v2": 0,
+      "engine_origin_attempts_v2": 0,
+      "engine_origin_records_v2": 0
+    }
+  },
+  "rawOperatorResponses": {
+    "inspect": {
+      "httpStatus": 200,
+      "body": {
+        "mode": "exact_healthy_legacy",
+        "preservedReceiptVersions": [
+          "0013_engine_os_urgent",
+          "0014_odds_quota_reservations",
+          "0015_engine_os_origin_identity",
+          "0016_engine_os_interim_scheduler"
+        ],
+        "preservedAlertId": "a5514f45beb8ad9c90efb03bed10bfcc2d056cc238f310187f9e91fa9370c1a0",
+        "schemaFingerprint": "sha256:353b1ad01eb414389d895b70ef58ccf56d2aeae4ca5fa4081d044d0e1fa2f88a"
+      }
+    },
+    "bootstrapReadbackAttemptOne": {
+      "httpStatus": 200,
+      "body": {
+        "status": "already_reconstructed",
+        "foundationBoundary": "accepted_legacy_0013_0014",
+        "migrationVersion": null,
+        "quotaEpoch": "2af18312d58955cbffc3bfe09694608ad60f509bf1c93834217a8395c57359ef",
+        "credentialGenerationId": "oddsapi-20260825-owner-rotation-01",
+        "observedAt": "2026-08-26T02:24:13.471Z",
+        "used": 38,
+        "remaining": 462,
+        "lastCost": 0,
+        "sourceCaptureRows": 0,
+        "reservationRows": 0,
+        "reservationEventRows": 0,
+        "providerRequestMade": false
+      }
+    },
+    "bootstrapReadbackAttemptTwo": {
+      "httpStatus": 200,
+      "body": {
+        "status": "already_reconstructed",
+        "foundationBoundary": "accepted_legacy_0013_0014",
+        "migrationVersion": null,
+        "quotaEpoch": "2af18312d58955cbffc3bfe09694608ad60f509bf1c93834217a8395c57359ef",
+        "credentialGenerationId": "oddsapi-20260825-owner-rotation-01",
+        "observedAt": "2026-08-26T02:24:13.471Z",
+        "used": 38,
+        "remaining": 462,
+        "lastCost": 0,
+        "sourceCaptureRows": 0,
+        "reservationRows": 0,
+        "reservationEventRows": 0,
+        "providerRequestMade": false
+      }
+    },
+    "verify": {
+      "httpStatus": 200,
+      "body": {
+        "status": "verified",
+        "foundationBoundary": "accepted_legacy_0013_0014",
+        "schemaFingerprint": "sha256:353b1ad01eb414389d895b70ef58ccf56d2aeae4ca5fa4081d044d0e1fa2f88a",
+        "foreignKeyViolationCount": 0,
+        "tableCounts": {
+          "source_manifests": 0,
+          "source_heartbeats": 0,
+          "quota_events": 1,
+          "quota_state": 1,
+          "quota_epochs": 1,
+          "quota_control": 1,
+          "reservations": 0,
+          "reservation_events": 0
+        },
+        "bootstrap": {
+          "quotaEpoch": "2af18312d58955cbffc3bfe09694608ad60f509bf1c93834217a8395c57359ef",
+          "credentialGenerationId": "oddsapi-20260825-owner-rotation-01",
+          "requestKey": "bootstrap:2af18312d58955cbffc3bfe09694608ad60f509bf1c93834217a8395c57359ef",
+          "observedAt": "2026-08-26T02:24:13.471Z",
+          "used": 38,
+          "remaining": 462,
+          "lastCost": 0
+        },
+        "preservedAlertId": "a5514f45beb8ad9c90efb03bed10bfcc2d056cc238f310187f9e91fa9370c1a0",
+        "downstreamOperationalTableCounts": {
+          "canonical_games": 0,
+          "game_provider_aliases": 0,
+          "game_kickoff_revisions": 0,
+          "forecast_origins": 0,
+          "game_schedule_revisions": 0,
+          "forecast_origin_versions": 0,
+          "engine_activations": 0,
+          "engine_scheduler_ticks_v2": 0,
+          "engine_scheduler_events_v2": 0,
+          "engine_origin_jobs_v2": 0,
+          "engine_origin_attempts_v2": 0,
+          "engine_origin_records_v2": 0
+        },
+        "downstreamOperationalTablesEmpty": true,
+        "providerRequestMade": false
+      }
+    }
+  },
+  "databaseMutation": {
+    "migration0017Applied": false,
+    "bootstrapInserted": false,
+    "existingRowsUpdated": false,
+    "existingRowsDeleted": false,
+    "candidateRepairCommit": "0a86e8b47b2709ada93ea9d82274814b7ea09f3c",
+    "candidateRepairRevertCommit": "c2496c33aab1db57660bedad9800aed0efc78e9d",
+    "finalMigrationSetEndsAt": "0016_engine_os_interim_scheduler"
+  },
+  "cleanRestoration": {
+    "sourceCommit": "c2496c33aab1db57660bedad9800aed0efc78e9d",
+    "versionNumber": 164,
+    "versionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_0c152ecef9ac819197403e9d20ff2728",
+    "deploymentId": "appgdep_6a8f59a6f0708191bc268f366658712c",
+    "deploymentStatus": "succeeded",
+    "environmentRevision": 25,
+    "environmentKeys": [
+      "ODDS_API_KEY_as_redacted_secret"
+    ],
+    "captureEnableKeyPresent": false,
+    "sundayHttpStatus": 200,
+    "retiredOperatorPostStatus": 405
+  },
+  "claims": {
+    "acceptedFoundationsPreserved": true,
+    "providerRequestMade": false,
+    "providerSecretRead": false,
+    "quotaReservationCreated": false,
+    "quotaEventCreated": false,
+    "captureEnabled": false,
+    "prospectiveRecordCreated": false,
+    "productionActivationCreated": false,
+    "sourceCaptureAccepted": false,
+    "forecastLedgerAccepted": false,
+    "os03aAccepted": false,
+    "os13aAccepted": false,
+    "fullOs15Accepted": false
+  }
+}

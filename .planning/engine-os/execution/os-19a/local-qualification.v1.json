@@ -1,0 +1,90 @@
+{
+  "schemaVersion": "engine-os.os-19a-local-qualification.v1",
+  "generatedAt": "2026-08-25T18:03:20-07:00",
+  "status": "local_pass_live_schema_bootstrap_and_primitives_pass_exact_isolated_path_pending",
+  "scope": "Atomic The Odds API quota reservation and exact 2026 schedule budget only",
+  "credentialHandling": {
+    "ownerAttestation": "replacement_key_regenerated_and_staged",
+    "secretInspectedByBuild": false,
+    "secretStoredInRepository": false,
+    "workerReadsSecret": false,
+    "captureEnabled": false,
+    "freshDashboardCounterBootstrapComplete": true,
+    "dashboardUsed": 38,
+    "dashboardRemaining": 462,
+    "credentialGenerationId": "oddsapi-20260825-owner-rotation-01"
+  },
+  "scheduleEvidence": {
+    "artifact": "config/2026-nfl-schedule.v1.json",
+    "sourceCommit": "66abff2fb404bb3a77fcb4886910d901d32b8e51",
+    "sourceCsvSha256": "ee90aae773984ae143426294b2724988f7f65e6d21e031212731f622e977b580",
+    "normalizedGamesSha256": "3d7e7ac2761f36e93a9734b693e43f861152ad7dee5ddb06f098ea935ba94801",
+    "quotaPlanSha256": "a7e125f8f09ed3e373d9370fda58a0053036ca50100c7f05c5cedb8f5b28a200",
+    "regularSeasonGames": 272,
+    "regularSeasonWeeks": 18,
+    "distinctKickoffInstants": 118
+  },
+  "requestPlan": {
+    "openSunday": 18,
+    "openMonday": 18,
+    "tuesdayOrigin": 18,
+    "ordinaryDaily": 72,
+    "kickoffMinus120": 118,
+    "kickoffMinus60": 118,
+    "kickoffMinus15": 118,
+    "totalRequests": 480,
+    "playerProps": 0,
+    "unregisteredRetries": 0,
+    "pseudoOpeners": 0
+  },
+  "budgetSimulation": {
+    "monthlyPlanCredits": 500,
+    "alertAtCredits": 400,
+    "hardCeilingCredits": 450,
+    "protectedReserveCredits": 50,
+    "resetOffsets": {
+      "minimumMinutes": -720,
+      "maximumMinutes": 840,
+      "stepMinutes": 15,
+      "scenarioCount": 105
+    },
+    "maximumScheduledCredits": 405,
+    "maximumAllowedCredits": 399,
+    "allOpenersPreserved": true,
+    "allTuesdayOriginsPreserved": true,
+    "allKickoffMinus60Preserved": true,
+    "allKickoffMinus15Preserved": true,
+    "withinHardCeilingInEveryScenario": true
+  },
+  "database": {
+    "migration": "drizzle/0014_odds_quota_reservations.sql",
+    "migrationDefinitionSha256": "91bc1571f8873ccaeb8a2b8a9a8c2425370b4eec3c0931f1fa3ae02ffae56da1",
+    "liveMigrationApplied": true,
+    "liveMigrationAppliedAt": "2026-08-26T01:35:48.026Z",
+    "liveMigrationReceipt": ".planning/engine-os/execution/os-19a/sites-d1-migration-receipt.v1.json",
+    "liveBootstrapReceipt": ".planning/engine-os/execution/os-19a/sites-quota-bootstrap-receipt.v1.json",
+    "atomicReservation": true,
+    "oneHolderDispatchToken": true,
+    "appendOnlyTransitionEvents": true,
+    "appendOnlyQuotaEpochHistory": true,
+    "ambiguousChargesConsumeCapacity": true,
+    "laterCumulativeHeaderReconciliation": true,
+    "monthlyResetEpochDetection": true,
+    "schedulePlanHashBoundToReservation": true,
+    "normalizedScheduleHashVerifiedAtRuntime": true,
+    "exactApprovedRequestContractEnforced": true,
+    "providerWideSingleFlightDispatch": true,
+    "supersededEpochDispatchBlocked": true,
+    "lateUnknownResponseSettlementBlocked": true
+  },
+  "verifiedTests": {
+    "command": "pnpm exec vitest run tests/odds-quota-reservation.test.ts tests/engine-os-urgent.test.ts tests/acceptance.test.ts",
+    "filesPassed": 3,
+    "testsPassed": 101,
+    "testsFailed": 0
+  },
+  "remainingActivationGates": [
+    "repeat the exact production reserveOddsQuota contention path against an isolated deployed D1 clone with provider dispatch disabled; the production D1 primitive probe is not a substitute",
+    "keep ENGINE_OS_CAPTURE_ENABLED false and keep the Worker from reading the staged key until all OS-02A, OS-03A, OS-13A, and OS-19A activation gates pass"
+  ]
+}

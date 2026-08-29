@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "engine-os-sites-environment-receipt-v1",
+  "checkedAt": "2026-08-25T20:41:37Z",
+  "sitesProjectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+  "environmentRevision": 11,
+  "valuesInspectedOrStored": false,
+  "requiredAbsentKeys": [
+    "CRON_SECRET",
+    "ENGINE_OS_CAPTURE_ENABLED",
+    "ENGINE_OS_MIGRATION_0013_ENABLED",
+    "ENGINE_OS_MIGRATION_0013_TOKEN",
+    "GABE_ACCESS_TOKEN",
+    "INTERNAL_TEAM_GATE_ENABLED",
+    "JARRETT_ACCESS_TOKEN",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_DEMO_MODE",
+    "ODDS_API_KEY",
+    "PIPELINE_WORKER_SECRET",
+    "PIPELINE_WORKER_URL",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "TEAM_SESSION_SECRET",
+    "VAPID_PRIVATE_KEY",
+    "VAPID_PUBLIC_KEY",
+    "VAPID_SUBJECT"
+  ],
+  "allRequiredKeysAbsent": true,
+  "limitations": [
+    "This receipt proves only the empty Sites control-plane key inventory at revision 11; secret values were not read or stored.",
+    "A post-deployment runtime probe initially reported the legacy ODDS_API_KEY binding as truthy. Version 135 removes every read of that binding, and the live API then returned configured=false; underlying-provider or hosting-layer absence is still not claimed.",
+    "It does not prove provider-side revocation of the exposed Odds API credential.",
+    "Environment revision 11 takes effect on production only with the final fail-closed Sites deployment."
+  ]
+}

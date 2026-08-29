@@ -1,0 +1,163 @@
+{
+  "version": "os01-hosted-migration-qualification.2026.2",
+  "status": "candidate_capacity_probe_passed_staging_deployable",
+  "workPackage": "OS-01",
+  "requirement": "ARC-03",
+  "predecessor": {
+    "path": "config/os01-hosted-migration-qualification.v1.json",
+    "sha256": "d411116582a982bdbf9a86d797bfd8346ee72115b87602bf6b204c5eadc59270",
+    "status": "terminal_capacity_blocked_not_deployable",
+    "preservation": "The v1 contract and its rejection remain immutable historical evidence and are not amended or reused as qualification evidence."
+  },
+  "authority": {
+    "sourceCommit": "d24db5632410894d4f82c12e7f1d0c4c256a208d",
+    "acceptedContract": {
+      "path": "config/os01-migration-qualification.v1.json",
+      "sha256": "9b5da72706f18670c3ecb67763d18f109cf228b2a56c83f1ea52ff8582882e51"
+    },
+    "predecessor": {
+      "path": "config/d1-schema-authority.v1.json",
+      "sha256": "948dbfd5657c169c01d15d6a6fea08524a321d71852cc3148355c0d4210fcc0d"
+    },
+    "successor": {
+      "path": "config/d1-schema-authority.v2.json",
+      "sha256": "87db50ad848bdd3ee11a6bc8895b2647b5cda7ad43bc9f49f9954276ead2d04e"
+    },
+    "journal": {
+      "path": "drizzle/meta/_journal.json",
+      "sha256": "c2f4c41e680cc92e3eb21cb02869e45dae4862e7296e0a72880e5f1026fbe77f"
+    },
+    "terminalManifest": {
+      "path": "config/d1-schema-manifest.v1.json",
+      "sha256": "4ca77b123faeeb7f5287994548f969bed35e2be9c6efcf4d88c509fb3d89b47d"
+    },
+    "orderedMigrationBundleSha256": "b72fae202662ae4cf689c4656bc762944264e9a59e637582b9fa0b4e0a31e122",
+    "legacyMigrationBundleSha256": "ba75205577b97fc97db5b9b4eea9f8351a077390994bf6b5e2a4642a062f9a79"
+  },
+  "capacityQualification": {
+    "receipt": {
+      "path": ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v2.json",
+      "sha256": "d24b4f3d68c1b34e6852779b538fe40331f2b4714df18b2e6c91d63e7ec68b47"
+    },
+    "projectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+    "deploymentId": "appgdep_6a9243901a808191ad9f6c099bc90331",
+    "sourceCommit": "f161104783f13ad15009fc2da4ac8f11f513c4fd",
+    "workerSha256": "8969879cc4c233d92d3a53d3202300b13b6e491e57dc3db031e12f309d983b05",
+    "builtWorkerSha256": "e08e0c035405223072ec7c35bc6430e1e1a252cab161005f4dc5b6cde755fd84",
+    "archiveSha256": "f0720062fe21c926d367520560728a2b5d077c1b0ece017bef0155862b5565c2",
+    "responseReceiptHash": "cb7c00a83a66304430c0c61385328568b752a7122069e5cc8c170e849193ed55",
+    "queryCount": 489,
+    "batchCount": 1,
+    "resultCount": 489,
+    "elapsedMilliseconds": 588,
+    "databaseMutations": 0,
+    "providerCalls": 0,
+    "providerSecretReads": 0,
+    "captureActivations": 0,
+    "ownerOnly": true,
+    "status": "passed_bounded_read_only_probe"
+  },
+  "executionBoundary": {
+    "exactTemporarySitesProjectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+    "ownerOnlyTemporarySitesProject": true,
+    "isolatedD1Only": true,
+    "productionAllowed": false,
+    "automaticMigrationsIncluded": false,
+    "providerBindings": [],
+    "providerAccessAllowed": false,
+    "captureActivationAllowed": false,
+    "scheduledTriggers": [],
+    "realRetainedLockAllowed": false,
+    "d1ExecutionPrerequisite": {
+      "accountingVersion": "engine-os.os01-hosted-migration-capacity.v1",
+      "requiredQueriesPerWorkerInvocation": 489,
+      "blankReplayMigrationStatements": 291,
+      "blankReplayBatchStatements": 295,
+      "blankPrestateQueries": 4,
+      "blankTerminalQueries": 190,
+      "successorMigrationBatchStatements": 137,
+      "batchMaximumDurationSeconds": 30,
+      "activePredeployProbeIncluded": true,
+      "authoritativeSitesEffectiveLimitProof": "passed_at_least_489_read_only_queries_in_one_batch_on_exact_staging_project",
+      "underThirtySecondCapacityProbeProof": "passed_588_milliseconds",
+      "underThirtySecondMutatingMigrationProof": "pending_hosted_blank_replay",
+      "atomicFreeTierSuccessorExists": false,
+      "failureBehavior": "deployment is allowed only to the exact qualified staging project; a platform-limit, timeout, or partial migration response fails qualification and supplies no migration evidence"
+    }
+  },
+  "profiles": [
+    {
+      "id": "blank_range_replay",
+      "resource": "qualified exact isolated Sites D1 A",
+      "actions": ["blank_replay", "verify_blank_terminal"],
+      "range": "0000_through_0020",
+      "expectedTerminalCounts": { "table": 93, "index": 80, "trigger": 76, "view": 0 },
+      "fixtureRowsAllowed": false
+    },
+    {
+      "id": "legacy_forward_and_backup",
+      "resource": "fresh owner-only isolated D1 B under a separately frozen successor contract",
+      "actions": ["legacy_prepare_export", "legacy_forward", "verify_legacy_terminal"],
+      "range": "0000_through_0016_then_0017_through_0020",
+      "legacyFixture": "one deterministic legacy_29 plays row",
+      "preservation": "exact projection of every legacy plays column and all semantic migration receipt fields",
+      "deploymentAllowedByThisContract": false
+    },
+    {
+      "id": "restore_block_and_partial_failure",
+      "resource": "fresh owner-only isolated D1 C under a separately frozen successor contract",
+      "actions": ["restore_import", "legacy_prepare_export", "failure_probe", "legacy_forward", "verify_legacy_terminal"],
+      "range": "blocked_distinct_restore_then_fixture_0016_then_failed_and_successful_0017_through_0020",
+      "restoreExpectedResult": "blocked_exact_distinct_restore_unavailable_before_any_write",
+      "deploymentAllowedByThisContract": false,
+      "failureInjection": {
+        "migrationPath": "drizzle/0019_engine_os_schema_closure.sql",
+        "globalStatementIndexWithinSuccessorRange": 70,
+        "statement": "qualification-only read from an intentionally missing table"
+      }
+    }
+  ],
+  "atomicity": {
+    "migrationUnit": "one D1 batch for the entire requested migration range",
+    "prewriteGuard": "schema version, exact catalog, exact row projection, and accepted ordered byte authority are revalidated inside the batch",
+    "terminalGuard": "exact terminal catalog, expected row cardinalities, semantic receipts, fixture row, and integrity preconditions must pass before the guard table can be dropped",
+    "retry": "an already verified target state returns the same deterministic receipt",
+    "partialFailure": "any injected or natural statement failure must reject the D1 batch and preserve the exact prestate",
+    "noRetrospectiveRepair": true
+  },
+  "schemaClaimBoundary": {
+    "acceptedByHarness": "same object names, types, owning tables, exact raw sqlite_schema SQL, normalized SQL tokens, object counts, exact expected rows, valid semantic migration receipts, foreign-key check, and quick-check",
+    "physicalManifestParityAccepted": false,
+    "unacceptedProof": "the hosted harness does not recompute the d24 physical manifest over table_xinfo, index_xinfo, foreign_key_list, collations, key flags, hidden columns, defaults, and related engine-interpreted details",
+    "consequence": "a passing hosted run remains raw-catalog and DDL parity evidence; D1 physical-manifest parity requires a separate proof before OS-01 or ARC-03 acceptance"
+  },
+  "logicalBackup": {
+    "format": "engine-os.os01-hosted-logical-backup.v1",
+    "sourceRows": "all legacy tables, explicit columns, ordered rows, per-row hashes, per-table hashes, and one whole-manifest hash",
+    "corruptionBehavior": "reject before the first database write",
+    "exactRestoreRequired": true,
+    "currentRestoreStatus": "blocked",
+    "blockedReason": "accepted migrations create append-only receipt rows with D1-generated applied_at values; replaying into a distinct D1 changes exact receipt rows, and the qualification harness refuses to normalize, exempt, update, drop, disable, or bypass that append-only evidence",
+    "requiredSuccessorProof": "an exact distinct-resource export/import or platform backup/restore path preserving every receipt byte and whole rows hash",
+    "negativeControl": "restore_import returns exact_distinct_restore_unavailable before the first database write"
+  },
+  "package": {
+    "entry": "qualification/os01-hosted-migration/entry.ts",
+    "route": "/__engine-os/os01-hosted-migration/v1",
+    "runtimeBindings": ["DB"],
+    "manifest": ".openai/os01-hosted-migration-package.v2.json",
+    "manifestDigest": ".openai/os01-hosted-migration-package.v2.sha256",
+    "reproducibility": "two empty output directories for the exact qualified staging project must produce identical entry, authority, and manifest hashes",
+    "productionReachability": "worker/index.ts does not import or route to this entry",
+    "deploymentAllowed": true,
+    "deploymentTargetRestriction": "exact project appgprj_6a92435d1d788191b4d6bcaff0a1525d only"
+  },
+  "receiptProtocol": {
+    "responseVersion": "engine-os.os01-hosted-migration-receipt.v1",
+    "requestIdentity": "256-bit qualification id plus one closed action",
+    "response": "stable JSON with a self hash and zero provider, binding-read, and capture counters",
+    "operatorRetention": "preserve exact request bytes, response bytes, HTTP status, package manifest bytes, manifest digest, project access observation, D1 observations, and retirement observation under exclusive immutable filenames",
+    "duplicateBehavior": "never overwrite an existing hosted receipt directory"
+  },
+  "claimBoundary": "The exact owner-only temporary Sites project passed one 489-statement read-only D1 batch in 588 milliseconds with zero mutation, provider, secret, and capture activity. This v2 contract therefore permits deployment of the qualification-only DB-bound harness only to that exact project and isolated D1. It remains a candidate: the mutating blank replay, hosted terminal verification, physical-manifest parity, exact distinct-resource restore, legacy-forward, partial-failure, and production gates remain unaccepted. It does not accept OS-01 or ARC-03, authorize production migration, activate capture, access a provider, consume quota, or access the retained production lock."
+}

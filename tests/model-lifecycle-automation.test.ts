@@ -1,0 +1,296 @@
+import { describe, expect, it } from "vitest";
+import { metrics as fixtureMetrics } from "./fixtures";
+import {
+  loopAStateMatchesRevision,
+  loopAStateRevision,
+  runPromotionGate,
+  updateTeamStates,
+  versionLoopAStateHash
+} from "@/domain/model-lifecycle";
+import { aggregateRollingFeatureStates, missingLifecycleFeatureSeasons } from "@/server/model-lifecycle/automation";
+import { championConfigurationStatus } from "@/domain/model-version";
+import {
+  bootstrapResidualEdgeInterval,
+  fitLogisticCalibration,
+  fitWeightedBootstrapModelEnsemble,
+  fitWeightedLogistic,
+  seasonWeekBlockSample,
+  type ModelTrainingRow
+} from "@/domain/model-fit";
+import {
+  buildLifecycleTeamContexts,
+  buildLifecycleTrainingRows,
+  fitLifecycleChallenger,
+  pairedWalkForwardLogLossEvidence,
+  type LifecycleGameRow,
+  type LifecycleTeamFeatureRow
+} from "@/server/model-lifecycle/training";
+
+describe("persisted weekly model lifecycle", () => {
+  it("fits the standard logistic calibration intercept and slope", () => {
+    const rows = [0.2, 0.5, 0.8].flatMap((probability) =>
+      Array.from({ length: 100 }, (_, index) => ({
+        probability,
+        outcome: (index < probability * 100 ? 1 : 0) as 0 | 1,
+        weight: 1
+      }))
+    );
+    const calibration = fitLogisticCalibration(rows);
+    expect(calibration.intercept).toBeCloseTo(0, 6);
+    expect(calibration.slope).toBeCloseTo(1, 6);
+  });
+
+  it("resamples complete season-week blocks and preserves decay weights", () => {
+    const rows: ModelTrainingRow[] = [1, 2].flatMap((week) => (["spread", "total", "moneyline"] as const).map((market, index) => ({
+      id: `${week}:${market}`, season: 2025, week, market, outcome: index % 2 as 0 | 1,
+      push: false, weight: 0.4 + week / 10, features: { marketLogit: 0 }
+    })));
+    const sampled = seasonWeekBlockSample(rows, 20260824);
+    for (const week of new Set(sampled.map((row) => row.week))) {
+      const block = sampled.filter((row) => row.week === week);
+      expect(block.map((row) => row.market).sort()).toEqual(["moneyline", "spread", "total"]);
+      const multipliers = block.map((row) => row.weight / rows.find((source) => source.id === row.id)!.weight);
+      expect(new Set(multipliers).size).toBe(1);
+    }
+  });
+
+  it("uses paired season-week evidence for challenger uncertainty", () => {
+    const champion = Array.from({ length: 12 }, (_, index) => ({
+      id: `row-${index}`, season: 2025, week: index % 4 + 1, market: "spread" as const,
+      probability: index % 2 ? 0.55 : 0.45, outcome: index % 2 as 0 | 1, weight: 1
+    }));
+    const challenger = champion.map((row) => ({ ...row, probability: row.outcome ? 0.65 : 0.35 }));
+    const evidence = pairedWalkForwardLogLossEvidence({ champion, challenger, samples: 500 });
+    expect(evidence.improvement).toBeGreaterThan(0);
+    expect(evidence.interval90[0]).toBeGreaterThan(0);
+    expect(evidence.blocks).toBe(4);
+  });
+  it("builds a deterministic fixed-seed coefficient ensemble and centers its interval on the live model edge", () => {
+    const rows: ModelTrainingRow[] = Array.from({ length: 160 }, (_, index) => ({
+      id: `row-${index}`,
+      season: 2023 + index % 3,
+      week: index % 18 + 1,
+      market: "total",
+      outcome: (index % 7 < 4 ? 1 : 0) as 0 | 1,
+      push: false,
+      weight: 0.5 + index % 5 / 5,
+      features: { marketLogit: (index % 9 - 4) / 8, totalEnvironment: (index % 5 - 2) / 2 }
+    }));
+    const central = fitWeightedLogistic(rows, { iterations: 80 });
+    const input = {
+      rows,
+      featureNames: central.featureNames,
+      initialCoefficients: central.coefficients,
+      members: 12,
+      seedStart: 202600,
+      regularization: central.regularization,
+      iterations: 15
+    };
+    const first = fitWeightedBootstrapModelEnsemble(input);
+    const repeated = fitWeightedBootstrapModelEnsemble(input);
+    expect(first.seeds).toEqual(Array.from({ length: 12 }, (_, index) => 202600 + index));
+    expect(first.models).toEqual(repeated.models);
+    const forecastRow = { season: 2026, market: "total" as const, features: { marketLogit: 0.1, totalEnvironment: 0.2 } };
+    const interval = bootstrapResidualEdgeInterval({
+      models: first.models,
+      forecastRow,
+      centralModelProbability: 0.56,
+      marketProbability: 0.51,
+      shrinkageWeight: 0.25
+    });
+    expect(interval).not.toBeNull();
+    expect(interval!.memberEdges).toHaveLength(12);
+    expect(interval!.interval[0]).toBeLessThan(interval!.interval[1]);
+    expect((interval!.interval[0] + interval!.interval[1]) / 2).toBeCloseTo(0.0125, 2);
+  });
+
+  it("withholds a champion whose logged config differs from the forecast config", () => {
+    expect(championConfigurationStatus("champion", "old", "current")).toBe("config_mismatch");
+    expect(championConfigurationStatus("champion", "old", "current", true)).toBe("compatible");
+    expect(championConfigurationStatus("champion", "current", "current")).toBe("compatible");
+    expect(championConfigurationStatus(null, null, "current")).toBe("unavailable");
+  });
+  it("updates strength in season order and derives rolling state only through the completed week", () => {
+    const states = updateTeamStates([], [
+      { gameId: "new", season: 2025, week: 1, homeTeam: "SEA", awayTeam: "SF", actualHomeMargin: 8, consensusHomeExpectedMargin: 3, completedAt: "2025-09-01" },
+      { gameId: "old", season: 2024, week: 18, homeTeam: "SEA", awayTeam: "SF", actualHomeMargin: -2, consensusHomeExpectedMargin: 1, completedAt: "2025-01-01" }
+    ], 0.2);
+    expect(states.find((state) => state.team === "SEA")?.mean).toBeCloseTo(0.2);
+
+    const features = aggregateRollingFeatureStates(Array.from({ length: 20 }, (_, index) => ({
+      game_id: `game-${index}`,
+      season: index < 3 ? 2024 : 2025,
+      week: index + 1,
+      game_date: `2025-09-${String(index % 28 + 1).padStart(2, "0")}`,
+      team: "SEA",
+      opponent: "SF",
+      plays: 60,
+      epa_per_play: index,
+      success_rate: 0.4,
+      explosive_rate: 0.1,
+      turnover_rate: 0.02,
+      seconds_per_play: 28,
+      pass_rate_over_expectation: 0.03
+    })), 2026, 0);
+    expect(features).toHaveLength(1);
+    expect(features[0]).toMatchObject({ team: "SEA", season: 2026, throughWeek: 0 });
+    expect(features[0].epa).toBeGreaterThan(10);
+  });
+
+  it("invalidates persisted strength states when the frozen K/config revision changes", () => {
+    const current = loopAStateRevision("2026.preseason.9", 0.005);
+    const prior = loopAStateRevision("2026.preseason.8", 0.18);
+    const currentHash = versionLoopAStateHash(current, "data-hash");
+    expect(loopAStateMatchesRevision(currentHash, current)).toBe(true);
+    expect(loopAStateMatchesRevision(currentHash, prior)).toBe(false);
+    expect(loopAStateMatchesRevision("legacy-unversioned-hash", current)).toBe(false);
+    expect(loopAStateMatchesRevision(null, current)).toBe(false);
+  });
+
+  it("retains the champion until every training season has team-feature coverage", () => {
+    const games = [
+      { game_id: "2024-game", season: 2024, away_team: "SF", home_team: "SEA" },
+      { game_id: "2025-game", season: 2025, away_team: "SEA", home_team: "SF" }
+    ];
+    expect(missingLifecycleFeatureSeasons(games, [
+      { game_id: "2024-game", season: 2024, team: "SF" },
+      { game_id: "2024-game", season: 2024, team: "SEA" },
+      { game_id: "2025-game", season: 2025, team: "SEA" }
+    ])).toEqual([2025]);
+    expect(missingLifecycleFeatureSeasons(games, [
+      { game_id: "2024-game", season: 2024, team: "SF" },
+      { game_id: "2024-game", season: 2024, team: "SEA" },
+      { game_id: "2025-game", season: 2025, team: "SEA" },
+      { game_id: "2025-game", season: 2025, team: "SF" }
+    ])).toEqual([]);
+  });
+
+  it("builds all three non-pick outcome markets and fits leakage-safe season origins", () => {
+    const games: LifecycleGameRow[] = [];
+    for (let season = 2020; season <= 2025; season += 1) {
+      for (let index = 0; index < 64; index += 1) {
+        const expected = index % 7 - 3;
+        const noise = (index * 11 + season) % 9 - 4;
+        games.push({
+          game_id: `${season}-${index}`,
+          season,
+          week: index % 18 + 1,
+          game_date: `${season}-09-${String(index % 28 + 1).padStart(2, "0")}`,
+          away_team: "SF",
+          home_team: "SEA",
+          result: expected + noise,
+          total: 42 + (index % 8),
+          spread_line: expected,
+          total_line: 44.5,
+          away_rest: 7,
+          home_rest: 7 + index % 2,
+          away_moneyline: 120,
+          home_moneyline: -140,
+          away_spread_odds: -105,
+          home_spread_odds: -115,
+          under_odds: -110,
+          over_odds: -110
+        });
+      }
+    }
+    const rows = buildLifecycleTrainingRows(games, 2025);
+    expect(new Set(rows.map((row) => row.market))).toEqual(new Set(["spread", "total", "moneyline"]));
+    expect(rows.some((row) => row.push)).toBe(true);
+    const challenger = fitLifecycleChallenger(rows, 2025);
+    expect(Object.keys(challenger.walkForwardModels)).toEqual(["2023", "2024", "2025"]);
+    expect(challenger.metrics.byMarket.spread.observations).toBeGreaterThan(0);
+    expect(Number.isFinite(challenger.metrics.pooledLogLoss)).toBe(true);
+  });
+
+  it("builds coefficient features only from team games completed before the forecast week", () => {
+    const target: LifecycleGameRow = {
+      game_id: "target", season: 2025, week: 5, game_date: "2025-10-01", away_team: "SF", home_team: "SEA",
+      result: 7, total: 48, spread_line: -2.5, total_line: 44.5, away_rest: 7, home_rest: 7,
+      away_moneyline: 120, home_moneyline: -140, away_spread_odds: -105, home_spread_odds: -115,
+      under_odds: -110, over_odds: -110
+    };
+    const features: LifecycleTeamFeatureRow[] = Array.from({ length: 5 }, (_, index) => {
+      const week = index + 1;
+      const currentWeekLeak = week === 5;
+      return [
+        {
+          game_id: `prior-${week}`, season: 2025, week, game_date: `2025-09-${String(week).padStart(2, "0")}`,
+          team: "SEA", opponent: "SF", plays: 60,
+          epa_per_play: currentWeekLeak ? -10 : 0.2, success_rate: 0.5, explosive_rate: 0.13,
+          turnover_rate: 0.01, seconds_per_play: 26, pass_rate_over_expectation: 0.05
+        },
+        {
+          game_id: `prior-${week}`, season: 2025, week, game_date: `2025-09-${String(week).padStart(2, "0")}`,
+          team: "SF", opponent: "SEA", plays: 60,
+          epa_per_play: currentWeekLeak ? 10 : -0.1, success_rate: 0.38, explosive_rate: 0.07,
+          turnover_rate: 0.03, seconds_per_play: 28, pass_rate_over_expectation: -0.03
+        }
+      ];
+    }).flat();
+    const contexts = buildLifecycleTeamContexts([target], features, { minimumGames: 4 });
+    const context = contexts.get("target");
+    expect(context).toBeDefined();
+    expect(context!.sideMatchupEpa).toBeGreaterThan(0);
+    expect(context!.sideBallSecurity).toBeGreaterThan(0);
+    const rows = buildLifecycleTrainingRows([target], 2025, contexts);
+    expect(rows.find((row) => row.market === "spread")!.features.sideMatchupEpa).toBe(context!.sideMatchupEpa);
+    expect(rows.find((row) => row.market === "total")!.features.sideMatchupEpa).toBe(0);
+    expect(rows.find((row) => row.market === "total")!.features.totalPaceEnvironment).toBeGreaterThan(0);
+  });
+
+  it("uses the configured calibration range as a hard promotion gate", () => {
+    const metrics = {
+      pooledLogLoss: 0.68,
+      calibrationIntercept: 0,
+      calibrationSlope: 0.79,
+      byMarket: {
+        spread: { logLoss: 0.68, observations: 10 },
+        total: { logLoss: 0.68, observations: 10 },
+        moneyline: { logLoss: 0.68, observations: 10 }
+      }
+    };
+    const result = runPromotionGate({
+      runId: "gate", championHash: "champion", challengerHash: "challenger",
+      championMetrics: { ...metrics, calibrationSlope: 1 }, challengerMetrics: metrics,
+      dataHash: "data", configHash: "config", featureSchemaHash: "features", codeHash: "code",
+      startedAt: "2026-09-15T14:00:00Z", completedAt: "2026-09-15T14:01:00Z",
+      calibrationSlopeRange: [0.8, 1.2]
+    });
+    expect(result.run.gateDecision).toBe("retain");
+    expect(result.alert?.type).toBe("gate_rejection");
+  });
+
+  it("does not promote a challenger merely because its loss is within tolerance", () => {
+    const champion = { ...fixtureMetrics, calibrationSlope: 1 };
+    const challenger = {
+      ...champion,
+      pooledLogLoss: 0.681,
+      byMarket: Object.fromEntries(Object.entries(champion.byMarket).map(([market, value]) => [market, { ...value, logLoss: value.logLoss + 0.001 }])) as typeof champion.byMarket
+    };
+    const result = runPromotionGate({
+      runId: "worse", championHash: "champion", challengerHash: "challenger",
+      championMetrics: champion, challengerMetrics: challenger,
+      pairedLogLossImprovement: -0.001, pairedLogLossImprovementInterval90: [-0.003, 0.001], pairedEvaluationBlocks: 54,
+      dataHash: "data", configHash: "config", featureSchemaHash: "features", codeHash: "code",
+      startedAt: "2026-09-15T14:00:00Z", completedAt: "2026-09-15T14:01:00Z"
+    });
+    expect(result.run.gateDecision).toBe("retain");
+  });
+
+  it("promotes only when paired evidence and protected markets pass", () => {
+    const champion = { ...fixtureMetrics, calibrationIntercept: 0, calibrationSlope: 1 };
+    const challenger = {
+      ...champion,
+      pooledLogLoss: 0.66,
+      byMarket: Object.fromEntries(Object.entries(champion.byMarket).map(([market, value]) => [market, { ...value, logLoss: value.logLoss - 0.01 }])) as typeof champion.byMarket
+    };
+    const result = runPromotionGate({
+      runId: "better", championHash: "champion", challengerHash: "challenger",
+      championMetrics: champion, challengerMetrics: challenger,
+      pairedLogLossImprovement: 0.01, pairedLogLossImprovementInterval90: [0.003, 0.017], pairedEvaluationBlocks: 54,
+      dataHash: "data", configHash: "config", featureSchemaHash: "features", codeHash: "code",
+      startedAt: "2026-09-15T14:00:00Z", completedAt: "2026-09-15T14:01:00Z"
+    });
+    expect(result.run.gateDecision).toBe("promote");
+  });
+});

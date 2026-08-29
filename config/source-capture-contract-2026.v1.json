@@ -1,0 +1,309 @@
+{
+  "version": "source-capture-contract.2026.1",
+  "status": "frozen",
+  "frozenOn": "2026-08-26",
+  "workPackage": "OS-03A",
+  "scope": {
+    "qualification": "provider_independent_non_market_capture",
+    "productionAcquisition": "disabled",
+    "marketProviderDispatch": "prohibited",
+    "marketQualification": "fixture_only",
+    "prospectiveCaptureStarted": false,
+    "acceptedUpstreamArtifactsMutable": false
+  },
+  "contractBindings": {
+    "operatingContractVersion": "engine-operating-contract.2026.1",
+    "operatingContractCanonicalHash": "b9c71c8d7c2339de7c229b3073572df9d0a566e9f9e72f6e02938ed6e5022917",
+    "rawObjectRetentionDays": 3650,
+    "manifestRetentionDays": 3650,
+    "r2AcknowledgedObjectRpoSeconds": 0,
+    "d1MetadataRpoSeconds": 900,
+    "r2MaximumStoredGiB": 10,
+    "d1MaximumStoredGiB": 5,
+    "workerMaximumCpuMillisecondsPerInvocation": 30000
+  },
+  "datasets": [
+    {
+      "dataset": "schedule",
+      "sourceClasses": ["nflverse_public"],
+      "maximumSourceAgeSeconds": 600,
+      "laterImportOwner": "OS-03",
+      "marketNamespace": false
+    },
+    {
+      "dataset": "play_by_play",
+      "sourceClasses": ["nflverse_public"],
+      "maximumSourceAgeSecondsByClass": {
+        "current_season": 43200,
+        "historical": 604800
+      },
+      "laterImportOwner": "OS-03",
+      "marketNamespace": false
+    },
+    {
+      "dataset": "roster",
+      "sourceClasses": ["nflverse_public"],
+      "maximumSourceAgeSeconds": 604800,
+      "laterImportOwner": "OS-03",
+      "marketNamespace": false
+    },
+    {
+      "dataset": "injury",
+      "sourceClasses": ["official_nfl_public", "official_team_public"],
+      "maximumSourceAgeSeconds": 129600,
+      "laterImportOwner": "OS-03",
+      "marketNamespace": false
+    },
+    {
+      "dataset": "inactive_roof",
+      "sourceClasses": ["official_nfl_public", "official_team_public"],
+      "maximumSourceAgeSeconds": 1200,
+      "laterImportOwner": "OS-03",
+      "marketNamespace": false
+    },
+    {
+      "dataset": "weather",
+      "sourceClasses": ["open_meteo_public"],
+      "maximumSourceAgeSeconds": 21600,
+      "laterImportOwner": "OS-03",
+      "marketNamespace": false
+    },
+    {
+      "dataset": "odds",
+      "sourceClasses": ["qualification_fixture"],
+      "maximumSourceAgeSeconds": null,
+      "laterImportOwner": "OS-04",
+      "marketNamespace": true,
+      "liveDispatch": "disabled_pending_OS-18A"
+    }
+  ],
+  "requestIdentity": {
+    "contract": "engine-os.redacted-http-request.v1",
+    "methodUppercase": true,
+    "urlIncludes": ["scheme", "host", "port_when_nondefault", "path"],
+    "urlExcludes": ["userinfo", "fragment", "query_values_not_explicitly_public"],
+    "publicQueryValues": "allowlist_only_sorted_multivalue",
+    "nonpublicQueryHandling": "retain_sorted_key_name_only_in_redacted_query_keys",
+    "publicHeaderValues": "allowlist_only",
+    "forbiddenPersistedHeaders": ["authorization", "cookie", "proxy-authorization", "set-cookie"],
+    "credentialBearingPath": "reject",
+    "canonicalSerialization": "RFC8785_style_repository_canonical_json",
+    "hash": "sha256"
+  },
+  "timeSemantics": {
+    "sourceObservedAt": "timestamp represented by the source evidence; nullable only with an explicit source_time_missing code",
+    "providerPublishedAt": "provider issue or publication timestamp; nullable only with an explicit publication_time_missing code",
+    "receiptCompletedAt": "time the final response byte is available to the capture lane",
+    "persistenceRequestedAt": "time immutable R2 publication begins",
+    "responsePersistedAt": "time response-object read-after-write verification completes",
+    "sidecarPersistedAt": "time sidecar-object read-after-write verification completes",
+    "manifestPersistedAt": "D1 statement timestamp for the committed manifest extension",
+    "validFrom": "first source-valid instant",
+    "validTo": "last source-valid instant or null for open-ended validity",
+    "orderingRules": [
+      "receiptCompletedAt <= persistenceRequestedAt",
+      "persistenceRequestedAt <= responsePersistedAt",
+      "responsePersistedAt <= sidecarPersistedAt",
+      "sidecarPersistedAt <= manifestPersistedAt",
+      "validTo is null or validFrom <= validTo"
+    ],
+    "clockFormat": "UTC ISO-8601 milliseconds"
+  },
+  "responseEvidence": {
+    "preservation": "exact_response_bytes_without_decode_normalize_or_recompression",
+    "hash": "sha256",
+    "minimumBytes": 1,
+    "maximumWorkerObjectBytes": 100000000,
+    "responseObjectKey": "raw/{provider}/{dataset}/sha256/{responseSha256}",
+    "sidecarObjectKey": "manifests/os03a/sha256/{sidecarSha256}.json",
+    "readAfterWriteVerification": "required_before_D1_pointer",
+    "contentDeduplication": "provider_dataset_response_digest",
+    "captureEventDeduplication": "provider_dataset_idempotency_key",
+    "sameBytesDifferentOrigin": "one_response_object_distinct_capture_manifests"
+  },
+  "sidecar": {
+    "schema": "engine-os.os-03a-capture-sidecar.v1",
+    "requiredFields": [
+      "captureId",
+      "idempotencyKey",
+      "provider",
+      "dataset",
+      "captureClass",
+      "request",
+      "requestHash",
+      "responseObjectKey",
+      "responseSha256",
+      "responseBytes",
+      "contentType",
+      "etag",
+      "sourceObservedAt",
+      "providerPublishedAt",
+      "receiptCompletedAt",
+      "persistenceRequestedAt",
+      "responsePersistedAt",
+      "validFrom",
+      "validTo",
+      "sourceSchemaVersion",
+      "usageRights",
+      "validationState",
+      "laterImport",
+      "evidenceHash"
+    ],
+    "selfHashExcluded": true,
+    "canonicalSerialization": "repository_canonical_json",
+    "hash": "sha256"
+  },
+  "usageRights": {
+    "requiredFields": [
+      "licenseId",
+      "rightsUri",
+      "retrievedFor",
+      "redistribution",
+      "retentionClass",
+      "reviewStatus"
+    ],
+    "retentionClass": "raw_source_3650_days",
+    "realSourceActivationRule": "rights review must be verified before non-fixture production acquisition",
+    "unknownRightsBehavior": "private_preservation_only_and_withhold_public_redistribution"
+  },
+  "secretSafety": {
+    "scanCanonicalRequest": true,
+    "scanSidecar": true,
+    "scanTextualResponseBeforeR2": true,
+    "binaryResponseRule": "only provider profiles with no request credential and an approved binary content type",
+    "secretBearingResponseBehavior": "do_not_persist_body_record_secret_filtered_failure_only",
+    "secretBearingErrorBehavior": "do_not_persist_body_record_secret_filtered_failure_only",
+    "storedFailurePayload": "enumerated_code_and_secret_free_metadata_only",
+    "liveMarketSecretRead": "prohibited"
+  },
+  "validationStates": {
+    "usable": "may advance latest-good pointer",
+    "raw_only_schema_invalid": "preserve exact bytes and manifest; do not advance latest-good pointer",
+    "raw_only_partial": "preserve exact bytes and manifest; do not advance latest-good pointer",
+    "raw_only_http_error": "preserve only after secret scan; do not advance latest-good pointer"
+  },
+  "publicationOrdering": [
+    "validate secret policy",
+    "write response object by content address",
+    "read back and verify response digest and byte count",
+    "build canonical sidecar with response persistence receipt",
+    "write sidecar by content address",
+    "read back and verify sidecar digest and byte count",
+    "atomically insert D1 base manifest, OS-03A extension, append-only event, and conditional last-good pointer",
+    "read back D1 pointer and reverify both R2 objects"
+  ],
+  "pointerRules": {
+    "latestGoodOwner": "source_capture_heartbeats.latest_capture_id",
+    "advanceOnlyWhen": "validationState_is_usable_and_all_R2_and_D1_evidence_verifies",
+    "failedOrPartialCapture": "preserve_prior_latest_capture_id",
+    "conflictingIdempotencyKey": "fail_closed_without_pointer_change",
+    "manifestWithoutSidecar": "prohibited",
+    "pointerWithoutManifest": "prohibited"
+  },
+  "eventJournal": {
+    "table": "source_capture_events",
+    "appendOnly": true,
+    "eventTypes": [
+      "capture_committed",
+      "capture_deduplicated",
+      "capture_failed",
+      "replay_verified",
+      "orphan_detected",
+      "orphan_removed"
+    ],
+    "attemptToken": "unique_per_execution_attempt",
+    "retryIdentity": "same_provider_dataset_idempotency_key_new_attempt_token",
+    "payload": "canonical_secret_free_json"
+  },
+  "failureAndHeartbeat": {
+    "failureCodes": [
+      "provider_unavailable",
+      "schema_invalid",
+      "partial_import",
+      "storage_failure",
+      "manifest_failure",
+      "corrupt_object",
+      "secret_filtered",
+      "source_time_missing",
+      "publication_time_missing"
+    ],
+    "failureEventAndAlert": "same_D1_batch",
+    "failureAlertTiming": "immediate_at_failure_before_any_later_required_horizon",
+    "lastGoodRequired": true,
+    "notModifiedWithoutPriorCapture": "reject",
+    "freshnessThresholds": "engine-operating-contract.2026.1.maximumSourceAgeSeconds",
+    "staleWatchdog": "provider_independent_check_only_no_fetch"
+  },
+  "retry": {
+    "storageLayerProviderCalls": 0,
+    "sameIdempotencyKeyRequired": true,
+    "newAttemptTokenRequired": true,
+    "retryAfterCommittedCapture": "verify_and_deduplicate",
+    "retryAfterResponseOnlyOrphan": "reuse_verified_content_address_then_commit_manifest",
+    "retryAfterConflict": "reject"
+  },
+  "orphanPolicy": {
+    "immediateCleanup": "best_effort_for_objects_created_by_a_failed_attempt_after_reference_check",
+    "sweeperMinimumAgeSeconds": 86400,
+    "sweeperPrefixes": ["raw/", "manifests/os03a/"],
+    "deleteReferencedObject": false,
+    "deleteObjectWithUnknownReferenceState": false,
+    "cleanupEvidence": "append_only_orphan_detected_and_orphan_removed_events",
+    "productionSweepDuringOS03AQualification": false
+  },
+  "laterImport": {
+    "schedule": {"owner": "OS-03", "target": "schedule_raw_snapshot"},
+    "play_by_play": {"owner": "OS-03", "target": "play_by_play_raw_snapshot"},
+    "roster": {"owner": "OS-03", "target": "roster_raw_snapshot"},
+    "injury": {"owner": "OS-03", "target": "injury_raw_snapshot"},
+    "inactive_roof": {"owner": "OS-03", "target": "pregame_context_raw_snapshot"},
+    "weather": {"owner": "OS-03", "target": "issued_weather_raw_snapshot"},
+    "odds": {"owner": "OS-04", "target": "market_raw_snapshot"},
+    "identityLinkRule": "later canonical IDs append a reference and never rewrite source bytes, sidecar, receipt time, or evidence hash"
+  },
+  "qualification": {
+    "resources": "isolated_owner_only_D1_and_R2",
+    "fixtureOnly": true,
+    "externalProviderRequests": 0,
+    "providerSecretsPresent": false,
+    "requiredProofs": [
+      "exact_byte_recovery",
+      "deterministic_response_deduplication",
+      "distinct_capture_events_for_same_bytes",
+      "secret_filtering",
+      "append_only_manifests_and_events",
+      "corruption_detection",
+      "publish_before_pointer_atomicity",
+      "provider_offline_replay",
+      "failed_upload_behavior",
+      "failed_manifest_behavior",
+      "heartbeat_and_alert_behavior",
+      "partial_import_last_good_preservation",
+      "orphan_detection_and_cleanup",
+      "disabled_market_fixture_without_dispatch"
+    ]
+  },
+  "activationBoundary": {
+    "captureEnvironmentKey": "ENGINE_OS_CAPTURE_ENABLED",
+    "productionRequiredValue": "true",
+    "qualificationExpectedProductionPresence": false,
+    "productionManifestRowsExpectedDuringQualification": 0,
+    "productionCaptureEventsExpectedDuringQualification": 0,
+    "providerQuotaReservationsExpectedDuringQualification": 0
+  },
+  "acceptanceBoundary": {
+    "mayAccept": "bounded_provider_independent_OS-03A_slice",
+    "mustNotClaim": [
+      "live_market_capture",
+      "provider_authentication",
+      "prospective_capture_stream",
+      "OS-03_complete",
+      "OS-04_complete",
+      "OS-13A_complete",
+      "DATA-01_complete",
+      "MKT-01_complete",
+      "LED-06_complete",
+      "statistical_model_acceptance"
+    ]
+  }
+}

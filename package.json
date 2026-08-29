@@ -1,5 +1,63 @@
 {
-  "name": "os01-capacity-probe",
+  "name": "nfl-projection-lab",
+  "version": "1.1.0",
   "private": true,
-  "version": "1.0.0"
+  "scripts": {
+    "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
+    "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
+    "build:next": "next build",
+    "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "artifact:margin": "tsx scripts/generate_margin_artifact.ts",
+    "artifact:total": "tsx scripts/generate_total_artifact.ts",
+    "audit:score": "tsx scripts/audit_score_engine.ts",
+    "model-lab:module1": "python3 scripts/model_lab_module_one.py",
+    "model-lab:module1:self-test": "python3 scripts/model_lab_module_one.py --self-test",
+    "build:os01-hosted-migration": "tsx scripts/build_os01_hosted_migration_harness.ts",
+    "audit:os01-hosted-capacity": "tsx scripts/os01-hosted-migration-capacity.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:check": "tsx scripts/verify_drizzle_schema.ts && tsx scripts/verify_d1_schema_authority.ts",
+    "verify": "pnpm lint && pnpm typecheck && pnpm db:check && pnpm test && pnpm build && python3 scripts/verify_active_build_graph.py"
+  },
+  "dependencies": {
+    "@block65/webcrypto-web-push": "1.0.2",
+    "@fontsource/roboto": "5.3.0",
+    "@noble/hashes": "2.0.1",
+    "clsx": "^2.1.1",
+    "drizzle-orm": "0.45.2",
+    "next": "16.3.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zod": "^4.1.11"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "1.37.1",
+    "@cloudflare/workers-types": "5.20260811.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^24.7.2",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "6.0.2",
+    "@vitejs/plugin-rsc": "0.5.26",
+    "drizzle-kit": "0.31.10",
+    "eslint": "^9.37.0",
+    "eslint-config-next": "16.3.0",
+    "jsdom": "^27.0.0",
+    "react-server-dom-webpack": "19.2.6",
+    "tsx": "4.23.12",
+    "typescript": "^5.9.3",
+    "vinext": "1.0.0-beta.2",
+    "vite": "8.0.13",
+    "vitest": "4.1.10",
+    "wrangler": "4.92.0"
+  },
+  "packageManager": "pnpm@11.16.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module"
 }

@@ -1,0 +1,160 @@
+{
+  "version": "2026.preseason.16",
+  "season": 2026,
+  "frozen": true,
+  "unitDollars": 25,
+  "executionBooks": ["betmgm", "fanduel"],
+  "model": {
+    "trainingStartSeason": 2010,
+    "decayHalfLifeSeasons": 2.5,
+    "decayCandidates": [1.5, 2, 2.5, 3, 4],
+    "shrinkageWeight": 0.25,
+    "strengthK": 0.005,
+    "strengthValidationArtifact": "strength-state-validation.json",
+    "strengthProductionStatus": "shadow_withheld_no_stable_gain",
+    "promotionProtectedMarketLogLossTolerance": 0.002,
+    "promotionCalibrationSlope": [0.8, 1.2],
+    "bootstrapMembers": 100,
+    "bootstrapUnit": "season_week",
+    "bootstrapSeedStart": 202600,
+    "bootstrapFitIterations": 25,
+    "intervalPercentiles": [0.1, 0.9],
+    "keyMargins": [3, 6, 7, 10, 14],
+    "keyMarginBoundarySeason": 2015,
+    "discreteMarginArtifact": "discrete-margin-2026.json",
+    "discreteTotalArtifact": "discrete-total-2026.json",
+    "totalTranslationValidationArtifact": "total-translation-validation.json",
+    "totalTranslationKernelBandwidth": 6,
+    "seasonEffects": "random_effects",
+    "scoreDistribution": {
+      "maxScore": 70,
+      "minimumTrainingGames": 256,
+      "maximumQuoteAgeMinutes": 75,
+      "maximumScheduledQuoteAgeMinutes": 2160,
+      "bakeoffCalibrationSlope": [0.8, 1.2],
+      "bakeoffCoverage80": [0.72, 0.88],
+      "maximumLogLossRegression": 0.002
+    }
+  },
+  "sizing": {
+    "kellyFraction": 0.25,
+    "referenceBankrollUnits": 100,
+    "roundDownUnits": 0.5,
+    "minimumUnits": 0.5,
+    "maximumUnits": 2,
+    "maximumGameUnits": 3,
+    "maximumWeekUnits": 10,
+    "maximumSidePositionsPerGame": 1,
+    "maximumTotalsPerGame": 1
+  },
+  "props": {
+    "minimumReferenceBooks": 3,
+    "minimumExpectedValue": 0.02,
+    "maximumPerBook": 3,
+    "maximumSnapshotSkewMinutes": 10,
+    "maximumQuoteAgeMinutes": 75,
+    "minimumHistoryGames": 6,
+    "historyWindowGames": 8,
+    "priorGames": 4,
+    "recencyWeight": 0.85,
+    "minimumHitRate": 0.5,
+    "participationSource": "nflverse_snap_counts",
+    "distinctRecommendationKey": "player_market",
+    "usageProjectionTrainingStartSeason": 2020,
+    "usageProjectionValidationArtifact": "prop-usage-validation.json",
+    "projectionByMarket": {
+      "player_pass_yds": {
+        "method": "weighted_yardage_mean",
+        "usageRecencyWeight": 0.85,
+        "efficiencyPriorOpportunities": 0
+      },
+      "player_rush_yds": {
+        "method": "usage_efficiency",
+        "usageRecencyWeight": 0.75,
+        "efficiencyPriorOpportunities": 40
+      },
+      "player_reception_yds": {
+        "method": "usage_efficiency",
+        "usageRecencyWeight": 0.85,
+        "efficiencyPriorOpportunities": 20
+      }
+    },
+    "matchupAdjustment": "market_consensus_only",
+    "matchupValidationArtifact": "prop-matchup-validation.json"
+  },
+  "matchupEvidence": {
+    "windowGames": 17,
+    "minimumTrainingGames": 4,
+    "opponentAdjustmentMethod": "play_weighted_ridge",
+    "ridgePenalty": 16,
+    "validationArtifact": "opponent-adjustment-validation.json",
+    "coefficientFeatureScaling": {
+      "clip": 4,
+      "epaPerPlay": 0.1,
+      "successRate": 0.05,
+      "explosiveRate": 0.03,
+      "turnoverRate": 0.01,
+      "secondsPerPlay": 3,
+      "proe": 0.05,
+      "centers": {
+        "epaPerPlay": 0,
+        "successRate": 0.44,
+        "explosiveRate": 0.1,
+        "turnoverRate": 0.02,
+        "secondsPerPlay": 28,
+        "proe": 0
+      }
+    }
+  },
+  "teasers": {
+    "points": 6,
+    "screeningAmerican": -130,
+    "selectableAmericanPrices": [-110, -120, -130, -140],
+    "minimumExpectedValue": 0,
+    "preferredOpponentExceptionalEv": 0.05
+  },
+  "monitoring": {
+    "pushEdgeThreshold": 0.03,
+    "calibrationSlope": [0.7, 1.3],
+    "psiThreshold": 0.2,
+    "softAnchorCentGap": 3,
+    "softAnchorConsecutiveWeeks": 4,
+    "creditAlert": 400,
+    "creditCeiling": 450,
+    "monthlyPlanCredits": 500,
+    "reserveCredits": 50
+  },
+  "qbTiers": {
+    "validationArtifact": "qb-tier-validation.json",
+    "definitions": [
+      {
+        "id": "proven_positive",
+        "minimumPriorDropbacks": 453.0,
+        "adjustedEpaPerDropback": { "minimum": -0.002433 }
+      },
+      {
+        "id": "experienced_below_average",
+        "minimumPriorDropbacks": 453.0,
+        "adjustedEpaPerDropback": { "maximumExclusive": -0.002433 }
+      },
+      {
+        "id": "limited_positive",
+        "priorDropbacks": { "minimumExclusive": 0, "maximumExclusive": 453.0 },
+        "adjustedEpaPerDropback": { "minimum": -0.002433 }
+      },
+      { "id": "unproven_or_below_average", "fallback": true }
+    ],
+    "learnedPointPriors": [],
+    "status": "validated_withheld_no_holdout_improvement",
+    "fallbackBehavior": "preserve_market_anchored_forecast_and_flag_qb_uncertainty"
+  },
+  "dataSources": {
+    "historicalInjuriesThrough": 2024,
+    "currentInjuries": "official_nfl_or_team",
+    "settlement": "nflverse",
+    "weather": "open_meteo_kickoff_hour",
+    "playerStats": "nflverse_weekly_player_stats",
+    "oddsRegion": "us",
+    "oddsMarkets": ["h2h", "spreads", "totals"]
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "version": "engine-operating-contract.2026.1",
+  "status": "frozen",
+  "effectiveSeason": 2026,
+  "frozenOn": "2026-08-25",
+  "changePolicy": {
+    "mode": "append_new_version_only",
+    "priorVersionFilesMutable": false,
+    "qualificationEvidenceMustStore": [
+      "operating_contract_version",
+      "operating_contract_hash"
+    ],
+    "priorQualificationEvidenceReevaluation": "never_automatic"
+  },
+  "clock": {
+    "timezone": "America/Los_Angeles",
+    "daylightSavingRule": "iana_timezone_database",
+    "scheduledJobGraceSeconds": 600,
+    "forecastMustPrecedeKickoffSeconds": 1
+  },
+  "forecastHorizons": [
+    {
+      "id": "weekly_tuesday_0730",
+      "schedule": "tuesday_07:30_local",
+      "requiredRecord": "football_forecast_or_withholding",
+      "scientificEligibility": true,
+      "informationCutoff": "completed_games_through_week_w_minus_1_at_origin",
+      "maximumPersistenceDelaySeconds": 600
+    },
+    {
+      "id": "kickoff_minus_120",
+      "schedule": "kickoff_minus_120_minutes",
+      "requiredRecord": "decision_support_forecast_or_withholding",
+      "scientificEligibility": false,
+      "informationCutoff": "forecast_time",
+      "maximumPersistenceDelaySeconds": 600
+    },
+    {
+      "id": "kickoff_minus_90",
+      "schedule": "kickoff_minus_90_minutes",
+      "requiredRecord": "context_refresh_forecast_or_withholding",
+      "scientificEligibility": false,
+      "informationCutoff": "forecast_time",
+      "maximumPersistenceDelaySeconds": 600
+    },
+    {
+      "id": "kickoff_minus_60",
+      "schedule": "kickoff_minus_60_minutes",
+      "requiredRecord": "decision_support_forecast_or_withholding",
+      "scientificEligibility": false,
+      "informationCutoff": "forecast_time",
+      "maximumPersistenceDelaySeconds": 600
+    },
+    {
+      "id": "kickoff_minus_15",
+      "schedule": "kickoff_minus_15_minutes",
+      "requiredRecord": "decision_support_forecast_or_withholding",
+      "scientificEligibility": false,
+      "informationCutoff": "forecast_time",
+      "maximumPersistenceDelaySeconds": 300
+    }
+  ],
+  "eligibility": {
+    "seasonType": "REG",
+    "scheduleMustBeKnownAtOrigin": true,
+    "gameMustKickOffAfterOrigin": true,
+    "eligiblePackageStatus": "shadow_eligible_or_champion",
+    "requiredProvenanceRatio": 1.0,
+    "maximumUnexplainedMissingRecords": 0,
+    "maximumLateScientificRecords": 0,
+    "requiredForecastOrWithholdingRatio": 1.0,
+    "minimumEligibleForecastRatioForPublicRelease": 0.98
+  },
+  "scheduleChanges": {
+    "revisionMode": "append_only",
+    "pastOriginBackfillAllowed": false,
+    "earlierKickoffMayGainEarlierOrigin": false,
+    "laterKickoffReclassifiesPriorLateRecord": false,
+    "futureOriginsUseLatestKnownScheduleRevision": true,
+    "missingAtOriginCode": "schedule_unavailable_at_origin",
+    "lateRunCode": "late_origin_excluded"
+  },
+  "maximumSourceAgeSeconds": {
+    "schedule": 600,
+    "completed_game_finals": 43200,
+    "current_season_play_by_play": 43200,
+    "historical_play_by_play": 604800,
+    "weekly_roster": 604800,
+    "official_injury_report": 129600,
+    "official_inactives_at_kickoff_minus_90": 1200,
+    "roof_status_at_kickoff_minus_90": 1200,
+    "kickoff_hour_weather_issue": 21600,
+    "odds_opener": 3600,
+    "odds_ordinary": 86400,
+    "odds_kickoff_minus_120": 1200,
+    "odds_kickoff_minus_60": 900,
+    "odds_kickoff_minus_15": 600
+  },
+  "servedPublicationAgeSeconds": {
+    "within120MinutesOfKickoff": 900,
+    "gameDayOutsideLiveWindow": 3600,
+    "regularSeasonEarlyWeek": 86400,
+    "offseason": 604800,
+    "stalePublicationMustBeLabeled": true,
+    "stalePublicationMayReplaceLastGood": false
+  },
+  "publicApi": {
+    "minimumRolling30DayAvailability": 0.99,
+    "maximumServerErrorRatio": 0.01,
+    "latencyMilliseconds": {
+      "p50": 150,
+      "p95": 500,
+      "p99": 1500
+    },
+    "maximumResponseBytes": 524288,
+    "cacheControlMaxAgeSeconds": 60,
+    "staleIfErrorSeconds": 86400,
+    "providerCallsFromReadRequests": 0,
+    "writesFromReadRequests": 0
+  },
+  "recovery": {
+    "r2AcknowledgedObjectRpoSeconds": 0,
+    "publicationPointerRpoSeconds": 0,
+    "d1MetadataRpoSeconds": 900,
+    "serviceRtoSeconds": 14400,
+    "d1BackupFrequencySeconds": 21600,
+    "r2ManifestBackupFrequencySeconds": 21600,
+    "restoreDrillFrequencyDays": 30,
+    "lastGoodPublicationRequired": true
+  },
+  "retentionDays": {
+    "rawSourceObjects": 3650,
+    "sourceManifests": 3650,
+    "modelPackages": 3650,
+    "forecastDistributions": 3650,
+    "forecastAndWithholdingRows": 3650,
+    "evaluationAndQualificationEvidence": 3650,
+    "auditAndCorrectionEvents": 3650,
+    "providerQuotaLedger": 400,
+    "jobRunLogs": 400,
+    "recoverableBackups": 35
+  },
+  "providerBudgets": {
+    "theOddsApi": {
+      "monthlyPlanCredits": 500,
+      "alertAtCredits": 400,
+      "hardCeilingCredits": 450,
+      "essentialReserveCredits": 50,
+      "paidTierSpendUsdPerMonth": 0,
+      "throttleOrder": [
+        "ordinary_tuesday_saturday",
+        "kickoff_minus_120",
+        "kickoff_minus_60_if_projected_usage_exceeds_ceiling"
+      ],
+      "alwaysPreserve": [
+        "sunday_1800_opener",
+        "monday_0900_opener",
+        "kickoff_minus_15"
+      ]
+    },
+    "nflverseMaximumRequestsPerDay": 310,
+    "officialNflMaximumRequestsPerDay": 500,
+    "openMeteoMaximumRequestsPerDay": 500,
+    "missingOrStaleQuotaStateBehavior": "block_nonessential_call_and_alert"
+  },
+  "computeBudgets": {
+    "paidComputeSpendUsdPerMonth": 0,
+    "computeRunnerMaximumVcpuHoursPerWeek": 48,
+    "computeRunnerMaximumVcpuHoursPerRun": 16,
+    "computeRunnerMaximumMemoryGiB": 16,
+    "computeRunnerMaximumWallClockSecondsPerRun": 21600,
+    "computeRunnerMaximumConcurrentScientificRuns": 1,
+    "workerMaximumCpuMillisecondsPerInvocation": 30000,
+    "fullHistoryFitOnPublicWorkerAllowed": false
+  },
+  "storageAndEgressBudgets": {
+    "r2MaximumStoredGiB": 10,
+    "d1MaximumStoredGiB": 5,
+    "gitTrackedArtifactMaximumGiB": 1,
+    "maximumMonthlyPublicEgressGiB": 10,
+    "alertAtFraction": 0.8,
+    "hardStopAtFraction": 1.0
+  }
+}

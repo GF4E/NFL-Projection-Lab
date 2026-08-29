@@ -1,0 +1,410 @@
+{
+  "schemaVersion": "prediction-engine-os-evidence-inventory-v1",
+  "inventoryId": "os-00-model-lab-freeze-2026-08-25",
+  "frozenOn": "2026-08-25",
+  "hashAlgorithm": "sha256",
+  "researchStatus": {
+    "module1": {
+      "version": "module1.2026-08-24.4",
+      "terminalStatus": "reject_all",
+      "benchmarkOnly": [
+        "c0_naive_points"
+      ],
+      "productionForecastChanged": false,
+      "confirmationLabel": "2025_retrospective_research_exposed"
+    },
+    "module2LegacyInvalidRun": {
+      "version": "module2.2026-08-24.7",
+      "terminalStatus": "protocol_invalid",
+      "productionForecastChanged": false
+    },
+    "module2": {
+      "version": "module2.2026-08-25.8",
+      "terminalStatus": "reject_all",
+      "benchmarkOnly": [
+        "p0_league_season_naive"
+      ],
+      "productionForecastChanged": false,
+      "confirmationLabel": "2025_retrospective_research_exposed"
+    },
+    "authorizedNextQuestion": {
+      "id": "module2b-residual-kernel-falsification",
+      "allowedChange": "D0 kernel [0.15, 0.70, 0.15] versus D1 [0, 1, 0] only",
+      "prerequisites": [
+        "R0 research constitution frozen",
+        "R1 independent target reconciliation passed"
+      ],
+      "forbiddenBeforeDecision": [
+        "P2 or new possession features",
+        "drive-outcome implementation",
+        "quarterback or player modules",
+        "market comparison"
+      ]
+    }
+  },
+  "gitFiles": [
+    {
+      "path": "requirements-model-lab.txt",
+      "bytes": 29,
+      "sha256": "613d0eb55ed2794d3fd59e22f6d013fea479d076a943876ec83a8db3e038103e",
+      "module": "shared",
+      "role": "analytical-runtime-requirements"
+    },
+    {
+      "path": "config/model-lab-module-one.config.json",
+      "bytes": 8947,
+      "sha256": "8a75a244eda2a6386205311696a45903110a0444a3a97c2ce0d1652ea5024b7d",
+      "module": "module1",
+      "role": "frozen-config"
+    },
+    {
+      "path": "docs/MODEL_LAB_MODULE_1.md",
+      "bytes": 19223,
+      "sha256": "3a75f6cfe0d4bbd4fa8dd03a7d7bb233af69a5ea096953e228da98246a0f5aea",
+      "module": "module1",
+      "role": "protocol"
+    },
+    {
+      "path": "docs/MODEL_LAB_MODULE_1_RESULT.md",
+      "bytes": 8392,
+      "sha256": "19e25e4a455b09c3f65004d7c5e4836c1131882bcea273b5457c83570cdffb88",
+      "module": "module1",
+      "role": "result-report"
+    },
+    {
+      "path": "scripts/model_lab_module_one.py",
+      "bytes": 97908,
+      "sha256": "07cd6dafb1c7ac178aabba98a43c29ec978de29d02471f1d7d54ae328f976ecd",
+      "module": "module1",
+      "role": "runner-code"
+    },
+    {
+      "path": "scripts/model_lab_module_one_data.py",
+      "bytes": 67609,
+      "sha256": "9b0a31f19c476253e526eb16764a162b25733ff9a59b7645466e17b37d9bcc5e",
+      "module": "module1",
+      "role": "data-code"
+    },
+    {
+      "path": "scripts/model_lab_module_one_models.py",
+      "bytes": 42529,
+      "sha256": "a5ce38974b6571033b1d9c1b6043a0aa2569813942018b802021b764338bd4e8",
+      "module": "module1",
+      "role": "model-code"
+    },
+    {
+      "path": "src/domain/model-lab-module-one.ts",
+      "bytes": 2172,
+      "sha256": "c19fdbf253f84ec764a53febe2e15b564b9327003c193aed1de42971bdbdbc60",
+      "module": "module1",
+      "role": "status-contract"
+    },
+    {
+      "path": "tests/model-lab-module-one-contract.test.ts",
+      "bytes": 2280,
+      "sha256": "6d46c92a3e79901d951eae649030e1e08d7f21e939978c8a242baebbe07cfe02",
+      "module": "module1",
+      "role": "contract-test"
+    },
+    {
+      "path": "config/model-lab-module-two.config.json",
+      "bytes": 34447,
+      "sha256": "ceb9cd5287fb2d2ecf4cbf0961d28e5b41f7b583282ff655cfe8d1a778686a3b",
+      "module": "module2",
+      "role": "frozen-config"
+    },
+    {
+      "path": "docs/MODEL_LAB_MODULE_2_PROTOCOL.md",
+      "bytes": 29439,
+      "sha256": "0332e69d604c727a0644d1521ba8b0494bd1f5fe9870388dcd28bf15255487b3",
+      "module": "module2",
+      "role": "protocol"
+    },
+    {
+      "path": "docs/MODEL_LAB_MODULE_2_RESULT.md",
+      "bytes": 18660,
+      "sha256": "71521a6985d8306a28ca4263087f33521c57b54580a769a97e5275c2ae5bde38",
+      "module": "module2",
+      "role": "result-report"
+    },
+    {
+      "path": "scripts/model_lab_module_two.py",
+      "bytes": 117078,
+      "sha256": "044f98b2363eaebcc8e14c0ec6bd06247520d79b3a749b6b98f0e6e348d1c617",
+      "module": "module2",
+      "role": "runner-code"
+    },
+    {
+      "path": "scripts/model_lab_module_two_data.py",
+      "bytes": 113757,
+      "sha256": "5af5d8e72f49bafbf7d4682b19c1ecbdce9e347b7d09563a948c577baa07aab4",
+      "module": "module2",
+      "role": "data-code"
+    },
+    {
+      "path": "scripts/model_lab_module_two_models.py",
+      "bytes": 99529,
+      "sha256": "34788dcf614e8abf9ab425b0821ffffe10b7fccde99e52e161b8eddf54d275b8",
+      "module": "module2",
+      "role": "model-code"
+    },
+    {
+      "path": "src/domain/model-lab-module-two.ts",
+      "bytes": 6187,
+      "sha256": "a95931f0acbff51f1bbe57e3775a17031d779286d0fe90d51e6baa122159d6a4",
+      "module": "module2",
+      "role": "status-contract"
+    },
+    {
+      "path": "tests/model-lab-module-two-contract.test.ts",
+      "bytes": 5370,
+      "sha256": "3ec359160620771fde836e2fa325355de3b4529c3f48add7a5a69697d6c7dcd0",
+      "module": "module2",
+      "role": "contract-test"
+    }
+  ],
+  "evidenceObjects": [
+    {
+      "path": "artifacts/model-lab/module-one/artifact-manifest.json",
+      "bytes": 1079,
+      "sha256": "93d0b4b08eefde88781b706491104a14bbd60e3a00e077b5efecc0687ab9f82c",
+      "module": "module1",
+      "role": "artifact-manifest"
+    },
+    {
+      "path": "artifacts/model-lab/module-one/forecasts.jsonl.gz",
+      "bytes": 79613454,
+      "sha256": "d9646c3b368570cc140d5ad3fae760377d8adfaded851e89d4f553842176eb07",
+      "module": "module1",
+      "role": "retrospective-forecasts"
+    },
+    {
+      "path": "artifacts/model-lab/module-one/scorecard.json",
+      "bytes": 855763,
+      "sha256": "bf7e954f562c28bfa8043f0e95a718e577d67f261d83a07098cfb75a52a7c59e",
+      "module": "module1",
+      "role": "scorecard"
+    },
+    {
+      "path": "artifacts/model-lab/module-one/scorecard.md",
+      "bytes": 1696,
+      "sha256": "dbf9dfc6be643a56be1412d23234d71d17370c05dc67be262e6959ba16f15af1",
+      "module": "module1",
+      "role": "scorecard-summary"
+    },
+    {
+      "path": "artifacts/model-lab/module-two/RESULT.md",
+      "bytes": 1300,
+      "sha256": "9349a3b028235a9e3b514ec18d91cdc2957401f44117e40568a3417093432ee8",
+      "module": "module2-legacy-invalid",
+      "role": "result-report"
+    },
+    {
+      "path": "artifacts/model-lab/module-two/artifact-hashes.json",
+      "bytes": 353,
+      "sha256": "dce4ebe49dedaf8efcd3dd84896bebeb026cbdc6501aa9d35cd5b10a353dda9f",
+      "module": "module2-legacy-invalid",
+      "role": "artifact-manifest"
+    },
+    {
+      "path": "artifacts/model-lab/module-two/audit.json",
+      "bytes": 1421375,
+      "sha256": "dec9ef1f55b23d61dfeabd7a8a82f9debd128bd080448461c73a9b16cfc88fea",
+      "module": "module2-legacy-invalid",
+      "role": "audit"
+    },
+    {
+      "path": "artifacts/model-lab/module-two/pre-replay-manifest.json",
+      "bytes": 44937,
+      "sha256": "194864b038235c1ad933a58dca6c0bb03ed5bc9b8fadfc94534c46d2a269cf3b",
+      "module": "module2-legacy-invalid",
+      "role": "freeze-manifest"
+    },
+    {
+      "path": "artifacts/model-lab/module-two/result.json",
+      "bytes": 1080,
+      "sha256": "ea580f320eebd3737dfea9697ed728fe6b22d3620556913afd9670d3e1e76104",
+      "module": "module2-legacy-invalid",
+      "role": "terminal-result"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/RESULT.md",
+      "bytes": 1701,
+      "sha256": "e1dafda157c115bb00adec32baae2bcbfd0d11539f1c297a7068e4ee39e0e52d",
+      "module": "module2",
+      "role": "result-report"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/artifact-hashes.json",
+      "bytes": 849,
+      "sha256": "779dcda4540621adfcc52039744a07e9c1b94d650e70085798e9fcc1f306eb2b",
+      "module": "module2",
+      "role": "artifact-manifest"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/audit.json",
+      "bytes": 249525,
+      "sha256": "517c23e499d73b6cf0cf1ca2d8cc4874c4e973c9bfd15f1f9107f9bf5a69ba54",
+      "module": "module2",
+      "role": "audit"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/metric-rows.jsonl.gz",
+      "bytes": 24503973,
+      "sha256": "55772218d88fe97ba1e6aa6b7a7602f116acaa8317508be6370ae38d13673f13",
+      "module": "module2",
+      "role": "metric-rows"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/paired-uncertainty.json",
+      "bytes": 38978,
+      "sha256": "ded1acceb55b907ca144687e119be4f141f40c46b30c9f58aea5eef32ba4bff4",
+      "module": "module2",
+      "role": "paired-uncertainty"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/pre-replay-manifest.json",
+      "bytes": 44983,
+      "sha256": "eecd6bfd47f648159770356ddac7357911ea879971fc3c41e4fe3df720efab9c",
+      "module": "module2",
+      "role": "freeze-manifest"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/result.json",
+      "bytes": 13735,
+      "sha256": "58bc028eaf0d24c441829ae6de8abca57c06064bc4bbbdf7bcdeca730a7db2e3",
+      "module": "module2",
+      "role": "terminal-result"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/retrospective-forecasts.jsonl.gz",
+      "bytes": 10907194,
+      "sha256": "66789eb97c70b813bc4574fd52aeaa5e3dc28717ea1658a4216782895dc6ee4c",
+      "module": "module2",
+      "role": "retrospective-forecasts"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/rolling-origin-scorecard.json",
+      "bytes": 288822,
+      "sha256": "649881159109b344571add933c48725ed7731f3e102d60dca8d846e0f1b80846",
+      "module": "module2",
+      "role": "scorecard"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/scientific-hashes.json",
+      "bytes": 609,
+      "sha256": "30603524d0e11ef073cc92024210ad58baa03d67826902f8da3aba1412964bcd",
+      "module": "module2",
+      "role": "scientific-hash-ledger"
+    }
+  ],
+  "sourceCache": {
+    "consumerModules": [
+      "module1",
+      "module2"
+    ],
+    "defaultWorkingCopyPath": ".model-lab-cache/module-one",
+    "indexPath": "source-index.json",
+    "objectsDirectory": "objects",
+    "indexBytes": 13227,
+    "indexSha256": "0a49ed9a11a31acfd2629496b1b86ba63206ddaebe0d809f3c2c1b27e19dc9c6",
+    "expectedIndexVersion": 1,
+    "expectedObjectCount": 33,
+    "expectedTotalObjectBytes": 502101912,
+    "targetObjectKeyTemplate": "model-lab/raw/sha256/{sha256}"
+  },
+  "statusAssertions": [
+    {
+      "path": "artifacts/model-lab/module-one/artifact-manifest.json",
+      "jsonPointer": "/result",
+      "equals": "reject_all"
+    },
+    {
+      "path": "artifacts/model-lab/module-one/artifact-manifest.json",
+      "jsonPointer": "/productionForecastChanged",
+      "equals": false
+    },
+    {
+      "path": "artifacts/model-lab/module-one/artifact-manifest.json",
+      "jsonPointer": "/runHashes/code",
+      "equals": "980c8257c43f69b06f95b4a2087919268919e69d392e68430f756335de047501"
+    },
+    {
+      "path": "artifacts/model-lab/module-one/artifact-manifest.json",
+      "jsonPointer": "/runHashes/config",
+      "equals": "f7be0d1535cb39af91aa7ddc8887ca87307a57f03c3e37dd56781cf826b7eaae"
+    },
+    {
+      "path": "artifacts/model-lab/module-one/artifact-manifest.json",
+      "jsonPointer": "/runHashes/data",
+      "equals": "51346cde4a86a60f660f32d99e1f9a6fd9097ef5905a8a36e8fab7cae545813d"
+    },
+    {
+      "path": "artifacts/model-lab/module-one/artifact-manifest.json",
+      "jsonPointer": "/runHashes/featureSchema",
+      "equals": "5f8dfc6009d8d9f51ac9b9c826abc77315e6b9a3fe95ac5b36507c40663c56cc"
+    },
+    {
+      "path": "artifacts/model-lab/module-two/result.json",
+      "jsonPointer": "/decision/result",
+      "equals": "protocol_invalid"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/result.json",
+      "jsonPointer": "/decision/result",
+      "equals": "reject_all"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/result.json",
+      "jsonPointer": "/hashes/code",
+      "equals": "6ea88ae5a609ef4dac85aa28e4f39785b86c2a32d456c34bf220ae17ed23efd6"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/result.json",
+      "jsonPointer": "/hashes/data",
+      "equals": "4c7aecce5c767074f52e6e53cd619c42783350c54422ca9dc75d1106942eeacd"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/result.json",
+      "jsonPointer": "/hashes/source",
+      "equals": "fd1f84f78153b9ea3967399a03a5c2c46b974d2a984944f88a4add76a9883149"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/result.json",
+      "jsonPointer": "/hashes/target_schema",
+      "equals": "f97545c8f2fc2af131815bbd6b0a9b6fbb418e3b65bdf4eb9e31788ee72e5ed3"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/scientific-hashes.json",
+      "jsonPointer": "/bundle",
+      "equals": "20c44163d40911f1d54bc3bd2c0e859646a59c28ae2ab5016169c51989e648f3"
+    },
+    {
+      "path": "config/model-lab-module-two.config.json",
+      "jsonPointer": "/moduleOneResult",
+      "equals": "reject_all"
+    },
+    {
+      "path": "config/model-lab-module-two.config.json",
+      "jsonPointer": "/forecastContract/retrospectiveConfirmationSeason",
+      "equals": 2025
+    }
+  ],
+  "nestedManifests": [
+    {
+      "path": "artifacts/model-lab/module-one/artifact-manifest.json",
+      "format": "module-one-artifacts-map",
+      "basePath": "artifacts/model-lab/module-one"
+    },
+    {
+      "path": "artifacts/model-lab/module-two/artifact-hashes.json",
+      "format": "filename-to-sha256",
+      "basePath": "artifacts/model-lab/module-two"
+    },
+    {
+      "path": "artifacts/model-lab/module-two-v8/artifact-hashes.json",
+      "format": "filename-to-sha256",
+      "basePath": "artifacts/model-lab/module-two-v8"
+    }
+  ]
+}

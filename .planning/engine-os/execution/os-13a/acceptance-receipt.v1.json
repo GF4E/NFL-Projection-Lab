@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "engine-os.os-13a-acceptance-receipt.v1",
+  "generatedAt": "2026-08-27T09:12:32Z",
+  "status": "accepted_bounded_mechanism_only",
+  "scope": "Dormant provider-independent qualification of append-only forecast-or-withheld ledger storage, provenance validation, immutable output pointers, deterministic job identity, retry convergence, and fenced publication. No production or prospective stream is activated.",
+  "preservedFoundations": [
+    "OS-00",
+    "OS-00B",
+    "OS-01A",
+    "OS-02A",
+    "bounded provider-independent OS-03A",
+    "OS-15A",
+    "OS-19A",
+    "R0",
+    "R1-v1",
+    "R1-v2"
+  ],
+  "historyBoundary": {
+    "cleanBaseCommit": "9747d5cd67f28dd6428d84a004c9d1231dcd096a",
+    "implementationCommit": "a61ae235b9962dea3f476baf6406fa10de864d7a",
+    "hardeningCommit": "97924bc6489807a534f8922022c4e4cc97453442",
+    "planningAndHostedReceiptCommit": "99efd1da3129543337e4f217f09781abab2e518e",
+    "validatedTree": "812574bef8e30c11ff3097cd43ed6064d0cf4e28",
+    "rejectedAttemptReceipt": ".planning/engine-os/execution/os-13a/rejected-attempt-receipt.v1.json",
+    "rejectedAttemptEvidenceReusable": false
+  },
+  "contract": {
+    "version": "forecast-ledger-contract.2026.1",
+    "source": "config/forecast-ledger-contract-2026.v1.json",
+    "sourceFileSha256": "32c760b33477b30f9de6b4e2a749883c6dae4eabcf3c3cd0a5b420dc19faf8f8",
+    "horizons": [
+      "weekly_tuesday_0730",
+      "kickoff_minus_120",
+      "kickoff_minus_90",
+      "kickoff_minus_60",
+      "kickoff_minus_15"
+    ],
+    "productionActivationAllowed": false,
+    "providerDependencyAllowed": false,
+    "providerDispatchAllowed": false,
+    "modelExecutionAllowed": false,
+    "retrospectiveBackfillAllowed": false
+  },
+  "sourceHashes": {
+    "migrationFileSha256": "356eabfa9ca55b821bab9e50c04321d04657d09483b64139e1b620e61d1272d2",
+    "migrationDefinitionSha256": "851f66b3ad07afe61be346b09f853875e675d25512f989b0f4337f6c64a1c293",
+    "rollbackFileSha256": "339b38076e5348bc4f37701efd5442e75aec2f843d5c0efd941fe62ce8e67693",
+    "kernelSha256": "6c8bc7d6924c71914ea9397f386bea78b96267c782c515df73c3d3ceb21119f3",
+    "runtimeSha256": "a1184b027ce70f38a7e6beccbb5d8e2b36080de0581dcb142fec867f8fb9862c",
+    "kernelTestSha256": "2f6eb38c976521d3e0bdee63e4c38f00a698748aeeb2e31184a768ac199a5913",
+    "migrationTestSha256": "b61da97fbce421e6cb43186d561dd39856c3cfff7817d87a8d652454ff2d400a",
+    "runtimeTestSha256": "8e79bbde07ef9a104a6f952dffa9f43627142b484493241b20c539e2f687f321"
+  },
+  "qualifiedBehavior": {
+    "regulationCurrentHeadsOnly": true,
+    "deterministicQualificationActivationJobAttemptEventAndRecordIdentities": true,
+    "databaseAuthoritativeClocks": true,
+    "databaseContemporaneityGuardSeconds": 5,
+    "renewableFencedLeaseSeconds": 120,
+    "leaseLosingWorkerCannotPublish": true,
+    "r2ExactBytesBeforeD1Pointer": true,
+    "terminalRowsAppendOnly": true,
+    "oneTerminalRecordPerJob": true,
+    "fullAndPartialActivationScopes": true,
+    "closedWithholdingVocabulary": true,
+    "missingProvenanceBecomesWithheld": "provenance_incomplete",
+    "mismatchedProvenanceBecomesWithheld": "package_hash_mismatch",
+    "noPackageDefault": "no_eligible_package",
+    "lateRecordsExcluded": true,
+    "missedOriginsNeverBackfilledProspectively": true,
+    "oddsStateCannotBlockLedger": true,
+    "os13bMustPreserveOs13aHistory": true
+  },
+  "localVerification": {
+    "worktree": "fresh_detached_no_env_files",
+    "dependencyInstall": "pnpm_install_frozen_lockfile_pass",
+    "focusedTestFilesPassed": 3,
+    "focusedTestsPassed": 94,
+    "fullTestFilesPassed": 54,
+    "fullTestFilesSkipped": 1,
+    "fullTestsPassed": 500,
+    "fullTestsSkipped": 1,
+    "typecheck": "pass",
+    "lint": "pass",
+    "build": "pass",
+    "activeBuildGraph": {
+      "status": "pass",
+      "sourceFilesScanned": 165,
+      "buildFilesScanned": 360,
+      "errors": 0
+    },
+    "migrationAndRollback": "pass_in_focused_suite",
+    "leakageBoundary": "pass_no_market_model_or_provider_dependency_in_ledger_runtime",
+    "gitDiffCheck": "pass",
+    "coldCloneEvidenceDependency": {
+      "status": "known_non_os13a_packaging_gap",
+      "initialFailure": "one Module 2 contract test could not find two ignored frozen pre-replay manifests",
+      "restoredHashes": [
+        "194864b038235c1ad933a58dca6c0bb03ed5bc9b8fadfc94534c46d2a269cf3b",
+        "eecd6bfd47f648159770356ddac7357911ea879971fc3c41e4fe3df720efab9c"
+      ],
+      "rerunStatus": "pass",
+      "disposition": "Preserve as an OS-09/OPS-09 clean-clone restoration requirement; it does not alter OS-13A ledger behavior."
+    },
+    "trackedHistorySecurityScan": {
+      "scannerReceiptSha256": "75a801a29746fb65e5d3c5054f203676d5d2d920215bc345c652d30b518080ce",
+      "matchedValuesEmitted": false,
+      "providerCredentialFound": false,
+      "expectedSyntheticCredentialFixtureFindings": 1,
+      "preExistingPersonalEmailFindings": 576,
+      "preExistingAbsoluteHomePathFindings": 2,
+      "repositoryWideOs18aCompletionClaimed": false
+    },
+    "builtOutput": {
+      "providerEndpointOccurrences": 0,
+      "providerBindingNameOccurrences": 0,
+      "captureFlagReferences": 3,
+      "captureFlagBindingInstalledByThisPackage": false
+    }
+  },
+  "hostedQualification": {
+    "receipt": ".planning/engine-os/execution/os-13a/hosted-qualification-receipt.v1.json",
+    "status": "accepted_bounded_mechanism_only",
+    "ownerOnly": true,
+    "providerBindingReads": 0,
+    "providerDispatches": 0,
+    "quotaReservations": 0,
+    "allFiveHorizonIdentitiesVerified": true,
+    "exactBytesRecovered": 5,
+    "terminalRecords": 10,
+    "leaseReclaims": 1
+  },
+  "independentAudits": [
+    {
+      "name": "hosted_integration_audit",
+      "status": "accepted_bounded",
+      "blockers": 0
+    },
+    {
+      "name": "post_proof_adversarial_audit",
+      "status": "accepted_bounded",
+      "blockers": 0
+    }
+  ],
+  "production": {
+    "migration0018Deployed": false,
+    "activationCreated": false,
+    "captureEnabledByThisPackage": false,
+    "providerRequestMade": false,
+    "quotaReservationMade": false,
+    "existing38Used462RemainingReceiptPreserved": true,
+    "productionForecastChanged": false,
+    "interfaceChanged": false
+  },
+  "cleanup": {
+    "acceptedHostedProjectTombstoned": true,
+    "rejectedHostedProjectTombstoned": true,
+    "physicalDeletionAvailable": false,
+    "authenticatedTombstoneStatus": 410,
+    "runtimeBindingsRetained": 0,
+    "disposition": "both_owner_only_projects_retired_to_inert_410_workers"
+  },
+  "explicitExclusions": [
+    "OS-13B",
+    "full OS-13",
+    "LED-01 completion",
+    "LED-03 completion",
+    "LED-06 completion",
+    "prospective scientific evidence",
+    "actual 2026 origin completeness",
+    "portable package qualification",
+    "production activation",
+    "provider authentication or acquisition",
+    "production forecast serving"
+  ],
+  "nextProviderFreePackage": "OS-01"
+}

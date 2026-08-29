@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "engine-os.os-00-r2-durability-receipt.v1",
+  "result": "accepted",
+  "acceptedAtUtc": "2026-08-26T16:56:01Z",
+  "scope": "OS-00 frozen-evidence durability and clean-clone reconstruction only",
+  "source": {
+    "archiveImplementationCommit": "2271a7ba0ae8de2f876b68c56487b663fd013ce9",
+    "operatorRetirementCommit": "8375a8c1f43aa976ad35c781035bde7f0155b848",
+    "archiveManifest": ".planning/engine-os/execution/os-00/r2-archive-manifest.v1.json",
+    "archiveManifestSha256": "123da9434123d875c2f5505a85cd783a2cc8d5730d304986721b4809b57d604a",
+    "evidenceInventorySha256": "1f13332c0f40953fdfe0b8f94a0522c87c9783405d8849a95357c1c2e0e4678d",
+    "sourceIndexSha256": "0a49ed9a11a31acfd2629496b1b86ba63206ddaebe0d809f3c2c1b27e19dc9c6",
+    "r1GamebookLedgerSha256": "21a3ea54c359c1acca68788c5af531144535d745485b8d6a54da1b32924d5b15"
+  },
+  "archive": {
+    "binding": "EVIDENCE",
+    "projectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+    "hashAlgorithm": "sha256",
+    "objectCount": 117,
+    "totalBytes": 630716255,
+    "categoryTotals": {
+      "model_lab_artifact": { "objects": 19, "bytes": 117991406 },
+      "model_lab_source_index": { "objects": 1, "bytes": 13227 },
+      "model_lab_source_object": { "objects": 33, "bytes": 502101912 },
+      "r1_official_gamebook": { "objects": 64, "bytes": 10609710 }
+    },
+    "publicObjectEgressAfterRetirement": false
+  },
+  "temporaryOperator": {
+    "route": "/__engine-os/evidence-archive/v1/object",
+    "exactManifestAllowlistCount": 117,
+    "deleteAllowed": false,
+    "automaticExpiryUtc": "2026-08-26T20:45:52.403Z",
+    "sitesVersion": 148,
+    "versionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_5fba677405288191aa387d3357c1ee0b",
+    "deploymentId": "appgdep_6a8f1846c4c88191b3d2cc7ed8629359",
+    "environmentRevision": 18,
+    "uploadResult": { "stored": 117, "deduplicated": 0 },
+    "remoteHeadVerification": { "verified": 117, "failures": 0 }
+  },
+  "cleanClone": {
+    "source": "remote Sites source repository",
+    "commit": "2271a7ba0ae8de2f876b68c56487b663fd013ce9",
+    "workingTreeCleanBeforeRestore": true,
+    "evidenceAbsentBeforeRestore": true,
+    "restoreResult": { "restored": 117, "bytes": 630716255, "failures": 0 },
+    "archiveVerification": { "objects": 117, "bytes": 630716255, "status": "pass" },
+    "os00EvidenceVerification": {
+      "files": 70,
+      "bytes": 620780101,
+      "sourceObjects": 33,
+      "gitTrackingRequired": true,
+      "status": "pass"
+    },
+    "ownershipVerification": {
+      "d1Tables": 78,
+      "supabaseLegacyTables": 25,
+      "r2ObjectFamilies": 8,
+      "status": "pass"
+    },
+    "applicationVerification": {
+      "lint": "pass",
+      "typecheck": "pass",
+      "tests": { "passed": 289, "skipped": 1, "failed": 0 },
+      "build": "pass",
+      "activeBuildGraph": "pass"
+    },
+    "preservedScientificStatuses": {
+      "module1": "reject_all",
+      "module2LegacyV7": "protocol_invalid",
+      "module2V8": "reject_all"
+    }
+  },
+  "failureDrills": {
+    "corruptRestoredObjectDetected": true,
+    "corruptDestinationOverwriteRefused": true,
+    "quarantinedThenRestored": { "restored": 1, "deduplicated": 116, "status": "pass" },
+    "remoteMissingAndDigestMismatch": "covered by fail-closed unit tests; no immutable R2 object was deleted for a destructive drill"
+  },
+  "retirement": {
+    "sitesVersion": 149,
+    "versionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_fc9fe1ed1fec8191a9d416ba9863046b",
+    "deploymentId": "appgdep_6a8f1a4262a8819190a2452f6ce75687",
+    "environmentRevision": 19,
+    "removedEnvironmentKeys": [
+      "ENGINE_OS_EVIDENCE_ARCHIVE_ENABLED",
+      "ENGINE_OS_EVIDENCE_ARCHIVE_EXPIRES_AT",
+      "ENGINE_OS_EVIDENCE_ARCHIVE_TOKEN"
+    ],
+    "remainingEnvironmentKeys": ["ODDS_API_KEY"],
+    "publicRouteStatus": { "HEAD": 404, "GET": 404, "PUT": 405 },
+    "operatorReachable": false
+  },
+  "unchangedProductionControls": {
+    "captureEnabled": false,
+    "linesConfigured": false,
+    "linesStale": true,
+    "oddsQuotaBefore": { "used": 38, "remaining": 462, "lastCost": 0 },
+    "oddsQuotaAfter": { "used": 38, "remaining": 462, "lastCost": 0 },
+    "oddsProviderRequestsByThisOperation": 0
+  },
+  "contentAudit": {
+    "provenanceHosts": ["github.com", "www.nfl.com", "static.www.nfl.com"],
+    "privateStorageRequired": true,
+    "publicRedistributionAuthorized": false,
+    "notes": [
+      "Three preserved model artifacts contain historical local absolute paths.",
+      "Roster evidence includes public athlete birth-date fields.",
+      "Preserved NFL and nflverse bytes require a separate rights review before any public redistribution."
+    ]
+  },
+  "explicitlyNotAccepted": {
+    "DATA-01_fullProspectiveCaptureContract": false,
+    "OPS-06_fullRecoveryQualification": false,
+    "OPS-09_publicRepositoryReproducibility": false,
+    "OS-03": false,
+    "OS-16": false,
+    "OS-21": false,
+    "captureAuthorization": false,
+    "providerAuthentication": false,
+    "statisticalExperimentAuthorization": false
+  }
+}

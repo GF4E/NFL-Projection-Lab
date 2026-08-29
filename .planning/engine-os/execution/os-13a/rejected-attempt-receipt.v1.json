@@ -1,0 +1,38 @@
+{
+  "version": "os-13a-rejected-attempt-receipt.2026.1",
+  "workPackage": "OS-13A",
+  "attemptedAt": "2026-08-27T04:30:10Z",
+  "baseCommit": "f12d85b8c482977a6ece8886e0c2c7fa9609dcbc",
+  "result": "rejected",
+  "reasonCode": "credential_boundary_violation_before_implementation",
+  "stage": "pre_implementation_read_only_audit",
+  "incident": {
+    "summary": "An independent audit used an overbroad local environment inventory and accessed the dormant provider credential despite the OS-13A prohibition on reading it.",
+    "secretValuePersistedInRepository": false,
+    "secretValueIncludedInReceipt": false,
+    "providerRequestMade": false,
+    "quotaReservationMade": false,
+    "quotaStateMutated": false,
+    "productionCaptureActivated": false,
+    "implementationFilesChanged": false,
+    "migrationCreated": false,
+    "modelOrInterfaceChanged": false
+  },
+  "containment": [
+    "Stopped OS-13A before contract freeze or implementation",
+    "Interrupted the remaining OS-13A audit tasks",
+    "Did not call a provider, use the credential, or repeat its value",
+    "Verified the working tree remained unchanged at the accepted OS-03A commit"
+  ],
+  "requiredRemediation": [
+    "Revoke and regenerate the dormant provider credential in the provider dashboard",
+    "Restage the replacement without pasting it into chat or exposing it to the repository",
+    "Begin a clean successor OS-13A attempt with environment-secret access explicitly prohibited in every delegated audit"
+  ],
+  "scopeClaims": {
+    "os13aAccepted": false,
+    "ledgerMechanismQualified": false,
+    "prospectiveCaptureStarted": false,
+    "productionActivationCreated": false
+  }
+}

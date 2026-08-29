@@ -1,0 +1,602 @@
+{
+  "version": "module2.2026-08-25.8",
+  "revisionFrom": "module2.2026-08-24.7",
+  "revisionHistory": [
+    {
+      "version": "module2.2026-08-24.2",
+      "reason": "The pre-replay source audit found six multi-offense fixed-drive envelopes. This revision froze the raw-drive and possession-team split, added audit fields, and kept special-teams-only control outside the offensive-series target."
+    },
+    {
+      "version": "module2.2026-08-24.3",
+      "reason": "The pre-implementation chronology review replaced a static cross-season calibration holdout with candidate-specific prior prequential residuals. A static fit before a 384-game block would not represent the successive Tuesday information sets inside that block."
+    },
+    {
+      "version": "module2.2026-08-24.4",
+      "reason": "The pre-implementation equation audit fixed the league-season baseline's prior strength at 64 games and defined its current-season update exactly."
+    },
+    {
+      "version": "module2.2026-08-24.5",
+      "reason": "A second independent pre-score audit blocked v4. This revision freezes the feature dictionary, candidate design, residual boundary, discrete calibration, common-manifest failure rule, bootstrap comparison families, ablation controls, and synthetic fixture assertions. It also separates historical audit ranges from valid count support."
+    },
+    {
+      "version": "module2.2026-08-24.6",
+      "reason": "The final pre-score equation audit found that neutral-site games have arbitrary schedule home and away labels. This revision excludes neutral games from P0 home-away location estimation while retaining both teams in P1's pooled league rate."
+    },
+    {
+      "version": "module2.2026-08-24.7",
+      "reason": "Two independent pre-replay implementation audits found that the source-missingness threshold, negative-control seeds, shared resample ledger, exact quantile rule, invalid-run path, selection order, and freeze-manifest verification were not fully executable. This revision fixes those contracts before any target-linked candidate score."
+    },
+    {
+      "version": "module2.2026-08-25.8",
+      "reason": "The v7 replay terminated protocol_invalid before aggregation or selection. It exposed two target-independent implementation defects: intentional 2010 null indicators were validated before P2 prehistory exclusion, and the runner omitted the already-frozen Tuesday date cutoff for postponed prior-week games. V8 fixes only those execution paths, retains every model, threshold, feature, seed, loss, and gate, and adds boundary tests. No v7 model scorecard, comparison, or gate result was produced or consulted."
+    }
+  ],
+  "revisionReason": "Repair the two target-independent v7 protocol-invalid execution defects without changing any scientific choice. Preserve the invalid v7 artifacts and freeze v8 before a new complete replay.",
+  "status": "preregistered_research_only",
+  "frozenBeforeCandidateReplay": true,
+  "moduleOneResult": "reject_all",
+  "moduleOneResearchBenchmark": "c0_naive_points_only",
+  "moduleOneArtifactsMutable": false,
+  "productionForecastChangeAllowed": false,
+  "marketComparisonAllowed": false,
+  "confidenceScoreAllowed": false,
+  "nextModuleAllowed": false,
+  "question": "Can market-free information available before an NFL week improve the joint distribution of home and away regulation offensive-series counts over league-season and partially pooled possession baselines?",
+  "forecastContract": {
+    "seasonType": "REG",
+    "forecastOrigin": "tuesday_0730_america_los_angeles",
+    "targetWeekInformationCutoff": "completed_games_through_week_w_minus_1",
+    "sameWeekEarlierGamesAllowed": false,
+    "trainingStartSeason": 2010,
+    "warmupSeasons": [2010, 2011, 2012],
+    "prehistoryOriginTreatment": "2010_origins_have_no_older_season_prior_and_are_retained_as_target_and_training_rows_but_not_forecast_or_scored",
+    "candidateTrainingEligibility": "p0_and_p1_may_use_every_prior_target_row; p2_may_use_only_prior_rows_with_stored_finite_prequential_p0_p1_and_feature_values; this_fixed_prehistory_exclusion_is_not_a_candidate_failure",
+    "commonScoredManifest": "every_game_in_development_2013_through_2024_and_confirmation_2025",
+    "developmentSeasons": [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+    "retrospectiveConfirmationSeason": 2025,
+    "prospectiveShadowSeason": 2026,
+    "historicalAvailability": "reconstructed_not_original_publication_time"
+  },
+  "target": {
+    "primary": [
+      "home_regulation_offensive_series",
+      "away_regulation_offensive_series"
+    ],
+    "secondaryStoredOnly": [
+      "overtime_occurred",
+      "home_overtime_offensive_series",
+      "away_overtime_offensive_series"
+    ],
+    "offensiveSeriesDefinition": "One unique game, corrected fixed-drive, and possession-team key containing at least one qualifying live offensive event. Special-teams-only control does not count as an offensive series.",
+    "qualifyingPlayTypes": [
+      "pass",
+      "run",
+      "qb_kneel",
+      "qb_spike",
+      "punt",
+      "field_goal"
+    ],
+    "qualifyingAbortedPlay": "aborted_play_equals_one_with_possession_team_and_not_no_play_kick_try_or_conversion",
+    "excludeConversionAttempts": true,
+    "regulationQuarters": [1, 2, 3, 4],
+    "overtimeMinimumQuarter": 5,
+    "driveRepair": {
+      "baseKey": ["game_id", "fixed_drive"],
+      "splitRule": "when_a_fixed_drive_has_multiple_qualifying_possession_teams_split_contiguous_play_id_ordered_segments_on_raw_drive_or_possession_team_change",
+      "knownMultiOffenseFixtureKeys": [
+        "2015_01_IND_BUF/6",
+        "2016_15_CLE_BUF/4",
+        "2018_01_TEN_MIA/13",
+        "2018_09_CHI_BUF/21",
+        "2019_02_TB_CAR/2",
+        "2023_12_PIT_CIN/8"
+      ],
+      "auditFieldsOnly": [
+        "drive_play_id_started",
+        "drive_start_transition",
+        "drive_end_transition",
+        "fixed_drive_result"
+      ],
+      "abortConditions": [
+        "qualifying_row_missing_possession_team",
+        "qualifying_row_missing_fixed_drive",
+        "repaired_multi_offense_segment_missing_raw_drive",
+        "repaired_segment_has_multiple_possession_teams",
+        "regulation_and_overtime_share_same_corrected_series_key",
+        "scheduled_team_missing_from_reconstructed_game",
+        "non_integer_or_non_positive_series_count"
+      ]
+    },
+    "edgeCases": {
+      "kickoffAndTouchback": "do_not_create_an_offensive_series_without_a_later_qualifying_offensive_event",
+      "punt": "qualifying_offensive_event_and_series_ending_event",
+      "fieldGoalAttemptAndBlock": "qualifying_offensive_event_even_when_the_only_qualifying_event",
+      "offensiveTurnover": "count_the_series_for_the_team_that_started_the_live_offensive_play",
+      "defensiveOrSpecialTeamsScore": "do_not_create_a_series_for_the_scoring_team",
+      "safety": "count_the_series_if_the_safety_occurs_on_a_qualifying_offensive_event",
+      "onsideKick": "the_kick_alone_does_not_count_and_the_subsequent_offense_counts_only_after_a_qualifying_event",
+      "kneelOnlyEndOfHalf": "count_in_primary_target_and_flag_for_audit_only_sensitivity",
+      "penaltyOnlyOrNoPlay": "does_not_create_an_offensive_series",
+      "acceptedPenaltyOnLivePlay": "counts_only_when_the_source_play_type_remains_qualifying",
+      "abortedPlay": "counts_when_live_and_not_nullified_or_a_try",
+      "halftimeOrRegulationEnd": "count_when_the_series_contains_a_qualifying_regulation_event",
+      "overtime": "store_separately_and_never_merge_into_the_primary_target"
+    },
+    "kneelOnlySensitivity": "audit_only_no_candidate_selection",
+    "probabilitySupport": {
+      "minimum": 0,
+      "maximumExact": 24,
+      "tailBucket": 25
+    },
+    "integrityBounds": {
+      "hardMinimumObservedPerTeam": 0,
+      "hardMaximumObservedPerTeam": 63,
+      "historicalAuditExpectedMinimum": 4,
+      "historicalAuditExpectedMaximum": 22,
+      "outsideHistoricalAuditRangeAction": "record_warning_and_target_diff_not_abort",
+      "outsideHardRangeAction": "abort_run"
+    },
+    "syntheticFixtureAssertions": {
+      "kickoff_touchback_only": {"regulationSeries": 0, "overtimeSeries": 0},
+      "punt_only": {"regulationSeries": 1, "offense": "AAA"},
+      "blocked_field_goal_only": {"regulationSeries": 1, "offense": "AAA"},
+      "live_offensive_turnover": {"regulationSeries": 1, "offense": "AAA"},
+      "defensive_or_return_score_only": {"regulationSeries": 0},
+      "live_safety": {"regulationSeries": 1, "offense": "AAA"},
+      "onside_kick_only": {"regulationSeries": 0},
+      "onside_then_live_play": {"regulationSeries": 1, "offense": "BBB"},
+      "kneel_only_end_half": {"regulationSeries": 1, "kneelOnly": true},
+      "penalty_or_no_play_only": {"regulationSeries": 0},
+      "accepted_penalty_on_live_play": {"regulationSeries": 1},
+      "aborted_live_play": {"regulationSeries": 1},
+      "aborted_nullified_play": {"regulationSeries": 0},
+      "live_play_ending_at_halftime": {"regulationSeries": 1},
+      "live_play_ending_at_regulation": {"regulationSeries": 1},
+      "overtime_live_play": {"regulationSeries": 0, "overtimeSeries": 1},
+      "multi_offense_fixed_drive": {"regulationSeries": 2, "offenses": ["AAA", "BBB"]}
+    }
+  },
+  "dataBoundary": {
+    "sourceCacheMode": "read_only_content_addressed",
+    "sourceCache": ".model-lab-cache/module-one",
+    "scheduleAllowlist": [
+      "game_id",
+      "season",
+      "game_type",
+      "week",
+      "gameday",
+      "gametime",
+      "away_team",
+      "home_team",
+      "location"
+    ],
+    "pbpAllowlist": [
+      "game_id",
+      "season",
+      "season_type",
+      "week",
+      "play_id",
+      "home_team",
+      "away_team",
+      "posteam",
+      "defteam",
+      "qtr",
+      "game_half",
+      "quarter_seconds_remaining",
+      "play_type",
+      "play_type_nfl",
+      "play",
+      "drive",
+      "fixed_drive",
+      "fixed_drive_result",
+      "drive_play_id_started",
+      "drive_start_transition",
+      "drive_end_transition",
+      "drive_time_of_possession",
+      "game_seconds_remaining",
+      "half_seconds_remaining",
+      "score_differential",
+      "pass_attempt",
+      "rush_attempt",
+      "sack",
+      "qb_kneel",
+      "qb_spike",
+      "field_goal_attempt",
+      "punt_attempt",
+      "kickoff_attempt",
+      "extra_point_attempt",
+      "two_point_attempt",
+      "penalty",
+      "aborted_play",
+      "incomplete_pass",
+      "out_of_bounds",
+      "touchback",
+      "own_kickoff_recovery",
+      "own_kickoff_recovery_td",
+      "safety",
+      "fumble_lost",
+      "interception",
+      "return_touchdown"
+    ],
+    "ephemeralFilterOnlyFields": ["score_differential"],
+    "forbiddenFieldPatterns": [
+      "spread",
+      "total_line",
+      "moneyline",
+      "odds",
+      "vig",
+      "book",
+      "consensus",
+      "opening",
+      "closing",
+      "line_movement",
+      "ticket",
+      "money_percentage",
+      "clv",
+      "selection",
+      "approval",
+      "rationale",
+      "units",
+      "final_score",
+      "points_per_drive",
+      "epa",
+      "success",
+      "win_probability",
+      "module_one"
+    ],
+    "teamAliases": {
+      "LA": "LAR",
+      "SL": "LAR",
+      "STL": "LAR",
+      "SD": "LAC",
+      "OAK": "LV",
+      "JAC": "JAX",
+      "ARZ": "ARI",
+      "BLT": "BAL",
+      "CLV": "CLE",
+      "HST": "HOU"
+    },
+    "missingData": {
+      "missingExpectedGameOrTeam": "abort_origin",
+      "partialSource": "abort_run",
+      "schemaMismatch": "abort_run",
+      "nonfiniteFoldTransform": "fail_candidate_origin",
+      "lowTeamExposure": "use_frozen_partial_pooling",
+      "derivedRateWithoutDenominator": "fold_league_prior_plus_missing_indicator",
+      "unexpectedFieldMissingnessMaximum": 0.01,
+      "unexpectedMissingnessComparison": "strictly_greater_than_maximum_aborts",
+      "unexpectedMissingnessUnit": "one_source_logical_name_by_season_by_field_by_eligibility_stratum_never_pooled",
+      "missingValueDefinition": "null_nan_blank_required_string_nonfinite_required_numeric_or_stratum_specific_out_of_domain_value_before_fill_or_feature_derivation",
+      "unexpectedMissingnessStrata": {
+        "schedule_identity_context": {
+          "scope": "selected_2010_through_2025_regular_season_schedule_rows",
+          "fields": ["game_id", "season", "week", "gameday", "home_team", "away_team", "location"],
+          "maximum": 0.0
+        },
+        "pbp_identity_timing_and_teams": {
+          "scope": "selected_regular_season_play_by_play_rows_after_type_coercion_and_team_aliasing",
+          "fields": ["game_id", "play_id", "season", "week", "qtr", "home_team", "away_team"],
+          "maximum": 0.0
+        },
+        "qualifying_series_keys": {
+          "scope": "rows_qualifying_under_the_frozen_offensive_series_definition",
+          "fields": ["posteam", "fixed_drive"],
+          "maximum": 0.0
+        },
+        "repaired_envelope_drive_key": {
+          "scope": "qualifying_rows_inside_a_multi_offense_fixed_drive_envelope",
+          "fields": ["drive"],
+          "maximum": 0.0
+        },
+        "neutral_interval_inputs": {
+          "scope": "current_rows_in_consecutive_scrimmage_pairs_inside_a_corrected_regulation_series_with_current_qtr_in_1_2_3_defined_before_consulting_clock_or_score_fields",
+          "fields": ["current_game_seconds_remaining", "following_game_seconds_remaining", "current_half_seconds_remaining", "current_score_differential"],
+          "maximum": 0.01
+        }
+      },
+      "structuralMissingnessExemptions": [
+        "nullable_binary_flags_whose_documented_null_encoding_means_false",
+        "drive_time_of_possession_when_missing_conflicted_or_withheld_after_drive_repair",
+        "optional_audit_labels",
+        "derived_team_history_zero_denominators_with_frozen_league_prior_and_indicator",
+        "derived_missing_indicator_columns",
+        "2010_intentionally_unforecasted_origin_rows"
+      ],
+      "originFrameMissingnessInvariant": "every_2011_through_2025_forecastable_model_input_is_finite_and_every_2013_through_2025_scored_row_is_finite",
+      "sourceMissingnessLedgerRequiredFields": ["source", "season", "stratum", "field", "eligible_count", "missing_count", "missing_fraction", "maximum", "passed", "example_ids"],
+      "candidateOriginFailureTreatment": "protocol_invalid_no_row_dropping_or_loss_imputation",
+      "commonManifestTreatment": "every_base_ablation_and_negative_control_must_score_every_expected_development_and_confirmation_game"
+    }
+  },
+  "features": {
+    "teamHistoryWindowGames": 17,
+    "leagueSeasonPriorGames": 64,
+    "possessionPriorGames": 4,
+    "pacePriorOpportunities": 250,
+    "drivePriorSeries": 32,
+    "timeDecayHalfLifeSeasons": 2.5,
+    "observationWeightMultipliersBySeason": {"2020": 0.5},
+    "timeWeightDefinition": {
+      "coordinate": "integer_origin_season_minus_row_season",
+      "equation": "weight=2^(-coordinate/2.5)*season_multiplier",
+      "withinSeasonWeight": 1.0,
+      "equalTimeOrder": ["season", "week", "game_date", "game_id"],
+      "arithmetic": "float64_no_rounding_before_hash_or_aggregation"
+    },
+    "rawFeatureDictionary": {
+      "offense_regulation_series_per_game": "weighted_sum_own_regulation_series_divided_by_weighted_sum_games",
+      "opponent_regulation_series_faced_per_game": "weighted_sum_opponent_regulation_series_divided_by_weighted_sum_games",
+      "offense_neutral_seconds_per_scrimmage_play": "weighted_sum_valid_consecutive_scrimmage_elapsed_seconds_divided_by_weighted_sum_valid_intervals",
+      "opponent_neutral_seconds_per_scrimmage_play_allowed": "opponent_perspective_same_ratio",
+      "offense_scrimmage_plays_per_regulation_series": "weighted_sum_qualifying_non_punt_non_field_goal_events_divided_by_weighted_sum_regulation_series",
+      "opponent_scrimmage_plays_per_regulation_series_allowed": "opponent_perspective_same_ratio",
+      "offense_regulation_series_seconds": "weighted_sum_unique_valid_source_drive_time_of_possession_divided_by_weighted_sum_unrepaired_series_with_one_valid_duration",
+      "opponent_regulation_series_seconds_allowed": "opponent_perspective_same_ratio",
+      "offense_incompletion_or_out_of_bounds_rate": "weighted_sum_scrimmage_events_with_incomplete_pass_or_out_of_bounds_divided_by_weighted_sum_scrimmage_events",
+      "opponent_incompletion_or_out_of_bounds_rate_allowed": "opponent_perspective_same_ratio"
+    },
+    "eligibleEventDetails": {
+      "scrimmageEvent": "qualifying_live_event_excluding_punt_and_field_goal",
+      "neutralElapsedInterval": "within_one_repaired_series_from_current_scrimmage_event_to_next_scrimmage_event_when_current_qtr_is_1_2_or_3_current_half_seconds_remaining_at_least_121_absolute_current_score_differential_at_most_8_and_elapsed_game_seconds_is_finite_nonnegative",
+      "repairedSeriesDuration": "missing_never_reuse_the_unsplit_source_drive_duration",
+      "durationConflict": "missing_when_source_drive_time_of_possession_has_not_exactly_one_finite_nonnegative_value",
+      "clockStop": "scrimmage_event_with_incomplete_pass_equals_one_or_out_of_bounds_equals_one",
+      "scoringFields": "never_aggregated_into_features"
+    },
+    "profileConstruction": {
+      "teamHistorySelection": "latest_17_eligible_team_games_by_equal_time_order_before_weighting",
+      "leaguePriorRows": "all_eligible_team_game_rows_before_origin",
+      "rateEquation": "(weighted_numerator+prior_strength*weighted_league_rate)/(weighted_denominator+prior_strength)",
+      "priorStrengthByDenominator": {"games": 4, "plays": 250, "series": 32},
+      "missingIndicator": "one_only_when_selected_team_or_opponent_history_has_zero_weighted_denominator_before_prior_is_added_else_zero",
+      "nonfiniteLeaguePrior": "abort_origin",
+      "featureValueWhenDenominatorMissing": "fold_league_prior",
+      "featureAndMissingIndicatorAvailability": "computed_only_from_origin_eligible_team_games"
+    },
+    "situationNeutralFilter": {
+      "quarters": [1, 2, 3],
+      "minimumHalfSecondsRemaining": 121,
+      "maximumAbsolutePregameIndependentScoreDifferential": 8
+    },
+    "groups": {
+      "possession_rate": [
+        "offense_regulation_series_per_game",
+        "opponent_regulation_series_faced_per_game"
+      ],
+      "situation_neutral_pace": [
+        "offense_neutral_seconds_per_scrimmage_play",
+        "opponent_neutral_seconds_per_scrimmage_play_allowed"
+      ],
+      "play_volume": [
+        "offense_scrimmage_plays_per_regulation_series",
+        "opponent_scrimmage_plays_per_regulation_series_allowed"
+      ],
+      "drive_duration": [
+        "offense_regulation_series_seconds",
+        "opponent_regulation_series_seconds_allowed"
+      ],
+      "clock_stop": [
+        "offense_incompletion_or_out_of_bounds_rate",
+        "opponent_incompletion_or_out_of_bounds_rate_allowed"
+      ],
+      "home_context": ["is_neutral_site"]
+    },
+    "scoringOutcomeSensitivityEnabled": false
+  },
+  "candidates": {
+    "p0_league_season_naive": {
+      "complexityRank": 0,
+      "description": "A 64-game previous-season weighted home and away prior updated by current-season games, with neutral games set to the pooled mean and a paired prequential residual distribution.",
+      "equation": "previous_home_and_away_means_use_only_nonneutral_prior_season_games_with_frozen_time_weights;current_home=(64*previous_home+weighted_current_nonneutral_home_count)/(64+weighted_current_nonneutral_game_weight);current_away_analogous;neutral_both=(current_home+current_away)/2;neutral_historical_games_do_not_estimate_the_location_split"
+    },
+    "p1_partially_pooled_rates": {
+      "complexityRank": 1,
+      "description": "Equal blend of latest-17-game partially pooled team offense rate and opponent series-allowed rate, plus a signed nonneutral home adjustment, with the same paired prequential residual distribution.",
+      "equation": "league_L=weighted_series/weighted_team_games; rate_T=(weighted_latest17_sum+4*L)/(weighted_latest17_games+4); H=(weighted_nonneutral_home_mean-weighted_nonneutral_away_mean)/2; home=clip((offense_home+allowed_away)/2+H,4,20); away=clip((offense_away+allowed_home)/2-H,4,20); neutral_H=0",
+      "ablationEquations": {
+        "offense_rate_only": "home=clip(offense_home+H,4,20);away=clip(offense_away-H,4,20);neutral_H=0",
+        "opponent_allowed_rate_only": "home=clip(allowed_away+H,4,20);away=clip(allowed_home-H,4,20);neutral_H=0",
+        "no_home_context": "the_full_equal_blend_with_H_set_to_zero_for_all_games",
+        "no_time_decay": "the_full_equal_blend_with_all_exponential_weights_set_to_one_while_the_2020_multiplier_remains_0.5"
+      },
+      "candidateSpecificAblations": ["offense_rate_only", "opponent_allowed_rate_only", "no_home_context", "no_time_decay"]
+    },
+    "p2_regularized_joint_count": {
+      "complexityRank": 2,
+      "ridgePenalty": 32,
+      "description": "Weighted multi-output ridge adjustment to row-specific prequential P0 means over an exact fold-scaled design, converted to a joint discrete count distribution with candidate-specific prior prequential residuals.",
+      "offset": "row_specific_prequential_p0_home_and_away_means",
+      "response": "actual_home_and_away_counts_minus_row_specific_prequential_p0_means",
+      "orderedDesign": {
+        "first": ["p1_home_mean", "p1_away_mean"],
+        "profileGroupOrder": ["situation_neutral_pace", "play_volume", "drive_duration", "clock_stop"],
+        "perProfileFeatureColumns": ["average_of_home_and_away_profile", "home_minus_away_profile", "average_of_corresponding_missing_indicators", "home_minus_away_corresponding_missing_indicators"],
+        "last": ["is_neutral_site"],
+        "intercept": "prepended_unpenalized"
+      },
+      "foldTransform": "each_nonintercept_column_imputed_by_weighted_training_fold_mean_then_centered_and_scaled_by_weighted_training_fold_population_standard_deviation; scale_below_1e-6_becomes_1; target_transform_reuses_fit_artifact",
+      "penalty": "ridge_32_on_every_scaled_design_coefficient_and_zero_on_intercept",
+      "coefficientEquation": "B=(X_transpose_W_X+diag(0,32,...,32))_solve_X_transpose_W_(Y-M0)",
+      "predictionEquation": "clip(M0+X_B,4,20)",
+      "candidateSpecificAblations": ["no_possession_rate", "no_situation_neutral_pace", "no_play_volume", "no_drive_duration", "no_clock_stop", "no_home_context", "no_time_decay"]
+      ,"ablationSemantics": {
+        "no_possession_rate": "remove_both_p1_mean_design_columns_but_retain_the_p0_offset",
+        "no_home_context": "remove_only_the_explicit_is_neutral_site_design_column;the_frozen_p0_offset_and_p1_design_columns_retain_their_baseline_location_adjustments",
+        "no_time_decay": "use_prequential_no_decay_p0_and_p1_columns_no_decay_profiles_no_decay_fit_weights_and_no_decay_residual_weights_while_retaining_the_2020_multiplier"
+      }
+    }
+  },
+  "distribution": {
+    "prequentialResidualWindowGames": 384,
+    "minimumBaseTrainingGames": 128,
+    "minimumPrequentialResidualGames": 128,
+    "residualTimeDecayHalfLifeSeasons": 2.5,
+    "residualWindowBoundary": "walk_backward_over_complete_prior_week_blocks_in_descending_season_week_order_and_include_a_block_only_when_the_total_will_not_exceed_384; restore_chronological_game_id_order_before_use",
+    "residualRelease": "after_every_candidate_has_forecast_every_game_in_the_week",
+    "residualOrder": ["season", "week", "game_id"],
+    "residualDecayCoordinate": "integer_forecast_origin_season_minus_residual_game_season_with_the_same_2020_multiplier",
+    "residualKernelOffsets": [-1, 0, 1],
+    "residualKernelWeights": [0.15, 0.7, 0.15],
+    "jointCellPseudocount": 0.0001,
+    "probabilityFloor": 1e-12,
+    "roundingRule": "round_half_away_from_zero_before_support_clipping",
+    "kernelCombination": "tensor_product_of_home_and_away_offset_weights_times_residual_time_weight",
+    "supportClippingOrder": "round_then_values_below_zero_to_zero_values_zero_through_24_exact_values_25_or_more_to_tail_25",
+    "smoothingOrder": "aggregate_weighted_kernel_mass_add_0.0001_to_each_of_676_cells_apply_1e-12_floor_then_normalize_once",
+    "predictionMeanBounds": [4.0, 20.0],
+    "energyScoreDrawPairs": 2048,
+    "energyScoreSeed": 20260824,
+    "randomizedPitSeed": 20260825,
+    "independenceDiagnostic": "factorize_each_joint_pmf_into_its_marginals_without_refitting"
+  },
+  "evaluation": {
+    "primaryMetric": "joint_negative_log_score",
+    "mandatoryMetrics": [
+      "multivariate_energy_score",
+      "home_crps",
+      "away_crps",
+      "total_crps",
+      "difference_crps",
+      "home_mae",
+      "away_mae",
+      "home_rmse",
+      "away_rmse",
+      "interval_coverage_and_width_50_80_95",
+      "joint_80_highest_density_coverage_and_size",
+      "randomized_discrete_pit_home_away_total_difference",
+      "predicted_and_observed_mean_variance_covariance",
+      "mean_calibration_intercept_and_slope",
+      "runtime_failure_and_bound_rates"
+    ],
+    "bootstrapMembers": 10000,
+    "bootstrapSeed": 20260824,
+    "bootstrapBitGenerator": "numpy_Generator_PCG64",
+    "bootstrapSeedDerivation": "seed64_is_first_8_bytes_big_endian_SHA256_UTF8_of_module2.v7_pipe_bootstrap_pipe_base=20260824_pipe_period=<period>_pipe_L=<L>",
+    "bootstrapLedgerPeriods": {
+      "development": {"members": 10000, "blockLengths": [1, 3, 6]},
+      "confirmation_2025": {"members": 5000, "blockLengths": [3]}
+    },
+    "bootstrapCanonicalManifestOrder": ["season", "week", "game_id"],
+    "bootstrapLedgerReuse": "one_exact_development_index_ledger_per_block_length_reused_by_primary_p1_ablation_p2_ablation_and_negative_control;development_coverage_and_covariance_use_first_5000_members_of_development_L3;confirmation_coverage_and_covariance_use_the_separate_5000_member_confirmation_2025_L3_ledger;each_period_ledger_is_shared_across_candidates",
+    "bootstrapIntegerDrawRule": "PCG64_integers_zero_inclusive_n_exclusive_endpoint_false",
+    "bootstrapLedgerHashRule": "sha256_of_dtype_shape_and_exact_little_endian_int64_index_bytes_without_rounding",
+    "primaryWeekBlockLength": 3,
+    "sensitivityWeekBlockLengths": [1, 6],
+    "simultaneousInterval": 0.9,
+    "calibrationBootstrapMembers": 5000,
+    "calibrationInterval": 0.95,
+    "quantileMethod": "hyndman_fan_type_7_numpy_linear",
+    "quantileEquation": "sort_finite_float64_draws;h=(B-1)*q;j=floor(h);gamma=h-j;Q=(1-gamma)*x[j]+gamma*x[min(j+1,B-1)]",
+    "scientificArrayHashRule": "sha256_of_dtype_shape_and_exact_little_endian_bytes_without_rounding",
+    "leaveOneSeasonOut": true,
+    "identicalGameManifestRequired": true
+    ,"pointPredictionSource": "joint_pmf_marginal_expectation_not_structural_location"
+    ,"marginalIntervalDefinition": "central_equal_tailed_quantiles_with_lower_first_cdf_at_least_alpha_over_2_upper_first_cdf_at_least_1_minus_alpha_over_2_inclusive_endpoint_coverage"
+    ,"joint80SetDefinition": "all_cells_at_or_above_the_probability_of_the_first_stable_descending_cell_that_brings_cumulative_mass_to_at_least_0.80_including_all_boundary_ties"
+    ,"coverageAggregation": "report_home_away_total_difference_separately; promotion_requires_home_and_away_each_to_pass"
+    ,"widthAggregation": "report_each_target; promotion_requires_home_and_away_80_width_each_to_pass"
+    ,"randomizedPIT": "cdf_below_observed_plus_u_times_observed_mass_where_u_uses_seed_20260825_game_id_and_target_only_shared_across_candidates; report_deciles_and_empirical_cdf_at_0.1_through_0.9_as_diagnostics"
+    ,"meanCalibration": "ordinary_least_squares_observed_on_intercept_plus_joint_pmf_marginal_expectation_separately_home_and_away_as_diagnostic"
+    ,"covarianceDefinition": "mean_within_game_pmf_covariance_plus_population_covariance_of_game_level_pmf_means_compared_with_population_covariance_of_observed_counts"
+    ,"bootstrapConstruction": "from_the_canonical_development_manifest_resample_12_season_labels_with_replacement;for_each_sampled_occurrence_draw_ceil(observed_week_count_over_L)_start_positions_uniformly_from_0_through_n_minus_L;append_contiguous_sorted_week_positions;truncate_to_exactly_n_weeks;append_every_game_in_game_id_order;preserve_repeated_occurrences;use_the_same_index_ledger_for_all_models_and_families"
+    ,"simultaneousIntervalMethod": "observed_delta_plus_or_minus_the_0.90_quantile_of_the_maximum_absolute_centered_bootstrap_deviation_across_every_comparison_in_the_named_family"
+    ,"primaryComparisonFamily": ["p1_minus_p0", "p2_minus_p0", "p2_minus_p1"]
+    ,"ablationComparisonFamily": "all_candidate_specific_removal_minus_full_candidate_deltas_in_one_0.90_simultaneous_family_per_candidate"
+    ,"negativeControlComparisonFamily": "the_two_negative_control_minus_full_p2_deltas_in_one_0.90_simultaneous_family"
+    ,"leaveOneSeasonOutDefinition": "game_weighted_mean_paired_improvement_after_excluding_exactly_one_development_season"
+    ,"failedForecastScoreTreatment": "none_any_expected_failure_makes_protocol_invalid"
+  },
+  "ablations": {
+    "p1_partially_pooled_rates": ["offense_rate_only", "opponent_allowed_rate_only", "no_home_context", "no_time_decay"],
+    "p2_regularized_joint_count": ["no_possession_rate", "no_situation_neutral_pace", "no_play_volume", "no_drive_duration", "no_clock_stop", "no_home_context", "no_time_decay"],
+    "decisionRule": "if_any_removal_has_a_simultaneous_90_percent_lower_improvement_bound_above_zero_the_full_candidate_is_falsified_and_is_not_repaired"
+  },
+  "negativeControls": [
+    "future_week_row_must_fail",
+    "same_week_row_must_fail",
+    "same_week_earlier_game_mutation_invariance",
+    "market_and_pick_table_invariance",
+    "overtime_row_mutation_invariance",
+    "fixed_drive_bijection_invariance",
+    "kickoff_try_penalty_only_rows_do_not_create_series",
+    "schedule_score_mutation_invariance",
+    "deterministic_noise_does_not_stably_improve",
+    "shuffle_team_identity_within_season_week_does_not_stably_improve",
+    "truncated_source_must_fail",
+    "fixed_seed_distribution_replay_is_byte_identical"
+  ],
+  "negativeControlConstruction": {
+    "replicatesPerControl": 1,
+    "deterministicNoise": "one_home_and_one_away_standard_normal_feature_from_PCG64_seed_SHA256(20260824,game_id,side);engineer_average_and_difference;fit_only_as_an_extra_p2_feature",
+    "shuffleTeamIdentity": "within_each_season_week_permute_complete_home_and_away_profile_vectors_across_games_with_PCG64_seed_SHA256(20260824,season,week,frame_role);targets_teams_and_p0_p1_means_do_not_move",
+    "seedSerialization": "canonical_UTF8_JSON_array_with_no_whitespace_using_python_json_sort_keys_true_and_separators_comma_colon;take_first_16_SHA256_hex_digits_as_integer_modulo_2^63_minus_1;initialize_numpy_default_rng_PCG64",
+    "noiseSeedTuple": [20260824, "game_id_string", "side_home_or_away_string"],
+    "shuffleSeedTuple": [20260824, "season_integer", "week_integer", "frame_role_training_or_target_string"],
+    "decisionRule": "if_either_control_has_a_simultaneous_90_percent_lower_improvement_bound_above_zero_relative_to_full_p2_then_p2_is_falsified"
+  },
+  "shadowEligibilityGate": {
+    "minimumDevelopmentLogScoreImprovementFraction": 0.01,
+    "minimumDevelopmentLogScoreImprovementNats": 0.01,
+    "simultaneousImprovementIntervalMustBeAboveZero": true,
+    "blockLengthSensitivityImprovementMustRemainPositive": true,
+    "minimumImprovedDevelopmentSeasons": 8,
+    "leaveOneSeasonOutImprovementMustRemainPositive": true,
+    "retrospectiveConfirmationPointEstimateMustImprove": true,
+    "maximumEnergyRegressionFraction": 0.005,
+    "maximumCrpsRegressionFraction": 0.005,
+    "maximumTeamMaeRegressionPossessions": 0.05,
+    "coverage80ObservedRange": [0.72, 0.88],
+    "coverage80ClusteredIntervalMustContainNominal": true,
+    "maximumIntervalWidthIncreaseFraction": 0.1,
+    "maximumCovarianceAbsoluteErrorIncrease": 0.1,
+    "maximumForecastFailureRate": 0.0,
+    "requiredPrimaryComparisons": {
+      "p1_partially_pooled_rates": ["p0_league_season_naive"],
+      "p2_regularized_joint_count": ["p0_league_season_naive", "p1_partially_pooled_rates"]
+    },
+    "thresholdsApplyToEveryRequiredComparison": true,
+    "blockLengthOneThreeSixSimultaneousLowerBoundsMustAllExceedZero": true,
+    "coverageGate": "home_and_away_80_percent_observed_coverage_each_in_0.72_to_0.88_and_each_clustered_95_percent_interval_contains_0.80",
+    "widthGate": "home_and_away_mean_80_percent_interval_width_each_no_more_than_10_percent_above_every_required_simpler_comparator",
+    "secondaryMetricGate": "energy_each_CRPS_and_each_team_MAE_limit_applies_against_every_required_simpler_comparator",
+    "pitAndMeanCalibrationRole": "mandatory_reported_diagnostics_not_separate_selection_thresholds",
+    "removalAblationMayNotStablyImproveFullCandidate": true,
+    "allLeakageInvarianceAndSourceTestsMustPass": true,
+    "simplerCandidatePreference": "select_p2_if_and_only_if_p2_passes_every_gate_including_stable_gain_over_p1;otherwise_select_p1_if_p1_passes;otherwise_reject_all",
+    "automaticProductionPromotion": false,
+    "retrospectivePassResult": "shadow_eligible_only"
+  },
+  "artifacts": {
+    "outputDirectory": "artifacts/model-lab/module-two-v8",
+    "forecastLabel": "retrospective_reconstruction",
+    "freezeManifestFilename": "pre-replay-manifest.json",
+    "freezeManifestLifecycle": "prepare_once_in_clean_output_before_any_candidate_fit_or_score_then_load_and_verify_without_overwrite_for_the_only_scored_replay",
+    "freezeManifestRequiredContents": [
+      "protocol_version",
+      "config_byte_hash",
+      "protocol_byte_hash",
+      "runner_data_model_code_byte_hashes",
+      "dependency_and_runtime_fingerprint",
+      "source_object_url_hash_byte_ledger",
+      "data_hash",
+      "feature_schema_hash",
+      "target_schema_hash",
+      "rng_quantile_and_resample_contract",
+      "expected_spec_list"
+    ],
+    "freezeManifestPrecondition": "no_scored_forecast_metric_scorecard_uncertainty_audit_result_or_artifact_hash_file_exists_in_output_directory",
+    "freezeManifestVerification": "full_replay_refuses_missing_mismatched_or_rewritten_manifest_and_recomputes_all_frozen_hashes_before_target_join_or_candidate_fit",
+    "scientificHashExcludes": ["wall_clock_timestamps", "measured_runtime", "gzip_header_time"],
+    "gzipMtime": 0,
+    "requiredHashes": [
+      "config_hash",
+      "code_hash",
+      "source_hash",
+      "data_hash",
+      "feature_schema_hash",
+      "origin_hash",
+      "fit_hash",
+      "forecast_hash"
+    ]
+  }
+}

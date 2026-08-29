@@ -1,0 +1,96 @@
+{
+  "version": "source-capture-contract.2026.2",
+  "status": "frozen",
+  "frozenOn": "2026-08-26",
+  "supersedes": "source-capture-contract.2026.1",
+  "baseContract": {
+    "path": "config/source-capture-contract-2026.v1.json",
+    "byteSha256": "6b685c480adff6ea9dc655d1065f48a9bee90b120b869c0ee0839c816710eba8",
+    "canonicalContentSha256": "168f59411370af79a5303f03f9901989c5ebc324b6b6b88141e94c48ee4fe7ee"
+  },
+  "corrections": {
+    "manifestV7CanonicalHash": {
+      "incorrectValue": "5216d7b3bef1b285d7fc3e6fb41a454e18c2d5b7d950534c79d6db0dcc6726a2",
+      "correctValue": "168f59411370af79a5303f03f9901989c5ebc324b6b6b88141e94c48ee4fe7ee",
+      "cause": "jq key ordering was used instead of repository canonicalJson locale ordering",
+      "disposition": "engine-os-contract-manifest.2026.7 is invalid and superseded before implementation"
+    }
+  },
+  "amendments": {
+    "clockStorage": {
+      "sidecarFields": [
+        "sourceObservedAt",
+        "providerPublishedAt",
+        "receiptCompletedAt",
+        "persistenceRequestedAt",
+        "responsePersistedAt",
+        "validFrom",
+        "validTo"
+      ],
+      "extensionFields": ["sidecarPersistedAt", "manifestPersistedAt"],
+      "rule": "sidecarPersistedAt and manifestPersistedAt are D1 persistence receipts and are excluded from the self-hashed sidecar"
+    },
+    "latestGood": {
+      "pointerMeaning": "latest fully verified usable capture only",
+      "rawOnlyOrFailedAttempts": "discoverable through immutable extension and event rows only",
+      "transientPointerAdvanceAllowed": false,
+      "ordering": "receiptCompletedAt ascending then captureId lexicographically ascending",
+      "replacementRule": "advance only when the candidate ordering tuple is strictly greater than the current latest-good tuple"
+    },
+    "attemptAndRetryIdentity": {
+      "attemptToken": "caller-supplied unique storage-safe token",
+      "duplicateDelivery": "same attempt token and same event payload converges on one event row",
+      "duplicateDeliveryConflict": "same attempt token with different event payload rejects",
+      "deliberateRetry": "new attempt token with the same provider, dataset, and idempotency key creates one new deduplicated event",
+      "captureIdentity": "provider, dataset, idempotency key",
+      "evidenceCollisionFields": [
+        "requestHash",
+        "responseSha256",
+        "sourceObservedAt",
+        "providerPublishedAt",
+        "validFrom",
+        "validTo",
+        "sourceSchemaVersion",
+        "usageRightsHash",
+        "validationState",
+        "laterImportHash"
+      ]
+    },
+    "sourceProfileBinding": {
+      "required": true,
+      "profileFields": [
+        "profileId",
+        "provider",
+        "dataset",
+        "origin",
+        "pathTemplate",
+        "allowedMethods",
+        "allowedPublicQueryKeys",
+        "allowedPublicHeaderKeys",
+        "allowedContentTypes",
+        "requestCredentialMode"
+      ],
+      "requestCredentialModes": ["none", "fixture_only"],
+      "os03aAllowedCredentialModes": ["none", "fixture_only"],
+      "routeMismatchBehavior": "reject before response bytes are accepted",
+      "unregisteredProfileBehavior": "reject",
+      "credentialBearingPathBehavior": "reject",
+      "liveMarketProfileBehavior": "absent"
+    },
+    "sourceKeyBinding": {
+      "format": "{provider}:{dataset}:{profileId}",
+      "crossProviderOrDatasetUse": "reject"
+    },
+    "partialStatus": {
+      "validationState": "raw_only_partial",
+      "heartbeatStatus": "partial",
+      "latestGoodPointer": "preserve"
+    },
+    "equalTimestampBehavior": {
+      "tieBreaker": "captureId lexicographic order",
+      "nondeterministicLastWriterWins": false
+    }
+  },
+  "effectiveContract": "source-capture-contract.2026.1 plus every amendment in this file",
+  "implementationMayBegin": true
+}

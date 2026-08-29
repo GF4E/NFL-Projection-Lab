@@ -1,0 +1,103 @@
+{
+  "version": "2026.08.24",
+  "answers": [
+    {
+      "questionId": "Q01",
+      "status": "accepted_design_hypothesis",
+      "answer": "Yes. The primary engine will produce a joint home/away score distribution and derive spread, total, and moneyline probabilities from the same possible game outcomes.",
+      "rationale": "The engine exists to produce meaningful, internally coherent results that facilitate and enhance human judgment. It must expose uncertainty and relevant evidence instead of replacing judgment with a single black-box pick.",
+      "evidence": [
+        "docs/decisions/ADR-0001-joint-score-decision-support.md"
+      ],
+      "author": "owner",
+      "answeredAt": "2026-08-24T21:51:34.000Z",
+      "implementationEffects": [
+        "Publish a central team-score forecast and a distribution around both teams' scores.",
+        "Derive spread, total, moneyline, push, and tie probabilities from the same normalized game-outcome distribution.",
+        "Show forecast uncertainty, market disagreement, source freshness, and the few evidence points that materially change the result.",
+        "Keep the model advisory: do not collapse the output into an unexplained recommendation or certainty claim."
+      ],
+      "validationRequired": [
+        "Compare the joint-distribution challenger with independent market models and a power-de-vigged market baseline on identical rolling-origin rows.",
+        "Require probability calibration, score-distribution fit, and derived-market log-loss diagnostics before promotion.",
+        "Verify that every published spread, total, and moneyline probability reconciles to the same normalized score outcomes."
+      ],
+      "adr": "docs/decisions/ADR-0001-joint-score-decision-support.md"
+    },
+    {
+      "questionId": "Q02",
+      "status": "accepted_design_hypothesis",
+      "answer": "Use pooled non-push log loss as the primary champion/challenger promotion metric. Calibration is a hard gate; Brier score, joint score fit, team-score error, market-level results, and CLV remain mandatory diagnostics.",
+      "rationale": "The engine must produce useful probabilities, not merely plausible scores or a profitable-looking retrospective record. Log loss rewards honest probability estimates and penalizes confident errors, while the calibration gate prevents a favorable average from concealing systematically overstated confidence.",
+      "evidence": [
+        "docs/decisions/ADR-0002-challenger-promotion-metric.md"
+      ],
+      "author": "owner",
+      "answeredAt": "2026-08-24T21:55:40.000Z",
+      "implementationEffects": [
+        "Evaluate champion and challenger on identical rolling-origin game-market rows with one Bernoulli outcome per eligible moneyline, spread, and total contract; exclude pushes from the pooled score and report them separately.",
+        "Make a challenger eligible for atomic promotion only when pooled mean log loss is lower, the paired season-week block-bootstrap 90% interval is wholly positive, no individual market regresses by more than 0.002 log-loss units, and calibration slope is within the frozen 0.8 to 1.2 range.",
+        "Report Brier score, joint score likelihood, team-score error, calibration, sample size, confidence intervals, market-level breakouts, and CLV without allowing a favorable diagnostic to override a failed hard gate.",
+        "Keep pick outcomes out of training and keep CLV as a monitoring diagnostic rather than a coefficient-fitting target."
+      ],
+      "validationRequired": [
+        "Freeze outcome definitions, row eligibility, market weights, probability bounds, and push handling before fitting either model.",
+        "Reproduce champion, challenger, and power-de-vigged market-baseline metrics on the same trailing three-season rolling-origin rows.",
+        "Inject an overconfident or degraded challenger and verify rejection, alerting, immutable run hashes, and no silent promotion.",
+        "Publish pooled and per-market sample sizes and uncertainty so a small apparent difference is not presented as decisive evidence."
+      ],
+      "adr": "docs/decisions/ADR-0002-challenger-promotion-metric.md"
+    },
+    {
+      "questionId": "Q03",
+      "status": "accepted_design_hypothesis",
+      "answer": "Run a controlled comparison of a simple market-anchored discrete-score baseline, a correlated negative-binomial model, and a possession-level simulation. Complexity receives no preference and must pass the Q02 promotion gates.",
+      "rationale": "These model families are established foundations rather than product differentiation. A common leakage-safe evaluation determines which one is useful; the engine's distinctive value must come from turning validated forecasts into scenario-aware support for human judgment.",
+      "evidence": [
+        "docs/decisions/ADR-0003-score-model-bakeoff.md",
+        "docs/NOVELTY_CHARTER.md"
+      ],
+      "author": "owner",
+      "answeredAt": "2026-08-24T21:58:42.000Z",
+      "implementationEffects": [
+        "Implement one shared as-of dataset, outcome contract, market baseline, and evaluation harness before adding model-specific complexity.",
+        "Treat the market-anchored discrete model as the minimum viable benchmark rather than assuming the most detailed simulator is best.",
+        "Require every candidate to emit the same normalized score-outcome interface so downstream decision support does not depend on model family.",
+        "Keep commodity forecast machinery separate from the proposed distinctive decision dossier."
+      ],
+      "validationRequired": [
+        "Compare all candidates on identical rolling-origin rows using the Q02 pooled log-loss and calibration gates.",
+        "Report joint score likelihood, team-score error, spread/total/moneyline breakouts, runtime, failure rate, and uncertainty stability.",
+        "Run ablations showing whether possession mechanics add held-out value beyond the simpler count and market-anchored models.",
+        "Reject added complexity that improves narrative detail without improving forecast quality or decision-relevant uncertainty."
+      ],
+      "adr": "docs/decisions/ADR-0003-score-model-bakeoff.md"
+    },
+    {
+      "questionId": "Q19",
+      "status": "accepted_design_hypothesis",
+      "answer": "Yes. Preserve the scenario-weighted numerical forecast, but label a positive mean edge as fragile when any reasonable unresolved scenario reverses the edge or drops it below the decision threshold. Label it indeterminate when material scenario state or weights cannot be supported reliably.",
+      "rationale": "Averaging mutually important futures into one clean number hides the exact uncertainty a knowledgeable person needs to judge. The engine should distinguish a robust conclusion from a favorable average that depends on unresolved QB, lineup, roof, weather, or price conditions.",
+      "evidence": [
+        "docs/decisions/ADR-0004-scenario-fragility-status.md",
+        "docs/NOVELTY_CHARTER.md"
+      ],
+      "author": "owner",
+      "answeredAt": "2026-08-24T22:04:38.000Z",
+      "implementationEffects": [
+        "Define a reasonable scenario through versioned forecast-time evidence, inclusion, and materiality rules; never invent a branch merely to create a warning.",
+        "Generate a joint score distribution, contract edge, uncertainty interval, and suggested units for each retained scenario before calculating the weighted mean.",
+        "Use robust when material scenarios preserve the decision, fragile when supported scenarios cross zero edge or the 0.5-unit floor, and indeterminate when a material state or its weight lacks defensible support or the aggregate interval spans zero.",
+        "Keep the numerical estimate and branch conditions visible. A fragility label informs judgment but does not silently alter an approved pick or replace existing approval and sizing gates.",
+        "State the concrete QB, lineup, weather, roof, or price condition that changes the conclusion."
+      ],
+      "validationRequired": [
+        "Freeze scenario inclusion, materiality, and weighting rules during offseason validation and hash them with each forecast.",
+        "Measure scenario-probability and interval calibration prospectively without using human selections as labels.",
+        "Replay late QB, inactive, roof, weather, and line changes to verify deterministic status transitions and last-good behavior.",
+        "Verify that the compact dossier exposes the weighted mean, branch disagreement, source freshness, and change threshold without presenting an unsupported causal claim."
+      ],
+      "adr": "docs/decisions/ADR-0004-scenario-fragility-status.md"
+    }
+  ]
+}

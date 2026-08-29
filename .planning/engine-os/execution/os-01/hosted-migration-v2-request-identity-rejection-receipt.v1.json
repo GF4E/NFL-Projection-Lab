@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "os01-hosted-migration-v2-request-identity-rejection-receipt.v1",
+  "recordedAt": "2026-08-29T02:53:00Z",
+  "result": "rejected_capacity_receipt_request_identity_mismatch",
+  "rejectedCommit": "f157401f02e2e5634f6225bef6eeefb594e65813",
+  "rejectedTree": "4bc3ed69e573f6d2ec61b387586071432bb5147b",
+  "immutableArtifacts": {
+    "contract": {
+      "path": "config/os01-hosted-migration-qualification.v2.json",
+      "sha256": "cd025216b156946404b5606e824575ff00e1d023f3fa40f4fa45e068a041cde6"
+    },
+    "capacityReceipt": {
+      "path": ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v2.json",
+      "sha256": "d24b4f3d68c1b34e6852779b538fe40331f2b4714df18b2e6c91d63e7ec68b47"
+    },
+    "builder": {
+      "path": "scripts/build_os01_hosted_migration_harness.ts",
+      "sha256": "e263e6d42b66964ecd6b631c9301f31a3cc3fecc4dd618efaa6654d2a5ef4782"
+    },
+    "tests": {
+      "path": "tests/os01-hosted-migration-harness.test.ts",
+      "sha256": "a8e8a2e95a6582cc9641cef3b0431d27230e549ead9e7f80dd8e710f562e8a90"
+    },
+    "adr": {
+      "path": ".planning/engine-os/execution/os-01/ADR-0011-hosted-migration-capacity-successor.md",
+      "sha256": "5fb9f021fd80287f34be1e54f9620ef5bdf78fbac2737b29ff6a53ce2b64ddee"
+    }
+  },
+  "defect": {
+    "recordedRoute": "/__engine-os/os01-d1-capacity-probe/v1",
+    "frozenSourceRoute": "/__engine-os/os01-capacity/v1",
+    "sourceCommit": "f161104783f13ad15009fc2da4ac8f11f513c4fd",
+    "sourceSha256": "8969879cc4c233d92d3a53d3202300b13b6e491e57dc3db031e12f309d983b05",
+    "consequence": "The capacity receipt is not an exact request-identity record. Its contract and package cannot authorize hosted migration deployment."
+  },
+  "independentAudit": {
+    "cleanCheckout": true,
+    "v1RejectionImmutability": "passed",
+    "focusedTests": "passed_16_of_16_but_missing_source_to_receipt_cross_check",
+    "exactProjectGate": "passed",
+    "packageReproducibility": "passed",
+    "providerCaptureProductionFailClosed": "passed",
+    "capacityResponseSelfHash": "passed_cb7c00a83a66304430c0c61385328568b752a7122069e5cc8c170e849193ed55",
+    "requestIdentity": "failed"
+  },
+  "claims": {
+    "v2Accepted": false,
+    "v2DeploymentAuthorized": false,
+    "hostedMigrationQualified": false,
+    "mutatingDurationQualified": false,
+    "os01Accepted": false,
+    "arc03Accepted": false,
+    "productionChanged": false
+  },
+  "claimBoundary": "Commit f157401 and its v2 artifacts remain immutable rejected evidence. Its passing tests, staging-project restriction, reproducible package, and fail-closed provider boundary do not cure the request-identity mismatch. No deployment or hosted migration claim may rely on v2."
+}

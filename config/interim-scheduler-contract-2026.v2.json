@@ -1,0 +1,139 @@
+{
+  "version": "interim-scheduler-contract.2026.2",
+  "status": "frozen_qualification",
+  "effectiveSeason": 2026,
+  "frozenOn": "2026-08-26",
+  "supersedes": "interim-scheduler-contract.2026.1",
+  "scope": {
+    "workPackage": "OS-15A",
+    "qualificationOnly": true,
+    "providerDispatchEnabled": false,
+    "captureActivationAllowed": false,
+    "modelExecutionAllowed": false,
+    "productionForecastMutationAllowed": false,
+    "originSource": "forecast_origin_versions_current_eligible_heads",
+    "legacyOriginSourceAllowed": false
+  },
+  "bindings": {
+    "operatingContractVersion": "engine-operating-contract.2026.1",
+    "operatingContractCanonicalSha256": "b9c71c8d7c2339de7c229b3073572df9d0a566e9f9e72f6e02938ed6e5022917",
+    "lifecycleContractVersion": "football-lifecycle.2026.1",
+    "lifecycleContractCanonicalSha256": "3e7f5a4d5b824162694994b923708c35b6ff3ef69287ace054122c24a7b6aee7",
+    "originIdentityMigrationVersion": "0015_engine_os_origin_identity",
+    "originIdentityReceiptPath": ".planning/engine-os/execution/os-02a/acceptance-receipt.v1.json"
+  },
+  "horizons": [
+    { "id": "weekly_tuesday_0730", "maximumPersistenceDelaySeconds": 600 },
+    { "id": "kickoff_minus_120", "maximumPersistenceDelaySeconds": 600 },
+    { "id": "kickoff_minus_90", "maximumPersistenceDelaySeconds": 600 },
+    { "id": "kickoff_minus_60", "maximumPersistenceDelaySeconds": 600 },
+    { "id": "kickoff_minus_15", "maximumPersistenceDelaySeconds": 300 }
+  ],
+  "clock": {
+    "timezone": "America/Los_Angeles",
+    "dispatcherCron": "* * * * *",
+    "watchdogCron": "1-59/2 * * * *",
+    "dispatcherNominalIntervalSeconds": 60,
+    "watchdogMaximumIntervalSeconds": 120,
+    "missedClaimAfterSeconds": 60,
+    "forecastMustPrecedeKickoffSeconds": 1,
+    "deadlineFormula": "min(scheduled_trigger_at_plus_horizon_cap,kickoff_at_minus_1_second)",
+    "scheduledTriggerMaySubstituteForInvocation": false,
+    "scheduledTriggerMaySubstituteForEvidence": false,
+    "scheduledTriggerMaySubstituteForPersistence": false
+  },
+  "identity": {
+    "tickKeyVersion": "engine-os.scheduler-tick.v1",
+    "tickKeyFields": ["scheduler_contract_hash", "lane", "nominal_scheduled_at"],
+    "jobKeyVersion": "engine-os.scheduler-job.v2",
+    "jobKeyFields": ["scheduler_contract_hash", "job_type", "origin_version_id", "activation_boundary"],
+    "jobType": "forecast_or_withholding",
+    "duplicateTriggerBehavior": "converge_on_deterministic_tick_and_job_keys",
+    "terminalRecordMayBeReopened": false
+  },
+  "lease": {
+    "durationSeconds": 90,
+    "renewalEverySeconds": 30,
+    "heartbeatEverySeconds": 30,
+    "heartbeatAlertAfterSeconds": 60,
+    "reclaimOnlyAfterLeaseExpiry": true,
+    "uniqueAttemptTokenRequired": true,
+    "storedAttemptTokenRepresentation": "sha256_only",
+    "monotonicFenceRequired": true,
+    "renewalRequiresExactAttemptAndFence": true,
+    "publicationRequiresExactAttemptAndFence": true,
+    "publicationRequiresUnexpiredLease": true,
+    "renewalFailureRevokesPublicationAuthority": true
+  },
+  "retry": {
+    "sameDeterministicJobIdentity": true,
+    "newAttemptTokenRequired": true,
+    "strictlyGreaterFenceRequired": true,
+    "lastSafeRetryOffsetSeconds": 60,
+    "terminalAttemptReplacementAllowed": false,
+    "afterDeadlineBehavior": "nonprospective_late_origin_excluded",
+    "missedOriginProspectiveBackfillAllowed": false
+  },
+  "publication": {
+    "currentEligibleHeadRecheckRequired": true,
+    "atomicTerminalInsertAndJobFinalizeRequired": true,
+    "requiredSeparateTimes": [
+      "scheduled_trigger_at", "invoked_at", "evidence_at", "generated_at",
+      "persistence_requested_at", "persisted_at", "persistence_deadline_at"
+    ],
+    "requiredOrdering": [
+      "scheduled_trigger_at_lte_generated_at", "evidence_at_lte_generated_at",
+      "generated_at_lte_persistence_requested_at",
+      "persistence_requested_at_lte_database_persisted_at",
+      "persisted_at_lte_persistence_deadline_at", "persisted_at_lte_kickoff_minus_1_second"
+    ],
+    "persistenceClock": "max_of_application_request_and_database_statement",
+    "qualificationForecastStatusAllowed": false,
+    "qualificationTerminalStatus": "withheld",
+    "qualificationWithholdingReason": "no_eligible_package",
+    "approvedWithholdingReasons": [
+      "no_eligible_package", "schedule_unavailable_at_origin", "required_source_stale",
+      "required_source_partial", "required_source_unavailable", "schema_invalid",
+      "provenance_incomplete", "package_hash_mismatch", "late_origin_excluded", "compute_failure"
+    ]
+  },
+  "missedTick": {
+    "independentWatchdogRequired": true,
+    "insideDeadlineBehavior": "claim_and_persist_timely_compute_failure_withholding",
+    "afterDeadlineBehavior": "persist_nonprospective_late_origin_excluded_and_alert",
+    "fabricatedContemporaneousRecordAllowed": false,
+    "watchdogAlertsIdempotent": true,
+    "recoveryBatchMaximumSlots": 30,
+    "recoveryCursorEventType": "watchdog_recovery_checkpoint",
+    "recoveryCursorPersistence": "append_only_after_each_completed_batch",
+    "extendedOutageBehavior": "resume_from_latest_audited_checkpoint_without_prospective_replay"
+  },
+  "scheduleRevision": {
+    "selectCurrentHeadOnly": true,
+    "supersededPendingJobBehavior": "invalidate_without_history_mutation",
+    "completedRecordReopenAllowed": false,
+    "laterKickoffAffectsElapsedOrigins": false,
+    "earlierKickoffMayGainEarlierOrigin": false,
+    "lateDiscoveredOriginBehavior": "nonprospective_schedule_unavailable_at_origin",
+    "unresolvedOriginBehavior": "record_operational_event_without_fabricated_trigger",
+    "resolvedFutureOriginBehavior": "schedule_normally",
+    "resolvedPastOriginBehavior": "nonprospective_schedule_unavailable_at_origin",
+    "allUnresolvedSchedulesMayActivate": false
+  },
+  "security": {
+    "oddsSecretMayBeRead": false,
+    "providerConnectorDependencyAllowed": false,
+    "networkDispatchAllowed": false,
+    "captureEnvironmentFlagRequiredForWorkerEntry": true,
+    "captureEnvironmentFlagName": "ENGINE_OS_CAPTURE_ENABLED",
+    "captureEnvironmentFlagQualifiedValue": "true"
+  },
+  "cutover": {
+    "contractPath": "config/interim-scheduler-cutover-2026.v2.json",
+    "nonexpiredLeasesBlockCutover": true,
+    "missedOriginsMayBeReplayed": false,
+    "terminalRowsRetainedUnchanged": true,
+    "onlyFuturePendingCurrentHeadsTransfer": true,
+    "singlePublishingSchedulerRequired": true
+  }
+}

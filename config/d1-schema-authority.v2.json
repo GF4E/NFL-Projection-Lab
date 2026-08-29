@@ -1,0 +1,199 @@
+{
+  "version": "d1-schema-authority.2026.2",
+  "status": "local_candidate_not_production_qualified",
+  "frozenOn": "2026-08-27",
+  "workPackage": "OS-01",
+  "requirement": "ARC-03",
+  "baseCommit": "636c419777a09380fe38dce804e6df5c4e374110",
+  "predecessorContract": {
+    "path": "config/d1-schema-authority.v1.json",
+    "byteSha256": "948dbfd5657c169c01d15d6a6fea08524a321d71852cc3148355c0d4210fcc0d",
+    "relationship": "immutable_predecessor_frozen_through_0018"
+  },
+  "scope": {
+    "executionAuthority": "ordered_sql_migrations_only",
+    "typedDeclaration": "db/schema.ts",
+    "physicalState": "cloudflare_d1",
+    "runtimeSchemaMutationAllowed": false,
+    "providerSecretAccessAllowed": false,
+    "providerDispatchAllowed": false,
+    "quotaReservationAllowed": false,
+    "captureActivationAllowed": false,
+    "productionForecastChangeAllowed": false
+  },
+  "orderedHistory": {
+    "predecessorJournalArchive": {
+      "path": ".planning/engine-os/execution/os-01/frozen-journal-through-0018.json",
+      "byteSha256": "d701dabe7625572abe24d69d330e9e9940adb0bd96a94dbc48b12cf1e212830d",
+      "entryCount": 18
+    },
+    "activeJournal": {
+      "path": "drizzle/meta/_journal.json",
+      "byteSha256": "c2f4c41e680cc92e3eb21cb02869e45dae4862e7296e0a72880e5f1026fbe77f",
+      "entryCount": 20,
+      "dialect": "sqlite",
+      "journalVersion": "7",
+      "frozenPrefixEntryCount": 18,
+      "successorTags": [
+        "0019_engine_os_schema_closure",
+        "0020_engine_os_plays_reconciliation"
+      ]
+    },
+    "successorMigrations": [
+      {
+        "order": 18,
+        "path": "drizzle/0019_engine_os_schema_closure.sql",
+        "byteSha256": "a1989560c3efd90c344d084b24937f1c31d4a19fafeb304313de98702599c31a",
+        "receiptVersion": "0019_engine_os_schema_closure",
+        "receiptDefinitionSha256": "9655dbc30cc725ed1b358cdcac3fcd3a441678e7a3d45bd31fa2c2a3f124b336",
+        "mode": "additive_exact_prestate_only"
+      },
+      {
+        "order": 19,
+        "path": "drizzle/0020_engine_os_plays_reconciliation.sql",
+        "byteSha256": "8addcc1c896b215ca5b40a0607372f9bcf9e4d9e5d96c184feba618a2aa89810",
+        "receiptVersion": "0020_engine_os_plays_reconciliation",
+        "receiptDefinitionSha256": "ad9cdf8d26293ecc3720bb08c8c1bd8a04df14d72159f4a04684b19debc83247",
+        "mode": "transactional_copy_verify_then_swap"
+      }
+    ],
+    "successorRollbacks": [
+      {
+        "path": "drizzle/rollback/0019_engine_os_schema_closure.down.sql",
+        "byteSha256": "b118a313724effd4990f21ba245496e44cc9fa8b26d0b8ae39a7da093e36b12c",
+        "scope": "empty_isolated_qualification_only"
+      },
+      {
+        "path": "drizzle/rollback/0020_engine_os_plays_reconciliation.down.sql",
+        "byteSha256": "f7886cb1f7d58c7bab86f97e72c89f7249cc168db61c2becbf48c756728cbe6d",
+        "scope": "empty_isolated_qualification_only"
+      }
+    ],
+    "mutationBehavior": "missing_duplicate_reordered_unknown_or_hash_changed_entry_aborts_before_schema_write"
+  },
+  "typedProjection": {
+    "rootPath": "db/schema.ts",
+    "rootByteSha256": "5a3aba4f6dee435e431e99820220cde8399bf26fecfff7b1f2d09b8867d42189",
+    "componentFiles": [
+      {
+        "path": "db/engine-os-schema.ts",
+        "byteSha256": "02e69cab6c6fb2964aa421a143489760b25f6149cdbe47b0419a85672aa4e63d"
+      },
+      {
+        "path": "db/runtime-schema.ts",
+        "byteSha256": "7825f105b4b5026e44e5671cf792ad82ce4cc2f83618d720c90b9bd18ca9e237"
+      }
+    ],
+    "snapshot": {
+      "path": "drizzle/meta/0020_snapshot.json",
+      "byteSha256": "ab4609c23cf11d4214882873c709c37f96922ec7962f76a0a0581a1fa38c9e21"
+    },
+    "parityTest": {
+      "path": "tests/d1-typed-physical-parity.test.ts",
+      "byteSha256": "707c112e500da31e37aeef9e0e6baf6146d692ff484e37e24cd502288bcb794b",
+      "tableCount": 93,
+      "comparedSemantics": [
+        "columns_defaults_nullability_primary_keys",
+        "unique_constraints",
+        "check_expressions",
+        "foreign_keys_and_actions",
+        "explicit_and_partial_indexes"
+      ]
+    }
+  },
+  "physicalProjection": {
+    "manifest": {
+      "path": "config/d1-schema-manifest.v1.json",
+      "byteSha256": "4ca77b123faeeb7f5287994548f969bed35e2be9c6efcf4d88c509fb3d89b47d",
+      "migrationSetSha256": "3fac8fd79aee6effc06e8d4f0d86283b5840b84b362805777787ce3c73f48efe",
+      "schemaFingerprintSha256": "4d78fd8de47ababbf6d809575a55275a166e8c99b332344b91c885f27eedafd2",
+      "objectCounts": {
+        "table": 93,
+        "index": 80,
+        "trigger": 76,
+        "view": 0
+      }
+    },
+    "ownershipRegistry": {
+      "path": ".planning/engine-os/execution/os-00/ownership-registry.v2.json",
+      "byteSha256": "c0371a11e0dbd20bf74606f21cdc5023257f24e10965a5661487e16c8d6be095",
+      "tableCount": 93
+    },
+    "unknownObjectBehavior": "drift_failure",
+    "postMigrationProductionMustEqualManifest": true
+  },
+  "runtimeBoundary": {
+    "terminalReceiptVersion": "0020_engine_os_plays_reconciliation",
+    "terminalReceiptDefinitionSha256": "ad9cdf8d26293ecc3720bb08c8c1bd8a04df14d72159f4a04684b19debc83247",
+    "schemaCheck": "select_only_exact_receipt_assertion",
+    "missingOldUnknownOrMismatchedBehavior": "fail_without_write",
+    "runtimeRepairAllowed": false,
+    "deployableDdlAllowed": false,
+    "migrationSqlReachableFromWorkerGraph": false,
+    "implementationArtifacts": [
+      {
+        "path": "src/server/schema-authority.ts",
+        "byteSha256": "aef53aedb801b724d7ccf786d65ec76c687769e1118204347f91d45728100bc1"
+      },
+      {
+        "path": "tests/schema-authority-runtime.test.ts",
+        "byteSha256": "e0727ec0f61e027669e16756b8e3f896661921df3e3fbcbd354867a8a406334a"
+      },
+      {
+        "path": "tests/runtime-ddl-boundary.test.ts",
+        "byteSha256": "f5fa9d175890e7f108be0286cc57c3bc8e1646b769e7564eef49419214ce28cf"
+      },
+      {
+        "path": "tests/qb-background.test.ts",
+        "byteSha256": "d376399ae48f5e7bad7b3522545756323ea23ddfcbb703bf334687cde88a5437"
+      }
+    ]
+  },
+  "qualifiedLocalEvidence": {
+    "blankOrderedReplay": "passed",
+    "typedPhysicalParity": "passed",
+    "semanticMutationDiagnostics": "passed",
+    "transactionalCopyPreservation": "passed",
+    "emptyOnlyRollback": "passed",
+    "runtimeDdlSourceBoundary": "passed",
+    "cleanBuildAndBuiltOutputBoundary": "passed_credential_free_archive",
+    "cleanBuildReceipt": {
+      "path": ".planning/engine-os/execution/os-01/clean-build-receipt.v1.json",
+      "byteSha256": "791d25bb94bdeb8ccfbe8a9b58bebc90159ccc1f436ce5f408be3b8aaa6fbe9d",
+      "buildRelevantInputSha256": "789fbc456790cd9dedbb944f487ce7cf0c1005c2d21eee2a098ab7a7dcad0b8a",
+      "buildAggregateSha256": "48d39b0e69d470cf438fe9cda729f8f0607b21c73e68e07ca8c31840df05376a"
+    },
+    "independentAcceptance": "pending_after_hosted_and_production_proof"
+  },
+  "supportedProductionPrestate": {
+    "id": "exact_production_census",
+    "readOnlyCensusStatus": "pending",
+    "rowPreservationManifestStatus": "pending",
+    "preMigrationBackupStatus": "pending",
+    "unknownOrMismatchedPrestateBehavior": "abort_without_schema_write",
+    "runtimeMutatedPlaysPrestateSupported": false
+  },
+  "remainingQualificationGates": [
+    "exact_production_semantic_census",
+    "exact_production_row_preservation_manifest",
+    "isolated_hosted_blank_replay",
+    "isolated_hosted_exact_prestate_replay",
+    "hosted_atomic_partial_failure_proof",
+    "pre_migration_production_backup",
+    "backup_restore_drill",
+    "dormant_production_forward_migration",
+    "postmigration_production_semantic_and_row_parity",
+    "independent_final_acceptance_audit"
+  ],
+  "qualification": {
+    "currentResult": "not_run",
+    "os01Accepted": false,
+    "arc03Accepted": false,
+    "productionMigrationApplied": false,
+    "productionActivationPresent": false,
+    "prospectiveEvidenceClaimed": false,
+    "providerCalls": 0,
+    "quotaReservations": 0,
+    "claimBoundary": "This successor binds the local 0000-0020 migration candidate, typed projection, semantic manifest, runtime fail-closed contract, and local proof only. It is not OS-01 or ARC-03 acceptance and does not authorize production migration, provider access, quota use, capture activation, or forecast changes."
+  }
+}

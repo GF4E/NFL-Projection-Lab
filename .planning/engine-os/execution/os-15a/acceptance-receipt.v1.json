@@ -1,0 +1,278 @@
+{
+  "schemaVersion": "engine-os.os-15a-acceptance-receipt.v1",
+  "generatedAt": "2026-08-26T21:34:28Z",
+  "status": "accepted",
+  "scope": "Bounded provider-free qualification of the interim 2026 scheduler and operating-system layer. This accepts OS-15A only; it does not accept source capture, OS-03A, OS-13A, full OS-15, a model package, prospective production forecasts, authenticated provider dispatch, or any statistical module.",
+  "preservedFoundations": [
+    "OS-00 architecture and evidence",
+    "OS-00B numerical operating contract",
+    "OS-01A migrations",
+    "OS-02A canonical game and five-horizon origin identities",
+    "OS-19A quota controls",
+    "R0",
+    "R1-v1",
+    "R1-v2"
+  ],
+  "source": {
+    "contractFreezeCommit": "d99fa4d",
+    "implementationCommit": "bf2cc19640aabe60fe5850edfee2fbf63bbdf5ec",
+    "implementationHistory": [
+      "d99fa4d",
+      "2e72043",
+      "c92e916",
+      "ba55f4b",
+      "513aaa3",
+      "168457f",
+      "bf2cc19"
+    ],
+    "schedulerKernelSha256": "d85491e6936c8eb656468c44d391517be2c6b72f77f4158ad98646b237ceeb45",
+    "schedulerRuntimeSha256": "ab774fcc3c513f9665d3b83da1608019b43e69ae24214bfab470781e54fb1f7d",
+    "workerEnvironmentBoundarySha256": "6239c291dd67c068c1d0bf00ceca6eda7d27e12f22a5285df31de0f5195f695d",
+    "workerEntrypointSha256": "e3f4d8f5bb2853c82bcd2c1c7a6605c5634480717cd665583e312e730515c30e"
+  },
+  "contracts": {
+    "schedulerVersion": "interim-scheduler-contract.2026.5",
+    "schedulerSourceFileSha256": "1de2fb74821ab2748551227a8f42701dff34b74901d007ecf1ff12b3727507dc",
+    "schedulerCanonicalSha256": "b00222c7aac57640278a64cc027dffd2d26d988375be20d0fbe87497aa06549f",
+    "cutoverVersion": "interim-scheduler-cutover.2026.5",
+    "cutoverSourceFileSha256": "92c083354107a353687f329c5b536e20938eccf6f4cd8648c41847876efeb4a8",
+    "cutoverCanonicalSha256": "f997ec8c594b5631483a44ef164e65d13059875f3b1508f91ec808a6c90c12ba",
+    "contractManifestSourceFileSha256": "ad9ffef7287e5ff711c27634248ee17a5c85959a251ba2ba965991101c9064be",
+    "contractManifestCanonicalSha256": "a88287e665323f4b3d352589ad5b5349e8a1774ef5da90abd12032d8a6c49592",
+    "deadlineBoundary": "persisted_at_strictly_before_minimum_of_horizon_cap_and_kickoff_minus_one_second",
+    "equalDeadlineDisposition": "late_nonprospective",
+    "providerDispatch": "disabled"
+  },
+  "qualifiedBehavior": {
+    "originSource": "current eligible heads from forecast_origin_versions",
+    "seasonType": "2026 REG",
+    "horizons": [
+      "weekly_tuesday_0730",
+      "kickoff_minus_120",
+      "kickoff_minus_90",
+      "kickoff_minus_60",
+      "kickoff_minus_15"
+    ],
+    "separateTemporalFields": [
+      "scheduled_trigger_at",
+      "invoked_at",
+      "evidence_at",
+      "generated_at",
+      "persistence_requested_at",
+      "persisted_at",
+      "persistence_deadline_at",
+      "kickoff_at"
+    ],
+    "deterministicTickIdentity": true,
+    "deterministicJobIdentity": true,
+    "uniqueAttemptTokens": true,
+    "fencedRenewableLeases": true,
+    "staleWorkerPublicationBlocked": true,
+    "duplicateAndRetryConvergence": true,
+    "oneTimelyRecordPerDueOrigin": true,
+    "prospectiveBackfillProhibited": true,
+    "timelyWithholdingReasons": [
+      "no_eligible_package",
+      "required_source_stale",
+      "required_source_partial",
+      "required_source_unavailable",
+      "schema_invalid",
+      "provenance_incomplete",
+      "package_hash_mismatch",
+      "compute_failure"
+    ],
+    "nonprospectiveClosureReasons": [
+      "schedule_unavailable_at_origin",
+      "late_origin_excluded"
+    ],
+    "unresolvedCurrentHeadBehavior": "append scheduler event and critical alert without fabricating a scheduled trigger",
+    "laterResolvedElapsedHeadBehavior": "close nonprospectively with schedule_unavailable_at_origin",
+    "independentDispatcherHeartbeat": true,
+    "independentWatchdog": true,
+    "missedTickDetection": true,
+    "dstAndRescheduleSemanticsInheritedFromAcceptedOs02aHeads": true,
+    "earlierKickoffEligibilityRatchetEnforced": true,
+    "lateDiscoveredAndUnresolvedOriginsWithheldOrIneligible": true,
+    "legacyCutoverVersioned": true,
+    "twoPublishingSchedulersProhibited": true,
+    "missedOriginReplayProhibited": true,
+    "maximumD1QueriesPerInvocation": 46,
+    "maximumOriginsPerInvocation": 32,
+    "watchdogRecoverySlotsPerInvocation": 12
+  },
+  "migration": {
+    "version": "0016_engine_os_interim_scheduler",
+    "source": "drizzle/0016_engine_os_interim_scheduler.sql",
+    "sourceFileSha256": "c121be1514510dedb2b5b1f6caef2e61d9b5999afc1a2f61a3f7477df7f74930",
+    "definitionHash": "sha256:bad6665a2976440b108e1c0223d01dab3a0313283b8d2e08f0eb509ef57edcb2",
+    "statementCount": 29,
+    "rollbackSource": "drizzle/rollback/0016_engine_os_interim_scheduler.down.sql",
+    "rollbackSourceFileSha256": "504e56b23052adeab182f075b13d9212e8d5b5514e91f94abb51543e1649985b",
+    "rollbackRequiresEmptyQualificationTables": true,
+    "productionAppliedAt": "2026-08-26T20:39:49.109Z",
+    "productionTableCount": 5,
+    "productionTriggerCount": 15
+  },
+  "isolatedQualification": {
+    "receipt": ".planning/engine-os/execution/os-15a/sites-staging-proof-receipt.v1.json",
+    "result": "pass",
+    "ownerOnly": true,
+    "providerCalls": 0,
+    "providerSecretsRead": 0,
+    "stagingRetiredToInertTombstone": true,
+    "stagingPhysicallyDeleted": false,
+    "hostedOverlapAndFencingVerified": true,
+    "allFiveHorizonsVerified": true,
+    "qualificationOnlyRecords": 7
+  },
+  "localVerification": {
+    "schedulerKernelTestSha256": "4c91f69159fb67dedabc42d9e763fcf95187a4f91cc0d0367013c51a36cd559e",
+    "schedulerMigrationTestSha256": "41d5c490c9faa5ae2bcba5801149dff7c97b77c3f0bf3b071ee8fa8c0b9e482e",
+    "schedulerRuntimeTestSha256": "e6b484dd57a5e51b41b8dd524c5e80a6d8ef1da98f31a0e384e5da49fa7716d7",
+    "fullSuite": {
+      "testFilesPassed": 47,
+      "testFilesSkipped": 1,
+      "testsPassed": 351,
+      "testsSkipped": 1,
+      "typecheck": "pass",
+      "lint": "pass",
+      "build": "pass",
+      "activeBuildGraph": "pass",
+      "diffCheck": "pass"
+    },
+    "focusedCoverage": [
+      "duplicate invocations",
+      "overlapping workers",
+      "lease expiry and recovery",
+      "stale-worker fencing",
+      "renewal failure",
+      "missed ticks and bounded watchdog recovery",
+      "schedule revisions and earlier kickoffs",
+      "DST and unresolved schedules",
+      "all five horizons",
+      "source, compute, provenance, deadline, schedule, and no-package withholding",
+      "strict open deadline boundary",
+      "rollback refusal after any scheduler evidence",
+      "provider and secret environment boundary"
+    ],
+    "securityScanDisposition": "The OS-15A diff introduces no known secret or provider-dispatch path. The repository-wide scanner still reports a pre-existing ignored local .env.local secret assignment and review-only absolute-home-path findings; values were not read or printed, and OS-15A does not claim repository-wide OS-18A completion."
+  },
+  "production": {
+    "projectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site",
+    "cleanRuntimeSourceCommit": "c2496c33aab1db57660bedad9800aed0efc78e9d",
+    "cleanRuntimeVersionNumber": 164,
+    "cleanRuntimeVersionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_0c152ecef9ac819197403e9d20ff2728",
+    "initialCleanDeploymentId": "appgdep_6a8f4b82192081918797d84d1ccec776",
+    "cleanRestoreDeploymentId": "appgdep_6a8f59a6f0708191bc268f366658712c",
+    "cleanRestoreDeploymentStatus": "succeeded",
+    "environmentRevision": 25,
+    "httpSundayStatus": 200,
+    "temporaryMigrationBridge": {
+      "firstFullApplicationAttemptVersionNumber": 156,
+      "firstFullApplicationAttemptSourceCommit": "c9e3b27",
+      "firstFullApplicationAttemptDeploymentId": "appgdep_6a8f4e23f1a08191ae8e1fd35e6afbdb",
+      "firstFullApplicationAttemptStatus": "failed_before_live_startup_cpu_limit_no_schema_change",
+      "slimOperatorVersionNumber": 157,
+      "slimOperatorSourceCommit": "918d683d3591abf66bbd6829da8ccd05f2a24ea3",
+      "slimOperatorVersionId": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_81327a2d3c208191b6230d5f2ea98558",
+      "slimOperatorDeploymentId": "appgdep_6a8f4efae4b88191949b9d062a6de1c6",
+      "slimOperatorDeploymentStatus": "succeeded",
+      "operatorOnlyFailClosed": true,
+      "providerOrSchedulerImports": false,
+      "migrationAppliedExactlyOnce": true,
+      "idempotentSecondCall": "already_applied",
+      "bridgeKeysRemoved": true,
+      "bridgeRetired": true,
+      "retiredOperatorPostStatus": 405
+    },
+    "schemaReadback": {
+      "migration0016HashMatches": true,
+      "schedulerTablesPresent": 5,
+      "schedulerTablesEmpty": true,
+      "engineActivationRows": 0,
+      "acceptedFoundationDirectAudit": "verified_no_repair_required",
+      "foundationSchemaFingerprint": "sha256:353b1ad01eb414389d895b70ef58ccf56d2aeae4ca5fa4081d044d0e1fa2f88a",
+      "foundationForeignKeyViolations": 0
+    },
+    "failClosed": {
+      "captureEnabledEnvironmentKeyPresent": false,
+      "onlyInstalledEnvironmentKey": "ODDS_API_KEY_as_redacted_secret",
+      "activeWorkerReadsOddsApiKey": false,
+      "providerRequests": 0,
+      "oddsCreditsUsed": 38,
+      "oddsCreditsRemaining": 462,
+      "oddsLastCost": 0,
+      "quotaReservations": 0,
+      "quotaReservationEvents": 0,
+      "prospectiveForecastOrWithholdingRows": 0
+    }
+  },
+  "productionFoundationDirectAudit": {
+    "receipt": ".planning/engine-os/execution/os-15a/production-foundation-direct-audit-receipt.v1.json",
+    "status": "verified_no_repair_required",
+    "databaseViewerProjectionDisposition": "stale_projection_rejected_as_database_evidence",
+    "directD1Boundary": "accepted_legacy_0013_0014",
+    "migration0017Applied": false,
+    "bootstrapMutation": false,
+    "twoExactBootstrapReadbacks": "already_reconstructed",
+    "providerRequests": 0,
+    "providerSecretsRead": 0,
+    "operatorRetired": true,
+    "candidateRepairSourceReverted": true
+  },
+  "independentAudit": {
+    "status": "accepted",
+    "scope": "Bounded provider-free OS-15A scheduler qualification only.",
+    "reviewCount": 3,
+    "reviews": [
+      {
+        "review": "hosted_stage_and_production_evidence",
+        "result": "accepted",
+        "finding": "Independently reproduced source and receipt hashes, the accepted legacy schema fingerprint, exact migrations 0013 through 0016, the 38/462 bootstrap, empty downstream scheduler tables, operator retirement, and the clean production runtime."
+      },
+      {
+        "review": "code_contract_and_master_plan",
+        "result": "accepted",
+        "finding": "Reproduced 60 focused tests and the complete 351-test suite, verified all five horizons, deadline, fencing, renewal, duplicate, watchdog, reschedule, and cutover behavior, and found no later-scope overclaim."
+      },
+      {
+        "review": "security_and_runtime_boundary",
+        "result": "accepted",
+        "finding": "Verified the provider-free dependency graph, pre-D1 capture gate, read-only public request boundary, clean migration tree ending at 0016, absent capture key, no active secret read, and no interface, model, or production-forecast change."
+      }
+    ],
+    "nonBlockingFindings": [
+      "The repository-wide scanner still identifies the ignored local .env.local assignment and pre-existing metadata/path review items; none is tracked or bundled by OS-15A, and repository-wide OS-18A security acceptance is not claimed.",
+      "The isolated staging receipt preserves response hashes and final D1 state rather than the raw phase response bodies, so it supports only the bounded scheduler-mechanism claim."
+    ]
+  },
+  "claims": {
+    "os15aAccepted": true,
+    "boundedProviderFreeSchedulerQualificationAccepted": true,
+    "os03aAccepted": false,
+    "os13aAccepted": false,
+    "fullOs15Accepted": false,
+    "led03Complete": false,
+    "ops01Complete": false,
+    "ops03Complete": false,
+    "prospectiveCaptureStarted": false,
+    "productionActivationCreated": false,
+    "providerDispatchAuthorized": false,
+    "r2Authorized": false,
+    "module2bRun": false,
+    "driveQuarterbackOrPlayerModuleAuthorized": false,
+    "interfaceChanged": false,
+    "statisticalModelChanged": false,
+    "productionForecastChanged": false
+  },
+  "limitations": [
+    "The hosted proof writes qualification-only no-package withholding rows on isolated staging. It does not prove exact-byte source capture, package verification, or a prospective production archive.",
+    "OS-03A must qualify immutable source bytes, sidecars, manifests, pointer ordering, corruption detection, failure preservation, and provider-offline replay before capture can be claimed.",
+    "OS-13A must bind every activated horizon to complete immutable provenance and prove all-horizon completeness before LED-03 can be checked.",
+    "Full OS-15 must import this versioned state, retire overlapping scheduler ownership, and qualify the durable cross-job DAG without replaying missed origins.",
+    "OS-18A provider authentication remains open. The dormant Odds secret was not read, provider dispatch stayed disabled, and quota remained 38 used and 462 remaining.",
+    "The owner-only staging project could not be physically deleted through the connector; it was stripped of environment keys and runtime bindings and replaced with an inert HTTP 410 tombstone.",
+    "The isolated staging proof preserves per-phase response hashes and final D1 state, but not the original raw phase-response bodies. This is sufficient for the bounded scheduler-mechanism claim only and cannot support broader source-capture or prospective-evidence acceptance."
+  ]
+}

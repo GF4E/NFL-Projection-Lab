@@ -1,0 +1,133 @@
+{
+  "version": "os01-migration-qualification.2026.1",
+  "status": "local_sqlite_d1_equivalent_candidate",
+  "workPackage": "OS-01",
+  "authorityContract": "d1-schema-authority.2026.2",
+  "executionBoundary": {
+    "offlineOnly": true,
+    "workerReachable": false,
+    "productionAllowed": false,
+    "providerAccessAllowed": false,
+    "captureActivationAllowed": false
+  },
+  "supportedPrestates": [
+    {
+      "id": "blank_ordered_chain",
+      "applicationRange": "0000_through_0020",
+      "schemaFingerprint": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "objectCounts": {
+        "table": 0,
+        "index": 0,
+        "trigger": 0,
+        "view": 0
+      }
+    },
+    {
+      "id": "ordered_through_0016_legacy_29",
+      "applicationRange": "0017_through_0020",
+      "schemaFingerprint": "25069f7ac7b40a7708748dc1d2318cb2cb5dd9b8fdb72a91d7694cd3d99c4c2f",
+      "objectCounts": {
+        "table": 48,
+        "index": 44,
+        "trigger": 46,
+        "view": 0
+      },
+      "playsShape": "legacy_29",
+      "scope": "deterministic_production_shaped_fixture_not_a_substitute_for_the_live_census"
+    }
+  ],
+  "authorizedRanges": [
+    {
+      "prestateId": "blank_ordered_chain",
+      "migrationPaths": [
+        "drizzle/0000_keen_red_shift.sql",
+        "drizzle/0001_parched_hedge_knight.sql",
+        "drizzle/0002_watery_patriot.sql",
+        "drizzle/0003_hesitant_bloodstorm.sql",
+        "drizzle/0004_player_prop_decision_board.sql",
+        "drizzle/0005_structured_contract_settlement.sql",
+        "drizzle/0006_execution_tracking.sql",
+        "drizzle/0008_play_forecast_provenance.sql",
+        "drizzle/0009_market_sentiment.sql",
+        "drizzle/0010_confidence_engine.sql",
+        "drizzle/0011_model_gate_evidence.sql",
+        "drizzle/0012_source_snapshot_timing.sql",
+        "drizzle/0013_engine_os_urgent.sql",
+        "drizzle/0014_odds_quota_reservations.sql",
+        "drizzle/0015_engine_os_origin_identity.sql",
+        "drizzle/0016_engine_os_interim_scheduler.sql",
+        "drizzle/0017_engine_os_source_capture.sql",
+        "drizzle/0018_engine_os_forecast_ledger.sql",
+        "drizzle/0019_engine_os_schema_closure.sql",
+        "drizzle/0020_engine_os_plays_reconciliation.sql"
+      ],
+      "receiptAdditions": [
+        { "version": "0013_engine_os_urgent", "migrationHash": "sha256:6205a3dfe09c2d663bb8c50378f295accd266ff2b2018668ca5353436a6797bb" },
+        { "version": "0014_odds_quota_reservations", "migrationHash": "sha256:91bc1571f8873ccaeb8a2b8a9a8c2425370b4eec3c0931f1fa3ae02ffae56da1" },
+        { "version": "0015_engine_os_origin_identity", "migrationHash": "sha256:622fb472f959273563f3dd139b7dde676e27b370a52c0241d6ee4d3726e3444a" },
+        { "version": "0016_engine_os_interim_scheduler", "migrationHash": "sha256:bad6665a2976440b108e1c0223d01dab3a0313283b8d2e08f0eb509ef57edcb2" },
+        { "version": "0017_engine_os_source_capture", "migrationHash": "sha256:d25f6119f4d0735247489623e5775cb185c866d7a3f1ebbb791c5f5cfaeac0e7" },
+        { "version": "0018_engine_os_forecast_ledger", "migrationHash": "sha256:851f66b3ad07afe61be346b09f853875e675d25512f989b0f4337f6c64a1c293" },
+        { "version": "0019_engine_os_schema_closure", "migrationHash": "sha256:9655dbc30cc725ed1b358cdcac3fcd3a441678e7a3d45bd31fa2c2a3f124b336" },
+        { "version": "0020_engine_os_plays_reconciliation", "migrationHash": "sha256:ad9cdf8d26293ecc3720bb08c8c1bd8a04df14d72159f4a04684b19debc83247" }
+      ]
+    },
+    {
+      "prestateId": "ordered_through_0016_legacy_29",
+      "migrationPaths": [
+        "drizzle/0017_engine_os_source_capture.sql",
+        "drizzle/0018_engine_os_forecast_ledger.sql",
+        "drizzle/0019_engine_os_schema_closure.sql",
+        "drizzle/0020_engine_os_plays_reconciliation.sql"
+      ],
+      "receiptAdditions": [
+        { "version": "0017_engine_os_source_capture", "migrationHash": "sha256:d25f6119f4d0735247489623e5775cb185c866d7a3f1ebbb791c5f5cfaeac0e7" },
+        { "version": "0018_engine_os_forecast_ledger", "migrationHash": "sha256:851f66b3ad07afe61be346b09f853875e675d25512f989b0f4337f6c64a1c293" },
+        { "version": "0019_engine_os_schema_closure", "migrationHash": "sha256:9655dbc30cc725ed1b358cdcac3fcd3a441678e7a3d45bd31fa2c2a3f124b336" },
+        { "version": "0020_engine_os_plays_reconciliation", "migrationHash": "sha256:ad9cdf8d26293ecc3720bb08c8c1bd8a04df14d72159f4a04684b19debc83247" }
+      ]
+    }
+  ],
+  "prewriteProtocol": {
+    "preflightClaimVersion": "os01.migration-preflight.v1",
+    "quiescence": "begin_immediate",
+    "revalidation": "schema_fingerprint_rows_hash_and_foreign_keys_inside_the_write_lock_before_first_statement",
+    "mismatchBehavior": "rollback_without_schema_write"
+  },
+  "atomicityProtocol": {
+    "migrationUnit": "entire_authorized_range_in_one_transaction",
+    "migrationOrder": "exact_contract_order_with_missing_duplicate_reordered_or_unknown_path_rejected_before_begin",
+    "partialFailureBehavior": "rollback_entire_range",
+    "terminalReceiptFailureBehavior": "receipt_and_all_terminal_evidence_verify_inside_the_transaction_before_commit",
+    "postCommitBehavior": "return_only_precomputed_verified_result_without_database_reads_or_writes"
+  },
+  "backupRestoreProtocol": {
+    "qualificationResource": "isolated_file_backed_sqlite",
+    "backupMode": "sqlite_online_backup_api",
+    "restoreOperation": "copy_verified_backup_bytes_into_a_distinct_database_resource",
+    "restoreProof": "distinct_restored_database_schema_fingerprint_rows_hash_foreign_key_check_and_exact_original_row_projection",
+    "corruptBackupBehavior": "reject"
+  },
+  "terminalProjection": {
+    "schemaFingerprint": "4d78fd8de47ababbf6d809575a55275a166e8c99b332344b91c885f27eedafd2",
+    "objectCounts": {
+      "table": 93,
+      "index": 80,
+      "trigger": 76,
+      "view": 0
+    },
+    "foreignKeyViolationCount": 0
+  },
+  "remainingExternalGates": [
+    "fresh_exact_production_semantic_census",
+    "fresh_exact_production_row_preservation_manifest",
+    "isolated_hosted_blank_replay",
+    "isolated_hosted_exact_live_prestate_replay",
+    "hosted_actual_path_partial_failure_proof",
+    "pre_migration_production_backup_and_restore_drill",
+    "dormant_production_forward_migration",
+    "postmigration_production_semantic_row_and_foreign_key_parity",
+    "independent_final_acceptance_audit"
+  ],
+  "claimBoundary": "This contract can qualify only the local SQLite D1-equivalent execution mechanism and deterministic fixture prestates. It does not accept OS-01 or ARC-03, does not establish the live production prestate, and does not authorize a hosted or production migration."
+}

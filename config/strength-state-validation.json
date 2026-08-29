@@ -1,0 +1,41 @@
+{
+  "generatedAt": "2026-08-12T20:28:00-07:00",
+  "trainingSource": "nflverse schedules and final scores",
+  "sourceUrl": "https://github.com/nflverse/nfldata/raw/master/data/games.csv",
+  "dataSnapshotHash": "98d7aae84987eae5bcf20450892d9947fa86db9a9b6b0db85f055b1ef53916db",
+  "trainingSeasons": [2010, 2025],
+  "validationSeasons": [2023, 2024, 2025],
+  "trainingGames": 4175,
+  "validationGames": 816,
+  "stateUpdate": "home += K * (actual margin - consensus expected home margin) / 2; away -= same",
+  "franchiseAliases": {
+    "LA": "LAR",
+    "STL": "LAR",
+    "SD": "LAC",
+    "OAK": "LV",
+    "JAC": "JAX"
+  },
+  "candidateK": [0, 0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01, 0.02, 0.03, 0.04, 0.06, 0.08, 0.12, 0.18],
+  "selectionMetric": "pooled rolling-origin residual RMSE",
+  "selectedK": 0.005,
+  "results": [
+    { "k": 0, "pooledRmse": 12.653264, "pooledMae": 9.744485, "rmse2023": 13.070721, "rmse2024": 12.605146, "rmse2025": 12.271178 },
+    { "k": 0.001, "pooledRmse": 12.641352, "pooledMae": 9.746575, "rmse2023": 13.071641, "rmse2024": 12.58506, "rmse2025": 12.25397 },
+    { "k": 0.002, "pooledRmse": 12.632297, "pooledMae": 9.751176, "rmse2023": 13.074982, "rmse2024": 12.567783, "rmse2025": 12.240116 },
+    { "k": 0.003, "pooledRmse": 12.626104, "pooledMae": 9.758604, "rmse2023": 13.080742, "rmse2024": 12.553324, "rmse2025": 12.229627 },
+    { "k": 0.004, "pooledRmse": 12.62278, "pooledMae": 9.768289, "rmse2023": 13.088919, "rmse2024": 12.541694, "rmse2025": 12.222512 },
+    { "k": 0.005, "pooledRmse": 12.622324, "pooledMae": 9.779381, "rmse2023": 13.099507, "rmse2024": 12.532902, "rmse2025": 12.218777 },
+    { "k": 0.006, "pooledRmse": 12.624739, "pooledMae": 9.792733, "rmse2023": 13.112501, "rmse2024": 12.526952, "rmse2025": 12.218425 },
+    { "k": 0.007, "pooledRmse": 12.630022, "pooledMae": 9.80679, "rmse2023": 13.127893, "rmse2024": 12.52385, "rmse2025": 12.221456 },
+    { "k": 0.008, "pooledRmse": 12.63817, "pooledMae": 9.822098, "rmse2023": 13.145676, "rmse2024": 12.523596, "rmse2025": 12.227867 },
+    { "k": 0.009, "pooledRmse": 12.649176, "pooledMae": 9.838112, "rmse2023": 13.165839, "rmse2024": 12.526192, "rmse2025": 12.237654 },
+    { "k": 0.01, "pooledRmse": 12.663035, "pooledMae": 9.854565, "rmse2023": 13.188372, "rmse2024": 12.531635, "rmse2025": 12.250808 },
+    { "k": 0.02, "pooledRmse": 12.955514 },
+    { "k": 0.03, "pooledRmse": 13.512356 },
+    { "k": 0.04, "pooledRmse": 14.302718 },
+    { "k": 0.06, "pooledRmse": 16.439959 },
+    { "k": 0.08, "pooledRmse": 19.103898 },
+    { "k": 0.12, "pooledRmse": 25.32348 },
+    { "k": 0.18, "pooledRmse": 35.680865, "pooledMae": 28.366654, "rmse2023": 34.570117, "rmse2024": 34.894584, "rmse2025": 37.5053 }
+  ]
+}

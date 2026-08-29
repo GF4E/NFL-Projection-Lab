@@ -1,0 +1,65 @@
+{
+  "schemaVersion": "engine-os-sites-d1-migration-receipt-v1",
+  "checkedAt": "2026-08-25T20:34:08Z",
+  "sitesProjectId": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+  "binding": "DB",
+  "migration": {
+    "version": "0013_engine_os_urgent",
+    "source": "drizzle/0013_engine_os_urgent.sql",
+    "sourceFileSha256": "sha256:39d6695a24d1fdb66b70ab831af1bcc9e061e523080d9a07239aa3583e3c9df9",
+    "schemaDefinitionSha256": "sha256:6205a3dfe09c2d663bb8c50378f295accd266ff2b2018668ca5353436a6797bb",
+    "statementCount": 41,
+    "appliedAt": "2026-08-25T20:33:02.114Z"
+  },
+  "productionProof": {
+    "migrationVersionNumber": 133,
+    "migrationDeploymentId": "appgdep_6a8dfbe48b44819182e768bf2063223a",
+    "environmentRevision": 10,
+    "invocationResult": "applied",
+    "liveReceiptRead": {
+      "version": "0013_engine_os_urgent",
+      "migration_hash": "sha256:6205a3dfe09c2d663bb8c50378f295accd266ff2b2018668ca5353436a6797bb",
+      "applied_at": "2026-08-25T20:33:02.114Z"
+    },
+    "visibleUrgentTables": [
+      "canonical_games",
+      "engine_activations",
+      "engine_job_runs",
+      "engine_schema_versions",
+      "engine_system_alerts",
+      "forecast_origin_records",
+      "forecast_origins",
+      "game_kickoff_revisions",
+      "game_provider_aliases",
+      "odds_quota_events"
+    ]
+  },
+  "temporaryBridge": {
+    "authentication": "ephemeral 256-bit bearer secret stored only as a Sites secret",
+    "publicUnauthenticatedAccess": false,
+    "removedFromFinalSource": true,
+    "removedFromEnvironmentRevision": 11
+  },
+  "finalQuarantineProof": {
+    "checkedAt": "2026-08-25T20:41:37Z",
+    "versionNumber": 135,
+    "deploymentId": "appgdep_6a8dfdd8e31c8191be5c7211397d8846",
+    "environmentRevision": 11,
+    "environmentEntryCount": 0,
+    "migrationEndpointPostStatus": 405,
+    "linesConfigured": false,
+    "captureCredentialReadPresentInBundle": false,
+    "scheduledAcquisitionEnabled": false
+  },
+  "claims": {
+    "urgentSchemaApplied": true,
+    "scheduledAcquisitionEnabled": false,
+    "prospectiveCaptureStarted": false,
+    "os01Accepted": false,
+    "engineOsComplete": false
+  },
+  "limitations": [
+    "The bounded Sites catalog returned the first 50 table names; later lexicographic names were outside that projection. The transactional batch and final append-only receipt establish all-or-nothing application of the 41 migration statements.",
+    "This receipt does not qualify R2 durability, scheduler delivery, quota reservation, forecast-origin completeness, package activation, or prospective capture."
+  ]
+}
