@@ -1,3 +1,5 @@
+import { splitHostedSqlStatements } from "./sql-statements";
+
 const ROUTE = "/__engine-os/os01-hosted-migration/v1";
 const MAX_REQUEST_BYTES = 512 * 1024;
 const GUARD_TABLE = "__os01_hosted_migration_guard_v1";
@@ -120,6 +122,10 @@ type ExpectedState = {
   counts: Record<ObjectType, number>;
 };
 
+export type HostedQualificationDiagnostic =
+  | "d1_prepare_multiple_statements"
+  | "d1_prepare_rejected";
+
 export type Os01HostedMigrationSource = Readonly<{
   order: number;
   path: string;
@@ -167,7 +173,11 @@ export type Os01HostedMigrationAuthority = Readonly<{
 }>;
 
 class HarnessError extends Error {
-  constructor(readonly code: string, readonly status: number) {
+  constructor(
+    readonly code: string,
+    readonly status: number,
+    readonly diagnostic?: HostedQualificationDiagnostic
+  ) {
     super(code);
   }
 }
@@ -413,8 +423,7 @@ export async function captureHostedState(db: D1Database): Promise<HostedStateEvi
 function splitStatements(migration: Os01HostedMigrationSource): MigrationStatement[] {
   return migration.source
     .split("--> statement-breakpoint")
-    .map((statement) => statement.trim())
-    .filter(Boolean)
+    .flatMap((entry) => splitHostedSqlStatements(entry))
     .map((sql) => ({ sql, migrationPath: migration.path }));
 }
 
@@ -685,12 +694,45 @@ function dropGuard(): MigrationStatement {
   return { sql: `DROP TABLE ${quote(GUARD_TABLE)}` };
 }
 
+function d1FailureText(error: unknown): string {
+  return error instanceof Error ? error.message.toLowerCase() : "";
+}
+
+function isD1MultipleStatementFailure(error: unknown): boolean {
+  const text = d1FailureText(error);
+  return text.includes("only execute one statement at a time") ||
+    text.includes("multiple statements") ||
+    text.includes("more than one statement");
+}
+
+export function classifyD1PreparationFailure(error: unknown): HostedQualificationDiagnostic {
+  return isD1MultipleStatementFailure(error)
+    ? "d1_prepare_multiple_statements"
+    : "d1_prepare_rejected";
+}
+
 async function executeAtomicBatch(db: D1Database, statements: readonly MigrationStatement[]): Promise<void> {
-  const prepared = statements.map((statement) => {
-    const query = db.prepare(statement.sql);
-    return statement.bindings?.length ? query.bind(...statement.bindings) : query;
-  });
-  await db.batch(prepared);
+  let prepared: D1PreparedStatement[];
+  try {
+    prepared = statements.map((statement) => {
+      const query = db.prepare(statement.sql);
+      return statement.bindings?.length ? query.bind(...statement.bindings) : query;
+    });
+  } catch (error) {
+    throw new HarnessError(
+      "qualification_failed",
+      500,
+      classifyD1PreparationFailure(error)
+    );
+  }
+  try {
+    await db.batch(prepared);
+  } catch (error) {
+    if (isD1MultipleStatementFailure(error)) {
+      throw new HarnessError("qualification_failed", 500, "d1_prepare_multiple_statements");
+    }
+    throw error;
+  }
 }
 
 async function migrationStatementsForRange(
@@ -1214,7 +1256,11 @@ function headers(): HeadersInit {
 function errorResponse(error: unknown): Response {
   const status = error instanceof HarnessError ? error.status : 500;
   const code = error instanceof HarnessError ? error.code : "qualification_failed";
-  return new Response(stableHostedJson({ error: code }), { status, headers: headers() });
+  const diagnostic = error instanceof HarnessError ? error.diagnostic : undefined;
+  return new Response(stableHostedJson({
+    error: code,
+    ...(diagnostic ? { diagnostic } : {})
+  }), { status, headers: headers() });
 }
 
 export async function handleOs01HostedMigrationQualification(

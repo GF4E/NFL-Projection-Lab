@@ -7,13 +7,14 @@ import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import acceptedContract from "../config/os01-migration-qualification.v1.json";
 import predecessorAuthority from "../config/d1-schema-authority.v1.json";
 import successorAuthority from "../config/d1-schema-authority.v2.json";
-import hostedContract from "../config/os01-hosted-migration-qualification.v3.json";
+import hostedContract from "../config/os01-hosted-migration-qualification.v4.json";
 import {
   buildOs01HostedMigrationHarness,
   extractCapacityProbeRequestIdentity
 } from "../scripts/build_os01_hosted_migration_harness";
 import { loadOs01HostedMigrationAuthority } from "../scripts/os01-hosted-migration-authority";
 import {
+  classifyD1PreparationFailure,
   handleOs01HostedMigrationQualification,
   hostedSha256,
   stableHostedJson,
@@ -21,6 +22,7 @@ import {
   type Os01HostedMigrationSource,
   type Os01LogicalBackup
 } from "../qualification/os01-hosted-migration/core";
+import { splitHostedSqlStatements } from "../qualification/os01-hosted-migration/sql-statements";
 
 type BoundValue = string | number | null | Uint8Array;
 
@@ -89,6 +91,9 @@ class LazyStatement {
 function sqliteD1(sqlite: DatabaseSync): D1Database {
   return {
     prepare(sql: string) {
+      if (splitHostedSqlStatements(sql).length !== 1) {
+        throw new Error("D1_ERROR: You can only execute one statement at a time.");
+      }
       return new LazyStatement(sqlite, sql) as unknown as D1PreparedStatement;
     },
     async batch<T>(statements: D1PreparedStatement[]): Promise<D1Result<T>[]> {
@@ -167,6 +172,82 @@ async function legacyBackup(d1: D1Database, id = qualificationId): Promise<Os01L
 }
 
 describe("OS-01 standalone hosted migration harness", () => {
+  it("reproduces the v3 D1 preparation failure and classifies it without leaking SQL", () => {
+    const migration = authority.migrations.find((item) =>
+      item.path === "drizzle/0010_confidence_engine.sql"
+    )!;
+    const breakpointEntry = migration.source.split("--> statement-breakpoint")[0]!;
+    expect(splitHostedSqlStatements(breakpointEntry)).toHaveLength(13);
+    const { sqlite, d1 } = database();
+    let failure: unknown;
+    try {
+      d1.prepare(breakpointEntry);
+    } catch (error) {
+      failure = error;
+    }
+    expect(failure).toBeInstanceOf(Error);
+    expect(classifyD1PreparationFailure(failure)).toBe("d1_prepare_multiple_statements");
+    expect(stableHostedJson({
+      error: "qualification_failed",
+      diagnostic: classifyD1PreparationFailure(failure)
+    })).toBe('{"diagnostic":"d1_prepare_multiple_statements","error":"qualification_failed"}');
+    expect(sqlite.prepare("SELECT count(*) AS count FROM sqlite_schema WHERE type = 'table'").get())
+      .toEqual({ count: 0 });
+    sqlite.close();
+  });
+
+  it("prepares 291 individual migration statements and submits one 295-statement atomic batch", async () => {
+    const { sqlite, d1 } = database();
+    const batchSizes: number[] = [];
+    const recording = new Proxy(d1, {
+      get(target, property) {
+        if (property === "batch") {
+          return async <T>(statements: D1PreparedStatement[]) => {
+            batchSizes.push(statements.length);
+            return target.batch<T>(statements);
+          };
+        }
+        const value = Reflect.get(target, property);
+        return typeof value === "function" ? value.bind(target) : value;
+      }
+    });
+    const result = await invoke(recording, "blank_replay");
+    expect(result.response.status, stableHostedJson(result.body)).toBe(200);
+    expect(batchSizes).toEqual([295]);
+    sqlite.close();
+  });
+
+  it("returns only the closed diagnostic when D1 rejects a prepared multi-statement entry", async () => {
+    const { sqlite, d1 } = database();
+    let injected = false;
+    const rejecting = new Proxy(d1, {
+      get(target, property) {
+        if (property === "prepare") {
+          return (sql: string) => {
+            if (!injected && sql.includes("__os01_hosted_migration_guard_v1")) {
+              injected = true;
+              throw new Error("D1_ERROR: You can only execute one statement at a time. SQL omitted");
+            }
+            return target.prepare(sql);
+          };
+        }
+        const value = Reflect.get(target, property);
+        return typeof value === "function" ? value.bind(target) : value;
+      }
+    });
+    const result = await invoke(rejecting, "blank_replay");
+    expect(result.response.status).toBe(500);
+    expect(result.body).toEqual({
+      diagnostic: "d1_prepare_multiple_statements",
+      error: "qualification_failed"
+    });
+    expect(stableHostedJson(result.body)).not.toContain("D1_ERROR");
+    expect(stableHostedJson(result.body)).not.toContain("SQL omitted");
+    expect(sqlite.prepare("SELECT count(*) AS count FROM sqlite_schema WHERE type = 'table'").get())
+      .toEqual({ count: 0 });
+    sqlite.close();
+  });
+
   it("derives its exact order, byte hashes, and ranges from the accepted d24 authority", async () => {
     expect(authority.sourceCommit).toBe("d24db5632410894d4f82c12e7f1d0c4c256a208d");
     expect(authority.acceptedContract.byteSha256).toBe(
@@ -401,7 +482,7 @@ describe("OS-01 standalone hosted migration harness", () => {
     const entry = readFileSync(join(directory, "server/index.js"), "utf8");
     expect(hosting).toEqual({ project_id: exactStagingProjectId, d1: "DB", r2: null });
     expect(manifest).toMatchObject({
-      version: "engine-os.os01-hosted-migration-package.v3",
+      version: "engine-os.os01-hosted-migration-package.v4",
       qualificationOnly: true,
       projectId: exactStagingProjectId,
       deploymentArchiveIncludesDrizzle: false,
@@ -420,7 +501,7 @@ describe("OS-01 standalone hosted migration harness", () => {
         maximumBatchDurationSeconds: 30,
         activePredeployProbeIncluded: true,
         capacityQualificationStatus: "passed_489_read_only_queries_in_one_batch_588ms_source_bound_request_identity",
-        mutatingMigrationDurationQualificationStatus: "pending_hosted_blank_replay"
+        mutatingMigrationDurationQualificationStatus: "pending_hosted_blank_replay_v4"
       },
       capacityProbe: {
         path: ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v3.json",
@@ -458,17 +539,45 @@ describe("OS-01 standalone hosted migration harness", () => {
       deploymentTargetRestriction: `exact_project:${exactStagingProjectId}`,
       freshOwnerOnlyAndBindingRefreshRequiredBeforeDeploy: true,
       ownerOnlyAccessRequiredBeforeDeploy: true,
+      authorizedHostedAction: "one_blank_replay_with_new_qualification_id",
+      predecessorPostFailureD1TableCount: 0,
+      stillBlankRefreshRequiredBeforeDeploy: true,
       qualificationContract: {
-        path: "config/os01-hosted-migration-qualification.v3.json",
+        path: "config/os01-hosted-migration-qualification.v4.json",
         sha256: await hostedSha256(readFileSync(
-          "config/os01-hosted-migration-qualification.v3.json",
+          "config/os01-hosted-migration-qualification.v4.json",
           "utf8"
         ))
       },
       rejectedPredecessorContract: {
+        path: "config/os01-hosted-migration-qualification.v3.json",
+        sha256: "eaddbab1dd84325eac82846446fa49a1c38359abce60283341886208c87f5a9d",
+        status: "rejected_runtime_statement_boundary_mismatch"
+      },
+      rejectedPredecessorReceipt: {
+        path: ".planning/engine-os/execution/os-01/hosted-migration-v3-runtime-boundary-rejection-receipt.v1.json",
+        sha256: "d42f6829a21e02d368354a3bbd851fb4e99a77adb7a32dc5086ce25b8a76497b",
+        hostedHttpStatus: 500,
+        hostedResponseSha256: "02bc538377738a19dda7d8c6bfabb2cf6e56be98008e976c216a470e9055a98a",
+        postFailureD1TableCount: 0
+      },
+      rejectedRequestIdentityPredecessorContract: {
         path: "config/os01-hosted-migration-qualification.v2.json",
         sha256: "cd025216b156946404b5606e824575ff00e1d023f3fa40f4fa45e068a041cde6",
         status: "rejected_request_identity_mismatch"
+      },
+      runtimeStatementBoundary: {
+        parserPath: "qualification/os01-hosted-migration/sql-statements.ts",
+        parserSha256: "419f97cba53ee0e95fdad8ddd29edf0a1a2a64cc359f34f85746c6ab02b43c46",
+        consumers: [
+          "qualification/os01-hosted-migration/core.ts",
+          "scripts/os01-hosted-migration-capacity.ts"
+        ],
+        statementBreakpointEntries: 272,
+        migrationStatements: 291,
+        embeddedStatementDifference: 19,
+        singleStatementPerPrepareRequired: true,
+        diagnosticVocabulary: ["d1_prepare_multiple_statements", "d1_prepare_rejected"]
       },
       historicalCapacityRejectionContract: {
         path: "config/os01-hosted-migration-qualification.v1.json",
@@ -478,8 +587,8 @@ describe("OS-01 standalone hosted migration harness", () => {
       productionAllowed: false,
       outputFiles: [
         ".openai/hosting.json",
-        ".openai/os01-hosted-migration-package.v3.json",
-        ".openai/os01-hosted-migration-package.v3.sha256",
+        ".openai/os01-hosted-migration-package.v4.json",
+        ".openai/os01-hosted-migration-package.v4.sha256",
         "server/index.js"
       ]
     });
@@ -495,8 +604,8 @@ describe("OS-01 standalone hosted migration harness", () => {
     });
     expect(readFileSync(result.manifestPath, "utf8"))
       .toBe(readFileSync(second.manifestPath, "utf8"));
-    expect(readFileSync(join(directory, ".openai/os01-hosted-migration-package.v3.sha256"), "utf8"))
-      .toBe(`${result.manifestSha256}  os01-hosted-migration-package.v3.json\n`);
+    expect(readFileSync(join(directory, ".openai/os01-hosted-migration-package.v4.sha256"), "utf8"))
+      .toBe(`${result.manifestSha256}  os01-hosted-migration-package.v4.json\n`);
     expect(entry).toContain("/__engine-os/os01-hosted-migration/v1");
     expect(entry).not.toMatch(/ODDS_API_KEY|ENGINE_OS_CAPTURE_ENABLED|the-odds-api\.com/u);
     expect(readFileSync("worker/index.ts", "utf8")).not.toContain("os01-hosted-migration");
@@ -507,7 +616,7 @@ describe("OS-01 standalone hosted migration harness", () => {
     })).rejects.toThrow("output directory must be empty");
   });
 
-  it("preserves the rejected v1 contract and rejects every non-qualified deployment target", async () => {
+  it("preserves every rejected predecessor and rejects every non-qualified deployment target", async () => {
     expect(await hostedSha256(readFileSync(
       "config/os01-hosted-migration-qualification.v1.json",
       "utf8"
@@ -520,13 +629,30 @@ describe("OS-01 standalone hosted migration harness", () => {
       ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v2.json",
       "utf8"
     ))).toBe("d24b4f3d68c1b34e6852779b538fe40331f2b4714df18b2e6c91d63e7ec68b47");
-    expect(hostedContract.status).toBe("candidate_corrected_request_identity_staging_deployable");
+    expect(await hostedSha256(readFileSync(
+      "config/os01-hosted-migration-qualification.v3.json",
+      "utf8"
+    ))).toBe("eaddbab1dd84325eac82846446fa49a1c38359abce60283341886208c87f5a9d");
+    expect(await hostedSha256(readFileSync(
+      ".planning/engine-os/execution/os-01/hosted-migration-v3-runtime-boundary-rejection-receipt.v1.json",
+      "utf8"
+    ))).toBe("d42f6829a21e02d368354a3bbd851fb4e99a77adb7a32dc5086ce25b8a76497b");
+    expect(hostedContract.status)
+      .toBe("candidate_corrected_runtime_boundaries_staging_retryable_after_refresh");
     expect(hostedContract.executionBoundary.exactTemporarySitesProjectId).toBe(exactStagingProjectId);
     expect(hostedContract.executionBoundary.productionAllowed).toBe(false);
     expect(hostedContract.executionBoundary.providerAccessAllowed).toBe(false);
     expect(hostedContract.executionBoundary.captureActivationAllowed).toBe(false);
     expect(hostedContract.package.deploymentAllowed).toBe(true);
     expect(hostedContract.executionBoundary.freshOwnerOnlyAndBindingRefreshRequiredBeforeDeploy).toBe(true);
+    expect(hostedContract.executionBoundary.predecessorPostFailureD1Observation.tables).toEqual([]);
+    expect(hostedContract.runtimeStatementBoundary).toMatchObject({
+      statementBreakpointEntries: 272,
+      migrationStatements: 291,
+      blankReplayBatchStatements: 295,
+      blankReplayInvocationQueries: 489,
+      singleStatementPerPrepareRequired: true
+    });
     const directory = mkdtempSync(join(tmpdir(), "os01-hosted-build-wrong-target-"));
     temporaryDirectories.push(directory);
     await expect(buildOs01HostedMigrationHarness({
@@ -567,6 +693,59 @@ describe("OS-01 standalone hosted migration harness", () => {
     });
     expect(rejectedReceipt.request.route).not.toBe(identity.route);
     expect(receipt.source.snapshotPath).toBe(sourcePath);
+  });
+
+  it("preserves the exact failed v3 hosted attempt as rejected, zero-table evidence", async () => {
+    const receiptPath =
+      ".planning/engine-os/execution/os-01/hosted-migration-v3-runtime-boundary-rejection-receipt.v1.json";
+    const receipt = JSON.parse(readFileSync(receiptPath, "utf8"));
+    expect(await hostedSha256(readFileSync(receiptPath, "utf8")))
+      .toBe("d42f6829a21e02d368354a3bbd851fb4e99a77adb7a32dc5086ce25b8a76497b");
+    expect(receipt).toMatchObject({
+      result: "rejected_runtime_statement_boundary_mismatch",
+      rejectedCandidate: {
+        deployedSourceCommit: "5093b82f615c2ab8cfadbfc84597afec684e63f7",
+        deployedSourceTree: "63a4372e1d22ce5ea89c7f78a4bff633f1e8a6a1"
+      },
+      hostedAttempt: {
+        projectId: exactStagingProjectId,
+        savedVersionId:
+          "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_6626ff193a68819198bd663cda6f964f",
+        deploymentId: "appgdep_6a924cd321a88191a349aee27a233a56",
+        request: {
+          method: "POST",
+          route: "/__engine-os/os01-hosted-migration/v1",
+          sha256: "dde6ebba8e2b11c5ad170c92aa070862bee710fdc1ca7ff95874fece595c9af6",
+          authenticationHeader: "OAI-Sites-Authorization"
+        },
+        response: {
+          httpStatus: 500,
+          body: { error: "qualification_failed" },
+          sha256: "02bc538377738a19dda7d8c6bfabb2cf6e56be98008e976c216a470e9055a98a",
+          capturedHeadersFileSha256:
+            "458999932b258401552dd24cd160b7a46308818b7cfb86ccc64ba8e9bced9af6",
+          rawHeadersRetained: false
+        },
+        workerRequestId: "d90ad9a5740765a154ddc6bf0b23d352",
+        workerWallMilliseconds: 213,
+        workerCpuMilliseconds: 12,
+        postFailureD1Observation: { tables: [], tableCount: 0, atomicFailurePreservedBlankState: true },
+        excludedGatewayAttempts: { count: 2, httpStatus: 401, reachedWorker: false }
+      },
+      defect: {
+        capacityParserMigrationStatements: 291,
+        runtimeBreakpointEntries: 272,
+        missingRuntimeStatementBoundaries: 19
+      },
+      securityAndActivation: {
+        providerCalls: 0,
+        providerSecretReads: 0,
+        quotaReservations: 0,
+        captureActivations: 0,
+        productionMutations: 0
+      },
+      claims: { v3Accepted: false, v3RetryAuthorized: false }
+    });
   });
 
   it("rejects non-POST, extra request keys, and wrong routes without touching D1", async () => {

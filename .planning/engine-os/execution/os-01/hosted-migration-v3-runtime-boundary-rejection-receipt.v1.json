@@ -1,0 +1,111 @@
+{
+  "schemaVersion": "os01-hosted-migration-v3-runtime-boundary-rejection-receipt.v1",
+  "recordedAt": "2026-08-29T03:17:20Z",
+  "result": "rejected_runtime_statement_boundary_mismatch",
+  "rejectedCandidate": {
+    "localCommit": "3fa6eb578d0bedf3c8493e780e471e2c1d78917e",
+    "deployedSourceCommit": "5093b82f615c2ab8cfadbfc84597afec684e63f7",
+    "deployedSourceTree": "63a4372e1d22ce5ea89c7f78a4bff633f1e8a6a1"
+  },
+  "immutableArtifacts": {
+    "contract": {
+      "path": "config/os01-hosted-migration-qualification.v3.json",
+      "sha256": "eaddbab1dd84325eac82846446fa49a1c38359abce60283341886208c87f5a9d"
+    },
+    "capacityReceipt": {
+      "path": ".planning/engine-os/execution/os-01/hosted-capacity-probe-receipt.v3.json",
+      "sha256": "91e61351ba23848cc76e2d10f386c6a38690b9e41681f2d2387a206d0a70955c"
+    },
+    "frozenCapacitySource": {
+      "path": ".planning/engine-os/execution/os-01/hosted-capacity-probe-worker.f161104.js.txt",
+      "sha256": "8969879cc4c233d92d3a53d3202300b13b6e491e57dc3db031e12f309d983b05"
+    },
+    "builder": {
+      "path": "scripts/build_os01_hosted_migration_harness.ts",
+      "sha256": "798766490febf463f48635a743fad5e782b598b1f3656af0227a37e93e5cb325"
+    },
+    "tests": {
+      "path": "tests/os01-hosted-migration-harness.test.ts",
+      "sha256": "2edbca475b0dcf5f7e57e7f222b64f8f63b8d3e8748d409ddfdda13524fb2741"
+    },
+    "adr": {
+      "path": ".planning/engine-os/execution/os-01/ADR-0012-source-bound-hosted-migration-candidate.md",
+      "sha256": "5a342762b8527e19e991685947ed9a3b84ce326390fd9ae49c9cd729cc072cc7"
+    },
+    "deployedPackage": {
+      "entrySha256": "44191019cc0ab6c6fa45e9ce17112a1e952e74b8ce96222a17e67ded6a5b70c5",
+      "manifestSha256": "f0ab5491d89f62025fa67d8e4ee3ecd47db4cd539cda048b6724c74430084aa3",
+      "archiveSha256": "f258c91ebdb6f3f53455fa761430550b7c71f1222a260a5e170fcf80faf0f246"
+    }
+  },
+  "hostedAttempt": {
+    "projectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+    "savedVersionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_6626ff193a68819198bd663cda6f964f",
+    "deploymentId": "appgdep_6a924cd321a88191a349aee27a233a56",
+    "deploymentStatus": "succeeded",
+    "request": {
+      "method": "POST",
+      "route": "/__engine-os/os01-hosted-migration/v1",
+      "version": "engine-os.os01-hosted-migration-request.v1",
+      "action": "blank_replay",
+      "qualificationId": "b61b3c824d1ac03806e7d04b59e1e07355c76d1840ea0940c0d8339c68364ca3",
+      "bytes": 166,
+      "sha256": "dde6ebba8e2b11c5ad170c92aa070862bee710fdc1ca7ff95874fece595c9af6",
+      "authenticationHeader": "OAI-Sites-Authorization"
+    },
+    "response": {
+      "httpStatus": 500,
+      "body": { "error": "qualification_failed" },
+      "bytes": 32,
+      "sha256": "02bc538377738a19dda7d8c6bfabb2cf6e56be98008e976c216a470e9055a98a",
+      "capturedHeadersFileSha256": "458999932b258401552dd24cd160b7a46308818b7cfb86ccc64ba8e9bced9af6",
+      "rawHeadersRetained": false,
+      "rawHeadersRetentionReason": "The raw header file contained a transient Set-Cookie and was removed after its hash and sanitized facts were captured."
+    },
+    "observedAt": "2026-08-29T03:09:04Z",
+    "workerRequestId": "d90ad9a5740765a154ddc6bf0b23d352",
+    "workerWallMilliseconds": 213,
+    "workerCpuMilliseconds": 12,
+    "postFailureD1Observation": {
+      "tables": [],
+      "tableCount": 0,
+      "atomicFailurePreservedBlankState": true
+    },
+    "excludedGatewayAttempts": {
+      "count": 2,
+      "httpStatus": 401,
+      "cause": "wrong Authorization header",
+      "reachedWorker": false,
+      "classification": "not_harness_executions"
+    }
+  },
+  "defect": {
+    "capacityParserMigrationStatements": 291,
+    "runtimeBreakpointEntries": 272,
+    "missingRuntimeStatementBoundaries": 19,
+    "embeddedMultiStatementEntries": [
+      { "path": "drizzle/0010_confidence_engine.sql", "breakpointEntry": 0, "statements": 13 },
+      { "path": "drizzle/0011_model_gate_evidence.sql", "breakpointEntry": 0, "statements": 4 },
+      { "path": "drizzle/0012_source_snapshot_timing.sql", "breakpointEntry": 0, "statements": 5 }
+    ],
+    "deployedBehavior": "The v3 runtime split only on statement-breakpoint markers, then passed embedded multi-statement strings to D1 prepare.",
+    "confirmation": "A D1-faithful adapter that rejects any prepare containing more than one semicolon-aware statement reproduces the pre-batch failure and preserves a zero-table database.",
+    "evidenceBoundary": "The generic hosted response did not expose a raw D1 error. Root cause is established by the exact deployed code-path mismatch and a local D1-faithful negative reproduction, not by an unobserved hosted error message."
+  },
+  "securityAndActivation": {
+    "providerCalls": 0,
+    "providerSecretReads": 0,
+    "quotaReservations": 0,
+    "captureActivations": 0,
+    "productionMutations": 0
+  },
+  "claims": {
+    "v3Accepted": false,
+    "v3RetryAuthorized": false,
+    "mutatingDurationQualified": false,
+    "hostedMigrationQualified": false,
+    "os01Accepted": false,
+    "arc03Accepted": false
+  },
+  "claimBoundary": "The v3 blank replay failed before publishing qualification evidence and left the exact isolated D1 blank. Its capacity evidence remains a bounded read-only proof, but v3 may not be retried or used to qualify hosted migration behavior. A versioned successor must use one reviewed semicolon-aware parser for both capacity accounting and runtime preparation, bind the corrected package hashes, independently pass local and clean-checkout audits, and require a fresh owner-only access and DB-only binding refresh before one retry against the still-blank isolated D1."
+}
