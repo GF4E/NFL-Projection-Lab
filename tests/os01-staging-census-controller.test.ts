@@ -293,7 +293,8 @@ describe("OS-01 staging census controller", () => {
         expect(request.method).toBe("POST");
         expect(request.redirect).toBe("error");
         expect(request.headers.get("content-type")).toBe("application/json");
-        expect(request.headers.get("authorization")).toBe("Bearer " + token);
+        expect(request.headers.get("authorization")).toBeNull();
+        expect(request.headers.get("oai-sites-authorization")).toBe(token);
         expect(await request.text()).toBe(STAGING_CENSUS_EXACT_BODY);
         return acceptedResponse();
       }
@@ -310,7 +311,7 @@ describe("OS-01 staging census controller", () => {
     expect(JSON.parse(readFileSync(artifacts.intent, "utf8"))).toMatchObject({
       status: "reserved_before_transport_no_retry",
       retryAllowedAfterReservation: false,
-      credentialKind: "ephemeral_sites_siwe_not_persisted"
+      credentialKind: "ephemeral_sites_siwc_not_persisted"
     });
     expect(statSync(artifacts.dispatchCompletion).size).toBeGreaterThan(0);
     writeJson(artifacts.postObservation, observation("post"));

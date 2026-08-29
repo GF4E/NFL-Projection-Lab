@@ -903,7 +903,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
     contentType: STAGING_CENSUS_SEMANTIC_CONTRACT.contentType,
     requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
     preObservationBytesSha256: sha256(preArtifact.bytes),
-    credentialKind: "ephemeral_sites_siwe_not_persisted",
+    credentialKind: "ephemeral_sites_siwc_not_persisted",
     retryAllowedAfterReservation: false,
     controlPlanePostcheckRequired: true,
     exclusiveHostAssumption: "single_owner_no_concurrent_writer_during_controller_window",
@@ -953,7 +953,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         {
           method: STAGING_CENSUS_SEMANTIC_CONTRACT.method,
           headers: {
-            Authorization: "Bearer " + input.authorizationToken,
+            "OAI-Sites-Authorization": input.authorizationToken,
             "Content-Type": STAGING_CENSUS_SEMANTIC_CONTRACT.contentType
           },
           body: STAGING_CENSUS_EXACT_BODY,
@@ -1258,7 +1258,7 @@ function validateIntentRecord(
     intent.contentType === STAGING_CENSUS_SEMANTIC_CONTRACT.contentType &&
     intent.requestBodySha256 === STAGING_CENSUS_EXACT_BODY_SHA256 &&
     validHex(intent.preObservationBytesSha256) &&
-    intent.credentialKind === "ephemeral_sites_siwe_not_persisted" &&
+    intent.credentialKind === "ephemeral_sites_siwc_not_persisted" &&
     intent.retryAllowedAfterReservation === false && intent.controlPlanePostcheckRequired === true &&
     intent.exclusiveHostAssumption === "single_owner_no_concurrent_writer_during_controller_window" &&
     timestampMilliseconds(intent.recordedAt) !== null ? intent : null;

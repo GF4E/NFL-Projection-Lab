@@ -51,3 +51,13 @@ a new controller-authority identity from the unchanged semantic census identity,
 and predecessor rejection-receipt hash. The worker request and response contract remain v2, but the
 controller root and every controller record bind the new authority identity. Rewriting or deleting
 generation 1 evidence is prohibited.
+
+## Authority generation 3
+
+Generation 2 reached the isolated Sites dispatcher but received HTTP 401 before the worker because
+the controller placed the ephemeral SIWC token in the generic Authorization header. Its reserved
+artifacts and rejection receipt are preserved; no worker or D1 read occurred. Generation 3 derives
+a new authority identity from that rejection receipt and follows the Sites dispatch contract: the
+raw ephemeral token appears only in `OAI-Sites-Authorization`, is never persisted, and is still
+checked for reflection before any response can be stored. Rewriting or deleting either earlier
+generation remains prohibited.

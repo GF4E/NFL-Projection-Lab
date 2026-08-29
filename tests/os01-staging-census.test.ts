@@ -118,12 +118,25 @@ describe("OS-01 staging DDL census", () => {
     });
     expect(hash(STAGING_CENSUS_SEMANTIC_CONTRACT)).toBe(STAGING_CENSUS_ID);
     expect(hash(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT)).toBe(STAGING_CENSUS_CONTROLLER_ID);
-    const predecessor = JSON.parse(readFileSync(resolve(
+    const firstPredecessor = JSON.parse(readFileSync(resolve(
       ".planning/engine-os/execution/os-01/staging-census-v2-hosted-attempt1-rejection-receipt.v1.json"
+    ), "utf8")) as Record<string, unknown>;
+    const firstPredecessorHash = firstPredecessor.receiptHash;
+    delete firstPredecessor.receiptHash;
+    expect(hash(firstPredecessor)).toBe(firstPredecessorHash);
+    const predecessor = JSON.parse(readFileSync(resolve(
+      ".planning/engine-os/execution/os-01/staging-census-v2-hosted-attempt2-rejection-receipt.v1.json"
     ), "utf8")) as Record<string, unknown>;
     const predecessorHash = predecessor.receiptHash;
     delete predecessor.receiptHash;
     expect(hash(predecessor)).toBe(predecessorHash);
+    expect(hash({
+      version: "engine-os.os01-staging-census-controller-authority-contract.v2",
+      semanticQualificationId: STAGING_CENSUS_ID,
+      generation: 2,
+      predecessorReceiptHash: firstPredecessorHash,
+      predecessorStatus: "rejected_invalid_pre_observation_persistence_before_dispatch"
+    })).toBe(predecessor.controllerAuthorityId);
     expect(STAGING_CENSUS_CONTROLLER_AUTHORITY_CONTRACT.predecessorReceiptHash).toBe(predecessorHash);
     expect(createHash("sha256").update(STAGING_CENSUS_EXACT_BODY).digest("hex"))
       .toBe(STAGING_CENSUS_EXACT_BODY_SHA256);
