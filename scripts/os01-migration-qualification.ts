@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { closeSync, constants, fstatSync, openSync, readFileSync } from "node:fs";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 
@@ -53,7 +53,7 @@ type FrozenRangeAuthority = {
   };
   expectedFinalManifest: CommittedManifest;
   expectedMigrationPaths: string[];
-  expectedMigrationByteHashes: Record<string, string>;
+  migrations: Array<{ path: string; statements: string[] }>;
   expectedReceiptAdditions: Array<{ version: string; migrationHash: string }>;
 };
 
@@ -117,8 +117,37 @@ export function stableJson(value: unknown): string {
   return JSON.stringify(stable(value));
 }
 
-function loadJson<T>(path: string): T {
-  return JSON.parse(readFileSync(resolve(root, path), "utf8")) as T;
+function assertWorkspaceRelativePath(path: string, workspaceRoot = root): string {
+  const resolved = resolve(workspaceRoot, path);
+  const relativePath = relative(workspaceRoot, resolved);
+  const withinRoot = relativePath !== ".." && !relativePath.startsWith(`..${sep}`);
+  if (isAbsolute(path) || !withinRoot) {
+    throw new Error(`OS-01 authority path escapes the tracked workspace: ${path}`);
+  }
+  return resolved;
+}
+
+function readFrozenWorkspaceBytes(path: string, expectedHash?: string): Buffer {
+  const resolved = assertWorkspaceRelativePath(path);
+  const descriptor = openSync(resolved, constants.O_RDONLY | constants.O_NOFOLLOW);
+  try {
+    if (!fstatSync(descriptor).isFile()) throw new Error(`OS-01 authority path is not a file: ${path}`);
+    const bytes = readFileSync(descriptor);
+    if (expectedHash && sha256(bytes) !== expectedHash) {
+      throw new Error(`OS-01 frozen authority byte mismatch: ${path}`);
+    }
+    return bytes;
+  } finally {
+    closeSync(descriptor);
+  }
+}
+
+function parseFrozenJson<T>(bytes: Uint8Array, label: string): T {
+  try {
+    return JSON.parse(Buffer.from(bytes).toString("utf8")) as T;
+  } catch {
+    throw new Error(`OS-01 frozen JSON is invalid: ${label}`);
+  }
 }
 
 export function validateAuthorizedRangeContract(
@@ -138,12 +167,10 @@ export function validateAuthorizedRangeContract(
   }
   for (const range of contract.authorizedRanges) {
     for (const path of range.migrationPaths) {
-      const resolved = resolve(workspaceRoot, path);
-      const withinRoot = !relative(workspaceRoot, resolved).startsWith(`..${sep}`) &&
-        relative(workspaceRoot, resolved) !== "..";
-      if (isAbsolute(path) || !path.startsWith("drizzle/") || !withinRoot) {
+      if (!path.startsWith("drizzle/")) {
         throw new Error(`OS-01 authorized migration path escapes the tracked migration root: ${path}`);
       }
+      assertWorkspaceRelativePath(path, workspaceRoot);
     }
     const expected = range.prestateId === "blank_ordered_chain"
       ? [...journalPaths]
@@ -159,15 +186,10 @@ function loadFrozenRangeAuthority(
 ): FrozenRangeAuthority {
   const contractPath = "config/os01-migration-qualification.v1.json";
   const successorPath = "config/d1-schema-authority.v2.json";
-  if (sha256(readFileSync(resolve(root, contractPath))) !== QUALIFICATION_CONTRACT_SHA256 ||
-    sha256(readFileSync(resolve(root, successorPath))) !== SUCCESSOR_AUTHORITY_SHA256) {
-    throw new Error("OS-01 internal migration authority bytes are not frozen");
-  }
-  const contract = loadJson<QualificationContract>(contractPath);
-  const predecessor = loadJson<{
-    frozenBaseline: { orderedMigrations: Array<{ path: string; byteSha256: string }> };
-  }>("config/d1-schema-authority.v1.json");
-  const successor = loadJson<{
+  const contractBytes = readFrozenWorkspaceBytes(contractPath, QUALIFICATION_CONTRACT_SHA256);
+  const successorBytes = readFrozenWorkspaceBytes(successorPath, SUCCESSOR_AUTHORITY_SHA256);
+  const contract = parseFrozenJson<QualificationContract>(contractBytes, contractPath);
+  const successor = parseFrozenJson<{
     version: string;
     predecessorContract: { path: string; byteSha256: string };
     orderedHistory: {
@@ -175,8 +197,33 @@ function loadFrozenRangeAuthority(
       successorMigrations: Array<{ path: string; byteSha256: string }>;
     };
     physicalProjection: { manifest: { path: string; byteSha256: string } };
-  }>(successorPath);
-  const terminal = loadJson<CommittedManifest>("config/d1-schema-manifest.v1.json");
+  }>(successorBytes, successorPath);
+  const predecessorBytes = readFrozenWorkspaceBytes(
+    successor.predecessorContract.path,
+    successor.predecessorContract.byteSha256
+  );
+  const predecessor = parseFrozenJson<{
+    frozenBaseline: { orderedMigrations: Array<{ path: string; byteSha256: string }> };
+  }>(predecessorBytes, successor.predecessorContract.path);
+  const journalBytes = readFrozenWorkspaceBytes(
+    successor.orderedHistory.activeJournal.path,
+    successor.orderedHistory.activeJournal.byteSha256
+  );
+  const journal = parseFrozenJson<{
+    entries: Array<{ idx: number; tag: string }>;
+  }>(journalBytes, successor.orderedHistory.activeJournal.path);
+  if (journal.entries.some((entry, index) => entry.idx !== index)) {
+    throw new Error("OS-01 frozen migration journal is not contiguous");
+  }
+  const journalPaths = journal.entries.map((entry) => `drizzle/${entry.tag}.sql`);
+  const terminalBytes = readFrozenWorkspaceBytes(
+    successor.physicalProjection.manifest.path,
+    successor.physicalProjection.manifest.byteSha256
+  );
+  const terminal = parseFrozenJson<CommittedManifest>(
+    terminalBytes,
+    successor.physicalProjection.manifest.path
+  );
   if (contract.version !== "os01-migration-qualification.2026.1" ||
     contract.authorityContract !== successor.version) {
     throw new Error("OS-01 migration qualification contract is not the frozen authority");
@@ -186,14 +233,6 @@ function loadFrozenRangeAuthority(
     contract.terminalProjection.foreignKeyViolationCount !== 0) {
     throw new Error("OS-01 terminal projection is not bound to the physical manifest");
   }
-  if (sha256(readFileSync(resolve(root, successor.predecessorContract.path))) !==
-      successor.predecessorContract.byteSha256 ||
-    sha256(readFileSync(resolve(root, successor.orderedHistory.activeJournal.path))) !==
-      successor.orderedHistory.activeJournal.byteSha256 ||
-    sha256(readFileSync(resolve(root, successor.physicalProjection.manifest.path))) !==
-      successor.physicalProjection.manifest.byteSha256) {
-    throw new Error("OS-01 predecessor, journal, or terminal manifest binding changed");
-  }
   const expectedPrestate = contract.supportedPrestates.find((item) => item.id === prestateId);
   const range = contract.authorizedRanges.find((item) => item.prestateId === prestateId);
   if (!expectedPrestate || !range) throw new Error("OS-01 prestate has no authorized migration range");
@@ -201,11 +240,16 @@ function loadFrozenRangeAuthority(
     ...predecessor.frozenBaseline.orderedMigrations,
     ...successor.orderedHistory.successorMigrations
   ].map((migration) => [migration.path, migration.byteSha256]));
-  const journalPaths = migrationPaths();
   validateAuthorizedRangeContract(contract, journalPaths);
+  const migrations = range.migrationPaths.map((path) => {
+    const expectedHash = expectedMigrationByteHashes[path];
+    if (!expectedHash) throw new Error(`OS-01 migration is absent from frozen history: ${path}`);
+    const bytes = readFrozenWorkspaceBytes(path, expectedHash);
+    return { path, statements: migrationStatementsFromBytes(bytes) };
+  });
   for (const receipt of range.receiptAdditions) {
-    const matchingPaths = range.migrationPaths.filter((path) => {
-      const sql = readFileSync(resolve(root, path), "utf8");
+    const matchingPaths = migrations.filter((migration) => {
+      const sql = migration.statements.join("\n");
       return sql.includes(`'${receipt.version}'`) && sql.includes(`'${receipt.migrationHash}'`);
     });
     if (matchingPaths.length !== 1) {
@@ -220,7 +264,7 @@ function loadFrozenRangeAuthority(
     },
     expectedFinalManifest: terminal,
     expectedMigrationPaths: [...range.migrationPaths],
-    expectedMigrationByteHashes,
+    migrations,
     expectedReceiptAdditions: [...range.receiptAdditions]
   };
 }
@@ -364,10 +408,10 @@ function assertPreserved(
   }
 }
 
-function migrationStatements(path: string): string[] {
-  return readFileSync(resolve(root, path), "utf8")
+function migrationStatementsFromBytes(bytes: Uint8Array): string[] {
+  return Buffer.from(bytes).toString("utf8")
     .split("--> statement-breakpoint")
-    .map((statement) => statement.trim())
+    .map((statement: string) => statement.trim())
     .filter(Boolean);
 }
 
@@ -387,18 +431,6 @@ export function migrationByteHashes(paths: readonly string[]): Record<string, st
   return Object.fromEntries(paths.map((path) => [path, sha256(readFileSync(resolve(root, path)))]));
 }
 
-function assertMigrationBytes(
-  paths: readonly string[],
-  expected: Readonly<Record<string, string>>
-): void {
-  for (const path of paths) {
-    const expectedHash = expected[path];
-    if (!expectedHash || sha256(readFileSync(resolve(root, path))) !== expectedHash) {
-      throw new Error(`OS-01 migration byte mismatch: ${path}`);
-    }
-  }
-}
-
 /**
  * Apply an already-qualified migration range under one SQLite write lock.
  * The claim is revalidated after BEGIN IMMEDIATE and before the first schema
@@ -412,7 +444,6 @@ export function applyQualifiedMigrationRange(
 ): MigrationRunResult {
   const authority = loadFrozenRangeAuthority(claim.supportedPrestate);
   const paths = authority.expectedMigrationPaths;
-  assertMigrationBytes(paths, authority.expectedMigrationByteHashes);
   const before = captureDatabaseEvidence(db, `pre:${claim.claimHash}`);
   if (before.schema.schemaFingerprint !== claim.schemaFingerprint || before.rowsHash !== claim.rowsHash ||
     before.schema.schemaFingerprint !== authority.expectedPrestate.schemaFingerprint ||
@@ -430,11 +461,11 @@ export function applyQualifiedMigrationRange(
     options.afterQuiesce?.();
     const locked = captureDatabaseEvidence(db, `pre:${claim.claimHash}`);
     verifyPreflightClaim(locked, claim, authority.expectedPrestate);
-    for (const [migrationIndex, path] of paths.entries()) {
-      for (const [statementIndex, statement] of migrationStatements(path).entries()) {
+    for (const [migrationIndex, migration] of authority.migrations.entries()) {
+      for (const [statementIndex, statement] of migration.statements.entries()) {
         db.exec(statement);
         options.afterStatement?.({
-          migrationPath: path,
+          migrationPath: migration.path,
           migrationIndex,
           statementIndex,
           globalStatementIndex
@@ -476,7 +507,9 @@ export function applyUnqualifiedFixtureMigrations(
   db.exec("BEGIN IMMEDIATE");
   try {
     for (const path of paths) {
-      for (const statement of migrationStatements(path)) db.exec(statement);
+      for (const statement of migrationStatementsFromBytes(readFileSync(resolve(root, path)))) {
+        db.exec(statement);
+      }
     }
     db.exec("COMMIT");
   } catch (error) {

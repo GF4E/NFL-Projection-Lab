@@ -1,7 +1,9 @@
-import { copyFileSync, mkdtempSync, rmSync, truncateSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, truncateSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { DatabaseSync, backup } from "node:sqlite";
+import { pathToFileURL } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
 
 import terminalManifest from "../config/d1-schema-manifest.v1.json";
@@ -12,6 +14,7 @@ import {
   captureDatabaseEvidence,
   migrationPaths,
   preflightClaim,
+  sha256,
   stableJson,
   validateAuthorizedRangeContract,
   type DatabaseEvidence,
@@ -74,6 +77,66 @@ function schemaAndRows(db: DatabaseSync, label: string): string {
     rows: captured.rows,
     foreignKeyViolations: captured.foreignKeyViolations
   });
+}
+
+function frozenAuthoritySubprocess(mode: "append" | "replace" | "delete") {
+  const directory = mkdtempSync(join(tmpdir(), `os01-authority-${mode}-`));
+  temporaryDirectories.push(directory);
+  const trackedPaths = [
+    "config/os01-migration-qualification.v1.json",
+    "config/d1-schema-authority.v1.json",
+    "config/d1-schema-authority.v2.json",
+    "config/d1-schema-manifest.v1.json",
+    "drizzle/meta/_journal.json",
+    ...paths
+  ];
+  for (const path of trackedPaths) {
+    const destination = join(directory, path);
+    mkdirSync(resolve(destination, ".."), { recursive: true });
+    copyFileSync(resolve(process.cwd(), path), destination);
+  }
+  const moduleUrl = pathToFileURL(resolve(
+    process.cwd(),
+    "scripts/os01-migration-qualification.ts"
+  )).href;
+  const target = join(directory, "drizzle/0017_engine_os_source_capture.sql");
+  const source = `
+    import { appendFileSync, unlinkSync, writeFileSync } from "node:fs";
+    import { DatabaseSync } from "node:sqlite";
+    import {
+      applyQualifiedMigrationRange,
+      captureDatabaseEvidence,
+      preflightClaim
+    } from ${JSON.stringify(moduleUrl)};
+    const db = new DatabaseSync(":memory:");
+    db.exec("PRAGMA foreign_keys = ON");
+    const before = captureDatabaseEvidence(db, "blank");
+    const result = applyQualifiedMigrationRange(
+      db,
+      preflightClaim(before, "blank_ordered_chain"),
+      { afterQuiesce: () => {
+        if (${JSON.stringify(mode)} === "append") appendFileSync(${JSON.stringify(target)}, "\\nSELECT 1;\\n");
+        if (${JSON.stringify(mode)} === "replace") writeFileSync(${JSON.stringify(target)}, "SELECT 1;\\n");
+        if (${JSON.stringify(mode)} === "delete") unlinkSync(${JSON.stringify(target)});
+      } }
+    );
+    db.close();
+    process.stdout.write(JSON.stringify(result));
+  `;
+  const execution = spawnSync(
+    process.execPath,
+    [resolve(process.cwd(), "node_modules/tsx/dist/cli.mjs"), "-e", source],
+    { cwd: directory, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }
+  );
+  if (execution.status !== 0) {
+    throw new Error(`frozen-authority subprocess failed: ${execution.stderr}`);
+  }
+  return JSON.parse(execution.stdout) as {
+    finalSchemaFingerprint: string;
+    finalCounts: Record<string, number>;
+    appliedMigrationPaths: string[];
+    appliedStatementCount: number;
+  };
 }
 
 describe("OS-01 isolated migration qualification path", () => {
@@ -181,6 +244,17 @@ describe("OS-01 isolated migration qualification path", () => {
     candidate.authorizedRanges[1]!.migrationPaths[0] = path;
     expect(() => validateAuthorizedRangeContract(candidate, paths)).toThrow();
   });
+
+  it.each(["append", "replace", "delete"] as const)(
+    "executes only frozen in-memory bytes after an afterQuiesce %s",
+    (mode) => {
+      const result = frozenAuthoritySubprocess(mode);
+      expect(result.finalSchemaFingerprint).toBe(terminalManifest.schemaFingerprint);
+      expect(result.finalCounts).toEqual({ table: 93, index: 80, trigger: 76, view: 0 });
+      expect(result.appliedMigrationPaths).toEqual(paths);
+      expect(result.appliedStatementCount).toBeGreaterThan(100);
+    }
+  );
 
   it("revalidates under BEGIN IMMEDIATE and rolls back a just-in-time prestate mutation", () => {
     const db = legacyDatabase();
@@ -328,6 +402,7 @@ describe("OS-01 isolated migration qualification path", () => {
     db.close();
 
     copyFileSync(backupPath, restoredPath);
+    expect(sha256(readFileSync(restoredPath))).toBe(sha256(readFileSync(backupPath)));
     const restored = new DatabaseSync(restoredPath);
     expect(schemaAndRows(restored, "legacy")).toBe(beforeComparable);
     expect(restored.prepare("PRAGMA foreign_key_check").all()).toEqual([]);
