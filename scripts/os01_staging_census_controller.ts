@@ -29,6 +29,7 @@ import {
 } from "../qualification/os01-staging-census/contract";
 
 const RESPONSE_LIMIT_BYTES = 2 * 1024 * 1024;
+const QUALIFICATION_WINDOW_MILLISECONDS = 30 * 60 * 1000;
 
 type CensusTransport = (request: Request) => Promise<Response>;
 type ObservationPhase = "pre" | "post";
@@ -92,11 +93,15 @@ type ArtifactIdentity = {
 
 type ControllerPaths = {
   root: string;
+  authority: string;
   preObservation: string;
   intent: string;
   response: string;
   attemptResult: string;
+  dispatchCompletion: string;
+  terminalFence: string;
   postObservation: string;
+  finalizationIntent: string;
   finalReceipt: string;
 };
 
@@ -126,11 +131,15 @@ function hasExactKeys(value: Record<string, unknown>, expected: string[]): boole
 function artifactPaths(root: string): ControllerPaths {
   return {
     root,
+    authority: resolve(root, STAGING_CENSUS_ARTIFACT_NAMES.authority),
     preObservation: resolve(root, STAGING_CENSUS_ARTIFACT_NAMES.preObservation),
     intent: resolve(root, STAGING_CENSUS_ARTIFACT_NAMES.intent),
     response: resolve(root, STAGING_CENSUS_ARTIFACT_NAMES.response),
     attemptResult: resolve(root, STAGING_CENSUS_ARTIFACT_NAMES.attemptResult),
+    dispatchCompletion: resolve(root, STAGING_CENSUS_ARTIFACT_NAMES.dispatchCompletion),
+    terminalFence: resolve(root, STAGING_CENSUS_ARTIFACT_NAMES.terminalFence),
     postObservation: resolve(root, STAGING_CENSUS_ARTIFACT_NAMES.postObservation),
+    finalizationIntent: resolve(root, STAGING_CENSUS_ARTIFACT_NAMES.finalizationIntent),
     finalReceipt: resolve(root, STAGING_CENSUS_ARTIFACT_NAMES.finalReceipt)
   };
 }
@@ -155,6 +164,10 @@ function rootIdentity(root: string): ArtifactIdentity {
 function sameIdentity(left: ArtifactIdentity, right: ArtifactIdentity): boolean {
   return left.device === right.device && left.inode === right.inode && left.mode === right.mode &&
     left.links === right.links;
+}
+
+function sameSnapshotIdentity(left: ArtifactIdentity, right: ArtifactIdentity): boolean {
+  return sameIdentity(left, right) && left.size === right.size;
 }
 
 function sameRootIdentity(left: ArtifactIdentity, right: ArtifactIdentity): boolean {
@@ -221,18 +234,122 @@ function durableExclusiveJson(path: string, value: unknown): void {
   verifyIdentity(path, reserved.identity);
 }
 
-function readPrivateBytes(path: string): Uint8Array {
-  privateFileIdentity(path);
-  return new Uint8Array(readFileSync(path));
+function descriptorIdentity(descriptor: number): ArtifactIdentity {
+  const stat = fstatSync(descriptor);
+  const uid = typeof process.getuid === "function" ? process.getuid() : stat.uid;
+  if (!stat.isFile() || stat.nlink !== 1 || (stat.mode & 0o777) !== 0o600 || stat.uid !== uid) {
+    throw new Error("controller artifact descriptor is not an owner mode-0600 single-link file");
+  }
+  return {
+    device: stat.dev,
+    inode: stat.ino,
+    mode: stat.mode & 0o777,
+    links: stat.nlink,
+    size: stat.size
+  };
+}
+
+function readPrivateArtifact(path: string): { bytes: Uint8Array; identity: ArtifactIdentity } {
+  const descriptor = openSync(path, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0));
+  try {
+    const before = descriptorIdentity(descriptor);
+    const pathBefore = privateFileIdentity(path);
+    if (!sameSnapshotIdentity(before, pathBefore)) {
+      throw new Error("controller artifact path and descriptor differ before read");
+    }
+    const bytes = new Uint8Array(readFileSync(descriptor));
+    const after = descriptorIdentity(descriptor);
+    if (!sameSnapshotIdentity(before, after) || after.size !== bytes.byteLength) {
+      throw new Error("controller artifact changed during read");
+    }
+    const pathAfter = privateFileIdentity(path);
+    if (!sameSnapshotIdentity(after, pathAfter)) {
+      throw new Error("controller artifact path and descriptor differ after read");
+    }
+    return { bytes, identity: after };
+  } finally {
+    closeSync(descriptor);
+  }
+}
+
+function verifyArtifactSnapshot(path: string, expected: ArtifactIdentity, expectedHash: string): void {
+  const current = readPrivateArtifact(path);
+  if (!sameSnapshotIdentity(current.identity, expected) || sha256(current.bytes) !== expectedHash) {
+    throw new Error("controller artifact snapshot changed");
+  }
 }
 
 function hashedBody<T extends Record<string, unknown>>(body: T, key: string): T & Record<string, string> {
   return { ...body, [key]: sha256(canonicalJson(body)) };
 }
 
+function timestampMilliseconds(value: unknown): number | null {
+  if (typeof value !== "string") return null;
+  const milliseconds = Date.parse(value);
+  if (!Number.isFinite(milliseconds) || new Date(milliseconds).toISOString() !== value) return null;
+  return milliseconds;
+}
+
+function createAuthorityRecord(
+  root: string,
+  qualificationEligible: boolean,
+  initializedAt: string
+): Record<string, unknown> {
+  if (timestampMilliseconds(initializedAt) === null) throw new Error("authority timestamp is not canonical UTC");
+  const body = {
+    version: "engine-os.os01-staging-census-controller-authority.v1",
+    status: "initialized_no_dispatch",
+    qualificationId: STAGING_CENSUS_ID,
+    qualificationEligible,
+    canonicalRoot: resolve(root),
+    projectId: STAGING_CENSUS_SEMANTIC_CONTRACT.projectId,
+    origin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
+    retryAfterAnyIntentOrOutputArtifact: false,
+    maximumQualificationWindowMilliseconds: QUALIFICATION_WINDOW_MILLISECONDS,
+    exclusiveHostAssumption: "single_owner_no_concurrent_writer_during_controller_window",
+    initializedAt
+  };
+  return hashedBody(body, "authorityHash");
+}
+
+function validateAuthority(
+  value: unknown,
+  root: string,
+  qualificationEligible: boolean
+): value is Record<string, unknown> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const authority = value as Record<string, unknown>;
+  if (!hasExactKeys(authority, [
+    "authorityHash", "canonicalRoot", "exclusiveHostAssumption", "initializedAt",
+    "maximumQualificationWindowMilliseconds", "origin", "projectId", "qualificationEligible",
+    "qualificationId", "retryAfterAnyIntentOrOutputArtifact", "status", "version"
+  ]) || !validHex(authority.authorityHash)) return false;
+  const body = { ...authority };
+  delete body.authorityHash;
+  return sha256(canonicalJson(body)) === authority.authorityHash &&
+    authority.version === "engine-os.os01-staging-census-controller-authority.v1" &&
+    authority.status === "initialized_no_dispatch" && authority.qualificationId === STAGING_CENSUS_ID &&
+    authority.qualificationEligible === qualificationEligible && authority.canonicalRoot === resolve(root) &&
+    authority.projectId === STAGING_CENSUS_SEMANTIC_CONTRACT.projectId &&
+    authority.origin === STAGING_CENSUS_SEMANTIC_CONTRACT.origin &&
+    authority.retryAfterAnyIntentOrOutputArtifact === false &&
+    authority.maximumQualificationWindowMilliseconds === QUALIFICATION_WINDOW_MILLISECONDS &&
+    authority.exclusiveHostAssumption === "single_owner_no_concurrent_writer_during_controller_window" &&
+    timestampMilliseconds(authority.initializedAt) !== null;
+}
+
+function initializeAuthorityArtifact(root: string, qualificationEligible: boolean, now: () => Date): void {
+  const paths = artifactPaths(root);
+  const recordedAt = now().toISOString();
+  durableExclusiveJson(paths.authority, createAuthorityRecord(root, qualificationEligible, recordedAt));
+}
+
 export function createOs01StagingCensusControlPlaneObservation(
   input: ControlPlaneObservationInput
 ): Record<string, unknown> {
+  if (input.environmentKeyNames.length !== 0) {
+    throw new Error("isolated staging census environment key list must be empty");
+  }
   const body = {
     version: "engine-os.os01-staging-census-control-plane-observation.v1",
     phase: input.phase,
@@ -300,7 +417,7 @@ function validateObservation(value: unknown, phase: ObservationPhase): value is 
       observation.projectId !== STAGING_CENSUS_SEMANTIC_CONTRACT.projectId ||
       observation.origin !== STAGING_CENSUS_SEMANTIC_CONTRACT.origin ||
       observation.exclusiveHostAssumption !== "single_owner_no_concurrent_writer_during_controller_window" ||
-      typeof observation.recordedAt !== "string" || !Number.isFinite(Date.parse(observation.recordedAt))) {
+      timestampMilliseconds(observation.recordedAt) === null) {
     return false;
   }
   const source = observation.source;
@@ -342,6 +459,7 @@ function validateObservation(value: unknown, phase: ObservationPhase): value is 
       (accessRow.revision as number) < 0 ||
       !hasExactKeys(environmentRow, ["captureEnabledKeyPresent", "keyNames", "revision"]) ||
       environmentRow.captureEnabledKeyPresent !== false || !Array.isArray(environmentRow.keyNames) ||
+      environmentRow.keyNames.length !== 0 ||
       (environmentRow.keyNames as unknown[]).some((key) => typeof key !== "string") ||
       new Set(environmentRow.keyNames as unknown[]).size !== (environmentRow.keyNames as unknown[]).length ||
       [...environmentRow.keyNames as string[]].sort(codePointCompare)
@@ -502,30 +620,142 @@ function resultWithHash(
   return { ...body, resultHash: sha256(canonicalJson(body)) };
 }
 
-function verifyRootAndIntent(
-  paths: ControllerPaths,
-  rootBefore: ArtifactIdentity,
-  intentIdentity: ArtifactIdentity
+function createDispatchCompletion(input: {
+  qualificationEligible: boolean;
+  attemptId: string;
+  intentBytesSha256: string;
+  responseBytesSha256: string;
+  resultBytesSha256: string;
+  recordedAt: string;
+}): Record<string, unknown> {
+  const body = {
+    version: "engine-os.os01-staging-census-dispatch-completion.v1",
+    status: "sealed_after_authority_verification",
+    qualificationId: STAGING_CENSUS_ID,
+    qualificationEligible: input.qualificationEligible,
+    attemptId: input.attemptId,
+    intentBytesSha256: input.intentBytesSha256,
+    responseBytesSha256: input.responseBytesSha256,
+    resultBytesSha256: input.resultBytesSha256,
+    retryAllowed: false,
+    recordedAt: input.recordedAt
+  };
+  return hashedBody(body, "completionHash");
+}
+
+function validateDispatchCompletion(
+  bytes: Uint8Array,
+  qualificationEligible: boolean
+): Record<string, unknown> | null {
+  const completion = parseHashedRecord(bytes, "completionHash");
+  if (!completion || !hasExactKeys(completion, [
+    "attemptId", "completionHash", "intentBytesSha256", "qualificationEligible", "qualificationId",
+    "recordedAt", "responseBytesSha256", "resultBytesSha256", "retryAllowed", "status", "version"
+  ])) return null;
+  return completion.version === "engine-os.os01-staging-census-dispatch-completion.v1" &&
+    completion.status === "sealed_after_authority_verification" &&
+    completion.qualificationId === STAGING_CENSUS_ID &&
+    completion.qualificationEligible === qualificationEligible && typeof completion.attemptId === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(completion.attemptId) &&
+    validHex(completion.intentBytesSha256) && validHex(completion.responseBytesSha256) &&
+    validHex(completion.resultBytesSha256) && completion.retryAllowed === false &&
+    timestampMilliseconds(completion.recordedAt) !== null ? completion : null;
+}
+
+function parseJson(bytes: Uint8Array, label: string): unknown {
+  try {
+    return JSON.parse(new TextDecoder().decode(bytes));
+  } catch {
+    throw new Error(label + " is not JSON");
+  }
+}
+
+function verifyReservedArtifact(
+  path: string,
+  reserved: { descriptor: number; identity: ArtifactIdentity },
+  expectedHash: string,
+  expectedSize: number
 ): void {
-  if (!sameRootIdentity(rootBefore, rootIdentity(paths.root))) throw new Error("controller root identity changed");
-  verifyIdentity(paths.intent, intentIdentity);
+  const descriptor = descriptorIdentity(reserved.descriptor);
+  if (!sameIdentity(descriptor, reserved.identity) || descriptor.size !== expectedSize) {
+    throw new Error("reserved controller artifact descriptor changed");
+  }
+  const artifact = readPrivateArtifact(path);
+  if (!sameIdentity(artifact.identity, reserved.identity) || artifact.identity.size !== expectedSize ||
+      sha256(artifact.bytes) !== expectedHash) {
+    throw new Error("reserved controller artifact path changed");
+  }
+}
+
+function verifyRunAuthority(input: {
+  paths: ControllerPaths;
+  rootBefore: ArtifactIdentity;
+  authority: { bytes: Uint8Array; identity: ArtifactIdentity };
+  pre: { bytes: Uint8Array; identity: ArtifactIdentity };
+  intentReserved: { descriptor: number; identity: ArtifactIdentity };
+  intentBytes: Uint8Array;
+  responseReserved: { descriptor: number; identity: ArtifactIdentity };
+  responseHash: string;
+  responseSize: number;
+  resultReserved: { descriptor: number; identity: ArtifactIdentity };
+  resultHash: string;
+  resultSize: number;
+  completionReserved: { descriptor: number; identity: ArtifactIdentity };
+  completionHash: string;
+  completionSize: number;
+}): void {
+  if (!sameRootIdentity(input.rootBefore, rootIdentity(input.paths.root))) {
+    throw new Error("controller root identity changed");
+  }
+  verifyArtifactSnapshot(input.paths.authority, input.authority.identity, sha256(input.authority.bytes));
+  verifyArtifactSnapshot(input.paths.preObservation, input.pre.identity, sha256(input.pre.bytes));
+  verifyReservedArtifact(
+    input.paths.intent, input.intentReserved, sha256(input.intentBytes), input.intentBytes.byteLength
+  );
+  verifyReservedArtifact(
+    input.paths.response, input.responseReserved, input.responseHash, input.responseSize
+  );
+  verifyReservedArtifact(input.paths.attemptResult, input.resultReserved, input.resultHash, input.resultSize);
+  verifyReservedArtifact(
+    input.paths.dispatchCompletion, input.completionReserved, input.completionHash, input.completionSize
+  );
+  if (existsSync(input.paths.terminalFence) || existsSync(input.paths.postObservation) ||
+      existsSync(input.paths.finalizationIntent) || existsSync(input.paths.finalReceipt)) {
+    throw new Error("terminal, postcheck, or finalization artifact appeared during dispatch");
+  }
 }
 
 async function runControllerCore(input: ControllerCoreInput): Promise<CensusControllerResult> {
   const paths = artifactPaths(input.root);
   const rootBefore = rootIdentity(paths.root);
-  const preBytes = readPrivateBytes(paths.preObservation);
-  let pre: unknown;
-  try {
-    pre = JSON.parse(new TextDecoder().decode(preBytes));
-  } catch {
-    throw new Error("control-plane pre-observation is not JSON");
+  const authorityArtifact = readPrivateArtifact(paths.authority);
+  const authority = parseJson(authorityArtifact.bytes, "controller authority");
+  if (!validateAuthority(authority, paths.root, input.qualificationEligible)) {
+    throw new Error("controller authority is invalid");
   }
+  const preArtifact = readPrivateArtifact(paths.preObservation);
+  const pre = parseJson(preArtifact.bytes, "control-plane pre-observation");
   if (!validateObservation(pre, "pre")) throw new Error("control-plane pre-observation is invalid");
+  if ([
+    paths.intent, paths.response, paths.attemptResult, paths.dispatchCompletion, paths.terminalFence,
+    paths.postObservation, paths.finalizationIntent, paths.finalReceipt
+  ]
+    .some((path) => existsSync(path))) {
+    throw new Error("canonical controller authority has already been consumed or postchecked");
+  }
   if (!input.authorizationToken || /[\r\n]/u.test(input.authorizationToken)) {
     throw new Error("one ephemeral Sites authorization token is required");
   }
   const attemptId = randomUUID();
+  const intentRecordedAt = input.now().toISOString();
+  const authorityMilliseconds = timestampMilliseconds(authority.initializedAt);
+  const preMilliseconds = timestampMilliseconds(pre.recordedAt);
+  const intentMilliseconds = timestampMilliseconds(intentRecordedAt);
+  if (authorityMilliseconds === null || preMilliseconds === null || intentMilliseconds === null ||
+      authorityMilliseconds > preMilliseconds || preMilliseconds > intentMilliseconds ||
+      intentMilliseconds - authorityMilliseconds > QUALIFICATION_WINDOW_MILLISECONDS) {
+    throw new Error("controller authority, pre-observation, and intent timestamps are not ordered in-window");
+  }
   const intentBody = {
     version: "engine-os.os01-staging-census-controller-intent.v2",
     status: "reserved_before_transport_no_retry",
@@ -538,26 +768,50 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
     route: STAGING_CENSUS_SEMANTIC_CONTRACT.route,
     contentType: STAGING_CENSUS_SEMANTIC_CONTRACT.contentType,
     requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
-    preObservationBytesSha256: sha256(preBytes),
+    preObservationBytesSha256: sha256(preArtifact.bytes),
     credentialKind: "ephemeral_sites_siwe_not_persisted",
     retryAllowedAfterReservation: false,
     controlPlanePostcheckRequired: true,
     exclusiveHostAssumption: "single_owner_no_concurrent_writer_during_controller_window",
-    recordedAt: input.now().toISOString()
+    recordedAt: intentRecordedAt
   };
   const intent = hashedBody(intentBody, "intentHash");
+  const intentBytes = new TextEncoder().encode(JSON.stringify(intent, null, 2) + "\n");
   let intentReserved: ReturnType<typeof reserveArtifact> | null = null;
   let responseReserved: ReturnType<typeof reserveArtifact> | null = null;
   let resultReserved: ReturnType<typeof reserveArtifact> | null = null;
+  let completionReserved: ReturnType<typeof reserveArtifact> | null = null;
   try {
     intentReserved = reserveArtifact(paths.intent);
+    writeDescriptor(intentReserved.descriptor, intentBytes);
+    syncDirectory(paths.root);
+    verifyArtifactSnapshot(paths.authority, authorityArtifact.identity, sha256(authorityArtifact.bytes));
+    verifyArtifactSnapshot(paths.preObservation, preArtifact.identity, sha256(preArtifact.bytes));
+    verifyReservedArtifact(paths.intent, intentReserved, sha256(intentBytes), intentBytes.byteLength);
     responseReserved = reserveArtifact(paths.response);
     resultReserved = reserveArtifact(paths.attemptResult);
-    writeDescriptor(intentReserved.descriptor, JSON.stringify(intent, null, 2) + "\n");
+    completionReserved = reserveArtifact(paths.dispatchCompletion);
     fsyncSync(responseReserved.descriptor);
     fsyncSync(resultReserved.descriptor);
+    fsyncSync(completionReserved.descriptor);
     syncDirectory(paths.root);
-    verifyRootAndIntent(paths, rootBefore, intentReserved.identity);
+    verifyRunAuthority({
+      paths,
+      rootBefore,
+      authority: authorityArtifact,
+      pre: preArtifact,
+      intentReserved,
+      intentBytes,
+      responseReserved,
+      responseHash: sha256(new Uint8Array()),
+      responseSize: 0,
+      resultReserved,
+      resultHash: sha256(new Uint8Array()),
+      resultSize: 0,
+      completionReserved,
+      completionHash: sha256(new Uint8Array()),
+      completionSize: 0
+    });
     let response: Response;
     try {
       response = await input.transport(new Request(
@@ -579,7 +833,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         qualificationId: STAGING_CENSUS_ID,
         qualificationEligible: input.qualificationEligible,
         attemptId,
-        preObservationBytesSha256: sha256(preBytes),
+        preObservationBytesSha256: sha256(preArtifact.bytes),
         requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
         responseBytesSha256: null,
         httpStatus: null,
@@ -590,7 +844,26 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         controlPlanePostcheckRequired: true,
         recordedAt: input.now().toISOString()
       });
-      writeDescriptor(resultReserved.descriptor, JSON.stringify(terminal, null, 2) + "\n");
+      const terminalBytes = new TextEncoder().encode(JSON.stringify(terminal, null, 2) + "\n");
+      writeDescriptor(resultReserved.descriptor, terminalBytes);
+      syncDirectory(paths.root);
+      verifyRunAuthority({
+        paths,
+        rootBefore,
+        authority: authorityArtifact,
+        pre: preArtifact,
+        intentReserved,
+        intentBytes,
+        responseReserved,
+        responseHash: sha256(new Uint8Array()),
+        responseSize: 0,
+        resultReserved,
+        resultHash: sha256(terminalBytes),
+        resultSize: terminalBytes.byteLength,
+        completionReserved,
+        completionHash: sha256(new Uint8Array()),
+        completionSize: 0
+      });
       return terminal;
     }
     let bytes: Uint8Array;
@@ -603,7 +876,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         qualificationId: STAGING_CENSUS_ID,
         qualificationEligible: input.qualificationEligible,
         attemptId,
-        preObservationBytesSha256: sha256(preBytes),
+        preObservationBytesSha256: sha256(preArtifact.bytes),
         requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
         responseBytesSha256: null,
         httpStatus: response.status,
@@ -614,16 +887,51 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         controlPlanePostcheckRequired: true,
         recordedAt: input.now().toISOString()
       });
-      writeDescriptor(resultReserved.descriptor, JSON.stringify(terminal, null, 2) + "\n");
+      const terminalBytes = new TextEncoder().encode(JSON.stringify(terminal, null, 2) + "\n");
+      writeDescriptor(resultReserved.descriptor, terminalBytes);
+      syncDirectory(paths.root);
+      verifyRunAuthority({
+        paths,
+        rootBefore,
+        authority: authorityArtifact,
+        pre: preArtifact,
+        intentReserved,
+        intentBytes,
+        responseReserved,
+        responseHash: sha256(new Uint8Array()),
+        responseSize: 0,
+        resultReserved,
+        resultHash: sha256(terminalBytes),
+        resultSize: terminalBytes.byteLength,
+        completionReserved,
+        completionHash: sha256(new Uint8Array()),
+        completionSize: 0
+      });
       return terminal;
     }
-    verifyRootAndIntent(paths, rootBefore, intentReserved.identity);
+    verifyRunAuthority({
+      paths,
+      rootBefore,
+      authority: authorityArtifact,
+      pre: preArtifact,
+      intentReserved,
+      intentBytes,
+      responseReserved,
+      responseHash: sha256(new Uint8Array()),
+      responseSize: 0,
+      resultReserved,
+      resultHash: sha256(new Uint8Array()),
+      resultSize: 0,
+      completionReserved,
+      completionHash: sha256(new Uint8Array()),
+      completionSize: 0
+    });
     const responseHash = sha256(bytes);
     const reflected = new TextDecoder().decode(bytes).includes(input.authorizationToken);
-    if (!reflected) writeDescriptor(responseReserved.descriptor, bytes);
     const valid = !reflected && response.status === 200 &&
       response.headers.get("content-type")?.toLowerCase() === "application/json" &&
       validateResponse(bytes, input.responseValidation);
+    if (valid) writeDescriptor(responseReserved.descriptor, bytes);
     const status = reflected ? "terminal_credential_reflection" :
       valid ? "pending_control_plane_postcheck" : "terminal_invalid_response";
     const result = resultWithHash({
@@ -632,7 +940,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
       qualificationId: STAGING_CENSUS_ID,
       qualificationEligible: input.qualificationEligible,
       attemptId,
-      preObservationBytesSha256: sha256(preBytes),
+      preObservationBytesSha256: sha256(preArtifact.bytes),
       requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
       responseBytesSha256: responseHash,
       httpStatus: response.status,
@@ -643,8 +951,55 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
       controlPlanePostcheckRequired: true,
       recordedAt: input.now().toISOString()
     });
-    writeDescriptor(resultReserved.descriptor, JSON.stringify(result, null, 2) + "\n");
-    verifyRootAndIntent(paths, rootBefore, intentReserved.identity);
+    const resultBytes = new TextEncoder().encode(JSON.stringify(result, null, 2) + "\n");
+    writeDescriptor(resultReserved.descriptor, resultBytes);
+    syncDirectory(paths.root);
+    verifyRunAuthority({
+      paths,
+      rootBefore,
+      authority: authorityArtifact,
+      pre: preArtifact,
+      intentReserved,
+      intentBytes,
+      responseReserved,
+      responseHash: valid ? responseHash : sha256(new Uint8Array()),
+      responseSize: valid ? bytes.byteLength : 0,
+      resultReserved,
+      resultHash: sha256(resultBytes),
+      resultSize: resultBytes.byteLength,
+      completionReserved,
+      completionHash: sha256(new Uint8Array()),
+      completionSize: 0
+    });
+    if (!valid) return result;
+    const completion = createDispatchCompletion({
+      qualificationEligible: input.qualificationEligible,
+      attemptId,
+      intentBytesSha256: sha256(intentBytes),
+      responseBytesSha256: responseHash,
+      resultBytesSha256: sha256(resultBytes),
+      recordedAt: input.now().toISOString()
+    });
+    const completionBytes = new TextEncoder().encode(JSON.stringify(completion, null, 2) + "\n");
+    writeDescriptor(completionReserved.descriptor, completionBytes);
+    syncDirectory(paths.root);
+    verifyRunAuthority({
+      paths,
+      rootBefore,
+      authority: authorityArtifact,
+      pre: preArtifact,
+      intentReserved,
+      intentBytes,
+      responseReserved,
+      responseHash,
+      responseSize: bytes.byteLength,
+      resultReserved,
+      resultHash: sha256(resultBytes),
+      resultSize: resultBytes.byteLength,
+      completionReserved,
+      completionHash: sha256(completionBytes),
+      completionSize: completionBytes.byteLength
+    });
     return result;
   } catch (error) {
     if (resultReserved) {
@@ -654,7 +1009,7 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         qualificationId: STAGING_CENSUS_ID,
         qualificationEligible: input.qualificationEligible,
         attemptId,
-        preObservationBytesSha256: sha256(preBytes),
+        preObservationBytesSha256: sha256(preArtifact.bytes),
         requestBodySha256: STAGING_CENSUS_EXACT_BODY_SHA256,
         responseBytesSha256: null,
         httpStatus: null,
@@ -666,14 +1021,34 @@ async function runControllerCore(input: ControllerCoreInput): Promise<CensusCont
         recordedAt: input.now().toISOString()
       });
       try {
-        writeDescriptor(resultReserved.descriptor, JSON.stringify(terminal, null, 2) + "\n");
+        if (descriptorIdentity(resultReserved.descriptor).size === 0 &&
+            sameIdentity(privateFileIdentity(paths.attemptResult), resultReserved.identity)) {
+          writeDescriptor(resultReserved.descriptor, JSON.stringify(terminal, null, 2) + "\n");
+        }
       } catch {
         // The durable intent remains the terminal no-retry evidence.
       }
     }
+    if (intentReserved && !existsSync(paths.terminalFence)) {
+      const fenceBody = {
+        version: "engine-os.os01-staging-census-terminal-fence.v1",
+        status: "terminal_artifact_authority_violation",
+        qualificationId: STAGING_CENSUS_ID,
+        qualificationEligible: input.qualificationEligible,
+        attemptId,
+        intentBytesSha256: sha256(intentBytes),
+        retryAllowed: false,
+        recordedAt: input.now().toISOString()
+      };
+      try {
+        durableExclusiveJson(paths.terminalFence, hashedBody(fenceBody, "fenceHash"));
+      } catch {
+        // Existing or untrusted terminal state remains fail-closed.
+      }
+    }
     throw error;
   } finally {
-    for (const reserved of [intentReserved, responseReserved, resultReserved]) {
+    for (const reserved of [intentReserved, responseReserved, resultReserved, completionReserved]) {
       if (reserved) {
         try {
           closeSync(reserved.descriptor);
@@ -706,66 +1081,191 @@ function parseHashedRecord(bytes: Uint8Array, hashKey: string): Record<string, u
   return sha256(canonicalJson(body)) === claimed ? record : null;
 }
 
-function finalizeCore(root: string, qualificationEligible: boolean, now: () => Date): Record<string, unknown> {
+function validateIntentRecord(
+  bytes: Uint8Array,
+  qualificationEligible: boolean
+): Record<string, unknown> | null {
+  const intent = parseHashedRecord(bytes, "intentHash");
+  if (!intent || !hasExactKeys(intent, [
+    "attemptId", "contentType", "controlPlanePostcheckRequired", "credentialKind",
+    "exclusiveHostAssumption", "intentHash", "method", "origin", "preObservationBytesSha256",
+    "projectId", "qualificationEligible", "qualificationId", "recordedAt", "requestBodySha256",
+    "retryAllowedAfterReservation", "route", "status", "version"
+  ])) return null;
+  return intent.version === "engine-os.os01-staging-census-controller-intent.v2" &&
+    intent.status === "reserved_before_transport_no_retry" && intent.qualificationId === STAGING_CENSUS_ID &&
+    intent.qualificationEligible === qualificationEligible && typeof intent.attemptId === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(intent.attemptId) &&
+    intent.projectId === STAGING_CENSUS_SEMANTIC_CONTRACT.projectId &&
+    intent.origin === STAGING_CENSUS_SEMANTIC_CONTRACT.origin &&
+    intent.method === STAGING_CENSUS_SEMANTIC_CONTRACT.method &&
+    intent.route === STAGING_CENSUS_SEMANTIC_CONTRACT.route &&
+    intent.contentType === STAGING_CENSUS_SEMANTIC_CONTRACT.contentType &&
+    intent.requestBodySha256 === STAGING_CENSUS_EXACT_BODY_SHA256 &&
+    validHex(intent.preObservationBytesSha256) &&
+    intent.credentialKind === "ephemeral_sites_siwe_not_persisted" &&
+    intent.retryAllowedAfterReservation === false && intent.controlPlanePostcheckRequired === true &&
+    intent.exclusiveHostAssumption === "single_owner_no_concurrent_writer_during_controller_window" &&
+    timestampMilliseconds(intent.recordedAt) !== null ? intent : null;
+}
+
+function validateResultRecord(
+  bytes: Uint8Array,
+  qualificationEligible: boolean
+): Record<string, unknown> | null {
+  const result = parseHashedRecord(bytes, "resultHash");
+  if (!result || !hasExactKeys(result, [
+    "attemptId", "controlPlanePostcheckRequired", "controllerDatabaseMutationAttempted", "httpStatus",
+    "oddsProviderPathInvoked", "preObservationBytesSha256", "qualificationEligible", "qualificationId",
+    "quotaPathInvoked", "recordedAt", "requestBodySha256", "responseBytesSha256", "resultHash",
+    "retryAllowed", "status", "version"
+  ])) return null;
+  const statuses = new Set([
+    "pending_control_plane_postcheck", "terminal_transport_uncertain", "terminal_invalid_response",
+    "terminal_credential_reflection", "terminal_artifact_authority_violation"
+  ]);
+  return result.version === "engine-os.os01-staging-census-controller-result.v2" &&
+    statuses.has(String(result.status)) && result.qualificationId === STAGING_CENSUS_ID &&
+    result.qualificationEligible === qualificationEligible && typeof result.attemptId === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u.test(result.attemptId) &&
+    validHex(result.preObservationBytesSha256) && result.requestBodySha256 === STAGING_CENSUS_EXACT_BODY_SHA256 &&
+    (result.responseBytesSha256 === null || validHex(result.responseBytesSha256)) &&
+    (result.httpStatus === null || (Number.isSafeInteger(result.httpStatus) &&
+      (result.httpStatus as number) >= 100 && (result.httpStatus as number) <= 599)) &&
+    result.retryAllowed === false && result.controllerDatabaseMutationAttempted === false &&
+    result.oddsProviderPathInvoked === false && result.quotaPathInvoked === false &&
+    result.controlPlanePostcheckRequired === true && timestampMilliseconds(result.recordedAt) !== null ? result : null;
+}
+
+function finalizeCore(
+  root: string,
+  qualificationEligible: boolean,
+  now: () => Date,
+  responseIdentity: ResponseValidationIdentity
+): Record<string, unknown> {
   const paths = artifactPaths(root);
   const rootBefore = rootIdentity(root);
-  if (existsSync(paths.finalReceipt)) throw new Error("staging census final receipt already exists");
-  const preBytes = readPrivateBytes(paths.preObservation);
-  const postBytes = readPrivateBytes(paths.postObservation);
-  const intentBytes = readPrivateBytes(paths.intent);
-  const responseBytes = readPrivateBytes(paths.response);
-  const resultBytes = readPrivateBytes(paths.attemptResult);
-  let pre: unknown;
-  let post: unknown;
-  try {
-    pre = JSON.parse(new TextDecoder().decode(preBytes));
-    post = JSON.parse(new TextDecoder().decode(postBytes));
-  } catch {
-    throw new Error("control-plane observation is not JSON");
+  if (existsSync(paths.finalizationIntent) || existsSync(paths.finalReceipt)) {
+    throw new Error("staging census finalization authority already consumed");
   }
-  const intent = parseHashedRecord(intentBytes, "intentHash");
-  const result = parseHashedRecord(resultBytes, "resultHash");
-  if (!validateObservation(pre, "pre") || !validateObservation(post, "post") || !intent || !result) {
+  const finalizationRecordedAt = now().toISOString();
+  const finalizationBody = {
+    version: "engine-os.os01-staging-census-finalization-intent.v1",
+    status: "reserved_before_evidence_validation_no_retry",
+    qualificationId: STAGING_CENSUS_ID,
+    qualificationEligible,
+    canonicalRoot: resolve(root),
+    retryAllowed: false,
+    recordedAt: finalizationRecordedAt
+  };
+  const finalizationIntent = hashedBody(finalizationBody, "finalizationIntentHash");
+  durableExclusiveJson(paths.finalizationIntent, finalizationIntent);
+  const finalizationArtifact = readPrivateArtifact(paths.finalizationIntent);
+  const expectedFinalizationBytes = new TextEncoder().encode(JSON.stringify(finalizationIntent, null, 2) + "\n");
+  if (sha256(finalizationArtifact.bytes) !== sha256(expectedFinalizationBytes)) {
+    throw new Error("staging census finalization intent changed after reservation");
+  }
+  if (existsSync(paths.terminalFence)) {
+    throw new Error("staging census dispatch is terminally fenced");
+  }
+  const authorityArtifact = readPrivateArtifact(paths.authority);
+  const preArtifact = readPrivateArtifact(paths.preObservation);
+  const postArtifact = readPrivateArtifact(paths.postObservation);
+  const intentArtifact = readPrivateArtifact(paths.intent);
+  const responseArtifact = readPrivateArtifact(paths.response);
+  const resultArtifact = readPrivateArtifact(paths.attemptResult);
+  const completionArtifact = readPrivateArtifact(paths.dispatchCompletion);
+  const authority = parseJson(authorityArtifact.bytes, "controller authority");
+  const pre = parseJson(preArtifact.bytes, "control-plane pre-observation");
+  const post = parseJson(postArtifact.bytes, "control-plane post-observation");
+  const intent = validateIntentRecord(intentArtifact.bytes, qualificationEligible);
+  const result = validateResultRecord(resultArtifact.bytes, qualificationEligible);
+  const completion = validateDispatchCompletion(completionArtifact.bytes, qualificationEligible);
+  if (!validateAuthority(authority, root, qualificationEligible) ||
+      !validateObservation(pre, "pre") || !validateObservation(post, "post") || !intent || !result ||
+      !completion) {
     throw new Error("staging census finalization evidence is invalid");
   }
   const identitiesMatch = observationIdentity(pre) === observationIdentity(post);
-  const responseIdentity = {
-    catalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
-    catalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
-    userTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount
-  };
-  const accepted = qualificationEligible && identitiesMatch &&
-    intent.qualificationEligible === true && result.qualificationEligible === true &&
-    result.status === "pending_control_plane_postcheck" &&
-    result.preObservationBytesSha256 === sha256(preBytes) &&
-    result.responseBytesSha256 === sha256(responseBytes) &&
-    validateResponse(responseBytes, responseIdentity);
+  const finalRecordedAt = finalizationRecordedAt;
+  const authorityMilliseconds = timestampMilliseconds(authority.initializedAt);
+  const preMilliseconds = timestampMilliseconds(pre.recordedAt);
+  const intentMilliseconds = timestampMilliseconds(intent.recordedAt);
+  const resultMilliseconds = timestampMilliseconds(result.recordedAt);
+  const completionMilliseconds = timestampMilliseconds(completion.recordedAt);
+  const postMilliseconds = timestampMilliseconds(post.recordedAt);
+  const finalMilliseconds = timestampMilliseconds(finalRecordedAt);
+  const temporalOrderValid = authorityMilliseconds !== null && preMilliseconds !== null &&
+    intentMilliseconds !== null && resultMilliseconds !== null && completionMilliseconds !== null &&
+    postMilliseconds !== null &&
+    finalMilliseconds !== null && authorityMilliseconds <= preMilliseconds &&
+    preMilliseconds <= intentMilliseconds && intentMilliseconds <= resultMilliseconds &&
+    resultMilliseconds <= completionMilliseconds && completionMilliseconds <= postMilliseconds &&
+    postMilliseconds <= finalMilliseconds &&
+    finalMilliseconds - authorityMilliseconds <= QUALIFICATION_WINDOW_MILLISECONDS;
+  const preHash = sha256(preArtifact.bytes);
+  const responseHash = sha256(responseArtifact.bytes);
+  const crossRecordBindingsVerified = intent.attemptId === result.attemptId &&
+    intent.qualificationId === result.qualificationId &&
+    intent.requestBodySha256 === result.requestBodySha256 &&
+    intent.requestBodySha256 === STAGING_CENSUS_EXACT_BODY_SHA256 &&
+    intent.preObservationBytesSha256 === preHash && result.preObservationBytesSha256 === preHash &&
+    result.responseBytesSha256 === responseHash && result.httpStatus === 200 && result.retryAllowed === false &&
+    result.status === "pending_control_plane_postcheck" && completion.attemptId === intent.attemptId &&
+    completion.qualificationId === intent.qualificationId &&
+    completion.intentBytesSha256 === sha256(intentArtifact.bytes) &&
+    completion.responseBytesSha256 === responseHash &&
+    completion.resultBytesSha256 === sha256(resultArtifact.bytes) && completion.retryAllowed === false;
+  const workerReceiptVerified = validateResponse(responseArtifact.bytes, responseIdentity);
+  const evidenceValid = identitiesMatch && temporalOrderValid && crossRecordBindingsVerified &&
+    workerReceiptVerified;
+  const accepted = qualificationEligible && evidenceValid;
   const body = {
     version: "engine-os.os01-staging-census-final-receipt.v1",
     status: accepted ? "accepted_read_only_census_after_control_plane_postcheck" :
-      qualificationEligible ? "terminal_control_plane_or_evidence_mismatch" : "test_only_postcheck_verified",
+      qualificationEligible ? "terminal_control_plane_or_evidence_mismatch" :
+        evidenceValid ? "test_only_postcheck_verified" : "test_only_postcheck_rejected",
     qualificationId: STAGING_CENSUS_ID,
     qualificationEligible,
+    authorityVerified: true,
     identitiesMatch,
+    temporalOrderValid,
+    crossRecordBindingsVerified,
     artifacts: {
-      preObservationBytesSha256: sha256(preBytes),
-      intentBytesSha256: sha256(intentBytes),
-      responseBytesSha256: sha256(responseBytes),
-      attemptResultBytesSha256: sha256(resultBytes),
-      postObservationBytesSha256: sha256(postBytes)
+      authorityBytesSha256: sha256(authorityArtifact.bytes),
+      preObservationBytesSha256: preHash,
+      intentBytesSha256: sha256(intentArtifact.bytes),
+      responseBytesSha256: responseHash,
+      attemptResultBytesSha256: sha256(resultArtifact.bytes),
+      dispatchCompletionBytesSha256: sha256(completionArtifact.bytes),
+      postObservationBytesSha256: sha256(postArtifact.bytes),
+      finalizationIntentBytesSha256: sha256(finalizationArtifact.bytes)
     },
     exactSourceDeploymentAccessEnvironmentAndBindingsMatch: identitiesMatch,
-    workerReadOnlyReceiptVerified: validateResponse(responseBytes, responseIdentity),
+    workerReadOnlyReceiptVerified: workerReceiptVerified,
     retryAllowed: false,
     providerSecretRead: false,
     oddsProviderPathInvoked: false,
     quotaPathInvoked: false,
     databaseMutationAuthorized: false,
     claimBoundary: "isolated_staging_read_only_census_only_not_os01_acceptance",
-    recordedAt: now().toISOString()
+    recordedAt: finalRecordedAt
   };
   const receipt = hashedBody(body, "finalReceiptHash");
   if (!sameRootIdentity(rootBefore, rootIdentity(root))) throw new Error("controller root identity changed");
+  verifyArtifactSnapshot(paths.authority, authorityArtifact.identity, sha256(authorityArtifact.bytes));
+  verifyArtifactSnapshot(paths.preObservation, preArtifact.identity, preHash);
+  verifyArtifactSnapshot(paths.postObservation, postArtifact.identity, sha256(postArtifact.bytes));
+  verifyArtifactSnapshot(paths.intent, intentArtifact.identity, sha256(intentArtifact.bytes));
+  verifyArtifactSnapshot(paths.response, responseArtifact.identity, responseHash);
+  verifyArtifactSnapshot(paths.attemptResult, resultArtifact.identity, sha256(resultArtifact.bytes));
+  verifyArtifactSnapshot(
+    paths.dispatchCompletion, completionArtifact.identity, sha256(completionArtifact.bytes)
+  );
+  verifyArtifactSnapshot(
+    paths.finalizationIntent, finalizationArtifact.identity, sha256(finalizationArtifact.bytes)
+  );
+  if (existsSync(paths.terminalFence)) throw new Error("staging census dispatch became terminally fenced");
   durableExclusiveJson(paths.finalReceipt, receipt);
   return receipt;
 }
@@ -775,13 +1275,12 @@ export function initializeOs01StagingCensusControllerAuthority(): string {
   mkdirSync(STAGING_CENSUS_CONTROLLER_ROOT, { mode: 0o700 });
   rootIdentity(STAGING_CENSUS_CONTROLLER_ROOT);
   syncDirectory(dirname(STAGING_CENSUS_CONTROLLER_ROOT));
+  initializeAuthorityArtifact(STAGING_CENSUS_CONTROLLER_ROOT, true, () => new Date());
   return STAGING_CENSUS_CONTROLLER_ROOT;
 }
 
 export async function runOs01StagingCensusController(input: {
   authorizationToken: string;
-  transport?: CensusTransport;
-  now?: () => Date;
 }): Promise<CensusControllerResult> {
   if (resolve(STAGING_CENSUS_CONTROLLER_ROOT) !== STAGING_CENSUS_CONTROLLER_ROOT ||
       basename(STAGING_CENSUS_CONTROLLER_ROOT) !== "engine-os-os01-staging-census-" + STAGING_CENSUS_ID) {
@@ -791,8 +1290,8 @@ export async function runOs01StagingCensusController(input: {
     root: STAGING_CENSUS_CONTROLLER_ROOT,
     qualificationEligible: true,
     authorizationToken: input.authorizationToken,
-    transport: input.transport ?? fetch,
-    now: input.now ?? (() => new Date()),
+    transport: fetch,
+    now: () => new Date(),
     responseValidation: {
       catalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
       catalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
@@ -801,11 +1300,19 @@ export async function runOs01StagingCensusController(input: {
   });
 }
 
-export function finalizeOs01StagingCensusController(now: () => Date = () => new Date()): Record<string, unknown> {
-  return finalizeCore(STAGING_CENSUS_CONTROLLER_ROOT, true, now);
+export function finalizeOs01StagingCensusController(): Record<string, unknown> {
+  return finalizeCore(STAGING_CENSUS_CONTROLLER_ROOT, true, () => new Date(), {
+    catalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
+    catalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
+    userTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount
+  });
 }
 
 export const os01StagingCensusControllerTestOnly = Object.freeze({
+  initialize(root: string, now: () => Date = () => new Date()): void {
+    rootIdentity(root);
+    initializeAuthorityArtifact(root, false, now);
+  },
   async run(input: {
     root: string;
     authorizationToken: string;
@@ -819,8 +1326,16 @@ export const os01StagingCensusControllerTestOnly = Object.freeze({
       now: input.now ?? (() => new Date())
     });
   },
-  finalize(root: string, now: () => Date = () => new Date()): Record<string, unknown> {
-    return finalizeCore(root, false, now);
+  finalize(
+    root: string,
+    now: () => Date = () => new Date(),
+    responseValidation: ResponseValidationIdentity = {
+      catalogHash: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogHash,
+      catalogRows: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedCatalogRows,
+      userTableCount: STAGING_CENSUS_SEMANTIC_CONTRACT.expectedUserTableCount
+    }
+  ): Record<string, unknown> {
+    return finalizeCore(root, false, now, responseValidation);
   }
 });
 

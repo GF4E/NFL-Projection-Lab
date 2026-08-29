@@ -13,14 +13,23 @@ staging origin and v2 route, with an empty query, exact media type, and exact UT
 
 The worker is deliberately stateless and read-only. It does **not** claim to durably enforce a
 one-shot request. The separate controller derives one canonical authority root and fixed artifact
-names from the qualification identity. It validates a mode-0600 control-plane pre-observation,
-then exclusively reserves the intent, response, and result files before its sole transport call.
-An existing intent, persistence conflict, or uncertain transport permanently prohibits a retry for
-that qualification identity. A valid worker response remains `pending_control_plane_postcheck`.
-Only an append-only finalizer may accept it after validating a post-observation with identical
-source, deployment, access, environment, bindings, and package identities. The controller rejects
-noncanonical roots as qualification evidence, bounds response bytes, and never persists a response
-that reflects its ephemeral Sites credential.
+names from the qualification identity. Initialization first persists a self-hashed authority
+record. It validates a mode-0600 control-plane pre-observation, durably reserves and writes the
+intent, then exclusively reserves the response, result, and dispatch-completion files before its
+sole transport call. Existing artifacts, persistence conflict, uncertain transport, or a blank
+crash artifact permanently prohibit a retry for that qualification identity. All reads use
+no-follow descriptors with stable descriptor/path identity checks. A response is persisted only
+after its complete schema and evidence roots validate; arbitrary or credential-reflecting bodies
+remain absent.
+
+A valid worker response remains `pending_control_plane_postcheck` until an independently hashed
+dispatch-completion record seals the exact intent, response, and result bytes after authority
+verification. Any later authority failure writes a terminal fence. Finalization is itself one-shot:
+it durably reserves a finalization intent before reading evidence, validates exact schemas and
+cross-record hashes, enforces canonical UTC ordering within a 30-minute window, and accepts only a
+post-observation with identical source, deployment, access, empty environment-key set, bindings,
+and package identities. A malformed or premature finalization cannot be repaired and retried. The
+controller rejects noncanonical roots as qualification evidence and bounds response bytes.
 
 The response contains table names, table DDL, DDL hashes, normalized foreign keys, exact row
 counts, and canonically sorted view names. It never returns view SQL. It re-reads the full catalog

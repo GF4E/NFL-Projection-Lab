@@ -18,6 +18,7 @@ import {
   createOs01StagingCensusControlPlaneObservation,
   os01StagingCensusControllerTestOnly,
   runOs01StagingCensusController,
+  type ControlPlaneObservationInput,
   type ResponseValidationIdentity
 } from "../scripts/os01_staging_census_controller";
 
@@ -46,8 +47,8 @@ function paths(directory: string) {
     >;
 }
 
-function observation(phase: "pre" | "post") {
-  return createOs01StagingCensusControlPlaneObservation({
+function observationInput(phase: "pre" | "post"): ControlPlaneObservationInput {
+  return {
     phase,
     sourceCommit: "a".repeat(40),
     sourceTree: "b".repeat(40),
@@ -64,16 +65,32 @@ function observation(phase: "pre" | "post") {
     environmentRevision: 0,
     environmentKeyNames: [],
     recordedAt: phase === "pre" ? "2026-08-29T08:00:00.000Z" : "2026-08-29T08:01:00.000Z"
-  });
+  };
+}
+
+function observation(phase: "pre" | "post") {
+  return createOs01StagingCensusControlPlaneObservation(observationInput(phase));
 }
 
 function writeJson(path: string, value: unknown): void {
   writeFileSync(path, JSON.stringify(value, null, 2) + "\n", { encoding: "utf8", flag: "wx", mode: 0o600 });
 }
 
+function replaceHashedJson(path: string, hashKey: string, mutate: (value: Record<string, unknown>) => void): void {
+  const value = JSON.parse(readFileSync(path, "utf8")) as Record<string, unknown>;
+  delete value[hashKey];
+  mutate(value);
+  value[hashKey] = sha256(canonicalJson(value));
+  writeFileSync(path, JSON.stringify(value, null, 2) + "\n", { encoding: "utf8", flag: "w", mode: 0o600 });
+}
+
 function prepareRoot(): { root: string; artifacts: ReturnType<typeof paths> } {
   const root = privateDirectory();
   const artifacts = paths(root);
+  os01StagingCensusControllerTestOnly.initialize(
+    root,
+    () => new Date("2026-08-29T07:59:59.000Z")
+  );
   writeJson(artifacts.preObservation, observation("pre"));
   return { root, artifacts };
 }
@@ -141,9 +158,11 @@ describe("OS-01 staging census controller", () => {
     type PublicInput = Parameters<typeof runOs01StagingCensusController>[0];
     expectTypeOf<PublicInput>().toEqualTypeOf<{
       authorizationToken: string;
-      transport?: (request: Request) => Promise<Response>;
-      now?: () => Date;
     }>();
+    expect(() => createOs01StagingCensusControlPlaneObservation({
+      ...observationInput("pre"),
+      environmentKeyNames: ["ENGINE_OS_CAPTURE_ENABLED"]
+    })).toThrow();
   });
 
   it("reserves intent, response, and result before one exact transport call and remains pending", async () => {
@@ -180,9 +199,12 @@ describe("OS-01 staging census controller", () => {
       retryAllowedAfterReservation: false,
       credentialKind: "ephemeral_sites_siwe_not_persisted"
     });
-    expect(() => os01StagingCensusControllerTestOnly.finalize(root)).toThrow();
+    expect(statSync(artifacts.dispatchCompletion).size).toBeGreaterThan(0);
     writeJson(artifacts.postObservation, observation("post"));
-    expect(os01StagingCensusControllerTestOnly.finalize(root)).toMatchObject({
+    expect(os01StagingCensusControllerTestOnly.finalize(
+      root,
+      () => new Date("2026-08-29T08:02:00.000Z")
+    )).toMatchObject({
       status: "test_only_postcheck_verified",
       identitiesMatch: true,
       workerReadOnlyReceiptVerified: true
@@ -201,12 +223,14 @@ describe("OS-01 staging census controller", () => {
       os01StagingCensusControllerTestOnly.run({
         root,
         authorizationToken: "token-one",
+        now: () => new Date("2026-08-29T08:00:01.000Z"),
         transport,
         responseValidation: defaultValidation
       }),
       os01StagingCensusControllerTestOnly.run({
         root,
         authorizationToken: "token-two",
+        now: () => new Date("2026-08-29T08:00:01.000Z"),
         transport,
         responseValidation: defaultValidation
       })
@@ -216,11 +240,33 @@ describe("OS-01 staging census controller", () => {
     expect(results.filter((result) => result.status === "rejected")).toHaveLength(1);
   });
 
+  it("terminally consumes an attempted finalization before post-observation evidence exists", async () => {
+    const { root, artifacts } = prepareRoot();
+    await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => acceptedResponse()
+    });
+    expect(() => os01StagingCensusControllerTestOnly.finalize(
+      root,
+      () => new Date("2026-08-29T08:00:02.000Z")
+    )).toThrow();
+    expect(statSync(artifacts.finalizationIntent).size).toBeGreaterThan(0);
+    writeJson(artifacts.postObservation, observation("post"));
+    expect(() => os01StagingCensusControllerTestOnly.finalize(
+      root,
+      () => new Date("2026-08-29T08:02:00.000Z")
+    )).toThrow("finalization authority already consumed");
+  });
+
   it("consumes the intent after transport uncertainty and prohibits a retry", async () => {
     const { root } = prepareRoot();
     const first = await os01StagingCensusControllerTestOnly.run({
       root,
       authorizationToken: "token-one",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
       responseValidation: defaultValidation,
       transport: async () => {
         throw new Error("uncertain transport");
@@ -232,6 +278,7 @@ describe("OS-01 staging census controller", () => {
     await expect(os01StagingCensusControllerTestOnly.run({
       root,
       authorizationToken: "token-two",
+      now: () => new Date("2026-08-29T08:00:02.000Z"),
       responseValidation: defaultValidation,
       transport: async () => {
         retryCalls += 1;
@@ -248,6 +295,7 @@ describe("OS-01 staging census controller", () => {
     await expect(os01StagingCensusControllerTestOnly.run({
       root,
       authorizationToken: "token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
       responseValidation: defaultValidation,
       transport: async () => {
         calls += 1;
@@ -257,12 +305,74 @@ describe("OS-01 staging census controller", () => {
     expect(calls).toBe(0);
   });
 
+  it("preserves durable authority and never dispatches after a blank intent crash artifact", async () => {
+    const { root, artifacts } = prepareRoot();
+    writeFileSync(artifacts.intent, "", { flag: "wx", mode: 0o600 });
+    let calls = 0;
+    await expect(os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => {
+        calls += 1;
+        return acceptedResponse();
+      }
+    })).rejects.toThrow();
+    expect(calls).toBe(0);
+    expect(JSON.parse(readFileSync(artifacts.authority, "utf8"))).toMatchObject({
+      status: "initialized_no_dispatch",
+      retryAfterAnyIntentOrOutputArtifact: false
+    });
+  });
+
+  it("prohibits dispatch when a post-observation already exists", async () => {
+    const { root, artifacts } = prepareRoot();
+    writeJson(artifacts.postObservation, observation("post"));
+    let calls = 0;
+    await expect(os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => {
+        calls += 1;
+        return acceptedResponse();
+      }
+    })).rejects.toThrow();
+    expect(calls).toBe(0);
+  });
+
+  it("writes a terminal fence when postcheck authority appears during dispatch", async () => {
+    const { root, artifacts } = prepareRoot();
+    await expect(os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => {
+        writeJson(artifacts.postObservation, observation("post"));
+        return acceptedResponse();
+      }
+    })).rejects.toThrow();
+    expect(JSON.parse(readFileSync(artifacts.terminalFence, "utf8"))).toMatchObject({
+      status: "terminal_artifact_authority_violation",
+      retryAllowed: false
+    });
+    expect(statSync(artifacts.dispatchCompletion).size).toBe(0);
+    expect(() => os01StagingCensusControllerTestOnly.finalize(
+      root,
+      () => new Date("2026-08-29T08:02:00.000Z")
+    )).toThrow("terminally fenced");
+  });
+
   it("never persists a response that reflects the ephemeral credential", async () => {
     const { root, artifacts } = prepareRoot();
     const token = "credential-must-not-be-written";
     const result = await os01StagingCensusControllerTestOnly.run({
       root,
       authorizationToken: token,
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
       responseValidation: defaultValidation,
       transport: async () => new Response(JSON.stringify({ reflected: token }), {
         status: 200,
@@ -272,6 +382,83 @@ describe("OS-01 staging census controller", () => {
     expect(result.status).toBe("terminal_credential_reflection");
     expect(statSync(artifacts.response).size).toBe(0);
     expect(readFileSync(artifacts.attemptResult, "utf8")).not.toContain(token);
+  });
+
+  it("does not persist a schema-invalid response even when the credential is encoded", async () => {
+    const { root, artifacts } = prepareRoot();
+    const token = "credential-must-not-be-encoded";
+    const result = await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: token,
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => Response.json({ encoded: Buffer.from(token).toString("base64") })
+    });
+    expect(result.status).toBe("terminal_invalid_response");
+    expect(statSync(artifacts.response).size).toBe(0);
+  });
+
+  it("rejects a self-hashed but cross-record-inconsistent intent", async () => {
+    const { root, artifacts } = prepareRoot();
+    await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => acceptedResponse()
+    });
+    replaceHashedJson(artifacts.intent, "intentHash", (intent) => {
+      intent.attemptId = "11111111-1111-4111-8111-111111111111";
+    });
+    writeJson(artifacts.postObservation, observation("post"));
+    expect(os01StagingCensusControllerTestOnly.finalize(
+      root,
+      () => new Date("2026-08-29T08:02:00.000Z")
+    )).toMatchObject({
+      status: "test_only_postcheck_rejected",
+      crossRecordBindingsVerified: false
+    });
+  });
+
+  it("rejects reversed control-plane observation time", async () => {
+    const { root, artifacts } = prepareRoot();
+    await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => acceptedResponse()
+    });
+    writeJson(artifacts.postObservation, createOs01StagingCensusControlPlaneObservation({
+      ...observationInput("post"),
+      recordedAt: "2026-08-29T07:59:58.000Z"
+    }));
+    expect(os01StagingCensusControllerTestOnly.finalize(
+      root,
+      () => new Date("2026-08-29T08:02:00.000Z")
+    )).toMatchObject({
+      status: "test_only_postcheck_rejected",
+      temporalOrderValid: false
+    });
+  });
+
+  it("rejects an exact-schema violation even when its self-hash is recomputed", async () => {
+    const { root, artifacts } = prepareRoot();
+    await os01StagingCensusControllerTestOnly.run({
+      root,
+      authorizationToken: "token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
+      responseValidation: defaultValidation,
+      transport: async () => acceptedResponse()
+    });
+    replaceHashedJson(artifacts.attemptResult, "resultHash", (result) => {
+      result.unexpected = true;
+    });
+    writeJson(artifacts.postObservation, observation("post"));
+    expect(() => os01StagingCensusControllerTestOnly.finalize(
+      root,
+      () => new Date("2026-08-29T08:02:00.000Z")
+    )).toThrow("staging census finalization evidence is invalid");
   });
 
   it("passes an actual worker response through controller validation and postcheck finalization", async () => {
@@ -310,6 +497,7 @@ describe("OS-01 staging census controller", () => {
     const result = await os01StagingCensusControllerTestOnly.run({
       root,
       authorizationToken: "integration-token",
+      now: () => new Date("2026-08-29T08:00:01.000Z"),
       responseValidation: validation,
       transport: async (request) => handleOs01StagingCensus(request, db as never, {
         expectedOrigin: STAGING_CENSUS_SEMANTIC_CONTRACT.origin,
@@ -321,9 +509,17 @@ describe("OS-01 staging census controller", () => {
     expect(result.status).toBe("pending_control_plane_postcheck");
     expect(result.responseBytesSha256).toBe(sha256(readFileSync(artifacts.response)));
     writeJson(artifacts.postObservation, observation("post"));
-    expect(os01StagingCensusControllerTestOnly.finalize(root)).toMatchObject({
+    const finalReceipt = os01StagingCensusControllerTestOnly.finalize(
+      root,
+      () => new Date("2026-08-29T08:02:00.000Z"),
+      validation
+    );
+    expect(finalReceipt).toMatchObject({
       status: "test_only_postcheck_verified",
-      identitiesMatch: true
+      identitiesMatch: true,
+      temporalOrderValid: true,
+      crossRecordBindingsVerified: true,
+      workerReadOnlyReceiptVerified: true
     });
   });
 });

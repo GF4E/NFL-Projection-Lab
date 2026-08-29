@@ -45,6 +45,7 @@ export async function buildOs01StagingCensus(input: { projectId: string; outDir:
   }
   await build({
     configFile: false,
+    envFile: false,
     logLevel: "warn",
     publicDir: false,
     build: {

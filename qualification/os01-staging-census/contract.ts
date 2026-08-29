@@ -52,11 +52,15 @@ export const STAGING_CENSUS_EXACT_BODY_SHA256 =
 export const STAGING_CENSUS_CONTROLLER_ROOT =
   `/private/tmp/engine-os-os01-staging-census-${STAGING_CENSUS_ID}`;
 export const STAGING_CENSUS_ARTIFACT_NAMES = Object.freeze({
+  authority: "authority.json",
   preObservation: "control-plane-pre.json",
   intent: "intent.json",
   response: "response.json",
   attemptResult: "attempt-result.json",
+  dispatchCompletion: "dispatch-completion.json",
+  terminalFence: "terminal-fence.json",
   postObservation: "control-plane-post.json",
+  finalizationIntent: "finalization-intent.json",
   finalReceipt: "final-receipt.json"
 });
 
