@@ -1,0 +1,28 @@
+{
+  "version": "engine-os.os01-hosted-migration-diagnostic-v1-live-rejection-receipt.v1",
+  "status": "rejected_diagnostic_transport",
+  "scope": "isolated_owner_only_blank_d1_replay",
+  "sourceCommit": "bd1464699963a586d3ffd74ca4d0a01cc9579f0f",
+  "projectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "versionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_77994fa4a9bc81918104c4a9d888893d",
+  "deploymentId": "appgdep_6a9256f7a2008191bdea55ada2acb0f9",
+  "request": {
+    "action": "blank_replay",
+    "qualificationId": "eaccc7cf918689eddba910161de0af0770e95b4313627ee0ca889c9666109efd",
+    "httpStatus": 500,
+    "workerRequestId": "6d21b7cb55ce5fd7015683e3b3a113ff",
+    "wallTimeMilliseconds": 165,
+    "responseSha256": "02bc538377738a19dda7d8c6bfabb2cf6e56be98008e976c216a470e9055a98a",
+    "responseBytes": 32
+  },
+  "postcondition": {
+    "userTables": [],
+    "atomicRollbackPreserved": true
+  },
+  "reason": "console_diagnostic_not_exposed_by_the_bounded_sites_log_projection",
+  "acceptedEvidence": false,
+  "providerDispatches": 0,
+  "providerBindingReads": 0,
+  "captureActivations": 0,
+  "productionMutations": 0
+}

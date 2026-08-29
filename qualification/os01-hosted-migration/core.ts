@@ -176,7 +176,8 @@ class HarnessError extends Error {
   constructor(
     readonly code: string,
     readonly status: number,
-    readonly diagnostic?: HostedQualificationDiagnostic
+    readonly diagnostic?: HostedQualificationDiagnostic,
+    readonly diagnosticDetail?: string
   ) {
     super(code);
   }
@@ -731,6 +732,9 @@ async function executeAtomicBatch(db: D1Database, statements: readonly Migration
     if (isD1MultipleStatementFailure(error)) {
       throw new HarnessError("qualification_failed", 500, "d1_prepare_multiple_statements");
     }
+    if (d1FailureText(error).includes("__os01_intentional_missing_table_v1")) {
+      throw error;
+    }
     // Diagnostic-only successor for the isolated owner-only harness. The v4
     // response deliberately collapsed batch failures to a generic code, which
     // made the second atomic rollback impossible to reduce. This log contains
@@ -740,7 +744,12 @@ async function executeAtomicBatch(db: D1Database, statements: readonly Migration
       event: "os01_hosted_blank_batch_rejected",
       message: d1FailureText(error).slice(0, 2_048)
     }));
-    throw error;
+    throw new HarnessError(
+      "qualification_failed",
+      500,
+      "d1_prepare_rejected",
+      d1FailureText(error).slice(0, 2_048)
+    );
   }
 }
 
@@ -1266,9 +1275,11 @@ function errorResponse(error: unknown): Response {
   const status = error instanceof HarnessError ? error.status : 500;
   const code = error instanceof HarnessError ? error.code : "qualification_failed";
   const diagnostic = error instanceof HarnessError ? error.diagnostic : undefined;
+  const diagnosticDetail = error instanceof HarnessError ? error.diagnosticDetail : undefined;
   return new Response(stableHostedJson({
     error: code,
-    ...(diagnostic ? { diagnostic } : {})
+    ...(diagnostic ? { diagnostic } : {}),
+    ...(diagnosticDetail ? { diagnosticDetail } : {})
   }), { status, headers: headers() });
 }
 

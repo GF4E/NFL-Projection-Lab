@@ -457,7 +457,11 @@ describe("OS-01 standalone hosted migration harness", () => {
       candidate as unknown as Os01HostedMigrationAuthority
     );
     expect(rejected.response.status).toBe(500);
-    expect(rejected.body).toEqual({ error: "qualification_failed" });
+    expect(rejected.body).toEqual({
+      error: "qualification_failed",
+      diagnostic: "d1_prepare_rejected",
+      diagnosticDetail: "check constraint failed: exact = 1"
+    });
     expect(sqlite.prepare("SELECT count(*) AS count FROM sqlite_schema WHERE type = 'table'").get())
       .toEqual({ count: 0 });
     sqlite.close();
