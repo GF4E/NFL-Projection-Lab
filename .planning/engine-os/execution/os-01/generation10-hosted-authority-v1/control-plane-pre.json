@@ -1,0 +1,57 @@
+{
+  "version": "engine-os.os01-staging-census-control-plane-observation.v1",
+  "phase": "pre",
+  "qualificationId": "525370dfc8d64ef549f8c76186c2846fe97ac5beca48d3671cda25a0a0fa5f74",
+  "controllerAuthorityId": "379588dc6e7ed0e7445e2fe78788b3f7143a4947ad524c066191cdd336a002aa",
+  "projectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "origin": "https://os01-d1-capacity-probe-two-20260829.psoiawesome.chatgpt.site",
+  "source": {
+    "commit": "4df3a7aa4bf75c45e750c011f78eb1e59612b9da",
+    "tree": "4151191b4036a86c379077dbb24173cf45fe3794"
+  },
+  "deployment": {
+    "versionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_79143247f6988191911e7b2283468c62",
+    "versionNumber": 20,
+    "deploymentId": "appgdep_6a92d50130d48191be824c41a896090a",
+    "status": "succeeded",
+    "url": "https://os01-d1-capacity-probe-two-20260829.psoiawesome.chatgpt.site"
+  },
+  "package": {
+    "workerSha256": "7c8c0d171182959e4df9fe5f278200039f4b4a13b272adc1c11ec8ca7da12d94",
+    "manifestSha256": "b20cc102cde9d3d1caaf2cd2104a0000848c7372ddd7680dc27450a992fac9fb",
+    "archiveSha256": "48eebe9ff440811101aacdd3c56639ce1fc5201ed792000e40a4cccd842afb64",
+    "archiveFileListRoot": "a94a7adf24d59819d1caff2fec9fc1c4e221aec3e7ab9326b1235c1935874f39",
+    "archiveContentRoot": "273a48f63bc819f7e07dd58082dd5b6b4caac6c8967b16b02d1a89db88b149a1",
+    "archiveFileCount": 2,
+    "archiveBytes": 5061,
+    "uploadMethodIdentity": "sites_save_site_version_exact_local_archive",
+    "remoteBuildRequested": false,
+    "censusRoute": "/__engine-os/os01-staging-census/v4",
+    "mutationRoutes": 0
+  },
+  "access": {
+    "mode": "custom",
+    "revision": 1,
+    "currentUserRole": "owner",
+    "ownerCount": 1,
+    "editorCount": 0,
+    "viewerCount": 0,
+    "groupCount": 0,
+    "externalVisitorCount": 0,
+    "ownerIdentityHash": "b0f350ebf43747b25023cf0442b2a94b7593e25c929d1003729b3382bf64ba23"
+  },
+  "environment": {
+    "revision": 0,
+    "keyNames": [],
+    "captureEnabledKeyPresent": false
+  },
+  "bindings": {
+    "d1": "DB",
+    "r2": null,
+    "providerBindings": 0,
+    "scheduledTriggers": 0
+  },
+  "exclusiveHostAssumption": "single_owner_no_concurrent_writer_during_controller_window",
+  "recordedAt": "2026-08-29T12:50:16.204Z",
+  "observationHash": "866d11d25d68351b89568c601da17131e989cf55015a05bbec728b31a736999f"
+}
