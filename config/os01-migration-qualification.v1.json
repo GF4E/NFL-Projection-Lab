@@ -44,8 +44,10 @@
   },
   "atomicityProtocol": {
     "migrationUnit": "entire_authorized_range_in_one_transaction",
+    "migrationOrder": "exact_contract_order_with_missing_duplicate_reordered_or_unknown_path_rejected_before_begin",
     "partialFailureBehavior": "rollback_entire_range",
-    "terminalReceiptFailureBehavior": "rollback_entire_range"
+    "terminalReceiptFailureBehavior": "receipt_and_all_terminal_evidence_verify_inside_the_transaction_before_commit",
+    "postCommitBehavior": "return_only_precomputed_verified_result_without_database_reads_or_writes"
   },
   "backupRestoreProtocol": {
     "qualificationResource": "isolated_file_backed_sqlite",

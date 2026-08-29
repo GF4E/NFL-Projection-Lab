@@ -42,6 +42,7 @@ export type MigrationRunOptions = {
     objectCounts: CommittedManifest["counts"];
   };
   expectedFinalManifest: CommittedManifest;
+  expectedMigrationPaths: readonly string[];
   expectedMigrationByteHashes: Readonly<Record<string, string>>;
   expectedReceiptAdditions: ReadonlyArray<{
     version: string;
@@ -280,6 +281,9 @@ export function applyQualifiedMigrationRange(
   paths: readonly string[],
   options: MigrationRunOptions
 ): MigrationRunResult {
+  if (stableJson(paths) !== stableJson(options.expectedMigrationPaths)) {
+    throw new Error("OS-01 migration range is missing, duplicated, or out of order");
+  }
   assertMigrationBytes(paths, options.expectedMigrationByteHashes);
   const before = captureDatabaseEvidence(db, `pre:${claim.claimHash}`);
   if (before.schema.schemaFingerprint !== claim.schemaFingerprint || before.rowsHash !== claim.rowsHash ||
@@ -319,17 +323,18 @@ export function applyQualifiedMigrationRange(
       throw new Error("OS-01 terminal database contains foreign-key violations");
     }
     assertPreserved(before, after, db, options.expectedReceiptAdditions);
-    db.exec("COMMIT");
-    const committed = captureDatabaseEvidence(db, options.expectedFinalManifest.migrationSetHash);
-    return {
+    const terminal = captureDatabaseEvidence(db, options.expectedFinalManifest.migrationSetHash);
+    const result: MigrationRunResult = {
       preflightClaimHash: claim.claimHash,
-      finalSchemaFingerprint: committed.schema.schemaFingerprint,
-      finalRowsHash: committed.rowsHash,
-      finalCounts: committed.schema.counts,
-      foreignKeyViolationCount: committed.foreignKeyViolations.length,
+      finalSchemaFingerprint: terminal.schema.schemaFingerprint,
+      finalRowsHash: terminal.rowsHash,
+      finalCounts: terminal.schema.counts,
+      foreignKeyViolationCount: terminal.foreignKeyViolations.length,
       appliedMigrationPaths: [...paths],
       appliedStatementCount: globalStatementIndex
     };
+    db.exec("COMMIT");
+    return result;
   } catch (error) {
     if (db.isTransaction) db.exec("ROLLBACK");
     throw error;

@@ -71,6 +71,7 @@ function options(
       objectCounts: prestate.objectCounts
     },
     expectedFinalManifest: terminalManifest,
+    expectedMigrationPaths: prestate.id === "blank_ordered_chain" ? paths : successors,
     expectedMigrationByteHashes: expectedHashes,
     expectedReceiptAdditions: receiptAdditions,
     ...overrides
@@ -208,6 +209,22 @@ describe("OS-01 isolated migration qualification path", () => {
     db.close();
   });
 
+  it("rejects a reordered migration range before BEGIN IMMEDIATE", () => {
+    const db = legacyDatabase();
+    const before = evidence(db, "legacy");
+    const beforeState = schemaAndRows(db, "legacy");
+    const reordered = [successors[1]!, successors[0]!, ...successors.slice(2)];
+    expect(() => applyQualifiedMigrationRange(
+      db,
+      preflightClaim(before, "ordered_through_0016_legacy_29"),
+      reordered,
+      options(legacyPrestate, successorReceiptAdditions)
+    )).toThrow(/missing, duplicated, or out of order/u);
+    expect(schemaAndRows(db, "legacy")).toBe(beforeState);
+    expect(db.isTransaction).toBe(false);
+    db.close();
+  });
+
   it("revalidates under BEGIN IMMEDIATE and rolls back a just-in-time prestate mutation", () => {
     const db = legacyDatabase();
     const before = evidence(db, "legacy");
@@ -282,6 +299,27 @@ describe("OS-01 isolated migration qualification path", () => {
     expect(db.prepare("SELECT profit_cents FROM plays WHERE id = 'legacy-preserved'").get())
       .toEqual({ profit_cents: 2381 });
     db.close();
+  });
+
+  it("performs no fallible database evidence read after COMMIT", () => {
+    const db = legacyDatabase();
+    const before = evidence(db, "legacy");
+    const originalExec = db.exec.bind(db);
+    Object.defineProperty(db, "exec", {
+      configurable: true,
+      value: (statement: string) => {
+        originalExec(statement);
+        if (statement === "COMMIT") db.close();
+      }
+    });
+    const result = applyQualifiedMigrationRange(
+      db,
+      preflightClaim(before, "ordered_through_0016_legacy_29"),
+      successors,
+      options(legacyPrestate, successorReceiptAdditions)
+    );
+    expect(result.finalSchemaFingerprint).toBe(terminalManifest.schemaFingerprint);
+    expect(result.finalCounts).toEqual({ table: 93, index: 80, trigger: 76, view: 0 });
   });
 
   it("proves an online backup restores the exact prestate and rejects corrupt backup bytes", async () => {
