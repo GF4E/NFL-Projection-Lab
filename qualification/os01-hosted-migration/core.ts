@@ -47,12 +47,22 @@ type ObjectType = "index" | "table" | "trigger" | "view";
 type HostedAction =
   | "blank_replay"
   | "blank_prefix_probe"
+  | "blank_component_probe"
   | "legacy_prepare_export"
   | "legacy_forward"
   | "restore_import"
   | "failure_probe"
   | "verify_blank_terminal"
   | "verify_legacy_terminal";
+
+type BlankComponentProbePhase =
+  | "sentinel_only"
+  | "reserved_create_then_sentinel"
+  | "plain_create_then_sentinel"
+  | "reserved_simple_then_sentinel"
+  | "reserved_schema_then_sentinel"
+  | "reserved_catalog_then_sentinel"
+  | "reserved_full_guard_then_sentinel";
 
 type CatalogIdentity = {
   type: ObjectType;
@@ -115,6 +125,7 @@ type QualificationRequest = {
   action: HostedAction;
   qualificationId: string;
   prefixStatementCount?: number;
+  componentProbePhase?: BlankComponentProbePhase;
   backup?: Os01LogicalBackup;
 };
 
@@ -1078,6 +1089,7 @@ async function verifyLegacyProjection(
 function requestKeys(action: HostedAction): readonly string[] {
   const base = ["action", "qualificationId", "version"];
   if (action === "blank_prefix_probe") return [...base, "prefixStatementCount"];
+  if (action === "blank_component_probe") return [...base, "componentProbePhase"];
   if (["legacy_forward", "restore_import", "failure_probe", "verify_legacy_terminal"].includes(action)) {
     return [...base, "backup"];
   }
@@ -1090,6 +1102,7 @@ function parseQualificationRequest(value: unknown): QualificationRequest {
   const actions: HostedAction[] = [
     "blank_replay",
     "blank_prefix_probe",
+    "blank_component_probe",
     "legacy_prepare_export",
     "legacy_forward",
     "restore_import",
@@ -1109,12 +1122,29 @@ function parseQualificationRequest(value: unknown): QualificationRequest {
         Number(record.prefixStatementCount) < 0 || Number(record.prefixStatementCount) > 291)) {
     throw new HarnessError("invalid_request", 400);
   }
+  const componentProbePhases: BlankComponentProbePhase[] = [
+    "sentinel_only",
+    "reserved_create_then_sentinel",
+    "plain_create_then_sentinel",
+    "reserved_simple_then_sentinel",
+    "reserved_schema_then_sentinel",
+    "reserved_catalog_then_sentinel",
+    "reserved_full_guard_then_sentinel"
+  ];
+  if (action === "blank_component_probe" &&
+      (typeof record.componentProbePhase !== "string" ||
+        !componentProbePhases.includes(record.componentProbePhase as BlankComponentProbePhase))) {
+    throw new HarnessError("invalid_request", 400);
+  }
   return {
     version: record.version,
     action,
     qualificationId: record.qualificationId,
     ...(action === "blank_prefix_probe"
       ? { prefixStatementCount: Number(record.prefixStatementCount) }
+      : {}),
+    ...(action === "blank_component_probe"
+      ? { componentProbePhase: record.componentProbePhase as BlankComponentProbePhase }
       : {}),
     ...(record.backup === undefined ? {} : { backup: record.backup as Os01LogicalBackup })
   };
@@ -1202,6 +1232,77 @@ async function performAction(
         : failureDetail.includes("sqlite_auth") ? "sqlite_auth" : "other",
       lastMigrationPath: last?.migrationPath ?? null,
       lastGlobalStatementIndex: last?.globalStatementIndex ?? null,
+      stateUnchanged: true,
+      beforeStateHash: beforeHash,
+      afterStateHash: afterHash,
+      claimBoundary: "diagnostic_only_not_qualification_evidence"
+    });
+  }
+
+  if (request.action === "blank_component_probe") {
+    assertState(initial, authority.supportedStates.blank);
+    const phase = request.componentProbePhase!;
+    const intentionalRollbackTable = "__os01_intentional_missing_table_v1";
+    const plainGuardTable = "os01_hosted_migration_guard_probe_v1";
+    const catalog = guardCatalogPredicate(initial.catalog, true);
+    const sentinel: MigrationStatement = { sql: `SELECT value FROM ${intentionalRollbackTable}` };
+    const phaseStatements: Record<BlankComponentProbePhase, MigrationStatement[]> = {
+      sentinel_only: [sentinel],
+      reserved_create_then_sentinel: [createGuard(), sentinel],
+      plain_create_then_sentinel: [
+        { sql: `CREATE TABLE ${quote(plainGuardTable)} (exact integer NOT NULL CHECK (exact = 1))` },
+        sentinel
+      ],
+      reserved_simple_then_sentinel: [
+        createGuard(),
+        { sql: `INSERT INTO ${quote(GUARD_TABLE)} (exact) VALUES (1)` },
+        sentinel
+      ],
+      reserved_schema_then_sentinel: [
+        createGuard(),
+        {
+          sql: `INSERT INTO ${quote(GUARD_TABLE)} (exact)
+            SELECT CASE WHEN (SELECT schema_version FROM pragma_schema_version) = ? THEN 1 ELSE 0 END`,
+          bindings: [initial.catalog.schemaVersion + 1]
+        },
+        sentinel
+      ],
+      reserved_catalog_then_sentinel: [
+        createGuard(),
+        {
+          sql: `INSERT INTO ${quote(GUARD_TABLE)} (exact)
+            SELECT CASE WHEN ${catalog.sql} THEN 1 ELSE 0 END`,
+          bindings: catalog.bindings
+        },
+        sentinel
+      ],
+      reserved_full_guard_then_sentinel: [
+        createGuard(),
+        guardInsert(initial, { checkSchemaVersion: true, excludeGuard: true }),
+        sentinel
+      ]
+    };
+    let failureDetail = "";
+    try {
+      await executeAtomicBatch(db, phaseStatements[phase]);
+    } catch (error) {
+      failureDetail = error instanceof HarnessError
+        ? error.diagnosticDetail ?? error.message
+        : d1FailureText(error);
+    }
+    const authorizedPhase = failureDetail.includes(intentionalRollbackTable);
+    const after = await captureHostedState(db);
+    assertState(after, authority.supportedStates.blank);
+    const beforeHash = await hostedSha256(stableHostedJson(initial));
+    const afterHash = await hostedSha256(stableHostedJson(after));
+    if (beforeHash !== afterHash) throw new HarnessError("component_probe_changed_state", 500);
+    return receipt(request, {
+      result: "blank_component_probe_state_unchanged",
+      componentProbePhase: phase,
+      authorizedPhase,
+      failureClass: authorizedPhase
+        ? "intentional_rollback"
+        : failureDetail.includes("sqlite_auth") ? "sqlite_auth" : "other",
       stateUnchanged: true,
       beforeStateHash: beforeHash,
       afterStateHash: afterHash,
@@ -1376,6 +1477,7 @@ export const os01HostedMigrationHarnessContract = Object.freeze({
   actions: Object.freeze([
     "blank_replay",
     "blank_prefix_probe",
+    "blank_component_probe",
     "legacy_prepare_export",
     "legacy_forward",
     "restore_import",

@@ -1,0 +1,44 @@
+{
+  "version": "engine-os.os01-hosted-migration-diagnostic-v4-live-rejection-receipt.v1",
+  "status": "zero_migration_guard_batch_rejected",
+  "scope": "isolated_owner_only_blank_d1_prefix_diagnostic",
+  "observedAt": "2026-08-29T04:24:23Z",
+  "sourceCommit": "3b9a7e5d02a932bfa43d6640d3ae16b7dfef4a72",
+  "sourceTree": "5a9a17c263617389d9ab38dccddb743b9367b82e",
+  "projectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "versionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_8149e056aadc8191ae9d553be2bb545b",
+  "deploymentId": "appgdep_6a925c64ea7081918cbf565ab0e90716",
+  "probes": [
+    {
+      "prefixStatementCount": 0,
+      "qualificationId": "08515e54a700e030305456d505d86ea7746691e3842d06a7ab5633e6f389d3c1",
+      "requestSha256": "d0184919bef16c33a4944f1f6944742d222f8774626d7ddef2248ea8613231d2",
+      "httpStatus": 500,
+      "responseSha256": "187b807db37eb524878fb2312c2c3143ded0b6c971cfee4284c85a237481e68a",
+      "responseBytes": 91,
+      "diagnosticDetail": "d1_error: not authorized: sqlite_auth"
+    },
+    {
+      "prefixStatementCount": 291,
+      "qualificationId": "98b8c2778a93bee4a131f1a6ffb8baede282c9f10d20a39ccb089e6ef8b2aaa7",
+      "requestSha256": "c4536e2272f0875b95505d08af670cc624b8a725f37059d5c95d774efac2e270",
+      "httpStatus": 500,
+      "responseSha256": "187b807db37eb524878fb2312c2c3143ded0b6c971cfee4284c85a237481e68a",
+      "responseBytes": 91,
+      "diagnosticDetail": "d1_error: not authorized: sqlite_auth"
+    }
+  ],
+  "inference": "The hosted rejection occurs before any migration statement is required; the zero-migration guard batch must be reduced before another migration candidate can qualify.",
+  "postcondition": {
+    "binding": "DB",
+    "userTables": [],
+    "tableCount": 0,
+    "atomicRollbackPreservedBlankCatalog": true
+  },
+  "acceptedEvidence": false,
+  "providerDispatches": 0,
+  "providerBindingReads": 0,
+  "quotaReservations": 0,
+  "captureActivations": 0,
+  "productionMutations": 0
+}

@@ -189,7 +189,52 @@ async function invokePrefix(
   return { response, body: await response.json() as Record<string, unknown> };
 }
 
+async function invokeComponentProbe(
+  d1: D1Database,
+  componentProbePhase: string
+): Promise<{ response: Response; body: Record<string, unknown> }> {
+  const request = new Request("https://owner-only.example.test/__engine-os/os01-hosted-migration/v1", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      version: "engine-os.os01-hosted-migration-request.v1",
+      action: "blank_component_probe",
+      qualificationId,
+      componentProbePhase
+    })
+  });
+  const response = await handleOs01HostedMigrationQualification(request, d1, authority);
+  return { response, body: await response.json() as Record<string, unknown> };
+}
+
 describe("OS-01 standalone hosted migration harness", () => {
+  it("keeps every bounded zero-migration component probe diagnostic and state-neutral", async () => {
+    const phases = [
+      "sentinel_only",
+      "reserved_create_then_sentinel",
+      "plain_create_then_sentinel",
+      "reserved_simple_then_sentinel",
+      "reserved_schema_then_sentinel",
+      "reserved_catalog_then_sentinel",
+      "reserved_full_guard_then_sentinel"
+    ];
+    for (const phase of phases) {
+      const { sqlite, d1 } = database();
+      const probed = await invokeComponentProbe(d1, phase);
+      expect(probed.response.status, `${phase}: ${JSON.stringify(probed.body)}`).toBe(200);
+      expect(probed.body).toMatchObject({
+        result: "blank_component_probe_state_unchanged",
+        componentProbePhase: phase,
+        authorizedPhase: true,
+        stateUnchanged: true,
+        claimBoundary: "diagnostic_only_not_qualification_evidence"
+      });
+      expect(sqlite.prepare("SELECT count(*) AS count FROM sqlite_schema WHERE type = 'table'").get())
+        .toEqual({ count: 0 });
+      sqlite.close();
+    }
+  });
+
   it("rolls back bounded blank-prefix probes without qualifying the migration", async () => {
     for (const count of [0, 145, 291]) {
       const { sqlite, d1 } = database();

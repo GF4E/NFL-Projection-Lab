@@ -1,0 +1,22 @@
+{
+  "version": "os01-hosted-migration-diagnostic.2026.5",
+  "status": "diagnostic_only_not_qualification_evidence",
+  "predecessorSourceCommit": "3b9a7e5d02a932bfa43d6640d3ae16b7dfef4a72",
+  "predecessorReceipt": ".planning/engine-os/execution/os-01/hosted-migration-diagnostic-v4-live-rejection-receipt.v1.json",
+  "exactTemporarySitesProjectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "authorizedAction": "bounded_zero_migration_component_probe_after_each_fresh_owner_only_db_only_zero_table_refresh",
+  "maximumHostedProbeRequestsAcrossV4AndV5": 10,
+  "componentPhases": [
+    "sentinel_only",
+    "reserved_create_then_sentinel",
+    "plain_create_then_sentinel",
+    "reserved_simple_then_sentinel",
+    "reserved_schema_then_sentinel",
+    "reserved_catalog_then_sentinel",
+    "reserved_full_guard_then_sentinel"
+  ],
+  "acceptedEvidenceAllowed": false,
+  "providerAccessAllowed": false,
+  "captureActivationAllowed": false,
+  "productionAllowed": false
+}
