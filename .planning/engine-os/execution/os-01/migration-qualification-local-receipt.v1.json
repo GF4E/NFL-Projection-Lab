@@ -1,0 +1,118 @@
+{
+  "version": "os01-migration-qualification-local-receipt.2026.1",
+  "recordedAt": "2026-08-29T00:25:52Z",
+  "workPackage": "OS-01",
+  "requirement": "ARC-03",
+  "result": "accepted_bounded_local_sqlite_d1_equivalent_mechanism_only",
+  "implementationCommit": "9935a5384d78f7c9d22c7a9d2e21dde9d1114058",
+  "implementationTree": "a87ed2a1dd7b25fad1b59694d7319a8238b0da9d",
+  "terminallyRejectedCandidates": [
+    {
+      "commit": "e9b8c03",
+      "reason": "caller-controlled migration order and post-commit evidence failure"
+    },
+    {
+      "commit": "71d9174",
+      "reason": "caller-controlled path and hash authority"
+    },
+    {
+      "commit": "75fedde",
+      "reason": "hash-then-reopen migration and authority byte TOCTOU"
+    }
+  ],
+  "artifacts": {
+    "contract": {
+      "path": "config/os01-migration-qualification.v1.json",
+      "sha256": "9b5da72706f18670c3ecb67763d18f109cf228b2a56c83f1ea52ff8582882e51"
+    },
+    "runner": {
+      "path": "scripts/os01-migration-qualification.ts",
+      "sha256": "0504d32ed3d08ee0cb8303b9559487e323a68f63cdce3e4f9e01763b07291e3a"
+    },
+    "tests": {
+      "path": "tests/os01-migration-qualification.test.ts",
+      "sha256": "b6eedb6c06181fcca585c08359024965afac215414f87495eb47cf8fcfb34337"
+    },
+    "predecessorAuthority": {
+      "path": "config/d1-schema-authority.v1.json",
+      "sha256": "948dbfd5657c169c01d15d6a6fea08524a321d71852cc3148355c0d4210fcc0d"
+    },
+    "successorAuthority": {
+      "path": "config/d1-schema-authority.v2.json",
+      "sha256": "87db50ad848bdd3ee11a6bc8895b2647b5cda7ad43bc9f49f9954276ead2d04e"
+    },
+    "terminalManifest": {
+      "path": "config/d1-schema-manifest.v1.json",
+      "sha256": "4ca77b123faeeb7f5287994548f969bed35e2be9c6efcf4d88c509fb3d89b47d",
+      "schemaFingerprint": "4d78fd8de47ababbf6d809575a55275a166e8c99b332344b91c885f27eedafd2",
+      "objectCounts": {
+        "table": 93,
+        "index": 80,
+        "trigger": 76,
+        "view": 0
+      }
+    },
+    "journal": {
+      "path": "drizzle/meta/_journal.json",
+      "sha256": "c2f4c41e680cc92e3eb21cb02869e45dae4862e7296e0a72880e5f1026fbe77f"
+    }
+  },
+  "acceptedProofs": [
+    "exact_blank_prestate_and_0000_through_0020_replay",
+    "exact_ordered_through_0016_legacy_29_fixture_and_0017_through_0020_replay",
+    "migration_paths_order_hashes_receipts_prestates_and_terminal_manifest_internally_bound",
+    "single_read_no_follow_authority_and_migration_buffers",
+    "after_quiesce_append_replace_and_delete_execute_only_frozen_bytes",
+    "begin_immediate_prewrite_revalidation_and_concurrent_writer_exclusion",
+    "partial_failure_rolls_back_the_entire_range",
+    "existing_new_and_receipt_table_additional_rows_roll_back",
+    "legacy_row_projection_is_exact_and_new_columns_receive_only_declared_defaults",
+    "terminal_evidence_is_built_before_commit_with_no_postcommit_database_read",
+    "online_backup_exact_copy_to_distinct_restore_and_corruption_rejection",
+    "terminal_93_80_76_fingerprint_and_zero_foreign_key_violations"
+  ],
+  "verification": {
+    "focusedTests": {
+      "files": 1,
+      "passed": 19,
+      "failed": 0
+    },
+    "schemaSuite": {
+      "files": 9,
+      "passed": 63,
+      "failed": 0
+    },
+    "typecheck": "passed",
+    "lint": "passed",
+    "independentAdversarialAudit": "accepted_exact_commit_9935a53"
+  },
+  "forbiddenActivity": {
+    "productionAccess": 0,
+    "providerSecretReads": 0,
+    "providerCalls": 0,
+    "quotaReservations": 0,
+    "captureActivation": 0,
+    "productionForecastChanges": 0,
+    "realRetainedLockAccess": 0
+  },
+  "remainingExternalGates": [
+    "fresh_exact_production_semantic_census",
+    "fresh_exact_production_row_preservation_manifest",
+    "isolated_hosted_blank_replay",
+    "isolated_hosted_exact_live_prestate_replay",
+    "hosted_actual_path_partial_failure_proof",
+    "pre_migration_production_backup_and_restore_drill",
+    "dormant_production_forward_migration",
+    "postmigration_production_semantic_row_and_foreign_key_parity",
+    "independent_final_acceptance_audit"
+  ],
+  "claims": {
+    "os01Accepted": false,
+    "arc03Accepted": false,
+    "hostedQualificationAccepted": false,
+    "productionMigrationAuthorized": false,
+    "productionMigrationApplied": false
+  },
+  "claimBoundary": "This receipt accepts only the bounded local SQLite/D1-equivalent migration mechanism at implementation commit 9935a53. It does not establish the live production prestate, qualify a hosted execution path, accept OS-01 or ARC-03, or authorize any production migration.",
+  "receiptHash": "4fdc199e54866de7e106803c3c1f65aaae048ce3bc036b0cc4f4f75489096efd"
+}
