@@ -517,7 +517,8 @@ function validateObservation(value: unknown, phase: ObservationPhase): value is 
       deploymentRow.status !== "succeeded" ||
       deploymentRow.url !== STAGING_CENSUS_SEMANTIC_CONTRACT.origin ||
       typeof deploymentRow.versionId !== "string" ||
-      !/^appgprj_[a-f0-9]{32}~appgver_[a-f0-9]{32}$/u.test(deploymentRow.versionId) ||
+      !new RegExp("^" + STAGING_CENSUS_SEMANTIC_CONTRACT.projectId + "~appgver_[a-f0-9]{32}$", "u")
+        .test(deploymentRow.versionId) ||
       !Number.isSafeInteger(deploymentRow.versionNumber) ||
       (deploymentRow.versionNumber as number) < 1 ||
       !hasExactKeys(packageRow, ["archiveSha256", "censusRoute", "manifestSha256", "mutationRoutes", "workerSha256"]) ||

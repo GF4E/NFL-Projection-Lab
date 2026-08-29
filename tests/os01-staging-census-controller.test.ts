@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdtempSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, realpathSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { afterEach, describe, expect, expectTypeOf, it } from "vitest";
@@ -53,7 +53,7 @@ function observationInput(phase: "pre" | "post"): ControlPlaneObservationInput {
     phase,
     sourceCommit: "a".repeat(40),
     sourceTree: "b".repeat(40),
-    versionId: "appgprj_" + "1".repeat(32) + "~appgver_" + "2".repeat(32),
+    versionId: STAGING_CENSUS_SEMANTIC_CONTRACT.projectId + "~appgver_" + "2".repeat(32),
     versionNumber: 11,
     deploymentId: "appgdep_" + "3".repeat(32),
     deploymentStatus: "succeeded",
@@ -191,7 +191,8 @@ describe("OS-01 staging census controller", () => {
     )).toThrow();
     for (const invalid of [
       { ...observationInput("pre"), versionId: "" },
-      { ...observationInput("pre"), deploymentId: "" }
+      { ...observationInput("pre"), deploymentId: "" },
+      { ...observationInput("pre"), versionId: "appgprj_" + "4".repeat(32) + "~appgver_" + "2".repeat(32) }
     ]) {
       const invalidRoot = privateDirectory();
       os01StagingCensusControllerTestOnly.initialize(
@@ -246,6 +247,35 @@ describe("OS-01 staging census controller", () => {
         finalize: () => { throw new Error("unexpected finalize"); }
       }
     })).rejects.toThrow("closed schema");
+  });
+
+  it("rejects blank hosted deployment identities on the full controller path before transport", async () => {
+    for (const invalid of [
+      { ...observationInput("pre"), versionId: "" },
+      { ...observationInput("pre"), deploymentId: "" },
+      { ...observationInput("pre"), versionId: "appgprj_" + "4".repeat(32) + "~appgver_" + "2".repeat(32) }
+    ]) {
+      const root = privateDirectory();
+      const artifacts = paths(root);
+      os01StagingCensusControllerTestOnly.initialize(
+        root,
+        () => new Date("2026-08-29T07:59:59.000Z")
+      );
+      writeJson(artifacts.preObservation, createOs01StagingCensusControlPlaneObservation(invalid));
+      let calls = 0;
+      await expect(os01StagingCensusControllerTestOnly.run({
+        root,
+        authorizationToken: "ephemeral-sites-token-for-test",
+        now: () => new Date("2026-08-29T08:00:01.000Z"),
+        responseValidation: defaultValidation,
+        transport: async () => {
+          calls += 1;
+          return acceptedResponse();
+        }
+      })).rejects.toThrow("pre-observation is invalid");
+      expect(calls).toBe(0);
+      expect(existsSync(artifacts.intent)).toBe(false);
+    }
   });
 
   it("reserves intent, response, and result before one exact transport call and remains pending", async () => {
