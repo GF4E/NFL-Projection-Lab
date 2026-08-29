@@ -147,3 +147,17 @@ This keeps the package below the Free-plan limit of 50 D1 queries per Worker inv
 preserving the pre/post checks. The 94 table names are validated before interpolation into the
 read-only compound statements, and every returned source-table identity and count is independently
 checked against the canonical sorted table set.
+
+The sole generation-8 hosted request was terminally rejected. The worker returned HTTP 500, and
+the controller-preserved response-byte hash exactly matches the closed
+`foreign_key_read_failed` envelope. The isolated worker log shows an otherwise successful fetch
+invocation and no runtime exception; the failure is therefore confined to the compound
+`pragma_foreign_key_list` D1 read. The empty response and dispatch-completion reservations,
+attempt result, request identifier, and rejection receipt are preserved. Generation 8 may not be
+retried or repaired into qualification evidence.
+
+A clean successor may remove hosted foreign-key introspection only if it treats exact DDL as the
+immutable source evidence and independently replays that DDL in a local SQLite verifier to derive
+normalized foreign keys. Such a change must advance the semantic and response contracts, receive
+a new qualification and controller authority identity chained to the generation-8 rejection
+receipt, and pass independent evidence-root and parser/replay audits before any hosted request.

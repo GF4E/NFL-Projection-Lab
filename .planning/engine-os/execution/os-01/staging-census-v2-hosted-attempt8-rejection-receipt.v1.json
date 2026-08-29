@@ -1,0 +1,107 @@
+{
+  "version": "engine-os.os01-staging-census-hosted-attempt-rejection.v1",
+  "status": "rejected_hosted_foreign_key_read_failed",
+  "qualificationId": "63542b54dcbb72ffb5d317004779d685cb3b32f42ce519e75beed621c894d7e1",
+  "controllerAuthorityId": "32f0feb8306c355d9761e319ca4bdcefecc47ff230433281cddf7f6e587e2b9f",
+  "sourceCommit": "83afb934bfe420d86b010ecd6fb3a51c522849d9",
+  "sourceTree": "83b4c02da098ca20c016b6b114f2519d816136ba",
+  "stagingProjectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "savedVersionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_f3a33271377881919eefde6f0b9e6478",
+  "savedVersionNumber": 18,
+  "deploymentId": "appgdep_6a92b80eaa8c8191b1b4fbf12074cc25",
+  "deploymentStatus": "succeeded",
+  "workerSha256": "d5cb0cc1c424f1362ce80d86b751e296bdf6ff2975042087d5604c7c886b5eae",
+  "manifestSha256": "601b4a2612a2dee4f082b777f77947e092bb8e82a6b399b74c146db2be8eca17",
+  "localArchiveSha256": "8b0be590ddbbd03633f61d8958beca481394ead24207125d54f9b223d628b290",
+  "storedArchiveContentHash": "sha256:3baa357f51488cb1a3adc74a55938dd096c9dc0e46824aff3de20ae9552acf03",
+  "authorityRoot": "/private/tmp/engine-os-os01-staging-census-32f0feb8306c355d9761e319ca4bdcefecc47ff230433281cddf7f6e587e2b9f",
+  "artifacts": {
+    "authority": {
+      "sha256": "ba4deffbe494636cd85f142e26f5a14e05a5ce689630ed2a7eccb29922b04b43",
+      "bytes": 928,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179067829
+    },
+    "preObservation": {
+      "sha256": "fb8b92a82b5950afd8a07f31845ec3f33eaf36eacce46335e49b3318d560aaac",
+      "bytes": 1980,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179067954
+    },
+    "intent": {
+      "sha256": "b24deb3f764051077ae6c1e957ab39a6efb0162c557af35e7d35b060380dfb87",
+      "bytes": 1487,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179067970
+    },
+    "response": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179067972
+    },
+    "attemptResult": {
+      "sha256": "d46084c9fde1a025674e81133fb80c2cc43c19b4deb370362aef37e88e61e60f",
+      "bytes": 1290,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179067973
+    },
+    "reservedDispatchCompletion": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "mode": 384,
+      "links": 1,
+      "device": 16777230,
+      "inode": 179067974
+    }
+  },
+  "failure": {
+    "stage": "hosted_worker_foreign_key_read",
+    "reason": "compound_pragma_foreign_key_list_failed",
+    "responseBytesSha256": "25c02685f706fed2c36fbcba77ca9de0dfecc66edcc4f8e35133f75c3791129b",
+    "responseHashMatchedClosedFailureCategory": "foreign_key_read_failed",
+    "responseHashMatchMethod": "exhaustive_reconstruction_of_the_closed_self_hashed_failure_vocabulary",
+    "attemptResultHash": "d46084c9fde1a025674e81133fb80c2cc43c19b4deb370362aef37e88e61e60f",
+    "workerLogRequestId": "cf76f7f737c50d8c29373a6aca8fefb8",
+    "workerLogHttpStatus": 500,
+    "workerLogOutcome": "ok",
+    "workerLogCpuTimeMs": 13,
+    "workerLogWallTimeMs": 464,
+    "controllerRunInvoked": true,
+    "hostRequestDispatched": true,
+    "httpStatus": 500,
+    "workerRequestDispatched": true,
+    "genericFailureResponsePersisted": false,
+    "databaseReadAttempted": true,
+    "databaseMutationAttempted": false,
+    "providerPathInvoked": false,
+    "quotaPathInvoked": false,
+    "retryAllowedOnConsumedAuthority": false,
+    "postObservationWritten": false,
+    "finalizationAttempted": false
+  },
+  "disposition": {
+    "originalAuthorityPreserved": true,
+    "artifactRewriteAllowed": false,
+    "artifactDeletionAllowed": false,
+    "cleanSuccessorRequired": true,
+    "sameAuthorityRetryAllowed": false,
+    "offlineForeignKeyDerivationFromExactDdlMayBeQualifiedSeparately": true,
+    "cleanupAuthorized": false,
+    "migrationAuthorized": false,
+    "productionAuthorized": false,
+    "os01Accepted": false
+  },
+  "recordedAt": "2026-08-29T10:51:03.000Z",
+  "receiptHash": "826cbc7df6c71ebf678b8dce0279acec087813399abc35d90fbb9d5e3e69711c"
+}
