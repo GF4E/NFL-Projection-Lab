@@ -171,7 +171,44 @@ async function legacyBackup(d1: D1Database, id = qualificationId): Promise<Os01L
   return prepared.body.backup as Os01LogicalBackup;
 }
 
+async function invokePrefix(
+  d1: D1Database,
+  prefixStatementCount: number
+): Promise<{ response: Response; body: Record<string, unknown> }> {
+  const request = new Request("https://owner-only.example.test/__engine-os/os01-hosted-migration/v1", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      version: "engine-os.os01-hosted-migration-request.v1",
+      action: "blank_prefix_probe",
+      qualificationId,
+      prefixStatementCount
+    })
+  });
+  const response = await handleOs01HostedMigrationQualification(request, d1, authority);
+  return { response, body: await response.json() as Record<string, unknown> };
+}
+
 describe("OS-01 standalone hosted migration harness", () => {
+  it("rolls back bounded blank-prefix probes without qualifying the migration", async () => {
+    for (const count of [0, 145, 291]) {
+      const { sqlite, d1 } = database();
+      const probed = await invokePrefix(d1, count);
+      expect(probed.response.status).toBe(200);
+      expect(probed.body).toMatchObject({
+        result: "blank_migration_prefix_rolled_back",
+        prefixStatementCount: count,
+        authorizedPrefix: true,
+        failureClass: "intentional_rollback",
+        stateUnchanged: true,
+        claimBoundary: "diagnostic_only_not_qualification_evidence"
+      });
+      expect(sqlite.prepare("SELECT count(*) AS count FROM sqlite_schema WHERE type = 'table'").get())
+        .toEqual({ count: 0 });
+      sqlite.close();
+    }
+  });
+
   it("reproduces the v3 D1 preparation failure and classifies it without leaking SQL", () => {
     const migration = authority.migrations.find((item) =>
       item.path === "drizzle/0010_confidence_engine.sql"

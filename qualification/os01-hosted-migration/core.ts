@@ -46,6 +46,7 @@ type Scalar = string | number | null;
 type ObjectType = "index" | "table" | "trigger" | "view";
 type HostedAction =
   | "blank_replay"
+  | "blank_prefix_probe"
   | "legacy_prepare_export"
   | "legacy_forward"
   | "restore_import"
@@ -113,6 +114,7 @@ type QualificationRequest = {
   version: "engine-os.os01-hosted-migration-request.v1";
   action: HostedAction;
   qualificationId: string;
+  prefixStatementCount?: number;
   backup?: Os01LogicalBackup;
 };
 
@@ -1075,6 +1077,7 @@ async function verifyLegacyProjection(
 
 function requestKeys(action: HostedAction): readonly string[] {
   const base = ["action", "qualificationId", "version"];
+  if (action === "blank_prefix_probe") return [...base, "prefixStatementCount"];
   if (["legacy_forward", "restore_import", "failure_probe", "verify_legacy_terminal"].includes(action)) {
     return [...base, "backup"];
   }
@@ -1086,6 +1089,7 @@ function parseQualificationRequest(value: unknown): QualificationRequest {
   const record = value as Record<string, unknown>;
   const actions: HostedAction[] = [
     "blank_replay",
+    "blank_prefix_probe",
     "legacy_prepare_export",
     "legacy_forward",
     "restore_import",
@@ -1100,10 +1104,18 @@ function parseQualificationRequest(value: unknown): QualificationRequest {
   }
   const action = record.action as HostedAction;
   if (!exactKeys(record, requestKeys(action))) throw new HarnessError("invalid_request", 400);
+  if (action === "blank_prefix_probe" &&
+      (!Number.isInteger(record.prefixStatementCount) ||
+        Number(record.prefixStatementCount) < 0 || Number(record.prefixStatementCount) > 291)) {
+    throw new HarnessError("invalid_request", 400);
+  }
   return {
     version: record.version,
     action,
     qualificationId: record.qualificationId,
+    ...(action === "blank_prefix_probe"
+      ? { prefixStatementCount: Number(record.prefixStatementCount) }
+      : {}),
     ...(record.backup === undefined ? {} : { backup: record.backup as Os01LogicalBackup })
   };
 }
@@ -1153,6 +1165,49 @@ async function performAction(
   const initial = await captureHostedState(db);
   const state = classifyState(initial, authority);
   if (state === "unknown") throw new HarnessError("unsupported_database_state", 409);
+
+  if (request.action === "blank_prefix_probe") {
+    assertState(initial, authority.supportedStates.blank);
+    const migrationStatements = await migrationStatementsForRange(migrations, 0, 20);
+    const prefixStatementCount = request.prefixStatementCount!;
+    const prefix = migrationStatements.slice(0, prefixStatementCount);
+    const intentionalRollbackTable = "__os01_intentional_missing_table_v1";
+    let failureDetail = "";
+    try {
+      await executeAtomicBatch(db, [
+        createGuard(),
+        guardInsert(initial, { checkSchemaVersion: true, excludeGuard: true }),
+        ...prefix,
+        { sql: `SELECT value FROM ${intentionalRollbackTable}` }
+      ]);
+    } catch (error) {
+      failureDetail = error instanceof HarnessError
+        ? error.diagnosticDetail ?? error.message
+        : d1FailureText(error);
+    }
+    if (!failureDetail) throw new HarnessError("prefix_probe_did_not_rollback", 500);
+    const after = await captureHostedState(db);
+    assertState(after, authority.supportedStates.blank);
+    const beforeHash = await hostedSha256(stableHostedJson(initial));
+    const afterHash = await hostedSha256(stableHostedJson(after));
+    if (beforeHash !== afterHash) throw new HarnessError("prefix_probe_changed_state", 500);
+    const last = prefix.at(-1);
+    const authorizedPrefix = failureDetail.includes(intentionalRollbackTable);
+    return receipt(request, {
+      result: "blank_migration_prefix_rolled_back",
+      prefixStatementCount,
+      authorizedPrefix,
+      failureClass: authorizedPrefix
+        ? "intentional_rollback"
+        : failureDetail.includes("sqlite_auth") ? "sqlite_auth" : "other",
+      lastMigrationPath: last?.migrationPath ?? null,
+      lastGlobalStatementIndex: last?.globalStatementIndex ?? null,
+      stateUnchanged: true,
+      beforeStateHash: beforeHash,
+      afterStateHash: afterHash,
+      claimBoundary: "diagnostic_only_not_qualification_evidence"
+    });
+  }
 
   if (request.action === "blank_replay") {
     const terminal = state === "blank" ? await applyBlankReplay(db, initial, authority, migrations) : initial;
@@ -1320,6 +1375,7 @@ export const os01HostedMigrationHarnessContract = Object.freeze({
   receiptVersion: "engine-os.os01-hosted-migration-receipt.v1",
   actions: Object.freeze([
     "blank_replay",
+    "blank_prefix_probe",
     "legacy_prepare_export",
     "legacy_forward",
     "restore_import",

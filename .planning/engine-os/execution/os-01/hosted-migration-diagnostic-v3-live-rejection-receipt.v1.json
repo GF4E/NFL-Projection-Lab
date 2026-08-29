@@ -1,0 +1,28 @@
+{
+  "version": "engine-os.os01-hosted-migration-diagnostic-v3-live-rejection-receipt.v1",
+  "status": "diagnostic_root_class_identified",
+  "scope": "isolated_owner_only_blank_d1_replay",
+  "sourceCommit": "6ce4e080efdd8d95c62de10bda3d17a97a59c32d",
+  "projectId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d",
+  "versionId": "appgprj_6a92435d1d788191b4d6bcaff0a1525d~appgver_b0e9ab836cdc8191a9b1545c6ff302c6",
+  "deploymentId": "appgdep_6a92591db1e88191a42a0695de487034",
+  "request": {
+    "action": "blank_replay",
+    "qualificationId": "bc1257af310142017017925528b7480f67d9747067b19747e72b25d16c79a171",
+    "httpStatus": 500,
+    "workerRequestId": "832897e4504c4775b47d075baae4af3b",
+    "wallTimeMilliseconds": 837,
+    "responseSha256": "187b807db37eb524878fb2312c2c3143ded0b6c971cfee4284c85a237481e68a",
+    "responseBytes": 91,
+    "diagnosticDetail": "d1_error: not authorized: sqlite_auth"
+  },
+  "postcondition": {
+    "userTables": [],
+    "atomicRollbackPreserved": true
+  },
+  "acceptedEvidence": false,
+  "providerDispatches": 0,
+  "providerBindingReads": 0,
+  "captureActivations": 0,
+  "productionMutations": 0
+}
