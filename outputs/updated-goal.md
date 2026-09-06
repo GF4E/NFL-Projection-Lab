@@ -2,7 +2,7 @@
 
 Version: 2.0
 Updated: September 6, 2026
-Status: Step 0 documentation revision only. Steps 1–7 have not been executed under this revision.
+Status: Step 0 complete. Step 1 complete; planning endpoint is three seasons, N0-only family. [Immutable result](../work/cycle-one-power-v1/result.json). Steps 2–7 have not run. Stop before Step 2 spending.
 Authority: owner review decisions 1–14 and revised build order. Later decisions supersede earlier conflicting choices in this plan only. No frozen experiment gate changes.
 Prior version: [byte-identical archive](../99_archive/superseded/updated-goal.v1.md). The previous document had no explicit version and is designated v1 for archival purposes.
 Prior SHA256: d05f12d82a7910794ca192bafd45885ec12358f8746c714ff36b484aa808b4c5
@@ -106,7 +106,7 @@ Archive the prior document byte-for-byte to 99_archive/superseded/, update this 
 
 ### Step 1 — power gate before model work
 
-Read saved paired per-game losses without rerunning or rescoring E3. Simulate true gains {0%, 1%, 2.5%, 5%, 7.5%, 10%}, horizons {1, 2, 3} seasons, week-block lengths {1, 3, 6}, and 1,000 replicates per cell, preserving saved paired-loss dependence. Evaluate the Tier A simultaneous one-sided 95% lower-bound claim above 5% with fixed-family Bonferroni correction. Use paired season/week resampling and a frozen seed and configuration. This is planning sensitivity, not new model performance or reversal of E3.
+Read saved paired per-game losses without rerunning or rescoring E3. Simulate true gains {0%, 1%, 2.5%, 5%, 7.5%, 10%}, horizons {1, 2, 3} seasons, week-block lengths {1, 3, 6}, and 1,000 replicates per cell, preserving saved paired-loss dependence. Evaluate the owner-amended planning-family simultaneous one-sided 95% lower-bound claim above 5% with fixed-family Bonferroni correction. This is not a Tier A registry test. Use paired season/week resampling and a frozen seed and configuration. This is planning sensitivity, not new model performance or reversal of E3.
 
 Write the complete design, source hashes, family size, per-cell results and smallest whole-season endpoint reaching at least 80% power at 7.5% true gain under all three block choices to a named immutable experiment record. Otherwise write INFEASIBLE_WITHIN_3_SEASONS. That result prohibits all subsequent steps. Aggregate scorecard means alone cannot preserve paired dependence: locate read-only underlying rows or report blocked.
 
