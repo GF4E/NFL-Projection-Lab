@@ -1,0 +1,48 @@
+{
+  "active_result": "result-4ea6e3bf91f17387.json",
+  "active_snapshot": "4ea6e3bf91f17387",
+  "authority": "Owner reset: market pricing, pick log, consensus filter by September 8; 300-credit cap; no model, power or teaser work before September 10. Standing engine-v2 commit/push approval.",
+  "code_sha256": {
+    "engine/__init__.py": "0da12c2236bc4ca91ade43709a4472076d7b31d403b33bdf60e6366dbf7edfb6",
+    "engine/pick_log.py": "4619e372852a7bb5bef08b95a683bea4c1aeaa14f67949f2356544a81ec5d05f",
+    "engine/pricing.py": "97b63536bde029c485abefa7c368cc575e411abfe2a075a051e7d80fd3867c56",
+    "engine/quote_capture.py": "012b00781d46996a42f854e9e5c6061c5d580aa49ab24b42f4d4899aef7ddc1c",
+    "scripts/append_pick.py": "c154d009b96099220bb23f739786ff8ef7811d31276c70f0d629327f6d7d693f",
+    "scripts/build_week1_board.py": "c556f56b0cb45956811e5767fb6ec060869d22fe61c567792adf44b2691a04e3",
+    "scripts/capture_week1.py": "553cbd7ab1863714219a2ada8035fbee104ccfbfb839c23ebaa4c368543dcae4",
+    "scripts/capture_week1_details.py": "d89d7eb38c33d472afd3116702743fb39a792f946c4c898e0efac51d72bd7fbb",
+    "scripts/week1_pricing.py": "0a72d50b10bc6d64f3b84d8cf37781857e99d161669ea7106a09e171dfa21799"
+  },
+  "commands": {
+    "offline_replay": "/opt/anaconda3/bin/python3.12 -B scripts/week1_pricing.py",
+    "refresh_mainlines": "/opt/anaconda3/bin/python3.12 -B scripts/week1_pricing.py --refresh-mainlines",
+    "verify": "/opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p test_week1_pricing.py"
+  },
+  "credit_cap": 300,
+  "credits_confirmed": 163,
+  "credits_total_accounted": 166,
+  "credits_uncertain_reserved": 3,
+  "decisions": {
+    "books": "BetMGM=betmgm; Caesars=williamhill_us; FanDuel=fanduel; DraftKings=draftkings. Sharp preference Pinnacle then BetOnline then LowVig among returned candidates. Priority is an operating convention, not a measured sharpness ranking. Pinnacle selected. Only BetMGM/Caesars executable.",
+    "caesars": "Requested on all captures; no quotes returned. Explicit coverage gap. The provider documents Caesars as paid-subscription-only; this record does not assert why a particular quote is missing.",
+    "coverage": "Fewer than two books is flagged, not a new acceptance gate. Never devig unmatched points or missing outcomes. Stale/future quotes excluded from pricing with reason.",
+    "credentials": "Local existing credential consumed in memory; URL passed to curl via stdin, not argv. Exact response bodies checked for credential before persistence. Only quota/date/content-type headers retained. No credentials or keyed raw headers committed.",
+    "credits": "All calls reserved atomically in a persistent ledger before dispatch. First Python transport attempt failed; its full reserved cost remains charged to the cap conservatively. System curl transport succeeded. No automatic retries. Future refreshes share the same cap.",
+    "deferred": "Model, power, teaser and Tier A work deferred until September 10 or later; no frozen acceptance gate or E3 result changed.",
+    "fair_line": "Closest offered consensus threshold to 50 percent for each game/market/player, deterministic lower-line tie break. No interpolation across key numbers. Moneylines have fair price rather than numeric line.",
+    "freshness": "Maximum book-update age one hour at capture; preserve exact timestamps and label live snapshot, not canonical T-60.",
+    "markets": "Moneyline, spreads, totals, alternate spreads/totals, passing yards/TDs, rushing yards, receiving yards and receptions. All complete returned markets in this bounded set processed; no props model or fabricated missing markets.",
+    "operations": "Default command replays cached evidence without network. Explicit --refresh-mainlines makes one capped live call and produces new immutable artifacts. Full alternate/prop refresh is not scheduled. Prior snapshots preserved.",
+    "picks": "Separate execution-intent/executed and paper CSV files. Approved/declined/fill are distinct append events with unique event IDs; no automatic bets or fabricated decisions. Model probability blank; consensus probability and source label populated. An executed event asserts the selected quote is the actual fill; never rewrite earlier approval.",
+    "price_edge": "Continuous American cents coordinate: a+100 for negative prices, a-100 for positive prices. Executable coordinate minus fair coordinate. Both fair probability bounds inclusive; no rounding before filter.",
+    "probabilities": "Unweighted median of complete-book power-devig outcome probabilities at EXACT event/market/player/line/outcome-count, renormalized across outcomes. Consensus includes the execution book. Not independent model probabilities.",
+    "pushes": "Devig probabilities are conditional on represented settled outcomes. For two-way push-capable lines, unconditional push mass is unavailable without a model. Do not invent it. Three-way markets remain separate.",
+    "week": "Provider kickoff window September 9 through before September 16 UTC; Week 1 label follows owner schedule scope. First returned kickoff is September 10 UTC, September 9 in US time."
+  },
+  "experiment_id": "week1-pricing-v1",
+  "sources": [
+    "https://the-odds-api.com/liveapi/guides/v4/",
+    "https://the-odds-api.com/sports-odds-data/bookmaker-apis.html"
+  ],
+  "status": "BOARD_READY_WITH_COVERAGE_GAPS"
+}

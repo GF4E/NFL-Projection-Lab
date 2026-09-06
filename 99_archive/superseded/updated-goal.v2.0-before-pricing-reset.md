@@ -1,18 +1,12 @@
 # NFL Prediction Engine: current goal and cycle-one build plan
 
-Version: 2.1
+Version: 2.0
 Updated: September 6, 2026
 Status: Step 0 complete. Step 1 complete; planning endpoint is three seasons, N0-only family. [Immutable result](../work/cycle-one-power-v1/result.json). Steps 2–7 have not run. Stop before Step 2 spending.
 Authority: owner review decisions 1–14 and revised build order. Later decisions supersede earlier conflicting choices in this plan only. No frozen experiment gate changes.
 Prior version: [byte-identical archive](../99_archive/superseded/updated-goal.v1.md). The previous document had no explicit version and is designated v1 for archival purposes.
 Prior SHA256: d05f12d82a7910794ca192bafd45885ec12358f8746c714ff36b484aa808b4c5
 Paths beginning with / are repository-relative unless they explicitly identify an external file. Repository root: /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/.
-
-## September 8 delivery override (owner reset)
-
-This release is pricing, append-only pick logs, and a consensus-filtered Week 1 CSV board only. Models, power simulation and teasers are deferred to Step 5 and later, resuming September 10 or later. The older ordered research plan below is retained as deferred context, not the active delivery sequence. No registered statistical gate or frozen result is changed.
-
-Active release: [usage and board](week1-pricing/README.md). Decisions, costs and evidence: [experiment record](../work/week1-pricing-v1/experiment.json). The owner approves creating files, dependencies, launchd agents, and engine-v2 commits/pushes without further questions. Stop only before exceeding the 300-credit delivery cap, deleting a file, or changing a registered gate. Decisions otherwise belong in the record. No provider refresh schedule was added by this release.
 
 ## Outcome and protected evidence
 
