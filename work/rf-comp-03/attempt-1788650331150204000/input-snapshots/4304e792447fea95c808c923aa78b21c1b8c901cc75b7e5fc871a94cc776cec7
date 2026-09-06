@@ -1,0 +1,429 @@
+"""RF-COMP-03 focused synthetic boundaries; separate harness owns execution.
+
+No historical inputs, scorer, bootstrap, or previous suite is invoked. Frozen
+functions supply all numerical/byte and exception oracles.
+"""
+import copy
+from dataclasses import fields, replace
+import importlib.util
+import json
+import math
+from pathlib import Path
+import struct
+import sys
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import research_score_encoding_memo as candidate
+import research_score_contract as contract
+import research_score_run as saved
+import research_score_split_archive as archive
+import research_score_split_forecast as frozen
+from research_score_distribution import JointDistribution, NumericalFailure
+from research_score_successor_distribution import JointBase
+from research_score_split_run import strict
+
+
+class FloatSubclass(float):
+    pass
+
+
+class ListSubclass(list):
+    pass
+
+
+def outcome(function, *args):
+    try:
+        return ('returned', function(*args))
+    except BaseException as error:
+        return ('raised', type(error), str(error))
+
+
+def native(value):
+    return json.loads(strict(value))
+
+
+def arrays(value):
+    return {f.name: (getattr(value, f.name).dtype.str, getattr(value, f.name).shape,
+                     getattr(value, f.name).tobytes(order='C'), getattr(value, f.name).flags.writeable)
+            for f in fields(value) if isinstance(getattr(value, f.name), np.ndarray)}
+
+
+class ExactCase(unittest.TestCase):
+    def assert_law_exact(self, left, right):
+        self.assertIs(type(left), type(right))
+        self.assertEqual(arrays(left), arrays(right))
+        for field in fields(right):
+            a, b = getattr(left, field.name), getattr(right, field.name)
+            self.assertIs(type(a), type(b))
+            if isinstance(b, np.ndarray):
+                continue
+            if isinstance(b, float):
+                self.assertEqual(struct.pack('>d', a), struct.pack('>d', b))
+            else:
+                self.assertEqual(a, b)
+
+
+class EncodingMemoTests(unittest.TestCase):
+    def test_exact_bytes_for_empty_extremes_and_700_floats(self):
+        special = [0., -0., 5e-324, -5e-324, sys.float_info.min, sys.float_info.max,
+                   -sys.float_info.max, .1, -.1, math.pi, 1e-7, 1e21]
+        memo = candidate.EncodingMemo()
+        for values in ([], [0.], [-0.], special, [special[i % len(special)] for i in range(700)]):
+            before = values.copy()
+            self.assertIs(type(memo(values)), bytes)
+            self.assertEqual(memo(values), contract.encoded(values))
+            self.assertEqual(values, before)
+
+    def test_repeated_distinct_lists_share_one_successful_entry(self):
+        with patch.object(candidate, 'encoded', wraps=contract.encoded) as encoder:
+            memo = candidate.EncodingMemo()
+            first = memo([.1, .2, .3])
+            second = memo(list((.1, .2, .3)))
+            self.assertEqual(encoder.call_count, 1)
+            self.assertIs(second, first)
+            self.assertEqual(second, contract.encoded([.1, .2, .3]))
+
+    def test_signed_zero_length_and_single_entry_eviction(self):
+        sequence = ([0.], [-0.], [-0.], [-0., 0.], [-0.], [0.])
+        with patch.object(candidate, 'encoded', wraps=contract.encoded) as encoder:
+            memo = candidate.EncodingMemo()
+            for values in sequence:
+                self.assertEqual(memo(values), contract.encoded(values))
+            self.assertEqual(encoder.call_count, 5)
+        self.assertNotEqual(contract.encoded([0.]), contract.encoded([-0.]))
+
+    def test_mutating_input_cannot_reuse_stale_snapshot_or_output(self):
+        values = [.1, .2, .3]
+        with patch.object(candidate, 'encoded', wraps=contract.encoded) as encoder:
+            memo = candidate.EncodingMemo()
+            saved_bytes = memo(values)
+            values[0] = .4
+            changed = memo(values)
+            values.append(.5)
+            longer = memo(values)
+            self.assertEqual(encoder.call_count, 3)
+            self.assertEqual(saved_bytes, contract.encoded([.1, .2, .3]))
+            self.assertEqual(changed, contract.encoded([.4, .2, .3]))
+            self.assertEqual(longer, contract.encoded(values))
+
+    def test_unsupported_inputs_delegate_identity_and_preserve_valid_entry(self):
+        unsupported = (None, True, 1, 1., 'value', (), (.1, .2), [1, 2.], [[.1]],
+                       {'x': [.1]}, np.array([.1]), [np.float64(.1)], [np.float32(.1)],
+                       [FloatSubclass(.1)], ListSubclass([.1]), [math.nan], [math.inf],
+                       [-math.inf], object())
+        for values in unsupported:
+            with self.subTest(value=repr(values)):
+                with patch.object(candidate, 'encoded', wraps=contract.encoded) as encoder:
+                    memo = candidate.EncodingMemo()
+                    prior = memo([.1, .2])
+                    expected = outcome(contract.encoded, values)
+                    self.assertEqual(outcome(memo, values), expected)
+                    self.assertIs(encoder.call_args.args[0], values)
+                    self.assertEqual(encoder.call_count, 2)
+                    self.assertIs(memo([.1, .2]), prior)
+                    self.assertEqual(encoder.call_count, 2)
+
+    def test_failed_supported_encoding_does_not_commit_or_evict(self):
+        failed = True
+        def encode(values):
+            if values == [.3, .4] and failed:
+                raise RuntimeError('synthetic_original_encoding_failure')
+            return contract.encoded(values)
+        with patch.object(candidate, 'encoded', side_effect=encode) as encoder:
+            memo = candidate.EncodingMemo()
+            previous = memo([.1, .2])
+            self.assertEqual(outcome(memo, [.3, .4]),
+                             ('raised', RuntimeError, 'synthetic_original_encoding_failure'))
+            self.assertIs(memo([.1, .2]), previous)
+            self.assertEqual(encoder.call_count, 2)
+            failed = False
+            self.assertEqual(memo([.3, .4]), contract.encoded([.3, .4]))
+            self.assertEqual(encoder.call_count, 3)
+            memo([.1, .2])
+            self.assertEqual(encoder.call_count, 4)
+
+    def test_encoder_bound_at_construction_and_no_cross_instance_entry(self):
+        original = candidate.encoded
+        with patch.object(candidate, 'encoded', wraps=contract.encoded) as first_encoder:
+            first = candidate.EncodingMemo()
+        with patch.object(candidate, 'encoded', wraps=contract.encoded) as second_encoder:
+            second = candidate.EncodingMemo()
+            self.assertEqual(first([.1]), contract.encoded([.1]))
+            self.assertEqual(second([.1]), contract.encoded([.1]))
+            self.assertEqual(first_encoder.call_count, 1)
+            self.assertEqual(second_encoder.call_count, 1)
+            self.assertEqual(first([.1]), second([.1]))
+            self.assertEqual(first_encoder.call_count, 1)
+            self.assertEqual(second_encoder.call_count, 1)
+        self.assertIs(candidate.encoded, original)
+
+
+class DescriptorRecoveryTests(ExactCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.mapper = JointBase.from_scores([[0, 0], [3, 7], [8, 4], [14, 20], [27, 16], [22, 28]],
+                                          [1, 2, 1, 3, 1, 2])
+        cls.law = cls.mapper.fit((12., 15.))
+        cls.pointer = {'name': 'object-' + 'a'*64 + '.json', 'sha256': 'a'*64}
+
+    def test_genuine_descriptor_recovery_and_roundtrip_are_exact_on_hits(self):
+        components, moments = JointBase.components, JointDistribution.moments
+        for independent in (False, True):
+            fitted = replace(self.law, independent=independent)
+            expected = native(saved.distribution_descriptor(fitted, self.pointer))
+            with patch.object(candidate, 'encoded', wraps=contract.encoded) as encoder, \
+                    patch.object(candidate, 'digest', wraps=contract.digest) as digest_calls:
+                memo = candidate.EncodingMemo()
+                with patch.object(JointBase, 'components', autospec=True, side_effect=components) as component_calls:
+                    with patch.object(JointDistribution, 'moments', autospec=True, side_effect=moments) as moment_calls:
+                        actual = native(candidate.distribution_descriptor(fitted, self.pointer, memo))
+                        recovered = candidate.recover_source_law(self.mapper, actual, memo)
+                        repeated = native(candidate.distribution_descriptor(recovered, self.pointer, memo))
+                self.assertEqual(actual, expected)
+                self.assertEqual(repeated, expected)
+                self.assertEqual(component_calls.call_count, 1)
+                self.assertEqual(moment_calls.call_count, 6)
+                self.assertEqual(encoder.call_count, 1)
+                self.assertEqual(digest_calls.call_count, 3)
+            oracle = archive.recover_source_law(self.mapper, expected)
+            self.assert_law_exact(recovered, oracle)
+
+    def test_direct_recovery_function_exact_with_explicit_original_encoder(self):
+        descriptor = native(saved.distribution_descriptor(self.law, self.pointer))
+        self.assert_law_exact(candidate.recover_distribution(self.mapper, descriptor, contract.encoded),
+                              saved.recover_distribution(self.mapper, descriptor))
+        self.assertEqual(native(candidate.distribution_descriptor(self.law, self.pointer, contract.encoded)), descriptor)
+
+    def test_changed_first_last_or_length_of_actual_alpha_rejects_primed_hit(self):
+        descriptor = native(saved.distribution_descriptor(self.law, self.pointer))
+        original_components = JointBase.components
+        for change in ('first', 'last', 'length'):
+            def altered(mapper, theta):
+                values = list(original_components(mapper, theta))
+                alpha = values[1].copy()
+                if change == 'length':
+                    alpha = alpha[:-1]
+                else:
+                    index = 0 if change == 'first' else -1
+                    alpha[index] = np.nextafter(alpha[index], math.inf)
+                values[1] = alpha
+                return tuple(values)
+            memo = candidate.EncodingMemo()
+            memo(self.law.alpha.tolist())
+            with patch.object(JointBase, 'components', altered):
+                expected = outcome(archive.recover_source_law, self.mapper, descriptor)
+                actual = outcome(candidate.recover_source_law, self.mapper, descriptor, memo)
+            self.assertEqual(expected, ('raised', ValueError, 'distribution_parameter_hash_mismatch'))
+            self.assertEqual(actual, expected)
+
+    def test_signed_zero_alpha_change_rejects_even_when_float_lists_compare_equal(self):
+        # Deliberate component corruption seam, not a fitted/scored forecast.
+        alpha = self.law.alpha.copy(); alpha[0] = 0.
+        fitted = replace(self.law, alpha=alpha)
+        memo = candidate.EncodingMemo()
+        descriptor = native(candidate.distribution_descriptor(fitted, self.pointer, memo))
+        original_components = JointBase.components
+        def changed(mapper, theta):
+            result = list(original_components(mapper, theta))
+            result[1] = alpha.copy(); result[1][0] = -0.
+            return tuple(result)
+        self.assertEqual(alpha.tolist(), changed(self.mapper, self.law.theta)[1].tolist())
+        with patch.object(JointBase, 'components', changed):
+            expected = outcome(archive.recover_source_law, self.mapper, descriptor)
+            actual = outcome(candidate.recover_source_law, self.mapper, descriptor, memo)
+        self.assertEqual(expected, ('raised', ValueError, 'distribution_parameter_hash_mismatch'))
+        self.assertEqual(actual, expected)
+
+    def test_saved_parameter_and_moment_corruption_is_checked_after_hit(self):
+        base = native(saved.distribution_descriptor(self.law, self.pointer))
+        for field in ('alphaSha256', 'beta', 'rates', 'mean', 'covariance'):
+            descriptor = copy.deepcopy(base)
+            if field == 'alphaSha256': descriptor[field] = '0'*64
+            elif field == 'beta': descriptor[field] = math.nextafter(descriptor[field], math.inf)
+            elif field in ('rates', 'mean'): descriptor[field][0] = math.nextafter(descriptor[field][0], math.inf)
+            else: descriptor[field][0][0] = math.nextafter(descriptor[field][0][0], math.inf)
+            with patch.object(candidate, 'encoded', wraps=contract.encoded) as encoder:
+                memo = candidate.EncodingMemo(); memo(self.law.alpha.tolist())
+                expected = outcome(archive.recover_source_law, self.mapper, descriptor)
+                actual = outcome(candidate.recover_source_law, self.mapper, descriptor, memo)
+                self.assertEqual(encoder.call_count, 1)
+            self.assertEqual(actual, expected)
+            self.assertEqual(expected[:2], ('raised', ValueError))
+            self.assertEqual(expected[2], 'distribution_moment_mismatch' if field in ('mean', 'covariance')
+                             else 'distribution_parameter_hash_mismatch')
+
+    def test_schema_and_mapper_guard_exception_identity_is_preserved(self):
+        base = native(saved.distribution_descriptor(self.law, self.pointer))
+        malformed = [None, [], {}, {**base, 'extra': True}, {**base, 'independent': 1},
+                     {**base, 'iterations': True}, {**base, 'alphaSha256': 'x'},
+                     {**base, 'mean': [math.nan, 1.]}, {**base, 'rates': [0., 1.]},
+                     {**base, 'mapper': {'name': 'other.json', 'sha256': 'a'*64}}]
+        for descriptor in malformed:
+            expected = outcome(archive.recover_source_law, self.mapper, descriptor)
+            actual = outcome(candidate.recover_source_law, self.mapper, descriptor, candidate.EncodingMemo())
+            self.assertEqual(actual, expected)
+            self.assertEqual(expected[0], 'raised')
+        class MapperSubclass(JointBase):
+            pass
+        for mapper in (object(), None, object.__new__(MapperSubclass)):
+            expected = outcome(archive.recover_source_law, mapper, base)
+            actual = outcome(candidate.recover_source_law, mapper, base, candidate.EncodingMemo())
+            self.assertEqual(actual, expected)
+            self.assertEqual(expected[2], 'unqualified_mapper_class')
+
+
+class EncodingAssemblyTests(ExactCase):
+    @classmethod
+    def setUpClass(cls):
+        path = ROOT / 'tests/research-score-split/test_forecast_unit.py'
+        spec = importlib.util.spec_from_file_location('encoding_memo_tiny_fixture', path)
+        cls.fixture = importlib.util.module_from_spec(spec); spec.loader.exec_module(cls.fixture)
+        cls.inputs = cls.fixture.fixture(2013)
+
+    def resolve(self, assembly_type, selected=10, variant='full', stage='inner', configure=None):
+        view, bank, outputs, pointers = copy.deepcopy(self.inputs)
+        with self.fixture.measured(view['origin']) as accounting:
+            assembly = assembly_type(view, bank, outputs, self.fixture.choice(2013, selected),
+                                     pointers, self.fixture.PARENT, accounting)
+            if configure is not None:
+                configure(assembly)
+            source_before = {group: {key: strict(row) for key, row in rows.items()}
+                             for group, rows in view['source_laws'].items()}
+            mapper_before = {delay: (mapper.atoms.tobytes(), mapper.weights.tobytes(), mapper.b, mapper.epsilon)
+                             for delay, mapper in view['mappers'].items()}
+            result = outcome(assembly.resolve, selected, variant, 'z-target', stage)
+            self.assertEqual({group: {key: strict(row) for key, row in rows.items()}
+                              for group, rows in view['source_laws'].items()}, source_before)
+            self.assertEqual({delay: (mapper.atoms.tobytes(), mapper.weights.tobytes(), mapper.b, mapper.epsilon)
+                              for delay, mapper in view['mappers'].items()}, mapper_before)
+        rows = accounting._origins[0]['callbacks']
+        semantic_rows = [{k: v for k, v in row.items() if k not in
+                          ('started_seconds', 'finished_seconds', 'seconds')} for row in rows]
+        for row in rows:
+            self.assertGreater(row['seconds'], 0.)
+        return result, semantic_rows
+
+    def assert_resolution_equal(self, actual, expected):
+        self.assertEqual(actual[1], expected[1])
+        self.assertEqual(actual[0][0], expected[0][0])
+        if expected[0][0] == 'raised':
+            self.assertEqual(actual[0][1:], expected[0][1:])
+        else:
+            left, right = actual[0][1], expected[0][1]
+            self.assert_law_exact(left[0], right[0])
+            self.assertEqual(strict(left[1:]), strict(right[1:]))
+
+    def test_only_resolve_is_overridden_and_inherited_boundary_methods_unchanged(self):
+        self.assertTrue(issubclass(candidate.EncodingAssembly, frozen._Assembly))
+        self.assertEqual({k for k, v in vars(candidate.EncodingAssembly).items() if callable(v)}, {'resolve'})
+        for name in ('__init__', 'recover', 'timed_source', 'selected_native', 'append', 'fallback_variant'):
+            self.assertIs(getattr(candidate.EncodingAssembly, name), getattr(frozen._Assembly, name))
+
+    def test_genuine_resolution_equal_across_full_independent_delay_and_zero_controls(self):
+        for selected, variant, stage in ((10, 'full', 'inner'), (10, 'independent_marginals', 'outer'),
+                                         (10, 'availability_24h', 'outer'), (6, 'zero_strength_update', 'outer'),
+                                         (6, 'zero_scoring_level_update', 'outer')):
+            args = (selected, variant, stage)
+            expected = self.resolve(frozen._Assembly, *args)
+            actual = self.resolve(candidate.EncodingAssembly, *args)
+            self.assert_resolution_equal(actual, expected)
+            self.assertEqual(actual[0][0], 'returned')
+            self.assertEqual(actual[0][1][3]['fit_calls'], 1)
+            self.assertEqual(actual[0][1][3]['descriptor_recoveries'], 1)
+
+    def test_each_resolve_creates_fresh_memo_inside_real_callback(self):
+        view, bank, outputs, pointers = copy.deepcopy(self.inputs)
+        actual_memo = candidate.EncodingMemo; memos = []
+        with self.fixture.measured(view['origin']) as accounting:
+            assembly = candidate.EncodingAssembly(view, bank, outputs, self.fixture.choice(2013, 10),
+                                                  pointers, self.fixture.PARENT, accounting)
+            def create():
+                self.assertIsNotNone(accounting._active_callback)
+                memo = actual_memo(); memos.append(memo)
+                return memo
+            with patch.object(candidate, 'encoded', wraps=contract.encoded) as encoder:
+                with patch.object(candidate, 'EncodingMemo', side_effect=create):
+                    first = assembly.resolve(10, 'full', 'z-target', 'inner')
+                    second = assembly.resolve(10, 'full', 'z-target', 'inner')
+                self.assertEqual(encoder.call_count, 2)
+        self.assertEqual(len(memos), 2); self.assertIsNot(memos[0], memos[1])
+        self.assert_law_exact(first[0], second[0])
+        self.assertEqual(strict(first[1:]), strict(second[1:]))
+
+    def test_noeligible_fallback_is_lazy_and_same_variant(self):
+        with patch.object(JointBase, 'fit', side_effect=AssertionError('fallback_must_not_fit')):
+            for variant, stage in (('full', 'inner'), ('full', 'outer'), ('availability_24h', 'outer'),
+                                   ('independent_marginals', 'outer'), ('zero_strength_update', 'outer')):
+                expected = self.resolve(frozen._Assembly, None, variant, stage)
+                actual = self.resolve(candidate.EncodingAssembly, None, variant, stage)
+                self.assert_resolution_equal(actual, expected)
+                self.assertEqual(actual[0][0], 'returned')
+                self.assertEqual(actual[0][1][2], 'no_eligible_setting')
+                self.assertEqual(actual[0][1][3]['fit_calls'], 0)
+                self.assertTrue(actual[1][0]['used_fallback'])
+
+    def test_fit_and_grid_numerical_failures_preserve_one_attempt_fallback(self):
+        for target, method in ((JointBase, 'fit'), (JointDistribution, 'grid')):
+            with patch.object(target, method, side_effect=NumericalFailure('synthetic_' + method)):
+                expected = self.resolve(frozen._Assembly, 10, 'availability_24h', 'outer')
+                actual = self.resolve(candidate.EncodingAssembly, 10, 'availability_24h', 'outer')
+            self.assert_resolution_equal(actual, expected)
+            self.assertEqual(actual[0][0], 'returned')
+            self.assertEqual(actual[0][1][2], 'synthetic_' + method)
+            self.assertEqual(actual[0][1][3]['fit_calls'], 1)
+            self.assertEqual(len(actual[1]), 1)
+
+    def test_required_fallback_failure_and_unexpected_fit_error_abort_exactly(self):
+        def bad_fallback(assembly):
+            assembly.full['N0', 0, 'z-target']['native_failure'] = 'synthetic_N0_failure'
+        expected = self.resolve(frozen._Assembly, None, configure=bad_fallback)
+        actual = self.resolve(candidate.EncodingAssembly, None, configure=bad_fallback)
+        self.assert_resolution_equal(actual, expected)
+        self.assertEqual(actual[0], ('raised', ValueError, 'required_N0_fallback_failed'))
+        with patch.object(JointBase, 'fit', side_effect=RuntimeError('unexpected_fit_error')):
+            expected = self.resolve(frozen._Assembly)
+            actual = self.resolve(candidate.EncodingAssembly)
+        self.assert_resolution_equal(actual, expected)
+        self.assertEqual(actual[0], ('raised', RuntimeError, 'unexpected_fit_error'))
+        self.assertEqual(len(actual[1]), 1)
+
+    def test_descriptor_roundtrip_check_remains_active(self):
+        results = []
+        for module, assembly_type in ((frozen, frozen._Assembly), (candidate, candidate.EncodingAssembly)):
+            original = module.distribution_descriptor; count = 0
+            def changed(*args):
+                nonlocal count
+                count += 1
+                descriptor = original(*args)
+                if count == 2:
+                    descriptor['mean'][0] += 1.
+                return descriptor
+            with patch.object(module, 'distribution_descriptor', side_effect=changed):
+                results.append(self.resolve(assembly_type))
+            self.assertEqual(count, 2)
+        self.assert_resolution_equal(results[1], results[0])
+        self.assertEqual(results[1][0], ('raised', ValueError, 'descriptor_roundtrip_changed'))
+
+    def test_no_global_binding_or_source_array_changes_after_resolution(self):
+        bindings = (contract.encoded, saved.encoded, saved.distribution_descriptor,
+                    saved.recover_distribution, archive.recover_source_law,
+                    frozen.distribution_descriptor, frozen.recover_source_law, frozen._Assembly.resolve)
+        view = self.inputs[0]
+        before = strict({group: list(rows.values()) for group, rows in view['source_laws'].items()})
+        expected = self.resolve(frozen._Assembly)
+        actual = self.resolve(candidate.EncodingAssembly)
+        self.assert_resolution_equal(actual, expected)
+        self.assertEqual(strict({group: list(rows.values()) for group, rows in view['source_laws'].items()}), before)
+        after = (contract.encoded, saved.encoded, saved.distribution_descriptor,
+                 saved.recover_distribution, archive.recover_source_law,
+                 frozen.distribution_descriptor, frozen.recover_source_law, frozen._Assembly.resolve)
+        self.assertTrue(all(a is b for a, b in zip(bindings, after)))
+
+
+if __name__ == '__main__':
+    unittest.main()

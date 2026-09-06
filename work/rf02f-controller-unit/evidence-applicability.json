@@ -1,0 +1,207 @@
+{
+  "blockers": [],
+  "current_controller": {
+    "bytes": 38422,
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py",
+    "sha256": "7f82f65839a53e7fd91fa09e531ad2b758dc6c7ffeed6503cc4c0b7e9643d28b"
+  },
+  "current_tests": {
+    "bytes": 29467,
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_controller_unit.py",
+    "sha256": "dd088f744f441f7dd8bae82751ec2edf673770ea05548d38bea8e24406b891c7"
+  },
+  "grader_controller_transfer": {
+    "all_other_grader_report_source_pins_unchanged": {
+      "scripts/research_score_split_archive.py": true,
+      "scripts/research_score_split_forecast.py": true,
+      "scripts/research_score_split_grade.py": true,
+      "scripts/research_score_split_run.py": true,
+      "tests/research-score-split/test_archive_unit.py": true,
+      "tests/research-score-split/test_forecast_unit.py": true,
+      "tests/research-score-split/test_grade_unit.py": true
+    },
+    "coverage": [
+      "Real Store state/ancestry/publication to actual archive.grade_inputs.",
+      "Missing/changed states, wrong run/parent, ancestry/write failure, exact saved byte/plan/pointer binding.",
+      "Directory fsync fault, own state origin/type/shape/population, terminal failure/interrupt/atomic paths.",
+      "No re-execution of PublishedOriginGrader scorer integration in this applicability check."
+    ],
+    "current_test_log": {
+      "bytes": 3875,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/saved-input-smoke-attempt-1.log",
+      "sha256": "9b8b48719f66ba60b08f28729a8bd7c40e0f899ae3b5889963fbe07f3ba1123e"
+    },
+    "current_test_report": {
+      "bytes": 471,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/saved-input-smoke-attempt-1.json",
+      "sha256": "205be30af3fc0a8e5260286191cb181880a9783e618c41860a9a99cd4b9fbd12"
+    },
+    "old_controller_sha256": "021c0c6139bd767020e788c587d908df28f9d086c73b2392587304a7a451db7b",
+    "old_grader_report": {
+      "bytes": 8859,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-grade-unit/author-qualification-final.json",
+      "sha256": "5e3b2db0a049ac8abaaa34f921575337c98dfebf443b243f3d039053ea4c0a45"
+    },
+    "status": "old_wholefile_equivalence_not_proven_current_publication_tests_used"
+  },
+  "limitations": [
+    "Neither ef82f33d nor021c0c exact tested wholefile was found; no equality to those absent bytes is asserted.",
+    "Source/AST equality of other preserved snapshots is context only, not a substitute for an absent tested snapshot.",
+    "Current CLI probe replaces missing old CLI transfer; current24 tests replace the controller publication boundary evidence.",
+    "Review scope and original synthetic limitations remain unchanged. No new scientific execution or approval."
+  ],
+  "old_cli_transfer": {
+    "replacement_current_actual_probe": {
+      "bytes": 3973,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/current-cli-missing-receipt-review.json",
+      "sha256": "b9dd35ae072e175467d41a935dbd1f6082f2f5a1ee03cf4042c111de6b0c6dc7"
+    },
+    "report": {
+      "bytes": 1705,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/controller-unit/cli-missing-receipt-review.json",
+      "sha256": "f1a44efdb9f7b64d43037f9f3c958668baf1020ffb831e4469a5068aa08f7be0"
+    },
+    "status": "not_proven_exact_old_snapshot_unavailable"
+  },
+  "other_preserved_snapshots": [
+    {
+      "comparisons": {
+        "ControllerEnvelope": {
+          "ast_equal": false,
+          "current_source_sha256": "6c3c971563fb1f5b41a62ee9f5cefe88335fc8bcbfc591fd1a28bae63a8541bd",
+          "old_source_sha256": "6b843eb191b2aa9116a8d9ace2fe4209ef513cd87d9d92421f798997d7e927c9",
+          "source_segment_equal": false
+        },
+        "_bank_state_digest": {
+          "present_in_snapshot": false
+        },
+        "_launch": {
+          "present_in_snapshot": false
+        },
+        "_suffix": {
+          "ast_equal": true,
+          "current_source_sha256": "7d636d2a430df4ffd5de5d4f7254fda164d2bd86e763482d38474fc860c438d1",
+          "old_source_sha256": "7d636d2a430df4ffd5de5d4f7254fda164d2bd86e763482d38474fc860c438d1",
+          "source_segment_equal": true
+        },
+        "_validate_published_state": {
+          "present_in_snapshot": false
+        },
+        "_worker_main": {
+          "present_in_snapshot": false
+        },
+        "publish_origin": {
+          "ast_equal": false,
+          "current_source_sha256": "04e0d7e31fb6be3d614684c996cd2633c20b21f96af08307d9481fbba579d95f",
+          "old_source_sha256": "e6e7f0b8f90447afd98307e58fe999897deee3b6732aff442869292e11aef719",
+          "source_segment_equal": false
+        },
+        "validate_publication_binding": {
+          "ast_equal": false,
+          "current_source_sha256": "6c1cdf2a48a7d4aa10fdb6211b87bc563579c23cf7fda12721ef8211bac45fe2",
+          "old_source_sha256": "128c10a692f5ec7f4d51fa63c496a3234ef024ff9d01c282a13f1ac4767d8bbc",
+          "source_segment_equal": false
+        }
+      },
+      "main_guards_ast_equal": false,
+      "matches_requested_old_tested_hash": false,
+      "snapshot": {
+        "bytes": 14044,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/controller-before-phase-read-fix.py",
+        "sha256": "3f46bebd406aaed3f4b98f275bfb22a8a976927672a584ba7aa248d7f512f39a"
+      }
+    },
+    {
+      "comparisons": {
+        "ControllerEnvelope": {
+          "ast_equal": false,
+          "current_source_sha256": "6c3c971563fb1f5b41a62ee9f5cefe88335fc8bcbfc591fd1a28bae63a8541bd",
+          "old_source_sha256": "6b843eb191b2aa9116a8d9ace2fe4209ef513cd87d9d92421f798997d7e927c9",
+          "source_segment_equal": false
+        },
+        "_bank_state_digest": {
+          "present_in_snapshot": false
+        },
+        "_launch": {
+          "present_in_snapshot": false
+        },
+        "_suffix": {
+          "present_in_snapshot": false
+        },
+        "_validate_published_state": {
+          "present_in_snapshot": false
+        },
+        "_worker_main": {
+          "present_in_snapshot": false
+        },
+        "publish_origin": {
+          "present_in_snapshot": false
+        },
+        "validate_publication_binding": {
+          "present_in_snapshot": false
+        }
+      },
+      "main_guards_ast_equal": false,
+      "matches_requested_old_tested_hash": false,
+      "snapshot": {
+        "bytes": 7320,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/smoke-timing/attempt-1-controller.py",
+        "sha256": "2fc0d2c93ee3b6f6b853653eda512c4f9b14f72e9c1ebed04f1960e6d5ec8632"
+      }
+    }
+  ],
+  "script": {
+    "bytes": 10203,
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/evidence-applicability.py",
+    "sha256": "a8e3ccda93a827d89dd3088a3bec376aa2ba16c38f1c604da8128948631bcdf7"
+  },
+  "six_phase_transfer": {
+    "class_source_sha256": "6c3c971563fb1f5b41a62ee9f5cefe88335fc8bcbfc591fd1a28bae63a8541bd",
+    "old_wholefile_sha256": "ef82f33dda523f92c3e4c2826be3583b7d59bef801fb3abec9cc3d28dadfdca4",
+    "process_reports": [
+      {
+        "bytes": 3108,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-success-1788620841081358000/process-report.json",
+        "sha256": "9149664eeddb3b30a91122fd1cab7d6a0ea9048f4886e0e5ddb9302713e9937b"
+      },
+      {
+        "bytes": 3177,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-ordinary-failure-1788620841664252000/process-report.json",
+        "sha256": "5145e355ebd672d5e2478ed94b880c5321bf0adde9049023842d63de03f08269"
+      },
+      {
+        "bytes": 3182,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-keyboard-interrupt-1788620842225854000/process-report.json",
+        "sha256": "e97085eee8f4d1b82f5facbeea7c1f52030853f2ae5d1f4b03c51faa3b823735"
+      },
+      {
+        "bytes": 3167,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-system-exit-1788620842791549000/process-report.json",
+        "sha256": "8e836e05fba7535653e0d2dd3d55a2d32a702531cd0716a7dcbe292cff81483c"
+      },
+      {
+        "bytes": 3144,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-external-load-timeout-1788620843375435000/process-report.json",
+        "sha256": "6ee3bbc98fd7601979695ccd65bcdf874400477aa9a26e96a8b5261155678869"
+      },
+      {
+        "bytes": 3155,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-internal-short-test-deadline-1788620843918226000/process-report.json",
+        "sha256": "8be33a47399a47700aa6e8dd9d65e32cf1f593a32d3e7b9cd48b05221e6fc30a"
+      }
+    ],
+    "report": {
+      "bytes": 5930,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/root-watchdog-integration-review-current-cli.json",
+      "sha256": "79291332f478348d3d4ecc53adb95357a76b51e6afcc85149893629091912d64"
+    },
+    "runtime_and_watchdog_pins_match": true,
+    "status": "exact_class_source_bytes_proven"
+  },
+  "snapshot_search_scope": [
+    "Workspace work Python files containing def _launch or class ControllerEnvelope.",
+    "Repository work Python files containing those same definitions; none found there."
+  ],
+  "status": "applicable_with_explicit_replacement_evidence",
+  "version": "rf02f.evidence-applicability.v1"
+}

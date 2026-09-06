@@ -1,0 +1,3147 @@
+{
+  "annual_choice": {
+    "games": 512,
+    "inner_seasons": [
+      2011,
+      2012
+    ],
+    "setting": 6,
+    "status": "selected"
+  },
+  "checks_passed": 107089,
+  "code_hashes": {
+    "scripts/research_score_compute_distribution.py": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1",
+    "scripts/research_score_compute_qualify.py": "41edf4cc2bc217fd0947aa2ad17e6112fd20e1aedc93b7eeb7ab0aae0ea77dcb",
+    "scripts/research_score_compute_run.py": "7089fc64b6464dadfddb4796059a975afe7f1fd43730420d8d8193d67104208f",
+    "scripts/research_score_conditional_adapter.py": "a6987485724c7f725661927e194ca39d77b303e15d868b872d3b9449a7cc19f2",
+    "scripts/research_score_conditional_admission.py": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+    "scripts/research_score_conditional_inference.py": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604",
+    "scripts/research_score_conditional_margin.py": "c1a0e334229999afe5bb000598ae0648789cc8ee0e112291b03707039015ad3d",
+    "scripts/research_score_conditional_policy.py": "aa72dc1799669340f3dbec32c5b6510f673ea70bba3d27b2315c311849a4551d",
+    "scripts/research_score_conditional_qualify.py": "cb0a13eb0afacb2a4ccde7826bc2288a31677853b71d061c5ccc477eca0647f6",
+    "scripts/research_score_conditional_replay.py": "8eae09d2b3cb7aec7a2e6fbe265679be39eea5dbf6bd327f24f75d9022f65b45",
+    "scripts/research_score_conditional_run.py": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+    "scripts/research_score_contract.py": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+    "scripts/research_score_distribution.py": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+    "scripts/research_score_encoding_memo.py": "da369432128b28c8268b47fb98bccaa3751d853a1b6876c7526cf9040d7addf2",
+    "scripts/research_score_inference.py": "4b61e0d4477eb49064353d9fd7b4e1c6ac37fc68553e0df0387d9f71bb8db078",
+    "scripts/research_score_metrics.py": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97",
+    "scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+    "scripts/research_score_probability_compute.py": "0ac0ecd32415720cc7e6fb1d2ec0c9229de3a46d6437d5ff380e9ebe2ee83661",
+    "scripts/research_score_replay.py": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594",
+    "scripts/research_score_run.py": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa",
+    "scripts/research_score_skellam_compute.py": "3a88ed783f87cd9fdbfed9fae177edbb8d72d36be8fcfd5374a25a9c4ef8a7d0",
+    "scripts/research_score_split_archive.py": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+    "scripts/research_score_split_budget.py": "0ee4dd5e7936a333fed6b2804f530bf310f588b811af41e3c8a5af1a335388ea",
+    "scripts/research_score_split_compute_controller.py": "0e89fcdfaad5c803e2620183867275af4f2eeff5d7dead14045de523d7c2bdd9",
+    "scripts/research_score_split_compute_integration.py": "f07fc0abe7361dbd5e137ce294908a20fb01ff1015f31b47670e0b88dbc6ddef",
+    "scripts/research_score_split_compute_preflight.py": "b65fc86a14109681c75024345d2adce979499a33afea2607ffc45248401c81b2",
+    "scripts/research_score_split_controller.py": "7f82f65839a53e7fd91fa09e531ad2b758dc6c7ffeed6503cc4c0b7e9643d28b",
+    "scripts/research_score_split_forecast.py": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34",
+    "scripts/research_score_split_grade.py": "042ed7773ee8e0fa0979eb22b7a2bc20f699c8ec2e2a05f761fce80a5aa81f4e",
+    "scripts/research_score_split_inference.py": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22",
+    "scripts/research_score_split_models.py": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+    "scripts/research_score_split_preflight.py": "301b97a6a25e6bca92b99f220657ae54039774122c3e6a65071eefa7d4c79d51",
+    "scripts/research_score_split_replay.py": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547",
+    "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+    "scripts/research_score_split_watchdog.py": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7",
+    "scripts/research_score_successor_distribution.py": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974",
+    "scripts/research_score_successor_qualify.py": "8fa0fb3f298bfa8419d535411b5bad7002fc56de3181d839ee4d047fcd45f7d3",
+    "scripts/research_score_successor_run.py": "b54c265c87a09d2ef9325363f668f3dd5a58cb49c54b82cd8286fdb61bd81459",
+    "tests/research-score-compute/test_cache.py": "a8dd3bf3721a91853eba32344a9301388fa9bd90b52b3c9997fb9c76ad3843dc",
+    "tests/research-score-compute/test_compute_qualify.py": "f12a8f493091c6d08ebfa6572b7a05010d02eb70e7dfaca0a96e64a0da280296",
+    "tests/research-score-compute/test_compute_run.py": "1c8e41eb477f3e86a2d5406dd1119b74f2c0d899c79bab2acb069fb2feb4bf76",
+    "tests/research-score-conditional-margin/test_adapter.py": "431326f6933504c315720c91492b38ef7fd42a2ceb182eb154658ea8d2771c99",
+    "tests/research-score-conditional-margin/test_admission.py": "416550a5459c6ae635db0dfbe35b27e1a51cd57501ec4c234f190c0b5c4249bb",
+    "tests/research-score-conditional-margin/test_conditional_margin.py": "53b18c9ee869696e13e552b9d01bdb8f79b9a1f1d4eb6973ae89420427f0809b",
+    "tests/research-score-conditional-margin/test_inference.py": "598d40031b1630993ff2f2aceb13a7d280dc86a5d4789e572c383d54da1ea629",
+    "tests/research-score-conditional-margin/test_policy.py": "64f8fea7fed97c356bbf221f5630b4fdc2ae0ada43118b85070c3a33b560b44d",
+    "tests/research-score-conditional-margin/test_qualify.py": "aace76b001643345bb5eadc1bd1fc05bc6745bb64fb6b662ef33f7f131e18341",
+    "tests/research-score-conditional-margin/test_replay.py": "6798aec8b7141819d9168bd736e18bf7b4cad7c348d776cdd8268a0569316fb7",
+    "tests/research-score-conditional-margin/test_run.py": "7720f9264d167b610f12971925d416bdef0c9ea08ce4a3cfdc0b193a4562621c",
+    "tests/research-score-encoding-memo/test_encoding_memo.py": "4304e792447fea95c808c923aa78b21c1b8c901cc75b7e5fc871a94cc776cec7",
+    "tests/research-score-probability-compute/test_probability_compute.py": "47b5b69c1a8a9ea033219a42ceead2c9f605d748bd133546d2c94149bb8b51c9",
+    "tests/research-score-skellam-compute/test_skellam_compute.py": "d597718272262bf488e14da2ba023a1a5c9150933ca7abad53e9c329727b8a7d",
+    "tests/research-score-split-compute/qualify_controller.py": "bfb27f98ad76d32e5f962aa897916a8d16d116574da3430873c228f3f73e67d9",
+    "tests/research-score-split-compute/test_controller.py": "d7b00908a9a5e73b55976fd7d1943bc1bd2b7abaf4af9b70bf35f03a75def7f3",
+    "tests/research-score-split-compute/test_integration.py": "5d9c43e08ef2f682a1ff5843697618d96d7784eff5da82e55c011ea7e3e2927e",
+    "tests/research-score-split-compute/test_preflight.py": "83d03a0b7b81053c241fe98b5cd47e9986b3fbc86dfd2a36ee859a2408957da6",
+    "tests/research-score-split/qualify_inference_unit.py": "bdc7016088a8e094e1c4c023e962b0be4935065d5f63df0c9c11e1bf6ef824d3",
+    "tests/research-score-split/test_archive_unit.py": "510c10f77c194dcb5c9591404c5238f43f494659aa96a247db0013ffd3f2969e",
+    "tests/research-score-split/test_bank_unit.py": "326837b37b50c1045b9ba830359a863b48db13c01c48d4b8a782d663184c8973",
+    "tests/research-score-split/test_budget.py": "64cf75c26cec296bc996f37b7f1109d6f0c546ff0a9ae52452c3c9af74f46bc9",
+    "tests/research-score-split/test_controller_unit.py": "dd088f744f441f7dd8bae82751ec2edf673770ea05548d38bea8e24406b891c7",
+    "tests/research-score-split/test_forecast_unit.py": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312",
+    "tests/research-score-split/test_grade_unit.py": "a99289bd9341bbd202107d7491bd9ad8a8022505b57b38ede9db2114b5ccfea1",
+    "tests/research-score-split/test_inference_unit.py": "6678ff40c73b2d5c493cd22d6e2321f7d9edb2d6d5b0a1241c29420c33e9040d",
+    "tests/research-score-split/test_mean_unit.py": "622c7f2f97da6c7f49bbc050ad6d7b583cd3da474b0eeb318dcbb21be6cf3799",
+    "tests/research-score-split/test_preflight_unit.py": "f326f9ca55dd2b30fe2753c0c7cc06505bf894befa2cd51abe8a0737a7cac05a",
+    "tests/research-score-split/test_run_unit.py": "a96576b22bd4c55ed8adf34d49ad78ee783605fe75a3f2f263f17a8c092bd42c",
+    "tests/research-score-split/test_watchdog_unit.py": "1cb98cd59db38847b7ddf3c0440e17f5e20cd9ffcd947b7aec5386a6f2ed5024",
+    "tests/research-score-successor/test_qualify.py": "9eaac19131c06877d9010b48a37315c0dc52d10639aa67faf331ecc1df633c23",
+    "tests/research-score-successor/test_solver.py": "0283d8c2e4d10b34e7552c5750a565e72b9a03b30ca658996089a4a966e5cfc2",
+    "tests/research-score-successor/test_successor_run.py": "a53ca0c80ec71f00e453599a7218d179d6dc5442ba6e407d726a24f608627755",
+    "tests/research-score/test_contract.py": "64157ed50c999e3ecba3b84b0da20afd88074544e957e16d3470d264a60b8bf2",
+    "tests/research-score/test_distribution.py": "b671c6a4b97757a8122a54b98491a4ca79952cceb78a2985c685a9d630f7fc14",
+    "tests/research-score/test_inference.py": "367bcb3e9bf989bae2c9773e82a0b6701b5a8c36bf9347026e3f3dca0f6d293a",
+    "tests/research-score/test_invariance.py": "e192da8539080a0be836ded37a802403bc5d171c148a3edd357db978ad98f50c",
+    "tests/research-score/test_mean_models.py": "fd625bdc03d53e725539ed9517d0c1a5fa5f5caf6fbb331ee3ab2627ffa9a8e7",
+    "tests/research-score/test_metrics.py": "3bd12882c193abe4eb716ddd4fc0b7871fa104a27e526c7187f27c9b44760f91",
+    "tests/research-score/test_replay.py": "ce21d82a17e3878a6ce80095faf5c267d51751df78318b10504d46a86e0a44b9",
+    "tests/research-score/test_run.py": "1b8fe02cc57bdfb95f190c03a49eb16669c3c5aab79f61c383d7e08d778ad58e"
+  },
+  "counts": {
+    "actual_mass_cdf_calls": 3328,
+    "actual_score_calls": 9856,
+    "copied_diagonal_inner": 4896,
+    "copied_e3_outer": 352,
+    "copied_raw_outer": 192,
+    "inner_rows": 14688,
+    "outer_rows": 608,
+    "scored_inner": 9792,
+    "scored_outer": 64
+  },
+  "evidence": [
+    {
+      "bytes": 67139,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/completion/artifact-index.json",
+      "sha256": "1bc24410a4049fe3754e7ce944ab43bc34f311edc2f0bcd7b1f7eaf6d99d4dd9"
+    },
+    {
+      "bytes": 413225,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/completion/terminal.json",
+      "sha256": "b52a904de1aad0303c1b662eec2bb4a9624695344991a94949248fd2048c170d"
+    },
+    {
+      "bytes": 23965,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/manifest.json",
+      "sha256": "b7fd5fb240c6cfa8abcc5f147b28ab37286e83e82ac41c37eb4f44b685d2caa8"
+    },
+    {
+      "bytes": 15387,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-COMP-04-PREFIT-ACCEPTANCE.v1.json",
+      "sha256": "9aaaa23ebc2b002c70d5acef35dd0f8349c721660c54033cfb457b760acd978e"
+    },
+    {
+      "bytes": 15897,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-04/attempt-1788652424308249000/qualification.v2.json",
+      "sha256": "8d763bc0ef108d505b977d3f2dfda2c5a8248d7b3c7189d8186330c54dcf6731"
+    },
+    {
+      "bytes": 1540,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_compute_distribution.py",
+      "sha256": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1"
+    },
+    {
+      "bytes": 14745,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_compute_qualify.py",
+      "sha256": "41edf4cc2bc217fd0947aa2ad17e6112fd20e1aedc93b7eeb7ab0aae0ea77dcb"
+    },
+    {
+      "bytes": 24724,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_compute_run.py",
+      "sha256": "7089fc64b6464dadfddb4796059a975afe7f1fd43730420d8d8193d67104208f"
+    },
+    {
+      "bytes": 13999,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_adapter.py",
+      "sha256": "a6987485724c7f725661927e194ca39d77b303e15d868b872d3b9449a7cc19f2"
+    },
+    {
+      "bytes": 32322,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_admission.py",
+      "sha256": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8"
+    },
+    {
+      "bytes": 23548,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_inference.py",
+      "sha256": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604"
+    },
+    {
+      "bytes": 11842,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_margin.py",
+      "sha256": "c1a0e334229999afe5bb000598ae0648789cc8ee0e112291b03707039015ad3d"
+    },
+    {
+      "bytes": 3223,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_policy.py",
+      "sha256": "aa72dc1799669340f3dbec32c5b6510f673ea70bba3d27b2315c311849a4551d"
+    },
+    {
+      "bytes": 18436,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_qualify.py",
+      "sha256": "cb0a13eb0afacb2a4ccde7826bc2288a31677853b71d061c5ccc477eca0647f6"
+    },
+    {
+      "bytes": 19858,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_replay.py",
+      "sha256": "8eae09d2b3cb7aec7a2e6fbe265679be39eea5dbf6bd327f24f75d9022f65b45"
+    },
+    {
+      "bytes": 52750,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_run.py",
+      "sha256": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343"
+    },
+    {
+      "bytes": 8198,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_contract.py",
+      "sha256": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34"
+    },
+    {
+      "bytes": 13532,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+      "sha256": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1"
+    },
+    {
+      "bytes": 5389,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_encoding_memo.py",
+      "sha256": "da369432128b28c8268b47fb98bccaa3751d853a1b6876c7526cf9040d7addf2"
+    },
+    {
+      "bytes": 13575,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_inference.py",
+      "sha256": "4b61e0d4477eb49064353d9fd7b4e1c6ac37fc68553e0df0387d9f71bb8db078"
+    },
+    {
+      "bytes": 9445,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_metrics.py",
+      "sha256": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97"
+    },
+    {
+      "bytes": 15069,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_models.py",
+      "sha256": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd"
+    },
+    {
+      "bytes": 4342,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+      "sha256": "0ac0ecd32415720cc7e6fb1d2ec0c9229de3a46d6437d5ff380e9ebe2ee83661"
+    },
+    {
+      "bytes": 6657,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_replay.py",
+      "sha256": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594"
+    },
+    {
+      "bytes": 27993,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py",
+      "sha256": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa"
+    },
+    {
+      "bytes": 3937,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_skellam_compute.py",
+      "sha256": "3a88ed783f87cd9fdbfed9fae177edbb8d72d36be8fcfd5374a25a9c4ef8a7d0"
+    },
+    {
+      "bytes": 44888,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_archive.py",
+      "sha256": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423"
+    },
+    {
+      "bytes": 5177,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_budget.py",
+      "sha256": "0ee4dd5e7936a333fed6b2804f530bf310f588b811af41e3c8a5af1a335388ea"
+    },
+    {
+      "bytes": 18734,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_compute_controller.py",
+      "sha256": "0e89fcdfaad5c803e2620183867275af4f2eeff5d7dead14045de523d7c2bdd9"
+    },
+    {
+      "bytes": 12704,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_compute_integration.py",
+      "sha256": "f07fc0abe7361dbd5e137ce294908a20fb01ff1015f31b47670e0b88dbc6ddef"
+    },
+    {
+      "bytes": 25202,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_compute_preflight.py",
+      "sha256": "b65fc86a14109681c75024345d2adce979499a33afea2607ffc45248401c81b2"
+    },
+    {
+      "bytes": 38422,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py",
+      "sha256": "7f82f65839a53e7fd91fa09e531ad2b758dc6c7ffeed6503cc4c0b7e9643d28b"
+    },
+    {
+      "bytes": 23576,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_forecast.py",
+      "sha256": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34"
+    },
+    {
+      "bytes": 16497,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_grade.py",
+      "sha256": "042ed7773ee8e0fa0979eb22b7a2bc20f699c8ec2e2a05f761fce80a5aa81f4e"
+    },
+    {
+      "bytes": 16104,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_inference.py",
+      "sha256": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22"
+    },
+    {
+      "bytes": 4803,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_models.py",
+      "sha256": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48"
+    },
+    {
+      "bytes": 23421,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_preflight.py",
+      "sha256": "301b97a6a25e6bca92b99f220657ae54039774122c3e6a65071eefa7d4c79d51"
+    },
+    {
+      "bytes": 4538,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_replay.py",
+      "sha256": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547"
+    },
+    {
+      "bytes": 23897,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py",
+      "sha256": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7"
+    },
+    {
+      "bytes": 20517,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_watchdog.py",
+      "sha256": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7"
+    },
+    {
+      "bytes": 4148,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py",
+      "sha256": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974"
+    },
+    {
+      "bytes": 15639,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_qualify.py",
+      "sha256": "8fa0fb3f298bfa8419d535411b5bad7002fc56de3181d839ee4d047fcd45f7d3"
+    },
+    {
+      "bytes": 16082,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_run.py",
+      "sha256": "b54c265c87a09d2ef9325363f668f3dd5a58cb49c54b82cd8286fdb61bd81459"
+    },
+    {
+      "bytes": 17050,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-compute/test_cache.py",
+      "sha256": "a8dd3bf3721a91853eba32344a9301388fa9bd90b52b3c9997fb9c76ad3843dc"
+    },
+    {
+      "bytes": 8401,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-compute/test_compute_qualify.py",
+      "sha256": "f12a8f493091c6d08ebfa6572b7a05010d02eb70e7dfaca0a96e64a0da280296"
+    },
+    {
+      "bytes": 28048,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-compute/test_compute_run.py",
+      "sha256": "1c8e41eb477f3e86a2d5406dd1119b74f2c0d899c79bab2acb069fb2feb4bf76"
+    },
+    {
+      "bytes": 25409,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_adapter.py",
+      "sha256": "431326f6933504c315720c91492b38ef7fd42a2ceb182eb154658ea8d2771c99"
+    },
+    {
+      "bytes": 17777,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_admission.py",
+      "sha256": "416550a5459c6ae635db0dfbe35b27e1a51cd57501ec4c234f190c0b5c4249bb"
+    },
+    {
+      "bytes": 13518,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_conditional_margin.py",
+      "sha256": "53b18c9ee869696e13e552b9d01bdb8f79b9a1f1d4eb6973ae89420427f0809b"
+    },
+    {
+      "bytes": 24217,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_inference.py",
+      "sha256": "598d40031b1630993ff2f2aceb13a7d280dc86a5d4789e572c383d54da1ea629"
+    },
+    {
+      "bytes": 15384,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_policy.py",
+      "sha256": "64f8fea7fed97c356bbf221f5630b4fdc2ae0ada43118b85070c3a33b560b44d"
+    },
+    {
+      "bytes": 16078,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_qualify.py",
+      "sha256": "aace76b001643345bb5eadc1bd1fc05bc6745bb64fb6b662ef33f7f131e18341"
+    },
+    {
+      "bytes": 23060,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_replay.py",
+      "sha256": "6798aec8b7141819d9168bd736e18bf7b4cad7c348d776cdd8268a0569316fb7"
+    },
+    {
+      "bytes": 45043,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_run.py",
+      "sha256": "7720f9264d167b610f12971925d416bdef0c9ea08ce4a3cfdc0b193a4562621c"
+    },
+    {
+      "bytes": 23993,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-encoding-memo/test_encoding_memo.py",
+      "sha256": "4304e792447fea95c808c923aa78b21c1b8c901cc75b7e5fc871a94cc776cec7"
+    },
+    {
+      "bytes": 20889,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-probability-compute/test_probability_compute.py",
+      "sha256": "47b5b69c1a8a9ea033219a42ceead2c9f605d748bd133546d2c94149bb8b51c9"
+    },
+    {
+      "bytes": 19939,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-skellam-compute/test_skellam_compute.py",
+      "sha256": "d597718272262bf488e14da2ba023a1a5c9150933ca7abad53e9c329727b8a7d"
+    },
+    {
+      "bytes": 13948,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split-compute/qualify_controller.py",
+      "sha256": "bfb27f98ad76d32e5f962aa897916a8d16d116574da3430873c228f3f73e67d9"
+    },
+    {
+      "bytes": 28179,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split-compute/test_controller.py",
+      "sha256": "d7b00908a9a5e73b55976fd7d1943bc1bd2b7abaf4af9b70bf35f03a75def7f3"
+    },
+    {
+      "bytes": 34554,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split-compute/test_integration.py",
+      "sha256": "5d9c43e08ef2f682a1ff5843697618d96d7784eff5da82e55c011ea7e3e2927e"
+    },
+    {
+      "bytes": 17320,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split-compute/test_preflight.py",
+      "sha256": "83d03a0b7b81053c241fe98b5cd47e9986b3fbc86dfd2a36ee859a2408957da6"
+    },
+    {
+      "bytes": 20060,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/qualify_inference_unit.py",
+      "sha256": "bdc7016088a8e094e1c4c023e962b0be4935065d5f63df0c9c11e1bf6ef824d3"
+    },
+    {
+      "bytes": 29641,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_archive_unit.py",
+      "sha256": "510c10f77c194dcb5c9591404c5238f43f494659aa96a247db0013ffd3f2969e"
+    },
+    {
+      "bytes": 20412,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_bank_unit.py",
+      "sha256": "326837b37b50c1045b9ba830359a863b48db13c01c48d4b8a782d663184c8973"
+    },
+    {
+      "bytes": 5004,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_budget.py",
+      "sha256": "64cf75c26cec296bc996f37b7f1109d6f0c546ff0a9ae52452c3c9af74f46bc9"
+    },
+    {
+      "bytes": 29467,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_controller_unit.py",
+      "sha256": "dd088f744f441f7dd8bae82751ec2edf673770ea05548d38bea8e24406b891c7"
+    },
+    {
+      "bytes": 26071,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_forecast_unit.py",
+      "sha256": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312"
+    },
+    {
+      "bytes": 24320,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_grade_unit.py",
+      "sha256": "a99289bd9341bbd202107d7491bd9ad8a8022505b57b38ede9db2114b5ccfea1"
+    },
+    {
+      "bytes": 18616,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_inference_unit.py",
+      "sha256": "6678ff40c73b2d5c493cd22d6e2321f7d9edb2d6d5b0a1241c29420c33e9040d"
+    },
+    {
+      "bytes": 14617,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_mean_unit.py",
+      "sha256": "622c7f2f97da6c7f49bbc050ad6d7b583cd3da474b0eeb318dcbb21be6cf3799"
+    },
+    {
+      "bytes": 11777,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_preflight_unit.py",
+      "sha256": "f326f9ca55dd2b30fe2753c0c7cc06505bf894befa2cd51abe8a0737a7cac05a"
+    },
+    {
+      "bytes": 25149,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_run_unit.py",
+      "sha256": "a96576b22bd4c55ed8adf34d49ad78ee783605fe75a3f2f263f17a8c092bd42c"
+    },
+    {
+      "bytes": 18090,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_watchdog_unit.py",
+      "sha256": "1cb98cd59db38847b7ddf3c0440e17f5e20cd9ffcd947b7aec5386a6f2ed5024"
+    },
+    {
+      "bytes": 7271,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-successor/test_qualify.py",
+      "sha256": "9eaac19131c06877d9010b48a37315c0dc52d10639aa67faf331ecc1df633c23"
+    },
+    {
+      "bytes": 8347,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-successor/test_solver.py",
+      "sha256": "0283d8c2e4d10b34e7552c5750a565e72b9a03b30ca658996089a4a966e5cfc2"
+    },
+    {
+      "bytes": 15966,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-successor/test_successor_run.py",
+      "sha256": "a53ca0c80ec71f00e453599a7218d179d6dc5442ba6e407d726a24f608627755"
+    },
+    {
+      "bytes": 7613,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score/test_contract.py",
+      "sha256": "64157ed50c999e3ecba3b84b0da20afd88074544e957e16d3470d264a60b8bf2"
+    },
+    {
+      "bytes": 11172,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score/test_distribution.py",
+      "sha256": "b671c6a4b97757a8122a54b98491a4ca79952cceb78a2985c685a9d630f7fc14"
+    },
+    {
+      "bytes": 7457,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score/test_inference.py",
+      "sha256": "367bcb3e9bf989bae2c9773e82a0b6701b5a8c36bf9347026e3f3dca0f6d293a"
+    },
+    {
+      "bytes": 6042,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score/test_invariance.py",
+      "sha256": "e192da8539080a0be836ded37a802403bc5d171c148a3edd357db978ad98f50c"
+    },
+    {
+      "bytes": 14449,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score/test_mean_models.py",
+      "sha256": "fd625bdc03d53e725539ed9517d0c1a5fa5f5caf6fbb331ee3ab2627ffa9a8e7"
+    },
+    {
+      "bytes": 4578,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score/test_metrics.py",
+      "sha256": "3bd12882c193abe4eb716ddd4fc0b7871fa104a27e526c7187f27c9b44760f91"
+    },
+    {
+      "bytes": 6647,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score/test_replay.py",
+      "sha256": "ce21d82a17e3878a6ce80095faf5c267d51751df78318b10504d46a86e0a44b9"
+    },
+    {
+      "bytes": 4640,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score/test_run.py",
+      "sha256": "1b8fe02cc57bdfb95f190c03a49eb16669c3c5aab79f61c383d7e08d778ad58e"
+    },
+    {
+      "bytes": 10374,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-COMP-04-COMPUTE-PROTOCOL.v1.md",
+      "sha256": "69de6edd1ea666209e02eb51005513a0a9a2622dd3eeb30c39a6be70c0bd0a00"
+    },
+    {
+      "bytes": 18023,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-04/attempt-1788652424308249000/numerical-review.v2.json",
+      "sha256": "4d72a436f7f9657699140f3b948d56edb753bb55d4f665eba43ca4999d1a8ce0"
+    },
+    {
+      "bytes": 27421,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-04/attempt-1788652424308249000/temporal-review.json",
+      "sha256": "5fb0a6901100af7e958130caf50e5f6e9ca9c21faef4aad4e1b34ffcbc1fd7ca"
+    },
+    {
+      "bytes": 307368,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/artifact-index.json",
+      "sha256": "ccde502d661a4beee8f8da537a2f23238950fb2931c1527638de4c92898804ab"
+    },
+    {
+      "bytes": 1310,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/admission.json",
+      "sha256": "9aa10144336df1284778754692ba9493fc183033ae299e6f9d5bcf81383b729c"
+    },
+    {
+      "bytes": 1172,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/smoke.json",
+      "sha256": "ec6cf938ee6f994658264e2aecbba80bd73659a467f434c9129c424b0e9a678c"
+    },
+    {
+      "bytes": 339,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/started.json",
+      "sha256": "a19981884f70b2a329d30ccbbb17cd45ba7ec20c9b2411deea7809fe82ffa09d"
+    },
+    {
+      "bytes": 11759719,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/pilot.json",
+      "sha256": "28e6569671b7fc3d1d83fefac068cee80f65d04e3e4fe5ad0703d35d94e8b79c"
+    },
+    {
+      "bytes": 3812,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/selection-2013.json",
+      "sha256": "0a248a518b00bfd4623d5368394b74dc8b8d9dc31aa125298f66ebceb860246a"
+    },
+    {
+      "bytes": 2507,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-01.json",
+      "sha256": "4ed52c703653b8760703d07947f4e524054408fa1c934e2b2af15354aef653af"
+    },
+    {
+      "bytes": 2282,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-01.json",
+      "sha256": "e1c4cd3e6368fe7733cad9861534275dbd29f7074e57924f867dd6e87fe2549f"
+    },
+    {
+      "bytes": 644,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-01.json",
+      "sha256": "24052364a9fe57125b32fe37de4c23e69327345e6e39a6408994b8189e6220e8"
+    },
+    {
+      "bytes": 7167,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-01.json",
+      "sha256": "5297ec3e058b5c40e2a5bb5b622b917af44fe3fa76dc7c91f24cf97b73c0caf4"
+    },
+    {
+      "bytes": 4319,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-02.json",
+      "sha256": "ec1e96bfa4655226782866aa9c263f4d142248488886fab024cda29e6fa25550"
+    },
+    {
+      "bytes": 4094,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-02.json",
+      "sha256": "9248367978a1be1f5e568659da544853632249c21995993dc1c245e9e5765f1e"
+    },
+    {
+      "bytes": 644,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-02.json",
+      "sha256": "e07e6710fa2a93d725f717536f1f91ddd7b81d6c4e662523199dff1a60267e2c"
+    },
+    {
+      "bytes": 8105,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-02.json",
+      "sha256": "ca5946ad8798b296a29865bd288e09f0a93cd46648413c0cdf287321efc512fd"
+    },
+    {
+      "bytes": 5318,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-03.json",
+      "sha256": "1e286db076fb2114d60a3de50b82824ef2619645254fa5b1e6d7d68588382b36"
+    },
+    {
+      "bytes": 5093,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-03.json",
+      "sha256": "473fc4e3dce56de7a1b56a81646f7a8b512c9e6b099a3cae75ce5080717912ed"
+    },
+    {
+      "bytes": 644,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-03.json",
+      "sha256": "49a92dc49b2ce8ba9a50472463a2aae9fbebf355a8e8eab063b243b3373b6cda"
+    },
+    {
+      "bytes": 9114,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-03.json",
+      "sha256": "a7c764a5940b8ee2edac9b3c72f9a3ee93c33ef672c0af78b7f4e25c16817783"
+    },
+    {
+      "bytes": 6154,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-04.json",
+      "sha256": "2b2ffebc1432b4f068d3e6ac55c7b5b8c16f8c76bce2d0fb8eabe727b203f616"
+    },
+    {
+      "bytes": 5930,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-04.json",
+      "sha256": "4a73d7140b85b21aa03d2bb60cd8550a0f2909b1afd2472b60f0e53affa40d6d"
+    },
+    {
+      "bytes": 644,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-04.json",
+      "sha256": "cc9263222cbe985107ec2462d0411b3676fb3341ec78c827a42eeff219f89d88"
+    },
+    {
+      "bytes": 10091,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-04.json",
+      "sha256": "6d0a7bd988cfb8de3ec4126273a655c39eca5c4ae759e6459e076b89ee62d9de"
+    },
+    {
+      "bytes": 6844,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-05.json",
+      "sha256": "31a7f6beb4d698dc586e62d6606310dbb695b4c2a42b5c1f91b9fdc5fccdfa1b"
+    },
+    {
+      "bytes": 6620,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-05.json",
+      "sha256": "8f90f47ed4db0f48b20bf585ed3d7d54bd544b3f16d19e095b934244f008b42a"
+    },
+    {
+      "bytes": 644,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-05.json",
+      "sha256": "bcf54672c27f60ad31e286514dff7a43b91ee792451a77a0f7eb7ae8dc291df3"
+    },
+    {
+      "bytes": 10949,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-05.json",
+      "sha256": "e2be18929a3e3f2f33a182b8b20d2ea1060826633166bafd513e21a196a7bc1a"
+    },
+    {
+      "bytes": 7816,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-06.json",
+      "sha256": "6d864f7fcfcb0d467a46098729779c88344ff8be1e284782de31b43a92a2d135"
+    },
+    {
+      "bytes": 7592,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-06.json",
+      "sha256": "2b744e8935d1b4212db2b894cac1609962532d583be024be2c29dc7715e40fcc"
+    },
+    {
+      "bytes": 644,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-06.json",
+      "sha256": "d0e91e6fdb1b90fa650b307b1966398ddc7a510e97ddb8738d645ff3bd77f8a8"
+    },
+    {
+      "bytes": 11804,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-06.json",
+      "sha256": "5a84af4c38310fb94f6f327626823fc1a317cb09085e3cfd6373974385b922cb"
+    },
+    {
+      "bytes": 8613,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-07.json",
+      "sha256": "6ebd41235bd1d094ab21d1073705dc36e588fc54c9bbcb706e78144c49c3ed2a"
+    },
+    {
+      "bytes": 8389,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-07.json",
+      "sha256": "6ede3361035a1c6ff8bbc9118bcfdb987e294b604db02931063128dcab60a85a"
+    },
+    {
+      "bytes": 644,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-07.json",
+      "sha256": "9388f222b54642b10ee16ec02559b3229eb20f2547433d2fc37bad1ab7f1d33b"
+    },
+    {
+      "bytes": 12658,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-07.json",
+      "sha256": "8f5c3bbc2448d79653b6db86a5e0ae2154a13cffcbc4c09e63d6e45e3927eb34"
+    },
+    {
+      "bytes": 9386,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-08.json",
+      "sha256": "25090d99e9c8ddf2702ae983d42f15f0bfe501acb33ea790f1ae7112f8199af0"
+    },
+    {
+      "bytes": 9162,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-08.json",
+      "sha256": "1867c9fd73539a4baaede5e732782b91ad9b02897e91ac13e91b13d2ef86d6e0"
+    },
+    {
+      "bytes": 644,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-08.json",
+      "sha256": "2c4f6e18fb32d5878b8ba83c180c6ffc1b1ef1c45ff7db2ce70a205157f215f7"
+    },
+    {
+      "bytes": 13512,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-08.json",
+      "sha256": "fc75197efff355372d62c323f7002cbdedec7c06fee75dad4a3ad69b24738243"
+    },
+    {
+      "bytes": 10069,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-09.json",
+      "sha256": "349fcc0b326696248fdab1b771ce2cb0b6a7c0549665a40d24257bda0a1d8bc3"
+    },
+    {
+      "bytes": 9845,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-09.json",
+      "sha256": "b2af07bad30a296033cd8eeb351dc2d6563327a0dc4a01fefd6942da6a42f409"
+    },
+    {
+      "bytes": 644,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-09.json",
+      "sha256": "b88204ae13b1042e1c05dd77ee4be14e33856cf49d5dd54e8f068edd6565d8d0"
+    },
+    {
+      "bytes": 14304,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-09.json",
+      "sha256": "a807e5c52bfe575e5bed66d42b6e0ebb82491fe78d6ddca7794a8c9219e90c1d"
+    },
+    {
+      "bytes": 10842,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-10.json",
+      "sha256": "06faef38a45a0d8e2b47a84aadc5f0ee20d8653afc763750d1190b4edcc6313e"
+    },
+    {
+      "bytes": 10617,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-10.json",
+      "sha256": "c45ac71ad61b6e6fca462355e11727fe80b2fa14475e554c89e62a497e0ae854"
+    },
+    {
+      "bytes": 645,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-10.json",
+      "sha256": "839d741fd8a076bfdd2985e06d1c07b3b33b51534d94f28aaac97f3073912dc8"
+    },
+    {
+      "bytes": 15098,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-10.json",
+      "sha256": "c6b9b61ee15e7938e66b8e073286e5c867ccaecbaaae04abb5e13af088519890"
+    },
+    {
+      "bytes": 11755,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-11.json",
+      "sha256": "5de1c911da46e1dda283398f26770ea23611a33585e80c0121b1c30c516f1b07"
+    },
+    {
+      "bytes": 11530,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-11.json",
+      "sha256": "c45207a76b315c001802e6faf6fd14e7834f448547cd23986f872063a10deacf"
+    },
+    {
+      "bytes": 645,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-11.json",
+      "sha256": "0fa49cdc9a31dcec6d388c5bb12cc1a21347aa601fd5132d2534fed793942bd3"
+    },
+    {
+      "bytes": 15958,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-11.json",
+      "sha256": "44f0321cb66cf5d0501c5c833ed161eb526267f9cedb093e0470c6ac0d5d1f89"
+    },
+    {
+      "bytes": 12780,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-12.json",
+      "sha256": "886a49198861b9d7ee8f09d84030b9b204351f0784ebbc330bb06c904e92a45d"
+    },
+    {
+      "bytes": 12555,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-12.json",
+      "sha256": "6ba1cf58dee6926b3935a13711057dc4ae0f2c66de1b92c9ad2ea02219fa92b2"
+    },
+    {
+      "bytes": 645,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-12.json",
+      "sha256": "4244d27ac4283326513d9c83ae7d46ca8e84e4f4c788ef352384dea3e3318c7a"
+    },
+    {
+      "bytes": 16937,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-12.json",
+      "sha256": "f97dfadbca10392062fa6a72e2652353a059d4f0a098e63b611861b77fd080ee"
+    },
+    {
+      "bytes": 13693,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-13.json",
+      "sha256": "a78b9216ec64d04b054bd65fc1611adc95faeaf6dfc73ffb8051d7e54c79432d"
+    },
+    {
+      "bytes": 13468,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-13.json",
+      "sha256": "a381146f7a54a08f09c263e180f77e17c00200c6a4704fa1c5c07000e94c8b6b"
+    },
+    {
+      "bytes": 645,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-13.json",
+      "sha256": "6ce8f62d40d074ac4d8dec860c09d228e55fe1d8986d695a6c9dc97f079e22fe"
+    },
+    {
+      "bytes": 17915,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-13.json",
+      "sha256": "2654ea65d39f963d57b7a9d10bd96aa3bd60975ff736a11e04fd2f8bc30571c3"
+    },
+    {
+      "bytes": 14607,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-14.json",
+      "sha256": "86a59c30d6d27cd65426577db923d60cbb4cba949daae2faaf42234105be1109"
+    },
+    {
+      "bytes": 14382,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-14.json",
+      "sha256": "21634dcd9a2c72e64908ebd03fa6b5ec986018146b07b153b560629dae69ac17"
+    },
+    {
+      "bytes": 645,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-14.json",
+      "sha256": "e01108118545252f7d16d08ecf0cb0f69280cb0b83343d245194c24e85a789d9"
+    },
+    {
+      "bytes": 18893,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-14.json",
+      "sha256": "3e52db473fe9bc38c202f99c9992f34e79e60cfedeae8033665bc28f1485dfbf"
+    },
+    {
+      "bytes": 15491,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-15.json",
+      "sha256": "7933b27127cceb5d85a699450482ed338dd94c2f9372fd92dd256282f0b630d5"
+    },
+    {
+      "bytes": 15266,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-15.json",
+      "sha256": "bfc1c712bea73ab1bc57b50b41ba1c54c1ed6137593d33eafcf00388f1fe3c8e"
+    },
+    {
+      "bytes": 645,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-15.json",
+      "sha256": "dd10c1423096bebbb92435369c0564e61b6481131a758587338e36dfbf29f4d5"
+    },
+    {
+      "bytes": 19839,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-15.json",
+      "sha256": "04ff675970653440835bd6a374b6ebae863804ff66c4a319b71805e45ad25f07"
+    },
+    {
+      "bytes": 16464,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-16.json",
+      "sha256": "ac91f0adafd8436d5e188fe483fe75be4d7af7b2f14cc474c6ef9a356438addb"
+    },
+    {
+      "bytes": 16239,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-16.json",
+      "sha256": "18d2a37fe4f54a7dfe2860d7a5c3efef8223828de08eeac67ce3d9bc92454065"
+    },
+    {
+      "bytes": 645,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-16.json",
+      "sha256": "576b8229550e4f4946ee674e88af5c8f37fb110eae6039d16c9d27fd14e6cbcc"
+    },
+    {
+      "bytes": 20848,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-16.json",
+      "sha256": "903dd8d4642fa4930b558ae569870f58e427178840c9bac758cc3789af43d0b0"
+    },
+    {
+      "bytes": 17300,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-17.json",
+      "sha256": "f6b86f644df717647f21dbb33c4fbfacbe8c236ef2cefb0fecb71cc2fc7b4ab6"
+    },
+    {
+      "bytes": 17075,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2010-17.json",
+      "sha256": "16403dda93da989051d7af9daac8f2141f90b32396c9e9a17698d9cd2eacd288"
+    },
+    {
+      "bytes": 645,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2010-17.json",
+      "sha256": "1db92720bd701b41003e6f19bb81fcceec0d903d21988d8cdb504f11d6c0ac5e"
+    },
+    {
+      "bytes": 21765,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2010-17.json",
+      "sha256": "1a60e0233e68b61b72fa731e7654131a7dd4c48829b7f8d643e4992a74f488d6"
+    },
+    {
+      "bytes": 286967,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-01.json",
+      "sha256": "7e63f029e5a7a776ae5977272d41cc22cb87156aa819ab9712654d0413c64d69"
+    },
+    {
+      "bytes": 276190,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-01.json",
+      "sha256": "f6a38b2315694894af39a63f0a988acd419b6e860b3916218adc9e403f70bd34"
+    },
+    {
+      "bytes": 394870,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-01.json",
+      "sha256": "46b6d489d6597b83b3606dc9acc3735f57d99b3abed3eac8f68f24e28f765bca"
+    },
+    {
+      "bytes": 22835,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-01.json",
+      "sha256": "f6ceccd0e801be86d8ab662695f7c1d427779deb073b5571552af519489b5f04"
+    },
+    {
+      "bytes": 287748,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-02.json",
+      "sha256": "b5e604d0660630dabc9d92d7635902ac5d3d410e5da7e73b1240c0cdaccb1efb"
+    },
+    {
+      "bytes": 276969,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-02.json",
+      "sha256": "a5065d0940329d99d1898e6011f310cc9148d66928dac0344395cc61c5997fcd"
+    },
+    {
+      "bytes": 394888,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-02.json",
+      "sha256": "289d6ce0fa23ee2b073a40ce3c3772ffd25c6da399eb45111cb8b49de8035391"
+    },
+    {
+      "bytes": 23752,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-02.json",
+      "sha256": "f73fd9ad096b3db99bbdd63b3915ad6923c0bdc04442b2160643619227ae1814"
+    },
+    {
+      "bytes": 288733,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-03.json",
+      "sha256": "95a6a54c1bc26f2bfd689c0dcc2e078bdbf1684dcd3b465966eae570b83fea43"
+    },
+    {
+      "bytes": 277968,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-03.json",
+      "sha256": "59970d3a5856f279b4b621a0eb9df8276694271dfa3a77f29f04dd0e1900cddf"
+    },
+    {
+      "bytes": 394888,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-03.json",
+      "sha256": "72f8b2328255d61dec004811085215a739bbfb09365b29053f7f19da72d4ed4d"
+    },
+    {
+      "bytes": 24760,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-03.json",
+      "sha256": "15378ebfbab82b1f1980515994c984069b333769ed1dbc45b3e8e1f5f12b6a29"
+    },
+    {
+      "bytes": 289613,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-04.json",
+      "sha256": "21e49bf0e5588d8854c9ed08c63815d7232e31d7e10f30ec5eb4c45e96fb368d"
+    },
+    {
+      "bytes": 278854,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-04.json",
+      "sha256": "83e8a4d6010f3fbf90803264ab9e632282b3b358c241e61133bee970a689d754"
+    },
+    {
+      "bytes": 394888,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-04.json",
+      "sha256": "e3ee4ecf046e80e33711ab5fb538921ed55b3eaf2a68998d5d35c86d88dcd062"
+    },
+    {
+      "bytes": 25738,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-04.json",
+      "sha256": "0c56e907d76aec75ddf13db900e85553d4049a6c678d1c4a402d99cbbb288b5f"
+    },
+    {
+      "bytes": 240084,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-05.json",
+      "sha256": "5d3abc961ba79fe74fcc43de4a3a16788e8c0c9fc738e5328044b78793627fac"
+    },
+    {
+      "bytes": 231259,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-05.json",
+      "sha256": "a8c20a8f6002b686520d42c2c55449571ec80e95f95adb7c7358074d5819800d"
+    },
+    {
+      "bytes": 321073,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-05.json",
+      "sha256": "9c2d2e3dc9785a3506e9a1c054a177f1f7a82cb47d0f733d93660d3a51e489ab"
+    },
+    {
+      "bytes": 26717,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-05.json",
+      "sha256": "f64ba60fa2c0fa61964856f99faa10ad8d35bd99fb55704b7aaf29ff2ba688fc"
+    },
+    {
+      "bytes": 240714,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-06.json",
+      "sha256": "d825fefde840b3d35936688439240ad572f909a0d9fcb724e8aa3a4133962b89"
+    },
+    {
+      "bytes": 231897,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-06.json",
+      "sha256": "beca04ece124d75045ea70a4357d0b46a6823d2c1c99226b63cc0c66b7d9e5a6"
+    },
+    {
+      "bytes": 321163,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-06.json",
+      "sha256": "8e3a0bb23d7c9a787408f79250f675d860ceb7afd9d1071410549997b5b67dc8"
+    },
+    {
+      "bytes": 27508,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-06.json",
+      "sha256": "927d1c8f94fc2fed25170b66da2077240afd122bda6771aa8c2653a62bb9f159"
+    },
+    {
+      "bytes": 241464,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-07.json",
+      "sha256": "26e546395332635ca954a37d7c7a2e4f41d78204f396fb1b2ebc91ef96f1ebd3"
+    },
+    {
+      "bytes": 232646,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-07.json",
+      "sha256": "ab6b22308b2dcca7ca2b50ca8ab54a96020e818d048700d36e21bc25380bd86f"
+    },
+    {
+      "bytes": 321163,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-07.json",
+      "sha256": "5ee37ee971a1cc59ed378c812919849addeb1e390a4c8f2517d27debb62d025d"
+    },
+    {
+      "bytes": 28304,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-07.json",
+      "sha256": "4c4cea430cdc6e0e5001960332b5a1c5032aee5436f5d2eb213329b396b91433"
+    },
+    {
+      "bytes": 242206,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-08.json",
+      "sha256": "6dacafe8d23429ee7294a2787526254d809e4c6b43cdb8ba372d0af27d5f8660"
+    },
+    {
+      "bytes": 233390,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-08.json",
+      "sha256": "36ed96038709e6deb389196be5b6070f256113a40eb900de91250d049b51ba61"
+    },
+    {
+      "bytes": 321163,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-08.json",
+      "sha256": "01fb799dc16d807662d937b9085830cb446b04d29424d6b36e09f8d3758c90d3"
+    },
+    {
+      "bytes": 29100,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-08.json",
+      "sha256": "7a702ac548c3a2dcaaf8814f012b67b4a65e1d3fd2f4f35818afcb48f032eef3"
+    },
+    {
+      "bytes": 259690,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-09.json",
+      "sha256": "ad6a301e8a81daeb44bf0ebbca90844a77d8cba6f6fbabde7a2601044ee5efbd"
+    },
+    {
+      "bytes": 250232,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-09.json",
+      "sha256": "1f5503160efbd1a3432c063c49a111e57e802363a4bbb5a2c8e6203caaacde84"
+    },
+    {
+      "bytes": 345678,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-09.json",
+      "sha256": "e519f5ffb47b6b87570db5c735900beba0d558bc6f58f7a4e1d33fbe8bfa0b6c"
+    },
+    {
+      "bytes": 29898,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-09.json",
+      "sha256": "6be99e516e2a8307ebd617d42db04c4ddd99285403a09a1e3d3d7913729bbd4b"
+    },
+    {
+      "bytes": 294186,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-10.json",
+      "sha256": "6d6eea7f37426bd83c37611d54dcc724a1c70af6cb006d14ef4545567c0339a6"
+    },
+    {
+      "bytes": 283565,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-10.json",
+      "sha256": "aba0ebafe30f816466d2ac193c4eab1f9f37c6a052d2a50fc2437b30846e7ec4"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-10.json",
+      "sha256": "cfaf061f376d9b057f9344a3064a81c1a1060a3dadc09de95b7625af95e48f58"
+    },
+    {
+      "bytes": 30750,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-10.json",
+      "sha256": "6b763a3b0199950da034ea509e216492cf4280c5025791d096cb9bafdd24868f"
+    },
+    {
+      "bytes": 261596,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-11.json",
+      "sha256": "64ad5e376c8fc6f5bd52c6fa3bc5eaeee05fe67e46e3ed92e911b210defb0ed8"
+    },
+    {
+      "bytes": 252277,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-11.json",
+      "sha256": "6a15cac8ea6eeff93e49298c217737d6baf4ba738d0acebf6ae3ed6ad0059efe"
+    },
+    {
+      "bytes": 345850,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-11.json",
+      "sha256": "8a8a7b2a8407e5592c64b6655e69210252e1c25e7d41e2f7f61158e2ea4c5b95"
+    },
+    {
+      "bytes": 31729,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-11.json",
+      "sha256": "4e12f7d846f73f219ce5485a8ab5bf87d875b19727ce3eec855e78a048834400"
+    },
+    {
+      "bytes": 295954,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-12.json",
+      "sha256": "65e567d6deaf2a9d4882dd703e52b797213e3b33c6132c0d20b50f97dbdb878a"
+    },
+    {
+      "bytes": 285284,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-12.json",
+      "sha256": "a2c44e7f11ed0d548ed287cd39b86d1fa0a044141c4ccfed3911439ba4bd9ac0"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-12.json",
+      "sha256": "b3b0f20b206bb1c1c9b919a2ea4deb49574984f2b41a50b72c6d6b86d2779bec"
+    },
+    {
+      "bytes": 32586,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-12.json",
+      "sha256": "1b0c55c78be28445e5337df5314625549dbf5f2526b65df5c7ccf8ebdf76766d"
+    },
+    {
+      "bytes": 296752,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-13.json",
+      "sha256": "d2fa938958eadc8a8c528fb43000d3122a305c839e838f2a680898d1cf086f1d"
+    },
+    {
+      "bytes": 286310,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-13.json",
+      "sha256": "7b7ffd83c0a05a9f918e1b5c973940465ed16ec0fc6d9a9ca8a1331ca6cfabf5"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-13.json",
+      "sha256": "05cd20a6dbf8f4454f92e420d31049de7308cbc8b27eca367ca666f6ac5fdfd0"
+    },
+    {
+      "bytes": 33563,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-13.json",
+      "sha256": "62fe45ea8b34dff919f5af8f53aa961ede468df8a12f84abe2f9c8a11aad7b33"
+    },
+    {
+      "bytes": 297668,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-14.json",
+      "sha256": "37a9fe283d27d1500ce202cb67d71355de28b22c5406ebbd56d06bdc5004aff1"
+    },
+    {
+      "bytes": 287225,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-14.json",
+      "sha256": "57aa28195452880f1c20e2bb1a2c2c636a81297c3af8025e02fdcc3578d5419a"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-14.json",
+      "sha256": "54eecbdafe83e776bb047da8e39dcfe4add63253034f37b03fa0a593a552af80"
+    },
+    {
+      "bytes": 34541,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-14.json",
+      "sha256": "a319a89c00359f2e48fd03511d4d2d82f8a4a6486d4c08d91ee93b3a0dbc7473"
+    },
+    {
+      "bytes": 298551,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-15.json",
+      "sha256": "946f5876a7e6e48bc15a9cb52f8db70c739342c7527e3bc6fac0106679f46ec9"
+    },
+    {
+      "bytes": 288138,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-15.json",
+      "sha256": "6adca2a205da6e631b83850ccd238e32b2a264c6e30feaaa62df6fe5e758b5f6"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-15.json",
+      "sha256": "8352d910531e9a3b088f6476cacf66e42413129a4d99c87d4708bd111ad18b4e"
+    },
+    {
+      "bytes": 35518,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-15.json",
+      "sha256": "61190d60a2e1d50d905234badb50878a470cc67f3c4663e5884257726ae8661c"
+    },
+    {
+      "bytes": 299505,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-16.json",
+      "sha256": "4fbe48cbf1ed503d39da32f9d363ae5a5c46cdc4c16bcc27e46c4e710c5bc05c"
+    },
+    {
+      "bytes": 289054,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-16.json",
+      "sha256": "94551a019ec3f15eaa91e51580ceec2f94e3d2f49fecfdc09f1d43aa50fb68b2"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-16.json",
+      "sha256": "527f719ff0cb1e9dbc0b673bedae354e16fc0e3c441eb888d093ce8d390f3d62"
+    },
+    {
+      "bytes": 36497,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-16.json",
+      "sha256": "33858b311df9d1db65acd7ddd0fa51de3102f7a79fed16db3dcfc3d1db7a532c"
+    },
+    {
+      "bytes": 300448,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-17.json",
+      "sha256": "d79ecf22e3191db38196385d781b714f0b09ba7a32d6f1d17a3f69386c283465"
+    },
+    {
+      "bytes": 289967,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2011-17.json",
+      "sha256": "f68ef9806e05fcf58606002860cf0f4209b49205a4147a3fb054bb4289e5ff04"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2011-17.json",
+      "sha256": "106f201100a9ea6c42becde6d1eb35df92f07cdcff96f0eca7853abca277669a"
+    },
+    {
+      "bytes": 37475,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2011-17.json",
+      "sha256": "7e425eceebf69750c832daf06fca0c998d88df0e6998d3832f9b6b055e670c9f"
+    },
+    {
+      "bytes": 301338,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-01.json",
+      "sha256": "61e2f258ed0b61577d11412c48c903fa8430cfd0cb4135c1863c50f1743ea329"
+    },
+    {
+      "bytes": 290756,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-01.json",
+      "sha256": "8534a14913c91262c7f01472e71e4ec2b33914343c8b4d27d8fabdebfe747910"
+    },
+    {
+      "bytes": 394870,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-01.json",
+      "sha256": "92e218683b9bf594b1c42ab61b2f6ff741471422f101a337f14d8ea0140544d9"
+    },
+    {
+      "bytes": 38483,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-01.json",
+      "sha256": "4a81d04525b94d0b78fd338f838e6a62e247035d71b67bcc2dd3a19dc32d777b"
+    },
+    {
+      "bytes": 302146,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-02.json",
+      "sha256": "e0772c10ce3cb6a40bf437b558c9089f7a623afc86f77cb83c7b62cb7a8f4679"
+    },
+    {
+      "bytes": 291593,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-02.json",
+      "sha256": "aa12a9c460264924884011b9a3b6018a93bc8006d917d2bfe2134bac18b2442d"
+    },
+    {
+      "bytes": 394888,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-02.json",
+      "sha256": "5782b53a67d8d87b169aa2d8eba7a0682a09f6217decbc9c701870b225860049"
+    },
+    {
+      "bytes": 39400,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-02.json",
+      "sha256": "326f9391c4d3fdbc1e7393bd2542fb4587739c791d9c6038613cf9b556f98977"
+    },
+    {
+      "bytes": 303188,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-03.json",
+      "sha256": "27c9792e5250a7261d6e70a6b525f48d0e43f3c20828cd37fc20249174a648ce"
+    },
+    {
+      "bytes": 292592,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-03.json",
+      "sha256": "2a83b935e02738ffe4ea2da62bb2f2a87f1fb792127641a1842aa1dae7b4443c"
+    },
+    {
+      "bytes": 394888,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-03.json",
+      "sha256": "b6e00a1c25ba63d260923637d13ccf9d1586fc65ee258cede01fa47dfa72b362"
+    },
+    {
+      "bytes": 40408,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-03.json",
+      "sha256": "3096474081ec814f933451b7895348f65f568db21480a607d3d509de125ec060"
+    },
+    {
+      "bytes": 287275,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-04.json",
+      "sha256": "77b929bdda9b008770b7e5ec2de6e74846b6e65e4f8e0d5456d19fae47557ea1"
+    },
+    {
+      "bytes": 277309,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-04.json",
+      "sha256": "9d1c814a8ba3920796637dd569f48b61720800b855fb8ee0a3cecc6bb11d77d6"
+    },
+    {
+      "bytes": 370283,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-04.json",
+      "sha256": "d6c26cc9e794929f0baad463018c7ee4dd95acb3f3ff4d0c86fd2e6786215cb4"
+    },
+    {
+      "bytes": 41387,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-04.json",
+      "sha256": "ee604fd584c2ad001fd2a961bd39c3fec53821b222822176bbb939ecc3ff6028"
+    },
+    {
+      "bytes": 271271,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-05.json",
+      "sha256": "b5af667f3460032f270fd19a6599c22ea40250d8374d4d1c959a9a168d3d6f5c"
+    },
+    {
+      "bytes": 261972,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-05.json",
+      "sha256": "1a4cf41662558d8afa897d49456253825a398cf43297d15d712d9f019a79c7a0"
+    },
+    {
+      "bytes": 345723,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-05.json",
+      "sha256": "a747a7cb03befa94686c438b8785177f421ed808b8506452c20b67e7d82eb798"
+    },
+    {
+      "bytes": 42302,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-05.json",
+      "sha256": "71d17ddd80f41b01a6d168370cce36fc73c539370bddb6248c9f8fc9b7376ca5"
+    },
+    {
+      "bytes": 272019,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-06.json",
+      "sha256": "7f9230b3a070972c15746eccf1b485370f038564ea57d71ed4a4a8958fd77ddd"
+    },
+    {
+      "bytes": 262717,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-06.json",
+      "sha256": "8e94d3a6a5013601187c183e77c496ac7a0bbcb6727edbda6b27b9161207f51b"
+    },
+    {
+      "bytes": 345723,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-06.json",
+      "sha256": "b751709a65cdffd9d926dd472be4c38eb82a2bbd7f5dd1e84ff937cfeb4df4c9"
+    },
+    {
+      "bytes": 43158,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-06.json",
+      "sha256": "c48926bebc5cb17bb51c007842788856e4a3dfb10d7340f1b8b162b36162c763"
+    },
+    {
+      "bytes": 256064,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-07.json",
+      "sha256": "fe60884ae89fb42429e08fe03e7e98218ee306fd40b36ffb3202c84350dc09e9"
+    },
+    {
+      "bytes": 247385,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-07.json",
+      "sha256": "de3874802cc05f28a401cb2ec9c14c524fb2362d4aa7ce35933bd493b0acf706"
+    },
+    {
+      "bytes": 321163,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-07.json",
+      "sha256": "54fe7acf3c648c1b4c3bd7ddd1a93fda9d199f67d0ce2091eb00b387f9236d5e"
+    },
+    {
+      "bytes": 44015,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-07.json",
+      "sha256": "c796ee7d03229f79194c187cada28ae026045ca0a95990c8846b550dade6ae77"
+    },
+    {
+      "bytes": 273443,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-08.json",
+      "sha256": "ae7448fd369e98704450d4c88f35d60dd67ec702d3c2a0034769cc5d86e6fea9"
+    },
+    {
+      "bytes": 264167,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-08.json",
+      "sha256": "8bfc6cbff1406caab1bc3f483740e4ef65ddeb78d15857206ede3c2556725fcf"
+    },
+    {
+      "bytes": 345678,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-08.json",
+      "sha256": "330e1180b59f958e52a1c199d4488fdc0177314a8f9fa1926ac0df389a3b3726"
+    },
+    {
+      "bytes": 44810,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-08.json",
+      "sha256": "8847be14b6cee907346e2230d93c34aca48d32b5ca1778141c6098f1b4be49fd"
+    },
+    {
+      "bytes": 274403,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-09.json",
+      "sha256": "16be6530415fdfd7a43180bf00cfe5cd0c77850bbd9edc3ed722e51f67de0b68"
+    },
+    {
+      "bytes": 265095,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-09.json",
+      "sha256": "8f6d8540c80a83cbdce3f1ac5ba280e454e87eb733bb6d8330b81e79c3996f53"
+    },
+    {
+      "bytes": 345768,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-09.json",
+      "sha256": "8b8a1b1a188eeb069c2bd7dc14bea9c64f2616392279ac2a838d26ce34059a43"
+    },
+    {
+      "bytes": 45665,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-09.json",
+      "sha256": "10a47e5af3ea2c4204f55e8f01753966b18db98ddd05dab1214ab135c41ca20f"
+    },
+    {
+      "bytes": 275195,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-10.json",
+      "sha256": "c907443a09de4c5260ad0bc0dcfc28b18f978fc7a0411a30306f9404aebe7601"
+    },
+    {
+      "bytes": 265990,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-10.json",
+      "sha256": "2f7ede5cbb19e81dc24fb760c28c4fd3627962a926f64b90d18fc16c7b755494"
+    },
+    {
+      "bytes": 345850,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-10.json",
+      "sha256": "87fd6e763da3300b91215e05a89e63b5649da6be07466324059e5c6ed3202678"
+    },
+    {
+      "bytes": 46523,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-10.json",
+      "sha256": "77497e1192c08e69d6a090922f4a71e090a1b8b8d92ebd34b171da01f4eaad05"
+    },
+    {
+      "bytes": 275932,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-11.json",
+      "sha256": "7adb96f8447c32905ee819e7504b871d455be3ad4b67294d5872a05aa887bd1f"
+    },
+    {
+      "bytes": 266751,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-11.json",
+      "sha256": "dc1ed665ab507efc34190afe05220a0f2c078b128b0199bade66314efa151767"
+    },
+    {
+      "bytes": 345805,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-11.json",
+      "sha256": "b7b664ca00dc58a59b0f02dea6cc02a0d528ffeb695854347c02b50cda70521a"
+    },
+    {
+      "bytes": 47379,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-11.json",
+      "sha256": "59c4d659cd78be92f41b1d838d7d171a90f1455f9a0b005e318a41b6dfcb0f2e"
+    },
+    {
+      "bytes": 310306,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-12.json",
+      "sha256": "9429e7527903942d59d3ff4d9cedca605f8d9423a72019bdd5ff70d985602f99"
+    },
+    {
+      "bytes": 299905,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-12.json",
+      "sha256": "d3fb323db6de7ab68e9c0740c1b97b791e5ca592538f7ae81fa5dd731e732c0e"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-12.json",
+      "sha256": "0e160a5c946428326d4cd5fcce98fd9aef77c94c07541da77482b2018210da40"
+    },
+    {
+      "bytes": 48233,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-12.json",
+      "sha256": "a1145f9342de9703332e8b1334851ce1c0d9314e6ac6064264605db38e3545c1"
+    },
+    {
+      "bytes": 311360,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-13.json",
+      "sha256": "6d906c4c468cd0a0ff2154bd2907b6a8931558679b3e9c6f774cb882705bc65a"
+    },
+    {
+      "bytes": 300934,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-13.json",
+      "sha256": "987edc1a149be071d05a944ff148848572782db76879527c0cf53b8662834f82"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-13.json",
+      "sha256": "002f5635f8b11ce3805723909b174a150a555768292c286138c1ac2031bbedcb"
+    },
+    {
+      "bytes": 49210,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-13.json",
+      "sha256": "33bbfcda3680a83de89a8ccb0dabc5fc252bddef47cb5332cc0cc7b7106c892a"
+    },
+    {
+      "bytes": 312279,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-14.json",
+      "sha256": "e0d5c95492311005576c3048debb525eb5c06a05dd0c837bdbcbaf3876b6ca1a"
+    },
+    {
+      "bytes": 301849,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-14.json",
+      "sha256": "70d50d41845eb9ac66bcd923f704997f95bd40d6d49e5588bf445eddf0418583"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-14.json",
+      "sha256": "36234292915a0cceeba1257c15f92c81066743b470187ab1d8d0f5ebc9a16415"
+    },
+    {
+      "bytes": 50188,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-14.json",
+      "sha256": "6e95041df07a671f3a1184b26d15714dbe0fb0bf4aa5b632bb15a7542a2f7391"
+    },
+    {
+      "bytes": 313198,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-15.json",
+      "sha256": "ca2314260f89b8a7ccda1e05e68f29410377625f5bb3c36120e9c76bdec20de8"
+    },
+    {
+      "bytes": 302764,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-15.json",
+      "sha256": "42e3496fbe6e40e3d6472b20e94f6ddc733c62c287b1df91c1640a3bb91b7e9c"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-15.json",
+      "sha256": "daa0fa77b48f6636fee442794a91f6906d5d864711deb92f150126efb415a8b5"
+    },
+    {
+      "bytes": 51167,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-15.json",
+      "sha256": "7ec445329ae04cf40c4810e75da68c833171b4481688ff1ff34764054e971c69"
+    },
+    {
+      "bytes": 314124,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-16.json",
+      "sha256": "50e459fdda37050ebd80a66cc8bed2e4620ea59363f2822c75b55f3f6f821476"
+    },
+    {
+      "bytes": 303676,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-16.json",
+      "sha256": "799b56f5bf4f34bb9b5b78872a0581d926f38cedbda7dd4d73b95d467495c712"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-16.json",
+      "sha256": "c4d2a9724096027a2c063b55a37c6f1073592aef3cfa91f3b10ce7acf4ff8dac"
+    },
+    {
+      "bytes": 52144,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-16.json",
+      "sha256": "ea0da397c12bcc9fb8250501789dcc83f70fe2a34d731343f65b5480293e9e28"
+    },
+    {
+      "bytes": 315057,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-17.json",
+      "sha256": "358d95424e1f52062161ab0ea91f62053aee5abaeeb5be80bd879a7e44422899"
+    },
+    {
+      "bytes": 304612,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2012-17.json",
+      "sha256": "4b2c814bd3312104a7a09eca88724f7352f12398f61a27fa2ec57c216b254267"
+    },
+    {
+      "bytes": 395033,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2012-17.json",
+      "sha256": "ee05b3bc5acf0ff253d2a428a79758e6b031ee18e38783c92ee507fefe9500e4"
+    },
+    {
+      "bytes": 53153,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2012-17.json",
+      "sha256": "02390330091891f67ae0e172da32adf10c58724cce7168e66c69c33cd73a593d"
+    },
+    {
+      "bytes": 423481,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2013-01.json",
+      "sha256": "97e6bf6fda05d7519f613dbc43e42d34cebd01614df245591a2317c4fc71af5a"
+    },
+    {
+      "bytes": 619542,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2013-01.json",
+      "sha256": "df0dd1cc4dd2612a3f3078d9ac790b9bd6483b29136c14a5102685f6af29dff2"
+    },
+    {
+      "bytes": 845475,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2013-01.json",
+      "sha256": "817fb7e31206ca648d3308fc0d491b285d60009206008d21dc4155653b1c0972"
+    },
+    {
+      "bytes": 54131,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2013-01.json",
+      "sha256": "4120032c073de53bf27e3b35d538fbd12ee9b7a1b9dc26d637e8ab7a69b53c91"
+    },
+    {
+      "bytes": 432043,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2013-02.json",
+      "sha256": "251288421b72b990018948f2a789269e36423e9db74d8bf9c76159c6294317e4"
+    },
+    {
+      "bytes": 620311,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/publication-binding-2013-02.json",
+      "sha256": "bf382fd28834a593cb053cd38225801be5535c618846263cf4b6e9c7f40e7fb1"
+    },
+    {
+      "bytes": 845397,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/grading-provenance-2013-02.json",
+      "sha256": "f40720f0c6cefed2bff047edfded49412d3797c5565903a1ea4e53bd2af99ad7"
+    },
+    {
+      "bytes": 55048,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/ancestry-2013-02.json",
+      "sha256": "23e9e8a64bc5fce4556752d69e56e242497bb0ec283b7717f463bcdb741a2f91"
+    },
+    {
+      "bytes": 3041,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rfcomp04-observer-9aaaa23ebc2b002c/process-report.json",
+      "sha256": "349d4936b9357b34c8da2bd6658bc373641f08a2e4cb942b7a6b8414f5eae022"
+    },
+    {
+      "bytes": 418442,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rfcomp04-observer-9aaaa23ebc2b002c/observations.jsonl",
+      "sha256": "dfa80df1073c1722a7e223f9b0ff68b3c27578fd584f8a44f562cb303860581a"
+    },
+    {
+      "bytes": 161,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rfcomp04-observer-9aaaa23ebc2b002c/phase.json",
+      "sha256": "19551eb48fc22efcafc54191857b164d2bb4ae9ab057bece0924cadaa59ca479"
+    },
+    {
+      "bytes": 0,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rfcomp04-observer-9aaaa23ebc2b002c/stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 264,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rfcomp04-observer-9aaaa23ebc2b002c/stdout.log",
+      "sha256": "beaec67fb8cb1b7e4f26be6f843a7c2c99858f8ff1311b284a062c70ecce16bc"
+    }
+  ],
+  "feed_batches_inferred_from_bound_controller_and_complete_postgrade_evidence": 36,
+  "last_origin": [
+    2013,
+    2
+  ],
+  "manifest_sha256": "b7fd5fb240c6cfa8abcc5f147b28ab37286e83e82ac41c37eb4f44b685d2caa8",
+  "metadata_seconds": 0.5479098749929108,
+  "modes": {
+    "inner:new_score": 9792,
+    "inner:source_inner": 4896,
+    "outer:new_score": 64,
+    "outer:raw_reference": 192,
+    "outer:source_outer": 352
+  },
+  "new_score_flags": {
+    "inner:False:False": 9738,
+    "inner:True:False": 54,
+    "outer:True:True": 64
+  },
+  "observer_summary": {
+    "elapsed_seconds": 183.70006162498612,
+    "exit_code": 1,
+    "kill_requests": [],
+    "observation_errors": [],
+    "process_ownership_lost": false,
+    "sample_count": 3067,
+    "sampled_group_peak_rss_mib": 886.234375,
+    "status": "failed_process",
+    "waited_worker_peak_rss_mib": 897.15625
+  },
+  "prefix": [
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 0,
+      "history24": 0,
+      "origin": [
+        2010,
+        1
+      ],
+      "origin_evidence": {
+        "bytes": 2507,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-01.json",
+        "sha256": "4ed52c703653b8760703d07947f4e524054408fa1c934e2b2af15354aef653af"
+      },
+      "origin_sha256": "7489304cfd090b2058653cdc3e647e62c27f5955c89dd6e14064ccbf0c6bff64",
+      "target_count": 16
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 16,
+      "history24": 14,
+      "origin": [
+        2010,
+        2
+      ],
+      "origin_evidence": {
+        "bytes": 4319,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-02.json",
+        "sha256": "ec1e96bfa4655226782866aa9c263f4d142248488886fab024cda29e6fa25550"
+      },
+      "origin_sha256": "09ec5efc0a15364b61b49120a2c1b966212a4409a17a5e3761b46c5dd58578a9",
+      "target_count": 16
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 32,
+      "history24": 31,
+      "origin": [
+        2010,
+        3
+      ],
+      "origin_evidence": {
+        "bytes": 5318,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-03.json",
+        "sha256": "1e286db076fb2114d60a3de50b82824ef2619645254fa5b1e6d7d68588382b36"
+      },
+      "origin_sha256": "59e625a732e940118c93fecde642a550457bcda34d4e8dbdb8a77a7c9f6252d4",
+      "target_count": 16
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 48,
+      "history24": 47,
+      "origin": [
+        2010,
+        4
+      ],
+      "origin_evidence": {
+        "bytes": 6154,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-04.json",
+        "sha256": "2b2ffebc1432b4f068d3e6ac55c7b5b8c16f8c76bce2d0fb8eabe727b203f616"
+      },
+      "origin_sha256": "4e5edc74553f9033a2e6033eab226afc7db9eee0a3d3b06f5fa4eac5ff9fdee2",
+      "target_count": 14
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 62,
+      "history24": 61,
+      "origin": [
+        2010,
+        5
+      ],
+      "origin_evidence": {
+        "bytes": 6844,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-05.json",
+        "sha256": "31a7f6beb4d698dc586e62d6606310dbb695b4c2a42b5c1f91b9fdc5fccdfa1b"
+      },
+      "origin_sha256": "f4a3ae5faf2cadb3b6274cd43820ec264ede3762ab8a8bbd43f65384d24e08c9",
+      "target_count": 14
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 76,
+      "history24": 75,
+      "origin": [
+        2010,
+        6
+      ],
+      "origin_evidence": {
+        "bytes": 7816,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-06.json",
+        "sha256": "6d864f7fcfcb0d467a46098729779c88344ff8be1e284782de31b43a92a2d135"
+      },
+      "origin_sha256": "abbed51be69f5d4da93135e386591fbc5d3e2bec3c62ea1beee05a49c03c84dc",
+      "target_count": 14
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 90,
+      "history24": 89,
+      "origin": [
+        2010,
+        7
+      ],
+      "origin_evidence": {
+        "bytes": 8613,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-07.json",
+        "sha256": "6ebd41235bd1d094ab21d1073705dc36e588fc54c9bbcb706e78144c49c3ed2a"
+      },
+      "origin_sha256": "70b42f2a798fe1e659fd7a02036f9870384eb2a6216286bd4e4e7a589f21cb32",
+      "target_count": 14
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 104,
+      "history24": 103,
+      "origin": [
+        2010,
+        8
+      ],
+      "origin_evidence": {
+        "bytes": 9386,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-08.json",
+        "sha256": "25090d99e9c8ddf2702ae983d42f15f0bfe501acb33ea790f1ae7112f8199af0"
+      },
+      "origin_sha256": "c6341507dfbf130b89a329d4df1a8808a838f35be70a9b7bdafb92228ba9b636",
+      "target_count": 13
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 117,
+      "history24": 116,
+      "origin": [
+        2010,
+        9
+      ],
+      "origin_evidence": {
+        "bytes": 10069,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-09.json",
+        "sha256": "349fcc0b326696248fdab1b771ce2cb0b6a7c0549665a40d24257bda0a1d8bc3"
+      },
+      "origin_sha256": "6cd69bb3bfc7b62cfccb62ff3d18899c8197b014556100d468ba30b6980f1e07",
+      "target_count": 13
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 130,
+      "history24": 129,
+      "origin": [
+        2010,
+        10
+      ],
+      "origin_evidence": {
+        "bytes": 10842,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-10.json",
+        "sha256": "06faef38a45a0d8e2b47a84aadc5f0ee20d8653afc763750d1190b4edcc6313e"
+      },
+      "origin_sha256": "d92273a07ac887791b1860781a0f63eed6720dcb963482ce3cb1c79a709de552",
+      "target_count": 14
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 144,
+      "history24": 143,
+      "origin": [
+        2010,
+        11
+      ],
+      "origin_evidence": {
+        "bytes": 11755,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-11.json",
+        "sha256": "5de1c911da46e1dda283398f26770ea23611a33585e80c0121b1c30c516f1b07"
+      },
+      "origin_sha256": "143a0ed29ee4465d0431a9d190360e18017f846227edfe58da9c5ac7a8c5fa12",
+      "target_count": 16
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 160,
+      "history24": 159,
+      "origin": [
+        2010,
+        12
+      ],
+      "origin_evidence": {
+        "bytes": 12780,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-12.json",
+        "sha256": "886a49198861b9d7ee8f09d84030b9b204351f0784ebbc330bb06c904e92a45d"
+      },
+      "origin_sha256": "d3c0939696833ef182ff739742a60c19aad076fa1b149cee9e7991a14253b960",
+      "target_count": 16
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 176,
+      "history24": 175,
+      "origin": [
+        2010,
+        13
+      ],
+      "origin_evidence": {
+        "bytes": 13693,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-13.json",
+        "sha256": "a78b9216ec64d04b054bd65fc1611adc95faeaf6dfc73ffb8051d7e54c79432d"
+      },
+      "origin_sha256": "bb2e6cfb0a01262d65c4d9ad70b11a8c685b6174633025ce7bd2a4f2f5297229",
+      "target_count": 16
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 192,
+      "history24": 191,
+      "origin": [
+        2010,
+        14
+      ],
+      "origin_evidence": {
+        "bytes": 14607,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-14.json",
+        "sha256": "86a59c30d6d27cd65426577db923d60cbb4cba949daae2faaf42234105be1109"
+      },
+      "origin_sha256": "48bf9b7060213fdd8d9fb9aaac633eba5ee2f2ebb0cebfa1079a2b380c079cb0",
+      "target_count": 16
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 208,
+      "history24": 206,
+      "origin": [
+        2010,
+        15
+      ],
+      "origin_evidence": {
+        "bytes": 15491,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-15.json",
+        "sha256": "7933b27127cceb5d85a699450482ed338dd94c2f9372fd92dd256282f0b630d5"
+      },
+      "origin_sha256": "884ee36aa3b53e892cf894426ccefa41ee8ecee418e8ca598d8a88841e9f20fc",
+      "target_count": 16
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 224,
+      "history24": 223,
+      "origin": [
+        2010,
+        16
+      ],
+      "origin_evidence": {
+        "bytes": 16464,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-16.json",
+        "sha256": "ac91f0adafd8436d5e188fe483fe75be4d7af7b2f14cc474c6ef9a356438addb"
+      },
+      "origin_sha256": "0f4f2b195be45a7fe1bd4131f2b45a7a5263b587107baeaf279d9c39dcd0af53",
+      "target_count": 16
+    },
+    {
+      "callbacks": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "history12": 239,
+      "history24": 238,
+      "origin": [
+        2010,
+        17
+      ],
+      "origin_evidence": {
+        "bytes": 17300,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2010-17.json",
+        "sha256": "f6b86f644df717647f21dbb33c4fbfacbe8c236ef2cefb0fecb71cc2fc7b4ab6"
+      },
+      "origin_sha256": "a8d6314f8c6a352b2f71af117cc4a681d7e8faf82e920a754fbf3566cb83ada4",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 256,
+      "history24": 256,
+      "origin": [
+        2011,
+        1
+      ],
+      "origin_evidence": {
+        "bytes": 286967,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-01.json",
+        "sha256": "7e63f029e5a7a776ae5977272d41cc22cb87156aa819ab9712654d0413c64d69"
+      },
+      "origin_sha256": "8bbd7249092af6c3ba1f379b5cff2f0fae3727806cfc09c9930d54e2e8063a9e",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 272,
+      "history24": 270,
+      "origin": [
+        2011,
+        2
+      ],
+      "origin_evidence": {
+        "bytes": 287748,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-02.json",
+        "sha256": "b5e604d0660630dabc9d92d7635902ac5d3d410e5da7e73b1240c0cdaccb1efb"
+      },
+      "origin_sha256": "c388204c11bc4e6fca0ba564ee4692ac20bf1aae7903ba75ce74006ed3cc8193",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 288,
+      "history24": 287,
+      "origin": [
+        2011,
+        3
+      ],
+      "origin_evidence": {
+        "bytes": 288733,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-03.json",
+        "sha256": "95a6a54c1bc26f2bfd689c0dcc2e078bdbf1684dcd3b465966eae570b83fea43"
+      },
+      "origin_sha256": "1ed281a3c59358e5d1c3d9195b8ca644e4c50c56f7d1b16f4b5859e5113ef029",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 304,
+      "history24": 303,
+      "origin": [
+        2011,
+        4
+      ],
+      "origin_evidence": {
+        "bytes": 289613,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-04.json",
+        "sha256": "21e49bf0e5588d8854c9ed08c63815d7232e31d7e10f30ec5eb4c45e96fb368d"
+      },
+      "origin_sha256": "748f5ad98c0f9364b00f0917b37531b48f411efc02571b323b05e83fc3e2755d",
+      "target_count": 16
+    },
+    {
+      "callbacks": 468,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 234,
+        "copied_diagonal_inner": 117,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 351,
+        "outer_rows": 0,
+        "scored_inner": 234,
+        "scored_outer": 0
+      },
+      "history12": 320,
+      "history24": 319,
+      "origin": [
+        2011,
+        5
+      ],
+      "origin_evidence": {
+        "bytes": 240084,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-05.json",
+        "sha256": "5d3abc961ba79fe74fcc43de4a3a16788e8c0c9fc738e5328044b78793627fac"
+      },
+      "origin_sha256": "340bda5d16f86f85296c841f19e31d762ae21cd4d3c45ed3e207d33e9a198b9f",
+      "target_count": 13
+    },
+    {
+      "callbacks": 468,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 234,
+        "copied_diagonal_inner": 117,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 351,
+        "outer_rows": 0,
+        "scored_inner": 234,
+        "scored_outer": 0
+      },
+      "history12": 333,
+      "history24": 332,
+      "origin": [
+        2011,
+        6
+      ],
+      "origin_evidence": {
+        "bytes": 240714,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-06.json",
+        "sha256": "d825fefde840b3d35936688439240ad572f909a0d9fcb724e8aa3a4133962b89"
+      },
+      "origin_sha256": "4e5ee80e79fd5bcfc9ab3ad4627886b8d8b4dd7e4dfb61b6b70a6840174104c8",
+      "target_count": 13
+    },
+    {
+      "callbacks": 468,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 234,
+        "copied_diagonal_inner": 117,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 351,
+        "outer_rows": 0,
+        "scored_inner": 234,
+        "scored_outer": 0
+      },
+      "history12": 346,
+      "history24": 345,
+      "origin": [
+        2011,
+        7
+      ],
+      "origin_evidence": {
+        "bytes": 241464,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-07.json",
+        "sha256": "26e546395332635ca954a37d7c7a2e4f41d78204f396fb1b2ebc91ef96f1ebd3"
+      },
+      "origin_sha256": "c333f62843ae6517c0a9ef05e9fb7392834a0e37c0118720566c47dfdd860765",
+      "target_count": 13
+    },
+    {
+      "callbacks": 468,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 234,
+        "copied_diagonal_inner": 117,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 351,
+        "outer_rows": 0,
+        "scored_inner": 234,
+        "scored_outer": 0
+      },
+      "history12": 359,
+      "history24": 358,
+      "origin": [
+        2011,
+        8
+      ],
+      "origin_evidence": {
+        "bytes": 242206,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-08.json",
+        "sha256": "6dacafe8d23429ee7294a2787526254d809e4c6b43cdb8ba372d0af27d5f8660"
+      },
+      "origin_sha256": "2433e4beb44bae05886a14ef782d69aee7c23cf4adaa27dfe42430f08424eb0a",
+      "target_count": 13
+    },
+    {
+      "callbacks": 504,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 252,
+        "copied_diagonal_inner": 126,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 378,
+        "outer_rows": 0,
+        "scored_inner": 252,
+        "scored_outer": 0
+      },
+      "history12": 372,
+      "history24": 371,
+      "origin": [
+        2011,
+        9
+      ],
+      "origin_evidence": {
+        "bytes": 259690,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-09.json",
+        "sha256": "ad6a301e8a81daeb44bf0ebbca90844a77d8cba6f6fbabde7a2601044ee5efbd"
+      },
+      "origin_sha256": "812363ab1bac0138936fcf49c914384516dc223cf817ecc6f6b27cc1f34a4311",
+      "target_count": 14
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 386,
+      "history24": 385,
+      "origin": [
+        2011,
+        10
+      ],
+      "origin_evidence": {
+        "bytes": 294186,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-10.json",
+        "sha256": "6d6eea7f37426bd83c37611d54dcc724a1c70af6cb006d14ef4545567c0339a6"
+      },
+      "origin_sha256": "b8c12933d8d1edd77c507f29d30e11f3dbbc9c920f84a5195f8f6e1f364294c4",
+      "target_count": 16
+    },
+    {
+      "callbacks": 504,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 252,
+        "copied_diagonal_inner": 126,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 378,
+        "outer_rows": 0,
+        "scored_inner": 252,
+        "scored_outer": 0
+      },
+      "history12": 402,
+      "history24": 401,
+      "origin": [
+        2011,
+        11
+      ],
+      "origin_evidence": {
+        "bytes": 261596,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-11.json",
+        "sha256": "64ad5e376c8fc6f5bd52c6fa3bc5eaeee05fe67e46e3ed92e911b210defb0ed8"
+      },
+      "origin_sha256": "7f6db14dade4ef30651d185ff2fe59ca7dbae754f0b469272af67c0790d07313",
+      "target_count": 14
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 416,
+      "history24": 415,
+      "origin": [
+        2011,
+        12
+      ],
+      "origin_evidence": {
+        "bytes": 295954,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-12.json",
+        "sha256": "65e567d6deaf2a9d4882dd703e52b797213e3b33c6132c0d20b50f97dbdb878a"
+      },
+      "origin_sha256": "3e8a21594fb70e343bc14b9fe40728d0f9b465862acc383015cd42c3b24bfc21",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 432,
+      "history24": 431,
+      "origin": [
+        2011,
+        13
+      ],
+      "origin_evidence": {
+        "bytes": 296752,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-13.json",
+        "sha256": "d2fa938958eadc8a8c528fb43000d3122a305c839e838f2a680898d1cf086f1d"
+      },
+      "origin_sha256": "b089398ccdde94ffebecdcda258bb62de85f3ad73d86d1ebddf07bf385b8ca19",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 448,
+      "history24": 447,
+      "origin": [
+        2011,
+        14
+      ],
+      "origin_evidence": {
+        "bytes": 297668,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-14.json",
+        "sha256": "37a9fe283d27d1500ce202cb67d71355de28b22c5406ebbd56d06bdc5004aff1"
+      },
+      "origin_sha256": "7719077d598a165314ae90530ecd3759146c7519e2f5c32d3afaa58cf76a2646",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 464,
+      "history24": 463,
+      "origin": [
+        2011,
+        15
+      ],
+      "origin_evidence": {
+        "bytes": 298551,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-15.json",
+        "sha256": "946f5876a7e6e48bc15a9cb52f8db70c739342c7527e3bc6fac0106679f46ec9"
+      },
+      "origin_sha256": "be61ca70e7a68359a2bfbd9a25a6ea65b8268747642ded1687367ab7ab53a352",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 480,
+      "history24": 479,
+      "origin": [
+        2011,
+        16
+      ],
+      "origin_evidence": {
+        "bytes": 299505,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-16.json",
+        "sha256": "4fbe48cbf1ed503d39da32f9d363ae5a5c46cdc4c16bcc27e46c4e710c5bc05c"
+      },
+      "origin_sha256": "f38c4e666a190fc077c488fd98195e40640f717ef497648d963373c6e510b5c6",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 496,
+      "history24": 495,
+      "origin": [
+        2011,
+        17
+      ],
+      "origin_evidence": {
+        "bytes": 300448,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2011-17.json",
+        "sha256": "d79ecf22e3191db38196385d781b714f0b09ba7a32d6f1d17a3f69386c283465"
+      },
+      "origin_sha256": "638241ab471700c27cc43d3fd8a575775c170798e5edd31c1cbda23a2922e96e",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 512,
+      "history24": 512,
+      "origin": [
+        2012,
+        1
+      ],
+      "origin_evidence": {
+        "bytes": 301338,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-01.json",
+        "sha256": "61e2f258ed0b61577d11412c48c903fa8430cfd0cb4135c1863c50f1743ea329"
+      },
+      "origin_sha256": "8ee8904877266d9250db8fd107307a6c68273bea0b6278f801d0a0ba916d1b6d",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 528,
+      "history24": 526,
+      "origin": [
+        2012,
+        2
+      ],
+      "origin_evidence": {
+        "bytes": 302146,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-02.json",
+        "sha256": "e0772c10ce3cb6a40bf437b558c9089f7a623afc86f77cb83c7b62cb7a8f4679"
+      },
+      "origin_sha256": "6702522f7993a896f8e9272cb223624f59b9b0624438ef41ff1eb808390cbb1f",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 544,
+      "history24": 543,
+      "origin": [
+        2012,
+        3
+      ],
+      "origin_evidence": {
+        "bytes": 303188,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-03.json",
+        "sha256": "27c9792e5250a7261d6e70a6b525f48d0e43f3c20828cd37fc20249174a648ce"
+      },
+      "origin_sha256": "62a8f631662933d353015a581948add47b690f25a81515e407c4cfcf64396e89",
+      "target_count": 16
+    },
+    {
+      "callbacks": 540,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 270,
+        "copied_diagonal_inner": 135,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 405,
+        "outer_rows": 0,
+        "scored_inner": 270,
+        "scored_outer": 0
+      },
+      "history12": 560,
+      "history24": 559,
+      "origin": [
+        2012,
+        4
+      ],
+      "origin_evidence": {
+        "bytes": 287275,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-04.json",
+        "sha256": "77b929bdda9b008770b7e5ec2de6e74846b6e65e4f8e0d5456d19fae47557ea1"
+      },
+      "origin_sha256": "5e4eea6905fcc2d262eaabe5569177463e91682227046f281c1e4a0dae856e3e",
+      "target_count": 15
+    },
+    {
+      "callbacks": 504,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 252,
+        "copied_diagonal_inner": 126,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 378,
+        "outer_rows": 0,
+        "scored_inner": 252,
+        "scored_outer": 0
+      },
+      "history12": 575,
+      "history24": 574,
+      "origin": [
+        2012,
+        5
+      ],
+      "origin_evidence": {
+        "bytes": 271271,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-05.json",
+        "sha256": "b5af667f3460032f270fd19a6599c22ea40250d8374d4d1c959a9a168d3d6f5c"
+      },
+      "origin_sha256": "ce13d275db37cc364560ff8c8d4c2b5afe81126ac789fd6b51a72e34b840390a",
+      "target_count": 14
+    },
+    {
+      "callbacks": 504,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 252,
+        "copied_diagonal_inner": 126,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 378,
+        "outer_rows": 0,
+        "scored_inner": 252,
+        "scored_outer": 0
+      },
+      "history12": 589,
+      "history24": 588,
+      "origin": [
+        2012,
+        6
+      ],
+      "origin_evidence": {
+        "bytes": 272019,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-06.json",
+        "sha256": "7f9230b3a070972c15746eccf1b485370f038564ea57d71ed4a4a8958fd77ddd"
+      },
+      "origin_sha256": "b09c8408e1bcc0f11023b8ef9aff89987eba5c9dc0dca22866fd1760c8e22c7d",
+      "target_count": 14
+    },
+    {
+      "callbacks": 468,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 234,
+        "copied_diagonal_inner": 117,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 351,
+        "outer_rows": 0,
+        "scored_inner": 234,
+        "scored_outer": 0
+      },
+      "history12": 603,
+      "history24": 602,
+      "origin": [
+        2012,
+        7
+      ],
+      "origin_evidence": {
+        "bytes": 256064,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-07.json",
+        "sha256": "fe60884ae89fb42429e08fe03e7e98218ee306fd40b36ffb3202c84350dc09e9"
+      },
+      "origin_sha256": "3c8b2f522973f6935879aceba46a9615d4ef0ddc0c5fba87fc3a05f57b24a5ac",
+      "target_count": 13
+    },
+    {
+      "callbacks": 504,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 252,
+        "copied_diagonal_inner": 126,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 378,
+        "outer_rows": 0,
+        "scored_inner": 252,
+        "scored_outer": 0
+      },
+      "history12": 616,
+      "history24": 615,
+      "origin": [
+        2012,
+        8
+      ],
+      "origin_evidence": {
+        "bytes": 273443,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-08.json",
+        "sha256": "ae7448fd369e98704450d4c88f35d60dd67ec702d3c2a0034769cc5d86e6fea9"
+      },
+      "origin_sha256": "85b175c6e0a54d22fe4e741a52a1611e4b5ca019f0a441c8d188294d6739bddc",
+      "target_count": 14
+    },
+    {
+      "callbacks": 504,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 252,
+        "copied_diagonal_inner": 126,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 378,
+        "outer_rows": 0,
+        "scored_inner": 252,
+        "scored_outer": 0
+      },
+      "history12": 630,
+      "history24": 629,
+      "origin": [
+        2012,
+        9
+      ],
+      "origin_evidence": {
+        "bytes": 274403,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-09.json",
+        "sha256": "16be6530415fdfd7a43180bf00cfe5cd0c77850bbd9edc3ed722e51f67de0b68"
+      },
+      "origin_sha256": "0d276aba84e5f8e05f5a391c011768061c08f5adfa8a34a8fd31945987a0bb76",
+      "target_count": 14
+    },
+    {
+      "callbacks": 504,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 252,
+        "copied_diagonal_inner": 126,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 378,
+        "outer_rows": 0,
+        "scored_inner": 252,
+        "scored_outer": 0
+      },
+      "history12": 644,
+      "history24": 643,
+      "origin": [
+        2012,
+        10
+      ],
+      "origin_evidence": {
+        "bytes": 275195,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-10.json",
+        "sha256": "c907443a09de4c5260ad0bc0dcfc28b18f978fc7a0411a30306f9404aebe7601"
+      },
+      "origin_sha256": "180a1c7412c6c88f75c370dd16479cfe7c5a7f9dc36d9c3b6b885282b784fe44",
+      "target_count": 14
+    },
+    {
+      "callbacks": 504,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 252,
+        "copied_diagonal_inner": 126,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 378,
+        "outer_rows": 0,
+        "scored_inner": 252,
+        "scored_outer": 0
+      },
+      "history12": 658,
+      "history24": 657,
+      "origin": [
+        2012,
+        11
+      ],
+      "origin_evidence": {
+        "bytes": 275932,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-11.json",
+        "sha256": "7adb96f8447c32905ee819e7504b871d455be3ad4b67294d5872a05aa887bd1f"
+      },
+      "origin_sha256": "cf64a4ef0404436d1e8ebf87ba106930fd3ea1f7bc08367c4f0da0df883d8a6b",
+      "target_count": 14
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 672,
+      "history24": 671,
+      "origin": [
+        2012,
+        12
+      ],
+      "origin_evidence": {
+        "bytes": 310306,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-12.json",
+        "sha256": "9429e7527903942d59d3ff4d9cedca605f8d9423a72019bdd5ff70d985602f99"
+      },
+      "origin_sha256": "e7946e02d3d29c98e61394c4c974a01587300af1d81fad87325ceb6ca047f0f9",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 688,
+      "history24": 687,
+      "origin": [
+        2012,
+        13
+      ],
+      "origin_evidence": {
+        "bytes": 311360,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-13.json",
+        "sha256": "6d906c4c468cd0a0ff2154bd2907b6a8931558679b3e9c6f774cb882705bc65a"
+      },
+      "origin_sha256": "6109fcf85fd42423c3d165bb55df71849e043ffc4a65a654d335f1a860c77c05",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 704,
+      "history24": 703,
+      "origin": [
+        2012,
+        14
+      ],
+      "origin_evidence": {
+        "bytes": 312279,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-14.json",
+        "sha256": "e0d5c95492311005576c3048debb525eb5c06a05dd0c837bdbcbaf3876b6ca1a"
+      },
+      "origin_sha256": "46dbc833af9e698ec32a996610f647f522cdaabfaf657674f679d1c8a97cbcf4",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 720,
+      "history24": 719,
+      "origin": [
+        2012,
+        15
+      ],
+      "origin_evidence": {
+        "bytes": 313198,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-15.json",
+        "sha256": "ca2314260f89b8a7ccda1e05e68f29410377625f5bb3c36120e9c76bdec20de8"
+      },
+      "origin_sha256": "3e692d6b8ad7d6c5a70e41c028381bf0829d35dd5180d6694e58201c36a8aad9",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 736,
+      "history24": 735,
+      "origin": [
+        2012,
+        16
+      ],
+      "origin_evidence": {
+        "bytes": 314124,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-16.json",
+        "sha256": "50e459fdda37050ebd80a66cc8bed2e4620ea59363f2822c75b55f3f6f821476"
+      },
+      "origin_sha256": "b0227889a1a3c62a3c6ebfe0c64f26bf6bbe2bb25c2d4ee20234563fc39beeae",
+      "target_count": 16
+    },
+    {
+      "callbacks": 576,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 288,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 432,
+        "outer_rows": 0,
+        "scored_inner": 288,
+        "scored_outer": 0
+      },
+      "history12": 752,
+      "history24": 752,
+      "origin": [
+        2012,
+        17
+      ],
+      "origin_evidence": {
+        "bytes": 315057,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2012-17.json",
+        "sha256": "358d95424e1f52062161ab0ea91f62053aee5abaeeb5be80bd879a7e44422899"
+      },
+      "origin_sha256": "779f17da4187d60c681cd1a81d4ea56751626e33537cfabb034a9cc7b0e2bdb4",
+      "target_count": 16
+    },
+    {
+      "callbacks": 800,
+      "counts": {
+        "actual_mass_cdf_calls": 1664,
+        "actual_score_calls": 320,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 176,
+        "copied_raw_outer": 96,
+        "inner_rows": 432,
+        "outer_rows": 304,
+        "scored_inner": 288,
+        "scored_outer": 32
+      },
+      "history12": 768,
+      "history24": 768,
+      "origin": [
+        2013,
+        1
+      ],
+      "origin_evidence": {
+        "bytes": 423481,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2013-01.json",
+        "sha256": "97e6bf6fda05d7519f613dbc43e42d34cebd01614df245591a2317c4fc71af5a"
+      },
+      "origin_sha256": "e7b57e23182a150507d4c49296fd43a8f9e3b9eff7010cbe7261f83ef5599743",
+      "target_count": 16
+    },
+    {
+      "callbacks": 816,
+      "counts": {
+        "actual_mass_cdf_calls": 1664,
+        "actual_score_calls": 320,
+        "copied_diagonal_inner": 144,
+        "copied_e3_outer": 176,
+        "copied_raw_outer": 96,
+        "inner_rows": 432,
+        "outer_rows": 304,
+        "scored_inner": 288,
+        "scored_outer": 32
+      },
+      "history12": 784,
+      "history24": 782,
+      "origin": [
+        2013,
+        2
+      ],
+      "origin_evidence": {
+        "bytes": 432043,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp04-v1-b7fd5fb240c6cfa8/origin-evidence-2013-02.json",
+        "sha256": "251288421b72b990018948f2a789269e36423e9db74d8bf9c76159c6294317e4"
+      },
+      "origin_sha256": "3a277a3c4c2e8744cfba22738691953f9fcd98494ae73fcb98236982c0887f60",
+      "target_count": 16
+    }
+  ],
+  "reason": "registered_pilot_cost_screen_failed",
+  "remaining_games": 3375,
+  "remaining_origins": 224,
+  "runtime": {
+    "executable": "/opt/anaconda3/bin/python3.12",
+    "isolated": true,
+    "numpy": "1.26.4",
+    "platform": "darwin",
+    "python": "3.12.2",
+    "scipy": "1.13.1"
+  },
+  "runtime_files": {
+    "/opt/anaconda3/lib/python3.12/json/encoder.py": "7c358788fbb2a6a07f66f1f8446c52396f35fc201108f666d5be002d86f31af2",
+    "/opt/anaconda3/lib/python3.12/lib-dynload/_struct.cpython-312-darwin.so": "73f08f7bee74f11215d5f8ea4ae07c0b10dd472c27107ff70f1f37ade1cc1fc3",
+    "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_boost/__init__.py": "7b5fdae4df81069cfba9bd1578b43b14e114456f4e7d0ded578dbf7cc0d590e5",
+    "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_boost/ncx2_ufunc.cpython-312-darwin.so": "f47203b31e7f1d18e84f002079d0cd5de9bedb7c8939a84bcca09894cd7bf7a6",
+    "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_discrete_distns.py": "54931b8b4e1001dba0ef3b24eedda8dcdeb35b3c7f5c7df209e7d2f372983d67",
+    "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py": "dd09066972ed405f801782a11da98f0894894155de90e426917dad3695944efe",
+    "/opt/anaconda3/lib/python3.12/struct.py": "9c231f9497caf513a22dee8f790b07f969b0e45854a0bdd6dd84b492e08c2856"
+  },
+  "smoke_interval_seconds": 47.114067374990555,
+  "terminal_status": "protocol_invalid",
+  "year_games": {
+    "2010": 256,
+    "2011": 256,
+    "2012": 256,
+    "2013": 32
+  }
+}

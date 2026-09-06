@@ -1,0 +1,30 @@
+{
+  "candidate": {
+    "events": [],
+    "images": [],
+    "outcome": {
+      "kind": "error",
+      "message": "maximum recursion depth exceeded",
+      "module": "builtins",
+      "type": "RecursionError"
+    },
+    "snapshots": []
+  },
+  "expected_decision": null,
+  "expected_modes": null,
+  "kind": "paired_value",
+  "label": "mutual",
+  "original": {
+    "events": [],
+    "images": [],
+    "outcome": {
+      "kind": "error",
+      "message": "maximum recursion depth exceeded",
+      "module": "builtins",
+      "type": "RecursionError"
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_cycles_and_deep_original_failures"
+}

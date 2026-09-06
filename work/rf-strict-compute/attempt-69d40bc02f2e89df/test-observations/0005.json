@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "Object of type Opaque is not JSON serializable",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "eligibility": {
+    "actual": false,
+    "expected": false,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "subclass-or-opaque-opaque",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "Opaque"
+  },
+  "label": "subclass-or-opaque-opaque",
+  "original": {
+    "kind": "error",
+    "message": "Object of type Opaque is not JSON serializable",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_builtin_subclasses_and_opaque_objects"
+}

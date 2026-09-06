@@ -1,0 +1,42 @@
+{
+  "blockers": [],
+  "evidence_paths_sha256": {
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/independent-tests.json": "3a26f8a839ab99a33abebfdd71bc55a9c987bd35880f13481956a801db10c5e7",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-process-attempt2.json": "68bb101c223433aa5698dda7ec5f17b6e113bd8969f512442ac76a1fc74d40ae",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-tests-attempt1.json": "3ce7d353e3840e9ea42400071f62a0a4dd0c3f1406f015ad5833aa7314258f7b",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-tests-attempt2.json": "025739dfba9b8b00731444185386bcec976fc9d43771d1e9c867f708213f64f8",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-MEAN-UNIT-SCOPE.v1.md": "a9fd7df9620df11e83a8494aa47d5e5cca72b50b8f8f7c094e5f1db4054c05ac",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_models.py": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_mean_unit.py": "622c7f2f97da6c7f49bbc050ad6d7b583cd3da474b0eeb318dcbb21be6cf3799"
+  },
+  "findings": [
+    "The four directO/D increments correctly implement independent strength and scoring-level updates; originalO/D masks remain distinct from zeroS/zeroP.",
+    "The nine registered diagonals delegate originalMeanTrajectory directly for all11existingvariants;99whole-state/forecast paths remain exact. NewzeroS/zeroP retain dedicatedtrajectories even ondiagonal.",
+    "The27grid order and registeredsetting checks match scope. Originalforecast chronology, ownstored pre-noise expectations,2020halving, commonretention and32-teamcentering are retained.",
+    "The retentiontest tolerance change is justified: inherited empty postretention _deliver centers state again. Independently reproduced discrepancy is rounding-level and below2e-16; it does not relax diagonal equivalence or change source arithmetic.",
+    "Attempt1failed test evidence is preserved; finalsource unchanged. Tests combine independent hand-calculation with exactdelegation checks; additional independent S/P batch reference covers all18offdiagonals\u00d713variants."
+  ],
+  "independent_evidence": {
+    "additional_off_diagonal_setting_variant_batch_checks": 234,
+    "analytical_retention_tolerance": 2e-16,
+    "batch_reference": "Independent S/P increments then O/D reconstruction and postmaskcentering, mixed2019/2020/2021synthetic games with sharedteams.",
+    "exact_diagonal_setting_variant_paths": 99,
+    "maximum_batch_absolute_error": 2.220446049250313e-16,
+    "retention_quarter_scaling_absolute_difference": 2.6020852139652106e-18,
+    "root_suite_reproduced_tests": 11
+  },
+  "limitations": [
+    "Only pure synthetic numerical/chronological behavior reviewed. No historical artifact load, modelselection, distribution fitting/scoring or experiment invocation.",
+    "FullRF02Fprotocol, distribution/inference integration, diagonalarchivequalification, capacitypilot and actualresearchresult remain unaccepted.",
+    "Unit inherits originalvalidation/failure semantics; this review does not redesign accepted originalsources.",
+    "No speedup, predictive improvement, external5percent, prospective, product or publication claim."
+  ],
+  "scope": "RF02F split-rate Elo pure synthetic mathematical qualification; no historical acceptance",
+  "source_hashes": {
+    "scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+    "scripts/research_score_split_models.py": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+    "tests/research-score-split/test_mean_unit.py": "622c7f2f97da6c7f49bbc050ad6d7b583cd3da474b0eeb318dcbb21be6cf3799"
+  },
+  "status": "accepted_pure_mean_unit_only"
+}

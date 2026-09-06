@@ -1,0 +1,355 @@
+"""Persistent synthetic RF-02F scorer/JSON/public-evaluator qualification.
+
+This entry point only creates synthetic inputs. No historical input path exists.
+"""
+import argparse
+import copy
+from dataclasses import fields, replace
+import hashlib
+import json
+import os
+from pathlib import Path
+import resource
+import signal
+import sys
+import time
+
+STARTED = time.monotonic()
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import numpy as np
+import scipy
+import research_score_split_inference as unit
+from research_score_compute_distribution import score_forecast
+from research_score_contract import encoded
+from research_score_distribution import JointDistribution
+from research_score_models import GameContext, HistoricalResult, pit_uniform
+from research_score_split_models import make_split_trajectory
+from research_score_successor_distribution import JointBase
+from research_score_replay import resolve_distribution
+
+CONFIG_PATH = ROOT / 'config/research-team-score-split.v1.json'
+CONFIG_SHA = '0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519'
+FILES = ('scripts/research_score_split_inference.py', 'tests/research-score-split/test_inference_unit.py',
+         'tests/research-score-split/qualify_inference_unit.py')
+SCORER_FILES = ('scripts/research_score_compute_distribution.py', 'scripts/research_score_metrics.py',
+                'scripts/research_score_distribution.py', 'scripts/research_score_models.py')
+
+
+def sha(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def parse(raw):
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result: raise ValueError('duplicate_json_key')
+            result[key] = value
+        return result
+    result = json.loads(raw, object_pairs_hook=pairs,
+                        parse_constant=lambda value: (_ for _ in ()).throw(ValueError('nonfinite_json')))
+    encoded(result)  # Reject overflowed JSON numbers as well as explicit constants.
+    return result
+
+
+def config():
+    raw = CONFIG_PATH.read_bytes()
+    if sha(raw) != CONFIG_SHA: raise ValueError('configuration_changed')
+    return parse(raw)
+
+
+def pins(names):
+    return {name: sha((ROOT / name).read_bytes()) for name in names}
+
+
+def runtime():
+    result = {'python': '.'.join(map(str, sys.version_info[:3])), 'numpy': np.__version__, 'scipy': scipy.__version__}
+    if result != {'python': '3.12.2', 'numpy': '1.26.4', 'scipy': '1.13.1'}:
+        raise ValueError('unqualified_synthetic_runtime')
+    return result
+
+
+def law_record(law):
+    result = {}
+    for field in fields(JointDistribution):
+        value = getattr(law, field.name)
+        result[field.name] = ({'dtype': value.dtype.str, 'shape': list(value.shape),
+                               'bytes_hex': value.tobytes(order='C').hex()}
+                              if isinstance(value, np.ndarray) else {'type': type(value).__name__, 'value': value})
+    return result
+
+
+def law_from_record(record):
+    values = {}
+    for name, value in record.items():
+        if 'bytes_hex' in value:
+            values[name] = np.frombuffer(bytes.fromhex(value['bytes_hex']), dtype=value['dtype']).reshape(value['shape']).copy()
+        else:
+            values[name] = value['value']
+    return JointDistribution(**values)
+
+
+def toy_laws():
+    original = JointDistribution(np.array([[0., 2.], [2., 0.]]), np.array([.375, .375]), .25,
+                                 np.array([1., 1.]), np.array([0., -0.]), 0)
+    changed = replace(original, alpha=np.array([.25, .25]), beta=.5)
+    return {'reference': original, 'new': changed, 'product': replace(changed, independent=True)}
+
+
+class ScoreCache:
+    """Synthetic-only exact-input reuse. Every returned payload is isolated."""
+    def __init__(self):
+        self.scorer = pins(SCORER_FILES); self.runtime = runtime()
+        self.values = {}; self.calls = 0; self.hits = 0
+        self.native_numpy_seen = False
+
+    def get(self, law, observed, game_id, double_grid=True, diagnostics=True,
+            scorer_identity=None, runtime_identity=None):
+        inputs = {'law_sha256': sha(encoded(law_record(law))), 'game_id': game_id,
+                  'observed': list(observed), 'double_grid': double_grid, 'diagnostics': diagnostics,
+                  'scorer_sha256': sha(encoded(self.scorer if scorer_identity is None else scorer_identity)),
+                  'runtime_sha256': sha(encoded(self.runtime if runtime_identity is None else runtime_identity))}
+        key = sha(encoded(inputs))
+        if key in self.values:
+            self.hits += 1
+        else:
+            self.calls += 1
+            value = score_forecast(law, observed, game_id, double_grid=double_grid, diagnostics=diagnostics)
+            self.native_numpy_seen |= type(value['grid_transport_bound']) is np.float64
+            if sha(encoded(law_record(law))) != inputs['law_sha256']:
+                raise AssertionError('scorer_mutated_law')
+            self.values[key] = copy.deepcopy(value)
+        return copy.deepcopy(self.values[key]), {'key_sha256': key, 'inputs': inputs,
+                                                 'scorer_metric_sha256': sha(encoded(self.values[key]))}
+
+
+def with_mass(law, metrics):
+    result = copy.deepcopy(metrics)
+    for target in unit.TARGETS:
+        result[target + '_interval_mass_80'] = law.cdf(target, result[target + '_upper_80']) - law.cdf(target, result[target + '_lower_80'] - 1)
+    return result
+
+
+def metadata():
+    result = []
+    for year, count in zip(unit.YEARS, unit.YEAR_COUNTS):
+        weeks = 17 if year <= 2020 else 18
+        for week in range(1, weeks + 1):
+            for i in range(count // weeks + (week <= count % weeks)):
+                result.append({'game_id': f'RF02F_SYNTHETIC_{year}_{week:02}_{i:02}', 'season': year, 'week': week})
+    return result
+
+
+def write(path, value):
+    raw = encoded(value)
+    with path.open('xb') as stream:
+        stream.write(raw); stream.flush(); os.fsync(stream.fileno())
+    return {'name': path.name, 'sha256': sha(raw), 'bytes': len(raw)}
+
+
+def read(directory, pointer):
+    if type(pointer['name']) is not str or Path(pointer['name']).name != pointer['name']:
+        raise ValueError('invalid_fixture_path')
+    path = directory / pointer['name']
+    if path.is_symlink() or not path.is_file(): raise ValueError('invalid_fixture_file')
+    raw = path.read_bytes()
+    if sha(raw) != pointer['sha256'] or len(raw) != pointer['bytes']:
+        raise ValueError('fixture_hash_mismatch')
+    return parse(raw)
+
+
+def bridge():
+    teams = tuple(f'S{i:02}' for i in range(32))
+    trajectory = make_split_trajectory({'ks': .2, 'kp': .05, 'retention': .75}, teams)
+    contexts = [GameContext(f'bridge-{i}', 2010, i + 1, teams[0], teams[1]) for i in range(3)]
+    a, b = HistoricalResult(contexts[0], 2, 2), HistoricalResult(contexts[1], 4, 0)
+    trajectory.forecast_origin(2010, 1, [], [contexts[0]])
+    trajectory.forecast_origin(2010, 2, [a], [contexts[1]])
+    forecast = trajectory.forecast_origin(2010, 3, [a, b], [contexts[2]])['forecasts'][0]
+    mapper = JointBase.from_scores([[2, 2], [4, 0], [0, 4], [0, 0]], np.ones(4))
+    fallback = mapper.fit([2., 2.])
+    output = []
+    for variant in ('full', 'independent_marginals'):
+        law, failure = resolve_distribution(mapper, forecast, 'E3', variant, fallback)
+        assert failure is None and law.independent == (variant == 'independent_marginals')
+        np.testing.assert_allclose(law.moments()[0], forecast['mean'], rtol=0, atol=1e-7)
+        metrics = with_mass(law, score_forecast(law, [3, 1], contexts[2].game_id, True, True))
+        output.append({'variant': variant, 'mean': forecast['mean'].tolist(), 'law': law_record(law), 'metrics': metrics})
+    law, failure = resolve_distribution(mapper, {'failure': 'synthetic_native_failure', 'mean': None},
+                                        'E3', 'full', fallback)
+    assert law is fallback and failure == 'synthetic_native_failure'
+    output.append({'variant': 'fallback', 'native_failure': failure, 'law': law_record(law),
+                   'metrics': with_mass(law, score_forecast(law, [3, 1], contexts[2].game_id, True, True))})
+    return output
+
+
+def build_fixture(directory, check):
+    series, _, _ = unit.registered(config())
+    games = metadata(); laws = toy_laws(); cache = ScoreCache()
+    law_pins = {name: sha(encoded(law_record(law))) for name, law in laws.items()}
+    files = []; row_digests = {key: hashlib.sha256() for key in series}
+    payload_digests = {key: hashlib.sha256() for key in series}
+    observed = [(0, 2), (2, 0), (1, 1), (0, 8), (8, 0), (0, 0), (1, 3), (1, 0)]
+    n = 0
+    for year in unit.YEARS:
+        check()
+        for week in range(1, (17 if year <= 2020 else 18) + 1):
+            rows = []; cohort = [r for r in games if (r['season'], r['week']) == (year, week)]
+            # One small origin cache bounds fixture-generation memory.
+            cache.values.clear()
+            for game in cohort:
+                pair = observed[n % len(observed)]; n += 1
+                for family, variant in series:
+                    name = 'reference' if family != 'E3' else 'product' if variant == 'independent_marginals' else 'new'
+                    law = laws[name]
+                    metrics, provenance = cache.get(law, pair, game['game_id'])
+                    if family == 'E3': metrics = with_mass(law, metrics)
+                    row = {'family': family, 'variant': variant, 'game_id': game['game_id'],
+                           'native_failure': None, 'metrics': metrics,
+                           'provenance': {**provenance, 'metric_sha256': sha(encoded(metrics))}}
+                    rows.append(row); row_digests[family, variant].update(encoded(row))
+                    payload_digests[family, variant].update(encoded({'game_id': game['game_id'], 'metrics': metrics}))
+            files.append(write(directory / f'scores-{year}-{week:02}.json', rows))
+        print(f'synthetic fixture year {year}: {n} games, {cache.calls} actual calls, {cache.hits} exact reuses', flush=True)
+    assert n == 3407 and cache.calls == 3407 * 3 and cache.calls + cache.hits == 3407 * 19
+    assert cache.native_numpy_seen
+    return {'version': 'rf02f-synthetic-inference-fixture.v1', 'synthetic_only': True,
+            'config_sha256': CONFIG_SHA, 'source_hashes': pins(FILES), 'scorer_hashes': cache.scorer,
+            'runtime': cache.runtime, 'series': [list(k) for k in series], 'metadata': games,
+            'laws': {law_pins[name]: law_record(law) for name, law in laws.items()}, 'files': files,
+            'counts': {'games': n, 'origins': len(files), 'rows': cache.calls + cache.hits,
+                       'actual_scorer_calls': cache.calls, 'exact_reuses': cache.hits},
+            'native_numpy_scalar_seen': cache.native_numpy_seen,
+            'series_digests': {':'.join(k): {'rows_sha256': row_digests[k].hexdigest(),
+                                          'metrics_sha256': payload_digests[k].hexdigest()} for k in series},
+            'audit_checks': {name: True for name in unit.AUDITS},
+            'audit_scope': 'Synthetic constructor/source/PIT/membership/digest checks only; no historical authority.'}
+
+
+def load_fixture(directory, pointer, check=lambda: None):
+    manifest = read(directory, pointer)
+    if (manifest['config_sha256'] != CONFIG_SHA or manifest['source_hashes'] != pins(FILES)
+            or manifest['scorer_hashes'] != pins(SCORER_FILES) or manifest['runtime'] != runtime()
+            or manifest['synthetic_only'] is not True):
+        raise ValueError('fixture_identity_mismatch')
+    series, _, _ = unit.registered(config()); games = metadata()
+    if manifest['metadata'] != games or manifest['series'] != [list(k) for k in series]:
+        raise ValueError('fixture_population_mismatch')
+    expected_files = [f'scores-{y}-{w:02}.json' for y in unit.YEARS for w in range(1, (17 if y <= 2020 else 18) + 1)]
+    if [p['name'] for p in manifest['files']] != expected_files: raise ValueError('fixture_origin_order')
+    rows = {key: [] for key in series}; digests = {key: hashlib.sha256() for key in series}
+    metrics_digests = {key: hashlib.sha256() for key in series}; seen_keys = {}; masses = {}; reuse = 0
+    laws = {key: law_from_record(value) for key, value in manifest['laws'].items()}
+    for key, law in laws.items():
+        if sha(encoded(law_record(law))) != key: raise ValueError('fixture_law_hash_mismatch')
+    scorer_hash = sha(encoded(manifest['scorer_hashes'])); runtime_hash = sha(encoded(manifest['runtime']))
+    pit_checks = 0; signed_zero_metrics = 0
+    for pointer in manifest['files']:
+        check(); records = read(directory, pointer)
+        y, w = map(int, pointer['name'][7:-5].split('-'))
+        cohort = [g for g in games if (g['season'], g['week']) == (y, w)]
+        expected = [(g['game_id'], *key) for g in cohort for key in series]
+        if [(r['game_id'], r['family'], r['variant']) for r in records] != expected:
+            raise ValueError('fixture_ordered_row_membership')
+        for row in records:
+            key = row['family'], row['variant']; p = row['provenance']; inputs = p['inputs']; m = row['metrics']
+            base_metrics = {k: v for k, v in m.items() if not k.endswith('_interval_mass_80')}
+            base_hash = sha(encoded(base_metrics))
+            if (sha(encoded(inputs)) != p['key_sha256'] or p['metric_sha256'] != sha(encoded(m))
+                    or p['scorer_metric_sha256'] != base_hash
+                    or inputs['game_id'] != row['game_id'] or inputs['observed'] != [m['home_observed'], m['away_observed']]
+                    or inputs['scorer_sha256'] != scorer_hash or inputs['runtime_sha256'] != runtime_hash
+                    or inputs['double_grid'] is not True or inputs['diagnostics'] is not True):
+                raise ValueError('fixture_scorer_provenance_mismatch')
+            law = laws[inputs['law_sha256']]
+            if p['key_sha256'] in seen_keys:
+                reuse += 1
+                if seen_keys[p['key_sha256']] != base_hash: raise ValueError('fixture_reused_payload_mismatch')
+            else:
+                seen_keys[p['key_sha256']] = base_hash
+                # Verify real game-ID randomization independently from persisted score bytes.
+                for target in unit.TARGETS:
+                    value = m[target + '_observed']; below = law.cdf(target, value - 1); at = law.cdf(target, value)
+                    if m[target + '_pit'] != below + pit_uniform(row['game_id'], target) * (at - below):
+                        raise ValueError('fixture_actual_game_pit_mismatch')
+                    pit_checks += 1
+            if key[0] == 'E3':
+                if p['key_sha256'] not in masses:
+                    masses[p['key_sha256']] = {target: law.cdf(target, m[target + '_upper_80'])
+                                              - law.cdf(target, m[target + '_lower_80'] - 1) for target in unit.TARGETS}
+                if any(m[t + '_interval_mass_80'] != masses[p['key_sha256']][t] for t in unit.TARGETS):
+                    raise ValueError('fixture_actual_interval_mass_mismatch')
+            signed_zero_metrics += sum(type(v) is float and v == 0 and bool(np.signbit(v)) for v in m.values())
+            digests[key].update(encoded(row)); metrics_digests[key].update(encoded({'game_id': row['game_id'], 'metrics': m}))
+            rows[key].append({k: row[k] for k in ('game_id', 'metrics', 'native_failure')})
+    for key in series:
+        if manifest['series_digests'][':'.join(key)] != {'rows_sha256': digests[key].hexdigest(), 'metrics_sha256': metrics_digests[key].hexdigest()}:
+            raise ValueError('fixture_series_digest_mismatch')
+    if manifest['counts'] != {'games': 3407, 'origins': 226, 'rows': 64733,
+                              'actual_scorer_calls': len(seen_keys), 'exact_reuses': reuse}:
+        raise ValueError('fixture_actual_call_reuse_counts')
+    return manifest, rows, {'actual_game_pit_checks': pit_checks, 'unique_score_keys': len(seen_keys),
+                            'reuses': reuse, 'signed_zero_metric_values': signed_zero_metrics}
+
+
+class QualificationStop(BaseException):
+    pass
+
+
+def qualify(directory):
+    directory.mkdir(parents=True, exist_ok=False)
+    def check():
+        if time.monotonic() - STARTED > 600 or resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**20 > 4096:
+            raise QualificationStop('synthetic_600_second_or_4096_MiB_limit')
+    signal.signal(signal.SIGALRM, lambda *_: (_ for _ in ()).throw(QualificationStop('synthetic_600_second_deadline')))
+    signal.setitimer(signal.ITIMER_REAL, max(.001, 600 - (time.monotonic() - STARTED)))
+    evidence = {'status': 'invalid', 'source_hashes': pins(FILES), 'historical_execution': False}
+    try:
+        bridge_pointer = write(directory / 'mean-mapper-scorer-bridge.json', bridge())
+        for row in read(directory, bridge_pointer): unit.validate_metric(row['metrics'], True)
+        preparation_started = time.monotonic()
+        fixture = build_fixture(directory, check)
+        fixture_pointer = write(directory / 'fixture-manifest.json', fixture)
+        evidence['fixture_pointer'] = fixture_pointer
+        evidence['generation_seconds'] = time.monotonic() - preparation_started
+        load_started = time.monotonic()
+        fixture, rows, validation = load_fixture(directory, fixture_pointer, check)
+        evidence['reload_validation_seconds'] = time.monotonic() - load_started
+        check(); evaluation_started = time.monotonic()
+        result = unit.evaluate(config(), fixture['metadata'], rows, fixture['audit_checks'])
+        evidence['public_evaluator_seconds'] = time.monotonic() - evaluation_started
+        check()
+        evaluation_pointer = write(directory / 'evaluation.json', result)
+        evidence['evaluation_pointer'] = evaluation_pointer
+        if result['status'] == 'protocol_invalid': raise AssertionError(result)
+        assert len(result['scorecards']) == 19 and result['counts']['outer_games'] == 3407
+        assert result['counts']['development_games'] == 3135 and result['counts']['exposed_2025_games'] == 272
+        assert result['inference']['comparison_order'] == [r['id'] for r in config()['energyComparisonsInOrder']]
+        assert result['inference']['calibration_cell_order'] == config()['calibrationCellsInOrder']
+        assert len(result['inference']['comparisons']) == 18 and len(result['inference']['calibration_cells']) == 8
+        assert set(result['inference']['blocks']) == {'1', '3', '6'}
+        for block in result['inference']['blocks'].values():
+            assert block['members'] == 10000 and len(block['coverage']) == 19 * 4 * 3 and len(block['pit_simultaneous_bands']) == 19 * 4
+        for card in result['scorecards'].values():
+            assert card['all_issued']['games'] == 3407 and card['exposed_2025']['games'] == 272
+            assert [card['seasons'][str(y)]['games'] for y in unit.YEARS] == list(unit.YEAR_COUNTS)
+        assert any(np.signbit(law_from_record(r).theta).any() for r in fixture['laws'].values())
+        assert validation['signed_zero_metric_values'] > 0
+        evidence.update(status='passed', derived_toy_label=result['status'], counts=fixture['counts'], validation=validation,
+                        bridge_pointer=bridge_pointer, complete_public_evaluator=True)
+    except BaseException as exc:
+        evidence.update(failure_type=type(exc).__name__, reason=str(exc))
+        raise
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        evidence['total_seconds_including_setup'] = time.monotonic() - STARTED
+        evidence['peak_rss_mib'] = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**20
+        write(directory / 'qualification.json', evidence)
+        print(json.dumps(evidence, indent=2), flush=True)
+    return evidence
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(); parser.add_argument('--output', type=Path, required=True)
+    args = parser.parse_args(); qualify(args.output.resolve())

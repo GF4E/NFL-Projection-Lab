@@ -1,0 +1,101 @@
+{
+  "version": "rf02f.forecast-unit-acceptance.v1",
+  "status": "accepted_synthetic_forecast_unit_only",
+  "protocol": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md",
+    "sha256": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16",
+    "bytes": 26126
+  },
+  "machineRegistry": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score-split.v1.json",
+    "sha256": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519",
+    "bytes": 13887
+  },
+  "sourceAndTests": [
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_forecast.py",
+      "sha256": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34",
+      "bytes": 23576
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_forecast_unit.py",
+      "sha256": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312",
+      "bytes": 26071
+    }
+  ],
+  "authorEvidence": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-forecast-unit/author-qualification.json",
+    "sha256": "c408a1ba542ea5cbbc78deedd436fb23c5ac455f62b266a04e27661ccee2b962",
+    "bytes": 6337
+  },
+  "independentReview": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-forecast-unit/numerical-review.json",
+    "sha256": "d83916c6143c5016d0ef59da02b8dafe100a39a3b5fd82af6709582ee62d870c",
+    "bytes": 5856
+  },
+  "rootAdjudication": {
+    "status": "accepted_with_scoped_limitations",
+    "findings": [
+      "18 focused tests pass; independent78 full-law comparisons exactly match original solver scalar/array bytes and26 fallback rows retain nine distinct N0 auxiliary laws.",
+      "Root code review confirms strict forecast-only view and outcome-free target contexts, original own-state expectations, fixed prior-season choice semantics, separate12/24 mapper binding and no retained cross-origin law cache.",
+      "New resolution delegates unchanged solver and validates strict native JSON descriptor recovery. Full historical chronology and persisted publication-to-grader proof remain controller obligations."
+    ]
+  },
+  "reusedDependencyPins": {
+    "scripts/research_score_split_forecast.py": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34",
+    "tests/research-score-split/test_forecast_unit.py": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312",
+    "scripts/research_score_conditional_margin.py": "c1a0e334229999afe5bb000598ae0648789cc8ee0e112291b03707039015ad3d",
+    "scripts/research_score_distribution.py": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+    "scripts/research_score_conditional_adapter.py": "a6987485724c7f725661927e194ca39d77b303e15d868b872d3b9449a7cc19f2",
+    "scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+    "scripts/research_score_contract.py": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+    "scripts/research_score_conditional_admission.py": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+    "scripts/research_score_replay.py": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594",
+    "scripts/research_score_metrics.py": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97",
+    "scripts/research_score_inference.py": "4b61e0d4477eb49064353d9fd7b4e1c6ac37fc68553e0df0387d9f71bb8db078",
+    "scripts/research_score_run.py": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa",
+    "scripts/research_score_split_models.py": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+    "scripts/research_score_split_replay.py": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547",
+    "scripts/research_score_successor_distribution.py": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974",
+    "scripts/research_score_split_archive.py": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+    "scripts/research_score_conditional_policy.py": "aa72dc1799669340f3dbec32c5b6510f673ea70bba3d27b2315c311849a4551d",
+    "scripts/research_score_conditional_replay.py": "8eae09d2b3cb7aec7a2e6fbe265679be39eea5dbf6bd327f24f75d9022f65b45",
+    "scripts/research_score_compute_distribution.py": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1",
+    "scripts/research_score_conditional_qualify.py": "cb0a13eb0afacb2a4ccde7826bc2288a31677853b71d061c5ccc477eca0647f6",
+    "scripts/research_score_conditional_inference.py": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604",
+    "scripts/research_score_conditional_run.py": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+    "scripts/research_score_split_budget.py": "0ee4dd5e7936a333fed6b2804f530bf310f588b811af41e3c8a5af1a335388ea",
+    "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+    ".planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16",
+    "config/research-team-score-split.v1.json": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519"
+  },
+  "priorUnitAcceptances": [
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-MEAN-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "61c448d59a30be43ccc15faf447d78f3be9e420cc83baf6a991aa5e3fa61101a",
+      "bytes": 3693
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-BANK-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "c4f252cd9bc053df019308cfebf5d70f0ca0287ee38bae7cdf2738033f978268",
+      "bytes": 4459
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-ARCHIVE-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "f0d96c36b181534260363a0b8365e488d9950f813a5a0354e606a81a7db4a28d",
+      "bytes": 9811
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-RUNTIME-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "0720c240a36c3ed32a72d1113560997417b05a12c8cec8b06a3c4c8a5b0e1ca9",
+      "bytes": 8135
+    }
+  ],
+  "limitations": [
+    "Small synthetic origins only; original SourceContext authentication and prior-only annual choices remain caller obligations.",
+    "No Store/scorer/bootstrap within assembler; final controller must qualify full handoff before historical invocation."
+  ],
+  "historical_execution_authorized": false,
+  "production_authorized": false,
+  "prospective_evidence": false
+}

@@ -1,0 +1,214 @@
+"""Synthetic numerical falsifiers only; never opens football/provider data."""
+from dataclasses import replace
+import importlib.util
+from pathlib import Path
+import sys
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+from scipy.spatial.distance import cdist
+
+SPEC = importlib.util.spec_from_file_location(
+    "research_score_distribution", Path(__file__).resolve().parents[2] / "scripts/research_score_distribution.py")
+dist = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = dist
+SPEC.loader.exec_module(dist)
+
+
+def base():
+    return dist.JointBase.from_scores(
+        [[7, 10], [14, 21], [28, 17], [31, 24], [0, 3], [21, 21]], [1, 2, 1, 3, 1, 2])
+
+
+def direct_energy(p, y):
+    points = np.argwhere(p > 0)
+    mass = p[p > 0]
+    return float(mass @ np.linalg.norm(points - y, axis=1) - .5 * mass @ cdist(points, points) @ mass)
+
+
+def direct_crps(grid, target, y):
+    values, p = dist.marginal(grid, target)
+    return float(p @ np.abs(values - y) - .5 * p @ np.abs(values[:, None] - values) @ p)
+
+
+class DistributionTests(unittest.TestCase):
+    def test_source_validation(self):
+        for scores, weights in [([], []), ([[1, 2]], [0]), ([[1, 2]], [-1]),
+                                ([[1.2, 3]], [1]), ([[-1, 2]], [1]),
+                                ([[1, np.nan]], [1]), ([[1, 2]], [np.inf]),
+                                ([[0, 0]], [1]), ([[1, 2]], [1, 2])]:
+            with self.subTest(scores=scores, weights=weights), self.assertRaises(dist.NumericalFailure):
+                dist.JointBase.from_scores(scores, weights)
+
+    def test_symmetric_empirical_atoms_and_order_invariance(self):
+        a = dist.JointBase.from_scores([[7, 10], [21, 14], [7, 10]], [1, 2, 3])
+        b = dist.JointBase.from_scores([[7, 10], [7, 10], [21, 14]], [3, 1, 2])
+        np.testing.assert_array_equal(a.atoms, b.atoms)
+        np.testing.assert_allclose(a.weights, b.weights, atol=1e-15)
+        for pair, weight in zip(a.atoms, a.weights):
+            self.assertAlmostEqual(weight, a.weights[np.all(a.atoms == pair[::-1], axis=1)][0])
+        self.assertAlmostEqual(a.weights.sum(), 1)
+
+    def test_log_normalizer_gradient_hessian(self):
+        b = base()
+        theta, step = np.array([.017, -.013]), 1e-5
+        _, _, _, _, mean, cov = b.components(theta)
+        numeric_mean, numeric_cov = np.zeros(2), np.zeros((2, 2))
+        for j in range(2):
+            delta = np.eye(2)[j] * step
+            plus, minus = b.components(theta + delta), b.components(theta - delta)
+            numeric_mean[j] = (plus[0] - minus[0]) / (2 * step)
+            numeric_cov[:, j] = (plus[4] - minus[4]) / (2 * step)
+        np.testing.assert_allclose(mean, numeric_mean, atol=1e-6, rtol=1e-7)
+        np.testing.assert_allclose(cov, numeric_cov, atol=2e-6, rtol=1e-7)
+        self.assertGreater(np.linalg.eigvalsh(cov).min(), 0)
+
+    def test_mean_matching_and_full_support(self):
+        for mu in ([18, 23], [7, 9], [35, 38], [.5, 1.5], [60, 8]):
+            with self.subTest(mu=mu):
+                fit = base().fit(mu)
+                np.testing.assert_allclose(fit.moments()[0], mu, atol=1e-7, rtol=0)
+                self.assertAlmostEqual(fit.alpha.sum() + fit.beta, 1, places=12)
+                self.assertTrue(np.isfinite(fit.log_probability(150, 151)))
+                self.assertGreater(np.linalg.eigvalsh(fit.moments()[1]).min(), 0)
+
+    def test_fit_fail_closed(self):
+        for mu in ([0, 2], [-1, 2], [1, np.nan], [np.inf, 2], [1]):
+            with self.subTest(mu=mu), self.assertRaises(dist.NumericalFailure):
+                base().fit(mu)
+        with self.assertRaisesRegex(dist.NumericalFailure, "mean_match_not_converged"):
+            base().fit([18, 23], maximum_iterations=0)
+
+    def test_swap_symmetry(self):
+        left, right = base().fit([19, 25]), base().fit([25, 19])
+        np.testing.assert_allclose(left.theta, right.theta[::-1], atol=1e-12)
+        self.assertAlmostEqual(left.log_probability(17, 28), right.log_probability(28, 17), places=12)
+        self.assertAlmostEqual(dist.energy_score(left.grid(), [17, 28]),
+                               dist.energy_score(right.grid(), [28, 17]), places=11)
+
+    def test_exact_log_probability_versus_grid(self):
+        fit = base().fit([18, 23])
+        grid = fit.grid()
+        for home, away in [(7, 10), (3, 4), (14, 21), (0, 0)]:
+            with self.subTest(score=(home, away)):
+                self.assertAlmostEqual(np.exp(fit.log_probability(home, away)),
+                                       grid.probability[home, away], delta=2e-12)
+        for observation in [(-1, 0), (1.2, 3), (np.nan, 4)]:
+            with self.assertRaises(dist.NumericalFailure):
+                fit.log_probability(*observation)
+
+    def test_analytic_moments_match_grid(self):
+        fit = base().fit([18, 23])
+        p = fit.grid().probability
+        points = np.moveaxis(np.indices(p.shape), 0, -1)
+        mean = np.sum(p[:, :, None] * points, axis=(0, 1))
+        covariance = np.einsum("ij,ija,ijb->ab", p, points - mean, points - mean)
+        np.testing.assert_allclose(mean, fit.moments()[0], atol=1e-8)
+        np.testing.assert_allclose(covariance, fit.moments()[1], atol=1e-6)
+
+    def test_fft_energy_dirac_two_atom_and_asymmetric_grid(self):
+        for p in (np.array([[1.]]), np.array([[.1, 0, .6], [0, .3, 0]]),
+                  np.array([[.5, 0], [0, .5]]), np.array([[0, .2], [.1, .3], [.4, 0]])):
+            for y in ([0, 0], [4, 5], [1, 0]):
+                grid = dist.ScoreGrid(p, 0, 0)
+                self.assertAlmostEqual(dist.energy_score(grid, y), direct_energy(p, y), places=12)
+
+    def test_independent_poisson_energy_against_direct_pairs(self):
+        # Small means keep the all-pairs oracle bounded; actual distribution retains infinite support.
+        fit = dist.JointDistribution(np.array([[0., 0.]]), np.array([0.]), 1.,
+                                     np.array([.8, 1.1]), np.zeros(2), 0)
+        grid = fit.grid()
+        self.assertAlmostEqual(dist.energy_score(grid, [2, 1]), direct_energy(grid.probability, [2, 1]), places=11)
+
+    def test_crps_all_marginals_against_direct_pairs(self):
+        grid = base().fit([18, 23]).grid()
+        for target, y in (("home", 21), ("away", 14), ("total", 35), ("margin", 7)):
+            self.assertAlmostEqual(dist.crps(grid, target, y), direct_crps(grid, target, y), places=11)
+            self.assertGreaterEqual(dist.crps(grid, target, y), 0)
+
+    def test_analytic_cdfs_and_independent_cross_terms(self):
+        fitted = base().fit([18, 23])
+        for fit in (fitted, replace(fitted, independent=True)):
+            grid = fit.grid()
+            for target in ("home", "away", "margin", "total"):
+                values, p = dist.marginal(grid, target)
+                for k in (-40, -10, 0, 7, 14, 21, 30, 40, 60, 80):
+                    with self.subTest(independent=fit.independent, target=target, value=k):
+                        self.assertAlmostEqual(fit.cdf(target, k), float(p[values <= k].sum()), delta=3e-12)
+
+    def test_independence_preserves_means_marginals_not_covariance(self):
+        joint = base().fit([18, 23])
+        independent = replace(joint, independent=True)
+        np.testing.assert_allclose(joint.moments()[0], independent.moments()[0])
+        np.testing.assert_allclose(np.diag(joint.moments()[1]), np.diag(independent.moments()[1]))
+        self.assertEqual(independent.moments()[1][0, 1], 0)
+        self.assertGreater(abs(joint.moments()[1][0, 1]), 1)
+        for h, a in ((7, 10), (0, 0), (18, 23)):
+            ph = joint.cdf("home", h) - joint.cdf("home", h - 1)
+            pa = joint.cdf("away", a) - joint.cdf("away", a - 1)
+            self.assertAlmostEqual(np.exp(independent.log_probability(h, a)), ph * pa, places=14)
+
+    def test_quantile_crossings_and_monotonicity(self):
+        joint = base().fit([18, 23])
+        for fit in (joint, replace(joint, independent=True)):
+            for target in ("home", "away", "margin", "total"):
+                endpoints = []
+                for q in (.025, .1, .25, .5, .75, .9, .975):
+                    k, distance = fit.quantile(target, q)
+                    self.assertLess(fit.cdf(target, k - 1), q)
+                    self.assertGreaterEqual(fit.cdf(target, k), q)
+                    self.assertGreater(distance, 1e-12)
+                    endpoints.append(k)
+                self.assertEqual(endpoints, sorted(endpoints))
+
+    def test_quantile_ambiguity_is_explicit(self):
+        fit = base().fit([18, 23])
+        q = fit.cdf("home", 18)
+        with self.assertRaisesRegex(dist.NumericalFailure, "quantile_boundary_ambiguous"):
+            fit.quantile("home", q)
+
+    def test_grid_tail_double_grid_and_caps(self):
+        joint = base().fit([18, 23])
+        for fit in (joint, replace(joint, independent=True)):
+            grid = fit.grid()
+            doubled = fit.grid(np.array(grid.probability.shape) * 2, maximum_cells=1024)
+            self.assertLessEqual(grid.omitted_probability_bound, 2e-12)
+            self.assertLessEqual(grid.score_error_bound, 1e-7)
+            for y in ([21, 14], [1, 80]):
+                self.assertLessEqual(abs(dist.energy_score(grid, y) - dist.energy_score(doubled, y)), 1e-6)
+                for target, value in (("home", y[0]), ("away", y[1]), ("total", sum(y)), ("margin", y[0] - y[1])):
+                    self.assertLessEqual(abs(dist.crps(grid, target, value) - dist.crps(doubled, target, value)), 1e-6)
+        with self.assertRaisesRegex(dist.NumericalFailure, "grid_tail_budget_exceeded"):
+            joint.grid(maximum_cells=16)
+        with self.assertRaisesRegex(dist.NumericalFailure, "grid_omits_empirical_atom"):
+            joint.grid([16, 16])
+
+    def test_transport_tail_formula_against_direct_poisson_sum(self):
+        fit = base().fit([18, 23])
+        from scipy.stats import poisson
+        home, away = np.indices((256, 256))
+        p = np.outer(poisson.pmf(np.arange(256), fit.rates[0]), poisson.pmf(np.arange(256), fit.rates[1]))
+        for m, n in ((0, 0), (15, 20), (31, 31), (63, 63)):
+            omitted = (home > m) | (away > n)
+            delta, error = fit.tail_bounds(m, n)
+            self.assertAlmostEqual(delta, float(fit.beta * p[omitted].sum()), places=13)
+            self.assertAlmostEqual(error, float(2 * fit.beta * np.sum(p[omitted] * (home + away)[omitted])), places=11)
+
+    def test_fft_cannot_normalize_excess_clipped_mass(self):
+        # Each negative is individually tolerable, but their aggregate correction is not.
+        correlation = np.full((16, 16), -9e-13)
+        correlation[0, 0] = 1 + 255 * 9e-13
+        p = np.zeros((8, 8))
+        p[0, 0] = 1
+        with patch.object(dist.np.fft, "irfft2", return_value=correlation):
+            with self.assertRaisesRegex(dist.NumericalFailure, "fft_clipped_mass_invalid"):
+                dist.energy_score(dist.ScoreGrid(p, 0, 0), [0, 0])
+
+    def test_nonfinite_crps_is_not_a_score(self):
+        with self.assertRaisesRegex(dist.NumericalFailure, "invalid_crps"):
+            dist.crps(dist.ScoreGrid(np.array([[1.]]), 0, 0), "home", np.nan)
+
+
+if __name__ == "__main__":
+    unittest.main()

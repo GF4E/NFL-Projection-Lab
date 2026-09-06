@@ -1,0 +1,25 @@
+{
+  "status": "accepted_scoped_runtime_temporal_and_atomic_behavior",
+  "checks": [
+    "real_signal_escapes_nested_exception_handler_and_restores_process_signal",
+    "delayed_stop_retains_original_deadline_and_only_remaining_grace_commits_metadata",
+    "already_expired_grace_writes_nothing_and_cleans_up_signal",
+    "post_rename_fsync_error_preserves_one_completion_and_saved_prefix",
+    "KeyboardInterrupt_preserved_while_post_call_deadline_is_latched",
+    "SystemExit_preserved_while_post_call_deadline_is_latched",
+    "smoke_timeout_retains_actual_cost_and_latches_stop_before_any_further_guarded_work"
+  ],
+  "source_sha256": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+  "test_sha256": "a96576b22bd4c55ed8adf34d49ad78ee783605fe75a3f2f263f17a8c092bd42c",
+  "seconds_including_imports": 0.5030430420010816,
+  "peak_rss_mib": 86.25,
+  "historical_fit_calls": 0,
+  "historical_score_calls": 0,
+  "historical_admission_calls": 0,
+  "bootstrap_calls": 0,
+  "limits": [
+    "Explicit synthetic clocks and a35millisecond real signal exercise stop paths, not historical7200second feasibility.",
+    "Python-delivered signals and peak-RSS sampling require a separate future external hard watchdog for native-code delays.",
+    "No full controller, production source admission or model/inference invocation. Post-rename fsync failure is uncertain durability, not a successful run."
+  ]
+}

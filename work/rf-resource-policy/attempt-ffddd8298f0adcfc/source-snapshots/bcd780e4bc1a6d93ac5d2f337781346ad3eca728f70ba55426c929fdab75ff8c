@@ -1,0 +1,35 @@
+{
+  "automatic_restart": false,
+  "baseline_compute_protocol": {
+    "path": ".planning/engine-os/research-first/RF-COMP-04-COMPUTE-PROTOCOL.v1.md",
+    "sha256": "69de6edd1ea666209e02eb51005513a0a9a2622dd3eeb30c39a6be70c0bd0a00"
+  },
+  "budget": {
+    "complete_smoke_seconds": 120,
+    "external_worker_grace_seconds": 0,
+    "invalid_metadata_seconds": 30,
+    "model_workers": 1,
+    "projected_seconds": 9000,
+    "rss_mib": 4096,
+    "seconds": 9000
+  },
+  "deferred_helpers_integrated": false,
+  "historical_invocation_authorized_by_this_file": false,
+  "overrides": {
+    "projected_seconds": {
+      "new": 9000,
+      "previous": 7200
+    },
+    "setup_inclusive_seconds": {
+      "new": 9000,
+      "previous": 7200
+    }
+  },
+  "production_authorized": false,
+  "provider_requests": 0,
+  "scientific_config": {
+    "path": "config/research-team-score-split.v1.json",
+    "sha256": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519"
+  },
+  "version": "rfcomp08.resource-policy.v1"
+}

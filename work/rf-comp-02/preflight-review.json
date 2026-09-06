@@ -1,0 +1,132 @@
+{
+  "blockers": [],
+  "dependencies": [
+    {
+      "bytes": 4342,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+      "sha256": "0ac0ecd32415720cc7e6fb1d2ec0c9229de3a46d6437d5ff380e9ebe2ee83661"
+    },
+    {
+      "bytes": 1540,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_compute_distribution.py",
+      "sha256": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1"
+    },
+    {
+      "bytes": 13532,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+      "sha256": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1"
+    },
+    {
+      "bytes": 9445,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_metrics.py",
+      "sha256": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97"
+    },
+    {
+      "bytes": 8755,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/controller-final-pins-20260905.json",
+      "sha256": "891d03da52317a62ee307e7c1c27b805413f6676520aa6acfd3651642de5f4f7"
+    },
+    {
+      "bytes": 148306,
+      "path": "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py",
+      "sha256": "dd09066972ed405f801782a11da98f0894894155de90e426917dad3695944efe"
+    },
+    {
+      "bytes": 59419,
+      "path": "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_discrete_distns.py",
+      "sha256": "54931b8b4e1001dba0ef3b24eedda8dcdeb35b3c7f5c7df209e7d2f372983d67"
+    },
+    {
+      "bytes": 1759,
+      "path": "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_boost/__init__.py",
+      "sha256": "7b5fdae4df81069cfba9bd1578b43b14e114456f4e7d0ded578dbf7cc0d590e5"
+    },
+    {
+      "bytes": 198784,
+      "path": "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_boost/ncx2_ufunc.cpython-312-darwin.so",
+      "sha256": "f47203b31e7f1d18e84f002079d0cd5de9bedb7c8939a84bcca09894cd7bf7a6"
+    }
+  ],
+  "findings": [
+    "The guarded path uses exactly builtin integer thresholds within +/-2**20 and exact float/np.float64 positive finite rates through1e4; unsupported types/domains reach the public function with unchanged arguments. Guards precede conversion. No failure is caught and retried.",
+    "The private call receives length-one int64/float64/float64 arrays, matching pinned public argsreduce semantics. It invokes the unchanged backend, preserves its eager np.where branches and overflow-only context, clips with NumPy, and selects a numpy scalar. The tests check dispatch arrays, warning/exception behavior, tiny positive rates and both guard edges.",
+    "Copied CDF arithmetic differs from RF-COMP-01 only at the two approved Skellam calls. Poisson, SF, empirical accumulation, probability guards, cache lookup/insert policy and fresh inherited readonly copies remain unchanged.",
+    "The18 tests cover exact types/IEEE bytes, asymmetric/tiny/subnormal rates, fallback argument identity, arrays/broadcasts/subclasses/huge integers, backend failure without retry, warning/error modes, injected clipping cases, CDF/quantile/full-score/grid equality and copy/cache isolation. These are static coverage findings, not passing test results.",
+    "The driver runs only the new suite, with failfast enabled, and then8 fixed synthetic cases using actual resolve and full-score callbacks. There is no encoder patch. Each mode is compared immediately with the accepted pinned original reference after its completed body is saved. Case counts and restored original encoder identity are asserted.",
+    "Six rotated rounds balance all three positions twice;24 warmups plus144 measured observations imply168 fit and168 score callbacks. Setup/hashing/persistence remain outside callback timers but inside the observed process.",
+    "Parent authentication/snapshots, post-run map equality, unique attempt outputs, child kill/cleanup, and retained failure logging are appropriate to this bounded synthetic qualification. No retry or historical entry point is added."
+  ],
+  "historical_execution": false,
+  "limitations": [
+    "No helper, scientific module, tests, callback, profile, bootstrap or historical run was executed during this review. Numerical equality and resource performance remain unverified until the registered command completes.",
+    "The private backend is version-specific. Any change to its Python or compiled files invalidates this review/qualification basis; do not infer compatibility across SciPy upgrades.",
+    "Matching array interface and AST arithmetic supports equivalence but does not prove all floating-point or warning behavior. The fixed tests and complete-body comparisons are the next required evidence.",
+    "The benchmark uses synthetic means/supports and partial assembly setup. It cannot establish historical capacity, predictive gain, a completed chronological experiment or authority to restart RF-02F.",
+    "Parent timing starts after importing time and its final report write follows the recorded elapsed checkpoint. Interpreter-startup/report-tail exclusion must stay explicit when interpreting completed resource evidence.",
+    "The design note records an earlier float64/scalar idea, but its explicit final superseding refinement is length-one int64/float64 arrays; the candidate and tests follow that final refinement."
+  ],
+  "pre_execution_binding_requirement": "Root will generate INPUT-PINS after this review, binding the exact reviewed artifacts, prior accepted evidence/references,66-file map and the four installed SciPy private-backend files listed here. This preflight does not authenticate a not-yet-created final pin document.",
+  "reviewed_artifacts": [
+    {
+      "bytes": 3937,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_skellam_compute.py",
+      "sha256": "3a88ed783f87cd9fdbfed9fae177edbb8d72d36be8fcfd5374a25a9c4ef8a7d0"
+    },
+    {
+      "bytes": 19939,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-skellam-compute/test_skellam_compute.py",
+      "sha256": "d597718272262bf488e14da2ba023a1a5c9150933ca7abad53e9c329727b8a7d"
+    },
+    {
+      "bytes": 12251,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/qualify.py",
+      "sha256": "e7fdbb791a1c36fe97e350cce25f043b05820ca8919f19122e037b92c5a53206"
+    },
+    {
+      "bytes": 4774,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/QUALIFICATION-SCOPE.md",
+      "sha256": "ae324e23eab0a88afd7a4160cd9692ae5ee1ef27343fc7140c998486665b5981"
+    },
+    {
+      "bytes": 4144,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/design-review.md",
+      "sha256": "3aae8d2dc54e7afea7ebc979ff4b73a724606bfa1ea9b2c154af9cdbe0249f42"
+    }
+  ],
+  "reviewed_hash_map": {
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/QUALIFICATION-SCOPE.md": "ae324e23eab0a88afd7a4160cd9692ae5ee1ef27343fc7140c998486665b5981",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/design-review.md": "3aae8d2dc54e7afea7ebc979ff4b73a724606bfa1ea9b2c154af9cdbe0249f42",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/qualify.py": "e7fdbb791a1c36fe97e350cce25f043b05820ca8919f19122e037b92c5a53206",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_skellam_compute.py": "3a88ed783f87cd9fdbfed9fae177edbb8d72d36be8fcfd5374a25a9c4ef8a7d0",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-skellam-compute/test_skellam_compute.py": "d597718272262bf488e14da2ba023a1a5c9150933ca7abad53e9c329727b8a7d"
+  },
+  "role": "independent_numerical",
+  "scientific_calls": 0,
+  "static_checks": {
+    "all66_frozen_source_test_files_unchanged": true,
+    "benchmark_cases": 8,
+    "candidate_and_test_root_supplied_hashes_match": true,
+    "candidate_cdf_ast_equals_rf_comp_01_with_exactly_two_skellam_call_substitutions": true,
+    "cdf_memoization_method_ast_unchanged": true,
+    "complete_fit_callbacks_planned": 168,
+    "complete_score_callbacks_planned": 168,
+    "driver_ast_parse": true,
+    "each_mode_each_order_position": 2,
+    "measured_rounds_per_case": 6,
+    "modes": [
+      "original",
+      "poisson",
+      "skellam"
+    ],
+    "new_focused_tests": 18,
+    "planned_observations_including_warmups": 168,
+    "planned_science_resource_caps_seconds_mib": [
+      60,
+      1024
+    ],
+    "warmups_per_mode_per_case": 1
+  },
+  "status": "accepted_for_one_registered_synthetic_qualification_only",
+  "unit_execution": false,
+  "version": "rf-comp-02.static-preflight-review.v1"
+}

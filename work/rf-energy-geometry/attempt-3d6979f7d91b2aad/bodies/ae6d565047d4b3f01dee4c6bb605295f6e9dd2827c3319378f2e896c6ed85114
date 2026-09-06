@@ -1,0 +1,45 @@
+{
+  "cache": {
+    "entries": [
+      [
+        8,
+        8
+      ]
+    ],
+    "evictions": 0,
+    "hits": 2,
+    "misses": 1,
+    "retained_bytes": 512
+  },
+  "distance": 1,
+  "events": [
+    "rfft2",
+    "irfft2",
+    "distance",
+    "rfft2",
+    "irfft2",
+    "rfft2",
+    "irfft2"
+  ],
+  "irfft2": 3,
+  "kind": "dependency_calls",
+  "label": "actual-fresh-fft-events",
+  "matrices": [
+    {
+      "c_bytes_hex": "0000000000000000000000000000f03f00000000000000400000000000000840000000000000104000000000000008400000000000000040000000000000f03f000000000000f03fcd3b7f669ea0f63fa8f4979b77e30140535bda3a584c094007edaf660f7e1040535bda3a584c0940a8f4979b77e30140cd3b7f669ea0f63f0000000000000040a8f4979b77e30140cd3b7f669ea00640f35961442bd80c40a8f4979b77e31140f35961442bd80c40cd3b7f669ea00640a8f4979b77e301400000000000000840535bda3a584c0940f35961442bd80c40d96cdfcc76f810400000000000001440d96cdfcc76f81040f35961442bd80c40535bda3a584c0940000000000000104007edaf660f7e1040a8f4979b77e311400000000000001440cd3b7f669ea016400000000000001440a8f4979b77e3114007edaf660f7e10400000000000000840535bda3a584c0940f35961442bd80c40d96cdfcc76f810400000000000001440d96cdfcc76f81040f35961442bd80c40535bda3a584c09400000000000000040a8f4979b77e30140cd3b7f669ea00640f35961442bd80c40a8f4979b77e31140f35961442bd80c40cd3b7f669ea00640a8f4979b77e30140000000000000f03fcd3b7f669ea0f63fa8f4979b77e30140535bda3a584c094007edaf660f7e1040535bda3a584c0940a8f4979b77e30140cd3b7f669ea0f63f",
+      "dtype": "<f8",
+      "shape": [
+        8,
+        8
+      ],
+      "strides": [
+        64,
+        8
+      ],
+      "type": "ndarray",
+      "writeable": false
+    }
+  ],
+  "rfft2": 3,
+  "test": "test_energy_geometry.EnergyGeometryTests.test_real_fft_is_fresh_on_hits_and_geometry_built_late"
+}

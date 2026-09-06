@@ -1,0 +1,57 @@
+{
+  "candidate": {
+    "events": [
+      "left-hook",
+      "assembly",
+      "right-hook"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": [
+      {
+        "mode": "fallback"
+      },
+      {
+        "mode": "fallback"
+      }
+    ]
+  },
+  "expected_decision": true,
+  "expected_modes": [
+    "fallback",
+    "fallback"
+  ],
+  "kind": "paired_value",
+  "label": "ArrayHook-fallback-True",
+  "original": {
+    "events": [
+      "left-hook",
+      "assembly",
+      "right-hook"
+    ],
+    "images": [
+      {
+        "ascii_body": "{\n  \"x\": \"\\u00e9\"\n}\n",
+        "bytes": 20,
+        "sha256": "3c4b4b50c07721282e36d3f0ee0d8a064487fa4c3953580dfca9ed5da3c5e740"
+      },
+      {
+        "ascii_body": "{\n  \"x\": \"\\u00e9\"\n}\n",
+        "bytes": 20,
+        "sha256": "3c4b4b50c07721282e36d3f0ee0d8a064487fa4c3953580dfca9ed5da3c5e740"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_subclass_and_numpy_hooks_once_per_capture"
+}

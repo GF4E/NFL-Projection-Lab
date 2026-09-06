@@ -1,0 +1,158 @@
+"""Per-game proper scores and diagnostics; no fitting or external data access."""
+import math
+
+import numpy as np
+from scipy.special import expit
+
+from research_score_distribution import NumericalFailure, energy_score, crps
+from research_score_models import pit_uniform
+
+TARGETS = ("home", "away", "margin", "total")
+LEVELS = (.5, .8, .95)
+
+
+def score_forecast(distribution, observed, game_id, double_grid=True, diagnostics=True):
+    y = np.asarray(observed, dtype=float)
+    if y.shape != (2,) or np.any(y < 0) or np.any(y != np.floor(y)) or not np.all(np.isfinite(y)):
+        raise NumericalFailure("invalid_target_pair")
+    grid = distribution.grid()
+    energy = energy_score(grid, y)
+    observations = {"home": y[0], "away": y[1], "margin": y[0] - y[1], "total": y.sum()}
+    scores = {target + "_crps": crps(grid, target, value) for target, value in observations.items()}
+    delta = 0.
+    if double_grid:
+        larger = distribution.grid(np.array(grid.probability.shape) * 2, maximum_cells=1024)
+        differences = [abs(energy - energy_score(larger, y))]
+        differences += [abs(scores[target + "_crps"] - crps(larger, target, value)) for target, value in observations.items()]
+        delta = max(differences)
+        if delta > 1e-6:
+            raise NumericalFailure("double_grid_score_mismatch")
+    mean, covariance = distribution.moments()
+    metrics = {"joint_energy_score": energy, "joint_nll": -distribution.log_probability(*y), **scores,
+               "predicted_covariance": float(covariance[0, 1]),
+               "residual_product": float((y[0] - mean[0]) * (y[1] - mean[1])),
+               "grid_cells": list(grid.probability.shape), "grid_transport_bound": grid.score_error_bound,
+               "grid_probability_bound": grid.omitted_probability_bound, "double_grid_difference": delta}
+    predictions = {"home": mean[0], "away": mean[1], "margin": mean[0] - mean[1], "total": mean.sum()}
+    for target, value in observations.items():
+        metrics[target + "_observed"] = float(value)
+        metrics[target + "_mean"] = float(predictions[target])
+        metrics[target + "_mae"] = float(abs(value - predictions[target]))
+        metrics[target + "_squared_error"] = float((value - predictions[target]) ** 2)
+    if not diagnostics:
+        return metrics
+    p_away = distribution.cdf("margin", -1)
+    p_tie = distribution.cdf("margin", 0) - p_away
+    p_home = 1 - distribution.cdf("margin", 0)
+    probabilities = np.array([p_home, p_tie, p_away])
+    if np.any(probabilities < 0) or abs(float(probabilities.sum()) - 1) > 1e-10:
+        raise NumericalFailure("invalid_win_tie_loss_probability")
+    label = 0 if y[0] > y[1] else 1 if y[0] == y[1] else 2
+    indicator = np.eye(3)[label]
+    if probabilities[label] <= 0 or not 0 < p_home < 1:
+        raise NumericalFailure("unresolvable_win_probability")
+    home_result = float(label == 0)
+    metrics.update(home_win_probability=p_home, tie_probability=p_tie, away_win_probability=p_away,
+                   home_win_observed=home_result, home_win_brier=(p_home - home_result) ** 2,
+                   home_win_log_loss=-(home_result * math.log(p_home) + (1 - home_result) * math.log1p(-p_home)),
+                   win_tie_loss_brier=float(np.sum((probabilities - indicator) ** 2)),
+                   win_tie_loss_log_loss=-math.log(float(probabilities[label])),
+                   tail_absolute_margin_21=distribution.cdf("margin", -21) + 1 - distribution.cdf("margin", 20),
+                   tail_total_70=1 - distribution.cdf("total", 69),
+                   observed_absolute_margin_21=float(abs(y[0] - y[1]) >= 21),
+                   observed_total_70=float(y.sum() >= 70))
+    for target, value in observations.items():
+        below, at = distribution.cdf(target, value - 1), distribution.cdf(target, value)
+        if below > at + 1e-12:
+            raise NumericalFailure("nonmonotone_observed_cdf")
+        metrics[target + "_pit"] = below + pit_uniform(game_id, target) * (at - below)
+        for level in LEVELS:
+            suffix = str(round(100 * level))
+            lo, lodistance = distribution.quantile(target, (1 - level) / 2)
+            hi, hidistance = distribution.quantile(target, (1 + level) / 2)
+            if hi < lo:
+                raise NumericalFailure("reversed_interval")
+            metrics[f"{target}_lower_{suffix}"] = lo
+            metrics[f"{target}_upper_{suffix}"] = hi
+            metrics[f"{target}_coverage_{suffix}"] = float(lo <= value <= hi)
+            metrics[f"{target}_width_{suffix}"] = hi - lo
+            metrics[f"{target}_boundary_distance_{suffix}"] = min(lodistance, hidistance)
+    return metrics
+
+
+def mean_calibration(predictions, observed):
+    x, y = np.asarray(predictions, dtype=float), np.asarray(observed, dtype=float)
+    if x.shape != y.shape or x.ndim != 1 or len(x) < 2 or not np.all(np.isfinite(x)) or not np.all(np.isfinite(y)):
+        return {"status": "diagnostic_failure", "reason": "invalid_calibration_rows"}
+    design = np.column_stack((np.ones(len(x)), x))
+    coef, _, rank, _ = np.linalg.lstsq(design, y, rcond=1e-12)
+    if rank < 2:
+        if not np.all(x == x[0]):
+            return {"status": "diagnostic_failure", "reason": "numerically_rank_deficient_nonconstant_predictor", "rank": int(rank)}
+        return {"status": "unavailable_by_design", "reason": "constant_predictor", "rank": int(rank),
+                "prediction_min": float(x.min()), "prediction_max": float(x.max()), "n": len(x)}
+    if not np.all(np.isfinite(coef)):
+        return {"status": "diagnostic_failure", "reason": "nonfinite_calibration"}
+    return {"status": "available", "intercept": float(coef[0]), "slope": float(coef[1]), "n": len(x)}
+
+
+def win_calibration(probabilities, observed):
+    p, y = np.asarray(probabilities, dtype=float), np.asarray(observed, dtype=float)
+    if p.shape != y.shape or p.ndim != 1 or len(p) < 2 or not np.all(np.isfinite(p)) or np.any(p <= 0) or np.any(p >= 1) or np.any((y != 0) & (y != 1)):
+        return {"status": "diagnostic_failure", "reason": "invalid_win_calibration_rows"}
+    x = np.column_stack((np.ones(len(p)), np.log(p) - np.log1p(-p)))
+    rank = int(np.linalg.matrix_rank(x))
+    if rank < 2:
+        if not np.all(p == p[0]):
+            return {"status": "diagnostic_failure", "reason": "numerically_rank_deficient_nonconstant_predictor", "rank": rank}
+        return {"status": "unavailable_by_design", "reason": "constant_predictor", "rank": rank,
+                "prediction_min": float(p.min()), "prediction_max": float(p.max()), "n": len(p)}
+    # Detect perfect/quasi separation in this one-predictor model before Newton.
+    positives, negatives = x[y == 1, 1], x[y == 0, 1]
+    if not len(positives) or not len(negatives) or positives.min() >= negatives.max() or positives.max() <= negatives.min():
+        return {"status": "diagnostic_failure", "reason": "separation", "n": len(p)}
+    coef = np.zeros(2)
+    for iteration in range(100):
+        linear = x @ coef
+        fitted = expit(linear)
+        gradient = x.T @ (fitted - y)
+        hessian = x.T @ (x * (fitted * (1 - fitted))[:, None])
+        try:
+            direction = np.linalg.solve(hessian, -gradient)
+        except np.linalg.LinAlgError:
+            return {"status": "diagnostic_failure", "reason": "singular_calibration_hessian"}
+        if np.max(np.abs(direction)) <= 1e-7:
+            return {"status": "available", "intercept": float(coef[0]), "slope": float(coef[1]), "iterations": iteration + 1, "n": len(p)}
+        current = float(np.sum(np.logaddexp(0, linear) - y * linear))
+        accepted = False
+        for halvings in range(41):
+            trial = coef + direction * (.5 ** halvings)
+            t = x @ trial
+            objective = float(np.sum(np.logaddexp(0, t) - y * t))
+            if np.isfinite(objective) and objective <= current + 1e-4 * (.5 ** halvings) * float(gradient @ direction):
+                coef, accepted = trial, True
+                break
+        if not accepted:
+            return {"status": "diagnostic_failure", "reason": "calibration_line_search"}
+    return {"status": "diagnostic_failure", "reason": "calibration_nonconvergence"}
+
+
+def aggregate(rows):
+    if not rows:
+        raise ValueError("empty_scorecard")
+    ignored = {"grid_cells"}
+    names = sorted(set(rows[0]) - ignored)
+    if any(set(row) != set(rows[0]) for row in rows):
+        raise ValueError("incomplete_diagnostics")
+    summary = {name: {"mean": float(np.mean([r[name] for r in rows])), "median": float(np.median([r[name] for r in rows]))}
+               for name in names}
+    for target in TARGETS:
+        summary[target + "_rmse"] = float(np.sqrt(np.mean([r[target + "_squared_error"] for r in rows])))
+    calibration = {target: mean_calibration([r[target + "_mean"] for r in rows], [r[target + "_observed"] for r in rows]) for target in TARGETS}
+    calibration["home_win"] = win_calibration([r["home_win_probability"] for r in rows], [r["home_win_observed"] for r in rows])
+    pit = {}
+    for target in TARGETS:
+        counts, _ = np.histogram([r[target + "_pit"] for r in rows], bins=np.linspace(0, 1, 11))
+        proportions = counts / len(rows)
+        pit[target] = {"counts": counts.tolist(), "proportions": proportions.tolist(), "maximum_uniform_bin_deviation": float(np.max(np.abs(proportions - .1)))}
+    return {"games": len(rows), "metrics": summary, "calibration": calibration, "pit": pit}

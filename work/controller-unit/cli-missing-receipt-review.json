@@ -1,0 +1,33 @@
+{
+  "status": "accepted",
+  "scope": "actual_isolated_CLI_missing_receipt_and_observer_reentry_only",
+  "controller_sha256": "ef82f33dda523f92c3e4c2826be3583b7d59bef801fb3abec9cc3d28dadfdca4",
+  "synthetic_acceptance_sha256": "af9f710e6737b89ce4447d01dd20e6180e0d91301d210f42b243a7aeebd4961f",
+  "missing_receipt": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/controller-unit/SYNTHETIC-MISSING-FINAL-ACCEPTANCE.json",
+  "observer_directory": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rf02f-observer-af9f710e6737b89c",
+  "process_report_sha256": "8128d7e02d86661a337f922bc59374b5a9f73bd7ac222d4dda4a70586f854cea",
+  "attempts": [
+    {
+      "attempt": 1,
+      "exit_code": 1,
+      "stdout_sha256": "2f2a43f8a7c7bfa5f643278847cc4da0904c7221dde9aaac8687068593fb16ba",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "attempt": 2,
+      "exit_code": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "1bb7dae4fb4f0fd83ff7ad7bfc5056fa8e59d0114e169834696a40ac3e92f064"
+    }
+  ],
+  "phase_handoff": "starting_owned_file_received",
+  "parent_start_argument_received": true,
+  "model_namespaces_created": 0,
+  "observer_reentry_refused_without_report_change": true,
+  "elapsed_seconds": 0.6367352079978446,
+  "limits": [
+    "Each subprocess hard timeout10seconds; production watchdog limits unchanged.",
+    "Missing finalreceipt fails in preflight before Store creation/admission. No fabricated approval or historical data read, fit, scorer, bootstrap or fullfixture.",
+    "CLI failure route only; does not qualify complete277-origin runner."
+  ]
+}

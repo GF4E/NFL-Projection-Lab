@@ -1,0 +1,506 @@
+"""Small synthetic archive/helper boundaries; never call production admission."""
+import copy
+from dataclasses import FrozenInstanceError, replace
+from datetime import datetime, timedelta
+import importlib
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import numpy as np
+import research_score_split_archive as a
+from research_score_contract import encoded, prepare_origin
+from research_score_distribution import JointDistribution
+from research_score_models import GameContext, HistoricalResult, MeanTrajectory, canonical_seed
+from research_score_run import distribution_descriptor, lineage
+
+
+CONFIG_RAW = (ROOT / 'config/research-team-score.v2.json').read_bytes()
+CONFIG = a.parse(CONFIG_RAW)
+SETTINGS = a.setting_grid(CONFIG)
+SERIES = a.registered_series(CONFIG)
+
+
+def record(game, year, week, kickoff, home=21, away=17):
+    dt = datetime.fromisoformat(kickoff)
+    return {'gameId': game, 'season': year, 'week': week, 'homeTeam': 'T00', 'awayTeam': 'T01',
+            'neutral': False, 'kickoffAt': kickoff, 'homeScore': home, 'awayScore': away, 'overtime': 0,
+            'availability': {str(d): (dt + timedelta(hours=d)).isoformat() for d in (12, 24)}}
+
+
+def source_fixture(year=2011, week=1):
+    records = [record('old', year-1, 17, f'{year-1}-12-26T17:00:00+00:00'),
+               record('z-target', year, week, f'{year}-09-11T17:00:00+00:00'),
+               record('a-target', year, week, f'{year}-09-12T17:00:00+00:00')]
+    window = {'eligibleInputIds': ['old'], 'inputIdSha256': a.sha(encoded(['old'])),
+              'firstDeliveryIds': ['old'], 'omittedPriorInputIds': [], 'minimumTrainingMet': True}
+    origin = {'season': year, 'week': week, 'originAt': f'{year}-09-06T14:30:00+00:00',
+              'role': 'outer' if year >= 2013 else 'inner', 'targetGameIds': ['z-target', 'a-target'],
+              'windows': {'12': copy.deepcopy(window), '24': copy.deepcopy(window)}}
+    return records, origin
+
+
+def mapper_fixture(records, origin, delay=12):
+    prepared = prepare_origin(records, origin, delay)
+    mapper = a.JointBase.from_scores([[r.home_score, r.away_score] for r in prepared['history']],
+                                    a.weights(prepared['history'], origin['season'], 2.5))
+    payload = {'atoms': mapper.atoms.tolist(), 'weights': mapper.weights.tolist(), 'b': mapper.b,
+               'epsilon': mapper.epsilon, 'input_sha256': prepared['input_hash'], 'half_life': 2.5}
+    _, alpha, beta, rates, _, _ = mapper.components(np.zeros(2))
+    law = JointDistribution(mapper.atoms.copy(), alpha, beta, rates, np.zeros(2), 0)
+    return prepared, mapper, payload, law
+
+
+def state_fixture(origin, mean):
+    forecasts = [{'game_id': g, 'mean': copy.deepcopy(mean), 'failure': None,
+                  'initialization_only': False} for g in sorted(origin['targetGameIds'])]
+    rows = []
+    for family, variant in SERIES:
+        if variant in ('independent_marginals', 'deterministic_noise'):
+            continue
+        for index in range(len(SETTINGS[family])):
+            output = {'forecasts': copy.deepcopy(forecasts), 'events': {
+                'delivered': ['old'], 'initialization_only': [],
+                'offseason_retention_applied': origin['season'] > 2010 and origin['week'] == 1},
+                'support': None, 'league_mean': float(sum(mean)/2), 'home_effect': 0.,
+                'elo_score_slope': 0., 'absorbing_failure': False}
+            rows.append({'key': [family, index, variant], 'output': output,
+                         'ratings': [1500.] * 32, 'offense': [0.] * 32, 'defense': [0.] * 32})
+    return {'origin': copy.deepcopy(origin), 'actual_computation_at': '2026-09-05T00:00:00+00:00',
+            'historical_status': 'retrospective_inferred', 'prospective': False, 'trajectory_state': rows}
+
+
+def metrics_fixture(target, outer=False):
+    # These are explicit schema fixtures, not claimed scored forecast evidence.
+    value = {key: 0. for key in (a._OUTER_METRICS if outer else a._BASE_METRICS)}
+    value['joint_energy_score'] = 1.
+    value['grid_cells'] = [64, 64]
+    h, away = target['homeScore'], target['awayScore']
+    for name, observation in zip(a._TARGETS, (h, away, h-away, h+away)):
+        value[name + '_observed'] = float(observation)
+    return value
+
+
+class TinyArchive:
+    """Real Archive + hashes; only a single synthetic origin, never1909 dummies."""
+    def __init__(self, year=2011, week=1, warmup=False):
+        self.temp = tempfile.TemporaryDirectory()
+        self.directory = Path(self.temp.name).resolve()
+        self.records, self.origin = source_fixture(year, week)
+        if warmup:
+            self.origin['windows']['12']['minimumTrainingMet'] = False
+            self.origin['windows']['24']['minimumTrainingMet'] = False
+        self.prepared, self.mapper, payload, self.law = mapper_fixture(self.records, self.origin)
+        self.contents = {}
+        manifest = {'bound_hashes': {'config': 'a' * 64}, 'code_hashes': {'synthetic': 'b' * 64}}
+        self.manifest_hash = a.sha(encoded(manifest))
+        self.contents['manifest.json'] = manifest
+        self.state = state_fixture(self.origin, self.law.moments()[0].tolist())
+        suffix = a._suffix(self.origin)
+        self.contents['state-' + suffix + '.json'] = self.state
+        self.selection = {family: {'setting': 0} for family in SETTINGS}
+        mapper_sha = a.sha(encoded(payload))
+        pointer = {'name': 'object-' + mapper_sha + '.json', 'sha256': mapper_sha}
+        self.mapper_pointers = {payload['input_sha256']: pointer}
+        self.contents[pointer['name']] = payload
+        self.descriptor = distribution_descriptor(self.law, pointer)
+        if warmup:
+            self.contents['warmup-' + suffix + '.json'] = {'status': 'warmup_unforecastable', 'targets': self.origin['targetGameIds']}
+        else:
+            full = [{'family': family, 'setting': i, 'game_id': g, 'native_failure': None,
+                     'distribution': copy.deepcopy(self.descriptor)} for g in self.origin['targetGameIds']
+                    for family, settings in SETTINGS.items() for i in range(len(settings))]
+            outer = []
+            if year >= 2013:
+                noises = {}
+                for g in self.origin['targetGameIds']:
+                    noise = [np.random.Generator(np.random.PCG64(canonical_seed('noise', g, side))).standard_normal()
+                             for side in ('home', 'away')]
+                    # Synthetic-only two numerical fits supply genuine descriptor
+                    # consistency for the output-only deterministic-noise helper.
+                    noises[g] = self.mapper.fit(self.law.moments()[0] + noise)
+                for family, variant in SERIES:
+                    for g in self.origin['targetGameIds']:
+                        law = noises[g] if variant == 'deterministic_noise' else replace(self.law, independent=True) if variant == 'independent_marginals' else self.law
+                        outer.append({'family': family, 'variant': variant, 'setting': 0, 'game_id': g,
+                                      'native_failure': None, 'distribution': distribution_descriptor(law, pointer)})
+            self.publication = {'classification': 'retrospective', 'origin_at': self.origin['originAt'],
+                                'manifest_sha256': self.manifest_hash,
+                                'full_setting_forecasts': full, 'outer_selected_forecasts': outer}
+            self.contents['forecasts-' + suffix + '.json'] = self.publication
+            self.refresh_lineage()
+            by_id = {r['gameId']: r for r in self.records}
+            self.inner = [{k: row[k] for k in ('family', 'setting', 'game_id', 'native_failure')} |
+                          {'metrics': metrics_fixture(by_id[row['game_id']])} for row in full]
+            self.contents['inner-losses-' + suffix + '.json'] = self.inner
+            if year >= 2013:
+                self.losses = [{k: row[k] for k in ('family', 'variant', 'game_id', 'native_failure')} |
+                               {'metrics': metrics_fixture(by_id[row['game_id']], True)} for row in outer]
+                self.contents['outer-losses-' + suffix + '.json'] = self.losses
+        self.save()
+
+    def refresh_lineage(self):
+        body_sha = a.sha(encoded(self.publication))
+        self.contents['ancestry-' + a._suffix(self.origin) + '.json'] = {
+            str(d): lineage(prepare_origin(self.records, self.origin, d), 'a' * 64,
+                            a.sha(encoded({'synthetic': 'b' * 64})), self.manifest_hash,
+                            {'forecast_bytes_sha256': body_sha, 'delay_hours': d}) for d in (12, 24)}
+
+    def save(self):
+        index = {}
+        for name, value in self.contents.items():
+            raw = encoded(value)
+            (self.directory / name).write_bytes(raw)
+            index[name] = {'sha256': a.sha(raw), 'bytes': len(raw)}
+        raw = encoded({'files': index})
+        (self.directory / 'artifact-index.json').write_bytes(raw)
+        self.archive = a.Archive(self.directory, self.manifest_hash, a.sha(raw))
+
+    def call(self, grade=False):
+        return a._origin_artifacts(self.archive, {r['gameId']: r for r in self.records}, self.origin,
+                                   SETTINGS, SERIES, self.selection, self.mapper_pointers, lambda: None, grade=grade)
+
+    def close(self):
+        self.temp.cleanup()
+
+
+def context_fixture(origins, records):
+    # Explicit test-only construction. The production admit_source has no
+    # fixture/injected pins parameter and is not called by these tests.
+    return a.SourceContext(Path('/synthetic-only-never-read'), encoded({'files': {}}), encoded({}), encoded(records),
+                           tuple(encoded(o) for o in origins), CONFIG_RAW, (), encoded({}), (), encoded({}), a._SEAL)
+
+
+def publication_fixture(origin, manifest='f' * 64):
+    full = [{'family': 'E3', 'setting': i, 'game_id': g, 'native_failure': None, 'distribution': {'recipe': 'synthetic'}}
+            for g in origin['targetGameIds'] for i in range(27)] if 2011 <= origin['season'] <= 2024 else []
+    outer = [{'family': f, 'variant': v, 'setting': 0, 'game_id': g, 'native_failure': None,
+              'distribution': {'recipe': 'synthetic'}} for f, v in tuple(('E3', v) for v in a.SPLIT_VARIANTS) + a.RAW_REFERENCES
+             for g in origin['targetGameIds']] if origin['season'] >= 2013 else []
+    return {'version': 'rf02f.origin-publication.v1', 'manifest_sha256': manifest, 'parent_manifest_sha256': a.PARENT_MANIFEST,
+            'origin': [origin['season'], origin['week']], 'origin_at': origin['originAt'],
+            'target_game_ids': origin['targetGameIds'], 'full_setting_forecasts': full, 'outer_selected_forecasts': outer}
+
+
+def proof(origin, manifest='f' * 64):
+    raw = encoded(publication_fixture(origin, manifest))
+    pointer = {'name': 'forecasts.json', 'sha256': a.sha(raw), 'bytes': len(raw)}
+    receipt = a._publication(origin, pointer, lambda p: raw, manifest)
+    # Explicit synthetic post-grading binding; real grade_inputs derives this
+    # only from the authenticated source inner-loss file after publication.
+    return replace(receipt, _diagonal_binding=tuple((i, g, float(i+1), None)
+                    for g in origin['targetGameIds'] for i in range(9)))
+
+
+def batch(origin):
+    return [{'family': 'E3', 'setting': i, 'game_id': g, 'native_failure': None,
+             'metrics': {'joint_energy_score': float(i + 1)}} for g in origin['targetGameIds'] for i in range(27)]
+
+
+class ArchiveTests(unittest.TestCase):
+    def tiny(self, *args, **kwargs):
+        value = TinyArchive(*args, **kwargs)
+        self.addCleanup(value.close)
+        return value
+
+    def test_import_inert_and_production_has_no_fixture_bypass(self):
+        with patch.object(a, 'Archive', side_effect=AssertionError('archive opened')):
+            importlib.reload(a)
+        with self.assertRaises(TypeError):
+            a.admit_source(ROOT, lambda: None, fixture={})
+        with tempfile.TemporaryDirectory() as path, self.assertRaises((ValueError, FileNotFoundError)):
+            a.admit_source(Path(path).resolve(), lambda: None)
+
+    def test_real_index_binding_membership_and_symlink_rejection(self):
+        x = self.tiny()
+        a._physical(x.archive)
+        (x.directory / 'unexpected.json').write_text('{}')
+        with self.assertRaisesRegex(ValueError, 'physical_archive'):
+            a._physical(x.archive)
+        (x.directory / 'unexpected.json').unlink()
+        path = x.directory / 'state-2011-01.json'
+        path.write_text('{}')
+        with self.assertRaisesRegex(ValueError, 'bound_file_mismatch'):
+            x.call()
+        path.unlink(); path.symlink_to(x.directory / 'manifest.json')
+        with self.assertRaises((ValueError, OSError)):
+            x.call()
+
+    def test_real_full_population_and_pregame_does_not_open_losses(self):
+        x = self.tiny()
+        names = []
+        old = x.archive.raw
+        def raw(name):
+            names.append(name)
+            return old(name)
+        x.archive.raw = raw
+        result = x.call()
+        self.assertEqual(len(result[1]), 81)
+        self.assertEqual(len(result[2]), 86)
+        self.assertEqual(result[6:8], ([], []))
+        self.assertFalse(any('losses' in n for n in names))
+        self.assertEqual([g.game_id for g in result[0][12]['targets']], ['z-target', 'a-target'])
+        self.assertEqual([r['game_id'] for r in result[1][0, 'full']['forecasts']], ['a-target', 'z-target'])
+        self.assertTrue(all(type(m) is a.JointBase for m in result[4].values()))
+        self.assertFalse(hasattr(result[0][12]['targets'][0], 'home_score'))
+        self.assertEqual(len(x.call(grade=True)[6]), 86)
+
+    def test_all_40_outer_series_and_different_metric_schema(self):
+        x = self.tiny(2013)
+        result = x.call(grade=True)
+        self.assertEqual((len(result[3]), len(result[7])), (80, 80))
+        x.inner[0]['metrics']['home_pit'] = .5
+        x.save()
+        with self.assertRaisesRegex(ValueError, 'inner_outer_metric_schema'):
+            x.call(grade=True)
+
+    def test_exact_warmup_preserves_finite_native_means(self):
+        x = self.tiny(2010, 5, warmup=True)
+        result = x.call()
+        self.assertIsNotNone(result[1][0, 'full']['forecasts'][0]['mean'])
+        self.assertEqual(result[2:8], ({}, {}, {}, {}, [], []))
+        x.origin['week'] = 6
+        for record in x.records:
+            if record['gameId'] in x.origin['targetGameIds']:
+                record['week'] = 6
+        x.state['origin'] = copy.deepcopy(x.origin)
+        x.contents['state-2010-06.json'] = x.state
+        x.save()
+        with self.assertRaisesRegex(ValueError, 'unregistered_warmup_exception'):
+            x.call()
+
+    def test_native_initialization_uses_actual_mean_trajectory_helper(self):
+        teams = [f'T{i:02}' for i in range(32)]
+        engine = MeanTrajectory('E2', {'k': .1, 'retention': .75}, teams)
+        g1, g2 = GameContext('first', 2010, 1, teams[0], teams[1]), GameContext('next', 2010, 2, teams[0], teams[1])
+        first = engine.forecast_origin(2010, 1, [], [g1])
+        second = engine.forecast_origin(2010, 2, [HistoricalResult(g1, 21, 17)], [g2])
+        self.assertIsNone(first['forecasts'][0]['mean'])
+        self.assertEqual(first['forecasts'][0]['failure'], 'warmup_no_prior_score')
+        self.assertTrue(first['forecasts'][0]['initialization_only'])
+        self.assertIsNone(second['forecasts'][0]['failure'])
+        self.assertEqual(second['events']['initialization_only'], ['first'])
+
+    def test_native_cache_types_order_events_and_rehashed_state(self):
+        for mutation in ('bool_setting', 'wrong_target', 'wrong_delivery', 'nonfinite_mean', 'bool_flag'):
+            with self.subTest(mutation=mutation):
+                x = self.tiny()
+                row = next(r for r in x.state['trajectory_state'] if r['key'] == ['E2', 0, 'full'])
+                if mutation == 'bool_setting': row['key'][1] = False
+                if mutation == 'wrong_target': row['output']['forecasts'][0]['game_id'] = 'other-origin'
+                if mutation == 'wrong_delivery': row['output']['events']['delivered'] = []
+                if mutation == 'nonfinite_mean': row['output']['forecasts'][0]['mean'][0] = 'NaN'
+                if mutation == 'bool_flag': row['output']['forecasts'][0]['initialization_only'] = 1
+                x.save()
+                with self.assertRaises(ValueError): x.call()
+
+    def test_both_real_closures_and_mapper_weight_b_tampering(self):
+        records, origin = source_fixture(2021)
+        records.insert(0, record('older', 2019, 17, '2019-12-26T17:00:00+00:00', 10, 30))
+        for window in origin['windows'].values():
+            window['eligibleInputIds'] = ['older', 'old']
+            window['inputIdSha256'] = a.sha(encoded(['older', 'old']))
+        prepared, mapper, payload, _ = mapper_fixture(records, origin)
+        actual = a._mapper(payload, prepared, {r['gameId']: r for r in records}, 2021)
+        self.assertEqual(type(actual), a.JointBase)
+        self.assertFalse(np.allclose(actual.weights, np.full(len(actual.weights), 1/len(actual.weights))))
+        for field in ('b', 'weights'):
+            changed = copy.deepcopy(payload)
+            if field == 'b': changed['b'] += .1
+            else: changed['weights'] = changed['weights'][1:] + changed['weights'][:1]
+            with self.assertRaisesRegex(ValueError, 'mapper_empirical'):
+                a._mapper(changed, prepared, {r['gameId']: r for r in records}, 2021)
+        changed = copy.deepcopy(records); changed[0]['homeScore'] += 1
+        new = prepare_origin(changed, origin)
+        with self.assertRaisesRegex(ValueError, 'mapper_source'):
+            a._mapper(payload, new, {r['gameId']: r for r in changed}, 2021)
+
+    def test_12_24_boundary_is_real_prepare_origin(self):
+        records, origin = source_fixture(2013, 2)
+        records[0] = record('old', 2013, 1, '2013-09-06T00:30:00+00:00')
+        origin['windows']['24']['eligibleInputIds'] = []
+        origin['windows']['24']['inputIdSha256'] = a.sha(encoded([]))
+        origin['windows']['24']['firstDeliveryIds'] = []
+        result = a._prepared(records, origin)
+        self.assertEqual(result[12]['input_ids'], ['old'])
+        self.assertEqual(result[24]['input_ids'], [])
+        self.assertNotEqual(result[12]['input_hash'], result[24]['input_hash'])
+
+    def test_rehashed_contradictory_or_missing_lineage(self):
+        x = self.tiny()
+        wrong = prepare_origin(x.records, x.origin, 24)
+        wrong['input_hash'] = 'd' * 64
+        # Rebuild every node/root digest, then rehash the outer archive too.
+        x.contents['ancestry-2011-01.json']['24'] = lineage(wrong, 'a'*64,
+            a.sha(encoded({'synthetic': 'b'*64})), x.manifest_hash,
+            {'forecast_bytes_sha256': a.sha(encoded(x.publication)), 'delay_hours': 24})
+        x.save()
+        with self.assertRaisesRegex(ValueError, 'lineage_source_mismatch'): x.call()
+        del x.contents['ancestry-2011-01.json']['24']; x.save()
+        with self.assertRaisesRegex(ValueError, 'lineage_delay_population'): x.call()
+
+    def test_full_native_failure_uses_own_N0_setting0_before_outer_exists(self):
+        x = self.tiny()
+        row = next(r for r in x.publication['full_setting_forecasts'] if r['family'] == 'E2')
+        row['native_failure'] = 'synthetic_solver_failure'
+        next(r for r in x.inner if r['family'] == 'E2')['native_failure'] = row['native_failure']
+        x.refresh_lineage(); x.save()
+        x.call(grade=True)
+        row['distribution']['theta'][0] = .1
+        x.refresh_lineage(); x.save()
+        with self.assertRaisesRegex(ValueError, 'full_N0_fallback'): x.call()
+
+    def test_noeligible_outer_fallback_and_native_reason(self):
+        x = self.tiny(2013)
+        x.selection['E2']['setting'] = None
+        originals = {(r['family'], r['variant'], r['game_id']): r for r in x.publication['outer_selected_forecasts']}
+        for row in x.publication['outer_selected_forecasts']:
+            if row['family'] == 'E2':
+                row['setting'] = None; row['native_failure'] = 'no_eligible_setting'
+                v = row['variant'] if ('N0', row['variant']) in SERIES else 'full'
+                row['distribution'] = copy.deepcopy(originals['N0', v, row['game_id']]['distribution'])
+        for row in x.losses:
+            if row['family'] == 'E2': row['native_failure'] = 'no_eligible_setting'
+        x.refresh_lineage(); x.save(); x.call(grade=True)
+        next(r for r in x.publication['outer_selected_forecasts'] if r['family'] == 'E2')['native_failure'] = 'different'
+        x.refresh_lineage(); x.save()
+        with self.assertRaisesRegex(ValueError, 'no_eligible_reason'): x.call()
+
+    def test_lazy_saved_law_recovery_never_calls_fit_or_score(self):
+        x = self.tiny()
+        with patch.object(a.JointBase, 'fit', side_effect=AssertionError('fit called')):
+            result = a.recover_source_law(x.mapper, x.descriptor)
+        np.testing.assert_array_equal(result.moments()[0], x.law.moments()[0])
+        changed = copy.deepcopy(x.descriptor); changed['iterations'] = True
+        with self.assertRaisesRegex(ValueError, 'saved_descriptor_flags'):
+            a.recover_source_law(x.mapper, changed)
+
+    def test_publication_owner_complete_order_raw_references_outcome_free(self):
+        _, origin = source_fixture(2013)
+        def check(value, manifest='f' * 64):
+            raw = encoded(value)
+            return a._publication(origin, {'name': 'forecasts.json', 'sha256': a.sha(raw), 'bytes': len(raw)}, lambda p: raw, manifest)
+        value = publication_fixture(origin)
+        self.assertEqual(check(value).origin, (2013, 1))
+        for mutation in ('owner', 'order', 'partial', 'outcome', 'bool_setting', 'reason'):
+            with self.subTest(mutation=mutation):
+                bad = copy.deepcopy(value)
+                if mutation == 'owner': bad['manifest_sha256'] = 'e' * 64
+                if mutation == 'order': bad['outer_selected_forecasts'].reverse()
+                if mutation == 'partial': bad['outer_selected_forecasts'].pop()
+                if mutation == 'outcome': bad['full_setting_forecasts'][0]['distribution']['home_observed'] = 7
+                if mutation == 'bool_setting': bad['full_setting_forecasts'][0]['setting'] = False
+                if mutation == 'reason': bad['outer_selected_forecasts'][0]['native_failure'] = True
+                with self.assertRaises(ValueError): check(bad)
+        with self.assertRaises(ValueError): a._publication(origin, True, lambda p: b'{}', 'f' * 64)
+
+    def test_grade_authenticates_publication_before_any_source_or_label_open(self):
+        records, origin = source_fixture()
+        context = context_fixture([origin], records)
+        with patch.object(a, '_current', side_effect=AssertionError('grader opened too soon')) as current:
+            with self.assertRaises(ValueError):
+                a.grade_inputs(context, origin, {'name': 'bad.json', 'sha256': 'a'*64, 'bytes': 2}, lambda: None,
+                               read_publication=lambda p: b'{}', expected_manifest_sha256='f'*64)
+            current.assert_not_called()
+
+    def test_public_api_projection_and_exact_diagonal_grading_receipt(self):
+        x = self.tiny()
+        context = a.SourceContext(x.directory, encoded({'files': x.archive.index}),
+            (x.directory / 'manifest.json').read_bytes(), encoded(x.records), (encoded(x.origin),),
+            CONFIG_RAW, (), encoded(x.mapper_pointers), (), encoded({}), a._SEAL)
+        # This is the complete public source-context roundtrip, including
+        # original model insertion order; no _current dependency replacement.
+        view = a.forecast_inputs(context, x.origin, lambda: None)
+        self.assertEqual(len(view['source_laws']['full']), 20)
+        self.assertNotIn('labels', view)
+        self.assertFalse(any('losses' in key for key in view['source_pointers']))
+        view['bank_prepared'][12]['history'].clear()
+        self.assertEqual(len(view['prepared_receipts'][12]['history']), 1)
+        events = []
+        raw = encoded(publication_fixture(x.origin))
+        pointer = {'name': 'forecasts.json', 'sha256': a.sha(raw), 'bytes': len(raw)}
+        def read(p):
+            self.assertEqual(p, pointer); events.append('durable_read'); return raw
+        result = a.grade_inputs(context, x.origin, pointer, lambda: None,
+                               read_publication=read, expected_manifest_sha256='f'*64)
+        self.assertEqual(events, ['durable_read'])
+        self.assertEqual(len(result['diagonal_inner_rows']), 18)
+        self.assertEqual(len(result['grading_receipt']._diagonal_binding), 18)
+        self.assertEqual(result['labels']['z-target'], [21, 17])
+        rows = batch(x.origin)
+        for row in rows:
+            if row['setting'] < 9: row['metrics']['joint_energy_score'] = 1.
+        feed = a.StrictSelectionFeed(context)
+        feed.add(x.origin, rows, result['grading_receipt'])
+        self.assertEqual(len(feed._selector.rows), 54)
+        changed = replace(context, _config_bytes=encoded(CONFIG))
+        with self.assertRaisesRegex(ValueError, 'state_key_mismatch'):
+            a.forecast_inputs(changed, x.origin, lambda: None)
+
+    def test_context_copies_origin_and_record_universe_are_immutable(self):
+        records, origin = source_fixture()
+        context = context_fixture([origin], records)
+        origins = context.origins; origins[0]['windows']['12']['eligibleInputIds'].clear()
+        records[0]['homeScore'] = 99
+        expected = context.expected_by_season; expected[2011].clear()
+        self.assertEqual(context.origins[0], origin)
+        self.assertEqual(len(context.expected_by_season[2011]), 2)
+        self.assertEqual(a.parse(context._records_bytes)[0]['homeScore'], 21)
+        with self.assertRaises(FrozenInstanceError): context._records_bytes = b'[]'
+
+    def test_selector_typed_batch_is_atomic_and_requires_bound_publication(self):
+        records, origin = source_fixture()
+        context = context_fixture([origin], records)
+        for mutation in ('bool_setting', 'bool_energy', 'bad_reason', 'duplicate', 'future_game', 'diagonal_energy', 'diagonal_reason'):
+            feed = a.StrictSelectionFeed(context); rows = batch(origin)
+            if mutation == 'bool_setting': rows[-1]['setting'] = True
+            if mutation == 'bool_energy': rows[-1]['metrics']['joint_energy_score'] = False
+            if mutation == 'bad_reason': rows[-1]['native_failure'] = 0
+            if mutation == 'duplicate': rows[-1] = copy.deepcopy(rows[0])
+            if mutation == 'future_game': rows[-1]['game_id'] = 'future'
+            if mutation == 'diagonal_energy': rows[0]['metrics']['joint_energy_score'] += 1
+            if mutation == 'diagonal_reason': rows[0]['native_failure'] = 'rehashed_change'
+            with self.assertRaises(ValueError): feed.add(origin, rows, proof(origin))
+            self.assertEqual(feed._selector.rows, {})
+        feed = a.StrictSelectionFeed(context)
+        with self.assertRaisesRegex(ValueError, 'grading_receipt'): feed.add(origin, batch(origin), True)
+        feed.add(origin, batch(origin), proof(origin))
+        self.assertEqual(len(feed._selector.rows), 54)
+        with self.assertRaisesRegex(ValueError, 'nonchronological'): feed.add(origin, batch(origin), proof(origin))
+
+    def test_selector_prior_universe_cached_integrity_and_season_before_add(self):
+        sources = [source_fixture(y) for y in (2011, 2012, 2013)]
+        # Unique IDs across years, preserving original nonlexicographic order.
+        for records, origin in sources:
+            suffix = '-' + str(origin['season'])
+            for r in records: r['gameId'] += suffix
+            origin['targetGameIds'] = [g + suffix for g in origin['targetGameIds']]
+            for window in origin['windows'].values():
+                window['eligibleInputIds'] = ['old' + suffix]
+                window['inputIdSha256'] = a.sha(encoded(window['eligibleInputIds']))
+                window['firstDeliveryIds'] = ['old' + suffix]
+        origins = [o for _, o in sources]
+        records = [r for rows, _ in sources for r in rows if r['gameId'] in {g for o in origins for g in o['targetGameIds']}]
+        context = context_fixture(origins, records); feed = a.StrictSelectionFeed(context)
+        with self.assertRaises(ValueError): feed.add(origins[1], batch(origins[1]), proof(origins[1]))
+        for origin in origins[:2]: feed.add(origin, batch(origin), proof(origin))
+        with self.assertRaisesRegex(ValueError, 'annual_selection_not_frozen'):
+            feed.add(origins[2], batch(origins[2]), proof(origins[2]))
+        expected = context.expected_by_season
+        selected = feed.select(2013, expected)
+        self.assertEqual(selected['E3']['setting'], 0)
+        bad = copy.deepcopy(expected); bad[2011].reverse()
+        with self.assertRaisesRegex(ValueError, 'prior_universe_changed'): feed.select(2013, bad)
+        with self.assertRaisesRegex(ValueError, 'invalid_outer_year'): feed.select(True, expected)
+        with self.assertRaisesRegex(ValueError, 'selection_run_swap'):
+            feed.add(origins[2], batch(origins[2]), proof(origins[2], 'e'*64))
+        feed._selector.frozen_choices[2013]['E3']['setting'] = 1
+        with self.assertRaisesRegex(ValueError, 'cached_selection_changed'): feed.select(2013, expected)
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -1,0 +1,189 @@
+{
+  "actual_cases": [
+    {
+      "background_epsilon": 0.05,
+      "double_grid_dimensions_implied_by_frozen_scorer": [
+        128,
+        128
+      ],
+      "eligible_history_games": 768,
+      "empirical_atoms": 685,
+      "empirical_diagonal_atoms": 1,
+      "forecast_pointer": {
+        "bytes": 803828,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02f-v1-7b400dec97ab30c1/forecasts-2013-01.json",
+        "sha256": "9e98922d5e245a73ebda73c222f9098f9976a462bcb3d92618250444a894fe58"
+      },
+      "game_id": "2013_01_ARI_STL",
+      "mapper_b": 22.391625011775744,
+      "mapper_pointer": {
+        "bytes": 42890,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02f-v1-7b400dec97ab30c1/object-f3c6e4279f6b0aab322fed4f957ea92a2e986acf7d9a718a1a2910b8826db37a.json",
+        "sha256": "f3c6e4279f6b0aab322fed4f957ea92a2e986acf7d9a718a1a2910b8826db37a"
+      },
+      "origin": [
+        2013,
+        1
+      ],
+      "role": "max_fit",
+      "saved_primary_grid": [
+        64,
+        64
+      ],
+      "score_range_per_axis": [
+        [
+          0.0,
+          62.0
+        ],
+        [
+          0.0,
+          62.0
+        ]
+      ],
+      "setting": 10,
+      "unique_coordinates_per_axis": [
+        52,
+        52
+      ],
+      "variant": "full"
+    },
+    {
+      "background_epsilon": 0.05,
+      "double_grid_dimensions_implied_by_frozen_scorer": [
+        128,
+        128
+      ],
+      "eligible_history_games": 784,
+      "empirical_atoms": 693,
+      "empirical_diagonal_atoms": 1,
+      "forecast_pointer": {
+        "bytes": 803720,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02f-v1-7b400dec97ab30c1/forecasts-2013-02.json",
+        "sha256": "4c48b6d33babaf29c3ddb9812177d13e91a1490d58b27e8e78ce2cab503592fd"
+      },
+      "game_id": "2013_02_MIA_IND",
+      "mapper_b": 22.41880679093216,
+      "mapper_pointer": {
+        "bytes": 43670,
+        "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02f-v1-7b400dec97ab30c1/object-c84ef36af404b43537cf6856c6cb1370f2ad757ee938302d6112df7dacc64a9b.json",
+        "sha256": "c84ef36af404b43537cf6856c6cb1370f2ad757ee938302d6112df7dacc64a9b"
+      },
+      "origin": [
+        2013,
+        2
+      ],
+      "role": "max_score",
+      "saved_primary_grid": [
+        64,
+        64
+      ],
+      "score_range_per_axis": [
+        [
+          0.0,
+          62.0
+        ],
+        [
+          0.0,
+          62.0
+        ]
+      ],
+      "setting": 6,
+      "unique_coordinates_per_axis": [
+        53,
+        53
+      ],
+      "variant": "zero_scoring_level_update"
+    }
+  ],
+  "conservative_interpretation": [
+    "The projected cost target is a52.468% reduction in F+S with all other terms fixed; the original frozen cost equation and historical maxima are not replaced by favorable synthetic medians.",
+    "Profiling can falsify an optimization rationale or locate repeated work; it cannot establish a new historical runtime guarantee.",
+    "A tiny-support result can establish correctness/small-shape cost only. A matched support count still does not reproduce actual weights, covariance, solver conditioning, tail probabilities or future support growth.",
+    "Empirical insertion, dense-grid/FFT work, tail checks and marginal CDF work have different shape dependence; retain complete-call timings alongside any proposed kernel speedup.",
+    "No actual pilot distribution, mean vector, outcome or empirical atom set is copied into the suggested fixture; only support extent/count and broad scale motivated it."
+  ],
+  "existing_fixture_sizes": {
+    "qualify_inference_unit_mean_mapper_bridge": {
+      "input_score_pairs": 4,
+      "pairs_are_synthetic": true
+    },
+    "qualify_inference_unit_toy_laws": {
+      "empirical_atoms": 2,
+      "number_of_laws": 3,
+      "reason": "The three variants are reference/new/product laws over the same two empirical atoms; three laws does not mean three support atoms."
+    }
+  },
+  "historical_execution": false,
+  "minimal_fixed_profile_design": {
+    "control": {
+      "purpose": "Three-atom control with the same score extent, avoiding the confound of a naturally tiny dense grid.",
+      "support": [
+        [
+          0,
+          62
+        ],
+        [
+          22,
+          22
+        ],
+        [
+          62,
+          0
+        ]
+      ],
+      "weights": [
+        0.01,
+        0.98,
+        0.01
+      ]
+    },
+    "fixed_requested_means": [
+      [
+        22,
+        22
+      ],
+      [
+        26,
+        18
+      ]
+    ],
+    "fixed_synthetic_observed_pair": [
+      21,
+      17
+    ],
+    "optional_scaling_case": "Only if the two cases do not resolve scaling:1024 pairs on axes0,2,...62 with the same fixed weight rule; label as sensitivity rather than observed historical coverage.",
+    "record": "Exact empirical count, actual primary/doubled grid dimensions, fit iterations, separate complete fit/score wall time and within-call attribution. Do not change means or support to force a favorable grid size after seeing timings.",
+    "representative": {
+      "purpose": "Near actual685/693 atom count, symmetric0..62 support and background mean near22; shape is deliberately synthetic and contains no historical score pairs or weights.",
+      "support": "All676 pairs (floor(62*i/25), floor(62*j/25)) for integer i,j in0..25.",
+      "weights": "Positive deterministic weights proportional to exp(-((h-22)^2+(a-22)^2)/200)."
+    },
+    "scorer_flags": {
+      "diagnostics": true,
+      "double_grid": true
+    }
+  },
+  "question_answer": "A tiny three-atom fixture cannot rule out empirical grid insertion as a bottleneck. The frozen grid method has a Python loop over every atom and is invoked twice by double-grid scoring. The actual maxima each use roughly230 times as many atoms, and tiny low-rate fixtures may additionally use much smaller dense grids.",
+  "scientific_calls": 0,
+  "scope": "Saved support-size metadata and synthetic fixture source review only. No distribution recovery, fit, scoring or profiling performed.",
+  "source_edits": false,
+  "source_pointers": [
+    {
+      "bytes": 13532,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+      "sha256": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1"
+    },
+    {
+      "bytes": 9445,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_metrics.py",
+      "sha256": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97"
+    },
+    {
+      "bytes": 20060,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/qualify_inference_unit.py",
+      "sha256": "bdc7016088a8e094e1c4c023e962b0be4935065d5f63df0c9c11e1bf6ef824d3"
+    }
+  ],
+  "status": "accepted_support_design_with_interpretation_limits",
+  "version": "rf02f.synthetic-profile-support-review.v1"
+}

@@ -1,0 +1,79 @@
+{
+  "version": "rf02f.mean-unit-acceptance.v1",
+  "status": "accepted_pure_synthetic_mean_unit_only",
+  "scope": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-MEAN-UNIT-SCOPE.v1.md",
+    "sha256": "a9fd7df9620df11e83a8494aa47d5e5cca72b50b8f8f7c094e5f1db4054c05ac",
+    "bytes": 5273
+  },
+  "implementation": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_models.py",
+    "sha256": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+    "bytes": 4803
+  },
+  "tests": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_mean_unit.py",
+    "sha256": "622c7f2f97da6c7f49bbc050ad6d7b583cd3da474b0eeb318dcbb21be6cf3799",
+    "bytes": 14617
+  },
+  "unchangedOriginal": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_models.py",
+    "sha256": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+    "bytes": 15069
+  },
+  "rootEvidence": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-tests-attempt1.json",
+      "sha256": "3ce7d353e3840e9ea42400071f62a0a4dd0c3f1406f015ad5833aa7314258f7b",
+      "bytes": 632
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-tests-attempt2.json",
+      "sha256": "025739dfba9b8b00731444185386bcec976fc9d43771d1e9c867f708213f64f8",
+      "bytes": 665
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-process-attempt2.json",
+      "sha256": "68bb101c223433aa5698dda7ec5f17b6e113bd8969f512442ac76a1fc74d40ae",
+      "bytes": 516
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-tests-attempt2.log",
+      "sha256": "fca0ce93b547cae85feb6b16242a077bbf6fe4cfbabbbe78060d6e6dad9a4fb5",
+      "bytes": 2240
+    }
+  ],
+  "independentReviews": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/numerical-review.json",
+      "sha256": "91c04193a7b1e6dc2db723cadd6a334262caa26411fcc7ce5b0ff9187a9c979d",
+      "bytes": 4093
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/temporal-review.json",
+      "sha256": "3ee5ce61c8a8737bbf40dba2aa1985131296fb53b827565c5833f0b49952bd47",
+      "bytes": 7917
+    }
+  ],
+  "observed": {
+    "rootTests": 11,
+    "exactDiagonalSettingVariantPaths": 99,
+    "rootCompleteProcessSeconds": 0.3901192090124823,
+    "rootPeakRssMiB": 51.40625,
+    "independentOffDiagonalBatchChecks": 234,
+    "maximumIndependentBatchError": 2.220446049250313e-16,
+    "independentTemporalProbes": 8
+  },
+  "testCorrection": "The initial real-arithmetic quarter-retention expectation missed inherited empty-batch recentering (2.602085e-18). Only that assertion now uses2e-16 absolute tolerance;99 tied trajectories remain exact. Attempt1 is preserved; source was unchanged.",
+  "integrationObligations": [
+    "authenticate immutable contents of every eligible historical row including already-delivered rows",
+    "abort rather than retry an instance after partly mutating delivery exceptions",
+    "retain own original-origin raw expectations and all archived controls",
+    "full protocol, bank/archive/mapper/inference/controller qualification and independent pre-fit acceptance required"
+  ],
+  "historicalFitAuthorized": false,
+  "historicalDataLoaded": false,
+  "predictiveAcceptance": false,
+  "productionAuthorization": false,
+  "researchDetailsPublic": false
+}

@@ -1,0 +1,13 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/profile_callbacks.py", line 278, in <module>
+    child(Path(sys.argv[2]))
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/profile_callbacks.py", line 216, in child
+    reference = run('capture')
+                ^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/profile_callbacks.py", line 194, in run
+    law, descriptor, reason, work = assembly.resolve(selected, variant, game, stage)
+                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_forecast.py", line 318, in resolve
+    law, descriptor, reason = self.accounting.callback('fit', callback, game_id=game, setting=selected,
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: child.<locals>.Accounting.callback() got multiple values for argument 'operation'

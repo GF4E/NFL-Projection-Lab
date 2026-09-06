@@ -1,0 +1,152 @@
+# RF-02F: separate strength and scoring-level Elo rates
+
+2026-09-05. **Draft for independent pre-fit protocol review. No historical invocation is authorized yet.** This is a new experiment after RF-02E rejection and the independently accepted saved-mean diagnostic. It does not reactivate the deferred RF-02D scope. The pure mean unit is separately accepted; bank, archive, numerical/inference/controller integration and full implementation acceptance remain pending. Detailed work stays private.
+
+## 1. Question, population and immutable controls
+
+Does allowing separate strength and scoring-level update rates produce a useful enhanced-Elo improvement over the original tied-rate E2, using the same eligible information and unchanged joint-score mapping? The saved diagnostic found improved margin means but mixed total means. Exposed2025 contradicts a universal version of that pattern. Calibration slopes are not rate estimates, and additional selection flexibility is part of this hypothesis.
+
+Use only the already admitted RF-01 v2 score data:4175 regular-season games2010–2025, with768 warmup games2010–2012,3135 development games2013–2024 and272 separately reported exposed2025 games. Retain277 chronological weekly origins and all226 outer origins/3407 target games, with original game order, overtime target treatment, neutral sites and franchise identities. No history is unseen. No external comparator is admitted, no prospective evidence is created and no live forecast stream is activated.
+
+Preserve RF-02C reject_all, RF-02D protocol_invalid, RF-02E derived reject_all, and every source/result/acceptance byte. Parent RF-02C manifest2d9c91d803f1c991be039b88167082c8a501ce60dc58b18afcab0b251bb75e38 and indexccde502d661a4beee8f8da537a2f23238950fb2931c1527638de4c92898804ab bind the reusable archive. Admitted-data SHAea7dc1c17cc4613ada871927842d90f6d41ffe61b45e6302c3032eac7cdffc85 remains fixed. The final acceptance must bind the complete original source/config/protocol/runtime and prior acceptance chain, plus every new source/test/config/protocol/qualification byte without circular self-hashes.
+
+The machine registry is `config/research-team-score-split.v1.json`. Protocol acceptance binds the exact hashes of this document and that registry, including all settings, variants, comparisons, calibration cells, decisions and cost limits. The registry points to this protocol's hash; this document names its path only, avoiding a circular hash. Neither draft status nor a pure-unit acceptance authorizes historical invocation.
+
+All original data rules remain: Tuesday07:30 America/Los_Angeles season-week origins; original12-hour main and24-hour sensitivity availability assumptions; strictly prior weeks and result availability strictly before origin; missing prior results omitted from inputs but never from target games; delayed results delivered once at the first eligible origin. These are retrospective availability assumptions, not contemporaneous issuance records or pregame lead times. Preserve original computation timestamps separately from historical origins.
+
+## 2. One new mean-model family and complete search order
+
+Call the new family E3 in the experiment ledger; its central algorithm remains enhanced Elo. The only predictive change is splitting the original E2 gain into KS for strength S=O+D and KP for scoring level P=O-D. This is not a possession/pace model. Use each candidate's own raw mean stored at the original forecast when computing later observed-minus-expected errors. Apply the exact increments and original chronology in RF-02F-MEAN-UNIT-SCOPE.v1.md and accepted implementation. No market, player, drive, injury, QB, news, new distribution, conditional-margin contraction or context feature is introduced.
+
+Preserve all nine original diagonal settings first, in original gain-major/retention-minor tie order. Then enumerate off-diagonals in ascending KS,KP,retention order. The complete order is:
+
+| Index | KS | KP | Retention |
+|---:|---:|---:|---:|
+|0|0.05|0.05|0.5|
+|1|0.05|0.05|0.75|
+|2|0.05|0.05|1|
+|3|0.1|0.1|0.5|
+|4|0.1|0.1|0.75|
+|5|0.1|0.1|1|
+|6|0.2|0.2|0.5|
+|7|0.2|0.2|0.75|
+|8|0.2|0.2|1|
+|9|0.05|0.1|0.5|
+|10|0.05|0.1|0.75|
+|11|0.05|0.1|1|
+|12|0.05|0.2|0.5|
+|13|0.05|0.2|0.75|
+|14|0.05|0.2|1|
+|15|0.1|0.05|0.5|
+|16|0.1|0.05|0.75|
+|17|0.1|0.05|1|
+|18|0.1|0.2|0.5|
+|19|0.1|0.2|0.75|
+|20|0.1|0.2|1|
+|21|0.2|0.05|0.5|
+|22|0.2|0.05|0.75|
+|23|0.2|0.05|1|
+|24|0.2|0.1|0.5|
+|25|0.2|0.1|0.75|
+|26|0.2|0.1|1|
+
+For each outer seasonY=2013…2025, select using exactly its full2011…2024 prior-two-season inner populationY-2,Y-1. The unweighted mean of per-game joint energy loss is minimized over all27 settings; native-failure rate must be<=0.005. Within1e-8 of the minimum, choose the first eligible setting in the table. Freeze one choice for all games and variants for the entire outer season. Preserve all candidate summaries and no-eligible-setting decisions. No2025 score enters any selection, no variant is retuned, and no selected setting is chosen from a favorable development subset.
+
+All settings/state-changing variants own their complete chronology from2010. Never splice annually selected states, retrofit a new rate onto archived O/D state or resume a new candidate from snapshots that omit stored expectations. Standard diagonal cases delegate the original MeanTrajectory directly; the two new zero-rate controls still need their own histories. Synthetic exactness is necessary but does not replace archive admission.
+
+## 3. Variants, efficient reuse and the forecast boundary
+
+E3 has13 series in this exact order: full; no_home_effect; no_prior_season_carryover; no_time_decay; no_team_identity; independent_marginals; availability_24h; no_offense; no_defense; shuffled_identity; deterministic_noise; zero_strength_update; zero_scoring_level_update. Original variants retain their algorithms/seeds. The new removals zero KS or KP from initialization, while O/D removals mask the corresponding increments after split arithmetic. These are different algorithmic ablations. They make no causal claim about NFL team components.
+
+The bank owns216 new trajectories:18off-diagonals×11state-changing variants plus9diagonals×2new zero variants. It borrows81 original diagonal outputs per origin. Independence and deterministic noise borrow full trajectory output; noise never enters learning expectations. Keep canonical origin/game order and validate the full cache before mutating any new engine.
+
+The controller validates both complete prepare_origin receipts and then passes the bank only each delay's exact history/targets fields. Receipt hashes and provenance remain in the controller ledger; do not pass extra receipt fields into the bank's strict input interface.
+
+Authenticate all required original files, exact hashes/lengths, source/runtime pins and both prepare_origin closures before use. Check exact semantic bodies of source→config/code→schema→forecast ancestry nodes, not graph connectivity alone. State files are independently index-bound, not falsely covered by a forecast-publication hash. Every reused row identifies its parent manifest/index, file hash, original family/setting/variant/game, source origin and availability delay. Require exact populations and native failure reasons; reject missing, duplicated, conflicting or mismatched cached rows.
+
+Exactly five original warmup origins,2010weeks1–5, have index-bound state/warmup files but no forecast, ancestry or mapper artifact. Admit those five through their exact original index entries, admitted origin and both eligible-input closures; require the state-only warmup schema and advance every new trajectory. Do not require nonexistent forecast ancestry or create a general missing-source exception. All later forecast-bearing origins require their full original closures. Stream the complete archive admission and retain authenticated pointers rather than holding all parsed state files in memory alongside the new engines.
+
+Reuse all9 full diagonal inner records for2011–2024:3647 games×9=32823 records, after complete admission and original nine-setting annual-selection reproduction. Compute exactly65646 new full inner scores,18 settings×3647 games, for a valid completed run. Native failures still receive the registered N0 fallback score and retain their failure marker. A smaller count is an incomplete invalid prefix, not an efficiency gain. Warmup2010 still advances every new trajectory, but its losses cannot affect any2013–2025 choice. Do not score unused2025 full-setting candidates for inner selection.
+
+Reuse original selected raw N0/E1/S1/E2 outer controls unchanged. The six scored references are N0full,N0availability24h,E2full,E2availability24h,E1full,S1full. Additionally admit the original N0 shared-variant laws required for same-variant fallback; these are auxiliary source inputs, not extra registered comparison claims. For E3 ordinary variants, reuse the original selected E2 law and outer metrics only when setting index, variant, game, origin, availability and all native/fallback flags exactly match. Derive any newly required actual interval-mass field from that same authenticated law and interval without rescoring unchanged metrics. Record reuse and derived-field calls separately.
+
+If E3 selects a different diagonal, its saved full law may be recovered, but its inner metric dictionary lacks complete outer diagnostics: compute the full outer score. Fit all missing variant laws from that same setting's authenticated native means. All off-diagonal and new zero-rate outer rows require their own law resolution and full scores. Never borrow another selected setting's metrics or use an inner scorecard as an outer scorecard. New zero-rate laws are never in RF-02C. Apply this reuse policy identically in the pilot and every later origin; project the uncached workload even if the pilot happens to select cached diagonal rows.
+
+The mapper uses the accepted successor_distribution.JointBase with the original empirical/Poisson family and all qualified RF-02S numerical settings. It depends only on eligible raw scores and original2.5-season weights/2020 multiplier, with separate12/24-hour maps. Mean ablations do not modify the mapper. Reuse exact admitted mapper atoms/weights/b/epsilon where available; authenticate payload equivalence to the eligible input closure. Preserve resolve_distribution fallback and compute_distribution.score_forecast, including mean/grid/normalization/support/tail tolerances, original per-inner-season/setting first double-grid check and all outer double-grid checks. Actual80% interval mass is computed as CDF(upper)-CDF(lower-1) from the same law/interval; it does not transform that law.
+
+Full/no_offense/no_defense/new zero controls fall back to original same-game N0full; shared variants use their corresponding original N0 variant, with availability24h strictly using the24-hour N0 law. Preserve native failures even after fallback. N0 fallback absence/failure is protocol-invalid. All3407 games remain, including difficult forecasts and failed variants. A family with no eligible setting emits the registered N0 fallback for every outer game/variant and records native failure.
+
+Durably store outcome-free forecasts/descriptors/native reasons/lineage for the complete origin before opening target labels in the grader. Loading an archive's future bytes for authentication does not authorize sending future values to model/selection calls. Authenticate contents of already-delivered input rows on every admitted closure: the original mean class does not itself detect altered prior score contents. After any delivery validation error, abort the run; inherited guards can partially mutate delivered state before raising, so the instance must never be retried.
+
+## 4. Exact inference registry and diagnostics
+
+Scored series comprise13E3+6raw references=19, each with the identical3407 ordered rows. Development inference uses only3135 games2013–2024. Overall3407 and every complete season2013–2025 are descriptive scorecards. Each setting's search history is reported, but no setting-level significance claim is made;27 inner search options are not27 separately selected outer hypotheses.
+
+The18 energy comparisons, all oriented gain=1-mean(candidate_loss)/mean(reference_loss), are registered in this order:
+
+1. N0full→E3full.
+2. E2full→E3full.
+3. E1full→E3full.
+4. S1full→E3full.
+5. N0availability24h→E3availability24h.
+6. E2availability24h→E3availability24h.
+7–18. E3full→each of its12non-full variants, in the variant order above.
+
+Use the unchanged original block_weights, weekly_sums and simultaneous_intervals mathematics:10000 replicates for each block length1,3,6; sample12 seasons with replacement, sample contiguous nonwrapping blocks within each sampled season and truncate to its original weekly length; seed20260904+block_length; weight by actual sampled game counts; recompute each relative gain in each sample; maximum standardized centered bootstrap across these18 contrasts;95% intervals with linear quantiles. Positive finite reference denominators and complete finite numeric metrics are mandatory. No old42-contrast or conditional28-contrast registry is silently reused.
+
+Register8 actual-mass calibration cells: E3full then E3availability24h, each home,away,margin,total80. Compute per-game observed interval membership minus its actual assigned mass, then its pooled mean and the same week/season resampling. Correct the8 residuals jointly using maximum standardized centered bootstrap, separately from the18 energy contrasts. All3 block intervals must contain0 to pass. There is no claim of a single joint95% confidence level across these two families.
+
+Retain original per-cell percentile95% nominal-coverage intervals at50/80/95, per-series/target ten-bin simultaneous PIT bands, aggregate calibration regressions and exact constant-predictor unavailability rules. These are their named marginal/per-series diagnostics, not additional globally simultaneous confidence claims. Report all original joint/marginal losses, MAE/RMSE, win/tie/loss scores, covariance/residual products, tails, interval coverage/mass/width, failures, season summaries and native-only diagnostics. Regressions describe frozen forecasts; their coefficients never alter a forecast or tune rates. Compute/validate all required diagnostic inputs before decision.
+
+The new evaluator must have an explicit registry/validator and invoke the real generic inference math. Full synthetic integration must exercise native score→persistence→JSON reload→public evaluator for all19×3407=64733 scored rows,226 outer origins, every full2013–2025 season, all18 comparisons and8 cells at all10000-member block calculations. Include all272 exposed2025 games in the public input; the evaluator alone filters the3135 development games for bootstrap inference. Include complete scorecards, nominal calibration and PIT work. A3135-only helper probe cannot qualify the public entry point. Do not bypass the strict NumPy/native-number boundary exposed by RF-02D. No historical output is qualified by a mock evaluator or hand-built favorable decision.
+
+## 5. Preregistered internal decisions
+
+The unchanged external product requirement remains>=5% relative joint-energy improvement against every admitted named eligible external comparator, including the strongest, simultaneous95% lower bounds>5%, required diagnostics and independent prospective confirmation. RF-02F cannot satisfy it: no external comparator or prospective archive is admitted. The following1% research thresholds are internal milestones and are not a weakened substitute.
+
+Define a valid internal split-constraint finding only if all of these hold:
+
+- E3full's development point gain versus original E2full is>=0.01 and its18-family simultaneous lower bound is>0 at all three block lengths. This is a1% point threshold plus evidence of positive improvement, not proof of a1% minimum effect.
+- Versus E2full, at least8of12 complete development seasons improve; every leave-one-season-out gain is positive; exposed2025 gain is positive. Report the complete season table regardless of decision.
+- All four removal mechanisms no_offense,no_defense,zero_strength_update,zero_scoring_level_update have E3full→removal upper bounds<0 at all block lengths, establishing deterioration on removal within this experiment. The new removals cannot replace the earlier failed defense requirement.
+- Every non-full E3 variant except availability24h must not stably beat full: not(all three lower bounds>0) for its full→variant contrast. Retain shuffled-identity and noise controls. E3availability24h has positive point energy gain versus both matched N0 and E2 sensitivity references.
+- All13E3 series and required N0/E2 full/24h references satisfy native-failure rate<=0.005 over all3407 games; N0full failure is protocol-invalid. No leakage, missing/duplicate data, required diagnostic computation, numerical integrity or source-admission failure is allowed. Raw E1/S1 failure counts remain visible.
+
+To become a **research candidate eligible for separately gated shadow consideration**, additionally require:
+
+- E3full development point gain>=0.01 versus N0full, with all-block lower bounds>0; resolved positive improvement versus classical E1full; S1 must not stably dominate E3 (not all S1→E3 upper bounds<0).
+- Versus N0full, the same8-season/all-leave-one-out/exposed2025 positive rules.
+- For both E3full and E3availability24h against their matched N0 and E2 references: mean joint NLL and each of home/away/margin/total CRPS<=1.005×reference; home/away MAE<=reference+0.1points;80% width<=1.1×reference, except when the candidate's own development energy gain versus that reference is>=0.02.
+- For E3full and E3availability24h, each target's80% empirical coverage is within[0.72,0.88], and each of the original pointwise nominal95% block intervals contains0.8. Also pass all8 actual-mass residual checks above. Actual-mass diagnostics do not erase the old nominal-coverage failures or change prior records.
+
+Terminal statistical labels are reject_all, mechanism_supported_distribution_unqualified, or research_shadow_candidate; any integrity/compute violation is protocol_invalid. A mechanism-only label requires every internal mechanism condition but at least one full-distribution condition failing, with the failure list visible. No label activates shadow/production, accepts a calibrated distribution, proves an external5% gain or closes the goal. Independently audit the actual terminal evidence before accepting even a retrospective research finding.
+
+## 6. Work accounting, budget and one retained pilot
+
+One model worker; pinned isolated Python3.12.2, NumPy1.26.4, SciPy1.13.1 and unchanged relevant runtime/distribution manifests. Final source/config/qualification identity must be frozen before creating the sole run directory. Begin the7200-second/4096-MiB envelope before reuse admission, runtime/source checks, smoke, mapper recovery or trajectory creation; separately report development qualification cost rather than hiding it. Retain every failed attempt. No automatic restart/resume or concurrent duplicate runner.
+
+Before historical implementation acceptance, one complete synthetic integration command, bounded600seconds/4096MiB including fixture preparation, must generate genuine real-scorer outputs for all64733 rows, persist/reload them, and invoke the real public evaluator with the full3407-game population and complete diagnostics. Freeze its synthetic fixture and qualification receipt with the source chain. Retain failed qualification evidence and measure total setup/scoring/persistence/evaluation costs separately from historical execution. Synthetic fixtures must not contain historical score values. For this synthetic fixture only, identical scorer inputs may reuse a scored payload across series: the cache key binds the complete unchanged law representation, actual game ID, observed pair, all effective scoring flags and pinned scorer/runtime. Never reuse across different games, laws, observations or flags, and never handcraft metrics. Keep payloads immutable or copy them before adding series metadata; retain per-row provenance, actual scorer/reuse counts and independently checked keys. Focused tests must show changed law/game/observation/flags cause a cache miss. Every64733-row public input remains complete. This avoids duplicate identical computation; it does not change historical reuse rules or count duplicated rows as independent observations.
+
+The initial in-run synthetic smoke includes focused boundary/selection checks and a real public capacity evaluation on that immutable full19×3407 synthetic scored fixture. It reuses the accepted fixture rather than regenerating its scorer outputs. Include all226 origins, exact complete-season game counts,272 exposed2025 rows, all18 contrasts,8 cells, three10000-member bootstraps, scorecards, nominal calibration and PIT work. The evaluator filters3135 development rows internally. The total smoke limit is120seconds. Fake forecasts remain conspicuously synthetic and cannot become scored historical output. Record the complete public evaluator wall timeT, fixture loading/validation cost and peak memory; T must include all public evaluation work, not just the bootstrap helper. This measures inference capacity, not forecast quality.
+
+Retain the original two pilot origins2013week1/week2 and all32 games as the first part of this same run. No disposable pilot or second tuning attempt. Record t1,t2 as complete origin durations, G1,G2 as target counts and N1,N2 as main eligible-history counts. Time every new law fit/recovery callback and every new score callback, including failures, without overlapping/nested timer double counting. Full outer score timings include all registered diagnostics and double-grid work. Keep raw maxima, counts and total durations for both callback classes. Define F as the maximum observed new full fit/recovery callback duration and S as the maximum observed new score callback duration, including full outer scores. Require finite positive successful nonfallback timing samples for an off-diagonal full law fit and a genuinely new full outer score; otherwise cost qualification fails with no retry. Failed callbacks also contribute to maxima and totals.
+
+For origin i, subtract its disjoint fit/recovery and score callback totals from t_i; the nonnegative remainder includes cache loading, closure validation, state advancement, mapper recovery outside those callbacks, annual selection, actual-mass CDF derivations and persistence. Define C as the maximum remainder per game over the two origins. All work must be assigned exactly once. At pilot closure define:
+
+`remaining_work = sum_over_remaining_origins(G_o * max(1, N_o/min(N1,N2)))`
+
+`projected_total = elapsed_so_far + remaining_work * (C + 31*(2*F + 2*S)) + 2*T + max(60, admission_seconds)`
+
+Charge31 fit/recovery and31 full-score slots per later game (18 new inner plus13 outer), even where exact cache reuse is possible. Use twice the observed maximum callback cost and the eligible-history factor above for the whole remaining workload. Later2025 origins receive the same allowance although their unused inner scores are skipped. All source/cache admission already counts in elapsed_so_far, and its measured duration also determines the terminal reserve. This is a conservative cost screen, not a promised runtime bound; the actual hard deadline/RSS check still governs. Require projected_total<=7200 and RSS<=4096. No model/scorer/inference callback may begin or continue past a stop signal. Failure may receive only a bounded30-second metadata-finalization grace, which must not perform scientific work.
+
+Use one atomic completion/failure publisher based on the later accepted Store semantics; never write competing success and failure terminals. Preserve ordinary/staged prefix files on failure, write only an invalid terminal/index if completion cannot commit, and make successful or invalid finalization mutually exclusive. Finalization faults, uncertain ownership or missing completion evidence are not model results. Include exact source/input/reuse pointers, actual call counts, remaining work estimate, wall time, peak memory and terminal status in immutable records.
+
+## 7. Mandatory pre-fit acceptance sequence
+
+1. Independent protocol review freezes this full design and its machine registry before any historical fitting/scoring; accepted pure units do not substitute for this.
+2. Complete the bank/selection unit and authenticate source/target/archive reuse using no historical refit. Require exact original nine-diagonal annual selections, complete common-game populations, correct fallback references and no mutation of source bytes.
+3. Qualify distribution/descriptor recovery, new mean-to-law scoring, actual-mass diagnostics and the real fully assembled evaluator on synthetic data. Exercise forecast persistence before grader access, future payload deletion/injection, stale/missing caches, no-eligible selection, finite NumPy scalars, double-grid failures, absorbing model failures and atomic deadline/write-fault completion. Bound every qualification command and retain failed evidence.
+4. Freeze the complete new implementation/qualification/source/runtime chain and obtain distinct numerical and temporal pre-fit reviews. Root verifies exact hashes, required coverage and a current phase gate; then, and only then, create the single new historical invocation.
+5. Authenticate the actual terminal archive and independently review all declared numerical and temporal scopes. Preserve contrary/negative results and update the private goal from the finding. Do not publish research details or broaden the public front-page beta scope.
+
+Open work is implementation/qualification and independent acceptance, not permission to choose thresholds or samples after seeing a new result. Any scientific change after protocol freeze requires a new explicitly versioned experiment, not a revision of this run.

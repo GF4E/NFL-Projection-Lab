@@ -1,0 +1,99 @@
+{
+  "artifact_bytes_authenticated": 35251675,
+  "artifact_files_authenticated": 1341,
+  "elapsed_seconds": 0.41360537499713246,
+  "findings": [],
+  "historical_execution": false,
+  "limitations": [
+    "Logical dispatched scores and five no-op callbacks are not numerical scores or actual pilot capacity.",
+    "The intentional failed no-op callback is caught by the dispatch spy; the production run would reject that ledger before inference. This is deliberate failure-accounting coverage, not a complete valid run.",
+    "Actual public inference, terminal completion, watchdog and numerical scorer evidence must come from the separately authenticated composite qualification."
+  ],
+  "reran_chronology_script": false,
+  "reran_scorer_fixture_or_bootstrap": false,
+  "result_sha256": "8808cb0fb3221143a14a9823da6f1a75a895d37686e4657f9438671a3c0a620d",
+  "scenarios": [
+    {
+      "actual_science_or_full_terminal_test": false,
+      "authenticated_files": 1125,
+      "exact_distinct_games": 4175,
+      "exact_logical_counts": {
+        "actual_mass_cdf_calls": 354328,
+        "actual_score_calls": 72460,
+        "copied_diagonal_inner": 32823,
+        "copied_e3_outer": 37477,
+        "copied_raw_outer": 20442,
+        "inner_rows": 98469,
+        "outer_rows": 64733,
+        "scored_inner": 65646,
+        "scored_outer": 6814
+      },
+      "exact_origin_count": 277,
+      "games_by_season": {
+        "2010": 256,
+        "2011": 256,
+        "2012": 256,
+        "2013": 256,
+        "2014": 256,
+        "2015": 256,
+        "2016": 256,
+        "2017": 256,
+        "2018": 256,
+        "2019": 256,
+        "2020": 256,
+        "2021": 272,
+        "2022": 271,
+        "2023": 272,
+        "2024": 272,
+        "2025": 272
+      },
+      "intentional_caught_noop_failure_count": 1,
+      "prior_selection_dispatch_order": true,
+      "publication_before_grader_dispatch": true,
+      "scenario": "complete-pass"
+    },
+    {
+      "actual_science_or_full_terminal_test": false,
+      "authenticated_files": 216,
+      "exact_distinct_games": 800,
+      "exact_logical_counts": {
+        "actual_mass_cdf_calls": 3328,
+        "actual_score_calls": 9856,
+        "copied_diagonal_inner": 4896,
+        "copied_e3_outer": 352,
+        "copied_raw_outer": 192,
+        "inner_rows": 14688,
+        "outer_rows": 608,
+        "scored_inner": 9792,
+        "scored_outer": 64
+      },
+      "exact_origin_count": 53,
+      "games_by_season": {
+        "2010": 256,
+        "2011": 256,
+        "2012": 256,
+        "2013": 32
+      },
+      "intentional_caught_noop_failure_count": 1,
+      "prior_selection_dispatch_order": true,
+      "publication_before_grader_dispatch": true,
+      "scenario": "pilot-stop"
+    }
+  ],
+  "script_sha256": "3d27c6959fbdb4d051868bddd95846b794c0ece1c11aa7141435796b37c1d9c3",
+  "source_hashes": {
+    ".planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16",
+    "config/research-team-score-split.v1.json": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519",
+    "scripts/research_score_conditional_run.py": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+    "scripts/research_score_split_archive.py": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+    "scripts/research_score_split_budget.py": "0ee4dd5e7936a333fed6b2804f530bf310f588b811af41e3c8a5af1a335388ea",
+    "scripts/research_score_split_controller.py": "7f82f65839a53e7fd91fa09e531ad2b758dc6c7ffeed6503cc4c0b7e9643d28b",
+    "scripts/research_score_split_forecast.py": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34",
+    "scripts/research_score_split_grade.py": "042ed7773ee8e0fa0979eb22b7a2bc20f699c8ec2e2a05f761fce80a5aa81f4e",
+    "scripts/research_score_split_replay.py": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547",
+    "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+    "tests/research-score-split/test_run_unit.py": "a96576b22bd4c55ed8adf34d49ad78ee783605fe75a3f2f263f17a8c092bd42c"
+  },
+  "status": "verified_with_explicit_synthetic_dispatch_limits",
+  "version": "rf02f.chronology-evidence-review.v1"
+}

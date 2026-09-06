@@ -1,0 +1,283 @@
+"""Complete immutable RF-02S numerical qualification; no football refitting."""
+import json
+from pathlib import Path
+import re
+import sys
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import numpy as np
+from research_score_contract import digest, encoded, load_accepted, read_regular, runtime_manifest
+from research_score_distribution import JointBase as LegacyJointBase, NumericalFailure
+from research_score_successor_distribution import JointBase
+from research_score_metrics import score_forecast
+from research_score_run import ImmutableRun, OUTPUT_PARENT, distribution_descriptor, plain
+
+ACCEPTANCE = '.planning/engine-os/research-first/RF-02S-ACCEPTANCE.v1.json'
+ACCEPTANCE_SHA = 'f0a675db488f7ec52302a19d706d586adb19c8ac2286f43ff3b43f165ab04e96'
+CONFIG = 'config/research-team-score-successor.v1.json'
+QUALIFICATION_FILES = (
+    'scripts/research_score_successor_distribution.py',
+    'scripts/research_score_successor_qualify.py',
+    'tests/research-score-successor/test_solver.py',
+    'tests/research-score-successor/test_qualify.py',
+)
+FAMILY_COUNTS = (('N0', 1), ('S1', 6), ('E1', 27), ('E2', 9))
+FATAL_GAME = '2011_08_NE_PIT'
+FATAL_MAPPER = 'object-a62d4fb06105b91e918219b1d0b47156b7ab35ab7ad7eb9808f370942497fa71.json'
+
+
+def bound_bytes(raw, sha, label, size=None):
+    if digest(raw) != sha or (size is not None and len(raw) != size):
+        raise ValueError('frozen_bytes_mismatch:' + label)
+    return raw
+
+
+def load_successor(root=ROOT):
+    root = Path(root)
+    receipt_raw = bound_bytes(read_regular(root / ACCEPTANCE), ACCEPTANCE_SHA, 'successor_acceptance')
+    receipt = json.loads(receipt_raw)
+    if receipt['result'] != 'accepted_for_implementation_only' or not receipt['implementationAuthorized']:
+        raise ValueError('successor_implementation_not_accepted')
+    config_raw = bound_bytes(read_regular(root / CONFIG), receipt['configSha256'], 'successor_config')
+    config = json.loads(config_raw)
+    bound_bytes(read_regular(root / config['specification']['path']), receipt['protocolSha256'], 'successor_protocol')
+    if config['specification']['sha256'] != receipt['protocolSha256']:
+        raise ValueError('successor_protocol_binding_mismatch')
+    for name, sha in config['oldSourceHashes'].items():
+        bound_bytes(read_regular(root / name), sha, name)
+    bound_bytes(read_regular(root / config['baseConfig']['path']), config['baseConfig']['sha256'], 'base_config')
+    return config, {'acceptance': digest(receipt_raw), 'config': digest(config_raw),
+                    'specification': receipt['protocolSha256']}
+
+
+def read_archive(config):
+    root = Path(config['oldRunDirectory'])
+    raw = bound_bytes(read_regular(root / 'artifact-index.json'), config['oldArtifactIndexSha256'], 'old_index')
+    index = json.loads(raw)['files']
+    if len(index) != config['corpus']['indexedFiles']:
+        raise ValueError('old_index_count_mismatch')
+    files, total = {}, 0
+    for name, pointer in index.items():
+        if not re.fullmatch('[a-z0-9.-]+', name):
+            raise ValueError('unsafe_archive_name')
+        value = bound_bytes(read_regular(root / name), pointer['sha256'], name, pointer['bytes'])
+        files[name] = value
+        total += len(value)
+    if total != config['corpus']['indexedBytes']:
+        raise ValueError('old_index_bytes_mismatch')
+    bound_bytes(files['manifest.json'], config['oldManifestSha256'], 'old_manifest')
+    manifest = json.loads(files['manifest.json'])
+    if any(manifest['code_hashes'].get(name) != sha for name, sha in config['oldSourceHashes'].items()):
+        raise ValueError('old_manifest_source_mismatch')
+    return files
+
+
+def state_rows(state):
+    result = {}
+    for trajectory in state['trajectory_state']:
+        family, setting, variant = trajectory['key']
+        if variant != 'full':
+            continue
+        for row in trajectory['output']['forecasts']:
+            key = (family, setting, row['game_id'])
+            if key in result or row['failure'] is not None:
+                raise ValueError('invalid_state_key_or_forecast')
+            result[key] = row
+    expected = {(f, j, g) for g in state['origin']['targetGameIds'] for f, count in FAMILY_COUNTS for j in range(count)}
+    if set(result) != expected:
+        raise ValueError('state_population_mismatch')
+    return result
+
+
+def ordered_keys(state):
+    for game in state['origin']['targetGameIds']:
+        for family, count in FAMILY_COUNTS:
+            for setting in range(count):
+                yield family, setting, game
+
+
+def corpus_calls(files):
+    published = sorted(name for name in files if re.fullmatch(r'forecasts-\d{4}-\d{2}\.json', name))
+    for name in published:
+        state_name = name.replace('forecasts-', 'state-')
+        state = json.loads(files[state_name])
+        rows = state_rows(state)
+        publication = json.loads(files[name])
+        records = publication['full_setting_forecasts']
+        expected = list(ordered_keys(state))
+        if publication['outer_selected_forecasts'] or [(r['family'],r['setting'],r['game_id']) for r in records] != expected:
+            raise ValueError('published_order_or_population_mismatch')
+        for record in records:
+            key = (record['family'], record['setting'], record['game_id'])
+            pointer = record['distribution']['mapper']
+            bound_bytes(files[pointer['name']], pointer['sha256'], 'mapper')
+            yield {'key': list(key), 'state': state_name, 'mapper': pointer['name'],
+                   'requested': rows[key]['mean'], 'published': True,
+                   'expectedFailure': record['native_failure'], 'descriptor': record['distribution']}
+    state_name = 'state-2011-08.json'
+    state = json.loads(files[state_name]); rows = state_rows(state)
+    bound_bytes(files[FATAL_MAPPER], FATAL_MAPPER[7:-5], 'fatal_mapper')
+    for key in ordered_keys(state):
+        fatal = key == ('N0', 0, FATAL_GAME)
+        yield {'key': list(key), 'state': state_name, 'mapper': FATAL_MAPPER,
+               'requested': rows[key]['mean'], 'published': False, 'fatal': fatal}
+        if fatal:
+            return
+    raise ValueError('fatal_order_boundary_missing')
+
+
+def make_mapper(blob, cls):
+    return cls(np.array(blob['atoms']), np.array(blob['weights']), blob['b'], blob['epsilon'])
+
+
+def check_fit(fit, requested):
+    values = (fit.atoms, fit.alpha, fit.beta, fit.rates, fit.theta, *fit.moments(), requested)
+    if (any(not np.all(np.isfinite(v)) for v in values)
+            or np.max(np.abs(fit.moments()[0]-requested)) > 1e-7
+            or not isinstance(fit.iterations, int) or not 0 <= fit.iterations <= 100
+            or np.linalg.eigvalsh(fit.moments()[1]).min() <= 0
+            or abs(float(fit.alpha.sum()+fit.beta)-1) > 1e-10):
+        raise ValueError('fitted_distribution_invalid')
+    fit.grid()
+
+
+def continuous_differences(old, new):
+    if not np.array_equal(old.atoms, new.atoms):
+        raise ValueError('mapper_atoms_changed')
+    diff = {name: float(np.max(np.abs(np.asarray(getattr(old,name))-np.asarray(getattr(new,name)))))
+            for name in ('theta','alpha','beta','rates')}
+    diff['mean'] = float(np.max(np.abs(old.moments()[0]-new.moments()[0])))
+    diff['covariance'] = float(np.max(np.abs(old.moments()[1]-new.moments()[1])))
+    shape = np.maximum(old.grid().probability.shape, new.grid().probability.shape)
+    diff['gridL1'] = float(np.abs(old.grid(shape).probability-new.grid(shape).probability).sum())
+    quantiles = {}
+    for target in ('home','away','margin','total'):
+        for level in (.5,.8,.95):
+            for probability in ((1-level)/2,(1+level)/2):
+                a,b = old.quantile(target,probability),new.quantile(target,probability)
+                if a[0] != b[0]:
+                    raise ValueError('integer_quantile_changed:' + repr((target, probability, a, b)))
+                quantiles[f'{target}:{probability}'] = [a[0],a[1],b[1]]
+    return diff, quantiles
+
+
+def proper_score_difference(old, new, observed, identity):
+    a,b = (score_forecast(d, observed, identity, double_grid=True, diagnostics=False) for d in (old,new))
+    names = ('joint_energy_score','joint_nll','home_crps','away_crps','margin_crps','total_crps')
+    differences = {name: abs(a[name]-b[name]) for name in names}
+    if not all(np.isfinite(value) for value in differences.values()):
+        raise ValueError('nonfinite_proper_score_difference')
+    return differences
+
+
+def validate_counts(counts, expected):
+    if any(value != expected[name] for name,value in counts.items()):
+        raise ValueError('complete_corpus_count_mismatch:'+repr(counts))
+
+
+def qualify():
+    config, bindings = load_successor()
+    _, inherited, admitted, _ = load_accepted(ROOT)
+    runtime = runtime_manifest(inherited)
+    files = read_archive(config)
+    code_hashes = {name: digest(read_regular(ROOT/name)) for name in QUALIFICATION_FILES}
+    manifest = {'version':'rf02s-qualification.v1','bindings':bindings,'codeHashes':code_hashes,
+                'oldSourceHashes':config['oldSourceHashes'],'runtime':runtime,
+                'oldManifestSha256':config['oldManifestSha256'],'oldArtifactIndexSha256':config['oldArtifactIndexSha256'],
+                'footballFits':0,'providerRequests':0,'productionAuthorized':False}
+    store = ImmutableRun(OUTPUT_PARENT, 'rf02s-qualification-v1-'+digest(encoded(manifest))[:16])
+    started = time.monotonic(); ledger=[]; maxima={}; bitwise=0; regressions=[]; failures=[]
+    successes=published_successes=published_count=unpublished_successes=0
+    mapper_cache={}; fit_cache={}; comparison_cache={}
+    by_game={r['gameId']:r for r in admitted['records']}
+    try:
+        store.write('manifest.json',manifest)
+        for call in corpus_calls(files):
+            key=tuple(call['key']); identity=key[2]
+            if call['mapper'] not in mapper_cache:
+                blob=json.loads(files[call['mapper']])
+                mapper_cache[call['mapper']]=(make_mapper(blob,LegacyJointBase),make_mapper(blob,JointBase))
+            old_mapper,new_mapper=mapper_cache[call['mapper']]
+            cache_key=(call['mapper'],tuple(call['requested']))
+            if cache_key not in fit_cache:
+                old=None; reason=None
+                try:
+                    old=old_mapper.fit(call['requested']); old.grid()
+                except NumericalFailure as exc: reason=str(exc)
+                fit_cache[cache_key]=(old,reason)
+            old,reason=fit_cache[cache_key]
+            if call['published']:
+                published_count+=1
+                if reason != call['expectedFailure']:
+                    raise ValueError('legacy_failure_not_reproduced')
+                if reason is None:
+                    descriptor=distribution_descriptor(old,call['descriptor']['mapper'])
+                    if descriptor != call['descriptor']:
+                        raise ValueError('legacy_descriptor_not_reproduced')
+                    published_successes+=1
+            if reason is None:
+                successes+=1
+                if not call['published']: unpublished_successes+=1
+            if call.get('fatal') and (reason != 'mean_match_not_converged' or successes != 12529):
+                raise ValueError('terminal_boundary_not_reproduced')
+            result={k:v for k,v in call.items() if k != 'descriptor'}
+            result['legacyFailure']=reason
+            try:
+                if cache_key not in comparison_cache:
+                    new=new_mapper.fit(call['requested']); check_fit(new,np.array(call['requested']))
+                    if old is not None and reason is None:
+                        check_fit(old,np.array(call['requested']))
+                        differences,quantiles=continuous_differences(old,new)
+                        exact=distribution_descriptor(old,{})==distribution_descriptor(new,{})
+                        for name,value in differences.items():
+                            if not np.isfinite(value) or value>config['equivalenceAbsolute'][name]:
+                                raise ValueError('equivalence_gate:'+name+':'+str(value))
+                    else: differences={};quantiles={};exact=False
+                    comparison_cache[cache_key]=(new,differences,quantiles,exact)
+                new,differences,quantiles,exact=comparison_cache[cache_key]
+                result.update(newIterations=new.iterations,newResidual=float(np.max(np.abs(new.moments()[0]-call['requested']))))
+                if reason is None:
+                    y=[by_game[identity]['homeScore'],by_game[identity]['awayScore']]
+                    scores=proper_score_difference(old,new,y,identity)
+                    if max(scores.values())>config['equivalenceAbsolute']['properScores']:
+                        raise ValueError('proper_score_equivalence_gate')
+                    result.update(differences=differences,properScoreDifferences=scores,bitwiseIdentical=exact,
+                                  quantileEqualityChecked=24)
+                    bitwise+=int(exact)
+                    for name,value in (differences|scores).items(): maxima[name]=max(maxima.get(name,0),value)
+                else:
+                    result['repaired']=True; regressions.append(result.copy())
+            except (NumericalFailure,ValueError) as exc:
+                result['qualificationFailure']=str(exc);failures.append(result.copy())
+            ledger.append(result)
+            if len(ledger)%500==0:
+                print(json.dumps({'phase':'numerical_qualification','calls':len(ledger),'failures':len(failures),
+                                  'seconds':round(time.monotonic()-started,2)}),flush=True)
+        counts={'allOccurrences':len(ledger),'publishedOccurrences':published_count,'publishedSuccesses':published_successes,
+                'successes':successes,'unpublishedSuccesses':unpublished_successes,
+                'candidateFailureOccurrences':sum(r['legacyFailure'] is not None and not r.get('fatal') for r in ledger),
+                'fatalBaselineOccurrences':sum(bool(r.get('fatal')) for r in ledger),
+                'candidateFailureUnique':len({(r['mapper'],tuple(r['requested'])) for r in ledger if r['legacyFailure'] and not r.get('fatal')}),
+                'allFailureUnique':len({(r['mapper'],tuple(r['requested'])) for r in ledger if r['legacyFailure']})}
+        validate_counts(counts, config['corpus'])
+        terminal={'status':'qualified' if not failures else 'qualification_failed','counts':counts,
+                  'successDescriptorsBitwiseIdentical':bitwise,'maxima':maxima,'qualificationFailures':len(failures),
+                  'repairedFailures':len(regressions),'seconds':time.monotonic()-started,'footballFits':0,
+                  'fullReplayAuthorized':False,'independentAcceptance':'pending','productionAuthorized':False}
+        store.write('occurrence-ledger.json',ledger)
+        store.write('equivalence.json',{'maxima':maxima,'failures':failures,'regressions':regressions})
+        store.write('terminal-decision.json',terminal);store.finish_index()
+        print(json.dumps(terminal|{'runDirectory':str(store.path)}),flush=True)
+        return 0 if not failures else 2
+    except BaseException as exc:
+        store.write('occurrence-ledger.json',ledger)
+        store.write('terminal-failure.json',{'status':'qualification_failed','reason':str(exc),'calls':len(ledger),
+                                           'footballFits':0,'seconds':time.monotonic()-started})
+        store.finish_index()
+        raise
+    finally: store.close()
+
+
+if __name__=='__main__': raise SystemExit(qualify())

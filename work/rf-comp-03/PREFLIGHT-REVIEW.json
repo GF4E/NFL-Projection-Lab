@@ -1,0 +1,126 @@
+{
+  "blockers": [],
+  "checks": [
+    "Three explicitly selected modes: frozen Assembly plus frozen cached scorer; frozen Assembly plus accepted Skellam scorer; EncodingAssembly plus the same accepted Skellam scorer. No shipping or benchmark encoder monkeypatch, function cloning, or global dispatch rebinding.",
+    "Each EncodingAssembly callback creates its own EncodingMemo inside the measured fit callback. Fit timing spans memo allocation, original fit/grid validation, snapshot/key/encoding, descriptor serialization, independent reconstruction, component/hash/moment checks, frozen law copies and full roundtrip. Original and candidate selected_native setup stays outside that same inherited callback boundary.",
+    "Eight fixed synthetic cases: 3/700 empirical atoms crossed with setting10 full/independent and setting6 two zero-update controls. Genuine tiny original/new trajectory histories supply z-target means. The benchmark explicitly constructs partial Assembly objects; it does not invoke historical admission or pretend to exercise the full chronological constructor.",
+    "One warmup per mode and six Latin-rotated measured rounds per case: each of three modes occupies each position twice, 21 pairs per case and 168 fit plus 168 complete score callbacks overall. Both original score flags are true; no metric subset or alternate score formula.",
+    "Each completed descriptor and full 104-field metric body, exact canonical hashes and recovered-law hash are saved to a unique exclusive observation path before post-score guards and reference comparisons. Reason/work/shared-binding diagnostics now survive a completed-callback mismatch. Strict JSON hashes retain signed-zero evidence even when ordinary Python float equality would not.",
+    "Every mode is immediately compared to the pinned accepted original reference, not merely to another candidate mode. Full descriptor/metric bodies and hashes plus recovered-law hash must match. No retry, alternative sample, tuning or favorable-timing selection is implemented.",
+    "The focused suite has 21 real tests with frozen functions as oracles. It challenges signed zeros, lengths, extreme/subnormal floats, mutation, eviction, unsupported object identity and errors, captured encoder and failed-encoding commit ordering; fresh instances and two genuine callbacks prove cache isolation.",
+    "Real component recovery tests prime cache hits, then change first/last alpha bits or length, flip signed zero, and corrupt saved alpha hash/beta/rates/mean/covariance. They require original exception class and message, spy fresh components/three hashes/six moments, compare all recovered field types/dtypes/shapes/C-bytes/writeability/scalars, and verify archive schema/class AdmissionFailure.",
+    "Real Assembly tests cover full, independence, 24-hour availability, both zero controls, no-eligible matched N0 fallback, fit/grid NumericalFailure, required-N0 failure, unexpected RuntimeError, full roundtrip corruption, unchanged source arrays/globals and inherited methods. Context-managed patches are restricted to the owned synthetic tests and restore original bindings.",
+    "Child asserts pinned Python/NumPy/SciPy/platform/isolation, authenticates inputs, runs only this focused module with failfast and no skips, then the benchmark and reauthentication. Parent authenticates and snapshots inputs before child, checks before/after map equality, monitors its owned child against 60 seconds and 1024 MiB, stops failures without retry, and retains log/process/test/case/observation evidence.",
+    "Final process success checks include complete elapsed time and observed child peak RSS. Source changes, unsuccessful/skipped tests, child stop or nonzero exit, reference mismatch and output serialization failures prevent qualification success."
+  ],
+  "closed_pre_execution_finding": {
+    "correction": "Driver cb47da9d\u2026 saves reason, work and shared-binding state with complete descriptor/metric bodies before those guards.",
+    "executed_before_correction": false,
+    "problem": "Post-score binding/reason/work guards originally preceded completed-body persistence."
+  },
+  "evidence": {
+    "accepted_skellam_scorer": {
+      "bytes": 3937,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_skellam_compute.py",
+      "sha256": "3a88ed783f87cd9fdbfed9fae177edbb8d72d36be8fcfd5374a25a9c4ef8a7d0"
+    },
+    "candidate": {
+      "bytes": 5389,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_encoding_memo.py",
+      "sha256": "da369432128b28c8268b47fb98bccaa3751d853a1b6876c7526cf9040d7addf2"
+    },
+    "design_review": {
+      "bytes": 5313,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/DESIGN-REVIEW.md",
+      "sha256": "58012fc2832af8a114ea5db89117dcaa6ae31d28cb23b488297569d88905202f"
+    },
+    "driver": {
+      "bytes": 12654,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/qualify.py",
+      "sha256": "cb47da9d8b9d8d072c9a3af8d07e9ff206410c85550d5fce4f3a8483cb3de3fd"
+    },
+    "frozen66_map": {
+      "bytes": 8755,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/controller-final-pins-20260905.json",
+      "sha256": "891d03da52317a62ee307e7c1c27b805413f6676520aa6acfd3651642de5f4f7"
+    },
+    "implementation_review": {
+      "bytes": 8101,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/IMPLEMENTATION-REVIEW.json",
+      "sha256": "43facfce5edf63fe8996bec93476552d839c74a4a85feade087cb098c1b07e36"
+    },
+    "isolation_review": {
+      "bytes": 3685,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/ISOLATION-REVIEW.md",
+      "sha256": "558d5fe471f8743ac0fdb7824cb1e79d26e25e913121ce125fb8334fb12e96f1"
+    },
+    "root_ast_review": {
+      "bytes": 578,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/ROOT-AST-REVIEW.json",
+      "sha256": "377a63b951f6d4ee79bd6c4dff4ced1da6cebdeeacfda47496cbce1d83fb2efd"
+    },
+    "root_preflight": {
+      "bytes": 1505,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/ROOT-PREFLIGHT.json",
+      "sha256": "805c6a291aa02b1c67f28f2037129e90f9f8a50d4101593f4c731d291729507b"
+    },
+    "scope": {
+      "bytes": 5604,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/QUALIFICATION-SCOPE.md",
+      "sha256": "687fd84207dafa039185e9dfba091d460ac17a349599bd3c3bf4eb3d2aafacec"
+    },
+    "synthetic_fixture": {
+      "bytes": 26071,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_forecast_unit.py",
+      "sha256": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312"
+    },
+    "tests": {
+      "bytes": 23993,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-encoding-memo/test_encoding_memo.py",
+      "sha256": "4304e792447fea95c808c923aa78b21c1b8c901cc75b7e5fc871a94cc776cec7"
+    }
+  },
+  "frozen66_unchanged": true,
+  "historical_execution": false,
+  "limits": [
+    "No tests, numerical calculations, scorer, fitter, reconstruction, bootstrap or historical process was invoked by this review; AST parsing and metadata hashes only.",
+    "Source-copy equivalence comes from the separately bound static implementation review. Tests still must actually pass, and timing/exactness require separate post-terminal review of persisted evidence.",
+    "The sampled RSS observer and final child peak report do not claim instantaneous kernel enforcement of every transient allocation. Timings include parent setup and post-run checks for the final pass/fail bound; child monitoring is cooperative polling by the external parent.",
+    "Three/700-atom synthetic supports and tiny native histories do not reproduce historical maximum callbacks, the complete controller or historical capacity. A synthetic threshold pass is only a lead.",
+    "Report unprofiled separate Fmax from 700-atom full-setting10 fits and Smax from both setting6 zero-control scores, plus broader all-score stress. Warmups, medians or cross-mode selected timing substitutions cannot replace the six registered rounds or fixed 0.007461491790146312-second target.",
+    "This grants no RF-02F restart, source admission, historical integration, changed science or model acceptance."
+  ],
+  "required_freeze_before_invocation": [
+    "Root must publish exact INPUT-PINS.json binding these current candidate/test/driver/scope/review bytes, original66 map and files, synthetic fixture, accepted probability/Skellam dependencies, pinned serializer/runtime/backend files and all eight accepted original reference bodies.",
+    "References selected by the references map must be included in the pinned files map. The parent/child authentication loops then enforce those exact bytes. This review intentionally precedes and cannot self-bind the later input-pins artifact."
+  ],
+  "reviewed_tests": [
+    "test_exact_bytes_for_empty_extremes_and_700_floats",
+    "test_repeated_distinct_lists_share_one_successful_entry",
+    "test_signed_zero_length_and_single_entry_eviction",
+    "test_mutating_input_cannot_reuse_stale_snapshot_or_output",
+    "test_unsupported_inputs_delegate_identity_and_preserve_valid_entry",
+    "test_failed_supported_encoding_does_not_commit_or_evict",
+    "test_encoder_bound_at_construction_and_no_cross_instance_entry",
+    "test_genuine_descriptor_recovery_and_roundtrip_are_exact_on_hits",
+    "test_direct_recovery_function_exact_with_explicit_original_encoder",
+    "test_changed_first_last_or_length_of_actual_alpha_rejects_primed_hit",
+    "test_signed_zero_alpha_change_rejects_even_when_float_lists_compare_equal",
+    "test_saved_parameter_and_moment_corruption_is_checked_after_hit",
+    "test_schema_and_mapper_guard_exception_identity_is_preserved",
+    "test_only_resolve_is_overridden_and_inherited_boundary_methods_unchanged",
+    "test_genuine_resolution_equal_across_full_independent_delay_and_zero_controls",
+    "test_each_resolve_creates_fresh_memo_inside_real_callback",
+    "test_noeligible_fallback_is_lazy_and_same_variant",
+    "test_fit_and_grid_numerical_failures_preserve_one_attempt_fallback",
+    "test_required_fallback_failure_and_unexpected_fit_error_abort_exactly",
+    "test_descriptor_roundtrip_check_remains_active",
+    "test_no_global_binding_or_source_array_changes_after_resolution"
+  ],
+  "role": "independent_driver_and_test_review",
+  "scientific_execution": false,
+  "static_test_count": 21,
+  "status": "accepted_static_preflight_for_one_bounded_synthetic_qualification",
+  "tests_executed": 0,
+  "version": "rf-comp-03.preflight-review.v1"
+}

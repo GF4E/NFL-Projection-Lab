@@ -1,0 +1,210 @@
+{
+  "cache_after": {
+    "entries": [],
+    "evictions": 0,
+    "hits": 0,
+    "misses": 1,
+    "retained_bytes": 0
+  },
+  "cache_before": {
+    "entries": [],
+    "evictions": 0,
+    "hits": 0,
+    "misses": 0,
+    "retained_bytes": 0
+  },
+  "candidate": {
+    "events": [],
+    "input_after": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "000000000000f03f0000000000000040",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f87f",
+        "dtype": "<f8",
+        "shape": [
+          1,
+          1
+        ],
+        "strides": [
+          8,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "input_before": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "000000000000f03f0000000000000040",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f87f",
+        "dtype": "<f8",
+        "shape": [
+          1,
+          1
+        ],
+        "strides": [
+          8,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "result": {
+      "outcome": {
+        "kind": "error",
+        "message": "invalid_energy_score",
+        "module": "research_score_distribution",
+        "type": "NumericalFailure"
+      },
+      "warnings": []
+    }
+  },
+  "expected_error": null,
+  "expected_fallback": false,
+  "fallback_calls": 0,
+  "kind": "energy_parity",
+  "label": "nonfinite-p-nan",
+  "original": {
+    "events": [],
+    "input_after": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "000000000000f03f0000000000000040",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f87f",
+        "dtype": "<f8",
+        "shape": [
+          1,
+          1
+        ],
+        "strides": [
+          8,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "input_before": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "000000000000f03f0000000000000040",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f87f",
+        "dtype": "<f8",
+        "shape": [
+          1,
+          1
+        ],
+        "strides": [
+          8,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "result": {
+      "outcome": {
+        "kind": "error",
+        "message": "invalid_energy_score",
+        "module": "research_score_distribution",
+        "type": "NumericalFailure"
+      },
+      "warnings": []
+    }
+  },
+  "test": "test_energy_geometry.EnergyGeometryTests.test_nonfinite_probability_and_observed_errors_warnings_match"
+}

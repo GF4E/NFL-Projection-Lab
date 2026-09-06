@@ -1,0 +1,63 @@
+"""Pure post-calibration independence control; no calibration or data access."""
+from dataclasses import fields, replace
+import hashlib
+import math
+
+import numpy as np
+
+from research_score_conditional_adapter import VERSION as ADAPTER_VERSION, distribution_fingerprint
+from research_score_distribution import JointDistribution
+
+
+VERSION = 'rf02d-conditional-policy-v1'
+OPERATION = 'product_of_calibrated_full_marginals'
+_DESCRIPTOR_FIELDS = {'version', 's', 'original_distribution_fingerprint',
+                      'resulting_distribution_fingerprint'}
+
+
+class ConditionalPolicyFailure(ValueError):
+    pass
+
+
+def _valid_fingerprint(value):
+    return type(value) is str and len(value) == 64 and all(character in '0123456789abcdef' for character in value)
+
+
+def independent_fingerprint(distribution):
+    """Bind product semantics and all fields through the accepted joint hash."""
+    if type(distribution) is not JointDistribution or distribution.independent is not True:
+        raise ConditionalPolicyFailure('requires_exact_product_distribution')
+    # This temporary view only serializes the actual fields. It is not a fit.
+    joint_fields = distribution_fingerprint(replace(distribution, independent=False))
+    digest = hashlib.sha256()
+    for content in (VERSION.encode('ascii'), OPERATION.encode('ascii'), b'independent=True',
+                    joint_fields.encode('ascii')):
+        digest.update(len(content).to_bytes(8, 'big'))
+        digest.update(content)
+    return digest.hexdigest()
+
+
+def independent_control(distribution, transformation_descriptor):
+    """Copy calibrated full marginals into the inherited product representation."""
+    descriptor = transformation_descriptor
+    if (type(descriptor) is not dict or set(descriptor) != _DESCRIPTOR_FIELDS
+            or type(descriptor['version']) is not str or descriptor['version'] != ADAPTER_VERSION
+            or type(descriptor['s']) is not float or not math.isfinite(descriptor['s'])
+            or not 0 <= descriptor['s'] <= 1
+            or not _valid_fingerprint(descriptor['original_distribution_fingerprint'])
+            or not _valid_fingerprint(descriptor['resulting_distribution_fingerprint'])):
+        raise ConditionalPolicyFailure('malformed_transformation_descriptor')
+    actual_fingerprint = distribution_fingerprint(distribution)
+    if descriptor['resulting_distribution_fingerprint'] != actual_fingerprint:
+        raise ConditionalPolicyFailure('transformed_distribution_fingerprint_mismatch')
+    if descriptor['s'] == 1 and descriptor['original_distribution_fingerprint'] != actual_fingerprint:
+        raise ConditionalPolicyFailure('identity_distribution_fingerprint_mismatch')
+    result = JointDistribution(**{
+        field.name: (getattr(distribution, field.name).copy()
+                     if isinstance(getattr(distribution, field.name), np.ndarray)
+                     else getattr(distribution, field.name))
+        for field in fields(JointDistribution)})
+    result.independent = True
+    return result, {'version': VERSION, 'operation': OPERATION,
+                    'joint_transformation': descriptor.copy(),
+                    'resulting_distribution_fingerprint': independent_fingerprint(result)}

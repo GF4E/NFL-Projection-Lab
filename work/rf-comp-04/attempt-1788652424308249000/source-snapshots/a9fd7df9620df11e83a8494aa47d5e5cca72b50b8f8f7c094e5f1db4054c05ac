@@ -1,0 +1,32 @@
+# RF-02F split-rate Elo mean unit: bounded implementation scope
+
+2026-09-05. This authorizes one additive pure-Python mean unit and synthetic qualification only. It is not the historical experiment protocol and authorizes no historical fitting, scoring, provider access or publication. Frozen RF-02C/D/E sources and artifacts remain unchanged. The independently accepted saved-mean diagnostic motivates testing the tied-rate constraint; it does not establish optimal gains.
+
+## Hypothesis and permitted change
+
+The existing E2 ties strength S=O+D and scoring level P=O-D to one gain. Add independent gains KS and KP with the original mean equations and chronological state machinery. Scoring level is not pace or possession count. For each eligible game, obtain errors eh=observed_home-stored_original_mean_home and ea=observed_away-stored_original_mean_away from this candidate's own original forecast. Set eM=eh-ea and eT=eh+ea. The candidate's direct O/D increments are:
+
+- dO_home=(KS*eM+KP*eT)/4; dO_away=(-KS*eM+KP*eT)/4.
+- dD_home=(KS*eM-KP*eT)/4; dD_away=(-KS*eM-KP*eT)/4.
+
+Apply the original 2020 multiplier of0.5 to both gains. Accumulate the entire eligible batch, then use original O/D state updates and32-team centering. Preserve original initialization-only handling, ordered delivery before offseason retention, common retention, absent/future/duplicate result refusals, original-origin stored expectations, deterministic noise and shuffle seeds, positive-mean checks and absorbing failure semantics. Do not add a state reset or substitute archived E2 errors for an off-diagonal candidate's own errors.
+
+## Interface and exact tied path
+
+Create only scripts/research_score_split_models.py for the implementation. It may import the unchanged research_score_models module and use existing dependencies; no I/O, network, implicit data loading, monkeypatching, frozen-source edits or new package. Expose split_setting_grid(), make_split_trajectory(setting, teams, variant="full") and SPLIT_VARIANTS. Settings have exactly ks,kp,retention. Accept only registered numeric values, reject bool/nonfinite/unregistered values and extra/missing keys.
+
+The complete grid order is the original nine E2 diagonals first: k0.05 with retention0.5,0.75,1; k0.1 with those retentions; k0.2 with those retentions. Then enumerate18 off-diagonals by ascending KS, ascending KP skipping equality, and ascending retention. Rates are0.05,0.1,0.2; retention0.5,0.75,1. No new value is selected from diagnostic results.
+
+For KS==KP and every original E2 variant, return the original MeanTrajectory("E2",{"k":KS,"retention":retention},teams,variant) directly. This delegates the complete original path and permits exact equality, avoiding floating-point reparameterization. Off-diagonals inherit the original forecast_origin machinery and change only result-update increments. The new zero_strength_update and zero_scoring_level_update variants set their respective effective gain to zero from initialization, before computing increments; they require their own trajectories even when nominal gains match.
+
+SPLIT_VARIANTS contains exactly full,no_home_effect,no_prior_season_carryover,no_time_decay,no_team_identity,independent_marginals,availability_24h,no_offense,no_defense,shuffled_identity,deterministic_noise,zero_strength_update,zero_scoring_level_update. Preserve original no_offense/no_defense controls by masking the corresponding O/D increment after the split formula. no_team_identity sets both gains to zero. The two new removals are not aliases for O/D masking. Availability and independent-marginal effects remain the controller/mapper's responsibility exactly as in the original model unit.
+
+## Cheapest meaningful qualification
+
+Use synthetic football contexts and scores only, under the existing isolated Python3.12.2/NumPy1.26.4/SciPy1.13.1 runtime. One bounded unit suite must finish within120seconds and2048MiB, with no historical artifact load. Root-authored tests should independently check hand-computed one-game and batch increments; original nine-setting/eleven-variant diagonal equivalence across2019/2020/2021 and delayed delivery; common retention and2020 weighting; noS/noP versus O/D masking; preservation of each original pre-noise expectation; future/duplicate/missing/changed-context refusal; and absorbing failure. A separate reviewer inspects exact source and qualification before broader integration.
+
+The suite may exercise the pure model's synthetic state updates. Passing it establishes numerical/temporal behavior only. Historical selection, input/mapper/control authentication, new-family distribution scoring,18-contrast inference and8-cell calibration, full integration qualification, a fixed cost pilot and the one new replay require a separately frozen RF-02F protocol and independent pre-fit acceptance. No automatic restart of any historical attempt is authorized.
+
+## Decision
+
+Retain the additive unit only if it matches the original tied path exactly and passes independent mathematical and temporal challenges. Reconstruct or remove it on a discrepancy. Measure suite wall time and peak RSS, including setup; do not call the design a compute speedup before equivalent-workload measurement. Keep all work and research details private.

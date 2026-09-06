@@ -1,0 +1,419 @@
+{
+  "all_support_vs_large_support_maxima_identical": true,
+  "blockers": [],
+  "cases": [
+    {
+      "atoms": 700,
+      "baseline_seconds": {
+        "fit": {
+          "maximum": 0.0029713750118389726,
+          "median": 0.0027580415044212714,
+          "minimum": 0.002524707990232855
+        },
+        "score": {
+          "maximum": 0.008758416995988227,
+          "median": 0.008542792005755473,
+          "minimum": 0.007743749985820614
+        }
+      },
+      "cprofile_diagnostic_only": {
+        "cached_cdf_calls": 261,
+        "cached_cdf_fraction_of_profiled_score": 0.7178163643849608,
+        "cached_cdf_seconds": 0.008675469,
+        "contract_encoded_calls": 6,
+        "contract_encoded_seconds": 0.002569417,
+        "quantile_calls": 24,
+        "quantile_seconds": 0.007555541000000001,
+        "scipy_cdf_calls": 126,
+        "scorer_seconds": 0.012085916998330504,
+        "underlying_cdf_calls": 126
+      },
+      "iterations": 4,
+      "native_mean": [
+        19.67343973795573,
+        16.430757446289068
+      ],
+      "paired_deposition_fraction": {
+        "maximum": 0.06201009777382693,
+        "median": 0.05758270804547071,
+        "minimum": 0.055118646885900714
+      },
+      "setting": 10,
+      "variant": "full"
+    },
+    {
+      "atoms": 700,
+      "baseline_seconds": {
+        "fit": {
+          "maximum": 0.003081666989601217,
+          "median": 0.0027563330077100545,
+          "minimum": 0.002536832995247096
+        },
+        "score": {
+          "maximum": 0.017566624999744818,
+          "median": 0.016760625003371388,
+          "minimum": 0.01611962499737274
+        }
+      },
+      "cprofile_diagnostic_only": {
+        "cached_cdf_calls": 261,
+        "cached_cdf_fraction_of_profiled_score": 0.855388045704504,
+        "cached_cdf_seconds": 0.019678202000000002,
+        "contract_encoded_calls": 6,
+        "contract_encoded_seconds": 0.0027292080000000003,
+        "quantile_calls": 24,
+        "quantile_seconds": 0.016840293000000003,
+        "scipy_cdf_calls": 237,
+        "scorer_seconds": 0.023005000010016374,
+        "underlying_cdf_calls": 128
+      },
+      "iterations": 4,
+      "native_mean": [
+        19.67343973795573,
+        16.430757446289068
+      ],
+      "paired_deposition_fraction": {
+        "maximum": 0.03518620309664064,
+        "median": 0.03338580007696214,
+        "minimum": 0.030461766553874964
+      },
+      "setting": 10,
+      "variant": "independent_marginals"
+    },
+    {
+      "atoms": 700,
+      "baseline_seconds": {
+        "fit": {
+          "maximum": 0.0028769170021405444,
+          "median": 0.0027040624991059303,
+          "minimum": 0.0024851669877534732
+        },
+        "score": {
+          "maximum": 0.009017457996378653,
+          "median": 0.008333124998898711,
+          "minimum": 0.007693833991652355
+        }
+      },
+      "cprofile_diagnostic_only": {
+        "cached_cdf_calls": 262,
+        "cached_cdf_fraction_of_profiled_score": 0.7695560467884774,
+        "cached_cdf_seconds": 0.008812411000000001,
+        "contract_encoded_calls": 6,
+        "contract_encoded_seconds": 0.002815957,
+        "quantile_calls": 24,
+        "quantile_seconds": 0.007965665,
+        "scipy_cdf_calls": 127,
+        "scorer_seconds": 0.011451291997218505,
+        "underlying_cdf_calls": 127
+      },
+      "iterations": 4,
+      "native_mean": [
+        19.785319010416668,
+        16.118652343750004
+      ],
+      "paired_deposition_fraction": {
+        "maximum": 0.06611267081276419,
+        "median": 0.06143414064248522,
+        "minimum": 0.05532065612010769
+      },
+      "setting": 6,
+      "variant": "zero_strength_update"
+    },
+    {
+      "atoms": 700,
+      "baseline_seconds": {
+        "fit": {
+          "maximum": 0.003057083988096565,
+          "median": 0.0028284579966566525,
+          "minimum": 0.002502249990357086
+        },
+        "score": {
+          "maximum": 0.008516250003594905,
+          "median": 0.008018833490496036,
+          "minimum": 0.0074806250049732625
+        }
+      },
+      "cprofile_diagnostic_only": {
+        "cached_cdf_calls": 261,
+        "cached_cdf_fraction_of_profiled_score": 0.7108398652093848,
+        "cached_cdf_seconds": 0.008622221000000001,
+        "contract_encoded_calls": 6,
+        "contract_encoded_seconds": 0.002660585,
+        "quantile_calls": 24,
+        "quantile_seconds": 0.007581417000000001,
+        "scipy_cdf_calls": 124,
+        "scorer_seconds": 0.01212962499994319,
+        "underlying_cdf_calls": 124
+      },
+      "iterations": 4,
+      "native_mean": [
+        19.411666666666665,
+        16.255000000000006
+      ],
+      "paired_deposition_fraction": {
+        "maximum": 0.06224932232381406,
+        "median": 0.05894598516514729,
+        "minimum": 0.056758543406354
+      },
+      "setting": 6,
+      "variant": "zero_scoring_level_update"
+    }
+  ],
+  "control_summary": {
+    "empirical_atoms": 3,
+    "iterations_by_variant": {
+      "full": 10,
+      "independent_marginals": 10,
+      "zero_scoring_level_update": 6,
+      "zero_strength_update": 7
+    },
+    "maximum_paired_deposition_fraction": 0.0021866696953870748
+  },
+  "decision": {
+    "historical_status": "RF-02F remains protocol_invalid at its frozen cost pilot; 224 remaining origins were not started and no predictive inference was produced.",
+    "insertion_only": "Retire as the sole next optimization hypothesis for this measured workload. Unrestricted, registered-role stress and pilot-like callback subsets all have optimistic insertion proxies far below 52.468%; no subset proves a bound for historical maxima.",
+    "next_primary_hotspot": "CDF/quantile evaluation inside the complete scorer. Profiled CDF time is 71.08% to 85.54% of profiled score time for 700 atoms, with 124-128 uncached distribution CDF calls and 124-237 scipy.stats CDF calls. Existing scalar (target,floor(value)) memoization is already active.",
+    "secondary_hotspot": "The full fit/recovery/descriptor callback performs substantial JSON encoding. Six contract.encoded calls consume 2.569-2.816 ms in the diagnostic 700-atom profiles, tracing to descriptor/component authentication. This is overlapping attribution, not an independently removable fraction. Do not remove authentication or assume Newton fitting dominates the callback.",
+    "smallest_next_falsifiable_hypothesis": "Reduce repeated work inside the remaining CDF misses while preserving the complete scalar CDF and metric outputs: first distinguish per-threshold SciPy background dispatch from repeated empirical/marginal preparation on the same fixed synthetic cases. A future exact within-score preparation or batched-background candidate must prove byte/exception equivalence and measure complete fit/scorer callbacks; this review authorizes no implementation or additional run."
+  },
+  "evidence": [
+    {
+      "bytes": 467137,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/result.json",
+      "sha256": "6c81869871760419cc164a2a3412b18d97f5dc8e2b7b734f7266e20a923b4694"
+    },
+    {
+      "bytes": 4831,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/process.json",
+      "sha256": "4a2a8f9677a6b85fef12c588dfb70d8d2c0dbff9a3dfcb370b4f44d762e94056"
+    },
+    {
+      "bytes": 646,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/identity.json",
+      "sha256": "c285060f2f6773630949e6512f2b11460454ba21406930dd95f2abbf0b05a66a"
+    },
+    {
+      "bytes": 15675,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/profile_callbacks.py",
+      "sha256": "e5ae4c43d18bb8e4f14c80ffa3a7aaf79a2227ac63b0b7de3073fe7dd2e51742"
+    },
+    {
+      "bytes": 5129,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/PROFILE-SCOPE.md",
+      "sha256": "20754722e22cfdf1e1fa85e13818deafc3b0ceebbda0c8718f1f9c66e18b1083"
+    },
+    {
+      "bytes": 7752,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/source-map-before.json",
+      "sha256": "48d939bdd53b04d89e7161959f2b7dc543ab6dcbc39b4571c9b8b0e910b94297"
+    },
+    {
+      "bytes": 7752,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/source-map-after.json",
+      "sha256": "48d939bdd53b04d89e7161959f2b7dc543ab6dcbc39b4571c9b8b0e910b94297"
+    },
+    {
+      "bytes": 1023,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/process.log",
+      "sha256": "d9a43f41b4228bcf470ba5779c62937340b7a4c6ef803cfe6295559433ea33b3"
+    },
+    {
+      "bytes": 8755,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/controller-final-pins-20260905.json",
+      "sha256": "891d03da52317a62ee307e7c1c27b805413f6676520aa6acfd3651642de5f4f7"
+    },
+    {
+      "bytes": 7056,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-terminal-audit/support-profile-design-review.json",
+      "sha256": "0cf89a7ec2cbc51c6b2fcbbd53a7c15075b763c15b3443da768ec372813b81ff"
+    },
+    {
+      "bytes": 20790,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-terminal-audit/numerical-review.json",
+      "sha256": "0e80baca28c43a45de163c7e539b8d2dbf96d21d571a113e981f4163f6749d06"
+    }
+  ],
+  "failed_attempts": [
+    {
+      "attempt": "attempt-1788645396498579000",
+      "log": {
+        "bytes": 1141,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645396498579000/process.log",
+        "sha256": "56721ac7e1d1301227500f00c1f8d72c27a019caf06a29b436f1a86a44a7cad8"
+      },
+      "process": {
+        "bytes": 1839,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645396498579000/process.json",
+        "sha256": "40537d7cdc797db64d3859341bc4a58622bba5572bf9ae0494dee4d5a557fdba"
+      },
+      "reason": "harness positional/metadata argument-name collision before a complete fit callback",
+      "status": "retained_failed_harness_attempt_not_numerical_evidence"
+    },
+    {
+      "attempt": "attempt-1788645472465418000",
+      "log": {
+        "bytes": 1739,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645472465418000/process.log",
+        "sha256": "735e8a52a3c226e76d7b0b9aa338d1784fd0b2797e6d240016bc95dea2bb33f9"
+      },
+      "process": {
+        "bytes": 1954,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645472465418000/process.json",
+        "sha256": "237694cf02de3a550a3d871473c5e4116857bcbce772071f21e648b6cb74db4e"
+      },
+      "reason": "first-case report JSON serialization of ndarray; no completed numerical profile persisted",
+      "status": "retained_failed_harness_attempt_not_numerical_evidence"
+    }
+  ],
+  "formulas": {
+    "interpretation": "Finite observed proxies conditional on paired instrumented component times; these are neither achieved speedups nor statistical upper confidence bounds. Maxima can change after removing a component. Inclusive grid contains deposition and is not added to it.",
+    "optimistic_observed_proxy_upper_fraction": "(max measured fit component + max measured score component) / (max unchanged fit + max unchanged score), computed within each stated eligibility population",
+    "paired_zero_component_recomputed_reduction_fraction": "1 - [max_i max(0,F_i-dF_i) + max_j max(0,S_j-dS_j)] / [max_i F_i + max_j S_j]"
+  },
+  "historical_execution": false,
+  "large_support_instrumentation_overhead_fraction": {
+    "maximum": 0.09953328702969033,
+    "median": -0.018052854373785565,
+    "minimum": -0.11201579910161075
+  },
+  "limitations": [
+    "The 700-atom synthetic support spans 0-62 and returns 64x64 plus doubled 128x128 grids, comparable in size to actual 685/693-atom metadata. Its weights, native means, conditioning, history and worst-case behavior are not historical matches.",
+    "The 700-atom cases converge in four iterations. The three-atom controls take six to ten iterations; control-versus-stress timing does not isolate atom-count complexity.",
+    "The original fixture mapper sizes are 6 (12-hour) and 4 (24-hour); the constructed control is exactly 3. The immutable pre-scope sentence calling the original fixture three atoms is inaccurate; the result records the actual counts.",
+    "Eight pairs per case and millisecond timing show overhead/noise (large-support combined range -11.20% to +9.95%, median -1.81%). Treat exact component-removal percentages as diagnostic proxies, not precision estimates of an achieved optimization.",
+    "cProfile adds overhead and its cumulative functions overlap. Its percentages are within that diagnostic pass only and never substituted into the unchanged baseline or frozen pilot formula.",
+    "Only a partial synthetic assembly object is used. Constructor, archive admission, chronological bank progression, durable publication, post-callback interval-mass CDF calls and other controller overhead are outside the measured callbacks.",
+    "Both a fit and a scorer callback are actual frozen operations; the profiling accounting wrapper does not measure the full production accounting/watchdog wrapper.",
+    "This review rechecks recorded hashes and measurement arithmetic without regenerating laws, grids, descriptors or metrics. Numerical byte equality was enforced by the retained profiled command, not independently rescored here.",
+    "No changed scientific criteria, forecast laws, historical computation, restart, capacity qualification or performance acceptance is implied."
+  ],
+  "new_fit_score_profile_calls_during_review": 0,
+  "required_historical_combined_reduction_fraction": 0.524680169716677,
+  "role": "independent_numerical",
+  "separate_maximum_envelopes": [
+    {
+      "deposition_seconds": {
+        "optimistic_observed_proxy_upper_fraction": 0.036419525504316645,
+        "paired_zero_component_recomputed_maxima_seconds": 0.020015292990137823,
+        "paired_zero_component_recomputed_reduction_fraction": 0.03065624021274116,
+        "sum_separate_maximum_component_times_seconds": 0.0007520009967265651
+      },
+      "eligible_fit_observations": 32,
+      "eligible_score_observations": 32,
+      "inclusive_grid_seconds": {
+        "optimistic_observed_proxy_upper_fraction": 0.06257379607362502,
+        "paired_zero_component_recomputed_maxima_seconds": 0.019614541990449652,
+        "paired_zero_component_recomputed_reduction_fraction": 0.05006467360253186,
+        "sum_separate_maximum_component_times_seconds": 0.001292042012210004
+      },
+      "maxima": {
+        "fit": {
+          "paired_instrumented_deposition_seconds": 0.00021629099501296878,
+          "repeat": 6,
+          "seconds": 0.003081666989601217,
+          "setting": 10,
+          "support": "synthetic700",
+          "variant": "independent_marginals"
+        },
+        "score": {
+          "paired_instrumented_deposition_seconds": 0.0004167080041952431,
+          "repeat": 2,
+          "seconds": 0.017566624999744818,
+          "setting": 10,
+          "support": "synthetic700",
+          "variant": "independent_marginals"
+        }
+      },
+      "population": "synthetic700",
+      "roles": "all fit callbacks and all complete-flag scorer cases",
+      "sum_separate_maxima_seconds": 0.020648291989346035
+    },
+    {
+      "deposition_seconds": {
+        "optimistic_observed_proxy_upper_fraction": 0.036109942061908776,
+        "paired_zero_component_recomputed_maxima_seconds": 0.019896625002729706,
+        "paired_zero_component_recomputed_reduction_fraction": 0.03122869843667042,
+        "sum_separate_maximum_component_times_seconds": 0.0007416259904857725
+      },
+      "eligible_fit_observations": 8,
+      "eligible_score_observations": 32,
+      "inclusive_grid_seconds": {
+        "optimistic_observed_proxy_upper_fraction": 0.06195223540508974,
+        "paired_zero_component_recomputed_maxima_seconds": 0.019500833019264974,
+        "paired_zero_component_recomputed_reduction_fraction": 0.05049990221705303,
+        "sum_separate_maximum_component_times_seconds": 0.0012723750114673749
+      },
+      "maxima": {
+        "fit": {
+          "paired_instrumented_deposition_seconds": 0.0002246670046588406,
+          "repeat": 0,
+          "seconds": 0.0029713750118389726,
+          "setting": 10,
+          "support": "synthetic700",
+          "variant": "full"
+        },
+        "score": {
+          "paired_instrumented_deposition_seconds": 0.0004167080041952431,
+          "repeat": 2,
+          "seconds": 0.017566624999744818,
+          "setting": 10,
+          "support": "synthetic700",
+          "variant": "independent_marginals"
+        }
+      },
+      "population": "synthetic700",
+      "roles": "fit full setting 10 only; all complete-flag scorer cases",
+      "sum_separate_maxima_seconds": 0.02053800001158379
+    },
+    {
+      "deposition_seconds": {
+        "optimistic_observed_proxy_upper_fraction": 0.06185973146655996,
+        "paired_zero_component_recomputed_maxima_seconds": 0.011327457992592826,
+        "paired_zero_component_recomputed_reduction_fraction": 0.055165921084351255,
+        "sum_separate_maximum_component_times_seconds": 0.0007416259904857725
+      },
+      "eligible_fit_observations": 8,
+      "eligible_score_observations": 16,
+      "inclusive_grid_seconds": {
+        "optimistic_observed_proxy_upper_fraction": 0.10305415066172913,
+        "paired_zero_component_recomputed_maxima_seconds": 0.010964291010168381,
+        "paired_zero_component_recomputed_reduction_fraction": 0.08545802559323179,
+        "sum_separate_maximum_component_times_seconds": 0.0012354990030871704
+      },
+      "maxima": {
+        "fit": {
+          "repeat": 0,
+          "seconds": 0.0029713750118389726,
+          "setting": 10,
+          "support": "synthetic700",
+          "variant": "full"
+        },
+        "score": {
+          "repeat": 1,
+          "seconds": 0.009017457996378653,
+          "setting": 6,
+          "support": "synthetic700",
+          "variant": "zero_strength_update"
+        }
+      },
+      "population": "synthetic700",
+      "roles": "pilot-like callback roles only: setting-10 full native fit; setting-6 zero-strength/zero-scoring-level complete scorer. Actual pilot selected diagonal 6 and copied other E3 outer series; this subset is not a historical reproduction.",
+      "sum_separate_maxima_seconds": 0.011988833008217625
+    }
+  ],
+  "status": "accepted_bounded_synthetic_measurement_and_interpretation",
+  "verified": {
+    "all_current_frozen_sources": 66,
+    "all_descriptor_metric_digest_equalities_rechecked": true,
+    "all_recorded_instrumented_grids_equal_original_capture": true,
+    "fixed_cases": 8,
+    "measured_unchanged_instrumented_pairs": 64,
+    "peak_child_rss_mib": 135.34375,
+    "process_seconds": 2.7489455420000013,
+    "raw_timing_arithmetic_and_summaries_recomputed": true,
+    "reported_actual_synthetic_fit_callbacks": 152,
+    "reported_actual_synthetic_score_callbacks": 152,
+    "strict_duplicate_free_finite_json": true
+  },
+  "version": "rf02f.synthetic-callback-profile-review.v1"
+}

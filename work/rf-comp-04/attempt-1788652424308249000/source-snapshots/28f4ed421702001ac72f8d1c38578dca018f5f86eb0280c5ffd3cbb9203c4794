@@ -1,0 +1,203 @@
+{
+  "comparisons": [
+    {
+      "current_function_ast_sha256": "9abb03b0bd61a4d856d5029f3891e8e7616aa461c2843ee1359cdd31771ae67f",
+      "function": "_launch",
+      "matched_after_enumerated_changes": true,
+      "original_function_ast_sha256": "bda378c26c4b3fa45186d39938e773459eadc7fa078d3794a9ba19d431eb6d7e",
+      "relocated_import_statements": []
+    },
+    {
+      "current_function_ast_sha256": "efe5a1389b8b8ae672354aac91f77a038c27bd5f1a6091c3bfa1ca9508812783",
+      "function": "_chronological_origins",
+      "matched_after_enumerated_changes": true,
+      "original_function_ast_sha256": "41e20d3c2ef3202cf6f5bade98e32a3dc603600d5d9ed0a534abf0f3ac968fe2",
+      "relocated_import_statements": [
+        "from research_score_split_archive import forecast_inputs, StrictSelectionFeed",
+        "from research_score_split_replay import SplitTrajectoryBank",
+        "from research_score_split_forecast import assemble_forecasts",
+        "from research_score_split_grade import PublishedOriginGrader",
+        "from research_score_split_run import put_object, pilot_projection"
+      ]
+    },
+    {
+      "current_function_ast_sha256": "c57691ebf8a2d20cc894d1591018dcbeada7dc9c23f1657be9f4d873608bda22",
+      "function": "run",
+      "matched_after_enumerated_changes": true,
+      "original_function_ast_sha256": "7468bf8bac37a38a73460bb3768e72e76bea13a04500c6a83b34f8038be674b8",
+      "relocated_import_statements": [
+        "from research_score_split_preflight import preflight",
+        "from research_score_split_archive import admit_source",
+        "from research_score_split_run import OriginAccounting",
+        "from research_score_conditional_run import Store",
+        "from research_score_run import OUTPUT_PARENT",
+        "from research_score_split_watchdog import _read_phase"
+      ]
+    },
+    {
+      "current_function_ast_sha256": "e04141981b4be1c1915e81371ad67fe360eb272bf5a3155a0ac3f9a770a1a3b1",
+      "function": "_worker_main",
+      "matched_after_enumerated_changes": true,
+      "original_function_ast_sha256": "e04141981b4be1c1915e81371ad67fe360eb272bf5a3155a0ac3f9a770a1a3b1",
+      "relocated_import_statements": []
+    }
+  ],
+  "controller": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_compute_controller.py",
+    "sha256": "0e89fcdfaad5c803e2620183867275af4f2eeff5d7dead14045de523d7c2bdd9"
+  },
+  "dependency_hashes_at_static_check": {
+    "scripts/research_score_conditional_admission.py": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+    "scripts/research_score_conditional_run.py": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+    "scripts/research_score_run.py": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa",
+    "scripts/research_score_split_archive.py": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+    "scripts/research_score_split_compute_integration.py": "f07fc0abe7361dbd5e137ce294908a20fb01ff1015f31b47670e0b88dbc6ddef",
+    "scripts/research_score_split_compute_preflight.py": "b65fc86a14109681c75024345d2adce979499a33afea2607ffc45248401c81b2",
+    "scripts/research_score_split_controller.py": "7f82f65839a53e7fd91fa09e531ad2b758dc6c7ffeed6503cc4c0b7e9643d28b",
+    "scripts/research_score_split_inference.py": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22",
+    "scripts/research_score_split_replay.py": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547",
+    "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+    "scripts/research_score_split_watchdog.py": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7"
+  },
+  "explicit_changes": [
+    "launcher description and rfcomp04 observer prefix",
+    "two rfcomp04 terminal version literals",
+    "fixed post-lean-guard import relocation for copied run and chronology functions",
+    "new composed assembler and grader dependency",
+    "new current preflight dependency",
+    "post-science runtime files and compute protocol reauthentication"
+  ],
+  "fixed_post_guard_imports": [
+    {
+      "line": 48,
+      "module": "research_score_conditional_admission",
+      "names": [
+        "bound"
+      ]
+    },
+    {
+      "line": 49,
+      "module": "research_score_conditional_run",
+      "names": [
+        "Store"
+      ]
+    },
+    {
+      "line": 50,
+      "module": "research_score_run",
+      "names": [
+        "OUTPUT_PARENT"
+      ]
+    },
+    {
+      "line": 51,
+      "module": "research_score_split_archive",
+      "names": [
+        "admit_source",
+        "forecast_inputs",
+        "StrictSelectionFeed"
+      ]
+    },
+    {
+      "line": 52,
+      "module": "research_score_split_replay",
+      "names": [
+        "SplitTrajectoryBank"
+      ]
+    },
+    {
+      "line": 53,
+      "module": "research_score_split_inference",
+      "names": [
+        "evaluate"
+      ]
+    },
+    {
+      "line": 54,
+      "module": "research_score_split_run",
+      "names": [
+        "OriginAccounting",
+        "RuntimeStop",
+        "require",
+        "strict",
+        "put_object",
+        "pilot_projection"
+      ]
+    },
+    {
+      "line": 56,
+      "module": "research_score_split_watchdog",
+      "names": [
+        "_read_phase"
+      ]
+    },
+    {
+      "line": 57,
+      "module": "research_score_split_controller",
+      "names": [
+        "PARENT_MANIFEST",
+        "PARENT_INDEX",
+        "CONFIG",
+        "CONFIG_SHA",
+        "COUNT_KEYS",
+        "ControllerEnvelope",
+        "run_smoke",
+        "_suffix",
+        "_bank_state_digest",
+        "_admission_evidence",
+        "publish_origin",
+        "validate_publication_binding",
+        "_saved_inference_inputs"
+      ]
+    },
+    {
+      "line": 61,
+      "module": "research_score_split_compute_integration",
+      "names": [
+        "assemble_forecasts",
+        "PublishedOriginGrader"
+      ]
+    },
+    {
+      "line": 62,
+      "module": "research_score_split_compute_preflight",
+      "names": [
+        "preflight",
+        "validate_runtime_files",
+        "COMPUTE_PROTOCOL_PATH",
+        "COMPUTE_PROTOCOL_SHA"
+      ]
+    }
+  ],
+  "limitations": [
+    "No candidate or test imports, unit execution, scientific calls or CLI execution occurred in this static check.",
+    "New integration/preflight dependency hashes are checkpoint observations while their authors finish; final qualification must pin all current sources.",
+    "Chronology scientific seams establish routing and logical dispatch counts only; synthetic clock is not measured capacity."
+  ],
+  "original_source": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py",
+    "sha256": "7f82f65839a53e7fd91fa09e531ad2b758dc6c7ffeed6503cc4c0b7e9643d28b"
+  },
+  "status": "static_only_passed_not_runtime_qualified",
+  "tests": {
+    "count": 14,
+    "methods": [
+      "SourceStructureTests.test_fixed_helpers_are_original_objects_and_composition_is_explicit",
+      "SourceStructureTests.test_copied_functions_have_only_registered_ast_changes",
+      "ChronologyTests.test_complete_277_origin_4175_game_order_and_dispatch_counts",
+      "ChronologyTests.test_actual_pilot_formula_retains_53_prefix_and_stops_224_suffix",
+      "ChronologyTests.test_wrong_original_origin_never_advances_or_grades",
+      "ChronologyTests.test_current_failed_grade_cannot_feed_or_inflate_completed_counts",
+      "TerminalFlowTests.test_new_terminal_atomic_pair_and_post_science_source_runtime_protocol_checks",
+      "TerminalFlowTests.test_existing_identity_refuses_before_second_admission",
+      "TerminalFlowTests.test_preflight_rejection_prevents_store_and_all_science",
+      "TerminalFlowTests.test_runtime_file_change_after_evaluation_forces_invalid_terminal",
+      "TerminalFlowTests.test_invalid_evaluation_payload_is_retained_before_invalid_terminal",
+      "TerminalFlowTests.test_partial_ordinary_write_is_retained_as_invalid_evidence",
+      "TerminalFlowTests.test_post_commit_failure_never_constructs_a_competing_terminal",
+      "TerminalFlowTests.test_user_interrupt_survives_failed_metadata_finalization"
+    ],
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split-compute/test_controller.py",
+    "sha256": "d7b00908a9a5e73b55976fd7d1943bc1bd2b7abaf4af9b70bf35f03a75def7f3"
+  }
+}

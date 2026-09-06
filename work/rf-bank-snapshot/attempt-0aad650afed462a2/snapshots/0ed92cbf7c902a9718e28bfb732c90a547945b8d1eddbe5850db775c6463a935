@@ -1,0 +1,435 @@
+"""Independent RF strict serializer equality tests; qualification owns execution.
+
+OBSERVATIONS are emitted before equality assertions. A qualification driver may
+set a writer to persist each record immediately. No frozen module is patched.
+"""
+from pathlib import Path
+import hashlib
+import math
+import struct
+import sys
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import numpy as np
+from research_score_conditional_run import strict as original_strict
+from research_score_conditional_replay import canonical
+import research_score_strict_compute as candidate
+
+OBSERVATIONS = []
+_OBSERVATION_WRITER = None
+LIMIT_DEPTH = 32
+LIMIT_NODES = 131072
+LIMIT_CHARS = 4 * 1024 * 1024
+
+
+def set_observation_writer(writer):
+    """Optional streaming sink; the driver, not tests, chooses the output path."""
+    global _OBSERVATION_WRITER
+    if writer is not None and not callable(writer):
+        raise TypeError('observation writer must be callable or None')
+    _OBSERVATION_WRITER = writer
+
+
+def _emit(value):
+    if _OBSERVATION_WRITER is None:
+        OBSERVATIONS.append(value)
+    else:
+        _OBSERVATION_WRITER(value)
+
+
+def _capture(function, value):
+    try:
+        result = function(value)
+    except Exception as error:
+        return {'kind': 'error', 'module': type(error).__module__,
+                'type': type(error).__qualname__, 'message': str(error)}, type(error)
+    if type(result) is bytes:
+        return {'kind': 'bytes', 'type': 'bytes', 'bytes': len(result),
+                'sha256': hashlib.sha256(result).hexdigest(),
+                'ascii_body': result.decode('ascii')}, bytes
+    return {'kind': 'unexpected_return', 'type': type(result).__qualname__}, type(result)
+
+
+def _nested(levels, leaf=0, kind=list):
+    result = leaf
+    for _ in range(levels):
+        result = [result] if kind is list else {'x': result}
+    return result
+
+
+class Text(str):
+    pass
+
+
+class Integer(int):
+    pass
+
+
+class Floating(float):
+    pass
+
+
+class Opaque:
+    pass
+
+
+class ItemHook(np.float64):
+    def item(self, *args):
+        self.calls.append('item')
+        if self.fail:
+            raise RuntimeError('item hook failed')
+        return self.payload
+
+
+class ArrayHook(np.ndarray):
+    def tolist(self):
+        self.calls.append('tolist')
+        if self.fail:
+            raise RuntimeError('tolist hook failed')
+        return self.payload
+
+
+class DictHook(dict):
+    def items(self):
+        self.calls.append('items')
+        if self.fail:
+            raise RuntimeError('items hook failed')
+        return super().items()
+
+
+class ListHook(list):
+    def __iter__(self):
+        self.calls.append('iter')
+        if self.fail:
+            raise RuntimeError('iter hook failed')
+        return super().__iter__()
+
+
+class StrictEqualityTests(unittest.TestCase):
+    def compare(self, label, factory, *, eligible=True, snapshot_factory=None):
+        # Original/candidate receive distinct but equal inputs, including their
+        # own counters for side-effecting hooks. Eligibility uses a third,
+        # independent canonical snapshot, never a second traversal of either.
+        left, right = factory(), factory()
+        original, original_type = _capture(original_strict, left)
+        actual, actual_type = _capture(candidate.strict, right)
+        if eligible is None:
+            eligibility = {'expected': None, 'actual': None,
+                           'reason': 'raw canonicalization must fail before encoding eligibility'}
+        else:
+            snapshot = snapshot_factory() if snapshot_factory is not None else canonical(factory())
+            answer = candidate.eligible(snapshot)
+            eligibility = {'expected': eligible, 'actual': answer, 'type': type(answer).__name__}
+        _emit({'test': self.id(), 'label': label,
+               'input': {'root_type': type(left).__name__, 'deterministic_builder': label,
+                         'reproducer': 'frozen test method named by test field'},
+               'original': original, 'candidate': actual, 'eligibility': eligibility})
+        self.assertIs(actual_type, original_type, label)
+        self.assertEqual(actual, original, label)
+        if eligible is not None:
+            self.assertIs(type(eligibility['actual']), bool, label)
+            self.assertIs(eligibility['actual'], eligible, label)
+        return left, right, original
+
+    def guard(self, label, snapshot, expected):
+        actual = candidate.eligible(snapshot)
+        _emit({'test': self.id(), 'label': label, 'kind': 'guard_only',
+               'expected': expected, 'actual': actual, 'type': type(actual).__name__})
+        self.assertIs(type(actual), bool)
+        self.assertIs(actual, expected, label)
+
+    def test_scalar_tokens_and_empty_containers(self):
+        for i, value in enumerate((None, False, True, 0, -1, 1, '', [], {}, (), 0.0, -0.0)):
+            with self.subTest(i=i):
+                self.compare('scalar-'+str(i), lambda v=value: v)
+        self.compare('nested-empty-containers', lambda: {'z': [[], {}, ()], 'a': ({}, [None])})
+
+    def test_insertion_order_string_sorting_and_delimiters(self):
+        for order in [('10', '2', '02', 'a'), ('a', '02', '2', '10')]:
+            self.compare('key-order-'+','.join(order), lambda order=order: {k: {'{}[],:': ['x,y', ':{}', []]} for k in order})
+        a = candidate.strict({'2': 2, '10': 10, '02': 2})
+        b = candidate.strict({'02': 2, '10': 10, '2': 2})
+        self.assertEqual(a, b)
+
+    def test_quotes_backslashes_and_every_control_character(self):
+        values = [''.join(chr(i) for i in range(32)), '\\"\\\\\\/', '{}[],:',
+                  'prefix\\\\\\\\\\\\\\"suffix', '\\' * 257 + '"' + '\\' * 258,
+                  'outside:\ninside:\tend:\r', '\x7f']
+        self.compare('all-control-escapes', lambda: {v: [v, '', {'quoted"': '\\'}] for v in values})
+
+    def test_unicode_bmp_nonbmp_surrogates_and_key_order(self):
+        keys = ['\u0000', 'é', '中', '\u2028', '\u2029', '\uffff', '\U00010000', '\U0010ffff', '\ud800', '\udfff']
+        self.compare('unicode-and-lone-surrogates', lambda: {k: [k, 'é😀\\"\n'] for k in reversed(keys)})
+        result = candidate.strict({'é': '\ud800😀'})
+        self.assertIn(b'\\u00e9', result)
+        self.assertIn(b'\\ud800\\ud83d\\ude00', result)
+        self.assertTrue(result.endswith(b'\n') and not result.endswith(b'\n\n'))
+
+    def test_float_bits_extremes_and_exponent_boundaries(self):
+        values = [0., -0., float.fromhex('0x0.0000000000001p-1022'),
+                  -float.fromhex('0x0.0000000000001p-1022'), sys.float_info.min,
+                  sys.float_info.max, -sys.float_info.max,
+                  1e-7, 1e-6, 1e-5, 1e-4, 1e15, 1e16, 1e20, 1e21,
+                  math.nextafter(1e-4, 0.), math.nextafter(1e16, math.inf)]
+        self.compare('finite-float-extremes', lambda: {'values': list(values)})
+        self.assertNotEqual(candidate.strict(0.), candidate.strict(-0.))
+
+    def test_integer_bit_guard_and_bool_distinction(self):
+        for value in [-(1 << 256), -(1 << 255), -1, 0, 1, (1 << 255), (1 << 256)-1, 1 << 256]:
+            self.compare('integer-bits-'+str(value.bit_length())+'-'+str(value < 0),
+                         lambda value=value: {'integer': value, 'boolean': True},
+                         eligible=value.bit_length() <= 256)
+        self.assertNotEqual(candidate.strict(True), candidate.strict(1))
+
+    def test_python_decimal_conversion_boundary_unchanged(self):
+        limit = sys.get_int_max_str_digits()
+        digits = limit if limit else 4300
+        for name, value in [('at', 10 ** (digits-1)), ('over', 10 ** digits), ('negative-over', -(10 ** digits))]:
+            self.compare('decimal-digit-limit-'+name, lambda value=value: [value], eligible=False)
+        self.assertEqual(sys.get_int_max_str_digits(), limit)
+
+    def test_nonfinite_floats_at_each_nesting_position(self):
+        for name, value in [('nan', math.nan), ('positive-inf', math.inf), ('negative-inf', -math.inf)]:
+            for position in range(4):
+                factory = [lambda v=value: v, lambda v=value: [v],
+                           lambda v=value: {'v': v}, lambda v=value: {'outer': [0, {'v': v}]}][position]
+                self.compare(name+'-position-'+str(position), factory, eligible=False)
+
+    def test_nonstring_and_mixed_keys_delegate(self):
+        cases = [lambda: {1: 'one'}, lambda: {None: 1}, lambda: {False: 2}, lambda: {1.5: 3},
+                 lambda: {'x': 1, 2: 3}, lambda: {(1, 2): 'tuple'},
+                 lambda: {math.nan: 'nan-key'}, lambda: {math.inf: 'infinity-key'}]
+        for i, factory in enumerate(cases):
+            self.compare('unsupported-key-'+str(i), factory, eligible=False)
+
+    def test_exact_numpy_scalars_and_arrays(self):
+        cases = [lambda: np.int64(7), lambda: np.uint64(2**64-1), lambda: np.float32(.1),
+                 lambda: np.float64(-0.), lambda: np.bool_(True), lambda: np.str_('😀'),
+                 lambda: np.array(3.5), lambda: np.array([[1., -0.], [2., 3.]]),
+                 lambda: np.array([], dtype=np.float64), lambda: np.array([1, 2], dtype='>i8')]
+        for i, factory in enumerate(cases):
+            self.compare('exact-numpy-'+str(i), factory)
+        self.compare('numpy-complex-unsupported', lambda: np.complex128(1+2j), eligible=False)
+        self.compare('numpy-nan', lambda: np.float64(math.nan), eligible=False)
+
+    def test_noncontiguous_and_readonly_numpy_arrays(self):
+        def factory():
+            x = np.arange(24., dtype=np.float64).reshape(4, 6)[:, ::2]
+            x[0, 0] = -0.; x.setflags(write=False)
+            return x
+        left, right, _ = self.compare('readonly-noncontiguous', factory)
+        self.assertFalse(left.flags.c_contiguous)
+        self.assertFalse(right.flags.writeable)
+        self.assertEqual(left.tobytes(), right.tobytes())
+
+    def test_object_arrays_convert_or_delegate(self):
+        self.compare('object-array-json', lambda: np.array([{'x': -0.}, (1, 2), 'é'], dtype=object))
+        self.compare('object-array-opaque', lambda: np.array([Opaque()], dtype=object), eligible=False)
+        self.compare('object-array-numpy-scalar', lambda: np.array([np.int64(3), np.float64(-0.)], dtype=object))
+
+    def test_builtin_subclasses_and_opaque_objects(self):
+        for label, factory in [('string-value', lambda: Text('é')),
+                               ('string-key', lambda: {Text('key'): 2}),
+                               ('int-subclass', lambda: Integer(3)),
+                               ('float-subclass', lambda: Floating(-0.)),
+                               ('opaque', Opaque), ('bytes', lambda: b'abc'),
+                               ('set', lambda: {1, 2}), ('complex', lambda: 1+2j)]:
+            self.compare('subclass-or-opaque-'+label, factory, eligible=False)
+        self.compare('raw-tuple-canonical-list', lambda: ((1, 2), []))
+
+    def test_dict_list_hooks_are_called_once_on_fast_and_fallback(self):
+        for cls, expected_hook in [(DictHook, 'items'), (ListHook, 'iter')]:
+            for bad in (False, True):
+                def factory(cls=cls, bad=bad):
+                    v = cls({'x': Opaque() if bad else 1}) if cls is DictHook else cls([Opaque() if bad else 1])
+                    v.calls, v.fail = [], False
+                    return v
+                snap = (lambda bad=bad: {'x': Opaque() if bad else 1}) if cls is DictHook else (lambda bad=bad: [Opaque() if bad else 1])
+                left, right, _ = self.compare(cls.__name__+'-fallback-'+str(bad), factory,
+                                              eligible=not bad, snapshot_factory=snap)
+                _emit({'test': self.id(), 'label': cls.__name__+'-hook-count-'+str(bad), 'kind': 'hook_counts',
+                       'original': list(left.calls), 'candidate': list(right.calls), 'expected': [expected_hook]})
+                self.assertEqual(left.calls, [expected_hook]); self.assertEqual(right.calls, [expected_hook])
+
+    def test_numpy_hooks_are_called_once_on_fast_and_fallback(self):
+        for cls, expected_hook in [(ArrayHook, 'tolist'), (ItemHook, 'item')]:
+            for bad in (False, True):
+                def factory(cls=cls, bad=bad):
+                    v = np.array([1.]).view(cls) if cls is ArrayHook else cls(1.)
+                    v.calls, v.fail, v.payload = [], False, [Opaque()] if bad else {'x': [-0., 2]}
+                    return v
+                left, right, _ = self.compare(cls.__name__+'-fallback-'+str(bad), factory,
+                    eligible=not bad, snapshot_factory=lambda bad=bad: [Opaque()] if bad else {'x': [-0., 2]})
+                _emit({'test': self.id(), 'label': cls.__name__+'-hook-count-'+str(bad), 'kind': 'hook_counts',
+                       'original': list(left.calls), 'candidate': list(right.calls), 'expected': [expected_hook]})
+                self.assertEqual(left.calls, [expected_hook]); self.assertEqual(right.calls, [expected_hook])
+
+    def test_raw_hook_failures_propagate_once(self):
+        for cls, hook in [(ArrayHook, 'tolist'), (ItemHook, 'item'), (DictHook, 'items'), (ListHook, 'iter')]:
+            def factory(cls=cls):
+                v = np.array([1.]).view(cls) if cls is ArrayHook else cls(1.) if cls is ItemHook else cls()
+                v.calls, v.fail, v.payload = [], True, None
+                return v
+            left, right, outcome = self.compare('failed-hook-'+cls.__name__, factory, eligible=None)
+            self.assertEqual(outcome['kind'], 'error')
+            _emit({'test': self.id(), 'label': cls.__name__+'-failed-hook-count', 'kind': 'hook_counts',
+                   'original': list(left.calls), 'candidate': list(right.calls), 'expected': [hook]})
+            self.assertEqual(left.calls, [hook]); self.assertEqual(right.calls, [hook])
+        self.compare('valid-after-hook-errors', lambda: {'ok': [1, -0.]})
+
+    def test_self_and_mutual_cycles_keep_original_failure(self):
+        def self_list():
+            x = []; x.append(x); return x
+        def self_dict():
+            x = {}; x['self'] = x; return x
+        def mutual():
+            a, b = [], {}; a.append(b); b['a'] = a; return a
+        for label, factory in [('self-list', self_list), ('self-dict', self_dict), ('mutual', mutual)]:
+            self.compare(label, factory, eligible=None)
+            self.guard(label+'-canonical-domain', factory(), False)
+        self.compare('valid-after-cycles', lambda: [1, {'x': []}])
+
+    def test_shared_acyclic_children_and_cycle_discrimination(self):
+        def factory():
+            shared = {'x': [1, 2]}
+            return [shared, shared, {'again': shared}]
+        self.compare('shared-acyclic', factory)
+        self.guard('shared-acyclic-snapshot', factory(), True)
+
+    def test_depth_exact_boundary_and_deep_delegation(self):
+        for cls in (list, dict):
+            for depth in (1, 31, 32, 33, 80):
+                self.compare(cls.__name__+'-depth-'+str(depth), lambda depth=depth, cls=cls: _nested(depth, kind=cls),
+                             eligible=depth <= LIMIT_DEPTH)
+        recursion = sys.getrecursionlimit()
+        self.compare('beyond-canonical-recursion', lambda: _nested(recursion * 2), eligible=None)
+        self.assertEqual(sys.getrecursionlimit(), recursion)
+
+    def test_node_boundary_counts_root_and_key_occurrences(self):
+        for nodes in (LIMIT_NODES-1, LIMIT_NODES, LIMIT_NODES+1):
+            self.compare('list-nodes-'+str(nodes), lambda nodes=nodes: [0] * (nodes-1), eligible=nodes <= LIMIT_NODES)
+        # 1 dict + 1 key + 1 list + N scalar values: exactly N+3 nodes.
+        for nodes in (LIMIT_NODES, LIMIT_NODES+1):
+            self.compare('key-counts-as-node-'+str(nodes), lambda nodes=nodes: {'x': [0] * (nodes-3)}, eligible=nodes <= LIMIT_NODES)
+
+    def test_shared_occurrences_count_again_at_node_guard(self):
+        # 1 root + M occurrences of (1 list + 1 integer); no unique-ID shortcut.
+        for count in (65535, 65536):
+            shared = [0]
+            snapshot = [shared] * count
+            self.guard('shared-node-count-'+str(count), snapshot, 1+2*count <= LIMIT_NODES)
+        self.compare('shared-node-fallback', lambda: [[0]] * 65536, eligible=False)
+
+    def test_string_char_guard_counts_values_and_keys(self):
+        for chars in (LIMIT_CHARS-1, LIMIT_CHARS, LIMIT_CHARS+1):
+            self.compare('string-chars-'+str(chars), lambda chars=chars: 'a' * chars, eligible=chars <= LIMIT_CHARS)
+        for chars in (LIMIT_CHARS, LIMIT_CHARS+1):
+            self.compare('key-plus-value-chars-'+str(chars), lambda chars=chars: {'é': 'a' * (chars-1)}, eligible=chars <= LIMIT_CHARS)
+        # Repeated shared string occurrences count again; Unicode characters,
+        # not ensure_ascii output bytes, define the eligibility boundary.
+        shared = '😀' * (LIMIT_CHARS // 2)
+        self.guard('shared-unicode-characters-at', [shared, shared], True)
+        self.guard('shared-unicode-characters-over', [shared, shared, 'x'], False)
+
+    def test_guard_rejects_snapshot_subclasses_without_hooks(self):
+        values = [Text('x'), Integer(1), Floating(1.), {Text('x'): 1}, (), np.int64(1), np.array([1])]
+        for i, value in enumerate(values):self.guard('snapshot-unsupported-'+str(i), value, False)
+        for cls, value in [(DictHook, {'x': 1}), (ListHook, [1])]:
+            x = cls(value); x.calls, x.fail = [], True
+            self.guard('snapshot-no-hook-'+cls.__name__, x, False)
+            self.assertEqual(x.calls, [])
+
+    def test_mutations_between_calls_and_same_shape_replacement(self):
+        left = {'nested': [1., -0.], 'first': 1, 'last': 2}
+        right = {'nested': [1., -0.], 'first': 1, 'last': 2}
+        states = [lambda x: None, lambda x: x['nested'].__setitem__(0, 2.),
+                  lambda x: x['nested'].__setitem__(1, 0.), lambda x: x.__setitem__('new', []),
+                  lambda x: x.pop('first'), lambda x: x.__setitem__('first', 1),
+                  lambda x: x.__setitem__('nested', [5., -0.])]
+        digests=[]
+        for i, mutate in enumerate(states):
+            mutate(left); mutate(right)
+            before=original_strict(left)
+            original, ot=_capture(original_strict,left); actual, at=_capture(candidate.strict,right)
+            _emit({'test':self.id(),'label':'mutable-dict-'+str(i),'original':original,'candidate':actual,
+                   'eligibility':{'actual':candidate.eligible(canonical(right)),'expected':True},
+                   'input':{'canonical_ascii':before.decode('ascii')}})
+            self.assertIs(ot,at);self.assertEqual(original,actual);digests.append(actual['sha256'])
+        self.assertNotEqual(digests[0],digests[1]);self.assertNotEqual(digests[1],digests[2])
+        self.assertEqual(digests[3],digests[5])
+        arrays=[np.array([1., -0.]),np.array([1., -0.])]
+        for i in range(4):
+            if i==1:
+                for x in arrays:x[0]=2.
+            if i==2:
+                for x in arrays:x.view(np.uint64)[1]=0
+            if i==3: arrays=[np.array([7.,-0.]),np.array([7.,-0.])]
+            original, ot=_capture(original_strict,arrays[0]);actual,at=_capture(candidate.strict,arrays[1])
+            _emit({'test':self.id(),'label':'mutable-array-'+str(i),'original':original,'candidate':actual,
+                   'input':{'dtype':arrays[0].dtype.str,'shape':list(arrays[0].shape),'bytes_hex':arrays[0].tobytes().hex()},
+                   'eligibility':{'actual':True,'expected':True}})
+            self.assertIs(ot,at);self.assertEqual(original,actual)
+
+    def test_direct_fallback_uses_single_canonical_snapshot(self):
+        def factory():
+            v = np.array([1.]).view(ArrayHook)
+            v.calls, v.fail, v.payload = [], False, [Opaque()]
+            return v
+        original_value, candidate_value = factory(), factory()
+        original, original_type = _capture(original_strict, original_value)
+        real_canonical, real_encoded = candidate.canonical, candidate.encoded
+        with patch.object(candidate, 'canonical', wraps=real_canonical) as conversion, \
+             patch.object(candidate, 'encoded', wraps=real_encoded) as fallback:
+            actual, actual_type = _capture(candidate.strict, candidate_value)
+            snapshot = fallback.call_args.args[0] if fallback.call_args else None
+            observed = {'test': self.id(), 'label': 'single-canonical-direct-fallback',
+                'original': original, 'candidate': actual, 'canonical_calls': conversion.call_count,
+                'encoded_calls': fallback.call_count, 'original_hooks': original_value.calls,
+                'candidate_hooks': candidate_value.calls, 'fallback_snapshot_type': type(snapshot).__name__,
+                'eligibility': {'expected': False, 'actual': candidate.eligible([Opaque()])}}
+            _emit(observed)
+            self.assertIs(actual_type, original_type); self.assertEqual(actual, original)
+            self.assertEqual(conversion.call_count, 1); self.assertEqual(fallback.call_count, 1)
+            self.assertIs(type(snapshot), list); self.assertIs(type(snapshot[0]), Opaque)
+            self.assertEqual(original_value.calls, ['tolist']); self.assertEqual(candidate_value.calls, ['tolist'])
+        self.compare('valid-after-direct-fallback', lambda: {'valid': [-0.]})
+
+    def test_unexpected_fastpath_errors_propagate_without_retry(self):
+        value = {'x': [1, -0., 'é']}
+        original, _ = _capture(original_strict, value)
+        for local_name in ('dumps', '_pretty'):
+            error = RuntimeError('injected '+local_name+' failure')
+            real_encoded = candidate.encoded
+            with patch.object(candidate, local_name, side_effect=error) as failed, \
+                 patch.object(candidate, 'encoded', wraps=real_encoded) as fallback:
+                actual, actual_type = _capture(candidate.strict, value)
+                _emit({'test': self.id(), 'label': 'injected-'+local_name,
+                       'original': original, 'candidate': actual, 'injected_error': str(error),
+                       'failed_calls': failed.call_count, 'fallback_calls': fallback.call_count,
+                       'eligibility': {'expected': True, 'actual': candidate.eligible(value)}})
+                self.assertIs(actual_type, RuntimeError)
+                self.assertEqual(actual['message'], str(error))
+                self.assertEqual(failed.call_count, 1); self.assertEqual(fallback.call_count, 0)
+            self.compare('valid-after-injected-'+local_name, lambda: {'ok': [1, -0.]})
+
+    def test_eligible_has_no_conversion_or_encoder_calls(self):
+        with patch.object(candidate, 'canonical', side_effect=AssertionError('guard canonicalized')) as conversion, \
+             patch.object(candidate, 'dumps', side_effect=AssertionError('guard encoded')) as compact, \
+             patch.object(candidate, 'encoded', side_effect=AssertionError('guard fallback encoded')) as fallback:
+            self.guard('pure-guard-eligible', {'x': [1, -0.]}, True)
+            self.guard('pure-guard-ineligible', {'x': Opaque()}, False)
+            _emit({'test': self.id(), 'label': 'pure-guard-call-counts', 'canonical_calls': conversion.call_count,
+                   'compact_calls': compact.call_count, 'encoded_calls': fallback.call_count})
+            self.assertEqual((conversion.call_count, compact.call_count, fallback.call_count), (0, 0, 0))
+
+    def test_failure_then_valid_has_no_retained_state(self):
+        for i,factory in enumerate((lambda: [math.nan], lambda: {1,'x'}, lambda: {'x':Opaque()}, lambda:{'a':1,2:3})):
+            self.compare('failure-sequence-'+str(i),factory,eligible=False)
+            self.compare('valid-after-failure-'+str(i),lambda:{'x':[-0.,1], 'empty':[]})
+
+
+if __name__ == '__main__':
+    unittest.main()

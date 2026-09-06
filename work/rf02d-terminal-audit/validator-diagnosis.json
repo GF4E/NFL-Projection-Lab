@@ -1,0 +1,269 @@
+{
+  "authentication": {
+    "all_43_manifest_source_test_pins_reverified": true,
+    "index_sha256": "4f48061462188255613895a2453694e7290294404b8a74352302792fb1f03e63",
+    "manifest_sha256": "482ec75028e1d16f687a51eac6c5139a1b1db6deb3cb7884320ce767febe163d",
+    "run_directory": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02d-v1-482ec75028e1d16f",
+    "scan_artifact": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02d-terminal-audit/validator-scan.json",
+      "sha256": "c60df506b722f29bc78fb318504456ae266cbb66102ccc360d259d408557664e"
+    },
+    "score_artifacts_individually_verified_by_index_sha256_and_bytes": 226,
+    "terminal_sha256": "7542e806cb2cad495470acad231c888ddbdcd316d449c3f106384c670cdee238"
+  },
+  "code_and_test_evidence": [
+    {
+      "finding": "Exact built-in numeric-type predicate",
+      "line": 43,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_inference.py",
+      "sha256": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604"
+    },
+    {
+      "finding": "Rejects every non-grid metric not satisfying the predicate",
+      "line": 90,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_inference.py",
+      "sha256": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604"
+    },
+    {
+      "finding": "Validation occurs before scorecard aggregation, bootstrap inference and decisions",
+      "line": 315,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_inference.py",
+      "sha256": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604"
+    },
+    {
+      "finding": "tail_bounds unpacks NumPy rates; moment and returned score_error_bound retain numpy.float64",
+      "line": 166,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+      "sha256": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1"
+    },
+    {
+      "finding": "ScoreGrid stores error without a float conversion",
+      "line": 200,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+      "sha256": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1"
+    },
+    {
+      "finding": "Scorer metric insertion order; grid_transport_bound receives grid.score_error_bound",
+      "line": 31,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_metrics.py",
+      "sha256": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97"
+    },
+    {
+      "finding": "strict serializes canonical values to finite JSON",
+      "line": 54,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_run.py",
+      "sha256": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343"
+    },
+    {
+      "finding": "canonical converts np.generic through item()",
+      "line": 28,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_replay.py",
+      "sha256": "8eae09d2b3cb7aec7a2e6fbe265679be39eea5dbf6bd327f24f75d9022f65b45"
+    },
+    {
+      "finding": "Actual mapped scoring receives original metric object",
+      "line": 564,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_run.py",
+      "sha256": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343"
+    },
+    {
+      "finding": "Persists canonical score artifact, then returns original in-memory scored rows",
+      "line": 585,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_run.py",
+      "sha256": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343"
+    },
+    {
+      "finding": "append_scored_origin preserves each original metrics object",
+      "line": 600,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_run.py",
+      "sha256": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343"
+    },
+    {
+      "finding": "Identity compares complete encoded dictionaries but does not call inference",
+      "line": 84,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_qualify.py",
+      "sha256": "cb0a13eb0afacb2a4ccde7826bc2288a31677853b71d061c5ccc477eca0647f6"
+    },
+    {
+      "finding": "Real nonidentity scorer integration compares serialized metrics",
+      "line": 260,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_run.py",
+      "sha256": "7720f9264d167b610f12971925d416bdef0c9ea08ce4a3cfdc0b193a4562621c"
+    },
+    {
+      "finding": "Full controller test uses production_fixture metric templates",
+      "line": 522,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_run.py",
+      "sha256": "7720f9264d167b610f12971925d416bdef0c9ea08ce4a3cfdc0b193a4562621c"
+    },
+    {
+      "finding": "Controller grader is stubbed and returns built-in-number templates",
+      "line": 603,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_run.py",
+      "sha256": "7720f9264d167b610f12971925d416bdef0c9ea08ce4a3cfdc0b193a4562621c"
+    },
+    {
+      "finding": "Controller calls public evaluate with stubbed grader and bootstrap",
+      "line": 628,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_run.py",
+      "sha256": "7720f9264d167b610f12971925d416bdef0c9ea08ce4a3cfdc0b193a4562621c"
+    },
+    {
+      "finding": "Production fixture explicitly sets grid_transport_bound to built-in float",
+      "line": 59,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_inference.py",
+      "sha256": "598d40031b1630993ff2f2aceb13a7d280dc86a5d4789e572c383d54da1ea629"
+    }
+  ],
+  "conclusion": "The terminal failure is an implementation interface mismatch: exact built-in type validation rejects a finite numpy.float64 transport-error diagnostic. The archive scan found no nonfinite or nonnumeric persisted scalar metric. This diagnosis does not establish candidate performance or validate other downstream inference conditions.",
+  "first_rejection": {
+    "field": "grid_transport_bound",
+    "file": "scores-2013-01.json",
+    "file_sha256": "18c558241598e4029a8344cd3b773b6ba6097039a204db208d029255808f36b2",
+    "finite": true,
+    "game_id": "2013_01_ARI_STL",
+    "json_pointer": "/mapped/0/metrics/grid_transport_bound",
+    "live_type": "numpy.float64",
+    "live_type_evidence": "Not retained in JSON. Deterministic consequence of the authenticated rates-array -> tail_bounds -> ScoreGrid -> scorer -> accumulator source path under the pinned runtime, independently reproduced through the existing synthetic publish/reconstruct/grade fixture. No historical scoring was performed.",
+    "persisted_type": "float",
+    "series": [
+      "N0C",
+      "full"
+    ],
+    "validator_position": "First configured series N0C/full, first original ordered game. Earlier scalar fields in the scorer insertion order are built-in floats; grid_cells is explicitly exempt.",
+    "value": 4.606387935832791e-12
+  },
+  "limitations": [
+    "The terminated process did not preserve Python object types. Actual values and complete finite persisted population are directly authenticated observations; the live numpy.float64 class and guaranteed mapped population are deductions from frozen executable semantics supported by the synthetic probe.",
+    "No aggregate, bootstrap, mapping decision or candidate result was recomputed, and no claim is made that the saved scientific forecasts pass downstream criteria.",
+    "This report diagnoses the validator boundary only; independent agents audit complete terminal and temporal evidence separately."
+  ],
+  "live_affected_population": {
+    "basis": "Source-derived for every mapped scoring call: the accepted distribution rates are NumPy arrays; uncast rate-based tail moment propagates to grid_transport_bound. All mapped score calls pass the same original objects to inference. The synthetic probe confirms both ordinary and independent mapped variants. JSON does not preserve live scalar classes.",
+    "games_per_series": 3407,
+    "guaranteed_grid_transport_bound_type_rejections": 68140,
+    "mapped_series": 20,
+    "persisted_transport_bound_range": [
+      9.025060602038958e-22,
+      1.764916221968697e-10
+    ],
+    "raw_reference_rows_loaded_as_JSON": 20442,
+    "raw_reference_series": 6
+  },
+  "minimal_falsifiable_successor_proposal": {
+    "approach": "Preserve this RF-02D protocol_invalid run and all 43 frozen files. Separately preregister an immutable derivation that authenticates the original completion/index and all exact score artifacts, reconstructs the exact original metadata, all twenty mapped and six raw-reference series, native failure reasons and audit evidence from the archive, and passes the unmodified parsed JSON metric values to the unchanged accepted evaluate. No rescoring, fitting, dropping, clipping, tolerances, sample changes or metric replacement.",
+    "authority_and_limits": "Requires a separately frozen protocol, source review, complete bounded qualification, its own runtime budget and new output identity before historical execution. It does not repair the original run or convert its terminal into a successful experiment.",
+    "falsifiable_prediction": "The saved JSON representation satisfies the exact built-in finite-number predicate for all 9,396,506 scalar metrics; this particular type failure will disappear. The unchanged evaluator may still identify a different downstream failure or reject every candidate.",
+    "status": "Proposal only; not implemented or executed"
+  },
+  "population": {
+    "invalid_grid_cells": [],
+    "mapped_transport_bounds": {
+      "count": 68140,
+      "maximum": 1.764916221968697e-10,
+      "minimum": 9.025060602038958e-22,
+      "zero_count": 0
+    },
+    "metric_field_count_populations": {
+      "('mapped', 108)": 68140,
+      "('raw_references', 104)": 20442
+    },
+    "ordered_original_game_count": 3407,
+    "persisted_rejected_values": [],
+    "scalar_values_checked": 9396506,
+    "score_artifact_ledger_sha256": "60ad2e6c8f5da0f6b9438f3310edce15c0866a0b78628f4ab50f77195f3e695e",
+    "score_bytes": 455634239,
+    "score_files": 226,
+    "series_counts": {
+      "E1:full": 3407,
+      "E2:availability_24h": 3407,
+      "E2:full": 3407,
+      "E2C:availability_24h": 3407,
+      "E2C:deterministic_noise": 3407,
+      "E2C:full": 3407,
+      "E2C:independent_marginals": 3407,
+      "E2C:no_defense": 3407,
+      "E2C:no_home_effect": 3407,
+      "E2C:no_offense": 3407,
+      "E2C:no_prior_season_carryover": 3407,
+      "E2C:no_team_identity": 3407,
+      "E2C:no_time_decay": 3407,
+      "E2C:shuffled_identity": 3407,
+      "N0:availability_24h": 3407,
+      "N0:full": 3407,
+      "N0C:availability_24h": 3407,
+      "N0C:deterministic_noise": 3407,
+      "N0C:full": 3407,
+      "N0C:independent_marginals": 3407,
+      "N0C:no_home_effect": 3407,
+      "N0C:no_prior_season_carryover": 3407,
+      "N0C:no_team_identity": 3407,
+      "N0C:no_time_decay": 3407,
+      "N0C:shuffled_identity": 3407,
+      "S1:full": 3407
+    }
+  },
+  "required_qualification": [
+    "Add a regression reproducing finite numpy.float64 grid_transport_bound from an actual synthetic scorer path and showing the unchanged validator rejects the live object while authenticated JSON decoding preserves its exact numeric value.",
+    "Exercise real synthetic scoring -> durable score artifact -> authenticated reload -> complete production-count public evaluate integration; keep the exact 3407-game, 20+6-series and 226-origin gates. Include a meaningful nonidentity and independence/fallback case.",
+    "Reject missing/duplicate/reordered/rehashed foreign score membership, modified native failure reasons, altered audit evidence, nonfinite markers/NaN/infinities/bools, incomplete files, and foreign manifest/source pins. Check exact original values and complete field sets with no drop or coercion of scientific values.",
+    "Authenticate all original parent/runtime/43-source pins and all archive rows; preserve 3135 development games, 272 exposed-2025 games, full-population failure ceilings, all28 energy comparisons, all16 calibration cells and existing candidate/mapping decisions.",
+    "Independent numerical and temporal acceptance of the new derivation code and synthetic evidence must precede any authorized historical inference. Independently audit its terminal result afterward."
+  ],
+  "scope": "Read-only actual archive scan plus authorized synthetic type-only integration probe. No historical scoring, fits, altered-input inference, repair, coercion/drop, new replay, or source/archive edits.",
+  "status": "confirmed_numeric_type_boundary_mismatch",
+  "synthetic_probe": {
+    "actual_synthetic_score_calls": 40,
+    "all_other_non_grid_fields_accepted": true,
+    "first": {
+      "field": "grid_transport_bound",
+      "finite": true,
+      "game_id": "z-first",
+      "series": [
+        "N0C",
+        "full"
+      ],
+      "type": "numpy.float64",
+      "value": 6.373574025683899e-14
+    },
+    "fixture": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-conditional-margin/test_run.py:fixture",
+    "mapped_rows": 40,
+    "operational_note": "First probe stopped before fixture construction because macOS temporary directory path traversed /var symlink and Store correctly rejected it. Repeated once with Path.resolve(), as the accepted tests already do; only the second probe scored synthetic data.",
+    "original_vs_persisted_strict_metric_bytes_equal": true,
+    "persisted_rejected_scalar_values": 0,
+    "procedure": "Use existing two-game, twenty-series fixture through accepted publish_origin and grade_origin, inspect _number(value) for each metric, then read the persisted score artifact. Never call evaluate or any historical source.",
+    "rejected_field_counts": {
+      "grid_transport_bound": 40
+    }
+  },
+  "terminal": {
+    "automatic_restart": false,
+    "execution_counts": {
+      "mapped_prediction_calls": 68140,
+      "native_reason_matches": 88582,
+      "prediction_reconstruction_calls": 68140,
+      "published_origins": 226,
+      "recipe_reconstruction_calls": 68140,
+      "score_calls": 68140
+    },
+    "failure_type": "RunFailure",
+    "independent_actual_result_acceptance": false,
+    "invalid_finalization_only_cap_seconds": 30,
+    "peak_rss_mib": 1504.078125,
+    "phase": "inference",
+    "post_terminal_independent_numerical_and_temporal_review_required": true,
+    "production_authorized": false,
+    "reason": "inference_protocol_invalid:nonfinite_or_nonnumeric_metric",
+    "scientific_stop_elapsed_seconds": 3946.0649833750067,
+    "seconds": 3946.0649833750067,
+    "status": "protocol_invalid",
+    "version": "rf02d-team-score.v1"
+  },
+  "version": "rf02d-validator-diagnosis.v1",
+  "why_tests_missed_it": [
+    "Actual 520-occurrence identity qualification compares complete encoded metric bytes, which preserve numeric values but erase the Python versus NumPy scalar-class distinction; it never invokes inference.",
+    "Real synthetic publication/reconstruction/scoring tests check metrics, probabilities, fingerprints and serialized equality but do not feed those original scorer objects into the production inference validator.",
+    "The full 226-origin controller wiring test invokes public evaluate after a stubbed grader returns hand-built production_fixture metrics. Its grid_transport_bound is a built-in float. Thus real scoring and inference validation were tested on different metric-object representations.",
+    "Inference synthetic tests construct numeric fixtures directly and did not include the actual scorer float64 diagnostic at the integration boundary."
+  ]
+}

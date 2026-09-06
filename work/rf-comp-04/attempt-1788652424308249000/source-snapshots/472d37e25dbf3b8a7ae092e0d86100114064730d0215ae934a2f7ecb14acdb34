@@ -1,0 +1,384 @@
+"""RF-02F current-origin law assembly; no files, labels, scores or publication.
+
+The owner supplies an admitted archive view, a bank already advanced once, a
+frozen annual choice and its active accounting scope. All four returned values
+are current-origin only. A source reference binds a FORECAST artifact; the
+post-publication grader must separately bind the actual loss artifact.
+"""
+import copy
+from dataclasses import fields, replace
+import hashlib
+import json
+import math
+import re
+
+import numpy as np
+
+from research_score_split_archive import (PARENT_MANIFEST, PARENT_INDEX, RAW_REFERENCES,
+    STATE_VARIANTS, E2_VARIANTS, recover_source_law, _descriptor)
+from research_score_split_models import SPLIT_VARIANTS, split_setting_grid
+from research_score_split_replay import SplitTrajectoryBank
+from research_score_split_run import CallbackResult, strict
+from research_score_replay import resolve_distribution
+from research_score_run import distribution_descriptor
+from research_score_successor_distribution import JointBase
+
+
+_STATE_VARIANTS = tuple(v for v in SPLIT_VARIANTS if v not in ('independent_marginals', 'deterministic_noise'))
+_SOURCE_SERIES = tuple(('N0', v) for v in E2_VARIANTS if v not in ('no_offense', 'no_defense')) + tuple(
+    ('E2', v) for v in E2_VARIANTS) + (('E1', 'full'), ('S1', 'full'))
+_PRIVATE_FALLBACK = object()
+
+
+def require(value, reason):
+    if not value:
+        raise ValueError(reason)
+
+
+def _number(value):
+    return type(value) in (int, float) and math.isfinite(value)
+
+
+def _reason(value):
+    require(value is None or type(value) is str and bool(value.strip()), 'invalid_native_reason')
+    return value is not None
+
+
+def _pointer(value, *, sized=False):
+    require(type(value) is dict and set(value) == ({'name', 'sha256', 'bytes'} if sized else {'name', 'sha256'})
+            and type(value['name']) is str and re.fullmatch('[a-z0-9][a-z0-9.-]*', value['name'])
+            and '..' not in value['name'] and type(value['sha256']) is str
+            and re.fullmatch('[0-9a-f]{64}', value['sha256']), 'invalid_source_pointer')
+    if sized:
+        require(type(value['bytes']) is int and value['bytes'] > 0, 'invalid_source_size')
+    else:
+        require(value['name'] == 'object-' + value['sha256'] + '.json', 'noncanonical_mapper_pointer')
+
+
+def _choice(value, year):
+    if year < 2013:
+        require(value is None, 'choice_before_outer_season')
+        return None
+    require(type(value) is dict and set(value) == {'setting', 'status', 'games', 'inner_seasons', 'candidates'}
+            and type(value['games']) is int and value['games'] > 0
+            and value['inner_seasons'] == [year-2, year-1]
+            and all(type(y) is int for y in value['inner_seasons']), 'invalid_frozen_choice')
+    candidates = value['candidates']
+    require(type(candidates) is list and len(candidates) == 27, 'choice_candidate_population')
+    for i, row in enumerate(candidates):
+        require(type(row) is dict and set(row) == {'setting', 'mean_energy', 'failure_rate', 'eligible'}
+                and type(row['setting']) is int and row['setting'] == i
+                and _number(row['mean_energy']) and row['mean_energy'] >= 0
+                and _number(row['failure_rate']) and 0 <= row['failure_rate'] <= 1
+                and type(row['eligible']) is bool and row['eligible'] is (row['failure_rate'] <= .005),
+                'invalid_choice_candidate')
+    eligible = [row for row in candidates if row['eligible']]
+    best = None if not eligible else next(row['setting'] for row in eligible
+        if row['mean_energy'] <= min(c['mean_energy'] for c in eligible) + 1e-8)
+    require((value['setting'] is None or type(value['setting']) is int) and value['setting'] == best
+            and value['status'] == ('no_eligible_setting' if best is None else 'selected'), 'frozen_choice_contradiction')
+    return best
+
+
+def _forecast(row, ids):
+    require(type(row) is dict and set(row) == {'game_id', 'mean', 'failure', 'initialization_only'}
+            and type(row['game_id']) is str and row['game_id'] in ids and type(row['initialization_only']) is bool,
+            'invalid_native_forecast_schema')
+    failed = _reason(row['failure'])
+    if row['mean'] is None:
+        require(failed, 'successful_native_mean_missing')
+        return
+    require(type(row['mean']) in (list, np.ndarray), 'invalid_native_mean_type')
+    values = np.asarray(row['mean'])
+    require(values.shape == (2,) and values.dtype.kind in 'iuf' and np.all(np.isfinite(values)), 'invalid_native_mean')
+    require(failed or np.all(values > 0), 'successful_native_mean_not_positive')
+
+
+def _validate_native(view, bank, outputs, origin):
+    require(type(bank) is SplitTrajectoryBank and bank.settings == {'E3': split_setting_grid()}
+            and bank.series == [('E3', v) for v in SPLIT_VARIANTS], 'unregistered_bank')
+    expected = {('E3', i, v) for i in range(27) for v in _STATE_VARIANTS}
+    new_keys = {('E3', i, v) for i in range(27) for v in _STATE_VARIANTS if i >= 9 or v not in STATE_VARIANTS}
+    require(type(outputs) is dict and all(type(k) is tuple and len(k) == 3 and type(k[1]) is int for k in outputs)
+            and set(outputs) == expected and set(bank.engines) == new_keys, 'native_output_population')
+    require(type(view['diagonal_outputs']) is dict
+            and set(view['diagonal_outputs']) == {(i, v) for i in range(9) for v in STATE_VARIANTS}, 'diagonal_view_population')
+    native = {}
+    for key, output in outputs.items():
+        require(type(output) is dict and set(output) == {'forecasts', 'events', 'support', 'league_mean', 'home_effect',
+                'elo_score_slope', 'absorbing_failure'} and type(output['absorbing_failure']) is bool,
+                'invalid_native_output_schema')
+        forecasts = output['forecasts']
+        require(type(forecasts) is list and [r.get('game_id') for r in forecasts] == sorted(origin['targetGameIds']),
+                'native_forecast_order')
+        for row in forecasts:
+            _forecast(row, origin['targetGameIds'])
+            native[*key[1:], row['game_id']] = row
+        if key not in new_keys:
+            require(strict(output) == strict(view['diagonal_outputs'][key[1:]]), 'borrowed_native_output_changed')
+            continue
+        engine = bank.engines[key]
+        require(engine.last_origin == (origin['season'], origin['week'])
+                and output['absorbing_failure'] is engine.failed, 'bank_not_advanced_at_origin')
+        for row in forecasts:
+            require(row['game_id'] in engine.stored, 'own_expectation_missing')
+            stored = engine.stored[row['game_id']]
+            require((stored['context'].season, stored['context'].week) == (origin['season'], origin['week'])
+                    and row['initialization_only'] is stored['initialization_only'], 'own_expectation_origin_or_flag')
+            mean = None if engine.failed else stored['mean']
+            failure = engine.failure_reason if engine.failed else 'warmup_no_prior_score' if mean is None else (
+                'invalid_mean' if not np.all(np.isfinite(mean)) or np.any(mean <= 0) else None)
+            require(strict(row['mean']) == strict(mean) and row['failure'] == failure, 'own_native_expectation_changed')
+    return native
+
+
+def _source_row(row, key, pointers, *, selected):
+    wanted = {'family', 'setting', 'game_id', 'native_failure', 'distribution'} | ({'variant'} if selected else set())
+    require(type(row) is dict and set(row) == wanted and (row['setting'] is None and selected or type(row['setting']) is int),
+            'source_row_schema')
+    actual = (row['family'], row['variant'], row['game_id']) if selected else (row['family'], row['setting'], row['game_id'])
+    require(actual == key, 'source_row_key_mismatch')
+    require(row['family'] in ('N0', 'E2', 'E1', 'S1') and (row['setting'] is None or
+            0 <= row['setting'] < {'N0': 1, 'E2': 9, 'E1': 27, 'S1': 6}[row['family']]), 'source_setting_range')
+    _reason(row['native_failure'])
+    _descriptor(row['distribution'])
+    variant = row['variant'] if selected else 'full'
+    delay = 24 if variant == 'availability_24h' else 12
+    require(row['distribution']['mapper'] == pointers[delay]
+            and row['distribution']['independent'] is (variant == 'independent_marginals'), 'source_mapper_or_flag_mismatch')
+    require(row['family'] != 'N0' or row['native_failure'] is None, 'required_N0_source_failure')
+
+
+def _native_source(row, forecast):
+    """Source law failures may originate in the solver after a valid mean."""
+    reason = row['native_failure']
+    if forecast['failure'] is not None:
+        require(reason == forecast['failure'], 'source_native_reason_mismatch')
+    if reason is None:
+        require(forecast['failure'] is None and forecast['mean'] is not None
+                and np.max(np.abs(np.asarray(forecast['mean']) - np.asarray(row['distribution']['mean']))) <= 1e-7,
+                'source_requested_mean_mismatch')
+
+
+def _frozen_law(law):
+    copied = {}
+    for field in fields(law):
+        value = getattr(law, field.name)
+        if isinstance(value, np.ndarray):
+            value = value.copy(); value.setflags(write=False)
+        copied[field.name] = value
+    return replace(law, **copied)
+
+
+def _work(kind):
+    return {'kind': kind, 'fit_calls': 0, 'saved_recoveries': 0, 'descriptor_recoveries': 0, 'source_cache_hits': 0}
+
+
+class _Assembly:
+    def __init__(self, view, bank, outputs, choice, pointers, parent, accounting):
+        require(type(view) is dict and set(view) == {'origin', 'prepared_receipts', 'bank_prepared', 'diagonal_outputs',
+                'source_laws', 'mapper_sources', 'mappers', 'original_selection', 'source_pointers'}, 'invalid_archive_view')
+        self.view, self.bank, self.outputs, self.accounting = view, bank, outputs, accounting
+        self.origin = view['origin']
+        require(type(self.origin) is dict and type(self.origin.get('season')) is int and 2010 <= self.origin['season'] <= 2025
+                and type(self.origin.get('week')) is int and 1 <= self.origin['week'] <= 18, 'invalid_origin')
+        self.year = self.origin['season']
+        ids = self.origin['targetGameIds']
+        require(type(ids) is list and ids and all(type(g) is str and g for g in ids) and len(ids) == len(set(ids)),
+                'invalid_target_population')
+        require(type(parent) is dict and parent == {'parent_manifest_sha256': PARENT_MANIFEST,
+                'parent_index_sha256': PARENT_INDEX}, 'unaccepted_parent_binding')
+        self.parent, self.pointers = copy.deepcopy(parent), copy.deepcopy(pointers)
+        require(callable(getattr(accounting, 'callback', None)), 'missing_origin_accounting')
+        self.selected = _choice(choice, self.year)
+        self.native = _validate_native(view, bank, outputs, self.origin)
+        require(type(view['prepared_receipts']) is dict and set(view['prepared_receipts']) == {12, 24}
+                and type(view['bank_prepared']) is dict and set(view['bank_prepared']) == {12, 24}, 'invalid_prepared_delays')
+        for delay in (12, 24):
+            prepared = view['prepared_receipts'][delay]
+            require(prepared['origin_at'] == self.origin['originAt'] and prepared['delay_hours'] == delay
+                    and [g.game_id for g in prepared['targets']] == ids
+                    and all((g.season, g.week) == (self.year, self.origin['week']) for g in prepared['targets'])
+                    and view['bank_prepared'][delay] == {k: prepared[k] for k in ('history', 'targets')},
+                    'prepared_origin_or_bank_mismatch')
+        self.full = view['source_laws']['full']; self.outer = view['source_laws']['outer']
+        self.cache = {}
+        self.result = {'full_setting_forecasts': [], 'outer_selected_forecasts': [],
+                       'grading_plan': {'inner': [], 'outer': []}, 'resolved_laws': {}}
+        if self.year == 2010:
+            require(pointers == {} and choice is None, 'state_only_2010_law_work')
+            return
+        require(type(pointers) is dict and set(pointers) == {12, 24}
+                and set(view['mapper_sources']) == set(view['mappers']) == {12, 24}, 'mapper_delay_population')
+        for delay in (12, 24):
+            _pointer(pointers[delay])
+            source = view['mapper_sources'][delay]; mapper = view['mappers'][delay]
+            require(pointers[delay] == source['pointer'] and type(mapper) is JointBase, 'local_mapper_not_exact_parent')
+            payload = source['payload']
+            expected = {'atoms': mapper.atoms, 'weights': mapper.weights, 'b': mapper.b, 'epsilon': mapper.epsilon,
+                        'input_sha256': view['prepared_receipts'][delay]['input_hash'], 'half_life': 2.5}
+            require(strict(payload) == strict(expected), 'live_mapper_differs_from_admitted_payload')
+            require(hashlib.sha256(strict(payload)).hexdigest() == pointers[delay]['sha256'], 'mapper_payload_pointer_mismatch')
+        pointer = view['source_pointers']['forecasts']
+        _pointer(pointer, sized=True)
+        require(pointer['name'] == f"forecasts-{self.year}-{self.origin['week']:02}.json", 'wrong_origin_forecast_pointer')
+        expected_full = {(f, i, g) for g in ids for f, count in (('N0', 1), ('E2', 9)) for i in range(count)}
+        require(type(self.full) is dict and set(self.full) == expected_full, 'full_source_population')
+        for key, row in self.full.items():
+            _source_row(row, key, pointers, selected=False)
+            if row['family'] == 'E2':
+                _native_source(row, self.native[row['setting'], 'full', row['game_id']])
+                if row['native_failure'] is not None:
+                    require(strict(row['distribution']) == strict(self.full['N0', 0, row['game_id']]['distribution']),
+                            'source_inner_fallback_mismatch')
+        expected_outer = {(f, v, g) for f, v in _SOURCE_SERIES for g in ids} if self.year >= 2013 else set()
+        require(type(self.outer) is dict and set(self.outer) == expected_outer, 'outer_source_population')
+        for key, row in self.outer.items():
+            _source_row(row, key, pointers, selected=True)
+            original = view['original_selection'][row['family']]['setting']
+            require((original is None or type(original) is int) and row['setting'] == original, 'source_annual_setting_mismatch')
+            if row['family'] == 'E2':
+                require(original is None or 0 <= original < 9, 'original_E2_setting_range')
+                if original is None:
+                    require(row['native_failure'] == 'no_eligible_setting', 'source_noeligible_reason')
+                else:
+                    forecast = self.selected_native(original, row['variant'], row['game_id'])
+                    _native_source(row, forecast)
+                if row['native_failure'] is not None:
+                    fallback = self.fallback_variant(row['variant'])
+                    require(strict(row['distribution']) == strict(self.outer['N0', fallback, row['game_id']]['distribution']),
+                            'source_outer_fallback_mismatch')
+
+    def selected_native(self, selected, variant, game):
+        output = self.bank.selected_output(self.outputs, 'E3', selected, variant)
+        if output is None:
+            return None
+        rows = {r['game_id']: r for r in output['forecasts']}
+        require(set(rows) == set(self.origin['targetGameIds']), 'selected_native_population')
+        row = rows[game]; _forecast(row, self.origin['targetGameIds'])
+        return row
+
+    @staticmethod
+    def fallback_variant(variant):
+        return 'full' if variant in ('full', 'no_offense', 'no_defense', 'zero_strength_update', 'zero_scoring_level_update') else variant
+
+    def source_ref(self, row, stage):
+        variant = row['variant'] if 'variant' in row else 'full'
+        return {**self.parent, 'kind': 'source_forecast', 'forecast_file': copy.deepcopy(self.view['source_pointers']['forecasts']),
+                'source_key': [row['family'], row['setting'], variant, row['game_id']],
+                'source_population': 'outer_selected_forecasts' if stage == 'outer' else 'full_setting_forecasts',
+                'origin': [self.year, self.origin['week']], 'delay_hours': 24 if variant == 'availability_24h' else 12}
+
+    def recover(self, row, work):
+        descriptor = row['distribution']; delay = 24 if row.get('variant') == 'availability_24h' else 12
+        key = row['game_id'], delay, strict(descriptor)
+        if key in self.cache:
+            work['source_cache_hits'] += 1
+            return self.cache[key]
+        work['saved_recoveries'] += 1
+        law = _frozen_law(recover_source_law(self.view['mappers'][delay], descriptor))
+        self.cache[key] = law
+        return law
+
+    def timed_source(self, row, selected, variant, stage):
+        work = _work('saved_recovery')
+        key = row['game_id'], 24 if variant == 'availability_24h' else 12, strict(row['distribution'])
+        if key in self.cache:
+            work['kind'] = 'current_origin_cache'
+            return self.recover(row, work), copy.deepcopy(row['distribution']), row['native_failure'], work
+        def callback():
+            law = self.recover(row, work)
+            return CallbackResult(law, row['native_failure'], row['native_failure'] is not None)
+        law = self.accounting.callback('fit', callback, game_id=row['game_id'], setting=selected,
+            variant=variant, stage=stage, operation='recovery')
+        return law, copy.deepcopy(row['distribution']), row['native_failure'], work
+
+    def resolve(self, selected, variant, game, stage):
+        work = _work('new_resolution')
+        forecast = self.selected_native(selected, variant, game)
+        delay = 24 if variant == 'availability_24h' else 12
+        mapper = self.view['mappers'][delay]
+        def callback():
+            work['fit_calls'] += int(forecast is not None and forecast['failure'] is None)
+            law, reason = resolve_distribution(mapper, forecast, 'E3', variant, _PRIVATE_FALLBACK)
+            _reason(reason)
+            if law is _PRIVATE_FALLBACK:
+                require(reason is not None, 'fallback_sentinel_without_native_failure')
+                fallback = self.full['N0', 0, game] if stage == 'inner' else self.outer['N0', self.fallback_variant(variant), game]
+                require(fallback['native_failure'] is None, 'required_N0_fallback_failed')
+                law = self.recover(fallback, work)
+            require(law is not _PRIVATE_FALLBACK, 'unresolved_fallback_sentinel')
+            # Native JSON values cross the same strict boundary as persistence;
+            # no NumPy scalar leaks into the accepted descriptor validator.
+            descriptor = json.loads(strict(distribution_descriptor(law, self.pointers[delay])))
+            work['descriptor_recoveries'] += 1
+            recovered = _frozen_law(recover_source_law(mapper, descriptor))
+            require(strict(distribution_descriptor(recovered, self.pointers[delay])) == strict(descriptor), 'descriptor_roundtrip_changed')
+            return CallbackResult((recovered, descriptor, reason), reason, reason is not None)
+        law, descriptor, reason = self.accounting.callback('fit', callback, game_id=game, setting=selected,
+            variant=variant, stage=stage, operation='fit')
+        return law, descriptor, reason, work
+
+    def append(self, stage, row, mode, source, work, law=None):
+        key = [row['family'], row['setting'], row['game_id']] if stage == 'inner' else [row['family'], row['variant'], row['game_id']]
+        target = 'full_setting_forecasts' if stage == 'inner' else 'outer_selected_forecasts'
+        self.result[target].append(copy.deepcopy(row))
+        self.result['grading_plan'][stage].append({'key': key, 'mode': mode,
+            'source': None if source is None else self.source_ref(source, 'outer' if 'variant' in source else 'inner'),
+            'law_work': work})
+        if law is not None:
+            self.result['resolved_laws'][stage, row['setting'] if stage == 'inner' else row['variant'], row['game_id']] = law
+
+    def build(self):
+        if self.year == 2010:
+            return self.result
+        ids = self.origin['targetGameIds']
+        if self.year <= 2024:
+            for game in ids:
+                for selected in range(27):
+                    if selected < 9:
+                        source = self.full['E2', selected, game]
+                        row = dict(copy.deepcopy(source), family='E3')
+                        self.append('inner', row, 'source_inner', source, _work('descriptor_copy'))
+                    else:
+                        law, descriptor, reason, work = self.resolve(selected, 'full', game, 'inner')
+                        row = {'family': 'E3', 'setting': selected, 'game_id': game, 'native_failure': reason, 'distribution': descriptor}
+                        self.append('inner', row, 'new_score', None, work, law)
+        if self.year < 2013:
+            return self.result
+        same = self.selected is not None and self.selected < 9 and self.selected == self.view['original_selection']['E2']['setting']
+        inner_rows = {(r['setting'], r['game_id']): r for r in self.result['full_setting_forecasts']}
+        for variant in SPLIT_VARIANTS:
+            for game in ids:
+                source, mode = None, 'new_score'
+                if same and variant in E2_VARIANTS:
+                    source = self.outer['E2', variant, game]; mode = 'source_outer'
+                    law, descriptor, reason, work = self.timed_source(source, self.selected, variant, 'outer')
+                elif variant == 'full' and self.selected is not None and self.selected < 9:
+                    source = self.full['E2', self.selected, game]
+                    law, descriptor, reason, work = self.timed_source(source, self.selected, variant, 'outer')
+                elif variant == 'full' and ('inner', self.selected, game) in self.result['resolved_laws']:
+                    law = self.result['resolved_laws']['inner', self.selected, game]
+                    row = inner_rows[self.selected, game]
+                    descriptor, reason, work = copy.deepcopy(row['distribution']), row['native_failure'], _work('current_origin_cache')
+                else:
+                    law, descriptor, reason, work = self.resolve(self.selected, variant, game, 'outer')
+                row = {'family': 'E3', 'setting': self.selected, 'variant': variant, 'game_id': game,
+                       'native_failure': reason, 'distribution': descriptor}
+                self.append('outer', row, mode, source, work, law)
+        for family, variant in RAW_REFERENCES:
+            for game in ids:
+                source = self.outer[family, variant, game]
+                self.append('outer', source, 'raw_reference', source, _work('descriptor_copy'))
+        return self.result
+
+
+def assemble_forecasts(view, bank, outputs, choice, *, local_mapper_pointers, parent_binding, accounting):
+    """Return full rows, outer rows, private grading plan and resolved law cache.
+
+    parent_binding has exactly parent_manifest_sha256/parent_index_sha256.
+    choice is the complete E3 annual decision, or None before2013. The owning
+    controller authenticates that choice and the archive/runtime provenance.
+    No target outcome, score file, Store or grading callback is accepted here.
+    """
+    return _Assembly(view, bank, outputs, choice, local_mapper_pointers, parent_binding, accounting).build()

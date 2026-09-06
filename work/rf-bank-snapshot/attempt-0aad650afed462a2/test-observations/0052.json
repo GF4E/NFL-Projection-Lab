@@ -1,0 +1,12 @@
+{
+  "kind": "handle_contract",
+  "label": "mode-assignment-forbidden",
+  "outcome": {
+    "kind": "error",
+    "message": "super(type, obj): obj must be an instance or subtype of type",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "retained_mode": "supported",
+  "test": "test_bank_snapshot.SnapshotTests.test_failure_then_valid_and_readonly_mode"
+}

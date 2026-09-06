@@ -1,0 +1,188 @@
+"""RF-COMP-04 explicit forecast/scoring composition; no historical entry point.
+
+Only assembly's fit callback encoding and new-score probability dispatch change.
+The original publication/label/source checks and extra interval-mass calls remain.
+"""
+import copy
+from functools import partial
+import math
+import os
+
+import research_score_split_archive as archive
+from research_score_encoding_memo import EncodingAssembly
+from research_score_skellam_compute import score_forecast
+from research_score_metrics import TARGETS
+from research_score_split_grade import (
+    PublishedOriginGrader as OriginalPublishedOriginGrader,
+    require, _hash, _key, _losses, _source, _bound_law, _COUNTERS,
+)
+from research_score_split_inference import validate_metric
+from research_score_split_run import CallbackResult, read_publication, strict
+
+VERSION = 'rfcomp04.forecast-grade-composition.v1'
+
+
+def assemble_forecasts(view, bank, outputs, choice, *, local_mapper_pointers, parent_binding, accounting):
+    """Use the qualified per-fit encoder through the original public build path."""
+    return EncodingAssembly(view, bank, outputs, choice, local_mapper_pointers, parent_binding, accounting).build()
+
+
+class PublishedOriginGrader(OriginalPublishedOriginGrader):
+    """Original grade body with a fixed, qualified new-score dependency.
+
+    State ownership is inherited. The body below is a literal source copy so
+    original hashes, checks, extra mass CDFs and failure semantics remain visible.
+    """
+    def grade(self, store, manifest, manifest_sha, view, assembly, publication_pointer,
+              context, accounting, *, validate_binding):
+        # A rejected reentry is not a new attempt at the previous origin.
+        self._attempt_origin = None
+        require(not self._stopped, 'grader_stopped_or_reentered')
+        self._stopped = True  # Every exception, including a stop signal, poisons this attempt.
+        self._attempt_counts = dict.fromkeys(_COUNTERS, 0)
+        check = accounting.envelope.check
+        check()
+        origin = archive._context_origin(context, view['origin'])
+        require(self._next < len(context._origins) and strict(origin) == context._origins[self._next],
+                'grader_original_origin_order')
+        self._attempt_origin = [origin['season'], origin['week']]
+        require(_hash(manifest) == manifest_sha and store.read('manifest.json') == strict(manifest),
+                'grader_manifest_not_saved')
+        if self._context is None:
+            self._context, self._store, self._manifest = context, store, manifest_sha
+        require(context is self._context and store is self._store and manifest_sha == self._manifest,
+                'grader_run_store_or_context_swap')
+        require(callable(validate_binding), 'missing_publication_binding_validator')
+        validated = validate_binding()
+        require(type(validated) is tuple and len(validated) == 2 and all(type(v) is dict for v in validated),
+                'publication_binding_validator_requires_saved_objects')
+        publication, binding = validated
+        require(publication == archive.parse(read_publication(store, publication_pointer))
+                and binding['publication'] == publication_pointer and binding['manifest_sha256'] == manifest_sha
+                and strict(binding['grading_plan']) == strict(assembly['grading_plan']), 'publication_binding_return_mismatch')
+        archive._publication(origin, publication_pointer, partial(read_publication, store), manifest_sha)
+        require(strict(publication['full_setting_forecasts']) == strict(assembly['full_setting_forecasts'])
+                and strict(publication['outer_selected_forecasts']) == strict(assembly['outer_selected_forecasts']),
+                'grading_assembly_publication_mismatch')
+        year = origin['season']; games = origin['targetGameIds']
+        require(type(assembly['grading_plan']) is dict and set(assembly['grading_plan']) == {'inner', 'outer'},
+                'grading_plan_stages')
+        plans, sources = {}, {}
+        for stage, field in (('inner', 'full_setting_forecasts'), ('outer', 'outer_selected_forecasts')):
+            rows = publication[field]; plans[stage] = assembly['grading_plan'][stage]
+            require(type(plans[stage]) is list and len(plans[stage]) == len(rows), 'grading_plan_population')
+            for row, plan in zip(rows, plans[stage]):
+                require(type(plan) is dict and set(plan) == {'key', 'mode', 'source', 'law_work'}
+                        and plan['key'] == _key(row, stage), 'grading_plan_row_order_or_schema')
+                work = plan['law_work']
+                require(type(work) is dict and set(work) == {'kind', 'fit_calls', 'saved_recoveries',
+                    'descriptor_recoveries', 'source_cache_hits'} and work['kind'] in
+                    {'descriptor_copy', 'new_resolution', 'saved_recovery', 'current_origin_cache'}
+                    and all(type(v) is int and v >= 0 for k, v in work.items() if k != 'kind'), 'invalid_law_work')
+                sources[stage, tuple(plan['key'])] = _source(view, row, stage, plan)
+                if plan['mode'] == 'new_score' or stage == 'outer' and row['family'] == 'E3':
+                    _bound_law(view, assembly, row, stage)
+        # Only after the complete saved publication and plans pass may labels
+        # or original score files be opened. State-only2010 opens neither.
+        graded = None
+        inner_source, outer_source = {}, {}
+        if year >= 2011:
+            graded = archive.grade_inputs(context, origin, publication_pointer, check,
+                read_publication=partial(read_publication, store), expected_manifest_sha256=manifest_sha)
+            require(graded['origin'] == origin and set(graded['labels']) == set(games), 'graded_origin_or_label_population')
+            for observed in graded['labels'].values():
+                require(type(observed) is list and len(observed) == 2 and all(type(x) is int and x >= 0 for x in observed)
+                        and sum(observed) <= 200, 'invalid_graded_observation')
+            require(all(graded['source_pointers'][k] == v for k, v in view['source_pointers'].items()),
+                    'pregame_and_grader_source_pointer_mismatch')
+            inner_expected = [['E2', i, g] for g in games for i in range(9)]
+            inner_source = _losses(graded['diagonal_inner_rows'], 'inner', inner_expected)
+            if year >= 2013:
+                e2_expected = [['E2', v, g] for v in archive.E2_VARIANTS for g in games]
+                outer_source = _losses(graded['e2_outer_rows'], 'outer', e2_expected)
+                raw_expected = [[family, v, g] for family, v in archive.RAW_REFERENCES for g in games]
+                raw = _losses(graded['raw_outer_rows'], 'outer', raw_expected)
+                for key, row in raw.items():
+                    require(key not in outer_source or strict(row) == strict(outer_source[key]), 'conflicting_raw_E2_loss')
+                    outer_source[key] = row
+        counts = self._attempt_counts
+        saved, provenance_rows, artifacts = {'inner': [], 'outer': []}, [], {}
+        for stage, field in (('inner', 'full_setting_forecasts'), ('outer', 'outer_selected_forecasts')):
+            for row, plan in zip(publication[field], plans[stage]):
+                check()
+                game, variant, reason = row['game_id'], row.get('variant', 'full'), row['native_failure']
+                observed = graded['labels'][game]
+                source = sources[stage, tuple(plan['key'])]
+                loss_ref = None; flags = None
+                if plan['mode'] == 'new_score':
+                    law = _bound_law(view, assembly, row, stage)
+                    first = (year, row['setting']) not in self._seen_inner
+                    flags = {'double_grid': first if stage == 'inner' else True, 'diagnostics': stage == 'outer'}
+                    def score():
+                        counts['actual_score_calls'] += 1
+                        metrics = score_forecast(law, observed, game, **flags)
+                        return CallbackResult(metrics, reason, reason is not None)
+                    metrics = accounting.callback('score', score, game_id=game, setting=row['setting'],
+                        variant=variant, stage=stage, operation='score', **flags)
+                    if stage == 'inner':
+                        self._seen_inner.add((year, row['setting']))
+                    counts['scored_' + stage] += 1
+                else:
+                    source_stage = 'inner' if plan['mode'] == 'source_inner' else 'outer'
+                    source_key = (source['family'], source['setting'] if source_stage == 'inner' else source['variant'], game)
+                    original = (inner_source if source_stage == 'inner' else outer_source)[source_key]
+                    require(original['native_failure'] == reason, 'source_loss_native_reason_mismatch')
+                    metrics = copy.deepcopy(original['metrics'])
+                    loss_ref = {'kind': 'source_' + source_stage + '_loss',
+                        'file': copy.deepcopy(graded['source_pointers'][source_stage + '_losses']),
+                        'source_key': list(source_key)}
+                    counts[{'source_inner': 'copied_diagonal_inner', 'source_outer': 'copied_e3_outer',
+                            'raw_reference': 'copied_raw_outer'}[plan['mode']]] += 1
+                if stage == 'outer' and row['family'] == 'E3':
+                    law = _bound_law(view, assembly, row, stage)
+                    metrics = archive.parse(strict(metrics))
+                    for target in TARGETS:
+                        check(); counts['actual_mass_cdf_calls'] += 1
+                        high = law.cdf(target, metrics[target + '_upper_80'])
+                        check(); counts['actual_mass_cdf_calls'] += 1
+                        low = law.cdf(target, metrics[target + '_lower_80'] - 1)
+                        mass = float(high - low)
+                        require(math.isfinite(mass) and 0 <= mass <= 1, 'invalid_actual_interval_mass')
+                        metrics[target + '_interval_mass_80'] = mass
+                result = {k: row[k] for k in ('family', 'game_id', 'native_failure', 'setting' if stage == 'inner' else 'variant')}
+                result['metrics'] = metrics
+                saved[stage].append(result); counts[stage + '_rows'] += 1
+                provenance_rows.append({'stage': stage, 'key': plan['key'], 'mode': plan['mode'], 'native_failure': reason,
+                    'source_forecast': copy.deepcopy(plan['source']), 'source_loss': loss_ref, 'score_flags': flags,
+                    'law_work': copy.deepcopy(plan['law_work']), 'metrics_sha256': _hash(metrics)})
+        suffix = f"{year}-{origin['week']:02}"
+        for stage in ('inner', 'outer'):
+            if not saved[stage]:
+                continue
+            check()
+            name = stage + '-losses-' + suffix + '.json'
+            store.write(name, saved[stage]); artifacts[stage + '_losses'] = store.pointer(name)
+            reloaded = store.read_bound(artifacts[stage + '_losses'])
+            require(strict(reloaded) == strict(saved[stage]), 'saved_scores_changed')
+            for row in reloaded:
+                observed = graded['labels'][row['game_id']]
+                if stage == 'inner':
+                    archive._metrics(row['metrics'], {'homeScore': observed[0], 'awayScore': observed[1]}, False)
+                else:
+                    require(validate_metric(row['metrics'], row['family'] == 'E3')[:2] == tuple(observed), 'saved_metric_observation_mismatch')
+            saved[stage] = reloaded
+        check()
+        provenance = {'version': 'rf02f.origin-grading.v1', 'manifest_sha256': manifest_sha,
+            'origin': [year, origin['week']], 'publication': publication_pointer,
+            'source_pointers': {} if graded is None else graded['source_pointers'],
+            'score_artifacts': copy.deepcopy(artifacts), 'counts': counts, 'rows': provenance_rows}
+        name = 'grading-provenance-' + suffix + '.json'
+        store.write(name, provenance); artifacts['grading_provenance'] = store.pointer(name)
+        require(strict(store.read_bound(artifacts['grading_provenance'])) == strict(provenance), 'saved_grading_provenance_changed')
+        check()
+        os.fsync(store.fd)
+        check()
+        self._next += 1; self._stopped = False
+        return {'inner_rows': saved['inner'], 'outer_rows': saved['outer'],
+            'grading_receipt': None if graded is None else graded['grading_receipt'],
+            'artifacts': artifacts, 'counts': copy.deepcopy(counts)}

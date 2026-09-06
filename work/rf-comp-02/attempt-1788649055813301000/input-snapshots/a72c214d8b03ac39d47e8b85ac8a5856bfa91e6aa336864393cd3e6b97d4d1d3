@@ -1,0 +1,72 @@
+{
+  "actual_benchmark_observations": 288,
+  "created_at": "2026-09-05T22:36:04.765221+00:00",
+  "decision": "retain_CDF_component_evidence_defer_encoder_and_controller_integration_profile_remaining_cost",
+  "evidence": [
+    {
+      "bytes": 888,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/QUALIFICATION-PINS.json",
+      "sha256": "3fe288b5727703a2c10cfb67cfe71d3ea886eb99d650be35c4f03f6123b46c09"
+    },
+    {
+      "bytes": 8822,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/source-map-before.json",
+      "sha256": "a3e47ad92f75fb139096f9a7c59b77a429688647e01acdfbd895f07d5755547b"
+    },
+    {
+      "bytes": 8822,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/source-map-after.json",
+      "sha256": "a3e47ad92f75fb139096f9a7c59b77a429688647e01acdfbd895f07d5755547b"
+    },
+    {
+      "bytes": 129,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/unit-tests.json",
+      "sha256": "cfe042033ed008bfe4a357d1bb9a9bbb875f12ec8533feaed22e784a56b6442f"
+    },
+    {
+      "bytes": 2138606,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/benchmark.json",
+      "sha256": "8d6bd85a91694b0331cfa2e36a1fbabc589b060753ac87be9b540d8045f408e3"
+    },
+    {
+      "bytes": 7721,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/process.json",
+      "sha256": "847a5ec5352bc7e1c0c6d2a2fb040f7d7d26f6e0062a14bfa042f951ccaa2a29"
+    },
+    {
+      "bytes": 8347,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/implementation-evidence-review.json",
+      "sha256": "c5c0aa6b4ee7ae3c53010ef5d5a53a0987246dbf7a451b3b91e205a6513ac80d"
+    },
+    {
+      "bytes": 24892,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/numerical-review.json",
+      "sha256": "da0c32f94027108bb57d48d20e8076fefcc6c20515487bf0e8a7b72311572946"
+    },
+    {
+      "bytes": 1149,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/root-review.json",
+      "sha256": "f17c75d29a6a108c961d882663c262488181e6a1fbb404cc52f3734792b50889"
+    }
+  ],
+  "frozen_original_files": 66,
+  "historical_gate_unchanged": {
+    "F_plus_S_seconds": 0.007461491790146312,
+    "required_reduction_fraction": 0.524680169716677
+  },
+  "next_measurement": "one separate <=30s1024MiB original/both remaining-cost profile on the same fixed synthetic cases; attribution only, no new computational implementation",
+  "not_accepted": [
+    "historical_capacity",
+    "historical_restart",
+    "full_controller_integration",
+    "predictive_gain",
+    "external_five_percent",
+    "prospective",
+    "production"
+  ],
+  "status": "accepted_synthetic_exactness_and_insufficient_capacity_gain",
+  "synthetic_both_F_plus_S_seconds": 0.008955625991802663,
+  "synthetic_both_reduction_fraction": 0.22376141607882039,
+  "test_count": 21,
+  "version": "rf.comp01.qualification-acceptance.v1"
+}

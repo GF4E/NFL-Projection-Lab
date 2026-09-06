@@ -1,0 +1,21 @@
+{
+  "status": "rejected",
+  "scope": "independent_watchdog_ownership_review",
+  "source_sha256": "8fc861884e8263726fab714111020e6333cfe46aa37b7de079d577acb62dbab3",
+  "blockers": [
+    {
+      "id": "signal_after_wait4_before_returncode",
+      "finding": "wait4 releases PID ownership before child.returncode bookkeeping; SIGALRM in the gap calls kill_owned on a released numeric PGID. Cleanup then attempts a second wait and raises ChildProcessError.",
+      "reproduction": "Harmless pinned Python -I -c pass child; wrapper performed real wait4 then synchronously invoked installed SIGALRM handler before returning wait result. killpg intercepted and logged; no actual group signal.",
+      "observed_reaped_pid": 81010,
+      "observed_killpg_after_release": true,
+      "cleanup_error": "ChildProcessError",
+      "minimum_fix": "Make release/bookkeeping signal-safe and prove no signal targets a released PID/group, including interrupt delivery at the wait-return boundary."
+    }
+  ],
+  "limits": [
+    "No historical work, scorer, bootstrap or full fixture.",
+    "Source candidate remained in development; no final unit acceptance.",
+    "Other phase/runtime paths read but focused17 process suite not duplicated."
+  ]
+}

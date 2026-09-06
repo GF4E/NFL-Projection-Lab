@@ -1,0 +1,24 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "injected dumps failure",
+    "module": "builtins",
+    "type": "RuntimeError"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true
+  },
+  "failed_calls": 1,
+  "fallback_calls": 0,
+  "injected_error": "injected dumps failure",
+  "label": "injected-dumps",
+  "original": {
+    "ascii_body": "{\n  \"x\": [\n    1,\n    -0.0,\n    \"\\u00e9\"\n  ]\n}\n",
+    "bytes": 47,
+    "kind": "bytes",
+    "sha256": "20fb53a6e33f3ca90b6b78146f5053e31293bd14360b9f42ef184f1557f59ba8",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_unexpected_fastpath_errors_propagate_without_retry"
+}

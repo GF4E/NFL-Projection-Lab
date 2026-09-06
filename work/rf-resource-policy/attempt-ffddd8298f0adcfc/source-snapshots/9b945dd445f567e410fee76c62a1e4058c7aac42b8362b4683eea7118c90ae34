@@ -1,0 +1,173 @@
+"""Offline, explicit-path RF v2 admission/runtime and as-of feature boundary."""
+from datetime import datetime, timedelta
+import hashlib
+from importlib import metadata
+import json
+import os
+from pathlib import Path
+import platform
+import stat
+import sys
+
+import numpy as np
+import scipy
+
+from research_score_models import GameContext, HistoricalResult
+
+ACCEPTANCE_PATH = ".planning/engine-os/research-first/RF-01-ACCEPTANCE.v2.json"
+ACCEPTANCE_HASH = "a9ec511e1f05935d98a9dd271a5079a4f490d3f020b31a76cbd2661146f7c11e"
+BOUND_FIELDS = ("config", "specification", "dataChecks", "admittedData", "admissionScript", "admissionTests")
+
+
+def encoded(value):
+    return (json.dumps(value, sort_keys=True, indent=2, allow_nan=False) + "\n").encode()
+
+
+def digest(raw):
+    return hashlib.sha256(raw).hexdigest()
+
+
+def read_regular(path):
+    path = Path(path)
+    if not path.is_absolute() or ".." in path.parts:
+        raise ValueError("absolute_canonical_path_required")
+    directory = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        for component in path.parts[1:-1]:
+            following = os.open(component, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=directory)
+            os.close(directory)
+            directory = following
+        fd = os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=directory)
+    finally:
+        os.close(directory)
+    with os.fdopen(fd, "rb") as stream:
+        if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+            raise ValueError("non_regular_input_refused")
+        return stream.read()
+
+
+def verify_bound_reader(read_named):
+    """Receipt hash is checked BEFORE any path it contains can be opened."""
+    raw = read_named(ACCEPTANCE_PATH)
+    if digest(raw) != ACCEPTANCE_HASH:
+        raise ValueError("unaccepted_admission_receipt")
+    receipt = json.loads(raw)
+    if receipt["result"] != "accepted_research_prefit_only" or not receipt["authority"]["modelImplementationAuthorizedAfterThisReceiptCommit"]:
+        raise ValueError("prefit_not_accepted")
+    bound = {}
+    for field in BOUND_FIELDS:
+        value = read_named(receipt[field]["path"])
+        if digest(value) != receipt[field]["sha256"]:
+            raise ValueError("frozen_bytes_mismatch:" + field)
+        bound[field] = value
+    config, data = json.loads(bound["config"]), json.loads(bound["admittedData"])
+    if data["version"] != config["version"] or data["sourceIndexSha256"] != config["sourceIndexSha256"] or data["scheduleSha256"] != config["scheduleSha256"]:
+        raise ValueError("admitted_data_identity_mismatch")
+    return receipt, config, data, {key: digest(value) for key, value in bound.items()}
+
+
+def load_accepted(root):
+    # The authenticated acceptance document contains the sole permitted absolute data path.
+    root = Path(root).absolute()
+    return verify_bound_reader(lambda name: read_regular(Path(name) if Path(name).is_absolute() else root / name))
+
+
+def runtime_manifest(config):
+    if not sys.flags.isolated:
+        raise ValueError("isolated_python_required")
+    versions = {"python": platform.python_version(), "numpy": np.__version__, "scipy": scipy.__version__,
+                "pypdf": metadata.version("pypdf")}
+    if any(versions[key] != config["runtime"][key] for key in versions):
+        raise ValueError("unpinned_numerical_runtime")
+    distributions = {}
+    for name in ("numpy", "scipy", "pypdf"):
+        package = metadata.distribution(name)
+        raw = package.read_text("METADATA")
+        record = package.read_text("RECORD")
+        if raw is None or record is None:
+            raise ValueError("missing_distribution_metadata")
+        distributions[name] = {"metadataSha256": digest(raw.encode()), "recordSha256": digest(record.encode())}
+    executable = Path(sys.executable).resolve(strict=True)
+    return {"versions": versions, "executable": str(executable), "executableSha256": digest(read_regular(executable)),
+            "distributionMetadata": distributions, "isolatedMode": bool(sys.flags.isolated),
+            "networkAllowed": False, "providerAccessAllowed": False, "modelWorkers": 1}
+
+
+def context(row):
+    return GameContext(row["gameId"], row["season"], row["week"], row["homeTeam"], row["awayTeam"], row["neutral"])
+
+
+def prepare_origin(records, origin, delay=12):
+    if delay not in (12, 24):
+        raise ValueError("unregistered_availability_delay")
+    if len({row["gameId"] for row in records}) != len(records):
+        raise ValueError("duplicate_game_identity")
+    by_id = {row["gameId"]: row for row in records}
+    cutoff = datetime.fromisoformat(origin["originAt"])
+    if cutoff.utcoffset() is None:
+        raise ValueError("naive_origin_timestamp")
+    key = (origin["season"], origin["week"])
+    eligible = []
+    for row in sorted(records, key=lambda r: (r["season"], r["week"], r["gameId"])):
+        if (row["season"], row["week"]) >= key:
+            continue
+        kickoff = datetime.fromisoformat(row["kickoffAt"])
+        if kickoff.utcoffset() is None:
+            raise ValueError("naive_kickoff_timestamp")
+        available = kickoff + timedelta(hours=delay)
+        if available.isoformat() != row["availability"][str(delay)]:
+            raise ValueError("availability_proxy_mismatch")
+        if available < cutoff:
+            eligible.append(row)
+    ids = [r["gameId"] for r in eligible]
+    if ids != origin["windows"][str(delay)]["eligibleInputIds"]:
+        raise ValueError("admission_asof_mismatch")
+    if digest(encoded(ids)) != origin["windows"][str(delay)]["inputIdSha256"]:
+        raise ValueError("admission_input_id_hash_mismatch")
+    targets = [by_id[identity] for identity in origin["targetGameIds"]]
+    if any((r["season"], r["week"]) != key or datetime.fromisoformat(r["kickoffAt"]) <= cutoff for r in targets):
+        raise ValueError("invalid_target_origin")
+    # Target scores/OT remain on the grader side. They are absent from GameContext.
+    history = [HistoricalResult(context(r), r["homeScore"], r["awayScore"]) for r in eligible]
+    feature_rows = [{"context": vars(row.context), "home_score": row.home_score, "away_score": row.away_score}
+                    for row in history]
+    return {"targets": [context(r) for r in targets], "history": history,
+            "input_ids": ids, "input_hash": digest(encoded(feature_rows)),
+            "target_context_hash": digest(encoded([vars(context(r)) for r in targets])),
+            "origin_at": origin["originAt"], "availability": "retrospective_inferred",
+            "delay_hours": delay}
+
+
+def node_hash(node):
+    return digest(encoded({key: value for key, value in node.items() if key != "sha256"}))
+
+
+def verify_ancestry(nodes, expected_roots, cutoff):
+    """A small hash-bound dependency closure, not a general graph service."""
+    if len({node["id"] for node in nodes}) != len(nodes):
+        raise ValueError("duplicate_ancestor")
+    by_id, visited, visiting = {node["id"]: node for node in nodes}, set(), set()
+    if not isinstance(expected_roots, dict) or not expected_roots:
+        raise ValueError("expected_root_hashes_required")
+    def visit(identity, expected_hash):
+        if identity in visiting:
+            raise ValueError("cyclic_ancestry")
+        if identity not in by_id:
+            raise ValueError("missing_ancestor")
+        node = by_id[identity]
+        if node_hash(node) != node["sha256"] or node["sha256"] != expected_hash:
+            raise ValueError("ancestor_hash_mismatch")
+        if identity in visited:
+            return
+        if node["kind"] not in {"football_source", "feature_schema", "target_schema", "configuration", "transform", "model", "forecast"}:
+            raise ValueError("forbidden_ancestor_kind")
+        if node.get("available_at") is not None and datetime.fromisoformat(node["available_at"]) > cutoff:
+            raise ValueError("future_ancestor")
+        visiting.add(identity)
+        for parent in node["parents"]:
+            visit(parent["id"], parent["sha256"])
+        visiting.remove(identity)
+        visited.add(identity)
+    for identity, expected_hash in expected_roots.items():
+        visit(identity, expected_hash)
+    return sorted(visited)

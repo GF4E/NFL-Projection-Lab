@@ -1,0 +1,57 @@
+synthetic fixture year 2013: 256 games, 768 actual calls, 4096 exact reuses
+synthetic fixture year 2014: 512 games, 1536 actual calls, 8192 exact reuses
+synthetic fixture year 2015: 768 games, 2304 actual calls, 12288 exact reuses
+synthetic fixture year 2016: 1024 games, 3072 actual calls, 16384 exact reuses
+synthetic fixture year 2017: 1280 games, 3840 actual calls, 20480 exact reuses
+synthetic fixture year 2018: 1536 games, 4608 actual calls, 24576 exact reuses
+synthetic fixture year 2019: 1792 games, 5376 actual calls, 28672 exact reuses
+synthetic fixture year 2020: 2048 games, 6144 actual calls, 32768 exact reuses
+synthetic fixture year 2021: 2320 games, 6960 actual calls, 37120 exact reuses
+synthetic fixture year 2022: 2591 games, 7773 actual calls, 41456 exact reuses
+synthetic fixture year 2023: 2863 games, 8589 actual calls, 45808 exact reuses
+synthetic fixture year 2024: 3135 games, 9405 actual calls, 50160 exact reuses
+synthetic fixture year 2025: 3407 games, 10221 actual calls, 54512 exact reuses
+{
+  "status": "passed",
+  "source_hashes": {
+    "scripts/research_score_split_inference.py": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22",
+    "tests/research-score-split/test_inference_unit.py": "6678ff40c73b2d5c493cd22d6e2321f7d9edb2d6d5b0a1241c29420c33e9040d",
+    "tests/research-score-split/qualify_inference_unit.py": "bdc7016088a8e094e1c4c023e962b0be4935065d5f63df0c9c11e1bf6ef824d3"
+  },
+  "historical_execution": false,
+  "fixture_pointer": {
+    "name": "fixture-manifest.json",
+    "sha256": "22bd22dcb3b08218385fab0ddb52471d178f31e9ca84bf9fa202d09c96d9354d",
+    "bytes": 380428
+  },
+  "generation_seconds": 73.54062933300156,
+  "reload_validation_seconds": 32.99104520799301,
+  "public_evaluator_seconds": 13.86764429199684,
+  "evaluation_pointer": {
+    "name": "evaluation.json",
+    "sha256": "caeda7fa5f04c1fbfc2bedd8fcb8a8bc4bfec6631222f4ee0665ddee9e081352",
+    "bytes": 10725042
+  },
+  "derived_toy_label": "reject_all",
+  "counts": {
+    "actual_scorer_calls": 10221,
+    "exact_reuses": 54512,
+    "games": 3407,
+    "origins": 226,
+    "rows": 64733
+  },
+  "validation": {
+    "actual_game_pit_checks": 40884,
+    "unique_score_keys": 10221,
+    "reuses": 54512,
+    "signed_zero_metric_values": 8075
+  },
+  "bridge_pointer": {
+    "name": "mean-mapper-scorer-bridge.json",
+    "sha256": "c46dee7db2e7e3edf1b318dc20bb3f1a9126e5519c92af98c626e17fc36504fe",
+    "bytes": 15642
+  },
+  "complete_public_evaluator": true,
+  "total_seconds_including_setup": 121.08971812500386,
+  "peak_rss_mib": 719.953125
+}

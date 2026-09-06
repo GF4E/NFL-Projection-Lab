@@ -1,0 +1,422 @@
+"""Tiny synthetic assembler boundaries; no archive admission or scoring.
+
+The accounting fixture supplies one explicit synthetic origin to the accepted
+real origin/callback methods. It does not claim the production277-origin gate.
+"""
+import copy
+from contextlib import contextmanager
+from dataclasses import replace
+import hashlib
+import json
+from pathlib import Path
+import sys
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import numpy as np
+import research_score_split_forecast as f
+from research_score_distribution import JointDistribution, NumericalFailure
+from research_score_models import GameContext, HistoricalResult, MeanTrajectory, weights
+from research_score_split_models import SPLIT_VARIANTS, split_setting_grid
+from research_score_split_replay import SplitTrajectoryBank
+from research_score_split_run import OriginAccounting, RuntimeEnvelope, RuntimeStop, strict
+
+
+TEAMS = tuple(f'T{i:02}' for i in range(32))
+PARENT = {'parent_manifest_sha256': f.PARENT_MANIFEST, 'parent_index_sha256': f.PARENT_INDEX}
+
+
+def native(value):
+    return json.loads(strict(value))
+
+
+def game(name, year, week, home=0, away=1):
+    return GameContext(name, year, week, TEAMS[home], TEAMS[away])
+
+
+def choice(year, selected):
+    candidates = [{'setting': i, 'mean_energy': 1. if i == selected else 2.,
+                   'failure_rate': 1. if selected is None else 0., 'eligible': selected is not None} for i in range(27)]
+    return {'setting': selected, 'status': 'no_eligible_setting' if selected is None else 'selected',
+            'games': 2, 'inner_seasons': [year-2, year-1], 'candidates': candidates}
+
+
+def fixture(year=2013):
+    """Real own histories and original diagonals on four synthetic origins."""
+    bank = SplitTrajectoryBank(TEAMS)
+    old = {(i, v): MeanTrajectory('E2', {'k': s['ks'], 'retention': s['retention']}, TEAMS, v)
+           for i, s in enumerate(split_setting_grid()[:9]) for v in f.STATE_VARIANTS}
+    warm, first, third = (game(name, 2010, week) for week, name in enumerate(('warm', 'first', 'third'), 1))
+    results = [HistoricalResult(warm, 20, 10), HistoricalResult(first, 26, 14), HistoricalResult(third, 13, 24)]
+    data = None
+    steps = [(2010, 1, [warm], [], []), (2010, 2, [first], results[:1], results[:1]),
+             (2010, 3, [third], results[:2], results[:1])]
+    if year == 2010:
+        steps = steps[:1]
+    else:
+        steps.append((year, 1, [game('z-target', year, 1), game('a-target', year, 1, 2, 3)], results, results[:2]))
+    for y, week, targets, h12, h24 in steps:
+        data = {d: {'history': h, 'targets': targets} for d, h in ((12, h12), (24, h24))}
+        diagonal = {(i, v): native(e.forecast_origin(y, week, **{
+            'eligible_results': data[24 if v == 'availability_24h' else 12]['history'], 'targets': targets}))
+                    for (i, v), e in old.items()}
+        outputs = bank.advance(y, week, data, diagonal)
+    origin = {'season': year, 'week': 1, 'originAt': f'{year}-09-01T12:00:00+00:00',
+              'targetGameIds': [g.game_id for g in targets],
+              'windows': {'12': {'eligibleInputIds': [r.context.game_id for r in data[12]['history']]}}}
+    prepared = {d: {**data[d], 'origin_at': origin['originAt'], 'delay_hours': d,
+                    'input_hash': hashlib.sha256(strict([r.context.game_id for r in data[d]['history']])).hexdigest()}
+                for d in (12, 24)}
+    view = {'origin': origin, 'prepared_receipts': prepared, 'bank_prepared': data, 'diagonal_outputs': diagonal,
+            'source_laws': {'full': {}, 'outer': {}}, 'mapper_sources': {}, 'mappers': {},
+            'original_selection': None if year < 2013 else {family: {'setting': 0} for family in ('N0', 'E2', 'E1', 'S1')},
+            'source_pointers': {}}
+    pointers = {}
+    if year == 2010:
+        return view, bank, outputs, pointers
+    for d in (12, 24):
+        h = data[d]['history']
+        mapper = f.JointBase.from_scores([[r.home_score, r.away_score] for r in h], weights(h, year, 2.5))
+        payload = native({'atoms': mapper.atoms, 'weights': mapper.weights, 'b': mapper.b,
+                          'epsilon': mapper.epsilon, 'input_sha256': prepared[d]['input_hash'], 'half_life': 2.5})
+        digest = hashlib.sha256(strict(payload)).hexdigest()
+        pointers[d] = {'name': 'object-' + digest + '.json', 'sha256': digest}
+        view['mapper_sources'][d] = {'pointer': pointers[d], 'payload': payload}
+        view['mappers'][d] = mapper
+    laws = {}
+    def law(mean, variant):
+        d = 24 if variant == 'availability_24h' else 12
+        key = d, tuple(mean), variant == 'independent_marginals'
+        if key not in laws:
+            fitted = view['mappers'][d].fit(mean)
+            if key[2]:
+                fitted = replace(fitted, independent=True)
+            laws[key] = native(f.distribution_descriptor(fitted, pointers[d]))
+        return copy.deepcopy(laws[key])
+    for gid in origin['targetGameIds']:
+        full = view['source_laws']['full']
+        full['N0', 0, gid] = {'family': 'N0', 'setting': 0, 'game_id': gid, 'native_failure': None,
+                              'distribution': law([20., 16.], 'full')}
+        for i in range(9):
+            forecast = next(r for r in outputs['E3', i, 'full']['forecasts'] if r['game_id'] == gid)
+            full['E2', i, gid] = {'family': 'E2', 'setting': i, 'game_id': gid, 'native_failure': forecast['failure'],
+                                  'distribution': law(forecast['mean'], 'full')}
+    if year >= 2013:
+        for family, variant in f._SOURCE_SERIES:
+            for gid in origin['targetGameIds']:
+                mean = [20., 16.]
+                if family == 'E2':
+                    selected = bank.selected_output(outputs, 'E3', 0, variant)
+                    mean = next(r['mean'] for r in selected['forecasts'] if r['game_id'] == gid)
+                view['source_laws']['outer'][family, variant, gid] = {
+                    'family': family, 'setting': 0, 'variant': variant, 'game_id': gid, 'native_failure': None,
+                    'distribution': law(mean, variant)}
+    raw = strict({'full': list(view['source_laws']['full'].values()), 'outer': list(view['source_laws']['outer'].values())})
+    view['source_pointers']['forecasts'] = {'name': f'forecasts-{year}-01.json',
+                                           'sha256': hashlib.sha256(raw).hexdigest(), 'bytes': len(raw)}
+    return view, bank, outputs, pointers
+
+
+@contextmanager
+def measured(origin):
+    # Explicit tiny-fixture construction, with the real envelope, origin and
+    # callback implementation. The production full-plan constructor is intact.
+    envelope = RuntimeEnvelope()
+    acc = object.__new__(OriginAccounting)
+    acc.envelope, acc._plan, acc._origins = envelope, (strict(origin),), []
+    acc._active_origin = acc._active_callback = None
+    try:
+        with acc.origin(origin):
+            yield acc
+    finally:
+        envelope.close()
+
+
+class ForecastUnitTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.fixtures = {year: fixture(year) for year in (2010, 2011, 2013, 2025)}
+
+    def inputs(self, year=2013):
+        return copy.deepcopy(self.fixtures[year])
+
+    def assemble(self, inputs, selected=0):
+        view, bank, outputs, pointers = inputs
+        with measured(view['origin']) as accounting:
+            result = f.assemble_forecasts(view, bank, outputs,
+                None if view['origin']['season'] < 2013 else choice(view['origin']['season'], selected),
+                local_mapper_pointers=pointers, parent_binding=PARENT, accounting=accounting)
+        calls = accounting._origins[0]['callbacks']
+        for i, call in enumerate(calls):
+            self.assertGreater(call['seconds'], 0)
+            self.assertEqual(call['kind'], 'fit')
+            if i:
+                self.assertGreaterEqual(call['started_seconds'], calls[i-1]['finished_seconds'])
+        return result, calls
+
+    def test_state_only_has_no_law_callbacks_or_outputs(self):
+        with patch.object(f.JointBase, 'fit', side_effect=AssertionError('no2010fits')):
+            result, calls = self.assemble(self.inputs(2010))
+        self.assertEqual(result, {'full_setting_forecasts': [], 'outer_selected_forecasts': [],
+                                 'grading_plan': {'inner': [], 'outer': []}, 'resolved_laws': {}})
+        self.assertEqual(calls, [])
+
+    def test_inner_population_order_diagonals_and_real_offdiagonal_laws(self):
+        inputs = self.inputs(2011)
+        result, calls = self.assemble(inputs)
+        rows = result['full_setting_forecasts']; plans = result['grading_plan']['inner']
+        self.assertEqual([(r['game_id'], r['setting']) for r in rows],
+                         [(g, i) for g in ('z-target', 'a-target') for i in range(27)])
+        self.assertEqual(len(calls), 36)
+        self.assertEqual(result['outer_selected_forecasts'], [])
+        for row, plan in zip(rows, plans):
+            self.assertEqual(plan['key'], ['E3', row['setting'], row['game_id']])
+            if row['setting'] < 9:
+                original = inputs[0]['source_laws']['full']['E2', row['setting'], row['game_id']]
+                self.assertEqual(row, {**original, 'family': 'E3'})
+                self.assertEqual(plan['mode'], 'source_inner')
+                self.assertEqual(plan['law_work']['fit_calls'], 0)
+            else:
+                law = result['resolved_laws']['inner', row['setting'], row['game_id']]
+                self.assertEqual(native(f.distribution_descriptor(law, inputs[3][12])), row['distribution'])
+                self.assertEqual(plan['law_work']['fit_calls'], 1)
+                self.assertEqual(plan['law_work']['descriptor_recoveries'], 1)
+                self.assertIsNone(row['native_failure'])
+
+    def test_same_selected_reuses_exact_eleven_and_scores_only_new_zero_controls(self):
+        inputs = self.inputs()
+        before = strict(inputs[0]['source_laws']['outer']['E2', 'deterministic_noise', 'z-target'])
+        result, calls = self.assemble(inputs)
+        rows = result['outer_selected_forecasts']; plans = result['grading_plan']['outer']
+        expected = [(family, v, g) for family, v in tuple(('E3', v) for v in SPLIT_VARIANTS) + f.RAW_REFERENCES
+                    for g in ('z-target', 'a-target')]
+        self.assertEqual([(r['family'], r['variant'], r['game_id']) for r in rows], expected)
+        self.assertEqual([p['key'] for p in plans], [list(k) for k in expected])
+        self.assertEqual(sum(p['mode'] == 'source_outer' for p in plans), 22)
+        self.assertEqual(sum(p['mode'] == 'new_score' for p in plans), 4)
+        self.assertEqual(sum(p['mode'] == 'raw_reference' for p in plans), 12)
+        self.assertEqual(sum(c['stage'] == 'outer' and c['operation'] == 'fit' for c in calls), 4)
+        for row, plan in zip(rows, plans):
+            if plan['source']:
+                self.assertEqual(plan['source']['kind'], 'source_forecast')
+                self.assertEqual(plan['source']['forecast_file'], inputs[0]['source_pointers']['forecasts'])
+                self.assertNotIn('loss_file', plan['source'])
+            if plan['mode'] == 'source_outer':
+                self.assertEqual(row, {**inputs[0]['source_laws']['outer']['E2', row['variant'], row['game_id']], 'family': 'E3'})
+        self.assertEqual(before, strict(inputs[0]['source_laws']['outer']['E2', 'deterministic_noise', 'z-target']))
+
+    def test_different_diagonal_full_uses_source_inner_law_but_requires_outer_score(self):
+        inputs = self.inputs()
+        result, calls = self.assemble(inputs, 1)
+        e3 = result['grading_plan']['outer'][:26]
+        self.assertTrue(all(p['mode'] == 'new_score' for p in e3))
+        for plan in e3[:2]:
+            self.assertEqual(plan['source']['source_population'], 'full_setting_forecasts')
+            self.assertEqual(plan['source']['source_key'][:3], ['E2', 1, 'full'])
+        self.assertEqual(sum(c['stage'] == 'outer' and c['operation'] == 'recovery' for c in calls), 2)
+        self.assertEqual(sum(c['stage'] == 'outer' and c['operation'] == 'fit' for c in calls), 24)
+
+    def test_selected_offdiagonal_full_reuses_current_own_inner_only(self):
+        inputs = self.inputs()
+        native_before = strict(inputs[2]['E3', 9, 'full'])
+        result, calls = self.assemble(inputs, 9)
+        for gid in ('z-target', 'a-target'):
+            self.assertIs(result['resolved_laws']['inner', 9, gid], result['resolved_laws']['outer', 'full', gid])
+        self.assertEqual(sum(c['stage'] == 'outer' for c in calls), 24)
+        self.assertTrue(all(p['source'] is None for p in result['grading_plan']['outer'][:26]))
+        self.assertEqual(native_before, strict(inputs[2]['E3', 9, 'full']))
+        self.assertEqual(result['grading_plan']['outer'][0]['law_work']['kind'], 'current_origin_cache')
+
+    def test_2025_no_unused_inner_or_offdiagonal_work(self):
+        result, calls = self.assemble(self.inputs(2025), 26)
+        self.assertEqual(result['full_setting_forecasts'], [])
+        self.assertEqual(result['grading_plan']['inner'], [])
+        self.assertEqual(len(calls), 26)
+        self.assertTrue(all(c['stage'] == 'outer' and c['setting'] == 26 for c in calls))
+
+    def test_noeligible_lazy_same_variant_fallback_without_fit_or_sentinel_escape(self):
+        inputs = self.inputs(2025)
+        with patch.object(f.JointBase, 'fit', side_effect=AssertionError('noeligible must not fit')):
+            result, calls = self.assemble(inputs, None)
+        self.assertEqual(len(calls), 26)
+        for row in result['outer_selected_forecasts'][:26]:
+            v = row['variant']; gid = row['game_id']
+            fallback = f._Assembly.fallback_variant(v)
+            self.assertEqual(row['native_failure'], 'no_eligible_setting')
+            self.assertEqual(row['distribution'], inputs[0]['source_laws']['outer']['N0', fallback, gid]['distribution'])
+            self.assertIsInstance(result['resolved_laws']['outer', v, gid], JointDistribution)
+        self.assertTrue(all(c['used_fallback'] for c in calls))
+        work = [p['law_work'] for p in result['grading_plan']['outer'][:26]]
+        self.assertEqual(sum(w['fit_calls'] for w in work), 0)
+        self.assertGreater(sum(w['source_cache_hits'] for w in work), 0)
+        self.assertGreater(sum(w['saved_recoveries'] for w in work), 0)
+
+    def test_grid_failure_one_attempt_exact_reason_and_delay_specific_N0(self):
+        inputs = self.inputs(2025)
+        real_fit = f.JointBase.fit
+        fit_calls = []
+        def fit(mapper, mean, *args, **kw):
+            fit_calls.append(mapper)
+            return real_fit(mapper, mean, *args, **kw)
+        with patch.object(f.JointBase, 'fit', fit), patch.object(JointDistribution, 'grid', side_effect=NumericalFailure('synthetic_grid_failure')):
+            result, calls = self.assemble(inputs, 9)
+        self.assertEqual(len(fit_calls), 26)
+        self.assertEqual(len(calls), 26)
+        for row in result['outer_selected_forecasts'][:26]:
+            self.assertEqual(row['native_failure'], 'synthetic_grid_failure')
+            fallback = f._Assembly.fallback_variant(row['variant'])
+            self.assertEqual(row['distribution'], inputs[0]['source_laws']['outer']['N0', fallback, row['game_id']]['distribution'])
+        availability = next(r for r in result['outer_selected_forecasts'] if r['variant'] == 'availability_24h')
+        self.assertEqual(availability['distribution']['mapper'], inputs[3][24])
+        self.assertNotEqual(inputs[3][12], inputs[3][24])
+
+    def test_native_absorbing_failure_uses_original_reason_without_fit_for_that_engine(self):
+        inputs = self.inputs(2025)
+        view, bank, outputs, _ = inputs
+        engine = bank.engines['E3', 9, 'full']
+        engine._absorb('synthetic_absorbing_failure')
+        output = outputs['E3', 9, 'full']; output['absorbing_failure'] = True
+        for row in output['forecasts']:
+            row.update(mean=None, failure=engine.failure_reason)
+        result, calls = self.assemble(inputs, 9)
+        full_calls = [c for c in calls if c['variant'] == 'full']
+        self.assertTrue(all(c['native_failure'] == 'synthetic_absorbing_failure' and c['used_fallback'] for c in full_calls))
+        self.assertTrue(all(p['law_work']['fit_calls'] == 0 for p in result['grading_plan']['outer'][:2]))
+
+    def test_saved_original_fallback_reason_and_descriptor_are_copied_unchanged(self):
+        inputs = self.inputs(2025); view = inputs[0]
+        for gid in view['origin']['targetGameIds']:
+            outer = view['source_laws']['outer']
+            outer['E2', 'full', gid]['native_failure'] = 'original_solver_failure'
+            outer['E2', 'full', gid]['distribution'] = copy.deepcopy(outer['N0', 'full', gid]['distribution'])
+        result, calls = self.assemble(inputs, 0)
+        for row, plan in zip(result['outer_selected_forecasts'][:2], result['grading_plan']['outer'][:2]):
+            self.assertEqual(plan['mode'], 'source_outer')
+            self.assertEqual(plan['law_work']['fit_calls'], 0)
+            self.assertEqual(row['native_failure'], 'original_solver_failure')
+            self.assertEqual(row['distribution'], view['source_laws']['outer']['N0', 'full', row['game_id']]['distribution'])
+        self.assertTrue(all(c['used_fallback'] for c in calls if c['variant'] == 'full'))
+
+    def test_inner_grid_fallback_uses_full_N0_with_one_measured_resolution(self):
+        inputs = self.inputs(2011)
+        with patch.object(JointDistribution, 'grid', side_effect=NumericalFailure('inner_grid_failed')):
+            result, calls = self.assemble(inputs)
+        self.assertEqual(len(calls), 36)
+        new = [(r, p) for r, p in zip(result['full_setting_forecasts'], result['grading_plan']['inner']) if r['setting'] >= 9]
+        for row, plan in new:
+            self.assertEqual(row['native_failure'], 'inner_grid_failed')
+            self.assertEqual(row['distribution'], inputs[0]['source_laws']['full']['N0', 0, row['game_id']]['distribution'])
+            self.assertEqual(plan['law_work']['fit_calls'], 1)
+        self.assertEqual(sum(p['law_work']['saved_recoveries'] for _, p in new), 2)
+        self.assertEqual(sum(p['law_work']['source_cache_hits'] for _, p in new), 34)
+
+    def test_new_independence_noise_shuffle_and_both_zero_controls_use_selected_own_means(self):
+        inputs = self.inputs(2025); view, bank, outputs, _ = inputs
+        result, calls = self.assemble(inputs, 26)
+        rows = {(r['variant'], r['game_id']): r for r in result['outer_selected_forecasts'] if r['family'] == 'E3'}
+        for variant in ('independent_marginals', 'deterministic_noise', 'shuffled_identity',
+                        'zero_strength_update', 'zero_scoring_level_update'):
+            expected = bank.selected_output(outputs, 'E3', 26, variant)
+            for forecast in expected['forecasts']:
+                row = rows[variant, forecast['game_id']]
+                self.assertIsNone(row['native_failure'])
+                np.testing.assert_allclose(row['distribution']['mean'], forecast['mean'], rtol=0, atol=1e-7)
+                self.assertIs(row['distribution']['independent'], variant == 'independent_marginals')
+                if variant == 'independent_marginals':
+                    self.assertEqual(row['distribution']['covariance'][0][1], 0.)
+
+    def test_invalid_native_population_origin_mean_and_borrowed_flag_before_callbacks(self):
+        for case in ('missing', 'extra', 'reverse', 'mean', 'flag', 'origin', 'borrowed'):
+            inputs = self.inputs(2025); view, bank, outputs, pointers = inputs
+            row = outputs['E3', 26, 'full']['forecasts'][0]
+            if case == 'missing': outputs.pop(('E3', 26, 'full'))
+            elif case == 'extra': outputs['E3', 27, 'full'] = outputs['E3', 26, 'full']
+            elif case == 'reverse': outputs['E3', 26, 'full']['forecasts'].reverse()
+            elif case == 'mean': row['mean'] = np.asarray(row['mean']) + 1.
+            elif case == 'flag': row['initialization_only'] = not row['initialization_only']
+            elif case == 'origin': bank.engines['E3', 26, 'full'].last_origin = (2024, 1)
+            else: outputs['E3', 0, 'full']['forecasts'][0]['failure'] = 'fake'
+            with self.subTest(case=case), measured(view['origin']) as acc:
+                with self.assertRaises(ValueError):
+                    f.assemble_forecasts(view, bank, outputs, choice(2025, 26), local_mapper_pointers=pointers, parent_binding=PARENT, accounting=acc)
+                self.assertEqual(acc._active_origin['callbacks'], [])
+
+    def test_wrong_source_selection_mean_flags_mapper_or_forecast_pointer_rejected(self):
+        for case in ('setting', 'mean', 'independence', 'mapper', 'payload', 'failure', 'missingN0', 'loss_pointer', 'label'):
+            inputs = self.inputs(2025); view, bank, outputs, pointers = inputs
+            row = view['source_laws']['outer']['E2', 'full', 'z-target']
+            if case == 'setting': row['setting'] = 1
+            elif case == 'mean': row['distribution']['mean'][0] += 1.
+            elif case == 'independence': row['distribution']['independent'] = True
+            elif case == 'mapper': pointers[24] = copy.deepcopy(pointers[12])
+            elif case == 'payload': view['mapper_sources'][12]['payload']['epsilon'] *= 2
+            elif case == 'failure': view['source_laws']['outer']['N0', 'full', 'z-target']['native_failure'] = 'fake'
+            elif case == 'missingN0': view['source_laws']['outer'].pop(('N0', 'availability_24h', 'z-target'))
+            elif case == 'loss_pointer': view['source_pointers']['forecasts']['name'] = 'outer-losses-2025-01.json'
+            else: row['observed_home'] = 20
+            with self.subTest(case=case), measured(view['origin']) as acc:
+                with self.assertRaises(ValueError):
+                    f.assemble_forecasts(view, bank, outputs, choice(2025, 9), local_mapper_pointers=pointers, parent_binding=PARENT, accounting=acc)
+                self.assertEqual(acc._active_origin['callbacks'], [])
+
+    def test_choice_must_be_frozen_prior_two_year_strict_decision(self):
+        for case in ('future', 'bool', 'chosen', 'missing', 'tie', 'failure', 'nan'):
+            view, bank, outputs, pointers = self.inputs(2025)
+            decision = choice(2025, 9)
+            if case == 'future': decision['inner_seasons'] = [2024, 2025]
+            elif case == 'bool': decision['setting'] = True
+            elif case == 'chosen': decision['setting'] = 10
+            elif case == 'missing': decision['candidates'].pop()
+            elif case == 'tie': decision['candidates'][0]['mean_energy'] = 1. + 1e-9
+            elif case == 'failure': decision['candidates'][9]['failure_rate'] = .006
+            else: decision['candidates'][9]['mean_energy'] = float('nan')
+            with self.subTest(case=case), measured(view['origin']) as acc:
+                with self.assertRaises(ValueError):
+                    f.assemble_forecasts(view, bank, outputs, decision, local_mapper_pointers=pointers, parent_binding=PARENT, accounting=acc)
+                self.assertEqual(acc._active_origin['callbacks'], [])
+
+    def test_source_recovery_corruption_abort_retains_failed_callback_no_retry(self):
+        view, bank, outputs, pointers = self.inputs(2025)
+        # Keep request/flags plausible; strict component recovery catches this.
+        view['source_laws']['outer']['E2', 'full', 'z-target']['distribution']['theta'][0] += .001
+        with measured(view['origin']) as acc:
+            with self.assertRaisesRegex(ValueError, 'distribution_parameter_hash_mismatch'):
+                f.assemble_forecasts(view, bank, outputs, choice(2025, 0), local_mapper_pointers=pointers, parent_binding=PARENT, accounting=acc)
+            calls = acc._active_origin['callbacks']
+            self.assertEqual(len(calls), 1)
+            self.assertEqual(calls[0]['operation'], 'recovery')
+            self.assertEqual(calls[0]['error_type'], 'ValueError')
+            self.assertGreater(calls[0]['seconds'], 0)
+
+    def test_runtime_stop_is_not_numerical_fallback_or_second_callback(self):
+        view, bank, outputs, pointers = self.inputs(2025)
+        with measured(view['origin']) as acc:
+            with patch.object(f.JointBase, 'fit', side_effect=RuntimeStop('synthetic_stop')) as fitted:
+                with self.assertRaisesRegex(RuntimeStop, 'synthetic_stop'):
+                    f.assemble_forecasts(view, bank, outputs, choice(2025, 9), local_mapper_pointers=pointers, parent_binding=PARENT, accounting=acc)
+            self.assertEqual(fitted.call_count, 1)
+            self.assertEqual(len(acc._active_origin['callbacks']), 1)
+            self.assertEqual(acc._active_origin['callbacks'][0]['error_type'], 'RuntimeStop')
+
+    def test_arrays_readonly_no_source_mutation_and_cache_not_global(self):
+        inputs = self.inputs(2025)
+        source_before = {k: strict(v) for k, v in inputs[0]['source_laws']['outer'].items()}
+        result, first_calls = self.assemble(inputs, None)
+        result2, second_calls = self.assemble(inputs, None)
+        self.assertEqual(len(first_calls), len(second_calls))
+        self.assertEqual(source_before, {k: strict(v) for k, v in inputs[0]['source_laws']['outer'].items()})
+        law = result['resolved_laws']['outer', 'full', 'z-target']
+        other = result2['resolved_laws']['outer', 'full', 'z-target']
+        for field in ('atoms', 'alpha', 'rates', 'theta'):
+            values = getattr(law, field)
+            self.assertFalse(values.flags.writeable)
+            self.assertFalse(np.shares_memory(values, getattr(other, field)))
+            self.assertFalse(np.shares_memory(values, inputs[0]['mappers'][12].atoms))
+        result['outer_selected_forecasts'][0]['distribution']['theta'][0] += 10.
+        self.assertEqual(source_before, {k: strict(v) for k, v in inputs[0]['source_laws']['outer'].items()})
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -1,0 +1,34 @@
+{
+  "candidate": {
+    "events": [
+      "late-before"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "error",
+      "message": "late canonical failure",
+      "module": "builtins",
+      "type": "RuntimeError"
+    },
+    "snapshots": []
+  },
+  "expected_decision": null,
+  "expected_modes": null,
+  "kind": "paired_value",
+  "label": "unsupported-left-leaf-late-hook",
+  "original": {
+    "events": [
+      "late-before"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "error",
+      "message": "late canonical failure",
+      "module": "builtins",
+      "type": "RuntimeError"
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_entire_canonical_traversal_precedes_fallback"
+}

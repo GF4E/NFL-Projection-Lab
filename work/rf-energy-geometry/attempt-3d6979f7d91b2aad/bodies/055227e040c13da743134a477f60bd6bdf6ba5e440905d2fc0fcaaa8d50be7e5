@@ -1,0 +1,228 @@
+{
+  "cache_after": {
+    "entries": [
+      [
+        4,
+        4
+      ],
+      [
+        8,
+        8
+      ]
+    ],
+    "evictions": 0,
+    "hits": 0,
+    "misses": 3,
+    "retained_bytes": 640
+  },
+  "cache_before": {
+    "entries": [
+      [
+        4,
+        4
+      ],
+      [
+        8,
+        8
+      ]
+    ],
+    "evictions": 0,
+    "hits": 0,
+    "misses": 2,
+    "retained_bytes": 640
+  },
+  "candidate": {
+    "events": [],
+    "input_after": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "000000000000f03f0000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f0bf000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          5,
+          5
+        ],
+        "strides": [
+          40,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "input_before": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "000000000000f03f0000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f0bf000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          5,
+          5
+        ],
+        "strides": [
+          40,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "result": {
+      "outcome": {
+        "kind": "error",
+        "message": "invalid_energy_score",
+        "module": "research_score_distribution",
+        "type": "NumericalFailure"
+      },
+      "warnings": []
+    }
+  },
+  "expected_error": "invalid_energy_score",
+  "expected_fallback": false,
+  "fallback_calls": 0,
+  "kind": "energy_parity",
+  "label": "failed-third",
+  "original": {
+    "events": [],
+    "input_after": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "000000000000f03f0000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f0bf000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          5,
+          5
+        ],
+        "strides": [
+          40,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "input_before": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "000000000000f03f0000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f0bf000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          5,
+          5
+        ],
+        "strides": [
+          40,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "result": {
+      "outcome": {
+        "kind": "error",
+        "message": "invalid_energy_score",
+        "module": "research_score_distribution",
+        "type": "NumericalFailure"
+      },
+      "warnings": []
+    }
+  },
+  "test": "test_energy_geometry.EnergyGeometryTests.test_failed_third_miss_does_not_publish_or_evict"
+}

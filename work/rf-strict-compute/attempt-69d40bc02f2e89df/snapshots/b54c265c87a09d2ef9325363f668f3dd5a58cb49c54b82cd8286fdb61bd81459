@@ -1,0 +1,274 @@
+"""One RF-02S replay through the frozen RF-02 runner after accepted qualification."""
+import argparse
+import ast
+import json
+from pathlib import Path
+import re
+import sys
+import types
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+import research_score_run as legacy
+import research_score_replay as replay
+from research_score_contract import digest, encoded, load_accepted, read_regular, runtime_manifest
+from research_score_successor_distribution import JointBase
+
+IMPLEMENTATION_PATH = ".planning/engine-os/research-first/RF-02S-IMPLEMENTATION.v1.json"
+ANCHOR_PATH = ".planning/engine-os/research-first/RF-02S-IMPLEMENTATION-ANCHOR.v1.json"
+NEW_CODE_FILES = ["scripts/research_score_successor_" + name + ".py"
+                  for name in ("distribution", "qualify", "run")]
+NEW_TEST_FILES = ["tests/research-score-successor/test_" + name + ".py"
+                  for name in ("solver", "qualify", "successor_run")]
+CODE_FILES = legacy.CODE_FILES + NEW_CODE_FILES
+TEST_FILES = legacy.TEST_FILES + NEW_TEST_FILES
+QUALIFICATION_CODE_FILES = [NEW_CODE_FILES[0], NEW_CODE_FILES[1], NEW_TEST_FILES[0], NEW_TEST_FILES[1]]
+RECEIPT_FIELDS = {"version", "result", "independentReviewer", "successorBindings", "codeHashes",
+                  "qualification", "runtime", "productionAuthorized", "providerAccessAllowed", "automaticRestart"}
+QUALIFICATION_FIELDS = {"directory", "manifestSha256", "indexSha256", "terminalSha256"}
+SMOKE_PROGRAM = """import sys, unittest
+suite = unittest.TestSuite()
+for directory in ('tests/research-score', 'tests/research-score-successor'):
+    suite.addTests(unittest.TestLoader().discover(directory, pattern='test_*.py'))
+result = unittest.TextTestRunner(verbosity=1).run(suite)
+raise SystemExit(not result.wasSuccessful())
+"""
+
+
+def _sha(value):
+    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+
+
+def _bound(path, sha, label):
+    if not _sha(sha):
+        raise ValueError("invalid_bound_hash:" + label)
+    raw = read_regular(path)
+    if digest(raw) != sha:
+        raise ValueError("frozen_bytes_mismatch:" + label)
+    return raw
+
+
+def verify_implementation(root, successor_config, bindings, runtime, code_hashes,
+                          output_parent=legacy.OUTPUT_PARENT):
+    """Authenticate the fixed receipt before opening its sole external directory."""
+    root = Path(root)
+    anchor_raw = read_regular(root / ANCHOR_PATH)
+    anchor = json.loads(anchor_raw)
+    if (set(anchor) != {"version", "receiptSha256"}
+            or anchor["version"] != "rf02s-implementation-anchor.v1"
+            or not _sha(anchor["receiptSha256"])):
+        raise ValueError("invalid_implementation_anchor")
+    receipt_raw = _bound(root / IMPLEMENTATION_PATH, anchor["receiptSha256"], "implementation_receipt")
+    receipt = json.loads(receipt_raw)
+    if (set(receipt) != RECEIPT_FIELDS or receipt["version"] != "rf02s-implementation-acceptance.v1"
+            or receipt["result"] != "accepted_for_one_replay"
+            or not isinstance(receipt["independentReviewer"], str) or not receipt["independentReviewer"].strip()
+            or any(receipt[name] is not False for name in
+                   ("productionAuthorized", "providerAccessAllowed", "automaticRestart"))):
+        raise ValueError("implementation_not_accepted")
+    if receipt["successorBindings"] != bindings or receipt["runtime"] != runtime:
+        raise ValueError("implementation_successor_or_runtime_mismatch")
+    if receipt["codeHashes"] != code_hashes or set(code_hashes) != set(CODE_FILES + TEST_FILES):
+        raise ValueError("implementation_code_freeze_mismatch")
+    qualification = receipt["qualification"]
+    if not isinstance(qualification, dict) or set(qualification) != QUALIFICATION_FIELDS:
+        raise ValueError("invalid_qualification_binding")
+    directory = Path(qualification["directory"])
+    if (not directory.is_absolute() or ".." in directory.parts or directory.parent != Path(output_parent)
+            or not re.fullmatch(r"rf02s-qualification-v1-[0-9a-f]{16}", directory.name)):
+        raise ValueError("invalid_qualification_directory")
+    # Both trust anchors are checked before the index can supply any file names.
+    manifest_raw = _bound(directory / "manifest.json", qualification["manifestSha256"], "qualification_manifest")
+    if directory.name != "rf02s-qualification-v1-" + digest(manifest_raw)[:16]:
+        raise ValueError("qualification_identity_mismatch")
+    index_raw = _bound(directory / "artifact-index.json", qualification["indexSha256"], "qualification_index")
+    index = json.loads(index_raw)
+    if not isinstance(index, dict) or set(index) != {"files"} or not isinstance(index["files"], dict):
+        raise ValueError("invalid_qualification_index")
+    files = index["files"]
+    required = {"manifest.json", "terminal-decision.json", "occurrence-ledger.json", "equivalence.json"}
+    if not required.issubset(files) or "artifact-index.json" in files:
+        raise ValueError("qualification_artifact_population_mismatch")
+    artifacts = {}
+    for name, bound in files.items():
+        if (not re.fullmatch(r"[a-z0-9][a-z0-9.-]*", name) or ".." in name
+                or not isinstance(bound, dict) or set(bound) != {"sha256", "bytes"}
+                or type(bound["bytes"]) is not int or bound["bytes"] < 0):
+            raise ValueError("unsafe_qualification_index_member")
+        raw = _bound(directory / name, bound["sha256"], "qualification_artifact:" + name)
+        if len(raw) != bound["bytes"]:
+            raise ValueError("qualification_artifact_size_mismatch")
+        artifacts[name] = raw
+    if artifacts["manifest.json"] != manifest_raw:
+        raise ValueError("qualification_manifest_index_mismatch")
+    terminal_raw = artifacts["terminal-decision.json"]
+    if not _sha(qualification["terminalSha256"]) or digest(terminal_raw) != qualification["terminalSha256"]:
+        raise ValueError("qualification_terminal_hash_mismatch")
+    manifest, terminal = json.loads(manifest_raw), json.loads(terminal_raw)
+    if (terminal.get("status") != "qualified" or terminal.get("qualificationFailures") != 0
+            or terminal.get("footballFits") != 0 or terminal.get("productionAuthorized") is not False):
+        raise ValueError("qualification_not_accepted")
+    expected_counts = {key: value for key, value in successor_config["corpus"].items()
+                       if key not in {"indexedFiles", "indexedBytes"}}
+    if (terminal.get("counts") != expected_counts
+            or terminal.get("repairedFailures") != (expected_counts["candidateFailureOccurrences"]
+                                                     + expected_counts["fatalBaselineOccurrences"])):
+        raise ValueError("qualification_population_mismatch")
+    expected_qualification_code = {name: code_hashes[name] for name in QUALIFICATION_CODE_FILES}
+    if (manifest.get("version") != "rf02s-qualification.v1"
+            or manifest.get("bindings") != bindings or manifest.get("runtime") != runtime
+            or manifest.get("oldSourceHashes") != successor_config["oldSourceHashes"]
+            or manifest.get("codeHashes") != expected_qualification_code
+            or manifest.get("oldManifestSha256") != successor_config["oldManifestSha256"]
+            or manifest.get("oldArtifactIndexSha256") != successor_config["oldArtifactIndexSha256"]
+            or manifest.get("footballFits") != 0 or manifest.get("providerRequests") != 0
+            or manifest.get("productionAuthorized") is not False):
+        raise ValueError("qualification_successor_or_code_mismatch")
+    return {"receipt": receipt, "receiptSha256": digest(receipt_raw), "anchorSha256": digest(anchor_raw),
+            "qualificationManifest": manifest, "qualificationTerminal": terminal,
+            "frozenObjects": [(ANCHOR_PATH, anchor_raw), (IMPLEMENTATION_PATH, receipt_raw)]}
+
+
+def preflight(root=ROOT):
+    from research_score_successor_qualify import load_successor
+    root = Path(root)
+    successor_config, bindings = load_successor(root)
+    accepted = load_accepted(root)
+    runtime = runtime_manifest(accepted[1])
+    if successor_config["budget"] != accepted[1]["budget"]:
+        raise ValueError("successor_budget_changed")
+    code_hashes = {name: digest(read_regular(root / name)) for name in CODE_FILES + TEST_FILES}
+    implementation = verify_implementation(root, successor_config, bindings, runtime, code_hashes)
+    return {"root": root, "accepted": accepted, "successorConfig": successor_config,
+            "bindings": bindings, "runtime": runtime, "codeHashes": code_hashes,
+            "implementation": implementation}
+
+
+def adapted_tree(source):
+    """Precisely three frozen-run adaptations: manifest, identity, smoke command."""
+    tree = ast.parse(source)
+    run_nodes = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "run"]
+    if len(run_nodes) != 1:
+        raise ValueError("inherited_run_structure_mismatch")
+    counts = {"manifest": 0, "identity": 0, "smoke": 0}
+    for node in ast.walk(run_nodes[0]):
+        if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+            name = node.targets[0].id
+            if name == "manifest":
+                if not isinstance(node.value, ast.Dict):
+                    raise ValueError("inherited_manifest_structure_mismatch")
+                keys = [key.value if isinstance(key, ast.Constant) else None for key in node.value.keys]
+                if keys.count("version") != 1 or "successor" in keys:
+                    raise ValueError("inherited_manifest_structure_mismatch")
+                version = node.value.values[keys.index("version")]
+                if not isinstance(version, ast.Constant) or version.value != "rf02.team-score.v2":
+                    raise ValueError("inherited_manifest_version_mismatch")
+                version.value = "rf02s.team-score.v1"
+                node.value.keys.append(ast.Constant("successor"))
+                node.value.values.append(ast.Name(id="_SUCCESSOR_BINDING", ctx=ast.Load()))
+                counts["manifest"] += 1
+            elif name == "store":
+                expected = ast.parse('ImmutableRun(OUTPUT_PARENT, "rf02-v2-" + manifest_hash[:16])', mode="eval").body
+                if ast.dump(node.value) != ast.dump(expected):
+                    raise ValueError("inherited_identity_structure_mismatch")
+                node.value.args[1].left.value = "rf02s-v1-"
+                counts["identity"] += 1
+            elif name == "smoke":
+                expected = ast.parse('[sys.executable, "-I", "-m", "unittest", "discover", "-s", "tests/research-score", "-p", "test_*.py"]', mode="eval").body
+                if (not isinstance(node.value, ast.Call)
+                        or ast.dump(node.value.func) != ast.dump(ast.parse("subprocess.run", mode="eval").body)
+                        or len(node.value.args) != 1 or ast.dump(node.value.args[0]) != ast.dump(expected)):
+                    raise ValueError("inherited_smoke_structure_mismatch")
+                node.value.args[0] = ast.Name(id="_SMOKE_COMMAND", ctx=ast.Load())
+                counts["smoke"] += 1
+    if counts != {"manifest": 1, "identity": 1, "smoke": 1}:
+        raise ValueError("inherited_adapter_match_count_mismatch")
+    return ast.fix_missing_locations(tree)
+
+
+def build_runner(context):
+    root = context["root"]
+    source = _bound(root / "scripts/research_score_run.py",
+                    context["successorConfig"]["oldSourceHashes"]["scripts/research_score_run.py"], "inherited_runner")
+    tree = adapted_tree(source.decode())
+    adapter_hash = digest(ast.dump(tree, include_attributes=False).encode())
+    module = types.ModuleType("_rf02s_inherited_runner")
+    module.__file__ = str(root / "scripts/research_score_run.py")
+    exec(compile(tree, module.__file__, "exec"), module.__dict__)
+    # Clone only the mapper factory's globals; legacy module bindings remain intact.
+    private_globals = dict(replay.common_mapper.__globals__, JointBase=JointBase)
+    module.common_mapper = types.FunctionType(replay.common_mapper.__code__, private_globals,
+                                              replay.common_mapper.__name__, replay.common_mapper.__defaults__)
+    module.CODE_FILES, module.TEST_FILES = CODE_FILES, TEST_FILES
+    module._SMOKE_COMMAND = [sys.executable, "-I", "-c", SMOKE_PROGRAM]
+    implementation = context["implementation"]
+    module._SUCCESSOR_BINDING = {
+        "version": "rf02s.numerical-successor.v1", "bindings": context["bindings"],
+        "qualification": implementation["receipt"]["qualification"],
+        "implementation_receipt_sha256": implementation["receiptSha256"],
+        "implementation_anchor_sha256": implementation["anchorSha256"],
+        "adapter_ast_sha256": adapter_hash,
+        "scope": "numerical_mean_matching_and_successor_provenance_only"}
+    original_store = module.ImmutableRun
+    frozen_objects = list(implementation["frozenObjects"])
+    acceptance_path = ".planning/engine-os/research-first/RF-02S-ACCEPTANCE.v1.json"
+    frozen_objects += [(acceptance_path, _bound(root / acceptance_path, context["bindings"]["acceptance"],
+                                               "successor_acceptance")),
+                       ("config/research-team-score-successor.v1.json",
+                        _bound(root / "config/research-team-score-successor.v1.json", context["bindings"]["config"],
+                               "successor_config")),
+                       (context["successorConfig"]["specification"]["path"],
+                        _bound(root / context["successorConfig"]["specification"]["path"],
+                               context["bindings"]["specification"], "successor_protocol"))]
+
+    class SuccessorStore(original_store):
+        def write(self, name, value):
+            result = super().write(name, value)
+            if name == "manifest.json":
+                for path, raw in frozen_objects:
+                    self.object({"path": path, "source": raw.decode(), "sha256": digest(raw)})
+            return result
+
+    module.ImmutableRun = SuccessorStore
+    def accepted_frozen():
+        from research_score_successor_qualify import load_successor
+        current = {name: digest(read_regular(root / name)) for name in CODE_FILES + TEST_FILES}
+        if current != context["codeHashes"]:
+            raise ValueError("implementation_changed_after_preflight")
+        current_successor, current_bindings = load_successor(root)
+        if current_successor != context["successorConfig"] or current_bindings != context["bindings"]:
+            raise ValueError("successor_changed_after_preflight")
+        current_accepted = load_accepted(root)
+        if current_accepted != context["accepted"]:
+            raise ValueError("inherited_acceptance_changed_after_preflight")
+        for path, raw in implementation["frozenObjects"]:
+            _bound(root / path, digest(raw), "implementation_document")
+        return current_accepted
+    module.load_accepted = lambda _root: accepted_frozen()
+    return module
+
+
+def run():
+    context = preflight()
+    return build_runner(context).run()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--run", action="store_true")
+    group.add_argument("--preflight", action="store_true")
+    args = parser.parse_args()
+    if args.preflight:
+        context = preflight()
+        adapted = build_runner(context)
+        print(json.dumps({"status": "successor_preflight_pass", "runtime": context["runtime"],
+                          "successor": adapted._SUCCESSOR_BINDING, "code_hashes": context["codeHashes"],
+                          "games": len(context["accepted"][2]["records"]),
+                          "origins": len(context["accepted"][2]["origins"]), "real_model_fits": 0}, sort_keys=True))
+        return 0
+    return run()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "{\n  \"empty\": [],\n  \"x\": [\n    -0.0,\n    1\n  ]\n}\n",
+    "bytes": 48,
+    "kind": "bytes",
+    "sha256": "c9917d1a3630c0bce525bd04ca1dc5ad12c6bbcb000f8ae2bf0661d90ac54209",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "valid-after-failure-1",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "dict"
+  },
+  "label": "valid-after-failure-1",
+  "original": {
+    "ascii_body": "{\n  \"empty\": [],\n  \"x\": [\n    -0.0,\n    1\n  ]\n}\n",
+    "bytes": 48,
+    "kind": "bytes",
+    "sha256": "c9917d1a3630c0bce525bd04ca1dc5ad12c6bbcb000f8ae2bf0661d90ac54209",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_failure_then_valid_has_no_retained_state"
+}

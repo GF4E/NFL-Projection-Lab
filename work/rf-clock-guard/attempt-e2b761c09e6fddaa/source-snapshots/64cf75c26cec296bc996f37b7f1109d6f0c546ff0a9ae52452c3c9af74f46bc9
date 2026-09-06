@@ -1,0 +1,93 @@
+"""Independent arithmetic expectations for the frozen RF-02F cost screen."""
+import copy
+from pathlib import Path
+import sys
+import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
+from research_score_split_budget import pilot_projection
+
+
+def call(seconds, *, native_success=True, full=True, off_diagonal=True, outer=False):
+    return dict(seconds=seconds, native_success=native_success, full=full,
+                off_diagonal=off_diagonal, outer=outer)
+
+
+def inputs():
+    pilots = [dict(season=2013, week=w, games=16, history_games=n, seconds=t,
+                   fit_calls=[call(.1)], score_calls=[call(.2, outer=True)])
+              for w, n, t in [(1, 100, 16.3), (2, 120, 8.3)]]
+    future = [dict(season=2013, week=3, games=16, history_games=100),
+              dict(season=2025, week=18, games=16, history_games=200)]
+    return pilots, future
+
+
+class BudgetTests(unittest.TestCase):
+    def test_hand_computed_full_work_and_input_nonmutation(self):
+        p, future = inputs(); before = copy.deepcopy((p, future))
+        got = pilot_projection(p, future, 100., 5., 10.)
+        # Remainder max=1 second/game; history-weighted future games=16+32.
+        # 100 +48*(1 +31*(.2+.4)) +10+60 =1110.8.
+        self.assertAlmostEqual(got['projected_total_seconds'], 1110.8, places=10)
+        self.assertEqual(got['remaining_weighted_games'], 48)
+        self.assertEqual(got['observed_fit_calls'], 2)
+        self.assertEqual(got['observed_score_calls'], 2)
+        self.assertEqual(got['fit_slots_per_future_game'], 31)
+        self.assertEqual(got['score_slots_per_future_game'], 31)
+        self.assertEqual((p, future), before)
+        self.assertFalse(got['historical_invocation_authorized'])
+        self.assertTrue(got['runtime_and_rss_enforcement_required'])
+
+    def test_failed_calls_raise_the_maximum_and_keep_remainder_disjoint(self):
+        p, future = inputs(); p[0]['fit_calls'].append(call(.3, native_success=False))
+        p[0]['seconds'] += .3
+        got = pilot_projection(p, future, 100., 5., 10.)
+        self.assertAlmostEqual(got['maximum_remainder_seconds_per_game'], 1)
+        self.assertEqual(got['maximum_fit_seconds'], .3)
+        self.assertEqual(got['observed_fit_calls'], 3)
+        self.assertAlmostEqual(got['projected_total_seconds'], 1706.)
+
+    def test_missing_successful_new_timing_anchors_fail(self):
+        for change in ('failed_fit', 'diagonal_fit', 'inner_only_score', 'failed_score', 'partial_score'):
+            with self.subTest(change=change):
+                p, future = inputs()
+                for row in p:
+                    if change == 'failed_fit': row['fit_calls'][0]['native_success'] = False
+                    if change == 'diagonal_fit': row['fit_calls'][0]['off_diagonal'] = False
+                    if change == 'inner_only_score': row['score_calls'][0]['outer'] = False
+                    if change == 'failed_score': row['score_calls'][0]['native_success'] = False
+                    if change == 'partial_score': row['score_calls'][0]['full'] = False
+                with self.assertRaises(ValueError): pilot_projection(p, future, 100., 5., 10.)
+
+    def test_2025_is_charged_full_slots_and_history_factor_has_floor(self):
+        p, future = inputs(); future[0]['history_games'] = 50
+        got = pilot_projection(p, future, 100., 5., 10.)
+        self.assertEqual(got['remaining_weighted_games'], 48)
+        self.assertAlmostEqual(got['projected_total_seconds'], 1110.8)
+
+    def test_inclusive_7200_screen_and_admission_reserve(self):
+        p, _ = inputs()
+        self.assertTrue(pilot_projection(p, [], 7130., 5., 10.)['within_time_screen'])
+        self.assertFalse(pilot_projection(p, [], 7130.001, 5., 10.)['within_time_screen'])
+        self.assertEqual(pilot_projection(p, [], 200., 5., 100.)['projected_total_seconds'], 310.)
+
+    def test_invalid_clocks_overlap_population_and_future_order_fail(self):
+        for bad in (True, float('nan'), float('inf'), -1., '1'):
+            p, future = inputs()
+            with self.subTest(bad=bad), self.assertRaises(ValueError):
+                pilot_projection(p, future, bad, 5., 10.)
+        for change in ('overlap', 'elapsed', 'order', 'duplicate', 'pilot_future', 'bad_count', 'boolean_flag'):
+            with self.subTest(change=change):
+                p, future = inputs(); elapsed=100.
+                if change == 'overlap': p[0]['seconds'] = .1
+                if change == 'elapsed': elapsed = 20.
+                if change == 'order': future.reverse()
+                if change == 'duplicate': future.append(copy.deepcopy(future[-1]))
+                if change == 'pilot_future': future[0]['week'] = 2
+                if change == 'bad_count': p[0]['games'] = True
+                if change == 'boolean_flag': p[0]['fit_calls'][0]['native_success'] = 1
+                with self.assertRaises(ValueError): pilot_projection(p, future, elapsed, 5., 10.)
+
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)

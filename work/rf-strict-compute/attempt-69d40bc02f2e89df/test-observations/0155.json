@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "[\n  {\n    \"x\": [\n      1,\n      2\n    ]\n  },\n  {\n    \"x\": [\n      1,\n      2\n    ]\n  },\n  {\n    \"again\": {\n      \"x\": [\n        1,\n        2\n      ]\n    }\n  }\n]\n",
+    "bytes": 161,
+    "kind": "bytes",
+    "sha256": "acd8919e4cc1cbb9edf6dd7644bebf1f2ffa769882882ba73f1100f62663fb8b",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "shared-acyclic",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "list"
+  },
+  "label": "shared-acyclic",
+  "original": {
+    "ascii_body": "[\n  {\n    \"x\": [\n      1,\n      2\n    ]\n  },\n  {\n    \"x\": [\n      1,\n      2\n    ]\n  },\n  {\n    \"again\": {\n      \"x\": [\n        1,\n        2\n      ]\n    }\n  }\n]\n",
+    "bytes": 161,
+    "kind": "bytes",
+    "sha256": "acd8919e4cc1cbb9edf6dd7644bebf1f2ffa769882882ba73f1100f62663fb8b",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_shared_acyclic_children_and_cycle_discrimination"
+}

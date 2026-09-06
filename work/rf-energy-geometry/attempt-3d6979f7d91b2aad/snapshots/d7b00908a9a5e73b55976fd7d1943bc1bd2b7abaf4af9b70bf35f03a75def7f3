@@ -1,0 +1,451 @@
+"""RF-COMP-04 controller routing and failure tests; no historical science.
+
+Chronology uses the accepted complete synthetic plan, real Store and real
+OriginAccounting with a deterministic synthetic clock. Scientific stages are
+explicit routing seams, never numeric evidence. Terminal tests use the real
+runtime/Store with synthetic preflight, admission and evaluator outcomes.
+All test substitutions target this new controller module only.
+"""
+import ast
+import copy
+from contextlib import contextmanager, ExitStack
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import tempfile
+import time
+from types import SimpleNamespace
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[2]
+import sys
+sys.path.insert(0, str(ROOT / 'scripts'))
+import research_score_split_compute_controller as c
+import research_score_split_controller as original_controller
+import research_score_split_run as runtime
+import research_score_split_replay as replay
+import research_score_split_watchdog as watchdog
+from research_score_split_archive import RAW_REFERENCES
+
+
+CONTROLLER_TEST_EVIDENCE = []
+
+
+def digest(value):
+    return hashlib.sha256(c.strict(value)).hexdigest()
+
+
+def load_plan():
+    path = ROOT / 'tests/research-score-split/test_run_unit.py'
+    spec = importlib.util.spec_from_file_location('compute_controller_plan_fixture', path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module.original_plan()
+
+
+class RoutingEnvelope:
+    """Synthetic clock, not runtime/capacity evidence; no shared clock patches."""
+    def __init__(self):
+        self.now = .75
+        self.peak_rss_mib = 64.
+        self.phase_measurements = [
+            {'name': 'admission', 'started_seconds': 0., 'finished_seconds': .25,
+             'seconds': .25, 'error_type': None},
+            {'name': 'inference_smoke', 'started_seconds': .25, 'finished_seconds': .75,
+             'seconds': .5, 'error_type': None}]
+
+    def elapsed(self): return self.now
+    def check(self): pass
+    def _after(self, error): self.check()
+    def call(self, function, *args, **kwargs):
+        self.now += .00001
+        try: return function(*args, **kwargs)
+        finally: self.now += .00001
+
+    def work(self, duration, error=None):
+        self.now += duration
+        if error is not None: raise error
+        return runtime.CallbackResult('EXPLICIT-NONNUMERICAL-ROUTING')
+
+
+class SourceStructureTests(unittest.TestCase):
+    def test_fixed_helpers_are_original_objects_and_composition_is_explicit(self):
+        import research_score_split_compute_integration as integration
+        import research_score_split_compute_preflight as preflight
+        for name in ('ControllerEnvelope', 'run_smoke', '_suffix', '_bank_state_digest',
+                     '_admission_evidence', 'publish_origin', 'validate_publication_binding',
+                     '_saved_inference_inputs'):
+            self.assertIs(getattr(c, name), getattr(original_controller, name))
+        self.assertIs(c.assemble_forecasts, integration.assemble_forecasts)
+        self.assertIs(c.PublishedOriginGrader, integration.PublishedOriginGrader)
+        self.assertIs(c.preflight, preflight.preflight)
+        self.assertIs(c.validate_runtime_files, preflight.validate_runtime_files)
+        self.assertIs(c.OriginAccounting, runtime.OriginAccounting)
+        self.assertIs(c.Store, runtime.Store)
+
+    def test_copied_functions_have_only_registered_ast_changes(self):
+        old = ast.parse(Path(original_controller.__file__).read_bytes())
+        new = ast.parse(Path(c.__file__).read_bytes())
+        functions = lambda tree: {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
+        left, right = functions(old), functions(new)
+        self.assertEqual(set(right), {'_launch', '_chronological_origins', 'run', '_worker_main'})
+        for name in right:
+            expected, actual = copy.deepcopy(left[name]), copy.deepcopy(right[name])
+            if name in ('_chronological_origins', 'run'):
+                expected.body = [n for n in expected.body if not isinstance(n, (ast.Import, ast.ImportFrom))]
+            if name == '_launch':
+                for node in ast.walk(expected):
+                    if isinstance(node, ast.Constant) and type(node.value) is str:
+                        node.value = node.value.replace('One accepted RF-02F worker', 'One accepted RF-COMP-04 worker')
+                        if node.value == 'rf02f-observer-': node.value = 'rfcomp04-observer-'
+            if name == 'run':
+                for node in ast.walk(expected):
+                    if isinstance(node, ast.Constant) and node.value == 'rf02f.terminal.v1':
+                        node.value = 'rfcomp04.terminal.v1'
+                additions = ast.parse('envelope.call(validate_runtime_files, envelope.check)\n'
+                                      'envelope.call(bound, ROOT / COMPUTE_PROTOCOL_PATH, COMPUTE_PROTOCOL_SHA)').body
+                body = next(n for n in expected.body if isinstance(n, ast.Try)).body
+                anchor = ast.parse('envelope.call(bound, ROOT/CONFIG, CONFIG_SHA)').body[0]
+                indices = [i for i, n in enumerate(body) if ast.dump(n) == ast.dump(anchor)]
+                self.assertEqual(len(indices), 1)
+                body[indices[0]+1:indices[0]+1] = additions
+            self.assertEqual(ast.dump(actual, include_attributes=False),
+                             ast.dump(expected, include_attributes=False), name)
+        source = Path(c.__file__).read_text()
+        self.assertLess(source.index("if __name__ == '__main__' and '--watchdog-phase-file'"),
+                        source.index('from research_score_conditional_admission import'))
+        self.assertNotIn('FunctionType', source)
+        self.assertNotIn('__globals__', source)
+
+
+class ChronologyTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.origins = load_plan()
+
+    def scenario(self, *, reject_pilot=False, wrong_origin=False, fail_grade=False):
+        origins = self.origins
+        trace, selected, fed, advanced, published, graded = [], {}, [], [], [], []
+        context = SimpleNamespace(origins=origins, teams=('AAA', 'BBB'), expected_by_season={
+            y: [g for o in origins if o['season'] == y for g in o['targetGameIds']] for y in range(2010, 2026)})
+        manifest = {'explicit_synthetic_dispatch_only': True}
+        manifest_sha = digest(manifest)
+        envelope = RoutingEnvelope()
+        accounting = runtime.OriginAccounting(envelope, origins)
+        progress = {'phase': 'synthetic_start', 'completed_origins': 0,
+                    'counts': dict.fromkeys(c.COUNT_KEYS, 0), 'artifacts': {}}
+        def event(kind, original, **extra):
+            trace.append({'kind': kind, 'origin': [original['season'], original['week']], **extra})
+        test = self
+
+        class Feed:
+            def __init__(self, ctx): test.assertIs(ctx, context)
+            def select(self, year, expected):
+                test.assertNotIn(year, selected); test.assertIs(expected, context.expected_by_season)
+                test.assertTrue(all(o['season'] < year for o in graded))
+                test.assertEqual([o for o in fed if o['season'] in (year-2, year-1)],
+                                 [o for o in origins if o['season'] in (year-2, year-1)])
+                selected[year] = {'setting': 0, 'inner_seasons': [year-2, year-1], 'routing_only': True}
+                event('select_before_current_labels', {'season': year, 'week': 1})
+                return {'E3': selected[year]}
+            def add(self, original, rows, receipt):
+                test.assertIs(graded[-1], original); test.assertNotIn(original, fed)
+                test.assertTrue(2011 <= original['season'] <= 2024)
+                test.assertEqual(receipt['origin'], [original['season'], original['week']])
+                test.assertEqual(rows, [['E3', i, game] for game in original['targetGameIds'] for i in range(27)])
+                fed.append(original); event('feed_after_saved_grade', original)
+
+        class Bank:
+            def __init__(self, teams):
+                test.assertEqual(teams, context.teams)
+                self.engines = {('E3', i, v): SimpleNamespace(last_origin=None, ratings=[], offense=[], defense=[])
+                    for i in range(27) for v in replay._STATE_VARIANTS if i >= 9 or v in replay._ZERO_VARIANTS}
+                test.assertEqual(len(self.engines), 216)
+            def advance(self, year, week, prepared, diagonal):
+                original = origins[len(advanced)]
+                test.assertEqual((year, week), (original['season'], original['week']))
+                test.assertIs(prepared, original); test.assertEqual(len(diagonal), 81)
+                if year >= 2013: test.assertIn(year, selected)
+                for engine in self.engines.values(): engine.last_origin = (year, week)
+                advanced.append(original); event('advance', original)
+                return {**diagonal, **{key: {'routing_state': [year, week]} for key in self.engines}}
+
+        def forecast(ctx, original, check):
+            test.assertIs(ctx, context); check(); event('forecast_inputs', original)
+            mappers = {}
+            for delay in (12, 24):
+                payload = {'synthetic_mapper_only': delay}; h = digest(payload)
+                mappers[delay] = {'payload': payload, 'pointer': {'name': 'object-'+h+'.json', 'sha256': h}}
+            return {'origin': {**original, 'week': 2} if wrong_origin else original,
+                'mapper_sources': mappers, 'bank_prepared': original,
+                'diagonal_outputs': {('E3', i, v): {'routing_state': [original['season'], original['week']]}
+                                     for i, v in replay._DIAGONAL_KEYS},
+                'source_pointers': {'synthetic_only': True}}
+
+        def assemble(view, bank, outputs, choice, **kwargs):
+            original = view['origin']; year = original['season']; ids = original['targetGameIds']
+            test.assertEqual(choice, selected.get(year)); test.assertEqual(len(outputs), 297)
+            test.assertIs(kwargs['accounting'], accounting)
+            event('composed_assembler_dispatch', original)
+            if (year, original['week']) in ((2013, 1), (2013, 2)):
+                accounting.callback('fit', lambda: envelope.work(.001), game_id=ids[0], setting=9,
+                    variant='full', stage='inner', operation='fit')
+                if reject_pilot and original['week'] == 2:
+                    with test.assertRaisesRegex(ValueError, 'intentional_callback_failure'):
+                        accounting.callback('fit', lambda: envelope.work(.008, ValueError('intentional_callback_failure')),
+                            game_id=ids[0], setting=10, variant='full', stage='inner', operation='fit')
+            return {'full_setting_forecasts': [['E3', i, g] for g in ids for i in range(27)]
+                        if 2011 <= year <= 2024 else [],
+                    'outer_selected_forecasts': [[family, variant, g]
+                        for family, variant in [('E3', v) for v in runtime.SPLIT_VARIANTS] + list(RAW_REFERENCES)
+                        for g in ids] if year >= 2013 else [], 'synthetic_routing_only': True}
+
+        def publish(store, man, sha, view, bank, outputs, assembly, env):
+            original = view['origin']; suffix = c._suffix(original)
+            test.assertEqual(sha, manifest_sha); test.assertNotIn(original, published)
+            value = {'manifest_sha256': sha, 'origin': [original['season'], original['week']], **assembly}
+            store.write('forecast-'+suffix+'.json', value)
+            pointer = store.pointer('forecast-'+suffix+'.json')
+            store.write('publication-binding-'+suffix+'.json', {'publication': pointer, 'manifest_sha256': sha})
+            test.assertEqual(store.read_bound(pointer), value)
+            os.fsync(store.fd); published.append(original); event('published_fsynced', original)
+            return pointer
+
+        def validate(store, man, sha, view, assembly, pointer, env):
+            value = store.read_bound(pointer)
+            test.assertEqual(value['manifest_sha256'], sha)
+            test.assertEqual(value['origin'], [view['origin']['season'], view['origin']['week']])
+            return value, store.read_bound(store.pointer('publication-binding-'+c._suffix(view['origin'])+'.json'))
+
+        class Grader:
+            last_attempt_origin = None
+            last_attempt_counts = None
+            def grade(self, store, man, sha, view, assembly, pointer, ctx, acc, *, validate_binding):
+                original = view['origin']; year = original['season']; n = len(original['targetGameIds'])
+                self.last_attempt_origin = [year, original['week']]
+                validate_binding(); test.assertIs(published[-1], original); test.assertNotIn(original, graded)
+                event('grade_after_publication', original)
+                inner, outer = assembly['full_setting_forecasts'], assembly['outer_selected_forecasts']
+                counts = dict(inner_rows=len(inner), outer_rows=len(outer), copied_diagonal_inner=9*n if inner else 0,
+                    scored_inner=18*n if inner else 0, copied_e3_outer=11*n if outer else 0,
+                    scored_outer=2*n if outer else 0, copied_raw_outer=6*n if outer else 0,
+                    actual_score_calls=(18*n if inner else 0)+(2*n if outer else 0),
+                    actual_mass_cdf_calls=13*n*8 if outer else 0)
+                self.last_attempt_counts = counts
+                if fail_grade and (year, original['week']) == (2013, 1):
+                    raise ValueError('synthetic_current_grader_failure')
+                if (year, original['week']) in ((2013, 1), (2013, 2)):
+                    acc.callback('score', lambda: envelope.work(.002), game_id=original['targetGameIds'][0],
+                        setting=0, variant='zero_strength_update', stage='outer', operation='score',
+                        double_grid=True, diagnostics=True)
+                name = 'routing-grade-'+c._suffix(original)+'.json'
+                store.write(name, {'routing_only': True, 'inner_keys': inner, 'outer_keys': outer, 'counts': counts})
+                saved = store.read_bound(store.pointer(name)); os.fsync(store.fd)
+                graded.append(original); event('graded_fsynced', original)
+                return {'inner_rows': saved['inner_keys'], 'outer_rows': saved['outer_keys'], 'counts': counts,
+                        'grading_receipt': {'origin': [year, original['week']], 'routing_only': True},
+                        'artifacts': {'routing_only': store.pointer(name)}}
+
+        def pilot(plan, ledger, suffix):
+            test.assertEqual(len(ledger['origins']), 53); test.assertEqual(suffix, origins[53:])
+            projection = runtime.pilot_projection(plan, ledger, suffix)
+            test.assertIs(projection['within_time_screen'], True)
+            test.assertEqual(projection['failed_callback_count'], 1 if reject_pilot else 0)
+            event('real_formula_synthetic_cost_pilot', origins[52], remaining_origins=len(suffix))
+            return {**projection, 'within_time_screen': False, 'synthetic_forced_rejection': True} if reject_pilot else projection
+
+        with tempfile.TemporaryDirectory() as directory:
+            store = runtime.Store(Path(directory).resolve(), 'rfcomp04-routing-only')
+            try:
+                with ExitStack() as stack:
+                    for name, replacement in [('forecast_inputs', forecast), ('StrictSelectionFeed', Feed),
+                        ('SplitTrajectoryBank', Bank), ('assemble_forecasts', assemble), ('PublishedOriginGrader', Grader),
+                        ('publish_origin', publish), ('validate_publication_binding', validate), ('pilot_projection', pilot)]:
+                        stack.enter_context(patch.object(c, name, replacement))
+                    error = None
+                    try: c._chronological_origins(context, store, manifest, manifest_sha, {}, envelope, accounting, progress)
+                    except ValueError as exc: error = str(exc)
+                count = 0 if wrong_origin else 51 if fail_grade else 53 if reject_pilot else 277
+                self.assertEqual(progress['completed_origins'], count)
+                self.assertEqual(graded, origins[:count])
+                self.assertEqual(advanced, origins[:count + int(fail_grade)])
+                self.assertEqual(published, origins[:count + int(fail_grade)])
+                self.assertEqual(len(accounting.snapshot()['origins']), count + int(fail_grade or wrong_origin))
+                self.assertEqual('origin-index.json' in store.index, not (wrong_origin or fail_grade or reject_pilot))
+                self.assertTrue(all(2011 <= o['season'] <= 2024 for o in fed))
+                if count == 277:
+                    index = store.read_bound(store.pointer('origin-index.json'))
+                    self.assertEqual(index['counts'], progress['counts']); self.assertEqual(len(index['origins']), 277)
+                    self.assertEqual(sum(len(o['targetGameIds']) for o in graded), 4175)
+                    self.assertEqual(progress['counts']['inner_rows'], 98469)
+                    self.assertEqual(progress['counts']['outer_rows'], 64733)
+                    self.assertEqual(len(fed), 242); self.assertEqual(list(selected), list(range(2013, 2026)))
+                with self.assertRaisesRegex(ValueError, 'nonchronological_or_nested_origin'):
+                    with accounting.origin(origins[0]): pass
+                CONTROLLER_TEST_EVIDENCE.append({'scope': 'synthetic_dispatch_only_no_numeric_evidence',
+                    'reject_pilot': reject_pilot, 'wrong_origin': wrong_origin, 'fail_grade': fail_grade,
+                    'completed_origins': count, 'counts': progress['counts'], 'expected_error': error,
+                    'trace': trace, 'store_index': dict(store.index),
+                    'limitations': 'Artificial clock and scientific routing seams; actual Store and OriginAccounting only.'})
+                return error, progress, trace
+            finally: store.close()
+
+    def test_complete_277_origin_4175_game_order_and_dispatch_counts(self):
+        error, progress, trace = self.scenario()
+        self.assertIsNone(error)
+        self.assertEqual([x['origin'] for x in trace if x['kind'] == 'advance'],
+                         [[o['season'], o['week']] for o in self.origins])
+
+    def test_actual_pilot_formula_retains_53_prefix_and_stops_224_suffix(self):
+        error, progress, trace = self.scenario(reject_pilot=True)
+        self.assertEqual(error, 'registered_pilot_cost_screen_failed')
+        self.assertEqual(trace[-1]['kind'], 'real_formula_synthetic_cost_pilot')
+        self.assertEqual(trace[-1]['remaining_origins'], 224)
+        self.assertEqual(progress['completed_origins'], 53)
+
+    def test_wrong_original_origin_never_advances_or_grades(self):
+        error, progress, trace = self.scenario(wrong_origin=True)
+        self.assertEqual(error, 'forecast_origin_swapped')
+        self.assertEqual([x['kind'] for x in trace], ['forecast_inputs'])
+
+    def test_current_failed_grade_cannot_feed_or_inflate_completed_counts(self):
+        error, progress, trace = self.scenario(fail_grade=True)
+        self.assertEqual(error, 'synthetic_current_grader_failure')
+        failure = progress['failed_origin_grading_attempt']
+        self.assertEqual(failure['origin'], [2013, 1]); self.assertIs(failure['included_in_completed_counts'], False)
+        self.assertEqual(progress['completed_origins'], 51)
+        self.assertEqual(trace[-1]['kind'], 'grade_after_publication')
+
+
+class TerminalFlowTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
+        self.folder = Path(self.temp.name).resolve(); self.phase = self.folder/'phase.json'
+        watchdog._write_phase(self.phase, {'version': 'rf02f.owned-phase.v1', 'owner': 'a'*32,
+            'phase': 'starting', 'smoke_started': None, 'smoke_finished': None}, initial=True)
+        manifest = {'version': 'rfcomp04.synthetic-controller-test.v1',
+            'parent_manifest_sha256': c.PARENT_MANIFEST, 'parent_index_sha256': c.PARENT_INDEX,
+            'bound_hashes': {'config': c.CONFIG_SHA}, 'code_hashes': {'synthetic-source.py': 'a'*64},
+            'qualification': {'synthetic': True}, 'independent_reviews': {'synthetic': True}}
+        self.ready = {'manifest': manifest, 'manifest_sha256': digest(manifest),
+                      'identity': 'rfcomp04-synthetic-terminal', 'config': {}}
+        self.context = SimpleNamespace(origins=[])
+        self.evaluation = {'status': 'reject_all', 'synthetic_terminal_only': True}
+        self.ledger = SimpleNamespace(_origins=[], snapshot=lambda: {'origins': []})
+        self.checked = []
+
+    @contextmanager
+    def seams(self, **overrides):
+        def bound(path, fingerprint, *args):
+            self.checked.append(('bound', str(path), fingerprint)); return b'{}'
+        def runtime_files(check):
+            check(); self.checked.append(('runtime_files',))
+        values = {'preflight': lambda *args: self.ready, 'admit_source': lambda *args: self.context,
+                  'OUTPUT_PARENT': self.folder, '_admission_evidence': lambda *args: {'synthetic': True},
+                  'run_smoke': lambda *args: {'synthetic': True}, 'OriginAccounting': lambda *args: self.ledger,
+                  '_chronological_origins': lambda *args: [], '_saved_inference_inputs': lambda *args: ([], {}, []),
+                  'evaluate': lambda *args: self.evaluation, 'bound': bound, 'validate_runtime_files': runtime_files}
+        values.update(overrides)
+        with ExitStack() as stack:
+            for name, value in values.items(): stack.enter_context(patch.object(c, name, value))
+            yield
+
+    def execute(self):
+        return c.run(c.ROOT, '/explicit-synthetic-unread-acceptance', 'e'*64, self.phase, time.monotonic())
+
+    def terminal(self):
+        return json.loads((self.folder/self.ready['identity']/'completion/terminal.json').read_bytes())
+
+    def test_new_terminal_atomic_pair_and_post_science_source_runtime_protocol_checks(self):
+        with self.seams(): result = self.execute()
+        terminal = self.terminal()
+        self.assertEqual(result['status'], 'reject_all'); self.assertEqual(terminal['version'], 'rfcomp04.terminal.v1')
+        self.assertEqual(self.checked, [('bound', str(c.ROOT/'synthetic-source.py'), 'a'*64),
+            ('bound', str(c.ROOT/c.CONFIG), c.CONFIG_SHA), ('runtime_files',),
+            ('bound', str(c.ROOT/c.COMPUTE_PROTOCOL_PATH), c.COMPUTE_PROTOCOL_SHA)])
+        index = json.loads((self.folder/self.ready['identity']/'completion/artifact-index.json').read_bytes())
+        self.assertEqual(index['files']['completion/terminal.json']['sha256'], digest(terminal))
+        self.assertEqual(index['uncommitted_artifacts'], []); self.assertEqual(index['uncommitted_staging'], [])
+        CONTROLLER_TEST_EVIDENCE.append({'scope': 'synthetic_terminal_routing_only', 'terminal_version': terminal['version'],
+                                         'source_runtime_protocol_checks': self.checked})
+
+    def test_existing_identity_refuses_before_second_admission(self):
+        with self.seams(): self.execute()
+        def no_admission(*args): self.fail('second admission forbidden')
+        with self.seams(admit_source=no_admission):
+            with self.assertRaises(FileExistsError): self.execute()
+        self.assertEqual(self.terminal()['status'], 'reject_all')
+
+    def test_preflight_rejection_prevents_store_and_all_science(self):
+        def reject(*args): raise ValueError('unaccepted_current_receipt')
+        def forbidden(*args): self.fail('work before accepted preflight')
+        with self.seams(preflight=reject, Store=forbidden, admit_source=forbidden, evaluate=forbidden):
+            with self.assertRaisesRegex(ValueError, 'unaccepted_current_receipt'): self.execute()
+        self.assertFalse((self.folder/self.ready['identity']).exists())
+
+    def test_runtime_file_change_after_evaluation_forces_invalid_terminal(self):
+        def changed(check): check(); raise ValueError('runtime_binary_changed')
+        with self.seams(validate_runtime_files=changed): result = self.execute()
+        self.assertEqual(result['status'], 'protocol_invalid')
+        terminal = self.terminal()
+        self.assertEqual(terminal['version'], 'rfcomp04.terminal.v1')
+        self.assertEqual(terminal['reason'], 'runtime_binary_changed')
+        self.assertIn('evaluation', terminal['artifacts'])
+
+    def test_invalid_evaluation_payload_is_retained_before_invalid_terminal(self):
+        self.evaluation = {'status': 'protocol_invalid', 'reason': 'synthetic_inference_failure', 'details': ['preserve']}
+        with self.seams(): result = self.execute()
+        self.assertEqual(result['status'], 'protocol_invalid')
+        terminal = self.terminal(); pointer = terminal['artifacts']['evaluation']
+        raw = (self.folder/self.ready['identity']/pointer['name']).read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), pointer['sha256'])
+        self.assertEqual(json.loads(raw), self.evaluation)
+        self.assertEqual(self.checked, [])
+
+    def test_partial_ordinary_write_is_retained_as_invalid_evidence(self):
+        class PartialStore(runtime.Store):
+            def write(self, name, value):
+                if name == 'admission.json':
+                    self.uncommitted_artifacts.add(name)
+                    fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600, dir_fd=self.fd)
+                    with os.fdopen(fd, 'wb') as out: out.write(b'{"incomplete":'); out.flush(); os.fsync(out.fileno())
+                    raise OSError('synthetic_partial_write')
+                return super().write(name, value)
+        with self.seams(Store=PartialStore): result = self.execute()
+        self.assertEqual(result['status'], 'protocol_invalid')
+        folder = self.folder/self.ready['identity']
+        index = json.loads((folder/'completion/artifact-index.json').read_bytes())
+        self.assertEqual(index['uncommitted_artifacts'], ['admission.json'])
+        self.assertEqual((folder/'admission.json').read_bytes(), b'{"incomplete":')
+        self.assertEqual(index['files']['admission.json']['sha256'], hashlib.sha256(b'{"incomplete":').hexdigest())
+
+    def test_post_commit_failure_never_constructs_a_competing_terminal(self):
+        class LateStore(runtime.Store):
+            def finish(self, terminal, budget=None):
+                super().finish(terminal, budget)
+                raise OSError('synthetic_post_commit_fsync')
+        class NoCompetingEnvelope(c.ControllerEnvelope):
+            def finalize_invalid(self, *args): raise AssertionError('competing terminal forbidden')
+        with self.seams(Store=LateStore, ControllerEnvelope=NoCompetingEnvelope):
+            with self.assertRaisesRegex(OSError, 'synthetic_post_commit_fsync'): self.execute()
+        self.assertEqual(self.terminal()['status'], 'reject_all')
+        self.assertEqual(len(list((self.folder/self.ready['identity']).glob('completion'))), 1)
+
+    def test_user_interrupt_survives_failed_metadata_finalization(self):
+        class FailedClosure(c.ControllerEnvelope):
+            def finalize_invalid(self, *args): raise OSError('synthetic_closure_failure')
+        for kind in (KeyboardInterrupt, SystemExit):
+            self.ready['identity'] = 'rfcomp04-synthetic-'+kind.__name__.lower()
+            error = kind('preserve_original_interrupt')
+            def interrupted(*args): raise error
+            with self.seams(admit_source=interrupted, ControllerEnvelope=FailedClosure):
+                try: self.execute()
+                except BaseException as caught: self.assertIs(caught, error)
+                else: self.fail('original interrupt lost')
+            self.assertFalse((self.folder/self.ready['identity']/'completion').exists())
+
+
+if __name__ == '__main__':
+    unittest.main()

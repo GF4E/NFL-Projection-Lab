@@ -1,0 +1,113 @@
+{
+  "historical_execution": false,
+  "independent_attribution_review_required": true,
+  "optimization_selected": null,
+  "plain": {
+    "B": 0.4473948329978157,
+    "F_total": 0.03519487509038299,
+    "S_total": 0.1511660000833217,
+    "callbacks": 88,
+    "counts": {
+      "actual_mass_cdf_calls": 208,
+      "actual_score_calls": 40,
+      "copied_diagonal_inner": 18,
+      "copied_e3_outer": 22,
+      "copied_raw_outer": 12,
+      "inner_rows": 54,
+      "outer_rows": 38,
+      "scored_inner": 36,
+      "scored_outer": 4
+    },
+    "excluded_work": [
+      "annual selection",
+      "StrictSelectionFeed.add",
+      "full historical admission",
+      "large history/index behavior",
+      "smoke",
+      "bootstrap",
+      "complete controller",
+      "historical terminal"
+    ],
+    "historical_capacity_claim": false,
+    "nondeterministic_closure": [
+      "new state actual_computation_at",
+      "state hash/bytes",
+      "publication-binding hash/bytes"
+    ],
+    "remainder": 0.261033957824111,
+    "resolved_laws": 62,
+    "route": "plain",
+    "setup_seconds": 0.14255154199781828,
+    "source_scorer_calls_during_setup": 8,
+    "stage_seconds": {
+      "assembly_and_after_digest": 0.0790173749846872,
+      "durable_publication": 0.05858954199356958,
+      "grade_and_saved_reload": 0.2609182499872986,
+      "native_advance_and_digest": 0.03227275001700036,
+      "single_origin_evidence_persistence": 0.004390834015794098,
+      "source_and_mapper_preparation": 0.01214812500984408
+    },
+    "status": "exact_declared_path_only",
+    "unallocated_seconds": 5.795698962174356e-05
+  },
+  "profiled": {
+    "B": 1.048051707999548,
+    "F_total": 0.06226033405982889,
+    "S_total": 0.16451083702850156,
+    "callbacks": 88,
+    "counts": {
+      "actual_mass_cdf_calls": 208,
+      "actual_score_calls": 40,
+      "copied_diagonal_inner": 18,
+      "copied_e3_outer": 22,
+      "copied_raw_outer": 12,
+      "inner_rows": 54,
+      "outer_rows": 38,
+      "scored_inner": 36,
+      "scored_outer": 4
+    },
+    "excluded_work": [
+      "annual selection",
+      "StrictSelectionFeed.add",
+      "full historical admission",
+      "large history/index behavior",
+      "smoke",
+      "bootstrap",
+      "complete controller",
+      "historical terminal"
+    ],
+    "historical_capacity_claim": false,
+    "nondeterministic_closure": [
+      "new state actual_computation_at",
+      "state hash/bytes",
+      "publication-binding hash/bytes"
+    ],
+    "remainder": 0.8212805369112175,
+    "resolved_laws": 62,
+    "route": "profiled",
+    "setup_seconds": 0.14419112500036135,
+    "source_scorer_calls_during_setup": 8,
+    "stage_seconds": {
+      "assembly_and_after_digest": 0.19171075001941063,
+      "durable_publication": 0.2310160420020111,
+      "grade_and_saved_reload": 0.4817745420150459,
+      "native_advance_and_digest": 0.10010849998798221,
+      "single_origin_evidence_persistence": 0.016490875015733764,
+      "source_and_mapper_preparation": 0.026815874996827915
+    },
+    "status": "exact_declared_path_only",
+    "unallocated_seconds": 0.0001351239625364542
+  },
+  "profiled_plain_B_ratio": 2.3425655164074386,
+  "qualitative_only": true,
+  "stage_ratios": {
+    "assembly_and_after_digest": 2.4261847480577825,
+    "durable_publication": 3.9429569534331903,
+    "grade_and_saved_reload": 1.8464578159576743,
+    "native_advance_and_digest": 3.101951334647587,
+    "single_origin_evidence_persistence": 3.755750036647953,
+    "source_and_mapper_preparation": 2.207408548652406
+  },
+  "status": "pending_actual_process_completion",
+  "timing_limitation": "Fixed order confounds instrumentation, cache and OS effects. Cumulative profiles overlap; no speedup or capacity estimate."
+}

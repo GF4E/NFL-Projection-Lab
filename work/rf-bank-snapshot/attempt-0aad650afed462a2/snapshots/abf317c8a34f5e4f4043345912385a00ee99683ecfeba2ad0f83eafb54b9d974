@@ -1,0 +1,87 @@
+"""RF-02S frozen numerical successor; original distribution primitives unchanged."""
+import numpy as np
+
+from research_score_distribution import JointBase as LegacyJointBase, JointDistribution, NumericalFailure, _finite
+
+
+def residual_slope(gradient, covariance, direction):
+    value = float(gradient @ covariance @ direction)
+    _finite(value)
+    if not value < 0:
+        raise NumericalFailure("not_residual_descent")
+    return value
+
+
+class JointBase(LegacyJointBase):
+    def fit(self, requested_mean, maximum_iterations=100):
+        requested = np.asarray(requested_mean, dtype=float)
+        if requested.shape != (2,) or np.any(requested <= 0):
+            raise NumericalFailure("invalid_requested_mean")
+        _finite(requested)
+        if not isinstance(maximum_iterations, int) or not 0 <= maximum_iterations <= 100:
+            raise NumericalFailure("invalid_iteration_budget")
+        theta = np.zeros(2)
+        for iteration in range(maximum_iterations + 1):
+            normalizer, alpha, beta, rates, mean, covariance = self.components(theta)
+            gradient = mean - requested
+            residual = float(np.max(np.abs(gradient)))
+            if residual <= 1e-7:
+                return JointDistribution(self.atoms, alpha, beta, rates, theta, iteration)
+            if iteration == maximum_iterations:
+                break
+            try:
+                np.linalg.cholesky(covariance)
+                direction = np.linalg.solve(covariance, -gradient)
+            except np.linalg.LinAlgError as exc:
+                raise NumericalFailure("non_positive_hessian") from exc
+            direction *= min(1.0, 2.0 / max(2.0, float(np.max(np.abs(direction)))))
+            _finite(direction)
+            descent = float(gradient @ direction)
+            if not descent < 0:
+                raise NumericalFailure("not_descent")
+            product = float(theta @ requested)
+            objective = normalizer - product
+            accepted = False
+            for halvings in range(41):
+                step = 0.5 ** halvings
+                trial = theta + step * direction
+                try:
+                    components = self.components(trial)
+                    trial_product = float(trial @ requested)
+                    trial_objective = components[0] - trial_product
+                    _finite(trial_objective)
+                except NumericalFailure:
+                    continue
+                if trial_objective <= objective + 1e-4 * step * descent:
+                    trial_residual = float(np.max(np.abs(components[4] - requested)))
+                    resolution = 8 * np.finfo(float).eps * max(
+                        1., abs(normalizer), abs(product), abs(components[0]), abs(trial_product))
+                    moving = not np.array_equal(trial, theta)
+                    progress = (trial_residual <= 1e-7 or trial_residual <= (1 - 1e-4) * residual
+                                or objective - trial_objective > resolution)
+                    if moving and progress:
+                        theta, accepted = trial, True
+                    break
+            if accepted:
+                continue
+            phi = .5 * float(gradient @ gradient)
+            _finite(phi)
+            slope = residual_slope(gradient, covariance, direction)
+            for halvings in range(41):
+                step = 0.5 ** halvings
+                trial = theta + step * direction
+                if np.array_equal(trial, theta):
+                    continue
+                try:
+                    trial_gradient = self.components(trial)[4] - requested
+                    trial_phi = .5 * float(trial_gradient @ trial_gradient)
+                    _finite(trial_phi)
+                except NumericalFailure:
+                    continue
+                if (trial_phi <= phi + 1e-4 * step * slope
+                        and np.max(np.abs(trial_gradient)) < residual):
+                    theta, accepted = trial, True
+                    break
+            if not accepted:
+                raise NumericalFailure("line_search_failed")
+        raise NumericalFailure("mean_match_not_converged")

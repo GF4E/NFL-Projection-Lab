@@ -1,0 +1,431 @@
+import ast
+import copy
+import json
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+from unittest import mock
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
+import research_score_compute_run as runner
+
+
+class ComputeRunTests(unittest.TestCase):
+    def fixture(self, parent):
+        root = parent / "checkout"
+        (root / Path(runner.ANCHOR_PATH).parent).mkdir(parents=True)
+        output_parent = parent / "research-data"
+        output_parent.mkdir()
+        codes = {name: runner.digest(name.encode()) for name in runner.CODE_FILES + runner.TEST_FILES}
+        old_sources = {name: codes[name] for name in runner.numerical.CODE_FILES + runner.numerical.TEST_FILES}
+        bindings = {"acceptance": "a" * 64, "config": "b" * 64, "specification": "c" * 64,
+                    "predecessorConfig": "d" * 64, "predecessorImplementation": "e" * 64}
+        runtime = {"isolatedMode": True, "modelWorkers": 1}
+        config = json.loads(runner.read_regular(ROOT / "config/research-team-score-compute.v1.json"))
+        config["frozenSourceHashes"] = old_sources
+        # A small, explicitly synthetic complete population exercises the same verifier.
+        counts = {"fullSettingScoredOccurrences": 2, "outerScoredOccurrences": 4, "allScoredOccurrences": 6,
+                  "outerGames": 2, "outerSeries": 2}
+        config["inputCounts"].update(counts)
+        manifest = {"version": "rf02c-qualification.v1", "bindings": bindings, "runtime": runtime,
+                    "frozenSourceHashes": old_sources,
+                    "codeHashes": {name: codes[name] for name in runner.QUALIFICATION_CODE_FILES},
+                    "inputManifestSha256": config["inputManifestSha256"],
+                    "inputIndexSha256": config["inputIndexSha256"],
+                    "footballFits": 0, "newForecasts": 0, "providerRequests": 0, "productionAuthorized": False}
+        manifest_raw = runner.encoded(manifest)
+        directory = output_parent / ("rf02c-qualification-v1-" + runner.digest(manifest_raw)[:16])
+        directory.mkdir()
+        ledger = [{"scope": "inner", "originFile": "forecasts-2011-01.json", "key": ["N0", 0, game],
+                   "gameId": game, "doubleGrid": i == 0, "diagnostics": False, "nativeFailure": None,
+                   "metricSha256": "f" * 64, "canonicalEqual": True} for i, game in enumerate(("g1", "g2"))]
+        outer = [{"scope": "outer", "originFile": "forecasts-2013-01.json", "key": [family, "full", game],
+                  "gameId": game, "doubleGrid": True, "diagnostics": True, "nativeFailure": None,
+                  "metricSha256": "f" * 64, "canonicalEqual": True}
+                 for family in ("N0", "S1") for game in ("g1", "g2")]
+        efficiency = self.efficiency(config, [20.0] * 3, [10.0] * 3)
+        terminal = {"status": "qualified", "equalityFailures": 0, "nativeFailures": 0, "footballFits": 0,
+                    "newForecasts": 0, "productionAuthorized": False, "counts": counts,
+                    "canonicalEqualOccurrences": 6, "efficiency": efficiency,
+                    "independentAcceptance": "pending", "fullReplayAuthorized": False, "seconds": 90.0}
+        artifacts = {"manifest.json": manifest_raw, "terminal-decision.json": runner.encoded(terminal),
+                     "occurrence-ledger.json": runner.encoded(ledger + outer)}
+        for pair in range(3):
+            rows = [{"occurrenceIndex": i, "key": row["key"],
+                     "order": ["baseline", "candidate"] if (pair + i) % 2 == 0 else ["candidate", "baseline"],
+                     "baselineSeconds": 5.0, "candidateSeconds": 2.5, "canonicalEqual": True}
+                    for i, row in enumerate(outer)]
+            artifacts[f"timing-pass-{pair}.json"] = runner.encoded({"passIndex": pair, "occurrences": rows,
+                                                                   "baselineSeconds": 20.0, "candidateSeconds": 10.0})
+        for name, raw in artifacts.items():
+            (directory / name).write_bytes(raw)
+        index_raw = runner.encoded({"files": {name: {"sha256": runner.digest(raw), "bytes": len(raw)}
+                                             for name, raw in artifacts.items()}})
+        (directory / "artifact-index.json").write_bytes(index_raw)
+        receipt = {"version": "rf02c-implementation-acceptance.v1", "result": "accepted_for_one_replay",
+                   "independentReviewer": "independent-synthetic-reviewer", "computeBindings": bindings,
+                   "codeHashes": codes, "runtime": runtime, "productionAuthorized": False,
+                   "providerAccessAllowed": False, "automaticRestart": False,
+                   "qualification": {"directory": str(directory), "manifestSha256": runner.digest(manifest_raw),
+                                     "indexSha256": runner.digest(index_raw),
+                                     "terminalSha256": runner.digest(artifacts["terminal-decision.json"])}}
+        self.freeze(root, receipt)
+        return root, config, bindings, runtime, codes, output_parent, receipt
+
+    def efficiency(self, config, baseline, candidate, rss=256.0):
+        savings = min(before - after for before, after in zip(baseline, candidate))
+        ratio = runner.median(after / before for before, after in zip(baseline, candidate))
+        gate = config["efficiencyGate"]
+        screen = (gate["originalPilotElapsed"]
+                  + max(0, gate["originalMeanOuterSeconds"] - savings / gate["pilotOrigins"])
+                  * gate["originalRemainingWork"] + gate["originalInferenceProjection"])
+        return {"pairedPasses": 3, "baselineSeconds": baseline, "candidateSeconds": candidate,
+                "minimumSavingsSeconds": savings, "medianRatio": ratio, "screenProjectedSeconds": screen,
+                "rssMiB": rss, "passed": True}
+
+    def freeze(self, root, receipt):
+        raw = runner.encoded(receipt)
+        (root / runner.IMPLEMENTATION_PATH).write_bytes(raw)
+        (root / runner.ANCHOR_PATH).write_bytes(runner.encoded({
+            "version": "rf02c-implementation-anchor.v1", "receiptSha256": runner.digest(raw)}))
+
+    def verify(self, fixture):
+        return runner.verify_implementation(*fixture[:5], output_parent=fixture[5])
+
+    def revise_artifact(self, fixture, name, transform):
+        root, *_, receipt = fixture
+        directory = Path(receipt["qualification"]["directory"])
+        value = json.loads((directory / name).read_bytes())
+        transform(value)
+        raw = runner.encoded(value)
+        (directory / name).write_bytes(raw)
+        index = json.loads((directory / "artifact-index.json").read_bytes())
+        index["files"][name] = {"sha256": runner.digest(raw), "bytes": len(raw)}
+        index_raw = runner.encoded(index)
+        (directory / "artifact-index.json").write_bytes(index_raw)
+        receipt["qualification"]["indexSha256"] = runner.digest(index_raw)
+        if name == "terminal-decision.json":
+            receipt["qualification"]["terminalSha256"] = runner.digest(raw)
+        self.freeze(root, receipt)
+
+    def test_acceptance_binds_code_runtime_and_qualification(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            result = self.verify(fixture)
+            self.assertEqual(result["receipt"]["result"], "accepted_for_one_replay")
+            self.assertEqual(result["qualificationTerminal"]["status"], "qualified")
+
+    def test_missing_or_unaccepted_implementation_blocks_before_replay(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            root, *_, receipt = fixture
+            (root / runner.ANCHOR_PATH).unlink()
+            with self.assertRaises(FileNotFoundError):
+                self.verify(fixture)
+            for field, value in (("result", "pending"), ("independentReviewer", ""),
+                                 ("productionAuthorized", True), ("providerAccessAllowed", True),
+                                 ("automaticRestart", True), ("productionAuthorized", 0)):
+                changed = copy.deepcopy(receipt)
+                changed[field] = value
+                self.freeze(root, changed)
+                with self.assertRaisesRegex(ValueError, "implementation_not_accepted"):
+                    self.verify(fixture)
+        with mock.patch.object(runner, "preflight", side_effect=ValueError("not_accepted")), \
+                mock.patch.object(runner, "build_runner") as build:
+            with self.assertRaisesRegex(ValueError, "not_accepted"):
+                runner.run()
+            build.assert_not_called()
+
+    def test_receipt_hash_checked_before_external_path(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            root, *_, receipt = fixture
+            changed = copy.deepcopy(receipt)
+            changed["qualification"]["directory"] = "/never-open-this"
+            (root / runner.IMPLEMENTATION_PATH).write_bytes(runner.encoded(changed))
+            with mock.patch.object(runner, "read_regular", wraps=runner.read_regular) as read:
+                with self.assertRaisesRegex(ValueError, "frozen_bytes_mismatch:implementation_receipt"):
+                    self.verify(fixture)
+                self.assertEqual(len(read.call_args_list), 2)
+                self.assertTrue(all(str(args.args[0]).startswith(str(root)) for args in read.call_args_list))
+
+    def test_freeze_mismatch_and_unsafe_directory_refuse(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            root, *_, receipt = fixture
+            for field, value, expected in (
+                    ("codeHashes", {}, "implementation_code_freeze_mismatch"),
+                    ("runtime", {}, "implementation_successor_or_runtime_mismatch"),
+                    ("computeBindings", {}, "implementation_successor_or_runtime_mismatch")):
+                changed = copy.deepcopy(receipt)
+                changed[field] = value
+                self.freeze(root, changed)
+                with self.assertRaisesRegex(ValueError, expected):
+                    self.verify(fixture)
+            for directory in ("relative", "/never-open-this", str(fixture[5] / ".." / "unsafe")):
+                changed = copy.deepcopy(receipt)
+                changed["qualification"]["directory"] = directory
+                self.freeze(root, changed)
+                with self.assertRaisesRegex(ValueError, "invalid_qualification_directory"):
+                    self.verify(fixture)
+
+    def test_artifact_corruption_and_index_path_refuse(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            root, *_, receipt = fixture
+            directory = Path(receipt["qualification"]["directory"])
+            original = (directory / "occurrence-ledger.json").read_bytes()
+            (directory / "occurrence-ledger.json").write_bytes(b"corrupt")
+            with self.assertRaisesRegex(ValueError, "frozen_bytes_mismatch:qualification_artifact"):
+                self.verify(fixture)
+            (directory / "occurrence-ledger.json").write_bytes(original)
+            index = json.loads((directory / "artifact-index.json").read_bytes())
+            index["files"]["../unsafe"] = {"sha256": "0" * 64, "bytes": 0}
+            raw = runner.encoded(index)
+            (directory / "artifact-index.json").write_bytes(raw)
+            changed = copy.deepcopy(receipt)
+            changed["qualification"]["indexSha256"] = runner.digest(raw)
+            self.freeze(root, changed)
+            with self.assertRaisesRegex(ValueError, "unsafe_qualification_index_member"):
+                self.verify(fixture)
+
+    def test_failed_qualification_is_not_accepted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            root, *_, receipt = fixture
+            directory = Path(receipt["qualification"]["directory"])
+            terminal_raw = runner.encoded({"status": "qualification_failed"})
+            (directory / "terminal-decision.json").write_bytes(terminal_raw)
+            index = json.loads((directory / "artifact-index.json").read_bytes())
+            index["files"]["terminal-decision.json"] = {"sha256": runner.digest(terminal_raw), "bytes": len(terminal_raw)}
+            index_raw = runner.encoded(index)
+            (directory / "artifact-index.json").write_bytes(index_raw)
+            changed = copy.deepcopy(receipt)
+            changed["qualification"].update(indexSha256=runner.digest(index_raw), terminalSha256=runner.digest(terminal_raw))
+            self.freeze(root, changed)
+            with self.assertRaisesRegex(ValueError, "qualification_not_accepted"):
+                self.verify(fixture)
+
+    def test_counts_failure_records_and_complete_ledgers_are_required(self):
+        cases = [
+            ("terminal-decision.json", lambda v: v.update(nativeFailures=1), "qualification_not_accepted"),
+            ("terminal-decision.json", lambda v: v.update(equalityFailures=False), "qualification_not_accepted"),
+            ("terminal-decision.json", lambda v: v.update(canonicalEqualOccurrences=5), "qualification_population_mismatch"),
+            ("occurrence-ledger.json", lambda v: v.pop(), "qualification_equality_ledger_count_mismatch"),
+            ("occurrence-ledger.json", lambda v: v[0].update(nativeFailure="changed"), "qualification_equality_ledger_invalid"),
+            ("occurrence-ledger.json", lambda v: v[1].update(v[0]), "qualification_duplicate_occurrence"),
+            ("occurrence-ledger.json", lambda v: v[2].update(diagnostics=False), "qualification_outer_flags_changed"),
+            ("occurrence-ledger.json", lambda v: v[1].update(doubleGrid=True), "qualification_inner_flags_changed"),
+            ("timing-pass-0.json", lambda v: v["occurrences"].pop(), "qualification_timing_population_mismatch"),
+            ("timing-pass-1.json", lambda v: v["occurrences"][0].update(order=["baseline", "candidate"]),
+             "qualification_timing_ledger_invalid"),
+            ("timing-pass-2.json", lambda v: v["occurrences"][0].update(baselineSeconds=7.0),
+             "qualification_timing_totals_mismatch"),
+        ]
+        for name, change, expected in cases:
+            with self.subTest(name=name, expected=expected), tempfile.TemporaryDirectory() as temp:
+                fixture = self.fixture(Path(temp).resolve())
+                self.revise_artifact(fixture, name, change)
+                with self.assertRaisesRegex(ValueError, expected):
+                    self.verify(fixture)
+
+    def test_efficiency_is_recomputed_without_best_pass_selection(self):
+        config = json.loads(runner.read_regular(ROOT / "config/research-team-score-compute.v1.json"))
+        runner.verify_efficiency(self.efficiency(config, [20.0] * 3, [10.0] * 3), config)
+        for baseline, candidate, rss in (
+                ([20.0] * 3, [10.0, 10.0, 21.0], 256.0),  # One slower pass.
+                ([20.0] * 3, [14.1] * 3, 256.0),          # Ratio threshold.
+                ([10.0] * 3, [5.0] * 3, 256.0),          # Absolute conservative projection.
+                ([20.0] * 3, [10.0] * 3, 4096.01)):
+            with self.subTest(baseline=baseline, candidate=candidate, rss=rss):
+                with self.assertRaisesRegex(ValueError, "qualification_efficiency_not_passed"):
+                    runner.verify_efficiency(self.efficiency(config, baseline, candidate, rss), config)
+        for field, value in (("minimumSavingsSeconds", 100.0), ("medianRatio", 0.0),
+                             ("screenProjectedSeconds", 1.0), ("passed", 1), ("rssMiB", float("nan")),
+                             ("baselineSeconds", [float("inf")] * 3)):
+            efficiency = self.efficiency(config, [20.0] * 3, [10.0] * 3)
+            efficiency[field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                runner.verify_efficiency(efficiency, config)
+
+    def test_complete_scientific_source_binding_and_qualification_subset(self):
+        config = json.loads(runner.read_regular(ROOT / "config/research-team-score-compute.v1.json"))
+        self.assertEqual(len(runner.CODE_FILES + runner.TEST_FILES), 27)
+        self.assertEqual(len(set(runner.CODE_FILES + runner.TEST_FILES)), 27)
+        self.assertEqual(set(config["frozenSourceHashes"]), set(runner.numerical.CODE_FILES + runner.numerical.TEST_FILES))
+        self.assertEqual(runner.QUALIFICATION_CODE_FILES,
+                         [runner.NEW_CODE_FILES[0], runner.NEW_CODE_FILES[1], runner.NEW_TEST_FILES[0], runner.NEW_TEST_FILES[1]])
+        for name, sha in config["frozenSourceHashes"].items():
+            self.assertEqual(runner.digest(runner.read_regular(ROOT / name)), sha, name)
+
+    def test_adapter_changes_only_registered_three_nodes(self):
+        source = runner.read_regular(ROOT / "scripts/research_score_run.py").decode()
+        original = ast.parse(source)
+        adapted = runner.adapted_tree(source)
+        inherited = next(node for node in adapted.body if isinstance(node, ast.FunctionDef) and node.name == "run")
+        originals = {node.targets[0].id: node for node in ast.walk(next(
+            node for node in original.body if isinstance(node, ast.FunctionDef) and node.name == "run"))
+            if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name)
+            and node.targets[0].id in {"manifest", "store", "smoke"}}
+        found = set()
+        for node in ast.walk(inherited):
+            if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+                name = node.targets[0].id
+                if name in originals:
+                    if name == "manifest":
+                        self.assertEqual(node.value.values[0].value, "rf02c.team-score.v1")
+                        self.assertEqual(node.value.keys[-1].value, "compute")
+                    elif name == "store":
+                        self.assertEqual(node.value.args[1].left.value, "rf02c-v1-")
+                    else:
+                        self.assertEqual(node.value.args[0].id, "_SMOKE_COMMAND")
+                        self.assertEqual(ast.dump(ast.Call(func=node.value.func, args=[], keywords=node.value.keywords)),
+                                         ast.dump(ast.Call(func=originals[name].value.func, args=[], keywords=originals[name].value.keywords)))
+                    node.value = copy.deepcopy(originals[name].value)
+                    found.add(name)
+        self.assertEqual(found, {"manifest", "store", "smoke"})
+        self.assertEqual(ast.dump(adapted), ast.dump(original))
+        with self.assertRaisesRegex(ValueError, "inherited_.*mismatch"):
+            runner.adapted_tree(source.replace('"rf02-v2-"', '"unexpected-"'))
+
+    def context(self):
+        config = json.loads(runner.read_regular(ROOT / "config/research-team-score-compute.v1.json"))
+        bindings = {"acceptance": runner.digest(runner.read_regular(
+            ROOT / ".planning/engine-os/research-first/RF-02C-ACCEPTANCE.v1.json")),
+            "config": runner.digest(runner.read_regular(ROOT / "config/research-team-score-compute.v1.json")),
+            "specification": config["specification"]["sha256"],
+            "predecessorConfig": config["predecessorConfig"]["sha256"],
+            "predecessorImplementation": config["predecessorImplementation"]["sha256"]}
+        numerical_config = json.loads(runner.read_regular(ROOT / config["predecessorConfig"]["path"]))
+        numerical_bindings = {"acceptance": runner.digest(runner.read_regular(
+            ROOT / ".planning/engine-os/research-first/RF-02S-ACCEPTANCE.v1.json")),
+            "config": config["predecessorConfig"]["sha256"],
+            "specification": numerical_config["specification"]["sha256"]}
+        accepted, runtime = ({}, {"budget": {}}, {}, {}), {"pinned": True}
+        inherited = {"root": ROOT, "accepted": accepted, "runtime": runtime,
+                     "successorConfig": numerical_config, "bindings": numerical_bindings,
+                     "implementation": {"frozenObjects": []}}
+        return {"root": ROOT, "computeConfig": config, "bindings": bindings,
+                "codeHashes": {}, "accepted": accepted, "runtime": runtime, "numericalContext": inherited,
+                "implementation": {"receipt": {"qualification": {"manifestSha256": "q"}},
+                                   "receiptSha256": "r", "anchorSha256": "a", "frozenObjects": []}}
+
+    def test_private_mapper_binding_and_combined_smoke(self):
+        import research_score_metrics
+        import research_score_compute_distribution
+        original_scorer = research_score_metrics.score_forecast
+        legacy_mapper = runner.replay.common_mapper.__globals__["JointBase"]
+        module = runner.build_runner(self.context())
+        self.assertIs(module.common_mapper.__globals__["JointBase"], runner.JointBase)
+        self.assertIs(runner.replay.common_mapper.__globals__["JointBase"], legacy_mapper)
+        self.assertIsNot(legacy_mapper, runner.JointBase)
+        self.assertEqual(module.common_mapper.__code__, runner.replay.common_mapper.__code__)
+        self.assertIs(module.score_forecast, research_score_compute_distribution.score_forecast)
+        self.assertIs(research_score_metrics.score_forecast, original_scorer)
+        self.assertIsNot(module.score_forecast, original_scorer)
+        self.assertEqual(module._SMOKE_COMMAND, [sys.executable, "-I", "-c", runner.SMOKE_PROGRAM])
+        self.assertIn("tests/research-score-successor", runner.SMOKE_PROGRAM)
+        self.assertIn("tests/research-score-compute", runner.SMOKE_PROGRAM)
+        self.assertIn("tests/research-score'", runner.SMOKE_PROGRAM)
+        self.assertEqual(module.CODE_FILES, runner.CODE_FILES)
+        self.assertEqual(module.TEST_FILES, runner.TEST_FILES)
+
+    def test_document_chain_reauthenticated_at_inherited_invocation(self):
+        context = self.context()
+        context["codeHashes"] = {name: runner.digest(runner.read_regular(ROOT / name))
+                                 for name in runner.CODE_FILES + runner.TEST_FILES}
+        module = runner.build_runner(context)
+        with mock.patch("research_score_compute_qualify.load_compute",
+                        return_value=(context["computeConfig"], context["bindings"])), \
+                mock.patch.object(runner.numerical, "preflight", return_value=context["numericalContext"]) as accepted, \
+                mock.patch.object(runner, "runtime_manifest", return_value=context["runtime"]), \
+                mock.patch.object(runner, "verify_implementation", return_value=context["implementation"]) as verify:
+            self.assertEqual(module.load_accepted(ROOT), context["accepted"])
+            accepted.assert_called_once_with(ROOT)
+            verify.assert_called_once_with(ROOT, context["computeConfig"], context["bindings"],
+                                           context["runtime"], context["codeHashes"])
+        with mock.patch("research_score_compute_qualify.load_compute",
+                        return_value=(context["computeConfig"], {"changed": True})), \
+                mock.patch.object(runner.numerical, "preflight") as accepted:
+            with self.assertRaisesRegex(ValueError, "compute_changed_after_preflight"):
+                module.load_accepted(ROOT)
+            accepted.assert_not_called()
+        with mock.patch("research_score_compute_qualify.load_compute",
+                        return_value=(context["computeConfig"], context["bindings"])), \
+                mock.patch.object(runner.numerical, "preflight", return_value={"accepted": ({}, {}, {}, {})}):
+            with self.assertRaisesRegex(ValueError, "inherited_acceptance_changed_after_preflight"):
+                module.load_accepted(ROOT)
+
+    def test_changed_science_refuses_before_runner_construction(self):
+        with tempfile.TemporaryDirectory() as temp:
+            context = self.context()
+            context["root"] = Path(temp).resolve()
+            path = context["root"] / "scripts/research_score_run.py"
+            path.parent.mkdir()
+            source = runner.read_regular(ROOT / "scripts/research_score_run.py")
+            path.write_bytes(source.replace(b'fullReplayMaximumSeconds', b'changedReplayMaximumSeconds'))
+            with self.assertRaisesRegex(ValueError, "frozen_bytes_mismatch:inherited_runner"):
+                runner.build_runner(context)
+
+    def test_runtime_and_qualification_are_rechecked_before_new_output(self):
+        context = self.context()
+        context["codeHashes"] = {name: runner.digest(runner.read_regular(ROOT / name))
+                                 for name in runner.CODE_FILES + runner.TEST_FILES}
+        module = runner.build_runner(context)
+        with mock.patch("research_score_compute_qualify.load_compute",
+                        return_value=(context["computeConfig"], context["bindings"])), \
+                mock.patch.object(runner.numerical, "preflight", return_value=context["numericalContext"]), \
+                mock.patch.object(module, "ImmutableRun") as store:
+            with mock.patch.object(runner, "runtime_manifest", return_value={"changed": True}):
+                with self.assertRaisesRegex(ValueError, "runtime_changed_after_preflight"):
+                    module.run()
+            with mock.patch.object(runner, "runtime_manifest", return_value=context["runtime"]), \
+                    mock.patch.object(runner, "verify_implementation", side_effect=ValueError("corrupt_qualification")):
+                with self.assertRaisesRegex(ValueError, "corrupt_qualification"):
+                    module.run()
+            store.assert_not_called()
+
+    def test_identity_hash_binds_successor_before_output_creation(self):
+        module = runner.build_runner(self.context())
+        module.CODE_FILES, module.TEST_FILES = [], []
+        module.load_accepted = lambda _root: ({}, {}, {}, {"config": "old"})
+        module.runtime_manifest = lambda _config: {"pinned": True}
+        identities = []
+        class BeforeOutput:
+            def __init__(self, parent, identity):
+                identities.append(identity)
+                raise RuntimeError("captured_before_output")
+        module.ImmutableRun = BeforeOutput
+        for suffix in ("first", "second"):
+            module._COMPUTE_BINDING["implementation_receipt_sha256"] = suffix
+            with self.assertRaisesRegex(RuntimeError, "captured_before_output"):
+                module.run()
+        self.assertTrue(all(identity.startswith("rf02c-v1-") for identity in identities))
+        self.assertNotEqual(*identities)
+        self.assertEqual(runner.replay.common_mapper.__globals__["JointBase"], runner.legacy.JointBase)
+
+    def test_consumed_compute_identity_cannot_restart(self):
+        module = runner.build_runner(self.context())
+        module.CODE_FILES, module.TEST_FILES = [], []
+        module.load_accepted = lambda _root: ({}, {}, {}, {"config": "synthetic"})
+        module.runtime_manifest = lambda _config: {"pinned": True}
+        original_store = module.ImmutableRun
+        class AfterCreate(original_store):
+            def __init__(self, parent, identity):
+                super().__init__(parent, identity)
+                self.close()
+                raise RuntimeError("synthetic_stop_after_identity")
+        module.ImmutableRun = AfterCreate
+        with tempfile.TemporaryDirectory() as temp:
+            module.OUTPUT_PARENT = Path(temp).resolve()
+            with self.assertRaisesRegex(RuntimeError, "synthetic_stop_after_identity"):
+                module.run()
+            with self.assertRaises(FileExistsError):
+                module.run()
+            self.assertEqual(len(list(module.OUTPUT_PARENT.iterdir())), 1)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,159 @@
+{
+  "version": "rf02f.protocol-acceptance.v1",
+  "status": "accepted_design_for_implementation_and_synthetic_qualification_only",
+  "createdAt": "2026-09-05T12:23:12.459684+00:00",
+  "protocol": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md",
+    "sha256": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16",
+    "bytes": 26126
+  },
+  "machineRegistry": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score-split.v1.json",
+    "sha256": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519",
+    "bytes": 13887
+  },
+  "independentFinalSupplements": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-numerical-review-supplement.json",
+      "sha256": "e7eaf3f94545c20f9c4c01e29b7ab9a8d9a9c3e2052d74846dd7252a85443e2e",
+      "bytes": 2237
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-temporal-review-supplement.json",
+      "sha256": "35ea858184dca2f3e890772b62b80cdb981edceea6a64bf7d64b4f3706b4bc60",
+      "bytes": 5157
+    }
+  ],
+  "preservedEarlierReviews": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-numerical-review.json",
+      "sha256": "a5f7376108b96eea478389d20f8af9b850ab5cc4994b84fadf8c84d0124ca0e1",
+      "bytes": 3886
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-temporal-review.json",
+      "sha256": "fe3f6385c95d2f442fac2fb264680148cfc1d29f03ca503192a33eb5ba6ce1c8",
+      "bytes": 10209
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-numerical-review-final.json",
+      "sha256": "ca2b96a49784cfcab080c148417c38d4f08d9f76bc0b93045dd8129f0607bcfd",
+      "bytes": 3284
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-temporal-review-final.json",
+      "sha256": "8d2f033d977dd9db5c20a6bfcc634641d0fc118849665f8b3d5031cd9fd1c058",
+      "bytes": 10860
+    }
+  ],
+  "acceptedPureUnits": [
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-MEAN-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "61c448d59a30be43ccc15faf447d78f3be9e420cc83baf6a991aa5e3fa61101a",
+      "bytes": 3693
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-BANK-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "c4f252cd9bc053df019308cfebf5d70f0ca0287ee38bae7cdf2738033f978268",
+      "bytes": 4459
+    }
+  ],
+  "rootVerified": {
+    "protocolAndConfigHashes": true,
+    "directConfigPins": true,
+    "noCircularHash": true,
+    "exactRegistriesSeparatelyReviewed": true,
+    "separateNumericalAndTemporalReview": true,
+    "syntheticReuseDoesNotChangeHistoricalRules": true
+  },
+  "population": {
+    "origins": 277,
+    "outerOrigins": 226,
+    "outerGames": 3407,
+    "developmentGames": 3135,
+    "exposed2025Games": 272,
+    "newEngines": 216,
+    "cachedDiagonalOutputsPerOrigin": 81,
+    "totalStateOutputsPerOrigin": 297,
+    "innerGamesPerSetting": 3647,
+    "reusedDiagonalInnerRows": 32823,
+    "scoredSeries": 19,
+    "energyComparisons": 18,
+    "actualMassCells": 8,
+    "newOffDiagonalInnerScores": 65646,
+    "syntheticScoredRows": 64733,
+    "stateOnlyWarmupOrigins": [
+      [
+        2010,
+        1
+      ],
+      [
+        2010,
+        2
+      ],
+      [
+        2010,
+        3
+      ],
+      [
+        2010,
+        4
+      ],
+      [
+        2010,
+        5
+      ]
+    ]
+  },
+  "budget": {
+    "modelWorkers": 1,
+    "maximumSeconds": 7200,
+    "maximumRssMiB": 4096,
+    "maximumSyntheticSmokeSeconds": 120,
+    "pilotOrigins": [
+      [
+        2013,
+        1
+      ],
+      [
+        2013,
+        2
+      ]
+    ],
+    "pilotExpectedGames": 32,
+    "pilotPerGameStatistic": "maximum_noncallback_remainder_plus_31_twice_max_fit_and_score_costs",
+    "pilotInferenceReserveMultiplier": 2,
+    "pilotMinimumFinalReserveSeconds": 60,
+    "metadataOnlyFinalizationGraceSeconds": 30,
+    "automaticRestart": false,
+    "maximumSyntheticIntegrationSeconds": 600,
+    "maximumSyntheticIntegrationRssMiB": 4096,
+    "syntheticSmokeFixture": "frozen_real_scorer_19_by_3407_fixture_reloaded_by_real_public_evaluator",
+    "pilotFitSlotsPerFutureGame": 31,
+    "pilotScoreSlotsPerFutureGame": 31,
+    "pilotCallbackMaximumMultiplier": 2,
+    "pilotRequiredSuccessfulNonfallbackSamples": [
+      "offdiagonal_full_law_fit",
+      "new_full_outer_score"
+    ],
+    "pilotIncludesFailedCallbackTiming": true,
+    "pilotHistoryFactor": "max(1, N_o/min(N1,N2))",
+    "pilotFormula": "elapsed_so_far + sum(G_o * max(1,N_o/min(N1,N2))) * (C + 31*(2*F+2*S)) + 2*T + max(60,admission_seconds)",
+    "publicSmokeOuterGames": 3407,
+    "publicSmokeOuterOrigins": 226,
+    "publicSmokeDevelopmentGames": 3135,
+    "publicSmokeExposed2025Games": 272
+  },
+  "remainingBeforeHistoricalInvocation": [
+    "complete_archive_and_semantic_reuse_admission",
+    "real_mean_distribution_descriptor_scoring_and_inference_integration",
+    "complete_atomic_controller_budget_and_failure_qualification",
+    "freeze_full_implementation_source_runtime_evidence_chain",
+    "separate_numerical_and_temporal_implementation_acceptance",
+    "current_phase_gate"
+  ],
+  "historicalInvocationAuthorized": false,
+  "predictiveAcceptance": false,
+  "productionAuthorization": false,
+  "researchDetailsPublic": false
+}

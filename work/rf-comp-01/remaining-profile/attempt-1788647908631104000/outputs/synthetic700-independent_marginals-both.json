@@ -1,0 +1,1204 @@
+{
+  "callbacks": [
+    {
+      "binary_profile": {
+        "bytes": 24409,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/profiles/synthetic700-independent_marginals-both-fit.pstats",
+        "sha256": "e0f4c4a6e49887d1b9c4f9fa5ab216ef509bc9e6237dd76c3291ddc733900a12"
+      },
+      "error": null,
+      "instrumented_seconds": 0.0037771249772049487,
+      "json_profile": {
+        "bytes": 138383,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/profiles/synthetic700-independent_marginals-both-fit.json",
+        "sha256": "f1dfe95a3a758c3da4e4f1ae7f0f88afe952e73746385e8cb8f7f7f3da826a16"
+      },
+      "kind": "fit",
+      "metadata": {
+        "game_id": "z-target",
+        "operation": "fit",
+        "setting": 10,
+        "stage": "outer",
+        "variant": "independent_marginals"
+      },
+      "top_cumulative": [
+        {
+          "callers": [],
+          "calls": 1,
+          "cumulative_seconds": 0.0037236250000000004,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_forecast.py",
+            301,
+            "callback"
+          ],
+          "primitive_calls": 1,
+          "self_seconds": 2.0333e-05
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_forecast.py",
+                301,
+                "callback"
+              ],
+              "statistics": [
+                1,
+                1,
+                6.166000000000001e-06,
+                0.001691875
+              ]
+            }
+          ],
+          "calls": 1,
+          "cumulative_seconds": 0.001691875,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_replay.py",
+            120,
+            "resolve_distribution"
+          ],
+          "primitive_calls": 1,
+          "self_seconds": 6.166000000000001e-06
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py",
+                117,
+                "distribution_descriptor"
+              ],
+              "statistics": [
+                2,
+                2,
+                8.875e-06,
+                0.0008404590000000001
+              ]
+            },
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py",
+                125,
+                "recover_distribution"
+              ],
+              "statistics": [
+                1,
+                1,
+                3.832e-06,
+                0.00045000000000000004
+              ]
+            }
+          ],
+          "calls": 3,
+          "cumulative_seconds": 0.001290459,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+            40,
+            "encode_flat_floats"
+          ],
+          "primitive_calls": 3,
+          "self_seconds": 1.2707e-05
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_replay.py",
+                120,
+                "resolve_distribution"
+              ],
+              "statistics": [
+                1,
+                1,
+                8.671e-05,
+                0.001215292
+              ]
+            }
+          ],
+          "calls": 1,
+          "cumulative_seconds": 0.001215292,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py",
+            16,
+            "fit"
+          ],
+          "primitive_calls": 1,
+          "self_seconds": 8.671e-05
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_contract.py",
+                22,
+                "encoded"
+              ],
+              "statistics": [
+                3,
+                3,
+                4.7080000000000005e-06,
+                0.000221541
+              ]
+            },
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+                40,
+                "encode_flat_floats"
+              ],
+              "statistics": [
+                3,
+                3,
+                5.459000000000001e-06,
+                0.000852876
+              ]
+            }
+          ],
+          "calls": 6,
+          "cumulative_seconds": 0.001074417,
+          "function": [
+            "/opt/anaconda3/lib/python3.12/json/__init__.py",
+            183,
+            "dumps"
+          ],
+          "primitive_calls": 6,
+          "self_seconds": 1.0167000000000001e-05
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/json/__init__.py",
+                183,
+                "dumps"
+              ],
+              "statistics": [
+                6,
+                6,
+                3.3963e-05,
+                0.00106225
+              ]
+            }
+          ],
+          "calls": 6,
+          "cumulative_seconds": 0.00106225,
+          "function": [
+            "/opt/anaconda3/lib/python3.12/json/encoder.py",
+            183,
+            "encode"
+          ],
+          "primitive_calls": 6,
+          "self_seconds": 3.3963e-05
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py",
+                125,
+                "recover_distribution"
+              ],
+              "statistics": [
+                1,
+                1,
+                3.4916e-05,
+                0.00010266600000000001
+              ]
+            },
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py",
+                16,
+                "fit"
+              ],
+              "statistics": [
+                9,
+                9,
+                0.00036024500000000003,
+                0.0009532490000000001
+              ]
+            }
+          ],
+          "calls": 10,
+          "cumulative_seconds": 0.0010559150000000002,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+            55,
+            "components"
+          ],
+          "primitive_calls": 10,
+          "self_seconds": 0.00039516100000000005
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_forecast.py",
+                301,
+                "callback"
+              ],
+              "statistics": [
+                2,
+                2,
+                1.1623e-05,
+                0.000997375
+              ]
+            }
+          ],
+          "calls": 2,
+          "cumulative_seconds": 0.000997375,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py",
+            117,
+            "distribution_descriptor"
+          ],
+          "primitive_calls": 2,
+          "self_seconds": 1.1623e-05
+        }
+      ],
+      "top_self": [
+        {
+          "callers": [
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/json/encoder.py",
+                183,
+                "encode"
+              ],
+              "statistics": [
+                6,
+                6,
+                0.000840373,
+                0.000848166
+              ]
+            }
+          ],
+          "calls": 6,
+          "cumulative_seconds": 0.000848166,
+          "function": [
+            "/opt/anaconda3/lib/python3.12/json/encoder.py",
+            205,
+            "iterencode"
+          ],
+          "primitive_calls": 6,
+          "self_seconds": 0.000840373
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py",
+                125,
+                "recover_distribution"
+              ],
+              "statistics": [
+                1,
+                1,
+                3.4916e-05,
+                0.00010266600000000001
+              ]
+            },
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py",
+                16,
+                "fit"
+              ],
+              "statistics": [
+                9,
+                9,
+                0.00036024500000000003,
+                0.0009532490000000001
+              ]
+            }
+          ],
+          "calls": 10,
+          "cumulative_seconds": 0.0010559150000000002,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+            55,
+            "components"
+          ],
+          "primitive_calls": 10,
+          "self_seconds": 0.00039516100000000005
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_replay.py",
+                120,
+                "resolve_distribution"
+              ],
+              "statistics": [
+                1,
+                1,
+                0.000249376,
+                0.00045933300000000003
+              ]
+            }
+          ],
+          "calls": 1,
+          "cumulative_seconds": 0.00045933300000000003,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+            177,
+            "grid"
+          ],
+          "primitive_calls": 1,
+          "self_seconds": 0.000249376
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "~",
+                0,
+                "<built-in method builtins.all>"
+              ],
+              "statistics": [
+                2103,
+                2103,
+                0.00022056400000000002,
+                0.00029010500000000003
+              ]
+            }
+          ],
+          "calls": 2103,
+          "cumulative_seconds": 0.00029010500000000003,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+            42,
+            "<genexpr>"
+          ],
+          "primitive_calls": 2103,
+          "self_seconds": 0.00022056400000000002
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/core/_methods.py",
+                39,
+                "_amax"
+              ],
+              "statistics": [
+                1,
+                1,
+                9.625e-06,
+                9.625e-06
+              ]
+            },
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/core/_methods.py",
+                47,
+                "_sum"
+              ],
+              "statistics": [
+                14,
+                14,
+                1.9957000000000002e-05,
+                1.9957000000000002e-05
+              ]
+            },
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/core/_methods.py",
+                61,
+                "_all"
+              ],
+              "statistics": [
+                28,
+                28,
+                3.4747000000000005e-05,
+                3.4747000000000005e-05
+              ]
+            },
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/core/fromnumeric.py",
+                71,
+                "_wrapreduction"
+              ],
+              "statistics": [
+                95,
+                95,
+                0.000101259,
+                0.000101259
+              ]
+            }
+          ],
+          "calls": 138,
+          "cumulative_seconds": 0.00016558800000000001,
+          "function": [
+            "~",
+            0,
+            "<method 'reduce' of 'numpy.ufunc' objects>"
+          ],
+          "primitive_calls": 138,
+          "self_seconds": 0.00016558800000000001
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py",
+                117,
+                "distribution_descriptor"
+              ],
+              "statistics": [
+                4,
+                4,
+                7.741700000000001e-05,
+                0.00011158400000000001
+              ]
+            },
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py",
+                125,
+                "recover_distribution"
+              ],
+              "statistics": [
+                2,
+                2,
+                4.1583000000000005e-05,
+                6.125e-05
+              ]
+            }
+          ],
+          "calls": 6,
+          "cumulative_seconds": 0.00017283400000000002,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+            134,
+            "moments"
+          ],
+          "primitive_calls": 6,
+          "self_seconds": 0.000119
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+                55,
+                "components"
+              ],
+              "statistics": [
+                10,
+                10,
+                0.000109581,
+                0.00024475
+              ]
+            }
+          ],
+          "calls": 10,
+          "cumulative_seconds": 0.00024475,
+          "function": [
+            "/opt/anaconda3/lib/python3.12/site-packages/scipy/special/_logsumexp.py",
+            7,
+            "logsumexp"
+          ],
+          "primitive_calls": 10,
+          "self_seconds": 0.000109581
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_replay.py",
+                120,
+                "resolve_distribution"
+              ],
+              "statistics": [
+                1,
+                1,
+                8.671e-05,
+                0.001215292
+              ]
+            }
+          ],
+          "calls": 1,
+          "cumulative_seconds": 0.001215292,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py",
+            16,
+            "fit"
+          ],
+          "primitive_calls": 1,
+          "self_seconds": 8.671e-05
+        }
+      ]
+    },
+    {
+      "binary_profile": {
+        "bytes": 27902,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/profiles/synthetic700-independent_marginals-both-score.pstats",
+        "sha256": "e379b6d64cf5c0b0a85f9bc2de485a15b0c81a8c115fdebfd022310c952b8f9c"
+      },
+      "error": null,
+      "instrumented_seconds": 0.016038125002523884,
+      "json_profile": {
+        "bytes": 169373,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/profiles/synthetic700-independent_marginals-both-score.json",
+        "sha256": "ce8ee1ab57a3f2e2fec8c5115fa6ff46237b657b67628b62f906fd871a04ee42"
+      },
+      "kind": "score",
+      "metadata": {
+        "diagnostics": true,
+        "double_grid": true,
+        "game_id": "z-target",
+        "operation": "score",
+        "setting": 10,
+        "stage": "outer",
+        "variant": "independent_marginals"
+      },
+      "top_cumulative": [
+        {
+          "callers": [],
+          "calls": 1,
+          "cumulative_seconds": 0.015980166,
+          "function": [
+            "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/profile_remaining.py",
+            210,
+            "score"
+          ],
+          "primitive_calls": 1,
+          "self_seconds": 7.583e-06
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/profile_remaining.py",
+                210,
+                "score"
+              ],
+              "statistics": [
+                1,
+                1,
+                1.4667e-05,
+                0.015970625000000002
+              ]
+            }
+          ],
+          "calls": 1,
+          "cumulative_seconds": 0.015970625000000002,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+            96,
+            "score_forecast"
+          ],
+          "primitive_calls": 1,
+          "self_seconds": 1.4667e-05
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+                96,
+                "score_forecast"
+              ],
+              "statistics": [
+                1,
+                1,
+                0.000178953,
+                0.015924
+              ]
+            }
+          ],
+          "calls": 1,
+          "cumulative_seconds": 0.015924,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_metrics.py",
+            14,
+            "score_forecast"
+          ],
+          "primitive_calls": 1,
+          "self_seconds": 0.000178953
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+                235,
+                "quantile"
+              ],
+              "statistics": [
+                247,
+                247,
+                0.000142251,
+                0.010966659
+              ]
+            },
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_metrics.py",
+                14,
+                "score_forecast"
+              ],
+              "statistics": [
+                14,
+                14,
+                1.6993e-05,
+                0.001752749
+              ]
+            }
+          ],
+          "calls": 261,
+          "cumulative_seconds": 0.012719408000000001,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+            84,
+            "cdf"
+          ],
+          "primitive_calls": 261,
+          "self_seconds": 0.000159244
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+                84,
+                "cdf"
+              ],
+              "statistics": [
+                128,
+                128,
+                0.001372642,
+                0.012529922
+              ]
+            }
+          ],
+          "calls": 128,
+          "cumulative_seconds": 0.012529922,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+            50,
+            "_cdf"
+          ],
+          "primitive_calls": 128,
+          "self_seconds": 0.001372642
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_metrics.py",
+                14,
+                "score_forecast"
+              ],
+              "statistics": [
+                24,
+                24,
+                7.230000000000001e-05,
+                0.011043834
+              ]
+            }
+          ],
+          "calls": 24,
+          "cumulative_seconds": 0.011043834,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+            235,
+            "quantile"
+          ],
+          "primitive_calls": 24,
+          "self_seconds": 7.230000000000001e-05
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+                50,
+                "_cdf"
+              ],
+              "statistics": [
+                144,
+                144,
+                0.000464232,
+                0.002979329
+              ]
+            }
+          ],
+          "calls": 144,
+          "cumulative_seconds": 0.002979329,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+            203,
+            "_marginal_atoms"
+          ],
+          "primitive_calls": 144,
+          "self_seconds": 0.000464232
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+                50,
+                "_cdf"
+              ],
+              "statistics": [
+                202,
+                202,
+                0.00148367,
+                0.0027074100000000004
+              ]
+            }
+          ],
+          "calls": 202,
+          "cumulative_seconds": 0.0027074100000000004,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+            21,
+            "poisson_cdf"
+          ],
+          "primitive_calls": 202,
+          "self_seconds": 0.00148367
+        }
+      ],
+      "top_self": [
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+                50,
+                "_cdf"
+              ],
+              "statistics": [
+                202,
+                202,
+                0.00148367,
+                0.0027074100000000004
+              ]
+            }
+          ],
+          "calls": 202,
+          "cumulative_seconds": 0.0027074100000000004,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+            21,
+            "poisson_cdf"
+          ],
+          "primitive_calls": 202,
+          "self_seconds": 0.00148367
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+                84,
+                "cdf"
+              ],
+              "statistics": [
+                128,
+                128,
+                0.001372642,
+                0.012529922
+              ]
+            }
+          ],
+          "calls": 128,
+          "cumulative_seconds": 0.012529922,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+            50,
+            "_cdf"
+          ],
+          "primitive_calls": 128,
+          "self_seconds": 0.001372642
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/core/_methods.py",
+                39,
+                "_amax"
+              ],
+              "statistics": [
+                2,
+                2,
+                1.6583e-05,
+                1.6583e-05
+              ]
+            },
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/core/_methods.py",
+                43,
+                "_amin"
+              ],
+              "statistics": [
+                2,
+                2,
+                1.2001e-05,
+                1.2001e-05
+              ]
+            },
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/core/_methods.py",
+                47,
+                "_sum"
+              ],
+              "statistics": [
+                152,
+                152,
+                0.000270537,
+                0.000270537
+              ]
+            },
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/core/_methods.py",
+                55,
+                "_any"
+              ],
+              "statistics": [
+                37,
+                37,
+                3.5916e-05,
+                3.5916e-05
+              ]
+            },
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/core/_methods.py",
+                61,
+                "_all"
+              ],
+              "statistics": [
+                166,
+                166,
+                0.000127617,
+                0.000127617
+              ]
+            },
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/core/fromnumeric.py",
+                71,
+                "_wrapreduction"
+              ],
+              "statistics": [
+                534,
+                534,
+                0.00046459500000000005,
+                0.00046459500000000005
+              ]
+            }
+          ],
+          "calls": 893,
+          "cumulative_seconds": 0.0009272490000000001,
+          "function": [
+            "~",
+            0,
+            "<method 'reduce' of 'numpy.ufunc' objects>"
+          ],
+          "primitive_calls": 893,
+          "self_seconds": 0.0009272490000000001
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/lib/arraysetops.py",
+                138,
+                "unique"
+              ],
+              "statistics": [
+                144,
+                144,
+                0.0009195280000000001,
+                0.0023432920000000003
+              ]
+            }
+          ],
+          "calls": 144,
+          "cumulative_seconds": 0.0023432920000000003,
+          "function": [
+            "/opt/anaconda3/lib/python3.12/site-packages/numpy/lib/arraysetops.py",
+            323,
+            "_unique1d"
+          ],
+          "primitive_calls": 144,
+          "self_seconds": 0.0009195280000000001
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/lib/arraysetops.py",
+                323,
+                "_unique1d"
+              ],
+              "statistics": [
+                144,
+                144,
+                0.0007061750000000001,
+                0.0007061750000000001
+              ]
+            }
+          ],
+          "calls": 144,
+          "cumulative_seconds": 0.0007061750000000001,
+          "function": [
+            "~",
+            0,
+            "<method 'argsort' of 'numpy.ndarray' objects>"
+          ],
+          "primitive_calls": 144,
+          "self_seconds": 0.0007061750000000001
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/lib/stride_tricks.py",
+                367,
+                "broadcast_to"
+              ],
+              "statistics": [
+                19,
+                19,
+                5.0041000000000004e-05,
+                7.308400000000001e-05
+              ]
+            },
+            {
+              "function": [
+                "/opt/anaconda3/lib/python3.12/site-packages/numpy/lib/stride_tricks.py",
+                480,
+                "broadcast_arrays"
+              ],
+              "statistics": [
+                206,
+                206,
+                0.000531144,
+                0.0007891080000000001
+              ]
+            }
+          ],
+          "calls": 225,
+          "cumulative_seconds": 0.000862192,
+          "function": [
+            "/opt/anaconda3/lib/python3.12/site-packages/numpy/lib/stride_tricks.py",
+            340,
+            "_broadcast_to"
+          ],
+          "primitive_calls": 225,
+          "self_seconds": 0.000581185
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+                50,
+                "_cdf"
+              ],
+              "statistics": [
+                35,
+                35,
+                0.000540198,
+                0.002633584
+              ]
+            }
+          ],
+          "calls": 35,
+          "cumulative_seconds": 0.002633584,
+          "function": [
+            "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py",
+            3470,
+            "cdf"
+          ],
+          "primitive_calls": 35,
+          "self_seconds": 0.000540198
+        },
+        {
+          "callers": [
+            {
+              "function": [
+                "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_metrics.py",
+                14,
+                "score_forecast"
+              ],
+              "statistics": [
+                2,
+                2,
+                0.000530415,
+                0.0009564170000000001
+              ]
+            }
+          ],
+          "calls": 2,
+          "cumulative_seconds": 0.0009564170000000001,
+          "function": [
+            "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+            177,
+            "grid"
+          ],
+          "primitive_calls": 2,
+          "self_seconds": 0.000530415
+        }
+      ]
+    }
+  ],
+  "descriptor": {
+    "alphaSha256": "0078c7c105a87bc3c79ba51080e167ccb8698284252f9aab927500304e3ef302",
+    "beta": 0.041081712583614795,
+    "covariance": [
+      [
+        110.49473695661067,
+        0.0
+      ],
+      [
+        0.0,
+        97.12524453293848
+      ]
+    ],
+    "independent": true,
+    "iterations": 4,
+    "mapper": {
+      "name": "object-158a1b32727b9b8d9b8db016e7bd8a51894c6441aaab4e89b1947e23b496a6a0.json",
+      "sha256": "158a1b32727b9b8d9b8db016e7bd8a51894c6441aaab4e89b1947e23b496a6a0"
+    },
+    "mean": [
+      19.67343973795578,
+      16.43075744628908
+    ],
+    "rates": [
+      22.262252926676066,
+      21.578826830258272
+    ],
+    "theta": [
+      -0.02835051770232566,
+      -0.05953047347095097
+    ],
+    "version": "rf.joint-distribution.v2"
+  },
+  "descriptor_sha256": "eaf931c1634cace5e922fdbe8733e61a5da6ed41e1b5424241e2d51f8b9e5049",
+  "law_sha256": "fa9153220987b804c20491736f9c825da204128aa61be524410d83abd8ba6af3",
+  "metrics": {
+    "away_boundary_distance_50": 0.008009201819896672,
+    "away_boundary_distance_80": 0.0027796329348389603,
+    "away_boundary_distance_95": 2.4458755135237098e-05,
+    "away_coverage_50": 1.0,
+    "away_coverage_80": 1.0,
+    "away_coverage_95": 1.0,
+    "away_crps": 2.5211129168808224,
+    "away_lower_50": 9,
+    "away_lower_80": 3,
+    "away_lower_95": 1,
+    "away_mae": 0.5692425537109216,
+    "away_mean": 16.43075744628908,
+    "away_observed": 17.0,
+    "away_pit": 0.5444785193700782,
+    "away_squared_error": 0.32403708495533146,
+    "away_upper_50": 23,
+    "away_upper_80": 30,
+    "away_upper_95": 38,
+    "away_width_50": 14,
+    "away_width_80": 27,
+    "away_width_95": 37,
+    "away_win_probability": 0.39655339183856797,
+    "double_grid_difference": 1.5631940186722204e-13,
+    "grid_cells": [
+      64,
+      64
+    ],
+    "grid_probability_bound": 4.675464458779785e-14,
+    "grid_transport_bound": 4.031486327549278e-12,
+    "home_boundary_distance_50": 0.004096090961100085,
+    "home_boundary_distance_80": 0.0014387838740713699,
+    "home_boundary_distance_95": 0.0006317800202206847,
+    "home_coverage_50": 1.0,
+    "home_coverage_80": 1.0,
+    "home_coverage_95": 1.0,
+    "home_crps": 2.6294833854087685,
+    "home_lower_50": 12,
+    "home_lower_80": 6,
+    "home_lower_95": 1,
+    "home_mae": 1.3265602620442216,
+    "home_mean": 19.67343973795578,
+    "home_observed": 21.0,
+    "home_pit": 0.5766214414913585,
+    "home_squared_error": 1.759762128834834,
+    "home_upper_50": 27,
+    "home_upper_80": 34,
+    "home_upper_95": 42,
+    "home_width_50": 15,
+    "home_width_80": 28,
+    "home_width_95": 41,
+    "home_win_brier": 0.18055204177215783,
+    "home_win_log_loss": 0.5532359591040967,
+    "home_win_observed": 1.0,
+    "home_win_probability": 0.5750858418784356,
+    "joint_energy_score": 3.9721033527709704,
+    "joint_nll": 7.145834386257286,
+    "margin_boundary_distance_50": 0.0008929210195730009,
+    "margin_boundary_distance_80": 0.0013433074112573357,
+    "margin_boundary_distance_95": 0.0013343225208555243,
+    "margin_coverage_50": 1.0,
+    "margin_coverage_80": 1.0,
+    "margin_coverage_95": 1.0,
+    "margin_crps": 3.4142056527337505,
+    "margin_lower_50": -7,
+    "margin_lower_80": -15,
+    "margin_lower_95": -25,
+    "margin_mae": 0.7573177083333,
+    "margin_mean": 3.2426822916667,
+    "margin_observed": 4.0,
+    "margin_pit": 0.5096256600996968,
+    "margin_squared_error": 0.5735301113552013,
+    "margin_upper_50": 13,
+    "margin_upper_80": 22,
+    "margin_upper_95": 31,
+    "margin_width_50": 20,
+    "margin_width_80": 37,
+    "margin_width_95": 56,
+    "observed_absolute_margin_21": 0.0,
+    "observed_total_70": 0.0,
+    "predicted_covariance": 0.0,
+    "residual_product": 0.7551345512174821,
+    "tail_absolute_margin_21": 0.16656588748590406,
+    "tail_total_70": 0.014691413089370164,
+    "tie_probability": 0.02836076628299644,
+    "total_boundary_distance_50": 0.002771966115100555,
+    "total_boundary_distance_80": 0.004116374266961917,
+    "total_boundary_distance_95": 0.001732468856960323,
+    "total_coverage_50": 1.0,
+    "total_coverage_80": 1.0,
+    "total_coverage_95": 1.0,
+    "total_crps": 3.596235897369459,
+    "total_lower_50": 26,
+    "total_lower_80": 18,
+    "total_lower_95": 10,
+    "total_mae": 1.8958028157551468,
+    "total_mean": 36.10419718424485,
+    "total_observed": 38.0,
+    "total_pit": 0.5803481580120505,
+    "total_squared_error": 3.594068316225143,
+    "total_upper_50": 46,
+    "total_upper_80": 55,
+    "total_upper_95": 66,
+    "total_width_50": 20,
+    "total_width_80": 37,
+    "total_width_95": 56,
+    "win_tie_loss_brier": 0.3386109674149894,
+    "win_tie_loss_log_loss": 0.5532359591040967
+  },
+  "metrics_sha256": "5582cd0dc53a6e5bab2b07f627485038668d05d94be14ff611e6957eedb7e6c1",
+  "mode": "both",
+  "shared_binding_restored": true
+}

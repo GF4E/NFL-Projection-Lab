@@ -1,0 +1,26 @@
+{
+  "command": [
+    "/opt/anaconda3/bin/python3.12",
+    "-I",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "tests/research-score-split",
+    "-p",
+    "test_archive_unit.py",
+    "-v"
+  ],
+  "exit_code": 1,
+  "external_seconds_including_setup": 1.3570579579973128,
+  "peak_rss_mib": 114.625,
+  "wall_limit_seconds": 120,
+  "rss_limit_mib": 2048,
+  "source_hashes": {
+    "scripts/research_score_split_archive.py": "dbecaa6dbe87c6d1f8a2a94def53b5db4a7daac1abbe6309ef4d34bd6cb066f5",
+    "tests/research-score-split/test_archive_unit.py": "8a777541475996f5c56d9e963e4c296bf8b5298d0226c7466f893a523a5310a1"
+  },
+  "source_hashes_unchanged": true,
+  "historical_admission_invoked": false,
+  "log_sha256": "87cffc36f072eb9283ae479c188c42df01ac8b65b0256d2fc62765f1646418ae"
+}

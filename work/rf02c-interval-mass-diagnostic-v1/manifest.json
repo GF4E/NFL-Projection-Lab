@@ -1,0 +1,53 @@
+{
+  "bootstrap": {
+    "blocks": [
+      1,
+      3,
+      6
+    ],
+    "intervals": "pointwise95percentile_for_each_cell_and_residual_no_simultaneous_adjustment",
+    "members": 10000,
+    "seed": 20260904
+  },
+  "budgetMiB": 4096,
+  "budgetSeconds": 300,
+  "diagnostic": "original80_interval_mass_all16cells",
+  "families": [
+    "N0",
+    "S1",
+    "E1",
+    "E2"
+  ],
+  "fields": [
+    "forecast_mass",
+    "realized_coverage",
+    "coverage_residual",
+    "lower_forecast",
+    "lower_realized",
+    "lower_residual",
+    "upper_forecast",
+    "upper_realized",
+    "upper_residual",
+    "predicted_variance",
+    "squared_residual",
+    "variance_residual",
+    "interval_width",
+    "mean_error"
+  ],
+  "footballFits": 0,
+  "newAcceptanceGate": false,
+  "numericalFits": 0,
+  "primary": "2013-2024 development",
+  "runIndexSha256": "ccde502d661a4beee8f8da537a2f23238950fb2931c1527638de4c92898804ab",
+  "runManifestSha256": "2d9c91d803f1c991be039b88167082c8a501ce60dc58b18afcab0b251bb75e38",
+  "scopeSha256": "b133c9759a034ebbed33df46209b17add5d1a644e469466ce967e5616bb94ba1",
+  "scoreCalls": 0,
+  "scriptSha256": "41c4caa8768ef4455861fca00cc857b8bbfe88d9d3b120e4840ca0e5db4d9e20",
+  "separateDiagnostic": "2025 exposed",
+  "targets": [
+    "home",
+    "away",
+    "margin",
+    "total"
+  ]
+}

@@ -1,0 +1,328 @@
+"""Independent synthetic interleavings; no historical fixtures or model calls."""
+import ast
+from contextlib import contextmanager
+import hashlib
+import inspect
+import json
+import math
+from pathlib import Path
+import signal
+import sys
+import tempfile
+import time
+from types import SimpleNamespace, MethodType
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT/'scripts'))
+import research_score_clock_guard as unit
+import research_score_resource_policy as baseline
+import research_score_split_run as inherited
+
+OBSERVATIONS=[]
+def save(kind, **values):
+    row={'kind':kind, **values};json.dumps(row,allow_nan=False);OBSERVATIONS.append(row)
+
+class Clock:
+    def __init__(self):self.now=time.monotonic();self.trace=[];self.hook=None;self.live=True
+    def __call__(self):
+        value=time.monotonic() if self.live else self.now;self.trace.append({'event':'acquire','value':value.hex()})
+        hook,self.hook=self.hook,None
+        if hook:hook()
+        self.trace.append({'event':'return','value':value.hex()});return value
+
+@contextmanager
+def controlled():
+    clock=Clock()
+    class Envelope(unit.ControllerEnvelope):
+        def _arm(self):pass
+        def elapsed(self):return clock.now-self.started
+    previous=signal.getsignal(signal.SIGALRM)
+    with patch.object(unit,'time',SimpleNamespace(monotonic=clock)),patch.object(unit,'rss_mib',return_value=16.):
+        env=Envelope();clock.live=False;clock.now=env._last
+        try:yield env,clock
+        finally:env.close()
+    assert signal.getsignal(signal.SIGALRM) is previous
+    assert signal.getitimer(signal.ITIMER_REAL)==(0.,0.)
+
+def inject_line(function, lineno, callback):
+    old=sys.gettrace(); fired=[]
+    def trace(frame,event,arg):
+        if frame.f_code is function.__code__ and event=='line' and frame.f_lineno==lineno and not fired:
+            fired.append(lineno);callback()
+        return trace
+    return old,trace,fired
+
+class InterleavingTests(unittest.TestCase):
+    def test_original_exact_body_counterexample_and_true_reversal(self):
+        path=ROOT/'scripts/research_score_resource_policy.py';tree=ast.parse(path.read_text())
+        cls=next(n for n in tree.body if isinstance(n,ast.ClassDef) and n.name=='RuntimeEnvelope')
+        method=next(n for n in cls.body if isinstance(n,ast.FunctionDef) and n.name=='check')
+        class Stop(BaseException):pass
+        results=[]
+        for nested in (True,False):
+            trace=[]; state=SimpleNamespace(phase='science',stop_reason=None,_last=99.,_deadline=1000.,_smoke_deadline=None,peak_rss_mib=0.)
+            samples=iter([100.,101.] if nested else [100.,99.]);once=[False]
+            def clock():
+                v=next(samples);trace.append(['acquired',v])
+                if nested and not once[0]:once[0]=True;state.check()
+                return v
+            def stop(reason,*a):raise Stop(reason)
+            state._stop=stop
+            namespace={'time':SimpleNamespace(monotonic=clock),'math':math,'rss_mib':lambda:16.,'finite':lambda x:math.isfinite(x),'RuntimeStop':Stop}
+            exec(compile(ast.Module(body=[method],type_ignores=[]),str(path),'exec'),namespace)
+            state.check=MethodType(namespace['check'],state)
+            with self.assertRaisesRegex(Stop,'invalid_monotonic_clock'):
+                state.check()
+                if not nested:state.check()
+            results.append({'nested':nested,'trace':trace,'last':state._last})
+        save('original_counterexample',source_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),cases=results)
+
+    def test_nested_sample_request_takes_no_nested_sample_and_is_serviced(self):
+        with controlled() as (env,clock):
+            trace=[];clock.trace=[];clock.now+=1.
+            def nested():
+                before=len(clock.trace);clock.now+=1.;env._watchdog(signal.SIGALRM,None)
+                self.assertEqual(len(clock.trace),before);self.assertTrue(env._check_pending);trace.append('nested_deferred')
+            clock.hook=nested;env.check()
+            self.assertEqual(env._last,clock.now);self.assertFalse(env._check_active)
+            self.assertGreaterEqual(sum(x['event']=='acquire' for x in clock.trace),2)
+            save('nested_sample',trace=clock.trace,events=trace,last=env._last.hex())
+
+    def test_every_guard_line_entry_pending_release_interleaving(self):
+        lines,start=inspect.getsourcelines(unit.ControllerEnvelope.check)
+        targets=[start+i for i,s in enumerate(lines) if s.strip() and not s.lstrip().startswith(('def ','#','"""'))]
+        records=[]
+        for line in targets:
+            with controlled() as (env,clock):
+                clock.trace=[];clock.now+=1.;events=[]
+                def nested():
+                    events.append({'active_before':env._check_active,'pending_before':env._check_pending})
+                    clock.now+=1.;env._watchdog(signal.SIGALRM,None)
+                old,trace,fired=inject_line(unit.ControllerEnvelope.check,line,nested)
+                sys.settrace(trace)
+                try:env.check()
+                finally:sys.settrace(old)
+                self.assertFalse(env._check_active);self.assertEqual(env.phase,'science')
+                if fired:self.assertEqual(env._last,clock.now)
+                records.append({'line':line,'fired':bool(fired),'events':events,'samples':clock.trace,'last':env._last.hex()})
+        self.assertGreaterEqual(sum(r['fired'] for r in records),6)
+        save('guard_line_interleavings',records=records)
+
+    def test_nested_branch_assignment_and_return_requests_are_serviced(self):
+        lines,start=inspect.getsourcelines(unit.ControllerEnvelope.check)
+        targets=[start+i for i,line in enumerate(lines) if '_check_pending = True' in line or line.strip()=='return']
+        records=[]
+        for target in targets:
+            with controlled() as (env,clock):
+                fired=[];old=sys.gettrace()
+                def trace(frame,event,arg):
+                    if frame.f_code is unit.ControllerEnvelope.check.__code__ and event=='line' and frame.f_lineno==target and env._check_active and not fired:
+                        fired.append(target);clock.now+=1.;env._watchdog(signal.SIGALRM,None)
+                    return trace
+                clock.hook=lambda:env._watchdog(signal.SIGALRM,None)
+                sys.settrace(trace)
+                try:env.check()
+                finally:sys.settrace(old)
+                self.assertFalse(env._check_active);self.assertEqual(env._last,clock.now)
+                records.append({'line':target,'fired':bool(fired),'samples':clock.trace})
+        self.assertGreaterEqual(sum(r['fired'] for r in records),2)
+        save('nested_branch_interleavings',records=records)
+
+    def test_compare_commit_and_rss_interleavings(self):
+        function=unit._runtime_check;lines,start=inspect.getsourcelines(function)
+        targets=[start+i for i,s in enumerate(lines) if 'self._last = now' in s or 'if not math.isfinite(now)' in s or 'self.peak_rss_mib =' in s]
+        self.assertEqual(len(targets),3)
+        records=[]
+        for line in targets:
+            with controlled() as (env,clock):
+                clock.now+=1.;clock.trace=[]
+                def nested():clock.now+=1.;env._watchdog(signal.SIGALRM,None)
+                old,trace,fired=inject_line(function,line,nested);sys.settrace(trace)
+                try:env.check()
+                finally:sys.settrace(old)
+                self.assertTrue(fired);self.assertEqual(env._last,clock.now);self.assertFalse(env._check_active)
+                records.append({'line':line,'trace':clock.trace})
+        save('compare_commit_rss_interleavings',records=records)
+
+    def test_finite_repeated_pending_requests_do_not_recurse(self):
+        with controlled() as (env,clock):
+            calls=[]
+            def rss():
+                calls.append(len(inspect.stack()));clock.now+=.01
+                if len(calls)<=20:env._watchdog(signal.SIGALRM,None)
+                return 16.
+            with patch.object(unit,'rss_mib',side_effect=rss):env.check()
+            self.assertEqual(len(calls),21);self.assertEqual(min(calls),max(calls));self.assertFalse(env._check_active)
+            save('finite_pending_drain',checks=len(calls),stack_depths=calls)
+
+class FailureTests(unittest.TestCase):
+    def test_true_reversal_and_nonfinite_are_not_retried(self):
+        for label,value in [('backward',-1.),('nan',float('nan')),('positive_infinity',float('inf')),('negative_infinity',-float('inf'))]:
+            with controlled() as (env,clock):
+                clock.now=env._last-1 if label=='backward' else value;clock.trace=[]
+                with self.assertRaisesRegex(unit.RuntimeStop,'invalid_monotonic_clock'):env.check()
+                self.assertFalse(env._check_active);self.assertEqual(env.phase,'stopped')
+                self.assertEqual(env._clock_failure['sample']['float_hex'],clock.now.hex())
+                self.assertEqual(env._clock_failure['previous_last']['float_hex'],env._last.hex())
+                save('clock_failure',case=label,samples=len(clock.trace),reason=env.stop_reason,diagnostic=env._clock_failure)
+
+    def test_rss_highwater_invalid_and_cap(self):
+        with controlled() as (env,clock):
+            for value in (100.,20.,4096.):
+                with patch.object(unit,'rss_mib',return_value=value):env.check()
+            self.assertEqual(env.peak_rss_mib,4096.)
+            with patch.object(unit,'rss_mib',return_value=4096.1),self.assertRaisesRegex(unit.RuntimeStop,'4096'):env.check()
+            save('rss_cap',peak=env.peak_rss_mib,reason=env.stop_reason)
+        with controlled() as (env,_):
+            with patch.object(unit,'rss_mib',return_value=float('nan')),self.assertRaisesRegex(unit.RuntimeStop,'invalid_memory'):env.check()
+            self.assertFalse(env._check_active);save('invalid_rss',reason=env.stop_reason)
+
+    def test_pending_crosses_deadline_and_earliest_smoke_preserved(self):
+        for complete,evaluator,expected in ((None,None,9000.),(120.,130.,120.),(None,120.,120.)):
+            with controlled() as (env,clock):
+                env._whole_smoke_deadline=None if complete is None else env.started+complete
+                env._smoke_deadline=None if evaluator is None else env.started+evaluator
+                def rss():
+                    clock.now=env.started+9001.;env._watchdog(signal.SIGALRM,None);return 16.
+                with patch.object(unit,'rss_mib',side_effect=rss),self.assertRaises(unit.RuntimeStop):env.check()
+                self.assertEqual(env.scientific_stop_elapsed,expected);self.assertFalse(env._check_active)
+                save('pending_deadline',complete=complete,evaluator=evaluator,stop=env.scientific_stop_elapsed,reason=env.stop_reason)
+
+    def test_pending_failure_propagates_original_without_drain(self):
+        for cls in (ValueError,KeyboardInterrupt,SystemExit):
+            with controlled() as (env,clock):
+                failure=cls('original');calls=[]
+                def rss():calls.append(1);env._watchdog(signal.SIGALRM,None);raise failure
+                with patch.object(unit,'rss_mib',side_effect=rss):
+                    try:env.check()
+                    except BaseException as actual:self.assertIs(actual,failure)
+                    else:self.fail('original exception lost')
+                self.assertEqual(len(calls),1);self.assertFalse(env._check_active)
+                save('original_exception',type=cls.__name__,checks=len(calls),pending=env._check_pending)
+
+    def test_exception_release_signal_cannot_replace_original(self):
+        for cls in (ValueError,KeyboardInterrupt,SystemExit):
+            with controlled() as (env,clock):
+                primary=cls('primary');secondary=ValueError('nested replacement');calls=[];fired=[]
+                def rss():
+                    calls.append(1)
+                    raise primary if len(calls)==1 else secondary
+                old=sys.gettrace()
+                def trace(frame,event,arg):
+                    if frame.f_code is unit.ControllerEnvelope.check.__code__ and event=='return' and not env._check_active and not fired:
+                        fired.append(True);env._watchdog(signal.SIGALRM,None)
+                    return trace
+                actual=None
+                with patch.object(unit,'rss_mib',side_effect=rss):
+                    sys.settrace(trace)
+                    try:env.check()
+                    except BaseException as error:actual=error
+                    finally:sys.settrace(old)
+                save('exception_release_signal',original=cls.__name__,actual=None if actual is None else type(actual).__name__,
+                     same_exception=actual is primary,rss_calls=len(calls),injected=bool(fired))
+                self.assertTrue(fired);self.assertIs(actual,primary);self.assertEqual(len(calls),1)
+
+    def test_later_watchdog_rethrows_primary_until_explicit_check(self):
+        for target in ('rss','deadline'):
+            with controlled() as (env,clock):
+                primary=KeyboardInterrupt('swallowed for test');calls=[]
+                def fail():calls.append(1);raise primary
+                with patch.object(unit,'rss_mib',side_effect=fail):
+                    try:env.check()
+                    except KeyboardInterrupt as error:self.assertIs(error,primary)
+                    for _ in range(2):
+                        try:env._watchdog(signal.SIGALRM,None)
+                        except BaseException as error:self.assertIs(error,primary)
+                        else:self.fail('handler silently ignored primary')
+                self.assertEqual(len(calls),1)
+                if target=='deadline':clock.now=env.started+9001.
+                with patch.object(unit,'rss_mib',return_value=4097. if target=='rss' else 16.),self.assertRaises(unit.RuntimeStop):env.check()
+                self.assertIn('4096' if target=='rss' else '9000',env.stop_reason)
+                save('latched_primary_then_explicit_check',target=target,reason=env.stop_reason,failed_rss_calls=len(calls))
+
+    def test_latch_write_and_explicit_reset_signal_boundaries(self):
+        lines,start=inspect.getsourcelines(unit.ControllerEnvelope.check)
+        latch=next(start+i for i,line in enumerate(lines) if '_check_failed_error = error' in line)
+        reset=next(start+i for i,line in enumerate(lines) if '_check_failed_error = None' in line)
+        after_reset=next(start+i for i,line in enumerate(lines) if 'while True:' in line)
+        records=[]
+        for target in (latch,reset,after_reset):
+            with controlled() as (env,clock):
+                primary=KeyboardInterrupt('primary');calls=[]
+                if target!=latch:env._check_failed_error=primary
+                def rss():
+                    calls.append(1)
+                    if target==latch:raise primary
+                    return 16.
+                old,trace,fired=inject_line(unit.ControllerEnvelope.check,target,lambda:env._watchdog(signal.SIGALRM,None))
+                actual=None
+                with patch.object(unit,'rss_mib',side_effect=rss):
+                    sys.settrace(trace)
+                    try:env.check()
+                    except BaseException as error:actual=error
+                    finally:sys.settrace(old)
+                self.assertTrue(fired);self.assertFalse(env._check_active)
+                if target in (latch,reset):self.assertIs(actual,primary)
+                else:self.assertIsNone(actual);self.assertIsNone(env._check_failed_error);self.assertEqual(len(calls),2)
+                self.assertEqual(len(calls),1 if target==latch else 0 if target==reset else 2)
+                records.append({'line':target,'rss_calls':len(calls),'same_primary':actual is primary,'active':env._check_active})
+        save('latch_reset_boundary_interleavings',records=records)
+
+    def test_inherited_after_preserves_interrupt_with_latched_deadline(self):
+        for cls in (KeyboardInterrupt,SystemExit):
+            with controlled() as (env,clock):
+                error=cls('interrupt')
+                def callback():clock.now=env.started+9001.;raise error
+                try:env.call(callback)
+                except BaseException as actual:self.assertIs(actual,error)
+                else:self.fail('interrupt lost')
+                self.assertEqual(env.scientific_stop_elapsed,9000.);save('callback_interrupt',type=cls.__name__,reason=env.stop_reason)
+
+    def test_metadata_dispatch_bypasses_scientific_guard(self):
+        with controlled() as (env,_):
+            env.phase='metadata_finalization';env._grace_deadline=time.monotonic()-1.;env._check_active=True
+            with self.assertRaisesRegex(unit.RuntimeStop,'metadata_finalization'):env._watchdog(signal.SIGALRM,None)
+            self.assertFalse(env._check_pending)
+            save('metadata_dispatch',guard_active=True,deadline_rejected=True)
+
+    def test_actual_complete_smoke_success_failure_and_reentry(self):
+        from research_score_split_watchdog import _write_phase, _read_phase
+        for fail in (False,True):
+            with tempfile.TemporaryDirectory() as folder:
+                path=Path(folder)/'phase.json'
+                _write_phase(path,{'version':'rf02f.owned-phase.v1','owner':'a'*32,'phase':'starting',
+                                  'smoke_started':None,'smoke_finished':None},initial=True)
+                with unit.ControllerEnvelope() as env:
+                    marker=KeyboardInterrupt('body interrupt')
+                    try:
+                        with env.complete_smoke(path):
+                            self.assertEqual(_read_phase(path)[0]['phase'],'smoke')
+                            self.assertIsNotNone(env._whole_smoke_deadline)
+                            if fail:raise marker
+                    except KeyboardInterrupt as error:self.assertTrue(fail);self.assertIs(error,marker)
+                    phase=_read_phase(path)[0]
+                    self.assertEqual(phase['phase'],'smoke' if fail else 'science')
+                    self.assertIsNone(env._whole_smoke_deadline)
+                    with self.assertRaisesRegex(ValueError,'reuse'):
+                        with env.complete_smoke(path):self.fail('reused smoke')
+                    save('actual_complete_smoke',failed=fail,phase=phase)
+
+    def test_real_signal_pending_crosses_real_deadline(self):
+        previous=signal.getsignal(signal.SIGALRM);calls=[]
+        with unit.ControllerEnvelope() as env:
+            def rss():
+                calls.append({'active':env._check_active,'before_pending':env._check_pending})
+                if len(calls)==1:
+                    env._deadline=time.monotonic()+.02
+                    signal.setitimer(signal.ITIMER_REAL,.005)
+                    time.sleep(.04)
+                    self.assertTrue(env._check_pending)
+                return 16.
+            with patch.object(unit,'rss_mib',side_effect=rss),self.assertRaisesRegex(unit.RuntimeStop,'9000'):env.check()
+            self.assertFalse(env._check_active);self.assertEqual(env.phase,'stopped')
+            save('real_signal_pending_deadline',calls=calls,reason=env.stop_reason)
+        self.assertIs(signal.getsignal(signal.SIGALRM),previous);self.assertEqual(signal.getitimer(signal.ITIMER_REAL),(0.,0.))
+
+if __name__=='__main__':unittest.main()

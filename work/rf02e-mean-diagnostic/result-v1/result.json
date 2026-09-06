@@ -1,0 +1,3380 @@
+{
+  "analytical_tests": {
+    "constant_predictor": true,
+    "invalid_numeric_rejection": true,
+    "known_values": true,
+    "paired_sign": true,
+    "pooled_between_group_terms": true,
+    "reversal_invariance": true
+  },
+  "cells": {
+    "E2:availability_24h:margin": {
+      "2013": {
+        "mean_observation": 3.10546875,
+        "mean_prediction": 2.8362506689976694,
+        "mean_squared_error": 162.6832956202138,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.2692180810023305,
+        "prediction_observation_covariance": 39.273961249237324,
+        "prediction_variance": 41.22064465077646
+      },
+      "2014": {
+        "mean_observation": 2.48828125,
+        "mean_prediction": 2.9558065789425068,
+        "mean_squared_error": 212.5119684861443,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.467525328942507,
+        "prediction_observation_covariance": 25.85956450133986,
+        "prediction_variance": 19.864217384722778
+      },
+      "2015": {
+        "mean_observation": 1.5625,
+        "mean_prediction": 2.4839597930781188,
+        "mean_squared_error": 170.17348208448112,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.9214597930781189,
+        "prediction_observation_covariance": 29.708157462349845,
+        "prediction_variance": 29.619615108921238
+      },
+      "2016": {
+        "mean_observation": 2.56640625,
+        "mean_prediction": 2.283570407084417,
+        "mean_squared_error": 144.1570959740646,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.28283584291558317,
+        "prediction_observation_covariance": 22.355660101916786,
+        "prediction_variance": 23.894392353899466
+      },
+      "2017": {
+        "mean_observation": 2.484375,
+        "mean_prediction": 2.340319453434896,
+        "mean_squared_error": 190.46283084388148,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.14405554656510422,
+        "prediction_observation_covariance": 19.66784296309036,
+        "prediction_variance": 16.965508910191023
+      },
+      "2018": {
+        "mean_observation": 2.203125,
+        "mean_prediction": 2.5081409802054893,
+        "mean_squared_error": 179.13692072118207,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.3050159802054894,
+        "prediction_observation_covariance": 21.6487987750553,
+        "prediction_variance": 16.82024328873695
+      },
+      "2019": {
+        "mean_observation": -0.140625,
+        "mean_prediction": 2.11298387379412,
+        "mean_squared_error": 184.5393142516989,
+        "n": 256,
+        "observed_minus_predicted_bias": -2.25360887379412,
+        "prediction_observation_covariance": 30.781640629523213,
+        "prediction_variance": 21.668617945326712
+      },
+      "2020": {
+        "mean_observation": 0.0546875,
+        "mean_prediction": 1.7018931636165349,
+        "mean_squared_error": 178.08574683603248,
+        "n": 256,
+        "observed_minus_predicted_bias": -1.6472056636165349,
+        "prediction_observation_covariance": 26.056499294915305,
+        "prediction_variance": 25.636887150268947
+      },
+      "2021": {
+        "mean_observation": 1.713235294117647,
+        "mean_prediction": 1.3346370049942224,
+        "mean_squared_error": 204.21360845054528,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.37859828912342464,
+        "prediction_observation_covariance": 39.10609924018828,
+        "prediction_variance": 44.9970572041109
+      },
+      "2022": {
+        "mean_observation": 1.977859778597786,
+        "mean_prediction": 1.6044519278998934,
+        "mean_squared_error": 137.8060944850812,
+        "n": 271,
+        "observed_minus_predicted_bias": 0.37340785069789256,
+        "prediction_observation_covariance": 20.683901749691383,
+        "prediction_variance": 27.130895710314487
+      },
+      "2023": {
+        "mean_observation": 2.6838235294117645,
+        "mean_prediction": 1.7866949269738233,
+        "mean_squared_error": 180.21681473200906,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.8971286024379416,
+        "prediction_observation_covariance": 26.049226359522773,
+        "prediction_variance": 24.26480704700185
+      },
+      "2024": {
+        "mean_observation": 1.8676470588235294,
+        "mean_prediction": 1.863589805408311,
+        "mean_squared_error": 176.30113774265436,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.004057253415218467,
+        "prediction_observation_covariance": 24.893106096435922,
+        "prediction_variance": 17.818086069376644
+      },
+      "development": {
+        "mean_observation": 1.8842105263157896,
+        "mean_prediction": 2.1409167350336844,
+        "mean_squared_error": 176.66111764288505,
+        "n": 3135,
+        "observed_minus_predicted_bias": -0.25670620871789496,
+        "prediction_observation_covariance": 27.367632902327166,
+        "prediction_variance": 26.1142275003908
+      },
+      "exposed_2025": {
+        "mean_observation": 2.0698529411764706,
+        "mean_prediction": 1.9926484646948732,
+        "mean_squared_error": 171.34563681313614,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.07720447648159741,
+        "prediction_observation_covariance": 28.63324049072915,
+        "prediction_variance": 28.350007285031943
+      }
+    },
+    "E2:availability_24h:total": {
+      "2013": {
+        "mean_observation": 46.81640625,
+        "mean_prediction": 45.12794185216839,
+        "mean_squared_error": 203.68736500740968,
+        "n": 256,
+        "observed_minus_predicted_bias": 1.6884643978316116,
+        "prediction_observation_covariance": 17.533900647455702,
+        "prediction_variance": 28.72311719461529
+      },
+      "2014": {
+        "mean_observation": 45.17578125,
+        "mean_prediction": 45.57521784354117,
+        "mean_squared_error": 177.46946404134738,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.3994365935411667,
+        "prediction_observation_covariance": 11.2568282911526,
+        "prediction_variance": 10.553688829244368
+      },
+      "2015": {
+        "mean_observation": 45.625,
+        "mean_prediction": 45.51552470898718,
+        "mean_squared_error": 187.32428172836194,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.10947529101282308,
+        "prediction_observation_covariance": 3.863972969726989,
+        "prediction_variance": 11.587117828473577
+      },
+      "2016": {
+        "mean_observation": 45.55078125,
+        "mean_prediction": 45.47162104881861,
+        "mean_squared_error": 163.39738702424586,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.0791602011813892,
+        "prediction_observation_covariance": 13.842566468875235,
+        "prediction_variance": 13.43820735989682
+      },
+      "2017": {
+        "mean_observation": 43.4375,
+        "mean_prediction": 45.284700265265116,
+        "mean_squared_error": 212.41557802505628,
+        "n": 256,
+        "observed_minus_predicted_bias": -1.847200265265115,
+        "prediction_observation_covariance": -1.402176538989866,
+        "prediction_variance": 7.015482377081047
+      },
+      "2018": {
+        "mean_observation": 46.6875,
+        "mean_prediction": 45.32734910934009,
+        "mean_squared_error": 203.03329396083907,
+        "n": 256,
+        "observed_minus_predicted_bias": 1.3601508906599094,
+        "prediction_observation_covariance": 12.96370127057602,
+        "prediction_variance": 11.630217306628186
+      },
+      "2019": {
+        "mean_observation": 45.625,
+        "mean_prediction": 45.35213854600711,
+        "mean_squared_error": 182.91519001321305,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.2728614539928902,
+        "prediction_observation_covariance": 10.625355956341908,
+        "prediction_variance": 11.669573552821753
+      },
+      "2020": {
+        "mean_observation": 49.578125,
+        "mean_prediction": 45.787940486449294,
+        "mean_squared_error": 200.60623621334872,
+        "n": 256,
+        "observed_minus_predicted_bias": 3.7901845135507095,
+        "prediction_observation_covariance": 4.937571464471702,
+        "prediction_variance": 10.067296511157505
+      },
+      "2021": {
+        "mean_observation": 45.963235294117645,
+        "mean_prediction": 46.133880108011546,
+        "mean_squared_error": 189.2388382306274,
+        "n": 272,
+        "observed_minus_predicted_bias": -0.17064481389390074,
+        "prediction_observation_covariance": 8.286484874286465,
+        "prediction_variance": 18.00462820558421
+      },
+      "2022": {
+        "mean_observation": 43.76383763837639,
+        "mean_prediction": 45.684914879026174,
+        "mean_squared_error": 191.73267491230095,
+        "n": 271,
+        "observed_minus_predicted_bias": -1.9210772406497856,
+        "prediction_observation_covariance": 12.901853765803821,
+        "prediction_variance": 23.7540158643989
+      },
+      "2023": {
+        "mean_observation": 43.536764705882355,
+        "mean_prediction": 45.154306023847035,
+        "mean_squared_error": 182.7443545074857,
+        "n": 272,
+        "observed_minus_predicted_bias": -1.6175413179646814,
+        "prediction_observation_covariance": 10.517666518331954,
+        "prediction_variance": 14.67930515477824
+      },
+      "2024": {
+        "mean_observation": 45.8235294117647,
+        "mean_prediction": 44.91060794791118,
+        "mean_squared_error": 166.7883087738797,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.9129214638535247,
+        "prediction_observation_covariance": 7.011922267459155,
+        "prediction_variance": 8.664281342851517
+      },
+      "development": {
+        "mean_observation": 45.61499202551834,
+        "mean_prediction": 45.44432120900196,
+        "mean_squared_error": 188.3262185301544,
+        "n": 3135,
+        "observed_minus_predicted_bias": 0.17067081651637436,
+        "prediction_observation_covariance": 9.485416098727983,
+        "prediction_variance": 14.291113468006177
+      },
+      "exposed_2025": {
+        "mean_observation": 46.025735294117645,
+        "mean_prediction": 45.299127294320826,
+        "mean_squared_error": 178.41334128625172,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.726607999796826,
+        "prediction_observation_covariance": 13.267655261267041,
+        "prediction_variance": 14.292678458192126
+      }
+    },
+    "E2:full:margin": {
+      "2013": {
+        "mean_observation": 3.10546875,
+        "mean_prediction": 2.7906388809119305,
+        "mean_squared_error": 161.78224313081037,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.3148298690880696,
+        "prediction_observation_covariance": 39.66752373892483,
+        "prediction_variance": 41.08007766941658
+      },
+      "2014": {
+        "mean_observation": 2.48828125,
+        "mean_prediction": 2.9274937184553025,
+        "mean_squared_error": 213.113712431788,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.43921246845530243,
+        "prediction_observation_covariance": 25.608680899148347,
+        "prediction_variance": 19.98986646673965
+      },
+      "2015": {
+        "mean_observation": 1.5625,
+        "mean_prediction": 2.4868534616171263,
+        "mean_squared_error": 170.13111902984153,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.9243534616171263,
+        "prediction_observation_covariance": 29.696436994418555,
+        "prediction_variance": 29.548469946675063
+      },
+      "2016": {
+        "mean_observation": 2.56640625,
+        "mean_prediction": 2.308419932564009,
+        "mean_squared_error": 144.28493624317767,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.25798631743599126,
+        "prediction_observation_covariance": 22.226449987250195,
+        "prediction_variance": 23.777251567732947
+      },
+      "2017": {
+        "mean_observation": 2.484375,
+        "mean_prediction": 2.351980258776859,
+        "mean_squared_error": 190.3250057341732,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.1323947412231411,
+        "prediction_observation_covariance": 19.776376199762687,
+        "prediction_variance": 17.047973906820044
+      },
+      "2018": {
+        "mean_observation": 2.203125,
+        "mean_prediction": 2.518221148186149,
+        "mean_squared_error": 178.79119882348164,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.31509614818614906,
+        "prediction_observation_covariance": 21.78095769021977,
+        "prediction_variance": 16.73258838694443
+      },
+      "2019": {
+        "mean_observation": -0.140625,
+        "mean_prediction": 2.124261040087853,
+        "mean_squared_error": 184.4805718967836,
+        "n": 256,
+        "observed_minus_predicted_bias": -2.264886040087853,
+        "prediction_observation_covariance": 30.81778580140915,
+        "prediction_variance": 21.631210115642066
+      },
+      "2020": {
+        "mean_observation": 0.0546875,
+        "mean_prediction": 1.701853447915259,
+        "mean_squared_error": 177.65439831586457,
+        "n": 256,
+        "observed_minus_predicted_bias": -1.647165947915259,
+        "prediction_observation_covariance": 26.186622728783234,
+        "prediction_variance": 25.465916336115715
+      },
+      "2021": {
+        "mean_observation": 1.713235294117647,
+        "mean_prediction": 1.29465932348271,
+        "mean_squared_error": 203.5723316670602,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.4185759706349371,
+        "prediction_observation_covariance": 39.237576614598865,
+        "prediction_variance": 44.58686599078123
+      },
+      "2022": {
+        "mean_observation": 1.977859778597786,
+        "mean_prediction": 1.550940087238649,
+        "mean_squared_error": 136.97955346833132,
+        "n": 271,
+        "observed_minus_predicted_bias": 0.4269196913591371,
+        "prediction_observation_covariance": 21.01908103546524,
+        "prediction_variance": 26.931886265204966
+      },
+      "2023": {
+        "mean_observation": 2.6838235294117645,
+        "mean_prediction": 1.7865750305080885,
+        "mean_squared_error": 180.21144517038707,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.8972484989036761,
+        "prediction_observation_covariance": 25.92015099232538,
+        "prediction_variance": 24.001071611512437
+      },
+      "2024": {
+        "mean_observation": 1.8676470588235294,
+        "mean_prediction": 1.8642914493749667,
+        "mean_squared_error": 176.33699476209108,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.003355609448562561,
+        "prediction_observation_covariance": 24.915323253066795,
+        "prediction_variance": 17.8983826032656
+      },
+      "development": {
+        "mean_observation": 1.8842105263157896,
+        "mean_prediction": 2.131794764152112,
+        "mean_squared_error": 176.43970793623853,
+        "n": 3135,
+        "observed_minus_predicted_bias": -0.24758423783632247,
+        "prediction_observation_covariance": 27.426606382541053,
+        "prediction_variance": 26.015364876941405
+      },
+      "exposed_2025": {
+        "mean_observation": 2.0698529411764706,
+        "mean_prediction": 1.9793748434837553,
+        "mean_squared_error": 170.78899786793176,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.09047809769271525,
+        "prediction_observation_covariance": 28.86204490770467,
+        "prediction_variance": 28.24875141880531
+      }
+    },
+    "E2:full:total": {
+      "2013": {
+        "mean_observation": 46.81640625,
+        "mean_prediction": 45.11591705739096,
+        "mean_squared_error": 202.65773314034584,
+        "n": 256,
+        "observed_minus_predicted_bias": 1.7004891926090435,
+        "prediction_observation_covariance": 17.95909516342689,
+        "prediction_variance": 28.503122888058535
+      },
+      "2014": {
+        "mean_observation": 45.17578125,
+        "mean_prediction": 45.581641512231776,
+        "mean_squared_error": 176.58547526893415,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.4058602622317766,
+        "prediction_observation_covariance": 11.774377500961346,
+        "prediction_variance": 10.69962551624957
+      },
+      "2015": {
+        "mean_observation": 45.625,
+        "mean_prediction": 45.50857999338917,
+        "mean_squared_error": 187.86375740443472,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.11642000661083121,
+        "prediction_observation_covariance": 3.60156720081358,
+        "prediction_variance": 11.600213188122627
+      },
+      "2016": {
+        "mean_observation": 45.55078125,
+        "mean_prediction": 45.47185787991637,
+        "mean_squared_error": 162.8310603015064,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.0789233700836321,
+        "prediction_observation_covariance": 14.093880369043898,
+        "prediction_variance": 13.374545876600406
+      },
+      "2017": {
+        "mean_observation": 43.4375,
+        "mean_prediction": 45.283327241408365,
+        "mean_squared_error": 212.11189499201936,
+        "n": 256,
+        "observed_minus_predicted_bias": -1.8458272414083665,
+        "prediction_observation_covariance": -1.2908109222049307,
+        "prediction_variance": 6.939601192484283
+      },
+      "2018": {
+        "mean_observation": 46.6875,
+        "mean_prediction": 45.30875077049732,
+        "mean_squared_error": 203.29068061327172,
+        "n": 256,
+        "observed_minus_predicted_bias": 1.3787492295026835,
+        "prediction_observation_covariance": 12.811049677497314,
+        "prediction_variance": 11.531361780412112
+      },
+      "2019": {
+        "mean_observation": 45.625,
+        "mean_prediction": 45.35098204883651,
+        "mean_squared_error": 183.30802559883318,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.2740179511634969,
+        "prediction_observation_covariance": 10.440013819845555,
+        "prediction_variance": 11.69109240096445
+      },
+      "2020": {
+        "mean_observation": 49.578125,
+        "mean_prediction": 45.78762133269299,
+        "mean_squared_error": 200.74292440151197,
+        "n": 256,
+        "observed_minus_predicted_bias": 3.7905036673070094,
+        "prediction_observation_covariance": 4.836286927760776,
+        "prediction_variance": 9.998996220790636
+      },
+      "2021": {
+        "mean_observation": 45.963235294117645,
+        "mean_prediction": 46.1259269870928,
+        "mean_squared_error": 188.71506780070658,
+        "n": 272,
+        "observed_minus_predicted_bias": -0.16269169297515293,
+        "prediction_observation_covariance": 8.495885770184897,
+        "prediction_variance": 17.90231063300599
+      },
+      "2022": {
+        "mean_observation": 43.76383763837639,
+        "mean_prediction": 45.68114637505375,
+        "mean_squared_error": 191.5096739049367,
+        "n": 271,
+        "observed_minus_predicted_bias": -1.9173087366773633,
+        "prediction_observation_covariance": 12.939023330316308,
+        "prediction_variance": 23.61981895886286
+      },
+      "2023": {
+        "mean_observation": 43.536764705882355,
+        "mean_prediction": 45.164460383871244,
+        "mean_squared_error": 182.76768275850546,
+        "n": 272,
+        "observed_minus_predicted_bias": -1.6276956779888885,
+        "prediction_observation_covariance": 10.528919985016229,
+        "prediction_variance": 14.69218703434578
+      },
+      "2024": {
+        "mean_observation": 45.8235294117647,
+        "mean_prediction": 44.91017461284157,
+        "mean_squared_error": 166.51506010289452,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.9133547989231318,
+        "prediction_observation_covariance": 7.191009323638453,
+        "prediction_variance": 8.748415394673497
+      },
+      "development": {
+        "mean_observation": 45.61499202551834,
+        "mean_prediction": 45.44139236151315,
+        "mean_squared_error": 188.12081766152164,
+        "n": 3135,
+        "observed_minus_predicted_bias": 0.17359966400518811,
+        "prediction_observation_covariance": 9.568230234421685,
+        "prediction_variance": 14.250332555028468
+      },
+      "exposed_2025": {
+        "mean_observation": 46.025735294117645,
+        "mean_prediction": 45.299397502623094,
+        "mean_squared_error": 177.82535719607404,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.7263377914945488,
+        "prediction_observation_covariance": 13.540249346407558,
+        "prediction_variance": 14.250275136311064
+      }
+    },
+    "N0:availability_24h:margin": {
+      "2013": {
+        "mean_observation": 3.10546875,
+        "mean_prediction": 2.6491059566515216,
+        "mean_squared_error": 173.48860613791584,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.4563627933484785,
+        "prediction_observation_covariance": 19.487580033301224,
+        "prediction_variance": 12.317404112592033
+      },
+      "2014": {
+        "mean_observation": 2.48828125,
+        "mean_prediction": 2.878600976070079,
+        "mean_squared_error": 217.93100565579806,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.390319726070079,
+        "prediction_observation_covariance": 18.381888252408768,
+        "prediction_variance": 10.394132501157728
+      },
+      "2015": {
+        "mean_observation": 1.5625,
+        "mean_prediction": 2.421791112692617,
+        "mean_squared_error": 176.16811928726696,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.8592911126926167,
+        "prediction_observation_covariance": 17.062932587757242,
+        "prediction_variance": 10.434509496428921
+      },
+      "2016": {
+        "mean_observation": 2.56640625,
+        "mean_prediction": 2.3014748672466205,
+        "mean_squared_error": 149.3515044873224,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.2649313827533796,
+        "prediction_observation_covariance": 11.646447094430604,
+        "prediction_variance": 7.680182328655029
+      },
+      "2017": {
+        "mean_observation": 2.484375,
+        "mean_prediction": 2.2466698492559884,
+        "mean_squared_error": 197.71694801656417,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.23770515074401144,
+        "prediction_observation_covariance": 12.00448767170066,
+        "prediction_variance": 8.857163761900248
+      },
+      "2018": {
+        "mean_observation": 2.203125,
+        "mean_prediction": 2.4493987778841233,
+        "mean_squared_error": 181.54194789952248,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.24627377788412344,
+        "prediction_observation_covariance": 17.25268812826539,
+        "prediction_variance": 10.465433148004953
+      },
+      "2019": {
+        "mean_observation": -0.140625,
+        "mean_prediction": 2.0387152733859706,
+        "mean_squared_error": 190.69099139850857,
+        "n": 256,
+        "observed_minus_predicted_bias": -2.1793402733859706,
+        "prediction_observation_covariance": 23.016168202595086,
+        "prediction_variance": 12.618579167121696
+      },
+      "2020": {
+        "mean_observation": 0.0546875,
+        "mean_prediction": 1.7374970590011736,
+        "mean_squared_error": 180.85310749216845,
+        "n": 256,
+        "observed_minus_predicted_bias": -1.6828095590011736,
+        "prediction_observation_covariance": 16.78665659380276,
+        "prediction_variance": 9.746000890564483
+      },
+      "2021": {
+        "mean_observation": 1.713235294117647,
+        "mean_prediction": 1.2855119817843075,
+        "mean_squared_error": 209.71853047469472,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.42772331233333966,
+        "prediction_observation_covariance": 19.18019291362708,
+        "prediction_variance": 10.610556007751724
+      },
+      "2022": {
+        "mean_observation": 1.977859778597786,
+        "mean_prediction": 1.50176026371053,
+        "mean_squared_error": 137.13055264794002,
+        "n": 271,
+        "observed_minus_predicted_bias": 0.47609951488725605,
+        "prediction_observation_covariance": 11.959176432722293,
+        "prediction_variance": 8.91866591412207
+      },
+      "2023": {
+        "mean_observation": 2.6838235294117645,
+        "mean_prediction": 1.7391145244936397,
+        "mean_squared_error": 185.60503836354502,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.9447090049181248,
+        "prediction_observation_covariance": 16.006017265653096,
+        "prediction_variance": 9.478977116137347
+      },
+      "2024": {
+        "mean_observation": 1.8676470588235294,
+        "mean_prediction": 1.8287648553276745,
+        "mean_squared_error": 186.95401690938513,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.03888220349585494,
+        "prediction_observation_covariance": 14.857507307704015,
+        "prediction_variance": 8.398272294200186
+      },
+      "development": {
+        "mean_observation": 1.8842105263157896,
+        "mean_prediction": 2.0798253502719093,
+        "mean_squared_error": 182.22771740572978,
+        "n": 3135,
+        "observed_minus_predicted_bias": -0.1956148239561195,
+        "prediction_observation_covariance": 16.61089975322478,
+        "prediction_variance": 10.194993883273675
+      },
+      "exposed_2025": {
+        "mean_observation": 2.0698529411764706,
+        "mean_prediction": 1.941143908722394,
+        "mean_squared_error": 175.4593301779103,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.1287090324540766,
+        "prediction_observation_covariance": 17.866747035106897,
+        "prediction_variance": 10.920108254715133
+      }
+    },
+    "N0:availability_24h:total": {
+      "2013": {
+        "mean_observation": 46.81640625,
+        "mean_prediction": 45.718900836784506,
+        "mean_squared_error": 199.9402880272085,
+        "n": 256,
+        "observed_minus_predicted_bias": 1.0975054132154907,
+        "prediction_observation_covariance": 8.240070416210537,
+        "prediction_variance": 8.034773642631334
+      },
+      "2014": {
+        "mean_observation": 45.17578125,
+        "mean_prediction": 46.25887257970838,
+        "mean_squared_error": 178.97706843796496,
+        "n": 256,
+        "observed_minus_predicted_bias": -1.0830913297083804,
+        "prediction_observation_covariance": 8.603752836163281,
+        "prediction_variance": 5.741605079653631
+      },
+      "2015": {
+        "mean_observation": 45.625,
+        "mean_prediction": 45.424805720949045,
+        "mean_squared_error": 182.54660693445308,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.20019427905095524,
+        "prediction_observation_covariance": 2.7418424236676184,
+        "prediction_variance": 4.5370890324235935
+      },
+      "2016": {
+        "mean_observation": 45.55078125,
+        "mean_prediction": 45.441042063524264,
+        "mean_squared_error": 167.8040851198346,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.10973918647573819,
+        "prediction_observation_covariance": 7.807417289558673,
+        "prediction_variance": 5.768830745255176
+      },
+      "2017": {
+        "mean_observation": 43.4375,
+        "mean_prediction": 44.83745686518762,
+        "mean_squared_error": 205.74688513465847,
+        "n": 256,
+        "observed_minus_predicted_bias": -1.3999568651876197,
+        "prediction_observation_covariance": 0.020588055782915525,
+        "prediction_variance": 4.644588271838348
+      },
+      "2018": {
+        "mean_observation": 46.6875,
+        "mean_prediction": 45.347295470341926,
+        "mean_squared_error": 209.02775106164847,
+        "n": 256,
+        "observed_minus_predicted_bias": 1.3402045296580722,
+        "prediction_observation_covariance": 7.687479534734335,
+        "prediction_variance": 7.126093199801138
+      },
+      "2019": {
+        "mean_observation": 45.625,
+        "mean_prediction": 45.491262320010875,
+        "mean_squared_error": 184.56827671249602,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.13373767998912667,
+        "prediction_observation_covariance": 7.763011546613724,
+        "prediction_variance": 7.654539038674575
+      },
+      "2020": {
+        "mean_observation": 49.578125,
+        "mean_prediction": 46.982654379222765,
+        "mean_squared_error": 190.28370860377507,
+        "n": 256,
+        "observed_minus_predicted_bias": 2.5954706207772325,
+        "prediction_observation_covariance": 3.9614968806046287,
+        "prediction_variance": 5.4216506372915845
+      },
+      "2021": {
+        "mean_observation": 45.963235294117645,
+        "mean_prediction": 47.08767557838199,
+        "mean_squared_error": 187.11431634263542,
+        "n": 272,
+        "observed_minus_predicted_bias": -1.1244402842643437,
+        "prediction_observation_covariance": 3.1881990982584836,
+        "prediction_variance": 4.448288465168633
+      },
+      "2022": {
+        "mean_observation": 43.76383763837639,
+        "mean_prediction": 44.90862098506508,
+        "mean_squared_error": 187.75308256183052,
+        "n": 271,
+        "observed_minus_predicted_bias": -1.1447833466886912,
+        "prediction_observation_covariance": 4.374495610906413,
+        "prediction_variance": 5.099716057820483
+      },
+      "2023": {
+        "mean_observation": 43.536764705882355,
+        "mean_prediction": 44.02887868518701,
+        "mean_squared_error": 181.4519554397924,
+        "n": 272,
+        "observed_minus_predicted_bias": -0.4921139793046547,
+        "prediction_observation_covariance": 5.763471850639775,
+        "prediction_variance": 6.2527804983964685
+      },
+      "2024": {
+        "mean_observation": 45.8235294117647,
+        "mean_prediction": 44.43493589871551,
+        "mean_squared_error": 167.00582797255274,
+        "n": 272,
+        "observed_minus_predicted_bias": 1.3885935130491998,
+        "prediction_observation_covariance": 6.077832135503764,
+        "prediction_variance": 5.918853932295932
+      },
+      "development": {
+        "mean_observation": 45.61499202551834,
+        "mean_prediction": 45.489259301894975,
+        "mean_squared_error": 186.72846316931827,
+        "n": 3135,
+        "observed_minus_predicted_bias": 0.12573272362336743,
+        "prediction_observation_covariance": 6.473212316939227,
+        "prediction_variance": 6.682270353413166
+      },
+      "exposed_2025": {
+        "mean_observation": 46.025735294117645,
+        "mean_prediction": 46.12855946891453,
+        "mean_squared_error": 180.49507418430673,
+        "n": 272,
+        "observed_minus_predicted_bias": -0.10282417479688322,
+        "prediction_observation_covariance": 7.4346957527977136,
+        "prediction_variance": 5.225878713754575
+      }
+    },
+    "N0:full:margin": {
+      "2013": {
+        "mean_observation": 3.10546875,
+        "mean_prediction": 2.6344529523158493,
+        "mean_squared_error": 173.18000659348306,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.47101579768415064,
+        "prediction_observation_covariance": 19.711986210190872,
+        "prediction_variance": 12.444028039423321
+      },
+      "2014": {
+        "mean_observation": 2.48828125,
+        "mean_prediction": 2.85266978622383,
+        "mean_squared_error": 218.0415334110566,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.36438853622383016,
+        "prediction_observation_covariance": 18.379343678840453,
+        "prediction_variance": 10.519141592507733
+      },
+      "2015": {
+        "mean_observation": 1.5625,
+        "mean_prediction": 2.4109515681614067,
+        "mean_squared_error": 176.11272746935174,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.8484515681614069,
+        "prediction_observation_covariance": 17.04356675241505,
+        "prediction_variance": 10.358897160666295
+      },
+      "2016": {
+        "mean_observation": 2.56640625,
+        "mean_prediction": 2.2969302456804126,
+        "mean_squared_error": 149.2933627299272,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.2694760043195876,
+        "prediction_observation_covariance": 11.633394648944918,
+        "prediction_variance": 7.593507000952052
+      },
+      "2017": {
+        "mean_observation": 2.484375,
+        "mean_prediction": 2.248013916888984,
+        "mean_squared_error": 197.45531254364676,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.23636108311101586,
+        "prediction_observation_covariance": 12.135178533637276,
+        "prediction_variance": 8.857547189936902
+      },
+      "2018": {
+        "mean_observation": 2.203125,
+        "mean_prediction": 2.44371387836729,
+        "mean_squared_error": 181.1588709189663,
+        "n": 256,
+        "observed_minus_predicted_bias": -0.24058887836728982,
+        "prediction_observation_covariance": 17.481321618334622,
+        "prediction_variance": 10.542390912866507
+      },
+      "2019": {
+        "mean_observation": -0.140625,
+        "mean_prediction": 2.0468501400941324,
+        "mean_squared_error": 190.75198453706435,
+        "n": 256,
+        "observed_minus_predicted_bias": -2.1874751400941324,
+        "prediction_observation_covariance": 23.003787478070347,
+        "prediction_variance": 12.61928739530021
+      },
+      "2020": {
+        "mean_observation": 0.0546875,
+        "mean_prediction": 1.7251154748314448,
+        "mean_squared_error": 180.8379450061984,
+        "n": 256,
+        "observed_minus_predicted_bias": -1.6704279748314448,
+        "prediction_observation_covariance": 16.775375397359962,
+        "prediction_variance": 9.749794404475104
+      },
+      "2021": {
+        "mean_observation": 1.713235294117647,
+        "mean_prediction": 1.2736199870458973,
+        "mean_squared_error": 209.59423483064478,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.43961530707174973,
+        "prediction_observation_covariance": 19.242220226970854,
+        "prediction_variance": 10.600000604090972
+      },
+      "2022": {
+        "mean_observation": 1.977859778597786,
+        "mean_prediction": 1.4911934418267108,
+        "mean_squared_error": 137.05711017435326,
+        "n": 271,
+        "observed_minus_predicted_bias": 0.48666633677107507,
+        "prediction_observation_covariance": 11.938576788269001,
+        "prediction_variance": 8.793850776358417
+      },
+      "2023": {
+        "mean_observation": 2.6838235294117645,
+        "mean_prediction": 1.7356294994553207,
+        "mean_squared_error": 185.9345139794112,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.948194029956444,
+        "prediction_observation_covariance": 15.801907005589797,
+        "prediction_variance": 9.39363539740527
+      },
+      "2024": {
+        "mean_observation": 1.8676470588235294,
+        "mean_prediction": 1.8259973460267702,
+        "mean_squared_error": 186.34742440574533,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.04164971279675922,
+        "prediction_observation_covariance": 15.1421070275577,
+        "prediction_variance": 8.360656357440368
+      },
+      "development": {
+        "mean_observation": 1.8842105263157896,
+        "mean_prediction": 2.0720661051352054,
+        "mean_squared_error": 182.11219210004128,
+        "n": 3135,
+        "observed_minus_predicted_bias": -0.18785557881941592,
+        "prediction_observation_covariance": 16.661930359042465,
+        "prediction_variance": 10.18450523007838
+      },
+      "exposed_2025": {
+        "mean_observation": 2.0698529411764706,
+        "mean_prediction": 1.918033131627709,
+        "mean_squared_error": 175.12881894101417,
+        "n": 272,
+        "observed_minus_predicted_bias": 0.15181980954876143,
+        "prediction_observation_covariance": 18.046195851193456,
+        "prediction_variance": 10.942011410455956
+      }
+    },
+    "N0:full:total": {
+      "2013": {
+        "mean_observation": 46.81640625,
+        "mean_prediction": 45.71069680187962,
+        "mean_squared_error": 200.0883270691541,
+        "n": 256,
+        "observed_minus_predicted_bias": 1.1057094481203777,
+        "prediction_observation_covariance": 8.17033021104129,
+        "prediction_variance": 8.025257022613074
+      },
+      "2014": {
+        "mean_observation": 45.17578125,
+        "mean_prediction": 46.28524668580135,
+        "mean_squared_error": 178.53790774026805,
+        "n": 256,
+        "observed_minus_predicted_bias": -1.109465435801344,
+        "prediction_observation_covariance": 8.87608745169639,
+        "prediction_variance": 5.7892868882745345
+      },
+      "2015": {
+        "mean_observation": 45.625,
+        "mean_prediction": 45.41164259051024,
+        "mean_squared_error": 183.02725141879225,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.21335740948976123,
+        "prediction_observation_covariance": 2.514432460863487,
+        "prediction_variance": 4.557469956335027
+      },
+      "2016": {
+        "mean_observation": 45.55078125,
+        "mean_prediction": 45.43361314897841,
+        "mean_squared_error": 167.2540693394343,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.11716810102159247,
+        "prediction_observation_covariance": 8.091442869043526,
+        "prediction_variance": 5.785180448975914
+      },
+      "2017": {
+        "mean_observation": 43.4375,
+        "mean_prediction": 44.846322756982744,
+        "mean_squared_error": 205.39388501897483,
+        "n": 256,
+        "observed_minus_predicted_bias": -1.408822756982744,
+        "prediction_observation_covariance": 0.18266980951595796,
+        "prediction_variance": 4.590849327414293
+      },
+      "2018": {
+        "mean_observation": 46.6875,
+        "mean_prediction": 45.35821744582582,
+        "mean_squared_error": 209.12785160471003,
+        "n": 256,
+        "observed_minus_predicted_bias": 1.329282554174179,
+        "prediction_observation_covariance": 7.59640560819997,
+        "prediction_variance": 7.073201962278159
+      },
+      "2019": {
+        "mean_observation": 45.625,
+        "mean_prediction": 45.469089265317095,
+        "mean_squared_error": 184.64682456072535,
+        "n": 256,
+        "observed_minus_predicted_bias": 0.15591073468290848,
+        "prediction_observation_covariance": 7.697563919404783,
+        "prediction_variance": 7.595769242345549
+      },
+      "2020": {
+        "mean_observation": 49.578125,
+        "mean_prediction": 47.00626176535714,
+        "mean_squared_error": 190.40989093578298,
+        "n": 256,
+        "observed_minus_predicted_bias": 2.571863234642862,
+        "prediction_observation_covariance": 3.810915287287552,
+        "prediction_variance": 5.368657028275432
+      },
+      "2021": {
+        "mean_observation": 45.963235294117645,
+        "mean_prediction": 47.064405665141564,
+        "mean_squared_error": 186.7937580543272,
+        "n": 272,
+        "observed_minus_predicted_bias": -1.1011703710239142,
+        "prediction_observation_covariance": 3.35607325827262,
+        "prediction_variance": 4.515268263744226
+      },
+      "2022": {
+        "mean_observation": 43.76383763837639,
+        "mean_prediction": 44.883162101281606,
+        "mean_squared_error": 187.7190750099088,
+        "n": 271,
+        "observed_minus_predicted_bias": -1.1193244629052226,
+        "prediction_observation_covariance": 4.364795112532153,
+        "prediction_variance": 5.1039491667479195
+      },
+      "2023": {
+        "mean_observation": 43.536764705882355,
+        "mean_prediction": 44.02156387016939,
+        "mean_squared_error": 181.31319420832028,
+        "n": 272,
+        "observed_minus_predicted_bias": -0.484799164287039,
+        "prediction_observation_covariance": 5.83890472545557,
+        "prediction_variance": 6.27203095548956
+      },
+      "2024": {
+        "mean_observation": 45.8235294117647,
+        "mean_prediction": 44.46362769738006,
+        "mean_squared_error": 166.40025575124062,
+        "n": 272,
+        "observed_minus_predicted_bias": 1.3599017143846477,
+        "prediction_observation_covariance": 6.346110187578355,
+        "prediction_variance": 5.928697086829028
+      },
+      "development": {
+        "mean_observation": 45.61499202551834,
+        "mean_prediction": 45.48842951663997,
+        "mean_squared_error": 186.59976008789488,
+        "n": 3135,
+        "observed_minus_predicted_bias": 0.12656250887837747,
+        "prediction_observation_covariance": 6.536572820310814,
+        "prediction_variance": 6.68007892786907
+      },
+      "exposed_2025": {
+        "mean_observation": 46.025735294117645,
+        "mean_prediction": 46.12529155162372,
+        "mean_squared_error": 180.12751000263768,
+        "n": 272,
+        "observed_minus_predicted_bias": -0.09955625750607026,
+        "prediction_observation_covariance": 7.636515871782403,
+        "prediction_variance": 5.26261613256895
+      }
+    }
+  },
+  "complete_metric_digests": {
+    "E2:availability_24h": "edac0ef78403e40b87748f81b1f04d01229940d7b93cc8a35fc9748b1d474628",
+    "E2:full": "084f7b6ccb87ec3e4f3bd8d7e6bfcd4aba0cf497947c335e09079654727f8151",
+    "N0:availability_24h": "83970c420495384cb289b9bcda90d856d10dc09b9308fcb70619a543542a6b39",
+    "N0:full": "408deb0f778dcde0dd9afb2224522267e4e287751df7affc3ffd93b9a911b0e1"
+  },
+  "counts": {
+    "cell_summaries": 112,
+    "cells": 8,
+    "games": 3407,
+    "origins": 226,
+    "paired_differences": 56,
+    "partitions": 14,
+    "selected_rows": 13628
+  },
+  "decision": "pending_root_and_independent_interpretation_of_all_partitions_no_grid_authorized",
+  "existing_calibration_no_new_fit_no_uncertainty": {
+    "E2:availability_24h:margin": {
+      "development": {
+        "intercept": -0.3594638568523069,
+        "n": 3135,
+        "slope": 1.0479970315766605,
+        "status": "available"
+      },
+      "exposed_2025": {
+        "intercept": 0.05729674923451682,
+        "n": 272,
+        "slope": 1.009990586698958,
+        "status": "available"
+      }
+    },
+    "E2:availability_24h:total": {
+      "development": {
+        "intercept": 15.452311073005287,
+        "n": 3135,
+        "slope": 0.6637282756142964,
+        "status": "available"
+      },
+      "exposed_2025": {
+        "intercept": 3.9753102226140538,
+        "n": 272,
+        "slope": 0.9282833375197379,
+        "status": "available"
+      }
+    },
+    "E2:full:margin": {
+      "development": {
+        "intercept": -0.3632265617791977,
+        "n": 3135,
+        "slope": 1.054246462130171,
+        "status": "available"
+      },
+      "exposed_2025": {
+        "intercept": 0.04750495223922681,
+        "n": 272,
+        "slope": 1.021710463581448,
+        "status": "available"
+      }
+    },
+    "E2:full:total": {
+      "development": {
+        "intercept": 15.103865172255912,
+        "n": 3135,
+        "slope": 0.671439083787935,
+        "status": "available"
+      },
+      "exposed_2025": {
+        "intercept": 2.983398808653194,
+        "n": 272,
+        "slope": 0.9501745907983006,
+        "status": "available"
+      }
+    },
+    "N0:availability_24h:margin": {
+      "development": {
+        "intercept": -1.5044889464973072,
+        "n": 3135,
+        "slope": 1.6293192466233146,
+        "status": "available"
+      },
+      "exposed_2025": {
+        "intercept": -1.1061162311901598,
+        "n": 272,
+        "slope": 1.6361327761922417,
+        "status": "available"
+      }
+    },
+    "N0:availability_24h:total": {
+      "development": {
+        "intercept": 1.5488860423828545,
+        "n": 3135,
+        "slope": 0.968714519853697,
+        "status": "available"
+      },
+      "exposed_2025": {
+        "intercept": -19.599937238917366,
+        "n": 272,
+        "slope": 1.4226690208537585,
+        "status": "available"
+      }
+    },
+    "N0:full:margin": {
+      "development": {
+        "intercept": -1.505705857754777,
+        "n": 3135,
+        "slope": 1.6360078356908259,
+        "status": "available"
+      },
+      "exposed_2025": {
+        "intercept": -1.0934778436329755,
+        "n": 272,
+        "slope": 1.6492576341081941,
+        "status": "available"
+      }
+    },
+    "N0:full:total": {
+      "development": {
+        "intercept": 1.103776630052457,
+        "n": 3135,
+        "slope": 0.9785173035965861,
+        "status": "available"
+      },
+      "exposed_2025": {
+        "intercept": -20.906093315737856,
+        "n": 272,
+        "slope": 1.4510873830454813,
+        "status": "available"
+      }
+    }
+  },
+  "limitations": [
+    "Descriptive exposed-history moments cannot identify optimal update rates or demonstrate prospective improvement.",
+    "Original publication/availability limits are inherited; no original model or experiment is accepted by these diagnostics."
+  ],
+  "limits": {
+    "peak_rss_mib": 2048,
+    "seconds": 120
+  },
+  "native_failure_counts": {
+    "E2:availability_24h": 0,
+    "E2:full": 0,
+    "N0:availability_24h": 0,
+    "N0:full": 0
+  },
+  "native_reason_digests": {
+    "E2:availability_24h": "2f6f36b22752c4ddc7653463b91f2eed784bed0324847b5ed8c339947b4893d2",
+    "E2:full": "2f6f36b22752c4ddc7653463b91f2eed784bed0324847b5ed8c339947b4893d2",
+    "N0:availability_24h": "2f6f36b22752c4ddc7653463b91f2eed784bed0324847b5ed8c339947b4893d2",
+    "N0:full": "2f6f36b22752c4ddc7653463b91f2eed784bed0324847b5ed8c339947b4893d2"
+  },
+  "ordered_games_sha256": "6432ace20a1a4494f7bd26bdb527447d1da1738b26dfeda90d87f7015ab23bda",
+  "paired_differences": {
+    "availability_24h:margin": {
+      "2013": {
+        "E2_minus_N0_mean_squared_error": -10.805310517702027,
+        "n": 256
+      },
+      "2014": {
+        "E2_minus_N0_mean_squared_error": -5.419037169653766,
+        "n": 256
+      },
+      "2015": {
+        "E2_minus_N0_mean_squared_error": -5.994637202785834,
+        "n": 256
+      },
+      "2016": {
+        "E2_minus_N0_mean_squared_error": -5.194408513257783,
+        "n": 256
+      },
+      "2017": {
+        "E2_minus_N0_mean_squared_error": -7.2541171726826885,
+        "n": 256
+      },
+      "2018": {
+        "E2_minus_N0_mean_squared_error": -2.4050271783404265,
+        "n": 256
+      },
+      "2019": {
+        "E2_minus_N0_mean_squared_error": -6.151677146809677,
+        "n": 256
+      },
+      "2020": {
+        "E2_minus_N0_mean_squared_error": -2.7673606561359576,
+        "n": 256
+      },
+      "2021": {
+        "E2_minus_N0_mean_squared_error": -5.50492202414944,
+        "n": 272
+      },
+      "2022": {
+        "E2_minus_N0_mean_squared_error": 0.675541837141179,
+        "n": 271
+      },
+      "2023": {
+        "E2_minus_N0_mean_squared_error": -5.388223631535993,
+        "n": 272
+      },
+      "2024": {
+        "E2_minus_N0_mean_squared_error": -10.652879166730775,
+        "n": 272
+      },
+      "development": {
+        "E2_minus_N0_mean_squared_error": -5.56659976284472,
+        "n": 3135
+      },
+      "exposed_2025": {
+        "E2_minus_N0_mean_squared_error": -4.113693364774171,
+        "n": 272
+      }
+    },
+    "availability_24h:total": {
+      "2013": {
+        "E2_minus_N0_mean_squared_error": 3.7470769802011907,
+        "n": 256
+      },
+      "2014": {
+        "E2_minus_N0_mean_squared_error": -1.5076043966175945,
+        "n": 256
+      },
+      "2015": {
+        "E2_minus_N0_mean_squared_error": 4.777674793908852,
+        "n": 256
+      },
+      "2016": {
+        "E2_minus_N0_mean_squared_error": -4.406698095588758,
+        "n": 256
+      },
+      "2017": {
+        "E2_minus_N0_mean_squared_error": 6.668692890397827,
+        "n": 256
+      },
+      "2018": {
+        "E2_minus_N0_mean_squared_error": -5.994457100809398,
+        "n": 256
+      },
+      "2019": {
+        "E2_minus_N0_mean_squared_error": -1.6530866992829523,
+        "n": 256
+      },
+      "2020": {
+        "E2_minus_N0_mean_squared_error": 10.322527609573648,
+        "n": 256
+      },
+      "2021": {
+        "E2_minus_N0_mean_squared_error": 2.124521887992022,
+        "n": 272
+      },
+      "2022": {
+        "E2_minus_N0_mean_squared_error": 3.9795923504704334,
+        "n": 271
+      },
+      "2023": {
+        "E2_minus_N0_mean_squared_error": 1.2923990676932682,
+        "n": 272
+      },
+      "2024": {
+        "E2_minus_N0_mean_squared_error": -0.21751919867304959,
+        "n": 272
+      },
+      "development": {
+        "E2_minus_N0_mean_squared_error": 1.597755360836114,
+        "n": 3135
+      },
+      "exposed_2025": {
+        "E2_minus_N0_mean_squared_error": -2.081732898055022,
+        "n": 272
+      }
+    },
+    "full:margin": {
+      "2013": {
+        "E2_minus_N0_mean_squared_error": -11.397763462672675,
+        "n": 256
+      },
+      "2014": {
+        "E2_minus_N0_mean_squared_error": -4.9278209792686205,
+        "n": 256
+      },
+      "2015": {
+        "E2_minus_N0_mean_squared_error": -5.981608439510231,
+        "n": 256
+      },
+      "2016": {
+        "E2_minus_N0_mean_squared_error": -5.008426486749523,
+        "n": 256
+      },
+      "2017": {
+        "E2_minus_N0_mean_squared_error": -7.130306809473552,
+        "n": 256
+      },
+      "2018": {
+        "E2_minus_N0_mean_squared_error": -2.3676720954846515,
+        "n": 256
+      },
+      "2019": {
+        "E2_minus_N0_mean_squared_error": -6.27141264028075,
+        "n": 256
+      },
+      "2020": {
+        "E2_minus_N0_mean_squared_error": -3.183546690333839,
+        "n": 256
+      },
+      "2021": {
+        "E2_minus_N0_mean_squared_error": -6.021903163584578,
+        "n": 272
+      },
+      "2022": {
+        "E2_minus_N0_mean_squared_error": -0.07755670602193045,
+        "n": 271
+      },
+      "2023": {
+        "E2_minus_N0_mean_squared_error": -5.723068809024147,
+        "n": 272
+      },
+      "2024": {
+        "E2_minus_N0_mean_squared_error": -10.010429643654241,
+        "n": 272
+      },
+      "development": {
+        "E2_minus_N0_mean_squared_error": -5.672484163802736,
+        "n": 3135
+      },
+      "exposed_2025": {
+        "E2_minus_N0_mean_squared_error": -4.339821073082419,
+        "n": 272
+      }
+    },
+    "full:total": {
+      "2013": {
+        "E2_minus_N0_mean_squared_error": 2.56940607119174,
+        "n": 256
+      },
+      "2014": {
+        "E2_minus_N0_mean_squared_error": -1.952432471333898,
+        "n": 256
+      },
+      "2015": {
+        "E2_minus_N0_mean_squared_error": 4.836505985642499,
+        "n": 256
+      },
+      "2016": {
+        "E2_minus_N0_mean_squared_error": -4.4230090379279,
+        "n": 256
+      },
+      "2017": {
+        "E2_minus_N0_mean_squared_error": 6.718009973044526,
+        "n": 256
+      },
+      "2018": {
+        "E2_minus_N0_mean_squared_error": -5.8371709914383185,
+        "n": 256
+      },
+      "2019": {
+        "E2_minus_N0_mean_squared_error": -1.3387989618921643,
+        "n": 256
+      },
+      "2020": {
+        "E2_minus_N0_mean_squared_error": 10.333033465728994,
+        "n": 256
+      },
+      "2021": {
+        "E2_minus_N0_mean_squared_error": 1.921309746379385,
+        "n": 272
+      },
+      "2022": {
+        "E2_minus_N0_mean_squared_error": 3.7905988950279115,
+        "n": 271
+      },
+      "2023": {
+        "E2_minus_N0_mean_squared_error": 1.4544885501852,
+        "n": 272
+      },
+      "2024": {
+        "E2_minus_N0_mean_squared_error": 0.11480435165388156,
+        "n": 272
+      },
+      "development": {
+        "E2_minus_N0_mean_squared_error": 1.521057573626778,
+        "n": 3135
+      },
+      "exposed_2025": {
+        "E2_minus_N0_mean_squared_error": -2.302152806563635,
+        "n": 272
+      }
+    }
+  },
+  "partition_counts": {
+    "2013": 256,
+    "2014": 256,
+    "2015": 256,
+    "2016": 256,
+    "2017": 256,
+    "2018": 256,
+    "2019": 256,
+    "2020": 256,
+    "2021": 272,
+    "2022": 271,
+    "2023": 272,
+    "2024": 272,
+    "development": 3135,
+    "exposed_2025": 272
+  },
+  "peak_rss_mib": 410.6875,
+  "read_files": {
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf01-public-2026-09-04-v1/admitted-score-data.v2.json": {
+      "bytes": 37889519,
+      "sha256": "ea7dc1c17cc4613ada871927842d90f6d41ffe61b45e6302c3032eac7cdffc85"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/artifact-index.json": {
+      "bytes": 307368,
+      "sha256": "ccde502d661a4beee8f8da537a2f23238950fb2931c1527638de4c92898804ab"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-01.json": {
+      "bytes": 1452895,
+      "sha256": "6ce2170a887f2f2e4e250942018895638c8cdf7dba054c827acc70b9c97cd6c7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-02.json": {
+      "bytes": 1452737,
+      "sha256": "b6f6100473300f30fa8111cb152b87c634383c97b6b46118746f48551c984884"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-03.json": {
+      "bytes": 1451897,
+      "sha256": "bacb9b75d9aee9ce151551d70e3e8f07a4a18afae7c0397d54b4145217159594"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-04.json": {
+      "bytes": 1362370,
+      "sha256": "0b813e77ee1f39c87905e3a1a97131a7d9c9c7888b07ab7dfb5d958452943f69"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-05.json": {
+      "bytes": 1271339,
+      "sha256": "19d69d0e959c3491a6c5716d6eec6e147db669d65366a6a2477cf9db3961931d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-06.json": {
+      "bytes": 1362035,
+      "sha256": "2c2754f288ed40477e868d3db088fa8dcc24f6a1d3a9350dac91be19b80a0938"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-07.json": {
+      "bytes": 1362224,
+      "sha256": "a72d4ff200b3e28a2ebf575f29c9f22c1713483e17da37241bc75f7311489c27"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-08.json": {
+      "bytes": 1178911,
+      "sha256": "49dc76db2164be94a17b383626a2ba630acc138ca57c1301d7a4a84601ef4959"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-09.json": {
+      "bytes": 1179690,
+      "sha256": "76a6575f4fd45424f08ac67c438b017444044d4475a2dd441dc02c7b778082eb"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-10.json": {
+      "bytes": 1269856,
+      "sha256": "3892f89fd2eed19bb5a6a00fe662227f6ccaf00fd6133257bfce17b90a995b95"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-11.json": {
+      "bytes": 1360948,
+      "sha256": "680986822430896c806c8b0850298d0b3a1fbe7e21b6cd30795dc77bc6e36d8a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-12.json": {
+      "bytes": 1269873,
+      "sha256": "22da5fc402a8b5e89f874e779ef43d23760a717a2bd028681e425f6317e783d0"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-13.json": {
+      "bytes": 1450568,
+      "sha256": "fe0a5d9dba8a181a9b289c488bcf2dc39bafe7e296596067165f00278e4ccb52"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-14.json": {
+      "bytes": 1450660,
+      "sha256": "56c6ef5b499fecdd4c4644c2957c073fdb8fd398758e3db7e06e5edafd20f360"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-15.json": {
+      "bytes": 1450863,
+      "sha256": "6a4fb77a3f3b2508217fd9934348633475039f7cde2afec99b72b2c5fac8c35b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-16.json": {
+      "bytes": 1450626,
+      "sha256": "4c05b67891d20fb66747baa8d0466e82da6099347c073405d199552cf00ecc47"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2013-17.json": {
+      "bytes": 1450860,
+      "sha256": "57727c1ac7f32e74374f2d32b2f2cc37c35cba6d89d45643636b3921daa73e1a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-01.json": {
+      "bytes": 1450157,
+      "sha256": "ca9cc22284858709fbca843a0d572e73e6fccc9d7504b4fa6c8f4e7182c2cab9"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-02.json": {
+      "bytes": 1450830,
+      "sha256": "b32d39d43abfecbdcce0169859b542ca10f02f23014fdb3253327009b1248146"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-03.json": {
+      "bytes": 1450523,
+      "sha256": "8cbd422b17c265327df8d0f89678d9ce189fc08dff6b85638c2dfabe7ac9db27"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-04.json": {
+      "bytes": 1178778,
+      "sha256": "66b2ca3cf4f5ce5039da2fc5da7645c0fcdbf31bb02c87ed11177fa44a8c3b3b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-05.json": {
+      "bytes": 1361565,
+      "sha256": "58514560dd0465eaf5db6a4c56447574db3f5abdf53607f55ad607d49d47ec56"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-06.json": {
+      "bytes": 1362011,
+      "sha256": "b1b4731401a12bd743f4e1ff3fba590a11e2c135c265a116dedc6ac8c744bd8f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-07.json": {
+      "bytes": 1361765,
+      "sha256": "0b79e14bbc43838a7278c234a61cc2ba6e8d1b2d6be5e4e32269d3bea9e19a85"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-08.json": {
+      "bytes": 1361642,
+      "sha256": "c289294fa2b671e99fb6e5d6d0a38ccd9809baf4a7ee598fd09427359633d20b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-09.json": {
+      "bytes": 1180111,
+      "sha256": "2f52a2e8bcae2a83f1b25d251cbf49580f8d7fdf37edf4a45c8c9b45ca4f4587"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-10.json": {
+      "bytes": 1179732,
+      "sha256": "aae35c0fa5d746ee53ff78522ead5c955974aa5de0039123eb0b6dd0eac6a5a1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-11.json": {
+      "bytes": 1270902,
+      "sha256": "4c9c721c39808491d2b251bd2138d5a76292bb292b92fbb582e526c6909bdd9c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-12.json": {
+      "bytes": 1361463,
+      "sha256": "cd754c9705550300dd9dff0bbde97af9b04930deef52de930d4f7e70dce63d5c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-13.json": {
+      "bytes": 1452488,
+      "sha256": "152191a770d5d459a5b03b87db19f65f3c68b21c45729950c0390db23de7b481"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-14.json": {
+      "bytes": 1452744,
+      "sha256": "39a987263eb86251994d3666df92b730361e4158716318d8d95efffbcbb51fac"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-15.json": {
+      "bytes": 1452372,
+      "sha256": "380ce7b2790ffa6975a2c74ee65011aa83085409a85adc2bcfab73ebfc1c92c3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-16.json": {
+      "bytes": 1452635,
+      "sha256": "c80ff7734b64e02d863a9f65fa00b8ea99ef7a968795dfdd882b790126ed481e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2014-17.json": {
+      "bytes": 1452028,
+      "sha256": "ebf475e438d03311efa2d96375ffc0ae35ba38fe8796a82124b8d9f6977d8d39"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-01.json": {
+      "bytes": 1452263,
+      "sha256": "cf9c99c8cd191f0e0090ddd05e414f134648091261f963ebc6a9ce77c7834109"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-02.json": {
+      "bytes": 1452410,
+      "sha256": "04cde0d4194d97c0a192b85b87fa0bc9eef8852db7f3f780efc8b9f886772bc6"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-03.json": {
+      "bytes": 1451159,
+      "sha256": "3f97bc59acf7650732be6accbe4046e89214984515f771e3fef9c911406e7fec"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-04.json": {
+      "bytes": 1360863,
+      "sha256": "59ff66ad019d7f4ccbdf12ca3c23d4cd358adafaa85b06aa93a66823ed711df9"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-05.json": {
+      "bytes": 1269471,
+      "sha256": "b5433b9583c65f845967a32c4ab996a32f6bfc3321bb76c6388e133d3a5c41ad"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-06.json": {
+      "bytes": 1269399,
+      "sha256": "00344054002e6397eb0777ee94627809d02bfdd0ebd3f3952274b27690e5e322"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-07.json": {
+      "bytes": 1269027,
+      "sha256": "a471145b60cc852a6142da370460f6fcc087c530b9cce684ac32b2e9164e2a4a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-08.json": {
+      "bytes": 1268854,
+      "sha256": "84b4aa67cbacaef89cff7300fa0a790b5036ded29123537f61f37ce4169e9822"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-09.json": {
+      "bytes": 1178576,
+      "sha256": "4b00037cbce84271cf9d61cc997fba47cb1860fe5b59d0a5a7a81a3d4ea77b63"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-10.json": {
+      "bytes": 1268842,
+      "sha256": "11326c8ec9174f7b6e524b30939f8a7cb930d80b0105cb812aa5cc0657a3fc17"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-11.json": {
+      "bytes": 1269187,
+      "sha256": "5f3c95332f79d6631fe3776a9f19c6d58b30628cb966d48d8ce2ab56332b87ee"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-12.json": {
+      "bytes": 1450513,
+      "sha256": "c1f7dfddbe79c827040fc6a0d835f10d852a138169d7ae521c2555a650dda014"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-13.json": {
+      "bytes": 1450442,
+      "sha256": "1eea66ac5f46eb19f16e92be894ea601762c1ebc871ba36b20fcfbdd42894583"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-14.json": {
+      "bytes": 1450047,
+      "sha256": "11b31b5953fcd0a0eb11117c5c2fab720b85bd9a6a180bb7cf6270f097b46e49"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-15.json": {
+      "bytes": 1450377,
+      "sha256": "8e38a84e0d15d024e1822e74da3733ca9476769bfd3ecec922129a145b38fa5d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-16.json": {
+      "bytes": 1450650,
+      "sha256": "85d71f7b52d29a37092fda6ca88ceec34353d7cee828e6ba6727297c5efc9952"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2015-17.json": {
+      "bytes": 1450281,
+      "sha256": "47472a8a46e2adbc361b6b123d925d35452796868620b2941ba81f2edefc3cef"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-01.json": {
+      "bytes": 1449603,
+      "sha256": "42fecaf6cadf5d9d5d5cbb9363f697cacd59ddc96456c0555c861bbe5b629c13"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-02.json": {
+      "bytes": 1450234,
+      "sha256": "e3622f2cf7c6f74fa9c3b0a4a7713151f5d6b81bca2ac0aaf088bf8a008e810c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-03.json": {
+      "bytes": 1450339,
+      "sha256": "544c22bc853634b842d22b6f63e31e6736381684f0e5eab530fcd85107e2ffb1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-04.json": {
+      "bytes": 1359264,
+      "sha256": "5ff1a0c1d54143200d40d7f0bb345a667ea04c402a25eb44ab26f5d166d6c68c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-05.json": {
+      "bytes": 1268985,
+      "sha256": "27d0b46e6e1578fb4803511de51e804544f510e450c4f30d26ae4a1852620b52"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-06.json": {
+      "bytes": 1359586,
+      "sha256": "a1affbfa17d89f5d734d8c70e9f514d49269b92d85ea4eb2a5a5cb7f44e3a655"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-07.json": {
+      "bytes": 1359442,
+      "sha256": "34ce519036cdabeb1f1ece85d156661f29889d1429ddce366eab86534f3cf3f1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-08.json": {
+      "bytes": 1178200,
+      "sha256": "3b8e0a12a182f0f6b9dcb854b6ba8565d488d7b7ddae235dd67fe3c25190d688"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-09.json": {
+      "bytes": 1177871,
+      "sha256": "b1ce5d0a6c63715d276d54425b4a0a04da302608e1e7ebcdf472068525f34116"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-10.json": {
+      "bytes": 1268462,
+      "sha256": "3bfb59587d70c43aa44304db396b9b118806e8ce369c6a6f2c8a9ad68673ed29"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-11.json": {
+      "bytes": 1268194,
+      "sha256": "f498b15bd93b7fb9b20f04534dfe8f5cec8338b74743dd3d4e4f7fa4951f0aaf"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-12.json": {
+      "bytes": 1449512,
+      "sha256": "d2be820a5884622e9190f9ce8756d031f4839952ae0112d063e37d298a07318d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-13.json": {
+      "bytes": 1358881,
+      "sha256": "1f46ac3014b0385d3b8612396a17a2b2d6cabd0c8a3df86d1b135788fda46b46"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-14.json": {
+      "bytes": 1449370,
+      "sha256": "e5be9e22b8c5b5afcacd9b512cda785a44503b468068d30e67d56732f118ade0"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-15.json": {
+      "bytes": 1449335,
+      "sha256": "0c0be4491ac350d4db0691874d0207db06470e5ac261b9fd523c7caf1cc6d7b5"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-16.json": {
+      "bytes": 1449452,
+      "sha256": "98405f8ebd487c56a583152bb037f7a17433162da2aff23cc0f46c9d7ebb6b4d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2016-17.json": {
+      "bytes": 1449211,
+      "sha256": "6d60a62f8540deb8853a253d357f611be38ddf4758a3daa1f81e6b9ee855b064"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-01.json": {
+      "bytes": 1358322,
+      "sha256": "86d3bcae1997bf70b8337d7eca4c2e37f0aa2288831cd497ef1b10ebb4bbe0ca"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-02.json": {
+      "bytes": 1449693,
+      "sha256": "4358640318177919c6e7da41c509debc27a20960c4aea6873184a2a535f586ff"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-03.json": {
+      "bytes": 1449781,
+      "sha256": "bb01305b9d6892ce1edae35513525264fade057a473c86b7fc75865de2b8e79e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-04.json": {
+      "bytes": 1449465,
+      "sha256": "dd9b5edc28641f07e95009a8da1c4e1ea668dfbb33aebc193af135599ec77883"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-05.json": {
+      "bytes": 1268463,
+      "sha256": "29b2f1481a79547f1e4a425b3d728cebcaca9933e5ac8d97640208a9261c5070"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-06.json": {
+      "bytes": 1268481,
+      "sha256": "5768f1d7673bad3d1a04763db966e9449a2adf9fe99dcc242616270ced859247"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-07.json": {
+      "bytes": 1359045,
+      "sha256": "753aa1b933d66bea75b228b81b783c788589a1ce8429d437f7ff835c6474877d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-08.json": {
+      "bytes": 1177783,
+      "sha256": "e8f88f308355ec8271fcd328adee5c4e96c60b466f94e1d7b688e0617776692f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-09.json": {
+      "bytes": 1178154,
+      "sha256": "c2303c8864e7dba5239f2af9147673bf0f5fdf7696479065d38db4fbada925ed"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-10.json": {
+      "bytes": 1268746,
+      "sha256": "728b10f7f542e8c5b62dc8da063cbed5da3a967bfce8377f45914ac4dba867af"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-11.json": {
+      "bytes": 1268638,
+      "sha256": "cdc573551283a66caa25c9bc903f5d178da969937fd17b78d064cc7c92ccc0e2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-12.json": {
+      "bytes": 1449713,
+      "sha256": "ffc22f08733b7f7ab5c407441754fa84a695735688974773a4fe47a37e6c7672"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-13.json": {
+      "bytes": 1449951,
+      "sha256": "c5df57dd6618113dd21aa187b15f7eb9bee9b41a84bac820c7f09c5cfda7498e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-14.json": {
+      "bytes": 1450005,
+      "sha256": "fc1f1d933e129d66c7ab3ee75b1e0b91878302db5c17a5f1bcf890c6201c149c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-15.json": {
+      "bytes": 1449916,
+      "sha256": "8e2999901ef3705d0a00a85b7c64fe055946e99ccab6836eed1f891d0eeea9cc"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-16.json": {
+      "bytes": 1449402,
+      "sha256": "4093102b556450bdb5380770623c19b45c4cf25c736592546c55781299f78898"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2017-17.json": {
+      "bytes": 1449616,
+      "sha256": "66888d2a7685f136f43b3bd883f31ee1244b801ef3813793d8cea60ad2c81584"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-01.json": {
+      "bytes": 1449435,
+      "sha256": "3b31168cc58ba8dba78c66b5004ec8c88d845882436d65d46432f255a3a7e422"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-02.json": {
+      "bytes": 1450152,
+      "sha256": "82e84ab2f786f00e3ab6f9b107f7f8d07cc86b8a89273c01b48ce1cbb1f71c11"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-03.json": {
+      "bytes": 1449881,
+      "sha256": "6b8922e196a3200845399f16e36cf762d917d279dc5d200266f588f076c2d06b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-04.json": {
+      "bytes": 1359344,
+      "sha256": "ef238de40742ace604fc2c26c1979940314853faba5e752396e64ef5e10cbd6d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-05.json": {
+      "bytes": 1359697,
+      "sha256": "9c5e2e3f50288beb4259b5b54de496474dc6010db488f5a49afb43959176c45d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-06.json": {
+      "bytes": 1360011,
+      "sha256": "c226014eb5e53147f9605212016a83b16ca434ec203ac24546226a47d29c0e49"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-07.json": {
+      "bytes": 1269242,
+      "sha256": "1095854b45d5b4b0d17b7975257027a03b068326c15ede66262c36c954080456"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-08.json": {
+      "bytes": 1268534,
+      "sha256": "929d2d71f0c880ff93c1838bc252e79be8b52f60487491cb038b94d743c63442"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-09.json": {
+      "bytes": 1178004,
+      "sha256": "66d83605c87d914368ed83974529293dade6535507113730d96892048d837bb0"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-10.json": {
+      "bytes": 1268720,
+      "sha256": "4764992d2737b5f2a80a51aa71540d0f25ebbb2bb13c389b9dd4e2aef4182058"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-11.json": {
+      "bytes": 1178298,
+      "sha256": "9126584aa1b3df3b83686882f6ac6f9460a1d9bede67e5bb6047016dc227010b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-12.json": {
+      "bytes": 1359552,
+      "sha256": "835c7ecee6744f6141cda95175c3d1d7870c03f5422bd0790ec835d6227973fb"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-13.json": {
+      "bytes": 1450112,
+      "sha256": "f7b345ffe488f63a1072a9761299e97c61ebed864b5145bba85bbc7578fe5e99"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-14.json": {
+      "bytes": 1449843,
+      "sha256": "206ad17c278cf152ff46b6ad5356f1e6464fcd01b9191063c57dade614aefbb3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-15.json": {
+      "bytes": 1450326,
+      "sha256": "63c7be02f4f2aa93980853496e82205768a82a92ad73caf8ccedb42c0eadf631"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-16.json": {
+      "bytes": 1450470,
+      "sha256": "b2dd84e095e90f579fdafcb4576fc45904ea81b36c83e67fa8cb497ee4ae2265"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2018-17.json": {
+      "bytes": 1450020,
+      "sha256": "9d6c06e69b600dcdce881c632a122bff3bf012fdd5e487b6201d0a0da4885cba"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-01.json": {
+      "bytes": 1450309,
+      "sha256": "96a81107aa53a814549c571f9774d63954f2a4739f65d4e01d163090281be788"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-02.json": {
+      "bytes": 1450564,
+      "sha256": "db686e629cef26e7628f5a259d1704170c810759ff958441eb52d3800d2d161f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-03.json": {
+      "bytes": 1450373,
+      "sha256": "73dc2f37e0be171822a0ffc077f65ea2e6d282970de3e4d6fbc615a7ad1ef7b5"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-04.json": {
+      "bytes": 1359624,
+      "sha256": "3a64514ef869eafec5edee3d78e5b0fb1aced59d910f361f990e004eb00aaae2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-05.json": {
+      "bytes": 1359876,
+      "sha256": "c296ac0bfb62431c95b18c329a72985ac22e4b77da60567979c091561fb20caa"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-06.json": {
+      "bytes": 1269179,
+      "sha256": "63f7442af67b5cbb340787384c4af28a59e69509bce58e3e1b30cb10b84ad398"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-07.json": {
+      "bytes": 1269845,
+      "sha256": "4c65f5ab4fc0c17744963278bb6c3a97749dc3e9205850e9820aca2f598a5e03"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-08.json": {
+      "bytes": 1359630,
+      "sha256": "e3818334e5fd2833b78ab2c0b108de5f069f7d701018ef5cef9ed7898ab5a8d9"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-09.json": {
+      "bytes": 1269427,
+      "sha256": "fb83d5016ea9003dda718c327162d4de8104731db960c141e96dd22a913c7f81"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-10.json": {
+      "bytes": 1178745,
+      "sha256": "4c5c4217aa5c8e6020b5fa3886605ad1dd662516f2100d93ed9e49dc008a22a3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-11.json": {
+      "bytes": 1269149,
+      "sha256": "a7b5135b54965ec08047c07b3b7e82693b908897d1a25f6b2461841f9e73a6b7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-12.json": {
+      "bytes": 1269393,
+      "sha256": "dc932e2194f1112749248832ff628450467d1a5d139485f2fd1f1ffedef79834"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-13.json": {
+      "bytes": 1450506,
+      "sha256": "f29fab59bcfb93acb78df56e33c9b0308102e23fd6dae7f8d7e4f9e5de18125f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-14.json": {
+      "bytes": 1450029,
+      "sha256": "78be2895fcdda19a1a8f066f470f54cc4940139b6ce01dc7e284e68cd22c0af2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-15.json": {
+      "bytes": 1450568,
+      "sha256": "092f672c5c7dcb3b6c9fd8c1bea10520ca8ea2dfce7ebd21230a1d2f552a6728"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-16.json": {
+      "bytes": 1450111,
+      "sha256": "cc42116b9f97d7d2f5ff48052265c4f51d8da32a7bc6f1a922c5cb031eacc0a3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2019-17.json": {
+      "bytes": 1450376,
+      "sha256": "2f2104d6b5d5bbcc628d4b8b719013c08ab15976a349e5200077c7d30adbffca"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-01.json": {
+      "bytes": 1449753,
+      "sha256": "eb5395b20ac5884996383b4e176cafbd81cf4ef13172c8ee5cf9e0946bd7128a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-02.json": {
+      "bytes": 1450194,
+      "sha256": "cd9d66df6edfac188497d024391db5b4a384edfad2162a2b38b2fbd0fc423f73"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-03.json": {
+      "bytes": 1450713,
+      "sha256": "53e98238ad7b9b98580af78cff5853b9d4b02a7480ff5e6dee5d43856fb151ee"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-04.json": {
+      "bytes": 1359613,
+      "sha256": "0188c4fbddaaea612ddb54e658a2c5b1be8ccab87008fbeb3f927874884e63df"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-05.json": {
+      "bytes": 1269060,
+      "sha256": "88ade67cd66bd48bf08a60e3dbe04c5c981d4ad4f814d077a8fb84bfb979e72b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-06.json": {
+      "bytes": 1269338,
+      "sha256": "fb0614eb7f42b2f89b2ed7a60e8b79a19d727b796ce213cd8c959c2a72b133f0"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-07.json": {
+      "bytes": 1269158,
+      "sha256": "cc6b41918077f29203893f0dce33f685eafb4a632d6f3c82baeae944b84a09dd"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-08.json": {
+      "bytes": 1269567,
+      "sha256": "e088240d412fef597a37b0085edce24ccb3a713090f97d79c81dbfd478976744"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-09.json": {
+      "bytes": 1269294,
+      "sha256": "6e4e6f4361acc164b908627e587a1b3dec8e77cb91d584a46525100713ea0620"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-10.json": {
+      "bytes": 1269086,
+      "sha256": "1dabf6dc93985072c5f3e9497a3dbd99dd90603fc2d7f0591876cf5bdadbd0fc"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-11.json": {
+      "bytes": 1269235,
+      "sha256": "1c36602ce86700fdf7ba89af195e59285947abbf9aa51a8ba35e4a6cd6c51b44"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-12.json": {
+      "bytes": 1450668,
+      "sha256": "07a2d11739506d6f91a2574dc4767efb1eee197747583a1b51fb44393bd940be"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-13.json": {
+      "bytes": 1359526,
+      "sha256": "7ca397d9d088725d7145e5319c2ea59fee956a7f80d7995cc19c2412d361b6ee"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-14.json": {
+      "bytes": 1450537,
+      "sha256": "dacd1010d6fa2aa1d972d7f045b79f63374713cd0ae9e4ed6ea94979d86dd84f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-15.json": {
+      "bytes": 1450184,
+      "sha256": "b2c423be1b8d573e7931732e764c4c89db78aa5d088af73d273b51638dffde17"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-16.json": {
+      "bytes": 1450340,
+      "sha256": "ff8c49cac95f4eb44548137d060116a5a4311327d237785a2a7bdbde66420c09"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2020-17.json": {
+      "bytes": 1449904,
+      "sha256": "e0ef81958cdd356099d1708484bc7b8fb4730440028baf976945f9464b55c20f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-01.json": {
+      "bytes": 1448327,
+      "sha256": "97455bf2aba25630b27b4f2bc8c5c9bd85404bb75d2ea2c8d2b1a112beca23df"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-02.json": {
+      "bytes": 1448819,
+      "sha256": "8aee34dccf02eb510d49289a97453fae45fb3fc5c16c415107e214cf2f73d54b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-03.json": {
+      "bytes": 1448975,
+      "sha256": "ff4439119144550fa944c7c5763cc30ed265e86a01902e21d2e7b3e6e9a1dde1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-04.json": {
+      "bytes": 1448927,
+      "sha256": "957b8f005be3fe1bfe1c3a8f866dedc8f306b3e76d8ecc4d31f74e72720b2a3e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-05.json": {
+      "bytes": 1448476,
+      "sha256": "789c717bc21e0cca8ee505a01d06a851e281eb17bf2a09f97d4bc0ca3a2d210c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-06.json": {
+      "bytes": 1268147,
+      "sha256": "4ba19e311c736faa453585616f81fa125cd219297de4c8faaacf3da6d30b456e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-07.json": {
+      "bytes": 1176642,
+      "sha256": "5e38aa2ff7d179eb85d5dac491d2d5cb647b4a16017354cf96a835185f281ddd"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-08.json": {
+      "bytes": 1358206,
+      "sha256": "11800374889a3d9193f85e4502062f7aabe1c6b95d5a433bfba01bd64fad662b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-09.json": {
+      "bytes": 1267595,
+      "sha256": "4a2599905a3a1441036a71e11de824208357dd21853090db301bba450cc351f6"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-10.json": {
+      "bytes": 1267551,
+      "sha256": "fe75e635c434cb5cf091c7e2a565e6657d374b131db6f19c57f068231b75ff0e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-11.json": {
+      "bytes": 1358330,
+      "sha256": "cf68eb81675b071f90d18de54e7da5ffae9a4f56991b4ec90da73ec42d689fd7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-12.json": {
+      "bytes": 1358517,
+      "sha256": "447808d740b5e0186eed9747f50a54e9db6408e84d0acaea0c0dafc20c84b824"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-13.json": {
+      "bytes": 1267918,
+      "sha256": "4026030f6b352c965abaadd59e53631df9c54802f83e3f4fbde91cad67d722b3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-14.json": {
+      "bytes": 1267721,
+      "sha256": "0f56f22540da262b103144d7cc4214e8878159c0310a36cd0a17bdb888b15b4a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-15.json": {
+      "bytes": 1448807,
+      "sha256": "0bca7cea079d4c91c3076cc3cf9e60bd9d8066dd8d851b0b299842b6e8b0ce34"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-16.json": {
+      "bytes": 1448896,
+      "sha256": "417909b406579ac866b8d38438deda218b3341313810d2b825ccebf8b84e94b5"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-17.json": {
+      "bytes": 1448491,
+      "sha256": "330fa05c601ad5c9d4973cbce3c3cacd8131b09e166e83459697b7a89151298f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2021-18.json": {
+      "bytes": 1448685,
+      "sha256": "da2e48893bbacafeea961899cc428b5049267c4673704c771378a4876ca256b4"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-01.json": {
+      "bytes": 1450127,
+      "sha256": "b32ab99b4041e5313f44053722a7631d32a672bd11dbaf0e4d8a801370e02e72"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-02.json": {
+      "bytes": 1450105,
+      "sha256": "f1505728f39a927b9a5471abafe051a3c3641b21851d3256e9ebe52b476d63a7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-03.json": {
+      "bytes": 1450169,
+      "sha256": "24ff5a766be14f66b1dd5dfd0f64ce3369bc076cc24d4ab61f3f453ff58b709a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-04.json": {
+      "bytes": 1449920,
+      "sha256": "a1ce067e1c6095024e362e9a5218c50882549a8cce0e9bb2d23a7be2e70776d0"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-05.json": {
+      "bytes": 1449744,
+      "sha256": "479fb588ea0899c2ea4b473b74a97ffccd4201d2305444a9e5f455371a33e62d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-06.json": {
+      "bytes": 1268468,
+      "sha256": "d4686e0abe582b4830ce3f98d8b4de5b89d7c0e8bc194c808021fe5a4d603ff2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-07.json": {
+      "bytes": 1268500,
+      "sha256": "f812ecdb38902c82053807efb6fb3aab568985a550823f33ec47b2ecffe15692"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-08.json": {
+      "bytes": 1359339,
+      "sha256": "716ebe9adcaf98c93442772073c7d7b6236154f7bafd786b4146ac357b637b1f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-09.json": {
+      "bytes": 1178410,
+      "sha256": "6f75833728db1aa3ea78f91b665f91e1192b2486c3b62daa208bd8a06e031a73"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-10.json": {
+      "bytes": 1268772,
+      "sha256": "1ead3fbf58c6d3a9edde40cd0e26acfaa792b15e190df2c3553d309e15c54e8c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-11.json": {
+      "bytes": 1268501,
+      "sha256": "ce9dfde17f4ef85f4911ffbd5dbf45440f0c58e9c5eaefd2952715d437b08f8d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-12.json": {
+      "bytes": 1449931,
+      "sha256": "eb3744d14e8e321b4694677b496a3f364e7be1739e9addf998d47ae38e5358bd"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-13.json": {
+      "bytes": 1359612,
+      "sha256": "0800caeaff6c2a819e8dca1245a34b8bb4161e975cf4e7a927b6dc031e8405b7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-14.json": {
+      "bytes": 1178180,
+      "sha256": "ae362e8f8d87a686abc16b738d9c394265b1cd628addb3418433d88b30a8358b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-15.json": {
+      "bytes": 1450278,
+      "sha256": "6a3a95728521cddcfb472b2bccfc117f4be006ade7a39e37cf83d6f1b1c93978"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-16.json": {
+      "bytes": 1450447,
+      "sha256": "a706bcf321cec282c6fdaca9e709748425d510cb6048a3bbd5b93c4066960e29"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-17.json": {
+      "bytes": 1359870,
+      "sha256": "edb31777eca0c2b0131c189a9928f452f1494dd003566c7a16ede02b3878644e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2022-18.json": {
+      "bytes": 1449936,
+      "sha256": "c47f77fd1526c92d68806db9528222c468e59025f83403c07b61eb8c13959b74"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-01.json": {
+      "bytes": 1450113,
+      "sha256": "45ed5076a23838542972e4da0c791c99b72fbe4c289aa573a6dd36b000390a64"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-02.json": {
+      "bytes": 1450356,
+      "sha256": "36173e6ed4228e9f132738b4de64c295d4ab5ee0a4ded0777cca437f53e55713"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-03.json": {
+      "bytes": 1450010,
+      "sha256": "45ae2994965827b7a36452ac92a8c55bc091f732f9fbe22cf07b9fb1694e1729"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-04.json": {
+      "bytes": 1450293,
+      "sha256": "9b1bd7673def58afe6cf18019197f46c713a965f58e599af507f486001568064"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-05.json": {
+      "bytes": 1268747,
+      "sha256": "612977c6b806afc2e125640af0810c4b44075871c0dd48fed12c6c797d1221f7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-06.json": {
+      "bytes": 1358915,
+      "sha256": "dfb423c65df2f5ac90b0d32b8791aeede80f39c00f985168ca703e89566999ee"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-07.json": {
+      "bytes": 1177809,
+      "sha256": "b1205957667998da201e612af6717f00b5010013a85d50414e67dc0bb7e85da2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-08.json": {
+      "bytes": 1450104,
+      "sha256": "e2b6b1b883ee0d1572d391c8b93bf942c5c096227cb809577eaa97be8af4964c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-09.json": {
+      "bytes": 1268733,
+      "sha256": "eb00232511dc1c5c901e0de10bc6f23328c8638ebecd4339fd4de69c17fde424"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-10.json": {
+      "bytes": 1268579,
+      "sha256": "447ed2a718df31551e774167154390b0621ac7590b7c957e3fbe806a3d1cc496"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-11.json": {
+      "bytes": 1269082,
+      "sha256": "3a4339ce7dd027f1eb7dd9c26d1f9899eb19bd192399599fb23339cff0b65747"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-12.json": {
+      "bytes": 1450174,
+      "sha256": "cb952661e1e701281b9f0d88303a8c257ca9158646c1cc35fdd2a7aa6c987ad4"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-13.json": {
+      "bytes": 1178293,
+      "sha256": "b54af327e89b4a560579eabce4ace8a9e2fa766e7e3e020b26bac9645b261c91"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-14.json": {
+      "bytes": 1359785,
+      "sha256": "a10447734e5352b773b251984d249bf389bef1b5b3d94435702c65d582a6322c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-15.json": {
+      "bytes": 1450264,
+      "sha256": "b88ace71a711c644203f1a6b8b4469599b1c6d075c162fe5778f42b266b633c3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-16.json": {
+      "bytes": 1450568,
+      "sha256": "7417317ebbc5e29db0239a3e18e4c4ddc5182f57b9a0afa61dded223f4b5f000"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-17.json": {
+      "bytes": 1450508,
+      "sha256": "4dffc6e3948426acb1945dd00510bf651e695cd153b1ecdf740a5b7db989c7dc"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2023-18.json": {
+      "bytes": 1450174,
+      "sha256": "602d24382523b1d507153cf9c9a31718e024b01d54531351ddb8f5f434aaa7df"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-01.json": {
+      "bytes": 1449637,
+      "sha256": "6ce3d84de07dbd4ef7199bb885ec0e878229c7fea75164894a14f4ae537af975"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-02.json": {
+      "bytes": 1450469,
+      "sha256": "603e2e356670986ed521ce5263ba049f121c9846c88b3b38896f02884d8570e6"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-03.json": {
+      "bytes": 1450090,
+      "sha256": "971c649f84f93362f1b31dd4fa08d7a2c3dd300ba64773083470f4adb2d417d2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-04.json": {
+      "bytes": 1450457,
+      "sha256": "3428c6d9819360861fb6bf9011ef1a236028a2850242d578bb26adb94cca64c0"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-05.json": {
+      "bytes": 1268716,
+      "sha256": "4da88c2cbf2710e1ef99a5b3fe2852a7eae4368191969d13c8e9fe8561db9af2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-06.json": {
+      "bytes": 1268807,
+      "sha256": "1bd05149b5af54086dd5a233495010e4c92ebc085e14d206666f1818a25e946a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-07.json": {
+      "bytes": 1359521,
+      "sha256": "5f42106fc1a46797c7bb03a0f9c2369a1e05acc10068ac01f54096860df2fac8"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-08.json": {
+      "bytes": 1449490,
+      "sha256": "9d8f402a25b4672cc1fdfecd22050f24a7350d69754d05860eaab5ee28100445"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-09.json": {
+      "bytes": 1359054,
+      "sha256": "7fb70b45e1522c6178ac1ea8b1add727dcbe4e6b258ff6219948a6097b0e37b8"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-10.json": {
+      "bytes": 1268183,
+      "sha256": "4445c118001c7ddd12def22b2b19c724c0836bee15c397218508e9169c8726da"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-11.json": {
+      "bytes": 1268197,
+      "sha256": "d727fa5156a1e6c7e069252cb70f66adee84884e87c7f4523509564d7bf38792"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-12.json": {
+      "bytes": 1177584,
+      "sha256": "3b9485ed90a2f3af6c127f2d854da35645cf2d26f223f23db387ee7f4c83836a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-13.json": {
+      "bytes": 1449395,
+      "sha256": "462a72923163db7ebdb44ee973bf22b78027f1ec9cb6d27d7ec5b4c3f1d3f0c8"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-14.json": {
+      "bytes": 1177696,
+      "sha256": "fe04c3539f167705ad0e33227caa0a1cb5cf37c3e6053b6a03165fca61709a63"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-15.json": {
+      "bytes": 1449249,
+      "sha256": "9060bb0076945c7e1a3cc82e115635dc31e813d5f807bfda8099a49eb61c5f62"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-16.json": {
+      "bytes": 1449498,
+      "sha256": "5b4adf8b24ead64b1b9ebc3425f60c43620a4221d60a78019900ec04d5cf1fdf"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-17.json": {
+      "bytes": 1449524,
+      "sha256": "fcbc5d6ffccea657d78ce807c644283357257c7c9b05e4897b7d60d7edad0f0a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2024-18.json": {
+      "bytes": 1449331,
+      "sha256": "f513b07d164e0f26f90c6e9d2dde8cbfd602bfa12d352241c3cdc7bbb5326704"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-01.json": {
+      "bytes": 1448644,
+      "sha256": "dcd72306bdad5b898ce439561b49dc4f62eaee23ee5ff1873ed0aca25ccfade7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-02.json": {
+      "bytes": 1449323,
+      "sha256": "6c87c3445a044036455f4e28426de0b549b6911bb75acaa170bd153746c83103"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-03.json": {
+      "bytes": 1449604,
+      "sha256": "d72c9df123f01bd4fd66ef6647fff3484892c292fd06496262877e220ea39244"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-04.json": {
+      "bytes": 1449480,
+      "sha256": "178706a40af2fc59efc096f4863c93828f95b3098d7b827b935876ee278a339b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-05.json": {
+      "bytes": 1268119,
+      "sha256": "f0c49bf6a956c248d5decd03cc89a9aa864fa0438e96ab698d8d923d3b1275a4"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-06.json": {
+      "bytes": 1358578,
+      "sha256": "1892d613cee2357affea7de25b8882ccda1edf0987d4711f7d9401b6e0096548"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-07.json": {
+      "bytes": 1358620,
+      "sha256": "7951179d4e93f0c0169b847dea16ed556a7ba37e0e45cd3128cd6c13d46b1c59"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-08.json": {
+      "bytes": 1177716,
+      "sha256": "5da9e1df411b5a6fac07b671da2a24603ad011dd3c5d196aace8303609b59e17"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-09.json": {
+      "bytes": 1268167,
+      "sha256": "3ff94c19e3f5b4107153064d6c21274e550d1c104aefc497f813e050e348e963"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-10.json": {
+      "bytes": 1268083,
+      "sha256": "12f76afa56c076fe56666a4fa9f35258dabae9c88bce0ec6efb4e4e9903927df"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-11.json": {
+      "bytes": 1358722,
+      "sha256": "50559ccabf12d551eeb9f797f9021c63d75426644182a798193ad44926b30c08"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-12.json": {
+      "bytes": 1268128,
+      "sha256": "aa5b518c802be067a46dade97155874f3c444f8297df32a5c0319fa6cd657031"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-13.json": {
+      "bytes": 1449443,
+      "sha256": "3322fd519095274d4410e72d347217e914fde19a4b230dd47e9c573e8e559049"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-14.json": {
+      "bytes": 1268164,
+      "sha256": "336a247215f6d79d824e01dcaff36327d393b1e89119632163c2db37c9809df3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-15.json": {
+      "bytes": 1449262,
+      "sha256": "9c04f58c4551766a666711bc2ff67d75ef7264bfa480b082f65744d8565e0e15"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-16.json": {
+      "bytes": 1449114,
+      "sha256": "561d73e08e6b5082e9c86185c00253aec18f3f93ca86cc4a6e60b5a0ef6dfdba"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-17.json": {
+      "bytes": 1449393,
+      "sha256": "4f16b4b6cdd18eab2b7664af25204bfa66dc260bce1129135c1ea7378a95285a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/forecasts-2025-18.json": {
+      "bytes": 1449097,
+      "sha256": "f2a94db2216143d5da92c8670b2b77f73737c1ca3a781c29d55b1093946a4208"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/manifest.json": {
+      "bytes": 6433,
+      "sha256": "2d9c91d803f1c991be039b88167082c8a501ce60dc58b18afcab0b251bb75e38"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-01.json": {
+      "bytes": 2624827,
+      "sha256": "f01209b4c9047392308e811e83ea7c1e05ac65a0d8d492447bb9d38426c0a33b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-02.json": {
+      "bytes": 2624941,
+      "sha256": "553f0182d85ec22e3832372b6ff11921522107801a8500450f436f361f06b4b2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-03.json": {
+      "bytes": 2624904,
+      "sha256": "e2cda6360bb711e6dc469bcb466d21f5cee0bb5fb5ea1ff6b7ce708fd5f79b87"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-04.json": {
+      "bytes": 2461218,
+      "sha256": "dbc8cd2a1938011b497944835a166d06eacbe28bcacff2b895ca0235b6ab8d2f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-05.json": {
+      "bytes": 2296292,
+      "sha256": "0d4337962cadb816cc86a9c80e48017bb223113ce3d6522af1233a434755eae9"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-06.json": {
+      "bytes": 2460526,
+      "sha256": "922901a3ff6b51f14c24d9ef16313fd75fdaf2b7bccf613fbaefc34f02a0858f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-07.json": {
+      "bytes": 2460313,
+      "sha256": "b92f942c9b11f716d486239d2de30e9ef12b2d1b82f9d455f9a4ae713f34cb4d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-08.json": {
+      "bytes": 2132566,
+      "sha256": "4900f1bdf8eee8e1edba5aafb6f003714012bea571c5cb16da7075d2c12734c7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-09.json": {
+      "bytes": 2132046,
+      "sha256": "1b9da834ae3a321e5c09544942894b5c83569e96ed3adf5fe55e63f3fdbc2297"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-10.json": {
+      "bytes": 2296545,
+      "sha256": "367c10fa79bd792e74751327cff6b86cb41ff47b57479af0ae6a95d98dfc9b8a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-11.json": {
+      "bytes": 2461129,
+      "sha256": "7d1255381e2634ce36bd69753bf3e2178ddcc8ff578b4625dd1fc1a07915cc16"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-12.json": {
+      "bytes": 2297113,
+      "sha256": "9c510950a0e4465aeae2c6b7cde156685f19b4350b3d417594669394af246672"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-13.json": {
+      "bytes": 2624834,
+      "sha256": "b7d7621d3caceecb5fc3994d9c9747c5a8d6b158be3bc155951d242cfc7c9639"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-14.json": {
+      "bytes": 2624026,
+      "sha256": "fcfd4bdd6200d1e69b267803d0097b17568cd9540cab66673f152348833c82a1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-15.json": {
+      "bytes": 2624942,
+      "sha256": "07228faae0ed7419daecd269741006bb5ab9d7f1a2a95950f84574bf89f4f08a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-16.json": {
+      "bytes": 2624860,
+      "sha256": "85b63c4edaa83f826c5c7048d6be9dc9a8e5d61a1d0b54fca30773abf76dc7d6"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2013-17.json": {
+      "bytes": 2624649,
+      "sha256": "6c26805a4da82f69bda0af49754e0b2551f8e1f34b5ff2bce744ae541fc880b1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-01.json": {
+      "bytes": 2624498,
+      "sha256": "f1c004d710cf4c7cd9d2929c1e71ae75fcbe8a1a7512abfe227b03be0db288bf"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-02.json": {
+      "bytes": 2624501,
+      "sha256": "b3173cf2287dc214f9c646b2d0bfd8ec7fc9ee11747fc2d379811f8be62a6229"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-03.json": {
+      "bytes": 2624934,
+      "sha256": "2bd2a5c77539b673093d0d4ea6eab08f45f6a72767a29b21b06502ade8541b47"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-04.json": {
+      "bytes": 2132779,
+      "sha256": "1135e7bb4481500d8a9f7d13ec623168ea59829dd83e869284e6f81be1ffaa09"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-05.json": {
+      "bytes": 2460788,
+      "sha256": "edff101abe46a5633e4d198b17fde45db1821256de55a634419673e8ef1eb6be"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-06.json": {
+      "bytes": 2461366,
+      "sha256": "30ddd0b5fd01dde04543d829199c65b1ca714d70ba2853ac978e7250cdf7351b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-07.json": {
+      "bytes": 2460505,
+      "sha256": "9b5c96cedfa5c7e1d790c1ad466952bbc311b063675a49278ae755fe176f8ba8"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-08.json": {
+      "bytes": 2461516,
+      "sha256": "712b217e8d5745b83762178a19bf3400e7e8904f2de3732c5d8ee323bef9799f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-09.json": {
+      "bytes": 2132941,
+      "sha256": "538b58ef68f1279b3563d4f03db42714833039c911999b2a77b1ffa91dbea7b7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-10.json": {
+      "bytes": 2133227,
+      "sha256": "5b6c99fa990807e2813afcae5fc7edc1cb25ae66156e4ecf67c93e226f1ad13b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-11.json": {
+      "bytes": 2297628,
+      "sha256": "51a93b2acf9666172944a891bc25f260b25fc8e2ea805222d8d38365b28a2d1a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-12.json": {
+      "bytes": 2460800,
+      "sha256": "fceff2d859f95d4848399f239d7b28b6fe7ef388e9f4a1bfa8f6867561a8b3da"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-13.json": {
+      "bytes": 2624799,
+      "sha256": "12f79fcb13e2c0defbbdd2b2ec52061b41614d2a38f6af3a87a1bb62b4c6e673"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-14.json": {
+      "bytes": 2625676,
+      "sha256": "c654aeb09cbbe918d32a3edf0346ec379771682fd8315eda540e1e4847d75c26"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-15.json": {
+      "bytes": 2625498,
+      "sha256": "b67ecb9d206825056baaa064f3f5519c3835bd9b1dcc0888939b4ee757858c3b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-16.json": {
+      "bytes": 2625051,
+      "sha256": "c6d5f67f2789c68270cb987bb857230a941d1af0a32b56139455d37c78e947ba"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2014-17.json": {
+      "bytes": 2626027,
+      "sha256": "b7ddab445eb6926096013018f77fd12e92186adfd04e4664446bf6bc721608f3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-01.json": {
+      "bytes": 2625410,
+      "sha256": "f88d044c47bceb09e6fe9ae1fda22cd8cf3080b0deda074ad82c967eca46b512"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-02.json": {
+      "bytes": 2625535,
+      "sha256": "ed85c1758b9a13ca09a7927ca406c0dfbd211db0e80eaee2c3d642bc3c711cea"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-03.json": {
+      "bytes": 2624686,
+      "sha256": "b2959b3c1b8ccc84c998ecd99a292c650590ab75a0c2b8cdf0b13fd7673f2e76"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-04.json": {
+      "bytes": 2461095,
+      "sha256": "0531f66138bbd37e33a66154b5a379c5dc83ba054baddfe9d242d39e745621b2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-05.json": {
+      "bytes": 2296556,
+      "sha256": "2a755a43b8272c8fb7fdeb106c6ddd7bdb071462407478f8e738d9be9c89e200"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-06.json": {
+      "bytes": 2296742,
+      "sha256": "a4211b6388bec9de96f0d934888d62b78f926aea17a9977bb88d97cbca10c7e5"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-07.json": {
+      "bytes": 2296640,
+      "sha256": "1fda36a5a8d150b6ec09a173abd25eab03c3577e10a08e33d3713640f77ef9b4"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-08.json": {
+      "bytes": 2296281,
+      "sha256": "6d42fc617d2aaf2c288fd290c6f5899c23f64e237d422407a31b1d57f3164f02"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-09.json": {
+      "bytes": 2132122,
+      "sha256": "25e66592fb0c9a13c0b13840d047fb009433e8b46322dd51c8880d3e3843f272"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-10.json": {
+      "bytes": 2296413,
+      "sha256": "fb01f5e7e9564449e93e6ce4e85fc6966c68ff429dcbe5ac15078407c233f8d8"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-11.json": {
+      "bytes": 2296426,
+      "sha256": "53a0c018c7a6203d8457d5991b389e1c6f00eda92c286973db3eaf6bb2052cf4"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-12.json": {
+      "bytes": 2624335,
+      "sha256": "fe689c1fa362ee9827e2d89b5fc86e0d2c94e23179f5b49c154b994dc8cb8f88"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-13.json": {
+      "bytes": 2625144,
+      "sha256": "821d3214a11b271a9378e5127a0570a57cdf09d531b2513811aa0394a469f477"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-14.json": {
+      "bytes": 2624929,
+      "sha256": "39608edc1219e20505b93a7957016b931b2f7a9130f847b26ef2bb03bd721bbb"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-15.json": {
+      "bytes": 2624259,
+      "sha256": "37946c0d95a9b270d18970addba65c918d3a43012ff4862675b27cfec6d7bbef"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-16.json": {
+      "bytes": 2624758,
+      "sha256": "bc6fbf3ffd33b73a9ea19beca7b8c71a8f19d4bf4a199e27345a06e36e42ef93"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2015-17.json": {
+      "bytes": 2625043,
+      "sha256": "4456f07185c4c149c79a7e929bb73bd3cd53e049457360f63ec441225b58de70"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-01.json": {
+      "bytes": 2625113,
+      "sha256": "466ab053894aa7798b1e1cf349306ae9380e6ed5acb73b29ad07d4b74658d6e7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-02.json": {
+      "bytes": 2623879,
+      "sha256": "5fe07e6484911d0c75641f9999a0d399faa04dcde3aab6a1765ccbd67204511e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-03.json": {
+      "bytes": 2624732,
+      "sha256": "c1db33485812ccfa6a309a6b9e5de206efa4ebeb00026d4c145e77b3eaeb0cae"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-04.json": {
+      "bytes": 2460172,
+      "sha256": "da455d13a9699851a65b49fc2193bd2a25491c87853c8786407db982d94473b5"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-05.json": {
+      "bytes": 2296252,
+      "sha256": "6d87380521a99c853f6cb07361e42c6a1e52afe1795ae1d39caf7d98ad694772"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-06.json": {
+      "bytes": 2460294,
+      "sha256": "50f3ec46a12663ee311389bce3fd88614b19714b6c92b3c5f0db89b030bf5506"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-07.json": {
+      "bytes": 2460648,
+      "sha256": "4acb5a2638ef2438af31e9fe4231f3157189f47795f732f5fe3a30cb39dc128d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-08.json": {
+      "bytes": 2132260,
+      "sha256": "52cf3bb7b0075d2eed0a3752db6c893d03fb923a33b8f7c71723429dc21222af"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-09.json": {
+      "bytes": 2132163,
+      "sha256": "9754d7c5ce11090b7c110538eff1021a591eef47d1c7a50f4669411df62224d1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-10.json": {
+      "bytes": 2296123,
+      "sha256": "7a2108c737037dcb9d900d87e54e8991809e84245d855fe66a60b7e525b32fe5"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-11.json": {
+      "bytes": 2296370,
+      "sha256": "f9aba190e7a53b89f85d725b1911017834b69749a7a9e76b032d762463bfe498"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-12.json": {
+      "bytes": 2624022,
+      "sha256": "ac15d17b5e4420f082d56f649c85a0d6250172fdf0c34c775a8d2ae5b6c3df5e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-13.json": {
+      "bytes": 2460521,
+      "sha256": "9f2d9e68b3d3826d46e89f44fbd0afc1d5c12ac6cbef220871e5c81541a4aed1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-14.json": {
+      "bytes": 2624423,
+      "sha256": "60030f0cc51df2a53a59a6e8d5db5fdbd7f724d44b23057feac1ab0638bcba04"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-15.json": {
+      "bytes": 2624507,
+      "sha256": "4761388e9ad810bf67cb27ccfeb9d3c125398fb8338ed6a46571df10f5a9920d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-16.json": {
+      "bytes": 2624049,
+      "sha256": "c165fd1a1875147e031799bc66b7b80c19f16cb7ce091de5196d9b3c48f52e45"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2016-17.json": {
+      "bytes": 2624663,
+      "sha256": "c8b3d03956ae728bf6b4e7c25c9b78ac4b95207d7adb9b3717fe7e32c17b6aaa"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-01.json": {
+      "bytes": 2461549,
+      "sha256": "be9934eee8f53c2bccc5ab4e6ff76caa3f238378c5887d0c2bcf57b05bad662c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-02.json": {
+      "bytes": 2625382,
+      "sha256": "a36c55062d8989464b5c6b6fa2d62488bcca3c7c9c3062f55284e1dd03d04f87"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-03.json": {
+      "bytes": 2624005,
+      "sha256": "0e0fa046385dd724a1c14709d698367cdfbe8638687d7a885bff6595423942b5"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-04.json": {
+      "bytes": 2624095,
+      "sha256": "30630620bb6365fc292ae206646d55c24774696e93f0ce478e5dd4a0f9b96f5e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-05.json": {
+      "bytes": 2296126,
+      "sha256": "edb5aebab5efdcac69108b4b0bf40563999aeb096e1bff82019f6900000dc709"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-06.json": {
+      "bytes": 2296277,
+      "sha256": "8995e03eeba7c77f499140313258e5cc99c9ca49633f07e4e8512fac5fcdf135"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-07.json": {
+      "bytes": 2461110,
+      "sha256": "0d98a06adeb7d9bc7085dc1fd2b84b578bf9d6ea52101cf294b225de978ae2b1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-08.json": {
+      "bytes": 2132549,
+      "sha256": "d8ab49c3b218081d9a7b16cdaa36e0d9535955c068463a839f9fb8d6ec372774"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-09.json": {
+      "bytes": 2132657,
+      "sha256": "06242cbc7d9328acd007c90a16f2f735937870ad2923506a4e324d1b5d21cfcf"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-10.json": {
+      "bytes": 2296848,
+      "sha256": "8103eca5f2b7f072bf4a8222cc6a8b784da403308921478bdc2d49dc4e02e5f0"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-11.json": {
+      "bytes": 2296831,
+      "sha256": "9dffc5d6c08f666e6da9fa7d2cbc4db5407e7eeb0acbe4aabdde9fcfc570b02a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-12.json": {
+      "bytes": 2623884,
+      "sha256": "5940db1bcffd2400c43f5da51366281a9e7e6225e7183a704993e431df18e9eb"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-13.json": {
+      "bytes": 2624885,
+      "sha256": "6d3a8ba36217d23df18863c6fb1cac13c119aa06f94bedc70390f94e99aca61a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-14.json": {
+      "bytes": 2624593,
+      "sha256": "55ad14c4120aa5fc0552906c19d01d95e691f64dbfab73388c7e13821d21a476"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-15.json": {
+      "bytes": 2624642,
+      "sha256": "6c16861fd36c5fe3535ed18e05c24c6e126fada7baca73b76c1af8b33f3a8eb2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-16.json": {
+      "bytes": 2625027,
+      "sha256": "0b52d2c26a56b87c36f4588e48404fd0c469c6d73dfc7b8edbc4855f9b8043a7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2017-17.json": {
+      "bytes": 2624181,
+      "sha256": "023f79e3585a5def839fdf87c3c474c00d85164b771aebcac5a292d6e73f6b70"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-01.json": {
+      "bytes": 2624567,
+      "sha256": "6fcd7bd9f37a9a54919eef689cdc59a02262bd963456d81f2bb1fddf80b04a79"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-02.json": {
+      "bytes": 2623197,
+      "sha256": "d9c65f55ef2b9df61cd787e1e6647c877301e6c031b78ef29afced3b72a23685"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-03.json": {
+      "bytes": 2623771,
+      "sha256": "6e0aa438c45e99161af2529e1ee549d3a9a5c0b51c54b852ba464de0f8c1fca5"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-04.json": {
+      "bytes": 2460488,
+      "sha256": "3d3a5a9f1b284467da20601f492c3e1738d76e590c384758430ba7afff146a79"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-05.json": {
+      "bytes": 2460343,
+      "sha256": "0c72eb7498ce10363a33aa81dd8b6973ac31e536b60b114082a63134d82bb5ff"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-06.json": {
+      "bytes": 2461261,
+      "sha256": "2540c83f8b7d0f8d68ebfc1adb46411a362553298580f8a5d86c74cc73865a55"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-07.json": {
+      "bytes": 2297700,
+      "sha256": "c7dfc667b21a187bed1928c0d25030ecefb9d324a3b522a87f232292ebc326b9"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-08.json": {
+      "bytes": 2296847,
+      "sha256": "9cc273727c01fce255e1f788b5a0ee00496b0ba3030a1f0fbfecf9fd1d9c17bb"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-09.json": {
+      "bytes": 2132527,
+      "sha256": "4e4e7530cca4106168b225549f5361e6779552fc131067d7421310f17c7eda04"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-10.json": {
+      "bytes": 2296804,
+      "sha256": "7e47118681919b3424beeae1f4cb9ebc4295f306164296a6968190ff8034bbe5"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-11.json": {
+      "bytes": 2133010,
+      "sha256": "d9df22592cc8825d857b18d22b8e2f45615ac5525ca974f0a97858700b712411"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-12.json": {
+      "bytes": 2460343,
+      "sha256": "c89a2d2060ab3be23d42e416515a130d8f8c79b5b9cb085c07ca9aac288c262c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-13.json": {
+      "bytes": 2624772,
+      "sha256": "9982596599582a690589249f5ad7247d062dcf814dc8c519c211ab8fc02f44a5"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-14.json": {
+      "bytes": 2624596,
+      "sha256": "db388c0e13d309096966a1ff0f2ef3199fd71b09ab65c191b44d4aa93f4ed1e2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-15.json": {
+      "bytes": 2624630,
+      "sha256": "a4814ff697c01a802233e23d991209d101096dbb5c6a42e861a522dd653bf02c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-16.json": {
+      "bytes": 2625160,
+      "sha256": "d67807c7574535602433a44e1fc6dd0e649a0fa99aacf012428e56f3c86d35cf"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2018-17.json": {
+      "bytes": 2625338,
+      "sha256": "a6e8dde0e798137f8b1002c76afe81cceb3c3b3cea04c8cd9f2cef4c54645b59"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-01.json": {
+      "bytes": 2624724,
+      "sha256": "6cd92fd9297f2c3bc0c126ebd2003b61c7a181aa13fd2a4d0cee697fc9c4377f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-02.json": {
+      "bytes": 2625639,
+      "sha256": "661fd6b48983f724fc2a0fa295527816dd4fcaad05e205aad1b1186ffab6c2d7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-03.json": {
+      "bytes": 2624282,
+      "sha256": "db46b30dd1e2681c0cf24bdf43bb79ba6ecfde0fb1388049e5c1cdc70322ce2e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-04.json": {
+      "bytes": 2461242,
+      "sha256": "0f37e648394e146de58ee6c7502393db8fc33e3741b968a2c7d7a8f9364f6a65"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-05.json": {
+      "bytes": 2460762,
+      "sha256": "e6b970a7717db8176574a572ddb8a5485a6f68715d8561e61002fd1baa6bb7d4"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-06.json": {
+      "bytes": 2297067,
+      "sha256": "a50bb7f9ba77ecc4306039cb1171d1c551d9da6772e5c0357b2b62eddddb89b4"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-07.json": {
+      "bytes": 2297197,
+      "sha256": "e1c8de6dacd17efe1e593e6747caa9a4a6e69686f516568bf95d8d9ef24e1be1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-08.json": {
+      "bytes": 2459874,
+      "sha256": "df479e55e4c4a14587f648c010cbd15f37ed8fe87b8a9d8ce5ce5821eb61a4e3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-09.json": {
+      "bytes": 2296398,
+      "sha256": "e51f9ac8d72cb071d7285c5de4d2ce38f9c11faea62a39f3a8870c125321d40c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-10.json": {
+      "bytes": 2131971,
+      "sha256": "e08c01eec34c7886aeff43f2ea2d4bf8d2aca5258cfe5237f567a4084817a653"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-11.json": {
+      "bytes": 2296738,
+      "sha256": "4ac13b758f9d5b4a452f90e12f3289cc1a02aba26d171270def1dd55071234d6"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-12.json": {
+      "bytes": 2296717,
+      "sha256": "d04d6a0b69b62f496cdcb77bf61d45f42473b4fd282fc4ff82655917910caea3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-13.json": {
+      "bytes": 2624410,
+      "sha256": "255262c8486f2c766dbecc3b320ae80edbf4e1b2b386709ec8f82ac30224bd97"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-14.json": {
+      "bytes": 2624876,
+      "sha256": "5a4024e4e59d52def94d638d63b14bb01006cfd23d0ea1f0db3d1758313b96dd"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-15.json": {
+      "bytes": 2625281,
+      "sha256": "5d32d85dbae097791d2a49445739f3d0601b7be5ef73737da71bcfbf37e0e22b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-16.json": {
+      "bytes": 2624584,
+      "sha256": "85d1fe53c3d9e2d8ebb947fd039e9e36fdedfff6093be76110ef6941e3aad41d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2019-17.json": {
+      "bytes": 2624655,
+      "sha256": "0715a4441a10794a74a0c6eaa3e354bee49fb46a31254978c2439a4c79c48b08"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-01.json": {
+      "bytes": 2624605,
+      "sha256": "24250faf1249e679128ef812314de8fc35a8b29cf74bd8db5ea84cdcd79ff3b4"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-02.json": {
+      "bytes": 2624626,
+      "sha256": "dfb764a393292c243213344c6511e5f6d70c0713ee8f5d3fe45c43c06cdc713d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-03.json": {
+      "bytes": 2624555,
+      "sha256": "e8af1f7861d968c12966798c5bb10a58f17f8c1d5dbc7e26e6b4ae3e03c1cca3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-04.json": {
+      "bytes": 2459995,
+      "sha256": "3eb6fa138f09b9af8042f739e3d549ecfd47516398e090d7ed62b102238cedf0"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-05.json": {
+      "bytes": 2296111,
+      "sha256": "b9afb240d35cc42394c37dba2286ab6c9bd277a0dfda5f5f58c8a28bb99880a8"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-06.json": {
+      "bytes": 2297059,
+      "sha256": "bfadec88398b640595f65e8a42cab3be1300ae20dd32cccf01cce4c544206ea0"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-07.json": {
+      "bytes": 2297118,
+      "sha256": "f1200b7dde52d75859875d16ff62bdca8716a9e4c04f790188708a163b59b827"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-08.json": {
+      "bytes": 2297054,
+      "sha256": "8bc5d957cb766c14a124e4587b366cb30ad2b55365419b1bb774698f9cc87fa7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-09.json": {
+      "bytes": 2296596,
+      "sha256": "d14f53d40cb4547db2072af9431f273a58525310b5c6861aa710d7951aed72d1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-10.json": {
+      "bytes": 2297074,
+      "sha256": "0fc875984d617eec945f4e0315203716d38cfaed00c02dc91e490618ff595023"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-11.json": {
+      "bytes": 2296390,
+      "sha256": "8db3ed84b866d264bd20a9320df52df95ff74240efc2c10629c0816d1880f5ac"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-12.json": {
+      "bytes": 2625320,
+      "sha256": "c93593723f7162bafb02f6240c868a9e3fa01afe8d2efb3ee17d947ad73d086a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-13.json": {
+      "bytes": 2460731,
+      "sha256": "b9c87b72c8dbd235b0c23390eea7e3a7b19824964ceebe20dcb5bf5719492dc1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-14.json": {
+      "bytes": 2625207,
+      "sha256": "ff30b59e7b679ebf3920e7079acf78bedca74a9054676e3698e222de366b8850"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-15.json": {
+      "bytes": 2624206,
+      "sha256": "7b278a14158b1fea0140034e2939e0458a5b3fcb24b4306999ac603a9cb74468"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-16.json": {
+      "bytes": 2624274,
+      "sha256": "52132ad6011baacb5ca013cbf1ea71540598f6406cf55c85f9f30c5bfd682fdb"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2020-17.json": {
+      "bytes": 2624821,
+      "sha256": "279e68978bd1f96893f1ba9eba6e4f9294cc3c30c00b5122b489297886b68d07"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-01.json": {
+      "bytes": 2624666,
+      "sha256": "f114260d5098e3de1eadc3a64c166f8b2aae5c74b97e5b0f389093125d313dc4"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-02.json": {
+      "bytes": 2624212,
+      "sha256": "821a2e015b4d59112e48f2b632a1e02bf0eafebb84e409f006795b59e961bf18"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-03.json": {
+      "bytes": 2624662,
+      "sha256": "ac7b7fa0b433aec278cc22471d9c9f1fad52e6cd2d548c46ff375bef49403d24"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-04.json": {
+      "bytes": 2624436,
+      "sha256": "5f64a3ecdede1518e7b9d900924a995722fdea2004da44fbb8491a7f7562143b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-05.json": {
+      "bytes": 2624216,
+      "sha256": "d10e5ca7febd7a053e94fad961a390139f8385dd9874428c2f2e2a85f6658250"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-06.json": {
+      "bytes": 2297021,
+      "sha256": "50ece61fcf6bcc0d5e77db49f81799dceefff101c3d0cd35971d50a2e62226e0"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-07.json": {
+      "bytes": 2132618,
+      "sha256": "32ac65286325bc80783f8dfb2b09b9e12c51d7846c40cfd0f084d40b03c41c24"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-08.json": {
+      "bytes": 2460368,
+      "sha256": "3efb47acd38be08ab854e3a03f9ed4726590d407c3c235b8601aa03c5ea45e1f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-09.json": {
+      "bytes": 2295937,
+      "sha256": "3468954f0063a11fb37b6e5ec43cbd74fbee2b034a8d1856a610e30c1fedd6c4"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-10.json": {
+      "bytes": 2296937,
+      "sha256": "c08b1318be818e4191757bd160dc8f3ef35d01c416e5b14ae58ffa191f7d776b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-11.json": {
+      "bytes": 2459460,
+      "sha256": "fd4f0d1f44ae0a7e93f48ea9e92c0f94e97e3095fdf4929aa4f0e2839c96cfcf"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-12.json": {
+      "bytes": 2458350,
+      "sha256": "933bf66e886974dd210fc394bb852d6cabb6c08ac4e62ed753e3121d49287576"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-13.json": {
+      "bytes": 2296217,
+      "sha256": "ac63616c168fef2ba30e75e46d9b89dde62a0a87af03abdfcf644a6875698c6d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-14.json": {
+      "bytes": 2296523,
+      "sha256": "0c997883e9bd79ba90fb5cc4ebff1fef0ba8137a458557f3ad95f6d4e73bcb8b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-15.json": {
+      "bytes": 2623918,
+      "sha256": "97cd4b34b0ba908e48d5d236e8d997690b812cec413df1c716db2c5d27603fef"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-16.json": {
+      "bytes": 2624781,
+      "sha256": "514873aca9c467dc4e5049e60ed2c1010823f7c6770282db34d664d5ddf5691c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-17.json": {
+      "bytes": 2624566,
+      "sha256": "8961bebe9f679baad5be9bbbc4b330dfa83a0e63ddc05cfd8f38bfe1321b8d67"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2021-18.json": {
+      "bytes": 2623992,
+      "sha256": "9d62f70db33c1215af97131d86846d366576d588c93bfc927e6b6e2649605d3c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-01.json": {
+      "bytes": 2625160,
+      "sha256": "d9eb6ab41fc91628b59204d259f6c922fbec38523b6ac68cf96fc97acf3f0c23"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-02.json": {
+      "bytes": 2624331,
+      "sha256": "74e80d3c59e05afea44740c2ac8f2fe5eb97ce2a3cb573cb0524c9775c76fa4f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-03.json": {
+      "bytes": 2624897,
+      "sha256": "e1f701b5edfd4e1b2f15c9f38bcd28b476a797435de6599b8b6060a2f5aef74b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-04.json": {
+      "bytes": 2624045,
+      "sha256": "eee4e6918140a9b3ce87bad8565977679e36eeed85059d92721a40bfe919c2de"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-05.json": {
+      "bytes": 2624544,
+      "sha256": "450b25ef45ba47ea18fbec337472e297d71a64e186da7368974e113c0c4f61df"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-06.json": {
+      "bytes": 2295808,
+      "sha256": "e0c14e80fbc65ee38f2ef1f884bdbfef60c3483c8fe5b0b9f1cc17e8362d540a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-07.json": {
+      "bytes": 2296686,
+      "sha256": "bd167064028f29aef7b700d7424d1f8524bb263f0ceaaef444b245210f38e755"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-08.json": {
+      "bytes": 2460721,
+      "sha256": "bfe5bd590ff8554c44b20188190cc7abf2e29cae0f276253e676c7423f59ad15"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-09.json": {
+      "bytes": 2132993,
+      "sha256": "6d47670272b161d0d169884f843c08c748fa2207a7226a792e3ad1f606207312"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-10.json": {
+      "bytes": 2295878,
+      "sha256": "c836a1e48d656aada0c6fbdb127f8cb8c96a3b8faa63c943807e33d9b9e9a88b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-11.json": {
+      "bytes": 2296789,
+      "sha256": "c3c311ee5d745fcecb84fc2a80ace0b1f0f11a17f560713dc51b9033d4adf383"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-12.json": {
+      "bytes": 2624239,
+      "sha256": "656f0eeab0355ad11fcc9d5ca5904951618c985a2c836153c022ab378cea91b1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-13.json": {
+      "bytes": 2460978,
+      "sha256": "6e38948050747539d64d59b213f4c8dcf21634253c98f039cbae3412ef065cd7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-14.json": {
+      "bytes": 2132375,
+      "sha256": "911c03238ebcfb588d5d74d5581404ebe3fb53e46c386f42be9651e97fc4ae07"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-15.json": {
+      "bytes": 2623882,
+      "sha256": "4c1ec9f809bcbd5aa48c5da289e12f225d8e0586c0219891d3940ff2cb0033ec"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-16.json": {
+      "bytes": 2625317,
+      "sha256": "daa1c2456662c403e11237014684011afd91762ff17e9f4a0cd04f5fc40b56f9"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-17.json": {
+      "bytes": 2461085,
+      "sha256": "7b00c972a94ed19a38983e852e161a73e40ba66ffe9d42ee2bdb0e1ec5b6e78e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2022-18.json": {
+      "bytes": 2624083,
+      "sha256": "15428162b8a3676c5e0c0b41c831455874f6c7725bc0ebdadd2aa1759f05663f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-01.json": {
+      "bytes": 2624716,
+      "sha256": "f0daedfebbb8f71fd31b7c46edbf564c823d53b4dd5b75b26c655b37363376e1"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-02.json": {
+      "bytes": 2624311,
+      "sha256": "a5377903f5816ff0a9bd2d087b6c795026bca007834332f9fb6aff30345f1943"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-03.json": {
+      "bytes": 2624870,
+      "sha256": "73ea66477e9a51804818479d38c341180a685881e7b30719b927e59aa787fb67"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-04.json": {
+      "bytes": 2624700,
+      "sha256": "84abaf59ea635765851586afd24c500405d1fce5922c8cea032df10cfe735874"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-05.json": {
+      "bytes": 2296405,
+      "sha256": "0b52c7710491ad1faafd23bc6d0263b5be5fe3098a10fe9b260f15c1a94c1401"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-06.json": {
+      "bytes": 2460415,
+      "sha256": "5749c79fd9ce70e4c592a329e344430571b509123040baccd622ee05d8b7903e"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-07.json": {
+      "bytes": 2131761,
+      "sha256": "9bad6f7def6de217f3943be5ce08fccf2a8ededf1c6b0c89f1c27c3ec700277a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-08.json": {
+      "bytes": 2624177,
+      "sha256": "84bc68b12d89d4d642f72525b8faa1af7c2446140d68c02f80be093f1fc7550d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-09.json": {
+      "bytes": 2296445,
+      "sha256": "d74a41a3f4334b7b17fe0ab842dc21673aba16da9cad97a57e833bde7753a354"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-10.json": {
+      "bytes": 2296091,
+      "sha256": "c482de51d46e4ada3f5bb6ac8bc241ce5443d71a3f8d4147ddea1287d389186c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-11.json": {
+      "bytes": 2296116,
+      "sha256": "ee04c8e37c12cced46a6d7e154090191d8af76c4f4e01475f7721e8cc60d26b0"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-12.json": {
+      "bytes": 2624754,
+      "sha256": "9cd3803bd13210fb70038356270d0a2a3bdedec36d1b42cf7a6be9a967bef92a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-13.json": {
+      "bytes": 2132628,
+      "sha256": "2b7ccc8ed464761835a8a9dda7c12804551576426e30ec2ea18eba298b52649a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-14.json": {
+      "bytes": 2460191,
+      "sha256": "387fa103452a33bd230076b299d5571751643b046ce45c8f8bf4088aa11eb9c2"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-15.json": {
+      "bytes": 2624618,
+      "sha256": "3e782e017500633ef81bb3717367b875eedb85579946ba2344831bfedfe3ef9f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-16.json": {
+      "bytes": 2624255,
+      "sha256": "13ac8bbe8b0a03bdb7b52e49efd538c024de6f2272ee7ecdf0f24a2c3ed6e4aa"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-17.json": {
+      "bytes": 2624513,
+      "sha256": "354ca485ac698ee473184aa77a45b2885855aed3e0ab6601368f804133f06299"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2023-18.json": {
+      "bytes": 2624558,
+      "sha256": "61945a921902669363bf53ee89286824e75c4b4159083db2c6c765e797a53f06"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-01.json": {
+      "bytes": 2624429,
+      "sha256": "3aebf0e5ce6ac2c4ff0c358fa6c39765fffc81ba7b27be483ee0945ef0920196"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-02.json": {
+      "bytes": 2624485,
+      "sha256": "3226f1bc2940e23d31a2c6c6b6aaca7dc6550b700ae660ae4469618637c614f9"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-03.json": {
+      "bytes": 2624172,
+      "sha256": "e316bfd508fe4499fa53609e85186b2ad2e05aa6e598e3546949b48f9138bc0c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-04.json": {
+      "bytes": 2623951,
+      "sha256": "05c1f01fda4bed399bad9ebb008761ab787af9369360afcccabf3dc7474b2a0c"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-05.json": {
+      "bytes": 2295681,
+      "sha256": "c1f036595f361e9a13ae0fbbe6db15d0bece1e8dc0061e37b60e86e78b447a14"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-06.json": {
+      "bytes": 2296618,
+      "sha256": "ff80e41c0b851768bb178302388c3629bc59d3978fe9d25d4795a2a1e41e6508"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-07.json": {
+      "bytes": 2460126,
+      "sha256": "6cd081f157061e779969beda504a3290f1527b1f54512b6b7e9b9e76881e217a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-08.json": {
+      "bytes": 2623278,
+      "sha256": "8d4006a39c3058b21bc377b48a4049d5c46aced3082b473611df8ee02c75db97"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-09.json": {
+      "bytes": 2460107,
+      "sha256": "4bc45919565870ddb988d4a925af462849d89a4c06524d61b101b00032b27c5d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-10.json": {
+      "bytes": 2296492,
+      "sha256": "dcec69b2fea33f053743ec988b86674251bd6e40b6c9df9629b714282bfef27a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-11.json": {
+      "bytes": 2295765,
+      "sha256": "b2d33f55faa9275ffd8524c4b51b429310e77f2272cb42c9000421c668d39629"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-12.json": {
+      "bytes": 2131989,
+      "sha256": "e7f32a39499965bca5629c35b2be40dbae52aaa567f06a863e17211d71f45e4b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-13.json": {
+      "bytes": 2624470,
+      "sha256": "77bc0f852dbe1c76da384a06a39f7f5ebb19f61534e86f2380002915c327133b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-14.json": {
+      "bytes": 2131947,
+      "sha256": "c47721db5580f12a454bb77688c5cf9841d46dca225101ef4d72c8ea3c90f211"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-15.json": {
+      "bytes": 2624050,
+      "sha256": "ef9a5b005ee7b92352dc266c2734f13f5c0a1693db1805e187a139fc0f640a8d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-16.json": {
+      "bytes": 2623680,
+      "sha256": "77d6a97b1f029f4008eae64fb3113a3af54ca44406ae9d28091f4e27a1739ef3"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-17.json": {
+      "bytes": 2624454,
+      "sha256": "6ee13bca909554a8984c131a9eed77372d01da04606116d4b1962834dd1c1820"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2024-18.json": {
+      "bytes": 2623511,
+      "sha256": "b5cac98872184c3a5dad129e121d3fabf8931b0173a3d8cab3e1af7fa32461a5"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-01.json": {
+      "bytes": 2624489,
+      "sha256": "cf2f344d18998dd8bc6986042a4509dd95096a17b39a2814bd13a0f5d73821eb"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-02.json": {
+      "bytes": 2624417,
+      "sha256": "abda8522231e9333a83eee49d088c8efe5b5585e588f8f917ed9c084f42d400b"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-03.json": {
+      "bytes": 2624417,
+      "sha256": "a2af2db380f872e3118abc13195e39d2a21c8022090bfc3d7f86a098cd36458d"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-04.json": {
+      "bytes": 2624280,
+      "sha256": "c1da91a2c5d2a3b08ccf80ed1f783ef87396959addc8448ca309656823bedf0f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-05.json": {
+      "bytes": 2296407,
+      "sha256": "85597c1a19a51c99483444f31ff6d3941068d01a97b6b2f9c0e2d2f4e5afcedc"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-06.json": {
+      "bytes": 2459860,
+      "sha256": "7049426b55d0a1eef9a25d2d35c63ab259bc67b79672ca4c47a2f7ac92e50060"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-07.json": {
+      "bytes": 2460556,
+      "sha256": "b2f7f5f6c7a52024eec1c3a2c12c5aa3594dfa679bd22e40362370bb1bd7cb74"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-08.json": {
+      "bytes": 2132665,
+      "sha256": "8fde719013cf6996f416c33e3ffb97e53f35db3f2a45af597fdb82d8e337de5a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-09.json": {
+      "bytes": 2296098,
+      "sha256": "494a97becb22faebc91cefcc70b28a4a0dec3cd16ea8911b5c8da58efa7aa954"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-10.json": {
+      "bytes": 2296302,
+      "sha256": "8a86d04b10b0c287982ba60b4f678d1b504a83eacedcffbddf06eca51defad9f"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-11.json": {
+      "bytes": 2460351,
+      "sha256": "76935a8a7529b323274660baf55fab4a917e940efd39d8aac59ae73d3d629510"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-12.json": {
+      "bytes": 2295964,
+      "sha256": "9cdf7f17568dc73cb23ab765da3ea3d93674ad4da9af330fde704c729669fcf7"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-13.json": {
+      "bytes": 2624165,
+      "sha256": "548701ff71df094737267de270fb96706fee516cd3b1eb84ecd3ec598ec81b90"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-14.json": {
+      "bytes": 2296781,
+      "sha256": "f45fc87d03054724785874313d8ba783c742767cc8eb93acf993520a04825d85"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-15.json": {
+      "bytes": 2623602,
+      "sha256": "53a2d10415f407af1ae4ac7e0a0d950ef757006192d13f2fe3cab1bbcafb5d89"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-16.json": {
+      "bytes": 2624184,
+      "sha256": "c570e29a5e816da022ffd227d17f2f91da7d84ad5e3f7885511b11bb0ca62025"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-17.json": {
+      "bytes": 2624369,
+      "sha256": "e44819d6982b3ccaf14359b3f0d58646552d356f363b0e34fdb84cb0dec00a00"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991/outer-losses-2025-18.json": {
+      "bytes": 2623510,
+      "sha256": "eba37c7544878c1aea612434c3eddcb526e641da2d88592e4df8690d6973c00a"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02e-v1-b6a2bfb0ff2f0dd3/authenticated-inputs.json": {
+      "bytes": 36946868,
+      "sha256": "8d5afff3a281cc08bf400c7694dfe468b126a580661136744690c186c7eb57ce"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02e-v1-b6a2bfb0ff2f0dd3/completion/artifact-index.json": {
+      "bytes": 919,
+      "sha256": "00f441fa3e6477cb906f7bd7da7b11edd4fe8bb49938603bb242295306303a78"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02e-v1-b6a2bfb0ff2f0dd3/evaluation.json": {
+      "bytes": 1699227,
+      "sha256": "c9124f0528bb5f81e6abd23d5a4cca9c991ad731310ed8be43799502f46fa0f4"
+    },
+    "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02e-v1-b6a2bfb0ff2f0dd3/manifest.json": {
+      "bytes": 12026,
+      "sha256": "b6a2bfb0ff2f0dd300011816f2500cd94864d4ecab7db771461844b71ee3e4d8"
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02e-terminal-audit/numerical-terminal-review.json": {
+      "bytes": 12382,
+      "sha256": "d74a00f0b84c9051d36e5fbe430a5e3453a9f954a720b5177008f77064c203a3"
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02e-terminal-audit/temporal-terminal-review.json": {
+      "bytes": 15668,
+      "sha256": "aa19f4d5d865ddbc88160e74360ac2eada9b52ba154a2a50fb8cc39bacb41a9c"
+    }
+  },
+  "runtime": {
+    "distributionMetadata": {
+      "numpy": {
+        "metadataSha256": "4f151eefd36459b2a4b1831a4faaf673f3fa95a0397c27c52dc4cd2591202f66",
+        "recordSha256": "0526b68e396b892d95d837c7e135b88a7d23c9906405d95f5a7bb3a858b610f1"
+      },
+      "pypdf": {
+        "metadataSha256": "22dbb490bf8d3814f24cf834af5929bd147be1dc47ac66b8746f11d9067827ed",
+        "recordSha256": "7c7116742b4cae15d397ce94b227824f4fd146cb66faa94d2f6a8f0a6f3ce090"
+      },
+      "scipy": {
+        "metadataSha256": "daa3b9481a7879f190a33428547728d6b5d3151996b2bf2b8c64c5d9dd5820ee",
+        "recordSha256": "8070e28a84a1826c1fec89cb76d8c22a19d6328761fbf9e8ee7b0484a4569220"
+      }
+    },
+    "executable": "/opt/anaconda3/bin/python3.12",
+    "executableSha256": "a31fd089a3b57a09d86744234c21a3c831aec2509eecd78d0e01b520e064357c",
+    "isolatedMode": true,
+    "modelWorkers": 1,
+    "networkAllowed": false,
+    "providerAccessAllowed": false,
+    "versions": {
+      "numpy": "1.26.4",
+      "pypdf": "6.13.2",
+      "python": "3.12.2",
+      "scipy": "1.13.1"
+    }
+  },
+  "scientific_calls": {
+    "bootstrap": 0,
+    "fit": 0,
+    "forecast": 0,
+    "score": 0,
+    "transform": 0
+  },
+  "scope_sha256": "0663b5f6c78daa9c4ecd6ebaafbdfd6e3d125ba05a1a7abb448c506bae0c843f",
+  "script_sha256": "50342db78ff332c9584b993d955a6bc9e8f0b836ee44ed7ab2aa92173005c50b",
+  "seconds_before_publication": 8.23318612499861,
+  "source_hashes": {
+    "scripts/research_score_compute_distribution.py": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1",
+    "scripts/research_score_compute_qualify.py": "41edf4cc2bc217fd0947aa2ad17e6112fd20e1aedc93b7eeb7ab0aae0ea77dcb",
+    "scripts/research_score_compute_run.py": "7089fc64b6464dadfddb4796059a975afe7f1fd43730420d8d8193d67104208f",
+    "scripts/research_score_conditional_adapter.py": "a6987485724c7f725661927e194ca39d77b303e15d868b872d3b9449a7cc19f2",
+    "scripts/research_score_conditional_admission.py": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+    "scripts/research_score_conditional_infer_archive.py": "f464c04fb8c0173571c56589e0823aec64719d5c1e3c6bbf9deb3bbadd4a8601",
+    "scripts/research_score_conditional_inference.py": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604",
+    "scripts/research_score_conditional_margin.py": "c1a0e334229999afe5bb000598ae0648789cc8ee0e112291b03707039015ad3d",
+    "scripts/research_score_conditional_policy.py": "aa72dc1799669340f3dbec32c5b6510f673ea70bba3d27b2315c311849a4551d",
+    "scripts/research_score_conditional_qualify.py": "cb0a13eb0afacb2a4ccde7826bc2288a31677853b71d061c5ccc477eca0647f6",
+    "scripts/research_score_conditional_replay.py": "8eae09d2b3cb7aec7a2e6fbe265679be39eea5dbf6bd327f24f75d9022f65b45",
+    "scripts/research_score_conditional_run.py": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+    "scripts/research_score_contract.py": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+    "scripts/research_score_distribution.py": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+    "scripts/research_score_inference.py": "4b61e0d4477eb49064353d9fd7b4e1c6ac37fc68553e0df0387d9f71bb8db078",
+    "scripts/research_score_metrics.py": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97",
+    "scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+    "scripts/research_score_replay.py": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594",
+    "scripts/research_score_run.py": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa",
+    "scripts/research_score_successor_distribution.py": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974",
+    "scripts/research_score_successor_qualify.py": "8fa0fb3f298bfa8419d535411b5bad7002fc56de3181d839ee4d047fcd45f7d3",
+    "scripts/research_score_successor_run.py": "b54c265c87a09d2ef9325363f668f3dd5a58cb49c54b82cd8286fdb61bd81459",
+    "tests/research-score-compute/test_cache.py": "a8dd3bf3721a91853eba32344a9301388fa9bd90b52b3c9997fb9c76ad3843dc",
+    "tests/research-score-compute/test_compute_qualify.py": "f12a8f493091c6d08ebfa6572b7a05010d02eb70e7dfaca0a96e64a0da280296",
+    "tests/research-score-compute/test_compute_run.py": "1c8e41eb477f3e86a2d5406dd1119b74f2c0d899c79bab2acb069fb2feb4bf76",
+    "tests/research-score-conditional-margin/test_adapter.py": "431326f6933504c315720c91492b38ef7fd42a2ceb182eb154658ea8d2771c99",
+    "tests/research-score-conditional-margin/test_admission.py": "416550a5459c6ae635db0dfbe35b27e1a51cd57501ec4c234f190c0b5c4249bb",
+    "tests/research-score-conditional-margin/test_conditional_margin.py": "53b18c9ee869696e13e552b9d01bdb8f79b9a1f1d4eb6973ae89420427f0809b",
+    "tests/research-score-conditional-margin/test_infer_archive.py": "aef020dfcf0d8b8a860b05345dc3fce46d7cd615fe83d43e7bb0edc3555ac3b9",
+    "tests/research-score-conditional-margin/test_inference.py": "598d40031b1630993ff2f2aceb13a7d280dc86a5d4789e572c383d54da1ea629",
+    "tests/research-score-conditional-margin/test_policy.py": "64f8fea7fed97c356bbf221f5630b4fdc2ae0ada43118b85070c3a33b560b44d",
+    "tests/research-score-conditional-margin/test_qualify.py": "aace76b001643345bb5eadc1bd1fc05bc6745bb64fb6b662ef33f7f131e18341",
+    "tests/research-score-conditional-margin/test_replay.py": "6798aec8b7141819d9168bd736e18bf7b4cad7c348d776cdd8268a0569316fb7",
+    "tests/research-score-conditional-margin/test_run.py": "7720f9264d167b610f12971925d416bdef0c9ea08ce4a3cfdc0b193a4562621c",
+    "tests/research-score-successor/test_qualify.py": "9eaac19131c06877d9010b48a37315c0dc52d10639aa67faf331ecc1df633c23",
+    "tests/research-score-successor/test_solver.py": "0283d8c2e4d10b34e7552c5750a565e72b9a03b30ca658996089a4a966e5cfc2",
+    "tests/research-score-successor/test_successor_run.py": "a53ca0c80ec71f00e453599a7218d179d6dc5442ba6e407d726a24f608627755",
+    "tests/research-score/test_contract.py": "64157ed50c999e3ecba3b84b0da20afd88074544e957e16d3470d264a60b8bf2",
+    "tests/research-score/test_distribution.py": "b671c6a4b97757a8122a54b98491a4ca79952cceb78a2985c685a9d630f7fc14",
+    "tests/research-score/test_inference.py": "367bcb3e9bf989bae2c9773e82a0b6701b5a8c36bf9347026e3f3dca0f6d293a",
+    "tests/research-score/test_invariance.py": "e192da8539080a0be836ded37a802403bc5d171c148a3edd357db978ad98f50c",
+    "tests/research-score/test_mean_models.py": "fd625bdc03d53e725539ed9517d0c1a5fa5f5caf6fbb331ee3ab2627ffa9a8e7",
+    "tests/research-score/test_metrics.py": "3bd12882c193abe4eb716ddd4fc0b7871fa104a27e526c7187f27c9b44760f91",
+    "tests/research-score/test_replay.py": "ce21d82a17e3878a6ce80095faf5c267d51751df78318b10504d46a86e0a44b9",
+    "tests/research-score/test_run.py": "1b8fe02cc57bdfb95f190c03a49eb16669c3c5aab79f61c383d7e08d778ad58e"
+  },
+  "status": "complete_descriptive_evidence_requires_independent_review",
+  "terminal_acceptance_sha256": "463bc0a16c617dc228b4a7f1c80bc15cabcf8df5900ea97b5ab9db28135d9835",
+  "validation": {
+    "absolute_tolerance": 1e-09,
+    "all_moment_and_partition_identities_passed": true,
+    "existing_aggregate_reconciliation_passed": true,
+    "maximum_squared_error_absolute_difference": 0.0,
+    "relative_tolerance": 1e-12,
+    "squared_errors_checked": 27256
+  },
+  "version": "rf02e-saved-mean-diagnostic.v1"
+}

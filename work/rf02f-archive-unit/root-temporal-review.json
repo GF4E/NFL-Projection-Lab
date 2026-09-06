@@ -1,0 +1,35 @@
+{
+  "status": "accepted_synthetic_temporal_boundary_only",
+  "checks": [
+    "public_forecast_reads_only_pregame_artifacts_and_outcome_free_targets",
+    "changed_target_and_future_outcomes_do_not_change_forecast_inputs_or_prefill_selection",
+    "real_store_publication_precedes_real_source_grader_and_binds_diagonal_rows",
+    "wrong_run_publication_rejected",
+    "post_admission_loss_tampering_rejected",
+    "baseexception_budget_stop_propagates_before_publication_read",
+    "future_batch_before_prior_rejected",
+    "current_year_grade_before_selection_rejected",
+    "complete_prior_two_year_selection_stays_frozen_after_current_year_grading"
+  ],
+  "source_hashes": {
+    "scripts/research_score_split_archive.py": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+    "tests/research-score-split/test_archive_unit.py": "510c10f77c194dcb5c9591404c5238f43f494659aa96a247db0013ffd3f2969e",
+    "scripts/research_score_conditional_run.py": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+    "scripts/research_score_conditional_admission.py": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+    "scripts/research_score_contract.py": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+    "config/research-team-score.v2.json": "422b1082361a2d0d926f639c8cf67b38615517a8269a7f05729aea0c8f264615"
+  },
+  "seconds_including_imports": 0.5391508750035428,
+  "peak_rss_mib": 97.578125,
+  "historical_admission_calls": 0,
+  "historical_fit_calls": 0,
+  "score_calls": 0,
+  "bootstrap_calls": 0,
+  "prior_attempt": "Attempt1 used HistoricalResult.game_id instead of HistoricalResult.context.game_id in this probe. Only the reviewer accessor was corrected; failed script, log and process report retained.",
+  "limits": [
+    "Tiny explicit synthetic contexts, not production source admission.",
+    "Private fields/seals guard accidental API misuse, not arbitrary Python introspection.",
+    "Publication recipe semantics and all277-origin controller/runtime remain unqualified.",
+    "Retrospective order is not proof of original contemporaneous issuance."
+  ]
+}

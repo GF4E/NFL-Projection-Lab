@@ -1,0 +1,184 @@
+{
+  "cache_after": {
+    "entries": [],
+    "evictions": 0,
+    "hits": 0,
+    "misses": 0,
+    "retained_bytes": 0
+  },
+  "cache_before": {
+    "entries": [],
+    "evictions": 0,
+    "hits": 0,
+    "misses": 0,
+    "retained_bytes": 0
+  },
+  "candidate": {
+    "events": [
+      "grid.probability",
+      "observed.0"
+    ],
+    "input_after": {
+      "bounds": {},
+      "grid_type": "GridHook",
+      "observed": {
+        "items": [
+          {
+            "float64_bits": "3ff0000000000000",
+            "float_hex": "0x1.0000000000000p+0",
+            "type": "float"
+          },
+          {
+            "float64_bits": "4000000000000000",
+            "float_hex": "0x1.0000000000000p+1",
+            "type": "float"
+          }
+        ],
+        "type": "ObservedHook"
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f03f000000000000000000000000000000000000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          2,
+          2
+        ],
+        "strides": [
+          16,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "input_before": {
+      "bounds": {},
+      "grid_type": "GridHook",
+      "observed": {
+        "items": [
+          {
+            "float64_bits": "3ff0000000000000",
+            "float_hex": "0x1.0000000000000p+0",
+            "type": "float"
+          },
+          {
+            "float64_bits": "4000000000000000",
+            "float_hex": "0x1.0000000000000p+1",
+            "type": "float"
+          }
+        ],
+        "type": "ObservedHook"
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f03f000000000000000000000000000000000000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          2,
+          2
+        ],
+        "strides": [
+          16,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "result": {
+      "outcome": {
+        "kind": "error",
+        "message": "observation failed 0",
+        "module": "builtins",
+        "type": "RuntimeError"
+      },
+      "warnings": []
+    }
+  },
+  "expected_error": null,
+  "expected_fallback": true,
+  "fallback_calls": 1,
+  "kind": "energy_parity",
+  "label": "fallback-hooks-False-0",
+  "original": {
+    "events": [
+      "grid.probability",
+      "observed.0"
+    ],
+    "input_after": {
+      "bounds": {},
+      "grid_type": "GridHook",
+      "observed": {
+        "items": [
+          {
+            "float64_bits": "3ff0000000000000",
+            "float_hex": "0x1.0000000000000p+0",
+            "type": "float"
+          },
+          {
+            "float64_bits": "4000000000000000",
+            "float_hex": "0x1.0000000000000p+1",
+            "type": "float"
+          }
+        ],
+        "type": "ObservedHook"
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f03f000000000000000000000000000000000000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          2,
+          2
+        ],
+        "strides": [
+          16,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "input_before": {
+      "bounds": {},
+      "grid_type": "GridHook",
+      "observed": {
+        "items": [
+          {
+            "float64_bits": "3ff0000000000000",
+            "float_hex": "0x1.0000000000000p+0",
+            "type": "float"
+          },
+          {
+            "float64_bits": "4000000000000000",
+            "float_hex": "0x1.0000000000000p+1",
+            "type": "float"
+          }
+        ],
+        "type": "ObservedHook"
+      },
+      "probability": {
+        "c_bytes_hex": "000000000000f03f000000000000000000000000000000000000000000000000",
+        "dtype": "<f8",
+        "shape": [
+          2,
+          2
+        ],
+        "strides": [
+          16,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "result": {
+      "outcome": {
+        "kind": "error",
+        "message": "observation failed 0",
+        "module": "builtins",
+        "type": "RuntimeError"
+      },
+      "warnings": []
+    }
+  },
+  "test": "test_energy_geometry.EnergyGeometryTests.test_original_fallback_grid_and_observation_hook_order"
+}

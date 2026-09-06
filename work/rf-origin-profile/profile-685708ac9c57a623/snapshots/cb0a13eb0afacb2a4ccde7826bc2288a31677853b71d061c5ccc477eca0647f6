@@ -1,0 +1,318 @@
+"""Fixed RF-02D identity qualification; no scalar estimation or successor replay."""
+import argparse
+from dataclasses import fields
+import json
+import os
+from pathlib import Path
+import resource
+import signal
+import sys
+import time
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
+
+from research_score_conditional_admission import (
+    ADMITTED_DATA, CONFIG_SHA, PROTOCOL_SHA, PARENT_MANIFEST, PARENT_INDEX,
+    SERIES, YEARS, YEAR_COUNTS, Archive, bound, parse, sha, identity_sample,
+    recover_original, validate_selected_rows, validate_independent_source, _source_manifest)
+from research_score_conditional_adapter import distribution_fingerprint, transform_distribution
+from research_score_conditional_policy import independent_control, independent_fingerprint
+from research_score_compute_distribution import score_forecast
+from research_score_contract import encoded, read_regular
+from research_score_distribution import JointBase, JointDistribution
+
+VERSION = 'rf02d-identity-qualification.v1'
+ADMISSION_ACCEPTANCE = '8c737ad9869efa7ef2948332ab6019384517f9a511e474add9026c227f1958a3'
+REPLAY_ACCEPTANCE = '6f3659c1f6b5bfbcc77585197969374b36867769e4fbcb2eeb180c53ed2bb5bf'
+ADMISSION_SOURCE = {
+    'scripts/research_score_conditional_admission.py': 'd6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8',
+    'tests/research-score-conditional-margin/test_admission.py': '416550a5459c6ae635db0dfbe35b27e1a51cd57501ec4c234f190c0b5c4249bb'}
+SAMPLE_SHA = 'f36dcdbdbaa616d65feca266abc531932a539fcc8948d20105541409a6969185'
+PLANNING = '.planning/engine-os/research-first/'
+BOUNDS = {'seconds': 600, 'peak_rss_mib': 4096, 'occurrences': 520,
+          'scalar_estimates': 0, 'football_fits': 0, 'successor_replay': False}
+
+
+class QualificationFailure(ValueError):
+    pass
+
+
+def require(condition, reason):
+    if not condition:
+        raise QualificationFailure(reason)
+
+
+def _rss():
+    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == 'darwin' else 1024)
+
+
+def _field_bytes(value):
+    if isinstance(value, np.ndarray):
+        return ('array', value.dtype.str, value.shape, value.tobytes(order='C'))
+    if isinstance(value, np.generic):
+        return ('numpy_scalar', value.dtype.str, value.tobytes())
+    return (type(value), encoded(value))
+
+
+def _snapshot(distribution):
+    require(type(distribution) is JointDistribution, 'exact_joint_distribution_required')
+    return {field.name: (_field_bytes(getattr(distribution, field.name)),
+            getattr(distribution, field.name).flags.writeable
+            if isinstance(getattr(distribution, field.name), np.ndarray) else None)
+            for field in fields(JointDistribution)}
+
+
+def compare_identity(original, result):
+    """Exact every-field comparison, including signed zero, dtype, and no aliasing."""
+    require(type(original) is type(result) is JointDistribution, 'exact_joint_distribution_required')
+    for field in fields(JointDistribution):
+        old, new = getattr(original, field.name), getattr(result, field.name)
+        require(_field_bytes(old) == _field_bytes(new), 'identity_field_mismatch:' + field.name)
+        if isinstance(new, np.ndarray):
+            for other in fields(JointDistribution):
+                source = getattr(original, other.name)
+                if isinstance(source, np.ndarray):
+                    require(not np.shares_memory(source, new), 'identity_array_alias:' + field.name)
+    fingerprint = independent_fingerprint if original.independent else distribution_fingerprint
+    old_hash, new_hash = fingerprint(original), fingerprint(result)
+    require(old_hash == new_hash, 'identity_fingerprint_mismatch')
+    return old_hash, new_hash
+
+
+def verify_metrics(distribution, archived_metrics, observed, game_id):
+    require(type(archived_metrics) is dict and type(game_id) is str and game_id, 'invalid_metric_input')
+    require(len(observed) == 2 and all(type(value) is int and value >= 0 for value in observed)
+            and sum(observed) <= 200, 'invalid_identity_observation')
+    before = _snapshot(distribution)
+    actual = score_forecast(distribution, observed, game_id, double_grid=True, diagnostics=True)
+    require(_snapshot(distribution) == before, 'scorer_mutated_distribution')
+    old_raw, new_raw = encoded(archived_metrics), encoded(actual)
+    require(old_raw == new_raw, 'complete_identity_metrics_mismatch')
+    return sha(old_raw), sha(new_raw)
+
+
+def qualify_occurrence(original, archived_metrics, observed, game_id, *, full_original=None):
+    """Synthetic-testable occurrence path; the public run fixes population/authentication."""
+    before = _snapshot(original)
+    if original.independent:
+        require(full_original is not None and full_original.independent is False, 'independence_full_source_required')
+        full_before = _snapshot(full_original)
+        transformed, descriptor = transform_distribution(full_original, 1.0)
+        full_hash, _ = compare_identity(full_original, transformed)
+        result, operation = independent_control(transformed, descriptor)
+        require(_snapshot(full_original) == full_before, 'adapter_mutated_full_source')
+    else:
+        require(full_original is None, 'unexpected_full_source')
+        result, descriptor = transform_distribution(original, 1.0)
+        operation, full_hash = None, None
+    old_hash, new_hash = compare_identity(original, result)
+    require(_snapshot(original) == before, 'adapter_mutated_source')
+    archived_hash, metric_hash = verify_metrics(result, archived_metrics, observed, game_id)
+    return {'source_distribution_sha256': old_hash, 'result_distribution_sha256': new_hash,
+            'full_source_distribution_sha256': full_hash, 'transformation': descriptor,
+            'independence_operation': operation, 'archived_metrics_sha256': archived_hash,
+            'new_metrics_sha256': metric_hash}
+
+
+def _create_output(output_directory, parent_directory):
+    output, parent = Path(output_directory), Path(parent_directory).resolve()
+    require(output.is_absolute() and '..' not in output.parts, 'absolute_output_path_required')
+    require(not output.resolve().is_relative_to(parent), 'parent_archive_output_forbidden')
+    descriptor = os.open(output.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        for part in output.parts[1:-1]:
+            following = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=descriptor)
+            os.close(descriptor)
+            descriptor = following
+        os.mkdir(output.name, mode=0o700, dir_fd=descriptor)
+        return os.open(output.name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=descriptor)
+    finally:
+        os.close(descriptor)
+
+
+def _write(output_fd, name, value):
+    raw = encoded(value)
+    fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=output_fd)
+    with os.fdopen(fd, 'wb') as stream:
+        stream.write(raw)
+        stream.flush()
+        os.fsync(stream.fileno())
+    os.fsync(output_fd)
+    return {'sha256': sha(raw), 'bytes': len(raw)}
+
+
+def _authenticate(run_directory, admitted_data_path, root, budget):
+    acceptance = parse(bound(root / (PLANNING + 'RF-02D-ADMISSION-ACCEPTANCE.v1.json'), ADMISSION_ACCEPTANCE))
+    require(acceptance['status'] == 'accepted_numerical_and_temporal_admission_only'
+            and acceptance['historical_admission_accepted'] is True, 'admission_acceptance_required')
+    evidence = {name: parse(bound(pointer['path'], pointer['sha256'])) for name, pointer in acceptance['evidence'].items()}
+    admission = evidence['result.json']
+    pins = {'parent_manifest': PARENT_MANIFEST, 'parent_index': PARENT_INDEX,
+            'admitted_data': ADMITTED_DATA, 'config': CONFIG_SHA, 'protocol': PROTOCOL_SHA}
+    require(admission['status'] == 'passed' and admission['pins'] == pins
+            and admission['counts'] == acceptance['counts']
+            and admission['counts']['recovered_distributions'] == 68140
+            and admission['counts']['calibration_cases'] == 56430
+            and admission['scope']['scalar_estimates'] == admission['scope']['score_calls'] == 0
+            and acceptance['identity_sample_sha256'] == SAMPLE_SHA, 'admission_result_binding_mismatch')
+    replay = parse(bound(root / (PLANNING + 'RF-02D-REPLAY-UNIT-ACCEPTANCE.v1.json'), REPLAY_ACCEPTANCE))
+    require(replay['status'] == 'accepted_pure_annual_and_prediction_unit_only'
+            and replay['pure_replay_unit_accepted'] is True, 'pure_replay_acceptance_required')
+    config = parse(bound(root / 'config/research-team-score-conditional.v1.json', CONFIG_SHA))
+    bound(root / config['protocol'], PROTOCOL_SHA)
+    units = {**config['accepted_unit_hashes'], **ADMISSION_SOURCE, **replay['accepted_source_hashes']}
+    require(len(units) == 10, 'accepted_unit_population_mismatch')
+    for name, fingerprint in units.items():
+        require(name.startswith(('scripts/research_score_conditional_', 'tests/research-score-conditional-margin/'))
+                and '..' not in Path(name).parts and not Path(name).is_absolute(), 'unsafe_unit_path')
+        bound(root / name, fingerprint)
+    archive = Archive(run_directory)
+    require(set(archive.index) & {'terminal-decision.json', 'terminal-failure.json'} == {'terminal-decision.json'}
+            and archive.read('terminal-decision.json')['status'] == 'reject_all', 'accepted_parent_terminal_required')
+    archive.verify_all(budget)
+    data, original_config = _source_manifest(archive, root, admitted_data_path)
+    require(archive.manifest['code_hashes']['scripts/research_score_compute_distribution.py']
+            == '8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1', 'cached_scorer_pin_mismatch')
+    pins.update(admission_acceptance=ADMISSION_ACCEPTANCE, replay_acceptance=REPLAY_ACCEPTANCE,
+                admission_result=acceptance['evidence']['result.json']['sha256'])
+    return archive, data, original_config, admission, {'pins': pins, 'accepted_unit_hashes': units,
+             'parent_code_hashes': archive.manifest['code_hashes'], 'runtime': archive.manifest['runtime']}
+
+
+def _sample(data, admission):
+    origins = [origin for origin in data['origins'] if origin['season'] in YEARS]
+    require(len(origins) == 226 and [(o['season'], o['week']) for o in origins]
+            == sorted(set((o['season'], o['week']) for o in origins)), 'identity_origin_population_mismatch')
+    records = {row['gameId']: row for row in data['records']}
+    require(len(records) == len(data['records']), 'duplicate_admitted_game')
+    for year, count in zip(YEARS, YEAR_COUNTS):
+        games = [game for origin in origins if origin['season'] == year for game in origin['targetGameIds']]
+        require(len(games) == len(set(games)) == count
+                and set(games) == {game for game, row in records.items() if row['season'] == year},
+                'identity_game_population_mismatch')
+    sample = identity_sample(origins)
+    require(sample['occurrences'] == 520 and sample['sha256'] == SAMPLE_SHA
+            and encoded(sample) == encoded(admission['identity_equivalence_sample']), 'fixed_identity_sample_mismatch')
+    return sample, records, {(o['season'], o['week']): o for o in origins}
+
+
+def _recover(archive, descriptor, mappers):
+    pointer = descriptor['mapper']
+    key = pointer['name'], pointer['sha256']
+    if key not in mappers:
+        value = archive.read(pointer)
+        mappers[key] = JointBase(np.asarray(value['atoms']), np.asarray(value['weights']), value['b'], value['epsilon'])
+    return recover_original(mappers[key], descriptor)
+
+
+def _run_occurrences(archive, sample, records, origins, original_config, output_fd, budget, report):
+    series = [(family, variant) for family in original_config['models']
+              for variant in ['full'] + original_config['variants']['allModels']
+              + original_config['variants'].get(family, []) + original_config['variants']['negativeControlsAllModels']]
+    require(len(series) == len(set(series)) == 40 and set(SERIES) <= set(series), 'parent_series_mismatch')
+    current, rows, losses, mappers = None, None, None, None
+    for index, key in enumerate(sample['keys']):
+        budget()
+        location = key['season'], key['week']
+        if location != current:
+            origin = origins[location]
+            suffix = f'{location[0]}-{location[1]:02}'
+            forecast_file, loss_file = 'forecasts-' + suffix + '.json', 'outer-losses-' + suffix + '.json'
+            publication = archive.read(forecast_file)
+            require(publication['origin_at'] == origin['originAt'] and publication['classification'] == 'retrospective'
+                    and publication['manifest_sha256'] == PARENT_MANIFEST, 'identity_forecast_origin_mismatch')
+            rows, losses = validate_selected_rows(publication, archive.read(loss_file), origin, series)
+            current, mappers = location, {}
+        row_key = key['family'], key['variant'], key['game_id']
+        row, loss, record = rows[row_key], losses[row_key], records[key['game_id']]
+        require(record['season'] == key['season'] and record['week'] == key['week'], 'sample_record_membership_mismatch')
+        require(row['distribution']['independent'] is (key['variant'] == 'independent_marginals'), 'sample_flag_mismatch')
+        require(key['family'] != 'N0' or row['native_failure'] is None, 'required_N0_native_failure')
+        original = _recover(archive, row['distribution'], mappers)
+        full = None
+        if original.independent:
+            full_row = rows[key['family'], 'full', key['game_id']]
+            validate_independent_source(full_row, row)
+            full = _recover(archive, full_row['distribution'], mappers)
+        result = qualify_occurrence(original, loss['metrics'], [record['homeScore'], record['awayScore']],
+                                    key['game_id'], full_original=full)
+        budget()
+        ledger = {'occurrence': index, 'key': key, 'native_failure': row['native_failure'],
+                  'archived_native_failure': loss['native_failure'],
+                  'source_descriptor_sha256': sha(encoded(row['distribution'])),
+                  'archived_loss_row_sha256': sha(encoded(loss)),
+                  'forecast_file': {forecast_file: archive.index[forecast_file]},
+                  'loss_file': {loss_file: archive.index[loss_file]}, **result}
+        name = f'occurrence-{index:03}.json'
+        report['artifacts'][name] = _write(output_fd, name, ledger)
+        report['complete_count'] += 1
+    require(report['complete_count'] == 520, 'incomplete_identity_qualification')
+
+
+def qualify_identity(run_directory, admitted_data_path, repository_root, output_directory):
+    """Execute only after independent source review and explicit historical authorization."""
+    output_fd = _create_output(output_directory, run_directory)
+    started = time.monotonic()
+    report = {'version': VERSION, 'status': 'protocol_invalid', 'complete_count': 0,
+              'bounds': dict(BOUNDS), 'artifacts': {}, 'scalar_estimates': 0, 'football_fits': 0}
+    prior_handler = None
+    alarm_installed = False
+    def budget():
+        require(time.monotonic() - started <= 600 and _rss() <= 4096, 'identity_resource_budget_exceeded')
+    def expired(_signal, _frame):
+        raise QualificationFailure('identity_wall_time_exceeded')
+    try:
+        root = Path(repository_root).resolve()
+        require(root == Path(__file__).resolve().parents[1], 'qualification_repository_mismatch')
+        require(signal.getitimer(signal.ITIMER_REAL) == (0.0, 0.0), 'active_timer_not_supported')
+        prior_handler = signal.signal(signal.SIGALRM, expired)
+        signal.setitimer(signal.ITIMER_REAL, 600)
+        alarm_installed = True
+        archive, data, config, admission, binding = _authenticate(run_directory, admitted_data_path, root, budget)
+        sample, records, origins = _sample(data, admission)
+        own_paths = ('scripts/research_score_conditional_qualify.py',
+                     'tests/research-score-conditional-margin/test_qualify.py')
+        own_hashes = {name: sha(read_regular(root / name)) for name in own_paths}
+        manifest = {'version': VERSION, **binding, 'qualification_source_hashes': own_hashes,
+                    'sample_sha256': sample['sha256'], 'bounds': dict(BOUNDS)}
+        report['artifacts']['manifest.json'] = _write(output_fd, 'manifest.json', manifest)
+        report['artifacts']['sample.json'] = _write(output_fd, 'sample.json', sample)
+        report.update(pins=binding['pins'], sample_sha256=sample['sha256'], expected_count=520)
+        budget()
+        _run_occurrences(archive, sample, records, origins, config, output_fd, budget, report)
+        for name, fingerprint in {**binding['parent_code_hashes'], **binding['accepted_unit_hashes'], **own_hashes}.items():
+            bound(root / name, fingerprint)
+        budget()
+        report.update(status='passed', checked_indexed_files=len(archive.checked),
+                      checked_indexed_bytes=sum(pointer['bytes'] for pointer in archive.checked.values()))
+    except Exception as exc:
+        report.update(status='protocol_invalid', failure_type=type(exc).__name__, reason=str(exc))
+    finally:
+        if alarm_installed:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+            signal.signal(signal.SIGALRM, prior_handler)
+        report.update(seconds=time.monotonic() - started, peak_rss_mib=_rss())
+        try:
+            _write(output_fd, 'receipt.json', report)
+        finally:
+            os.close(output_fd)
+    return report
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--run-directory', required=True)
+    parser.add_argument('--admitted-data', required=True)
+    parser.add_argument('--repository-root', required=True)
+    parser.add_argument('--output-directory', required=True)
+    args = parser.parse_args()
+    result = qualify_identity(args.run_directory, args.admitted_data, args.repository_root, args.output_directory)
+    print(json.dumps({'status': result['status'], 'complete_count': result['complete_count'],
+                      'seconds': result['seconds'], 'output_directory': args.output_directory}, sort_keys=True))
+    return 0 if result['status'] == 'passed' else 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

@@ -1,0 +1,88 @@
+{
+  "status": "accepted",
+  "scope": "actual_owned_watchdog_ControllerEnvelope_complete_smoke_integration_only",
+  "controller_wholefile_sha256_at_start": "1d2afe8d2db268bc0e99e8624d154dc05a79a4c50cb40e6ca36b7c41a5f2f957",
+  "controller_class_source_sha256": "831b94f2d9d33c9fe4272a2cf3865faa298a4da91cef1694b0121ad9f8619ca0",
+  "watchdog_sha256": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7",
+  "runtime_sha256": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+  "prior_rejection": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/root-watchdog-integration-review.json",
+    "sha256": "4a94e1b2cefdf76ca3fda16fa585c49da1cf4bb92a354fb1dfbe98222eb8e1b9"
+  },
+  "blockers": [],
+  "results": [
+    {
+      "name": "success",
+      "process_directory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-success-1788618869681715000",
+      "process_report_sha256": "a0cec56fd591ac8059dbc9ee69befd3dcb3f436e5221d6ee2c795a47833f8e76",
+      "status": "completed_process",
+      "exit_code": 0,
+      "stop_reason": null,
+      "phase": "science",
+      "stdout": "{\"phase_measurements\": [{\"name\": \"inference_smoke\", \"started_seconds\": 0.07355241700133774, \"finished_seconds\": 0.10861149999254849, \"seconds\": 0.035059082991210744, \"error_type\": null}], \"elapsed\": 0.12123095800052397}\n",
+      "elapsed_seconds": 0.8258250830112956
+    },
+    {
+      "name": "ordinary_failure",
+      "process_directory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-ordinary-failure-1788618870509423000",
+      "process_report_sha256": "069ed91dfc941454eb7a55728b1b2dd66fae0bbfd9b79c9668602f87e52f76a8",
+      "status": "externally_stopped_process",
+      "exit_code": 1,
+      "stop_reason": "incomplete_owned_phase_handshake",
+      "phase": "smoke",
+      "stdout": "{\"error_type\": \"ValueError\", \"phase_measurements\": [{\"name\": \"inference_smoke\", \"started_seconds\": 0.018546666993643157, \"finished_seconds\": 0.04110333399148658, \"seconds\": 0.022556666997843422, \"error_type\": \"ValueError\"}]}\n",
+      "elapsed_seconds": 0.5624697500024922
+    },
+    {
+      "name": "keyboard_interrupt",
+      "process_directory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-keyboard-interrupt-1788618871073404000",
+      "process_report_sha256": "764fa05cc8ade24df734474f8c610740970075c637b8df9641376ba3efafe086",
+      "status": "externally_stopped_process",
+      "exit_code": -2,
+      "stop_reason": "incomplete_owned_phase_handshake",
+      "phase": "smoke",
+      "stdout": "{\"error_type\": \"KeyboardInterrupt\", \"phase_measurements\": [{\"name\": \"inference_smoke\", \"started_seconds\": 0.01868170801026281, \"finished_seconds\": 0.04123716600588523, \"seconds\": 0.02255545799562242, \"error_type\": \"KeyboardInterrupt\"}]}\n",
+      "elapsed_seconds": 0.517651374990237
+    },
+    {
+      "name": "system_exit",
+      "process_directory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-system-exit-1788618871592594000",
+      "process_report_sha256": "3f3ee83dd44b9a032419d73a1e6db7ff76e72dedf11210ca905cd9b0d7f0224c",
+      "status": "externally_stopped_process",
+      "exit_code": 1,
+      "stop_reason": "incomplete_owned_phase_handshake",
+      "phase": "smoke",
+      "stdout": "{\"error_type\": \"SystemExit\", \"phase_measurements\": [{\"name\": \"inference_smoke\", \"started_seconds\": 0.013927834006608464, \"finished_seconds\": 0.03648179200536106, \"seconds\": 0.022553957998752594, \"error_type\": \"SystemExit\"}]}\n",
+      "elapsed_seconds": 0.5120406669884687
+    },
+    {
+      "name": "external_load_timeout",
+      "process_directory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-external-load-timeout-1788618872105658000",
+      "process_report_sha256": "10b55107edf66eb9525954bb9e3ee233beaf9f5677ecdbd10a1c8b6d521b624c",
+      "status": "externally_stopped_process",
+      "exit_code": -9,
+      "stop_reason": "complete_smoke_deadline",
+      "phase": "smoke",
+      "stdout": "load_started\n",
+      "elapsed_seconds": 0.5032990830077324
+    },
+    {
+      "name": "internal_short_test_deadline",
+      "process_directory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-fixed-internal-short-test-deadline-1788618872610437000",
+      "process_report_sha256": "45d80ecd18d2c186741f5d2170477fdffc90fe055d379cc9aea6ba6ada3908f8",
+      "status": "externally_stopped_process",
+      "exit_code": 1,
+      "stop_reason": "incomplete_owned_phase_handshake",
+      "phase": "smoke",
+      "stdout": "{\"error_type\": \"RuntimeStop\", \"stop_reason\": \"registered_120_second_complete_smoke_deadline\", \"phase_measurements\": []}\n",
+      "elapsed_seconds": 0.545889500004705
+    }
+  ],
+  "limits": [
+    "Six small real owned subprocesses only, no run_smoke/fullfixture/admission/model/scoring/bootstrap.",
+    "External timeout uses private shortened80ms smoke seam; internal timeout sets instance deadline30ms solely to exercise real exception handling without120s wait. Successful and ordinary/BaseException paths use public supervise fixed limits.",
+    "Parent marks failed smoke handshakes operationally invalid; retained child stdout proves original exception type and evaluator phase timing even when parent stops on incomplete phase.",
+    "This does not qualify full controller publication, complete smoke workload performance, historical admission or a historical run.",
+    "Controller wholefile may receive unrelated concurrent edits; class source hash binds exact inspected boundary."
+  ]
+}

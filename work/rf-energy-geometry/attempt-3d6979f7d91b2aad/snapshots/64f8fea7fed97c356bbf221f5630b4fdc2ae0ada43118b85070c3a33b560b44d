@@ -1,0 +1,252 @@
+"""Synthetic qualification for the existing product-of-marginals semantics."""
+from dataclasses import fields, replace
+import hashlib
+import inspect
+import json
+import math
+from pathlib import Path
+import resource
+import sys
+import time
+import unittest
+
+import numpy as np
+from scipy.stats import poisson
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
+import research_score_conditional_policy as unit
+from research_score_conditional_adapter import distribution_fingerprint, transform_distribution
+from research_score_distribution import JointDistribution
+from research_score_metrics import score_forecast
+
+
+def canonical(value):
+    return json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode('utf-8')
+
+
+def fixture():
+    return JointDistribution(
+        np.array([[0, 0], [0, 2], [0, 2], [2, 0], [1, 6], [6, 1], [3, 4], [8, 2]]),
+        np.array([.03, .12, .06, .06, .09, .14, .1, 0.]),
+        .4, np.array([4.2, 5.7]), np.array([-.125, .25]), 7)
+
+
+class PolicyTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.started = time.monotonic()
+
+    @classmethod
+    def tearDownClass(cls):
+        elapsed = time.monotonic() - cls.started
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == 'darwin' else 1024)
+        if elapsed > 120 or rss > 4096:
+            raise AssertionError(f'synthetic_budget_exceeded: seconds={elapsed}, rss_mib={rss}')
+
+    def test_copy_preserves_every_field_dtype_bytes_and_inputs(self):
+        original = JointDistribution(
+            np.asfortranarray(np.array([[0, 0], [2, 1], [2, 1], [1, 2]], dtype='>i2')),
+            np.array([.5, .1, .25, .1, -0., .1, .125, .1], dtype=np.float32)[::2],
+            np.float64(.125), np.array([3., 4.], dtype=np.float32),
+            np.array([0., -0.], dtype=np.float32)[::-1], np.int32(2), np.bool_(False))
+        original.alpha.setflags(write=False)
+        descriptor = transform_distribution(original, 1.)[1]
+        before_descriptor = canonical(descriptor)
+        snapshots = {field.name: (getattr(original, field.name).tobytes(order='C'),
+                                  getattr(original, field.name).flags.writeable)
+                     for field in fields(original) if isinstance(getattr(original, field.name), np.ndarray)}
+        result, operation = unit.independent_control(original, descriptor)
+        self.assertIs(type(result), JointDistribution)
+        self.assertIs(result.independent, True)
+        self.assertIs(original.independent, np.False_)
+        for field in fields(original):
+            if field.name == 'independent':
+                continue
+            old, new = getattr(original, field.name), getattr(result, field.name)
+            self.assertIs(type(old), type(new))
+            if isinstance(old, np.ndarray):
+                self.assertEqual(old.dtype, new.dtype)
+                self.assertEqual(old.shape, new.shape)
+                self.assertEqual(old.tobytes(order='C'), new.tobytes(order='C'))
+                self.assertFalse(np.shares_memory(old, new))
+                self.assertEqual(snapshots[field.name], (old.tobytes(order='C'), old.flags.writeable))
+                new.flat[0] += 1
+                self.assertEqual(old.tobytes(order='C'), snapshots[field.name][0])
+            else:
+                self.assertIs(old, new)
+        self.assertEqual(canonical(descriptor), before_descriptor)
+        self.assertEqual(operation['joint_transformation'], descriptor)
+        self.assertIsNot(operation['joint_transformation'], descriptor)
+        operation['joint_transformation']['s'] = .3
+        self.assertEqual(canonical(descriptor), before_descriptor)
+
+    def test_exact_marginal_cdfs_quantiles_means_variances_and_zero_covariance(self):
+        for scale in (0., .6, 1.):
+            calibrated, descriptor = transform_distribution(fixture(), scale)
+            product, _ = unit.independent_control(calibrated, descriptor)
+            expected_mean, expected_covariance = calibrated.moments()
+            mean, covariance = product.moments()
+            self.assertEqual(mean.tobytes(), expected_mean.tobytes())
+            self.assertEqual(np.diag(covariance).tobytes(), np.diag(expected_covariance).tobytes())
+            self.assertEqual(covariance[0, 1], 0.)
+            self.assertEqual(covariance[1, 0], 0.)
+            for target in ('home', 'away'):
+                for value in (-1.9, -1., 0., .5, 2., 7., 20., 100.):
+                    self.assertEqual(product.cdf(target, value), calibrated.cdf(target, value))
+                for probability in (.025, .1, .25, .75, .9, .975):
+                    self.assertEqual(product.quantile(target, probability), calibrated.quantile(target, probability))
+
+    def test_identical_rectangle_grid_product_and_inherited_bounds(self):
+        calibrated, descriptor = transform_distribution(fixture(), .4)
+        product, _ = unit.independent_control(calibrated, descriptor)
+        for rectangle in ((32, 32), (64, 48)):
+            joint_grid = calibrated.grid(rectangle)
+            product_grid = product.grid(rectangle)
+            expected = np.outer(joint_grid.probability.sum(axis=1), joint_grid.probability.sum(axis=0))
+            self.assertEqual(product_grid.probability.tobytes(), expected.tobytes())
+            self.assertEqual(product_grid.omitted_probability_bound, 2 * joint_grid.omitted_probability_bound)
+            self.assertEqual(product_grid.score_error_bound, joint_grid.score_error_bound)
+            self.assertLessEqual(product_grid.omitted_probability_bound, 1e-12)
+            self.assertLessEqual(product_grid.score_error_bound, 1e-7)
+            self.assertEqual(product.tail_bounds(rectangle[0] - 1, rectangle[1] - 1),
+                             calibrated.tail_bounds(rectangle[0] - 1, rectangle[1] - 1))
+
+    def test_identity_complete_canonical_metrics_equal_raw_independent_control(self):
+        originals = [fixture(), JointDistribution(np.array([[0, 2], [2, 0]]), np.array([.4, .4]),
+                                                .2, np.array([3., 4.]), np.array([0., -0.]), 0)]
+        for index, original in enumerate(originals):
+            calibrated, descriptor = transform_distribution(original, 1.)
+            product, _ = unit.independent_control(calibrated, descriptor)
+            raw_control = replace(original, independent=True)
+            for observation in ((7, 2), (0, 30)):
+                game_id = f'synthetic-policy-identity-{index}'
+                self.assertEqual(canonical(score_forecast(product, observation, game_id)),
+                                 canonical(score_forecast(raw_control, observation, game_id)))
+
+    def test_nonidentity_changes_total_margin_and_scores_with_full_support(self):
+        original = fixture()
+        calibrated, descriptor = transform_distribution(original, .4)
+        product, operation = unit.independent_control(calibrated, descriptor)
+        for target in ('total', 'margin'):
+            differences = [abs(product.cdf(target, value) - calibrated.cdf(target, value))
+                           for value in range(-7, 20)]
+            self.assertGreater(max(differences), 1e-3)
+        for observation in ((0, 0), (90, 0), (0, 90), (1000, 1000)):
+            log_probability = product.log_probability(*observation)
+            self.assertTrue(math.isfinite(log_probability))
+            expected = 0.
+            for side, score in enumerate(observation):
+                mass = math.fsum(calibrated.alpha[calibrated.atoms[:, side] == score])
+                background_log = math.log(calibrated.beta) + float(poisson.logpmf(score, calibrated.rates[side]))
+                expected += float(np.logaddexp(math.log(mass), background_log)) if mass > 0 else background_log
+            self.assertAlmostEqual(log_probability, expected, delta=1e-10)
+        scores = score_forecast(product, (0, 30), 'synthetic-policy-transformed')
+        self.assertGreater(scores['joint_energy_score'], 0.)
+        self.assertLessEqual(scores['grid_probability_bound'], 1e-12)
+        self.assertLessEqual(scores['grid_transport_bound'], 1e-7)
+        self.assertLessEqual(scores['double_grid_difference'], 1e-6)
+        self.assertEqual(scores['predicted_covariance'], 0.)
+        raw_scores = score_forecast(replace(original, independent=True), (0, 30), 'synthetic-policy-transformed')
+        self.assertNotEqual(canonical(scores), canonical(raw_scores))
+        self.assertEqual(operation['joint_transformation']['s'], .4)
+
+    def test_background_only_identity_and_product_provenance(self):
+        original = replace(fixture(), alpha=np.zeros(8), beta=1.)
+        calibrated, descriptor = transform_distribution(original, 0.)
+        product, operation = unit.independent_control(calibrated, descriptor)
+        np.testing.assert_array_equal(product.atoms, [[0, 0]])
+        np.testing.assert_array_equal(product.alpha, [0.])
+        for target in ('home', 'away', 'total', 'margin'):
+            for value in (-1, 0, 7, 20):
+                self.assertAlmostEqual(product.cdf(target, value), calibrated.cdf(target, value), delta=1e-12)
+        self.assertEqual(operation['operation'], 'product_of_calibrated_full_marginals')
+        self.assertNotEqual(operation['resulting_distribution_fingerprint'],
+                            descriptor['resulting_distribution_fingerprint'])
+
+    def test_deterministic_complete_descriptor_and_framed_operation_fingerprint(self):
+        calibrated, descriptor = transform_distribution(fixture(), .6)
+        product, operation = unit.independent_control(calibrated, descriptor)
+        another, repeated = unit.independent_control(calibrated, descriptor)
+        self.assertEqual(canonical(operation), canonical(repeated))
+        self.assertEqual(set(operation), {'version', 'operation', 'joint_transformation',
+                                          'resulting_distribution_fingerprint'})
+        self.assertEqual(operation['joint_transformation'], descriptor)
+        expected = hashlib.sha256()
+        joint_fingerprint = distribution_fingerprint(replace(product, independent=False))
+        for value in (unit.VERSION.encode('ascii'), unit.OPERATION.encode('ascii'),
+                      b'independent=True', joint_fingerprint.encode('ascii')):
+            expected.update(len(value).to_bytes(8, 'big'))
+            expected.update(value)
+        self.assertEqual(operation['resulting_distribution_fingerprint'], expected.hexdigest())
+        self.assertEqual(unit.independent_fingerprint(product), unit.independent_fingerprint(another))
+        self.assertIs(product.independent, True)
+
+    def test_operation_fingerprint_sensitive_to_every_preserved_field(self):
+        calibrated, descriptor = transform_distribution(fixture(), 1.)
+        product, _ = unit.independent_control(calibrated, descriptor)
+        baseline = unit.independent_fingerprint(product)
+        variants = [replace(product, atoms=product.atoms.astype(np.float64)),
+                    replace(product, alpha=product.alpha[::-1]),
+                    replace(product, beta=np.float64(product.beta)),
+                    replace(product, rates=product.rates[::-1]),
+                    replace(product, theta=np.array([-.125, -0.])),
+                    replace(product, iterations=8)]
+        for variant in variants:
+            self.assertNotEqual(unit.independent_fingerprint(variant), baseline)
+        self.assertEqual(unit.independent_fingerprint(replace(product, atoms=np.asfortranarray(product.atoms))), baseline)
+        with self.assertRaisesRegex(unit.ConditionalPolicyFailure, 'requires_exact_product_distribution'):
+            unit.independent_fingerprint(calibrated)
+
+    def test_malformed_descriptors_and_identity_contradiction_rejected(self):
+        calibrated, descriptor = transform_distribution(fixture(), .6)
+        malformed = [None, [], {}, {**descriptor, 'extra': 1}]
+        for key in descriptor:
+            malformed.append({name: value for name, value in descriptor.items() if name != key})
+        for key, values in (('version', ('wrong', 1)), ('s', (True, 0, np.float64(.6), -.1, 1.1, np.nan, np.inf, '.6')),
+                            ('original_distribution_fingerprint', ('x' * 64, '0' * 63, 0, ['0' * 64])),
+                            ('resulting_distribution_fingerprint', ('F' * 64, '0' * 65, None))):
+            malformed.extend({**descriptor, key: value} for value in values)
+        for bad in malformed:
+            with self.subTest(descriptor=bad), self.assertRaisesRegex(
+                    unit.ConditionalPolicyFailure, 'malformed_transformation_descriptor'):
+                unit.independent_control(calibrated, bad)
+        identity, identity_descriptor = transform_distribution(fixture(), 1.)
+        with self.assertRaisesRegex(unit.ConditionalPolicyFailure, 'identity_distribution_fingerprint_mismatch'):
+            unit.independent_control(identity, {**identity_descriptor, 'original_distribution_fingerprint': '0' * 64})
+
+    def test_descriptor_mismatch_and_invalid_distribution_rejected(self):
+        calibrated, descriptor = transform_distribution(fixture(), .6)
+        with self.assertRaisesRegex(unit.ConditionalPolicyFailure, 'transformed_distribution_fingerprint_mismatch'):
+            unit.independent_control(calibrated, {**descriptor, 'resulting_distribution_fingerprint': '0' * 64})
+        with self.assertRaisesRegex(unit.ConditionalPolicyFailure, 'transformed_distribution_fingerprint_mismatch'):
+            unit.independent_control(replace(calibrated, iterations=9), descriptor)
+
+        class Subclass(JointDistribution):
+            pass
+
+        for invalid in (object(), Subclass(**vars(calibrated)), replace(calibrated, independent=True),
+                        replace(calibrated, rates=np.array([0., 2.]))):
+            with self.assertRaises(ValueError):
+                unit.independent_control(invalid, descriptor)
+
+    def test_copied_provenance_is_separate_from_distribution_fingerprint(self):
+        calibrated, descriptor = transform_distribution(fixture(), .6)
+        product, operation = unit.independent_control(calibrated, descriptor)
+        # Only the given actual output is verifiable here; the complete original
+        # transformation claim is retained for the later provenance verifier.
+        alternate = {**descriptor, 'original_distribution_fingerprint': 'a' * 64}
+        second_product, second_operation = unit.independent_control(calibrated, alternate)
+        self.assertNotEqual(canonical(operation), canonical(second_operation))
+        self.assertEqual(unit.independent_fingerprint(product), unit.independent_fingerprint(second_product))
+
+    def test_source_has_only_existing_distribution_and_provenance_dependencies(self):
+        imports = [line for line in inspect.getsource(unit).splitlines()
+                   if line.startswith('import ') or line.startswith('from ')]
+        self.assertEqual(imports, ['from dataclasses import fields, replace', 'import hashlib', 'import math',
+                                  'import numpy as np',
+                                  'from research_score_conditional_adapter import VERSION as ADAPTER_VERSION, distribution_fingerprint',
+                                  'from research_score_distribution import JointDistribution'])
+
+
+if __name__ == '__main__':
+    unittest.main()

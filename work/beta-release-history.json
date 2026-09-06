@@ -1,0 +1,36 @@
+{
+  "initialDetailedDraft": {
+    "version": 167,
+    "deployed": false,
+    "supersededByOwnerInstruction": true
+  },
+  "frontPage": {
+    "version": 168,
+    "sourceCommit": "1f11d5298da8a6873ab153bf65b7417ea6393234",
+    "deploymentId": "appgdep_6a9bfd3ffcc081919c30b215b1cefbf8",
+    "status": "succeeded",
+    "scope": "front page Beta label and site update date only",
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site"
+  },
+  "verification": {
+    "build": "pass",
+    "typecheck": "pass",
+    "focusedLint": "pass",
+    "existingPublicAndSlateRegressionTests": 14,
+    "localWorkerFrontPageStatus": 200,
+    "localWorkerResearchRouteStatus": 404,
+    "archiveValidated": true,
+    "newDatabaseMigrations": 0,
+    "liveHttpChecks": {
+      "/sunday": {
+        "status": 200,
+        "betaDateVerified": true,
+        "researchDetailsAbsent": true
+      },
+      "/research": {
+        "status": 404,
+        "researchDetailsAbsent": true
+      }
+    }
+  }
+}

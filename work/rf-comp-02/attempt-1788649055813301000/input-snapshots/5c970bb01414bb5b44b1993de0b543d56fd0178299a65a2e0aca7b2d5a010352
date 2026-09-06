@@ -1,0 +1,659 @@
+{
+  "blockers": [],
+  "composed_large_support_attribution": [
+    {
+      "functions": [
+        {
+          "calls": 10,
+          "inclusive_fraction": 0.26025671580811005,
+          "inclusive_seconds": 0.0009555000000000001,
+          "line": 55,
+          "name": "components",
+          "self_seconds": 0.00035837200000000003,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 6,
+          "inclusive_fraction": 0.036861938646964694,
+          "inclusive_seconds": 0.000135334,
+          "line": 134,
+          "name": "moments",
+          "self_seconds": 0.00010900300000000001,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.12892553879677232,
+          "inclusive_seconds": 0.000473334,
+          "line": 177,
+          "name": "grid",
+          "self_seconds": 0.00026716900000000004,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 3,
+          "inclusive_fraction": 0.3674034932416329,
+          "inclusive_seconds": 0.0013488760000000002,
+          "line": 40,
+          "name": "encode_flat_floats",
+          "self_seconds": 1.7793e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.29770835177556093,
+          "inclusive_seconds": 0.001092999,
+          "line": 117,
+          "name": "distribution_descriptor",
+          "self_seconds": 1.379e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.15930679922372407,
+          "inclusive_seconds": 0.000584875,
+          "line": 125,
+          "name": "recover_distribution",
+          "self_seconds": 9.333e-06,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.29960382690408904,
+          "inclusive_seconds": 0.001099958,
+          "line": 16,
+          "name": "fit",
+          "self_seconds": 8.728900000000001e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py"
+        }
+      ],
+      "instrumented_seconds": 0.003700542001752183,
+      "kind": "fit",
+      "profile_self_seconds": 0.003671375,
+      "variant": "full"
+    },
+    {
+      "functions": [
+        {
+          "calls": 34,
+          "inclusive_fraction": 0.3316353519294695,
+          "inclusive_seconds": 0.002294585,
+          "line": 3470,
+          "name": "cdf",
+          "self_seconds": 0.00047481300000000004,
+          "source": "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.004034687093510622,
+          "inclusive_seconds": 2.7916000000000002e-05,
+          "line": 134,
+          "name": "moments",
+          "self_seconds": 2.2124e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.12326564532446883,
+          "inclusive_seconds": 0.000852875,
+          "line": 177,
+          "name": "grid",
+          "self_seconds": 0.000497206,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 24,
+          "inclusive_fraction": 0.4974106084694319,
+          "inclusive_seconds": 0.003441584,
+          "line": 235,
+          "name": "quantile",
+          "self_seconds": 5.6288e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.18992975863564096,
+          "inclusive_seconds": 0.001314124,
+          "line": 262,
+          "name": "energy_score",
+          "self_seconds": 0.000435373,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        }
+      ],
+      "instrumented_seconds": 0.006945541012100875,
+      "kind": "score",
+      "profile_self_seconds": 0.0069190000000000015,
+      "remaining_generic_cdf_backend": {
+        "backend_inclusive_seconds": 0.000476791,
+        "calls": 34,
+        "identity": "pinned scipy.stats.skellam._cdf, source line1572",
+        "wrapper_fraction": 0.3316353519294695,
+        "wrapper_inclusive_seconds": 0.002294585
+      },
+      "variant": "full"
+    },
+    {
+      "functions": [
+        {
+          "calls": 10,
+          "inclusive_fraction": 0.2814397655759199,
+          "inclusive_seconds": 0.0010559150000000002,
+          "line": 55,
+          "name": "components",
+          "self_seconds": 0.00039516100000000005,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 6,
+          "inclusive_fraction": 0.04606654933735058,
+          "inclusive_seconds": 0.00017283400000000002,
+          "line": 134,
+          "name": "moments",
+          "self_seconds": 0.000119,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.12242895672595237,
+          "inclusive_seconds": 0.00045933300000000003,
+          "line": 177,
+          "name": "grid",
+          "self_seconds": 0.000249376,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 3,
+          "inclusive_fraction": 0.3439542751503066,
+          "inclusive_seconds": 0.001290459,
+          "line": 40,
+          "name": "encode_flat_floats",
+          "self_seconds": 1.2707e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.2658367256751567,
+          "inclusive_seconds": 0.000997375,
+          "line": 117,
+          "name": "distribution_descriptor",
+          "self_seconds": 1.1623e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.17233789457046733,
+          "inclusive_seconds": 0.000646583,
+          "line": 125,
+          "name": "recover_distribution",
+          "self_seconds": 1.2959e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.3239195347980574,
+          "inclusive_seconds": 0.001215292,
+          "line": 16,
+          "name": "fit",
+          "self_seconds": 8.671e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py"
+        }
+      ],
+      "instrumented_seconds": 0.0037771249772049487,
+      "kind": "fit",
+      "profile_self_seconds": 0.0037518329999999996,
+      "variant": "independent_marginals"
+    },
+    {
+      "functions": [
+        {
+          "calls": 35,
+          "inclusive_fraction": 0.16459348611821506,
+          "inclusive_seconds": 0.002633584,
+          "line": 3470,
+          "name": "cdf",
+          "self_seconds": 0.000540198,
+          "source": "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.0019166232931196808,
+          "inclusive_seconds": 3.0667e-05,
+          "line": 134,
+          "name": "moments",
+          "self_seconds": 2.0083e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.059774060068987694,
+          "inclusive_seconds": 0.0009564170000000001,
+          "line": 177,
+          "name": "grid",
+          "self_seconds": 0.000530415,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 144,
+          "inclusive_fraction": 0.18620182473887126,
+          "inclusive_seconds": 0.002979329,
+          "line": 203,
+          "name": "_marginal_atoms",
+          "self_seconds": 0.000464232,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 24,
+          "inclusive_fraction": 0.6902165027471581,
+          "inclusive_seconds": 0.011043834,
+          "line": 235,
+          "name": "quantile",
+          "self_seconds": 7.230000000000001e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.08682784126731756,
+          "inclusive_seconds": 0.001389292,
+          "line": 262,
+          "name": "energy_score",
+          "self_seconds": 0.000411792,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        }
+      ],
+      "instrumented_seconds": 0.016038125002523884,
+      "kind": "score",
+      "profile_self_seconds": 0.016000536,
+      "remaining_generic_cdf_backend": {
+        "backend_inclusive_seconds": 0.000547415,
+        "calls": 35,
+        "identity": "pinned scipy.stats.skellam._cdf, source line1572",
+        "wrapper_fraction": 0.16459348611821506,
+        "wrapper_inclusive_seconds": 0.002633584
+      },
+      "variant": "independent_marginals"
+    },
+    {
+      "functions": [
+        {
+          "calls": 10,
+          "inclusive_fraction": 0.25992049891935076,
+          "inclusive_seconds": 0.000970749,
+          "line": 55,
+          "name": "components",
+          "self_seconds": 0.000363672,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 6,
+          "inclusive_fraction": 0.04017385707155847,
+          "inclusive_seconds": 0.000150041,
+          "line": 134,
+          "name": "moments",
+          "self_seconds": 0.00011695500000000001,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.1284877444312829,
+          "inclusive_seconds": 0.00047987500000000005,
+          "line": 177,
+          "name": "grid",
+          "self_seconds": 0.000278997,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 3,
+          "inclusive_fraction": 0.3775755115679802,
+          "inclusive_seconds": 0.001410166,
+          "line": 40,
+          "name": "encode_flat_floats",
+          "self_seconds": 1.3251e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.3075582254647648,
+          "inclusive_seconds": 0.001148666,
+          "line": 117,
+          "name": "distribution_descriptor",
+          "self_seconds": 1.7875e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.16436658319927858,
+          "inclusive_seconds": 0.0006138750000000001,
+          "line": 125,
+          "name": "recover_distribution",
+          "self_seconds": 8.958000000000001e-06,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.2964580089065201,
+          "inclusive_seconds": 0.001107209,
+          "line": 16,
+          "name": "fit",
+          "self_seconds": 9.091000000000001e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py"
+        }
+      ],
+      "instrumented_seconds": 0.003763042011996731,
+      "kind": "fit",
+      "profile_self_seconds": 0.0037347920000000002,
+      "variant": "zero_strength_update"
+    },
+    {
+      "functions": [
+        {
+          "calls": 36,
+          "inclusive_fraction": 0.3482586324975352,
+          "inclusive_seconds": 0.002623418,
+          "line": 3470,
+          "name": "cdf",
+          "self_seconds": 0.0005300680000000001,
+          "source": "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.004452699131908193,
+          "inclusive_seconds": 3.3542000000000005e-05,
+          "line": 134,
+          "name": "moments",
+          "self_seconds": 2.7125000000000002e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.12128368148558888,
+          "inclusive_seconds": 0.000913625,
+          "line": 177,
+          "name": "grid",
+          "self_seconds": 0.000529039,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 24,
+          "inclusive_fraction": 0.49016820614581874,
+          "inclusive_seconds": 0.0036924170000000004,
+          "line": 235,
+          "name": "quantile",
+          "self_seconds": 6.1914e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.18810669220421883,
+          "inclusive_seconds": 0.001417,
+          "line": 262,
+          "name": "energy_score",
+          "self_seconds": 0.000467419,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        }
+      ],
+      "instrumented_seconds": 0.007563624996691942,
+      "kind": "score",
+      "profile_self_seconds": 0.007532959,
+      "remaining_generic_cdf_backend": {
+        "backend_inclusive_seconds": 0.000533918,
+        "calls": 36,
+        "identity": "pinned scipy.stats.skellam._cdf, source line1572",
+        "wrapper_fraction": 0.3482586324975352,
+        "wrapper_inclusive_seconds": 0.002623418
+      },
+      "variant": "zero_strength_update"
+    },
+    {
+      "functions": [
+        {
+          "calls": 10,
+          "inclusive_fraction": 0.2567533689423187,
+          "inclusive_seconds": 0.000957583,
+          "line": 55,
+          "name": "components",
+          "self_seconds": 0.00035632700000000003,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 6,
+          "inclusive_fraction": 0.03674432235453669,
+          "inclusive_seconds": 0.00013704100000000002,
+          "line": 134,
+          "name": "moments",
+          "self_seconds": 0.000109332,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.12874549245854025,
+          "inclusive_seconds": 0.00048016700000000004,
+          "line": 177,
+          "name": "grid",
+          "self_seconds": 0.00027045600000000003,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 3,
+          "inclusive_fraction": 0.37652761716256206,
+          "inclusive_seconds": 0.001404291,
+          "line": 40,
+          "name": "encode_flat_floats",
+          "self_seconds": 1.2252e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.3050831688153876,
+          "inclusive_seconds": 0.001137833,
+          "line": 117,
+          "name": "distribution_descriptor",
+          "self_seconds": 1.6914e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.1631549693357139,
+          "inclusive_seconds": 0.0006085,
+          "line": 125,
+          "name": "recover_distribution",
+          "self_seconds": 9.376000000000001e-06,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.29791078520038294,
+          "inclusive_seconds": 0.0011110830000000001,
+          "line": 16,
+          "name": "fit",
+          "self_seconds": 8.9536e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py"
+        }
+      ],
+      "instrumented_seconds": 0.003760749998036772,
+      "kind": "fit",
+      "profile_self_seconds": 0.0037295830000000007,
+      "variant": "zero_scoring_level_update"
+    },
+    {
+      "functions": [
+        {
+          "calls": 34,
+          "inclusive_fraction": 0.3337490053126079,
+          "inclusive_seconds": 0.0025441680000000003,
+          "line": 3470,
+          "name": "cdf",
+          "self_seconds": 0.0005352810000000001,
+          "source": "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py"
+        },
+        {
+          "calls": 1,
+          "inclusive_fraction": 0.005378461335028553,
+          "inclusive_seconds": 4.1e-05,
+          "line": 134,
+          "name": "moments",
+          "self_seconds": 3.4001e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.11738596809286841,
+          "inclusive_seconds": 0.000894833,
+          "line": 177,
+          "name": "grid",
+          "self_seconds": 0.0005135410000000001,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 24,
+          "inclusive_fraction": 0.5014704188562031,
+          "inclusive_seconds": 0.003822708,
+          "line": 235,
+          "name": "quantile",
+          "self_seconds": 6.4195e-05,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        },
+        {
+          "calls": 2,
+          "inclusive_fraction": 0.1879892924017558,
+          "inclusive_seconds": 0.001433042,
+          "line": 262,
+          "name": "energy_score",
+          "self_seconds": 0.000474203,
+          "source": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py"
+        }
+      ],
+      "instrumented_seconds": 0.00765025001601316,
+      "kind": "score",
+      "profile_self_seconds": 0.007622998000000002,
+      "remaining_generic_cdf_backend": {
+        "backend_inclusive_seconds": 0.00051975,
+        "calls": 34,
+        "identity": "pinned scipy.stats.skellam._cdf, source line1572",
+        "wrapper_fraction": 0.3337490053126079,
+        "wrapper_inclusive_seconds": 0.0025441680000000003
+      },
+      "variant": "zero_scoring_level_update"
+    }
+  ],
+  "evidence": [
+    {
+      "bytes": 3265,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/SCOPE.md",
+      "sha256": "23333dc5b05636f13a2fa3bb4768e45fcf8dfa3d6f6d8ac350929ed848e71345"
+    },
+    {
+      "bytes": 13545,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/profile_remaining.py",
+      "sha256": "b88ee9ebea74a7d96da30cf91320867a47dd6d4dcbcad5a4883776e8684c414b"
+    },
+    {
+      "bytes": 13992,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/INPUT-PINS.json",
+      "sha256": "c581b070833afffb39f146287e347fed56d49704b230df5da381cc59f21f1254"
+    },
+    {
+      "bytes": 13992,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/source-map-before.json",
+      "sha256": "c581b070833afffb39f146287e347fed56d49704b230df5da381cc59f21f1254"
+    },
+    {
+      "bytes": 13992,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/source-map-after.json",
+      "sha256": "c581b070833afffb39f146287e347fed56d49704b230df5da381cc59f21f1254"
+    },
+    {
+      "bytes": 2633,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/process.json",
+      "sha256": "d683c1c3a90e060aa6edcba7d0aed4548af51fa8ead6a0ba497b726e1fcaeecc"
+    },
+    {
+      "bytes": 668,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/process.log",
+      "sha256": "528577548faea71ab555d64e46100c96cb0ad5864a4b9c49de48f9b516bf8677"
+    },
+    {
+      "bytes": 714048,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/result.json",
+      "sha256": "63aa6d51fdd24a8a906e95d3d2ae9d957ee33b1b0cb1db8094554beb543bf399"
+    },
+    {
+      "bytes": 251676,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/attribution-summary.json",
+      "sha256": "6974435a875a845a14d116205c34677e5e5c2abd7cf19ec397d0b3da4861c534"
+    },
+    {
+      "bytes": 59419,
+      "path": "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_discrete_distns.py",
+      "sha256": "54931b8b4e1001dba0ef3b24eedda8dcdeb35b3c7f5c7df209e7d2f372983d67"
+    }
+  ],
+  "findings": [
+    "The reported attribution is reproducible from all32 saved binary profiles, including5521 function entries and complete caller relations. No output mismatch or source drift was found.",
+    "Three flat encodings remain34.40-37.76% of instrumented large-support fit time; the actual fitter is29.65-32.39%. Ten components calls, six moments calls, two descriptors, one recovery and one validation grid remain. These nested fractions cannot be added or interpreted as removable work.",
+    "Remaining generic CDF calls in all four large-support composed scorer cases are Skellam calls, confirmed by the sole _discrete_distns.py backend at line1572 and its caller relation. Full has34 calls/33.16% inclusive; zero controls have36/34 calls and34.83%/33.37%.",
+    "Independent-marginals scoring additionally repeats _marginal_atoms144 times for18.62% inclusive. This broad stress overhead is distinct from the actual pilot selected-diagonal zero-control workload."
+  ],
+  "historical_execution": false,
+  "limitations": [
+    "One original-then-both pass per case, with no warmup, replication or overhead calibration. These profile times are attribution, not original/candidate speed ratios, confidence bounds or historical maxima.",
+    "Cumulative functions overlap. Profile fractions use total_self_seconds from cProfile, not uninstrumented wall time, and profiling disproportionately affects Python work.",
+    "Fixture construction is included in process resource reporting but excluded from the16+16 callback counters. Only operation callbacks are profiled; constructor/admission, selection, output conversion, hashing, stats inspection, persistence and whole-controller work are outside cProfile.",
+    "All inputs and means are synthetic. Support size and selected roles provide relevant stress shapes, not reproduced historical inputs or a completed chronological experiment.",
+    "Law equality is against a retained canonical hash. Descriptor and metric bodies were independently byte-verified here, but law arrays or grids were not reconstructed/rescored.",
+    "The parent clock starts after importing time and ends before its final process-report serialization; the worker process and prior input/output persistence are observed. Startup/tail exclusion is explicit and the recorded1.409s/125.53MiB is far below30s/1024MiB.",
+    "Metadata inspection used standard pstats deserialization only. No scientific module, fitter, scorer, CDF, profiler, unit suite, bootstrap, history admission, or previous run was invoked.",
+    "RF-02F remains protocol_invalid and RF-COMP-01 remains short of its fixed historical capacity requirement. This review authorizes neither source changes nor restart/integration."
+  ],
+  "next_bounded_hypothesis": {
+    "backend_constraint": "Pinned SciPy uses private Boost _ncx2_cdf internally. scipy.special.chndtr is a different numerical backend and must not be substituted under an assumed exactness claim. Public Skellam calls preserve that backend.",
+    "decision_boundary": "Do not infer a counterfactual gain from cumulative profile percentages. Proceed beyond synthetic work only if separately qualified complete-callback measurements meet the unchanged fixed computational target; the present profile supplies no such result.",
+    "proposal": "Within one scoring call, batch/cache nearby finite integer Skellam CDF requests through the same public scipy.stats.skellam.cdf function, while retaining original scalar empirical arithmetic, returned values, failure boundaries and per-score isolation.",
+    "reason": "The remaining public-wrapper dispatch is a substantial shared scorer cost in full and both actual-pilot-like zero-control variants. Batching can test whether fewer wrapper dispatches offset additional backend evaluations.",
+    "smallest_test": "A separately preregistered fixed batching policy on these same synthetic supports/rates and boundary cases, complete scalar CDF/quantile/metric byte and exception comparisons, followed by the unchanged full-callback four-mode/counterbalanced resource measurement. Include preparation, unused batch work and fresh per-score cache costs. No such test was executed or authorized by this review."
+  },
+  "role": "independent_numerical",
+  "scientific_calls_during_review": 0,
+  "status": "accepted_bounded_synthetic_attribution_only",
+  "verification": {
+    "additional_input_pins": 20,
+    "all32_reported_selected_attributions_exact": true,
+    "binary_json_function_entries_exact": 5521,
+    "binary_profiles_and_full_json_profiles": 32,
+    "callback_errors": 0,
+    "caller_relations_exact": 9420,
+    "cases": 8,
+    "fit_callbacks": 16,
+    "frozen_source_test_pins": 66,
+    "limits_seconds_mib": [
+      30,
+      1024
+    ],
+    "metric_fields_per_output": 104,
+    "output_bodies_equal_accepted_original": 16,
+    "peak_child_rss_mib": 125.53125,
+    "resource_seconds": 1.4088569169980474,
+    "retained_evidence_index_bytes": 7889387,
+    "retained_evidence_index_files_authenticated": 136,
+    "score_callbacks": 16,
+    "shared_binding_restoration_recorded_each_mode": true
+  },
+  "verified_fit_fraction_ranges": {
+    "3_encode_flat_floats": {
+      "max": 0.016532636054469745,
+      "min": 0.013615472931201978
+    },
+    "3_fit": {
+      "max": 0.7254999558420911,
+      "min": 0.6636696650786086
+    },
+    "700_encode_flat_floats": {
+      "max": 0.3775755115679802,
+      "min": 0.3439542751503066
+    },
+    "700_fit": {
+      "max": 0.3239195347980574,
+      "min": 0.2964580089065201
+    }
+  },
+  "version": "rf-comp-01.remaining-profile.numerical-review.v1"
+}

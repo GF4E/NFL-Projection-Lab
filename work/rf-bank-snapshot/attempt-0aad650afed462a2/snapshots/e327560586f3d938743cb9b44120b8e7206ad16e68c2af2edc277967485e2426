@@ -1,0 +1,119 @@
+"""RF-COMP-06: fresh, private bank snapshots for ephemeral equality only.
+
+Original canonical conversion always runs once. Unsupported captures are encoded
+immediately by the original encoder. This module does not replace persisted
+serialization, compute a persisted digest, or integrate with a controller.
+"""
+from dataclasses import dataclass
+from math import copysign, isfinite
+
+from research_score_conditional_replay import canonical
+from research_score_contract import encoded
+
+
+VERSION = 'rfcomp06.bank-snapshot.v1'
+MAX_DEPTH = 32
+MAX_NODES = 131072
+MAX_CHARACTERS = 4194304
+MAX_INTEGER_BITS = 256
+
+
+@dataclass(frozen=True, slots=True, repr=False, eq=False)
+class _Snapshot:
+    # These fields are private owned data, not a caller mutation interface.
+    _value: object
+    _fallback: bytes | None
+
+    @property
+    def mode(self):
+        return 'supported' if self._fallback is None else 'fallback'
+
+
+def _eligible(snapshot):
+    """Read every supported node afresh; unsupported trees use original encoding.
+
+    Depth counts containers. Nodes include each value and dictionary key
+    occurrence. Aliases are revisited; identities detect only active cycles.
+    """
+    nodes = characters = 0
+    ancestors = set()
+
+    def visit(value, depth):
+        nonlocal nodes, characters
+        nodes += 1
+        if nodes > MAX_NODES:
+            return False
+        kind = type(value)
+        if value is None or kind is bool:
+            return True
+        if kind is str:
+            characters += len(value)
+            return characters <= MAX_CHARACTERS and value.isascii()
+        if kind is int:
+            return value.bit_length() <= MAX_INTEGER_BITS
+        if kind is float:
+            return isfinite(value)
+        if kind is not dict and kind is not list:
+            return False
+        depth += 1
+        identity = id(value)
+        if depth > MAX_DEPTH or identity in ancestors:
+            return False
+        ancestors.add(identity)
+        try:
+            if kind is dict:
+                for key, item in value.items():
+                    if type(key) is not str or not visit(key, depth) or not visit(item, depth):
+                        return False
+            else:
+                for item in value:
+                    if not visit(item, depth):
+                        return False
+            return True
+        finally:
+            ancestors.remove(identity)
+
+    return visit(snapshot, 0)
+
+
+def capture_value(value):
+    """Own one complete canonical image, or original fallback bytes, right now."""
+    snapshot = canonical(value)
+    if _eligible(snapshot):
+        return _Snapshot(snapshot, None)
+    return _Snapshot(None, encoded(snapshot))
+
+
+def capture(bank, outputs):
+    """Preserve the frozen bank digest's exact payload construction and order."""
+    return capture_value({'outputs': [{'key': list(key), 'output': outputs[key]} for key in sorted(outputs)],
+        'own': [{'key': list(key), 'last_origin': list(engine.last_origin),
+                 **{name: getattr(engine, name) for name in ('ratings', 'offense', 'defense')}}
+                for key, engine in sorted(bank.engines.items())]})
+
+
+def _same_content(left, right):
+    """Compare only owned, completely validated, exact builtin content."""
+    kind = type(left)
+    if kind is not type(right):
+        return False
+    if kind is dict:
+        return left.keys() == right.keys() and all(
+            _same_content(value, right[key]) for key, value in left.items())
+    if kind is list:
+        return len(left) == len(right) and all(
+            _same_content(a, b) for a, b in zip(left, right))
+    if kind is float:
+        return left == right and (left != 0.0 or copysign(1.0, left) == copysign(1.0, right))
+    return left == right
+
+
+def same(before, after):
+    """Compare two completed captures without rereading or caching raw inputs."""
+    if type(before) is not _Snapshot or type(after) is not _Snapshot:
+        raise TypeError('snapshots_required')
+    if before._fallback is None and after._fallback is None:
+        return _same_content(before._value, after._value)
+    left = encoded(before._value) if before._fallback is None else before._fallback
+    right = encoded(after._value) if after._fallback is None else after._fallback
+    return left == right

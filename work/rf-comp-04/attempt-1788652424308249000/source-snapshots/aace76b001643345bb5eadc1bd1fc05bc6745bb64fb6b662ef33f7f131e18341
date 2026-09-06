@@ -1,0 +1,288 @@
+"""Synthetic-only identity qualification checks; never open historical inputs."""
+import copy
+from dataclasses import replace
+from pathlib import Path
+import resource
+import sys
+import tempfile
+import time
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
+import research_score_conditional_qualify as unit
+from research_score_contract import encoded
+from research_score_distribution import JointBase, JointDistribution
+from research_score_metrics import score_forecast as original_score
+
+
+def distribution():
+    return JointDistribution(np.array([[0., 2.], [2., 0.], [3., 3.]]), np.array([.2, .3, .2]),
+                             .3, np.array([2., 3.]), np.array([0., -0.]), 4, False)
+
+
+def saved(mapper, independent=False):
+    theta = np.array([0., -0.])
+    _, alpha, beta, rates, _, _ = mapper.components(theta)
+    original = JointDistribution(mapper.atoms, alpha, beta, rates, theta, 3, independent)
+    mean, covariance = original.moments()
+    pointer = {'name': 'object-' + 'a' * 64 + '.json', 'sha256': 'a' * 64}
+    return {'version': 'rf.joint-distribution.v2', 'mapper': pointer, 'theta': theta.tolist(),
+            'alphaSha256': unit.sha(encoded(alpha.tolist())), 'beta': beta, 'rates': rates.tolist(),
+            'iterations': 3, 'independent': independent, 'mean': mean.tolist(), 'covariance': covariance.tolist()}
+
+
+def population():
+    origins, records = [], []
+    for year, count in zip(unit.YEARS, unit.YEAR_COUNTS):
+        weeks = 17 if year <= 2020 else 18
+        for week in range(1, weeks + 1):
+            games = []
+            for number in range(count // weeks + (week <= count % weeks)):
+                game = f'{year}-{week}-{number}'
+                games.append(game)
+                records.append({'gameId': game, 'season': year, 'week': week})
+            origins.append({'season': year, 'week': week, 'targetGameIds': games})
+    return {'origins': origins, 'records': records}
+
+
+class QualificationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.started = time.monotonic()
+
+    @classmethod
+    def tearDownClass(cls):
+        elapsed = time.monotonic() - cls.started
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == 'darwin' else 1024)
+        if elapsed > 120 or rss > 4096:
+            raise AssertionError(f'synthetic_budget_exceeded: seconds={elapsed}, rss_mib={rss}')
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.directory = Path(self.temporary.name).resolve()
+        self.parent = self.directory / 'parent'
+        self.parent.mkdir()
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    def test_ordinary_identity_entire_original_metrics_and_arrays(self):
+        original = distribution()
+        snapshot = unit._snapshot(original)
+        metrics = original_score(original, [1, 2], 'synthetic-ordinary', double_grid=True, diagnostics=True)
+        result = unit.qualify_occurrence(original, metrics, [1, 2], 'synthetic-ordinary')
+        self.assertEqual(result['source_distribution_sha256'], result['result_distribution_sha256'])
+        self.assertEqual(result['archived_metrics_sha256'], result['new_metrics_sha256'])
+        self.assertEqual(result['archived_metrics_sha256'], unit.sha(encoded(metrics)))
+        self.assertIsNone(result['independence_operation'])
+        self.assertEqual(snapshot, unit._snapshot(original))
+
+    def test_independence_identity_uses_full_then_qualified_policy(self):
+        full = distribution()
+        raw = replace(full, atoms=full.atoms.copy(), alpha=full.alpha.copy(), rates=full.rates.copy(),
+                      theta=full.theta.copy(), independent=True)
+        metrics = original_score(raw, [0, 2], 'synthetic-independent', double_grid=True, diagnostics=True)
+        observed_inputs = []
+        real_transform = unit.transform_distribution
+        def transform(source, scale):
+            observed_inputs.append(source.independent)
+            return real_transform(source, scale)
+        with patch.object(unit, 'transform_distribution', side_effect=transform):
+            result = unit.qualify_occurrence(raw, metrics, [0, 2], 'synthetic-independent', full_original=full)
+        self.assertEqual(observed_inputs, [False])
+        self.assertEqual(result['source_distribution_sha256'], result['result_distribution_sha256'])
+        self.assertEqual(result['full_source_distribution_sha256'], unit.distribution_fingerprint(full))
+        self.assertEqual(result['independence_operation']['operation'], 'product_of_calibrated_full_marginals')
+        with self.assertRaisesRegex(unit.QualificationFailure, 'full_source_required'):
+            unit.qualify_occurrence(raw, metrics, [0, 2], 'synthetic-independent')
+        with self.assertRaisesRegex(unit.QualificationFailure, 'identity_field_mismatch'):
+            unit.qualify_occurrence(replace(raw, iterations=5), metrics, [0, 2], 'synthetic-independent', full_original=full)
+
+    def test_complete_field_comparison_rejects_dtype_signedzero_flags_and_alias(self):
+        original = distribution()
+        result, _ = unit.transform_distribution(original, 1.)
+        unit.compare_identity(original, result)
+        bad = (replace(result, atoms=result.atoms.astype(np.int64)),
+               replace(result, theta=np.array([0., 0.])), replace(result, beta=np.float32(result.beta)),
+               replace(result, iterations=True), replace(result, independent=True),
+               replace(result, rates=original.rates))
+        for changed in bad:
+            with self.subTest(changed=changed):
+                with self.assertRaises(unit.QualificationFailure):
+                    unit.compare_identity(original, changed)
+
+    def test_metric_equality_has_no_subset_tolerance_or_signedzero_exception(self):
+        original = distribution()
+        cases = [({'value': 1.}, {'value': 1. + 1e-14}),
+                 ({'value': -0.}, {'value': 0.}), ({'value': 1., 'diagnostic': 2}, {'value': 1.})]
+        for archived, actual in cases:
+            with patch.object(unit, 'score_forecast', return_value=actual) as score:
+                with self.assertRaisesRegex(unit.QualificationFailure, 'complete_identity_metrics_mismatch'):
+                    unit.verify_metrics(original, archived, [0, 1], 'original-game-id')
+                score.assert_called_once_with(original, [0, 1], 'original-game-id', double_grid=True, diagnostics=True)
+
+    def test_scorer_failure_is_not_replaced_or_retried(self):
+        with patch.object(unit, 'score_forecast', side_effect=RuntimeError('synthetic score failure')) as score:
+            with self.assertRaisesRegex(RuntimeError, 'synthetic score failure'):
+                unit.verify_metrics(distribution(), {}, [0, 0], 'g')
+            self.assertEqual(score.call_count, 1)
+
+    def test_scorer_mutation_is_rejected(self):
+        source = distribution()
+        def mutate(*args, **kwargs):
+            source.theta[0] = 1.
+            return {}
+        with patch.object(unit, 'score_forecast', side_effect=mutate):
+            with self.assertRaisesRegex(unit.QualificationFailure, 'scorer_mutated'):
+                unit.verify_metrics(source, {}, [0, 0], 'g')
+
+    def test_invalid_observations_never_score(self):
+        for observed in ([True, 0], [0., 0], [-1, 1], [201, 0]):
+            with patch.object(unit, 'score_forecast') as score:
+                with self.assertRaises(unit.QualificationFailure):
+                    unit.verify_metrics(distribution(), {}, observed, 'g')
+                score.assert_not_called()
+
+    def test_saved_components_only_and_corrupt_component_binding(self):
+        mapper = JointBase(np.array([[0., 2.], [2., 0.]]), np.array([.5, .5]), 1.)
+        value = {'atoms': mapper.atoms.tolist(), 'weights': mapper.weights.tolist(), 'b': mapper.b, 'epsilon': mapper.epsilon}
+        class Reader:
+            calls = 0
+            def read(self, pointer):
+                self.calls += 1
+                return value
+        archive, mappers, descriptor = Reader(), {}, saved(mapper)
+        with patch.object(JointBase, 'fit', side_effect=AssertionError('fit forbidden'), create=True):
+            result = unit._recover(archive, descriptor, mappers)
+            self.assertIs(type(result), JointDistribution)
+            unit._recover(archive, descriptor, mappers)
+        self.assertEqual(archive.calls, 1)
+        descriptor['alphaSha256'] = 'f' * 64
+        with self.assertRaisesRegex(ValueError, 'components_mismatch'):
+            unit._recover(archive, descriptor, mappers)
+
+    def test_all_520_keys_ordered_first_last_and_exact_membership(self):
+        data = population()
+        sample = unit.identity_sample(data['origins'])
+        self.assertEqual(sample['occurrences'], 520)
+        self.assertEqual(sample['keys'][0]['game_id'], data['origins'][0]['targetGameIds'][0])
+        self.assertEqual(sample['keys'][19]['family'], 'E2')
+        admission = {'identity_equivalence_sample': sample}
+        # Synthetic IDs differ; public execution always uses the fixed real hash.
+        with patch.object(unit, 'SAMPLE_SHA', sample['sha256']):
+            actual, records, origins = unit._sample(data, admission)
+            self.assertEqual(actual, sample)
+            self.assertEqual((len(records), len(origins)), (3407, 226))
+            for mutation in ('missing', 'duplicate', 'reordered', 'wrong_season'):
+                changed = copy.deepcopy(data)
+                if mutation == 'missing':
+                    changed['origins'][0]['targetGameIds'].pop()
+                elif mutation == 'duplicate':
+                    changed['origins'][0]['targetGameIds'][1] = changed['origins'][0]['targetGameIds'][0]
+                elif mutation == 'reordered':
+                    changed['origins'][0]['targetGameIds'].reverse()
+                else:
+                    changed['records'][0]['season'] = 2025
+                with self.subTest(mutation=mutation), self.assertRaises(unit.QualificationFailure):
+                    unit._sample(changed, admission)
+        with self.assertRaisesRegex(unit.QualificationFailure, 'fixed_identity_sample'):
+            unit._sample(data, admission)
+
+    def test_forecast_loss_membership_and_failure_flags(self):
+        origin = {'targetGameIds': ['g']}
+        rows = [{'family': 'E2', 'variant': 'full', 'game_id': 'g', 'native_failure': 'old failure'}]
+        losses = copy.deepcopy(rows)
+        unit.validate_selected_rows({'outer_selected_forecasts': rows}, losses, origin, [('E2', 'full')])
+        for changed in ([{**losses[0], 'native_failure': None}], losses * 2, [{**losses[0], 'game_id': 'other'}]):
+            with self.assertRaises(ValueError):
+                unit.validate_selected_rows({'outer_selected_forecasts': rows}, changed, origin, [('E2', 'full')])
+
+    def test_exclusive_directory_and_artifacts_preserve_existing(self):
+        output = self.directory / 'out'
+        fd = unit._create_output(output, self.parent)
+        try:
+            pointer = unit._write(fd, 'sample.json', {'keys': ['a']})
+            self.assertEqual(pointer['sha256'], unit.sha((output / 'sample.json').read_bytes()))
+            with self.assertRaises(FileExistsError):
+                unit._write(fd, 'sample.json', {'keys': ['b']})
+        finally:
+            unit.os.close(fd)
+        with self.assertRaises(FileExistsError):
+            unit._create_output(output, self.parent)
+        self.assertEqual(unit.parse((output / 'sample.json').read_bytes()), {'keys': ['a']})
+
+    def test_parent_output_and_symlink_ancestors_rejected(self):
+        with self.assertRaisesRegex(unit.QualificationFailure, 'parent_archive_output'):
+            unit._create_output(self.parent / 'out', self.parent)
+        link = self.directory / 'link'
+        link.symlink_to(self.parent, target_is_directory=True)
+        with self.assertRaises((unit.QualificationFailure, OSError)):
+            unit._create_output(link / 'out', self.parent)
+        outside = self.directory / 'outside'
+        outside.mkdir()
+        link.unlink()
+        link.symlink_to(outside, target_is_directory=True)
+        with self.assertRaises(OSError):
+            unit._create_output(link / 'out', self.parent)
+        self.assertFalse((outside / 'out').exists())
+
+    def test_corrupt_acceptance_rejected_before_archive_or_score(self):
+        root = self.directory / 'repository'
+        path = root / unit.PLANNING / 'RF-02D-ADMISSION-ACCEPTANCE.v1.json'
+        path.parent.mkdir(parents=True)
+        path.write_bytes(encoded({'historical_admission_accepted': True}))
+        with patch.object(unit, 'Archive') as archive, patch.object(unit, 'score_forecast') as score:
+            with self.assertRaisesRegex(ValueError, 'bound_file_mismatch'):
+                unit._authenticate(self.parent, 'absent-data', root, lambda: None)
+            archive.assert_not_called()
+            score.assert_not_called()
+
+    def test_corrupt_admission_result_parent_pin_rejected(self):
+        acceptance = {'status': 'accepted_numerical_and_temporal_admission_only', 'historical_admission_accepted': True,
+                      'evidence': {'result.json': {'path': 'synthetic-result', 'sha256': 'a' * 64}},
+                      'counts': {}, 'identity_sample_sha256': unit.SAMPLE_SHA}
+        result = {'status': 'passed', 'pins': {'parent_index': 'b' * 64}}
+        def read(path, expected, size=None):
+            return encoded(result if str(path) == 'synthetic-result' else acceptance)
+        with patch.object(unit, 'bound', side_effect=read), patch.object(unit, 'Archive') as archive:
+            with self.assertRaisesRegex(unit.QualificationFailure, 'admission_result_binding'):
+                unit._authenticate(self.parent, 'absent-data', self.directory, lambda: None)
+            archive.assert_not_called()
+
+    def test_public_authentication_failure_persists_invalid_receipt_without_scoring(self):
+        output = self.directory / 'invalid'
+        with patch.object(unit, '_authenticate', side_effect=ValueError('synthetic corrupt binding')), \
+             patch.object(unit, 'score_forecast') as score:
+            result = unit.qualify_identity(self.parent, 'absent-data', Path(unit.__file__).resolve().parents[1], output)
+        self.assertEqual(result['status'], 'protocol_invalid')
+        self.assertEqual(result['complete_count'], 0)
+        self.assertEqual(unit.parse((output / 'receipt.json').read_bytes()), result)
+        self.assertFalse((output / 'sample.json').exists())
+        score.assert_not_called()
+
+    def test_sample_is_durable_before_first_metric_and_failure_preserves_it(self):
+        output = self.directory / 'ordered'
+        data = population()
+        sample = unit.identity_sample(data['origins'])
+        binding = {'pins': {}, 'accepted_unit_hashes': {}, 'parent_code_hashes': {}, 'runtime': {}}
+        def run(archive, actual_sample, records, origins, config, fd, budget, report):
+            self.assertEqual(unit.parse((output / 'sample.json').read_bytes()), sample)
+            self.assertTrue((output / 'manifest.json').is_file())
+            self.assertEqual(actual_sample['occurrences'], 520)
+            raise RuntimeError('synthetic first score failure')
+        with patch.object(unit, '_authenticate', return_value=(None, data, {}, {}, binding)), \
+             patch.object(unit, '_sample', return_value=(sample, {}, {})), \
+             patch.object(unit, '_run_occurrences', side_effect=run):
+            result = unit.qualify_identity(self.parent, 'absent-data', Path(unit.__file__).resolve().parents[1], output)
+        self.assertEqual(result['status'], 'protocol_invalid')
+        self.assertEqual(result['reason'], 'synthetic first score failure')
+        self.assertEqual(result['complete_count'], 0)
+        self.assertEqual(set(result['artifacts']), {'manifest.json', 'sample.json'})
+        self.assertEqual(unit.BOUNDS['occurrences'], 520)
+
+
+if __name__ == '__main__':
+    unittest.main()

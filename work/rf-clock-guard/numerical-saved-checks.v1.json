@@ -1,0 +1,345 @@
+{
+  "callback_modes": [
+    {
+      "count": 72,
+      "diagnostics": null,
+      "double_grid": null,
+      "kind": "fit",
+      "stage": "inner"
+    },
+    {
+      "count": 24,
+      "diagnostics": null,
+      "double_grid": null,
+      "kind": "fit",
+      "stage": "outer"
+    },
+    {
+      "count": 36,
+      "diagnostics": false,
+      "double_grid": true,
+      "kind": "score",
+      "stage": "inner"
+    },
+    {
+      "count": 36,
+      "diagnostics": false,
+      "double_grid": false,
+      "kind": "score",
+      "stage": "inner"
+    },
+    {
+      "count": 8,
+      "diagnostics": true,
+      "double_grid": true,
+      "kind": "score",
+      "stage": "outer"
+    }
+  ],
+  "callbacks_across_two_routes": 176,
+  "cli_probes": 2,
+  "complete_laws_across_two_routes": 124,
+  "metric_field_counts_across_two_routes": {
+    "28": 108,
+    "104": 24,
+    "108": 52
+  },
+  "no_scientific_execution_in_this_audit": true,
+  "observations": 64,
+  "paired_science_sha256": "cc9bd72c9cb9da3302c49e1d1d84ce4f3a7dfbdc5532532b0e0fedc8a666f411",
+  "peak_combined_rss_mib": 292.921875,
+  "positive_manifest_sha256": "3a501791d7d8312a4053af515fe66d3a88c26c5db367aa0a0b495252cc54c8df",
+  "preflight_negative_cases": [
+    {
+      "case": "old_receipt",
+      "error": {
+        "message": "final_prefit_acceptance_required",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 0,
+      "returned_identity": null
+    },
+    {
+      "case": "missing_receipt",
+      "error": {
+        "message": "exact_final_acceptance_schema_required",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 0,
+      "returned_identity": null
+    },
+    {
+      "case": "missing_guard",
+      "error": {
+        "message": "exact_final_acceptance_schema_required",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 0,
+      "returned_identity": null
+    },
+    {
+      "case": "missing_resource",
+      "error": {
+        "message": "exact_final_acceptance_schema_required",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 0,
+      "returned_identity": null
+    },
+    {
+      "case": "wrong_guard_hash",
+      "error": {
+        "message": "fixed_guard_protocol_required",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 7,
+      "returned_identity": null
+    },
+    {
+      "case": "wrong_guard_path",
+      "error": {
+        "message": "fixed_guard_protocol_required",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 7,
+      "returned_identity": null
+    },
+    {
+      "case": "guard_bytes",
+      "error": {
+        "message": "synthetic_hash_mismatch",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 8,
+      "returned_identity": null
+    },
+    {
+      "case": "rehashed_resource_9001",
+      "error": {
+        "message": "exact_resource_policy_required",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 4,
+      "returned_identity": null
+    },
+    {
+      "case": "baseline_source",
+      "error": {
+        "message": "baseline_scientific_source_evidence_mismatch",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 5,
+      "returned_identity": null
+    },
+    {
+      "case": "frozen_source_bytes",
+      "error": {
+        "message": "synthetic_hash_mismatch",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 13,
+      "returned_identity": null
+    },
+    {
+      "case": "declared_frozen_hash",
+      "error": {
+        "message": "frozen_source_pin_changed",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 12,
+      "returned_identity": null
+    },
+    {
+      "case": "candidate_bytes",
+      "error": {
+        "message": "synthetic_hash_mismatch",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 14,
+      "returned_identity": null
+    },
+    {
+      "case": "missing_source",
+      "error": {
+        "message": "exact_source_membership_required",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 12,
+      "returned_identity": null
+    },
+    {
+      "case": "runtime_bytes",
+      "error": {
+        "message": "synthetic_hash_mismatch",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 1,
+      "returned_identity": null
+    },
+    {
+      "case": "receipt_status",
+      "error": {
+        "message": "closed_predecessor_acceptance_required",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 9,
+      "returned_identity": null
+    },
+    {
+      "case": "receipt_missing",
+      "error": {
+        "message": "exact_final_acceptance_schema_required",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 0,
+      "returned_identity": null
+    },
+    {
+      "case": "terminal_reason",
+      "error": {
+        "message": "predecessor_invalid_status_must_remain",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 12,
+      "returned_identity": null
+    },
+    {
+      "case": "terminal_promoted",
+      "error": {
+        "message": "predecessor_invalid_status_must_remain",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 12,
+      "returned_identity": null
+    },
+    {
+      "case": "terminal_manifest",
+      "error": {
+        "message": "predecessor_invalid_status_must_remain",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 12,
+      "returned_identity": null
+    },
+    {
+      "case": "artifact_bytes",
+      "error": {
+        "message": "synthetic_hash_mismatch",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 11,
+      "returned_identity": null
+    },
+    {
+      "case": "null_artifact_hash",
+      "error": {
+        "message": "invalid_sha256",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 11,
+      "returned_identity": null
+    },
+    {
+      "case": "qualification_version",
+      "error": {
+        "message": "qualification_or_review_not_accepted_for_exact_candidate",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 19,
+      "returned_identity": null
+    },
+    {
+      "case": "qualification_guard",
+      "error": {
+        "message": "qualification_or_review_not_accepted_for_exact_candidate",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 19,
+      "returned_identity": null
+    },
+    {
+      "case": "review_guard",
+      "error": {
+        "message": "qualification_or_review_not_accepted_for_exact_candidate",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 20,
+      "returned_identity": null
+    },
+    {
+      "case": "review_resource",
+      "error": {
+        "message": "qualification_or_review_not_accepted_for_exact_candidate",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 20,
+      "returned_identity": null
+    },
+    {
+      "case": "review_scope",
+      "error": {
+        "message": "qualification_or_review_not_accepted_for_exact_candidate",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 20,
+      "returned_identity": null
+    },
+    {
+      "case": "review_qualification",
+      "error": {
+        "message": "independent_review_role_or_qualification_mismatch",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 20,
+      "returned_identity": null
+    },
+    {
+      "case": "review_blocker",
+      "error": {
+        "message": "independent_review_role_or_qualification_mismatch",
+        "type": "ValueError"
+      },
+      "kind": "synthetic_preflight_rejection",
+      "positive_reader_calls": 20,
+      "returned_identity": null
+    }
+  ],
+  "process_elapsed_seconds": 3.148145375016611,
+  "readonly_float64_array_images_verified": 496,
+  "real_routes": 2,
+  "runtime_files": 7,
+  "scalar_float_bit_images_verified": 124,
+  "scientific_rows_across_two_routes": 184,
+  "source_and_mapper_images_unchanged": true,
+  "source_files": 91,
+  "status": "passed_saved_numerical_checks",
+  "test_methods": 25,
+  "through_checked_commit_seconds": 3.1656414169992786
+}

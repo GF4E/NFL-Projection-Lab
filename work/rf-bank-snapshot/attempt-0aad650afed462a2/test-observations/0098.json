@@ -1,0 +1,53 @@
+{
+  "candidate": {
+    "events": [
+      "assembly"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": false
+    },
+    "snapshots": [
+      {
+        "mode": "supported"
+      },
+      {
+        "mode": "supported"
+      }
+    ]
+  },
+  "expected_decision": false,
+  "expected_modes": [
+    "supported",
+    "supported"
+  ],
+  "kind": "paired_value",
+  "label": "scalar-content-6",
+  "original": {
+    "events": [
+      "assembly"
+    ],
+    "images": [
+      {
+        "ascii_body": "1.0\n",
+        "bytes": 4,
+        "sha256": "5717e7c840171019a4eeab5b79a7f894a4986eaff93d04ec5b12c9a189f594bf"
+      },
+      {
+        "ascii_body": "1.0000000000000002\n",
+        "bytes": 19,
+        "sha256": "e0a0f424b7119759b29e10ac3dbbc45bd67b08050dcc3d2e3b2b7f4fa60153f5"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": false
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_scalar_types_signed_zero_and_finite_float_content"
+}

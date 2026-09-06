@@ -1,0 +1,47 @@
+{
+  "cache_after": {
+    "entries": [
+      [
+        4,
+        4
+      ],
+      [
+        8,
+        8
+      ]
+    ],
+    "evictions": 0,
+    "hits": 0,
+    "misses": 3,
+    "retained_bytes": 640
+  },
+  "cache_before": {
+    "entries": [
+      [
+        4,
+        4
+      ],
+      [
+        8,
+        8
+      ]
+    ],
+    "evictions": 0,
+    "hits": 0,
+    "misses": 2,
+    "retained_bytes": 640
+  },
+  "calls": 1,
+  "kind": "deliberate_injection",
+  "label": "injection-_build_distance",
+  "result": {
+    "outcome": {
+      "kind": "error",
+      "message": "injected _build_distance",
+      "module": "builtins",
+      "type": "RuntimeError"
+    },
+    "warnings": []
+  },
+  "test": "test_energy_geometry.EnergyGeometryTests.test_injected_fft_and_geometry_errors_no_retry_or_eviction"
+}

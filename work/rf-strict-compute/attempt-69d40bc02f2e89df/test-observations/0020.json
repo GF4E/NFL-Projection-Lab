@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "maximum recursion depth exceeded",
+    "module": "builtins",
+    "type": "RecursionError"
+  },
+  "eligibility": {
+    "actual": null,
+    "expected": null,
+    "reason": "raw canonicalization must fail before encoding eligibility"
+  },
+  "input": {
+    "deterministic_builder": "beyond-canonical-recursion",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "list"
+  },
+  "label": "beyond-canonical-recursion",
+  "original": {
+    "kind": "error",
+    "message": "maximum recursion depth exceeded",
+    "module": "builtins",
+    "type": "RecursionError"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_depth_exact_boundary_and_deep_delegation"
+}

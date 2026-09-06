@@ -1,0 +1,719 @@
+{
+  "version": "rf02f.split-rate-candidate.v1",
+  "status": "draft_for_independent_prefit_review",
+  "historicalInvocationAuthorizedByThisFile": false,
+  "providerAccessAllowed": false,
+  "productionAuthorization": false,
+  "researchDetailsPublic": false,
+  "protocol": {
+    "path": ".planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md",
+    "sha256": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16"
+  },
+  "inheritedConfig": {
+    "path": "config/research-team-score.v2.json",
+    "sha256": "422b1082361a2d0d926f639c8cf67b38615517a8269a7f05729aea0c8f264615"
+  },
+  "meanUnitAcceptance": {
+    "path": ".planning/engine-os/research-first/RF-02F-MEAN-UNIT-ACCEPTANCE.v1.json",
+    "sha256": "61c448d59a30be43ccc15faf447d78f3be9e420cc83baf6a991aa5e3fa61101a"
+  },
+  "parent": {
+    "manifestSha256": "2d9c91d803f1c991be039b88167082c8a501ce60dc58b18afcab0b251bb75e38",
+    "indexSha256": "ccde502d661a4beee8f8da537a2f23238950fb2931c1527638de4c92898804ab",
+    "admittedDataSha256": "ea7dc1c17cc4613ada871927842d90f6d41ffe61b45e6302c3032eac7cdffc85"
+  },
+  "settingsInTieOrder": [
+    {
+      "ks": 0.05,
+      "kp": 0.05,
+      "retention": 0.5
+    },
+    {
+      "ks": 0.05,
+      "kp": 0.05,
+      "retention": 0.75
+    },
+    {
+      "ks": 0.05,
+      "kp": 0.05,
+      "retention": 1
+    },
+    {
+      "ks": 0.1,
+      "kp": 0.1,
+      "retention": 0.5
+    },
+    {
+      "ks": 0.1,
+      "kp": 0.1,
+      "retention": 0.75
+    },
+    {
+      "ks": 0.1,
+      "kp": 0.1,
+      "retention": 1
+    },
+    {
+      "ks": 0.2,
+      "kp": 0.2,
+      "retention": 0.5
+    },
+    {
+      "ks": 0.2,
+      "kp": 0.2,
+      "retention": 0.75
+    },
+    {
+      "ks": 0.2,
+      "kp": 0.2,
+      "retention": 1
+    },
+    {
+      "ks": 0.05,
+      "kp": 0.1,
+      "retention": 0.5
+    },
+    {
+      "ks": 0.05,
+      "kp": 0.1,
+      "retention": 0.75
+    },
+    {
+      "ks": 0.05,
+      "kp": 0.1,
+      "retention": 1
+    },
+    {
+      "ks": 0.05,
+      "kp": 0.2,
+      "retention": 0.5
+    },
+    {
+      "ks": 0.05,
+      "kp": 0.2,
+      "retention": 0.75
+    },
+    {
+      "ks": 0.05,
+      "kp": 0.2,
+      "retention": 1
+    },
+    {
+      "ks": 0.1,
+      "kp": 0.05,
+      "retention": 0.5
+    },
+    {
+      "ks": 0.1,
+      "kp": 0.05,
+      "retention": 0.75
+    },
+    {
+      "ks": 0.1,
+      "kp": 0.05,
+      "retention": 1
+    },
+    {
+      "ks": 0.1,
+      "kp": 0.2,
+      "retention": 0.5
+    },
+    {
+      "ks": 0.1,
+      "kp": 0.2,
+      "retention": 0.75
+    },
+    {
+      "ks": 0.1,
+      "kp": 0.2,
+      "retention": 1
+    },
+    {
+      "ks": 0.2,
+      "kp": 0.05,
+      "retention": 0.5
+    },
+    {
+      "ks": 0.2,
+      "kp": 0.05,
+      "retention": 0.75
+    },
+    {
+      "ks": 0.2,
+      "kp": 0.05,
+      "retention": 1
+    },
+    {
+      "ks": 0.2,
+      "kp": 0.1,
+      "retention": 0.5
+    },
+    {
+      "ks": 0.2,
+      "kp": 0.1,
+      "retention": 0.75
+    },
+    {
+      "ks": 0.2,
+      "kp": 0.1,
+      "retention": 1
+    }
+  ],
+  "variantsInOrder": [
+    "full",
+    "no_home_effect",
+    "no_prior_season_carryover",
+    "no_time_decay",
+    "no_team_identity",
+    "independent_marginals",
+    "availability_24h",
+    "no_offense",
+    "no_defense",
+    "shuffled_identity",
+    "deterministic_noise",
+    "zero_strength_update",
+    "zero_scoring_level_update"
+  ],
+  "seriesInOrder": [
+    [
+      "E3",
+      "full"
+    ],
+    [
+      "E3",
+      "no_home_effect"
+    ],
+    [
+      "E3",
+      "no_prior_season_carryover"
+    ],
+    [
+      "E3",
+      "no_time_decay"
+    ],
+    [
+      "E3",
+      "no_team_identity"
+    ],
+    [
+      "E3",
+      "independent_marginals"
+    ],
+    [
+      "E3",
+      "availability_24h"
+    ],
+    [
+      "E3",
+      "no_offense"
+    ],
+    [
+      "E3",
+      "no_defense"
+    ],
+    [
+      "E3",
+      "shuffled_identity"
+    ],
+    [
+      "E3",
+      "deterministic_noise"
+    ],
+    [
+      "E3",
+      "zero_strength_update"
+    ],
+    [
+      "E3",
+      "zero_scoring_level_update"
+    ],
+    [
+      "N0",
+      "full"
+    ],
+    [
+      "N0",
+      "availability_24h"
+    ],
+    [
+      "E2",
+      "full"
+    ],
+    [
+      "E2",
+      "availability_24h"
+    ],
+    [
+      "E1",
+      "full"
+    ],
+    [
+      "S1",
+      "full"
+    ]
+  ],
+  "rawReferences": [
+    [
+      "N0",
+      "full"
+    ],
+    [
+      "N0",
+      "availability_24h"
+    ],
+    [
+      "E2",
+      "full"
+    ],
+    [
+      "E2",
+      "availability_24h"
+    ],
+    [
+      "E1",
+      "full"
+    ],
+    [
+      "S1",
+      "full"
+    ]
+  ],
+  "energyComparisonsInOrder": [
+    {
+      "id": "N0:full->E3:full",
+      "reference": [
+        "N0",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "full"
+      ]
+    },
+    {
+      "id": "E2:full->E3:full",
+      "reference": [
+        "E2",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "full"
+      ]
+    },
+    {
+      "id": "E1:full->E3:full",
+      "reference": [
+        "E1",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "full"
+      ]
+    },
+    {
+      "id": "S1:full->E3:full",
+      "reference": [
+        "S1",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "full"
+      ]
+    },
+    {
+      "id": "N0:availability_24h->E3:availability_24h",
+      "reference": [
+        "N0",
+        "availability_24h"
+      ],
+      "candidate": [
+        "E3",
+        "availability_24h"
+      ]
+    },
+    {
+      "id": "E2:availability_24h->E3:availability_24h",
+      "reference": [
+        "E2",
+        "availability_24h"
+      ],
+      "candidate": [
+        "E3",
+        "availability_24h"
+      ]
+    },
+    {
+      "id": "E3:full->E3:no_home_effect",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "no_home_effect"
+      ]
+    },
+    {
+      "id": "E3:full->E3:no_prior_season_carryover",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "no_prior_season_carryover"
+      ]
+    },
+    {
+      "id": "E3:full->E3:no_time_decay",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "no_time_decay"
+      ]
+    },
+    {
+      "id": "E3:full->E3:no_team_identity",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "no_team_identity"
+      ]
+    },
+    {
+      "id": "E3:full->E3:independent_marginals",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "independent_marginals"
+      ]
+    },
+    {
+      "id": "E3:full->E3:availability_24h",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "availability_24h"
+      ]
+    },
+    {
+      "id": "E3:full->E3:no_offense",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "no_offense"
+      ]
+    },
+    {
+      "id": "E3:full->E3:no_defense",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "no_defense"
+      ]
+    },
+    {
+      "id": "E3:full->E3:shuffled_identity",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "shuffled_identity"
+      ]
+    },
+    {
+      "id": "E3:full->E3:deterministic_noise",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "deterministic_noise"
+      ]
+    },
+    {
+      "id": "E3:full->E3:zero_strength_update",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "zero_strength_update"
+      ]
+    },
+    {
+      "id": "E3:full->E3:zero_scoring_level_update",
+      "reference": [
+        "E3",
+        "full"
+      ],
+      "candidate": [
+        "E3",
+        "zero_scoring_level_update"
+      ]
+    }
+  ],
+  "calibrationCellsInOrder": [
+    [
+      "E3",
+      "full",
+      "home",
+      80
+    ],
+    [
+      "E3",
+      "full",
+      "away",
+      80
+    ],
+    [
+      "E3",
+      "full",
+      "margin",
+      80
+    ],
+    [
+      "E3",
+      "full",
+      "total",
+      80
+    ],
+    [
+      "E3",
+      "availability_24h",
+      "home",
+      80
+    ],
+    [
+      "E3",
+      "availability_24h",
+      "away",
+      80
+    ],
+    [
+      "E3",
+      "availability_24h",
+      "margin",
+      80
+    ],
+    [
+      "E3",
+      "availability_24h",
+      "total",
+      80
+    ]
+  ],
+  "expected": {
+    "origins": 277,
+    "outerOrigins": 226,
+    "outerGames": 3407,
+    "developmentGames": 3135,
+    "exposed2025Games": 272,
+    "newEngines": 216,
+    "cachedDiagonalOutputsPerOrigin": 81,
+    "totalStateOutputsPerOrigin": 297,
+    "innerGamesPerSetting": 3647,
+    "reusedDiagonalInnerRows": 32823,
+    "scoredSeries": 19,
+    "energyComparisons": 18,
+    "actualMassCells": 8,
+    "newOffDiagonalInnerScores": 65646,
+    "syntheticScoredRows": 64733,
+    "stateOnlyWarmupOrigins": [
+      [
+        2010,
+        1
+      ],
+      [
+        2010,
+        2
+      ],
+      [
+        2010,
+        3
+      ],
+      [
+        2010,
+        4
+      ],
+      [
+        2010,
+        5
+      ]
+    ]
+  },
+  "selection": {
+    "innerSeasons": 2,
+    "tieTolerance": 1e-08,
+    "maximumNativeFailureRate": 0.005,
+    "settingFrozenForSeason": true,
+    "variantRetuning": false,
+    "innerScoreSeasons": [
+      2011,
+      2024
+    ]
+  },
+  "inference": {
+    "bootstrapMembers": 10000,
+    "blockLengths": [
+      1,
+      3,
+      6
+    ],
+    "seedBase": 20260904,
+    "simultaneousEnergyFamily": 18,
+    "simultaneousActualMassFamily": 8,
+    "jointConfidenceAcrossFamiliesClaimed": false,
+    "quantileMethod": "linear",
+    "intervalLevel": 0.95
+  },
+  "internalMechanism": {
+    "minimumEnergyGainVsE2": 0.01,
+    "allBlockLowerStrictlyAbove": 0,
+    "minimumPositiveDevelopmentSeasons": 8,
+    "allLeaveOneSeasonOutGainsPositive": true,
+    "exposed2025GainPositive": true,
+    "requiredRemovals": [
+      "no_offense",
+      "no_defense",
+      "zero_strength_update",
+      "zero_scoring_level_update"
+    ],
+    "removalAllBlockUpperStrictlyBelow": 0,
+    "availabilityPositiveGainReferences": [
+      "N0",
+      "E2"
+    ],
+    "allE3FailureCeiling": 0.005
+  },
+  "researchCandidate": {
+    "minimumEnergyGainVsN0": 0.01,
+    "resolvedPositiveReference": "E1",
+    "noStableInferiorityReference": "S1",
+    "secondaryVariants": [
+      "full",
+      "availability_24h"
+    ],
+    "secondaryReferences": [
+      "N0",
+      "E2"
+    ],
+    "maximumNllCrpsRelativeRegression": 0.005,
+    "maximumTeamMaeIncreasePoints": 0.1,
+    "maximumWidthRelativeIncrease": 0.1,
+    "wideIntervalExceptionEnergyGain": 0.02,
+    "nominalCoverage80Range": [
+      0.72,
+      0.88
+    ],
+    "nominalCoverageAllBlockIntervalsContain": 0.8,
+    "actualMassAllBlockIntervalsContain": 0
+  },
+  "budget": {
+    "modelWorkers": 1,
+    "maximumSeconds": 7200,
+    "maximumRssMiB": 4096,
+    "maximumSyntheticSmokeSeconds": 120,
+    "pilotOrigins": [
+      [
+        2013,
+        1
+      ],
+      [
+        2013,
+        2
+      ]
+    ],
+    "pilotExpectedGames": 32,
+    "pilotPerGameStatistic": "maximum_noncallback_remainder_plus_31_twice_max_fit_and_score_costs",
+    "pilotInferenceReserveMultiplier": 2,
+    "pilotMinimumFinalReserveSeconds": 60,
+    "metadataOnlyFinalizationGraceSeconds": 30,
+    "automaticRestart": false,
+    "maximumSyntheticIntegrationSeconds": 600,
+    "maximumSyntheticIntegrationRssMiB": 4096,
+    "syntheticSmokeFixture": "frozen_real_scorer_19_by_3407_fixture_reloaded_by_real_public_evaluator",
+    "pilotFitSlotsPerFutureGame": 31,
+    "pilotScoreSlotsPerFutureGame": 31,
+    "pilotCallbackMaximumMultiplier": 2,
+    "pilotRequiredSuccessfulNonfallbackSamples": [
+      "offdiagonal_full_law_fit",
+      "new_full_outer_score"
+    ],
+    "pilotIncludesFailedCallbackTiming": true,
+    "pilotHistoryFactor": "max(1, N_o/min(N1,N2))",
+    "pilotFormula": "elapsed_so_far + sum(G_o * max(1,N_o/min(N1,N2))) * (C + 31*(2*F+2*S)) + 2*T + max(60,admission_seconds)",
+    "publicSmokeOuterGames": 3407,
+    "publicSmokeOuterOrigins": 226,
+    "publicSmokeDevelopmentGames": 3135,
+    "publicSmokeExposed2025Games": 272
+  },
+  "statisticalTerminalLabels": [
+    "reject_all",
+    "mechanism_supported_distribution_unqualified",
+    "research_shadow_candidate"
+  ],
+  "integrityTerminalLabel": "protocol_invalid",
+  "unresolvedBeforeHistoricalInvocation": [
+    "independentProtocolFreeze",
+    "bankAndArchiveReuseQualification",
+    "realDistributionAndInferenceIntegration",
+    "atomicControllerAndBudgetQualification",
+    "completeNewSourceAndRuntimeBinding",
+    "independentImplementationAcceptance"
+  ],
+  "reuse": {
+    "ordinaryE3Outer": "only_exact_original_selected_E2_setting_variant_game_origin_availability_flags",
+    "newActualMassFields": "derive_from_same_authenticated_law_and_interval_without_unchanged_metric_rescore",
+    "differentDiagonalOuter": "recover_available_full_law_and_compute_complete_outer_score_fit_missing_variant_laws",
+    "offDiagonalAndNewZeroOuter": "own_law_resolution_and_full_score",
+    "sourceAdmission": "complete_streaming_validation_with_authenticated_pointers",
+    "preparedBankFields": [
+      "history",
+      "targets"
+    ]
+  },
+  "syntheticFixtureReuse": {
+    "allowed": "exact_same_game_law_observation_effective_flags_scorer_and_runtime_only",
+    "cacheKeyFields": [
+      "completeLawRepresentation",
+      "gameId",
+      "observedPair",
+      "effectiveScoringFlags",
+      "scorerSource",
+      "runtimeIdentity"
+    ],
+    "crossGameReuse": false,
+    "handcraftedMetrics": false,
+    "isolatePayloads": true,
+    "recordActualCallsAndReuses": true,
+    "recordPerRowProvenance": true,
+    "verifyChangedInputsCauseMiss": true,
+    "historicalReusePolicyChanged": false
+  }
+}

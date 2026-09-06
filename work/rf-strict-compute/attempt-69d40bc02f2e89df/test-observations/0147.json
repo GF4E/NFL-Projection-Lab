@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "{\n  \"a\": [\n    {},\n    [\n      null\n    ]\n  ],\n  \"z\": [\n    [],\n    {},\n    []\n  ]\n}\n",
+    "bytes": 85,
+    "kind": "bytes",
+    "sha256": "cd95fd13bd98c6b148190bfd0021b863543706d2a054bc3bd479d4ce0ae0d7d3",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "nested-empty-containers",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "dict"
+  },
+  "label": "nested-empty-containers",
+  "original": {
+    "ascii_body": "{\n  \"a\": [\n    {},\n    [\n      null\n    ]\n  ],\n  \"z\": [\n    [],\n    {},\n    []\n  ]\n}\n",
+    "bytes": 85,
+    "kind": "bytes",
+    "sha256": "cd95fd13bd98c6b148190bfd0021b863543706d2a054bc3bd479d4ce0ae0d7d3",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_scalar_tokens_and_empty_containers"
+}

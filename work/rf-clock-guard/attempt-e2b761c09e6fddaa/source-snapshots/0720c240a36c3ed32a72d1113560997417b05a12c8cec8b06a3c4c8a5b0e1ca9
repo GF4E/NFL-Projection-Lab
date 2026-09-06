@@ -1,0 +1,156 @@
+{
+  "version": "rf02f.runtime-unit-acceptance.v1",
+  "status": "accepted_synthetic_runtime_accounting_and_atomic_boundary_prerequisite_only",
+  "createdAt": "2026-09-05T13:51:43.900014+00:00",
+  "scope": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-RUNTIME-UNIT-SCOPE.v1.md",
+    "sha256": "4563e8d43a2454fb6ba7ce992e866feb6497171f15cb50594f28aaef92db7c37",
+    "bytes": 3237
+  },
+  "protocolAcceptance": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-PROTOCOL-ACCEPTANCE.v1.json",
+    "sha256": "c55f4e651bb9726402ac310b3bc06b2337cd58523aaa0e2ee7496fb847fc554b",
+    "bytes": 5703
+  },
+  "protocol": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md",
+    "sha256": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16",
+    "bytes": 26126
+  },
+  "machineRegistry": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score-split.v1.json",
+    "sha256": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519",
+    "bytes": 13887
+  },
+  "pureBudgetAcceptance": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-BUDGET-UNIT-ACCEPTANCE.v1.json",
+    "sha256": "3481ef013b073714038b60aef8cc5055bf11331d7412b87f61b46ada0c7c6b5b",
+    "bytes": 2906
+  },
+  "archiveAcceptance": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-ARCHIVE-UNIT-ACCEPTANCE.v1.json",
+    "sha256": "f0d96c36b181534260363a0b8365e488d9950f813a5a0354e606a81a7db4a28d",
+    "bytes": 9811
+  },
+  "sourceAndTests": [
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py",
+      "sha256": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+      "bytes": 23897
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_run_unit.py",
+      "sha256": "a96576b22bd4c55ed8adf34d49ad78ee783605fe75a3f2f263f17a8c092bd42c",
+      "bytes": 25149
+    }
+  ],
+  "reusedDependencyPins": [
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_budget.py",
+      "sha256": "0ee4dd5e7936a333fed6b2804f530bf310f588b811af41e3c8a5af1a335388ea",
+      "bytes": 5177
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_models.py",
+      "sha256": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+      "bytes": 4803
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_run.py",
+      "sha256": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+      "bytes": 52750
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py",
+      "sha256": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa",
+      "bytes": 27993
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_replay.py",
+      "sha256": "8eae09d2b3cb7aec7a2e6fbe265679be39eea5dbf6bd327f24f75d9022f65b45",
+      "bytes": 19858
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_contract.py",
+      "sha256": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+      "bytes": 8198
+    }
+  ],
+  "authorEvidence": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/focused-fd5aedb73a409c09.json",
+      "sha256": "993a6afe3dab47f05f44e9dd8731a594cd9eb29cc3184bb28d8af868b7d3ec93",
+      "bytes": 634
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/focused-fd5aedb73a409c09.log",
+      "sha256": "3f9eff20bc0a35ccf351e87efb84a918d5e4177ef4a52aaf608c0dcf3c9f8749",
+      "bytes": 3258
+    }
+  ],
+  "independentNumericalReview": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/runtime-numerical-review.json",
+    "sha256": "31ac4e0da1649be1d3d766105418d42f447e4207cd1c30a56b6f52a0684e51f6",
+    "bytes": 3125
+  },
+  "independentRootTemporalEvidence": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/root-temporal.py",
+      "sha256": "8d5576b2a40e69643703e9a1b40b2f4bba29cb837461e4ef80c9185c45255d9b",
+      "bytes": 8264
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/root-temporal.json",
+      "sha256": "5707bee4ed80bca0c14fc45696b2073e2d04bfef464e66a7ed55935b9348368b",
+      "bytes": 1414
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/root-temporal.log",
+      "sha256": "5707bee4ed80bca0c14fc45696b2073e2d04bfef464e66a7ed55935b9348368b",
+      "bytes": 1414
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/root-temporal-process.json",
+      "sha256": "85c6c5b5ae16b738bfea4c9cc8399df06789aa6271796a8aa233e41931ac4740",
+      "bytes": 170
+    }
+  ],
+  "observed": {
+    "authorTests": 20,
+    "authorExternalSeconds": 11.847954750002827,
+    "authorPeakRssMiB": 246.65625,
+    "independentAccountingTests": 7,
+    "independentSeconds": 11.197826666000765,
+    "independentPeakRssMiB": 251.671875,
+    "rootTemporalChecks": 7,
+    "rootExternalSeconds": 0.565716707991669,
+    "rootPeakRssMiB": 86.25,
+    "syntheticOriginalOrigins": 277,
+    "syntheticRetainedPrefix": 53,
+    "syntheticRemainingOrigins": 224,
+    "syntheticRemainingGames": 3375
+  },
+  "closedDraftFindings": [
+    "Reused frozen pure budget formula rather than duplicate it; exact16+16 pilots, math.fsum and complete effective score flags retained.",
+    "Grace anchored to original stop or registered deadline even after delayed signal delivery; expired grace checks and timer arming are protected by cleanup.",
+    "Separate120-second inference-smoke deadline and7200-second total deadline propagate through ordinary Exception handlers; explicit KeyboardInterrupt/SystemExit preserved.",
+    "Real Store partial writes, pre-rename staging, post-rename fsync failure and duplicate-terminal rejection exercised."
+  ],
+  "integrationObligations": [
+    "Preserve these accepted runtime helper bytes; implement the complete historical controller separately and bind its exact final source/runtime chain.",
+    "Start a future external hard watchdog before imports/runtime/source admission and all scientific work. Python-delivered signals and peak-RSS sampling can be delayed by native code; this unit is not a kernel hard-limit implementation.",
+    "Actual source admission, complete target laws/state/lineage publication, post-publication grader, strict savedJSON feed, exact source-law/score reuse and full public evaluator remain complete-controller obligations.",
+    "Place genuine operations inside disjoint callbacks and authenticate metadata/true cache misses. Caller supplied labels on a timing record do not prove a fit/score happened.",
+    "Reuse accepted full synthetic fixture; later120-second real public smoke and actual retained pilot are still required within one run.",
+    "A post-rename fsync error means uncertain durability; preserve single completion and report uncertainty, not scientific success."
+  ],
+  "limits": [
+    "Tests use explicit toy277-origin populations, fake clocks and a short real signal. They do not prove original historical chronology compatibility, historical cost feasibility or predictive value.",
+    "Focused120-second/2048MiB test caps and observed costs are separate from the future7200/4096 historical envelope. Root additionally externally sampled its test child RSS; no claim of instantaneous kernel RSS enforcement."
+  ],
+  "historicalInvocationAuthorized": false,
+  "historicalDataLoaded": false,
+  "predictiveAcceptance": false,
+  "productionAuthorization": false,
+  "researchDetailsPublic": false
+}

@@ -1,0 +1,252 @@
+"""Bounded RF-COMP-08 synthetic qualification. No historical acceptance creation."""
+import time
+STARTED = time.monotonic()
+import argparse
+import hashlib
+import importlib.util
+import json
+import os
+from pathlib import Path
+import resource
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+WORK = Path('/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-resource-policy')
+PYTHON = '/opt/anaconda3/bin/python3.12'
+LIMIT_SECONDS, LIMIT_MIB = 600, 2048
+sys.dont_write_bytecode = True
+IS_CHILD = '--child' in sys.argv
+PARENT_RESERVE_MIB, CHILD_LIMIT_MIB = 512, 1536
+
+
+def budget_check():
+    if time.monotonic() - STARTED >= LIMIT_SECONDS:
+        raise RuntimeError('complete_qualification_deadline')
+    limit = CHILD_LIMIT_MIB if IS_CHILD else PARENT_RESERVE_MIB
+    if resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 2**20 >= limit:
+        raise RuntimeError('qualification_parent_or_child_memory_reserve')
+
+
+def encoded(value):
+    return (json.dumps(value, sort_keys=True, indent=2, allow_nan=False) + '\n').encode()
+
+
+def save(path, value, *, enforce=True):
+    if enforce: budget_check()
+    raw=encoded(value)
+    if enforce: budget_check()
+    with path.open('xb') as stream:
+        for offset in range(0,len(raw),1024*1024):
+            if enforce: budget_check()
+            stream.write(raw[offset:offset+1024*1024])
+        stream.flush(); os.fsync(stream.fileno())
+    if enforce: budget_check()
+
+
+def fingerprint(path, *, enforce=True):
+    if enforce: budget_check()
+    h = hashlib.sha256(); size = 0
+    with path.open('rb') as stream:
+        while chunk := stream.read(1024 * 1024):
+            if enforce: budget_check()
+            h.update(chunk); size += len(chunk)
+    return {'path': str(path), 'sha256': h.hexdigest(), 'bytes': size}
+
+
+def authenticate(pins_path, expected):
+    assert fingerprint(pins_path)['sha256'] == expected, 'qualification_pin_map_changed'
+    pins = json.loads(pins_path.read_bytes())
+    for name, sha in pins['code_hashes'].items():
+        assert fingerprint(ROOT / name)['sha256'] == sha, ('source_changed', name)
+    for name, pin in pins['inputs'].items():
+        current = fingerprint(Path(name))
+        assert current['sha256'] == pin['sha256'] and current['bytes'] == pin['bytes'], ('input_changed', name)
+    return pins
+
+
+def copied(source, destination):
+    with source.open('rb') as src, destination.open('xb') as dst:
+        while chunk := src.read(1024*1024):
+            budget_check(); dst.write(chunk)
+        dst.flush(); os.fsync(dst.fileno())
+    budget_check()
+
+
+def parent(pins_path):
+    sys.path.insert(0,str(ROOT/'scripts'))
+    from research_score_resource_watchdog import _supervise
+    pin_sha=fingerprint(pins_path)['sha256']
+    attempt=WORK/('attempt-'+pin_sha[:16]);attempt.mkdir()
+    stop=source_error=None; before=None; report=None; cli=None
+    observer='rfcomp08-qualification-'+pin_sha[:16]
+    command=[PYTHON,'-I',str(Path(__file__).resolve()),'--child',str(attempt),
+        '--pins',str(pins_path),'--pins-sha256',pin_sha,'--started',repr(STARTED)]
+    try:
+        before=authenticate(pins_path,pin_sha)
+        save(attempt/'source-map-before.json',before)
+        copied(pins_path,attempt/'INPUT-PINS.json')
+        snapshots=attempt/'source-snapshots';snapshots.mkdir()
+        paths={str(ROOT/name):sha for name,sha in before['code_hashes'].items()}
+        paths.update({name:pin['sha256'] for name,pin in before['inputs'].items() if pin['snapshot']})
+        for name,sha in paths.items():
+            if not (snapshots/sha).exists(): copied(Path(name),snapshots/sha)
+        budget_check()
+        remaining=LIMIT_SECONDS-(time.monotonic()-STARTED)-30
+        assert remaining>0,'no_qualification_worker_budget'
+        report=_supervise(command,cwd=ROOT,output_parent=WORK,identity=observer,
+            limits=(remaining,float(CHILD_LIMIT_MIB),2.,.05),phase_status=False)
+        save(attempt/'unit-watchdog.json',report)
+        copied(WORK/observer/'stdout.log',attempt/'process.log')
+        copied(WORK/observer/'stderr.log',attempt/'process-stderr.log')
+        assert report['status']=='completed_process' and report['exit_code']==0,'unit_worker_failed'
+        cli=cli_probes(attempt,before)
+    except BaseException as error:
+        stop=type(error).__name__+':'+str(error)
+    try:
+        after=authenticate(pins_path,pin_sha)
+        save(attempt/'source-map-after.json',after)
+        assert before==after,'input_map_changed'
+    except BaseException as error:
+        source_error=type(error).__name__+':'+str(error)
+    own_peak=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/2**20
+    watched=[r for r in (report, None if cli is None else cli['worker_report']) if r is not None]
+    child_peak=max([0.]+[max(r['sampled_group_peak_rss_mib'],r['waited_worker_peak_rss_mib'] or 0.) for r in watched])
+    process={'attempt':str(attempt),'command':command,'stop':stop,'source_error':source_error,
+        'exit_code':None if report is None else report['exit_code'],
+        'wall_seconds':time.monotonic()-STARTED,'parent_peak_rss_mib':own_peak,
+        'max_child_group_rss_mib':child_peak,'conservative_combined_rss_mib':own_peak+child_peak,
+        'limits':{'seconds':LIMIT_SECONDS,'rss_mib':LIMIT_MIB,'parent_reserve_mib':PARENT_RESERVE_MIB,'child_limit_mib':CHILD_LIMIT_MIB},
+        'memory_scope':'parent high-water plus maximum accepted watched child/group peak; sampled child RSS, not instantaneous kernel enforcement',
+        'clock_scope':'first script statement including preparation/authentication; final checked/fsynced qualification commit recorded separately; interpreter startup excluded',
+        'watchdog':None if report is None else fingerprint(WORK/observer/'process-report.json',enforce=False)}
+    save(attempt/'process.json',process,enforce=False)
+    print(json.dumps(process,sort_keys=True),flush=True)
+    assert stop is source_error is None and report is not None and cli is not None,'qualification_process_failed'
+    budget_check();assert own_peak+child_peak<LIMIT_MIB,'complete_qualification_memory_limit'
+    unit=json.loads((attempt/'unit-tests.json').read_bytes())
+    assert unit['success'] and unit['tests_run']>0 and not unit['skipped'] and cli['passed']
+    # Empty logs remain authenticated through this nonempty index. The inherited
+    # acceptance reader requires each direct evidence pointer to have bytes > 0.
+    save(attempt/'qualification-artifacts.json', {
+        'scope': 'all retained files before provisional qualification finalization',
+        'files': [fingerprint(p) for p in sorted(attempt.rglob('*')) if p.is_file()]})
+    record={'version':'rfcomp08.controller-qualification.v1','status':'pending_driver_completion',
+        'scope':'resource_policy_complete_controller_qualification','historical_execution':False,
+        'code_hashes':before['code_hashes'],'runtime':before['runtime'],'runtime_files':before['runtime_files'],
+        'protocol_sha256':before['protocol_sha256'],'config_sha256':before['config_sha256'],
+        'compute_protocol_sha256':before['compute_protocol_sha256'],
+        'resource_protocol_sha256':before['resource_protocol_sha256'],
+        'resource_policy_sha256':before['resource_policy_sha256'],
+        'tests':{'run':unit['tests_run']+2,'passed':unit['tests_run']+2},
+        'count_basis':'new focused resource test methods plus actual owned worker CLI rejection and duplicate watchdog observer rejection; launcher source checked, not executed; unchanged COMP04 science qualification reused without recounting tests',
+        'evidence':[pin for name in ('process.json','process.log','process-stderr.log','INPUT-PINS.json',
+            'source-map-before.json','source-map-after.json','unit-watchdog.json','unit-tests.json',
+            'numerical-observations.json','controller-test-evidence.json','cli-probes.json','qualification-artifacts.json')
+            if (pin := fingerprint(attempt/name))['bytes'] > 0],
+        'limits':['Synthetic exactness and declared full-plan routing evidence only; no historical capacity or predictive result.',
+                  'Unchanged COMP04 53-check qualification and full inference evidence authenticated and reused; no new large-fixture bootstrap.']}
+    staged=attempt/'qualification-staging.json'
+    save(staged,record);budget_check()
+    assert resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/2**20+child_peak<LIMIT_MIB
+    # All success bytes have been written/fsynced and the total cap checked.
+    os.link(staged,attempt/'candidate-qualification.json')
+    fd=os.open(attempt,os.O_RDONLY|os.O_DIRECTORY)
+    try:os.fsync(fd)
+    finally:os.close(fd)
+    elapsed=time.monotonic()-STARTED
+    save(attempt/'qualification-commit.json',{'elapsed_seconds':elapsed,'within_600_seconds':elapsed<LIMIT_SECONDS,
+        'candidate_qualification':fingerprint(attempt/'candidate-qualification.json'),
+        'not_a_final_qualification':True})
+    budget_check()
+    print('Provisional candidate only. Root must verify actual process exit, completion receipt and all pins before constructing passed qualification; independent reviews remain required.',flush=True)
+
+
+def load_test(name):
+    path = ROOT / 'tests/research-score-resource-policy' / ('test_' + name + '.py')
+    spec = importlib.util.spec_from_file_location('comp08_test_' + name, path)
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module
+
+
+def cli_probes(attempt,pins):
+    from research_score_resource_watchdog import _supervise
+    marker=hashlib.sha256(encoded({'test':'rfcomp08-missing-receipt-v1','code_hashes':pins['code_hashes']})).hexdigest()
+    missing=WORK/('nonexistent-final-acceptance-'+marker+'.json')
+    identity='rfcomp08-observer-'+marker[:16];observation=ROOT/'work'/identity
+    assert not missing.exists() and not observation.exists(),'probe_identity_already_spent'
+    command=[PYTHON,'-I',str(ROOT/'scripts/research_score_resource_controller.py'),
+        '--repository-root',str(ROOT),'--implementation-acceptance',str(missing),
+        '--implementation-acceptance-sha256',marker,'--envelope-started-monotonic',repr(time.monotonic())]
+    rows=[];worker=None
+    try:
+        budget_check();seconds=min(20.,LIMIT_SECONDS-(time.monotonic()-STARTED)-10.)
+        assert seconds>0,'no_cli_probe_budget'
+        # The owned phase file selects actual _worker_main; this does not invoke _launch.
+        worker=_supervise(command,cwd=ROOT,output_parent=ROOT/'work',identity=identity,
+            limits=(seconds,float(CHILD_LIMIT_MIB),2.,.05),phase_status=True)
+        save(attempt/'cli-missing-receipt.json',worker)
+        rows.append({'kind':'missing_receipt_worker_cli','exit_code':worker['exit_code'],'status':worker['status']})
+        assert worker['status']=='externally_stopped_process' and worker['stop_reason']=='incomplete_owned_phase_handshake' and worker['exit_code']==1
+        stderr=(observation/'stderr.log').read_text()
+        assert 'FileNotFoundError' in stderr and str(missing) in stderr,'expected_preflight_failure_missing'
+        budget_check()
+        try:
+            _supervise(command,cwd=ROOT,output_parent=ROOT/'work',identity=identity,
+                limits=(min(20.,LIMIT_SECONDS-(time.monotonic()-STARTED)-10.),float(CHILD_LIMIT_MIB),2.,.05),phase_status=True)
+        except FileExistsError:
+            rows.append({'kind':'duplicate_owned_observer','result':'FileExistsError_before_second_spawn'})
+        else:raise AssertionError('duplicate_observer_not_rejected')
+        files=[fingerprint(p) for p in sorted(observation.rglob('*')) if p.is_file()]
+        result={'passed':True,'command':command,'observer':str(observation),'probes':rows,
+            'worker_report':worker,'observer_files':files,
+            'scope':'Actual owned worker CLI invalid-receipt preflight plus exclusive watchdog observer allocation; lean launcher source checked, not executed. No scientific callbacks.'}
+        save(attempt/'cli-probes.json',result);return result
+    except BaseException:
+        save(attempt/'cli-probes.json',{'passed':False,'command':command,'observer':str(observation),
+            'probes':rows,'worker_report':worker},enforce=False)
+        raise
+
+
+def child(attempt, pins_path, pin_sha):
+    import unittest
+    pins = authenticate(pins_path, pin_sha)
+    sys.path.insert(0, str(ROOT / 'scripts'))
+    import research_score_resource_preflight as preflight
+    assert preflight.actual_runtime() == pins['runtime']
+    assert preflight.CODE_FILES == tuple(sorted(pins['code_hashes']))
+    preflight.validate_runtime_files(lambda: None)
+    modules=[]; result=None; began=time.monotonic()
+    try:
+        modules=[load_test('resource_policy')]
+        suite=unittest.TestSuite(unittest.defaultTestLoader.loadTestsFromModule(module) for module in modules)
+        result=unittest.TextTestRunner(stream=sys.stdout,verbosity=2,failfast=True).run(suite)
+    finally:
+        numerical=[item for module in modules for item in getattr(module,'OBSERVATIONS',[])]
+        controller=[{'kind':'shared_current_source_membership','source_count':len(pins['code_hashes']),
+                     'resource_protocol_sha256':pins['resource_protocol_sha256'],
+                     'resource_policy_sha256':pins['resource_policy_sha256']}] + [item for module in modules for item in getattr(module,'CONTROLLER_TEST_EVIDENCE',[])]
+        save(attempt / 'numerical-observations.json', numerical)
+        save(attempt / 'controller-test-evidence.json', controller)
+        save(attempt / 'unit-tests.json', {'tests_run':0 if result is None else result.testsRun,
+            'success':False if result is None else result.wasSuccessful(),
+            'failures':[] if result is None else [(t.id(),trace) for t,trace in result.failures],
+            'errors':[] if result is None else [(t.id(),trace) for t,trace in result.errors],
+            'skipped':[] if result is None else [(t.id(),reason) for t,reason in result.skipped],
+            'wall_seconds':time.monotonic()-began})
+    assert result is not None and result.wasSuccessful() and not result.skipped, 'unit_qualification_failed'
+    assert numerical and controller, 'real_numerical_and_controller_evidence_required'
+    authenticate(pins_path,pin_sha)
+
+
+if __name__ == '__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--pins',required=True,type=Path)
+    parser.add_argument('--child',type=Path)
+    parser.add_argument('--pins-sha256')
+    parser.add_argument('--started',type=float)
+    args=parser.parse_args()
+    if args.child is not None:
+        assert args.started is not None and args.started<=STARTED
+        STARTED=args.started
+        child(args.child,args.pins,args.pins_sha256)
+    else: parent(args.pins)

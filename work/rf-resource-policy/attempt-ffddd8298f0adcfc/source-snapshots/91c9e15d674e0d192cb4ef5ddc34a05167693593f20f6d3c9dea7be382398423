@@ -1,0 +1,726 @@
+"""RF-02F archive boundary. Imports are inert; no fits, scoring, or selection prefill.
+
+Production admission has no injectable trust arguments. SourceContext contains
+immutable bytes/tuples, and its public properties return copies. Every later
+origin read is checked against the originally admitted index again.
+
+forecast_inputs returns origin, prepared_receipts, bank_prepared,
+diagonal_outputs, source_laws {full, outer}, mapper_sources, mappers,
+original_selection, and source_pointers. Laws are saved descriptors, not scores.
+grade_inputs additionally requires the owning Store's read_publication callback
+and expected_manifest_sha256. The callback MUST check its own durable index and
+return the exact saved bytes. This module validates the envelope and membership;
+the controller owns descriptor semantics, durability, and actual issuance time.
+"""
+import copy
+from dataclasses import dataclass, field
+from datetime import datetime
+import math
+from pathlib import Path
+import re
+
+import numpy as np
+
+from research_score_conditional_admission import (
+    Archive, AdmissionFailure, bound, parse, require, sha, validate_lineage,
+    validate_mapper, validate_selection, validate_requested_mean,
+    validate_selected_rows, validate_independent_source)
+from research_score_contract import ACCEPTANCE_HASH, encoded, prepare_origin
+from research_score_models import setting_grid, weights
+from research_score_replay import registered_series
+from research_score_run import recover_distribution
+from research_score_split_models import SPLIT_VARIANTS, split_setting_grid
+from research_score_split_replay import SplitSelectionHistory
+from research_score_successor_distribution import JointBase
+
+
+PARENT = Path('/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991')
+PARENT_MANIFEST = '2d9c91d803f1c991be039b88167082c8a501ce60dc58b18afcab0b251bb75e38'
+PARENT_INDEX = 'ccde502d661a4beee8f8da537a2f23238950fb2931c1527638de4c92898804ab'
+PARENT_TERMINAL = '8865f8911b590a2376649c9bd00885e527bbda7b22ea329bb4eca7e27393d9e0'
+PROTOCOL_PATH = '.planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md'
+PROTOCOL_SHA = 'd7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16'
+CONFIG_PATH = 'config/research-team-score-split.v1.json'
+CONFIG_SHA = '0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519'
+ACCEPTANCE_PATH = '.planning/engine-os/research-first/RF-02F-PROTOCOL-ACCEPTANCE.v1.json'
+PROTOCOL_ACCEPTANCE_SHA = 'c55f4e651bb9726402ac310b3bc06b2337cd58523aaa0e2ee7496fb847fc554b'
+PARENT_RESULT_PATH = '.planning/engine-os/research-first/RF-02C-RESULT.v1.md'
+PARENT_RESULT_SHA = 'bb04fe701642b33c9a32d973f2cbf82c308a9b0b47ec8f7c23c7f36f70d3f375'
+HELPER_HASHES = {
+    'scripts/research_score_conditional_admission.py': 'd6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8',
+    'scripts/research_score_conditional_adapter.py': 'a6987485724c7f725661927e194ca39d77b303e15d868b872d3b9449a7cc19f2',
+    'scripts/research_score_split_models.py': '1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48',
+    'scripts/research_score_split_replay.py': '44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547',
+}
+RAW_REFERENCES = (('N0', 'full'), ('N0', 'availability_24h'), ('E2', 'full'),
+                  ('E2', 'availability_24h'), ('E1', 'full'), ('S1', 'full'))
+E2_VARIANTS = SPLIT_VARIANTS[:-2]
+STATE_VARIANTS = tuple(v for v in E2_VARIANTS if v not in ('independent_marginals', 'deterministic_noise'))
+WARMUPS = tuple((2010, week) for week in range(1, 6))
+_SEAL = object()
+_TARGETS = ('home', 'away', 'margin', 'total')
+_BASE_METRICS = {'joint_energy_score', 'joint_nll', 'predicted_covariance', 'residual_product',
+                 'grid_cells', 'grid_transport_bound', 'grid_probability_bound', 'double_grid_difference'}
+_BASE_METRICS |= {target + '_' + suffix for target in _TARGETS
+                  for suffix in ('crps', 'observed', 'mean', 'mae', 'squared_error')}
+_OUTER_METRICS = _BASE_METRICS | {
+    'home_win_probability', 'tie_probability', 'away_win_probability', 'home_win_observed',
+    'home_win_brier', 'home_win_log_loss', 'win_tie_loss_brier', 'win_tie_loss_log_loss',
+    'tail_absolute_margin_21', 'tail_total_70', 'observed_absolute_margin_21', 'observed_total_70'}
+_OUTER_METRICS |= {target + '_pit' for target in _TARGETS}
+_OUTER_METRICS |= {f'{target}_{field}_{level}' for target in _TARGETS for level in (50, 80, 95)
+                   for field in ('lower', 'upper', 'coverage', 'width', 'boundary_distance')}
+
+
+def _number(value, reason, minimum=None):
+    require(type(value) in (int, float) and math.isfinite(value)
+            and (minimum is None or value >= minimum), reason)
+
+
+def _reason(value):
+    require(value is None or (type(value) is str and bool(value.strip())), 'invalid_native_reason')
+    return value is not None
+
+
+def _hash(value):
+    require(type(value) is str and re.fullmatch('[0-9a-f]{64}', value), 'invalid_hash')
+
+
+def _origin_key(origin):
+    require(type(origin) is dict and type(origin.get('season')) is int
+            and type(origin.get('week')) is int, 'invalid_origin_type')
+    return origin['season'], origin['week']
+
+
+def _suffix(origin):
+    year, week = _origin_key(origin)
+    return f'{year}-{week:02}'
+
+
+def _pointer(archive, name):
+    require(name in archive.index, 'missing_source_artifact:' + name)
+    return {'name': name, **archive.index[name]}
+
+
+def _physical(archive):
+    require({p.name for p in archive.directory.iterdir()} == set(archive.index) | {'artifact-index.json'},
+            'physical_archive_membership_mismatch')
+
+
+def _prepared(records, origin):
+    result = {delay: prepare_origin(records, origin, delay) for delay in (12, 24)}
+    for delay, receipt in result.items():
+        require([g.game_id for g in receipt['targets']] == origin['targetGameIds'], 'target_order_mismatch')
+        require(type(origin['windows'][str(delay)]['minimumTrainingMet']) is bool, 'invalid_training_flag')
+    return result
+
+
+def _state(state, origin, prepared, settings, series):
+    require(type(state) is dict and set(state) == {'origin', 'actual_computation_at', 'historical_status',
+            'prospective', 'trajectory_state'} and state['origin'] == origin
+            and state['historical_status'] == 'retrospective_inferred' and state['prospective'] is False,
+            'state_origin_provenance_mismatch')
+    require(datetime.fromisoformat(state['actual_computation_at']).utcoffset() is not None, 'invalid_state_timestamp')
+    expected = [(f, i, v) for f, v in series if v not in ('independent_marginals', 'deterministic_noise')
+                for i in range(len(settings[f]))]
+    rows = state['trajectory_state']
+    require(type(rows) is list and len(rows) == len(expected), 'state_population_mismatch')
+    native, diagonal = {}, {}
+    for row, key in zip(rows, expected):
+        require(type(row) is dict and set(row) == {'key', 'output', 'ratings', 'offense', 'defense'}
+                and type(row['key']) is list and len(row['key']) == 3
+                and type(row['key'][1]) is int and tuple(row['key']) == key, 'state_key_mismatch')
+        family, index, variant = key
+        output = row['output']
+        require(type(output) is dict and set(output) == {'forecasts', 'events', 'support', 'league_mean',
+                'home_effect', 'elo_score_slope', 'absorbing_failure'}, 'native_output_schema')
+        require(type(output['absorbing_failure']) is bool, 'native_absorbing_flag')
+        forecasts = output['forecasts']
+        require(type(forecasts) is list and [r.get('game_id') for r in forecasts]
+                == sorted(origin['targetGameIds']), 'native_target_population')
+        for forecast in forecasts:
+            require(type(forecast) is dict and set(forecast) == {'game_id', 'mean', 'failure', 'initialization_only'}
+                    and type(forecast['initialization_only']) is bool, 'native_forecast_schema')
+            failed = _reason(forecast['failure'])
+            mean = forecast['mean']
+            if mean is not None:
+                require(type(mean) is list and len(mean) == 2, 'native_mean_shape')
+                for value in mean:
+                    _number(value, 'native_mean_nonfinite')
+                require(failed or min(mean) > 0, 'successful_native_mean_not_positive')
+            require(failed or mean is not None, 'successful_native_mean_missing')
+            require(mean is not None or forecast['failure'] == 'warmup_no_prior_score' or output['absorbing_failure'],
+                    'unexplained_native_mean_missing')
+            if forecast['failure'] == 'warmup_no_prior_score':
+                require(mean is None and forecast['initialization_only'] is True, 'warmup_native_flag_mismatch')
+            native[(*key, forecast['game_id'])] = forecast
+        if family != 'E2':
+            continue
+        for field in ('ratings', 'offense', 'defense'):
+            require(type(row[field]) is list and len(row[field]) == 32, 'diagonal_state_shape')
+            for value in row[field]:
+                _number(value, 'diagonal_state_nonfinite')
+        require(output['support'] is None and type(output['elo_score_slope']) in (int, float)
+                and output['elo_score_slope'] == 0, 'diagonal_support_mismatch')
+        if output['league_mean'] is not None:
+            _number(output['league_mean'], 'invalid_league_mean', 0)
+        _number(output['home_effect'], 'invalid_home_effect')
+        events = output['events']
+        delay = 24 if variant == 'availability_24h' else 12
+        require(type(events) is dict and set(events) == {'delivered', 'initialization_only', 'offseason_retention_applied'}
+                and type(events['offseason_retention_applied']) is bool, 'diagonal_event_schema')
+        require(events['offseason_retention_applied'] is (origin['season'] > 2010 and origin['week'] == 1),
+                'diagonal_offseason_event_mismatch')
+        expected_delivered = origin['windows'][str(delay)]['firstDeliveryIds']
+        require(type(events['delivered']) is list and events['delivered'] == expected_delivered,
+                'diagonal_delivery_mismatch')
+        init = events['initialization_only']
+        require(type(init) is list and all(type(x) is str for x in init) and len(init) == len(set(init))
+                and set(init) <= set(expected_delivered), 'diagonal_initialization_mismatch')
+        require(set(expected_delivered) <= set(prepared[delay]['input_ids']), 'delivery_outside_closure')
+        diagonal[index, variant] = copy.deepcopy(output)
+    require(set(diagonal) == {(i, v) for i in range(9) for v in STATE_VARIANTS}, 'diagonal_cache_population')
+    return native, diagonal
+
+
+def _mapper(payload, prepared, records, season):
+    validate_mapper(payload, prepared, records)
+    expected = JointBase.from_scores([[r.home_score, r.away_score] for r in prepared['history']],
+                                    weights(prepared['history'], season, 2.5))
+    exact = {'atoms': expected.atoms.tolist(), 'weights': expected.weights.tolist(), 'b': expected.b,
+             'epsilon': expected.epsilon, 'input_sha256': prepared['input_hash'], 'half_life': 2.5}
+    require(encoded(payload) == encoded(exact), 'mapper_empirical_weights_or_parameters_mismatch')
+    return expected
+
+
+def _descriptor(value):
+    require(type(value) is dict and set(value) == {'version', 'mapper', 'theta', 'beta', 'rates', 'alphaSha256',
+            'iterations', 'independent', 'mean', 'covariance'} and value['version'] == 'rf.joint-distribution.v2',
+            'saved_descriptor_schema')
+    require(type(value['mapper']) is dict and set(value['mapper']) == {'name', 'sha256'}, 'saved_mapper_pointer')
+    _hash(value['mapper']['sha256'])
+    require(value['mapper']['name'] == 'object-' + value['mapper']['sha256'] + '.json', 'saved_mapper_pointer')
+    _hash(value['alphaSha256'])
+    require(type(value['iterations']) is int and value['iterations'] >= 0
+            and type(value['independent']) is bool, 'saved_descriptor_flags')
+    for name in ('theta', 'rates', 'mean'):
+        require(type(value[name]) is list and len(value[name]) == 2, 'saved_descriptor_vector')
+        for number in value[name]:
+            _number(number, 'saved_descriptor_nonfinite')
+    require(min(value['rates'] + value['mean']) > 0, 'saved_descriptor_positive')
+    _number(value['beta'], 'saved_beta', 0)
+    require(value['beta'] <= 1, 'saved_beta')
+    require(type(value['covariance']) is list and len(value['covariance']) == 2, 'saved_covariance')
+    for row in value['covariance']:
+        require(type(row) is list and len(row) == 2, 'saved_covariance')
+        for number in row:
+            _number(number, 'saved_covariance')
+
+
+def recover_source_law(mapper, descriptor):
+    """Lazy saved-component recovery only. Never invoke fit/grid/scorer."""
+    require(type(mapper) is JointBase, 'unqualified_mapper_class')
+    _descriptor(descriptor)
+    return recover_distribution(mapper, descriptor)
+
+
+def _metrics(value, target, outer):
+    require(type(value) is dict and set(value) == (_OUTER_METRICS if outer else _BASE_METRICS),
+            'inner_outer_metric_schema_mismatch')
+    for name, number in value.items():
+        if name != 'grid_cells':
+            _number(number, 'invalid_saved_metric')
+    cells = value['grid_cells']
+    require(type(cells) is list and len(cells) == 2 and all(type(x) is int and 0 < x <= 1024 for x in cells),
+            'invalid_saved_grid_shape')
+    _number(value['joint_energy_score'], 'invalid_inner_energy', 0)
+    h, a = target['homeScore'], target['awayScore']
+    require([value[t + '_observed'] for t in _TARGETS] == [h, a, h-a, h+a], 'saved_observation_mismatch')
+
+
+def _law_row(row, selected=False):
+    fields = {'family', 'setting', 'game_id', 'native_failure', 'distribution'} | ({'variant'} if selected else set())
+    require(type(row) is dict and set(row) == fields and type(row['family']) is str
+            and type(row['game_id']) is str and (row['setting'] is None and selected or type(row['setting']) is int),
+            'source_law_row_schema')
+    _reason(row['native_failure'])
+    _descriptor(row['distribution'])
+
+
+def _selection_schema(selection, settings):
+    require(type(selection) is dict and set(selection) == set(settings), 'selection_schema')
+    for family, decision in selection.items():
+        require(type(decision) is dict and set(decision) == {'candidates', 'games', 'inner_seasons', 'setting', 'status'}
+                and type(decision['games']) is int and type(decision['inner_seasons']) is list
+                and all(type(y) is int for y in decision['inner_seasons'])
+                and (decision['setting'] is None or type(decision['setting']) is int), 'selection_typed_metadata')
+        require(type(decision['candidates']) is list and len(decision['candidates']) == len(settings[family]),
+                'selection_candidate_count')
+        for i, candidate in enumerate(decision['candidates']):
+            require(type(candidate) is dict and set(candidate) == {'setting', 'mean_energy', 'failure_rate', 'eligible'}
+                    and type(candidate['setting']) is int and candidate['setting'] == i
+                    and type(candidate['eligible']) is bool, 'selection_typed_candidate')
+            _number(candidate['mean_energy'], 'selection_energy', 0)
+            _number(candidate['failure_rate'], 'selection_failure_rate', 0)
+            require(candidate['failure_rate'] <= 1, 'selection_failure_rate')
+
+
+def _origin_artifacts(archive, records, origin, settings, series, selection, mapper_pointers, budget_check, *, grade=False):
+    """Generic bound-reader boundary also used by small synthetic fixtures."""
+    budget_check()
+    prepared = _prepared(list(records.values()), origin)
+    suffix = _suffix(origin)
+    state_name = 'state-' + suffix + '.json'
+    native, diagonal = _state(archive.read(state_name), origin, prepared, settings, series)
+    pointers = {'state': _pointer(archive, state_name)}
+    if _origin_key(origin) in WARMUPS:
+        require(origin['windows']['12']['minimumTrainingMet'] is False, 'warmup_training_contradiction')
+        name = 'warmup-' + suffix + '.json'
+        require(archive.read(name) == {'status': 'warmup_unforecastable', 'targets': origin['targetGameIds']},
+                'warmup_envelope_mismatch')
+        require(all(prefix + suffix + '.json' not in archive.index for prefix in ('forecasts-', 'inner-losses-', 'ancestry-')),
+                'unexpected_warmup_forecast')
+        pointers['warmup'] = _pointer(archive, name)
+        return prepared, diagonal, {}, {}, {}, {}, [], [], pointers
+    require(origin['windows']['12']['minimumTrainingMet'] is True, 'unregistered_warmup_exception')
+    publication_name = 'forecasts-' + suffix + '.json'
+    publication = archive.read(publication_name)
+    require(type(publication) is dict and set(publication) == {'classification', 'origin_at', 'manifest_sha256',
+            'full_setting_forecasts', 'outer_selected_forecasts'} and publication['classification'] == 'retrospective'
+            and publication['origin_at'] == origin['originAt'] and publication['manifest_sha256'] == archive.manifest_sha256,
+            'forecast_origin_provenance_mismatch')
+    ancestry_name = 'ancestry-' + suffix + '.json'
+    ancestry = archive.read(ancestry_name)
+    require(type(ancestry) is dict and set(ancestry) == {'12', '24'}, 'lineage_delay_population')
+    mappers, mapper_sources = {}, {}
+    for delay in (12, 24):
+        budget_check()
+        validate_lineage(ancestry[str(delay)], prepared[delay], archive.manifest, archive.manifest_sha256,
+                         archive.index[publication_name]['sha256'])
+        key = prepared[delay]['input_hash']
+        require(key in mapper_pointers, 'eligible_mapper_missing')
+        pointer = mapper_pointers[key]
+        payload = archive.read(pointer)
+        mappers[delay] = _mapper(payload, prepared[delay], records, origin['season'])
+        mapper_sources[delay] = {'pointer': copy.deepcopy(pointer), 'payload': payload}
+    full, outer = {}, {}
+    expected = [(f, i, game) for game in origin['targetGameIds'] for f, grid in settings.items() for i in range(len(grid))]
+    full_rows = publication['full_setting_forecasts']
+    require(type(full_rows) is list and len(full_rows) == len(expected), 'full_source_population')
+    for row, key in zip(full_rows, expected):
+        _law_row(row)
+        family, setting, game = key
+        require((row['family'], row['setting'], row['game_id']) == key, 'full_source_order')
+        require(row['distribution']['mapper'] == mapper_sources[12]['pointer'] and row['distribution']['independent'] is False,
+                'full_mapper_or_flags_mismatch')
+        forecast = native[family, setting, 'full', game]
+        if forecast['failure'] is not None:
+            require(row['native_failure'] == forecast['failure'], 'full_native_reason_mismatch')
+        if row['native_failure'] is None:
+            validate_requested_mean(dict(row, variant='full'), native, {family: {'setting': setting}})
+        else:
+            require(family != 'N0' and encoded(row['distribution']) == encoded(full['N0', 0, game]['distribution']),
+                    'full_N0_fallback_mismatch')
+        full[key] = row
+    inner_name = 'inner-losses-' + suffix + '.json'
+    inner = []
+    if grade:
+        inner = archive.read(inner_name)
+        require(type(inner) is list and len(inner) == len(expected), 'inner_source_population')
+        for row, key in zip(inner, expected):
+            require(type(row) is dict and set(row) == {'family', 'setting', 'game_id', 'native_failure', 'metrics'}
+                    and type(row['setting']) is int and (row['family'], row['setting'], row['game_id']) == key,
+                    'inner_source_order_or_schema')
+            require(row['native_failure'] == full[key]['native_failure'], 'inner_native_reason_mismatch')
+            _metrics(row['metrics'], records[row['game_id']], False)
+    losses = []
+    if origin['season'] >= 2013:
+        outer_name = 'outer-losses-' + suffix + '.json'
+        outer_expected = [(f, v, g) for f, v in series for g in origin['targetGameIds']]
+        rows = publication['outer_selected_forecasts']
+        require(type(rows) is list and [(r['family'], r['variant'], r['game_id']) for r in rows] == outer_expected,
+                'selected_forecast_population_mismatch')
+        outer = dict(zip(outer_expected, rows))
+        if grade:
+            losses = archive.read(outer_name)
+            outer, _ = validate_selected_rows(publication, losses, origin, series)
+        for key, row in outer.items():
+            _law_row(row, True)
+            family, variant, game = key
+            validate_requested_mean(row, native, selection)
+            delay = 24 if variant == 'availability_24h' else 12
+            require(row['distribution']['mapper'] == mapper_sources[delay]['pointer']
+                    and row['distribution']['independent'] is (variant == 'independent_marginals'), 'selected_mapper_or_flags')
+            if row['setting'] is None:
+                require(row['native_failure'] == 'no_eligible_setting', 'no_eligible_reason_mismatch')
+            elif variant == 'full':
+                require(encoded(row['distribution']) == encoded(full[family, row['setting'], game]['distribution'])
+                        and row['native_failure'] == full[family, row['setting'], game]['native_failure'], 'selected_full_source_mismatch')
+            else:
+                v = 'full' if variant in ('independent_marginals', 'deterministic_noise') else variant
+                reason = native[family, row['setting'], v, game]['failure']
+                require(reason is None or row['native_failure'] == reason, 'selected_native_reason_mismatch')
+            if row['native_failure'] is not None:
+                fallback = variant if ('N0', variant) in series else 'full'
+                require(family != 'N0' and encoded(row['distribution']) == encoded(outer['N0', fallback, game]['distribution']),
+                        'selected_N0_fallback_mismatch')
+            if variant == 'independent_marginals':
+                validate_independent_source(outer[family, 'full', game], row)
+        for row in losses:
+            require(type(row) is dict and set(row) == {'family', 'variant', 'game_id', 'native_failure', 'metrics'},
+                    'outer_loss_schema')
+            _metrics(row['metrics'], records[row['game_id']], True)
+        pointers['outer_losses'] = _pointer(archive, outer_name)
+    else:
+        require(publication['outer_selected_forecasts'] == [], 'early_outer_population')
+    pointers.update(forecasts=_pointer(archive, publication_name), ancestry=_pointer(archive, ancestry_name),
+                    inner_losses=_pointer(archive, inner_name))
+    return prepared, diagonal, full, outer, mappers, mapper_sources, inner, losses, pointers
+
+
+@dataclass(frozen=True)
+class SourceContext:
+    _directory: Path = field(repr=False)
+    _index_bytes: bytes = field(repr=False)
+    _manifest_bytes: bytes = field(repr=False)
+    _records_bytes: bytes = field(repr=False)
+    _origins: tuple = field(repr=False)
+    _config_bytes: bytes = field(repr=False)
+    _selection_bytes: tuple = field(repr=False)
+    _mapper_pointer_bytes: bytes = field(repr=False)
+    _inner: tuple = field(repr=False)
+    _provenance_bytes: bytes = field(repr=False)
+    _seal: object = field(repr=False, compare=False)
+    _origin_keys: tuple = field(init=False, repr=False)
+
+    def __post_init__(self):
+        object.__setattr__(self, '_origin_keys', tuple(_origin_key(parse(raw)) for raw in self._origins))
+
+    @property
+    def origins(self):
+        return [parse(raw) for raw in self._origins]
+
+    @property
+    def teams(self):
+        records = parse(self._records_bytes)
+        return sorted({r['homeTeam'] for r in records} | {r['awayTeam'] for r in records})
+
+    @property
+    def expected_by_season(self):
+        records = parse(self._records_bytes)
+        return {year: [r['gameId'] for r in records if r['season'] == year] for year in range(2010, 2026)}
+
+    @property
+    def provenance(self):
+        return parse(self._provenance_bytes)
+
+
+def _context_origin(context, origin):
+    require(type(context) is SourceContext and context._seal is _SEAL, 'unadmitted_source_context')
+    key = _origin_key(origin)
+    require(key in context._origin_keys, 'origin_not_exact_admitted_source')
+    raw = context._origins[context._origin_keys.index(key)]
+    require(encoded(origin) == raw, 'origin_not_exact_admitted_source')
+    return parse(raw)
+
+
+def _reader(context):
+    # Local mutable reader; no caller can alter the context's index bytes.
+    archive = object.__new__(Archive)
+    archive.directory = context._directory
+    archive.index = parse(context._index_bytes)['files']
+    archive.manifest = parse(context._manifest_bytes)
+    archive.manifest_sha256, archive.index_sha256 = sha(context._manifest_bytes), sha(context._index_bytes)
+    archive.checked = {}
+    return archive
+
+
+def admit_source(repository_root, budget_check):
+    """Production-only complete admission inside the owning controller's clock."""
+    from research_score_compute_run import preflight
+    root = Path(repository_root)
+    require(callable(budget_check), 'missing_shared_budget')
+    budget_check()
+    for name, fingerprint in HELPER_HASHES.items():
+        bound(root / name, fingerprint)
+    bound(root / PROTOCOL_PATH, PROTOCOL_SHA)
+    registry = parse(bound(root / CONFIG_PATH, CONFIG_SHA))
+    acceptance = parse(bound(root / ACCEPTANCE_PATH, PROTOCOL_ACCEPTANCE_SHA))
+    require(acceptance['protocol']['sha256'] == PROTOCOL_SHA and acceptance['machineRegistry']['sha256'] == CONFIG_SHA,
+            'protocol_acceptance_mismatch')
+    for key in ('independentFinalSupplements', 'preservedEarlierReviews', 'acceptedPureUnits'):
+        for pointer in acceptance[key]:
+            budget_check()
+            bound(Path(pointer['path']), pointer['sha256'], pointer['bytes'])
+    bound(root / PARENT_RESULT_PATH, PARENT_RESULT_SHA)
+    evidence_parent = Path('/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work')
+    for name, fingerprint in (
+        ('rf02c-quantitative-audit-result.json', '1626fe3ae0c27f9561d0ccb506e5a33c7239ad2cb1ef247390818d3ff3d133a9'),
+        ('rf02c-temporal-audit-result.json', 'ba18d5af50461fe0d398ded51236e7ce7298ba4085cc7ee26806f64c300de385')):
+        budget_check()
+        bound(evidence_parent / name, fingerprint)
+    computation = preflight(root)
+    budget_check()
+    receipt, config, data, hashes = computation['accepted']
+    # registered_series intentionally follows the original model insertion
+    # order. Preserve the authenticated source JSON bytes, not sorted encoding.
+    original_config_raw = bound(root / registry['inheritedConfig']['path'], registry['inheritedConfig']['sha256'])
+    require(parse(original_config_raw) == config, 'original_config_value_mismatch')
+    archive = Archive(PARENT, PARENT_MANIFEST, PARENT_INDEX)
+    _physical(archive)
+    require(len(archive.index) == 1909 and sum(p['bytes'] for p in archive.index.values()) == 1861782789,
+            'parent_index_population')
+    manifest = archive.manifest
+    require(manifest['version'] == 'rf02c.team-score.v1' and manifest['code_hashes'] == computation['codeHashes']
+            and manifest['runtime'] == computation['runtime'] and manifest['bound_hashes'] == hashes
+            and manifest['accepted_receipt_sha256'] == ACCEPTANCE_HASH
+            and manifest['historical_status'] == data['historicalStatus'] == 'retrospective_inferred'
+            and manifest['production_authorization'] is False and manifest['prospective_evidence'] is False
+            and type(manifest['provider_requests']) is int and manifest['provider_requests'] == 0,
+            'parent_contract_mismatch')
+    implementation = computation['implementation']
+    require(manifest['compute']['bindings'] == computation['bindings']
+            and manifest['compute']['implementation_receipt_sha256'] == implementation['receiptSha256']
+            and manifest['compute']['implementation_anchor_sha256'] == implementation['anchorSha256']
+            and manifest['compute']['qualification'] == implementation['receipt']['qualification'], 'compute_chain_mismatch')
+    require(archive.index['terminal-decision.json']['sha256'] == PARENT_TERMINAL, 'parent_terminal_pin')
+    terminal = archive.read('terminal-decision.json')
+    require(terminal['status'] == 'reject_all' and terminal['selected_family'] is None
+            and terminal['real_origin_batches_attempted'] == 277 and terminal['production_authorized'] is False,
+            'parent_terminal_scope')
+    records = {r['gameId']: r for r in data['records']}
+    origins = data['origins']
+    require(len(records) == len(data['records']) and len(origins) == 277
+            and [_origin_key(o) for o in origins] == sorted({_origin_key(o) for o in origins}), 'source_origin_population')
+    all_games = [g for o in origins for g in o['targetGameIds']]
+    require(len(all_games) == len(set(all_games)) and set(all_games) == set(records), 'source_game_population')
+    outer = [o for o in origins if o['season'] >= 2013]
+    require(len(outer) == 226 and sum(len(o['targetGameIds']) for o in outer) == 3407
+            and sum(len(o['targetGameIds']) for o in outer if o['season'] <= 2024) == 3135, 'outer_source_population')
+    settings, series = setting_grid(config), registered_series(config)
+    require(sum(map(len, settings.values())) == 43 and registry['settingsInTieOrder'] == split_setting_grid(), 'fixed_setting_grid')
+    selections = {year: archive.read(f'selection-{year}.json') for year in range(2013, 2026)}
+    for selection in selections.values():
+        _selection_schema(selection, settings)
+    mapper_pointers = {}
+    for name in archive.index:
+        if not name.startswith('object-'):
+            continue
+        budget_check()
+        value = archive.read(name)
+        if type(value) is dict and set(value) == {'atoms', 'weights', 'b', 'epsilon', 'input_sha256', 'half_life'}:
+            key = value['input_sha256']
+            pointer = {'name': name, 'sha256': archive.index[name]['sha256']}
+            require(key not in mapper_pointers or mapper_pointers[key] == pointer, 'ambiguous_source_mapper')
+            mapper_pointers[key] = pointer
+    inner = {}
+    for origin in origins:
+        result = _origin_artifacts(archive, records, origin, settings, series, selections.get(origin['season']),
+                                   mapper_pointers, budget_check, grade=True)
+        if 2011 <= origin['season'] <= 2024:
+            for row in result[6]:
+                key = origin['season'], row['game_id'], row['family'], row['setting']
+                require(key not in inner, 'duplicate_source_inner_row')
+                inner[key] = (float(row['metrics']['joint_energy_score']), _reason(row['native_failure']))
+        del result
+    require(len(inner) == 156821, 'compact_inner_population')
+    for year, selection in selections.items():
+        budget_check()
+        validate_selection(selection, year, inner, records, config)
+    retained = tuple((*key, *value) for key, value in inner.items() if key[2] == 'E2')
+    require(len(retained) == 32823, 'diagonal_inner_population')
+    del inner
+    for name in archive.index:
+        if name not in archive.checked:
+            budget_check()
+            archive.raw(name)
+    _physical(archive)
+    require(set(archive.checked) == set(archive.index), 'incomplete_parent_byte_authentication')
+    budget_check()
+    provenance = {'parent_manifest_sha256': PARENT_MANIFEST, 'parent_index_sha256': PARENT_INDEX,
+                  'parent_terminal_sha256': PARENT_TERMINAL, 'protocol_sha256': PROTOCOL_SHA,
+                  'config_sha256': CONFIG_SHA, 'protocol_acceptance_sha256': PROTOCOL_ACCEPTANCE_SHA,
+                  'parent_result_sha256': PARENT_RESULT_SHA, 'indexed_files': 1909, 'indexed_bytes': 1861782789,
+                  'helper_hashes': HELPER_HASHES, 'origins': 277, 'diagonal_inner_rows': 32823,
+                  'historical_status': 'retrospective_inferred'}
+    return SourceContext(PARENT, encoded({'files': archive.index}), archive.raw('manifest.json'), encoded(data['records']),
+                         tuple(encoded(o) for o in origins), original_config_raw,
+                         tuple((y, encoded(s)) for y, s in selections.items()), encoded(mapper_pointers),
+                         retained, encoded(provenance), _SEAL)
+
+
+def _current(context, origin, budget_check, *, grade=False):
+    origin = _context_origin(context, origin)
+    records = {r['gameId']: r for r in parse(context._records_bytes)}
+    archive, config = _reader(context), parse(context._config_bytes)
+    selection = parse(dict(context._selection_bytes)[origin['season']]) if origin['season'] >= 2013 else None
+    result = _origin_artifacts(archive, records, origin, setting_grid(config), registered_series(config), selection,
+                               parse(context._mapper_pointer_bytes), budget_check, grade=grade)
+    return origin, records, selection, result
+
+
+def forecast_inputs(context, origin, budget_check):
+    """Return current pregame inputs only; target labels/losses stay private."""
+    origin, _, selection, result = _current(context, origin, budget_check)
+    prepared, diagonal, full, outer, mappers, mapper_sources, _, _, pointers = result
+    selected_sources = {(f, v, g): row for (f, v, g), row in outer.items()
+                        if f in ('N0', 'E2') or (f, v) in RAW_REFERENCES}
+    return {'origin': origin, 'prepared_receipts': prepared,
+            'bank_prepared': {d: {k: list(prepared[d][k]) for k in ('history', 'targets')} for d in (12, 24)},
+            'diagonal_outputs': diagonal,
+            'source_laws': {'full': {key: row for key, row in full.items() if key[0] in ('N0', 'E2')},
+                            'outer': selected_sources},
+            'mapper_sources': mapper_sources, 'mappers': mappers, 'original_selection': selection,
+            'source_pointers': {k: p for k, p in pointers.items() if 'losses' not in k}}
+
+
+@dataclass(frozen=True)
+class _GradingReceipt:
+    origin: tuple
+    manifest_sha256: str
+    publication_sha256: str
+    parent_manifest_sha256: str
+    _seal: object = field(repr=False, compare=False)
+    _diagonal_binding: tuple = field(default=(), repr=False)
+
+
+def _publication(origin, pointer, read_publication, expected_manifest_sha256):
+    _hash(expected_manifest_sha256)
+    require(type(pointer) is dict and set(pointer) == {'name', 'sha256', 'bytes'} and type(pointer['name']) is str
+            and re.fullmatch('[a-z0-9][a-z0-9.-]*', pointer['name']) and '..' not in pointer['name']
+            and type(pointer['bytes']) is int and pointer['bytes'] > 0 and callable(read_publication), 'invalid_publication_pointer')
+    _hash(pointer['sha256'])
+    raw = read_publication(copy.deepcopy(pointer))
+    require(type(raw) is bytes and len(raw) == pointer['bytes'] and sha(raw) == pointer['sha256'], 'publication_bytes_mismatch')
+    value = parse(raw)
+    require(type(value) is dict and set(value) == {'version', 'manifest_sha256', 'parent_manifest_sha256', 'origin',
+            'origin_at', 'target_game_ids', 'full_setting_forecasts', 'outer_selected_forecasts'}
+            and value['version'] == 'rf02f.origin-publication.v1' and value['manifest_sha256'] == expected_manifest_sha256
+            and value['parent_manifest_sha256'] == PARENT_MANIFEST and value['origin'] == list(_origin_key(origin))
+            and all(type(x) is int for x in value['origin']) and value['origin_at'] == origin['originAt']
+            and value['target_game_ids'] == origin['targetGameIds'], 'publication_owner_or_origin_mismatch')
+    full_expected = [('E3', i, g) for g in origin['targetGameIds'] for i in range(27)] if 2011 <= origin['season'] <= 2024 else []
+    outer_series = tuple(('E3', v) for v in SPLIT_VARIANTS) + RAW_REFERENCES
+    outer_expected = [(f, v, g) for f, v in outer_series for g in origin['targetGameIds']] if origin['season'] >= 2013 else []
+    for selected, field_name, expected in ((False, 'full_setting_forecasts', full_expected),
+                                           (True, 'outer_selected_forecasts', outer_expected)):
+        rows = value[field_name]
+        require(type(rows) is list and len(rows) == len(expected), 'publication_incomplete_population')
+        for row, key in zip(rows, expected):
+            fields = {'family', 'setting', 'game_id', 'native_failure', 'distribution'} | ({'variant'} if selected else set())
+            require(type(row) is dict and set(row) == fields and type(row['distribution']) is dict
+                    and (row['setting'] is None and selected or type(row['setting']) is int), 'publication_row_schema')
+            _reason(row['native_failure'])
+            maximum = {'E3': 27, 'N0': 1, 'E2': 9, 'E1': 27, 'S1': 6}.get(row['family'], 0)
+            require(row['setting'] is None or 0 <= row['setting'] < maximum, 'publication_setting_range')
+            require(row['setting'] is not None or row['native_failure'] == 'no_eligible_setting', 'publication_noeligible_flag')
+            require(row['family'] != 'N0' or row['native_failure'] is None, 'publication_N0_native_failure')
+            actual = (row['family'], row['variant'] if selected else row['setting'], row['game_id'])
+            require(actual == key, 'publication_member_order_mismatch')
+            # Recipe/law semantics are separately validated by the controller.
+            def no_outcomes(item):
+                if type(item) is dict:
+                    for k, v in item.items():
+                        require(type(k) is str and not ('observed' in k.lower() or k in {'metrics', 'labels', 'homeScore', 'awayScore', 'overtime'}),
+                                'outcome_in_forecast_publication')
+                        no_outcomes(v)
+                elif type(item) is list:
+                    for v in item:
+                        no_outcomes(v)
+            no_outcomes(row['distribution'])
+    return _GradingReceipt(_origin_key(origin), expected_manifest_sha256, pointer['sha256'], PARENT_MANIFEST, _SEAL)
+
+
+def grade_inputs(context, origin, publication_pointer, budget_check, *, read_publication, expected_manifest_sha256):
+    """Open grader-only current labels/losses after a complete bound publication."""
+    origin = _context_origin(context, origin)
+    budget_check()
+    proof = _publication(origin, publication_pointer, read_publication, expected_manifest_sha256)
+    origin, records, _, result = _current(context, origin, budget_check, grade=True)
+    inner, losses, pointers = result[6:]
+    proof = _GradingReceipt(proof.origin, proof.manifest_sha256, proof.publication_sha256,
+                            proof.parent_manifest_sha256, _SEAL,
+                            tuple((r['setting'], r['game_id'], r['metrics']['joint_energy_score'], r['native_failure'])
+                                  for r in inner if r['family'] == 'E2')
+                            if 2011 <= origin['season'] <= 2024 else ())
+    by_key = {(row['family'], row['variant'], row['game_id']): row for row in losses}
+    return {'origin': origin, 'grading_receipt': proof,
+            'labels': {g: [records[g]['homeScore'], records[g]['awayScore']] for g in origin['targetGameIds']},
+            'diagonal_inner_rows': [row for row in inner if row['family'] == 'E2'],
+            'raw_outer_rows': [by_key[f, v, g] for f, v in RAW_REFERENCES for g in origin['targetGameIds']] if losses else [],
+            'e2_outer_rows': [row for row in losses if row['family'] == 'E2'], 'source_pointers': pointers}
+
+
+class StrictSelectionFeed:
+    """Own an empty selector; admit complete post-publication batches in order."""
+    def __init__(self, context):
+        require(type(context) is SourceContext and context._seal is _SEAL, 'unadmitted_source_context')
+        self._context = context
+        self._selector = SplitSelectionHistory()
+        self._origins = tuple(b for b in context._origins if 2011 <= parse(b)['season'] <= 2024)
+        self._next = 0
+        self._manifest = None
+        self._accepted_rows = {}
+
+    def _integrity(self):
+        require(self._selector.settings == {'E3': split_setting_grid()}
+                and self._selector.config == {'failure': {'innerSettingIneligibleAboveFailureRate': .005},
+                                               'common': {'selectionTieTolerance': 1e-8}}
+                and self._selector.rows == self._accepted_rows, 'selector_state_or_grid_changed')
+
+    def add(self, origin, rows, grading_receipt):
+        self._integrity()
+        origin = _context_origin(self._context, origin)
+        require(self._next < len(self._origins) and encoded(origin) == self._origins[self._next], 'nonchronological_inner_batch')
+        require(type(grading_receipt) is _GradingReceipt and grading_receipt._seal is _SEAL
+                and grading_receipt.origin == _origin_key(origin) and grading_receipt.parent_manifest_sha256 == PARENT_MANIFEST,
+                'missing_bound_grading_receipt')
+        require(self._manifest is None or grading_receipt.manifest_sha256 == self._manifest, 'selection_run_swap')
+        year = origin['season']
+        require(year < 2013 or year in self._selector.frozen_choices, 'annual_selection_not_frozen_before_grading')
+        diagonal = grading_receipt._diagonal_binding
+        require([(i, game) for i, game, _, _ in diagonal]
+                == [(i, game) for game in origin['targetGameIds'] for i in range(9)], 'missing_diagonal_grading_binding')
+        diagonal = {(i, game): (energy, reason) for i, game, energy, reason in diagonal}
+        expected = [('E3', i, g) for g in origin['targetGameIds'] for i in range(27)]
+        require(type(rows) is list and len(rows) == len(expected), 'selection_batch_population')
+        additions = {}
+        for row, key in zip(rows, expected):
+            require(type(row) is dict and set(row) == {'family', 'setting', 'game_id', 'native_failure', 'metrics'}
+                    and type(row['setting']) is int and (row['family'], row['setting'], row['game_id']) == key,
+                    'selection_batch_order_or_types')
+            require(type(row['metrics']) is dict and 'joint_energy_score' in row['metrics'], 'selection_metric_missing')
+            energy = row['metrics']['joint_energy_score']
+            _number(energy, 'invalid_selection_energy', 0)
+            failed = _reason(row['native_failure'])
+            if row['setting'] < 9:
+                require(encoded([energy, row['native_failure']])
+                        == encoded(list(diagonal[row['setting'], row['game_id']])), 'reused_diagonal_selection_changed')
+            additions[year, row['game_id'], 'E3', row['setting']] = (float(energy), failed)
+        require(not (set(additions) & set(self._accepted_rows)), 'duplicate_selection_batch')
+        # Commit only after all rows pass; the unchanged helper now cannot fail.
+        for (y, game, family, setting), (energy, failed) in additions.items():
+            self._selector.add(y, game, family, setting, energy, failed)
+        self._accepted_rows.update(additions)
+        self._manifest = grading_receipt.manifest_sha256
+        self._next += 1
+
+    def select(self, year, expected_by_season):
+        self._integrity()
+        require(type(year) is int and 2013 <= year <= 2025, 'invalid_outer_year')
+        require(type(expected_by_season) is dict and all(type(y) is int for y in expected_by_season), 'invalid_universe_type')
+        admitted = self._context.expected_by_season
+        for prior in (year - 2, year - 1):
+            require(prior in expected_by_season and type(expected_by_season[prior]) is list
+                    and expected_by_season[prior] == admitted[prior], 'prior_universe_changed')
+        expected = {(y, g, 'E3', i) for y in (year - 2, year - 1) for g in admitted[y] for i in range(27)}
+        require({k for k in self._accepted_rows if k[0] in (year - 2, year - 1)} == expected, 'prior_selection_population')
+        require(not any(k[0] > year for k in self._accepted_rows), 'selection_future_prefill')
+        # Recompute from the same validated prior rows even when the pure helper
+        # has a cached choice, so tampering with that mutable cache fails closed.
+        fresh = SplitSelectionHistory()
+        fresh.rows = dict(self._accepted_rows)
+        expected_choice = fresh.select(year, expected_by_season)
+        if year in self._selector.frozen_choices:
+            require(self._selector.frozen_choices[year] == expected_choice, 'cached_selection_changed')
+        return self._selector.select(year, expected_by_season)

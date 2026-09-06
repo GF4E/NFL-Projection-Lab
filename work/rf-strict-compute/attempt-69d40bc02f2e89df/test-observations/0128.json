@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "item hook failed",
+    "module": "builtins",
+    "type": "RuntimeError"
+  },
+  "eligibility": {
+    "actual": null,
+    "expected": null,
+    "reason": "raw canonicalization must fail before encoding eligibility"
+  },
+  "input": {
+    "deterministic_builder": "failed-hook-ItemHook",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "ItemHook"
+  },
+  "label": "failed-hook-ItemHook",
+  "original": {
+    "kind": "error",
+    "message": "item hook failed",
+    "module": "builtins",
+    "type": "RuntimeError"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_raw_hook_failures_propagate_once"
+}

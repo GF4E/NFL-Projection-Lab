@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "keys must be str, int, float, bool or None, not tuple",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "eligibility": {
+    "actual": false,
+    "expected": false,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "unsupported-key-5",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "dict"
+  },
+  "label": "unsupported-key-5",
+  "original": {
+    "kind": "error",
+    "message": "keys must be str, int, float, bool or None, not tuple",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_nonstring_and_mixed_keys_delegate"
+}

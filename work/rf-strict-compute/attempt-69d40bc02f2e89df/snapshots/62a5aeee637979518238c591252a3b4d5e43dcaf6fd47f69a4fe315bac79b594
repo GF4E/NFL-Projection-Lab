@@ -1,0 +1,138 @@
+"""Chronological trajectory-bank and season-selection controls; no I/O."""
+from dataclasses import replace
+import copy
+import math
+
+import numpy as np
+
+from research_score_distribution import JointBase, NumericalFailure
+from research_score_models import MeanTrajectory, canonical_seed, setting_grid, weights
+
+
+def registered_series(config):
+    result = []
+    for family in config["models"]:
+        result.append((family, "full"))
+        for variant in config["variants"]["allModels"] + config["variants"].get(family, []) + config["variants"]["negativeControlsAllModels"]:
+            result.append((family, variant))
+    if len(result) != 40 or len(set(result)) != 40:
+        raise ValueError("registered_series_count_changed")
+    return result
+
+
+class SelectionHistory:
+    """Outer outcomes are never an argument to selection for that season."""
+    def __init__(self, config):
+        self.config, self.settings = config, setting_grid(config)
+        self.rows = {}
+        self.frozen_choices = {}
+
+    def add(self, season, game_id, family, setting, energy, native_failed):
+        if family not in self.settings or not 0 <= setting < len(self.settings[family]):
+            raise ValueError("unknown_setting")
+        if not math.isfinite(energy) or energy < 0:
+            raise ValueError("invalid_selection_loss")
+        key = (season, game_id, family, setting)
+        if key in self.rows:
+            raise ValueError("duplicate_inner_loss")
+        self.rows[key] = (float(energy), bool(native_failed))
+
+    def select(self, season, expected_by_season):
+        if season in self.frozen_choices:
+            return copy.deepcopy(self.frozen_choices[season])
+        if season < 2013 or season > 2025:
+            raise ValueError("unregistered_outer_season")
+        inner = (season - 2, season - 1)
+        if any(s not in expected_by_season for s in inner):
+            raise ValueError("missing_inner_universe")
+        expected = {(s, identity) for s in inner for identity in expected_by_season[s]}
+        if not expected:
+            raise ValueError("empty_inner_universe")
+        decision = {}
+        for family, settings in self.settings.items():
+            candidates = []
+            for setting in range(len(settings)):
+                available = {(s, identity): row for (s, identity, f, j), row in self.rows.items()
+                             if s in inner and f == family and j == setting}
+                if set(available) != expected:
+                    raise ValueError("inner_common_game_mismatch")
+                rows = [available[key] for key in sorted(expected)]
+                mean = float(np.mean([r[0] for r in rows]))
+                failure_rate = float(np.mean([r[1] for r in rows]))
+                candidates.append({"setting": setting, "mean_energy": mean, "failure_rate": failure_rate,
+                                   "eligible": failure_rate <= self.config["failure"]["innerSettingIneligibleAboveFailureRate"]})
+            eligible = [candidate for candidate in candidates if candidate["eligible"]]
+            if family == "N0" and not eligible:
+                raise ValueError("N0_inner_failure")
+            best = None
+            if eligible:
+                minimum = min(c["mean_energy"] for c in eligible)
+                best = next(c["setting"] for c in eligible if c["mean_energy"] <= minimum + self.config["common"]["selectionTieTolerance"])
+            decision[family] = {"setting": best, "inner_seasons": list(inner), "games": len(expected),
+                                "status": "selected" if best is not None else "no_eligible_setting", "candidates": candidates}
+        self.frozen_choices[season] = copy.deepcopy(decision)
+        return decision
+
+
+class TrajectoryBank:
+    """No splicing: every setting/algorithm owns its entire from-2010 history."""
+    def __init__(self, config, teams):
+        self.settings = setting_grid(config)
+        self.series = registered_series(config)
+        self.engines = {}
+        for family, variant in self.series:
+            if variant in {"independent_marginals", "deterministic_noise"}:
+                continue  # These alter only the output of the unchanged full trajectory.
+            for i, setting in enumerate(self.settings[family]):
+                self.engines[(family, i, variant)] = MeanTrajectory(family, setting, teams, variant)
+
+    def advance(self, season, week, prepared):
+        outputs = {}
+        for key, engine in self.engines.items():
+            delay = 24 if key[2] == "availability_24h" else 12
+            data = prepared[delay]
+            outputs[key] = engine.forecast_origin(season, week, data["history"], data["targets"])
+        return outputs
+
+    def selected_output(self, outputs, family, setting, variant):
+        if setting is None:
+            return None
+        key_variant = "full" if variant in {"independent_marginals", "deterministic_noise"} else variant
+        output = outputs[(family, setting, key_variant)]
+        if variant != "deterministic_noise":
+            return output
+        result = copy.deepcopy(output)
+        for row in result["forecasts"]:
+            if row["mean"] is None:
+                continue
+            row["mean"] += np.array([np.random.Generator(np.random.PCG64(canonical_seed("noise", row["game_id"], side))).standard_normal() for side in ("home", "away")])
+            if np.any(row["mean"] <= 0) or not np.all(np.isfinite(row["mean"])):
+                row["failure"] = "invalid_mean"
+        return result
+
+
+def common_mapper(prepared, season):
+    # Reconstruct from eligible football rows, never from a variant's mean offsets.
+    history = prepared["history"]
+    return JointBase.from_scores([[r.home_score, r.away_score] for r in history], weights(history, season, 2.5))
+
+
+def resolve_distribution(mapper, forecast, family, variant, n0_distribution):
+    """Full common-game fallback policy; caller records the returned failure."""
+    failure = "no_eligible_setting" if forecast is None else forecast["failure"]
+    fitted = None
+    if failure is None:
+        try:
+            fitted = mapper.fit(forecast["mean"])
+            if variant == "independent_marginals":
+                fitted = replace(fitted, independent=True)
+            fitted.grid()
+        except NumericalFailure as exc:
+            failure = str(exc)
+    if failure is not None:
+        if family == "N0" and variant == "full":
+            raise ValueError("N0_scored_forecast_failure:" + failure)
+        if n0_distribution is None:
+            raise ValueError("fallback_distribution_missing")
+        return n0_distribution, failure
+    return fitted, None

@@ -1,0 +1,91 @@
+import copy
+import importlib.util
+import json
+import os
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+spec = importlib.util.spec_from_file_location("research_score_run", ROOT / "scripts/research_score_run.py")
+runner = importlib.util.module_from_spec(spec)
+sys.modules[spec.name] = runner
+spec.loader.exec_module(runner)
+
+
+class RunTests(unittest.TestCase):
+    def test_immutable_run_exact_bytes_dedup_conflict_and_restart_refusal(self):
+        with tempfile.TemporaryDirectory() as temp:
+            parent = Path(temp).resolve()
+            store = runner.ImmutableRun(parent, "synthetic-run")
+            try:
+                raw = b' {"preserve":"exact bytes"}\n'
+                sha = store.write("example.json", raw)
+                self.assertEqual(sha, runner.digest(raw))
+                self.assertEqual(store.read("example.json"), raw)
+                self.assertEqual(store.write("example.json", raw), sha)
+                with self.assertRaisesRegex(ValueError, "immutable_output_conflict"):
+                    store.write("example.json", b"different")
+                pointer = store.object({"a": [1, 2]})
+                self.assertEqual(pointer, store.object({"a": [1, 2]}))
+                store.finish_index()
+                self.assertEqual(json.loads(store.read("artifact-index.json"))["files"]["example.json"]["sha256"], sha)
+                with self.assertRaises(FileExistsError):
+                    runner.ImmutableRun(parent, "synthetic-run")
+            finally:
+                store.close()
+
+    def test_output_symlink_and_traversal_refused(self):
+        with tempfile.TemporaryDirectory() as temp:
+            parent = Path(temp).resolve()
+            store = runner.ImmutableRun(parent, "synthetic-run")
+            try:
+                with self.assertRaisesRegex(ValueError, "invalid_output_name"):
+                    store.write("../outside.json", {})
+                for invalid in ("../outside.json", "/absolute.json"):
+                    with self.assertRaisesRegex(ValueError, "invalid_output_name"):
+                        store.read(invalid)
+                os.symlink("nonexistent-target", "alias.json", dir_fd=store.fd)
+                with self.assertRaises(OSError):
+                    store.write("alias.json", b"must_not_follow")
+            finally:
+                store.close()
+
+    def test_distribution_recovery_and_corruption(self):
+        from research_score_distribution import JointBase
+        mapper = JointBase.from_scores([[14, 21], [28, 17], [0, 3]], [1, 2, 1])
+        fitted = mapper.fit([20, 22])
+        descriptor = runner.distribution_descriptor(fitted, {"sha256": "synthetic"})
+        recovered = runner.recover_distribution(mapper, descriptor)
+        self.assertEqual(recovered.log_probability(17, 20), fitted.log_probability(17, 20))
+        for field, value in (("alphaSha256", "wrong"), ("rates", [2, 3]), ("mean", [10, 20]), ("theta", [0, 0])):
+            changed = copy.deepcopy(descriptor)
+            changed[field] = value
+            with self.assertRaisesRegex(ValueError, "distribution_.*mismatch"):
+                runner.recover_distribution(mapper, changed)
+
+    def test_complete_lineage_root_and_retrospective_label(self):
+        prepared = {"input_hash": "synthetic", "input_ids": ["old"], "origin_at": "2013-09-10T14:30:00+00:00"}
+        value = runner.lineage(prepared, "config", "code", "manifest", {"forecast_bytes_sha256": "output"})
+        self.assertEqual(value["nodes"][-1]["sha256"], value["expected_root"])
+        source = next(node for node in value["nodes"] if node["kind"] == "football_source")
+        self.assertEqual(source["body"]["availability_class"], "retrospective_inferred")
+        target = next(node for node in value["nodes"] if node["kind"] == "target_schema")
+        self.assertEqual(target["body"]["fields"], ["home_final_score_including_OT", "away_final_score_including_OT"])
+        model = next(node for node in value["nodes"] if node["kind"] == "model")
+        self.assertIn({"id": target["id"], "sha256": target["sha256"]}, model["parents"])
+
+    def test_required_code_and_test_files_exist(self):
+        for name in runner.CODE_FILES + runner.TEST_FILES:
+            self.assertTrue((ROOT / name).is_file(), name)
+
+    def test_budget_check_fail_closed(self):
+        with self.assertRaisesRegex(ValueError, "registered_runtime_or_memory_budget_exceeded"):
+            runner.check_budget(0, {"budget": {"fullReplayMaximumSeconds": -1, "maximumResidentMb": 4096}})
+
+
+if __name__ == "__main__":
+    unittest.main()

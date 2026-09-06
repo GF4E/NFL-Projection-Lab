@@ -1,0 +1,168 @@
+# RF-COMP-07: bounded lag-distance reuse
+
+Status: frozen scope for one standalone computational qualification. No model
+change, controller integration, new historical invocation or public update.
+Implement and statically review the source/tests/driver and exact inputs before
+the sole execution. Preserve the original79 files and every closed attempt.
+
+## Evidence and hypothesis
+
+The accepted current-origin profile contains40 new score callbacks (36 inner,
+four outer),40 base80x80 grids and22 explicit doubled160x160 grids. Exact source
+padding implies40 lag-distance matrices256x256 and22 matrices512x512. A shared
+owner could avoid60 repeated constructions after two cold fills. Copied64x64
+score rows are excluded. The source-derived doubled/padded sizes are not saved
+array observations and must be checked in the new actual qualification.
+
+Energy scoring consumed0.120851958 profiled seconds, including0.080686781 of
+identified probability-dependent work that must remain. The loose residual
+ceiling0.040165177 still contains required work; actual lag-distance cost is
+unmeasured. Profiler overhead2.3426 forbids a speedup estimate from these shares.
+Read-only assessments are owner-workspace work/rf-energy-geometry/
+attribution-assessment.md (dccd62268c149a7719e378945a51e45a163e57c23d6c3ad253bf37e0ca942f52),
+numerical-contract-assessment.md (fa13c9ea7840d94b9da7f628122251a3db832e20b6c97bc0554f24336db596b8),
+and lag-distance-contract.md (02ef8cdc6e5850470617beb8e659f9b7b22798e47cb0d3311354bee3e69a1866).
+
+Hypothesis: one explicitly owned, bounded cache of only immutable lag-distance
+matrices reduces complete scoring cost enough to justify later integration,
+while preserving exact original scores, errors and all current-data work.
+This is different from the retained/deferred bank snapshot and rejected pretty
+serializer. Neither is combined with this test.
+
+## Single implementation and ownership
+
+New source: scripts/research_score_energy_geometry.py. Public LagGeometry owner
+has energy_score(grid, observed), score_forecast(distribution, observed, game_id,
+double_grid=True, diagnostics=True), and cache_info() reporting only entries,
+retained_bytes, hits, misses and evictions. One owner spans the registered
+score sequence. New owners begin empty; no process-global cache or persistence.
+
+Supported direct energy inputs: exact original ScoreGrid type; exact NumPy
+ndarray probability, dtype equal to float64, rank two, positive dimensions at
+most256; exact float64 observed ndarray with shape(2,). Do not scan probability
+or observation values or impose new finite/mass/target validation. Unsupported
+inputs call the original energy function once without coercion or changed hooks.
+Rejecting arbitrary grid types must happen before reading their attributes.
+Reading the field of an exact dataclass for dtype/shape inspection adds no
+arbitrary hook. Do not copy/cast/reshape the current probability array.
+
+Keep dense np.indices, the observed-distance hypot, first-term arithmetic and
+the original padding expression unchanged. Keep forward/inverse FFT arguments,
+conjugation, every correlation minimum/sum check, clipping, repeated sum and
+normalization, final multiplication/reduction/subtraction, validation and clamp
+unchanged and fresh on every supported invocation. No observation, probability,
+distribution, grid, transform, score, callback result or prediction is cached.
+
+Replace only the late lag-vector/distance construction, at its original position
+after successful FFT validation, clipping and normalization. Key is the actual
+padded shape: an exact two-int tuple of positive powers of two, each at most512.
+Build misses with the exact original np.arange/np.where/np.hypot expressions.
+Do not construct geometry before its original stage. Unexpected constructor or
+FFT errors propagate without retry. Unsupported padded shapes use the original
+calculation without retention.
+
+Cache at most two distance matrices, FIFO insertion order; hits do not reorder.
+Only after the originating complete energy call succeeds may a miss be published
+and the oldest entry evicted. Failures must neither publish nor evict. Retained
+matrices are private, exact float64 C-order, read-only arrays; no retained lag
+vectors or coordinate arrays. Two maximum512x512 matrices contain at most4MiB
+of array bytes, excluding ordinary Python headers and transient miss storage.
+This is not a process-memory bound or adversarial security boundary. A warm hit
+intentionally skips geometry construction and cannot promise the allocation or
+monkeypatched-constructor failure of work it no longer performs. Ordinary
+numerical error behavior, failed-miss state and current-data reads remain tested.
+Counters count late lookups: hits on found entries, misses on missing supported
+keys even if the later call fails, and evictions only on successful publication.
+Unsupported fallback does not touch those counters or entries.
+
+The owner score method wraps the existing SkellamDistribution exactly once,
+then invokes a static copy of the small original score_forecast function with
+only an explicit energy callable added and used at its two original sites.
+All observation validation, grid/CRPS/double-grid work, diagnostics, quantiles,
+CDF caching, metric fields and operation order remain unchanged. Confirm this
+body correspondence statically. Import unchanged helpers; do not rebind frozen
+globals, patch shared NumPy/module objects, clone functions at runtime or create
+a controller copy/framework. Candidate-local dependency aliases may support
+scoped test spies/injections; normal calls must be the original numerical APIs.
+
+## Exactness before cost
+
+Independent tests: tests/research-score-energy-geometry/test_energy_geometry.py.
+Original energy and current Skellam score wrapper are the oracles. Preserve
+observations before assertions: exact float bits/type, encoded full metrics,
+warnings/errors/events, cache counts and lossless input metadata. Supplementary
+direct mathematical checks do not replace original bit equality.
+
+Cover cold/warm results, degenerate/two-atom/sparse/asymmetric/rectangular grids,
+axis swaps, singleton axes, FFT-padding transitions, supported bounds, fallback
+beyond bounds, same padded shape with different actual shapes, and alternating
+base/double grids. Mutate probabilities and observations between hits; include
+signed zero, read-only/strided/transposed arrays, unsupported types/subclasses,
+invalid observations/probabilities and every named energy failure. Verify
+isolated owners, two-entry FIFO with a third shape, successful-call-only
+publication/eviction, read-only ownership, and bounded retained bytes.
+
+Use candidate-local spies wrapping actual FFTs to demonstrate fresh forward and
+inverse work on every successful cold/warm call, original late construction,
+no raw-data retention, and exact failed-miss behavior. Deliberate injected errors
+are propagation tests, not claims that skipped work must still execute. Avoid
+reloading original modules or patching frozen/shared globals. Preserve all tests
+and partial outcomes on failure; no unchanged retry or alternative candidate.
+
+## Complete retained-fixture comparison
+
+Reconstruct the40 actual score calls in original saved callback order from the
+accepted origin's scientific-witness.json: original flags, game IDs, observed
+pair, and complete resolved-law field bytes. Do not fit, advance a trajectory,
+open a new historical archive, change labels or generate new predictions.
+Construct original JointDistribution fields from authenticated saved float64
+bytes and scalar bits. Document derived contiguous ownership; retain lossless
+fixture bodies once with per-call hash references. Original scientific witness
+SHA e695fcbcfc6f1c03754e1186c344cdc42bfa4cc45575ff517ecc4703f75f4db2.
+
+First perform one complete40-call original parity pass and one candidate parity
+pass with a fresh empty owner. Compare full original encoded metric dictionaries
+with each other and with the saved callback fields. The four outer interval-mass
+fields were computed after the score callback and are excluded by exact names
+only; all other fields must match. Verify actual80/160 grids and62 FFT pairs,
+two successful cold fills,60 hits,zero evictions and2.5MiB retained matrices.
+No copied score rows, templates or numerical stubs enter this workload.
+
+Only after exactness passes, run exactly one original40-call pass followed by
+one candidate40-call pass with another new empty owner. No warmup, repetitions,
+retiming, favorable subsets or timing selection. Each callback timer includes
+the complete existing distribution wrapper, scoring, all cold fills/lookups and
+cache work. Record owner construction separately and add it to candidate total;
+all setup, fixture reconstruction, tests, validation and evidence writes remain
+inside the total command clock. No fit timing is simulated or credited.
+
+The materiality screen is fixed before execution. Original historical maxima
+F=0.003964416013332084 and S=0.004798125009983778 imply a conditional score-only
+target S=0.0037128263652885327 when holding other terms fixed:22.619224% lower S.
+Use candidate/original ratio less than or equal to0.7738077598151377 as the
+engineering screen for both the complete40-call total (including candidate
+owner setup) and maximum single scored callback. Equality at the threshold
+passes; both ratios must pass. A pass is only an integration lead: this tiny, fixed-order
+panel does not estimate historical maxima or establish capacity. If exactness
+fails, cost is equal/slower, or either materiality screen fails, defer/remove this
+candidate from immediate integration and preserve the finding. Do not weaken
+the fixed historical7200-second gate or combine unmeasured bank-snapshot gains.
+
+## One bounded command and closure
+
+One parent-observed qualification, at most60 seconds and1024MiB setup-inclusive;
+reserve final5 seconds for evidence within the same cap, parent128/child896MiB.
+Use the existing watchdog implementation. Initial parent interpreter startup may
+be excluded only if explicitly recorded; sampled/waited RSS is not instantaneous
+kernel enforcement. Authenticate source/input/runtime bytes before and after.
+Pin all79 original source files, seven original runtime files, relevant NumPy
+FFT/numerical/native runtime files, scope, assessments, candidate/tests/driver,
+the accepted profile state/index/witness and closed COMP06 acceptance. Snapshot
+new/exact input bodies once; do not rehash old complete archives unnecessarily.
+
+Retain actual process handle/exit, logs, outcomes, full metric bytes, input
+witnesses and references, timing/cache records, before/after hashes, file index
+and failure evidence. No review writes inside the sealed attempt. Root and
+independent numerical/resource reviewers must inspect saved evidence after the
+actual process closes. No controller integration, prospective activation,
+historical invocation, external5% or predictive acceptance follows automatically.

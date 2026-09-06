@@ -1,0 +1,24 @@
+test_budget_exception_escapes_without_archive_or_output (__main__.PreflightTests.test_budget_exception_escapes_without_archive_or_output) ... ok
+test_duplicate_nonfinite_and_overflow_json_fail (__main__.PreflightTests.test_duplicate_nonfinite_and_overflow_json_fail) ... ok
+test_full_membership_and_frozen_pin_rejected (__main__.PreflightTests.test_full_membership_and_frozen_pin_rejected) ... ok
+test_manifest_bytes_equal_accepted_store_canonical_bytes (__main__.PreflightTests.test_manifest_bytes_equal_accepted_store_canonical_bytes) ... FAIL
+test_manifest_deterministic_and_excludes_observation_state (__main__.PreflightTests.test_manifest_deterministic_and_excludes_observation_state) ... ok
+test_production_registry_and_runtime_are_closed (__main__.PreflightTests.test_production_registry_and_runtime_are_closed) ... ok
+test_real_file_nosymlink_size_and_hash_boundary (__main__.PreflightTests.test_real_file_nosymlink_size_and_hash_boundary) ... ok
+test_review_and_qualification_bindings_cannot_be_truthy_grants (__main__.PreflightTests.test_review_and_qualification_bindings_cannot_be_truthy_grants) ... ok
+test_runtime_and_permissions_are_exact_native_types (__main__.PreflightTests.test_runtime_and_permissions_are_exact_native_types) ... ok
+test_source_config_and_protocol_bytes_are_authenticated (__main__.PreflightTests.test_source_config_and_protocol_bytes_are_authenticated) ... ok
+test_stage_and_evidence_pointer_tampering (__main__.PreflightTests.test_stage_and_evidence_pointer_tampering) ... ok
+
+======================================================================
+FAIL: test_manifest_bytes_equal_accepted_store_canonical_bytes (__main__.PreflightTests.test_manifest_bytes_equal_accepted_store_canonical_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_preflight_unit.py", line 70, in test_manifest_bytes_equal_accepted_store_canonical_bytes
+    self.assertEqual(p.encoded({"zero": -0.0}), strict({"zero": -0.0}))
+AssertionError: b'{"zero":-0.0}\n' != b'{\n  "zero": -0.0\n}\n'
+
+----------------------------------------------------------------------
+Ran 11 tests in 0.438s
+
+FAILED (failures=1)

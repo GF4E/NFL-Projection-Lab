@@ -1,0 +1,42 @@
+"""RF-02C exact CDF memoization, isolated to one unchanged scoring call."""
+from dataclasses import fields
+import math
+
+import numpy as np
+
+from research_score_distribution import JointDistribution
+from research_score_metrics import score_forecast as legacy_score_forecast
+
+
+class MemoizedDistribution(JointDistribution):
+    """Copy the analytic distribution; inherit every calculation except CDF reuse."""
+
+    def __init__(self, distribution):
+        values = {}
+        for field in fields(JointDistribution):
+            value = getattr(distribution, field.name)
+            if isinstance(value, np.ndarray):
+                value = value.copy(order="K")
+                value.setflags(write=False)
+            values[field.name] = value
+        super().__init__(**values)
+        self._cdf_cache = {}
+
+    def cdf(self, target, value):
+        key = (target, math.floor(value))
+        try:
+            return self._cdf_cache[key]
+        except TypeError:
+            # Unhashable invalid targets must retain the inherited exception,
+            # rather than gaining a dictionary-lookup TypeError.
+            return super().cdf(target, value)
+        except KeyError:
+            answer = super().cdf(target, value)
+            self._cdf_cache[key] = answer
+            return answer
+
+
+def score_forecast(distribution, observed, game_id, double_grid=True, diagnostics=True):
+    return legacy_score_forecast(
+        MemoizedDistribution(distribution), observed, game_id,
+        double_grid=double_grid, diagnostics=diagnostics)

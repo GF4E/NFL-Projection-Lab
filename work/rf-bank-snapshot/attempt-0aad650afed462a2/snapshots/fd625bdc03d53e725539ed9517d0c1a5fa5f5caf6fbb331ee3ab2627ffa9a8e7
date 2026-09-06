@@ -1,0 +1,273 @@
+"""No real historical fit: hand-solvable state updates and time falsifiers."""
+import importlib.util
+import json
+from pathlib import Path
+import sys
+import unittest
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+SPEC = importlib.util.spec_from_file_location("research_score_models", ROOT / "scripts/research_score_models.py")
+m = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = m
+SPEC.loader.exec_module(m)
+TEAMS = tuple(f"T{i:02}" for i in range(32))
+
+
+def game(i, season=2010, week=1, home="T00", away="T01", neutral=False):
+    return m.GameContext(str(i), season, week, home, away, neutral)
+
+
+def result(g, h=28, a=14):
+    return m.HistoricalResult(g, h, a)
+
+
+def model(family="E1", variant="full", **changes):
+    setting = {"N0": {}, "S1": {"ridge": 16, "half_life": 2.5},
+               "E1": {"k": 20, "retention": .5, "home_points": 0},
+               "E2": {"k": .1, "retention": .5}}[family]
+    return m.MeanTrajectory(family, setting | changes, TEAMS, variant)
+
+
+def forecasts_by_id(batch):
+    return {row["game_id"]: row for row in batch["forecasts"]}
+
+
+class MeanModelTests(unittest.TestCase):
+    def test_grid_is_exact_and_in_frozen_order(self):
+        grid = m.setting_grid(json.loads((ROOT / "config/research-team-score.v2.json").read_text()))
+        self.assertEqual({family: len(settings) for family, settings in grid.items()}, {"N0": 1, "S1": 6, "E1": 27, "E2": 9})
+        self.assertEqual(grid["S1"][:3], [{"ridge": 16, "half_life": h} for h in (2.5, 4, 1.5)])
+        self.assertEqual(grid["E1"][0], {"k": 10, "retention": .5, "home_points": 0})
+        self.assertEqual(grid["E1"][-1], {"k": 40, "retention": 1, "home_points": 80})
+
+    def test_elo_uses_stored_expectation_and_delivers_once(self):
+        engine = model()
+        first = game("first")
+        engine.forecast_origin(2010, 1, [], [first])
+        self.assertEqual(engine.stored["first"]["expected_win"], .5)
+        batch = engine.forecast_origin(2010, 2, [result(first)], [game("second", week=2)])
+        np.testing.assert_allclose(engine.ratings[:2], [1510, 1490])
+        self.assertEqual(batch["events"]["delivered"], ["first"])
+        self.assertAlmostEqual(engine.ratings.mean(), 1500)
+        engine.forecast_origin(2010, 3, [result(first)], [game("third", week=3)])
+        np.testing.assert_allclose(engine.ratings[:2], [1510, 1490])
+
+    def test_delayed_results_do_not_use_updated_expectations(self):
+        engine = model()
+        first, second = game("first"), game("second", week=2)
+        engine.forecast_origin(2010, 1, [], [first])
+        engine.forecast_origin(2010, 2, [], [second])
+        engine.forecast_origin(2010, 3, [result(first), result(second)], [game("third", week=3)])
+        np.testing.assert_allclose(engine.ratings[:2], [1520, 1480])
+
+    def test_elo_prior_season_delivery_precedes_retention(self):
+        engine = model()
+        first = game("late")
+        engine.forecast_origin(2010, 1, [], [first])
+        batch = engine.forecast_origin(2011, 1, [result(first)], [game("new", season=2011)])
+        np.testing.assert_allclose(engine.ratings[:2], [1505, 1495])
+        self.assertTrue(batch["events"]["offseason_retention_applied"])
+
+    def test_elo_home_term_tie_and_2020_multiplier(self):
+        engine = model(home_points=40)
+        first = game("tie", season=2020)
+        engine.forecast_origin(2020, 1, [], [first])
+        e = 1 / (1 + 10 ** (-.1))
+        engine.forecast_origin(2020, 2, [result(first, 20, 20)], [game("next", season=2020, week=2)])
+        self.assertAlmostEqual(engine.ratings[0], 1500 + 10 * (.5 - e))
+
+    def test_elo_score_mapping_uses_original_x(self):
+        engine = model(home_points=40)
+        first = game("first")
+        engine.forecast_origin(2010, 1, [], [first])
+        batch = engine.forecast_origin(2010, 2, [result(first)], [game("second", week=2)])
+        expected_slope = .1 * 14 / (.1 ** 2 + 16)
+        self.assertAlmostEqual(batch["elo_score_slope"], expected_slope)
+        x = engine.stored["second"]["x"]
+        np.testing.assert_allclose(batch["forecasts"][0]["mean"], [21 + expected_slope * x / 2, 21 - expected_slope * x / 2])
+
+    def test_e2_initialization_skipped_even_if_delivered_later(self):
+        engine = model("E2")
+        first, delayed = game("first"), game("delayed", home="T02", away="T03")
+        engine.forecast_origin(2010, 1, [], [first, delayed])
+        second = game("second", week=2)
+        b2 = engine.forecast_origin(2010, 2, [result(first)], [second])
+        self.assertEqual(b2["events"]["initialization_only"], ["first"])
+        np.testing.assert_allclose(engine.offense, 0)
+        batch = engine.forecast_origin(2010, 3, [result(first), result(delayed)], [game("third", week=3)])
+        self.assertEqual(batch["events"]["initialization_only"], ["delayed"])
+        np.testing.assert_allclose(engine.offense, 0)
+        np.testing.assert_allclose(engine.defense, 0)
+
+    def test_e2_hand_computed_residual_update_and_centering(self):
+        engine = model("E2")
+        first, second = game("first"), game("second", week=2)
+        engine.forecast_origin(2010, 1, [], [first])
+        engine.forecast_origin(2010, 2, [result(first)], [second])
+        np.testing.assert_allclose(engine.stored["second"]["mean"], [28, 14])
+        engine.forecast_origin(2010, 3, [result(first), result(second, 35, 10)], [game("third", week=3)])
+        expected_o, expected_d = np.zeros(32), np.zeros(32)
+        expected_o[0], expected_o[1] = .35, -.2
+        expected_d[1], expected_d[0] = -.35, .2
+        expected_o -= expected_o.mean()
+        expected_d -= expected_d.mean()
+        np.testing.assert_allclose(engine.offense, expected_o)
+        np.testing.assert_allclose(engine.defense, expected_d)
+
+    def test_noise_does_not_change_learning(self):
+        full, noise = model("E2"), model("E2", "deterministic_noise")
+        past = []
+        for week in range(1, 5):
+            current = game(f"g{week}", week=week)
+            a = full.forecast_origin(2010, week, past, [current])
+            b = noise.forecast_origin(2010, week, past, [current])
+            np.testing.assert_array_equal(full.offense, noise.offense)
+            np.testing.assert_array_equal(full.defense, noise.defense)
+            if week > 1:
+                np.testing.assert_array_equal(full.stored[current.game_id]["mean"], noise.stored[current.game_id]["mean"])
+                self.assertFalse(np.array_equal(a["forecasts"][0]["mean"], b["forecasts"][0]["mean"]))
+            past.append(result(current, 20 + week, 17))
+
+    def test_nonfinite_state_is_absorbing(self):
+        for family, field in (("E1", "ratings"), ("E2", "offense")):
+            engine = model(family)
+            first = game("first")
+            engine.forecast_origin(2010, 1, [], [first])
+            getattr(engine, field)[0] = np.nan
+            failed = engine.forecast_origin(2010, 2, [result(first)], [game("second", week=2)])
+            self.assertTrue(failed["absorbing_failure"])
+            self.assertEqual(failed["forecasts"][0]["failure"], "nonfinite_dynamic_state")
+            getattr(engine, field)[:] = 0
+            still = engine.forecast_origin(2011, 1, [result(first)], [game("later", season=2011)])
+            self.assertTrue(still["absorbing_failure"])
+            self.assertIsNone(still["forecasts"][0]["mean"])
+
+    def test_finite_negative_e2_mean_keeps_own_residual(self):
+        engine = model("E2")
+        first, second = game("first"), game("second", week=2)
+        engine.forecast_origin(2010, 1, [], [first])
+        engine.defense[1] = 100.
+        b = engine.forecast_origin(2010, 2, [result(first)], [second])
+        self.assertEqual(b["forecasts"][0]["failure"], "invalid_mean")
+        self.assertFalse(engine.failed)
+        saved = engine.stored["second"]["mean"].copy()
+        self.assertLess(saved[0], 0)
+        before = engine.offense.copy()
+        engine.forecast_origin(2010, 3, [result(first), result(second)], [game("third", week=3)])
+        delta = np.zeros(32)
+        delta[0], delta[1] = .05 * (28 - saved[0]), .05 * (14 - saved[1])
+        delta -= delta.mean()
+        np.testing.assert_allclose(engine.offense, before + delta)
+
+    def test_no_offense_or_defense_are_true_removals(self):
+        for variant, field in (("no_offense", "offense"), ("no_defense", "defense")):
+            engine = model("E2", variant)
+            first, second = game("first"), game("second", week=2)
+            engine.forecast_origin(2010, 1, [], [first])
+            engine.forecast_origin(2010, 2, [result(first)], [second])
+            engine.forecast_origin(2010, 3, [result(first), result(second, 40, 0)], [game("third", week=3)])
+            np.testing.assert_array_equal(getattr(engine, field), np.zeros(32))
+
+    def test_separate_setting_banks_do_not_share_state(self):
+        small, large = model(k=10), model(k=40)
+        first = game("first")
+        for engine in (small, large):
+            engine.forecast_origin(2010, 1, [], [first])
+            engine.forecast_origin(2010, 2, [result(first)], [game("second", week=2)])
+        self.assertEqual(small.ratings[0], 1505)
+        self.assertEqual(large.ratings[0], 1520)
+        self.assertFalse(np.shares_memory(small.ratings, large.ratings))
+
+    def test_same_week_future_and_duplicate_origin_rejected(self):
+        engine = model()
+        first = game("first")
+        for bad in (result(first), result(game("future", week=2))):
+            with self.assertRaisesRegex(ValueError, "same_week_or_future_input"):
+                engine.forecast_origin(2010, 1, [bad], [first])
+        engine.forecast_origin(2010, 1, [], [first])
+        with self.assertRaisesRegex(ValueError, "origin_not_strictly_chronological"):
+            engine.forecast_origin(2010, 1, [], [first])
+
+    def test_missing_original_forecast_cannot_be_invented(self):
+        with self.assertRaisesRegex(ValueError, "result_without_original_origin_expectation"):
+            model().forecast_origin(2010, 2, [result(game("unseen"))], [game("target", week=2)])
+
+    def test_shuffled_identity_is_week_specific_bijection_and_deterministic(self):
+        a, b = model(variant="shuffled_identity"), model(variant="shuffled_identity")
+        first = game("first")
+        a.forecast_origin(2010, 1, [], [first])
+        b.forecast_origin(2010, 1, [], [first])
+        self.assertEqual(a.permutations, b.permutations)
+        self.assertEqual(set(a.permutations[(2010, 1)].values()), set(TEAMS))
+        a.forecast_origin(2010, 2, [result(first)], [game("second", week=2)])
+        self.assertNotEqual(a.permutations[(2010, 1)], a.permutations[(2010, 2)])
+
+    def test_source_reordering_invariance(self):
+        for family in ("N0", "S1", "E1", "E2"):
+            a, b = model(family), model(family)
+            first = [game("a"), game("b", home="T02", away="T03")]
+            targets = [game("c", week=2), game("d", week=2, home="T02", away="T03")]
+            a.forecast_origin(2010, 1, [], first)
+            b.forecast_origin(2010, 1, [], first[::-1])
+            old = [result(first[0]), result(first[1], 17, 10)]
+            af = forecasts_by_id(a.forecast_origin(2010, 2, old, targets))
+            bf = forecasts_by_id(b.forecast_origin(2010, 2, old[::-1], targets[::-1]))
+            for identity in af:
+                np.testing.assert_allclose(af[identity]["mean"], bf[identity]["mean"], atol=1e-12)
+
+    def test_n0_pooling_hand_calculation_and_neutral_swap(self):
+        engine = model("N0")
+        first = game("first")
+        engine.forecast_origin(2010, 1, [], [first])
+        forward = game("next", week=2, neutral=True)
+        reverse = game("swap", week=2, home="T01", away="T00", neutral=True)
+        batch = forecasts_by_id(engine.forecast_origin(2010, 2, [result(first)], [forward, reverse]))
+        np.testing.assert_allclose(batch["next"]["mean"], [(28 + 4 * 21) / 5, (14 + 4 * 21) / 5])
+        np.testing.assert_allclose(batch["next"]["mean"], batch["swap"]["mean"][::-1])
+
+    def test_ridge_incidence_matches_laplacian_equations(self):
+        rows = [result(game("a"), 28, 14), result(game("b", home="T01", away="T02"), 17, 20),
+                result(game("c", home="T02", away="T00", neutral=True), 14, 10)]
+        h, r, support = m.ridge_srs(rows, TEAMS, 2011)
+        design = np.zeros((3, 33))
+        for i, row in enumerate(rows):
+            design[i, 0] = not row.context.neutral
+            design[i, 1 + TEAMS.index(row.context.home)] = 1
+            design[i, 1 + TEAMS.index(row.context.away)] = -1
+        w = m.weights(rows, 2011)
+        gram = design.T @ (w[:, None] * design) + np.diag([0] + [16] * 32)
+        y = np.array([14, -3, 4])
+        expected = np.linalg.solve(gram, design.T @ (w * y))
+        np.testing.assert_allclose(np.r_[h, r], expected, atol=1e-8)
+        self.assertLess(support["design_rank"], 32)
+        self.assertAlmostEqual(r.sum(), 0, places=12)
+
+    def test_n0_no_carryover_and_no_identity_keep_league_offset(self):
+        for variant in ("no_prior_season_carryover", "no_team_identity"):
+            engine = model("N0", variant)
+            first = game("first")
+            engine.forecast_origin(2010, 1, [], [first])
+            batch = engine.forecast_origin(2011, 1, [result(first)], [game("new", season=2011, neutral=True)])
+            np.testing.assert_allclose(batch["forecasts"][0]["mean"], [21, 21])
+
+    def test_no_home_effect_neutral_equivalence(self):
+        for family in ("N0", "S1", "E1", "E2"):
+            engine = model(family, "no_home_effect")
+            first = game("first")
+            engine.forecast_origin(2010, 1, [], [first])
+            batch = engine.forecast_origin(2010, 2, [result(first)], [game("h", week=2), game("n", week=2, neutral=True)])
+            values = forecasts_by_id(batch)
+            np.testing.assert_allclose(values["h"]["mean"], values["n"]["mean"], atol=1e-12)
+
+    def test_pit_seed_and_no_decay_weights(self):
+        self.assertEqual(m.canonical_seed("pit", "id", "home"), m.canonical_seed("pit", "id", "home"))
+        self.assertNotEqual(m.canonical_seed("pit", "id", "home"), m.canonical_seed("pit", "id", "away"))
+        self.assertTrue(0 < m.pit_uniform("id", "home") < 1)
+        rows = [result(game("a", season=2019)), result(game("b", season=2020))]
+        np.testing.assert_array_equal(m.weights(rows, 2021, None), [1, .5])
+
+
+if __name__ == "__main__":
+    unittest.main()

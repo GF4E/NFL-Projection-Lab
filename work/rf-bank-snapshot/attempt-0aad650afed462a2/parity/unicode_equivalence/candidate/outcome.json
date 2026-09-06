@@ -1,0 +1,22 @@
+{
+  "after": {
+    "mode": "fallback"
+  },
+  "before": {
+    "mode": "fallback"
+  },
+  "events": [
+    "before_capture_started",
+    "before_capture_finished",
+    "mutation_finished",
+    "after_capture_finished",
+    "comparison_finished"
+  ],
+  "name": "unicode_equivalence",
+  "outcome": {
+    "equal": true,
+    "kind": "comparison",
+    "type": "bool"
+  },
+  "route": "candidate"
+}

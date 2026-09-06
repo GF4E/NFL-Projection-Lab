@@ -1,0 +1,37 @@
+{
+  "status": "rejected",
+  "scope": "actual_owned_subprocess_controller_complete_smoke_handshake",
+  "source_hashes": {
+    "scripts/research_score_split_controller.py": "3f46bebd406aaed3f4b98f275bfb22a8a976927672a584ba7aa248d7f512f39a",
+    "scripts/research_score_split_watchdog.py": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7",
+    "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7"
+  },
+  "process_directory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/independent-handshake-1788618750787499000",
+  "process_report_sha256": "f30e5f36f7b22747ac2a04384ad9e17bd03e9eaa59c2d4df9f67036d78c6276e",
+  "process_status": "externally_stopped_process",
+  "exit_code": 1,
+  "phase_progression": [
+    {
+      "phase": "starting",
+      "smoke_started": null,
+      "smoke_finished": null,
+      "sha256": "fe6c80daa8d8d9411e9c18450a1b0e292c40eb63255f87b527c4ff45826279d9",
+      "observed_elapsed_seconds": 0.000935875010327436
+    },
+    {
+      "phase": "smoke",
+      "smoke_started": 102213.736236666,
+      "smoke_finished": null,
+      "sha256": "4b6f00708c8d8ea4c32f6dc827f17a91760da68202fa81a53000c2bd71de57ba",
+      "observed_elapsed_seconds": 0.6766459589998703
+    }
+  ],
+  "stderr": "Traceback (most recent call last):\n  File \"<string>\", line 6, in <module>\n  File \"/opt/anaconda3/lib/python3.12/contextlib.py\", line 137, in __enter__\n    return next(self.gen)\n           ^^^^^^^^^^^^^^\n  File \"/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py\", line 73, in complete_smoke\n    self._whole_smoke_deadline = phase['smoke_started'] + 120.\n                                 ~~~~~^^^^^^^^^^^^^^^^^\nTypeError: 'NoneType' object is not subscriptable\n",
+  "blockers": [
+    "Controller expects transition_phase return mapping, but held API returns None; durable smoke marker written, then TypeError before body."
+  ],
+  "limits": [
+    "Small actual subprocess workloads only; no run_smoke, fixture, admission or historical science.",
+    "Failed initial handshake cannot establish preparation/evaluator timing separation or all requested BaseException probes."
+  ]
+}

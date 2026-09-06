@@ -1,0 +1,395 @@
+"""One RF-02C replay with qualified per-call CDF caching and unchanged science."""
+import argparse
+import ast
+import json
+import math
+from statistics import median
+from pathlib import Path
+import re
+import sys
+import types
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+import research_score_run as legacy
+import research_score_replay as replay
+import research_score_successor_run as numerical
+from research_score_contract import digest, encoded, read_regular, runtime_manifest
+from research_score_successor_distribution import JointBase
+
+IMPLEMENTATION_PATH = ".planning/engine-os/research-first/RF-02C-IMPLEMENTATION.v1.json"
+ANCHOR_PATH = ".planning/engine-os/research-first/RF-02C-IMPLEMENTATION-ANCHOR.v1.json"
+NEW_CODE_FILES = ["scripts/research_score_compute_" + name + ".py"
+                  for name in ("distribution", "qualify", "run")]
+NEW_TEST_FILES = ["tests/research-score-compute/test_" + name + ".py"
+                  for name in ("cache", "compute_qualify", "compute_run")]
+CODE_FILES = numerical.CODE_FILES + NEW_CODE_FILES
+TEST_FILES = numerical.TEST_FILES + NEW_TEST_FILES
+QUALIFICATION_CODE_FILES = [NEW_CODE_FILES[0], NEW_CODE_FILES[1], NEW_TEST_FILES[0], NEW_TEST_FILES[1]]
+RECEIPT_FIELDS = {"version", "result", "independentReviewer", "computeBindings", "codeHashes",
+                  "qualification", "runtime", "productionAuthorized", "providerAccessAllowed", "automaticRestart"}
+QUALIFICATION_FIELDS = {"directory", "manifestSha256", "indexSha256", "terminalSha256"}
+SMOKE_PROGRAM = """import sys, unittest
+suite = unittest.TestSuite()
+for directory in ('tests/research-score', 'tests/research-score-successor', 'tests/research-score-compute'):
+    suite.addTests(unittest.TestLoader().discover(directory, pattern='test_*.py'))
+result = unittest.TextTestRunner(verbosity=1).run(suite)
+raise SystemExit(not result.wasSuccessful())
+"""
+
+
+def _sha(value):
+    return isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+
+
+def _bound(path, sha, label):
+    if not _sha(sha):
+        raise ValueError("invalid_bound_hash:" + label)
+    raw = read_regular(path)
+    if digest(raw) != sha:
+        raise ValueError("frozen_bytes_mismatch:" + label)
+    return raw
+
+
+def verify_efficiency(efficiency, config):
+    """Recompute the frozen screening decision; a reported pass alone is insufficient."""
+    gate = config["efficiencyGate"]
+    expected_fields = {"pairedPasses", "baselineSeconds", "candidateSeconds", "minimumSavingsSeconds",
+                       "medianRatio", "screenProjectedSeconds", "rssMiB", "passed"}
+    if not isinstance(efficiency, dict) or set(efficiency) != expected_fields:
+        raise ValueError("invalid_qualification_efficiency")
+    baseline, candidate = efficiency["baselineSeconds"], efficiency["candidateSeconds"]
+    if (type(efficiency["pairedPasses"]) is not int or efficiency["pairedPasses"] != gate["pairedPasses"]
+            or not isinstance(baseline, list) or not isinstance(candidate, list)
+            or len(baseline) != gate["pairedPasses"] or len(candidate) != gate["pairedPasses"]
+            or any(type(value) not in (int, float) or not math.isfinite(value) or value <= 0
+                   for value in baseline + candidate)):
+        raise ValueError("invalid_qualification_timings")
+    savings = min(before - after for before, after in zip(baseline, candidate))
+    ratio = median(after / before for before, after in zip(baseline, candidate))
+    screen = (gate["originalPilotElapsed"]
+              + max(0, gate["originalMeanOuterSeconds"] - savings / gate["pilotOrigins"])
+              * gate["originalRemainingWork"] + gate["originalInferenceProjection"])
+    rss = efficiency["rssMiB"]
+    if (efficiency["minimumSavingsSeconds"] != savings or efficiency["medianRatio"] != ratio
+            or efficiency["screenProjectedSeconds"] != screen
+            or type(rss) not in (int, float) or not math.isfinite(rss) or rss < 0
+            or rss > gate["rssMaximumMiB"] or not all(after < before for before, after in zip(baseline, candidate))
+            or ratio > gate["maximumMedianRatio"] or screen > gate["screenMaximumProjectedSeconds"]
+            or efficiency["passed"] is not True):
+        raise ValueError("qualification_efficiency_not_passed")
+
+
+def verify_ledgers(artifacts, counts, efficiency):
+    ledger = json.loads(artifacts["occurrence-ledger.json"])
+    if not isinstance(ledger, list) or len(ledger) != counts["allScoredOccurrences"]:
+        raise ValueError("qualification_equality_ledger_count_mismatch")
+    outer, identities, inner, seen_inner = [], set(), 0, set()
+    fields = {"scope", "originFile", "key", "gameId", "doubleGrid", "diagnostics", "nativeFailure",
+              "metricSha256", "canonicalEqual"}
+    for row in ledger:
+        if (not isinstance(row, dict) or set(row) != fields or row["scope"] not in ("inner", "outer")
+                or not isinstance(row["originFile"], str)
+                or not re.fullmatch(r"forecasts-\d{4}-\d{2}\.json", row["originFile"])
+                or not isinstance(row["gameId"], str)
+                or not isinstance(row["key"], list) or len(row["key"]) != 3
+                or not isinstance(row["key"][0], str) or row["key"][2] != row["gameId"]
+                or (row["scope"] == "inner" and (type(row["key"][1]) is not int or row["key"][1] < 0))
+                or (row["scope"] == "outer" and not isinstance(row["key"][1], str))
+                or type(row["doubleGrid"]) is not bool or type(row["diagnostics"]) is not bool
+                or row["nativeFailure"] is not None or row["canonicalEqual"] is not True
+                or not _sha(row["metricSha256"])):
+            raise ValueError("qualification_equality_ledger_invalid")
+        identity = (row["scope"], row["originFile"], tuple(row["key"]), row["gameId"])
+        if identity in identities:
+            raise ValueError("qualification_duplicate_occurrence")
+        identities.add(identity)
+        if row["scope"] == "outer":
+            if row["doubleGrid"] is not True or row["diagnostics"] is not True or len(row["key"]) != 3:
+                raise ValueError("qualification_outer_flags_changed")
+            outer.append(row)
+        else:
+            setting = (int(row["originFile"].split("-")[1]), row["key"][0], row["key"][1])
+            if row["diagnostics"] is not False or row["doubleGrid"] is not (setting not in seen_inner):
+                raise ValueError("qualification_inner_flags_changed")
+            seen_inner.add(setting)
+            inner += 1
+    observed = {"fullSettingScoredOccurrences": inner, "outerScoredOccurrences": len(outer),
+                "allScoredOccurrences": len(ledger), "outerGames": len({row["gameId"] for row in outer}),
+                "outerSeries": len({tuple(row["key"][:2]) for row in outer})}
+    if observed != counts:
+        raise ValueError("qualification_ledger_population_mismatch")
+    for pair in range(3):
+        timing = json.loads(artifacts[f"timing-pass-{pair}.json"])
+        if (not isinstance(timing, dict)
+                or set(timing) != {"passIndex", "occurrences", "baselineSeconds", "candidateSeconds"}
+                or type(timing["passIndex"]) is not int or timing["passIndex"] != pair
+                or not isinstance(timing["occurrences"], list) or len(timing["occurrences"]) != len(outer)):
+            raise ValueError("qualification_timing_population_mismatch")
+        baseline, candidate = [], []
+        for i, (row, original) in enumerate(zip(timing["occurrences"], outer)):
+            order = ["baseline", "candidate"] if (pair + i) % 2 == 0 else ["candidate", "baseline"]
+            if (not isinstance(row, dict) or set(row) != {"occurrenceIndex", "key", "order", "baselineSeconds",
+                                                         "candidateSeconds", "canonicalEqual"}
+                    or type(row["occurrenceIndex"]) is not int or row["occurrenceIndex"] != i
+                    or row["key"] != original["key"] or row["order"] != order
+                    or row["canonicalEqual"] is not True
+                    or any(type(row[name]) not in (int, float) or not math.isfinite(row[name]) or row[name] <= 0
+                           for name in ("baselineSeconds", "candidateSeconds"))):
+                raise ValueError("qualification_timing_ledger_invalid")
+            baseline.append(row["baselineSeconds"])
+            candidate.append(row["candidateSeconds"])
+        if (sum(baseline) != timing["baselineSeconds"] or sum(candidate) != timing["candidateSeconds"]
+                or timing["baselineSeconds"] != efficiency["baselineSeconds"][pair]
+                or timing["candidateSeconds"] != efficiency["candidateSeconds"][pair]):
+            raise ValueError("qualification_timing_totals_mismatch")
+
+
+def verify_implementation(root, compute_config, bindings, runtime, code_hashes,
+                          output_parent=legacy.OUTPUT_PARENT):
+    """Authenticate the fixed receipt before opening its sole external directory."""
+    root = Path(root)
+    anchor_raw = read_regular(root / ANCHOR_PATH)
+    anchor = json.loads(anchor_raw)
+    if (set(anchor) != {"version", "receiptSha256"}
+            or anchor["version"] != "rf02c-implementation-anchor.v1"
+            or not _sha(anchor["receiptSha256"])):
+        raise ValueError("invalid_implementation_anchor")
+    receipt_raw = _bound(root / IMPLEMENTATION_PATH, anchor["receiptSha256"], "implementation_receipt")
+    receipt = json.loads(receipt_raw)
+    if (set(receipt) != RECEIPT_FIELDS or receipt["version"] != "rf02c-implementation-acceptance.v1"
+            or receipt["result"] != "accepted_for_one_replay"
+            or not isinstance(receipt["independentReviewer"], str) or not receipt["independentReviewer"].strip()
+            or any(receipt[name] is not False for name in
+                   ("productionAuthorized", "providerAccessAllowed", "automaticRestart"))):
+        raise ValueError("implementation_not_accepted")
+    if receipt["computeBindings"] != bindings or receipt["runtime"] != runtime:
+        raise ValueError("implementation_successor_or_runtime_mismatch")
+    if receipt["codeHashes"] != code_hashes or set(code_hashes) != set(CODE_FILES + TEST_FILES):
+        raise ValueError("implementation_code_freeze_mismatch")
+    qualification = receipt["qualification"]
+    if not isinstance(qualification, dict) or set(qualification) != QUALIFICATION_FIELDS:
+        raise ValueError("invalid_qualification_binding")
+    directory = Path(qualification["directory"])
+    if (not directory.is_absolute() or ".." in directory.parts or directory.parent != Path(output_parent)
+            or not re.fullmatch(r"rf02c-qualification-v1-[0-9a-f]{16}", directory.name)):
+        raise ValueError("invalid_qualification_directory")
+    # Both trust anchors are checked before the index can supply any file names.
+    manifest_raw = _bound(directory / "manifest.json", qualification["manifestSha256"], "qualification_manifest")
+    if directory.name != "rf02c-qualification-v1-" + digest(manifest_raw)[:16]:
+        raise ValueError("qualification_identity_mismatch")
+    index_raw = _bound(directory / "artifact-index.json", qualification["indexSha256"], "qualification_index")
+    index = json.loads(index_raw)
+    if not isinstance(index, dict) or set(index) != {"files"} or not isinstance(index["files"], dict):
+        raise ValueError("invalid_qualification_index")
+    files = index["files"]
+    required = {"manifest.json", "terminal-decision.json", "occurrence-ledger.json",
+                "timing-pass-0.json", "timing-pass-1.json", "timing-pass-2.json"}
+    if not required.issubset(files) or "artifact-index.json" in files:
+        raise ValueError("qualification_artifact_population_mismatch")
+    artifacts = {}
+    for name, bound in files.items():
+        if (not re.fullmatch(r"[a-z0-9][a-z0-9.-]*", name) or ".." in name
+                or not isinstance(bound, dict) or set(bound) != {"sha256", "bytes"}
+                or type(bound["bytes"]) is not int or bound["bytes"] < 0):
+            raise ValueError("unsafe_qualification_index_member")
+        raw = _bound(directory / name, bound["sha256"], "qualification_artifact:" + name)
+        if len(raw) != bound["bytes"]:
+            raise ValueError("qualification_artifact_size_mismatch")
+        artifacts[name] = raw
+    if artifacts["manifest.json"] != manifest_raw:
+        raise ValueError("qualification_manifest_index_mismatch")
+    terminal_raw = artifacts["terminal-decision.json"]
+    if not _sha(qualification["terminalSha256"]) or digest(terminal_raw) != qualification["terminalSha256"]:
+        raise ValueError("qualification_terminal_hash_mismatch")
+    manifest, terminal = json.loads(manifest_raw), json.loads(terminal_raw)
+    if (terminal.get("status") != "qualified" or type(terminal.get("equalityFailures")) is not int
+            or terminal["equalityFailures"] != 0 or type(terminal.get("footballFits")) is not int
+            or type(terminal.get("nativeFailures")) is not int or terminal["nativeFailures"] != 0
+            or terminal["footballFits"] != 0 or type(terminal.get("newForecasts")) is not int
+            or terminal["newForecasts"] != 0 or terminal.get("productionAuthorized") is not False
+            or terminal.get("independentAcceptance") != "pending" or terminal.get("fullReplayAuthorized") is not False):
+        raise ValueError("qualification_not_accepted")
+    expected_counts = {key: value for key, value in compute_config["inputCounts"].items()
+                       if key not in {"indexedFiles", "indexedBytes"}}
+    if (terminal.get("counts") != expected_counts
+            or type(terminal.get("canonicalEqualOccurrences")) is not int
+            or terminal["canonicalEqualOccurrences"] != expected_counts["allScoredOccurrences"]):
+        raise ValueError("qualification_population_mismatch")
+    verify_efficiency(terminal.get("efficiency"), compute_config)
+    verify_ledgers(artifacts, expected_counts, terminal["efficiency"])
+    expected_qualification_code = {name: code_hashes[name] for name in QUALIFICATION_CODE_FILES}
+    if (manifest.get("version") != "rf02c-qualification.v1"
+            or manifest.get("bindings") != bindings or manifest.get("runtime") != runtime
+            or manifest.get("frozenSourceHashes") != compute_config["frozenSourceHashes"]
+            or manifest.get("codeHashes") != expected_qualification_code
+            or manifest.get("inputManifestSha256") != compute_config["inputManifestSha256"]
+            or manifest.get("inputIndexSha256") != compute_config["inputIndexSha256"]
+            or type(manifest.get("footballFits")) is not int or manifest["footballFits"] != 0
+            or type(manifest.get("newForecasts")) is not int or manifest["newForecasts"] != 0
+            or type(manifest.get("providerRequests")) is not int or manifest["providerRequests"] != 0
+            or manifest.get("productionAuthorized") is not False):
+        raise ValueError("qualification_successor_or_code_mismatch")
+    return {"receipt": receipt, "receiptSha256": digest(receipt_raw), "anchorSha256": digest(anchor_raw),
+            "qualificationManifest": manifest, "qualificationTerminal": terminal,
+            "frozenObjects": [(ANCHOR_PATH, anchor_raw), (IMPLEMENTATION_PATH, receipt_raw)]}
+
+
+def preflight(root=ROOT):
+    from research_score_compute_qualify import load_compute
+    root = Path(root)
+    compute_config, bindings = load_compute(root)
+    numerical_context = numerical.preflight(root)
+    accepted, runtime = numerical_context["accepted"], numerical_context["runtime"]
+    if compute_config["budget"] != accepted[1]["budget"]:
+        raise ValueError("successor_budget_changed")
+    code_hashes = {name: digest(read_regular(root / name)) for name in CODE_FILES + TEST_FILES}
+    implementation = verify_implementation(root, compute_config, bindings, runtime, code_hashes)
+    return {"root": root, "accepted": accepted, "computeConfig": compute_config,
+            "bindings": bindings, "runtime": runtime, "codeHashes": code_hashes,
+            "implementation": implementation, "numericalContext": numerical_context}
+
+
+def adapted_tree(source):
+    """Precisely three frozen-run adaptations: manifest, identity, smoke command."""
+    tree = ast.parse(source)
+    run_nodes = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "run"]
+    if len(run_nodes) != 1:
+        raise ValueError("inherited_run_structure_mismatch")
+    counts = {"manifest": 0, "identity": 0, "smoke": 0}
+    for node in ast.walk(run_nodes[0]):
+        if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+            name = node.targets[0].id
+            if name == "manifest":
+                if not isinstance(node.value, ast.Dict):
+                    raise ValueError("inherited_manifest_structure_mismatch")
+                keys = [key.value if isinstance(key, ast.Constant) else None for key in node.value.keys]
+                if keys.count("version") != 1 or "compute" in keys:
+                    raise ValueError("inherited_manifest_structure_mismatch")
+                version = node.value.values[keys.index("version")]
+                if not isinstance(version, ast.Constant) or version.value != "rf02.team-score.v2":
+                    raise ValueError("inherited_manifest_version_mismatch")
+                version.value = "rf02c.team-score.v1"
+                node.value.keys.append(ast.Constant("compute"))
+                node.value.values.append(ast.Name(id="_COMPUTE_BINDING", ctx=ast.Load()))
+                counts["manifest"] += 1
+            elif name == "store":
+                expected = ast.parse('ImmutableRun(OUTPUT_PARENT, "rf02-v2-" + manifest_hash[:16])', mode="eval").body
+                if ast.dump(node.value) != ast.dump(expected):
+                    raise ValueError("inherited_identity_structure_mismatch")
+                node.value.args[1].left.value = "rf02c-v1-"
+                counts["identity"] += 1
+            elif name == "smoke":
+                expected = ast.parse('[sys.executable, "-I", "-m", "unittest", "discover", "-s", "tests/research-score", "-p", "test_*.py"]', mode="eval").body
+                if (not isinstance(node.value, ast.Call)
+                        or ast.dump(node.value.func) != ast.dump(ast.parse("subprocess.run", mode="eval").body)
+                        or len(node.value.args) != 1 or ast.dump(node.value.args[0]) != ast.dump(expected)):
+                    raise ValueError("inherited_smoke_structure_mismatch")
+                node.value.args[0] = ast.Name(id="_SMOKE_COMMAND", ctx=ast.Load())
+                counts["smoke"] += 1
+    if counts != {"manifest": 1, "identity": 1, "smoke": 1}:
+        raise ValueError("inherited_adapter_match_count_mismatch")
+    return ast.fix_missing_locations(tree)
+
+
+def build_runner(context):
+    from research_score_compute_distribution import score_forecast
+    root = context["root"]
+    source = _bound(root / "scripts/research_score_run.py",
+                    context["computeConfig"]["frozenSourceHashes"]["scripts/research_score_run.py"], "inherited_runner")
+    tree = adapted_tree(source.decode())
+    adapter_hash = digest(ast.dump(tree, include_attributes=False).encode())
+    module = types.ModuleType("_rf02c_inherited_runner")
+    module.__file__ = str(root / "scripts/research_score_run.py")
+    exec(compile(tree, module.__file__, "exec"), module.__dict__)
+    # Clone only the mapper factory's globals; legacy module bindings remain intact.
+    private_globals = dict(replay.common_mapper.__globals__, JointBase=JointBase)
+    module.common_mapper = types.FunctionType(replay.common_mapper.__code__, private_globals,
+                                              replay.common_mapper.__name__, replay.common_mapper.__defaults__)
+    # Private runner substitution: the original metrics and replay modules stay intact.
+    module.score_forecast = score_forecast
+    module.CODE_FILES, module.TEST_FILES = CODE_FILES, TEST_FILES
+    module._SMOKE_COMMAND = [sys.executable, "-I", "-c", SMOKE_PROGRAM]
+    implementation = context["implementation"]
+    module._COMPUTE_BINDING = {
+        "version": "rf02c.compute-successor.v1", "bindings": context["bindings"],
+        "qualification": implementation["receipt"]["qualification"],
+        "implementation_receipt_sha256": implementation["receiptSha256"],
+        "implementation_anchor_sha256": implementation["anchorSha256"],
+        "adapter_ast_sha256": adapter_hash,
+        "scope": "per_score_call_exact_CDF_memoization_and_successor_provenance_only"}
+    original_store = module.ImmutableRun
+    frozen_objects = list(implementation["frozenObjects"])
+    acceptance_path = ".planning/engine-os/research-first/RF-02C-ACCEPTANCE.v1.json"
+    frozen_objects += [(acceptance_path, _bound(root / acceptance_path, context["bindings"]["acceptance"],
+                                               "compute_acceptance")),
+                       ("config/research-team-score-compute.v1.json",
+                        _bound(root / "config/research-team-score-compute.v1.json", context["bindings"]["config"],
+                               "compute_config")),
+                       (context["computeConfig"]["specification"]["path"],
+                        _bound(root / context["computeConfig"]["specification"]["path"],
+                               context["bindings"]["specification"], "compute_protocol"))]
+    inherited = context["numericalContext"]
+    frozen_objects += inherited["implementation"]["frozenObjects"]
+    for path, sha in (
+            (".planning/engine-os/research-first/RF-02S-ACCEPTANCE.v1.json", inherited["bindings"]["acceptance"]),
+            (context["computeConfig"]["predecessorConfig"]["path"], inherited["bindings"]["config"]),
+            (inherited["successorConfig"]["specification"]["path"], inherited["bindings"]["specification"])):
+        frozen_objects.append((path, _bound(root / path, sha, "inherited_document")))
+
+    class ComputeStore(original_store):
+        def write(self, name, value):
+            result = super().write(name, value)
+            if name == "manifest.json":
+                for path, raw in frozen_objects:
+                    self.object({"path": path, "source": raw.decode(), "sha256": digest(raw)})
+            return result
+
+    module.ImmutableRun = ComputeStore
+    def accepted_frozen():
+        from research_score_compute_qualify import load_compute
+        current = {name: digest(read_regular(root / name)) for name in CODE_FILES + TEST_FILES}
+        if current != context["codeHashes"]:
+            raise ValueError("implementation_changed_after_preflight")
+        current_compute, current_bindings = load_compute(root)
+        if current_compute != context["computeConfig"] or current_bindings != context["bindings"]:
+            raise ValueError("compute_changed_after_preflight")
+        current_numerical = numerical.preflight(root)
+        current_accepted = current_numerical["accepted"]
+        if current_numerical != inherited or current_accepted != context["accepted"]:
+            raise ValueError("inherited_acceptance_changed_after_preflight")
+        if runtime_manifest(current_accepted[1]) != context["runtime"]:
+            raise ValueError("runtime_changed_after_preflight")
+        current_implementation = verify_implementation(root, current_compute, current_bindings,
+                                                     context["runtime"], current)
+        if current_implementation != implementation:
+            raise ValueError("implementation_changed_after_preflight")
+        return current_accepted
+    module.load_accepted = lambda _root: accepted_frozen()
+    return module
+
+
+def run():
+    context = preflight()
+    return build_runner(context).run()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--run", action="store_true")
+    group.add_argument("--preflight", action="store_true")
+    args = parser.parse_args()
+    if args.preflight:
+        context = preflight()
+        adapted = build_runner(context)
+        print(json.dumps({"status": "compute_preflight_pass", "runtime": context["runtime"],
+                          "compute": adapted._COMPUTE_BINDING, "code_hashes": context["codeHashes"],
+                          "games": len(context["accepted"][2]["records"]),
+                          "origins": len(context["accepted"][2]["origins"]), "real_model_fits": 0}, sort_keys=True))
+        return 0
+    return run()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

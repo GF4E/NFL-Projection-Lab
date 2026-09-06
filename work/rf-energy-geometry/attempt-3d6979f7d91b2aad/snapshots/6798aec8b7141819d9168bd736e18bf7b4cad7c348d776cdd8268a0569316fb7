@@ -1,0 +1,349 @@
+"""Pure chronological receipt and prediction tests using mathematical fixtures."""
+import copy
+from dataclasses import replace
+import inspect
+from pathlib import Path
+import resource
+import sys
+import time
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
+import research_score_conditional_replay as unit
+from research_score_conditional_margin import ConditionalMarginFailure, estimate_scale
+from research_score_conditional_adapter import calibration_case, distribution_fingerprint, transform_distribution
+from research_score_conditional_policy import independent_control, independent_fingerprint
+from research_score_distribution import JointDistribution
+
+
+CUTOFF = '2014-09-02T14:30:00+00:00'
+ORIGIN = '2014-09-09T14:30:00+00:00'
+
+
+def distribution():
+    return JointDistribution(np.array([[0, 2], [2, 0]]), np.array([.45, .45]), .1,
+                             np.array([1., 1.]), np.array([0., -0.]), 0)
+
+
+def inputs(family='E2', variant='full', successes=256, home=1):
+    original = distribution()
+    case = calibration_case(original, home, 2 - home)
+    source_fp, case_fp = distribution_fingerprint(original), unit.fingerprint(case)
+    keys = [f'old-{index:03}' for index in range(256)]
+    sources, cases = [], []
+    for index, key in enumerate(keys):
+        source = {'family': family, 'variant': variant, 'season': 2013, 'game_id': key,
+                  'origin_at': '2013-09-03T14:30:00+00:00', 'kickoff_at': '2013-09-05T18:00:00+00:00',
+                  'availability': {'12': '2013-09-06T06:00:00+00:00', '24': '2013-09-06T18:00:00+00:00'},
+                  'native_failure': None if index < successes else 'inherited-grid-failure',
+                  'source_fingerprint': source_fp, 'case_fingerprint': case_fp,
+                  'observed_home': home, 'observed_away': 2 - home}
+        sources.append(source)
+        if index < successes:
+            cases.append({'family': family, 'variant': variant, 'season': 2013, 'game_id': key,
+                          'source_fingerprint': source_fp, 'case_fingerprint': case_fp, 'weight': 1., 'case': case})
+    return {2013: keys}, sources, cases
+
+
+def annual(family='E2', variant='full', successes=256, home=1):
+    return unit.annual_receipt(family, variant, 2014, CUTOFF, *inputs(family, variant, successes, home))
+
+
+def pregame(family='E2', variant='full', failure=None, original=None):
+    original = distribution() if original is None else original
+    if variant == 'independent_marginals':
+        original = replace(original, independent=True)
+    return {'family': family, 'variant': variant, 'season': 2014, 'game_id': 'target', 'origin_at': ORIGIN,
+            'kickoff_at': '2014-09-11T18:00:00+00:00', 'native_failure': failure,
+            'source_fingerprint': distribution_fingerprint(replace(original, independent=False)),
+            'distribution': original}
+
+
+class LaterPayload(dict):
+    def __getitem__(self, key):
+        if key != 'season':
+            raise AssertionError('later_payload_accessed')
+        return super().__getitem__(key)
+
+
+class ReplayUnitTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.started = time.monotonic()
+        cls.n0 = annual('N0', home=1)
+        cls.e2 = annual('E2', home=0)
+
+    @classmethod
+    def tearDownClass(cls):
+        elapsed = time.monotonic() - cls.started
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == 'darwin' else 1024)
+        if elapsed > 120 or rss > 4096:
+            raise AssertionError(f'synthetic_budget_exceeded: seconds={elapsed}, rss_mib={rss}')
+
+    def test_genuinely_empty_2013_identity_never_reads_current_payload(self):
+        with patch.object(unit, 'estimate_scale', side_effect=AssertionError('cold_start_fit_forbidden')):
+            receipt = unit.annual_receipt('E2', 'full', 2013, '2013-09-03T14:30:00+00:00', {},
+                                          [LaterPayload(season=2013)], [LaterPayload(season=2025)])
+        self.assertEqual(receipt['scale'], 1.)
+        self.assertEqual(receipt['status'], 'identity_no_prior_outer_support')
+        self.assertEqual(receipt['expected_count'], 0)
+        self.assertIsNone(receipt['estimator'])
+
+    def test_exact_255_256_boundary_and_independent_estimator_agreement(self):
+        population, sources, cases = inputs(successes=255)
+        with patch.object(unit, 'estimate_scale', side_effect=AssertionError('low_support_fit_forbidden')):
+            insufficient = unit.annual_receipt('E2', 'full', 2014, CUTOFF, population, sources, cases)
+        self.assertEqual(insufficient['status'], 'identity_insufficient_native_support')
+        self.assertEqual(insufficient['scale'], 1.)
+        self.assertEqual((insufficient['expected_count'], insufficient['native_success_count'], insufficient['failed_count']), (256, 255, 1))
+        self.assertEqual(insufficient['failed_keys'], [{'game_id': 'old-255', 'reason': 'inherited-grid-failure'}])
+        population, sources, cases = inputs(successes=256)
+        receipt = unit.annual_receipt('E2', 'full', 2014, CUTOFF, population, sources, cases)
+        expected = estimate_scale([row['case']['empirical_probabilities'] for row in cases],
+                                  [row['case']['empirical_fraction'] for row in cases],
+                                  [row['case']['fixed_variance'] for row in cases],
+                                  [row['case']['squared_residual'] for row in cases], [1.] * 256)
+        self.assertEqual(receipt['estimator'], expected)
+        self.assertEqual(receipt['scale'], expected['s'])
+        self.assertEqual(receipt['native_success_count'], 256)
+
+    def test_required_N0_failure_is_not_low_support_identity(self):
+        with self.assertRaisesRegex(unit.ReplayFailure, 'required_N0_native_failure'):
+            annual('N0', successes=255)
+
+    def test_current_future_payload_changes_and_deletion_leave_receipt_identical(self):
+        population, sources, cases = inputs(successes=255)
+        baseline = unit.annual_receipt('E2', 'full', 2014, CUTOFF, population, sources, cases)
+        extended_sources = sources + [LaterPayload(season=2014), LaterPayload(season=2025)]
+        extended_cases = cases + [LaterPayload(season=2014), LaterPayload(season=2025)]
+        repeated = unit.annual_receipt('E2', 'full', 2014, CUTOFF, population, extended_sources, extended_cases)
+        self.assertEqual(baseline, repeated)
+        self.assertEqual(baseline['sha256'], unit.fingerprint({k: v for k, v in baseline.items() if k != 'sha256'}))
+
+    def test_2025_has_no_2025_cases_and_all_prior_seasons_are_explicit(self):
+        population, sources, cases = {}, [], []
+        template = inputs(successes=0)[1][0]
+        for year, count in zip(range(2013, 2025), unit.YEAR_COUNTS):
+            keys = [f'{year}-{i}' for i in range(count)]
+            population[year] = keys
+            for key in keys:
+                sources.append({**template, 'season': year, 'game_id': key,
+                                'origin_at': f'{year}-09-03T14:30:00+00:00',
+                                'kickoff_at': f'{year}-09-05T18:00:00+00:00',
+                                'availability': {'12': f'{year}-09-06T06:00:00+00:00', '24': f'{year}-09-06T18:00:00+00:00'}})
+        receipt = unit.annual_receipt('E2', 'full', 2025, '2025-09-02T14:30:00+00:00', population,
+                                      sources + [LaterPayload(season=2025)], [LaterPayload(season=2025)])
+        self.assertEqual(receipt['expected_count'], 3135)
+        self.assertEqual(receipt['native_success_count'], 0)
+        self.assertEqual(receipt['status'], 'identity_insufficient_native_support')
+        missing = dict(population)
+        del missing[2024]
+        with self.assertRaisesRegex(unit.ReplayFailure, 'incomplete_prior_seasons'):
+            unit.annual_receipt('E2', 'full', 2025, '2025-09-02T14:30:00+00:00', missing, sources, [])
+
+    def test_missing_duplicate_wrong_series_and_failed_case_membership(self):
+        population, sources, cases = inputs(successes=255)
+        for bad_sources, bad_cases in ((sources[:-1], cases), (sources + [sources[0]], cases),
+                                       (sources, cases[:-1]), (sources, cases + [cases[0]]),
+                                       (sources, cases + [{**cases[0], 'game_id': 'old-255'}])):
+            with self.assertRaises(unit.ReplayFailure):
+                unit.annual_receipt('E2', 'full', 2014, CUTOFF, population, bad_sources, bad_cases)
+        sources = copy.deepcopy(sources)
+        sources[0]['family'] = 'N0'
+        with self.assertRaisesRegex(unit.ReplayFailure, 'invalid_or_duplicate_prior_source'):
+            unit.annual_receipt('E2', 'full', 2014, CUTOFF, population, sources, cases)
+        short = {2013: population[2013][:-1]}
+        with self.assertRaisesRegex(unit.ReplayFailure, 'incomplete_prior_season_population'):
+            unit.annual_receipt('E2', 'full', 2014, CUTOFF, short, sources[:-1], cases)
+
+    def test_case_hash_source_correspondence_weight_and_home_residual(self):
+        population, sources, cases = inputs(successes=255)
+        for field, value in (('case_fingerprint', 'a' * 64), ('source_fingerprint', 'b' * 64), ('weight', 2)):
+            changed = [dict(row) for row in cases]
+            changed[0][field] = value
+            with self.assertRaises(unit.ReplayFailure):
+                unit.annual_receipt('E2', 'full', 2014, CUTOFF, population, sources, changed)
+        changed, source_copy = copy.deepcopy(cases), copy.deepcopy(sources)
+        changed[0]['case']['squared_residual'] = 12.
+        changed[0]['case_fingerprint'] = unit.fingerprint(changed[0]['case'])
+        source_copy[0]['case_fingerprint'] = changed[0]['case_fingerprint']
+        with self.assertRaisesRegex(unit.ReplayFailure, 'case_home_residual_or_mixture_mismatch'):
+            unit.annual_receipt('E2', 'full', 2014, CUTOFF, population, source_copy, changed)
+
+    def test_numerical_case_failure_below_support_and_estimator_error_propagate(self):
+        population, sources, cases = inputs(successes=255)
+        cases, sources = copy.deepcopy(cases), copy.deepcopy(sources)
+        cases[0]['case']['empirical_probabilities'] = np.array([-1., 0., 2.])
+        cases[0]['case_fingerprint'] = unit.fingerprint(cases[0]['case'])
+        sources[0]['case_fingerprint'] = cases[0]['case_fingerprint']
+        with self.assertRaises(ConditionalMarginFailure):
+            unit.annual_receipt('E2', 'full', 2014, CUTOFF, population, sources, cases)
+        with patch.object(unit, 'estimate_scale', side_effect=ConditionalMarginFailure('forced_numerical_failure')):
+            with self.assertRaisesRegex(ConditionalMarginFailure, 'forced_numerical_failure'):
+                annual()
+
+    def test_cutoff_is_strict_and_independence_has_no_annual_fit(self):
+        population, sources, cases = inputs(successes=255)
+        sources = copy.deepcopy(sources)
+        for row in sources:
+            row['origin_at'] = '2013-12-29T14:30:00+00:00'
+            row['kickoff_at'] = '2013-12-31T23:00:00+00:00'
+            row['availability'] = {'12': '2014-01-01T11:00:00+00:00', '24': '2014-01-01T23:00:00+00:00'}
+        for cutoff in (sources[0]['availability']['12'], sources[0]['availability']['24']):
+            with self.assertRaisesRegex(ValueError, 'late_or_invalid_prior_outcome'):
+                unit.annual_receipt('E2', 'full', 2014, cutoff, population, sources, cases)
+        with self.assertRaisesRegex(unit.ReplayFailure, 'invalid_annual_series_or_season'):
+            unit.annual_receipt('E2', 'independent_marginals', 2014, CUTOFF, population, sources, cases)
+        with self.assertRaisesRegex(unit.ReplayFailure, 'annual_cutoff_year_mismatch'):
+            unit.annual_receipt('E2', 'full', 2014, '2015-09-02T14:30:00+00:00', population, sources, cases)
+
+    def test_rehashed_internally_contradictory_receipts_are_rejected(self):
+        changes = [{'expected_count': 255}, {'native_success_count': 255}, {'failed_count': 1},
+                   {'input_digest': 'bad'}, {'expected_population_sha256': 'bad'},
+                   {'case_keys': self.e2['case_keys'][:-1]}, {'case_sources': self.e2['case_sources'][:-1]},
+                   {'failed_keys': [{'game_id': 'phantom', 'reason': 'failure'}]},
+                   {'estimator': None, 'status': 'identity_insufficient_native_support'},
+                   {'estimator': None, 'status': 'identity_no_prior_outer_support'},
+                   {'cutoff': '2013-09-02T14:30:00+00:00'}]
+        for change in changes:
+            receipt = {**self.e2, **change}
+            receipt['sha256'] = unit.fingerprint({key: value for key, value in receipt.items() if key != 'sha256'})
+            with self.subTest(change=change), self.assertRaises(unit.ReplayFailure):
+                unit.predict('E2', 'full', 2014, ORIGIN, {('E2', 'full'): pregame()}, {('E2', 'full'): receipt})
+        failed_n0 = annual('E2', successes=255)
+        failed_n0['family'] = 'N0'
+        failed_n0['sha256'] = unit.fingerprint({key: value for key, value in failed_n0.items() if key != 'sha256'})
+        with self.assertRaisesRegex(unit.ReplayFailure, 'required_N0_native_failure'):
+            unit.predict('N0', 'full', 2014, ORIGIN, {('N0', 'full'): pregame('N0')}, {('N0', 'full'): failed_n0})
+
+    def test_rehashed_bad_estimator_metadata_and_bool_count_rejected(self):
+        for field, value in (('achieved_variance', -1.), ('clipped_target_variance', 999.),
+                             ('target_below_minimum', True), ('steps', 99), ('bracket', [0., 1.])):
+            receipt = copy.deepcopy(self.e2)
+            receipt['estimator'][field] = value
+            receipt['sha256'] = unit.fingerprint({key: item for key, item in receipt.items() if key != 'sha256'})
+            with self.subTest(field=field), self.assertRaises(unit.ReplayFailure):
+                unit.predict('E2', 'full', 2014, ORIGIN, {('E2', 'full'): pregame()}, {('E2', 'full'): receipt})
+        malformed = copy.deepcopy(self.e2['estimator'])
+        malformed['target_variance'] = float('inf')
+        with self.assertRaisesRegex(unit.ReplayFailure, 'nonfinite_or_negative_estimator_metadata'):
+            unit._estimator_metadata(malformed)
+        cold = unit.annual_receipt('E2', 'full', 2013, '2013-09-03T14:30:00+00:00', {}, [], [])
+        cold['expected_count'] = False
+        cold['sha256'] = unit.fingerprint({key: item for key, item in cold.items() if key != 'sha256'})
+        with self.assertRaisesRegex(unit.ReplayFailure, 'annual_receipt_population_mismatch'):
+            unit._receipt(cold, 'E2', 'full', 2013, unit._timestamp('2013-09-03T14:30:00+00:00'))
+
+    def test_rehashed_future_case_metadata_and_overlapping_failures_rejected(self):
+        for field, value in (('season', 2025), ('season', True), ('source_fingerprint', 'invalid'),
+                             ('case_fingerprint', 'b' * 63), ('weight', 2)):
+            receipt = copy.deepcopy(self.e2)
+            receipt['case_sources'][0][field] = value
+            receipt['sha256'] = unit.fingerprint({key: item for key, item in receipt.items() if key != 'sha256'})
+            with self.subTest(field=field, value=value), self.assertRaisesRegex(unit.ReplayFailure, 'invalid_receipt_case_source'):
+                unit.predict('E2', 'full', 2014, ORIGIN, {('E2', 'full'): pregame()}, {('E2', 'full'): receipt})
+        for successes, duplicate in ((255, False), (254, True)):
+            receipt = annual('E2', successes=successes)
+            receipt['failed_keys'][0]['game_id'] = receipt['failed_keys'][1]['game_id'] if duplicate else receipt['case_keys'][0]
+            receipt['sha256'] = unit.fingerprint({key: item for key, item in receipt.items() if key != 'sha256'})
+            with self.assertRaisesRegex(unit.ReplayFailure, 'overlapping_or_duplicate_receipt_failure_keys'):
+                unit.predict('E2', 'full', 2014, ORIGIN, {('E2', 'full'): pregame()}, {('E2', 'full'): receipt})
+
+    def test_native_success_uses_own_scale_and_full_descriptor_chain(self):
+        sources = {('N0', 'full'): pregame('N0'), ('E2', 'full'): pregame('E2')}
+        receipts = {('N0', 'full'): self.n0, ('E2', 'full'): self.e2}
+        self.assertNotEqual(self.n0['scale'], self.e2['scale'])
+        for family, receipt in (('N0', self.n0), ('E2', self.e2)):
+            result, provenance = unit.predict(family, 'full', 2014, ORIGIN, sources, receipts)
+            expected, descriptor = transform_distribution(sources[family, 'full']['distribution'], receipt['scale'])
+            self.assertEqual(distribution_fingerprint(result), distribution_fingerprint(expected))
+            self.assertEqual(provenance['transformation'], descriptor)
+            self.assertEqual(provenance['annual_receipt_sha256'], receipt['sha256'])
+            self.assertEqual(provenance['chosen_source']['family'], family)
+            self.assertEqual(provenance['requested_source_fingerprint'], descriptor['original_distribution_fingerprint'])
+            self.assertIsNone(provenance['product_operation'])
+
+    def test_E2_same_variant_and_offense_defense_use_N0_fallback_scale(self):
+        for variant in ('full', 'no_home_effect', 'no_offense', 'no_defense'):
+            fallback_variant = 'full' if variant in ('no_offense', 'no_defense') else variant
+            receipt = self.n0 if fallback_variant == 'full' else annual('N0', fallback_variant)
+            sources = {('E2', variant): pregame('E2', variant, 'inherited-failure'),
+                       ('N0', fallback_variant): pregame('N0', fallback_variant)}
+            result, provenance = unit.predict('E2', variant, 2014, ORIGIN, sources, {('N0', fallback_variant): receipt})
+            self.assertEqual(provenance['native_failure'], 'inherited-failure')
+            self.assertEqual(provenance['chosen_source']['family'], 'N0')
+            self.assertEqual(provenance['chosen_source']['variant'], fallback_variant)
+            self.assertEqual(provenance['annual_receipt_sha256'], receipt['sha256'])
+            self.assertEqual(provenance['transformation']['s'], receipt['scale'])
+
+    def test_independence_derives_full_or_full_fallback_and_never_contracts_raw_product(self):
+        for failure in (None, 'inherited-failure'):
+            sources = {('E2', 'full'): pregame('E2', failure=failure),
+                       ('E2', 'independent_marginals'): pregame('E2', 'independent_marginals', failure),
+                       ('N0', 'full'): pregame('N0')}
+            receipts = {('N0', 'full'): self.n0, ('E2', 'full'): self.e2}
+            result, provenance = unit.predict('E2', 'independent_marginals', 2014, ORIGIN, sources, receipts)
+            receipt = self.n0 if failure else self.e2
+            full, descriptor = transform_distribution(sources['E2', 'full']['distribution'], receipt['scale'])
+            expected, operation = independent_control(full, descriptor)
+            self.assertEqual(independent_fingerprint(result), independent_fingerprint(expected))
+            self.assertEqual(provenance['transformation'], descriptor)
+            self.assertEqual(provenance['product_operation'], operation)
+            self.assertEqual(provenance['annual_receipt_sha256'], receipt['sha256'])
+
+    def test_prediction_receipt_binding_digest_cutoff_and_required_N0_failure(self):
+        sources = {('N0', 'full'): pregame('N0')}
+        for key, value in (('target_season', 2015), ('family', 'E2'), ('variant', 'no_home_effect'),
+                           ('cutoff', '2015-09-02T14:30:00+00:00'), ('scale', .12345)):
+            receipt = {**self.n0, key: value}
+            with self.assertRaises(unit.ReplayFailure):
+                unit.predict('N0', 'full', 2014, ORIGIN, sources, {('N0', 'full'): receipt})
+        late_origin = unit.predict('N0', 'full', 2014, CUTOFF,
+                                  {('N0', 'full'): {**sources['N0', 'full'], 'origin_at': CUTOFF}}, {('N0', 'full'): self.n0})
+        self.assertEqual(late_origin[1]['annual_receipt_sha256'], self.n0['sha256'])
+        with self.assertRaisesRegex(unit.ReplayFailure, 'required_N0_native_failure'):
+            unit.predict('N0', 'full', 2014, ORIGIN, {('N0', 'full'): pregame('N0', failure='failed')}, {('N0', 'full'): self.n0})
+
+    def test_source_corruption_cross_game_and_fallback_mismatch_rejected(self):
+        receipt = {('N0', 'full'): self.n0}
+        for changed in ({**pregame('N0'), 'source_fingerprint': 'a' * 64},
+                        {**pregame('N0'), 'season': 2025}, {**pregame('N0'), 'origin_at': CUTOFF}):
+            with self.assertRaises(unit.ReplayFailure):
+                unit.predict('N0', 'full', 2014, ORIGIN, {('N0', 'full'): changed}, receipt)
+        sources = {('E2', 'full'): pregame('E2', failure='old-failure'), ('N0', 'full'): pregame('N0')}
+        sources['N0', 'full']['game_id'] = 'different'
+        with self.assertRaisesRegex(unit.ReplayFailure, 'pregame_source_identity_mismatch'):
+            unit.predict('E2', 'full', 2014, ORIGIN, sources, receipt)
+        sources['N0', 'full'] = pregame('N0', original=replace(distribution(), theta=np.array([.1, 0.])))
+        with self.assertRaisesRegex(unit.ReplayFailure, 'fallback_source_binding_mismatch'):
+            unit.predict('E2', 'full', 2014, ORIGIN, sources, receipt)
+
+    def test_future_sources_irrelevant_and_identity_preserves_exact_arrays(self):
+        sources = {('E2', 'full'): pregame('E2')}
+        receipts = {('E2', 'full'): self.e2}
+        baseline, descriptor = unit.predict('E2', 'full', 2014, ORIGIN, sources, receipts)
+        repeated, again = unit.predict('E2', 'full', 2014, ORIGIN,
+                                      {**sources, ('future', 'full'): object()}, {**receipts, ('future', 'full'): object()})
+        self.assertEqual(descriptor, again)
+        self.assertEqual(self.e2['scale'], 1.)
+        for field in ('atoms', 'alpha', 'rates', 'theta'):
+            original = getattr(sources['E2', 'full']['distribution'], field)
+            self.assertEqual(getattr(baseline, field).tobytes(), original.tobytes())
+            self.assertFalse(np.shares_memory(getattr(repeated, field), original))
+
+    def test_prediction_has_no_outcome_arguments_and_module_has_no_io_or_scoring(self):
+        self.assertEqual(str(inspect.signature(unit.predict)), '(family, variant, target_season, origin_at, sources, annual_receipts)')
+        source = inspect.getsource(unit)
+        for forbidden in ('open(', 'read_regular(', 'calibration_case(', 'score_forecast(', '.fit(', 'datetime.now('):
+            self.assertNotIn(forbidden, source)
+        for field in ('observed_home', 'observed_away', 'realized_total'):
+            with self.assertRaisesRegex(unit.ReplayFailure, 'invalid_pregame_source_fields'):
+                unit.predict('E2', 'full', 2014, ORIGIN, {('E2', 'full'): {**pregame(), field: 7}},
+                             {('E2', 'full'): self.e2})
+
+
+if __name__ == '__main__':
+    unittest.main()

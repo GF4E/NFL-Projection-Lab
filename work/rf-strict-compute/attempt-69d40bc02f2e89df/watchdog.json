@@ -1,0 +1,70 @@
+{
+  "artifacts": {
+    "observations.jsonl": {
+      "bytes": 5586,
+      "sha256": "7d4ca41a177f386b17ba43a3203838ba55b5f8f430e3a35db79de68bafd96894"
+    },
+    "stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "automatic_restart": false,
+  "command": [
+    "/opt/anaconda3/bin/python3.12",
+    "-I",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-strict-compute/qualify_strict.py",
+    "--child",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-strict-compute/attempt-69d40bc02f2e89df",
+    "--pins",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-strict-compute/INPUT-PINS.v1.json",
+    "--pins-sha256",
+    "69d40bc02f2e89df7fc9182e63df862ee0d7e43303c5c882bafb07cb0647aedc",
+    "--started",
+    "141557.372312208"
+  ],
+  "cwd": "/private/tmp/os01-gen15-rebuild.9ny71k",
+  "elapsed_seconds": 2.415747333987383,
+  "exit_code": 0,
+  "exit_observed_elapsed_seconds": 2.415727874991717,
+  "exit_signal": null,
+  "historical_invocation_authorized": false,
+  "kill_requests": [],
+  "limit_failure": false,
+  "limits": {
+    "complete_smoke_seconds": 120.0,
+    "parent_metadata_seconds": 2.0,
+    "rss_mib": 896.0,
+    "rss_sample_interval_seconds": 0.05,
+    "scientific_seconds": 54.92761604199768
+  },
+  "limits_of_observation": [
+    "RSS is sampled, not an instantaneous kernel RSS limit.",
+    "wait4 reports worker high-water RSS; group peak is the maximum observed group sum.",
+    "Parent scheduling can delay observation and signal delivery; timestamps retain that delay.",
+    "A completed process alone does not prove a complete or valid scientific terminal."
+  ],
+  "observation_errors": [],
+  "parent_metadata_deadline_elapsed_seconds": 4.415745749982307,
+  "pgid": 55725,
+  "phase_handshake_required": false,
+  "phase_progression": [],
+  "pid": 55725,
+  "process_ownership_lost": false,
+  "report_prepared_elapsed_seconds": 2.416020333999768,
+  "sample_count": 41,
+  "sampled_group_peak_rss_mib": 219.53125,
+  "sampled_worker_peak_rss_mib": 219.53125,
+  "scientific_terminal_verified": false,
+  "spawned_elapsed_seconds": 0.0019456250010989606,
+  "started_monotonic": 141557.444697666,
+  "status": "completed_process",
+  "stop_reason": null,
+  "version": "rf02f.external-process-watchdog.v1",
+  "waited_worker_peak_rss_mib": 222.46875,
+  "worker_grace_seconds": 0
+}

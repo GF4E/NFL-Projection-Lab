@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "{\n  \"\\u0000\": [\n    \"\\u0000\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\u00e9\": [\n    \"\\u00e9\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\u2028\": [\n    \"\\u2028\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\u2029\": [\n    \"\\u2029\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\u4e2d\": [\n    \"\\u4e2d\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\ud800\": [\n    \"\\ud800\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\udfff\": [\n    \"\\udfff\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\uffff\": [\n    \"\\uffff\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\ud800\\udc00\": [\n    \"\\ud800\\udc00\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\udbff\\udfff\": [\n    \"\\udbff\\udfff\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ]\n}\n",
+    "bytes": 667,
+    "kind": "bytes",
+    "sha256": "f1ed1aa970ceccdd06136f38914c94e16ebc0af344ef619439ebcf83320af9fa",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "unicode-and-lone-surrogates",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "dict"
+  },
+  "label": "unicode-and-lone-surrogates",
+  "original": {
+    "ascii_body": "{\n  \"\\u0000\": [\n    \"\\u0000\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\u00e9\": [\n    \"\\u00e9\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\u2028\": [\n    \"\\u2028\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\u2029\": [\n    \"\\u2029\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\u4e2d\": [\n    \"\\u4e2d\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\ud800\": [\n    \"\\ud800\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\udfff\": [\n    \"\\udfff\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\uffff\": [\n    \"\\uffff\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\ud800\\udc00\": [\n    \"\\ud800\\udc00\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ],\n  \"\\udbff\\udfff\": [\n    \"\\udbff\\udfff\",\n    \"\\u00e9\\ud83d\\ude00\\\\\\\"\\n\"\n  ]\n}\n",
+    "bytes": 667,
+    "kind": "bytes",
+    "sha256": "f1ed1aa970ceccdd06136f38914c94e16ebc0af344ef619439ebcf83320af9fa",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_unicode_bmp_nonbmp_surrogates_and_key_order"
+}

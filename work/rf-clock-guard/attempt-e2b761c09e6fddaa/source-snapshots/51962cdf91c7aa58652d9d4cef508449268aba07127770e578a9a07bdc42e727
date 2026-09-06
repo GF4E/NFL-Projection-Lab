@@ -1,0 +1,179 @@
+{
+  "accepted_at": "2026-09-06T08:24:09.914308+00:00",
+  "artifact_index": {
+    "bytes": 162353,
+    "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp08-v1-6683e6438f3c6077/completion/artifact-index.json",
+    "sha256": "144bad1e80231cf291f5630a06f7ffa863a379b5875a7883eea3c9c4168fde0b"
+  },
+  "binding_checks": {
+    "complete_membership_previously_verified": true,
+    "current_source_files_unchanged": 85,
+    "review_pointers_reauthenticated": true,
+    "runtime_files_unchanged": 7
+  },
+  "clock_diagnosis": {
+    "actual_historical_interleaving_proven": false,
+    "diagnosis": {
+      "bytes": 3539,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-resource-policy/clock-reentrancy/diagnosis-and-guard.md",
+      "sha256": "6c7f52846221e0bc3eef3b552a77b98d25acea2a84c437bb073d44ee193743db"
+    },
+    "evidence": {
+      "bytes": 6543,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-resource-policy/clock-reentrancy/result.json",
+      "sha256": "75e76ee862deab9467e8338ca509ed25a00fff07b3ef00e76dd491db680dda3e"
+    },
+    "source_mechanism_reproduced": true
+  },
+  "decision": {
+    "automatic_restart": false,
+    "external_five_percent_achieved": false,
+    "full_historical_inference": false,
+    "goal_complete": false,
+    "historical_retry_authorized": false,
+    "model_accepted": false,
+    "next_action": "Qualify separately registered RF-COMP-09 serialized resource check under unchanged approved limits and complete science; never resume this identity.",
+    "production_authorized": false,
+    "prospective_evidence": false,
+    "reason": "invalid_monotonic_clock",
+    "run_status_remains": "protocol_invalid"
+  },
+  "independent_reviews": {
+    "numerical": {
+      "bytes": 12495,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-resource-policy/actual-numerical-review.v1.json",
+      "sha256": "1faa9875c989c24e3e9e61123963530c1a47e29eb670a7d8b91ffe1d7fc2af07"
+    },
+    "temporal": {
+      "bytes": 4718,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-resource-policy/actual-temporal-review.v1.json",
+      "sha256": "aeacb8488eed0d4e9088440129458f2608f2033622392331c65c2cf8915872a6"
+    }
+  },
+  "limits": [
+    "Acceptance covers retained invalid operational and saved-prefix numerical evidence only; 929 of 3407 outer games were completed, with no final evaluation.",
+    "Numerical and temporal scopes and prior test authorship are disclosed in linked reports; root archive hash audit does not recompute science.",
+    "Synthetic reentrancy reproduces a source failure mechanism; actual disputed clock values/interleaving were not captured.",
+    "No new historical scoring, fit, recovery or bootstrap was performed for these terminal audits.",
+    "Observer limits are sampled/waited measurements with scheduling limitations, not kernel instantaneous resource guarantees."
+  ],
+  "manifest": {
+    "bytes": 25339,
+    "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp08-v1-6683e6438f3c6077/manifest.json",
+    "sha256": "6683e6438f3c607711623596ea8d41370e3ba9a3c9bcdd9dbead50703520ae5f"
+  },
+  "observed_process": {
+    "actual_tool_exit_code": 1,
+    "actual_tool_session": 30065,
+    "observer_seconds": 508.5570142919896,
+    "worker_peak_rss_mib": 1031.203125,
+    "worker_seconds": 508.0557431250054
+  },
+  "observer": {
+    "bytes": 3047,
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rfcomp08-observer-3bbc98b3645782ba/process-report.json",
+    "sha256": "2bfc5f06fb133bcda64e44ebab0b458cba25e05429edcce1adfe52660a5c0f55"
+  },
+  "pilot": {
+    "A": 56.07587466700352,
+    "C": 0.16938860142727208,
+    "E": 199.05728458298836,
+    "F": 0.004183665994787589,
+    "S": 0.005742999986978248,
+    "T": 15.284814957994968,
+    "W": 10898.028645833334,
+    "all_53_origin_intervals_and_callbacks_positive_disjoint_and_complete": true,
+    "complete_original_suffix_verified": true,
+    "failed_pilot_callbacks": 0,
+    "fixed_seconds_cap": 9000,
+    "formula": "E + W * (C + 31 * (2F + 2S)) + 2T + max(60,A)",
+    "headroom_seconds": 157.14366080095715,
+    "native_fit_anchor_count": 576,
+    "native_full_outer_score_anchor_count": 64,
+    "passed": true,
+    "projected_total_seconds": 8842.856339199043,
+    "raw_fit_calls": 976,
+    "raw_score_calls": 640,
+    "recomputed_exact_float_equality": true,
+    "remaining_games_at_pilot": 3375,
+    "remaining_origins_at_pilot": 224,
+    "validation": "Authenticated original 277-origin plan and saved accounting digest; independently recomputed F/S/C/W and exact native-fit/full-outer anchor indices, retaining 31 slots and multiplier 2."
+  },
+  "population": {
+    "complete_origins": 113,
+    "counts": {
+      "actual_mass_cdf_calls": 96616,
+      "actual_score_calls": 35199,
+      "copied_diagonal_inner": 12969,
+      "copied_e3_outer": 2816,
+      "copied_raw_outer": 5574,
+      "inner_rows": 38907,
+      "outer_rows": 17651,
+      "scored_inner": 25938,
+      "scored_outer": 9261
+    },
+    "failed_origin": [
+      2016,
+      12
+    ],
+    "inner_games_per_setting": 1441,
+    "inner_settings": 27,
+    "last_complete_origin": [
+      2016,
+      11
+    ],
+    "no_final_evaluation_or_scorecards": true,
+    "no_saved_2016_week12_publication_or_grading_batch": true,
+    "outer_games_per_series": 929,
+    "outer_series": 19,
+    "saved_native_failures": 0,
+    "saved_rows": 56558,
+    "schema_counts": {
+      "104": 5574,
+      "108": 12077,
+      "28": 38907
+    },
+    "state_targets": 1697,
+    "state_targets_by_season": {
+      "2010": 256,
+      "2011": 256,
+      "2012": 256,
+      "2013": 256,
+      "2014": 256,
+      "2015": 256,
+      "2016": 161
+    },
+    "unstarted_origins": 163
+  },
+  "prefit_acceptance": {
+    "bytes": 16706,
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-COMP-08-PREFIT-ACCEPTANCE.v1.json",
+    "sha256": "3bbc98b3645782ba088d814c61505a86041f0a5c82e6a32d6430b62c58fd1bbe"
+  },
+  "retained_archive": {
+    "exact_membership": true,
+    "indexed_bytes": 569373587,
+    "indexed_files": 1033,
+    "physical_bytes": 569535940,
+    "physical_files": 1034
+  },
+  "root_integrity": {
+    "bytes": 2412,
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-resource-policy/actual-root-integrity.v1.json",
+    "sha256": "380679d461fcbb4d241ffaa70eb8d8b4bc85126fe6d2cdf70e537c168aa0989c"
+  },
+  "run_identity": "rfcomp08-v1-6683e6438f3c6077",
+  "shared_COMP04_science": {
+    "inner_rows": 14688,
+    "loss_files_byte_identical": 38,
+    "outer_rows": 608,
+    "scope": "Every shared indexed inner/outer loss file through retained 2013 Week 2. Both current and prior file bytes matched their pinned indexes. Different run ownership/provenance and timings were not required to equal."
+  },
+  "status": "accepted_retained_protocol_invalid_clock_stop_only",
+  "terminal": {
+    "bytes": 124341,
+    "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp08-v1-6683e6438f3c6077/completion/terminal.json",
+    "sha256": "1922fb7be8173333f937dc1f1022c20db5071be099493a6c61c21204d107b4ec"
+  },
+  "version": "rfcomp08.terminal-acceptance.v1"
+}

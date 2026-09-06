@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py", line 51, in <module>
+    raise SystemExit(_launch(sys.argv[1:]))
+                     ^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py", line 45, in _launch
+    report = supervise(command, cwd=ROOT, output_parent=ROOT/'work', identity=observation)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_watchdog.py", line 121, in supervise
+    return _supervise(command, cwd=cwd, output_parent=output_parent, identity=identity,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_watchdog.py", line 386, in _supervise
+    raise interrupted
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_watchdog.py", line 268, in _supervise
+    candidate.mkdir(mode=0o700)  # Refuse every existing identity, even empty.
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/pathlib.py", line 1311, in mkdir
+    os.mkdir(self, mode)
+FileExistsError: [Errno 17] File exists: '/private/tmp/os01-gen15-rebuild.9ny71k/work/rf02f-observer-af9f710e6737b89c'

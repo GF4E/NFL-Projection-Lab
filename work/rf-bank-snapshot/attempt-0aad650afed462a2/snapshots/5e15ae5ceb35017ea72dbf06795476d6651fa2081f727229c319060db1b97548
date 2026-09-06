@@ -1,0 +1,13 @@
+# RF-COMP-06 static numerical readiness
+
+Decision: no static blocker found; ready for the sole registered qualification. Actual equality, error behavior, resources and timing remain unobserved. This review used source reading and static parsing only, without importing or executing candidate/tests. Reviewer authored the independent tests; the candidate and driver have other authors.
+
+Held source `scripts/research_score_bank_snapshot.py`: `e327560586f3d938743cb9b44120b8e7206ad16e68c2af2edc277967485e2426`. Held tests `tests/research-score-bank-snapshot/test_bank_snapshot.py`: `e53a7c2b52215d1d477011c2bfa810b2cfc0a8f376d5ce18c2b2817b40a40165` (29 methods). Frozen scope `RF-COMP-06-BANK-SNAPSHOT-SCOPE.v1.md`: `9f4ff7b1dced4698e48c4be4859893e16ebedb3f66e747913beda174749aff15`.
+
+`capture` preserves the original bank digest payload comprehension: sorted output keys and current output reads precede sorted owned engines; each engine's last origin, ratings, offense and defense retain their original access order. Both public capture paths converge on one unchanged canonical call. Its owned containers and immutable supported leaves are retained privately. Eligibility is freshly bounded by exact types, ASCII keys/values, finite floats, integer bits, depth, key/value occurrence count and string characters. Shared occurrences count again. Supported comparison distinguishes types and signed zero, preserves sequence order and ignores dictionary insertion order.
+
+Unsupported snapshots immediately use original encoded bytes, without recanonicalization. Mixed comparison encodes only the already-owned supported snapshot. Canonical, guard and encoder failures propagate without retry. Complete before capture precedes the assembly sentinel; complete after capture precedes equality, so an early difference cannot skip a late read or error. Snapshot handles are private implementation objects, not security boundaries or persisted formats.
+
+The 29 tests independently compare original bank digest or original strict/hash equality and exact exception type/message. Coverage includes all bank fields and sorted reads, late mutations/errors, canonical array/list equivalence, hooks, aliases, post-capture mutation, Unicode astral/surrogate equivalence through fallback, mixed modes, guard boundaries, cycles/deep failures, invalid handles and failure followed by success. Observations precede assertions. Scoped spies/injections affect only candidate-local bindings; frozen module globals remain untouched.
+
+No integration, historical retry, changed persisted bytes or capacity claim follows from this static review. RF-COMP-05's rejection remains intact; even a faster isolated bank comparison would leave the broader capacity gap unresolved.

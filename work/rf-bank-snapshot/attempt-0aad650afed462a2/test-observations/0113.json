@@ -1,0 +1,12 @@
+{
+  "calls": 1,
+  "kind": "deliberate_injection",
+  "label": "injected-eligibility",
+  "outcome": {
+    "kind": "error",
+    "message": "injected eligibility",
+    "module": "builtins",
+    "type": "RuntimeError"
+  },
+  "test": "test_bank_snapshot.SnapshotTests.test_unexpected_local_failures_propagate_without_retry"
+}

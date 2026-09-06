@@ -1,0 +1,290 @@
+"""RF-COMP-04 fixed computational composition; final one-run acceptance required.
+
+This file statically copies only the RF-02F launcher, chronological loop and
+worker orchestration. Scientific, publication, runtime and storage helpers are
+imported unchanged. No runtime code cloning, global rebinding or resume path.
+"""
+import argparse
+import copy
+from datetime import datetime, timezone
+import hashlib
+import json
+from pathlib import Path
+import sys
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+
+
+def _launch(argv):
+    """Lean parent: external watchdog starts before any scientific child import."""
+    from research_score_split_watchdog import supervise
+    import re
+    parser = argparse.ArgumentParser(description='One accepted RF-COMP-04 worker under fixed external limits')
+    parser.add_argument('--repository-root', required=True)
+    parser.add_argument('--implementation-acceptance', required=True)
+    parser.add_argument('--implementation-acceptance-sha256', required=True)
+    args = parser.parse_args(argv)
+    if Path(args.repository_root).resolve() != ROOT or not re.fullmatch('[0-9a-f]{64}', args.implementation_acceptance_sha256):
+        raise ValueError('invalid_fixed_launch_binding')
+    # This observation identity cannot be refreshed by changing a timestamp.
+    observation = 'rfcomp04-observer-' + args.implementation_acceptance_sha256[:16]
+    started = time.monotonic()
+    command = [sys.executable, '-I', str(Path(__file__).resolve()),
+        '--repository-root', str(ROOT), '--implementation-acceptance', args.implementation_acceptance,
+        '--implementation-acceptance-sha256', args.implementation_acceptance_sha256,
+        '--envelope-started-monotonic', repr(started)]
+    report = supervise(command, cwd=ROOT, output_parent=ROOT/'work', identity=observation)
+    print(json.dumps(report, sort_keys=True, allow_nan=False))
+    return 0 if report['status'] == 'completed_process' and report['exit_code'] == 0 else 1
+
+
+if __name__ == '__main__' and '--watchdog-phase-file' not in sys.argv:
+    raise SystemExit(_launch(sys.argv[1:]))
+
+
+# Fixed worker dependencies. The lean parent exits above before these imports.
+from research_score_conditional_admission import bound
+from research_score_conditional_run import Store
+from research_score_run import OUTPUT_PARENT
+from research_score_split_archive import admit_source, forecast_inputs, StrictSelectionFeed
+from research_score_split_replay import SplitTrajectoryBank
+from research_score_split_inference import evaluate
+from research_score_split_run import (
+    OriginAccounting, RuntimeStop, require, strict, put_object, pilot_projection)
+from research_score_split_watchdog import _read_phase
+from research_score_split_controller import (
+    PARENT_MANIFEST, PARENT_INDEX, CONFIG, CONFIG_SHA, COUNT_KEYS, ControllerEnvelope,
+    run_smoke, _suffix, _bank_state_digest, _admission_evidence, publish_origin,
+    validate_publication_binding, _saved_inference_inputs)
+from research_score_split_compute_integration import assemble_forecasts, PublishedOriginGrader
+from research_score_split_compute_preflight import (
+    preflight, validate_runtime_files, COMPUTE_PROTOCOL_PATH, COMPUTE_PROTOCOL_SHA)
+
+
+def _chronological_origins(context, store, manifest, manifest_sha, config, envelope, accounting, progress):
+    """The only historical loop: choose, advance, publish, grade, then admit loss."""
+    origins = context.origins
+    bank = SplitTrajectoryBank(context.teams)
+    feed, grader = StrictSelectionFeed(context), PublishedOriginGrader()
+    annual, evidence = {}, []
+    for index, original in enumerate(origins):
+        progress['phase'] = 'origin_' + _suffix(original)
+        with accounting.origin(original):
+            year, week = original['season'], original['week']
+            if year >= 2013 and year not in annual:
+                require(week == 1, 'annual_choice_first_origin_required')
+                selection = envelope.call(feed.select, year, context.expected_by_season)
+                store.write(f'selection-{year}.json', selection)
+                # Continue only with the exact saved choice, frozen before this
+                # year's first forecast or any current-year grader access.
+                annual[year] = store.read_bound(store.pointer(f'selection-{year}.json'))
+                require(strict(annual[year]) == strict(selection), 'saved_annual_choice_changed')
+            view = envelope.call(forecast_inputs, context, original, envelope.check)
+            require(strict(view['origin']) == strict(original), 'forecast_origin_swapped')
+            pointers = {}
+            if year >= 2011:
+                for delay in (12, 24):
+                    pointers[delay] = envelope.call(put_object, store, view['mapper_sources'][delay]['payload'])
+                    require(pointers[delay] == view['mapper_sources'][delay]['pointer'], 'copied_mapper_pointer_changed')
+            outputs = envelope.call(bank.advance, year, week, view['bank_prepared'], view['diagonal_outputs'])
+            state_before_assembly = envelope.call(_bank_state_digest, bank, outputs)
+            assembly = envelope.call(assemble_forecasts, view, bank, outputs,
+                annual[year]['E3'] if year >= 2013 else None,
+                local_mapper_pointers=pointers,
+                parent_binding={'parent_manifest_sha256': PARENT_MANIFEST, 'parent_index_sha256': PARENT_INDEX},
+                accounting=accounting)
+            require(envelope.call(_bank_state_digest, bank, outputs) == state_before_assembly,
+                    'native_state_changed_during_law_assembly')
+            pointer = publish_origin(store, manifest, manifest_sha, view, bank, outputs, assembly, envelope)
+            try:
+                graded = envelope.call(grader.grade, store, manifest, manifest_sha, view, assembly,
+                    pointer, context, accounting,
+                    validate_binding=lambda: validate_publication_binding(store, manifest, manifest_sha,
+                        view, assembly, pointer, envelope))
+            except BaseException:
+                if grader.last_attempt_origin == [year, week]:
+                    progress['failed_origin_grading_attempt'] = {
+                        'origin': [year, week], 'attempt_counts': grader.last_attempt_counts,
+                        'included_in_completed_counts': False}
+                raise
+            require(type(graded['counts']) is dict and set(graded['counts']) == set(COUNT_KEYS)
+                    and all(type(v) is int and v >= 0 for v in graded['counts'].values()), 'typed_grader_counts_required')
+            if 2011 <= year <= 2024:
+                envelope.call(feed.add, original, graded['inner_rows'], graded['grading_receipt'])
+            require(graded['counts']['inner_rows'] == (27*len(original['targetGameIds']) if 2011 <= year <= 2024 else 0)
+                    and graded['counts']['outer_rows'] == (19*len(original['targetGameIds']) if year >= 2013 else 0),
+                    'graded_origin_population')
+            origin_evidence = {'version': 'rf02f.origin-evidence.v1', 'manifest_sha256': manifest_sha,
+                'origin': original, 'forecast': pointer,
+                'publication_binding': store.pointer('publication-binding-' + _suffix(original) + '.json'),
+                'selection': store.pointer(f'selection-{year}.json') if year >= 2013 else None,
+                'score_artifacts': graded['artifacts'], 'counts': graded['counts'],
+                'native_states': {'borrowed': 81, 'own': 216},
+                'callback_records': copy.deepcopy(accounting._active_origin['callbacks']),
+                'source_pointers': view['source_pointers'], 'publication_before_grading': True}
+            name = 'origin-evidence-' + _suffix(original) + '.json'
+            store.write(name, origin_evidence)
+            for key in COUNT_KEYS:
+                progress['counts'][key] += graded['counts'][key]
+            progress['completed_origins'] += 1
+            evidence.append(store.pointer(name))
+            envelope.check()
+            del view, outputs, assembly, graded, origin_evidence
+        # The final origin duration includes every origin's artifact persistence.
+        # Only pilot/global accounting summaries are written outside an origin.
+        if (year, week) == (2013, 2):
+            progress['phase'] = 'pilot_cost_screen'
+            ledger = envelope.call(accounting.snapshot)
+            projection = envelope.call(pilot_projection, origins, ledger, origins[index+1:])
+            store.write('pilot.json', {'projection': projection, 'accounting': ledger,
+                                       'retained_prefix_origins': index+1, 'remaining_origins': len(origins)-index-1})
+            progress['artifacts']['pilot'] = store.pointer('pilot.json')
+            require(projection['within_time_screen'] is True and envelope.peak_rss_mib <= 4096,
+                    'registered_pilot_cost_screen_failed')
+            del ledger
+    require(len(evidence) == progress['completed_origins'] == 277 and set(annual) == set(range(2013, 2026))
+            and 'pilot' in progress['artifacts'], 'complete_chronological_run_required')
+    require(progress['counts']['inner_rows'] == 98469 and progress['counts']['outer_rows'] == 64733
+            and progress['counts']['copied_diagonal_inner'] == 32823 and progress['counts']['scored_inner'] == 65646
+            and progress['counts']['copied_raw_outer'] == 20442
+            and progress['counts']['copied_e3_outer'] + progress['counts']['scored_outer'] == 44291
+            and progress['counts']['actual_score_calls'] == 65646 + progress['counts']['scored_outer']
+            and progress['counts']['actual_mass_cdf_calls'] == 44291*8, 'complete_execution_counts')
+    store.write('origin-index.json', {'version': 'rf02f.origin-index.v1', 'manifest_sha256': manifest_sha,
+                                    'origins': evidence, 'counts': progress['counts']})
+    progress['artifacts']['origin_index'] = store.pointer('origin-index.json')
+    del bank, feed, grader
+    return evidence
+
+
+def run(repository_root, acceptance_path, acceptance_sha256, phase_file, started_monotonic):
+    """One worker. Final acceptance is mandatory; no resume or alternate limits."""
+    envelope = ControllerEnvelope(started_monotonic)
+    store = accounting = None
+    progress = {'phase': 'prefit_acceptance', 'completed_origins': 0,
+                'counts_scope': 'completed_saved_grading_batches', 'counts': {key: 0 for key in COUNT_KEYS}, 'artifacts': {}}
+    manifest_sha = None
+    try:
+        phase, _ = _read_phase(Path(phase_file))
+        require(phase['phase'] == 'starting', 'owned_starting_watchdog_phase_required')
+        ready = envelope.call(preflight, repository_root, acceptance_path, acceptance_sha256, envelope.check)
+        manifest, manifest_sha, config = ready['manifest'], ready['manifest_sha256'], ready['config']
+        require(hashlib.sha256(strict(manifest)).hexdigest() == manifest_sha, 'manifest_store_encoding_mismatch')
+        store = Store(OUTPUT_PARENT, ready['identity'])
+        require(store.write('manifest.json', manifest) == manifest_sha, 'manifest_write_mismatch')
+        store.write('started.json', {'actual_computation_at': datetime.now(timezone.utc).isoformat(),
+            'envelope_started_monotonic': envelope.started, 'worker_started_elapsed_seconds': envelope.elapsed(),
+            'watchdog_phase_path': str(Path(phase_file)), 'historical_status': 'retrospective_inferred'})
+        progress['phase'] = 'source_admission'
+        context = envelope.measure_phase('admission', admit_source, repository_root, envelope.check)
+        admission = _admission_evidence(context)
+        store.write('admission.json', admission)
+        progress['artifacts']['admission'] = store.pointer('admission.json')
+        progress['phase'] = 'complete_synthetic_smoke'
+        smoke = run_smoke(envelope, phase_file)
+        store.write('smoke.json', smoke)
+        progress['artifacts']['smoke'] = store.pointer('smoke.json')
+        accounting = OriginAccounting(envelope, context.origins)
+        evidence = _chronological_origins(context, store, manifest, manifest_sha, config, envelope, accounting, progress)
+        progress['phase'] = 'saved_public_inference_inputs'
+        metadata, rows, score_pointers = _saved_inference_inputs(context, store, manifest_sha, config, evidence, envelope)
+        ledger = envelope.call(accounting.snapshot)
+        require(all(row['complete'] and row['error_type'] is None
+                    and all(call['error_type'] is None for call in row['callbacks']) for row in ledger['origins']),
+                'unresolved_scientific_call_failure')
+        store.write('accounting.json', ledger)
+        progress['artifacts']['accounting'] = store.pointer('accounting.json')
+        # Each True value below is backed by a fixed pre-fit qualification,
+        # actual authenticated admission, successful chronological publication /
+        # grading / prior-only selection, complete variant counts and strict rows.
+        audits = {'admission': True, 'leakage': True, 'falsification': True, 'no_new_numerical_failure': True}
+        store.write('inference-input-index.json', {'metadata': metadata, 'source_scores': score_pointers,
+            'series': [{'key': list(key), 'rows': len(values), 'sha256': hashlib.sha256(strict(values)).hexdigest()}
+                       for key, values in rows.items()], 'audit_checks': audits,
+            'audit_evidence': {**progress['artifacts'], 'prefit_qualification': manifest['qualification'],
+                               'prefit_reviews': manifest['independent_reviews']}})
+        progress['artifacts']['inference_inputs'] = store.pointer('inference-input-index.json')
+        progress['phase'] = 'complete_public_inference'
+        began = envelope.elapsed()
+        result = envelope.call(evaluate, config, metadata, rows, audits)
+        inference_seconds = envelope.elapsed() - began
+        store.write('evaluation.json', result)
+        progress['artifacts']['evaluation'] = store.pointer('evaluation.json')
+        require(result['status'] != 'protocol_invalid', 'complete_public_inference_invalid:' + str(result.get('reason', 'see_saved_evaluation')))
+        require(result['status'] in ('reject_all', 'mechanism_supported_distribution_unqualified', 'research_shadow_candidate'),
+                'unknown_statistical_terminal')
+        del rows, metadata, result, ledger
+        # Reauthenticate source code after execution without refitting or
+        # reopening the complete historical archive a second time.
+        for path, fingerprint in manifest['code_hashes'].items():
+            envelope.call(bound, ROOT/path, fingerprint)
+        envelope.call(bound, ROOT/CONFIG, CONFIG_SHA)
+        envelope.call(validate_runtime_files, envelope.check)
+        envelope.call(bound, ROOT / COMPUTE_PROTOCOL_PATH, COMPUTE_PROTOCOL_SHA)
+        progress['phase'] = 'terminal_publication'
+        evaluation = store.read_bound(progress['artifacts']['evaluation'])
+        terminal = {'version': 'rfcomp04.terminal.v1', 'status': evaluation['status'],
+            'manifest_sha256': manifest_sha, **progress, 'seconds': envelope.elapsed(),
+            'public_inference_seconds': inference_seconds, 'peak_rss_mib': envelope.peak_rss_mib,
+            'production_authorized': False, 'prospective_evidence': False, 'provider_requests': 0,
+            'automatic_restart': False, 'external_five_percent_achieved': False,
+            'independent_actual_result_acceptance': False,
+            'post_terminal_independent_numerical_and_temporal_review_required': True}
+        store.finish(terminal, envelope.check)
+        envelope.check()
+        return {'status': terminal['status'], 'run_directory': str(store.path),
+                'independent_actual_result_acceptance': False}
+    except BaseException as error:
+        # Never create a competing terminal after atomic completion committed,
+        # including a post-rename fsync/deadline failure with uncertain durability.
+        if store is not None and store.finalized:
+            raise
+        # Anchor metadata allowance to the actual exception/earliest deadline,
+        # before constructing diagnostic metadata or copying a failed ledger.
+        if envelope.phase == 'science':
+            try:
+                envelope.check()
+                envelope._stop('controller_exception:' + type(error).__name__, time.monotonic())
+            except RuntimeStop:
+                pass
+        terminal = {'version': 'rfcomp04.terminal.v1', 'status': 'protocol_invalid',
+            'manifest_sha256': manifest_sha, **progress, 'reason': str(error), 'error_type': type(error).__name__,
+            'seconds': envelope.elapsed(), 'production_authorized': False, 'prospective_evidence': False,
+            'provider_requests': 0, 'automatic_restart': False, 'independent_actual_result_acceptance': False,
+            'post_terminal_independent_numerical_and_temporal_review_required': True,
+            'last_origin_accounting': copy.deepcopy(accounting._origins[-1]) if accounting and accounting._origins else None}
+        if store is not None:
+            try:
+                envelope.finalize_invalid(store, terminal)
+            except BaseException as closure_error:
+                if isinstance(error, (KeyboardInterrupt, SystemExit)):
+                    raise error from closure_error
+                raise
+        if isinstance(error, (KeyboardInterrupt, SystemExit)) or store is None:
+            raise
+        return {'status': 'protocol_invalid', 'run_directory': str(store.path), 'reason': str(error),
+                'independent_actual_result_acceptance': False}
+    finally:
+        envelope.close()
+        if store is not None:
+            store.close()
+
+
+def _worker_main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--repository-root', required=True)
+    parser.add_argument('--implementation-acceptance', required=True)
+    parser.add_argument('--implementation-acceptance-sha256', required=True)
+    parser.add_argument('--watchdog-phase-file', required=True)
+    parser.add_argument('--envelope-started-monotonic', required=True, type=float)
+    args = parser.parse_args()
+    result = run(args.repository_root, args.implementation_acceptance, args.implementation_acceptance_sha256,
+                 args.watchdog_phase_file, args.envelope_started_monotonic)
+    print(json.dumps(result, sort_keys=True, allow_nan=False))
+    return 1 if result['status'] == 'protocol_invalid' else 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(_worker_main())

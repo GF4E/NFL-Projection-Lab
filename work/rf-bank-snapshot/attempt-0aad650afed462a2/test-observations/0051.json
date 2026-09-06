@@ -1,0 +1,30 @@
+{
+  "candidate": {
+    "events": [],
+    "images": [],
+    "outcome": {
+      "kind": "error",
+      "message": "Out of range float values are not JSON compliant: nan",
+      "module": "builtins",
+      "type": "ValueError"
+    },
+    "snapshots": []
+  },
+  "expected_decision": null,
+  "expected_modes": null,
+  "kind": "paired_value",
+  "label": "failure-before-valid",
+  "original": {
+    "events": [],
+    "images": [],
+    "outcome": {
+      "kind": "error",
+      "message": "Out of range float values are not JSON compliant: nan",
+      "module": "builtins",
+      "type": "ValueError"
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_failure_then_valid_and_readonly_mode"
+}

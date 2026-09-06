@@ -1,0 +1,88 @@
+from dataclasses import replace
+import importlib.util
+from pathlib import Path
+import sys
+import unittest
+
+import numpy as np
+from scipy.special import expit
+
+ROOT = Path(__file__).resolve().parents[2]
+for name in ("research_score_models", "research_score_distribution", "research_score_metrics"):
+    spec = importlib.util.spec_from_file_location(name, ROOT / "scripts" / (name + ".py"))
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+m = sys.modules["research_score_metrics"]
+d = sys.modules["research_score_distribution"]
+
+
+class MetricTests(unittest.TestCase):
+    def distribution(self):
+        return d.JointBase.from_scores([[7, 10], [14, 21], [28, 17], [31, 24], [0, 3], [21, 21]], [1, 2, 1, 3, 1, 2]).fit([18, 23])
+
+    def test_all_metrics_bounded_with_exact_targets(self):
+        for independent in (False, True):
+            distribution = replace(self.distribution(), independent=independent)
+            rows = m.score_forecast(distribution, [17, 28], "synthetic")
+            self.assertEqual(rows["margin_observed"], -11)
+            self.assertEqual(rows["total_observed"], 45)
+            self.assertAlmostEqual(rows["home_win_probability"] + rows["tie_probability"] + rows["away_win_probability"], 1)
+            self.assertEqual(rows["home_win_observed"], 0)
+            self.assertAlmostEqual(rows["win_tie_loss_log_loss"], -np.log(rows["away_win_probability"]))
+            self.assertLessEqual(rows["double_grid_difference"], 1e-6)
+            for target in m.TARGETS:
+                self.assertTrue(0 <= rows[target + "_pit"] <= 1)
+                widths = [rows[f"{target}_width_{round(100 * level)}"] for level in m.LEVELS]
+                self.assertEqual(widths, sorted(widths))
+
+    def test_tie_is_separate_outcome(self):
+        row = m.score_forecast(self.distribution(), [21, 21], "tie")
+        self.assertEqual(row["home_win_observed"], 0)
+        self.assertAlmostEqual(row["win_tie_loss_log_loss"], -np.log(row["tie_probability"]))
+
+    def test_inner_scoring_same_primary_without_diagnostics(self):
+        full = m.score_forecast(self.distribution(), [17, 28], "synthetic")
+        inner = m.score_forecast(self.distribution(), [17, 28], "synthetic", double_grid=False, diagnostics=False)
+        self.assertEqual(inner["joint_energy_score"], full["joint_energy_score"])
+        self.assertEqual(inner["joint_nll"], full["joint_nll"])
+        self.assertNotIn("home_pit", inner)
+
+    def test_linear_calibration_identified_and_constant(self):
+        x = np.arange(20, dtype=float)
+        row = m.mean_calibration(x, 3 + 1.2 * x)
+        self.assertEqual(row["status"], "available")
+        self.assertAlmostEqual(row["intercept"], 3)
+        self.assertAlmostEqual(row["slope"], 1.2)
+        constant = m.mean_calibration(np.ones(20), x)
+        self.assertEqual(constant["status"], "unavailable_by_design")
+        self.assertEqual(m.mean_calibration([1, np.nan], [1, 2])["status"], "diagnostic_failure")
+        near_constant = m.mean_calibration([1, 1 + 1e-14, 1], [1, 2, 3])
+        self.assertEqual(near_constant["status"], "diagnostic_failure")
+
+    def test_logistic_calibration_oracle_and_unavailability(self):
+        # At repeated x=-log3,0,log3 the exact empirical rates are .25,.5,.75.
+        x = np.repeat([-np.log(3), 0, np.log(3)], 4)
+        y = np.array([0, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 1])
+        row = m.win_calibration(expit(x), y)
+        self.assertEqual(row["status"], "available")
+        self.assertAlmostEqual(row["intercept"], 0, places=7)
+        self.assertAlmostEqual(row["slope"], 1, places=7)
+        self.assertEqual(m.win_calibration([.5, .5], [0, 1])["status"], "unavailable_by_design")
+        self.assertEqual(m.win_calibration([.1, .9], [0, 1])["reason"], "separation")
+
+    def test_scorecard_rmse_and_diagnostic_completeness(self):
+        distribution = self.distribution()
+        rows = [m.score_forecast(distribution, y, str(i)) for i, y in enumerate(([17, 28], [28, 10], [21, 21], [10, 30]))]
+        card = m.aggregate(rows)
+        self.assertEqual(card["games"], 4)
+        self.assertAlmostEqual(card["metrics"]["home_rmse"], np.sqrt(np.mean([1, 100, 9, 64])), places=6)
+        self.assertEqual(card["calibration"]["home"]["status"], "unavailable_by_design")
+        self.assertEqual(sum(card["pit"]["home"]["counts"]), 4)
+        del rows[-1]["home_pit"]
+        with self.assertRaisesRegex(ValueError, "incomplete_diagnostics"):
+            m.aggregate(rows)
+
+
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "Object of type Opaque is not JSON serializable",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "eligibility": {
+    "actual": false,
+    "expected": false,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "DictHook-fallback-True",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "DictHook"
+  },
+  "label": "DictHook-fallback-True",
+  "original": {
+    "kind": "error",
+    "message": "Object of type Opaque is not JSON serializable",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_dict_list_hooks_are_called_once_on_fast_and_fallback"
+}

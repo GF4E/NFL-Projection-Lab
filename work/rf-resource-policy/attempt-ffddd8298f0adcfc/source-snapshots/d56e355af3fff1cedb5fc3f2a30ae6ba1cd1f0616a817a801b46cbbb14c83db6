@@ -1,0 +1,207 @@
+{
+  "version": "rf02f.inference-unit-acceptance.v1",
+  "status": "accepted_full_synthetic_inference_integration_only",
+  "createdAt": "2026-09-05T13:03:11.005640+00:00",
+  "protocolAcceptance": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-PROTOCOL-ACCEPTANCE.v1.json",
+    "sha256": "c55f4e651bb9726402ac310b3bc06b2337cd58523aaa0e2ee7496fb847fc554b",
+    "bytes": 5703
+  },
+  "machineRegistry": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score-split.v1.json",
+    "sha256": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519",
+    "bytes": 13887
+  },
+  "meanUnitAcceptance": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-MEAN-UNIT-ACCEPTANCE.v1.json",
+    "sha256": "61c448d59a30be43ccc15faf447d78f3be9e420cc83baf6a991aa5e3fa61101a",
+    "bytes": 3693
+  },
+  "sourceAndTests": [
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_inference.py",
+      "sha256": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22",
+      "bytes": 16104
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/qualify_inference_unit.py",
+      "sha256": "bdc7016088a8e094e1c4c023e962b0be4935065d5f63df0c9c11e1bf6ef824d3",
+      "bytes": 20060
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_inference_unit.py",
+      "sha256": "6678ff40c73b2d5c493cd22d6e2321f7d9edb2d6d5b0a1241c29420c33e9040d",
+      "bytes": 18616
+    }
+  ],
+  "reusedDependencyPins": [
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_inference.py",
+      "sha256": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604",
+      "bytes": 23548
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_inference.py",
+      "sha256": "4b61e0d4477eb49064353d9fd7b4e1c6ac37fc68553e0df0387d9f71bb8db078",
+      "bytes": 13575
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_metrics.py",
+      "sha256": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97",
+      "bytes": 9445
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_compute_distribution.py",
+      "sha256": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1",
+      "bytes": 1540
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+      "sha256": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+      "bytes": 13532
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_models.py",
+      "sha256": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+      "bytes": 15069
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_contract.py",
+      "sha256": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+      "bytes": 8198
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_models.py",
+      "sha256": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+      "bytes": 4803
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py",
+      "sha256": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974",
+      "bytes": 4148
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_replay.py",
+      "sha256": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594",
+      "bytes": 6657
+    }
+  ],
+  "authorEvidence": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/focused-2ef0064789059509.json",
+      "sha256": "4d5604d4d18f759a151b2fc67dc215856083455e62623bb89ebb434f5a988ab0",
+      "bytes": 851
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/focused-2ef0064789059509.log",
+      "sha256": "297b554e8248e08093fad9971fc2f7ff341dfd5e025dc6a015ccdffc9baacfa7",
+      "bytes": 3300
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/focused-943105d923d2043d.json",
+      "sha256": "f6cec5241c21284f2f3f3cea28adc581e552e54b131c300c34accf5664c173f1",
+      "bytes": 852
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/focused-943105d923d2043d.log",
+      "sha256": "1c28da6331a3f89ea6a8b5cfe632a3d149c49dad253f14dd2d983a01c7582590",
+      "bytes": 2532
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d-process.json",
+      "sha256": "be3ae98089a18df6c5f907fa86c96a8d9be29f6209b5245d940318bcf88037d9",
+      "bytes": 1842
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d.log",
+      "sha256": "c077f7608ff0fc78169ae903c82a6af63cdb58aaf5a96103a42b98de93c7eeb3",
+      "bytes": 2571
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d/qualification.json",
+      "sha256": "19f64845ee65da9631049a218aa19c3379dae873e164bd193a8bde2c874d2eeb",
+      "bytes": 1549
+    }
+  ],
+  "retainedSyntheticFixture": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d/fixture-manifest.json",
+    "sha256": "22bd22dcb3b08218385fab0ddb52471d178f31e9ca84bf9fa202d09c96d9354d",
+    "bytes": 380428
+  },
+  "retainedSyntheticEvaluation": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d/evaluation.json",
+    "sha256": "caeda7fa5f04c1fbfc2bedd8fcb8a8bc4bfec6631222f4ee0665ddee9e081352",
+    "bytes": 10725042
+  },
+  "realMeanMapperScorerBridge": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d/mean-mapper-scorer-bridge.json",
+    "sha256": "c46dee7db2e7e3edf1b318dc20bb3f1a9126e5519c92af98c626e17fc36504fe",
+    "bytes": 15642
+  },
+  "rootEvidence": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/root-review/result.json",
+      "sha256": "1dbadee3b28e0f6d40b47482cf4731647c51eb3827da4f4aac04af297c88c2e6",
+      "bytes": 1955
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/root-review/verify.py",
+      "sha256": "58f1afc8b0e1a7b4e0bf1c31947889a988589b9f849842ab04a34f05b97e57a8",
+      "bytes": 5904
+    }
+  ],
+  "independentReviews": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/numerical-review.json",
+      "sha256": "ca2d8abf2e7f140a03889c3345a5dc62a0bf0a4308d139d17785107ed6355a81",
+      "bytes": 4020
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/numerical-integration-review.json",
+      "sha256": "dffa6982a51332de5f2b2e0b24c1760b8c31b123be2d6e253b5717c5abadad75",
+      "bytes": 3629
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/temporal-review.json",
+      "sha256": "a2e1d6a8259ede08f2d02a77918442c6b693e1f1450f254a28ebfc8b4409f555",
+      "bytes": 4276
+    }
+  ],
+  "observed": {
+    "focusedTests": 17,
+    "fullProcessSeconds": 121.4608799169946,
+    "fullProcessPeakRssMiB": 719.953125,
+    "generationSeconds": 73.54062933300156,
+    "authenticatedReloadSeconds": 32.99104520799301,
+    "publicEvaluatorSeconds": 13.86764429199684,
+    "counts": {
+      "actual_scorer_calls": 10221,
+      "exact_reuses": 54512,
+      "games": 3407,
+      "origins": 226,
+      "rows": 64733
+    },
+    "rootAuthenticatedArtifacts": 229,
+    "rootAuthenticatedBytes": 318137807,
+    "independentExactSummaryChecks": 65504,
+    "independentUniqueFreshScorerCases": 3,
+    "bootstrapMembersPerBlock": [
+      10000,
+      10000,
+      10000
+    ]
+  },
+  "learning": "Complete genuine scorer-to-durable-JSON-to-public-evaluator path passes, preserving NumPy finite scalar and signed-zero values. Exact same-input fixture reuse avoids54512duplicate calls without reducing64733public rows. No wall-time speedup versus an uncached implementation was measured.",
+  "testCorrection": "Initial boundary expectation100.5 exceeded actual frozen binary64 threshold1.005*100. The test fixture uses the computed threshold; evaluator arithmetic was unchanged and the failed evidence retained.",
+  "limits": [
+    "Synthetic integration and fixed inference design only; toy reject_all is not a historical candidate result.",
+    "Bootstrap endpoints authenticated and inspected, not independently regenerated.",
+    "Original historical source timing, issuance, authentic audit flags, full archive/controller and final implementation acceptance remain required.",
+    "600second full qualification passed; the later120second in-run smoke is still required and has not run.",
+    "The retained fixture remains valid only with matching complete source/config/runtime dependencies."
+  ],
+  "historicalInvocationAuthorized": false,
+  "predictiveAcceptance": false,
+  "productionAuthorization": false,
+  "researchDetailsPublic": false
+}

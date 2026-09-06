@@ -1,0 +1,45 @@
+{
+  "cache": {
+    "entries": [],
+    "evictions": 0,
+    "hits": 0,
+    "misses": 0,
+    "retained_bytes": 0
+  },
+  "candidate": {
+    "outcome": {
+      "kind": "error",
+      "message": "invalid_target_pair",
+      "module": "research_score_distribution",
+      "type": "NumericalFailure"
+    },
+    "warnings": []
+  },
+  "input": {
+    "items": [
+      {
+        "float64_bits": "bff0000000000000",
+        "float_hex": "-0x1.0000000000000p+0",
+        "type": "float"
+      },
+      {
+        "float64_bits": "0000000000000000",
+        "float_hex": "0x0.0p+0",
+        "type": "float"
+      }
+    ],
+    "type": "list"
+  },
+  "kind": "full_metrics_parity",
+  "label": "invalid-scorer-target",
+  "original": {
+    "outcome": {
+      "kind": "error",
+      "message": "invalid_target_pair",
+      "module": "research_score_distribution",
+      "type": "NumericalFailure"
+    },
+    "warnings": []
+  },
+  "test": "test_energy_geometry.EnergyGeometryTests.test_full_scorer_invalid_target_retains_original_boundary"
+}

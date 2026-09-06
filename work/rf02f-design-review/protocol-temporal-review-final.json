@@ -1,0 +1,101 @@
+{
+  "status": "accepted_temporal_reuse_budget_design_only",
+  "reviewer": "compute_runner",
+  "reviewed_at_utc": "2026-09-05T12:17:22.773398+00:00",
+  "scope": "final independent temporal, archive reuse, ordering, controller and budget DESIGN review; not implementation qualification or historical pre-fit execution approval",
+  "protocol": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md",
+    "sha256": "438bca948ff511c1b2841237bd31c60422c3ee64b47542baa8dbb2cc8eae2f23",
+    "bytes": 25355
+  },
+  "config": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score-split.v1.json",
+    "sha256": "d3ad76915ebf6ed23e691c4ef4c14b31b8b6d2a3a6ca40909420dac0da461095",
+    "bytes": 13331
+  },
+  "verified_direct_hashes": {
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md": "438bca948ff511c1b2841237bd31c60422c3ee64b47542baa8dbb2cc8eae2f23",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score-split.v1.json": "d3ad76915ebf6ed23e691c4ef4c14b31b8b6d2a3a6ca40909420dac0da461095",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score.v2.json": "422b1082361a2d0d926f639c8cf67b38615517a8269a7f05729aea0c8f264615",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-MEAN-UNIT-ACCEPTANCE.v1.json": "61c448d59a30be43ccc15faf447d78f3be9e420cc83baf6a991aa5e3fa61101a",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-MEAN-UNIT-SCOPE.v1.md": "a9fd7df9620df11e83a8494aa47d5e5cca72b50b8f8f7c094e5f1db4054c05ac",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_models.py": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_mean_unit.py": "622c7f2f97da6c7f49bbc050ad6d7b583cd3da474b0eeb318dcbb21be6cf3799",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd"
+  },
+  "prior_requested_changes": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-temporal-review.json",
+    "sha256": "fe3f6385c95d2f442fac2fb264680148cfc1d29f03ca503192a33eb5ba6ce1c8",
+    "preserved_unchanged": true,
+    "reviewed_protocol_sha256": "54146a109d2ecbc5f3ec208faf092829ed4f0ff030c81137b54e307cd3f08946"
+  },
+  "resolved_requests": [
+    {
+      "id": "F-T1",
+      "status": "resolved",
+      "evidence": "Sections 4 and 6 require the real public input of 19 series \u00d7 3,407 rows, all 226 origins and all 2013\u20132025 seasons, with 272 exposed-2025 rows and internal filtering to 3,135 development rows. Complete scorecards, nominal calibration, PIT and all 18/8 families at all three full bootstraps are included. The 600-second/4,096-MiB integration command includes all 64,733 real scorer calls, setup, persistence/reload and public evaluation. The later 120-second smoke reloads the immutable accepted fixture and times complete public evaluation, not a smaller internal helper."
+    },
+    {
+      "id": "F-T2",
+      "status": "resolved",
+      "evidence": "Section 3 and expected.stateOnlyWarmupOrigins identify exactly 2010 weeks 1\u20135 as state/warmup-only sources, validate their original index/admitted origin and both input closures, and require complete forecast closures for later forecast-bearing origins. Streaming admission retains authenticated pointers instead of every parsed state artifact. No broad missing-source exemption was added."
+    },
+    {
+      "id": "F-T3",
+      "status": "resolved",
+      "evidence": "Section 3 and reuse registry fix the same-original-selected-diagonal law/metric reuse keys, derived interval-mass calls, different-diagonal full-law recovery plus complete outer score, missing-variant fitting and all off-diagonal/new-zero own law resolution/scoring. Section 6 fixes uncached projection slots, successful nonfallback timing samples, failed callback inclusion, disjoint callback totals/remainder, doubled maxima, history scaling, complete-public T and reserve; a cached diagonal pilot no longer substitutes for unmeasured later callbacks."
+    },
+    {
+      "id": "F-T4",
+      "status": "resolved",
+      "evidence": "Exactly 65,646 new inner scores and 32,823 reused diagonal records are required for a valid completed run, including N0 fallback/native-failure rows. A smaller count is an invalid prefix. The 19-series/3,407-row public registry binds 64,733 total metric rows."
+    }
+  ],
+  "static_registry_checks": {
+    "settings": "27 exact registered candidates, original 9 diagonals first then 18 ordered off-diagonals",
+    "variants": "13 exact ordered E3 variants, including distinct zero_strength_update and zero_scoring_level_update",
+    "series": "13 E3 plus exactly six original raw references in declared order",
+    "energy_comparisons": "18 exact reference/candidate/id mappings in declared order",
+    "actual_mass_cells": "8 exact ordered cells: full then 24-hour, each home/away/margin/total 80",
+    "population": "277 origins, 226 outer origins, 3,407 outer games = 3,135 development + 272 exposed-2025",
+    "engines": "18 \u00d7 11 + 9 \u00d7 2 = 216 new engines, plus 81 cached diagonal outputs = 297 state outputs per origin",
+    "inner_counts": "3,647 \u00d7 9 = 32,823 reused; 3,647 \u00d7 18 = 65,646 new",
+    "score_rows": "3,407 \u00d7 13 = 44,291 E3; 3,407 \u00d7 6 = 20,442 raw; total 64,733",
+    "bounds": "600-second/4,096-MiB synthetic integration, 120-second in-run smoke, 7,200-second/4,096-MiB full envelope, 30-second invalid-only finalization grace",
+    "pilot": "same retained 2013 weeks 1 and 2 with 32 games; 31 fit/recovery and 31 score slots per remaining game; two-times callback maxima and two-times complete-public inference T",
+    "authority": "historicalInvocationAuthorizedByThisFile, providerAccessAllowed, productionAuthorization and researchDetailsPublic are all false",
+    "hash_graph": "config binds exact protocol; protocol names config path only; acceptance must bind both and the final code/qualification chain, without circular self-hashes"
+  },
+  "accepted_temporal_and_persistence_contract": [
+    "Freeze a single full-family choice for Y from exactly complete Y-2/Y-1 populations with fixed tie order and failure threshold; no variant retuning or 2025 outcome selection.",
+    "Every new state-changing trajectory retains complete own from-2010 history, original-origin raw means, original delayed-delivery/retention semantics and fixed 12/24-hour information boundaries.",
+    "Authenticate reused source bytes and exact semantic lineage/input/target/native-reason relationships; state is independently index-bound, and all earlier-delivered row contents remain immutable.",
+    "Pass the bank only validated history/targets fields. Keep receipt metadata in the controller and target outcomes in the grader. Durably publish the whole origin before grading.",
+    "Abort after any delivery validation error instead of retrying a partly mutated instance. Preserve same-game matching-variant/delay N0 fallback and native failures on all issued rows.",
+    "The total clock starts before source/runtime/admission/smoke/recovery/trajectory work. Pilot t1/t2 include all origin work, and callback timing has no overlapping attribution. The noncallback remainder includes cache/closures/selection/state/mass CDF/persistence work.",
+    "The actual hard deadline/RSS gate remains authoritative even if the conservative projection passes. No scientific callback continues after stop, and only metadata finalization may use the fixed grace.",
+    "One new identity and one atomic terminal/index completion pair, with mutually exclusive valid/invalid publication and retained ordinary/staging prefixes; no restart or competing terminal.",
+    "Independent implementation and actual-terminal reviews remain mandatory. No research label activates shadow/production, proves the external five-percent target or creates prospective evidence."
+  ],
+  "implementation_acceptance_obligations": [
+    "Demonstrate actual fixture generation plus full public evaluation within the fixed 600-second integration limit; design acceptance does not predict that runtime or permit reduced rows/bootstrap work if it fails.",
+    "Treat selection.innerScoreSeasons [2011,2024] as inclusive year bounds as explicitly specified by the protocol, and verify every complete year/population rather than reading only the two endpoint seasons.",
+    "Resolve 2011\u20132012 inner N0 fallbacks from authenticated full_setting_forecasts N0 setting 0; no outer-selected N0 artifact exists for those warmup-inner years. All fixed fallback source memberships must be tested.",
+    "Enforce streaming and per-origin hash checks without retaining the entire parsed 1.862GB parent archive; measure actual process/child memory if a subprocess is used.",
+    "If smoke is a child process, termination/clock/RSS accounting must cover its lifetime and prevent continued scientific work after parent stop.",
+    "Test successful nonfallback pilot samples, finite positive F/S/G/N/T values, disjoint timer accounting including exceptions, exact future-origin sum, archive reuse branches, and no-eligible/failure paths.",
+    "Exercise public evaluator numeric-type/persistence boundaries and swallowed-deadline/late-fsync/uncommitted-prefix failure cases in the final real controller; do not inherit a success claim from pure-unit tests."
+  ],
+  "limitations": [
+    "Accepted for the exact temporal/reuse/budget DESIGN scope only. The separately scoped numerical reviewer owns statistical-method and gate interpretation acceptance.",
+    "No historical artifact payload was loaded, fitted, transformed, forecast, recovered as a distribution or scored during this final review. No provider/site/production operation or frozen-file edit occurred.",
+    "Static consistency and direct hash checks were executed; synthetic integration, complete archive admission, implementation behavior, actual pilot cost, resource compliance and historical outputs are not established here.",
+    "The prior pure-unit and requested-change evidence is preserved within its original scope. This review does not strengthen retrospective availability assumptions into contemporaneous issuance or prospective evidence.",
+    "No historical invocation is authorized by this design acceptance; the final implementation/qualification source/runtime chain, independent pre-fit reviews and root phase gate must pass first."
+  ],
+  "blockers": [],
+  "historical_invocation_authorized": false,
+  "implementation_accepted": false,
+  "historical_fit_or_score": false,
+  "frozen_files_edited": false
+}

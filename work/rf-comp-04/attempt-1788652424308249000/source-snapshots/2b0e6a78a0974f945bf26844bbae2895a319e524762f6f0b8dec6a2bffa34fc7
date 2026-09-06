@@ -1,0 +1,67 @@
+{
+  "status": "accepted",
+  "scope": "independent_watchdog_unit_process_and_phase_review_only",
+  "source_hashes": {
+    "scripts/research_score_split_watchdog.py": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7",
+    "tests/research-score-split/test_watchdog_unit.py": "1cb98cd59db38847b7ddf3c0440e17f5e20cd9ffcd947b7aec5386a6f2ed5024"
+  },
+  "preserved_rejection": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-watchdog-unit/watchdog-review.json",
+    "sha256": "0f0b5422da1b1b919c69ba9a3f4a1e64936466cb4e70cdb258ddc73160986e9f"
+  },
+  "blockers": [],
+  "closed_findings": [
+    "wait4 handoff blocks real SIGALRM/SIGINT and marks reaping; direct watchdog injection defers until returncode/ownership bookkeeping completes.",
+    "Actual lost wait status records uncertain ownership and prohibits numeric group signaling rather than manufacturing exit evidence."
+  ],
+  "independent_tests": {
+    "passed": 20,
+    "unittest_seconds": 1.889,
+    "exit_code": 0,
+    "retained_children_directory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-watchdog-unit/children-1788618545812716000",
+    "process_report_hashes": {
+      "public-fixed-handshake/process-report.json": "bd2b049be40191801c2f31d600fac6bed76250e86d721656b5caac88d0e4ea9a",
+      "synthetic-1/process-report.json": "db5ec6a9f7b79578b6295b938d37d8b1c7d30a1a877705d53b72a1340bc276cb",
+      "synthetic-10/process-report.json": "4440aab2a56514bcc9424b4ae893a59ae7d1469bede8cb5965d4c82fa4b61817",
+      "synthetic-11/process-report.json": "51bfda8c6721e9c530c03958862f5deaac36461b8264c4f2bdf83c90f6b5eb47",
+      "synthetic-12/process-report.json": "8ff4b319423222a213068b3048a7d992f12ade39f47f2e8a9bf562ded978e963",
+      "synthetic-13/process-report.json": "b81ab0f98db50d8beeb1bb626bc8e62f6919c7dd522bfd159cd0e7efa6d6e79a",
+      "synthetic-14/process-report.json": "51d7377106809671bffe16acdb2f393d88d703094261e88e9487ef790c6a0953",
+      "synthetic-15/process-report.json": "869f9b22cb0a0172f14531fb58505482b0a2fba39e274df91a69fbf8f7a62c78",
+      "synthetic-17/process-report.json": "9b31356a7e58069c37aa5b69267e5a2c795cfae4e00ee0528b7ec8ac89b6fbb3",
+      "synthetic-18/process-report.json": "a711bf3fe6b5b383011a1a99f08c28e26c8f2dbd81774caf472025c9ac859c81",
+      "synthetic-19/process-report.json": "4d41a6314261e329b55a3c0680c582e8759d399b54cb73128563e03ba8ce1a6a",
+      "synthetic-2/process-report.json": "32e2a2df9ac8889dfaf2e544e2b853a46db8ffe02291d628d81b2ab3bddfbceb",
+      "synthetic-20/process-report.json": "cc6a701ece78ce90d82b832e25705e84f4d06cc9e2b886e54b6fad8019492960",
+      "synthetic-21/process-report.json": "e49fb70e21bfa18dcd16ca7e4f85a6875d3c02b470b626ecdb85b67563c457c6",
+      "synthetic-22/process-report.json": "cd36e69e136d36cedaf268ca38f78bc7447a2e060683364168e0843b1b9f127f",
+      "synthetic-23/process-report.json": "63ea0b408d8ed7730b6b6be16ee06532e63877cdd58d61301d2a299ed3ecd3e5",
+      "synthetic-24/process-report.json": "61e1ffca929c55a81c6629f12a6711f3905a41cc804e6cc1f465636fbc782a5a",
+      "synthetic-25/process-report.json": "331ea1a714be2a350c3506f61c0aa24795f86f4a0931af84cf6772e5b644fca6",
+      "synthetic-26/process-report.json": "c70b9e4bba4bf51e7dae7d8c3812a958e0fc8640914ed1017f6133acc6f2fd5f",
+      "synthetic-27/process-report.json": "ebc754260c3fb23ae1e4f7cf64a1db72baf37205e0d51219009fe7018c5ffadf",
+      "synthetic-3/process-report.json": "831b7c47da354355fda4bdbee10c1443cdd73bb36606cdefc80842788cddc02f",
+      "synthetic-4/process-report.json": "f42b23ca01aa501b58b8ba5b4dbf582be512a096ac9ae96e7dcbc41234801ab4",
+      "synthetic-5/process-report.json": "c1f357b6f11da9aad97e5a8cc165ad216442f70f44a44116c6126bb5051f6276",
+      "synthetic-6/process-report.json": "f0fa2205ab3ceafd67b57fbe373ebc658a704b2f94238a3efc3e0da3a567e89d",
+      "synthetic-7/process-report.json": "a164ebb4312ea432d524907f9ff6c9f791207bf1ad47f375791b22240aa9f7e4",
+      "synthetic-8/process-report.json": "7273914a7bc56dafa596bc7f490b97e54fabd4c22f16821b3f903c91420adf26",
+      "synthetic-9/process-report.json": "f4dc69f96ebe4273ec539736d927da41eebf755f9ed05a93c381ce952e59b9c6"
+    },
+    "resource_warning": "Deliberate competing-reap probe emits Popen ResourceWarning because returncode remains unknown. Its actual child is reaped by the probe; no fake exit status is supplied."
+  },
+  "findings": [
+    "Direct handler injection and real queued alarm/interrupt at actual wait4-return all pass no-kill-after-release regression.",
+    "Fixed public7200s/4096MiB, one owned session/group, immediate externalSIGKILL without worker grace, parent-only30s closure retained.",
+    "One-way owner-bound phase timestamps detect missed transient smoke and enforce full120s smoke independently of total deadline.",
+    "Failed observation while owned child remains unreaped triggers stop; exit high-water RSS and sampled group sum stay distinct.",
+    "Normal/failed/signaled/uncertain process outcomes distinct; metadata timeout preserves incomplete artifacts, postpublication fsync failure does not overwrite report."
+  ],
+  "limitations": [
+    "RSS limit is sampled, not a kernel instantaneous reservation; wait4 worker high-water check cannot reconstruct unsampled descendant peaks. Scheduler/signal delays remain observable rather than claimed zero.",
+    "Process completion does not authenticate a scientific Store terminal. Controller admission, phase calls, result integrity and full historical budget integration still require separate qualification.",
+    "Private short-budget seams and synthetic harmless child processes only; no historical admission, fit/scorer/bootstrap or full fixture.",
+    "Returned unknown ownership must remain an operational failure and not prompt signaling reused IDs or an automatic restart.",
+    "No historical execution authorization, production promotion or scientific acceptance."
+  ]
+}

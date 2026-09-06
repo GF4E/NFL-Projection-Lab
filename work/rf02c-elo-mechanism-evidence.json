@@ -1,0 +1,686 @@
+{
+  "E1_gates": {
+    "checks": {
+      "K_zero_does_not_stably_win": true,
+      "K_zero_native_failure_ceiling": true,
+      "all_leave_one_season_out_positive": false,
+      "availability_24h_failure": true,
+      "availability_24h_gain": false,
+      "availability_24h_native_failure_ceiling": true,
+      "availability_24h_reference_failure": true,
+      "away_coverage_range": true,
+      "away_coverage_uncertainty": false,
+      "away_crps_regression": false,
+      "away_mae_regression": false,
+      "away_width": true,
+      "deterministic_noise_does_not_stably_win": true,
+      "deterministic_noise_native_failure_ceiling": true,
+      "eight_improved_seasons": false,
+      "energy_gain_at_least_one_percent": false,
+      "exposed_2025_positive": false,
+      "home_coverage_range": true,
+      "home_coverage_uncertainty": false,
+      "home_crps_regression": true,
+      "home_mae_regression": true,
+      "home_width": true,
+      "independent_marginals_does_not_stably_win": true,
+      "independent_marginals_native_failure_ceiling": true,
+      "joint_nll_regression": true,
+      "margin_coverage_range": true,
+      "margin_coverage_uncertainty": false,
+      "margin_crps_regression": true,
+      "margin_width": true,
+      "native_failure_ceiling": true,
+      "no_home_effect_does_not_stably_win": true,
+      "no_home_effect_native_failure_ceiling": true,
+      "no_prior_season_carryover_does_not_stably_win": true,
+      "no_prior_season_carryover_native_failure_ceiling": true,
+      "no_team_identity_does_not_stably_win": true,
+      "no_team_identity_native_failure_ceiling": true,
+      "no_time_decay_does_not_stably_win": true,
+      "no_time_decay_native_failure_ceiling": true,
+      "paired_lower_positive_all_blocks": false,
+      "positive_mechanism_K_zero": true,
+      "shuffled_identity_does_not_stably_win": true,
+      "shuffled_identity_native_failure_ceiling": true,
+      "simpler_qualifying_reference": false,
+      "total_coverage_range": true,
+      "total_coverage_uncertainty": true,
+      "total_crps_regression": false,
+      "total_width": true
+    },
+    "development_gain": -0.008605485499435564,
+    "exposed_2025_gain": -0.004945978548535729,
+    "leave_one_season_out_gains": {
+      "2013": -0.008175314155789658,
+      "2014": -0.008351303423277206,
+      "2015": -0.010207261987939809,
+      "2016": -0.008667992553773625,
+      "2017": -0.009350902353497175,
+      "2018": -0.007665566712642712,
+      "2019": -0.007735978102893555,
+      "2020": -0.008689771276819299,
+      "2021": -0.008961774574870043,
+      "2022": -0.007882816280884023,
+      "2023": -0.007643321500807191,
+      "2024": -0.009934830872575405
+    },
+    "passed": false,
+    "season_gains": {
+      "2013": -0.013409097239776692,
+      "2014": -0.011339257403013534,
+      "2015": 0.009628965470118142,
+      "2016": -0.007847850312333468,
+      "2017": -0.0005891247000581893,
+      "2018": -0.018913510252128493,
+      "2019": -0.01828271068186016,
+      "2020": -0.007666878617903861,
+      "2021": -0.0050285174055949376,
+      "2022": -0.01681004209381745,
+      "2023": -0.018833908646220133,
+      "2024": 0.005745504661010848
+    },
+    "simpler_reference": "N0"
+  },
+  "E2_gates": {
+    "checks": {
+      "all_leave_one_season_out_positive": true,
+      "availability_24h_failure": true,
+      "availability_24h_gain": true,
+      "availability_24h_native_failure_ceiling": true,
+      "availability_24h_reference_failure": true,
+      "away_coverage_range": true,
+      "away_coverage_uncertainty": false,
+      "away_crps_regression": true,
+      "away_mae_regression": true,
+      "away_width": true,
+      "deterministic_noise_does_not_stably_win": true,
+      "deterministic_noise_native_failure_ceiling": true,
+      "eight_improved_seasons": true,
+      "energy_gain_at_least_one_percent": false,
+      "exposed_2025_positive": true,
+      "home_coverage_range": true,
+      "home_coverage_uncertainty": false,
+      "home_crps_regression": true,
+      "home_mae_regression": true,
+      "home_width": true,
+      "independent_marginals_does_not_stably_win": true,
+      "independent_marginals_native_failure_ceiling": true,
+      "joint_nll_regression": true,
+      "margin_coverage_range": true,
+      "margin_coverage_uncertainty": false,
+      "margin_crps_regression": true,
+      "margin_width": true,
+      "native_failure_ceiling": true,
+      "no_defense_does_not_stably_win": true,
+      "no_defense_native_failure_ceiling": true,
+      "no_home_effect_does_not_stably_win": true,
+      "no_home_effect_native_failure_ceiling": true,
+      "no_offense_does_not_stably_win": true,
+      "no_offense_native_failure_ceiling": true,
+      "no_prior_season_carryover_does_not_stably_win": true,
+      "no_prior_season_carryover_native_failure_ceiling": true,
+      "no_team_identity_does_not_stably_win": true,
+      "no_team_identity_native_failure_ceiling": true,
+      "no_time_decay_does_not_stably_win": true,
+      "no_time_decay_native_failure_ceiling": true,
+      "paired_lower_positive_all_blocks": false,
+      "positive_mechanism_no_defense": false,
+      "positive_mechanism_no_offense": true,
+      "shuffled_identity_does_not_stably_win": true,
+      "shuffled_identity_native_failure_ceiling": true,
+      "simpler_qualifying_reference": false,
+      "total_coverage_range": true,
+      "total_coverage_uncertainty": true,
+      "total_crps_regression": true,
+      "total_width": true
+    },
+    "development_gain": 0.005882214820181222,
+    "exposed_2025_gain": 0.010050749443573788,
+    "leave_one_season_out_gains": {
+      "2013": 0.0053923407883450436,
+      "2014": 0.005541718966245812,
+      "2015": 0.0061344987299895536,
+      "2016": 0.005108588559813219,
+      "2017": 0.006387659642054367,
+      "2018": 0.0054830710962844404,
+      "2019": 0.005433327083544401,
+      "2020": 0.007328643637091881,
+      "2021": 0.0058791489188906925,
+      "2022": 0.006660165826092136,
+      "2023": 0.006075679109657232,
+      "2024": 0.005164201749279619
+    },
+    "passed": false,
+    "season_gains": {
+      "2013": 0.011352510983267181,
+      "2014": 0.009544306234497172,
+      "2015": 0.0030102419720193026,
+      "2016": 0.015259180072038988,
+      "2017": 0.00044656088475601794,
+      "2018": 0.010259596614889288,
+      "2019": 0.010878132884066005,
+      "2020": -0.010225224457699036,
+      "2021": 0.0059129949699281105,
+      "2022": -0.0029499630169267065,
+      "2023": 0.0038255647902763756,
+      "2024": 0.013633547712130736
+    },
+    "simpler_reference": "N0"
+  },
+  "bindings": {
+    "artifact-index.json": "ccde502d661a4beee8f8da537a2f23238950fb2931c1527638de4c92898804ab",
+    "manifest.json": "2d9c91d803f1c991be039b88167082c8a501ce60dc58b18afcab0b251bb75e38",
+    "paired-inference.json": "f1b4d45bbe325c34c5be09ff412bd3b2c44df5288d6b4bfe287ec4aab42e296d",
+    "scorecards.json": "e4300dc0356c2d9d60d5708ddc5bf6601666a53c3e684d22e1ecc053a8479f72",
+    "terminal-decision.json": "8865f8911b590a2376649c9bd00885e527bbda7b22ea329bb4eca7e27393d9e0"
+  },
+  "config_sha256": "422b1082361a2d0d926f639c8cf67b38615517a8269a7f05729aea0c8f264615",
+  "inference_convention": "Gain=(reference loss-variant loss)/reference loss; simultaneous 95% intervals over 42 comparisons; 10000 season/week-block bootstrap replicates, lengths 1/3/6.",
+  "model_grids": {
+    "E1": {
+      "homePointsGridInTieOrder": [
+        0,
+        40,
+        80
+      ],
+      "initialRating": 1500,
+      "kGridInTieOrder": [
+        10,
+        20,
+        40
+      ],
+      "rank": 2,
+      "retentionGridInTieOrder": [
+        0.5,
+        0.75,
+        1
+      ],
+      "scale": 400,
+      "scoreMappingRidge": 16
+    },
+    "E2": {
+      "initialDefense": 0,
+      "initialOffense": 0,
+      "kGridInTieOrder": [
+        0.05,
+        0.1,
+        0.2
+      ],
+      "rank": 3,
+      "retentionGridInTieOrder": [
+        0.5,
+        0.75,
+        1
+      ]
+    },
+    "N0": {
+      "latestTeamGames": 17,
+      "priorGames": 4,
+      "rank": 0,
+      "settings": [
+        {}
+      ]
+    },
+    "S1": {
+      "halfLifeGridInTieOrder": [
+        2.5,
+        4,
+        1.5
+      ],
+      "rank": 1,
+      "ridgeGridInTieOrder": [
+        16,
+        4
+      ]
+    }
+  },
+  "registered_paired_comparisons": {
+    "E1:full->E1:K_zero": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.0033211408009868864,
+          "lower": -0.04220417234870701,
+          "upper": -0.021638148705250014
+        },
+        "3": {
+          "bootstrap_sd": 0.0033681982828290226,
+          "lower": -0.04258523644554547,
+          "upper": -0.02125708460841156
+        },
+        "6": {
+          "bootstrap_sd": 0.003135989691896347,
+          "lower": -0.04249866498763568,
+          "upper": -0.021343656066321347
+        }
+      },
+      "gain": -0.03192116052697851,
+      "reference": [
+        "E1",
+        "full"
+      ],
+      "variant": [
+        "E1",
+        "K_zero"
+      ]
+    },
+    "E1:full->E2:full": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.004311553675411323,
+          "lower": 0.00101453365358576,
+          "upper": 0.027713647043236145
+        },
+        "3": {
+          "bootstrap_sd": 0.00451686811394579,
+          "lower": 6.320291941591845e-05,
+          "upper": 0.028664977777405988
+        },
+        "6": {
+          "bootstrap_sd": 0.004557459038960354,
+          "lower": -0.001007944654903982,
+          "upper": 0.029736125351725887
+        }
+      },
+      "gain": 0.014364090348410952,
+      "reference": [
+        "E1",
+        "full"
+      ],
+      "variant": [
+        "E2",
+        "full"
+      ]
+    },
+    "E2:full->E2:no_defense": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.0041982640351643005,
+          "lower": -0.023560009768351133,
+          "upper": 0.002437562325854426
+        },
+        "3": {
+          "bootstrap_sd": 0.004277906572279586,
+          "lower": -0.024105533357618357,
+          "upper": 0.002983085915121652
+        },
+        "6": {
+          "bootstrap_sd": 0.004061363534669936,
+          "lower": -0.024259958450935572,
+          "upper": 0.003137511008438865
+        }
+      },
+      "gain": -0.010561223721248353,
+      "reference": [
+        "E2",
+        "full"
+      ],
+      "variant": [
+        "E2",
+        "no_defense"
+      ]
+    },
+    "E2:full->E2:no_offense": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.00468252493928117,
+          "lower": -0.052063667834867364,
+          "upper": -0.023067330617331308
+        },
+        "3": {
+          "bootstrap_sd": 0.004878472696492532,
+          "lower": -0.053011265429137706,
+          "upper": -0.022119733023060965
+        },
+        "6": {
+          "bootstrap_sd": 0.005186756760819237,
+          "lower": -0.055060117564826504,
+          "upper": -0.020070880887372168
+        }
+      },
+      "gain": -0.037565499226099336,
+      "reference": [
+        "E2",
+        "full"
+      ],
+      "variant": [
+        "E2",
+        "no_offense"
+      ]
+    },
+    "N0:full->E1:full": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.0032645778706274302,
+          "lower": -0.01871336554674936,
+          "upper": 0.001502394547878233
+        },
+        "3": {
+          "bootstrap_sd": 0.0036518856789558114,
+          "lower": -0.020167746048301557,
+          "upper": 0.0029567750494304303
+        },
+        "6": {
+          "bootstrap_sd": 0.003728411341456795,
+          "lower": -0.02118119252338822,
+          "upper": 0.003970221524517092
+        }
+      },
+      "gain": -0.008605485499435564,
+      "reference": [
+        "N0",
+        "full"
+      ],
+      "variant": [
+        "E1",
+        "full"
+      ]
+    },
+    "N0:full->E2:full": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.0028601880292591724,
+          "lower": -0.002973581750833995,
+          "upper": 0.014738011391196439
+        },
+        "3": {
+          "bootstrap_sd": 0.0029804134685672275,
+          "lower": -0.00355409291132942,
+          "upper": 0.015318522551691863
+        },
+        "6": {
+          "bootstrap_sd": 0.0029722226883286515,
+          "lower": -0.004142913395355616,
+          "upper": 0.015907343035718058
+        }
+      },
+      "gain": 0.005882214820181222,
+      "reference": [
+        "N0",
+        "full"
+      ],
+      "variant": [
+        "E2",
+        "full"
+      ]
+    }
+  },
+  "removal_diagnostics": {
+    "E2:no_defense": {
+      "full_better_development_seasons": 9,
+      "removal_gain_2025_percent": -2.5438683604048973,
+      "removal_gain_development_percent": -1.0561223721248352
+    },
+    "E2:no_offense": {
+      "full_better_development_seasons": 12,
+      "removal_gain_2025_percent": -3.6750483528717055,
+      "removal_gain_development_percent": -3.7565499226099335
+    }
+  },
+  "rows": {
+    "E1:K_zero": {
+      "all_games": 3407,
+      "development": {
+        "away_coverage_80": 0.8178628389154705,
+        "away_crps": 5.531490962871223,
+        "away_mae": 7.888085227535215,
+        "away_width_80": 24.836682615629986,
+        "home_coverage_80": 0.8229665071770335,
+        "home_crps": 5.728934819880606,
+        "home_mae": 8.041044554595755,
+        "home_width_80": 26.31610845295056,
+        "joint_energy_score": 8.824335703400484,
+        "joint_nll": 7.965880645616509,
+        "margin_coverage_80": 0.8095693779904306,
+        "margin_crps": 8.021899391128597,
+        "margin_width_80": 36.889952153110045,
+        "total_coverage_80": 0.7987240829346093,
+        "total_crps": 7.80620371476794,
+        "total_width_80": 35.00318979266348
+      },
+      "development_games": 3135,
+      "energy_2025": 8.810268305858916,
+      "energy_gain_vs_N0_2025_percent": -5.207442295608022,
+      "energy_gain_vs_N0_development_percent": -4.0801343110454145,
+      "margin_crps_regression_vs_N0_percent": 6.36039586545779,
+      "native_failures": 0,
+      "season_energy": {
+        "2013": 8.951378333677766,
+        "2014": 9.269196908350704,
+        "2015": 8.646590729859263,
+        "2016": 8.244279363749964,
+        "2017": 9.04186386794191,
+        "2018": 9.060045359570552,
+        "2019": 8.995662916739366,
+        "2020": 8.913880939765416,
+        "2021": 9.20104934580528,
+        "2022": 8.230387048416514,
+        "2023": 8.765581487830586,
+        "2024": 8.600999845069943,
+        "2025": 8.810268305858916
+      },
+      "total_crps_regression_vs_N0_percent": 1.6953082387945326
+    },
+    "E1:full": {
+      "all_games": 3407,
+      "development": {
+        "away_coverage_80": 0.840829346092504,
+        "away_crps": 5.36735070857098,
+        "away_mae": 7.606627725144617,
+        "away_width_80": 25.317384370015947,
+        "home_coverage_80": 0.8328548644338118,
+        "home_crps": 5.537375619554356,
+        "home_mae": 7.7929929319390165,
+        "home_width_80": 25.83827751196172,
+        "joint_energy_score": 8.551366171126967,
+        "joint_nll": 7.908359841524701,
+        "margin_coverage_80": 0.8417862838915471,
+        "margin_crps": 7.540132944815479,
+        "margin_width_80": 37.14545454545455,
+        "total_coverage_80": 0.7987240829346093,
+        "total_crps": 7.806230435764609,
+        "total_width_80": 34.99393939393939
+      },
+      "development_games": 3135,
+      "energy_2025": 8.415605883687707,
+      "energy_gain_vs_N0_2025_percent": -0.49459785485357294,
+      "energy_gain_vs_N0_development_percent": -0.8605485499435563,
+      "margin_crps_regression_vs_N0_percent": -0.027227245500851087,
+      "native_failures": 0,
+      "season_energy": {
+        "2013": 8.648132059862228,
+        "2014": 8.93263609258766,
+        "2015": 8.303334282500993,
+        "2016": 7.975291829112866,
+        "2017": 8.838417567844544,
+        "2018": 8.84028529325149,
+        "2019": 8.71636631934622,
+        "2020": 8.620907320451305,
+        "2021": 8.896339886633768,
+        "2022": 8.073192256206765,
+        "2023": 8.560170965691725,
+        "2024": 8.236882269813995,
+        "2025": 8.415605883687707
+      },
+      "total_crps_regression_vs_N0_percent": 1.6956563465421601
+    },
+    "E2:full": {
+      "all_games": 3407,
+      "development": {
+        "away_coverage_80": 0.8446570972886762,
+        "away_crps": 5.280251012250645,
+        "away_mae": 7.4461975144869115,
+        "away_width_80": 25.307177033492824,
+        "home_coverage_80": 0.8350877192982457,
+        "home_crps": 5.464101388655149,
+        "home_mae": 7.711005668977675,
+        "home_width_80": 25.86762360446571,
+        "joint_energy_score": 8.428533574842554,
+        "joint_nll": 7.882083037735223,
+        "margin_coverage_80": 0.8500797448165869,
+        "margin_crps": 7.425772816295547,
+        "margin_width_80": 37.14481658692185,
+        "total_coverage_80": 0.8098883572567783,
+        "total_crps": 7.705308871679301,
+        "total_width_80": 34.871132376395536
+      },
+      "development_games": 3135,
+      "energy_2025": 8.290020474103061,
+      "energy_gain_vs_N0_2025_percent": 1.0050749443573788,
+      "energy_gain_vs_N0_development_percent": 0.5882214820181222,
+      "margin_crps_regression_vs_N0_percent": -1.543500131453032,
+      "native_failures": 0,
+      "season_energy": {
+        "2013": 8.436823854211902,
+        "2014": 8.748182386351335,
+        "2015": 8.358826084878116,
+        "2016": 7.792441500501818,
+        "2017": 8.829269135744276,
+        "2018": 8.587173930019949,
+        "2019": 8.466753326770158,
+        "2020": 8.642794774377336,
+        "2021": 8.799487497591379,
+        "2022": 7.963147037885009,
+        "2023": 8.369787660853847,
+        "2024": 8.17153392866403,
+        "2025": 8.290020474103061
+      },
+      "total_crps_regression_vs_N0_percent": 0.3809008081771536
+    },
+    "E2:no_defense": {
+      "all_games": 3407,
+      "development": {
+        "away_coverage_80": 0.8328548644338118,
+        "away_crps": 5.353218154061241,
+        "away_mae": 7.574254284810816,
+        "away_width_80": 25.271132376395535,
+        "home_coverage_80": 0.8267942583732057,
+        "home_crps": 5.505595624022573,
+        "home_mae": 7.751756482010091,
+        "home_width_80": 25.80574162679426,
+        "joint_energy_score": 8.51754920356852,
+        "joint_nll": 7.900914678305191,
+        "margin_coverage_80": 0.8440191387559809,
+        "margin_crps": 7.557857223456992,
+        "margin_width_80": 37.1244019138756,
+        "total_coverage_80": 0.8086124401913876,
+        "total_crps": 7.732764190946205,
+        "total_width_80": 34.893460925039875
+      },
+      "development_games": 3135,
+      "energy_2025": 8.500907682014857,
+      "energy_gain_vs_N0_2025_percent": -1.513225632539654,
+      "energy_gain_vs_N0_development_percent": -0.4616885514374754,
+      "margin_crps_regression_vs_N0_percent": 0.20777461638061037,
+      "native_failures": 0,
+      "season_energy": {
+        "2013": 8.661828837075376,
+        "2014": 8.874151958234258,
+        "2015": 8.554084156059215,
+        "2016": 7.949573941027172,
+        "2017": 8.792192907566953,
+        "2018": 8.664744122785494,
+        "2019": 8.737266712967422,
+        "2020": 8.673594582813699,
+        "2021": 8.751477239980417,
+        "2022": 7.9590081248884905,
+        "2023": 8.42205424884518,
+        "2024": 8.21368036190586,
+        "2025": 8.500907682014857
+      },
+      "total_crps_regression_vs_N0_percent": 0.7385749424506716
+    },
+    "E2:no_offense": {
+      "all_games": 3407,
+      "development": {
+        "away_coverage_80": 0.8325358851674641,
+        "away_crps": 5.4513856637298295,
+        "away_mae": 7.7313611505798026,
+        "away_width_80": 25.27751196172249,
+        "home_coverage_80": 0.8159489633173844,
+        "home_crps": 5.7024782425614635,
+        "home_mae": 8.043949153659788,
+        "home_width_80": 25.828070175438597,
+        "joint_energy_score": 8.745155646325454,
+        "joint_nll": 7.950328211000505,
+        "margin_coverage_80": 0.8248803827751197,
+        "margin_crps": 7.779076769466308,
+        "margin_width_80": 37.15502392344498,
+        "total_coverage_80": 0.7945773524720893,
+        "total_crps": 7.9135855269319695,
+        "total_width_80": 34.963955342902715
+      },
+      "development_games": 3135,
+      "energy_2025": 8.594682734989313,
+      "energy_gain_vs_N0_2025_percent": -2.633036418326595,
+      "energy_gain_vs_N0_development_percent": -3.1462316069642844,
+      "margin_crps_regression_vs_N0_percent": 3.140870301019641,
+      "native_failures": 0,
+      "season_energy": {
+        "2013": 8.71599033063326,
+        "2014": 9.169050447125436,
+        "2015": 8.50426867849011,
+        "2016": 8.074992716120988,
+        "2017": 9.031553791927585,
+        "2018": 8.959125627028083,
+        "2019": 8.767202042162143,
+        "2020": 8.93141914813448,
+        "2021": 9.301337141167462,
+        "2022": 8.218083034948418,
+        "2023": 8.693023846876887,
+        "2024": 8.585198337926304,
+        "2025": 8.594682734989313
+      },
+      "total_crps_regression_vs_N0_percent": 3.0942246501869497
+    },
+    "N0:full": {
+      "all_games": 3407,
+      "development": {
+        "away_coverage_80": 0.8370015948963317,
+        "away_crps": 5.297969102258352,
+        "away_mae": 7.497646458619001,
+        "away_width_80": 25.29377990430622,
+        "home_coverage_80": 0.8318979266347687,
+        "home_crps": 5.5120037959761605,
+        "home_mae": 7.7596923281710675,
+        "home_width_80": 25.83859649122807,
+        "joint_energy_score": 8.478405376600296,
+        "joint_nll": 7.891023744006177,
+        "margin_coverage_80": 0.8437001594896332,
+        "margin_crps": 7.542186474443008,
+        "margin_width_80": 37.14545454545455,
+        "total_coverage_80": 0.8124401913875599,
+        "total_crps": 7.676070656512396,
+        "total_width_80": 34.92631578947368
+      },
+      "development_games": 3135,
+      "energy_2025": 8.374187332778366,
+      "energy_gain_vs_N0_2025_percent": 0.0,
+      "energy_gain_vs_N0_development_percent": 0.0,
+      "native_failures": 0,
+      "season_energy": {
+        "2013": 8.53370280907992,
+        "2014": 8.832482302254832,
+        "2015": 8.38406414666852,
+        "2016": 7.913190296175471,
+        "2017": 8.833213703470937,
+        "2018": 8.676188120289009,
+        "2019": 8.559868716134428,
+        "2020": 8.55531476064349,
+        "2021": 8.851828313886054,
+        "2022": 7.939725142350512,
+        "2023": 8.40192978761974,
+        "2024": 8.284480792823215,
+        "2025": 8.374187332778366
+      }
+    }
+  },
+  "run": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02c-v1-2d9c91d803f1c991",
+  "scope": "Extraction and algebra only; no model fit, new score computation, tuning, revised criterion or authorization.",
+  "source_hashes": {
+    "scripts/research_score_distribution.py": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+    "scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+    "scripts/research_score_replay.py": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594"
+  },
+  "terminal_status": "reject_all"
+}

@@ -1,0 +1,101 @@
+{
+  "status": "accepted_pure_mean_unit_temporal_source_behavior_only",
+  "reviewer": "compute_runner",
+  "reviewed_at_utc": "2026-09-05T11:51:23.765966+00:00",
+  "scope": "exact RF-02F pure mean-unit source, root synthetic qualification and independent temporal/failure probes; no historical or integration acceptance",
+  "scope_document": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-MEAN-UNIT-SCOPE.v1.md",
+    "sha256": "a9fd7df9620df11e83a8494aa47d5e5cca72b50b8f8f7c094e5f1db4054c05ac"
+  },
+  "source_hashes": {
+    "scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+    "scripts/research_score_split_models.py": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+    "tests/research-score-split/test_mean_unit.py": "622c7f2f97da6c7f49bbc050ad6d7b583cd3da474b0eeb318dcbb21be6cf3799"
+  },
+  "frozen_original_source_unchanged": true,
+  "evidence": {
+    "root-tests-attempt1.json": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-tests-attempt1.json",
+      "sha256": "3ce7d353e3840e9ea42400071f62a0a4dd0c3f1406f015ad5833aa7314258f7b"
+    },
+    "root-tests-attempt2.json": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-tests-attempt2.json",
+      "sha256": "025739dfba9b8b00731444185386bcec976fc9d43771d1e9c867f708213f64f8"
+    },
+    "root-process-attempt2.json": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-process-attempt2.json",
+      "sha256": "68bb101c223433aa5698dda7ec5f17b6e113bd8969f512442ac76a1fc74d40ae"
+    },
+    "root-tests-attempt2.log": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-tests-attempt2.log",
+      "sha256": "fca0ce93b547cae85feb6b16242a077bbf6fe4cfbabbbe78060d6e6dad9a4fb5"
+    },
+    "temporal-probes.py": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/temporal-probes.py",
+      "sha256": "718d24e7a5a362f7fc0db6524029c90ea99e2e69833546a9151f40745297c969"
+    },
+    "temporal-probe-result.json": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/temporal-probe-result.json",
+      "sha256": "0efa31643cd8672c22cbd80d4e968178d8d9d86e2256a3eac9740c5a9dc804da"
+    },
+    "temporal-probe-process.json": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/temporal-probe-process.json",
+      "sha256": "7c0590cd861a98f063c641172af42aa6d2bbde63050d9b6dfc4e87b30f2590fe"
+    },
+    "temporal-probes.log": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/temporal-probes.log",
+      "sha256": "947dc6b40b796e0c2e1a6366d61117727d7f673e0212664bf545b83616c502d7"
+    }
+  },
+  "root_qualification": {
+    "tests": 11,
+    "exact_diagonal_setting_variant_combinations": 99,
+    "failures": 0,
+    "errors": 0,
+    "complete_process_seconds": 0.3901192090124823,
+    "peak_rss_mib": 51.40625,
+    "reviewed_not_repeated": true,
+    "prior_failed_attempt_retained": true,
+    "prior_attempt_test_hash_changed_only": true,
+    "prior_attempt_limit": "The preserved first attempt failed one rounding-sensitive retention assertion. Source hash is identical in both reports; final test uses its stated rounding tolerance while all 99 ordinary diagonal path checks remain exact."
+  },
+  "independent_probes": {
+    "tests": 8,
+    "failures": 0,
+    "errors": 0,
+    "test_seconds_excluding_imports": 0.04793104100099299,
+    "complete_process_seconds": 0.4245180420111865,
+    "peak_rss_mib": 50.171875,
+    "within_120_seconds_2048_mib": true,
+    "source_hashes_verified_before_after": true
+  },
+  "accepted_findings": [
+    "Every one of 18 off-diagonal settings across all 13 variants retains the exact inherited forecast_origin method and internal E2 failure/mean semantics. The factory copies incoming settings; ordinary tied paths directly return the original class.",
+    "A later off-diagonal forecast has its own means demonstrably different from diagonal E2. Delayed delivery after another result changes state according to that original off-diagonal mean, not a later or archived diagonal expectation. Mutating the returned forecast array does not change stored learning expectations.",
+    "Shuffled delivery uses the original game-season/week deterministic mapping even across a two-year delay; old-season result increments are applied before common retention. The independent seed and S/P arithmetic probe matches final O/D state.",
+    "All 27 settings retain exactly zero disabled S or P coordinates for their respective new removals over multiple games, 2020 weighting and season gaps. These variants retain distinct trajectories even at nominally tied gains.",
+    "Future/same-origin, disappearing-history, wrong-target, duplicate-target and repeated-target guards precede state mutation in the tested public precondition paths.",
+    "All 13 off-diagonal variants retain absorbing nonfinite-dynamic-state failure across later delivery and offseason transitions, without reset.",
+    "Finite nonpositive forecasts remain native invalid_mean without creating an absorbing failure; later updates use the original raw invalid mean as in frozen E2, never an external fallback mean.",
+    "Source inspection and root noise tests retain pre-noise learning expectations, original deterministic seeds and copied noise output. Independent-marginal and availability timing effects remain outside this pure mean unit."
+  ],
+  "required_integration_obligations": [
+    "Authenticate immutable historical input row contents on every relevant closure. The inherited unit checks delivered identity membership but does not hash-bind or reject changes to already-delivered score contents on a later call; the explicit probe demonstrates a changed league mean.",
+    "Treat a delivery validation error as fatal for that run/instance. The inherited delivered_context_mismatch check occurs after adding the game to delivered; the explicit probe confirms partial mutation. Do not retry the same instance or claim transactional rollback.",
+    "The factory validates settings at construction; callers must freeze the experiment configuration rather than mutate public model internals later.",
+    "Supply the actual prior-only 12/24-hour prepared inputs, fixed same-game fallback and mapper controls, exact original order and independent selection/score/inference admission. The pure unit cannot establish these caller guarantees."
+  ],
+  "limitations": [
+    "This accepts only the exact additive pure mean unit within the reviewed numerical/temporal synthetic scope. It is not full RF-02F protocol, archive reuse, selection, integration, qualification, cost-pilot or historical pre-fit approval.",
+    "No historical artifact, historical forecast, model fit, distribution fit, scorer, provider, site, production or publication operation was invoked. Synthetic state updates used invented football contexts and scores.",
+    "Root qualification provenance is its preserved report/process/log and matching source hashes; this reviewer did not witness that prior live process. The eight independent probes were run and completed in this review.",
+    "The measured subsecond synthetic runtime is not an equivalent-workload compute speedup estimate and does not predict historical replay cost.",
+    "Historical issuance, prospective evidence and predictive improvement are untested."
+  ],
+  "blockers": [],
+  "historical_data_loaded": false,
+  "historical_fit_or_score": false,
+  "historical_execution_authorized": false,
+  "frozen_files_edited": false,
+  "new_files_only_in_workspace_review_directory": true
+}

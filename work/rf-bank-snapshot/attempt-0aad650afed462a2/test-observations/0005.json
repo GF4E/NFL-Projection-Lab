@@ -1,0 +1,17 @@
+{
+  "candidate_after_equal": false,
+  "candidate_before_still_equal": true,
+  "kind": "mutation_decisions",
+  "label": "owned-alias-capture",
+  "original_after": {
+    "ascii_body": "[\n  {\n    \"x\": [\n      9.0,\n      0.0\n    ]\n  },\n  {\n    \"x\": [\n      9.0,\n      0.0\n    ]\n  }\n]\n",
+    "bytes": 97,
+    "sha256": "44dbfeeee4f7d132f70b9f86742d4de45dc52246bcb139fecdbc70b51636a7dd"
+  },
+  "original_before": {
+    "ascii_body": "[\n  {\n    \"x\": [\n      1.0,\n      -0.0\n    ]\n  },\n  {\n    \"x\": [\n      1.0,\n      -0.0\n    ]\n  }\n]\n",
+    "bytes": 99,
+    "sha256": "31852610e259d56e6f4116c271dcedf444a6f4960d9065b6016344aabc4d9334"
+  },
+  "test": "test_bank_snapshot.SnapshotTests.test_aliases_and_post_capture_mutation"
+}

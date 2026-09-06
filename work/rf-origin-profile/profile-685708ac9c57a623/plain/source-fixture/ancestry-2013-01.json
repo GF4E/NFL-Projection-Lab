@@ -1,0 +1,234 @@
+{
+  "12": {
+    "expected_root": "85397d461386aec9e6af6923533647e68faa3eb3b162ce46d53f94ccd0f3fb81",
+    "nodes": [
+      {
+        "available_at": null,
+        "body": {
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "id": "configuration",
+        "kind": "configuration",
+        "parents": [],
+        "sha256": "9eedae7e50b8c25f6cd505f91d70945d9626f669dcacbf57af26289fc29d064f"
+      },
+      {
+        "available_at": null,
+        "body": {
+          "admission_manifest": "74afed41bfbbb18331123a9a060e426cdddb15f7e48602f90cb5b98e57679c87",
+          "availability_class": "retrospective_inferred",
+          "ids": [
+            "old"
+          ],
+          "input_sha256": "78877a5aa3ca0ab0ff86b1f28cb4232d2475f961cd3b5e00ed6beff911416ed5"
+        },
+        "id": "eligible-football",
+        "kind": "football_source",
+        "parents": [],
+        "sha256": "5ccff775affcdb81292a4c722655fe2bc5cc3afcc45cec90a12acd85ac3aa15f"
+      },
+      {
+        "available_at": null,
+        "body": {
+          "historical": [
+            "game_id",
+            "season",
+            "week",
+            "home",
+            "away",
+            "neutral",
+            "home_score",
+            "away_score"
+          ],
+          "target_context": [
+            "game_id",
+            "season",
+            "week",
+            "home",
+            "away",
+            "neutral"
+          ]
+        },
+        "id": "feature-schema",
+        "kind": "feature_schema",
+        "parents": [],
+        "sha256": "057691a694084f77bcd46a9d5c44a2d4ba18da4f78f650a6af11eb3fe7ee95bd"
+      },
+      {
+        "available_at": null,
+        "body": {
+          "fields": [
+            "home_final_score_including_OT",
+            "away_final_score_including_OT"
+          ],
+          "overtime_occurrence": "diagnostic_only",
+          "season_type": "REG",
+          "type": "joint_nonnegative_integer_scores"
+        },
+        "id": "target-schema",
+        "kind": "target_schema",
+        "parents": [],
+        "sha256": "d8db22d56a414aa4ab53533cce5b83b79eb7b426ffb968eeab79062a92581ec5"
+      },
+      {
+        "available_at": null,
+        "body": {
+          "code_sha256": "061d87aba8e7628d5f63f51353b24f116d1ae278ae97100261da4fdaaf960530"
+        },
+        "id": "model",
+        "kind": "model",
+        "parents": [
+          {
+            "id": "configuration",
+            "sha256": "9eedae7e50b8c25f6cd505f91d70945d9626f669dcacbf57af26289fc29d064f"
+          },
+          {
+            "id": "eligible-football",
+            "sha256": "5ccff775affcdb81292a4c722655fe2bc5cc3afcc45cec90a12acd85ac3aa15f"
+          },
+          {
+            "id": "feature-schema",
+            "sha256": "057691a694084f77bcd46a9d5c44a2d4ba18da4f78f650a6af11eb3fe7ee95bd"
+          },
+          {
+            "id": "target-schema",
+            "sha256": "d8db22d56a414aa4ab53533cce5b83b79eb7b426ffb968eeab79062a92581ec5"
+          }
+        ],
+        "sha256": "7b34b447b8535be6d6dca0c008e5c661812aecec410aeaed3304dc7d856a2068"
+      },
+      {
+        "available_at": null,
+        "body": {
+          "delay_hours": 12,
+          "forecast_bytes_sha256": "e90a8b590cf7436b85195b926e26b4bb6e57444fbff6e042e62ce2f9a9595ab5"
+        },
+        "id": "forecast",
+        "kind": "forecast",
+        "parents": [
+          {
+            "id": "model",
+            "sha256": "7b34b447b8535be6d6dca0c008e5c661812aecec410aeaed3304dc7d856a2068"
+          }
+        ],
+        "sha256": "85397d461386aec9e6af6923533647e68faa3eb3b162ce46d53f94ccd0f3fb81"
+      }
+    ]
+  },
+  "24": {
+    "expected_root": "b8361cdf006c038b05d5117493844709a847c490a1d7547863b194463c7511ce",
+    "nodes": [
+      {
+        "available_at": null,
+        "body": {
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "id": "configuration",
+        "kind": "configuration",
+        "parents": [],
+        "sha256": "9eedae7e50b8c25f6cd505f91d70945d9626f669dcacbf57af26289fc29d064f"
+      },
+      {
+        "available_at": null,
+        "body": {
+          "admission_manifest": "74afed41bfbbb18331123a9a060e426cdddb15f7e48602f90cb5b98e57679c87",
+          "availability_class": "retrospective_inferred",
+          "ids": [
+            "old"
+          ],
+          "input_sha256": "78877a5aa3ca0ab0ff86b1f28cb4232d2475f961cd3b5e00ed6beff911416ed5"
+        },
+        "id": "eligible-football",
+        "kind": "football_source",
+        "parents": [],
+        "sha256": "5ccff775affcdb81292a4c722655fe2bc5cc3afcc45cec90a12acd85ac3aa15f"
+      },
+      {
+        "available_at": null,
+        "body": {
+          "historical": [
+            "game_id",
+            "season",
+            "week",
+            "home",
+            "away",
+            "neutral",
+            "home_score",
+            "away_score"
+          ],
+          "target_context": [
+            "game_id",
+            "season",
+            "week",
+            "home",
+            "away",
+            "neutral"
+          ]
+        },
+        "id": "feature-schema",
+        "kind": "feature_schema",
+        "parents": [],
+        "sha256": "057691a694084f77bcd46a9d5c44a2d4ba18da4f78f650a6af11eb3fe7ee95bd"
+      },
+      {
+        "available_at": null,
+        "body": {
+          "fields": [
+            "home_final_score_including_OT",
+            "away_final_score_including_OT"
+          ],
+          "overtime_occurrence": "diagnostic_only",
+          "season_type": "REG",
+          "type": "joint_nonnegative_integer_scores"
+        },
+        "id": "target-schema",
+        "kind": "target_schema",
+        "parents": [],
+        "sha256": "d8db22d56a414aa4ab53533cce5b83b79eb7b426ffb968eeab79062a92581ec5"
+      },
+      {
+        "available_at": null,
+        "body": {
+          "code_sha256": "061d87aba8e7628d5f63f51353b24f116d1ae278ae97100261da4fdaaf960530"
+        },
+        "id": "model",
+        "kind": "model",
+        "parents": [
+          {
+            "id": "configuration",
+            "sha256": "9eedae7e50b8c25f6cd505f91d70945d9626f669dcacbf57af26289fc29d064f"
+          },
+          {
+            "id": "eligible-football",
+            "sha256": "5ccff775affcdb81292a4c722655fe2bc5cc3afcc45cec90a12acd85ac3aa15f"
+          },
+          {
+            "id": "feature-schema",
+            "sha256": "057691a694084f77bcd46a9d5c44a2d4ba18da4f78f650a6af11eb3fe7ee95bd"
+          },
+          {
+            "id": "target-schema",
+            "sha256": "d8db22d56a414aa4ab53533cce5b83b79eb7b426ffb968eeab79062a92581ec5"
+          }
+        ],
+        "sha256": "7b34b447b8535be6d6dca0c008e5c661812aecec410aeaed3304dc7d856a2068"
+      },
+      {
+        "available_at": null,
+        "body": {
+          "delay_hours": 24,
+          "forecast_bytes_sha256": "e90a8b590cf7436b85195b926e26b4bb6e57444fbff6e042e62ce2f9a9595ab5"
+        },
+        "id": "forecast",
+        "kind": "forecast",
+        "parents": [
+          {
+            "id": "model",
+            "sha256": "7b34b447b8535be6d6dca0c008e5c661812aecec410aeaed3304dc7d856a2068"
+          }
+        ],
+        "sha256": "b8361cdf006c038b05d5117493844709a847c490a1d7547863b194463c7511ce"
+      }
+    ]
+  }
+}

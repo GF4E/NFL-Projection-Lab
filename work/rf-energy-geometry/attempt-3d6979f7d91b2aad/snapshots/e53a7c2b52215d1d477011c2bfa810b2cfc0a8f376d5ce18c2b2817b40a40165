@@ -1,0 +1,484 @@
+"""Independent RF bank snapshot tests. Qualification owns the sole execution."""
+from pathlib import Path
+import hashlib
+import math
+import sys
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import numpy as np
+from research_score_conditional_run import strict as original_strict
+from research_score_split_controller import _bank_state_digest as original_bank_digest
+import research_score_bank_snapshot as candidate
+
+OBSERVATIONS = []
+_OBSERVER = None
+DEPTH, NODES, CHARS = 32, 131072, 4 * 1024 * 1024
+
+
+def set_observation_writer(writer):
+    global _OBSERVER
+    if writer is not None and not callable(writer):
+        raise TypeError('observation writer must be callable or None')
+    _OBSERVER = writer
+
+
+def emit(row):
+    if _OBSERVER is None:
+        OBSERVATIONS.append(row)
+    else:
+        _OBSERVER(row)
+
+
+def outcome(function):
+    try:
+        value = function()
+    except Exception as error:
+        return {'kind': 'error', 'module': type(error).__module__,
+                'type': type(error).__qualname__, 'message': str(error)}, type(error)
+    return {'kind': 'decision', 'type': type(value).__qualname__, 'value': value}, type(value)
+
+
+def image(raw):
+    return {'ascii_body': raw.decode('ascii'), 'bytes': len(raw),
+            'sha256': hashlib.sha256(raw).hexdigest()}
+
+
+def nested(depth, kind=list):
+    value = 0
+    for _ in range(depth):
+        value = [value] if kind is list else {'x': value}
+    return value
+
+
+class Integer(int):
+    pass
+
+
+class Floating(float):
+    pass
+
+
+class Text(str):
+    pass
+
+
+class Opaque:
+    pass
+
+
+class ListHook(list):
+    def __iter__(self):
+        self.events.append(self.label)
+        if self.error:
+            raise RuntimeError(self.error)
+        return super().__iter__()
+
+
+class DictHook(dict):
+    def items(self):
+        self.events.append(self.label)
+        if self.error:
+            raise RuntimeError(self.error)
+        return super().items()
+
+
+class ArrayHook(np.ndarray):
+    def tolist(self):
+        self.events.append(self.label)
+        if self.error:
+            raise RuntimeError(self.error)
+        return self.payload
+
+
+class ScalarHook(np.float64):
+    def item(self):
+        self.events.append(self.label)
+        if self.error:
+            raise RuntimeError(self.error)
+        return self.payload
+
+
+def hooked(cls, events, label, payload=None, error=None):
+    value = np.array([1.]).view(cls) if cls is ArrayHook else cls(1.) if cls is ScalarHook else cls(payload)
+    value.events, value.label, value.error, value.payload = events, label, error, payload
+    return value
+
+
+class Engine:
+    def __init__(self, events, name):
+        self.events, self.name = events, name
+        self.values = {'last_origin': (2013, 1), 'ratings': {'A': 1., 'B': -0.},
+                       'offense': {'A': 2., 'B': 3.}, 'defense': {'A': 4., 'B': 5.}}
+        self.fail_field = None
+
+    def __getattr__(self, field):
+        if field not in self.values:
+            raise AttributeError(field)
+        self.events.append(self.name + '.' + field)
+        if field == self.fail_field:
+            raise RuntimeError(self.name + '.' + field + ' failed')
+        return self.values[field]
+
+
+class Outputs(dict):
+    def __iter__(self):
+        self.events.append('outputs.keys')
+        return super().__iter__()
+
+    def __getitem__(self, key):
+        self.events.append('output.' + str(key[1]))
+        return super().__getitem__(key)
+
+
+class Engines(dict):
+    def items(self):
+        self.events.append('engines.items')
+        return super().items()
+
+
+class Bank:
+    def __init__(self, events):
+        self.events = events
+        self.owned = Engines({('E3', i, 'full'): Engine(events, 'engine.' + str(i)) for i in (11, 10)})
+        self.owned.events = events
+
+    @property
+    def engines(self):
+        self.events.append('bank.engines')
+        return self.owned
+
+
+def bank_fixture(events):
+    bank = Bank(events)
+    outputs = Outputs({('E3', i, 'full'): {'forecasts': [{'game_id': 'game-' + str(i), 'mean': [19., 23.]}],
+                                         'failure': None} for i in (11, 0, 10)})
+    outputs.events = events
+    return bank, outputs
+
+
+class SnapshotTests(unittest.TestCase):
+    def pair(self, label, factory, expected=None, modes=None, bank=False):
+        records = {}
+        returned_types = {}
+        for route in ('original', 'candidate'):
+            events, images, snapshots = [], [], []
+            left, right = factory(events)
+            def run():
+                if route == 'original':
+                    def capture(value):
+                        if bank:
+                            digest = original_bank_digest(*value)
+                            images.append({'sha256': digest})
+                        else:
+                            raw = original_strict(value)
+                            images.append(image(raw))
+                            digest = hashlib.sha256(raw).hexdigest()
+                        return digest
+                else:
+                    def capture(value):
+                        result = candidate.capture(*value) if bank else candidate.capture_value(value)
+                        snapshots.append({'mode': result.mode})
+                        return result
+                before = capture(left)
+                events.append('assembly')
+                after = capture(right)
+                return before == after if route == 'original' else candidate.same(before, after)
+            result, result_type = outcome(run)
+            records[route] = {'outcome': result, 'events': list(events), 'images': images, 'snapshots': snapshots}
+            returned_types[route] = result_type
+        emit({'test': self.id(), 'label': label, 'kind': 'paired_bank' if bank else 'paired_value',
+              'original': records['original'], 'candidate': records['candidate'],
+              'expected_decision': expected, 'expected_modes': modes,
+              'reproducer': 'frozen test method and label; independently constructed route inputs'})
+        self.assertIs(returned_types['candidate'], returned_types['original'], label)
+        self.assertEqual(records['candidate']['outcome'], records['original']['outcome'], label)
+        self.assertEqual(records['candidate']['events'], records['original']['events'], label)
+        if expected is not None:
+            self.assertEqual(records['original']['outcome'], {'kind': 'decision', 'type': 'bool', 'value': expected})
+        if modes is not None:
+            self.assertEqual([s['mode'] for s in records['candidate']['snapshots']], modes)
+        return records
+
+    def modes(self, label, factory, supported):
+        value = factory()
+        real_canonical, real_encoded = candidate.canonical, candidate.encoded
+        with patch.object(candidate, 'canonical', wraps=real_canonical) as conversion, \
+             patch.object(candidate, 'encoded', wraps=real_encoded) as fallback:
+            snapshot = candidate.capture_value(value)
+            observed = {'test': self.id(), 'label': label, 'kind': 'guard_boundary',
+                        'mode': snapshot.mode, 'expected_mode': 'supported' if supported else 'fallback',
+                        'canonical_calls': conversion.call_count, 'encoded_calls': fallback.call_count}
+            emit(observed)
+            self.assertEqual(snapshot.mode, observed['expected_mode'])
+            self.assertEqual(conversion.call_count, 1)
+            self.assertEqual(fallback.call_count, 0 if supported else 1)
+        return snapshot
+
+    def test_complete_bank_payload_and_sorted_access_order(self):
+        result = self.pair('complete-current-bank-read', lambda events: (bank_fixture(events), bank_fixture(events)), True, ['supported']*2, True)
+        one = ['outputs.keys', 'output.0', 'output.10', 'output.11', 'bank.engines', 'engines.items']
+        one += ['engine.'+str(i)+'.'+field for i in (10, 11) for field in ('last_origin', 'ratings', 'offense', 'defense')]
+        self.assertEqual(result['candidate']['events'], one + ['assembly'] + one)
+
+    def test_every_output_and_owned_field_is_compared(self):
+        for change in ('output', 'last_origin', 'ratings', 'offense', 'defense', 'output-membership', 'engine-membership'):
+            def factory(events, change=change):
+                left, right = bank_fixture(events), bank_fixture(events)
+                bank, outputs = right
+                if change == 'output':
+                    dict.__getitem__(outputs, ('E3', 11, 'full'))['forecasts'][0]['mean'][-1] = 24.
+                elif change == 'output-membership':
+                    del outputs[('E3', 0, 'full')]
+                elif change == 'engine-membership':
+                    del bank.owned[('E3', 11, 'full')]
+                elif change == 'last_origin':
+                    bank.owned[('E3', 11, 'full')].values[change] = (2013, 2)
+                else:
+                    bank.owned[('E3', 11, 'full')].values[change]['B'] = 9.
+                return left, right
+            self.pair('bank-change-'+change, factory, False, ['supported']*2, True)
+
+    def test_bank_payload_attribute_failure_order(self):
+        for field in ('last_origin', 'ratings', 'offense', 'defense'):
+            def factory(events, field=field):
+                left, right = bank_fixture(events), bank_fixture(events)
+                right[0].owned[('E3', 11, 'full')].fail_field = field
+                dict.__getitem__(right[1], ('E3', 0, 'full'))['failure'] = 'early difference'
+                return left, right
+            result = self.pair('right-field-error-'+field, factory, bank=True)
+            self.assertEqual(result['candidate']['outcome']['type'], 'RuntimeError')
+            self.assertIn('assembly', result['candidate']['events'])
+        def failed_before(events):
+            left, right = bank_fixture(events), bank_fixture(events)
+            left[0].owned[('E3', 11, 'full')].fail_field = 'defense'
+            return left, right
+        result = self.pair('bank-before-assembly-fails', failed_before, bank=True)
+        self.assertNotIn('assembly', result['candidate']['events'])
+
+    def test_last_element_and_sequence_order(self):
+        for right in ([1, 2, 4], [3, 2, 1], [1, 2], [1, 2, 3, 4]):
+            self.pair('sequence-'+str(right), lambda events, right=right: ([1, 2, 3], list(right)), False, ['supported']*2)
+        self.pair('nested-last-element', lambda events: ({'a': [0]*64}, {'a': [0]*63+[1]}), False)
+
+    def test_dictionary_insertion_order_and_key_membership(self):
+        self.pair('dict-insertion-order', lambda events: ({'z': [], '10': [1, 2], '2': {'x': 3}}, {'2': {'x': 3}, '10': [1, 2], 'z': []}), True)
+        self.pair('dict-key-membership', lambda events: ({'a': 1}, {'b': 1}), False)
+
+    def test_scalar_types_signed_zero_and_finite_float_content(self):
+        cases = [(True, 1), (1, 1.), (False, 0), (0, 0.), (0., -0.), (-0., 0.),
+                 (1., math.nextafter(1., 2.)), (sys.float_info.min, 0.),
+                 (float.fromhex('0x0.0000000000001p-1022'), 0.), (sys.float_info.max, -sys.float_info.max)]
+        for i, (left, right) in enumerate(cases):
+            self.pair('scalar-content-'+str(i), lambda events, left=left, right=right: (left, right), False, ['supported']*2)
+        self.pair('equal-negative-zero', lambda events: (-0., -0.), True)
+
+    def test_empty_nested_and_ascii_escape_values(self):
+        value = {'empty': [{}, [], ()], 'text': ''.join(chr(i) for i in range(128))+'"\\{}[],:', 'float': -0.}
+        self.pair('ascii-full-range-and-empty', lambda events: (value, value), True, ['supported']*2)
+
+    def test_numpy_array_list_tuple_canonical_equivalence(self):
+        self.pair('numpy-array-list', lambda events: (np.array([[1., -0.], [2., 3.]]), [[1., -0.], [2., 3.]]), True, ['supported']*2)
+        self.pair('numpy-int-tuple', lambda events: (np.array([1, 2], dtype='>i8'), (1, 2)), True)
+        self.pair('numpy-scalar-float', lambda events: (np.float64(-0.), -0.), True)
+        self.pair('numpy-object-array', lambda events: (np.array([{'a': 1}, (2, 3)], dtype=object), [{'a': 1}, [2, 3]]), True)
+
+    def test_noncontiguous_readonly_arrays_are_not_mutated(self):
+        def factory(events):
+            value = np.arange(24.).reshape(4, 6)[:, ::2]
+            value[0, 0] = -0.; value.setflags(write=False)
+            return value, value.tolist()
+        self.pair('noncontiguous-readonly', factory, True)
+        value = factory([])[0]
+        before = (value.dtype.str, value.shape, value.strides, value.flags.writeable, value.tobytes())
+        snapshot = candidate.capture_value(value)
+        after = (value.dtype.str, value.shape, value.strides, value.flags.writeable, value.tobytes())
+        emit({'test': self.id(), 'label': 'source-array-immutable', 'kind': 'array_image',
+              'before': {'dtype': before[0], 'shape': list(before[1]), 'strides': list(before[2]), 'writeable': before[3], 'bytes_hex': before[4].hex()},
+              'after': {'dtype': after[0], 'shape': list(after[1]), 'strides': list(after[2]), 'writeable': after[3], 'bytes_hex': after[4].hex()}, 'mode': snapshot.mode})
+        self.assertEqual(before, after)
+
+    def test_unicode_astral_surrogate_json_equivalence(self):
+        for left, right in [('😀', '\ud83d\ude00'), ({'😀': ['é']}, {'\ud83d\ude00': ['é']}), ('\ud800', '\ud800')]:
+            self.pair('unicode-equivalence-'+str(type(left).__name__), lambda events, left=left, right=right: (left, right), True, ['fallback']*2)
+        self.pair('unicode-not-ascii-escape-literal', lambda events: ('😀', '\\ud83d\\ude00'), False, ['fallback', 'supported'])
+        self.pair('distinct-unicode', lambda events: ('é', '中'), False, ['fallback']*2)
+
+    def test_mixed_supported_fallback_comparison_both_directions(self):
+        for left, right in [(Integer(1), 1), (1, Integer(1)), (Floating(-0.), -0.), (-0., Floating(-0.)),
+                            (Text('abc'), 'abc'), ('abc', Text('abc')), ({Text('key'): 2}, {'key': 2})]:
+            self.pair('mixed-subclass-'+type(left).__name__+'-'+type(right).__name__, lambda events, left=left, right=right: (left, right), True)
+        self.pair('mixed-type-distinction', lambda events: (Integer(1), 1.), False, ['fallback', 'supported'])
+
+    def test_subclass_and_numpy_hooks_once_per_capture(self):
+        for cls in (ListHook, DictHook, ArrayHook, ScalarHook):
+            for fallback in (False, True):
+                def factory(events, cls=cls, fallback=fallback):
+                    payload = {'x': 'é' if fallback else [-0., 1]}
+                    if cls is ListHook: payload = [payload]
+                    return tuple(hooked(cls, events, side, payload) for side in ('left-hook', 'right-hook'))
+                result = self.pair(cls.__name__+'-fallback-'+str(fallback), factory, True, ['fallback' if fallback else 'supported']*2)
+                self.assertEqual(result['candidate']['events'], ['left-hook', 'assembly', 'right-hook'])
+
+    def test_before_capture_errors_prevent_assembly(self):
+        for raw in (lambda events: [math.nan], lambda events: {'bad': Opaque()},
+                    lambda events: hooked(ListHook, events, 'left-hook', [], 'left hook failed')):
+            result = self.pair('left-before-assembly-error', lambda events, raw=raw: (raw(events), hooked(ListHook, events, 'unread-right', [])))
+            self.assertEqual(result['candidate']['outcome']['kind'], 'error')
+            self.assertNotIn('assembly', result['candidate']['events'])
+            self.assertNotIn('unread-right', result['candidate']['events'])
+
+    def test_after_capture_errors_not_skipped_by_early_difference(self):
+        for bad in (math.nan, math.inf, Opaque()):
+            self.pair('late-unsupported-'+type(bad).__name__, lambda events, bad=bad: ([0, 0], [1, bad]))
+        self.pair('late-hook-after-early-difference', lambda events: ([0, 0], [1, hooked(ListHook, events, 'late-right', [], 'right hook failed')]))
+
+    def test_entire_canonical_traversal_precedes_fallback(self):
+        result = self.pair('unsupported-left-leaf-late-hook', lambda events: ([Opaque(), hooked(ListHook, events, 'late-before', [], 'late canonical failure')], []))
+        self.assertEqual(result['candidate']['events'], ['late-before'])
+        self.assertEqual(result['candidate']['outcome']['message'], 'late canonical failure')
+
+    def test_all_right_hooks_read_despite_first_difference(self):
+        def factory(events):
+            return [0, hooked(ListHook, events, 'left-tail', [3])], [1, hooked(ListHook, events, 'right-tail', [3])]
+        result = self.pair('complete-right-read', factory, False)
+        self.assertEqual(result['candidate']['events'], ['left-tail', 'assembly', 'right-tail'])
+
+    def test_cycles_and_deep_original_failures(self):
+        def cycle(events):
+            value = []; value.append(value); return value, []
+        def mutual(events):
+            left, right = {}, []; left['x'] = right; right.append(left); return left, []
+        for label, factory in [('cycle', cycle), ('mutual', mutual), ('deep', lambda events: (nested(sys.getrecursionlimit()*2), []))]:
+            result = self.pair(label, factory)
+            self.assertEqual(result['candidate']['outcome']['type'], 'RecursionError')
+            self.assertNotIn('assembly', result['candidate']['events'])
+
+    def test_aliases_and_post_capture_mutation(self):
+        shared = {'x': [1., -0.]}
+        original = [shared, shared]
+        before = candidate.capture_value(original)
+        shared['x'][0] = 9.; shared['x'][1] = 0.
+        equivalent_before = candidate.capture_value([{'x': [1., -0.]}, {'x': [1., -0.]}])
+        current = candidate.capture_value(original)
+        old_same, new_same = candidate.same(before, equivalent_before), candidate.same(before, current)
+        emit({'test': self.id(), 'label': 'owned-alias-capture', 'kind': 'mutation_decisions', 'original_before': image(original_strict([{'x': [1., -0.]}]*2)),
+              'original_after': image(original_strict(original)), 'candidate_before_still_equal': old_same, 'candidate_after_equal': new_same})
+        self.assertIs(old_same, True); self.assertIs(new_same, False)
+
+    def test_mixed_comparison_never_rereads_mutated_raw_input(self):
+        events = []
+        raw = hooked(ListHook, events, 'capture-hook', [1, -0.])
+        before = candidate.capture_value(raw)
+        raw[:] = [9, 0.]; raw.error = 'must never reread'
+        fallback = candidate.capture_value([Integer(1), Floating(-0.)])
+        with patch.object(candidate, 'canonical', side_effect=AssertionError('same recanonicalized')) as conversion:
+            actual = candidate.same(before, fallback)
+            reverse = candidate.same(fallback, before)
+            emit({'test': self.id(), 'label': 'mixed-owned-before-image', 'kind': 'mutation_decisions',
+                  'candidate_same': actual, 'candidate_reverse_same': reverse, 'raw_hook_events': events,
+                  'canonical_calls_during_same': conversion.call_count, 'before_mode': before.mode, 'after_mode': fallback.mode})
+            self.assertIs(actual, True); self.assertIs(reverse, True)
+            self.assertEqual(events, ['capture-hook']); self.assertEqual(conversion.call_count, 0)
+
+    def test_array_after_capture_mutation_cannot_change_before(self):
+        array = np.array([1., -0.]); before = candidate.capture_value(array)
+        array[0] = 2.; array.view(np.uint64)[1] = 0
+        old = candidate.capture_value([1., -0.]); new = candidate.capture_value(array)
+        actual = (candidate.same(before, old), candidate.same(before, new))
+        emit({'test': self.id(), 'label': 'array-owned-before', 'kind': 'mutation_decisions', 'decisions': list(actual),
+              'after_bytes_hex': array.tobytes().hex()})
+        self.assertEqual(actual, (True, False))
+
+    def test_container_depth_boundary(self):
+        for kind in (list, dict):
+            for depth in (1, 31, 32, 33, 80):
+                self.modes(kind.__name__+'-depth-'+str(depth), lambda depth=depth, kind=kind: nested(depth, kind), depth <= DEPTH)
+        self.pair('fallback-depth-equal', lambda events: (nested(33), nested(33)), True, ['fallback']*2)
+
+    def test_node_boundary_keys_and_repeated_occurrences(self):
+        for size in (NODES-1, NODES, NODES+1):
+            self.modes('node-count-'+str(size), lambda size=size: [0]*(size-1), size <= NODES)
+        for size in (NODES, NODES+1):
+            self.modes('key-node-count-'+str(size), lambda size=size: {'x': [0]*(size-3)}, size <= NODES)
+        for count in (65535, 65536):
+            self.modes('alias-node-count-'+str(count), lambda count=count: [[0]]*count, 1+2*count <= NODES)
+
+    def test_ascii_character_boundary_and_keys(self):
+        for size in (CHARS-1, CHARS, CHARS+1):
+            self.modes('ascii-char-count-'+str(size), lambda size=size: 'a'*size, size <= CHARS)
+        for size in (CHARS, CHARS+1):
+            self.modes('key-char-count-'+str(size), lambda size=size: {'x': 'a'*(size-1)}, size <= CHARS)
+        self.modes('shared-char-occurrences', lambda: ['a'*(CHARS//2)]*2, True)
+        self.modes('shared-char-occurrences-over', lambda: ['a'*(CHARS//2)]*2+['x'], False)
+        self.modes('ascii-del-boundary', lambda: '\x7f', True)
+        self.modes('unicode-first-nonascii', lambda: '\x80', False)
+
+    def test_integer_bits_and_decimal_guard(self):
+        for value in (-(1 << 256), -(1 << 255), 0, 1 << 255, (1 << 256)-1, 1 << 256):
+            self.modes('integer-bits-'+str(value.bit_length())+'-'+str(value < 0), lambda value=value: value, value.bit_length() <= 256)
+        limit = sys.get_int_max_str_digits()
+        if limit:
+            self.pair('decimal-conversion-error', lambda events: (10**limit, 1))
+        self.assertEqual(sys.get_int_max_str_digits(), limit)
+
+    def test_unsupported_keys_and_nonfinite_values(self):
+        for i, value in enumerate(({1: 'x'}, {None: 1}, {'x': 1, 2: 3}, {(1, 2): 3}, {math.nan: 1},
+                                   [math.nan], [math.inf], [-math.inf], [Opaque()], {1, 2}, b'x', 1+2j)):
+            self.pair('unsupported-case-'+str(i), lambda events, value=value: (value, value))
+
+    def test_fallback_capture_is_not_recanonicalized(self):
+        events = []
+        value = hooked(ArrayHook, events, 'tolist', ['é', 1])
+        real_canonical, real_encoded = candidate.canonical, candidate.encoded
+        with patch.object(candidate, 'canonical', wraps=real_canonical) as conversion, \
+             patch.object(candidate, 'encoded', wraps=real_encoded) as encoder:
+            snapshot = candidate.capture_value(value)
+            actual = candidate.same(snapshot, snapshot)
+            emit({'test': self.id(), 'label': 'fallback-single-canonical', 'kind': 'call_counts', 'mode': snapshot.mode,
+                  'canonical_calls': conversion.call_count, 'encoded_calls': encoder.call_count, 'events': events, 'decision': actual})
+            self.assertEqual((conversion.call_count, encoder.call_count), (1, 1))
+            self.assertEqual(events, ['tolist']); self.assertIs(actual, True)
+
+    def test_unexpected_local_failures_propagate_without_retry(self):
+        for stage in ('canonical', 'eligibility', 'fallback-encoded', 'mixed-encoded'):
+            if stage == 'mixed-encoded':
+                left = candidate.capture_value([1]); right = candidate.capture_value([Integer(1)])
+            local = 'canonical' if stage == 'canonical' else '_eligible' if stage == 'eligibility' else 'encoded'
+            error = RuntimeError('injected '+stage)
+            with patch.object(candidate, local, side_effect=error) as failing:
+                function = (lambda: candidate.capture_value([1])) if stage in ('canonical', 'eligibility') else (lambda: candidate.capture_value(['é'])) if stage == 'fallback-encoded' else (lambda: candidate.same(left, right))
+                actual, actual_type = outcome(function)
+                emit({'test': self.id(), 'label': 'injected-'+stage, 'kind': 'deliberate_injection', 'outcome': actual, 'calls': failing.call_count})
+                self.assertIs(actual_type, RuntimeError); self.assertEqual(actual['message'], str(error)); self.assertEqual(failing.call_count, 1)
+            self.pair('valid-after-'+stage, lambda events: ([1, -0.], [1, -0.]), True)
+
+    def test_failure_then_valid_and_readonly_mode(self):
+        self.pair('failure-before-valid', lambda events: ([math.nan], []))
+        left = candidate.capture_value([1]); right = candidate.capture_value([1])
+        assignment, assignment_type = outcome(lambda: setattr(left, 'mode', 'fallback'))
+        emit({'test': self.id(), 'label': 'mode-assignment-forbidden', 'kind': 'handle_contract', 'outcome': assignment,
+              'retained_mode': left.mode})
+        self.assertIn(assignment_type, (AttributeError, TypeError))
+        self.assertEqual(left.mode, 'supported')
+        actual = candidate.same(left, right)
+        emit({'test': self.id(), 'label': 'read-only-mode-valid-after-failure', 'kind': 'decision', 'value': actual, 'mode': left.mode})
+        self.assertIs(actual, True)
+
+    def test_invalid_handles_rejected_without_read_or_encoding(self):
+        snapshot = candidate.capture_value([1])
+        for i, (left, right) in enumerate(((None, snapshot), (snapshot, [1]), (object(), object()))):
+            with patch.object(candidate, 'canonical', side_effect=AssertionError('invalid handle canonicalized')) as conversion, \
+                 patch.object(candidate, 'encoded', side_effect=AssertionError('invalid handle encoded')) as encoder:
+                actual, actual_type = outcome(lambda: candidate.same(left, right))
+                emit({'test': self.id(), 'label': 'invalid-handle-'+str(i), 'kind': 'handle_contract',
+                      'outcome': actual, 'canonical_calls': conversion.call_count, 'encoded_calls': encoder.call_count})
+                self.assertIs(actual_type, TypeError)
+                self.assertEqual(actual['message'], 'snapshots_required')
+                self.assertEqual((conversion.call_count, encoder.call_count), (0, 0))
+
+
+if __name__ == '__main__':
+    unittest.main()

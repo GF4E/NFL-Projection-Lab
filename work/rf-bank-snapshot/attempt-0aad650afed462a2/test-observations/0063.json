@@ -1,0 +1,13 @@
+{
+  "canonical_calls": 0,
+  "encoded_calls": 0,
+  "kind": "handle_contract",
+  "label": "invalid-handle-1",
+  "outcome": {
+    "kind": "error",
+    "message": "snapshots_required",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "test": "test_bank_snapshot.SnapshotTests.test_invalid_handles_rejected_without_read_or_encoding"
+}

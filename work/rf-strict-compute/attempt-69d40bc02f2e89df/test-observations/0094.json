@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "Out of range float values are not JSON compliant: nan",
+    "module": "builtins",
+    "type": "ValueError"
+  },
+  "eligibility": {
+    "actual": false,
+    "expected": false,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "nan-position-3",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "dict"
+  },
+  "label": "nan-position-3",
+  "original": {
+    "kind": "error",
+    "message": "Out of range float values are not JSON compliant: nan",
+    "module": "builtins",
+    "type": "ValueError"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_nonfinite_floats_at_each_nesting_position"
+}

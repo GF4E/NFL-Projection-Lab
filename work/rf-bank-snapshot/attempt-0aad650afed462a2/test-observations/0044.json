@@ -1,0 +1,105 @@
+{
+  "candidate": {
+    "events": [
+      "outputs.keys",
+      "output.0",
+      "output.10",
+      "output.11",
+      "bank.engines",
+      "engines.items",
+      "engine.10.last_origin",
+      "engine.10.ratings",
+      "engine.10.offense",
+      "engine.10.defense",
+      "engine.11.last_origin",
+      "engine.11.ratings",
+      "engine.11.offense",
+      "engine.11.defense",
+      "assembly",
+      "outputs.keys",
+      "output.0",
+      "output.10",
+      "output.11",
+      "bank.engines",
+      "engines.items",
+      "engine.10.last_origin",
+      "engine.10.ratings",
+      "engine.10.offense",
+      "engine.10.defense",
+      "engine.11.last_origin",
+      "engine.11.ratings",
+      "engine.11.offense",
+      "engine.11.defense"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": false
+    },
+    "snapshots": [
+      {
+        "mode": "supported"
+      },
+      {
+        "mode": "supported"
+      }
+    ]
+  },
+  "expected_decision": false,
+  "expected_modes": [
+    "supported",
+    "supported"
+  ],
+  "kind": "paired_bank",
+  "label": "bank-change-output",
+  "original": {
+    "events": [
+      "outputs.keys",
+      "output.0",
+      "output.10",
+      "output.11",
+      "bank.engines",
+      "engines.items",
+      "engine.10.last_origin",
+      "engine.10.ratings",
+      "engine.10.offense",
+      "engine.10.defense",
+      "engine.11.last_origin",
+      "engine.11.ratings",
+      "engine.11.offense",
+      "engine.11.defense",
+      "assembly",
+      "outputs.keys",
+      "output.0",
+      "output.10",
+      "output.11",
+      "bank.engines",
+      "engines.items",
+      "engine.10.last_origin",
+      "engine.10.ratings",
+      "engine.10.offense",
+      "engine.10.defense",
+      "engine.11.last_origin",
+      "engine.11.ratings",
+      "engine.11.offense",
+      "engine.11.defense"
+    ],
+    "images": [
+      {
+        "sha256": "4d6a54f3197940fbc0626dd7c90d026b1b5b34e86e7fb9d49df4761b0fbc18b1"
+      },
+      {
+        "sha256": "6e94f450a25b4a7df9ea9e51da812463a73ffd9e86cdbb302ef5bd2c5d4c6af8"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": false
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_every_output_and_owned_field_is_compared"
+}

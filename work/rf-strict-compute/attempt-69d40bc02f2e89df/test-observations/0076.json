@@ -1,0 +1,25 @@
+{
+  "candidate": {
+    "ascii_body": "{\n  \"first\": 1,\n  \"last\": 2,\n  \"nested\": [\n    2.0,\n    0.0\n  ]\n}\n",
+    "bytes": 66,
+    "kind": "bytes",
+    "sha256": "d4f52d823869fdf5e90bf0dedc3934e7b2d90e62c8038935550124d652a68a24",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true
+  },
+  "input": {
+    "canonical_ascii": "{\n  \"first\": 1,\n  \"last\": 2,\n  \"nested\": [\n    2.0,\n    0.0\n  ]\n}\n"
+  },
+  "label": "mutable-dict-2",
+  "original": {
+    "ascii_body": "{\n  \"first\": 1,\n  \"last\": 2,\n  \"nested\": [\n    2.0,\n    0.0\n  ]\n}\n",
+    "bytes": 66,
+    "kind": "bytes",
+    "sha256": "d4f52d823869fdf5e90bf0dedc3934e7b2d90e62c8038935550124d652a68a24",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_mutations_between_calls_and_same_shape_replacement"
+}

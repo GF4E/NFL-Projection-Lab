@@ -1,0 +1,1531 @@
+{
+  "cells": 16,
+  "checkedArtifactCount": 680,
+  "games": 3407,
+  "interpretationLimits": [
+    "Post-result descriptive diagnosis, not new acceptance or causality",
+    "Pointwise intervals across16cells and4residuals; no simultaneous correction",
+    "2025 exposed sample reported separately without12-season-bootstrap confidence intervals",
+    "Variance comparison uses squared residual around forecast mean, includes mean bias",
+    "No fitting, proper scoring, restart, calibrated nominal replacement or threshold change"
+  ],
+  "peakRssMiB": 265.03125,
+  "seconds": 24.263842207998096,
+  "status": "complete",
+  "subsets": {
+    "development": {
+      "cells": {
+        "E1:away": {
+          "coverage_residual": 0.016162627055993042,
+          "forecastMassAboveNominal80": 0.024666719036509743,
+          "forecast_mass": 0.8246667190365098,
+          "interval_width": 25.317384370015947,
+          "lower_forecast": 0.0848808332655075,
+          "lower_realized": 0.0759170653907496,
+          "lower_residual": -0.008963767874757854,
+          "mean_error": -0.04161356259122754,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": -0.0009299822930385614,
+                "upper": 0.032628099838392356
+              },
+              "lower_residual": {
+                "lower": -0.02287269235552932,
+                "upper": 0.005794091447962564
+              },
+              "upper_residual": {
+                "lower": -0.021365127842492553,
+                "upper": 0.008358461004798968
+              },
+              "variance_residual": {
+                "lower": -11.880820873263023,
+                "upper": -0.3278464005269585
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": 0.000689755868011525,
+                "upper": 0.03218987528106766
+              },
+              "lower_residual": {
+                "lower": -0.02217020611007174,
+                "upper": 0.004806455527745244
+              },
+              "upper_residual": {
+                "lower": -0.021477214530411293,
+                "upper": 0.007111493985183448
+              },
+              "variance_residual": {
+                "lower": -11.756642380920288,
+                "upper": -0.7572511049009442
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": 0.001985258026512383,
+                "upper": 0.03341504676151849
+              },
+              "lower_residual": {
+                "lower": -0.021656940672156212,
+                "upper": 0.004888647115793917
+              },
+              "upper_residual": {
+                "lower": -0.021099319680322304,
+                "upper": 0.0036812510578885438
+              },
+              "variance_residual": {
+                "lower": -12.306123567222034,
+                "upper": -0.9932410285547931
+              }
+            }
+          },
+          "predicted_variance": 96.74229864896948,
+          "realizedAboveNominal80": 0.04082934609250399,
+          "realized_coverage": 0.840829346092504,
+          "squaredResidualToPredictedVarianceRatio": 0.9347102557817133,
+          "squared_residual": 90.42601871508916,
+          "upper_forecast": 0.09045244769798155,
+          "upper_realized": 0.08325358851674641,
+          "upper_residual": -0.007198859181235197,
+          "variance_residual": -6.316279933880235
+        },
+        "E1:home": {
+          "coverage_residual": 0.008485532078420946,
+          "forecastMassAboveNominal80": 0.024369332355390183,
+          "forecast_mass": 0.8243693323553902,
+          "interval_width": 25.83827751196172,
+          "lower_forecast": 0.08506315857918083,
+          "lower_realized": 0.0784688995215311,
+          "lower_residual": -0.006594259057649851,
+          "mean_error": -0.12377502438245251,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": -0.010653456370394157,
+                "upper": 0.028116926862430086
+              },
+              "lower_residual": {
+                "lower": -0.019666492252862558,
+                "upper": 0.006142961997524834
+              },
+              "upper_residual": {
+                "lower": -0.014870840291368093,
+                "upper": 0.01213914314117126
+              },
+              "variance_residual": {
+                "lower": -11.049525100943606,
+                "upper": 3.2428233225554024
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": -0.009638510073485809,
+                "upper": 0.026555864380928062
+              },
+              "lower_residual": {
+                "lower": -0.0205404999900045,
+                "upper": 0.003370218809368953
+              },
+              "upper_residual": {
+                "lower": -0.012139965779039617,
+                "upper": 0.013473314139810913
+              },
+              "variance_residual": {
+                "lower": -10.66063822410167,
+                "upper": 2.982925283169914
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": -0.008165947457479396,
+                "upper": 0.027473541542927915
+              },
+              "lower_residual": {
+                "lower": -0.022146519530717876,
+                "upper": 0.0006229965779241825
+              },
+              "upper_residual": {
+                "lower": -0.01128239704835711,
+                "upper": 0.014829780923885684
+              },
+              "variance_residual": {
+                "lower": -11.47574944081525,
+                "upper": 2.1546627031881194
+              }
+            }
+          },
+          "predicted_variance": 101.19792074983494,
+          "realizedAboveNominal80": 0.0328548644338118,
+          "realized_coverage": 0.8328548644338118,
+          "squaredResidualToPredictedVarianceRatio": 0.9605702824998554,
+          "squared_residual": 97.20771532306692,
+          "upper_forecast": 0.0905675090654282,
+          "upper_realized": 0.0886762360446571,
+          "upper_residual": -0.0018912730207711116,
+          "variance_residual": -3.990205426767884
+        },
+        "E1:margin": {
+          "coverage_residual": 0.02992665067194227,
+          "forecastMassAboveNominal80": 0.01185963321960537,
+          "forecast_mass": 0.8118596332196054,
+          "interval_width": 37.14545454545455,
+          "lower_forecast": 0.09404076634494703,
+          "lower_realized": 0.07814992025518341,
+          "lower_residual": -0.01589084608976348,
+          "mean_error": -0.08216146179122494,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": 0.007689516714729739,
+                "upper": 0.051317189146386645
+              },
+              "lower_residual": {
+                "lower": -0.03200992648797176,
+                "upper": 0.0011518644308754799
+              },
+              "upper_residual": {
+                "lower": -0.03095035906583999,
+                "upper": 0.004660756507157873
+              },
+              "variance_residual": {
+                "lower": -44.427069683780495,
+                "upper": -12.731228386841691
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": 0.009257678143732618,
+                "upper": 0.051834313733358645
+              },
+              "lower_residual": {
+                "lower": -0.033592960376755604,
+                "upper": -0.0005332603790352206
+              },
+              "upper_residual": {
+                "lower": -0.030107061844761075,
+                "upper": 0.00543343319100493
+              },
+              "variance_residual": {
+                "lower": -44.19708531924924,
+                "upper": -14.047782718876194
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": 0.008949793353759065,
+                "upper": 0.051518547264032884
+              },
+              "lower_residual": {
+                "lower": -0.032692206304653554,
+                "upper": -0.0007255241705936213
+              },
+              "upper_residual": {
+                "lower": -0.029290955419988607,
+                "upper": 0.003187996650236579
+              },
+              "variance_residual": {
+                "lower": -45.71218881865344,
+                "upper": -15.06483601227336
+              }
+            }
+          },
+          "predicted_variance": 210.85848632517428,
+          "realizedAboveNominal80": 0.04178628389154704,
+          "realized_coverage": 0.8417862838915471,
+          "squaredResidualToPredictedVarianceRatio": 0.8641290512200012,
+          "squared_residual": 182.20894372985845,
+          "upper_forecast": 0.0940996004354484,
+          "upper_realized": 0.08006379585326953,
+          "upper_residual": -0.014035804582178877,
+          "variance_residual": -28.64954259531631
+        },
+        "E1:total": {
+          "coverage_residual": -0.010472355487723775,
+          "forecastMassAboveNominal80": 0.009196438422332864,
+          "forecast_mass": 0.8091964384223329,
+          "interval_width": 34.99393939393939,
+          "lower_forecast": 0.09581892822419229,
+          "lower_realized": 0.09760765550239234,
+          "lower_residual": 0.001788727278199987,
+          "mean_error": -0.1653885869736807,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": -0.02844433380722226,
+                "upper": 0.006451161342067199
+              },
+              "lower_residual": {
+                "lower": -0.014948594828281387,
+                "upper": 0.017666003606682367
+              },
+              "upper_residual": {
+                "lower": -0.006044336413327564,
+                "upper": 0.025521895159003473
+              },
+              "variance_residual": {
+                "lower": -2.4715560630893316,
+                "upper": 19.154465616697145
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": -0.02747741013860868,
+                "upper": 0.005009492241712075
+              },
+              "lower_residual": {
+                "lower": -0.013510768649970696,
+                "upper": 0.015537256778466879
+              },
+              "upper_residual": {
+                "lower": -0.005045638317664557,
+                "upper": 0.026315927816060413
+              },
+              "variance_residual": {
+                "lower": -1.005456265112709,
+                "upper": 18.24938248362305
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": -0.02550143026810413,
+                "upper": 0.008433360497974756
+              },
+              "lower_residual": {
+                "lower": -0.015679796042267713,
+                "upper": 0.01365194489388471
+              },
+              "upper_residual": {
+                "lower": -0.0049406808228850485,
+                "upper": 0.024680712800880272
+              },
+              "variance_residual": {
+                "lower": -2.5747431713935445,
+                "upper": 16.88264956639334
+              }
+            }
+          },
+          "predicted_variance": 185.0219524724344,
+          "realizedAboveNominal80": -0.0012759170653907637,
+          "realized_coverage": 0.7987240829346093,
+          "squaredResidualToPredictedVarianceRatio": 1.043435774872268,
+          "squared_residual": 193.05852434645456,
+          "upper_forecast": 0.09498463335347457,
+          "upper_realized": 0.10366826156299841,
+          "upper_residual": 0.00868362820952379,
+          "variance_residual": 8.036571874020046
+        },
+        "E2:away": {
+          "coverage_residual": 0.01833399968536705,
+          "forecastMassAboveNominal80": 0.026323097603309864,
+          "forecast_mass": 0.8263230976033099,
+          "interval_width": 25.307177033492824,
+          "lower_forecast": 0.08346989685394349,
+          "lower_realized": 0.0711323763955343,
+          "lower_residual": -0.01233752045840905,
+          "mean_error": -0.2105919509207558,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": 0.0017713786730452939,
+                "upper": 0.03435834159751131
+              },
+              "lower_residual": {
+                "lower": -0.025317039533112783,
+                "upper": 0.0018586391798724843
+              },
+              "upper_residual": {
+                "lower": -0.01885163218124938,
+                "upper": 0.00854643141101963
+              },
+              "variance_residual": {
+                "lower": -14.393544559444717,
+                "upper": -2.8986130487187673
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": 0.0024624004644939637,
+                "upper": 0.03330725762515131
+              },
+              "lower_residual": {
+                "lower": -0.025541015869573514,
+                "upper": -9.989444625045845e-05
+              },
+              "upper_residual": {
+                "lower": -0.016828203893215973,
+                "upper": 0.008549810298252544
+              },
+              "variance_residual": {
+                "lower": -14.294320177838435,
+                "upper": -2.9554018407185247
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": 0.002886609274580405,
+                "upper": 0.03534005441415943
+              },
+              "lower_residual": {
+                "lower": -0.026014223499361937,
+                "upper": -0.0014785950666569498
+              },
+              "upper_residual": {
+                "lower": -0.016816457779657772,
+                "upper": 0.00823293186779529
+              },
+              "variance_residual": {
+                "lower": -14.689125736651734,
+                "upper": -2.612030089235307
+              }
+            }
+          },
+          "predicted_variance": 96.53962188353543,
+          "realizedAboveNominal80": 0.04465709728867617,
+          "realized_coverage": 0.8446570972886762,
+          "squaredResidualToPredictedVarianceRatio": 0.9084514486570091,
+          "squared_residual": 87.70155935289766,
+          "upper_forecast": 0.09020700554274773,
+          "upper_realized": 0.08421052631578947,
+          "upper_residual": -0.005996479226958012,
+          "variance_residual": -8.838062530637718
+        },
+        "E2:home": {
+          "coverage_residual": 0.011251881981861387,
+          "forecastMassAboveNominal80": 0.0238358373163835,
+          "forecast_mass": 0.8238358373163835,
+          "interval_width": 25.86762360446571,
+          "lower_forecast": 0.08558949938375807,
+          "lower_realized": 0.07942583732057416,
+          "lower_residual": -0.00616366206318397,
+          "mean_error": 0.036992286915567295,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": -0.006500992188848021,
+                "upper": 0.028760409707527784
+              },
+              "lower_residual": {
+                "lower": -0.018322238368883963,
+                "upper": 0.006818413363479986
+              },
+              "upper_residual": {
+                "lower": -0.017211621478681917,
+                "upper": 0.007729790418304119
+              },
+              "variance_residual": {
+                "lower": -13.690191626741274,
+                "upper": -0.4188455406022906
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": -0.005865964093618334,
+                "upper": 0.027916748981807085
+              },
+              "lower_residual": {
+                "lower": -0.019031611305713906,
+                "upper": 0.003472237158885835
+              },
+              "upper_residual": {
+                "lower": -0.015646117778430203,
+                "upper": 0.009601344533991852
+              },
+              "variance_residual": {
+                "lower": -13.404626328727339,
+                "upper": -0.705895502775405
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": -0.005558518227430789,
+                "upper": 0.028040994577992945
+              },
+              "lower_residual": {
+                "lower": -0.019677000532507895,
+                "upper": 0.002063040921889659
+              },
+              "upper_residual": {
+                "lower": -0.015313324773153886,
+                "upper": 0.011312673273885547
+              },
+              "variance_residual": {
+                "lower": -14.087602467563707,
+                "upper": -1.8748176977207978
+              }
+            }
+          },
+          "predicted_variance": 101.79747840784107,
+          "realizedAboveNominal80": 0.03508771929824561,
+          "realized_coverage": 0.8350877192982457,
+          "squaredResidualToPredictedVarianceRatio": 0.92908689807681,
+          "squared_residual": 94.5787034459821,
+          "upper_forecast": 0.09057466329985767,
+          "upper_realized": 0.08548644338118022,
+          "upper_residual": -0.0050882199186774515,
+          "variance_residual": -7.218774961858596
+        },
+        "E2:margin": {
+          "coverage_residual": 0.037681556041828476,
+          "forecastMassAboveNominal80": 0.012398188774757846,
+          "forecast_mass": 0.8123981887747579,
+          "interval_width": 37.14481658692185,
+          "lower_forecast": 0.09376872320026361,
+          "lower_realized": 0.07783094098883572,
+          "lower_residual": -0.015937782211427907,
+          "mean_error": 0.24758423783632222,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": 0.016328755825095697,
+                "upper": 0.0586239963900299
+              },
+              "lower_residual": {
+                "lower": -0.030549181353677405,
+                "upper": -0.0005943766581790177
+              },
+              "upper_residual": {
+                "lower": -0.03554239760557899,
+                "upper": -0.006312345730284008
+              },
+              "variance_residual": {
+                "lower": -49.75851650089867,
+                "upper": -19.58841307703654
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": 0.017902381827662666,
+                "upper": 0.05993927848414963
+              },
+              "lower_residual": {
+                "lower": -0.03193235338933823,
+                "upper": -0.0020187510153708162
+              },
+              "upper_residual": {
+                "lower": -0.03444276491725989,
+                "upper": -0.007696785915142586
+              },
+              "variance_residual": {
+                "lower": -50.25569435081392,
+                "upper": -21.18520030867785
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": 0.018629423779536535,
+                "upper": 0.06025241483529052
+              },
+              "lower_residual": {
+                "lower": -0.03173464097736621,
+                "upper": -0.002184512942876359
+              },
+              "upper_residual": {
+                "lower": -0.033844541405302485,
+                "upper": -0.01031178990013831
+              },
+              "variance_residual": {
+                "lower": -51.07513225287702,
+                "upper": -21.87319730228719
+              }
+            }
+          },
+          "predicted_variance": 211.18698909610455,
+          "realizedAboveNominal80": 0.050079744816586835,
+          "realized_coverage": 0.8500797448165869,
+          "squaredResidualToPredictedVarianceRatio": 0.8354667524330603,
+          "squared_residual": 176.4397079362386,
+          "upper_forecast": 0.09383308802497783,
+          "upper_realized": 0.07208931419457736,
+          "upper_residual": -0.02174377383040056,
+          "variance_residual": -34.74728115986579
+        },
+        "E2:total": {
+          "coverage_residual": -0.004493112741229274,
+          "forecastMassAboveNominal80": 0.014381469998010044,
+          "forecast_mass": 0.8143814699980101,
+          "interval_width": 34.871132376395536,
+          "lower_forecast": 0.09173747595626108,
+          "lower_realized": 0.0912280701754386,
+          "lower_residual": -0.0005094057808227168,
+          "mean_error": -0.17359966400518861,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": -0.02250710941578654,
+                "upper": 0.013081941602149537
+              },
+              "lower_residual": {
+                "lower": -0.015964455555665037,
+                "upper": 0.015822917566394368
+              },
+              "upper_residual": {
+                "lower": -0.009445151022766938,
+                "upper": 0.022521091747960735
+              },
+              "variance_residual": {
+                "lower": -8.665365614238748,
+                "upper": 14.32191895735663
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": -0.021062355327468148,
+                "upper": 0.012480849267595406
+              },
+              "lower_residual": {
+                "lower": -0.015146369697918214,
+                "upper": 0.01324011829241268
+              },
+              "upper_residual": {
+                "lower": -0.008760257463066835,
+                "upper": 0.022721760171794038
+              },
+              "variance_residual": {
+                "lower": -7.1033985356320715,
+                "upper": 13.817445137632317
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": -0.01955926095705166,
+                "upper": 0.013292319108257629
+              },
+              "lower_residual": {
+                "lower": -0.015172598371527053,
+                "upper": 0.012373433606978644
+              },
+              "upper_residual": {
+                "lower": -0.00896247085109756,
+                "upper": 0.020610516089630795
+              },
+              "variance_residual": {
+                "lower": -8.69415092135577,
+                "upper": 13.293509380003346
+              }
+            }
+          },
+          "predicted_variance": 185.48721148664836,
+          "realizedAboveNominal80": 0.00988835725677828,
+          "realized_coverage": 0.8098883572567783,
+          "squaredResidualToPredictedVarianceRatio": 1.0141983167128645,
+          "squared_residual": 188.1208176615219,
+          "upper_forecast": 0.09388105404573108,
+          "upper_realized": 0.09888357256778309,
+          "upper_residual": 0.0050025185220519625,
+          "variance_residual": 2.6336061748731674
+        },
+        "N0:away": {
+          "coverage_residual": 0.01204005385312743,
+          "forecastMassAboveNominal80": 0.024961541043203694,
+          "forecast_mass": 0.8249615410432037,
+          "interval_width": 25.29377990430622,
+          "lower_forecast": 0.08440844729887537,
+          "lower_realized": 0.07655502392344497,
+          "lower_residual": -0.007853423375430496,
+          "mean_error": -0.15720904384889658,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": -0.0048473317748558824,
+                "upper": 0.02828000363602425
+              },
+              "lower_residual": {
+                "lower": -0.020085478415227034,
+                "upper": 0.0051059026735736784
+              },
+              "upper_residual": {
+                "lower": -0.016502291084308337,
+                "upper": 0.009298171519191599
+              },
+              "variance_residual": {
+                "lower": -13.446367299819647,
+                "upper": -3.255075518945812
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": -0.004029420753413878,
+                "upper": 0.028854852549748358
+              },
+              "lower_residual": {
+                "lower": -0.020814054097133473,
+                "upper": 0.004273175821909232
+              },
+              "upper_residual": {
+                "lower": -0.016382252280025655,
+                "upper": 0.00822814280771181
+              },
+              "variance_residual": {
+                "lower": -13.242296450940055,
+                "upper": -3.3614607624626816
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": -0.00226705824891571,
+                "upper": 0.03042452370156165
+              },
+              "lower_residual": {
+                "lower": -0.02096530498475719,
+                "upper": 0.003211370604887759
+              },
+              "upper_residual": {
+                "lower": -0.015593981713563366,
+                "upper": 0.006419838362208968
+              },
+              "variance_residual": {
+                "lower": -13.7539405974089,
+                "upper": -3.309958235908552
+              }
+            }
+          },
+          "predicted_variance": 96.51754657301464,
+          "realizedAboveNominal80": 0.0370015948963317,
+          "realized_coverage": 0.8370015948963317,
+          "squaredResidualToPredictedVarianceRatio": 0.9122621963903573,
+          "squared_residual": 88.04930902690694,
+          "upper_forecast": 0.09063001165791991,
+          "upper_realized": 0.08644338118022328,
+          "upper_residual": -0.004186630477696948,
+          "variance_residual": -8.468237546107439
+        },
+        "N0:home": {
+          "coverage_residual": 0.007767465761950996,
+          "forecastMassAboveNominal80": 0.02413046087281767,
+          "forecast_mass": 0.8241304608728177,
+          "interval_width": 25.83859649122807,
+          "lower_forecast": 0.08519874058939642,
+          "lower_realized": 0.08197767145135566,
+          "lower_residual": -0.0032210691380407446,
+          "mean_error": 0.03064653497051945,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": -0.010440263674653845,
+                "upper": 0.025772798400249486
+              },
+              "lower_residual": {
+                "lower": -0.016578571242205666,
+                "upper": 0.010590640997666939
+              },
+              "upper_residual": {
+                "lower": -0.01586085121190067,
+                "upper": 0.00752618881657981
+              },
+              "variance_residual": {
+                "lower": -11.862518286092357,
+                "upper": 2.157710629838635
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": -0.009398568901988223,
+                "upper": 0.024875907777602516
+              },
+              "lower_residual": {
+                "lower": -0.018005857909032846,
+                "upper": 0.006865108857005221
+              },
+              "upper_residual": {
+                "lower": -0.013465369430999906,
+                "upper": 0.009596465599228497
+              },
+              "variance_residual": {
+                "lower": -11.56445438914374,
+                "upper": 1.862212680862238
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": -0.007257081575484533,
+                "upper": 0.025193193678843453
+              },
+              "lower_residual": {
+                "lower": -0.019488167530699645,
+                "upper": 0.0045398203848201115
+              },
+              "upper_residual": {
+                "lower": -0.012554306765401277,
+                "upper": 0.010878674737736049
+              },
+              "variance_residual": {
+                "lower": -12.578583624096071,
+                "upper": 0.6763681995827039
+              }
+            }
+          },
+          "predicted_variance": 101.34523836573364,
+          "realizedAboveNominal80": 0.03189792663476865,
+          "realized_coverage": 0.8318979266347687,
+          "squaredResidualToPredictedVarianceRatio": 0.9502830978551806,
+          "squared_residual": 96.30666706706106,
+          "upper_forecast": 0.09067079853778594,
+          "upper_realized": 0.0861244019138756,
+          "upper_residual": -0.004546396623910258,
+          "variance_residual": -5.038571298672525
+        },
+        "N0:margin": {
+          "coverage_residual": 0.03187789334219217,
+          "forecastMassAboveNominal80": 0.011822266147439642,
+          "forecast_mass": 0.8118222661474397,
+          "interval_width": 37.14545454545455,
+          "lower_forecast": 0.09415704164703984,
+          "lower_realized": 0.08038277511961722,
+          "lower_residual": -0.013774266527422484,
+          "mean_error": 0.18785557881941609,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": 0.010482416992523657,
+                "upper": 0.05274063883708896
+              },
+              "lower_residual": {
+                "lower": -0.027968445835244982,
+                "upper": 0.0009111887078702978
+              },
+              "upper_residual": {
+                "lower": -0.03236218182241783,
+                "upper": -0.0024947424093209954
+              },
+              "variance_residual": {
+                "lower": -43.148535442337256,
+                "upper": -12.54986599260899
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": 0.012227243921471547,
+                "upper": 0.05386464866926849
+              },
+              "lower_residual": {
+                "lower": -0.029192708616638356,
+                "upper": -0.0010054830950015296
+              },
+              "upper_residual": {
+                "lower": -0.03137553776741887,
+                "upper": -0.0028773952338437534
+              },
+              "variance_residual": {
+                "lower": -43.71834940749362,
+                "upper": -13.419022225395116
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": 0.013482684902453143,
+                "upper": 0.055006613507509065
+              },
+              "lower_residual": {
+                "lower": -0.02875882880174141,
+                "upper": -0.0010463504651918956
+              },
+              "upper_residual": {
+                "lower": -0.03137948676585393,
+                "upper": -0.0061830762372046015
+              },
+              "variance_residual": {
+                "lower": -45.14170109839425,
+                "upper": -14.506187713753592
+              }
+            }
+          },
+          "predicted_variance": 209.92386968597216,
+          "realizedAboveNominal80": 0.04370015948963313,
+          "realized_coverage": 0.8437001594896332,
+          "squaredResidualToPredictedVarianceRatio": 0.867515411050993,
+          "squared_residual": 182.11219210004123,
+          "upper_forecast": 0.09402069220551906,
+          "upper_realized": 0.0759170653907496,
+          "upper_residual": -0.01810362681476964,
+          "variance_residual": -27.811677585931566
+        },
+        "N0:total": {
+          "coverage_residual": -0.001575564335750917,
+          "forecastMassAboveNominal80": 0.01401575572330982,
+          "forecast_mass": 0.8140157557233099,
+          "interval_width": 34.92631578947368,
+          "lower_forecast": 0.09192227232654857,
+          "lower_realized": 0.09186602870813397,
+          "lower_residual": -5.6243618414691163e-05,
+          "mean_error": -0.12656250887837772,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": -0.01948026080387735,
+                "upper": 0.015479338552943816
+              },
+              "lower_residual": {
+                "lower": -0.014376149517248745,
+                "upper": 0.01575900293566441
+              },
+              "upper_residual": {
+                "lower": -0.011682926888841634,
+                "upper": 0.01633663605768982
+              },
+              "variance_residual": {
+                "lower": -9.579281270182275,
+                "upper": 11.870455242202691
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": -0.020209500065967136,
+                "upper": 0.013174717867399013
+              },
+              "lower_residual": {
+                "lower": -0.013528176971051407,
+                "upper": 0.012864004172730354
+              },
+              "upper_residual": {
+                "lower": -0.010026171081448971,
+                "upper": 0.019187765986796314
+              },
+              "variance_residual": {
+                "lower": -7.938284581332121,
+                "upper": 11.431015487702673
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": -0.016178368910156893,
+                "upper": 0.014553194485704283
+              },
+              "lower_residual": {
+                "lower": -0.01511672345434101,
+                "upper": 0.01080894967385908
+              },
+              "upper_residual": {
+                "lower": -0.009989372504296094,
+                "upper": 0.016805524418898276
+              },
+              "variance_residual": {
+                "lower": -9.660572804350078,
+                "upper": 10.20356215366055
+              }
+            }
+          },
+          "predicted_variance": 185.80170019152334,
+          "realizedAboveNominal80": 0.012440191387559807,
+          "realized_coverage": 0.8124401913875599,
+          "squaredResidualToPredictedVarianceRatio": 1.0042952238625862,
+          "squared_residual": 186.59976008789505,
+          "upper_forecast": 0.09406197195014084,
+          "upper_realized": 0.09569377990430622,
+          "upper_residual": 0.0016318079541656084,
+          "variance_residual": 0.7980598963715675
+        },
+        "S1:away": {
+          "coverage_residual": 0.013495488800484281,
+          "forecastMassAboveNominal80": 0.025101002427587837,
+          "forecast_mass": 0.8251010024275879,
+          "interval_width": 25.302711323763955,
+          "lower_forecast": 0.08448489300283027,
+          "lower_realized": 0.07559808612440191,
+          "lower_residual": -0.00888680687842834,
+          "mean_error": -0.14187647943780185,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": -0.003114888791833102,
+                "upper": 0.02922543781103056
+              },
+              "lower_residual": {
+                "lower": -0.021913703123137798,
+                "upper": 0.005023459929640136
+              },
+              "upper_residual": {
+                "lower": -0.01698936960779753,
+                "upper": 0.009145689279136102
+              },
+              "variance_residual": {
+                "lower": -11.000103087432166,
+                "upper": -0.021095915070307444
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": -0.0013482846931104039,
+                "upper": 0.02863216210217647
+              },
+              "lower_residual": {
+                "lower": -0.021560198439040532,
+                "upper": 0.003645197312565286
+              },
+              "upper_residual": {
+                "lower": -0.01615510287200505,
+                "upper": 0.008294389379713902
+              },
+              "variance_residual": {
+                "lower": -10.759132597950487,
+                "upper": -0.09607727700775424
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": 0.0002687104142763597,
+                "upper": 0.0295322578734314
+              },
+              "lower_residual": {
+                "lower": -0.022242430845733335,
+                "upper": 0.0027739365922809984
+              },
+              "upper_residual": {
+                "lower": -0.0149767789216692,
+                "upper": 0.006589950915859299
+              },
+              "variance_residual": {
+                "lower": -11.304660355434104,
+                "upper": -0.1501460525671919
+              }
+            }
+          },
+          "predicted_variance": 96.60104175982475,
+          "realizedAboveNominal80": 0.038596491228070184,
+          "realized_coverage": 0.8385964912280702,
+          "squaredResidualToPredictedVarianceRatio": 0.940818275753021,
+          "squared_residual": 90.8840255444239,
+          "upper_forecast": 0.09041410456958382,
+          "upper_realized": 0.08580542264752791,
+          "upper_residual": -0.004608681922055932,
+          "variance_residual": -5.717016215400582
+        },
+        "S1:home": {
+          "coverage_residual": 0.00423532986695807,
+          "forecastMassAboveNominal80": 0.024472804104332835,
+          "forecast_mass": 0.8244728041043329,
+          "interval_width": 25.884848484848487,
+          "lower_forecast": 0.08506038803959698,
+          "lower_realized": 0.08133971291866028,
+          "lower_residual": -0.003720675120936676,
+          "mean_error": -0.023512108709356997,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": -0.013748282105595517,
+                "upper": 0.022200563466905507
+              },
+              "lower_residual": {
+                "lower": -0.016747524199504805,
+                "upper": 0.010078658964803519
+              },
+              "upper_residual": {
+                "lower": -0.012017071115424579,
+                "upper": 0.011255937275223532
+              },
+              "variance_residual": {
+                "lower": -10.642908448216048,
+                "upper": 2.749805042697328
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": -0.013383499939437847,
+                "upper": 0.020639048622656902
+              },
+              "lower_residual": {
+                "lower": -0.016981423082910386,
+                "upper": 0.007441753518390455
+              },
+              "upper_residual": {
+                "lower": -0.009540667527705021,
+                "upper": 0.012158604152777934
+              },
+              "variance_residual": {
+                "lower": -10.162319665381697,
+                "upper": 2.3447467542439875
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": -0.012048336821383572,
+                "upper": 0.020121238909986183
+              },
+              "lower_residual": {
+                "lower": -0.01684229683615154,
+                "upper": 0.005372442612331927
+              },
+              "upper_residual": {
+                "lower": -0.009139263276086662,
+                "upper": 0.013164828180613732
+              },
+              "variance_residual": {
+                "lower": -10.909054712864627,
+                "upper": 1.438368117577912
+              }
+            }
+          },
+          "predicted_variance": 101.52644039730926,
+          "realizedAboveNominal80": 0.028708133971291794,
+          "realized_coverage": 0.8287081339712918,
+          "squaredResidualToPredictedVarianceRatio": 0.960854636128792,
+          "squared_residual": 97.55215094540807,
+          "upper_forecast": 0.09046680785606939,
+          "upper_realized": 0.08995215311004785,
+          "upper_residual": -0.0005146547460214118,
+          "variance_residual": -3.974289451900885
+        },
+        "S1:margin": {
+          "coverage_residual": 0.03005451922236836,
+          "forecastMassAboveNominal80": 0.012050743935527075,
+          "forecast_mass": 0.8120507439355271,
+          "interval_width": 37.17288676236045,
+          "lower_forecast": 0.09391120008081995,
+          "lower_realized": 0.0784688995215311,
+          "lower_residual": -0.015442300559288835,
+          "mean_error": 0.11836437072844398,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": 0.011932969174444237,
+                "upper": 0.04742730893335017
+              },
+              "lower_residual": {
+                "lower": -0.02819190132275474,
+                "upper": -0.0023356897485544473
+              },
+              "upper_residual": {
+                "lower": -0.02682762127574911,
+                "upper": -0.0009428737729391848
+              },
+              "variance_residual": {
+                "lower": -42.18033109758155,
+                "upper": -13.026652711011167
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": 0.015134724244878031,
+                "upper": 0.04897516246952751
+              },
+              "lower_residual": {
+                "lower": -0.029426604104587653,
+                "upper": -0.00472447823695365
+              },
+              "upper_residual": {
+                "lower": -0.02617822735569671,
+                "upper": -0.002116067469325874
+              },
+              "variance_residual": {
+                "lower": -41.91950288794325,
+                "upper": -13.912127101331778
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": 0.017752934539241202,
+                "upper": 0.04972616950384064
+              },
+              "lower_residual": {
+                "lower": -0.02985212728295254,
+                "upper": -0.006339244977391892
+              },
+              "upper_residual": {
+                "lower": -0.02571731611183676,
+                "upper": -0.004247230771871326
+              },
+              "variance_residual": {
+                "lower": -43.10062873729219,
+                "upper": -15.218317625738301
+              }
+            }
+          },
+          "predicted_variance": 211.4608908439664,
+          "realizedAboveNominal80": 0.042105263157894646,
+          "realized_coverage": 0.8421052631578947,
+          "squaredResidualToPredictedVarianceRatio": 0.869256853588681,
+          "squared_residual": 183.81382863208577,
+          "upper_forecast": 0.09403805598365376,
+          "upper_realized": 0.07942583732057416,
+          "upper_residual": -0.014612218663079542,
+          "variance_residual": -27.64706221188082
+        },
+        "S1:total": {
+          "coverage_residual": -0.010856538444600213,
+          "forecastMassAboveNominal80": 0.009261642112860957,
+          "forecast_mass": 0.809261642112861,
+          "interval_width": 34.98373205741627,
+          "lower_forecast": 0.09581208165518358,
+          "lower_realized": 0.09760765550239234,
+          "lower_residual": 0.001795573847208531,
+          "mean_error": -0.16538858814715926,
+          "pointwiseResidualBounds": {
+            "1": {
+              "coverage_residual": {
+                "lower": -0.02872719137951994,
+                "upper": 0.005972935834591216
+              },
+              "lower_residual": {
+                "lower": -0.014979977506958739,
+                "upper": 0.01767523910711881
+              },
+              "upper_residual": {
+                "lower": -0.005596746649380964,
+                "upper": 0.02575824887758763
+              },
+              "variance_residual": {
+                "lower": -2.2690348216873866,
+                "upper": 19.420482608660343
+              }
+            },
+            "3": {
+              "coverage_residual": {
+                "lower": -0.02788928293077027,
+                "upper": 0.004599500733525127
+              },
+              "lower_residual": {
+                "lower": -0.013557260586165104,
+                "upper": 0.015541267401324305
+              },
+              "upper_residual": {
+                "lower": -0.004538881758882883,
+                "upper": 0.026614300045593123
+              },
+              "variance_residual": {
+                "lower": -0.7233941723618894,
+                "upper": 18.504316196127284
+              }
+            },
+            "6": {
+              "coverage_residual": {
+                "lower": -0.025705317092572292,
+                "upper": 0.008171052896253228
+              },
+              "lower_residual": {
+                "lower": -0.01575648220985013,
+                "upper": 0.013662295413697246
+              },
+              "upper_residual": {
+                "lower": -0.0045856275485536,
+                "upper": 0.02486183784949256
+              },
+              "variance_residual": {
+                "lower": -2.348956675748207,
+                "upper": 17.105886430989454
+              }
+            }
+          },
+          "predicted_variance": 184.794073470301,
+          "realizedAboveNominal80": -0.0015948963317384823,
+          "realized_coverage": 0.7984051036682616,
+          "squaredResidualToPredictedVarianceRatio": 1.0447224887794158,
+          "squared_residual": 193.05852434757907,
+          "upper_forecast": 0.09492627623195429,
+          "upper_realized": 0.10398724082934609,
+          "upper_residual": 0.009060964597391717,
+          "variance_residual": 8.264450877277952
+        }
+      },
+      "games": 3135
+    },
+    "exposed2025": {
+      "cells": {
+        "E1:away": {
+          "coverage_residual": -0.016461342334894057,
+          "forecastMassAboveNominal80": 0.025284871746659388,
+          "forecast_mass": 0.8252848717466594,
+          "interval_width": 24.97426470588235,
+          "lower_forecast": 0.08366588799149041,
+          "lower_realized": 0.08823529411764706,
+          "lower_residual": 0.004569406126156604,
+          "mean_error": -0.031863683533700976,
+          "predicted_variance": 93.87346805521848,
+          "realizedAboveNominal80": 0.008823529411764675,
+          "realized_coverage": 0.8088235294117647,
+          "squaredResidualToPredictedVarianceRatio": 1.0053988912566925,
+          "squared_residual": 94.3802807011372,
+          "upper_forecast": 0.09104924026185074,
+          "upper_realized": 0.10294117647058823,
+          "upper_residual": 0.011891936208737441,
+          "variance_residual": 0.5068126459187114
+        },
+        "E1:home": {
+          "coverage_residual": 0.026355358468681218,
+          "forecastMassAboveNominal80": 0.022909347413671566,
+          "forecast_mass": 0.8229093474136716,
+          "interval_width": 25.21323529411765,
+          "lower_forecast": 0.08532628957911467,
+          "lower_realized": 0.0625,
+          "lower_residual": -0.022826289579114683,
+          "mean_error": -0.6930351903607348,
+          "predicted_variance": 96.95111514722424,
+          "realizedAboveNominal80": 0.04926470588235288,
+          "realized_coverage": 0.8492647058823529,
+          "squaredResidualToPredictedVarianceRatio": 0.8733007905560538,
+          "squared_residual": 84.66748550336193,
+          "upper_forecast": 0.09176436300721368,
+          "upper_realized": 0.08823529411764706,
+          "upper_residual": -0.003529068889566545,
+          "variance_residual": -12.283629643862291
+        },
+        "E1:margin": {
+          "coverage_residual": 0.01938365961108336,
+          "forecastMassAboveNominal80": 0.011498693330093124,
+          "forecast_mass": 0.8114986933300932,
+          "interval_width": 36.341911764705884,
+          "lower_forecast": 0.09441940716452893,
+          "lower_realized": 0.07352941176470588,
+          "lower_residual": -0.020889995399823103,
+          "mean_error": -0.661171506827035,
+          "predicted_variance": 201.86144185507052,
+          "realizedAboveNominal80": 0.030882352941176472,
+          "realized_coverage": 0.8308823529411765,
+          "squaredResidualToPredictedVarianceRatio": 0.8282713002489236,
+          "squared_residual": 167.19603891542175,
+          "upper_forecast": 0.09408189950537786,
+          "upper_realized": 0.09558823529411764,
+          "upper_residual": 0.0015063357887397499,
+          "variance_residual": -34.665402939648814
+        },
+        "E1:total": {
+          "coverage_residual": -0.007937973701308429,
+          "forecastMassAboveNominal80": 0.013085032524837947,
+          "forecast_mass": 0.813085032524838,
+          "interval_width": 34.0,
+          "lower_forecast": 0.09377690513073114,
+          "lower_realized": 0.08455882352941177,
+          "lower_residual": -0.009218081601319374,
+          "mean_error": -0.7248988738944371,
+          "predicted_variance": 179.78772454981484,
+          "realizedAboveNominal80": 0.0051470588235293935,
+          "realized_coverage": 0.8051470588235294,
+          "squaredResidualToPredictedVarianceRatio": 1.0618049367474078,
+          "squared_residual": 190.89949349357653,
+          "upper_forecast": 0.09313806234443102,
+          "upper_realized": 0.11029411764705882,
+          "upper_residual": 0.017156055302627794,
+          "variance_residual": 11.111768943761676
+        },
+        "E2:away": {
+          "coverage_residual": -0.012226919603041052,
+          "forecastMassAboveNominal80": 0.024726919603041297,
+          "forecast_mass": 0.8247269196030413,
+          "interval_width": 24.841911764705884,
+          "lower_forecast": 0.08466429424542178,
+          "lower_realized": 0.09191176470588236,
+          "lower_residual": 0.007247470460460599,
+          "mean_error": -0.31792984690091664,
+          "predicted_variance": 93.51489621524259,
+          "realizedAboveNominal80": 0.012499999999999956,
+          "realized_coverage": 0.8125,
+          "squaredResidualToPredictedVarianceRatio": 0.9658878573243636,
+          "squared_residual": 90.3249027332509,
+          "upper_forecast": 0.09060878615153722,
+          "upper_realized": 0.09558823529411764,
+          "upper_residual": 0.004979449142580455,
+          "variance_residual": -3.1899934819917135
+        },
+        "E2:home": {
+          "coverage_residual": 0.02236241677715918,
+          "forecastMassAboveNominal80": 0.023225818516958263,
+          "forecast_mass": 0.8232258185169583,
+          "interval_width": 25.341911764705884,
+          "lower_forecast": 0.08631043168786116,
+          "lower_realized": 0.0661764705882353,
+          "lower_residual": -0.020133961099625897,
+          "mean_error": -0.4084079445936321,
+          "predicted_variance": 98.08236387439584,
+          "realizedAboveNominal80": 0.045588235294117596,
+          "realized_coverage": 0.8455882352941176,
+          "squaredResidualToPredictedVarianceRatio": 0.8562423608213567,
+          "squared_residual": 83.98227479875204,
+          "upper_forecast": 0.09046374979518036,
+          "upper_realized": 0.08823529411764706,
+          "upper_residual": -0.002228455677533285,
+          "variance_residual": -14.100089075643709
+        },
+        "E2:margin": {
+          "coverage_residual": 0.02962432612842157,
+          "forecastMassAboveNominal80": 0.012287438577460508,
+          "forecast_mass": 0.8122874385774606,
+          "interval_width": 36.3125,
+          "lower_forecast": 0.09377128079858134,
+          "lower_realized": 0.07352941176470588,
+          "lower_residual": -0.020241869033875436,
+          "mean_error": -0.09047809769271566,
+          "predicted_variance": 202.18050438265809,
+          "realizedAboveNominal80": 0.041911764705882315,
+          "realized_coverage": 0.8419117647058824,
+          "squaredResidualToPredictedVarianceRatio": 0.8447352448220585,
+          "squared_residual": 170.78899786793195,
+          "upper_forecast": 0.09394128062395787,
+          "upper_realized": 0.08455882352941177,
+          "upper_residual": -0.009382457094546144,
+          "variance_residual": -31.391506514726228
+        },
+        "E2:total": {
+          "coverage_residual": -0.0080955647750723,
+          "forecastMassAboveNominal80": 0.013242623598601289,
+          "forecast_mass": 0.8132426235986013,
+          "interval_width": 33.97794117647059,
+          "lower_forecast": 0.09235879392352213,
+          "lower_realized": 0.08455882352941177,
+          "lower_residual": -0.007799970394110335,
+          "mean_error": -0.7263377914945487,
+          "predicted_variance": 181.01401579661854,
+          "realizedAboveNominal80": 0.0051470588235293935,
+          "realized_coverage": 0.8051470588235294,
+          "squaredResidualToPredictedVarianceRatio": 0.9823844657193447,
+          "squared_residual": 177.82535719607412,
+          "upper_forecast": 0.09439858247787622,
+          "upper_realized": 0.11029411764705882,
+          "upper_residual": 0.01589553516918266,
+          "variance_residual": -3.188658600544606
+        },
+        "N0:away": {
+          "coverage_residual": -0.008019523573600295,
+          "forecastMassAboveNominal80": 0.02419599416183571,
+          "forecast_mass": 0.8241959941618358,
+          "interval_width": 25.02573529411765,
+          "lower_forecast": 0.08527639130010808,
+          "lower_realized": 0.09926470588235294,
+          "lower_residual": 0.013988314582244869,
+          "mean_error": 0.12568803352741567,
+          "predicted_variance": 94.69249198093412,
+          "realizedAboveNominal80": 0.016176470588235237,
+          "realized_coverage": 0.8161764705882353,
+          "squaredResidualToPredictedVarianceRatio": 0.9781381801987935,
+          "squared_residual": 92.62234178471975,
+          "upper_forecast": 0.09052761453805636,
+          "upper_realized": 0.08455882352941177,
+          "upper_residual": -0.005968791008644581,
+          "variance_residual": -2.0701501962144895
+        },
+        "N0:home": {
+          "coverage_residual": 0.01630008333237989,
+          "forecastMassAboveNominal80": 0.02561168137350278,
+          "forecast_mass": 0.8256116813735028,
+          "interval_width": 25.702205882352942,
+          "lower_forecast": 0.08426001835428833,
+          "lower_realized": 0.07352941176470588,
+          "lower_residual": -0.010730606589582492,
+          "mean_error": -0.026131776021345598,
+          "predicted_variance": 98.64814958303882,
+          "realizedAboveNominal80": 0.041911764705882315,
+          "realized_coverage": 0.8419117647058824,
+          "squaredResidualToPredictedVarianceRatio": 0.8617072195110065,
+          "squared_residual": 85.00582268710623,
+          "upper_forecast": 0.09012830027220917,
+          "upper_realized": 0.08455882352941177,
+          "upper_residual": -0.005569476742797413,
+          "variance_residual": -13.642326895932646
+        },
+        "N0:margin": {
+          "coverage_residual": 0.015615506882035165,
+          "forecastMassAboveNominal80": 0.011590375470906467,
+          "forecast_mass": 0.8115903754709065,
+          "interval_width": 36.544117647058826,
+          "lower_forecast": 0.09456706363874051,
+          "lower_realized": 0.07352941176470588,
+          "lower_residual": -0.021037651874034627,
+          "mean_error": -0.15181980954876143,
+          "predicted_variance": 202.32599085817608,
+          "realizedAboveNominal80": 0.02720588235294108,
+          "realized_coverage": 0.8272058823529411,
+          "squaredResidualToPredictedVarianceRatio": 0.8655774683133706,
+          "squared_residual": 175.1288189410142,
+          "upper_forecast": 0.09384256089035357,
+          "upper_realized": 0.09926470588235294,
+          "upper_residual": 0.005422144991999432,
+          "variance_residual": -27.197171917161874
+        },
+        "N0:total": {
+          "coverage_residual": -0.015757795397319016,
+          "forecastMassAboveNominal80": 0.013551913044378083,
+          "forecast_mass": 0.8135519130443781,
+          "interval_width": 34.474264705882355,
+          "lower_forecast": 0.09215217730346904,
+          "lower_realized": 0.09926470588235294,
+          "lower_residual": 0.007112528578883948,
+          "mean_error": 0.09955625750607032,
+          "predicted_variance": 184.3552922697702,
+          "realizedAboveNominal80": -0.0022058823529411686,
+          "realized_coverage": 0.7977941176470589,
+          "squaredResidualToPredictedVarianceRatio": 0.9770672042278769,
+          "squared_residual": 180.12751000263748,
+          "upper_forecast": 0.0942959096521532,
+          "upper_realized": 0.10294117647058823,
+          "upper_residual": 0.008645266818435079,
+          "variance_residual": -4.227782267132425
+        },
+        "S1:away": {
+          "coverage_residual": -0.00420238472277102,
+          "forecastMassAboveNominal80": 0.024055325899241975,
+          "forecast_mass": 0.824055325899242,
+          "interval_width": 24.860294117647058,
+          "lower_forecast": 0.0849201713455754,
+          "lower_realized": 0.08455882352941177,
+          "lower_residual": -0.00036134781616362733,
+          "mean_error": -0.32959062748912765,
+          "predicted_variance": 93.31059048673636,
+          "realizedAboveNominal80": 0.019852941176470518,
+          "realized_coverage": 0.8198529411764706,
+          "squaredResidualToPredictedVarianceRatio": 1.0308037623051196,
+          "squared_residual": 96.18490773664014,
+          "upper_forecast": 0.09102450275518302,
+          "upper_realized": 0.09558823529411764,
+          "upper_residual": 0.004563732538934661,
+          "variance_residual": 2.8743172499037977
+        },
+        "S1:home": {
+          "coverage_residual": 0.0034736475566000224,
+          "forecastMassAboveNominal80": 0.0237322347963409,
+          "forecast_mass": 0.823732234796341,
+          "interval_width": 25.345588235294116,
+          "lower_forecast": 0.08594009484259685,
+          "lower_realized": 0.07720588235294118,
+          "lower_residual": -0.008734212489655663,
+          "mean_error": -0.3953082479095076,
+          "predicted_variance": 97.69980768078278,
+          "realizedAboveNominal80": 0.02720588235294108,
+          "realized_coverage": 0.8272058823529411,
+          "squaredResidualToPredictedVarianceRatio": 0.9048825190461477,
+          "squared_residual": 88.4068480845109,
+          "upper_forecast": 0.090327670361062,
+          "upper_realized": 0.09558823529411764,
+          "upper_residual": 0.005260564933055643,
+          "variance_residual": -9.292959596271993
+        },
+        "S1:margin": {
+          "coverage_residual": 0.015554338802065588,
+          "forecastMassAboveNominal80": 0.011651543550875276,
+          "forecast_mass": 0.8116515435508753,
+          "interval_width": 36.338235294117645,
+          "lower_forecast": 0.09414500123250849,
+          "lower_realized": 0.08088235294117647,
+          "lower_residual": -0.013262648291332087,
+          "mean_error": -0.06571762042037965,
+          "predicted_variance": 202.27711609741573,
+          "realizedAboveNominal80": 0.02720588235294108,
+          "realized_coverage": 0.8272058823529411,
+          "squaredResidualToPredictedVarianceRatio": 0.8813850109692103,
+          "squared_residual": 178.284018190341,
+          "upper_forecast": 0.09420345521661583,
+          "upper_realized": 0.09191176470588236,
+          "upper_residual": -0.002291690510733484,
+          "variance_residual": -23.99309790707458
+        },
+        "S1:total": {
+          "coverage_residual": -0.008003009773505477,
+          "forecastMassAboveNominal80": 0.013150068597034936,
+          "forecast_mass": 0.813150068597035,
+          "interval_width": 33.99632352941177,
+          "lower_forecast": 0.09372506416691857,
+          "lower_realized": 0.08455882352941177,
+          "lower_residual": -0.009166240637506803,
+          "mean_error": -0.7248988753986348,
+          "predicted_variance": 179.7436802376228,
+          "realizedAboveNominal80": 0.0051470588235293935,
+          "realized_coverage": 0.8051470588235294,
+          "squaredResidualToPredictedVarianceRatio": 1.062065120729641,
+          "squared_residual": 190.89949345196084,
+          "upper_forecast": 0.0931248672360466,
+          "upper_realized": 0.11029411764705882,
+          "upper_residual": 0.017169250411012277,
+          "variance_residual": 11.155813214338194
+        }
+      },
+      "games": 272
+    }
+  }
+}

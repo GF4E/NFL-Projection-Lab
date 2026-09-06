@@ -1,0 +1,786 @@
+"""One authenticated RF-02D run; historical invocation requires final acceptance."""
+import argparse
+from dataclasses import replace
+from datetime import datetime, timezone
+import hashlib
+import json
+import os
+from pathlib import Path
+import resource
+import signal
+import stat
+import sys
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import numpy as np
+from research_score_contract import encoded, read_regular
+from research_score_run import ImmutableRun, OUTPUT_PARENT
+from research_score_conditional_admission import (
+    ADMITTED_DATA, CONFIG_SHA, PROTOCOL_SHA, PARENT_MANIFEST, PARENT_INDEX, SERIES, ORDINARY,
+    YEARS, YEAR_COUNTS, Archive, admit_archive, bound, parse, sha, recover_original,
+    validate_selected_rows, validate_independent_source, _source_manifest)
+from research_score_conditional_adapter import calibration_case, distribution_fingerprint, transform_distribution
+from research_score_conditional_policy import independent_control, independent_fingerprint
+from research_score_conditional_replay import annual_receipt, predict, fingerprint, canonical
+from research_score_conditional_qualify import ADMISSION_ACCEPTANCE, REPLAY_ACCEPTANCE, SAMPLE_SHA, ADMISSION_SOURCE
+from research_score_conditional_inference import evaluate
+from research_score_compute_distribution import score_forecast
+from research_score_distribution import JointBase
+
+VERSION = 'rf02d-team-score.v1'
+PARENT_DIRECTORY = OUTPUT_PARENT / 'rf02c-v1-2d9c91d803f1c991'
+DATA_PATH = OUTPUT_PARENT / 'rf01-public-2026-09-04-v1/admitted-score-data.v2.json'
+IDENTITY_ACCEPTANCE = '878f7160eaa6306d67449f4361ea68e3a34ed5f915886f5270882f9560cb3968'
+INFERENCE_ACCEPTANCE = '0b8d5b547f19a9e823708aa5e06a69afcef39b4142a2f515f1cb938747cd5539'
+RAW_REFERENCES = (('N0', 'full'), ('E2', 'full'), ('N0', 'availability_24h'),
+                  ('E2', 'availability_24h'), ('E1', 'full'), ('S1', 'full'))
+CONDITIONAL_FILES = tuple(path for suffix in ('margin', 'adapter', 'policy', 'admission', 'replay', 'qualify', 'inference', 'run')
+                          for path in ('scripts/research_score_conditional_' + suffix + '.py',
+                                       'tests/research-score-conditional-margin/test_' + ('conditional_margin' if suffix == 'margin' else suffix) + '.py'))
+
+
+class RunFailure(ValueError):
+    pass
+
+
+def require(condition, reason):
+    if not condition:
+        raise RunFailure(reason)
+
+
+def strict(value):
+    return encoded(canonical(value))
+
+
+def rss_mib():
+    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == 'darwin' else 1024)
+
+
+class Budget:
+    def __init__(self):
+        self.started = time.monotonic()
+        self.admission_started = None
+        self.admission_active = False
+
+    def check(self):
+        now = time.monotonic()
+        require(now - self.started <= 7200 and rss_mib() <= 4096, 'registered_runtime_or_memory_budget_exceeded')
+        if self.admission_active:
+            require(now - self.admission_started <= 600, 'combined_admission_collection_budget_exceeded')
+
+    def start_admission(self):
+        require(self.admission_started is None, 'admission_clock_restart_forbidden')
+        self.admission_started, self.admission_active = time.monotonic(), True
+        self.check()
+
+    def end_admission(self):
+        self.check()
+        elapsed = time.monotonic() - self.admission_started
+        self.admission_active = False
+        return elapsed
+
+    def remaining(self):
+        deadlines = [self.started + 7200]
+        if self.admission_active:
+            deadlines.append(self.admission_started + 600)
+        return max(.001, min(deadlines) - time.monotonic())
+
+
+class Store(ImmutableRun):
+    """Strict finite artifacts; completion/ atomically exposes terminal and index."""
+    def __init__(self, parent, identity):
+        super().__init__(parent, identity)
+        self.finalized = False
+        self.uncommitted_staging = []
+        self.uncommitted_artifacts = set()
+
+    def write(self, name, value):
+        require(type(name) is str and name not in ('', '.', '..')
+                and all(c in 'abcdefghijklmnopqrstuvwxyz0123456789-.' for c in name), 'invalid_output_name')
+        require(not self.finalized and name not in self.index and name not in self.uncommitted_artifacts and name not in
+                {'terminal-decision.json', 'terminal-failure.json', 'artifact-index.json'}, 'artifact_rewrite_or_flat_terminal_forbidden')
+        raw = strict(value)
+        self.uncommitted_artifacts.add(name)
+        result = super().write(name, raw)
+        self.uncommitted_artifacts.remove(name)
+        return result
+
+    def pointer(self, name):
+        require(name in self.index, 'unknown_output_artifact')
+        return {'name': name, **self.index[name]}
+
+    def read_bound(self, pointer):
+        require(type(pointer) is dict and set(pointer) == {'name', 'sha256', 'bytes'}
+                and pointer['name'] in self.index and self.index[pointer['name']] ==
+                {k: pointer[k] for k in ('sha256', 'bytes')}, 'output_pointer_binding_mismatch')
+        raw = self.read(pointer['name'])
+        require(len(raw) == pointer['bytes'] and sha(raw) == pointer['sha256'], 'output_artifact_hash_mismatch')
+        return parse(raw)
+
+    def finish(self, terminal, budget=None):
+        require(not self.finalized, 'terminal_already_committed')
+        try:
+            os.stat('completion', dir_fd=self.fd, follow_symlinks=False)
+        except FileNotFoundError:
+            pass
+        else:
+            raise RunFailure('completion_already_exists')
+        if budget is not None: budget()
+        raw = strict(terminal)
+        files = dict(self.index)
+        uncommitted = []
+        for name in sorted(self.uncommitted_artifacts):
+            try:
+                fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=self.fd)
+            except FileNotFoundError:
+                continue
+            with os.fdopen(fd, 'rb') as stream:
+                require(stat.S_ISREG(os.fstat(stream.fileno()).st_mode), 'nonregular_uncommitted_artifact')
+                body = stream.read()
+                os.fsync(stream.fileno())
+            files[name] = {'sha256': sha(body), 'bytes': len(body)}
+            uncommitted.append(name)
+        require(not (uncommitted or self.uncommitted_staging) or terminal['status'] == 'protocol_invalid',
+                'uncommitted_prefix_requires_invalid_terminal')
+        for directory in self.uncommitted_staging:
+            staging_fd = os.open(directory, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=self.fd)
+            try:
+                for name in ('terminal.json', 'artifact-index.json'):
+                    try:
+                        fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=staging_fd)
+                    except FileNotFoundError:
+                        continue
+                    with os.fdopen(fd, 'rb') as stream:
+                        require(stat.S_ISREG(os.fstat(stream.fileno()).st_mode), 'nonregular_staging_evidence')
+                        body = stream.read()
+                        os.fsync(stream.fileno())
+                    files[directory + '/' + name] = {'sha256': sha(body), 'bytes': len(body)}
+                os.fsync(staging_fd)
+            finally:
+                os.close(staging_fd)
+        files['completion/terminal.json'] = {'sha256': sha(raw), 'bytes': len(raw)}
+        index = strict({'files': files, 'uncommitted_staging': list(self.uncommitted_staging),
+                        'uncommitted_artifacts': uncommitted})
+        stage_name = '.completion-staging-' + sha(raw)[:16]
+        os.mkdir(stage_name, mode=0o700, dir_fd=self.fd)
+        self.uncommitted_staging.append(stage_name)
+        staging = os.open(stage_name, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=self.fd)
+        try:
+            for name, body in (('terminal.json', raw), ('artifact-index.json', index)):
+                fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=staging)
+                with os.fdopen(fd, 'wb') as stream:
+                    stream.write(body); stream.flush(); os.fsync(stream.fileno())
+            os.fsync(staging)
+        finally:
+            os.close(staging)
+        if budget is not None: budget()
+        os.rename(stage_name, 'completion', src_dir_fd=self.fd, dst_dir_fd=self.fd)
+        self.finalized = True
+        os.fsync(self.fd)
+        return {'terminal_sha256': sha(raw), 'index_sha256': sha(index)}
+
+
+def _evidence(pointer):
+    require(type(pointer) is dict and set(pointer) == {'path', 'sha256'}, 'invalid_evidence_pointer')
+    return parse(bound(pointer['path'], pointer['sha256']))
+
+
+def preflight(root, acceptance_path, acceptance_sha256, budget):
+    root = Path(root).resolve()
+    require(root == ROOT, 'runner_repository_mismatch')
+    acceptance = parse(bound(acceptance_path, acceptance_sha256))
+    require(set(acceptance) == {'version', 'status', 'code_hashes', 'acceptances', 'audit_evidence'}
+            and acceptance['version'] == 'rf02d-runner-implementation-acceptance.v1'
+            and acceptance['status'] == 'accepted_for_one_bounded_replay', 'final_runner_acceptance_required')
+    archive = Archive(PARENT_DIRECTORY)
+    expected_files = set(archive.manifest['code_hashes']) | set(CONDITIONAL_FILES)
+    require(len(expected_files) == 43 and set(acceptance['code_hashes']) == expected_files, 'exact_43_source_bindings_required')
+    for name, digest in acceptance['code_hashes'].items():
+        require(not Path(name).is_absolute() and '..' not in Path(name).parts
+                and name.startswith(('scripts/research_score_', 'tests/research-score')), 'unsafe_code_path')
+        bound(root / name, digest)
+    require(all(acceptance['code_hashes'][name] == value for name, value in archive.manifest['code_hashes'].items()),
+            'frozen_parent_code_mismatch')
+    config = parse(bound(root / 'config/research-team-score-conditional.v1.json', CONFIG_SHA))
+    bound(root / config['protocol'], PROTOCOL_SHA)
+    require(all(acceptance['code_hashes'][name] == value for name, value in config['accepted_unit_hashes'].items()), 'accepted_finite_unit_mismatch')
+    require(all(acceptance['code_hashes'][name] == value for name, value in ADMISSION_SOURCE.items()), 'accepted_admission_source_mismatch')
+    require(set(acceptance['acceptances']) == {'admission', 'replay', 'identity', 'inference'}, 'stage_acceptance_membership')
+    stages = {name: _evidence(pointer) for name, pointer in acceptance['acceptances'].items()}
+    require(acceptance['acceptances']['admission']['sha256'] == ADMISSION_ACCEPTANCE
+            and acceptance['acceptances']['replay']['sha256'] == REPLAY_ACCEPTANCE
+            and acceptance['acceptances']['identity']['sha256'] == IDENTITY_ACCEPTANCE
+            and acceptance['acceptances']['inference']['sha256'] == INFERENCE_ACCEPTANCE, 'frozen_stage_acceptance_mismatch')
+    require(all(type(stage.get('status')) is str and stage['status'].startswith('accepted_') for stage in stages.values()),
+            'unaccepted_stage')
+    old_admission = _evidence(stages['admission']['evidence']['result.json'])
+    require(old_admission['status'] == 'passed' and old_admission['counts']['recovered_distributions'] == 68140
+            and old_admission['counts']['calibration_cases'] == 56430
+            and old_admission['pins'] == {'parent_manifest': PARENT_MANIFEST, 'parent_index': PARENT_INDEX,
+                'admitted_data': ADMITTED_DATA, 'config': CONFIG_SHA, 'protocol': PROTOCOL_SHA}, 'actual_admission_acceptance_mismatch')
+    identity = stages['identity']
+    require(identity['historical_identity_qualification_accepted'] is True and identity['exact_identity_occurrences'] == 520
+            and identity['sample_keys_sha256'] == SAMPLE_SHA, 'fixed_identity_acceptance_required')
+    identity_receipt = _evidence(identity['evidence']['receipt.json'])
+    identity_manifest = _evidence(identity['evidence']['manifest.json'])
+    require(len(identity_manifest['accepted_unit_hashes']) == 10
+            and all(acceptance['code_hashes'].get(name) == value
+                    for name, value in identity_manifest['accepted_unit_hashes'].items()),
+            'identity_prior_unit_source_mismatch')
+    require(all(acceptance['code_hashes'].get(name) == value
+                for name, value in identity_manifest['qualification_source_hashes'].items())
+            and set(identity_manifest['qualification_source_hashes']) ==
+            {'scripts/research_score_conditional_qualify.py', 'tests/research-score-conditional-margin/test_qualify.py'},
+            'accepted_identity_source_mismatch')
+    require(identity_receipt['status'] == 'passed' and identity_receipt['complete_count'] == 520
+            and identity_receipt['sample_sha256'] == SAMPLE_SHA
+            and set(identity_receipt['artifacts']) == {'manifest.json', 'sample.json'} |
+                {f'occurrence-{i:03}.json' for i in range(520)}, 'identity_result_mismatch')
+    identity_directory = Path(identity['evidence']['receipt.json']['path']).parent
+    for name, pointer in identity_receipt['artifacts'].items():
+        require(type(name) is str and Path(name).name == name and '..' not in name, 'unsafe_identity_artifact')
+        bound(identity_directory / name, pointer['sha256'], pointer['bytes'])
+    for stage_name in ('replay', 'inference'):
+        for name, digest in stages[stage_name]['accepted_source_hashes'].items():
+            require(acceptance['code_hashes'].get(name) == digest, 'stage_accepted_source_mismatch')
+    require(set(acceptance['audit_evidence']) == {'leakage', 'falsification'}, 'implementation_audit_membership')
+    audits = {name: _evidence(pointer) for name, pointer in acceptance['audit_evidence'].items()}
+    require(all(value.get('status') == 'accepted' and value.get('source_hashes') == acceptance['code_hashes']
+                for value in audits.values()), 'implementation_audit_not_bound_to_sources')
+    budget.check()
+    manifest = {'version': VERSION, 'implementation_acceptance_sha256': acceptance_sha256,
+                'code_hashes': acceptance['code_hashes'], 'acceptances': acceptance['acceptances'],
+                'audit_evidence': acceptance['audit_evidence'], 'config_sha256': CONFIG_SHA, 'protocol_sha256': PROTOCOL_SHA,
+                'parent_manifest_sha256': PARENT_MANIFEST, 'parent_index_sha256': PARENT_INDEX,
+                'admitted_data_sha256': ADMITTED_DATA, 'runtime': archive.manifest['runtime'],
+                'production_authorized': False, 'provider_requests': 0, 'automatic_restart': False,
+                'compute': config['compute'], 'independent_actual_result_acceptance': False}
+    return archive, config, acceptance, old_admission, manifest
+
+
+def recover_source(archive, descriptor, mappers):
+    pointer = descriptor['mapper']; key = pointer['name'], pointer['sha256']
+    if key not in mappers:
+        value = archive.read(pointer)
+        mappers[key] = JointBase(np.asarray(value['atoms']), np.asarray(value['weights']), value['b'], value['epsilon'])
+    return recover_original(mappers[key], descriptor)
+
+
+def _parent_series(config):
+    return [(family, variant) for family in config['models'] for variant in ['full'] + config['variants']['allModels']
+            + config['variants'].get(family, []) + config['variants']['negativeControlsAllModels']]
+
+
+def origin_bundle(archive, origin, parent_config):
+    suffix = f"{origin['season']}-{origin['week']:02}"
+    forecast_name, loss_name = 'forecasts-' + suffix + '.json', 'outer-losses-' + suffix + '.json'
+    publication, losses = archive.read(forecast_name), archive.read(loss_name)
+    require(publication['origin_at'] == origin['originAt'] and publication['classification'] == 'retrospective'
+            and publication['manifest_sha256'] == PARENT_MANIFEST, 'parent_origin_binding_mismatch')
+    rows, losses = validate_selected_rows(publication, losses, origin, _parent_series(parent_config))
+    for family, variant in SERIES:
+        for game in origin['targetGameIds']:
+            row = rows[family, variant, game]
+            require(row['distribution']['independent'] is (variant == 'independent_marginals'), 'parent_variant_flag_mismatch')
+            if variant == 'independent_marginals': validate_independent_source(rows[family, 'full', game], row)
+    return rows, losses, {'forecast': {'name': forecast_name, **archive.index[forecast_name]},
+                           'loss': {'name': loss_name, **archive.index[loss_name]}}
+
+
+def validate_cohort(data):
+    origins = [origin for origin in data['origins'] if origin['season'] in YEARS]
+    records = {row['gameId']: row for row in data['records']}
+    require(len(records) == len(data['records']) and len(origins) == 226, 'complete_parent_cohort_required')
+    require([(o['season'], o['week']) for o in origins] == sorted(set((o['season'], o['week']) for o in origins)), 'parent_origin_order_mismatch')
+    by_year = {year: [game for origin in origins if origin['season'] == year for game in origin['targetGameIds']] for year in YEARS}
+    for year, count in zip(YEARS, YEAR_COUNTS):
+        require(len(by_year[year]) == len(set(by_year[year])) == count
+                and set(by_year[year]) == {key for key, row in records.items() if row['season'] == year}, 'parent_year_game_membership_mismatch')
+    for origin in origins:
+        for game in origin['targetGameIds']:
+            row = records[game]
+            require((row['season'], row['week']) == (origin['season'], origin['week'])
+                    and datetime.fromisoformat(origin['originAt']) < datetime.fromisoformat(row['kickoffAt']), 'parent_target_origin_mismatch')
+    return origins, records, by_year
+
+
+def collect_cases(archive, data, parent_config, expected, store, manifest_sha256, budget):
+    origins, records, by_year = validate_cohort(data)
+    source_digest, case_digest = hashlib.sha256(), hashlib.sha256()
+    chunks, current_chunk = [], []
+    counts = {'unique_original_sources': 0, 'unique_prior_cases': 0, 'reconstruction_calls': 0, 'case_constructor_calls': 0}
+    for origin in origins:
+        budget.check()
+        rows, _, references = origin_bundle(archive, origin, parent_config)
+        mappers = {}
+        current_chunk = []
+        for family, variant in SERIES:
+            for game in origin['targetGameIds']:
+                row, record = rows[family, variant, game], records[game]
+                original = recover_source(archive, row['distribution'], mappers)
+                source_hash = distribution_fingerprint(replace(original, independent=False))
+                source_digest.update(encoded([family, variant, game, source_hash, original.independent]))
+                counts['reconstruction_calls'] += 1; counts['unique_original_sources'] += 1
+                require(row['native_failure'] is None, 'unexpected_inherited_failure_after_native_zero_admission')
+                if (family, variant) in ORDINARY and origin['season'] <= 2024:
+                    case = canonical(calibration_case(original, record['homeScore'], record['awayScore']))
+                    case_digest.update(encoded({'key': [family, variant, game], 'source_fingerprint': source_hash, 'case': case}))
+                    case_hash = fingerprint(case)
+                    source = {'family': family, 'variant': variant, 'season': origin['season'], 'game_id': game,
+                        'origin_at': origin['originAt'], 'kickoff_at': record['kickoffAt'], 'availability': record['availability'],
+                        'native_failure': row['native_failure'], 'source_fingerprint': source_hash, 'case_fingerprint': case_hash,
+                        'observed_home': record['homeScore'], 'observed_away': record['awayScore']}
+                    case_row = {'family': family, 'variant': variant, 'season': origin['season'], 'game_id': game,
+                        'source_fingerprint': source_hash, 'case_fingerprint': case_hash, 'weight': 1, 'case': case}
+                    current_chunk.append({'source': source, 'case': case_row, 'original_distribution': row['distribution'],
+                                          'parent_references': references, 'admitted_data_sha256': ADMITTED_DATA})
+                    counts['case_constructor_calls'] += 1; counts['unique_prior_cases'] += 1
+        if current_chunk:
+            name = f"cases-{origin['season']}-{origin['week']:02}.json"
+            store.write(name, {'version': 'rf02d-case-chunk.v1', 'run_manifest_sha256': manifest_sha256,
+                              'origin': origin, 'rows': current_chunk})
+            chunks.append({'season': origin['season'], 'pointer': store.pointer(name)})
+        budget.check()
+    verify_collection(counts, source_digest.hexdigest(), case_digest.hexdigest(), expected)
+    report = {**counts, 'recovered_sources_sha256': source_digest.hexdigest(), 'case_inputs_sha256': case_digest.hexdigest(),
+              'latest_case_season': 2024, 'case_chunks': chunks}
+    store.write('case-collection.json', report)
+    return origins, records, by_year, report
+
+
+def verify_collection(counts, source_digest, case_digest, expected):
+    require(counts['unique_original_sources'] == counts['reconstruction_calls'] == 68140
+            and counts['unique_prior_cases'] == counts['case_constructor_calls'] == 56430, 'collector_population_mismatch')
+    require(source_digest == expected['recovered_sources_sha256']
+            and case_digest == expected['case_inputs_sha256'], 'collector_accepted_digest_mismatch')
+
+
+def load_case_inputs(store, collection, manifest_sha256, budget):
+    sources, cases = {key: [] for key in ORDINARY}, {key: [] for key in ORDINARY}
+    seen, digest = set(), hashlib.sha256()
+    for reference in collection['case_chunks']:
+        budget.check()
+        chunk = store.read_bound(reference['pointer'])
+        require(chunk['version'] == 'rf02d-case-chunk.v1' and chunk['run_manifest_sha256'] == manifest_sha256
+                and chunk['origin']['season'] == reference['season'] <= 2024, 'case_chunk_run_or_year_mismatch')
+        for row in chunk['rows']:
+            source, case_row = row['source'], row['case']
+            key = source['family'], source['variant']; occurrence = (*key, source['game_id'])
+            require(key in sources and occurrence not in seen and source['season'] == reference['season']
+                    and (case_row['family'], case_row['variant'], case_row['game_id'], case_row['season']) == (*key, source['game_id'], source['season'])
+                    and case_row['source_fingerprint'] == source['source_fingerprint']
+                    and case_row['case_fingerprint'] == source['case_fingerprint'] == fingerprint(case_row['case'])
+                    and case_row['weight'] == 1 and row['admitted_data_sha256'] == ADMITTED_DATA, 'persisted_case_binding_mismatch')
+            seen.add(occurrence)
+            digest.update(encoded({'key': list(occurrence), 'source_fingerprint': source['source_fingerprint'], 'case': case_row['case']}))
+            sources[key].append(source); cases[key].append(case_row)
+    require(len(seen) == 56430 and all(len(rows) == 3135 for rows in cases.values())
+            and digest.hexdigest() == collection['case_inputs_sha256'], 'persisted_case_population_or_digest_mismatch')
+    budget.check()
+    return sources, cases
+
+
+def receipt_envelope(receipt, manifest_sha256, case_chunks):
+    body = canonical(receipt)
+    require(body['sha256'] == fingerprint({key: value for key, value in body.items() if key != 'sha256'}), 'pure_receipt_digest_mismatch')
+    return {'version': 'rf02d-annual-envelope.v1', 'run_manifest_sha256': manifest_sha256,
+            'family': body['family'], 'variant': body['variant'], 'target_season': body['target_season'],
+            'case_chunks': case_chunks, 'pure_receipt_sha256': body['sha256'], 'pure_receipt': body}
+
+
+def verify_envelope(envelope, pointer, manifest_sha256, key, season, cutoff, chunks):
+    require(set(envelope) == {'version', 'run_manifest_sha256', 'family', 'variant', 'target_season',
+                             'case_chunks', 'pure_receipt_sha256', 'pure_receipt'}
+            and envelope['version'] == 'rf02d-annual-envelope.v1'
+            and envelope['run_manifest_sha256'] == manifest_sha256
+            and (envelope['family'], envelope['variant'], envelope['target_season']) == (*key, season)
+            and envelope['case_chunks'] == chunks, 'annual_envelope_run_year_or_inputs_mismatch')
+    raw, body = strict(envelope), envelope['pure_receipt']
+    require(sha(raw) == pointer['sha256'] and len(raw) == pointer['bytes'], 'annual_envelope_file_hash_mismatch')
+    require((body['family'], body['variant'], body['target_season'], body['cutoff']) == (*key, season, cutoff)
+            and body['sha256'] == envelope['pure_receipt_sha256']
+            == fingerprint({key: value for key, value in body.items() if key != 'sha256'}), 'annual_receipt_binding_mismatch')
+    return body
+
+
+def fit_annual_receipts(store, manifest_sha256, origins, by_year, sources, cases, collection, budget):
+    entries, cold, estimated = [], 0, 0
+    for year in YEARS:
+        cutoff = next(origin['originAt'] for origin in origins if origin['season'] == year)
+        prior = {old: by_year[old] for old in YEARS if old < year}
+        chunks = [row['pointer'] for row in collection['case_chunks'] if row['season'] < year]
+        for family, variant in ORDINARY:
+            budget.check()
+            receipt = annual_receipt(family, variant, year, cutoff, prior,
+                         [row for row in sources[family, variant] if row['season'] < year],
+                         [row for row in cases[family, variant] if row['season'] < year])
+            if year == 2013:
+                require(receipt['status'] == 'identity_no_prior_outer_support' and receipt['estimator'] is None, 'cold_start_receipt_mismatch')
+                cold += 1
+            else:
+                require(receipt['estimator'] is not None, 'missing_registered_scalar_estimate')
+                estimated += 1
+            envelope = receipt_envelope(receipt, manifest_sha256, chunks)
+            name = f'annual-{year}-{family.lower()}-{variant.replace("_", "-")}.json'
+            store.write(name, envelope)
+            pointer = store.pointer(name)
+            verify_envelope(store.read_bound(pointer), pointer, manifest_sha256, (family, variant), year, cutoff, chunks)
+            entries.append({'family': family, 'variant': variant, 'target_season': year,
+                            'pointer': pointer, 'pure_receipt_sha256': receipt['sha256']})
+            budget.check()
+    require(len(entries) == 234 and cold == 18 and estimated == 216, 'annual_receipt_population_mismatch')
+    result = {'version': 'rf02d-annual-index.v1', 'run_manifest_sha256': manifest_sha256,
+              'entries': entries, 'cold_starts': cold, 'estimated_receipts': estimated,
+              'case_collection': store.pointer('case-collection.json')}
+    store.write('annual-index.json', result)
+    return result
+
+
+def load_annual(store, index, manifest_sha256, season, cutoff, collection):
+    require(index['run_manifest_sha256'] == manifest_sha256 and len(index['entries']) == 234, 'annual_index_run_or_count_mismatch')
+    selected = [row for row in index['entries'] if row['target_season'] == season]
+    require([(row['family'], row['variant']) for row in selected] == list(ORDINARY), 'annual_index_series_or_order_mismatch')
+    chunks = [row['pointer'] for row in collection['case_chunks'] if row['season'] < season]
+    bodies, envelopes, pointers = {}, {}, {}
+    for row in selected:
+        key = row['family'], row['variant']; pointer = row['pointer']
+        envelope = store.read_bound(pointer)
+        body = verify_envelope(envelope, pointer, manifest_sha256, key, season, cutoff, chunks)
+        require(row['pure_receipt_sha256'] == body['sha256'], 'annual_index_pure_digest_mismatch')
+        bodies[key], envelopes[key], pointers[key] = body, envelope, pointer
+    return bodies, envelopes, pointers, chunks
+
+
+def pregame_sources(archive, origin, contexts, parent_rows, game, mappers, counts):
+    context = contexts[game]
+    require(set(context) == {'game_id', 'season', 'week', 'kickoff_at'}
+            and (context['game_id'], context['season'], context['week']) == (game, origin['season'], origin['week']),
+            'outcome_free_target_context_required')
+    sources = {}
+    for family, variant in SERIES:
+        row = parent_rows[family, variant, game]
+        original = recover_source(archive, row['distribution'], mappers)
+        counts['prediction_reconstruction_calls'] += 1
+        sources[family, variant] = {'family': family, 'variant': variant, 'season': origin['season'], 'game_id': game,
+            'origin_at': origin['originAt'], 'kickoff_at': context['kickoff_at'], 'native_failure': row['native_failure'],
+            'source_fingerprint': distribution_fingerprint(replace(original, independent=False)), 'distribution': original}
+    return sources
+
+
+def law_fingerprint(distribution):
+    return independent_fingerprint(distribution) if distribution.independent else distribution_fingerprint(distribution)
+
+
+def publish_origin(store, archive, manifest_sha256, origin, contexts, parent_rows, references,
+                   receipts, receipt_pointers, budget, counts):
+    require(list(contexts) == origin['targetGameIds'], 'original_target_order_required')
+    mappers, made = {}, {}
+    for game in origin['targetGameIds']:
+        budget.check()
+        sources = pregame_sources(archive, origin, contexts, parent_rows, game, mappers, counts)
+        for family, variant in SERIES:
+            mapped, provenance = predict(family, variant, origin['season'], origin['originAt'], sources, receipts)
+            require(provenance['native_failure'] == parent_rows[family, variant, game]['native_failure'], 'mapped_native_reason_mismatch')
+            chosen = provenance['chosen_source']; chosen_key = chosen['family'], chosen['variant']
+            made[family, variant, game] = {'version': 'rf02d-transformed-law-recipe.v1', 'family': family + 'C',
+                'variant': variant, 'game_id': game, 'season': origin['season'], 'week': origin['week'],
+                'origin_at': origin['originAt'], 'native_failure': provenance['native_failure'],
+                'parent_forecast': references['forecast'], 'annual_envelope': receipt_pointers[chosen_key],
+                'provenance': provenance, 'result_distribution_fingerprint': law_fingerprint(mapped)}
+            counts['mapped_prediction_calls'] += 1
+            budget.check()
+    rows = [made[family, variant, game] for family, variant in SERIES for game in origin['targetGameIds']]
+    require(len(rows) == 20 * len(origin['targetGameIds']), 'partial_origin_publication_forbidden')
+    name = f"forecasts-{origin['season']}-{origin['week']:02}.json"
+    store.write(name, {'version': 'rf02d-origin-publication.v1', 'run_manifest_sha256': manifest_sha256,
+                      'origin': origin, 'rows': rows})
+    os.fsync(store.fd)
+    budget.check()
+    return store.pointer(name)
+
+
+def recover_recipe(recipe, archive, parent_rows, parent_reference, envelope, envelope_pointer,
+                   manifest_sha256, origin, cutoff, chunks, mappers, counts):
+    require(set(recipe) == {'version', 'family', 'variant', 'game_id', 'season', 'week', 'origin_at', 'native_failure',
+                           'parent_forecast', 'annual_envelope', 'provenance', 'result_distribution_fingerprint'}
+            and recipe['version'] == 'rf02d-transformed-law-recipe.v1', 'transformed_law_recipe_required')
+    family, variant, game = recipe['family'][:-1], recipe['variant'], recipe['game_id']
+    require(recipe['family'] in ('N0C', 'E2C') and (family, variant) in SERIES
+            and (recipe['season'], recipe['week'], recipe['origin_at']) == (origin['season'], origin['week'], origin['originAt'])
+            and game in origin['targetGameIds'] and recipe['parent_forecast'] == parent_reference, 'recipe_origin_or_parent_mismatch')
+    requested = parent_rows[family, variant, game]
+    ordinary = 'full' if variant == 'independent_marginals' else variant
+    full = parent_rows[family, ordinary, game]
+    chosen_key = (family, ordinary)
+    if full['native_failure'] is not None:
+        require(family == 'E2', 'required_N0_native_failure')
+        chosen_key = ('N0', ordinary if ('N0', ordinary) in ORDINARY else 'full')
+    chosen = parent_rows[*chosen_key, game]
+    require(chosen['native_failure'] is None and recipe['native_failure'] == requested['native_failure'] == full['native_failure'],
+            'recipe_native_reason_or_fallback_mismatch')
+    if variant == 'independent_marginals': validate_independent_source(full, requested)
+    require(encoded(full['distribution']) == encoded(chosen['distribution']), 'recipe_fallback_source_mismatch')
+    require(recipe['annual_envelope'] == envelope_pointer, 'recipe_receipt_pointer_mismatch')
+    receipt = verify_envelope(envelope, envelope_pointer, manifest_sha256, chosen_key, origin['season'], cutoff, chunks)
+    provenance = recipe['provenance']
+    require(provenance['sha256'] == fingerprint({key: value for key, value in provenance.items() if key != 'sha256'})
+            and (provenance['family'], provenance['variant'], provenance['target_season'], provenance['origin_at'], provenance['game_id'])
+            == (family, variant, origin['season'], origin['originAt'], game)
+            and provenance['native_failure'] == recipe['native_failure']
+            and provenance['annual_receipt_sha256'] == receipt['sha256'], 'recipe_provenance_binding_mismatch')
+    original = recover_source(archive, chosen['distribution'], mappers)
+    counts['recipe_reconstruction_calls'] += 1
+    source_hash = distribution_fingerprint(original)
+    require(provenance['chosen_source'] == {'family': chosen_key[0], 'variant': chosen_key[1], 'game_id': game,
+                                           'source_fingerprint': source_hash}
+            and provenance['requested_source_fingerprint'] == source_hash, 'recipe_source_fingerprint_mismatch')
+    result, transformation = transform_distribution(original, receipt['scale'])
+    operation = None
+    if variant == 'independent_marginals': result, operation = independent_control(result, transformation)
+    require(transformation == provenance['transformation'] and operation == provenance['product_operation']
+            and law_fingerprint(result) == recipe['result_distribution_fingerprint'], 'persisted_transformed_law_mismatch')
+    return result
+
+
+def grade_origin(store, archive, manifest_sha256, origin, publication_pointer, records, parent_rows, parent_losses,
+                 references, annual, cutoff, budget, counts):
+    publication = store.read_bound(publication_pointer)
+    expected = [(family + 'C', variant, game) for family, variant in SERIES for game in origin['targetGameIds']]
+    require(publication['version'] == 'rf02d-origin-publication.v1' and publication['run_manifest_sha256'] == manifest_sha256
+            and publication['origin'] == origin
+            and [(row['family'], row['variant'], row['game_id']) for row in publication['rows']] == expected,
+            'published_complete_origin_membership_required')
+    _, envelopes, pointers, chunks = annual
+    scored, mappers = [], {}
+    for recipe in publication['rows']:
+        budget.check()
+        chosen = recipe['provenance']['chosen_source']; key = chosen['family'], chosen['variant']
+        result = recover_recipe(recipe, archive, parent_rows, references['forecast'], envelopes[key], pointers[key],
+                                manifest_sha256, origin, cutoff, chunks, mappers, counts)
+        record = records[recipe['game_id']]
+        require((record['season'], record['week']) == (origin['season'], origin['week']), 'grader_target_membership_mismatch')
+        metrics = score_forecast(result, [record['homeScore'], record['awayScore']], recipe['game_id'], double_grid=True, diagnostics=True)
+        counts['score_calls'] += 1
+        for target in ('home', 'away', 'margin', 'total'):
+            lo, hi = metrics[target + '_lower_80'], metrics[target + '_upper_80']
+            mass = result.cdf(target, hi) - result.cdf(target, lo - 1)
+            require(np.isfinite(mass) and 0 <= mass <= 1, 'invalid_mapped_interval_mass')
+            metrics[target + '_interval_mass_80'] = float(mass)
+        scored.append({'family': recipe['family'], 'variant': recipe['variant'], 'game_id': recipe['game_id'],
+                       'native_failure': recipe['native_failure'], 'metrics': metrics,
+                       'forecast_publication': publication_pointer, 'recipe_sha256': sha(strict(recipe))})
+        budget.check()
+    raw = []
+    for family, variant in RAW_REFERENCES:
+        for game in origin['targetGameIds']:
+            row = parent_losses[family, variant, game]
+            require(row['native_failure'] == parent_rows[family, variant, game]['native_failure'], 'raw_reference_reason_mismatch')
+            record, metrics = records[game], row['metrics']
+            require(metrics['home_observed'] == record['homeScore'] and metrics['away_observed'] == record['awayScore'], 'raw_reference_outcome_mismatch')
+            raw.append({'family': family, 'variant': variant, 'game_id': game, 'native_failure': row['native_failure'],
+                        'metrics': metrics, 'parent_loss': references['loss'], 'original_row_sha256': sha(encoded(row))})
+    name = f"scores-{origin['season']}-{origin['week']:02}.json"
+    store.write(name, {'run_manifest_sha256': manifest_sha256, 'origin': origin, 'mapped': scored, 'raw_references': raw})
+    return scored, raw
+
+
+def pilot_projection(elapsed_total, pilot_seconds, pilot_games, completed_games):
+    require(all(type(value) in (int, float) and np.isfinite(value) and value >= 0 for value in (elapsed_total, pilot_seconds))
+            and type(pilot_games) is int and pilot_games > 0 and type(completed_games) is int
+            and pilot_games <= completed_games <= 3407, 'invalid_registered_pilot_inputs')
+    remaining = 3407 - completed_games
+    projected = elapsed_total + 2 * pilot_seconds * remaining / pilot_games + 600
+    return {'elapsed_total': elapsed_total, 'pilot_scoring_seconds': pilot_seconds, 'pilot_game_count': pilot_games,
+            'completed_game_count': completed_games, 'remaining_game_count': remaining, 'projected_seconds': projected,
+            'maximum_seconds': 7200, 'passed': projected <= 7200}
+
+
+def append_scored_origin(origin, mapped, raw, parent_rows, rows_by_series, metadata):
+    expected_mapped = [(family + 'C', variant, game) for family, variant in SERIES for game in origin['targetGameIds']]
+    expected_raw = [(family, variant, game) for family, variant in RAW_REFERENCES for game in origin['targetGameIds']]
+    require([(r['family'], r['variant'], r['game_id']) for r in mapped] == expected_mapped
+            and [(r['family'], r['variant'], r['game_id']) for r in raw] == expected_raw, 'exact_archived_scoring_order_required')
+    for row in mapped + raw:
+        raw_family = row['family'][:-1] if row['family'] in ('N0C', 'E2C') else row['family']
+        require(row['native_failure'] == parent_rows[raw_family, row['variant'], row['game_id']]['native_failure'],
+                'exact_native_failure_reason_required')
+        rows_by_series[row['family'], row['variant']].append({name: row[name] for name in ('game_id', 'metrics', 'native_failure')})
+    metadata.extend({'game_id': game, 'season': origin['season'], 'week': origin['week']} for game in origin['targetGameIds'])
+
+
+def runtime_audits(store, acceptance, admission, collection, annual_index, origins, metadata, rows_by_series, counts):
+    expected_games = [game for origin in origins for game in origin['targetGameIds']]
+    mapped_keys = [(family + 'C', variant) for family, variant in SERIES]
+    checks = {'admission_passed': admission['status'] == 'passed',
+              'all_original_sources': collection['unique_original_sources'] == 68140,
+              'all_prior_cases': collection['unique_prior_cases'] == 56430 and collection['latest_case_season'] == 2024,
+              'annual_population': len(annual_index['entries']) == 234 and annual_index['cold_starts'] == 18
+                                   and annual_index['estimated_receipts'] == 216,
+              'original_game_order': [row['game_id'] for row in metadata] == expected_games and len(metadata) == 3407,
+              'all_scored_series_order': set(rows_by_series) == set(mapped_keys + list(RAW_REFERENCES))
+                  and all([row['game_id'] for row in rows] == expected_games for rows in rows_by_series.values()),
+              'complete_publications': counts['published_origins'] == len(origins) == 226,
+              'all_mapped_laws_and_scores': counts['mapped_prediction_calls'] == counts['recipe_reconstruction_calls']
+                                           == counts['score_calls'] == 68140,
+              'all_native_reasons_matched': counts['native_reason_matches'] == 26 * 3407}
+    require(all(type(value) is bool and value for value in checks.values()), 'runtime_admission_chronology_or_population_failure')
+    reviews = {name: _evidence(pointer) for name, pointer in acceptance['audit_evidence'].items()}
+    reviewed = {name: report.get('status') == 'accepted' and report.get('source_hashes') == acceptance['code_hashes']
+                for name, report in reviews.items()}
+    require(all(reviewed.values()), 'implementation_audit_evidence_changed')
+    audit_checks = {'admission': checks['admission_passed'] and checks['all_original_sources'] and checks['all_prior_cases'],
+                    'leakage': reviewed['leakage'] and checks['annual_population'] and checks['original_game_order']
+                               and checks['complete_publications'] and checks['all_native_reasons_matched'],
+                    'falsification': reviewed['falsification'] and checks['all_scored_series_order']
+                                      and checks['all_native_reasons_matched'],
+                    'no_new_numerical_failure': checks['all_mapped_laws_and_scores']}
+    evidence = {'version': 'rf02d-runtime-checks.v1', 'checks': checks, 'audit_checks': audit_checks,
+                'implementation_review_evidence': acceptance['audit_evidence'],
+                'admission': store.pointer('admission.json'), 'case_collection': store.pointer('case-collection.json'),
+                'annual_index': store.pointer('annual-index.json'),
+                'actual_post_terminal_numerical_and_temporal_acceptance': False,
+                'falsification_scope': 'accepted implementation invariance checks plus complete runtime control population; independent actual result review pending'}
+    store.write('runtime-checks.json', evidence)
+    return audit_checks
+
+
+def run(repository_root, implementation_acceptance_path, implementation_acceptance_sha256):
+    budget = Budget()  # Includes this attempt's preflight, data work, fits, grading and inference.
+    store = None
+    previous_handler, installed = None, False
+    counts = {'prediction_reconstruction_calls': 0, 'mapped_prediction_calls': 0,
+              'recipe_reconstruction_calls': 0, 'score_calls': 0, 'published_origins': 0, 'native_reason_matches': 0}
+    phase = 'preflight'
+    def alarm(_signal, _frame):
+        raise RunFailure('registered_wall_clock_deadline_exceeded:' + phase)
+    try:
+        require(signal.getitimer(signal.ITIMER_REAL) == (0.0, 0.0), 'existing_timer_not_supported')
+        previous_handler = signal.signal(signal.SIGALRM, alarm)
+        installed = True
+        signal.setitimer(signal.ITIMER_REAL, budget.remaining())
+        archive, config, acceptance, expected_admission, manifest = preflight(
+            repository_root, implementation_acceptance_path, implementation_acceptance_sha256, budget)
+        manifest_sha256 = sha(strict(manifest))
+        store = Store(OUTPUT_PARENT, 'rf02d-v1-' + manifest_sha256[:16])
+        store.write('manifest.json', manifest)
+        store.write('started.json', {'started_at': datetime.now(timezone.utc).isoformat(),
+                                    'implementation_acceptance': {'path': str(implementation_acceptance_path),
+                                                                 'sha256': implementation_acceptance_sha256}})
+        os.fsync(store.fd)
+        phase = 'admission_and_case_preparation'
+        budget.start_admission()
+        signal.setitimer(signal.ITIMER_REAL, budget.remaining())
+        admission = admit_archive(PARENT_DIRECTORY, DATA_PATH, repository_root)
+        store.write('admission.json', admission)
+        budget.check()
+        require(admission['status'] == 'passed' and admission['counts'] == expected_admission['counts']
+                and admission['recovered_sources_sha256'] == expected_admission['recovered_sources_sha256']
+                and admission['case_inputs_sha256'] == expected_admission['case_inputs_sha256'], 'fresh_admission_mismatch')
+        data, parent_config = _source_manifest(archive, Path(repository_root), DATA_PATH)
+        origins, records, by_year, collection = collect_cases(archive, data, parent_config, expected_admission,
+                                                            store, manifest_sha256, budget)
+        collection = store.read_bound(store.pointer('case-collection.json'))
+        sources, cases = load_case_inputs(store, collection, manifest_sha256, budget)
+        combined_admission_seconds = budget.end_admission()
+        signal.setitimer(signal.ITIMER_REAL, budget.remaining())
+        store.write('admission-cost.json', {'combined_admission_case_preparation_seconds': combined_admission_seconds,
+            'admission_reconstruction_calls': admission['counts']['recovered_distributions'],
+            'admission_case_constructor_calls': admission['counts']['calibration_cases'],
+            'collector_reconstruction_calls': collection['reconstruction_calls'],
+            'collector_case_constructor_calls': collection['case_constructor_calls'],
+            'unique_original_sources': 68140, 'unique_prior_cases': 56430})
+        phase = 'annual_receipts'
+        annual_index = fit_annual_receipts(store, manifest_sha256, origins, by_year, sources, cases, collection, budget)
+        del sources, cases, data
+        phase = 'chronological_prediction_and_grading'
+        metadata = []
+        rows_by_series = {key: [] for key in [(family + 'C', variant) for family, variant in SERIES] + list(RAW_REFERENCES)}
+        completed_games, pilot_games, pilot_seconds, pilot_origins = 0, 0, 0., 0
+        first_cutoffs = {year: next(origin['originAt'] for origin in origins if origin['season'] == year) for year in YEARS}
+        for origin in origins:
+            budget.check()
+            origin_started = time.monotonic()  # Includes receipt reads/validation and persistence, never scoring only.
+            parent_rows, parent_losses, references = origin_bundle(archive, origin, parent_config)
+            annual_index = store.read_bound(store.pointer('annual-index.json'))
+            annual = load_annual(store, annual_index, manifest_sha256, origin['season'], first_cutoffs[origin['season']], collection)
+            contexts = {game: {'game_id': game, 'season': records[game]['season'], 'week': records[game]['week'],
+                              'kickoff_at': records[game]['kickoffAt']} for game in origin['targetGameIds']}
+            publication = publish_origin(store, archive, manifest_sha256, origin, contexts, parent_rows, references,
+                                         annual[0], annual[2], budget, counts)
+            counts['published_origins'] += 1
+            scored, raw = grade_origin(store, archive, manifest_sha256, origin, publication, records, parent_rows, parent_losses,
+                                       references, annual, first_cutoffs[origin['season']], budget, counts)
+            append_scored_origin(origin, scored, raw, parent_rows, rows_by_series, metadata)
+            counts['native_reason_matches'] += len(scored) + len(raw)
+            completed_games += len(origin['targetGameIds'])
+            budget.check()
+            if origin['season'] == 2014 and pilot_origins < 2:
+                pilot_seconds += time.monotonic() - origin_started
+                pilot_games += len(origin['targetGameIds']); pilot_origins += 1
+                if pilot_origins == 2:
+                    projection = pilot_projection(time.monotonic() - budget.started, pilot_seconds, pilot_games, completed_games)
+                    store.write('pilot.json', projection)
+                    budget.check()
+                    require(projection['passed'], 'registered_pilot_projection_failed')
+        require(pilot_origins == 2 and completed_games == 3407, 'incomplete_registered_replay')
+        phase = 'inference'
+        audit_checks = runtime_audits(store, acceptance, admission, collection, annual_index, origins, metadata, rows_by_series, counts)
+        budget.check()
+        evaluation = evaluate(config, metadata, rows_by_series, audit_checks)
+        store.write('evaluation.json', evaluation)
+        require(evaluation['status'] != 'protocol_invalid', 'inference_protocol_invalid:' + evaluation.get('reason', 'unknown'))
+        budget.check()
+        for name, digest in acceptance['code_hashes'].items(): bound(Path(repository_root) / name, digest)
+        bound(Path(repository_root) / 'config/research-team-score-conditional.v1.json', CONFIG_SHA)
+        bound(Path(repository_root) / config['protocol'], PROTOCOL_SHA)
+        phase = 'terminal_publication'
+        terminal = {key: value for key, value in evaluation.items() if key not in ('scorecards', 'inference')}
+        terminal.update(version=VERSION, run_manifest_sha256=manifest_sha256, seconds=time.monotonic() - budget.started,
+                        peak_rss_mib=rss_mib(), execution_counts=counts, evaluation=store.pointer('evaluation.json'),
+                        runtime_checks=store.pointer('runtime-checks.json'), independent_actual_result_acceptance=False,
+                        post_terminal_independent_numerical_and_temporal_review_required=True,
+                        started_at_artifact=store.pointer('started.json'))
+        store.finish(terminal, budget.check)
+        return {'status': terminal['status'], 'run_directory': str(store.path),
+                'seconds': time.monotonic() - budget.started, 'independent_actual_result_acceptance': False}
+    except Exception as exc:
+        if installed: signal.setitimer(signal.ITIMER_REAL, 0)
+        if store is not None and store.finalized:
+            raise RunFailure('completion_committed_then_finalization_failed:' + str(exc)) from exc
+        stopped = time.monotonic() - budget.started
+        terminal = {'version': VERSION, 'status': 'protocol_invalid', 'phase': phase,
+                    'failure_type': type(exc).__name__, 'reason': str(exc), 'seconds': stopped,
+                    'scientific_stop_elapsed_seconds': stopped, 'invalid_finalization_only_cap_seconds': 30,
+                    'peak_rss_mib': rss_mib(), 'execution_counts': counts, 'production_authorized': False,
+                    'automatic_restart': False, 'independent_actual_result_acceptance': False,
+                    'post_terminal_independent_numerical_and_temporal_review_required': True}
+        if store is not None:
+            def finalization_expired(_signal, _frame):
+                raise RunFailure('invalid_finalization_only_deadline_exceeded')
+            signal.signal(signal.SIGALRM, finalization_expired)
+            signal.setitimer(signal.ITIMER_REAL, 30)
+            store.finish(terminal)
+            terminal['run_directory'] = str(store.path)
+        return terminal
+    finally:
+        if installed:
+            signal.setitimer(signal.ITIMER_REAL, 0)
+            signal.signal(signal.SIGALRM, previous_handler)
+        if store is not None: store.close()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--repository-root', required=True)
+    parser.add_argument('--implementation-acceptance', required=True)
+    parser.add_argument('--implementation-acceptance-sha256', required=True)
+    args = parser.parse_args()
+    result = run(args.repository_root, args.implementation_acceptance, args.implementation_acceptance_sha256)
+    print(json.dumps(result, sort_keys=True, allow_nan=False))
+    return 1 if result['status'] == 'protocol_invalid' else 0
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

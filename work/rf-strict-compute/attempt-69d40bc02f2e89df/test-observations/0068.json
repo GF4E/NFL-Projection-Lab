@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "{\n  \"boolean\": true,\n  \"integer\": -1\n}\n",
+    "bytes": 39,
+    "kind": "bytes",
+    "sha256": "33ba56fe287d924e6dd7e4d8b4dfcf34400494727fb85be37824ccb600e1546f",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "integer-bits-1-True",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "dict"
+  },
+  "label": "integer-bits-1-True",
+  "original": {
+    "ascii_body": "{\n  \"boolean\": true,\n  \"integer\": -1\n}\n",
+    "bytes": 39,
+    "kind": "bytes",
+    "sha256": "33ba56fe287d924e6dd7e4d8b4dfcf34400494727fb85be37824ccb600e1546f",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_integer_bit_guard_and_bool_distinction"
+}

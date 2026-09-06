@@ -1,0 +1,50 @@
+{
+  "candidate": {
+    "events": [
+      "assembly"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": [
+      {
+        "mode": "supported"
+      },
+      {
+        "mode": "fallback"
+      }
+    ]
+  },
+  "expected_decision": true,
+  "expected_modes": null,
+  "kind": "paired_value",
+  "label": "mixed-subclass-int-Integer",
+  "original": {
+    "events": [
+      "assembly"
+    ],
+    "images": [
+      {
+        "ascii_body": "1\n",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      },
+      {
+        "ascii_body": "1\n",
+        "bytes": 2,
+        "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_mixed_supported_fallback_comparison_both_directions"
+}

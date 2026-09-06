@@ -1,0 +1,75 @@
+{
+  "attempts": [
+    {
+      "attempt": 1,
+      "exit_code": 1,
+      "stderr": {
+        "bytes": 0,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/current-cli-missing-receipt/attempt-1.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stdout": {
+        "bytes": 2946,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/current-cli-missing-receipt/attempt-1.stdout",
+        "sha256": "b249968eb1e19328bceb9e990966b225964677d13dc595ae5febb1542666f15a"
+      }
+    },
+    {
+      "attempt": 2,
+      "exit_code": 1,
+      "stderr": {
+        "bytes": 1394,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/current-cli-missing-receipt/attempt-2.stderr",
+        "sha256": "954fca8054f7fe632c344a1d1556b5e083c42834295adb2877c495482dd187b3"
+      },
+      "stdout": {
+        "bytes": 0,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/current-cli-missing-receipt/attempt-2.stdout",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "before_store_and_admission": "Source run() calls preflight before Store; missing receipt fails in preflight._file before _validate/admission.",
+  "command": [
+    "/opt/anaconda3/bin/python3.12",
+    "-I",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py",
+    "--repository-root",
+    "/private/tmp/os01-gen15-rebuild.9ny71k",
+    "--implementation-acceptance",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/current-cli-missing-receipt/SYNTHETIC-MISSING-ACCEPTANCE-NOT-AUTHORIZED.json",
+    "--implementation-acceptance-sha256",
+    "822724ed5eaf2de2df0c8f9f93d2c9d2ae32309faca43d3d8a6f70de1e54faf1"
+  ],
+  "failure": "FileNotFoundError for explicitly nonexistent receipt in preflight",
+  "historical_admission_fit_score_bootstrap_calls": 0,
+  "limitations": [
+    "Failure route only. No valid receipt supplied or created; no historical archive loaded.",
+    "No inference, numerical performance, complete run or historical execution acceptance is claimed."
+  ],
+  "model_namespaces_created": 0,
+  "new_observer_reentry_refused": true,
+  "observer_directory": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rf02f-observer-822724ed5eaf2de2",
+  "old_observer_preserved": true,
+  "phase": {
+    "bytes": 140,
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rf02f-observer-822724ed5eaf2de2/phase.json",
+    "sha256": "27e35a0d53afa725216526ad1bcfcc502a2c6f5a507c47474c34a18ed3841773"
+  },
+  "pins": {
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py": "7f82f65839a53e7fd91fa09e531ad2b758dc6c7ffeed6503cc4c0b7e9643d28b",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_preflight.py": "301b97a6a25e6bca92b99f220657ae54039774122c3e6a65071eefa7d4c79d51",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_watchdog.py": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_controller_unit.py": "dd088f744f441f7dd8bae82751ec2edf673770ea05548d38bea8e24406b891c7"
+  },
+  "process_report": {
+    "bytes": 2827,
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rf02f-observer-822724ed5eaf2de2/process-report.json",
+    "sha256": "b29d8977fb509bbaf1224efd1e8f5e27f54f554bed90a9276a1d1708e9d530e4"
+  },
+  "seconds": 0.884898707998218,
+  "source_hashes_unchanged": true,
+  "status": "passed_current_cli_failure_route_only",
+  "subprocess_timeout_seconds": 10
+}

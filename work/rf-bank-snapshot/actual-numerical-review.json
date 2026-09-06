@@ -1,0 +1,1669 @@
+{
+  "attempt": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2",
+  "authorship_disclosure": "Reviewer authored the 29 focused tests and previously reviewed candidate statically; source and qualification driver have other authors. The retained full-bank panel was authored by root.",
+  "blockers": [],
+  "complete_panel": {
+    "actual_complete_comparisons": 40,
+    "lossless_input_images": 80,
+    "mutation_results": [
+      {
+        "expected_equal": true,
+        "name": "unchanged",
+        "reconstructed_original_after": {
+          "bytes": 606489,
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "reconstructed_original_before": {
+          "bytes": 606489,
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        }
+      },
+      {
+        "expected_equal": false,
+        "name": "last_rating",
+        "reconstructed_original_after": {
+          "bytes": 606489,
+          "sha256": "619aa2084e41d4861f205d02acac3722efb87af09c16ed83c7e8b7ec4e0a3f85"
+        },
+        "reconstructed_original_before": {
+          "bytes": 606489,
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        }
+      },
+      {
+        "expected_equal": false,
+        "name": "last_output_mean",
+        "reconstructed_original_after": {
+          "bytes": 606489,
+          "sha256": "65a7252cee4d9d4d097e84d41a9e9646d3eefdf523874831ffe3d30e4599acdd"
+        },
+        "reconstructed_original_before": {
+          "bytes": 606489,
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        }
+      },
+      {
+        "expected_equal": false,
+        "name": "last_origin",
+        "reconstructed_original_after": {
+          "bytes": 606489,
+          "sha256": "e742e4229ae76ea079af93b3aeb251f16489c4814e7043defaaf309fcf990932"
+        },
+        "reconstructed_original_before": {
+          "bytes": 606489,
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        }
+      },
+      {
+        "expected_equal": false,
+        "name": "forecast_order",
+        "reconstructed_original_after": {
+          "bytes": 606489,
+          "sha256": "2e803a8ec374bc5194789c8ca97ddeb428c1fab2f700c76bccdc69c3a5ab948c"
+        },
+        "reconstructed_original_before": {
+          "bytes": 606489,
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        }
+      },
+      {
+        "expected_equal": true,
+        "name": "dict_insertion_order",
+        "reconstructed_original_after": {
+          "bytes": 606489,
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "reconstructed_original_before": {
+          "bytes": 606489,
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        }
+      },
+      {
+        "expected_equal": false,
+        "name": "signed_zero",
+        "reconstructed_original_after": {
+          "bytes": 606487,
+          "sha256": "ba9be2c25e2640fe274103db51d9b0c53c9151c3fa5281c16974f1d0ad116361"
+        },
+        "reconstructed_original_before": {
+          "bytes": 606486,
+          "sha256": "ccea1579f4641ea6ec6c10107f036657b2bd95211e8b0515fe557d1ce9a558e8"
+        }
+      },
+      {
+        "expected_equal": false,
+        "name": "numeric_type",
+        "reconstructed_original_after": {
+          "bytes": 606486,
+          "sha256": "863b14a5e3f2c0be31852b7d484feb0ad546cf609f9be7999a7e61b0a5da7810"
+        },
+        "reconstructed_original_before": {
+          "bytes": 606488,
+          "sha256": "0109a32296faa12cb59dd6bf2ffcfbfb6d2635460e5112553b93cfa2fb6d352c"
+        }
+      },
+      {
+        "expected_equal": true,
+        "name": "array_list",
+        "reconstructed_original_after": {
+          "bytes": 606489,
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "reconstructed_original_before": {
+          "bytes": 606489,
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        }
+      },
+      {
+        "expected_equal": true,
+        "name": "unicode_equivalence",
+        "reconstructed_original_after": {
+          "bytes": 606527,
+          "sha256": "e415e941d05993d25abe98a1ffd685d9f92bcb8f937353ed9a84a014781d666d"
+        },
+        "reconstructed_original_before": {
+          "bytes": 606527,
+          "sha256": "e415e941d05993d25abe98a1ffd685d9f92bcb8f937353ed9a84a014781d666d"
+        }
+      }
+    ],
+    "outputs_per_input": 297,
+    "own_float_values_per_input": 20736,
+    "own_vectors_per_input": 648,
+    "owned_engines_per_input": 216,
+    "pairs": 10,
+    "phases": [
+      "parity",
+      "timed"
+    ],
+    "reconstructed_original_digest_checks": 40,
+    "reconstruction": "Independent typed-tree derivation from pinned saved state plus exactly the registered setup/mutation. All 80 images matched including dict insertion order, array dtype/shape/strides/writeability/C bytes, float hex, tuple/list type and UTF8 surrogatepass strings. Stdlib decoding and JSON formatting reconstructed actual original digest bytes without invoking original or candidate functions.",
+    "routes_per_phase": 2
+  },
+  "disposition": {
+    "controller_integration_accepted": false,
+    "historical_capacity_established": false,
+    "isolated_hypothesis_passed": true,
+    "recommendation": "Retain only as a measured partial-cost lead eligible for a separately scoped integration decision. Do not infer the remaining historical capacity gap is closed, expand callsites, or retime this fixed panel.",
+    "remove_immediate_candidate": false
+  },
+  "evidence": [
+    {
+      "bytes": 22016,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/INPUT-PINS.json",
+      "sha256": "0aad650afed462a2ea23552f9ae6f4f08d4fc05bcf64f3a4ce2df1d9b306b7fb"
+    },
+    {
+      "bytes": 66495,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/artifact-index.json",
+      "sha256": "4d0c2a93e92b41c2ef2bc736ee48f03c097b2b94085762c94be5c184d2de3653"
+    },
+    {
+      "bytes": 17155,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/child-result.json",
+      "sha256": "face2ee1b0950a7c026a203307e9fd4f2d3a907e0e6579a8b5d96c26bfc9bbe0"
+    },
+    {
+      "bytes": 272,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/completion.json",
+      "sha256": "608a64e1a1f757cc719ca8503c9d149ecfc70b28bf81648fc2b2cabe0816f99e"
+    },
+    {
+      "bytes": 662,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/pair-definitions.json",
+      "sha256": "9733e94c63ecaa6e87de92efd3d2f8105d7930d92248ccb4ca8cf1f137511623"
+    },
+    {
+      "bytes": 11552,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity-results.json",
+      "sha256": "bb0a6cfa7589c7ff39786a7d22a45eaa561824bd0c97bb5e2f93441edcbd8c49"
+    },
+    {
+      "bytes": 5318594,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/array_list/candidate/after-input.json",
+      "sha256": "7e94243362e834a0dcdbe680621363965abd2eca135692c5c4f99d43dbd85b00"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/array_list/candidate/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 381,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/array_list/candidate/outcome.json",
+      "sha256": "376ed9ea350b61475f096a2d2d8934b641692792e900dcae0f694ee8f59bc5a0"
+    },
+    {
+      "bytes": 5318594,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/array_list/original/after-input.json",
+      "sha256": "7e94243362e834a0dcdbe680621363965abd2eca135692c5c4f99d43dbd85b00"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/array_list/original/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 494,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/array_list/original/outcome.json",
+      "sha256": "095f1976c68f87c873352b407df16e5011e66e4e4225320523000a5676f56d01"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/dict_insertion_order/candidate/after-input.json",
+      "sha256": "c25e1e77b9c397c17e9afe340d52813212b466cfdfbae5f1fb321f63771b0f8f"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/dict_insertion_order/candidate/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 391,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/dict_insertion_order/candidate/outcome.json",
+      "sha256": "741206102c2d6c7082660a6bddd50a7859c5bffe490e8f545f33a555ab2ba670"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/dict_insertion_order/original/after-input.json",
+      "sha256": "c25e1e77b9c397c17e9afe340d52813212b466cfdfbae5f1fb321f63771b0f8f"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/dict_insertion_order/original/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 504,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/dict_insertion_order/original/outcome.json",
+      "sha256": "10838a26ae6f84475b8937c5dad0d7df79def5fae45c412b7a3a7b2231afaca3"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/forecast_order/candidate/after-input.json",
+      "sha256": "55fb522997c259b8e49d0cdb07fabb548c3f12dd89e2bb36640ef157a8cad23a"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/forecast_order/candidate/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 386,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/forecast_order/candidate/outcome.json",
+      "sha256": "5f7bde1fd8ad14ffa2904a85e47cf6d31e6e2d12a848aec715c5af8855faf5c7"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/forecast_order/original/after-input.json",
+      "sha256": "55fb522997c259b8e49d0cdb07fabb548c3f12dd89e2bb36640ef157a8cad23a"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/forecast_order/original/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 499,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/forecast_order/original/outcome.json",
+      "sha256": "70032630df987a0681b1e210f3b3b9b566294912d93403c40d30608b2541f839"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_origin/candidate/after-input.json",
+      "sha256": "8c38ff667283feb843909df6e3491a215aabe4836c13c33b4a89a82d2ab5b6e6"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_origin/candidate/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 383,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_origin/candidate/outcome.json",
+      "sha256": "695ae6bf7ba381b63963e0739bee8d9284ce0c571613dd7e56ef52757a59381d"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_origin/original/after-input.json",
+      "sha256": "8c38ff667283feb843909df6e3491a215aabe4836c13c33b4a89a82d2ab5b6e6"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_origin/original/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 496,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_origin/original/outcome.json",
+      "sha256": "5a734fb3b568d1ddaa83bcbba1c89cc9380f4a74dff44de729733d1efe583a5f"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_output_mean/candidate/after-input.json",
+      "sha256": "4754390edb942d561413a79938f21cc1a6ad4a976c36ce1acf84a5e5813dde70"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_output_mean/candidate/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 388,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_output_mean/candidate/outcome.json",
+      "sha256": "d719575a982f752e3e811fbaaa03fe717b4a3f03680ea94ff7f61ab364109630"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_output_mean/original/after-input.json",
+      "sha256": "4754390edb942d561413a79938f21cc1a6ad4a976c36ce1acf84a5e5813dde70"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_output_mean/original/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 501,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_output_mean/original/outcome.json",
+      "sha256": "0234a294cf54c4418e3ca42483aa09e8760427f1c26cd723f2b1eb62b3873e76"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_rating/candidate/after-input.json",
+      "sha256": "191a6284fd35aad1cf977a8006968485b5b5d75bb1315a16829e9d619b49a5a0"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_rating/candidate/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 383,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_rating/candidate/outcome.json",
+      "sha256": "cd711910ed4856f3d97ec29861f1d3d4a22a0790352a65410da792321844f901"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_rating/original/after-input.json",
+      "sha256": "191a6284fd35aad1cf977a8006968485b5b5d75bb1315a16829e9d619b49a5a0"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_rating/original/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 496,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/last_rating/original/outcome.json",
+      "sha256": "82ec362723c90f81fb64629c78ebe38d157da7af75e59c0c6dea9415da0881ec"
+    },
+    {
+      "bytes": 3164833,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/numeric_type/candidate/after-input.json",
+      "sha256": "cf815bcecb3881af1da2ddc3d8be716314c2223c1521828dd531c9641464f765"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/numeric_type/candidate/before-input.json",
+      "sha256": "c1fc7a3aff1b2d6e97f0aae6b88f2d8683caed870782e47c22e8d7538c7fad42"
+    },
+    {
+      "bytes": 384,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/numeric_type/candidate/outcome.json",
+      "sha256": "4de4fb2d3ade88fb6eb66012965422ed476d2a9c524d453621fb36810e03df29"
+    },
+    {
+      "bytes": 3164833,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/numeric_type/original/after-input.json",
+      "sha256": "cf815bcecb3881af1da2ddc3d8be716314c2223c1521828dd531c9641464f765"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/numeric_type/original/before-input.json",
+      "sha256": "c1fc7a3aff1b2d6e97f0aae6b88f2d8683caed870782e47c22e8d7538c7fad42"
+    },
+    {
+      "bytes": 497,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/numeric_type/original/outcome.json",
+      "sha256": "3c7768f6c9d0d6db7d11e32e2620fc39b2c6b62d666ffefd16c724be8c649776"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/signed_zero/candidate/after-input.json",
+      "sha256": "07cd82a018b0ac4e9ce633feed1f874f4493d585bc476654909d50abb82d0d44"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/signed_zero/candidate/before-input.json",
+      "sha256": "3af3b0c4f03ca1b6b2767c698baf5a65395eaf99b07cfba3fb13905bace6187c"
+    },
+    {
+      "bytes": 383,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/signed_zero/candidate/outcome.json",
+      "sha256": "07d906654e41e8f78dcacfacce93bbfebd335385fd384be0d60c7521ffbe200b"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/signed_zero/original/after-input.json",
+      "sha256": "07cd82a018b0ac4e9ce633feed1f874f4493d585bc476654909d50abb82d0d44"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/signed_zero/original/before-input.json",
+      "sha256": "3af3b0c4f03ca1b6b2767c698baf5a65395eaf99b07cfba3fb13905bace6187c"
+    },
+    {
+      "bytes": 496,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/signed_zero/original/outcome.json",
+      "sha256": "421f5758f0934ea90c58f76fd15fc3506f455339af9b7b11f3a2d98e6e5bc35b"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unchanged/candidate/after-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unchanged/candidate/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 380,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unchanged/candidate/outcome.json",
+      "sha256": "271b30a37db1b0280dc5d74fa8931c0833ed1e08a8d82f05aac07a2d8d1bc146"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unchanged/original/after-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unchanged/original/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 493,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unchanged/original/outcome.json",
+      "sha256": "68ef598b22490b9ac244d154ef3a0fd87b909f7a399865fdd50dec6e9faa0738"
+    },
+    {
+      "bytes": 3165154,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unicode_equivalence/candidate/after-input.json",
+      "sha256": "efb8173f5b49e4c041a9c80e477fb8cdeb005e618c135c21e3c3ee2ead20abb7"
+    },
+    {
+      "bytes": 3165150,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unicode_equivalence/candidate/before-input.json",
+      "sha256": "781cdf8be054a819e26c7581551fa37f4f39727583e35175a019c0796880f024"
+    },
+    {
+      "bytes": 388,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unicode_equivalence/candidate/outcome.json",
+      "sha256": "00b61c85fb41670f18dc73c5b8ac61ca9fc4bbffab2fb7c0e25a755230b96bdb"
+    },
+    {
+      "bytes": 3165154,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unicode_equivalence/original/after-input.json",
+      "sha256": "efb8173f5b49e4c041a9c80e477fb8cdeb005e618c135c21e3c3ee2ead20abb7"
+    },
+    {
+      "bytes": 3165150,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unicode_equivalence/original/before-input.json",
+      "sha256": "781cdf8be054a819e26c7581551fa37f4f39727583e35175a019c0796880f024"
+    },
+    {
+      "bytes": 503,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/parity/unicode_equivalence/original/outcome.json",
+      "sha256": "a493fad2d628b2c94aca12ff068f0e42f82aea361938ec660bcf48d3b94394ed"
+    },
+    {
+      "bytes": 1355,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/process.json",
+      "sha256": "bdb6f5b8254c6bec0eb0ba351fd542fb2383cbef251ec9b41551150d2551ff1d"
+    },
+    {
+      "bytes": 641244,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/snapshots/0be4fb5801dc501d6ebb0a15c764eac82a45edb81dc640db77c6ae2c626bbda1",
+      "sha256": "0be4fb5801dc501d6ebb0a15c764eac82a45edb81dc640db77c6ae2c626bbda1"
+    },
+    {
+      "bytes": 10129,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/snapshots/9f4ff7b1dced4698e48c4be4859893e16ebedb3f66e747913beda174749aff15",
+      "sha256": "9f4ff7b1dced4698e48c4be4859893e16ebedb3f66e747913beda174749aff15"
+    },
+    {
+      "bytes": 23887,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/snapshots/c87cbfb3222aa953f88c23ca63fbe89877968086ef3079c8cd944b27fcc75259",
+      "sha256": "c87cbfb3222aa953f88c23ca63fbe89877968086ef3079c8cd944b27fcc75259"
+    },
+    {
+      "bytes": 4295,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/snapshots/e327560586f3d938743cb9b44120b8e7206ad16e68c2af2edc277967485e2426",
+      "sha256": "e327560586f3d938743cb9b44120b8e7206ad16e68c2af2edc277967485e2426"
+    },
+    {
+      "bytes": 26255,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/snapshots/e53a7c2b52215d1d477011c2bfa810b2cfc0a8f376d5ce18c2b2817b40a40165",
+      "sha256": "e53a7c2b52215d1d477011c2bfa810b2cfc0a8f376d5ce18c2b2817b40a40165"
+    },
+    {
+      "bytes": 22016,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/source-map-after.json",
+      "sha256": "0aad650afed462a2ea23552f9ae6f4f08d4fc05bcf64f3a4ce2df1d9b306b7fb"
+    },
+    {
+      "bytes": 22016,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/source-map-before.json",
+      "sha256": "0aad650afed462a2ea23552f9ae6f4f08d4fc05bcf64f3a4ce2df1d9b306b7fb"
+    },
+    {
+      "bytes": 1083,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0001.json",
+      "sha256": "21279008a5403989474fef682482607e608589542f06ad7684b7552b718be602"
+    },
+    {
+      "bytes": 1083,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0002.json",
+      "sha256": "c8e6cbaae08b838c07f9c2f9380578fd9de78fd55cd210bfc7fd9dc4713d549f"
+    },
+    {
+      "bytes": 1068,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0003.json",
+      "sha256": "e6f59186e67faad8e613b8083e8e36a22b48fed7267c46a8f4d2e0bcb39cce33"
+    },
+    {
+      "bytes": 1065,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0004.json",
+      "sha256": "309a7206a8eaa5a39db20dc61af063f720d40e6636268e522cadeaacced26461"
+    },
+    {
+      "bytes": 755,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0005.json",
+      "sha256": "3e95c361d447e929270d576ce516dfa7559e8c3f2ab4adc46557fd92cf8edfdd"
+    },
+    {
+      "bytes": 1221,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0006.json",
+      "sha256": "7b9fe8675768ec2145c73b41cb829fc1149067e84fc16eb21d49d35869d35823"
+    },
+    {
+      "bytes": 268,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0007.json",
+      "sha256": "383b41e470f974e7e994dfb1f813a9bde350c0b3ceee33011611a3f7e760679f"
+    },
+    {
+      "bytes": 256,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0008.json",
+      "sha256": "126a7e88f09d1d8b44dcd973c23fdf1bafb50ec4e983a56172d4eb3f1bc82acb"
+    },
+    {
+      "bytes": 256,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0009.json",
+      "sha256": "8797a05d59049bec3dbbaee04a147303907cf2b400b9abc1bd9137845ebb887d"
+    },
+    {
+      "bytes": 254,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0010.json",
+      "sha256": "f3983ca7b9b6f4c41da0b6991aec17028e10f095ccb260e62e12ee946d31a5e4"
+    },
+    {
+      "bytes": 254,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0011.json",
+      "sha256": "6123e584e4d1fd439201631349728ed6f83dd69454614fe9ff94b7ac1676a6e5"
+    },
+    {
+      "bytes": 252,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0012.json",
+      "sha256": "ebf07c3283b365240e89c0e4e66d9ec0f739715836866dde1533115beb0a9b0a"
+    },
+    {
+      "bytes": 255,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0013.json",
+      "sha256": "49cb7cbd87c56308a865e68bcee427e662b5fb0b87c22b84bd60923df6677fa8"
+    },
+    {
+      "bytes": 258,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0014.json",
+      "sha256": "fd361b00e34ccf8b2595d6a41b4769fec045cd533916622348a270ccbe751fb9"
+    },
+    {
+      "bytes": 250,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0015.json",
+      "sha256": "683638cb47ba1896c97bb0b081c9a2e99f3678ba38ade7b0d7fd17c3231e2470"
+    },
+    {
+      "bytes": 252,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0016.json",
+      "sha256": "5cd1c1c72bb4defef931c443752d0e08f09e3911717b173110c76a55a9b0931b"
+    },
+    {
+      "bytes": 2189,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0017.json",
+      "sha256": "1f516511abcbdca954b2b46e9de1a33473ec5abc36392de75083306b1f704398"
+    },
+    {
+      "bytes": 2231,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0018.json",
+      "sha256": "6ad36078ea94b367c2362d141637d5f64cfd32463262af1499361333a47c03e9"
+    },
+    {
+      "bytes": 2285,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0019.json",
+      "sha256": "43637d985bb36e5a62d1a73ad2d512b868307148c0ba3b2f675884788bf90c63"
+    },
+    {
+      "bytes": 2339,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0020.json",
+      "sha256": "e8e7fe2f598d0f2699bc5df49e82de926611b9aa85bfb0f0bea226d19bb7acc2"
+    },
+    {
+      "bytes": 1455,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0021.json",
+      "sha256": "25d6e3bbbec7d6667c3a0ebe9244505485a4cb93b8764c1b9b7184723ab22d81"
+    },
+    {
+      "bytes": 810,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0022.json",
+      "sha256": "956d609ad778d7ce9a572cea1664112981379da36dab5db22a04fc25b3b3776a"
+    },
+    {
+      "bytes": 794,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0023.json",
+      "sha256": "d5cb894e44c68010f8f069e719e7e9c0901ec64937f841559cf972b61adede88"
+    },
+    {
+      "bytes": 786,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0024.json",
+      "sha256": "a7f321fc4531a8fa05c5e4faa0702fbe2acd3480bbf68a66012ca9d28853aed8"
+    },
+    {
+      "bytes": 2416,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0025.json",
+      "sha256": "4f5b61154ae2d4abf338b79327961f434f3ecf31d5fc901740901be5f7796959"
+    },
+    {
+      "bytes": 235,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0026.json",
+      "sha256": "0f1b415885297970368e8c3676efada55688029639174bed65071f4729438eca"
+    },
+    {
+      "bytes": 236,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0027.json",
+      "sha256": "2e01405faeb4bd6ac6854042d6c617eb41fb4335890850c57ab0d06e11cd174f"
+    },
+    {
+      "bytes": 236,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0028.json",
+      "sha256": "1d94e61cde985f37f25c550e7c6049a052ab39651cdeaa6ff6e7e33972b09f57"
+    },
+    {
+      "bytes": 234,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0029.json",
+      "sha256": "f8c31aa7ac568a2b31dbf2d363e7072dd2793e448ee47f5b4f7d223715fb787e"
+    },
+    {
+      "bytes": 234,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0030.json",
+      "sha256": "760bae6bb082c56a0a606367ee42c5e6f4839dd35ad46042ef9104dabd7f9dc7"
+    },
+    {
+      "bytes": 235,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0031.json",
+      "sha256": "49d14e2d28071db23f8280c18a43cb7d2b1079b8c8d780ae161586ec5a3ed62e"
+    },
+    {
+      "bytes": 236,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0032.json",
+      "sha256": "6b51547420685c4c80121570f7716f85166cfa55d9fc2deee10c5c5a883f2eae"
+    },
+    {
+      "bytes": 236,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0033.json",
+      "sha256": "5f8c78d9bca296057b5ffda86781b606f8a54915ae475ec235f4f1265d13e02c"
+    },
+    {
+      "bytes": 234,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0034.json",
+      "sha256": "0b06eb140260fdd0c1c45456e9ee6c8b0c63fa1ded4bac3e0b13b95cb53e9c86"
+    },
+    {
+      "bytes": 234,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0035.json",
+      "sha256": "4bec46205f0d8b074d6f3d1ec3a381f918d74a712798c51c59572fbd163e7abb"
+    },
+    {
+      "bytes": 5854,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0036.json",
+      "sha256": "a5855c556edfb1dd40d0e8d0fb9d249eeb3a04b013d0ec654683926309f111dc"
+    },
+    {
+      "bytes": 750,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0037.json",
+      "sha256": "9fc5d1b5eae443dc4c2048798d956eedea285d50ec53a6384a696fd7a8843b3e"
+    },
+    {
+      "bytes": 751,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0038.json",
+      "sha256": "54b3065717d5a4168ecd61fd94f10fa8454180889a1f75c6c3569349219ffc84"
+    },
+    {
+      "bytes": 749,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0039.json",
+      "sha256": "900c1cb8b239659e22495f9f9be50a670737773d35f153312a0f71cf6adf2b5b"
+    },
+    {
+      "bytes": 1253,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0040.json",
+      "sha256": "f94e01898971845b856c7aae975f080aa21e94beae70fa3b0bc623cda78243cf"
+    },
+    {
+      "bytes": 1121,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0041.json",
+      "sha256": "699d89a602884eb62c309e4adfdc18524b4ead6f37669621ddbbb6e42b03159b"
+    },
+    {
+      "bytes": 1952,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0042.json",
+      "sha256": "9f147540ec6334bb0085b114ae25747103816a4e59c256ab30d755d8d699ca9b"
+    },
+    {
+      "bytes": 813,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0043.json",
+      "sha256": "8687dce5b0a29cd8a08bce5208cfcd8aae8a356eac9c8fd5ccdf3a7e4213bde7"
+    },
+    {
+      "bytes": 2406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0044.json",
+      "sha256": "5487f591c90a360de62a503d020fe934e75ff74e40c3b5479ddc9ec039206fe1"
+    },
+    {
+      "bytes": 2411,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0045.json",
+      "sha256": "7e69cfb731d5ffb0e580351be905b3fbd4fa101454e7b85aaac830b2eff65de8"
+    },
+    {
+      "bytes": 2407,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0046.json",
+      "sha256": "bfe6c7e349725a2aee8ef02920d04f62cce4f620f02a33574a2b53eab0fb3206"
+    },
+    {
+      "bytes": 2407,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0047.json",
+      "sha256": "2e89245e243510f9650a85f3c340f00c9396b99de0f47d70f9523f30c6a46aee"
+    },
+    {
+      "bytes": 2407,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0048.json",
+      "sha256": "52f1e1c35eff764229b8eea3b6d1930dd2925cf914a6f5708cfc017851193efd"
+    },
+    {
+      "bytes": 2381,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0049.json",
+      "sha256": "b12b396c67d0c4e2eace4d75f7473d91db9b3dc6bb53416ecba701daad24e24f"
+    },
+    {
+      "bytes": 2193,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0050.json",
+      "sha256": "d61a74d5ebabca2aead3a044e545becbf9780b14068b4274352f1c36e5e27d77"
+    },
+    {
+      "bytes": 802,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0051.json",
+      "sha256": "1aa6cf0adffe089c3e83a0370562810219d4c8ac82e32ddb7def52af6298076f"
+    },
+    {
+      "bytes": 362,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0052.json",
+      "sha256": "e6177e01b138d786980778dbaf51f99fb2cfefa038400970f142f0609f5ec163"
+    },
+    {
+      "bytes": 202,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0053.json",
+      "sha256": "5f84ad2ef9810ad6f664e0aa055b23f14a19dbe642bd928a9472d9e62823d1e3"
+    },
+    {
+      "bytes": 279,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0054.json",
+      "sha256": "4b0b9ef5af7c6b8c72d4de7af3ca90cf07d34bd01d89c47558aa07ab479fb04c"
+    },
+    {
+      "bytes": 248,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0055.json",
+      "sha256": "3cd841b0a55cea9fbf6af3976a5643fd35d890cf1f245e8931f840f585a083f8"
+    },
+    {
+      "bytes": 250,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0056.json",
+      "sha256": "f18618d04a11f95b2b01faadcd4477e3345c675de11a26ef0d19a61a12909932"
+    },
+    {
+      "bytes": 249,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0057.json",
+      "sha256": "b2cdb7fa4fb1741287e9d80b433389b290c602a010851d6316b6a4512ddc6e57"
+    },
+    {
+      "bytes": 251,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0058.json",
+      "sha256": "6f37ed7b0b21ee3a2faf6b2988f37425e9053b6fd46082b141203d2759effd79"
+    },
+    {
+      "bytes": 251,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0059.json",
+      "sha256": "6f37ed7b0b21ee3a2faf6b2988f37425e9053b6fd46082b141203d2759effd79"
+    },
+    {
+      "bytes": 249,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0060.json",
+      "sha256": "8fc8091eed3946337de15f602a80493aee4375af0dd02e1035b5fe07900af4b0"
+    },
+    {
+      "bytes": 928,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0061.json",
+      "sha256": "90fee51f109911cdd010f62eea4a69075ac8fdea9ca8b8a64478ccfb89a612d0"
+    },
+    {
+      "bytes": 338,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0062.json",
+      "sha256": "1add33be60693546e0ab1b129acca6558d3eab9ae29d5d343e941940bb60960c"
+    },
+    {
+      "bytes": 338,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0063.json",
+      "sha256": "554d6f344e56676abd74e236b4a3fd4398a084cc797245fc7275473ff14fba2d"
+    },
+    {
+      "bytes": 338,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0064.json",
+      "sha256": "8283552354c054a96259eac89c5483a7097956e666b4afd0d106c5faad2b05fb"
+    },
+    {
+      "bytes": 1150,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0065.json",
+      "sha256": "12c5f87c367e5bcf08fb4664d3821d2968d555ae99f3e8517dafadea61c3dbb4"
+    },
+    {
+      "bytes": 1150,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0066.json",
+      "sha256": "24a8cc6ccf089f2ee97ea36a16640fa22eea86e7cb405a88dd685ea25e918c76"
+    },
+    {
+      "bytes": 1141,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0067.json",
+      "sha256": "77299768b89c8c96a26def5096cc6d29d5cd0233410c8a4d43ab5138f8a2583e"
+    },
+    {
+      "bytes": 1159,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0068.json",
+      "sha256": "2b3f97115488b4a68e9f664169683c73de16aa0df30c4be146dc7ee0edb48221"
+    },
+    {
+      "bytes": 2141,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0069.json",
+      "sha256": "b4da24422b8cc86672f35d7bb37a38fa2393d7a5d5dedf0710b5c9b352de4fb2"
+    },
+    {
+      "bytes": 375,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0070.json",
+      "sha256": "eb69e6e33700badf7d45df546b0a8b26012918d6c5c3e7381d79959681a928c2"
+    },
+    {
+      "bytes": 1098,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0071.json",
+      "sha256": "5455362af1133cc4d299b5925daf719582b01603757a29120b4d1a3f43516a55"
+    },
+    {
+      "bytes": 1098,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0072.json",
+      "sha256": "0da0fa1413078f52c15e63fe29bd6c768564a1e5a657f9cfabddd38485123796"
+    },
+    {
+      "bytes": 1107,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0073.json",
+      "sha256": "7d400ab4f8721b9183d35caeb1d5e663bab02b42acf58515c2646a039b9e1bd0"
+    },
+    {
+      "bytes": 1107,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0074.json",
+      "sha256": "f72c1e579c3bf5f258a333658705254984194ae948767278ffd2ab97f711c555"
+    },
+    {
+      "bytes": 1107,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0075.json",
+      "sha256": "d2740f24e0e23baab5a98c5b44c4e41c945b8676160b8be0bc294b7b5570ec2f"
+    },
+    {
+      "bytes": 1107,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0076.json",
+      "sha256": "e6daf1ed316c19cce81ce62bd9df629e6a34bdf8f01296746d815ba2bf431f3e"
+    },
+    {
+      "bytes": 1132,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0077.json",
+      "sha256": "d0b93546382128d12158a4fe62fcaef45a4b78641fdac6f59f3b059e2a077c36"
+    },
+    {
+      "bytes": 1132,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0078.json",
+      "sha256": "83120f52b84d3bdf216bc5901b1381b7d2879cffcd17476975d42f3349cb65ad"
+    },
+    {
+      "bytes": 259,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0079.json",
+      "sha256": "4edd5224d28f212c6ea5e64df3f6fc31efa433b311322b77491c8cf40626dd27"
+    },
+    {
+      "bytes": 259,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0080.json",
+      "sha256": "bf68d4d22883e0135c07c06e0b968562cd83628bd44308f656d3cb38594c13df"
+    },
+    {
+      "bytes": 257,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0081.json",
+      "sha256": "761bcbbbaf6403fe7811b7e7d080ef1174fd5461051f1bf73c88e0c36c30cb8d"
+    },
+    {
+      "bytes": 263,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0082.json",
+      "sha256": "abeb14fe7c2e31df79354053997f60fcb35785319fc72b542446175470650406"
+    },
+    {
+      "bytes": 261,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0083.json",
+      "sha256": "783b44a41558f67683fbb10cdc8cab00d3b6e56f187f5d69a993588c37b6e0e8"
+    },
+    {
+      "bytes": 264,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0084.json",
+      "sha256": "9759308d9317bcf21eedd3634af5d4b5d2dbd5a0184202d5f9589fef6ec523b8"
+    },
+    {
+      "bytes": 262,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0085.json",
+      "sha256": "54d5141af7e8dc33f35c37e7372bef779db15c429819c7abeee2f20949a5e9a4"
+    },
+    {
+      "bytes": 1433,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0086.json",
+      "sha256": "fcd107be9ee31e5b554a86739bb78d0bac49291aba9f9b8ff5996a01ed4f5a9e"
+    },
+    {
+      "bytes": 898,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0087.json",
+      "sha256": "eaf8c2af92246eb5018caab0694331074e2921da320afb23252b435d737736ed"
+    },
+    {
+      "bytes": 1244,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0088.json",
+      "sha256": "0e6049272b956e81d39fd96ffd115bbcb4c10a730fc8713805d49a5e98b101af"
+    },
+    {
+      "bytes": 1111,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0089.json",
+      "sha256": "a12051e4716573ea4566f366f46b4ac97e7f966bdea20e9296cd5d6f7fbe610e"
+    },
+    {
+      "bytes": 1090,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0090.json",
+      "sha256": "f0ad0b198cec7c658a66473474ed2e13e01df6b70906230f7b6f7bc4908fd167"
+    },
+    {
+      "bytes": 1192,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0091.json",
+      "sha256": "a46c54ffe064f79529f2b83ffbc507c09547e6cfdd8efa6213064698c4e1d11a"
+    },
+    {
+      "bytes": 1127,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0092.json",
+      "sha256": "8bfd22e750aa14df58782c1b2b7dc34bf777db37fcd552cecd0ad94424ad4871"
+    },
+    {
+      "bytes": 1126,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0093.json",
+      "sha256": "ba62c293c30879a9d28f825f46d0e7261add333e9831280110f0a4f03f4d89aa"
+    },
+    {
+      "bytes": 1128,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0094.json",
+      "sha256": "f35c30125f06dfcd6946706935d5a8505560362a86d2dfdd1232388f2e037b49"
+    },
+    {
+      "bytes": 1126,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0095.json",
+      "sha256": "d4f1d37b26d039eabc74a7194b49ba5267c792b294ec7a74547d8748642a8eb4"
+    },
+    {
+      "bytes": 1129,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0096.json",
+      "sha256": "396f77381b3d2b44a17ab415a2237f89f504f649ddc85d6619b72588c44a6bd0"
+    },
+    {
+      "bytes": 1129,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0097.json",
+      "sha256": "ab655944a1a9cec78412ad595dbad50fc5633291bc1027940bbb1a1a60913f77"
+    },
+    {
+      "bytes": 1144,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0098.json",
+      "sha256": "fd3897136e5d5b8f8cf97df76e58b71072d066648d97dc9303635e6d23085d0c"
+    },
+    {
+      "bytes": 1149,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0099.json",
+      "sha256": "4682414fca89a7e34be77af84a0c1e21379fddabb2f805a470aa95e83f436449"
+    },
+    {
+      "bytes": 1131,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0100.json",
+      "sha256": "2de087ea1ee71c2e52a04a7d2d1d8da093d21d79dbb36d4a7702a442e4e9ebc8"
+    },
+    {
+      "bytes": 1171,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0101.json",
+      "sha256": "1aacca54fdcbfcf337d6af8160abec4aaa040ce34063c5ac720c1022e9fd10e8"
+    },
+    {
+      "bytes": 1096,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0102.json",
+      "sha256": "67cf7c9a20ea8b5dc4546f3b475e0a367581a12b75a3db6437936f7eaffa3aa1"
+    },
+    {
+      "bytes": 1312,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0103.json",
+      "sha256": "42bd48740c2fca5de745e47dbd9e9a2eeb7c9d070aa06e139d92b4e5fc7bb9ee"
+    },
+    {
+      "bytes": 1269,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0104.json",
+      "sha256": "b7a6cf34fa13b95ff5b77b398c2bd087ac83593094e21f2725422c473b684390"
+    },
+    {
+      "bytes": 1276,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0105.json",
+      "sha256": "553ff3af12dddf0e3bdacc0c48e0b3a8296b386dcfe6f023a26d0daff43f718a"
+    },
+    {
+      "bytes": 1245,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0106.json",
+      "sha256": "943402a07e57ce1311e3b3e50e9ce045a58714b89e316861b911fc539b3456d6"
+    },
+    {
+      "bytes": 1277,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0107.json",
+      "sha256": "7442e8cad246a322e44a4f0b404979227cdbc0351b3de6ebdf51c569abca4f90"
+    },
+    {
+      "bytes": 1246,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0108.json",
+      "sha256": "8f2af3acb55e8a6afcbbdd3d416ffdad8a717762a268c7ccc6c5fe839cb364e5"
+    },
+    {
+      "bytes": 1278,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0109.json",
+      "sha256": "6f6f09a7d23e9f5fa072d3204777ad8d24ddd23dcdac24647062ab6ad21bd459"
+    },
+    {
+      "bytes": 1247,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0110.json",
+      "sha256": "22e0604d8bd9862f6d1b41a3ecb9feb31bfdf0d7fdd14a60507dad54b59a7f83"
+    },
+    {
+      "bytes": 316,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0111.json",
+      "sha256": "208fb95806e3369e7d4516db8dbc2ee4c0aecb14d0693c14341f9b3cf235c968"
+    },
+    {
+      "bytes": 1128,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0112.json",
+      "sha256": "cd4a674385a2a8a8e34224fe1c5875023c8cba694221b187ad18e09786949fa8"
+    },
+    {
+      "bytes": 320,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0113.json",
+      "sha256": "1ed0ba10674e8880c401fa4a25096e171f7867925cfaf6453cda5fe6896add9c"
+    },
+    {
+      "bytes": 1130,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0114.json",
+      "sha256": "6fd93adb648046b0e295ac030605e6657aec8b547d38db96295f38a7ba8e99a4"
+    },
+    {
+      "bytes": 330,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0115.json",
+      "sha256": "985d8cc5c6c2be40fb02bfdeb61d4dc0e7cfafd27157f2f58fd473b8881db5df"
+    },
+    {
+      "bytes": 1135,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0116.json",
+      "sha256": "c0548fb30153131f9294b9c2ad32e5c4d4598aa4851276b134a407aa1a39985f"
+    },
+    {
+      "bytes": 324,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0117.json",
+      "sha256": "8907a652a01ba1bb79364b92049cbdca725982402e52903951827cfd149e6914"
+    },
+    {
+      "bytes": 1132,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0118.json",
+      "sha256": "c214e892583f7c03313fbadb925234d1d7e7a372d6c17d7ddcda3ad59905ec0a"
+    },
+    {
+      "bytes": 1152,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0119.json",
+      "sha256": "fe1fd42bc47be23529a11e8d2d01c23977189df4533acce7372ac925e51d55e8"
+    },
+    {
+      "bytes": 1219,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0120.json",
+      "sha256": "6c319307d82069e7cc21ac933f3045e7bcab30b07b31fe5d7223b900aa71976e"
+    },
+    {
+      "bytes": 1136,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0121.json",
+      "sha256": "bd7c06fab6cb1c48f67f0292ca015eb719e4a7535be81e25be1a88b3d17be7ae"
+    },
+    {
+      "bytes": 1170,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0122.json",
+      "sha256": "4b5c56302ec5d72f2d9d4b742d00b244bffcc09bd4c6ec66f63336b0e59fe0aa"
+    },
+    {
+      "bytes": 1132,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0123.json",
+      "sha256": "7037d0bc54820114cc444052aefb08b15f507fc6ddfd085858782fba32800276"
+    },
+    {
+      "bytes": 1115,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0124.json",
+      "sha256": "7fd162815dc3a94bf8a30d05102c2938db03fbcb9da82ae1ff45fd4131137614"
+    },
+    {
+      "bytes": 1113,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0125.json",
+      "sha256": "bafedc288892ee08de2fef3910c2c81d213b1699fbdd8581f6b64b30f6c59924"
+    },
+    {
+      "bytes": 801,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0126.json",
+      "sha256": "e1476c3a9c00035aaedd6424b82f2ce8bbd365f8fc1f3317c54a09f83a364e21"
+    },
+    {
+      "bytes": 799,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0127.json",
+      "sha256": "bb381a5739ac0787715cf24a46efcc1070733b3b098fff273268e0e55db12430"
+    },
+    {
+      "bytes": 801,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0128.json",
+      "sha256": "2390981426c98440dcc835e235c5734c9a0c07dededf99aaa40f0f780a13dc8e"
+    },
+    {
+      "bytes": 801,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0129.json",
+      "sha256": "e3f32ec95730e30cc55ea452ddd358f5901f0b52d3cc8dea046b06585f05f889"
+    },
+    {
+      "bytes": 801,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0130.json",
+      "sha256": "ae9bdac6f8fc50b2c08fbafd99903483b796203dc1e7bd334d66b147052dc985"
+    },
+    {
+      "bytes": 803,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0131.json",
+      "sha256": "6751d5c722af04dd315b0729a35a82e5e6ad62eac53ff9fd9836ce087c5a3d3b"
+    },
+    {
+      "bytes": 785,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0132.json",
+      "sha256": "341817fc383bb90c01f746b1482ad9a633856f67f4b1ea8dcd32a6f366f960af"
+    },
+    {
+      "bytes": 779,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0133.json",
+      "sha256": "5fabc5dca7fa82a2bb588afeefd197be342bb3b5089881f55f3921a71c170135"
+    },
+    {
+      "bytes": 784,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0134.json",
+      "sha256": "847864a0ac216048846cb556d1158944b3136f2e9b36dd9ad99b145e999fc61d"
+    },
+    {
+      "bytes": 788,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/test-observations/0135.json",
+      "sha256": "80dbe04ff18a8b8862fb7b3e3d42324e235d5a56c75aef8a7494f835472b7b2c"
+    },
+    {
+      "bytes": 5318594,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/array_list/after-input.json",
+      "sha256": "7e94243362e834a0dcdbe680621363965abd2eca135692c5c4f99d43dbd85b00"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/array_list/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 605,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/array_list/outcome.json",
+      "sha256": "1fa856d8754f7d215b28cf759e6298acf9aedbe6121054ea8af816d910ad089d"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/dict_insertion_order/after-input.json",
+      "sha256": "c25e1e77b9c397c17e9afe340d52813212b466cfdfbae5f1fb321f63771b0f8f"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/dict_insertion_order/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 625,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/dict_insertion_order/outcome.json",
+      "sha256": "3a77d5450f41f551dee2c078b5b3d008643bb6cf9038ac595dcfa0f7943d74cb"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/forecast_order/after-input.json",
+      "sha256": "55fb522997c259b8e49d0cdb07fabb548c3f12dd89e2bb36640ef157a8cad23a"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/forecast_order/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 614,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/forecast_order/outcome.json",
+      "sha256": "14adb81aa43b8bf4df235414746d3e7bab8f3b9d0091b866ef7301f6284e2ac3"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/last_origin/after-input.json",
+      "sha256": "8c38ff667283feb843909df6e3491a215aabe4836c13c33b4a89a82d2ab5b6e6"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/last_origin/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 607,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/last_origin/outcome.json",
+      "sha256": "3cb937651489111fd55fe2f9ee02bd5c88643a33f4e4b75c4d2bb79059390f5e"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/last_output_mean/after-input.json",
+      "sha256": "4754390edb942d561413a79938f21cc1a6ad4a976c36ce1acf84a5e5813dde70"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/last_output_mean/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 618,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/last_output_mean/outcome.json",
+      "sha256": "607a7febe8412702fef3223089b1af9d8c5fc5c276ed3dc59f5b126f93c042f4"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/last_rating/after-input.json",
+      "sha256": "191a6284fd35aad1cf977a8006968485b5b5d75bb1315a16829e9d619b49a5a0"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/last_rating/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 608,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/last_rating/outcome.json",
+      "sha256": "07fe814cc9be90f4f93d35df3ebfa5fe7ca2984e76888b76b6264fbe70878603"
+    },
+    {
+      "bytes": 3164833,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/numeric_type/after-input.json",
+      "sha256": "cf815bcecb3881af1da2ddc3d8be716314c2223c1521828dd531c9641464f765"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/numeric_type/before-input.json",
+      "sha256": "c1fc7a3aff1b2d6e97f0aae6b88f2d8683caed870782e47c22e8d7538c7fad42"
+    },
+    {
+      "bytes": 609,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/numeric_type/outcome.json",
+      "sha256": "769719b8332480679ef348f1c71114736741a34ef5401c7feaaaaf48f0be0534"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/signed_zero/after-input.json",
+      "sha256": "07cd82a018b0ac4e9ce633feed1f874f4493d585bc476654909d50abb82d0d44"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/signed_zero/before-input.json",
+      "sha256": "3af3b0c4f03ca1b6b2767c698baf5a65395eaf99b07cfba3fb13905bace6187c"
+    },
+    {
+      "bytes": 608,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/signed_zero/outcome.json",
+      "sha256": "9c7003611b398addb68bfc0c9e7617da46d30c65558e41bd05ae33d352248e35"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/unchanged/after-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/unchanged/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 603,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/unchanged/outcome.json",
+      "sha256": "1c53a60d61ac8e3fc1c07bce08396bf282acaf08819031e530eff4f3c16937de"
+    },
+    {
+      "bytes": 3165154,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/unicode_equivalence/after-input.json",
+      "sha256": "efb8173f5b49e4c041a9c80e477fb8cdeb005e618c135c21e3c3ee2ead20abb7"
+    },
+    {
+      "bytes": 3165150,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/unicode_equivalence/before-input.json",
+      "sha256": "781cdf8be054a819e26c7581551fa37f4f39727583e35175a019c0796880f024"
+    },
+    {
+      "bytes": 621,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/candidate/unicode_equivalence/outcome.json",
+      "sha256": "fe3810df64980c1b4354b79071eccca9c345e946c7fd5ce3bac5ffa24760f8ab"
+    },
+    {
+      "bytes": 5318594,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/array_list/after-input.json",
+      "sha256": "7e94243362e834a0dcdbe680621363965abd2eca135692c5c4f99d43dbd85b00"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/array_list/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 716,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/array_list/outcome.json",
+      "sha256": "3588bafc39b9a9bc93a0feda40968206049c196ebda43b4ec5a55498c8850625"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/dict_insertion_order/after-input.json",
+      "sha256": "c25e1e77b9c397c17e9afe340d52813212b466cfdfbae5f1fb321f63771b0f8f"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/dict_insertion_order/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 736,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/dict_insertion_order/outcome.json",
+      "sha256": "3a27b95903d94ae83f2e938ecaa55362e7e851c103fe7ee169502f66b2f2c460"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/forecast_order/after-input.json",
+      "sha256": "55fb522997c259b8e49d0cdb07fabb548c3f12dd89e2bb36640ef157a8cad23a"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/forecast_order/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 724,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/forecast_order/outcome.json",
+      "sha256": "a902fd197bc9cdf923dc01150d3c2279fe246a48c6886b1bf9da5cd67e1421c0"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/last_origin/after-input.json",
+      "sha256": "8c38ff667283feb843909df6e3491a215aabe4836c13c33b4a89a82d2ab5b6e6"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/last_origin/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 719,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/last_origin/outcome.json",
+      "sha256": "0e51ebf89efdd4b402ba495e747374373017a557c8cd15ff4f3df24269f715a0"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/last_output_mean/after-input.json",
+      "sha256": "4754390edb942d561413a79938f21cc1a6ad4a976c36ce1acf84a5e5813dde70"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/last_output_mean/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 729,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/last_output_mean/outcome.json",
+      "sha256": "cd4eea8a989e5ff022dcb081d919a4603e271b41b584affbf6377bba51318b3a"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/last_rating/after-input.json",
+      "sha256": "191a6284fd35aad1cf977a8006968485b5b5d75bb1315a16829e9d619b49a5a0"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/last_rating/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 719,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/last_rating/outcome.json",
+      "sha256": "cf7427a921aeb41a78ab431576e18ca85dd28f3b9c8b39f69df111e9967e41f2"
+    },
+    {
+      "bytes": 3164833,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/numeric_type/after-input.json",
+      "sha256": "cf815bcecb3881af1da2ddc3d8be716314c2223c1521828dd531c9641464f765"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/numeric_type/before-input.json",
+      "sha256": "c1fc7a3aff1b2d6e97f0aae6b88f2d8683caed870782e47c22e8d7538c7fad42"
+    },
+    {
+      "bytes": 721,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/numeric_type/outcome.json",
+      "sha256": "595c3c6f2161bfa81aa5f3eb0151308d8b0ce51d3178bd34f1918edf353f5d93"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/signed_zero/after-input.json",
+      "sha256": "07cd82a018b0ac4e9ce633feed1f874f4493d585bc476654909d50abb82d0d44"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/signed_zero/before-input.json",
+      "sha256": "3af3b0c4f03ca1b6b2767c698baf5a65395eaf99b07cfba3fb13905bace6187c"
+    },
+    {
+      "bytes": 719,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/signed_zero/outcome.json",
+      "sha256": "2cf8630f3611aa2538b34626d0ddf98ebd9550cb269911ccc9cf080de72b7aa7"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/unchanged/after-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 3164858,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/unchanged/before-input.json",
+      "sha256": "d117de945c38e9fe2bf3a308f964679531b7dd9999c462d291d40a4dfabc85ed"
+    },
+    {
+      "bytes": 715,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/unchanged/outcome.json",
+      "sha256": "35ada7e582fe54813c56061f941f8d5de3076d63ddd74598cae7bca9de757c22"
+    },
+    {
+      "bytes": 3165154,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/unicode_equivalence/after-input.json",
+      "sha256": "efb8173f5b49e4c041a9c80e477fb8cdeb005e618c135c21e3c3ee2ead20abb7"
+    },
+    {
+      "bytes": 3165150,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/unicode_equivalence/before-input.json",
+      "sha256": "781cdf8be054a819e26c7581551fa37f4f39727583e35175a019c0796880f024"
+    },
+    {
+      "bytes": 734,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/timed/original/unicode_equivalence/outcome.json",
+      "sha256": "4cc7adcbdb58855835fe8fccf0adf18dca040c3bbed5a2bba0dbaf6ccbde8b2c"
+    },
+    {
+      "bytes": 4037,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2/unittest.log",
+      "sha256": "47c009b2a28dd368271034d7f9c65ac3b62b17fee25a2efad4c11f10ffeecf2e"
+    },
+    {
+      "bytes": 23887,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/qualify_bank_snapshot.py",
+      "sha256": "c87cbfb3222aa953f88c23ca63fbe89877968086ef3079c8cd944b27fcc75259"
+    },
+    {
+      "bytes": 641244,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-origin-profile/profile-685708ac9c57a623/plain/origin-store/state-2013-01.json",
+      "sha256": "0be4fb5801dc501d6ebb0a15c764eac82a45edb81dc640db77c6ae2c626bbda1"
+    },
+    {
+      "bytes": 10129,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-COMP-06-BANK-SNAPSHOT-SCOPE.v1.md",
+      "sha256": "9f4ff7b1dced4698e48c4be4859893e16ebedb3f66e747913beda174749aff15"
+    },
+    {
+      "bytes": 4295,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_bank_snapshot.py",
+      "sha256": "e327560586f3d938743cb9b44120b8e7206ad16e68c2af2edc277967485e2426"
+    },
+    {
+      "bytes": 26255,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-bank-snapshot/test_bank_snapshot.py",
+      "sha256": "e53a7c2b52215d1d477011c2bfa810b2cfc0a8f376d5ce18c2b2817b40a40165"
+    }
+  ],
+  "held_sources": {
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/qualify_bank_snapshot.py": "c87cbfb3222aa953f88c23ca63fbe89877968086ef3079c8cd944b27fcc75259",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-COMP-06-BANK-SNAPSHOT-SCOPE.v1.md": "9f4ff7b1dced4698e48c4be4859893e16ebedb3f66e747913beda174749aff15",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_bank_snapshot.py": "e327560586f3d938743cb9b44120b8e7206ad16e68c2af2edc277967485e2426",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-bank-snapshot/test_bank_snapshot.py": "e53a7c2b52215d1d477011c2bfa810b2cfc0a8f376d5ce18c2b2817b40a40165"
+  },
+  "input_pins_sha256": "0aad650afed462a2ea23552f9ae6f4f08d4fc05bcf64f3a4ce2df1d9b306b7fb",
+  "limits": [
+    "One fixed-order unprofiled original pass then candidate pass after equivalence checks; timing includes both captures, mutation and comparison/helper dispatch but excludes fixture/image construction inside the setup-inclusive command. Cache/order/OS uncertainty remains.",
+    "Saved fixture reconstructs only the bank comparison payload, not runnable trajectories, history or engine.stored. No fit/scorer/callback term or whole-origin capacity measured.",
+    "The candidate targets only two ephemeral bank digest calls; prior instrumentation attribution is qualitative and eliminating the whole bucket would still not establish sufficient capacity.",
+    "JSON errors preserve module/type/message and event order; exact live exception class identity comes from the passing frozen test assertions and cannot be independently recovered from serialized metadata.",
+    "Input images prove equality of captured before/after content, not unobserved transient mutation or live pointer identities; pinned source structure and mutation tests supply the ownership evidence.",
+    "Whole archive/current source/runtime/process ownership/resource acceptance is separately performed by root and operational reviewer; this report authenticates each artifact it uses.",
+    "One initial read-only inspection referred to nonexistent parity.json and stopped with FileNotFoundError; corrected to the existing parity-results.json. This was an auditor filename error, not a candidate/qualification failure; no execution was repeated."
+  ],
+  "metadata_checks_passed": 82636,
+  "runtime": {
+    "executable": "/opt/anaconda3/bin/python3.12",
+    "isolated": true,
+    "numpy": "1.26.4",
+    "platform": "darwin",
+    "python": "3.12.2",
+    "scipy": "1.13.1"
+  },
+  "scope": "Saved typed input images, actual original hashes, snapshot outcomes, focused errors/hooks/guards, and fixed timing sums only. No candidate, model, driver, test or scientific import/call; no retiming.",
+  "status": "accepted_exact_synthetic_snapshot_equivalence_with_isolated_timing_lead",
+  "tests": {
+    "capture_modes": {
+      "fallback": 31,
+      "guard_fallback": 13,
+      "guard_supported": 19,
+      "supported": 99
+    },
+    "classifications": {
+      "array_image": 1,
+      "call_counts": 1,
+      "decision": 1,
+      "deliberate_injection": 4,
+      "guard_boundary": 32,
+      "handle_contract": 4,
+      "mutation_decisions": 3,
+      "paired_bank": 13,
+      "paired_value": 76
+    },
+    "observations": 135,
+    "pair_decisions": {
+      "False": 27,
+      "True": 34
+    },
+    "pair_error_types": {
+      "builtins.RecursionError": 3,
+      "builtins.RuntimeError": 8,
+      "builtins.TypeError": 8,
+      "builtins.ValueError": 9
+    },
+    "passed": 29,
+    "run": 29
+  },
+  "timing": {
+    "aggregate_seconds": {
+      "candidate": 0.349627083982341,
+      "original": 0.4744956649665255
+    },
+    "call_intervals": 20,
+    "candidate_original_ratio": 0.7368393639739708,
+    "fixed_order": [
+      "original",
+      "candidate"
+    ],
+    "math_fsum_seconds": {
+      "candidate": 0.349627083982341,
+      "original": 0.4744956649665255
+    },
+    "observed_reduction_percent": 26.316063602602924,
+    "observed_seconds_saved": 0.12486858098418452,
+    "pair_order": [
+      "unchanged",
+      "last_rating",
+      "last_output_mean",
+      "last_origin",
+      "forecast_order",
+      "dict_insertion_order",
+      "signed_zero",
+      "numeric_type",
+      "array_list",
+      "unicode_equivalence"
+    ],
+    "per_pair": [
+      {
+        "candidate_seconds": 0.025923000008333474,
+        "name": "unchanged",
+        "original_seconds": 0.038072708004619926
+      },
+      {
+        "candidate_seconds": 0.027162250014953315,
+        "name": "last_rating",
+        "original_seconds": 0.03833787501207553
+      },
+      {
+        "candidate_seconds": 0.022943582996958867,
+        "name": "last_output_mean",
+        "original_seconds": 0.03809966699918732
+      },
+      {
+        "candidate_seconds": 0.10919854199164547,
+        "name": "last_origin",
+        "original_seconds": 0.04016362500260584
+      },
+      {
+        "candidate_seconds": 0.024059833987848833,
+        "name": "forecast_order",
+        "original_seconds": 0.03921954098041169
+      },
+      {
+        "candidate_seconds": 0.024898917006794363,
+        "name": "dict_insertion_order",
+        "original_seconds": 0.04010145799838938
+      },
+      {
+        "candidate_seconds": 0.025154790986562148,
+        "name": "signed_zero",
+        "original_seconds": 0.038444166973931715
+      },
+      {
+        "candidate_seconds": 0.02272887498838827,
+        "name": "numeric_type",
+        "original_seconds": 0.03859437498613261
+      },
+      {
+        "candidate_seconds": 0.027458334021503106,
+        "name": "array_list",
+        "original_seconds": 0.12428233301034197
+      },
+      {
+        "candidate_seconds": 0.040098957979353145,
+        "name": "unicode_equivalence",
+        "original_seconds": 0.03917991599882953
+      }
+    ]
+  },
+  "version": "rfcomp06.saved-numerical-review.v1"
+}

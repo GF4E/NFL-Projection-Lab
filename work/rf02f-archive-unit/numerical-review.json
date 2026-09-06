@@ -1,0 +1,51 @@
+{
+  "status": "rejected",
+  "scope": "synthetic_numerical_archive_unit_and_public_boundary_review",
+  "source_hashes": {
+    "scripts/research_score_split_archive.py": "4f770418a12b66a1280eed259232dda7c49dd95ce93008e6fa0d7a67c287830b",
+    "tests/research-score-split/test_archive_unit.py": "a5ab18a3d61f7c9994ac6ca8e77f90b90eb19fb9c3bb45fa85ff98e2cb556144",
+    ".planning/engine-os/research-first/RF-02F-ARCHIVE-UNIT-SCOPE.v1.md": "018b5557860ad0b58155e69fa201fff682758fc5519d785e03a5583d2da13ff5",
+    ".planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16"
+  },
+  "blockers": [
+    {
+      "id": "configuration_roundtrip_changes_registered_order",
+      "source": "SourceContext construction in admit_source and _current registered_series",
+      "mechanism": "encoded(config) canonicalizes dictionary key order. registered_series iterates config.models directly; context reload changes original N0,S1,E1,E2 order to E1,E2,N0,S1. _state requires ordered original state rows, so forecast_inputs raises state_key_mismatch after successful admission.",
+      "reproduction": "Construct real TinyArchive(2013,1), SourceContext using encoded(CONFIG), same indexed manifest/records/origin/selection/mapper pointers; explicitly substitute synthetic parent manifest pin only. Calling actual forecast_inputs fails in _current -> _origin_artifacts -> _state with AdmissionFailure state_key_mismatch. No production admission invoked.",
+      "minimum_fix": "Preserve admitted config iteration order or separately retain and use exact admitted series order throughout later public reads. Add successful actual forecast_inputs and grade_inputs composition regression, including original target order and complete81 diagonals/6 references."
+    }
+  ],
+  "evidence": {
+    "independent_existing_tests": 18,
+    "passed": 18,
+    "unittest_seconds": 0.856,
+    "exit_code": 0,
+    "independent_public_composition_probe": "failed as described",
+    "original_model_order": [
+      "N0",
+      "S1",
+      "E1",
+      "E2"
+    ],
+    "context_roundtrip_model_order": [
+      "E1",
+      "E2",
+      "N0",
+      "S1"
+    ],
+    "registered_series_equal_after_context_roundtrip": false
+  },
+  "other_findings": [
+    "Streaming admission authenticates all indexed bodies without retaining parsed states, reproduces43-setting annual selection summaries and keeps32823E2 inner tuples outside selector.",
+    "Full empirical mapper weights,b,epsilon and closure hash are compared, and successor JointBase used; lazy law recovery uses components only.",
+    "Strict typed full27-setting batches validated before selector mutation; publication byte/schema guard precedes grader source/labels.",
+    "Exactly five warmup exceptions and81 state variants are checked; full original40 outer series checked before projection."
+  ],
+  "limitations": [
+    "No actual admit_source, historical archive loading, historical fitting/scoring or bootstrap.",
+    "Existing18tests use synthetic schema metrics and small genuine helper fixtures, not historical numerical correctness.",
+    "No archive/controller acceptance until public roundtrip blocker closes; source hashes may subsequently change.",
+    "Root owns independent temporal/controller integration and production trust-chain review."
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "additional_inputs": 55,
+  "counts_by_mode": {
+    "memo": 56,
+    "original": 56,
+    "skellam": 56
+  },
+  "frozen_files": 66,
+  "historical_target_F_plus_S": 0.007461491790146312,
+  "limits": [
+    "six measured rounds of synthetic callbacks with counterbalancedpositions",
+    "timing includes memo allocation, byte-key construction, original encoding on miss, original verification and scoring",
+    "law equality uses retained hashes; descriptor/metric bodies rehashed",
+    "synthetic baseline differs from historical52.468percent requirement; no historical capacity or predictive result"
+  ],
+  "metric_fields_each": 104,
+  "observations": 168,
+  "resources": {
+    "peak_child_rss_mib": 144.25,
+    "wall_seconds": 3.89810145800584
+  },
+  "status": "root_metadata_exactness_and_timing_checked_independent_review_pending",
+  "summary": {
+    "memo": {
+      "Fmax": 0.0020138339896220714,
+      "below_historical_target": true,
+      "broad_FplusS": 0.011904209008207545,
+      "broad_Smax": 0.009890375018585473,
+      "broad_reduction_from_original": 0.33084046158795966,
+      "pilot_FplusS": 0.00638575098128058,
+      "pilot_Smax": 0.004371916991658509,
+      "pilot_reduction_from_original": 0.37822071480132635
+    },
+    "original": {
+      "Fmax": 0.0026152500067837536,
+      "below_historical_target": false,
+      "broad_FplusS": 0.017789792007533833,
+      "broad_Smax": 0.01517454200075008,
+      "broad_reduction_from_original": 0.0,
+      "pilot_FplusS": 0.010270124999806285,
+      "pilot_Smax": 0.007654874993022531,
+      "pilot_reduction_from_original": 0.0
+    },
+    "skellam": {
+      "Fmax": 0.002649208006914705,
+      "below_historical_target": true,
+      "broad_FplusS": 0.012660792010137811,
+      "broad_Smax": 0.010011584003223106,
+      "broad_reduction_from_original": 0.2883114088812242,
+      "pilot_FplusS": 0.00676929100882262,
+      "pilot_Smax": 0.004120083001907915,
+      "pilot_reduction_from_original": 0.3408754996701304
+    }
+  },
+  "unit_tests": {
+    "errors": [],
+    "failures": [],
+    "skipped": [],
+    "success": true,
+    "tests_run": 21,
+    "wall_seconds": 1.322589708986925
+  }
+}

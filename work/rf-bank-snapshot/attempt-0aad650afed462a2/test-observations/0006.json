@@ -1,0 +1,54 @@
+{
+  "candidate": {
+    "events": [
+      "left-tail",
+      "assembly",
+      "right-tail"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": false
+    },
+    "snapshots": [
+      {
+        "mode": "supported"
+      },
+      {
+        "mode": "supported"
+      }
+    ]
+  },
+  "expected_decision": false,
+  "expected_modes": null,
+  "kind": "paired_value",
+  "label": "complete-right-read",
+  "original": {
+    "events": [
+      "left-tail",
+      "assembly",
+      "right-tail"
+    ],
+    "images": [
+      {
+        "ascii_body": "[\n  0,\n  [\n    3\n  ]\n]\n",
+        "bytes": 23,
+        "sha256": "c3a295cbd3722e46bb3f32b74e56d63ff90952690e097119bad84eb3a62ad929"
+      },
+      {
+        "ascii_body": "[\n  1,\n  [\n    3\n  ]\n]\n",
+        "bytes": 23,
+        "sha256": "cb00f8b46166180e58254dbca6ea72798a1a5134e49ae7022af2a7952f9ca88e"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": false
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_all_right_hooks_read_despite_first_difference"
+}

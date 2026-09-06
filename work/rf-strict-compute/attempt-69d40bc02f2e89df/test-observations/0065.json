@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "{\n  \"02\": {\n    \"{}[],:\": [\n      \"x,y\",\n      \":{}\",\n      []\n    ]\n  },\n  \"10\": {\n    \"{}[],:\": [\n      \"x,y\",\n      \":{}\",\n      []\n    ]\n  },\n  \"2\": {\n    \"{}[],:\": [\n      \"x,y\",\n      \":{}\",\n      []\n    ]\n  },\n  \"a\": {\n    \"{}[],:\": [\n      \"x,y\",\n      \":{}\",\n      []\n    ]\n  }\n}\n",
+    "bytes": 289,
+    "kind": "bytes",
+    "sha256": "54e74f15dc08f398f1274eda76fe4853b4a82f42743769cbdde8c77d7219408a",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "key-order-a,02,2,10",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "dict"
+  },
+  "label": "key-order-a,02,2,10",
+  "original": {
+    "ascii_body": "{\n  \"02\": {\n    \"{}[],:\": [\n      \"x,y\",\n      \":{}\",\n      []\n    ]\n  },\n  \"10\": {\n    \"{}[],:\": [\n      \"x,y\",\n      \":{}\",\n      []\n    ]\n  },\n  \"2\": {\n    \"{}[],:\": [\n      \"x,y\",\n      \":{}\",\n      []\n    ]\n  },\n  \"a\": {\n    \"{}[],:\": [\n      \"x,y\",\n      \":{}\",\n      []\n    ]\n  }\n}\n",
+    "bytes": 289,
+    "kind": "bytes",
+    "sha256": "54e74f15dc08f398f1274eda76fe4853b4a82f42743769cbdde8c77d7219408a",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_insertion_order_string_sorting_and_delimiters"
+}

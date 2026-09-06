@@ -1,0 +1,529 @@
+{
+  "adding_control3_does_not_change_any_reported_maximum": true,
+  "blocker_to_historical_capacity_progress": "Strict fixed computational target remains unmet in both retained synthetic subsets.",
+  "blockers_to_bounded_exactness_acceptance": [],
+  "conclusion": {
+    "broad_stress": "Original20.392042003 ms; Poisson15.893375006 ms; Skellam14.455583994 ms. The observed29.1116% reduction is material but remains far above the fixed absolute target.",
+    "decision": "Retain the composed Poisson+Skellam helper as an exact computational candidate with measurable synthetic benefit. The sole qualification does not meet the fixed cost target; no historical/controller integration, restart, changed threshold, or further timing repetitions to seek a favorable maximum follow. Any next computational hypothesis needs a distinct bounded preregistration.",
+    "exactness": "All18 retained tests and every complete synthetic descriptor/104-field metric comparison pass against the authenticated frozen original reference, including selected warnings/errors, backend array interface, cache isolation and grid bytes. This is bounded runtime-specific evidence, not a universal proof.",
+    "historical_status": "RF-02F remains protocol_invalid at its preserved cost pilot; no full predictive inference is available.",
+    "pilot_like": "Original Fmax+Smax10.918166983 ms; Poisson9.037208016 ms; Skellam7.524540997 ms. Skellam reduces the observed sum31.0824%, but remains0.063049207 ms above the strict7.461491790 ms target. Do not round the near-miss into a pass."
+  },
+  "evidence": [
+    {
+      "bytes": 16863,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/INPUT-PINS.json",
+      "sha256": "68b50389563dde3ddb353e2cb0bcffd4dbc6af253ad3c82cc7181ad3078c58cc"
+    },
+    {
+      "bytes": 16863,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/source-map-before.json",
+      "sha256": "68b50389563dde3ddb353e2cb0bcffd4dbc6af253ad3c82cc7181ad3078c58cc"
+    },
+    {
+      "bytes": 16863,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/source-map-after.json",
+      "sha256": "68b50389563dde3ddb353e2cb0bcffd4dbc6af253ad3c82cc7181ad3078c58cc"
+    },
+    {
+      "bytes": 5684,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/process.json",
+      "sha256": "ad373d98b8d11bbacc88d56154c770c5a1861c5bbce77ea8c9b4977535b331f2"
+    },
+    {
+      "bytes": 4375,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/process.log",
+      "sha256": "2061a550bc4e84f962f50ef9d82faa91544a6ce484e196117b2f5f082553acc3"
+    },
+    {
+      "bytes": 130,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/unit-tests.json",
+      "sha256": "be5d127ed04bcb14f6b407f51a9a3a325e3881e81a8190951dbcc33fc229ba8a"
+    },
+    {
+      "bytes": 1247139,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/benchmark.json",
+      "sha256": "7bd4b467883a6b3949adaa3898e6be219b9581acac8bde7e1049f348754c85d5"
+    },
+    {
+      "bytes": 12251,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/qualify.py",
+      "sha256": "e7fdbb791a1c36fe97e350cce25f043b05820ca8919f19122e037b92c5a53206"
+    },
+    {
+      "bytes": 4774,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/QUALIFICATION-SCOPE.md",
+      "sha256": "ae324e23eab0a88afd7a4160cd9692ae5ee1ef27343fc7140c998486665b5981"
+    },
+    {
+      "bytes": 8772,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/preflight-review.json",
+      "sha256": "bb227d6acee885032d17aeb3c0bb5004a25af1527c72cb74d261458b4bd783bb"
+    }
+  ],
+  "fixed_requirement": {
+    "F_plus_S_seconds": 0.007461491790146312,
+    "historical_combined_reduction_fraction": 0.524680169716677,
+    "unchanged": true
+  },
+  "historical_execution": false,
+  "large_support_timing_summaries": [
+    {
+      "iterations": 4,
+      "modes": {
+        "original": {
+          "fit_seconds": {
+            "maximum": 0.0028224999841768295,
+            "median": 0.0027387084992369637,
+            "minimum": 0.00262120901606977
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "minimum": 0.0
+          },
+          "score_seconds": {
+            "maximum": 0.008599249995313585,
+            "median": 0.00825879150943365,
+            "minimum": 0.008048416988458484
+          }
+        },
+        "poisson": {
+          "fit_seconds": {
+            "maximum": 0.0030043330043554306,
+            "median": 0.0027689584967447445,
+            "minimum": 0.00263612499111332
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.2650202542895246,
+            "median": 0.22723964684507725,
+            "minimum": 0.17680472209901332
+          },
+          "score_seconds": {
+            "maximum": 0.0063910419994499534,
+            "median": 0.005776686986791901,
+            "minimum": 0.005543249979382381
+          }
+        },
+        "skellam": {
+          "fit_seconds": {
+            "maximum": 0.0028574999887496233,
+            "median": 0.002759603987215087,
+            "minimum": 0.0026285840140189976
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.38618946926387165,
+            "median": 0.34819422646955533,
+            "minimum": 0.2847415263345807
+          },
+          "score_seconds": {
+            "maximum": 0.005194291996303946,
+            "median": 0.004490020990488119,
+            "minimum": 0.003999792010290548
+          }
+        }
+      },
+      "native_mean": [
+        19.67343973795573,
+        16.430757446289068
+      ],
+      "setting": 10,
+      "variant": "full"
+    },
+    {
+      "iterations": 4,
+      "modes": {
+        "original": {
+          "fit_seconds": {
+            "maximum": 0.0028645000129472464,
+            "median": 0.002739354007644579,
+            "minimum": 0.0025644589914008975
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "minimum": 0.0
+          },
+          "score_seconds": {
+            "maximum": 0.017569542018463835,
+            "median": 0.01663022898719646,
+            "minimum": 0.016392791003454477
+          }
+        },
+        "poisson": {
+          "fit_seconds": {
+            "maximum": 0.0029370830161496997,
+            "median": 0.0027779790107160807,
+            "minimum": 0.0026442910020705312
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.24210130629139948,
+            "median": 0.23095425243444473,
+            "minimum": 0.2241626996148608
+          },
+          "score_seconds": {
+            "maximum": 0.012889042001916096,
+            "median": 0.012240563009981997,
+            "minimum": 0.011674417008180171
+          }
+        },
+        "skellam": {
+          "fit_seconds": {
+            "maximum": 0.0031331669888459146,
+            "median": 0.0027595830033533275,
+            "minimum": 0.002635875018313527
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.3236454920363898,
+            "median": 0.3057501367590163,
+            "minimum": 0.23006053621388
+          },
+          "score_seconds": {
+            "maximum": 0.011598084005527198,
+            "median": 0.011037479009246454,
+            "minimum": 0.010332292004022747
+          }
+        }
+      },
+      "native_mean": [
+        19.67343973795573,
+        16.430757446289068
+      ],
+      "setting": 10,
+      "variant": "independent_marginals"
+    },
+    {
+      "iterations": 4,
+      "modes": {
+        "original": {
+          "fit_seconds": {
+            "maximum": 0.002827874996000901,
+            "median": 0.0027109169895993546,
+            "minimum": 0.0026300830068066716
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "minimum": 0.0
+          },
+          "score_seconds": {
+            "maximum": 0.007817417004844174,
+            "median": 0.0076439794938778505,
+            "minimum": 0.007617833995027468
+          }
+        },
+        "poisson": {
+          "fit_seconds": {
+            "maximum": 0.0028578749916050583,
+            "median": 0.0027262920048087835,
+            "minimum": 0.002691208996111527
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.23722500974503513,
+            "median": 0.20464121257080858,
+            "minimum": 0.1403362454737892
+          },
+          "score_seconds": {
+            "maximum": 0.006032875011442229,
+            "median": 0.005565958505030721,
+            "minimum": 0.005167875002371147
+          }
+        },
+        "skellam": {
+          "fit_seconds": {
+            "maximum": 0.002803958021104336,
+            "median": 0.0026751039986265823,
+            "minimum": 0.0025855829881038517
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.3614143152627549,
+            "median": 0.33362541233342263,
+            "minimum": 0.2865625028730483
+          },
+          "score_seconds": {
+            "maximum": 0.004667041008360684,
+            "median": 0.004212936983094551,
+            "minimum": 0.00401874998351559
+          }
+        }
+      },
+      "native_mean": [
+        19.785319010416668,
+        16.118652343750004
+      ],
+      "setting": 6,
+      "variant": "zero_strength_update"
+    },
+    {
+      "iterations": 4,
+      "modes": {
+        "original": {
+          "fit_seconds": {
+            "maximum": 0.002964291983516887,
+            "median": 0.0027443329890957102,
+            "minimum": 0.0026254169933963567
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.0,
+            "median": 0.0,
+            "minimum": 0.0
+          },
+          "score_seconds": {
+            "maximum": 0.00809566699899733,
+            "median": 0.007851832997403108,
+            "minimum": 0.007451042009051889
+          }
+        },
+        "poisson": {
+          "fit_seconds": {
+            "maximum": 0.0029515830101445317,
+            "median": 0.002784458003588952,
+            "minimum": 0.0025262919953092933
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.2528589320447232,
+            "median": 0.22254106795713452,
+            "minimum": 0.16558326449094607
+          },
+          "score_seconds": {
+            "maximum": 0.005965375021332875,
+            "median": 0.005537125485716388,
+            "minimum": 0.005121750000398606
+          }
+        },
+        "skellam": {
+          "fit_seconds": {
+            "maximum": 0.002867125003831461,
+            "median": 0.0026442915113875642,
+            "minimum": 0.002577166975243017
+          },
+          "paired_complete_sum_reduction_vs_original": {
+            "maximum": 0.3923786323983247,
+            "median": 0.3578373167739527,
+            "minimum": 0.2973763886925447
+          },
+          "score_seconds": {
+            "maximum": 0.0044719580037053674,
+            "median": 0.004067958521773107,
+            "minimum": 0.00397429199074395
+          }
+        }
+      },
+      "native_mean": [
+        19.411666666666665,
+        16.255000000000006
+      ],
+      "setting": 6,
+      "variant": "zero_scoring_level_update"
+    }
+  ],
+  "limitations": [
+    "Pilot-like roles match the kinds of newly scored diagonal-setting6 controls, not historical means/support weights/history or maximum runtime. Broader independent/full cases are stress coverage.",
+    "Only six counterbalanced rounds per case in one short process. Counterbalance controls order position but is not a confidence interval; the near-threshold result is especially sensitive to timing variability and must remain a failure of the fixed observed-maxima gate.",
+    "Fit code is identical in all modes; small differences in its observed maxima are timing variation, not algorithmic fitting gains. All encoder paths remain original.",
+    "The actual resolve/scorer operation callbacks are complete, but assembly constructor/admission, native selection, chronological state progression, production accounting/watchdog overhead, post-callback mass CDFs, whole-origin publication and bootstrap are outside callback timers.",
+    "Mode setup and output hashing/persistence are included in the observed process cost. Interpreter startup and the parent final process-report serialization tail are outside its elapsed checkpoint; the recorded3.464s/186.67MiB has substantial margin under60s/1024MiB.",
+    "Metric/descriptor bodies and hashes were independently recomputed without scientific functions. Full recovered arrays are represented by a law hash rather than retained law bodies, so that equality is checked against the accepted stored hash, not independently reconstructed here.",
+    "The log contains three FutureWarnings from the test inspecting writability of public-wrapper broadcast arrays. These occur outside observed_call comparison and are test-inspection warnings, not a mismatched candidate numerical warning or failed test. Selected function warnings and exceptions are compared by the passing suite.",
+    "The private Skellam backend is bound by installed Python and native-library source hashes plus the pinned runtime. This evidence must not be carried across unqualified dependency changes.",
+    "The observed synthetic31.08%/29.11% reductions are not the historical52.468% reduction requirement; baselines differ. Neither metric is evidence of predictive quality or a completed research experiment."
+  ],
+  "role": "independent_numerical",
+  "scientific_calls_during_review": 0,
+  "separate_maxima": [
+    {
+      "fit_roles": "setting10 full native fit callbacks",
+      "modes": {
+        "original": {
+          "excess_over_fixed_absolute_target_seconds": 0.0034566751930278482,
+          "maxima": {
+            "fit": {
+              "observations": 6,
+              "repeat": 3,
+              "seconds": 0.0028224999841768295,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 12,
+              "repeat": 1,
+              "seconds": 0.00809566699899733,
+              "setting": 6,
+              "support": "synthetic700",
+              "variant": "zero_scoring_level_update"
+            }
+          },
+          "original_over_mode_ratio": 1.0,
+          "reduction_fraction_vs_original": 0.0,
+          "sum_separate_maxima_seconds": 0.01091816698317416
+        },
+        "poisson": {
+          "excess_over_fixed_absolute_target_seconds": 0.0015757162256513479,
+          "maxima": {
+            "fit": {
+              "observations": 6,
+              "repeat": 0,
+              "seconds": 0.0030043330043554306,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 12,
+              "repeat": 0,
+              "seconds": 0.006032875011442229,
+              "setting": 6,
+              "support": "synthetic700",
+              "variant": "zero_strength_update"
+            }
+          },
+          "original_over_mode_ratio": 1.2081349642598085,
+          "reduction_fraction_vs_original": 0.1722779080293625,
+          "sum_separate_maxima_seconds": 0.00903720801579766
+        },
+        "skellam": {
+          "excess_over_fixed_absolute_target_seconds": 6.304920696399534e-05,
+          "incremental_reduction_fraction_vs_poisson": 0.1673821180217504,
+          "maxima": {
+            "fit": {
+              "observations": 6,
+              "repeat": 0,
+              "seconds": 0.0028574999887496233,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 12,
+              "repeat": 2,
+              "seconds": 0.004667041008360684,
+              "setting": 6,
+              "support": "synthetic700",
+              "variant": "zero_strength_update"
+            }
+          },
+          "original_over_mode_ratio": 1.451007707628562,
+          "reduction_fraction_vs_original": 0.31082378491680185,
+          "sum_separate_maxima_seconds": 0.007524540997110307
+        }
+      },
+      "role": "pilot_like",
+      "score_roles": "two setting6 zero-update complete scorers",
+      "support_population": "synthetic700"
+    },
+    {
+      "fit_roles": "setting10 full native fit callbacks",
+      "modes": {
+        "original": {
+          "excess_over_fixed_absolute_target_seconds": 0.012930550212494353,
+          "maxima": {
+            "fit": {
+              "observations": 6,
+              "repeat": 3,
+              "seconds": 0.0028224999841768295,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 24,
+              "repeat": 0,
+              "seconds": 0.017569542018463835,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "independent_marginals"
+            }
+          },
+          "original_over_mode_ratio": 1.0,
+          "reduction_fraction_vs_original": 0.0,
+          "sum_separate_maxima_seconds": 0.020392042002640665
+        },
+        "poisson": {
+          "excess_over_fixed_absolute_target_seconds": 0.008431883216125214,
+          "maxima": {
+            "fit": {
+              "observations": 6,
+              "repeat": 0,
+              "seconds": 0.0030043330043554306,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 24,
+              "repeat": 3,
+              "seconds": 0.012889042001916096,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "independent_marginals"
+            }
+          },
+          "original_over_mode_ratio": 1.2830529698439737,
+          "reduction_fraction_vs_original": 0.22060895106956846,
+          "sum_separate_maxima_seconds": 0.015893375006271526
+        },
+        "skellam": {
+          "excess_over_fixed_absolute_target_seconds": 0.00699409220413051,
+          "incremental_reduction_fraction_vs_poisson": 0.09046480130415047,
+          "maxima": {
+            "fit": {
+              "observations": 6,
+              "repeat": 0,
+              "seconds": 0.0028574999887496233,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 24,
+              "repeat": 2,
+              "seconds": 0.011598084005527198,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "independent_marginals"
+            }
+          },
+          "original_over_mode_ratio": 1.4106688467732729,
+          "reduction_fraction_vs_original": 0.29111640744929335,
+          "sum_separate_maxima_seconds": 0.014455583994276822
+        }
+      },
+      "role": "broad_stress",
+      "score_roles": "all four full-flag scorer variants",
+      "support_population": "synthetic700"
+    }
+  ],
+  "status": "accepted_bounded_synthetic_exactness_capacity_target_not_met",
+  "verification": {
+    "accepted_law_hash_comparisons_rechecked": true,
+    "accepted_original_reference_rows": 8,
+    "additional_input_pins_and_archived_snapshots": 36,
+    "all_raw_times_positive_and_finite": true,
+    "cases": 8,
+    "complete_benchmark_fit_callbacks": 168,
+    "complete_benchmark_score_callbacks": 168,
+    "each_mode_each_position_per_case": 2,
+    "encoder": "original_unmodified",
+    "frozen_source_test_pins_unchanged": 66,
+    "full_metric_and_descriptor_original_bytes_hashes_recomputed": true,
+    "measured_observations": 144,
+    "measured_rounds_per_case": 6,
+    "metric_fields_each": 104,
+    "modes": 3,
+    "new_unit_tests_passed": 18,
+    "observation_bytes": 904107,
+    "observation_inventory_sha256": "c95a9200b598a0cfbdb0fb76e43e400a6996c2fe9eeacef8eada522168cbb1a7",
+    "peak_child_rss_mib": 186.671875,
+    "physical_observations_including_warmups": 168,
+    "process_seconds": 3.463716583006317,
+    "resource_limits_seconds_mib": [
+      60,
+      1024
+    ],
+    "unit_failures_errors_skips": 0,
+    "unit_seconds": 0.2846707919961773,
+    "warmups_per_mode_case": 1
+  },
+  "version": "rf-comp-02.numerical-review.v1"
+}

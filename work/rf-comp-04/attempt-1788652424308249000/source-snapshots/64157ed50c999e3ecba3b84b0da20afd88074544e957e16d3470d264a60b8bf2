@@ -1,0 +1,147 @@
+import copy
+from datetime import datetime, timedelta, timezone
+import importlib.util
+import json
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+for name in ("research_score_models", "research_score_contract"):
+    spec = importlib.util.spec_from_file_location(name, ROOT / "scripts" / (name + ".py"))
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+c = sys.modules["research_score_contract"]
+
+
+def source(i, week, kickoff, score=21):
+    start = datetime.fromisoformat(kickoff)
+    return {"gameId": str(i), "season": 2013, "week": week, "homeTeam": "T00", "awayTeam": "T01",
+            "neutral": False, "kickoffAt": kickoff, "homeScore": score, "awayScore": 14, "overtime": 0,
+            "availability": {str(delay): (start + timedelta(hours=delay)).isoformat() for delay in (12, 24)}}
+
+
+def fixture():
+    rows = [source("old", 1, "2013-09-08T17:00:00+00:00"),
+            source("monday", 1, "2013-09-10T02:00:00+00:00"),
+            source("target", 2, "2013-09-15T17:00:00+00:00"),
+            source("future", 3, "2013-09-22T17:00:00+00:00")]
+    twelve, twentyfour = ["monday", "old"], ["old"]
+    windows = {str(h): {"eligibleInputIds": ids, "inputIdSha256": c.digest(c.encoded(ids))} for h, ids in ((12, twelve), (24, twentyfour))}
+    return rows, {"season": 2013, "week": 2, "originAt": "2013-09-10T14:30:00+00:00", "targetGameIds": ["target"], "windows": windows}
+
+
+class ContractTests(unittest.TestCase):
+    def test_receipt_rejected_before_opening_untrusted_path(self):
+        accessed = []
+        def read(name):
+            accessed.append(name)
+            return b'{"admittedData":{"path":"must-not-open"}}'
+        with self.assertRaisesRegex(ValueError, "unaccepted_admission_receipt"):
+            c.verify_bound_reader(read)
+        self.assertEqual(accessed, [c.ACCEPTANCE_PATH])
+
+    def test_frozen_config_mutation_is_rejected(self):
+        receipt = (ROOT / c.ACCEPTANCE_PATH).read_bytes()
+        accessed = []
+        def read(name):
+            accessed.append(name)
+            return receipt if name == c.ACCEPTANCE_PATH else b'{"models":"changed"}'
+        with self.assertRaisesRegex(ValueError, "frozen_bytes_mismatch:config"):
+            c.verify_bound_reader(read)
+        self.assertEqual(len(accessed), 2)
+
+    def test_future_current_scores_and_market_columns_cannot_change_features(self):
+        rows, origin = fixture()
+        first = c.prepare_origin(rows, origin)
+        changed = copy.deepcopy(rows)
+        for row in changed:
+            row["spread"] = -1000
+            row["recorded_selection"] = "injected"
+            if row["week"] >= 2:
+                row["homeScore"], row["awayScore"], row["overtime"] = 200, 150, 1
+        second = c.prepare_origin(changed, origin)
+        self.assertEqual(first, second)
+        self.assertFalse(hasattr(first["targets"][0], "home_score"))
+        self.assertFalse(hasattr(first["targets"][0], "overtime"))
+
+    def test_truncated_future_and_reordering_invariance(self):
+        rows, origin = fixture()
+        self.assertEqual(c.prepare_origin(rows, origin), c.prepare_origin(rows[:-1][::-1], origin))
+
+    def test_12h_24h_and_strict_availability(self):
+        rows, origin = fixture()
+        self.assertEqual(c.prepare_origin(rows, origin, 12)["input_ids"], ["monday", "old"])
+        self.assertEqual(c.prepare_origin(rows, origin, 24)["input_ids"], ["old"])
+        # At exact availability, the result is still excluded (strictly-before rule).
+        origin["originAt"] = "2013-09-10T14:00:00+00:00"
+        origin["windows"]["12"] = origin["windows"]["24"]
+        self.assertEqual(c.prepare_origin(rows, origin, 12)["input_ids"], ["old"])
+
+    def test_forged_eligibility_availability_and_postkickoff_rejected(self):
+        rows, origin = fixture()
+        bad = copy.deepcopy(origin)
+        bad["windows"]["12"]["eligibleInputIds"].append("target")
+        with self.assertRaisesRegex(ValueError, "admission_asof_mismatch"):
+            c.prepare_origin(rows, bad)
+        badrows = copy.deepcopy(rows)
+        badrows[0]["availability"]["12"] = "2013-01-01T00:00:00+00:00"
+        with self.assertRaisesRegex(ValueError, "availability_proxy_mismatch"):
+            c.prepare_origin(badrows, origin)
+        badrows = copy.deepcopy(rows)
+        badrows[2]["kickoffAt"] = origin["originAt"]
+        with self.assertRaisesRegex(ValueError, "invalid_target_origin"):
+            c.prepare_origin(badrows, origin)
+
+    def test_ancestor_closure_hash_market_cycle_missing_and_future(self):
+        body = {"source": "synthetic_football"}
+        source_node = {"id": "source", "kind": "football_source", "body": body,
+                       "parents": [], "available_at": "2013-09-09T00:00:00+00:00"}
+        source_node["sha256"] = c.node_hash(source_node)
+        prediction = {"id": "forecast", "kind": "forecast", "body": {}, "parents": [{"id": "source", "sha256": source_node["sha256"]}]}
+        prediction["sha256"] = c.node_hash(prediction)
+        cutoff = datetime(2013, 9, 10, tzinfo=timezone.utc)
+        expected = {"forecast": prediction["sha256"]}
+        self.assertEqual(c.verify_ancestry([source_node, prediction], expected, cutoff), ["forecast", "source"])
+        for field, value in (("kind", "market"), ("available_at", "2013-09-01T00:00:00+00:00"), ("parents", [{"id": "missing", "sha256": "bad"}])):
+            with self.assertRaisesRegex(ValueError, "ancestor_hash_mismatch"):
+                c.verify_ancestry([source_node | {field: value}, prediction], expected, cutoff)
+        mutations = [("forbidden_ancestor_kind", {"kind": "market"}),
+                     ("future_ancestor", {"available_at": "2013-09-11T00:00:00+00:00"}),
+                     ("missing_ancestor", {"parents": [{"id": "unknown", "sha256": "unknown"}]})]
+        for message, changes in mutations:
+            changed = source_node | changes
+            changed["sha256"] = c.node_hash(changed)
+            out = prediction | {"parents": [{"id": "source", "sha256": changed["sha256"]}]}
+            out["sha256"] = c.node_hash(out)
+            with self.subTest(message=message), self.assertRaisesRegex(ValueError, message):
+                c.verify_ancestry([changed, out], {"forecast": out["sha256"]}, cutoff)
+        with self.assertRaisesRegex(ValueError, "ancestor_hash_mismatch"):
+            c.verify_ancestry([source_node, prediction], {"forecast": "wrong_root"}, cutoff)
+
+    def test_exact_path_reader_refuses_symlinks_and_returns_regular_bytes(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp).resolve()
+            original = root / "regular"
+            original.write_bytes(b"synthetic_fixture")
+            self.assertEqual(c.read_regular(original), b"synthetic_fixture")
+            link = root / "alias"
+            link.symlink_to(original)
+            with self.assertRaises(OSError):
+                c.read_regular(link)
+            directory = root / "directory"
+            directory.mkdir()
+            parent_link = root / "linked_directory"
+            parent_link.symlink_to(directory, target_is_directory=True)
+            with self.assertRaises(OSError):
+                c.read_regular(parent_link / "never_opened")
+
+    def test_unpinned_runtime_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "unpinned_numerical_runtime"):
+            c.runtime_manifest({"runtime": {k: "bad" for k in ("python", "numpy", "scipy", "pypdf")}})
+
+
+if __name__ == "__main__":
+    unittest.main()

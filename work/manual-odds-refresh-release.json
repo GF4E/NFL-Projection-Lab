@@ -1,0 +1,66 @@
+{
+  "feature": "Owner-only manual odds refresh and analysis reload",
+  "site_url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday",
+  "site_id": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+  "version_id": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_c890d0e43f1c819182dda2727855885b",
+  "version_number": 169,
+  "commit": "64df6ac42b6cf49e3962128e1ef22cf1f7a8d6b1",
+  "deployment_id": "appgdep_6a9d3ab143dc819190e03b57b13341f2",
+  "deployment_status": "succeeded",
+  "environment_revision": 29,
+  "validation": {
+    "focused_tests": 51,
+    "typecheck": "pass",
+    "changed_file_lint": "pass",
+    "production_build": "pass",
+    "active_build_graph": "pass",
+    "live_lines": {
+      "http": 200,
+      "count": 192,
+      "stale": true
+    },
+    "live_analysis": {
+      "http": 200,
+      "games": 16
+    },
+    "anonymous_refresh_post_http": 401,
+    "spoofed_identity_get_access": "sign_in"
+  },
+  "activation": "Complete: owner-authorized key installed as a private Sites secret; environment revision 29 deployed; real owner refresh published current quotes and rebuilt analysis.",
+  "configured_nonsecret_settings": [
+    "ODDS_REFRESH_OWNER_EMAIL",
+    "ODDS_REFRESH_ENABLED",
+    "ODDS_REFRESH_CREDENTIAL_GENERATION"
+  ],
+  "provider_requests_executed_this_turn": 0,
+  "runtime_policy": "Owner sign-in plus same-origin JSON POST; global five-minute cooldown; ordinary quota ceiling and essential future reserve; raw response storage; no automatic paid retries; analysis-only retry after successful odds publication.",
+  "research_goal": "Unchanged; historical model/source qualification is separate from this beta interface feature.",
+  "security_scan_notes": "No credential findings. Three personal-email detections are synthetic example.test fixture addresses. Two path review detections are build/test tooling paths. No actual owner email is embedded in source or browser assets.",
+  "activation_deployment_id": "appgdep_6a9d3c358eb48191a319137468b42da2",
+  "temporary_key_handoff_removed": true,
+  "live_activation_evidence": {
+    "lineCount": 192,
+    "currentGames": 16,
+    "staleGames": 0,
+    "stale": false,
+    "books": [
+      "betmgm",
+      "fanduel"
+    ],
+    "earliestQuoteAt": "2026-09-06T10:11:44Z",
+    "latestQuoteAt": "2026-09-06T10:12:16Z",
+    "analysisGames": 16,
+    "analysisGeneratedAt": "2026-09-06T10:13:59.843Z",
+    "latestManualRun": {
+      "snapshot_key": "manual-odds:2026-09-06T10:12:33.663Z",
+      "job": "manual",
+      "scheduled_for": "2026-09-06T10:12:33.663Z",
+      "game_id": null,
+      "status": "succeeded",
+      "started_at": "2026-09-06T10:12:33.663Z",
+      "completed_at": "2026-09-06T10:12:51.810Z",
+      "message": "Owner refresh published complete mainline quotes",
+      "quota_used": null
+    }
+  }
+}

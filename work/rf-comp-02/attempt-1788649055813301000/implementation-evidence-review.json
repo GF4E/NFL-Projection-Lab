@@ -1,0 +1,1135 @@
+{
+  "accepted_reference_pointers": {
+    "control3-full": {
+      "bytes": 5367,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-full-warmup-original.json",
+      "sha256": "4b94d9d36bea59490e2507bf6878e87ad06204c2a61a2eed33cf5cebce36560d"
+    },
+    "control3-independent_marginals": {
+      "bytes": 5349,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-independent_marginals-warmup-original.json",
+      "sha256": "914c9e1953557cd974ea42335a8ccbaa798d2cbfee92783f145899bbfca050d5"
+    },
+    "control3-zero_scoring_level_update": {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-zero_scoring_level_update-warmup-original.json",
+      "sha256": "2a53019761c7523da0a0f76f404955c45d23e20323b2a5649271d02415c81b77"
+    },
+    "control3-zero_strength_update": {
+      "bytes": 5399,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-zero_strength_update-warmup-original.json",
+      "sha256": "b0caecd14bf9d4088b901e53655324cc8b3652fe9de521c79b29ff3a3fe08b30"
+    },
+    "synthetic700-full": {
+      "bytes": 5370,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-full-warmup-original.json",
+      "sha256": "a0510dda0f1f94a019020c6e7c0c2cf6e8069c00dcd760495a48987b48b0e61e"
+    },
+    "synthetic700-independent_marginals": {
+      "bytes": 5354,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-independent_marginals-warmup-original.json",
+      "sha256": "f21f129071112c749c356fe96a829581f3650bc246460a17bd66576f23709938"
+    },
+    "synthetic700-zero_scoring_level_update": {
+      "bytes": 5407,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-zero_scoring_level_update-warmup-original.json",
+      "sha256": "3e521356dacab9ddf8d59eae9309b9123358a2a6794112dba1e61fe815341a91"
+    },
+    "synthetic700-zero_strength_update": {
+      "bytes": 5403,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-zero_strength_update-warmup-original.json",
+      "sha256": "d3e0a25454902032396108d7503d10024f371868386510b34f121174974cf8d9"
+    }
+  },
+  "additional_input_hashes": {
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/QUALIFICATION-SCOPE.md": "008be7c0e1c98577906893b68dff443593ee51ef3d1514112596c9989379287e",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/QUALIFICATION-PINS.json": "3fe288b5727703a2c10cfb67cfe71d3ea886eb99d650be35c4f03f6123b46c09",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/benchmark.json": "8d6bd85a91694b0331cfa2e36a1fbabc589b060753ac87be9b540d8045f408e3",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/implementation-evidence-review.json": "c5c0aa6b4ee7ae3c53010ef5d5a53a0987246dbf7a451b3b91e205a6513ac80d",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-full-warmup-original.json": "4b94d9d36bea59490e2507bf6878e87ad06204c2a61a2eed33cf5cebce36560d",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-independent_marginals-warmup-original.json": "914c9e1953557cd974ea42335a8ccbaa798d2cbfee92783f145899bbfca050d5",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-zero_scoring_level_update-warmup-original.json": "2a53019761c7523da0a0f76f404955c45d23e20323b2a5649271d02415c81b77",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-zero_strength_update-warmup-original.json": "b0caecd14bf9d4088b901e53655324cc8b3652fe9de521c79b29ff3a3fe08b30",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-full-warmup-original.json": "a0510dda0f1f94a019020c6e7c0c2cf6e8069c00dcd760495a48987b48b0e61e",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-independent_marginals-warmup-original.json": "f21f129071112c749c356fe96a829581f3650bc246460a17bd66576f23709938",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-zero_scoring_level_update-warmup-original.json": "3e521356dacab9ddf8d59eae9309b9123358a2a6794112dba1e61fe815341a91",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-zero_strength_update-warmup-original.json": "d3e0a25454902032396108d7503d10024f371868386510b34f121174974cf8d9",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/process.json": "847a5ec5352bc7e1c0c6d2a2fb040f7d7d26f6e0062a14bfa042f951ccaa2a29",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/unit-tests.json": "cfe042033ed008bfe4a357d1bb9a9bbb875f12ec8533feaed22e784a56b6442f",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/qualify.py": "8c9db8dc35d55f57a948aa34fe70d6d323825b92ede936f2ea119cacfaed34d8",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/SCOPE.md": "23333dc5b05636f13a2fa3bb4768e45fcf8dfa3d6f6d8ac350929ed848e71345",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/attribution-summary.json": "6974435a875a845a14d116205c34677e5e5c2abd7cf19ec397d0b3da4861c534",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/numerical-review.json": "5c970bb01414bb5b44b1993de0b543d56fd0178299a65a2e0aca7b2d5a010352",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/root-review.json": "974de8dcb75c202bcf3753bcd20d67e23764de94bdb2ebdfad0f6099748014f5",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/profile_remaining.py": "b88ee9ebea74a7d96da30cf91320867a47dd6d4dcbcad5a4883776e8684c414b",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/QUALIFICATION-SCOPE.md": "ae324e23eab0a88afd7a4160cd9692ae5ee1ef27343fc7140c998486665b5981",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/design-review.md": "3aae8d2dc54e7afea7ebc979ff4b73a724606bfa1ea9b2c154af9cdbe0249f42",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/preflight-review.json": "bb227d6acee885032d17aeb3c0bb5004a25af1527c72cb74d261458b4bd783bb",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/qualify.py": "e7fdbb791a1c36fe97e350cce25f043b05820ca8919f19122e037b92c5a53206",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/root-preflight.json": "09aa0f68113b6c478e47a91997f4fcbc43add05a551a8478be5fd2b6d85cda2a",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/controller-final-pins-20260905.json": "891d03da52317a62ee307e7c1c27b805413f6676520aa6acfd3651642de5f4f7",
+    "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_boost/__init__.py": "7b5fdae4df81069cfba9bd1578b43b14e114456f4e7d0ded578dbf7cc0d590e5",
+    "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_boost/ncx2_ufunc.cpython-312-darwin.so": "f47203b31e7f1d18e84f002079d0cd5de9bedb7c8939a84bcca09894cd7bf7a6",
+    "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_discrete_distns.py": "54931b8b4e1001dba0ef3b24eedda8dcdeb35b3c7f5c7df209e7d2f372983d67",
+    "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py": "dd09066972ed405f801782a11da98f0894894155de90e426917dad3695944efe",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-COMP-01-ACCEPTANCE.v1.json": "a72c214d8b03ac39d47e8b85ac8a5856bfa91e6aa336864393cd3e6b97d4d1d3",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-COMP-01-REMAINING-PROFILE-ACCEPTANCE.v1.json": "6b8530830efec814602b0807f600edf2bac2357161ddf3d151bcb755b434b85e",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py": "0ac0ecd32415720cc7e6fb1d2ec0c9229de3a46d6437d5ff380e9ebe2ee83661",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_skellam_compute.py": "3a88ed783f87cd9fdbfed9fae177edbb8d72d36be8fcfd5374a25a9c4ef8a7d0",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-probability-compute/test_probability_compute.py": "47b5b69c1a8a9ea033219a42ceead2c9f605d748bd133546d2c94149bb8b51c9",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-skellam-compute/test_skellam_compute.py": "d597718272262bf488e14da2ba023a1a5c9150933ca7abad53e9c329727b8a7d"
+  },
+  "attempt": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000",
+  "blockers": [],
+  "candidate": {
+    "bytes": 3937,
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_skellam_compute.py",
+    "sha256": "3a88ed783f87cd9fdbfed9fae177edbb8d72d36be8fcfd5374a25a9c4ef8a7d0"
+  },
+  "checks": {
+    "additional_sources_current_snapshots_before_after_exact": 36,
+    "all_input_snapshot_members_exact": true,
+    "callback_metadata_and_positive_finite_timing_rows_exact": 336,
+    "cases_exact": 8,
+    "cdf_ast_equal_after_only_two_helper_substitutions": true,
+    "complete_metric_fields_each": 104,
+    "descriptor_metric_bodies_and_hashes_equal_accepted_original": 168,
+    "each_mode_each_position_per_case": 2,
+    "fit_callbacks_total": 168,
+    "frozen_sources_current_before_after_exact": 66,
+    "law_hashes_equal_accepted_original": 168,
+    "measured_observations": 144,
+    "measured_observations_per_mode": {
+      "original": 48,
+      "poisson": 48,
+      "skellam": 48
+    },
+    "measured_rounds": 48,
+    "observation_bytes": 904107,
+    "observation_index_sha256": "b100ee7965418b5ded59d93f5aab607b415e5aae7c92b6331e95f3329575c4ed",
+    "observations_per_mode": {
+      "original": 56,
+      "poisson": 56,
+      "skellam": 56
+    },
+    "observations_total": 168,
+    "score_callbacks_total": 168,
+    "test_errors": 0,
+    "test_failures": 0,
+    "test_names_expected_logged_exact": 18,
+    "test_skips": 0,
+    "test_successes": 18,
+    "warmups": 24
+  },
+  "driver": {
+    "bytes": 12251,
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/qualify.py",
+    "sha256": "e7fdbb791a1c36fe97e350cce25f043b05820ca8919f19122e037b92c5a53206"
+  },
+  "driver_review": [
+    "Unittest suite is loaded from the pinned new test file, run failfast, persisted, and required to succeed without skipped tests before benchmark starts.",
+    "The unmocked benchmark selects original_score, prior.score_forecast, or candidate.score_forecast by the explicit original/poisson/skellam mode. Candidate scorer constructs SkellamDistribution, whose _cdf calls the new helper in exactly the correlated and independent margin branches.",
+    "The candidate helper uses the pinned SciPy private backend with length-one int64/float64 arrays, clipping and scalar extraction; unsupported arguments delegate unchanged to the generic public function. Actual passing focused tests exercise backend argument identity, dispatch and error outcomes.",
+    "Each benchmark observation invokes real _Assembly.resolve and separately times complete score_forecast with double_grid=True and diagnostics=True; one fit and one recovery are asserted. No cProfile or helper-only timer is used.",
+    "The original encoder is retained for every mode; no patch is applied by the benchmark. saved.encoded identity is asserted after every observation and at completion.",
+    "Complete descriptor/metric bodies are saved before equality checks against pinned earlier original references. All observations, including every warmup and rotated round, are present.",
+    "The retained source map and source snapshots authenticate the candidate, tests, driver, SciPy implementation/backend binary, prior accepted evidence and 66 original sources. No scientific module was imported or executed by this review."
+  ],
+  "evidence": {
+    "benchmark.json": {
+      "bytes": 1247139,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/benchmark.json",
+      "sha256": "7bd4b467883a6b3949adaa3898e6be219b9581acac8bde7e1049f348754c85d5"
+    },
+    "process.json": {
+      "bytes": 5684,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/process.json",
+      "sha256": "ad373d98b8d11bbacc88d56154c770c5a1861c5bbce77ea8c9b4977535b331f2"
+    },
+    "process.log": {
+      "bytes": 4375,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/process.log",
+      "sha256": "2061a550bc4e84f962f50ef9d82faa91544a6ce484e196117b2f5f082553acc3"
+    },
+    "source-map-after.json": {
+      "bytes": 16863,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/source-map-after.json",
+      "sha256": "68b50389563dde3ddb353e2cb0bcffd4dbc6af253ad3c82cc7181ad3078c58cc"
+    },
+    "source-map-before.json": {
+      "bytes": 16863,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/source-map-before.json",
+      "sha256": "68b50389563dde3ddb353e2cb0bcffd4dbc6af253ad3c82cc7181ad3078c58cc"
+    },
+    "unit-tests.json": {
+      "bytes": 130,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/unit-tests.json",
+      "sha256": "be5d127ed04bcb14f6b407f51a9a3a325e3881e81a8190951dbcc33fc229ba8a"
+    }
+  },
+  "input_pins": {
+    "bytes": 16863,
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/INPUT-PINS.json",
+    "sha256": "68b50389563dde3ddb353e2cb0bcffd4dbc6af253ad3c82cc7181ad3078c58cc"
+  },
+  "limitations": [
+    "This reviewer authored the focused tests; this is not independent numerical acceptance. Separate numerical and timing review remains required.",
+    "Passing finite synthetic cases do not prove equality on every admissible input or historical feasibility. Backend behavior is pinned to the recorded runtime and library source/binary hashes.",
+    "Canonical recovered-law hashes are retained and compared; raw law arrays and benchmark grids are not persisted for independent rehash here. The passing focused suite separately compares actual primary/doubled grid arrays and bounds.",
+    "Runtime/branch invocation evidence comes from the authenticated source, assertions and retained outputs, not an external instruction trace. No new profiling or callback invocation occurred during review.",
+    "The recorded process clock begins after importing time; interpreter startup and the final process-report write tail are excluded. Parent child-RSS sampling/wait accounting is not a historical runtime guarantee.",
+    "The benchmark deliberately uses a tiny genuine synthetic bank and bypasses archive admission/complete assembly construction. Unit/fixture computations are included in process resources but excluded from its 168+168 callback counters.",
+    "No historical admission, new historical score, bootstrap, model acceptance, restart or production authorization follows from this result."
+  ],
+  "observation_index": [
+    {
+      "bytes": 5367,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-0-original.json",
+      "sha256": "f7a0baac848fe0e0f36803ee269e60231cac95d3609be6839af1623106860454"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-0-poisson.json",
+      "sha256": "6f78b9c41129ee58beb15ab22c91ad74fc0f5bef72622a0cbd4c851d67aeca51"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-0-skellam.json",
+      "sha256": "5d383d4a8c492dbc466b43fc29efd5d6f0af404abdd5de8fcbc7dd3a1282c03e"
+    },
+    {
+      "bytes": 5368,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-1-original.json",
+      "sha256": "3f4adfd28758b0d3afeeb519fbeadc8a53a252d017da8e175ccc3d9ee6abeca7"
+    },
+    {
+      "bytes": 5367,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-1-poisson.json",
+      "sha256": "7bb88abd63984c1b0457fc5783991b67f22e03d66b44495d266dea64b39c5bf9"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-1-skellam.json",
+      "sha256": "4a33b702aee1900a55a25ea2e2b720d2d41d53a2c54d25e3ccb4ebb3b9e948a7"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-2-original.json",
+      "sha256": "87b5bcf362bd34e83b393ed84d2f6683be52a3ad686778ec7f29e8b37f482a5a"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-2-poisson.json",
+      "sha256": "5b990f9401068caaf7eb013976c5a2d84590f167a140561702d53422eb4d0400"
+    },
+    {
+      "bytes": 5367,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-2-skellam.json",
+      "sha256": "edcd82672818d41489de56188c49d7d6cc449e04302fda80f8a5aad3ba6350da"
+    },
+    {
+      "bytes": 5367,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-3-original.json",
+      "sha256": "470a8fdb7e1df0e274d0e313cc16d4a692b3f0bb7eb8a49f66ba7f94cc0ab79c"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-3-poisson.json",
+      "sha256": "de8f9e8f08d31642f853022f8d54cbd712c409ec09afb56ad7619ec75bef1f8e"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-3-skellam.json",
+      "sha256": "dc77f13c4b7f358297cddc2255172990e2282393a96420081ceb5560d4a271f7"
+    },
+    {
+      "bytes": 5368,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-4-original.json",
+      "sha256": "18865c740ed3f7a6d2049f34d7d3786cc2f38f5884c8cddb91e4b942ca925c19"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-4-poisson.json",
+      "sha256": "eaecc0f5bcaf449034b4e993644532f7c2062302107091f7baa5dc61b3c85250"
+    },
+    {
+      "bytes": 5367,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-4-skellam.json",
+      "sha256": "9612b3105a04d46b18d9a42ff53a8cca7b328fef3f431816e8ecd8e2e1f0340a"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-5-original.json",
+      "sha256": "7c7be6009c45c41b5354d18130ffa335b6b31814a51add858848143dcfff5d20"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-5-poisson.json",
+      "sha256": "2309826c3bf89260d508be089b51085b64aee4ae3357a46f8adf0bd60b299c63"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-repeat-5-skellam.json",
+      "sha256": "d696e23aad445b3b52aa94850e25ad3633a492937dca3308148d2e626d91d42b"
+    },
+    {
+      "bytes": 5367,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-warmup-original.json",
+      "sha256": "a368f981a1d1e16203a343a4648d68892fcc3b4e718c1aeaecc412a01de84f7d"
+    },
+    {
+      "bytes": 5365,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-warmup-poisson.json",
+      "sha256": "61dadcc6bce8760799cb62311b6e6f0d0473ce36efbe38e339b9a0f0b8a01335"
+    },
+    {
+      "bytes": 5366,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-full-warmup-skellam.json",
+      "sha256": "3bf72799f9341ce5673276730943401c7c402c1313e58b541bed439378b43a1a"
+    },
+    {
+      "bytes": 5349,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-0-original.json",
+      "sha256": "955c6630166a5860dca50331edcae53d8f2bb9c73b8db07fcc33f8e5d6ad85ca"
+    },
+    {
+      "bytes": 5349,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-0-poisson.json",
+      "sha256": "47f7449ac1298c3f87819c9bacb2650a60efef1061ca24b8a50909563a938a90"
+    },
+    {
+      "bytes": 5350,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-0-skellam.json",
+      "sha256": "266b62e7a6d131c40fea4d79471f33da80f25c46ae0858a480e3ce03ec0569ed"
+    },
+    {
+      "bytes": 5349,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-1-original.json",
+      "sha256": "efab47995cc700f2722bded9a04cab72b2d461572ed952c50cbb308055d3a06a"
+    },
+    {
+      "bytes": 5347,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-1-poisson.json",
+      "sha256": "54ea1cce77a62a162e4009c949f1f008945f565d49070bb4e97c6defeb641882"
+    },
+    {
+      "bytes": 5348,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-1-skellam.json",
+      "sha256": "b64290eb4d208fdcb0d0b29e52898e8094a3293de87d210e331eb28d8fa02695"
+    },
+    {
+      "bytes": 5350,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-2-original.json",
+      "sha256": "4b236a166176f56c0247b4c92f05dea8ab34a44c6e457305656ce4d5cc5d64ac"
+    },
+    {
+      "bytes": 5348,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-2-poisson.json",
+      "sha256": "9d917817f8da60139d2667689baa22243b16181386c5ac6bf02e5e589bb65e94"
+    },
+    {
+      "bytes": 5349,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-2-skellam.json",
+      "sha256": "a693fa3cad1cb395a47829acc99ec3c55fdfaa4fe898128a04994d75e229af9d"
+    },
+    {
+      "bytes": 5349,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-3-original.json",
+      "sha256": "74641892c2c66aed8c2c733d885761abf383ceaba17e6dfa8203810b439b3628"
+    },
+    {
+      "bytes": 5350,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-3-poisson.json",
+      "sha256": "93f6d72cc93305a2e9cd3cb5a9a199284f25694bde9e4383860a8bb602e9f425"
+    },
+    {
+      "bytes": 5348,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-3-skellam.json",
+      "sha256": "55dd006c86d224747d5f3d6a14a2a22850e4784b1da0ae77705c9e780e132d13"
+    },
+    {
+      "bytes": 5349,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-4-original.json",
+      "sha256": "fb271ba0b3db7474d4723b6343527f747e9094f2dfd46d8f40970b1be23f1682"
+    },
+    {
+      "bytes": 5348,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-4-poisson.json",
+      "sha256": "df4612e03cc4c4a1922b370593d008945a5e8cd6d81712894ab3541a8f4e68e2"
+    },
+    {
+      "bytes": 5349,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-4-skellam.json",
+      "sha256": "659b297350cd070932a66bad2f45444275f8858986edc0a4ec84aa64b83b580a"
+    },
+    {
+      "bytes": 5349,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-5-original.json",
+      "sha256": "fdb1e69f5377ec5e5ca1196ec1e7c56a03fb6a800a8f861cb9b43fee401099f4"
+    },
+    {
+      "bytes": 5348,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-5-poisson.json",
+      "sha256": "07e2f9d04efc21c7f893aef04c8baa88c1cd89d63ecf57ba076803882e871600"
+    },
+    {
+      "bytes": 5349,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-repeat-5-skellam.json",
+      "sha256": "a733a1f56752d5249bf76d678f5caeecfba3381639a9f956e778e2e877407df1"
+    },
+    {
+      "bytes": 5350,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-warmup-original.json",
+      "sha256": "f8b97d1988bc455525d42e1967596fd1496fabe71646d9c802509a35bdc6c200"
+    },
+    {
+      "bytes": 5348,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-warmup-poisson.json",
+      "sha256": "115f5e7daa58d538871ac46ec89f963d1c59028e3760b0036ffd7a68e2a4eb61"
+    },
+    {
+      "bytes": 5348,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-independent_marginals-warmup-skellam.json",
+      "sha256": "edbbc9d38ec59e3cb8ead328ee027a406fd47f248f3fa866f5a2a5baaa209865"
+    },
+    {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-0-original.json",
+      "sha256": "09d6a084581f0f105a4f2d2c7ac291d34c09c1ff6fcc8028c3f2a1a2a16c7dc4"
+    },
+    {
+      "bytes": 5404,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-0-poisson.json",
+      "sha256": "e50097ed99332412515317bb8b00544a8386eca4d365aa3028231cd73fad290b"
+    },
+    {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-0-skellam.json",
+      "sha256": "04988b9bd0cd6dce32d6a7cb8a164e69c5275d6fcecdf5c9575b61d3e0d6b158"
+    },
+    {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-1-original.json",
+      "sha256": "ac319d6224e7ffba96eccb61bf4ef87e6d2df65b82d85b9936491e7a5c76758f"
+    },
+    {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-1-poisson.json",
+      "sha256": "ee626c0f8a7796939f5337fd3742c5ed8d4e752b9d4ad0910dc88fd6990ae894"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-1-skellam.json",
+      "sha256": "6f1effc2863ece83736efa06266ac94e17a35ccd38cbaf72cd49413f74e60e1e"
+    },
+    {
+      "bytes": 5407,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-2-original.json",
+      "sha256": "fd753d56b35c4c369997540eceb2edf384dd12023e77bef81d7d4e068c25c1f0"
+    },
+    {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-2-poisson.json",
+      "sha256": "627241d7ae942d61d6c27048d80f4409f96c79cf1de65ed92e4a233c3404885c"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-2-skellam.json",
+      "sha256": "b18513a706cc5b22600e089ffd0dec65b2acb5fc23df626e2192b95774d45466"
+    },
+    {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-3-original.json",
+      "sha256": "91bbd85928d54fc08f2d79224bb1f0da2a5cbe6d1365aa72ca80a84498dacd04"
+    },
+    {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-3-poisson.json",
+      "sha256": "f6baeb6fb0c94ee51b53b5ab5e35eb773072a58d70d20ca29a12d8b7eb86484e"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-3-skellam.json",
+      "sha256": "13adff88faeb77e11c29e7fd12daf544fbe38cc77d8a947b87392150837ea5e9"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-4-original.json",
+      "sha256": "f529c06b6d5a6a0d434948f253324115edb9ede7c48384adf56668ba491e098a"
+    },
+    {
+      "bytes": 5404,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-4-poisson.json",
+      "sha256": "76d1e5aa2d844bb07bd75c7aaa372a3708bfea01de7dd5d70d77ccf6541509cf"
+    },
+    {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-4-skellam.json",
+      "sha256": "bb6717dd51eb9732ada170602bb0ee440498de38e33591e3a58f5592f87a79e0"
+    },
+    {
+      "bytes": 5404,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-5-original.json",
+      "sha256": "8d252547d70d34f600a923856ed787302452d78a3b3508fd65bc378934910163"
+    },
+    {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-5-poisson.json",
+      "sha256": "6a50ab0abba11c47fa0db7cb6c31aced3d66ccff0b44e0953ff8396ee1d5bad3"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-repeat-5-skellam.json",
+      "sha256": "73f890101cfbe68d6bfc926f61ae01f739bdc7d9f2a912dea95722d200529220"
+    },
+    {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-warmup-original.json",
+      "sha256": "d846225fa635309f49e5cc501b480267fe7996abb2ba0dc7dc16a795f7de8807"
+    },
+    {
+      "bytes": 5405,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-warmup-poisson.json",
+      "sha256": "0d397c9df406a14fa05146037d395397bc343a68f90a1d52f5d4676ffe21e5e5"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_scoring_level_update-warmup-skellam.json",
+      "sha256": "54673a8b941dd8760eab6836a9245c421c0d56cbfc44379266dd85e20a212b94"
+    },
+    {
+      "bytes": 5399,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-0-original.json",
+      "sha256": "a8bfa2894d0b6ab687138daff3f140cc7efe5213cd6fe919133f452bf38bb9a8"
+    },
+    {
+      "bytes": 5398,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-0-poisson.json",
+      "sha256": "da2f6a4c663c22f1a223522decf33184adc6aa38c4d33134ac0ee15042fd1e95"
+    },
+    {
+      "bytes": 5398,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-0-skellam.json",
+      "sha256": "170bfc5d7f33e471f0159782c922740c04b2b2ba2ff90f323b25c4f4f6865b92"
+    },
+    {
+      "bytes": 5399,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-1-original.json",
+      "sha256": "6b4b2415ec58fe5304776701e93345ce21705997739078e67a1885cdbc0c46e1"
+    },
+    {
+      "bytes": 5398,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-1-poisson.json",
+      "sha256": "1287fd3c434e8b64fc4c2a382edd765b40511953a2a57ebb561d4e4099a2ec04"
+    },
+    {
+      "bytes": 5399,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-1-skellam.json",
+      "sha256": "8c1e15abc4fe5a61b780febec61e534bcdaeab2f88be0a8b75beedb60753a8f2"
+    },
+    {
+      "bytes": 5399,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-2-original.json",
+      "sha256": "846929f7a60a47be83fd82f3b63a40de01653400d09f880b113dca94d1b78a13"
+    },
+    {
+      "bytes": 5397,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-2-poisson.json",
+      "sha256": "9ca5e2c1f2e55cbdf02cae564ab711683b195c47cfc76d28ef29c17bc6edd079"
+    },
+    {
+      "bytes": 5397,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-2-skellam.json",
+      "sha256": "ec4243b15c181df960965df2fc87ed8d6fbf59fa1ae97087ff63088c47e6693a"
+    },
+    {
+      "bytes": 5399,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-3-original.json",
+      "sha256": "279dbdd74a4ec5f0c5866ef7232a6cceaedbdad71c5f806e23c9f256bed01c74"
+    },
+    {
+      "bytes": 5397,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-3-poisson.json",
+      "sha256": "4496c70c978ad4b856faae81e6f4c0a34381cc8e0ce948690344c1f7538de65d"
+    },
+    {
+      "bytes": 5399,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-3-skellam.json",
+      "sha256": "034d3b8685cf3a602c1ae0ce52ca32efb384c71090b18bb0f6e0ef3baa08d8e6"
+    },
+    {
+      "bytes": 5398,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-4-original.json",
+      "sha256": "c356ca5d288e718dea3c75ec23bc08f5b13f754232dd1a6e596289e410ab96c5"
+    },
+    {
+      "bytes": 5398,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-4-poisson.json",
+      "sha256": "5a9f064de816b2706a4485eda33eb18cbd85f96b02d906da1f50862c7dba0ed3"
+    },
+    {
+      "bytes": 5397,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-4-skellam.json",
+      "sha256": "97d9ac818ec7c761fd6eb1d55fbb3050ce2c4ed08165d11791ed7b8442f1a611"
+    },
+    {
+      "bytes": 5399,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-5-original.json",
+      "sha256": "38ef37ef20c790b3b5018592b5aa05b026b0482e4a5764e453c36e92007a6dff"
+    },
+    {
+      "bytes": 5397,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-5-poisson.json",
+      "sha256": "808ed935066c5d1e3b688726a0ed52c3d2430aeaf1b7639bbbe92a03d14b6575"
+    },
+    {
+      "bytes": 5398,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-repeat-5-skellam.json",
+      "sha256": "a6acf4b4b4f689f51e51751bd18c3305b6a0bc1d855768d9bc7affebd8871e39"
+    },
+    {
+      "bytes": 5399,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-warmup-original.json",
+      "sha256": "a4e1b0c5ec1d3162918fbafc1ac92104f015be4ca9ae04787701afaa1c4d03e2"
+    },
+    {
+      "bytes": 5398,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-warmup-poisson.json",
+      "sha256": "eb3f14138df40fd486ed80b976776e76044f6488e41cef7712297f18168e4dc8"
+    },
+    {
+      "bytes": 5398,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/control3-zero_strength_update-warmup-skellam.json",
+      "sha256": "47b16b061331481d0be05cba3d69a2a637ac7471bcacd82f21aedc1ad220d9e5"
+    },
+    {
+      "bytes": 5372,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-0-original.json",
+      "sha256": "e8af9cc5408c3b33269ba9a7f473de0b1f13a67d72a2fbaa78e0f34582df9671"
+    },
+    {
+      "bytes": 5371,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-0-poisson.json",
+      "sha256": "64a6560f16fec149da16d3a797657e9a57357e49da87f7fda874682202324526"
+    },
+    {
+      "bytes": 5371,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-0-skellam.json",
+      "sha256": "92c869a33de3becdf32109d8efbf59d37944db05da88cd7eea4651eff7583dec"
+    },
+    {
+      "bytes": 5370,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-1-original.json",
+      "sha256": "0de3c5eb6886669e3450ac65f98b1f6bd85d3b760f548a312ae06d2ddf0f4af1"
+    },
+    {
+      "bytes": 5372,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-1-poisson.json",
+      "sha256": "30fa959da94d275d1cf0f1c5956583f652a9a2bf790d09ca15a851c2d57ce2e0"
+    },
+    {
+      "bytes": 5371,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-1-skellam.json",
+      "sha256": "d60758cca7a6b4e7ac51e204e2cb3ab94d23c6df0e9fe2761c73391829076f21"
+    },
+    {
+      "bytes": 5372,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-2-original.json",
+      "sha256": "800bc9c859075ebf631620a969b9e9018728a0aac07bfdc3c432c75f5869482e"
+    },
+    {
+      "bytes": 5370,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-2-poisson.json",
+      "sha256": "f55907d16632b7bd537ef80e036bb7b2b555a8908b71d458771c0cc154ab9e42"
+    },
+    {
+      "bytes": 5370,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-2-skellam.json",
+      "sha256": "5efe0b55d53376a11d202c2953054a27188c645cee6b1d2427880d1ef86a78eb"
+    },
+    {
+      "bytes": 5372,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-3-original.json",
+      "sha256": "6e1f172e35851d65ec4c9ab181e5d519ae49ba4896ac53b57321a88a51e41545"
+    },
+    {
+      "bytes": 5371,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-3-poisson.json",
+      "sha256": "886f0478448b7a58279859910ac748481c1566e39a7b85f506162c4680326bec"
+    },
+    {
+      "bytes": 5371,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-3-skellam.json",
+      "sha256": "97a202458c4ae5347d4b1a544d321d4768909c80b92b0b9a5f1cec677326f88e"
+    },
+    {
+      "bytes": 5372,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-4-original.json",
+      "sha256": "b00eebefa973265578ae981a95af07417cfa6d2941817e05466eefe128724749"
+    },
+    {
+      "bytes": 5369,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-4-poisson.json",
+      "sha256": "94de267b5cfde4a738526518340b558dd00ca294bc41f9fe664f2f0701730047"
+    },
+    {
+      "bytes": 5371,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-4-skellam.json",
+      "sha256": "d471132faa2d947d3a350715bb1aab6d49e2e0c73c71b9682351e9a05dfae715"
+    },
+    {
+      "bytes": 5370,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-5-original.json",
+      "sha256": "d98addabb7601a8da3eebeb44b896422a16095e6254837b1a5a30a839394bf24"
+    },
+    {
+      "bytes": 5372,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-5-poisson.json",
+      "sha256": "bf8d51bf2cdb4898d1e3ca4ff080acb743092c5e2e40c628e64e217065c83952"
+    },
+    {
+      "bytes": 5371,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-repeat-5-skellam.json",
+      "sha256": "2b6eeb7054582bd313f8b89ebfe620351ed96c0499dd21fe964aea62af98461d"
+    },
+    {
+      "bytes": 5371,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-warmup-original.json",
+      "sha256": "59b1698436fb4984598f765deaae174d2dcda294871d5327704b2a90354fae13"
+    },
+    {
+      "bytes": 5371,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-warmup-poisson.json",
+      "sha256": "df52b1a8323052c9dd1a5b64ab4aa42770d96cd495590502b11078dc34e891b5"
+    },
+    {
+      "bytes": 5370,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-full-warmup-skellam.json",
+      "sha256": "d77bb27e58488c27c0a9c87cec1a3f19f21f48b81a45fb0648036b060c51d3c6"
+    },
+    {
+      "bytes": 5355,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-0-original.json",
+      "sha256": "47d43e795db29548d746cc3bb8e6c46b3df6b604a983aa77c78e57c9104a45d8"
+    },
+    {
+      "bytes": 5351,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-0-poisson.json",
+      "sha256": "838b17830d5ae2e5d1f34f068a833966d661c44262290dfe3e1020dc6f5f699a"
+    },
+    {
+      "bytes": 5353,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-0-skellam.json",
+      "sha256": "3ec4251918d3ea613f8d9615d84a00a86cd3ecdb51b21e7de936210416796e3e"
+    },
+    {
+      "bytes": 5353,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-1-original.json",
+      "sha256": "2832519fd442b707bae37006359dd9cf12d6cef64cfd101123a291d5edd9d2ae"
+    },
+    {
+      "bytes": 5351,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-1-poisson.json",
+      "sha256": "e61e963ddb46b722631d3ae806d8b65e58300e5bde69f0cfdbe4f78168a9726a"
+    },
+    {
+      "bytes": 5353,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-1-skellam.json",
+      "sha256": "6348683ca08a2fa17ad2d5ebbc4f5ba9025239fc7c3ee046120dfab6d734c441"
+    },
+    {
+      "bytes": 5355,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-2-original.json",
+      "sha256": "5b9d0a473668c241544e0be7c65ad471bfbccf706c513fdff68463996f0f80a3"
+    },
+    {
+      "bytes": 5354,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-2-poisson.json",
+      "sha256": "79951dda341f18ada6e889352a357245a49327748e81b5e5dca4a55bdcba7d6c"
+    },
+    {
+      "bytes": 5354,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-2-skellam.json",
+      "sha256": "f2dd1e99e89201c08fc59637b13385b71d87d958cda7673feba71b01d8df0c33"
+    },
+    {
+      "bytes": 5353,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-3-original.json",
+      "sha256": "3e27727fae5287564fc8fe1b721b700930100ecda371015fc24961df90b44c53"
+    },
+    {
+      "bytes": 5354,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-3-poisson.json",
+      "sha256": "3ee8b0bc759d3123aef4c16e46adeb76928bc95844512f401c6b9ab3163b9d60"
+    },
+    {
+      "bytes": 5354,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-3-skellam.json",
+      "sha256": "23b233939da4ba58679e8eef0a293eb2b6c177b3664913ae318cebbce32e0f30"
+    },
+    {
+      "bytes": 5354,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-4-original.json",
+      "sha256": "15fd291dc3e91533e1468a11f00f18b909d446e253addc31ef9b2f5defb712eb"
+    },
+    {
+      "bytes": 5353,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-4-poisson.json",
+      "sha256": "3255ef3d1c690a1fcd556f5d4853a086ec53507aa1c5d7e57e1b7ea2e472bd26"
+    },
+    {
+      "bytes": 5354,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-4-skellam.json",
+      "sha256": "3837975e56118b11c15bba8783d0fd4ecfef81a41ac5fd84c349779e65476e56"
+    },
+    {
+      "bytes": 5353,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-5-original.json",
+      "sha256": "0d5ce308be49660fb029cbf75a2001e963a9a509f417fa8b0b25b07f30c7838d"
+    },
+    {
+      "bytes": 5354,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-5-poisson.json",
+      "sha256": "36772430e955336343ae2400799355dabef7c2c7a8a783dd18f55d1fdd858c90"
+    },
+    {
+      "bytes": 5353,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-repeat-5-skellam.json",
+      "sha256": "051d4a4b6f4cce6fab7fa251ea2fd1fbff7bdc1d0ae8274e8c74f02cb3ee79e3"
+    },
+    {
+      "bytes": 5355,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-warmup-original.json",
+      "sha256": "d8f5c7b33567c6e9207a0cf47f582708ea971f6c921a623bc013d3998fdc0387"
+    },
+    {
+      "bytes": 5354,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-warmup-poisson.json",
+      "sha256": "cb9166245027e84cc88144e34a5b2de97220a1d428e08065003a73a7a6ff2d2d"
+    },
+    {
+      "bytes": 5353,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-independent_marginals-warmup-skellam.json",
+      "sha256": "7e8ef50172bb4ced56fd2bdbe157a3d4c83a0985418e0d83109dfb45efe042e7"
+    },
+    {
+      "bytes": 5408,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-0-original.json",
+      "sha256": "2d408d62f74b5c71d09474ec2fcf5b36f66dd76c6533f2ad2d90a9c8a4871c11"
+    },
+    {
+      "bytes": 5407,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-0-poisson.json",
+      "sha256": "1c627b7cae3b5c854a5bdf8fe63d29c3ad93bc80a244deb0dffb47974acc3981"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-0-skellam.json",
+      "sha256": "101f4af2bdfe3a34611968bae18a1c234058d63b2bbb159b3cbf9622257f5dd3"
+    },
+    {
+      "bytes": 5407,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-1-original.json",
+      "sha256": "9398d2515e815f080ad72b516abc0b74654cf6621b3221eed1743f63c444acd0"
+    },
+    {
+      "bytes": 5407,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-1-poisson.json",
+      "sha256": "6bdd4d57cc5369a1a99c65eba39254dadca16f68b85e12065221469bf0bca5ce"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-1-skellam.json",
+      "sha256": "5bb9c8f7d9b11b48c7f56d738c069da8c25acc832dd0a16cc2d8b9e252db8483"
+    },
+    {
+      "bytes": 5408,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-2-original.json",
+      "sha256": "b06338656ea9f3300e1a5fe865aa90f888e4ea4410813f742f767dcf73ae6247"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-2-poisson.json",
+      "sha256": "e18070b5a4632cbc7f7c82de4aefaabe60f26f6666facaa621f18c60c4b883d2"
+    },
+    {
+      "bytes": 5408,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-2-skellam.json",
+      "sha256": "ddc1e02038d04fe6c71598b9a51352a38fab22e60c296d281733dbc6a7065d1a"
+    },
+    {
+      "bytes": 5407,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-3-original.json",
+      "sha256": "41bcde370afb3c54448ca646464df560ddebeadd6eb673d92356ce080d56a5c8"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-3-poisson.json",
+      "sha256": "dfd5388785ab1c147692fc7db69b5a9e2fed565871ac311111ea18953fe84a7b"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-3-skellam.json",
+      "sha256": "5d0117d3d2b9a658438d66c69794c8e598868b485f2e6bdaa70023b5dff174df"
+    },
+    {
+      "bytes": 5408,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-4-original.json",
+      "sha256": "1834466679e83ef271d58c3ffd824e567ba6f6a860dafcfdcb7bad69522aa81c"
+    },
+    {
+      "bytes": 5408,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-4-poisson.json",
+      "sha256": "62e78db5e19d031bd1912ee9a05b2d2562b5e0552e9b4cf58bafca3b69893033"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-4-skellam.json",
+      "sha256": "01d895abe7831ffba49dd362ab2464cacabbe4dae916f92c008be45faea7395c"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-5-original.json",
+      "sha256": "3b7800987788aed1c71505b89c3465535eb6683d8440dcbf7b19cacde5aac2dc"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-5-poisson.json",
+      "sha256": "063691de6c6a52dbe2238ca3e793044333b8a8ee5025a5f8d5a572441b927893"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-repeat-5-skellam.json",
+      "sha256": "5bdb0e14ffb0c019c5773c2af60da776b210589cbf65ebbced910bfc66b87708"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-warmup-original.json",
+      "sha256": "122bb00a173cc69813d4aaa45750ebc9b19fe2103a6580567c47eb470ed12bb8"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-warmup-poisson.json",
+      "sha256": "37715ca88543a959d7d86d343d11bf31cc20df89e7a47597dedd757b37d1bc7f"
+    },
+    {
+      "bytes": 5406,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_scoring_level_update-warmup-skellam.json",
+      "sha256": "79c4accca5aa4ed223c96619772c7476a9f1cc7ff94e99ae228c2c32ed36f06c"
+    },
+    {
+      "bytes": 5404,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-0-original.json",
+      "sha256": "de32583380a255a8d654f25d457bdaa359d3dac7a478e6d14610bb5d341c148b"
+    },
+    {
+      "bytes": 5403,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-0-poisson.json",
+      "sha256": "4bbfd637f6bfc6c9e90a8f2acebc2e17044864cb31a4cb0f196f6a6eef28ddcf"
+    },
+    {
+      "bytes": 5402,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-0-skellam.json",
+      "sha256": "37305877835fffe3f1b278594de4d428b3dafb8fb536d8055ef40dc6c67b814f"
+    },
+    {
+      "bytes": 5404,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-1-original.json",
+      "sha256": "55d22040fd204b21d14771b2373ecfbff4c1b51ca8ee0f2874b6a13cc7eff535"
+    },
+    {
+      "bytes": 5403,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-1-poisson.json",
+      "sha256": "7fdf6c10a62e0d625c70461ef6de1c6afd3af110a048b1a14d9e429f0c92b700"
+    },
+    {
+      "bytes": 5403,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-1-skellam.json",
+      "sha256": "33f0df4054e92f47b604ca8d1637a54f53cb315e3e6bf3a0dfea2e3db3ee5e28"
+    },
+    {
+      "bytes": 5403,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-2-original.json",
+      "sha256": "e91b6733e897cb5b5d93a54ee5be3b7b1591333c25145a697f5ee631589803b3"
+    },
+    {
+      "bytes": 5403,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-2-poisson.json",
+      "sha256": "d19e6ee6f5537fb9f4e2499dcf99720e07a50e0cd7132a38ddbf1e9dd18f4146"
+    },
+    {
+      "bytes": 5402,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-2-skellam.json",
+      "sha256": "a4c2c1b60c271b37347ec28b856736fa331087c6f06430c632df9436d67f98e1"
+    },
+    {
+      "bytes": 5404,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-3-original.json",
+      "sha256": "77ee179f6de5d4216ee08d50063f9417f6e4bb01601719a074e3b66e374b3cc1"
+    },
+    {
+      "bytes": 5402,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-3-poisson.json",
+      "sha256": "f402698ff6ed1c5a8db037c9e9c0254da33b598ed242d9473fe04360ee614c7d"
+    },
+    {
+      "bytes": 5402,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-3-skellam.json",
+      "sha256": "5b20222239a06876407c36dcca2f174df87cb57a34359717cf5cf2e0cdd7ed48"
+    },
+    {
+      "bytes": 5403,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-4-original.json",
+      "sha256": "a251cb799bbf471ee4ed4116f030d22ecf155cc92e74592da2dc3e699ef2bde2"
+    },
+    {
+      "bytes": 5403,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-4-poisson.json",
+      "sha256": "cdd656b0d1c7d9d687b156f2577172e15c1d831ee3173d74313b0844d53170a9"
+    },
+    {
+      "bytes": 5403,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-4-skellam.json",
+      "sha256": "2545b8ff3ec0fa0887ec644da95ddd2ae678c2d60ae2722fb0427fc808e39619"
+    },
+    {
+      "bytes": 5404,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-5-original.json",
+      "sha256": "d9cebd029f26c8136973b68c607c8533caa195a1f8b590cf41b991d6e96b9491"
+    },
+    {
+      "bytes": 5403,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-5-poisson.json",
+      "sha256": "9c98f0c461a8fa62edfb6f9b87581c2a1ad6619499daa9b97eb8bcc91e2456eb"
+    },
+    {
+      "bytes": 5404,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-repeat-5-skellam.json",
+      "sha256": "4b845483e6aa76f9b8aebf43cd755d3116d9f247d84ab03d14e9db5813c4d165"
+    },
+    {
+      "bytes": 5404,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-warmup-original.json",
+      "sha256": "ff748e1d2d6bb18bca37aed0a9db71d6fcb7f72350373b06254b7356b5824029"
+    },
+    {
+      "bytes": 5403,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-warmup-poisson.json",
+      "sha256": "c0fb8e78ce49ffd954a252c4673ba4d6a421a74ae2b64d45c60f08d41da9b1cc"
+    },
+    {
+      "bytes": 5402,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/observations/synthetic700-zero_strength_update-warmup-skellam.json",
+      "sha256": "5c739d1135f9c29cb5823d407b6685541e4a10bf67bac43067c989f75d3bce7c"
+    }
+  ],
+  "prior_candidate": {
+    "bytes": 4342,
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py",
+    "sha256": "0ac0ecd32415720cc7e6fb1d2ec0c9229de3a46d6437d5ff380e9ebe2ee83661"
+  },
+  "resources": {
+    "exit_code": 0,
+    "peak_child_rss_mib": 186.671875,
+    "rss_limit_mib": 1024,
+    "source_error": null,
+    "stop": null,
+    "wall_limit_seconds": 60,
+    "wall_seconds": 3.463716583006317
+  },
+  "reviewer_role": {
+    "candidate_author": false,
+    "independent_numerical_acceptance": false,
+    "qualification_driver_author": false,
+    "test_author": true
+  },
+  "scope": "test_log_source_binding_saved_output_and_driver_wiring_review",
+  "scope_document": {
+    "bytes": 4774,
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/QUALIFICATION-SCOPE.md",
+    "sha256": "ae324e23eab0a88afd7a4160cd9692ae5ee1ef27343fc7140c998486665b5981"
+  },
+  "source_hashes": {
+    "scripts/research_score_compute_distribution.py": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1",
+    "scripts/research_score_compute_qualify.py": "41edf4cc2bc217fd0947aa2ad17e6112fd20e1aedc93b7eeb7ab0aae0ea77dcb",
+    "scripts/research_score_compute_run.py": "7089fc64b6464dadfddb4796059a975afe7f1fd43730420d8d8193d67104208f",
+    "scripts/research_score_conditional_adapter.py": "a6987485724c7f725661927e194ca39d77b303e15d868b872d3b9449a7cc19f2",
+    "scripts/research_score_conditional_admission.py": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+    "scripts/research_score_conditional_inference.py": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604",
+    "scripts/research_score_conditional_margin.py": "c1a0e334229999afe5bb000598ae0648789cc8ee0e112291b03707039015ad3d",
+    "scripts/research_score_conditional_policy.py": "aa72dc1799669340f3dbec32c5b6510f673ea70bba3d27b2315c311849a4551d",
+    "scripts/research_score_conditional_qualify.py": "cb0a13eb0afacb2a4ccde7826bc2288a31677853b71d061c5ccc477eca0647f6",
+    "scripts/research_score_conditional_replay.py": "8eae09d2b3cb7aec7a2e6fbe265679be39eea5dbf6bd327f24f75d9022f65b45",
+    "scripts/research_score_conditional_run.py": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+    "scripts/research_score_contract.py": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+    "scripts/research_score_distribution.py": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+    "scripts/research_score_inference.py": "4b61e0d4477eb49064353d9fd7b4e1c6ac37fc68553e0df0387d9f71bb8db078",
+    "scripts/research_score_metrics.py": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97",
+    "scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+    "scripts/research_score_replay.py": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594",
+    "scripts/research_score_run.py": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa",
+    "scripts/research_score_split_archive.py": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+    "scripts/research_score_split_budget.py": "0ee4dd5e7936a333fed6b2804f530bf310f588b811af41e3c8a5af1a335388ea",
+    "scripts/research_score_split_controller.py": "7f82f65839a53e7fd91fa09e531ad2b758dc6c7ffeed6503cc4c0b7e9643d28b",
+    "scripts/research_score_split_forecast.py": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34",
+    "scripts/research_score_split_grade.py": "042ed7773ee8e0fa0979eb22b7a2bc20f699c8ec2e2a05f761fce80a5aa81f4e",
+    "scripts/research_score_split_inference.py": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22",
+    "scripts/research_score_split_models.py": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+    "scripts/research_score_split_preflight.py": "301b97a6a25e6bca92b99f220657ae54039774122c3e6a65071eefa7d4c79d51",
+    "scripts/research_score_split_replay.py": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547",
+    "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+    "scripts/research_score_split_watchdog.py": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7",
+    "scripts/research_score_successor_distribution.py": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974",
+    "scripts/research_score_successor_qualify.py": "8fa0fb3f298bfa8419d535411b5bad7002fc56de3181d839ee4d047fcd45f7d3",
+    "scripts/research_score_successor_run.py": "b54c265c87a09d2ef9325363f668f3dd5a58cb49c54b82cd8286fdb61bd81459",
+    "tests/research-score-compute/test_cache.py": "a8dd3bf3721a91853eba32344a9301388fa9bd90b52b3c9997fb9c76ad3843dc",
+    "tests/research-score-compute/test_compute_qualify.py": "f12a8f493091c6d08ebfa6572b7a05010d02eb70e7dfaca0a96e64a0da280296",
+    "tests/research-score-compute/test_compute_run.py": "1c8e41eb477f3e86a2d5406dd1119b74f2c0d899c79bab2acb069fb2feb4bf76",
+    "tests/research-score-conditional-margin/test_adapter.py": "431326f6933504c315720c91492b38ef7fd42a2ceb182eb154658ea8d2771c99",
+    "tests/research-score-conditional-margin/test_admission.py": "416550a5459c6ae635db0dfbe35b27e1a51cd57501ec4c234f190c0b5c4249bb",
+    "tests/research-score-conditional-margin/test_conditional_margin.py": "53b18c9ee869696e13e552b9d01bdb8f79b9a1f1d4eb6973ae89420427f0809b",
+    "tests/research-score-conditional-margin/test_inference.py": "598d40031b1630993ff2f2aceb13a7d280dc86a5d4789e572c383d54da1ea629",
+    "tests/research-score-conditional-margin/test_policy.py": "64f8fea7fed97c356bbf221f5630b4fdc2ae0ada43118b85070c3a33b560b44d",
+    "tests/research-score-conditional-margin/test_qualify.py": "aace76b001643345bb5eadc1bd1fc05bc6745bb64fb6b662ef33f7f131e18341",
+    "tests/research-score-conditional-margin/test_replay.py": "6798aec8b7141819d9168bd736e18bf7b4cad7c348d776cdd8268a0569316fb7",
+    "tests/research-score-conditional-margin/test_run.py": "7720f9264d167b610f12971925d416bdef0c9ea08ce4a3cfdc0b193a4562621c",
+    "tests/research-score-split/qualify_inference_unit.py": "bdc7016088a8e094e1c4c023e962b0be4935065d5f63df0c9c11e1bf6ef824d3",
+    "tests/research-score-split/test_archive_unit.py": "510c10f77c194dcb5c9591404c5238f43f494659aa96a247db0013ffd3f2969e",
+    "tests/research-score-split/test_bank_unit.py": "326837b37b50c1045b9ba830359a863b48db13c01c48d4b8a782d663184c8973",
+    "tests/research-score-split/test_budget.py": "64cf75c26cec296bc996f37b7f1109d6f0c546ff0a9ae52452c3c9af74f46bc9",
+    "tests/research-score-split/test_controller_unit.py": "dd088f744f441f7dd8bae82751ec2edf673770ea05548d38bea8e24406b891c7",
+    "tests/research-score-split/test_forecast_unit.py": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312",
+    "tests/research-score-split/test_grade_unit.py": "a99289bd9341bbd202107d7491bd9ad8a8022505b57b38ede9db2114b5ccfea1",
+    "tests/research-score-split/test_inference_unit.py": "6678ff40c73b2d5c493cd22d6e2321f7d9edb2d6d5b0a1241c29420c33e9040d",
+    "tests/research-score-split/test_mean_unit.py": "622c7f2f97da6c7f49bbc050ad6d7b583cd3da474b0eeb318dcbb21be6cf3799",
+    "tests/research-score-split/test_preflight_unit.py": "f326f9ca55dd2b30fe2753c0c7cc06505bf894befa2cd51abe8a0737a7cac05a",
+    "tests/research-score-split/test_run_unit.py": "a96576b22bd4c55ed8adf34d49ad78ee783605fe75a3f2f263f17a8c092bd42c",
+    "tests/research-score-split/test_watchdog_unit.py": "1cb98cd59db38847b7ddf3c0440e17f5e20cd9ffcd947b7aec5386a6f2ed5024",
+    "tests/research-score-successor/test_qualify.py": "9eaac19131c06877d9010b48a37315c0dc52d10639aa67faf331ecc1df633c23",
+    "tests/research-score-successor/test_solver.py": "0283d8c2e4d10b34e7552c5750a565e72b9a03b30ca658996089a4a966e5cfc2",
+    "tests/research-score-successor/test_successor_run.py": "a53ca0c80ec71f00e453599a7218d179d6dc5442ba6e407d726a24f608627755",
+    "tests/research-score/test_contract.py": "64157ed50c999e3ecba3b84b0da20afd88074544e957e16d3470d264a60b8bf2",
+    "tests/research-score/test_distribution.py": "b671c6a4b97757a8122a54b98491a4ca79952cceb78a2985c685a9d630f7fc14",
+    "tests/research-score/test_inference.py": "367bcb3e9bf989bae2c9773e82a0b6701b5a8c36bf9347026e3f3dca0f6d293a",
+    "tests/research-score/test_invariance.py": "e192da8539080a0be836ded37a802403bc5d171c148a3edd357db978ad98f50c",
+    "tests/research-score/test_mean_models.py": "fd625bdc03d53e725539ed9517d0c1a5fa5f5caf6fbb331ee3ab2627ffa9a8e7",
+    "tests/research-score/test_metrics.py": "3bd12882c193abe4eb716ddd4fc0b7871fa104a27e526c7187f27c9b44760f91",
+    "tests/research-score/test_replay.py": "ce21d82a17e3878a6ce80095faf5c267d51751df78318b10504d46a86e0a44b9",
+    "tests/research-score/test_run.py": "1b8fe02cc57bdfb95f190c03a49eb16669c3c5aab79f61c383d7e08d778ad58e"
+  },
+  "status": "accepted_retained_synthetic_qualification_evidence_only",
+  "tests": {
+    "bytes": 19939,
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-skellam-compute/test_skellam_compute.py",
+    "sha256": "d597718272262bf488e14da2ba023a1a5c9150933ca7abad53e9c329727b8a7d"
+  },
+  "unit_seconds": 0.2846707919961773,
+  "warnings": [
+    {
+      "count": 3,
+      "interpretation": "Three test-inspection warnings are visible; they are outside candidate/oracle warning capture. No failed warning-equivalence assertion or numerical error is reported.",
+      "kind": "FutureWarning",
+      "origin": "test helper array_state reads broadcast-array writeability during backend argument comparison"
+    }
+  ]
+}

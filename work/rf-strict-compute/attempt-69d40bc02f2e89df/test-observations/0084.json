@@ -1,0 +1,29 @@
+{
+  "candidate": {
+    "ascii_body": "[\n  7.0,\n  -0.0\n]\n",
+    "bytes": 18,
+    "kind": "bytes",
+    "sha256": "c6d7dd57e665804993912e9fe7fd36dfea50d8e5181a4fe1871831fd9d920204",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true
+  },
+  "input": {
+    "bytes_hex": "0000000000001c400000000000000080",
+    "dtype": "<f8",
+    "shape": [
+      2
+    ]
+  },
+  "label": "mutable-array-3",
+  "original": {
+    "ascii_body": "[\n  7.0,\n  -0.0\n]\n",
+    "bytes": 18,
+    "kind": "bytes",
+    "sha256": "c6d7dd57e665804993912e9fe7fd36dfea50d8e5181a4fe1871831fd9d920204",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_mutations_between_calls_and_same_shape_replacement"
+}

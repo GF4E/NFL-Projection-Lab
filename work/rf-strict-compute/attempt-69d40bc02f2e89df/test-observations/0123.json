@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit",
+    "module": "builtins",
+    "type": "ValueError"
+  },
+  "eligibility": {
+    "actual": false,
+    "expected": false,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "decimal-digit-limit-over",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "list"
+  },
+  "label": "decimal-digit-limit-over",
+  "original": {
+    "kind": "error",
+    "message": "Exceeds the limit (4300 digits) for integer string conversion; use sys.set_int_max_str_digits() to increase the limit",
+    "module": "builtins",
+    "type": "ValueError"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_python_decimal_conversion_boundary_unchanged"
+}

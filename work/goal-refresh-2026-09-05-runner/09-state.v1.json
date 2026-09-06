@@ -1,0 +1,61 @@
+{
+  "version": "engine-os.quality-gate-state.v1",
+  "updatedAt": "2026-09-05T07:04:54.979356+00:00",
+  "predictiveResultStatus": "historical_only",
+  "lastDeepGate": {
+    "id": "2026-09-05-rf02d-runner-readiness-review",
+    "observableGoalTokens": 6073811,
+    "decision": "fix_runner_failure_prefix_and_bound_finalization_then_complete_synthetic_qualification"
+  },
+  "lastProgressPulse": {
+    "id": "2026-09-05-rf02d-runner-readiness-review",
+    "observableGoalTokens": 6073811,
+    "decision": "fix_runner_failure_prefix_and_bound_finalization_then_complete_synthetic_qualification"
+  },
+  "current": {
+    "observableGoalTokens": 6073811,
+    "packageAttemptsSinceDeepGate": 0,
+    "latestFailureSignature": "rf02s_pilot_projected_budget_exceeded",
+    "consecutiveSameFailureCount": 1,
+    "phaseBoundary": false
+  },
+  "thresholds": {
+    "progressPulseTokens": 100000,
+    "deepGateTokens": 500000,
+    "packageAttemptsBeforeDeepGate": 3,
+    "repeatedFailureCountBeforeDeepGate": 2,
+    "minimumProspectiveWeeksForPromotion": 8,
+    "minimumGradedGamesForPromotion": 128
+  },
+  "activePackage": {
+    "id": "RF-02D-inference-and-integrated-runner",
+    "executionStatus": "runner_orchestration_implemented_failure_path_fixes_and_tests_pending",
+    "agentEvidenceQuestions": [
+      "integrated_runner_implementation",
+      "independent_integrated_numerical_qualification",
+      "independent_integrated_temporal_persistence_qualification"
+    ]
+  },
+  "recordedDueState": {
+    "progressPulseDue": false,
+    "deepGateDue": false
+  },
+  "counterDomain": {
+    "threadId": "01a06e57-ea63-71c1-9c75-ba48f42d3a2c",
+    "priorDomainSnapshot": {
+      "lastDeepGate": {
+        "id": "2026-09-04-rf04-data-feasibility",
+        "observableGoalTokens": 31246936,
+        "decision": "block_player_fit_await_public_data_audit_permission"
+      },
+      "lastProgressPulse": {
+        "id": "2026-09-04-rf04-data-feasibility",
+        "observableGoalTokens": 31246936,
+        "decision": "block_player_fit_await_public_data_audit_permission"
+      },
+      "lastRecordedTokens": 31246936,
+      "sourceThread": "019ff283-4d9c-72b1-9d95-9d8c53784bad"
+    }
+  },
+  "independentScientificAcceptance": "accepted_historical_reject_all_with_retrospective_limits"
+}

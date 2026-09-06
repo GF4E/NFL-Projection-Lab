@@ -1,0 +1,274 @@
+"""Synthetic-only adapter for the qualified finite conditional contraction."""
+from dataclasses import fields
+import hashlib
+import json
+import math
+
+import numpy as np
+from scipy.stats import poisson
+
+from research_score_conditional_margin import contract_conditional
+from research_score_distribution import JointDistribution
+
+
+VERSION = 'rf02d-conditional-adapter-v1'
+MAXIMUM_TOTAL = 200
+MAXIMUM_INPUT_ATOMS = 65536
+MASS_TOLERANCE = 1e-12
+MOMENT_TOLERANCE = 1e-10
+
+
+class ConditionalAdapterFailure(ValueError):
+    pass
+
+
+def _array(value, name, shape=None):
+    if type(value) is not np.ndarray or value.dtype.kind not in 'biuf':
+        raise ConditionalAdapterFailure('invalid_' + name)
+    if shape is not None and value.shape != shape:
+        raise ConditionalAdapterFailure('invalid_' + name + '_shape')
+    if not np.all(np.isfinite(value)):
+        raise ConditionalAdapterFailure('nonfinite_' + name)
+    return value
+
+
+def _scalar(value, name):
+    number = np.asarray(value)
+    if number.ndim != 0 or number.dtype.kind not in 'biuf':
+        raise ConditionalAdapterFailure('invalid_' + name)
+    converted = float(number)
+    if not math.isfinite(converted):
+        raise ConditionalAdapterFailure('nonfinite_' + name)
+    if number > 0 and converted == 0:
+        raise ConditionalAdapterFailure(name + '_underflow')
+    return converted
+
+
+def _validate(distribution):
+    if type(distribution) is not JointDistribution:
+        raise ConditionalAdapterFailure('requires_exact_joint_distribution')
+    if not isinstance(distribution.independent, (bool, np.bool_)) or distribution.independent:
+        raise ConditionalAdapterFailure('independent_distribution_not_supported')
+    atoms = _array(distribution.atoms, 'atoms')
+    if atoms.ndim != 2 or atoms.shape[1] != 2 or not len(atoms):
+        raise ConditionalAdapterFailure('invalid_atoms_shape')
+    # Inspect bounds before conversion to integer or allocating dense vectors.
+    if len(atoms) > MAXIMUM_INPUT_ATOMS:
+        raise ConditionalAdapterFailure('input_atom_limit_exceeded')
+    if np.any(atoms < 0) or np.any(atoms != np.floor(atoms)):
+        raise ConditionalAdapterFailure('invalid_integer_atoms')
+    if np.any(atoms > MAXIMUM_TOTAL):
+        raise ConditionalAdapterFailure('empirical_total_limit_exceeded')
+    bounded_atoms = atoms.astype(np.float64)
+    if np.any(bounded_atoms.sum(axis=1) > MAXIMUM_TOTAL):
+        raise ConditionalAdapterFailure('empirical_total_limit_exceeded')
+    alpha = _array(distribution.alpha, 'alpha', (len(atoms),))
+    if np.any(alpha < 0) or np.any(alpha > 1 + MASS_TOLERANCE):
+        raise ConditionalAdapterFailure('invalid_empirical_mass')
+    converted_alpha = alpha.astype(np.float64)
+    if np.any((alpha > 0) & (converted_alpha == 0)):
+        raise ConditionalAdapterFailure('empirical_mass_underflow')
+    beta = _scalar(distribution.beta, 'beta')
+    if beta <= 0 or abs(math.fsum([*converted_alpha, beta]) - 1) > MASS_TOLERANCE:
+        raise ConditionalAdapterFailure('invalid_distribution_mass')
+    rates = _array(distribution.rates, 'rates', (2,))
+    if np.any(rates <= 0):
+        raise ConditionalAdapterFailure('invalid_background_rates')
+    _array(distribution.theta, 'theta', (2,))
+    iterations = distribution.iterations
+    if (not isinstance(iterations, (int, np.integer)) or isinstance(iterations, (bool, np.bool_))
+            or iterations < 0):
+        raise ConditionalAdapterFailure('invalid_iterations')
+    return bounded_atoms.astype(np.int64), converted_alpha
+
+
+def _fingerprint(distribution):
+    digest = hashlib.sha256()
+
+    def frame(content):
+        digest.update(len(content).to_bytes(8, 'big'))
+        digest.update(content)
+
+    frame(VERSION.encode('ascii'))
+    for field in fields(JointDistribution):
+        frame(field.name.encode('ascii'))
+        value = getattr(distribution, field.name)
+        if isinstance(value, np.ndarray):
+            frame(json.dumps({'kind': 'array', 'dtype': value.dtype.str,
+                              'shape': list(value.shape), 'order': 'C'},
+                             sort_keys=True, separators=(',', ':')).encode('ascii'))
+            frame(value.tobytes(order='C'))
+        elif isinstance(value, np.generic):
+            frame(('numpy-scalar:' + value.dtype.str).encode('ascii'))
+            frame(value.tobytes())
+        elif isinstance(value, bool):
+            frame(b'bool:1' if value else b'bool:0')
+        elif isinstance(value, int):
+            frame(('int:' + str(value)).encode('ascii'))
+        elif isinstance(value, float):
+            frame(('float:' + value.hex()).encode('ascii'))
+        else:
+            raise ConditionalAdapterFailure('unsupported_provenance_scalar')
+    return digest.hexdigest()
+
+
+def distribution_fingerprint(distribution):
+    """Hash every validated field, including exact C-order array bytes."""
+    _validate(distribution)
+    return _fingerprint(distribution)
+
+
+def _copy(distribution):
+    return JointDistribution(**{
+        field.name: (getattr(distribution, field.name).copy()
+                     if isinstance(getattr(distribution, field.name), np.ndarray)
+                     else getattr(distribution, field.name))
+        for field in fields(JointDistribution)})
+
+
+def _merge_positive(masses):
+    # Ascending checks expose a positive duplicate contribution that disappears
+    # in floating-point grouping; fsum supplies the final deterministic mass.
+    cumulative = 0.0
+    for mass in sorted(masses):
+        combined = math.fsum((cumulative, mass))
+        if cumulative > 0 and combined <= max(cumulative, mass):
+            raise ConditionalAdapterFailure('grouping_mass_resolution_loss')
+        cumulative = combined
+    return math.fsum(masses)
+
+
+def transform_distribution(distribution, s):
+    """Return an ordinary distribution and descriptor; no fitting or I/O."""
+    atoms, alpha = _validate(distribution)
+    scale = _scalar(s, 'scale')
+    if not 0 <= scale <= 1:
+        raise ConditionalAdapterFailure('invalid_scale')
+    original_fingerprint = _fingerprint(distribution)
+    result = _copy(distribution)
+    if scale != 1:
+        grouped = {}
+        for (home, away), mass in zip(atoms, alpha):
+            if mass > 0:
+                grouped.setdefault((int(home + away), int(home)), []).append(float(mass))
+        totals = {}
+        for (total, home), masses in sorted(grouped.items()):
+            totals.setdefault(total, {})[home] = _merge_positive(masses)
+        output = []
+        for total, masses in sorted(totals.items()):
+            original_mass = math.fsum(masses.values())
+            probabilities = np.zeros(total + 1)
+            for home, mass in masses.items():
+                probabilities[home] = mass / original_mass
+                if probabilities[home] == 0:
+                    raise ConditionalAdapterFailure('conditional_normalization_mass_underflow')
+            contracted = contract_conditional(probabilities, scale, total=total)
+            transformed = original_mass * contracted
+            if np.any((contracted > 0) & (transformed == 0)):
+                raise ConditionalAdapterFailure('conditional_rescaling_mass_underflow')
+            after_mass = math.fsum(transformed)
+            before_mean = math.fsum(home * mass for home, mass in masses.items()) / original_mass
+            after_mean = math.fsum(home * float(mass) for home, mass in enumerate(transformed)) / after_mass
+            if (abs(after_mass - original_mass) > MASS_TOLERANCE
+                    or abs(after_mean - before_mean) > MOMENT_TOLERANCE):
+                raise ConditionalAdapterFailure('conditional_mass_or_mean_changed')
+            if np.flatnonzero(transformed)[0] < min(masses) or np.flatnonzero(transformed)[-1] > max(masses):
+                raise ConditionalAdapterFailure('empirical_support_expanded')
+            output.extend((home, total - home, float(mass))
+                          for home, mass in enumerate(transformed) if mass > 0)
+        if output:
+            output.sort()
+            result.atoms = np.array([(home, away) for home, away, _ in output], dtype=np.int64)
+            result.alpha = np.array([mass for _, _, mass in output])
+        else:
+            result.atoms = np.zeros((1, 2), dtype=np.int64)
+            result.alpha = np.zeros(1)
+        _validate(result)
+        if np.any(result.atoms.max(axis=0) > atoms.max(axis=0)):
+            raise ConditionalAdapterFailure('empirical_axis_maximum_expanded')
+        before_mean, before_covariance = distribution.moments()
+        after_mean, after_covariance = result.moments()
+        if (not np.all(np.isfinite([before_mean, after_mean]))
+                or not np.all(np.isfinite([before_covariance, after_covariance]))
+                or np.max(np.abs(before_mean - after_mean)) > MOMENT_TOLERANCE
+                or abs(float(before_covariance.sum()) - float(after_covariance.sum())) > MOMENT_TOLERANCE):
+            raise ConditionalAdapterFailure('full_distribution_moments_changed')
+    descriptor = {'version': VERSION, 's': scale,
+                  'original_distribution_fingerprint': original_fingerprint,
+                  'resulting_distribution_fingerprint': _fingerprint(result)}
+    return result, descriptor
+
+
+def calibration_case(distribution, observed_home, observed_away):
+    """Construct one explicit case for estimate_scale; establish no timing."""
+    atoms, alpha = _validate(distribution)
+    for observation in (observed_home, observed_away):
+        if (not isinstance(observation, (int, np.integer)) or isinstance(observation, (bool, np.bool_))
+                or observation < 0 or observation > MAXIMUM_TOTAL):
+            raise ConditionalAdapterFailure('invalid_calibration_observation')
+    home, away = int(observed_home), int(observed_away)
+    total = home + away
+    if total > MAXIMUM_TOTAL:
+        raise ConditionalAdapterFailure('calibration_total_limit_exceeded')
+    rates = [_scalar(value, 'rate') for value in distribution.rates]
+    try:
+        total_rate = math.fsum(rates)
+    except OverflowError as exc:
+        raise ConditionalAdapterFailure('nonfinite_total_rate') from exc
+    if not math.isfinite(total_rate):
+        raise ConditionalAdapterFailure('nonfinite_total_rate')
+    home_fraction, away_fraction = rates[0] / total_rate, rates[1] / total_rate
+    if not 0 < home_fraction < 1 or not 0 < away_fraction < 1:
+        raise ConditionalAdapterFailure('unrepresentable_background_split')
+    background_mean = total * home_fraction
+    background_variance = total * home_fraction * away_fraction
+    log_background = math.log(float(distribution.beta)) + float(poisson.logpmf(total, total_rate))
+    if not math.isfinite(log_background):
+        raise ConditionalAdapterFailure('nonfinite_background_total_log_mass')
+    grouped = {}
+    for (atom_home, atom_away), mass in zip(atoms, alpha):
+        if atom_home + atom_away == total and mass > 0:
+            grouped.setdefault(int(atom_home), []).append(float(mass))
+    masses = {key: _merge_positive(values) for key, values in sorted(grouped.items())}
+    empirical_mass = math.fsum(masses.values())
+    empirical_mean, empirical_variance = None, 0.0
+    probabilities = None
+    if empirical_mass == 0:
+        a, b, mean = 0.0, 1.0, background_mean
+        fixed, log_total = background_variance, log_background
+    else:
+        probabilities = np.zeros(total + 1)
+        for atom_home, mass in masses.items():
+            probabilities[atom_home] = mass / empirical_mass
+            if probabilities[atom_home] == 0:
+                raise ConditionalAdapterFailure('conditional_normalization_mass_underflow')
+        conditional_mass = math.fsum(probabilities)
+        if abs(conditional_mass - 1) > MASS_TOLERANCE:
+            raise ConditionalAdapterFailure('invalid_conditional_mass')
+        empirical_mean = math.fsum(index * float(p) for index, p in enumerate(probabilities)) / conditional_mass
+        empirical_variance = math.fsum(float(p) * (index - empirical_mean) ** 2
+                                       for index, p in enumerate(probabilities)) / conditional_mass
+        log_empirical = math.log(empirical_mass)
+        log_total = float(np.logaddexp(log_empirical, log_background))
+        a, b = math.exp(log_empirical - log_total), math.exp(log_background - log_total)
+        if (not 0 < a < 1 or not 0 < b < 1 or abs(a + b - 1) > MASS_TOLERANCE
+                or abs((1 - a) - b) > MASS_TOLERANCE):
+            raise ConditionalAdapterFailure('unrepresentable_positive_mixture_fraction')
+        mean = a * empirical_mean + b * background_mean
+        fixed = b * background_variance + a * b * (empirical_mean - background_mean) ** 2
+        complementary_fixed = (1 - a) * background_variance + a * (1 - a) * (empirical_mean - background_mean) ** 2
+        if abs(fixed - complementary_fixed) > MOMENT_TOLERANCE:
+            raise ConditionalAdapterFailure('unresolvable_complementary_mixture_variance')
+    conditional_variance = fixed + a * empirical_variance
+    squared_residual = (home - mean) ** 2
+    if (not all(math.isfinite(value) for value in (mean, fixed, conditional_variance, squared_residual, log_total))
+            or not -MOMENT_TOLERANCE <= mean <= total + MOMENT_TOLERANCE
+            or min(fixed, conditional_variance, squared_residual) < 0):
+        raise ConditionalAdapterFailure('invalid_calibration_case_moments')
+    return {'empirical_probabilities': probabilities, 'empirical_fraction': a,
+            'background_fraction': b, 'fixed_variance': fixed, 'squared_residual': squared_residual,
+            'total': total, 'conditional_mean': mean, 'conditional_variance': conditional_variance,
+            'empirical_mean': empirical_mean, 'empirical_variance': empirical_variance,
+            'background_mean': background_mean, 'background_variance': background_variance,
+            'empirical_total_mass': empirical_mass, 'log_background_total_mass': log_background,
+            'log_total_mass': log_total}

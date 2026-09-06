@@ -1,0 +1,119 @@
+{
+  "status": "author_qualified_pending_independent_review",
+  "created_at": "2026-09-05T15:08:26.087268+00:00",
+  "scope": "tiny_synthetic_archive_publication_scorer_store_grader_handoff_only",
+  "source_hashes": {
+    "scripts/research_score_split_grade.py": "2d8deb48a562a368fa239fb963185bfb2dd9440f1786d0369d6ec21a28edeb6e",
+    "tests/research-score-split/test_grade_unit.py": "a774ce92e1540a2bf0a5d1bf2e5dd8eaa82e31a61262d96da30caa51d207157f",
+    "scripts/research_score_split_controller.py": "ef82f33dda523f92c3e4c2826be3583b7d59bef801fb3abec9cc3d28dadfdca4",
+    "scripts/research_score_split_archive.py": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+    "scripts/research_score_split_forecast.py": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34",
+    "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+    "tests/research-score-split/test_archive_unit.py": "510c10f77c194dcb5c9591404c5238f43f494659aa96a247db0013ffd3f2969e",
+    "tests/research-score-split/test_forecast_unit.py": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312"
+  },
+  "qualification": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-grade-unit/attempt-1788620714129934000.json",
+    "sha256": "94d449b0934c9d37e5517cf773ca06e6c6a21e944d0743263d6b77bb26fb9930",
+    "bytes": 2193
+  },
+  "log": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-grade-unit/attempt-1788620714129934000.log",
+    "sha256": "5818683331495a099e521a549090189c3753108318fa1f420ad5fef6d6790e3c",
+    "bytes": 2183
+  },
+  "tests": 12,
+  "unittest_seconds": 5.648,
+  "process_seconds": 6.1750873339915415,
+  "peak_rss_mib": 255.703125,
+  "limits": {
+    "seconds": 120,
+    "rss_mib": 2048
+  },
+  "retained_attempts": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-grade-unit/attempt-1788620052554325000.json",
+      "sha256": "1f4cc238c11b1b8f4a58e6a00b8c7e07e87de4af98a50842af049b3ac996b585",
+      "bytes": 2192
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-grade-unit/attempt-1788620220572066000.json",
+      "sha256": "cbf9224d20570eb9aab75f20a3fb2f504dea135493cb6a85901cd7aae11ee656",
+      "bytes": 2192
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-grade-unit/attempt-1788620557958773000.json",
+      "sha256": "2331a4e33cfdfe19098c187afac7ffa3d953900a63933fac5799167b2f84724e",
+      "bytes": 2191
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-grade-unit/attempt-1788620714129934000.json",
+      "sha256": "94d449b0934c9d37e5517cf773ca06e6c6a21e944d0743263d6b77bb26fb9930",
+      "bytes": 2193
+    }
+  ],
+  "failed_attempts": 1,
+  "failed_attempt_explanation": "The first test fixture supplied a macOS /var symlink path to the unchanged no-symlink Store. Only the fixture path was canonicalized; its failed log/cost is preserved. Subsequent three runs passed, with narrow lifetime/counter additions between them.",
+  "only_repository_files_written": [
+    "scripts/research_score_split_grade.py",
+    "tests/research-score-split/test_grade_unit.py"
+  ],
+  "historical_admission_calls": 0,
+  "historical_fits": 0,
+  "historical_scores": 0,
+  "bootstrap_calls": 0,
+  "api": {
+    "constructor": "PublishedOriginGrader()",
+    "method": "grade(store, manifest, manifest_sha, view, assembly, publication_pointer, context, accounting, *, validate_binding)",
+    "validator": "zero-argument owner closure returning (saved_publication, saved_binding), never Boolean",
+    "return_keys": [
+      "inner_rows",
+      "outer_rows",
+      "grading_receipt",
+      "artifacts",
+      "counts"
+    ],
+    "artifact_keys": [
+      "inner_losses",
+      "outer_losses",
+      "grading_provenance"
+    ],
+    "artifact_omissions": "No empty-stage loss file;2010 only grading provenance,2025 no inner file.",
+    "read_only_properties": [
+      "last_attempt_counts",
+      "last_attempt_origin"
+    ],
+    "counter_keys": [
+      "inner_rows",
+      "outer_rows",
+      "copied_diagonal_inner",
+      "scored_inner",
+      "copied_e3_outer",
+      "scored_outer",
+      "copied_raw_outer",
+      "actual_score_calls",
+      "actual_mass_cdf_calls"
+    ]
+  },
+  "findings": [
+    "Actual tiny indexed source files feed forecast_inputs, the accepted assembler, root publication/ancestry validator, real grade_inputs, unchanged cached scorer and strict Store readback. No _current/grade_inputs replacement is used by the successful handoff or lifetime paths.",
+    "Source fixture metrics are genuine score_forecast results; identical complete synthetic law/game/observation/flag inputs are reused only while constructing these source fixtures.",
+    "Validation closure runs before grade_inputs; malformed/Boolean bindings, tampered publication/plans/laws and skipped origins fail before labels open.2010 opens no grader labels and scores nothing.",
+    "Same-selected original11 E3 series copy original metrics without scorer calls, adding only four actual80 interval masses. Different diagonal full receives a new complete outer score, with separate source-forecast and actual source-loss provenance.",
+    "Principal two-game2013 example persists54 inner/38 outer rows:18 copied inner/36 new inner,22 copied E3 outer/4 new outer/12 unchanged raw references;40 actual score calls and208 additional CDF calls.",
+    "Actual three-origin source/prepare/lineage/publication/grader composition confirms first-inner-double-grid True for first game of each setting,False thereafter in the same season, and True again in the next season.",
+    "Every E3 outer score has full diagnostics/double grid; noeligible fallback scores preserve native reason and full common-game coverage. Source rows are not mutated.",
+    "Strict durable JSON reload supplies native finite metric scalars to validation, feed and inference; nonfinite output is rejected. Source and score metadata remain separately bound.",
+    "Numerical score failure, RuntimeStop and readback mismatch retain failed callback or saved prefix evidence and poison the grader. No retry, reset or terminal writer exists in this module.",
+    "last_attempt_counts/last_attempt_origin return copies. Rejected reentry clears origin binding, preventing the owner from accidentally attaching previous-origin counters to a new failed call."
+  ],
+  "limitations": [
+    "Explicit synthetic SourceContext construction exercises actual helper boundaries without executing full production admission or claiming the1909-file historical chain was admitted here.",
+    "Tiny lifetime fixtures keep fictional target kickoff dates in2030 so their labels remain outside all three origin histories. They test grading lifetime and actual closure compatibility, not historical schedule realism or original complete population.",
+    "2010 uses a minimal saved binding fixture to isolate its no-label behavior; non2010 paths use the current root controller publication/ancestry validator.",
+    "The root controller file was under construction; its exact tested snapshot is bound here. Final complete source closure/controller/watchdog qualification and distinct acceptance are still required.",
+    "Complete returned counts describe a saved origin. The failure properties describe attempted current-origin work and require explicit matching-origin labelling alongside retained accounting.",
+    "No historical scoring, full synthetic3407-game inference, bootstrap, external process watchdog or final scientific terminal was run by this qualification."
+  ],
+  "blockers": []
+}

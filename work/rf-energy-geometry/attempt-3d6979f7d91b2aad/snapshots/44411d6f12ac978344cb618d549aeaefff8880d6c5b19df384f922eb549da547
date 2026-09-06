@@ -1,0 +1,91 @@
+"""Pure RF-02F trajectory bank and fixed prior-season selection; no I/O.
+
+The controller must authenticate every borrowed diagonal output and supply
+both availability histories from the start of 2010.  Cache validation here
+establishes shape and origin membership, not archive provenance.
+"""
+import copy
+
+from research_score_replay import SelectionHistory, TrajectoryBank
+from research_score_split_models import (SPLIT_VARIANTS, make_split_trajectory,
+                                         split_setting_grid)
+
+
+_OUTPUT_ONLY = {"independent_marginals", "deterministic_noise"}
+_ZERO_VARIANTS = {"zero_strength_update", "zero_scoring_level_update"}
+_STATE_VARIANTS = tuple(v for v in SPLIT_VARIANTS if v not in _OUTPUT_ONLY)
+_ORIGINAL_STATE_VARIANTS = tuple(v for v in _STATE_VARIANTS if v not in _ZERO_VARIANTS)
+_DIAGONAL_KEYS = {(i, variant) for i in range(9) for variant in _ORIGINAL_STATE_VARIANTS}
+
+
+class SplitSelectionHistory(SelectionHistory):
+    def __init__(self):
+        self.config = {
+            "failure": {"innerSettingIneligibleAboveFailureRate": .005},
+            "common": {"selectionTieTolerance": 1e-8},
+        }
+        self.settings = {"E3": split_setting_grid()}
+        self.rows = {}
+        self.frozen_choices = {}
+
+
+class SplitTrajectoryBank(TrajectoryBank):
+    def __init__(self, teams):
+        self.settings = {"E3": split_setting_grid()}
+        self.series = [("E3", variant) for variant in SPLIT_VARIANTS]
+        # Materialize once: callers may supply an iterator of franchise names.
+        teams = tuple(teams)
+        self.engines = {
+            ("E3", i, variant): make_split_trajectory(setting, teams, variant)
+            for i, setting in enumerate(self.settings["E3"])
+            for variant in _STATE_VARIANTS
+            if i >= 9 or variant in _ZERO_VARIANTS
+        }
+
+    def advance(self, season, week, prepared, diagonal_outputs):
+        # Complete cache validation and copying precede every state transition.
+        if not isinstance(prepared, dict) or set(prepared) != {12, 24}:
+            raise ValueError("invalid_prepared_delays")
+        target_ids = {}
+        for delay in (12, 24):
+            data = prepared[delay]
+            if not isinstance(data, dict) or set(data) != {"history", "targets"}:
+                raise ValueError("invalid_prepared_fields")
+            targets = data["targets"]
+            if any((g.season, g.week) != (season, week) for g in targets):
+                raise ValueError("wrong_target_origin")
+            ids = [g.game_id for g in targets]
+            if len(set(ids)) != len(ids):
+                raise ValueError("duplicate_target")
+            target_ids[delay] = sorted(ids)
+        if not isinstance(diagonal_outputs, dict):
+            raise ValueError("invalid_diagonal_cache")
+        if any(type(key) is not tuple or len(key) != 2 or type(key[0]) is not int
+               or type(key[1]) is not str for key in diagonal_outputs):
+            raise ValueError("invalid_diagonal_cache_key")
+        if set(diagonal_outputs) != _DIAGONAL_KEYS:
+            raise ValueError("diagonal_cache_population_mismatch")
+        for (i, variant), output in diagonal_outputs.items():
+            if not isinstance(output, dict) or not isinstance(output.get("forecasts"), list):
+                raise ValueError("invalid_diagonal_output")
+            forecasts = output["forecasts"]
+            if any(not isinstance(row, dict) or type(row.get("game_id")) is not str
+                   for row in forecasts):
+                raise ValueError("invalid_diagonal_forecast")
+            ids = [row["game_id"] for row in forecasts]
+            delay = 24 if variant == "availability_24h" else 12
+            if ids != target_ids[delay] or len(set(ids)) != len(ids):
+                raise ValueError("diagonal_cache_target_mismatch")
+        outputs = {("E3", i, variant): copy.deepcopy(diagonal_outputs[(i, variant)])
+                   for i in range(9) for variant in _ORIGINAL_STATE_VARIANTS}
+        outputs.update(super().advance(season, week, prepared))
+        return outputs
+
+    def selected_output(self, outputs, family, setting, variant):
+        if family != "E3":
+            raise ValueError("unknown_split_family")
+        if variant not in SPLIT_VARIANTS:
+            raise ValueError("unknown_split_variant")
+        if setting is not None and (type(setting) is not int or not 0 <= setting < 27):
+            raise ValueError("unknown_split_setting")
+        return super().selected_output(outputs, family, setting, variant)

@@ -1,0 +1,87 @@
+"""Pure RF-02F pilot cost screen; callers own clocks, attribution and stop signals."""
+import math
+
+
+def _require(condition, reason):
+    if not condition:
+        raise ValueError(reason)
+
+
+def _finite(value, positive=False):
+    return type(value) in (int, float) and math.isfinite(value) and (value > 0 if positive else value >= 0)
+
+
+def _calls(rows):
+    _require(type(rows) is list, "invalid_callback_records")
+    for row in rows:
+        _require(type(row) is dict and set(row) == {"seconds", "native_success", "full", "off_diagonal", "outer"},
+                 "invalid_callback_schema")
+        _require(_finite(row["seconds"], positive=True)
+                 and all(type(row[k]) is bool for k in ("native_success", "full", "off_diagonal", "outer")),
+                 "invalid_callback_timing")
+    return rows
+
+
+def pilot_projection(pilots, remaining_origins, elapsed_seconds, evaluator_seconds, admission_seconds):
+    """Apply frozen section6 formula, without granting execution permission.
+
+    Call durations must be disjoint parts of each origin's complete duration.
+    The controller authenticates origins, game populations and timer attribution.
+    Future records contain only target/history counts, never outcomes or scores.
+    For fits, full names the full mean variant; for scores, full means complete
+    diagnostics and double-grid scoring. Outer distinguishes grader scores from
+    inner selection losses. Every supplied call must be new, never a cache hit.
+    """
+    _require(all(_finite(v) for v in (elapsed_seconds, admission_seconds))
+             and _finite(evaluator_seconds, positive=True), "invalid_total_timing")
+    _require(type(pilots) is list and len(pilots) == 2, "two_retained_pilots_required")
+    fit_calls, score_calls, remainders, histories = [], [], [], []
+    for expected_week, row in enumerate(pilots, 1):
+        _require(type(row) is dict and set(row) == {"season", "week", "games", "history_games", "seconds",
+                                                   "fit_calls", "score_calls"}, "invalid_pilot_schema")
+        _require(type(row["season"]) is int and row["season"] == 2013
+                 and type(row["week"]) is int and row["week"] == expected_week
+                 and type(row["games"]) is int and row["games"] == 16
+                 and type(row["history_games"]) is int and row["history_games"] > 0
+                 and _finite(row["seconds"], positive=True), "invalid_retained_pilot")
+        fits, scores = _calls(row["fit_calls"]), _calls(row["score_calls"])
+        remainder = row["seconds"] - math.fsum(x["seconds"] for x in fits + scores)
+        _require(remainder >= 0, "overlapping_or_excess_callback_time")
+        remainders.append(remainder / row["games"])
+        histories.append(row["history_games"])
+        fit_calls.extend(fits)
+        score_calls.extend(scores)
+    _require(any(r["native_success"] and r["full"] and r["off_diagonal"] for r in fit_calls),
+             "successful_new_off_diagonal_full_fit_required")
+    _require(any(r["native_success"] and r["full"] and r["outer"] for r in score_calls),
+             "successful_new_full_outer_score_required")
+    _require(elapsed_seconds >= admission_seconds + evaluator_seconds + math.fsum(p["seconds"] for p in pilots),
+             "inconsistent_elapsed_time")
+    _require(type(remaining_origins) is list, "invalid_remaining_origins")
+    weighted, origins = [], []
+    for row in remaining_origins:
+        _require(type(row) is dict and set(row) == {"season", "week", "games", "history_games"},
+                 "invalid_remaining_origin_schema")
+        _require(type(row["season"]) is int and 2013 <= row["season"] <= 2025
+                 and type(row["week"]) is int and 1 <= row["week"] <= 18
+                 and type(row["games"]) is int and 0 < row["games"] <= 16
+                 and type(row["history_games"]) is int and row["history_games"] > 0,
+                 "invalid_remaining_origin")
+        origins.append((row["season"], row["week"]))
+        weighted.append(row["games"] * max(1., row["history_games"] / min(histories)))
+    _require(origins == sorted(set(origins)) and all(o > (2013, 2) for o in origins),
+             "duplicate_or_unordered_remaining_origins")
+    c = max(remainders)
+    f = max(r["seconds"] for r in fit_calls)
+    s = max(r["seconds"] for r in score_calls)
+    remaining_work = math.fsum(weighted)
+    projected = elapsed_seconds + remaining_work * (c + 31 * (2 * f + 2 * s)) \
+        + 2 * evaluator_seconds + max(60., admission_seconds)
+    _require(math.isfinite(projected), "nonfinite_projection")
+    return {"projected_total_seconds": projected, "remaining_weighted_games": remaining_work,
+            "maximum_remainder_seconds_per_game": c, "maximum_fit_seconds": f,
+            "maximum_score_seconds": s, "observed_fit_calls": len(fit_calls),
+            "observed_score_calls": len(score_calls), "fit_slots_per_future_game": 31,
+            "score_slots_per_future_game": 31, "callback_maximum_multiplier": 2,
+            "within_time_screen": projected <= 7200,
+            "runtime_and_rss_enforcement_required": True, "historical_invocation_authorized": False}

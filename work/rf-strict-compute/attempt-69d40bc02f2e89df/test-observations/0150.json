@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "maximum recursion depth exceeded",
+    "module": "builtins",
+    "type": "RecursionError"
+  },
+  "eligibility": {
+    "actual": null,
+    "expected": null,
+    "reason": "raw canonicalization must fail before encoding eligibility"
+  },
+  "input": {
+    "deterministic_builder": "self-dict",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "dict"
+  },
+  "label": "self-dict",
+  "original": {
+    "kind": "error",
+    "message": "maximum recursion depth exceeded",
+    "module": "builtins",
+    "type": "RecursionError"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_self_and_mutual_cycles_keep_original_failure"
+}

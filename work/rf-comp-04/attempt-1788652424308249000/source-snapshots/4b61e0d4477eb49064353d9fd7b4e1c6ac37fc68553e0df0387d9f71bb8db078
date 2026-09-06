@@ -1,0 +1,204 @@
+"""Registered paired season/week-block uncertainty and terminal research gates."""
+import itertools
+
+import numpy as np
+
+from research_score_models import BASE_SEED
+from research_score_replay import registered_series
+from research_score_metrics import TARGETS, LEVELS
+
+
+def comparison_family(config):
+    series = registered_series(config)
+    comparisons = [(f"{a}:full->{b}:full", (a, "full"), (b, "full"))
+                   for a, b in itertools.combinations(config["models"], 2)]
+    comparisons += [(f"{family}:full->{family}:{variant}", (family, "full"), (family, variant))
+                    for family, variant in series if variant != "full"]
+    if len(comparisons) != 42 or len({item[0] for item in comparisons}) != 42:
+        raise ValueError("comparison_family_changed")
+    return comparisons
+
+
+def block_weights(game_metadata, length, members=10000, required_seasons=12):
+    """Each sampled season contributes its W weekly groups, not a fixed game count."""
+    keys = sorted({(row["season"], row["week"]) for row in game_metadata})
+    seasons = sorted({key[0] for key in keys})
+    if len(seasons) != required_seasons or length not in (1, 3, 6):
+        raise ValueError("invalid_block_bootstrap_universe")
+    index = {key: j for j, key in enumerate(keys)}
+    groups = [np.array([index[key] for key in keys if key[0] == season]) for season in seasons]
+    if any(len(group) < length for group in groups):
+        raise ValueError("season_shorter_than_block")
+    result = np.zeros((members, len(keys)), dtype=np.int16)
+    rng = np.random.Generator(np.random.PCG64(BASE_SEED + length))
+    for b in range(members):
+        sampled_seasons = rng.integers(0, len(seasons), size=len(seasons))
+        for s in sampled_seasons:
+            group = groups[s]
+            starts = rng.integers(0, len(group) - length + 1, size=(len(group) + length - 1) // length)
+            weeks = np.concatenate([group[start:start + length] for start in starts])[:len(group)]
+            np.add.at(result[b], weeks, 1)
+    game_groups = np.array([index[(row["season"], row["week"])] for row in game_metadata])
+    return result, game_groups, keys
+
+
+def weekly_sums(values, game_groups, group_count):
+    values = np.asarray(values, dtype=float)
+    output = np.zeros((group_count,) + values.shape[1:])
+    np.add.at(output, game_groups, values)
+    return output
+
+
+def simultaneous_intervals(point_gains, sampled_gains):
+    point, sampled = np.asarray(point_gains), np.asarray(sampled_gains)
+    if sampled.ndim != 2 or sampled.shape[1] != len(point) or len(sampled) < 2 or not np.all(np.isfinite(sampled)) or not np.all(np.isfinite(point)):
+        raise ValueError("invalid_paired_inference")
+    sd = np.std(sampled, axis=0, ddof=1)
+    scaled = np.zeros_like(sampled)
+    for k in range(len(point)):
+        if sd[k] == 0:
+            if not np.all(sampled[:, k] == point[k]):
+                raise ValueError("inconsistent_zero_variance_comparison")
+        else:
+            scaled[:, k] = np.abs(sampled[:, k] - point[k]) / sd[k]
+    critical = float(np.quantile(np.max(scaled, axis=1), .95, method="linear"))
+    return point - critical * sd, point + critical * sd, sd, critical
+
+
+def infer(config, metadata, rows_by_series, members=None):
+    """Caller passes only the fixed common development cohort, ordered identically."""
+    series = registered_series(config)
+    if set(rows_by_series) != set(series) or any(len(rows_by_series[key]) != len(metadata) for key in series):
+        raise ValueError("inference_common_game_mismatch")
+    n = config["evaluation"]["bootstrapMembers"] if members is None else members
+    comparisons = comparison_family(config)
+    lookup = {key: i for i, key in enumerate(series)}
+    references = np.array([lookup[ref] for _, ref, _ in comparisons])
+    variants = np.array([lookup[var] for _, _, var in comparisons])
+    losses = np.array([[row["joint_energy_score"] for row in rows_by_series[key]] for key in series]).T
+    means = losses.mean(axis=0)
+    if np.any(means <= 0):
+        raise ValueError("nonpositive_reference_loss")
+    gains = (means[references] - means[variants]) / means[references]
+    coverage_columns = [(key, target, round(100 * level)) for key in series for target in TARGETS for level in LEVELS]
+    coverage = np.array([[row[f"{target}_coverage_{level}"] for row in rows_by_series[key]]
+                         for key, target, level in coverage_columns]).T
+    output = {"comparisons": {name: {"reference": list(ref), "variant": list(var), "gain": float(gains[i]), "blocks": {}}
+                              for i, (name, ref, var) in enumerate(comparisons)}, "blocks": {}}
+    for length in config["evaluation"]["bootstrapBlockLengths"]:
+        counts, game_groups, keys = block_weights(metadata, length, n)
+        # Float conversion permits efficient BLAS while retaining exact integer multiplicities.
+        counts = counts.astype(float)
+        game_counts = np.bincount(game_groups, minlength=len(keys))
+        denominators = counts @ game_counts
+        sampled_means = (counts @ weekly_sums(losses, game_groups, len(keys))) / denominators[:, None]
+        sampled_gains = (sampled_means[:, references] - sampled_means[:, variants]) / sampled_means[:, references]
+        lower, upper, sd, critical = simultaneous_intervals(gains, sampled_gains)
+        for i, (name, _, _) in enumerate(comparisons):
+            output["comparisons"][name]["blocks"][str(length)] = {"lower": float(lower[i]), "upper": float(upper[i]), "bootstrap_sd": float(sd[i])}
+        sampled_coverage = counts @ weekly_sums(coverage, game_groups, len(keys)) / denominators[:, None]
+        endpoints = np.quantile(sampled_coverage, [.025, .975], axis=0, method="linear")
+        cov = {":".join((*key, target, str(level))): {"point": float(coverage[:, i].mean()), "lower": float(endpoints[0, i]), "upper": float(endpoints[1, i])}
+               for i, (key, target, level) in enumerate(coverage_columns)}
+        pit = {}
+        for key in series:
+            for target in TARGETS:
+                values = np.array([row[target + "_pit"] for row in rows_by_series[key]])
+                bins = np.minimum(9, np.floor(values * 10).astype(int))
+                if np.any(bins < 0) or np.any(values > 1):
+                    raise ValueError("invalid_pit_value")
+                observed_bins = np.eye(10)[bins]
+                proportions = observed_bins.mean(axis=0)
+                sampled_bins = counts @ weekly_sums(observed_bins, game_groups, len(keys)) / denominators[:, None]
+                radius = float(np.quantile(np.max(np.abs(sampled_bins - proportions), axis=1), .95, method="linear"))
+                pit[":".join((*key, target))] = {"family": "ten_bins_for_this_series_target", "radius": radius,
+                    "lower": np.maximum(0, proportions - radius).tolist(), "upper": np.minimum(1, proportions + radius).tolist()}
+        output["blocks"][str(length)] = {"members": n, "critical_max_standardized": critical,
+                                        "coverage": cov, "pit_simultaneous_bands": pit}
+    return output
+
+
+def decide(config, metadata, rows_by_series, failures_by_series, inference, calibration_by_series, leakage_passed):
+    """Returns a retrospective research decision; cannot activate any package."""
+    series = registered_series(config)
+    development = [i for i, row in enumerate(metadata) if 2013 <= row["season"] <= 2024]
+    diagnostic = [i for i, row in enumerate(metadata) if row["season"] == 2025]
+    if len(development) != config["folds"]["expectedDevelopmentGames"] or len(diagnostic) != config["folds"]["expectedDiagnosticGames"]:
+        raise ValueError("terminal_common_game_count_mismatch")
+    if (not leakage_passed or set(rows_by_series) != set(series) or set(failures_by_series) != set(series)
+            or any(len(rows_by_series[key]) != len(metadata) or len(failures_by_series[key]) != len(metadata) for key in series)):
+        raise ValueError("terminal_leakage_or_completeness_failure")
+    if any(failures_by_series[("N0", "full")]):
+        raise ValueError("N0_scored_forecast_failure")
+    if set(calibration_by_series) != set(series):
+        raise ValueError("required_calibration_completeness")
+    for values in calibration_by_series.values():
+        if set(values) != set(TARGETS) | {"home_win"}:
+            raise ValueError("required_calibration_completeness")
+        for c in values.values():
+            if c.get("n") != len(development):
+                raise ValueError("required_calibration_population")
+            if c.get("status") == "available":
+                if not all(np.isfinite(c.get(name, np.nan)) for name in ("intercept", "slope")):
+                    raise ValueError("required_calibration_failure")
+            elif c.get("status") == "unavailable_by_design":
+                if (c.get("reason") != "constant_predictor" or c.get("rank") != 1
+                        or not np.isfinite(c.get("prediction_min", np.nan))
+                        or c.get("prediction_min") != c.get("prediction_max")):
+                    raise ValueError("unsubstantiated_structural_unavailability")
+            else:
+                raise ValueError("required_calibration_failure")
+    def mean(key, metric, indices=development):
+        return float(np.mean([rows_by_series[key][i][metric] for i in indices]))
+    def gain(ref, other, indices=development):
+        a, b = mean(ref, "joint_energy_score", indices), mean(other, "joint_energy_score", indices)
+        return (a - b) / a
+    def bounds(name, endpoint, predicate):
+        return all(predicate(inference["comparisons"][name]["blocks"][str(length)][endpoint])
+                   for length in config["evaluation"]["bootstrapBlockLengths"])
+    seasons = sorted({metadata[i]["season"] for i in development})
+    gates, eligible, reference = {}, [], ("N0", "full")
+    for family in ("S1", "E1", "E2"):
+        key, baseline = (family, "full"), ("N0", "full")
+        overall = gain(baseline, key)
+        by_season = {str(s): gain(baseline, key, [i for i in development if metadata[i]["season"] == s]) for s in seasons}
+        leave_one = {str(s): gain(baseline, key, [i for i in development if metadata[i]["season"] != s]) for s in seasons}
+        checks = {"energy_gain_at_least_one_percent": overall >= .01,
+                  "paired_lower_positive_all_blocks": bounds(f"N0:full->{family}:full", "lower", lambda x: x > 0),
+                  "eight_improved_seasons": sum(g > 0 for g in by_season.values()) >= 8,
+                  "all_leave_one_season_out_positive": all(g > 0 for g in leave_one.values()),
+                  "exposed_2025_positive": gain(baseline, key, diagnostic) > 0,
+                  "native_failure_ceiling": float(np.mean(failures_by_series[key])) <= .005}
+        for metric in ["joint_nll"] + [t + "_crps" for t in TARGETS]:
+            checks[metric + "_regression"] = mean(key, metric) <= 1.005 * mean(baseline, metric)
+        for target in ("home", "away"):
+            checks[target + "_mae_regression"] = mean(key, target + "_mae") <= mean(baseline, target + "_mae") + .1
+        for target in TARGETS:
+            coverage = mean(key, target + "_coverage_80")
+            checks[target + "_coverage_range"] = .72 <= coverage <= .88
+            checks[target + "_coverage_uncertainty"] = all(
+                block["coverage"][f"{family}:full:{target}:80"]["lower"] <= .8 <= block["coverage"][f"{family}:full:{target}:80"]["upper"]
+                for block in inference["blocks"].values())
+            checks[target + "_width"] = mean(key, target + "_width_80") <= 1.1 * mean(baseline, target + "_width_80") or overall >= .02
+        variants = [variant for f, variant in series if f == family and variant != "full"]
+        for variant in variants:
+            checks[variant + "_native_failure_ceiling"] = float(np.mean(failures_by_series[(family, variant)])) <= .005
+            if variant != "availability_24h":
+                checks[variant + "_does_not_stably_win"] = not bounds(f"{family}:full->{family}:{variant}", "lower", lambda x: x > 0)
+        mechanisms = {"S1": ["no_team_identity"], "E1": ["K_zero"], "E2": ["no_offense", "no_defense"]}[family]
+        for mechanism in mechanisms:
+            checks["positive_mechanism_" + mechanism] = bounds(f"{family}:full->{family}:{mechanism}", "upper", lambda x: x < 0)
+        checks["availability_24h_gain"] = gain(("N0", "availability_24h"), (family, "availability_24h")) > 0
+        checks["availability_24h_failure"] = float(np.mean(failures_by_series[(family, "availability_24h")])) <= .005
+        checks["availability_24h_reference_failure"] = float(np.mean(failures_by_series[("N0", "availability_24h")])) <= .005
+        checks["simpler_qualifying_reference"] = bounds(f"{reference[0]}:full->{family}:full", "lower", lambda x: x > 0)
+        passed = all(checks.values())
+        gates[family] = {"passed": passed, "checks": checks, "development_gain": overall,
+                         "season_gains": by_season, "leave_one_season_out_gains": leave_one,
+                         "exposed_2025_gain": gain(baseline, key, diagnostic), "simpler_reference": reference[0]}
+        if passed:
+            eligible.append(family)
+            reference = key
+    return {"status": "shadow_eligible" if eligible else "reject_all", "selected_family": reference[0] if eligible else None,
+            "gates": gates, "production_authorized": False, "prospective_evidence": False,
+            "claim_at_least_one_percent_proven": False, "market_value_evidence": False}

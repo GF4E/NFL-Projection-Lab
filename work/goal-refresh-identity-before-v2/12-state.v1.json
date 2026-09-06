@@ -1,0 +1,61 @@
+{
+  "version": "engine-os.quality-gate-state.v1",
+  "updatedAt": "2026-09-05T06:29:08.076227+00:00",
+  "predictiveResultStatus": "historical_only",
+  "lastDeepGate": {
+    "id": "2026-09-05-rf02d-admission-closure",
+    "observableGoalTokens": 5034079,
+    "decision": "continue_identity_metric_and_integrated_runner_qualification"
+  },
+  "lastProgressPulse": {
+    "id": "2026-09-05-rf02d-identity-and-runner",
+    "observableGoalTokens": 5219005,
+    "decision": "continue_identity_output_audits_and_full_inference_implementation"
+  },
+  "current": {
+    "observableGoalTokens": 5219005,
+    "packageAttemptsSinceDeepGate": 0,
+    "latestFailureSignature": "rf02s_pilot_projected_budget_exceeded",
+    "consecutiveSameFailureCount": 1,
+    "phaseBoundary": false
+  },
+  "thresholds": {
+    "progressPulseTokens": 100000,
+    "deepGateTokens": 500000,
+    "packageAttemptsBeforeDeepGate": 3,
+    "repeatedFailureCountBeforeDeepGate": 2,
+    "minimumProspectiveWeeksForPromotion": 8,
+    "minimumGradedGamesForPromotion": 128
+  },
+  "activePackage": {
+    "id": "RF-02D-inference-and-integrated-runner",
+    "executionStatus": "identity520_passed_actual_audits_pending_inference_implementation",
+    "agentEvidenceQuestions": [
+      "full28comparison_and16cell_inference_decision_implementation",
+      "independent_actual_identity_numerical_audit",
+      "independent_actual_identity_temporal_persistence_audit"
+    ]
+  },
+  "recordedDueState": {
+    "progressPulseDue": false,
+    "deepGateDue": false
+  },
+  "counterDomain": {
+    "threadId": "01a06e57-ea63-71c1-9c75-ba48f42d3a2c",
+    "priorDomainSnapshot": {
+      "lastDeepGate": {
+        "id": "2026-09-04-rf04-data-feasibility",
+        "observableGoalTokens": 31246936,
+        "decision": "block_player_fit_await_public_data_audit_permission"
+      },
+      "lastProgressPulse": {
+        "id": "2026-09-04-rf04-data-feasibility",
+        "observableGoalTokens": 31246936,
+        "decision": "block_player_fit_await_public_data_audit_permission"
+      },
+      "lastRecordedTokens": 31246936,
+      "sourceThread": "019ff283-4d9c-72b1-9d95-9d8c53784bad"
+    }
+  },
+  "independentScientificAcceptance": "accepted_historical_reject_all_with_retrospective_limits"
+}

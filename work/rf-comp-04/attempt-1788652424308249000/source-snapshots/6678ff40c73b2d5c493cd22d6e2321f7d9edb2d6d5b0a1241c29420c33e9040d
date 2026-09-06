@@ -1,0 +1,283 @@
+"""Focused synthetic RF-02F validation/gate tests; full integration is separate."""
+import copy
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import numpy as np
+import research_score_split_inference as unit
+import qualify_inference_unit as fixture
+
+
+def gate_fixture():
+    config = fixture.config(); series, comparisons, cells = unit.registered(config)
+    metadata = [{'game_id': f'gate-{y}-{i}', 'season': y, 'week': i + 1} for y in unit.YEARS for i in range(5)]
+    metrics, failures = {}, {}
+    for key in series:
+        energy = 98.5 if key in (('E3', 'full'), ('E3', 'availability_24h')) else 101. if key[0] == 'E3' else 100.
+        row = {'joint_energy_score': energy, 'joint_nll': 100.}
+        for t in unit.TARGETS:
+            row.update({t + '_crps': 100., t + '_mae': 2., t + '_width_80': 10., t + '_coverage_80': .8})
+        metrics[key] = [dict(row) for _ in metadata]; failures[key] = [None] * len(metadata)
+    inference = {'comparisons': {}, 'calibration_cells': {}, 'blocks': {str(n): {'coverage': {}} for n in unit.LENGTHS}}
+    for name, reference, candidate in comparisons:
+        lo, hi = (-.04, -.001) if reference[0] == 'E3' else (.001, .04)
+        inference['comparisons'][name] = {'blocks': {str(n): {'lower': lo, 'upper': hi} for n in unit.LENGTHS}}
+    for cell in cells:
+        label = ':'.join(map(str, cell))
+        inference['calibration_cells'][label] = {'blocks': {str(n): {'lower': -.02, 'upper': .02} for n in unit.LENGTHS}}
+        for n in unit.LENGTHS:
+            inference['blocks'][str(n)]['coverage'][label] = {'lower': .75, 'upper': .85}
+    return config, metadata, metrics, failures, inference
+
+
+def public_shape_fixture():
+    """Shape-only repeated metrics; explicitly not scorer/PIT integration evidence."""
+    config = fixture.config(); metadata = fixture.metadata(); cache = fixture.ScoreCache()
+    law = fixture.toy_laws()['reference']
+    live, _ = cache.get(law, [0, 2], 'shape-only')
+    raw = fixture.parse(unit.encoded(live)); mass = fixture.parse(unit.encoded(fixture.with_mass(law, live)))
+    rows = {key: [{'game_id': g['game_id'], 'metrics': mass if key[0] == 'E3' else raw, 'native_failure': None}
+                   for g in metadata] for key in unit.registered(config)[0]}
+    return config, metadata, rows, {name: True for name in unit.AUDITS}
+
+
+class ValidationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.inputs = public_shape_fixture()
+
+    def test_exact_registry_and_no_reduced_public_gate(self):
+        config, metadata, rows, audit = self.inputs
+        self.assertEqual([len(x) for x in unit.registered(config)], [19, 18, 8])
+        changed = copy.deepcopy(config); changed['seriesInOrder'].reverse()
+        self.assertEqual(unit.evaluate(changed, metadata, rows, audit)['reason'], 'frozen_configuration_mismatch')
+        self.assertEqual(unit.evaluate(config, metadata[:3135], rows, audit)['reason'], 'production_common_population_required')
+        self.assertEqual(unit.evaluate(config, metadata, rows, {})['reason'], 'required_audit_failure')
+        for value in (False, 1, 'true', None):
+            self.assertEqual(unit.evaluate(config, metadata, rows, {**audit, 'admission': value})['reason'], 'required_audit_failure')
+
+    def test_full_shapes_accept_and_reject_membership_population_order(self):
+        config, metadata, rows, audit = self.inputs
+        self.assertEqual(len(unit.validate(config, metadata, rows, audit)[3]), 19)
+        examples = [metadata[:-1], [metadata[1], metadata[0]] + metadata[2:],
+                    [metadata[0]] + metadata[:-1], [dict(metadata[0], season=True)] + metadata[1:],
+                    [dict(metadata[0], week=18)] + metadata[1:]]
+        for changed in examples:
+            self.assertEqual(unit.evaluate(config, changed, rows, audit)['status'], 'protocol_invalid')
+        missing = dict(rows); missing.pop(('E3', 'zero_strength_update'))
+        self.assertEqual(unit.evaluate(config, metadata, missing, audit)['reason'], 'required_series_membership')
+        bad = dict(rows); bad['E3', 'full'] = rows['E3', 'full'][1:] + rows['E3', 'full'][:1]
+        self.assertEqual(unit.evaluate(config, metadata, bad, audit)['reason'], 'series_game_alignment_mismatch')
+
+    def test_metric_types_grid_diagnostics_probabilities_intervals(self):
+        metrics = self.inputs[2]['E3', 'full'][0]['metrics']
+        mutations = ({'joint_energy_score': True}, {'joint_nll': '1'}, {'joint_nll': float('nan')},
+                     {'grid_transport_bound': np.float64(1e-12)}, {'grid_probability_bound': float('inf')},
+                     {'double_grid_difference': None}, {'grid_cells': [True, 8]}, {'grid_cells': [8]},
+                     {'home_pit': 1.01}, {'home_crps': -1}, {'joint_energy_score': -1},
+                     {'home_win_probability': 0.}, {'away_win_probability': 2.},
+                     {'home_width_80': 100}, {'home_coverage_80': .5}, {'home_lower_80': .5},
+                     {'home_interval_mass_80': -1}, {'margin_observed': 99}, {'extra_metric': 1})
+        for mutation in mutations:
+            with self.subTest(mutation=mutation), self.assertRaises(unit.InferenceFailure):
+                unit.validate_metric(metrics | mutation, True)
+        for name in ('tail_total_70', 'residual_product', 'home_win_brier', 'home_boundary_distance_95'):
+            changed = dict(metrics); changed.pop(name)
+            with self.assertRaises(unit.InferenceFailure): unit.validate_metric(changed, True)
+        with self.assertRaises(unit.InferenceFailure): unit.validate_metric(metrics, False)
+
+    def test_outcome_native_reason_and_independent_alias_boundaries(self):
+        config, metadata, rows, audit = self.inputs
+        bad = dict(rows); changed = list(rows['N0', 'full']); changed[0] = dict(changed[0], native_failure='native'); bad['N0', 'full'] = changed
+        self.assertEqual(unit.evaluate(config, metadata, bad, audit)['reason'], 'required_N0_native_failure')
+        bad = dict(rows); changed = list(rows['E3', 'independent_marginals']); changed[0] = dict(changed[0], native_failure='new-independent-failure'); bad['E3', 'independent_marginals'] = changed
+        result = unit.validate(config, metadata, bad, audit)
+        self.assertEqual(result[4]['E3', 'independent_marginals'][0], 'new-independent-failure')
+        self.assertIsNone(result[4]['E3', 'full'][0])
+        changed[0] = dict(changed[0], native_failure=True)
+        self.assertEqual(unit.evaluate(config, metadata, bad, audit)['reason'], 'invalid_native_failure_flag')
+
+    def test_native_numpy_durable_json_and_signed_zero(self):
+        law = fixture.toy_laws()['reference']; live, _ = fixture.ScoreCache().get(law, [0, 2], 'real-boundary')
+        self.assertIs(type(live['grid_transport_bound']), np.float64)
+        with self.assertRaises(unit.InferenceFailure): unit.validate_metric(live, False)
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp); pointer = fixture.write(directory / 'real-score.json', live)
+            saved = fixture.read(directory, pointer)
+            unit.validate_metric(saved, False)
+            self.assertEqual(unit.encoded(saved), unit.encoded(live))
+            signed = fixture.read(directory, fixture.write(directory / 'zero.json', {'value': -0.0}))
+            self.assertTrue(np.signbit(signed['value']))
+            (directory / 'real-score.json').write_bytes(b'{}')
+            with self.assertRaises(ValueError): fixture.read(directory, pointer)
+
+    def test_constant_calibration_empty_native_and_baseexception_propagation(self):
+        raw = self.inputs[2]['N0', 'full'][0]['metrics']
+        result = unit.card([raw] * 5)
+        self.assertTrue(all(r['status'] == 'unavailable_by_design' for r in result['calibration'].values()))
+        self.assertEqual(unit.card([]), {'status': 'unavailable', 'reason': 'empty_native_success_subset', 'games': 0})
+        class Stop(BaseException): pass
+        class InterruptedConfig(dict):
+            def items(self): raise Stop('deadline')
+        with self.assertRaises(Stop): unit.evaluate(InterruptedConfig({'x': 1}), [], {}, {})
+
+
+class DecisionTests(unittest.TestCase):
+    def decide(self, values): return unit.decision(*values)
+
+    def test_all_three_labels_and_complete_failed_lists(self):
+        values = gate_fixture(); result = self.decide(values)
+        self.assertEqual(result['status'], 'research_shadow_candidate')
+        self.assertEqual(result['failed_mechanism_checks'], []); self.assertEqual(result['failed_candidate_checks'], [])
+        for r in values[2]['E3', 'full']: r['joint_nll'] = 200
+        self.assertEqual(self.decide(values)['status'], 'mechanism_supported_distribution_unqualified')
+        values[4]['comparisons']['E2:full->E3:full']['blocks']['6']['lower'] = 0
+        result = self.decide(values)
+        self.assertEqual(result['status'], 'reject_all')
+        self.assertIn('energy_lower_positive_all_blocks', result['failed_mechanism_checks'])
+
+    def test_point_threshold_is_separate_from_positive_evidence(self):
+        for loss, passes in ((99., True), (99.000001, False)):
+            values = gate_fixture()
+            for row in values[2]['E3', 'full']: row['joint_energy_score'] = loss
+            result = self.decide(values)
+            self.assertEqual(result['mechanism_checks']['energy_gain_at_least_one_percent'], passes)
+            self.assertTrue(result['mechanism_checks']['energy_lower_positive_all_blocks'])
+        values = gate_fixture(); values[4]['comparisons']['E2:full->E3:full']['blocks']['3']['lower'] = 0
+        self.assertFalse(self.decide(values)['mechanism_checks']['energy_lower_positive_all_blocks'])
+
+    def test_all_four_removals_and_negative_control_all_any(self):
+        for removal in fixture.config()['internalMechanism']['requiredRemovals']:
+            values = gate_fixture(); values[4]['comparisons']['E3:full->E3:' + removal]['blocks']['3']['upper'] = 0
+            self.assertFalse(self.decide(values)['mechanism_checks'][removal + ':positive_mechanism_all_blocks'])
+        for variant in ('shuffled_identity', 'deterministic_noise', 'no_home_effect'):
+            values = gate_fixture(); blocks = values[4]['comparisons']['E3:full->E3:' + variant]['blocks']
+            for block in blocks.values(): block['lower'] = .001
+            self.assertFalse(self.decide(values)['mechanism_checks'][variant + ':does_not_stably_outperform_full'])
+            blocks['6']['lower'] = 0
+            self.assertTrue(self.decide(values)['mechanism_checks'][variant + ':does_not_stably_outperform_full'])
+
+    def test_season_leave_one_out_exposed_and_24h_gates(self):
+        values = gate_fixture()
+        for row, metric in zip(values[1], values[2]['E3', 'full']):
+            if row['season'] >= 2020: metric['joint_energy_score'] = 101
+        result = self.decide(values)
+        self.assertFalse(result['mechanism_checks']['eight_improved_seasons'])
+        self.assertFalse(result['mechanism_checks']['exposed_2025_positive'])
+        values = gate_fixture()
+        for row, metric in zip(values[1], values[2]['E3', 'full']):
+            metric['joint_energy_score'] = 1. if row['season'] == 2013 else 101.
+        self.assertFalse(self.decide(values)['mechanism_checks']['all_leave_one_season_out_positive'])
+        values = gate_fixture()
+        for row, metric in zip(values[1], values[2]['E3', 'availability_24h']):
+            if row['season'] <= 2024: metric['joint_energy_score'] = 100.
+            else: metric['joint_energy_score'] = .01
+        result = self.decide(values)
+        for reference in ('N0', 'E2'):
+            self.assertFalse(result['mechanism_checks'][reference + ':availability_24h_gain_positive'])
+
+    def test_e1_and_s1_interval_signs(self):
+        values = gate_fixture(); values[4]['comparisons']['E1:full->E3:full']['blocks']['1']['lower'] = 0
+        self.assertFalse(self.decide(values)['candidate_checks']['E1:energy_lower_positive_all_blocks'])
+        blocks = values[4]['comparisons']['S1:full->E3:full']['blocks']
+        for b in blocks.values(): b['upper'] = -.001
+        self.assertFalse(self.decide(values)['candidate_checks']['not_stably_worse_than_S1'])
+        blocks['6']['upper'] = 0
+        self.assertTrue(self.decide(values)['candidate_checks']['not_stably_worse_than_S1'])
+
+    def test_secondary_checks_each_variant_reference_and_metric(self):
+        for variant in ('full', 'availability_24h'):
+            for field in ['joint_nll'] + [t + '_crps' for t in unit.TARGETS]:
+                values = gate_fixture()
+                # Match the frozen floating-point expression exactly; literal
+                # 100.5 is one ULP above 1.005 * 100 in this runtime.
+                for row in values[2]['E3', variant]: row[field] = 1.005 * 100.
+                result = self.decide(values)
+                for reference in ('N0', 'E2'): self.assertTrue(result['candidate_checks'][f'{reference}:{variant}:{field}'])
+                for row in values[2]['E3', variant]: row[field] = 100.50001
+                result = self.decide(values)
+                for reference in ('N0', 'E2'): self.assertFalse(result['candidate_checks'][f'{reference}:{variant}:{field}'])
+            for target in ('home', 'away'):
+                values = gate_fixture()
+                for row in values[2]['E3', variant]: row[target + '_mae'] = 2.10001
+                for reference in ('N0', 'E2'):
+                    self.assertFalse(self.decide(values)['candidate_checks'][f'{reference}:{variant}:{target}_mae'])
+
+    def test_width_exception_uses_same_variant_and_reference_gain(self):
+        values = gate_fixture()
+        for row in values[2]['E3', 'full']: row['joint_energy_score'] = 95.
+        for row in values[2]['E3', 'availability_24h']:
+            row['joint_energy_score'] = 98.; row['home_width_80'] = 12.
+        for row in values[2]['E2', 'availability_24h']: row['joint_energy_score'] = 99.
+        checks = self.decide(values)['candidate_checks']
+        self.assertTrue(checks['N0:availability_24h:home_width'])
+        self.assertFalse(checks['E2:availability_24h:home_width'])
+        for row in values[2]['E3', 'availability_24h']: row['home_width_80'] = 11.
+        self.assertTrue(self.decide(values)['candidate_checks']['E2:availability_24h:home_width'])
+
+    def test_all_nominal_and_actual_mass_cells_inclusive_endpoints(self):
+        for cell in fixture.config()['calibrationCellsInOrder']:
+            values = gate_fixture(); label = ':'.join(map(str, cell))
+            values[4]['blocks']['3']['coverage'][label]['lower'] = .800001
+            self.assertFalse(self.decide(values)['candidate_checks'][label + ':nominal_intervals'])
+            values[4]['blocks']['3']['coverage'][label]['lower'] = .8
+            values[4]['calibration_cells'][label]['blocks']['6']['upper'] = 0
+            self.assertTrue(self.decide(values)['candidate_checks'][label + ':actual_mass_intervals'])
+            values[4]['calibration_cells'][label]['blocks']['6']['upper'] = -.000001
+            self.assertFalse(self.decide(values)['candidate_checks'][label + ':actual_mass_intervals'])
+            family, variant, target, _ = cell
+            for row in values[2][family, variant]: row[target + '_coverage_80'] = .9
+            self.assertFalse(self.decide(values)['candidate_checks'][label + ':nominal_range'])
+
+    def test_failure_population_includes_exposed_and_no_e1_s1_veto(self):
+        values = list(gate_fixture()); original = values[2]
+        values[1] = fixture.metadata()
+        values[2] = {k: [dict(rows[0]) for _ in values[1]] for k, rows in original.items()}
+        values[3] = {k: [None] * 3407 for k in original}
+        for family in ('E1', 'S1'): values[3][family, 'full'] = ['visible_failure'] * 3407
+        for count in (17, 18):
+            values[3]['E3', 'zero_strength_update'] = [None] * (3407 - count) + ['exposed_failure'] * count
+            checks = self.decide(values)['mechanism_checks']
+            self.assertEqual(checks['E3:zero_strength_update:native_failure_ceiling'], count == 17)
+            self.assertNotIn('E1:full:native_failure_ceiling', checks)
+            self.assertNotIn('S1:full:native_failure_ceiling', checks)
+
+
+class SyntheticCacheTests(unittest.TestCase):
+    def test_cache_complete_input_key_misses_and_payload_isolation(self):
+        cache = fixture.ScoreCache(); law = fixture.toy_laws()['reference']
+        value, provenance = cache.get(law, [0, 2], 'cache-game')
+        second, again = cache.get(law, [0, 2], 'cache-game')
+        self.assertEqual(provenance, again); self.assertEqual((cache.calls, cache.hits), (1, 1))
+        value['home_mean'] = 999
+        self.assertNotEqual(second['home_mean'], 999)
+        changes = [(fixture.toy_laws()['new'], [0, 2], 'cache-game', {}),
+                   (law, [2, 0], 'cache-game', {}), (law, [0, 2], 'other-game', {}),
+                   (law, [0, 2], 'cache-game', {'double_grid': False}),
+                   (law, [0, 2], 'cache-game', {'diagnostics': False}),
+                   (law, [0, 2], 'cache-game', {'scorer_identity': {'synthetic_changed_pin': 'x'}}),
+                   (law, [0, 2], 'cache-game', {'runtime_identity': {'synthetic_changed_runtime': 'x'}})]
+        for changed, observed, game, flags in changes:
+            before = cache.calls; _, key = cache.get(changed, observed, game, **flags)
+            self.assertEqual(cache.calls, before + 1); self.assertNotEqual(key['key_sha256'], provenance['key_sha256'])
+        signed = fixture.toy_laws()['reference']; signed.theta = np.array([-0., 0.])
+        before = cache.calls; cache.get(signed, [0, 2], 'cache-game')
+        self.assertEqual(cache.calls, before + 1)
+
+    def test_compact_real_mean_mapper_score_independence_and_fallback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            directory = Path(tmp); pointer = fixture.write(directory / 'bridge.json', fixture.bridge())
+            rows = fixture.read(directory, pointer)
+            self.assertEqual([r['variant'] for r in rows], ['full', 'independent_marginals', 'fallback'])
+            for row in rows: unit.validate_metric(row['metrics'], True)
+            self.assertEqual(rows[-1]['native_failure'], 'synthetic_native_failure')
+            self.assertNotEqual(rows[0]['law'], rows[-1]['law'])
+            self.assertTrue(rows[1]['law']['independent']['value'])
+
+
+if __name__ == '__main__': unittest.main(verbosity=2)

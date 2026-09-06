@@ -1,0 +1,108 @@
+"""RF-COMP-03 candidate: exact original JSON-byte reuse within one fit.
+
+No global rebinding, historical entry point, or cross-fit cache. The versioned
+descriptor/recovery/resolve copies retain the frozen checks and arithmetic;
+their only changed dependency is the explicitly passed encoding callable.
+"""
+import json
+import math
+import struct
+
+import numpy as np
+
+from research_score_contract import digest, encoded
+from research_score_split_archive import _descriptor, require as _archive_require
+from research_score_split_forecast import (
+    _Assembly, _PRIVATE_FALLBACK, _frozen_law, _reason, _work, require)
+from research_score_split_run import CallbackResult, strict
+from research_score_replay import resolve_distribution
+from research_score_successor_distribution import JointBase
+
+VERSION = 'rf.compute-encoding-memo.v1'
+
+
+class EncodingMemo:
+    """One successful finite-float-list encoding; original bytes on every miss.
+
+    Keys include every IEEE754 bit and their length, so signed zero is distinct.
+    Unsupported calls retain their original input and leave the entry intact.
+    Capture one snapshot for key and encoding; synchronous use only. Allocation
+    failure under exhausted resources is outside numerical equivalence claims.
+    """
+
+    __slots__ = ('_encoder', '_entry')
+
+    def __init__(self):
+        self._encoder = encoded
+        self._entry = None
+
+    def __call__(self, value):
+        if type(value) is not list:
+            return self._encoder(value)
+        snapshot = tuple(value)
+        if not all(type(number) is float and math.isfinite(number) for number in snapshot):
+            return self._encoder(value)
+        key = struct.pack('>' + str(len(snapshot)) + 'd', *snapshot)
+        if self._entry is not None and key == self._entry[0]:
+            return self._entry[1]
+        result = self._encoder(list(snapshot))
+        self._entry = (key, result)
+        return result
+
+
+def distribution_descriptor(fitted, mapper_pointer, encode):
+    return {"version": "rf.joint-distribution.v2", "mapper": mapper_pointer,
+            "theta": fitted.theta.tolist(), "beta": fitted.beta, "rates": fitted.rates.tolist(),
+            "alphaSha256": digest(encode(fitted.alpha.tolist())), "iterations": fitted.iterations,
+            "independent": fitted.independent, "mean": fitted.moments()[0].tolist(),
+            "covariance": fitted.moments()[1].tolist()}
+
+
+def recover_distribution(mapper, descriptor, encode):
+    theta = np.asarray(descriptor["theta"])
+    _, alpha, beta, rates, _, _ = mapper.components(theta)
+    if (digest(encode(alpha.tolist())) != descriptor["alphaSha256"] or beta != descriptor["beta"]
+            or rates.tolist() != descriptor["rates"]):
+        raise ValueError("distribution_parameter_hash_mismatch")
+    from research_score_distribution import JointDistribution
+    recovered = JointDistribution(mapper.atoms, alpha, beta, rates, theta, descriptor["iterations"], descriptor["independent"])
+    if recovered.moments()[0].tolist() != descriptor["mean"] or recovered.moments()[1].tolist() != descriptor["covariance"]:
+        raise ValueError("distribution_moment_mismatch")
+    return recovered
+
+
+def recover_source_law(mapper, descriptor, encode):
+    """Retain original mapper/schema admission and independent reconstruction."""
+    _archive_require(type(mapper) is JointBase, 'unqualified_mapper_class')
+    _descriptor(descriptor)
+    return recover_distribution(mapper, descriptor, encode)
+
+
+class EncodingAssembly(_Assembly):
+    """Change only new-law resolution; memo allocation is inside its callback."""
+
+    def resolve(self, selected, variant, game, stage):
+        work = _work('new_resolution')
+        forecast = self.selected_native(selected, variant, game)
+        delay = 24 if variant == 'availability_24h' else 12
+        mapper = self.view['mappers'][delay]
+        def callback():
+            encode = EncodingMemo()
+            work['fit_calls'] += int(forecast is not None and forecast['failure'] is None)
+            law, reason = resolve_distribution(mapper, forecast, 'E3', variant, _PRIVATE_FALLBACK)
+            _reason(reason)
+            if law is _PRIVATE_FALLBACK:
+                require(reason is not None, 'fallback_sentinel_without_native_failure')
+                fallback = self.full['N0', 0, game] if stage == 'inner' else self.outer['N0', self.fallback_variant(variant), game]
+                require(fallback['native_failure'] is None, 'required_N0_fallback_failed')
+                law = self.recover(fallback, work)
+            require(law is not _PRIVATE_FALLBACK, 'unresolved_fallback_sentinel')
+            # Preserve the same native-JSON boundary and independent recovery.
+            descriptor = json.loads(strict(distribution_descriptor(law, self.pointers[delay], encode)))
+            work['descriptor_recoveries'] += 1
+            recovered = _frozen_law(recover_source_law(mapper, descriptor, encode))
+            require(strict(distribution_descriptor(recovered, self.pointers[delay], encode)) == strict(descriptor), 'descriptor_roundtrip_changed')
+            return CallbackResult((recovered, descriptor, reason), reason, reason is not None)
+        law, descriptor, reason = self.accounting.callback('fit', callback, game_id=game, setting=selected,
+            variant=variant, stage=stage, operation='fit')
+        return law, descriptor, reason, work

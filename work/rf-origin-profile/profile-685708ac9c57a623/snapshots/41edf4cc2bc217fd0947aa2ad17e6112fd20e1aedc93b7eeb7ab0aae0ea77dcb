@@ -1,0 +1,249 @@
+"""RF-02C exact scoring and fixed paired-cost qualification; no football fits."""
+import json
+from pathlib import Path
+import re
+import sys
+import time
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import numpy as np
+from research_score_contract import encoded, digest, read_regular
+from research_score_distribution import JointBase
+from research_score_metrics import score_forecast as baseline_score
+from research_score_compute_distribution import score_forecast as cached_score
+from research_score_run import ImmutableRun, OUTPUT_PARENT, plain, recover_distribution, rss_mb
+from research_score_replay import registered_series
+from research_score_successor_run import preflight as predecessor_preflight
+
+ACCEPTANCE_PATH = '.planning/engine-os/research-first/RF-02C-ACCEPTANCE.v1.json'
+ACCEPTANCE_SHA = '038ff4889430f6981f0b0734f02aea1140185142f8f5e3562d1a3f7bbce34eb4'
+CONFIG_PATH = 'config/research-team-score-compute.v1.json'
+QUALIFICATION_FILES = (
+    'scripts/research_score_compute_distribution.py', 'scripts/research_score_compute_qualify.py',
+    'tests/research-score-compute/test_cache.py', 'tests/research-score-compute/test_compute_qualify.py',
+)
+COUNT_KEYS = {'fullSettingScoredOccurrences', 'outerScoredOccurrences', 'allScoredOccurrences', 'outerGames', 'outerSeries'}
+
+
+def bound(raw, sha, label, size=None):
+    if digest(raw) != sha or (size is not None and len(raw) != size):
+        raise ValueError('frozen_bytes_mismatch:' + label)
+    return raw
+
+
+def load_compute(root=ROOT):
+    root = Path(root)
+    receipt_raw = bound(read_regular(root / ACCEPTANCE_PATH), ACCEPTANCE_SHA, 'compute_acceptance')
+    receipt = json.loads(receipt_raw)
+    if receipt['result'] != 'accepted_for_implementation_only' or receipt['implementationAuthorized'] is not True:
+        raise ValueError('compute_implementation_not_accepted')
+    raw = bound(read_regular(root / CONFIG_PATH), receipt['configSha256'], 'compute_config')
+    config = json.loads(raw)
+    spec = config['specification']
+    bound(read_regular(root / spec['path']), receipt['protocolSha256'], 'compute_protocol')
+    if spec['sha256'] != receipt['protocolSha256']:
+        raise ValueError('compute_specification_binding_mismatch')
+    bindings = {'acceptance': digest(receipt_raw), 'config': digest(raw), 'specification': spec['sha256']}
+    for key in ('predecessorConfig', 'predecessorImplementation'):
+        value = config[key]
+        bound(read_regular(root / value['path']), value['sha256'], key)
+        bindings[key] = value['sha256']
+    for name, sha in config['frozenSourceHashes'].items():
+        bound(read_regular(root / name), sha, name)
+    return config, bindings
+
+
+def read_input(config):
+    directory = Path(config['inputRunDirectory'])
+    raw = bound(read_regular(directory / 'artifact-index.json'), config['inputIndexSha256'], 'input_index')
+    index = json.loads(raw)['files']
+    if len(index) != config['inputCounts']['indexedFiles']:
+        raise ValueError('input_file_count_mismatch')
+    files = {}
+    for name, pointer in index.items():
+        if not re.fullmatch(r'[a-z0-9.-]+', name) or '..' in name:
+            raise ValueError('unsafe_input_name')
+        files[name] = bound(read_regular(directory / name), pointer['sha256'], name, pointer['bytes'])
+    if sum(map(len, files.values())) != config['inputCounts']['indexedBytes']:
+        raise ValueError('input_byte_count_mismatch')
+    bound(files['manifest.json'], config['inputManifestSha256'], 'input_manifest')
+    manifest = json.loads(files['manifest.json'])
+    if manifest['code_hashes'] != config['frozenSourceHashes']:
+        raise ValueError('input_source_bindings_mismatch')
+    if manifest['successor']['implementation_receipt_sha256'] != config['predecessorImplementation']['sha256']:
+        raise ValueError('input_predecessor_implementation_mismatch')
+    terminal = json.loads(files['terminal-failure.json'])
+    if terminal['status'] != 'protocol_invalid' or terminal['reason'] != 'pilot_projected_budget_exceeded':
+        raise ValueError('input_terminal_boundary_changed')
+    return files
+
+
+def counts_or_fail(counts, config):
+    expected = {key: config['inputCounts'][key] for key in COUNT_KEYS}
+    if counts != expected:
+        raise ValueError('scored_population_mismatch:' + repr(counts))
+
+
+def scoring_occurrences(files, inherited_config, admitted):
+    by_game = {row['gameId']: row for row in admitted['records']}
+    seen_inner = set()
+    series = registered_series(inherited_config)
+    for name in sorted(n for n in files if re.fullmatch(r'forecasts-\d{4}-\d{2}\.json', n)):
+        season = int(name.split('-')[1])
+        publication = json.loads(files[name])
+        for scope, forecast_field, loss_prefix in (
+                ('inner', 'full_setting_forecasts', 'inner-losses-'),
+                ('outer', 'outer_selected_forecasts', 'outer-losses-')):
+            forecasts = publication[forecast_field]
+            loss_name = name.replace('forecasts-', loss_prefix)
+            if not forecasts:
+                if scope != 'outer' or loss_name in files:
+                    raise ValueError('unexpected_empty_scored_population')
+                continue
+            losses = json.loads(files[loss_name])
+            def identity(row):
+                return (row['family'], row['setting'] if scope == 'inner' else row['variant'], row['game_id'])
+            keys = [identity(row) for row in forecasts]
+            if len(set(keys)) != len(keys) or keys != [identity(row) for row in losses]:
+                raise ValueError('forecast_loss_key_order_mismatch')
+            if scope == 'outer':
+                games = list(dict.fromkeys(row['game_id'] for row in forecasts))
+                if keys != [(family, variant, game) for family, variant in series for game in games]:
+                    raise ValueError('outer_series_population_mismatch')
+            for forecast, loss in zip(forecasts, losses):
+                if forecast['native_failure'] != loss['native_failure']:
+                    raise ValueError('failure_record_mismatch')
+                game = forecast['game_id']
+                source = by_game[game]
+                if scope == 'inner':
+                    first = (season, forecast['family'], forecast['setting']) not in seen_inner
+                    seen_inner.add((season, forecast['family'], forecast['setting']))
+                else:
+                    first = True
+                yield {'scope': scope, 'originFile': name, 'key': list(identity(forecast)),
+                       'gameId': game, 'observed': [source['homeScore'], source['awayScore']],
+                       'doubleGrid': first, 'diagnostics': scope == 'outer',
+                       'nativeFailure': forecast['native_failure'], 'descriptor': forecast['distribution'],
+                       'archivedMetrics': loss['metrics']}
+
+
+def recover_occurrence(occurrence, files, mapper_cache):
+    pointer = occurrence['descriptor']['mapper']
+    key = (pointer['name'], pointer['sha256'])
+    if key not in mapper_cache:
+        blob = json.loads(bound(files[pointer['name']], pointer['sha256'], 'distribution_mapper'))
+        mapper_cache[key] = JointBase(np.array(blob['atoms']), np.array(blob['weights']), blob['b'], blob['epsilon'])
+    return recover_distribution(mapper_cache[key], occurrence['descriptor'])
+
+
+def score_one(function, distribution, occurrence):
+    return function(distribution, occurrence['observed'], occurrence['gameId'],
+                    double_grid=occurrence['doubleGrid'], diagnostics=occurrence['diagnostics'])
+
+
+def canonical_equal(metrics, expected):
+    raw = encoded(plain(metrics))
+    if raw != encoded(expected):
+        raise ValueError('canonical_metric_dictionary_mismatch')
+    return digest(raw)
+
+
+def efficiency_result(baseline_seconds, candidate_seconds, rss, gate):
+    b = np.asarray(baseline_seconds, dtype=float); c = np.asarray(candidate_seconds, dtype=float)
+    if (b.shape != (3,) or c.shape != (3,) or not np.all(np.isfinite(b))
+            or not np.all(np.isfinite(c)) or np.any(b <= 0) or np.any(c <= 0) or not np.isfinite(rss) or rss < 0):
+        raise ValueError('invalid_timing_measurements')
+    savings = float(np.min(b-c)); ratio = float(np.median(c/b))
+    projection = (gate['originalPilotElapsed'] + max(0., gate['originalMeanOuterSeconds'] - savings/gate['pilotOrigins'])
+                  * gate['originalRemainingWork'] + gate['originalInferenceProjection'])
+    passed = bool(np.all(c < b) and ratio <= gate['maximumMedianRatio']
+                  and projection <= gate['screenMaximumProjectedSeconds'] and rss <= gate['rssMaximumMiB'])
+    return {'pairedPasses': 3, 'baselineSeconds': b.tolist(), 'candidateSeconds': c.tolist(),
+            'minimumSavingsSeconds': savings, 'medianRatio': ratio, 'screenProjectedSeconds': projection,
+            'rssMiB': rss, 'passed': passed}
+
+
+def qualify():
+    config, bindings = load_compute()
+    predecessor = predecessor_preflight(ROOT)
+    _, inherited, admitted, _ = predecessor['accepted']
+    if config['budget'] != inherited['budget']:
+        raise ValueError('inherited_budget_changed')
+    files = read_input(config)
+    hashes = {name: digest(read_regular(ROOT/name)) for name in QUALIFICATION_FILES}
+    manifest = {'version': 'rf02c-qualification.v1', 'bindings': bindings, 'codeHashes': hashes,
+                'frozenSourceHashes': config['frozenSourceHashes'], 'inputManifestSha256': config['inputManifestSha256'],
+                'inputIndexSha256': config['inputIndexSha256'], 'runtime': predecessor['runtime'],
+                'footballFits': 0, 'newForecasts': 0, 'providerRequests': 0, 'productionAuthorized': False}
+    store = ImmutableRun(OUTPUT_PARENT, 'rf02c-qualification-v1-'+digest(encoded(manifest))[:16])
+    started = time.perf_counter(); ledger = []; outer = []; mapper_cache = {}; phase = 'equality'
+    try:
+        store.write('manifest.json', manifest)
+        inner_count = 0; failures = 0; outer_games = set(); outer_series = set()
+        for occurrence in scoring_occurrences(files, inherited, admitted):
+            # Recovery is outside timing, and each invocation receives its own fresh instance.
+            baseline = recover_occurrence(occurrence, files, mapper_cache)
+            candidate = recover_occurrence(occurrence, files, mapper_cache)
+            b = score_one(baseline_score, baseline, occurrence)
+            c = score_one(cached_score, candidate, occurrence)
+            sha = canonical_equal(b, occurrence['archivedMetrics'])
+            if canonical_equal(c, occurrence['archivedMetrics']) != sha:
+                raise ValueError('baseline_candidate_digest_mismatch')
+            ledger.append({key: occurrence[key] for key in ('scope','originFile','key','gameId','doubleGrid','diagnostics','nativeFailure')}
+                          | {'metricSha256': sha, 'canonicalEqual': True})
+            failures += int(occurrence['nativeFailure'] is not None)
+            if occurrence['scope'] == 'outer':
+                outer.append(occurrence); outer_games.add(occurrence['gameId']); outer_series.add(tuple(occurrence['key'][:2]))
+            else:
+                inner_count += 1
+            if len(ledger) % 2000 == 0:
+                print(json.dumps({'phase': phase, 'exactOccurrences': len(ledger), 'seconds': round(time.perf_counter()-started,2)}), flush=True)
+        counts = {'fullSettingScoredOccurrences': inner_count, 'outerScoredOccurrences': len(outer),
+                  'allScoredOccurrences': len(ledger), 'outerGames': len(outer_games), 'outerSeries': len(outer_series)}
+        counts_or_fail(counts, config)
+        if failures != 0:
+            raise ValueError('preserved_failure_population_changed')
+        store.write('occurrence-ledger.json', ledger)
+        phase = 'paired_timing'; baseline_totals = []; candidate_totals = []
+        for pair in range(3):
+            rows = []
+            for i, occurrence in enumerate(outer):
+                order = ('baseline','candidate') if (pair+i)%2 == 0 else ('candidate','baseline')
+                elapsed = {}
+                for kind in order:
+                    distribution = recover_occurrence(occurrence, files, mapper_cache)
+                    function = baseline_score if kind == 'baseline' else cached_score
+                    tick = time.perf_counter()
+                    metrics = score_one(function, distribution, occurrence)
+                    elapsed[kind] = time.perf_counter()-tick
+                    canonical_equal(metrics, occurrence['archivedMetrics'])
+                rows.append({'occurrenceIndex': i, 'key': occurrence['key'], 'order': list(order),
+                             'baselineSeconds': elapsed['baseline'], 'candidateSeconds': elapsed['candidate'],
+                             'canonicalEqual': True})
+            b = sum(row['baselineSeconds'] for row in rows); c = sum(row['candidateSeconds'] for row in rows)
+            baseline_totals.append(b); candidate_totals.append(c)
+            store.write(f'timing-pass-{pair}.json', {'passIndex': pair, 'occurrences': rows,
+                                                    'baselineSeconds': b, 'candidateSeconds': c})
+            print(json.dumps({'phase':phase,'passIndex':pair,'baselineSeconds':b,'candidateSeconds':c,'ratio':c/b}),flush=True)
+        efficiency = efficiency_result(baseline_totals,candidate_totals,rss_mb(),config['efficiencyGate'])
+        terminal = {'status': 'qualified' if efficiency['passed'] else 'qualification_failed', 'counts': counts,
+                    'canonicalEqualOccurrences': len(ledger), 'equalityFailures': 0, 'nativeFailures': failures,
+                    'efficiency': efficiency, 'seconds': time.perf_counter()-started, 'footballFits': 0,
+                    'newForecasts': 0, 'productionAuthorized': False, 'independentAcceptance': 'pending', 'fullReplayAuthorized': False}
+        store.write('terminal-decision.json',terminal);store.finish_index()
+        print(json.dumps(terminal|{'runDirectory':str(store.path)}),flush=True)
+        return 0 if efficiency['passed'] else 2
+    except BaseException as exc:
+        if 'occurrence-ledger.json' not in store.index:
+            store.write('occurrence-ledger.json',ledger)
+        store.write('terminal-failure.json',{'status':'qualification_failed','phase':phase,'reason':str(exc),
+                                           'completedEqualityOccurrences':len(ledger),'footballFits':0,'newForecasts':0,
+                                           'automaticRestart':False,'seconds':time.perf_counter()-started})
+        store.finish_index()
+        raise
+    finally:
+        store.close()
+
+
+if __name__ == '__main__': raise SystemExit(qualify())

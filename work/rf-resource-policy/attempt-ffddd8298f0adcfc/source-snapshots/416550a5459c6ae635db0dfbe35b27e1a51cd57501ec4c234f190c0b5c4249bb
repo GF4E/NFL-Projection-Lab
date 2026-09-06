@@ -1,0 +1,304 @@
+"""Synthetic archive/closure checks; never open the actual parent archive."""
+import copy
+from dataclasses import replace
+from datetime import datetime, timedelta
+import inspect
+import json
+from pathlib import Path
+import resource
+import sys
+import tempfile
+import time
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
+import research_score_conditional_admission as unit
+from research_score_contract import node_hash, prepare_origin
+from research_score_distribution import JointBase, JointDistribution
+
+
+def saved(mapper, independent=False):
+    theta = np.array([0., -0.])
+    _, alpha, beta, rates, _, _ = mapper.components(theta)
+    distribution = JointDistribution(mapper.atoms, alpha, beta, rates, theta, 3, independent)
+    mean, covariance = distribution.moments()
+    descriptor = {'version': 'rf.joint-distribution.v2', 'mapper': {'name': 'object-' + 'a' * 64 + '.json', 'sha256': 'a' * 64},
+                  'theta': theta.tolist(), 'alphaSha256': unit.sha(unit.encoded(alpha.tolist())), 'beta': beta,
+                  'rates': rates.tolist(), 'iterations': 3, 'independent': independent,
+                  'mean': mean.tolist(), 'covariance': covariance.tolist()}
+    return distribution, descriptor
+
+
+def source_record(game='old', season=2013, week=1, kickoff='2013-09-05T18:00:00+00:00', home=0, away=2):
+    dt = datetime.fromisoformat(kickoff)
+    return {'gameId': game, 'season': season, 'week': week, 'homeTeam': 'A', 'awayTeam': 'B', 'neutral': False,
+            'homeScore': home, 'awayScore': away, 'kickoffAt': kickoff,
+            'availability': {str(delay): (dt + timedelta(hours=delay)).isoformat() for delay in (12, 24)}}
+
+
+def case_source(record, failure=None):
+    return {'game_id': record['gameId'], 'season': record['season'],
+            'origin_at': (datetime.fromisoformat(record['kickoffAt']) - timedelta(days=2)).isoformat(),
+            'kickoff_at': record['kickoffAt'], 'availability': record['availability'], 'native_failure': failure}
+
+
+def original_config():
+    return {'models': {'N0': {}, 'S1': {'ridgeGridInTieOrder': [1], 'halfLifeGridInTieOrder': [2]},
+                       'E1': {'kGridInTieOrder': [1], 'retentionGridInTieOrder': [1], 'homePointsGridInTieOrder': [0]},
+                       'E2': {'kGridInTieOrder': [1, 2], 'retentionGridInTieOrder': [1]}},
+            'failure': {'innerSettingIneligibleAboveFailureRate': .005},
+            'common': {'selectionTieTolerance': 1e-12}}
+
+
+class AdmissionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.started = time.monotonic()
+
+    @classmethod
+    def tearDownClass(cls):
+        elapsed = time.monotonic() - cls.started
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == 'darwin' else 1024)
+        if elapsed > 120 or rss > 4096:
+            raise AssertionError(f'synthetic_budget_exceeded: seconds={elapsed}, rss_mib={rss}')
+
+    def setUp(self):
+        self.temporary = tempfile.TemporaryDirectory()
+        self.directory = Path(self.temporary.name).resolve()
+        self.mapper = JointBase(np.array([[0., 2.], [2., 0.]]), np.array([.5, .5]), 1.)
+
+    def tearDown(self):
+        self.temporary.cleanup()
+
+    def archive(self, extra=None):
+        values = {'manifest.json': {'version': 'synthetic'}, 'terminal-decision.json': {'status': 'reject_all'},
+                  'later.json': {'future': 1}, **(extra or {})}
+        pointers = {}
+        for name, value in values.items():
+            raw = unit.encoded(value)
+            (self.directory / name).write_bytes(raw)
+            pointers[name] = {'sha256': unit.sha(raw), 'bytes': len(raw)}
+        index = unit.encoded({'files': pointers})
+        (self.directory / 'artifact-index.json').write_bytes(index)
+        return unit.Archive(self.directory, pointers['manifest.json']['sha256'], unit.sha(index))
+
+    def test_authenticated_archive_pointer_and_all_file_corruption_checks(self):
+        obj = {'synthetic': [1, 2]}
+        fingerprint = unit.sha(unit.encoded(obj))
+        name = 'object-' + fingerprint + '.json'
+        archive = self.archive({name: obj})
+        self.assertEqual(archive.read({'name': name, 'sha256': fingerprint}), obj)
+        archive.verify_all()
+        self.assertEqual(set(archive.checked), set(archive.index))
+        (self.directory / 'later.json').write_bytes(b'corrupted')
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'bound_file_mismatch'):
+            archive.verify_all()
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'object_pointer_mismatch'):
+            archive.read({'name': name, 'sha256': '0' * 64})
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'unindexed_artifact'):
+            archive.read('../outside.json')
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'object_pointer_mismatch'):
+            archive.read({'name': [], 'sha256': fingerprint})
+
+    def test_missing_later_file_invalidates_global_admission(self):
+        archive = self.archive()
+        (self.directory / 'later.json').unlink()
+        with self.assertRaises(FileNotFoundError):
+            archive.verify_all()
+
+    def test_unsafe_index_names_and_symlinks_are_rejected(self):
+        archive = self.archive()
+        original = json.loads((self.directory / 'artifact-index.json').read_bytes())
+        for bad_name in ('../outside.json', '/tmp/outside.json', 'a/child.json', 'a..b.json'):
+            malformed = copy.deepcopy(original)
+            malformed['files'][bad_name] = malformed['files']['later.json']
+            raw = unit.encoded(malformed)
+            (self.directory / 'artifact-index.json').write_bytes(raw)
+            with self.assertRaisesRegex(unit.AdmissionFailure, 'unsafe_indexed_path'):
+                unit.Archive(self.directory, archive.manifest_sha256, unit.sha(raw))
+        (self.directory / 'later.json').unlink()
+        (self.directory / 'later.json').symlink_to(self.directory / 'manifest.json')
+        with self.assertRaises(OSError):
+            archive.read('later.json')
+
+    def test_duplicate_json_keys_and_nonfinite_constants_rejected(self):
+        for raw in (b'{"a":1,"a":2}', b'{"value":NaN}', b'{"value":Infinity}'):
+            with self.assertRaises(unit.AdmissionFailure):
+                unit.parse(raw)
+
+    def test_components_only_recovery_is_exact_and_never_fits(self):
+        original, descriptor = saved(self.mapper)
+        with patch.object(JointBase, 'fit', side_effect=AssertionError('fit_forbidden')):
+            recovered = unit.recover_original(self.mapper, descriptor)
+        for field in ('atoms', 'alpha', 'rates', 'theta'):
+            self.assertEqual(getattr(original, field).tobytes(), getattr(recovered, field).tobytes())
+            self.assertFalse(np.shares_memory(getattr(original, field), getattr(recovered, field)))
+        self.assertEqual(recovered.beta, original.beta)
+        self.assertEqual(recovered.iterations, 3)
+        self.assertTrue(np.signbit(recovered.theta[1]))
+        self.assertEqual(unit.distribution_fingerprint(recovered), unit.distribution_fingerprint(original))
+        independent, descriptor = saved(self.mapper, True)
+        recovered = unit.recover_original(self.mapper, descriptor)
+        self.assertEqual(recovered.moments()[1].tobytes(), independent.moments()[1].tobytes())
+
+    def test_saved_component_moment_and_flag_changes_rejected(self):
+        _, descriptor = saved(self.mapper)
+        changes = {'alphaSha256': 'b' * 64, 'beta': descriptor['beta'] + .001,
+                   'rates': [4., 5.], 'mean': [3., 2.], 'covariance': [[1., 0.], [0., 1.]],
+                   'iterations': -1, 'independent': 0, 'theta': [float('nan'), 0.], 'version': 'wrong'}
+        for field, value in changes.items():
+            with self.subTest(field=field), self.assertRaises((unit.AdmissionFailure, ValueError)):
+                unit.recover_original(self.mapper, {**descriptor, field: value})
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'invalid_saved_distribution_schema'):
+            unit.recover_original(self.mapper, {**descriptor, 'extra': 1})
+
+    def test_mapper_source_support_and_bounds_checked_without_refit(self):
+        row = source_record()
+        prepared = {'input_hash': 'f' * 64, 'input_ids': ['old']}
+        mapper = {'atoms': [[0, 2], [2, 0]], 'weights': [.5, .5], 'b': 1., 'epsilon': .05,
+                  'input_sha256': 'f' * 64, 'half_life': 2.5}
+        with patch.object(JointBase, 'from_scores', side_effect=AssertionError('mapper_refit_forbidden')):
+            recovered = unit.validate_mapper(mapper, prepared, {'old': row})
+        self.assertEqual(recovered.atoms.tolist(), mapper['atoms'])
+        for field, value in (('input_sha256', 'a' * 64), ('atoms', [[0, 2]]), ('weights', [.6, .6]),
+                             ('epsilon', .1), ('b', -1.), ('half_life', 1.)):
+            with self.subTest(field=field), self.assertRaises(unit.AdmissionFailure):
+                unit.validate_mapper({**mapper, field: value}, prepared, {'old': row})
+
+    def test_complete_series_rows_and_failure_ledger_membership(self):
+        origin = {'targetGameIds': ['first', 'second']}
+        rows = [{'family': family, 'variant': variant, 'game_id': game, 'native_failure': None}
+                for family, variant in unit.SERIES for game in origin['targetGameIds']]
+        losses = copy.deepcopy(rows)
+        selected, checked = unit.validate_selected_rows({'outer_selected_forecasts': rows}, losses, origin, unit.SERIES)
+        self.assertEqual(len(selected), 40)
+        self.assertEqual(set(selected), set(checked))
+        for bad in (rows[:-1], rows + [rows[0]], rows[::-1]):
+            with self.assertRaisesRegex(unit.AdmissionFailure, 'population_mismatch'):
+                unit.validate_selected_rows({'outer_selected_forecasts': bad}, losses, origin, unit.SERIES)
+        losses[0]['native_failure'] = 'native-failure'
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'native_failure_ledger_mismatch'):
+            unit.validate_selected_rows({'outer_selected_forecasts': rows}, losses, origin, unit.SERIES)
+
+    def test_raw_independence_is_bound_to_full_fields_and_failure(self):
+        _, full = saved(self.mapper)
+        _, independent = saved(self.mapper, True)
+        row = {'distribution': full, 'native_failure': None}
+        control = {'distribution': independent, 'native_failure': None}
+        unit.validate_independent_source(row, control)
+        for changed in ({**control, 'native_failure': 'different'},
+                        {**control, 'distribution': {**independent, 'iterations': 4}},
+                        {**control, 'distribution': {**independent, 'independent': False}}):
+            with self.assertRaises(unit.AdmissionFailure):
+                unit.validate_independent_source(row, changed)
+
+    def test_selected_original_setting_and_native_requested_mean_chain(self):
+        _, descriptor = saved(self.mapper)
+        row = {'family': 'N0', 'variant': 'full', 'setting': 0, 'game_id': 'g',
+               'native_failure': None, 'distribution': descriptor}
+        native = {('N0', 0, 'full', 'g'): {'mean': descriptor['mean'], 'failure': None}}
+        selection = {'N0': {'setting': 0}}
+        unit.validate_requested_mean(row, native, selection)
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'original_annual_setting_mismatch'):
+            unit.validate_requested_mean({**row, 'setting': 1}, native, selection)
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'requested_mean_provenance_mismatch'):
+            unit.validate_requested_mean(row, {('N0', 0, 'full', 'g'): {'mean': [5., 6.], 'failure': None}}, selection)
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'native_state_forecast_missing'):
+            unit.validate_requested_mean(row, {}, selection)
+
+    def test_selection_receipt_recomputed_from_only_original_inner_losses(self):
+        config = original_config()
+        records = {str(year): source_record(str(year), year) for year in (2011, 2012, 2013)}
+        inner, selection = {}, {}
+        for family, grid in unit.setting_grid(config).items():
+            candidates = []
+            for setting in range(len(grid)):
+                for year in (2011, 2012, 2013):
+                    inner[year, str(year), family, setting] = (10. + setting if year < 2013 else 99999., False)
+                candidates.append({'setting': setting, 'mean_energy': 10. + setting, 'failure_rate': 0., 'eligible': True})
+            selection[family] = {'setting': 0, 'inner_seasons': [2011, 2012], 'games': 2,
+                                 'status': 'selected', 'candidates': candidates}
+        unit.validate_selection(selection, 2013, inner, records, config)
+        changed = copy.deepcopy(selection)
+        changed['E2']['setting'] = 1
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'selected_setting_mismatch'):
+            unit.validate_selection(changed, 2013, inner, records, config)
+        missing = dict(inner)
+        del missing[2012, '2012', 'N0', 0]
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'selection_inner_population_mismatch'):
+            unit.validate_selection(selection, 2013, missing, records, config)
+
+    def test_prior_closure_excludes_current_future_and_partitions_native_failures(self):
+        old = case_source(source_record('old'))
+        failed = case_source(source_record('failed'), 'native-grid-failure')
+        current = case_source(source_record('current', 2014, kickoff='2014-09-05T18:00:00+00:00'))
+        future = case_source(source_record('future', 2025, kickoff='2025-09-05T18:00:00+00:00'))
+        cutoff = '2014-09-02T14:30:00+00:00'
+        baseline = unit.annual_case_sources([old, failed], 2014, cutoff, ['old', 'failed'])
+        self.assertEqual(baseline, unit.annual_case_sources([old, failed, current, future], 2014, cutoff, ['old', 'failed']))
+        self.assertEqual((baseline['expected'], baseline['native_success'], baseline['failed']), (2, 1, 1))
+        self.assertEqual(baseline['case_keys'], ['old'])
+        self.assertEqual(baseline['failed_keys'], [{'game_id': 'failed', 'reason': 'native-grid-failure'}])
+        empty = unit.annual_case_sources([old], 2013, '2013-09-03T14:30:00+00:00', [])
+        self.assertEqual(empty['expected'], 0)
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'annual_prior_population_mismatch'):
+            unit.annual_case_sources([old, old], 2014, cutoff, ['old'])
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'annual_prior_population_mismatch'):
+            unit.annual_case_sources([], 2014, cutoff, ['old'])
+
+    def test_prior_availability_is_strict_and_both_delay_regimes_checked(self):
+        old = case_source(source_record())
+        for cutoff in (old['availability']['12'], old['availability']['24']):
+            with self.assertRaisesRegex(unit.AdmissionFailure, 'late_or_invalid_prior_outcome'):
+                unit.annual_case_sources([old], 2014, cutoff, ['old'])
+        wrong = copy.deepcopy(old)
+        wrong['availability']['24'] = old['availability']['12']
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'late_or_invalid_prior_outcome'):
+            unit.annual_case_sources([wrong], 2014, '2014-09-02T14:30:00+00:00', ['old'])
+
+    def test_identity_keys_follow_original_origin_and_target_order(self):
+        origins = [{'season': year, 'week': week, 'targetGameIds': [f'{year}-{week}-z', f'{year}-{week}-a']}
+                   for year in unit.YEARS for week in (1, 2)]
+        sample = unit.identity_sample(origins)
+        self.assertEqual(sample['occurrences'], 520)
+        self.assertEqual(sample['keys'][0]['game_id'], '2013-1-z')
+        self.assertEqual(sample['keys'][20]['game_id'], '2013-2-a')
+        self.assertEqual(sample['sha256'], unit.sha(unit.encoded(sample['keys'])))
+        self.assertEqual(sample, unit.identity_sample(origins))
+
+    def test_production_population_and_pins_cannot_be_replaced_by_small_fixture(self):
+        archive = self.archive()
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'outer_origin_population_mismatch'):
+            unit._admit(archive, {'records': [], 'origins': []}, {}, lambda: None)
+        self.assertEqual(len(unit.SERIES), 20)
+        self.assertEqual(len(unit.ORDINARY), 18)
+        self.assertEqual(sum(unit.YEAR_COUNTS), 3407)
+        self.assertEqual(sum(unit.YEAR_COUNTS[:-1]) * len(unit.ORDINARY), 56430)
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'bound_file_mismatch'):
+            unit.Archive(self.directory)
+
+    def test_requested_report_is_exclusive_and_parent_is_read_only(self):
+        path = self.directory / 'report.json'
+        report = {'status': 'synthetic'}
+        unit._write_report(path, report)
+        self.assertEqual(path.read_bytes(), unit.encoded(report))
+        with self.assertRaises(FileExistsError):
+            unit._write_report(path, {'status': 'changed'})
+        with self.assertRaisesRegex(unit.AdmissionFailure, 'parent_archive_report_write_forbidden'):
+            unit.admit_archive(self.directory, self.directory / 'data.json', self.directory, self.directory / 'new.json')
+        self.assertFalse((self.directory / 'new.json').exists())
+
+    def test_source_has_no_parameter_estimation_scoring_or_solver_calls(self):
+        source = inspect.getsource(unit)
+        self.assertNotIn('estimate_scale(', source)
+        self.assertNotIn('score_forecast(', source)
+        self.assertNotIn('.fit(', source)
+        self.assertNotIn('.from_scores(', source)
+        self.assertIn('mapper.components(theta)', source)
+
+
+if __name__ == '__main__':
+    unittest.main()

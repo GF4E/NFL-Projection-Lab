@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "{\n  \"1.5\": 3\n}\n",
+    "bytes": 15,
+    "kind": "bytes",
+    "sha256": "a188cce69c0e0e448ccc6bef987ea4cad2313fb4fee3c09980217e3f686243e9",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": false,
+    "expected": false,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "unsupported-key-3",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "dict"
+  },
+  "label": "unsupported-key-3",
+  "original": {
+    "ascii_body": "{\n  \"1.5\": 3\n}\n",
+    "bytes": 15,
+    "kind": "bytes",
+    "sha256": "a188cce69c0e0e448ccc6bef987ea4cad2313fb4fee3c09980217e3f686243e9",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_nonstring_and_mixed_keys_delegate"
+}

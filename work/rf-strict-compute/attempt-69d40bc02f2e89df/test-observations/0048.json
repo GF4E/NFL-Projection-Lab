@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "Object of type set is not JSON serializable",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "eligibility": {
+    "actual": false,
+    "expected": false,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "failure-sequence-1",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "set"
+  },
+  "label": "failure-sequence-1",
+  "original": {
+    "kind": "error",
+    "message": "Object of type set is not JSON serializable",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_failure_then_valid_has_no_retained_state"
+}

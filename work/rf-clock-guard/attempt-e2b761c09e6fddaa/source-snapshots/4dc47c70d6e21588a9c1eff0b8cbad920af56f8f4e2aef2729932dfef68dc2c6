@@ -1,0 +1,522 @@
+"""RF-COMP-08 focused synthetic resource checks; qualifier owns execution.
+
+No historical archive is opened. Clock tests replace only candidate-local
+names and use a named no-timer/elapsed subclass. Original module globals stay
+untouched. One-origin accounting is explicitly seeded only for the tiny real
+science pair; its original callback/origin methods are retained.
+"""
+import ast
+import copy
+from contextlib import contextmanager
+import hashlib
+import importlib.util
+import json
+import math
+import os
+from pathlib import Path
+import signal
+import sys
+import tempfile
+import time
+from types import SimpleNamespace
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import research_score_resource_policy as unit
+import research_score_resource_watchdog as watchdog
+import research_score_resource_preflight as preflight
+import research_score_resource_controller as controller
+import research_score_split_run as original_runtime
+import research_score_split_controller as original_controller
+import research_score_split_compute_controller as baseline_controller
+import research_score_split_watchdog as original_watchdog
+
+OBSERVATIONS = []
+PYTHON = '/opt/anaconda3/bin/python3.12'
+
+
+def save(kind, **values):
+    row = {'kind': kind, **values}
+    # Fail before retaining a non-JSON observation; do not coerce invalid data.
+    json.dumps(row, sort_keys=True, allow_nan=False)
+    OBSERVATIONS.append(row)
+
+
+def load_fixture(filename, name):
+    spec = importlib.util.spec_from_file_location(name, ROOT / filename)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class Clock:
+    def __init__(self): self.now = time.monotonic()
+    def __call__(self): return self.now
+    def advance(self, seconds): self.now += seconds
+
+
+@contextmanager
+def controlled(controller_clock=False, parent_age=None):
+    clock = Clock()
+    base = unit.ControllerEnvelope if controller_clock else unit.RuntimeEnvelope
+
+    class TestEnvelope(base):
+        def _arm(self): pass  # No real timer is needed for a controlled clock.
+        def elapsed(self): return clock.now - self.started
+
+    prior = signal.getsignal(signal.SIGALRM)
+    with patch.object(unit, 'time', SimpleNamespace(monotonic=clock)):
+        args = {} if parent_age is None else {'started_monotonic': clock.now-parent_age}
+        envelope = TestEnvelope(**args)
+        try:
+            yield envelope, clock
+        finally:
+            envelope.close()
+    if signal.getsignal(signal.SIGALRM) is not prior:
+        raise AssertionError('test leaked signal handler')
+
+
+def original_plan():
+    origins, seen = [], []
+    for year in range(2010, 2026):
+        weeks = 17 if year <= 2020 else 18
+        count = 256 if year <= 2020 else 271 if year == 2022 else 272
+        base, remainder = divmod(count-32, weeks-2)
+        sizes = [16, 16] + [base + (i < remainder) for i in range(weeks-2)]
+        for week, size in enumerate(sizes, 1):
+            games = [f'synthetic-{year}-{week}-{i}' for i in range(size)]
+            # Fixed already-seen history gives exact binary cost arithmetic;
+            # this is an accounting fixture, not a reconstructed NFL closure.
+            history = seen[:16]
+            origins.append({'season': year, 'week': week, 'targetGameIds': games,
+                'windows': {'12': {'eligibleInputIds': history}},
+                'originAt': f'{year}-{week:02d}-synthetic'})
+            seen.extend(games)
+    return origins
+
+
+def measured_pilot(origins):
+    with controlled() as (envelope, clock):
+        envelope.measure_phase('admission', lambda: clock.advance(2.))
+        envelope.measure_phase('inference_smoke', lambda: clock.advance(3.))
+        accounting = original_runtime.OriginAccounting(envelope, origins)
+        for origin in origins[:53]:
+            with accounting.origin(origin):
+                if origin['season'] == 2013:
+                    game = origin['targetGameIds'][0]
+                    for kind, duration, failed, fallback, operation in (
+                            ('fit', 1/4096, False, False, 'fit'),
+                            ('fit', 1/1024, True, False, 'fit'),
+                            ('fit', 1/2048, False, True, 'recovery'),
+                            ('score', 1/2048, False, False, 'score')):
+                        def callback():
+                            clock.advance(duration)
+                            if failed: raise ValueError('synthetic_failed_callback')
+                            return unit.CallbackResult(None, 'native_failure' if fallback else None, fallback)
+                        try:
+                            accounting.callback(kind, callback, game_id=game, setting=9,
+                                variant='full', stage='outer', operation=operation,
+                                **({'double_grid': True, 'diagnostics': True} if kind == 'score' else {}))
+                        except ValueError as error:
+                            if not failed or str(error) != 'synthetic_failed_callback': raise
+                clock.advance(1/256)
+        return accounting.snapshot()
+
+
+def tree(module): return ast.parse(Path(module.__file__).read_bytes())
+def functions(node):
+    return {n.name: n for n in node.body if isinstance(n, (ast.FunctionDef, ast.ClassDef))}
+
+
+class SourceTests(unittest.TestCase):
+    def test_shared_science_accounting_storage_and_failure_identities(self):
+        for name in ('RuntimeStop', 'CallbackResult', 'OriginAccounting'):
+            self.assertIs(getattr(unit, name), getattr(original_runtime, name))
+        for name in ('Store', 'OriginAccounting', 'assemble_forecasts', 'PublishedOriginGrader',
+                     'admit_source', 'forecast_inputs', 'StrictSelectionFeed', 'SplitTrajectoryBank',
+                     'evaluate', 'run_smoke', '_bank_state_digest', 'publish_origin',
+                     'validate_publication_binding', '_saved_inference_inputs'):
+            self.assertIs(getattr(controller, name), getattr(baseline_controller, name), name)
+        self.assertIs(controller.ControllerEnvelope, unit.ControllerEnvelope)
+        self.assertIs(controller.pilot_projection, unit.pilot_projection)
+        self.assertIs(controller.preflight, preflight.preflight)
+        self.assertIs(unit.RuntimeEnvelope.finalize_invalid, original_runtime.RuntimeEnvelope.finalize_invalid)
+        self.assertIs(unit._original_pilot_projection, original_runtime.pilot_projection)
+        for name in ('_observe', '_read_phase', '_write_phase', '_json', 'ObservationFailure', '_Halt'):
+            self.assertIs(getattr(watchdog, name), getattr(original_watchdog, name))
+        save('shared_identities', science='COMP04 exact objects', changed='resource boundary only')
+
+    def test_runtime_and_watchdog_ast_only_registered_resource_changes(self):
+        old = functions(tree(original_runtime))['RuntimeEnvelope']
+        new = functions(tree(unit))['RuntimeEnvelope']
+        left, right = functions(old), functions(new)
+        self.assertEqual(set(right), {'__init__', 'check'})
+        for name, actual in right.items():
+            expected = copy.deepcopy(left[name])
+            for n in ast.walk(expected):
+                if isinstance(n, ast.Constant):
+                    if type(n.value) in (int, float) and n.value == 7200: n.value = 9000.
+                    elif n.value == 'registered_7200_second_deadline': n.value = 'registered_9000_second_deadline'
+            self.assertEqual(ast.dump(expected), ast.dump(actual), name)
+        old_controller = functions(tree(original_controller))['ControllerEnvelope']
+        new_controller = functions(tree(unit))['ControllerEnvelope']
+        for n in ast.walk(old_controller):
+            if isinstance(n, ast.Constant) and type(n.value) in (int, float) and n.value == 7200: n.value = 9000.
+        self.assertEqual(ast.dump(old_controller), ast.dump(new_controller))
+        old_watch, new_watch = functions(tree(original_watchdog)), functions(tree(watchdog))
+        for name in ('supervise', '_supervise'):
+            expected = copy.deepcopy(old_watch[name])
+            for n in ast.walk(expected):
+                if isinstance(n, ast.Constant):
+                    if type(n.value) in (int, float) and n.value == 7200:
+                        n.value = 9000. if type(n.value) is float else 9000
+                    elif type(n.value) is str:
+                        n.value = n.value.replace('fixed7200s', 'fixed9000s')
+                        if n.value == 'rf02f.external-process-watchdog.v1': n.value = 'rfcomp08.external-process-watchdog.v1'
+            self.assertEqual(ast.dump(expected), ast.dump(new_watch[name]), name)
+        save('resource_ast', exact=['worker_init/check', 'controller_smoke_methods', 'watchdog_public/private'])
+
+    def test_chronological_loop_is_literal_and_scientific_config_unchanged(self):
+        old, new = functions(tree(baseline_controller)), functions(tree(controller))
+        self.assertEqual(ast.dump(old['_chronological_origins']), ast.dump(new['_chronological_origins']))
+        raw = (ROOT/preflight.CONFIG_PATH).read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(), '0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519')
+        self.assertEqual(len(preflight.FROZEN_CODE_HASHES), 79)
+        self.assertEqual(json.loads((ROOT/preflight.RESOURCE_POLICY_PATH).read_bytes()), preflight.POLICY)
+        self.assertEqual(preflight.POLICY['budget'], unit.BUDGET)
+        self.assertFalse(preflight.POLICY['deferred_helpers_integrated'])
+        save('chronology_ast', exact=True, origins=277, settings=27, variants=13, scored_series=19,
+             fit_slots=31, score_slots=31, scientific_config_sha256=hashlib.sha256(raw).hexdigest())
+
+
+class ProjectionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.origins = original_plan()
+        cls.ledger = measured_pilot(cls.origins)
+
+    def project(self, ledger, remaining=None):
+        return unit.pilot_projection(self.origins, ledger, self.origins[53:] if remaining is None else remaining)
+
+    def at(self, target):
+        ledger = copy.deepcopy(self.ledger)
+        first = original_runtime.pilot_projection(self.origins, ledger, self.origins[53:])
+        # All synthetic counts/durations use exact binary values: solve only E,
+        # preserving every actual interval, failed callback and original formula.
+        ledger['elapsed_seconds'] += target - first['projected_total_seconds']
+        return ledger
+
+    def test_below_between_at_above_caps_exact_delegated_formula(self):
+        for target in (7199., 7200., 8000., 9000., 9000.000000000002):
+            ledger = self.at(target)
+            old = original_runtime.pilot_projection(self.origins, ledger, self.origins[53:])
+            new = self.project(ledger)
+            save('pilot_pair', requested_projection=target, original=old, resource=new,
+                 ledger_sha256=hashlib.sha256(original_runtime.strict(ledger)).hexdigest())
+            self.assertEqual(old['projected_total_seconds'], target)
+            self.assertEqual(new, {**old, 'within_time_screen': target <= 9000,
+                                  'passed': target <= 9000})
+            self.assertEqual(old['within_time_screen'], target <= 7200)
+            self.assertEqual((new['fit_slots_per_future_game'], new['score_slots_per_future_game'],
+                              new['callback_maximum_multiplier']), (31, 31, 2))
+
+    def test_failures_remain_maxima_and_rss_still_vetoes(self):
+        ledger = self.at(8000.); result = self.project(ledger)
+        self.assertEqual(result['failed_callback_count'], 2)
+        self.assertEqual(result['maximum_fit_seconds'], 1/1024)
+        self.assertEqual(result['maximum_score_seconds'], 1/2048)
+        self.assertEqual(result['remaining_origins'], 224)
+        for rss, passed in ((4096., True), (4096.0001, False)):
+            ledger['peak_rss_mib'] = rss; new = self.project(ledger)
+            save('rss_projection', rss=rss, result=new)
+            self.assertTrue(new['within_time_screen']); self.assertIs(new['passed'], passed)
+
+    def test_invalid_membership_anchor_and_failed_interval_preserve_original_errors(self):
+        for case in ('suffix', 'origin', 'fit_anchor', 'outer_flags', 'negative_time'):
+            ledger=copy.deepcopy(self.ledger);remaining=copy.deepcopy(self.origins[53:])
+            if case=='suffix': remaining.pop()
+            elif case=='origin': ledger['origins'][-1]['game_ids'].reverse()
+            elif case=='fit_anchor':
+                for row in ledger['origins']:
+                    for call in row['callbacks']:
+                        if call['operation']=='fit': call['operation']='recovery'
+            elif case=='outer_flags': ledger['origins'][-1]['callbacks'][-1]['diagnostics']=False
+            else: ledger['origins'][-1]['callbacks'][1]['seconds']=-1.
+            errors=[]
+            for function in (original_runtime.pilot_projection, unit.pilot_projection):
+                try: function(self.origins, ledger, remaining)
+                except Exception as error: errors.append((type(error),str(error)))
+            save('invalid_pilot_pair', case=case, errors=[[e.__module__+'.'+e.__name__,s] for e,s in errors])
+            self.assertEqual(len(errors),2);self.assertIs(errors[0][0],errors[1][0]);self.assertEqual(errors[0][1],errors[1][1])
+
+
+class RuntimeTests(unittest.TestCase):
+    def test_initial_9000_deadline_and_no_7200_or_600_stop(self):
+        with controlled() as (env, clock):
+            self.assertEqual(env._deadline-env.started,9000.)
+            env.measure_phase('admission',lambda:clock.advance(601.))
+            clock.now=env.started+7200.;env.check()
+            clock.now=env.started+8999.5;env.check()
+            clock.now=env.started+9000.
+            with self.assertRaisesRegex(unit.RuntimeStop,'9000'):env.check()
+            save('initial_deadline',stop=env.stop_reason,elapsed=env.scientific_stop_elapsed,deadline=env._deadline-env.started)
+            self.assertEqual(env.scientific_stop_elapsed,9000.)
+            with self.assertRaises(unit.RuntimeStop):env.call(lambda:self.fail('science after stop'))
+
+    def test_parent_start_counts_imports_and_delayed_delivery(self):
+        with controlled(True,parent_age=7300.) as (env,clock):
+            self.assertEqual(env._deadline-env.started,9000.);env.check()
+            clock.now=env.started+9025.
+            with self.assertRaisesRegex(unit.RuntimeStop,'9000'):env.check()
+            self.assertEqual(env.scientific_stop_elapsed,9000.)
+            save('parent_start_deadline',observed_elapsed=env.elapsed(),scientific_stop=env.scientific_stop_elapsed)
+
+    def test_earlier_smoke_and_failed_callbacks_keep_original_limits(self):
+        with controlled(True) as (env,clock):
+            env._whole_smoke_deadline=env.started+120.
+            clock.now=env.started+9005.
+            with self.assertRaisesRegex(unit.RuntimeStop,'complete_smoke'):env.check()
+            self.assertEqual(env.scientific_stop_elapsed,120.)
+            save('earliest_complete_smoke',elapsed=env.scientific_stop_elapsed,reason=env.stop_reason)
+        with controlled() as (env,clock):
+            def fails(): clock.advance(121.);raise ValueError('original_callback_failure')
+            with self.assertRaisesRegex(unit.RuntimeStop,'120_second_smoke'):
+                env.measure_phase('inference_smoke',fails)
+            save('smoke_failed_callback',measurements=env.phase_measurements,reason=env.stop_reason)
+            self.assertEqual(env.scientific_stop_elapsed,120.)
+            self.assertEqual(env.phase_measurements[0]['seconds'],121.)
+
+    def test_memory_boundary_and_interrupt_preservation(self):
+        with controlled() as (env,_):
+            with patch.object(unit,'rss_mib',return_value=4096.):env.check()
+            with patch.object(unit,'rss_mib',return_value=4096.001):
+                with self.assertRaisesRegex(unit.RuntimeStop,'4096'):env.check()
+            save('memory_stop',reason=env.stop_reason)
+        for error in (ValueError,KeyboardInterrupt,SystemExit):
+            with controlled() as (env,clock):
+                def callback(): clock.now=env.started+9001.;raise error('preserved')
+                expected=unit.RuntimeStop if error is ValueError else error
+                with self.assertRaises(expected):env.call(callback)
+                self.assertEqual(env.stop_reason,'registered_9000_second_deadline')
+                save('post_callback_stop',raised=expected.__name__,original=error.__name__,reason=env.stop_reason)
+
+    def test_real_short_signal_escapes_exception_and_restores_handler(self):
+        prior=signal.getsignal(signal.SIGALRM)
+        with unit.RuntimeEnvelope() as env:
+            env._deadline=time.monotonic()+.02;env._arm()
+            with self.assertRaisesRegex(unit.RuntimeStop,'9000'):
+                try:time.sleep(.12)
+                except Exception:self.fail('deadline swallowed')
+            save('actual_short_signal',reason=env.stop_reason)
+        self.assertIs(signal.getsignal(signal.SIGALRM),prior)
+        self.assertEqual(signal.getitimer(signal.ITIMER_REAL),(0.,0.))
+
+    def test_real_invalid_closure_no_science_and_no_second_terminal(self):
+        with tempfile.TemporaryDirectory() as folder:
+            store=original_runtime.Store(Path(folder).resolve(),'synthetic-resource-grace')
+            env=unit.RuntimeEnvelope()
+            try:
+                old_finish=store.finish
+                def finish(value,check):
+                    self.assertEqual(env.phase,'metadata_finalization')
+                    with self.assertRaises(unit.RuntimeStop):env.call(lambda:self.fail('grace science'))
+                    return old_finish(value,check)
+                with patch.object(store,'finish',side_effect=finish):
+                    terminal=env.finalize_invalid(store,{'status':'protocol_invalid','reason':'synthetic'})
+                save('actual_metadata_closure',terminal=terminal,finalized=store.finalized)
+                self.assertEqual(terminal['invalid_finalization_only_cap_seconds'],30)
+                self.assertTrue(store.finalized)
+                with self.assertRaises(ValueError):env.finalize_invalid(store,{'status':'protocol_invalid'})
+            finally:env.close();store.close()
+
+    def test_expired_grace_does_not_refresh_after_late_delivery(self):
+        with tempfile.TemporaryDirectory() as folder:
+            store=original_runtime.Store(Path(folder).resolve(),'synthetic-expired-grace')
+            env=unit.RuntimeEnvelope()
+            try:
+                env.started=time.monotonic()-9031.;env._deadline=env.started+9000.
+                with patch.object(store,'finish',side_effect=AssertionError('late terminal write')) as finish:
+                    with self.assertRaisesRegex(unit.RuntimeStop,'metadata_finalization'):
+                        env.finalize_invalid(store,{'status':'protocol_invalid'})
+                self.assertEqual(finish.call_count,0);self.assertFalse(store.finalized)
+                self.assertEqual(env.scientific_stop_elapsed,9000.)
+                self.assertEqual(env._grace_deadline,env.started+9030.)
+                save('expired_grace',reason=env.stop_reason,scientific_stop=env.scientific_stop_elapsed,finalized=store.finalized)
+            finally:env.close();store.close()
+
+
+class WatchdogTests(unittest.TestCase):
+    def child(self,code,limits=(2.,256.,1.,.01),phase=False,smoke=.12,public=False):
+        with tempfile.TemporaryDirectory() as folder:
+            args={'cwd':ROOT,'output_parent':Path(folder),'identity':'synthetic-resource-child'}
+            command=[PYTHON,'-I','-c',code]
+            before=signal.getsignal(signal.SIGALRM)
+            report=(watchdog.supervise(command,**args) if public else
+                    watchdog._supervise(command,**args,limits=limits,phase_status=phase,_smoke_seconds=smoke))
+            root=Path(folder)/args['identity'];artifacts={}
+            for name,pointer in report['artifacts'].items():
+                raw=(root/name).read_bytes()
+                self.assertEqual(pointer,{'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)})
+                artifacts[name]=raw.decode('utf8')
+            save('owned_child',report=report,artifact_bodies=artifacts)
+            self.assertEqual(json.loads((root/'process-report.json').read_bytes()),report)
+            self.assertFalse(report['scientific_terminal_verified']);self.assertFalse(report['automatic_restart'])
+            self.assertEqual(report['worker_grace_seconds'],0)
+            self.assertIs(signal.getsignal(signal.SIGALRM),before)
+            self.assertEqual(signal.getitimer(signal.ITIMER_REAL),(0.,0.))
+            with self.assertRaises(ChildProcessError):os.waitpid(report['pid'],os.WNOHANG)
+            return report
+
+    def header(self):
+        return ('import sys,time;sys.path.insert(0,'+repr(str(ROOT/'scripts'))+');'
+            'from research_score_split_watchdog import transition_phase;'
+            "p=sys.argv[sys.argv.index('--watchdog-phase-file')+1];")
+
+    def test_public_9000_policy_and_real_phase_handshake(self):
+        report=self.child(self.header()+"transition_phase(p,'smoke');transition_phase(p,'science')",public=True)
+        self.assertEqual(report['status'],'completed_process');self.assertEqual(report['exit_code'],0)
+        self.assertEqual(report['limits'],{'scientific_seconds':9000.,'rss_mib':4096.,
+            'parent_metadata_seconds':30.,'rss_sample_interval_seconds':.05,'complete_smoke_seconds':120.})
+        self.assertEqual(report['phase_progression'][-1]['phase'],'science')
+        with tempfile.TemporaryDirectory() as folder:
+            for limits in ((9000.1,256.,1.,.01),(2.,4096.1,1.,.01),(2.,256.,30.1,.01)):
+                with self.assertRaisesRegex(ValueError,'invalid_private_test_limits'):
+                    watchdog._supervise([PYTHON,'-I','-c','pass'],cwd=ROOT,output_parent=Path(folder),identity='invalid',limits=limits)
+            self.assertEqual(list(Path(folder).iterdir()),[])
+
+    def test_native_signal_suppression_hard_stops_without_worker_grace(self):
+        report=self.child("import hashlib,signal;signal.signal(signal.SIGALRM,signal.SIG_IGN);signal.signal(signal.SIGTERM,signal.SIG_IGN);hashlib.pbkdf2_hmac('sha256',b'x',b'y',1000000000)",limits=(.2,256.,1.,.01))
+        self.assertEqual(report['stop_reason'],'scientific_wall_deadline')
+        self.assertEqual(report['exit_code'],-signal.SIGKILL)
+        self.assertAlmostEqual(report['scientific_stop_elapsed_seconds'],.2,places=6)
+        self.assertEqual(report['kill_requests'][0]['pgid'],report['pid'])
+
+    def test_short_external_smoke_and_rss_remain_enforced(self):
+        report=self.child(self.header()+"transition_phase(p,'smoke');time.sleep(3)",phase=True)
+        self.assertEqual(report['stop_reason'],'complete_smoke_deadline')
+        self.assertEqual(report['exit_code'],-signal.SIGKILL)
+        report=self.child('import time;x=bytearray(80*1024**2);time.sleep(3)',limits=(2.,48.,1.,.01))
+        self.assertIn(report['stop_reason'],('sampled_group_rss_limit','waited_worker_peak_rss_limit'))
+        self.assertEqual(report['exit_code'],-signal.SIGKILL)
+
+    def test_missing_observation_and_existing_identity_are_not_success(self):
+        with patch.object(watchdog,'_observe',return_value=[]):
+            report=self.child('import time;time.sleep(3)')
+        self.assertEqual(report['status'],'observation_or_setup_failure')
+        self.assertTrue(report['observation_errors'])
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder)/'taken';path.mkdir();(path/'sentinel').write_bytes(b'unchanged')
+            with self.assertRaises(FileExistsError):
+                watchdog.supervise([PYTHON,'-I','-c',"raise AssertionError('must not spawn')"],
+                    cwd=ROOT,output_parent=Path(folder),identity='taken')
+            self.assertEqual(list(path.iterdir()),[path/'sentinel'])
+            self.assertEqual((path/'sentinel').read_bytes(),b'unchanged')
+
+
+class ResourceFixture:
+    def __init__(self):
+        old=load_fixture('tests/research-score-split-compute/test_preflight.py','comp08_old_schema_fixture')
+        self.base=old.Fixture();f=self.base;p=preflight
+        rp=f.put_raw(p.RESOURCE_PROTOCOL_PATH,b'explicit synthetic resource protocol')
+        policy=f.put(p.RESOURCE_POLICY_PATH,p.POLICY)
+        baseline=f.put('synthetic-baseline.json',{'version':'rfcomp04.prefit-acceptance.v1',
+            'status':'accepted_for_one_historical_invocation','code_hashes':f.frozen,
+            'runtime':p.RUNTIME,'runtime_files':f.runtime_files,
+            'evidence':[f.put('synthetic-baseline-evidence.json',{'synthetic':True})]})
+        self.resource_sha=rp['sha256'];self.policy_sha=policy['sha256'];self.baseline_pointer=baseline
+        f.acceptance.update(version=p.VERSION,resource_protocol=rp,resource_policy=policy,baseline_acceptance=baseline)
+        q=json.loads(f.files[f.root/f.acceptance['qualification']['path']])
+        q.update(version='rfcomp08.controller-qualification.v1',scope=p.REVIEW_SCOPE,
+            resource_protocol_sha256=self.resource_sha,resource_policy_sha256=self.policy_sha)
+        f.acceptance['qualification']=f.put('synthetic-qualification.json',q)
+        for role in ('numerical','temporal'):
+            f.acceptance['independent_reviews'][role]=f.put('synthetic-'+role+'.json',
+                {**q,'version':'rfcomp08.controller-review.v1','status':'accepted','role':role,
+                 'qualification_sha256':f.acceptance['qualification']['sha256'],'blockers':[],'findings':['synthetic schema only']})
+
+    def run(self):
+        f=self.base
+        return preflight._validate(f.root,f.acceptance,'a'*64,preflight.RUNTIME,f.check,
+            read=f.read,frozen=f.frozen,candidates=f.candidates,stages=f.stages,
+            protocol_sha=f.protocol_sha,config_sha=f.config_sha,compute_sha=f.compute_sha,
+            runtime_files=f.runtime_files,terminal_pointers={},resource_sha=self.resource_sha,
+            policy_sha=self.policy_sha,baseline_pointer=self.baseline_pointer)
+
+
+class PreflightTests(unittest.TestCase):
+    def test_fresh_manifest_budget_identity_and_scientific_registry(self):
+        fixture=ResourceFixture();first=fixture.run();second=fixture.run()
+        save('synthetic_preflight',manifest=first['manifest'],identity=first['identity'])
+        self.assertEqual(first,second)
+        self.assertEqual(first['manifest']['budget'],unit.BUDGET)
+        self.assertEqual(first['identity'],'rfcomp08-v1-'+preflight.digest(preflight.encoded(first['manifest']))[:16])
+        self.assertEqual(preflight.encoded(first['manifest']),original_runtime.strict(first['manifest']))
+        self.assertEqual(first['manifest']['scientific_registry'],{k:first['config'][k] for k in
+            ('settingsInTieOrder','variantsInOrder','seriesInOrder','energyComparisonsInOrder','calibrationCellsInOrder')})
+        self.assertFalse(first['manifest']['automatic_restart'])
+
+    def test_old_missing_wrong_and_rehashed_resource_policy_rejected(self):
+        for case in ('old','missing_policy','missing_protocol','wrong_hash','rehashed_7200','truthy_grace'):
+            x=ResourceFixture();f=x.base
+            if case=='old':f.acceptance['version']='rfcomp04.prefit-acceptance.v1'
+            elif case=='missing_policy':del f.acceptance['resource_policy']
+            elif case=='missing_protocol':del f.acceptance['resource_protocol']
+            elif case=='wrong_hash':f.acceptance['resource_policy']['sha256']='0'*64
+            else:
+                policy=copy.deepcopy(preflight.POLICY)
+                policy['budget']['seconds' if case=='rehashed_7200' else 'external_worker_grace_seconds']=7200 if case=='rehashed_7200' else False
+                pointer=f.put(preflight.RESOURCE_POLICY_PATH,policy)
+                f.acceptance['resource_policy']=pointer;x.policy_sha=pointer['sha256']
+            with self.subTest(case=case),self.assertRaises(ValueError):x.run()
+            save('rejected_resource_binding',case=case)
+
+    def test_baseline_source_runtime_and_review_scope_contradictions_rejected(self):
+        for case in ('baseline_source','baseline_evidence','frozen_source','runtime','review_policy','review_scope','old_qualification'):
+            x=ResourceFixture();f=x.base
+            if case=='baseline_source':
+                f.mutate_document(x.baseline_pointer,lambda v:v.update(code_hashes={}))
+            elif case=='baseline_evidence':f.files[f.root/'synthetic-baseline-evidence.json']+=b' '
+            elif case=='frozen_source':f.files[f.root/next(iter(f.frozen))]+=b' '
+            elif case=='runtime':f.files[f.root/'synthetic-runtime.bin']+=b' '
+            elif case=='old_qualification':f.mutate_document(f.acceptance['qualification'],lambda v:v.update(version='rfcomp04.controller-qualification.v1'))
+            else:f.mutate_document(f.acceptance['independent_reviews']['numerical'],lambda v:v.update(
+                **({'resource_policy_sha256':'0'*64} if case=='review_policy' else {'scope':'complete_controller_synthetic_qualification'})))
+            with self.subTest(case=case),self.assertRaises(ValueError):x.run()
+            save('rejected_resource_evidence',case=case)
+
+
+class GenuineScienceTests(unittest.TestCase):
+    def test_one_actual_shared_science_pair_under_old_and_resource_envelopes(self):
+        fixtures=load_fixture('tests/research-score-split-compute/test_integration.py','comp08_tiny_science_fixture')
+        witnesses=[]
+        for label,control in (('COMP04',baseline_controller),('COMP08',controller)):
+            case=fixtures.IntegratedCase(2013,0)
+            try:
+                with control.ControllerEnvelope() as envelope:
+                    # Explicit one-origin synthetic context. All original
+                    # accounting operations, Store, assembler and scorer run.
+                    accounting=object.__new__(original_runtime.OriginAccounting)
+                    accounting.envelope=envelope;accounting._plan=(original_runtime.strict(case.view['origin']),)
+                    accounting._origins=[];accounting._active_origin=None;accounting._active_callback=None
+                    with accounting.origin(case.view['origin']):
+                        pointer=case.publish(accounting)
+                        graded=case.grade(control.PublishedOriginGrader(),accounting,pointer)
+                    scientific={
+                        'assembly':{k:case.assembly[k] for k in ('full_setting_forecasts','outer_selected_forecasts','grading_plan')},
+                        'laws':[{'key':list(k),'fields':fixtures.law_fields(v)} for k,v in case.assembly['resolved_laws'].items()],
+                        'inner_rows':graded['inner_rows'],'outer_rows':graded['outer_rows'],'counts':graded['counts'],
+                        'provenance':case.store.read_bound(graded['artifacts']['grading_provenance'])}
+                    body=original_runtime.strict(scientific)
+                    save('real_science_pair',route=label,science=json.loads(body),sha256=hashlib.sha256(body).hexdigest(),
+                        fixture_scope='same tiny scientific manifest; original one-origin accounting methods',
+                        deadline_seconds=envelope._deadline-envelope.started)
+                    witnesses.append(body)
+            finally:case.close()
+        self.assertEqual(witnesses[0],witnesses[1])
+        self.assertEqual(OBSERVATIONS[-2]['deadline_seconds'],7200.)
+        self.assertEqual(OBSERVATIONS[-1]['deadline_seconds'],9000.)
+
+
+if __name__=='__main__':unittest.main()

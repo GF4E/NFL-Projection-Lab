@@ -1,0 +1,76 @@
+{
+  "version": "rf02f.root-terminal-integrity.v1",
+  "status": "passed_integrity_only_pending_independent_terminal_reviews",
+  "run_directory": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02f-v1-7b400dec97ab30c1",
+  "indexed_files": 431,
+  "indexed_bytes": 191260309,
+  "manifest": {
+    "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02f-v1-7b400dec97ab30c1/manifest.json",
+    "sha256": "7b400dec97ab30c11928463696ed4f86b8ca496646998f4e15812c0cfd8e381e",
+    "bytes": 20187
+  },
+  "completion_files": [
+    {
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02f-v1-7b400dec97ab30c1/completion/artifact-index.json",
+      "sha256": "30c43545ce4b1cdccc46196df7cc18e215de77b64afdeaf64513788cd3375b19",
+      "bytes": 67139
+    },
+    {
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rf02f-v1-7b400dec97ab30c1/completion/terminal.json",
+      "sha256": "ec40d8a78b6c70a4f66759101db8cc0037b8449740f0ecbe31cadcaf4919324e",
+      "bytes": 413142
+    }
+  ],
+  "process_report": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rf02f-observer-c8bfb96705884106/process-report.json",
+    "sha256": "0e3b81aa4eaebbab34814813de7362cf9079179f61432a51c05e6d84d792aa67",
+    "bytes": 3029
+  },
+  "source_files_unchanged": 66,
+  "actual_completed_origins": 53,
+  "last_origin": [
+    2013,
+    2
+  ],
+  "uncommitted_artifacts": [],
+  "uncommitted_staging": [],
+  "only_model_namespace": true,
+  "terminal_status": "protocol_invalid",
+  "terminal_reason": "registered_pilot_cost_screen_failed",
+  "counts": {
+    "actual_mass_cdf_calls": 3328,
+    "actual_score_calls": 9856,
+    "copied_diagonal_inner": 4896,
+    "copied_e3_outer": 352,
+    "copied_raw_outer": 192,
+    "inner_rows": 14688,
+    "outer_rows": 608,
+    "scored_inner": 9792,
+    "scored_outer": 64
+  },
+  "scientific_failed_callbacks": 0,
+  "pilot_projection_seconds": 12765.113383447922,
+  "registered_limit_seconds": 7200,
+  "process_seconds": 207.77404308400583,
+  "process_peak_rss_mib": 782.671875,
+  "actual_admission_seconds": 58.93409329200222,
+  "complete_smoke_seconds": 49.96891783400497,
+  "public_smoke_evaluator_seconds": 14.745588792007766,
+  "no_full_historical_evaluation": true,
+  "new_scientific_calls": 0,
+  "automatic_restart": false,
+  "prior_read_only_attempt": {
+    "status": "failed_audit_schema_assumption",
+    "error": "AssertionError",
+    "reason": "Initial inline audit compared index membership to top-level files only. The index also correctly includes completion/terminal.json. The corrected audit compares recursive files except the index itself.",
+    "research_artifact_or_source_changed": false,
+    "scientific_invocation": false
+  },
+  "seconds": 0.34747366700321436,
+  "peak_rss_mib": 80.890625,
+  "script": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-terminal-audit/root_integrity.py",
+    "sha256": "8a55bb8fb75525f65d43082dfb6eeb1760fd4973fe365f2e6e7822e78e58bcea",
+    "bytes": 5098
+  }
+}

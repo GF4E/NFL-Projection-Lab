@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/opt/anaconda3/bin/python3.12",
+    "-I",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_bank_unit.py"
+  ],
+  "exit_code": 0,
+  "external_wall_seconds_including_setup": 1.4267359160003252,
+  "peak_child_rss_mib": 86.9375,
+  "observed_test_rss_mib": 85.34375,
+  "wall_cap_seconds": 120,
+  "rss_cap_mib": 2048,
+  "limit_failure": null,
+  "guard": "external elapsed/RSS polling; macOS rejects setrlimit AS/RSS, so neither is claimed as a kernel limit",
+  "source_test_hashes": {
+    "scripts/research_score_split_replay.py": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547",
+    "tests/research-score-split/test_bank_unit.py": "326837b37b50c1045b9ba830359a863b48db13c01c48d4b8a782d663184c8973"
+  },
+  "mean_source_unchanged": true,
+  "scope": "synthetic_bank_and_inherited_selection_only",
+  "log_path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-bank-unit/author-tests-44411d6f12ac.log",
+  "log_sha256": "9089fb838aa2ed652870b8d9d66ce89796d081f9d7c304a3c4262b78a0793c5d"
+}

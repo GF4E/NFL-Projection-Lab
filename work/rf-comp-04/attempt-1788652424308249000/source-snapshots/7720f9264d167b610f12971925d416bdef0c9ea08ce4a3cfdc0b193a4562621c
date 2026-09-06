@@ -1,0 +1,655 @@
+"""Synthetic integrated runner boundaries; no actual archive or historical fits."""
+import copy
+from dataclasses import replace
+from datetime import datetime, timedelta
+import json
+import os
+from pathlib import Path
+import resource
+import sys
+import tempfile
+import time
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
+import research_score_conditional_run as unit
+from research_score_distribution import JointBase, JointDistribution
+
+
+class SyntheticArchive:
+    def __init__(self, values):
+        self.values = values
+        self.index = {name: {'sha256': unit.sha(unit.strict(value)), 'bytes': len(unit.strict(value))}
+                      for name, value in values.items()}
+
+    def read(self, pointer):
+        return copy.deepcopy(self.values[pointer['name'] if isinstance(pointer, dict) else pointer])
+
+
+def saved(mapper, pointer, independent=False):
+    theta = np.array([0., -0.])
+    _, alpha, beta, rates, _, _ = mapper.components(theta)
+    d = JointDistribution(mapper.atoms.copy(), alpha, beta, rates, theta, 3, independent)
+    mean, covariance = d.moments()
+    return {'version': 'rf.joint-distribution.v2', 'mapper': pointer, 'theta': theta.tolist(), 'beta': beta,
+            'rates': rates.tolist(), 'alphaSha256': unit.sha(unit.encoded(alpha.tolist())), 'iterations': 3,
+            'independent': independent, 'mean': mean.tolist(), 'covariance': covariance.tolist()}
+
+
+def fixture(store):
+    mapper_value = {'atoms': [[0., 2.], [2., 0.]], 'weights': [.5, .5], 'b': 1., 'epsilon': .05}
+    mapper_hash = unit.sha(unit.strict(mapper_value))
+    pointer = {'name': 'object-' + mapper_hash + '.json', 'sha256': mapper_hash}
+    mapper = JointBase(np.array(mapper_value['atoms']), np.array(mapper_value['weights']), 1.)
+    archive = SyntheticArchive({pointer['name']: mapper_value})
+    origin = {'season': 2013, 'week': 1, 'originAt': '2013-09-03T14:30:00+00:00', 'targetGameIds': ['z-first', 'a-last']}
+    records = {game: {'gameId': game, 'season': 2013, 'week': 1, 'kickoffAt': '2013-09-05T18:00:00+00:00',
+                      'homeScore': 0, 'awayScore': 2} for game in origin['targetGameIds']}
+    contexts = {game: {'game_id': game, 'season': 2013, 'week': 1, 'kickoff_at': records[game]['kickoffAt']}
+                for game in origin['targetGameIds']}
+    parent_rows, parent_losses = {}, {}
+    series = list(unit.SERIES) + [key for key in unit.RAW_REFERENCES if key not in unit.SERIES]
+    for family, variant in series:
+        descriptor = saved(mapper, pointer, variant == 'independent_marginals')
+        for game in origin['targetGameIds']:
+            key = family, variant, game
+            parent_rows[key] = {'family': family, 'variant': variant, 'game_id': game,
+                                'native_failure': None, 'distribution': copy.deepcopy(descriptor)}
+            parent_losses[key] = {'family': family, 'variant': variant, 'game_id': game,
+                                 'native_failure': None, 'metrics': {'home_observed': 0., 'away_observed': 2.}}
+    references = {'forecast': {'name': 'forecasts-2013-01.json', 'sha256': 'a' * 64, 'bytes': 123},
+                  'loss': {'name': 'outer-losses-2013-01.json', 'sha256': 'b' * 64, 'bytes': 456}}
+    manifest_hash = 'c' * 64
+    bodies, envelopes, pointers = {}, {}, {}
+    for family, variant in unit.ORDINARY:
+        body = unit.annual_receipt(family, variant, 2013, origin['originAt'], {}, [], [])
+        envelope = unit.receipt_envelope(body, manifest_hash, [])
+        name = f'annual-{family.lower()}-{variant.replace("_", "-")}.json'
+        store.write(name, envelope)
+        bodies[family, variant], envelopes[family, variant], pointers[family, variant] = body, envelope, store.pointer(name)
+    counts = {'prediction_reconstruction_calls': 0, 'mapped_prediction_calls': 0,
+              'recipe_reconstruction_calls': 0, 'score_calls': 0}
+    return {'archive': archive, 'origin': origin, 'records': records, 'contexts': contexts, 'rows': parent_rows,
+            'losses': parent_losses, 'references': references, 'manifest': manifest_hash,
+            'annual': (bodies, envelopes, pointers, []), 'budget': unit.Budget(), 'counts': counts}
+
+
+class RunTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.started = time.monotonic()
+
+    @classmethod
+    def tearDownClass(cls):
+        elapsed = time.monotonic() - cls.started
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == 'darwin' else 1024)
+        if elapsed > 120 or rss > 4096:
+            raise AssertionError(f'synthetic_budget_exceeded: seconds={elapsed}, rss_mib={rss}')
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.directory = Path(self.temp.name).resolve()
+        self.store = unit.Store(self.directory, 'synthetic-run')
+
+    def tearDown(self):
+        self.store.close()
+        self.temp.cleanup()
+
+    def publish(self, f):
+        return unit.publish_origin(self.store, f['archive'], f['manifest'], f['origin'], f['contexts'], f['rows'],
+                                   f['references'], f['annual'][0], f['annual'][2], f['budget'], f['counts'])
+
+    def grade(self, f, pointer, records=None):
+        return unit.grade_origin(self.store, f['archive'], f['manifest'], f['origin'], pointer,
+                                f['records'] if records is None else records, f['rows'], f['losses'], f['references'],
+                                f['annual'], f['origin']['originAt'], f['budget'], f['counts'])
+
+    def test_complete_publication_is_durable_before_any_grader_outcome(self):
+        f = fixture(self.store)
+        with patch.object(unit.os, 'fsync', wraps=os.fsync) as synced:
+            pointer = self.publish(f)
+            self.assertIn(self.store.fd, [call.args[0] for call in synced.call_args_list])
+        publication = self.store.read_bound(pointer)
+        self.assertEqual(len(publication['rows']), 40)
+        self.assertEqual(publication['rows'][0]['game_id'], 'z-first')
+        self.assertEqual(publication['rows'][1]['game_id'], 'a-last')
+        self.assertNotIn('observed_home', publication['rows'][0])
+        owner = self
+        class Guard(dict):
+            def __getitem__(self, key):
+                if key in ('homeScore', 'awayScore'):
+                    owner.assertEqual(len(owner.store.read_bound(pointer)['rows']), 40)
+                return super().__getitem__(key)
+        records = {key: Guard(value) for key, value in f['records'].items()}
+        real_score = unit.score_forecast
+        with patch.object(unit, 'score_forecast', wraps=real_score) as score:
+            mapped, raw = self.grade(f, pointer, records)
+        self.assertEqual((len(mapped), len(raw), score.call_count), (40, 12, 40))
+        self.assertTrue(all(call.kwargs == {'double_grid': True, 'diagnostics': True} for call in score.call_args_list))
+        self.assertEqual(f['counts'], {'prediction_reconstruction_calls': 40, 'mapped_prediction_calls': 40,
+                                      'recipe_reconstruction_calls': 40, 'score_calls': 40})
+        for row in mapped:
+            self.assertTrue(all(0 <= row['metrics'][target + '_interval_mass_80'] <= 1
+                                for target in ('home', 'away', 'margin', 'total')))
+        self.assertIs(raw[0]['metrics'], f['losses']['N0', 'full', 'z-first']['metrics'])
+
+    def test_pregame_whitelist_and_original_target_order(self):
+        f = fixture(self.store)
+        f['contexts']['z-first']['observed_home'] = 0
+        with patch.object(unit, 'predict') as predict, self.assertRaisesRegex(unit.RunFailure, 'outcome_free'):
+            self.publish(f)
+        predict.assert_not_called()
+        f['contexts']['z-first'].pop('observed_home')
+        f['contexts'] = dict(reversed(list(f['contexts'].items())))
+        with self.assertRaisesRegex(unit.RunFailure, 'original_target_order'):
+            self.publish(f)
+
+    def test_receipt_foreign_run_same_year_cutoff_and_mutation_rejected(self):
+        f = fixture(self.store); key = ('E2', 'full')
+        envelope, pointer = f['annual'][1][key], f['annual'][2][key]
+        unit.verify_envelope(envelope, pointer, f['manifest'], key, 2013, f['origin']['originAt'], [])
+        for mutation in ('run', 'cutoff', 'year', 'scale'):
+            changed = copy.deepcopy(envelope)
+            if mutation == 'run': changed['run_manifest_sha256'] = 'd' * 64
+            elif mutation == 'cutoff': changed['pure_receipt']['cutoff'] = '2013-09-04T14:30:00+00:00'
+            elif mutation == 'year': changed['target_season'] = 2014
+            else: changed['pure_receipt']['scale'] = .5
+            # Even recomputing the envelope file pointer cannot repair its expected run/cutoff/pure binding.
+            new_pointer = dict(pointer, sha256=unit.sha(unit.strict(changed)), bytes=len(unit.strict(changed)))
+            with self.subTest(mutation=mutation), self.assertRaises(unit.RunFailure):
+                unit.verify_envelope(changed, new_pointer, f['manifest'], key, 2013, f['origin']['originAt'], [])
+
+    def test_persisted_recipe_reconstruction_and_old_theta_rejected(self):
+        f = fixture(self.store); pointer = self.publish(f)
+        publication = self.store.read_bound(pointer)
+        recipe = publication['rows'][0]
+        def recover(value):
+            chosen = recipe['provenance']['chosen_source']; key = chosen['family'], chosen['variant']
+            return unit.recover_recipe(value, f['archive'], f['rows'], f['references']['forecast'],
+                    f['annual'][1][key], f['annual'][2][key], f['manifest'], f['origin'], f['origin']['originAt'], [], {}, f['counts'])
+        result = recover(recipe)
+        self.assertEqual(unit.law_fingerprint(result), recipe['result_distribution_fingerprint'])
+        with self.assertRaisesRegex(unit.RunFailure, 'transformed_law_recipe'):
+            recover(f['rows']['N0', 'full', 'z-first']['distribution'])
+        for field, value in (('result_distribution_fingerprint', 'f' * 64), ('native_failure', 'changed'),
+                             ('parent_forecast', {'name': 'wrong'})):
+            changed = copy.deepcopy(recipe); changed[field] = value
+            with self.subTest(field=field), self.assertRaises(unit.RunFailure): recover(changed)
+        changed = copy.deepcopy(recipe); changed['provenance']['transformation']['s'] = .5
+        changed['provenance']['sha256'] = unit.fingerprint({key: value for key, value in changed['provenance'].items() if key != 'sha256'})
+        with self.assertRaisesRegex(unit.RunFailure, 'persisted_transformed_law'): recover(changed)
+
+    def test_E2_fallback_and_independence_bind_N0_full_receipt(self):
+        f = fixture(self.store)
+        for variant in ('full', 'independent_marginals', 'no_offense', 'no_defense'):
+            for game in f['origin']['targetGameIds']:
+                f['rows']['E2', variant, game]['native_failure'] = 'synthetic-native-failure'
+                f['losses']['E2', variant, game]['native_failure'] = 'synthetic-native-failure'
+        pointer = self.publish(f)
+        rows = self.store.read_bound(pointer)['rows']
+        failed = [row for row in rows if row['native_failure'] is not None]
+        self.assertEqual(len(failed), 8)
+        for row in failed:
+            self.assertEqual(row['annual_envelope'], f['annual'][2]['N0', 'full'])
+            self.assertEqual(row['provenance']['chosen_source']['family'], 'N0')
+            self.assertEqual(row['provenance']['chosen_source']['variant'], 'full')
+        scored, _ = self.grade(f, pointer)
+        self.assertEqual(sum(row['native_failure'] == 'synthetic-native-failure' for row in scored), 8)
+
+    def test_real_nonidentity_2014_receipts_recipe_grading_and_differing_fallback_scale(self):
+        f = fixture(self.store)
+        f['origin'].update(season=2014, originAt='2014-09-02T14:30:00+00:00')
+        for game in f['origin']['targetGameIds']:
+            f['records'][game].update(season=2014, kickoffAt='2014-09-04T18:00:00+00:00')
+            f['contexts'][game].update(season=2014, kickoff_at='2014-09-04T18:00:00+00:00')
+        f['references']['forecast']['name'] = 'forecasts-2014-01.json'
+        f['references']['loss']['name'] = 'outer-losses-2014-01.json'
+        original = unit.recover_source(f['archive'], f['rows']['N0', 'full', 'z-first']['distribution'], {})
+        source_hash = unit.distribution_fingerprint(original)
+        kickoff = datetime.fromisoformat('2013-12-01T18:00:00+00:00')
+        games = [f'synthetic-prior-{i}' for i in range(256)]
+        bodies, envelopes, pointers = {}, {}, {}
+        for family, variant in unit.ORDINARY:
+            observed = (1, 1) if family == 'N0' else (0, 2)
+            case = unit.canonical(unit.calibration_case(original, *observed))
+            case_hash = unit.fingerprint(case)
+            sources, cases = [], []
+            for game in games:
+                common = {'family': family, 'variant': variant, 'season': 2013, 'game_id': game,
+                          'source_fingerprint': source_hash, 'case_fingerprint': case_hash}
+                sources.append({**common, 'origin_at': '2013-11-26T14:30:00+00:00', 'kickoff_at': kickoff.isoformat(),
+                    'availability': {str(hours): (kickoff + timedelta(hours=hours)).isoformat() for hours in (12, 24)},
+                    'native_failure': None, 'observed_home': observed[0], 'observed_away': observed[1]})
+                cases.append({**common, 'weight': 1, 'case': case})
+            body = unit.annual_receipt(family, variant, 2014, f['origin']['originAt'], {2013: games}, sources, cases)
+            later = [{'season': 2025, 'unreadable_future_payload': object()}]
+            unchanged = unit.annual_receipt(family, variant, 2014, f['origin']['originAt'], {2013: games}, sources + later, cases + later)
+            self.assertEqual(body, unchanged)
+            envelope = unit.receipt_envelope(body, f['manifest'], [])
+            name = f'warm-2014-{family.lower()}-{variant.replace("_", "-")}.json'
+            self.store.write(name, envelope)
+            bodies[family, variant], envelopes[family, variant], pointers[family, variant] = body, envelope, self.store.pointer(name)
+        self.assertLess(bodies['N0', 'full']['scale'], 1.)
+        self.assertNotEqual(bodies['N0', 'full']['scale'], bodies['E2', 'full']['scale'])
+        f['annual'] = bodies, envelopes, pointers, []
+        for variant in ('full', 'independent_marginals', 'no_offense', 'no_defense'):
+            for game in f['origin']['targetGameIds']:
+                f['rows']['E2', variant, game]['native_failure'] = 'synthetic-inherited-failure'
+                f['losses']['E2', variant, game]['native_failure'] = 'synthetic-inherited-failure'
+        pointer = self.publish(f)
+        recipes = self.store.read_bound(pointer)['rows']
+        mapped, _ = self.grade(f, pointer)
+        for row, recipe in zip(mapped, recipes):
+            raw_family, variant = row['family'][:-1], row['variant']
+            fallback = recipe['native_failure'] is not None
+            key = ('N0', 'full') if fallback else (raw_family, 'full' if variant == 'independent_marginals' else variant)
+            expected, descriptor = unit.transform_distribution(original, bodies[key]['scale'])
+            if variant == 'independent_marginals': expected, _ = unit.independent_control(expected, descriptor)
+            self.assertEqual(recipe['result_distribution_fingerprint'], unit.law_fingerprint(expected))
+            self.assertEqual(recipe['provenance']['transformation']['s'], bodies[key]['scale'])
+            if fallback:
+                self.assertEqual(recipe['annual_envelope'], pointers['N0', 'full'])
+                self.assertNotEqual(recipe['annual_envelope'], pointers['E2', 'full'])
+            expected_metrics = unit.score_forecast(expected, [0, 2], row['game_id'], double_grid=True, diagnostics=True)
+            for target in ('home', 'away', 'margin', 'total'):
+                expected_metrics[target + '_interval_mass_80'] = float(expected.cdf(target, expected_metrics[target + '_upper_80'])
+                    - expected.cdf(target, expected_metrics[target + '_lower_80'] - 1))
+            self.assertEqual(unit.strict(row['metrics']), unit.strict(expected_metrics))
+
+    def test_corrupt_source_or_receipt_prevents_scoring(self):
+        f = fixture(self.store); pointer = self.publish(f)
+        f['rows']['N0', 'full', 'z-first']['distribution']['alphaSha256'] = 'f' * 64
+        with patch.object(unit, 'score_forecast') as score, self.assertRaises(ValueError): self.grade(f, pointer)
+        score.assert_not_called()
+
+    def test_synchronized_game_reorder_and_changed_failure_reason_rejected(self):
+        f = fixture(self.store); pointer = self.publish(f)
+        publication = self.store.read_bound(pointer)
+        changed = copy.deepcopy(publication); changed['rows'][0:2] = reversed(changed['rows'][0:2])
+        with patch.object(self.store, 'read_bound', return_value=changed), patch.object(unit, 'score_forecast') as score:
+            with self.assertRaisesRegex(unit.RunFailure, 'complete_origin_membership'): self.grade(f, pointer)
+        score.assert_not_called()
+        mapped = [{'family': family + 'C', 'variant': variant, 'game_id': game, 'native_failure': None, 'metrics': {}}
+                  for family, variant in unit.SERIES for game in f['origin']['targetGameIds']]
+        raw = [{'family': family, 'variant': variant, 'game_id': game, 'native_failure': None, 'metrics': {}}
+               for family, variant in unit.RAW_REFERENCES for game in f['origin']['targetGameIds']]
+        mapped[-1]['native_failure'] = 'same-boolean-different-reason'
+        f['rows']['E2', 'deterministic_noise', 'a-last']['native_failure'] = 'original-reason'
+        rows = {key: [] for key in [(family + 'C', variant) for family, variant in unit.SERIES] + list(unit.RAW_REFERENCES)}
+        with self.assertRaisesRegex(unit.RunFailure, 'exact_native_failure_reason'):
+            unit.append_scored_origin(f['origin'], mapped, raw, f['rows'], rows, [])
+
+    def test_combined_admission_590_plus_collector_11_fails_before_fit(self):
+        now = [0.]
+        with patch.object(unit.time, 'monotonic', side_effect=lambda: now[0]), patch.object(unit, 'rss_mib', return_value=100.):
+            budget = unit.Budget(); budget.start_admission()
+            now[0] = 590.; budget.check()
+            now[0] = 601.
+            with self.assertRaisesRegex(unit.RunFailure, 'combined_admission'):
+                budget.end_admission()
+            with self.assertRaisesRegex(unit.RunFailure, 'clock_restart'):
+                budget.start_admission()
+            now[0] = 7201.
+            with self.assertRaisesRegex(unit.RunFailure, 'runtime_or_memory'): budget.check()
+        with patch.object(unit, 'rss_mib', return_value=4097.):
+            with self.assertRaisesRegex(unit.RunFailure, 'runtime_or_memory'): unit.Budget().check()
+
+    def test_exact_retained_pilot_formula_and_boundaries(self):
+        result = unit.pilot_projection(700., 12., 32, 288)
+        self.assertEqual(result['remaining_game_count'], 3119)
+        self.assertEqual(result['projected_seconds'], 700 + 2 * 12 * 3119 / 32 + 600)
+        boundary = unit.pilot_projection(6600., 0., 32, 288)
+        self.assertTrue(boundary['passed'])
+        self.assertFalse(unit.pilot_projection(6600.001, 0., 32, 288)['passed'])
+        for args in ((1, 1, 0, 256), (1, 1, True, 256), (1, 1, 10, 3408)):
+            with self.assertRaises(unit.RunFailure): unit.pilot_projection(*args)
+
+    def test_atomic_completion_and_existing_identity_are_never_overwritten(self):
+        self.store.write('prefix.json', {'done': 1})
+        result = self.store.finish({'status': 'reject_all'})
+        completion = self.store.path / 'completion'
+        terminal = (completion / 'terminal.json').read_bytes()
+        index = unit.parse((completion / 'artifact-index.json').read_bytes())
+        self.assertEqual(result['terminal_sha256'], unit.sha(terminal))
+        self.assertEqual(set(index['files']), {'prefix.json', 'completion/terminal.json'})
+        self.assertEqual(index['uncommitted_artifacts'], [])
+        with self.assertRaises(unit.RunFailure): self.store.finish({'status': 'protocol_invalid'})
+        with self.assertRaises(FileExistsError): unit.Store(self.directory, 'synthetic-run')
+        with self.assertRaises(unit.RunFailure): self.store.write('later.json', {})
+        self.assertEqual((completion / 'terminal.json').read_bytes(), terminal)
+        self.assertFalse((self.store.path / 'terminal-failure.json').exists())
+
+    def test_pre_rename_budget_failure_staging_is_indexed_only_as_uncommitted(self):
+        calls = [0]
+        def budget():
+            calls[0] += 1
+            if calls[0] == 2: raise unit.RunFailure('deadline-before-rename')
+        with self.assertRaisesRegex(unit.RunFailure, 'deadline-before-rename'):
+            self.store.finish({'status': 'reject_all'}, budget)
+        self.assertFalse(self.store.finalized)
+        self.assertFalse((self.store.path / 'completion').exists())
+        stage = self.store.uncommitted_staging[0]
+        self.store.finish({'status': 'protocol_invalid'})
+        index = unit.parse((self.store.path / 'completion/artifact-index.json').read_bytes())
+        self.assertEqual(index['uncommitted_staging'], [stage])
+        self.assertIn(stage + '/terminal.json', index['files'])
+        self.assertEqual(unit.parse((self.store.path / 'completion/terminal.json').read_bytes())['status'], 'protocol_invalid')
+
+    def test_after_rename_fsync_failure_cannot_create_second_terminal(self):
+        real_fsync = unit.os.fsync
+        def failing(fd):
+            if fd == self.store.fd and self.store.finalized: raise OSError('after-rename-fsync')
+            return real_fsync(fd)
+        with patch.object(unit.os, 'fsync', side_effect=failing), self.assertRaisesRegex(OSError, 'after-rename'):
+            self.store.finish({'status': 'reject_all'})
+        self.assertTrue(self.store.finalized)
+        self.assertTrue((self.store.path / 'completion/artifact-index.json').exists())
+        with self.assertRaisesRegex(unit.RunFailure, 'already_committed'):
+            self.store.finish({'status': 'protocol_invalid'})
+
+    def test_failed_publication_retains_indexed_uncommitted_bytes_without_grading(self):
+        f = fixture(self.store)
+        real_fsync = unit.os.fsync
+        failed = [False]
+        def once(fd):
+            # The publication is the only ordinary artifact attempted during publish.
+            if self.store.uncommitted_artifacts == {'forecasts-2013-01.json'} and not failed[0]:
+                failed[0] = True
+                raise OSError('publication-fsync')
+            return real_fsync(fd)
+        with patch.object(unit.os, 'fsync', side_effect=once), patch.object(unit, 'grade_origin') as grader:
+            with self.assertRaisesRegex(OSError, 'publication-fsync'):
+                pointer = self.publish(f)
+                grader(pointer)
+        grader.assert_not_called()
+        self.assertNotIn('forecasts-2013-01.json', self.store.index)
+        raw = (self.store.path / 'forecasts-2013-01.json').read_bytes()
+        self.store.finish({'status': 'protocol_invalid'})
+        index = unit.parse((self.store.path / 'completion/artifact-index.json').read_bytes())
+        self.assertEqual(index['uncommitted_artifacts'], ['forecasts-2013-01.json'])
+        self.assertEqual(index['files']['forecasts-2013-01.json'], {'sha256': unit.sha(raw), 'bytes': len(raw)})
+
+    def test_strict_nonfinite_failure_is_never_a_marker_or_success(self):
+        with self.assertRaises(ValueError): self.store.write('bad.json', {'scientific': np.nan})
+        self.assertFalse((self.store.path / 'bad.json').exists())
+        with self.assertRaises(ValueError): unit.strict({'scientific': np.array([np.inf])})
+
+    def test_missing_later_parent_file_is_not_low_support_identity(self):
+        values = {'manifest.json': {'synthetic': True}, 'later.json': {'year': 2025}}
+        archive_directory = self.directory / 'parent'; archive_directory.mkdir()
+        pointers = {}
+        for name, value in values.items():
+            raw = unit.strict(value); (archive_directory / name).write_bytes(raw)
+            pointers[name] = {'sha256': unit.sha(raw), 'bytes': len(raw)}
+        index = unit.strict({'files': pointers}); (archive_directory / 'artifact-index.json').write_bytes(index)
+        archive = unit.Archive(archive_directory, pointers['manifest.json']['sha256'], unit.sha(index))
+        (archive_directory / 'later.json').unlink()
+        with self.assertRaises(FileNotFoundError): archive.verify_all()
+
+    def test_source_and_case_digest_mismatch_block_fitting_at_exact_counts(self):
+        counts = {'unique_original_sources': 68140, 'reconstruction_calls': 68140,
+                  'unique_prior_cases': 56430, 'case_constructor_calls': 56430}
+        expected = {'recovered_sources_sha256': 'a' * 64, 'case_inputs_sha256': 'b' * 64}
+        unit.verify_collection(counts, 'a' * 64, 'b' * 64, expected)
+        for source, cases in (('c' * 64, 'b' * 64), ('a' * 64, 'c' * 64)):
+            with patch.object(unit, 'annual_receipt') as fit, self.assertRaisesRegex(unit.RunFailure, 'accepted_digest'):
+                unit.verify_collection(counts, source, cases, expected)
+                fit()
+            fit.assert_not_called()
+        with self.assertRaisesRegex(unit.RunFailure, 'population'):
+            unit.verify_collection(dict(counts, unique_prior_cases=1), 'a' * 64, 'b' * 64, expected)
+
+    def test_persisted_case_mutation_rejected_before_any_fit(self):
+        f = fixture(self.store)
+        source = {'family': 'N0', 'variant': 'full', 'season': 2013, 'game_id': 'g',
+                  'source_fingerprint': 'a' * 64, 'case_fingerprint': unit.fingerprint({'value': 1})}
+        case = {**source, 'weight': 1, 'case': {'value': 2}}
+        self.store.write('cases-bad.json', {'version': 'rf02d-case-chunk.v1', 'run_manifest_sha256': f['manifest'],
+            'origin': {'season': 2013}, 'rows': [{'source': source, 'case': case, 'admitted_data_sha256': unit.ADMITTED_DATA}]})
+        collection = {'case_chunks': [{'season': 2013, 'pointer': self.store.pointer('cases-bad.json')}], 'case_inputs_sha256': 'b' * 64}
+        with patch.object(unit, 'annual_receipt') as fit, self.assertRaisesRegex(unit.RunFailure, 'persisted_case_binding'):
+            unit.load_case_inputs(self.store, collection, f['manifest'], f['budget'])
+            fit()
+        fit.assert_not_called()
+
+    def preflight_fixture(self):
+        config = json.loads((unit.ROOT / 'config/research-team-score-conditional.v1.json').read_bytes())
+        parent_hashes = {f'scripts/research_score_synthetic{i}.py': 'a' * 64 for i in range(27)}
+        code = dict(parent_hashes)
+        code.update({name: unit.sha(unit.read_regular(unit.ROOT / name)) for name in unit.CONDITIONAL_FILES})
+        pointers = {name: {'path': name, 'sha256': digest} for name, digest in
+                    [('admission', unit.ADMISSION_ACCEPTANCE), ('replay', unit.REPLAY_ACCEPTANCE),
+                     ('identity', unit.IDENTITY_ACCEPTANCE), ('inference', unit.INFERENCE_ACCEPTANCE)]}
+        accepted = {'version': 'rf02d-runner-implementation-acceptance.v1', 'status': 'accepted_for_one_bounded_replay',
+                    'code_hashes': code, 'acceptances': pointers,
+                    'audit_evidence': {name: {'path': name, 'sha256': 'd' * 64} for name in ('leakage', 'falsification')}}
+        prior = {name: digest for name, digest in code.items() if name in unit.CONDITIONAL_FILES[:10]}
+        qualification = {name: code[name] for name in unit.CONDITIONAL_FILES[10:12]}
+        stage_values = {
+          'admission': {'status': 'accepted_numerical_and_temporal_admission_only',
+                        'evidence': {'result.json': {'path': 'admission-result', 'sha256': 'd' * 64}}},
+          'admission-result': {'status': 'passed', 'counts': {'recovered_distributions': 68140, 'calibration_cases': 56430},
+              'pins': {'parent_manifest': unit.PARENT_MANIFEST, 'parent_index': unit.PARENT_INDEX,
+                       'admitted_data': unit.ADMITTED_DATA, 'config': unit.CONFIG_SHA, 'protocol': unit.PROTOCOL_SHA}},
+          'replay': {'status': 'accepted_pure', 'accepted_source_hashes': {name: code[name] for name in unit.CONDITIONAL_FILES[8:10]}},
+          'inference': {'status': 'accepted_pure', 'accepted_source_hashes': {name: code[name] for name in unit.CONDITIONAL_FILES[12:14]}},
+          'identity': {'status': 'accepted_fixed_identity_qualification_only', 'historical_identity_qualification_accepted': True,
+                       'exact_identity_occurrences': 520, 'sample_keys_sha256': unit.SAMPLE_SHA,
+                       'evidence': {name + '.json': {'path': name, 'sha256': 'd' * 64} for name in ('receipt', 'manifest')}},
+          'receipt': {'status': 'passed', 'complete_count': 520, 'sample_sha256': unit.SAMPLE_SHA,
+                      'artifacts': {name: {'sha256': 'a' * 64, 'bytes': 0} for name in
+                                    ['manifest.json', 'sample.json'] + [f'occurrence-{i:03}.json' for i in range(520)]}},
+          'manifest': {'accepted_unit_hashes': prior, 'qualification_source_hashes': qualification},
+          'leakage': {'status': 'accepted', 'source_hashes': copy.deepcopy(code)},
+          'falsification': {'status': 'accepted', 'source_hashes': copy.deepcopy(code)}}
+        class Archive:
+            manifest = {'code_hashes': parent_hashes, 'runtime': {'python': 'synthetic'}}
+        def read(path, digest, size=None):
+            if str(path) == 'implementation': return unit.strict(accepted)
+            if str(path).endswith('config/research-team-score-conditional.v1.json'): return unit.strict(config)
+            return b''
+        return accepted, stage_values, Archive(), read
+
+    def test_preflight_rehashed_old_source_contradictions_rejected(self):
+        accepted, stages, archive, read = self.preflight_fixture()
+        with patch.object(unit, 'bound', side_effect=read), patch.object(unit, '_evidence', side_effect=lambda p: stages[p['path']]), \
+             patch.object(unit, 'Archive', return_value=archive):
+            unit.preflight(unit.ROOT, 'implementation', 'a' * 64, unit.Budget())
+            for name in ('scripts/research_score_conditional_admission.py', 'scripts/research_score_conditional_qualify.py',
+                         'scripts/research_score_conditional_inference.py'):
+                original = accepted['code_hashes'][name]
+                accepted['code_hashes'][name] = 'f' * 64
+                with self.subTest(name=name), self.assertRaises(unit.RunFailure):
+                    unit.preflight(unit.ROOT, 'implementation', 'b' * 64, unit.Budget())
+                accepted['code_hashes'][name] = original
+            stages['falsification']['status'] = 'pending'
+            with self.assertRaisesRegex(unit.RunFailure, 'audit_not_bound'):
+                unit.preflight(unit.ROOT, 'implementation', 'b' * 64, unit.Budget())
+
+    def test_public_orchestration_shared_deadline_and_finalization_only_grace(self):
+        now = [0.]
+        admission = {'status': 'passed', 'counts': {}, 'recovered_sources_sha256': 'a', 'case_inputs_sha256': 'b'}
+        manifest = {'version': 'synthetic-orchestration-clock'}
+        order = []
+        def admit(*args):
+            order.append('admission'); now[0] = 590.; return admission
+        def collect(*args):
+            order.append('collector'); now[0] = 601.; args[-1].check()
+        with patch.object(unit.time, 'monotonic', side_effect=lambda: now[0]), \
+             patch.object(unit, 'OUTPUT_PARENT', self.directory), \
+             patch.object(unit, 'preflight', return_value=(None, {}, {}, admission, manifest)), \
+             patch.object(unit, 'admit_archive', side_effect=admit), \
+             patch.object(unit, '_source_manifest', return_value=({}, {})), \
+             patch.object(unit, 'collect_cases', side_effect=collect), \
+             patch.object(unit, 'fit_annual_receipts') as fit, patch.object(unit, 'publish_origin') as publish, \
+             patch.object(unit, 'grade_origin') as grade, patch.object(unit, 'evaluate') as evaluate, \
+             patch.object(unit.signal, 'setitimer') as timers:
+            result = unit.run(unit.ROOT, 'synthetic-implementation', 'a' * 64)
+        self.assertEqual(order, ['admission', 'collector'])
+        self.assertEqual(result['status'], 'protocol_invalid')
+        self.assertEqual(result['scientific_stop_elapsed_seconds'], 601.)
+        self.assertEqual(result['invalid_finalization_only_cap_seconds'], 30)
+        self.assertIn((unit.signal.ITIMER_REAL, 30), [call.args for call in timers.call_args_list])
+        for spy in (fit, publish, grade, evaluate): spy.assert_not_called()
+        completion = Path(result['run_directory']) / 'completion'
+        self.assertTrue((completion / 'terminal.json').exists())
+        self.assertEqual(unit.parse((completion / 'terminal.json').read_bytes())['status'], 'protocol_invalid')
+
+    def test_grace_timeout_preserves_prefix_without_scientific_callbacks(self):
+        admission = {'status': 'passed'}
+        manifest = {'version': 'synthetic-finalization-timeout'}
+        real_finish = unit.Store.finish
+        def timeout(store, terminal, budget=None):
+            if terminal['status'] == 'protocol_invalid':
+                unit.signal.getsignal(unit.signal.SIGALRM)(unit.signal.SIGALRM, None)
+            return real_finish(store, terminal, budget)
+        with patch.object(unit, 'OUTPUT_PARENT', self.directory), \
+             patch.object(unit, 'preflight', return_value=(None, {}, {}, admission, manifest)), \
+             patch.object(unit, 'admit_archive', side_effect=RuntimeError('scientific-stop')), \
+             patch.object(unit.Store, 'finish', new=timeout), \
+             patch.object(unit, 'fit_annual_receipts') as fit, patch.object(unit, 'grade_origin') as grade:
+            with self.assertRaisesRegex(unit.RunFailure, 'finalization_only_deadline'):
+                unit.run(unit.ROOT, 'synthetic-implementation', 'a' * 64)
+        fit.assert_not_called(); grade.assert_not_called()
+        directory = self.directory / ('rf02d-v1-' + unit.sha(unit.strict(manifest))[:16])
+        self.assertTrue((directory / 'manifest.json').exists())
+        self.assertFalse((directory / 'completion').exists())
+
+    def test_complete_226_origin_controller_pilot_public_evaluate_and_no_restart(self):
+        import research_score_conditional_inference as inference_unit
+        from test_inference import production_fixture
+        config, original_metadata, fixture_rows, _ = production_fixture()
+        templates = {key: rows[0]['metrics'] for key, rows in fixture_rows.items()}
+        del fixture_rows
+        origins, records = [], {}
+        for row in original_metadata:
+            if not origins or (origins[-1]['season'], origins[-1]['week']) != (row['season'], row['week']):
+                origins.append({'season': row['season'], 'week': row['week'],
+                                'originAt': f"{row['season']}-09-01T00:00:00+00:00", 'targetGameIds': []})
+            origins[-1]['targetGameIds'].append(row['game_id'])
+            records[row['game_id']] = {'gameId': row['game_id'], 'season': row['season'], 'week': row['week'],
+                'kickoffAt': f"{row['season']}-09-03T00:00:00+00:00", 'homeScore': 1, 'awayScore': 2}
+        for origin in origins: origin['targetGameIds'].reverse()  # Deliberately preserve nonlexicographic parent order.
+        expected_ids = [game for origin in origins for game in origin['targetGameIds']]
+        by_year = {year: [game for origin in origins if origin['season'] == year for game in origin['targetGameIds']] for year in unit.YEARS}
+        evidence = {}
+        for name in ('leakage', 'falsification'):
+            path = self.directory / (name + '-review.json')
+            raw = unit.strict({'status': 'accepted', 'source_hashes': {}}); path.write_bytes(raw)
+            evidence[name] = {'path': str(path), 'sha256': unit.sha(raw)}
+        acceptance = {'code_hashes': {}, 'audit_evidence': evidence}
+        admission = {'status': 'passed', 'counts': {'recovered_distributions': 68140, 'calibration_cases': 56430},
+                     'recovered_sources_sha256': 'a' * 64, 'case_inputs_sha256': 'b' * 64}
+        manifest = {'version': 'synthetic-complete-controller', 'audit_evidence': evidence}
+        now, order, published, graded = [0.], [], [], []
+        def admit(*args):
+            order.append('admission'); now[0] += 100.; return admission
+        def collect(archive, data, parent_config, expected, store, manifest_hash, budget):
+            order.append('collection'); now[0] += 100.
+            collection = {'unique_original_sources': 68140, 'unique_prior_cases': 56430,
+                'reconstruction_calls': 68140, 'case_constructor_calls': 56430, 'latest_case_season': 2024,
+                'recovered_sources_sha256': 'a' * 64, 'case_inputs_sha256': 'b' * 64, 'case_chunks': []}
+            store.write('case-collection.json', collection)
+            return origins, records, by_year, collection
+        def reload(*args):
+            order.append('persisted-case-reload'); now[0] += 20.; return {}, {}
+        def annual(store, manifest_hash, *args):
+            order.append('all-annual-receipts'); now[0] += 1.
+            entries = []
+            for year in unit.YEARS:
+                for family, variant in unit.ORDINARY:
+                    name = f'annual-synthetic-{len(entries):03}.json'
+                    store.write(name, {'family': family, 'variant': variant, 'target_season': year})
+                    entries.append({'family': family, 'variant': variant, 'target_season': year, 'pointer': store.pointer(name)})
+            result = {'run_manifest_sha256': manifest_hash, 'entries': entries, 'cold_starts': 18, 'estimated_receipts': 216}
+            store.write('annual-index.json', result); return result
+        def bundle(archive, origin, parent_config):
+            rows = {}
+            for family, variant in list(unit.SERIES) + [key for key in unit.RAW_REFERENCES if key not in unit.SERIES]:
+                for game in origin['targetGameIds']:
+                    reason = 'inherited-synthetic' if (family, variant, game) == ('E2', 'no_offense', expected_ids[-1]) else None
+                    rows[family, variant, game] = {'native_failure': reason}
+            return rows, {}, {}
+        def load(store, index, manifest_hash, season, cutoff, collection):
+            now[0] += .01
+            self.assertEqual(len(index['entries']), 234)
+            self.assertTrue(all(row['pointer']['name'] in store.index for row in index['entries']))
+            return {}, {}, {}, []
+        def publish(store, archive, manifest_hash, origin, contexts, parent_rows, refs, receipts, pointers, budget, counts):
+            now[0] += .02
+            self.assertEqual(order[:4], ['admission', 'collection', 'persisted-case-reload', 'all-annual-receipts'])
+            self.assertEqual(list(contexts), origin['targetGameIds'])
+            self.assertTrue(all(set(row) == {'game_id', 'season', 'week', 'kickoff_at'} for row in contexts.values()))
+            published.append((origin['season'], origin['week']))
+            name = f"synthetic-publication-{origin['season']}-{origin['week']:02}.json"
+            store.write(name, {'games': origin['targetGameIds'], 'series': [list(key) for key in unit.SERIES]})
+            counts['prediction_reconstruction_calls'] += 20 * len(origin['targetGameIds'])
+            counts['mapped_prediction_calls'] += 20 * len(origin['targetGameIds'])
+            return store.pointer(name)
+        def grade(store, archive, manifest_hash, origin, pointer, target_records, parent_rows, losses, refs, receipts, cutoff, budget, counts):
+            now[0] += .03
+            self.assertEqual(store.read_bound(pointer)['games'], origin['targetGameIds'])
+            self.assertEqual(len(store.read_bound(pointer)['series']), 20)
+            self.assertEqual(published[-1], (origin['season'], origin['week']))
+            graded.append((origin['season'], origin['week']))
+            mapped, raw = [], []
+            for family, variant in unit.SERIES:
+                for game in origin['targetGameIds']:
+                    self.assertEqual((target_records[game]['homeScore'], target_records[game]['awayScore']), (1, 2))
+                    mapped.append({'family': family + 'C', 'variant': variant, 'game_id': game,
+                        'native_failure': parent_rows[family, variant, game]['native_failure'], 'metrics': templates[family + 'C', variant]})
+            for family, variant in unit.RAW_REFERENCES:
+                for game in origin['targetGameIds']:
+                    raw.append({'family': family, 'variant': variant, 'game_id': game,
+                        'native_failure': parent_rows[family, variant, game]['native_failure'], 'metrics': templates[family, variant]})
+            counts['recipe_reconstruction_calls'] += len(mapped); counts['score_calls'] += len(mapped)
+            return mapped, raw
+        fake_inference = {'comparisons': {row['id']: {'blocks': {str(length): {'lower': -.01, 'upper': .01}
+                            for length in (1, 3, 6)}} for row in config['comparisons']},
+                          'calibration_cells': {':'.join(map(str, cell)): {'blocks': {str(length): {'lower': -.01, 'upper': .01}
+                            for length in (1, 3, 6)}} for cell in config['calibration_cells']}}
+        real_evaluate = unit.evaluate
+        def evaluate(cfg, metadata, rows, audits):
+            self.assertEqual([row['game_id'] for row in metadata], expected_ids)
+            self.assertEqual(len(rows), 26)
+            self.assertEqual(sum(row['season'] == 2013 for row in metadata), 256)
+            self.assertEqual(rows['E2C', 'no_offense'][-1]['native_failure'], 'inherited-synthetic')
+            self.assertEqual(audits, {name: True for name in ('admission', 'leakage', 'falsification', 'no_new_numerical_failure')})
+            return real_evaluate(cfg, metadata, rows, audits)
+        with patch.object(unit.time, 'monotonic', side_effect=lambda: now[0]), patch.object(unit, 'OUTPUT_PARENT', self.directory), \
+             patch.object(unit, 'preflight', return_value=(None, config, acceptance, admission, manifest)), \
+             patch.object(unit, 'admit_archive', side_effect=admit) as admission_spy, \
+             patch.object(unit, '_source_manifest', return_value=({}, {})), patch.object(unit, 'collect_cases', side_effect=collect), \
+             patch.object(unit, 'load_case_inputs', side_effect=reload), patch.object(unit, 'fit_annual_receipts', side_effect=annual), \
+             patch.object(unit, 'origin_bundle', side_effect=bundle), patch.object(unit, 'load_annual', side_effect=load), \
+             patch.object(unit, 'publish_origin', side_effect=publish), patch.object(unit, 'grade_origin', side_effect=grade), \
+             patch.object(inference_unit, '_infer', return_value=fake_inference), patch.object(unit, 'evaluate', side_effect=evaluate) as evaluate_spy, \
+             patch.object(unit.signal, 'setitimer'):
+            result = unit.run(unit.ROOT, 'synthetic-implementation', 'a' * 64)
+            second = unit.run(unit.ROOT, 'synthetic-implementation', 'a' * 64)
+        self.assertEqual(result['status'], 'reject_all')
+        self.assertEqual(second['status'], 'protocol_invalid')
+        self.assertEqual(admission_spy.call_count, 1)
+        self.assertEqual(evaluate_spy.call_count, 1)
+        self.assertEqual(len(published), 226); self.assertEqual(published, graded)
+        directory = Path(result['run_directory'])
+        pilot = unit.parse((directory / 'pilot.json').read_bytes())
+        pilot_origins = [origin for origin in origins if origin['season'] == 2014][:2]
+        pilot_games = sum(len(origin['targetGameIds']) for origin in pilot_origins)
+        self.assertEqual(pilot['pilot_game_count'], pilot_games)
+        self.assertEqual(pilot['completed_game_count'], 256 + pilot_games)
+        self.assertAlmostEqual(pilot['pilot_scoring_seconds'], .12, delta=1e-10)
+        self.assertEqual(pilot['projected_seconds'], pilot['elapsed_total'] + 2 * pilot['pilot_scoring_seconds'] *
+                         (3407 - 256 - pilot_games) / pilot_games + 600)
+        terminal = unit.parse((directory / 'completion/terminal.json').read_bytes())
+        self.assertFalse(terminal['independent_actual_result_acceptance'])
+        self.assertEqual(terminal['execution_counts']['score_calls'], 68140)
+        audit = unit.parse((directory / 'runtime-checks.json').read_bytes())
+        self.assertEqual(audit['implementation_review_evidence'], evidence)
+
+
+if __name__ == '__main__':
+    unittest.main()

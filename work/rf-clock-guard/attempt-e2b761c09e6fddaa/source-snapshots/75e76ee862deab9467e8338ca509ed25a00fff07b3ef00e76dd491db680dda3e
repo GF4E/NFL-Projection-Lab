@@ -1,0 +1,237 @@
+{
+  "cases": [
+    {
+      "error": {
+        "reason": "invalid_monotonic_clock",
+        "type": "IsolatedStop"
+      },
+      "handler": {
+        "ast_sha256": "159f04f393e91053e25b68c3eda4448b6ae845fc0b5e3153eb397a775fe7bf5c",
+        "class": "RuntimeEnvelope",
+        "line": 99,
+        "method": "_watchdog",
+        "path": "scripts/research_score_split_run.py"
+      },
+      "injected_dependencies": {
+        "_stop": "local BaseException latch, no timer/process action",
+        "clock": "fixed synthetic samples",
+        "rss_mib": 16
+      },
+      "last": 101.0,
+      "mode": "nested_monotone",
+      "phase": "stopped",
+      "source": {
+        "ast_sha256": "3e61e003f32d1b20355bd6f6a5d4f36aab1dcc8dfedca79f3dd16876d852181a",
+        "class": "RuntimeEnvelope",
+        "line": 114,
+        "method": "check",
+        "path": "scripts/research_score_split_run.py"
+      },
+      "trace": [
+        {
+          "event": "sample_acquired",
+          "value": 100.0
+        },
+        {
+          "event": "watchdog_enter",
+          "outer_sample": 100.0
+        },
+        {
+          "event": "sample_acquired",
+          "value": 101.0
+        },
+        {
+          "event": "sample_returned",
+          "value": 101.0
+        },
+        {
+          "event": "watchdog_return",
+          "last": 101.0
+        },
+        {
+          "event": "sample_returned",
+          "value": 100.0
+        },
+        {
+          "event": "stop",
+          "last": 101.0,
+          "reason": "invalid_monotonic_clock"
+        }
+      ]
+    },
+    {
+      "error": {
+        "reason": "invalid_monotonic_clock",
+        "type": "IsolatedStop"
+      },
+      "handler": {
+        "ast_sha256": "159f04f393e91053e25b68c3eda4448b6ae845fc0b5e3153eb397a775fe7bf5c",
+        "class": "RuntimeEnvelope",
+        "line": 99,
+        "method": "_watchdog",
+        "path": "scripts/research_score_split_run.py"
+      },
+      "injected_dependencies": {
+        "_stop": "local BaseException latch, no timer/process action",
+        "clock": "fixed synthetic samples",
+        "rss_mib": 16
+      },
+      "last": 100.0,
+      "mode": "true_reversal",
+      "phase": "stopped",
+      "source": {
+        "ast_sha256": "3e61e003f32d1b20355bd6f6a5d4f36aab1dcc8dfedca79f3dd16876d852181a",
+        "class": "RuntimeEnvelope",
+        "line": 114,
+        "method": "check",
+        "path": "scripts/research_score_split_run.py"
+      },
+      "trace": [
+        {
+          "event": "sample_acquired",
+          "value": 100.0
+        },
+        {
+          "event": "sample_returned",
+          "value": 100.0
+        },
+        {
+          "event": "sample_acquired",
+          "value": 99.0
+        },
+        {
+          "event": "sample_returned",
+          "value": 99.0
+        },
+        {
+          "event": "stop",
+          "last": 100.0,
+          "reason": "invalid_monotonic_clock"
+        }
+      ]
+    },
+    {
+      "error": {
+        "reason": "invalid_monotonic_clock",
+        "type": "IsolatedStop"
+      },
+      "handler": {
+        "ast_sha256": "159f04f393e91053e25b68c3eda4448b6ae845fc0b5e3153eb397a775fe7bf5c",
+        "class": "RuntimeEnvelope",
+        "line": 99,
+        "method": "_watchdog",
+        "path": "scripts/research_score_split_run.py"
+      },
+      "injected_dependencies": {
+        "_stop": "local BaseException latch, no timer/process action",
+        "clock": "fixed synthetic samples",
+        "rss_mib": 16
+      },
+      "last": 101.0,
+      "mode": "nested_monotone",
+      "phase": "stopped",
+      "source": {
+        "ast_sha256": "27ff335aa91a880529a169959eee77160f8297db27a0287585a907dd5c0cc302",
+        "class": "RuntimeEnvelope",
+        "line": 47,
+        "method": "check",
+        "path": "scripts/research_score_resource_policy.py"
+      },
+      "trace": [
+        {
+          "event": "sample_acquired",
+          "value": 100.0
+        },
+        {
+          "event": "watchdog_enter",
+          "outer_sample": 100.0
+        },
+        {
+          "event": "sample_acquired",
+          "value": 101.0
+        },
+        {
+          "event": "sample_returned",
+          "value": 101.0
+        },
+        {
+          "event": "watchdog_return",
+          "last": 101.0
+        },
+        {
+          "event": "sample_returned",
+          "value": 100.0
+        },
+        {
+          "event": "stop",
+          "last": 101.0,
+          "reason": "invalid_monotonic_clock"
+        }
+      ]
+    },
+    {
+      "error": {
+        "reason": "invalid_monotonic_clock",
+        "type": "IsolatedStop"
+      },
+      "handler": {
+        "ast_sha256": "159f04f393e91053e25b68c3eda4448b6ae845fc0b5e3153eb397a775fe7bf5c",
+        "class": "RuntimeEnvelope",
+        "line": 99,
+        "method": "_watchdog",
+        "path": "scripts/research_score_split_run.py"
+      },
+      "injected_dependencies": {
+        "_stop": "local BaseException latch, no timer/process action",
+        "clock": "fixed synthetic samples",
+        "rss_mib": 16
+      },
+      "last": 100.0,
+      "mode": "true_reversal",
+      "phase": "stopped",
+      "source": {
+        "ast_sha256": "27ff335aa91a880529a169959eee77160f8297db27a0287585a907dd5c0cc302",
+        "class": "RuntimeEnvelope",
+        "line": 47,
+        "method": "check",
+        "path": "scripts/research_score_resource_policy.py"
+      },
+      "trace": [
+        {
+          "event": "sample_acquired",
+          "value": 100.0
+        },
+        {
+          "event": "sample_returned",
+          "value": 100.0
+        },
+        {
+          "event": "sample_acquired",
+          "value": 99.0
+        },
+        {
+          "event": "sample_returned",
+          "value": 99.0
+        },
+        {
+          "event": "stop",
+          "last": 100.0,
+          "reason": "invalid_monotonic_clock"
+        }
+      ]
+    }
+  ],
+  "historical_execution": false,
+  "limitations": [
+    "Deterministic nested sample injection, not a real SIGALRM scheduling test.",
+    "The retained historical terminal has no now/last trace; its precise cause remains inferred.",
+    "No corrective implementation is executed or accepted by this diagnosis."
+  ],
+  "scientific_imports": false,
+  "seconds": 0.03940375000820495,
+  "source_hashes": {
+    "scripts/research_score_resource_policy.py": "6535330f1665399b73f6dba691b3ca01c2a461b4df029d6a00cd85dd6a6d9350",
+    "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7"
+  },
+  "status": "reproduced_false_clock_failure_in_both_exact_check_bodies"
+}

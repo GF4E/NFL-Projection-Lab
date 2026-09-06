@@ -1,0 +1,37 @@
+test_actual_primary_and_doubled_grid_bytes_and_bounds (skellam_compute_tests.SkellamDistributionTests.test_actual_primary_and_doubled_grid_bytes_and_bounds) ... ok
+test_all_cdfs_and_quantiles_correlated_and_independent (skellam_compute_tests.SkellamDistributionTests.test_all_cdfs_and_quantiles_correlated_and_independent) ... ok
+test_complete_104_field_scores_all_flags_and_input_immutability (skellam_compute_tests.SkellamDistributionTests.test_complete_104_field_scores_all_flags_and_input_immutability) ... ok
+test_instance_cache_and_floor_equivalence (skellam_compute_tests.SkellamDistributionTests.test_instance_cache_and_floor_equivalence) ... ok
+test_invalid_cdf_and_quantile_failures_remain_exact (skellam_compute_tests.SkellamDistributionTests.test_invalid_cdf_and_quantile_failures_remain_exact) ... ok
+test_invalid_score_observations_and_grid_budget_failures (skellam_compute_tests.SkellamDistributionTests.test_invalid_score_observations_and_grid_budget_failures) ... ok
+test_readonly_copies_and_cross_array_source_isolation (skellam_compute_tests.SkellamDistributionTests.test_readonly_copies_and_cross_array_source_isolation) ... ok
+test_signature_and_unchanged_non_cdf_methods (skellam_compute_tests.SkellamDistributionTests.test_signature_and_unchanged_non_cdf_methods) ... ok
+test_array_fallback_broadcast_layout_and_input_immutability (skellam_compute_tests.SkellamHelperTests.test_array_fallback_broadcast_layout_and_input_immutability) ... ok
+test_asymmetric_rates_and_integer_threshold_bytes (skellam_compute_tests.SkellamHelperTests.test_asymmetric_rates_and_integer_threshold_bytes) ... ok
+test_backend_failure_propagates_without_retry_or_global_mutation (skellam_compute_tests.SkellamHelperTests.test_backend_failure_propagates_without_retry_or_global_mutation) ... ok
+test_clipping_signed_zero_and_nan_from_same_backend (skellam_compute_tests.SkellamHelperTests.test_clipping_signed_zero_and_nan_from_same_backend) ... ok
+test_error_states_preserve_backend_warnings_and_exceptions (skellam_compute_tests.SkellamHelperTests.test_error_states_preserve_backend_warnings_and_exceptions) ... ok
+test_inclusive_fast_boundaries_avoid_generic_dispatch (skellam_compute_tests.SkellamHelperTests.test_inclusive_fast_boundaries_avoid_generic_dispatch) ... ok
+test_private_backend_arguments_match_public_wrapper_dispatch (skellam_compute_tests.SkellamHelperTests.test_private_backend_arguments_match_public_wrapper_dispatch) ... /private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-skellam-compute/test_skellam_compute.py:51: FutureWarning: future versions will not create a writeable array from broadcast_array. Set the writable flag explicitly to avoid this warning.
+  value.tobytes(order='C'), value.flags.writeable)
+/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-skellam-compute/test_skellam_compute.py:51: FutureWarning: future versions will not create a writeable array from broadcast_array. Set the writable flag explicitly to avoid this warning.
+  value.tobytes(order='C'), value.flags.writeable)
+/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-skellam-compute/test_skellam_compute.py:51: FutureWarning: future versions will not create a writeable array from broadcast_array. Set the writable flag explicitly to avoid this warning.
+  value.tobytes(order='C'), value.flags.writeable)
+ok
+test_tiny_normal_subnormal_and_mixed_rate_types (skellam_compute_tests.SkellamHelperTests.test_tiny_normal_subnormal_and_mixed_rate_types) ... ok
+test_unsupported_rates_delegate_each_position_without_coercion (skellam_compute_tests.SkellamHelperTests.test_unsupported_rates_delegate_each_position_without_coercion) ... ok
+test_unsupported_thresholds_delegate_original_arguments (skellam_compute_tests.SkellamHelperTests.test_unsupported_thresholds_delegate_original_arguments) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.285s
+
+OK
+RF-COMP-02 control3 full all modes exact
+RF-COMP-02 control3 independent_marginals all modes exact
+RF-COMP-02 control3 zero_strength_update all modes exact
+RF-COMP-02 control3 zero_scoring_level_update all modes exact
+RF-COMP-02 synthetic700 full all modes exact
+RF-COMP-02 synthetic700 independent_marginals all modes exact
+RF-COMP-02 synthetic700 zero_strength_update all modes exact
+RF-COMP-02 synthetic700 zero_scoring_level_update all modes exact

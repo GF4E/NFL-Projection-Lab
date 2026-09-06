@@ -1,0 +1,1878 @@
+{
+  "adding_control3_cases_changes_maxima": false,
+  "attempt": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000",
+  "audit_execution": {
+    "elapsed_seconds_before_report": 0.20574904102250002,
+    "historical_execution": false,
+    "kind": "stdlib_json_hash_and_saved_timing_arithmetic_only",
+    "scientific_execution": false,
+    "tests_rerun": 0
+  },
+  "authentication": {
+    "additional_pinned_files_current_and_snapshots_verified": 55,
+    "additional_snapshot_population_exact": true,
+    "all_pinned_paths_and_hashes": {
+      "files": {
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/QUALIFICATION-SCOPE.md": "008be7c0e1c98577906893b68dff443593ee51ef3d1514112596c9989379287e",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/QUALIFICATION-PINS.json": "3fe288b5727703a2c10cfb67cfe71d3ea886eb99d650be35c4f03f6123b46c09",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/benchmark.json": "8d6bd85a91694b0331cfa2e36a1fbabc589b060753ac87be9b540d8045f408e3",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/implementation-evidence-review.json": "c5c0aa6b4ee7ae3c53010ef5d5a53a0987246dbf7a451b3b91e205a6513ac80d",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-full-warmup-original.json": "4b94d9d36bea59490e2507bf6878e87ad06204c2a61a2eed33cf5cebce36560d",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-independent_marginals-warmup-original.json": "914c9e1953557cd974ea42335a8ccbaa798d2cbfee92783f145899bbfca050d5",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-zero_scoring_level_update-warmup-original.json": "2a53019761c7523da0a0f76f404955c45d23e20323b2a5649271d02415c81b77",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-zero_strength_update-warmup-original.json": "b0caecd14bf9d4088b901e53655324cc8b3652fe9de521c79b29ff3a3fe08b30",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-full-warmup-original.json": "a0510dda0f1f94a019020c6e7c0c2cf6e8069c00dcd760495a48987b48b0e61e",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-independent_marginals-warmup-original.json": "f21f129071112c749c356fe96a829581f3650bc246460a17bd66576f23709938",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-zero_scoring_level_update-warmup-original.json": "3e521356dacab9ddf8d59eae9309b9123358a2a6794112dba1e61fe815341a91",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-zero_strength_update-warmup-original.json": "d3e0a25454902032396108d7503d10024f371868386510b34f121174974cf8d9",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/process.json": "847a5ec5352bc7e1c0c6d2a2fb040f7d7d26f6e0062a14bfa042f951ccaa2a29",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/unit-tests.json": "cfe042033ed008bfe4a357d1bb9a9bbb875f12ec8533feaed22e784a56b6442f",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/qualify.py": "8c9db8dc35d55f57a948aa34fe70d6d323825b92ede936f2ea119cacfaed34d8",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/SCOPE.md": "23333dc5b05636f13a2fa3bb4768e45fcf8dfa3d6f6d8ac350929ed848e71345",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/attribution-summary.json": "6974435a875a845a14d116205c34677e5e5c2abd7cf19ec397d0b3da4861c534",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/numerical-review.json": "5c970bb01414bb5b44b1993de0b543d56fd0178299a65a2e0aca7b2d5a010352",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/attempt-1788647908631104000/root-review.json": "974de8dcb75c202bcf3753bcd20d67e23764de94bdb2ebdfad0f6099748014f5",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/remaining-profile/profile_remaining.py": "b88ee9ebea74a7d96da30cf91320867a47dd6d4dcbcad5a4883776e8684c414b",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/QUALIFICATION-SCOPE.md": "ae324e23eab0a88afd7a4160cd9692ae5ee1ef27343fc7140c998486665b5981",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/benchmark.json": "7bd4b467883a6b3949adaa3898e6be219b9581acac8bde7e1049f348754c85d5",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/numerical-review.json": "cca4f2dfc9498c914db5fd0c8eb18fd043effd7d7f11f3c7edfa269aa21db336",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/process.json": "ad373d98b8d11bbacc88d56154c770c5a1861c5bbce77ea8c9b4977535b331f2",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/root-review.json": "1bc6603d2ae6d16bc7d3f2aa6dd4dab7c84dac967ebbd9e5090c6690c68da165",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/attempt-1788649055813301000/unit-tests.json": "be5d127ed04bcb14f6b407f51a9a3a325e3881e81a8190951dbcc33fc229ba8a",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/design-review.md": "3aae8d2dc54e7afea7ebc979ff4b73a724606bfa1ea9b2c154af9cdbe0249f42",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/preflight-review.json": "bb227d6acee885032d17aeb3c0bb5004a25af1527c72cb74d261458b4bd783bb",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/qualify.py": "e7fdbb791a1c36fe97e350cce25f043b05820ca8919f19122e037b92c5a53206",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-02/root-preflight.json": "09aa0f68113b6c478e47a91997f4fcbc43add05a551a8478be5fd2b6d85cda2a",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/DESIGN-REVIEW.md": "58012fc2832af8a114ea5db89117dcaa6ae31d28cb23b488297569d88905202f",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/IMPLEMENTATION-REVIEW.json": "43facfce5edf63fe8996bec93476552d839c74a4a85feade087cb098c1b07e36",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/ISOLATION-REVIEW.md": "558d5fe471f8743ac0fdb7824cb1e79d26e25e913121ce125fb8334fb12e96f1",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/PREFLIGHT-REVIEW.json": "fd456845beb53ac9281dceff59d7fabaca18574b0fc7fc0e8a3a997b947a1cc6",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/QUALIFICATION-SCOPE.md": "687fd84207dafa039185e9dfba091d460ac17a349599bd3c3bf4eb3d2aafacec",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/ROOT-AST-REVIEW.json": "377a63b951f6d4ee79bd6c4dff4ced1da6cebdeeacfda47496cbce1d83fb2efd",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/ROOT-PREFLIGHT.json": "805c6a291aa02b1c67f28f2037129e90f9f8a50d4101593f4c731d291729507b",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/qualify.py": "cb47da9d8b9d8d072c9a3af8d07e9ff206410c85550d5fce4f3a8483cb3de3fd",
+        "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/controller-final-pins-20260905.json": "891d03da52317a62ee307e7c1c27b805413f6676520aa6acfd3651642de5f4f7",
+        "/opt/anaconda3/lib/python3.12/json/encoder.py": "7c358788fbb2a6a07f66f1f8446c52396f35fc201108f666d5be002d86f31af2",
+        "/opt/anaconda3/lib/python3.12/lib-dynload/_struct.cpython-312-darwin.so": "73f08f7bee74f11215d5f8ea4ae07c0b10dd472c27107ff70f1f37ade1cc1fc3",
+        "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_boost/__init__.py": "7b5fdae4df81069cfba9bd1578b43b14e114456f4e7d0ded578dbf7cc0d590e5",
+        "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_boost/ncx2_ufunc.cpython-312-darwin.so": "f47203b31e7f1d18e84f002079d0cd5de9bedb7c8939a84bcca09894cd7bf7a6",
+        "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_discrete_distns.py": "54931b8b4e1001dba0ef3b24eedda8dcdeb35b3c7f5c7df209e7d2f372983d67",
+        "/opt/anaconda3/lib/python3.12/site-packages/scipy/stats/_distn_infrastructure.py": "dd09066972ed405f801782a11da98f0894894155de90e426917dad3695944efe",
+        "/opt/anaconda3/lib/python3.12/struct.py": "9c231f9497caf513a22dee8f790b07f969b0e45854a0bdd6dd84b492e08c2856",
+        "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-COMP-01-ACCEPTANCE.v1.json": "a72c214d8b03ac39d47e8b85ac8a5856bfa91e6aa336864393cd3e6b97d4d1d3",
+        "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-COMP-01-REMAINING-PROFILE-ACCEPTANCE.v1.json": "6b8530830efec814602b0807f600edf2bac2357161ddf3d151bcb755b434b85e",
+        "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-COMP-02-ACCEPTANCE.v1.json": "c0406a8a569b984397a040b596f4f1bf62312747f557430c1f495a5bf866859f",
+        "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_encoding_memo.py": "da369432128b28c8268b47fb98bccaa3751d853a1b6876c7526cf9040d7addf2",
+        "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_probability_compute.py": "0ac0ecd32415720cc7e6fb1d2ec0c9229de3a46d6437d5ff380e9ebe2ee83661",
+        "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_skellam_compute.py": "3a88ed783f87cd9fdbfed9fae177edbb8d72d36be8fcfd5374a25a9c4ef8a7d0",
+        "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-encoding-memo/test_encoding_memo.py": "4304e792447fea95c808c923aa78b21c1b8c901cc75b7e5fc871a94cc776cec7",
+        "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-probability-compute/test_probability_compute.py": "47b5b69c1a8a9ea033219a42ceead2c9f605d748bd133546d2c94149bb8b51c9",
+        "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-skellam-compute/test_skellam_compute.py": "d597718272262bf488e14da2ba023a1a5c9150933ca7abad53e9c329727b8a7d"
+      },
+      "frozen": {
+        "scripts/research_score_compute_distribution.py": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1",
+        "scripts/research_score_compute_qualify.py": "41edf4cc2bc217fd0947aa2ad17e6112fd20e1aedc93b7eeb7ab0aae0ea77dcb",
+        "scripts/research_score_compute_run.py": "7089fc64b6464dadfddb4796059a975afe7f1fd43730420d8d8193d67104208f",
+        "scripts/research_score_conditional_adapter.py": "a6987485724c7f725661927e194ca39d77b303e15d868b872d3b9449a7cc19f2",
+        "scripts/research_score_conditional_admission.py": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+        "scripts/research_score_conditional_inference.py": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604",
+        "scripts/research_score_conditional_margin.py": "c1a0e334229999afe5bb000598ae0648789cc8ee0e112291b03707039015ad3d",
+        "scripts/research_score_conditional_policy.py": "aa72dc1799669340f3dbec32c5b6510f673ea70bba3d27b2315c311849a4551d",
+        "scripts/research_score_conditional_qualify.py": "cb0a13eb0afacb2a4ccde7826bc2288a31677853b71d061c5ccc477eca0647f6",
+        "scripts/research_score_conditional_replay.py": "8eae09d2b3cb7aec7a2e6fbe265679be39eea5dbf6bd327f24f75d9022f65b45",
+        "scripts/research_score_conditional_run.py": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+        "scripts/research_score_contract.py": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+        "scripts/research_score_distribution.py": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+        "scripts/research_score_inference.py": "4b61e0d4477eb49064353d9fd7b4e1c6ac37fc68553e0df0387d9f71bb8db078",
+        "scripts/research_score_metrics.py": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97",
+        "scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+        "scripts/research_score_replay.py": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594",
+        "scripts/research_score_run.py": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa",
+        "scripts/research_score_split_archive.py": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+        "scripts/research_score_split_budget.py": "0ee4dd5e7936a333fed6b2804f530bf310f588b811af41e3c8a5af1a335388ea",
+        "scripts/research_score_split_controller.py": "7f82f65839a53e7fd91fa09e531ad2b758dc6c7ffeed6503cc4c0b7e9643d28b",
+        "scripts/research_score_split_forecast.py": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34",
+        "scripts/research_score_split_grade.py": "042ed7773ee8e0fa0979eb22b7a2bc20f699c8ec2e2a05f761fce80a5aa81f4e",
+        "scripts/research_score_split_inference.py": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22",
+        "scripts/research_score_split_models.py": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+        "scripts/research_score_split_preflight.py": "301b97a6a25e6bca92b99f220657ae54039774122c3e6a65071eefa7d4c79d51",
+        "scripts/research_score_split_replay.py": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547",
+        "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+        "scripts/research_score_split_watchdog.py": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7",
+        "scripts/research_score_successor_distribution.py": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974",
+        "scripts/research_score_successor_qualify.py": "8fa0fb3f298bfa8419d535411b5bad7002fc56de3181d839ee4d047fcd45f7d3",
+        "scripts/research_score_successor_run.py": "b54c265c87a09d2ef9325363f668f3dd5a58cb49c54b82cd8286fdb61bd81459",
+        "tests/research-score-compute/test_cache.py": "a8dd3bf3721a91853eba32344a9301388fa9bd90b52b3c9997fb9c76ad3843dc",
+        "tests/research-score-compute/test_compute_qualify.py": "f12a8f493091c6d08ebfa6572b7a05010d02eb70e7dfaca0a96e64a0da280296",
+        "tests/research-score-compute/test_compute_run.py": "1c8e41eb477f3e86a2d5406dd1119b74f2c0d899c79bab2acb069fb2feb4bf76",
+        "tests/research-score-conditional-margin/test_adapter.py": "431326f6933504c315720c91492b38ef7fd42a2ceb182eb154658ea8d2771c99",
+        "tests/research-score-conditional-margin/test_admission.py": "416550a5459c6ae635db0dfbe35b27e1a51cd57501ec4c234f190c0b5c4249bb",
+        "tests/research-score-conditional-margin/test_conditional_margin.py": "53b18c9ee869696e13e552b9d01bdb8f79b9a1f1d4eb6973ae89420427f0809b",
+        "tests/research-score-conditional-margin/test_inference.py": "598d40031b1630993ff2f2aceb13a7d280dc86a5d4789e572c383d54da1ea629",
+        "tests/research-score-conditional-margin/test_policy.py": "64f8fea7fed97c356bbf221f5630b4fdc2ae0ada43118b85070c3a33b560b44d",
+        "tests/research-score-conditional-margin/test_qualify.py": "aace76b001643345bb5eadc1bd1fc05bc6745bb64fb6b662ef33f7f131e18341",
+        "tests/research-score-conditional-margin/test_replay.py": "6798aec8b7141819d9168bd736e18bf7b4cad7c348d776cdd8268a0569316fb7",
+        "tests/research-score-conditional-margin/test_run.py": "7720f9264d167b610f12971925d416bdef0c9ea08ce4a3cfdc0b193a4562621c",
+        "tests/research-score-split/qualify_inference_unit.py": "bdc7016088a8e094e1c4c023e962b0be4935065d5f63df0c9c11e1bf6ef824d3",
+        "tests/research-score-split/test_archive_unit.py": "510c10f77c194dcb5c9591404c5238f43f494659aa96a247db0013ffd3f2969e",
+        "tests/research-score-split/test_bank_unit.py": "326837b37b50c1045b9ba830359a863b48db13c01c48d4b8a782d663184c8973",
+        "tests/research-score-split/test_budget.py": "64cf75c26cec296bc996f37b7f1109d6f0c546ff0a9ae52452c3c9af74f46bc9",
+        "tests/research-score-split/test_controller_unit.py": "dd088f744f441f7dd8bae82751ec2edf673770ea05548d38bea8e24406b891c7",
+        "tests/research-score-split/test_forecast_unit.py": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312",
+        "tests/research-score-split/test_grade_unit.py": "a99289bd9341bbd202107d7491bd9ad8a8022505b57b38ede9db2114b5ccfea1",
+        "tests/research-score-split/test_inference_unit.py": "6678ff40c73b2d5c493cd22d6e2321f7d9edb2d6d5b0a1241c29420c33e9040d",
+        "tests/research-score-split/test_mean_unit.py": "622c7f2f97da6c7f49bbc050ad6d7b583cd3da474b0eeb318dcbb21be6cf3799",
+        "tests/research-score-split/test_preflight_unit.py": "f326f9ca55dd2b30fe2753c0c7cc06505bf894befa2cd51abe8a0737a7cac05a",
+        "tests/research-score-split/test_run_unit.py": "a96576b22bd4c55ed8adf34d49ad78ee783605fe75a3f2f263f17a8c092bd42c",
+        "tests/research-score-split/test_watchdog_unit.py": "1cb98cd59db38847b7ddf3c0440e17f5e20cd9ffcd947b7aec5386a6f2ed5024",
+        "tests/research-score-successor/test_qualify.py": "9eaac19131c06877d9010b48a37315c0dc52d10639aa67faf331ecc1df633c23",
+        "tests/research-score-successor/test_solver.py": "0283d8c2e4d10b34e7552c5750a565e72b9a03b30ca658996089a4a966e5cfc2",
+        "tests/research-score-successor/test_successor_run.py": "a53ca0c80ec71f00e453599a7218d179d6dc5442ba6e407d726a24f608627755",
+        "tests/research-score/test_contract.py": "64157ed50c999e3ecba3b84b0da20afd88074544e957e16d3470d264a60b8bf2",
+        "tests/research-score/test_distribution.py": "b671c6a4b97757a8122a54b98491a4ca79952cceb78a2985c685a9d630f7fc14",
+        "tests/research-score/test_inference.py": "367bcb3e9bf989bae2c9773e82a0b6701b5a8c36bf9347026e3f3dca0f6d293a",
+        "tests/research-score/test_invariance.py": "e192da8539080a0be836ded37a802403bc5d171c148a3edd357db978ad98f50c",
+        "tests/research-score/test_mean_models.py": "fd625bdc03d53e725539ed9517d0c1a5fa5f5caf6fbb331ee3ab2627ffa9a8e7",
+        "tests/research-score/test_metrics.py": "3bd12882c193abe4eb716ddd4fc0b7871fa104a27e526c7187f27c9b44760f91",
+        "tests/research-score/test_replay.py": "ce21d82a17e3878a6ce80095faf5c267d51751df78318b10504d46a86e0a44b9",
+        "tests/research-score/test_run.py": "1b8fe02cc57bdfb95f190c03a49eb16669c3c5aab79f61c383d7e08d778ad58e"
+      },
+      "references": {
+        "control3-full": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-full-warmup-original.json",
+        "control3-independent_marginals": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-independent_marginals-warmup-original.json",
+        "control3-zero_scoring_level_update": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-zero_scoring_level_update-warmup-original.json",
+        "control3-zero_strength_update": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-zero_strength_update-warmup-original.json",
+        "synthetic700-full": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-full-warmup-original.json",
+        "synthetic700-independent_marginals": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-independent_marginals-warmup-original.json",
+        "synthetic700-zero_scoring_level_update": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-zero_scoring_level_update-warmup-original.json",
+        "synthetic700-zero_strength_update": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-zero_strength_update-warmup-original.json"
+      },
+      "version": "rf-comp03.input-pins.v1"
+    },
+    "attempt_driver_scope_bytes_equal_current": true,
+    "before_after_pins_exact": true,
+    "eight_references_in_pinned_files": true,
+    "frozen_files_before_after_current_verified": 66
+  },
+  "blockers": [],
+  "broader_all_score_separate_maxima": {
+    "memo": {
+      "Fmax": {
+        "observation": "synthetic700-full-repeat-4-memo.json",
+        "repeat": 4,
+        "seconds": 0.0020138339896220714,
+        "setting": 10,
+        "stage": "inner",
+        "support": "synthetic700",
+        "variant": "full"
+      },
+      "Smax": {
+        "observation": "synthetic700-independent_marginals-repeat-5-memo.json",
+        "repeat": 5,
+        "seconds": 0.009890375018585473,
+        "setting": 10,
+        "stage": "outer",
+        "support": "synthetic700",
+        "variant": "independent_marginals"
+      },
+      "combined_reduction_vs_original_percent": 33.084046158795964,
+      "combined_reduction_vs_skellam_percent": 5.975795205579971,
+      "combined_seconds": 0.011904209008207545,
+      "difference_from_target_seconds": 0.004442717218061233,
+      "fit_max_reduction_vs_original_percent": 22.996501887072217,
+      "fit_max_reduction_vs_skellam_percent": 23.983545861036283,
+      "margin_below_target_percent": -59.54194339432646,
+      "score_max_reduction_vs_original_percent": 34.822579698968234,
+      "score_max_reduction_vs_skellam_percent": 1.2106873857185008,
+      "strict_below_fixed_absolute_target": false
+    },
+    "original": {
+      "Fmax": {
+        "observation": "synthetic700-full-repeat-2-original.json",
+        "repeat": 2,
+        "seconds": 0.0026152500067837536,
+        "setting": 10,
+        "stage": "inner",
+        "support": "synthetic700",
+        "variant": "full"
+      },
+      "Smax": {
+        "observation": "synthetic700-independent_marginals-repeat-3-original.json",
+        "repeat": 3,
+        "seconds": 0.01517454200075008,
+        "setting": 10,
+        "stage": "outer",
+        "support": "synthetic700",
+        "variant": "independent_marginals"
+      },
+      "combined_reduction_vs_original_percent": 0.0,
+      "combined_seconds": 0.017789792007533833,
+      "difference_from_target_seconds": 0.010328300217387522,
+      "fit_max_reduction_vs_original_percent": 0.0,
+      "margin_below_target_percent": -138.42138419326727,
+      "score_max_reduction_vs_original_percent": 0.0,
+      "strict_below_fixed_absolute_target": false
+    },
+    "skellam": {
+      "Fmax": {
+        "observation": "synthetic700-full-repeat-1-skellam.json",
+        "repeat": 1,
+        "seconds": 0.002649208006914705,
+        "setting": 10,
+        "stage": "inner",
+        "support": "synthetic700",
+        "variant": "full"
+      },
+      "Smax": {
+        "observation": "synthetic700-independent_marginals-repeat-3-skellam.json",
+        "repeat": 3,
+        "seconds": 0.010011584003223106,
+        "setting": 10,
+        "stage": "outer",
+        "support": "synthetic700",
+        "variant": "independent_marginals"
+      },
+      "combined_reduction_vs_original_percent": 28.83114088812242,
+      "combined_seconds": 0.012660792010137811,
+      "difference_from_target_seconds": 0.005199300219991499,
+      "fit_max_reduction_vs_original_percent": -1.2984609518350787,
+      "margin_below_target_percent": -69.68177900909474,
+      "score_max_reduction_vs_original_percent": 34.02381434162407,
+      "strict_below_fixed_absolute_target": false
+    }
+  },
+  "callback_total_seconds_including_warmups": {
+    "fit": 0.3120809979736805,
+    "score": 0.9214013360033277
+  },
+  "evidence": {
+    "INPUT-PINS.json": {
+      "bytes": 20175,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/INPUT-PINS.json",
+      "sha256": "ac1b7fe5675bd255b48da2434cf16d9744a58fb46a67b2678f35b2457ce9a683"
+    },
+    "QUALIFICATION-SCOPE.md": {
+      "bytes": 5604,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/QUALIFICATION-SCOPE.md",
+      "sha256": "687fd84207dafa039185e9dfba091d460ac17a349599bd3c3bf4eb3d2aafacec"
+    },
+    "benchmark.json": {
+      "bytes": 1298881,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/benchmark.json",
+      "sha256": "cd25b3fb16b1918eee00d31885007e535978e85d143b08226236cc21f0ebd5ce"
+    },
+    "case-control3-full.json": {
+      "bytes": 146408,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/case-control3-full.json",
+      "sha256": "0614f853844a8ba7c7781147b83b509151a1e0fac35463b3ac5ce407ad34c9ab"
+    },
+    "case-control3-independent_marginals.json": {
+      "bytes": 146063,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/case-control3-independent_marginals.json",
+      "sha256": "38b3ebdf7efcd1e39477ad7a77970bbf0af418bfa8efafeeadf874e0b39f41ed"
+    },
+    "case-control3-zero_scoring_level_update.json": {
+      "bytes": 147251,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/case-control3-zero_scoring_level_update.json",
+      "sha256": "24a2fc5311e24cdd8825228980a7f1d904512be54516d67786f6539bba767af8"
+    },
+    "case-control3-zero_strength_update.json": {
+      "bytes": 147100,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/case-control3-zero_strength_update.json",
+      "sha256": "7720a208ccaf2eec8898671f0ac87580b74bbba7ed0a60a9c6af9326b818add9"
+    },
+    "case-synthetic700-full.json": {
+      "bytes": 146510,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/case-synthetic700-full.json",
+      "sha256": "6aeabc9aa1403b34aa97b26bfb77c7b16a5b555797fabc991123d21ce4db8a84"
+    },
+    "case-synthetic700-independent_marginals.json": {
+      "bytes": 146166,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/case-synthetic700-independent_marginals.json",
+      "sha256": "0434ebd6d796d3150d77647961b2ce2724367a800f101e2847e4540855c78da2"
+    },
+    "case-synthetic700-zero_scoring_level_update.json": {
+      "bytes": 147294,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/case-synthetic700-zero_scoring_level_update.json",
+      "sha256": "06b99c8928ce71664fd1972c86206e4c50bfb6b17015c7d7afe6a9bf90702a4b"
+    },
+    "case-synthetic700-zero_strength_update.json": {
+      "bytes": 147194,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/case-synthetic700-zero_strength_update.json",
+      "sha256": "3e78fc72c8ca6cd58d289d4dfd124f1d04c95b1142bab243ae4fa88a7803f359"
+    },
+    "process.json": {
+      "bytes": 6705,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/process.json",
+      "sha256": "0a6f6096929d5dffafa7703f7569a85788afa22cb5e009415ac3cc21e575059b"
+    },
+    "process.log": {
+      "bytes": 4222,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/process.log",
+      "sha256": "bf4440c08841fcefe3433b00f1980f84b45285c86c67b6e1b89600d10b04dd80"
+    },
+    "qualify.py": {
+      "bytes": 12654,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/qualify.py",
+      "sha256": "cb47da9d8b9d8d072c9a3af8d07e9ff206410c85550d5fce4f3a8483cb3de3fd"
+    },
+    "source-map-after.json": {
+      "bytes": 20175,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/source-map-after.json",
+      "sha256": "ac1b7fe5675bd255b48da2434cf16d9744a58fb46a67b2678f35b2457ce9a683"
+    },
+    "source-map-before.json": {
+      "bytes": 20175,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/source-map-before.json",
+      "sha256": "ac1b7fe5675bd255b48da2434cf16d9744a58fb46a67b2678f35b2457ce9a683"
+    },
+    "unit-tests.json": {
+      "bytes": 129,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/unit-tests.json",
+      "sha256": "3b7c05221e8966b8700f73068ffb0ef9b5b1a53de967b2fb789501baed4be2f2"
+    }
+  },
+  "findings": [
+    "All saved tests and complete observations pass the registered exactness checks. No scientific method, law parameters, metric body, alpha hash, native reason, recovery work count or shared encoder binding changed in the inspected evidence.",
+    "The actual memo mode uses EncodingAssembly.resolve; allocation is inside the timed fit callback. Original/skellam modes retain the frozen Assembly. All three execute the complete original recovery/descriptor checks. The bound test verifies hits still recompute components, digest and moments. Shipping and benchmark source contain no encoder monkeypatch.",
+    "On the registered pilot-like synthetic subset, memo Fmax+Smax is strictly below the unchanged absolute target. Its same-run combined reduction is 37.822071480132635 percent, not the historical 52.4680169716677 percent requirement. This is a synthetic computational lead only.",
+    "Memo reduces the full700 fit maximum versus the same-run Skellam baseline, while its pilot-like score maximum is slightly slower even though scorer implementation is unchanged. The observed whole-pair reduction therefore includes measurement variation in the unchanged score path.",
+    "Unchanged Skellam also falls below the absolute target in RF-COMP-03 although it missed in RF-COMP-02. Its prior-to-current timing shift is direct evidence that the threshold crossing cannot be attributed solely to the memo. No historical capacity conclusion follows.",
+    "Broader all-score stress remains above the fixed target, with independent-marginal scoring setting the maximum. Adding the three-atom controls changes neither subset maximum."
+  ],
+  "fixed_absolute_target_seconds": 0.007461491790146312,
+  "historical_combined_reduction_requirement_percent": 52.4680169716677,
+  "limits": [
+    "Saved metadata/body review only; no test, fit, reconstruction, score, bootstrap, profile or historical call rerun.",
+    "Benchmark is eight fixed synthetic supports/means with partial Assembly setup, z-target and observed [21,17]. It does not reproduce historical support distributions, outer sequence, hardware/load state, complete controller costs or historical maxima.",
+    "Maxima are six recorded rounds, selected independently for fit and score exactly as registered. They are neither confidence bounds nor extrapolated historical capacity. Warmups are retained but excluded from these maxima.",
+    "Timing comparison is unprofiled and counterbalanced within each case; cross-run clock/load/noise and unchanged score-path variation remain. No resampling, alternative subset or rounding converts a miss into a pass.",
+    "The complete metric/descriptor bodies permit exact byte/hash verification. Only the recovered-law digest, not every recovered array body, is persisted in observations; equality to pinned accepted law digests and the separately logged full-field tests supplies that evidence without prohibited reconstruction.",
+    "All55 additional files and66 frozen files were authenticated current/before/after; runtime version assertions and pinned serializer/backend files are bound. This is not a claim that every installed binary dependency was individually hashed.",
+    "RSS is external sampled worker memory plus reported child peak. No claim of instantaneous kernel enforcement or parent-plus-child peak is made.",
+    "Historical RF-02F remains protocol_invalid at its preserved cost pilot. No full predictive inference or new model acceptance exists."
+  ],
+  "next_action": "Retain the exact memo candidate as a bounded synthetic lead. Any next integration/capacity experiment requires a separately specified current-source path and independent qualification preserving every frozen scientific check, all original timing components and the actual watchdog/pilot; this review does not authorize restarting RF-02F or selecting favorable repeat timings.",
+  "observation_verification": {
+    "canonical_body_hashes_recomputed": true,
+    "cases": 8,
+    "counterbalance_per_case": {
+      "control3-full": {
+        "memo": [
+          2,
+          2,
+          2
+        ],
+        "original": [
+          2,
+          2,
+          2
+        ],
+        "skellam": [
+          2,
+          2,
+          2
+        ]
+      },
+      "control3-independent_marginals": {
+        "memo": [
+          2,
+          2,
+          2
+        ],
+        "original": [
+          2,
+          2,
+          2
+        ],
+        "skellam": [
+          2,
+          2,
+          2
+        ]
+      },
+      "control3-zero_scoring_level_update": {
+        "memo": [
+          2,
+          2,
+          2
+        ],
+        "original": [
+          2,
+          2,
+          2
+        ],
+        "skellam": [
+          2,
+          2,
+          2
+        ]
+      },
+      "control3-zero_strength_update": {
+        "memo": [
+          2,
+          2,
+          2
+        ],
+        "original": [
+          2,
+          2,
+          2
+        ],
+        "skellam": [
+          2,
+          2,
+          2
+        ]
+      },
+      "synthetic700-full": {
+        "memo": [
+          2,
+          2,
+          2
+        ],
+        "original": [
+          2,
+          2,
+          2
+        ],
+        "skellam": [
+          2,
+          2,
+          2
+        ]
+      },
+      "synthetic700-independent_marginals": {
+        "memo": [
+          2,
+          2,
+          2
+        ],
+        "original": [
+          2,
+          2,
+          2
+        ],
+        "skellam": [
+          2,
+          2,
+          2
+        ]
+      },
+      "synthetic700-zero_scoring_level_update": {
+        "memo": [
+          2,
+          2,
+          2
+        ],
+        "original": [
+          2,
+          2,
+          2
+        ],
+        "skellam": [
+          2,
+          2,
+          2
+        ]
+      },
+      "synthetic700-zero_strength_update": {
+        "memo": [
+          2,
+          2,
+          2
+        ],
+        "original": [
+          2,
+          2,
+          2
+        ],
+        "skellam": [
+          2,
+          2,
+          2
+        ]
+      }
+    },
+    "exact_callback_metadata_and_both_score_flags": true,
+    "exact_reference_descriptor_and_metric_bytes": true,
+    "fit_callbacks": 168,
+    "measured_observations": 144,
+    "metrics_per_observation": 104,
+    "null_reason_expected_work_binding_on_every_observation": true,
+    "observation_file_sha256": {
+      "control3-full-repeat-0-memo.json": "745a29f9b1c60ed46b080a7d206be0158c7cb479ee4a73b5e3f23d137a4136a5",
+      "control3-full-repeat-0-original.json": "5c0e5e768bf55792b68abf196a755ed249a88fbd0ab89e2c10d66eb2a8d8a7f9",
+      "control3-full-repeat-0-skellam.json": "ca465e38d61d19497d2e5bbfea59f1dbcd91273e0d41cdf9b6498ac216bfaedd",
+      "control3-full-repeat-1-memo.json": "5486da1622c9dc2b7ed2720afc48dcb1d669d3776a2985a11bdad8d259f13b1e",
+      "control3-full-repeat-1-original.json": "e0930d7634d05b0323ccd113514d2e0eae02ba21a92b6bad00e44810676ad098",
+      "control3-full-repeat-1-skellam.json": "4d164d65cacaeb9b49a81c4da92e1af1f64d99dd825a38ceedb2d3ec7d4dd5ce",
+      "control3-full-repeat-2-memo.json": "b255ba17f4fd644f9c73465ea71a2ed926156a32bd0719778c178090f4d9db40",
+      "control3-full-repeat-2-original.json": "d3491ec98025341f299c6f05f2e2a55332fab65147ae921c393d814a43382bd1",
+      "control3-full-repeat-2-skellam.json": "039e9fcba963b6acdbcec17343eefc87db297e1976b8f779e2e437668a0c14bb",
+      "control3-full-repeat-3-memo.json": "cf50986a5aa6f90ba5385a9c163ebfe2ce06d23b5c8f98819d2e1969a99833a0",
+      "control3-full-repeat-3-original.json": "3082b37288400a38bbd9443ac4e58f3ee3975501342e52b8856a15d64ff29490",
+      "control3-full-repeat-3-skellam.json": "2b92c7f4ebc8dbbe95e5e3da93075650f55b26bceb4a9bd11efbcac3a1d094bb",
+      "control3-full-repeat-4-memo.json": "a61f53a9f7c10b5f1894f97182da16caa760d1967303fc5a988e9b475769a940",
+      "control3-full-repeat-4-original.json": "d90c6956aac99f00d6064c46316e19a6dab38ba2abdaab4600f14dd280c47d57",
+      "control3-full-repeat-4-skellam.json": "e0e30c9eca43f8aac5894bedd880e02bd6bca628c089c4bbad8ae78c298f8fa4",
+      "control3-full-repeat-5-memo.json": "72d79e90df8cc52b1b0f232607a5b8ed89904d2da9ec90daf4ca841952a2d080",
+      "control3-full-repeat-5-original.json": "ac6b7b0105028b3e92dc0d4639aeba3f3c1a1089e70d723499dcfa64a350111c",
+      "control3-full-repeat-5-skellam.json": "cdc7c69c96bcf231169ab84fca38d4e908dc87e9d2fec2eb275d4fe82f6cda52",
+      "control3-full-warmup-memo.json": "15c0cb510f1527ba9353751e008b3a730badfd62510eb695423163ba210911be",
+      "control3-full-warmup-original.json": "cc142cda926e21ddbdea76648796ed64377d36fa7ee32ad7fee955738aca372c",
+      "control3-full-warmup-skellam.json": "bb0bef1d8e9f2ed20973de1ddf8aaa591add83aa8fcc307d7ce3eb1f2e4bc42b",
+      "control3-independent_marginals-repeat-0-memo.json": "6466313a7c272dd38c664c4a012fb41c49ecd89c683958cfee35d21674d4f1e7",
+      "control3-independent_marginals-repeat-0-original.json": "7020492618a9453916648d8cbd57b4b2ece0b81e7ed6a690895f7b926879b2c3",
+      "control3-independent_marginals-repeat-0-skellam.json": "78e9a2c3954e2babfae35ddb65dccc910ff5262296c7db123ed2bcc9b6807200",
+      "control3-independent_marginals-repeat-1-memo.json": "132694bbfaf3e84e52779d18fb53e4fd7fa71bf189feb087756f9e32209f85c8",
+      "control3-independent_marginals-repeat-1-original.json": "22fd50c8fc501e8095c939cc8846bc20cf36383b57a8df3380b7ca0a4713e9df",
+      "control3-independent_marginals-repeat-1-skellam.json": "09a6612d7521116fe09b4bb5f02d362426c983b61ba92190678908ac349fd836",
+      "control3-independent_marginals-repeat-2-memo.json": "acababf3e83a81944d9322756a2b8c8a33417d6cc6a9c8134e9bf27104ee02b2",
+      "control3-independent_marginals-repeat-2-original.json": "9a68b9f1764cab113462d916cd5046d02a0cb99ce808c1e46fe01729dde6d467",
+      "control3-independent_marginals-repeat-2-skellam.json": "e749112c8b708e0345d414ef5f28bd10f5bc312944756676b625c01a15a508de",
+      "control3-independent_marginals-repeat-3-memo.json": "4e8aacd8286243741d02dcf8a0d14c52ef9ff8ca02cfcd37cb976a4b6a60d61f",
+      "control3-independent_marginals-repeat-3-original.json": "87d9caef87259d37e971755177799dfc7b5f6dfb5bcebd25c490663943f4c3ca",
+      "control3-independent_marginals-repeat-3-skellam.json": "40af78782ce0523c52963211a5b205d1e1b668ae0285f5b31345ac17f93885d7",
+      "control3-independent_marginals-repeat-4-memo.json": "dc6866fb37a36f3b77a70bbdd8cae735bcf0aed0e2d24071a8a8f6127585c199",
+      "control3-independent_marginals-repeat-4-original.json": "9a09b3a79f0fd936045af456d2803160098fd6b0531b18a07ba715cba65ac054",
+      "control3-independent_marginals-repeat-4-skellam.json": "2b50cd95a2b1437db408e443e0bd8ccb614f6fadaf8d2c33326233a178a3c02a",
+      "control3-independent_marginals-repeat-5-memo.json": "b57df0677224457d63c916ab209e86d1a90bf8b13065250d4abd4c1ba5fea91d",
+      "control3-independent_marginals-repeat-5-original.json": "ae3e4d375d2b7740931a610158d1e036195eb0230cf6df19b217339cf9102efd",
+      "control3-independent_marginals-repeat-5-skellam.json": "98191e0e253eaf621e0e0a695114172277f0a693e2577be084c405ea47354489",
+      "control3-independent_marginals-warmup-memo.json": "cdc17a3c33c81615a5769c1cbf00b4404c709e1796cbc6ab6bd9a37d32bdfcdc",
+      "control3-independent_marginals-warmup-original.json": "750050f6d01307240cff8db192f73c13cd5df55ae4a18b854c79697fdf53edfa",
+      "control3-independent_marginals-warmup-skellam.json": "4961a5984af2115cc7a1240ea87b3264e651d25e6e0704a4a7335d0c12c18ef5",
+      "control3-zero_scoring_level_update-repeat-0-memo.json": "4b4ca56e8261691123342776c96566c1ffba32d33a613778b89251e91065a6ec",
+      "control3-zero_scoring_level_update-repeat-0-original.json": "8567324eb73ad48f8a134e6ffd6dafc37e85101b96810fbd1d4c39f8f114ac9e",
+      "control3-zero_scoring_level_update-repeat-0-skellam.json": "dc0f58cad942cc2bad044ef3063d780233474b2beed30abe08eaf222deecb6c5",
+      "control3-zero_scoring_level_update-repeat-1-memo.json": "faaa75e64adc803caa3f460cdfae70756768e7356def3ed6bf8df9813aba5ef7",
+      "control3-zero_scoring_level_update-repeat-1-original.json": "161ad4320956b1c86122dd7f68063e04e5d66e5a10c14df29386df44aeb267ed",
+      "control3-zero_scoring_level_update-repeat-1-skellam.json": "771b6251e9b6b2e2024af09e2a5452ecc926687154553f20c96b4ba16140f56e",
+      "control3-zero_scoring_level_update-repeat-2-memo.json": "80a3a6613460ba96ec0f7073db06161aa1e7c0cf136cbbff5aa6d86dc55db67f",
+      "control3-zero_scoring_level_update-repeat-2-original.json": "2548c8a40bd6e5830a067d230340a10c81ed39a39966b67cafdbfd83df1702f9",
+      "control3-zero_scoring_level_update-repeat-2-skellam.json": "e30384f2877ba4a7b2a7798b936673f7cbe5c6839398b911afeec70f0230dde9",
+      "control3-zero_scoring_level_update-repeat-3-memo.json": "5315e6abbe2403fa163d7c920efe1d9d9cf79f85ddd6aefa863d29c298633c62",
+      "control3-zero_scoring_level_update-repeat-3-original.json": "91dd9adb4b078cdff7e138a5d2ffcdcabce8feb384308713109c546bd844b83b",
+      "control3-zero_scoring_level_update-repeat-3-skellam.json": "0e62981610aec0924b1e6bc1b580dd05b0805672b5046cb109e87840d027d20c",
+      "control3-zero_scoring_level_update-repeat-4-memo.json": "6988089cf2b4a442731ad578586e56a5f4afcefc8e66494f28891eee4ae185e4",
+      "control3-zero_scoring_level_update-repeat-4-original.json": "c4292c1286b845e248f3a1401bdd1daf3e481933c721159fb4e44619502fd28e",
+      "control3-zero_scoring_level_update-repeat-4-skellam.json": "62b4c6b9d32b2fea4e6d06be1d4ed4cb9ed2a5e89f40953f32a49ad5dd5cb917",
+      "control3-zero_scoring_level_update-repeat-5-memo.json": "041245d3085edb2ed07629affe46f91a7a437e6dd73aa9ca54f5763443068d77",
+      "control3-zero_scoring_level_update-repeat-5-original.json": "a99996c1858c04d5d3a892120298d136e773989526e8637fd2251dbec7b7d21b",
+      "control3-zero_scoring_level_update-repeat-5-skellam.json": "dc081998261eb8d570e743f15cfc8441fe5f27373f3b6bcc97971f32a54abe81",
+      "control3-zero_scoring_level_update-warmup-memo.json": "80b2c1064c4cd51abd70440e16af09c124e8574967df1b383e87e2261f96215d",
+      "control3-zero_scoring_level_update-warmup-original.json": "e9f6d713c30f7fc6ddea6efc78b79145eda6a39da9763c1d06acd39eda8595e1",
+      "control3-zero_scoring_level_update-warmup-skellam.json": "896af77b4c119980703ba45323655c66a737f175b5dd693b1702bc4d69d28664",
+      "control3-zero_strength_update-repeat-0-memo.json": "314eff93aeed8157e7302eaac9b3506b8bef97cec2384e69257eb880286ab4ee",
+      "control3-zero_strength_update-repeat-0-original.json": "c741ab8c751bd86ef4303043f80766cf6b951d63f17c6425f2eee7c117248c80",
+      "control3-zero_strength_update-repeat-0-skellam.json": "d237c2254f90ac26ffd92a5490031a866897ec273b58f96504c241b106057995",
+      "control3-zero_strength_update-repeat-1-memo.json": "e2207b3ba6d975fa8b7d20521a31a3144e73f684ad3838a1f7be321004b95036",
+      "control3-zero_strength_update-repeat-1-original.json": "36f4a509dd609ea25ca72df658a61722260c7f6962c7a456fb14e2f4971a3bc3",
+      "control3-zero_strength_update-repeat-1-skellam.json": "d03e278c2b228671f018a62fe1d1f2b357412bb61eb4798e2008f12e61d0930b",
+      "control3-zero_strength_update-repeat-2-memo.json": "170e5c2544b8838e580a4cce1ccb5f29e35a6fe312bca74b789c7f4bac4196ae",
+      "control3-zero_strength_update-repeat-2-original.json": "574961e569159a4a446b2b2fef648df73f36e9ffe7c2f405d622de91de083bb4",
+      "control3-zero_strength_update-repeat-2-skellam.json": "1f9a382772e99379c69939606d3bc6c9b733e1cd03fb02bbdedbf5f17dc34e24",
+      "control3-zero_strength_update-repeat-3-memo.json": "dc4d13e1ec3a0f82802dfa7b920667e85fd80931107dd1ae09b517b64ce8af3b",
+      "control3-zero_strength_update-repeat-3-original.json": "9926a0e9adf57c3425ee30aa25b2b4d0c3aa808afc385a8c2882ba56d1ec0ff8",
+      "control3-zero_strength_update-repeat-3-skellam.json": "84877e6a8987776d53f714fdf98cc1da4583e41b81ed614e9e2472ec43be34aa",
+      "control3-zero_strength_update-repeat-4-memo.json": "d154ff5ab9bce4fb713c6eb517522d4fc7d762777b79299ee9bb840cc82414b1",
+      "control3-zero_strength_update-repeat-4-original.json": "e13d6edbb91a9a3dcf93d728edf39d9e1b90896025ace68f56f829d032b27998",
+      "control3-zero_strength_update-repeat-4-skellam.json": "267baca24da60ec4d649791ca784a93b7c73df68143f215712861c2b5999a79a",
+      "control3-zero_strength_update-repeat-5-memo.json": "deb81455c594badabb53e1804031d5c517d5ba2c5e642d5179edee20b656a75d",
+      "control3-zero_strength_update-repeat-5-original.json": "96da7677818d5e5edbda6451b724fb406cb7bbd79d3040997207be1a02bbf9fb",
+      "control3-zero_strength_update-repeat-5-skellam.json": "778c41e106258972929858f613d3aa922587f0f59f3e1262e0b944d7081e55c0",
+      "control3-zero_strength_update-warmup-memo.json": "52132d38e6a597160bca5af45362089d0a1690c4572035fd0062476c379e00ec",
+      "control3-zero_strength_update-warmup-original.json": "beb0512458b3b9bb51a8c113a04eab4c10e26767130a26a5924c22a953c67e12",
+      "control3-zero_strength_update-warmup-skellam.json": "8c22947eab89dc4879cacadf1ecdf773c51a6623dd5f506f3ce839769d562308",
+      "synthetic700-full-repeat-0-memo.json": "9ed1a7ffe439f280bcc6802efcf2ac01a7495d8af472b9c24c6d50fa9d768ac9",
+      "synthetic700-full-repeat-0-original.json": "ce037f8fe7547398aaeb62cf3b4202dad23001018c2e2319e014c796017e81ae",
+      "synthetic700-full-repeat-0-skellam.json": "c5e18b09ed66d813426f90b41de20aa186516d5485c858ff7afb430e7fa261be",
+      "synthetic700-full-repeat-1-memo.json": "8e4abfe6a02831ea4a085cef62a359bf3189d2c90cc2f1c0d88d5a47033b0a7f",
+      "synthetic700-full-repeat-1-original.json": "7bf48bebad085690c27ad303186886689405526e4b8ef7711fecbd45579d5c5a",
+      "synthetic700-full-repeat-1-skellam.json": "6f69fc11d28b48b129d1617dc66ea589029f105aa2739fccf27eaa1dba2dcb02",
+      "synthetic700-full-repeat-2-memo.json": "7e14c11e97efe2447ba6a7d2d46b1d81db58eb68ab7bc3f9e88c56c1732e5137",
+      "synthetic700-full-repeat-2-original.json": "06c112d88f8507c92bee2c20d5fd5a7754db57643bd7f76f702db5f1e7997734",
+      "synthetic700-full-repeat-2-skellam.json": "06ba6f07b363dc11f3f58488927d3aa0a3dff76c8ff7b1c73e78b8cdf7630228",
+      "synthetic700-full-repeat-3-memo.json": "3d8da69b53aa2a27a08645deeb36f2e08fab481616727cfdc83fec3d5f1b996f",
+      "synthetic700-full-repeat-3-original.json": "8d58a9ec1090f0980e99155e65181ba26597ec90e68cd882a5e3fd48eed94b06",
+      "synthetic700-full-repeat-3-skellam.json": "f7e8efcc82481ba2c302ae340731dfe7b36f139cb70a8dd8dbfabfc82bdb8d88",
+      "synthetic700-full-repeat-4-memo.json": "1dd2377126c4eacc79c4653998dddec5cd3072ccfbdc5ace98ed9d6302d335c5",
+      "synthetic700-full-repeat-4-original.json": "c7aa8cda62cb4fbd210d0bf6fbc19a721b078b6f2d6c14667adbe8d7f4d34e75",
+      "synthetic700-full-repeat-4-skellam.json": "dcd1fe9f39e8b193aaab2641ada8d2217eb09093fe1a9daf9fc04ad783923764",
+      "synthetic700-full-repeat-5-memo.json": "48daafae87af2bef9eaff9122bf2608154e4eb84a21d5ef8552ae50fdd7d058c",
+      "synthetic700-full-repeat-5-original.json": "158d0bfea08d07dca93c86587ec50e2df2ef20d5dc6e57c522acef920ff74826",
+      "synthetic700-full-repeat-5-skellam.json": "918abb9251fc062041faa8c4a9c0760a7bf0d2f3b3b042f4be43ae2dfd26c907",
+      "synthetic700-full-warmup-memo.json": "3052ae3eb18f03fa3afce550955eba78001d4393a471f79e076cf5c1666ca144",
+      "synthetic700-full-warmup-original.json": "e87e53f9898b96eebc8e0f88e456b9ab135a4c11febe11053661b608ec03bda6",
+      "synthetic700-full-warmup-skellam.json": "7cc6e27dd67aa63b67fb468720aa599f12e0f1bd326c6cd9576e774127cac5d4",
+      "synthetic700-independent_marginals-repeat-0-memo.json": "4ae9768765198a0a4fac835f6c2beb6f6228d7e6f823a6e1b0cea27679e13b9a",
+      "synthetic700-independent_marginals-repeat-0-original.json": "786f11e42f2b66ece39f01523c4b727ea06490f842020f170b432c7a38f3239d",
+      "synthetic700-independent_marginals-repeat-0-skellam.json": "f069212544c9975eda58bd4d85a0e25d721ab46e5967eabc6a5647e7cee1ed80",
+      "synthetic700-independent_marginals-repeat-1-memo.json": "84e2eb9ac22cd333c07065797005d106c74a130c0616d5e23fece975b70a1be3",
+      "synthetic700-independent_marginals-repeat-1-original.json": "565889b7897e930e90dba5b2e5d5d689bf0339750c48c68099129480c8d6a812",
+      "synthetic700-independent_marginals-repeat-1-skellam.json": "eaf6d3ea2869e6e128a1e7aacf293245b49a0a245592089b20efb0e518a5cfd4",
+      "synthetic700-independent_marginals-repeat-2-memo.json": "99388a548e2ba9f91fca3057828380a137cd454f8fcd66121eb10b450aa00b23",
+      "synthetic700-independent_marginals-repeat-2-original.json": "d3a3231a389f204eb0a1816be3d20c72a9c26ee3ddc85cd0431472e1168da227",
+      "synthetic700-independent_marginals-repeat-2-skellam.json": "83db8ef4b04402e492a0150fdb8b71d6a8aeedb225e11a2f3a0a2a63d3641b2a",
+      "synthetic700-independent_marginals-repeat-3-memo.json": "0e767d73ec226a0852390d6144e6d89332103c2e4c1c363576583315b233b613",
+      "synthetic700-independent_marginals-repeat-3-original.json": "bcbf783f82689c6aac51c06518ef50f361208bd954a3b1601c3294236d01409e",
+      "synthetic700-independent_marginals-repeat-3-skellam.json": "69ae5932441b7d69a8140f61bdb274c491b77129de00672fcbd8a292cd5bc63f",
+      "synthetic700-independent_marginals-repeat-4-memo.json": "d2ca74527188a04427c0346f6dc31546acabc381cc220b46b43abaf27960ad77",
+      "synthetic700-independent_marginals-repeat-4-original.json": "b06f8fead778569160d852604d29f873e174bc302801c54e8737dff55a396ccf",
+      "synthetic700-independent_marginals-repeat-4-skellam.json": "7b7b92f86cbce523d712fec8dd3047a742490c24feb252f2a077b0d942b0ed06",
+      "synthetic700-independent_marginals-repeat-5-memo.json": "099b8e5f78e8ab7d09f37bf7807f4603165be89303c08179dfcd753b07009265",
+      "synthetic700-independent_marginals-repeat-5-original.json": "fee57712aa93c825455d27d82adfd9237ed6161a5ba1315ecbd73a922fc7fe4b",
+      "synthetic700-independent_marginals-repeat-5-skellam.json": "da39c67503365738cccdfb1087a3854f91250228b95d6bc0e1143a522def4fa6",
+      "synthetic700-independent_marginals-warmup-memo.json": "3cd5bcbb32fb113f76a9779f3dd10e278b389087f21a20cae8ff5e28e7fcc762",
+      "synthetic700-independent_marginals-warmup-original.json": "44ce1a85cb9f5dff16d6bd6961b650502b19d5f51992dede31d7ae43d25053da",
+      "synthetic700-independent_marginals-warmup-skellam.json": "98d70a192a3f679f11f6752bab6fe27ebd1c4a562d8623e17631e68d1051d3a5",
+      "synthetic700-zero_scoring_level_update-repeat-0-memo.json": "cb7ab3f9a1cb5f0b9e8a2cc7d90cbb00d32f1305654dc17c1d61c86bda38e646",
+      "synthetic700-zero_scoring_level_update-repeat-0-original.json": "c6d0b4658ac560991666cba99fa36119e42621208da8537fff6469ba1ec7a8c3",
+      "synthetic700-zero_scoring_level_update-repeat-0-skellam.json": "c41ab12b92e245eb899283e1be989912d85f5b91c4c73d5a60d2fbcfeda6e401",
+      "synthetic700-zero_scoring_level_update-repeat-1-memo.json": "be6e748adc153c603354f7c84cdebb7e095528e0ec453f5e444708a273ea268e",
+      "synthetic700-zero_scoring_level_update-repeat-1-original.json": "b6850b076db3212814b84fa607921284dad4ac1fec54f382c2eac4ea5e8088a4",
+      "synthetic700-zero_scoring_level_update-repeat-1-skellam.json": "261f6ecec659c5333be79536b6474603743d95a5a608a00e74fd368d3b828b2e",
+      "synthetic700-zero_scoring_level_update-repeat-2-memo.json": "faeb86925b3fe8972b7d2f7c214b03c31d9a96f736b94def99de9517de424723",
+      "synthetic700-zero_scoring_level_update-repeat-2-original.json": "854b5d77a7259d9c3ef23297a98ab798b7c3ca9dbcf22652b0a5d8e4751be61c",
+      "synthetic700-zero_scoring_level_update-repeat-2-skellam.json": "6cdcffc5a769815e940a6874d8e5374ad89d7a6866f71a666f28b7e77c292025",
+      "synthetic700-zero_scoring_level_update-repeat-3-memo.json": "acdd14fa4f84e7032f59dafac6936820593094a9336381f0dd9d5eccaaa034ba",
+      "synthetic700-zero_scoring_level_update-repeat-3-original.json": "bf3c351170a6361f94e532b85d45f4007c447020a3121f81daa658855ba667fb",
+      "synthetic700-zero_scoring_level_update-repeat-3-skellam.json": "470560358a505122be36f37025d9a709aa45b1af4115f14d36ec35f8e7b3420a",
+      "synthetic700-zero_scoring_level_update-repeat-4-memo.json": "1b8c531655449b64ab3d0ab5752e6a9e8a21535172c14aa5169b71391639581f",
+      "synthetic700-zero_scoring_level_update-repeat-4-original.json": "0ea1ee7f96211b7f5fca6c8d7ca2a13a335e31085ced929bc164483105127ad7",
+      "synthetic700-zero_scoring_level_update-repeat-4-skellam.json": "0245990c09512423967dbc2a9e6f77e5b701319f5d1303cb2c50a87253198c2d",
+      "synthetic700-zero_scoring_level_update-repeat-5-memo.json": "af7f5b4ed443ed19313b03de6d45a2011957a9932b6c613b91caab527179bed8",
+      "synthetic700-zero_scoring_level_update-repeat-5-original.json": "5a7cd8abc90dd21d25681b75420c3f21194d126ce8554ab0341ea3ddba5799fe",
+      "synthetic700-zero_scoring_level_update-repeat-5-skellam.json": "dc8ed3c2d4d93c5a367af7007209a20243b524371a351ca4ace1297f599cf545",
+      "synthetic700-zero_scoring_level_update-warmup-memo.json": "0fa0fb4257bba865c41156131e48d22457950833bfb28867572ef97d1dfe97ce",
+      "synthetic700-zero_scoring_level_update-warmup-original.json": "652d9067b8ab35e88c9bb75dfbb3c858c646c07c67d5d04e7782b1601fec4eeb",
+      "synthetic700-zero_scoring_level_update-warmup-skellam.json": "3c0c2922a828baf2aa514d14db551f0bdec31653fe5f1ba5fb2b60f503d20064",
+      "synthetic700-zero_strength_update-repeat-0-memo.json": "a8a87da8e2e7cca7221db9a4a68fa0630a51dd915b3c667bd251dab2e4c64d13",
+      "synthetic700-zero_strength_update-repeat-0-original.json": "0f655ab05fe5f3e06810e0126ce8312e716d93d76cb31842a1cfb8a9f66b1ad1",
+      "synthetic700-zero_strength_update-repeat-0-skellam.json": "b430c3a944a38dd02db5f49f8bb984352c4c555c4072918b0e505223e9d2df91",
+      "synthetic700-zero_strength_update-repeat-1-memo.json": "fac69d0343f0dfc4e5c880a0e1e3b2a3324ce4152a61aa820491fe5b95218219",
+      "synthetic700-zero_strength_update-repeat-1-original.json": "f380cc2e9a384bbf8f9fde5dc5780bd0e3f71ea2ed6bd7a2dddde4e00d07e7e0",
+      "synthetic700-zero_strength_update-repeat-1-skellam.json": "db2ef3230f5ad036927c8bade4e631df09e2d3d0d47aaa867fa01e593e1899e7",
+      "synthetic700-zero_strength_update-repeat-2-memo.json": "d67159bd7ebbfe04da4a83e38c4199027136dadbfa89d3452593fe708d1c78c8",
+      "synthetic700-zero_strength_update-repeat-2-original.json": "1a3b4ca51b8c52e119db5df78208ba9b2051fffc84f9dc108b3a4d762e6d6343",
+      "synthetic700-zero_strength_update-repeat-2-skellam.json": "c4c10b9a8376455abde7baf778e0171ac56e17a75dcf75da33d3ba55c092f397",
+      "synthetic700-zero_strength_update-repeat-3-memo.json": "88a09c7284adeb27ac0a9644353d077111b905e973f1730abef9bc9dbc419df2",
+      "synthetic700-zero_strength_update-repeat-3-original.json": "321d8dbb5f2bfa1115c1a4799934b54de235f8b40530462775c53aedcd83216b",
+      "synthetic700-zero_strength_update-repeat-3-skellam.json": "12995a3c7c7447564b042364915416b086a2b12c080f90346daca0f9082ade62",
+      "synthetic700-zero_strength_update-repeat-4-memo.json": "c1d2fcb8f93e79ab739f3a92edccdad961b923d299b3580700a868ab03fd4678",
+      "synthetic700-zero_strength_update-repeat-4-original.json": "0582a21b10768de93e8211e515ca311ae927bdbd329ec73f626c250b0a07958d",
+      "synthetic700-zero_strength_update-repeat-4-skellam.json": "1a8b14618f14abb344d813fbe3dfc61b4142f05ffac1ceea566965ea3e608318",
+      "synthetic700-zero_strength_update-repeat-5-memo.json": "ea372db3668c8c0dd7884b6264c546f5d52a2ffa24e164cba7757a62c110e6de",
+      "synthetic700-zero_strength_update-repeat-5-original.json": "4c9f8400e2f620f427104d662ff83bf52bc53143dfa288cb2de400c15690e5e4",
+      "synthetic700-zero_strength_update-repeat-5-skellam.json": "ff759dc1dc606fc0bcea8e60f1281c7a0f4253dcfde19df9894ac523183342e8",
+      "synthetic700-zero_strength_update-warmup-memo.json": "1bc98ee618c6dd12bb074d6b47fab7d16deea589c398d0eedc1e5064d5bab9bc",
+      "synthetic700-zero_strength_update-warmup-original.json": "c5930fd58ecf862ecf3c9cacddaaf0d662da826369d430c874d10d612d580cfa",
+      "synthetic700-zero_strength_update-warmup-skellam.json": "d9d362d2c2579f3be336a9759ae3f41e3df88dd2eff303ced0ce24950a85d9fa"
+    },
+    "observation_hash_map_sha256": "a1adf3158b878b4254a9a9d137a93d0583754a6f4157258705f68b7a7d894a07",
+    "per_mode_all_observations": {
+      "memo": 56,
+      "original": 56,
+      "skellam": 56
+    },
+    "physical_observations": 168,
+    "recovered_law_hashes_equal_accepted_originals": true,
+    "reference_pointers": {
+      "control3-full": {
+        "bytes": 5367,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-full-warmup-original.json",
+        "sha256": "4b94d9d36bea59490e2507bf6878e87ad06204c2a61a2eed33cf5cebce36560d"
+      },
+      "control3-independent_marginals": {
+        "bytes": 5349,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-independent_marginals-warmup-original.json",
+        "sha256": "914c9e1953557cd974ea42335a8ccbaa798d2cbfee92783f145899bbfca050d5"
+      },
+      "control3-zero_scoring_level_update": {
+        "bytes": 5405,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-zero_scoring_level_update-warmup-original.json",
+        "sha256": "2a53019761c7523da0a0f76f404955c45d23e20323b2a5649271d02415c81b77"
+      },
+      "control3-zero_strength_update": {
+        "bytes": 5399,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/control3-zero_strength_update-warmup-original.json",
+        "sha256": "b0caecd14bf9d4088b901e53655324cc8b3652fe9de521c79b29ff3a3fe08b30"
+      },
+      "synthetic700-full": {
+        "bytes": 5370,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-full-warmup-original.json",
+        "sha256": "a0510dda0f1f94a019020c6e7c0c2cf6e8069c00dcd760495a48987b48b0e61e"
+      },
+      "synthetic700-independent_marginals": {
+        "bytes": 5354,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-independent_marginals-warmup-original.json",
+        "sha256": "f21f129071112c749c356fe96a829581f3650bc246460a17bd66576f23709938"
+      },
+      "synthetic700-zero_scoring_level_update": {
+        "bytes": 5407,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-zero_scoring_level_update-warmup-original.json",
+        "sha256": "3e521356dacab9ddf8d59eae9309b9123358a2a6794112dba1e61fe815341a91"
+      },
+      "synthetic700-zero_strength_update": {
+        "bytes": 5403,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/observations/synthetic700-zero_strength_update-warmup-original.json",
+        "sha256": "d3e0a25454902032396108d7503d10024f371868386510b34f121174974cf8d9"
+      }
+    },
+    "score_callbacks": 168,
+    "signed_negative_zero_metric_leaves": 0,
+    "warmups": 24
+  },
+  "pilot_like_separate_maxima": {
+    "memo": {
+      "Fmax": {
+        "observation": "synthetic700-full-repeat-4-memo.json",
+        "repeat": 4,
+        "seconds": 0.0020138339896220714,
+        "setting": 10,
+        "stage": "inner",
+        "support": "synthetic700",
+        "variant": "full"
+      },
+      "Smax": {
+        "observation": "synthetic700-zero_scoring_level_update-repeat-0-memo.json",
+        "repeat": 0,
+        "seconds": 0.004371916991658509,
+        "setting": 6,
+        "stage": "outer",
+        "support": "synthetic700",
+        "variant": "zero_scoring_level_update"
+      },
+      "combined_reduction_vs_original_percent": 37.822071480132635,
+      "combined_reduction_vs_skellam_percent": 5.665881804197226,
+      "combined_seconds": 0.00638575098128058,
+      "difference_from_target_seconds": -0.0010757408088657317,
+      "fit_max_reduction_vs_original_percent": 22.996501887072217,
+      "fit_max_reduction_vs_skellam_percent": 23.983545861036283,
+      "margin_below_target_percent": 14.417235039866439,
+      "score_max_reduction_vs_original_percent": 42.88715366817173,
+      "score_max_reduction_vs_skellam_percent": -6.112352339357607,
+      "strict_below_fixed_absolute_target": true
+    },
+    "original": {
+      "Fmax": {
+        "observation": "synthetic700-full-repeat-2-original.json",
+        "repeat": 2,
+        "seconds": 0.0026152500067837536,
+        "setting": 10,
+        "stage": "inner",
+        "support": "synthetic700",
+        "variant": "full"
+      },
+      "Smax": {
+        "observation": "synthetic700-zero_strength_update-repeat-3-original.json",
+        "repeat": 3,
+        "seconds": 0.007654874993022531,
+        "setting": 6,
+        "stage": "outer",
+        "support": "synthetic700",
+        "variant": "zero_strength_update"
+      },
+      "combined_reduction_vs_original_percent": 0.0,
+      "combined_seconds": 0.010270124999806285,
+      "difference_from_target_seconds": 0.002808633209659973,
+      "fit_max_reduction_vs_original_percent": 0.0,
+      "margin_below_target_percent": -37.64171145197894,
+      "score_max_reduction_vs_original_percent": 0.0,
+      "strict_below_fixed_absolute_target": false
+    },
+    "skellam": {
+      "Fmax": {
+        "observation": "synthetic700-full-repeat-1-skellam.json",
+        "repeat": 1,
+        "seconds": 0.002649208006914705,
+        "setting": 10,
+        "stage": "inner",
+        "support": "synthetic700",
+        "variant": "full"
+      },
+      "Smax": {
+        "observation": "synthetic700-zero_strength_update-repeat-0-skellam.json",
+        "repeat": 0,
+        "seconds": 0.004120083001907915,
+        "setting": 6,
+        "stage": "outer",
+        "support": "synthetic700",
+        "variant": "zero_strength_update"
+      },
+      "combined_reduction_vs_original_percent": 34.08754996701304,
+      "combined_seconds": 0.00676929100882262,
+      "difference_from_target_seconds": -0.000692200781323692,
+      "fit_max_reduction_vs_original_percent": -1.2984609518350787,
+      "margin_below_target_percent": 9.27697571466628,
+      "score_max_reduction_vs_original_percent": 46.17700477586639,
+      "strict_below_fixed_absolute_target": true
+    }
+  },
+  "process": {
+    "attempt": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000",
+    "exit_code": 0,
+    "peak_child_rss_mib": 144.25,
+    "rss_limit_mib": 1024,
+    "rss_samples": [
+      [
+        0.05135254201013595,
+        2.34375
+      ],
+      [
+        0.08286724999197759,
+        16.59375
+      ],
+      [
+        0.11960475001251325,
+        21.734375
+      ],
+      [
+        0.1627202919917181,
+        26.53125
+      ],
+      [
+        0.23441108301631175,
+        31.65625
+      ],
+      [
+        0.2697163330158219,
+        40.078125
+      ],
+      [
+        0.30538883298868313,
+        43.59375
+      ],
+      [
+        0.34147820799262263,
+        46.875
+      ],
+      [
+        0.37772345799021423,
+        49.953125
+      ],
+      [
+        0.41056358299101703,
+        52.53125
+      ],
+      [
+        0.44325629199738614,
+        54.984375
+      ],
+      [
+        0.47397933300817385,
+        56.4375
+      ],
+      [
+        0.5020572080102284,
+        59.109375
+      ],
+      [
+        0.534787167009199,
+        61.359375
+      ],
+      [
+        0.5678565830166917,
+        63.296875
+      ],
+      [
+        0.6010122500010766,
+        67.0625
+      ],
+      [
+        0.6300058329943568,
+        68.421875
+      ],
+      [
+        0.6598697500012349,
+        73.03125
+      ],
+      [
+        0.6923427500005346,
+        74.203125
+      ],
+      [
+        0.7253412080171984,
+        78.140625
+      ],
+      [
+        0.7580987499968614,
+        81.046875
+      ],
+      [
+        0.791035833011847,
+        81.671875
+      ],
+      [
+        0.8241101670137141,
+        85.53125
+      ],
+      [
+        0.8575814169889782,
+        87.8125
+      ],
+      [
+        0.8898257079999894,
+        88.75
+      ],
+      [
+        0.9225670830055606,
+        89.21875
+      ],
+      [
+        0.9548451250011567,
+        91.46875
+      ],
+      [
+        0.9881440830067731,
+        93.015625
+      ],
+      [
+        1.01874566701008,
+        93.3125
+      ],
+      [
+        1.0519426249957178,
+        93.78125
+      ],
+      [
+        1.0849409170041326,
+        94.328125
+      ],
+      [
+        1.1176300829974934,
+        96.21875
+      ],
+      [
+        1.1504014579986688,
+        98.171875
+      ],
+      [
+        1.1834859579976182,
+        100.453125
+      ],
+      [
+        1.216649417008739,
+        103.015625
+      ],
+      [
+        1.248534957994707,
+        103.90625
+      ],
+      [
+        1.2770655000058468,
+        103.96875
+      ],
+      [
+        1.3097160420147702,
+        104.0625
+      ],
+      [
+        1.3421268750098534,
+        104.671875
+      ],
+      [
+        1.3748152920161374,
+        105.25
+      ],
+      [
+        1.403303583007073,
+        105.3125
+      ],
+      [
+        1.436442292004358,
+        105.3125
+      ],
+      [
+        1.4692615419917274,
+        105.984375
+      ],
+      [
+        1.5022453330166172,
+        105.984375
+      ],
+      [
+        1.5353927079995628,
+        106.015625
+      ],
+      [
+        1.568221249995986,
+        106.59375
+      ],
+      [
+        1.6010178750148043,
+        107.203125
+      ],
+      [
+        1.6339302920096088,
+        107.296875
+      ],
+      [
+        1.6671995829965454,
+        107.390625
+      ],
+      [
+        1.7000644170038868,
+        108.171875
+      ],
+      [
+        1.7329943749937229,
+        108.171875
+      ],
+      [
+        1.7657688749895897,
+        108.1875
+      ],
+      [
+        1.798590124992188,
+        108.1875
+      ],
+      [
+        1.831035208015237,
+        108.1875
+      ],
+      [
+        1.8636913330119569,
+        108.203125
+      ],
+      [
+        1.8937296250078361,
+        108.78125
+      ],
+      [
+        1.9261279579950497,
+        108.8125
+      ],
+      [
+        1.9587702919961885,
+        108.8125
+      ],
+      [
+        1.9916911250038538,
+        108.8125
+      ],
+      [
+        2.019760875002248,
+        108.8125
+      ],
+      [
+        2.0521915830031503,
+        109.390625
+      ],
+      [
+        2.0845429170003626,
+        109.390625
+      ],
+      [
+        2.1174549580027815,
+        109.390625
+      ],
+      [
+        2.149941417010268,
+        109.390625
+      ],
+      [
+        2.182587582996348,
+        109.96875
+      ],
+      [
+        2.2150735000032,
+        109.96875
+      ],
+      [
+        2.245825457997853,
+        109.96875
+      ],
+      [
+        2.277076041995315,
+        115.703125
+      ],
+      [
+        2.309915958001511,
+        131.1875
+      ],
+      [
+        2.3426917920005508,
+        138.109375
+      ],
+      [
+        2.375496082997415,
+        138.21875
+      ],
+      [
+        2.408488207991468,
+        138.296875
+      ],
+      [
+        2.4413117920048535,
+        138.3125
+      ],
+      [
+        2.4743503750069067,
+        139.40625
+      ],
+      [
+        2.5020899169903714,
+        139.40625
+      ],
+      [
+        2.5350768330099527,
+        142.515625
+      ],
+      [
+        2.567970125004649,
+        142.546875
+      ],
+      [
+        2.601293582993094,
+        142.546875
+      ],
+      [
+        2.6292090000060853,
+        142.609375
+      ],
+      [
+        2.6622260420117527,
+        142.65625
+      ],
+      [
+        2.6937421250040643,
+        142.6875
+      ],
+      [
+        2.726460167003097,
+        142.71875
+      ],
+      [
+        2.7590700419968925,
+        142.71875
+      ],
+      [
+        2.7919340420048684,
+        142.75
+      ],
+      [
+        2.82478637501481,
+        142.78125
+      ],
+      [
+        2.857779457990546,
+        142.859375
+      ],
+      [
+        2.8908344169904012,
+        142.921875
+      ],
+      [
+        2.9204552920127753,
+        143.046875
+      ],
+      [
+        2.952078625006834,
+        143.109375
+      ],
+      [
+        2.98505750001641,
+        143.109375
+      ],
+      [
+        3.016060458001448,
+        143.109375
+      ],
+      [
+        3.0494437080051284,
+        143.109375
+      ],
+      [
+        3.082414458011044,
+        143.109375
+      ],
+      [
+        3.115118292014813,
+        143.203125
+      ],
+      [
+        3.1461854579974897,
+        143.21875
+      ],
+      [
+        3.1770679999899585,
+        143.21875
+      ],
+      [
+        3.2098313749884255,
+        143.28125
+      ],
+      [
+        3.2425413329910953,
+        143.28125
+      ],
+      [
+        3.27544445800595,
+        143.3125
+      ],
+      [
+        3.3081360420037527,
+        143.3125
+      ],
+      [
+        3.340878499991959,
+        143.34375
+      ],
+      [
+        3.3738927920057904,
+        143.34375
+      ],
+      [
+        3.4020709579926915,
+        143.34375
+      ],
+      [
+        3.4349181670113467,
+        143.40625
+      ],
+      [
+        3.4677469579910394,
+        143.4375
+      ],
+      [
+        3.5004663330037147,
+        143.9375
+      ],
+      [
+        3.5333260420011356,
+        143.9375
+      ],
+      [
+        3.5665551249985583,
+        144.09375
+      ],
+      [
+        3.599531832995126,
+        144.125
+      ],
+      [
+        3.632570542016765,
+        144.125
+      ],
+      [
+        3.66552129201591,
+        144.15625
+      ],
+      [
+        3.6984110420162324,
+        144.15625
+      ],
+      [
+        3.7266728329996113,
+        144.15625
+      ],
+      [
+        3.759298499993747,
+        144.15625
+      ],
+      [
+        3.7920275419892278,
+        144.1875
+      ],
+      [
+        3.82575508300215,
+        144.1875
+      ],
+      [
+        3.8585479170142207,
+        144.1875
+      ]
+    ],
+    "source_error": null,
+    "stop": null,
+    "wall_limit_seconds": 60,
+    "wall_seconds": 3.89810145800584
+  },
+  "raw_measured_times_in_repeat_order": [
+    {
+      "atoms": 3,
+      "modes": {
+        "memo": {
+          "fit_seconds": [
+            0.0016704169975128025,
+            0.0016075829917099327,
+            0.001506833010353148,
+            0.0015745830023661256,
+            0.001701208995655179,
+            0.0017568750190548599
+          ],
+          "score_seconds": [
+            0.0029069579904899,
+            0.0029975830111652613,
+            0.0027814169880002737,
+            0.0027261249779257923,
+            0.002841207984602079,
+            0.002596458012703806
+          ]
+        },
+        "original": {
+          "fit_seconds": [
+            0.001650166988838464,
+            0.001674791012192145,
+            0.0019737500115297735,
+            0.0017374170129187405,
+            0.0015964169870130718,
+            0.0015702499949838966
+          ],
+          "score_seconds": [
+            0.004961375001585111,
+            0.00505808400339447,
+            0.005239625024842098,
+            0.004611500015016645,
+            0.004735333001008257,
+            0.004933167016133666
+          ]
+        },
+        "skellam": {
+          "fit_seconds": [
+            0.0015990420070011169,
+            0.0015935830015223473,
+            0.0015388749889098108,
+            0.0016160410013981164,
+            0.0014582090079784393,
+            0.0015954160189721733
+          ],
+          "score_seconds": [
+            0.002643290994456038,
+            0.002773000014713034,
+            0.0025132500159088522,
+            0.0027129160007461905,
+            0.0029534999921452254,
+            0.0028969590202905238
+          ]
+        }
+      },
+      "native_mean": [
+        19.67343973795573,
+        16.430757446289068
+      ],
+      "setting": 10,
+      "stage": "inner",
+      "support": "control3",
+      "variant": "full"
+    },
+    {
+      "atoms": 3,
+      "modes": {
+        "memo": {
+          "fit_seconds": [
+            0.001593374996446073,
+            0.0016387499927077442,
+            0.0016475000011269003,
+            0.0015751669998280704,
+            0.0015408750041387975,
+            0.001494124997407198
+          ],
+          "score_seconds": [
+            0.005543917010072619,
+            0.005759167019277811,
+            0.005622958007734269,
+            0.005781166022643447,
+            0.006175625021569431,
+            0.006154457980301231
+          ]
+        },
+        "original": {
+          "fit_seconds": [
+            0.0016011249972507358,
+            0.0015987500082701445,
+            0.0015597500023432076,
+            0.0016226249863393605,
+            0.00151983299292624,
+            0.0015610420086886734
+          ],
+          "score_seconds": [
+            0.009880291006993502,
+            0.008979167003417388,
+            0.008654832985484973,
+            0.009025582985486835,
+            0.008991874987259507,
+            0.009054374997504056
+          ]
+        },
+        "skellam": {
+          "fit_seconds": [
+            0.0017754169821273535,
+            0.0015467499906662852,
+            0.0017199169960804284,
+            0.0016428750241175294,
+            0.001615417015273124,
+            0.0015798329841345549
+          ],
+          "score_seconds": [
+            0.006041082990122959,
+            0.005715917010093108,
+            0.005510124989086762,
+            0.005856750009115785,
+            0.0053819580061826855,
+            0.005754375015385449
+          ]
+        }
+      },
+      "native_mean": [
+        19.67343973795573,
+        16.430757446289068
+      ],
+      "setting": 10,
+      "stage": "outer",
+      "support": "control3",
+      "variant": "independent_marginals"
+    },
+    {
+      "atoms": 3,
+      "modes": {
+        "memo": {
+          "fit_seconds": [
+            0.0014595409738831222,
+            0.001242291007656604,
+            0.001275874994462356,
+            0.001334125001449138,
+            0.0012049590004608035,
+            0.0012726660061161965
+          ],
+          "score_seconds": [
+            0.0029349999967962503,
+            0.0027139589947182685,
+            0.0030174590065144002,
+            0.0025944590161088854,
+            0.0027957080164924264,
+            0.0026767500094138086
+          ]
+        },
+        "original": {
+          "fit_seconds": [
+            0.001261083991266787,
+            0.0012837090180255473,
+            0.0012880419963039458,
+            0.0013665839796885848,
+            0.0014302089984994382,
+            0.0012421249994076788
+          ],
+          "score_seconds": [
+            0.005230332986684516,
+            0.0048531249922234565,
+            0.004808833997230977,
+            0.0048940000124275684,
+            0.004899666004348546,
+            0.005085540993604809
+          ]
+        },
+        "skellam": {
+          "fit_seconds": [
+            0.001318208989687264,
+            0.001395667000906542,
+            0.0012792079942300916,
+            0.0012612919963430613,
+            0.0013770410150755197,
+            0.0013277500111144036
+          ],
+          "score_seconds": [
+            0.0027209999971091747,
+            0.0028327500040177256,
+            0.0029497079958673567,
+            0.002733208006247878,
+            0.0029466249980032444,
+            0.0026173340156674385
+          ]
+        }
+      },
+      "native_mean": [
+        19.785319010416668,
+        16.118652343750004
+      ],
+      "setting": 6,
+      "stage": "outer",
+      "support": "control3",
+      "variant": "zero_strength_update"
+    },
+    {
+      "atoms": 3,
+      "modes": {
+        "memo": {
+          "fit_seconds": [
+            0.0012604999938048422,
+            0.0012455839896574616,
+            0.0011259590100962669,
+            0.0010498340125195682,
+            0.0010380829917266965,
+            0.0011406660196371377
+          ],
+          "score_seconds": [
+            0.0030651669949293137,
+            0.0031216670176945627,
+            0.0027165829960722476,
+            0.002748500002780929,
+            0.002463540993630886,
+            0.002806125005008653
+          ]
+        },
+        "original": {
+          "fit_seconds": [
+            0.0012039589928463101,
+            0.001181416999315843,
+            0.0010634579812176526,
+            0.0011150420177727938,
+            0.0013631670153699815,
+            0.0011494159989524633
+          ],
+          "score_seconds": [
+            0.004990957997506484,
+            0.005078292015241459,
+            0.005092000006698072,
+            0.004975541989551857,
+            0.004775083012646064,
+            0.005023750010877848
+          ]
+        },
+        "skellam": {
+          "fit_seconds": [
+            0.0012310839956626296,
+            0.001206374989124015,
+            0.0011261669860687107,
+            0.0013059580232948065,
+            0.0011727499950211495,
+            0.0013213329948484898
+          ],
+          "score_seconds": [
+            0.002579749998403713,
+            0.002613333985209465,
+            0.0029594999796245247,
+            0.0026691250095609576,
+            0.0026087500154972076,
+            0.0026729579840321094
+          ]
+        }
+      },
+      "native_mean": [
+        19.411666666666665,
+        16.255000000000006
+      ],
+      "setting": 6,
+      "stage": "outer",
+      "support": "control3",
+      "variant": "zero_scoring_level_update"
+    },
+    {
+      "atoms": 700,
+      "modes": {
+        "memo": {
+          "fit_seconds": [
+            0.0019665000145323575,
+            0.0017625420005060732,
+            0.0017925839929375798,
+            0.0018029999919235706,
+            0.0020138339896220714,
+            0.0017552920035086572
+          ],
+          "score_seconds": [
+            0.0036525830219034106,
+            0.003706499992404133,
+            0.0037545420054811984,
+            0.003641290997620672,
+            0.0040222909883596,
+            0.004023291985504329
+          ]
+        },
+        "original": {
+          "fit_seconds": [
+            0.002381667000008747,
+            0.002329415990971029,
+            0.0026152500067837536,
+            0.0023979579855222255,
+            0.00244062501587905,
+            0.0023909169831313193
+          ],
+          "score_seconds": [
+            0.007315625000046566,
+            0.007207791990367696,
+            0.007126749987946823,
+            0.007157499989261851,
+            0.007148083997890353,
+            0.00708874998963438
+          ]
+        },
+        "skellam": {
+          "fit_seconds": [
+            0.0024429589975625277,
+            0.002649208006914705,
+            0.0024240420025307685,
+            0.002542874979553744,
+            0.002458208007737994,
+            0.002416083007119596
+          ],
+          "score_seconds": [
+            0.003828833985608071,
+            0.003819792007561773,
+            0.0038600839907303452,
+            0.003766124980757013,
+            0.003987250005593523,
+            0.0037004999758210033
+          ]
+        }
+      },
+      "native_mean": [
+        19.67343973795573,
+        16.430757446289068
+      ],
+      "setting": 10,
+      "stage": "inner",
+      "support": "synthetic700",
+      "variant": "full"
+    },
+    {
+      "atoms": 700,
+      "modes": {
+        "memo": {
+          "fit_seconds": [
+            0.0018895420071203262,
+            0.0020537080126814544,
+            0.0019642080005723983,
+            0.0018538330041337758,
+            0.0018827079911716282,
+            0.0017796250176616013
+          ],
+          "score_seconds": [
+            0.009700292022898793,
+            0.009615999995730817,
+            0.00964354199822992,
+            0.009667833015555516,
+            0.00943816697690636,
+            0.009890375018585473
+          ]
+        },
+        "original": {
+          "fit_seconds": [
+            0.002480833005392924,
+            0.0024632080167066306,
+            0.00242958398303017,
+            0.002500625007087365,
+            0.0026386250101495534,
+            0.0025803330063354224
+          ],
+          "score_seconds": [
+            0.015146791993174702,
+            0.014523791003739461,
+            0.014462666003964841,
+            0.01517454200075008,
+            0.014823834004346281,
+            0.01426120797987096
+          ]
+        },
+        "skellam": {
+          "fit_seconds": [
+            0.002677208016393706,
+            0.0025156250048894435,
+            0.002523458009818569,
+            0.002480082999682054,
+            0.0024516659905202687,
+            0.0025047920062206686
+          ],
+          "score_seconds": [
+            0.009747542004333809,
+            0.009534832992358133,
+            0.009545708016958088,
+            0.010011584003223106,
+            0.009795083984499797,
+            0.009348499996121973
+          ]
+        }
+      },
+      "native_mean": [
+        19.67343973795573,
+        16.430757446289068
+      ],
+      "setting": 10,
+      "stage": "outer",
+      "support": "synthetic700",
+      "variant": "independent_marginals"
+    },
+    {
+      "atoms": 700,
+      "modes": {
+        "memo": {
+          "fit_seconds": [
+            0.0017220419831573963,
+            0.001862958015408367,
+            0.0017484999843873084,
+            0.0017402500088792294,
+            0.001760167011525482,
+            0.00177425000583753
+          ],
+          "score_seconds": [
+            0.0038888340059202164,
+            0.004006959003163502,
+            0.004060708015458658,
+            0.003958874993259087,
+            0.00398325000423938,
+            0.003940291004255414
+          ]
+        },
+        "original": {
+          "fit_seconds": [
+            0.0024580830067861825,
+            0.0024656660098116845,
+            0.002494708984158933,
+            0.0024337079958058894,
+            0.002581082982942462,
+            0.0024683749943505973
+          ],
+          "score_seconds": [
+            0.006908125011250377,
+            0.0074910830007866025,
+            0.007540540973423049,
+            0.007654874993022531,
+            0.007578958990052342,
+            0.0072646249900572
+          ]
+        },
+        "skellam": {
+          "fit_seconds": [
+            0.002515750005841255,
+            0.0024205840018112212,
+            0.0024760409723967314,
+            0.0023586659808643162,
+            0.0025367080233991146,
+            0.0024445419840049
+          ],
+          "score_seconds": [
+            0.004120083001907915,
+            0.0035976250073872507,
+            0.00394699999014847,
+            0.003985874995123595,
+            0.003964792005717754,
+            0.003988374985055998
+          ]
+        }
+      },
+      "native_mean": [
+        19.785319010416668,
+        16.118652343750004
+      ],
+      "setting": 6,
+      "stage": "outer",
+      "support": "synthetic700",
+      "variant": "zero_strength_update"
+    },
+    {
+      "atoms": 700,
+      "modes": {
+        "memo": {
+          "fit_seconds": [
+            0.0019313340017106384,
+            0.0017363340011797845,
+            0.002012957993429154,
+            0.001901290990645066,
+            0.0020057080255355686,
+            0.0017941659898497164
+          ],
+          "score_seconds": [
+            0.004371916991658509,
+            0.003859249991364777,
+            0.003770250012166798,
+            0.003873583977110684,
+            0.0036725419922731817,
+            0.0037959170003887266
+          ]
+        },
+        "original": {
+          "fit_seconds": [
+            0.0025332080258522183,
+            0.002399207995040342,
+            0.0024845410080160946,
+            0.0024792079930193722,
+            0.0024959580041468143,
+            0.0024586250074207783
+          ],
+          "score_seconds": [
+            0.007384500000625849,
+            0.006954082986339927,
+            0.007074292021570727,
+            0.007636875001480803,
+            0.006900499982293695,
+            0.007454832986695692
+          ]
+        },
+        "skellam": {
+          "fit_seconds": [
+            0.00245800000266172,
+            0.0023811249993741512,
+            0.002435666974633932,
+            0.002414209011476487,
+            0.002466874982928857,
+            0.0023954159987624735
+          ],
+          "score_seconds": [
+            0.004050250019645318,
+            0.003995416016550735,
+            0.0038328329974319786,
+            0.0037620000075548887,
+            0.0035781250044237822,
+            0.003664416988613084
+          ]
+        }
+      },
+      "native_mean": [
+        19.411666666666665,
+        16.255000000000006
+      ],
+      "setting": 6,
+      "stage": "outer",
+      "support": "synthetic700",
+      "variant": "zero_scoring_level_update"
+    }
+  ],
+  "role": "independent_saved_numerical_and_evidence_review",
+  "same_round_full700_fit_memo_reduction_vs_skellam_percent": [
+    19.503355705337633,
+    33.469097333782116,
+    26.04979653545313,
+    29.096003286800055,
+    18.077152816894003,
+    27.34968135050625
+  ],
+  "source_hashes": {
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/attempt-1788650331150204000/qualify.py": "cb47da9d8b9d8d072c9a3af8d07e9ff206410c85550d5fce4f3a8483cb3de3fd",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_encoding_memo.py": "da369432128b28c8268b47fb98bccaa3751d853a1b6876c7526cf9040d7addf2",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-encoding-memo/test_encoding_memo.py": "4304e792447fea95c808c923aa78b21c1b8c901cc75b7e5fc871a94cc776cec7"
+  },
+  "status": "accepted_bounded_synthetic_exactness_pilot_like_absolute_target_lead_only",
+  "unchanged_baseline_cross_run_comparison": {
+    "original": {
+      "change_percent": -5.935446713414105,
+      "current_combined_seconds": 0.010270124999806285,
+      "previous_combined_seconds": 0.01091816698317416,
+      "same_implementation": true
+    },
+    "skellam": {
+      "change_percent": -10.037156931934188,
+      "current_combined_seconds": 0.00676929100882262,
+      "previous_combined_seconds": 0.007524540997110307,
+      "same_implementation": true
+    }
+  },
+  "unit_evidence": {
+    "all21_exact_test_names_in_log": true,
+    "errors": 0,
+    "failed": 0,
+    "key_test_assertions_reviewed": [
+      "Cache-hit path: fresh JointBase.components exactly once, digest three times, moments six times, original encoder once; genuine recovered fields equal original, including independent law.",
+      "Mutation, signed-zero/length keys, fresh lists, exact unsupported identity/errors, per-instance binding, encoder-failure retention and successful commit ordering.",
+      "Changed first/last alpha element by nextafter, changed length, signed-zero flip, saved alpha hash/beta/rates/mean/covariance reject with unchanged exception class/message even with primed cache.",
+      "Two real resolve callbacks create distinct memos inside active callbacks and cause two original encodings in total.",
+      "Genuine full/independence/24-hour/zero-control resolution, lazy no-eligible fallback, fit/grid numerical failure, failed N0, unexpected fit error and altered second descriptor roundtrip checks.",
+      "Global callable bindings and source law/mapper arrays unchanged."
+    ],
+    "passed": 21,
+    "skipped": 0,
+    "tests_run": 21,
+    "unit_wall_seconds": 1.322589708986925
+  },
+  "version": "rf-comp-03.numerical-review.v1"
+}

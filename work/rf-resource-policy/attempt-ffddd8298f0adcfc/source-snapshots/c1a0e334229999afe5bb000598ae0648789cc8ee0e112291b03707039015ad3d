@@ -1,0 +1,253 @@
+"""Pure finite empirical conditional contraction and explicit-array estimator.
+
+This unit is not a complete score distribution, historical calibration wrapper,
+forecast, or infinite-support adapter. No data access or model fitting occurs.
+"""
+import math
+
+import numpy as np
+
+
+MASS_TOLERANCE = 1e-12
+MOMENT_TOLERANCE = 1e-10
+SCALE_TOLERANCE = 1e-12
+MAXIMUM_BISECTION_STEPS = 60
+
+
+class ConditionalMarginFailure(ValueError):
+    pass
+
+
+def _scalar(value, name):
+    array = np.asarray(value)
+    if array.ndim != 0 or array.dtype.kind not in 'biuf':
+        raise ConditionalMarginFailure('invalid_' + name)
+    number = float(array)
+    if not math.isfinite(number):
+        raise ConditionalMarginFailure('nonfinite_' + name)
+    return number
+
+
+def _probabilities(probabilities, total=None):
+    original = np.asarray(probabilities)
+    if original.ndim != 1 or original.size == 0 or original.dtype.kind not in 'biuf':
+        raise ConditionalMarginFailure('invalid_probability_vector')
+    if total is not None and (not isinstance(total, (int, np.integer)) or isinstance(total, (bool, np.bool_))
+                              or total < 0 or total != original.size - 1):
+        raise ConditionalMarginFailure('incomplete_conditional_vector')
+    values = original.astype(np.float64, copy=True)
+    if not np.all(np.isfinite(values)) or np.any(values < 0):
+        raise ConditionalMarginFailure('invalid_probability')
+    if np.any(values > 1 + MASS_TOLERANCE):
+        raise ConditionalMarginFailure('invalid_probability_mass')
+    mass = math.fsum(values)
+    if not math.isfinite(mass) or mass <= 0 or abs(mass - 1) > MASS_TOLERANCE:
+        raise ConditionalMarginFailure('invalid_probability_mass')
+    support = np.arange(values.size, dtype=float)
+    mean = float(support @ values) / mass
+    if not math.isfinite(mean) or not 0 <= mean <= values.size - 1:
+        raise ConditionalMarginFailure('invalid_conditional_mean')
+    return original, values, mass, mean
+
+
+def conditional_moments(probabilities, *, total=None):
+    """Normalize moments by incoming mass without renormalizing the vector."""
+    _, values, mass, mean = _probabilities(probabilities, total)
+    variance = math.fsum(float(p) * (h - mean) ** 2 for h, p in enumerate(values)) / mass
+    if not math.isfinite(variance) or variance < 0:
+        raise ConditionalMarginFailure('invalid_conditional_variance')
+    return {'mass': mass, 'mean': mean, 'variance': variance}
+
+
+def contract_conditional(probabilities, s, *, total=None):
+    """Contract within one complete finite total, preserving incoming mass."""
+    original, values, mass, mean = _probabilities(probabilities, total)
+    scale = _scalar(s, 'scale')
+    if not 0 <= scale <= 1:
+        raise ConditionalMarginFailure('invalid_scale')
+    if scale == 1 or np.count_nonzero(values) == 1:
+        return original.copy()
+    result = np.zeros_like(values)
+    for home in np.flatnonzero(values):
+        probability = float(values[home])
+        z = mean + scale * (float(home) - mean)
+        lower = math.floor(z)
+        fraction = z - lower
+        if lower < 0 or lower >= values.size or (fraction > 0 and lower + 1 >= values.size):
+            raise ConditionalMarginFailure('transformed_support_out_of_bounds')
+        low_mass = probability * (1 - fraction)
+        high_mass = probability * fraction
+        if (fraction < 1 and low_mass == 0) or (fraction > 0 and high_mass == 0):
+            raise ConditionalMarginFailure('rounding_mass_underflow')
+        result[lower] += low_mass
+        if fraction > 0:
+            result[lower + 1] += high_mass
+    if not np.all(np.isfinite(result)) or np.any(result < 0):
+        raise ConditionalMarginFailure('invalid_transformed_probability')
+    after = conditional_moments(result)
+    if (abs(after['mass'] - mass) > MOMENT_TOLERANCE
+            or abs(after['mean'] - mean) > MOMENT_TOLERANCE):
+        raise ConditionalMarginFailure('transformed_mass_or_mean_changed')
+    return result
+
+
+def _variance_profile(probabilities):
+    _, values, mass, mean = _probabilities(probabilities)
+    if np.count_nonzero(values) == 1:
+        return values, mass, mean, 0.0
+    fraction = mean - math.floor(mean)
+    return values, mass, mean, fraction * (1 - fraction)
+
+
+def _profile_excess(profile, scale):
+    """Stable variance above the minimum, including exact flat segments.
+
+    The linear interpolation of h**2 is convex and piecewise linear. Subtract
+    its supporting line on [floor(c), floor(c)+1]; its averaged linear term
+    cancels because c is the conditional mean. Remaining hinge contributions
+    are nonnegative and exactly zero while each mapped cell stays in that bin.
+    """
+    values, mass, mean, minimum = profile
+    if np.count_nonzero(values) == 1:
+        return 0.0
+    floor_mean = math.floor(mean)
+    terms = []
+    for home in np.flatnonzero(values):
+        displacement = scale * (float(home) - mean)
+        distance = max(0.0, (mean - floor_mean - 1) + displacement,
+                       (floor_mean - mean) - displacement)
+        count = math.floor(distance) + 1
+        gap = count * (2 * distance - count + 1) if distance > 0 else 0.0
+        if gap < 0 or not math.isfinite(gap):
+            raise ConditionalMarginFailure('invalid_variance_hinge')
+        terms.append(float(values[home]) * gap)
+    result = math.fsum(terms) / mass
+    if not math.isfinite(result) or result < 0:
+        raise ConditionalMarginFailure('invalid_profile_variance')
+    return result
+
+
+def _profile_variance(profile, scale):
+    return profile[3] + _profile_excess(profile, scale)
+
+
+def _numbers(values, count, name):
+    array = np.asarray(values)
+    if array.ndim != 1 or len(array) != count or array.dtype.kind not in 'biuf':
+        raise ConditionalMarginFailure('invalid_' + name)
+    array = array.astype(np.float64, copy=True)
+    if not np.all(np.isfinite(array)):
+        raise ConditionalMarginFailure('nonfinite_' + name)
+    return array
+
+
+def estimate_scale(empirical_probabilities, empirical_fractions, fixed_variances,
+                   squared_residuals, weights):
+    """Estimate one scale from explicit synthetic training cases only.
+
+    Fixed variances must already include background and between-component
+    contributions. The caller supplies squared residuals about the ORIGINAL
+    full conditional mean. This pure unit cannot verify historical provenance.
+    """
+    vectors = list(empirical_probabilities)
+    count = len(vectors)
+    if count == 0:
+        raise ConditionalMarginFailure('empty_training_cases')
+    fractions = _numbers(empirical_fractions, count, 'empirical_fractions')
+    fixed = _numbers(fixed_variances, count, 'fixed_variances')
+    residuals = _numbers(squared_residuals, count, 'squared_residuals')
+    weight = _numbers(weights, count, 'weights')
+    if (np.any(fractions < 0) or np.any(fractions > 1) or np.any(fixed < 0)
+            or np.any(residuals < 0) or np.any(weight < 0) or not np.any(weight > 0)):
+        raise ConditionalMarginFailure('invalid_training_case_values')
+    profiles = []
+    for vector, fraction in zip(vectors, fractions):
+        if vector is None:
+            if fraction != 0:
+                raise ConditionalMarginFailure('missing_empirical_vector')
+            profiles.append(None)
+        else:
+            profiles.append(_variance_profile(vector))
+    # Scale before summation to avoid overflow; reject lost positive weights,
+    # which can still multiply large residuals into meaningful contributions.
+    scaled_weights = weight / float(weight.max())
+    if np.any((weight > 0) & (scaled_weights == 0)):
+        raise ConditionalMarginFailure('positive_weight_underflow')
+    normalized_weights = scaled_weights / math.fsum(scaled_weights)
+    if np.any((weight > 0) & (normalized_weights == 0)):
+        raise ConditionalMarginFailure('positive_weight_underflow')
+
+    def average(numbers):
+        value = math.fsum(float(w) * float(number) for w, number in zip(normalized_weights, numbers))
+        if not math.isfinite(value):
+            raise ConditionalMarginFailure('nonfinite_weighted_average')
+        return value
+
+    def excess_variance(scale):
+        return average([a * (0.0 if profile is None else _profile_excess(profile, scale))
+                        for a, profile in zip(fractions, profiles)])
+
+    minimum = average([b + a * (0.0 if profile is None else profile[3])
+                       for b, a, profile in zip(fixed, fractions, profiles)])
+
+    def variance(scale):
+        return minimum + excess_variance(scale)
+
+    adjustable = excess_variance(1.0)
+    target, maximum = average(residuals), minimum + adjustable
+    if adjustable > MASS_TOLERANCE and (
+            max(math.ulp(minimum), math.ulp(maximum)) > MOMENT_TOLERANCE
+            or abs((maximum - minimum) - adjustable) > MOMENT_TOLERANCE):
+        raise ConditionalMarginFailure('unresolvable_fixed_variance_arithmetic')
+    if maximum < minimum - MOMENT_TOLERANCE:
+        raise ConditionalMarginFailure('nonmonotone_variance_endpoints')
+    clipped = min(maximum, max(minimum, target))
+    below, above = target < minimum, target > maximum
+    steps, lower, upper = 0, 0.0, 1.0
+    if adjustable <= MASS_TOLERANCE:
+        scale, status = 1.0, 'no_adjustable_variance'
+        lower = upper = 1.0
+    elif target >= maximum:
+        scale, status = 1.0, 'identity_upper_boundary'
+        lower = upper = 1.0
+    else:
+        # Compare excess above V(0), so a fixed background contribution cannot
+        # round a positive departure from a minimum plateau back down to V(0).
+        clipped_excess = clipped - minimum
+        lower_variance, upper_variance = 0.0, adjustable
+        for steps in range(1, MAXIMUM_BISECTION_STEPS + 1):
+            middle = (lower + upper) / 2
+            middle_variance = excess_variance(middle)
+            if (middle_variance < lower_variance - MOMENT_TOLERANCE
+                    or middle_variance > upper_variance + MOMENT_TOLERANCE):
+                raise ConditionalMarginFailure('nonmonotone_variance_profile')
+            if middle_variance <= clipped_excess:
+                lower, lower_variance = middle, middle_variance
+            else:
+                upper, upper_variance = middle, middle_variance
+            if upper - lower <= SCALE_TOLERANCE:
+                break
+        if upper - lower > SCALE_TOLERANCE:
+            raise ConditionalMarginFailure('scale_bisection_not_converged')
+        scale = lower  # Feasible side of the rightmost crossing, never midpoint.
+        status = ('target_below_minimum' if below else 'minimum_variance_plateau'
+                  if target == minimum else 'interior')
+    achieved = variance(scale)
+    # Verify the analytic profile against explicit finite-vector contraction.
+    actual = []
+    for b, a, profile, vector in zip(fixed, fractions, profiles, vectors):
+        if profile is None or a == 0:
+            actual.append(b)
+            continue
+        moments = conditional_moments(contract_conditional(vector, scale))
+        analytic = _profile_variance(profile, scale)
+        if abs(moments['variance'] - analytic) > MOMENT_TOLERANCE:
+            raise ConditionalMarginFailure('variance_profile_transform_mismatch')
+        actual.append(b + a * moments['variance'])
+    if abs(average(actual) - achieved) > MOMENT_TOLERANCE:
+        raise ConditionalMarginFailure('mixture_variance_transform_mismatch')
+    return {'s': scale, 'target_variance': target, 'clipped_target_variance': clipped,
+            'minimum_variance': minimum, 'original_variance': maximum,
+            'achieved_variance': achieved, 'status': status, 'target_below_minimum': below,
+            'target_above_original': above, 'steps': steps, 'bracket': [lower, upper],
+            'no_adjustable_variance': status == 'no_adjustable_variance'}

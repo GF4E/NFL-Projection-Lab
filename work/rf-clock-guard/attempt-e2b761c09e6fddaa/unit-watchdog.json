@@ -1,0 +1,70 @@
+{
+  "artifacts": {
+    "observations.jsonl": {
+      "bytes": 5893,
+      "sha256": "8e55137cbccdbd996b00b14459e581e33ab46f96fc99ddd49a73d15692f01163"
+    },
+    "stderr.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stdout.log": {
+      "bytes": 4225,
+      "sha256": "3e03c80cc50614e40ed0435bc72cad3c8dffc99bfa41c2e2c2c1e57611bb1b84"
+    }
+  },
+  "automatic_restart": false,
+  "command": [
+    "/opt/anaconda3/bin/python3.12",
+    "-I",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-clock-guard/qualify_clock_guard.py",
+    "--child",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-clock-guard/attempt-e2b761c09e6fddaa",
+    "--pins",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-clock-guard/INPUT-PINS-e2b761c09e6fddaa.json",
+    "--pins-sha256",
+    "e2b761c09e6fddaa265ac62ca312a9a429945fce3cb679947d559cf5747bccbb",
+    "--started",
+    "167332.512573416"
+  ],
+  "cwd": "/private/tmp/os01-gen15-rebuild.9ny71k",
+  "elapsed_seconds": 2.5126503750216216,
+  "exit_code": 0,
+  "exit_observed_elapsed_seconds": 2.512629958015168,
+  "exit_signal": null,
+  "historical_invocation_authorized": false,
+  "kill_requests": [],
+  "limit_failure": false,
+  "limits": {
+    "complete_smoke_seconds": 120.0,
+    "parent_metadata_seconds": 2.0,
+    "rss_mib": 1536.0,
+    "rss_sample_interval_seconds": 0.05,
+    "scientific_seconds": 569.9373507910059
+  },
+  "limits_of_observation": [
+    "RSS is sampled, not an instantaneous kernel RSS limit.",
+    "wait4 reports worker high-water RSS; group peak is the maximum observed group sum.",
+    "Parent scheduling can delay observation and signal delivery; timestamps retain that delay.",
+    "A completed process alone does not prove a complete or valid scientific terminal."
+  ],
+  "observation_errors": [],
+  "parent_metadata_deadline_elapsed_seconds": 4.5126477500016335,
+  "pgid": 3382,
+  "phase_handshake_required": false,
+  "phase_progression": [],
+  "pid": 3382,
+  "process_ownership_lost": false,
+  "report_prepared_elapsed_seconds": 2.513104125013342,
+  "sample_count": 44,
+  "sampled_group_peak_rss_mib": 261.015625,
+  "sampled_worker_peak_rss_mib": 261.015625,
+  "scientific_terminal_verified": false,
+  "spawned_elapsed_seconds": 0.0019092500151600689,
+  "started_monotonic": 167332.575225833,
+  "status": "completed_process",
+  "stop_reason": null,
+  "version": "rfcomp08.external-process-watchdog.v1",
+  "waited_worker_peak_rss_mib": 261.0625,
+  "worker_grace_seconds": 0
+}

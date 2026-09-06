@@ -1,0 +1,303 @@
+"""Synthetic-only exactness and failure tests for the frozen RF-02C cache."""
+from dataclasses import fields, replace
+import inspect
+import json
+import math
+from pathlib import Path
+import sys
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+import research_score_compute_distribution as candidate
+import research_score_distribution as legacy
+import research_score_metrics as metrics
+from research_score_successor_distribution import JointBase
+from research_score_run import distribution_descriptor
+
+
+SCORES = [[7, 10], [14, 21], [28, 17], [31, 24], [0, 3], [21, 21]]
+WEIGHTS = [1, 2, 1, 3, 1, 2]
+TARGETS = ("home", "away", "margin", "total")
+
+
+def canonical(value):
+    # JSON bytes distinguish signed zero; dict/float equality alone does not.
+    return json.dumps(value, sort_keys=True, separators=(",", ":"),
+                      allow_nan=False).encode("utf-8")
+
+
+def fitted(mean=(18, 23)):
+    return JointBase.from_scores(SCORES, WEIGHTS).fit(mean)
+
+
+def outcome(function, *args, **kwargs):
+    try:
+        return "returned", canonical(function(*args, **kwargs))
+    except Exception as exc:
+        return "raised", type(exc), str(exc)
+
+
+class CacheTests(unittest.TestCase):
+    def assert_scores_exact(self, distribution, observed=(17, 28),
+                            double_grid=True, diagnostics=True):
+        original = metrics.score_forecast(distribution, observed, "synthetic-cache",
+                                          double_grid=double_grid, diagnostics=diagnostics)
+        wrapped = candidate.score_forecast(distribution, observed, "synthetic-cache",
+                                           double_grid=double_grid, diagnostics=diagnostics)
+        self.assertEqual(canonical(original), canonical(wrapped))
+        return original
+
+    def test_signature_and_unchanged_method_inheritance(self):
+        self.assertEqual(inspect.signature(candidate.score_forecast),
+                         inspect.signature(metrics.score_forecast))
+        self.assertIs(candidate.legacy_score_forecast, metrics.score_forecast)
+        methods = {name for name, value in vars(legacy.JointDistribution).items()
+                   if callable(value) and not name.startswith("__")}
+        self.assertIn("quantile", methods)
+        for name in methods - {"cdf"}:
+            self.assertIs(getattr(candidate.MemoizedDistribution, name),
+                          getattr(legacy.JointDistribution, name), name)
+
+    def test_preserve_all_fields_types_values_signed_zero_and_array_flags(self):
+        original = legacy.JointDistribution(
+            np.array([[0, 0], [7, 10]], dtype=np.int16),
+            np.array([.25, .5], dtype=np.float32), np.float64(.25),
+            np.array([10., 15.], dtype=np.float32),
+            np.array([-0., 0.], dtype=np.float32), np.int32(3), np.bool_(True))
+        original.alpha.setflags(write=False)
+        snapshots = {field.name: (getattr(original, field.name).tobytes(),
+                                  getattr(original, field.name).flags.writeable)
+                     for field in fields(legacy.JointDistribution)
+                     if isinstance(getattr(original, field.name), np.ndarray)}
+        wrapped = candidate.MemoizedDistribution(original)
+        for field in fields(legacy.JointDistribution):
+            left, right = getattr(original, field.name), getattr(wrapped, field.name)
+            self.assertIs(type(left), type(right), field.name)
+            if isinstance(left, np.ndarray):
+                self.assertEqual(left.dtype, right.dtype)
+                self.assertEqual(left.shape, right.shape)
+                self.assertEqual(left.tobytes(), right.tobytes())
+                self.assertFalse(np.shares_memory(left, right))
+                self.assertFalse(right.flags.writeable)
+                self.assertEqual((left.tobytes(), left.flags.writeable), snapshots[field.name])
+                with self.assertRaises(ValueError):
+                    right.flat[0] = 0
+            else:
+                self.assertIs(left, right)
+        self.assertTrue(np.signbit(wrapped.theta[0]))
+        self.assertFalse(np.signbit(wrapped.theta[1]))
+
+    def test_copy_does_not_retain_original_array_storage(self):
+        original = fitted()
+        wrapped = candidate.MemoizedDistribution(original)
+        before = {name: getattr(wrapped, name).tobytes()
+                  for name in ("atoms", "alpha", "rates", "theta")}
+        for name in before:
+            getattr(original, name).flat[0] += 1
+            self.assertEqual(getattr(wrapped, name).tobytes(), before[name])
+
+    def test_cdf_repeated_integer_keys_and_negative_fractional_floor(self):
+        original, calls = fitted(), []
+        inherited = legacy.JointDistribution.cdf
+        wrapped = candidate.MemoizedDistribution(original)
+
+        def record(distribution, target, value):
+            calls.append((target, value))
+            return inherited(distribution, target, value)
+
+        with patch.object(legacy.JointDistribution, "cdf", record):
+            for target in TARGETS:
+                for first, same in ((-1.9, -1.1), (-.9, -.1), (0., .99), (7.01, 7.99)):
+                    expected = inherited(original, target, first)
+                    one = wrapped.cdf(target, first)
+                    two = wrapped.cdf(target, same)
+                    self.assertEqual(canonical(one), canonical(expected))
+                    self.assertIs(two, one)
+        self.assertEqual(len(calls), 16)
+        self.assertEqual(len(wrapped._cdf_cache), 16)
+        self.assertEqual(calls[0], ("home", -1.9))
+        self.assertIn(("margin", -2), wrapped._cdf_cache)
+        self.assertNotIn(("margin", 1), wrapped._cdf_cache)
+
+    def test_cache_is_target_specific_and_keeps_exact_return_object(self):
+        wrapped = candidate.MemoizedDistribution(fitted())
+        with patch.object(legacy.JointDistribution, "cdf", return_value=-0.) as inherited:
+            first = wrapped.cdf("home", .1)
+            again = wrapped.cdf("home", .9)
+            other = wrapped.cdf("away", .1)
+        self.assertIs(first, again)
+        self.assertEqual(inherited.call_count, 2)
+        self.assertEqual(canonical(first), b"-0.0")
+        self.assertEqual(canonical(other), b"-0.0")
+
+    def test_no_cache_of_failed_cdf(self):
+        wrapped = candidate.MemoizedDistribution(fitted())
+        failure = legacy.NumericalFailure("synthetic_failed_cdf")
+        with patch.object(legacy.JointDistribution, "cdf",
+                          side_effect=[failure, failure, .25]) as inherited:
+            for _ in range(2):
+                with self.assertRaisesRegex(legacy.NumericalFailure, "synthetic_failed_cdf"):
+                    wrapped.cdf("home", 7.5)
+                self.assertEqual(wrapped._cdf_cache, {})
+            self.assertEqual(wrapped.cdf("home", 7.9), .25)
+            self.assertEqual(wrapped.cdf("home", 7), .25)
+        self.assertEqual(inherited.call_count, 3)
+
+    def test_invalid_targets_nonfinite_arguments_and_exception_order(self):
+        original = fitted()
+        wrapped = candidate.MemoizedDistribution(original)
+        targets = ("unknown", "", None, 3, (), [], {}, ["home"])
+        values = (np.nan, np.inf, -np.inf, "not-a-number", None)
+        for target, value in [(target, 7.1) for target in targets] + [
+                (target, value) for target in ("home", "unknown", []) for value in values]:
+            with self.subTest(target=target, value=value):
+                expected = outcome(original.cdf, target, value)
+                self.assertEqual(expected[0], "raised")
+                for _ in range(2):
+                    self.assertEqual(outcome(wrapped.cdf, target, value), expected)
+        self.assertEqual(wrapped._cdf_cache, {})
+
+    def test_unhashable_target_preserves_legacy_success_or_failure(self):
+        original, wrapped = fitted(), candidate.MemoizedDistribution(fitted())
+        for target in (np.array(["home"]), np.array(["not-valid"]), np.array(["home", "away"])):
+            with self.subTest(target=repr(target)):
+                self.assertEqual(outcome(original.cdf, target, 7), outcome(wrapped.cdf, target, 7))
+        self.assertEqual(wrapped._cdf_cache, {})
+
+    def test_quantiles_dispatch_through_cache_and_retain_boundaries(self):
+        original = fitted()
+        inherited, calls = legacy.JointDistribution.cdf, []
+        wrapped = candidate.MemoizedDistribution(original)
+
+        def record(distribution, target, value):
+            calls.append((target, math.floor(value)))
+            return inherited(distribution, target, value)
+
+        for target in TARGETS:
+            expected = [original.quantile(target, p) for p in (.025, .1, .25, .75, .9, .975)]
+            with patch.object(legacy.JointDistribution, "cdf", record):
+                actual = [wrapped.quantile(target, p) for p in (.025, .1, .25, .75, .9, .975)]
+                count = len(calls)
+                repeated = [wrapped.quantile(target, p) for p in (.025, .1, .25, .75, .9, .975)]
+                self.assertEqual(len(calls), count)
+            self.assertEqual(canonical(expected), canonical(actual))
+            self.assertEqual(canonical(expected), canonical(repeated))
+        self.assertEqual(len(calls), len(set(calls)))
+
+    def test_quantile_ambiguity_and_invalid_probability_unchanged(self):
+        original, wrapped = fitted(), candidate.MemoizedDistribution(fitted())
+        for target in TARGETS:
+            probability = original.cdf(target, 18)
+            expected = outcome(original.quantile, target, probability)
+            self.assertEqual(expected, ("raised", legacy.NumericalFailure, "quantile_boundary_ambiguous"))
+            for _ in range(2):
+                self.assertEqual(outcome(wrapped.quantile, target, probability), expected)
+        for probability in (0, 1, -.1, np.nan, np.inf):
+            self.assertEqual(outcome(original.quantile, "home", probability),
+                             outcome(wrapped.quantile, "home", probability))
+
+    def test_all_metric_bytes_and_original_object_unchanged(self):
+        for independent in (False, True):
+            original = replace(fitted(), independent=independent)
+            descriptor = canonical(distribution_descriptor(original, {"mapper": "synthetic"}))
+            arrays = {name: (getattr(original, name).tobytes(), getattr(original, name).flags.writeable)
+                      for name in ("atoms", "alpha", "rates", "theta")}
+            for double_grid, diagnostics in ((False, False), (True, False), (False, True), (True, True)):
+                with self.subTest(independent=independent, double_grid=double_grid, diagnostics=diagnostics):
+                    self.assert_scores_exact(original, double_grid=double_grid, diagnostics=diagnostics)
+            self.assertEqual(canonical(distribution_descriptor(original, {"mapper": "synthetic"})), descriptor)
+            for name, before in arrays.items():
+                self.assertEqual((getattr(original, name).tobytes(), getattr(original, name).flags.writeable), before)
+            self.assertFalse(hasattr(original, "_cdf_cache"))
+
+    def test_scoring_invocations_and_distributions_never_share_cache(self):
+        originals = (fitted(), fitted((22, 16)))
+        observed_calls, wrappers = [], []
+        real_score = candidate.legacy_score_forecast
+
+        def inspect_score(distribution, observed, game_id, double_grid=True, diagnostics=True):
+            self.assertIsInstance(distribution, candidate.MemoizedDistribution)
+            self.assertEqual(distribution._cdf_cache, {})
+            wrappers.append(distribution)
+            observed_calls.append((observed, game_id, double_grid, diagnostics))
+            return real_score(distribution, observed, game_id, double_grid, diagnostics)
+
+        with patch.object(candidate, "legacy_score_forecast", inspect_score):
+            for original, observed, game_id, flag in ((originals[0], [17, 28], "same", True),
+                                                      (originals[0], [17, 28], "same", True),
+                                                      (originals[0], [21, 21], "other", False),
+                                                      (originals[1], [17, 28], "same", True)):
+                expected = metrics.score_forecast(original, observed, game_id, flag, True)
+                actual = candidate.score_forecast(original, observed, game_id, flag, True)
+                self.assertEqual(canonical(expected), canonical(actual))
+        self.assertEqual(len({id(value) for value in wrappers}), 4)
+        self.assertEqual(len({id(value._cdf_cache) for value in wrappers}), 4)
+        self.assertTrue(all(value._cdf_cache for value in wrappers))
+        self.assertEqual(observed_calls[2], ([21, 21], "other", False, True))
+
+    def test_coordinate_swap_order_and_independent_marginals(self):
+        original = fitted()
+        for independent in (False, True):
+            joint = replace(original, independent=independent)
+            swapped = replace(joint, atoms=joint.atoms[:, ::-1], rates=joint.rates[::-1], theta=joint.theta[::-1])
+            reordered = replace(joint, atoms=joint.atoms[::-1], alpha=joint.alpha[::-1])
+            for distribution, observed in ((joint, [17, 28]), (swapped, [28, 17]), (reordered, [17, 28])):
+                self.assert_scores_exact(distribution, observed)
+            left, right = candidate.MemoizedDistribution(joint), candidate.MemoizedDistribution(swapped)
+            for value in (-31.5, -1, 0, 10, 17.9, 40, 90):
+                self.assertEqual(canonical(left.cdf("home", value)), canonical(right.cdf("away", value)))
+                self.assertEqual(canonical(left.cdf("away", value)), canonical(right.cdf("home", value)))
+        independent = candidate.MemoizedDistribution(replace(original, independent=True))
+        dependent = candidate.MemoizedDistribution(original)
+        for target in ("home", "away"):
+            for value in (0, 17, 28, 60):
+                self.assertEqual(canonical(independent.cdf(target, value)), canonical(dependent.cdf(target, value)))
+
+    def test_extreme_means_and_primary_grid_failure(self):
+        for mean in ((1e-4, 1e-4), (.01, 100), (100, 100), (60, 8)):
+            distribution = fitted(mean)
+            with self.subTest(mean=mean):
+                self.assert_scores_exact(distribution, observed=(1, 2), diagnostics=False)
+                for independent in (False, True):
+                    value = replace(distribution, independent=independent)
+                    expected = outcome(metrics.score_forecast, value, [1, 2], "extreme")
+                    self.assertEqual(outcome(candidate.score_forecast, value, [1, 2], "extreme"), expected)
+        huge = legacy.JointDistribution(np.array([[0., 0.]]), np.array([0.]), 1.,
+                                        np.array([1e6, 1e6]), np.zeros(2), 0)
+        expected = ("raised", legacy.NumericalFailure, "grid_tail_budget_exceeded")
+        self.assertEqual(outcome(metrics.score_forecast, huge, [1, 2], "huge"), expected)
+        self.assertEqual(outcome(candidate.score_forecast, huge, [1, 2], "huge"), expected)
+
+    def test_invalid_observations_keep_failure_semantics(self):
+        original = fitted()
+        for observed in ([1], [-1, 0], [1.1, 3], [np.nan, 0], [np.inf, 0], [[1, 2]]):
+            expected = outcome(metrics.score_forecast, original, observed, "invalid")
+            # Inherited discovery reloads distribution after metrics; use the
+            # exact exception class retained by the unchanged scoring module.
+            self.assertEqual(expected, ("raised", metrics.NumericalFailure, "invalid_target_pair"))
+            self.assertEqual(outcome(candidate.score_forecast, original, observed, "invalid"), expected)
+
+    def test_descriptor_mapper_and_fallback_distribution_unchanged(self):
+        # The scorer receives an already chosen distribution; it cannot refit,
+        # replace a failed candidate, or alter the caller's mapper descriptor.
+        fallback = fitted((21, 21))
+        mapper = {"kind": "synthetic-naive-fallback", "mean": [21., 21.]}
+        before = canonical(distribution_descriptor(fallback, mapper))
+        wrapped = candidate.MemoizedDistribution(fallback)
+        self.assertEqual(canonical(distribution_descriptor(wrapped, mapper)), before)
+        with patch.object(JointBase, "fit", side_effect=AssertionError("scoring_must_not_fit")):
+            self.assert_scores_exact(fallback, observed=(21, 21))
+        self.assertEqual(canonical(distribution_descriptor(fallback, mapper)), before)
+        self.assertEqual(mapper, {"kind": "synthetic-naive-fallback", "mean": [21., 21.]})
+
+    def test_canonical_equality_detects_signed_zero(self):
+        self.assertEqual({"score": 0.}, {"score": -0.})
+        self.assertNotEqual(canonical({"score": 0.}), canonical({"score": -0.}))
+        self.assertEqual(canonical({"score": -0.}), b'{"score":-0.0}')
+
+
+if __name__ == "__main__":
+    unittest.main()

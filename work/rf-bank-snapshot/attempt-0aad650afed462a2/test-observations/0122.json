@@ -1,0 +1,53 @@
+{
+  "candidate": {
+    "events": [
+      "assembly"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": false
+    },
+    "snapshots": [
+      {
+        "mode": "fallback"
+      },
+      {
+        "mode": "supported"
+      }
+    ]
+  },
+  "expected_decision": false,
+  "expected_modes": [
+    "fallback",
+    "supported"
+  ],
+  "kind": "paired_value",
+  "label": "unicode-not-ascii-escape-literal",
+  "original": {
+    "events": [
+      "assembly"
+    ],
+    "images": [
+      {
+        "ascii_body": "\"\\ud83d\\ude00\"\n",
+        "bytes": 15,
+        "sha256": "987ba74ef5e732bfa79659dd63cf124e8eccb53eabd625e177143bcd3f7260b9"
+      },
+      {
+        "ascii_body": "\"\\\\ud83d\\\\ude00\"\n",
+        "bytes": 17,
+        "sha256": "fd3722246a80140aad1696437d1b579b54e301137ee3bab669be81f68bb53a17"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": false
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_unicode_astral_surrogate_json_equivalence"
+}

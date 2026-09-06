@@ -1,0 +1,221 @@
+{
+  "acceptance_scope": "Integrated implementation temporal, leakage-boundary, persistence and operational failure-handling review on exact candidate hashes; synthetic execution only.",
+  "authenticated_bindings": {
+    "accepted_prior_unit_hashes_cross_checked": true,
+    "all_43_files_authenticated_before_and_after_tests": true,
+    "conditional_files": 16,
+    "exact_source_test_files": 43,
+    "frozen_parent_files": 27,
+    "pins": {
+      ".planning/engine-os/research-first/RF-02D-ADMISSION-ACCEPTANCE.v1.json": "8c737ad9869efa7ef2948332ab6019384517f9a511e474add9026c227f1958a3",
+      ".planning/engine-os/research-first/RF-02D-HISTORICAL-PROTOCOL.v1.md": "6fb5423bc60ef6f0f4e23b2ca4e4fe88991cda33f81a1218c74f745e76513de9",
+      ".planning/engine-os/research-first/RF-02D-IDENTITY-ACCEPTANCE.v1.json": "878f7160eaa6306d67449f4361ea68e3a34ed5f915886f5270882f9560cb3968",
+      ".planning/engine-os/research-first/RF-02D-INFERENCE-ACCEPTANCE.v1.json": "0b8d5b547f19a9e823708aa5e06a69afcef39b4142a2f515f1cb938747cd5539",
+      ".planning/engine-os/research-first/RF-02D-REPLAY-UNIT-ACCEPTANCE.v1.json": "6f3659c1f6b5bfbcc77585197969374b36867769e4fbcb2eeb180c53ed2bb5bf",
+      "config/research-team-score-conditional.v1.json": "235e7bdf74b2e75620cdd4cafdd8cb9fa130c631949ff6172e047116a503a615"
+    },
+    "reviewed_runtime": {
+      "distributionMetadata": {
+        "numpy": {
+          "metadataSha256": "4f151eefd36459b2a4b1831a4faaf673f3fa95a0397c27c52dc4cd2591202f66",
+          "recordSha256": "0526b68e396b892d95d837c7e135b88a7d23c9906405d95f5a7bb3a858b610f1"
+        },
+        "pypdf": {
+          "metadataSha256": "22dbb490bf8d3814f24cf834af5929bd147be1dc47ac66b8746f11d9067827ed",
+          "recordSha256": "7c7116742b4cae15d397ce94b227824f4fd146cb66faa94d2f6a8f0a6f3ce090"
+        },
+        "scipy": {
+          "metadataSha256": "daa3b9481a7879f190a33428547728d6b5d3151996b2bf2b8c64c5d9dd5820ee",
+          "recordSha256": "8070e28a84a1826c1fec89cb76d8c22a19d6328761fbf9e8ee7b0484a4569220"
+        }
+      },
+      "executable": "/opt/anaconda3/bin/python3.12",
+      "executableSha256": "a31fd089a3b57a09d86744234c21a3c831aec2509eecd78d0e01b520e064357c",
+      "isolatedMode": true,
+      "modelWorkers": 1,
+      "networkAllowed": false,
+      "providerAccessAllowed": false,
+      "versions": {
+        "numpy": "1.26.4",
+        "pypdf": "6.13.2",
+        "python": "3.12.2",
+        "scipy": "1.13.1"
+      }
+    },
+    "runtime_matches_pinned_accepted_identity_manifest": true
+  },
+  "blockers": [],
+  "created_at": "2026-09-05T07:38:28.867365+00:00",
+  "evidence": {
+    "source-hashes-candidate.json": {
+      "bytes": 5061,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02d-runner-review/source-hashes-candidate.json",
+      "sha256": "3847b851996e849b5185d2318c39f20fd9d420c33cd8c47ee41935e4b04dc1da"
+    },
+    "temporal-authentication.json": {
+      "bytes": 2095,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02d-runner-review/temporal-authentication.json",
+      "sha256": "043c34333c69de2cddffeaff4c1a7530d515d83923db139381d248858b12d966"
+    },
+    "temporal-checklist.md": {
+      "bytes": 7019,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02d-runner-review/temporal-checklist.md",
+      "sha256": "8d56ceae4e29ba1083ebb53438143c7e1d618183907230ba57f2157529f49bf2"
+    },
+    "temporal-final-probes.json": {
+      "bytes": 1657,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02d-runner-review/temporal-final-probes.json",
+      "sha256": "903f84ef060e7d88af97aa90558315dee3ea863692c5cd40bc4984aaadb2b990"
+    },
+    "temporal-final-probes.py": {
+      "bytes": 12153,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02d-runner-review/temporal-final-probes.py",
+      "sha256": "dfaa52bf0a89ccc5907a37fe977c40dda7b2698c8d110b087e570eeb40e9adae"
+    }
+  },
+  "focused_synthetic_tests": {
+    "command": "/opt/anaconda3/bin/python3.12 -I -m unittest discover -s tests/research-score-conditional-margin -p test_run.py -v",
+    "cwd": "/private/tmp/os01-gen15-rebuild.9ny71k",
+    "evidence": "Independently observed unified exec session 37442 complete with Ran 22 tests in 9.023s / OK.",
+    "exit_code": 0,
+    "scope": "Toy distributions and synthetic observations exercise real nonidentity estimation, mapping, fallback, recipe recovery and scoring. Full 226-origin controller uses synthetic 3407-key metadata with mocked admission, construction and grader callbacks; public evaluate is real but its bootstrap _infer is replaced with fixed synthetic interval output. This does not execute a historical replay or claim full-population numerical grading.",
+    "status": "passed",
+    "suite_enforced_maximum_rss_mib": 4096,
+    "suite_enforced_maximum_seconds": 120,
+    "suite_seconds": 9.023,
+    "tests": 22
+  },
+  "independent_additional_probes": {
+    "all_43_hashes_reverified": true,
+    "historical_fits_or_scores": 0,
+    "historical_inputs_read": 0,
+    "peak_rss_mib": 102.5625,
+    "probe_script_sha256": "dfaa52bf0a89ccc5907a37fe977c40dda7b2698c8d110b087e570eeb40e9adae",
+    "probes": {
+      "annual_sequence_and_prior_only_call_boundary": {
+        "all_234_artifacts_persisted_and_selected_year_reloaded": true,
+        "calls": 234,
+        "cold_start_calls": 18,
+        "estimated_spy_calls": 216,
+        "exact_prior_counts": true,
+        "first_origin_cutoffs": true,
+        "fully_rehashed_wrong_same_year_cutoff_rejected": true,
+        "numerical_estimator_invocations": 0,
+        "opaque_2025_payload_excluded": true
+      },
+      "half_written_terminal_staging_retention": {
+        "missing_prior_index_not_fabricated": true,
+        "only_final_invalid_completion_authoritative": true,
+        "prior_terminal_bytes_indexed_as_uncommitted": true
+      },
+      "real_signal_delivery_in_finalization_only": {
+        "limitation": "Actual signal mechanism tested with shortened delivery; no claim of a measured 30-second wait.",
+        "no_scientific_callbacks_after_stop": true,
+        "prefix_retained_without_completion": true,
+        "previous_handler_restored_and_timer_cleared": true,
+        "requested_cap_seconds": 30,
+        "signal_raised_expected_failure": true,
+        "synthetic_delivery_seconds": 0.02
+      },
+      "truncated_ordinary_artifact_retention": {
+        "only_completion_terminal_authoritative": true,
+        "opaque_bytes_indexed": true,
+        "retained_bytes": 14,
+        "successful_completion_rejected": true
+      }
+    },
+    "seconds": 0.684364791988628,
+    "status": "passed_independent_synthetic_probes"
+  },
+  "limitations": [
+    "Accepted implementation and synthetic tests do not authenticate an actual RF-02D historical execution or establish predictive improvement.",
+    "Original historical publication remains unverified; reconstruction time is not historical issuance time.",
+    "Filesystem timestamps alone cannot prove execution ordering or exclude unrelated executions. Ordering evidence here is inspected code and synthetic event/read/fsync assertions; actual archive and process handle require independent review.",
+    "The independent real-signal delivery probe asserted a requested 30-second cap but shortened timer delivery to 0.02 seconds. It validates signal handling, not an observed 30-second elapsed wait.",
+    "Implementation invariance evidence plus runtime completeness is not a substitute for the required independent post-terminal numerical and temporal audits."
+  ],
+  "reviewed_persistence_contract": {
+    "atomic_commit": "Both files and staging directory are fsynced before rename; finalized is set immediately after rename, then parent directory is fsynced. Post-rename error propagates without competing terminal or overwrite; actual exit and final audit remain mandatory.",
+    "authoritative_location": "completion/terminal.json only; completion/artifact-index.json appears in the same single directory rename.",
+    "finalization_grace": "After scientific failure only, timer switches to a 30-second invalid-record-finalization cap. Scientific stop elapsed is retained, no scientific callbacks resume, and no 600/7200 acceptance limit is extended. Grace timeout preserves prefix and propagates nonzero failure; no restart follows.",
+    "index_schema": [
+      "files",
+      "uncommitted_artifacts",
+      "uncommitted_staging"
+    ],
+    "no_restart": "Exclusive deterministic run reservation rejects any existing identity. Completed or invalid-prefix runs are never resumed; subsequent write/terminal attempts after finalization fail.",
+    "ordinary_write_failure": "Tracked attempted artifacts retain their exact regular-file bytes even if truncated or unparseable; invalid completion indexes those bytes as uncommitted. A success terminal with an uncommitted prefix is rejected.",
+    "staging_failure": "Prior incomplete terminal staging directories remain indexed only as uncommitted evidence; absent children are not fabricated. Staged success is not authoritative. Only final completion directory supplies terminal status."
+  },
+  "reviewed_temporal_contract": {
+    "accepted_sources": "Preflight requires exact 43 membership and hashes, all prior unit bindings, exact four stage acceptance pins, all 522 identity artifacts, and source-bound implementation audits. Final code/config/protocol bytes are rechecked before terminal publication.",
+    "annual_receipts": "All 234 receipts are generated in ascending year/configured ordinary-series order using only earlier native-success raw case rows and authenticated first-origin cutoffs; exact prior counts, strict 12h/24h availability and original selection ancestry are inherited from accepted admission/replay units. No 2025 outcome becomes a case. Run/year/series/chunk envelope, pure digest and file SHA are checked; sealed annual index is reloaded for every origin.",
+    "case_preparation": "One 7200-second clock begins before preflight. Fresh accepted admission, collector and persisted-case reload share one 600-second phase deadline. Both accepted aggregate digests must match before any fit; unique 68140 sources and 56430 cases are distinguished from repeat reconstruction calls.",
+    "failure_records": "Exact native reasons are authenticated across all 20 mapped variants and six raw references. Inherited E2 fallback uses matching mapped N0 scalar/source, or N0 full for offense/defense removals; independence derives from mapped full/fallback. New numerical/provenance failure invalidates. Current pinned parent is native-zero; general inherited fallback is exercised synthetically.",
+    "inference": "Runtime checks and source-bound leakage/falsification reviews produce four explicit audit flags linked to immutable admission/collection/annual pointers. The already accepted public evaluate separates 2013-2024 inference from exposed-2025 point checks while retaining all-issued failure rates. Post-terminal independent actual acceptance remains false.",
+    "original_population": "_source_manifest authenticates the fixed admitted data/runtime and parent chain. validate_cohort and origin_bundle preserve exact original origins and targetGameIds; append_scored_origin verifies ordered mapped/raw populations and exact original native reasons. Public inference receives all 3407 games, with 3135 development and 272 exposed 2025 games.",
+    "outcome_boundary": "Prediction receives strict nine-field pregame sources and four-field outcome-free target contexts. Entire 20-series origin publication is written, hash-checked and directory-fsynced before grader invocation. Grader reopens the exact complete publication and reconstructs original-source/annual-receipt/transform/product recipes before accessing current target observations.",
+    "pilot": "All 2013 identity rows remain. Exactly the first two 2014 origins form the retained pilot, including receipt reads, publication, all-series grading and mass/numerical checks. Projection includes elapsed admission/case/fit costs and the unchanged factor-two allowance plus 600 seconds. Deadline/RSS/pilot failure cannot choose a smaller population or restart."
+  },
+  "reviewer": "/root/compute_runner",
+  "scope": {
+    "actual_historical_result_accepted": false,
+    "historical_metric_calls": 0,
+    "historical_runner_execution": false,
+    "historical_scalar_fits": 0,
+    "historical_scientific_inputs_evaluated": 0,
+    "identity_qualifier_reruns": 0,
+    "native_goal_complete": false,
+    "predictive_improvement_established": false,
+    "production_authorized": false,
+    "providers_or_network_used": false,
+    "source_edits": 0
+  },
+  "source_hashes": {
+    "scripts/research_score_compute_distribution.py": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1",
+    "scripts/research_score_compute_qualify.py": "41edf4cc2bc217fd0947aa2ad17e6112fd20e1aedc93b7eeb7ab0aae0ea77dcb",
+    "scripts/research_score_compute_run.py": "7089fc64b6464dadfddb4796059a975afe7f1fd43730420d8d8193d67104208f",
+    "scripts/research_score_conditional_adapter.py": "a6987485724c7f725661927e194ca39d77b303e15d868b872d3b9449a7cc19f2",
+    "scripts/research_score_conditional_admission.py": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+    "scripts/research_score_conditional_inference.py": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604",
+    "scripts/research_score_conditional_margin.py": "c1a0e334229999afe5bb000598ae0648789cc8ee0e112291b03707039015ad3d",
+    "scripts/research_score_conditional_policy.py": "aa72dc1799669340f3dbec32c5b6510f673ea70bba3d27b2315c311849a4551d",
+    "scripts/research_score_conditional_qualify.py": "cb0a13eb0afacb2a4ccde7826bc2288a31677853b71d061c5ccc477eca0647f6",
+    "scripts/research_score_conditional_replay.py": "8eae09d2b3cb7aec7a2e6fbe265679be39eea5dbf6bd327f24f75d9022f65b45",
+    "scripts/research_score_conditional_run.py": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+    "scripts/research_score_contract.py": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+    "scripts/research_score_distribution.py": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+    "scripts/research_score_inference.py": "4b61e0d4477eb49064353d9fd7b4e1c6ac37fc68553e0df0387d9f71bb8db078",
+    "scripts/research_score_metrics.py": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97",
+    "scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+    "scripts/research_score_replay.py": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594",
+    "scripts/research_score_run.py": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa",
+    "scripts/research_score_successor_distribution.py": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974",
+    "scripts/research_score_successor_qualify.py": "8fa0fb3f298bfa8419d535411b5bad7002fc56de3181d839ee4d047fcd45f7d3",
+    "scripts/research_score_successor_run.py": "b54c265c87a09d2ef9325363f668f3dd5a58cb49c54b82cd8286fdb61bd81459",
+    "tests/research-score-compute/test_cache.py": "a8dd3bf3721a91853eba32344a9301388fa9bd90b52b3c9997fb9c76ad3843dc",
+    "tests/research-score-compute/test_compute_qualify.py": "f12a8f493091c6d08ebfa6572b7a05010d02eb70e7dfaca0a96e64a0da280296",
+    "tests/research-score-compute/test_compute_run.py": "1c8e41eb477f3e86a2d5406dd1119b74f2c0d899c79bab2acb069fb2feb4bf76",
+    "tests/research-score-conditional-margin/test_adapter.py": "431326f6933504c315720c91492b38ef7fd42a2ceb182eb154658ea8d2771c99",
+    "tests/research-score-conditional-margin/test_admission.py": "416550a5459c6ae635db0dfbe35b27e1a51cd57501ec4c234f190c0b5c4249bb",
+    "tests/research-score-conditional-margin/test_conditional_margin.py": "53b18c9ee869696e13e552b9d01bdb8f79b9a1f1d4eb6973ae89420427f0809b",
+    "tests/research-score-conditional-margin/test_inference.py": "598d40031b1630993ff2f2aceb13a7d280dc86a5d4789e572c383d54da1ea629",
+    "tests/research-score-conditional-margin/test_policy.py": "64f8fea7fed97c356bbf221f5630b4fdc2ae0ada43118b85070c3a33b560b44d",
+    "tests/research-score-conditional-margin/test_qualify.py": "aace76b001643345bb5eadc1bd1fc05bc6745bb64fb6b662ef33f7f131e18341",
+    "tests/research-score-conditional-margin/test_replay.py": "6798aec8b7141819d9168bd736e18bf7b4cad7c348d776cdd8268a0569316fb7",
+    "tests/research-score-conditional-margin/test_run.py": "7720f9264d167b610f12971925d416bdef0c9ea08ce4a3cfdc0b193a4562621c",
+    "tests/research-score-successor/test_qualify.py": "9eaac19131c06877d9010b48a37315c0dc52d10639aa67faf331ecc1df633c23",
+    "tests/research-score-successor/test_solver.py": "0283d8c2e4d10b34e7552c5750a565e72b9a03b30ca658996089a4a966e5cfc2",
+    "tests/research-score-successor/test_successor_run.py": "a53ca0c80ec71f00e453599a7218d179d6dc5442ba6e407d726a24f608627755",
+    "tests/research-score/test_contract.py": "64157ed50c999e3ecba3b84b0da20afd88074544e957e16d3470d264a60b8bf2",
+    "tests/research-score/test_distribution.py": "b671c6a4b97757a8122a54b98491a4ca79952cceb78a2985c685a9d630f7fc14",
+    "tests/research-score/test_inference.py": "367bcb3e9bf989bae2c9773e82a0b6701b5a8c36bf9347026e3f3dca0f6d293a",
+    "tests/research-score/test_invariance.py": "e192da8539080a0be836ded37a802403bc5d171c148a3edd357db978ad98f50c",
+    "tests/research-score/test_mean_models.py": "fd625bdc03d53e725539ed9517d0c1a5fa5f5caf6fbb331ee3ab2627ffa9a8e7",
+    "tests/research-score/test_metrics.py": "3bd12882c193abe4eb716ddd4fc0b7871fa104a27e526c7187f27c9b44760f91",
+    "tests/research-score/test_replay.py": "ce21d82a17e3878a6ce80095faf5c267d51751df78318b10504d46a86e0a44b9",
+    "tests/research-score/test_run.py": "1b8fe02cc57bdfb95f190c03a49eb16669c3c5aab79f61c383d7e08d778ad58e"
+  },
+  "status": "accepted",
+  "version": "rf02d-runner-temporal-implementation-review.v1"
+}

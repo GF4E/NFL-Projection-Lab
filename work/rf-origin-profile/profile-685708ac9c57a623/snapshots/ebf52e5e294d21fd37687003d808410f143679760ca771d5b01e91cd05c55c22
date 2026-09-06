@@ -1,0 +1,269 @@
+"""RF-02F fixed retrospective inference; pure inputs, no file/network I/O."""
+from collections import Counter
+import hashlib
+
+import numpy as np
+
+from research_score_contract import encoded
+from research_score_conditional_inference import (_infer, _validate_calibration,
+                                                  _all_bounds)
+from research_score_metrics import TARGETS, LEVELS, aggregate
+
+
+VERSION = 'rf02f-split-inference.v1'
+CONFIG_CANONICAL_SHA = '3a0fab06d09381ddb7dd2b678fa05512500399def132751d5a67a4981939c08a'
+YEARS = tuple(range(2013, 2026))
+YEAR_COUNTS = (256,) * 8 + (272, 271, 272, 272, 272)
+LENGTHS = (1, 3, 6)
+AUDITS = {'admission', 'leakage', 'falsification', 'no_new_numerical_failure'}
+LIMITATIONS = {'production_authorized': False, 'prospective_evidence': False,
+              'original_publication_verified': False,
+              'external_five_percent_achieved': False, 'shadow_activated': False,
+              'history_informed_exploratory_intervals': True,
+              'original_decisions_overwritten': False}
+
+
+class InferenceFailure(ValueError):
+    pass
+
+
+def require(value, reason):
+    if not value:
+        raise InferenceFailure(reason)
+
+
+def registered(config):
+    require(hashlib.sha256(encoded(config)).hexdigest() == CONFIG_CANONICAL_SHA,
+            'frozen_configuration_mismatch')
+    series = tuple(map(tuple, config['seriesInOrder']))
+    comparisons = [(r['id'], tuple(r['reference']), tuple(r['candidate']))
+                   for r in config['energyComparisonsInOrder']]
+    cells = tuple(map(tuple, config['calibrationCellsInOrder']))
+    require(len(series) == len(set(series)) == 19 and len(comparisons) == 18
+            and len({r[0] for r in comparisons}) == 18 and len(cells) == len(set(cells)) == 8,
+            'registered_family_mismatch')
+    return series, comparisons, cells
+
+
+def number(value):
+    return type(value) in (int, float) and np.isfinite(value)
+
+
+def metric_fields(mass):
+    names = {'joint_energy_score', 'joint_nll', 'home_win_probability', 'home_win_observed',
+             'tie_probability', 'away_win_probability', 'predicted_covariance', 'residual_product',
+             'grid_cells', 'grid_transport_bound', 'grid_probability_bound', 'double_grid_difference',
+             'home_win_brier', 'home_win_log_loss', 'win_tie_loss_brier', 'win_tie_loss_log_loss',
+             'tail_absolute_margin_21', 'tail_total_70', 'observed_absolute_margin_21', 'observed_total_70'}
+    for target in TARGETS:
+        names.update(target + suffix for suffix in ('_crps', '_mae', '_squared_error', '_mean', '_observed', '_pit'))
+        for level in LEVELS:
+            names.update(f'{target}_{suffix}_{round(100 * level)}'
+                         for suffix in ('lower', 'upper', 'coverage', 'width', 'boundary_distance'))
+        if mass:
+            names.add(target + '_interval_mass_80')
+    return names
+
+
+def validate_metric(row, mass):
+    require(type(row) is dict and set(row) == metric_fields(mass), 'exact_metric_fields_required')
+    require(all(number(value) for name, value in row.items() if name != 'grid_cells'),
+            'nonfinite_or_nonnumeric_metric')
+    require(type(row['grid_cells']) is list and len(row['grid_cells']) == 2
+            and all(type(v) is int and v > 0 for v in row['grid_cells']), 'invalid_grid_shape')
+    require(row['joint_energy_score'] >= 0 and row['joint_nll'] >= 0, 'negative_proper_loss')
+    require(0 < row['home_win_probability'] < 1 and 0 <= row['tie_probability'] <= 1
+            and 0 <= row['away_win_probability'] <= 1
+            and abs(sum(row[n] for n in ('home_win_probability', 'tie_probability', 'away_win_probability')) - 1) <= 1e-10
+            and row['home_win_observed'] in (0, 1), 'invalid_win_diagnostics')
+    for target in TARGETS:
+        require(0 <= row[target + '_pit'] <= 1 and row[target + '_crps'] >= 0
+                and row[target + '_mae'] >= 0 and row[target + '_squared_error'] >= 0,
+                'invalid_marginal_metrics')
+        if mass:
+            require(0 <= row[target + '_interval_mass_80'] <= 1, 'invalid_actual_interval_mass')
+        for level in LEVELS:
+            suffix = str(round(100 * level))
+            lo, hi = row[f'{target}_lower_{suffix}'], row[f'{target}_upper_{suffix}']
+            value = row[target + '_observed']
+            require(lo == int(lo) and hi == int(hi) and lo <= hi
+                    and row[f'{target}_width_{suffix}'] == hi - lo
+                    and row[f'{target}_coverage_{suffix}'] == float(lo <= value <= hi),
+                    'invalid_interval_diagnostics')
+    h, a, margin, total = (row[t + '_observed'] for t in TARGETS)
+    require(h >= 0 and a >= 0 and h == int(h) and a == int(a) and h + a <= 200
+            and margin == h - a and total == h + a and row['home_win_observed'] == float(h > a),
+            'inconsistent_observed_targets')
+    return h, a, margin, total, row['home_win_observed']
+
+
+def validate(config, metadata, rows_by_series, audit_checks):
+    series, comparisons, cells = registered(config)
+    require(type(audit_checks) is dict and set(audit_checks) == AUDITS
+            and all(type(v) is bool and v for v in audit_checks.values()), 'required_audit_failure')
+    require(type(metadata) is list and len(metadata) == 3407, 'production_common_population_required')
+    require(all(type(r) is dict and set(r) == {'game_id', 'season', 'week'}
+                and type(r['game_id']) is str and r['game_id']
+                and type(r['season']) is int and r['season'] in YEARS
+                and type(r['week']) is int and 1 <= r['week'] <= 18 for r in metadata), 'invalid_game_metadata')
+    ids = [r['game_id'] for r in metadata]
+    origins = [(r['season'], r['week']) for r in metadata]
+    require(len(set(ids)) == 3407 and origins == sorted(origins), 'duplicate_or_unordered_common_games')
+    require([sum(r['season'] == year for r in metadata) for year in YEARS] == list(YEAR_COUNTS)
+            and len(set(origins)) == 226, 'season_or_origin_population_mismatch')
+    require(type(rows_by_series) is dict and set(rows_by_series) == set(series), 'required_series_membership')
+    metrics, failures, observed = {}, {}, None
+    for key in series:
+        rows = rows_by_series[key]
+        require(type(rows) is list and len(rows) == 3407, 'series_population_mismatch')
+        require(all(type(r) is dict and set(r) == {'game_id', 'metrics', 'native_failure'} for r in rows),
+                'invalid_scored_row_schema')
+        require([r['game_id'] for r in rows] == ids, 'series_game_alignment_mismatch')
+        require(all(r['native_failure'] is None or (type(r['native_failure']) is str and r['native_failure'])
+                    for r in rows), 'invalid_native_failure_flag')
+        failures[key] = [r['native_failure'] for r in rows]
+        require(key[0] != 'N0' or not any(failures[key]), 'required_N0_native_failure')
+        metrics[key] = [r['metrics'] for r in rows]
+        outcomes = [validate_metric(r, key[0] == 'E3') for r in metrics[key]]
+        require(observed is None or outcomes == observed, 'cross_series_outcome_mismatch')
+        observed = outcomes
+    return series, comparisons, cells, metrics, failures
+
+
+def card(rows):
+    if not rows:
+        return {'status': 'unavailable', 'reason': 'empty_native_success_subset', 'games': 0}
+    result = aggregate(rows)
+    _validate_calibration(result['calibration'], rows)
+    encoded(result)
+    return result
+
+
+def scorecards(metadata, metrics, failures):
+    subsets = {'development': [i for i, r in enumerate(metadata) if r['season'] <= 2024],
+               'all_issued': list(range(len(metadata))),
+               'exposed_2025': [i for i, r in enumerate(metadata) if r['season'] == 2025]}
+    subsets.update({str(y): [i for i, r in enumerate(metadata) if r['season'] == y] for y in YEARS})
+    result = {}
+    for key, rows in metrics.items():
+        full, native = {}, {}
+        for name, indices in subsets.items():
+            full[name] = card([rows[i] for i in indices])
+            successful = [rows[i] for i in indices if failures[key][i] is None]
+            native[name] = full[name] if len(successful) == len(indices) else card(successful)
+        result[':'.join(key)] = {n: full[n] for n in ('development', 'all_issued', 'exposed_2025')}
+        result[':'.join(key)]['seasons'] = {str(y): full[str(y)] for y in YEARS}
+        result[':'.join(key)]['native_success_only'] = {
+            **{n: native[n] for n in ('development', 'all_issued', 'exposed_2025')},
+            'seasons': {str(y): native[str(y)] for y in YEARS}}
+    return result
+
+
+def decision(config, metadata, metrics, failures, inference):
+    """Small explicit synthetic cohorts may test gates; evaluate fixes production counts."""
+    dev = [i for i, r in enumerate(metadata) if r['season'] <= 2024]
+    exposed = [i for i, r in enumerate(metadata) if r['season'] == 2025]
+    years = sorted({metadata[i]['season'] for i in dev})
+    def mean(key, metric, indices=dev):
+        require(indices, 'empty_decision_cohort')
+        answer = float(np.mean([metrics[key][i][metric] for i in indices]))
+        require(np.isfinite(answer), 'nonfinite_decision_mean')
+        return answer
+    def gain(reference, candidate, indices=dev):
+        denominator = mean(reference, 'joint_energy_score', indices)
+        require(denominator > 0, 'nonpositive_decision_reference')
+        return 1 - mean(candidate, 'joint_energy_score', indices) / denominator
+    def stability(reference):
+        key = (reference, 'full'); target = ('E3', 'full')
+        overall = gain(key, target)
+        seasonal = {str(y): gain(key, target, [i for i in dev if metadata[i]['season'] == y]) for y in years}
+        omitted = {str(y): gain(key, target, [i for i in dev if metadata[i]['season'] != y]) for y in years}
+        late = gain(key, target, exposed)
+        return {'energy_gain_at_least_one_percent': overall >= .01,
+                'energy_lower_positive_all_blocks': _all_bounds(inference, reference + ':full->E3:full', 'lower', True),
+                'eight_improved_seasons': sum(v > 0 for v in seasonal.values()) >= 8,
+                'all_leave_one_season_out_positive': all(v > 0 for v in omitted.values()),
+                'exposed_2025_positive': late > 0}, {
+                    'development_gain': overall, 'season_gains': seasonal,
+                    'leave_one_season_out_gains': omitted, 'exposed_2025_gain': late}
+    mechanism, e2_stability = stability('E2')
+    candidate, n0_stability = stability('N0')
+    for variant in config['variantsInOrder']:
+        if variant in ('full', 'availability_24h'):
+            continue
+        name = 'E3:full->E3:' + variant
+        mechanism[variant + ':does_not_stably_outperform_full'] = not _all_bounds(inference, name, 'lower', True)
+        if variant in config['internalMechanism']['requiredRemovals']:
+            mechanism[variant + ':positive_mechanism_all_blocks'] = _all_bounds(inference, name, 'upper', False)
+    rates = {':'.join(k): float(np.mean([v is not None for v in values])) for k, values in failures.items()}
+    for key in metrics:
+        if key[0] == 'E3' or key in ((f, v) for f in ('N0', 'E2') for v in ('full', 'availability_24h')):
+            mechanism[':'.join(key) + ':native_failure_ceiling'] = rates[':'.join(key)] <= .005
+    availability = {}
+    for reference in ('N0', 'E2'):
+        value = gain((reference, 'availability_24h'), ('E3', 'availability_24h'))
+        mechanism[reference + ':availability_24h_gain_positive'] = value > 0
+        availability[reference] = value
+    candidate['E1:energy_lower_positive_all_blocks'] = _all_bounds(inference, 'E1:full->E3:full', 'lower', True)
+    candidate['not_stably_worse_than_S1'] = not _all_bounds(inference, 'S1:full->E3:full', 'upper', False)
+    secondary_gains = {}
+    for variant in ('full', 'availability_24h'):
+        key = ('E3', variant)
+        for family in ('N0', 'E2'):
+            ref = (family, variant); prefix = family + ':' + variant + ':'
+            overall = gain(ref, key); secondary_gains[prefix[:-1]] = overall
+            for metric in ['joint_nll'] + [t + '_crps' for t in TARGETS]:
+                candidate[prefix + metric] = mean(key, metric) <= 1.005 * mean(ref, metric)
+            for target in ('home', 'away'):
+                candidate[prefix + target + '_mae'] = mean(key, target + '_mae') <= mean(ref, target + '_mae') + .1
+            for target in TARGETS:
+                candidate[prefix + target + '_width'] = (mean(key, target + '_width_80') <= 1.1 * mean(ref, target + '_width_80')
+                                                        or overall >= .02)
+        for target in TARGETS:
+            label = ':'.join((*key, target, '80'))
+            value = mean(key, target + '_coverage_80')
+            candidate[label + ':nominal_range'] = .72 <= value <= .88
+            candidate[label + ':nominal_intervals'] = all(
+                inference['blocks'][str(length)]['coverage'][label]['lower'] <= .8
+                <= inference['blocks'][str(length)]['coverage'][label]['upper'] for length in LENGTHS)
+    for cell in config['calibrationCellsInOrder']:
+        label = ':'.join(map(str, cell))
+        candidate[label + ':actual_mass_intervals'] = all(
+            inference['calibration_cells'][label]['blocks'][str(length)]['lower'] <= 0
+            <= inference['calibration_cells'][label]['blocks'][str(length)]['upper'] for length in LENGTHS)
+    supported = all(mechanism.values())
+    qualified = supported and all(candidate.values())
+    return {'status': 'research_shadow_candidate' if qualified else
+            'mechanism_supported_distribution_unqualified' if supported else 'reject_all',
+            'mechanism_supported': supported, 'candidate_qualified': qualified,
+            'mechanism_checks': mechanism, 'candidate_checks': candidate,
+            'failed_mechanism_checks': [k for k, v in mechanism.items() if not v],
+            'failed_candidate_checks': [k for k, v in candidate.items() if not v],
+            'stability': {'E2:full': e2_stability, 'N0:full': n0_stability},
+            'availability_gains': availability, 'secondary_reference_gains': secondary_gains,
+            'all_issued_native_failure_rates': rates, 'failure_population': '2013-2025_all_issued'}
+
+
+def evaluate(config, metadata, rows_by_series, audit_checks):
+    """One full fixed gate; caller authenticates original order, reasons and evidence."""
+    try:
+        series, comparisons, cells, metrics, failures = validate(config, metadata, rows_by_series, audit_checks)
+        cards = scorecards(metadata, metrics, failures)
+        indices = [i for i, r in enumerate(metadata) if r['season'] <= 2024]
+        # All 19 receive nominal/PIT diagnostics; only eight registered cells need actual mass.
+        inference = _infer([metadata[i] for i in indices], {k: [v[i] for i in indices] for k, v in metrics.items()},
+                           series, (), comparisons, cells)
+        result = {'version': VERSION, 'scorecards': cards, 'inference': inference,
+                  **decision(config, metadata, metrics, failures, inference), **LIMITATIONS,
+                  'audit_checks': dict(audit_checks),
+                  'counts': {'outer_games': 3407, 'outer_origins': 226, 'development_games': 3135,
+                             'exposed_2025_games': 272, 'series': 19, 'energy_comparisons': 18, 'calibration_cells': 8},
+                  'native_failures': {':'.join(k): {'count': sum(v is not None for v in values),
+                       'reasons': dict(Counter(v for v in values if v is not None)),
+                       'games': [{'game_id': metadata[i]['game_id'], 'reason': v}
+                                 for i, v in enumerate(values) if v is not None]} for k, values in failures.items()}}
+        encoded(result)
+        return result
+    except Exception as exc:
+        return {'version': VERSION, 'status': 'protocol_invalid', 'mechanism_supported': False,
+                'candidate_qualified': False, 'failure_type': type(exc).__name__, 'reason': str(exc), **LIMITATIONS}

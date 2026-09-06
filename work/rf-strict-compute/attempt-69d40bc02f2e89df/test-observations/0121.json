@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "[\n  3,\n  -0.0\n]\n",
+    "bytes": 16,
+    "kind": "bytes",
+    "sha256": "1552b43277390f7c7b5ce4e47fc3ff8ef16871d584424358068f8a8af53062c1",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "object-array-numpy-scalar",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "ndarray"
+  },
+  "label": "object-array-numpy-scalar",
+  "original": {
+    "ascii_body": "[\n  3,\n  -0.0\n]\n",
+    "bytes": 16,
+    "kind": "bytes",
+    "sha256": "1552b43277390f7c7b5ce4e47fc3ff8ef16871d584424358068f8a8af53062c1",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_object_arrays_convert_or_delegate"
+}

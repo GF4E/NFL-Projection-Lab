@@ -1,0 +1,106 @@
+"""Pure RF-02F split-rate E2 mean trajectories; no data loading or scoring.
+
+The original diagonal is delegated verbatim.  Other trajectories inherit the
+original chronological forecasting path and change only the O/D increments.
+"""
+import math
+from numbers import Real
+
+import numpy as np
+
+from research_score_models import MeanTrajectory
+
+
+_RATES = (.05, .1, .2)
+_RETENTIONS = (.5, .75, 1.)
+SPLIT_VARIANTS = (
+    "full", "no_home_effect", "no_prior_season_carryover", "no_time_decay",
+    "no_team_identity", "independent_marginals", "availability_24h",
+    "no_offense", "no_defense", "shuffled_identity", "deterministic_noise",
+    "zero_strength_update", "zero_scoring_level_update",
+)
+_ZERO_VARIANTS = {"zero_strength_update", "zero_scoring_level_update"}
+
+
+def split_setting_grid():
+    """Return the nine original diagonals, then the 18 ordered off-diagonals."""
+    pairs = [(k, k) for k in _RATES]
+    pairs += [(ks, kp) for ks in _RATES for kp in _RATES if ks != kp]
+    return [{"ks": ks, "kp": kp, "retention": retention}
+            for ks, kp in pairs for retention in _RETENTIONS]
+
+
+def make_split_trajectory(setting, teams, variant="full"):
+    """Construct one registered setting/variant with its own chronological state."""
+    if not isinstance(setting, dict) or set(setting) != {"ks", "kp", "retention"}:
+        raise ValueError("unregistered_split_setting")
+    for key, allowed in (("ks", _RATES), ("kp", _RATES),
+                         ("retention", _RETENTIONS)):
+        value = setting[key]
+        if (isinstance(value, (bool, np.bool_)) or not isinstance(value, Real)
+                or value not in allowed or not math.isfinite(value)):
+            raise ValueError("unregistered_split_setting")
+    if variant not in SPLIT_VARIANTS:
+        raise ValueError("unregistered_split_variant")
+    setting = {key: float(value) for key, value in setting.items()}
+    if setting["ks"] == setting["kp"] and variant not in _ZERO_VARIANTS:
+        return MeanTrajectory("E2", {"k": setting["ks"],
+                                     "retention": setting["retention"]},
+                              teams, variant)
+    return _SplitTrajectory(setting, teams, variant)
+
+
+class _SplitTrajectory(MeanTrajectory):
+    def __init__(self, setting, teams, variant):
+        # The new removals use the original full forecast equations and seeds.
+        super().__init__("E2", setting, teams,
+                         "full" if variant in _ZERO_VARIANTS else variant)
+        self.variant = variant
+
+    def _deliver(self, rows, events):
+        rdelta, odelta, ddelta = np.zeros(32), np.zeros(32), np.zeros(32)
+        for row in rows:
+            game = row.context
+            if game.game_id in self.delivered:
+                raise ValueError("duplicate_result_delivery")
+            if game.game_id not in self.stored:
+                raise ValueError("result_without_original_origin_expectation")
+            self.delivered.add(game.game_id)
+            events["delivered"].append(game.game_id)
+            if self.failed:
+                continue
+            stored = self.stored[game.game_id]
+            if stored["context"] != game:
+                raise ValueError("delivered_context_mismatch")
+            if stored["initialization_only"]:
+                events["initialization_only"].append(game.game_id)
+                continue
+            h, a = self.index[game.home], self.index[game.away]
+            multiplier = .5 if game.season == 2020 else 1.
+            ks = self.setting["ks"] * multiplier
+            kp = self.setting["kp"] * multiplier
+            if self.variant in {"no_team_identity", "zero_strength_update"}:
+                ks = 0.
+            if self.variant in {"no_team_identity", "zero_scoring_level_update"}:
+                kp = 0.
+            error = np.asarray([row.home_score, row.away_score]) - stored["mean"]
+            margin_error = error[0] - error[1]
+            total_error = error[0] + error[1]
+            strength_step = ks * margin_error
+            scoring_step = kp * total_error
+            if self.variant != "no_offense":
+                odelta[h] += (strength_step + scoring_step) / 4
+                odelta[a] += (-strength_step + scoring_step) / 4
+            if self.variant != "no_defense":
+                ddelta[h] += (strength_step - scoring_step) / 4
+                ddelta[a] += (-strength_step - scoring_step) / 4
+        if self.failed:
+            return
+        self.ratings += rdelta
+        self.offense += odelta
+        self.defense += ddelta
+        self.offense -= self.offense.mean()
+        self.defense -= self.defense.mean()
+        if not all(np.all(np.isfinite(array))
+                   for array in (self.ratings, self.offense, self.defense)):
+            self._absorb("nonfinite_dynamic_state")

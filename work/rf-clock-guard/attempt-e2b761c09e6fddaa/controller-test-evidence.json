@@ -1,0 +1,690 @@
+[
+  {
+    "guard_protocol_sha256": "9f7f68aa65d04ec172818c62d64e2f32768e058c22bd92c81ce6a2dc3a287ffb",
+    "kind": "shared_current_source_membership",
+    "resource_policy_sha256": "bcd780e4bc1a6d93ac5d2f337781346ad3eca728f70ba55426c929fdab75ff8c",
+    "resource_protocol_sha256": "58d77e6e1cb727ee6655d1ab925b1475fa7dd9fdcdb5740fe1630b5ad27d012f",
+    "source_count": 91
+  },
+  {
+    "changed_boundary": "private byte-reader and trust roots only",
+    "identity": "rfcomp09-v1-3a501791d7d8312a",
+    "kind": "synthetic_guard_preflight",
+    "manifest": {
+      "actual_result_acceptance": "pending_independent_terminal_audits",
+      "automatic_restart": false,
+      "baseline_acceptance": {
+        "bytes": 967,
+        "path": "synthetic-resource-baseline.json",
+        "sha256": "b3edc3f8b842fb7b7ac4db7150b928bed2907d853d1b37f1f008d6623475ef51"
+      },
+      "bound_hashes": {
+        "admittedData": "ea7dc1c17cc4613ada871927842d90f6d41ffe61b45e6302c3032eac7cdffc85",
+        "config": "16bca8002d5b1d22ed40e160b6b73a802d86f5ca56768a48d9e81058fa406713",
+        "inheritedConfig": "422b1082361a2d0d926f639c8cf67b38615517a8269a7f05729aea0c8f264615",
+        "protocol": "131276c5baaaa0ca8ee20ea302863d7d8723709595b5818b1a7ebc3b6c29e21a"
+      },
+      "budget": {
+        "complete_smoke_seconds": 120,
+        "external_worker_grace_seconds": 0,
+        "invalid_metadata_seconds": 30,
+        "model_workers": 1,
+        "projected_seconds": 9000,
+        "rss_mib": 4096,
+        "seconds": 9000
+      },
+      "code_hashes": {
+        "scripts/research_score_synthetic_candidate.py": "dda18a0e21ae47c53b4309434cbc02ae8bf764fa83a6defbb719431242722aa7",
+        "scripts/research_score_synthetic_frozen.py": "ffb304816a1090313e833215c08dae3d209cfad1ffd1f674f0909a2ae99e1394"
+      },
+      "compute_protocol": {
+        "bytes": 26,
+        "path": ".planning/engine-os/research-first/RF-COMP-04-COMPUTE-PROTOCOL.v1.md",
+        "sha256": "69a905b1c20903715279bfa004053b4da37a17a6c5142cd1fb97f15972980121"
+      },
+      "guard_protocol": {
+        "bytes": 39,
+        "path": ".planning/engine-os/research-first/RF-COMP-09-CLOCK-PROTOCOL.v1.md",
+        "sha256": "a061dc2ab302040749ec14ff8faa81ee4714a50ed2fd40bef69dc7d4e5614fdd"
+      },
+      "historical_status": "retrospective_inferred",
+      "implementation_acceptance_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "independent_reviews": {
+        "numerical": {
+          "bytes": 1759,
+          "path": "synthetic-guard-numerical.json",
+          "sha256": "1ab39fd3be209276b5c77c470a089e8fa7746dce69d8beefb3fff63d1b88e142"
+        },
+        "temporal": {
+          "bytes": 1758,
+          "path": "synthetic-guard-temporal.json",
+          "sha256": "37557ad637461cf8c2240ce08c6d1d2aa1142fc0b90c30ef5bf21dcf88569634"
+        }
+      },
+      "parent_index_sha256": "ccde502d661a4beee8f8da537a2f23238950fb2931c1527638de4c92898804ab",
+      "parent_manifest_sha256": "2d9c91d803f1c991be039b88167082c8a501ce60dc58b18afcab0b251bb75e38",
+      "predecessor_terminal": {
+        "bytes": 749,
+        "path": "synthetic-predecessor-receipt.json",
+        "sha256": "280634d0228ccc756aee300437dae28f48b1aac49bd3d4928c6c30a1e37a3284"
+      },
+      "production_authorized": false,
+      "prospective_evidence": false,
+      "provider_requests": 0,
+      "qualification": {
+        "bytes": 1563,
+        "path": "synthetic-guard-qualification.json",
+        "sha256": "2bd8f84a94564e90c559f4ab92bddede6a6556ff1c6c4bdf5a92da384447d527"
+      },
+      "resource_policy": {
+        "bytes": 1010,
+        "path": "config/research-local-resource-policy.v1.json",
+        "sha256": "bcd780e4bc1a6d93ac5d2f337781346ad3eca728f70ba55426c929fdab75ff8c"
+      },
+      "resource_protocol": {
+        "bytes": 36,
+        "path": ".planning/engine-os/research-first/RF-COMP-08-RESOURCE-PROTOCOL.v1.md",
+        "sha256": "673af2923dba4cf6a974f863c32d6f592b71037d46b4ef81bf692f3f1c3c7a95"
+      },
+      "runtime": {
+        "executable": "/opt/anaconda3/bin/python3.12",
+        "isolated": true,
+        "numpy": "1.26.4",
+        "platform": "darwin",
+        "python": "3.12.2",
+        "scipy": "1.13.1"
+      },
+      "runtime_files": {
+        "/private/tmp/os01-gen15-rebuild.9ny71k/synthetic-runtime.bin": "440381f7f439e3b31174c1bc5c4ccd10a59fc8232e6dacf25253ef89adbce744"
+      },
+      "scientific_registry": {
+        "calibrationCellsInOrder": [
+          [
+            "E3",
+            "full",
+            "home",
+            80
+          ],
+          [
+            "E3",
+            "full",
+            "away",
+            80
+          ],
+          [
+            "E3",
+            "full",
+            "margin",
+            80
+          ],
+          [
+            "E3",
+            "full",
+            "total",
+            80
+          ],
+          [
+            "E3",
+            "availability_24h",
+            "home",
+            80
+          ],
+          [
+            "E3",
+            "availability_24h",
+            "away",
+            80
+          ],
+          [
+            "E3",
+            "availability_24h",
+            "margin",
+            80
+          ],
+          [
+            "E3",
+            "availability_24h",
+            "total",
+            80
+          ]
+        ],
+        "energyComparisonsInOrder": [
+          {
+            "candidate": [
+              "E3",
+              "full"
+            ],
+            "id": "N0:full->E3:full",
+            "reference": [
+              "N0",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "full"
+            ],
+            "id": "E2:full->E3:full",
+            "reference": [
+              "E2",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "full"
+            ],
+            "id": "E1:full->E3:full",
+            "reference": [
+              "E1",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "full"
+            ],
+            "id": "S1:full->E3:full",
+            "reference": [
+              "S1",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "availability_24h"
+            ],
+            "id": "N0:availability_24h->E3:availability_24h",
+            "reference": [
+              "N0",
+              "availability_24h"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "availability_24h"
+            ],
+            "id": "E2:availability_24h->E3:availability_24h",
+            "reference": [
+              "E2",
+              "availability_24h"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "no_home_effect"
+            ],
+            "id": "E3:full->E3:no_home_effect",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "no_prior_season_carryover"
+            ],
+            "id": "E3:full->E3:no_prior_season_carryover",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "no_time_decay"
+            ],
+            "id": "E3:full->E3:no_time_decay",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "no_team_identity"
+            ],
+            "id": "E3:full->E3:no_team_identity",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "independent_marginals"
+            ],
+            "id": "E3:full->E3:independent_marginals",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "availability_24h"
+            ],
+            "id": "E3:full->E3:availability_24h",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "no_offense"
+            ],
+            "id": "E3:full->E3:no_offense",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "no_defense"
+            ],
+            "id": "E3:full->E3:no_defense",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "shuffled_identity"
+            ],
+            "id": "E3:full->E3:shuffled_identity",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "deterministic_noise"
+            ],
+            "id": "E3:full->E3:deterministic_noise",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "zero_strength_update"
+            ],
+            "id": "E3:full->E3:zero_strength_update",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          },
+          {
+            "candidate": [
+              "E3",
+              "zero_scoring_level_update"
+            ],
+            "id": "E3:full->E3:zero_scoring_level_update",
+            "reference": [
+              "E3",
+              "full"
+            ]
+          }
+        ],
+        "seriesInOrder": [
+          [
+            "E3",
+            "full"
+          ],
+          [
+            "E3",
+            "no_home_effect"
+          ],
+          [
+            "E3",
+            "no_prior_season_carryover"
+          ],
+          [
+            "E3",
+            "no_time_decay"
+          ],
+          [
+            "E3",
+            "no_team_identity"
+          ],
+          [
+            "E3",
+            "independent_marginals"
+          ],
+          [
+            "E3",
+            "availability_24h"
+          ],
+          [
+            "E3",
+            "no_offense"
+          ],
+          [
+            "E3",
+            "no_defense"
+          ],
+          [
+            "E3",
+            "shuffled_identity"
+          ],
+          [
+            "E3",
+            "deterministic_noise"
+          ],
+          [
+            "E3",
+            "zero_strength_update"
+          ],
+          [
+            "E3",
+            "zero_scoring_level_update"
+          ],
+          [
+            "N0",
+            "full"
+          ],
+          [
+            "N0",
+            "availability_24h"
+          ],
+          [
+            "E2",
+            "full"
+          ],
+          [
+            "E2",
+            "availability_24h"
+          ],
+          [
+            "E1",
+            "full"
+          ],
+          [
+            "S1",
+            "full"
+          ]
+        ],
+        "settingsInTieOrder": [
+          {
+            "kp": 0.05,
+            "ks": 0.05,
+            "retention": 0.5
+          },
+          {
+            "kp": 0.05,
+            "ks": 0.05,
+            "retention": 0.75
+          },
+          {
+            "kp": 0.05,
+            "ks": 0.05,
+            "retention": 1
+          },
+          {
+            "kp": 0.1,
+            "ks": 0.1,
+            "retention": 0.5
+          },
+          {
+            "kp": 0.1,
+            "ks": 0.1,
+            "retention": 0.75
+          },
+          {
+            "kp": 0.1,
+            "ks": 0.1,
+            "retention": 1
+          },
+          {
+            "kp": 0.2,
+            "ks": 0.2,
+            "retention": 0.5
+          },
+          {
+            "kp": 0.2,
+            "ks": 0.2,
+            "retention": 0.75
+          },
+          {
+            "kp": 0.2,
+            "ks": 0.2,
+            "retention": 1
+          },
+          {
+            "kp": 0.1,
+            "ks": 0.05,
+            "retention": 0.5
+          },
+          {
+            "kp": 0.1,
+            "ks": 0.05,
+            "retention": 0.75
+          },
+          {
+            "kp": 0.1,
+            "ks": 0.05,
+            "retention": 1
+          },
+          {
+            "kp": 0.2,
+            "ks": 0.05,
+            "retention": 0.5
+          },
+          {
+            "kp": 0.2,
+            "ks": 0.05,
+            "retention": 0.75
+          },
+          {
+            "kp": 0.2,
+            "ks": 0.05,
+            "retention": 1
+          },
+          {
+            "kp": 0.05,
+            "ks": 0.1,
+            "retention": 0.5
+          },
+          {
+            "kp": 0.05,
+            "ks": 0.1,
+            "retention": 0.75
+          },
+          {
+            "kp": 0.05,
+            "ks": 0.1,
+            "retention": 1
+          },
+          {
+            "kp": 0.2,
+            "ks": 0.1,
+            "retention": 0.5
+          },
+          {
+            "kp": 0.2,
+            "ks": 0.1,
+            "retention": 0.75
+          },
+          {
+            "kp": 0.2,
+            "ks": 0.1,
+            "retention": 1
+          },
+          {
+            "kp": 0.05,
+            "ks": 0.2,
+            "retention": 0.5
+          },
+          {
+            "kp": 0.05,
+            "ks": 0.2,
+            "retention": 0.75
+          },
+          {
+            "kp": 0.05,
+            "ks": 0.2,
+            "retention": 1
+          },
+          {
+            "kp": 0.1,
+            "ks": 0.2,
+            "retention": 0.5
+          },
+          {
+            "kp": 0.1,
+            "ks": 0.2,
+            "retention": 0.75
+          },
+          {
+            "kp": 0.1,
+            "ks": 0.2,
+            "retention": 1
+          }
+        ],
+        "variantsInOrder": [
+          "full",
+          "no_home_effect",
+          "no_prior_season_carryover",
+          "no_time_decay",
+          "no_team_identity",
+          "independent_marginals",
+          "availability_24h",
+          "no_offense",
+          "no_defense",
+          "shuffled_identity",
+          "deterministic_noise",
+          "zero_strength_update",
+          "zero_scoring_level_update"
+        ]
+      },
+      "stage_acceptances": {
+        "synthetic": {
+          "bytes": 38,
+          "path": "synthetic-stage.json",
+          "sha256": "10eca0ba40803697a499326c33c1ac9325b0308162c22f192b8feb23190af1bc"
+        }
+      },
+      "version": "rfcomp09.manifest.v1"
+    },
+    "scope": "synthetic_preflight_not_historical_authority"
+  },
+  {
+    "exact_chronology_object": true,
+    "kind": "controller_ast_applicability",
+    "launcher_changes": [
+      "One accepted RF-COMP-08 worker under fixed external limits",
+      "rfcomp08-observer-"
+    ],
+    "run_changes": [
+      "two terminal versions",
+      "guard protocol reauthentication",
+      "predecessor terminal reauthentication",
+      "lossless clock failure metadata"
+    ],
+    "scope": "source_ast_applicability_no_history_execution",
+    "unchanged_watchdog_import": true,
+    "unchanged_worker_main": true
+  },
+  {
+    "callbacks": 88,
+    "counts": {
+      "actual_mass_cdf_calls": 208,
+      "actual_score_calls": 40,
+      "copied_diagonal_inner": 18,
+      "copied_e3_outer": 22,
+      "copied_raw_outer": 12,
+      "inner_rows": 54,
+      "outer_rows": 38,
+      "scored_inner": 36,
+      "scored_outer": 4
+    },
+    "full_law_count": 62,
+    "grading_artifacts": {
+      "grading_provenance": {
+        "bytes": 105987,
+        "name": "grading-provenance-2013-01.json",
+        "sha256": "4234d23416b3d0704827cb28499115e3dad0e8c441b4b86b23989c0258723984"
+      },
+      "inner_losses": {
+        "bytes": 68275,
+        "name": "inner-losses-2013-01.json",
+        "sha256": "9ec1a5e349a7b8d7e48068229a4b85dbbc206c05e0b09ff98b2f49384e859b38"
+      },
+      "outer_losses": {
+        "bytes": 154349,
+        "name": "outer-losses-2013-01.json",
+        "sha256": "eed6061abf0394fa7c5bdf15eb50de77cda7a851433a1f6c93099784b963a205"
+      }
+    },
+    "publication": {
+      "bytes": 94282,
+      "name": "forecasts-2013-01.json",
+      "sha256": "3ce1d900af1d58d9187e46a2fc4e8975bccae635f0e4861e038e5557116eb610"
+    },
+    "route": "accepted_resource",
+    "scientific_sha256": "cc9bd72c9cb9da3302c49e1d1d84ce4f3a7dfbdc5532532b0e0fedc8a666f411",
+    "scope": "one_real_tiny_numerical_route"
+  },
+  {
+    "callbacks": 88,
+    "counts": {
+      "actual_mass_cdf_calls": 208,
+      "actual_score_calls": 40,
+      "copied_diagonal_inner": 18,
+      "copied_e3_outer": 22,
+      "copied_raw_outer": 12,
+      "inner_rows": 54,
+      "outer_rows": 38,
+      "scored_inner": 36,
+      "scored_outer": 4
+    },
+    "full_law_count": 62,
+    "grading_artifacts": {
+      "grading_provenance": {
+        "bytes": 105987,
+        "name": "grading-provenance-2013-01.json",
+        "sha256": "4234d23416b3d0704827cb28499115e3dad0e8c441b4b86b23989c0258723984"
+      },
+      "inner_losses": {
+        "bytes": 68275,
+        "name": "inner-losses-2013-01.json",
+        "sha256": "9ec1a5e349a7b8d7e48068229a4b85dbbc206c05e0b09ff98b2f49384e859b38"
+      },
+      "outer_losses": {
+        "bytes": 154349,
+        "name": "outer-losses-2013-01.json",
+        "sha256": "eed6061abf0394fa7c5bdf15eb50de77cda7a851433a1f6c93099784b963a205"
+      }
+    },
+    "publication": {
+      "bytes": 94282,
+      "name": "forecasts-2013-01.json",
+      "sha256": "3ce1d900af1d58d9187e46a2fc4e8975bccae635f0e4861e038e5557116eb610"
+    },
+    "route": "guarded",
+    "scientific_sha256": "cc9bd72c9cb9da3302c49e1d1d84ce4f3a7dfbdc5532532b0e0fedc8a666f411",
+    "scope": "one_real_tiny_numerical_route"
+  }
+]

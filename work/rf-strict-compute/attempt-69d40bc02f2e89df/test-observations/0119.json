@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "[\n  {\n    \"x\": -0.0\n  },\n  [\n    1,\n    2\n  ],\n  \"\\u00e9\"\n]\n",
+    "bytes": 60,
+    "kind": "bytes",
+    "sha256": "d6793d6d4b4d613633e1530ad1df4c03652f5e7f5d26dd5c13682bbf246ab615",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "object-array-json",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "ndarray"
+  },
+  "label": "object-array-json",
+  "original": {
+    "ascii_body": "[\n  {\n    \"x\": -0.0\n  },\n  [\n    1,\n    2\n  ],\n  \"\\u00e9\"\n]\n",
+    "bytes": 60,
+    "kind": "bytes",
+    "sha256": "d6793d6d4b4d613633e1530ad1df4c03652f5e7f5d26dd5c13682bbf246ab615",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_object_arrays_convert_or_delegate"
+}

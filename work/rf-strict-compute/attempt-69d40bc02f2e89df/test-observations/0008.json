@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "Object of type complex is not JSON serializable",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "eligibility": {
+    "actual": false,
+    "expected": false,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "subclass-or-opaque-complex",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "complex"
+  },
+  "label": "subclass-or-opaque-complex",
+  "original": {
+    "kind": "error",
+    "message": "Object of type complex is not JSON serializable",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_builtin_subclasses_and_opaque_objects"
+}

@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "<string>", line 12, in <module>
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py", line 168, in measure_phase
+    return self.call(callback, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py", line 150, in call
+    return callback(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 11, in callback
+KeyboardInterrupt: synthetic

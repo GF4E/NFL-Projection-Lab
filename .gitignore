@@ -1,0 +1,31 @@
+# Credentials and local environments
+.env*
+**/.env*
+*.pem
+*.key
+*api-key*
+*api_key*
+*credentials*
+*credential*
+**/private-input/
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+# Rebuildable dependencies and local caches
+node_modules/
+.DS_Store
+.cache/
+# Separate checkout, preserved in place; never push its public remote
+/work/site-beta/
+# Bundled site archives may contain local configuration
+/work/*.tar
+/work/*.tar.gz
+# Files over 50 MB: explicit paths (Git has no size glob)
+/work/rf02s_cost_diagnostic_result.json
+# Raw odds transport envelopes can contain authentication headers.
+**/raw-odds-response*
+**/raw_odds_response*
+**/odds-response-headers*
+**/odds_response_headers*

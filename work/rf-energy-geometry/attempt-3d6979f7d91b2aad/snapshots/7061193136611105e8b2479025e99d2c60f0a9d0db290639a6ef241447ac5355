@@ -1,0 +1,413 @@
+"""Independent energy geometry contracts. Only the owner runs qualification."""
+from pathlib import Path
+import gc
+import hashlib
+import math
+import struct
+import sys
+import unittest
+from unittest.mock import patch
+import warnings
+import weakref
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT/'scripts'))
+import numpy as np
+from research_score_distribution import ScoreGrid, JointDistribution, energy_score as original_energy
+from research_score_skellam_compute import score_forecast as original_score
+from research_score_conditional_run import strict as original_strict
+import research_score_energy_geometry as candidate
+
+OBSERVATIONS = []
+_WRITER = None
+
+
+def set_observation_writer(writer):
+    global _WRITER
+    if writer is not None and not callable(writer):
+        raise TypeError('observation writer must be callable or None')
+    _WRITER = writer
+
+
+def emit(row):
+    if _WRITER is None:
+        OBSERVATIONS.append(row)
+    else:
+        _WRITER(row)
+
+
+def scalar_image(value):
+    kind = type(value)
+    if kind in (float, np.float64, np.float32):
+        return {'type': kind.__name__, 'float_hex': float(value).hex(),
+                'float64_bits': struct.pack('>d', float(value)).hex()}
+    if value is None or kind in (bool, int, str):
+        return {'type': kind.__name__, 'value': value}
+    if kind is complex:
+        return {'type': 'complex', 'real': value.real.hex(), 'imag': value.imag.hex()}
+    return {'type': kind.__name__}
+
+
+def image(value):
+    if isinstance(value, np.ndarray):
+        result = {'type': type(value).__name__, 'dtype': value.dtype.str, 'shape': list(value.shape),
+                  'strides': list(value.strides), 'writeable': bool(value.flags.writeable)}
+        if value.dtype.hasobject:
+            result['object_values'] = [scalar_image(v) for v in np.ndarray.flatten(value)]
+        else:
+            result['c_bytes_hex'] = np.ndarray.tobytes(value, order='C').hex()
+        return result
+    if isinstance(value, (tuple, list)):
+        return {'type': type(value).__name__, 'items': [image(v) for v in list.__iter__(value)]} if isinstance(value, list) else {'type': 'tuple', 'items': [image(v) for v in value]}
+    return scalar_image(value)
+
+
+def inputs(grid, observed):
+    fields = vars(grid) if hasattr(grid, '__dict__') else {}
+    probability = fields.get('probability', fields.get('_probability'))
+    return {'grid_type': type(grid).__name__, 'probability': image(probability), 'observed': image(observed),
+            'bounds': {name: image(fields[name]) for name in ('omitted_probability_bound', 'score_error_bound') if name in fields}}
+
+
+def call(function):
+    error_type = None
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter('always')
+        try:
+            value = function()
+            if type(value) is dict:
+                raw = original_strict(value)
+                answer = {'kind': 'metrics', 'type': 'dict', 'bytes': len(raw),
+                          'sha256': hashlib.sha256(raw).hexdigest(), 'ascii_body': raw.decode('ascii')}
+            else:
+                answer = {'kind': 'return', **scalar_image(value)}
+        except Exception as error:
+            error_type = type(error)
+            answer = {'kind': 'error', 'module': type(error).__module__, 'type': type(error).__qualname__, 'message': str(error)}
+    return {'outcome': answer, 'warnings': [{'category': type(w.message).__module__+'.'+type(w.message).__qualname__, 'message': str(w.message)} for w in caught]}, error_type
+
+
+def dirac(shape, mass=1.):
+    p = np.zeros(shape, dtype=np.float64)
+    p.flat[0] = mass
+    return p
+
+
+def fixture(p, y=(1., 2.)):
+    return ScoreGrid(p, 0., 0.), np.asarray(y, dtype=np.float64)
+
+
+class GridSubclass(ScoreGrid):
+    pass
+
+
+class ArraySubclass(np.ndarray):
+    pass
+
+
+class GridHook:
+    def __init__(self, probability, events, fail=False):
+        self._probability, self.events, self.fail = probability, events, fail
+
+    @property
+    def probability(self):
+        self.events.append('grid.probability')
+        if self.fail:
+            raise RuntimeError('grid probability failed')
+        return self._probability
+
+
+class ObservedHook(list):
+    def __getitem__(self, index):
+        self.events.append('observed.'+str(index))
+        if self.fail == index:
+            raise RuntimeError('observation failed '+str(index))
+        return super().__getitem__(index)
+
+
+class EnergyGeometryTests(unittest.TestCase):
+    def compare(self, label, factory, owner=None, expected_error=None, expect_fallback=False):
+        owner = candidate.LagGeometry() if owner is None else owner
+        records, types = {}, {}
+        for route in ('original', 'candidate'):
+            events = []
+            grid, observed = factory(events)
+            before = inputs(grid, observed)
+            if route == 'original':
+                actual, error_type = call(lambda: original_energy(grid, observed))
+            else:
+                cache_before = owner.cache_info()
+                real = candidate._original_energy_score
+                with patch.object(candidate, '_original_energy_score', wraps=real) as fallback:
+                    actual, error_type = call(lambda: owner.energy_score(grid, observed))
+                    fallback_calls = fallback.call_count
+                cache_after = owner.cache_info()
+            records[route] = {'result': actual, 'input_before': before, 'input_after': inputs(grid, observed), 'events': list(events)}
+            types[route] = error_type
+        emit({'test': self.id(), 'label': label, 'kind': 'energy_parity', 'original': records['original'],
+              'candidate': records['candidate'], 'cache_before': cache_before, 'cache_after': cache_after,
+              'fallback_calls': fallback_calls, 'expected_fallback': expect_fallback, 'expected_error': expected_error})
+        self.assertEqual(records['candidate']['result'], records['original']['result'], label)
+        self.assertIs(types['candidate'], types['original'], label)
+        self.assertEqual(records['candidate']['events'], records['original']['events'], label)
+        self.assertEqual(records['original']['input_before'], records['candidate']['input_before'], label)
+        for row in records.values():
+            self.assertEqual(row['input_before'], row['input_after'], label)
+        self.assertEqual(fallback_calls, int(expect_fallback), label)
+        if expect_fallback:
+            self.assertEqual(cache_before, cache_after, label)
+        if expected_error:
+            self.assertEqual(records['original']['result']['outcome']['message'], expected_error)
+        return owner, records
+
+    def test_cold_warm_dirac_two_atom_and_asymmetric_bits(self):
+        cases = [np.array([[1.]]), np.array([[.5, 0], [0, .5]]),
+                 np.array([[.1, 0, .6], [0, .3, 0]]), np.array([[0, .2], [.1, .3], [.4, 0]])]
+        for i, p in enumerate(cases):
+            owner = candidate.LagGeometry()
+            for cycle in range(2):
+                for j, y in enumerate(((0., 0.), (4., 5.), (1., 0.))):
+                    self.compare('small-'+str(i)+'-'+str(cycle)+'-'+str(j), lambda events, p=p, y=y: fixture(p.copy(), y), owner)
+
+    def test_singleton_axes_swaps_and_rectangular_orientation(self):
+        for shape in ((1, 2), (2, 1), (1, 17), (17, 1), (3, 5), (5, 3)):
+            p = dirac(shape); p.flat[0] = .4; p.flat[-1] += .6
+            self.compare('orientation-'+str(shape), lambda events, p=p: fixture(p.copy()))
+
+    def test_padding_transitions_and_same_padded_different_actual_shape(self):
+        owner = candidate.LagGeometry()
+        for side in (8, 9, 15, 16, 17):
+            self.compare('padding-'+str(side), lambda events, side=side: fixture(dirac((side, 3))), owner)
+        owner = candidate.LagGeometry()
+        for shape in ((9, 10), (16, 15), (10, 9)):
+            self.compare('same-padded-'+str(shape), lambda events, shape=shape: fixture(dirac(shape), (20., 7.)), owner)
+        info = owner.cache_info()
+        emit({'test': self.id(), 'label': 'shared-padded-counts', 'kind': 'cache_contract', 'actual': info})
+        self.assertEqual(info, {'entries': [[32, 32]], 'retained_bytes': 32*32*8, 'hits': 2, 'misses': 1, 'evictions': 0})
+
+    def test_base_doubled_alternation_and_supported_bound(self):
+        owner = candidate.LagGeometry()
+        for shape in ((80, 80), (160, 160), (80, 80), (160, 160)):
+            self.compare('base-double-'+str(shape), lambda events, shape=shape: fixture(dirac(shape)), owner)
+        info = owner.cache_info()
+        emit({'test': self.id(), 'label': 'base-double-cache', 'kind': 'cache_contract', 'actual': info})
+        self.assertEqual(info, {'entries': [[256, 256], [512, 512]], 'retained_bytes': 2621440, 'hits': 2, 'misses': 2, 'evictions': 0})
+        self.compare('maximum-supported-256', lambda events: fixture(dirac((256, 256))))
+        self.compare('first-unsupported-257', lambda events: fixture(dirac((257, 2))), expect_fallback=True)
+
+    def test_probability_and_observation_changes_are_fresh_on_hits(self):
+        owner = candidate.LagGeometry()
+        p = np.array([[.1, .2], [.3, .4]])
+        states = [(p, (0., 0.)), (p[::-1].copy(), (0., 0.)), (p, (3., 7.)),
+                  (np.array([[.4, .3], [.2, .1]]), (-0., 2.))]
+        results = []
+        for i, (probability, y) in enumerate(states):
+            _, rows = self.compare('fresh-data-'+str(i), lambda events, p=probability, y=y: fixture(p.copy(), y), owner)
+            results.append(rows['candidate']['result']['outcome']['float64_bits'])
+        self.assertGreater(len(set(results)), 1)
+        self.assertEqual(owner.cache_info()['hits'], 3)
+
+    def test_inplace_probability_and_observation_mutation(self):
+        owner = candidate.LagGeometry(); p = dirac((4, 4)); y = np.array([0., -0.])
+        for i in range(3):
+            if i == 1: p[0, 0] = .25; p[-1, -1] = .75
+            if i == 2: y[:] = [8., 2.]
+            self.compare('inplace-current-data-'+str(i), lambda events: (ScoreGrid(p, 0., 0.), y), owner)
+
+    def test_signed_zero_and_layout_views(self):
+        def strided(events):
+            large = np.zeros((8, 8)); p = large[::2, ::2]; p[0, 0] = 1.; p[1, 1] = -0.
+            p.setflags(write=False); y = np.array([-0., 1., 0., 2.])[::2]
+            return fixture(p, y)
+        self.compare('readonly-strided', strided)
+        self.compare('fortran-transpose', lambda events: fixture(np.array([[.1, .2, .1], [.2, .3, .1]]).T))
+        self.compare('negative-strides', lambda events: fixture(dirac((3, 4))[::-1, ::-1]))
+
+    def test_unsupported_probability_types_and_shapes_fallback(self):
+        cases = [lambda: np.array([[1]], dtype=np.int64), lambda: np.array([[1.]], dtype=np.float32),
+                 lambda: np.array([[1.]], dtype='>f8'), lambda: np.array([[1.+0j]]),
+                 lambda: np.array([[1.]], dtype=object), lambda: dirac((2, 2)).view(ArraySubclass),
+                 lambda: np.array([1., 0.]), lambda: np.ones((1, 1, 1)), lambda: np.empty((0, 2))]
+        for i, make in enumerate(cases):
+            self.compare('unsupported-p-'+str(i), lambda events, make=make: fixture(make()), expect_fallback=True)
+        self.compare('grid-subclass', lambda events: (GridSubclass(dirac((2, 2)), 0., 0.), np.array([1., 2.])), expect_fallback=True)
+
+    def test_unsupported_observation_types_and_shapes_fallback(self):
+        values = [(1., 2.), [1., 2.], np.array([1, 2]), np.array([1., 2.], dtype=np.float32),
+                  np.array([1., 2., 99.]), np.array([1.]), None, np.array([1., 2.]).view(ArraySubclass)]
+        for i, value in enumerate(values):
+            self.compare('unsupported-y-'+str(i), lambda events, value=value: (ScoreGrid(dirac((2, 2)), 0., 0.), value), expect_fallback=True)
+
+    def test_original_fallback_grid_and_observation_hook_order(self):
+        for fail_grid, fail_index in ((False, None), (True, None), (False, 0), (False, 1)):
+            def factory(events, fail_grid=fail_grid, fail_index=fail_index):
+                y = ObservedHook([1., 2.]); y.events = events; y.fail = fail_index
+                return GridHook(dirac((2, 2)), events, fail_grid), y
+            _, rows = self.compare('fallback-hooks-'+str(fail_grid)+'-'+str(fail_index), factory, expect_fallback=True)
+            expected = ['grid.probability']
+            if not fail_grid:
+                expected.append('observed.0')
+                if fail_index != 0: expected.append('observed.1')
+            self.assertEqual(rows['candidate']['events'], expected)
+
+    def test_natural_correlation_mass_failure_is_before_lookup(self):
+        owner, _ = self.compare('mass-two', lambda events: fixture(dirac((4, 4), 2.)), expected_error='fft_correlation_invalid')
+        self.assertEqual(owner.cache_info(), {'entries': [], 'retained_bytes': 0, 'hits': 0, 'misses': 0, 'evictions': 0})
+
+    def test_natural_aggregate_clipped_mass_failure_is_before_lookup(self):
+        def factory(events):
+            p = np.full((16, 16), -4e-13, dtype=np.float64)
+            p[0, 0] = 1 + 255*4e-13
+            return fixture(p)
+        owner, _ = self.compare('many-small-negative-correlation-cells', factory, expected_error='fft_clipped_mass_invalid')
+        self.assertEqual(owner.cache_info()['misses'], 0)
+
+    def test_natural_negative_energy_failure_does_not_publish(self):
+        owner, _ = self.compare('negative-unit-dirac', lambda events: fixture(dirac((3, 3), -1.), (1., 0.)), expected_error='invalid_energy_score')
+        self.assertEqual(owner.cache_info(), {'entries': [], 'retained_bytes': 0, 'hits': 0, 'misses': 1, 'evictions': 0})
+
+    def test_nonfinite_probability_and_observed_errors_warnings_match(self):
+        for label, value in (('nan', math.nan), ('inf', math.inf), ('minus-inf', -math.inf)):
+            self.compare('nonfinite-p-'+label, lambda events, value=value: fixture(np.array([[value]])))
+            self.compare('nonfinite-y-'+label, lambda events, value=value: fixture(dirac((2, 2)), (value, 1.)), expected_error='invalid_energy_score')
+
+    def test_fifo_hits_do_not_reorder_and_third_success_evicts_oldest(self):
+        owner = candidate.LagGeometry()
+        for shape in ((2, 2), (3, 3), (2, 2), (5, 5)):
+            self.compare('fifo-'+str(shape), lambda events, shape=shape: fixture(dirac(shape)), owner)
+        info = owner.cache_info()
+        emit({'test': self.id(), 'label': 'fifo-result', 'kind': 'cache_contract', 'actual': info})
+        self.assertEqual(info, {'entries': [[8, 8], [16, 16]], 'retained_bytes': (64+256)*8, 'hits': 1, 'misses': 3, 'evictions': 1})
+
+    def test_failed_third_miss_does_not_publish_or_evict(self):
+        owner = candidate.LagGeometry()
+        for shape in ((2, 2), (3, 3)):
+            self.compare('prefill-'+str(shape), lambda events, shape=shape: fixture(dirac(shape)), owner)
+        self.compare('failed-third', lambda events: fixture(dirac((5, 5), -1.), (1., 0.)), owner, expected_error='invalid_energy_score')
+        info = owner.cache_info()
+        emit({'test': self.id(), 'label': 'failed-miss-retained-fifo', 'kind': 'cache_contract', 'actual': info})
+        self.assertEqual(info, {'entries': [[4, 4], [8, 8]], 'retained_bytes': (16+64)*8, 'hits': 0, 'misses': 3, 'evictions': 0})
+        self.compare('valid-third-after-failure', lambda events: fixture(dirac((5, 5))), owner)
+        self.assertEqual(owner.cache_info()['evictions'], 1)
+
+    def test_warm_hit_failure_counts_hit_but_keeps_geometry(self):
+        owner = candidate.LagGeometry()
+        self.compare('hit-prefill', lambda events: fixture(dirac((3, 3))), owner)
+        self.compare('failed-hit', lambda events: fixture(dirac((3, 3), -1.), (1., 0.)), owner, expected_error='invalid_energy_score')
+        info = owner.cache_info()
+        emit({'test': self.id(), 'label': 'failed-hit-state', 'kind': 'cache_contract', 'actual': info})
+        self.assertEqual(info, {'entries': [[8, 8]], 'retained_bytes': 512, 'hits': 1, 'misses': 1, 'evictions': 0})
+
+    def test_owner_isolation_metadata_copies_and_bounded_bytes(self):
+        left, right = candidate.LagGeometry(), candidate.LagGeometry()
+        self.compare('left-owner-fill', lambda events: fixture(dirac((256, 256))), left)
+        self.assertEqual(right.cache_info()['entries'], [])
+        metadata = left.cache_info(); metadata['entries'][0][0] = 1; metadata['hits'] = 99
+        self.assertEqual(left.cache_info()['entries'], [[512, 512]])
+        self.compare('second-max-rectangular', lambda events: fixture(dirac((256, 128))), left)
+        actual = left.cache_info()
+        emit({'test': self.id(), 'label': 'owner-and-bounds', 'kind': 'cache_contract', 'actual': actual, 'other_owner': right.cache_info()})
+        self.assertLessEqual(actual['retained_bytes'], 4*1024*1024)
+        self.assertEqual(actual['retained_bytes'], (512*512+512*256)*8)
+
+    def test_real_fft_is_fresh_on_hits_and_geometry_built_late(self):
+        owner = candidate.LagGeometry(); events = []; built = []
+        real_forward, real_inverse, real_build = candidate._rfft2, candidate._irfft2, candidate._build_distance
+        def forward(*args, **kwargs):
+            events.append('rfft2'); return real_forward(*args, **kwargs)
+        def inverse(*args, **kwargs):
+            events.append('irfft2'); return real_inverse(*args, **kwargs)
+        def build(shape):
+            events.append('distance'); result = real_build(shape); built.append(result); return result
+        with patch.object(candidate, '_rfft2', side_effect=forward) as f, \
+             patch.object(candidate, '_irfft2', side_effect=inverse) as r, \
+             patch.object(candidate, '_build_distance', side_effect=build) as b:
+            for i in range(3):
+                self.compare('real-fft-call-'+str(i), lambda events, i=i: fixture(dirac((4, 4)), (float(i), 2.)), owner)
+            observed = {'test': self.id(), 'label': 'actual-fresh-fft-events', 'kind': 'dependency_calls', 'events': events,
+                        'rfft2': f.call_count, 'irfft2': r.call_count, 'distance': b.call_count,
+                        'matrices': [image(value) for value in built], 'cache': owner.cache_info()}
+            emit(observed)
+            self.assertEqual(events, ['rfft2', 'irfft2', 'distance', 'rfft2', 'irfft2', 'rfft2', 'irfft2'])
+            self.assertEqual((f.call_count, r.call_count, b.call_count), (3, 3, 1))
+        self.assertEqual(len(built), 1)
+        self.assertEqual(built[0].dtype, np.dtype('float64'))
+        self.assertTrue(built[0].flags.c_contiguous); self.assertFalse(built[0].flags.writeable)
+        self.assertTrue(built[0].flags.owndata)
+
+    def test_no_geometry_construction_before_natural_fft_failures(self):
+        owner = candidate.LagGeometry(); real_build = candidate._build_distance
+        with patch.object(candidate, '_build_distance', wraps=real_build) as build:
+            self.compare('pre-geometry-correlation-failure', lambda events: fixture(dirac((4, 4), 2.)), owner, expected_error='fft_correlation_invalid')
+            emit({'test': self.id(), 'label': 'no-premature-distance', 'kind': 'dependency_calls', 'distance': build.call_count, 'cache': owner.cache_info()})
+            self.assertEqual(build.call_count, 0)
+
+    def test_injected_fft_and_geometry_errors_no_retry_or_eviction(self):
+        for alias in ('_rfft2', '_irfft2', '_build_distance'):
+            owner = candidate.LagGeometry()
+            for shape in ((2, 2), (3, 3)):
+                owner.energy_score(*fixture(dirac(shape)))
+            before = owner.cache_info()
+            error = RuntimeError('injected '+alias)
+            with patch.object(candidate, alias, side_effect=error) as failing:
+                actual, actual_type = call(lambda: owner.energy_score(*fixture(dirac((5, 5)))))
+                after = owner.cache_info()
+                emit({'test': self.id(), 'label': 'injection-'+alias, 'kind': 'deliberate_injection', 'result': actual,
+                      'calls': failing.call_count, 'cache_before': before, 'cache_after': after})
+                self.assertIs(actual_type, RuntimeError); self.assertEqual(actual['outcome']['message'], str(error))
+                self.assertEqual(failing.call_count, 1)
+                self.assertEqual(after['entries'], before['entries']); self.assertEqual(after['evictions'], before['evictions'])
+                self.assertEqual(after['misses'], before['misses'] + int(alias == '_build_distance'))
+            self.compare('valid-after-'+alias, lambda events: fixture(dirac((5, 5))), owner)
+
+    def test_hit_intentionally_skips_constructor_but_not_fft(self):
+        owner = candidate.LagGeometry(); owner.energy_score(*fixture(dirac((3, 3))))
+        with patch.object(candidate, '_build_distance', side_effect=RuntimeError('must be skipped on hit')) as build:
+            self.compare('constructor-skipped-on-hit', lambda events: fixture(dirac((3, 3)), (4., 5.)), owner)
+            emit({'test': self.id(), 'label': 'skipped-hit-construction', 'kind': 'dependency_calls', 'distance': build.call_count, 'cache': owner.cache_info()})
+            self.assertEqual(build.call_count, 0)
+
+    def test_no_grid_probability_or_observation_is_retained(self):
+        owner = candidate.LagGeometry(); p = dirac((4, 4)); y = np.array([1., 2.]); grid = ScoreGrid(p, 0., 0.)
+        references = [weakref.ref(value) for value in (grid, p, y)]
+        owner.energy_score(grid, y)
+        del grid, p, y
+        gc.collect()
+        alive = [ref() is not None for ref in references]
+        emit({'test': self.id(), 'label': 'raw-input-lifetime', 'kind': 'ownership', 'retained_inputs': alive, 'cache': owner.cache_info()})
+        self.assertEqual(alive, [False, False, False])
+
+    def test_full_scorer_metrics_and_single_skellam_wrap(self):
+        def law(independent):
+            return JointDistribution(np.array([[0., 0.]]), np.array([0.]), 1., np.array([.8, 1.1]), np.zeros(2), 0, independent)
+        for independent in (False, True):
+            for double_grid, diagnostics in ((False, False), (True, False), (True, True)):
+                owner = candidate.LagGeometry(); left, right = law(independent), law(independent)
+                before = {f: image(getattr(right, f)) for f in ('atoms','alpha','rates','theta')}
+                old, old_type = call(lambda: original_score(left, [2, 1], 'synthetic-energy-'+str(independent), double_grid=double_grid, diagnostics=diagnostics))
+                real_wrapper = candidate.SkellamDistribution
+                with patch.object(candidate, 'SkellamDistribution', wraps=real_wrapper) as wrapper:
+                    new, new_type = call(lambda: owner.score_forecast(right, [2, 1], 'synthetic-energy-'+str(independent), double_grid=double_grid, diagnostics=diagnostics))
+                    wraps = wrapper.call_count
+                after = {f: image(getattr(right, f)) for f in ('atoms','alpha','rates','theta')}
+                emit({'test': self.id(), 'label': 'score-'+str((independent,double_grid,diagnostics)), 'kind': 'full_metrics_parity',
+                      'original': old, 'candidate': new, 'wrapper_calls': wraps, 'flags': {'double_grid': double_grid, 'diagnostics': diagnostics},
+                      'independent': independent, 'law_before': before, 'law_after': after, 'law_scalars': {'beta': image(right.beta), 'iterations': right.iterations},
+                      'observed': image([2, 1]), 'game_id': 'synthetic-energy-'+str(independent), 'cache': owner.cache_info()})
+                self.assertIs(new_type, old_type); self.assertEqual(new, old); self.assertEqual(old['outcome']['kind'], 'metrics')
+                self.assertEqual(wraps, 1); self.assertEqual(before, after)
+
+    def test_full_scorer_invalid_target_retains_original_boundary(self):
+        law = JointDistribution(np.array([[0., 0.]]), np.array([0.]), 1., np.array([.8, 1.1]), np.zeros(2), 0)
+        for observed in ([1.5, 2.], [math.nan, 0.], [-1., 0.], [1.]):
+            owner = candidate.LagGeometry()
+            old, old_type = call(lambda: original_score(law, observed, 'invalid-synthetic-target'))
+            new, new_type = call(lambda: owner.score_forecast(law, observed, 'invalid-synthetic-target'))
+            emit({'test': self.id(), 'label': 'invalid-scorer-target', 'kind': 'full_metrics_parity', 'input': image(observed),
+                  'original': old, 'candidate': new, 'cache': owner.cache_info()})
+            self.assertIs(old_type, new_type); self.assertEqual(old, new)
+            self.assertEqual(old['outcome']['message'], 'invalid_target_pair'); self.assertEqual(owner.cache_info()['misses'], 0)
+
+
+if __name__ == '__main__':
+    unittest.main()

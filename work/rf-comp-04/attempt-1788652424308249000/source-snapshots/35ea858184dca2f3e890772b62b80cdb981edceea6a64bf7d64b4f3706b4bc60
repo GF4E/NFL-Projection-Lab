@@ -1,0 +1,65 @@
+{
+  "version": "rf02f.temporal-protocol-supplement.v1",
+  "status": "accepted_temporal_reuse_budget_design_only",
+  "reviewer": "compute_runner",
+  "reviewed_at_utc": "2026-09-05T12:21:47.789634+00:00",
+  "scope": "supplemental exact-hash acceptance of synthetic fixture exact-input payload reuse; carries forward the prior accepted temporal/reuse/budget design scope and limitations only",
+  "protocol": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md",
+    "sha256": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16",
+    "bytes": 26126
+  },
+  "config": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score-split.v1.json",
+    "sha256": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519",
+    "bytes": 13887
+  },
+  "prior_design_acceptance": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-temporal-review-final.json",
+    "sha256": "8d2f033d977dd9db5c20a6bfcc634641d0fc118849665f8b3d5031cd9fd1c058",
+    "preserved_unchanged": true
+  },
+  "original_requested_change_review": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-temporal-review.json",
+    "sha256": "fe3f6385c95d2f442fac2fb264680148cfc1d29f03ca503192a33eb5ba6ce1c8",
+    "preserved_unchanged": true
+  },
+  "exact_delta_verification": {
+    "method": "Reverse only the three declared protocol text changes and the two config changes in memory, then compare reconstructed complete bytes against the previously accepted SHA-256 pins.",
+    "reconstructed_prior_protocol_sha256": "438bca948ff511c1b2841237bd31c60422c3ee64b47542baa8dbb2cc8eae2f23",
+    "reconstructed_prior_config_sha256": "d3ad76915ebf6ed23e691c4ef4c14b31b8b6d2a3a6ca40909420dac0da461095",
+    "exact_match": true,
+    "protocol_changes": [
+      "replace one-call-per-row fixture wording with genuine scorer provenance for every row",
+      "append the explicit synthetic exact-input reuse constraints",
+      "replace smoke regeneration call-count phrase with scorer-output phrase"
+    ],
+    "config_changes": [
+      "add syntheticFixtureReuse object",
+      "update protocol.sha256"
+    ],
+    "no_other_design_bytes_changed": true
+  },
+  "accepted_clarification": [
+    "Only synthetic fixture rows may share a scored payload across series when the complete unchanged law representation, actual game ID, observed pair, every effective scoring flag and pinned scorer/runtime are exactly identical.",
+    "No cross-game, changed-law, changed-observation or changed-flag reuse; no handcrafted metrics. Immutable payloads or copied metadata attachment prevent alias mutation between rows.",
+    "Every output row retains genuine scorer provenance with independently checked cache keys. Actual scorer invocations and reused payload counts are recorded separately from the unchanged 64,733 public rows.",
+    "Focused synthetic qualification must prove changed law/game/observation/flags cause cache misses. This acceptance does not claim those new implementation tests have already run.",
+    "The complete 19 \u00d7 3,407 public evaluator input, all 226 origins, 3,135 internal development rows, 272 exposed-2025 rows, 18 comparisons, eight cells and three complete bootstraps remain unchanged.",
+    "The 600-second/4,096-MiB full synthetic integration bound, 120-second in-run full public evaluator smoke and 7,200-second/4,096-MiB historical envelope remain unchanged.",
+    "Historical reuse, fitted model paths, source/observation availability, inference populations, multiplicity and scientific decisions are unchanged. Repeated synthetic rows are not claimed to be additional independent games."
+  ],
+  "superseded_prior_review_wording": "The previous review description of 64,733 real scorer calls now means 64,733 rows with exact real-scorer provenance. Actual unique calls and exact-input reuse must be reported; no other prior review finding or limitation changes.",
+  "blockers": [],
+  "limitations": [
+    "This is design acceptance of the exact revised protocol/config only, not implementation or fixture qualification and not permission for historical invocation.",
+    "The prior accepted design scope and implementation obligations remain in force, including immutable historical row authentication, abort after partly mutating delivery errors, complete source admission, pilot accounting and atomic terminal failure handling.",
+    "Only read-only hashing, text reconstruction and JSON comparison were performed. No scorer, synthetic fixture generation, historical artifact payload, historical fit, distribution recovery, provider/site operation or frozen-file edit occurred.",
+    "Final implementation/source/runtime qualification, independent numerical/temporal pre-fit reviews and the root phase gate are still required before any historical invocation."
+  ],
+  "historical_invocation_authorized": false,
+  "implementation_accepted": false,
+  "scorer_invoked": false,
+  "historical_fit_or_score": false,
+  "frozen_files_edited": false
+}

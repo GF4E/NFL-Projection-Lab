@@ -1,0 +1,116 @@
+"""RF-COMP-05 candidate: guarded exact-byte pretty JSON, not run integration.
+
+Canonical conversion remains unchanged and runs once per strict call. The
+candidate retains no input/output cache and delegates unsupported snapshots to
+the original encoder. Qualification is specific to the pinned Python runtime.
+"""
+from json import dumps
+from math import isfinite
+from re import compile as regex_compile
+
+from research_score_conditional_replay import canonical
+from research_score_contract import encoded
+
+
+VERSION = 'rfcomp05.strict-compute.v1'
+MAX_DEPTH = 32
+MAX_NODES = 131072
+MAX_CHARACTERS = 4194304
+MAX_INTEGER_BITS = 256
+
+# Match complete quoted tokens first, so their punctuation is never reformatted.
+# The input is valid ASCII-escaped JSON produced by the unchanged stdlib token
+# encoder; this helper is not a general-purpose parser for external text.
+_TOKENS = regex_compile(r'"(?:[^"\\]+|\\.)*"|[{}\[\],:]')
+_INDENTS = tuple('\n' + '  '*depth for depth in range(MAX_DEPTH+1))
+
+
+def eligible(snapshot):
+    """Freshly inspect a canonical tree, without conversion or encoding hooks.
+
+    Root containers have depth1. Every value and dictionary key occurrence is
+    a node, and all string occurrences contribute to the character limit.
+    Active-path identities detect cycles only; shared children are revisited.
+    """
+    nodes = characters = 0
+    ancestors = set()
+
+    def visit(value, depth):
+        nonlocal nodes, characters
+        nodes += 1
+        if nodes > MAX_NODES:
+            return False
+        kind = type(value)
+        if value is None or kind is bool:
+            return True
+        if kind is str:
+            characters += len(value)
+            return characters <= MAX_CHARACTERS
+        if kind is int:
+            return value.bit_length() <= MAX_INTEGER_BITS
+        if kind is float:
+            return isfinite(value)
+        if kind is not dict and kind is not list:
+            return False
+        depth += 1
+        identity = id(value)
+        if depth > MAX_DEPTH or identity in ancestors:
+            return False
+        ancestors.add(identity)
+        try:
+            if kind is dict:
+                for key, item in value.items():
+                    if type(key) is not str or not visit(key, depth) or not visit(item, depth):
+                        return False
+            else:
+                for item in value:
+                    if not visit(item, depth):
+                        return False
+            return True
+        finally:
+            ancestors.remove(identity)
+
+    return visit(snapshot, 0)
+
+
+def _pretty(compact):
+    """Preserve JSON tokens and insert only original indent2 whitespace."""
+    pieces = []
+    last = depth = 0
+    for match in _TOKENS.finditer(compact):
+        start, end = match.span()
+        pieces.append(compact[last:start])
+        token = match.group()
+        if token[0] == '"':
+            pieces.append(token)
+        elif token in ('{', '['):
+            pieces.append(token)
+            depth += 1
+            close = '}' if token == '{' else ']'
+            if compact[end:end+1] != close:
+                pieces.append(_INDENTS[depth])
+        elif token in ('}', ']'):
+            depth -= 1
+            opening = '{' if token == '}' else '['
+            if compact[start-1:start] != opening:
+                pieces.append(_INDENTS[depth])
+            pieces.append(token)
+        elif token == ',':
+            pieces.extend((',', _INDENTS[depth]))
+        else:
+            pieces.append(': ')
+        last = end
+    if depth != 0:
+        raise ValueError('invalid_internal_compact_json_depth')
+    pieces.append(compact[last:])
+    return ''.join(pieces)
+
+
+def strict(value):
+    """Return original strict bytes; unexpected fast-path failures propagate."""
+    snapshot = canonical(value)
+    if not eligible(snapshot):
+        return encoded(snapshot)
+    compact = dumps(snapshot, sort_keys=True, ensure_ascii=True,
+                    allow_nan=False, separators=(',', ':'))
+    return (_pretty(compact) + '\n').encode('utf-8')

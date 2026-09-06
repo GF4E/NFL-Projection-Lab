@@ -1,0 +1,50 @@
+{
+  "candidate": {
+    "events": [
+      "assembly"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": false
+    },
+    "snapshots": [
+      {
+        "mode": "supported"
+      },
+      {
+        "mode": "supported"
+      }
+    ]
+  },
+  "expected_decision": false,
+  "expected_modes": null,
+  "kind": "paired_value",
+  "label": "dict-key-membership",
+  "original": {
+    "events": [
+      "assembly"
+    ],
+    "images": [
+      {
+        "ascii_body": "{\n  \"a\": 1\n}\n",
+        "bytes": 13,
+        "sha256": "5e36b6560513586ced65eca0e8b025fe88edbcab82ba2cb67a5fcb2d7b202383"
+      },
+      {
+        "ascii_body": "{\n  \"b\": 1\n}\n",
+        "bytes": 13,
+        "sha256": "1b274b11a09018181231171a807ae52ba4fae824f7d9b45e3da3d2b030d69f03"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": false
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_dictionary_insertion_order_and_key_membership"
+}

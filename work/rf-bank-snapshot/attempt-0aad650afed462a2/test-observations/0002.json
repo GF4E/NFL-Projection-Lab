@@ -1,0 +1,44 @@
+{
+  "candidate": {
+    "events": [
+      "assembly"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "error",
+      "message": "Out of range float values are not JSON compliant: inf",
+      "module": "builtins",
+      "type": "ValueError"
+    },
+    "snapshots": [
+      {
+        "mode": "supported"
+      }
+    ]
+  },
+  "expected_decision": null,
+  "expected_modes": null,
+  "kind": "paired_value",
+  "label": "late-unsupported-float",
+  "original": {
+    "events": [
+      "assembly"
+    ],
+    "images": [
+      {
+        "ascii_body": "[\n  0,\n  0\n]\n",
+        "bytes": 13,
+        "sha256": "4f4ef56ec5dfda1532daaf29e876af3bad61321526c130cf56c5448de7ec07fc"
+      }
+    ],
+    "outcome": {
+      "kind": "error",
+      "message": "Out of range float values are not JSON compliant: inf",
+      "module": "builtins",
+      "type": "ValueError"
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_after_capture_errors_not_skipped_by_early_difference"
+}

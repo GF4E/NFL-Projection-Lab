@@ -1,0 +1,251 @@
+"""Deterministic synthetic qualification; no historical inputs or score runs."""
+import inspect
+import math
+from pathlib import Path
+import resource
+import sys
+import time
+import unittest
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
+import research_score_conditional_margin as unit
+
+
+def moments(vector):
+    mass = math.fsum(vector)
+    mean = math.fsum(i * float(p) for i, p in enumerate(vector)) / mass
+    variance = math.fsum(float(p) * (i - mean) ** 2 for i, p in enumerate(vector)) / mass
+    return mass, mean, variance
+
+
+class ConditionalMarginTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.started = time.monotonic()
+
+    @classmethod
+    def tearDownClass(cls):
+        elapsed = time.monotonic() - cls.started
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == 'darwin' else 1024)
+        if elapsed > 120 or rss > 4096:
+            raise AssertionError(f'synthetic_budget_exceeded: seconds={elapsed}, rss_mib={rss}')
+
+    def test_exact_identity_preserves_bytes_dtype_zeros_and_original(self):
+        for dtype in (np.float32, np.float64, np.int16):
+            p = np.array([1., -0., 0.], dtype=dtype)
+            before, flags = p.tobytes(), p.flags.writeable
+            q = unit.contract_conditional(p, 1, total=2)
+            self.assertEqual(q.tobytes(), before)
+            self.assertEqual(q.dtype, p.dtype)
+            self.assertFalse(np.shares_memory(p, q))
+            self.assertEqual(p.tobytes(), before)
+            self.assertEqual(p.flags.writeable, flags)
+        p = np.array([.25, 0., .75])
+        p.setflags(write=False)
+        q = unit.contract_conditional(p, 1)
+        self.assertEqual(q.tobytes(), p.tobytes())
+        self.assertFalse(p.flags.writeable)
+
+    def test_zero_total_and_point_laws(self):
+        for total, home in ((0, 0), (7, 0), (7, 3), (200, 200)):
+            p = np.zeros(total + 1)
+            p[home] = 1
+            for s in (0., .01, .5, .999999999999, 1.):
+                np.testing.assert_array_equal(unit.contract_conditional(p, s), p)
+                self.assertEqual(unit.conditional_moments(p)['variance'], 0)
+
+    def test_randomized_rounding_is_linear_variance_not_scale_squared(self):
+        p = np.array([.5, 0., .5])
+        for s in (0., .125, .25, .5, .75, 1.):
+            q = unit.contract_conditional(p, s)
+            np.testing.assert_array_equal(q, [.5 * s, 1 - s, .5 * s])
+            self.assertEqual(moments(q)[2], s)
+        result = unit.estimate_scale([p], [.8], [.1], [.5], [1.])
+        self.assertAlmostEqual(result['s'], .5, delta=1e-12)
+        self.assertEqual(result['status'], 'interior')
+        self.assertAlmostEqual(result['achieved_variance'], .5, delta=1e-12)
+
+    def test_rightmost_plateau_boundary_and_below_minimum(self):
+        p = [.75, 0., .25]
+        for target in (.25, .1):
+            result = unit.estimate_scale([p], [1.], [0.], [target], [1.])
+            self.assertAlmostEqual(result['s'], 1 / 3, delta=1e-12)
+            self.assertEqual(result['minimum_variance'], .25)
+            self.assertEqual(result['achieved_variance'], .25)
+            self.assertEqual(result['target_below_minimum'], target < .25)
+            self.assertLessEqual(result['steps'], 60)
+            self.assertLessEqual(result['bracket'][1] - result['bracket'][0], 1e-12)
+            self.assertGreater(unit._profile_variance(unit._variance_profile(p), 1 / 3 + 1e-10), .25)
+        reversed_result = unit.estimate_scale([p[::-1]], [1.], [0.], [.25], [1.])
+        self.assertAlmostEqual(reversed_result['s'], 1 / 3, delta=1e-12)
+        large_fixed = unit.estimate_scale([p], [1.], [10000.], [10000.25], [1.])
+        self.assertAlmostEqual(large_fixed['s'], 1 / 3, delta=1e-12)
+
+    def test_minimum_integer_law_and_integer_boundary_mean(self):
+        for p in ([.75, 0., .25], [.5, 0., .5], [0., .25, 0., .75]):
+            mass, mean, _ = moments(p)
+            q = unit.contract_conditional(p, 0)
+            occupied = set(np.flatnonzero(q))
+            self.assertLessEqual(len(occupied), 2)
+            self.assertTrue(occupied <= {math.floor(mean), math.ceil(mean)})
+            self.assertAlmostEqual(moments(q)[0], mass, delta=1e-10)
+            self.assertAlmostEqual(moments(q)[1], mean, delta=1e-10)
+            fraction = mean - math.floor(mean)
+            self.assertAlmostEqual(moments(q)[2], fraction * (1 - fraction), delta=1e-10)
+
+    def test_unresolvable_fixed_variance_is_explicit_failure(self):
+        # With exact arithmetic, the symmetric law needs s=0; the asymmetric
+        # law has R<V(0) and a rightmost minimum plateau ending at s=1/3.
+        # Neither is an identity, although 1e16 hides their empirical variance.
+        for p in ([.5, 0., .5], [.75, 0., .25]):
+            with self.subTest(p=p), self.assertRaisesRegex(
+                    unit.ConditionalMarginFailure, 'unresolvable_fixed_variance_arithmetic'):
+                unit.estimate_scale([p], [1.], [1e16], [1e16], [1.])
+        # A truly background-only law still has no adjustable variance.
+        result = unit.estimate_scale([None], [0.], [1e16], [1e16], [1.])
+        self.assertEqual(result['s'], 1.)
+        self.assertTrue(result['no_adjustable_variance'])
+
+    def test_preserved_input_mass_near_tolerance(self):
+        p = np.array([.25, 0., .75]) * (1 + 5e-13)
+        for s in (0., .2, .8, 1.):
+            q = unit.contract_conditional(p, s)
+            self.assertAlmostEqual(moments(q)[0], moments(p)[0], delta=1e-15)
+            self.assertAlmostEqual(moments(q)[1], moments(p)[1], delta=1e-12)
+        self.assertEqual(unit.contract_conditional(p, 1).tobytes(), p.tobytes())
+
+    def test_mixed_totals_mass_means_reversal_and_monotone_variance(self):
+        # Deterministic shapes cover sparse, asymmetric, endpoint-heavy and
+        # broad laws without random sampling or dependence on football data.
+        laws = []
+        for total in (1, 2, 7, 20, 67, 200):
+            x = np.arange(total + 1, dtype=float)
+            for raw in (1 + (x % 5), np.exp(-x / 3), 1 / (1 + (x - total / 3) ** 2)):
+                laws.append(raw / math.fsum(raw))
+            sparse = np.zeros(total + 1)
+            sparse[0], sparse[-1] = .73, .27
+            laws.append(sparse)
+        for p in laws:
+            mass, mean, original_variance = moments(p)
+            previous = -1.
+            profile = unit._variance_profile(p)
+            for s in np.linspace(0, 1, 41):
+                q = unit.contract_conditional(p, s)
+                actual_mass, actual_mean, variance = moments(q)
+                self.assertEqual(len(q), len(p))
+                self.assertTrue(np.all(q >= 0))
+                self.assertAlmostEqual(actual_mass, mass, delta=1e-10)
+                self.assertAlmostEqual(actual_mean, mean, delta=1e-10)
+                self.assertGreaterEqual(variance + 1e-10, previous)
+                self.assertLessEqual(variance, original_variance + 1e-10)
+                np.testing.assert_allclose(q, unit.contract_conditional(p[::-1], s)[::-1], rtol=0, atol=1e-10)
+                self.assertAlmostEqual(unit._profile_variance(profile, s), variance, delta=1e-10)
+                previous = variance
+
+    def test_very_small_probabilities_and_explicit_underflow(self):
+        p = np.array([1e-300, .25, 0., .75 - 1e-300])
+        for s in (0., .25, .5, 1.):
+            q = unit.contract_conditional(p, s)
+            self.assertAlmostEqual(moments(q)[0], moments(p)[0], delta=1e-10)
+            self.assertAlmostEqual(moments(q)[1], moments(p)[1], delta=1e-10)
+        p = np.array([np.nextafter(0., 1.), .5, .5])
+        with self.assertRaisesRegex(unit.ConditionalMarginFailure, 'rounding_mass_underflow'):
+            unit.contract_conditional(p, .5)
+
+    def test_invalid_vectors_scale_and_complete_length(self):
+        for p in ([], [0, 0], [.5, -.1, .6], [np.nan, 1.], [np.inf, 0], [.2, .3],
+                  [[1., 0.]], ['1', '0'], [1 + 2e-12], [1+0j], [1e308, 1e308]):
+            with self.subTest(p=p), self.assertRaises((unit.ConditionalMarginFailure, ValueError)):
+                unit.contract_conditional(p, .5)
+        for s in (-.1, 1.1, np.nan, np.inf, [0.5], '0.5'):
+            with self.subTest(s=s), self.assertRaises(unit.ConditionalMarginFailure):
+                unit.contract_conditional([.5, 0, .5], s)
+        for total in (-1, 3, 2., True):
+            with self.assertRaises(unit.ConditionalMarginFailure):
+                unit.contract_conditional([.5, 0, .5], .5, total=total)
+
+    def test_mixture_fixed_variance_decomposition(self):
+        p, a = np.array([.75, 0., .25]), .4
+        bg = np.array([.25, .5, .25])
+        c_emp, c_bg = moments(p)[1], moments(bg)[1]
+        fixed = (1 - a) * moments(bg)[2] + a * (1 - a) * (c_emp - c_bg) ** 2
+        for s in (0., .2, .5, 1.):
+            mixture = a * unit.contract_conditional(p, s) + (1 - a) * bg
+            self.assertAlmostEqual(moments(mixture)[1], a*c_emp + (1-a)*c_bg, delta=1e-12)
+            self.assertAlmostEqual(moments(mixture)[2], fixed + a * unit._profile_variance(unit._variance_profile(p), s), delta=1e-12)
+
+    def test_background_only_flat_and_upper_boundaries(self):
+        for target in (0., .7, 2.):
+            result = unit.estimate_scale([None], [0.], [.7], [target], [1.])
+            self.assertEqual(result['s'], 1.)
+            self.assertEqual(result['status'], 'no_adjustable_variance')
+            self.assertEqual(result['minimum_variance'], .7)
+            self.assertEqual(result['original_variance'], .7)
+            self.assertEqual(result['target_below_minimum'], target < .7)
+        for p in ([1.], [.3, .7], [0., 1., 0.]):
+            result = unit.estimate_scale([p], [1.], [0.], [0.], [2.])
+            self.assertEqual(result['s'], 1.)
+            self.assertTrue(result['no_adjustable_variance'])
+        for target in (1., 10.):
+            result = unit.estimate_scale([[.5, 0., .5]], [1.], [0.], [target], [1.])
+            self.assertEqual(result['s'], 1.)
+            self.assertEqual(result['status'], 'identity_upper_boundary')
+
+    def test_mixed_cases_weight_scaling_and_permutation_invariance(self):
+        laws = [[.5, 0., .5], [.75, 0., .25], None, [0., .2, 0., .8]]
+        a, fixed = np.array([.8, .5, 0., .7]), np.array([.1, .2, .9, .1])
+        weights = np.array([2., 1., .5, 3.])
+        target_s = .625
+        residuals = np.array([b + f * (0. if law is None else moments(unit.contract_conditional(law, target_s))[2])
+                              for b, f, law in zip(fixed, a, laws)])
+        expected = unit.estimate_scale(laws, a, fixed, residuals, weights)
+        self.assertAlmostEqual(expected['s'], target_s, delta=1e-12)
+        for factor in (1e-200, .125, 7., 1e200):
+            result = unit.estimate_scale(laws, a, fixed, residuals, weights * factor)
+            self.assertAlmostEqual(result['s'], expected['s'], delta=1e-12)
+            self.assertAlmostEqual(result['target_variance'], expected['target_variance'], delta=1e-10)
+        order = [2, 0, 3, 1]
+        result = unit.estimate_scale([laws[i] for i in order], a[order], fixed[order], residuals[order], weights[order])
+        self.assertAlmostEqual(result['s'], expected['s'], delta=1e-12)
+        self.assertAlmostEqual(result['achieved_variance'], expected['achieved_variance'], delta=1e-10)
+
+    def test_zero_weight_cases_are_validated_and_ignored_statistically(self):
+        one = unit.estimate_scale([[.5, 0., .5]], [1.], [0.], [.5], [1.])
+        two = unit.estimate_scale([[.5, 0., .5], [1.]], [1., .2], [0., 7.], [.5, 500.], [1., 0.])
+        self.assertEqual(one['s'], two['s'])
+        with self.assertRaises(unit.ConditionalMarginFailure):
+            unit.estimate_scale([[.5, 0., .5], [-1., 2.]], [1., .2], [0., 7.], [.5, 500.], [1., 0.])
+
+    def test_positive_weights_lost_during_scaling_or_normalization_fail(self):
+        # A tiny positive weight can have a meaningful contribution after
+        # multiplication by a huge residual. Dropping it falsely gives s=.5.
+        cases = [([1e308, 1e-16], [5e-12, 1e308]),
+                 ([1., 1., np.nextafter(0., 1.)], [5e-12, 5e-12, 1e308])]
+        for weights, residuals in cases:
+            count = len(weights)
+            with self.subTest(weights=weights), self.assertRaisesRegex(
+                    unit.ConditionalMarginFailure, 'positive_weight_underflow'):
+                unit.estimate_scale([[.5, 0., .5]] * count, [1e-11] * count,
+                                    [0.] * count, residuals, weights)
+
+    def test_invalid_training_arrays_and_values(self):
+        valid = ([[.5, 0., .5]], [.8], [.1], [.5], [1.])
+        cases = [(0, []), (0, [None]), (1, [-.1]), (1, [1.1]), (1, [np.nan]),
+                 (2, [-1.]), (2, [np.inf]), (3, [-1.]), (3, [np.nan]),
+                 (4, [0.]), (4, [-1.]), (4, [np.inf]), (4, []), (4, [[1.]])]
+        for index, value in cases:
+            arguments = list(valid)
+            arguments[index] = value
+            with self.subTest(index=index, value=value), self.assertRaises(unit.ConditionalMarginFailure):
+                unit.estimate_scale(*arguments)
+
+    def test_source_has_no_historical_or_model_imports(self):
+        imports = [line for line in inspect.getsource(unit).splitlines()
+                   if line.startswith('import ') or line.startswith('from ')]
+        self.assertEqual(imports, ['import math', 'import numpy as np'])
+
+
+if __name__ == '__main__':
+    unittest.main()

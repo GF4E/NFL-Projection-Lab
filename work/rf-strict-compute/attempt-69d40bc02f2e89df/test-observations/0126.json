@@ -1,0 +1,26 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "tolist hook failed",
+    "module": "builtins",
+    "type": "RuntimeError"
+  },
+  "eligibility": {
+    "actual": null,
+    "expected": null,
+    "reason": "raw canonicalization must fail before encoding eligibility"
+  },
+  "input": {
+    "deterministic_builder": "failed-hook-ArrayHook",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "ArrayHook"
+  },
+  "label": "failed-hook-ArrayHook",
+  "original": {
+    "kind": "error",
+    "message": "tolist hook failed",
+    "module": "builtins",
+    "type": "RuntimeError"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_raw_hook_failures_propagate_once"
+}

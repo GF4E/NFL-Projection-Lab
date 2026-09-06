@@ -1,0 +1,365 @@
+"""COMP09 integration only; execution belongs to the frozen qualifier.
+
+The synthetic preflight replaces only its declared byte-reader/trust-root seam.
+The real numerical pair uses the same tiny scientific manifest, fresh inputs,
+real Store/archive/publication/grader and inherited accounting. No history is
+admitted. Timer interleaving adversaries are in the separate timer test module.
+"""
+import ast
+import copy
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import sys
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import research_score_clock_guard as guard
+import research_score_clock_guard_controller as controller
+import research_score_clock_guard_preflight as preflight
+import research_score_resource_controller as baseline
+import research_score_resource_policy as resource
+import research_score_resource_watchdog as watchdog
+import research_score_resource_preflight as prior_preflight
+import research_score_split_run as original_runtime
+
+OBSERVATIONS = []
+CONTROLLER_TEST_EVIDENCE = []
+
+
+def save(kind, **values):
+    row = {'kind': kind, **values}
+    json.dumps(row, sort_keys=True, allow_nan=False)
+    OBSERVATIONS.append(row)
+    return row
+
+
+def fixture_module(path, name):
+    spec = importlib.util.spec_from_file_location(name, ROOT / path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def definitions(module):
+    tree = ast.parse(Path(module.__file__).read_bytes())
+    return {n.name: n for n in tree.body if isinstance(n, (ast.FunctionDef, ast.ClassDef))}
+
+
+def array_image(array):
+    return {'dtype': array.dtype.str, 'shape': list(array.shape),
+            'c_bytes_hex': array.tobytes(order='C').hex(),
+            'writeable': bool(array.flags.writeable)}
+
+
+def original_images(case):
+    return json.loads(original_runtime.strict({
+        'source_laws': {k: list(v.values()) for k, v in case.view['source_laws'].items()},
+        'mappers': {str(k): {'atoms': array_image(v.atoms), 'weights': array_image(v.weights),
+                            'b': v.b, 'epsilon': v.epsilon}
+                    for k, v in case.view['mappers'].items()}}))
+
+
+class ScienceApplicabilityTests(unittest.TestCase):
+    def test_shared_original_science_accounting_failure_and_pilot_objects(self):
+        for name in ('Store', 'OriginAccounting', 'assemble_forecasts', 'PublishedOriginGrader',
+                     'admit_source', 'forecast_inputs', 'StrictSelectionFeed', 'SplitTrajectoryBank',
+                     'evaluate', 'run_smoke', '_bank_state_digest', 'publish_origin',
+                     'validate_publication_binding', '_saved_inference_inputs', 'pilot_projection'):
+            self.assertIs(getattr(controller, name), getattr(baseline, name), name)
+        self.assertIs(controller.RuntimeStop, original_runtime.RuntimeStop)
+        self.assertIs(controller.ControllerEnvelope, guard.ControllerEnvelope)
+        self.assertIs(controller.preflight, preflight.preflight)
+        self.assertIs(controller.pilot_projection, resource.pilot_projection)
+        self.assertIs(guard.ControllerEnvelope.finalize_invalid, resource.ControllerEnvelope.finalize_invalid)
+        self.assertIs(controller._chronological_origins, baseline._chronological_origins)
+        self.assertIs(controller._read_phase, baseline._read_phase)
+        self.assertEqual(resource.BUDGET['seconds'], 9000)
+        self.assertEqual(resource.BUDGET['projected_seconds'], 9000)
+        self.assertEqual(resource.BUDGET['rss_mib'], 4096)
+        self.assertEqual(resource.BUDGET['complete_smoke_seconds'], 120)
+        self.assertEqual(resource.BUDGET['invalid_metadata_seconds'], 30)
+        self.assertEqual(resource.BUDGET['external_worker_grace_seconds'], 0)
+        save('shared_science_identity', preserved='science/store/accounting/pilot/watchdog', budget=resource.BUDGET)
+
+    def test_frozen_85_sources_seven_runtime_and_scientific_registry(self):
+        accepted_path = ROOT / '.planning/engine-os/research-first/RF-COMP-08-PREFIT-ACCEPTANCE.v1.json'
+        raw = accepted_path.read_bytes()
+        self.assertEqual(hashlib.sha256(raw).hexdigest(),
+            '3bbc98b3645782ba088d814c61505a86041f0a5c82e6a32d6430b62c58fd1bbe')
+        accepted = json.loads(raw)
+        self.assertEqual(preflight.FROZEN_CODE_HASHES, accepted['code_hashes'])
+        self.assertEqual(len(accepted['code_hashes']), 85)
+        self.assertEqual(preflight.RUNTIME_FILES, accepted['runtime_files'])
+        self.assertEqual(len(accepted['runtime_files']), 7)
+        for name, expected in {**accepted['code_hashes'], **accepted['runtime_files']}.items():
+            self.assertEqual(hashlib.sha256((ROOT/name).read_bytes()).hexdigest(), expected, name)
+        self.assertEqual(preflight.POLICY, prior_preflight.POLICY)
+        self.assertEqual(preflight.RESOURCE_POLICY_SHA, prior_preflight.RESOURCE_POLICY_SHA)
+        self.assertEqual(preflight.CONFIG_SHA, '0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519')
+        registry = json.loads((ROOT/preflight.CONFIG_PATH).read_bytes())
+        self.assertEqual([len(registry[x]) for x in ('settingsInTieOrder', 'variantsInOrder', 'seriesInOrder',
+                                                   'energyComparisonsInOrder', 'calibrationCellsInOrder')],
+                         [27, 13, 19, 18, 8])
+        save('frozen_applicability', code_hashes=accepted['code_hashes'], runtime_files=accepted['runtime_files'],
+             registry_sha256=preflight.CONFIG_SHA, origin_count=277, outer_games=3407)
+
+    def test_controller_launcher_worker_ast_has_only_registered_deltas(self):
+        old, new = definitions(baseline), definitions(controller)
+        self.assertIs(controller._chronological_origins, baseline._chronological_origins)
+        self.assertNotIn('_chronological_origins', new)
+        self.assertEqual(ast.dump(old['_worker_main']), ast.dump(new['_worker_main']))
+        launch = copy.deepcopy(old['_launch'])
+        replacements = {'One accepted RF-COMP-08 worker under fixed external limits':
+                        'One accepted RF-COMP-09 worker under fixed external limits',
+                        'rfcomp08-observer-': 'rfcomp09-observer-'}
+        changed = []
+        for node in ast.walk(launch):
+            if isinstance(node, ast.Constant) and type(node.value) is str and node.value in replacements:
+                changed.append(node.value); node.value = replacements[node.value]
+        self.assertEqual(set(changed), set(replacements))
+        self.assertEqual(ast.dump(launch), ast.dump(new['_launch']))
+        old_run, new_run = copy.deepcopy(old['run']), copy.deepcopy(new['run'])
+        added = [ast.parse(line).body[0] for line in (
+            'envelope.call(bound, ROOT / GUARD_PROTOCOL_PATH, GUARD_PROTOCOL_SHA)',
+            'envelope.call(validate_predecessor_terminal, envelope.check)')]
+        attempt = next(node for node in new_run.body if isinstance(node, ast.Try))
+        for expected in added:
+            matches = [node for node in attempt.body if ast.dump(node) == ast.dump(expected)]
+            self.assertEqual(len(matches), 1)
+            attempt.body.remove(matches[0])
+        removed_diagnostic = 0; changed_versions = 0
+        diagnostic = ast.dump(ast.parse('copy.deepcopy(envelope._clock_failure)', mode='eval').body)
+        for node in ast.walk(new_run):
+            if isinstance(node, ast.Dict):
+                positions = [i for i, key in enumerate(node.keys)
+                             if isinstance(key, ast.Constant) and key.value == 'clock_failure']
+                for i in reversed(positions):
+                    self.assertEqual(ast.dump(node.values[i]), diagnostic)
+                    node.keys.pop(i); node.values.pop(i); removed_diagnostic += 1
+            if isinstance(node, ast.Constant) and node.value == 'rfcomp09.terminal.v1':
+                node.value = 'rfcomp08.terminal.v1'; changed_versions += 1
+        self.assertEqual(removed_diagnostic, 1); self.assertEqual(changed_versions, 2)
+        self.assertEqual(ast.dump(old_run), ast.dump(new_run))
+        row = save('controller_ast_applicability', exact_chronology_object=True,
+                   unchanged_worker_main=True, unchanged_watchdog_import=True,
+                   launcher_changes=sorted(replacements),
+                   run_changes=['two terminal versions', 'guard protocol reauthentication',
+                                'predecessor terminal reauthentication', 'lossless clock failure metadata'])
+        CONTROLLER_TEST_EVIDENCE.append({'scope': 'source_ast_applicability_no_history_execution', **row})
+
+    def test_one_real_resource_and_guarded_science_pair(self):
+        fixtures = fixture_module('tests/research-score-split-compute/test_integration.py',
+                                  'comp09_accepted_tiny_science_fixture')
+        bindings = fixtures.global_bindings()
+        bodies = []; routes = []
+        for label, control in (('accepted_resource', baseline), ('guarded', controller)):
+            case = fixtures.IntegratedCase(2013, 0)
+            try:
+                before = original_images(case)
+                with control.ControllerEnvelope() as envelope:
+                    # A declared single-origin fixture, not a reduced production
+                    # gate. All actual origin/callback methods remain unchanged.
+                    accounting = object.__new__(original_runtime.OriginAccounting)
+                    accounting.envelope = envelope
+                    accounting._plan = (original_runtime.strict(case.view['origin']),)
+                    accounting._origins = []; accounting._active_origin = None; accounting._active_callback = None
+                    with accounting.origin(case.view['origin']):
+                        pointer = case.publish(accounting)
+                        graded = case.grade(control.PublishedOriginGrader(), accounting, pointer)
+                    science = {
+                        'assembly': {k: case.assembly[k] for k in
+                            ('full_setting_forecasts', 'outer_selected_forecasts', 'grading_plan')},
+                        'laws': [{'key': list(k), 'fields': fixtures.law_fields(v)}
+                                 for k, v in case.assembly['resolved_laws'].items()],
+                        'inner_rows': graded['inner_rows'], 'outer_rows': graded['outer_rows'],
+                        'counts': graded['counts'],
+                        'provenance': case.store.read_bound(graded['artifacts']['grading_provenance'])}
+                    body = original_runtime.strict(science)
+                    callbacks = accounting._origins[0]['callbacks']
+                    callback_contract = [{k: v for k, v in c.items()
+                        if k not in ('started_seconds', 'finished_seconds', 'seconds')} for c in callbacks]
+                    after = original_images(case)
+                    row = save('real_science_pair', route=label, science=json.loads(body),
+                        sha256=hashlib.sha256(body).hexdigest(), source_before=before, source_after=after,
+                        callbacks=callbacks, callback_contract=callback_contract,
+                        source_globals_unchanged=fixtures.global_bindings() == bindings,
+                        deadline_seconds=envelope._deadline-envelope.started,
+                        scope='same tiny scientific manifest; real original accounting and full persisted scores')
+                    bodies.append(body); routes.append(row)
+                    CONTROLLER_TEST_EVIDENCE.append({'scope': 'one_real_tiny_numerical_route', 'route': label,
+                        'scientific_sha256': row['sha256'], 'counts': graded['counts'],
+                        'callbacks': len(callbacks), 'full_law_count': len(science['laws']),
+                        'publication': pointer, 'grading_artifacts': graded['artifacts']})
+                    # Full witnesses and observations are retained before checks.
+                    self.assertEqual(before, after)
+                    self.assertTrue(row['source_globals_unchanged'])
+                    self.assertEqual(row['deadline_seconds'], 9000.)
+                    self.assertEqual(len(callbacks), 88)
+                    self.assertEqual(len(science['laws']), 62)
+                    self.assertEqual(len(graded['inner_rows']), 54)
+                    self.assertEqual(len(graded['outer_rows']), 38)
+                    self.assertEqual(graded['counts']['actual_score_calls'], 40)
+                    self.assertEqual(graded['counts']['actual_mass_cdf_calls'], 208)
+            finally:
+                case.close()
+        self.assertEqual(bodies[0], bodies[1])
+        self.assertEqual(routes[0]['callback_contract'], routes[1]['callback_contract'])
+        self.assertEqual(routes[0]['source_before'], routes[1]['source_before'])
+
+
+class GuardFixture:
+    """Positive-reader fixture; every substituted byte/pin is test-local."""
+    def __init__(self):
+        old = fixture_module('tests/research-score-resource-policy/test_resource_policy.py',
+                             'comp09_resource_schema_fixture')
+        resource_fixture = old.ResourceFixture(); self.base = f = resource_fixture.base
+        self.resource_sha = resource_fixture.resource_sha; self.policy_sha = resource_fixture.policy_sha
+        gp = f.put_raw(preflight.GUARD_PROTOCOL_PATH, b'explicit synthetic clock-guard protocol')
+        self.guard_sha = gp['sha256']
+        self.baseline_pointer = f.put('synthetic-resource-baseline.json', {
+            'version': 'rfcomp08.prefit-acceptance.v1', 'status': 'accepted_for_one_historical_invocation',
+            'code_hashes': dict(f.frozen), 'runtime': preflight.RUNTIME,
+            'runtime_files': f.runtime_files,
+            'resource_policy': f.acceptance['resource_policy'],
+            'evidence': [f.put('synthetic-resource-evidence.json', {'scope': 'synthetic old evidence only'})]})
+        manifest = f.put(str(f.root/'synthetic-predecessor-manifest.json'), {'synthetic': True})
+        terminal = f.put(str(f.root/'synthetic-predecessor-terminal.json'), {
+            'status': 'protocol_invalid', 'reason': 'invalid_monotonic_clock',
+            'manifest_sha256': manifest['sha256']})
+        index = f.put(str(f.root/'synthetic-predecessor-index.json'), {'files': {'terminal': terminal}})
+        self.predecessor_artifacts = {'manifest': manifest, 'artifact_index': index, 'terminal': terminal}
+        self.predecessor_pointer = f.put('synthetic-predecessor-receipt.json', {
+            'version': 'rfcomp08.terminal-acceptance.v1',
+            'status': 'accepted_retained_protocol_invalid_clock_stop_only', **self.predecessor_artifacts})
+        f.acceptance.update(version=preflight.VERSION, guard_protocol=gp,
+            baseline_acceptance=self.baseline_pointer, predecessor_terminal=self.predecessor_pointer)
+        q = json.loads(f.files[f.root/f.acceptance['qualification']['path']])
+        q.update(version='rfcomp09.controller-qualification.v1', scope=preflight.REVIEW_SCOPE,
+                 guard_protocol_sha256=self.guard_sha)
+        f.acceptance['qualification'] = f.put('synthetic-guard-qualification.json', q)
+        for role in ('numerical', 'temporal'):
+            f.acceptance['independent_reviews'][role] = f.put('synthetic-guard-'+role+'.json', {
+                **q, 'version': 'rfcomp09.controller-review.v1', 'status': 'accepted', 'role': role,
+                'qualification_sha256': f.acceptance['qualification']['sha256'],
+                'blockers': [], 'findings': ['explicit synthetic schema fixture only']})
+
+    def run(self):
+        f = self.base
+        return preflight._validate(f.root, f.acceptance, 'a'*64, preflight.RUNTIME, f.check,
+            read=f.read, frozen=f.frozen, candidates=f.candidates, stages=f.stages,
+            protocol_sha=f.protocol_sha, config_sha=f.config_sha, compute_sha=f.compute_sha,
+            runtime_files=f.runtime_files, terminal_pointers={}, resource_sha=self.resource_sha,
+            policy_sha=self.policy_sha, baseline_pointer=self.baseline_pointer, guard_sha=self.guard_sha,
+            predecessor_pointer=self.predecessor_pointer, predecessor_artifacts=self.predecessor_artifacts)
+
+    def rehash_predecessor_body(self, key, change):
+        f = self.base
+        f.mutate_document(self.predecessor_artifacts[key], change)
+        f.mutate_document(self.predecessor_pointer,
+            lambda value: value.update({key: self.predecessor_artifacts[key]}))
+
+
+class PreflightIntegrationTests(unittest.TestCase):
+    def rejected(self, case, fixture):
+        output = error = None
+        try:
+            output = fixture.run()
+        except Exception as exc:
+            error = {'type': type(exc).__name__, 'message': str(exc)}
+        save('synthetic_preflight_rejection', case=case, error=error,
+             returned_identity=None if output is None else output.get('identity'),
+             positive_reader_calls=len(fixture.base.reads))
+        self.assertIsNotNone(error, case)
+        self.assertEqual(error['type'], 'ValueError', case)
+
+    def test_fresh_guard_manifest_is_deterministic_exact_store_bytes(self):
+        f = GuardFixture(); first = f.run(); second = f.run()
+        row = save('synthetic_guard_preflight', manifest=first['manifest'], identity=first['identity'],
+                   changed_boundary='private byte-reader and trust roots only')
+        CONTROLLER_TEST_EVIDENCE.append({'scope': 'synthetic_preflight_not_historical_authority', **row})
+        self.assertEqual(first, second)
+        self.assertEqual(first['manifest']['budget'], resource.BUDGET)
+        self.assertEqual(first['manifest']['guard_protocol']['sha256'], f.guard_sha)
+        self.assertEqual(first['manifest']['resource_policy']['sha256'], f.policy_sha)
+        self.assertEqual(first['manifest']['predecessor_terminal'], f.predecessor_pointer)
+        self.assertEqual(first['identity'], 'rfcomp09-v1-'+preflight.digest(preflight.encoded(first['manifest']))[:16])
+        self.assertEqual(preflight.encoded(first['manifest']), original_runtime.strict(first['manifest']))
+        self.assertEqual(first['manifest']['scientific_registry'], {k: first['config'][k] for k in
+            ('settingsInTieOrder', 'variantsInOrder', 'seriesInOrder', 'energyComparisonsInOrder', 'calibrationCellsInOrder')})
+        self.assertFalse(first['manifest']['automatic_restart'])
+        self.assertEqual(first['manifest']['actual_result_acceptance'], 'pending_independent_terminal_audits')
+
+    def test_old_missing_wrong_guard_resource_and_source_bindings_rejected(self):
+        cases = ('old_receipt', 'missing_receipt', 'missing_guard', 'missing_resource', 'wrong_guard_hash',
+                 'wrong_guard_path', 'guard_bytes', 'rehashed_resource_9001', 'baseline_source',
+                 'frozen_source_bytes', 'declared_frozen_hash', 'candidate_bytes', 'missing_source', 'runtime_bytes')
+        for case in cases:
+            with self.subTest(case=case):
+                x = GuardFixture(); f = x.base
+                if case == 'old_receipt': f.acceptance['version'] = 'rfcomp08.prefit-acceptance.v1'
+                elif case == 'missing_receipt': f.acceptance = None
+                elif case == 'missing_guard': del f.acceptance['guard_protocol']
+                elif case == 'missing_resource': del f.acceptance['resource_policy']
+                elif case == 'wrong_guard_hash': f.acceptance['guard_protocol']['sha256'] = '0'*64
+                elif case == 'wrong_guard_path': f.acceptance['guard_protocol']['path'] = preflight.RESOURCE_PROTOCOL_PATH
+                elif case == 'guard_bytes': f.files[f.root/preflight.GUARD_PROTOCOL_PATH] += b' '
+                elif case == 'rehashed_resource_9001':
+                    value = copy.deepcopy(preflight.POLICY); value['budget']['seconds'] = 9001
+                    p = f.put(preflight.RESOURCE_POLICY_PATH, value)
+                    f.acceptance['resource_policy'] = p; x.policy_sha = p['sha256']
+                elif case == 'baseline_source':
+                    f.mutate_document(x.baseline_pointer, lambda value: value.update(code_hashes={}))
+                elif case == 'frozen_source_bytes': f.files[f.root/next(iter(f.frozen))] += b' '
+                elif case == 'declared_frozen_hash': f.acceptance['code_hashes'][next(iter(f.frozen))] = '0'*64
+                elif case == 'candidate_bytes': f.files[f.root/f.candidates[0]] += b' '
+                elif case == 'missing_source': del f.acceptance['code_hashes'][f.candidates[0]]
+                elif case == 'runtime_bytes': f.files[f.root/'synthetic-runtime.bin'] += b' '
+                self.rejected(case, x)
+
+    def test_rehashed_old_qualification_or_review_binding_cannot_authorize_guard(self):
+        cases = ('qualification_version', 'qualification_guard', 'review_guard', 'review_resource',
+                 'review_scope', 'review_qualification', 'review_blocker')
+        for case in cases:
+            with self.subTest(case=case):
+                x = GuardFixture(); f = x.base
+                if case.startswith('qualification'):
+                    changes = {'version': 'rfcomp08.controller-qualification.v1'} if case.endswith('version') else {'guard_protocol_sha256': '0'*64}
+                    f.mutate_document(f.acceptance['qualification'], lambda value: value.update(changes))
+                    for p in f.acceptance['independent_reviews'].values():
+                        f.mutate_document(p, lambda value: value.update(qualification_sha256=f.acceptance['qualification']['sha256']))
+                else:
+                    changes = {'review_guard': {'guard_protocol_sha256': '0'*64},
+                               'review_resource': {'resource_policy_sha256': '0'*64},
+                               'review_scope': {'scope': 'resource_policy_complete_controller_qualification'},
+                               'review_qualification': {'qualification_sha256': '0'*64},
+                               'review_blocker': {'blockers': ['unresolved synthetic blocker']}}[case]
+                    f.mutate_document(f.acceptance['independent_reviews']['numerical'], lambda value: value.update(changes))
+                self.rejected(case, x)
+
+    def test_predecessor_invalid_status_and_exact_artifacts_remain_bound(self):
+        for case in ('receipt_status', 'receipt_missing', 'terminal_reason', 'terminal_promoted',
+                     'terminal_manifest', 'artifact_bytes', 'null_artifact_hash'):
+            with self.subTest(case=case):
+                x = GuardFixture(); f = x.base
+                if case == 'receipt_status':
+                    f.mutate_document(x.predecessor_pointer, lambda value: value.update(status='accepted_scientific_result'))
+                elif case == 'receipt_missing': del f.acceptance['predecessor_terminal']
+                elif case in ('terminal_reason', 'terminal_promoted', 'terminal_manifest'):
+                    changes = {'terminal_reason': {'reason': 'different_stop'},
+                               'terminal_promoted': {'status': 'reject_all'},
+                               'terminal_manifest': {'manifest_sha256': '0'*64}}[case]
+                    x.rehash_predecessor_body('terminal', lambda value: value.update(changes))
+                elif case == 'artifact_bytes':
+                    f.files[Path(x.predecessor_artifacts['artifact_index']['path'])] += b' '
+                else:
+                    x.predecessor_artifacts['terminal']['sha256'] = None
+                    f.mutate_document(x.predecessor_pointer,
+                        lambda value: value.update(terminal=x.predecessor_artifacts['terminal']))
+                self.rejected(case, x)
+
+
+if __name__ == '__main__':
+    unittest.main()

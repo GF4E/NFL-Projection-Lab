@@ -1,0 +1,94 @@
+test_focused_suite_stops_after_swallowed_unittest_baseexception (__main__.SmokeTimingTests.test_focused_suite_stops_after_swallowed_unittest_baseexception) ... ok
+test_loading_plus_evaluation_overrun_cannot_reset_to_evaluator_120 (__main__.SmokeTimingTests.test_loading_plus_evaluation_overrun_cannot_reset_to_evaluator_120) ... ok
+test_real_three_focused_cases_preserve_live_archive_seal (__main__.SmokeTimingTests.test_real_three_focused_cases_preserve_live_archive_seal) ... ok
+test_total_deadline_wins_if_shorter_and_user_interrupts_survive (__main__.SmokeTimingTests.test_total_deadline_wins_if_shorter_and_user_interrupts_survive) ... 
+  test_total_deadline_wins_if_shorter_and_user_interrupts_survive (__main__.SmokeTimingTests.test_total_deadline_wins_if_shorter_and_user_interrupts_survive) (kind=<class 'KeyboardInterrupt'>) ... FAIL
+  test_total_deadline_wins_if_shorter_and_user_interrupts_survive (__main__.SmokeTimingTests.test_total_deadline_wins_if_shorter_and_user_interrupts_survive) (kind=<class 'SystemExit'>) ... FAIL
+test_total_smoke_includes_loading_but_pilot_T_is_evaluator_only (__main__.SmokeTimingTests.test_total_smoke_includes_loading_but_pilot_T_is_evaluator_only) ... ok
+
+======================================================================
+FAIL: test_total_deadline_wins_if_shorter_and_user_interrupts_survive (__main__.SmokeTimingTests.test_total_deadline_wins_if_shorter_and_user_interrupts_survive) (kind=<class 'KeyboardInterrupt'>)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py", line 73, in complete_smoke
+    yield
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_controller_unit.py", line 83, in test_total_deadline_wins_if_shorter_and_user_interrupts_survive
+    env.call(interrupted)
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py", line 147, in call
+    self.check()
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py", line 45, in check
+    self._stop('registered_120_second_complete_smoke_deadline', self._whole_smoke_deadline)
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py", line 112, in _stop
+    raise RuntimeStop(self.stop_reason)
+research_score_split_run.RuntimeStop: registered_120_second_complete_smoke_deadline
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_controller_unit.py", line 79, in test_total_deadline_wins_if_shorter_and_user_interrupts_survive
+    with env.complete_smoke(Path('/synthetic-owned-phase')):
+  File "/opt/anaconda3/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py", line 84, in complete_smoke
+    self._after(error)
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py", line 139, in _after
+    self.check()
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py", line 46, in check
+    return super().check()
+           ^^^^^^^^^^^^^^^
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py", line 116, in check
+    raise RuntimeStop(self.stop_reason or 'scientific_work_outside_live_envelope')
+research_score_split_run.RuntimeStop: registered_120_second_complete_smoke_deadline
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_controller_unit.py", line 85, in test_total_deadline_wins_if_shorter_and_user_interrupts_survive
+    self.assertIs(error, original)
+AssertionError: RuntimeStop('registered_120_second_complete_smoke_deadline') is not KeyboardInterrupt('explicit_stop')
+
+======================================================================
+FAIL: test_total_deadline_wins_if_shorter_and_user_interrupts_survive (__main__.SmokeTimingTests.test_total_deadline_wins_if_shorter_and_user_interrupts_survive) (kind=<class 'SystemExit'>)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py", line 73, in complete_smoke
+    yield
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_controller_unit.py", line 83, in test_total_deadline_wins_if_shorter_and_user_interrupts_survive
+    env.call(interrupted)
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py", line 147, in call
+    self.check()
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py", line 45, in check
+    self._stop('registered_120_second_complete_smoke_deadline', self._whole_smoke_deadline)
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py", line 112, in _stop
+    raise RuntimeStop(self.stop_reason)
+research_score_split_run.RuntimeStop: registered_120_second_complete_smoke_deadline
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_controller_unit.py", line 79, in test_total_deadline_wins_if_shorter_and_user_interrupts_survive
+    with env.complete_smoke(Path('/synthetic-owned-phase')):
+  File "/opt/anaconda3/lib/python3.12/contextlib.py", line 158, in __exit__
+    self.gen.throw(value)
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py", line 84, in complete_smoke
+    self._after(error)
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py", line 139, in _after
+    self.check()
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py", line 46, in check
+    return super().check()
+           ^^^^^^^^^^^^^^^
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py", line 116, in check
+    raise RuntimeStop(self.stop_reason or 'scientific_work_outside_live_envelope')
+research_score_split_run.RuntimeStop: registered_120_second_complete_smoke_deadline
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_controller_unit.py", line 85, in test_total_deadline_wins_if_shorter_and_user_interrupts_survive
+    self.assertIs(error, original)
+AssertionError: RuntimeStop('registered_120_second_complete_smoke_deadline') is not SystemExit('explicit_stop')
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.112s
+
+FAILED (failures=2)

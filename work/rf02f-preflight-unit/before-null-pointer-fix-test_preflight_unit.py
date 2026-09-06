@@ -1,0 +1,146 @@
+"""Synthetic preflight schema fixtures only; never create a final approval file."""
+import copy
+import hashlib
+import importlib.util
+import json
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import research_score_split_preflight as p
+
+
+class Fixture:
+    def __init__(self):
+        self.root = ROOT
+        self.files = {}
+        self.reads = []
+        self.checks = 0
+        self.frozen = {'scripts/research_score_synthetic_frozen.py': self.put_raw('scripts/research_score_synthetic_frozen.py', b'frozen')['sha256']}
+        self.candidates = ('scripts/research_score_synthetic_candidate.py',)
+        candidate = self.put_raw(self.candidates[0], b'candidate')
+        self.code = {**self.frozen, self.candidates[0]: candidate['sha256']}
+        config = json.loads((ROOT / p.CONFIG_PATH).read_bytes())
+        protocol = self.put_raw(p.PROTOCOL_PATH, b'synthetic protocol')
+        config['protocol']['sha256'] = protocol['sha256']
+        self.protocol_sha = protocol['sha256']
+        cp = self.put(p.CONFIG_PATH, config);self.config_sha = cp['sha256']
+        inherited = self.put_raw(config['inheritedConfig']['path'], (ROOT/config['inheritedConfig']['path']).read_bytes())
+        assert inherited['sha256']==p.INHERITED_CONFIG_SHA
+        stage = self.put('synthetic-stage.json', {'status':'synthetic_unit_only'})
+        self.stages = {'synthetic': {**{k:stage[k] for k in ('path','sha256')}, 'status':'synthetic_unit_only'}}
+        evidence=self.put('synthetic-log.json', {'synthetic': True})
+        common={'version':'rf02f.controller-qualification.v1','status':'passed','scope':p.REVIEW_SCOPE,
+            'code_hashes':self.code,'protocol_sha256':self.protocol_sha,'config_sha256':self.config_sha,
+            'runtime':p.RUNTIME,'historical_execution':False,'tests':{'run':3,'passed':3},'evidence':[evidence]}
+        qual=self.put('synthetic-qualification.json',common)
+        reviews={}
+        for role in ('numerical','temporal'):
+            reviews[role]=self.put('synthetic-'+role+'.json',{**common,'version':'rf02f.controller-review.v1','status':'accepted',
+                'role':role,'qualification_sha256':qual['sha256'],'blockers':[],'findings':['synthetic schema fixture only']})
+        self.acceptance={'version':p.VERSION,'status':'accepted_for_one_historical_invocation','code_hashes':self.code,
+            'protocol':protocol,'config':cp,'stage_acceptances':{'synthetic':stage},'qualification':qual,
+            'independent_reviews':reviews,'runtime':copy.deepcopy(p.RUNTIME),'permissions':copy.deepcopy(p.PERMISSIONS)}
+    def put_raw(self,name,raw):
+        self.files[self.root/name]=raw
+        return {'path':name,'sha256':p.digest(raw),'bytes':len(raw)}
+    def put(self,name,value):return self.put_raw(name,p.encoded(value))
+    def check(self):self.checks+=1
+    def read(self,path,check,expected_sha=None,expected_bytes=None):
+        check();self.reads.append(path);raw=self.files[path]
+        if expected_sha is not None:p.require(p.digest(raw)==expected_sha,'synthetic_hash_mismatch')
+        if expected_bytes is not None:p.require(type(expected_bytes)is int and len(raw)==expected_bytes,'synthetic_size_mismatch')
+        return raw
+    def run(self, runtime=None):
+        return p._validate(self.root,self.acceptance,'a'*64,p.RUNTIME if runtime is None else runtime,self.check,
+            read=self.read,frozen=self.frozen,candidates=self.candidates,stages=self.stages,
+            protocol_sha=self.protocol_sha,config_sha=self.config_sha)
+    def mutate_document(self,pointer,change):
+        x=json.loads(self.files[self.root/pointer['path']]);change(x);new=self.put(pointer['path'],x);pointer.update(new)
+
+
+class PreflightTests(unittest.TestCase):
+    def test_manifest_bytes_equal_accepted_store_canonical_bytes(self):
+        from research_score_split_run import strict
+        self.assertEqual(p.encoded({}), strict({}))
+        self.assertEqual(p.encoded({}), b"{}\n")
+        self.assertEqual(p.encoded({"zero": -0.0}), strict({"zero": -0.0}))
+        result = Fixture().run()
+        self.assertEqual(p.encoded(result["manifest"]), strict(result["manifest"]))
+        self.assertEqual(result["manifest_sha256"], p.digest(strict(result["manifest"])))
+
+    def test_manifest_deterministic_and_excludes_observation_state(self):
+        f=Fixture();a=f.run();b=f.run();self.assertEqual(a,b)
+        self.assertEqual(a['identity'],'rf02f-v1-'+p.digest(p.encoded(a['manifest']))[:16])
+        self.assertEqual(a['manifest']['implementation_acceptance_sha256'],'a'*64)
+        self.assertFalse(a['manifest']['production_authorized']);self.assertEqual(a['manifest']['actual_result_acceptance'],'pending_independent_terminal_audits')
+        self.assertFalse(any(key in p.encoded(a['manifest']).decode() for key in ('phase_path','started_monotonic','measurements')))
+        self.assertGreater(f.checks,0)
+    def test_full_membership_and_frozen_pin_rejected(self):
+        for mode in ('missing','extra','frozen','unsafe','bool_hash'):
+            f=Fixture();code=f.acceptance['code_hashes']
+            if mode=='missing':code.pop(f.candidates[0])
+            if mode=='extra':code['scripts/extra.py']='a'*64
+            if mode=='frozen':code[next(iter(f.frozen))]='a'*64
+            if mode=='unsafe':code['../secret']='a'*64
+            if mode=='bool_hash':code[f.candidates[0]]=True
+            with self.subTest(mode=mode),self.assertRaises(ValueError):f.run()
+    def test_source_config_and_protocol_bytes_are_authenticated(self):
+        for name in ('scripts/research_score_synthetic_candidate.py',p.CONFIG_PATH,p.PROTOCOL_PATH):
+            f=Fixture();f.files[f.root/name]+=b' '
+            with self.assertRaises(ValueError):f.run()
+    def test_runtime_and_permissions_are_exact_native_types(self):
+        for mode in ('platform','isolated','version','permission_bool','provider_bool'):
+            f=Fixture();runtime=copy.deepcopy(p.RUNTIME)
+            if mode=='platform':runtime['platform']='linux'
+            if mode=='isolated':runtime['isolated']=1
+            if mode=='version':runtime['numpy']='future'
+            if mode=='permission_bool':f.acceptance['permissions']['one_historical_invocation']=1
+            if mode=='provider_bool':f.acceptance['permissions']['provider_requests']=False
+            with self.assertRaises(ValueError):f.run(runtime)
+    def test_review_and_qualification_bindings_cannot_be_truthy_grants(self):
+        changes=[lambda x:x.update(status='pending'),lambda x:x.update(scope='unit_only'),
+            lambda x:x.update(historical_execution=True),lambda x:x.update(tests={'run':0,'passed':0}),
+            lambda x:x.update(tests={'run':True,'passed':True}),lambda x:x.update(evidence=[]),
+            lambda x:x.update(protocol_sha256='0'*64),lambda x:x.update(code_hashes={})]
+        for change in changes:
+            f=Fixture();f.mutate_document(f.acceptance['qualification'],change)
+            with self.assertRaises(ValueError):f.run()
+        for change in (lambda x:x.update(role='other'),lambda x:x.update(blockers=['unresolved']),lambda x:x.update(qualification_sha256='0'*64)):
+            f=Fixture();f.mutate_document(f.acceptance['independent_reviews']['numerical'],change)
+            with self.assertRaises(ValueError):f.run()
+    def test_stage_and_evidence_pointer_tampering(self):
+        for mode in ('stage','size','path','evidence'):
+            f=Fixture()
+            if mode=='stage':f.acceptance['stage_acceptances']={}
+            elif mode=='size':f.acceptance['qualification']['bytes']=True
+            elif mode=='path':f.acceptance['qualification']['path']='../forbidden'
+            else:f.files[f.root/'synthetic-log.json']+=b' '
+            with self.assertRaises(ValueError):f.run()
+    def test_duplicate_nonfinite_and_overflow_json_fail(self):
+        for raw in (b'{"a":1,"a":2}',b'{"a":NaN}',b'{"a":1e999}'):
+            with self.assertRaises(ValueError):p.parse(raw)
+    def test_real_file_nosymlink_size_and_hash_boundary(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path=Path(folder).resolve()/'small.json';path.write_bytes(b'{"x":1}')
+            self.assertEqual(p._file(path,lambda:None,expected_sha=p.digest(path.read_bytes()),expected_bytes=7),b'{"x":1}')
+            alias=path.with_name('alias.json');alias.symlink_to(path)
+            for q in (alias,path/'..'/'small.json'):
+                with self.assertRaises(ValueError):p._file(q,lambda:None)
+            with self.assertRaises(ValueError):p._file(path,lambda:None,expected_bytes=True)
+            with self.assertRaises(ValueError):p._file(path,lambda:None,expected_sha='0'*64)
+    def test_budget_exception_escapes_without_archive_or_output(self):
+        class Stop(BaseException):pass
+        with self.assertRaises(Stop):p.preflight(ROOT,ROOT/'absent-final-acceptance.json','a'*64,lambda:(_ for _ in ()).throw(Stop()))
+        with self.assertRaises(TypeError):p.preflight(ROOT,ROOT/'absent','a'*64,lambda:None,fixture={})
+    def test_production_registry_and_runtime_are_closed(self):
+        self.assertEqual(len(p.CODE_FILES),66);self.assertEqual(len(set(p.CODE_FILES)),66)
+        self.assertEqual(set(p.STAGES),{'protocol','mean','bank','budget','inference','archive','runtime','forecast','watchdog'})
+        self.assertEqual(p.actual_runtime(),p.RUNTIME)
+        for name,sha in p.FROZEN_CODE_HASHES.items():self.assertEqual(p.digest((ROOT/name).read_bytes()),sha,name)
+
+
+if __name__=='__main__':unittest.main(verbosity=2)

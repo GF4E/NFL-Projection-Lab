@@ -1,0 +1,128 @@
+import copy
+import importlib.util
+import json
+from pathlib import Path
+import sys
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+for name in ("research_score_models", "research_score_distribution", "research_score_replay"):
+    spec = importlib.util.spec_from_file_location(name, ROOT / "scripts" / (name + ".py"))
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+r = sys.modules["research_score_replay"]
+m = sys.modules["research_score_models"]
+d = sys.modules["research_score_distribution"]
+TEAMS = tuple(f"T{i:02}" for i in range(32))
+
+
+class ReplayTests(unittest.TestCase):
+    def config(self):
+        return json.loads((ROOT / "config/research-team-score.v2.json").read_text())
+
+    def populated_selection(self):
+        history = r.SelectionHistory(self.config())
+        expected = {2011: ["a", "b"], 2012: ["c", "d"]}
+        for season, ids in expected.items():
+            for identity in ids:
+                for family, settings in history.settings.items():
+                    for setting in range(len(settings)):
+                        history.add(season, identity, family, setting, 10 - .01 * setting, False)
+        return history, expected
+
+    def test_finite_grid_choice_uses_only_prior_seasons(self):
+        history, expected = self.populated_selection()
+        initial = history.select(2013, expected)
+        self.assertEqual(initial["E1"]["setting"], 26)
+        for setting in range(27):
+            history.add(2013, "outer", "E1", setting, 1 if setting == 0 else 100, False)
+        self.assertEqual(initial, history.select(2013, expected))
+
+    def test_common_games_missing_row_invalidates_selection(self):
+        history, expected = self.populated_selection()
+        del history.rows[(2011, "a", "E1", 0)]
+        with self.assertRaisesRegex(ValueError, "inner_common_game_mismatch"):
+            history.select(2013, expected)
+
+    def test_native_failure_threshold_and_no_eligible_setting(self):
+        history, expected = self.populated_selection()
+        for key, value in list(history.rows.items()):
+            if key[2] == "E1":
+                history.rows[key] = (value[0], True)
+        decision = history.select(2013, expected)
+        self.assertIsNone(decision["E1"]["setting"])
+        self.assertEqual(decision["E1"]["status"], "no_eligible_setting")
+
+    def test_tie_tolerance_respects_registered_order(self):
+        history, expected = self.populated_selection()
+        for key in history.rows:
+            if key[2] == "S1":
+                history.rows[key] = (10 - key[3] * 1e-10, False)
+        self.assertEqual(history.select(2013, expected)["S1"]["setting"], 0)
+
+    def test_registered_series_and_bank_reuse_do_not_share_setting_states(self):
+        bank = r.TrajectoryBank(self.config(), TEAMS)
+        self.assertEqual(len(bank.series), 40)
+        self.assertNotIn(("E1", 0, "independent_marginals"), bank.engines)
+        self.assertNotIn(("E1", 0, "deterministic_noise"), bank.engines)
+        first = m.GameContext("a", 2010, 1, "T00", "T01")
+        prepared = {12: {"history": [], "targets": [first]}, 24: {"history": [], "targets": [first]}}
+        bank.advance(2010, 1, prepared)
+        next_game = m.GameContext("b", 2010, 2, "T00", "T01")
+        # A delayed input is delivered to the12h bank but not its24h counterpart.
+        prepared = {12: {"history": [m.HistoricalResult(first, 28, 14)], "targets": [next_game]},
+                    24: {"history": [], "targets": [next_game]}}
+        outputs = bank.advance(2010, 2, prepared)
+        self.assertEqual(bank.engines[("E1", 0, "full")].ratings[0], 1505)
+        self.assertEqual(bank.engines[("E1", 18, "full")].ratings[0], 1520)
+        self.assertEqual(bank.engines[("E1", 0, "availability_24h")].ratings[0], 1500)
+        full = bank.selected_output(outputs, "E1", 0, "full")
+        noisy = bank.selected_output(outputs, "E1", 0, "deterministic_noise")
+        self.assertFalse(np.array_equal(full["forecasts"][0]["mean"], noisy["forecasts"][0]["mean"]))
+        np.testing.assert_array_equal(full["forecasts"][0]["mean"], bank.engines[("E1", 0, "full")].stored["b"]["mean"])
+
+    def test_fallback_never_changes_n0_or_hides_failure(self):
+        mapper = d.JointBase.from_scores([[14, 21], [28, 17]], [1, 1])
+        baseline = mapper.fit([20, 22])
+        failed = {"mean": np.array([-2, 30]), "failure": "invalid_mean"}
+        recovered, reason = r.resolve_distribution(mapper, failed, "E1", "full", baseline)
+        self.assertIs(recovered, baseline)
+        self.assertEqual(reason, "invalid_mean")
+        with self.assertRaisesRegex(ValueError, "N0_scored_forecast_failure"):
+            r.resolve_distribution(mapper, failed, "N0", "full", None)
+        recovered, reason = r.resolve_distribution(mapper, None, "E2", "full", baseline)
+        self.assertIs(recovered, baseline)
+        self.assertEqual(reason, "no_eligible_setting")
+
+    def test_distribution_solver_failure_is_counted(self):
+        mapper = d.JointBase.from_scores([[14, 21], [28, 17]], [1, 1])
+        baseline = mapper.fit([20, 22])
+        with patch.object(mapper, "fit", side_effect=d.NumericalFailure("injected_solver_failure")):
+            recovered, reason = r.resolve_distribution(mapper, {"mean": [20, 22], "failure": None}, "E1", "full", baseline)
+        self.assertIs(recovered, baseline)
+        self.assertEqual(reason, "injected_solver_failure")
+
+    def test_candidate_grid_failure_returns_counted_baseline(self):
+        mapper = d.JointBase.from_scores([[14, 21], [28, 17]], [1, 1])
+        baseline = mapper.fit([20, 22])
+        broken = mapper.fit([22, 20])
+        with patch.object(mapper, "fit", return_value=broken), patch.object(broken, "grid", side_effect=d.NumericalFailure("grid_tail_budget_exceeded")):
+            recovered, reason = r.resolve_distribution(mapper, {"mean": [22, 20], "failure": None}, "E1", "full", baseline)
+        self.assertIs(recovered, baseline)
+        self.assertEqual(reason, "grid_tail_budget_exceeded")
+
+    def test_common_mapper_is_not_variant_mean_decay(self):
+        rows = [m.HistoricalResult(m.GameContext("a", 2010, 1, "T00", "T01"), 7, 10),
+                m.HistoricalResult(m.GameContext("b", 2020, 1, "T00", "T01"), 28, 31)]
+        mapper = r.common_mapper({"history": rows}, 2021)
+        w = m.weights(rows, 2021, 2.5)
+        self.assertAlmostEqual(mapper.b, (w[0] * 8.5 + w[1] * 29.5) / w.sum())
+        self.assertNotAlmostEqual(mapper.b, (8.5 + .5 * 29.5) / 1.5)
+
+
+if __name__ == "__main__":
+    unittest.main()

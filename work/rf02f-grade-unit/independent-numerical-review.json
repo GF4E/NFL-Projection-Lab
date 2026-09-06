@@ -1,0 +1,56 @@
+{
+  "status": "accepted",
+  "scope": "synthetic_published_origin_grader_unit_only",
+  "source_hashes": {
+    "scripts/research_score_split_grade.py": "042ed7773ee8e0fa0979eb22b7a2bc20f699c8ec2e2a05f761fce80a5aa81f4e",
+    "tests/research-score-split/test_grade_unit.py": "a99289bd9341bbd202107d7491bd9ad8a8022505b57b38ede9db2114b5ccfea1",
+    "scripts/research_score_split_controller.py": "021c0c6139bd767020e788c587d908df28f9d086c73b2392587304a7a451db7b",
+    "scripts/research_score_split_archive.py": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+    "scripts/research_score_split_forecast.py": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34",
+    "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+    "scripts/research_score_split_inference.py": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22",
+    "scripts/research_score_compute_distribution.py": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1",
+    "scripts/research_score_metrics.py": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97",
+    "scripts/research_score_distribution.py": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+    "tests/research-score-split/test_archive_unit.py": "510c10f77c194dcb5c9591404c5238f43f494659aa96a247db0013ffd3f2969e",
+    "tests/research-score-split/test_forecast_unit.py": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312"
+  },
+  "blockers": [],
+  "independent_evidence": {
+    "focused_tests_passed": 13,
+    "unittest_seconds": 6.267,
+    "exit_code": 0,
+    "distinct_probe": {
+      "new_zero_strength_uncached_metric_bytes_equal": true,
+      "sample_game_id": "z-target",
+      "raw_N0_exact_saved_bytes_equal": true,
+      "counts": {
+        "inner_rows": 54,
+        "outer_rows": 38,
+        "copied_diagonal_inner": 18,
+        "scored_inner": 36,
+        "copied_e3_outer": 22,
+        "scored_outer": 4,
+        "copied_raw_outer": 12,
+        "actual_score_calls": 40,
+        "actual_mass_cdf_calls": 208
+      },
+      "seconds": 0.6196987500006799
+    },
+    "peak_rss_mib": 210.71875
+  },
+  "findings": [
+    "Actual Store publication and saved binding/law/reuse validation precede archive grade_inputs label access. First inner double-grid uses season+setting, unchanged original lifetime semantics;2010 state-only and2025 no-inner paths covered.",
+    "Copied original inner/outer/raw metrics are not rescored; source forecasts and source losses carry distinct precise pointers. E3only actual80interval masses use F(U)-F(L-1) on descriptor-bound law.",
+    "New scorers run inside disjoint accounting with effective flags; failed calls/cdfattempts retained, failure poisons instance against retry.",
+    "Saved metrics are strict JSON reloaded and validated before return. Both score/provenance files and directory fsync complete before selector-ready return.",
+    "Independent newlyscored zero-strength row agrees byte-for-byte with original uncached scorer; sampled rawN0 remains exact copied bytes."
+  ],
+  "limitations": [
+    "No historical archive/admission, fullfixture, bootstrap or full277-origin controller execution.",
+    "Synthetic fixtures construct small genuine distributions/means and score inputs, but do not qualify a historical source population or scientific outcome.",
+    "Grader depends on owning controller validate_binding for full durable state/ancestry/publication semantics; callable result checks are not independent archive authentication.",
+    "Controller wholefile hash is observed snapshot, not full controller acceptance; its unrelated integration may change.",
+    "Acceptance covers this held grader source/tests with dependencies listed, not final prefit acceptance or historical authorization."
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "changed_science_or_artifacts": false,
+  "observed_original_fields": 104,
+  "reason": "Initial audit incorrectly asserted 108 scorer fields. Unchanged scorer output has 104; four interval-mass fields are added by the excluded historical grader layer. The assertion failed before final review creation.",
+  "repair": "Corrected audit count to 104 and retained exact full original-vs-candidate metric byte comparisons.",
+  "status": "retained_audit_only_failure"
+}

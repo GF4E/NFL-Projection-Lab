@@ -1,0 +1,18 @@
+# Cost-gate dependency review
+
+Decision: **no further concrete candidate is justified by the current source and accepted timing evidence.** Complete the existing dependency table and stop at that decision; this review does not propose another profile, harness, controller or historical invocation.
+
+Read-only basis: frozen `scripts/research_score_split_budget.py`; current `scripts/research_score_split_compute_integration.py` grader boundaries; accepted RF-COMP-04 and RF-COMP-07 results; saved origin-profile attribution review. No source imports, numerical execution, tests, retiming or archive replay.
+
+The fixed projection is `E + W*(C + 31*(2*Fmax + 2*Smax)) + 2*T + max(60,A)`. Both maxima range over **all actual callbacks, including failures**. Successful full off-diagonal fit/full outer score are required anchors, not restrictions on the maximum populations. The multiplier remains 31 regardless of observed call count.
+
+| Proposed affected path | Actual governing term and constraint |
+|---|---|
+| Inner scoring implementation | Can lower Smax only if it lowers the governing score callback; lowering other inner calls or their count alone primarily lowers elapsed E. Outer calls always retain diagnostics and double-grid, while inner calls omit diagnostics and only the first year/setting uses double-grid. Inner-only savings cannot establish a lower outer maximum. The saved evidence does not attribute a sufficient removable share of the governing maximum to an inner-only operation. |
+| Shared scorer operation | Could reach both inner and outer Smax, but must preserve every score, flag, warning/error and complete metric dictionary. COMP-07 already tested one such reachable operation: aggregate ratio 0.8908471484 and maximum ratio 0.8568699402 both missed 0.7738077598, even with favorable identical-law reuse. No combining this isolated gain with other unintegrated helpers. |
+| Metric hashing, strict serialization, saved-score reload/validation, provenance and directory fsync | These are outside `accounting.callback('score', ...)`; genuine reductions in complete-origin overhead can reduce C and E, not Fmax/Smax. Fresh saved-publication authentication, metrics equality, observation validation and durable publication/feed ordering remain required. The selector's narrower consumption does not permit reducing the 28-field inner schema or these checks. |
+| Fewer callbacks or moving work across timer boundaries | Fewer calls do not reduce the fixed future 31-slot charge. If callback duration and complete-origin duration fall equally, their contribution cancels from the C remainder. Moving the same work outside a callback increases C and cannot be claimed as removed cost. Fit maxima are unaffected by inner scoring/persistence changes. |
+
+RF-COMP-04's remaining targets are conditional: 12.39% lower Fmax+Smax, or 42.05% lower C, holding the other terms fixed. The profile's 65.99% serialization bucket was an inclusive-overlap-controlled attribution ceiling, not achievable savings; its serializer successor was slower. The bank snapshot helper is only a partial-cost result, and the complete scorer geometry screen failed. No source-only inner shortcut now demonstrates the needed maximum or remainder reduction while keeping checks unchanged. A reachable code location alone is insufficient grounds for another implementation.
+
+Limits: this is a dependency/decision check, not a fresh measurement or proof that all possible optimizations are exhausted. It neither supplies historical capacity nor changes the negative results, scientific gates, external 5% objective or public scope.

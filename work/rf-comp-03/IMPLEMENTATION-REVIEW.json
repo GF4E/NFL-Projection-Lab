@@ -1,0 +1,115 @@
+{
+  "blockers": [],
+  "candidate": {
+    "bytes": 5389,
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_encoding_memo.py",
+    "sha256": "da369432128b28c8268b47fb98bccaa3751d853a1b6876c7526cf9040d7addf2"
+  },
+  "checks": {
+    "candidate_exact_root_hash": true,
+    "distribution_descriptor_exact_AST_except_encode_parameter_and_call": true,
+    "frozen66_files_unchanged": true,
+    "recover_distribution_exact_AST_except_encode_parameter_and_call": true,
+    "recover_source_law_exact_AST_except_parameter_call_and_require_alias": true,
+    "resolve_exact_AST_except_local_memo_and_three_encode_arguments": true,
+    "subclass_overrides_only_resolve": true
+  },
+  "design": {
+    "bytes": 5313,
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/DESIGN-REVIEW.md",
+    "sha256": "58012fc2832af8a114ea5db89117dcaa6ae31d28cb23b488297569d88905202f"
+  },
+  "findings": [
+    "Every cached key is constructed from one current tuple snapshot of an exact builtin list of exact builtin finite floats. Big-endian IEEE754 packing preserves every bit, signed zero and length; it uses direct bytes equality rather than a digest or mutable ndarray identity.",
+    "The original pinned encoder is bound once per instance. Misses encode a plain-list copy of the same snapshot; successful original bytes are retained only after encoding returns. Unsupported calls pass the original object unchanged and retain the previous entry. Exceptions are neither cached nor retried.",
+    "EncodingMemo is allocated as the first statement inside each actual fit callback. Only EncodingAssembly.resolve is overridden. Inherited source recovery/cache, selected forecasts, full assembly routing and fallback selection remain unchanged. No cache or encoder rebinding is global; separate callbacks cannot share memo entries.",
+    "The descriptor and reconstruction copies are AST-identical after exactly the reviewed encode-parameter substitution. The source-law wrapper also retains the archive require binding, so unqualified classes and descriptor failures retain AdmissionFailure rather than forecast ValueError.",
+    "The resolve copy is AST-identical after local memo creation and the three explicit callable arguments. It still executes original native resolution, reason/fallback guards, strict JSON conversion, mapper.components, SHA comparison, beta/rates checks, law construction, moments validation, frozen copies, complete descriptor roundtrip and callback failure/accounting metadata.",
+    "For identical successful alpha contents the intended saving is repeated serialization only: fitted descriptor encodes once, independent recovered alpha and recovered descriptor may hit. Snapshot/type/finite scans and full bit keys still execute on every call. Components, hashing and all checks are not memoized.",
+    "Fallback self.recover retains its inherited original encoder path. The new memo can cover only the later descriptor/reconstruction roundtrip, not the inherited fallback recovery itself."
+  ],
+  "frozen_source_map": {
+    "bytes": 8755,
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/controller-final-pins-20260905.json",
+    "sha256": "891d03da52317a62ee307e7c1c27b805413f6676520aa6acfd3651642de5f4f7"
+  },
+  "historical_execution": false,
+  "limits": [
+    "Static review only: no module imported, no tests, scoring, fitting, recovery, scientific or historical calls executed. AST parsing and metadata hashing are the only executable verification here.",
+    "No numerical equality, performance, capacity, full-controller integration or historical authorization is established.",
+    "Pinned original encoder always returns immutable bytes; behavior under deliberate replacement with an arbitrary non-bytes encoder is outside the shipping contract.",
+    "Synchronous use only; new snapshot/key allocations do not promise identical resource-exhaustion behavior or safety against concurrent caller mutation.",
+    "Driver and independently authored tests were not part of this source-only acceptance."
+  ],
+  "relevant_dependency_pins": {
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_admission.py": {
+      "bytes": 32322,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_admission.py",
+      "sha256": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8"
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_contract.py": {
+      "bytes": 8198,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_contract.py",
+      "sha256": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34"
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py": {
+      "bytes": 13532,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+      "sha256": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1"
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_replay.py": {
+      "bytes": 6657,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_replay.py",
+      "sha256": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594"
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py": {
+      "bytes": 27993,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py",
+      "sha256": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa"
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_archive.py": {
+      "bytes": 44888,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_archive.py",
+      "sha256": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423"
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_forecast.py": {
+      "bytes": 23576,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_forecast.py",
+      "sha256": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34"
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py": {
+      "bytes": 23897,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py",
+      "sha256": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7"
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py": {
+      "bytes": 4148,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py",
+      "sha256": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974"
+    }
+  },
+  "required_remaining_qualification": [
+    "Independent focused tests of mutation, signed zero, unsupported inputs, encoder failures/commit ordering and cross-callback isolation.",
+    "Original/candidate corruption tests proving components/hash/moment/schema/fallback/roundtrip failures remain equal in type and message.",
+    "Static driver/test review, exact source/runtime/input pins, and one bounded complete callback qualification with save-before-assert evidence.",
+    "Independent post-terminal exactness and unprofiled separate-max cost review against the unchanged target."
+  ],
+  "role": "independent_implementation_design_and_source_review",
+  "runtime_to_be_qualified": {
+    "executable": "/opt/anaconda3/bin/python3.12",
+    "isolated": true,
+    "numpy": "1.26.4",
+    "platform": "darwin",
+    "python": "3.12.2",
+    "scipy": "1.13.1"
+  },
+  "scientific_execution": false,
+  "scope": {
+    "bytes": 5604,
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-03/QUALIFICATION-SCOPE.md",
+    "sha256": "687fd84207dafa039185e9dfba091d460ac17a349599bd3c3bf4eb3d2aafacec"
+  },
+  "status": "accepted_static_implementation_for_synthetic_qualification_only",
+  "tests_executed": 0,
+  "version": "rf-comp-03.implementation-review.v1"
+}

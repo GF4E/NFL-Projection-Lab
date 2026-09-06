@@ -1,0 +1,403 @@
+"""Synthetic inference/gate arithmetic; no historical distributions or fitting."""
+import copy
+import json
+from pathlib import Path
+import resource
+import sys
+import time
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
+import research_score_conditional_inference as unit
+
+
+def configuration():
+    return json.loads((Path(__file__).resolve().parents[2] / 'config/research-team-score-conditional.v1.json').read_bytes())
+
+
+def decision_fixture():
+    config = configuration()
+    mapped, raw, comparisons, cells = unit._registered(config)
+    metadata = [{'game_id': f'{year}-{i}', 'season': year, 'week': i + 1}
+                for year in unit.YEARS for i in range(5)]
+    metrics, failures = {}, {}
+    for key in mapped + raw:
+        rows = []
+        for row in metadata:
+            energy = 98. if key[0] == 'E2C' else 100.
+            result = {'joint_energy_score': energy, 'joint_nll': 10.}
+            for target in unit.TARGETS:
+                result.update({target + '_crps': 5., target + '_mae': 3.,
+                               target + '_coverage_80': float(row['week'] <= 4), target + '_width_80': 20.})
+            rows.append(result)
+        metrics[key], failures[key] = rows, [False] * len(metadata)
+    inference = {'comparisons': {}, 'calibration_cells': {}}
+    for name, ref, candidate in comparisons:
+        removal = ref[0] == candidate[0]
+        lo, hi = (-.02, -.001) if removal else (.001, .03)
+        inference['comparisons'][name] = {'gain': .02, 'blocks': {
+            str(length): {'lower': lo, 'upper': hi, 'bootstrap_sd': .01} for length in unit.LENGTHS}}
+    for cell in cells:
+        inference['calibration_cells'][':'.join(map(str, cell))] = {'residual': 0., 'blocks': {
+            str(length): {'lower': -.01, 'upper': .01, 'bootstrap_sd': .01} for length in unit.LENGTHS}}
+    return config, metadata, metrics, failures, mapped, inference
+
+
+def production_fixture():
+    config = configuration()
+    mapped, raw, _, _ = unit._registered(config)
+    metadata = []
+    for year, count in zip(unit.YEARS, unit.YEAR_COUNTS):
+        weeks = 17 if year <= 2020 else 18
+        for week in range(1, weeks + 1):
+            for i in range(count // weeks + (week <= count % weeks)):
+                metadata.append({'game_id': f'{year}-{week}-{i}', 'season': year, 'week': week})
+    base = {'joint_energy_score': 2., 'joint_nll': 3., 'home_win_probability': .4, 'tie_probability': .2,
+            'away_win_probability': .4, 'home_win_observed': 0., 'predicted_covariance': .1, 'residual_product': .2,
+            'grid_cells': [8, 8], 'grid_transport_bound': 1e-8, 'grid_probability_bound': 1e-10,
+            'double_grid_difference': 1e-10, 'home_win_brier': .16, 'home_win_log_loss': .51,
+            'win_tie_loss_brier': .5, 'win_tie_loss_log_loss': .92,
+            'tail_absolute_margin_21': .01, 'tail_total_70': .02,
+            'observed_absolute_margin_21': 0., 'observed_total_70': 0.}
+    for target, observed in zip(unit.TARGETS, (1., 2., -1., 3.)):
+        base.update({target + '_observed': observed, target + '_mean': observed + .1,
+                     target + '_crps': 1., target + '_mae': .1, target + '_squared_error': .01,
+                     target + '_pit': .5})
+        for level in unit.LEVELS:
+            suffix = str(round(100 * level))
+            base.update({f'{target}_lower_{suffix}': -2, f'{target}_upper_{suffix}': 4,
+                         f'{target}_coverage_{suffix}': 1., f'{target}_width_{suffix}': 6,
+                         f'{target}_boundary_distance_{suffix}': .01})
+    rows = {}
+    for key in mapped + raw:
+        row_metrics = dict(base)
+        if key in mapped:
+            row_metrics.update({target + '_interval_mass_80': .83 for target in unit.TARGETS})
+        rows[key] = [{'game_id': row['game_id'], 'native_failure': None, 'metrics': dict(row_metrics)} for row in metadata]
+    return config, metadata, rows, {name: True for name in unit.AUDITS}
+
+
+class InferenceTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.started = time.monotonic()
+
+    @classmethod
+    def tearDownClass(cls):
+        elapsed = time.monotonic() - cls.started
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == 'darwin' else 1024)
+        if elapsed > 120 or rss > 4096:
+            raise AssertionError(f'synthetic_budget_exceeded: seconds={elapsed}, rss_mib={rss}')
+
+    def decide(self, values):
+        _, metadata, metrics, failures, mapped, inference = values
+        return unit._decision(metadata, metrics, failures, mapped, inference)
+
+    def test_exact_registered_order_and_families(self):
+        config = configuration()
+        mapped, raw, comparisons, cells = unit._registered(config)
+        self.assertEqual((len(mapped), len(raw), len(comparisons), len(cells)), (20, 6, 28, 16))
+        self.assertEqual(comparisons[0], ('N0C:full->N0C:no_home_effect', ('N0C', 'full'), ('N0C', 'no_home_effect')))
+        self.assertEqual(comparisons[-1], ('S1:full->E2C:full', ('S1', 'full'), ('E2C', 'full')))
+        for field in ('series', 'raw_references', 'comparisons', 'calibration_cells'):
+            for operation in ('drop', 'duplicate', 'reverse'):
+                changed = copy.deepcopy(config)
+                if operation == 'drop': changed[field].pop()
+                elif operation == 'duplicate': changed[field][-1] = changed[field][0]
+                else: changed[field].reverse()
+                with self.subTest(field=field, operation=operation), self.assertRaises(unit.InferenceFailure):
+                    unit._registered(changed)
+        changed = copy.deepcopy(config)
+        changed['inference']['members'] = 8
+        self.assertEqual(unit.evaluate(changed, [], {}, {})['status'], 'protocol_invalid')
+
+    def test_paired_ratio_recomputed_with_shared_counts_and_separate_families(self):
+        losses = np.array([[1., 2., 1.], [3., 1., 2.], [4., 5., 2.], [2., 1., 3.]])
+        residuals = np.array([[.2, -.8], [-.8, .2], [.1, -.9], [.1, .1]])
+        groups = np.array([0, 0, 1, 2])
+        counts = np.array([[1, 1, 1], [2, 0, 1], [0, 2, 1], [1, 0, 2], [2, 1, 0]])
+        references, candidates = np.array([0, 0, 1]), np.array([1, 2, 2])
+        result = unit.paired_block_statistics(losses, residuals, counts, groups, references, candidates)
+        expected_gains, expected_residuals = [], []
+        for row in counts:
+            multiplicities = row[groups]
+            means = np.average(losses, axis=0, weights=multiplicities)
+            expected_gains.append(1 - means[candidates] / means[references])
+            expected_residuals.append(np.average(residuals, axis=0, weights=multiplicities))
+        np.testing.assert_allclose(result['sampled_gains'], expected_gains, rtol=0, atol=1e-15)
+        np.testing.assert_allclose(result['sampled_residuals'], expected_residuals, rtol=0, atol=1e-15)
+        self.assertFalse(np.allclose(result['sampled_gains'][0], np.mean(1 - losses[:, candidates] / losses[:, references], axis=0)))
+        expected_energy = unit.simultaneous_intervals(result['gains'], np.array(expected_gains))
+        expected_calibration = unit.simultaneous_intervals(result['residuals'], np.array(expected_residuals))
+        for actual, expected in zip(result['energy'], expected_energy): np.testing.assert_allclose(actual, expected)
+        for actual, expected in zip(result['calibration'], expected_calibration): np.testing.assert_allclose(actual, expected)
+        self.assertNotEqual(result['energy'][3], result['calibration'][3])
+
+    def test_block_invalid_denominators_counts_and_nonfinites(self):
+        good = (np.array([[1., 2.], [2., 1.]]), np.array([[.1], [-.1]]), np.array([[1, 1], [2, 1]]),
+                np.array([0, 1]), np.array([0]), np.array([1]))
+        for position, value in ((0, [[0., 2.], [0., 1.]]), (0, [[np.nan, 2.], [2., 1.]]),
+                                (2, [[0, 0], [1, 1]]), (2, [[.5, 1], [1, 1]]),
+                                (2, [[-1, 2], [1, 1]]), (3, [0, 2]), (4, [True])):
+            args = list(good); args[position] = value
+            with self.subTest(position=position), self.assertRaises(unit.InferenceFailure):
+                unit.paired_block_statistics(*args)
+
+    def test_each_count_matrix_reused_for_28_energy_and_16_actual_mass_cells(self):
+        mapped, raw, comparisons, cells = unit._registered(configuration())
+        metadata = [{'game_id': 'a', 'season': 2013, 'week': 1}, {'game_id': 'b', 'season': 2013, 'week': 2}]
+        metrics = {}
+        for index, key in enumerate(mapped + raw):
+            metrics[key] = []
+            for i in range(2):
+                row = {'joint_energy_score': 10. + index + i * (1 + index / 10)}
+                for target in unit.TARGETS:
+                    row[target + '_interval_mass_80'] = .6
+                    row[target + '_pit'] = .2 + i * .6
+                    for level in unit.LEVELS:
+                        row[f'{target}_coverage_{round(100 * level)}'] = float(i == 0)
+                metrics[key].append(row)
+        counts = np.resize(np.array([[1, 1], [2, 0], [0, 2]], dtype=np.int16), (10000, 2))
+        calls = []
+        def weights(meta, length, **kwargs):
+            calls.append((meta, length, kwargs))
+            return counts.copy(), np.array([0, 1]), [(2013, 1), (2013, 2)]
+        real_intervals = unit.simultaneous_intervals
+        shapes = []
+        def intervals(point, sampled):
+            shapes.append((len(point), sampled.shape))
+            return real_intervals(point, sampled)
+        with patch.object(unit, 'block_weights', side_effect=weights), \
+             patch.object(unit, 'simultaneous_intervals', side_effect=intervals):
+            result = unit._infer(metadata, metrics, mapped, raw, comparisons, cells)
+        self.assertEqual([call[1] for call in calls], [1, 3, 6])
+        self.assertTrue(all(call[2] == {'members': 10000, 'required_seasons': 12} for call in calls))
+        self.assertEqual(shapes, [(28, (10000, 28)), (16, (10000, 16))] * 3)
+        self.assertTrue(all(abs(cell['residual'] + .1) < 1e-15 for cell in result['calibration_cells'].values()))
+        self.assertEqual(len(result['blocks']['1']['coverage']), 240)
+        self.assertEqual(len(result['blocks']['1']['pit_simultaneous_bands']), 80)
+        with patch.object(unit, 'block_weights', return_value=(counts[:2], np.array([0, 1]), [(2013, 1), (2013, 2)])):
+            with self.assertRaisesRegex(unit.InferenceFailure, 'production_bootstrap_member_count'):
+                unit._infer(metadata, metrics, mapped, raw, comparisons, cells)
+
+    def test_candidate_and_mapping_both_pass_without_promotion(self):
+        result = self.decide(decision_fixture())
+        self.assertEqual(result['status'], 'research_candidate_qualified_not_promoted')
+        self.assertTrue(result['mapping_supported'])
+        self.assertTrue(result['candidate_qualified'])
+        self.assertFalse(result['production_authorized'])
+        self.assertFalse(result['external_five_percent_achieved'])
+        self.assertEqual(len([name for name in result['mapping_checks'] if name.startswith('calibration:')]), 8)
+        self.assertEqual(len([name for name in result['candidate_checks'] if name.startswith('calibration:')]), 16)
+
+    def test_N0_only_calibration_failure_separates_mapping_support(self):
+        values = decision_fixture()
+        values[-1]['calibration_cells']['N0C:availability_24h:margin:80']['blocks']['3']['lower'] = .001
+        result = self.decide(values)
+        self.assertEqual(result['status'], 'mapping_supported_only')
+        self.assertTrue(result['mapping_supported'])
+        self.assertFalse(result['candidate_qualified'])
+        values[-1]['calibration_cells']['E2C:full:home:80']['blocks']['6']['upper'] = -.001
+        self.assertEqual(self.decide(values)['status'], 'reject_all')
+
+    def test_mapping_is_not_additional_candidate_prerequisite(self):
+        values = decision_fixture()
+        for row in values[2]['E2', 'availability_24h']:
+            row['joint_nll'] = 5.
+        result = self.decide(values)
+        self.assertFalse(result['mapping_supported'])
+        self.assertTrue(result['candidate_qualified'])
+        self.assertEqual(result['status'], 'research_candidate_qualified_not_promoted')
+
+    def test_mapping_energy_requires_all_lengths_and_both_regimes(self):
+        for variant in ('full', 'availability_24h'):
+            values = decision_fixture()
+            values[-1]['comparisons'][f'E2:{variant}->E2C:{variant}']['blocks']['1']['lower'] = 0.
+            self.assertFalse(self.decide(values)['mapping_supported'])
+
+    def test_stable_variant_requires_all_lengths_but_mechanisms_require_all_negative(self):
+        for variant in ('independent_marginals', 'shuffled_identity', 'deterministic_noise', 'no_team_identity'):
+            values = decision_fixture()
+            blocks = values[-1]['comparisons'][f'E2C:full->E2C:{variant}']['blocks']
+            blocks['1']['lower'], blocks['1']['upper'] = .001, .02
+            self.assertTrue(self.decide(values)['candidate_qualified'])
+            for block in blocks.values(): block.update(lower=.001, upper=.02)
+            self.assertFalse(self.decide(values)['candidate_qualified'])
+        for variant in ('no_offense', 'no_defense'):
+            values = decision_fixture()
+            values[-1]['comparisons'][f'E2C:full->E2C:{variant}']['blocks']['3']['upper'] = 0.
+            self.assertFalse(self.decide(values)['candidate_qualified'])
+
+    def test_S1_inferiority_requires_all_lengths(self):
+        values = decision_fixture()
+        blocks = values[-1]['comparisons']['S1:full->E2C:full']['blocks']
+        blocks['1'].update(lower=-.03, upper=-.01)
+        self.assertTrue(self.decide(values)['candidate_qualified'])
+        for block in blocks.values(): block.update(lower=-.03, upper=-.01)
+        self.assertFalse(self.decide(values)['candidate_qualified'])
+
+    def test_point_secondary_width_and_coverage_boundaries(self):
+        values = decision_fixture()
+        for row in values[2]['E2C', 'full']:
+            row['joint_energy_score'] = 99.
+            row['joint_nll'] = 1.005 * 10.
+            row['home_mae'] = 3.1
+            for target in unit.TARGETS: row[target + '_width_80'] = 22.
+        self.assertTrue(self.decide(values)['candidate_qualified'])
+        values[2]['E2C', 'full'][0]['joint_nll'] += 1e-8
+        self.assertFalse(self.decide(values)['candidate_qualified'])
+        values = decision_fixture()
+        for row in values[2]['E2C', 'full']:
+            row['joint_energy_score'] = 98.
+            row['home_width_80'] = 50.
+        self.assertTrue(self.decide(values)['candidate_qualified'])
+        for row in values[2]['E2C', 'full']: row['joint_energy_score'] = 98.01
+        self.assertFalse(self.decide(values)['candidate_qualified'])
+        for coverage, expected in ((.72, True), (.88, True), (.71999, False), (.88001, False)):
+            values = decision_fixture()
+            if coverage in (.72, .88):
+                # Integer indicators yield exactly the registered boundary, avoiding
+                # a sum of repeated non-binary synthetic coverage fractions.
+                values[1][:] = [{'game_id': str(i), 'season': 2013 + i % 12, 'week': 1} for i in range(100)] + [
+                                {'game_id': 'diagnostic', 'season': 2025, 'week': 1}]
+                for key in values[2]:
+                    values[2][key] = [dict(values[2][key][0]) for _ in values[1]]
+                    values[3][key] = [False] * len(values[1])
+                    for i, row in enumerate(values[2][key]):
+                        for target in unit.TARGETS: row[target + '_coverage_80'] = float(i < 80)
+                for i, row in enumerate(values[2]['E2C', 'full']):
+                    row['home_coverage_80'] = float(i < round(100 * coverage))
+            else:
+                for row in values[2]['E2C', 'full']: row['home_coverage_80'] = coverage
+            self.assertEqual(self.decide(values)['candidate_qualified'], expected)
+
+    def test_both_baselines_classical_and_24h_are_required(self):
+        for comparison in ('N0:full->E2C:full', 'N0C:full->E2C:full', 'E1:full->E2C:full'):
+            values = decision_fixture()
+            values[-1]['comparisons'][comparison]['blocks']['6']['lower'] = 0.
+            self.assertFalse(self.decide(values)['candidate_qualified'])
+        for baseline in ('N0', 'N0C'):
+            values = decision_fixture()
+            for row in values[2][baseline, 'availability_24h']: row['joint_energy_score'] = 97.
+            self.assertFalse(self.decide(values)['candidate_qualified'])
+
+    def test_exposed_2025_changes_only_prescribed_stability_point(self):
+        values = decision_fixture()
+        before = self.decide(values)
+        for key, rows in values[2].items():
+            for i, row in enumerate(rows):
+                if values[1][i]['season'] == 2025:
+                    row['joint_energy_score'] = 120. if key == ('E2C', 'full') else 100.
+                    row['joint_nll'] = 1e6
+                    row['home_width_80'] = 1e6
+        after = self.decide(values)
+        self.assertEqual(before['mapping_checks'], after['mapping_checks'])
+        self.assertEqual(before['all_issued_native_failure_rates'], after['all_issued_native_failure_rates'])
+        for key in before['stability']:
+            for field in ('development_gain', 'season_gains', 'leave_one_season_out_gains'):
+                self.assertEqual(before['stability'][key][field], after['stability'][key][field])
+        self.assertFalse(after['candidate_qualified'])
+        changed_checks = [name for name in before['candidate_checks'] if before['candidate_checks'][name] != after['candidate_checks'][name]]
+        self.assertEqual(set(changed_checks), {'N0:full:exposed_2025_positive', 'N0C:full:exposed_2025_positive'})
+
+    def test_season_count_LOSO_and_failure_threshold(self):
+        values = decision_fixture()
+        for i, row in enumerate(values[2]['E2C', 'full']):
+            if values[1][i]['season'] <= 2017: row['joint_energy_score'] = 100.
+        self.assertFalse(self.decide(values)['candidate_checks']['N0:full:eight_improved_seasons'])
+        values = decision_fixture()
+        values[3]['E2C', 'no_defense'][0] = True
+        self.assertFalse(self.decide(values)['candidate_checks']['E2C:no_defense:native_failure_ceiling'])
+        # Explicit synthetic 200-game decision cohort checks the exact 0.5% boundary.
+        values = decision_fixture()
+        _, metadata, metrics, failures, mapped, inference = values
+        metadata[:] = [{'game_id': str(i), 'season': 2013 + i % 12, 'week': 1} for i in range(199)] + [
+                       {'game_id': 'diagnostic', 'season': 2025, 'week': 1}]
+        for key in metrics:
+            metrics[key] = [dict(metrics[key][0]) for _ in metadata]
+            for row in metrics[key]:
+                for target in unit.TARGETS: row[target + '_coverage_80'] = .8
+            failures[key] = [False] * len(metadata)
+        failures['E2C', 'full'][0] = True
+        self.assertTrue(self.decide(values)['candidate_checks']['E2C:full:native_failure_ceiling'])
+        failures['E2C', 'full'][1] = True
+        self.assertFalse(self.decide(values)['candidate_checks']['E2C:full:native_failure_ceiling'])
+
+    def test_failure_scope_includes_2025_but_classical_reports_do_not_veto(self):
+        values = decision_fixture()
+        values[3]['E2C', 'independent_marginals'][-1] = True
+        result = self.decide(values)
+        self.assertFalse(result['candidate_qualified'])
+        self.assertAlmostEqual(result['all_issued_native_failure_rates']['E2C:independent_marginals'], 1 / 65)
+        values = decision_fixture()
+        for key in (('E1', 'full'), ('S1', 'full')): values[3][key] = [True] * 65
+        result = self.decide(values)
+        self.assertTrue(result['candidate_qualified'])
+        self.assertEqual(result['all_issued_native_failure_rates']['E1:full'], 1.)
+        self.assertNotIn('E1:full:native_failure_ceiling', result['candidate_checks'])
+        self.assertNotIn('S1:full:native_failure_ceiling', result['candidate_checks'])
+
+    def test_structural_unavailability_must_match_actual_constant_predictor(self):
+        rows = [{**{target + '_mean': 1. for target in unit.TARGETS}, 'home_win_probability': .5} for _ in range(3)]
+        valid = {target: {'status': 'unavailable_by_design', 'reason': 'constant_predictor', 'rank': 1,
+                         'prediction_min': .5 if target == 'home_win' else 1.,
+                         'prediction_max': .5 if target == 'home_win' else 1., 'n': 3}
+                 for target in (*unit.TARGETS, 'home_win')}
+        unit._validate_calibration(valid, rows)
+        for field, value in (('reason', 'failed'), ('rank', True), ('prediction_max', 2.), ('n', True),
+                             ('status', 'diagnostic_failure')):
+            changed = copy.deepcopy(valid); changed['home'][field] = value
+            with self.assertRaises(unit.InferenceFailure): unit._validate_calibration(changed, rows)
+        rows[0]['home_mean'] = 1.01
+        with self.assertRaisesRegex(unit.InferenceFailure, 'unsubstantiated'):
+            unit._validate_calibration(valid, rows)
+
+    def test_production_membership_validation_and_missing_audit_fail_closed(self):
+        config, metadata, rows, audits = production_fixture()
+        result = unit._validate(config, metadata, rows, audits)
+        self.assertEqual((len(result[0]), len(result[1])), (20, 6))
+        with self.assertRaises(unit.InferenceFailure): unit._validate(config, metadata[:-1], rows, audits)
+        for value in (False, 1, None):
+            changed = dict(audits); changed['leakage'] = value
+            with self.assertRaisesRegex(unit.InferenceFailure, 'required_audit_failure'):
+                unit._validate(config, metadata, rows, changed)
+        self.assertEqual(unit.evaluate(config, [], {}, audits)['status'], 'protocol_invalid')
+        first = rows['E2C', 'full'][0]
+        old = first['game_id']; first['game_id'] = 'wrong'
+        with self.assertRaisesRegex(unit.InferenceFailure, 'alignment'):
+            unit._validate(config, metadata, rows, audits)
+        first['game_id'] = old
+        first['metrics']['home_interval_mass_80'] = 1.1
+        with self.assertRaisesRegex(unit.InferenceFailure, 'interval_mass'):
+            unit._validate(config, metadata, rows, audits)
+        first['metrics']['home_interval_mass_80'] = .83
+        rows['N0C', 'full'][0]['native_failure'] = 'unexpected'
+        with self.assertRaisesRegex(unit.InferenceFailure, 'required_N0'):
+            unit._validate(config, metadata, rows, audits)
+
+    def test_evaluate_filters_development_before_inference(self):
+        config, metadata, rows, audits = production_fixture()
+        fake_card = {'games': 3135, 'metrics': {}, 'calibration': {}, 'pit': {}}
+        captured = []
+        def infer(dev_metadata, dev_metrics, mapped, raw, comparisons, cells):
+            captured.append((len(dev_metadata), max(row['season'] for row in dev_metadata),
+                             len(dev_metrics['E2C', 'full']), dev_metrics['E2C', 'full'][0]['joint_energy_score']))
+            return {'synthetic': True}
+        with patch.object(unit, 'aggregate', return_value=fake_card), \
+             patch.object(unit, '_validate_calibration'), patch.object(unit, '_infer', side_effect=infer), \
+             patch.object(unit, '_decision', return_value={'status': 'reject_all'}):
+            first = unit.evaluate(config, metadata, rows, audits)
+            for key in rows:
+                for i, row in enumerate(rows[key]):
+                    if metadata[i]['season'] == 2025: row['metrics']['joint_energy_score'] = 1e9
+            second = unit.evaluate(config, metadata, rows, audits)
+        self.assertEqual(first['status'], 'reject_all')
+        self.assertEqual(second['status'], 'reject_all')
+        self.assertEqual(captured, [(3135, 2024, 3135, 2.), (3135, 2024, 3135, 2.)])
+
+
+if __name__ == '__main__':
+    unittest.main()

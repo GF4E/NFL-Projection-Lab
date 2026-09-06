@@ -1,0 +1,306 @@
+"""RF v2 analytic joint-score distribution and deterministic proper scores.
+
+Pure numerical functions: no data access, credentials, network, or production.
+The runner must separately enforce the committed RF-01 admission receipt.
+"""
+from dataclasses import dataclass
+import math
+
+import numpy as np
+from scipy.special import logsumexp, pdtr, pdtrc
+from scipy.stats import poisson, skellam
+
+
+class NumericalFailure(ValueError):
+    pass
+
+
+def _finite(value):
+    if not np.all(np.isfinite(value)):
+        raise NumericalFailure("nonfinite_number")
+
+
+def _validate_atoms(atoms, weights):
+    atoms, weights = np.asarray(atoms, dtype=float), np.asarray(weights, dtype=float)
+    if atoms.ndim != 2 or atoms.shape[1] != 2 or len(atoms) == 0 or weights.shape != (len(atoms),):
+        raise NumericalFailure("invalid_atom_shape")
+    _finite(atoms)
+    _finite(weights)
+    if np.any(atoms < 0) or np.any(atoms != np.floor(atoms)) or np.any(weights < 0) or weights.sum() <= 0:
+        raise NumericalFailure("invalid_atoms_or_weights")
+    return atoms, weights
+
+
+@dataclass
+class JointBase:
+    atoms: np.ndarray
+    weights: np.ndarray
+    b: float
+    epsilon: float = 0.05
+
+    @classmethod
+    def from_scores(cls, scores, weights):
+        scores, weights = _validate_atoms(scores, weights)
+        pairs = np.concatenate((scores, scores[:, ::-1]), axis=0)
+        mass = np.concatenate((weights, weights)) / (2 * weights.sum())
+        atoms, indices = np.unique(pairs, axis=0, return_inverse=True)
+        merged = np.bincount(indices, weights=mass)
+        keep = merged > 0
+        atoms, merged = atoms[keep], merged[keep]
+        b = float(np.sum(merged * atoms.mean(axis=1)))
+        if not b > 0:
+            raise NumericalFailure("zero_training_score_mean")
+        return cls(atoms, merged / merged.sum(), b)
+
+    def components(self, theta):
+        theta = np.asarray(theta, dtype=float)
+        if theta.shape != (2,):
+            raise NumericalFailure("invalid_theta")
+        _finite(theta)
+        with np.errstate(over="ignore", invalid="ignore"):
+            rates = self.b * np.exp(theta)
+            log_atoms = math.log1p(-self.epsilon) + np.log(self.weights) + self.atoms @ theta
+            log_bg = math.log(self.epsilon) + self.b * np.expm1(theta).sum()
+            normalizer = float(logsumexp(np.append(log_atoms, log_bg)))
+            alpha, beta = np.exp(log_atoms - normalizer), float(np.exp(log_bg - normalizer))
+        _finite(rates)
+        _finite(normalizer)
+        _finite(alpha)
+        _finite(beta)
+        mean = alpha @ self.atoms + beta * rates
+        centered = self.atoms - mean
+        covariance = centered.T @ (centered * alpha[:, None]) + beta * (np.diag(rates) + np.outer(rates - mean, rates - mean))
+        _finite(mean)
+        _finite(covariance)
+        return normalizer, alpha, beta, rates, mean, covariance
+
+    def fit(self, requested_mean, maximum_iterations=100):
+        requested = np.asarray(requested_mean, dtype=float)
+        if requested.shape != (2,) or np.any(requested <= 0):
+            raise NumericalFailure("invalid_requested_mean")
+        _finite(requested)
+        theta = np.zeros(2)
+        for iteration in range(maximum_iterations + 1):
+            normalizer, alpha, beta, rates, mean, covariance = self.components(theta)
+            gradient = mean - requested
+            if np.max(np.abs(gradient)) <= 1e-7:
+                return JointDistribution(self.atoms, alpha, beta, rates, theta, iteration)
+            if iteration == maximum_iterations:
+                break
+            try:
+                np.linalg.cholesky(covariance)
+                direction = np.linalg.solve(covariance, -gradient)
+            except np.linalg.LinAlgError as exc:
+                raise NumericalFailure("non_positive_hessian") from exc
+            direction *= min(1.0, 2.0 / max(2.0, float(np.max(np.abs(direction)))))
+            descent = float(gradient @ direction)
+            if not descent < 0:
+                raise NumericalFailure("not_descent")
+            objective = normalizer - float(theta @ requested)
+            accepted = False
+            for halvings in range(41):
+                step = 0.5 ** halvings
+                trial = theta + step * direction
+                try:
+                    trial_objective = self.components(trial)[0] - float(trial @ requested)
+                except NumericalFailure:
+                    continue
+                if trial_objective <= objective + 1e-4 * step * descent:
+                    theta = trial
+                    accepted = True
+                    break
+            if not accepted:
+                raise NumericalFailure("line_search_failed")
+        raise NumericalFailure("mean_match_not_converged")
+
+
+@dataclass
+class ScoreGrid:
+    probability: np.ndarray
+    omitted_probability_bound: float
+    score_error_bound: float
+
+
+@dataclass
+class JointDistribution:
+    atoms: np.ndarray
+    alpha: np.ndarray
+    beta: float
+    rates: np.ndarray
+    theta: np.ndarray
+    iterations: int
+    independent: bool = False
+
+    def moments(self):
+        mean = self.alpha @ self.atoms + self.beta * self.rates
+        centered = self.atoms - mean
+        covariance = centered.T @ (centered * self.alpha[:, None]) + self.beta * (np.diag(self.rates) + np.outer(self.rates - mean, self.rates - mean))
+        if self.independent:
+            covariance = np.diag(np.diag(covariance))
+        return mean, covariance
+
+    def log_probability(self, home, away):
+        observation = np.array([home, away], dtype=float)
+        _finite(observation)
+        if np.any(observation < 0) or np.any(observation != np.floor(observation)):
+            raise NumericalFailure("invalid_score_target")
+        if self.independent:
+            logs = []
+            for side in range(2):
+                mass = float(self.alpha[self.atoms[:, side] == observation[side]].sum())
+                terms = [math.log(self.beta) + float(poisson.logpmf(observation[side], self.rates[side]))] if self.beta > 0 else []
+                if mass > 0:
+                    terms.append(math.log(mass))
+                logs.append(float(logsumexp(terms)))
+            result = sum(logs)
+        else:
+            mass = float(self.alpha[np.all(self.atoms == observation, axis=1)].sum())
+            terms = [math.log(self.beta) + float(poisson.logpmf(observation, self.rates).sum())] if self.beta > 0 else []
+            if mass > 0:
+                terms.append(math.log(mass))
+            result = float(logsumexp(terms))
+        _finite(result)
+        return result
+
+    def tail_bounds(self, m, n):
+        r, s = self.rates
+        fr, fs = float(pdtr(m, r)), float(pdtr(n, s))
+        sr, ss = float(pdtrc(m, r)), float(pdtrc(n, s))
+        frm = float(pdtr(m - 1, r)) if m >= 1 else 0.0
+        fsn = float(pdtr(n - 1, s)) if n >= 1 else 0.0
+        srm = float(pdtrc(m - 1, r)) if m >= 1 else 1.0
+        ssn = float(pdtrc(n - 1, s)) if n >= 1 else 1.0
+        delta = self.beta * (sr + fr * ss)
+        moment = r * (srm + frm * ss) + s * (ssn + fsn * sr)
+        return delta, 2 * self.beta * moment
+
+    def grid(self, cells=None, maximum_cells=512):
+        minimum = np.maximum(16, (np.floor(self.atoms.max(axis=0) / 16).astype(int) + 1) * 16)
+        shape = minimum if cells is None else np.asarray(cells, dtype=int)
+        if shape.shape != (2,) or np.any(shape < minimum):
+            raise NumericalFailure("grid_omits_empirical_atom")
+        while True:
+            if np.any(shape > maximum_cells):
+                raise NumericalFailure("grid_tail_budget_exceeded")
+            delta, error = self.tail_bounds(int(shape[0] - 1), int(shape[1] - 1))
+            if delta <= 1e-12 and error <= 1e-7:
+                break
+            if cells is not None:
+                raise NumericalFailure("explicit_grid_tail_bound_failed")
+            shape = shape + 16
+        home, away = np.arange(shape[0]), np.arange(shape[1])
+        p = self.beta * np.outer(poisson.pmf(home, self.rates[0]), poisson.pmf(away, self.rates[1]))
+        for atom, mass in zip(self.atoms.astype(int), self.alpha):
+            p[atom[0], atom[1]] += mass
+        p[0, 0] += delta
+        if not abs(float(p.sum()) - 1) <= 1e-10:
+            raise NumericalFailure("grid_mass_mismatch")
+        p /= p.sum()
+        if self.independent:
+            p = np.outer(p.sum(axis=1), p.sum(axis=0))
+        return ScoreGrid(p, delta * (2 if self.independent else 1), error)
+
+    def _marginal_atoms(self, side):
+        values, index = np.unique(self.atoms[:, side], return_inverse=True)
+        return values, np.bincount(index, weights=self.alpha)
+
+    def cdf(self, target, value):
+        k = math.floor(value)
+        r, s = self.rates
+        if target in ("home", "away"):
+            side = 0 if target == "home" else 1
+            answer = float(self.alpha[self.atoms[:, side] <= k].sum()) + self.beta * float(poisson.cdf(k, self.rates[side]))
+        elif target in ("total", "margin") and not self.independent:
+            values = self.atoms[:, 0] + self.atoms[:, 1] if target == "total" else self.atoms[:, 0] - self.atoms[:, 1]
+            background = poisson.cdf(k, r + s) if target == "total" else skellam.cdf(k, r, s)
+            answer = float(self.alpha[values <= k].sum()) + self.beta * float(background)
+        elif target in ("total", "margin"):
+            h, ph = self._marginal_atoms(0)
+            a, pa = self._marginal_atoms(1)
+            values = h[:, None] + a if target == "total" else h[:, None] - a
+            answer = float((np.outer(ph, pa) * (values <= k)).sum())
+            if target == "total":
+                answer += self.beta * float(ph @ poisson.cdf(k - h, s) + pa @ poisson.cdf(k - a, r))
+                answer += self.beta ** 2 * float(poisson.cdf(k, r + s))
+            else:
+                answer += self.beta * float(ph @ poisson.sf(h - k - 1, s) + pa @ poisson.cdf(k + a, r))
+                answer += self.beta ** 2 * float(skellam.cdf(k, r, s))
+        else:
+            raise NumericalFailure("unknown_target")
+        _finite(answer)
+        if not -1e-12 <= answer <= 1 + 1e-12:
+            raise NumericalFailure("invalid_cdf_probability")
+        return min(1.0, max(0.0, answer))
+
+    def quantile(self, target, probability):
+        if not 0 < probability < 1:
+            raise NumericalFailure("invalid_quantile_probability")
+        low, high = -1, 16
+        while self.cdf(target, low) >= probability:
+            low *= 2
+            if abs(low) > 2 ** 20:
+                raise NumericalFailure("quantile_support_exhausted")
+        while self.cdf(target, high) < probability:
+            high *= 2
+            if high > 2 ** 20:
+                raise NumericalFailure("quantile_support_exhausted")
+        while high - low > 1:
+            middle = (low + high) // 2
+            if self.cdf(target, middle) >= probability:
+                high = middle
+            else:
+                low = middle
+        below, at = self.cdf(target, high - 1), self.cdf(target, high)
+        if not below < probability <= at:
+            raise NumericalFailure("quantile_crossing_invalid")
+        distance = min(probability - below, at - probability)
+        if distance <= 1e-12:
+            raise NumericalFailure("quantile_boundary_ambiguous")
+        return high, distance
+
+
+def energy_score(grid, observed):
+    p = grid.probability
+    home, away = np.indices(p.shape)
+    first = float(np.sum(p * np.hypot(home - observed[0], away - observed[1])))
+    shape = tuple(1 << (2 * n - 2).bit_length() for n in p.shape)
+    transformed = np.fft.rfft2(p, s=shape)
+    correlation = np.fft.irfft2(transformed * transformed.conj(), s=shape)
+    if correlation.min() < -1e-12 or abs(float(correlation.sum()) - 1) > 1e-10:
+        raise NumericalFailure("fft_correlation_invalid")
+    correlation = np.maximum(correlation, 0)
+    if abs(float(correlation.sum()) - 1) > 1e-10:
+        raise NumericalFailure("fft_clipped_mass_invalid")
+    correlation /= correlation.sum()
+    lags = [np.where(np.arange(n) <= (n - 1) // 2, np.arange(n), np.arange(n) - n) for n in shape]
+    distance = np.hypot(lags[0][:, None], lags[1])
+    answer = first - 0.5 * float(np.sum(correlation * distance))
+    if answer < -1e-10 or not np.isfinite(answer):
+        raise NumericalFailure("invalid_energy_score")
+    return max(0.0, answer)
+
+
+def marginal(grid, target):
+    p = grid.probability
+    if target == "home":
+        return np.arange(p.shape[0]), p.sum(axis=1)
+    if target == "away":
+        return np.arange(p.shape[1]), p.sum(axis=0)
+    home, away = np.indices(p.shape)
+    if target == "total":
+        return np.arange(sum(p.shape) - 1), np.bincount((home + away).ravel(), weights=p.ravel(), minlength=sum(p.shape) - 1)
+    if target == "margin":
+        return np.arange(1 - p.shape[1], p.shape[0]), np.bincount((home - away + p.shape[1] - 1).ravel(), weights=p.ravel(), minlength=sum(p.shape) - 1)
+    raise NumericalFailure("unknown_target")
+
+
+def crps(grid, target, observed):
+    values, probabilities = marginal(grid, target)
+    previous_cdf = np.cumsum(probabilities) - probabilities
+    previous_moment = np.cumsum(probabilities * values) - probabilities * values
+    first = float(probabilities @ np.abs(values - observed))
+    half_pair = float(probabilities @ (values * previous_cdf - previous_moment))
+    answer = first - half_pair
+    if answer < -1e-10 or not np.isfinite(answer):
+        raise NumericalFailure("invalid_crps")
+    return max(0.0, answer)

@@ -1,0 +1,85 @@
+"""RF-COMP-02 candidate: guarded scalar Skellam dispatch, pinned-runtime only.
+
+Retain RF-COMP-01 Poisson calculations and all empirical arithmetic. No global
+patch, historical entry point, encoder change or cross-forecast cache.
+"""
+import math
+
+import numpy as np
+from scipy.stats import poisson, skellam
+
+from research_score_distribution import NumericalFailure, _finite
+from research_score_probability_compute import ProbabilityDistribution, poisson_cdf
+from research_score_metrics import score_forecast as legacy_score_forecast
+
+VERSION = 'rf.compute-skellam.v1'
+
+
+def skellam_cdf(value, home_rate, away_rate):
+    """Use the identical private backend on the narrow validated scalar domain.
+
+    SciPy 1.13.1 public scalar CDF dispatch passes length-one arrays to _cdf,
+    clips its result, then returns a numpy float64. Preserve those operations,
+    including both branches of the backend's np.where and its error context.
+    All unsupported inputs retain the original generic call.
+    """
+    if (type(value) is int and -(2**20) <= value <= 2**20
+            and type(home_rate) in (float, np.float64)
+            and type(away_rate) in (float, np.float64)
+            and math.isfinite(home_rate) and 0 < home_rate <= 1e4
+            and math.isfinite(away_rate) and 0 < away_rate <= 1e4):
+        return np.clip(skellam._cdf(np.array([value], dtype=np.int64),
+                                   np.array([home_rate], dtype=np.float64),
+                                   np.array([away_rate], dtype=np.float64)), 0, 1)[0]
+    return skellam.cdf(value, home_rate, away_rate)
+
+
+def _cdf(law, target, value):
+    # Same arithmetic and accumulation order as RF-COMP-01. Only its two
+    # Skellam CDF calls are replaced; empirical, Poisson and SF paths stay.
+    k = math.floor(value)
+    r, s = law.rates
+    if target in ('home', 'away'):
+        side = 0 if target == 'home' else 1
+        answer = float(law.alpha[law.atoms[:, side] <= k].sum()) + law.beta * float(poisson_cdf(k, law.rates[side]))
+    elif target in ('total', 'margin') and not law.independent:
+        values = law.atoms[:, 0] + law.atoms[:, 1] if target == 'total' else law.atoms[:, 0] - law.atoms[:, 1]
+        background = poisson_cdf(k, r + s) if target == 'total' else skellam_cdf(k, r, s)
+        answer = float(law.alpha[values <= k].sum()) + law.beta * float(background)
+    elif target in ('total', 'margin'):
+        h, ph = law._marginal_atoms(0)
+        a, pa = law._marginal_atoms(1)
+        values = h[:, None] + a if target == 'total' else h[:, None] - a
+        answer = float((np.outer(ph, pa) * (values <= k)).sum())
+        if target == 'total':
+            answer += law.beta * float(ph @ poisson_cdf(k - h, s) + pa @ poisson_cdf(k - a, r))
+            answer += law.beta ** 2 * float(poisson_cdf(k, r + s))
+        else:
+            answer += law.beta * float(ph @ poisson.sf(h - k - 1, s) + pa @ poisson_cdf(k + a, r))
+            answer += law.beta ** 2 * float(skellam_cdf(k, r, s))
+    else:
+        raise NumericalFailure('unknown_target')
+    _finite(answer)
+    if not -1e-12 <= answer <= 1 + 1e-12:
+        raise NumericalFailure('invalid_cdf_probability')
+    return min(1.0, max(0.0, answer))
+
+
+class SkellamDistribution(ProbabilityDistribution):
+    """Readonly per-score copy with the original CDF memoization policy."""
+
+    def cdf(self, target, value):
+        key = (target, math.floor(value))
+        try:
+            return self._cdf_cache[key]
+        except TypeError:
+            return _cdf(self, target, value)
+        except KeyError:
+            answer = _cdf(self, target, value)
+            self._cdf_cache[key] = answer
+            return answer
+
+
+def score_forecast(distribution, observed, game_id, double_grid=True, diagnostics=True):
+    return legacy_score_forecast(SkellamDistribution(distribution), observed, game_id,
+                                 double_grid=double_grid, diagnostics=diagnostics)

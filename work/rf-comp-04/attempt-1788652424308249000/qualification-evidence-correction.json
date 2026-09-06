@@ -1,0 +1,17 @@
+{
+  "changes": "Remove only the zero-size direct pointer from the current qualification. Preserve all original files/tests/observations, prior qualification and exact code hashes. No scientific rerun.",
+  "previous_qualification": {
+    "bytes": 15424,
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-04/attempt-1788652424308249000/qualification.json",
+    "sha256": "656b73683b78c39168b0a3b0f58a1144d6218aebdd12ed01719a3e959d764374"
+  },
+  "reason": "Current preflight requires positive-size top-level evidence pointers. Empty stderr is valid process evidence but cannot be a direct qualification pointer; bind it through this nonempty correction record and retained watchdog report.",
+  "retained_empty_artifacts": [
+    {
+      "bytes": 0,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-04/attempt-1788652424308249000/process-stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "status": "metadata_only_qualification_admission_correction"
+}

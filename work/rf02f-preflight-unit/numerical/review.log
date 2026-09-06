@@ -1,0 +1,19 @@
+test_budget_exception_escapes_without_archive_or_output (held_preflight_tests.PreflightTests.test_budget_exception_escapes_without_archive_or_output) ... ok
+test_duplicate_nonfinite_and_overflow_json_fail (held_preflight_tests.PreflightTests.test_duplicate_nonfinite_and_overflow_json_fail) ... ok
+test_full_membership_and_frozen_pin_rejected (held_preflight_tests.PreflightTests.test_full_membership_and_frozen_pin_rejected) ... ok
+test_manifest_bytes_equal_accepted_store_canonical_bytes (held_preflight_tests.PreflightTests.test_manifest_bytes_equal_accepted_store_canonical_bytes) ... ok
+test_manifest_deterministic_and_excludes_observation_state (held_preflight_tests.PreflightTests.test_manifest_deterministic_and_excludes_observation_state) ... ok
+test_null_qualification_review_and_evidence_bypass_closed (held_preflight_tests.PreflightTests.test_null_qualification_review_and_evidence_bypass_closed) ... ok
+test_pointer_hash_and_size_fail_before_reader (held_preflight_tests.PreflightTests.test_pointer_hash_and_size_fail_before_reader) ... ok
+test_production_registry_and_runtime_are_closed (held_preflight_tests.PreflightTests.test_production_registry_and_runtime_are_closed) ... ok
+test_real_file_nosymlink_size_and_hash_boundary (held_preflight_tests.PreflightTests.test_real_file_nosymlink_size_and_hash_boundary) ... ok
+test_review_and_qualification_bindings_cannot_be_truthy_grants (held_preflight_tests.PreflightTests.test_review_and_qualification_bindings_cannot_be_truthy_grants) ... ok
+test_runtime_and_permissions_are_exact_native_types (held_preflight_tests.PreflightTests.test_runtime_and_permissions_are_exact_native_types) ... ok
+test_source_config_and_protocol_bytes_are_authenticated (held_preflight_tests.PreflightTests.test_source_config_and_protocol_bytes_are_authenticated) ... ok
+test_stage_and_evidence_pointer_tampering (held_preflight_tests.PreflightTests.test_stage_and_evidence_pointer_tampering) ... ok
+
+----------------------------------------------------------------------
+Ran 13 tests in 0.037s
+
+OK
+{"path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-preflight-unit/numerical/preflight-review.json", "sha256": "baaf137af84d54b48286cd65daa5f4e73bec23cf90e61d918a6f4257b63aefdd", "tests": 13, "seconds": 0.9929506249900442, "rss_mib": 119.453125, "authenticated_evidence_files": 106, "registered_import_edges": 226, "null_pointer_probes": [{"probe": "null_qualification", "rejected": true, "reason": "invalid_sha256"}, {"probe": "null_review", "rejected": true, "reason": "invalid_sha256"}, {"probe": "null_evidence_sha", "rejected": true, "reason": "invalid_sha256"}, {"probe": "null_evidence_size", "rejected": true, "reason": "positive_evidence_size_required"}]}

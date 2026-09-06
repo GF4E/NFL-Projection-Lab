@@ -1,0 +1,164 @@
+# RF-COMP-06: ephemeral bank-state snapshots
+
+Status: fixed implementation and bounded synthetic qualification scope. Exact
+source, test, driver and input pins must pass review before execution. This
+document does not authorize controller integration or any historical invocation.
+
+## Question and immutable boundary
+
+Test one different computational hypothesis from the closed RF-COMP-05 pretty
+serializer: replace only the private before/after bank-state comparison with
+fresh owned content snapshots. The original `_bank_state_digest` results are
+local equality values, not persisted origin-evidence hashes. All persisted
+serialization, hashes, source authentication, publication validation, metric
+conversion and scientific computations remain unchanged.
+
+The design is `work/rf-strict-compute/NEXT-EFFICIENCY-DESIGN.md`, SHA-256
+`d1b535773196fb5c5162134d67f72334cdd9a646effb9050b7bb45cd4de6a1f9`.
+RF-COMP-05 remains closed after exactness passed but the candidate's sole timing
+pass was 1.917723 times the original. No retiming or variant of that candidate
+is permitted. Preserve all 79 frozen RF-COMP-04 source/test files, all closed
+RF-COMP-05 files and outputs, and the inherited runtime pins.
+
+The accepted tiny-origin profile attributes 0.158821792 seconds to the two bank
+digest strict calls, about 19.34% of profiled remainder. This is not a speedup
+prediction: whole-origin profiling overhead was 2.3426 times, and eliminating
+this entire bucket would not alone close the current 42.05% remainder gap under
+a proportional extrapolation. It does not reduce the fit/score callback term
+whose alternative target is 12.39%. No favorable result here authorizes a
+historical retry or establishes sufficient capacity.
+
+## Single candidate and API
+
+The only candidate source is `scripts/research_score_bank_snapshot.py`.
+
+- `capture(bank, outputs)` returns an opaque owned snapshot. Its payload
+  comprehension, key sorting, attribute accesses and evaluation order are
+  identical to the payload argument in frozen `_bank_state_digest`.
+- `capture_value(value)` uses the same capture path for focused synthetic tests.
+- `same(before, after)` returns an exact builtin bool for two valid handles.
+  It rejects other arguments with `TypeError` and does not read input objects.
+- A read-only `mode` property reports `supported` or `fallback`; it exposes no
+  retained content. The handle is a private implementation object, not an
+  adversarial security boundary or persisted format.
+
+Each capture calls original `canonical` exactly once, retaining its original
+NumPy conversion, subclass hooks, traversal and exceptions. There is no bulk
+array shortcut, additional canonicalizer, input cache or mutable global patch.
+For supported captures, original canonical has produced owned builtin
+containers and immutable leaves. Retain that private tree; do not construct a
+general-purpose binary representation or expose it to assembly.
+
+The fresh eligibility traversal supports only exact builtin dict/list, ASCII
+str keys and values, None, bool, finite float and bounded int. Root containers
+have depth 1; the maximum is 32 container levels. Every value and dictionary
+key occurrence is one node, including the root: at most 131072 nodes. All string
+occurrences, including keys and repeated aliases, contribute their character
+counts to a 4194304-character limit. Integers have at most 256 magnitude bits
+using `bit_length()`. Active-path identities detect cycles only; aliases are
+visited again. A supported tree must be completely examined before capture
+returns. An unsupported or over-limit tree proceeds directly to the original
+encoder; it cannot enter the content-comparison path.
+
+Unsupported captures call original `encoded(snapshot)` immediately and retain
+only its bytes. They never call `strict` or canonical again. Canonical or encoder
+errors propagate at that capture, including before assembly could execute.
+Non-ASCII input deliberately falls back: raw Unicode equality is not universally
+equivalent to ensure-ASCII JSON (an astral character and a literal surrogate pair
+can share the same JSON spelling).
+
+For two supported captures, comparison preserves exact leaf types, sequence
+order, dictionary key membership and values, while ignoring dictionary insertion
+order. Finite float equality also distinguishes positive and negative zero.
+Ordinary Python numeric equality alone is insufficient. Both complete captures
+precede comparison, so a mismatch cannot skip validation or errors in the second
+capture. Comparison may short-circuit only across already-owned validated trees.
+
+For two fallback captures, compare their stored original bytes. For a mixed
+pair, encode the owned supported tree with original `encoded` and compare against
+the stored fallback bytes. Never reread the original bank or output object, and
+never retry or suppress an unexpected error. Snapshot internals are not a public
+mutation interface. No equality result changes any persisted hash or bytes.
+
+## Equivalence first
+
+The independent test file is new
+`tests/research-score-bank-snapshot/test_bank_snapshot.py`. Qualification must
+retain observed original and candidate outcomes before asserting agreement.
+Use the original digest-equality decision and original exception behavior as
+the oracle, not another hand-written JSON implementation.
+
+Cover the complete bank-shaped synthetic input and fixed adversarial cases:
+unchanged content; last-element/output/last-origin mutations; sequence order;
+dictionary insertion order; signed zero; bool/int/float distinctions; canonical
+NumPy/list equivalences; aliases and mutation after capture; Unicode fallback;
+subclasses/conversion hooks; invalid keys; nonfinite numbers; cycles/depth and
+all guard limits. Verify exactly one canonical call, immediate encoder fallback,
+original left-to-right capture failure order, no assembly after failed before
+capture, and no raw reread in mixed comparison. Candidate-local dependency spies
+may inspect hooks and injected errors; frozen module globals remain unchanged.
+Unexpected candidate encoder or traversal errors must propagate without retry.
+
+No model fit, admission, distribution recovery, scorer call, bootstrap, historical
+archive iteration or full-origin rerun belongs to this qualification. Fixture
+construction reads the accepted saved synthetic state only, reconstructing its
+297 outputs and 216 owned engines without generating scientific predictions.
+
+## Fixed timing and resource contract
+
+Use exactly ten complete-bank pairs in the order below. Each independent fixture
+starts from the pinned saved state with 297 outputs and 216 owned engines;
+last_origin is (2013, 1), as supported by that state's publication validation.
+This reconstruction is a driver-owned fixture, not a reproduced historical bank.
+"Last" means the last sorted engine/output key, then the indicated last sequence
+entry. Pair-specific setup precedes the before capture.
+
+1. Unchanged: no mutation.
+2. Add 1 to the last owned engine's ratings[-1].
+3. Add 1 to the last output's forecasts[-1].mean[-1].
+4. Change the last engine's last_origin to (2013, 2).
+5. Reverse the last output's forecasts order.
+6. Reverse insertion order of the last output dictionary, preserving content.
+7. Signed zero: set the last engine's ratings[-1] to +0.0 in setup; mutate to -0.0.
+8. Numeric type: set the last output's final mean entry to builtin float 1.0 in
+   setup; mutate to builtin int 1.
+9. Replace every owned ratings/offense/defense ndarray with its list, preserving
+   canonical content.
+10. Unicode equivalence: add diagnostic="😀" to the last output in setup; mutate
+    to the literal surrogate pair "\ud83d\ude00". Original encoded bytes are
+    equal; both candidate captures must use fallback.
+
+After the complete parity panel passes, execute exactly one unprofiled original
+ten-pair pass followed by one candidate ten-pair pass. The original pair timer
+contains actual original digest, fixed mutation, actual original digest and
+equality. The candidate pair timer contains capture, the same fixed mutation,
+capture and same. Thus both captures, original payload construction, canonical
+conversion, eligibility, retained content, any fallback, mutation and comparison
+are charged. Reconstruct each independent fixture and apply setup outside the
+per-pair timer but inside the total command clock. Retain all ten pair outcomes
+and times, in order, plus total pass times. Focused tests cover errors and
+sentinels; the timing panel has no synthetic model/scorer stage. No warmup,
+repeats, selected cases, alternative representation or favorable timing selection
+is allowed.
+
+The single qualification process has a 60-second and 1024-MiB setup-inclusive
+external envelope. Reserve the final 5 seconds within that cap for evidence
+finalization, with no additional candidate work; the observer records and stops
+the owned child on deadline or memory violation. Bound observer/child memory at
+128/896 MiB, respectively, within the total. Preserve failed attempts and partial
+observations; a stopped or mismatching attempt cannot be called a pass or retried
+with a different panel. All inputs, source and runtime files are authenticated
+before and after execution within the same total clock.
+
+The input map must bind this scope, design, candidate, independent tests,
+qualification driver, exact original digest/canonical/encoder sources, all 79
+frozen files, closed RF-COMP-05 files, saved synthetic state and relevant original
+runtime files. Retain exact fixture array metadata/bytes, ordered pair definitions,
+all observations, actual timing totals, process handle/exit/log, resource evidence,
+before/after hashes and final file index outside old attempt directories.
+
+An inexact or slower candidate is removed from the immediate integration path.
+A faster result supports only this fixed isolated comparison, with one-pass
+timing uncertainty stated. Any later integration needs a separately reviewed new
+controller identity and explicit helper binding; no editing frozen files, global
+patching, runtime source cloning or copying an entire controller for this test.

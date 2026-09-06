@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-resource-policy/audit-terminal-saved.py", line 33, in <module>
+    ptr=m[key];load(Q/ptr['path'],ptr['sha256'],ptr['bytes'])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-resource-policy/audit-terminal-saved.py", line 19, in load
+    x=json.loads(b,object_pairs_hook=pairs,parse_constant=bad)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/json/__init__.py", line 359, in loads
+    return cls(**kw).decode(s)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)

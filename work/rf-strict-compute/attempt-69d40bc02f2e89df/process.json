@@ -1,0 +1,35 @@
+{
+  "automatic_retry": false,
+  "child_group_peak_rss_mib": 222.46875,
+  "clock_scope": "First script clock through final checked evidence publication; initial parent interpreter startup excluded.",
+  "command": [
+    "/opt/anaconda3/bin/python3.12",
+    "-I",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-strict-compute/qualify_strict.py",
+    "--child",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-strict-compute/attempt-69d40bc02f2e89df",
+    "--pins",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-strict-compute/INPUT-PINS.v1.json",
+    "--pins-sha256",
+    "69d40bc02f2e89df7fc9182e63df862ee0d7e43303c5c882bafb07cb0647aedc",
+    "--started",
+    "141557.372312208"
+  ],
+  "conservative_combined_rss_mib": 257.734375,
+  "elapsed_seconds_before_final_index": 2.4996825419948436,
+  "exit_code": 0,
+  "final_acceptance": false,
+  "historical_execution": false,
+  "limits": {
+    "child_mib": 896.0,
+    "evidence_reserve_seconds": 5.0,
+    "mib": 1024.0,
+    "parent_mib": 128.0,
+    "seconds": 60.0
+  },
+  "memory_scope": "Parent high-water plus maximum sampled/waited child-group RSS; not an instantaneous kernel bound.",
+  "parent_peak_rss_mib": 35.265625,
+  "source_error": null,
+  "status": "provisional_qualification_evidence",
+  "stop": null
+}

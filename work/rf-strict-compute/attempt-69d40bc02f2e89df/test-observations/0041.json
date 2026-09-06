@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "[\n  [\n    1.0,\n    -0.0\n  ],\n  [\n    2.0,\n    3.0\n  ]\n]\n",
+    "bytes": 56,
+    "kind": "bytes",
+    "sha256": "181c8c3d877680b053c53777f591c62a88c9f7234c89180a812ec88a0599d21a",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "exact-numpy-7",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "ndarray"
+  },
+  "label": "exact-numpy-7",
+  "original": {
+    "ascii_body": "[\n  [\n    1.0,\n    -0.0\n  ],\n  [\n    2.0,\n    3.0\n  ]\n]\n",
+    "bytes": 56,
+    "kind": "bytes",
+    "sha256": "181c8c3d877680b053c53777f591c62a88c9f7234c89180a812ec88a0599d21a",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_exact_numpy_scalars_and_arrays"
+}

@@ -1,0 +1,53 @@
+{
+  "candidate": {
+    "events": [
+      "assembly"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": [
+      {
+        "mode": "fallback"
+      },
+      {
+        "mode": "fallback"
+      }
+    ]
+  },
+  "expected_decision": true,
+  "expected_modes": [
+    "fallback",
+    "fallback"
+  ],
+  "kind": "paired_value",
+  "label": "unicode-equivalence-dict",
+  "original": {
+    "events": [
+      "assembly"
+    ],
+    "images": [
+      {
+        "ascii_body": "{\n  \"\\ud83d\\ude00\": [\n    \"\\u00e9\"\n  ]\n}\n",
+        "bytes": 41,
+        "sha256": "5fbfeef253ec3caf7791489755d1a61825a1d1e2a6bf708b8956be058fe57c20"
+      },
+      {
+        "ascii_body": "{\n  \"\\ud83d\\ude00\": [\n    \"\\u00e9\"\n  ]\n}\n",
+        "bytes": 41,
+        "sha256": "5fbfeef253ec3caf7791489755d1a61825a1d1e2a6bf708b8956be058fe57c20"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_unicode_astral_surrogate_json_equivalence"
+}

@@ -1,0 +1,50 @@
+{
+  "candidate": {
+    "events": [
+      "assembly"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": [
+      {
+        "mode": "supported"
+      },
+      {
+        "mode": "supported"
+      }
+    ]
+  },
+  "expected_decision": true,
+  "expected_modes": null,
+  "kind": "paired_value",
+  "label": "dict-insertion-order",
+  "original": {
+    "events": [
+      "assembly"
+    ],
+    "images": [
+      {
+        "ascii_body": "{\n  \"10\": [\n    1,\n    2\n  ],\n  \"2\": {\n    \"x\": 3\n  },\n  \"z\": []\n}\n",
+        "bytes": 67,
+        "sha256": "6e82db97b781522c8c51ccfbe29373aed75a4092303cb567d19aa4ab99fc9f13"
+      },
+      {
+        "ascii_body": "{\n  \"10\": [\n    1,\n    2\n  ],\n  \"2\": {\n    \"x\": 3\n  },\n  \"z\": []\n}\n",
+        "bytes": 67,
+        "sha256": "6e82db97b781522c8c51ccfbe29373aed75a4092303cb567d19aa4ab99fc9f13"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_dictionary_insertion_order_and_key_membership"
+}

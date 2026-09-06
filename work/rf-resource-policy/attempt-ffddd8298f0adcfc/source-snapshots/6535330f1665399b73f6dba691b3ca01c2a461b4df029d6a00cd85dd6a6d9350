@@ -1,0 +1,143 @@
+"""RF-COMP-08 resource amendment; all scientific dependencies remain COMP04.
+
+Only worker deadline initialization/reason and the projected-cost decision
+change. RuntimeStop, callbacks, accounting and invalid closure retain their
+original identities. Imports do not create an envelope or run science.
+"""
+from contextlib import contextmanager
+import math
+import signal
+import time
+
+from research_score_split_run import (
+    RuntimeEnvelope as _OriginalRuntimeEnvelope, RuntimeStop, CallbackResult,
+    OriginAccounting, finite, require, rss_mib,
+    pilot_projection as _original_pilot_projection)
+
+VERSION = 'rfcomp08.resource-policy.v1'
+BUDGET = {'seconds': 9000, 'projected_seconds': 9000, 'rss_mib': 4096,
+          'complete_smoke_seconds': 120, 'invalid_metadata_seconds': 30,
+          'external_worker_grace_seconds': 0, 'model_workers': 1}
+
+
+class RuntimeEnvelope(_OriginalRuntimeEnvelope):
+    """Original initialization/check with the separately accepted 9000s cap."""
+    def __init__(self):
+        self.started = time.monotonic()
+        self._deadline = self.started + 9000.
+        self._last = self.started
+        self.phase = 'science'
+        self.stop_reason = None
+        self.scientific_stop_elapsed = None
+        self.peak_rss_mib = 0.
+        self.phase_measurements = []
+        self._active_measurement = None
+        self._smoke_deadline = None
+        self._installed = False
+        require(signal.getitimer(signal.ITIMER_REAL) == (0., 0.), 'existing_process_timer')
+        self._previous_handler = signal.signal(signal.SIGALRM, self._watchdog)
+        self._installed = True
+        try:
+            self.check()
+            self._arm()
+        except BaseException:
+            self.close()
+            raise
+
+    def check(self):
+        if self.phase != 'science':
+            raise RuntimeStop(self.stop_reason or 'scientific_work_outside_live_envelope')
+        now = time.monotonic()
+        if not math.isfinite(now) or now < self._last:
+            self._stop('invalid_monotonic_clock')
+        self._last = now
+        usage = rss_mib()
+        if not finite(usage):
+            self._stop('invalid_memory_measurement')
+        self.peak_rss_mib = max(self.peak_rss_mib, usage)
+        if now >= self._deadline:
+            deadline = min(self._deadline, self._smoke_deadline or self._deadline)
+            reason = 'registered_120_second_smoke_deadline' if deadline < self._deadline else 'registered_9000_second_deadline'
+            self._stop(reason, deadline)
+        if self._smoke_deadline is not None and now >= self._smoke_deadline:
+            self._stop('registered_120_second_smoke_deadline', self._smoke_deadline)
+        if usage > 4096:
+            self._stop('registered_4096_MiB_limit')
+
+
+class ControllerEnvelope(RuntimeEnvelope):
+    """Add the entire120-second smoke cap without changing evaluator timing."""
+    def __init__(self, started_monotonic=None):
+        self._whole_smoke_deadline = None
+        self._whole_smoke_used = False
+        super().__init__()
+        if started_monotonic is not None:
+            try:
+                require(type(started_monotonic) in (int, float) and math.isfinite(started_monotonic)
+                        and 0 <= started_monotonic <= self.started, 'invalid_parent_envelope_start')
+                self.started = started_monotonic
+                self._deadline = self.started + 9000.
+                self.check()
+                self._arm()
+            except BaseException:
+                self.close()
+                raise
+
+    def check(self):
+        # Prefer the earliest actual deadline even if a long native call caused
+        # delivery after both the whole smoke and evaluator-only clocks expired.
+        if self.phase == 'science' and self._whole_smoke_deadline is not None:
+            now = time.monotonic()
+            if now >= self._whole_smoke_deadline and self._whole_smoke_deadline <= self._deadline:
+                self._stop('registered_120_second_complete_smoke_deadline', self._whole_smoke_deadline)
+        return super().check()
+
+    def _arm(self):
+        if self.phase != 'metadata_finalization' and self._whole_smoke_deadline is not None:
+            deadline = min(self._deadline, self._whole_smoke_deadline,
+                           self._smoke_deadline if self._smoke_deadline is not None else self._deadline)
+            signal.setitimer(signal.ITIMER_REAL, max(.000001, min(.1, deadline - time.monotonic())), .1)
+        else:
+            super()._arm()
+
+    @contextmanager
+    def complete_smoke(self, phase_path):
+        """One owned parent phase transition brackets all preparation and science.
+
+        The external watchdog helper validates this file and retains both smoke
+        timestamps. This is a production contract, not a truthy audit flag.
+        """
+        from research_score_split_watchdog import transition_phase, _read_phase
+        self.check()
+        require(not self._whole_smoke_used, 'complete_smoke_reuse_forbidden')
+        self._whole_smoke_used = True
+        transition_phase(phase_path, 'smoke')
+        phase, _ = _read_phase(phase_path)
+        require(phase['phase'] == 'smoke', 'complete_smoke_phase_not_durable')
+        self._whole_smoke_deadline = phase['smoke_started'] + 120.
+        error = None
+        try:
+            self.check()
+            self._arm()
+            yield
+            self.check()
+            transition_phase(phase_path, 'science')
+            self.check()
+        except BaseException as exc:
+            error = exc
+            raise
+        finally:
+            # Failure preserves the external smoke marker; it cannot erase an
+            # overrun or claim the parent may forget the shorter hard deadline.
+            self._whole_smoke_deadline = None
+            self._after(error)
+            if self.phase == 'science':
+                self._arm()
+
+
+def pilot_projection(original_origins, ledger, remaining_origins):
+    """Retain every original check/arithmetic value; amend only the two gates."""
+    result = _original_pilot_projection(original_origins, ledger, remaining_origins)
+    within = result['projected_total_seconds'] <= 9000
+    return {**result, 'within_time_screen': within,
+            'passed': within and ledger['peak_rss_mib'] <= 4096}

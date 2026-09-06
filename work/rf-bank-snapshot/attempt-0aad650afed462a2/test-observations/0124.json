@@ -1,0 +1,50 @@
+{
+  "candidate": {
+    "events": [
+      "assembly"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": [
+      {
+        "mode": "fallback"
+      },
+      {
+        "mode": "fallback"
+      }
+    ]
+  },
+  "expected_decision": null,
+  "expected_modes": null,
+  "kind": "paired_value",
+  "label": "unsupported-case-0",
+  "original": {
+    "events": [
+      "assembly"
+    ],
+    "images": [
+      {
+        "ascii_body": "{\n  \"1\": \"x\"\n}\n",
+        "bytes": 15,
+        "sha256": "ab69942ccb626d0d7f41f55efa043b6f0c26c4ab01af29613b6236a85102d3b8"
+      },
+      {
+        "ascii_body": "{\n  \"1\": \"x\"\n}\n",
+        "bytes": 15,
+        "sha256": "ab69942ccb626d0d7f41f55efa043b6f0c26c4ab01af29613b6236a85102d3b8"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_unsupported_keys_and_nonfinite_values"
+}

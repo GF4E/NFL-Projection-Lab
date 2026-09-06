@@ -1,0 +1,284 @@
+"""Frozen RF v2 mean-model trajectories. Pure football-history inputs only.
+
+No files, network, providers, production entry points or implicit data loading.
+Each instance owns one setting and variant from the start of chronology.
+"""
+from dataclasses import dataclass, replace
+import hashlib
+import itertools
+import json
+import math
+
+import numpy as np
+from scipy.special import expit
+
+
+BASE_SEED = 20260904
+VARIANTS = {"full", "no_home_effect", "no_prior_season_carryover", "no_time_decay",
+            "no_team_identity", "independent_marginals", "availability_24h",
+            "no_ridge", "K_zero", "no_offense", "no_defense", "shuffled_identity", "deterministic_noise"}
+
+
+@dataclass(frozen=True)
+class GameContext:
+    game_id: str
+    season: int
+    week: int
+    home: str
+    away: str
+    neutral: bool = False
+
+
+@dataclass(frozen=True)
+class HistoricalResult:
+    context: GameContext
+    home_score: int
+    away_score: int
+
+
+def canonical_seed(*items):
+    raw = json.dumps([BASE_SEED, *items], ensure_ascii=True, separators=(",", ":")).encode("utf-8")
+    return int.from_bytes(hashlib.sha256(raw).digest()[:8], "big")
+
+
+def pit_uniform(game_id, target):
+    return ((canonical_seed("pit", game_id, target) >> 11) + .5) / 2 ** 53
+
+
+def setting_grid(config):
+    result = {"N0": [{}]}
+    m = config["models"]
+    result["S1"] = [{"ridge": ridge, "half_life": half} for ridge, half in itertools.product(
+        m["S1"]["ridgeGridInTieOrder"], m["S1"]["halfLifeGridInTieOrder"])]
+    result["E1"] = [{"k": k, "retention": retention, "home_points": home} for k, retention, home in itertools.product(
+        m["E1"]["kGridInTieOrder"], m["E1"]["retentionGridInTieOrder"], m["E1"]["homePointsGridInTieOrder"])]
+    result["E2"] = [{"k": k, "retention": retention} for k, retention in itertools.product(
+        m["E2"]["kGridInTieOrder"], m["E2"]["retentionGridInTieOrder"])]
+    return result
+
+
+def weights(results, season, half_life=2.5):
+    years = np.asarray([row.context.season for row in results])
+    decay = np.ones(len(years)) if half_life is None else np.exp2(-(season - years) / half_life)
+    return decay * np.where(years == 2020, .5, 1.)
+
+
+def league_offsets(results, season, half_life=2.5):
+    if not results:
+        return None, 0.
+    w = weights(results, season, half_life)
+    scores = np.asarray([[row.home_score, row.away_score] for row in results], dtype=float)
+    b = float(w @ scores.mean(axis=1) / w.sum())
+    at_home = np.asarray([not row.context.neutral for row in results], dtype=bool)
+    h = float(w[at_home] @ (scores[at_home, 0] - scores[at_home, 1]) / w[at_home].sum()) if at_home.any() else 0.
+    return b, h
+
+
+def ridge_srs(results, teams, season, ridge=16, half_life=2.5, no_home=False, no_identity=False):
+    if not results:
+        return 0., np.zeros(len(teams)), {"design_rank": 0, "augmented_rank": 0, "observations": 0}
+    indices = {team: j for j, team in enumerate(teams)}
+    x = np.zeros((len(results), 1 + len(teams)))
+    y = np.asarray([row.home_score - row.away_score for row in results], dtype=float)
+    for i, row in enumerate(results):
+        x[i, 0] = not row.context.neutral and not no_home
+        if not no_identity:
+            x[i, 1 + indices[row.context.home]] = 1
+            x[i, 1 + indices[row.context.away]] = -1
+    w = weights(results, season, half_life)
+    penalty = np.zeros((len(teams), 1 + len(teams)))
+    penalty[:, 1:] = np.eye(len(teams)) * math.sqrt(ridge)
+    design = np.vstack((x * np.sqrt(w[:, None]), penalty))
+    target = np.concatenate((y * np.sqrt(w), np.zeros(len(teams))))
+    coef, _, rank, _ = np.linalg.lstsq(design, target, rcond=1e-12)
+    # The unpenalized incidence rank is a support diagnostic, not a confidence score.
+    support_rank = int(np.linalg.matrix_rank(x, tol=np.linalg.norm(x, 2) * 1e-12))
+    return float(coef[0]), coef[1:], {"design_rank": support_rank, "augmented_rank": int(rank), "observations": len(results)}
+
+
+class MeanTrajectory:
+    def __init__(self, family, setting, teams, variant="full"):
+        if family not in {"N0", "S1", "E1", "E2"} or variant not in VARIANTS:
+            raise ValueError("unregistered_family_or_variant")
+        if (variant == "no_ridge" and family != "S1") or (variant == "K_zero" and family != "E1") or (variant in {"no_offense", "no_defense"} and family != "E2"):
+            raise ValueError("variant_wrong_family")
+        self.family, self.setting, self.teams, self.variant = family, dict(setting), tuple(sorted(teams)), variant
+        if len(self.teams) != 32 or len(set(self.teams)) != 32:
+            raise ValueError("requires_32_unique_franchises")
+        self.index = {team: j for j, team in enumerate(self.teams)}
+        self.ratings = np.full(32, 1500.)
+        self.offense, self.defense = np.zeros(32), np.zeros(32)
+        self.stored = {}
+        self.delivered = set()
+        self.last_origin = None
+        self.failed = False
+        self.failure_reason = None
+        self.permutations = {}
+
+    def _context(self, game):
+        if game.home not in self.index or game.away not in self.index or game.home == game.away:
+            raise ValueError("invalid_franchise_identity")
+        if self.variant != "shuffled_identity":
+            return game
+        key = (game.season, game.week)
+        if key not in self.permutations:
+            order = np.random.Generator(np.random.PCG64(canonical_seed("shuffle", *key))).permutation(self.teams)
+            self.permutations[key] = dict(zip(self.teams, order))
+        mapping = self.permutations[key]
+        return replace(game, home=mapping[game.home], away=mapping[game.away])
+
+    def _absorb(self, reason):
+        self.failed, self.failure_reason = True, reason
+
+    def _deliver(self, rows, events):
+        rdelta, odelta, ddelta = np.zeros(32), np.zeros(32), np.zeros(32)
+        for row in rows:
+            game = row.context
+            if game.game_id in self.delivered:
+                raise ValueError("duplicate_result_delivery")
+            if game.game_id not in self.stored:
+                raise ValueError("result_without_original_origin_expectation")
+            self.delivered.add(game.game_id)
+            events["delivered"].append(game.game_id)
+            if self.failed or self.family not in {"E1", "E2"}:
+                continue
+            stored = self.stored[game.game_id]
+            if stored["context"] != game:
+                raise ValueError("delivered_context_mismatch")
+            h, a = self.index[game.home], self.index[game.away]
+            multiplier = .5 if game.season == 2020 else 1.
+            k = self.setting["k"] * multiplier
+            if self.variant in {"no_team_identity", "K_zero"}:
+                k = 0.
+            if self.family == "E1":
+                result = 1. if row.home_score > row.away_score else .5 if row.home_score == row.away_score else 0.
+                delta = k * (result - stored["expected_win"])
+                rdelta[h] += delta
+                rdelta[a] -= delta
+            elif stored["initialization_only"]:
+                events["initialization_only"].append(game.game_id)
+            else:
+                error = np.asarray([row.home_score, row.away_score]) - stored["mean"]
+                if self.variant != "no_offense":
+                    odelta[h] += k * error[0] / 2
+                    odelta[a] += k * error[1] / 2
+                if self.variant != "no_defense":
+                    ddelta[a] -= k * error[0] / 2
+                    ddelta[h] -= k * error[1] / 2
+        if self.failed:
+            return
+        self.ratings += rdelta
+        self.offense += odelta
+        self.defense += ddelta
+        self.offense -= self.offense.mean()
+        self.defense -= self.defense.mean()
+        if not all(np.all(np.isfinite(array)) for array in (self.ratings, self.offense, self.defense)):
+            self._absorb("nonfinite_dynamic_state")
+
+    def forecast_origin(self, season, week, eligible_results, targets):
+        key = (season, week)
+        if self.last_origin is not None and key <= self.last_origin:
+            raise ValueError("origin_not_strictly_chronological")
+        if len({g.game_id for g in targets}) != len(targets):
+            raise ValueError("duplicate_target")
+        if any(g.game_id in self.stored for g in targets):
+            raise ValueError("target_identity_already_forecast")
+        if any((g.season, g.week) != key for g in targets):
+            raise ValueError("wrong_target_origin")
+        if any((r.context.season, r.context.week) >= key for r in eligible_results):
+            raise ValueError("same_week_or_future_input")
+        if any(not isinstance(r.home_score, int) or not isinstance(r.away_score, int)
+               or min(r.home_score, r.away_score) < 0 for r in eligible_results):
+            raise ValueError("invalid_historical_score")
+        ids = {r.context.game_id for r in eligible_results}
+        if len(ids) != len(eligible_results) or not self.delivered <= ids:
+            raise ValueError("duplicate_or_disappearing_input")
+        rows = [replace(r, context=self._context(r.context)) for r in sorted(eligible_results, key=lambda r: (r.context.season, r.context.week, r.context.game_id))]
+        games = [self._context(g) for g in sorted(targets, key=lambda g: g.game_id)]
+        arriving = [r for r in rows if r.context.game_id not in self.delivered]
+        events = {"delivered": [], "initialization_only": [], "offseason_retention_applied": False}
+        if self.last_origin is not None and season > self.last_origin[0]:
+            self._deliver([r for r in arriving if r.context.season < season], events)
+            retention = 0. if self.variant == "no_prior_season_carryover" else self.setting.get("retention", 1.)
+            retention **= season - self.last_origin[0]
+            if not self.failed:
+                self.ratings = 1500 + (self.ratings - 1500) * retention
+                self.offense *= retention
+                self.defense *= retention
+            events["offseason_retention_applied"] = True
+            self._deliver([r for r in arriving if r.context.season == season], events)
+        else:
+            self._deliver(arriving, events)
+        self.last_origin = key
+        mean_half_life = None if self.variant == "no_time_decay" else 2.5
+        b, home_effect = league_offsets(rows, season, mean_half_life)
+        if self.variant == "no_home_effect":
+            home_effect = 0.
+        team_rows = [r for r in rows if r.context.season == season] if self.variant == "no_prior_season_carryover" else rows
+        support = None
+        if self.family == "S1":
+            half_life = None if self.variant == "no_time_decay" else self.setting["half_life"]
+            ridge = 0 if self.variant == "no_ridge" else self.setting["ridge"]
+            h_srs, r_srs, support = ridge_srs(team_rows, self.teams, season, ridge, half_life,
+                                            self.variant == "no_home_effect", self.variant == "no_team_identity")
+        slope = 0.
+        if self.family == "E1" and rows and not self.failed:
+            x = np.asarray([self.stored[r.context.game_id]["x"] for r in rows])
+            y = np.asarray([r.home_score - r.away_score for r in rows])
+            w = weights(rows, season, mean_half_life)
+            raw_slope = float(np.sum(w * x * y) / (np.sum(w * x * x) + 16))
+            if not np.isfinite(raw_slope):
+                self._absorb("nonfinite_dynamic_mean")
+            else:
+                slope = max(0., raw_slope)
+        output = []
+        for game in games:
+            h, a = self.index[game.home], self.index[game.away]
+            home = 0. if game.neutral else 1.
+            stored = {"context": game, "mean": None, "initialization_only": b is None}
+            raw = None
+            if self.family == "E1" and not self.failed:
+                home_points = 0. if self.variant == "no_home_effect" else self.setting["home_points"]
+                x = float((self.ratings[h] - self.ratings[a] + home_points * home) / 400)
+                stored.update(x=x, expected_win=float(expit(math.log(10) * x)))
+                if b is not None:
+                    raw = np.array([b + slope * x / 2, b - slope * x / 2])
+                if not np.isfinite(x):
+                    self._absorb("nonfinite_dynamic_mean")
+            elif b is not None and not self.failed:
+                if self.family == "N0":
+                    def rates(team):
+                        if self.variant == "no_team_identity":
+                            return b, b
+                        recent = [r for r in team_rows if team in (r.context.home, r.context.away)][-17:]
+                        w = weights(recent, season, mean_half_life)
+                        pf = [r.home_score if r.context.home == team else r.away_score for r in recent]
+                        pa = [r.away_score if r.context.home == team else r.home_score for r in recent]
+                        return (float(w @ pf) + 4 * b) / (w.sum() + 4), (float(w @ pa) + 4 * b) / (w.sum() + 4)
+                    pfh, pah = rates(game.home)
+                    pfa, paa = rates(game.away)
+                    raw = np.array([.5 * (pfh + paa) + home_effect * home / 2,
+                                    .5 * (pfa + pah) - home_effect * home / 2])
+                elif self.family == "S1":
+                    margin = h_srs * home + r_srs[h] - r_srs[a]
+                    raw = np.array([b + margin / 2, b - margin / 2])
+                else:
+                    raw = np.array([b + home_effect * home / 2 + self.offense[h] - self.defense[a],
+                                    b - home_effect * home / 2 + self.offense[a] - self.defense[h]])
+            if raw is not None and self.family in {"E1", "E2"} and not np.all(np.isfinite(raw)):
+                self._absorb("nonfinite_dynamic_mean")
+            stored["mean"] = None if raw is None else raw.copy()
+            self.stored[game.game_id] = stored
+            # Noise changes only this forecast, never the original expectation used for learning.
+            prediction = None if raw is None else raw.copy()
+            if prediction is not None and self.variant == "deterministic_noise":
+                prediction += np.array([np.random.Generator(np.random.PCG64(canonical_seed("noise", game.game_id, side))).standard_normal() for side in ("home", "away")])
+            failure = "warmup_no_prior_score" if prediction is None else "invalid_mean" if not np.all(np.isfinite(prediction)) or np.any(prediction <= 0) else None
+            output.append({"game_id": game.game_id, "mean": prediction, "failure": failure,
+                           "initialization_only": stored["initialization_only"]})
+        if self.failed:
+            for record in output:
+                record["mean"], record["failure"] = None, self.failure_reason
+        return {"forecasts": output, "events": events, "support": support,
+                "league_mean": b, "home_effect": home_effect, "elo_score_slope": slope,
+                "absorbing_failure": self.failed}

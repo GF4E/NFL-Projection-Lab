@@ -1,0 +1,36 @@
+# RF-COMP-09: serialized runtime checks
+
+Registered September 6, 2026 before implementation or qualification. ADR-0018 authorizes bounded source-backed research repair. The owner-approved RF-COMP-08 resource envelope remains 9,000 seconds / 4,096 MiB for this separately registered corrective successor. This does not reopen RF-COMP-08 or authorize an unchanged retry.
+
+## Hypothesis and evidence
+
+RF-COMP-08 closed `protocol_invalid` on `invalid_monotonic_clock` after 113 completed origins and 929 outer games, at 508.056 seconds / 1,031.203 MiB. Its complete-cost pilot passed at 8,842.856 seconds. Preserve its manifest `6683e6438f3c607711623596ea8d41370e3ba9a3c9bcdd9dbead50703520ae5f`, terminal `1922fb7be8173333f937dc1f1022c20db5071be099493a6c61c21204d107b4ec` and pre-fit acceptance `3bbc98b3645782ba088d814c61505a86041f0a5c82e6a32d6430b62c58fd1bbe`. Independent terminal audits must close before new historical execution.
+
+The exact-method synthetic diagnostic in owner workspace `work/rf-resource-policy/clock-reentrancy/result.json` (SHA `75e76ee862deab9467e8338ca509ed25a00fff07b3ef00e76dd491db680dda3e`) reproduces the following source defect in both original and resource runtime: outer samples 100; nested watchdog samples and commits 101; outer compares its already acquired 100 against 101 and falsely stops. Sequential actual reversal 100 then 99 fails correctly. This proves a possible source mechanism; the historical log lacks the disputed samples and cannot prove that interleaving caused the actual stop.
+
+Hypothesis: serializing the entire outermost resource check and servicing nested requests with fresh complete checks removes this false failure while retaining every real monotonic, deadline, memory and closure rule. No clock tolerance, timestamp clamping, swallowed exception or favorable rereading is allowed.
+
+## Exact scope
+
+Preserve all 85 source/test pins and seven runtime pins bound by RF-COMP-08 pre-fit acceptance, all original science/config/protocol bytes and all prior results. Use new source files for the guard, preflight and controller. Reuse immutable science and watchdog helpers; identity-only copies are permitted where the current fixed constants make safe reuse impossible. No global module mutation in production, framework, new scientific configuration or deferred optimization. New preflight binds this protocol, inherited resource policy, old acceptance as evidence, exact original 85 pins, new source/tests/qualification and distinct reviews. New manifest/run and observer identities use `rfcomp09`; old acceptance alone cannot authorize them. Reauthenticate repair and resource bindings at completion.
+
+Initialize active/pending ownership flags before checks or handler installation. Protect the complete combined check: complete-smoke precedence, strict finite/monotonic sample comparison and commit, RSS high-water update, earliest deadlines and memory cap. Nested checks take no clock/RSS sample and change only the pending request. A protected successful check releases active in `finally` and services pending through a fresh full iteration without recursive stack growth. Clear pending before a fresh protected check; release active before examining pending. Signals around every ownership assignment must either perform a complete check or leave a serviced request. A failing check releases ownership and propagates its original exception without a cleanup drain replacing it. Keep inherited metadata-phase watchdog dispatch and external process ownership enforcement. Continuous interrupts may delay return but every iteration must enforce full limits; no silent request drop or arbitrary retry cutoff.
+
+Preserve original scientific routing, model parameters, complete grids, all 277 origins / 4,175 state games / 3,407 outer games, all 19 series and diagnostics, availability assumptions, selection/tie ordering, uncertainty and acceptance thresholds. Complete-cost pilot formula/accounting remains exact and must freshly pass. Scientific resource envelope is setup-inclusive 9,000 seconds, projection at most 9,000, 4,096 MiB, one worker, complete smoke 120 seconds, invalid metadata only 30 seconds, external scientific/worker grace zero. No extension or resumption.
+
+## Focused qualification
+
+Development checks bounded at 120 seconds / 1,024 MiB. One exact-candidate complete qualification bounded at 600 seconds / 2,048 MiB including preparation and process evidence; freeze inputs/code first. Failure requires diagnosis and changed implementation before another qualification; preserve every attempt. Reuse accepted unchanged inference/controller science evidence rather than replaying large bootstrap or historical scores.
+
+1. Deterministically inject nested watchdog entry at sample/compare/commit and active/pending/release boundaries. Retain traces of acquired/committed times and serviced requests. Verify increasing acquisitions do not fail, repeated requests terminate when finite, and original bodies reproduce the counterexample. Test genuine reversal/nonfinite clocks, RSS invalid/over-cap/high-water behavior, earliest complete-smoke/evaluator/total deadlines, exceptions/interrupts and metadata-only closure without weakening rules.
+2. One shortened actual signal exercise complements deterministic injection; include a pending request crossing a real deadline. Observe actual process completion and external guard behavior. No 150-minute synthetic wait.
+3. Exercise the new actual CLI/preflight identity and missing/old/wrong acceptance, source/repair/resource binding contradictions and duplicate refusal. Prove original scientific loop/helper identity or declared AST-only deltas, unchanged budget/pilot and old 85/7 pins. Reuse unchanged watchdog/inference tests.
+4. Run one genuine tiny complete science equivalence pair with original accepted routing versus guarded routing, using fresh identical synthetic inputs and full persisted output/array equality. It is operational equivalence evidence only. No historical fitting, scoring or resampling during qualification.
+
+Distinct numerical and temporal reviewers inspect the exact implementation and retained qualification; root authenticates pointers/source and actual completion. Issue one new pre-fit acceptance only after both accept. No receipt machinery beyond the existing minimal protocol/qualification/review/acceptance path.
+
+## One corrected historical invocation
+
+After acceptance, execute one new complete historical invocation, same approved limits and all original science. Never restart or resume RF-COMP-08 or this closed identity. Preserve terminal evidence on any outcome. Complete distinct numerical and temporal result audits before any scientific decision. A computational pass does not establish the external 5% target, prospective confirmation or product readiness.
+
+No new dataset/provider/credentials/paid services, prospective/production activation, market features or additional publication. The public front page Beta scope remains unchanged; research details stay private.

@@ -1,0 +1,63 @@
+{
+  "status": "accepted",
+  "scope": "complete_synthetic_scorer_json_public_evaluator_and_real_bootstrap_qualification",
+  "source_hashes": {
+    "scripts/research_score_split_inference.py": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22",
+    "tests/research-score-split/qualify_inference_unit.py": "bdc7016088a8e094e1c4c023e962b0be4935065d5f63df0c9c11e1bf6ef824d3",
+    "tests/research-score-split/test_inference_unit.py": "6678ff40c73b2d5c493cd22d6e2321f7d9edb2d6d5b0a1241c29420c33e9040d"
+  },
+  "protocol_sha256": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16",
+  "config_sha256": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519",
+  "qualification_sha256": "19f64845ee65da9631049a218aa19c3379dae873e164bd193a8bde2c874d2eeb",
+  "fixture_manifest_sha256": "22bd22dcb3b08218385fab0ddb52471d178f31e9ca84bf9fa202d09c96d9354d",
+  "evaluation_sha256": "caeda7fa5f04c1fbfc2bedd8fcb8a8bc4bfec6631222f4ee0665ddee9e081352",
+  "blockers": [],
+  "reviewer_attempt_note": "First audit attempt completed ledger, three fresh metrics and decision checks then stopped on reviewer-only KeyError treating derived away_rmse as a raw metric. Corrected audit handles sqrt(mean squared error); no scientific source/artifact changed.",
+  "independent_checks": {
+    "all_origin_files": 226,
+    "all_rows": 64733,
+    "all_series_digests": 19,
+    "unique_complete_score_keys": 10221,
+    "reuses": 54512,
+    "signed_zero_metric_values": 8075,
+    "fresh_original_uncached_scorer_checks": [
+      {
+        "game_id": "RF02F_SYNTHETIC_2013_01_00",
+        "law_sha256": "d99c2adc4c42d2a09476549b3969b09c07c3a3a12dc4b8142b9401f6ce7f8064",
+        "complete_metric_bytes_equal": true
+      },
+      {
+        "game_id": "RF02F_SYNTHETIC_2013_01_00",
+        "law_sha256": "f4a3d553f4188bda5a31433bfaa892408e86bb9ec3c2f1095529f83a6dc4f327",
+        "complete_metric_bytes_equal": true
+      },
+      {
+        "game_id": "RF02F_SYNTHETIC_2013_01_00",
+        "law_sha256": "0ca6786fcc94e4714daad1cff655d56401915faab0458962b49099665f499397",
+        "complete_metric_bytes_equal": true
+      }
+    ],
+    "all_cohort_mean_median_checks": 65504,
+    "max_summary_error": 0.0,
+    "decision_exact_using_retained_intervals": true,
+    "comparison_count": 18,
+    "actual_mass_cells": 8,
+    "development_games": 3135,
+    "exposed_games": 272,
+    "reported_bootstrap_members_per_block": 10000,
+    "nominal_cells_per_block": 228,
+    "pit_bands_per_block": 76,
+    "fresh_scorer_calls_across_both_review_attempts": 6,
+    "unique_fresh_game_law_checks": 3
+  },
+  "limits": [
+    "No bootstrap endpoints regenerated; inspected retained three complete real bootstrap outputs and reviewed unchanged call path.",
+    "Independent fresh scoring covers three first-game laws only, not all 10221 calls. Author loader separately verified 40884 actual-ID PIT equations; complete independent ledger and cache key checks bind all rows.",
+    "Toy laws keep target means constant; actual numerical calibration regression is structurally unavailable by design and validated. Small real mean/mapper/fallback bridge and focused gate tests supplement synthetic integration; this is not historical mean-state proof.",
+    "No historical input, fits, scores, candidate evaluation or historical invocation authorization. No production, prospective or external-five-percent claim.",
+    "Root separately owns full timing/persistence/source-binding audit."
+  ],
+  "seconds": 25.958417041998473,
+  "peak_rss_mib": 565.609375,
+  "audit_script_sha256": "27e22690a241fead26d3d1b3754a8ddfd026a3ab6fe02f81e5e65da0dbf52185"
+}

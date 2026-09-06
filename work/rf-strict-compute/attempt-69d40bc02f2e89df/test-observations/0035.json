@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "18446744073709551615\n",
+    "bytes": 21,
+    "kind": "bytes",
+    "sha256": "f01cedc887ef3f800ffcf67e544b5b16cca680844255ccd759d5af6cf0ecd2e5",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "exact-numpy-1",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "uint64"
+  },
+  "label": "exact-numpy-1",
+  "original": {
+    "ascii_body": "18446744073709551615\n",
+    "bytes": 21,
+    "kind": "bytes",
+    "sha256": "f01cedc887ef3f800ffcf67e544b5b16cca680844255ccd759d5af6cf0ecd2e5",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_exact_numpy_scalars_and_arrays"
+}

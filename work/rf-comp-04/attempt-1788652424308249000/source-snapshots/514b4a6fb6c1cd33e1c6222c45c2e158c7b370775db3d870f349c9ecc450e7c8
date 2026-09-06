@@ -1,0 +1,61 @@
+{
+  "version": "rf02f.watchdog-unit-acceptance.v1",
+  "status": "accepted_synthetic_watchdog_unit_only",
+  "protocol": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md",
+    "sha256": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16",
+    "bytes": 26126
+  },
+  "machineRegistry": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score-split.v1.json",
+    "sha256": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519",
+    "bytes": 13887
+  },
+  "sourceAndTests": [
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_watchdog.py",
+      "sha256": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7",
+      "bytes": 20517
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_watchdog_unit.py",
+      "sha256": "1cb98cd59db38847b7ddf3c0440e17f5e20cd9ffcd947b7aec5386a6f2ed5024",
+      "bytes": 18090
+    }
+  ],
+  "authorEvidence": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-watchdog-unit/focused-5866b724ed955705.json",
+    "sha256": "77580ece544ba6fbded1e06fc9d775b9e60e23fde515f18b2c542ca2c21c12d8",
+    "bytes": 694
+  },
+  "independentReview": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-watchdog-unit/watchdog-review-final.json",
+    "sha256": "2b0e6a78a0974f945bf26844bbae2895a319e524762f6f0b8dec6a2bffa34fc7",
+    "bytes": 5934
+  },
+  "rootAdjudication": {
+    "status": "accepted_with_scoped_limitations",
+    "findings": [
+      "20 independently repeated process tests pass; ownership-loss/reap race is closed with real queued-signal coverage.",
+      "Held helper has no scientific terminal authority. Immediate owned-group hard stop and parent metadata closure are qualified only under observed scheduling/RSS limits.",
+      "Root reviewed held code and actual ControllerEnvelope integration evidence: six subprocess probes pass after controller corrected its mistaken transition return contract."
+    ]
+  },
+  "controllerIntegrationEvidence": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/root-watchdog-integration-review-final.json",
+    "sha256": "b20891b8baf28b15b3a68d9be49ab95d28fd5cb62566385c3c75f29d57f9afee",
+    "bytes": 5933
+  },
+  "preservedReviewRejection": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-watchdog-unit/watchdog-review.json",
+    "sha256": "0f0b5422da1b1b919c69ba9a3f4a1e64936466cb4e70cdb258ddc73160986e9f",
+    "bytes": 1230
+  },
+  "limitations": [
+    "RSS is sampled and scheduling can delay enforcement; report retains timing and separate group versus waited-worker peaks.",
+    "No actual historical source admission, scientific acceptance or full controller authorization."
+  ],
+  "historical_execution_authorized": false,
+  "production_authorized": false,
+  "prospective_evidence": false
+}

@@ -1,0 +1,57 @@
+{
+  "candidate": {
+    "events": [
+      "left-hook",
+      "assembly",
+      "right-hook"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": [
+      {
+        "mode": "supported"
+      },
+      {
+        "mode": "supported"
+      }
+    ]
+  },
+  "expected_decision": true,
+  "expected_modes": [
+    "supported",
+    "supported"
+  ],
+  "kind": "paired_value",
+  "label": "ListHook-fallback-False",
+  "original": {
+    "events": [
+      "left-hook",
+      "assembly",
+      "right-hook"
+    ],
+    "images": [
+      {
+        "ascii_body": "[\n  {\n    \"x\": [\n      -0.0,\n      1\n    ]\n  }\n]\n",
+        "bytes": 49,
+        "sha256": "b73d5ed58f54859c707a7a8c0aa3845a7bd7336de283232ec40a6487a7e08a0c"
+      },
+      {
+        "ascii_body": "[\n  {\n    \"x\": [\n      -0.0,\n      1\n    ]\n  }\n]\n",
+        "bytes": 49,
+        "sha256": "b73d5ed58f54859c707a7a8c0aa3845a7bd7336de283232ec40a6487a7e08a0c"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_subclass_and_numpy_hooks_once_per_capture"
+}

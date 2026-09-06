@@ -1,0 +1,173 @@
+"""RF-COMP-07: caller-owned reuse of only late energy lag-distance matrices.
+
+Every probability/observation calculation remains fresh. A successful energy
+call may commit one immutable geometry entry; an enclosing score can still fail
+later. No process-global cache, controller integration or persisted format.
+"""
+import math
+
+import numpy as np
+
+from research_score_distribution import NumericalFailure, ScoreGrid, crps
+from research_score_distribution import energy_score as _original_energy_score
+from research_score_metrics import LEVELS, TARGETS
+from research_score_models import pit_uniform
+from research_score_skellam_compute import SkellamDistribution
+
+
+VERSION = 'rfcomp07.energy-geometry.v1'
+_rfft2 = np.fft.rfft2
+_irfft2 = np.fft.irfft2
+
+
+def _build_distance(shape):
+    lags = [np.where(np.arange(n) <= (n - 1) // 2, np.arange(n), np.arange(n) - n) for n in shape]
+    distance = np.hypot(lags[0][:, None], lags[1])
+    return distance
+
+
+def _supported_shape(shape):
+    return type(shape) is tuple and len(shape) == 2 and all(
+        type(n) is int and 0 < n <= 512 and (n & (n - 1)) == 0 for n in shape)
+
+
+class LagGeometry:
+    """Two-entry FIFO owned by the caller, with no retained raw scoring inputs."""
+
+    def __init__(self):
+        self._entries = {}
+        self._hits = self._misses = self._evictions = 0
+
+    def cache_info(self):
+        return {'entries': [list(shape) for shape in self._entries],
+                'retained_bytes': sum(value.nbytes for value in self._entries.values()),
+                'hits': self._hits, 'misses': self._misses, 'evictions': self._evictions}
+
+    def _publish(self, shape, distance):
+        # Construction is fresh and C-order float64. Commit a replacement dict
+        # only after preparation succeeds, so a failed miss never evicts an old
+        # entry. The pending matrix is transient, outside retained-byte counts.
+        distance.setflags(write=False)
+        entries = self._entries.copy()
+        evictions = self._evictions
+        if len(entries) == 2:
+            del entries[next(iter(entries))]
+            evictions += 1
+        entries[shape] = distance
+        self._entries = entries
+        self._evictions = evictions
+
+    def energy_score(self, grid, observed):
+        if type(grid) is not ScoreGrid:
+            return _original_energy_score(grid, observed)
+        p = grid.probability
+        if not (type(p) is np.ndarray and p.dtype == np.float64 and p.ndim == 2
+                and all(0 < n <= 256 for n in p.shape)
+                and type(observed) is np.ndarray and observed.dtype == np.float64
+                and observed.shape == (2,)):
+            return _original_energy_score(grid, observed)
+
+        home, away = np.indices(p.shape)
+        first = float(np.sum(p * np.hypot(home - observed[0], away - observed[1])))
+        shape = tuple(1 << (2 * n - 2).bit_length() for n in p.shape)
+        transformed = _rfft2(p, s=shape)
+        correlation = _irfft2(transformed * transformed.conj(), s=shape)
+        if correlation.min() < -1e-12 or abs(float(correlation.sum()) - 1) > 1e-10:
+            raise NumericalFailure("fft_correlation_invalid")
+        correlation = np.maximum(correlation, 0)
+        if abs(float(correlation.sum()) - 1) > 1e-10:
+            raise NumericalFailure("fft_clipped_mass_invalid")
+        correlation /= correlation.sum()
+
+        supported = _supported_shape(shape)
+        pending = False
+        if supported and shape in self._entries:
+            self._hits += 1
+            distance = self._entries[shape]
+        else:
+            if supported:
+                self._misses += 1
+                pending = True
+            distance = _build_distance(shape)
+
+        answer = first - 0.5 * float(np.sum(correlation * distance))
+        if answer < -1e-10 or not np.isfinite(answer):
+            raise NumericalFailure("invalid_energy_score")
+        result = max(0.0, answer)
+        if pending:
+            self._publish(shape, distance)
+        return result
+
+    def score_forecast(self, distribution, observed, game_id, double_grid=True, diagnostics=True):
+        return _score_forecast(SkellamDistribution(distribution), observed, game_id,
+                               double_grid=double_grid, diagnostics=diagnostics,
+                               energy_score=self.energy_score)
+
+
+def _score_forecast(distribution, observed, game_id, double_grid=True, diagnostics=True, *, energy_score):
+    y = np.asarray(observed, dtype=float)
+    if y.shape != (2,) or np.any(y < 0) or np.any(y != np.floor(y)) or not np.all(np.isfinite(y)):
+        raise NumericalFailure("invalid_target_pair")
+    grid = distribution.grid()
+    energy = energy_score(grid, y)
+    observations = {"home": y[0], "away": y[1], "margin": y[0] - y[1], "total": y.sum()}
+    scores = {target + "_crps": crps(grid, target, value) for target, value in observations.items()}
+    delta = 0.
+    if double_grid:
+        larger = distribution.grid(np.array(grid.probability.shape) * 2, maximum_cells=1024)
+        differences = [abs(energy - energy_score(larger, y))]
+        differences += [abs(scores[target + "_crps"] - crps(larger, target, value)) for target, value in observations.items()]
+        delta = max(differences)
+        if delta > 1e-6:
+            raise NumericalFailure("double_grid_score_mismatch")
+    mean, covariance = distribution.moments()
+    metrics = {"joint_energy_score": energy, "joint_nll": -distribution.log_probability(*y), **scores,
+               "predicted_covariance": float(covariance[0, 1]),
+               "residual_product": float((y[0] - mean[0]) * (y[1] - mean[1])),
+               "grid_cells": list(grid.probability.shape), "grid_transport_bound": grid.score_error_bound,
+               "grid_probability_bound": grid.omitted_probability_bound, "double_grid_difference": delta}
+    predictions = {"home": mean[0], "away": mean[1], "margin": mean[0] - mean[1], "total": mean.sum()}
+    for target, value in observations.items():
+        metrics[target + "_observed"] = float(value)
+        metrics[target + "_mean"] = float(predictions[target])
+        metrics[target + "_mae"] = float(abs(value - predictions[target]))
+        metrics[target + "_squared_error"] = float((value - predictions[target]) ** 2)
+    if not diagnostics:
+        return metrics
+    p_away = distribution.cdf("margin", -1)
+    p_tie = distribution.cdf("margin", 0) - p_away
+    p_home = 1 - distribution.cdf("margin", 0)
+    probabilities = np.array([p_home, p_tie, p_away])
+    if np.any(probabilities < 0) or abs(float(probabilities.sum()) - 1) > 1e-10:
+        raise NumericalFailure("invalid_win_tie_loss_probability")
+    label = 0 if y[0] > y[1] else 1 if y[0] == y[1] else 2
+    indicator = np.eye(3)[label]
+    if probabilities[label] <= 0 or not 0 < p_home < 1:
+        raise NumericalFailure("unresolvable_win_probability")
+    home_result = float(label == 0)
+    metrics.update(home_win_probability=p_home, tie_probability=p_tie, away_win_probability=p_away,
+                   home_win_observed=home_result, home_win_brier=(p_home - home_result) ** 2,
+                   home_win_log_loss=-(home_result * math.log(p_home) + (1 - home_result) * math.log1p(-p_home)),
+                   win_tie_loss_brier=float(np.sum((probabilities - indicator) ** 2)),
+                   win_tie_loss_log_loss=-math.log(float(probabilities[label])),
+                   tail_absolute_margin_21=distribution.cdf("margin", -21) + 1 - distribution.cdf("margin", 20),
+                   tail_total_70=1 - distribution.cdf("total", 69),
+                   observed_absolute_margin_21=float(abs(y[0] - y[1]) >= 21),
+                   observed_total_70=float(y.sum() >= 70))
+    for target, value in observations.items():
+        below, at = distribution.cdf(target, value - 1), distribution.cdf(target, value)
+        if below > at + 1e-12:
+            raise NumericalFailure("nonmonotone_observed_cdf")
+        metrics[target + "_pit"] = below + pit_uniform(game_id, target) * (at - below)
+        for level in LEVELS:
+            suffix = str(round(100 * level))
+            lo, lodistance = distribution.quantile(target, (1 - level) / 2)
+            hi, hidistance = distribution.quantile(target, (1 + level) / 2)
+            if hi < lo:
+                raise NumericalFailure("reversed_interval")
+            metrics[f"{target}_lower_{suffix}"] = lo
+            metrics[f"{target}_upper_{suffix}"] = hi
+            metrics[f"{target}_coverage_{suffix}"] = float(lo <= value <= hi)
+            metrics[f"{target}_width_{suffix}"] = hi - lo
+            metrics[f"{target}_boundary_distance_{suffix}"] = min(lodistance, hidistance)
+    return metrics

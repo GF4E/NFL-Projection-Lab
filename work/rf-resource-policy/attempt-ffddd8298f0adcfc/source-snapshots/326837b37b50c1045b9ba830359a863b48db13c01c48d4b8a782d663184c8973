@@ -1,0 +1,359 @@
+"""Synthetic RF-02F bank/selection qualification; no historical inputs."""
+import copy
+from pathlib import Path
+import sys
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
+import numpy as np
+from research_score_models import GameContext, HistoricalResult, MeanTrajectory
+from research_score_replay import SelectionHistory, TrajectoryBank
+from research_score_split_models import SPLIT_VARIANTS, make_split_trajectory, split_setting_grid
+from research_score_split_replay import SplitSelectionHistory, SplitTrajectoryBank
+
+
+TEAMS = tuple(f"T{i:02d}" for i in range(32))
+OLD_STATE = ("full", "no_home_effect", "no_prior_season_carryover", "no_time_decay",
+             "no_team_identity", "availability_24h", "no_offense", "no_defense",
+             "shuffled_identity")
+NEW_ZERO = ("zero_strength_update", "zero_scoring_level_update")
+STATE = OLD_STATE + NEW_ZERO
+
+
+def game(name, year=2010, week=1, home=0, away=1):
+    return GameContext(name, year, week, TEAMS[home], TEAMS[away])
+
+
+def prepared(targets, history=(), history24=None, targets24=None):
+    return {12: {"history": list(history), "targets": list(targets)},
+            24: {"history": list(history if history24 is None else history24),
+                 "targets": list(targets if targets24 is None else targets24)}}
+
+
+def equal_tree(test, actual, expected):
+    if isinstance(expected, np.ndarray):
+        test.assertEqual(actual.dtype, expected.dtype)
+        test.assertEqual(actual.shape, expected.shape)
+        test.assertEqual(actual.tobytes(), expected.tobytes())
+    elif isinstance(expected, dict):
+        test.assertEqual(set(actual), set(expected))
+        for key in expected:
+            equal_tree(test, actual[key], expected[key])
+    elif isinstance(expected, (tuple, list)):
+        test.assertEqual(len(actual), len(expected))
+        for left, right in zip(actual, expected):
+            equal_tree(test, left, right)
+    else:
+        test.assertEqual(actual, expected)
+
+
+class OriginalDiagonals:
+    """Real synthetic caller outputs, never an engine factory inside the bank."""
+    def __init__(self):
+        self.engines = {
+            (i, v): MeanTrajectory("E2", {"k": s["ks"], "retention": s["retention"]}, TEAMS, v)
+            for i, s in enumerate(split_setting_grid()[:9]) for v in OLD_STATE
+        }
+
+    def advance(self, year, week, data):
+        return {(i, v): engine.forecast_origin(year, week,
+                    data[24 if v == "availability_24h" else 12]["history"],
+                    data[24 if v == "availability_24h" else 12]["targets"])
+                for (i, v), engine in self.engines.items()}
+
+
+def populated_bank():
+    bank, old = SplitTrajectoryBank(iter(TEAMS)), OriginalDiagonals()
+    warm, first, next_game = game("warm"), game("first", week=2), game("next", week=3)
+    warm_result = HistoricalResult(warm, 20, 10)
+    first_result = HistoricalResult(first, 26, 14)
+    origins = [(2010, 1, prepared([warm])),
+               (2010, 2, prepared([first], [warm_result], [])),
+               (2010, 3, prepared([next_game], [warm_result, first_result], [warm_result]))]
+    for year, week, data in origins:
+        cache = old.advance(year, week, data)
+        outputs = bank.advance(year, week, data, cache)
+    return bank, old, outputs, cache, origins, (warm_result, first_result)
+
+
+class SplitBankTests(unittest.TestCase):
+    def test_exact_engine_registry_and_complete_output_population(self):
+        bank = SplitTrajectoryBank(iter(TEAMS))
+        expected = {("E3", i, v) for i in range(27) for v in STATE
+                    if i >= 9 or v in NEW_ZERO}
+        self.assertEqual(set(bank.engines), expected)
+        self.assertEqual(len(expected), 216)
+        self.assertEqual(len({id(engine) for engine in bank.engines.values()}), 216)
+        self.assertTrue(all(engine.last_origin is None for engine in bank.engines.values()))
+        data = prepared([game("z", home=2, away=3), game("a")])
+        cache = OriginalDiagonals().advance(2010, 1, data)
+        output = bank.advance(2010, 1, data, cache)
+        self.assertEqual(set(output), {("E3", i, v) for i in range(27) for v in STATE})
+        self.assertEqual(len(output), 297)
+        for key, row in output.items():
+            self.assertEqual([f["game_id"] for f in row["forecasts"]], ["a", "z"])
+            self.assertTrue(all(f["initialization_only"] for f in row["forecasts"]))
+        for (i, v), row in cache.items():
+            equal_tree(self, output[("E3", i, v)], row)
+            self.assertIsNot(output[("E3", i, v)], row)
+
+    def test_bad_cache_rejected_before_any_engine_changes(self):
+        bank = SplitTrajectoryBank(TEAMS)
+        data = prepared([game("a"), game("z", home=2, away=3)])
+        valid = OriginalDiagonals().advance(2010, 1, data)
+        baseline = copy.deepcopy({key: engine.__dict__ for key, engine in bank.engines.items()})
+        malformed = [None]
+        missing = copy.deepcopy(valid); missing.pop((8, "full")); malformed.append(missing)
+        extra = copy.deepcopy(valid); extra[(9, "full")] = extra[(0, "full")]; malformed.append(extra)
+        wrong = copy.deepcopy(valid); wrong[(0, "independent_marginals")] = wrong.pop((0, "full")); malformed.append(wrong)
+        boolean = copy.deepcopy(valid); boolean[(False, "full")] = boolean.pop((0, "full")); malformed.append(boolean)
+        for change in ("missing", "duplicate", "reverse", "other_origin", "missing_forecasts", "bad_id"):
+            bad = copy.deepcopy(valid)
+            row = bad[(8, "shuffled_identity")]
+            if change == "missing": row["forecasts"].pop()
+            elif change == "duplicate": row["forecasts"][1] = copy.deepcopy(row["forecasts"][0])
+            elif change == "reverse": row["forecasts"].reverse()
+            elif change == "other_origin": row["forecasts"][0]["game_id"] = "2011-other"
+            elif change == "missing_forecasts": row.pop("forecasts")
+            else: row["forecasts"][0]["game_id"] = None
+            malformed.append(bad)
+        for bad in malformed:
+            with self.subTest(case=malformed.index(bad) if bad is None else len(bad)):
+                with self.assertRaises(ValueError):
+                    bank.advance(2010, 1, data, bad)
+                equal_tree(self, {key: engine.__dict__ for key, engine in bank.engines.items()}, baseline)
+
+    def test_prepared_shape_origin_and_delay_specific_cache_membership(self):
+        bank = SplitTrajectoryBank(TEAMS)
+        data = prepared([game("twelve")], targets24=[game("twentyfour", home=2, away=3)])
+        cache = OriginalDiagonals().advance(2010, 1, data)
+        bad_inputs = [{12: data[12]}, {**data, 48: data[12]},
+                      {**data, 12: {**data[12], "outcome": 1}},
+                      prepared([game("wrong", week=2)]),
+                      prepared([game("same"), game("same")])]
+        for bad in bad_inputs:
+            with self.assertRaises(ValueError):
+                bank.advance(2010, 1, bad, cache)
+            self.assertTrue(all(e.last_origin is None for e in bank.engines.values()))
+        swapped = copy.deepcopy(cache)
+        swapped[(8, "availability_24h")] = copy.deepcopy(cache[(8, "full")])
+        with self.assertRaisesRegex(ValueError, "cache_target"):
+            bank.advance(2010, 1, data, swapped)
+        self.assertTrue(all(e.last_origin is None for e in bank.engines.values()))
+        outputs = bank.advance(2010, 1, data, cache)
+        for (_, _, variant), row in outputs.items():
+            self.assertEqual(row["forecasts"][0]["game_id"],
+                             "twentyfour" if variant == "availability_24h" else "twelve")
+
+    def test_real_availability_histories_and_original_expectations(self):
+        bank, old, outputs, cache, origins, rows = populated_bank()
+        full, delayed = bank.engines[("E3", 9, "full")], bank.engines[("E3", 9, "availability_24h")]
+        self.assertEqual(full.delivered, {"warm", "first"})
+        self.assertEqual(delayed.delivered, {"warm"})
+        np.testing.assert_array_equal(full.stored["first"]["mean"], [20., 10.])
+        self.assertIsNone(delayed.stored["first"]["mean"])
+        self.assertTrue(np.any(full.offense != 0))
+        np.testing.assert_array_equal(delayed.offense, np.zeros(32))
+        data = prepared([game("later", week=4)], rows)
+        outputs = bank.advance(2010, 4, data, old.advance(2010, 4, data))
+        self.assertEqual(outputs[("E3", 9, "availability_24h")]["events"]["initialization_only"], ["first"])
+        np.testing.assert_array_equal(delayed.offense, np.zeros(32))
+        for engine in bank.engines.values():
+            self.assertEqual(set(engine.stored), {"warm", "first", "next", "later"})
+
+    def test_all_engines_keep_whole_history_without_selection_splicing(self):
+        bank, old, outputs, cache, origins, rows = populated_bank()
+        for index, variant in ((9, "full"), (26, "full"), (0, "zero_strength_update"),
+                               (20, "availability_24h"), (16, "shuffled_identity")):
+            direct = make_split_trajectory(split_setting_grid()[index], TEAMS, variant)
+            for year, week, data in origins:
+                d = data[24 if variant == "availability_24h" else 12]
+                expected = direct.forecast_origin(year, week, d["history"], d["targets"])
+            equal_tree(self, bank.engines[("E3", index, variant)].__dict__, direct.__dict__)
+            equal_tree(self, bank.selected_output(outputs, "E3", index, variant), expected)
+        first_state = copy.deepcopy(bank.engines[("E3", 9, "full")].__dict__)
+        for i in (26, 0, 9, 17, 2, 9):
+            bank.selected_output(outputs, "E3", i, "full")
+        equal_tree(self, bank.engines[("E3", 9, "full")].__dict__, first_state)
+        self.assertFalse(np.array_equal(bank.engines[("E3", 9, "full")].offense,
+                                       bank.engines[("E3", 26, "full")].offense))
+
+    def test_all_selected_variants_and_original_output_only_noise(self):
+        bank, _, outputs, cache, _, _ = populated_bank()
+        for index in (0, 9, 26):
+            full = outputs[("E3", index, "full")]
+            for variant in SPLIT_VARIANTS:
+                actual = bank.selected_output(outputs, "E3", index, variant)
+                if variant == "deterministic_noise":
+                    expected = TrajectoryBank.selected_output(None, {("E2", index, "full"): full},
+                                                               "E2", index, variant)
+                    equal_tree(self, actual, expected)
+                    self.assertIsNot(actual, full)
+                elif variant == "independent_marginals":
+                    self.assertIs(actual, full)
+                else:
+                    self.assertIs(actual, outputs[("E3", index, variant)])
+        for variant in SPLIT_VARIANTS:
+            self.assertIsNone(bank.selected_output(outputs, "E3", None, variant))
+
+    def test_noise_preserves_failures_and_original_invalid_mean_checks(self):
+        bank = SplitTrajectoryBank(TEAMS)
+        for mean, failure in ((None, "warmup_no_prior_score"),
+                              (np.array([-100., -100.]), None),
+                              (np.array([20., 10.]), "inherited_reason")):
+            output = {"forecasts": [{"game_id": "noise-probe", "mean": mean, "failure": failure}]}
+            saved = copy.deepcopy(output)
+            actual = bank.selected_output({("E3", 0, "full"): output}, "E3", 0, "deterministic_noise")
+            expected = TrajectoryBank.selected_output(None, {("E2", 0, "full"): output},
+                                                       "E2", 0, "deterministic_noise")
+            equal_tree(self, actual, expected)
+            equal_tree(self, output, saved)
+            if mean is not None and mean[0] < 0:
+                self.assertEqual(actual["forecasts"][0]["failure"], "invalid_mean")
+
+    def test_cache_and_selected_setting_are_not_mutated_or_aliased(self):
+        bank, _, outputs, cache, _, _ = populated_bank()
+        saved = copy.deepcopy(cache)
+        other = copy.deepcopy(outputs[("E3", 1, "full")])
+        noisy = bank.selected_output(outputs, "E3", 0, "deterministic_noise")
+        noisy["forecasts"][0]["mean"][:] = 999
+        outputs[("E3", 0, "full")]["forecasts"][0]["mean"][:] = -9
+        outputs[("E3", 0, "full")]["events"]["delivered"].append("changed")
+        equal_tree(self, cache, saved)
+        equal_tree(self, outputs[("E3", 1, "full")], other)
+
+    def test_selected_unknown_registry_members_are_rejected(self):
+        bank = SplitTrajectoryBank(TEAMS)
+        for family, setting, variant in (("E2", 0, "full"), ("E2", None, "full"),
+                                         ("E3", 0, "K_zero"), ("E3", None, "unknown")):
+            with self.assertRaises(ValueError): bank.selected_output({}, family, setting, variant)
+        for index in (-1, 27, True, .0, "0"):
+            with self.assertRaises(ValueError): bank.selected_output({}, "E3", index, "full")
+
+
+def universe():
+    return {2011: ["b", "a"], 2012: ["d", "c"]}
+
+
+def fill(history, expected, losses=None, failed=None):
+    losses = (lambda season, identity, index: 1. + index / 100) if losses is None else losses
+    failed = (lambda season, identity, index: False) if failed is None else failed
+    for season, identities in expected.items():
+        for identity in identities:
+            for index in range(27):
+                history.add(season, identity, "E3", index, losses(season, identity, index),
+                            failed(season, identity, index))
+
+
+class SplitSelectionTests(unittest.TestCase):
+    def test_inherited_methods_fixed_constructor_and_fresh_state(self):
+        self.assertIs(SplitSelectionHistory.add, SelectionHistory.add)
+        self.assertIs(SplitSelectionHistory.select, SelectionHistory.select)
+        a, b = SplitSelectionHistory(), SplitSelectionHistory()
+        self.assertEqual(a.settings, {"E3": split_setting_grid()})
+        self.assertEqual(a.config, {"failure": {"innerSettingIneligibleAboveFailureRate": .005},
+                                    "common": {"selectionTieTolerance": 1e-8}})
+        a.config["common"]["selectionTieTolerance"] = 1
+        a.settings["E3"][0]["ks"] = 9
+        self.assertEqual(b.config["common"]["selectionTieTolerance"], 1e-8)
+        self.assertEqual(b.settings["E3"][0]["ks"], .05)
+        with self.assertRaises(TypeError): SplitSelectionHistory({})
+
+    def test_nine_diagonal_choices_and_candidate_summaries_match_original_e2(self):
+        for scenario in ("minimum", "tie", "failed_best"):
+            config = {"models": {"S1": {"ridgeGridInTieOrder": [16], "halfLifeGridInTieOrder": [2.5]},
+                                  "E1": {"kGridInTieOrder": [16], "retentionGridInTieOrder": [1],
+                                         "homePointsGridInTieOrder": [35]},
+                                  "E2": {"kGridInTieOrder": [.05, .1, .2],
+                                         "retentionGridInTieOrder": [.5, .75, 1]}},
+                      "failure": {"innerSettingIneligibleAboveFailureRate": .005},
+                      "common": {"selectionTieTolerance": 1e-8}}
+            old, new = SelectionHistory(config), SplitSelectionHistory()
+            expected = universe()
+            def loss(season, identity, index):
+                if index == 7: return .5
+                if scenario == "tie" and index == 6: return .5 + 5e-9
+                return 1 + index / 100
+            def failed(season, identity, index):
+                return scenario == "failed_best" and index == 7 and identity == "a"
+            fill(new, expected, loss, failed)
+            for family, settings in old.settings.items():
+                for season, identities in reversed(list(expected.items())):
+                    for identity in reversed(identities):
+                        for index in range(len(settings)):
+                            old.add(season, identity, family, index, loss(season, identity, index),
+                                    failed(season, identity, index))
+            actual, reference = new.select(2013, expected)["E3"], old.select(2013, expected)["E2"]
+            self.assertEqual(actual["candidates"][:9], reference["candidates"])
+            self.assertEqual({k: v for k, v in actual.items() if k != "candidates"},
+                             {k: v for k, v in reference.items() if k != "candidates"})
+
+    def test_genuinely_winning_off_diagonal_and_fixed_tie_preference(self):
+        for improvement, expected_index in ((5e-9, 0), (2e-8, 19), (.25, 19)):
+            history = SplitSelectionHistory()
+            fill(history, universe(), lambda s, g, i: 1 - improvement if i == 19 else 1.)
+            self.assertEqual(history.select(2013, universe())["E3"]["setting"], expected_index)
+
+    def test_prior_two_seasons_sorted_aggregation_and_future_isolation(self):
+        expected = universe()
+        history = SplitSelectionHistory()
+        per_game = {"a": 1e16, "b": 1., "c": 1., "d": 2.}
+        fill(history, expected, lambda s, g, i: per_game[g] + i)
+        fill(history, {2010: ["past"], 2013: ["current"], 2025: ["future"]},
+             lambda s, g, i: 0. if i == 26 else 1e30)
+        decision = history.select(2013, expected)["E3"]
+        self.assertEqual(decision["inner_seasons"], [2011, 2012])
+        self.assertEqual(decision["games"], 4)
+        self.assertEqual(decision["candidates"][0]["mean_energy"], float(np.mean([1e16, 1., 1., 2.])))
+        self.assertEqual(decision["setting"], 0)
+
+    def test_season_frozen_choice_and_return_copy_isolation(self):
+        history = SplitSelectionHistory(); fill(history, universe())
+        first = history.select(2013, universe())
+        saved = copy.deepcopy(first)
+        first["E3"]["candidates"][0]["mean_energy"] = 99
+        first["E3"]["setting"] = 26
+        fill(history, {2013: ["later"]}, lambda s, g, i: 0. if i == 26 else 1.)
+        again = history.select(2013, {})
+        self.assertEqual(again, saved)
+        again["E3"]["inner_seasons"].append(9999)
+        self.assertEqual(history.select(2013, universe()), saved)
+
+    def test_native_failure_threshold_boundary_and_family_fallback(self):
+        expected = {2011: [f"a{i:03}" for i in range(100)],
+                    2012: [f"b{i:03}" for i in range(100)]}
+        history = SplitSelectionHistory()
+        fill(history, expected, lambda s, g, i: .1 if i == 1 else 1. + i,
+             lambda s, g, i: (i == 0 and g == "a000") or (i == 1 and g in {"a000", "a001"}))
+        decision = history.select(2013, expected)["E3"]
+        self.assertEqual(decision["setting"], 0)
+        self.assertEqual(decision["candidates"][0]["failure_rate"], .005)
+        self.assertTrue(decision["candidates"][0]["eligible"])
+        self.assertFalse(decision["candidates"][1]["eligible"])
+        none = SplitSelectionHistory(); fill(none, universe(), failed=lambda s, g, i: True)
+        fallback = none.select(2013, universe())["E3"]
+        self.assertIsNone(fallback["setting"])
+        self.assertEqual(fallback["status"], "no_eligible_setting")
+
+    def test_invalid_losses_settings_duplicates_and_populations(self):
+        for family, index, energy in (("E2", 0, 1), ("E3", -1, 1), ("E3", 27, 1),
+                                       ("E3", 0, float("nan")), ("E3", 0, float("inf")), ("E3", 0, -1)):
+            with self.assertRaises(ValueError):
+                SplitSelectionHistory().add(2011, "a", family, index, energy, False)
+        history = SplitSelectionHistory(); fill(history, universe())
+        with self.assertRaisesRegex(ValueError, "duplicate_inner_loss"):
+            history.add(2011, "a", "E3", 0, 1, False)
+        for change in ("missing", "extra"):
+            broken = SplitSelectionHistory(); fill(broken, universe())
+            if change == "missing": broken.rows.pop((2011, "a", "E3", 26))
+            else: broken.add(2011, "unknown", "E3", 26, 1, False)
+            with self.assertRaisesRegex(ValueError, "inner_common_game_mismatch"):
+                broken.select(2013, universe())
+        for year, expected in ((2012, universe()), (2026, universe()), (2013, {2011: ["a"]}),
+                                (2013, {2011: [], 2012: []})):
+            with self.assertRaises(ValueError): SplitSelectionHistory().select(year, expected)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

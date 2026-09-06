@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "{\n  \"x\": 0\n}\n",
+    "bytes": 13,
+    "kind": "bytes",
+    "sha256": "c7fb92f4416a909c5ca37bd6a6454e6f2dd7bf67b6920279c8780b53e6f5d89b",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "dict-depth-1",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "dict"
+  },
+  "label": "dict-depth-1",
+  "original": {
+    "ascii_body": "{\n  \"x\": 0\n}\n",
+    "bytes": 13,
+    "kind": "bytes",
+    "sha256": "c7fb92f4416a909c5ca37bd6a6454e6f2dd7bf67b6920279c8780b53e6f5d89b",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_depth_exact_boundary_and_deep_delegation"
+}

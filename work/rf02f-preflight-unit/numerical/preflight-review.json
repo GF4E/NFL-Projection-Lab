@@ -1,0 +1,1512 @@
+{
+  "status": "accepted_preflight_numerical_schema_and_binding_unit_only",
+  "source_hashes": {
+    "scripts/research_score_split_preflight.py": "301b97a6a25e6bca92b99f220657ae54039774122c3e6a65071eefa7d4c79d51",
+    "tests/research-score-split/test_preflight_unit.py": "f326f9ca55dd2b30fe2753c0c7cc06505bf894befa2cd51abe8a0737a7cac05a"
+  },
+  "frozen_code_hashes": {
+    "scripts/research_score_compute_distribution.py": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1",
+    "scripts/research_score_compute_qualify.py": "41edf4cc2bc217fd0947aa2ad17e6112fd20e1aedc93b7eeb7ab0aae0ea77dcb",
+    "scripts/research_score_compute_run.py": "7089fc64b6464dadfddb4796059a975afe7f1fd43730420d8d8193d67104208f",
+    "scripts/research_score_conditional_adapter.py": "a6987485724c7f725661927e194ca39d77b303e15d868b872d3b9449a7cc19f2",
+    "scripts/research_score_conditional_admission.py": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+    "scripts/research_score_conditional_inference.py": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604",
+    "scripts/research_score_conditional_margin.py": "c1a0e334229999afe5bb000598ae0648789cc8ee0e112291b03707039015ad3d",
+    "scripts/research_score_conditional_policy.py": "aa72dc1799669340f3dbec32c5b6510f673ea70bba3d27b2315c311849a4551d",
+    "scripts/research_score_conditional_qualify.py": "cb0a13eb0afacb2a4ccde7826bc2288a31677853b71d061c5ccc477eca0647f6",
+    "scripts/research_score_conditional_replay.py": "8eae09d2b3cb7aec7a2e6fbe265679be39eea5dbf6bd327f24f75d9022f65b45",
+    "scripts/research_score_conditional_run.py": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+    "scripts/research_score_contract.py": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+    "scripts/research_score_distribution.py": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+    "scripts/research_score_inference.py": "4b61e0d4477eb49064353d9fd7b4e1c6ac37fc68553e0df0387d9f71bb8db078",
+    "scripts/research_score_metrics.py": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97",
+    "scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+    "scripts/research_score_replay.py": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594",
+    "scripts/research_score_run.py": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa",
+    "scripts/research_score_split_archive.py": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+    "scripts/research_score_split_budget.py": "0ee4dd5e7936a333fed6b2804f530bf310f588b811af41e3c8a5af1a335388ea",
+    "scripts/research_score_split_inference.py": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22",
+    "scripts/research_score_split_models.py": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+    "scripts/research_score_split_replay.py": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547",
+    "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+    "scripts/research_score_successor_distribution.py": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974",
+    "scripts/research_score_successor_qualify.py": "8fa0fb3f298bfa8419d535411b5bad7002fc56de3181d839ee4d047fcd45f7d3",
+    "scripts/research_score_successor_run.py": "b54c265c87a09d2ef9325363f668f3dd5a58cb49c54b82cd8286fdb61bd81459",
+    "tests/research-score-compute/test_cache.py": "a8dd3bf3721a91853eba32344a9301388fa9bd90b52b3c9997fb9c76ad3843dc",
+    "tests/research-score-compute/test_compute_qualify.py": "f12a8f493091c6d08ebfa6572b7a05010d02eb70e7dfaca0a96e64a0da280296",
+    "tests/research-score-compute/test_compute_run.py": "1c8e41eb477f3e86a2d5406dd1119b74f2c0d899c79bab2acb069fb2feb4bf76",
+    "tests/research-score-conditional-margin/test_adapter.py": "431326f6933504c315720c91492b38ef7fd42a2ceb182eb154658ea8d2771c99",
+    "tests/research-score-conditional-margin/test_admission.py": "416550a5459c6ae635db0dfbe35b27e1a51cd57501ec4c234f190c0b5c4249bb",
+    "tests/research-score-conditional-margin/test_conditional_margin.py": "53b18c9ee869696e13e552b9d01bdb8f79b9a1f1d4eb6973ae89420427f0809b",
+    "tests/research-score-conditional-margin/test_inference.py": "598d40031b1630993ff2f2aceb13a7d280dc86a5d4789e572c383d54da1ea629",
+    "tests/research-score-conditional-margin/test_policy.py": "64f8fea7fed97c356bbf221f5630b4fdc2ae0ada43118b85070c3a33b560b44d",
+    "tests/research-score-conditional-margin/test_qualify.py": "aace76b001643345bb5eadc1bd1fc05bc6745bb64fb6b662ef33f7f131e18341",
+    "tests/research-score-conditional-margin/test_replay.py": "6798aec8b7141819d9168bd736e18bf7b4cad7c348d776cdd8268a0569316fb7",
+    "tests/research-score-conditional-margin/test_run.py": "7720f9264d167b610f12971925d416bdef0c9ea08ce4a3cfdc0b193a4562621c",
+    "tests/research-score-split/qualify_inference_unit.py": "bdc7016088a8e094e1c4c023e962b0be4935065d5f63df0c9c11e1bf6ef824d3",
+    "tests/research-score-split/test_archive_unit.py": "510c10f77c194dcb5c9591404c5238f43f494659aa96a247db0013ffd3f2969e",
+    "tests/research-score-split/test_bank_unit.py": "326837b37b50c1045b9ba830359a863b48db13c01c48d4b8a782d663184c8973",
+    "tests/research-score-split/test_budget.py": "64cf75c26cec296bc996f37b7f1109d6f0c546ff0a9ae52452c3c9af74f46bc9",
+    "tests/research-score-split/test_inference_unit.py": "6678ff40c73b2d5c493cd22d6e2321f7d9edb2d6d5b0a1241c29420c33e9040d",
+    "tests/research-score-split/test_mean_unit.py": "622c7f2f97da6c7f49bbc050ad6d7b583cd3da474b0eeb318dcbb21be6cf3799",
+    "tests/research-score-split/test_run_unit.py": "a96576b22bd4c55ed8adf34d49ad78ee783605fe75a3f2f263f17a8c092bd42c",
+    "tests/research-score-successor/test_qualify.py": "9eaac19131c06877d9010b48a37315c0dc52d10639aa67faf331ecc1df633c23",
+    "tests/research-score-successor/test_solver.py": "0283d8c2e4d10b34e7552c5750a565e72b9a03b30ca658996089a4a966e5cfc2",
+    "tests/research-score-successor/test_successor_run.py": "a53ca0c80ec71f00e453599a7218d179d6dc5442ba6e407d726a24f608627755",
+    "tests/research-score/test_contract.py": "64157ed50c999e3ecba3b84b0da20afd88074544e957e16d3470d264a60b8bf2",
+    "tests/research-score/test_distribution.py": "b671c6a4b97757a8122a54b98491a4ca79952cceb78a2985c685a9d630f7fc14",
+    "tests/research-score/test_inference.py": "367bcb3e9bf989bae2c9773e82a0b6701b5a8c36bf9347026e3f3dca0f6d293a",
+    "tests/research-score/test_invariance.py": "e192da8539080a0be836ded37a802403bc5d171c148a3edd357db978ad98f50c",
+    "tests/research-score/test_mean_models.py": "fd625bdc03d53e725539ed9517d0c1a5fa5f5caf6fbb331ee3ab2627ffa9a8e7",
+    "tests/research-score/test_metrics.py": "3bd12882c193abe4eb716ddd4fc0b7871fa104a27e526c7187f27c9b44760f91",
+    "tests/research-score/test_replay.py": "ce21d82a17e3878a6ce80095faf5c267d51751df78318b10504d46a86e0a44b9",
+    "tests/research-score/test_run.py": "1b8fe02cc57bdfb95f190c03a49eb16669c3c5aab79f61c383d7e08d778ad58e",
+    "scripts/research_score_split_watchdog.py": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7",
+    "tests/research-score-split/test_watchdog_unit.py": "1cb98cd59db38847b7ddf3c0440e17f5e20cd9ffcd947b7aec5386a6f2ed5024",
+    "scripts/research_score_split_forecast.py": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34",
+    "tests/research-score-split/test_forecast_unit.py": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312"
+  },
+  "unfrozen_registry_members_observed_hashes": {
+    "scripts/research_score_split_controller.py": "ef82f33dda523f92c3e4c2826be3583b7d59bef801fb3abec9cc3d28dadfdca4",
+    "tests/research-score-split/test_controller_unit.py": "8684a27d32380ba3be4d947a47c26f4118d698efcf6e90c709fe96aa3d190edd",
+    "scripts/research_score_split_grade.py": "cdee8dc60c9a6d2d3943d734b4d8694978616719e1634c21769bc7ad9cf7fa7e",
+    "tests/research-score-split/test_grade_unit.py": "398077436f71c0a3f0195280c81f387ddeb1bf5b79a56cc87d170306d1ce26f3",
+    "scripts/research_score_split_preflight.py": "301b97a6a25e6bca92b99f220657ae54039774122c3e6a65071eefa7d4c79d51",
+    "tests/research-score-split/test_preflight_unit.py": "f326f9ca55dd2b30fe2753c0c7cc06505bf894befa2cd51abe8a0737a7cac05a"
+  },
+  "actual_runtime": {
+    "python": "3.12.2",
+    "numpy": "1.26.4",
+    "scipy": "1.13.1",
+    "platform": "darwin",
+    "executable": "/opt/anaconda3/bin/python3.12",
+    "isolated": true
+  },
+  "stage_pins": {
+    "protocol": {
+      "path": ".planning/engine-os/research-first/RF-02F-PROTOCOL-ACCEPTANCE.v1.json",
+      "sha256": "c55f4e651bb9726402ac310b3bc06b2337cd58523aaa0e2ee7496fb847fc554b",
+      "bytes": 5703,
+      "status": "accepted_design_for_implementation_and_synthetic_qualification_only"
+    },
+    "mean": {
+      "path": ".planning/engine-os/research-first/RF-02F-MEAN-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "61c448d59a30be43ccc15faf447d78f3be9e420cc83baf6a991aa5e3fa61101a",
+      "bytes": 3693,
+      "status": "accepted_pure_synthetic_mean_unit_only"
+    },
+    "bank": {
+      "path": ".planning/engine-os/research-first/RF-02F-BANK-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "c4f252cd9bc053df019308cfebf5d70f0ca0287ee38bae7cdf2738033f978268",
+      "bytes": 4459,
+      "status": "accepted_pure_synthetic_bank_and_selection_only"
+    },
+    "budget": {
+      "path": ".planning/engine-os/research-first/RF-02F-BUDGET-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "3481ef013b073714038b60aef8cc5055bf11331d7412b87f61b46ada0c7c6b5b",
+      "bytes": 2906,
+      "status": "accepted_pure_synthetic_cost_formula_only"
+    },
+    "inference": {
+      "path": ".planning/engine-os/research-first/RF-02F-INFERENCE-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "d56e355af3fff1cedb5fc3f2a30ae6ba1cd1f0616a817a801b46cbbb14c83db6",
+      "bytes": 9709,
+      "status": "accepted_full_synthetic_inference_integration_only"
+    },
+    "archive": {
+      "path": ".planning/engine-os/research-first/RF-02F-ARCHIVE-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "f0d96c36b181534260363a0b8365e488d9950f813a5a0354e606a81a7db4a28d",
+      "bytes": 9811,
+      "status": "accepted_synthetic_archive_forecast_grader_and_selector_boundaries_only"
+    },
+    "runtime": {
+      "path": ".planning/engine-os/research-first/RF-02F-RUNTIME-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "0720c240a36c3ed32a72d1113560997417b05a12c8cec8b06a3c4c8a5b0e1ca9",
+      "bytes": 8135,
+      "status": "accepted_synthetic_runtime_accounting_and_atomic_boundary_prerequisite_only"
+    },
+    "watchdog": {
+      "path": ".planning/engine-os/research-first/RF-02F-WATCHDOG-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "514b4a6fb6c1cd33e1c6222c45c2e158c7b370775db3d870f349c9ecc450e7c8",
+      "bytes": 3068,
+      "status": "accepted_synthetic_watchdog_unit_only"
+    },
+    "forecast": {
+      "path": ".planning/engine-os/research-first/RF-02F-FORECAST-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "cf86de2cd0ffd377503f8b650b56b3dfb6ede9d5b44a356a3281942cdd25c4cb",
+      "bytes": 6751,
+      "status": "accepted_synthetic_forecast_unit_only"
+    }
+  },
+  "authenticated_embedded_evidence": {
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-PROTOCOL-ACCEPTANCE.v1.json": {
+      "sha256": "c55f4e651bb9726402ac310b3bc06b2337cd58523aaa0e2ee7496fb847fc554b",
+      "bytes": 5703
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md": {
+      "sha256": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16",
+      "bytes": 26126
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score-split.v1.json": {
+      "sha256": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519",
+      "bytes": 13887
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-numerical-review-supplement.json": {
+      "sha256": "e7eaf3f94545c20f9c4c01e29b7ab9a8d9a9c3e2052d74846dd7252a85443e2e",
+      "bytes": 2237
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-temporal-review-supplement.json": {
+      "sha256": "35ea858184dca2f3e890772b62b80cdb981edceea6a64bf7d64b4f3706b4bc60",
+      "bytes": 5157
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-numerical-review.json": {
+      "sha256": "a5f7376108b96eea478389d20f8af9b850ab5cc4994b84fadf8c84d0124ca0e1",
+      "bytes": 3886
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-temporal-review.json": {
+      "sha256": "fe3f6385c95d2f442fac2fb264680148cfc1d29f03ca503192a33eb5ba6ce1c8",
+      "bytes": 10209
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-numerical-review-final.json": {
+      "sha256": "ca2b96a49784cfcab080c148417c38d4f08d9f76bc0b93045dd8129f0607bcfd",
+      "bytes": 3284
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-design-review/protocol-temporal-review-final.json": {
+      "sha256": "8d2f033d977dd9db5c20a6bfcc634641d0fc118849665f8b3d5031cd9fd1c058",
+      "bytes": 10860
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-MEAN-UNIT-ACCEPTANCE.v1.json": {
+      "sha256": "61c448d59a30be43ccc15faf447d78f3be9e420cc83baf6a991aa5e3fa61101a",
+      "bytes": 3693
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-BANK-UNIT-ACCEPTANCE.v1.json": {
+      "sha256": "c4f252cd9bc053df019308cfebf5d70f0ca0287ee38bae7cdf2738033f978268",
+      "bytes": 4459
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-MEAN-UNIT-SCOPE.v1.md": {
+      "sha256": "a9fd7df9620df11e83a8494aa47d5e5cca72b50b8f8f7c094e5f1db4054c05ac",
+      "bytes": 5273
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_models.py": {
+      "sha256": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+      "bytes": 4803
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_mean_unit.py": {
+      "sha256": "622c7f2f97da6c7f49bbc050ad6d7b583cd3da474b0eeb318dcbb21be6cf3799",
+      "bytes": 14617
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_models.py": {
+      "sha256": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+      "bytes": 15069
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-tests-attempt1.json": {
+      "sha256": "3ce7d353e3840e9ea42400071f62a0a4dd0c3f1406f015ad5833aa7314258f7b",
+      "bytes": 632
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-tests-attempt2.json": {
+      "sha256": "025739dfba9b8b00731444185386bcec976fc9d43771d1e9c867f708213f64f8",
+      "bytes": 665
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-process-attempt2.json": {
+      "sha256": "68bb101c223433aa5698dda7ec5f17b6e113bd8969f512442ac76a1fc74d40ae",
+      "bytes": 516
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/root-tests-attempt2.log": {
+      "sha256": "fca0ce93b547cae85feb6b16242a077bbf6fe4cfbabbbe78060d6e6dad9a4fb5",
+      "bytes": 2240
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/numerical-review.json": {
+      "sha256": "91c04193a7b1e6dc2db723cadd6a334262caa26411fcc7ce5b0ff9187a9c979d",
+      "bytes": 4093
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-mean-unit/temporal-review.json": {
+      "sha256": "3ee5ce61c8a8737bbf40dba2aa1985131296fb53b827565c5833f0b49952bd47",
+      "bytes": 7917
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-BANK-UNIT-SCOPE.v1.md": {
+      "sha256": "febb1935249cfddb57ae4d6b217853a4d0d2fe1ac0e480c58d381dcd18041fc9",
+      "bytes": 4613
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_replay.py": {
+      "sha256": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594",
+      "bytes": 6657
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_replay.py": {
+      "sha256": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547",
+      "bytes": 4538
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_bank_unit.py": {
+      "sha256": "326837b37b50c1045b9ba830359a863b48db13c01c48d4b8a782d663184c8973",
+      "bytes": 20412
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/work/rf02f-bank-unit/root-qualification.json": {
+      "sha256": "e2d3333f709d7ea50254f241313c1fb4578787e4b3a4141ff047c3bed69b5f48",
+      "bytes": 963
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/work/rf02f-bank-unit/root-tests.log": {
+      "sha256": "e4e1e67d5cbd96b0c738804a16bb290c84bdc975c9b31b570dcaeee53d17e1bd",
+      "bytes": 2546
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-bank-unit/author-qualification-44411d6f12ac.json": {
+      "sha256": "9c71ecbf693795051968e1fa6b496f9ee2793f8b91bff66631230bb374db8bda",
+      "bytes": 1075
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-bank-unit/author-tests-44411d6f12ac.log": {
+      "sha256": "9089fb838aa2ed652870b8d9d66ce89796d081f9d7c304a3c4262b78a0793c5d",
+      "bytes": 2546
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-bank-unit/independent-review.json": {
+      "sha256": "200a863cb23dde835d93ce3e419cecc03e42de4ba3b25d2449e268af619ca970",
+      "bytes": 3482
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-BUDGET-UNIT-ACCEPTANCE.v1.json": {
+      "sha256": "3481ef013b073714038b60aef8cc5055bf11331d7412b87f61b46ada0c7c6b5b",
+      "bytes": 2906
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-budget-unit/root-qualification-attempt1.json": {
+      "sha256": "7d047c8004089610afa41f5d35298bd1b805f06a158695f151c0183273f11df4",
+      "bytes": 627
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_budget.py": {
+      "sha256": "0ee4dd5e7936a333fed6b2804f530bf310f588b811af41e3c8a5af1a335388ea",
+      "bytes": 5177
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_budget.py": {
+      "sha256": "64cf75c26cec296bc996f37b7f1109d6f0c546ff0a9ae52452c3c9af74f46bc9",
+      "bytes": 5004
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-budget-unit/root-tests-attempt1.log": {
+      "sha256": "1e00f53a50cb92458d2fae0d9a21a7a8646648d429206567937d29df3d7102bd",
+      "bytes": 946
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-budget-unit/independent-review.json": {
+      "sha256": "7efc76d53ce207c9f95b79dba1cc88288a74baf384347a5fc7898d775c7f2d99",
+      "bytes": 2765
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-INFERENCE-UNIT-ACCEPTANCE.v1.json": {
+      "sha256": "d56e355af3fff1cedb5fc3f2a30ae6ba1cd1f0616a817a801b46cbbb14c83db6",
+      "bytes": 9709
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_inference.py": {
+      "sha256": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22",
+      "bytes": 16104
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/qualify_inference_unit.py": {
+      "sha256": "bdc7016088a8e094e1c4c023e962b0be4935065d5f63df0c9c11e1bf6ef824d3",
+      "bytes": 20060
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_inference_unit.py": {
+      "sha256": "6678ff40c73b2d5c493cd22d6e2321f7d9edb2d6d5b0a1241c29420c33e9040d",
+      "bytes": 18616
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_inference.py": {
+      "sha256": "acaf57739ebb30f6a7a4abcb3c2673bbbd649ceca7fa3af6c435c27be9dd1604",
+      "bytes": 23548
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_inference.py": {
+      "sha256": "4b61e0d4477eb49064353d9fd7b4e1c6ac37fc68553e0df0387d9f71bb8db078",
+      "bytes": 13575
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_metrics.py": {
+      "sha256": "8afc0500345467f50d8c9dad4a33e95f55959727eb022696b5ab41fee7df7d97",
+      "bytes": 9445
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_compute_distribution.py": {
+      "sha256": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1",
+      "bytes": 1540
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py": {
+      "sha256": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+      "bytes": 13532
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_contract.py": {
+      "sha256": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+      "bytes": 8198
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py": {
+      "sha256": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974",
+      "bytes": 4148
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/focused-2ef0064789059509.json": {
+      "sha256": "4d5604d4d18f759a151b2fc67dc215856083455e62623bb89ebb434f5a988ab0",
+      "bytes": 851
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/focused-2ef0064789059509.log": {
+      "sha256": "297b554e8248e08093fad9971fc2f7ff341dfd5e025dc6a015ccdffc9baacfa7",
+      "bytes": 3300
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/focused-943105d923d2043d.json": {
+      "sha256": "f6cec5241c21284f2f3f3cea28adc581e552e54b131c300c34accf5664c173f1",
+      "bytes": 852
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/focused-943105d923d2043d.log": {
+      "sha256": "1c28da6331a3f89ea6a8b5cfe632a3d149c49dad253f14dd2d983a01c7582590",
+      "bytes": 2532
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d-process.json": {
+      "sha256": "be3ae98089a18df6c5f907fa86c96a8d9be29f6209b5245d940318bcf88037d9",
+      "bytes": 1842
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d.log": {
+      "sha256": "c077f7608ff0fc78169ae903c82a6af63cdb58aaf5a96103a42b98de93c7eeb3",
+      "bytes": 2571
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d/qualification.json": {
+      "sha256": "19f64845ee65da9631049a218aa19c3379dae873e164bd193a8bde2c874d2eeb",
+      "bytes": 1549
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d/fixture-manifest.json": {
+      "sha256": "22bd22dcb3b08218385fab0ddb52471d178f31e9ca84bf9fa202d09c96d9354d",
+      "bytes": 380428
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d/evaluation.json": {
+      "sha256": "caeda7fa5f04c1fbfc2bedd8fcb8a8bc4bfec6631222f4ee0665ddee9e081352",
+      "bytes": 10725042
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d/mean-mapper-scorer-bridge.json": {
+      "sha256": "c46dee7db2e7e3edf1b318dc20bb3f1a9126e5519c92af98c626e17fc36504fe",
+      "bytes": 15642
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/root-review/result.json": {
+      "sha256": "1dbadee3b28e0f6d40b47482cf4731647c51eb3827da4f4aac04af297c88c2e6",
+      "bytes": 1955
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/root-review/verify.py": {
+      "sha256": "58f1afc8b0e1a7b4e0bf1c31947889a988589b9f849842ab04a34f05b97e57a8",
+      "bytes": 5904
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/numerical-review.json": {
+      "sha256": "ca2d8abf2e7f140a03889c3345a5dc62a0bf0a4308d139d17785107ed6355a81",
+      "bytes": 4020
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/numerical-integration-review.json": {
+      "sha256": "dffa6982a51332de5f2b2e0b24c1760b8c31b123be2d6e253b5717c5abadad75",
+      "bytes": 3629
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/temporal-review.json": {
+      "sha256": "a2e1d6a8259ede08f2d02a77918442c6b693e1f1450f254a28ebfc8b4409f555",
+      "bytes": 4276
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-ARCHIVE-UNIT-ACCEPTANCE.v1.json": {
+      "sha256": "f0d96c36b181534260363a0b8365e488d9950f813a5a0354e606a81a7db4a28d",
+      "bytes": 9811
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-ARCHIVE-UNIT-SCOPE.v1.md": {
+      "sha256": "018b5557860ad0b58155e69fa201fff682758fc5519d785e03a5583d2da13ff5",
+      "bytes": 5632
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_archive.py": {
+      "sha256": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+      "bytes": 44888
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_archive_unit.py": {
+      "sha256": "510c10f77c194dcb5c9591404c5238f43f494659aa96a247db0013ffd3f2969e",
+      "bytes": 29641
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score.v2.json": {
+      "sha256": "422b1082361a2d0d926f639c8cf67b38615517a8269a7f05729aea0c8f264615",
+      "bytes": 6517
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_admission.py": {
+      "sha256": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+      "bytes": 32322
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_adapter.py": {
+      "sha256": "a6987485724c7f725661927e194ca39d77b303e15d868b872d3b9449a7cc19f2",
+      "bytes": 13999
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_compute_run.py": {
+      "sha256": "7089fc64b6464dadfddb4796059a975afe7f1fd43730420d8d8193d67104208f",
+      "bytes": 24724
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py": {
+      "sha256": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa",
+      "bytes": 27993
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_run.py": {
+      "sha256": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+      "bytes": 52750
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/author-qualification-final.json": {
+      "sha256": "96ef83482c61548d12f6d395d7be139290db113866d6357e753fb2965ab256c2",
+      "bytes": 6564
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/numerical-review-final.json": {
+      "sha256": "8026c29bbe71ba07442bd6d39d325dd57016dcfabfac81b35231cc73c1672109",
+      "bytes": 3305
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-review.py": {
+      "sha256": "75884a3bda9ec8414bcc5ed9b2f4800eaa3a1e50a264df17603487d1f8ee3b9c",
+      "bytes": 9246
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-review.json": {
+      "sha256": "8a06e327903c8b9f0c22d50e59081e2791bdd8054f165b47dddb44fa6d7bfd1b",
+      "bytes": 2134
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-review.log": {
+      "sha256": "8a06e327903c8b9f0c22d50e59081e2791bdd8054f165b47dddb44fa6d7bfd1b",
+      "bytes": 2134
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-process.json": {
+      "sha256": "5e59efbd3470fdeebaa488923e8f303f57c21a3083eced46dab58ea5a797c03b",
+      "bytes": 275
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/numerical-review.json": {
+      "sha256": "e96d3b23f2d9c59c1f7691c0d7e57a60c6a95bc8ec53e9e54ff47de8c732bc6d",
+      "bytes": 3351
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-attempt-1.py": {
+      "sha256": "b4a11738d8f1425d517f1a0480c4b6b06185879676364cb047030af79a48337f",
+      "bytes": 9026
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-attempt-1-review.log": {
+      "sha256": "902eb9c6f8b89e8234129111adebff577b5f563a143fde29ced7359169ed62e4",
+      "bytes": 375
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-attempt-1-process.json": {
+      "sha256": "307b34fad38c684bd04cb9556db3d966b64e02facca9c81b734725c93133a041",
+      "bytes": 272
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-RUNTIME-UNIT-ACCEPTANCE.v1.json": {
+      "sha256": "0720c240a36c3ed32a72d1113560997417b05a12c8cec8b06a3c4c8a5b0e1ca9",
+      "bytes": 8135
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-RUNTIME-UNIT-SCOPE.v1.md": {
+      "sha256": "4563e8d43a2454fb6ba7ce992e866feb6497171f15cb50594f28aaef92db7c37",
+      "bytes": 3237
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_run.py": {
+      "sha256": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+      "bytes": 23897
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_run_unit.py": {
+      "sha256": "a96576b22bd4c55ed8adf34d49ad78ee783605fe75a3f2f263f17a8c092bd42c",
+      "bytes": 25149
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_replay.py": {
+      "sha256": "8eae09d2b3cb7aec7a2e6fbe265679be39eea5dbf6bd327f24f75d9022f65b45",
+      "bytes": 19858
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/focused-fd5aedb73a409c09.json": {
+      "sha256": "993a6afe3dab47f05f44e9dd8731a594cd9eb29cc3184bb28d8af868b7d3ec93",
+      "bytes": 634
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/focused-fd5aedb73a409c09.log": {
+      "sha256": "3f9eff20bc0a35ccf351e87efb84a918d5e4177ef4a52aaf608c0dcf3c9f8749",
+      "bytes": 3258
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/runtime-numerical-review.json": {
+      "sha256": "31ac4e0da1649be1d3d766105418d42f447e4207cd1c30a56b6f52a0684e51f6",
+      "bytes": 3125
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/root-temporal.py": {
+      "sha256": "8d5576b2a40e69643703e9a1b40b2f4bba29cb837461e4ef80c9185c45255d9b",
+      "bytes": 8264
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/root-temporal.json": {
+      "sha256": "5707bee4ed80bca0c14fc45696b2073e2d04bfef464e66a7ed55935b9348368b",
+      "bytes": 1414
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/root-temporal.log": {
+      "sha256": "5707bee4ed80bca0c14fc45696b2073e2d04bfef464e66a7ed55935b9348368b",
+      "bytes": 1414
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-runtime-unit/root-temporal-process.json": {
+      "sha256": "85c6c5b5ae16b738bfea4c9cc8399df06789aa6271796a8aa233e41931ac4740",
+      "bytes": 170
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-WATCHDOG-UNIT-ACCEPTANCE.v1.json": {
+      "sha256": "514b4a6fb6c1cd33e1c6222c45c2e158c7b370775db3d870f349c9ecc450e7c8",
+      "bytes": 3068
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_watchdog.py": {
+      "sha256": "57b2d3d9da4751d67818889e5ae8ae0242412de9cf55f0dee6e3dbdbf3ac63f7",
+      "bytes": 20517
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_watchdog_unit.py": {
+      "sha256": "1cb98cd59db38847b7ddf3c0440e17f5e20cd9ffcd947b7aec5386a6f2ed5024",
+      "bytes": 18090
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-watchdog-unit/focused-5866b724ed955705.json": {
+      "sha256": "77580ece544ba6fbded1e06fc9d775b9e60e23fde515f18b2c542ca2c21c12d8",
+      "bytes": 694
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-watchdog-unit/watchdog-review-final.json": {
+      "sha256": "2b0e6a78a0974f945bf26844bbae2895a319e524762f6f0b8dec6a2bffa34fc7",
+      "bytes": 5934
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/root-watchdog-integration-review-final.json": {
+      "sha256": "b20891b8baf28b15b3a68d9be49ab95d28fd5cb62566385c3c75f29d57f9afee",
+      "bytes": 5933
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-watchdog-unit/watchdog-review.json": {
+      "sha256": "0f0b5422da1b1b919c69ba9a3f4a1e64936466cb4e70cdb258ddc73160986e9f",
+      "bytes": 1230
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-FORECAST-UNIT-ACCEPTANCE.v1.json": {
+      "sha256": "cf86de2cd0ffd377503f8b650b56b3dfb6ede9d5b44a356a3281942cdd25c4cb",
+      "bytes": 6751
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_forecast.py": {
+      "sha256": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34",
+      "bytes": 23576
+    },
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_forecast_unit.py": {
+      "sha256": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312",
+      "bytes": 26071
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-forecast-unit/author-qualification.json": {
+      "sha256": "c408a1ba542ea5cbbc78deedd436fb23c5ac455f62b266a04e27661ccee2b962",
+      "bytes": 6337
+    },
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-forecast-unit/numerical-review.json": {
+      "sha256": "d83916c6143c5016d0ef59da02b8dafe100a39a3b5fd82af6709582ee62d870c",
+      "bytes": 5856
+    }
+  },
+  "registered_import_edges": [
+    [
+      "scripts/research_score_compute_distribution.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_compute_distribution.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "scripts/research_score_compute_qualify.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "scripts/research_score_compute_qualify.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_compute_qualify.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "scripts/research_score_compute_qualify.py",
+      "scripts/research_score_compute_distribution.py"
+    ],
+    [
+      "scripts/research_score_compute_qualify.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "scripts/research_score_compute_qualify.py",
+      "scripts/research_score_replay.py"
+    ],
+    [
+      "scripts/research_score_compute_qualify.py",
+      "scripts/research_score_successor_run.py"
+    ],
+    [
+      "scripts/research_score_compute_run.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "scripts/research_score_compute_run.py",
+      "scripts/research_score_replay.py"
+    ],
+    [
+      "scripts/research_score_compute_run.py",
+      "scripts/research_score_successor_run.py"
+    ],
+    [
+      "scripts/research_score_compute_run.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "scripts/research_score_compute_run.py",
+      "scripts/research_score_successor_distribution.py"
+    ],
+    [
+      "scripts/research_score_compute_run.py",
+      "scripts/research_score_compute_qualify.py"
+    ],
+    [
+      "scripts/research_score_compute_run.py",
+      "scripts/research_score_compute_distribution.py"
+    ],
+    [
+      "scripts/research_score_compute_run.py",
+      "scripts/research_score_compute_qualify.py"
+    ],
+    [
+      "scripts/research_score_conditional_adapter.py",
+      "scripts/research_score_conditional_margin.py"
+    ],
+    [
+      "scripts/research_score_conditional_adapter.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_conditional_admission.py",
+      "scripts/research_score_conditional_adapter.py"
+    ],
+    [
+      "scripts/research_score_conditional_admission.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "scripts/research_score_conditional_admission.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_conditional_admission.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "scripts/research_score_conditional_inference.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "scripts/research_score_conditional_inference.py",
+      "scripts/research_score_inference.py"
+    ],
+    [
+      "scripts/research_score_conditional_inference.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "scripts/research_score_conditional_policy.py",
+      "scripts/research_score_conditional_adapter.py"
+    ],
+    [
+      "scripts/research_score_conditional_policy.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_conditional_qualify.py",
+      "scripts/research_score_conditional_admission.py"
+    ],
+    [
+      "scripts/research_score_conditional_qualify.py",
+      "scripts/research_score_conditional_adapter.py"
+    ],
+    [
+      "scripts/research_score_conditional_qualify.py",
+      "scripts/research_score_conditional_policy.py"
+    ],
+    [
+      "scripts/research_score_conditional_qualify.py",
+      "scripts/research_score_compute_distribution.py"
+    ],
+    [
+      "scripts/research_score_conditional_qualify.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "scripts/research_score_conditional_qualify.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_conditional_replay.py",
+      "scripts/research_score_conditional_admission.py"
+    ],
+    [
+      "scripts/research_score_conditional_replay.py",
+      "scripts/research_score_conditional_margin.py"
+    ],
+    [
+      "scripts/research_score_conditional_replay.py",
+      "scripts/research_score_conditional_adapter.py"
+    ],
+    [
+      "scripts/research_score_conditional_replay.py",
+      "scripts/research_score_conditional_policy.py"
+    ],
+    [
+      "scripts/research_score_conditional_run.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "scripts/research_score_conditional_run.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "scripts/research_score_conditional_run.py",
+      "scripts/research_score_conditional_admission.py"
+    ],
+    [
+      "scripts/research_score_conditional_run.py",
+      "scripts/research_score_conditional_adapter.py"
+    ],
+    [
+      "scripts/research_score_conditional_run.py",
+      "scripts/research_score_conditional_policy.py"
+    ],
+    [
+      "scripts/research_score_conditional_run.py",
+      "scripts/research_score_conditional_replay.py"
+    ],
+    [
+      "scripts/research_score_conditional_run.py",
+      "scripts/research_score_conditional_qualify.py"
+    ],
+    [
+      "scripts/research_score_conditional_run.py",
+      "scripts/research_score_conditional_inference.py"
+    ],
+    [
+      "scripts/research_score_conditional_run.py",
+      "scripts/research_score_compute_distribution.py"
+    ],
+    [
+      "scripts/research_score_conditional_run.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_contract.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "scripts/research_score_inference.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "scripts/research_score_inference.py",
+      "scripts/research_score_replay.py"
+    ],
+    [
+      "scripts/research_score_inference.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "scripts/research_score_metrics.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_metrics.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "scripts/research_score_replay.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_replay.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "scripts/research_score_run.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "scripts/research_score_run.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_run.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "scripts/research_score_run.py",
+      "scripts/research_score_replay.py"
+    ],
+    [
+      "scripts/research_score_run.py",
+      "scripts/research_score_inference.py"
+    ],
+    [
+      "scripts/research_score_run.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_run.py",
+      "scripts/research_score_replay.py"
+    ],
+    [
+      "scripts/research_score_run.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "scripts/research_score_split_archive.py",
+      "scripts/research_score_conditional_admission.py"
+    ],
+    [
+      "scripts/research_score_split_archive.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "scripts/research_score_split_archive.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "scripts/research_score_split_archive.py",
+      "scripts/research_score_replay.py"
+    ],
+    [
+      "scripts/research_score_split_archive.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "scripts/research_score_split_archive.py",
+      "scripts/research_score_split_models.py"
+    ],
+    [
+      "scripts/research_score_split_archive.py",
+      "scripts/research_score_split_replay.py"
+    ],
+    [
+      "scripts/research_score_split_archive.py",
+      "scripts/research_score_successor_distribution.py"
+    ],
+    [
+      "scripts/research_score_split_archive.py",
+      "scripts/research_score_compute_run.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_conditional_admission.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_models.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_run.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_inference.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_watchdog.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_replay.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_forecast.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_grade.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_run.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_preflight.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_run.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_conditional_run.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_watchdog.py"
+    ],
+    [
+      "scripts/research_score_split_controller.py",
+      "scripts/research_score_split_watchdog.py"
+    ],
+    [
+      "scripts/research_score_split_forecast.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "scripts/research_score_split_forecast.py",
+      "scripts/research_score_split_models.py"
+    ],
+    [
+      "scripts/research_score_split_forecast.py",
+      "scripts/research_score_split_replay.py"
+    ],
+    [
+      "scripts/research_score_split_forecast.py",
+      "scripts/research_score_split_run.py"
+    ],
+    [
+      "scripts/research_score_split_forecast.py",
+      "scripts/research_score_replay.py"
+    ],
+    [
+      "scripts/research_score_split_forecast.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "scripts/research_score_split_forecast.py",
+      "scripts/research_score_successor_distribution.py"
+    ],
+    [
+      "scripts/research_score_split_grade.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "scripts/research_score_split_grade.py",
+      "scripts/research_score_compute_distribution.py"
+    ],
+    [
+      "scripts/research_score_split_grade.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_split_grade.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "scripts/research_score_split_grade.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "scripts/research_score_split_grade.py",
+      "scripts/research_score_split_inference.py"
+    ],
+    [
+      "scripts/research_score_split_grade.py",
+      "scripts/research_score_split_models.py"
+    ],
+    [
+      "scripts/research_score_split_grade.py",
+      "scripts/research_score_split_run.py"
+    ],
+    [
+      "scripts/research_score_split_inference.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "scripts/research_score_split_inference.py",
+      "scripts/research_score_conditional_inference.py"
+    ],
+    [
+      "scripts/research_score_split_inference.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "scripts/research_score_split_models.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "scripts/research_score_split_replay.py",
+      "scripts/research_score_replay.py"
+    ],
+    [
+      "scripts/research_score_split_replay.py",
+      "scripts/research_score_split_models.py"
+    ],
+    [
+      "scripts/research_score_split_run.py",
+      "scripts/research_score_conditional_run.py"
+    ],
+    [
+      "scripts/research_score_split_run.py",
+      "scripts/research_score_split_models.py"
+    ],
+    [
+      "scripts/research_score_split_run.py",
+      "scripts/research_score_split_budget.py"
+    ],
+    [
+      "scripts/research_score_successor_distribution.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_successor_qualify.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "scripts/research_score_successor_qualify.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "scripts/research_score_successor_qualify.py",
+      "scripts/research_score_successor_distribution.py"
+    ],
+    [
+      "scripts/research_score_successor_qualify.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "scripts/research_score_successor_qualify.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "scripts/research_score_successor_run.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "scripts/research_score_successor_run.py",
+      "scripts/research_score_replay.py"
+    ],
+    [
+      "scripts/research_score_successor_run.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "scripts/research_score_successor_run.py",
+      "scripts/research_score_successor_distribution.py"
+    ],
+    [
+      "scripts/research_score_successor_run.py",
+      "scripts/research_score_successor_qualify.py"
+    ],
+    [
+      "scripts/research_score_successor_run.py",
+      "scripts/research_score_successor_qualify.py"
+    ],
+    [
+      "tests/research-score-compute/test_cache.py",
+      "scripts/research_score_compute_distribution.py"
+    ],
+    [
+      "tests/research-score-compute/test_cache.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-compute/test_cache.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "tests/research-score-compute/test_cache.py",
+      "scripts/research_score_successor_distribution.py"
+    ],
+    [
+      "tests/research-score-compute/test_cache.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "tests/research-score-compute/test_compute_qualify.py",
+      "scripts/research_score_compute_qualify.py"
+    ],
+    [
+      "tests/research-score-compute/test_compute_run.py",
+      "scripts/research_score_compute_run.py"
+    ],
+    [
+      "tests/research-score-compute/test_compute_run.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "tests/research-score-compute/test_compute_run.py",
+      "scripts/research_score_compute_distribution.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_adapter.py",
+      "scripts/research_score_conditional_adapter.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_adapter.py",
+      "scripts/research_score_conditional_margin.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_adapter.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_adapter.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_admission.py",
+      "scripts/research_score_conditional_admission.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_admission.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_admission.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_conditional_margin.py",
+      "scripts/research_score_conditional_margin.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_inference.py",
+      "scripts/research_score_conditional_inference.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_policy.py",
+      "scripts/research_score_conditional_policy.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_policy.py",
+      "scripts/research_score_conditional_adapter.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_policy.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_policy.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_qualify.py",
+      "scripts/research_score_conditional_qualify.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_qualify.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_qualify.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_qualify.py",
+      "scripts/research_score_metrics.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_replay.py",
+      "scripts/research_score_conditional_replay.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_replay.py",
+      "scripts/research_score_conditional_margin.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_replay.py",
+      "scripts/research_score_conditional_adapter.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_replay.py",
+      "scripts/research_score_conditional_policy.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_replay.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_run.py",
+      "scripts/research_score_conditional_run.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_run.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-conditional-margin/test_run.py",
+      "scripts/research_score_conditional_inference.py"
+    ],
+    [
+      "tests/research-score-split/qualify_inference_unit.py",
+      "scripts/research_score_split_inference.py"
+    ],
+    [
+      "tests/research-score-split/qualify_inference_unit.py",
+      "scripts/research_score_compute_distribution.py"
+    ],
+    [
+      "tests/research-score-split/qualify_inference_unit.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "tests/research-score-split/qualify_inference_unit.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-split/qualify_inference_unit.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "tests/research-score-split/qualify_inference_unit.py",
+      "scripts/research_score_split_models.py"
+    ],
+    [
+      "tests/research-score-split/qualify_inference_unit.py",
+      "scripts/research_score_successor_distribution.py"
+    ],
+    [
+      "tests/research-score-split/qualify_inference_unit.py",
+      "scripts/research_score_replay.py"
+    ],
+    [
+      "tests/research-score-split/test_archive_unit.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "tests/research-score-split/test_archive_unit.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "tests/research-score-split/test_archive_unit.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-split/test_archive_unit.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "tests/research-score-split/test_archive_unit.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "tests/research-score-split/test_bank_unit.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "tests/research-score-split/test_bank_unit.py",
+      "scripts/research_score_replay.py"
+    ],
+    [
+      "tests/research-score-split/test_bank_unit.py",
+      "scripts/research_score_split_models.py"
+    ],
+    [
+      "tests/research-score-split/test_bank_unit.py",
+      "scripts/research_score_split_replay.py"
+    ],
+    [
+      "tests/research-score-split/test_budget.py",
+      "scripts/research_score_split_budget.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_split_controller.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_split_run.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_split_watchdog.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_split_replay.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_conditional_run.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_split_preflight.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "tests/research-score-split/test_controller_unit.py",
+      "scripts/research_score_conditional_run.py"
+    ],
+    [
+      "tests/research-score-split/test_forecast_unit.py",
+      "scripts/research_score_split_forecast.py"
+    ],
+    [
+      "tests/research-score-split/test_forecast_unit.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-split/test_forecast_unit.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "tests/research-score-split/test_forecast_unit.py",
+      "scripts/research_score_split_models.py"
+    ],
+    [
+      "tests/research-score-split/test_forecast_unit.py",
+      "scripts/research_score_split_replay.py"
+    ],
+    [
+      "tests/research-score-split/test_forecast_unit.py",
+      "scripts/research_score_split_run.py"
+    ],
+    [
+      "tests/research-score-split/test_grade_unit.py",
+      "scripts/research_score_split_archive.py"
+    ],
+    [
+      "tests/research-score-split/test_grade_unit.py",
+      "scripts/research_score_split_controller.py"
+    ],
+    [
+      "tests/research-score-split/test_grade_unit.py",
+      "scripts/research_score_split_forecast.py"
+    ],
+    [
+      "tests/research-score-split/test_grade_unit.py",
+      "scripts/research_score_split_grade.py"
+    ],
+    [
+      "tests/research-score-split/test_grade_unit.py",
+      "scripts/research_score_compute_distribution.py"
+    ],
+    [
+      "tests/research-score-split/test_grade_unit.py",
+      "scripts/research_score_contract.py"
+    ],
+    [
+      "tests/research-score-split/test_grade_unit.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-split/test_grade_unit.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "tests/research-score-split/test_grade_unit.py",
+      "scripts/research_score_split_replay.py"
+    ],
+    [
+      "tests/research-score-split/test_grade_unit.py",
+      "scripts/research_score_split_run.py"
+    ],
+    [
+      "tests/research-score-split/test_inference_unit.py",
+      "scripts/research_score_split_inference.py"
+    ],
+    [
+      "tests/research-score-split/test_mean_unit.py",
+      "scripts/research_score_models.py"
+    ],
+    [
+      "tests/research-score-split/test_mean_unit.py",
+      "scripts/research_score_split_models.py"
+    ],
+    [
+      "tests/research-score-split/test_preflight_unit.py",
+      "scripts/research_score_split_preflight.py"
+    ],
+    [
+      "tests/research-score-split/test_preflight_unit.py",
+      "scripts/research_score_split_run.py"
+    ],
+    [
+      "tests/research-score-split/test_run_unit.py",
+      "scripts/research_score_split_run.py"
+    ],
+    [
+      "tests/research-score-split/test_run_unit.py",
+      "scripts/research_score_split_run.py"
+    ],
+    [
+      "tests/research-score-split/test_run_unit.py",
+      "scripts/research_score_conditional_run.py"
+    ],
+    [
+      "tests/research-score-split/test_run_unit.py",
+      "scripts/research_score_split_budget.py"
+    ],
+    [
+      "tests/research-score-split/test_watchdog_unit.py",
+      "scripts/research_score_split_watchdog.py"
+    ],
+    [
+      "tests/research-score-successor/test_qualify.py",
+      "scripts/research_score_successor_qualify.py"
+    ],
+    [
+      "tests/research-score-successor/test_solver.py",
+      "scripts/research_score_successor_distribution.py"
+    ],
+    [
+      "tests/research-score-successor/test_solver.py",
+      "scripts/research_score_distribution.py"
+    ],
+    [
+      "tests/research-score-successor/test_solver.py",
+      "scripts/research_score_successor_distribution.py"
+    ],
+    [
+      "tests/research-score-successor/test_solver.py",
+      "scripts/research_score_run.py"
+    ],
+    [
+      "tests/research-score-successor/test_successor_run.py",
+      "scripts/research_score_successor_run.py"
+    ],
+    [
+      "tests/research-score/test_run.py",
+      "scripts/research_score_distribution.py"
+    ]
+  ],
+  "negative_probes": [
+    {
+      "probe": "null_qualification",
+      "rejected": true,
+      "reason": "invalid_sha256"
+    },
+    {
+      "probe": "null_review",
+      "rejected": true,
+      "reason": "invalid_sha256"
+    },
+    {
+      "probe": "null_evidence_sha",
+      "rejected": true,
+      "reason": "invalid_sha256"
+    },
+    {
+      "probe": "null_evidence_size",
+      "rejected": true,
+      "reason": "positive_evidence_size_required"
+    }
+  ],
+  "tests_run": 13,
+  "tests_failed": 0,
+  "process_seconds": 0.9929506249900442,
+  "peak_rss_mib": 119.453125,
+  "blockers": [],
+  "closed_blocker": "Null required pointer digest/size formerly bypassed optional _file checks; final source rejects them before reading.",
+  "conclusions": [
+    "Exact66 registry consists of60 fixed accepted files plus6 final candidate files; all local research_score imports are represented.",
+    "Nine actual frozen stage receipts and their embedded pointers authenticate under the accepted roots.",
+    "Runtime values and permission types are exact; deterministic manifest bytes equal accepted Store strict serialization including signed zero.",
+    "Approval -> distinct qualification/reviews -> exact source hashes is acyclic; the new manifest binds approval and does not appear in its prerequisites."
+  ],
+  "limitations": [
+    "Six observed final candidate hashes are a review snapshot, not independent acceptance of those other implementations.",
+    "The owner must create and authenticate the final approval only after complete controller qualification and distinct reviews.",
+    "No final approval file, historical source admission, fit, score, bootstrap or historical invocation was created or run."
+  ]
+}

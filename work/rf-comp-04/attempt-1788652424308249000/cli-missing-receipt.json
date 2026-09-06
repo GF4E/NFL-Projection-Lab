@@ -1,0 +1,86 @@
+{
+  "artifacts": {
+    "observations.jsonl": {
+      "bytes": 1625,
+      "sha256": "6e7f31827778bdb51090c8f45d8abe21a87a3b725ae0a02a7d742d2552c24376"
+    },
+    "phase.json": {
+      "bytes": 140,
+      "sha256": "c4ac80d98c2031acf3d03ce901f11c56ec809c1013dd26cd21e755cc8be83629"
+    },
+    "stderr.log": {
+      "bytes": 1819,
+      "sha256": "557d336803b2d5f673d1469d77a4ffbb5266088e0647b7cbaf03822cfc2af500"
+    },
+    "stdout.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "automatic_restart": false,
+  "command": [
+    "/opt/anaconda3/bin/python3.12",
+    "-I",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_compute_controller.py",
+    "--repository-root",
+    "/private/tmp/os01-gen15-rebuild.9ny71k",
+    "--implementation-acceptance",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-04/nonexistent-final-acceptance-9f793e46be60836754f3099906807f2b81915a7bda8e850fa21fe57bfad4e57c.json",
+    "--implementation-acceptance-sha256",
+    "9f793e46be60836754f3099906807f2b81915a7bda8e850fa21fe57bfad4e57c",
+    "--envelope-started-monotonic",
+    "135907.7029865",
+    "--watchdog-phase-file",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/work/rfcomp04-observer-9f793e46be608367/phase.json"
+  ],
+  "cwd": "/private/tmp/os01-gen15-rebuild.9ny71k",
+  "elapsed_seconds": 0.6922672920045443,
+  "exit_code": 1,
+  "exit_observed_elapsed_seconds": 0.6920986250042915,
+  "exit_signal": null,
+  "historical_invocation_authorized": false,
+  "kill_requests": [],
+  "limit_failure": true,
+  "limits": {
+    "complete_smoke_seconds": 120.0,
+    "parent_metadata_seconds": 2.0,
+    "rss_mib": 1536.0,
+    "rss_sample_interval_seconds": 0.05,
+    "scientific_seconds": 20.0
+  },
+  "limits_of_observation": [
+    "RSS is sampled, not an instantaneous kernel RSS limit.",
+    "wait4 reports worker high-water RSS; group peak is the maximum observed group sum.",
+    "Parent scheduling can delay observation and signal delivery; timestamps retain that delay.",
+    "A completed process alone does not prove a complete or valid scientific terminal."
+  ],
+  "observation_errors": [],
+  "parent_metadata_deadline_elapsed_seconds": 2.692252708977321,
+  "pgid": 45524,
+  "phase_handshake_required": true,
+  "phase_progression": [
+    {
+      "observed_elapsed_seconds": 0.000799542001914233,
+      "phase": "starting",
+      "sha256": "c4ac80d98c2031acf3d03ce901f11c56ec809c1013dd26cd21e755cc8be83629",
+      "smoke_finished": null,
+      "smoke_started": null
+    }
+  ],
+  "pid": 45524,
+  "process_ownership_lost": false,
+  "report_prepared_elapsed_seconds": 0.6925900839851238,
+  "sample_count": 12,
+  "sampled_group_peak_rss_mib": 85.140625,
+  "sampled_worker_peak_rss_mib": 85.140625,
+  "scientific_stop_elapsed_seconds": 0.6922527089773212,
+  "scientific_terminal_verified": false,
+  "spawned_elapsed_seconds": 0.002276791987242177,
+  "started_monotonic": 135907.702991541,
+  "status": "externally_stopped_process",
+  "stop_observed_elapsed_seconds": 0.6922576249926351,
+  "stop_reason": "incomplete_owned_phase_handshake",
+  "version": "rf02f.external-process-watchdog.v1",
+  "waited_worker_peak_rss_mib": 85.265625,
+  "worker_grace_seconds": 0
+}

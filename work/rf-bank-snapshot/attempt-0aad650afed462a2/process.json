@@ -1,0 +1,35 @@
+{
+  "automatic_retry": false,
+  "child_group_peak_rss_mib": 308.1875,
+  "clock_scope": "First script clock through final checked evidence publication; initial parent interpreter startup excluded.",
+  "command": [
+    "/opt/anaconda3/bin/python3.12",
+    "-I",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/qualify_bank_snapshot.py",
+    "--child",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/attempt-0aad650afed462a2",
+    "--pins",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-bank-snapshot/INPUT-PINS.v1.json",
+    "--pins-sha256",
+    "0aad650afed462a2ea23552f9ae6f4f08d4fc05bcf64f3a4ce2df1d9b306b7fb",
+    "--started",
+    "143868.013511833"
+  ],
+  "conservative_combined_rss_mib": 344.84375,
+  "elapsed_seconds_before_final_index": 7.976458582998021,
+  "exit_code": 0,
+  "final_acceptance": false,
+  "historical_execution": false,
+  "limits": {
+    "child_mib": 896.0,
+    "evidence_reserve_seconds": 5.0,
+    "mib": 1024.0,
+    "parent_mib": 128.0,
+    "seconds": 60.0
+  },
+  "memory_scope": "Parent high-water plus maximum sampled/waited child-group RSS; not an instantaneous kernel bound.",
+  "parent_peak_rss_mib": 36.65625,
+  "source_error": null,
+  "status": "provisional_qualification_evidence",
+  "stop": null
+}

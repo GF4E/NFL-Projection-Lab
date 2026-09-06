@@ -1,0 +1,515 @@
+"""RF-COMP-04 genuine tiny composition tests; the qualifier owns execution.
+
+Only this test adapter selects the new public assembler in the original Case.
+No historical admission, inference, copied metric template, or production
+dependency injection is used. Witnesses survive a later equality assertion.
+"""
+import copy
+from contextlib import nullcontext
+from dataclasses import fields, replace
+from datetime import datetime, timedelta
+from functools import partial
+import hashlib
+import inspect
+from pathlib import Path
+import struct
+import sys
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / 'scripts'))
+sys.path.insert(0, str(ROOT / 'tests/research-score-split'))
+import numpy as np
+import research_score_contract as contract
+import research_score_encoding_memo as encoding
+import research_score_run as saved
+import research_score_skellam_compute as probability
+import research_score_split_archive as archive
+import research_score_split_compute_integration as composed
+import research_score_split_compute_preflight as compute_preflight
+import research_score_split_controller as controller
+import research_score_split_forecast as forecast
+import research_score_split_grade as original_grade
+from research_score_distribution import JointDistribution, NumericalFailure
+from research_score_models import MeanTrajectory
+from research_score_split_replay import SplitTrajectoryBank
+from research_score_split_run import Store, RuntimeStop, put_object, read_publication, strict
+from research_score_successor_distribution import JointBase
+import test_archive_unit as archive_fixtures
+from test_archive_unit import CONFIG_RAW
+from test_forecast_unit import TEAMS, choice, measured, native
+from test_grade_unit import Case
+
+
+NUMERICAL_OBSERVATIONS = []
+
+
+def fingerprint(value):
+    return hashlib.sha256(strict(value)).hexdigest()
+
+
+def law_fields(law):
+    result = {}
+    for field in fields(law):
+        value = getattr(law, field.name)
+        if isinstance(value, np.ndarray):
+            result[field.name] = {'dtype': value.dtype.str, 'shape': list(value.shape),
+                'c_bytes_hex': value.tobytes(order='C').hex(), 'writeable': value.flags.writeable,
+                'values': value.tolist()}
+        else:
+            result[field.name] = {'type': type(value).__name__, 'value': native(value)}
+            if type(value) is float:
+                result[field.name]['float_bits'] = struct.pack('>d', value).hex()
+    return result
+
+
+def global_bindings():
+    return (contract.encoded, saved.encoded, saved.distribution_descriptor,
+        saved.recover_distribution, archive.recover_source_law, forecast._Assembly.resolve,
+        forecast.assemble_forecasts, original_grade.score_forecast,
+        original_grade.PublishedOriginGrader.grade, probability.score_forecast)
+
+
+class IntegratedCase(Case):
+    """Explicit synthetic adaptation of Case.publish; no global assembler patch."""
+    def publish(self, accounting):
+        year = self.view['origin']['season']
+        if year == 2010:
+            # The original state-only adapter performs no assembly or grading.
+            return super().publish(accounting)
+        if self.bank is None:
+            self.bank = SplitTrajectoryBank(TEAMS)
+            old = self.view['bank_prepared'][12]['history'][0].context
+            initial = {d: {'targets': [old], 'history': []} for d in (12, 24)}
+            diagonals = {(i, v): MeanTrajectory('E2', {'k': s['ks'], 'retention': s['retention']}, TEAMS, v)
+                         .forecast_origin(old.season, old.week, [], [old])
+                         for i, s in enumerate(forecast.split_setting_grid()[:9]) for v in forecast.STATE_VARIANTS}
+            self.bank.advance(old.season, old.week, initial, diagonals)
+        self.outputs = self.bank.advance(year, self.view['origin']['week'],
+            self.view['bank_prepared'], self.view['diagonal_outputs'])
+        self.assembly = composed.assemble_forecasts(self.view, self.bank, self.outputs,
+            None if year < 2013 else choice(year, self.selected), local_mapper_pointers=self.pointers,
+            parent_binding={'parent_manifest_sha256': archive.PARENT_MANIFEST,
+                            'parent_index_sha256': archive.PARENT_INDEX}, accounting=accounting)
+        pointer = controller.publish_origin(self.store, self.manifest, self.manifest_sha, self.view,
+            self.bank, self.outputs, self.assembly, accounting.envelope)
+        self.validate = partial(controller.validate_publication_binding, self.store, self.manifest,
+            self.manifest_sha, self.view, self.assembly, pointer, accounting.envelope)
+        return pointer
+
+
+class IntegrationTests(unittest.TestCase):
+    def case(self, year=2013, selected=0, kind=IntegratedCase, week=1):
+        value = kind(year, selected, week); self.addCleanup(value.close); return value
+
+    def run_real_pair(self, year, selected, failure=None):
+        """Two real routes, with witnesses saved before cross-route equality."""
+        witnesses, cases = [], []
+        bindings = global_bindings()
+        for label, case_type, module in (('original', Case, original_grade),
+                                         ('composed', IntegratedCase, composed)):
+            x = self.case(year, selected, case_type); cases.append(x)
+            source_before = strict({group: list(rows.values()) for group, rows in x.view['source_laws'].items()})
+            mapper_before = {d: (m.atoms.tobytes(), m.weights.tobytes(), m.b, m.epsilon)
+                             for d, m in x.view['mappers'].items()}
+            calls, mass_calls, memos = [], [], []
+            real_score, real_cdf, real_memo = module.score_forecast, JointDistribution.cdf, encoding.EncodingMemo
+            with measured(x.view['origin']) as acc:
+                def create_memo():
+                    self.assertIsNotNone(acc._active_callback)
+                    self.assertEqual(acc._active_callback['kind'], 'fit')
+                    memo = real_memo(); memos.append(memo); return memo
+                def score(law, observed, game_id, **flags):
+                    self.assertIs(type(law), JointDistribution)
+                    self.assertIsNotNone(acc._active_callback)
+                    metrics = real_score(law, observed, game_id, **flags)
+                    calls.append({'game_id': game_id, 'observed': list(observed), 'flags': flags,
+                        'law_sha256': fingerprint(law_fields(law)), 'metrics': native(metrics)})
+                    return metrics
+                def cdf(law, target, value):
+                    answer = real_cdf(law, target, value)
+                    if type(law) is JointDistribution:
+                        mass_calls.append({'target': target, 'value': native(value), 'answer': native(answer),
+                            'law_sha256': fingerprint(law_fields(law)),
+                            'outside_score_callback': acc._active_callback is None})
+                    return answer
+                fault = patch.object(JointBase, 'fit', side_effect=failure) if failure else nullcontext()
+                with fault, patch.object(encoding, 'EncodingMemo', side_effect=create_memo):
+                    pointer = x.publish(acc)
+                    with patch.object(module, 'score_forecast', side_effect=score), patch.object(JointDistribution, 'cdf', cdf):
+                        result = x.grade(module.PublishedOriginGrader(), acc, pointer)
+                callbacks = native(acc._active_origin['callbacks'])
+            science = {k: x.assembly[k] for k in ('full_setting_forecasts', 'outer_selected_forecasts', 'grading_plan')}
+            laws = [{'key': list(k), 'fields': law_fields(v)} for k, v in x.assembly['resolved_laws'].items()]
+            witness = native({'route': label, 'year': year, 'selected': selected,
+                'identity_scope': 'same_synthetic_manifest_for_exact_scientific_byte_comparison',
+                'injected_fit_failure': None if failure is None else str(failure),
+                'assembly': science, 'resolved_laws': laws, 'inner_rows': result['inner_rows'],
+                'outer_rows': result['outer_rows'], 'counts': result['counts'], 'score_calls': calls,
+                'mass_calls': mass_calls, 'memo_instances': len(memos), 'callbacks': callbacks,
+                'provenance': x.store.read_bound(result['artifacts']['grading_provenance']),
+                'publication': archive.parse(read_publication(x.store, pointer))})
+            NUMERICAL_OBSERVATIONS.append(witness); witnesses.append(witness)
+            # These are source integrity checks after retaining completed evidence.
+            self.assertEqual(strict({group: list(rows.values()) for group, rows in x.view['source_laws'].items()}), source_before)
+            self.assertEqual({d: (m.atoms.tobytes(), m.weights.tobytes(), m.b, m.epsilon)
+                              for d, m in x.view['mappers'].items()}, mapper_before)
+            self.assertEqual(len(calls), result['counts']['actual_score_calls'])
+            self.assertEqual(len(mass_calls), result['counts']['actual_mass_cdf_calls'])
+            self.assertTrue(all(r['outside_score_callback'] for r in mass_calls))
+            self.assertEqual(len({id(m) for m in memos}), len(memos))
+            self.assertEqual(len(memos), 0 if label == 'original' else sum(
+                r['kind'] == 'fit' and r['operation'] == 'fit' for r in callbacks))
+            for stage in ('inner', 'outer'):
+                if result[stage + '_rows']:
+                    self.assertEqual(strict(result[stage + '_rows']),
+                        x.store.read(result['artifacts'][stage + '_losses']['name']))
+            for row in result['outer_rows']:
+                self.assertEqual(len(row['metrics']), 108 if row['family'] == 'E3' else 104)
+                self.assertIs(type(row['metrics']['grid_transport_bound']), float)
+            for row in calls:
+                self.assertEqual(len(row['metrics']), 104 if row['flags']['diagnostics'] else 28)
+        left, right = witnesses
+        for name in ('assembly', 'resolved_laws', 'inner_rows', 'outer_rows', 'counts', 'score_calls',
+                     'mass_calls', 'provenance', 'publication'):
+            self.assertEqual(strict(left[name]), strict(right[name]), name)
+        for key, law in cases[0].assembly['resolved_laws'].items():
+            other = cases[1].assembly['resolved_laws'][key]
+            self.assertIs(type(other), JointDistribution)
+            for field in fields(law):
+                a, b = getattr(law, field.name), getattr(other, field.name)
+                if isinstance(a, np.ndarray):
+                    self.assertFalse(np.shares_memory(a, b)); self.assertFalse(b.flags.writeable)
+        self.assertTrue(all(a is b for a, b in zip(bindings, global_bindings())))
+        return cases[1], witnesses[1]
+
+    def test_fixed_public_signatures_and_inherited_state_helpers(self):
+        self.assertEqual(inspect.signature(composed.assemble_forecasts), inspect.signature(forecast.assemble_forecasts))
+        self.assertEqual(inspect.signature(composed.PublishedOriginGrader.grade), inspect.signature(original_grade.PublishedOriginGrader.grade))
+        self.assertIs(composed.score_forecast, probability.score_forecast)
+        self.assertIs(composed.EncodingAssembly, encoding.EncodingAssembly)
+        self.assertIs(composed.PublishedOriginGrader.__init__, original_grade.PublishedOriginGrader.__init__)
+        for name in ('last_attempt_counts', 'last_attempt_origin'):
+            self.assertIs(getattr(composed.PublishedOriginGrader, name), getattr(original_grade.PublishedOriginGrader, name))
+        for name in ('_source', '_bound_law', '_losses', '_key', '_hash', 'require', '_COUNTERS'):
+            self.assertIs(getattr(composed, name), getattr(original_grade, name))
+
+    def test_same_diagonal_copies_and_new_zero_scores_match_original_bytes(self):
+        x, w = self.run_real_pair(2013, 0)
+        self.assertEqual(w['counts'], {'inner_rows': 54, 'outer_rows': 38, 'copied_diagonal_inner': 18,
+            'scored_inner': 36, 'copied_e3_outer': 22, 'scored_outer': 4, 'copied_raw_outer': 12,
+            'actual_score_calls': 40, 'actual_mass_cdf_calls': 208})
+        proof = w['provenance']['rows']
+        scored_outer = [r for r in proof if r['stage'] == 'outer' and r['score_flags'] is not None]
+        self.assertEqual({r['key'][1] for r in scored_outer}, {'zero_strength_update', 'zero_scoring_level_update'})
+        for row in proof:
+            if row['mode'] in ('source_inner', 'source_outer', 'raw_reference'):
+                self.assertIsNone(row['score_flags']); self.assertIsNotNone(row['source_loss'])
+                self.assertIn('losses', row['source_loss']['file']['name'])
+                self.assertEqual(row['source_forecast']['kind'], 'source_forecast')
+        self.assertGreater(w['memo_instances'], 0)
+
+    def test_offdiagonal_full_all_variants_and_original_mass_calls_are_exact(self):
+        x, w = self.run_real_pair(2013, 10)
+        self.assertEqual(w['counts']['actual_score_calls'], 62)
+        self.assertEqual(w['counts']['copied_e3_outer'], 0)
+        self.assertEqual({r['variant'] for r in w['outer_rows'] if r['family'] == 'E3'}, set(forecast.SPLIT_VARIANTS))
+        extra = iter(w['mass_calls'])
+        for row in w['outer_rows'][:26]:
+            law = x.assembly['resolved_laws']['outer', row['variant'], row['game_id']]
+            delay = 24 if row['variant'] == 'availability_24h' else 12
+            descriptor = next(r['distribution'] for r in w['assembly']['outer_selected_forecasts']
+                if r['family'] == 'E3' and r['variant'] == row['variant'] and r['game_id'] == row['game_id'])
+            self.assertEqual(descriptor['mapper'], x.pointers[delay])
+            self.assertIs(law.independent, row['variant'] == 'independent_marginals')
+            for target in original_grade.TARGETS:
+                high, low = next(extra), next(extra)
+                self.assertEqual((high['target'], low['target']), (target, target))
+                self.assertEqual(high['value'], row['metrics'][target + '_upper_80'])
+                self.assertEqual(low['value'], row['metrics'][target + '_lower_80'] - 1)
+                self.assertEqual(high['law_sha256'], fingerprint(law_fields(law)))
+                self.assertEqual(low['law_sha256'], high['law_sha256'])
+                self.assertEqual(float(high['answer'] - low['answer']), row['metrics'][target + '_interval_mass_80'])
+        self.assertEqual(list(extra), [])
+
+    def test_different_diagonal_full_is_rescored_and_2025_has_no_inner(self):
+        _, w = self.run_real_pair(2025, 1)
+        self.assertEqual(w['inner_rows'], [])
+        self.assertEqual(w['counts']['actual_score_calls'], 26)
+        self.assertEqual(w['counts']['copied_e3_outer'], 0)
+        full = w['provenance']['rows'][:2]
+        self.assertTrue(all(r['source_forecast']['source_population'] == 'full_setting_forecasts' for r in full))
+        self.assertTrue(all(r['source_loss'] is None for r in full))
+        self.assertTrue(all(r['flags'] == {'double_grid': True, 'diagnostics': True} for r in w['score_calls']))
+
+    def test_noeligible_fallback_reason_diagnostics_and_scientific_bytes(self):
+        _, w = self.run_real_pair(2025, None)
+        self.assertEqual(w['counts']['actual_score_calls'], 26)
+        self.assertTrue(all(r['native_failure'] == 'no_eligible_setting' for r in w['outer_rows'][:26]))
+        self.assertTrue(all(r['native_failure'] == 'no_eligible_setting' and r['used_fallback']
+            for r in w['callbacks'] if r['kind'] == 'score'))
+        self.assertTrue(all(r['flags'] == {'double_grid': True, 'diagnostics': True} for r in w['score_calls']))
+
+    def test_numerical_fit_failure_uses_same_fallback_without_retry(self):
+        _, w = self.run_real_pair(2025, 10, NumericalFailure('synthetic_comp04_fit_failure'))
+        self.assertEqual(w['counts']['actual_score_calls'], 26)
+        self.assertTrue(all(r['native_failure'] == 'synthetic_comp04_fit_failure' for r in w['outer_rows'][:26]))
+        self.assertTrue(all(r['used_fallback'] for r in w['callbacks'] if r['kind'] == 'score'))
+
+    def test_complete_durable_publication_precedes_labels_and_candidate_score(self):
+        x = self.case(); events = []; real_inputs = archive.grade_inputs; real_score = composed.score_forecast
+        with measured(x.view['origin']) as acc:
+            with patch.object(archive, 'grade_inputs', side_effect=AssertionError('labels_during_forecast')):
+                pointer = x.publish(acc)
+            def validated():
+                events.append('binding'); return x.validate()
+            def labels(*args, **kwargs):
+                publication, binding = x.validate()
+                self.assertEqual(len(publication['full_setting_forecasts']), 54)
+                self.assertEqual(len(publication['outer_selected_forecasts']), 38)
+                self.assertEqual(read_publication(x.store, pointer), strict(publication))
+                self.assertEqual(binding['publication'], pointer)
+                events.append('labels'); return real_inputs(*args, **kwargs)
+            def score(*args, **kwargs):
+                self.assertIn('labels', events); events.append('score'); return real_score(*args, **kwargs)
+            with patch.object(archive, 'grade_inputs', side_effect=labels), patch.object(composed, 'score_forecast', side_effect=score):
+                result = x.grade(composed.PublishedOriginGrader(), acc, pointer, validated)
+        NUMERICAL_OBSERVATIONS.append(native({'route': 'composed_publication_boundary',
+            'inner_rows': result['inner_rows'], 'outer_rows': result['outer_rows'], 'counts': result['counts'], 'events': events}))
+        self.assertEqual(events[:2], ['binding', 'labels'])
+        self.assertEqual(events.count('labels'), 1); self.assertEqual(events.count('score'), 40)
+
+    def test_real_composed_publication_binds_current79_new_manifest(self):
+        x = self.case(2025, 0)
+        old_manifest, old_sha = copy.deepcopy(x.manifest), x.manifest_sha
+        original_source = {name: pointer.copy() for name, pointer in x.view['source_pointers'].items()}
+        code = {name: hashlib.sha256((ROOT / name).read_bytes()).hexdigest()
+                for name in compute_preflight.CODE_FILES}
+        runtime_files = {name: hashlib.sha256(Path(name).read_bytes()).hexdigest()
+                         for name in compute_preflight.RUNTIME_FILES}
+        protocol_raw = (ROOT / compute_preflight.COMPUTE_PROTOCOL_PATH).read_bytes()
+        compute_pointer = {'path': compute_preflight.COMPUTE_PROTOCOL_PATH,
+            'sha256': hashlib.sha256(protocol_raw).hexdigest(), 'bytes': len(protocol_raw)}
+        # Ownership/lineage fixture, not a fabricated implementation acceptance.
+        # Actual preflight qualification belongs to the separate preflight suite.
+        x.manifest = {'version': 'rfcomp04.manifest.v1', 'code_hashes': code,
+            'runtime_files': runtime_files, 'compute_protocol': compute_pointer,
+            'runtime': copy.deepcopy(compute_preflight.RUNTIME),
+            'bound_hashes': {'config': compute_preflight.CONFIG_SHA, 'protocol': compute_preflight.PROTOCOL_SHA,
+                'admittedData': compute_preflight.DATA_SHA, 'inheritedConfig': compute_preflight.INHERITED_CONFIG_SHA},
+            'parent_manifest_sha256': archive.PARENT_MANIFEST, 'parent_index_sha256': archive.PARENT_INDEX,
+            'synthetic_fixture': 'new_owner_publication_only_no_prefit_acceptance',
+            'historical_execution': False, 'production_authorized': False}
+        x.manifest_sha = fingerprint(x.manifest)
+        x.store.close()
+        x.store = Store(Path(x.parent.name).resolve(), 'synthetic-comp04-' + x.manifest_sha[:16])
+        x.store.write('manifest.json', x.manifest)
+        x.pointers = {d: put_object(x.store, item['payload']) for d, item in x.view['mapper_sources'].items()}
+        real = composed.score_forecast; calls = []
+        def score(law, observed, game_id, **flags):
+            metrics = real(law, observed, game_id, **flags)
+            calls.append({'game_id': game_id, 'observed': list(observed), 'flags': flags,
+                'law_sha256': fingerprint(law_fields(law)), 'metrics': native(metrics)})
+            return metrics
+        with measured(x.view['origin']) as acc:
+            pointer = x.publish(acc)
+            publication, binding = x.validate()
+            ancestry = x.store.read_bound(binding['ancestry'])
+            with patch.object(composed, 'score_forecast', side_effect=score):
+                result = x.grade(composed.PublishedOriginGrader(), acc, pointer)
+            provenance = x.store.read_bound(result['artifacts']['grading_provenance'])
+            NUMERICAL_OBSERVATIONS.append(native({'route': 'composed_current79_new_owner',
+                'identity_scope': 'current_source_runtime_protocol_binding_real_publication',
+                'manifest': x.manifest, 'manifest_sha256': x.manifest_sha, 'old_manifest_sha256': old_sha,
+                'publication': publication, 'binding': binding, 'ancestry': ancestry, 'provenance': provenance,
+                'assembly': {k: x.assembly[k] for k in ('full_setting_forecasts', 'outer_selected_forecasts', 'grading_plan')},
+                'inner_rows': result['inner_rows'], 'outer_rows': result['outer_rows'],
+                'counts': result['counts'], 'score_calls': calls}))
+            self.assertEqual(len(code), 79)
+            self.assertEqual(runtime_files, compute_preflight.RUNTIME_FILES)
+            self.assertEqual(compute_pointer['sha256'], compute_preflight.COMPUTE_PROTOCOL_SHA)
+            self.assertNotEqual(old_sha, x.manifest_sha)
+            self.assertEqual(x.store.read('manifest.json'), strict(x.manifest))
+            self.assertEqual(x.view['source_pointers'], original_source)
+            self.assertEqual(publication['manifest_sha256'], x.manifest_sha)
+            self.assertEqual(binding['manifest_sha256'], x.manifest_sha)
+            self.assertEqual(provenance['manifest_sha256'], x.manifest_sha)
+            self.assertEqual(result['grading_receipt'].publication_sha256, pointer['sha256'])
+            for delay in ('12', '24'):
+                nodes = {n['id']: n for n in ancestry[delay]['nodes']}
+                self.assertEqual(nodes['model']['body']['code_sha256'], fingerprint(code))
+                self.assertEqual(nodes['eligible-football']['body']['admission_manifest'], x.manifest_sha)
+                self.assertEqual(nodes['configuration']['body']['sha256'], compute_preflight.CONFIG_SHA)
+                self.assertEqual(nodes['forecast']['body']['forecast_bytes_sha256'], pointer['sha256'])
+            self.assertEqual(len(calls), 4)
+            # Wrong owner fails at the saved-manifest guard, before any labels.
+            rejected = composed.PublishedOriginGrader()
+            with patch.object(archive, 'grade_inputs', side_effect=AssertionError('old_owner_labels')) as labels:
+                with self.assertRaisesRegex(ValueError, 'grader_manifest_not_saved'):
+                    rejected.grade(x.store, old_manifest, old_sha, x.view, x.assembly, pointer,
+                        x.context, acc, validate_binding=x.validate)
+                with self.assertRaisesRegex(ValueError, 'grader_stopped'):
+                    x.grade(rejected, acc, pointer)
+                labels.assert_not_called()
+
+    def test_first_inner_double_grid_survives_origin_and_resets_at_season(self):
+        # Same explicit artificial future-target seam as the accepted grader
+        # test: scheduled synthetic targets remain unobserved until2030.
+        original_source = archive_fixtures.source_fixture
+        def future_targets(year, week):
+            records, origin = original_source(year, week); names = {}
+            for record in records:
+                old = record['gameId'] == 'old'
+                identity = 'old' if old else f"{record['gameId']}-{year}-{week}"
+                names[record['gameId']] = identity; record['gameId'] = identity
+                if old: record['season'], record['week'] = 2010, 17
+                kickoff = datetime.fromisoformat('2010-12-26T17:00:00+00:00' if old else '2030-09-11T17:00:00+00:00')
+                record['kickoffAt'] = kickoff.isoformat()
+                record['availability'] = {str(d): (kickoff + timedelta(hours=d)).isoformat() for d in (12, 24)}
+            origin['targetGameIds'] = [names[g] for g in origin['targetGameIds']]
+            return records, origin
+        with patch.object(archive_fixtures, 'source_fixture', future_targets):
+            cases = [self.case(year, week=week) for year, week in ((2011, 1), (2011, 2), (2012, 1))]
+        x = cases[0]; records = {}
+        for value in cases:
+            x.archive.contents.update(value.archive.contents)
+            for row in value.archive.records:
+                self.assertTrue(row['gameId'] not in records or row == records[row['gameId']])
+                records[row['gameId']] = row
+        x.archive.records = list(records.values()); x.archive.save()
+        origins = [copy.deepcopy(value.archive.origin) for value in cases]
+        x.context = archive.SourceContext(x.archive.directory, contract.encoded({'files': x.archive.archive.index}),
+            (x.archive.directory / 'manifest.json').read_bytes(), contract.encoded(x.archive.records),
+            tuple(contract.encoded(o) for o in origins), CONFIG_RAW, (), contract.encoded(x.archive.mapper_pointers),
+            (), contract.encoded({}), archive._SEAL)
+        grader = composed.PublishedOriginGrader(); real = composed.score_forecast
+        for index, origin in enumerate(origins):
+            x.view = archive.forecast_inputs(x.context, origin, lambda: None)
+            x.pointers = {d: put_object(x.store, value['payload']) for d, value in x.view['mapper_sources'].items()}
+            seen = []
+            def score(law, observed, game_id, **flags):
+                metrics = real(law, observed, game_id, **flags)
+                seen.append({'game_id': game_id, 'observed': list(observed), 'flags': flags, 'metrics': native(metrics)})
+                return metrics
+            with measured(origin) as acc:
+                pointer = x.publish(acc)
+                with patch.object(composed, 'score_forecast', side_effect=score):
+                    result = x.grade(grader, acc, pointer)
+            NUMERICAL_OBSERVATIONS.append(native({'route': 'composed_multi_origin', 'origin': origin,
+                'assembly': {k: x.assembly[k] for k in ('full_setting_forecasts', 'outer_selected_forecasts', 'grading_plan')},
+                'inner_rows': result['inner_rows'], 'outer_rows': result['outer_rows'],
+                'counts': result['counts'], 'score_calls': seen}))
+            self.assertEqual(len(seen), 36)
+            self.assertEqual([row['flags']['double_grid'] for row in seen],
+                             [False] * 36 if index == 1 else [True] * 18 + [False] * 18)
+            self.assertTrue(all(row['flags']['diagnostics'] is False for row in seen))
+        with measured(origins[-1]) as acc, patch.object(archive, 'grade_inputs', side_effect=AssertionError('reentry_labels')) as labels:
+            with self.assertRaisesRegex(ValueError, 'grader_original_origin_order'): x.grade(grader, acc, pointer)
+            labels.assert_not_called()
+
+    def test_bad_binding_publication_plan_or_law_stops_before_labels(self):
+        for fault in ('boolean', 'publication', 'plan', 'law_class', 'law_value', 'source_pointer'):
+            with self.subTest(fault=fault):
+                x = self.case(2025); grader = composed.PublishedOriginGrader()
+                with measured(x.view['origin']) as acc:
+                    pointer = x.publish(acc); validator = None
+                    if fault == 'boolean': validator = lambda: True
+                    elif fault == 'publication': (x.store.path / pointer['name']).write_bytes(b'{}')
+                    elif fault == 'plan': x.assembly['grading_plan']['outer'][0]['mode'] = 'new_score'
+                    elif fault == 'source_pointer': x.assembly['grading_plan']['outer'][0]['source']['forecast_file']['sha256'] = '0'*64
+                    else:
+                        key = 'outer', 'full', 'z-target'; law = x.assembly['resolved_laws'][key]
+                        x.assembly['resolved_laws'][key] = probability.SkellamDistribution(law) if fault == 'law_class' else replace(law, beta=math_next(law.beta))
+                    with patch.object(archive, 'grade_inputs', side_effect=AssertionError('premature_labels')) as labels:
+                        with self.assertRaises(ValueError): x.grade(grader, acc, pointer, validator)
+                        with self.assertRaisesRegex(ValueError, 'grader_stopped'): x.grade(grader, acc, pointer)
+                        labels.assert_not_called()
+
+    def test_partial_publication_failure_cannot_open_labels_or_score(self):
+        x = self.case(2025); write = x.store.write
+        def broken(name, value):
+            if name.startswith('forecasts-'):
+                raise OSError('synthetic_publication_write_failure')
+            return write(name, value)
+        with measured(x.view['origin']) as acc, patch.object(x.store, 'write', side_effect=broken):
+            with patch.object(archive, 'grade_inputs', side_effect=AssertionError('premature_labels')) as labels, \
+                    patch.object(composed, 'score_forecast', side_effect=AssertionError('premature_score')) as score:
+                with self.assertRaisesRegex(OSError, 'publication_write_failure'): x.publish(acc)
+                labels.assert_not_called(); score.assert_not_called()
+        self.assertTrue(any(n.startswith('state-') for n in x.store.index))
+        self.assertFalse(any(n.startswith('forecasts-') for n in x.store.index))
+
+    def test_scorer_exception_and_baseexception_poison_one_attempt(self):
+        for error in (NumericalFailure('synthetic_new_score_failure'), RuntimeStop('synthetic_new_score_stop')):
+            x = self.case(2025, 1); grader = composed.PublishedOriginGrader()
+            with measured(x.view['origin']) as acc:
+                pointer = x.publish(acc)
+                with patch.object(composed, 'score_forecast', side_effect=error) as score:
+                    with self.assertRaises(type(error)): x.grade(grader, acc, pointer)
+                    with self.assertRaisesRegex(ValueError, 'grader_stopped'): x.grade(grader, acc, pointer)
+                    self.assertEqual(score.call_count, 1)
+                rows = [r for r in acc._active_origin['callbacks'] if r['kind'] == 'score']
+                self.assertEqual(len(rows), 1); self.assertEqual(rows[0]['error_type'], type(error).__name__)
+                self.assertEqual(grader.last_attempt_counts['actual_score_calls'], 1)
+                self.assertFalse(any(n.startswith('outer-losses-') for n in x.store.index))
+                self.assertFalse((x.store.path / 'completion').exists())
+
+    def test_real_candidate_nonfinite_output_is_not_saved_or_retried(self):
+        x = self.case(2025, 1); grader = composed.PublishedOriginGrader(); real = composed.score_forecast
+        with measured(x.view['origin']) as acc:
+            pointer = x.publish(acc)
+            def bad(*args, **kwargs):
+                metrics = real(*args, **kwargs)
+                metrics['grid_transport_bound'] = np.float64('nan'); return metrics
+            with patch.object(composed, 'score_forecast', side_effect=bad):
+                with self.assertRaises(ValueError): x.grade(grader, acc, pointer)
+            self.assertFalse(any(n.startswith('outer-losses-') for n in x.store.index))
+            with self.assertRaisesRegex(ValueError, 'grader_stopped'): x.grade(grader, acc, pointer)
+
+    def test_saved_score_reload_tamper_retains_prefix_and_poison(self):
+        x = self.case(2025, 1); grader = composed.PublishedOriginGrader(); read = x.store.read_bound
+        with measured(x.view['origin']) as acc:
+            pointer = x.publish(acc)
+            def corrupt(p):
+                result = read(p)
+                if p['name'].startswith('outer-losses-'): result[0]['metrics']['joint_energy_score'] += 1.
+                return result
+            with patch.object(x.store, 'read_bound', side_effect=corrupt):
+                with self.assertRaisesRegex(ValueError, 'saved_scores_changed'): x.grade(grader, acc, pointer)
+            self.assertIn('outer-losses-2025-01.json', x.store.index)
+            self.assertNotIn('grading-provenance-2025-01.json', x.store.index)
+            with self.assertRaisesRegex(ValueError, 'grader_stopped'): x.grade(grader, acc, pointer)
+
+    def test_final_directory_fsync_failure_withholds_ready_result(self):
+        x = self.case(2025, 1); grader = composed.PublishedOriginGrader(); fsync = composed.os.fsync
+        with measured(x.view['origin']) as acc:
+            pointer = x.publish(acc)
+            def fail(fd):
+                if fd == x.store.fd: raise OSError('synthetic_grade_directory_fsync')
+                return fsync(fd)
+            with patch.object(composed.os, 'fsync', side_effect=fail):
+                with self.assertRaisesRegex(OSError, 'grade_directory_fsync'): x.grade(grader, acc, pointer)
+            self.assertEqual(grader.last_attempt_counts['actual_score_calls'], 26)
+            self.assertIn('outer-losses-2025-01.json', x.store.index)
+            self.assertIn('grading-provenance-2025-01.json', x.store.index)
+            with self.assertRaisesRegex(ValueError, 'grader_stopped'): x.grade(grader, acc, pointer)
+
+    def test_2010_state_only_route_has_no_labels_or_scores(self):
+        x = self.case(2010)
+        with measured(x.view['origin']) as acc:
+            pointer = x.publish(acc)
+            with patch.object(archive, 'grade_inputs', side_effect=AssertionError('2010_labels')) as labels, \
+                    patch.object(composed, 'score_forecast', side_effect=AssertionError('2010_score')) as score:
+                result = x.grade(composed.PublishedOriginGrader(), acc, pointer)
+                labels.assert_not_called(); score.assert_not_called()
+        self.assertIsNone(result['grading_receipt']); self.assertTrue(all(v == 0 for v in result['counts'].values()))
+
+
+def math_next(value):
+    # A typed descriptor contradiction without an additional fitted law.
+    return float(np.nextafter(value, np.inf))
+
+
+if __name__ == '__main__':
+    unittest.main()

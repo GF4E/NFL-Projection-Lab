@@ -1,0 +1,401 @@
+"""Bounded synthetic adapter qualification; no fits or historical inputs."""
+from dataclasses import fields, replace
+import inspect
+import json
+import math
+from pathlib import Path
+import resource
+import sys
+import time
+import unittest
+from unittest.mock import patch
+
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
+import research_score_conditional_adapter as unit
+from research_score_conditional_margin import estimate_scale
+import research_score_metrics as metrics
+from research_score_distribution import JointDistribution
+
+
+def canonical(value):
+    return json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode('utf-8')
+
+
+def fixture():
+    return JointDistribution(
+        np.array([[0, 0], [0, 2], [0, 2], [2, 0], [1, 6], [6, 1], [3, 4], [8, 2]]),
+        np.array([.03, .12, .06, .06, .09, .14, .1, 0.]),
+        .4, np.array([4.2, 5.7]), np.array([-.125, .25]), 7)
+
+
+def conditional_summary(distribution):
+    grouped = {}
+    for (home, away), mass in zip(distribution.atoms, distribution.alpha):
+        if mass > 0:
+            grouped.setdefault(int(home + away), []).append((float(home), float(mass)))
+    result = {}
+    for total, rows in grouped.items():
+        mass = math.fsum(weight for _, weight in rows)
+        mean = math.fsum(home * weight for home, weight in rows) / mass
+        variance = math.fsum(weight * (home - mean) ** 2 for home, weight in rows) / mass
+        result[total] = (mass, mean, variance)
+    return result
+
+
+class AdapterTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.started = time.monotonic()
+
+    @classmethod
+    def tearDownClass(cls):
+        elapsed = time.monotonic() - cls.started
+        rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == 'darwin' else 1024)
+        if elapsed > 120 or rss > 4096:
+            raise AssertionError(f'synthetic_budget_exceeded: seconds={elapsed}, rss_mib={rss}')
+
+    def test_hand_computable_law_and_background_unchanged(self):
+        original = JointDistribution(np.array([[0, 2], [2, 0]]), np.array([.4, .4]),
+                                     .2, np.array([3., 4.]), np.array([0., -0.]), 0)
+        expected = {0.: ([[1, 1]], [.8]),
+                    .5: ([[0, 2], [1, 1], [2, 0]], [.2, .4, .2])}
+        for scale, (atoms, alpha) in expected.items():
+            transformed, descriptor = unit.transform_distribution(original, scale)
+            self.assertIs(type(transformed), JointDistribution)
+            np.testing.assert_array_equal(transformed.atoms, atoms)
+            np.testing.assert_array_equal(transformed.alpha, alpha)
+            self.assertIs(transformed.beta, original.beta)
+            self.assertEqual(transformed.rates.tobytes(), original.rates.tobytes())
+            self.assertEqual(transformed.theta.tobytes(), original.theta.tobytes())
+            self.assertEqual(transformed.iterations, original.iterations)
+            self.assertEqual(set(descriptor), {'version', 's', 'original_distribution_fingerprint',
+                                               'resulting_distribution_fingerprint'})
+            self.assertEqual(descriptor['s'], scale)
+
+    def test_multiple_totals_mass_means_and_dependence_change(self):
+        original = fixture()
+        before = conditional_summary(original)
+        mean, covariance = original.moments()
+        for scale in (0., 1 / 3, .625, 1.):
+            transformed, _ = unit.transform_distribution(original, scale)
+            after = conditional_summary(transformed)
+            self.assertEqual(set(before), set(after))
+            reduction = 0.
+            for total in before:
+                self.assertAlmostEqual(before[total][0], after[total][0], delta=1e-10)
+                self.assertAlmostEqual(before[total][1], after[total][1], delta=1e-10)
+                self.assertLessEqual(after[total][2], before[total][2] + 1e-10)
+                reduction += before[total][0] * (before[total][2] - after[total][2])
+            new_mean, new_covariance = transformed.moments()
+            np.testing.assert_allclose(new_mean, mean, atol=1e-10, rtol=0)
+            self.assertAlmostEqual(new_covariance[0, 0], covariance[0, 0] - reduction, delta=1e-10)
+            self.assertAlmostEqual(new_covariance[1, 1], covariance[1, 1] - reduction, delta=1e-10)
+            self.assertAlmostEqual(new_covariance[0, 1], covariance[0, 1] + reduction, delta=1e-10)
+            margin = np.array([1., -1.])
+            self.assertAlmostEqual(margin @ new_covariance @ margin,
+                                   margin @ covariance @ margin - 4 * reduction, delta=1e-10)
+            self.assertAlmostEqual(new_covariance.sum(), covariance.sum(), delta=1e-10)
+            self.assertTrue(np.all(transformed.atoms >= 0))
+            np.testing.assert_array_equal(transformed.atoms, np.floor(transformed.atoms))
+            self.assertTrue(np.all(transformed.atoms.max(axis=0) <= original.atoms.max(axis=0)))
+            for value in (-1., 0., 1.9, 2., 6., 7., 20., 80.):
+                self.assertAlmostEqual(transformed.cdf('total', value), original.cdf('total', value), delta=1e-10)
+            for rectangle in ((31, 31), (47, 63)):
+                self.assertTrue(np.all(original.atoms <= rectangle))
+                self.assertTrue(np.all(transformed.atoms <= rectangle))
+                self.assertEqual(transformed.tail_bounds(*rectangle), original.tail_bounds(*rectangle))
+
+    def test_reversal_and_input_permutation(self):
+        original = fixture()
+        reverse = replace(original, atoms=original.atoms[:, ::-1], rates=original.rates[::-1],
+                          theta=original.theta[::-1])
+        order = np.array([7, 3, 2, 4, 0, 6, 1, 5])
+        permuted = replace(original, atoms=original.atoms[order], alpha=original.alpha[order])
+        for scale in (0., .4):
+            direct, descriptor = unit.transform_distribution(original, scale)
+            swapped, _ = unit.transform_distribution(reverse, scale)
+            shuffled, shuffled_descriptor = unit.transform_distribution(permuted, scale)
+            swap_order = np.lexsort((swapped.atoms[:, 0], swapped.atoms[:, 1]))
+            np.testing.assert_array_equal(swapped.atoms[swap_order, ::-1], direct.atoms)
+            np.testing.assert_allclose(swapped.alpha[swap_order], direct.alpha, atol=1e-10, rtol=0)
+            np.testing.assert_array_equal(shuffled.atoms, direct.atoms)
+            self.assertEqual(shuffled.alpha.tobytes(), direct.alpha.tobytes())
+            self.assertEqual(shuffled_descriptor['resulting_distribution_fingerprint'],
+                             descriptor['resulting_distribution_fingerprint'])
+            self.assertNotEqual(shuffled_descriptor['original_distribution_fingerprint'],
+                                descriptor['original_distribution_fingerprint'])
+
+    def test_identity_copies_every_field_dtype_bytes_and_logical_order(self):
+        original = JointDistribution(
+            np.asfortranarray(np.array([[0, 0], [2, 1], [2, 1], [1, 2]], dtype='>i2')),
+            np.array([.5, .1, .25, .1, -0., .1, .125, .1], dtype=np.float32)[::2],
+            np.float64(.125), np.array([3., 4.], dtype=np.float32),
+            np.array([0., -0.], dtype=np.float32)[::-1], np.int32(2), np.bool_(False))
+        original.alpha.setflags(write=False)
+        snapshot = {field.name: (getattr(original, field.name).tobytes(order='C'),
+                                 getattr(original, field.name).flags.writeable)
+                    for field in fields(original) if isinstance(getattr(original, field.name), np.ndarray)}
+        copied, descriptor = unit.transform_distribution(original, 1.)
+        for field in fields(original):
+            old, new = getattr(original, field.name), getattr(copied, field.name)
+            self.assertIs(type(old), type(new))
+            if isinstance(old, np.ndarray):
+                self.assertEqual(old.dtype, new.dtype)
+                self.assertEqual(old.shape, new.shape)
+                self.assertEqual(old.tobytes(order='C'), new.tobytes(order='C'))
+                self.assertFalse(np.shares_memory(old, new))
+                self.assertEqual(snapshot[field.name], (old.tobytes(order='C'), old.flags.writeable))
+            else:
+                self.assertIs(old, new)
+        self.assertEqual(descriptor['original_distribution_fingerprint'], descriptor['resulting_distribution_fingerprint'])
+        self.assertTrue(np.signbit(copied.theta[0]))
+
+    def test_nonidentity_never_aliases_or_mutates_inputs(self):
+        original = fixture()
+        before = {name: getattr(original, name).tobytes() for name in ('atoms', 'alpha', 'rates', 'theta')}
+        result, _ = unit.transform_distribution(original, .4)
+        for name in before:
+            left, right = getattr(original, name), getattr(result, name)
+            self.assertFalse(np.shares_memory(left, right))
+            self.assertEqual(left.tobytes(), before[name])
+            right.flat[0] += 1
+            self.assertEqual(left.tobytes(), before[name])
+
+    def test_background_only_and_total_zero(self):
+        original = JointDistribution(np.array([[8, 2], [1, 4]]), np.zeros(2), 1.,
+                                     np.array([3.2, 4.1]), np.array([0., 0.]), 0)
+        for scale in (0., .3):
+            result, _ = unit.transform_distribution(original, scale)
+            np.testing.assert_array_equal(result.atoms, [[0, 0]])
+            np.testing.assert_array_equal(result.alpha, [0.])
+            np.testing.assert_array_equal(result.moments()[0], original.moments()[0])
+            self.assertLessEqual(result.grid().omitted_probability_bound, 1e-12)
+            for observation in ((0, 0), (90, 0), (0, 90)):
+                self.assertEqual(result.log_probability(*observation), original.log_probability(*observation))
+        zero_total = replace(original, atoms=np.array([[0, 0], [0, 0]]), alpha=np.array([.1, .2]), beta=.7)
+        result, _ = unit.transform_distribution(zero_total, 0.)
+        np.testing.assert_array_equal(result.atoms, [[0, 0]])
+        self.assertAlmostEqual(result.alpha[0], .3, delta=1e-15)
+
+    def test_identity_complete_original_methods_and_canonical_metrics(self):
+        originals = [fixture(), JointDistribution(np.array([[0, 2], [2, 0]]), np.array([.4, .4]),
+                                                .2, np.array([3., 4.]), np.array([0., -0.]), 0)]
+        for index, original in enumerate(originals):
+            copied, _ = unit.transform_distribution(original, 1.)
+            for first, second in zip(original.moments(), copied.moments()):
+                self.assertEqual(first.dtype, second.dtype)
+                self.assertEqual(first.tobytes(), second.tobytes())
+            for cells in (None, (64, 64)):
+                first, second = original.grid(cells), copied.grid(cells)
+                self.assertEqual(first.probability.tobytes(), second.probability.tobytes())
+                self.assertEqual(first.omitted_probability_bound, second.omitted_probability_bound)
+                self.assertEqual(first.score_error_bound, second.score_error_bound)
+            for target in ('home', 'away', 'margin', 'total'):
+                for value in (-4.2, -1., 0., 2.8, 7., 90.):
+                    self.assertEqual(original.cdf(target, value), copied.cdf(target, value))
+                for probability in (.025, .1, .25, .75, .9, .975):
+                    self.assertEqual(original.quantile(target, probability), copied.quantile(target, probability))
+            for observation in ((0, 0), (7, 2), (90, 0)):
+                self.assertEqual(original.log_probability(*observation), copied.log_probability(*observation))
+            observation, game_id = (7, 2), f'synthetic-adapter-identity-{index}'
+            self.assertEqual(canonical(metrics.score_forecast(original, observation, game_id)),
+                             canonical(metrics.score_forecast(copied, observation, game_id)))
+
+    def test_nonidentity_full_support_and_original_scorer_certificates(self):
+        original = fixture()
+        for scale in (0., .6):
+            transformed, _ = unit.transform_distribution(original, scale)
+            for observation in ((0, 0), (90, 0), (0, 90), (1000, 1000)):
+                self.assertTrue(math.isfinite(transformed.log_probability(*observation)))
+            scores = metrics.score_forecast(transformed, (0, 30), f'synthetic-adapter-{scale}')
+            self.assertGreater(scores['joint_energy_score'], 0)
+            self.assertTrue(math.isfinite(scores['joint_nll']))
+            self.assertLessEqual(scores['grid_probability_bound'], 1e-12)
+            self.assertLessEqual(scores['grid_transport_bound'], 1e-7)
+            self.assertLessEqual(scores['double_grid_difference'], 1e-6)
+            baseline = metrics.score_forecast(original, (0, 30), f'synthetic-adapter-{scale}')
+            for key in ('total_mean', 'total_crps', 'total_pit', 'total_lower_80', 'total_upper_80'):
+                self.assertAlmostEqual(scores[key], baseline[key], delta=1e-10)
+
+    def test_fingerprints_cover_every_field_and_c_order_not_strides(self):
+        original = fixture()
+        baseline = unit.distribution_fingerprint(original)
+        self.assertEqual(len(baseline), 64)
+        self.assertEqual(baseline, unit.distribution_fingerprint(replace(original, atoms=np.asfortranarray(original.atoms))))
+        variants = [replace(original, atoms=original.atoms.astype(np.float64)),
+                    replace(original, theta=np.array([-.125, -0.])),
+                    replace(original, rates=original.rates[::-1]),
+                    replace(original, iterations=8), replace(original, iterations=np.int32(7)),
+                    replace(original, independent=np.bool_(False)),
+                    replace(original, beta=np.float64(.4)),
+                    replace(original, alpha=original.alpha[::-1])]
+        for changed in variants:
+            self.assertNotEqual(baseline, unit.distribution_fingerprint(changed))
+        for scale in (0., .5, 1.):
+            first, a = unit.transform_distribution(original, scale)
+            second, b = unit.transform_distribution(original, scale)
+            self.assertEqual(canonical(a), canonical(b))
+            self.assertEqual(a['resulting_distribution_fingerprint'], unit.distribution_fingerprint(first))
+            self.assertEqual(unit.distribution_fingerprint(first), unit.distribution_fingerprint(second))
+
+    def test_small_positive_mass_and_explicit_losses(self):
+        original = JointDistribution(np.array([[0, 2], [2, 0], [1, 1]]), np.array([1e-300, .2, .2]),
+                                     .6, np.array([3., 4.]), np.zeros(2), 0)
+        result, _ = unit.transform_distribution(original, .75)
+        self.assertTrue(np.any((result.alpha > 0) & (result.alpha < 1e-200)))
+        self.assertAlmostEqual(math.fsum(result.alpha), math.fsum(original.alpha), delta=1e-10)
+        duplicate_loss = replace(original, atoms=np.array([[0, 2], [0, 2], [1, 1]]))
+        with self.assertRaisesRegex(unit.ConditionalAdapterFailure, 'grouping_mass_resolution_loss'):
+            unit.transform_distribution(duplicate_loss, .5)
+        smallest = np.nextafter(0., 1.)
+        rescaling_loss = replace(original, atoms=np.array([[0, 2], [2, 0]]),
+                                 alpha=np.array([smallest, smallest]), beta=1.)
+        with self.assertRaisesRegex(unit.ConditionalAdapterFailure, 'conditional_rescaling_mass_underflow'):
+            unit.transform_distribution(rescaling_loss, .5)
+
+    def test_mass_near_tolerance_is_preserved_without_renormalization(self):
+        original = fixture()
+        original.alpha = original.alpha * (1 + 5e-13)
+        result, _ = unit.transform_distribution(original, .4)
+        self.assertGreater(math.fsum([*result.alpha, result.beta]), 1.)
+        self.assertAlmostEqual(math.fsum(result.alpha), math.fsum(original.alpha), delta=1e-15)
+
+    def test_exact_class_independence_and_invalid_fields(self):
+        original = fixture()
+
+        class Subclass(JointDistribution):
+            pass
+
+        for invalid in (object(), Subclass(**vars(original)), replace(original, independent=True),
+                        replace(original, independent=0)):
+            with self.assertRaises(unit.ConditionalAdapterFailure):
+                unit.transform_distribution(invalid, .5)
+        changes = [('atoms', np.array([])), ('atoms', np.empty((0, 2))),
+                   ('atoms', np.array([[0, 1, 2]])), ('atoms', np.array([[-1, 2]])),
+                   ('atoms', np.array([[.5, 1.5]])), ('atoms', np.array([[np.nan, 0]])),
+                   ('atoms', np.array([[np.inf, 0]])), ('atoms', [[0, 0]]),
+                   ('alpha', np.ones(2)), ('alpha', -original.alpha), ('alpha', original.alpha * 2),
+                   ('alpha', np.full(8, np.nan)), ('beta', 0.), ('beta', -1.), ('beta', np.inf),
+                   ('rates', np.array([0., 2.])), ('rates', np.array([1., np.inf])),
+                   ('rates', np.array([1.])), ('theta', np.array([0., np.nan])),
+                   ('theta', np.zeros(3)), ('iterations', -1), ('iterations', 1.), ('iterations', True)]
+        for field, value in changes:
+            with self.subTest(field=field, value=value), self.assertRaises(unit.ConditionalAdapterFailure):
+                unit.transform_distribution(replace(original, **{field: value}), 1.)
+        for scale in (-.1, 1.1, np.nan, np.inf, [.5], '0.5'):
+            with self.assertRaises(unit.ConditionalAdapterFailure):
+                unit.transform_distribution(original, scale)
+
+    def test_allocation_bounds_precede_dense_allocation(self):
+        original = fixture()
+        for atoms in (np.array([[101, 100]]), np.array([[1e308, 0.]]),
+                      np.array([[np.iinfo(np.uint64).max, 0]], dtype=np.uint64),
+                      np.zeros((65537, 2), dtype=np.int8)):
+            invalid = replace(original, atoms=atoms, alpha=np.zeros(len(atoms)), beta=1.)
+            with patch.object(unit.np, 'zeros', side_effect=AssertionError('dense_allocation_before_bounds')):
+                with self.assertRaisesRegex(unit.ConditionalAdapterFailure, 'limit_exceeded'):
+                    unit.transform_distribution(invalid, .5)
+        maximum = replace(original, atoms=np.array([[0, 200], [200, 0]]), alpha=np.array([.3, .3]))
+        result, _ = unit.transform_distribution(maximum, .5)
+        self.assertTrue(np.all(result.atoms.sum(axis=1) == 200))
+        many = replace(original, atoms=np.zeros((65536, 2), dtype=np.int8),
+                       alpha=np.full(65536, .5 / 65536), beta=.5)
+        result, _ = unit.transform_distribution(many, .5)
+        np.testing.assert_array_equal(result.atoms, [[0, 0]])
+        np.testing.assert_array_equal(result.alpha, [.5])
+
+    def test_imports_exclude_fit_history_and_replay_controllers(self):
+        imports = [line for line in inspect.getsource(unit).splitlines()
+                   if line.startswith('import ') or line.startswith('from ')]
+        self.assertEqual(imports, ['from dataclasses import fields', 'import hashlib', 'import json',
+                                  'import math', 'import numpy as np', 'from scipy.stats import poisson',
+                                  'from research_score_conditional_margin import contract_conditional',
+                                  'from research_score_distribution import JointDistribution'])
+
+    def test_calibration_case_background_only_total_and_zero(self):
+        original = fixture()
+        case = unit.calibration_case(original, 1, 2)
+        self.assertIsNone(case['empirical_probabilities'])
+        self.assertEqual(case['empirical_fraction'], 0.)
+        self.assertEqual(case['background_fraction'], 1.)
+        probability = original.rates[0] / original.rates.sum()
+        self.assertAlmostEqual(case['conditional_mean'], 3 * probability, delta=1e-10)
+        self.assertAlmostEqual(case['fixed_variance'], 3 * probability * (1 - probability), delta=1e-10)
+        self.assertAlmostEqual(case['squared_residual'], (1 - 3 * probability) ** 2, delta=1e-10)
+        for distribution in (original, replace(original, alpha=np.zeros(len(original.alpha)), beta=1.)):
+            zero = unit.calibration_case(distribution, 0, 0)
+            self.assertEqual(zero['conditional_mean'], 0.)
+            self.assertEqual(zero['conditional_variance'], 0.)
+            self.assertEqual(zero['fixed_variance'], 0.)
+            self.assertEqual(zero['squared_residual'], 0.)
+
+    def test_calibration_balanced_unequal_means_and_direct_enumeration(self):
+        poisson_mass = math.exp(-4) * 4 ** 4 / math.factorial(4)
+        beta = 1 / (1 + poisson_mass)
+        qemp = beta * poisson_mass
+        original = JointDistribution(np.array([[0, 4], [4, 0]]), np.array([.75 * qemp, .25 * qemp]),
+                                     beta, np.array([2., 2.]), np.zeros(2), 0)
+        case = unit.calibration_case(original, 0, 4)
+        self.assertAlmostEqual(case['empirical_fraction'], .5, delta=1e-12)
+        self.assertAlmostEqual(case['background_fraction'], .5, delta=1e-12)
+        self.assertAlmostEqual(case['conditional_mean'], 1.5, delta=1e-12)
+        self.assertAlmostEqual(case['fixed_variance'], .75, delta=1e-12)
+        self.assertAlmostEqual(case['conditional_variance'], 2.25, delta=1e-12)
+        np.testing.assert_array_equal(case['empirical_probabilities'], [.75, 0., 0., 0., .25])
+        for distribution, observation in ((original, (0, 4)), (fixture(), (1, 6)), (fixture(), (2, 0))):
+            row = unit.calibration_case(distribution, *observation)
+            total = sum(observation)
+            p = distribution.rates[0] / distribution.rates.sum()
+            background = np.array([math.comb(total, h) * p ** h * (1 - p) ** (total - h)
+                                   for h in range(total + 1)])
+            mixture = row['empirical_fraction'] * row['empirical_probabilities'] + row['background_fraction'] * background
+            direct_mean = math.fsum(h * float(mass) for h, mass in enumerate(mixture))
+            direct_variance = math.fsum(float(mass) * (h - direct_mean) ** 2 for h, mass in enumerate(mixture))
+            self.assertAlmostEqual(math.fsum(mixture), 1., delta=1e-12)
+            self.assertAlmostEqual(row['conditional_mean'], direct_mean, delta=1e-10)
+            self.assertAlmostEqual(row['conditional_variance'], direct_variance, delta=1e-10)
+            self.assertAlmostEqual(row['squared_residual'], (observation[0] - direct_mean) ** 2, delta=1e-10)
+            expected_log_mass = math.log(math.fsum(distribution.alpha[distribution.atoms.sum(axis=1) == total])
+                                         + distribution.beta * math.exp(-distribution.rates.sum())
+                                         * distribution.rates.sum() ** total / math.factorial(total))
+            self.assertAlmostEqual(row['log_total_mass'], expected_log_mass, delta=1e-10)
+        estimate = estimate_scale([case['empirical_probabilities']], [case['empirical_fraction']],
+                                  [case['fixed_variance']], [case['squared_residual']], [1.])
+        self.assertAlmostEqual(estimate['s'], 1., delta=1e-12)
+
+    def test_calibration_case_invalid_observations_and_total_rates(self):
+        for observation in ((-1, 2), (1.5, 2), (1., 2), (True, 2), ('1', 2),
+                            (np.nan, 0), (0, np.inf), (201, 0), (100, 101)):
+            with self.subTest(observation=observation), self.assertRaises(unit.ConditionalAdapterFailure):
+                unit.calibration_case(fixture(), *observation)
+        overflowing = replace(fixture(), rates=np.array([1e308, 1e308]))
+        with self.assertRaisesRegex(unit.ConditionalAdapterFailure, 'nonfinite_total_rate'):
+            unit.calibration_case(overflowing, 1, 1)
+        unrepresentable_split = replace(fixture(), rates=np.array([np.nextafter(0., 1.), 1e308]))
+        with self.assertRaisesRegex(unit.ConditionalAdapterFailure, 'unrepresentable_background_split'):
+            unit.calibration_case(unrepresentable_split, 1, 1)
+
+    def test_calibration_extreme_log_mass_imbalance_rejected(self):
+        for alpha, beta, rates in ((1., 1e-300, [2., 3.]),
+                                   (1e-300, 1., [2., 3.]),
+                                   (1., np.nextafter(0., 1.), [100., 100.])):
+            distribution = JointDistribution(np.array([[0, 2]]), np.array([alpha]), beta,
+                                             np.array(rates), np.zeros(2), 0)
+            with self.subTest(alpha=alpha, beta=beta), self.assertRaisesRegex(
+                    unit.ConditionalAdapterFailure, 'unrepresentable_positive_mixture_fraction'):
+                unit.calibration_case(distribution, 0, 2)
+
+    def test_calibration_vector_is_copied_and_constructor_is_observation_only(self):
+        original = fixture()
+        fingerprint = unit.distribution_fingerprint(original)
+        case = unit.calibration_case(original, np.int64(0), np.int32(2))
+        self.assertFalse(np.shares_memory(case['empirical_probabilities'], original.alpha))
+        case['empirical_probabilities'][0] = 0
+        self.assertEqual(fingerprint, unit.distribution_fingerprint(original))
+        self.assertEqual(str(inspect.signature(unit.transform_distribution)), '(distribution, s)')
+
+
+if __name__ == '__main__':
+    unittest.main()

@@ -1,0 +1,653 @@
+{
+  "adding_control3_does_not_change_any_reported_maximum": true,
+  "blocker_to_historical_capacity_progress": "Whole callback gains do not meet the unchanged fixed computational target.",
+  "blockers_to_bounded_exactness_acceptance": [],
+  "conclusion": {
+    "benefit": "For pilot-like roles, both lowers Fmax+Smax from 11.537208 to 8.955626 ms (22.3761%). CDF-only reduces 17.2110%; encoder-only 0.2120%. Broad stress gives both 21.7366% and CDF-only 22.0378%, so the small additional encoder benefit is not robust in the separate maxima.",
+    "capacity": "All modes exceed 7.461492 ms in both subsets; measured reductions remain far below the unchanged 52.468% historical requirement. Synthetic and historical baselines differ, so even a synthetic absolute pass would not establish historical capacity.",
+    "exactness": "The pinned candidate passes the retained finite synthetic oracle suite and all full descriptor/metric byte comparisons. This is bounded synthetic exactness, not a proof over every input or runtime.",
+    "historical_result": "RF-02F remains its preserved protocol_invalid cost prefix, with no full predictive inference.",
+    "next_integration": "Do not advance to historical or complete-controller integration on this evidence. Retain the CDF helper as a candidate component; defer the small/noisy encoder integration. Further compute work, if chosen, should first test a bounded hypothesis about remaining complete-callback cost and reassess the same fixed target."
+  },
+  "evidence": [
+    {
+      "bytes": 888,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/QUALIFICATION-PINS.json",
+      "sha256": "3fe288b5727703a2c10cfb67cfe71d3ea886eb99d650be35c4f03f6123b46c09"
+    },
+    {
+      "bytes": 8822,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/source-map-before.json",
+      "sha256": "a3e47ad92f75fb139096f9a7c59b77a429688647e01acdfbd895f07d5755547b"
+    },
+    {
+      "bytes": 8822,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/source-map-after.json",
+      "sha256": "a3e47ad92f75fb139096f9a7c59b77a429688647e01acdfbd895f07d5755547b"
+    },
+    {
+      "bytes": 7721,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/process.json",
+      "sha256": "847a5ec5352bc7e1c0c6d2a2fb040f7d7d26f6e0062a14bfa042f951ccaa2a29"
+    },
+    {
+      "bytes": 4204,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/process.log",
+      "sha256": "cd1341ebd07333bc4b5b9bd2fe93043da67a87fe12fdacbc3230a2c7620c6256"
+    },
+    {
+      "bytes": 129,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/unit-tests.json",
+      "sha256": "cfe042033ed008bfe4a357d1bb9a9bbb875f12ec8533feaed22e784a56b6442f"
+    },
+    {
+      "bytes": 2138606,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/benchmark.json",
+      "sha256": "8d6bd85a91694b0331cfa2e36a1fbabc589b060753ac87be9b540d8045f408e3"
+    },
+    {
+      "bytes": 10997,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/qualify.py",
+      "sha256": "8c9db8dc35d55f57a948aa34fe70d6d323825b92ede936f2ea119cacfaed34d8"
+    },
+    {
+      "bytes": 4230,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/QUALIFICATION-SCOPE.md",
+      "sha256": "008be7c0e1c98577906893b68dff443593ee51ef3d1514112596c9989379287e"
+    },
+    {
+      "bytes": 4342,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/research_score_probability_compute.py",
+      "sha256": "0ac0ecd32415720cc7e6fb1d2ec0c9229de3a46d6437d5ff380e9ebe2ee83661"
+    },
+    {
+      "bytes": 20889,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/test_probability_compute.py",
+      "sha256": "47b5b69c1a8a9ea033219a42ceead2c9f605d748bd133546d2c94149bb8b51c9"
+    },
+    {
+      "bytes": 8755,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/controller-final-pins-20260905.json",
+      "sha256": "891d03da52317a62ee307e7c1c27b805413f6676520aa6acfd3651642de5f4f7"
+    },
+    {
+      "bytes": 467,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/numerical-review-audit-attempt-1.json",
+      "sha256": "6886bfbb70098c4c97b6521119cafdfcfedfff475a0b4c716faad86f87a406bf"
+    }
+  ],
+  "fixed_requirement": {
+    "historical_combined_reduction_fraction": 0.524680169716677,
+    "historical_maximum_fit_plus_score_seconds": 0.007461491790146312,
+    "unchanged": true
+  },
+  "historical_execution": false,
+  "large_support_case_timings": [
+    {
+      "iterations": 4,
+      "modes": {
+        "both": {
+          "fit_seconds": {
+            "max": 0.0027732089947676286,
+            "median": 0.00248397899849806,
+            "min": 0.0024354999914066866
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.3052330503583739,
+            "median": 0.2763659562341558,
+            "min": 0.19644764702927997
+          },
+          "score_seconds": {
+            "max": 0.006513333995826542,
+            "median": 0.005885374994250014,
+            "min": 0.005393707993789576
+          }
+        },
+        "cdf": {
+          "fit_seconds": {
+            "max": 0.00292233400978148,
+            "median": 0.002776082998025231,
+            "min": 0.00269762500829529
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.30848543253585514,
+            "median": 0.2543531064009758,
+            "min": 0.21598673360384246
+          },
+          "score_seconds": {
+            "max": 0.0060996669926680624,
+            "median": 0.005823270999826491,
+            "min": 0.005606334001640789
+          }
+        },
+        "encoder": {
+          "fit_seconds": {
+            "max": 0.0029605409945361316,
+            "median": 0.0026521664985921234,
+            "min": 0.0024122080067172647
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.08734898249840883,
+            "median": 0.0437183502664914,
+            "min": -0.039075139729057184
+          },
+          "score_seconds": {
+            "max": 0.008955082987085916,
+            "median": 0.008313395504956134,
+            "min": 0.008035374994506128
+          }
+        },
+        "original": {
+          "fit_seconds": {
+            "max": 0.002957165997941047,
+            "median": 0.002844354501576163,
+            "min": 0.0026977910019923
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0
+          },
+          "score_seconds": {
+            "max": 0.009188832991640083,
+            "median": 0.008803145501588006,
+            "min": 0.00808745798713062
+          }
+        }
+      },
+      "native_mean": [
+        19.67343973795573,
+        16.430757446289068
+      ],
+      "setting": 10,
+      "variant": "full"
+    },
+    {
+      "iterations": 4,
+      "modes": {
+        "both": {
+          "fit_seconds": {
+            "max": 0.0028334999951766804,
+            "median": 0.002612458003568463,
+            "min": 0.002214041000115685
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.28841026684451854,
+            "median": 0.22547960071182155,
+            "min": 0.20351296177935874
+          },
+          "score_seconds": {
+            "max": 0.013317874996573664,
+            "median": 0.012215270995511673,
+            "min": 0.011418624999350868
+          }
+        },
+        "cdf": {
+          "fit_seconds": {
+            "max": 0.003042667012778111,
+            "median": 0.0027575834974413738,
+            "min": 0.0025244169955840334
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.26854511268476144,
+            "median": 0.2195186519223849,
+            "min": 0.16831317507115362
+          },
+          "score_seconds": {
+            "max": 0.01310683299379889,
+            "median": 0.01226585399126634,
+            "min": 0.011698540998622775
+          }
+        },
+        "encoder": {
+          "fit_seconds": {
+            "max": 0.002626540997880511,
+            "median": 0.002492146501026582,
+            "min": 0.0023715410061413422
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.05600246739983894,
+            "median": 0.031693017159576675,
+            "min": -0.0017757639815605408
+          },
+          "score_seconds": {
+            "max": 0.017048499998054467,
+            "median": 0.01627047899819445,
+            "min": 0.015645125007722527
+          }
+        },
+        "original": {
+          "fit_seconds": {
+            "max": 0.003054166998481378,
+            "median": 0.002709854503336828,
+            "min": 0.002535167004680261
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0
+          },
+          "score_seconds": {
+            "max": 0.017603000000235625,
+            "median": 0.01660043750598561,
+            "min": 0.01606891700066626
+          }
+        }
+      },
+      "native_mean": [
+        19.67343973795573,
+        16.430757446289068
+      ],
+      "setting": 10,
+      "variant": "independent_marginals"
+    },
+    {
+      "iterations": 4,
+      "modes": {
+        "both": {
+          "fit_seconds": {
+            "max": 0.0027672500000335276,
+            "median": 0.0024660835042595863,
+            "min": 0.002189874998293817
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.33545321340618495,
+            "median": 0.26741279091657955,
+            "min": 0.1229321328380969
+          },
+          "score_seconds": {
+            "max": 0.006182416997035034,
+            "median": 0.005306104496412445,
+            "min": 0.005133333004778251
+          }
+        },
+        "cdf": {
+          "fit_seconds": {
+            "max": 0.0029174999945098534,
+            "median": 0.0025696875018184073,
+            "min": 0.002408583997748792
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.310288600537194,
+            "median": 0.2196998951458436,
+            "min": 0.13981527836704855
+          },
+          "score_seconds": {
+            "max": 0.006142333993921056,
+            "median": 0.005656000001181383,
+            "min": 0.00509354101086501
+          }
+        },
+        "encoder": {
+          "fit_seconds": {
+            "max": 0.0025096670142374933,
+            "median": 0.00240856250457,
+            "min": 0.0021949590009171516
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.1265542016918666,
+            "median": 0.05490113916851935,
+            "min": -0.06402454418571679
+          },
+          "score_seconds": {
+            "max": 0.008552208004402928,
+            "median": 0.007716395499301143,
+            "min": 0.007295374991372228
+          }
+        },
+        "original": {
+          "fit_seconds": {
+            "max": 0.002932458999566734,
+            "median": 0.002839020497049205,
+            "min": 0.002443791992845945
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0
+          },
+          "score_seconds": {
+            "max": 0.008580041991081089,
+            "median": 0.007889520995377097,
+            "min": 0.007293667003978044
+          }
+        }
+      },
+      "native_mean": [
+        19.785319010416668,
+        16.118652343750004
+      ],
+      "setting": 6,
+      "variant": "zero_strength_update"
+    },
+    {
+      "iterations": 4,
+      "modes": {
+        "both": {
+          "fit_seconds": {
+            "max": 0.0026884169928962365,
+            "median": 0.0025036875013029203,
+            "min": 0.002194417000282556
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.34950858168687715,
+            "median": 0.29585850291644666,
+            "min": 0.17481768384717566
+          },
+          "score_seconds": {
+            "max": 0.006011833989759907,
+            "median": 0.005039520998252556,
+            "min": 0.0047673750086687505
+          }
+        },
+        "cdf": {
+          "fit_seconds": {
+            "max": 0.0029022079979768023,
+            "median": 0.0025856040010694414,
+            "min": 0.002438041992718354
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.324576589752956,
+            "median": 0.26371254550086726,
+            "min": 0.09953700014912559
+          },
+          "score_seconds": {
+            "max": 0.006629208000958897,
+            "median": 0.005086249999294523,
+            "min": 0.004862833011429757
+          }
+        },
+        "encoder": {
+          "fit_seconds": {
+            "max": 0.0027091670053778216,
+            "median": 0.0024582295009167865,
+            "min": 0.0021973749971948564
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.1282046040247612,
+            "median": 0.05040301364844668,
+            "min": -0.04619544787092966
+          },
+          "score_seconds": {
+            "max": 0.008325917006004602,
+            "median": 0.007745229508145712,
+            "min": 0.007110500009730458
+          }
+        },
+        "original": {
+          "fit_seconds": {
+            "max": 0.003044790995772928,
+            "median": 0.002846937502908986,
+            "min": 0.002413624999462627
+          },
+          "paired_sum_reduction_fraction": {
+            "max": 0.0,
+            "median": 0.0,
+            "min": 0.0
+          },
+          "score_seconds": {
+            "max": 0.008510125000611879,
+            "median": 0.007696396001847461,
+            "min": 0.007104958000127226
+          }
+        }
+      },
+      "native_mean": [
+        19.411666666666665,
+        16.255000000000006
+      ],
+      "setting": 6,
+      "variant": "zero_scoring_level_update"
+    }
+  ],
+  "limitations": [
+    "The actual pilot selected diagonal setting6; only its two zero-update E3 outer series required new scores. The broad independent/full synthetic scorer cases are stress coverage, not reproduced pilot workload.",
+    "Synthetic supports, weights, native means and tiny history differ from actual historical inputs. The 700-atom support and four solver iterations are size-relevant but do not reproduce a historical maximum.",
+    "Counterbalancing puts each mode in each position twice, but this is one short serial process, not independent process replications or a confidence interval. Keep all observations and maxima; do not choose favorable medians to relax the gate.",
+    "The real operation callbacks include candidate guards, copying, fitting, validation, descriptor creation/recovery and full scoring. Assembly constructor, native selection, archive admission, chronological progression, production accounting/watchdog bookkeeping, post-callback mass CDFs, durable controller publication and bootstrap are excluded.",
+    "Mode setup and output hashing/serialization are outside individual callbacks but inside the observed process. The reported parent clock runs through the final source check, immediately before writing process.json; the run has ample measured headroom under60 seconds.",
+    "Descriptor and metric bodies support independent canonical byte/hash verification here. Recovered arrays are represented only by a law hash; no law reconstruction occurred in this review. Unit tests separately check copied fields and primary/doubled grid bytes, bounds and types.",
+    "The actual pinned suite has21 tests, including direct primary/doubled-grid equality, rather than the early20-test planning shorthand.",
+    "Focused comparisons suppress warnings: they establish tested returned values/types/bytes or exception class/message equality, not warning-stream equivalence.",
+    "Tested finite rates range1e-9 to1000. The wider guarded finite domain is not exhaustively qualified; future integration must preserve runtime/source binding and unsupported-input fallback.",
+    "A retained audit-only failure incorrectly expected108 rather than104 scorer fields. Only the audit assertion was corrected; the candidate and qualification artifacts were unchanged."
+  ],
+  "role": "independent_numerical",
+  "scientific_calls_during_review": 0,
+  "separate_maxima": [
+    {
+      "fit_roles": "setting10 full",
+      "modes": {
+        "both": {
+          "exceeds_fixed_absolute_target": true,
+          "maxima": {
+            "fit": {
+              "observations": 8,
+              "repeat": 0,
+              "seconds": 0.0027732089947676286,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 16,
+              "repeat": 6,
+              "seconds": 0.006182416997035034,
+              "setting": 6,
+              "support": "synthetic700",
+              "variant": "zero_strength_update"
+            }
+          },
+          "original_over_mode_ratio": 1.2882637126184666,
+          "reduction_fraction_vs_original": 0.22376141607882039,
+          "sum_separate_maxima_seconds": 0.008955625991802663
+        },
+        "cdf": {
+          "exceeds_fixed_absolute_target": true,
+          "maxima": {
+            "fit": {
+              "observations": 8,
+              "repeat": 7,
+              "seconds": 0.00292233400978148,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 16,
+              "repeat": 7,
+              "seconds": 0.006629208000958897,
+              "setting": 6,
+              "support": "synthetic700",
+              "variant": "zero_scoring_level_update"
+            }
+          },
+          "original_over_mode_ratio": 1.207889571762229,
+          "reduction_fraction_vs_original": 0.17210974961803205,
+          "sum_separate_maxima_seconds": 0.009551542010740377
+        },
+        "encoder": {
+          "exceeds_fixed_absolute_target": true,
+          "maxima": {
+            "fit": {
+              "observations": 8,
+              "repeat": 6,
+              "seconds": 0.0029605409945361316,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 16,
+              "repeat": 0,
+              "seconds": 0.008552208004402928,
+              "setting": 6,
+              "support": "synthetic700",
+              "variant": "zero_strength_update"
+            }
+          },
+          "original_over_mode_ratio": 1.0021245134489887,
+          "reduction_fraction_vs_original": 0.0021200094603780473,
+          "sum_separate_maxima_seconds": 0.01151274899893906
+        },
+        "original": {
+          "exceeds_fixed_absolute_target": true,
+          "maxima": {
+            "fit": {
+              "observations": 8,
+              "repeat": 0,
+              "seconds": 0.002957165997941047,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 16,
+              "repeat": 1,
+              "seconds": 0.008580041991081089,
+              "setting": 6,
+              "support": "synthetic700",
+              "variant": "zero_strength_update"
+            }
+          },
+          "original_over_mode_ratio": 1.0,
+          "reduction_fraction_vs_original": 0.0,
+          "sum_separate_maxima_seconds": 0.011537207989022136
+        }
+      },
+      "role": "pilot_like",
+      "score_roles": "setting6 zero_strength_update and zero_scoring_level_update",
+      "support_population": "synthetic700"
+    },
+    {
+      "fit_roles": "setting10 full",
+      "modes": {
+        "both": {
+          "exceeds_fixed_absolute_target": true,
+          "maxima": {
+            "fit": {
+              "observations": 8,
+              "repeat": 0,
+              "seconds": 0.0027732089947676286,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 32,
+              "repeat": 7,
+              "seconds": 0.013317874996573664,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "independent_marginals"
+            }
+          },
+          "original_over_mode_ratio": 1.277736540884394,
+          "reduction_fraction_vs_original": 0.21736604690991834,
+          "sum_separate_maxima_seconds": 0.016091083991341293
+        },
+        "cdf": {
+          "exceeds_fixed_absolute_target": true,
+          "maxima": {
+            "fit": {
+              "observations": 8,
+              "repeat": 7,
+              "seconds": 0.00292233400978148,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 32,
+              "repeat": 1,
+              "seconds": 0.01310683299379889,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "independent_marginals"
+            }
+          },
+          "original_over_mode_ratio": 1.2826721434485169,
+          "reduction_fraction_vs_original": 0.22037754923759478,
+          "sum_separate_maxima_seconds": 0.01602916700358037
+        },
+        "encoder": {
+          "exceeds_fixed_absolute_target": true,
+          "maxima": {
+            "fit": {
+              "observations": 8,
+              "repeat": 6,
+              "seconds": 0.0029605409945361316,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 32,
+              "repeat": 6,
+              "seconds": 0.017048499998054467,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "independent_marginals"
+            }
+          },
+          "original_over_mode_ratio": 1.0275437991151177,
+          "reduction_fraction_vs_original": 0.026805474510028127,
+          "sum_separate_maxima_seconds": 0.0200090409925906
+        },
+        "original": {
+          "exceeds_fixed_absolute_target": true,
+          "maxima": {
+            "fit": {
+              "observations": 8,
+              "repeat": 0,
+              "seconds": 0.002957165997941047,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "full"
+            },
+            "score": {
+              "observations": 32,
+              "repeat": 7,
+              "seconds": 0.017603000000235625,
+              "setting": 10,
+              "support": "synthetic700",
+              "variant": "independent_marginals"
+            }
+          },
+          "original_over_mode_ratio": 1.0,
+          "reduction_fraction_vs_original": 0.0,
+          "sum_separate_maxima_seconds": 0.02056016599817667
+        }
+      },
+      "role": "broad_stress",
+      "score_roles": "all four complete-flag variants",
+      "support_population": "synthetic700"
+    }
+  ],
+  "status": "accepted_bounded_synthetic_exactness_only_capacity_target_not_met",
+  "verification": {
+    "actual_benchmark_fit_callbacks": 288,
+    "actual_benchmark_score_callbacks": 288,
+    "complete_cases": 8,
+    "each_mode_in_each_order_position_per_case": 2,
+    "frozen_source_test_pins_unchanged": 66,
+    "full_metric_fields": 104,
+    "measured_observations": 256,
+    "metric_and_descriptor_body_hashes_and_byte_equalities_recomputed": true,
+    "modes_per_case": 4,
+    "observation_inventory_sha256": "a68d3644348cd9c2a39f3838886d1389fa057069d8e7d95f2f760bd1797892e6",
+    "peak_child_rss_mib": 205.3125,
+    "persisted_observations_including_warmups": 288,
+    "preparation_and_observation_inclusive_seconds": 4.7589016660058405,
+    "qualified_input_pins": 5,
+    "recorded_law_hash_equalities_checked": true,
+    "rounds_per_case": 8,
+    "saved_observation_bytes": 1549368,
+    "unit_seconds": 0.277139541998622,
+    "unit_tests_failed": 0,
+    "unit_tests_passed": 21,
+    "unit_tests_skipped": 0,
+    "warmups_per_mode_case": 1
+  },
+  "version": "rf-comp-01.numerical-review.v1"
+}

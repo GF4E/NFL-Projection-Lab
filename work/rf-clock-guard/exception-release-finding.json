@@ -1,0 +1,15 @@
+{
+  "status": "reproduced_guard_release_exception_replacement",
+  "source_sha256": "cbda894f2ad256ad810d8e54656186cf6d20193c920a78d7038dd63b7b1fe378",
+  "probe": "one-shot sys.settrace return event on actual ControllerEnvelope.check after _check_active=False, call inherited _watchdog",
+  "primary": "KeyboardInterrupt:primary",
+  "nested": "ValueError:nested",
+  "actual": "ValueError:nested",
+  "is_primary": false,
+  "rss_calls": 2,
+  "fired": true,
+  "seconds": 0.574862125,
+  "historical_execution": false,
+  "scientific_callbacks": 0,
+  "limitation": "Deterministic Python trace injection models signal dispatch at unwind boundary; not observed actual OS signal interleaving."
+}

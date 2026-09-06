@@ -1,0 +1,120 @@
+"""Chronological pipeline invariance on invented games, not real results."""
+import copy
+from datetime import datetime, timedelta, timezone
+import importlib.util
+from pathlib import Path
+import sys
+import unittest
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+for name in ("research_score_models", "research_score_contract", "research_score_distribution"):
+    spec = importlib.util.spec_from_file_location(name, ROOT / "scripts" / (name + ".py"))
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+m = sys.modules["research_score_models"]
+c = sys.modules["research_score_contract"]
+d = sys.modules["research_score_distribution"]
+
+
+def fixture():
+    rows, origins = [], []
+    for week in range(1, 7):
+        ids = []
+        cutoff = datetime(2013, 9, 3, 14, 30, tzinfo=timezone.utc) + timedelta(weeks=week - 1)
+        kickoff = cutoff + timedelta(days=5, hours=2, minutes=30)
+        for pair in range(16):
+            identity = f"{week:02}-{pair:02}"
+            ids.append(identity)
+            rows.append({"gameId": identity, "season": 2013, "week": week, "kickoffAt": kickoff.isoformat(),
+                "homeTeam": f"T{2 * pair:02}", "awayTeam": f"T{2 * pair + 1:02}", "neutral": True,
+                "homeScore": 14 + (week * 3 + pair) % 22, "awayScore": 10 + (week + pair * 3) % 20, "overtime": 0,
+                "availability": {str(delay): (kickoff + timedelta(hours=delay)).isoformat() for delay in (12, 24)}})
+        eligible = [row["gameId"] for row in rows if row["week"] < week]
+        origins.append({"season": 2013, "week": week, "originAt": cutoff.isoformat(), "targetGameIds": ids,
+                        "windows": {str(delay): {"eligibleInputIds": eligible.copy(), "inputIdSha256": c.digest(c.encoded(eligible))} for delay in (12, 24)}})
+    return rows, origins
+
+
+def replay(rows, origins, family):
+    teams = sorted({row["homeTeam"] for row in rows} | {row["awayTeam"] for row in rows})
+    setting = {"N0": {}, "S1": {"ridge": 16, "half_life": 2.5}, "E1": {"k": 20, "retention": .5, "home_points": 40}, "E2": {"k": .1, "retention": .5}}[family]
+    engine = m.MeanTrajectory(family, setting, teams)
+    result = {}
+    for origin in origins:
+        prepared = c.prepare_origin(rows, origin)
+        batch = engine.forecast_origin(2013, origin["week"], prepared["history"], prepared["targets"])
+        for row in batch["forecasts"]:
+            result[row["game_id"]] = row["mean"]
+    return result
+
+
+class InvarianceTests(unittest.TestCase):
+    def test_full_mean_pipeline_global_franchise_renaming(self):
+        rows, origins = fixture()
+        renamed = copy.deepcopy(rows)
+        naming = {f"T{i:02}": f"R{31 - i:02}" for i in range(32)}
+        for row in renamed:
+            row["homeTeam"], row["awayTeam"] = naming[row["homeTeam"]], naming[row["awayTeam"]]
+        for family in ("N0", "S1", "E1", "E2"):
+            a, b = replay(rows, origins, family), replay(renamed, origins, family)
+            for key in a:
+                if a[key] is None:
+                    self.assertIsNone(b[key])
+                else:
+                    np.testing.assert_allclose(a[key], b[key], atol=1e-8, rtol=0)
+
+    def test_current_week_outcomes_cannot_change_own_predictions(self):
+        rows, origins = fixture()
+        changed = copy.deepcopy(rows)
+        for row in changed:
+            if row["week"] == 6:
+                row["homeScore"], row["awayScore"], row["overtime"] = 70, 0, 1
+            row["spread"] = 100
+            row["public_betting"] = .99
+        for family in ("N0", "S1", "E1", "E2"):
+            a, b = replay(rows, origins, family), replay(changed, origins, family)
+            for key in a:
+                if a[key] is not None:
+                    np.testing.assert_array_equal(a[key], b[key])
+
+    def test_truncated_future_sources_and_input_order_leave_forecasts_identical(self):
+        rows, origins = fixture()
+        truncated = [row for row in rows if row["week"] < 6][::-1]
+        for family in ("N0", "S1", "E1", "E2"):
+            a, b = replay(rows, origins[:-1], family), replay(truncated, origins[:-1], family)
+            for key in a:
+                if a[key] is not None:
+                    np.testing.assert_array_equal(a[key], b[key])
+
+    def test_neutral_home_away_swap_preserves_mirrored_mean_and_distribution(self):
+        rows, origins = fixture()
+        swapped = copy.deepcopy(rows)
+        for row in swapped:
+            row["homeTeam"], row["awayTeam"] = row["awayTeam"], row["homeTeam"]
+            row["homeScore"], row["awayScore"] = row["awayScore"], row["homeScore"]
+        for family in ("N0", "S1", "E1", "E2"):
+            a, b = replay(rows, origins, family), replay(swapped, origins, family)
+            for key in a:
+                if a[key] is not None:
+                    np.testing.assert_allclose(a[key], b[key][::-1], atol=1e-8, rtol=0)
+            past = c.prepare_origin(rows, origins[-1])["history"]
+            mapper = d.JointBase.from_scores([[r.home_score, r.away_score] for r in past], m.weights(past, 2013))
+            final = origins[-1]["targetGameIds"][0]
+            joint_a, joint_b = mapper.fit(a[final]), mapper.fit(b[final])
+            self.assertAlmostEqual(joint_a.log_probability(20, 17), joint_b.log_probability(17, 20), places=9)
+
+    def test_cycle_cannot_pass_hash_bound_closure(self):
+        root = {"id": "root", "kind": "forecast", "body": {}, "parents": [], "available_at": None}
+        child = {"id": "child", "kind": "model", "body": {}, "parents": [{"id": "root", "sha256": "unresolved_cycle"}], "available_at": None}
+        child["sha256"] = c.node_hash(child)
+        root["parents"] = [{"id": "child", "sha256": child["sha256"]}]
+        root["sha256"] = c.node_hash(root)
+        with self.assertRaisesRegex(ValueError, "cyclic_ancestry"):
+            c.verify_ancestry([root, child], {"root": root["sha256"]}, datetime.now(timezone.utc))
+
+
+if __name__ == "__main__":
+    unittest.main()

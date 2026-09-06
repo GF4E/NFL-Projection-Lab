@@ -1,0 +1,174 @@
+{
+  "all_66_frozen_sources_and_five_qualification_inputs_authenticated": true,
+  "binding_restoration": "Driver uses one temporary saved.encoded binding per operation and asserts identity restoration before storing every one of288 observations; terminal success and complete retained bodies support all assertions passing. Candidate module has no shared-global mutation.",
+  "blockers": [],
+  "case_summaries": [
+    {
+      "atoms": 3,
+      "callbacks_per_kind": 36,
+      "law_sha256": "55e5cead1cc647dcc5d9e988a680c5c1d3146a8d1509dc6edda8ba31d50a24a4",
+      "modes_equal": true,
+      "support": "control3",
+      "variant": "full"
+    },
+    {
+      "atoms": 3,
+      "callbacks_per_kind": 36,
+      "law_sha256": "ac4fa94c821dad60b5caec1e7c94787d8afa9c630044b06d8ed98eb7d066e69b",
+      "modes_equal": true,
+      "support": "control3",
+      "variant": "independent_marginals"
+    },
+    {
+      "atoms": 3,
+      "callbacks_per_kind": 36,
+      "law_sha256": "f09de548c44aaac2d50daa6792c3b30068a72de4995b2a96dd8ed9f69a02077b",
+      "modes_equal": true,
+      "support": "control3",
+      "variant": "zero_strength_update"
+    },
+    {
+      "atoms": 3,
+      "callbacks_per_kind": 36,
+      "law_sha256": "e6ffdb34a054361e1d518bf0b0e3aa3ae7a7f3ce9527f10520c6c15c9f3e1a12",
+      "modes_equal": true,
+      "support": "control3",
+      "variant": "zero_scoring_level_update"
+    },
+    {
+      "atoms": 700,
+      "callbacks_per_kind": 36,
+      "law_sha256": "c7d5f89006596b196325c74fade594bb623caf2fa2a37a37d3f29e1e33505847",
+      "modes_equal": true,
+      "support": "synthetic700",
+      "variant": "full"
+    },
+    {
+      "atoms": 700,
+      "callbacks_per_kind": 36,
+      "law_sha256": "fa9153220987b804c20491736f9c825da204128aa61be524410d83abd8ba6af3",
+      "modes_equal": true,
+      "support": "synthetic700",
+      "variant": "independent_marginals"
+    },
+    {
+      "atoms": 700,
+      "callbacks_per_kind": 36,
+      "law_sha256": "821cfc385f8c6ca77a05a3b98a65ac9481a3258fb735a599024dfd3dac93e603",
+      "modes_equal": true,
+      "support": "synthetic700",
+      "variant": "zero_strength_update"
+    },
+    {
+      "atoms": 700,
+      "callbacks_per_kind": 36,
+      "law_sha256": "a5694895f2216837294487e4c024e36241612e151bb22f05b37679cf74ae7da7",
+      "modes_equal": true,
+      "support": "synthetic700",
+      "variant": "zero_scoring_level_update"
+    }
+  ],
+  "cdf_source_ast_equal_except_declared_helper_substitution": true,
+  "inputs": {
+    "QUALIFICATION-PINS.json": {
+      "bytes": 888,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/QUALIFICATION-PINS.json",
+      "sha256": "3fe288b5727703a2c10cfb67cfe71d3ea886eb99d650be35c4f03f6123b46c09"
+    },
+    "QUALIFICATION-SCOPE.md": {
+      "bytes": 4230,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/QUALIFICATION-SCOPE.md",
+      "sha256": "008be7c0e1c98577906893b68dff443593ee51ef3d1514112596c9989379287e"
+    },
+    "benchmark.json": {
+      "bytes": 2138606,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/benchmark.json",
+      "sha256": "8d6bd85a91694b0331cfa2e36a1fbabc589b060753ac87be9b540d8045f408e3"
+    },
+    "process.json": {
+      "bytes": 7721,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/process.json",
+      "sha256": "847a5ec5352bc7e1c0c6d2a2fb040f7d7d26f6e0062a14bfa042f951ccaa2a29"
+    },
+    "process.log": {
+      "bytes": 4204,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/process.log",
+      "sha256": "cd1341ebd07333bc4b5b9bd2fe93043da67a87fe12fdacbc3230a2c7620c6256"
+    },
+    "qualify.py": {
+      "bytes": 10997,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/qualify.py",
+      "sha256": "8c9db8dc35d55f57a948aa34fe70d6d323825b92ede936f2ea119cacfaed34d8"
+    },
+    "research_score_probability_compute.py": {
+      "bytes": 4342,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/research_score_probability_compute.py",
+      "sha256": "0ac0ecd32415720cc7e6fb1d2ec0c9229de3a46d6437d5ff380e9ebe2ee83661"
+    },
+    "source-map-after.json": {
+      "bytes": 8822,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/source-map-after.json",
+      "sha256": "a3e47ad92f75fb139096f9a7c59b77a429688647e01acdfbd895f07d5755547b"
+    },
+    "source-map-before.json": {
+      "bytes": 8822,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/source-map-before.json",
+      "sha256": "a3e47ad92f75fb139096f9a7c59b77a429688647e01acdfbd895f07d5755547b"
+    },
+    "test_probability_compute.py": {
+      "bytes": 20889,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/test_probability_compute.py",
+      "sha256": "47b5b69c1a8a9ea033219a42ceead2c9f605d748bd133546d2c94149bb8b51c9"
+    },
+    "unit-tests.json": {
+      "bytes": 129,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-comp-01/attempt-1788647181588420000/unit-tests.json",
+      "sha256": "cfe042033ed008bfe4a357d1bb9a9bbb875f12ec8533feaed22e784a56b6442f"
+    }
+  },
+  "limitations": [
+    "No tests, fits, scores, grids, historical admission, benchmark, or bootstrap were rerun for this review.",
+    "Retained descriptor and metric bodies were independently rehashed and compared exactly, including signed-zero JSON spelling. Law equality is a retained canonical-law hash assertion; full law bodies are not saved and were not independently regenerated.",
+    "Actual grid equality is covered by the retained21-test success with inspected test source, including primary/doubled probability bytes and bounds; the benchmark retains grid metadata rather than full grids.",
+    "Callback counts cover benchmark operations only; unit-test and synthetic-fixture setup computations are excluded from those counters but included in process resources.",
+    "The temporary synthetic assembly omits constructor/archive admission; successful fixture callbacks do not qualify a complete historical controller or all possible input domains.",
+    "Resource evidence is the retained parent observation and root terminal notification, not an independently rerun process. Sampling and child high-water RSS do not prove instantaneous kernel enforcement; interpreter startup and final report-write tail are outside the recorded clock.",
+    "Separate-maxima benefit interpretation belongs to the independent timing reviewer. This report makes no historical capacity, predictive-quality, restart, or production authorization claim."
+  ],
+  "observations": {
+    "bodies": 288,
+    "canonical_index_sha256": "4eaacc68606ef1550765727c009eeb2c1b9a54e35a8b859269c3f384b3439650",
+    "cases": 8,
+    "fit_callbacks": 288,
+    "indexed_bytes": 1549368,
+    "nonreference_body_and_law_hash_comparisons": 280,
+    "per_mode": {
+      "both": 72,
+      "cdf": 72,
+      "encoder": 72,
+      "original": 72
+    },
+    "physical_observation_membership_exact": true,
+    "rotated_rounds_per_case": 8,
+    "score_callbacks": 288,
+    "warmups_per_case": 4
+  },
+  "resources": {
+    "exit_code": 0,
+    "peak_child_rss_mib": 205.3125,
+    "rss_limit_mib": 2048,
+    "wall_limit_seconds": 60,
+    "wall_seconds": 4.7589016660058405
+  },
+  "reviewer_role": "Author of the21 focused tests; did not author candidate or qualification driver. Evidence/source review is separate from execution, but this is not an independent test-design review.",
+  "scope": "source_and_run_identity_test_counts_complete_callback_bodies_output_equality_binding_restoration_resources",
+  "status": "accepted_retained_synthetic_qualification_evidence_only",
+  "unit_tests": {
+    "errors": 0,
+    "failures": 0,
+    "log_names_match_test_source": true,
+    "skipped": 0,
+    "success": true,
+    "tests_run": 21
+  }
+}

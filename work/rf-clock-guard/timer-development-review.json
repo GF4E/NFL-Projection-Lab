@@ -1,0 +1,42 @@
+{
+  "status": "passed_focused_timer_development",
+  "scope": "independent_timer_interleaving_tests_only",
+  "source": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_clock_guard.py",
+    "sha256": "988192c508186c79ac8c71f1e842f3e6bcb63f1c01d94752dc329954462ab6ff",
+    "bytes": 4469
+  },
+  "test": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-clock-guard/test_clock_guard.py",
+    "sha256": "d2fc3be6a30d95756ab6e12bce4e5625acb567b832f8583cdf9898804e184d0e",
+    "bytes": 19362
+  },
+  "process": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-clock-guard/timer-development-attempt2/process-report.json",
+    "sha256": "5e6d5918854158472e29068e93646729b36ad750224a9584cb59393213ff588b",
+    "bytes": 1879
+  },
+  "test_log": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-clock-guard/timer-development-attempt2/stderr.log",
+    "sha256": "abd016e6163cea779372e1afd4c0430f718fc1dfc78cd0c09f7eb453f74938ef",
+    "bytes": 2490
+  },
+  "prior_failure": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-clock-guard/exception-release-finding.json",
+    "sha256": "a77837555477cbc025537764594e3184a6c15eb2d4359767b1de42363eacaccb",
+    "bytes": 685
+  },
+  "tests": 17,
+  "historical_execution": false,
+  "scientific_callbacks": 0,
+  "findings": [
+    "Exact original counterexample reproduced; guarded increasing acquisitions, all reachable guard statements, nestedpendingbranch, compare/commit/RSS injection and finite21iteration drain pass.",
+    "Saved-primary latch closes explicit exception-release regression for ValueError/KeyboardInterrupt/SystemExit. Later handler reraises sameprimary; explicit boundary resumes realRSS/totaldeadline checks. Reset/latch-write boundaries tested.",
+    "True reversal/nonfinite clocks preserve floathex diagnostics; highwater/memory/earliest120smoke/9000deadline/metadata dispatch retained. Actual complete-smoke success/failure/reentry and realSIGALRM pending crossingdeadline pass."
+  ],
+  "limitations": [
+    "Development tests only, no finalimplementation acceptance or historical permission.",
+    "OBSERVATIONS retained in process memory for root completequalifier to save; development log reports results, notfulltraceJSON.",
+    "Controlled clock/sys.settrace injections model deterministic windows; oneactualshortsignal complements but doesnotproveallpossibleOSinterleavings."
+  ]
+}

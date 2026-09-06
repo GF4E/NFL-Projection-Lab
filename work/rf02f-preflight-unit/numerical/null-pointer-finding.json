@@ -1,0 +1,14 @@
+{
+  "status": "reproduced_blocker_pending_author_fix",
+  "source_sha256": "9c09b7fcf9f500c75e19d769d4ec85a278edcedb9bdfea1b1506680da4b2c852",
+  "test_sha256": "b459a0e9b506a811c88332cfd09a4c2ed4fa45641c1a9cbdc4db82afdb9e69ed",
+  "finding": "_pointer does not validate required digest/size values before passing them to _file's optional expected_sha/expected_bytes parameters. Null values skip authentication.",
+  "actual_probes": [
+    "The complete in-memory synthetic acceptance fixture accepted qualification.sha256=null and qualification.bytes=null when both separately rehashed review records referenced qualification_sha256=null.",
+    "Real _pointer/_file calls accepted two different file contents and lengths under an unchanged null/null pointer to a synthetic WORK file."
+  ],
+  "minimal_fix": "Validate required pointer SHA with _sha and require an exact nonnegative integer size before read; also validate SHA in the stage pointer branch that omits size.",
+  "historical_execution": false,
+  "approval_file_created": false,
+  "repository_files_edited": false
+}

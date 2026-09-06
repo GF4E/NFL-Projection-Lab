@@ -1,0 +1,42 @@
+{
+  "accepted_actual_reviews": {
+    "Actual numerical terminal review": {
+      "bytes": 5711,
+      "path": "/private/var/folders/_w/qdm05hdd4bd6jn63np8pcfrw0000gn/T/tmp81wwa38m/evidence/numerical.json",
+      "sha256": "4601758ab2544c3db6c71ca77d73d92ab4e321da2b0a686c173c01402d2e1721"
+    },
+    "Actual temporal terminal review": {
+      "bytes": 1464,
+      "path": "/private/var/folders/_w/qdm05hdd4bd6jn63np8pcfrw0000gn/T/tmp81wwa38m/evidence/temporal.json",
+      "sha256": "2ab010381ffd4b8d02a119b0e7f4f9d5c3e4bd346f6703f022edb6bf773074d3"
+    }
+  },
+  "checks": {
+    "admission": true,
+    "falsification": true,
+    "leakage": true,
+    "no_new_numerical_failure": true
+  },
+  "input_ledger_sha256": "7cea380a7bcf31a029e56902686d9216a795f11e9be9c5109869a9501cc92123",
+  "limitations": [
+    "Explicit synthetic trust roots; no research authority."
+  ],
+  "rf02d_scientific_terminal_status": "protocol_invalid",
+  "run_manifest_sha256": "24de0a1914f5026cf46bb81136483bca0ebeb84b19f7a5ac931c92e35c79dc18",
+  "source_annual_index": {
+    "bytes": 91288,
+    "name": "annual-index.json",
+    "sha256": "d521ec56719ed05976fcb7c6c92fa8a2d01ff8aa1560266f132eebf9333860c1"
+  },
+  "source_case_collection": {
+    "bytes": 43993,
+    "name": "case-collection.json",
+    "sha256": "e51b2de9c291e196addbf7ef748eb7ffe728d40f643e1d5b2f81a467a974d58b"
+  },
+  "source_runtime_checks": {
+    "bytes": 1191,
+    "name": "runtime-checks.json",
+    "sha256": "1a7344d1052033d941ce59c6d0c3790f4d18b7c820eca203d97d9cca6e6a361d"
+  },
+  "version": "rf02e-derived-audit-inputs.v1"
+}

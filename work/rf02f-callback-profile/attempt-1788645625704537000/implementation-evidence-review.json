@@ -1,0 +1,302 @@
+{
+  "all_66_sources_authenticated_current_and_before_after": true,
+  "blockers": [],
+  "frozen_source_map": {
+    "bytes": 8755,
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-controller-unit/controller-final-pins-20260905.json",
+    "sha256": "891d03da52317a62ee307e7c1c27b805413f6676520aa6acfd3651642de5f4f7"
+  },
+  "inputs": {
+    "PROFILE-SCOPE.md": {
+      "bytes": 5129,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/PROFILE-SCOPE.md",
+      "sha256": "20754722e22cfdf1e1fa85e13818deafc3b0ceebbda0c8718f1f9c66e18b1083"
+    },
+    "identity.json": {
+      "bytes": 646,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/identity.json",
+      "sha256": "c285060f2f6773630949e6512f2b11460454ba21406930dd95f2abbf0b05a66a"
+    },
+    "process.json": {
+      "bytes": 4831,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/process.json",
+      "sha256": "4a2a8f9677a6b85fef12c588dfb70d8d2c0dbff9a3dfcb370b4f44d762e94056"
+    },
+    "process.log": {
+      "bytes": 1023,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/process.log",
+      "sha256": "d9a43f41b4228bcf470ba5779c62937340b7a4c6ef803cfe6295559433ea33b3"
+    },
+    "profile_callbacks.py": {
+      "bytes": 15675,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/profile_callbacks.py",
+      "sha256": "e5ae4c43d18bb8e4f14c80ffa3a7aaf79a2227ac63b0b7de3073fe7dd2e51742"
+    },
+    "result.json": {
+      "bytes": 467137,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/result.json",
+      "sha256": "6c81869871760419cc164a2a3412b18d97f5dc8e2b7b734f7266e20a923b4694"
+    },
+    "source-map-after.json": {
+      "bytes": 7752,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/source-map-after.json",
+      "sha256": "48d939bdd53b04d89e7161959f2b7dc543ab6dcbc39b4571c9b8b0e910b94297"
+    },
+    "source-map-before.json": {
+      "bytes": 7752,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645625704537000/source-map-before.json",
+      "sha256": "48d939bdd53b04d89e7161959f2b7dc543ab6dcbc39b4571c9b8b0e910b94297"
+    }
+  },
+  "limitations": [
+    "No profiling, fitting, scoring, grid generation, or bootstrap was repeated for this review.",
+    "Equality is authenticated recorded canonical/grid hash comparison under inspected instrumentation; raw grid arrays and full metric dictionaries were not persisted and were not independently regenerated.",
+    "Measured unchanged baselines have no grid wrapper; grid equality evidence comes from capture-only warmup and instrumented passes, with descriptor/metric equality on every measured baseline.",
+    "Synthetic source/assembly constructor and historical admission were intentionally bypassed; successful callbacks do not qualify failure behavior or a proposed optimization.",
+    "Parent wall clock starts after Python startup/import time; reported elapsed precedes final process-report write. Actual margin is ample, but this is not proof of an instantaneous kernel deadline. RSS was sampled with retained child high-water mark.",
+    "Same-case retirement flag is consistent with retained fractions; separate Fmax/Smax interpretation required by scope belongs to the independent numerical review and is not a historical speedup/capacity claim.",
+    "Prior attempts remain failed; attempt2 performed callbacks but did not persist completed numerical results.",
+    "The152 fit and152 score counts describe the complete profiled callback pipeline, including warmup and cProfile; scientific fixture-construction calls during setup are not enumerated by these counters, although their time is included in process resources."
+  ],
+  "observed_case_checks": [
+    {
+      "complete_fit_callbacks": 19,
+      "complete_score_callbacks": 19,
+      "grid_shapes": [
+        [
+          64,
+          64
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          128,
+          128
+        ]
+      ],
+      "output_equalities": 18,
+      "pairs": 8,
+      "support": "control3",
+      "variant": "full"
+    },
+    {
+      "complete_fit_callbacks": 19,
+      "complete_score_callbacks": 19,
+      "grid_shapes": [
+        [
+          64,
+          64
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          128,
+          128
+        ]
+      ],
+      "output_equalities": 18,
+      "pairs": 8,
+      "support": "control3",
+      "variant": "independent_marginals"
+    },
+    {
+      "complete_fit_callbacks": 19,
+      "complete_score_callbacks": 19,
+      "grid_shapes": [
+        [
+          64,
+          64
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          128,
+          128
+        ]
+      ],
+      "output_equalities": 18,
+      "pairs": 8,
+      "support": "control3",
+      "variant": "zero_strength_update"
+    },
+    {
+      "complete_fit_callbacks": 19,
+      "complete_score_callbacks": 19,
+      "grid_shapes": [
+        [
+          64,
+          64
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          128,
+          128
+        ]
+      ],
+      "output_equalities": 18,
+      "pairs": 8,
+      "support": "control3",
+      "variant": "zero_scoring_level_update"
+    },
+    {
+      "complete_fit_callbacks": 19,
+      "complete_score_callbacks": 19,
+      "grid_shapes": [
+        [
+          64,
+          64
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          128,
+          128
+        ]
+      ],
+      "output_equalities": 18,
+      "pairs": 8,
+      "support": "synthetic700",
+      "variant": "full"
+    },
+    {
+      "complete_fit_callbacks": 19,
+      "complete_score_callbacks": 19,
+      "grid_shapes": [
+        [
+          64,
+          64
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          128,
+          128
+        ]
+      ],
+      "output_equalities": 18,
+      "pairs": 8,
+      "support": "synthetic700",
+      "variant": "independent_marginals"
+    },
+    {
+      "complete_fit_callbacks": 19,
+      "complete_score_callbacks": 19,
+      "grid_shapes": [
+        [
+          64,
+          64
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          128,
+          128
+        ]
+      ],
+      "output_equalities": 18,
+      "pairs": 8,
+      "support": "synthetic700",
+      "variant": "zero_strength_update"
+    },
+    {
+      "complete_fit_callbacks": 19,
+      "complete_score_callbacks": 19,
+      "grid_shapes": [
+        [
+          64,
+          64
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          128,
+          128
+        ]
+      ],
+      "output_equalities": 18,
+      "pairs": 8,
+      "support": "synthetic700",
+      "variant": "zero_scoring_level_update"
+    }
+  ],
+  "overhead_evidence": {
+    "all_64_pair_ratios_and_case_summaries_recomputed": true,
+    "cprofile_not_used_as_wall_baseline": true,
+    "maximum_fraction": 0.09953328702969033,
+    "minimum_fraction": -0.1354642854377448
+  },
+  "prior_failed_attempts": [
+    {
+      "identity": {
+        "bytes": 646,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645396498579000/identity.json",
+        "sha256": "0a5e7dee51426e8e110220449091121883ad1b6a35319791b0b27ebe0ce2bd14"
+      },
+      "log": {
+        "bytes": 1141,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645396498579000/process.log",
+        "sha256": "56721ac7e1d1301227500f00c1f8d72c27a019caf06a29b436f1a86a44a7cad8"
+      },
+      "process": {
+        "bytes": 1839,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645396498579000/process.json",
+        "sha256": "40537d7cdc797db64d3859341bc4a58622bba5572bf9ae0494dee4d5a557fdba"
+      },
+      "results_accepted": false
+    },
+    {
+      "identity": {
+        "bytes": 646,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645472465418000/identity.json",
+        "sha256": "98e702f6ab21f3ae1ba812ccaad631496b4141587883411be61cbd44e171fb47"
+      },
+      "log": {
+        "bytes": 1739,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645472465418000/process.log",
+        "sha256": "735e8a52a3c226e76d7b0b9aa338d1784fd0b2797e6d240016bc95dea2bb33f9"
+      },
+      "process": {
+        "bytes": 1954,
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-callback-profile/attempt-1788645472465418000/process.json",
+        "sha256": "237694cf02de3a550a3d871473c5e4116857bcbce772071f21e648b6cb74db4e"
+      },
+      "results_accepted": false
+    }
+  ],
+  "resource_evidence": {
+    "exit_code": 0,
+    "limit_mib": 2048,
+    "limits_seconds": 60,
+    "parent_process_observation": "retained parent process report plus root terminal notification; this reviewer did not observe or rerun execution",
+    "peak_child_rss_mib": 135.34375,
+    "wall_seconds": 2.7489455420000013
+  },
+  "scope": "implementation_identity_complete_callback_counts_equality_metadata_and_resource_evidence",
+  "status": "accepted_retained_synthetic_profile_evidence_only",
+  "totals": {
+    "canonical_descriptor_and_metric_comparisons": 144,
+    "cases": 8,
+    "fit_callbacks": 152,
+    "instrumented_grid_comparisons_to_captured_reference": 216,
+    "paired_repetitions": 64,
+    "recorded_grid_signatures": 240,
+    "score_callbacks": 152
+  }
+}

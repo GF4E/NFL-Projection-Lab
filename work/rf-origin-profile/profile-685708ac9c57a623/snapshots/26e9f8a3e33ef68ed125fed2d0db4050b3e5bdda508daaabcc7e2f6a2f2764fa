@@ -1,0 +1,440 @@
+"""One offline immutable RF v2 replay. No downloads, providers or production."""
+import argparse
+from dataclasses import replace
+from datetime import datetime, timezone
+import json
+import os
+from pathlib import Path
+import resource
+import signal
+import stat
+import subprocess
+import sys
+import time
+
+# Isolated Python deliberately excludes the script directory from import search.
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "scripts"))
+import numpy as np
+from research_score_contract import (ACCEPTANCE_HASH, encoded, digest, load_accepted, runtime_manifest,
+                                     read_regular, prepare_origin, node_hash, verify_ancestry)
+from research_score_distribution import JointBase, NumericalFailure
+from research_score_metrics import score_forecast, aggregate
+from research_score_replay import TrajectoryBank, SelectionHistory, common_mapper, resolve_distribution
+from research_score_inference import infer, decide
+
+CODE_FILES = ["scripts/research_score_" + name + ".py" for name in
+              ("distribution", "models", "contract", "metrics", "replay", "inference", "run")]
+TEST_FILES = ["tests/research-score/test_" + name + ".py" for name in
+              ("distribution", "mean_models", "contract", "metrics", "replay", "inference", "invariance", "run")]
+OUTPUT_PARENT = Path("/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data")
+
+
+def plain(value):
+    if isinstance(value, np.ndarray):
+        return plain(value.tolist())
+    if isinstance(value, np.generic):
+        return plain(value.item())
+    if isinstance(value, dict):
+        return {str(key): plain(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [plain(item) for item in value]
+    if isinstance(value, float) and not np.isfinite(value):
+        return {"nonfinite": str(value)}
+    return value
+
+
+def _directory_fd(path):
+    path = Path(path)
+    if not path.is_absolute() or ".." in path.parts:
+        raise ValueError("absolute_output_parent_required")
+    fd = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW)
+    try:
+        for part in path.parts[1:]:
+            following = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
+            os.close(fd)
+            fd = following
+        return fd
+    except BaseException:
+        os.close(fd)
+        raise
+
+
+class ImmutableRun:
+    def __init__(self, parent, identity):
+        if not identity or any(character not in "abcdefghijklmnopqrstuvwxyz0123456789-." for character in identity):
+            raise ValueError("invalid_run_identity")
+        self.path, self.index = Path(parent) / identity, {}
+        parent_fd = _directory_fd(parent)
+        try:
+            os.mkdir(identity, mode=0o700, dir_fd=parent_fd)  # Existing identity is never resumed/restarted.
+            self.fd = os.open(identity, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=parent_fd)
+        finally:
+            os.close(parent_fd)
+
+    def write(self, name, value):
+        if not name or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-." for c in name):
+            raise ValueError("invalid_output_name")
+        raw = value if isinstance(value, bytes) else encoded(plain(value))
+        sha = digest(raw)
+        try:
+            fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=self.fd)
+        except FileExistsError:
+            if self.read(name) != raw:
+                raise ValueError("immutable_output_conflict")
+        else:
+            with os.fdopen(fd, "wb") as stream:
+                stream.write(raw)
+                stream.flush()
+                os.fsync(stream.fileno())
+        if digest(self.read(name)) != sha:
+            raise ValueError("output_hash_recovery_failed")
+        self.index[name] = {"sha256": sha, "bytes": len(raw)}
+        return sha
+
+    def read(self, name):
+        if not name or any(c not in "abcdefghijklmnopqrstuvwxyz0123456789-." for c in name):
+            raise ValueError("invalid_output_name")
+        fd = os.open(name, os.O_RDONLY | os.O_NOFOLLOW, dir_fd=self.fd)
+        with os.fdopen(fd, "rb") as stream:
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                raise ValueError("nonregular_output_refused")
+            return stream.read()
+
+    def object(self, value):
+        raw = encoded(plain(value))
+        name = "object-" + digest(raw) + ".json"
+        self.write(name, raw)
+        return {"name": name, "sha256": digest(raw)}
+
+    def finish_index(self):
+        self.write("artifact-index.json", {"files": self.index.copy()})
+
+    def close(self):
+        os.close(self.fd)
+
+
+def distribution_descriptor(fitted, mapper_pointer):
+    return {"version": "rf.joint-distribution.v2", "mapper": mapper_pointer,
+            "theta": fitted.theta.tolist(), "beta": fitted.beta, "rates": fitted.rates.tolist(),
+            "alphaSha256": digest(encoded(fitted.alpha.tolist())), "iterations": fitted.iterations,
+            "independent": fitted.independent, "mean": fitted.moments()[0].tolist(),
+            "covariance": fitted.moments()[1].tolist()}
+
+
+def recover_distribution(mapper, descriptor):
+    theta = np.asarray(descriptor["theta"])
+    _, alpha, beta, rates, _, _ = mapper.components(theta)
+    if (digest(encoded(alpha.tolist())) != descriptor["alphaSha256"] or beta != descriptor["beta"]
+            or rates.tolist() != descriptor["rates"]):
+        raise ValueError("distribution_parameter_hash_mismatch")
+    from research_score_distribution import JointDistribution
+    recovered = JointDistribution(mapper.atoms, alpha, beta, rates, theta, descriptor["iterations"], descriptor["independent"])
+    if recovered.moments()[0].tolist() != descriptor["mean"] or recovered.moments()[1].tolist() != descriptor["covariance"]:
+        raise ValueError("distribution_moment_mismatch")
+    return recovered
+
+
+def lineage(prepared, config_hash, code_hash, manifest_hash, output_body):
+    def node(identity, kind, body, parents=(), available=None):
+        value = {"id": identity, "kind": kind, "body": body,
+                 "parents": [{"id": p["id"], "sha256": p["sha256"]} for p in parents], "available_at": available}
+        value["sha256"] = node_hash(value)
+        return value
+    configuration = node("configuration", "configuration", {"sha256": config_hash})
+    source = node("eligible-football", "football_source", {"input_sha256": prepared["input_hash"], "ids": prepared["input_ids"],
+                  "availability_class": "retrospective_inferred", "admission_manifest": manifest_hash})
+    schema = node("feature-schema", "feature_schema", {"historical": ["game_id", "season", "week", "home", "away", "neutral", "home_score", "away_score"],
+                  "target_context": ["game_id", "season", "week", "home", "away", "neutral"]})
+    target_schema = node("target-schema", "target_schema", {"fields": ["home_final_score_including_OT", "away_final_score_including_OT"],
+                         "type": "joint_nonnegative_integer_scores", "season_type": "REG", "overtime_occurrence": "diagnostic_only"})
+    model = node("model", "model", {"code_sha256": code_hash}, [configuration, source, schema, target_schema])
+    forecast = node("forecast", "forecast", output_body, [model])
+    nodes = [configuration, source, schema, target_schema, model, forecast]
+    verify_ancestry(nodes, {"forecast": forecast["sha256"]}, datetime.fromisoformat(prepared["origin_at"]))
+    return {"expected_root": forecast["sha256"], "nodes": nodes}
+
+
+def rss_mb():
+    value = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    return value / (1024 ** 2 if sys.platform == "darwin" else 1024)
+
+
+def check_budget(started, config):
+    elapsed, rss = time.monotonic() - started, rss_mb()
+    if elapsed > config["budget"]["fullReplayMaximumSeconds"] or rss > config["budget"]["maximumResidentMb"]:
+        raise ValueError("registered_runtime_or_memory_budget_exceeded")
+    return elapsed, rss
+
+
+def inference_cost_probe(config):
+    """Fixed synthetic capacity probe, never model evidence or real outcome fitting."""
+    from research_score_replay import registered_series
+    from research_score_metrics import TARGETS, LEVELS
+    metadata_rows = [{"season": year, "week": week} for year in range(2013, 2025) for week in range(1, 18) for _ in range(16)]
+    synthetic = {}
+    for j, key in enumerate(registered_series(config)):
+        rows = []
+        for n in range(len(metadata_rows)):
+            row = {"joint_energy_score": 10 + (n % 7) / 10 + (j % 5) * .01 * (1 + n % 3)}
+            for target in TARGETS:
+                row[target + "_pit"] = ((n % 10) + .5) / 10
+                for level in LEVELS:
+                    row[f"{target}_coverage_{round(100 * level)}"] = float(n % 10 < round(10 * level))
+            rows.append(row)
+        synthetic[key] = rows
+    tick = time.monotonic()
+    infer(config, metadata_rows, synthetic, members=100)
+    seconds = time.monotonic() - tick
+    return {"synthetic_members": 100, "seconds": seconds, "projected_10000_member_seconds": seconds * 100,
+            "real_data_used": False, "extrapolation_not_a_runtime_guarantee": True}
+
+
+def run():
+    receipt, config, data, hashes = load_accepted(ROOT)
+    runtime = runtime_manifest(config)
+    code_bytes = {name: read_regular(ROOT / name) for name in CODE_FILES + TEST_FILES}
+    code_hashes = {name: digest(raw) for name, raw in code_bytes.items()}
+    manifest = {"version": "rf02.team-score.v2", "accepted_receipt_sha256": ACCEPTANCE_HASH,
+                "bound_hashes": hashes, "code_hashes": code_hashes, "runtime": runtime,
+                "historical_status": "retrospective_inferred", "prospective_evidence": False,
+                "production_authorization": False, "provider_requests": 0}
+    manifest_hash = digest(encoded(manifest))
+    store = ImmutableRun(OUTPUT_PARENT, "rf02-v2-" + manifest_hash[:16])
+    started = time.monotonic()
+    previous_handler = signal.getsignal(signal.SIGALRM)
+    def deadline(_signum, _frame):
+        raise TimeoutError("registered_7200_second_deadline")
+    signal.signal(signal.SIGALRM, deadline)
+    signal.setitimer(signal.ITIMER_REAL, config["budget"]["fullReplayMaximumSeconds"])
+    real_fits, real_origin_batches, pilot_seconds, pilot_games, scored_origins = 0, 0, None, 0, 0
+    try:
+        store.write("manifest.json", manifest)
+        store.object(json.loads(read_regular(ROOT / receipt["config"]["path"])))
+        store.object({"specification": read_regular(ROOT / receipt["specification"]["path"]).decode()})
+        for name, raw in code_bytes.items():
+            store.object({"path": name, "source": raw.decode(), "sha256": digest(raw)})
+        smoke_start = time.monotonic()
+        smoke = subprocess.run([sys.executable, "-I", "-m", "unittest", "discover", "-s", "tests/research-score", "-p", "test_*.py"],
+                               cwd=ROOT, capture_output=True, text=True, timeout=120, check=False,
+                               env={"PATH": "/usr/bin:/bin", "PYTHONNOUSERSITE": "1"})
+        smoke_seconds = time.monotonic() - smoke_start
+        store.write("synthetic-tests.json", {"returncode": smoke.returncode, "seconds": smoke_seconds,
+                    "stdout": smoke.stdout, "stderr": smoke.stderr, "code_hashes": code_hashes})
+        if smoke.returncode or smoke_seconds > 120:
+            raise ValueError("synthetic_gate_failed")
+        inference_probe = inference_cost_probe(config)
+        store.write("synthetic-inference-capacity.json", inference_probe)
+        if time.monotonic() - smoke_start > 120:
+            raise ValueError("synthetic_smoke_budget_exceeded")
+        by_id = {row["gameId"]: row for row in data["records"]}
+        teams = sorted({r["homeTeam"] for r in data["records"]} | {r["awayTeam"] for r in data["records"]})
+        expected = {s: [r["gameId"] for r in data["records"] if r["season"] == s] for s in range(2010, 2026)}
+        selection, bank = SelectionHistory(config), TrajectoryBank(config, teams)
+        series_rows = {key: [] for key in bank.series}
+        series_failures = {key: [] for key in bank.series}
+        outer_metadata, previous_season, first_inner_checked = [], None, set()
+        choices = None
+        total_outer_origins = sum(origin["season"] >= 2013 for origin in data["origins"])
+        outer_durations, inner_durations = [], []
+        for origin in data["origins"]:
+            tick = time.monotonic()
+            check_budget(started, config)
+            season, week = origin["season"], origin["week"]
+            prepared = {delay: prepare_origin(data["records"], origin, delay) for delay in (12, 24)}
+            if season >= 2013 and season != previous_season:
+                choices = selection.select(season, expected)
+                store.write(f"selection-{season}.json", choices)
+            previous_season = season
+            real_origin_batches += 1
+            outputs = bank.advance(season, week, prepared)
+            output_receipt = {"origin": origin, "actual_computation_at": datetime.now(timezone.utc).isoformat(),
+                              "historical_status": "retrospective_inferred", "prospective": False,
+                              "trajectory_state": [{"key": list(key), "output": value,
+                                                    "ratings": bank.engines[key].ratings,
+                                                    "offense": bank.engines[key].offense,
+                                                    "defense": bank.engines[key].defense} for key, value in outputs.items()]}
+            store.write(f"state-{season}-{week:02}.json", output_receipt)
+            if not origin["windows"]["12"]["minimumTrainingMet"]:
+                if season >= 2011:
+                    raise ValueError("scored_origin_below_minimum_history")
+                store.write(f"warmup-{season}-{week:02}.json", {"status": "warmup_unforecastable", "targets": origin["targetGameIds"]})
+                continue
+            mappers = {"main": common_mapper(prepared[12], season), "availability_24h": common_mapper(prepared[24], season)}
+            mapper_pointers = {name: store.object({"atoms": mapper.atoms, "weights": mapper.weights, "b": mapper.b,
+                                                  "epsilon": mapper.epsilon,
+                                                  "input_sha256": prepared[24 if name == "availability_24h" else 12]["input_hash"],
+                                                  "half_life": 2.5})
+                               for name, mapper in mappers.items()}
+            native_rows = {key: {row["game_id"]: row for row in output["forecasts"]} for key, output in outputs.items()}
+            full_distributions, full_failures, baselines, baseline_variants, full_records = {}, {}, {}, {}, []
+            for identity in origin["targetGameIds"]:
+                for family, settings in bank.settings.items():
+                    for setting in range(len(settings)):
+                        record_key = (family, setting, identity)
+                        forecast = native_rows[(family, setting, "full")][identity]
+                        fitted, failure = resolve_distribution(mappers["main"], forecast, family, "full", baselines.get(identity))
+                        if failure is None:
+                            real_fits += 1
+                        if family == "N0":
+                            baselines[identity] = fitted
+                        descriptor = distribution_descriptor(fitted, mapper_pointers["main"])
+                        recover_distribution(mappers["main"], descriptor)
+                        full_distributions[record_key], full_failures[record_key] = fitted, failure
+                        full_records.append({"family": family, "setting": setting, "game_id": identity,
+                                             "native_failure": failure, "distribution": descriptor})
+                if season >= 2013:
+                    if not origin["windows"]["24"]["minimumTrainingMet"]:
+                        raise ValueError("availability_sensitivity_reference_history_shortfall")
+                    try:
+                        baseline_variants[("availability_24h", identity)], _ = resolve_distribution(
+                            mappers["availability_24h"], native_rows[("N0", 0, "availability_24h")][identity], "N0", "full", None)
+                        real_fits += 1
+                    except (NumericalFailure, ValueError) as exc:
+                        raise ValueError("availability_sensitivity_N0_reference_failed") from exc
+                    for variant in [variant for family, variant in bank.series if family == "N0" and variant not in {"full", "availability_24h"}]:
+                        output = bank.selected_output(outputs, "N0", 0, variant)
+                        forecast = next(row for row in output["forecasts"] if row["game_id"] == identity)
+                        mapper_name = "main"
+                        baseline_variants[(variant, identity)], _ = resolve_distribution(
+                            mappers[mapper_name], forecast, "N0", "independent_marginals" if variant == "independent_marginals" else "full", None)
+                        real_fits += 1
+                baseline_variants[("full", identity)] = baselines[identity]
+            outer_distributions, outer_failures, outer_records = {}, {}, []
+            if season >= 2013:
+                for family, variant in bank.series:
+                    chosen = choices[family]["setting"]
+                    chosen_output = bank.selected_output(outputs, family, chosen, variant)
+                    forecasts = {} if chosen_output is None else {r["game_id"]: r for r in chosen_output["forecasts"]}
+                    mapper_name = "availability_24h" if variant == "availability_24h" else "main"
+                    for identity in origin["targetGameIds"]:
+                        if variant == "full" and chosen is not None:
+                            fitted, failure = full_distributions[(family, chosen, identity)], full_failures[(family, chosen, identity)]
+                        elif family == "N0":
+                            fitted, failure = baseline_variants[(variant, identity)], None
+                        else:
+                            shared_variant = variant if variant in config["variants"]["allModels"] + config["variants"]["negativeControlsAllModels"] else "full"
+                            fallback = baseline_variants[(shared_variant, identity)]
+                            fitted, failure = resolve_distribution(mappers[mapper_name], forecasts.get(identity), family, variant, fallback)
+                            if failure is None:
+                                real_fits += 1
+                        # Fallbacks never cross the sensitivity's declared information boundary.
+                        descriptor = distribution_descriptor(fitted, mapper_pointers[mapper_name])
+                        recover_distribution(mappers[mapper_name], descriptor)
+                        outer_distributions[(family, variant, identity)], outer_failures[(family, variant, identity)] = fitted, failure
+                        outer_records.append({"family": family, "variant": variant, "setting": chosen,
+                                              "game_id": identity, "native_failure": failure, "distribution": descriptor})
+            publication = {"origin_at": origin["originAt"], "classification": "retrospective", "full_setting_forecasts": full_records,
+                           "outer_selected_forecasts": outer_records, "manifest_sha256": manifest_hash}
+            publication_hash = store.write(f"forecasts-{season}-{week:02}.json", publication)
+            store.write(f"ancestry-{season}-{week:02}.json", {str(delay): lineage(prepared[delay], hashes["config"], digest(encoded(code_hashes)), manifest_hash,
+                        {"forecast_bytes_sha256": publication_hash, "delay_hours": delay}) for delay in (12, 24)})
+            # The grader opens current target labels only after immutable forecast publication.
+            inner_losses = []
+            for identity in origin["targetGameIds"]:
+                target = by_id[identity]
+                observed = [target["homeScore"], target["awayScore"]]
+                for family, settings in bank.settings.items():
+                    for setting in range(len(settings)):
+                        record_key = (family, setting, identity)
+                        first = (season, family, setting) not in first_inner_checked
+                        metrics = score_forecast(full_distributions[record_key], observed, identity, double_grid=first, diagnostics=False)
+                        first_inner_checked.add((season, family, setting))
+                        failure = full_failures[record_key]
+                        if season >= 2011:
+                            selection.add(season, identity, family, setting, metrics["joint_energy_score"], failure is not None)
+                        inner_losses.append({"game_id": identity, "family": family, "setting": setting, "native_failure": failure, "metrics": metrics})
+                if season >= 2013:
+                    outer_metadata.append({"game_id": identity, "season": season, "week": week, "overtime": target["overtime"], "origin_at": origin["originAt"]})
+            store.write(f"inner-losses-{season}-{week:02}.json", inner_losses)
+            if season >= 2013:
+                outer_loss_records = []
+                for family, variant in bank.series:
+                    for identity in origin["targetGameIds"]:
+                        target = by_id[identity]
+                        key = (family, variant, identity)
+                        metrics = score_forecast(outer_distributions[key], [target["homeScore"], target["awayScore"]], identity, double_grid=True)
+                        series_rows[(family, variant)].append(metrics)
+                        series_failures[(family, variant)].append(outer_failures[key] is not None)
+                        outer_loss_records.append({"game_id": identity, "family": family, "variant": variant,
+                                                   "native_failure": outer_failures[key], "metrics": metrics})
+                store.write(f"outer-losses-{season}-{week:02}.json", outer_loss_records)
+                scored_origins += 1
+                outer_durations.append(time.monotonic() - tick)
+                if season == 2013 and week <= 2:
+                    pilot_games += len(origin["targetGameIds"])
+                if season == 2013 and week == 2:
+                    pilot_seconds = time.monotonic() - started
+                    # Account for all40outer series and43inner settings already present in the pilot.
+                    current_input_count = max(len(prepared[12]["history"]), 1)
+                    remaining = [o for o in data["origins"] if (o["season"], o["week"]) > (season, week)]
+                    # Conservative input-size adjustment includes larger late-history fits/mappers.
+                    relative_work = sum(max(1, len(o["windows"]["12"]["eligibleInputIds"]) / current_input_count)
+                                        * len(o["targetGameIds"]) / max(1, len(origin["targetGameIds"])) for o in remaining)
+                    projection = pilot_seconds + np.mean(outer_durations) * relative_work + inference_probe["projected_10000_member_seconds"]
+                    store.write("pilot-receipt.json", {"games": pilot_games, "origins": 2, "elapsed_seconds": pilot_seconds,
+                               "mean_outer_origin_seconds": float(np.mean(outer_durations)), "projected_replay_seconds": float(projection),
+                               "input_scaled_remaining_work": relative_work, "inference_probe": inference_probe,
+                               "rss_mb": rss_mb(), "disposable_pilot": False})
+                    if projection > 7200 or rss_mb() > 4096:
+                        raise ValueError("pilot_projected_budget_exceeded")
+            else:
+                inner_durations.append(time.monotonic() - tick)
+            elapsed, rss = check_budget(started, config)
+            print(json.dumps({"phase": "replay", "season": season, "week": week, "scored_outer_origins": scored_origins,
+                              "elapsed_seconds": round(elapsed, 2), "rss_mb": round(rss, 2)}), flush=True)
+        if len(outer_metadata) != 3407:
+            raise ValueError("outer_common_game_count_mismatch")
+        development = [i for i, row in enumerate(outer_metadata) if row["season"] <= 2024]
+        cards, calibration = {}, {}
+        for key in bank.series:
+            all_rows = series_rows[key]
+            dev_card = aggregate([all_rows[i] for i in development])
+            calibration[key] = dev_card["calibration"]
+            cards[":".join(key)] = {"overall": aggregate(all_rows), "development": dev_card,
+                "seasons": {str(season): aggregate([all_rows[i] for i, meta in enumerate(outer_metadata) if meta["season"] == season]) for season in range(2013, 2026)},
+                "native_failures": int(sum(series_failures[key])), "scored_games": len(all_rows),
+                "native_only": aggregate([row for row, failed in zip(all_rows, series_failures[key]) if not failed]) if not all(series_failures[key]) else {"status": "no_native_forecasts"}}
+        store.write("scorecards.json", cards)
+        check_budget(started, config)
+        uncertainty = infer(config, [outer_metadata[i] for i in development], {key: [rows[i] for i in development] for key, rows in series_rows.items()})
+        store.write("paired-inference.json", uncertainty)
+        decision = decide(config, outer_metadata, series_rows, series_failures, uncertainty, calibration, leakage_passed=True)
+        elapsed, rss = check_budget(started, config)
+        store.write("terminal-decision.json", decision | {"seconds": elapsed, "rss_mb": rss, "distribution_fits_succeeded": real_fits,
+                                                          "real_origin_batches_attempted": real_origin_batches,
+                                                          "independent_output_acceptance": "pending", "production_authorized": False})
+        store.finish_index()
+        print(json.dumps({"status": decision["status"], "run_directory": str(store.path), "independent_acceptance": "pending"}), flush=True)
+        return 0
+    except BaseException as exc:
+        store.write("terminal-failure.json", {"status": "protocol_invalid", "failure_type": type(exc).__name__,
+                    "reason": str(exc), "seconds": time.monotonic() - started, "rss_mb": rss_mb(),
+                    "distribution_fits_succeeded": real_fits, "real_origin_batches_attempted": real_origin_batches,
+                    "automatic_restart": False,
+                    "production_authorized": False})
+        store.finish_index()
+        raise
+    finally:
+        signal.setitimer(signal.ITIMER_REAL, 0)
+        signal.signal(signal.SIGALRM, previous_handler)
+        store.close()
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--run", action="store_true", help="Execute exactly one frozen offline run after synthetic checks")
+    parser.add_argument("--preflight", action="store_true", help="Verify accepted bytes/runtime only; no real fit")
+    args = parser.parse_args()
+    if args.run == args.preflight:
+        parser.error("select exactly one of --run or --preflight")
+    if args.preflight:
+        _, config, data, hashes = load_accepted(ROOT)
+        print(json.dumps({"status": "preflight_pass", "runtime": runtime_manifest(config), "hashes": hashes,
+                          "games": len(data["records"]), "origins": len(data["origins"]), "real_model_fits": 0}, sort_keys=True))
+        return 0
+    return run()
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,59 @@
+{
+  "2011_week8": {
+    "12": {
+      "input_sha256": "b40b289ac07566de45feb9cc98b0a9b517ccdb2c92e4db6aa7feaa98ffe76e09",
+      "inputs": 359,
+      "new_deliveries": 13,
+      "omitted": []
+    },
+    "24": {
+      "input_sha256": "e6f409bd2c65fa67f3a5f5aaeaa3790fde78b779d0231a01b758a3b7528af1c5",
+      "inputs": 358,
+      "new_deliveries": 13,
+      "omitted": [
+        "2011_07_BAL_JAX"
+      ]
+    }
+  },
+  "artifact_index_sha256": "93d52799f823e92545ea6deef57b0bd5c8b3b97157fdbab66eb2a5cad1d34192",
+  "counts": {
+    "dynamic_requested_means": 56448,
+    "dynamic_state_transitions": 3816,
+    "full_requested_mean_comparisons": 31132,
+    "indexed_bytes": 203726113,
+    "indexed_files": 330,
+    "lineage_closures": 96,
+    "origin_windows": 106,
+    "trajectory_delivery_ledgers": 18656
+  },
+  "feature_falsification": "12h and24h actual2011week8 features unchanged under current/future score+OT mutation, injected market/selection fields, future truncation, source reversal",
+  "limitations": [
+    "No full research leakage/promotion acceptance: only53 origins through2013week2;32 outer games.",
+    "No model fitted/replayed by this audit; E1/E2 delayed state equations checked from immutable original-origin snapshots.",
+    "E1 score-slope fitting and S1/N0 coefficients were inspected in source, not independently refit.",
+    "Ancestor available_at fields are null; independent admitted kickoff+delay computation supplies retrospective cutoff evidence, not original publication evidence.",
+    "Full scorecards,12-season paired uncertainty, full calibrations and all-game falsification are absent after terminal budget halt."
+  ],
+  "max_abs_differences": {
+    "dynamic_requested": 0.0,
+    "dynamic_state": 2.2737367544323206e-13,
+    "requested_fit": 9.995673622142931e-08
+  },
+  "omitted_prior_occurrences": {
+    "12": 1,
+    "24": 54
+  },
+  "run_manifest_sha256": "c4fc78f7beb8c9ee71cbbced19538d16a82c73a7272002221c637277834a2fb8",
+  "status": "terminal_prefix_temporal_checks_pass",
+  "terminal": {
+    "automatic_restart": false,
+    "distribution_fits_succeeded": 32284,
+    "failure_type": "ValueError",
+    "production_authorized": false,
+    "real_origin_batches_attempted": 53,
+    "reason": "pilot_projected_budget_exceeded",
+    "rss_mb": 639.609375,
+    "seconds": 123.211533917005,
+    "status": "protocol_invalid"
+  }
+}

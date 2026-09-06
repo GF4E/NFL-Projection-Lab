@@ -1,0 +1,25 @@
+# RF-COMP-08 implementation handoff
+
+Authoring scope: four new Python modules and one separate resource policy. No old source, scientific configuration, protocol, acceptance or attempt was edited. The only executed development utilities parsed/copied source and authenticated bytes; no repository module, test or scientific callback was imported or run.
+
+## Exact boundaries
+
+- `scripts/research_score_resource_policy.py`: `RuntimeEnvelope` inherits the original runtime and overrides only literal copies of `__init__` and `check`, replacing 7,200 with 9,000 and the matching stop reason. `ControllerEnvelope` copies the original complete-smoke class, changing only the inherited parent-start deadline to 9,000. All other runtime methods, including stop/finalization/cleanup, retain the original implementation. `pilot_projection(original_origins, ledger, remaining_origins)` calls the entire original validator/formula and replaces only `within_time_screen` and `passed`. Original `RuntimeStop`, `CallbackResult` and `OriginAccounting` identities are retained.
+- `scripts/research_score_resource_watchdog.py`: only `supervise` and `_supervise` are copied, with public/private 9,000-second bounds and a new report version. Original phase, JSON, process-observation and exception helpers are imported unchanged. There are no scientific imports in this parent path. Worker grace remains zero; report closure remains parent-only and bounded at 30 seconds.
+- `scripts/research_score_resource_controller.py`: the COMP04 chronological loop and worker argument parser are AST-identical. The launcher changes only watchdog import and identity. `run` changes terminal identity and adds post-science resource-protocol/policy authentication. Fixed imports select the new envelope, pilot and preflight; all science routes still bind the original COMP04 assembly/grader, bank, selector, score and inference modules. Publication/Store helpers are unchanged. No COMP05/06/07 helper is imported.
+- `scripts/research_score_resource_preflight.py`: reuse non-versioned readers and old fixed constants, never old `preflight`/`_validate`. Preserve all 79 baseline source/test pins and seven runtime pins, original science protocol/config and COMP04 compute protocol. Add the separate resource pointers and exact old COMP04 acceptance as evidence. Only a fresh RF-COMP-08 receipt, qualification and distinct numerical/temporal reviews can produce a new manifest/identity.
+- `config/research-local-resource-policy.v1.json`: resource override only. Effective limits are 9,000 setup-inclusive/projected seconds, 4,096 MiB, complete smoke 120 seconds, invalid metadata 30 seconds, external worker grace zero, one model worker. Original scientific config bytes remain unchanged.
+
+## Receipt and qualification interface
+
+Public preflight signature and return shape match COMP04. The exact acceptance schema additionally requires `resource_protocol`, `resource_policy` and `baseline_acceptance` pointers. Qualification/review records additionally require `resource_protocol_sha256` and `resource_policy_sha256`; `compute_protocol_sha256` remains the original COMP04 pin. New report versions are `rfcomp08.controller-qualification.v1` / `rfcomp08.controller-review.v1`, with scope `resource_policy_complete_controller_qualification`.
+
+`CANDIDATE_FILES` contains the four new modules, `tests/research-score-resource-policy/test_resource_policy.py` and `tests/research-score-resource-policy/qualify_resource_policy.py`. Thus the final source map contains exactly 85 files. The new config and resource protocol are separately pinned. Manifest/run prefix is `rfcomp08-v1-`; observer prefix is `rfcomp08-observer-`, tied to the final receipt SHA. Existing identities are refused without retries.
+
+The test author owns the single focused test file; root owns the qualification driver and real missing/old-receipt and duplicate-identity CLI probes. Focus checks on both initial and inherited deadlines, earlier smoke, memory/invalid-finalization boundaries, unchanged pilot arithmetic and 9,000 threshold endpoints, exact acceptance/policy rejection, unchanged science routing and preserved failed evidence. No full bootstrap repeat is necessary merely to recount unchanged scientific evidence.
+
+## Static evidence and remaining gate
+
+`author-source-delta.json` records 11 passing AST comparisons and authentication of all 79 original source/test and seven runtime files. This is author evidence, not independent acceptance. Preflight's added binding logic and import graph still require independent review and actual bounded synthetic qualification. No historical invocation has occurred under this path.
+
+Clock/RSS observation limitations remain those of the accepted design: Python signal delivery may be delayed by native work; external polling and parent scheduling are sampled rather than instantaneous kernel enforcement. The unchanged launcher's initial argument processing precedes its recorded monotonic start; the worker inherits that recorded start and cannot reset it. No new claim of instantaneous enforcement or predictive performance is made.

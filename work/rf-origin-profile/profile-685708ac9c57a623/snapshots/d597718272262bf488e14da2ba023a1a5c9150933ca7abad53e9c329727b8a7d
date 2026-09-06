@@ -1,0 +1,358 @@
+"""RF-COMP-02 focused synthetic oracle tests; separate harness owns execution.
+
+No historical archive, bootstrap, provider, or prior test-suite rerun. Expected
+numbers and backend dispatch arguments come from the frozen public functions.
+"""
+from contextlib import ExitStack
+from dataclasses import fields, replace
+import inspect
+import json
+import math
+from pathlib import Path
+import struct
+import sys
+import unittest
+import warnings
+from unittest.mock import patch
+
+import numpy as np
+from scipy import special
+from scipy.stats import skellam
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
+import research_score_skellam_compute as candidate
+import research_score_probability_compute as prior
+import research_score_compute_distribution as frozen
+from research_score_distribution import JointDistribution, NumericalFailure
+from research_score_successor_distribution import JointBase
+
+
+TARGETS = ('home', 'away', 'margin', 'total')
+RATE_PAIRS = ((1e-9, 1e-9), (.01, .5), (.5, .01), (1., 16.), (16., 1.),
+              (16., 22.), (22., 16.), (40., 100.), (100., 40.),
+              (1000., 1.), (1., 1000.), (1000., 1000.), (1e4, 1e4),
+              (1e4, .01), (.01, 1e4))
+
+
+class FloatSubclass(float):
+    pass
+
+
+class IntSubclass(int):
+    pass
+
+
+class ArraySubclass(np.ndarray):
+    pass
+
+
+def array_state(value):
+    return (type(value), value.dtype.str, value.shape, value.strides,
+            value.tobytes(order='C'), value.flags.writeable)
+
+
+def observed_call(function, args, numpy_errors=None, special_errors=None):
+    """Retain return type/bytes and warning or exception identity separately."""
+    with warnings.catch_warnings(record=True) as warning_records:
+        warnings.simplefilter('always')
+        with ExitStack() as stack:
+            if numpy_errors is not None:
+                stack.enter_context(np.errstate(**numpy_errors))
+            if special_errors is not None:
+                stack.enter_context(special.errstate(**special_errors))
+            try:
+                outcome = ('returned', function(*args))
+            except Exception as error:
+                outcome = ('raised', type(error), str(error))
+    return outcome, [(w.category, str(w.message)) for w in warning_records]
+
+
+class ExactCase(unittest.TestCase):
+    def assert_exact(self, actual, expected):
+        self.assertIs(type(actual), type(expected))
+        if isinstance(expected, np.ndarray):
+            self.assertEqual(actual.dtype, expected.dtype)
+            self.assertEqual(actual.shape, expected.shape)
+            self.assertEqual(actual.tobytes(order='C'), expected.tobytes(order='C'))
+        elif isinstance(expected, np.generic):
+            self.assertEqual(actual.dtype, expected.dtype)
+            self.assertEqual(actual.tobytes(), expected.tobytes())
+        elif isinstance(expected, float):
+            self.assertEqual(struct.pack('>d', actual), struct.pack('>d', expected))
+        elif isinstance(expected, dict):
+            self.assertEqual(actual.keys(), expected.keys())
+            for key in expected:
+                self.assert_exact(actual[key], expected[key])
+        elif isinstance(expected, (tuple, list)):
+            self.assertEqual(len(actual), len(expected))
+            for left, right in zip(actual, expected):
+                self.assert_exact(left, right)
+        else:
+            self.assertEqual(actual, expected)
+
+    def assert_observed_equal(self, actual, expected):
+        self.assertEqual(actual[1], expected[1], 'warning category/message/order changed')
+        self.assertEqual(actual[0][0], expected[0][0])
+        if expected[0][0] == 'raised':
+            self.assertEqual(actual[0][1:], expected[0][1:])
+        else:
+            self.assert_exact(actual[0][1], expected[0][1])
+
+    def oracle(self, function, reference, args, **states):
+        expected = observed_call(reference, args, **states)
+        self.assert_observed_equal(observed_call(function, args, **states), expected)
+        return expected
+
+
+class SkellamHelperTests(ExactCase):
+    def test_asymmetric_rates_and_integer_threshold_bytes(self):
+        for rates in RATE_PAIRS:
+            for cast in (float, np.float64):
+                for value in (-2**20, -10000, -1000, -22, -1, 0, 1, 22, 1000, 10000, 2**20):
+                    args = (value, cast(rates[0]), cast(rates[1]))
+                    with self.subTest(args=args):
+                        self.oracle(candidate.skellam_cdf, skellam.cdf, args)
+
+    def test_tiny_normal_subnormal_and_mixed_rate_types(self):
+        tiny = (5e-324, sys.float_info.min, 1e-300, 1e-9)
+        for rate in tiny:
+            for home, away in ((rate, rate), (rate, 22.), (22., rate), (rate, 1e4), (1e4, rate)):
+                for value in (-2**20, -1, 0, 1, 2**20):
+                    with self.subTest(value=value, home=home, away=away):
+                        self.oracle(candidate.skellam_cdf, skellam.cdf, (value, np.float64(home), away))
+
+    def test_inclusive_fast_boundaries_avoid_generic_dispatch(self):
+        public = skellam.cdf
+        for value in (-2**20, -1, 0, 1, 2**20):
+            for home, away in ((22., 16.), (np.float64(1e4), 1.), (1., np.float64(1e4))):
+                args = (value, home, away)
+                expected = observed_call(public, args)
+                with patch.object(candidate.skellam, 'cdf', side_effect=AssertionError('generic_dispatch')):
+                    actual = observed_call(candidate.skellam_cdf, args)
+                self.assert_observed_equal(actual, expected)
+
+    def test_private_backend_arguments_match_public_wrapper_dispatch(self):
+        backend = skellam._cdf
+        for args in ((-1, 22., 16.), (0, np.float64(.01), 1e4), (2**20, 1e4, np.float64(1e-9))):
+            with patch.object(skellam, '_cdf', wraps=backend) as original_probe:
+                expected = observed_call(skellam.cdf, args)
+            with patch.object(candidate.skellam, '_cdf', wraps=backend) as candidate_probe:
+                actual = observed_call(candidate.skellam_cdf, args)
+            self.assert_observed_equal(actual, expected)
+            self.assertEqual(original_probe.call_count, 1)
+            self.assertEqual(candidate_probe.call_count, 1)
+            self.assertEqual(candidate_probe.call_args.kwargs, original_probe.call_args.kwargs)
+            for left, right in zip(candidate_probe.call_args.args, original_probe.call_args.args):
+                self.assertEqual(array_state(left), array_state(right))
+            self.assertEqual([a.shape for a in candidate_probe.call_args.args], [(1,), (1,), (1,)])
+            self.assertEqual([a.dtype for a in candidate_probe.call_args.args],
+                             [np.dtype('int64'), np.dtype('float64'), np.dtype('float64')])
+
+    def test_unsupported_thresholds_delegate_original_arguments(self):
+        values = (-2**20-1, 2**20+1, 10**400, -(10**400), True, False,
+                  -0., 0., .5, np.float64(1.), np.int64(1), IntSubclass(1), FloatSubclass(1.),
+                  math.nan, math.inf, -math.inf, complex(1., 0.), '1', None,
+                  [], [0, 1], (0, 1), np.array(1), np.array([0, 1]),
+                  np.array([0., 1.], dtype=object), np.array([0., 1.]).view(ArraySubclass))
+        public = skellam.cdf
+        for value in values:
+            args = (value, 22., 16.)
+            with self.subTest(value=repr(value)):
+                expected = observed_call(public, args)
+                with patch.object(candidate.skellam, 'cdf', wraps=public) as fallback:
+                    actual = observed_call(candidate.skellam_cdf, args)
+                self.assertEqual(fallback.call_count, 1)
+                for passed, original in zip(fallback.call_args.args, args):
+                    self.assertIs(passed, original)
+                self.assert_observed_equal(actual, expected)
+
+    def test_unsupported_rates_delegate_each_position_without_coercion(self):
+        invalid = (0., -0., -1., math.nextafter(1e4, math.inf), 1e6,
+                   math.nan, math.inf, -math.inf, True, False, 1, np.int64(1), np.float32(1.),
+                   FloatSubclass(1.), IntSubclass(1), complex(1., 0.), '1', None,
+                   [1., 2.], np.array(1.), np.array([1., 2.]), np.array([1., 2.]).view(ArraySubclass))
+        public = skellam.cdf
+        for value in invalid:
+            for args in ((0, value, 22.), (0, 22., value)):
+                with self.subTest(args=repr(args)):
+                    expected = observed_call(public, args)
+                    with patch.object(candidate.skellam, 'cdf', wraps=public) as fallback:
+                        actual = observed_call(candidate.skellam_cdf, args)
+                    self.assertEqual(fallback.call_count, 1)
+                    for passed, original in zip(fallback.call_args.args, args):
+                        self.assertIs(passed, original)
+                    self.assert_observed_equal(actual, expected)
+
+    def test_array_fallback_broadcast_layout_and_input_immutability(self):
+        base = np.array([-100., -1., -0., 0., .5, 1., 22., 100.])
+        for values in (base, base[::-1], base[::2], base.reshape(2, 4),
+                       np.empty(0), np.empty((2, 0)), np.array([math.nan, math.inf, -math.inf])):
+            values.setflags(write=False)
+            before = array_state(values)
+            self.oracle(candidate.skellam_cdf, skellam.cdf, (values, 22., 16.))
+            self.assertEqual(array_state(values), before)
+        self.oracle(candidate.skellam_cdf, skellam.cdf,
+                    (np.ones((2, 3)), np.ones(4), np.ones(5)))
+
+    def test_error_states_preserve_backend_warnings_and_exceptions(self):
+        states = ({}, {'numpy_errors': {'all': 'raise'}}, {'numpy_errors': {'all': 'warn'}},
+                  {'special_errors': {'all': 'raise'}}, {'special_errors': {'all': 'warn'}},
+                  {'numpy_errors': {'invalid': 'raise', 'under': 'raise'},
+                   'special_errors': {'all': 'raise'}})
+        inputs = ((-1, 22., 16.), (0, 16., 22.), (1, 22., 16.),
+                  (-2**20, 1e4, .01), (2**20, .01, 1e4),
+                  (0, 5e-324, 22.), (1, 22., 5e-324), (-1, 1e4, sys.float_info.min),
+                  (0, 0., 1.), (math.nan, 1., 1.))
+        for state in states:
+            for args in inputs:
+                with self.subTest(args=args, state=state):
+                    self.oracle(candidate.skellam_cdf, skellam.cdf, args, **state)
+
+    def test_clipping_signed_zero_and_nan_from_same_backend(self):
+        for returned in (-0., -1e-15, 1. + 1e-15, math.nan):
+            raw = np.array([returned], dtype='float64')
+            with patch.object(skellam, '_cdf', return_value=raw.copy()):
+                expected = observed_call(skellam.cdf, (0, 22., 16.))
+            with patch.object(candidate.skellam, '_cdf', return_value=raw.copy()) as backend:
+                actual = observed_call(candidate.skellam_cdf, (0, 22., 16.))
+            self.assertEqual(backend.call_count, 1)
+            self.assert_observed_equal(actual, expected)
+
+    def test_backend_failure_propagates_without_retry_or_global_mutation(self):
+        public, backend = skellam.cdf.__func__, skellam._cdf.__func__
+        for error in (RuntimeError('backend_failure'), FloatingPointError('backend_float_failure'),
+                      special.SpecialFunctionError('backend_special_failure')):
+            with patch.object(candidate.skellam, '_cdf', side_effect=error) as private:
+                with patch.object(candidate.skellam, 'cdf', side_effect=AssertionError('no_fallback_after_backend')) as fallback:
+                    result = observed_call(candidate.skellam_cdf, (0, 22., 16.))
+            self.assertEqual(result, (('raised', type(error), str(error)), []))
+            self.assertEqual(private.call_count, 1)
+            self.assertEqual(fallback.call_count, 0)
+        self.assertIs(skellam.cdf.__func__, public)
+        self.assertIs(skellam._cdf.__func__, backend)
+
+
+class SkellamDistributionTests(ExactCase):
+    @classmethod
+    def setUpClass(cls):
+        mapper = JointBase.from_scores([[0, 0], [3, 7], [8, 4], [14, 20], [27, 16], [22, 28]],
+                                       [1, 2, 1, 3, 1, 2])
+        cls.laws = (mapper.fit((12., 15.)), mapper.fit((24., 11.)))
+
+    def test_signature_and_unchanged_non_cdf_methods(self):
+        self.assertEqual(inspect.signature(candidate.score_forecast), inspect.signature(frozen.score_forecast))
+        self.assertTrue(issubclass(candidate.SkellamDistribution, frozen.MemoizedDistribution))
+        for name in ('__init__', 'grid', 'tail_bounds', 'moments', 'log_probability', 'quantile', '_marginal_atoms'):
+            self.assertIs(getattr(candidate.SkellamDistribution, name), getattr(prior.ProbabilityDistribution, name))
+
+    def test_readonly_copies_and_cross_array_source_isolation(self):
+        original = replace(self.laws[0], theta=np.array([-0., 0.]))
+        wrapped = candidate.SkellamDistribution(original)
+        arrays = []
+        for field in fields(JointDistribution):
+            source, copied = getattr(original, field.name), getattr(wrapped, field.name)
+            self.assert_exact(copied, source)
+            if isinstance(source, np.ndarray):
+                arrays.append((source, copied))
+                self.assertFalse(copied.flags.writeable)
+                with self.assertRaises(ValueError):
+                    copied.flat[0] = 999.
+        for source, _ in arrays:
+            for _, copied in arrays:
+                self.assertFalse(np.shares_memory(source, copied))
+        before = [array_state(x) for x, _ in arrays]
+        wrapped.cdf('margin', 0)
+        self.assertEqual([array_state(x) for x, _ in arrays], before)
+        self.assertFalse(hasattr(original, '_cdf_cache'))
+
+    def test_instance_cache_and_floor_equivalence(self):
+        first = candidate.SkellamDistribution(self.laws[0])
+        second = candidate.SkellamDistribution(self.laws[1])
+        self.assertIsNot(first._cdf_cache, second._cdf_cache)
+        with patch.object(candidate, 'skellam_cdf', wraps=candidate.skellam_cdf) as helper:
+            answer = first.cdf('margin', 7.)
+            first_calls = helper.call_count
+            self.assertEqual(first_calls, 1)
+            self.assert_exact(first.cdf('margin', 7.999), answer)
+            self.assertEqual(helper.call_count, first_calls)
+            self.assertEqual(second._cdf_cache, {})
+            second.cdf('margin', 7.)
+            self.assertEqual(helper.call_count, first_calls + 1)
+        self.assert_exact(answer, frozen.MemoizedDistribution(self.laws[0]).cdf('margin', 7.))
+
+    def test_all_cdfs_and_quantiles_correlated_and_independent(self):
+        for original in self.laws:
+            for independent in (False, True):
+                law = replace(original, independent=independent)
+                actual, expected = candidate.SkellamDistribution(law), frozen.MemoizedDistribution(law)
+                for target in TARGETS:
+                    for value in (-100., -1., -.01, -0., 0., .99, 1., 12., 21.9, 22., 50., 200.):
+                        with self.subTest(independent=independent, target=target, value=value):
+                            self.oracle(actual.cdf, expected.cdf, (target, value))
+                    for probability in (.025, .1, .25, .75, .9, .975):
+                        self.oracle(actual.quantile, expected.quantile, (target, probability))
+
+    def test_actual_primary_and_doubled_grid_bytes_and_bounds(self):
+        for original in self.laws:
+            for independent in (False, True):
+                law = replace(original, independent=independent)
+                actual, expected = candidate.SkellamDistribution(law), frozen.MemoizedDistribution(law)
+                reference_primary = expected.grid()
+                for request in ({}, {'cells': np.asarray(reference_primary.probability.shape) * 2, 'maximum_cells': 1024}):
+                    left, right = actual.grid(**request), expected.grid(**request)
+                    self.assertIs(type(left), type(right))
+                    self.assert_exact(left.probability, right.probability)
+                    self.assert_exact(left.omitted_probability_bound, right.omitted_probability_bound)
+                    self.assert_exact(left.score_error_bound, right.score_error_bound)
+                    self.assertFalse(np.shares_memory(left.probability, right.probability))
+
+    def test_complete_104_field_scores_all_flags_and_input_immutability(self):
+        public, backend = skellam.cdf.__func__, skellam._cdf.__func__
+        for original in self.laws:
+            for independent in (False, True):
+                law = replace(original, independent=independent)
+                before = {f.name: array_state(getattr(law, f.name)) for f in fields(law)
+                          if isinstance(getattr(law, f.name), np.ndarray)}
+                for double_grid in (False, True):
+                    for diagnostics in (False, True):
+                        with self.subTest(independent=independent, double_grid=double_grid, diagnostics=diagnostics):
+                            args = (law, [13, 17], 'synthetic-skellam-compute')
+                            kwargs = {'double_grid': double_grid, 'diagnostics': diagnostics}
+                            expected = frozen.score_forecast(*args, **kwargs)
+                            with patch.object(JointBase, 'fit', side_effect=AssertionError('scoring_must_not_fit')):
+                                actual = candidate.score_forecast(*args, **kwargs)
+                            self.assert_exact(actual, expected)
+                            self.assertEqual(len(actual), 104 if diagnostics else 28)
+                            self.assertEqual(json.dumps(actual, sort_keys=True, allow_nan=False),
+                                             json.dumps(expected, sort_keys=True, allow_nan=False))
+                self.assertEqual({name: array_state(getattr(law, name)) for name in before}, before)
+        self.assertIs(skellam.cdf.__func__, public)
+        self.assertIs(skellam._cdf.__func__, backend)
+
+    def test_invalid_cdf_and_quantile_failures_remain_exact(self):
+        left, right = candidate.SkellamDistribution(self.laws[0]), frozen.MemoizedDistribution(self.laws[0])
+        for args in (('bogus', 0), ([], 0), ({}, 0), ('margin', math.nan), ('margin', math.inf),
+                     ('margin', -math.inf), ('margin', '1')):
+            self.oracle(left.cdf, right.cdf, args)
+        for probability in (0., 1., -.1, 1.1, math.nan):
+            self.oracle(left.quantile, right.quantile, ('margin', probability))
+        ambiguous = JointDistribution(np.array([[0., 0.], [2., 2.]]), np.array([.5, .5]),
+                                      0., np.array([1., 1.]), np.zeros(2), 0)
+        actual, expected = candidate.SkellamDistribution(ambiguous), frozen.MemoizedDistribution(ambiguous)
+        result = self.oracle(actual.quantile, expected.quantile, ('home', .5))
+        self.assertEqual(result[0], ('raised', NumericalFailure, 'quantile_boundary_ambiguous'))
+
+    def test_invalid_score_observations_and_grid_budget_failures(self):
+        for observed in ([1], [-1, 0], [1.5, 3], [math.nan, 0], [math.inf, 0], [[1, 2]]):
+            result = self.oracle(candidate.score_forecast, frozen.score_forecast,
+                                 (self.laws[0], observed, 'synthetic-skellam-invalid'))
+            self.assertEqual(result[0], ('raised', NumericalFailure, 'invalid_target_pair'))
+        huge = JointDistribution(np.array([[0., 0.]]), np.array([0.]), 1.,
+                                 np.array([1e6, 1e6]), np.zeros(2), 0)
+        result = self.oracle(candidate.score_forecast, frozen.score_forecast,
+                             (huge, [1, 2], 'synthetic-skellam-grid-failure'))
+        self.assertEqual(result[0], ('raised', NumericalFailure, 'grid_tail_budget_exceeded'))
+
+
+if __name__ == '__main__':
+    unittest.main()

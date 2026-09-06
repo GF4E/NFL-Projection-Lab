@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "[\n  [\n    -0.0,\n    2.0,\n    4.0\n  ],\n  [\n    6.0,\n    8.0,\n    10.0\n  ],\n  [\n    12.0,\n    14.0,\n    16.0\n  ],\n  [\n    18.0,\n    20.0,\n    22.0\n  ]\n]\n",
+    "bytes": 151,
+    "kind": "bytes",
+    "sha256": "30ed4615ecbd2666a2c6d7b64792c3b8575e8e121e8a6a34d868c5ce5ea44cbd",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": true,
+    "expected": true,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "readonly-noncontiguous",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "ndarray"
+  },
+  "label": "readonly-noncontiguous",
+  "original": {
+    "ascii_body": "[\n  [\n    -0.0,\n    2.0,\n    4.0\n  ],\n  [\n    6.0,\n    8.0,\n    10.0\n  ],\n  [\n    12.0,\n    14.0,\n    16.0\n  ],\n  [\n    18.0,\n    20.0,\n    22.0\n  ]\n]\n",
+    "bytes": 151,
+    "kind": "bytes",
+    "sha256": "30ed4615ecbd2666a2c6d7b64792c3b8575e8e121e8a6a34d868c5ce5ea44cbd",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_noncontiguous_and_readonly_numpy_arrays"
+}

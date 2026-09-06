@@ -1,0 +1,252 @@
+{
+  "annual_selections": [
+    {
+      "inner_seasons": [
+        2011,
+        2012
+      ],
+      "season": 2013,
+      "setting": 6
+    },
+    {
+      "inner_seasons": [
+        2012,
+        2013
+      ],
+      "season": 2014,
+      "setting": 24
+    },
+    {
+      "inner_seasons": [
+        2013,
+        2014
+      ],
+      "season": 2015,
+      "setting": 24
+    },
+    {
+      "inner_seasons": [
+        2014,
+        2015
+      ],
+      "season": 2016,
+      "setting": 16
+    },
+    {
+      "inner_seasons": [
+        2015,
+        2016
+      ],
+      "season": 2017,
+      "setting": 24
+    },
+    {
+      "inner_seasons": [
+        2016,
+        2017
+      ],
+      "season": 2018,
+      "setting": 21
+    },
+    {
+      "inner_seasons": [
+        2017,
+        2018
+      ],
+      "season": 2019,
+      "setting": 15
+    },
+    {
+      "inner_seasons": [
+        2018,
+        2019
+      ],
+      "season": 2020,
+      "setting": 24
+    },
+    {
+      "inner_seasons": [
+        2019,
+        2020
+      ],
+      "season": 2021,
+      "setting": 24
+    },
+    {
+      "inner_seasons": [
+        2020,
+        2021
+      ],
+      "season": 2022,
+      "setting": 24
+    },
+    {
+      "inner_seasons": [
+        2021,
+        2022
+      ],
+      "season": 2023,
+      "setting": 4
+    },
+    {
+      "inner_seasons": [
+        2022,
+        2023
+      ],
+      "season": 2024,
+      "setting": 3
+    },
+    {
+      "inner_seasons": [
+        2023,
+        2024
+      ],
+      "season": 2025,
+      "setting": 16
+    }
+  ],
+  "blockers": [],
+  "budget": {
+    "complete_smoke_seconds": 120,
+    "external_worker_grace_seconds": 0,
+    "invalid_metadata_seconds": 30,
+    "model_workers": 1,
+    "projected_seconds": 9000,
+    "rss_mib": 4096,
+    "seconds": 9000
+  },
+  "complete_smoke_seconds": 49.50016420800239,
+  "completed_origins": 277,
+  "counts": {
+    "actual_mass_cdf_calls": 354328,
+    "actual_score_calls": 101137,
+    "copied_diagonal_inner": 32823,
+    "copied_e3_outer": 8800,
+    "copied_raw_outer": 20442,
+    "inner_rows": 98469,
+    "outer_rows": 64733,
+    "scored_inner": 65646,
+    "scored_outer": 35491
+  },
+  "evidence": [
+    {
+      "bytes": 26505,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp09-v1-d78471e3d2ffdb18/manifest.json",
+      "sha256": "d78471e3d2ffdb182266939ee13403a19b894261d9fe67ef47570f3d82d662de"
+    },
+    {
+      "bytes": 418718,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp09-v1-d78471e3d2ffdb18/completion/artifact-index.json",
+      "sha256": "d9c6742f28e144c2c641cd97034b9ccf72645baf33de772b7e2f3a9530d98220"
+    },
+    {
+      "bytes": 2148,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp09-v1-d78471e3d2ffdb18/completion/terminal.json",
+      "sha256": "0fe65f37d0739074b48d79a18636636176f062c22c98404ea51515cf949abc20"
+    },
+    {
+      "bytes": 46118,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp09-v1-d78471e3d2ffdb18/origin-index.json",
+      "sha256": "05e529879a33c8c821687bf0bed1f92ba89a1887bc4f624e395e12840b53b3c6"
+    },
+    {
+      "bytes": 11758764,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp09-v1-d78471e3d2ffdb18/pilot.json",
+      "sha256": "6161e36de12d83f5ad33a4273aa67172a62a80be0e4002dec712328c5df65f86"
+    },
+    {
+      "bytes": 3049,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rfcomp09-observer-ba46aa5fdb0df76a/process-report.json",
+      "sha256": "90bf6f4c43bf66dc87dd4fa5886ed372c5a2fc24b2e2a74236ad99e053919bb2"
+    },
+    {
+      "bytes": 162,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rfcomp09-observer-ba46aa5fdb0df76a/phase.json",
+      "sha256": "445d770352403fa7b13eea1966502e3391649dc694a3d024cfa3fa025bae40c0"
+    }
+  ],
+  "findings": [
+    "Root reports actualtool session34188 closedexit0; independently authenticated ownedobserver confirms completedprocess/exit0 with no kill, observationerror, resourcefailure or ownershiploss.",
+    "Authoritative atomiccompletion pair, criticalindexedmetadata, all277origin-evidence files and13annualselection files authenticated. Everyorigin in original2010\u20132025weekly order; all12/24eligible input gameIDs precede origin; completecallbacktimestamps globally ordered.",
+    "All277publication/score pointers matchindex and retainedbefore-grading markers. Four nontrivial sampleorigins independently bind state/ancestry/publication/grader with19complete series and bothavailabilitypaths.",
+    "Exposed2025 retains272outergames, noinnerforecasts/rows/scoring;2025annualselection uses2023\u20132024. All13seasonselections useprior2years. Development3135andfull3407outerpopulations unchanged.",
+    "Counts aggregate exactly acrossall277savedgrading batches and matchoriginindex/terminal. No uncommittedartifacts/staging declared. Evaluationpointer binds fullsavedresult; numericalreview ownsitsarithmetic/decision."
+  ],
+  "games": {
+    "development": 3135,
+    "exposed": 272,
+    "outer": 3407,
+    "state": 4175
+  },
+  "limitations": [
+    "No fitting,recovery,scoring,bootstrap orscientificrerun. Annualchoices not independently re-estimated.",
+    "Root owns complete2655-file physicalmembership/hash audit; thisreview authenticatescriticalmetadata and sampled fullpublicationbodies, notalllaw/scorebytes.",
+    "Temporal source-admission andunchangedcontroller routing evidence reused. Strictdate/cutoff availability beyondgameweekorder reliesonacceptedsourceadmission; no newclaimoforiginalTuesdayissuance.",
+    "Publicationbeforegrading inferredfromauthenticatedbindings andqualifieddurablewrite ordering, notexternalper-write timestamptrace.",
+    "ObserverRSSissampled/waited; processcompletion doesnotalone establishscientificacceptance. Separatefullnumericalreview required; reject_all isnotpromotion,external5percent/prospective/productacceptance."
+  ],
+  "observer_seconds": 1706.098933125002,
+  "peak_rss_mib": 1769.046875,
+  "pilot_projected_seconds": 8429.741971801992,
+  "reported_scientific_status": "reject_all",
+  "runtime_files_verified": 7,
+  "sample_bindings": [
+    {
+      "availability_windows": [
+        "12",
+        "24"
+      ],
+      "origin": [
+        2013,
+        1
+      ],
+      "publication_and_grader_binding": "verified",
+      "series": 19,
+      "targets": 16
+    },
+    {
+      "availability_windows": [
+        "12",
+        "24"
+      ],
+      "origin": [
+        2016,
+        11
+      ],
+      "publication_and_grader_binding": "verified",
+      "series": 19,
+      "targets": 14
+    },
+    {
+      "availability_windows": [
+        "12",
+        "24"
+      ],
+      "origin": [
+        2025,
+        1
+      ],
+      "publication_and_grader_binding": "verified",
+      "series": 19,
+      "targets": 16
+    },
+    {
+      "availability_windows": [
+        "12",
+        "24"
+      ],
+      "origin": [
+        2025,
+        18
+      ],
+      "publication_and_grader_binding": "verified",
+      "series": 19,
+      "targets": 16
+    }
+  ],
+  "source_hashes_verified": 91,
+  "status": "accepted_complete_retained_temporal_evidence",
+  "unstarted_origins": 0,
+  "version": "rfcomp09.actual-temporal-review.v1",
+  "worker_seconds": 1705.953538583999
+}

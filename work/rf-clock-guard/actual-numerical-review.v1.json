@@ -1,0 +1,591 @@
+{
+  "audit_execution": {
+    "audit_failures": 0,
+    "audit_script_changed_after_execution": false,
+    "fit_score_CDF_FFT_or_bootstrap_calls": false,
+    "immutable_artifact_mutations": false,
+    "metadata_audit_exit_code": 0,
+    "prepared_auditor_sha256": "77ac4d97db89a81b4b28a3bc183dd14008449c6c6bc25e53f306f6e8859ad9e1",
+    "project_imports": false
+  },
+  "blockers": [],
+  "complete_population": {
+    "all_saved_rows": 163202,
+    "annual_selections": [
+      {
+        "games": 512,
+        "prior_seasons": [
+          2011,
+          2012
+        ],
+        "season": 2013,
+        "setting": 6
+      },
+      {
+        "games": 512,
+        "prior_seasons": [
+          2012,
+          2013
+        ],
+        "season": 2014,
+        "setting": 24
+      },
+      {
+        "games": 512,
+        "prior_seasons": [
+          2013,
+          2014
+        ],
+        "season": 2015,
+        "setting": 24
+      },
+      {
+        "games": 512,
+        "prior_seasons": [
+          2014,
+          2015
+        ],
+        "season": 2016,
+        "setting": 16
+      },
+      {
+        "games": 512,
+        "prior_seasons": [
+          2015,
+          2016
+        ],
+        "season": 2017,
+        "setting": 24
+      },
+      {
+        "games": 512,
+        "prior_seasons": [
+          2016,
+          2017
+        ],
+        "season": 2018,
+        "setting": 21
+      },
+      {
+        "games": 512,
+        "prior_seasons": [
+          2017,
+          2018
+        ],
+        "season": 2019,
+        "setting": 15
+      },
+      {
+        "games": 512,
+        "prior_seasons": [
+          2018,
+          2019
+        ],
+        "season": 2020,
+        "setting": 24
+      },
+      {
+        "games": 512,
+        "prior_seasons": [
+          2019,
+          2020
+        ],
+        "season": 2021,
+        "setting": 24
+      },
+      {
+        "games": 528,
+        "prior_seasons": [
+          2020,
+          2021
+        ],
+        "season": 2022,
+        "setting": 24
+      },
+      {
+        "games": 543,
+        "prior_seasons": [
+          2021,
+          2022
+        ],
+        "season": 2023,
+        "setting": 4
+      },
+      {
+        "games": 543,
+        "prior_seasons": [
+          2022,
+          2023
+        ],
+        "season": 2024,
+        "setting": 3
+      },
+      {
+        "games": 544,
+        "prior_seasons": [
+          2023,
+          2024
+        ],
+        "season": 2025,
+        "setting": 16
+      }
+    ],
+    "borrowed_engines": 81,
+    "counts": {
+      "actual_mass_cdf_calls": 354328,
+      "actual_score_calls": 101137,
+      "copied_diagonal_inner": 32823,
+      "copied_e3_outer": 8800,
+      "copied_raw_outer": 20442,
+      "inner_rows": 98469,
+      "outer_rows": 64733,
+      "scored_inner": 65646,
+      "scored_outer": 35491
+    },
+    "development_games": 3135,
+    "exposed_2025_games": 272,
+    "failed_callbacks": 0,
+    "inner_games_per_setting": 3647,
+    "inner_settings": 27,
+    "last_origin": [
+      2025,
+      18
+    ],
+    "metric_schema_counts": {
+      "104": 20442,
+      "108": 44291,
+      "28": 98469
+    },
+    "native_failures": 0,
+    "native_success_only_cards_equal_all_cards": true,
+    "origins": 277,
+    "outer_games_per_series": 3407,
+    "outer_origins": 226,
+    "outer_series": 19,
+    "own_engines": 216,
+    "state_games": 4175
+  },
+  "decision_changing_findings": [
+    "E3 improves development joint energy over E2 by 0.1371543673%, below the registered 1% threshold; all three simultaneous intervals include zero. Only five of twelve development seasons improve, and exposed 2025 worsens by 0.3000650910%.",
+    "E3 improves development joint energy over N0 by 0.7245690778%, below 1%; block lengths 3 and 6 have lower bounds below zero. Exposed 2025 improves over N0 by 0.7080257324%, which does not repair the failed development gates.",
+    "The no-offense and zero-strength-update controls are stably worse than full E3, but the required no-defense and zero-scoring-level-update controls do not establish their registered all-block mechanism support.",
+    "Six nominal 80% coverage-interval gates fail for home, away and margin in the full and 24-hour models. Both margin actual-mass residual families also fail: full residual +3.7663816754 percentage points, block-6 simultaneous interval [+1.2347987245,+6.2979646264] percentage points; 24-hour residual +3.7461966605 points.",
+    "The result is a valid completed retrospective rejection under the frozen criteria. Computational completion and correct gate execution do not establish the external 5% target, prospective confirmation or product readiness."
+  ],
+  "evaluation_sha256": "83fd47af1839660d47c4aca0053a32f509dcc23c9faa6cff175bff0cd05e6101",
+  "evidence": [
+    {
+      "bytes": 26505,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp09-v1-d78471e3d2ffdb18/manifest.json",
+      "sha256": "d78471e3d2ffdb182266939ee13403a19b894261d9fe67ef47570f3d82d662de"
+    },
+    {
+      "bytes": 2148,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp09-v1-d78471e3d2ffdb18/completion/terminal.json",
+      "sha256": "0fe65f37d0739074b48d79a18636636176f062c22c98404ea51515cf949abc20"
+    },
+    {
+      "bytes": 418718,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp09-v1-d78471e3d2ffdb18/completion/artifact-index.json",
+      "sha256": "d9c6742f28e144c2c641cd97034b9ccf72645baf33de772b7e2f3a9530d98220"
+    },
+    {
+      "bytes": 11136356,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp09-v1-d78471e3d2ffdb18/evaluation.json",
+      "sha256": "83fd47af1839660d47c4aca0053a32f509dcc23c9faa6cff175bff0cd05e6101"
+    },
+    {
+      "bytes": 11758764,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp09-v1-d78471e3d2ffdb18/pilot.json",
+      "sha256": "6161e36de12d83f5ad33a4273aa67172a62a80be0e4002dec712328c5df65f86"
+    },
+    {
+      "bytes": 338562,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp09-v1-d78471e3d2ffdb18/inference-input-index.json",
+      "sha256": "2b2894936801bbbd6546645ffdea279f3ee9d71fefc758f51b5947c69169b3c8"
+    },
+    {
+      "bytes": 3049,
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/work/rfcomp09-observer-ba46aa5fdb0df76a/process-report.json",
+      "sha256": "90bf6f4c43bf66dc87dd4fa5886ed372c5a2fc24b2e2a74236ad99e053919bb2"
+    },
+    {
+      "bytes": 25467,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-clock-guard/audit-terminal-saved.py",
+      "sha256": "77ac4d97db89a81b4b28a3bc183dd14008449c6c6bc25e53f306f6e8859ad9e1"
+    },
+    {
+      "bytes": 557401,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-clock-guard/actual-numerical-saved-checks.json",
+      "sha256": "637b833e1403aeaf534be10d304e2557e0a4114aa06d001f2d26eee240c45c07"
+    },
+    {
+      "bytes": 4218,
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf-clock-guard/actual-numerical-saved-checks.log",
+      "sha256": "df721ce5d10b66f6758be2d8b95734a241f8b15aed41bf3fb707243bff4e8676"
+    },
+    {
+      "bytes": 162353,
+      "path": "/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp08-v1-6683e6438f3c6077/completion/artifact-index.json",
+      "sha256": "144bad1e80231cf291f5630a06f7ffa863a379b5875a7883eea3c9c4168fde0b"
+    }
+  ],
+  "full_inference": {
+    "PIT_series_target_bands_per_block": 76,
+    "actual_mass_calibration_cells": 8,
+    "all_registered_mechanism_candidate_booleans_rederived": true,
+    "bootstrap_blocks": {
+      "1": 10000,
+      "3": 10000,
+      "6": 10000
+    },
+    "candidate_qualified": false,
+    "comparison_and_calibration_order_exact": true,
+    "comparisons": 18,
+    "development_only_population": 3135,
+    "failed_candidate_checks": [
+      "energy_gain_at_least_one_percent",
+      "energy_lower_positive_all_blocks",
+      "E3:full:home:80:nominal_intervals",
+      "E3:full:away:80:nominal_intervals",
+      "E3:full:margin:80:nominal_intervals",
+      "E3:availability_24h:home:80:nominal_intervals",
+      "E3:availability_24h:away:80:nominal_intervals",
+      "E3:availability_24h:margin:80:nominal_intervals",
+      "E3:full:margin:80:actual_mass_intervals",
+      "E3:availability_24h:margin:80:actual_mass_intervals"
+    ],
+    "failed_mechanism_checks": [
+      "energy_gain_at_least_one_percent",
+      "energy_lower_positive_all_blocks",
+      "eight_improved_seasons",
+      "exposed_2025_positive",
+      "no_defense:positive_mechanism_all_blocks",
+      "zero_scoring_level_update:positive_mechanism_all_blocks"
+    ],
+    "failure_population": "2013-2025_all_issued",
+    "mechanism_supported": false,
+    "nominal_coverage_columns_per_block": 228
+  },
+  "key_calibration_fraction_units": {
+    "E3:availability_24h:margin:80": {
+      "actual_mass_residual": {
+        "blocks": {
+          "1": {
+            "bootstrap_sd": 0.01061564206057988,
+            "lower": 0.010730630078191052,
+            "upper": 0.0641933031312157
+          },
+          "3": {
+            "bootstrap_sd": 0.010286705522847427,
+            "lower": 0.011255945700476735,
+            "upper": 0.06366798750893002
+          },
+          "6": {
+            "bootstrap_sd": 0.010156492152135072,
+            "lower": 0.011473264179327886,
+            "upper": 0.06345066903007887
+          }
+        },
+        "residual": 0.03746196660470338
+      },
+      "nominal_block6": {
+        "lower": 0.8330618872472034,
+        "point": 0.8500797448165869,
+        "upper": 0.8727807461579836
+      }
+    },
+    "E3:full:margin:80": {
+      "actual_mass_residual": {
+        "blocks": {
+          "1": {
+            "bootstrap_sd": 0.01044243642190605,
+            "lower": 0.01136863078653549,
+            "upper": 0.06395900272216042
+          },
+          "3": {
+            "bootstrap_sd": 0.01011798524068354,
+            "lower": 0.01188762124286085,
+            "upper": 0.06344001226583507
+          },
+          "6": {
+            "bootstrap_sd": 0.009893530639975957,
+            "lower": 0.01234798724478458,
+            "upper": 0.06297964626391134
+          }
+        },
+        "residual": 0.037663816754347955
+      },
+      "nominal_block6": {
+        "lower": 0.8348534201954397,
+        "point": 0.8503987240829346,
+        "upper": 0.873466784819449
+      }
+    }
+  },
+  "key_contrasts_fraction_units": {
+    "E2:full->E3:full": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.0017398489536976098,
+          "lower": -0.003682453273819588,
+          "upper": 0.006425540618971084
+        },
+        "3": {
+          "bootstrap_sd": 0.0017049536007557782,
+          "lower": -0.0037491862621894965,
+          "upper": 0.006492273607340992
+        },
+        "6": {
+          "bootstrap_sd": 0.0016813963409107902,
+          "lower": -0.003970965749541628,
+          "upper": 0.006714053094693124
+        }
+      },
+      "candidate": [
+        "E3",
+        "full"
+      ],
+      "gain": 0.001371543672575748,
+      "reference": [
+        "E2",
+        "full"
+      ]
+    },
+    "E3:full->E3:no_defense": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.004484618232127643,
+          "lower": -0.02416129898621797,
+          "upper": 0.001892970613166154
+        },
+        "3": {
+          "bootstrap_sd": 0.004515471782214816,
+          "lower": -0.02469612359382318,
+          "upper": 0.002427795220771363
+        },
+        "6": {
+          "bootstrap_sd": 0.004145717130849842,
+          "lower": -0.024306866121276836,
+          "upper": 0.00203853774822502
+        }
+      },
+      "candidate": [
+        "E3",
+        "no_defense"
+      ],
+      "gain": -0.011134164186525908,
+      "reference": [
+        "E3",
+        "full"
+      ]
+    },
+    "E3:full->E3:no_offense": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.004578347228775415,
+          "lower": -0.05197840713667637,
+          "upper": -0.025379600539595065
+        },
+        "3": {
+          "bootstrap_sd": 0.0048309304475059045,
+          "lower": -0.05318842517625685,
+          "upper": -0.024169582500014587
+        },
+        "6": {
+          "bootstrap_sd": 0.005220089437067309,
+          "lower": -0.05526544233765138,
+          "upper": -0.022092565338620057
+        }
+      },
+      "candidate": [
+        "E3",
+        "no_offense"
+      ],
+      "gain": -0.03867900383813572,
+      "reference": [
+        "E3",
+        "full"
+      ]
+    },
+    "E3:full->E3:zero_scoring_level_update": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.00296732448884525,
+          "lower": -0.01633045897190101,
+          "upper": 0.0009087948997824769
+        },
+        "3": {
+          "bootstrap_sd": 0.0030613582995318157,
+          "lower": -0.016905445354864837,
+          "upper": 0.0014837812827463038
+        },
+        "6": {
+          "bootstrap_sd": 0.003157052496130867,
+          "lower": -0.01774212703552497,
+          "upper": 0.0023204629634064333
+        }
+      },
+      "candidate": [
+        "E3",
+        "zero_scoring_level_update"
+      ],
+      "gain": -0.0077108320360592675,
+      "reference": [
+        "E3",
+        "full"
+      ]
+    },
+    "E3:full->E3:zero_strength_update": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.004012260399203695,
+          "lower": -0.05090690150446816,
+          "upper": -0.027596887422357476
+        },
+        "3": {
+          "bootstrap_sd": 0.004071247326419686,
+          "lower": -0.05147965130500005,
+          "upper": -0.027024137621825588
+        },
+        "6": {
+          "bootstrap_sd": 0.0039025984970146666,
+          "lower": -0.05165210536773058,
+          "upper": -0.026851683559095056
+        }
+      },
+      "candidate": [
+        "E3",
+        "zero_strength_update"
+      ],
+      "gain": -0.03925189446341282,
+      "reference": [
+        "E3",
+        "full"
+      ]
+    },
+    "N0:full->E3:full": {
+      "blocks": {
+        "1": {
+          "bootstrap_sd": 0.0024135632704099285,
+          "lower": 0.0002346560716580126,
+          "upper": 0.01425672548482132
+        },
+        "3": {
+          "bootstrap_sd": 0.0024968526744148433,
+          "lower": -0.0002534624109773601,
+          "upper": 0.014744843967456692
+        },
+        "6": {
+          "bootstrap_sd": 0.0024019452851034274,
+          "lower": -0.000386308295889589,
+          "upper": 0.014877689852368921
+        }
+      },
+      "candidate": [
+        "E3",
+        "full"
+      ],
+      "gain": 0.007245690778239666,
+      "reference": [
+        "N0",
+        "full"
+      ]
+    }
+  },
+  "limits": [
+    "Statistical resamples and regression fits were retained from the authenticated original evaluator; no fresh bootstrap, calibration fit, trajectory update or forecast/scorer computation was performed.",
+    "Saved descriptive metric means, point effects and all final gate booleans were independently checked. This does not independently reconstruct every distribution, median, fitted diagnostic or bootstrap member.",
+    "Current forecast/provenance row bindings were checked across all 163,202 rows, while temporal availability, state update execution and full physical artifact closure have separate reviews.",
+    "The 2025 slice is explicitly exposed retrospective evidence. No prospective issuance, external comparator, shadow activation, production release or new-run authorization follows.",
+    "RF-COMP08 and earlier invalid or rejected runs retain their original dispositions. This acceptance concerns only the completed new COMP09 result."
+  ],
+  "registered_pilot": {
+    "A": 54.45194554197951,
+    "C": 0.16654201877645392,
+    "E": 193.14060433401028,
+    "F": 0.004218332993332297,
+    "S": 0.0051532500074245036,
+    "T": 14.725658083014423,
+    "W": 10898.028645833334,
+    "fixed_seconds_cap": 9000,
+    "headroom_seconds": 570.2580281980081,
+    "native_fit_anchor_count": 576,
+    "native_full_outer_score_anchor_count": 64,
+    "passed": true,
+    "projected_total_seconds": 8429.741971801992,
+    "raw_fit_calls": 976,
+    "raw_score_calls": 640,
+    "remaining_games_at_pilot": 3375,
+    "remaining_origins_at_pilot": 224
+  },
+  "resources": {
+    "external_limit_failure": false,
+    "external_status": "completed_process",
+    "fixed_limits": {
+      "rss_mib": 4096,
+      "scientific_seconds": 9000
+    },
+    "kill_requests": [],
+    "observed_exit_code": 0,
+    "observer_seconds": 1706.098933125002,
+    "process_ownership_lost": false,
+    "waited_worker_peak_rss_mib": 1769.046875,
+    "worker_seconds": 1705.953538583999
+  },
+  "reviewer_independence": {
+    "guard_implementation_author": false,
+    "historical_run_executor": false,
+    "integration_test_author": true,
+    "prior_authorship": "Earlier score-cache/inference and integration components were authored in this task. This is independent saved-result review, not independent reimplementation of their scientific algorithms."
+  },
+  "role": "numerical",
+  "run_manifest_sha256": "d78471e3d2ffdb182266939ee13403a19b894261d9fe67ef47570f3d82d662de",
+  "saved_numerical_checks": {
+    "all_actual_interval_mass_values_in_unit_interval": true,
+    "all_card_metric_means_crosschecked_from_saved_rows": true,
+    "all_metric_digests_match_saved_grading_provenance": true,
+    "complete_saved_inference_row_digests_and_original_metadata_verified": true,
+    "direct_parent_metric_copies_verified": 62065,
+    "exact_28_104_108_field_schemas_and_finite_values": true,
+    "first_per_year_setting_inner_flags_and_complete_outer_flags_preserved": true,
+    "law_row_keys_native_reasons_and_grading_plans_match": true,
+    "mean_roundoff_check_only": {
+      "absolute_tolerance": 1e-12,
+      "purpose": "Allows stdlib fsum versus original NumPy mean rounding; no frozen decision threshold, score value, interval or input changed.",
+      "relative_tolerance": 1e-12
+    },
+    "observed_targets_match_authenticated_admitted_records": true,
+    "ordered_original_game_series_membership": true,
+    "source_and_current_publication_pointers_bound": true
+  },
+  "scope": "Full saved numerical result and frozen gate interpretation, without rescoring or resampling. Final experiment acceptance remains composed with separate temporal and physical-integrity review.",
+  "source_identity": {
+    "code_map_sha256": "63e98b5c40f46382cdd99d72054103202d0414a4c2d22cb18bdca4a3e3dd949e",
+    "compute_protocol_sha256": "69de6edd1ea666209e02eb51005513a0a9a2622dd3eeb30c39a6be70c0bd0a00",
+    "current_bytes_match_manifest_and_prefit": true,
+    "current_code_files": 91,
+    "current_runtime_files": 7,
+    "guard_protocol_sha256": "9f7f68aa65d04ec172818c62d64e2f32768e058c22bd92c81ce6a2dc3a287ffb",
+    "prefit_acceptance_sha256": "ba46aa5fdb0df76a895ba23011848aa8eb3c0a49f43663a60812bc26d00868f0",
+    "resource_policy_sha256": "bcd780e4bc1a6d93ac5d2f337781346ad3eca728f70ba55426c929fdab75ff8c",
+    "scientific_config_sha256": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519",
+    "scientific_protocol_sha256": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16"
+  },
+  "status": "accepted_retrospective_reject_all",
+  "terminal_status": "reject_all",
+  "unchanged_prior_prefix": {
+    "COMP04": {
+      "current_and_original_file_bytes_authenticated_and_identical": true,
+      "loss_files": 38,
+      "rows": 15296
+    },
+    "COMP08": {
+      "current_file_hashes_and_sizes_equal_authenticated_closed_COMP08_index": true,
+      "loss_files": 158,
+      "prior_file_integrity": "Reused accepted COMP08 physical-index audit; did not reread every old file.",
+      "rows": 56558
+    }
+  },
+  "version": "rfcomp09.actual-numerical-review.v1"
+}

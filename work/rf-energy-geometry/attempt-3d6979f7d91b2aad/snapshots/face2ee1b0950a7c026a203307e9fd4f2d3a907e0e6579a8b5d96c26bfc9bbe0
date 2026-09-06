@@ -1,0 +1,623 @@
+{
+  "aggregate_seconds": {
+    "candidate": 0.349627083982341,
+    "original": 0.4744956649665255
+  },
+  "candidate_observed_faster": true,
+  "candidate_original_ratio": 0.7368393639739708,
+  "complete_input_images_unchanged_except_declared_mutations": true,
+  "elapsed_seconds_before_result": 7.868870832986431,
+  "fixed_timing_order": [
+    "original",
+    "candidate"
+  ],
+  "fixture_scope": {
+    "last_origin": [
+      2013,
+      1
+    ],
+    "limitations": "Derived contiguous float64 vectors and last_origin from accepted publication validation; no engine.stored/history or runnable trajectory bank reconstructed.",
+    "outputs": 297,
+    "own_state_float_values": 20736,
+    "own_state_vectors": 648,
+    "owned_engines": 216
+  },
+  "historical_execution": false,
+  "integration_accepted": false,
+  "pair_count_per_route": 10,
+  "parity_pairs": 10,
+  "setup_seconds_before_timing": 4.447114666982088,
+  "status": "pending_root_actual_exit_and_independent_review",
+  "test_observation_count": 135,
+  "tests": {
+    "count": 29,
+    "errors": 0,
+    "failures": 0,
+    "seconds": 0.3795782499946654,
+    "skipped": 0
+  },
+  "timing_limitations": "One fixed original-then-candidate ten-pair pass after required equivalence; includes mutations and helper dispatch; fixture construction and lossless evidence outside pair timers but inside command. Order/cache/OS effects; isolated partial cost only.",
+  "timings": [
+    {
+      "actual": {
+        "after": {
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "before": {
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "unchanged",
+        "outcome": {
+          "equal": true,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "original"
+      },
+      "finished_monotonic": 143872.644401333,
+      "name": "unchanged",
+      "route": "original",
+      "seconds": 0.038072708004619926,
+      "started_monotonic": 143872.606328625
+    },
+    {
+      "actual": {
+        "after": {
+          "sha256": "619aa2084e41d4861f205d02acac3722efb87af09c16ed83c7e8b7ec4e0a3f85"
+        },
+        "before": {
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "last_rating",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "original"
+      },
+      "finished_monotonic": 143872.780807416,
+      "name": "last_rating",
+      "route": "original",
+      "seconds": 0.03833787501207553,
+      "started_monotonic": 143872.742469541
+    },
+    {
+      "actual": {
+        "after": {
+          "sha256": "65a7252cee4d9d4d097e84d41a9e9646d3eefdf523874831ffe3d30e4599acdd"
+        },
+        "before": {
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "last_output_mean",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "original"
+      },
+      "finished_monotonic": 143872.919855208,
+      "name": "last_output_mean",
+      "route": "original",
+      "seconds": 0.03809966699918732,
+      "started_monotonic": 143872.881755541
+    },
+    {
+      "actual": {
+        "after": {
+          "sha256": "e742e4229ae76ea079af93b3aeb251f16489c4814e7043defaaf309fcf990932"
+        },
+        "before": {
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "last_origin",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "original"
+      },
+      "finished_monotonic": 143873.143947291,
+      "name": "last_origin",
+      "route": "original",
+      "seconds": 0.04016362500260584,
+      "started_monotonic": 143873.103783666
+    },
+    {
+      "actual": {
+        "after": {
+          "sha256": "2e803a8ec374bc5194789c8ca97ddeb428c1fab2f700c76bccdc69c3a5ab948c"
+        },
+        "before": {
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "forecast_order",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "original"
+      },
+      "finished_monotonic": 143873.284607291,
+      "name": "forecast_order",
+      "route": "original",
+      "seconds": 0.03921954098041169,
+      "started_monotonic": 143873.24538775
+    },
+    {
+      "actual": {
+        "after": {
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "before": {
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "dict_insertion_order",
+        "outcome": {
+          "equal": true,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "original"
+      },
+      "finished_monotonic": 143873.425250291,
+      "name": "dict_insertion_order",
+      "route": "original",
+      "seconds": 0.04010145799838938,
+      "started_monotonic": 143873.385148833
+    },
+    {
+      "actual": {
+        "after": {
+          "sha256": "ba9be2c25e2640fe274103db51d9b0c53c9151c3fa5281c16974f1d0ad116361"
+        },
+        "before": {
+          "sha256": "ccea1579f4641ea6ec6c10107f036657b2bd95211e8b0515fe557d1ce9a558e8"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "signed_zero",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "original"
+      },
+      "finished_monotonic": 143873.64936075,
+      "name": "signed_zero",
+      "route": "original",
+      "seconds": 0.038444166973931715,
+      "started_monotonic": 143873.610916583
+    },
+    {
+      "actual": {
+        "after": {
+          "sha256": "863b14a5e3f2c0be31852b7d484feb0ad546cf609f9be7999a7e61b0a5da7810"
+        },
+        "before": {
+          "sha256": "0109a32296faa12cb59dd6bf2ffcfbfb6d2635460e5112553b93cfa2fb6d352c"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "numeric_type",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "original"
+      },
+      "finished_monotonic": 143873.790158208,
+      "name": "numeric_type",
+      "route": "original",
+      "seconds": 0.03859437498613261,
+      "started_monotonic": 143873.751563833
+    },
+    {
+      "actual": {
+        "after": {
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "before": {
+          "sha256": "83b4188c62160e5023b60e2de3d03463c3d362e5c92172dea38fe8855f308d65"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "array_list",
+        "outcome": {
+          "equal": true,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "original"
+      },
+      "finished_monotonic": 143874.015060291,
+      "name": "array_list",
+      "route": "original",
+      "seconds": 0.12428233301034197,
+      "started_monotonic": 143873.890777958
+    },
+    {
+      "actual": {
+        "after": {
+          "sha256": "e415e941d05993d25abe98a1ffd685d9f92bcb8f937353ed9a84a014781d666d"
+        },
+        "before": {
+          "sha256": "e415e941d05993d25abe98a1ffd685d9f92bcb8f937353ed9a84a014781d666d"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "unicode_equivalence",
+        "outcome": {
+          "equal": true,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "original"
+      },
+      "finished_monotonic": 143874.190020541,
+      "name": "unicode_equivalence",
+      "route": "original",
+      "seconds": 0.03917991599882953,
+      "started_monotonic": 143874.150840625
+    },
+    {
+      "actual": {
+        "after": {
+          "mode": "supported"
+        },
+        "before": {
+          "mode": "supported"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "unchanged",
+        "outcome": {
+          "equal": true,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "candidate"
+      },
+      "finished_monotonic": 143874.317923166,
+      "name": "unchanged",
+      "route": "candidate",
+      "seconds": 0.025923000008333474,
+      "started_monotonic": 143874.292000166
+    },
+    {
+      "actual": {
+        "after": {
+          "mode": "supported"
+        },
+        "before": {
+          "mode": "supported"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "last_rating",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "candidate"
+      },
+      "finished_monotonic": 143874.531395708,
+      "name": "last_rating",
+      "route": "candidate",
+      "seconds": 0.027162250014953315,
+      "started_monotonic": 143874.504233458
+    },
+    {
+      "actual": {
+        "after": {
+          "mode": "supported"
+        },
+        "before": {
+          "mode": "supported"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "last_output_mean",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "candidate"
+      },
+      "finished_monotonic": 143874.657921541,
+      "name": "last_output_mean",
+      "route": "candidate",
+      "seconds": 0.022943582996958867,
+      "started_monotonic": 143874.634977958
+    },
+    {
+      "actual": {
+        "after": {
+          "mode": "supported"
+        },
+        "before": {
+          "mode": "supported"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "last_origin",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "candidate"
+      },
+      "finished_monotonic": 143874.867934875,
+      "name": "last_origin",
+      "route": "candidate",
+      "seconds": 0.10919854199164547,
+      "started_monotonic": 143874.758736333
+    },
+    {
+      "actual": {
+        "after": {
+          "mode": "supported"
+        },
+        "before": {
+          "mode": "supported"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "forecast_order",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "candidate"
+      },
+      "finished_monotonic": 143874.991582375,
+      "name": "forecast_order",
+      "route": "candidate",
+      "seconds": 0.024059833987848833,
+      "started_monotonic": 143874.967522541
+    },
+    {
+      "actual": {
+        "after": {
+          "mode": "supported"
+        },
+        "before": {
+          "mode": "supported"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "dict_insertion_order",
+        "outcome": {
+          "equal": true,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "candidate"
+      },
+      "finished_monotonic": 143875.115506208,
+      "name": "dict_insertion_order",
+      "route": "candidate",
+      "seconds": 0.024898917006794363,
+      "started_monotonic": 143875.090607291
+    },
+    {
+      "actual": {
+        "after": {
+          "mode": "supported"
+        },
+        "before": {
+          "mode": "supported"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "signed_zero",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "candidate"
+      },
+      "finished_monotonic": 143875.320608666,
+      "name": "signed_zero",
+      "route": "candidate",
+      "seconds": 0.025154790986562148,
+      "started_monotonic": 143875.295453875
+    },
+    {
+      "actual": {
+        "after": {
+          "mode": "supported"
+        },
+        "before": {
+          "mode": "supported"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "numeric_type",
+        "outcome": {
+          "equal": false,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "candidate"
+      },
+      "finished_monotonic": 143875.440858458,
+      "name": "numeric_type",
+      "route": "candidate",
+      "seconds": 0.02272887498838827,
+      "started_monotonic": 143875.418129583
+    },
+    {
+      "actual": {
+        "after": {
+          "mode": "supported"
+        },
+        "before": {
+          "mode": "supported"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "array_list",
+        "outcome": {
+          "equal": true,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "candidate"
+      },
+      "finished_monotonic": 143875.566900625,
+      "name": "array_list",
+      "route": "candidate",
+      "seconds": 0.027458334021503106,
+      "started_monotonic": 143875.539442291
+    },
+    {
+      "actual": {
+        "after": {
+          "mode": "fallback"
+        },
+        "before": {
+          "mode": "fallback"
+        },
+        "events": [
+          "before_capture_started",
+          "before_capture_finished",
+          "mutation_finished",
+          "after_capture_finished",
+          "comparison_finished"
+        ],
+        "name": "unicode_equivalence",
+        "outcome": {
+          "equal": true,
+          "kind": "comparison",
+          "type": "bool"
+        },
+        "route": "candidate"
+      },
+      "finished_monotonic": 143875.823593583,
+      "name": "unicode_equivalence",
+      "route": "candidate",
+      "seconds": 0.040098957979353145,
+      "started_monotonic": 143875.783494625
+    }
+  ],
+  "worker_peak_rss_mib": 308.171875
+}

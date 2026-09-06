@@ -1,0 +1,237 @@
+"""RF-COMP-09 pre-fit boundary; old permissions and failures are evidence only.
+
+No historical admission, approval creation or mutable dependency injection in
+production. The private reader/pin seam exists for explicit synthetic fixtures.
+"""
+from pathlib import Path
+from research_score_split_preflight import (
+    ROOT, WORK, PROTOCOL_PATH, PROTOCOL_SHA, CONFIG_PATH, CONFIG_SHA,
+    INHERITED_CONFIG_SHA, PARENT_MANIFEST, PARENT_INDEX, DATA_SHA, RUNTIME,
+    PERMISSIONS, require, encoded, parse, digest, _sha, _relative, _file,
+    _pointer, _stage_evidence, actual_runtime)
+from research_score_resource_preflight import (
+    FROZEN_CODE_HASHES as _OLD_FROZEN, STAGES, RUNTIME_FILES, TERMINAL_POINTERS,
+    COMPUTE_PROTOCOL_PATH, COMPUTE_PROTOCOL_SHA, _runtime_files, validate_runtime_files,
+    RESOURCE_PROTOCOL_PATH, RESOURCE_PROTOCOL_SHA, RESOURCE_POLICY_PATH, RESOURCE_POLICY_SHA,
+    POLICY, BUDGET)
+
+VERSION = 'rfcomp09.prefit-acceptance.v1'
+REVIEW_SCOPE = 'clock_guard_complete_controller_qualification'
+GUARD_PROTOCOL_PATH = '.planning/engine-os/research-first/RF-COMP-09-CLOCK-PROTOCOL.v1.md'
+GUARD_PROTOCOL_SHA = '9f7f68aa65d04ec172818c62d64e2f32768e058c22bd92c81ce6a2dc3a287ffb'
+BASELINE_ACCEPTANCE = {'path': '.planning/engine-os/research-first/RF-COMP-08-PREFIT-ACCEPTANCE.v1.json', 'sha256': '3bbc98b3645782ba088d814c61505a86041f0a5c82e6a32d6430b62c58fd1bbe', 'bytes': 16706}
+PREDECESSOR_TERMINAL = {'path': '.planning/engine-os/research-first/RF-COMP-08-TERMINAL-ACCEPTANCE.v1.json', 'sha256': '51962cdf91c7aa58652d9d4cef508449268aba07127770e578a9a07bdc42e727', 'bytes': 7373}
+PREDECESSOR_ARTIFACTS = {'manifest': {'bytes': 25339, 'path': '/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp08-v1-6683e6438f3c6077/manifest.json', 'sha256': '6683e6438f3c607711623596ea8d41370e3ba9a3c9bcdd9dbead50703520ae5f'}, 'artifact_index': {'bytes': 162353, 'path': '/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp08-v1-6683e6438f3c6077/completion/artifact-index.json', 'sha256': '144bad1e80231cf291f5630a06f7ffa863a379b5875a7883eea3c9c4168fde0b'}, 'terminal': {'bytes': 124341, 'path': '/Users/gabe/.codex/.chatgpt-projects/g-p-68af6fbbc1a48191b135cb36cf3961bf/research-data/rfcomp08-v1-6683e6438f3c6077/completion/terminal.json', 'sha256': '1922fb7be8173333f937dc1f1022c20db5071be099493a6c61c21204d107b4ec'}}
+FROZEN_CODE_HASHES = {**_OLD_FROZEN, **{'scripts/research_score_resource_controller.py': '6871d7306b08cd3ea85f4c4516e413f8aa534a6905283adbc18908185cc2ef87', 'scripts/research_score_resource_policy.py': '6535330f1665399b73f6dba691b3ca01c2a461b4df029d6a00cd85dd6a6d9350', 'scripts/research_score_resource_preflight.py': 'f88d8f50336c714ad72ae4e9b34c589672ad3d4cf6c442752156a6cafdf613d3', 'scripts/research_score_resource_watchdog.py': 'f5dddcb238dc603b552a92d8f12195de6ae84b187af2daae89d5f2387a273783', 'tests/research-score-resource-policy/qualify_resource_policy.py': '1a93a0fc4a1e51e3b5de75db81bb1497065932e4b2b6351df5da08882000b996', 'tests/research-score-resource-policy/test_resource_policy.py': '4dc47c70d6e21588a9c1eff0b8cbad920af56f8f4e2aef2729932dfef68dc2c6'}}
+CANDIDATE_FILES = (
+    'scripts/research_score_clock_guard.py',
+    'scripts/research_score_clock_guard_preflight.py',
+    'scripts/research_score_clock_guard_controller.py',
+    'tests/research-score-clock-guard/test_clock_guard.py',
+    'tests/research-score-clock-guard/test_integration.py',
+    'tests/research-score-clock-guard/qualify_clock_guard.py')
+CODE_FILES = tuple(sorted(set(FROZEN_CODE_HASHES) | set(CANDIDATE_FILES)))
+
+
+def _predecessor(root, check, *, read, pointer, artifacts):
+    """Authenticate fixed invalid-terminal evidence without replaying any row."""
+    receipt = parse(_pointer(pointer, root, check, read=read))
+    require(receipt['version'] == 'rfcomp08.terminal-acceptance.v1'
+            and receipt['status'] == 'accepted_retained_protocol_invalid_clock_stop_only',
+            'closed_predecessor_acceptance_required')
+    require(type(artifacts) is dict and set(artifacts) == {'manifest', 'artifact_index', 'terminal'},
+            'exact_predecessor_artifacts_required')
+    bodies = {}
+    for key, fixed in artifacts.items():
+        require(receipt[key] == fixed and set(fixed) == {'path', 'sha256', 'bytes'},
+                'fixed_predecessor_artifact_required')
+        _sha(fixed['sha256'])
+        require(type(fixed['bytes']) is int and fixed['bytes'] > 0, 'positive_predecessor_size_required')
+        path = Path(fixed['path'])
+        require(path.is_absolute(), 'absolute_predecessor_artifact_required')
+        bodies[key] = read(path, check, expected_sha=fixed['sha256'], expected_bytes=fixed['bytes'])
+    terminal = parse(bodies['terminal'])
+    require(terminal['status'] == 'protocol_invalid' and terminal['reason'] == 'invalid_monotonic_clock'
+            and terminal['manifest_sha256'] == artifacts['manifest']['sha256'],
+            'predecessor_invalid_status_must_remain')
+    # Only the three fixed archive pointers can be outside the ordinary roots.
+    _stage_evidence({k:v for k,v in receipt.items() if k not in artifacts}, root, check, read=read)
+    return receipt
+
+
+def validate_predecessor_terminal(check):
+    require(callable(check), 'shared_budget_check_required')
+    return _predecessor(ROOT, check, read=_file, pointer=PREDECESSOR_TERMINAL,
+                        artifacts=PREDECESSOR_ARTIFACTS)
+
+
+def _evidence_result(value, code_hashes, runtime, protocol_sha, config_sha, *, role=None, qualification_sha=None, compute_sha=None, runtime_files=None, resource_sha=None, policy_sha=None, guard_sha=None):
+    required = {'version', 'status', 'scope', 'code_hashes', 'protocol_sha256', 'config_sha256',
+                'runtime', 'historical_execution', 'tests', 'evidence', 'compute_protocol_sha256', 'runtime_files',
+                'resource_protocol_sha256', 'resource_policy_sha256', 'guard_protocol_sha256'}
+    require(type(value) is dict and required <= set(value), 'qualification_or_review_binding_fields')
+    require(value['version'] == ('rfcomp09.controller-qualification.v1' if role is None else 'rfcomp09.controller-review.v1')
+            and value['status'] == ('passed' if role is None else 'accepted')
+            and value['scope'] == REVIEW_SCOPE and value['code_hashes'] == code_hashes
+            and value['protocol_sha256'] == protocol_sha and value['config_sha256'] == config_sha
+            and encoded(value['runtime']) == encoded(runtime) and value['historical_execution'] is False
+            and value['compute_protocol_sha256'] == compute_sha
+            and encoded(value['runtime_files']) == encoded(runtime_files)
+            and value['resource_protocol_sha256'] == resource_sha
+            and value['resource_policy_sha256'] == policy_sha
+            and value['guard_protocol_sha256'] == guard_sha,
+            'qualification_or_review_not_accepted_for_exact_candidate')
+    tests = value['tests']
+    require(type(tests) is dict and set(tests) == {'run', 'passed'}
+            and type(tests['run']) is int and type(tests['passed']) is int
+            and tests['run'] > 0 and tests['run'] == tests['passed'], 'complete_positive_test_counts_required')
+    require(type(value['evidence']) is list and value['evidence'], 'actual_evidence_pointers_required')
+    if role is not None:
+        require(value.get('role') == role and value.get('qualification_sha256') == qualification_sha
+                and value.get('blockers') == [] and type(value.get('findings')) is list,
+                'independent_review_role_or_qualification_mismatch')
+
+
+def _validate(root, acceptance, acceptance_sha, runtime, check, *, read, frozen, candidates, stages,
+              protocol_sha=PROTOCOL_SHA, config_sha=CONFIG_SHA, compute_sha=None, runtime_files=None, terminal_pointers=None,
+              resource_sha=None, policy_sha=None, baseline_pointer=None, guard_sha=None,
+              predecessor_pointer=None, predecessor_artifacts=None):
+    """Explicit synthetic seam. Production passes only the constants below."""
+    require(type(acceptance) is dict and set(acceptance) == {'version', 'status', 'code_hashes', 'protocol',
+            'config', 'compute_protocol', 'runtime_files', 'stage_acceptances', 'qualification', 'independent_reviews', 'runtime', 'permissions',
+            'resource_protocol', 'resource_policy', 'baseline_acceptance', 'guard_protocol', 'predecessor_terminal'},
+            'exact_final_acceptance_schema_required')
+    require(acceptance['version'] == VERSION and acceptance['status'] == 'accepted_for_one_historical_invocation',
+            'final_prefit_acceptance_required')
+    _sha(compute_sha)
+    _sha(acceptance_sha)
+    require(encoded(acceptance['runtime_files']) == encoded(runtime_files), 'fixed_runtime_files_required')
+    _runtime_files(check, read=read, pins=runtime_files)
+    require(acceptance['compute_protocol']['path'] == COMPUTE_PROTOCOL_PATH
+            and acceptance['compute_protocol']['sha256'] == compute_sha, 'fixed_compute_protocol_required')
+    _pointer(acceptance['compute_protocol'], root, check, read=read)
+    _sha(resource_sha); _sha(policy_sha)
+    require(acceptance['resource_protocol']['path'] == RESOURCE_PROTOCOL_PATH
+            and acceptance['resource_protocol']['sha256'] == resource_sha
+            and acceptance['resource_policy']['path'] == RESOURCE_POLICY_PATH
+            and acceptance['resource_policy']['sha256'] == policy_sha,
+            'fixed_resource_protocol_and_policy_required')
+    _pointer(acceptance['resource_protocol'], root, check, read=read)
+    policy = parse(_pointer(acceptance['resource_policy'], root, check, read=read))
+    require(encoded(policy) == encoded(POLICY) and encoded(policy['budget']) == encoded(BUDGET),
+            'exact_resource_policy_required')
+    require(acceptance['baseline_acceptance'] == baseline_pointer, 'fixed_baseline_evidence_required')
+    baseline = parse(_pointer(acceptance['baseline_acceptance'], root, check, read=read))
+    require(baseline['version'] == 'rfcomp08.prefit-acceptance.v1'
+            and baseline['status'] == 'accepted_for_one_historical_invocation'
+            and baseline['code_hashes'] == frozen
+            and encoded(baseline['runtime']) == encoded(runtime)
+            and encoded(baseline['runtime_files']) == encoded(runtime_files),
+            'baseline_scientific_source_evidence_mismatch')
+    # Authenticate old evidence recursively; never call its permission validator.
+    _stage_evidence(baseline, root, check, read=read)
+    _sha(guard_sha)
+    require(acceptance['guard_protocol']['path'] == GUARD_PROTOCOL_PATH
+            and acceptance['guard_protocol']['sha256'] == guard_sha, 'fixed_guard_protocol_required')
+    _pointer(acceptance['guard_protocol'], root, check, read=read)
+    require(acceptance['predecessor_terminal'] == predecessor_pointer,
+            'fixed_predecessor_terminal_evidence_required')
+    _predecessor(root, check, read=read, pointer=predecessor_pointer, artifacts=predecessor_artifacts)
+
+
+    require(encoded(acceptance['permissions']) == encoded(PERMISSIONS), 'fixed_permissions_required')
+    require(encoded(runtime) == encoded(RUNTIME) and encoded(acceptance['runtime']) == encoded(runtime),
+            'unqualified_runtime')
+    code = acceptance['code_hashes']
+    require(type(code) is dict and set(code) == set(frozen) | set(candidates), 'exact_source_membership_required')
+    for name, fingerprint in code.items():
+        _relative(name); _sha(fingerprint)
+        require(name not in frozen or fingerprint == frozen[name], 'frozen_source_pin_changed')
+        read(root / name, check, expected_sha=fingerprint)
+    require(acceptance['protocol']['path'] == PROTOCOL_PATH and acceptance['protocol']['sha256'] == protocol_sha
+            and acceptance['config']['path'] == CONFIG_PATH and acceptance['config']['sha256'] == config_sha,
+            'fixed_protocol_configuration_required')
+    _pointer(acceptance['protocol'], root, check, read=read)
+    config = parse(_pointer(acceptance['config'], root, check, read=read))
+    require(config['protocol'] == {'path': PROTOCOL_PATH, 'sha256': protocol_sha}
+            and config['inheritedConfig'] == {'path': 'config/research-team-score.v2.json', 'sha256': INHERITED_CONFIG_SHA}
+            and config['parent'] == {'manifestSha256': PARENT_MANIFEST, 'indexSha256': PARENT_INDEX,
+                                     'admittedDataSha256': DATA_SHA}, 'inherited_scientific_binding_mismatch')
+    read(root / config['inheritedConfig']['path'], check, expected_sha=INHERITED_CONFIG_SHA)
+    require(type(acceptance['stage_acceptances']) is dict and set(acceptance['stage_acceptances']) == set(stages),
+            'exact_stage_membership_required')
+    for name, expected in stages.items():
+        require(expected['sha256'] is not None, 'stage_acceptance_pin_not_frozen:' + name)
+        pointer = acceptance['stage_acceptances'][name]
+        require(pointer['path'] == expected['path'] and pointer['sha256'] == expected['sha256'], 'fixed_stage_acceptance_mismatch')
+        stage = parse(_pointer(pointer, root, check, read=read))
+        require(stage['status'] == expected['status'], 'stage_status_mismatch')
+        if name == 'rf02f_terminal':
+            # Old permission is evidence only, never passed to a permission validator.
+            for key, fixed in terminal_pointers.items():
+                require(stage[key] == fixed, 'fixed_terminal_evidence_required')
+                _sha(fixed['sha256'])
+                require(type(fixed['bytes']) is int and fixed['bytes'] > 0, 'positive_terminal_size_required')
+                read(Path(fixed['path']), check, expected_sha=fixed['sha256'], expected_bytes=fixed['bytes'])
+            for key in ('observer', 'prefit_acceptance', 'root_integrity'):
+                _pointer(stage[key], root, check, read=read)
+            for item in stage['independent_reviews'].values():
+                _pointer(item, root, check, read=read)
+        else:
+            _stage_evidence(stage, root, check, read=read)
+    qualification = parse(_pointer(acceptance['qualification'], root, check, read=read))
+    _evidence_result(qualification, code, runtime, protocol_sha, config_sha, compute_sha=compute_sha, runtime_files=runtime_files,
+                     resource_sha=resource_sha, policy_sha=policy_sha, guard_sha=guard_sha)
+    require(type(acceptance['independent_reviews']) is dict
+            and set(acceptance['independent_reviews']) == {'numerical', 'temporal'}, 'distinct_reviews_required')
+    identities = [str((root / acceptance['qualification']['path']).resolve())]
+    for role, pointer in acceptance['independent_reviews'].items():
+        identities.append(str((root / pointer['path']).resolve()))
+        review = parse(_pointer(pointer, root, check, read=read))
+        _evidence_result(review, code, runtime, protocol_sha, config_sha, role=role,
+                         qualification_sha=acceptance['qualification']['sha256'], compute_sha=compute_sha, runtime_files=runtime_files,
+                     resource_sha=resource_sha, policy_sha=policy_sha, guard_sha=guard_sha)
+        for evidence in review['evidence']:
+            _pointer(evidence, root, check, read=read)
+    require(len(set(identities)) == 3, 'qualification_and_reviews_must_be_distinct')
+    for evidence in qualification['evidence']:
+        _pointer(evidence, root, check, read=read)
+    check()
+    manifest = {'version': 'rfcomp09.manifest.v1', 'implementation_acceptance_sha256': acceptance_sha,
+                'compute_protocol': acceptance['compute_protocol'], 'runtime_files': dict(runtime_files),
+                'resource_protocol': acceptance['resource_protocol'], 'resource_policy': acceptance['resource_policy'],
+                'baseline_acceptance': acceptance['baseline_acceptance'],
+                'guard_protocol': acceptance['guard_protocol'], 'predecessor_terminal': acceptance['predecessor_terminal'],
+                'code_hashes': dict(code), 'stage_acceptances': acceptance['stage_acceptances'],
+                'qualification': acceptance['qualification'], 'independent_reviews': acceptance['independent_reviews'],
+                'bound_hashes': {'config': config_sha, 'protocol': protocol_sha, 'admittedData': DATA_SHA,
+                                 'inheritedConfig': INHERITED_CONFIG_SHA},
+                'parent_manifest_sha256': PARENT_MANIFEST, 'parent_index_sha256': PARENT_INDEX,
+                'runtime': runtime, 'budget': dict(BUDGET),
+                'scientific_registry': {key: config[key] for key in ('settingsInTieOrder', 'variantsInOrder',
+                        'seriesInOrder', 'energyComparisonsInOrder', 'calibrationCellsInOrder')},
+                'historical_status': 'retrospective_inferred', 'production_authorized': False,
+                'prospective_evidence': False, 'provider_requests': 0, 'automatic_restart': False,
+                'actual_result_acceptance': 'pending_independent_terminal_audits'}
+    fingerprint = digest(encoded(manifest))
+    return {'config': config, 'manifest': manifest, 'manifest_sha256': fingerprint,
+            'identity': 'rfcomp09-v1-' + fingerprint[:16], 'acceptance': acceptance}
+
+
+def preflight(root, acceptance_path, acceptance_sha256, budget_check):
+    """Validate one supplied final receipt, never construct an approval or load history."""
+    require(callable(budget_check), 'shared_budget_check_required')
+    budget_check()
+    _sha(COMPUTE_PROTOCOL_SHA)
+    _sha(RESOURCE_PROTOCOL_SHA); _sha(RESOURCE_POLICY_SHA); _sha(GUARD_PROTOCOL_SHA)
+    require(Path(root) == ROOT and Path(root).resolve() == ROOT, 'fixed_repository_required')
+    _sha(acceptance_sha256)
+    path = Path(acceptance_path)
+    require(path.is_absolute() and (path.is_relative_to(ROOT) or path.is_relative_to(WORK)), 'approved_acceptance_path_required')
+    acceptance = parse(_file(path, budget_check, expected_sha=acceptance_sha256))
+    return _validate(ROOT, acceptance, acceptance_sha256, actual_runtime(), budget_check, read=_file,
+                     frozen=FROZEN_CODE_HASHES, candidates=CANDIDATE_FILES, stages=STAGES, compute_sha=COMPUTE_PROTOCOL_SHA,
+                     runtime_files=RUNTIME_FILES, terminal_pointers=TERMINAL_POINTERS,
+                     resource_sha=RESOURCE_PROTOCOL_SHA, policy_sha=RESOURCE_POLICY_SHA,
+                     baseline_pointer=BASELINE_ACCEPTANCE, guard_sha=GUARD_PROTOCOL_SHA,
+                     predecessor_pointer=PREDECESSOR_TERMINAL, predecessor_artifacts=PREDECESSOR_ARTIFACTS)

@@ -1,0 +1,303 @@
+"""Pure annual receipts and outcome-free RF-02D prediction construction."""
+from dataclasses import replace
+from datetime import datetime
+import hashlib
+import json
+import math
+
+import numpy as np
+
+from research_score_conditional_admission import annual_case_sources, ORDINARY, SERIES, YEARS, YEAR_COUNTS, PRIOR_COUNTS
+from research_score_conditional_margin import conditional_moments, estimate_scale
+from research_score_conditional_adapter import distribution_fingerprint, transform_distribution
+from research_score_conditional_policy import independent_control
+
+
+VERSION = 'rf02d-chronological-unit-v1'
+
+
+class ReplayFailure(ValueError):
+    pass
+
+
+def require(condition, reason):
+    if not condition:
+        raise ReplayFailure(reason)
+
+
+def canonical(value):
+    if isinstance(value, np.ndarray):
+        return canonical(value.tolist())
+    if isinstance(value, np.generic):
+        return canonical(value.item())
+    if isinstance(value, dict):
+        return {key: canonical(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [canonical(item) for item in value]
+    return value
+
+
+def fingerprint(value):
+    return hashlib.sha256(json.dumps(canonical(value), sort_keys=True, separators=(',', ':'),
+                                     allow_nan=False).encode('utf-8')).hexdigest()
+
+
+def _hash(value):
+    return type(value) is str and len(value) == 64 and all(c in '0123456789abcdef' for c in value)
+
+
+def _timestamp(value):
+    require(type(value) is str, 'invalid_timestamp')
+    parsed = datetime.fromisoformat(value)
+    require(parsed.utcoffset() is not None, 'naive_timestamp')
+    return parsed
+
+
+def _number(value):
+    return type(value) in (int, float) and math.isfinite(value)
+
+
+def _case(case, source):
+    """Validate supplied constructor output even below the fitting threshold."""
+    required = {'empirical_probabilities', 'empirical_fraction', 'background_fraction', 'fixed_variance',
+                'squared_residual', 'total', 'conditional_mean', 'conditional_variance', 'empirical_mean',
+                'empirical_variance', 'background_mean', 'background_variance', 'empirical_total_mass',
+                'log_background_total_mass', 'log_total_mass'}
+    require(type(case) is dict and set(case) == required, 'invalid_case_schema')
+    for name in required - {'empirical_probabilities', 'empirical_mean'}:
+        require(_number(case[name]), 'nonfinite_or_invalid_case_value')
+    home, away = source['observed_home'], source['observed_away']
+    require(type(home) is int and type(away) is int and min(home, away) >= 0
+            and home + away <= 200 and type(case['total']) is int and case['total'] == home + away,
+            'case_observation_mismatch')
+    a, b, total = case['empirical_fraction'], case['background_fraction'], case['total']
+    require(0 <= a < 1 and 0 < b <= 1 and abs(a + b - 1) <= 1e-12
+            and abs((1 - a) - b) <= 1e-12, 'invalid_case_mixture_fraction')
+    background_mean, background_variance = case['background_mean'], case['background_variance']
+    require(0 <= background_mean <= total and background_variance >= 0, 'invalid_case_background_moments')
+    expected_background_variance = 0. if total == 0 else background_mean * (1 - background_mean / total)
+    require(abs(background_variance - expected_background_variance) <= 1e-10, 'case_background_variance_mismatch')
+    probabilities = case['empirical_probabilities']
+    if a == 0:
+        require(probabilities is None and case['empirical_mean'] is None and case['empirical_variance'] == 0
+                and case['empirical_total_mass'] == 0 and b == 1, 'background_only_case_mismatch')
+        expected_mean, fixed, empirical_variance = background_mean, background_variance, 0.
+    else:
+        moments = conditional_moments(probabilities, total=total)
+        require(_number(case['empirical_mean']) and abs(case['empirical_mean'] - moments['mean']) <= 1e-10
+                and abs(case['empirical_variance'] - moments['variance']) <= 1e-10
+                and 0 < case['empirical_total_mass'] <= 1 + 1e-12, 'case_empirical_moments_mismatch')
+        expected_mean = a * moments['mean'] + b * background_mean
+        empirical_variance = moments['variance']
+        fixed = b * background_variance + a * b * (moments['mean'] - background_mean) ** 2
+        require(abs(math.exp(math.log(case['empirical_total_mass']) - case['log_total_mass']) - a) <= 1e-12,
+                'case_empirical_log_mass_mismatch')
+    require(abs(math.exp(case['log_background_total_mass'] - case['log_total_mass']) - b) <= 1e-12,
+            'case_background_log_mass_mismatch')
+    require(abs(case['conditional_mean'] - expected_mean) <= 1e-10
+            and abs(case['fixed_variance'] - fixed) <= 1e-10 and case['fixed_variance'] >= 0
+            and abs(case['conditional_variance'] - (fixed + a * empirical_variance)) <= 1e-10
+            and abs(case['squared_residual'] - (home - expected_mean) ** 2) <= 1e-10,
+            'case_home_residual_or_mixture_mismatch')
+
+
+def annual_receipt(family, variant, target_season, cutoff, expected_prior_games, sources, cases):
+    require((family, variant) in ORDINARY and type(target_season) is int and target_season in YEARS,
+            'invalid_annual_series_or_season')
+    require(_timestamp(cutoff).year == target_season, 'annual_cutoff_year_mismatch')
+    years = list(range(2013, target_season))
+    require(type(expected_prior_games) is dict and set(expected_prior_games) == set(years), 'incomplete_prior_seasons')
+    expected = []
+    for year in years:
+        games = expected_prior_games[year]
+        require(type(games) is list and len(games) == YEAR_COUNTS[year - 2013]
+                and all(type(game) is str and game for game in games) and len(games) == len(set(games)),
+                'incomplete_prior_season_population')
+        expected.extend((year, game) for game in games)
+    require(len(expected) == len(set(game for _, game in expected)), 'duplicate_expected_prior_game')
+    # Read only season before filtering. Later payloads/outcomes may be absent.
+    prior_sources = [row for row in sources if 2013 <= row['season'] < target_season]
+    source_by_key = {}
+    for row in prior_sources:
+        key = row['season'], row['game_id']
+        require(key not in source_by_key and (row['family'], row['variant']) == (family, variant)
+                and _hash(row['source_fingerprint']), 'invalid_or_duplicate_prior_source')
+        require(row['native_failure'] is None or (type(row['native_failure']) is str and row['native_failure']),
+                'invalid_native_failure_metadata')
+        require(family != 'N0' or row['native_failure'] is None, 'required_N0_native_failure')
+        source_by_key[key] = row
+    require(set(source_by_key) == set(expected), 'prior_source_membership_mismatch')
+    ordered_sources = [source_by_key[key] for key in expected]
+    closure = annual_case_sources(ordered_sources, target_season, cutoff, [game for _, game in expected])
+    prior_cases = [row for row in cases if 2013 <= row['season'] < target_season]
+    case_by_key = {}
+    for row in prior_cases:
+        key = row['season'], row['game_id']
+        require(key not in case_by_key and (row['family'], row['variant']) == (family, variant), 'invalid_or_duplicate_prior_case')
+        case_by_key[key] = row
+    success_keys = [key for key in expected if source_by_key[key]['native_failure'] is None]
+    require(set(case_by_key) == set(success_keys), 'native_success_case_membership_mismatch')
+    ordered_cases, case_sources = [], []
+    for key in success_keys:
+        row, source = case_by_key[key], source_by_key[key]
+        require(row['source_fingerprint'] == source['source_fingerprint']
+                and _hash(source['case_fingerprint']) and row['case_fingerprint'] == source['case_fingerprint']
+                and fingerprint(row['case']) == row['case_fingerprint'], 'case_source_fingerprint_mismatch')
+        require(type(row['weight']) in (int, float) and row['weight'] == 1, 'nonuniform_case_weight')
+        _case(row['case'], source)
+        ordered_cases.append(row['case'])
+        case_sources.append({'season': key[0], 'game_id': key[1], 'source_fingerprint': source['source_fingerprint'],
+                             'case_fingerprint': row['case_fingerprint'], 'weight': 1})
+    if target_season == 2013:
+        require(not expected and not success_keys, 'invalid_cold_start_support')
+        scale, status, estimator = 1., 'identity_no_prior_outer_support', None
+    elif len(success_keys) < 256:
+        scale, status, estimator = 1., 'identity_insufficient_native_support', None
+    else:
+        estimator = estimate_scale([case['empirical_probabilities'] for case in ordered_cases],
+                                   [case['empirical_fraction'] for case in ordered_cases],
+                                   [case['fixed_variance'] for case in ordered_cases],
+                                   [case['squared_residual'] for case in ordered_cases], [1.] * len(ordered_cases))
+        scale, status = estimator['s'], estimator['status']
+    receipt = {'version': VERSION, 'family': family, 'variant': variant, 'target_season': target_season,
+               'cutoff': cutoff, 'expected_count': closure['expected'], 'native_success_count': closure['native_success'],
+               'failed_count': closure['failed'], 'failed_keys': closure['failed_keys'],
+               'case_keys': closure['case_keys'], 'case_sources': case_sources,
+               'expected_population_sha256': fingerprint(expected_prior_games),
+               'input_digest': fingerprint({'sources': ordered_sources, 'cases': [case_by_key[key] for key in success_keys]}),
+               'status': status, 'estimator': estimator, 'scale': scale}
+    receipt = canonical(receipt)
+    receipt['sha256'] = fingerprint(receipt)
+    return receipt
+
+
+def _estimator_metadata(estimator):
+    fields = {'s', 'target_variance', 'clipped_target_variance', 'minimum_variance', 'original_variance',
+              'achieved_variance', 'status', 'target_below_minimum', 'target_above_original',
+              'steps', 'bracket', 'no_adjustable_variance'}
+    require(type(estimator) is dict and set(estimator) == fields, 'invalid_estimator_metadata')
+    for key in ('s', 'target_variance', 'clipped_target_variance', 'minimum_variance', 'original_variance', 'achieved_variance'):
+        require(_number(estimator[key]) and estimator[key] >= 0, 'nonfinite_or_negative_estimator_metadata')
+    for key in ('target_below_minimum', 'target_above_original', 'no_adjustable_variance'):
+        require(type(estimator[key]) is bool, 'invalid_estimator_flag')
+    target, minimum, maximum = estimator['target_variance'], estimator['minimum_variance'], estimator['original_variance']
+    clipped, achieved = estimator['clipped_target_variance'], estimator['achieved_variance']
+    status, bracket, steps = estimator['status'], estimator['bracket'], estimator['steps']
+    require(status in {'no_adjustable_variance', 'identity_upper_boundary', 'target_below_minimum',
+                       'minimum_variance_plateau', 'interior'}
+            and minimum <= maximum + 1e-10 and clipped == min(maximum, max(minimum, target))
+            and minimum - 1e-10 <= achieved <= maximum + 1e-10
+            and estimator['target_below_minimum'] is (target < minimum)
+            and estimator['target_above_original'] is (target > maximum)
+            and estimator['no_adjustable_variance'] is (status == 'no_adjustable_variance'),
+            'inconsistent_estimator_variance_metadata')
+    require(type(steps) is int and 0 <= steps <= 60 and type(bracket) is list and len(bracket) == 2
+            and all(_number(value) for value in bracket) and 0 <= bracket[0] <= bracket[1] <= 1
+            and estimator['s'] == bracket[0], 'invalid_estimator_bisection_metadata')
+    if status in ('no_adjustable_variance', 'identity_upper_boundary'):
+        require(estimator['s'] == 1 and bracket == [1., 1.] and steps == 0
+                and (abs(maximum - minimum) <= 1e-10 if status == 'no_adjustable_variance' else target >= maximum),
+                'inconsistent_estimator_identity_metadata')
+    else:
+        expected_status = 'target_below_minimum' if target < minimum else 'minimum_variance_plateau' if target == minimum else 'interior'
+        require(status == expected_status and target < maximum and steps > 0
+                and bracket[1] - bracket[0] <= 1e-12 and achieved <= clipped + 1e-10,
+                'inconsistent_estimator_crossing_metadata')
+
+
+def _receipt(receipt, family, variant, season, origin):
+    require(type(receipt) is dict and receipt['version'] == VERSION
+            and (receipt['family'], receipt['variant'], receipt['target_season']) == (family, variant, season)
+            and _timestamp(receipt['cutoff']).year == season
+            and _timestamp(receipt['cutoff']) <= origin, 'annual_receipt_identity_or_cutoff_mismatch')
+    require(_hash(receipt['sha256']) and receipt['sha256'] == fingerprint({key: value for key, value in receipt.items() if key != 'sha256'}),
+            'annual_receipt_digest_mismatch')
+    require(_hash(receipt['input_digest']) and _hash(receipt['expected_population_sha256']), 'invalid_annual_input_digest')
+    require(type(receipt['expected_count']) is int and receipt['expected_count'] == PRIOR_COUNTS[season - 2013]
+            and type(receipt['native_success_count']) is int and receipt['native_success_count'] >= 0
+            and type(receipt['failed_count']) is int and receipt['failed_count'] >= 0
+            and receipt['native_success_count'] + receipt['failed_count'] == receipt['expected_count']
+            and len(receipt['failed_keys']) == receipt['failed_count']
+            and len(receipt['case_keys']) == len(set(receipt['case_keys'])) == len(receipt['case_sources']) == receipt['native_success_count']
+            and [row['game_id'] for row in receipt['case_sources']] == receipt['case_keys'],
+            'annual_receipt_population_mismatch')
+    require(family != 'N0' or receipt['failed_count'] == 0, 'required_N0_native_failure')
+    for row in receipt['case_sources']:
+        require(type(row) is dict and set(row) == {'season', 'game_id', 'source_fingerprint', 'case_fingerprint', 'weight'}
+                and type(row['season']) is int and 2013 <= row['season'] < season
+                and type(row['game_id']) is str and row['game_id']
+                and _hash(row['source_fingerprint']) and _hash(row['case_fingerprint'])
+                and type(row['weight']) in (int, float) and row['weight'] == 1, 'invalid_receipt_case_source')
+    failed_keys = []
+    for row in receipt['failed_keys']:
+        require(type(row) is dict and set(row) == {'game_id', 'reason'} and type(row['game_id']) is str
+                and row['game_id'] and type(row['reason']) is str and row['reason'], 'invalid_receipt_failure_source')
+        failed_keys.append(row['game_id'])
+    require(len(failed_keys) == len(set(failed_keys)) and not set(failed_keys) & set(receipt['case_keys']),
+            'overlapping_or_duplicate_receipt_failure_keys')
+    require(type(receipt['scale']) is float and math.isfinite(receipt['scale']) and 0 <= receipt['scale'] <= 1,
+            'invalid_annual_scale')
+    if receipt['estimator'] is not None:
+        _estimator_metadata(receipt['estimator'])
+        require(receipt['native_success_count'] >= 256 and receipt['scale'] == receipt['estimator']['s']
+                and receipt['status'] == receipt['estimator']['status'],
+                'annual_estimator_result_mismatch')
+    else:
+        status = 'identity_no_prior_outer_support' if season == 2013 else 'identity_insufficient_native_support'
+        require(receipt['scale'] == 1 and receipt['status'] == status and receipt['native_success_count'] < 256,
+                'invalid_annual_identity')
+    return receipt
+
+
+def _source(sources, family, variant, season, origin_at, game_id=None):
+    require((family, variant) in sources, 'required_source_missing')
+    source = sources[family, variant]
+    require(type(source) is dict and set(source) == {'family', 'variant', 'season', 'game_id', 'origin_at',
+                                                    'kickoff_at', 'native_failure', 'source_fingerprint', 'distribution'},
+            'invalid_pregame_source_fields')
+    require((source['family'], source['variant'], source['season'], source['origin_at']) == (family, variant, season, origin_at)
+            and type(source['game_id']) is str and source['game_id']
+            and (game_id is None or game_id == source['game_id'])
+            and _timestamp(origin_at) < _timestamp(source['kickoff_at']), 'pregame_source_identity_mismatch')
+    require(source['native_failure'] is None or (type(source['native_failure']) is str and source['native_failure']),
+            'invalid_native_failure_metadata')
+    distribution = source['distribution']
+    require(distribution.independent is (variant == 'independent_marginals'), 'raw_source_independence_mismatch')
+    actual = distribution_fingerprint(replace(distribution, independent=False))
+    require(source['source_fingerprint'] == actual, 'pregame_source_fingerprint_mismatch')
+    if family == 'N0':
+        require(source['native_failure'] is None, 'required_N0_native_failure')
+    return source
+
+
+def predict(family, variant, target_season, origin_at, sources, annual_receipts):
+    require((family, variant) in SERIES and type(target_season) is int and target_season in YEARS,
+            'invalid_prediction_series_or_season')
+    origin = _timestamp(origin_at)
+    requested = _source(sources, family, variant, target_season, origin_at)
+    ordinary_variant = 'full' if variant == 'independent_marginals' else variant
+    full = requested if ordinary_variant == variant else _source(sources, family, 'full', target_season, origin_at, requested['game_id'])
+    if variant == 'independent_marginals':
+        require(requested['source_fingerprint'] == full['source_fingerprint']
+                and requested['native_failure'] == full['native_failure'], 'independence_full_source_mismatch')
+    chosen_family, chosen_variant, chosen = family, ordinary_variant, full
+    if full['native_failure'] is not None:
+        require(family == 'E2', 'required_N0_native_failure')
+        chosen_family = 'N0'
+        chosen_variant = ordinary_variant if ('N0', ordinary_variant) in ORDINARY else 'full'
+        chosen = _source(sources, chosen_family, chosen_variant, target_season, origin_at, requested['game_id'])
+        require(chosen['source_fingerprint'] == full['source_fingerprint'], 'fallback_source_binding_mismatch')
+    require((chosen_family, chosen_variant) in annual_receipts, 'required_annual_receipt_missing')
+    receipt = _receipt(annual_receipts[chosen_family, chosen_variant], chosen_family, chosen_variant, target_season, origin)
+    mapped, transform = transform_distribution(chosen['distribution'], receipt['scale'])
+    operation = None
+    if variant == 'independent_marginals':
+        mapped, operation = independent_control(mapped, transform)
+    provenance = {'version': VERSION, 'family': family, 'variant': variant, 'target_season': target_season,
+                  'origin_at': origin_at, 'game_id': requested['game_id'], 'native_failure': requested['native_failure'],
+                  'requested_source_fingerprint': requested['source_fingerprint'],
+                  'chosen_source': {'family': chosen_family, 'variant': chosen_variant, 'game_id': chosen['game_id'],
+                                    'source_fingerprint': chosen['source_fingerprint']},
+                  'annual_receipt_sha256': receipt['sha256'], 'transformation': transform, 'product_operation': operation}
+    provenance['sha256'] = fingerprint(provenance)
+    return mapped, provenance

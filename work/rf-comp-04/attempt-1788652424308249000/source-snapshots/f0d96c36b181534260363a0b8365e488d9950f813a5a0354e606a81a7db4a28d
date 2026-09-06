@@ -1,0 +1,200 @@
+{
+  "version": "rf02f.archive-unit-acceptance.v1",
+  "status": "accepted_synthetic_archive_forecast_grader_and_selector_boundaries_only",
+  "createdAt": "2026-09-05T13:29:29.570425+00:00",
+  "scope": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-ARCHIVE-UNIT-SCOPE.v1.md",
+    "sha256": "018b5557860ad0b58155e69fa201fff682758fc5519d785e03a5583d2da13ff5",
+    "bytes": 5632
+  },
+  "protocolAcceptance": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-PROTOCOL-ACCEPTANCE.v1.json",
+    "sha256": "c55f4e651bb9726402ac310b3bc06b2337cd58523aaa0e2ee7496fb847fc554b",
+    "bytes": 5703
+  },
+  "protocol": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md",
+    "sha256": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16",
+    "bytes": 26126
+  },
+  "machineRegistry": {
+    "path": "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score-split.v1.json",
+    "sha256": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519",
+    "bytes": 13887
+  },
+  "sourceAndTests": [
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_archive.py",
+      "sha256": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+      "bytes": 44888
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/test_archive_unit.py",
+      "sha256": "510c10f77c194dcb5c9591404c5238f43f494659aa96a247db0013ffd3f2969e",
+      "bytes": 29641
+    }
+  ],
+  "priorUnitAcceptances": [
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-MEAN-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "61c448d59a30be43ccc15faf447d78f3be9e420cc83baf6a991aa5e3fa61101a",
+      "bytes": 3693
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/.planning/engine-os/research-first/RF-02F-BANK-UNIT-ACCEPTANCE.v1.json",
+      "sha256": "c4f252cd9bc053df019308cfebf5d70f0ca0287ee38bae7cdf2738033f978268",
+      "bytes": 4459
+    }
+  ],
+  "reusedDependencyPins": [
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/config/research-team-score.v2.json",
+      "sha256": "422b1082361a2d0d926f639c8cf67b38615517a8269a7f05729aea0c8f264615",
+      "bytes": 6517
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_admission.py",
+      "sha256": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+      "bytes": 32322
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_adapter.py",
+      "sha256": "a6987485724c7f725661927e194ca39d77b303e15d868b872d3b9449a7cc19f2",
+      "bytes": 13999
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_compute_run.py",
+      "sha256": "7089fc64b6464dadfddb4796059a975afe7f1fd43730420d8d8193d67104208f",
+      "bytes": 24724
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_contract.py",
+      "sha256": "9b945dd445f567e410fee76c62a1e4058c7aac42b8362b4683eea7118c90ae34",
+      "bytes": 8198
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_models.py",
+      "sha256": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd",
+      "bytes": 15069
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_replay.py",
+      "sha256": "62a5aeee637979518238c591252a3b4d5e43dcaf6fd47f69a4fe315bac79b594",
+      "bytes": 6657
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_run.py",
+      "sha256": "26e9f8a3e33ef68ed125fed2d0db4050b3e5bdda508daaabcc7e2f6a2f2764fa",
+      "bytes": 27993
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_successor_distribution.py",
+      "sha256": "abf317c8a34f5e4f4043345912385a00ee99683ecfeba2ad0f83eafb54b9d974",
+      "bytes": 4148
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_distribution.py",
+      "sha256": "aaa557304054788603f29d56a11fa7e4fe98d3f32b7e699c7f9919f8d7b41ba1",
+      "bytes": 13532
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_models.py",
+      "sha256": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+      "bytes": 4803
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_replay.py",
+      "sha256": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547",
+      "bytes": 4538
+    },
+    {
+      "path": "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_conditional_run.py",
+      "sha256": "2d817be3992a819f9e5c3c509dece39e3349fff8a65acdeb053426a6b826a343",
+      "bytes": 52750
+    }
+  ],
+  "authorEvidence": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/author-qualification-final.json",
+    "sha256": "96ef83482c61548d12f6d395d7be139290db113866d6357e753fb2965ab256c2",
+    "bytes": 6564
+  },
+  "independentNumericalReview": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/numerical-review-final.json",
+    "sha256": "8026c29bbe71ba07442bd6d39d325dd57016dcfabfac81b35231cc73c1672109",
+    "bytes": 3305
+  },
+  "independentRootTemporalEvidence": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-review.py",
+      "sha256": "75884a3bda9ec8414bcc5ed9b2f4800eaa3a1e50a264df17603487d1f8ee3b9c",
+      "bytes": 9246
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-review.json",
+      "sha256": "8a06e327903c8b9f0c22d50e59081e2791bdd8054f165b47dddb44fa6d7bfd1b",
+      "bytes": 2134
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-review.log",
+      "sha256": "8a06e327903c8b9f0c22d50e59081e2791bdd8054f165b47dddb44fa6d7bfd1b",
+      "bytes": 2134
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-process.json",
+      "sha256": "5e59efbd3470fdeebaa488923e8f303f57c21a3083eced46dab58ea5a797c03b",
+      "bytes": 275
+    }
+  ],
+  "preservedFailedEvidence": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/numerical-review.json",
+      "sha256": "e96d3b23f2d9c59c1f7691c0d7e57a60c6a95bc8ec53e9e54ff47de8c732bc6d",
+      "bytes": 3351
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-attempt-1.py",
+      "sha256": "b4a11738d8f1425d517f1a0480c4b6b06185879676364cb047030af79a48337f",
+      "bytes": 9026
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-attempt-1-review.log",
+      "sha256": "902eb9c6f8b89e8234129111adebff577b5f563a143fde29ced7359169ed62e4",
+      "bytes": 375
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-attempt-1-process.json",
+      "sha256": "307b34fad38c684bd04cb9556db3d966b64e02facca9c81b734725c93133a041",
+      "bytes": 272
+    }
+  ],
+  "observed": {
+    "authorTests": 19,
+    "authorCompleteProcessSeconds": 1.487489374994766,
+    "authorPeakRssMiB": 120.21875,
+    "authorAllSixAttemptProcessSeconds": 8.216926207984216,
+    "independentTests": 19,
+    "independentOuterPublicProbe": {
+      "diagonalStates": 81,
+      "rawReferenceRows": 12,
+      "E2VariantRows": 22,
+      "diagonalReceiptRows": 18
+    },
+    "rootDistinctTemporalChecks": 9,
+    "rootCompleteProcessSeconds": 0.6129225409968058,
+    "rootPeakRssMiB": 97.578125,
+    "rootPreservedFailedProcessSeconds": 0.6360737909999443
+  },
+  "learning": "Independent actual SourceContext roundtrip exposed sorted configuration keys changing model iteration order; exact original authenticated configuration bytes now survive context serialization. Helpers alone had missed the composition failure. Root probe accessor correction affected reviewer code only; all failures retained.",
+  "limits": [
+    "Acceptance permits composing this unit into controller qualification only. No actual production admit_source,1909-file read or historical RF-02F fit/score/bootstrap occurred.",
+    "Author and numerical RSS are measured peaks, not kernel-enforced limits; root also externally sampled RSS and wall time. Tiny fixtures do not demonstrate277-origin compatibility or7200-second historical feasibility.",
+    "Existing tiny outer fixtures use synthetic deterministic-noise fits; metrics are explicit schema fixtures, not new scientific score evidence.",
+    "Owning Store callback controls actual durable index authority; archive validates returned bytes, expected manifest/origin/member order. Controller must qualify distribution recipes, complete state/lineage publication, new metrics/fallback, own chronology and all-source/runtime chain.",
+    "Private Python seals guard accidental misuse, not arbitrary introspection. Retrospective temporal ordering does not prove contemporaneous original issuance.",
+    "Runtime/accounting helpers and complete historical controller remain unaccepted. Separate complete numerical and temporal pre-fit review plus fresh gate are still required."
+  ],
+  "historicalFitAuthorized": false,
+  "predictiveAcceptance": false,
+  "productionAuthorization": false,
+  "researchDetailsPublic": false
+}

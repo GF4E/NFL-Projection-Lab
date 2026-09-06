@@ -1,0 +1,121 @@
+import copy
+import sys
+from pathlib import Path
+import unittest
+from unittest.mock import patch
+import json
+import numpy as np
+from dataclasses import replace
+
+sys.path.insert(0,str(Path(__file__).resolve().parents[2]/'scripts'))
+import research_score_successor_qualify as q
+
+
+class QualificationTests(unittest.TestCase):
+    def successor_fixture(self):
+        root=Path('/synthetic')
+        source=b'old source';spec=b'frozen protocol';base=b'base config'
+        config={'oldSourceHashes':{'old.py':q.digest(source)},'baseConfig':{'path':'base.json','sha256':q.digest(base)},
+                'specification':{'path':'protocol.md','sha256':q.digest(spec)}}
+        configraw=q.encoded(config)
+        receipt={'result':'accepted_for_implementation_only','implementationAuthorized':True,
+                 'configSha256':q.digest(configraw),'protocolSha256':q.digest(spec)}
+        raw=q.encoded(receipt)
+        files={root/q.ACCEPTANCE:raw,root/q.CONFIG:configraw,root/'old.py':source,root/'base.json':base,root/'protocol.md':spec}
+        return root,files,q.digest(raw)
+
+    def test_changed_successor_bindings_refused_before_fitting(self):
+        root,files,anchor=self.successor_fixture()
+        with patch.object(q,'read_regular',side_effect=lambda p:files[p]),patch.object(q,'ACCEPTANCE_SHA',anchor):
+            q.load_successor(root)
+        for changed in files:
+            corrupted=dict(files);corrupted[changed]+=b'x'
+            with patch.object(q,'read_regular',side_effect=lambda p:corrupted[p]),patch.object(q,'ACCEPTANCE_SHA',anchor):
+                with self.assertRaisesRegex(ValueError,'frozen_bytes_mismatch'):q.load_successor(root)
+
+    def archive_fixture(self):
+        root=Path('/synthetic-archive')
+        files={'manifest.json':q.encoded({'code_hashes':{}}),'state.json':b'{}'}
+        index={'files':{name:{'sha256':q.digest(raw),'bytes':len(raw)} for name,raw in files.items()}}
+        indexraw=q.encoded(index)
+        config={'oldRunDirectory':str(root),'oldArtifactIndexSha256':q.digest(indexraw),
+                'oldManifestSha256':q.digest(files['manifest.json']),'oldSourceHashes':{},
+                'corpus':{'indexedFiles':len(files),'indexedBytes':sum(map(len,files.values()))}}
+        files['artifact-index.json']=indexraw
+        return config,{root/name:raw for name,raw in files.items()}
+
+    def test_archive_bytes_members_and_totals_fail_closed(self):
+        config,files=self.archive_fixture()
+        with patch.object(q,'read_regular',side_effect=lambda p:files[p]):q.read_archive(config)
+        for field in ('indexedFiles','indexedBytes'):
+            changed=copy.deepcopy(config);changed['corpus'][field]+=1
+            with patch.object(q,'read_regular',side_effect=lambda p:files[p]):
+                with self.assertRaisesRegex(ValueError,'old_index_.*mismatch'):q.read_archive(changed)
+        for name in files:
+            changed=dict(files);changed[name]+=b'x'
+            with patch.object(q,'read_regular',side_effect=lambda p:changed[p]):
+                with self.assertRaisesRegex(ValueError,'frozen_bytes_mismatch'):q.read_archive(config)
+        changed=dict(files);del changed[Path('/synthetic-archive/state.json')]
+        with patch.object(q,'read_regular',side_effect=lambda p:changed[p]):
+            with self.assertRaises(KeyError):q.read_archive(config)
+
+    def test_corrupt_hash_or_size_refused(self):
+        raw=b'fixed bytes'
+        self.assertEqual(q.bound_bytes(raw,q.digest(raw),'fixture',len(raw)),raw)
+        for value,sha,size in ((raw+b'x',q.digest(raw),len(raw)+1),(raw,'0'*64,len(raw)),(raw,q.digest(raw),1)):
+            with self.assertRaisesRegex(ValueError,'frozen_bytes_mismatch'):
+                q.bound_bytes(value,sha,'fixture',size)
+
+    def test_nonfinite_distribution_and_scores_refused(self):
+        fit=q.JointBase.from_scores([[7,10],[28,21]],[1,1]).fit([18,23])
+        for name,value in (('theta',np.array([np.nan,0.])),('alpha',np.full_like(fit.alpha,np.nan)),
+                           ('beta',np.nan),('rates',np.array([np.nan,1.])),('iterations',-1),('iterations',.5)):
+            with self.assertRaises(ValueError):q.check_fit(replace(fit,**{name:value}),np.array([18,23]))
+        with patch.object(fit,'moments',return_value=(np.array([18.,23.]),np.full((2,2),np.nan))):
+            with self.assertRaises(ValueError):q.check_fit(fit,np.array([18,23]))
+        scores={name:np.nan for name in ('joint_energy_score','joint_nll','home_crps','away_crps','margin_crps','total_crps')}
+        with patch.object(q,'score_forecast',return_value=scores):
+            with self.assertRaisesRegex(ValueError,'nonfinite_proper_score'):q.proper_score_difference(fit,fit,[7,10],'fixture')
+
+    def fixture_state(self):
+        return {'origin':{'targetGameIds':['game']},'trajectory_state':[
+            {'key':[f,j,'full'],'output':{'forecasts':[{'game_id':'game','mean':[20,21],'failure':None}]}}
+            for f,count in q.FAMILY_COUNTS for j in range(count)]}
+
+    def test_state_missing_duplicate_failure_and_extra_refused(self):
+        state=self.fixture_state();self.assertEqual(len(q.state_rows(state)),43)
+        variants=[]
+        a=copy.deepcopy(state);a['trajectory_state'].pop();variants.append(a)
+        a=copy.deepcopy(state);a['trajectory_state'].append(a['trajectory_state'][0]);variants.append(a)
+        a=copy.deepcopy(state);a['trajectory_state'][0]['output']['forecasts'][0]['failure']='changed';variants.append(a)
+        a=copy.deepcopy(state);a['trajectory_state'][0]['output']['forecasts'][0]['game_id']='extra';variants.append(a)
+        for a in variants:
+            with self.assertRaises(ValueError):q.state_rows(a)
+
+    def test_old_order_has_43_calls_per_game(self):
+        state=self.fixture_state()
+        keys=list(q.ordered_keys(state))
+        self.assertEqual(keys[0],('N0',0,'game'))
+        self.assertEqual(keys[-1],('E2',8,'game'))
+        self.assertEqual(keys[7],('E1',0,'game'))
+
+    def test_changed_counts_refused(self):
+        expected={'successes':12529,'allOccurrences':12557}
+        q.validate_counts(expected,expected)
+        for key in expected:
+            changed=dict(expected);changed[key]-=1
+            with self.assertRaisesRegex(ValueError,'complete_corpus_count_mismatch'):q.validate_counts(changed,expected)
+
+    def test_publication_order_duplicates_and_fatal_boundary(self):
+        state=self.fixture_state()
+        records=[{'family':f,'setting':j,'game_id':g,'distribution':{'mapper':{'name':'mapper.json','sha256':q.digest(b'{}')}},'native_failure':None}
+                 for f,j,g in q.ordered_keys(state)]
+        for changed in (records[::-1],records+[records[0]],records[:-1]):
+            files={'state-2011-01.json':q.encoded(state),'forecasts-2011-01.json':q.encoded({'full_setting_forecasts':changed,'outer_selected_forecasts':[]})}
+            with self.assertRaisesRegex(ValueError,'published_order_or_population_mismatch'):list(q.corpus_calls(files))
+        files={'state-2011-08.json':q.encoded(state),q.FATAL_MAPPER:b'{}'}
+        with patch.object(q,'bound_bytes',side_effect=lambda raw,*args:raw):
+            with self.assertRaisesRegex(ValueError,'fatal_order_boundary_missing'):list(q.corpus_calls(files))
+
+
+if __name__=='__main__': unittest.main()

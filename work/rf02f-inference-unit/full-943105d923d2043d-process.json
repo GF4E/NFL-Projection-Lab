@@ -1,0 +1,38 @@
+{
+  "command": [
+    "/opt/anaconda3/bin/python3.12",
+    "-I",
+    "/private/tmp/os01-gen15-rebuild.9ny71k/tests/research-score-split/qualify_inference_unit.py",
+    "--output",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d"
+  ],
+  "source_hashes": {
+    "scripts/research_score_split_inference.py": "ebf52e5e294d21fd37687003d808410f143679760ca771d5b01e91cd05c55c22",
+    "tests/research-score-split/test_inference_unit.py": "6678ff40c73b2d5c493cd22d6e2321f7d9edb2d6d5b0a1241c29420c33e9040d",
+    "tests/research-score-split/qualify_inference_unit.py": "bdc7016088a8e094e1c4c023e962b0be4935065d5f63df0c9c11e1bf6ef824d3"
+  },
+  "exit_code": 0,
+  "external_wall_seconds_including_setup": 121.4608799169946,
+  "peak_rss_mib": 719.953125,
+  "observed_peak_rss_mib": 709.859375,
+  "limit_failure": null,
+  "wall_limit_seconds": 600,
+  "rss_limit_mib": 4096,
+  "log_path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d.log",
+  "log_sha256": "c077f7608ff0fc78169ae903c82a6af63cdb58aaf5a96103a42b98de93c7eeb3",
+  "qualification_directory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-inference-unit/full-943105d923d2043d",
+  "source_hashes_unchanged": true,
+  "scope": "sole full synthetic real scorer/durable JSON/public evaluator qualification; no historical execution",
+  "fixture-manifest.json": {
+    "sha256": "22bd22dcb3b08218385fab0ddb52471d178f31e9ca84bf9fa202d09c96d9354d",
+    "bytes": 380428
+  },
+  "evaluation.json": {
+    "sha256": "caeda7fa5f04c1fbfc2bedd8fcb8a8bc4bfec6631222f4ee0665ddee9e081352",
+    "bytes": 10725042
+  },
+  "qualification.json": {
+    "sha256": "19f64845ee65da9631049a218aa19c3379dae873e164bd193a8bde2c874d2eeb",
+    "bytes": 1549
+  }
+}

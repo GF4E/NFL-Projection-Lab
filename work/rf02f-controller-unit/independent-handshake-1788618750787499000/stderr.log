@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "<string>", line 6, in <module>
+  File "/opt/anaconda3/lib/python3.12/contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "/private/tmp/os01-gen15-rebuild.9ny71k/scripts/research_score_split_controller.py", line 73, in complete_smoke
+    self._whole_smoke_deadline = phase['smoke_started'] + 120.
+                                 ~~~~~^^^^^^^^^^^^^^^^^
+TypeError: 'NoneType' object is not subscriptable

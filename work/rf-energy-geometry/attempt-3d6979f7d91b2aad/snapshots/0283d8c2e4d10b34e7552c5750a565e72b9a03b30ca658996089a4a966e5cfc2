@@ -1,0 +1,145 @@
+import sys
+from pathlib import Path
+import unittest
+from unittest.mock import patch
+import numpy as np
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts'))
+from research_score_successor_distribution import JointBase, NumericalFailure, residual_slope
+from research_score_distribution import JointDistribution, energy_score, crps
+import research_score_successor_distribution as successor
+from research_score_run import distribution_descriptor
+
+
+SCORES = [[7, 10], [14, 21], [28, 17], [31, 24], [0, 3], [21, 21]]
+WEIGHTS = [1, 2, 1, 3, 1, 2]
+
+
+class SolverTests(unittest.TestCase):
+    def assert_equivalent(self, left, right):
+        """Apply every frozen continuous and discrete gate to synthetic probes."""
+        np.testing.assert_array_equal(left.atoms, right.atoms)
+        for name, tolerance in (('theta', 1e-7), ('alpha', 1e-8), ('beta', 1e-8), ('rates', 1e-5)):
+            np.testing.assert_allclose(getattr(left, name), getattr(right, name), atol=tolerance, rtol=0)
+        for index, tolerance in ((0, 2e-7), (1, 1e-5)):
+            np.testing.assert_allclose(left.moments()[index], right.moments()[index], atol=tolerance, rtol=0)
+        shape = np.maximum(left.grid().probability.shape, right.grid().probability.shape)
+        left_grid, right_grid = left.grid(cells=shape), right.grid(cells=shape)
+        self.assertLessEqual(float(np.abs(left_grid.probability-right_grid.probability).sum()), 1e-7)
+        for observed in SCORES:
+            self.assertLessEqual(abs(energy_score(left_grid, observed)-energy_score(right_grid, observed)), 1e-6)
+            self.assertLessEqual(abs(left.log_probability(*observed)-right.log_probability(*observed)), 1e-6)
+            for target, outcome in zip(('home', 'away', 'margin', 'total'),
+                                       (observed[0], observed[1], observed[0]-observed[1], sum(observed))):
+                self.assertLessEqual(abs(crps(left_grid, target, outcome)-crps(right_grid, target, outcome)), 1e-6)
+        for target in ('home', 'away', 'margin', 'total'):
+            for probability in (.025, .1, .25, .75, .9, .975):
+                self.assertEqual(left.quantile(target, probability)[0], right.quantile(target, probability)[0])
+
+    def test_extremes_swap_order_and_determinism(self):
+        base = JointBase.from_scores(SCORES, WEIGHTS)
+        reordered = JointBase.from_scores(SCORES[::-1], WEIGHTS[::-1])
+        for mu in ([18,23], [7,9], [35,38], [.5,1.5], [60,8], [1e-4,1e-4], [100,100], [.01,100]):
+            with self.subTest(mu=mu):
+                fit, swap, order = base.fit(mu), base.fit(mu[::-1]), reordered.fit(mu)
+                for distribution, requested in ((fit, mu), (swap, mu[::-1]), (order, mu)):
+                    np.testing.assert_allclose(distribution.moments()[0], requested, atol=1e-7, rtol=0)
+                    self.assertLessEqual(distribution.iterations, 100)
+                    self.assertTrue(np.all(np.isfinite(distribution.moments()[1])))
+                    self.assertGreater(np.linalg.eigvalsh(distribution.moments()[1]).min(), 0)
+                    self.assertLessEqual(abs(float(distribution.alpha.sum()+distribution.beta)-1), 1e-10)
+                    distribution.grid()
+                swapped_atoms = swap.atoms[:, ::-1]
+                permutation = np.lexsort((swapped_atoms[:, 1], swapped_atoms[:, 0]))
+                canonical_swap = JointDistribution(swapped_atoms[permutation], swap.alpha[permutation],
+                                                   swap.beta, swap.rates[::-1], swap.theta[::-1], swap.iterations)
+                self.assert_equivalent(fit, canonical_swap)
+                self.assert_equivalent(fit, order)
+                self.assertEqual(distribution_descriptor(fit, {}), distribution_descriptor(base.fit(mu), {}))
+
+    def test_invalid_means_and_iteration_budget(self):
+        base = JointBase.from_scores(SCORES, WEIGHTS)
+        for mu in ([0,2],[-1,2],[np.nan,2],[np.inf,2],[1]):
+            with self.assertRaises(NumericalFailure): base.fit(mu)
+        for budget in (0,101,-1):
+            with self.assertRaises(NumericalFailure): base.fit([18,23], maximum_iterations=budget)
+        with self.assertRaises(NumericalFailure): base.fit([1e6,1e6]).grid()
+
+    def test_scaled_direction_derivative(self):
+        g=np.array([100.,-20.]); c=np.diag([2.,4.])
+        d=np.linalg.solve(c,-g); d*=2/np.max(np.abs(d))
+        self.assertEqual(residual_slope(g,c,d), float(g@c@d))
+        self.assertNotEqual(residual_slope(g,c,d), -float(g@g))
+
+    def test_exhaustion_and_nonpositive_hessian(self):
+        base=JointBase.from_scores(SCORES, WEIGHTS)
+        original=base.components
+        initial=original(np.zeros(2))
+        def plateau(theta):
+            values=list(initial); values[0]=1e16+float(np.asarray(theta)@np.array([18.,23.]))
+            return tuple(values)
+        with patch.object(base,'components',side_effect=plateau):
+            with self.assertRaisesRegex(NumericalFailure,'line_search_failed'): base.fit([18,23])
+        def nonfinite_trial(theta):
+            if np.any(theta): raise NumericalFailure('nonfinite_number')
+            return initial
+        with patch.object(base,'components',side_effect=nonfinite_trial):
+            with self.assertRaisesRegex(NumericalFailure,'line_search_failed'): base.fit([18,23])
+        broken=list(initial); broken[-1]=-np.eye(2)
+        with patch.object(base,'components',return_value=tuple(broken)):
+            with self.assertRaisesRegex(NumericalFailure,'non_positive_hessian'): base.fit([18,23])
+
+    def test_rounded_objective_uses_residual_progress(self):
+        base=JointBase.from_scores(SCORES, WEIGHTS)
+        original=base.components
+        requested=np.array([18.,23.])
+        def rounded(theta):
+            result=list(original(theta))
+            result[0]=1e16+float(np.asarray(theta)@requested)
+            return tuple(result)
+        with patch.object(base,'components',side_effect=rounded):
+            fit=base.fit(requested)
+        np.testing.assert_allclose(fit.moments()[0], requested, atol=1e-7, rtol=0)
+
+    def test_exhausted_objective_search_recovers_using_residual_search(self):
+        base = JointBase.from_scores(SCORES, WEIGHTS)
+        original = base.components
+        requested = np.array([18., 23.])
+        def reject_initial_objective_trials(theta):
+            values = list(original(theta))
+            values[0] = float(np.asarray(theta) @ requested) + (1. if np.any(theta) else 0.)
+            return tuple(values)
+        with patch.object(base, 'components', side_effect=reject_initial_objective_trials), \
+                patch.object(successor, 'residual_slope', wraps=residual_slope) as fallback:
+            fit = base.fit(requested)
+        self.assertGreaterEqual(fallback.call_count, 1)
+        np.testing.assert_allclose(fit.moments()[0], requested, atol=1e-7, rtol=0)
+        self.assertLessEqual(fit.iterations, 100)
+        fit.grid()
+
+    def test_representational_theta_no_op_fails_closed(self):
+        base = JointBase.from_scores(SCORES, WEIGHTS)
+        initial = base.components(np.zeros(2))
+        requested = np.array([18., 23.])
+        visited = []
+        def force_no_op_after_first_move(theta):
+            theta = np.asarray(theta)
+            visited.append(theta.copy())
+            values = list(initial)
+            at_start = np.array_equal(theta, np.zeros(2))
+            values[0] = float(theta @ requested) + (0. if at_start else -1.)
+            values[4] = requested - 1. if at_start else requested + 1e-6
+            values[5] = np.eye(2) * (1. if at_start else 1e20)
+            return tuple(values)
+        with patch.object(base, 'components', side_effect=force_no_op_after_first_move), \
+                patch.object(successor, 'residual_slope', wraps=residual_slope) as fallback:
+            with self.assertRaisesRegex(NumericalFailure, 'line_search_failed'):
+                base.fit(requested)
+        self.assertEqual(fallback.call_count, 1)
+        gradient, covariance, direction = fallback.call_args.args
+        np.testing.assert_array_equal(np.ones(2) + direction, np.ones(2))
+        self.assertGreater(float(np.max(np.abs(gradient))), 1e-7)
+        self.assertGreaterEqual(sum(np.array_equal(theta, np.ones(2)) for theta in visited), 3)
+
+
+if __name__ == '__main__': unittest.main()

@@ -1,0 +1,50 @@
+{
+  "candidate": {
+    "events": [
+      "assembly"
+    ],
+    "images": [],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": [
+      {
+        "mode": "supported"
+      },
+      {
+        "mode": "supported"
+      }
+    ]
+  },
+  "expected_decision": true,
+  "expected_modes": null,
+  "kind": "paired_value",
+  "label": "numpy-object-array",
+  "original": {
+    "events": [
+      "assembly"
+    ],
+    "images": [
+      {
+        "ascii_body": "[\n  {\n    \"a\": 1\n  },\n  [\n    2,\n    3\n  ]\n]\n",
+        "bytes": 45,
+        "sha256": "4e5a5e0f73c75c75d59ff11c97eff41cfdf90db42e9d03723ec6e304c2cf2212"
+      },
+      {
+        "ascii_body": "[\n  {\n    \"a\": 1\n  },\n  [\n    2,\n    3\n  ]\n]\n",
+        "bytes": 45,
+        "sha256": "4e5a5e0f73c75c75d59ff11c97eff41cfdf90db42e9d03723ec6e304c2cf2212"
+      }
+    ],
+    "outcome": {
+      "kind": "decision",
+      "type": "bool",
+      "value": true
+    },
+    "snapshots": []
+  },
+  "reproducer": "frozen test method and label; independently constructed route inputs",
+  "test": "test_bank_snapshot.SnapshotTests.test_numpy_array_list_tuple_canonical_equivalence"
+}

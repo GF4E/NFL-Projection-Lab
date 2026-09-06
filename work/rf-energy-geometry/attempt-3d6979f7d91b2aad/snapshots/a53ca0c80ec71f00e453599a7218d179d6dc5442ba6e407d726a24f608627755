@@ -1,0 +1,260 @@
+import ast
+import copy
+import json
+from pathlib import Path
+import sys
+import tempfile
+import unittest
+from unittest import mock
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
+import research_score_successor_run as runner
+
+
+class SuccessorRunTests(unittest.TestCase):
+    def fixture(self, parent):
+        root = parent / "checkout"
+        (root / Path(runner.ANCHOR_PATH).parent).mkdir(parents=True)
+        output_parent = parent / "research-data"
+        output_parent.mkdir()
+        codes = {name: runner.digest(name.encode()) for name in runner.CODE_FILES + runner.TEST_FILES}
+        old_sources = {name: codes[name] for name in runner.legacy.CODE_FILES}
+        bindings = {"acceptance": "a" * 64, "config": "b" * 64, "specification": "c" * 64}
+        runtime = {"isolatedMode": True, "modelWorkers": 1}
+        config = json.loads(runner.read_regular(ROOT / "config/research-team-score-successor.v1.json"))
+        config["oldSourceHashes"] = old_sources
+        counts = {key: value for key, value in config["corpus"].items() if key not in {"indexedFiles", "indexedBytes"}}
+        manifest = {"version": "rf02s-qualification.v1", "bindings": bindings, "runtime": runtime,
+                    "oldSourceHashes": old_sources,
+                    "codeHashes": {name: codes[name] for name in runner.QUALIFICATION_CODE_FILES},
+                    "oldManifestSha256": config["oldManifestSha256"],
+                    "oldArtifactIndexSha256": config["oldArtifactIndexSha256"],
+                    "footballFits": 0, "providerRequests": 0, "productionAuthorized": False}
+        manifest_raw = runner.encoded(manifest)
+        directory = output_parent / ("rf02s-qualification-v1-" + runner.digest(manifest_raw)[:16])
+        directory.mkdir()
+        artifacts = {"manifest.json": manifest_raw,
+                     "terminal-decision.json": runner.encoded({"status": "qualified", "qualificationFailures": 0,
+                        "footballFits": 0, "productionAuthorized": False, "counts": counts, "repairedFailures": 28}),
+                     "occurrence-ledger.json": runner.encoded([]), "equivalence.json": runner.encoded({})}
+        for name, raw in artifacts.items():
+            (directory / name).write_bytes(raw)
+        index_raw = runner.encoded({"files": {name: {"sha256": runner.digest(raw), "bytes": len(raw)}
+                                             for name, raw in artifacts.items()}})
+        (directory / "artifact-index.json").write_bytes(index_raw)
+        receipt = {"version": "rf02s-implementation-acceptance.v1", "result": "accepted_for_one_replay",
+                   "independentReviewer": "independent-synthetic-reviewer", "successorBindings": bindings,
+                   "codeHashes": codes, "runtime": runtime, "productionAuthorized": False,
+                   "providerAccessAllowed": False, "automaticRestart": False,
+                   "qualification": {"directory": str(directory), "manifestSha256": runner.digest(manifest_raw),
+                                     "indexSha256": runner.digest(index_raw),
+                                     "terminalSha256": runner.digest(artifacts["terminal-decision.json"])}}
+        self.freeze(root, receipt)
+        return root, config, bindings, runtime, codes, output_parent, receipt
+
+    def freeze(self, root, receipt):
+        raw = runner.encoded(receipt)
+        (root / runner.IMPLEMENTATION_PATH).write_bytes(raw)
+        (root / runner.ANCHOR_PATH).write_bytes(runner.encoded({
+            "version": "rf02s-implementation-anchor.v1", "receiptSha256": runner.digest(raw)}))
+
+    def verify(self, fixture):
+        return runner.verify_implementation(*fixture[:5], output_parent=fixture[5])
+
+    def test_acceptance_binds_code_runtime_and_qualification(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            result = self.verify(fixture)
+            self.assertEqual(result["receipt"]["result"], "accepted_for_one_replay")
+            self.assertEqual(result["qualificationTerminal"]["status"], "qualified")
+
+    def test_missing_or_unaccepted_implementation_blocks_before_replay(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            root, *_, receipt = fixture
+            (root / runner.ANCHOR_PATH).unlink()
+            with self.assertRaises(FileNotFoundError):
+                self.verify(fixture)
+            for field, value in (("result", "pending"), ("independentReviewer", ""),
+                                 ("productionAuthorized", True), ("providerAccessAllowed", True),
+                                 ("automaticRestart", True), ("productionAuthorized", 0)):
+                changed = copy.deepcopy(receipt)
+                changed[field] = value
+                self.freeze(root, changed)
+                with self.assertRaisesRegex(ValueError, "implementation_not_accepted"):
+                    self.verify(fixture)
+        with mock.patch.object(runner, "preflight", side_effect=ValueError("not_accepted")), \
+                mock.patch.object(runner, "build_runner") as build:
+            with self.assertRaisesRegex(ValueError, "not_accepted"):
+                runner.run()
+            build.assert_not_called()
+
+    def test_receipt_hash_checked_before_external_path(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            root, *_, receipt = fixture
+            changed = copy.deepcopy(receipt)
+            changed["qualification"]["directory"] = "/never-open-this"
+            (root / runner.IMPLEMENTATION_PATH).write_bytes(runner.encoded(changed))
+            with mock.patch.object(runner, "read_regular", wraps=runner.read_regular) as read:
+                with self.assertRaisesRegex(ValueError, "frozen_bytes_mismatch:implementation_receipt"):
+                    self.verify(fixture)
+                self.assertEqual(len(read.call_args_list), 2)
+                self.assertTrue(all(str(args.args[0]).startswith(str(root)) for args in read.call_args_list))
+
+    def test_freeze_mismatch_and_unsafe_directory_refuse(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            root, *_, receipt = fixture
+            for field, value, expected in (
+                    ("codeHashes", {}, "implementation_code_freeze_mismatch"),
+                    ("runtime", {}, "implementation_successor_or_runtime_mismatch"),
+                    ("successorBindings", {}, "implementation_successor_or_runtime_mismatch")):
+                changed = copy.deepcopy(receipt)
+                changed[field] = value
+                self.freeze(root, changed)
+                with self.assertRaisesRegex(ValueError, expected):
+                    self.verify(fixture)
+            for directory in ("relative", "/never-open-this", str(fixture[5] / ".." / "unsafe")):
+                changed = copy.deepcopy(receipt)
+                changed["qualification"]["directory"] = directory
+                self.freeze(root, changed)
+                with self.assertRaisesRegex(ValueError, "invalid_qualification_directory"):
+                    self.verify(fixture)
+
+    def test_artifact_corruption_and_index_path_refuse(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            root, *_, receipt = fixture
+            directory = Path(receipt["qualification"]["directory"])
+            original = (directory / "occurrence-ledger.json").read_bytes()
+            (directory / "occurrence-ledger.json").write_bytes(b"corrupt")
+            with self.assertRaisesRegex(ValueError, "frozen_bytes_mismatch:qualification_artifact"):
+                self.verify(fixture)
+            (directory / "occurrence-ledger.json").write_bytes(original)
+            index = json.loads((directory / "artifact-index.json").read_bytes())
+            index["files"]["../unsafe"] = {"sha256": "0" * 64, "bytes": 0}
+            raw = runner.encoded(index)
+            (directory / "artifact-index.json").write_bytes(raw)
+            changed = copy.deepcopy(receipt)
+            changed["qualification"]["indexSha256"] = runner.digest(raw)
+            self.freeze(root, changed)
+            with self.assertRaisesRegex(ValueError, "unsafe_qualification_index_member"):
+                self.verify(fixture)
+
+    def test_failed_qualification_is_not_accepted(self):
+        with tempfile.TemporaryDirectory() as temp:
+            fixture = self.fixture(Path(temp).resolve())
+            root, *_, receipt = fixture
+            directory = Path(receipt["qualification"]["directory"])
+            terminal_raw = runner.encoded({"status": "qualification_failed"})
+            (directory / "terminal-decision.json").write_bytes(terminal_raw)
+            index = json.loads((directory / "artifact-index.json").read_bytes())
+            index["files"]["terminal-decision.json"] = {"sha256": runner.digest(terminal_raw), "bytes": len(terminal_raw)}
+            index_raw = runner.encoded(index)
+            (directory / "artifact-index.json").write_bytes(index_raw)
+            changed = copy.deepcopy(receipt)
+            changed["qualification"].update(indexSha256=runner.digest(index_raw), terminalSha256=runner.digest(terminal_raw))
+            self.freeze(root, changed)
+            with self.assertRaisesRegex(ValueError, "qualification_not_accepted"):
+                self.verify(fixture)
+
+    def test_adapter_changes_only_registered_three_nodes(self):
+        source = runner.read_regular(ROOT / "scripts/research_score_run.py").decode()
+        original = ast.parse(source)
+        adapted = runner.adapted_tree(source)
+        inherited = next(node for node in adapted.body if isinstance(node, ast.FunctionDef) and node.name == "run")
+        originals = {node.targets[0].id: node for node in ast.walk(next(
+            node for node in original.body if isinstance(node, ast.FunctionDef) and node.name == "run"))
+            if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name)
+            and node.targets[0].id in {"manifest", "store", "smoke"}}
+        found = set()
+        for node in ast.walk(inherited):
+            if isinstance(node, ast.Assign) and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name):
+                name = node.targets[0].id
+                if name in originals:
+                    if name == "manifest":
+                        self.assertEqual(node.value.values[0].value, "rf02s.team-score.v1")
+                        self.assertEqual(node.value.keys[-1].value, "successor")
+                    elif name == "store":
+                        self.assertEqual(node.value.args[1].left.value, "rf02s-v1-")
+                    else:
+                        self.assertEqual(node.value.args[0].id, "_SMOKE_COMMAND")
+                        self.assertEqual(ast.dump(ast.Call(func=node.value.func, args=[], keywords=node.value.keywords)),
+                                         ast.dump(ast.Call(func=originals[name].value.func, args=[], keywords=originals[name].value.keywords)))
+                    node.value = copy.deepcopy(originals[name].value)
+                    found.add(name)
+        self.assertEqual(found, {"manifest", "store", "smoke"})
+        self.assertEqual(ast.dump(adapted), ast.dump(original))
+        with self.assertRaisesRegex(ValueError, "inherited_.*mismatch"):
+            runner.adapted_tree(source.replace('"rf02-v2-"', '"unexpected-"'))
+
+    def context(self):
+        config = json.loads(runner.read_regular(ROOT / "config/research-team-score-successor.v1.json"))
+        bindings = {"acceptance": runner.digest(runner.read_regular(
+            ROOT / ".planning/engine-os/research-first/RF-02S-ACCEPTANCE.v1.json")),
+            "config": runner.digest(runner.read_regular(ROOT / "config/research-team-score-successor.v1.json")),
+            "specification": config["specification"]["sha256"]}
+        return {"root": ROOT, "successorConfig": config, "bindings": bindings,
+                "codeHashes": {}, "accepted": ({}, {"budget": {}}, {}, {}),
+                "implementation": {"receipt": {"qualification": {"manifestSha256": "q"}},
+                                   "receiptSha256": "r", "anchorSha256": "a", "frozenObjects": []}}
+
+    def test_private_mapper_binding_and_combined_smoke(self):
+        legacy_mapper = runner.replay.common_mapper.__globals__["JointBase"]
+        module = runner.build_runner(self.context())
+        self.assertIs(module.common_mapper.__globals__["JointBase"], runner.JointBase)
+        self.assertIs(runner.replay.common_mapper.__globals__["JointBase"], legacy_mapper)
+        self.assertIsNot(legacy_mapper, runner.JointBase)
+        self.assertEqual(module.common_mapper.__code__, runner.replay.common_mapper.__code__)
+        self.assertEqual(module._SMOKE_COMMAND, [sys.executable, "-I", "-c", runner.SMOKE_PROGRAM])
+        self.assertIn("tests/research-score-successor", runner.SMOKE_PROGRAM)
+        self.assertIn("tests/research-score'", runner.SMOKE_PROGRAM)
+        self.assertEqual(module.CODE_FILES, runner.CODE_FILES)
+        self.assertEqual(module.TEST_FILES, runner.TEST_FILES)
+
+    def test_document_chain_reauthenticated_at_inherited_invocation(self):
+        context = self.context()
+        context["codeHashes"] = {name: runner.digest(runner.read_regular(ROOT / name))
+                                 for name in runner.CODE_FILES + runner.TEST_FILES}
+        module = runner.build_runner(context)
+        with mock.patch("research_score_successor_qualify.load_successor",
+                        return_value=(context["successorConfig"], context["bindings"])), \
+                mock.patch.object(runner, "load_accepted", return_value=context["accepted"]) as accepted:
+            self.assertEqual(module.load_accepted(ROOT), context["accepted"])
+            accepted.assert_called_once_with(ROOT)
+        with mock.patch("research_score_successor_qualify.load_successor",
+                        return_value=(context["successorConfig"], {"changed": True})), \
+                mock.patch.object(runner, "load_accepted") as accepted:
+            with self.assertRaisesRegex(ValueError, "successor_changed_after_preflight"):
+                module.load_accepted(ROOT)
+            accepted.assert_not_called()
+        with mock.patch("research_score_successor_qualify.load_successor",
+                        return_value=(context["successorConfig"], context["bindings"])), \
+                mock.patch.object(runner, "load_accepted", return_value=({}, {}, {}, {})):
+            with self.assertRaisesRegex(ValueError, "inherited_acceptance_changed_after_preflight"):
+                module.load_accepted(ROOT)
+
+    def test_identity_hash_binds_successor_before_output_creation(self):
+        module = runner.build_runner(self.context())
+        module.CODE_FILES, module.TEST_FILES = [], []
+        module.load_accepted = lambda _root: ({}, {}, {}, {"config": "old"})
+        module.runtime_manifest = lambda _config: {"pinned": True}
+        identities = []
+        class BeforeOutput:
+            def __init__(self, parent, identity):
+                identities.append(identity)
+                raise RuntimeError("captured_before_output")
+        module.ImmutableRun = BeforeOutput
+        for suffix in ("first", "second"):
+            module._SUCCESSOR_BINDING["implementation_receipt_sha256"] = suffix
+            with self.assertRaisesRegex(RuntimeError, "captured_before_output"):
+                module.run()
+        self.assertTrue(all(identity.startswith("rf02s-v1-") for identity in identities))
+        self.assertNotEqual(*identities)
+        self.assertEqual(runner.replay.common_mapper.__globals__["JointBase"], runner.legacy.JointBase)
+
+
+if __name__ == "__main__":
+    unittest.main()

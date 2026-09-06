@@ -1,0 +1,26 @@
+# Minimal COMP09 successor plan — design only
+
+Retain the approved 9,000-second projected/setup-inclusive ceiling, 4,096 MiB, 120-second complete smoke, 30-second invalid metadata closure and zero scientific/external worker grace. Preserve all 85 COMP08 source/test/qualifier files and its closed invalid result. No deferred compute helper or statistical change is proposed.
+
+## Files and identities
+
+1. `scripts/research_score_clock_guard.py`: one guarded `ControllerEnvelope` derived from the accepted resource controller envelope. Initialize active/pending/diagnostic state before inherited constructor checks. Guard the entire check, coalesce nested watchdog requests, and perform a fresh complete check after clearing active in `finally`. Preserve inherited initialization, timer arming, phase transitions, callback accounting and invalid finalization. To retain exact disputed values without stack introspection, a small literal copy of the existing two check bodies may add a failure-diagnostic assignment immediately before the existing clock stop. Prove the original comparison/error/deadline ordering remains exact; no epsilon or timestamp clamping.
+2. `scripts/research_score_clock_guard_controller.py`: import the current `_chronological_origins` directly. It already accepts an envelope and binds the unchanged science/pilot dependencies in its original module. Copy only the lean launcher, `run` and worker entry glue that need fixed new envelope/preflight/identity bindings. Add the new guard-protocol post-science recheck and bounded diagnostic metadata to invalid terminal construction. Keep `rf02f` scientific wire schemas and all original publication/Store functions.
+3. `scripts/research_score_clock_guard_preflight.py`: adapt the current exact acceptance boundary, preserving its non-versioned readers and constants rather than calling an old permission validator. Freeze all 85 old hashes plus the three modules and two new test/qualifier files: 90 total. Keep the existing resource policy/config and COMP04 scientific dependencies unchanged.
+
+No new watchdog module or resource config is needed. Import `research_score_resource_watchdog.supervise` unchanged. The launcher chooses `rfcomp09-observer-<acceptance16>`; the new manifest/run prefix is `rfcomp09-v1-`, and terminal schema `rfcomp09.terminal.v1`. Its retained watchdog report may keep the `rfcomp08.external-process-watchdog.v1` component schema: the observer directory, explicit worker command and acceptance identify the new experiment.
+
+## Acceptance changes
+
+Use new COMP09 pre-fit/qualification/review versions and one explicit guard qualification scope. Add `guard_protocol` and fixed `predecessor_terminal` evidence pointers to the existing receipt/manifest. `baseline_acceptance` becomes the exact COMP08 receipt; its frozen source map must equal the new 85-file baseline. Old receipts and terminal are authenticated evidence only. Qualification and distinct numerical/temporal review records bind `guard_protocol_sha256`, the predecessor terminal receipt, all current source/runtime pins and the unchanged resource/science protocol/config pins. No acceptance field may reinterpret the COMP08 failure as success.
+
+## Narrow qualification
+
+- Reuse authenticated COMP08/COMP04 complete-controller and inference evidence without recounting or rerunning their bootstrap. Verify direct identities of science, pilot, chronological loop, publication, Store and external supervisor; prove allowed AST deltas for copied entry/terminal code.
+- Run one genuine `IntegratedCase(2013, selected=0)` pair under accepted versus guarded envelopes. Compare complete outcome-free laws/recipes, saved inner/outer metric bytes, flags/reasons, counts and provenance. Explicitly label the existing one-origin synthetic accounting seed; do not claim whole-history coverage.
+- Deterministically inject nested watchdog requests after sample acquisition, before baseline comparison/commit, during RSS checking and around guard release/pending replay. Prove monotonically increasing acquired samples pass, every actual decreasing/nonfinite sample fails, pending requests cause fresh full checks, and failures clear active state without permitting science. Exercise earlier complete-smoke/total deadlines, RSS high-water retention, exception/interrupt precedence and original-stop-anchored metadata closure.
+- Add one short actual signal test under the external supervisor; retain its command, exits and resources. Exercise new worker/launcher acceptance binding and duplicate observer refusal. Use no historical data or favorable-timing repetitions.
+
+On a clock stop, retain a small `clock_failure` object containing reason, exact observed sample, prior baseline, check context and guard/pending state. Represent float values with type plus `float.hex()` text, so NaN/infinity remain lossless JSON-safe diagnostics; retain no model payload. Test that this metadata cannot mask the original stop or consume scientific grace. The terminal record alone remains insufficient to infer a real OS clock reversal.
+
+Root must freeze the protocol and independently accept this changed boundary before implementation qualification or any separately authorized fresh invocation. This plan performs neither.

@@ -1,0 +1,188 @@
+{
+  "audit_seconds": 7.358515250001801,
+  "blockers": [],
+  "checks": {
+    "all_four_metric_and_native_reason_digests_match": true,
+    "authenticated_logged_input_files": 461,
+    "cell_summaries_independently_recomputed": 112,
+    "cell_values_compared": 784,
+    "completion_result_binding_verified": true,
+    "failure_file_absent": true,
+    "maximum_cell_absolute_difference": 5.684341886080802e-14,
+    "ordered_games": 3407,
+    "origins": 226,
+    "paired_differences_independently_recomputed": 56,
+    "saved_squared_errors_exact": 27256,
+    "selected_rows": 13628,
+    "source_hashes_verified": 45
+  },
+  "completion_sha256": "ee80ddcbc913db2f56943e8d1a1d88b8a2dae3817102104a1d32d090cbd6245f",
+  "interpretation": [
+    "Margin MSE improves in all12full development seasons and11of12 at24h;2022 at24h is the explicit counterexample. Both exposed2025margin differences also favorE2.",
+    "Total MSE worsens in8of12full and7of12at24h development seasons, with pooled increases1.5211 and1.5978. Both exposed2025total differences favorE2, so poorer total performance is not universal or prospective confirmation.",
+    "Existing development E2 calibration slopes about1.054/1.048 for margin versus0.671/0.664 for total describe the saved forecast scaling. They are not causal update-rate estimates or significance evidence.",
+    "The asymmetric complete-season pattern gives a falsifiable reason to test the tied-rate constraint while preserving means/scoring mechanisms and control evidence in a new protocol. It does not prove splitting rates will improve joint energy or satisfy distribution/NLL gates."
+  ],
+  "limitations": [
+    "Independent NumPy reductions checked original math.fsum outputs within declared1e-12relative/1e-9absolute tolerance; no new regression, model fit, transform, scorer, bootstrap or update-gain estimation.",
+    "Existing aggregate calibration coefficients are inherited from acceptedRF02E arithmetic audit; this audit does not refit them.",
+    "All examined history remains exposed. Any new hypothesis needs separate preregistration, exact tied-case equivalence, bounded capacity, controls and independent review; no27-setting automaticauthorization."
+  ],
+  "patterns": {
+    "availability_24h:margin": {
+      "all_development_season_differences": {
+        "2013": -10.805310517702027,
+        "2014": -5.419037169653766,
+        "2015": -5.994637202785834,
+        "2016": -5.194408513257783,
+        "2017": -7.2541171726826885,
+        "2018": -2.4050271783404265,
+        "2019": -6.151677146809677,
+        "2020": -2.7673606561359576,
+        "2021": -5.50492202414944,
+        "2022": 0.675541837141179,
+        "2023": -5.388223631535993,
+        "2024": -10.652879166730775
+      },
+      "development_difference": -5.56659976284472,
+      "exposed_2025_difference": -4.113693364774171,
+      "negative_development_seasons": [
+        "2013",
+        "2014",
+        "2015",
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020",
+        "2021",
+        "2023",
+        "2024"
+      ],
+      "positive_development_seasons": [
+        "2022"
+      ]
+    },
+    "availability_24h:total": {
+      "all_development_season_differences": {
+        "2013": 3.7470769802011907,
+        "2014": -1.5076043966175945,
+        "2015": 4.777674793908852,
+        "2016": -4.406698095588758,
+        "2017": 6.668692890397827,
+        "2018": -5.994457100809398,
+        "2019": -1.6530866992829523,
+        "2020": 10.322527609573648,
+        "2021": 2.124521887992022,
+        "2022": 3.9795923504704334,
+        "2023": 1.2923990676932682,
+        "2024": -0.21751919867304959
+      },
+      "development_difference": 1.597755360836114,
+      "exposed_2025_difference": -2.081732898055022,
+      "negative_development_seasons": [
+        "2014",
+        "2016",
+        "2018",
+        "2019",
+        "2024"
+      ],
+      "positive_development_seasons": [
+        "2013",
+        "2015",
+        "2017",
+        "2020",
+        "2021",
+        "2022",
+        "2023"
+      ]
+    },
+    "full:margin": {
+      "all_development_season_differences": {
+        "2013": -11.397763462672675,
+        "2014": -4.9278209792686205,
+        "2015": -5.981608439510231,
+        "2016": -5.008426486749523,
+        "2017": -7.130306809473552,
+        "2018": -2.3676720954846515,
+        "2019": -6.27141264028075,
+        "2020": -3.183546690333839,
+        "2021": -6.021903163584578,
+        "2022": -0.07755670602193045,
+        "2023": -5.723068809024147,
+        "2024": -10.010429643654241
+      },
+      "development_difference": -5.672484163802736,
+      "exposed_2025_difference": -4.339821073082419,
+      "negative_development_seasons": [
+        "2013",
+        "2014",
+        "2015",
+        "2016",
+        "2017",
+        "2018",
+        "2019",
+        "2020",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ],
+      "positive_development_seasons": []
+    },
+    "full:total": {
+      "all_development_season_differences": {
+        "2013": 2.56940607119174,
+        "2014": -1.952432471333898,
+        "2015": 4.836505985642499,
+        "2016": -4.4230090379279,
+        "2017": 6.718009973044526,
+        "2018": -5.8371709914383185,
+        "2019": -1.3387989618921643,
+        "2020": 10.333033465728994,
+        "2021": 1.921309746379385,
+        "2022": 3.7905988950279115,
+        "2023": 1.4544885501852,
+        "2024": 0.11480435165388156
+      },
+      "development_difference": 1.521057573626778,
+      "exposed_2025_difference": -2.302152806563635,
+      "negative_development_seasons": [
+        "2014",
+        "2016",
+        "2018",
+        "2019"
+      ],
+      "positive_development_seasons": [
+        "2013",
+        "2015",
+        "2017",
+        "2020",
+        "2021",
+        "2022",
+        "2023",
+        "2024"
+      ]
+    }
+  },
+  "recommendation": "Evidence warrants a NEW narrowly scoped tied-versus-split strength/scoring-level update hypothesis; it does not authorize the deferred27-setting search or determine optimal rates.",
+  "resource_observation": {
+    "counts": {
+      "cell_summaries": 112,
+      "cells": 8,
+      "games": 3407,
+      "origins": 226,
+      "paired_differences": 56,
+      "partitions": 14,
+      "selected_rows": 13628
+    },
+    "peak_rss_mib": 410.6875,
+    "result_sha256": "126399b55ddfa374d0ee9ff050b8698c7deab4b1864edf780aed4b56f21f15d0",
+    "seconds": 8.236091333004879,
+    "status": "complete_descriptive_evidence_requires_independent_review"
+  },
+  "result_sha256": "126399b55ddfa374d0ee9ff050b8698c7deab4b1864edf780aed4b56f21f15d0",
+  "scope_sha256": "0663b5f6c78daa9c4ecd6ebaafbdfd6e3d125ba05a1a7abb448c506bae0c843f",
+  "script_sha256": "50342db78ff332c9584b993d955a6bc9e8f0b836ee44ed7ab2aa92173005c50b",
+  "status": "accepted_descriptive_evidence_only"
+}

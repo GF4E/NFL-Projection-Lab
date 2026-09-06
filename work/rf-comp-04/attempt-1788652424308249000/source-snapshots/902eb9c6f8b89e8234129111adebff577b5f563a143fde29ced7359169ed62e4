@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-archive-unit/root-temporal-review.py", line 64, in <module>
+    require([r.game_id for r in view['bank_prepared'][d]['history']] == ['old'], 'history_membership')
+             ^^^^^^^^^
+AttributeError: 'HistoricalResult' object has no attribute 'game_id'

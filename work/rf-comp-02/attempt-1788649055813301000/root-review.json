@@ -1,0 +1,63 @@
+{
+  "additional_inputs": 36,
+  "counts_by_mode": {
+    "original": 56,
+    "poisson": 56,
+    "skellam": 56
+  },
+  "frozen_files": 66,
+  "historical_target_F_plus_S": 0.007461491790146312,
+  "limitations": [
+    "synthetic, six measured rounds; maxima are noisy",
+    "complete original encoder/fit/recovery retained in every mode",
+    "law comparison uses accepted retained hashes; metric/descriptor bodies rehashed",
+    "no historical capacity or predictive result"
+  ],
+  "metric_fields_each": 104,
+  "observations": 168,
+  "resources": {
+    "peak_child_rss_mib": 186.671875,
+    "wall_seconds": 3.463716583006317
+  },
+  "status": "root_metadata_exactness_and_timing_checked_independent_review_pending",
+  "summary": {
+    "original": {
+      "Fmax": 0.0028224999841768295,
+      "below_historical_target": false,
+      "broad_FplusS": 0.020392042002640665,
+      "broad_Smax": 0.017569542018463835,
+      "broad_reduction_from_original": 0.0,
+      "pilot_FplusS": 0.01091816698317416,
+      "pilot_Smax": 0.00809566699899733,
+      "pilot_reduction_from_original": 0.0
+    },
+    "poisson": {
+      "Fmax": 0.0030043330043554306,
+      "below_historical_target": false,
+      "broad_FplusS": 0.015893375006271526,
+      "broad_Smax": 0.012889042001916096,
+      "broad_reduction_from_original": 0.22060895106956846,
+      "pilot_FplusS": 0.00903720801579766,
+      "pilot_Smax": 0.006032875011442229,
+      "pilot_reduction_from_original": 0.1722779080293625
+    },
+    "skellam": {
+      "Fmax": 0.0028574999887496233,
+      "below_historical_target": false,
+      "broad_FplusS": 0.014455583994276822,
+      "broad_Smax": 0.011598084005527198,
+      "broad_reduction_from_original": 0.29111640744929335,
+      "pilot_FplusS": 0.007524540997110307,
+      "pilot_Smax": 0.004667041008360684,
+      "pilot_reduction_from_original": 0.31082378491680185
+    }
+  },
+  "unit_tests": {
+    "errors": [],
+    "failures": [],
+    "skipped": [],
+    "success": true,
+    "tests_run": 18,
+    "wall_seconds": 0.2846707919961773
+  }
+}

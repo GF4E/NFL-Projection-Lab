@@ -1,0 +1,137 @@
+{
+  "status": "author_qualified_pending_independent_review",
+  "created_at": "2026-09-05T14:27:30.263321+00:00",
+  "scope": "tiny_synthetic_current_origin_forecast_assembly_only",
+  "source_hashes": {
+    "scripts/research_score_split_forecast.py": "472d37e25dbf3b8a7ae092e0d86100114064730d0215ae934a2f7ecb14acdb34",
+    "tests/research-score-split/test_forecast_unit.py": "1e74451a9c7dd0043e1725f97e634d96f41cc5fee88229eb0b0f69a4a23e0312",
+    "scripts/research_score_split_archive.py": "91c9e15d674e0d192cb4ef5ddc34a05167693593f20f6d3c9dea7be382398423",
+    "scripts/research_score_split_run.py": "b71ba98cb62c78c657a02dd0a95f6d2296323b43b4425ef5a5b5597ff1efc9c7",
+    "scripts/research_score_split_models.py": "1826dc343e8fb41154cd572b621a7847a9cfa6bce243b5eeb70661ae7fbb5f48",
+    "scripts/research_score_split_replay.py": "44411d6f12ac978344cb618d549aeaefff8880d6c5b19df384f922eb549da547",
+    "scripts/research_score_models.py": "8b2c59c28e080c3da22ba5b8ed608faaf340292873a0c11cb319820a481fe3bd"
+  },
+  "protocol_config_hashes": {
+    ".planning/engine-os/research-first/RF-02F-HISTORICAL-PROTOCOL.v1.md": "d7b921cb2e9a8376b912363a5fff9f27168a2467411c45e144927c7a5d506d16",
+    "config/research-team-score-split.v1.json": "0fe90bbc966e8eb92e6d345b145fc297547b1f4b922d095a0eabbf5e97c60519"
+  },
+  "qualification": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-forecast-unit/attempt-1788618280719236000.json",
+    "sha256": "3ab1d1e7706082f42ade0aeb3deb02142db25aa488e4bfec6a40066c87c15561",
+    "bytes": 1917
+  },
+  "log": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-forecast-unit/attempt-1788618280719236000.log",
+    "sha256": "2ead7624e39485c54b1760d67aab0d97cea47cfe65069e9f2cfc1f4b023286dc",
+    "bytes": 3353
+  },
+  "tests": 18,
+  "unittest_seconds": 1.677,
+  "process_seconds": 2.2704903749981895,
+  "peak_rss_mib": 113.28125,
+  "limits": {
+    "seconds": 120,
+    "rss_mib": 2048
+  },
+  "retained_attempts": [
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-forecast-unit/attempt-1788618054962217000.json",
+      "sha256": "087f95e15a9d034d37a1f08980c073924a764052cdc15cf32f9ef38b7f4f7489",
+      "bytes": 1918
+    },
+    {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/rf02f-forecast-unit/attempt-1788618280719236000.json",
+      "sha256": "3ab1d1e7706082f42ade0aeb3deb02142db25aa488e4bfec6a40066c87c15561",
+      "bytes": 1917
+    }
+  ],
+  "failed_attempts": 0,
+  "historical_admission_calls": 0,
+  "historical_fits": 0,
+  "historical_scores": 0,
+  "bootstrap_calls": 0,
+  "only_repository_files_written": [
+    "scripts/research_score_split_forecast.py",
+    "tests/research-score-split/test_forecast_unit.py"
+  ],
+  "findings": [
+    "All297 native outputs and216 own engines are checked;81 borrowed outputs remain exact; wrong or partially advanced origin states fail before any law callback.",
+    "2010 emits no laws;2011-2024 traverses original targets then27 settings;2025 has no unused inner law work. Outer order is13E3 variants then6 raw references, each in original target order.",
+    "Same selected diagonal preserves original11 source laws/reasons; different diagonal full recovers a saved inner law but remains new_score; own offdiagonal full inner law is reused only within this origin.",
+    "Both new zero controls, shuffle, deterministic noise and independence resolve from actual selected bank helpers;12/24 mapper payloads and pointers are separately checked.",
+    "Noeligible/native/grid failures preserve exact reasons; lazy authorized N0 recovery and descriptor roundtrip occur inside one real timed callback; source cache hits and new fits have distinct per-row work metadata.",
+    "Invalid source recovery and RuntimeStop propagate with failed callback evidence and no second attempt.",
+    "Publication and grading schemas contain no target outcome or metric fields; source refs explicitly identify source_forecast and its forecast_file, never a loss artifact.",
+    "Cached laws copy arrays read-only; separate calls share neither cache nor returned arrays."
+  ],
+  "api": {
+    "function": "assemble_forecasts(view, bank, outputs, choice, *, local_mapper_pointers, parent_binding, accounting)",
+    "parent_binding_keys": [
+      "parent_manifest_sha256",
+      "parent_index_sha256"
+    ],
+    "return_keys": [
+      "full_setting_forecasts",
+      "outer_selected_forecasts",
+      "grading_plan",
+      "resolved_laws"
+    ],
+    "plan_row_keys": [
+      "key",
+      "mode",
+      "source",
+      "law_work"
+    ],
+    "inner_plan_key": [
+      "E3",
+      "setting",
+      "game_id"
+    ],
+    "outer_plan_key": [
+      "family",
+      "variant",
+      "game_id"
+    ],
+    "source_ref_keys": [
+      "kind",
+      "forecast_file",
+      "source_population",
+      "source_key",
+      "origin",
+      "delay_hours",
+      "parent_manifest_sha256",
+      "parent_index_sha256"
+    ],
+    "source_kind": "source_forecast",
+    "source_key": [
+      "family",
+      "setting",
+      "variant",
+      "game_id"
+    ],
+    "law_work_keys": [
+      "kind",
+      "fit_calls",
+      "saved_recoveries",
+      "descriptor_recoveries",
+      "source_cache_hits"
+    ],
+    "resolved_inner_key": [
+      "inner",
+      "setting",
+      "game_id"
+    ],
+    "resolved_outer_key": [
+      "outer",
+      "variant",
+      "game_id"
+    ]
+  },
+  "limitations": [
+    "The supplied view must come from accepted forecast_inputs and the bank must be the once-advanced current bank. The assembler does not authenticate source files or independently prove the frozen choice prior-loss population.",
+    "The tiny explicit accounting fixture uses actual RuntimeEnvelope and OriginAccounting.origin/callback methods but does not repeat the full277-origin constructor gate.",
+    "No Store/publication/grader/scorer is called here. The owning full controller must persist state and lineage, publish the complete origin, authenticate the publication, then open actual loss pointers and grade.",
+    "Full historical controller admission, execution cost, hard watchdog, completion and no-restart behavior are outside this pure unit qualification. This report does not authorize historical invocation."
+  ],
+  "blockers": []
+}

@@ -1,0 +1,151 @@
+{
+  "actual_tool_exit_code": 0,
+  "actual_tool_session": 3777,
+  "cli_probes": 2,
+  "code_files": 79,
+  "commit_seconds": 22.001082959002815,
+  "conservative_combined_rss_mib": 397.40625,
+  "controller_witnesses": [
+    {
+      "completed_origins": 53,
+      "counts": {
+        "actual_mass_cdf_calls": 3328,
+        "actual_score_calls": 9856,
+        "copied_diagonal_inner": 4896,
+        "copied_e3_outer": 352,
+        "copied_raw_outer": 192,
+        "inner_rows": 14688,
+        "outer_rows": 608,
+        "scored_inner": 9792,
+        "scored_outer": 64
+      },
+      "expected_error": "registered_pilot_cost_screen_failed",
+      "fail_grade": false,
+      "reject_pilot": true,
+      "scope": "synthetic_dispatch_only_no_numeric_evidence",
+      "wrong_origin": false
+    },
+    {
+      "completed_origins": 277,
+      "counts": {
+        "actual_mass_cdf_calls": 354328,
+        "actual_score_calls": 72460,
+        "copied_diagonal_inner": 32823,
+        "copied_e3_outer": 37477,
+        "copied_raw_outer": 20442,
+        "inner_rows": 98469,
+        "outer_rows": 64733,
+        "scored_inner": 65646,
+        "scored_outer": 6814
+      },
+      "expected_error": null,
+      "fail_grade": false,
+      "reject_pilot": false,
+      "scope": "synthetic_dispatch_only_no_numeric_evidence",
+      "wrong_origin": false
+    },
+    {
+      "completed_origins": 51,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 9216,
+        "copied_diagonal_inner": 4608,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 13824,
+        "outer_rows": 0,
+        "scored_inner": 9216,
+        "scored_outer": 0
+      },
+      "expected_error": "synthetic_current_grader_failure",
+      "fail_grade": true,
+      "reject_pilot": false,
+      "scope": "synthetic_dispatch_only_no_numeric_evidence",
+      "wrong_origin": false
+    },
+    {
+      "completed_origins": 0,
+      "counts": {
+        "actual_mass_cdf_calls": 0,
+        "actual_score_calls": 0,
+        "copied_diagonal_inner": 0,
+        "copied_e3_outer": 0,
+        "copied_raw_outer": 0,
+        "inner_rows": 0,
+        "outer_rows": 0,
+        "scored_inner": 0,
+        "scored_outer": 0
+      },
+      "expected_error": "forecast_origin_swapped",
+      "fail_grade": false,
+      "reject_pilot": false,
+      "scope": "synthetic_dispatch_only_no_numeric_evidence",
+      "wrong_origin": true
+    },
+    {
+      "scope": "synthetic_terminal_routing_only"
+    }
+  ],
+  "exact_pairs": [
+    {
+      "composed_index": 2,
+      "injected_fit_failure": null,
+      "inner_rows": 0,
+      "original_index": 1,
+      "outer_rows": 38,
+      "selected": 1,
+      "year": 2025
+    },
+    {
+      "composed_index": 7,
+      "injected_fit_failure": null,
+      "inner_rows": 0,
+      "original_index": 6,
+      "outer_rows": 38,
+      "selected": null,
+      "year": 2025
+    },
+    {
+      "composed_index": 9,
+      "injected_fit_failure": "synthetic_comp04_fit_failure",
+      "inner_rows": 0,
+      "original_index": 8,
+      "outer_rows": 38,
+      "selected": 10,
+      "year": 2025
+    },
+    {
+      "composed_index": 11,
+      "injected_fit_failure": null,
+      "inner_rows": 54,
+      "original_index": 10,
+      "outer_rows": 38,
+      "selected": 10,
+      "year": 2013
+    },
+    {
+      "composed_index": 14,
+      "injected_fit_failure": null,
+      "inner_rows": 54,
+      "original_index": 13,
+      "outer_rows": 38,
+      "selected": 0,
+      "year": 2013
+    }
+  ],
+  "external_inputs": 383,
+  "not_accepted": [
+    "historical_capacity",
+    "historical_invocation",
+    "predictive_gain",
+    "external5percent",
+    "prospective",
+    "product_readiness"
+  ],
+  "numerical_witnesses": 15,
+  "paired_scientific_rows_per_route": 298,
+  "status": "root_verified_synthetic_result_independent_reviews_pending",
+  "stream_hashed_reused_fixture_files": 226,
+  "tool_evidence": "functions.write_stdin session3777 final response exit_code0; exact command closed, no rerun",
+  "unit_tests": 51
+}

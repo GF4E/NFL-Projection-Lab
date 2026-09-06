@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>GIT_TERMINAL_PROMPT</key>
+		<string>0</string>
+	</dict>
+	<key>Label</key>
+	<string>com.gabe.nfl-engine-autopush</string>
+	<key>ProcessType</key>
+	<string>Background</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/opt/anaconda3/bin/python3.12</string>
+		<string>-B</string>
+		<string>/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/nfl_engine_autopush.py</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>/Users/gabe/Library/Logs/nfl-engine-autopush.log</string>
+	<key>StandardOutPath</key>
+	<string>/Users/gabe/Library/Logs/nfl-engine-autopush.log</string>
+	<key>StartCalendarInterval</key>
+	<dict>
+		<key>Hour</key>
+		<integer>23</integer>
+		<key>Minute</key>
+		<integer>0</integer>
+	</dict>
+	<key>WorkingDirectory</key>
+	<string>/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6</string>
+</dict>
+</plist>

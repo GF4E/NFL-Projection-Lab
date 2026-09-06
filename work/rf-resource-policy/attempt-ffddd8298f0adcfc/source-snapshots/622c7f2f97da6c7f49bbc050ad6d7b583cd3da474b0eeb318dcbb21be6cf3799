@@ -1,0 +1,262 @@
+"""Independent synthetic arithmetic and chronology challenges for RF-02F.
+
+No historical data is read. Run with the pinned isolated Python runtime.
+"""
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import resource
+import sys
+import time
+import unittest
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "scripts"))
+import numpy as np
+from research_score_models import GameContext, HistoricalResult, MeanTrajectory
+from research_score_split_models import SPLIT_VARIANTS, make_split_trajectory, split_setting_grid
+
+TEAMS = tuple(f"T{i:02d}" for i in range(32))
+SETTING = {"ks": .2, "kp": .05, "retention": .5}
+ORIGINAL_VARIANTS = (
+    "full", "no_home_effect", "no_prior_season_carryover", "no_time_decay",
+    "no_team_identity", "independent_marginals", "availability_24h",
+    "no_offense", "no_defense", "shuffled_identity", "deterministic_noise",
+)
+
+
+def game(name, year, week, h=0, a=1, neutral=False):
+    return GameContext(name, year, week, TEAMS[h], TEAMS[a], neutral)
+
+
+def result(context, h, a):
+    return HistoricalResult(context, h, a)
+
+
+def ready(variant="full", year=2019, setting=None):
+    model = make_split_trajectory(SETTING if setting is None else setting, TEAMS, variant)
+    warm = game("warm", year, 1)
+    first = game("first", year, 2)
+    model.forecast_origin(year, 1, [], [warm])
+    warm_result = result(warm, 10, 10)
+    model.forecast_origin(year, 2, [warm_result], [first])
+    return model, warm_result, result(first, 18, 6)
+
+
+def deliver_one(variant="full", year=2019, setting=None):
+    model, warm, first = ready(variant, year, setting)
+    forecast = model.forecast_origin(year, 3, [warm, first], [game("next", year, 3)])
+    return model, forecast
+
+
+def equal_tree(case, left, right):
+    if isinstance(left, np.ndarray):
+        case.assertIsInstance(right, np.ndarray)
+        case.assertTrue(np.array_equal(left, right, equal_nan=True), (left, right))
+    elif isinstance(left, dict):
+        case.assertEqual(set(left), set(right))
+        for key in left:
+            equal_tree(case, left[key], right[key])
+    elif isinstance(left, (list, tuple)):
+        case.assertEqual(len(left), len(right))
+        for a, b in zip(left, right):
+            equal_tree(case, a, b)
+    else:
+        case.assertEqual(left, right)
+
+
+class SplitMeanUnitTests(unittest.TestCase):
+    def test_grid_is_complete_diagonal_first_and_fresh(self):
+        grid = split_setting_grid()
+        diagonal = [{"ks": k, "kp": k, "retention": r}
+                    for k in (.05, .1, .2) for r in (.5, .75, 1)]
+        off = [{"ks": ks, "kp": kp, "retention": r}
+               for ks in (.05, .1, .2) for kp in (.05, .1, .2) if ks != kp
+               for r in (.5, .75, 1)]
+        self.assertEqual(grid, diagonal + off)
+        self.assertEqual(len({tuple(sorted(x.items())) for x in grid}), 27)
+        grid[0]["ks"] = 999
+        self.assertEqual(split_setting_grid()[0], diagonal[0])
+        self.assertEqual(set(SPLIT_VARIANTS), set(ORIGINAL_VARIANTS) | {
+            "zero_strength_update", "zero_scoring_level_update"})
+
+    def test_registered_setting_and_variant_validation(self):
+        bad = [None, {}, {**SETTING, "extra": 1}, {"ks": .2, "kp": .05}]
+        for key in SETTING:
+            for value in (True, False, np.bool_(True), float("nan"), float("inf"), -.1, .03, "0.2", None):
+                bad.append({**SETTING, key: value})
+        for setting in bad:
+            with self.subTest(setting=setting), self.assertRaises((ValueError, TypeError)):
+                make_split_trajectory(setting, TEAMS)
+        with self.assertRaises(ValueError):
+            make_split_trajectory(SETTING, TEAMS, "K_zero")
+        with self.assertRaises(ValueError):
+            make_split_trajectory(SETTING, TEAMS[:31])
+        with self.assertRaises(ValueError):
+            make_split_trajectory(SETTING, (*TEAMS[:31], TEAMS[0]))
+
+    def test_hand_computed_off_diagonal_update_and_forecast(self):
+        model, output = deliver_one()
+        # Original means10,10 and observed18,6 give margin error12,total error4.
+        # Centering across32 subtracts .003125 from O and adds it to D.
+        offense = np.full(32, -.003125); offense[0] = .646875; offense[1] = -.553125
+        defense = np.full(32, .003125); defense[0] = .553125; defense[1] = -.646875
+        np.testing.assert_allclose(model.offense, offense, rtol=0, atol=2e-16)
+        np.testing.assert_allclose(model.defense, defense, rtol=0, atol=2e-16)
+        np.testing.assert_allclose(output["forecasts"][0]["mean"], [15.29375, 6.89375], rtol=0, atol=4e-15)
+        np.testing.assert_array_equal(model.ratings, np.full(32, 1500.))
+        self.assertEqual(output["events"]["delivered"], ["first"])
+
+    def test_shared_team_batch_uses_pre_batch_expectations(self):
+        model = make_split_trajectory(SETTING, TEAMS)
+        warm = game("warm", 2019, 1)
+        a, b = game("a", 2019, 2, 0, 1), game("b", 2019, 2, 0, 2)
+        model.forecast_origin(2019, 1, [], [warm])
+        wr = result(warm, 10, 10)
+        model.forecast_origin(2019, 2, [wr], [b, a])
+        out = model.forecast_origin(2019, 3, [result(b, 14, 14), wr, result(a, 18, 6)], [])
+        # a contributes O(.65,-.55),D(.55,-.65); b contributes O(.1,.1),D(-.1,-.1).
+        expected_o = np.full(32, -.009375); expected_o[:3] = [.740625, -.559375, .090625]
+        expected_d = np.full(32, .009375); expected_d[:3] = [.459375, -.640625, -.090625]
+        np.testing.assert_allclose(model.offense, expected_o, rtol=0, atol=3e-16)
+        np.testing.assert_allclose(model.defense, expected_d, rtol=0, atol=3e-16)
+        self.assertEqual(out["events"]["delivered"], ["a", "b"])
+
+    def test_all_99_original_diagonal_paths_are_exact(self):
+        contexts = [game("g0", 2019, 1), game("g1", 2019, 2, 0, 2, True),
+                    game("g2", 2019, 3, 3, 4), game("g3", 2020, 1),
+                    game("g4", 2020, 2, 2, 3), game("g5", 2021, 1, 0, 4),
+                    game("g6", 2021, 2, 1, 3)]
+        scores = [(20, 10), (17, 23), (31, 13), (28, 14), (21, 24), (13, 10), (30, 27)]
+        rows = [result(g, *score) for g, score in zip(contexts, scores)]
+        eligible_indices = [[], [0], [0], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2, 3, 4], [0, 1, 2, 3, 4, 5]]
+        for setting in split_setting_grid()[:9]:
+            for variant in ORIGINAL_VARIANTS:
+                with self.subTest(setting=setting, variant=variant):
+                    actual = make_split_trajectory(setting, TEAMS, variant)
+                    self.assertIs(type(actual), MeanTrajectory)
+                    expected = MeanTrajectory("E2", {"k": setting["ks"], "retention": setting["retention"]}, TEAMS, variant)
+                    for target, indices in zip(contexts, eligible_indices):
+                        eligible = [rows[i] for i in indices]
+                        equal_tree(self, actual.forecast_origin(target.season, target.week, eligible, [target]),
+                                   expected.forecast_origin(target.season, target.week, eligible, [target]))
+                        equal_tree(self, actual.__dict__, expected.__dict__)
+
+    def test_2020_multiplier_and_two_year_retention_order(self):
+        normal, _ = deliver_one()
+        pandemic, _ = deliver_one(year=2020)
+        np.testing.assert_array_equal(pandemic.offense, normal.offense / 2)
+        np.testing.assert_array_equal(pandemic.defense, normal.defense / 2)
+        delayed, warm, first = ready()
+        out = delayed.forecast_origin(2021, 1, [warm, first], [game("late", 2021, 1)])
+        # The inherited path centers again in its empty post-retention batch.
+        # Compare the independent real-arithmetic result at rounding tolerance;
+        # the99 ordinary diagonal comparisons above still require exact equality.
+        np.testing.assert_allclose(delayed.offense, normal.offense / 4, rtol=0, atol=2e-16)
+        np.testing.assert_allclose(delayed.defense, normal.defense / 4, rtol=0, atol=2e-16)
+        self.assertTrue(out["events"]["offseason_retention_applied"])
+        reset, warm, first = ready("no_prior_season_carryover")
+        reset.forecast_origin(2021, 1, [warm, first], [])
+        np.testing.assert_array_equal(reset.offense, np.zeros(32))
+        np.testing.assert_array_equal(reset.defense, np.zeros(32))
+
+    def test_distinct_strength_scoring_and_offense_defense_removals(self):
+        no_s, _ = deliver_one("zero_strength_update")
+        no_p, _ = deliver_one("zero_scoring_level_update")
+        np.testing.assert_array_equal(no_s.offense + no_s.defense, np.zeros(32))
+        np.testing.assert_array_equal(no_p.offense - no_p.defense, np.zeros(32))
+        self.assertAlmostEqual(no_s.offense[0] - no_s.defense[0], .09375, places=14)
+        self.assertAlmostEqual(no_p.offense[0] + no_p.defense[0], 1.2, places=14)
+        no_o, _ = deliver_one("no_offense")
+        no_d, _ = deliver_one("no_defense")
+        np.testing.assert_array_equal(no_o.offense, np.zeros(32))
+        np.testing.assert_array_equal(no_d.defense, np.zeros(32))
+        self.assertFalse(np.array_equal(no_s.defense, no_o.defense))
+        self.assertFalse(np.array_equal(no_p.offense, no_d.offense))
+        identity, _ = deliver_one("no_team_identity")
+        np.testing.assert_array_equal(identity.offense, np.zeros(32))
+        np.testing.assert_array_equal(identity.defense, np.zeros(32))
+        for name in ("zero_strength_update", "zero_scoring_level_update"):
+            tied, _ = deliver_one(name, setting={"ks": .1, "kp": .1, "retention": 1})
+            self.assertIsNot(type(tied), MeanTrajectory)
+
+    def test_delayed_result_uses_its_own_original_mean(self):
+        model, warm, first = ready()
+        other = game("other", 2019, 3, 2, 3)
+        model.forecast_origin(2019, 3, [warm], [other])
+        other_result = result(other, 100, 100)
+        model.forecast_origin(2019, 4, [warm, other_result], [])
+        before_o, before_d = model.offense.copy(), model.defense.copy()
+        np.testing.assert_array_equal(model.stored["first"]["mean"], [10, 10])
+        model.forecast_origin(2019, 5, [warm, first, other_result], [])
+        expected, _ = deliver_one()
+        np.testing.assert_allclose(model.offense - before_o, expected.offense, rtol=0, atol=5e-16)
+        np.testing.assert_allclose(model.defense - before_d, expected.defense, rtol=0, atol=5e-16)
+
+    def test_noise_changes_forecast_but_not_learning_expectation(self):
+        normal, warm, first = ready()
+        noisy, _, _ = ready("deterministic_noise")
+        np.testing.assert_array_equal(normal.stored["first"]["mean"], noisy.stored["first"]["mean"])
+        n = normal.forecast_origin(2019, 3, [warm, first], [game("next", 2019, 3)])
+        x = noisy.forecast_origin(2019, 3, [warm, first], [game("next", 2019, 3)])
+        np.testing.assert_array_equal(normal.offense, noisy.offense)
+        np.testing.assert_array_equal(normal.defense, noisy.defense)
+        self.assertFalse(np.array_equal(n["forecasts"][0]["mean"], x["forecasts"][0]["mean"]))
+        np.testing.assert_array_equal(normal.stored["next"]["mean"], noisy.stored["next"]["mean"])
+
+    def test_temporal_identity_and_duplicate_guards(self):
+        model, warm, first = ready()
+        with self.assertRaisesRegex(ValueError, "same_week_or_future_input"):
+            model.forecast_origin(2019, 3, [warm, result(game("future", 2019, 3), 7, 7)], [])
+        self.assertEqual(model.last_origin, (2019, 2))
+        with self.assertRaisesRegex(ValueError, "duplicate_or_disappearing_input"):
+            model.forecast_origin(2019, 3, [warm, first, first], [])
+        with self.assertRaisesRegex(ValueError, "result_without_original_origin_expectation"):
+            model.forecast_origin(2019, 3, [warm, result(game("unknown", 2018, 1), 1, 2)], [])
+        fresh, warm, first = ready()
+        changed = result(game("first", 2019, 2, neutral=True), 18, 6)
+        with self.assertRaisesRegex(ValueError, "delivered_context_mismatch"):
+            fresh.forecast_origin(2019, 3, [warm, changed], [])
+        fresh, warm, first = ready()
+        fresh.forecast_origin(2019, 3, [warm, first], [])
+        with self.assertRaisesRegex(ValueError, "duplicate_result_delivery"):
+            fresh._deliver([first], {"delivered": [], "initialization_only": []})
+
+    def test_initialization_and_absorbing_failure_never_reset(self):
+        model, warm, first = ready()
+        np.testing.assert_array_equal(model.offense, np.zeros(32))
+        self.assertTrue(model.stored["warm"]["initialization_only"])
+        model.offense[0] = np.inf
+        with np.errstate(invalid="ignore"):
+            broken = model.forecast_origin(2019, 3, [warm, first], [game("next", 2019, 3)])
+        self.assertTrue(broken["absorbing_failure"])
+        self.assertEqual(broken["forecasts"][0]["failure"], "nonfinite_dynamic_state")
+        later = model.forecast_origin(2021, 1, [warm, first], [game("later", 2021, 1)])
+        self.assertTrue(later["absorbing_failure"])
+        self.assertIsNone(later["forecasts"][0]["mean"])
+        self.assertEqual(later["forecasts"][0]["failure"], "nonfinite_dynamic_state")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--report", type=Path)
+    args = parser.parse_args()
+    started = time.monotonic()
+    suite = unittest.defaultTestLoader.loadTestsFromTestCase(SplitMeanUnitTests)
+    result_ = unittest.TextTestRunner(verbosity=2).run(suite)
+    seconds = time.monotonic() - started
+    rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / (1024 ** 2 if sys.platform == "darwin" else 1024)
+    bounded = seconds <= 120 and rss <= 2048
+    report = {"status": "passed_synthetic_only" if result_.wasSuccessful() and bounded else "failed",
+              "tests": result_.testsRun, "failures": len(result_.failures), "errors": len(result_.errors),
+              "testSecondsExcludingImports": seconds, "peakRssMiB": rss, "withinBounds": bounded,
+              "python": sys.version.split()[0], "numpy": np.__version__,
+              "sourceSha256": {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+                  for p in [ROOT / "scripts/research_score_models.py", ROOT / "scripts/research_score_split_models.py", Path(__file__).resolve()]},
+              "historicalDataLoaded": False, "historicalFitOrScore": False}
+    if args.report:
+        args.report.parent.mkdir(parents=True, exist_ok=True)
+        args.report.write_text(json.dumps(report, indent=2) + "\n")
+    print(json.dumps(report))
+    raise SystemExit(0 if result_.wasSuccessful() and bounded else 1)

@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "ascii_body": "\"\\u00e9\"\n",
+    "bytes": 9,
+    "kind": "bytes",
+    "sha256": "103097e2264fba6d6bdce69e238d525d6617262739ef2170906d6e9a66b6ab01",
+    "type": "bytes"
+  },
+  "eligibility": {
+    "actual": false,
+    "expected": false,
+    "type": "bool"
+  },
+  "input": {
+    "deterministic_builder": "subclass-or-opaque-string-value",
+    "reproducer": "frozen test method named by test field",
+    "root_type": "Text"
+  },
+  "label": "subclass-or-opaque-string-value",
+  "original": {
+    "ascii_body": "\"\\u00e9\"\n",
+    "bytes": 9,
+    "kind": "bytes",
+    "sha256": "103097e2264fba6d6bdce69e238d525d6617262739ef2170906d6e9a66b6ab01",
+    "type": "bytes"
+  },
+  "test": "test_strict_compute.StrictEqualityTests.test_builtin_subclasses_and_opaque_objects"
+}

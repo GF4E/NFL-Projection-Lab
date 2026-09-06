@@ -1,0 +1,127 @@
+import importlib.util
+import json
+from pathlib import Path
+import sys
+import unittest
+
+import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+for name in ("research_score_models", "research_score_distribution", "research_score_metrics", "research_score_replay", "research_score_inference"):
+    spec = importlib.util.spec_from_file_location(name, ROOT / "scripts" / (name + ".py"))
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+i = sys.modules["research_score_inference"]
+
+
+class InferenceTests(unittest.TestCase):
+    def config(self):
+        return json.loads((ROOT / "config/research-team-score.v2.json").read_text())
+
+    def test_42_registered_comparisons_and_signs(self):
+        comparisons = i.comparison_family(self.config())
+        self.assertEqual(len(comparisons), 42)
+        self.assertEqual(comparisons[0], ("N0:full->S1:full", ("N0", "full"), ("S1", "full")))
+        self.assertIn(("E2:full->E2:no_offense", ("E2", "full"), ("E2", "no_offense")), comparisons)
+
+    def test_block_sampling_reproducible_week_groups_and_weighting(self):
+        metadata = [{"season": year, "week": week} for year in range(2013, 2025) for week in range(1, 7) for _ in range(1 + week % 2)]
+        for length in (1, 3, 6):
+            a, groups, keys = i.block_weights(metadata, length, members=50)
+            b, _, _ = i.block_weights(metadata, length, members=50)
+            np.testing.assert_array_equal(a, b)
+            np.testing.assert_array_equal(a.sum(axis=1), np.full(50, 72))
+            sums = i.weekly_sums(np.ones((len(metadata), 2)), groups, len(keys))
+            np.testing.assert_array_equal(sums[:, 0], np.bincount(groups))
+            if length == 6:
+                # With exactly six weeks, each sampled season is one whole contiguous block.
+                for season in range(12):
+                    self.assertTrue(np.all(a[:, season * 6:season * 6 + 6] == a[:, season * 6, None]))
+
+    def test_simultaneous_max_family_and_zero_variance(self):
+        sampled = np.array([[.05, 0], [.1, 0], [.15, 0], [.2, 0]])
+        point = np.array([.1, 0])
+        lower, upper, sd, critical = i.simultaneous_intervals(point, sampled)
+        expected_sd = np.std(sampled[:, 0], ddof=1)
+        expected_c = np.quantile(np.abs(sampled[:, 0] - .1) / expected_sd, .95)
+        self.assertAlmostEqual(critical, expected_c)
+        self.assertAlmostEqual(lower[0], .1 - critical * sd[0])
+        self.assertEqual(lower[1], upper[1])
+        with self.assertRaisesRegex(ValueError, "inconsistent_zero_variance_comparison"):
+            i.simultaneous_intervals([.1], np.zeros((4, 1)))
+
+    def test_end_to_end_synthetic_clustered_inference(self):
+        config = self.config()
+        metadata = [{"season": year, "week": week} for year in range(2013, 2025) for week in range(1, 7)]
+        rows = {}
+        for j, key in enumerate(i.registered_series(config)):
+            records = []
+            for n, meta in enumerate(metadata):
+                record = {"joint_energy_score": 10 + n / 100 + (j % 5) * .01 * ((n % 3) + 1)}
+                for target in i.TARGETS:
+                    record[target + "_pit"] = ((n % 10) + .5) / 10
+                    for level in i.LEVELS:
+                        record[f"{target}_coverage_{round(100 * level)}"] = float(n % 10 < round(10 * level))
+                records.append(record)
+            rows[key] = records
+        inference = i.infer(config, metadata, rows, members=30)
+        self.assertEqual(len(inference["comparisons"]), 42)
+        self.assertEqual(set(inference["blocks"]), {"1", "3", "6"})
+        for block in inference["blocks"].values():
+            self.assertEqual(block["members"], 30)
+            self.assertEqual(len(block["coverage"]), 480)
+            self.assertEqual(len(block["pit_simultaneous_bands"]), 160)
+            self.assertEqual(block["coverage"]["N0:full:home:80"]["point"], sum(n % 10 < 8 for n in range(72)) / 72)
+
+    def terminal_fixture(self):
+        config = self.config()
+        # Match the frozen cohort sizes without loading any actual game/result.
+        metadata = [{"season": 2013 + n % 12, "week": 1 + n % 17} for n in range(3135)] + [{"season": 2025, "week": 1} for _ in range(272)]
+        series = i.registered_series(config)
+        rows, failures, calibration = {}, {}, {}
+        for family, variant in series:
+            energy = {"N0": 10., "S1": 9.5, "E1": 9., "E2": 8.5}[family]
+            if variant not in ("full", "availability_24h"):
+                energy += .1
+            metric = {"joint_energy_score": energy, "joint_nll": 3.}
+            for target in i.TARGETS:
+                metric.update({target + "_crps": 3., target + "_mae": 3., target + "_coverage_80": .8, target + "_width_80": 20.})
+            rows[(family, variant)] = [dict(metric) for _ in metadata]
+            failures[(family, variant)] = [False] * len(metadata)
+            calibration[(family, variant)] = {target: {"status": "available", "intercept": 0., "slope": 1., "n": 3135}
+                                              for target in (*i.TARGETS, "home_win")}
+        comparisons = {}
+        for name, ref, variant in i.comparison_family(config):
+            a, b = rows[ref][0]["joint_energy_score"], rows[variant][0]["joint_energy_score"]
+            gain = (a - b) / a
+            comparisons[name] = {"blocks": {str(length): {"lower": gain - .001, "upper": gain + .001} for length in (1, 3, 6)}}
+        blocks = {str(length): {"coverage": {f"{family}:full:{target}:80": {"lower": .78, "upper": .82}
+                                              for family in config["models"] for target in i.TARGETS}} for length in (1, 3, 6)}
+        return config, metadata, rows, failures, {"comparisons": comparisons, "blocks": blocks}, calibration
+
+    def test_empty_or_partial_calibration_cannot_admit(self):
+        config, metadata, rows, failures, inference, calibration = self.terminal_fixture()
+        self.assertEqual(i.decide(config, metadata, rows, failures, inference, calibration, True)["status"], "shadow_eligible")
+        with self.assertRaisesRegex(ValueError, "required_calibration_completeness"):
+            i.decide(config, metadata, rows, failures, inference, {}, True)
+        del calibration[("E1", "full")]["home_win"]
+        with self.assertRaisesRegex(ValueError, "required_calibration_completeness"):
+            i.decide(config, metadata, rows, failures, inference, calibration, True)
+
+    def test_all_fallback_ablation_cannot_supply_mechanism_evidence(self):
+        config, metadata, rows, failures, inference, calibration = self.terminal_fixture()
+        failures[("E1", "K_zero")] = [True] * len(metadata)
+        decision = i.decide(config, metadata, rows, failures, inference, calibration, True)
+        self.assertFalse(decision["gates"]["E1"]["passed"])
+        self.assertFalse(decision["gates"]["E1"]["checks"]["K_zero_native_failure_ceiling"])
+
+    def test_unjustified_constant_calibration_cannot_admit(self):
+        config, metadata, rows, failures, inference, calibration = self.terminal_fixture()
+        calibration[("E1", "full")]["home_win"] = {"status": "unavailable_by_design", "n": 3135}
+        with self.assertRaisesRegex(ValueError, "unsubstantiated_structural_unavailability"):
+            i.decide(config, metadata, rows, failures, inference, calibration, True)
+
+
+if __name__ == "__main__":
+    unittest.main()

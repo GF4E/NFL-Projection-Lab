@@ -1,0 +1,29 @@
+{
+  "candidate": {
+    "kind": "error",
+    "message": "Object of type Opaque is not JSON serializable",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "candidate_hooks": [
+    "tolist"
+  ],
+  "canonical_calls": 1,
+  "eligibility": {
+    "actual": false,
+    "expected": false
+  },
+  "encoded_calls": 1,
+  "fallback_snapshot_type": "list",
+  "label": "single-canonical-direct-fallback",
+  "original": {
+    "kind": "error",
+    "message": "Object of type Opaque is not JSON serializable",
+    "module": "builtins",
+    "type": "TypeError"
+  },
+  "original_hooks": [
+    "tolist"
+  ],
+  "test": "test_strict_compute.StrictEqualityTests.test_direct_fallback_uses_single_canonical_snapshot"
+}

@@ -1,0 +1,70 @@
+{
+  "auditor": "/root/compute_runner",
+  "baselineLastFirstRatio": 2.4859501717014263,
+  "baselineSeconds": [
+    19.594233804993564,
+    25.665883668996685,
+    48.710288891881646
+  ],
+  "candidateLastFirstRatio": 2.4859515485347754,
+  "candidateSeconds": [
+    11.379345105007815,
+    14.851967805014283,
+    28.288500585105794
+  ],
+  "counts": {
+    "allScoredOccurrences": 32412,
+    "fullSettingScoredOccurrences": 31132,
+    "outerGames": 32,
+    "outerScoredOccurrences": 1280,
+    "outerSeries": 40
+  },
+  "footballFitsInAudit": 0,
+  "medianRatio": 0.5807496847418349,
+  "minimumSavingsSeconds": 8.21488869998575,
+  "newArchive": {
+    "bytes": 13112663,
+    "files": 6,
+    "indexSha256": "8ddfc9c0728288ee4a5f5fefbafe7ad88f8d252e639220fa7dd3d97fdf482eaa",
+    "manifestSha256": "a2e7a4313ffa5cf5c96b0851485cab9f3a856a6bacae36b722e7a62ba97b4535"
+  },
+  "notes": [
+    "All 32412 ledger entries exactly match independently reconstructed authenticated archive keys, flags, failures and metric hashes.",
+    "All three timing passes preserve 1280 outer records, parity order, exact positive finite totals and equality flags.",
+    "Absolute times increased substantially across passes; cause is not established. All timings retained and minimum absolute savings used.",
+    "This is a computational screen. The unchanged 7200-second replay pilot remains mandatory; no predictive gain is established.",
+    "No scoring was repeated. Actual equality flags rely on authenticated reviewed implementation; this audit independently checks their archived metric hashes and complete occurrence population."
+  ],
+  "oldNumericalQualificationArchive": {
+    "bytes": 10726601,
+    "files": 4,
+    "indexSha256": "312ebb7f015bfd896bd3780ff6357d43384e0cf1b02c9817588d4a737082b464",
+    "manifestSha256": "9000e21e4d097260fe9ddd3ae17e9c7fd28b6f557ab578a1048e45b8595d9848"
+  },
+  "oldReplayArchive": {
+    "bytes": 203726113,
+    "files": 330,
+    "indexSha256": "93d52799f823e92545ea6deef57b0bd5c8b3b97157fdbab66eb2a5cad1d34192",
+    "manifestSha256": "c4fc78f7beb8c9ee71cbbced19538d16a82c73a7272002221c637277834a2fb8"
+  },
+  "qualificationSeconds": 264.0215434999991,
+  "ratios": [
+    0.5807496847418349,
+    0.5786657493096503,
+    0.5807500063876757
+  ],
+  "reviewReceiptSha256": "4b9c8dd36449554e39d83003f25961cf7dc07dd839162581a8f7810cf5b25b85",
+  "reviewedCodeHashes": {
+    "scripts/research_score_compute_distribution.py": "8000026887b63eaf387ef53791bd5cb4badda944f74fdf9725eea2fcff0feaa1",
+    "scripts/research_score_compute_qualify.py": "41edf4cc2bc217fd0947aa2ad17e6112fd20e1aedc93b7eeb7ab0aae0ea77dcb",
+    "tests/research-score-compute/test_cache.py": "a8dd3bf3721a91853eba32344a9301388fa9bd90b52b3c9997fb9c76ad3843dc",
+    "tests/research-score-compute/test_compute_qualify.py": "f12a8f493091c6d08ebfa6572b7a05010d02eb70e7dfaca0a96e64a0da280296"
+  },
+  "rssMiB": 604.234375,
+  "scoreCallsInAudit": 0,
+  "screenMarginSeconds": 313.50081708716243,
+  "screenProjectedSeconds": 6686.499182912838,
+  "status": "independently_verified_qualification_pass",
+  "terminalSha256": "d06386414f0e97f5eb2e11717f831c954db68c7170dec839cf2577077f72ced8",
+  "timingPassesInAudit": 0
+}

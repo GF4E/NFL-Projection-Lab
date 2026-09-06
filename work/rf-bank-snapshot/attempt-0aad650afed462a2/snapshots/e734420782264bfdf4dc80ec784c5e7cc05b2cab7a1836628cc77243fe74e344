@@ -1,0 +1,43 @@
+# RF-COMP-05 guarded strict serializer qualification
+
+Version `rfcomp05.strict-scope.v1`, September 6, 2026. This freezes one private implementation and synthetic qualification scope. It authorizes neither controller integration nor a historical invocation. Preserve all 79 accepted source/test files, accepted runtime and prior failed identities.
+
+Design: owner-workspace `work/rf-origin-profile/NEXT-SERIALIZER-DESIGN.md`, SHA-256 `5d791b4e3aeea1bb001087b6185d9f0769ddaabec28fdbbe0829e16b1b6d329b`. The accepted origin profile (`93553c563f064232a58215e8e5f96831a80f7573133d1116be4fe26a9322b6a6`) supplies qualitative attribution only. Its 2.3426× instrumentation/order difference prevents quantitative speedup inference. No tiny-profile fraction or serializer time may replace the historical cost equation.
+
+## One candidate and exact contract
+
+Create only `scripts/research_score_strict_compute.py` with public `strict(value) -> bytes` and `eligible(snapshot) -> bool`. The eligibility helper accepts an already canonicalized value and performs no canonicalization or encoding. The new `strict` invokes the unchanged original `research_score_conditional_replay.canonical(value)` exactly once. It freshly inspects that resulting snapshot, then uses either the candidate encoder or original `research_score_contract.encoded(snapshot)` directly. No repeated canonicalization, object-identity memo, retained input/output state, mutable-global patch, runtime source/AST cloning or new dependency.
+
+Preserve the exact original `encoded(canonical(value))` bytes and error behavior: sort_keys=True, indent=2, default ASCII escaping, original integer/float tokens including signed zero, separators and empty-container layout, UTF-8 encoding, and exactly one final newline. Original canonical conversion remains responsible for NumPy conversion, subclass hooks, raw cyclic/deep traversal and its failures.
+
+The fast domain has fixed inclusive limits:
+
+- Exact built-in dict/list containers; exact str keys; exact str, bool, None, int and float values only. Integers have bit_length at most256; floats must be finite. Subclasses and unsupported canonical values are ineligible without invoking conversion hooks.
+- Root containers have depth1; maximum container depth32. Scalars/keys do not add container depth. Maximum131,072 nodes, counting the root, every value occurrence and every dictionary-key occurrence. Maximum4,194,304 Unicode characters across all string-key and string-value occurrences. Aliased acyclic children are fully revisited and counted for each occurrence.
+- Detect a repeated container on the active ancestor path as a cycle; ineligible values take original encoded(snapshot), without truncation, coercion, a new rejection exception or a changed process recursion/integer-conversion limit.
+
+For eligible snapshots only, the pinned stdlib C compact encoder generates tokens with sort_keys=True, ensure_ascii=True, allow_nan=False and separators(',', ':'). A single whitespace formatter recognizes complete JSON string tokens, preserves all scalar/string tokens verbatim and formats punctuation outside strings to the original indent2 layout. No naive punctuation replacement inside strings, custom numeric formatter, third-party JSON package or alternative candidate. Unexpected compact-encoder/formatter exceptions propagate; no catch-and-fallback retry. The fallback decision precedes these calls.
+
+## Fixed evidence and meaningful tests
+
+Root freezes the source/test/driver/scope input map before execution. Independent focused tests compare original strict with candidate strict byte-for-byte, including byte type, or exact exception type/message. They cover nested/empty values; tuple/NumPy canonicalization; Unicode ordering and ASCII escapes, control characters and embedded punctuation; signed zero, subnormals, finite extremes/exponents and integer boundaries; nonfinite values; exact guard boundaries; unsupported/mixed keys; subclasses and side-effecting hooks; object/noncontiguous/read-only arrays; cycles/shared aliases/deep input; mutations between calls; failure followed by success; and candidate-local injected unexpected formatter/encoder failures without retry. Tests never patch frozen module globals. Preserve actual observations before equality assertions.
+
+The saved corpus is the exact ten JSON files (1,188,475 bytes) in owner-workspace `work/rf-origin-profile/profile-685708ac9c57a623/plain/origin-store/`, authenticated against the retained profile index and closed numerical/root acceptance. Use every file in lexical filename order. Require original strict(json.loads(saved_bytes)) equals the saved bytes; retain each candidate result and all errors rather than silently excluding a file.
+
+Append exactly one eleventh input derived deterministically from saved `state-2013-01.json`: recursively replace every nonempty list consisting entirely of exact built-in floats with np.asarray(values, dtype=np.float64); preserve every other leaf/container. Retain array paths, dtype, shape, C-order bytes and the source state. Require original strict on this state-shaped NumPy value equals the saved state bytes. No fitting, distribution recovery, scoring, CDF, historical data or bootstrap occurs in constructing or checking this corpus.
+
+After complete equivalence checks, make one fixed **unprofiled** timing comparison: one original strict pass over all11 ordered inputs, then one candidate strict pass over the same11 inputs. Process each input once per pass. Time the complete call, including canonical conversion, eligibility, compact encoding, whitespace formatting and byte creation. Output retention remains outside per-call timing but inside the command cap. Report every observation, aggregate times and guard/fallback coverage. No warmup, extra rounds, repeated median, favorable subset, retiming, alternative guards or best-case result selection. Fixed order, cache and OS effects remain disclosed.
+
+## Resource, integrity and completion
+
+Use isolated `/opt/anaconda3/bin/python3.12 -I`, accepted Python3.12.2/NumPy1.26.4/SciPy1.13.1/Darwin. Total60 seconds /1,024 MiB includes initial script imports/setup, authentication/snapshots, tests, corpus construction, equivalence, both fixed timing passes, all output persistence and after-pins. Reuse the accepted external observer with128-MiB parent reserve, at most896-MiB child/group allocation, conservative combined RSS checks and five seconds of final-evidence reserve inside the60-second cap. Initial parent interpreter startup is explicitly excluded; child startup is included. Sampled RSS is not an instantaneous kernel bound.
+
+Bind all79 frozen files, the original seven runtime files, original canonical/encoded/strict source identities, source corpus/index/reviews, design and this scope, new candidate/test/driver, and the actual stdlib JSON/tokenizer implementations and native dependencies (including _json and the Python/re engine implementation when used). Preserve exact source/scope/input snapshots and reauthenticate before/after. No upgrades or dependency installation.
+
+The sole registered attempt uses a new exclusive identity derived from its frozen pin map. Preserve command, actual exit, resources, outputs/errors, full observations, partial bytes and failed evidence. Stop on a source/runtime/input, equality, count, budget or ownership defect. A failed attempt requires diagnosis and a separately frozen correction before any additional invocation; no unchanged retry or late scientific work. Driver metadata remains provisional until actual process completion and independent review.
+
+## Decision boundary
+
+Only a passing complete byte/error suite permits timing interpretation. If the candidate's full11-item aggregate is not lower than original, remove it from immediate integration consideration. A lower observation supports at most subsequent explicit integration design; it is not a reliable speedup estimate, removal of the whole attributed bucket or historical capacity proof. Keep one candidate, preserve failures and do not change the fixed guards based on measured outcomes.
+
+Frozen functions hold their original serializer bindings. This standalone scope does not replace Store.write, state/publication helpers, grader, controller or preflight. Any later integration needs separate versioned files, exact explicit bindings, source-difference review and complete declared-path parity/timing qualification; no global patch or frozen-file edit. All statistical gates, external5% target, prospective/product requirements and the unchanged7,200-second historical cost pilot remain. Public scope is front-page Beta/date only.

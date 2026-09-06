@@ -1,0 +1,220 @@
+{
+  "cache_after": {
+    "entries": [
+      [
+        4,
+        4
+      ]
+    ],
+    "evictions": 0,
+    "hits": 2,
+    "misses": 1,
+    "retained_bytes": 128
+  },
+  "cache_before": {
+    "entries": [
+      [
+        4,
+        4
+      ]
+    ],
+    "evictions": 0,
+    "hits": 1,
+    "misses": 1,
+    "retained_bytes": 128
+  },
+  "candidate": {
+    "events": [],
+    "input_after": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "00000000000008400000000000001c40",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "9a9999999999b93f9a9999999999c93f333333333333d33f9a9999999999d93f",
+        "dtype": "<f8",
+        "shape": [
+          2,
+          2
+        ],
+        "strides": [
+          16,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "input_before": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "00000000000008400000000000001c40",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "9a9999999999b93f9a9999999999c93f333333333333d33f9a9999999999d93f",
+        "dtype": "<f8",
+        "shape": [
+          2,
+          2
+        ],
+        "strides": [
+          16,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "result": {
+      "outcome": {
+        "float64_bits": "4019b3de13286ba6",
+        "float_hex": "0x1.9b3de13286ba6p+2",
+        "kind": "return",
+        "type": "float"
+      },
+      "warnings": []
+    }
+  },
+  "expected_error": null,
+  "expected_fallback": false,
+  "fallback_calls": 0,
+  "kind": "energy_parity",
+  "label": "fresh-data-2",
+  "original": {
+    "events": [],
+    "input_after": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "00000000000008400000000000001c40",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "9a9999999999b93f9a9999999999c93f333333333333d33f9a9999999999d93f",
+        "dtype": "<f8",
+        "shape": [
+          2,
+          2
+        ],
+        "strides": [
+          16,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "input_before": {
+      "bounds": {
+        "omitted_probability_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        },
+        "score_error_bound": {
+          "float64_bits": "0000000000000000",
+          "float_hex": "0x0.0p+0",
+          "type": "float"
+        }
+      },
+      "grid_type": "ScoreGrid",
+      "observed": {
+        "c_bytes_hex": "00000000000008400000000000001c40",
+        "dtype": "<f8",
+        "shape": [
+          2
+        ],
+        "strides": [
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      },
+      "probability": {
+        "c_bytes_hex": "9a9999999999b93f9a9999999999c93f333333333333d33f9a9999999999d93f",
+        "dtype": "<f8",
+        "shape": [
+          2,
+          2
+        ],
+        "strides": [
+          16,
+          8
+        ],
+        "type": "ndarray",
+        "writeable": true
+      }
+    },
+    "result": {
+      "outcome": {
+        "float64_bits": "4019b3de13286ba6",
+        "float_hex": "0x1.9b3de13286ba6p+2",
+        "kind": "return",
+        "type": "float"
+      },
+      "warnings": []
+    }
+  },
+  "test": "test_energy_geometry.EnergyGeometryTests.test_probability_and_observation_changes_are_fresh_on_hits"
+}

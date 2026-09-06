@@ -1,0 +1,21 @@
+# RF-COMP-07 driver static review
+
+Initial status: held for a narrow failure-retention correction, agreed by root before execution. Initial driver SHA `ebbb38d6997ea7d384e5b3840a49fb090af0bf1c2e82176a55eeb6bbfe302520`; builder SHA `4e8aef55da719d5a9e2dca8dff8a96b54112d576f8b4b4474376a282c481f82f`. Read source only; no candidate/tests/driver imports or execution.
+
+Finding: run_pass attempted after-input imaging before durably retaining the callback error/warnings/timing, allowing a postimage failure to mask the primary callback error. It also attempted strict(metrics) before retaining a typed result, losing returned nonfinite/unserializable value evidence. Request immediate saved callback outcome, typed return before serialization and separately retained post-call evidence/serialization errors, preserving the primary exception.
+
+Other reviewed contracts align: exact40 ordered source-keyed calls/36 inner/four outer/22 doubled; full law/input bytes and exactly four postcallback mass-field exclusions; distinct empty owners for candidate parity and timing; complete40 original then40 candidate passes; no warmed parity owner; owner creation charged in aggregate and all cold fills/cache work inside callbacks; both aggregate and maximum use <=0.7738077598151377 with no fit credit.
+
+Parity-only sys.setprofile observes actual pinned NumPy rfft2/irfft2 __wrapped__ function code, recording shape/dtype/padding/axes/norm and exact per-call order for124 events/62 pairs. It is restored in finally and forbidden during timing. This proves observed calls/arguments rather than their internal mathematical correctness; separate candidate tests and full metric parity cover that. Candidate cache counts require two fills/60hits/no eviction/2.5MiB, while focused tests cover failure/FIFO boundaries. No shared frozen numerical globals are patched by this observer.
+
+Required source/runtime/fixture/assessment/closed-COMP06 inputs are authenticated before/after; builder pins exact source/test/scope and driver hash plus Python/JSON/re/native NumPy FFT/runtime closure. The inherited79-source/seven-runtime maps remain exact. Source bodies/scope/evidence are snapshotted once, complete metric/typed/input bodies deduplicated by exact bytes with occurrence pointers. No old attempt is written; independent reviews must stay outside new sealed attempts.
+
+The inherited owned-watchdog pattern uses shared setup-inclusive clock,60seconds/1024MiB,128/896 reserve split and final5seconds inside cap. Imports/tests/fixture/scoring/evidence/authentication remain in command budget; per-callback timers exclude reconstruction and output retention. Failure metadata and final completion remain provisional until actual exit/root integrity review. No historical capacity or predictive acceptance follows from a passing synthetic proxy. Final source hash and failure-retention closure will be appended before recommending execution.
+
+## Final corrected driver closure
+
+Accepted for the bounded standalone qualification at held driver SHA `644d849b2ae0ee927205213ae100ba3370bdfcbad354ad401eee7867543ffea4` (36,051 bytes), subject to root final input-map/source/test verification. No execution occurred during review.
+
+Inspected the revised run_pass block. Immediate callback metadata now retains route/item/time/warnings and return type or original error before any post-call imaging or budget check. Successful typed return and its pointer are saved before after-input imaging and strict serialization. Later imaging/serialization errors are separately retained as postprocessing_error; evidence-write failures receive separate fields and cannot replace an existing callback exception. Primary exceptions are re-raised without retry. Full successful bodies remain saved before all parity assertions. The original callback and timer brackets are unchanged.
+
+The initial blocker is closed; no remaining material static driver blocker. Runtime/input membership and freeze_inputs source review remain as above; final freezing must use this corrected hash. Root actual tool exit, whole indexed identity/resource review and independent saved numerical review are still required after the one command. Passing this review grants neither empirical acceptance nor controller/historical permission.

@@ -1,0 +1,511 @@
+"""Controller boundary tests only; no full fixture or historical invocation."""
+from contextlib import contextmanager, ExitStack
+from pathlib import Path
+import sys
+import copy
+import hashlib
+import importlib.util
+import json
+import time
+import tempfile
+from types import SimpleNamespace
+import unittest
+from unittest.mock import patch
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT/'scripts'))
+import research_score_split_controller as c
+import research_score_split_run as r
+import research_score_split_watchdog as w
+
+
+@contextmanager
+def synthetic_clock():
+    clock = [1000.]
+    phases = []
+    def phase(path, name):
+        phases.append((name, clock[0]))
+        return None
+    with patch.object(r.time, 'monotonic', lambda: clock[0]), \
+         patch.object(r, 'rss_mib', lambda: 100.), \
+         patch.object(r.signal, 'getitimer', lambda _: (0., 0.)), \
+         patch.object(r.signal, 'setitimer', lambda *args: None), \
+         patch.object(r.signal, 'signal', lambda *args: None), \
+         patch.object(w, 'transition_phase', phase), \
+         patch.object(w, '_read_phase', lambda path: ({'phase': 'smoke', 'smoke_started': phases[0][1]}, b'')):
+        env = c.ControllerEnvelope()
+        try:
+            yield clock, env, phases
+        finally:
+            env.close()
+
+
+class SmokeTimingTests(unittest.TestCase):
+    def test_total_smoke_includes_loading_but_pilot_T_is_evaluator_only(self):
+        with synthetic_clock() as (clock, env, phases):
+            with env.complete_smoke(Path('/synthetic-owned-phase')):
+                clock[0] += 70
+                def evaluate():
+                    clock[0] += 15
+                    return 'synthetic_timing_value'
+                self.assertEqual(env.measure_phase('inference_smoke', evaluate), 'synthetic_timing_value')
+            self.assertEqual(env.phase_measurements, [{'name': 'inference_smoke',
+                'started_seconds': 70., 'finished_seconds': 85., 'seconds': 15., 'error_type': None}])
+            self.assertEqual(phases, [('smoke', 1000.), ('science', 1085.)])
+            self.assertIsNone(env._whole_smoke_deadline)
+            with self.assertRaisesRegex(ValueError, 'complete_smoke_reuse'):
+                with env.complete_smoke(Path('/synthetic-owned-phase')):
+                    self.fail('second smoke entered')
+
+    def test_loading_plus_evaluation_overrun_cannot_reset_to_evaluator_120(self):
+        with synthetic_clock() as (clock, env, phases):
+            with self.assertRaisesRegex(r.RuntimeStop, 'complete_smoke_deadline'):
+                with env.complete_smoke(Path('/synthetic-owned-phase')):
+                    clock[0] += 110
+                    def evaluate():
+                        clock[0] += 11
+                        return 'not_delivered'
+                    env.measure_phase('inference_smoke', evaluate)
+            self.assertEqual(env.scientific_stop_elapsed, 120.)
+            self.assertEqual(env.phase_measurements[0]['seconds'], 11.)
+            self.assertEqual(phases, [('smoke', 1000.)])
+            self.assertEqual(env.phase, 'stopped')
+
+    def test_total_deadline_wins_if_shorter_and_user_interrupts_survive(self):
+        with synthetic_clock() as (clock, env, phases):
+            clock[0] += 7190
+            with self.assertRaisesRegex(r.RuntimeStop, '7200_second_deadline'):
+                with env.complete_smoke(Path('/synthetic-owned-phase')):
+                    clock[0] += 11
+            self.assertEqual(env.scientific_stop_elapsed, 7200.)
+            self.assertEqual(len(phases), 1)
+        for kind in (KeyboardInterrupt, SystemExit):
+            with self.subTest(kind=kind), synthetic_clock() as (clock, env, phases):
+                original = kind('explicit_stop')
+                try:
+                    with env.complete_smoke(Path('/synthetic-owned-phase')):
+                        def interrupted():
+                            clock[0] += 121
+                            raise original
+                        env.call(interrupted)
+                except BaseException as error:
+                    self.assertIs(error, original)
+                else:
+                    self.fail('interrupt disappeared')
+                self.assertEqual(phases, [('smoke', 1000.)])
+
+    def test_focused_suite_stops_after_swallowed_unittest_baseexception(self):
+        with synthetic_clock() as (clock, env, phases):
+            ran = []
+            class Cases(unittest.TestCase):
+                def test_bad_cache_rejected_before_any_engine_changes(self):
+                    ran.append('first')
+                    clock[0] += 121
+                    env.check()
+                def test_prior_two_seasons_sorted_aggregation_and_future_isolation(self):
+                    ran.append('forbidden_second')
+                def test_native_failure_threshold_boundary_and_family_fallback(self):
+                    ran.append('forbidden_third')
+            module = SimpleNamespace(SplitBankTests=Cases, SplitSelectionTests=Cases)
+            with patch.object(c, '_load_bound_module', return_value=module):
+                with self.assertRaisesRegex(r.RuntimeStop, 'complete_smoke_deadline'):
+                    with env.complete_smoke(Path('/synthetic-owned-phase')):
+                        c._focused_smoke(env)
+            self.assertEqual(ran, ['first'])
+            self.assertEqual(len(phases), 1)
+
+    def test_smoke_orchestration_reports_both_phase_writes_and_evaluator_only_T(self):
+        # Explicit loader/evaluator stubs qualify orchestration only. The bound
+        # accepted fixture pointer/config remain real; full evaluation evidence
+        # is reused, not rerun or replaced by these small non-metric sentinels.
+        with synthetic_clock() as (clock, env, phases):
+            loaded = []
+            fixture = {'metadata': ['explicit_orchestration_sentinel'],
+                       'audit_checks': {'synthetic': True}, 'counts': {'synthetic': True}}
+            rows = {'explicit_sentinel': []}
+            def transition(path, name):
+                phases.append((name, clock[0])); clock[0] += 2 if name == 'smoke' else 3
+            def load(directory, pointer, check):
+                loaded.append((directory, pointer)); check(); clock[0] += 10
+                return fixture, rows, {'synthetic': True}
+            def evaluate(config, metadata, incoming, audits):
+                self.assertIs(metadata, fixture['metadata']); self.assertIs(incoming, rows)
+                self.assertIs(audits, fixture['audit_checks']); clock[0] += 7
+                return {'status': 'reject_all', 'synthetic_orchestration_only': True}
+            with patch.object(w, 'transition_phase', transition), \
+                 patch.object(c, '_focused_smoke', return_value={'tests': 3, 'passed': True}), \
+                 patch.object(c, '_load_bound_module', return_value=SimpleNamespace(load_fixture=load)), \
+                 patch.object(c, 'evaluate', evaluate):
+                result = c.run_smoke(env, Path('/explicit-synthetic-phase'))
+            self.assertEqual(result['fixture_load_validation_seconds'], 10.)
+            self.assertEqual(result['public_evaluator_seconds'], 7.)
+            self.assertEqual(result['complete_smoke_seconds'], 22.)
+            self.assertEqual(env.phase_measurements[0]['seconds'], 7.)
+            self.assertEqual(len(loaded), 1)
+            self.assertEqual(loaded[0][1]['sha256'], result['fixture']['sha256'])
+            self.assertEqual(phases, [('smoke', 1000.), ('science', 1019.)])
+
+    def test_invalid_smoke_keeps_exact_returned_failure_details(self):
+        with synthetic_clock() as (clock, env, phases):
+            failure = {'status': 'protocol_invalid', 'failure_type': 'ExplicitSyntheticFailure',
+                       'reason': 'retain_this_boundary_evidence'}
+            module = SimpleNamespace(load_fixture=lambda *args: ({'metadata': [], 'audit_checks': {}, 'counts': {}}, {}, {}))
+            with patch.object(c, '_focused_smoke', return_value={'tests': 3, 'passed': True}), \
+                 patch.object(c, '_load_bound_module', return_value=module), patch.object(c, 'evaluate', return_value=failure):
+                with self.assertRaisesRegex(ValueError, 'real_public_smoke_invalid') as caught:
+                    c.run_smoke(env, Path('/explicit-synthetic-phase'))
+            self.assertEqual(json.loads(str(caught.exception).split(':', 1)[1]), failure)
+            self.assertEqual(phases, [('smoke', 1000.)])
+
+    def test_real_three_focused_cases_preserve_live_archive_seal(self):
+        import research_score_split_archive as archive
+        original = archive._SEAL
+        with synthetic_clock() as (_, env, _):
+            result = c._focused_smoke(env)
+        self.assertEqual(result['tests'], 3)
+        self.assertTrue(result['passed'])
+        self.assertIs(archive._SEAL, original)
+
+
+
+
+def archive_fixtures():
+    spec = importlib.util.spec_from_file_location('controller_archive_fixtures', ROOT/'tests/research-score-split/test_archive_unit.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class PublicationTests(unittest.TestCase):
+    def setUp(self):
+        import research_score_split_archive as archive
+        from research_score_split_replay import SplitTrajectoryBank
+        from research_score_conditional_run import Store
+        t = archive_fixtures()
+        self.source = t.TinyArchive()
+        self.addCleanup(self.source.close)
+        x = self.source
+        self.context = archive.SourceContext(x.directory, t.encoded({'files': x.archive.index}),
+            (x.directory/'manifest.json').read_bytes(), t.encoded(x.records), (t.encoded(x.origin),),
+            t.CONFIG_RAW, (), t.encoded(x.mapper_pointers), (), t.encoded({}), archive._SEAL)
+        self.view = archive.forecast_inputs(self.context, x.origin, lambda: None)
+        self.bank = SplitTrajectoryBank(tuple(f'T{i:02}' for i in range(32)))
+        # Establish each own original expectation before delivering its result.
+        old = self.view['bank_prepared'][12]['history'][0].context
+        for engine in self.bank.engines.values():
+            engine.forecast_origin(old.season, old.week, [], [old])
+        self.outputs = self.bank.advance(2011, 1, self.view['bank_prepared'], self.view['diagonal_outputs'])
+        self.manifest = {'parent_manifest_sha256': c.PARENT_MANIFEST, 'parent_index_sha256': c.PARENT_INDEX,
+            'bound_hashes': {'config': c.CONFIG_SHA}, 'code_hashes': {'synthetic': 'b'*64}}
+        self.manifest_sha = hashlib.sha256(c.strict(self.manifest)).hexdigest()
+        # Explicit publication-schema fixture. No claim these descriptors were
+        # numerically assembled; law/scorer integration has separate real tests.
+        pub = t.publication_fixture(x.origin, self.manifest_sha)
+        self.assembly = {k: pub[k] for k in ('full_setting_forecasts', 'outer_selected_forecasts')}
+        self.assembly['grading_plan'] = {'inner': [], 'outer': []}
+        self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
+        self.store = Store(Path(self.temp.name).resolve(), 'synthetic-publication')
+        self.addCleanup(self.store.close)
+        self.env = SimpleNamespace(check=lambda: None)
+
+    def publish(self):
+        return c.publish_origin(self.store, self.manifest, self.manifest_sha, self.view,
+                                self.bank, self.outputs, self.assembly, self.env)
+
+    def validate(self, pointer):
+        return c.validate_publication_binding(self.store, self.manifest, self.manifest_sha,
+                                             self.view, self.assembly, pointer, self.env)
+
+    def test_real_store_state_ancestry_publication_then_actual_archive_grader(self):
+        from functools import partial
+        import research_score_split_archive as archive
+        pointer = self.publish()
+        self.assertEqual(list(self.store.index), ['state-2011-01.json', 'ancestry-2011-01.json',
+                         'publication-binding-2011-01.json', 'forecasts-2011-01.json'])
+        publication, binding = self.validate(pointer)
+        state = self.store.read_bound(binding['state'])
+        self.assertEqual(len(state['trajectory_state']), 297)
+        self.assertEqual(sum('source_state' in row for row in state['trajectory_state']), 81)
+        self.assertEqual(sum('own_state' in row for row in state['trajectory_state']), 216)
+        self.assertNotIn('labels', publication)
+        grade = archive.grade_inputs(self.context, self.view['origin'], pointer, self.env.check,
+            read_publication=partial(c.read_publication, self.store), expected_manifest_sha256=self.manifest_sha)
+        self.assertEqual(grade['labels'], {'z-target': [21, 17], 'a-target': [21, 17]})
+        self.assertEqual(len(grade['diagonal_inner_rows']), 18)
+        self.assertEqual(grade['grading_receipt'].publication_sha256, pointer['sha256'])
+        with self.assertRaises(ValueError): self.publish()
+
+    def test_incomplete_or_changed_borrowed_state_prevents_publication(self):
+        for change in ('missing', 'changed'):
+            original = copy.deepcopy(self.outputs)
+            with self.subTest(change=change):
+                if change == 'missing': self.outputs.pop(('E3', 26, 'full'))
+                else: self.outputs['E3', 0, 'full']['league_mean'] += 1
+                with self.assertRaisesRegex(ValueError, 'native_state|borrowed_native'):
+                    self.publish()
+                self.assertEqual(self.store.index, {})
+            self.outputs = original
+
+    def test_wrong_manifest_or_parent_rejected_before_writes(self):
+        self.manifest['parent_index_sha256'] = 'e'*64
+        with self.assertRaisesRegex(ValueError, 'manifest_bytes_changed'): self.publish()
+        self.manifest_sha = hashlib.sha256(c.strict(self.manifest)).hexdigest()
+        with self.assertRaisesRegex(ValueError, 'manifest_parent_or_config'): self.publish()
+        self.assertEqual(self.store.index, {})
+
+    def test_ancestry_failure_preserves_state_but_no_publication(self):
+        with patch.object(c, 'validate_lineage', side_effect=ValueError('injected_ancestry_fault')):
+            with self.assertRaisesRegex(ValueError, 'injected_ancestry_fault'): self.publish()
+        self.assertEqual(list(self.store.index), ['state-2011-01.json'])
+
+    def test_write_failure_has_no_readable_complete_forecast(self):
+        original = self.store.write
+        def fail(name, value):
+            if name.startswith('forecasts-'): raise OSError('injected_forecast_write_fault')
+            return original(name, value)
+        with patch.object(self.store, 'write', side_effect=fail):
+            with self.assertRaisesRegex(OSError, 'injected_forecast_write_fault'): self.publish()
+        self.assertEqual(len(self.store.index), 3)
+        with self.assertRaises(ValueError): self.store.pointer('forecasts-2011-01.json')
+
+    def test_saved_bytes_and_in_memory_assembly_cannot_change_before_grading(self):
+        pointer = self.publish()
+        self.assembly['full_setting_forecasts'][0]['native_failure'] = 'changed'
+        with self.assertRaisesRegex(ValueError, 'saved_forecasts_differ'): self.validate(pointer)
+        self.assembly['full_setting_forecasts'][0]['native_failure'] = None
+        path = self.store.path / pointer['name']
+        raw = path.read_bytes(); path.write_bytes(raw + b' ')
+        with self.assertRaises(ValueError): self.validate(pointer)
+
+    def test_pointer_and_plan_must_belong_to_exact_saved_publication(self):
+        pointer = self.publish()
+        bad = dict(pointer, bytes=True)
+        with self.assertRaises(ValueError): self.validate(bad)
+        self.assembly['grading_plan']['inner'].append({'invented': 'plan'})
+        with self.assertRaisesRegex(ValueError, 'publication_binding_changed'): self.validate(pointer)
+
+
+
+
+class ExtendedPublicationTests(PublicationTests):
+    # Run the parent seven cases only once; the test loader below selects the
+    # new cases on this subclass explicitly rather than duplicating them.
+    def test_directory_fsync_failure_blocks_publication_handoff(self):
+        original = c.os.fsync
+        def failing(fd):
+            if fd == self.store.fd: raise OSError('injected_directory_fsync')
+            return original(fd)
+        with patch.object(c.os, 'fsync', side_effect=failing):
+            with self.assertRaisesRegex(OSError, 'injected_directory_fsync'): self.publish()
+        self.assertIn('forecasts-2011-01.json', self.store.index)
+        # Bytes exist, but publish did not return a pointer and caller cannot
+        # enter grading through the successful publication path.
+
+    def test_rehashed_state_population_and_own_state_invalid(self):
+        pointer = self.publish()
+        _, binding = self.validate(pointer)
+        state = self.store.read_bound(binding['state'])
+        for change in ('duplicate', 'bool-index', 'short-vector', 'wrong-own-origin'):
+            with self.subTest(change=change):
+                bad = copy.deepcopy(state)
+                if change == 'duplicate': bad['trajectory_state'][1] = copy.deepcopy(bad['trajectory_state'][0])
+                if change == 'bool-index': bad['trajectory_state'][0]['key'][1] = False
+                if change == 'short-vector':
+                    next(row for row in bad['trajectory_state'] if 'own_state' in row)['own_state']['ratings'].pop()
+                if change == 'wrong-own-origin': bad['origin']['week'] = 2
+                with self.assertRaises(ValueError): c._validate_published_state(bad, self.manifest_sha, self.view)
+        before = c._bank_state_digest(self.bank, self.outputs)
+        self.bank.engines['E3', 9, 'full'].offense[0] += 1
+        self.assertNotEqual(c._bank_state_digest(self.bank, self.outputs), before)
+        self.bank.engines['E3', 9, 'full'].last_origin = (2010, 17)
+        with self.assertRaisesRegex(ValueError, 'own_state_not_at_published_origin'):
+            self.publish()
+
+
+class TerminalFlowTests(unittest.TestCase):
+    """Actual Store/runtime; explicit synthetic seams isolate terminal routing.
+
+    Preflight/admission/smoke/model/inference are NOT run or qualified by these
+    tests. Separate fixed real integration evidence governs those components.
+    """
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)
+        self.folder = Path(self.temp.name).resolve()
+        self.phase = self.folder/'phase.json'
+        w._write_phase(self.phase, {'version': 'rf02f.owned-phase.v1', 'owner': 'a'*32,
+            'phase': 'starting', 'smoke_started': None, 'smoke_finished': None}, initial=True)
+        manifest = {'parent_manifest_sha256': c.PARENT_MANIFEST, 'parent_index_sha256': c.PARENT_INDEX,
+            'bound_hashes': {'config': c.CONFIG_SHA}, 'code_hashes': {},
+            'qualification': {'synthetic': True}, 'independent_reviews': {'synthetic': True}}
+        self.ready = {'manifest': manifest, 'manifest_sha256': hashlib.sha256(c.strict(manifest)).hexdigest(),
+            'identity': 'explicit-synthetic-terminal', 'config': {}}
+        self.context = SimpleNamespace(origins=[])
+        self.evaluation = {'status': 'reject_all', 'synthetic_terminal_fixture': True}
+        self.fake_ledger = SimpleNamespace(_origins=[], snapshot=lambda: {'origins': []})
+
+    @contextmanager
+    def seams(self, **changes):
+        import research_score_split_preflight as preflight
+        import research_score_split_archive as archive
+        import research_score_run as original
+        with ExitStack() as stack:
+            patches = [(preflight, 'preflight', {'return_value': self.ready}),
+                (archive, 'admit_source', changes.pop('admission', {'return_value': self.context})),
+                (original, 'OUTPUT_PARENT', {'new': self.folder}),
+                (c, '_admission_evidence', {'return_value': {'synthetic': True}}),
+                (c, 'run_smoke', {'return_value': {'synthetic': True}}),
+                (r, 'OriginAccounting', {'return_value': self.fake_ledger}),
+                (c, '_chronological_origins', {'return_value': []}),
+                (c, '_saved_inference_inputs', {'return_value': ([], {}, [])}),
+                (c, 'evaluate', {'return_value': self.evaluation})]
+            for module, name, args in patches: stack.enter_context(patch.object(module, name, **args))
+            yield
+
+    def execute(self):
+        return c.run(c.ROOT, '/explicit-synthetic-acceptance-not-read', 'e'*64, self.phase, time.monotonic())
+
+    def terminal(self):
+        return json.loads((self.folder/self.ready['identity']/'completion/terminal.json').read_bytes())
+
+    def test_actual_atomic_success_and_existing_identity_refusal(self):
+        import research_score_split_archive as archive
+        with self.seams():
+            result = self.execute()
+            self.assertEqual(result['status'], 'reject_all')
+            self.assertEqual(self.terminal()['status'], 'reject_all')
+            with patch.object(archive, 'admit_source', side_effect=AssertionError('forbidden_second_admission')):
+                with self.assertRaises(FileExistsError): self.execute()
+        self.assertEqual(len(list((self.folder/self.ready['identity']).glob('completion'))), 1)
+
+    def test_invalid_evaluator_payload_saved_before_invalid_terminal(self):
+        self.evaluation = {'status': 'protocol_invalid', 'reason': 'explicit_numpy_boundary_fixture',
+                           'failure_type': 'SyntheticFailure', 'details': ['preserve_me']}
+        with self.seams(): result = self.execute()
+        self.assertEqual(result['status'], 'protocol_invalid')
+        terminal = self.terminal()
+        pointer = terminal['artifacts']['evaluation']
+        saved = (self.folder/self.ready['identity']/pointer['name']).read_bytes()
+        self.assertEqual(hashlib.sha256(saved).hexdigest(), pointer['sha256'])
+        self.assertEqual(json.loads(saved), self.evaluation)
+        self.assertIn('explicit_numpy_boundary_fixture', terminal['reason'])
+
+    def test_interrupt_survives_failed_metadata_closure(self):
+        for kind in (KeyboardInterrupt, SystemExit):
+            with self.subTest(kind=kind):
+                self.ready['identity'] = 'explicit-synthetic-' + kind.__name__.lower()
+                error = kind('original_user_interrupt')
+                with self.seams(admission={'side_effect': error}), patch.object(c.ControllerEnvelope,
+                    'finalize_invalid', side_effect=OSError('injected_metadata_fsync')):
+                    try: self.execute()
+                    except BaseException as caught: self.assertIs(caught, error)
+                    else: self.fail('original interrupt disappeared')
+                self.assertFalse((self.folder/self.ready['identity']/'completion').exists())
+
+    def test_late_atomic_completion_fault_preserves_one_terminal(self):
+        from research_score_conditional_run import Store
+        finish = Store.finish
+        def fail_after_commit(store, terminal, budget=None):
+            result = finish(store, terminal, budget)
+            raise OSError('injected_post_commit_fsync')
+        with self.seams(), patch.object(Store, 'finish', fail_after_commit), \
+             patch.object(c.ControllerEnvelope, 'finalize_invalid', side_effect=AssertionError('competing_terminal_forbidden')):
+            with self.assertRaisesRegex(OSError, 'injected_post_commit_fsync'): self.execute()
+        self.assertEqual(self.terminal()['status'], 'reject_all')
+        self.assertEqual(len(list((self.folder/self.ready['identity']).glob('completion'))), 1)
+
+    def test_parent_start_counts_import_setup_and_cannot_be_future(self):
+        with synthetic_clock() as (clock, existing, _):
+            existing.close()
+            env = c.ControllerEnvelope(clock[0]-5)
+            try:
+                self.assertEqual(env.elapsed(), 5.)
+                self.assertEqual(env._deadline, clock[0]+7195.)
+            finally: env.close()
+            with self.assertRaisesRegex(ValueError, 'invalid_parent_envelope_start'):
+                c.ControllerEnvelope(clock[0]+1)
+
+
+class SavedInputAssemblyTests(unittest.TestCase):
+    """Full-size routing with conspicuous NON-METRIC sentinels, never inference.
+
+    Real Store serialization/index/readback and the actual controller loader are
+    used. This does not generate or claim a scored synthetic forecast fixture;
+    complete valid scorer/inference evidence is retained separately and reused.
+    """
+    @classmethod
+    def setUpClass(cls):
+        from research_score_conditional_run import Store
+        spec = importlib.util.spec_from_file_location('saved_inputs_plan', ROOT/'tests/research-score-split/test_run_unit.py')
+        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+        cls.origins = module.original_plan()
+        # Reverse targets within each origin to catch accidental sorting.
+        for origin in cls.origins: origin['targetGameIds'].reverse()
+        cls.context = SimpleNamespace(origins=cls.origins)
+        cls.config = json.loads((ROOT/c.CONFIG).read_bytes())
+        cls.temp = tempfile.TemporaryDirectory()
+        cls.store = Store(Path(cls.temp.name).resolve(), 'synthetic-input-assembly')
+        cls.addClassCleanup(cls.store.close); cls.addClassCleanup(cls.temp.cleanup)
+        cls.evidence = []
+        for origin in cls.origins:
+            suffix = c._suffix(origin); artifacts = {}
+            if origin['season'] >= 2013:
+                rows = [{'family': family, 'variant': variant, 'game_id': game,
+                         'native_failure': 'synthetic_native_failure' if family == 'E3' and variant == 'zero_strength_update' else None,
+                         'metrics': {'__not_a_scored_metric_fixture__': [game, family, variant]}}
+                        for family, variant in cls.config['seriesInOrder'] for game in origin['targetGameIds']]
+                name = 'outer-losses-' + suffix + '.json'; cls.store.write(name, rows)
+                artifacts['outer_losses'] = cls.store.pointer(name)
+            entry = {'version': 'rf02f.origin-evidence.v1', 'manifest_sha256': 'f'*64,
+                     'origin': origin, 'publication_before_grading': True, 'score_artifacts': artifacts}
+            name = 'origin-evidence-' + suffix + '.json'; cls.store.write(name, entry)
+            cls.evidence.append(cls.store.pointer(name))
+        c.os.fsync(cls.store.fd)
+        cls.env = SimpleNamespace(check=lambda: None)
+
+    def load(self, evidence=None):
+        return c._saved_inference_inputs(self.context, self.store, 'f'*64, self.config,
+                                         self.evidence if evidence is None else evidence, self.env)
+
+    def test_complete_saved_19_by_3407_routing_preserves_order_flags_and_2025(self):
+        metadata, rows, pointers = self.load()
+        ids = [game for origin in self.origins if origin['season'] >= 2013 for game in origin['targetGameIds']]
+        self.assertEqual([row['game_id'] for row in metadata], ids)
+        self.assertEqual(len(metadata), 3407); self.assertEqual(len(pointers), 226)
+        self.assertEqual(sum(row['season'] == 2025 for row in metadata), 272)
+        self.assertEqual(list(rows), list(map(tuple, self.config['seriesInOrder'])))
+        self.assertEqual(sum(map(len, rows.values())), 64733)
+        for (family, variant), values in rows.items():
+            self.assertEqual([row['game_id'] for row in values], ids)
+            for row in values:
+                self.assertEqual(set(row), {'game_id', 'metrics', 'native_failure'})
+                self.assertEqual(row['metrics'], {'__not_a_scored_metric_fixture__': [row['game_id'], family, variant]})
+                self.assertEqual(row['native_failure'], 'synthetic_native_failure' if (family, variant) == ('E3', 'zero_strength_update') else None)
+
+    def test_incomplete_reordered_or_foreign_origin_pointer_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'final_origin_index_population'): self.load(self.evidence[:-1])
+        changed = list(self.evidence); changed[51], changed[52] = changed[52], changed[51]
+        with self.assertRaisesRegex(ValueError, 'saved_origin_evidence_binding'): self.load(changed)
+        changed = list(self.evidence); changed[0] = {**changed[0], 'sha256': 'a'*64}
+        with self.assertRaises(ValueError): self.load(changed)
+
+    def test_real_changed_score_bytes_never_reach_public_input(self):
+        entry = self.store.read_bound(self.evidence[51]); pointer = entry['score_artifacts']['outer_losses']
+        path = self.store.path/pointer['name']; original = path.read_bytes()
+        try:
+            path.write_bytes(original + b' ')
+            with self.assertRaisesRegex(ValueError, 'hash_mismatch'): self.load()
+        finally:
+            path.write_bytes(original)
+
+
+def load_tests(loader, suite, pattern):
+    # Avoid running inherited low-impact publication cases twice.
+    selected = unittest.TestSuite()
+    for cls in (SmokeTimingTests, PublicationTests, TerminalFlowTests, SavedInputAssemblyTests): selected.addTests(loader.loadTestsFromTestCase(cls))
+    for name in ('test_directory_fsync_failure_blocks_publication_handoff', 'test_rehashed_state_population_and_own_state_invalid'):
+        selected.addTest(ExtendedPublicationTests(name))
+    return selected
+
+
+if __name__ == '__main__':
+    unittest.main(verbosity=2)

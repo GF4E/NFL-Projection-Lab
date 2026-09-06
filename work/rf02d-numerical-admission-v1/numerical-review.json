@@ -1,0 +1,608 @@
+{
+  "actual_admission_counts": {
+    "annual_selections": 13,
+    "calibration_cases": 56430,
+    "lineage_closures": 452,
+    "native_failures": 0,
+    "ordinary_series": 18,
+    "recovered_distributions": 68140,
+    "selected_games": 3407,
+    "selected_rows": 68140,
+    "series": 20,
+    "source_mapper_objects": 437
+  },
+  "actual_case_digest": "a476649145bbef1919acedaf76d1a3f916f18d12fffef1c5361c352d5a7fe542",
+  "actual_recovery_digest": "b50d8cf2a690df1cbcf89972914888c3fd93b843ef569038597078d101c44bbd",
+  "admission_report_sha256": "8c0944fb4b4a6a086e26b133e1a087863ee430d1917d75ddfac1283ef6f64ca1",
+  "checked_artifacts": {
+    "forecasts-2013-01.json": {
+      "bytes": 1452895,
+      "sha256": "6ce2170a887f2f2e4e250942018895638c8cdf7dba054c827acc70b9c97cd6c7"
+    },
+    "forecasts-2024-18.json": {
+      "bytes": 1449331,
+      "sha256": "f513b07d164e0f26f90c6e9d2dde8cbfd602bfa12d352241c3cdc7bbb5326704"
+    },
+    "forecasts-2025-01.json": {
+      "bytes": 1448644,
+      "sha256": "dcd72306bdad5b898ce439561b49dc4f62eaee23ee5ff1873ed0aca25ccfade7"
+    },
+    "forecasts-2025-18.json": {
+      "bytes": 1449097,
+      "sha256": "f2a94db2216143d5da92c8670b2b77f73737c1ca3a781c29d55b1093946a4208"
+    },
+    "manifest.json": {
+      "bytes": 6433,
+      "sha256": "2d9c91d803f1c991be039b88167082c8a501ce60dc58b18afcab0b251bb75e38"
+    },
+    "object-11c332614a59e25522107953fa2e545cfa1b311a245c2c1581485e23351ef708.json": {
+      "bytes": 94378,
+      "sha256": "11c332614a59e25522107953fa2e545cfa1b311a245c2c1581485e23351ef708"
+    },
+    "object-4cfc13eb9a66eaed45603b32a3f050c6166ba9fbdca405b069476f8463d9700f.json": {
+      "bytes": 94628,
+      "sha256": "4cfc13eb9a66eaed45603b32a3f050c6166ba9fbdca405b069476f8463d9700f"
+    },
+    "object-75b68a6714365722b5f86a7b6bc23006a722f22d8d0a30e31dbf8bc97f0a5d5a.json": {
+      "bytes": 96927,
+      "sha256": "75b68a6714365722b5f86a7b6bc23006a722f22d8d0a30e31dbf8bc97f0a5d5a"
+    },
+    "object-c7c77cf7b10b76e5c0563905200cf2f0eb3b4be2a78eb79f6a55e7e15ef06162.json": {
+      "bytes": 94414,
+      "sha256": "c7c77cf7b10b76e5c0563905200cf2f0eb3b4be2a78eb79f6a55e7e15ef06162"
+    },
+    "object-f3c6e4279f6b0aab322fed4f957ea92a2e986acf7d9a718a1a2910b8826db37a.json": {
+      "bytes": 42890,
+      "sha256": "f3c6e4279f6b0aab322fed4f957ea92a2e986acf7d9a718a1a2910b8826db37a"
+    },
+    "outer-losses-2013-01.json": {
+      "bytes": 2624827,
+      "sha256": "f01209b4c9047392308e811e83ea7c1e05ac65a0d8d492447bb9d38426c0a33b"
+    },
+    "outer-losses-2024-18.json": {
+      "bytes": 2623511,
+      "sha256": "b5cac98872184c3a5dad129e121d3fabf8931b0173a3d8cab3e1af7fa32461a5"
+    },
+    "outer-losses-2025-01.json": {
+      "bytes": 2624489,
+      "sha256": "cf2f344d18998dd8bc6986042a4509dd95096a17b39a2814bd13a0f5d73821eb"
+    },
+    "outer-losses-2025-18.json": {
+      "bytes": 2623510,
+      "sha256": "eba37c7544878c1aea612434c3eddcb526e641da2d88592e4df8690d6973c00a"
+    }
+  },
+  "future_case_constructions": 0,
+  "future_source_checks": 4,
+  "limitations": [
+    "Full recovery/case counts and aggregate digests come from independently reviewed admission output; not fully recomputed in this sample audit.",
+    "Independent direct-mixture enumeration covers36cases only;2025sources checked without cases.",
+    "No fitting, estimation or scoring performed.",
+    "Initial audit invocation failed before archive reads because report path was relative; corrected to canonical absolute path."
+  ],
+  "maximum_independent_moment_error": 5.3290705182007514e-14,
+  "peak_rss_mib": 138.640625,
+  "reviewed_pins": {
+    ".planning/engine-os/research-first/RF-02D-HISTORICAL-PROTOCOL.v1.md": "6fb5423bc60ef6f0f4e23b2ca4e4fe88991cda33f81a1218c74f745e76513de9",
+    "config/research-team-score-conditional.v1.json": "235e7bdf74b2e75620cdd4cafdd8cb9fa130c631949ff6172e047116a503a615",
+    "scripts/research_score_conditional_admission.py": "d6043ce8c84b5689f791d21934929debaa603267a5de27d6ec1438c75ca307b8",
+    "tests/research-score-conditional-margin/test_admission.py": "416550a5459c6ae635db0dfbe35b27e1a51cd57501ec4c234f190c0b5c4249bb"
+  },
+  "sample_cases": 36,
+  "sample_evidence": [
+    {
+      "case_constructed": true,
+      "case_sha256": "d743edb9d8d6a4caeac066e67020189c7323307eb169901edc9cb6da309857b4",
+      "fingerprint": "da1946a83cf43d38bcb32225a28ae4444e4323a5e76117d59820e01c58b20532",
+      "key": {
+        "family": "N0",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "full",
+        "week": 1
+      },
+      "maximum_error": 2.842170943040401e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "73f8b1f8056b4715c76ff91d44ee42cc83ee8daba6757ed99de1de72124da40d",
+      "fingerprint": "62e4c5f4957c3a648b39ad13b752650fdc2e0b49becc786d694eec59677cd4c1",
+      "key": {
+        "family": "N0",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "no_home_effect",
+        "week": 1
+      },
+      "maximum_error": 1.4210854715202004e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "215dc1ea6268bb6ba813e9cdb0761f61721a12c6fbc4fc672e067ca5ad78e052",
+      "fingerprint": "33dc5787daf0137c2948de7274047efbbabd11034a14b9e6782ecc9269deab05",
+      "key": {
+        "family": "N0",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "no_prior_season_carryover",
+        "week": 1
+      },
+      "maximum_error": 4.718447854656915e-15
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "7e7694fcb96751181d79478195455151264fbb6cb80ca11782ceb091130e98f8",
+      "fingerprint": "9d9ac359ed69e315afc0a9ab1649a8ba6ed22c17946bfc05811050a92d506ff5",
+      "key": {
+        "family": "N0",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "no_time_decay",
+        "week": 1
+      },
+      "maximum_error": 4.440892098500626e-16
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "215dc1ea6268bb6ba813e9cdb0761f61721a12c6fbc4fc672e067ca5ad78e052",
+      "fingerprint": "33dc5787daf0137c2948de7274047efbbabd11034a14b9e6782ecc9269deab05",
+      "key": {
+        "family": "N0",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "no_team_identity",
+        "week": 1
+      },
+      "maximum_error": 4.718447854656915e-15
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "d743edb9d8d6a4caeac066e67020189c7323307eb169901edc9cb6da309857b4",
+      "fingerprint": "da1946a83cf43d38bcb32225a28ae4444e4323a5e76117d59820e01c58b20532",
+      "key": {
+        "family": "N0",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "availability_24h",
+        "week": 1
+      },
+      "maximum_error": 2.842170943040401e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "0fe5d422cb62fa28cd376d9e28fee46fa05b952a9b0e95340897adaaab30286b",
+      "fingerprint": "1ed7a63b197a77a8f33b833fad1b9b7f667c303de209169fda80329aa5c4ed44",
+      "key": {
+        "family": "N0",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "shuffled_identity",
+        "week": 1
+      },
+      "maximum_error": 5.3290705182007514e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "a7a05a1751f845d4d37ea34349b92655f5c8116b7b9f3382ff3f627262602e5c",
+      "fingerprint": "f12cc7d66bb9c86ebe2f3e14801bf39b1a09dd431d66ab6523549298bc56817a",
+      "key": {
+        "family": "N0",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "deterministic_noise",
+        "week": 1
+      },
+      "maximum_error": 3.019806626980426e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "7dc94baac5625d0f2b7f34a99db100217ff88f53d7648d5d60436aefb6471796",
+      "fingerprint": "8bbd3fb733e801eb081a6e5c9ecc457167ca3f3a57cbc5208849fd414f80e546",
+      "key": {
+        "family": "E2",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "full",
+        "week": 1
+      },
+      "maximum_error": 4.796163466380676e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "277140d7db1e452fbca00c65130efb0ea80a9354adc0dbd1cf664d2706f2451e",
+      "fingerprint": "d7e777be604c3acdef2a11635e3d78a410efb31e8fa313cca3f88fd6f3a60022",
+      "key": {
+        "family": "E2",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "no_home_effect",
+        "week": 1
+      },
+      "maximum_error": 1.4210854715202004e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "215dc1ea6268bb6ba813e9cdb0761f61721a12c6fbc4fc672e067ca5ad78e052",
+      "fingerprint": "33dc5787daf0137c2948de7274047efbbabd11034a14b9e6782ecc9269deab05",
+      "key": {
+        "family": "E2",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "no_prior_season_carryover",
+        "week": 1
+      },
+      "maximum_error": 4.718447854656915e-15
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "f0af1a405236fde0f44aad894ab9d759924bf3f21b6544635844d721a1d68b16",
+      "fingerprint": "894d1e350edc8baae2a3997418e67c9d45090136005a2a5c6ba327439c771c3f",
+      "key": {
+        "family": "E2",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "no_time_decay",
+        "week": 1
+      },
+      "maximum_error": 2.4868995751603507e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "215dc1ea6268bb6ba813e9cdb0761f61721a12c6fbc4fc672e067ca5ad78e052",
+      "fingerprint": "33dc5787daf0137c2948de7274047efbbabd11034a14b9e6782ecc9269deab05",
+      "key": {
+        "family": "E2",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "no_team_identity",
+        "week": 1
+      },
+      "maximum_error": 4.718447854656915e-15
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "cfdf5652b0c48bbc4970039486415c95e55b79ba9cd10e5aa47276d93cb510e8",
+      "fingerprint": "618979c12530d4cf7cf45d8a5fba5f255dd345b98c73efb0645e53a4997d1003",
+      "key": {
+        "family": "E2",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "availability_24h",
+        "week": 1
+      },
+      "maximum_error": 2.4868995751603507e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "a64ba74a5acf959f9cb7cce1479c6faecbe01cb5b13b4a4073467db14bb6ec9e",
+      "fingerprint": "11ecc661eaca3b29505d9e87f35d55b5cd588c0c00608ad3dbc760639a8f0fd4",
+      "key": {
+        "family": "E2",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "no_offense",
+        "week": 1
+      },
+      "maximum_error": 2.842170943040401e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "0ec37f19a771573d62b8c529c10142955c0a33c8741112e71cefc3fd1a165648",
+      "fingerprint": "edb0575c8811e1bf572d6132abda2a7f723c256a4e322a9ec47878902baa01ab",
+      "key": {
+        "family": "E2",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "no_defense",
+        "week": 1
+      },
+      "maximum_error": 1.509903313490213e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "b1f376f2b8445e5c6901b19dbaf616cd034e763a532444b0b7f37845f0a2aace",
+      "fingerprint": "64b86211cae753261bc82778bfb94989a75daa2fccf5dad1401c879745c59b3c",
+      "key": {
+        "family": "E2",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "shuffled_identity",
+        "week": 1
+      },
+      "maximum_error": 2.6645352591003757e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "8c57f6610ce60416de5606786e18672d27334d2cf66c835b857f93eb028482e0",
+      "fingerprint": "a8f085be501446385b241c0c5b64f87d4117b1f787bac7fd9971ed0f387e70d1",
+      "key": {
+        "family": "E2",
+        "game_id": "2013_01_ARI_STL",
+        "season": 2013,
+        "variant": "deterministic_noise",
+        "week": 1
+      },
+      "maximum_error": 5.1514348342607263e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "fb1426c24d2c81474642be95810c5678b4d283c2c6730a8c95a4757afedfe086",
+      "fingerprint": "c0c69d5faa026c15b8de4b0463d85528a92fad3058ce190d632f2d7889f26245",
+      "key": {
+        "family": "N0",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "full",
+        "week": 18
+      },
+      "maximum_error": 7.105427357601002e-15
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "bd3798e0ea9a35f30d0eba0e38c153ed059785f76a05c579c6082a692910f5a0",
+      "fingerprint": "f75d0de072019aaf314ea0ce40fa05deff8dac7bd150027058223054e06243b9",
+      "key": {
+        "family": "N0",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "no_home_effect",
+        "week": 18
+      },
+      "maximum_error": 1.4210854715202004e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "e1dafd4c64f67abf4a73280dd76f89378990fde7656e81643613518ec4ec8bca",
+      "fingerprint": "46abfc78835c9d52ca7f7572e2aaf06b6d703641e665e1a90ef04cca36fb5104",
+      "key": {
+        "family": "N0",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "no_prior_season_carryover",
+        "week": 18
+      },
+      "maximum_error": 7.105427357601002e-15
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "c432df54a4ed760dbe65b4d15f974314b900b6906fcdce851eab2ddffd07273d",
+      "fingerprint": "51ac57d914b330a14cb072565a38783233e7996da6ab60173e3dedb433ffa741",
+      "key": {
+        "family": "N0",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "no_time_decay",
+        "week": 18
+      },
+      "maximum_error": 2.042810365310288e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "4b415eb688f0e475da3f7aa378761d6af651eb911544ac7e7ab1ea95aac2c867",
+      "fingerprint": "102d86cb84527c4a73ae852f9a57beb79fb692022951bec99bbdcedb28b09dc8",
+      "key": {
+        "family": "N0",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "no_team_identity",
+        "week": 18
+      },
+      "maximum_error": 0.0
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "f9d9da699ea02814855a454072fe789b6c3e0e5ef79025c6f2aabfde9c54f0ca",
+      "fingerprint": "3f3ad57592b1f8161c9c29690e08fd56da5715f362cbe780d24003b3cce8a1f4",
+      "key": {
+        "family": "N0",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "availability_24h",
+        "week": 18
+      },
+      "maximum_error": 2.531308496145357e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "696a3222e94f2f42008cbb0ab1686d295aa48d39dd90a57a8f1668986edca959",
+      "fingerprint": "bbb1f0e440c8beb037b24acdf2794e714f49c5dae12bdfa58da65778b5150294",
+      "key": {
+        "family": "N0",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "shuffled_identity",
+        "week": 18
+      },
+      "maximum_error": 5.1514348342607263e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "5fbbd525a6f8e4d2564be0bb9519ae98da08ffb2e5869572c349b579bdd792b6",
+      "fingerprint": "e39e8081ed84c6cca84c9d2447d5ad73d203324f978b87cc9e25fdf84a151333",
+      "key": {
+        "family": "N0",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "deterministic_noise",
+        "week": 18
+      },
+      "maximum_error": 1.4210854715202004e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "53333538288e1f8b8e5be902ba867a827f217d9e032b91f2c63192c57d4da4cc",
+      "fingerprint": "6171e37f14fdd9cf0c203297a73d7920db31abf6f52fde7c81b2fcf99341b528",
+      "key": {
+        "family": "E2",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "full",
+        "week": 18
+      },
+      "maximum_error": 1.9984014443252818e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "e4dde218316924101f60cae9aa9b79d49ed2382ad52866ed5953b80e7268cea9",
+      "fingerprint": "b59ebb98fd4592b7be6eed7c13f72eed3c16967b1a3c26a6dba5622a149f93fe",
+      "key": {
+        "family": "E2",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "no_home_effect",
+        "week": 18
+      },
+      "maximum_error": 8.826273045769994e-15
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "0a3f3296db63edc7ad591a87e27cee51330008986812d59dd43fe6b0b9dcaef1",
+      "fingerprint": "eae9064bed636f556afc499ecc356fbe2fed251a55e11032e9733007b1477520",
+      "key": {
+        "family": "E2",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "no_prior_season_carryover",
+        "week": 18
+      },
+      "maximum_error": 0.0
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "d90da2ba4e72e950015a6f878ef48382adc504ed2684c5867b6ed87d2f4da699",
+      "fingerprint": "faa860f8969975eb99c2dde1352ebb3138d5473a44c940c78473df3462357b85",
+      "key": {
+        "family": "E2",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "no_time_decay",
+        "week": 18
+      },
+      "maximum_error": 3.241851231905457e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "4b415eb688f0e475da3f7aa378761d6af651eb911544ac7e7ab1ea95aac2c867",
+      "fingerprint": "102d86cb84527c4a73ae852f9a57beb79fb692022951bec99bbdcedb28b09dc8",
+      "key": {
+        "family": "E2",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "no_team_identity",
+        "week": 18
+      },
+      "maximum_error": 0.0
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "984a6e44b601eb5657ba5f07fb9ae01331d5f065beda806bf98c289953fce970",
+      "fingerprint": "83e947ee201261fa5ff38441cd733fe93f2274444c5790a8fd3ae504e1b7c8eb",
+      "key": {
+        "family": "E2",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "availability_24h",
+        "week": 18
+      },
+      "maximum_error": 7.105427357601002e-15
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "874fe264c25b5b270a1cb72a0b0426ac72f5fdd887b708406b432d369085acc1",
+      "fingerprint": "185d074b133f74d101189bca9d638238d529bc2d655bae24a120249a3d693c3d",
+      "key": {
+        "family": "E2",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "no_offense",
+        "week": 18
+      },
+      "maximum_error": 3.375077994860476e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "d1e7bde2e4594991aad970f9b255cd32b34cae69658922440758c9a7b5708d5c",
+      "fingerprint": "e27bc254852e539727ced1b0d531d2a24b3c4dcee65fe1e360fd85f8225ae10a",
+      "key": {
+        "family": "E2",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "no_defense",
+        "week": 18
+      },
+      "maximum_error": 1.1102230246251565e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "750f6b1c161d7783b06a224ee08912bb9e26cabc64fccc17bdf9f06e9fceb625",
+      "fingerprint": "a527ece2592dfeeb44f442c6c9f93c1451b5233f54b3eeba952b926051053873",
+      "key": {
+        "family": "E2",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "shuffled_identity",
+        "week": 18
+      },
+      "maximum_error": 2.3092638912203256e-14
+    },
+    {
+      "case_constructed": true,
+      "case_sha256": "d93eb983098df2be39c59a4c504feb9ec2c2ec61e20a77d9a7080b59ac451afe",
+      "fingerprint": "f1a911fd29573e39eb3e69188bf4c256c19758f7a53bb4214ae737757305e016",
+      "key": {
+        "family": "E2",
+        "game_id": "2024_18_WAS_DAL",
+        "season": 2024,
+        "variant": "deterministic_noise",
+        "week": 18
+      },
+      "maximum_error": 8.382183835919932e-15
+    },
+    {
+      "case_constructed": false,
+      "fingerprint": "1b6235b0951815837827a2857d1e10310c9f7048605536a76e0d411fcdd149d5",
+      "key": {
+        "family": "N0",
+        "game_id": "2025_01_ARI_NO",
+        "season": 2025,
+        "variant": "full",
+        "week": 1
+      }
+    },
+    {
+      "case_constructed": false,
+      "fingerprint": "c6891460d025cbf688db7986c0ae5f2d96467f0ad46a284878babc5d6e943f56",
+      "key": {
+        "family": "E2",
+        "game_id": "2025_01_ARI_NO",
+        "season": 2025,
+        "variant": "full",
+        "week": 1
+      }
+    },
+    {
+      "case_constructed": false,
+      "fingerprint": "95c3244c1b02b868c0d2384c178421cf2e176fa5b185961d0c5f44a9e0f35fde",
+      "key": {
+        "family": "N0",
+        "game_id": "2025_18_WAS_PHI",
+        "season": 2025,
+        "variant": "full",
+        "week": 18
+      }
+    },
+    {
+      "case_constructed": false,
+      "fingerprint": "082cf48cf81fcf5f1d0763f4ddc839925bccb5be92d1c07a8f1ed1bd7fa2047e",
+      "key": {
+        "family": "E2",
+        "game_id": "2025_18_WAS_PHI",
+        "season": 2025,
+        "variant": "full",
+        "week": 18
+      }
+    }
+  ],
+  "seconds": 0.6805098750046454,
+  "status": "scoped_sample_passed"
+}
