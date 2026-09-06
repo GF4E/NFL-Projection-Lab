@@ -4,7 +4,7 @@ from collections import defaultdict
 from pathlib import Path
 BASE_BOOKS={'betmgm','williamhill_us','fanduel','draftkings'}
 SHARP_PRIORITY=['pinnacle','betonlineag','lowvig']
-EXECUTION={'betmgm','williamhill_us'}
+EXECUTION={'betmgm','williamhill_us','fanduel','draftkings'}
 def decimal_odds(a):
     a=float(a)
     if not math.isfinite(a) or abs(a)<100: raise ValueError('Invalid American odds')
@@ -42,7 +42,7 @@ def normalize(captures):
         for book in event.get('bookmakers',[]):
             if book['key'] not in allowed: continue
             for market in book.get('markets',[]):
-                original=market['key']; kind=original.replace('alternate_','')
+                original=market['key']; kind=original.replace('alternate_','').removesuffix('_alternate')
                 if kind not in {'spreads','totals','h2h'} and not kind.startswith('player_'): continue
                 groups=defaultdict(list)
                 for o in market.get('outcomes',[]):
@@ -92,7 +92,7 @@ def normalize(captures):
                 best=max(r['decimal_price'] for r in matching); bestrows=[r for r in matching if r['decimal_price']==best]
                 executable=[r for r in matching if r['executed_book'] in EXECUTION]
                 bestexec=max(executable,key=lambda r:r['decimal_price']) if executable else None
-                row.update({'consensus_id':cid,'consensus_fair_probability':p,'fair_probability':p,'fair_price':american(p),'price_edge_cents':price_edge(p,row['book_price']),'qualifying_books':len(books),'coverage_flag':'FEWER_THAN_TWO_BOOKS' if len(books)<2 else 'OK','best_price':bestrows[0]['book_price'],'best_price_books':'|'.join(sorted(r['executed_book'] for r in bestrows)),'best_executable_price':bestexec['book_price'] if bestexec else '', 'filter_pass':qualifies(p,row['book_price'],len(books)),'board_eligible':qualifies(p,row['book_price'],len(books)) and row['executed_book'] in EXECUTION})
+                row.update({'consensus_id':cid,'consensus_fair_probability':p,'fair_probability':p,'fair_price':american(p),'price_edge_cents':price_edge(p,row['book_price']),'qualifying_books':len(books),'coverage_flag':'FEWER_THAN_TWO_BOOKS' if len(books)<2 else 'OK','best_price':bestrows[0]['book_price'],'best_price_books':'|'.join(sorted(r['executed_book'] for r in bestrows)),'best_executable_price':bestexec['book_price'] if bestexec else '', 'filter_pass':qualifies(p,row['book_price'],len(books)) and row['executed_book'] in EXECUTION,'board_eligible':qualifies(p,row['book_price'],len(books)) and row['executed_book'] in EXECUTION})
                 allrows.append(row)
     # Fair line is the offered consensus threshold closest to 50%; no interpolation/model.
     family=defaultdict(list)

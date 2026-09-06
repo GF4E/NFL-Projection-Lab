@@ -1,0 +1,469 @@
+{
+  "active_snapshot": "09647eb114428dc7",
+  "artifact_policy": "T60 pricing and board files plus hash-bound receipt under outputs/week1-t60/<group>. Data, code and schedule hashes retained. Prior snapshots untouched.",
+  "base_commit": "77ee681dba69eac56ca428428b43d044d7701360",
+  "board_result": "work/week1-pricing-v1/result-09647eb114428dc7.json",
+  "claims": "No model, power, teaser, acceptance-gate change or fabricated pick.",
+  "code_sha256": {
+    "engine/pick_log.py": "48073db9bc942b4b9a03db2fc2763e3ed81cd1896c6beeb9ff9805acd42d6ae7",
+    "engine/pricing.py": "4578e574c7c36a59a0cf0ee2243b61dd80507182f6d5b817c12f106ee415ed79",
+    "engine/quote_capture.py": "d31c837a2b50fe0aef63503f3a74eb4fc99f7a09169e14f7a3d0ad9f755946d1",
+    "scripts/week1_pricing.py": "dade115c2112dc63a561869c863f037d0a82f52c8bdf8cd4eaa6b11e24c1b7e0",
+    "scripts/week1_t60_runner.py": "4d0a5d40a917b8787c7fae2d87b29bf740e35e3d8140c6cbe096a78cec3493bc"
+  },
+  "coverage_matrix": [
+    {
+      "alternative_key": "",
+      "book": "betmgm",
+      "catalogue_events_alternative": 0,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "alternate_spreads",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "",
+      "book": "betmgm",
+      "catalogue_events_alternative": 0,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "alternate_totals",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "player_pass_yds_alternate",
+      "book": "betmgm",
+      "catalogue_events_alternative": 2,
+      "catalogue_events_direct": 0,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 2,
+      "events_with_priced_quotes": 2,
+      "market": "player_pass_yds",
+      "status": "PRICED_ONE_SIDED_CANNOT_DEVIG"
+    },
+    {
+      "alternative_key": "player_pass_tds_alternate",
+      "book": "betmgm",
+      "catalogue_events_alternative": 0,
+      "catalogue_events_direct": 0,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 0,
+      "market": "player_pass_tds",
+      "status": "NOT_LISTED_NO_FURTHER_RETRY"
+    },
+    {
+      "alternative_key": "player_rush_yds_alternate",
+      "book": "betmgm",
+      "catalogue_events_alternative": 2,
+      "catalogue_events_direct": 0,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 2,
+      "events_with_priced_quotes": 2,
+      "market": "player_rush_yds",
+      "status": "PRICED_ONE_SIDED_CANNOT_DEVIG"
+    },
+    {
+      "alternative_key": "player_reception_yds_alternate",
+      "book": "betmgm",
+      "catalogue_events_alternative": 2,
+      "catalogue_events_direct": 0,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 2,
+      "events_with_priced_quotes": 2,
+      "market": "player_reception_yds",
+      "status": "PRICED_ONE_SIDED_CANNOT_DEVIG"
+    },
+    {
+      "alternative_key": "player_receptions_alternate",
+      "book": "betmgm",
+      "catalogue_events_alternative": 0,
+      "catalogue_events_direct": 0,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 0,
+      "market": "player_receptions",
+      "status": "NOT_LISTED_NO_FURTHER_RETRY"
+    },
+    {
+      "alternative_key": "",
+      "book": "williamhill_us",
+      "catalogue_events_alternative": 0,
+      "catalogue_events_direct": 15,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 0,
+      "market": "alternate_spreads",
+      "status": "LISTED_BUT_NOT_PRICED_WITH_CURRENT_CREDENTIAL"
+    },
+    {
+      "alternative_key": "",
+      "book": "williamhill_us",
+      "catalogue_events_alternative": 0,
+      "catalogue_events_direct": 15,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 0,
+      "market": "alternate_totals",
+      "status": "LISTED_BUT_NOT_PRICED_WITH_CURRENT_CREDENTIAL"
+    },
+    {
+      "alternative_key": "player_pass_yds_alternate",
+      "book": "williamhill_us",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 0,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 0,
+      "market": "player_pass_yds",
+      "status": "LISTED_BUT_NOT_PRICED_WITH_CURRENT_CREDENTIAL"
+    },
+    {
+      "alternative_key": "player_pass_tds_alternate",
+      "book": "williamhill_us",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 0,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 0,
+      "market": "player_pass_tds",
+      "status": "LISTED_BUT_NOT_PRICED_WITH_CURRENT_CREDENTIAL"
+    },
+    {
+      "alternative_key": "player_rush_yds_alternate",
+      "book": "williamhill_us",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 0,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 0,
+      "market": "player_rush_yds",
+      "status": "LISTED_BUT_NOT_PRICED_WITH_CURRENT_CREDENTIAL"
+    },
+    {
+      "alternative_key": "player_reception_yds_alternate",
+      "book": "williamhill_us",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 0,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 0,
+      "market": "player_reception_yds",
+      "status": "LISTED_BUT_NOT_PRICED_WITH_CURRENT_CREDENTIAL"
+    },
+    {
+      "alternative_key": "player_receptions_alternate",
+      "book": "williamhill_us",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 0,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 0,
+      "market": "player_receptions",
+      "status": "LISTED_BUT_NOT_PRICED_WITH_CURRENT_CREDENTIAL"
+    },
+    {
+      "alternative_key": "",
+      "book": "fanduel",
+      "catalogue_events_alternative": 0,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "alternate_spreads",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "",
+      "book": "fanduel",
+      "catalogue_events_alternative": 0,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "alternate_totals",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "player_pass_yds_alternate",
+      "book": "fanduel",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "player_pass_yds",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "player_pass_tds_alternate",
+      "book": "fanduel",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "player_pass_tds",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "player_rush_yds_alternate",
+      "book": "fanduel",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "player_rush_yds",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "player_reception_yds_alternate",
+      "book": "fanduel",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "player_reception_yds",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "player_receptions_alternate",
+      "book": "fanduel",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "player_receptions",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "",
+      "book": "draftkings",
+      "catalogue_events_alternative": 0,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "alternate_spreads",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "",
+      "book": "draftkings",
+      "catalogue_events_alternative": 0,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "alternate_totals",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "player_pass_yds_alternate",
+      "book": "draftkings",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "player_pass_yds",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "player_pass_tds_alternate",
+      "book": "draftkings",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "player_pass_tds",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "player_rush_yds_alternate",
+      "book": "draftkings",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "player_rush_yds",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "player_reception_yds_alternate",
+      "book": "draftkings",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "player_reception_yds",
+      "status": "PRICED"
+    },
+    {
+      "alternative_key": "player_receptions_alternate",
+      "book": "draftkings",
+      "catalogue_events_alternative": 16,
+      "catalogue_events_direct": 16,
+      "events_checked": 16,
+      "events_with_one_sided_over_quotes": 0,
+      "events_with_priced_quotes": 16,
+      "market": "player_receptions",
+      "status": "PRICED"
+    }
+  ],
+  "coverage_source": "Official event-markets endpoint is the per-event bookmaker/market catalogue. Queried all Week 1 events with regions=us,us2; one credit per successful query. It lists recently seen markets, not guaranteed entitlement or current prices.",
+  "credits": {
+    "cap": 300,
+    "confirmed": 217,
+    "future_live_reserved": 18,
+    "this_followup_accounted": 55,
+    "total_accounted": 221,
+    "unallocated_remaining": 61,
+    "uncertain_held": 4
+  },
+  "diagnosis": "BetMGM alternate spreads/totals exist under the original keys. Three yardage props exist under *_alternate keys and were recaptured once; returned prop offers are one-sided Over, so they are not given invented devig probabilities. Missing BetMGM passing-TD/receptions keys are not retried. Caesars catalogue entries exist but no priced offers returned with this credential. Absence does not establish plan entitlement; no more coverage retries.",
+  "execution_books": [
+    "betmgm",
+    "williamhill_us",
+    "fanduel",
+    "draftkings"
+  ],
+  "experiment_id": "week1-followups-v1",
+  "filter": "Unchanged inclusive probability and price-edge thresholds, evaluated on each execution-book quote. Reference-only books cannot pass filter_pass.",
+  "future_status": "SCHEDULE_INSTALLED_BACKGROUND_EXECUTION_BLOCKED",
+  "provider_docs": "https://the-odds-api.com/liveapi/guides/v4/#get-event-markets",
+  "runtime": "Loaded local launchd interval dispatcher. Requires this Mac awake, logged in, with network and the existing credential. T65 requests shared across identical kickoffs. Freeze during T61\u2013T60 from T65 capture so the T60 deadline is honored. Actual receipt/freeze times persisted; missed windows emit MISSED, never backdated.",
+  "runtime_verification": {
+    "T60_operational_status": "BLOCKED_BACKGROUND_RUN_UNVERIFIED",
+    "background_run_completed": false,
+    "cause": "Unresolved background file-access stall; macOS Documents permission is suspected, not confirmed",
+    "evidence": "background-open-sample.txt",
+    "launchd_loaded": true,
+    "manual_runner": "passed before due times, no spend",
+    "observed_state": "Python stalls in _io_open_code/open; launchctl reports first run still active and no exit"
+  },
+  "schedule": {
+    "credit_cap": 300,
+    "freeze_window": "T61 through T60 inclusive; never freeze after cutoff",
+    "freeze_window_seconds": 60,
+    "groups": [
+      {
+        "cutoff_at": "2026-09-09T23:20:00+00:00",
+        "event_ids": [
+          "8c94552d022acec4a0458d70c19d3da9"
+        ],
+        "id": "1927f6c588b9",
+        "kickoff_at": "2026-09-10T00:20:00+00:00",
+        "refresh_at": "2026-09-09T23:15:00+00:00",
+        "reserved_credits": 3
+      },
+      {
+        "cutoff_at": "2026-09-10T23:35:00+00:00",
+        "event_ids": [
+          "acc580d74344ea3b31bbcdd057fe6a9c"
+        ],
+        "id": "d461b6564c00",
+        "kickoff_at": "2026-09-11T00:35:00+00:00",
+        "refresh_at": "2026-09-10T23:30:00+00:00",
+        "reserved_credits": 3
+      },
+      {
+        "cutoff_at": "2026-09-13T16:00:00+00:00",
+        "event_ids": [
+          "7dddb296a42e7a41a774b24bd1709ce1",
+          "7e09efed7e12c659b82740b67ce2f9a1",
+          "95c01d1bb797d6df14824b106c5a9130",
+          "b6cfdcbafa61ce220ba87dc2d9b80c77",
+          "c1d3fcec25aaeb06ebd2244d33d338e0",
+          "e55c6fe19fce094ce214c8b0e5b504e9",
+          "ed6d24ff979f9c71979fead577b0b3f7",
+          "fc362aff0d889ec52d358307a70c32ed"
+        ],
+        "id": "aa0bba6bdd68",
+        "kickoff_at": "2026-09-13T17:00:00+00:00",
+        "refresh_at": "2026-09-13T15:55:00+00:00",
+        "reserved_credits": 3
+      },
+      {
+        "cutoff_at": "2026-09-13T19:25:00+00:00",
+        "event_ids": [
+          "17885cb8dcade8f6c3bce14b2de805e8",
+          "1edfa5ceaa1ad2cb57df1c1b908731f6",
+          "c5d95f48a16849ab6bebc68fbbfcb74a",
+          "cb77efed7e711d25a72c1a2a0a1af119"
+        ],
+        "id": "52411a63423c",
+        "kickoff_at": "2026-09-13T20:25:00+00:00",
+        "refresh_at": "2026-09-13T19:20:00+00:00",
+        "reserved_credits": 3
+      },
+      {
+        "cutoff_at": "2026-09-13T23:20:00+00:00",
+        "event_ids": [
+          "3e646c7479c57f5d9752d8c7dfe7059b"
+        ],
+        "id": "5f6cc1e38046",
+        "kickoff_at": "2026-09-14T00:20:00+00:00",
+        "refresh_at": "2026-09-13T23:15:00+00:00",
+        "reserved_credits": 3
+      },
+      {
+        "cutoff_at": "2026-09-14T23:15:00+00:00",
+        "event_ids": [
+          "5ad8135dc2b5f27de0b777acd317855a"
+        ],
+        "id": "11f0259bb9d5",
+        "kickoff_at": "2026-09-15T00:15:00+00:00",
+        "refresh_at": "2026-09-14T23:10:00+00:00",
+        "reserved_credits": 3
+      }
+    ],
+    "launch_poll_seconds": 15,
+    "note": "T60-deadline artifact created before or at cutoff using the T65 snapshot. Actual receipt/freeze timestamps retained; missed deadlines never backdated.",
+    "refresh_window_seconds": 60
+  },
+  "source_sha256": {
+    "work/week1-pricing-v1/captures/010cde4c4cdac221001e10b4060f5e79c6ae35bcabf24d8a38345c49bbb95dc3.json": "010cde4c4cdac221001e10b4060f5e79c6ae35bcabf24d8a38345c49bbb95dc3",
+    "work/week1-pricing-v1/captures/03baa16a7b1976404c0fc7838c12094c144479356ee008e22e7cb154cd58b2bc.json": "03baa16a7b1976404c0fc7838c12094c144479356ee008e22e7cb154cd58b2bc",
+    "work/week1-pricing-v1/captures/0cf7acf143f128862187a0ae0a5e1f129e1dfa2afee16761f3221ec841341b00.json": "0cf7acf143f128862187a0ae0a5e1f129e1dfa2afee16761f3221ec841341b00",
+    "work/week1-pricing-v1/captures/125d373484827d6eb1fcf8fc9c2ae6a0db0c6949ad17b50e32303a60914148c4.json": "125d373484827d6eb1fcf8fc9c2ae6a0db0c6949ad17b50e32303a60914148c4",
+    "work/week1-pricing-v1/captures/1d0e2fcaea4647a998f05ae77f4746ebca0c94bfacc4fdc2663f3674b7a74d17.json": "1d0e2fcaea4647a998f05ae77f4746ebca0c94bfacc4fdc2663f3674b7a74d17",
+    "work/week1-pricing-v1/captures/21eed16409d14242bb38c4eca62cf9ebebffdb94b9f58cb567cac00ed5659e44.json": "21eed16409d14242bb38c4eca62cf9ebebffdb94b9f58cb567cac00ed5659e44",
+    "work/week1-pricing-v1/captures/23041c43769c390b344b8a83bfeffa153795c74f8976ddc17570959642a8ffa9.json": "23041c43769c390b344b8a83bfeffa153795c74f8976ddc17570959642a8ffa9",
+    "work/week1-pricing-v1/captures/27ac4d21006714b13094726a4904d7d1430f64b604a004cf61ce435842c73964.json": "27ac4d21006714b13094726a4904d7d1430f64b604a004cf61ce435842c73964",
+    "work/week1-pricing-v1/captures/2c63f6abf0a2357b4b821396d4ec57e038e06babee6be1d29ed21e2151c85a3c.json": "2c63f6abf0a2357b4b821396d4ec57e038e06babee6be1d29ed21e2151c85a3c",
+    "work/week1-pricing-v1/captures/304f64916531827f1268aa66e3ea920ccf939f60e1b7cb84170ce9215a259fef.json": "304f64916531827f1268aa66e3ea920ccf939f60e1b7cb84170ce9215a259fef",
+    "work/week1-pricing-v1/captures/3cb7eb06c6421011962d8d9bed2bd933606c4034bd063a2300aba35b2430fe5c.json": "3cb7eb06c6421011962d8d9bed2bd933606c4034bd063a2300aba35b2430fe5c",
+    "work/week1-pricing-v1/captures/4395b40a09f4eaadc132b43641c1600ba688f4057c525370233b92cb9b6e4562.json": "4395b40a09f4eaadc132b43641c1600ba688f4057c525370233b92cb9b6e4562",
+    "work/week1-pricing-v1/captures/5970be4f38a61be485e4d9e4b57352481f83fa0834a6e3e92a5ffe0a16d04e8a.json": "5970be4f38a61be485e4d9e4b57352481f83fa0834a6e3e92a5ffe0a16d04e8a",
+    "work/week1-pricing-v1/captures/7774abf2ff3032d008ac52dce8596b65c6e94364f0829b13f44e7569f1417624.json": "7774abf2ff3032d008ac52dce8596b65c6e94364f0829b13f44e7569f1417624",
+    "work/week1-pricing-v1/captures/79173a3cf24d06f4338c5b56fa6a795304cb2e501bb242d551b15fcb1696b5af.json": "79173a3cf24d06f4338c5b56fa6a795304cb2e501bb242d551b15fcb1696b5af",
+    "work/week1-pricing-v1/captures/7e993aaffa36cb4ea5629d426224285550af53991109d0f6e0d5121954382fc8.json": "7e993aaffa36cb4ea5629d426224285550af53991109d0f6e0d5121954382fc8",
+    "work/week1-pricing-v1/captures/82b26012bff5c8c9a1c1e063099741ab73efd79b7c0f566d9cb4a5f8c3318443.json": "82b26012bff5c8c9a1c1e063099741ab73efd79b7c0f566d9cb4a5f8c3318443",
+    "work/week1-pricing-v1/captures/82eeaa59c546bf799baae8d4f9697ec5758292cdae211b412fe1c057ed569193.json": "82eeaa59c546bf799baae8d4f9697ec5758292cdae211b412fe1c057ed569193",
+    "work/week1-pricing-v1/captures/845aeac440f993fe0f26f6d67caf7bc2a4a39499b3783e7b924c18b5fe824fef.json": "845aeac440f993fe0f26f6d67caf7bc2a4a39499b3783e7b924c18b5fe824fef",
+    "work/week1-pricing-v1/captures/851e2a4ddea579a8cde71317d814edd2f53fa52ad337e884f252d8561617b30f.json": "851e2a4ddea579a8cde71317d814edd2f53fa52ad337e884f252d8561617b30f",
+    "work/week1-pricing-v1/captures/8f811d12e4224c53a120c2d4be558856c68f8609b22ff2fcef46cde66091fe39.json": "8f811d12e4224c53a120c2d4be558856c68f8609b22ff2fcef46cde66091fe39",
+    "work/week1-pricing-v1/captures/90f343399039065a2ff4042a5b4fd0271f9a75326351855ce9fbb30a87dc92c6.json": "90f343399039065a2ff4042a5b4fd0271f9a75326351855ce9fbb30a87dc92c6",
+    "work/week1-pricing-v1/captures/9b6a7d01d27f27ccc0fd67b9378d96addf012a5e56e463be7cc92506c3d24c1f.json": "9b6a7d01d27f27ccc0fd67b9378d96addf012a5e56e463be7cc92506c3d24c1f",
+    "work/week1-pricing-v1/captures/a9b35a2ed438bef07855af8c00000e34088542300b13c16bfb8b144a22fecac6.json": "a9b35a2ed438bef07855af8c00000e34088542300b13c16bfb8b144a22fecac6",
+    "work/week1-pricing-v1/captures/b90a5378b09795ade6c2cb1095fe496a5d9e30dc515e8ad24f369bffce1385bf.json": "b90a5378b09795ade6c2cb1095fe496a5d9e30dc515e8ad24f369bffce1385bf",
+    "work/week1-pricing-v1/captures/c4341cde27814ad84f28a5eb613fdfc93051af36fcd21ac4c9cd129ee3142a6e.json": "c4341cde27814ad84f28a5eb613fdfc93051af36fcd21ac4c9cd129ee3142a6e",
+    "work/week1-pricing-v1/captures/d39c1cf80183eb602a43c427dae05b1a199ca03b58e7a9380bcdf49d3a9c892c.json": "d39c1cf80183eb602a43c427dae05b1a199ca03b58e7a9380bcdf49d3a9c892c",
+    "work/week1-pricing-v1/captures/e3df1f9541f94b8d48c87a98eb24f71000e2b1200d4482795cd35267c06023cf.json": "e3df1f9541f94b8d48c87a98eb24f71000e2b1200d4482795cd35267c06023cf",
+    "work/week1-pricing-v1/captures/e65b2864a8688d7d7e6e0c2a6892a0fffe7ef18ac2f058b7b01f1e71668e56a9.json": "e65b2864a8688d7d7e6e0c2a6892a0fffe7ef18ac2f058b7b01f1e71668e56a9",
+    "work/week1-pricing-v1/captures/ea226eaef284c2c040500829eea48a268521efbbf647d5a7401295be1aed6f06.json": "ea226eaef284c2c040500829eea48a268521efbbf647d5a7401295be1aed6f06",
+    "work/week1-pricing-v1/captures/f4305fac7d4193769529b591b4b8972729eee8b9012207ca627c2918b73d368f.json": "f4305fac7d4193769529b591b4b8972729eee8b9012207ca627c2918b73d368f",
+    "work/week1-pricing-v1/captures/fc05c69f78c6ade0d88e296dc645f6665bd2fc2a7d00c9a02a69395795f4e993.json": "fc05c69f78c6ade0d88e296dc645f6665bd2fc2a7d00c9a02a69395795f4e993"
+  }
+}

@@ -1,0 +1,76 @@
+gui/501/com.gabe.nfl-week1-t60 = {
+	active count = 1
+	path = /Users/gabe/Library/LaunchAgents/com.gabe.nfl-week1-t60.plist
+	type = LaunchAgent
+	state = xpcproxy
+
+	program = /opt/anaconda3/bin/python3.12
+	arguments = {
+		/opt/anaconda3/bin/python3.12
+		-B
+		/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/week1_t60_runner.py
+	}
+
+	working directory = /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6
+
+	stdout path = /Users/gabe/Library/Logs/nfl-week1-t60.log
+	stderr path = /Users/gabe/Library/Logs/nfl-week1-t60.log
+	inherited environment = {
+		SSH_AUTH_SOCK => /var/run/com.apple.launchd.rq9HsSQKbH/Listeners
+	}
+
+	default environment = {
+		PATH => /usr/bin:/bin:/usr/sbin:/sbin
+	}
+
+	environment = {
+		OSLogRateLimit => 64
+		GIT_TERMINAL_PROMPT => 0
+		XPC_SERVICE_NAME => com.gabe.nfl-week1-t60
+	}
+
+	domain = gui/501 [100017]
+	asid = 100017
+	minimum runtime = 10
+	exit timeout = 5
+	runs = 1
+	pid = 87897
+	immediate reason = speculative
+	forks = 0
+	execs = 0
+	initialized = 0
+	trampolined = 0
+	started suspended = 0
+	proxy started suspended = 0
+	checked allocations = 0 (queried = 0)
+	checked allocations reason = no host
+	checked allocations flags = 0x0
+	last exit code = (never exited)
+
+	resource coalition = {
+		ID = 27903
+		type = resource
+		state = active
+		active count = 1
+		name = com.gabe.nfl-week1-t60
+	}
+
+	jetsam coalition = {
+		ID = 27904
+		type = jetsam
+		state = active
+		active count = 1
+		name = com.gabe.nfl-week1-t60
+	}
+
+	spawn type = background (5)
+	jetsam priority = 40
+	jetsam memory limit (active) = (unlimited)
+	jetsam memory limit (inactive) = (unlimited)
+	jetsamproperties category = daemon
+	jetsam thread limit = 32
+	cpumon = default
+	run interval = 15 seconds
+
+	properties = runatload | inferred program
+}

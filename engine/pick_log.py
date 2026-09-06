@@ -12,7 +12,7 @@ def initialize(path):
 def append(path,quote,*,pick_id,status,approver,paper=False):
     if status not in {'approved','declined','executed'}: raise ValueError('Invalid decision')
     if paper and status=='executed': raise ValueError('Paper record cannot claim execution')
-    if quote['executed_book'] not in {'betmgm','williamhill_us'}: raise ValueError('Book is not executable')
+    if quote['executed_book'] not in {'betmgm','williamhill_us','fanduel','draftkings'}: raise ValueError('Book is not executable')
     for v in [pick_id,approver]:
         if not v.strip() or v[0] in '=+-@' or any(c in v for c in '\r\n'): raise ValueError('Invalid identity field')
     initialize(path)

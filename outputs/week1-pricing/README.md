@@ -1,3 +1,5 @@
+> Superseded active board: see [four-book coverage and T60 follow-up](FOLLOWUP.md). Earlier snapshots below remain preserved.
+
 # Week 1 pricing release
 
 [Week 1 board](4ea6e3bf91f17387/week1_board.csv) · [All priced offers](4ea6e3bf91f17387/pricing.csv) · [Decision record](../../work/week1-pricing-v1/experiment.json)

@@ -25,23 +25,35 @@ def spent(entries=None):
     reservations={x['request_id']:x for x in entries if x['status']=='reserved'}
     results={x['request_id']:x for x in entries if x['status']=='complete'}
     return sum(results[k]['credits'] if k in results else v['reserved_credits'] for k,v in reservations.items())
-def fetch(path, params):
+def fetch(path, params, *, live_group=None):
     RUN.mkdir(parents=True,exist_ok=True)
     secret=key()
     with (RUN/'capture.lock').open('a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
         entries=ledger_entries()
         if any(x['status']=='reserved' and not any(y.get('request_id')==x['request_id'] and y['status']=='complete' for y in entries) for x in entries): raise RuntimeError('Unresolved prior charge; no additional dispatch')
-        cost=len(params.get('markets','').split(','))*math.ceil(len(params['bookmakers'].split(','))/10)
-        if spent(entries)+cost>300: raise RuntimeError('300-credit deliverable cap reached')
+        cost=1 if path.endswith('/markets') else len(params.get('markets','').split(','))*(math.ceil(len(params['bookmakers'].split(','))/10) if params.get('bookmakers') else len(params['regions'].split(',')))
+        schedule_path=ROOT/'work/week1-followups-v1/schedule.json'
+        groups=json.loads(schedule_path.read_text())['groups'] if schedule_path.exists() else []
+        dispatched={x.get('live_group') for x in entries if x['status']=='reserved'}
+        if live_group:
+            group=next((g for g in groups if g['id']==live_group),None)
+            if not group or live_group in dispatched: raise RuntimeError('Unknown or already dispatched live group')
+            delta=(dt.datetime.fromisoformat(now())-dt.datetime.fromisoformat(group['refresh_at'])).total_seconds()
+            if not 0<=delta<60: raise RuntimeError('Outside T65 dispatch window')
+            if set(params.get('eventIds','').split(','))!=set(group['event_ids']) or params.get('markets')!='h2h,spreads,totals' or cost!=3: raise RuntimeError('Live request differs from registered group')
+        reserve=sum(g['reserved_credits'] for g in groups if g['id'] not in dispatched and g['id']!=live_group)
+        if spent(entries)+cost+reserve>300: raise RuntimeError('300-credit cap including remaining live reservations reached')
         rid=hashlib.sha256((now()+path+json.dumps(params,sort_keys=True)).encode()).hexdigest()[:20]
         def log(x):
             with (RUN/'credits.jsonl').open('a') as f: f.write(json.dumps(x,sort_keys=True)+'\n'); f.flush(); os.fsync(f.fileno())
-        log({'request_id':rid,'status':'reserved','reserved_credits':cost,'at':now(),'path':path,'params':params})
+        log({'request_id':rid,'status':'reserved','reserved_credits':cost,'at':now(),'path':path,'params':params,'live_group':live_group})
         url='https://api.the-odds-api.com/v4/'+path+'?'+urlencode({**params,'apiKey':secret})
         config='url = "'+url+'"\n'
         proc=subprocess.run(['/usr/bin/curl','-q','--silent','--show-error','--max-time','30','--include','--config','-'],input=config.encode(),stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-        if proc.returncode: raise RuntimeError(f'Transport failure code {proc.returncode}; charge reserved')
+        if proc.returncode:
+            log({'request_id':rid,'status':'complete','credits':cost,'charge_evidence':'conservative_reservation_transport_failure','transport_error':proc.returncode,'at':now()})
+            raise RuntimeError(f'Transport failure code {proc.returncode}; full cost retained')
         packet=proc.stdout
         while True:
             header,raw=packet.split(b'\r\n\r\n',1)

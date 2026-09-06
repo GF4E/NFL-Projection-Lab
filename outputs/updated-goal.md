@@ -181,3 +181,7 @@ BLOCKED: [what needs a decision, or NONE]
 ## Owner version-control amendment
 
 Owner explicitly redirected backfill to the public GF4E/NFL-Projection-Lab repository on orphan branch engine-v2. Never push main or os01-hosted-diagnostic-v1. This supersedes the unavailable private-repository destination for these artifacts. Credentials and keyed raw odds transport remain excluded. Daily launchd backup targets engine-v2 only at 23:00 machine-local time. Commit and push after each completed step, adding COMMIT to the report. The nested work/site-beta checkout and bundled site archives remain excluded; source files exceeding 50 MB stay local and ignored.
+
+## Week 1 follow-up (owner approved)
+
+Execution books are BetMGM, Caesars, FanDuel and DraftKings. Per-book filter and pick-log acceptance updated without changing probability/edge gates. [Coverage evidence, credit reserve and active board](week1-pricing/FOLLOWUP.md). The registered local schedule refreshes at T65 and writes separate T60-deadline artifacts before cutoff. No more coverage retries; no new model or statistical gate changes.
