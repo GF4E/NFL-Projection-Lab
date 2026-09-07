@@ -13,6 +13,26 @@ def at(s): return dt.datetime.fromisoformat(s)
 def fixture():
     return {'id':'g','home_team':'H','away_team':'A','commence_time':G['kickoff_at'],'bookmakers':[{'key':b,'last_update':G['refresh_at'],'markets':[{'key':'h2h','outcomes':[{'name':'H','price':-180},{'name':'A','price':160}]}]} for b in EXECUTION]}
 class FollowupTests(unittest.TestCase):
+    def test_heartbeat_once_per_hour_across_calls(self):
+        state=FIX/'heartbeat.json'
+        with patch('builtins.print') as log:
+            self.assertTrue(runner.heartbeat(at(G['refresh_at']),state))
+            self.assertFalse(runner.heartbeat(at(G['refresh_at'])+dt.timedelta(seconds=15),state))
+            self.assertTrue(runner.heartbeat(at(G['refresh_at'])+dt.timedelta(hours=1),state))
+            self.assertEqual(log.call_count,2)
+    def test_heartbeat_clock_rollback_suppressed(self):
+        state=FIX/'heartbeat-rollback.json'
+        with patch('builtins.print'):
+            runner.heartbeat(at(G['refresh_at']),state)
+            self.assertFalse(runner.heartbeat(at(G['refresh_at'])-dt.timedelta(hours=1),state))
+    def test_local_schedule_preserves_registered_utc(self):
+        from zoneinfo import ZoneInfo
+        before=json.loads((ROOT/'work/week1-operations-v1/schedule-before.json').read_text())
+        after=json.loads(runner.PLAN.read_text())
+        for old,new in zip(before['groups'],after['groups'],strict=True):
+            for key,value in old.items(): self.assertEqual(new[key],value)
+            for field in ('kickoff','refresh','cutoff'):
+                self.assertEqual(new[field+'_local'],at(new[field+'_at']).astimezone(ZoneInfo(after['local_timezone'])).isoformat())
     def test_four_execution_books(self): self.assertEqual(EXECUTION,{'betmgm','williamhill_us','fanduel','draftkings'})
     def test_append_new_execution_books(self):
         rows,*_=normalize([(fixture(),{'at':G['refresh_at'],'sha256':'fixture'})])

@@ -7,6 +7,17 @@ from engine.pricing import normalize,timestamp
 from build_week1_board import encoded_csv,put
 PLAN=ROOT/'work/week1-followups-v1/schedule.json'
 OUT=ROOT/'outputs/week1-t60'
+def heartbeat(current,state_path):
+    """Called under the scheduler lock; persisted UTC hour survives process restarts."""
+    hour=current.astimezone(dt.timezone.utc).strftime('%Y-%m-%dT%H:00:00Z')
+    if state_path.exists():
+        try: previous=json.loads(state_path.read_text()).get('hour','')
+        except (ValueError,OSError): previous=''
+        if previous>=hour: return False
+    state_path.write_text(json.dumps({'hour':hour,'at':current.isoformat()})+'\n')
+    print(f'{current.isoformat()} HEARTBEAT week1-t60 scheduler alive',flush=True)
+    return True
+
 def phase(group,current):
     t=timestamp(group['refresh_at']);cut=timestamp(group['cutoff_at'])
     if current<t: return 'WAIT'
@@ -50,6 +61,7 @@ def run():
     with (OUT/'scheduler.lock').open('a') as lock:
         try: fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError: return
+        heartbeat(dt.datetime.now(dt.timezone.utc),OUT/'heartbeat.json')
         for group in json.loads(PLAN.read_text())['groups']:
             current=dt.datetime.now(dt.timezone.utc);stage=phase(group,current);folder=OUT/group['id']
             if (folder/'receipt.json').exists(): continue

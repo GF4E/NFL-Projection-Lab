@@ -1,0 +1,41 @@
+{
+  "id": "week1-operations-v1",
+  "date": "2026-09-07T09:53:38.300328+02:00",
+  "base_commit": "f9d5b79236a9cea41e90a592be06849300f60483",
+  "tests": {
+    "passed": 29,
+    "failed": 0,
+    "evidence": "tests.txt"
+  },
+  "credits": {
+    "spent_this_run": 0,
+    "accounted": 221,
+    "provider_confirmed": 217,
+    "uncertain_held": 4,
+    "remaining": 79,
+    "live_reserved": 18,
+    "unallocated": 61,
+    "ledger": "work/week1-pricing-v1/credits.jsonl",
+    "ledger_sha256": "745f2d321a33b3e279efd851b85c46250c89f72b7bf17a7c34c5e3f58e81fb15"
+  },
+  "runtime": {
+    "user_report": "Full Disk Access granted to python3.12; unattended execution verified at launchd level",
+    "launchd_evidence": "launchd-verification.txt",
+    "heartbeat_evidence": "heartbeat-verification.txt",
+    "heartbeat_lines_observed": 1,
+    "future_T60_delivery": "Pending actual game windows"
+  },
+  "decisions": [
+    "One heartbeat on the first successful dispatcher tick of each UTC hour, persisted across invocations under the scheduler lock. Backward clock hours are suppressed.",
+    "Six prompting rules are a consolidation of standing user instructions, not a claimed verbatim list.",
+    "Local schedule annotations use Europe/Rome; all prior schedule fields are unchanged.",
+    "Thursday in Rome opener T65: 2026-09-10 01:15 CEST. US Thursday game T65: 2026-09-11 01:30 CEST.",
+    "STATUS last commit identifies the verified parent checkpoint to avoid a self-referential commit hash."
+  ],
+  "next_decision_needed_from_Gabe": "NONE within current scope",
+  "hashes": {
+    "scripts/week1_t60_runner.py": "56438500830fedb5182b8d04e72ec57fc6194d4efb36b239bd93ff952141ffb4",
+    "work/week1-followups-v1/schedule.json": "1e8f6c42019d8c4b31ad830f35d34a499dc31dbb6671cf1738c25a7874515022",
+    "AGENTS.md": "aaf00711009704944b3caa15d28452d6a16a3bc23423abbbf7410e053ee5f396"
+  }
+}
