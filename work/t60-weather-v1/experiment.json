@@ -1,0 +1,131 @@
+{
+  "experiment_id": "t60-weather-v1",
+  "tests_passed": 73,
+  "tests_failed": 0,
+  "credits_spent": 0,
+  "current_forecasts": [
+    {
+      "event_id": "8c94552d022acec4a0458d70c19d3da9",
+      "kickoff_at": "2026-09-10T00:20:00Z",
+      "roof": "outdoors",
+      "status": "FORECAST",
+      "model": "gfs_global",
+      "forecast_run_initialized_at": "2026-09-08T12:00:00+00:00",
+      "forecast_issued_at": "2026-09-08T19:02:41+00:00",
+      "issuance_basis": "max GFS013/GFS025 API availability; exact run requested",
+      "request_at": "2026-09-08T19:54:16.678010+00:00",
+      "received_at": "2026-09-08T19:54:16.943391+00:00",
+      "valid_at": "2026-09-10T00:00+00:00",
+      "wind_mph": 5.5,
+      "precip_mm": 0.0,
+      "temperature_c": 23.4,
+      "source_sha256": "57c3b80b46a6f3fa344a017f53290f09d80bba8ba2e616eed99f83a5e0c5508b",
+      "requests": [
+        {
+          "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json",
+          "request_at": "2026-09-08T19:54:16.225628+00:00",
+          "received_at": "2026-09-08T19:54:16.465933+00:00",
+          "sha256": "edfa911d28f7b86d1c0fc652bf1db6b8a1d7f9ded96c3dc66073f78b6dabe0b2"
+        },
+        {
+          "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json",
+          "request_at": "2026-09-08T19:54:16.466815+00:00",
+          "received_at": "2026-09-08T19:54:16.676604+00:00",
+          "sha256": "2ed0b89d5f116b65ad453816dea24068cf4b60011bd576039dda8362abe02aee"
+        },
+        {
+          "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=47.5951513&longitude=-122.3316259&models=gfs_global&run=2026-09-08T12%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7",
+          "request_at": "2026-09-08T19:54:16.678010+00:00",
+          "received_at": "2026-09-08T19:54:16.943391+00:00",
+          "sha256": "57c3b80b46a6f3fa344a017f53290f09d80bba8ba2e616eed99f83a5e0c5508b"
+        }
+      ],
+      "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+      "home_team": "Seattle Seahawks",
+      "away_team": "New England Patriots",
+      "stadium": "Lumen Field",
+      "in_wind_band": false,
+      "evidence": "CURRENT_PREVIEW_NOT_T60"
+    },
+    {
+      "event_id": "acc580d74344ea3b31bbcdd057fe6a9c",
+      "kickoff_at": "2026-09-11T00:35:00Z",
+      "roof": "outdoors",
+      "status": "FORECAST",
+      "model": "gfs_global",
+      "forecast_run_initialized_at": "2026-09-08T12:00:00+00:00",
+      "forecast_issued_at": "2026-09-08T19:02:41+00:00",
+      "issuance_basis": "max GFS013/GFS025 API availability; exact run requested",
+      "request_at": "2026-09-08T19:54:17.329466+00:00",
+      "received_at": "2026-09-08T19:54:17.564916+00:00",
+      "valid_at": "2026-09-11T00:00+00:00",
+      "wind_mph": 2.0,
+      "precip_mm": 0.0,
+      "temperature_c": 13.7,
+      "source_sha256": "9d70944f2c8730cd17a6c63cb055d68ad6ddd116371d3d8b5518212c8a2c598f",
+      "requests": [
+        {
+          "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json",
+          "request_at": "2026-09-08T19:54:16.945417+00:00",
+          "received_at": "2026-09-08T19:54:17.143571+00:00",
+          "sha256": "edfa911d28f7b86d1c0fc652bf1db6b8a1d7f9ded96c3dc66073f78b6dabe0b2"
+        },
+        {
+          "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json",
+          "request_at": "2026-09-08T19:54:17.144297+00:00",
+          "received_at": "2026-09-08T19:54:17.329136+00:00",
+          "sha256": "2ed0b89d5f116b65ad453816dea24068cf4b60011bd576039dda8362abe02aee"
+        },
+        {
+          "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=-37.819943&longitude=144.983447&models=gfs_global&run=2026-09-08T12%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7",
+          "request_at": "2026-09-08T19:54:17.329466+00:00",
+          "received_at": "2026-09-08T19:54:17.564916+00:00",
+          "sha256": "9d70944f2c8730cd17a6c63cb055d68ad6ddd116371d3d8b5518212c8a2c598f"
+        }
+      ],
+      "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+      "home_team": "Los Angeles Rams",
+      "away_team": "San Francisco 49ers",
+      "stadium": "Melbourne Cricket Ground",
+      "in_wind_band": false,
+      "evidence": "CURRENT_PREVIEW_NOT_T60"
+    }
+  ],
+  "backfilled": false,
+  "live_picks": 0,
+  "scheduled_capture_status": "Installed in existing 15-second launchd runner; future T65 capture not yet occurred",
+  "pins": {
+    "engine/live_weather.py": "7ab3776e0ecd1f25e63182941829c0a5d8a15db4427db85a4796da16a4eae2de",
+    "engine/scorecard.py": "3197ad77595126be4a4a7bb797986dbf0f3f480b009605f3833ef2a6cff6bf2f",
+    "scripts/week1_t60_runner.py": "6c0058ee23126941da6ada3cf48d17d6292c643ddc5628b3cea1d3ba5603a2c1",
+    "scripts/verify_live_weather.py": "5321ad54a64da703d048a8cba8d0f9b170f37d18ba293867bb1195d6d0e53e05",
+    "tests/test_week1_live_weather.py": "65b6a6ed35551297133485c7749118e5a4a62ad442d4c83db54653ff335e4ff3",
+    "RULES.md": "572a2bdd3a8aebf4b07b86a36521c670f18c77f4ca0728a947d65601f1805d39",
+    "work/t60-weather-v1/tests-verified.log": "47864b60f098b5882cc0e763d3c67448916e0a0f525d48ff443136bb4b37effd",
+    "work/t60-weather-v1/tests-complete.log": "95eb455a3b830ec625766f264c08ed170bc32dcdb4b626d6abc4ebf73571ed7a",
+    "work/t60-weather-v1/venues-77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c.csv": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
+    "work/t60-weather-v1/tests-final.log": "7e4a4eca5c1ebfad452cd6a96024d84f713b445e14beda9b42f750ed9fbd384a",
+    "work/t60-weather-v1/tests.log": "47864b60f098b5882cc0e763d3c67448916e0a0f525d48ff443136bb4b37effd",
+    "work/t60-weather-v1/launchctl.txt": "1af0987db9c3a105643993c7ab703998bfb4ccce5378b7d089bab82b826ec683",
+    "work/t60-weather-v1/venues-manifest.json": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+    "work/t60-weather-v1/nflverse-schedules-194c74fac612ee252041af2e4f65f551e32bbc408282669a12c4c113a684e6e3.csv": "194c74fac612ee252041af2e4f65f551e32bbc408282669a12c4c113a684e6e3",
+    "work/t60-weather-v1/current-check/acc580d74344ea3b31bbcdd057fe6a9c.json": "452b5d463cd4699d4dbef6f24682c309323c568b5f404ccf41170c94a54656e7",
+    "work/t60-weather-v1/current-check/8c94552d022acec4a0458d70c19d3da9.json": "7ce1fee009e7a335f43f9fed9f7193afb827d32c353b330a642924b40e37dd49",
+    "work/t60-weather-v1/current-check/sources/2ed0b89d5f116b65ad453816dea24068cf4b60011bd576039dda8362abe02aee.json": "2ed0b89d5f116b65ad453816dea24068cf4b60011bd576039dda8362abe02aee",
+    "work/t60-weather-v1/current-check/sources/edfa911d28f7b86d1c0fc652bf1db6b8a1d7f9ded96c3dc66073f78b6dabe0b2.json": "edfa911d28f7b86d1c0fc652bf1db6b8a1d7f9ded96c3dc66073f78b6dabe0b2",
+    "work/t60-weather-v1/current-check/sources/57c3b80b46a6f3fa344a017f53290f09d80bba8ba2e616eed99f83a5e0c5508b.json": "57c3b80b46a6f3fa344a017f53290f09d80bba8ba2e616eed99f83a5e0c5508b",
+    "work/t60-weather-v1/current-check/sources/9d70944f2c8730cd17a6c63cb055d68ad6ddd116371d3d8b5518212c8a2c598f.json": "9d70944f2c8730cd17a6c63cb055d68ad6ddd116371d3d8b5518212c8a2c598f"
+  },
+  "decisions": [
+    "Use exact GFS Global single-run forecast, not stitched or observed weather. Metadata run initialization and maximum component API availability recorded separately; availability must be at least10 minutes old for replication. Successful request reception before T60 proves availability of the stored payload.",
+    "Weather fetched after existing odds dispatch to protect reserved Odds calls. Weather group has bounded time budget and per-request timeout; missing/late weather skips paper picks and preserves ordinary board publication.",
+    "nflverse supplies schedule venue IDs and roof. Coordinate source is separately pinned greerreNFL/Stadiums; no official nflverse coordinate table was found. MCG roof source dome corrected to outdoors using venue operator evidence https://www.mcc.org.au/members-reserve/seating-maps; raw value retained. Unknown HOU/IND roof statuses remain ineligible.",
+    "No backfill. Current-check captures stay research previews, never injected into scheduled folders. Default scorecard includes dedicated paper rule log; live gates unchanged."
+  ],
+  "sources": [
+    "https://open-meteo.com/en/docs/model-updates",
+    "https://open-meteo.com/en/docs/single-runs-api",
+    "https://nflreadr.nflverse.com/articles/dictionary_schedules.html",
+    "https://www.mcc.org.au/members-reserve/seating-maps"
+  ]
+}

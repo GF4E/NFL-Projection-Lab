@@ -2,9 +2,9 @@
 
 Date: 2026-09-08, Europe/Rome.
 
-Current step: harvest-three follow-up and paper-rule registration complete. T60-issued historical forecast validation is blocked by archive provenance/coverage; stitched forecasts are diagnostic only. [Report](work/harvest-weather-followup-v1/REPORT.md). Prospective weather dispatch remains to be implemented before paper collection.
+Current step: prospective T65 weather capture and stored-forecast paper-rule integration complete. Future T60 execution remains pending. Historical issuance gap is not backfilled. [Report](work/t60-weather-v1/REPORT.md).
 
-Last verified commit before this update: `59183797544f07c96de5b943afca0079db348fee` on `engine-v2`; use `git log -1 --format=%H` for this update.
+Last verified commit before this update: `4b99a7b4ca5ee6c07e6c23a794b9249bbe7c0d51` on `engine-v2`; use `git log -1 --format=%H` for this update.
 
 Active [board](outputs/week1-pricing/b8abbbed73959c5e/week1_board.csv) and [pricing](outputs/week1-pricing/b8abbbed73959c5e/pricing.csv) are offline replays of saved quotes, not refreshed odds. Model fields cover game markets; player props retain consensus-only pricing. Caesars still has no priced quotes in these captures.
 
