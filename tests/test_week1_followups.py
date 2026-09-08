@@ -38,7 +38,7 @@ class FollowupTests(unittest.TestCase):
         rows,*_=normalize([(fixture(),{'at':G['refresh_at'],'sha256':'fixture'})])
         for b in ['fanduel','draftkings']:
             row=next(r for r in rows if r['executed_book']==b)
-            self.assertEqual(append(FIX/(b+'.csv'),row,pick_id=b,status='declined',approver='test'),'appended')
+            self.assertEqual(append(FIX/(b+'.csv'),row,pick_id=b,status='declined'),'appended')
     def test_phase_boundaries(self):
         self.assertEqual(runner.phase(G,at(G['refresh_at'])-dt.timedelta(seconds=1)),'WAIT')
         self.assertEqual(runner.phase(G,at(G['refresh_at'])),'REFRESH')

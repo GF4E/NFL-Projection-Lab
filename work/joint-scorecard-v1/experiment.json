@@ -1,0 +1,44 @@
+{
+  "artifacts": [
+    "outputs/scorecard.csv",
+    "outputs/scorecard_picks.csv",
+    "outputs/scorecard.json"
+  ],
+  "authorization": "Gabe: no approver or executor; one joint pick per entry; weekly/cumulative spread and total scorecards with live and paper combined and separate",
+  "base_commit": "fac1edd9c07d14a875290873fe18ab03157da4c7",
+  "code_sha256": {
+    "engine/pick_log.py": "50e5124188ee453426973c7c9176b05dadfcf070e5b7635007547f9c9bdc40f3",
+    "engine/scorecard.py": "7a60134d849e4c5661aae4c374a091ef50b66ff80f34e1f83a5966504af355c4",
+    "scripts/append_pick.py": "a0b9bbff19907d851c615c3464a3d0a1d81a77bbfdc95f204729d258585b3e4e"
+  },
+  "created_at": "2026-09-08T18:06:53.447936+00:00",
+  "credits": {
+    "accounted": 221,
+    "remaining": 79,
+    "spent_this_run": 0
+  },
+  "decisions": [
+    "New joint entries use picked or declined; class is live or paper. No approver, executor, or execution-confirmed fields. Book identity remains required for frozen quote and CLV attribution.",
+    "Both current pick logs contained headers only; exact original bytes archived before schema update. No historic picks or frozen experiments modified.",
+    "One row per joint pick ID within its class; duplicate IDs within a class fail, distinct live and paper records stay distinct even if IDs match.",
+    "Declined rows remain visible but do not count as bets or enter mean CLV. Unsettled picked rows are pending.",
+    "Final home/away scores include overtime; exact integer line equality is a push, half-point lines cannot push against integer scores.",
+    "CLV averages use available exact-line executed-book closing grades, not zeros for missing closes. Each grade must match class, ID and frozen quote/book/event/side/line/price. CLV sample size is explicit.",
+    "Cumulative covers all supplied seasons. Weekly rows are keyed by season and week, with combined/live/paper for each market.",
+    "outputs/scorecard.csv is a regenerable current report, with labeled per-pick details and hashed-input receipt. No data fetching or scheduling added."
+  ],
+  "experiment_id": "joint-scorecard-v1",
+  "replay_inputs_sha256": {
+    "work/joint-scorecard-v1/inputs/paper_pick_log.csv": "3e7d628488d10c19c80bd8b2d42af5752e5350c75cb787813fb92dd02e92d1d9",
+    "work/joint-scorecard-v1/inputs/pick_log.csv": "3e7d628488d10c19c80bd8b2d42af5752e5350c75cb787813fb92dd02e92d1d9"
+  },
+  "verification": {
+    "actual_joint_picks": 0,
+    "command": "/opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p test_week1*.py",
+    "failed": 0,
+    "fixture_scope": "unit tests only; no synthetic entries in live outputs",
+    "passed": 39,
+    "scorecard_cli": "/opt/anaconda3/bin/python3.12 -B -m engine.scorecard --scorecard",
+    "test_output": "tests.txt"
+  }
+}

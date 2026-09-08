@@ -56,17 +56,17 @@ class PricingTests(unittest.TestCase):
         rows,*_=normalize([(e,r)])
         flags=[q for q in rows if q['board_eligible']]
         self.assertEqual(len(flags),1);self.assertEqual(flags[0]['executed_book'],'betmgm')
-        self.assertEqual(append(FIXTURES/'flagged-paper.csv',flags[0],pick_id='flagged',status='approved',approver='test',paper=True),'appended')
+        self.assertEqual(append(FIXTURES/'flagged-paper.csv',flags[0],pick_id='flagged',status='picked',paper=True),'appended')
         with (FIXTURES/'flagged-paper.csv').open() as f: saved=list(csv.DictReader(f))
         self.assertEqual(saved[0]['record_class'],'paper');self.assertEqual(saved[0]['quote_id'],flags[0]['quote_id'])
     def test_append_idempotency_and_conflict(self):
         q=normalize([fixture()])[0][0];q['executed_book']='betmgm';p=FIXTURES/'decisions.csv'
-        self.assertEqual(append(p,q,pick_id='test',status='declined',approver='test'), 'appended');before=p.read_bytes()
-        self.assertEqual(append(p,q,pick_id='test',status='declined',approver='test'),'already_recorded');self.assertEqual(p.read_bytes(),before)
-        with self.assertRaises(ValueError): append(p,q,pick_id='test',status='approved',approver='test')
+        self.assertEqual(append(p,q,pick_id='test',status='declined'), 'appended');before=p.read_bytes()
+        self.assertEqual(append(p,q,pick_id='test',status='declined'),'already_recorded');self.assertEqual(p.read_bytes(),before)
+        with self.assertRaises(ValueError): append(p,q,pick_id='test',status='picked')
     def test_paper_execution_separate(self):
         q=normalize([fixture()])[0][0];q['executed_book']='betmgm'
-        with self.assertRaises(ValueError): append(FIXTURES/'paper.csv',q,pick_id='x',status='executed',approver='test',paper=True)
+        with self.assertRaises(ValueError): append(FIXTURES/'paper.csv',q,pick_id='x',status='executed',paper=True)
     def test_cap_no_dispatch(self):
         p=FIXTURES/'budget';p.mkdir();(p/'credits.jsonl').write_text(json.dumps({'request_id':'old','status':'reserved','reserved_credits':299})+'\n'+json.dumps({'request_id':'old','status':'complete','credits':299})+'\n')
         with patch.object(quote_capture,'RUN',p),patch.object(quote_capture,'key',return_value='fixture'),patch.object(quote_capture.subprocess,'run') as call:
