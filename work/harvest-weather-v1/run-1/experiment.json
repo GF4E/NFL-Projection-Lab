@@ -1,0 +1,749 @@
+{
+  "buckets": [
+    {
+      "bucket": "<10",
+      "group": "wind",
+      "lower95": 0.47143815750663653,
+      "mean_total_residual": 0.4863731656184486,
+      "n": 1431,
+      "push": 14,
+      "under_l": 712,
+      "under_rate": 0.497529992942837,
+      "under_w": 705,
+      "upper95": 0.5228107479052446
+    },
+    {
+      "bucket": "10\u2013<15",
+      "group": "wind",
+      "lower95": 0.5443768257059396,
+      "mean_total_residual": -1.9039039039039038,
+      "n": 333,
+      "push": 3,
+      "under_l": 133,
+      "under_rate": 0.5969696969696969,
+      "under_w": 197,
+      "upper95": 0.6474397590361446
+    },
+    {
+      "bucket": "15\u201320",
+      "group": "wind",
+      "lower95": 0.42306701030927835,
+      "mean_total_residual": -0.297029702970297,
+      "n": 101,
+      "push": 0,
+      "under_l": 49,
+      "under_rate": 0.5148514851485149,
+      "under_w": 52,
+      "upper95": 0.6060606060606061
+    },
+    {
+      "bucket": ">20",
+      "group": "wind",
+      "lower95": 0.36363636363636365,
+      "mean_total_residual": -6.538461538461538,
+      "n": 13,
+      "push": 0,
+      "under_l": 5,
+      "under_rate": 0.6153846153846154,
+      "under_w": 8,
+      "upper95": 0.8888888888888888
+    },
+    {
+      "bucket": "dry",
+      "group": "precip",
+      "lower95": 0.47911158893496475,
+      "mean_total_residual": 0.26705276705276704,
+      "n": 1554,
+      "push": 14,
+      "under_l": 766,
+      "under_rate": 0.5025974025974026,
+      "under_w": 774,
+      "upper95": 0.5261097237022185
+    },
+    {
+      "bucket": "wet",
+      "group": "precip",
+      "lower95": 0.5279714850367024,
+      "mean_total_residual": -1.4444444444444444,
+      "n": 324,
+      "push": 3,
+      "under_l": 133,
+      "under_rate": 0.5856697819314641,
+      "under_w": 188,
+      "upper95": 0.6384394254542599
+    },
+    {
+      "bucket": "outdoor",
+      "group": "dome",
+      "lower95": 0.4946750444491373,
+      "mean_total_residual": -0.028221512247071354,
+      "n": 1878,
+      "push": 17,
+      "under_l": 899,
+      "under_rate": 0.5169263836646965,
+      "under_w": 962,
+      "upper95": 0.539042408837906
+    },
+    {
+      "bucket": "indoor",
+      "group": "dome",
+      "lower95": 0.4600221556512513,
+      "mean_total_residual": 1.4152431011826545,
+      "n": 761,
+      "push": 4,
+      "under_l": 383,
+      "under_rate": 0.4940554821664465,
+      "under_w": 374,
+      "upper95": 0.5272496831432193
+    }
+  ],
+  "candidate_built": true,
+  "code_sha256": "fab60f813a2e06658e5d6901937537a945d880bdab3f5423e392bc85f56b4124",
+  "coefficients": [
+    {
+      "coefficient": 16.434161889447534,
+      "evaluation_season": 2016,
+      "feature": "intercept",
+      "lower95": -8.833924087211525,
+      "se": 11.919440923113013,
+      "training_max_season": 2015,
+      "training_n": 256,
+      "upper95": 41.70224786610659,
+      "week_clusters": 17
+    },
+    {
+      "coefficient": 0.7331245129555151,
+      "evaluation_season": 2016,
+      "feature": "market_total",
+      "lower95": 0.15512267455078,
+      "se": 0.2726545561337716,
+      "training_max_season": 2015,
+      "training_n": 256,
+      "upper95": 1.31112635136025,
+      "week_clusters": 17
+    },
+    {
+      "coefficient": -0.48720804193028494,
+      "evaluation_season": 2016,
+      "feature": "wind",
+      "lower95": -0.9886440302847357,
+      "se": 0.23653697575014807,
+      "training_max_season": 2015,
+      "training_n": 256,
+      "upper95": 0.01422794642416575,
+      "week_clusters": 17
+    },
+    {
+      "coefficient": -4.633033919982483,
+      "evaluation_season": 2016,
+      "feature": "precip",
+      "lower95": -8.161173539062954,
+      "se": 1.6642911456360507,
+      "training_max_season": 2015,
+      "training_n": 256,
+      "upper95": -1.1048943009020116,
+      "week_clusters": 17
+    },
+    {
+      "coefficient": -3.5339884153235195,
+      "evaluation_season": 2016,
+      "feature": "dome",
+      "lower95": -10.013072975286935,
+      "se": 3.056308488093429,
+      "training_max_season": 2015,
+      "training_n": 256,
+      "upper95": 2.945096144639897,
+      "week_clusters": 17
+    },
+    {
+      "coefficient": 1.885419047809494,
+      "evaluation_season": 2017,
+      "feature": "intercept",
+      "lower95": -13.688059434267219,
+      "se": 7.654638184141996,
+      "training_max_season": 2016,
+      "training_n": 512,
+      "upper95": 17.458897529886208,
+      "week_clusters": 34
+    },
+    {
+      "coefficient": 1.0333177027011209,
+      "evaluation_season": 2017,
+      "feature": "market_total",
+      "lower95": 0.6860592803280057,
+      "se": 0.1706836133444027,
+      "training_max_season": 2016,
+      "training_n": 512,
+      "upper95": 1.380576125074236,
+      "week_clusters": 34
+    },
+    {
+      "coefficient": -0.4051727660875705,
+      "evaluation_season": 2017,
+      "feature": "wind",
+      "lower95": -0.6853368568995001,
+      "se": 0.13770557103363634,
+      "training_max_season": 2016,
+      "training_n": 512,
+      "upper95": -0.12500867527564097,
+      "week_clusters": 34
+    },
+    {
+      "coefficient": -3.32936167629025,
+      "evaluation_season": 2017,
+      "feature": "precip",
+      "lower95": -6.783282405351791,
+      "se": 1.6976626980351066,
+      "training_max_season": 2016,
+      "training_n": 512,
+      "upper95": 0.12455905277129053,
+      "week_clusters": 34
+    },
+    {
+      "coefficient": -2.9937078481346013,
+      "evaluation_season": 2017,
+      "feature": "dome",
+      "lower95": -6.98021208829482,
+      "se": 1.9594368472717214,
+      "training_max_season": 2016,
+      "training_n": 512,
+      "upper95": 0.992796392025618,
+      "week_clusters": 34
+    },
+    {
+      "coefficient": 11.29776164823649,
+      "evaluation_season": 2018,
+      "feature": "intercept",
+      "lower95": -1.2464125845022256,
+      "se": 6.2453597492675765,
+      "training_max_season": 2017,
+      "training_n": 768,
+      "upper95": 23.841935880975207,
+      "week_clusters": 51
+    },
+    {
+      "coefficient": 0.8329527957880073,
+      "evaluation_season": 2018,
+      "feature": "market_total",
+      "lower95": 0.5592922955919997,
+      "se": 0.13624717268578906,
+      "training_max_season": 2017,
+      "training_n": 768,
+      "upper95": 1.106613295984015,
+      "week_clusters": 51
+    },
+    {
+      "coefficient": -0.5153118249715477,
+      "evaluation_season": 2018,
+      "feature": "wind",
+      "lower95": -0.7877718820097397,
+      "se": 0.13564950884279664,
+      "training_max_season": 2017,
+      "training_n": 768,
+      "upper95": -0.24285176793335572,
+      "week_clusters": 51
+    },
+    {
+      "coefficient": -1.852518648632882,
+      "evaluation_season": 2018,
+      "feature": "precip",
+      "lower95": -4.885893826298449,
+      "se": 1.5102244984430384,
+      "training_max_season": 2017,
+      "training_n": 768,
+      "upper95": 1.1808565290326847,
+      "week_clusters": 51
+    },
+    {
+      "coefficient": -3.8736129958510457,
+      "evaluation_season": 2018,
+      "feature": "dome",
+      "lower95": -7.46671864038517,
+      "se": 1.78889713670218,
+      "training_max_season": 2017,
+      "training_n": 768,
+      "upper95": -0.2805073513169214,
+      "week_clusters": 51
+    },
+    {
+      "coefficient": 5.351177335991467,
+      "evaluation_season": 2019,
+      "feature": "intercept",
+      "lower95": -5.616249463116311,
+      "se": 5.49467980782248,
+      "training_max_season": 2018,
+      "training_n": 1024,
+      "upper95": 16.318604135099246,
+      "week_clusters": 68
+    },
+    {
+      "coefficient": 0.9589218890594858,
+      "evaluation_season": 2019,
+      "feature": "market_total",
+      "lower95": 0.7245259205938288,
+      "se": 0.11743235843324856,
+      "training_max_season": 2018,
+      "training_n": 1024,
+      "upper95": 1.1933178575251429,
+      "week_clusters": 68
+    },
+    {
+      "coefficient": -0.4609514038213686,
+      "evaluation_season": 2019,
+      "feature": "wind",
+      "lower95": -0.7110335735676124,
+      "se": 0.1252911438180656,
+      "training_max_season": 2018,
+      "training_n": 1024,
+      "upper95": -0.2108692340751248,
+      "week_clusters": 68
+    },
+    {
+      "coefficient": -2.355082108206378,
+      "evaluation_season": 2019,
+      "feature": "precip",
+      "lower95": -4.736661039485403,
+      "se": 1.1931708233966853,
+      "training_max_season": 2018,
+      "training_n": 1024,
+      "upper95": 0.026496823072647224,
+      "week_clusters": 68
+    },
+    {
+      "coefficient": -3.557025302857821,
+      "evaluation_season": 2019,
+      "feature": "dome",
+      "lower95": -6.600073272352645,
+      "se": 1.5245667501130402,
+      "training_max_season": 2018,
+      "training_n": 1024,
+      "upper95": -0.5139773333629964,
+      "week_clusters": 68
+    },
+    {
+      "coefficient": 6.058089396723429,
+      "evaluation_season": 2020,
+      "feature": "intercept",
+      "lower95": -3.4711038903860176,
+      "se": 4.791887239289905,
+      "training_max_season": 2019,
+      "training_n": 1280,
+      "upper95": 15.587282683832875,
+      "week_clusters": 85
+    },
+    {
+      "coefficient": 0.9249035455864749,
+      "evaluation_season": 2020,
+      "feature": "market_total",
+      "lower95": 0.7229117382715833,
+      "se": 0.10157438670308899,
+      "training_max_season": 2019,
+      "training_n": 1280,
+      "upper95": 1.1268953529013666,
+      "week_clusters": 85
+    },
+    {
+      "coefficient": -0.33593092562309096,
+      "evaluation_season": 2020,
+      "feature": "wind",
+      "lower95": -0.5675745859472685,
+      "se": 0.11648523296000204,
+      "training_max_season": 2019,
+      "training_n": 1280,
+      "upper95": -0.10428726529891344,
+      "week_clusters": 85
+    },
+    {
+      "coefficient": -2.4872950162284315,
+      "evaluation_season": 2020,
+      "feature": "precip",
+      "lower95": -4.373591938298361,
+      "se": 0.9485506147310561,
+      "training_max_season": 2019,
+      "training_n": 1280,
+      "upper95": -0.6009980941585022,
+      "week_clusters": 85
+    },
+    {
+      "coefficient": -2.1985411885879875,
+      "evaluation_season": 2020,
+      "feature": "dome",
+      "lower95": -5.038413724061747,
+      "se": 1.4280693605360257,
+      "training_max_season": 2019,
+      "training_n": 1280,
+      "upper95": 0.6413313468857718,
+      "week_clusters": 85
+    },
+    {
+      "coefficient": 3.04074962430246,
+      "evaluation_season": 2021,
+      "feature": "intercept",
+      "lower95": -4.788055223687273,
+      "se": 3.9465052653827337,
+      "training_max_season": 2020,
+      "training_n": 1536,
+      "upper95": 10.869554472292192,
+      "week_clusters": 102
+    },
+    {
+      "coefficient": 0.9876591604571734,
+      "evaluation_season": 2021,
+      "feature": "market_total",
+      "lower95": 0.8207759942019692,
+      "se": 0.08412590518194117,
+      "training_max_season": 2020,
+      "training_n": 1536,
+      "upper95": 1.1545423267123776,
+      "week_clusters": 102
+    },
+    {
+      "coefficient": -0.30084736571377685,
+      "evaluation_season": 2021,
+      "feature": "wind",
+      "lower95": -0.4993895178625633,
+      "se": 0.1000852191451424,
+      "training_max_season": 2020,
+      "training_n": 1536,
+      "upper95": -0.1023052135649904,
+      "week_clusters": 102
+    },
+    {
+      "coefficient": -2.258197498020924,
+      "evaluation_season": 2021,
+      "feature": "precip",
+      "lower95": -4.018343521343323,
+      "se": 0.8872906763882382,
+      "training_max_season": 2020,
+      "training_n": 1536,
+      "upper95": -0.49805147469852495,
+      "week_clusters": 102
+    },
+    {
+      "coefficient": -1.2280572186734449,
+      "evaluation_season": 2021,
+      "feature": "dome",
+      "lower95": -3.7047407633052027,
+      "se": 1.2484976748508196,
+      "training_max_season": 2020,
+      "training_n": 1536,
+      "upper95": 1.248626325958313,
+      "week_clusters": 102
+    },
+    {
+      "coefficient": 4.366308824426594,
+      "evaluation_season": 2022,
+      "feature": "intercept",
+      "lower95": -2.8440078175239103,
+      "se": 3.6413903802493093,
+      "training_max_season": 2021,
+      "training_n": 1808,
+      "upper95": 11.576625466377099,
+      "week_clusters": 120
+    },
+    {
+      "coefficient": 0.9547830261894577,
+      "evaluation_season": 2022,
+      "feature": "market_total",
+      "lower95": 0.8027906546777983,
+      "se": 0.07675995202120758,
+      "training_max_season": 2021,
+      "training_n": 1808,
+      "upper95": 1.106775397701117,
+      "week_clusters": 120
+    },
+    {
+      "coefficient": -0.3132101409599495,
+      "evaluation_season": 2022,
+      "feature": "wind",
+      "lower95": -0.4971333472112616,
+      "se": 0.09288582280166872,
+      "training_max_season": 2021,
+      "training_n": 1808,
+      "upper95": -0.12928693470863734,
+      "week_clusters": 120
+    },
+    {
+      "coefficient": -1.2681498015507775,
+      "evaluation_season": 2022,
+      "feature": "precip",
+      "lower95": -2.948393880693489,
+      "se": 0.8485653169048617,
+      "training_max_season": 2021,
+      "training_n": 1808,
+      "upper95": 0.41209427759193384,
+      "week_clusters": 120
+    },
+    {
+      "coefficient": -0.9723969861565757,
+      "evaluation_season": 2022,
+      "feature": "dome",
+      "lower95": -3.1939471053692885,
+      "se": 1.1219384161684378,
+      "training_max_season": 2021,
+      "training_n": 1808,
+      "upper95": 1.249153133056137,
+      "week_clusters": 120
+    },
+    {
+      "coefficient": 4.550803602941687,
+      "evaluation_season": 2023,
+      "feature": "intercept",
+      "lower95": -1.8154229088646598,
+      "se": 3.2194427154937575,
+      "training_max_season": 2022,
+      "training_n": 2079,
+      "upper95": 10.917030114748034,
+      "week_clusters": 138
+    },
+    {
+      "coefficient": 0.9450701820699373,
+      "evaluation_season": 2023,
+      "feature": "market_total",
+      "lower95": 0.8099358312488911,
+      "se": 0.0683383320648376,
+      "training_max_season": 2022,
+      "training_n": 2079,
+      "upper95": 1.0802045328909835,
+      "week_clusters": 138
+    },
+    {
+      "coefficient": -0.29124512504251504,
+      "evaluation_season": 2023,
+      "feature": "wind",
+      "lower95": -0.46144922401174787,
+      "se": 0.0860733348958702,
+      "training_max_season": 2022,
+      "training_n": 2079,
+      "upper95": -0.12104102607328221,
+      "week_clusters": 138
+    },
+    {
+      "coefficient": -1.4188800483556152,
+      "evaluation_season": 2023,
+      "feature": "precip",
+      "lower95": -2.9266693827955748,
+      "se": 0.7624990063202403,
+      "training_max_season": 2022,
+      "training_n": 2079,
+      "upper95": 0.08890928608434434,
+      "week_clusters": 138
+    },
+    {
+      "coefficient": -0.6849548582916684,
+      "evaluation_season": 2023,
+      "feature": "dome",
+      "lower95": -2.691367642264899,
+      "se": 1.0146561718557745,
+      "training_max_season": 2022,
+      "training_n": 2079,
+      "upper95": 1.3214579256815626,
+      "week_clusters": 138
+    },
+    {
+      "coefficient": 6.090546641850017,
+      "evaluation_season": 2024,
+      "feature": "intercept",
+      "lower95": 0.21752036392395713,
+      "se": 2.973101416740315,
+      "training_max_season": 2023,
+      "training_n": 2351,
+      "upper95": 11.963572919776077,
+      "week_clusters": 156
+    },
+    {
+      "coefficient": 0.919320788315237,
+      "evaluation_season": 2024,
+      "feature": "market_total",
+      "lower95": 0.7940746593090865,
+      "se": 0.06340333347204452,
+      "training_max_season": 2023,
+      "training_n": 2351,
+      "upper95": 1.0445669173213876,
+      "week_clusters": 156
+    },
+    {
+      "coefficient": -0.33761252585763,
+      "evaluation_season": 2024,
+      "feature": "wind",
+      "lower95": -0.4976450610097172,
+      "se": 0.08101325185168955,
+      "training_max_season": 2023,
+      "training_n": 2351,
+      "upper95": -0.1775799907055428,
+      "week_clusters": 156
+    },
+    {
+      "coefficient": -1.5723887808275658,
+      "evaluation_season": 2024,
+      "feature": "precip",
+      "lower95": -2.949656060605329,
+      "se": 0.6972138565304233,
+      "training_max_season": 2023,
+      "training_n": 2351,
+      "upper95": -0.19512150104980308,
+      "week_clusters": 156
+    },
+    {
+      "coefficient": -1.0123889468780851,
+      "evaluation_season": 2024,
+      "feature": "dome",
+      "lower95": -2.8691760291786137,
+      "se": 0.9399611109729684,
+      "training_max_season": 2023,
+      "training_n": 2351,
+      "upper95": 0.8443981354224432,
+      "week_clusters": 156
+    },
+    {
+      "coefficient": 5.984113374553113,
+      "evaluation_season": 2025,
+      "feature": "intercept",
+      "lower95": 0.38565678306832485,
+      "se": 2.8364261284321737,
+      "training_max_season": 2024,
+      "training_n": 2623,
+      "upper95": 11.582569966037902,
+      "week_clusters": 174
+    },
+    {
+      "coefficient": 0.9189447275371161,
+      "evaluation_season": 2025,
+      "feature": "market_total",
+      "lower95": 0.7990521567544537,
+      "se": 0.060742887761260085,
+      "training_max_season": 2024,
+      "training_n": 2623,
+      "upper95": 1.0388372983197784,
+      "week_clusters": 174
+    },
+    {
+      "coefficient": -0.3028808350313987,
+      "evaluation_season": 2025,
+      "feature": "wind",
+      "lower95": -0.45215471983956046,
+      "se": 0.07562876307845978,
+      "training_max_season": 2024,
+      "training_n": 2623,
+      "upper95": -0.15360695022323692,
+      "week_clusters": 174
+    },
+    {
+      "coefficient": -1.4836815620167128,
+      "evaluation_season": 2025,
+      "feature": "precip",
+      "lower95": -2.8378742185193917,
+      "se": 0.6860939923473569,
+      "training_max_season": 2024,
+      "training_n": 2623,
+      "upper95": -0.1294889055140338,
+      "week_clusters": 174
+    },
+    {
+      "coefficient": -0.8736843533123229,
+      "evaluation_season": 2025,
+      "feature": "dome",
+      "lower95": -2.6097538493634054,
+      "se": 0.8795697169221762,
+      "training_max_season": 2024,
+      "training_n": 2623,
+      "upper95": 0.8623851427387597,
+      "week_clusters": 174
+    }
+  ],
+  "comparisons": [
+    {
+      "market_crps": 7.39150435918017,
+      "paired_n": 2639,
+      "season": "ALL",
+      "weather_crps": 7.3938327646307185
+    },
+    {
+      "market_crps": 7.032623291015625,
+      "paired_n": 256,
+      "season": 2016,
+      "weather_crps": 7.080230712890625
+    },
+    {
+      "market_crps": 7.997447967529297,
+      "paired_n": 256,
+      "season": 2017,
+      "weather_crps": 7.995952606201172
+    },
+    {
+      "market_crps": 7.525005764431427,
+      "paired_n": 256,
+      "season": 2018,
+      "weather_crps": 7.535351170433896
+    },
+    {
+      "market_crps": 7.553423702716827,
+      "paired_n": 256,
+      "season": 2019,
+      "weather_crps": 7.5938474498689175
+    },
+    {
+      "market_crps": 7.2232818531989995,
+      "paired_n": 256,
+      "season": 2020,
+      "weather_crps": 7.253158507347101
+    },
+    {
+      "market_crps": 7.488747319364861,
+      "paired_n": 272,
+      "season": 2021,
+      "weather_crps": 7.529006336249559
+    },
+    {
+      "market_crps": 7.411894638992494,
+      "paired_n": 271,
+      "season": 2022,
+      "weather_crps": 7.381229340577846
+    },
+    {
+      "market_crps": 7.288942888143936,
+      "paired_n": 272,
+      "season": 2023,
+      "weather_crps": 7.166669285644404
+    },
+    {
+      "market_crps": 7.0036177942027615,
+      "paired_n": 272,
+      "season": 2024,
+      "weather_crps": 7.068796480219321
+    },
+    {
+      "market_crps": 7.412148676645459,
+      "paired_n": 272,
+      "season": 2025,
+      "weather_crps": 7.362826280967566
+    }
+  ],
+  "credits_spent": 0,
+  "evidence": "RECONSTRUCTED_ERA5_KICKOFF_WEATHER_NOT_AS_ISSUED_T60",
+  "experiment_id": "harvest-weather-v1",
+  "input_manifest_sha256": "35c67b45197e3eaa246aae3935f14d0b4a3a820d7534d9107f3880a2217cd550",
+  "margin_delta": 0.0,
+  "promotion": false,
+  "promotion_reason": "Margin unchanged: strict margin improvement gate fails. Historical observed weather and historical lines are not as-issued T60 evidence.",
+  "protocol_sha256": "27ef24d7b26ad3a6ba1f32a1042175f5158d8e9e054e0097efcec8bf9126631b",
+  "saved_baseline_sha256": "c00c0f57b43448102c2a156d620eff2a8e3b9e7a7b58a962e9966af05bffbe45",
+  "selection_caveat": "Conditional study selection uses full coefficient trajectory; overlapping expanding fits are not ten independent replications.",
+  "stability": {
+    "dome": {
+      "negative": 10,
+      "positive": 0,
+      "qualifies": true
+    },
+    "precip": {
+      "negative": 10,
+      "positive": 0,
+      "qualifies": true
+    },
+    "wind": {
+      "negative": 10,
+      "positive": 0,
+      "qualifies": true
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "id": "harvest-weather-v1",
+  "schedule": "work/market-distribution-v1/schedules-d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07.csv",
+  "schedule_sha256": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07",
+  "evaluation": "REG 2016-2025; 2015 training-only warmup",
+  "weather": "ERA5 hourly UTC kickoff hour floored; Eastern schedule times; mph, mm, Celsius; outdoor/open roofs only; indoor exposure zero, measurement missing",
+  "buckets": {
+    "wind": [
+      "[0,10)",
+      "[10,15)",
+      "[15,20]",
+      ">20"
+    ],
+    "precip": [
+      "dry=0",
+      "wet>0"
+    ],
+    "dome": [
+      "outdoor/open",
+      "dome/closed"
+    ]
+  },
+  "intervals": "5000 within-season whole-week bootstrap replicates, pointwise percentile 95%, seed 20260908; pushes excluded from rate",
+  "regression": "OLS intercept,market_total,wind_mph,precip_mm,dome; prior seasons only; CR1 week-cluster covariance, t G-1 intervals",
+  "stability": "At least 8 of 10 prior-season coefficient point estimates have same nonzero sign for any of wind, precip, dome; overlapping fits are not independent evidence; no significance gate added",
+  "candidate": "If stable, full registered regression location with same prior-season market residual PMF; temperature cached but excluded from regression",
+  "promotion": "Margin CRPS strictly improves AND total does not worsen; unchanged margin fails; reconstructed weather not as-issued T60",
+  "credits_spent": 0
+}

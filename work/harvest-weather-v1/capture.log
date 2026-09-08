@@ -1,0 +1,87 @@
+ATL97 18 cached
+BAL00 91 cached
+BOS00 90 cached
+BUF00 89 cached
+CAR00 89 cached
+CHI98 89 cached
+CIN00 89 cached
+CLE00 90 cached
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/harvest_weather_capture.py", line 45, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/harvest_weather_capture.py", line 37, in main
+    for rows in pool.map(fetch,sorted(groups.items())):weather.update(rows)
+  File "/opt/anaconda3/lib/python3.12/concurrent/futures/_base.py", line 619, in result_iterator
+    yield _result_or_cancel(fs.pop())
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/concurrent/futures/_base.py", line 317, in _result_or_cancel
+    return fut.result(timeout)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/concurrent/futures/_base.py", line 449, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/concurrent/futures/_base.py", line 401, in __get_result
+    raise self._exception
+  File "/opt/anaconda3/lib/python3.12/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/harvest_weather_capture.py", line 26, in fetch
+    payload=urllib.request.urlopen(url,timeout=120).read();data=json.loads(payload);sha=hashlib.sha256(payload).hexdigest();raw=BASE/'responses'/f'{sha}.json';put(raw,payload)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/urllib/request.py", line 215, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/urllib/request.py", line 521, in open
+    response = meth(req, response)
+               ^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/urllib/request.py", line 630, in http_response
+    response = self.parent.error(
+               ^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/urllib/request.py", line 559, in error
+    return self._call_chain(*args)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/urllib/request.py", line 492, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/urllib/request.py", line 639, in http_error_default
+    raise HTTPError(req.full_url, code, msg, hdrs, fp)
+urllib.error.HTTPError: HTTP Error 429: Too Many Requests
+ATL97 18 cached
+BAL00 91 cached
+BOS00 90 cached
+BUF00 89 cached
+CAR00 89 cached
+CHI98 89 cached
+CIN00 89 cached
+CLE00 90 cached
+DAL00 3 cached
+DEN00 91 cached
+FRA00 2 cached
+GER00 2 cached
+GNB00 89 cached
+HOU00 5 cached
+IND00 16 cached
+JAX00 83 cached
+KAN00 89 cached
+LAX97 22 cached
+LAX99 29 cached
+LON00 15 cached
+LON01 3 cached
+LON02 10 cached
+MEX00 4 cached
+MIA00 89 cached
+MIN98 8 cached
+NAS00 90 cached
+NYC01 429 {"error":true,"reason":"Minutely API request limit exceeded. Please try again in one minute."}
+NYC01 181 cached
+OAK00 36 cached
+PHI00 89 cached
+PHO00 10 cached
+PIT00 91 cached
+SAO00 1 cached
+SDG00 16 cached
+SEA00 90 cached
+SFO01 87 cached
+TAM00 88 cached
+WAS00 90 cached

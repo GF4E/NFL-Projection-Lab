@@ -59,3 +59,25 @@ Published methodology for later independent nfelo work: [market regression](http
 ## Harvest two: disagreement study
 
 [Bucket and seasonal regression report](work/harvest-disagreement-v1/REPORT.md). The conditional blend was not triggered under the stability definition fixed before this study. No promotion gate or live location was changed. Replay with `python -m engine.disagreement --output work/harvest-disagreement-v1/run-2` using the pinned interpreter.
+
+### Harvest two outcome: NEGATIVE
+
+No blend was triggered under its frozen stability rule; this is a negative harvest outcome, not proof of zero incremental Elo information. Numerical results: [experiment](work/harvest-disagreement-v1/run-2/experiment.json). ATS excludes pushes and exact agreements; intervals are pointwise week-cluster bootstrap intervals. nfelo remains `DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST`.
+
+| Series | Absolute disagreement | Games | W–L–P | No side | Mean directional residual (points) | ATS rate (95% interval) |
+|---|---|---:|---|---:|---:|---|
+| ANYA | <1 | 657 | 311–328–18 | 0 | +0.014 | 48.7% (44.6–52.7%) |
+| ANYA | 1–<2 | 583 | 280–287–16 | 0 | -0.226 | 49.4% (45.4–53.3%) |
+| ANYA | 2–<3 | 486 | 224–250–12 | 0 | -0.502 | 47.3% (42.6–51.9%) |
+| ANYA | 3–4 | 348 | 163–177–8 | 0 | -0.412 | 47.9% (42.5–53.5%) |
+| ANYA | >4 | 565 | 289–265–11 | 0 | +0.936 | 52.2% (47.8–56.3%) |
+| nfelo | <1 | 537 | 110–115–7 | 305 | +0.334 | 48.9% (42.5–55.2%) |
+| nfelo | 1–<2 | 238 | 113–123–2 | 0 | -0.412 | 47.9% (41.8–53.9%) |
+| nfelo | 2–<3 | 95 | 42–52–1 | 0 | -0.958 | 44.7% (35.6–54.2%) |
+| nfelo | 3–4 | 58 | 33–24–1 | 0 | +1.276 | 57.9% (44.0–69.1%) |
+| nfelo | >4 | 18 | 6–10–2 | 0 | -2.333 | 37.5% (16.7–55.6%) |
+
+
+## Harvest three: weather totals — NEGATIVE
+
+[Experiment and wind, precipitation, dome tables](work/harvest-weather-v1/REPORT.md). The requested sign-consistency trigger fired, but the location adjustment worsened total CRPS; margin remained unchanged. No promotion. Reanalysis remains retrospective evidence. Run `python -m engine.harvest --harvest weather-v1 --output work/harvest-weather-v1/run-2` offline.
