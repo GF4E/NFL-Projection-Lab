@@ -1,0 +1,10 @@
+version = 1
+id = "weekly-nfl-component-harvest"
+kind = "heartbeat"
+name = "Weekly NFL component harvest"
+prompt = "Run the weekly harvest review in /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6. Read AGENTS.md and HARVEST.md first. Check the four candidate repositories' current license, last push and commit using public metadata, and published methodology only for unlicensed nfelo; never copy its code. Pin changed inputs without overwriting prior versions. Revisit the missing qualified 2016–2025 QB inputs and missing totals forecast documented in harvest one. For an implemented named component with suitable inputs, run engine.harvest --harvest into a new immutable run directory, verify chronology and paired CRPS for both targets, record incomplete coverage/cutoff mismatches honestly, and run tests. If no new qualifying inputs exist, record a concise no-change review rather than invent forecasts or repeat failed data requests. Do not spend Odds API credits, delete files, change registered gates, or change the live empirical market location. Commit and push only to engine-v2 and report tests, artifacts, blockers and verified commit."
+status = "ACTIVE"
+rrule = "FREQ=WEEKLY;BYDAY=TU;BYHOUR=9;BYMINUTE=0;BYSECOND=0"
+target_thread_id = "01a06e57-ea63-71c1-9c75-ba48f42d3a2c"
+created_at = 1788891688457
+updated_at = 1788891688457

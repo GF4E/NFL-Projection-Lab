@@ -1,0 +1,42 @@
+{
+  "candidate_total": "NOT_PROVIDED_BY_538; cannot pass both-target promotion",
+  "component": "538-qb-elo",
+  "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+  "elo_points_per_margin_point": 25,
+  "inputs": {
+    "work/harvest-elo-v1/sources/538-README.md": "fb1ddde48e2df0aa8dcf21df993623d9aa26efc7775b4058941cc03615347ab2",
+    "work/harvest-elo-v1/sources/538-initial_elos.csv": "d9e5ef0c9d762128fd2a9da0107989de4ab5c9f1e52411864adae19c6528bdf1",
+    "work/harvest-elo-v1/sources/538-nfl_elo.csv": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "work/harvest-elo-v1/sources/538-nfl_games.csv": "af16cf3c5848393057fad07feea278f0a85ab7b57ddbfe42ed96b5c80e7d519d",
+    "work/harvest-elo-v1/sources/nfelo-historic_projected_spreads.csv": "fb25751153b16dae1e83108181302407cc8d232a6d140e6f6990103e9ebc0f69",
+    "work/harvest-elo-v1/sources/nfelo-metadata.json": "faf4389f0d7554f6d6e99911c63fceabe876bb06a88fe2501b3ea87087c7ac5e",
+    "work/harvest-elo-v1/sources/nfl-bet-engine-metadata.json": "60f0958c285dae8e08e637c0b8f4e483ae0fe6d41322506998f01a246f5027e3",
+    "work/harvest-elo-v1/sources/nfl-elo-game-LICENSE": "5c607ded77b85e160aad53f838aa3d65f6a8e2c0a5ae241884d9c4bccb2eacb5",
+    "work/harvest-elo-v1/sources/nfl-elo-game-forecast.py": "9d572f614b15b69b2fb2ac2ddbae4000647366a00fbb9386584adef4322fbb59",
+    "work/harvest-elo-v1/sources/nfl-elo-game-metadata.json": "2208c7c0946e0a48f49b27b9c256c440c0ba4c1dadd87daf00ad8a9726355385",
+    "work/harvest-elo-v1/sources/pins.json": "d2b8364f18cd160da8d559c9d0f3050990716f86e9a67d2e3feeea088c324730",
+    "work/harvest-elo-v1/sources/sports-quant-metadata.json": "6198155f753cf2cd08592dfd0c5b13917681abe60b2c1fc8347e06bb6adf7370",
+    "work/market-distribution-v1/schedules-d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
+  },
+  "market_residual_training_start": 2015,
+  "nfelo_duplicate_policy": "Exclude every duplicated game_id, even if rounded spread agrees; no score-dependent selection. Added after input validation failed and before comparative scoring.",
+  "nfelo_margin_column": "home_closing_line_rounded_nfelo",
+  "nfelo_total": "NOT_PROVIDED",
+  "population": "REG",
+  "promotion": "requires both targets, complete coverage, qualified matching cutoff, lower paired CRPS; otherwise live location unchanged",
+  "qb_input": "explicit pregame adjustments required; missing is not zero",
+  "schedules": "work/market-distribution-v1/schedules-d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07.csv",
+  "seasons": [
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "shape_fit": "prior seasons only, frozen before evaluation season"
+}

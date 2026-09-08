@@ -34,3 +34,7 @@ Offline replay of the named capture set:
 ```
 
 Only push `engine-v2` to `https://github.com/GF4E/NFL-Projection-Lab.git`; never push `main` or `os01-hosted-diagnostic-v1`. Use conventional commits and run `scripts/nfl_engine_autopush.py --check` with pinned Python before committing. Verify the remote commit before reporting completion. Reports cite experiment records for numerical claims.
+
+## Weekly harvest
+
+Gabe authorizes the weekly candidate harvest documented in HARVEST.md and the `engine.harvest --harvest` runner. Port only licensed implementations; nfelo permits methodology-based independent work and reference CSV use in this request, never code copying. Keep the empirical market location live until a complete qualified harvest beats it on both targets. Missing QB inputs or totals are blockers, not zero-valued forecasts or successful comparisons. Weekly research uses no Odds API credits.

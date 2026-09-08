@@ -1,0 +1,839 @@
+{
+  "candidate_vs_nfelo": {
+    "margin": {
+      "candidate_crps": null,
+      "nfelo_crps": null,
+      "paired_n": 0
+    },
+    "total": {
+      "candidate_crps": null,
+      "nfelo_crps": null,
+      "paired_n": 0
+    }
+  },
+  "code_sha256": {
+    "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+    "engine/harvest.py": "88f3508a4ee0ae72d11c3ff670340053256ca9a6a258162fb2cadd3201b7a5db",
+    "engine/market_distribution.py": "0897c49705a05c04d65f1c02a830bc8446166ee6750153b629f2f4c40766b03b"
+  },
+  "component": "538-qb-elo",
+  "credits_spent": 0,
+  "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+  "excluded_nfelo_duplicate_ids": [
+    "2025_04_SEA_ARI",
+    "2025_08_MIN_LAC",
+    "2025_11_NYJ_NE",
+    "2025_13_CHI_PHI",
+    "2025_13_CIN_BAL",
+    "2025_13_GB_DET",
+    "2025_13_KC_DAL"
+  ],
+  "limitations": [
+    "Pinned upstream code has no QB estimator or totals forecast. QB adjustment math is implemented but must receive qualified pregame inputs; missing values are never zero-filled.",
+    "538 point-to-margin conversion and empirical CRPS wrappers are local diagnostic adapters, not published 538 distribution forecasts.",
+    "Historical nflverse lines and nfelo outputs do not attest T60 issuance. nfelo begins 2021; first-season residual calibration is unavailable.",
+    "The live PMF trained on 2015-2025 is never scored on its own training games; market shapes are refit using prior seasons only."
+  ],
+  "live_location": "empirical_market_distribution_unchanged",
+  "predictions_input_sha256": null,
+  "promotion_eligible": false,
+  "protocol_sha256": "9db4e5c782f1f51e09d889ae9bb0ea1bf3f08cfd715ef958ca8bd419e75e0121",
+  "qb_input_sha256": null,
+  "scores": [
+    {
+      "crps": 7.095248228834634,
+      "eligible_games": 2639,
+      "market_crps_same_games": 7.095248228834634,
+      "paired_n": 2639,
+      "season": "ALL",
+      "series": "market_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.39150435918017,
+      "eligible_games": 2639,
+      "market_crps_same_games": 7.39150435918017,
+      "paired_n": 2639,
+      "season": "ALL",
+      "series": "market_total",
+      "target": "total"
+    },
+    {
+      "crps": null,
+      "eligible_games": 2639,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": "ALL",
+      "series": "candidate_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 2639,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": "ALL",
+      "series": "candidate_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.3553873174661755,
+      "eligible_games": 2639,
+      "market_crps_same_games": 7.095248228834634,
+      "paired_n": 2639,
+      "season": "ALL",
+      "series": "elo_base_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.012361584168634,
+      "eligible_games": 2639,
+      "market_crps_same_games": 6.94610944802063,
+      "paired_n": 946,
+      "season": "ALL",
+      "series": "nfelo_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 2639,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": "ALL",
+      "series": "nfelo_total",
+      "target": "total"
+    },
+    {
+      "crps": 6.6113433837890625,
+      "eligible_games": 256,
+      "market_crps_same_games": 6.6113433837890625,
+      "paired_n": 256,
+      "season": 2016,
+      "series": "market_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.032623291015625,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.032623291015625,
+      "paired_n": 256,
+      "season": 2016,
+      "series": "market_total",
+      "target": "total"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2016,
+      "series": "candidate_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2016,
+      "series": "candidate_total",
+      "target": "total"
+    },
+    {
+      "crps": 6.732696533203125,
+      "eligible_games": 256,
+      "market_crps_same_games": 6.6113433837890625,
+      "paired_n": 256,
+      "season": 2016,
+      "series": "elo_base_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2016,
+      "series": "nfelo_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2016,
+      "series": "nfelo_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.314174652099609,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.314174652099609,
+      "paired_n": 256,
+      "season": 2017,
+      "series": "market_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.997447967529297,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.997447967529297,
+      "paired_n": 256,
+      "season": 2017,
+      "series": "market_total",
+      "target": "total"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2017,
+      "series": "candidate_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2017,
+      "series": "candidate_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.740325927734375,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.314174652099609,
+      "paired_n": 256,
+      "season": 2017,
+      "series": "elo_base_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2017,
+      "series": "nfelo_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2017,
+      "series": "nfelo_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.257466634114583,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.257466634114583,
+      "paired_n": 256,
+      "season": 2018,
+      "series": "market_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.525005764431428,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.525005764431428,
+      "paired_n": 256,
+      "season": 2018,
+      "series": "market_total",
+      "target": "total"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2018,
+      "series": "candidate_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2018,
+      "series": "candidate_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.52096896701389,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.257466634114583,
+      "paired_n": 256,
+      "season": 2018,
+      "series": "elo_base_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2018,
+      "series": "nfelo_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2018,
+      "series": "nfelo_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.359577178955078,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.359577178955078,
+      "paired_n": 256,
+      "season": 2019,
+      "series": "market_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.553423702716827,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.553423702716827,
+      "paired_n": 256,
+      "season": 2019,
+      "series": "market_total",
+      "target": "total"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2019,
+      "series": "candidate_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2019,
+      "series": "candidate_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.576174736022949,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.359577178955078,
+      "paired_n": 256,
+      "season": 2019,
+      "series": "elo_base_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2019,
+      "series": "nfelo_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2019,
+      "series": "nfelo_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.07381408691406,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.07381408691406,
+      "paired_n": 256,
+      "season": 2020,
+      "series": "market_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.2232818531989995,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.2232818531989995,
+      "paired_n": 256,
+      "season": 2020,
+      "series": "market_total",
+      "target": "total"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2020,
+      "series": "candidate_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2020,
+      "series": "candidate_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.199999389648438,
+      "eligible_games": 256,
+      "market_crps_same_games": 7.07381408691406,
+      "paired_n": 256,
+      "season": 2020,
+      "series": "elo_base_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2020,
+      "series": "nfelo_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 256,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2020,
+      "series": "nfelo_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.701084535885482,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.701084535885482,
+      "paired_n": 272,
+      "season": 2021,
+      "series": "market_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.488747319364861,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.488747319364861,
+      "paired_n": 272,
+      "season": 2021,
+      "series": "market_total",
+      "target": "total"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2021,
+      "series": "candidate_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2021,
+      "series": "candidate_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.998523811888848,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.701084535885482,
+      "paired_n": 272,
+      "season": 2021,
+      "series": "elo_base_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2021,
+      "series": "nfelo_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2021,
+      "series": "nfelo_total",
+      "target": "total"
+    },
+    {
+      "crps": 6.3899783689142495,
+      "eligible_games": 271,
+      "market_crps_same_games": 6.3899783689142495,
+      "paired_n": 271,
+      "season": 2022,
+      "series": "market_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.411894638992494,
+      "eligible_games": 271,
+      "market_crps_same_games": 7.411894638992494,
+      "paired_n": 271,
+      "season": 2022,
+      "series": "market_total",
+      "target": "total"
+    },
+    {
+      "crps": null,
+      "eligible_games": 271,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2022,
+      "series": "candidate_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 271,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2022,
+      "series": "candidate_total",
+      "target": "total"
+    },
+    {
+      "crps": 6.584630826035162,
+      "eligible_games": 271,
+      "market_crps_same_games": 6.3899783689142495,
+      "paired_n": 271,
+      "season": 2022,
+      "series": "elo_base_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 6.461399403511404,
+      "eligible_games": 271,
+      "market_crps_same_games": 6.353128166109031,
+      "paired_n": 238,
+      "season": 2022,
+      "series": "nfelo_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 271,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2022,
+      "series": "nfelo_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.277224907240047,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.277224907240047,
+      "paired_n": 272,
+      "season": 2023,
+      "series": "market_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.288942888143936,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.288942888143936,
+      "paired_n": 272,
+      "season": 2023,
+      "series": "market_total",
+      "target": "total"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2023,
+      "series": "candidate_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2023,
+      "series": "candidate_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.615866884624133,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.277224907240047,
+      "paired_n": 272,
+      "season": 2023,
+      "series": "elo_base_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.387863961011403,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.337131192986669,
+      "paired_n": 238,
+      "season": 2023,
+      "series": "nfelo_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2023,
+      "series": "nfelo_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.033491299372385,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.033491299372385,
+      "paired_n": 272,
+      "season": 2024,
+      "series": "market_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.003617794202761,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.003617794202761,
+      "paired_n": 272,
+      "season": 2024,
+      "series": "market_total",
+      "target": "total"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2024,
+      "series": "candidate_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2024,
+      "series": "candidate_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.288139323299866,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.033491299372385,
+      "paired_n": 272,
+      "season": 2024,
+      "series": "elo_base_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.278168858338312,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.210913568403331,
+      "paired_n": 239,
+      "season": 2024,
+      "series": "nfelo_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2024,
+      "series": "nfelo_total",
+      "target": "total"
+    },
+    {
+      "crps": 6.93997756020614,
+      "eligible_games": 272,
+      "market_crps_same_games": 6.93997756020614,
+      "paired_n": 272,
+      "season": 2025,
+      "series": "market_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 7.412148676645459,
+      "eligible_games": 272,
+      "market_crps_same_games": 7.412148676645459,
+      "paired_n": 272,
+      "season": 2025,
+      "series": "market_total",
+      "target": "total"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2025,
+      "series": "candidate_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2025,
+      "series": "candidate_total",
+      "target": "total"
+    },
+    {
+      "crps": 7.293314815519062,
+      "eligible_games": 272,
+      "market_crps_same_games": 6.93997756020614,
+      "paired_n": 272,
+      "season": 2025,
+      "series": "elo_base_margin",
+      "target": "margin"
+    },
+    {
+      "crps": 6.918125630840876,
+      "eligible_games": 272,
+      "market_crps_same_games": 6.880214145083739,
+      "paired_n": 231,
+      "season": 2025,
+      "series": "nfelo_margin",
+      "target": "margin"
+    },
+    {
+      "crps": null,
+      "eligible_games": 272,
+      "market_crps_same_games": null,
+      "paired_n": 0,
+      "season": 2025,
+      "series": "nfelo_total",
+      "target": "total"
+    }
+  ],
+  "season_fit_audit": [
+    {
+      "sample_sizes": {},
+      "season": 2015,
+      "training_max_season": null
+    },
+    {
+      "sample_sizes": {
+        "elo_base_margin": 256,
+        "market_margin": 256,
+        "market_total": 256
+      },
+      "season": 2016,
+      "training_max_season": 2015
+    },
+    {
+      "sample_sizes": {
+        "elo_base_margin": 512,
+        "market_margin": 512,
+        "market_total": 512
+      },
+      "season": 2017,
+      "training_max_season": 2016
+    },
+    {
+      "sample_sizes": {
+        "elo_base_margin": 768,
+        "market_margin": 768,
+        "market_total": 768
+      },
+      "season": 2018,
+      "training_max_season": 2017
+    },
+    {
+      "sample_sizes": {
+        "elo_base_margin": 1024,
+        "market_margin": 1024,
+        "market_total": 1024
+      },
+      "season": 2019,
+      "training_max_season": 2018
+    },
+    {
+      "sample_sizes": {
+        "elo_base_margin": 1280,
+        "market_margin": 1280,
+        "market_total": 1280
+      },
+      "season": 2020,
+      "training_max_season": 2019
+    },
+    {
+      "sample_sizes": {
+        "elo_base_margin": 1536,
+        "market_margin": 1536,
+        "market_total": 1536
+      },
+      "season": 2021,
+      "training_max_season": 2020
+    },
+    {
+      "sample_sizes": {
+        "elo_base_margin": 1808,
+        "market_margin": 1808,
+        "market_total": 1808,
+        "nfelo_margin": 224
+      },
+      "season": 2022,
+      "training_max_season": 2021
+    },
+    {
+      "sample_sizes": {
+        "elo_base_margin": 2079,
+        "market_margin": 2079,
+        "market_total": 2079,
+        "nfelo_margin": 462
+      },
+      "season": 2023,
+      "training_max_season": 2022
+    },
+    {
+      "sample_sizes": {
+        "elo_base_margin": 2351,
+        "market_margin": 2351,
+        "market_total": 2351,
+        "nfelo_margin": 700
+      },
+      "season": 2024,
+      "training_max_season": 2023
+    },
+    {
+      "sample_sizes": {
+        "elo_base_margin": 2623,
+        "market_margin": 2623,
+        "market_total": 2623,
+        "nfelo_margin": 939
+      },
+      "season": 2025,
+      "training_max_season": 2024
+    }
+  ],
+  "status": "INCOMPLETE_QB_INPUTS_AND_NO_TOTAL_FORECAST"
+}

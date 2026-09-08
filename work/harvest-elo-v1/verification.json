@@ -1,0 +1,39 @@
+{
+  "automation": {
+    "evidence": "weekly-automation.toml",
+    "id": "weekly-nfl-component-harvest",
+    "next_execution": "scheduled, not yet observed",
+    "schedule": "Tuesday 09:00 app-local",
+    "status": "ACTIVE"
+  },
+  "base_commit": "643c27ea87054c19f0ece2acfd2cb0a7b107d8b2",
+  "blocked": [
+    "Qualified pregame QB estimator/inputs for 2015 warm-up and 2016-2025 evaluation are unavailable from the specified repository.",
+    "538 and nfelo supply no native total forecast; no total CRPS or both-target superiority is fabricated."
+  ],
+  "created_at": "2026-09-08T18:23:37.030778+00:00",
+  "credits": {
+    "accounted": 221,
+    "remaining": 79,
+    "spent_this_run": 0
+  },
+  "experiment": "run-3/experiment.json",
+  "live_artifact_unchanged": {
+    "path": "work/market-distribution-v1/model.json",
+    "sha256": "b51a8f9c7e978b5f9ce455fa5792ec0324fb0108fb953443de1f9c05cdea94fd"
+  },
+  "preserved_prior_runs": [
+    "run-1",
+    "run-2"
+  ],
+  "replay": "replay-verification.json",
+  "scope_status": "Partial implementation: full requested QB-adjusted 2016-2025 comparison cannot be claimed. Base Elo port, QB adjustment formula, generic harvest runner, market and nfelo diagnostics, and weekly loop are delivered.",
+  "source_failures": [
+    "538 data GitHub README points to external CSV; direct CSV path in repository returned 404.",
+    "Official projects.fivethirtyeight.com NFL CSV returned no usable data; retained empty response as evidence.",
+    "538 methodology URL now redirects; adjustment formula verified via indexed primary-source excerpt."
+  ],
+  "tests_failed": 0,
+  "tests_file": "tests.txt",
+  "tests_passed": 46
+}
