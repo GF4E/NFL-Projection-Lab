@@ -1,0 +1,11 @@
+{
+  "retrieved": "2026-09-08 via web tool; direct HTML request returned403",
+  "historical_forecast": {
+    "url": "https://open-meteo.com/en/docs/historical-forecast-api",
+    "finding": "Continuous stitched forecast series since approximately2022; no individual-run structure for cutoff selection"
+  },
+  "single_runs": {
+    "url": "https://open-meteo.com/en/docs/single-runs-api",
+    "finding": "ECMWF IFS HRES available from2024-03-14 as cycle49R1 hindcasts; others from2026-04-02. Run timestamp is initialization, not public availability; computation adds latency."
+  }
+}

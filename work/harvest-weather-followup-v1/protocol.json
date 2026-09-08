@@ -1,0 +1,16 @@
+{
+  "id": "harvest-weather-followup-v1",
+  "bucket": "10 <= wind_mph < 15; outdoor/open roof; REG 2016-2025",
+  "season_threshold": 0.524,
+  "rate": "under wins/(wins+losses); pushes reported and excluded",
+  "bonferroni": "four fixed wind buckets; alpha=.05/4; two-sided percentile bootstrap endpoints .00625,.99375; same within-season week clusters as harvest three; 100000 replicates seed20260908 for tail precision",
+  "forecast_diagnostic": "2022-2025 stitched historical forecast, pinned gfs_global, UTC kickoff hour; all outdoor games including games outside observed bucket; not closest issuance T60 and not a chronology validation",
+  "chronology": "2022-onward stitched series has no run-availability metadata. Single runs: ECMWF March2024 onward hindcasts, other models April2026; cannot establish full 2022-2025 as-issued T60 rate",
+  "paper_rule": "WIND-UNDER-10-15-V1; 2026 REG Weeks1-4; >=30 paper picks AND positive verified mean CLV before any live consideration; distinct from model promotion gate",
+  "credits_spent": 0,
+  "inputs": {
+    "work/harvest-weather-v1/weather-manifest.json": "35c67b45197e3eaa246aae3935f14d0b4a3a820d7534d9107f3880a2217cd550",
+    "work/harvest-weather-v1/protocol.json": "27ef24d7b26ad3a6ba1f32a1042175f5158d8e9e054e0097efcec8bf9126631b",
+    "work/harvest-weather-v1/sources/stadiums.csv": "c988ee1019001e62ee6931734fbdbcbbf39e6c5bb532298816e308874de089bc"
+  }
+}

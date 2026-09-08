@@ -81,3 +81,5 @@ No blend was triggered under its frozen stability rule; this is a negative harve
 ## Harvest three: weather totals — NEGATIVE
 
 [Experiment and wind, precipitation, dome tables](work/harvest-weather-v1/REPORT.md). The requested sign-consistency trigger fired, but the location adjustment worsened total CRPS; margin remained unchanged. No promotion. Reanalysis remains retrospective evidence. Run `python -m engine.harvest --harvest weather-v1 --output work/harvest-weather-v1/run-2` offline.
+
+[Harvest-three follow-up](work/harvest-weather-followup-v1/REPORT.md): seasonal counts and four-bucket multiplicity correction, with a stitched-forecast sensitivity diagnostic. Historical T60 issuance remains unverified. [Paper rule](RULES.md) registered separately; no live promotion.
