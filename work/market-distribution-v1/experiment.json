@@ -1,0 +1,98 @@
+{
+  "authorization": "Gabe 2026-09-08: empirical residual distributions, consensus OR model filter, teaser legs and offline grading; supersedes prior date deferral for this deliverable only",
+  "base_commit": "e55945d1c55bd13e726f56ef1618f45be58fa177",
+  "board": {
+    "evidence": "offline replay of saved captures; not new live prices or as-issued historical model forecasts",
+    "filter_sources": {
+      "consensus": 1,
+      "model": 16
+    },
+    "missing_book_quotes": [
+      "williamhill_us"
+    ],
+    "path": "outputs/week1-pricing/b8abbbed73959c5e/week1_board.csv",
+    "pricing_path": "outputs/week1-pricing/b8abbbed73959c5e/pricing.csv",
+    "rows": 17
+  },
+  "code_sha256": {
+    "engine/market_distribution.py": "0897c49705a05c04d65f1c02a830bc8446166ee6750153b629f2f4c40766b03b",
+    "engine/market_grade.py": "9ba26bf357491fb1cacd29dcf64203ec663f7f1a6e6a87960cc1d38c2286eb22",
+    "engine/pricing.py": "e62e5472ea9acf9a05401ae49749c2467040f08842a2203993e42a5d419afed2",
+    "scripts/build_week1_board.py": "4519d36c06fdf6d4863a0abe527b3479e0739a1c4aef65c2e33c14d06bb08bca"
+  },
+  "created_at": "2026-09-08T18:00:50.769852+00:00",
+  "credits": {
+    "accounted": 221,
+    "ledger_sha256": "745f2d321a33b3e279efd851b85c46250c89f72b7bf17a7c34c5e3f58e81fb15",
+    "remaining": 79,
+    "spent_this_run": 0
+  },
+  "decisions": [
+    "Regular season is the primary population; completed 2015-2025 games only, final scores include overtime. Missing line rows excluded per target.",
+    "nflverse spread_line is positive for a favored home team; residual is home_score-away_score-spread_line. Inference uses negative home handicap for favored home team.",
+    "Historical half-point lines cannot produce exclusively integer exact residuals. Preserve exact residual counts; additionally quantize residuals to nearest integer, halves away from zero. No smoothing or centering. This representation choice is explicit, not claimed to preserve half-point locations.",
+    "At inference round the consensus center to the nearest integer (halves away from zero), translate the integer histogram; clamp impossible negative total support to zero, preserving unit mass. This is an approximate integer location model, not a conditional key-number model.",
+    "Fair probabilities for two-way wager pricing are conditional on no push; unconditional win and push probabilities are separate columns. Three-way moneylines retain tie mass.",
+    "Player props cannot be modeled from game margins/totals; model fields remain blank with UNSUPPORTED_PLAYER_PROP and consensus filtering retained.",
+    "Wong flags apply to the offered side handicap; ticket joint probabilities are not inferred from marginal legs.",
+    "Consensus fair line uses existing closest-offered-to-50pct method; no new line interpolation or data calls.",
+    "CLV is American cents against power-devigged executed-book closing probability at the exact approved line, last quote within ten minutes before kickoff and after approval. Missing close is unavailable; no different-book substitution.",
+    "Grading only accepts T60 label with pre-cutoff inputs/freeze, matching frozen pick quote and pinned model code/artifact; final results required. Training-period grades rejected.",
+    "Intermediate snapshot 7e0e95dd23da8c9d is superseded by the active replay snapshot; retained, not deleted."
+  ],
+  "experiment_id": "market-distribution-v1",
+  "model": {
+    "path": "work/market-distribution-v1/artifacts/4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041.json",
+    "sha256": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041"
+  },
+  "performance_claim": "NONE; no prospective results exist yet",
+  "sample_sizes": {
+    "margin": 2895,
+    "total": 2895
+  },
+  "season_counts": {
+    "2015": 256,
+    "2016": 256,
+    "2017": 256,
+    "2018": 256,
+    "2019": 256,
+    "2020": 256,
+    "2021": 272,
+    "2022": 271,
+    "2023": 272,
+    "2024": 272,
+    "2025": 272
+  },
+  "source": {
+    "field_definitions": "https://raw.githubusercontent.com/nflverse/nfldata/master/DATASETS.md",
+    "path": "work/market-distribution-v1/schedules-d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07.csv",
+    "sha256": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07",
+    "url": "https://raw.githubusercontent.com/nflverse/nfldata/master/data/games.csv"
+  },
+  "verification": {
+    "grade_cli": "grade-cli-verification.json; synthetic fixture only",
+    "home_minus2_5": {
+      "conditional_win": 0.5008635578583766,
+      "loss": 0.49913644214162345,
+      "push": 0.0,
+      "win": 0.5008635578583766
+    },
+    "home_minus3": {
+      "conditional_win": 0.4879518072289156,
+      "loss": 0.4991364421416235,
+      "push": 0.02521588946459413,
+      "win": 0.47564766839378236
+    },
+    "home_six_point_teaser": {
+      "conditional_win": 0.6878777106292215,
+      "loss": 0.3032815198618307,
+      "push": 0.028324697754749568,
+      "win": 0.6683937823834197
+    },
+    "margin_mass": 1.0,
+    "tests_failed": 0,
+    "tests_file": "work/market-distribution-v1/tests.txt",
+    "tests_passed": 35,
+    "total_mass": 1.0
+  }
+}

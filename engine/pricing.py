@@ -105,6 +105,8 @@ def normalize(captures):
         if row['market']=='spreads' and row['side']==row['away_team'] and line!='': line=-line
         row['consensus_fair_line']=line
         row['fair_line_method']='closest_offered_consensus_to_50pct_no_interpolation' if line!='' else 'not_applicable'
+    from engine.market_distribution import enrich
+    allrows=enrich(allrows)
     return sorted(allrows,key=lambda r:(r['event_id'],r['market'],r['player'],str(r['line']),r['side'],r['executed_book'])),issues,sharp,sorted(returned)
 
 def write_csv(path,rows,fields):

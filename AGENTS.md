@@ -17,7 +17,7 @@ These consolidate Gabe's standing instructions into operating rules; they are no
 
 ## Scope and safeguards
 
-Current deliverable: market pricing, CSV pick log, four-book execution board and scheduled T65 mainline captures with immutable T60 artifacts. No model, power simulation or teaser work before September 10 and the later authorized steps. Execution books: BetMGM, Caesars, FanDuel, DraftKings. Preserve the consensus filter and all registered mathematics. Never modify frozen experiments, archived forecasts or saved scorecards; never reverse E3's rejection. Keep approved/declined and executed/paper pick records separate.
+Current deliverable: market pricing, CSV pick log, four-book execution board and scheduled T65 mainline captures with immutable T60 artifacts. The September 8 request authorizes the empirical market residual distribution, teaser leg probabilities, consensus-or-model board filter, and offline grading now. Power simulation and other model/teaser work remain deferred. Execution books: BetMGM, Caesars, FanDuel, DraftKings. The September 8 authorized filter passes either consensus or empirical-model edge at the unchanged 60–70% band and 10-cent threshold; preserve other registered mathematics. Never modify frozen experiments, archived forecasts or saved scorecards; never reverse E3's rejection. Keep approved/declined and executed/paper pick records separate.
 
 Pin ingested sources by hash; preserve versions, quota accounting, chronology safeguards and last-good publication. No credentials in code, logs or Git. Never make unscheduled Odds API calls. Respect the existing reserved live budget within the cumulative cap.
 

@@ -1,15 +1,13 @@
 # Current status
 
-Date: 2026-09-07, Europe/Rome.
+Date: 2026-09-08, Europe/Rome.
 
-Current step: Week 1 pricing operations — coverage diagnosis and four-book board complete; T65 refresh/T60 artifact scheduler operational. Actual game-window captures remain pending. Models, power simulation and teasers remain deferred.
+Current step: empirical market residual distribution, pricing integration and offline grading delivered. The September 8 request authorizes this scope now; other deferred model experiments remain unchanged.
 
-Last verified commit before this status update: `f9d5b79236a9cea41e90a592be06849300f60483` on `engine-v2`. Run `git log -1 --format=%H` for the commit containing the latest status update.
+Last verified commit before this update: `e55945d1c55bd13e726f56ef1618f45be58fa177` on `engine-v2`. `git log -1 --format=%H` identifies the commit containing this status.
 
-Credits remaining: **79 of 300**; 221 accounted (217 confirmed + 4 held), including 18 reserved for upcoming refreshes and 61 unallocated. This operations update spent **0**. [Evidence](work/week1-operations-v1/experiment.json)
+Active [board](outputs/week1-pricing/b8abbbed73959c5e/week1_board.csv) and [pricing](outputs/week1-pricing/b8abbbed73959c5e/pricing.csv) are offline replays of saved quotes, not refreshed odds. Model fields cover game markets; player props retain consensus-only pricing. Caesars still has no priced quotes in these captures.
 
-Next decision needed from Gabe: **NONE** within current scope and budget. Approval is needed before exceeding the cap, deleting files or changing a registered gate.
+Credits: 221 accounted, 79 remaining; 18 reserved for scheduled live refreshes. This run spent 0. Next decision from Gabe: NONE within authorized scope. [Experiment](work/market-distribution-v1/experiment.json)
 
-Launchd execution is verified after Full Disk Access was granted. The hourly heartbeat appeared in the actual launchd log; 29 tests passed, none failed. A waiting periodic job can show `not running` between successful invocations. [Verification](work/week1-operations-v1/experiment.json)
-
-Local schedule timezone: **Europe/Rome (CEST)**. The opener's T65 refresh is **Thursday September 10 at 01:15**; T60 is 01:20. The US Thursday game's T65 refresh is **Friday September 11 at 01:30**; T60 is 01:35. Both are explicit in the [schedule](work/week1-followups-v1/schedule.json); registered UTC times are unchanged.
+T65 refresh schedule remains unchanged: opener Thursday September 10, 01:15 CEST; US Thursday game Friday September 11, 01:30 CEST. Actual T60 grading remains pending the scheduled artifacts, final results, and executed-book closing quotes for CLV. No closing-price collection was added.

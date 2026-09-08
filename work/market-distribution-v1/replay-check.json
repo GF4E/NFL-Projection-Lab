@@ -1,0 +1,38 @@
+{
+  "experiment_id": "week1-pricing-v1",
+  "snapshot_id": "b8abbbed73959c5e",
+  "pricing_csv": "outputs/week1-pricing/b8abbbed73959c5e/pricing.csv",
+  "board_csv": "outputs/week1-pricing/b8abbbed73959c5e/week1_board.csv",
+  "event_count": 16,
+  "pricing_rows": 9800,
+  "board_rows": 17,
+  "board_markets": [
+    "h2h",
+    "player_receptions",
+    "spreads"
+  ],
+  "sharp_reference": "pinnacle",
+  "returned_books": [
+    "betmgm",
+    "betonlineag",
+    "draftkings",
+    "fanduel",
+    "lowvig",
+    "pinnacle"
+  ],
+  "missing_requested_books": [
+    "williamhill_us"
+  ],
+  "credits_confirmed": 217,
+  "credits_uncertain_reserved": 4,
+  "credits_total_accounted": 221,
+  "credit_cap": 300,
+  "status": "BOARD_READY_WITH_COVERAGE_GAPS",
+  "probability_source": "consensus_plus_empirical_residual_model",
+  "model_reference": {
+    "path": "work/market-distribution-v1/artifacts/4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041.json",
+    "sha256": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041"
+  },
+  "filter_change_authorization": "Gabe 2026-09-08: either consensus or model clears band and edge",
+  "parity_or_model_gate_changed": true
+}
