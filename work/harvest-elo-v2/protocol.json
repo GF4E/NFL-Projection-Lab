@@ -1,0 +1,23 @@
+{
+  "credits": "No Odds API calls",
+  "elo_defaults": {
+    "HFA": 65,
+    "K": 20,
+    "elo_points_per_margin_point": 25,
+    "reversion": 0.3333333333333333
+  },
+  "id": "harvest-elo-v2",
+  "nfelo": "Pinned v1 reference CSV, exclude all duplicated IDs, own residual shape needs prior reference seasons, DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+  "parameters_selected": "Fixed before new candidate comparisons; prior base-only results were already viewed in harvest v1",
+  "population": "REG 2016-2025, paired populations explicit; postseason affects only subsequent Elo/QB state",
+  "promotion_rule": "User-authorized update: margin CRPS improves AND total CRPS does not worsen on paired population; separate evidence restrictions still apply; retrospective starter identities not prospective-qualified",
+  "qb_aggregation": "Ratio of pooled numerators and denominators across previous 10 appearances, not mean of ratios. Team baseline previous 10 team games. Exclude whole target week.",
+  "qb_candidate": "Same plain Elo state updates; add home-minus-away pre-week ANY/A adjustment at forecast time only",
+  "qb_metric": "ANY/A=(passing yards +20*pass TD -45*INT -sack yards)/(attempts+sacks). This is not 538 VALUE.",
+  "qb_rookie_prior": "Prior league pooled ANY/A from previous 256 team-games when no prior QB attempts; explicitly flagged",
+  "qb_to_elo": "25 Elo points per 1 ANY/A unit above team baseline, one margin point per ANY/A. Fixed local diagnostic conversion; no tuning or 538 attribution.",
+  "qb_window": 10,
+  "shape_fit": "Freeze residual histograms before each season using REG games from 2015 through prior season; no evaluation-year labels in shape",
+  "starter": "Retrospective passer with most official attempts per team-game; sacks excluded from attempts; tie by passer ID; no claim known at T60",
+  "total_companion": "Same prior-season empirical MARKET total residual histogram centered on league mean of previous 256 completed REG games, excluding target week. Not an Elo total forecast."
+}

@@ -1,0 +1,10 @@
+version = 1
+id = "weekly-nfl-component-harvest"
+kind = "heartbeat"
+name = "Weekly NFL component harvest"
+prompt = "Run the weekly harvest review in /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6. Read AGENTS.md and HARVEST.md. Inspect public metadata for the four candidate repositories; pin source versions and never copy unlicensed nfelo code. Harvest v2 now supplies plain Elo and a reconstructed rolling-ANY/A QB candidate with a shared league-mean totals companion; ANY/A is not 538 VALUE and retrospective starter identities are not as-issued T60 evidence. Use engine.harvest --harvest elo-anya-v2 or another implemented named component in a new immutable run directory. Compare paired CRPS, report paired_n, preserve chronology and cutoff labels, and keep the live location unchanged unless the registered margin-improves and total-does-not-worsen rule and evidence qualification are satisfied. Reuse pinned inputs if no new relevant source exists; record a concise no-change review. No Odds API credits, deletion, or unapproved gate changes. Test, commit and push authorized work only to engine-v2, then report the verified commit."
+status = "ACTIVE"
+rrule = "FREQ=WEEKLY;BYDAY=TU;BYHOUR=9;BYMINUTE=0;BYSECOND=0"
+target_thread_id = "01a06e57-ea63-71c1-9c75-ba48f42d3a2c"
+created_at = 1788891688457
+updated_at = 1788893417079

@@ -1,0 +1,827 @@
+{
+  "code_sha256": {
+    "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+    "engine/harvest.py": "88f3508a4ee0ae72d11c3ff670340053256ca9a6a258162fb2cadd3201b7a5db",
+    "engine/harvest_comparison.py": "c782c98fe90d14441e9c5d1507c80f80f11133c819b050a2abf25d0c72c44b3c",
+    "engine/market_distribution.py": "0897c49705a05c04d65f1c02a830bc8446166ee6750153b629f2f4c40766b03b",
+    "engine/qb_history.py": "5d651f0d009791395a2d24a0f52be479a3411f284a23c2d638708be32a2fc15d"
+  },
+  "comparisons": [
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.355387317466176,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.26013908863154267,
+      "paired_n": 2639,
+      "reference": "market_margin",
+      "reference_crps": 7.095248228834634,
+      "season": "ALL",
+      "target": "margin"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.218104722026755,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": 0.20574313785812137,
+      "paired_n": 946,
+      "reference": "nfelo_margin",
+      "reference_crps": 7.012361584168634,
+      "season": "ALL",
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.321724994118212,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.22647676528357863,
+      "paired_n": 2639,
+      "reference": "market_margin",
+      "reference_crps": 7.095248228834634,
+      "season": "ALL",
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.167690598326815,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": 0.15532901415818134,
+      "paired_n": 946,
+      "reference": "nfelo_margin",
+      "reference_crps": 7.012361584168634,
+      "season": "ALL",
+      "target": "margin"
+    },
+    {
+      "candidate": "companion_total",
+      "candidate_crps": 7.789375149352005,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.3978707901718339,
+      "paired_n": 2639,
+      "reference": "market_total",
+      "reference_crps": 7.391504359180171,
+      "season": "ALL",
+      "target": "total"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 6.732696533203125,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.1213531494140625,
+      "paired_n": 256,
+      "reference": "market_margin",
+      "reference_crps": 6.6113433837890625,
+      "season": 2016,
+      "target": "margin"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2016,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 6.6798858642578125,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.06854248046875,
+      "paired_n": 256,
+      "reference": "market_margin",
+      "reference_crps": 6.6113433837890625,
+      "season": 2016,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2016,
+      "target": "margin"
+    },
+    {
+      "candidate": "companion_total",
+      "candidate_crps": 7.505706787109375,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.47308349609375,
+      "paired_n": 256,
+      "reference": "market_total",
+      "reference_crps": 7.032623291015625,
+      "season": 2016,
+      "target": "total"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.740325927734375,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.4261512756347656,
+      "paired_n": 256,
+      "reference": "market_margin",
+      "reference_crps": 7.314174652099609,
+      "season": 2017,
+      "target": "margin"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2017,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.613758087158203,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.29958343505859375,
+      "paired_n": 256,
+      "reference": "market_margin",
+      "reference_crps": 7.314174652099609,
+      "season": 2017,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2017,
+      "target": "margin"
+    },
+    {
+      "candidate": "companion_total",
+      "candidate_crps": 8.011089324951172,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.013641357421875,
+      "paired_n": 256,
+      "reference": "market_total",
+      "reference_crps": 7.997447967529297,
+      "season": 2017,
+      "target": "total"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.52096896701389,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.26350233289930713,
+      "paired_n": 256,
+      "reference": "market_margin",
+      "reference_crps": 7.257466634114583,
+      "season": 2018,
+      "target": "margin"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2018,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.549648708767362,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.29218207465277857,
+      "paired_n": 256,
+      "reference": "market_margin",
+      "reference_crps": 7.257466634114583,
+      "season": 2018,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2018,
+      "target": "margin"
+    },
+    {
+      "candidate": "companion_total",
+      "candidate_crps": 8.23552619086372,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.710520426432292,
+      "paired_n": 256,
+      "reference": "market_total",
+      "reference_crps": 7.525005764431428,
+      "season": 2018,
+      "target": "total"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.576174736022949,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.2165975570678711,
+      "paired_n": 256,
+      "reference": "market_margin",
+      "reference_crps": 7.359577178955078,
+      "season": 2019,
+      "target": "margin"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2019,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.579320907592773,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.2197437286376953,
+      "paired_n": 256,
+      "reference": "market_margin",
+      "reference_crps": 7.359577178955078,
+      "season": 2019,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2019,
+      "target": "margin"
+    },
+    {
+      "candidate": "companion_total",
+      "candidate_crps": 7.843234062194824,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.2898103594779968,
+      "paired_n": 256,
+      "reference": "market_total",
+      "reference_crps": 7.553423702716827,
+      "season": 2019,
+      "target": "total"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.199999389648438,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.12618530273437756,
+      "paired_n": 256,
+      "reference": "market_margin",
+      "reference_crps": 7.07381408691406,
+      "season": 2020,
+      "target": "margin"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2020,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.217022705078124,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.1432086181640635,
+      "paired_n": 256,
+      "reference": "market_margin",
+      "reference_crps": 7.07381408691406,
+      "season": 2020,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2020,
+      "target": "margin"
+    },
+    {
+      "candidate": "companion_total",
+      "candidate_crps": 7.8706695556640565,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.647387702465057,
+      "paired_n": 256,
+      "reference": "market_total",
+      "reference_crps": 7.2232818531989995,
+      "season": 2020,
+      "target": "total"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.998523811888848,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.2974392760033657,
+      "paired_n": 272,
+      "reference": "market_margin",
+      "reference_crps": 7.7010845358854825,
+      "season": 2021,
+      "target": "margin"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2021,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 8.002902311437271,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.3018177755517888,
+      "paired_n": 272,
+      "reference": "market_margin",
+      "reference_crps": 7.7010845358854825,
+      "season": 2021,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": null,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": null,
+      "paired_n": 0,
+      "reference": "nfelo_margin",
+      "reference_crps": null,
+      "season": 2021,
+      "target": "margin"
+    },
+    {
+      "candidate": "companion_total",
+      "candidate_crps": 7.915663127026528,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.4269158076616675,
+      "paired_n": 272,
+      "reference": "market_total",
+      "reference_crps": 7.488747319364861,
+      "season": 2021,
+      "target": "total"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 6.584630826035162,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.19465245712091228,
+      "paired_n": 271,
+      "reference": "market_margin",
+      "reference_crps": 6.3899783689142495,
+      "season": 2022,
+      "target": "margin"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 6.584232497843878,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": 0.12283309433247425,
+      "paired_n": 238,
+      "reference": "nfelo_margin",
+      "reference_crps": 6.461399403511404,
+      "season": 2022,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 6.615668541311996,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.2256901723977469,
+      "paired_n": 271,
+      "reference": "market_margin",
+      "reference_crps": 6.3899783689142495,
+      "season": 2022,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 6.627345362874962,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": 0.16594595936355816,
+      "paired_n": 238,
+      "reference": "nfelo_margin",
+      "reference_crps": 6.461399403511404,
+      "season": 2022,
+      "target": "margin"
+    },
+    {
+      "candidate": "companion_total",
+      "candidate_crps": 7.786809097466069,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.3749144584735751,
+      "paired_n": 271,
+      "reference": "market_total",
+      "reference_crps": 7.411894638992494,
+      "season": 2022,
+      "target": "total"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.615866884624133,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.33864197738408564,
+      "paired_n": 272,
+      "reference": "market_margin",
+      "reference_crps": 7.277224907240047,
+      "season": 2023,
+      "target": "margin"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.681631826964705,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": 0.29376786595330096,
+      "paired_n": 238,
+      "reference": "nfelo_margin",
+      "reference_crps": 7.387863961011404,
+      "season": 2023,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.51300456158384,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.23577965434379333,
+      "paired_n": 272,
+      "reference": "market_margin",
+      "reference_crps": 7.277224907240047,
+      "season": 2023,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.575068023332176,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": 0.18720406232077202,
+      "paired_n": 238,
+      "reference": "nfelo_margin",
+      "reference_crps": 7.387863961011404,
+      "season": 2023,
+      "target": "margin"
+    },
+    {
+      "candidate": "companion_total",
+      "candidate_crps": 7.630556921268664,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.3416140331247286,
+      "paired_n": 272,
+      "reference": "market_total",
+      "reference_crps": 7.288942888143936,
+      "season": 2023,
+      "target": "total"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.288139323299867,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.25464802392748176,
+      "paired_n": 272,
+      "reference": "market_margin",
+      "reference_crps": 7.033491299372385,
+      "season": 2024,
+      "target": "margin"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.394063818749198,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": 0.11589496041088587,
+      "paired_n": 239,
+      "reference": "nfelo_margin",
+      "reference_crps": 7.278168858338312,
+      "season": 2024,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.224221823045486,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.19073052367310073,
+      "paired_n": 272,
+      "reference": "market_margin",
+      "reference_crps": 7.033491299372385,
+      "season": 2024,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.337806593504126,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": 0.05963773516581394,
+      "paired_n": 239,
+      "reference": "nfelo_margin",
+      "reference_crps": 7.278168858338312,
+      "season": 2024,
+      "target": "margin"
+    },
+    {
+      "candidate": "companion_total",
+      "candidate_crps": 7.292371764846153,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.28875397064339126,
+      "paired_n": 272,
+      "reference": "market_total",
+      "reference_crps": 7.0036177942027615,
+      "season": 2024,
+      "target": "total"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.293314815519062,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.3533372553129217,
+      "paired_n": 272,
+      "reference": "market_margin",
+      "reference_crps": 6.93997756020614,
+      "season": 2025,
+      "target": "margin"
+    },
+    {
+      "candidate": "plain_margin",
+      "candidate_crps": 7.211558896328178,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": 0.29343326548730175,
+      "paired_n": 231,
+      "reference": "nfelo_margin",
+      "reference_crps": 6.918125630840876,
+      "season": 2025,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.221044829417655,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.2810672692115146,
+      "paired_n": 272,
+      "reference": "market_margin",
+      "reference_crps": 6.93997756020614,
+      "season": 2025,
+      "target": "margin"
+    },
+    {
+      "candidate": "anya_margin",
+      "candidate_crps": 7.12868027814884,
+      "cutoff_label": "DIFFERENT_CUTOFF_NOT_A_SUPERIORITY_TEST",
+      "delta_candidate_minus_reference": 0.2105546473079638,
+      "paired_n": 231,
+      "reference": "nfelo_margin",
+      "reference_crps": 6.918125630840876,
+      "season": 2025,
+      "target": "margin"
+    },
+    {
+      "candidate": "companion_total",
+      "candidate_crps": 7.832665238351858,
+      "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+      "delta_candidate_minus_reference": 0.42051656170639884,
+      "paired_n": 272,
+      "reference": "market_total",
+      "reference_crps": 7.412148676645459,
+      "season": 2025,
+      "target": "total"
+    }
+  ],
+  "credits_spent": 0,
+  "excluded_nfelo_duplicate_ids": [
+    "2025_04_SEA_ARI",
+    "2025_08_MIN_LAC",
+    "2025_11_NYJ_NE",
+    "2025_13_CHI_PHI",
+    "2025_13_CIN_BAL",
+    "2025_13_GB_DET",
+    "2025_13_KC_DAL"
+  ],
+  "experiment_id": "harvest-elo-v2",
+  "gates": {
+    "anya": {
+      "evidence_qualification": "Reconstructed historical lines and postgame-derived starter identity do not establish as-issued T60 availability",
+      "margin": {
+        "candidate": "anya_margin",
+        "candidate_crps": 7.321724994118212,
+        "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+        "delta_candidate_minus_reference": 0.22647676528357863,
+        "paired_n": 2639,
+        "reference": "market_margin",
+        "reference_crps": 7.095248228834634,
+        "season": "ALL",
+        "target": "margin"
+      },
+      "margin_improves": false,
+      "numeric_gate_pass": false,
+      "paired_n": 2639,
+      "promotion_eligible": false,
+      "total": {
+        "candidate": "companion_total",
+        "candidate_crps": 7.789375149352005,
+        "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+        "delta_candidate_minus_reference": 0.3978707901718339,
+        "paired_n": 2639,
+        "reference": "market_total",
+        "reference_crps": 7.391504359180171,
+        "season": "ALL",
+        "target": "total"
+      },
+      "total_does_not_worsen": false
+    },
+    "plain": {
+      "evidence_qualification": "Reconstructed historical lines and postgame-derived starter identity do not establish as-issued T60 availability",
+      "margin": {
+        "candidate": "plain_margin",
+        "candidate_crps": 7.355387317466176,
+        "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+        "delta_candidate_minus_reference": 0.26013908863154267,
+        "paired_n": 2639,
+        "reference": "market_margin",
+        "reference_crps": 7.095248228834634,
+        "season": "ALL",
+        "target": "margin"
+      },
+      "margin_improves": false,
+      "numeric_gate_pass": false,
+      "paired_n": 2639,
+      "promotion_eligible": false,
+      "total": {
+        "candidate": "companion_total",
+        "candidate_crps": 7.789375149352005,
+        "cutoff_label": "RECONSTRUCTED_HISTORY_NOT_AS_ISSUED_T60",
+        "delta_candidate_minus_reference": 0.3978707901718339,
+        "paired_n": 2639,
+        "reference": "market_total",
+        "reference_crps": 7.391504359180171,
+        "season": "ALL",
+        "target": "total"
+      },
+      "total_does_not_worsen": false
+    }
+  },
+  "limitations": [
+    "Starter identity is reconstructed from the target game and could differ from the announced starter; no prospective availability claim.",
+    "ANY/A differs from 538 VALUE; fixed 25-Elo-per-ANY/A-unit scale is a local untuned diagnostic convention.",
+    "NFelo has margin locations only, with own prior-season empirical wrapper for CRPS; no native nfelo distribution or totals claim.",
+    "Market shapes are fitted from prior seasons only; the live all-years fit is not used for in-sample scoring."
+  ],
+  "live_location": "empirical_market_distribution_unchanged",
+  "missing_qb_game_ids": [],
+  "protocol_sha256": "bd6dd72642e9e760b2c66fe6e7e22620efc45594579d70ac82600d7f0e928ba1",
+  "qb_metric": "Rolling ANY/A proxy, NOT published 538 VALUE",
+  "qb_table": {
+    "code_sha256": "5d651f0d009791395a2d24a0f52be479a3411f284a23c2d638708be32a2fc15d",
+    "evidence": "Most-attempts starter identity is reconstructed using target-game PBP; QB values use prior weeks only. Not prospective T60 evidence.",
+    "metric": "Rolling ANY/A; not 538 VALUE",
+    "missing_passer_plays": 0,
+    "passer_stats_sha256": "c8b0e4187695ec49e6c2ba9f3db14a4dc0710622941f882bee2ad7bf0cb51808",
+    "pbp_manifest_sha256": "9b2525fe1cbabb6e0f9710c8a1f47fc98e5a624a7cb71067c53bfbc21a8891da",
+    "qb_history_sha256": "d7b69986341d49721322086a86bf231a5ab3140fab05e7235705be55da8f5eca",
+    "team_game_rows": 6590
+  },
+  "shape_audit": [
+    {
+      "max_training_season": null,
+      "season": 2015,
+      "shape_n": {}
+    },
+    {
+      "max_training_season": 2015,
+      "season": 2016,
+      "shape_n": {
+        "anya_margin": 256,
+        "market_margin": 256,
+        "market_total": 256,
+        "plain_margin": 256
+      }
+    },
+    {
+      "max_training_season": 2016,
+      "season": 2017,
+      "shape_n": {
+        "anya_margin": 512,
+        "market_margin": 512,
+        "market_total": 512,
+        "plain_margin": 512
+      }
+    },
+    {
+      "max_training_season": 2017,
+      "season": 2018,
+      "shape_n": {
+        "anya_margin": 768,
+        "market_margin": 768,
+        "market_total": 768,
+        "plain_margin": 768
+      }
+    },
+    {
+      "max_training_season": 2018,
+      "season": 2019,
+      "shape_n": {
+        "anya_margin": 1024,
+        "market_margin": 1024,
+        "market_total": 1024,
+        "plain_margin": 1024
+      }
+    },
+    {
+      "max_training_season": 2019,
+      "season": 2020,
+      "shape_n": {
+        "anya_margin": 1280,
+        "market_margin": 1280,
+        "market_total": 1280,
+        "plain_margin": 1280
+      }
+    },
+    {
+      "max_training_season": 2020,
+      "season": 2021,
+      "shape_n": {
+        "anya_margin": 1536,
+        "market_margin": 1536,
+        "market_total": 1536,
+        "plain_margin": 1536
+      }
+    },
+    {
+      "max_training_season": 2021,
+      "season": 2022,
+      "shape_n": {
+        "anya_margin": 1808,
+        "market_margin": 1808,
+        "market_total": 1808,
+        "nfelo_margin": 224,
+        "plain_margin": 1808
+      }
+    },
+    {
+      "max_training_season": 2022,
+      "season": 2023,
+      "shape_n": {
+        "anya_margin": 2079,
+        "market_margin": 2079,
+        "market_total": 2079,
+        "nfelo_margin": 462,
+        "plain_margin": 2079
+      }
+    },
+    {
+      "max_training_season": 2023,
+      "season": 2024,
+      "shape_n": {
+        "anya_margin": 2351,
+        "market_margin": 2351,
+        "market_total": 2351,
+        "nfelo_margin": 700,
+        "plain_margin": 2351
+      }
+    },
+    {
+      "max_training_season": 2024,
+      "season": 2025,
+      "shape_n": {
+        "anya_margin": 2623,
+        "market_margin": 2623,
+        "market_total": 2623,
+        "nfelo_margin": 939,
+        "plain_margin": 2623
+      }
+    }
+  ],
+  "source_hashes": {
+    "nfelo": "fb25751153b16dae1e83108181302407cc8d232a6d140e6f6990103e9ebc0f69",
+    "nflverse_schedule": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07",
+    "pbp_manifest": "9b2525fe1cbabb6e0f9710c8a1f47fc98e5a624a7cb71067c53bfbc21a8891da"
+  },
+  "status": "COMPARISONS_COMPLETE",
+  "total_companion": "Prior-season empirical market total residual shape, centered on prior-256-REG-game league mean, shared by both Elo candidates"
+}

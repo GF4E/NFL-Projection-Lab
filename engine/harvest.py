@@ -133,4 +133,12 @@ def run(component,output,qb_input=None,predictions_input=None):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--harvest',required=True);p.add_argument('--output',required=True);p.add_argument('--qb-input');p.add_argument('--predictions')
-    a=p.parse_args();result=run(a.harvest,a.output,a.qb_input,a.predictions);print(json.dumps({'status':result['status'],'promotion_eligible':result['promotion_eligible'],'output':a.output}))
+    a=p.parse_args()
+    if a.harvest=='elo-anya-v2':
+        if a.qb_input or a.predictions:p.error('elo-anya-v2 uses the pinned reconstructed QB table')
+        from engine.harvest_comparison import run as run_comparison
+        result=run_comparison(a.output)
+        print(json.dumps({'status':result['status'],'promotion_eligible':any(g['promotion_eligible'] for g in result['gates'].values()),'output':a.output}))
+    else:
+        result=run(a.harvest,a.output,a.qb_input,a.predictions)
+        print(json.dumps({'status':result['status'],'promotion_eligible':result['promotion_eligible'],'output':a.output}))

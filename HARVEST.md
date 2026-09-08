@@ -9,13 +9,18 @@ Research queue, not live model selection. Metadata checked September 8, 2026; co
 | [ShamgarBN/nfl-bet-engine](https://github.com/ShamgarBN/nfl-bet-engine/tree/9aa4326c96d6aa5d771b7b68be8226d9f96a7023) | MIT | 2026-06-23T17:12:38Z | Reimplement the walk-forward backtest structure; do not import its models or UI. |
 | [thadhutch/sports-quant](https://github.com/thadhutch/sports-quant/tree/5cba2c0a7f499129e3a9c98597cb85397c3fa862) | MIT | 2026-03-19T22:29:59Z | Reimplement weather features for totals using the existing automated weather stack; no other features. |
 
+
+## Current executable result: harvest v2
+
+The [v2 comparison](work/harvest-elo-v2/README.md) supersedes the missing-input outcome below for the newly authorized ANY/A proxy and league-mean totals companion. Run `python -m engine.harvest --harvest elo-anya-v2 --output work/harvest-elo-v2/run-2` with the pinned interpreter. Both candidates have nonzero paired counts; neither passes the updated numerical gate. Full 538 VALUE remains distinct from this reconstructed ANY/A proxy.
+
 ## Weekly loop
 
 Every Tuesday, review upstream metadata and published methodology, hash/pin changed inputs, select one named component, register its input/target/cutoff contract before viewing comparative results, then run the offline harvest. Preserve every prior run and record missing inputs and rejected comparisons. No Odds API calls, unlicensed code copying, automatic upstream code execution, or live location changes. A task-thread weekly heartbeat runs this review; see the scheduling record.
 
-The live location stays the empirical market distribution. A candidate needs better paired CRPS on **both** targets and comparable evidence before it can qualify. A missing target, incomplete coverage, or different cutoff cannot pass. No five-percent claim is registered here and E3 remains untouched.
+The live location stays the empirical market distribution. Under the latest user-authorized rule, a candidate needs **better margin CRPS and total CRPS no worse** on paired games, plus comparable evidence, before it can qualify. A missing target, incomplete coverage, or different cutoff cannot pass. No five-percent claim is registered here and E3 remains untouched.
 
-## Harvest one
+## Historical harvest one (preserved)
 
 [Final experiment](work/harvest-elo-v1/run-3/experiment.json) · [paired losses](work/harvest-elo-v1/run-3/paired-losses.csv) · [pre-comparison protocol](work/harvest-elo-v1/protocol.json).
 

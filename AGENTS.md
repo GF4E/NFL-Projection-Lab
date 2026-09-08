@@ -37,4 +37,6 @@ Only push `engine-v2` to `https://github.com/GF4E/NFL-Projection-Lab.git`; never
 
 ## Weekly harvest
 
-Gabe authorizes the weekly candidate harvest documented in HARVEST.md and the `engine.harvest --harvest` runner. Port only licensed implementations; nfelo permits methodology-based independent work and reference CSV use in this request, never code copying. Keep the empirical market location live until a complete qualified harvest beats it on both targets. Missing QB inputs or totals are blockers, not zero-valued forecasts or successful comparisons. Weekly research uses no Odds API credits.
+Gabe authorizes the weekly candidate harvest documented in HARVEST.md and the `engine.harvest --harvest` runner. Port only licensed implementations; nfelo permits methodology-based independent work and reference CSV use in this request, never code copying. Under Gabe's updated harvest rule, promotion requires margin CRPS to improve and total CRPS not to worsen; preserve evidence qualification. Keep the empirical market location live while this rule fails. Missing QB inputs or totals are blockers, not zero-valued forecasts or successful comparisons. Weekly research uses no Odds API credits.
+
+The executable `--harvest elo-anya-v2` comparison pairs plain 538-default Elo and a reconstructed rolling-ANY/A QB proxy with a shared league-mean totals companion. ANY/A is not 538 VALUE. Most-attempts starter identity is retrospective; prior-week value windows do not establish pregame starter availability. Record that evidence distinction.

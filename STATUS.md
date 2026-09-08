@@ -2,9 +2,9 @@
 
 Date: 2026-09-08, Europe/Rome.
 
-Current step: weekly harvest framework installed; harvest one is partial. Base Elo and available nfelo margin diagnostics are graded; full QB-adjusted and total comparisons remain blocked by missing source inputs/outputs. [Harvest record](work/harvest-elo-v1/run-3/experiment.json).
+Current step: harvest v2 comparisons complete. Plain Elo and reconstructed ANY/A-adjusted Elo both have full market-paired evaluation coverage; nfelo is compared on its covered subset. Both share a league-mean totals companion. Neither passes the updated promotion rule; the live model remains unchanged. [Comparison](work/harvest-elo-v2/README.md).
 
-Last verified commit before this update: `643c27ea87054c19f0ece2acfd2cb0a7b107d8b2` on `engine-v2`; use `git log -1 --format=%H` for this update.
+Last verified commit before this update: `1054fb8116bf756d479bda96ef077dc53019c8a9` on `engine-v2`; use `git log -1 --format=%H` for this update.
 
 Active [board](outputs/week1-pricing/b8abbbed73959c5e/week1_board.csv) and [pricing](outputs/week1-pricing/b8abbbed73959c5e/pricing.csv) are offline replays of saved quotes, not refreshed odds. Model fields cover game markets; player props retain consensus-only pricing. Caesars still has no priced quotes in these captures.
 
@@ -14,4 +14,4 @@ T65 refresh schedule remains unchanged: opener Thursday September 10, 01:15 CEST
 
 Generate the [scorecard](outputs/scorecard.csv) with `/opt/anaconda3/bin/python3.12 -B -m engine.scorecard --scorecard`. Current logs have no picks; zero counts are not performance evidence. [Joint-log experiment](work/joint-scorecard-v1/experiment.json).
 
-Weekly review: Tuesday 09:00 app-local, active. [Verification](work/harvest-elo-v1/verification.json). No live model location was changed and no Odds API credits were used. No immediate action required from Gabe; missing qualified QB inputs and a totals-method decision are tracked for the weekly review.
+Weekly review: Tuesday 09:00 app-local, active. [Verification](work/harvest-elo-v1/verification.json). No live model location was changed and no Odds API credits were used. No immediate action required from Gabe. ANY/A and totals-companion research is now executable; prospective qualification remains separate.
