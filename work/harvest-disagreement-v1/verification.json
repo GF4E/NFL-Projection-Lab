@@ -1,0 +1,30 @@
+{
+  "base_commit": "8b4d2ec8fea740249303fbd818fb3e523317cee7",
+  "credits_accounted": 221,
+  "credits_remaining": 79,
+  "credits_spent": 0,
+  "date": "2026-09-08T19:15:07.925966+00:00",
+  "decisions": [
+    "Fixed operational stability criterion was selected before viewing this study. It is separate from the unchanged live promotion gate.",
+    "Exact disagreement zero gets no side, not an arbitrary home pick; exclude it from directional averages and ATS rates.",
+    "Bucket 3-4 includes exactly four points; over four is strict.",
+    "ATS intervals cluster within season; coefficient intervals cluster by season-week. All intervals are pointwise."
+  ],
+  "experiment": "run-2/experiment.json",
+  "hashes": {
+    "engine/disagreement.py": "ee831725cbb73736f3000a43ade953aad77f5c8ac89b6f7a2b4521695740f8b7",
+    "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+    "engine/harvest.py": "a27901e2cb484c146cc1a5c8952536ed3b4248d12a951845c6203821ee375b8c",
+    "engine/qb_history.py": "5d651f0d009791395a2d24a0f52be479a3411f284a23c2d638708be32a2fc15d",
+    "work/market-distribution-v1/model.json": "b51a8f9c7e978b5f9ce455fa5792ec0324fb0108fb953443de1f9c05cdea94fd"
+  },
+  "libraries": {
+    "numpy": "1.26.4",
+    "scipy": "1.13.1",
+    "statsmodels_test_oracle": "0.14.2"
+  },
+  "scope": "Descriptive bucket study and prior-season regression complete; blend condition not met, no blend or promotion score fabricated.",
+  "test_log": "tests.txt",
+  "tests_failed": 0,
+  "tests_passed": 55
+}

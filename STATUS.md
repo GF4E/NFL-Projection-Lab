@@ -2,9 +2,9 @@
 
 Date: 2026-09-08, Europe/Rome.
 
-Current step: harvest v2 comparisons complete. Plain Elo and reconstructed ANY/A-adjusted Elo both have full market-paired evaluation coverage; nfelo is compared on its covered subset. Both share a league-mean totals companion. Neither passes the updated promotion rule; the live model remains unchanged. [Comparison](work/harvest-elo-v2/README.md).
+Current step: harvest-two disagreement buckets and rolling-origin regression complete. The predeclared coefficient stability condition was not met, so no blend was fitted and no promotion evaluated. [Report](work/harvest-disagreement-v1/REPORT.md).
 
-Last verified commit before this update: `1054fb8116bf756d479bda96ef077dc53019c8a9` on `engine-v2`; use `git log -1 --format=%H` for this update.
+Last verified commit before this update: `8b4d2ec8fea740249303fbd818fb3e523317cee7` on `engine-v2`; use `git log -1 --format=%H` for this update.
 
 Active [board](outputs/week1-pricing/b8abbbed73959c5e/week1_board.csv) and [pricing](outputs/week1-pricing/b8abbbed73959c5e/pricing.csv) are offline replays of saved quotes, not refreshed odds. Model fields cover game markets; player props retain consensus-only pricing. Caesars still has no priced quotes in these captures.
 

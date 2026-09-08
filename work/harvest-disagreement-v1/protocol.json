@@ -1,0 +1,15 @@
+{
+  "ATS": "home when disagreement>0, away when disagreement<0; signed residual=(actual_margin-market_margin)*sign(disagreement). Positive=win, zero=push. ATS rate excludes pushes/no_side; game count includes all.",
+  "ATS_interval": "Pointwise 95% percentile bootstrap, resampling whole season-week clusters within each season, 5000 replicates, seed 20260908; not simultaneous nor evidence of independent wagers.",
+  "blend_if_stable": "If eligible, weights {0,.05,.10,.15,.20,.25,.30,.40,.50,.75,1}; choose prior-season rolling validation margin CRPS only, ties favor smaller w; first evaluated year uses w=0 until an earlier validation season exists. Residual shape frozen before evaluation year, no current-year labels. Total stays the same empirical market total distribution; this is a margin-only blend, not the previous league-mean totals companion.",
+  "buckets": "[0,1), [1,2), [2,3), [3,4], (4,infinity); exact zero disagreements have no model side and are reported as no_side",
+  "credits": 0,
+  "input": "work/harvest-elo-v2/run-2/paired-losses.csv",
+  "population": "All 2639 ANY/A games; nfelo subset exactly the 946 rows with nonmissing nfelo CRPS in saved replay. No reselecting on results.",
+  "positive_stable": "All 10 prior-season-fitted c point estimates strictly positive AND at least 8 of 10 pointwise 95% lower bounds strictly positive. This operational definition is fixed before this study, not a change to the promotion gate. Overlapping training windows are not independent replications.",
+  "promotion": "Existing gate: lower paired margin CRPS and total CRPS no worse; preserve reconstructed/cutoff evidence restrictions. No live change from retrospective starter identities.",
+  "registered_at": "2026-09-08T19:10:36.094408+00:00",
+  "regression": "OLS actual_margin=a+b*market_margin+c*ANYA_margin; fit on 2015 through previous season, predict evaluation season 2016-2025. Solve equivalent market plus disagreement design; map coefficients back. Week-cluster robust CR1 covariance, t interval with cluster_count-1 degrees of freedom.",
+  "sha256": "c00c0f57b43448102c2a156d620eff2a8e3b9e7a7b58a962e9966af05bffbe45",
+  "spread_convention": "home winning-margin points for both forecasts, not sportsbook handicap; disagreement=forecast_margin-market_margin"
+}
