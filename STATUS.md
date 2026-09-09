@@ -2,9 +2,9 @@
 
 Date: 2026-09-08, Europe/Rome.
 
-Current step: prospective T65 weather capture and stored-forecast paper-rule integration complete. Future T60 execution remains pending. Historical issuance gap is not backfilled. [Report](work/t60-weather-v1/REPORT.md).
+Current step: offline teaser pricing, calibration and situational study complete. Two-leg -110 historical ticket test clears; no situational paper rule qualified. No live promotion. [Report](work/teaser-calibration-situations-v1/REPORT.md).
 
-Last verified commit before this update: `4b99a7b4ca5ee6c07e6c23a794b9249bbe7c0d51` on `engine-v2`; use `git log -1 --format=%H` for this update.
+Last verified commit before this update: `50e0ed7b51331b46ed9cb9f96a934c4fdf8d8370` on `engine-v2`; use `git log -1 --format=%H` for this update.
 
 Active [board](outputs/week1-pricing/b8abbbed73959c5e/week1_board.csv) and [pricing](outputs/week1-pricing/b8abbbed73959c5e/pricing.csv) are offline replays of saved quotes, not refreshed odds. Model fields cover game markets; player props retain consensus-only pricing. Caesars still has no priced quotes in these captures.
 

@@ -1,0 +1,16 @@
+{
+  "id": "teaser-calibration-situations-v1",
+  "population": "nflverse REG2015-2025, completed games; weather2016-2025",
+  "teasers": "Wong legs inclusive -8.5 to -7.5 or +1.5 to +2.5; six points; enumerate every distinct-game combination of two/three qualifying legs within each season-week, before considering results. Descriptive ticket universe, not a retrospectively selected strategy. Loss beats push; otherwise any push voids entire ticket. Hypothetical common policy, not current book contract.",
+  "pricing": "Independent-game product probabilities explicitly labeled assumption; no joint model. Price tiers -110,-120,-130. Empirical reproduction uses actual tickets; compare conditional win rates with break-even excluding voids. Pricing tier clears only if week-cluster lower95 exceeds break-even; multiplicity family6 (two ticket sizes x three prices). Point estimate clears separately.",
+  "calibration": "Full frozen2015-2025 artifact coverage is labeled descriptive in-sample. Separate rolling-origin coverage fits residual shape2015 through prior season (2015 unavailable warmup); equal-tail inclusive integer intervals. Flag absolute coverage-minus-nominal >.03; raw residual sampleSD ddof1 by season.",
+  "situations": "Six tests: cold(<35F outdoor kickoff observed temperature), Thursday(Eastern schedule weekday), off-bye(no scheduled game in prior regular-season week, prior participation this season, week>1), each Under and ATS. Cold/Thursday ATS selects home; off-bye ATS selects sole off-bye side; if both off bye no ATS side, Under counted once. Cold2016-2025, other2015-2025. Bye is derived from complete schedule, including uncompleted games, not a long-rest proxy.",
+  "interval": "10000 within-season whole-week bootstrap replicates seed20260909, pointwise95 and two-sided Bonferroni95 across6 situational tests; teaser tier family6 one-sided95. Whole-week dependence preserved, not ticket independence.",
+  "paper_registration": "Only adjusted lower bound >110/210 at -110 qualifies; temperature needs prospective forecast replication, retrospective observed weather alone not sufficient. 30 paper picks and positive verified meanCLV before live consideration; no live automation.",
+  "credits_spent": 0,
+  "inputs": {
+    "work/harvest-weather-v1/protocol.json": "27ef24d7b26ad3a6ba1f32a1042175f5158d8e9e054e0097efcec8bf9126631b",
+    "work/harvest-weather-v1/weather-manifest.json": "35c67b45197e3eaa246aae3935f14d0b4a3a820d7534d9107f3880a2217cd550",
+    "work/market-distribution-v1/model.json": "b51a8f9c7e978b5f9ce455fa5792ec0324fb0108fb953443de1f9c05cdea94fd"
+  }
+}

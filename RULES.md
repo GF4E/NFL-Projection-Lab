@@ -32,3 +32,7 @@ Registration is complete. The existing T65 odds schedule remains unchanged. The 
 Evidence: [follow-up experiment](work/harvest-weather-followup-v1/run-1/experiment.json). Historical forecast issuance at T60 is not established by the stitched archive diagnostic.
 
 Forecast implementation: [T60 weather experiment](work/t60-weather-v1/experiment.json). GFS Global uses a pinned run initialization and metadata API availability time as the issuance field, with the documented replication delay respected. Venue game IDs/roofs come from nflverse; coordinates are separately attributed in the hashed manifest. A documented MCG roof correction preserves the erroneous source value alongside the effective outdoor value. Unknown retractable-roof status remains ineligible.
+
+## Situational review: no additional rule qualified
+
+[Teaser/calibration/situational experiment](work/teaser-calibration-situations-v1/run-2/experiment.json) tested cold kickoff temperature, Thursday and off-bye games for Under and ATS with six-test Bonferroni correction. None cleared adjusted -110 break-even. No rule was added or existing gate changed.
