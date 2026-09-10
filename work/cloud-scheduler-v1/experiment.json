@@ -1,0 +1,34 @@
+{
+  "experiment_id": "cloud-scheduler-v1",
+  "recorded_at": "2026-09-10T17:08:35.336576+00:00",
+  "status": "BLOCKED_PROVIDER_ACCOUNT_ACCESS",
+  "repository_head_before_record": "d51087b0be262c0924572ff82ad26405de9c841b",
+  "provider_candidate": "DigitalOcean Basic regular CPU Droplet",
+  "advertised_plan": {
+    "monthly_usd_before_tax": 4,
+    "vcpu": 1,
+    "ram_mib": 512,
+    "disk_gib": 10,
+    "proposed_swap_gib": 2,
+    "source": "https://www.digitalocean.com/pricing/droplets"
+  },
+  "selection_limit": "Lowest-priced suitable always-on public-IPv4 VM verified in this run, not a claim about every provider; unprovisioned and resource sufficiency not yet tested.",
+  "observed_blocker": "No supported VM provider CLI credentials/configs found. DigitalOcean billing URL redirects to login in browser. Payment-method status cannot be read without sign-in.",
+  "billing_page": "https://cloud.digitalocean.com/account/billing",
+  "api_token_instructions": "https://docs.digitalocean.com/reference/api/create-personal-access-token/",
+  "host": null,
+  "systemd_status": "NOT_INSTALLED_NO_HOST",
+  "cloud_synthetic_cycle": "NOT_RUN",
+  "cloud_lock": "NOT_IMPLEMENTED",
+  "laptop_fallback": "UNCHANGED",
+  "credits_spent": 0,
+  "hosting_charges_incurred": 0,
+  "timing_note": "Only existing T65 runner found; requested T80 change remains to implement prospectively without changing frozen missed artifacts.",
+  "remaining": [
+    "User signs in to provider and completes billing setup if needed; scoped API credentials required for scripted provisioning.",
+    "Provision VM and validate memory/disk; install pinned Linux Python environment; clone engine-v2.",
+    "Install root-restricted environment secret without logging/committing it; least-privilege repository write access.",
+    "Implement shared atomic capture ownership and fencing across cloud and Mac, fail closed if lock unavailable; preserve quota/dispatch ledger across hosts.",
+    "Install T80 systemd service/timer, preserve T60 freeze and Mac yielding fallback, verify synthetic cycle without Odds API calls, verify artifact push."
+  ]
+}
