@@ -19,3 +19,9 @@ Verification: 105 tests passed, 0 failed. Named synthetic replay created two pic
 ```
 
 Reports: `outputs/model-pick-v1/reports/`, separated by version; CLV reference is explicitly `nflverse_close`. T60 artifacts and legacy scorecards remain separate. Pick logic and frozen shadow coefficients remain fixed through the Week 4 review. Current ESPN probes expose no dedicated inactives collection; scheduled pulls record unknowns if still unavailable.
+
+## Executed slip ingestion
+
+Implemented `--ingest-slip` for pasted text and local screenshots. Production log: `outputs/jaret/pick_log.csv`, source `jaret`, status `executed`. Missing fields and all OCR fields require confirmation before append. No real slip was supplied. The hourly cached-results grading job has observed exit 0; source scorecards retain separate model versions and CLV references. [Usage](SLIPS.md), [experiment](work/slip-ingest-v1/experiment.json).
+
+Verification: 117 passed, 0 failed; local screenshot rehearsal and duplicate/idempotent grading verified. Odds API credits spent: 0. Evidence and commands are in the linked experiment. Frozen T75 file hashes are unchanged. Last verified pushed commit before this update: `53916c86cdb70b0012ffe9a23fad48b4aefe2dca`.

@@ -1,6 +1,7 @@
 """Offline joint-pick weekly/cumulative scorecards. No provider calls."""
 import argparse
 import csv
+import fcntl
 import hashlib
 import io
 import json
@@ -10,7 +11,9 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
 
 def read(path):
-    with Path(path).open(newline='') as f: return list(csv.DictReader(f))
+    with Path(path).open(newline='') as f:
+        fcntl.flock(f,fcntl.LOCK_SH)
+        return list(csv.DictReader(f))
 
 def write(path, rows, fields):
     path=Path(path);path.parent.mkdir(parents=True,exist_ok=True)
@@ -26,11 +29,11 @@ def scorecard(picks, results=None, grades=(), output=ROOT/'outputs/scorecard.csv
     for path in grades:
         for r in read(path):
             if r.get('clv_cents','')=='': continue
-            if r.get('clv_status')!='EXACT_LINE_EXECUTED_BOOK_CLOSE': raise ValueError('Unsupported CLV evidence')
+            if r.get('clv_status') not in {'EXACT_LINE_EXECUTED_BOOK_CLOSE','SLIP_NFLVERSE_CLOSE_PRICED'}: raise ValueError('Unsupported CLV evidence')
             value=float(r['clv_cents'])
             if not math.isfinite(value): raise ValueError('Nonfinite CLV')
             key=(r['record_class'],r['pick_id'])
-            identity=(r['quote_id'],r['executed_book'],r['event_id'],r['side'],r['line_at_approval'],r['book_price'],value)
+            identity=(r['quote_id'],r['executed_book'],r['event_id'],r['side'],r['line_at_approval'],r['book_price'],value,r.get('clv_reference','executed_book_close'))
             if key in clv and clv[key]!=identity: raise ValueError('Conflicting CLV grades')
             clv[key]=identity
     entries=[];seen=set()
@@ -40,9 +43,9 @@ def scorecard(picks, results=None, grades=(), output=ROOT/'outputs/scorecard.csv
             if mode not in {'live','paper'}: raise ValueError('Joint pick schema required')
             if key in seen: raise ValueError('Duplicate joint pick ID within class')
             seen.add(key)
-            if pick['status'] not in {'picked','declined'}: raise ValueError('Unknown pick status')
+            if pick['status'] not in {'picked','declined','executed'}: raise ValueError('Unknown pick status')
             market=pick['market'].replace('alternate_','')
-            if market not in {'spreads','totals'}: continue
+            if market not in {'spreads','totals','moneyline'}: continue
             result=by_event.get(pick['event_id'],{})
             season=pick.get('season') or result.get('season');week=pick.get('week') or result.get('week')
             if not season or not week: raise ValueError('Season and week required')
@@ -59,6 +62,9 @@ def scorecard(picks, results=None, grades=(), output=ROOT/'outputs/scorecard.csv
                     if pick['side']==pick['home_team']: value=home-away+line
                     elif pick['side']==pick['away_team']: value=away-home+line
                     else: raise ValueError('Spread side must match team')
+                elif market=='moneyline':
+                    if pick['side'] not in (pick['home_team'],pick['away_team']): raise ValueError('Moneyline side must match team')
+                    value=(home-away)*(1 if pick['side']==pick['home_team'] else -1)
                 else:
                     if pick['side'] not in {'Over','Under'}: raise ValueError('Invalid total side')
                     value=(home+away-line)*(1 if pick['side']=='Over' else -1)
@@ -66,32 +72,37 @@ def scorecard(picks, results=None, grades=(), output=ROOT/'outputs/scorecard.csv
             value=''
             if key in clv and outcome!='declined':
                 expected=tuple(pick[k] for k in ('quote_id','executed_book','event_id','side','line_at_approval','book_price'))
-                if clv[key][:-1]!=expected: raise ValueError('CLV does not match frozen pick quote')
-                value=clv[key][-1]
-            entries.append(dict(pick_id=pick['pick_id'],record_class=mode,is_paper=mode=='paper',season=season,week=week,market=market,event_id=pick['event_id'],executed_book=pick['executed_book'],side=pick['side'],line=pick['line_at_approval'],outcome=outcome,clv_cents=value,clv_available=value!=''))
+                if clv[key][:-2]!=expected: raise ValueError('CLV does not match frozen pick quote')
+                value=clv[key][-2]
+            entries.append(dict(source=pick.get('source') or ('engine_paper' if mode=='paper' else 'engine'),clv_reference=clv[key][-1] if key in clv else pick.get('clv_reference','executed_book_close'),stake=pick.get('stake',''),stake_currency=pick.get('stake_currency',''),book_price=pick['book_price'],pick_id=pick['pick_id'],record_class=mode,is_paper=mode=='paper',season=season,week=week,market=market,event_id=pick['event_id'],executed_book=pick['executed_book'],side=pick['side'],line=pick['line_at_approval'],outcome=outcome,clv_cents=value,clv_available=value!=''))
     rows=[]
     scopes=[('cumulative','ALL','ALL')]+[('week',s,w) for s,w in sorted({(r['season'],r['week']) for r in entries})]
     for scope,season,week in scopes:
-        for market in ('spreads','totals'):
+        for market in ('spreads','totals')+ (('moneyline',) if any(r['market']=='moneyline' for r in entries) else ()):
             for mode in ('combined','live','paper'):
-                group=[r for r in entries if r['market']==market and (mode=='combined' or r['record_class']==mode) and (scope=='cumulative' or (r['season'],r['week'])==(season,week))]
-                values=[r['clv_cents'] for r in group if r['clv_cents']!='']
-                rows.append(dict(scope=scope,season=season,week=week,market=market,record_class=mode,picks=sum(r['outcome']!='declined' for r in group),wins=sum(r['outcome']=='win' for r in group),losses=sum(r['outcome']=='loss' for r in group),pushes=sum(r['outcome']=='push' for r in group),pending=sum(r['outcome']=='pending' for r in group),declined=sum(r['outcome']=='declined' for r in group),clv_n=len(values),mean_clv_cents=sum(values)/len(values) if values else ''))
+                for source in ['ALL']+sorted({r['source'] for r in entries}):
+                    for reference in ['ALL']+sorted({r['clv_reference'] for r in entries}):
+                        group=[r for r in entries if r['market']==market and (source=='ALL' or r['source']==source) and (reference=='ALL' or r['clv_reference']==reference) and (mode=='combined' or r['record_class']==mode) and (scope=='cumulative' or (r['season'],r['week'])==(season,week))]
+                        values=[r['clv_cents'] for r in group if r['clv_cents']!='']
+                        mixed=len({r['clv_reference'] for r in group if r['clv_cents']!=''})>1
+                        if mixed:values=[]  # Never average incompatible close references.
+                        rows.append(dict(source=source,clv_reference='MIXED_SEE_REFERENCE_ROWS' if mixed else reference,scope=scope,season=season,week=week,market=market,record_class=mode,picks=sum(r['outcome']!='declined' for r in group),wins=sum(r['outcome']=='win' for r in group),losses=sum(r['outcome']=='loss' for r in group),pushes=sum(r['outcome']=='push' for r in group),pending=sum(r['outcome']=='pending' for r in group),declined=sum(r['outcome']=='declined' for r in group),clv_n=len(values),mean_clv_cents=sum(values)/len(values) if values else ''))
     output=Path(output)
     write(output,rows,list(rows[0]))
     details=output.with_name(output.stem+'_picks.csv')
-    write(details,entries,['pick_id','record_class','is_paper','season','week','market','event_id','executed_book','side','line','outcome','clv_cents','clv_available'])
+    write(details,entries,['source','clv_reference','stake','stake_currency','book_price','pick_id','record_class','is_paper','season','week','market','event_id','executed_book','side','line','outcome','clv_cents','clv_available'])
     inputs=paths+([Path(results)] if results else [])+[Path(p) for p in grades]
-    receipt={'inputs_sha256':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs},'rows':len(rows),'joint_entries':len(entries),'definition':'Each picked joint entry counts once within its class; combined includes live and paper. Declined entries are shown but excluded from W/L/P and CLV. Missing results are pending; mean CLV uses only available verified exact-line executed-book close grades, in American cents. Cumulative spans supplied seasons; weekly rows include season.','outputs_sha256':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in (output,details)}}
+    receipt={'inputs_sha256':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs},'rows':len(rows),'joint_entries':len(entries),'definition':'Each picked or executed joint entry counts once within its class; combined includes live and paper. Declined entries are shown but excluded from W/L/P and CLV. Missing results are pending; CLV includes separately labeled exact executed-book closes or slip nflverse closes versus executed prices, in American cents; incompatible references are not averaged. Source breakdowns retain live/paper identity. Cumulative spans supplied seasons; weekly rows include season.','outputs_sha256':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in (output,details)}}
     output.with_suffix('.json').write_text(json.dumps(receipt,indent=2,sort_keys=True)+'\n')
     return rows
 
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--scorecard',action='store_true',required=True)
-    p.add_argument('--picks',nargs='+',default=[str(ROOT/'outputs/week1-pricing/pick_log.csv'),str(ROOT/'outputs/week1-pricing/paper_pick_log.csv'),str(ROOT/'outputs/weather-paper/pick_log.csv')])
+    p.add_argument('--picks',nargs='+',default=[str(ROOT/'outputs/week1-pricing/pick_log.csv'),str(ROOT/'outputs/week1-pricing/paper_pick_log.csv'),str(ROOT/'outputs/weather-paper/pick_log.csv')]+([str(ROOT/'outputs/jaret/pick_log.csv')] if (ROOT/'outputs/jaret/pick_log.csv').exists() else []))
     p.add_argument('--results',help='Final results CSV: event_id,home_score,away_score,status; season/week optional cross-check')
     p.add_argument('--grades',nargs='*',default=[],help='Verified pick_clv.csv outputs from --grade, for live and paper')
     p.add_argument('--output',default=str(ROOT/'outputs/scorecard.csv'))
-    a=p.parse_args();scorecard(a.picks,a.results,a.grades,a.output)
+    a=p.parse_args()
+    scorecard(a.picks,a.results,a.grades,a.output)
     print(a.output)

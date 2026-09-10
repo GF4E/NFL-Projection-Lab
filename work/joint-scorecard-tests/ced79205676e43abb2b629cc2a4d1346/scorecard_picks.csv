@@ -1,0 +1,8 @@
+source,clv_reference,stake,stake_currency,book_price,pick_id,record_class,is_paper,season,week,market,event_id,executed_book,side,line,outcome,clv_cents,clv_available
+engine,executed_book_close,,,-110,push,live,False,2026,1,spreads,g1,betmgm,H,-3,push,10.0,True
+engine_paper,executed_book_close,,,-110,win,paper,True,2026,1,spreads,g1,betmgm,H,-2.5,win,20.0,True
+engine,executed_book_close,,,-110,loss,live,False,2026,1,spreads,g1,betmgm,A,2.5,loss,,False
+engine_paper,executed_book_close,,,-110,under,paper,True,2026,1,totals,g1,betmgm,Under,45,push,,False
+engine,executed_book_close,,,-110,over,live,False,2026,1,totals,g1,betmgm,Over,44.5,win,,False
+engine,executed_book_close,,,-110,second,live,False,2026,2,spreads,g2,betmgm,H,-3,pending,,False
+engine,executed_book_close,,,-110,no,live,False,2026,1,spreads,g1,betmgm,H,-3,declined,,False

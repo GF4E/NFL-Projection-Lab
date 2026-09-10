@@ -1,0 +1,72 @@
+{
+  "code_sha256": {
+    "engine/scorecard.py": "0053d43aa89602af36cf8347fdb40ab3f3bfeb0967c688dfb0f25c3c5b724047",
+    "engine/slip_grade.py": "bd3fe59cea8821f18f76450fd1af65727bd3e8aa6bcef0ee82c53bb9ad196610",
+    "engine/slip_ingest.py": "19412684292715d283a4431e0080a5230b460242add9541efa63edd75abb51dc",
+    "scripts/jaret_scorecard_runner.py": "6a9a55f1b7fdbc8e1dc058144b11714b0882d3cc00b41f1c671d9161ae5b4f9c",
+    "scripts/slip_ocr.swift": "ac3c684ab5e4d63021dd839c4ec4660a9f3ddcbfbb87a80fadd0b9cf8ccdef05",
+    "scripts/slip_replay.py": "4caee438464a6b71d4f0486c8e7cddfec3d0d5f68c9dd76b2025451063517154"
+  },
+  "credits_spent": 0,
+  "decisions": [
+    "Add a separate extended append-only slip CSV. Preserve existing pick_log interfaces/headers and frozen T75 modules byte-for-byte.",
+    "Auto-import complete unambiguous text; missing/invalid fields return NEEDS_CONFIRMATION without a row. Interactive CLI asks each field; noninteractive usage saves an ignored review JSON for explicit --set/--confirm resume.",
+    "Local macOS Vision OCR only. All screenshot fields require confirmation; original screenshot bytes and OCR review are private/ignored and hashed. No external OCR service or credits.",
+    "Resolve game only from unique cached schedule match or explicit ID. Never infer timezone, stake currency, unknown line/price, or target game from the current day.",
+    "Supported settlement: straight full-game spread/alternate spread, total/alternate total and two-way moneyline, including overtime. Multi-leg/player/period/cashed-out/free-bet slips remain unsupported and are rejected, not partially imported.",
+    "Deduplicate identical game/market/side/line/price/stake/currency/book/placement timestamp across pasted/OCR inputs. Actual placement time and later ingestion time remain distinct.",
+    "No as-placed model probability is invented. Existing settlement arithmetic is reused. Store profit in original stake currency and per-unit return; do not combine monetary amounts across currencies.",
+    "Slip CLV is explicitly nflverse_close_vs_executed_price, based on closing distribution fair probability minus executed-price break-even and executed American price versus closing fair American price. It is separate from T75 forecast-movement CLV and legacy executed-book closes. Post-kickoff wagers have no pregame CLV.",
+    "First grade and its result snapshot are immutable, so later final-score corrections cannot silently change W/L/P or CLV. Cached final/close feeds only; no provider requests.",
+    "Hourly slip job follows cached daily results. Combined source CSV includes engine, paper_rule and jaret rows with distinct model versions. Legacy joint scorecard adds source and CLV-reference breakdowns; mixed-reference means are suppressed.",
+    "Rehearsal caught nondeterministic CSV key order on a second grading run. Canonical export v2 fixes ordering and nested values; failed v1 exports remain preserved. Repeated replay now matches."
+  ],
+  "experiment_id": "slip-ingest-v1",
+  "grade_service": {
+    "evidence": "work/slip-ingest-v1/launchd-verification.txt",
+    "interval_seconds": 3600,
+    "label": "com.gabe.nfl-jaret-scorecard",
+    "observed_last_exit": 0
+  },
+  "limitations": [
+    "No real slip was supplied; the confirmed example is synthetic and stored outside the production log.",
+    "Existing cloud migration remains blocked separately; this job runs on the same Mac."
+  ],
+  "log": "outputs/jaret/pick_log.csv",
+  "pick_status": "executed",
+  "real_slips_imported": 0,
+  "recorded_at": "2026-09-10T22:01:27.774386+00:00",
+  "replay": "work/slip-ingest-v1/synthetic-v1/experiment.json",
+  "replay_command": "/opt/anaconda3/bin/python3.12 -B scripts/slip_replay.py",
+  "report": {
+    "credits_spent": 0,
+    "graded": 0,
+    "pending": 0,
+    "pick_count": 0,
+    "report": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/jaret/reports/0498014b318b34d6607ef0962adb26f0698c54780bdea9882fc59b26ab9db575",
+    "source_scorecard": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/jaret/source-reports/591db8a5bfbccbae7d41549f3a5eb71a26d3163ea4f88c60973fcf19c460c805/scorecard.csv"
+  },
+  "runtime_integrity": {
+    "engine/elo.py": true,
+    "engine/live_weather.py": true,
+    "engine/market_distribution.py": true,
+    "engine/model_pick.py": true,
+    "engine/pick_store.py": true,
+    "engine/pricing.py": true,
+    "engine/t75_budget.py": true,
+    "engine/t75_capture.py": true,
+    "engine/t75_grade.py": true,
+    "engine/t75_prepare.py": true,
+    "engine/t75_report.py": true,
+    "engine/t75_shadow.py": true,
+    "scripts/model_pick_daily.py": true,
+    "scripts/model_pick_runner.py": true
+  },
+  "source": "jaret",
+  "status": "IMPLEMENTED_VERIFIED",
+  "tests": {
+    "failed": 0,
+    "passed": 117
+  },
+  "verify_command": "/opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'"
+}

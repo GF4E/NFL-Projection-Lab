@@ -1,0 +1,48 @@
+{
+  "clv_definition": "American cents versus devigged closing fair price at exact approved line and executed book. Quotes must be within final 10 minutes before kickoff. Missing closes stay ungraded.",
+  "coverage": [
+    {
+      "coverage": 1.0,
+      "level": 0.5,
+      "n": 1,
+      "target": "margin"
+    },
+    {
+      "coverage": 1.0,
+      "level": 0.8,
+      "n": 1,
+      "target": "margin"
+    },
+    {
+      "coverage": 1.0,
+      "level": 0.95,
+      "n": 1,
+      "target": "margin"
+    },
+    {
+      "coverage": 1.0,
+      "level": 0.5,
+      "n": 1,
+      "target": "total"
+    },
+    {
+      "coverage": 1.0,
+      "level": 0.8,
+      "n": 1,
+      "target": "total"
+    },
+    {
+      "coverage": 1.0,
+      "level": 0.95,
+      "n": 1,
+      "target": "total"
+    }
+  ],
+  "input_sha256": {
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/market-distribution-tests/7f7f6b1723aa4bc6afd2c648dbce8f3f/T60.csv": "bc87a01119f11f590148f36344386d015eaec8577daa4a730bfee9068a2f45a2",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/market-distribution-tests/7f7f6b1723aa4bc6afd2c648dbce8f3f/close.csv": "8197de32e95251891907bf98e3deed1c50d8996c2987f0c0c36a766689e8541b",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/market-distribution-tests/7f7f6b1723aa4bc6afd2c648dbce8f3f/picks.csv": "a56b023bc51c087a1ce8d727c6b72d017c15d139c3449d1f8d4438ad13d699d9",
+    "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/market-distribution-tests/7f7f6b1723aa4bc6afd2c648dbce8f3f/results.csv": "2a23c34987effdb25e161fe7322c27b2fb921910d95d93d50ce0e5e87d3595c0"
+  },
+  "ungraded_event_ids": []
+}
