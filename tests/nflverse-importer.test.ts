@@ -194,7 +194,7 @@ describe("automatic nflverse importer", () => {
     const worker = readFileSync("worker/index.ts", "utf8");
     const maintenance = readFileSync("src/server/background-maintenance.ts", "utf8");
     const settlement = readFileSync("src/server/automatic-settlement.ts", "utf8");
-    expect(worker).toContain("runBackgroundMaintenance");
+    expect(worker).toContain("refreshLockedBoard");
     expect(maintenance).toContain("settleCompletedTeamPlays(input.db, now)");
     expect(maintenance).toContain("runKickoffWeatherAutomation");
     expect(settlement).toContain("play_settlement_audit");

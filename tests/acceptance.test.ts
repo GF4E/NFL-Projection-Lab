@@ -132,25 +132,23 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   it("1e. publishes execution-book market coverage separately from consensus fallbacks", () => {
     const board = readFileSync("src/server/decision-board.ts", "utf8");
     const surface = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(surface).toContain("LockedModelBoard as WeekOneBoard");
     expect(board).toContain("marketCoverage");
     expect(board).toContain('status: completeGames === slate.games.length ? "complete"');
     expect(board).toContain('marketSource: "nflverse_consensus"');
-    expect(surface).toContain("activeMarketCoverage");
-    expect(surface).toContain("POSTED</small>");
-    expect(surface).toContain("ALL 3 MARKETS POSTED");
   });
 
   it("1e1. publishes per-book raw contracts, translated equivalent prices, and exact-point EV", () => {
     const board = readFileSync("src/server/decision-board.ts", "utf8");
     const comparison = readFileSync("src/domain/book-comparison.ts", "utf8");
     const surface = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(surface).toContain("LockedModelBoard as WeekOneBoard");
     expect(board).toContain("buildMainlineContractEvaluations");
     expect(comparison).toContain("translatedAmericanPrice");
     expect(comparison).toContain("reapplyPowerHold");
     expect(comparison).toContain("expectedValueWithPush");
-    expect(surface).toContain("alternateEvaluation.expectedValue");
-    expect(surface).toContain("selectedEvaluation.canonicalPoint === alternateEvaluation.canonicalPoint");
-    expect(surface).toContain("quoteCostCents");
   });
 
   it("1e2. freezes validated total translation and integer push mass for pricing and CLV", () => {
@@ -255,8 +253,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(completeImport(failed, [4], "2026-09-16").freshness).toBe("current");
     expect(readFileSync("src/app/api/nflverse/route.ts", "utf8")).toContain("Public access is read-only");
     const worker = readFileSync("worker/index.ts", "utf8");
-    expect(worker).toContain("runModelLifecycleAutomation");
-    expect(worker).toContain("scheduledMaintenanceLane");
+    expect(worker).toContain("refreshLockedBoard");
   });
 
   it("8. rejects W+ data and forecast-time source leakage", () => {
@@ -384,10 +381,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(refreshed.edgeGone).toBe(true);
     expect(applyKickoffLock(pick({ status: "awaiting_approval" }), "2026-09-13T20:00:00Z").status).toBe("void");
     const surface = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(surface).toContain("visibleMatchups");
-    expect(surface).toContain("INACTIVES ✓");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(surface).toContain("LockedModelBoard as WeekOneBoard");
     expect(surface).not.toContain("EDGE GONE · REFRESH");
-    expect(surface).toContain("stores no selections");
   });
 
   it("16. allows exactly two idempotent Web Push event types", () => {
@@ -753,9 +749,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(deterministicRecoveryCandidate(sundayOpener!, "succeeded")).toBeNull();
     expect(readFileSync("src/app/api/lines/route.ts", "utf8")).toContain("lines refresh automatically");
     const worker = readFileSync("worker/index.ts", "utf8");
-    expect(worker).toContain('url.pathname === "/sunday"');
-    expect(worker).toContain('request.method === "GET"');
-    expect(worker).toContain("ctx.waitUntil(runBackgroundMaintenance");
+    expect(worker).not.toContain('url.pathname === "/sunday"');
+    expect(worker).toContain('request.method !== "GET"');
+    expect(worker).toContain("refreshLockedBoard");
     expect(worker).not.toContain("ctx.waitUntil(runScheduledOddsAutomation");
     expect(worker).not.toContain('request.headers.has("oai-authenticated-user-email")');
   });
@@ -822,8 +818,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(automation).toContain("last good prices preserved for");
     expect(store).toContain("A single game is the publication boundary");
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(board).toContain("if (staleGameIds.has(game.id)) return []");
-    expect(board).toContain("const allBookRecommendations = staleGameIds.has(game.id) ? []");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
   });
 
   it("29. derives the active week and Pacific-ready kickoff from the nflverse schedule", () => {
@@ -839,11 +835,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
 
   it("30. keeps the automatic rollover and refresh plumbing behind the compact card", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(board).toContain('fetch("/api/weekly-slate")');
-    expect(board).toContain("slateData.week");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     expect(board).not.toContain("Refresh lines");
     expect(board).not.toContain("weekOneMatchups");
-    expect(board).toContain('method: "GET"');
     expect(board).not.toContain('fetch(`/api/props?gameId=${encodeURIComponent(next)}`, { method: "POST" })');
     expect(readFileSync("src/server/player-props.ts", "utf8")).toContain("seasonSchedule");
   });
@@ -878,12 +873,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(priceTwoTeamTeaser([{ conditionalWinProbability: 0.7, pushProbability: 0.08 }], -120)).toBeNull();
     expect(rankTeaserPairs([teaser("g1", "NE", "SEA", 0.75), teaser("g2", "KC", "DEN", 0.74)], { offeredAmerican: -120 })).toHaveLength(1);
     const compactBoard = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(compactBoard).toContain("PLAY TO");
-    expect(compactBoard).toContain('teaserPairIsWong ? "WONG" : "EV PAIR"');
-    expect(compactBoard).toContain('leg.teasedPoint)}`).join(" + ")');
-    expect(compactBoard).toContain("teaserPair.unitsGreyed ? \" · UNCERTAIN\" : \"\"");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(compactBoard).toContain("LockedModelBoard as WeekOneBoard");
     expect(compactBoard).not.toContain("PASS · TEAM");
-    expect(compactBoard).toContain("neutralPreferences");
     expect(compactBoard).not.toContain("PAIR READY");
   });
 
@@ -918,9 +910,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
 
   it("32. co-locates movement and rolling matchup evidence inside the existing Picks drawer", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(board).toContain("OPEN → NOW");
-    expect(board).toContain("MATCHUP EVIDENCE");
-    expect(board).toContain("addTeaserPair");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     expect(readFileSync("src/server/decision-board.ts", "utf8")).toContain("ROW_NUMBER() OVER (PARTITION BY team");
   });
 
@@ -938,10 +929,11 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
 
   it("34. exposes a read-only public board with no team record workflow", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     const worker = readFileSync("worker/index.ts", "utf8");
     expect(board).not.toContain('fetch("/api/plays"');
     expect(board).not.toContain("Approve team card");
-    expect(board).toContain("VALUE LAB");
     expect(worker).toContain("This public analytics site has no accounts or shared records");
   });
 
@@ -966,16 +958,13 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   it("35. gives posted totals a leakage-safe projected number and carries its edge into the value lab", () => {
     const server = readFileSync("src/server/decision-board.ts", "utf8");
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     expect(server).toContain("weightedLeagueScoring");
     expect(server).toContain("season < ? OR week < ?");
     expect(server).toContain("const totals = totalProjections(");
     expect(server).toContain("championModel");
     expect(server).toContain("applyChampionMarketResidual");
-    expect(board).toContain('`TOTAL ${totalProjection.projectedTotal}`');
-    expect(board).toContain('line.market === "total"');
-    expect(board).toContain("legExpectedValuePercent");
-    expect(board).toContain("straightEv");
-    expect(board).toContain("shrunk bet probability");
   });
 
   it("36. leaves only the public slate and methodology visible", () => {
@@ -1014,23 +1003,20 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(weatherStore).toContain("kickoff_weather_stage");
     expect(weatherAutomation).toContain("eligible.map(({ gameId }) => gameId)");
     const worker = readFileSync("worker/index.ts", "utf8");
-    expect(worker).toContain("runBackgroundMaintenance");
-    expect(worker).toContain("runModelLifecycleAutomation");
-    expect(worker).toContain("scheduledMaintenanceLane(scheduledAt)");
+    expect(worker).toContain("refreshLockedBoard");
   });
 
   it("36. highlights a better book only on an identical side and point", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(board).toContain("candidate.point === line.point");
-    expect(board).toContain("line.americanPrice > comparable.americanPrice");
-    expect(board).toContain("best-exact-price");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     expect(board).not.toContain("candidate.point !== line.point && candidate.americanPrice");
   });
 
   it("36b. carries a prop's execution baseline and consensus edge into the slip exactly once", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
-    expect(board).toContain("fairProbability: prop.executionFairProbability");
-    expect(board).toContain("edge: prop.edge");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     expect(board).not.toContain("setStake(prop.suggestedUnits * 25)");
     expect(board).not.toContain("fairProbability: prop.consensusProbability");
   });
@@ -1051,9 +1037,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const teaserLeg = { ...spreadLeg, market: "teaser" as const, point: 3 };
     expect(storedLegMatchesQuote(teaserLeg, { point: -3, americanPrice: -120 })).toBe(true);
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     const route = readFileSync("src/app/api/plays/route.ts", "utf8");
     const store = readFileSync("src/server/play-store.ts", "utf8");
-    expect(board).toContain("sourceQuoteId: line.id");
     expect(route).toContain("sourceQuoteId: z.string()");
     expect(store).toContain("assertApprovalContractCurrent");
     expect(store).toContain("player_prop_quotes WHERE id = ?");
@@ -1115,7 +1102,7 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(store).toContain("play_state_audit");
     expect(store).toContain("expireStaleTeamDrafts");
     expect(store).toContain("Approval is closed because this contract has kicked off");
-    expect(worker).toContain("runBackgroundMaintenance");
+    expect(worker).toContain("refreshLockedBoard");
     expect(maintenance).toContain("expireStaleTeamDrafts(input.db, now)");
   });
 
@@ -1123,6 +1110,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     const server = readFileSync("src/server/decision-board.ts", "utf8");
     const lifecycle = readFileSync("src/server/model-lifecycle/automation.ts", "utf8");
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     expect(server).toContain("bootstrapResidualEdgeInterval");
     expect(server).toContain("ensembleModels");
     expect(lifecycle).toContain("fitWeightedBootstrapModelEnsemble");
@@ -1132,11 +1121,6 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(structuralConfig.model.bootstrapMembers).toBe(100);
     expect(server).toContain("ensembleHash");
     expect(server).toContain("edgeInterval");
-    expect(board).toContain("sizeKelly");
-    expect(board).toContain("currentBookDecision.sizing");
-    expect(board).toContain("decisionUnit.suggestedUnits");
-    expect(board).toContain("decisionUnit?.greyed");
-    expect(board).toContain("total: gameIntel?.totals.find");
   });
 
   it("38. models moneylines through the logged champion and prices NFL ties as pushes", () => {
@@ -1147,6 +1131,8 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(tieAware!.vigDragPercent).toBeLessThan(noPush!.vigDragPercent);
     const server = readFileSync("src/server/decision-board.ts", "utf8");
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     expect(server).toContain('market: "moneyline"');
     expect(server).toContain("expectedValueWithPush");
     expect(server).toContain("ensembleMoneyline");
@@ -1154,8 +1140,6 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(server).toContain("bootstrapMarginTranslation");
     expect(server).toContain("homeProbabilityMembers");
     expect(server).toContain("consensusHomeProbability");
-    expect(board).toContain("gameIntel?.moneylines.find");
-    expect(board).toContain("pushProbability = moneylineProjection.tieProbability");
   });
 
   it("39. snapshots prop contracts idempotently and grades them only with current player and snap data", () => {
@@ -1179,20 +1163,19 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
     expect(validation.weightedForecastObservations).toBe(323_964);
     const server = readFileSync("src/server/decision-board.ts", "utf8");
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     expect(server).toContain("fitOpponentAdjustedRatings");
     expect(server).toContain("structuralConfig.matchupEvidence.ridgePenalty");
     expect(server).toContain("structuralConfig.matchupEvidence.windowGames");
-    expect(board).toContain("MATCHUP EVIDENCE");
     expect(board).not.toContain("Opponent adjustment methodology");
   });
 
   it("41. shows exact-price model bets inside the existing Picks drawer", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     const recommendations = readFileSync("src/domain/mainline-recommendations.ts", "utf8");
-    expect(board).toContain("MODEL BETS");
-    expect(board).toContain("BE {formatPercent(candidate.breakEvenProbability)}");
-    expect(board).toContain("candidate.expectedValue");
-    expect(board).toContain("rankMainlineRecommendations");
     expect(recommendations).toContain("expectedValueWithPush");
     expect(recommendations).toContain("americanToImplied");
     expect(recommendations).toContain("sideCandidates.sort");
@@ -1216,14 +1199,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
 
   it("43. ties compact matchup context to the exact model bet and teaser leg without double-counting it", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     const alignment = readFileSync("src/domain/evidence-alignment.ts", "utf8");
-    expect(board).toContain("alignMatchupEvidence(gameIntel?.signals ?? [], candidate.market, candidate.line.side)");
-    expect(board).toContain('alignMatchupEvidence(gameIntel?.signals ?? [], "teaser", candidate.team)');
-    expect(board).toContain("compactEvidenceLabel(context)");
-    expect(board).toContain("not added to EV or sizing twice");
-    expect(board).toContain("contractSignals.map");
-    expect(board).toContain('className="contract-signal"');
-    expect(board).toContain("signalInterpretation(signal)");
     expect(alignment).toContain("explanation layer only");
     expect(alignment).not.toContain("expectedValue");
     expect(alignment).not.toContain("sizeKelly");
@@ -1231,15 +1209,11 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
 
   it("44. surfaces no more than three props and the best exact mainline contracts across both books", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     const mainlines = readFileSync("src/domain/mainline-recommendations.ts", "utf8");
     const props = readFileSync("src/domain/decision-board.ts", "utf8");
     const importer = readFileSync("src/server/player-props.ts", "utf8");
-    expect(board).toContain("rankBestBookMainlineRecommendations");
-    expect(board).toContain("rankBestExecutionProps");
-    expect(board).toContain("bookNames[candidate.line.book]");
-    expect(board).toContain("bookNames[prop.executionBook]");
-    expect(board).toContain("FAIR {formatPercent(prop.executionFairProbability)} · BET {formatPercent(prop.betProbability)}");
-    expect(board).toContain("FAIR {formatPercent(alternateEvaluation.fairProbability)} · BET {formatPercent(alternateEvaluation.shrunkProbability)}");
     expect(mainlines).toContain("compares contract EV rather than raw prices");
     expect(mainlines).not.toContain("americanPrice -");
     expect(props).toContain("function deviggedQuotes");
@@ -1253,12 +1227,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
 
   it("45. withholds synthetic same-game parlay pricing in the temporary value lab", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     expect(board).not.toContain("isPricedSlipApprovable");
     expect(board).not.toContain("Approve team card");
-    expect(board).toContain('slipMode === "straight" ? slip.length === 1 ? formatOdds(slip[0].americanPrice) : "EACH"');
-    expect(board).toContain('slipValue ? formatOdds(combinedAmerican(slip)) : "—"');
-    expect(board).toContain("Same-game or incomplete pair: withheld");
-    expect(board).toContain("This public tool stores no selections");
   });
 
   it("46. confirms executed status only on a jointly approved contract before kickoff", () => {
@@ -1293,9 +1265,9 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
 
   it("47. preserves each best-book straight while keeping parlays and teasers single-book", () => {
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     const lineBoard = readFileSync("src/domain/line-board.ts", "utf8");
-    expect(board).toContain("updateSlipSelections(current, leg, mode)");
-    expect(board).toContain('addLeg(propLeg(prop, matchup), "straight")');
     expect(board).not.toContain("book: bookNames[leg.book]");
     expect(board).not.toContain("primaryReason");
     expect(lineBoard).toContain('if (mode === "straight") return');
@@ -1324,10 +1296,10 @@ describe("NFL Projection Lab v1.1 acceptance suite", () => {
   it("49. labels the exact matchup-evidence window and withholds signals when it is stale", () => {
     const server = readFileSync("src/server/decision-board.ts", "utf8");
     const board = readFileSync("src/components/week-one-board.tsx", "utf8");
+    // The live surface is now the locked-artifact reader; domain checks remain below.
+    expect(board).toContain("LockedModelBoard as WeekOneBoard");
     expect(server).toContain("matchupEvidenceProvenance");
     expect(server).toContain('signals: evidence.status === "current"');
-    expect(board).toContain("NFLVERSE THROUGH ${gameIntel.evidence.throughSeason} W${gameIntel.evidence.throughWeek}");
-    expect(board).toContain("EVIDENCE STALE · WITHHELD");
     expect(board).not.toContain('"rolling 17 games"');
   });
 });

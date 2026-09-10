@@ -1,15 +1,12 @@
+import { readLockedBoard, refreshLockedBoard } from "../src/server/locked-board";
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
 import { listNflverseImportStates } from "../src/server/nflverse/store";
-import { buildDecisionBoard } from "../src/server/decision-board";
 import { getPlayerPropBoard } from "../src/server/player-props";
 import { listOddsAutomationRuns } from "../src/server/odds-automation";
 import { weeklySlate } from "../src/server/weekly-slate";
 import { listOfficialInjuryImportStates } from "../src/server/official-injuries/store";
 import { listPregameContextStates } from "../src/server/pregame-context/store";
-import { runBackgroundMaintenance } from "../src/server/background-maintenance";
-import { runModelLifecycleAutomation } from "../src/server/model-lifecycle/automation";
-import { scheduledMaintenanceLane } from "../src/domain/background-maintenance";
 import { getConfidenceEngineHealth } from "../src/server/confidence-engine/store";
 
 interface AssetFetcher {
@@ -78,16 +75,10 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
-    if (
-      url.pathname === "/sunday" && request.method === "GET" && env.ODDS_API_KEY
-    ) {
-      // Sites does not guarantee that a packaged cron fires immediately after a
-      // deployment. A board navigation may run the same idempotent maintenance
-      // lane in the background; snapshot leases prevent duplicate provider spend.
-      ctx.waitUntil(runBackgroundMaintenance({
-        db: env.DB,
-        apiKey: env.ODDS_API_KEY
-      }).catch(() => undefined));
+    if (url.pathname === "/api/model-board" || url.pathname === "/api/decision-board") {
+      if (request.method !== "GET") return json({ error: "Read-only publication" }, 405);
+      try { return json(await readLockedBoard(env.DB)); }
+      catch { return json({ error: "Locked board unavailable", status: "STALE" }, 503); }
     }
     // Keep automation control outside the framework router so cron, browser wakeups,
     // and production deployments all reach the same Cloudflare-bound D1 database.
@@ -111,16 +102,6 @@ const worker = {
       url.pathname === "/api/digest"
     ) {
       return json({ error: "This public analytics site has no accounts or shared records." }, 410);
-    }
-    if (url.pathname === "/api/decision-board") {
-      try {
-        const rawWeek = url.searchParams.get("week");
-        const week = rawWeek === null ? undefined : Number(rawWeek);
-        if (week !== undefined && (!Number.isInteger(week) || week < 1 || week > 18)) return json({ error: "week must be an integer from 1 through 18" }, 400);
-        return json(await buildDecisionBoard(env.DB, { week }));
-      } catch (error) {
-        return json({ error: error instanceof Error ? error.message : "Unable to build decision board" }, 503);
-      }
     }
     if (url.pathname === "/api/weekly-slate") {
       try {
@@ -159,10 +140,8 @@ const worker = {
     return handler.fetch(request, env, ctx);
   },
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
-    const scheduledAt = new Date(controller.scheduledTime);
-    ctx.waitUntil(scheduledMaintenanceLane(scheduledAt) === "lifecycle"
-      ? runModelLifecycleAutomation({ db: env.DB, now: scheduledAt })
-      : runBackgroundMaintenance({ db: env.DB, apiKey: env.ODDS_API_KEY, now: scheduledAt }));
+    ctx.waitUntil(refreshLockedBoard(env.DB).catch(() => undefined));
+
   }
 };
 
