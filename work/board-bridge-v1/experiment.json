@@ -1,0 +1,106 @@
+{
+  "experiment": "board-bridge-v1",
+  "recorded_at": "2026-09-10T22:23:26.075411+00:00",
+  "status": "VERIFIED_LOCAL_DEPLOYMENT_PENDING",
+  "odds_credits_spent": 0,
+  "decisions": [
+    "Read immutable locks and first actual grades; do not select another side or mutate frozen runtime files.",
+    "PLAY reads filtered_subset and validates the unchanged 60-70% / 10-cent rule and execution book.",
+    "TEASE is a leg only, NEEDS_PARTNER; requires a frozen six-point ticket quote at -110 or better. Mainline prices cannot substitute. No actual frozen teaser ticket quotes exist in the current runtime, so qualifying unpriced legs are HARD PASS.",
+    "Grades refer to original locked straight picks, matching the scorecard. TEASE is not a placed ticket.",
+    "MISSED records have no freeze and no fabricated grade; recorded_at is preserved separately.",
+    "Executable display expires at kickoff. A final score overrides stale-line display. Transport freshness is checked every five minutes and fails closed after fifteen minutes.",
+    "Use final source hash pinned by the first grade; a changed final or grade is rejected by the reader.",
+    "Reader-only changes are applied to GitHub main and the existing Sites production checkout; no engine code or provider data is merged into main.",
+    "Two wrapper launchd entrypoints delegate to unmodified workers, then export/commit/push board artifacts; no additional provider calls.",
+    "Random local test scratch directories are ignored locally; named immutable replay artifacts are committed and no files deleted."
+  ],
+  "tests": {
+    "python": {
+      "passed": 124,
+      "failed": 0
+    },
+    "main": {
+      "passed": 245,
+      "failed": 0,
+      "skipped": 1
+    },
+    "production_reader": {
+      "passed": 13,
+      "failed": 0
+    },
+    "production_full_before_final_cache_test": {
+      "passed": 359,
+      "failed": 4,
+      "skipped": 1
+    },
+    "production_baseline": {
+      "commit": "64df6ac",
+      "passed_in_three_suites": 109,
+      "failed_in_three_suites": 5,
+      "failures": [
+        "NFL Projection Lab v1.1 acceptance suite 27. schedules idempotent opener and kickoff snapshots without duplicate kickoff windows",
+        "NFL Projection Lab v1.1 acceptance suite 30. keeps the automatic rollover and refresh plumbing behind the compact card",
+        "OS-15A provider-free scheduler runtime produces exactly 1,360 timely terminal rows in a healthy full-schedule replay",
+        "OS-15A provider-free scheduler runtime consumes all and only the five accepted horizons and makes duplicate ticks converge",
+        "Model Laboratory Module 2 contract anchors the v8 config and preserves the invalid v7 freeze"
+      ],
+      "note": "Four unchanged failures remain: legacy lines-route text assertion, two dormant OS scheduler lease tests, and missing retired model-lab manifest. One additional baseline UI assertion is superseded by the requested reader."
+    }
+  },
+  "builds": {
+    "main": "PASS",
+    "production": "PASS; final rebuild required after cache guard edit"
+  },
+  "frozen_runtime_hashes_verified": 14,
+  "board_content_sha256": "33bb26d799890d3448404984dfd6cc0c866c6dc9d2e03830032bf5e9d3e10b14",
+  "games": 272,
+  "ne_sea": {
+    "away_abbr": "NE",
+    "away_team": "New England Patriots",
+    "cutoff_at": "2026-09-09T23:05:00+00:00",
+    "expires_at": "2026-09-10T00:20:00+00:00",
+    "final_score": {
+      "away": 10.0,
+      "home": 13.0
+    },
+    "final_source": {
+      "provider": "nflverse",
+      "sha256": "e2be2c898f2741a5011661b48ea26e94517ff48e69540dd64eaa464b50f11109"
+    },
+    "freeze_time": null,
+    "game_id": "2026_01_NE_SEA",
+    "grade_status": "MISSED",
+    "home_abbr": "SEA",
+    "home_team": "Seattle Seahawks",
+    "kickoff_at": "2026-09-10T00:20:00+00:00",
+    "lock_status": "MISSED",
+    "margin": 3.0,
+    "record_class": "paper_model_pick",
+    "recorded_at": "2026-09-10T17:32:12.775419+00:00",
+    "season": 2026,
+    "status": "FINAL",
+    "total": 23.0,
+    "verdicts": {
+      "spreads": {
+        "availability": "MISSED",
+        "edge_source": null,
+        "grade": null,
+        "reason": "LATE",
+        "state": null
+      },
+      "totals": {
+        "availability": "MISSED",
+        "edge_source": null,
+        "grade": null,
+        "reason": "LATE",
+        "state": null
+      }
+    },
+    "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+    "week": 1
+  },
+  "verification_command": "/opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'",
+  "replay_command": "/opt/anaconda3/bin/python3.12 -B scripts/board_bridge_replay.py",
+  "immutable_replay": "work/board-bridge-v1/synthetic-v2/manifest.json"
+}

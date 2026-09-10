@@ -25,3 +25,7 @@ Reports: `outputs/model-pick-v1/reports/`, separated by version; CLV reference i
 Implemented `--ingest-slip` for pasted text and local screenshots. Production log: `outputs/jaret/pick_log.csv`, source `jaret`, status `executed`. Missing fields and all OCR fields require confirmation before append. No real slip was supplied. The hourly cached-results grading job has observed exit 0; source scorecards retain separate model versions and CLV references. [Usage](SLIPS.md), [experiment](work/slip-ingest-v1/experiment.json).
 
 Verification: 117 passed, 0 failed; local screenshot rehearsal and duplicate/idempotent grading verified. Odds API credits spent: 0. Evidence and commands are in the linked experiment. Frozen T75 file hashes are unchanged. Last verified pushed commit before this update: `53916c86cdb70b0012ffe9a23fad48b4aefe2dca`.
+
+## Locked board bridge — September 11, 2026
+
+Read-only board export and website reader implemented. NE at SEA is 13–10 FINAL, with both immutable model records MISSED; no retrospective picks or grades were invented. Frozen runtime hashes are unchanged. Zero Odds API credits. Verification and decisions: [experiment](work/board-bridge-v1/experiment.json). Deployment and wrapper installation are pending verification. Last verified engine commit before this change: `fa1008c5f5918016f89f4c3427282490c6668512`. Jaret slip remains pending confirmation of the placement timezone.

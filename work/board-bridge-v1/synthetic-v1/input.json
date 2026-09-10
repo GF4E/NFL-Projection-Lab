@@ -1,0 +1,262 @@
+{
+  "feeds": {
+    "synthetic-results": {
+      "synthetic-L": {
+        "away_score": 10,
+        "home_score": 13
+      },
+      "synthetic-P": {
+        "away_score": 10,
+        "home_score": 13
+      },
+      "synthetic-W": {
+        "away_score": 10,
+        "home_score": 13
+      },
+      "synthetic-missed": {
+        "away_score": 10,
+        "home_score": 13
+      }
+    }
+  },
+  "games": [
+    {
+      "away_abbr": "A",
+      "away_team": "Away",
+      "game_id": "synthetic-missed",
+      "home_abbr": "H",
+      "home_team": "Home",
+      "kickoff_at": "2026-09-10T00:20:00Z",
+      "season": 2026,
+      "week": 1
+    },
+    {
+      "away_abbr": "A",
+      "away_team": "Away",
+      "game_id": "synthetic-W",
+      "home_abbr": "H",
+      "home_team": "Home",
+      "kickoff_at": "2026-09-10T00:20:00Z",
+      "season": 2026,
+      "week": 1
+    },
+    {
+      "away_abbr": "A",
+      "away_team": "Away",
+      "game_id": "synthetic-L",
+      "home_abbr": "H",
+      "home_team": "Home",
+      "kickoff_at": "2026-09-10T00:20:00Z",
+      "season": 2026,
+      "week": 1
+    },
+    {
+      "away_abbr": "A",
+      "away_team": "Away",
+      "game_id": "synthetic-P",
+      "home_abbr": "H",
+      "home_team": "Home",
+      "kickoff_at": "2026-09-10T00:20:00Z",
+      "season": 2026,
+      "week": 1
+    }
+  ],
+  "grades": [
+    {
+      "game_id": "synthetic-W",
+      "kind": "actual",
+      "market": "spreads",
+      "outcome": "W",
+      "result_source": "synthetic-results",
+      "version": "synthetic-v1"
+    },
+    {
+      "game_id": "synthetic-W",
+      "kind": "actual",
+      "market": "totals",
+      "outcome": "W",
+      "result_source": "synthetic-results",
+      "version": "synthetic-v1"
+    },
+    {
+      "game_id": "synthetic-L",
+      "kind": "actual",
+      "market": "spreads",
+      "outcome": "L",
+      "result_source": "synthetic-results",
+      "version": "synthetic-v1"
+    },
+    {
+      "game_id": "synthetic-L",
+      "kind": "actual",
+      "market": "totals",
+      "outcome": "L",
+      "result_source": "synthetic-results",
+      "version": "synthetic-v1"
+    },
+    {
+      "game_id": "synthetic-P",
+      "kind": "actual",
+      "market": "spreads",
+      "outcome": "P",
+      "result_source": "synthetic-results",
+      "version": "synthetic-v1"
+    },
+    {
+      "game_id": "synthetic-P",
+      "kind": "actual",
+      "market": "totals",
+      "outcome": "P",
+      "result_source": "synthetic-results",
+      "version": "synthetic-v1"
+    }
+  ],
+  "latest_feed": "synthetic-results",
+  "now": "2026-09-10T04:00:00+00:00",
+  "records": [
+    {
+      "freeze_timestamp": "2026-09-10T01:00:00Z",
+      "game": {
+        "away_abbr": "A",
+        "away_team": "Away",
+        "game_id": "synthetic-missed",
+        "home_abbr": "H",
+        "home_team": "Home",
+        "kickoff_at": "2026-09-10T00:20:00Z",
+        "season": 2026,
+        "week": 1
+      },
+      "picks": [],
+      "reason": "LATE",
+      "status": "MISSED",
+      "version": "synthetic-v1"
+    },
+    {
+      "freeze_timestamp": "2026-09-09T23:05:00Z",
+      "game": {
+        "away_abbr": "A",
+        "away_team": "Away",
+        "game_id": "synthetic-W",
+        "home_abbr": "H",
+        "home_team": "Home",
+        "kickoff_at": "2026-09-10T00:20:00Z",
+        "season": 2026,
+        "week": 1
+      },
+      "picks": [
+        {
+          "EV": 0.1,
+          "book": "betmgm",
+          "edge_source": "price",
+          "fair_probability": 0.65,
+          "filtered_subset": true,
+          "line": -3,
+          "market": "spreads",
+          "price": -110,
+          "price_edge_cents": 12,
+          "side": "Home"
+        },
+        {
+          "EV": 0.1,
+          "book": "betmgm",
+          "edge_source": "price",
+          "fair_probability": 0.65,
+          "filtered_subset": true,
+          "line": 44.5,
+          "market": "totals",
+          "price": -110,
+          "price_edge_cents": 12,
+          "side": "Under"
+        }
+      ],
+      "reason": "LATE",
+      "status": "LOCKED",
+      "version": "synthetic-v1"
+    },
+    {
+      "freeze_timestamp": "2026-09-09T23:05:00Z",
+      "game": {
+        "away_abbr": "A",
+        "away_team": "Away",
+        "game_id": "synthetic-L",
+        "home_abbr": "H",
+        "home_team": "Home",
+        "kickoff_at": "2026-09-10T00:20:00Z",
+        "season": 2026,
+        "week": 1
+      },
+      "picks": [
+        {
+          "EV": 0.1,
+          "book": "betmgm",
+          "edge_source": "price",
+          "fair_probability": 0.65,
+          "filtered_subset": true,
+          "line": -3,
+          "market": "spreads",
+          "price": -110,
+          "price_edge_cents": 12,
+          "side": "Home"
+        },
+        {
+          "EV": 0.1,
+          "book": "betmgm",
+          "edge_source": "price",
+          "fair_probability": 0.65,
+          "filtered_subset": true,
+          "line": 44.5,
+          "market": "totals",
+          "price": -110,
+          "price_edge_cents": 12,
+          "side": "Under"
+        }
+      ],
+      "reason": "LATE",
+      "status": "LOCKED",
+      "version": "synthetic-v1"
+    },
+    {
+      "freeze_timestamp": "2026-09-09T23:05:00Z",
+      "game": {
+        "away_abbr": "A",
+        "away_team": "Away",
+        "game_id": "synthetic-P",
+        "home_abbr": "H",
+        "home_team": "Home",
+        "kickoff_at": "2026-09-10T00:20:00Z",
+        "season": 2026,
+        "week": 1
+      },
+      "picks": [
+        {
+          "EV": 0.1,
+          "book": "betmgm",
+          "edge_source": "price",
+          "fair_probability": 0.65,
+          "filtered_subset": true,
+          "line": -3,
+          "market": "spreads",
+          "price": -110,
+          "price_edge_cents": 12,
+          "side": "Home"
+        },
+        {
+          "EV": 0.1,
+          "book": "betmgm",
+          "edge_source": "price",
+          "fair_probability": 0.65,
+          "filtered_subset": true,
+          "line": 44.5,
+          "market": "totals",
+          "price": -110,
+          "price_edge_cents": 12,
+          "side": "Under"
+        }
+      ],
+      "reason": "LATE",
+      "status": "LOCKED",
+      "version": "synthetic-v1"
+    }
+  ],
+  "version": "synthetic-v1"
+}
