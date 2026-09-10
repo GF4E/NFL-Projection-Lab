@@ -1,7 +1,7 @@
 {
   "experiment": "board-bridge-v1",
-  "recorded_at": "2026-09-10T22:23:26.075411+00:00",
-  "status": "VERIFIED_LOCAL_DEPLOYMENT_PENDING",
+  "recorded_at": "2026-09-10T22:35:32.016586+00:00",
+  "status": "DEPLOYED_AND_LIVE_BROWSER_VERIFIED",
   "odds_credits_spent": 0,
   "decisions": [
     "Read immutable locks and first actual grades; do not select another side or mutate frozen runtime files.",
@@ -13,7 +13,8 @@
     "Use final source hash pinned by the first grade; a changed final or grade is rejected by the reader.",
     "Reader-only changes are applied to GitHub main and the existing Sites production checkout; no engine code or provider data is merged into main.",
     "Two wrapper launchd entrypoints delegate to unmodified workers, then export/commit/push board artifacts; no additional provider calls.",
-    "Random local test scratch directories are ignored locally; named immutable replay artifacts are committed and no files deleted."
+    "Random local test scratch directories are ignored locally; named immutable replay artifacts are committed and no files deleted.",
+    "On GitHub main the old site model/provider cron and navigation-triggered maintenance were replaced by publication reads. Legacy decision-board URL aliases the same read-only DTO. Live production retains its existing disabled provider-free scheduler gate."
   ],
   "tests": {
     "python": {
@@ -46,11 +47,25 @@
         "Model Laboratory Module 2 contract anchors the v8 config and preserves the invalid v7 freeze"
       ],
       "note": "Four unchanged failures remain: legacy lines-route text assertion, two dormant OS scheduler lease tests, and missing retired model-lab manifest. One additional baseline UI assertion is superseded by the requested reader."
+    },
+    "production_full": {
+      "passed": 360,
+      "failed": 4,
+      "skipped": 1,
+      "failures": [
+        "NFL Projection Lab v1.1 acceptance suite 27. schedules idempotent opener and kickoff snapshots without duplicate kickoff windows",
+        "OS-15A provider-free scheduler runtime produces exactly 1,360 timely terminal rows in a healthy full-schedule replay",
+        "OS-15A provider-free scheduler runtime consumes all and only the five accepted horizons and makes duplicate ticks converge",
+        "Model Laboratory Module 2 contract anchors the v8 config and preserves the invalid v7 freeze"
+      ]
     }
   },
   "builds": {
     "main": "PASS",
-    "production": "PASS; final rebuild required after cache guard edit"
+    "production": "PASS",
+    "typescript": "PASS both checkouts",
+    "main_lint": "PASS",
+    "production_active_build_graph": "PASS"
   },
   "frozen_runtime_hashes_verified": 14,
   "board_content_sha256": "33bb26d799890d3448404984dfd6cc0c866c6dc9d2e03830032bf5e9d3e10b14",
@@ -102,5 +117,39 @@
   },
   "verification_command": "/opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'",
   "replay_command": "/opt/anaconda3/bin/python3.12 -B scripts/board_bridge_replay.py",
-  "immutable_replay": "work/board-bridge-v1/synthetic-v2/manifest.json"
+  "immutable_replay": "work/board-bridge-v1/synthetic-v2/manifest.json",
+  "github_engine_implementation_commit": "7878006337d0d6ecb1fa4fbc6dfa495385511c52",
+  "wrappers": {
+    "capture": "15 seconds; observed two runs, last exit 0",
+    "daily": "3600 seconds; observed one run, last exit 0",
+    "verification_directory": "work/board-bridge-v1/launchd",
+    "scope": "Unattended invocation verified; future T80 provider dispatch and future T75 locks are not claimed."
+  },
+  "github_main_initial_reader_commit": "d513a0fee85cadcf8466befcab94444c69893fde",
+  "github_main_commit": "6ebde9b530277caadb59ad4a177c2b5116cfbc98",
+  "production_source_initial_commit": "12ea5e0a310e58ce57bb441d65b56079ac45354c",
+  "production_source_commit": "b0801c22d84df0b66f2b8042d40fc2af02dbc67e",
+  "deployment": {
+    "project_id": "appgprj_6a7ba1bc638c819197788ab281abfbc3",
+    "version_id": "appgprj_6a7ba1bc638c819197788ab281abfbc3~appgver_4dab649bf6d481918cdb5893d3ae7630",
+    "deployment_id": "appgdep_6aa33071c6d48191bfb5ef50524c8dc6",
+    "version_number": 171,
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site",
+    "status": "succeeded",
+    "updated_at": "2026-09-10T22:35:25.786353+00:00"
+  },
+  "publication_verification": "work/board-bridge-v1/publication-verification.json",
+  "live_verification": {
+    "checked_at": "2026-09-10T22:36:24.586116+00:00",
+    "browser_url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday",
+    "observed": [
+      "NE 10 \u2014 SEA 13 FINAL in matchup row and open decision window",
+      "Total 23; home margin +3",
+      "Spread MISSED; total MISSED; Freeze: MISSED \u2014 no lock",
+      "Frozen model version visible; no open line cards for the finished game",
+      "Pending games STALE; obsolete release-date banner removed"
+    ],
+    "grade_rendering": "W, L and PUSH verified with synthetic reader tests; no retrospective model grade created for the real MISSED game."
+  },
+  "odds_budget_file_present": false
 }

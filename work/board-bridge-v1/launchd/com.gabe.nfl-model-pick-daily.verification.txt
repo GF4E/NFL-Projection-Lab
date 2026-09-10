@@ -1,0 +1,66 @@
+gui/501/com.gabe.nfl-model-pick-daily = {
+	active count = 0
+	path = /Users/gabe/Library/LaunchAgents/com.gabe.nfl-model-pick-daily.plist
+	type = LaunchAgent
+	state = not running
+
+	program = /opt/anaconda3/bin/python3.12
+	arguments = {
+		/opt/anaconda3/bin/python3.12
+		-B
+		/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/model_board_runner.py
+		daily
+	}
+
+	working directory = /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6
+
+	stdout path = /Users/gabe/Library/Logs/com.gabe.nfl-model-pick-daily.log
+	stderr path = /Users/gabe/Library/Logs/com.gabe.nfl-model-pick-daily.log
+	inherited environment = {
+		SSH_AUTH_SOCK => /var/run/com.apple.launchd.rq9HsSQKbH/Listeners
+	}
+
+	default environment = {
+		PATH => /usr/bin:/bin:/usr/sbin:/sbin
+	}
+
+	environment = {
+		OSLogRateLimit => 64
+		GIT_TERMINAL_PROMPT => 0
+		XPC_SERVICE_NAME => com.gabe.nfl-model-pick-daily
+	}
+
+	domain = gui/501 [100017]
+	asid = 100017
+	minimum runtime = 10
+	exit timeout = 5
+	runs = 1
+	last exit code = 0
+
+	resource coalition = {
+		ID = 39188
+		type = resource
+		state = active
+		active count = 1
+		name = com.gabe.nfl-model-pick-daily
+	}
+
+	jetsam coalition = {
+		ID = 39189
+		type = jetsam
+		state = active
+		active count = 1
+		name = com.gabe.nfl-model-pick-daily
+	}
+
+	spawn type = background (5)
+	jetsam priority = 40
+	jetsam memory limit (active) = (unlimited)
+	jetsam memory limit (inactive) = (unlimited)
+	jetsamproperties category = daemon
+	jetsam thread limit = 32
+	cpumon = default
+	run interval = 3600 seconds
+
+	properties = runatload | inferred program
+}
