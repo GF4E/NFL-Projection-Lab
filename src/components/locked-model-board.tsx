@@ -21,7 +21,7 @@ export function GameDecision({ game: g }: { game: LockedGame }) {
   return <div className="locked-decision">
     {final && <div className="locked-final"><strong>{g.away_abbr} {g.final_score!.away} — {g.home_abbr} {g.final_score!.home} FINAL</strong><span>Total {g.total} · Home margin {odds(g.margin)}</span></div>}
     <div className="locked-verdicts"><VerdictView title="Spread" verdict={g.verdicts.spreads} final={final} /><VerdictView title="Total" verdict={g.verdicts.totals} final={final} /></div>
-    <footer>Freeze: {when(g.freeze_time)}<br/><span title={g.version}>Version: {g.version}</span></footer>
+    <footer>Freeze: {g.lock_status === "MISSED" ? "MISSED — no lock" : when(g.freeze_time)}<br/><span title={g.version}>Version: {g.version}</span></footer>
   </div>;
 }
 

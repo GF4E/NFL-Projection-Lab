@@ -21,6 +21,8 @@ describe('published board interactions',()=>{
     expect(container.textContent).toContain('A 10 — H 13 FINAL');
     expect(screen.getAllByText('MISSED').length).toBeGreaterThanOrEqual(2);
     expect(container.textContent).toContain('PT');
+    expect(container.textContent).toContain('Freeze: MISSED — no lock');
+    expect(container.textContent).not.toContain('Awaiting lock');
     expect(container.querySelectorAll('.locked-verdict')).toHaveLength(2);
     expect(container.querySelectorAll('img')).toHaveLength(0);
   });
