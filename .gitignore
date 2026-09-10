@@ -32,3 +32,8 @@ node_modules/
 
 # Mutable hourly scheduler liveness state
 /outputs/week1-t60/heartbeat.json
+
+# T75 local liveness and retained atomic staging links
+/outputs/model-pick-v1/heartbeat.json
+/outputs/model-pick-v1/scheduler.lock
+**/.pending-*

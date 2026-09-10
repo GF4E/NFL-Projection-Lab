@@ -1,0 +1,48 @@
+{
+  "books": [
+    "betmgm",
+    "draftkings",
+    "fanduel",
+    "williamhill_us"
+  ],
+  "capture_minutes": 80,
+  "code_hashes": {
+    "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+    "engine/live_weather.py": "7ab3776e0ecd1f25e63182941829c0a5d8a15db4427db85a4796da16a4eae2de",
+    "engine/market_distribution.py": "0897c49705a05c04d65f1c02a830bc8446166ee6750153b629f2f4c40766b03b",
+    "engine/model_pick.py": "3dd21e2feca822c35f896e57303f6070690fb3ea348f88372202f23e71792015",
+    "engine/pick_store.py": "9d7e9eeaca921bb322cd0594c807f6d9b9093f95c34a9449d20de99b6e45e1db",
+    "engine/pricing.py": "e62e5472ea9acf9a05401ae49749c2467040f08842a2203993e42a5d419afed2",
+    "engine/t75_budget.py": "b91e1106300d4ae93938d1ffb073d56c6f565504ab7cbd9f0cc1d8501db9742d",
+    "engine/t75_capture.py": "e9ab87567c26506ac94232267ed928a3f0cd1629ab990107eb41668dc21e8bc8",
+    "engine/t75_grade.py": "8d6f2f87f740a2ef618168778bfb003f9cb9a2acf42822c7b1eeb5056e46db19",
+    "engine/t75_prepare.py": "f008c3a45ede544b4d8226d333efd8fd832c6e7064b90b36688ea09b4a928396",
+    "engine/t75_report.py": "c47a702a6bd5bd07e74d52e9c0888801170f4d5f95dc68b76b11f499bf926236",
+    "engine/t75_shadow.py": "f78b25ed8e35d92b6661351083162e496ecdfbda59a3f856e4b8c14d12dc9a52",
+    "scripts/model_pick_daily.py": "a4cfbb25ea1b3a9bd18d02176d9860b94622f9bd79a69936210a2bcc221cb947",
+    "scripts/model_pick_runner.py": "97b56b4809e617046bafbc0d1949d60423030f36e364dbc1b53c0c389c8e2031"
+  },
+  "coefficient_origin": "2025 evaluation row, trained through 2024; freeze existing estimates, no refit",
+  "coefficient_sources": {
+    "work/harvest-disagreement-v1/run-2/regression.csv": "1fbb22096e571470554a9d18b0c9c376de708c3f5abcbafd32e9e2cdc679e1e0",
+    "work/harvest-weather-v1/run-2/coefficients.csv": "d24c10d0efb682d14d916c333e81c8a2f95a42f940b7df9e693b7f772d98e930"
+  },
+  "coefficients": {
+    "dome": -0.8736843533123229,
+    "elo_c": 0.16972529040581222,
+    "wind": -0.3028808350313987
+  },
+  "coefficients_sha256": "ce4ad8af1c59284575aeb05647b31de912cb1726c8b700e1d0828827f7afbb3d",
+  "created_at": "2026-09-10T17:29:19.893368+00:00",
+  "cutoff_minutes": 75,
+  "distribution": {
+    "path": "work/market-distribution-v1/artifacts/4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041.json",
+    "sha256": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041"
+  },
+  "no_changes_before": "2026 Week 4 review; any authorized subsequent change requires a new version",
+  "pre_release_manifest": "config.json is the immutable first offline rehearsal manifest; runtime-config.json pins the deployed build after reporting/operational verification.",
+  "reservation_per_group": 3,
+  "sharp": "pinnacle",
+  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+  "weekly_credit_cap": 60
+}

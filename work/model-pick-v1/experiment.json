@@ -1,0 +1,83 @@
+{
+  "budget": {
+    "accounted_by_week": {},
+    "remaining_by_week": {},
+    "weekly_cap": 60
+  },
+  "coefficient_sources": {
+    "work/harvest-disagreement-v1/run-2/regression.csv": "1fbb22096e571470554a9d18b0c9c376de708c3f5abcbafd32e9e2cdc679e1e0",
+    "work/harvest-weather-v1/run-2/coefficients.csv": "d24c10d0efb682d14d916c333e81c8a2f95a42f940b7df9e693b7f772d98e930"
+  },
+  "coefficients": {
+    "dome": -0.8736843533123229,
+    "elo_c": 0.16972529040581222,
+    "wind": -0.3028808350313987
+  },
+  "decisions": [
+    "Fair line is inverse integer-PMF location minimizing difference from the power-devigged home/Over non-push probability. Among equally close probabilities, choose nearest posted center; remaining ties midpoint. No residual smoothing.",
+    "Pinnacle anchor is equal weight between the other execution books median and Pinnacle location. With only one component, use that component. No independent component yields MISSED NO_QUOTES; never self-reference.",
+    "The distribution center is frozen existing integer rounding. Full and each book-specific leave-one-out center and provenance are stored.",
+    "EV = unconditional win probability * net payout - unconditional loss probability, push zero. fair_probability is labeled conditional_non_push.",
+    "Exact EV ties draw side uniformly first, then book uniformly, from sorted candidates with SHA256(game_id|version) and market-separated RNG streams.",
+    "Freeze worker starts in the final minute preceding T75, verifies actual completion by cutoff, and records actual timestamp. Capture only first 60 seconds of T80; no retries or backfill.",
+    "No global provider snapshot timestamp is offered by live Odds API: store null explicitly; retain provider HTTP response time separately and every bookmaker/market update timestamp. Never fabricate a snapshot timestamp.",
+    "Reserve three credits before each dispatch under an exclusive ledger lock. Settle only authoritative 0..3 credit headers. Uncertain requests retain reservation. 20 unresolved reservations exhaust 60 credits; a 61st attempt is refused, not authorized.",
+    "Shadows freeze 2025 evaluation-row coefficients from harvest two/three (trained through 2024). Elo adjusts each independent market location by c*(Elo margin - market margin). Weather uses wind and dome coefficients only, no refit or other predictors.",
+    "ANY/A uses published prior-week player metrics with untuned league prior for a depth-chart starter lacking history; known inactive starter or unavailable/lagging QB data means shadow unavailable, never zero-filled. Inactives have no promoted counterfactual coefficient.",
+    "Inactives public source probe found no dedicated ESPN inactives collection on either Week 1 summary. Scheduled T85 attempt accepts only that explicit collection. Injuries/Out reports are never treated as complete inactives; missing or stale depth/list remains unknown.",
+    "Public ingestion prepares label-free schedule and state DTOs separately. Lock worker has no final feed. Scorer consumes locked decision DTO and separate nflverse final/close feed; it does not follow capture paths.",
+    "CLV probability = closing distribution fair non-push probability at locked line minus locked fair probability. CLV cents = initial fair American price cents minus closing fair American price cents. Reference is nflverse_close, distinct from old executed-book CLV.",
+    "Final feed requires both scores, agreeing result/total fields, and both close lines. First grade is immutable; later source corrections cannot silently overwrite it.",
+    "T75 paper wind rule is a separately named cutoff version retaining the 30-pick/positive CLV gate; T60 entries are not pooled. No money is placed by these model-pick records.",
+    "First rehearsal config.json and synthetic artifacts remain unchanged. runtime-config.json pins final deployment after report/operational completion; no active model-pick decision logic changed.",
+    "Old launchd label retained for continuity, but its executable is now model_pick_runner.py. New daily job checks hourly and completes once per UTC date; T65 worker is no longer scheduled. Daily Git autosave remains installed.",
+    "Atomic create-only artifacts publish via hard link after fsync. Staging links are retained locally and ignored; no files deleted."
+  ],
+  "experiment_id": "model-pick-v1-T75",
+  "host": "Mac.homenet.telecomitalia.it",
+  "kickoff_groups": 118,
+  "limitations": [
+    "Mac sleep can still miss captures. Cloud host and cross-host lock remain blocked by DigitalOcean account/API access; see work/cloud-scheduler-v1/experiment.json.",
+    "Current verification is synthetic plus observed launchd exits, not proof of a future live capture.",
+    "ESPN inactives collection unavailable in current probes; unknowns are expected until a reliable list is actually returned.",
+    "nflverse closing lines are retrospective consensus reference, not guaranteed executed-book closing quotes. Reports label the distinction."
+  ],
+  "live_locked_picks_at_install": 0,
+  "live_scored_picks_at_install": 0,
+  "missed_games_at_install": 1,
+  "next_capture_Rome": "2026-09-11T01:15:00+02:00",
+  "next_capture_utc": "2026-09-10T23:15:00+00:00",
+  "next_cutoff_Rome": "2026-09-11T01:20:00+02:00",
+  "next_cutoff_utc": "2026-09-10T23:20:00+00:00",
+  "odds_credits_spent_this_run": 0,
+  "prior_budget": "Old 300-credit deliverable ledger preserved. New request explicitly authorizes 60 credits/week prospectively; no historical balances reset.",
+  "recorded_at": "2026-09-10T17:33:54.898017+00:00",
+  "replay": {
+    "command": "/opt/anaconda3/bin/python3.12 -B scripts/model_pick_replay.py",
+    "experiment": "work/model-pick-v1/synthetic-v1/experiment.json",
+    "repeated_identically": true
+  },
+  "report": {
+    "lock_count": 1,
+    "report": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/reports/0842f4ca72f2092684a5236fabea1c26a97619c3915b0ce322a3cdab592163fe",
+    "scored_records": 0
+  },
+  "runtime_config_sha256": "965deeab8c1f55a96362a4c0298904a9e842b32bccd4d975c647f58a5bfffe6f",
+  "schedule": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/model-pick-v1/schedules/a0efb09fe1572eb0f0de0102127c7ed21abdc0b5da857c5508ae0320e34885ce.json",
+    "sha256": "a0efb09fe1572eb0f0de0102127c7ed21abdc0b5da857c5508ae0320e34885ce"
+  },
+  "source_docs": [
+    "https://the-odds-api.com/liveapi/guides/v4/",
+    "https://nflreadr.nflverse.com/articles/dictionary_depth_charts.html"
+  ],
+  "status": "MAC_SCHEDULE_INSTALLED_CLOUD_STILL_UNPROVISIONED",
+  "tests": {
+    "command": "/opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'",
+    "failed": 0,
+    "passed": 105
+  },
+  "verification_record": "work/model-pick-v1/launchd-verified.json",
+  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+  "week1_remaining": 60
+}

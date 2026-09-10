@@ -36,3 +36,9 @@ Forecast implementation: [T60 weather experiment](work/t60-weather-v1/experiment
 ## Situational review: no additional rule qualified
 
 [Teaser/calibration/situational experiment](work/teaser-calibration-situations-v1/run-2/experiment.json) tested cold kickoff temperature, Thursday and off-bye games for Under and ATS with six-test Bonferroni correction. None cleared adjusted -110 break-even. No rule was added or existing gate changed.
+
+## WIND-UNDER-10-15-V1-T75
+
+September 10 cutoff version authorized by the standing T75 request. This is a separate paper series; existing T60 entries, registration and gates remain unchanged. Active 2026 Weeks 1–4. Use only the stored, qualified T80 kickoff-hour forecast, an outdoor roof and 10 <= wind mph < 15. Freeze by T75 using the new full power-devigged consensus total with at least two retail contributors; choose Under at that exact line and the best offered execution-book price. Store it in `paper_picks` of the immutable T75 file. Missing forecasts or exact executable lines mean no paper pick.
+
+The necessary live-money gate remains at least 30 paper picks in this version and positive mean CLV, with coverage reported. No live wagering is performed. This version grades against explicitly labeled `nflverse_close`; old executed-book CLV and T60 counts cannot be pooled with it. The daily T75 scorecard reports this series separately. The earlier T65 job is superseded prospectively; no old artifact is backfilled. [Registration and implementation evidence](work/model-pick-v1/experiment.json).

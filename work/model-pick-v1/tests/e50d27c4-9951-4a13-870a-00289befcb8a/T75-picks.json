@@ -1,0 +1,280 @@
+{
+  "capture": {
+    "received_at": "2026-09-13T15:40:05Z",
+    "request_at": "2026-09-13T15:40:00Z",
+    "status": "CAPTURED"
+  },
+  "consensus": {
+    "spreads": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": 3,
+          "line": -3.0,
+          "market": "spreads",
+          "power": 1.0719425631310813,
+          "probabilities": [
+            0.5000000000000001,
+            0.5000000000000001
+          ],
+          "updated_at": "2026-09-13T15:40:00Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 3,
+          "line": -3.0,
+          "market": "spreads",
+          "power": 1.0719425631310813,
+          "probabilities": [
+            0.5000000000000001,
+            0.5000000000000001
+          ],
+          "updated_at": "2026-09-13T15:40:00Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": 3,
+          "line": -3.0,
+          "market": "spreads",
+          "power": 1.0719425631310813,
+          "probabilities": [
+            0.5000000000000001,
+            0.5000000000000001
+          ],
+          "updated_at": "2026-09-13T15:40:00Z"
+        }
+      },
+      "full": {
+        "center": 3,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": null,
+        "retail_median": 3
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 3.0,
+          "contributors": [
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 3.0
+        },
+        "draftkings": {
+          "center": 3.0,
+          "contributors": [
+            "betmgm",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 3.0
+        },
+        "fanduel": {
+          "center": 3.0,
+          "contributors": [
+            "betmgm",
+            "draftkings"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 3.0
+        },
+        "williamhill_us": {
+          "center": 3,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 3
+        }
+      }
+    },
+    "totals": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": 45,
+          "line": 45.0,
+          "market": "totals",
+          "power": 1.0719425631310813,
+          "probabilities": [
+            0.5000000000000001,
+            0.5000000000000001
+          ],
+          "updated_at": "2026-09-13T15:40:00Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 45,
+          "line": 45.0,
+          "market": "totals",
+          "power": 1.0719425631310813,
+          "probabilities": [
+            0.5000000000000001,
+            0.5000000000000001
+          ],
+          "updated_at": "2026-09-13T15:40:00Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": 45,
+          "line": 45.0,
+          "market": "totals",
+          "power": 1.0719425631310813,
+          "probabilities": [
+            0.5000000000000001,
+            0.5000000000000001
+          ],
+          "updated_at": "2026-09-13T15:40:00Z"
+        }
+      },
+      "full": {
+        "center": 45,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": null,
+        "retail_median": 45
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 45.0,
+          "contributors": [
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 45.0
+        },
+        "draftkings": {
+          "center": 45.0,
+          "contributors": [
+            "betmgm",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 45.0
+        },
+        "fanduel": {
+          "center": 45.0,
+          "contributors": [
+            "betmgm",
+            "draftkings"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 45.0
+        },
+        "williamhill_us": {
+          "center": 45,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 45
+        }
+      }
+    }
+  },
+  "cutoff": "T75",
+  "distribution_hash": "8efd8681f0c56e131cafe05348e5db57a1d68a670c9402ef7546282f3ca3922d",
+  "freeze_timestamp": "2026-09-13T15:44:30Z",
+  "game": {
+    "away_abbr": "A",
+    "away_team": "Away",
+    "capture_at": "2026-09-13T15:40:00Z",
+    "cutoff_at": "2026-09-13T15:45:00Z",
+    "game_id": "TEST_01_A_H",
+    "home_abbr": "H",
+    "home_team": "Home",
+    "kickoff_at": "2026-09-13T17:00:00Z",
+    "roof": "outdoors",
+    "season": 2026,
+    "week": 1
+  },
+  "picks": [
+    {
+      "EV": -0.027272727272727115,
+      "book": "betmgm",
+      "conditional_win": 0.5000000000000001,
+      "edge_source": "tiebreak",
+      "exact_tie_count": 6,
+      "fair_probability": 0.5000000000000001,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": 3.0,
+      "loo_center": 3.0,
+      "loss": 0.29999999999999993,
+      "market": "spreads",
+      "price": -110.0,
+      "price_edge_cents": -9.999999999999943,
+      "push": 0.4,
+      "quote_updated_at": "2026-09-13T15:40:00Z",
+      "seed": "6c691aedf6773dca524b6b61eb04042a6ab5e3a45012a3ff6cf42ba89040f39f",
+      "side": "Away",
+      "win": 0.30000000000000004
+    },
+    {
+      "EV": -0.027272727272727115,
+      "book": "draftkings",
+      "conditional_win": 0.5000000000000001,
+      "edge_source": "tiebreak",
+      "exact_tie_count": 6,
+      "fair_probability": 0.5000000000000001,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": 45.0,
+      "loo_center": 45.0,
+      "loss": 0.29999999999999993,
+      "market": "totals",
+      "price": -110.0,
+      "price_edge_cents": -9.999999999999943,
+      "push": 0.4,
+      "quote_updated_at": "2026-09-13T15:40:00Z",
+      "seed": "6c691aedf6773dca524b6b61eb04042a6ab5e3a45012a3ff6cf42ba89040f39f",
+      "side": "Over",
+      "win": 0.30000000000000004
+    }
+  ],
+  "record_class": "paper_model_pick",
+  "status": "LOCKED",
+  "version": "model-pick-v1-T75-synthetic"
+}
