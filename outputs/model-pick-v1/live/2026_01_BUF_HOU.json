@@ -1,0 +1,535 @@
+{
+  "analysis": {
+    "captured_at": "2026-09-11T18:33:08.624150+00:00",
+    "measured": {
+      "elo_disagreement": 3.6370711132649194,
+      "half_points": [
+        {
+          "buy_price_available": false,
+          "from": -1.5,
+          "same_EV_max_negative_price": 111.99748468141733,
+          "side": "Buffalo Bills",
+          "to": -1.0
+        }
+      ],
+      "spreads": {
+        "best_same_line": {
+          "advantage_cents": 2.0,
+          "book": "fanduel",
+          "fair_probability": 0.4991364421416235,
+          "line": -1.5,
+          "market": "spreads",
+          "price": -106.0,
+          "side": "Buffalo Bills"
+        },
+        "consensus_line": 1.0,
+        "movement": null
+      },
+      "teaser_candidates": [
+        {
+          "book": "draftkings",
+          "fair_probability": 0.5008635578583766,
+          "key_numbers_crossed": [
+            3,
+            7
+          ],
+          "line": 1.5,
+          "market": "spreads",
+          "price": -112.0,
+          "side": "Houston Texans",
+          "teased_line": 7.5
+        },
+        {
+          "book": "draftkings",
+          "fair_probability": 0.49326424870466323,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "line": 44.5,
+          "market": "totals",
+          "price": -115.0,
+          "side": "Over",
+          "teased_line": 38.5
+        },
+        {
+          "book": "betmgm",
+          "fair_probability": 0.507823613086771,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "line": 45.0,
+          "market": "totals",
+          "price": -108.0,
+          "side": "Over",
+          "teased_line": 39.0
+        }
+      ],
+      "totals": {
+        "best_same_line": {
+          "advantage_cents": 1.0,
+          "book": "fanduel",
+          "fair_probability": 0.5067357512953368,
+          "line": 44.5,
+          "market": "totals",
+          "price": -104.0,
+          "side": "Under"
+        },
+        "consensus_line": 45.5,
+        "movement": null
+      },
+      "wind_rule": false
+    },
+    "sentences": [
+      "Spread consensus is HOU +1. This is the first capture; movement is not yet measured.",
+      "FanDuel has the best captured price for Buffalo Bills -1.5 at -106, 2 cents better than the next book at the same line.",
+      "Total consensus is +45.5. This is the first capture; movement is not yet measured.",
+      "FanDuel has the best captured price for Under +44.5 at -104, 1 cents better than the next book at the same line.",
+      "The spread is not within a half point of 3 or 7.",
+      "Buying Buffalo Bills from -1.5 to -1 preserves the current modeled EV up to -112.0; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "The venue is indoors or its roof is unknown; WIND RULE does not apply.",
+      "Plain Elo disagrees with the market margin by +3.64 points; diagnostic only, with no QB adjustment.",
+      "Teaser candidates: Houston Texans +1.5 to +7.5, crossing 3, 7; Over +44.5 to +38.5, crossing 41, 44; Over +45 to +39, crossing 41, 44. Ticket prices and a partner are not established.",
+      "QB status: inactives unknown until T-90."
+    ]
+  },
+  "capture": {
+    "label": "FRIDAY",
+    "params": {
+      "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
+      "commenceTimeFrom": "2026-09-13T17:00:00Z",
+      "commenceTimeTo": "2026-09-15T00:15:00Z",
+      "dateFormat": "iso",
+      "markets": "spreads,totals",
+      "oddsFormat": "american"
+    },
+    "received_at": "2026-09-11T18:33:08.624150+00:00",
+    "request_at": "2026-09-11T18:33:08.536726+00:00",
+    "request_id": "LIVE_FRIDAY_2026_W01",
+    "source": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_FRIDAY_2026_W01/sources/1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573.json",
+      "sha256": "1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573"
+    },
+    "status": "CAPTURED"
+  },
+  "capture_label": "FRIDAY",
+  "captured_at": "2026-09-11T18:33:08.624150+00:00",
+  "consensus": {
+    "spreads": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": -1,
+          "line": 1.5,
+          "market": "spreads",
+          "power": 1.0647311734675267,
+          "probabilities": [
+            0.5023369847659711,
+            0.49766301523402895
+          ],
+          "updated_at": "2026-09-11T18:31:49Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": -1,
+          "line": 1.5,
+          "market": "spreads",
+          "power": 1.0718103317980505,
+          "probabilities": [
+            0.5046406578884406,
+            0.4953593421115595
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": -1,
+          "line": 1.5,
+          "market": "spreads",
+          "power": 1.0714135375354,
+          "probabilities": [
+            0.5092825998442164,
+            0.49071740015578375
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": -1,
+          "line": 1.0,
+          "market": "spreads",
+          "power": 1.0419779692389954,
+          "probabilities": [
+            0.48566116403207604,
+            0.514338835967924
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": -1.0,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": -1,
+        "retail_median": -1
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": -1.0,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -1,
+          "retail_median": -1.0
+        },
+        "draftkings": {
+          "center": -1.0,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -1,
+          "retail_median": -1.0
+        },
+        "fanduel": {
+          "center": -1.0,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -1,
+          "retail_median": -1.0
+        },
+        "williamhill_us": {
+          "center": -1.0,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -1,
+          "retail_median": -1
+        }
+      }
+    },
+    "totals": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": 45,
+          "line": 45.0,
+          "market": "totals",
+          "power": 1.0647311734675267,
+          "probabilities": [
+            0.49766301523402895,
+            0.5023369847659711
+          ],
+          "updated_at": "2026-09-11T18:31:49Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 46,
+          "line": 44.5,
+          "market": "totals",
+          "power": 1.071115843039896,
+          "probabilities": [
+            0.5116044544982121,
+            0.488395545501788
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": 46,
+          "line": 44.5,
+          "market": "totals",
+          "power": 1.0775096512308782,
+          "probabilities": [
+            0.5161351282556743,
+            0.48386487174432585
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": 45,
+          "line": 45.0,
+          "market": "totals",
+          "power": 1.0574485894788523,
+          "probabilities": [
+            0.4952918731707774,
+            0.5047081268292227
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": 45.5,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": 45,
+        "retail_median": 46
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 45.5,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 45,
+          "retail_median": 46.0
+        },
+        "draftkings": {
+          "center": 45.25,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 45,
+          "retail_median": 45.5
+        },
+        "fanduel": {
+          "center": 45.25,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 45,
+          "retail_median": 45.5
+        },
+        "williamhill_us": {
+          "center": 45.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 45,
+          "retail_median": 46
+        }
+      }
+    }
+  },
+  "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+  "forecast": {
+    "status": "INDOOR_OR_ROOF_UNKNOWN"
+  },
+  "game": {
+    "away_abbr": "BUF",
+    "away_team": "Buffalo Bills",
+    "capture_at": "2026-09-13T15:40:00+00:00",
+    "cutoff_at": "2026-09-13T15:45:00+00:00",
+    "espn_id": "401872660",
+    "game_id": "2026_01_BUF_HOU",
+    "home_abbr": "HOU",
+    "home_team": "Houston Texans",
+    "kickoff_at": "2026-09-13T17:00:00+00:00",
+    "latitude": "29.6849239",
+    "longitude": "-95.41082",
+    "neutral": false,
+    "roof": "",
+    "season": 2026,
+    "stadium_id": "HOU00",
+    "venue_source_sha256": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
+    "week": 1
+  },
+  "inactives": {
+    "status": "INACTIVES_UNAVAILABLE"
+  },
+  "lifecycle": "live-to-locked-v1",
+  "offers": [
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5008635578583766,
+      "line": 1.5,
+      "market": "spreads",
+      "price": -112.0,
+      "side": "Houston Texans"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.4991364421416235,
+      "line": -1.5,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Buffalo Bills"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.49326424870466323,
+      "line": 44.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Over"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5067357512953368,
+      "line": 44.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Under"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5008635578583766,
+      "line": 1.5,
+      "market": "spreads",
+      "price": -114.0,
+      "side": "Houston Texans"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.4991364421416235,
+      "line": -1.5,
+      "market": "spreads",
+      "price": -106.0,
+      "side": "Buffalo Bills"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.49326424870466323,
+      "line": 44.5,
+      "market": "totals",
+      "price": -118.0,
+      "side": "Over"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5067357512953368,
+      "line": 44.5,
+      "market": "totals",
+      "price": -104.0,
+      "side": "Under"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.5008635578583766,
+      "line": 1.5,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Houston Texans"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.4991364421416235,
+      "line": -1.5,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Buffalo Bills"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.507823613086771,
+      "line": 45.0,
+      "market": "totals",
+      "price": -108.0,
+      "side": "Over"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.492176386913229,
+      "line": 45.0,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Under"
+    }
+  ],
+  "paper_picks": [],
+  "picks": [
+    {
+      "EV": -0.02998012187571275,
+      "book": "fanduel",
+      "conditional_win": 0.4991364421416235,
+      "edge_source": "tiebreak",
+      "exact_tie_count": 1,
+      "fair_probability": 0.4991364421416235,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": -1.5,
+      "loo_center": -1.0,
+      "loss": 0.5008635578583764,
+      "market": "spreads",
+      "price": -106.0,
+      "price_edge_cents": -6.3460207612456685,
+      "push": 0.0,
+      "quote_updated_at": "2026-09-11T18:32:51Z",
+      "seed": null,
+      "side": "Buffalo Bills",
+      "win": 0.4991364421416235
+    },
+    {
+      "EV": -0.006018333997608594,
+      "book": "fanduel",
+      "conditional_win": 0.5067357512953368,
+      "edge_source": "tiebreak",
+      "exact_tie_count": 1,
+      "fair_probability": 0.5067357512953368,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": 44.5,
+      "loo_center": 45.25,
+      "loss": 0.49326424870466323,
+      "market": "totals",
+      "price": -104.0,
+      "price_edge_cents": -1.2689075630252233,
+      "push": 0.0,
+      "quote_updated_at": "2026-09-11T18:32:51Z",
+      "seed": null,
+      "side": "Under",
+      "win": 0.5067357512953368
+    }
+  ],
+  "record_class": "paper_model_pick",
+  "status": "LIVE",
+  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041"
+}

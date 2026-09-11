@@ -1,0 +1,510 @@
+{
+  "analysis": {
+    "captured_at": "2026-09-11T18:33:08.624150+00:00",
+    "measured": {
+      "elo_disagreement": 0.389715205011953,
+      "half_points": [
+        {
+          "buy_price_available": false,
+          "from": 6.0,
+          "same_EV_max_negative_price": 117.65813148788926,
+          "side": "Washington Commanders",
+          "to": 6.5
+        }
+      ],
+      "spreads": {
+        "best_same_line": {
+          "advantage_cents": null,
+          "book": "draftkings",
+          "fair_probability": 0.5120481927710844,
+          "line": 6.0,
+          "market": "spreads",
+          "price": -112.0,
+          "side": "Washington Commanders"
+        },
+        "consensus_line": -6.0,
+        "movement": null
+      },
+      "teaser_candidates": [
+        {
+          "book": "draftkings",
+          "fair_probability": 0.4842832469775475,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "line": 44.5,
+          "market": "totals",
+          "price": -105.0,
+          "side": "Over",
+          "teased_line": 38.5
+        }
+      ],
+      "totals": {
+        "best_same_line": {
+          "advantage_cents": 3.0,
+          "book": "betmgm",
+          "fair_probability": 0.5157167530224525,
+          "line": 44.5,
+          "market": "totals",
+          "price": -112.0,
+          "side": "Under"
+        },
+        "consensus_line": 44.0,
+        "movement": null
+      },
+      "wind_rule": false
+    },
+    "sentences": [
+      "Spread consensus is PHI -6. This is the first capture; movement is not yet measured.",
+      "DraftKings has the best captured price for Washington Commanders +6 at -112; no other book has a comparable price at that line.",
+      "Total consensus is +44. This is the first capture; movement is not yet measured.",
+      "BetMGM has the best captured price for Under +44.5 at -112, 3 cents better than the next book at the same line.",
+      "The spread is not within a half point of 3 or 7.",
+      "Buying Washington Commanders from +6 to +6.5 preserves the current modeled EV up to -117.7; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+      "Plain Elo disagrees with the market margin by +0.39 points; diagnostic only, with no QB adjustment.",
+      "Teaser candidates: Over +44.5 to +38.5, crossing 41, 44. Ticket prices and a partner are not established.",
+      "QB status: inactives unknown until T-90."
+    ]
+  },
+  "capture": {
+    "label": "FRIDAY",
+    "params": {
+      "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
+      "commenceTimeFrom": "2026-09-13T17:00:00Z",
+      "commenceTimeTo": "2026-09-15T00:15:00Z",
+      "dateFormat": "iso",
+      "markets": "spreads,totals",
+      "oddsFormat": "american"
+    },
+    "received_at": "2026-09-11T18:33:08.624150+00:00",
+    "request_at": "2026-09-11T18:33:08.536726+00:00",
+    "request_id": "LIVE_FRIDAY_2026_W01",
+    "source": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_FRIDAY_2026_W01/sources/1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573.json",
+      "sha256": "1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573"
+    },
+    "status": "CAPTURED"
+  },
+  "capture_label": "FRIDAY",
+  "captured_at": "2026-09-11T18:33:08.624150+00:00",
+  "consensus": {
+    "spreads": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": 6,
+          "line": -5.5,
+          "market": "spreads",
+          "power": 1.0647311734675267,
+          "probabilities": [
+            0.5023369847659711,
+            0.49766301523402895
+          ],
+          "updated_at": "2026-09-11T18:31:50Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 6,
+          "line": -6.0,
+          "market": "spreads",
+          "power": 1.0718103317980505,
+          "probabilities": [
+            0.4953593421115595,
+            0.5046406578884406
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": 6,
+          "line": -5.5,
+          "market": "spreads",
+          "power": 1.0719425631310813,
+          "probabilities": [
+            0.5000000000000001,
+            0.5000000000000001
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": 6,
+          "line": -5.5,
+          "market": "spreads",
+          "power": 1.0432096687204968,
+          "probabilities": [
+            0.5,
+            0.5
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": 6.0,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": 6,
+        "retail_median": 6
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 6.0,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 6,
+          "retail_median": 6.0
+        },
+        "draftkings": {
+          "center": 6.0,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 6,
+          "retail_median": 6.0
+        },
+        "fanduel": {
+          "center": 6.0,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 6,
+          "retail_median": 6.0
+        },
+        "williamhill_us": {
+          "center": 6.0,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 6,
+          "retail_median": 6
+        }
+      }
+    },
+    "totals": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": 45,
+          "line": 44.5,
+          "market": "totals",
+          "power": 1.0607640901233029,
+          "probabilities": [
+            0.4917898337466912,
+            0.5082101662533091
+          ],
+          "updated_at": "2026-09-11T18:31:50Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 44,
+          "line": 44.5,
+          "market": "totals",
+          "power": 1.071115843039896,
+          "probabilities": [
+            0.488395545501788,
+            0.5116044544982121
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": 44,
+          "line": 44.5,
+          "market": "totals",
+          "power": 1.071115843039896,
+          "probabilities": [
+            0.488395545501788,
+            0.5116044544982121
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": 44,
+          "line": 44.5,
+          "market": "totals",
+          "power": 1.0597590257815699,
+          "probabilities": [
+            0.4847471226033539,
+            0.515252877396646
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": 44.0,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": 44,
+        "retail_median": 44
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 44.0,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 44,
+          "retail_median": 44.0
+        },
+        "draftkings": {
+          "center": 44.25,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 44,
+          "retail_median": 44.5
+        },
+        "fanduel": {
+          "center": 44.25,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 44,
+          "retail_median": 44.5
+        },
+        "williamhill_us": {
+          "center": 44.0,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 44,
+          "retail_median": 44
+        }
+      }
+    }
+  },
+  "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+  "forecast": {
+    "error": "ValueError",
+    "status": "UNAVAILABLE"
+  },
+  "game": {
+    "away_abbr": "WAS",
+    "away_team": "Washington Commanders",
+    "capture_at": "2026-09-13T19:05:00+00:00",
+    "cutoff_at": "2026-09-13T19:10:00+00:00",
+    "espn_id": "401872929",
+    "game_id": "2026_01_WAS_PHI",
+    "home_abbr": "PHI",
+    "home_team": "Philadelphia Eagles",
+    "kickoff_at": "2026-09-13T20:25:00+00:00",
+    "latitude": "39.9007914",
+    "longitude": "-75.1674645",
+    "neutral": false,
+    "roof": "outdoors",
+    "season": 2026,
+    "stadium_id": "PHI00",
+    "venue_source_sha256": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
+    "week": 1
+  },
+  "inactives": {
+    "status": "INACTIVES_UNAVAILABLE"
+  },
+  "lifecycle": "live-to-locked-v1",
+  "offers": [
+    {
+      "book": "draftkings",
+      "fair_probability": 0.4879518072289156,
+      "line": -6.0,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Philadelphia Eagles"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5120481927710844,
+      "line": 6.0,
+      "market": "spreads",
+      "price": -112.0,
+      "side": "Washington Commanders"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.4842832469775475,
+      "line": 44.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Over"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5157167530224525,
+      "line": 44.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Under"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5008635578583766,
+      "line": -5.5,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Philadelphia Eagles"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.4991364421416235,
+      "line": 5.5,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Washington Commanders"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.4842832469775475,
+      "line": 44.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Over"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5157167530224525,
+      "line": 44.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Under"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.5008635578583766,
+      "line": -5.5,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Philadelphia Eagles"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.4991364421416235,
+      "line": 5.5,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Washington Commanders"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.4842832469775475,
+      "line": 44.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Over"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.5157167530224525,
+      "line": 44.5,
+      "market": "totals",
+      "price": -112.0,
+      "side": "Under"
+    }
+  ],
+  "paper_picks": [],
+  "picks": [
+    {
+      "EV": -0.029990130767332757,
+      "book": "draftkings",
+      "conditional_win": 0.5120481927710844,
+      "edge_source": "tiebreak",
+      "exact_tie_count": 1,
+      "fair_probability": 0.5120481927710844,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": 6.0,
+      "loo_center": 6.0,
+      "loss": 0.4756476683937823,
+      "market": "spreads",
+      "price": -112.0,
+      "price_edge_cents": -7.061728395061721,
+      "push": 0.02521588946459413,
+      "quote_updated_at": "2026-09-11T18:32:49Z",
+      "seed": null,
+      "side": "Washington Commanders",
+      "win": 0.4991364421416235
+    },
+    {
+      "EV": -0.023821860350357882,
+      "book": "betmgm",
+      "conditional_win": 0.5157167530224525,
+      "edge_source": "price",
+      "exact_tie_count": 1,
+      "fair_probability": 0.5157167530224525,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": 44.5,
+      "loo_center": 44.0,
+      "loss": 0.48428324697754754,
+      "market": "totals",
+      "price": -112.0,
+      "price_edge_cents": -5.509272467903017,
+      "push": 0.0,
+      "quote_updated_at": "2026-09-11T18:31:50Z",
+      "seed": null,
+      "side": "Under",
+      "win": 0.5157167530224525
+    }
+  ],
+  "record_class": "paper_model_pick",
+  "status": "LIVE",
+  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041"
+}

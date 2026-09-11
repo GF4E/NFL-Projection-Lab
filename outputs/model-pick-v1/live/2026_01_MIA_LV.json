@@ -1,0 +1,522 @@
+{
+  "analysis": {
+    "captured_at": "2026-09-11T18:33:08.624150+00:00",
+    "measured": {
+      "elo_disagreement": -5.31637921251583,
+      "half_points": [
+        {
+          "buy_price_available": false,
+          "from": -3.0,
+          "same_EV_max_negative_price": 119.10344827586202,
+          "side": "Las Vegas Raiders",
+          "to": -2.5
+        }
+      ],
+      "spreads": {
+        "best_same_line": {
+          "advantage_cents": 2.0,
+          "book": "betmgm",
+          "fair_probability": 0.5225225225225226,
+          "line": -3.0,
+          "market": "spreads",
+          "price": -110.0,
+          "side": "Las Vegas Raiders"
+        },
+        "consensus_line": -3.5,
+        "movement": null
+      },
+      "teaser_candidates": [
+        {
+          "book": "draftkings",
+          "fair_probability": 0.5067357512953368,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "line": 40.5,
+          "market": "totals",
+          "price": -115.0,
+          "side": "Under",
+          "teased_line": 46.5
+        },
+        {
+          "book": "fanduel",
+          "fair_probability": 0.5067357512953368,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "line": 39.5,
+          "market": "totals",
+          "price": -105.0,
+          "side": "Under",
+          "teased_line": 45.5
+        }
+      ],
+      "totals": {
+        "best_same_line": {
+          "advantage_cents": null,
+          "book": "fanduel",
+          "fair_probability": 0.5067357512953368,
+          "line": 39.5,
+          "market": "totals",
+          "price": -105.0,
+          "side": "Under"
+        },
+        "consensus_line": 40.5,
+        "movement": null
+      },
+      "wind_rule": false
+    },
+    "sentences": [
+      "Spread consensus is LV -3.5. This is the first capture; movement is not yet measured.",
+      "BetMGM has the best captured price for Las Vegas Raiders -3 at -110, 2 cents better than the next book at the same line.",
+      "Total consensus is +40.5. This is the first capture; movement is not yet measured.",
+      "FanDuel has the best captured price for Under +39.5 at -105; no other book has a comparable price at that line.",
+      "The spread is on or within a half point of 3.",
+      "Buying Las Vegas Raiders from -3 to -2.5 preserves the current modeled EV up to -119.1; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "The venue is indoors or its roof is unknown; WIND RULE does not apply.",
+      "Plain Elo disagrees with the market margin by -5.32 points; diagnostic only, with no QB adjustment.",
+      "Teaser candidates: Under +40.5 to +46.5, crossing 41, 44; Under +39.5 to +45.5, crossing 41, 44. Ticket prices and a partner are not established.",
+      "QB status: inactives unknown until T-90."
+    ]
+  },
+  "capture": {
+    "label": "FRIDAY",
+    "params": {
+      "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
+      "commenceTimeFrom": "2026-09-13T17:00:00Z",
+      "commenceTimeTo": "2026-09-15T00:15:00Z",
+      "dateFormat": "iso",
+      "markets": "spreads,totals",
+      "oddsFormat": "american"
+    },
+    "received_at": "2026-09-11T18:33:08.624150+00:00",
+    "request_at": "2026-09-11T18:33:08.536726+00:00",
+    "request_id": "LIVE_FRIDAY_2026_W01",
+    "source": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_FRIDAY_2026_W01/sources/1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573.json",
+      "sha256": "1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573"
+    },
+    "status": "CAPTURED"
+  },
+  "capture_label": "FRIDAY",
+  "captured_at": "2026-09-11T18:33:08.624150+00:00",
+  "consensus": {
+    "spreads": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": 3,
+          "line": -3.0,
+          "market": "spreads",
+          "power": 1.0647311734675267,
+          "probabilities": [
+            0.5023369847659711,
+            0.49766301523402895
+          ],
+          "updated_at": "2026-09-11T18:31:50Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 3,
+          "line": -3.0,
+          "market": "spreads",
+          "power": 1.0718103317980505,
+          "probabilities": [
+            0.5046406578884406,
+            0.4953593421115595
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": 4,
+          "line": -3.0,
+          "market": "spreads",
+          "power": 1.0764584395717796,
+          "probabilities": [
+            0.5207527066370117,
+            0.4792472933629884
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": 4,
+          "line": -3.0,
+          "market": "spreads",
+          "power": 1.0429018863905268,
+          "probabilities": [
+            0.5071670142287985,
+            0.4928329857712016
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": 3.5,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": 4,
+        "retail_median": 3
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 3.75,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 4,
+          "retail_median": 3.5
+        },
+        "draftkings": {
+          "center": 3.75,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 4,
+          "retail_median": 3.5
+        },
+        "fanduel": {
+          "center": 3.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 4,
+          "retail_median": 3.0
+        },
+        "williamhill_us": {
+          "center": 3.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 4,
+          "retail_median": 3
+        }
+      }
+    },
+    "totals": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": 41,
+          "line": 40.5,
+          "market": "totals",
+          "power": 1.0647311734675267,
+          "probabilities": [
+            0.49766301523402895,
+            0.5023369847659711
+          ],
+          "updated_at": "2026-09-11T18:31:50Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 40,
+          "line": 40.5,
+          "market": "totals",
+          "power": 1.071115843039896,
+          "probabilities": [
+            0.488395545501788,
+            0.5116044544982121
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": 41,
+          "line": 39.5,
+          "market": "totals",
+          "power": 1.071115843039896,
+          "probabilities": [
+            0.5116044544982121,
+            0.488395545501788
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": 40,
+          "line": 40.5,
+          "market": "totals",
+          "power": 1.0567423620049805,
+          "probabilities": [
+            0.488226726355143,
+            0.5117732736448571
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": 40.5,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": 40,
+        "retail_median": 41
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 40.25,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 40,
+          "retail_median": 40.5
+        },
+        "draftkings": {
+          "center": 40.5,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 40,
+          "retail_median": 41.0
+        },
+        "fanduel": {
+          "center": 40.25,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 40,
+          "retail_median": 40.5
+        },
+        "williamhill_us": {
+          "center": 40.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 40,
+          "retail_median": 41
+        }
+      }
+    }
+  },
+  "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+  "forecast": {
+    "status": "INDOOR_OR_ROOF_UNKNOWN"
+  },
+  "game": {
+    "away_abbr": "MIA",
+    "away_team": "Miami Dolphins",
+    "capture_at": "2026-09-13T19:05:00+00:00",
+    "cutoff_at": "2026-09-13T19:10:00+00:00",
+    "espn_id": "401872928",
+    "game_id": "2026_01_MIA_LV",
+    "home_abbr": "LV",
+    "home_team": "Las Vegas Raiders",
+    "kickoff_at": "2026-09-13T20:25:00+00:00",
+    "latitude": "36.0908515",
+    "longitude": "-115.1833441",
+    "neutral": false,
+    "roof": "dome",
+    "season": 2026,
+    "stadium_id": "VEG00",
+    "venue_source_sha256": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
+    "week": 1
+  },
+  "inactives": {
+    "status": "INACTIVES_UNAVAILABLE"
+  },
+  "lifecycle": "live-to-locked-v1",
+  "offers": [
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5225225225225226,
+      "line": -3.0,
+      "market": "spreads",
+      "price": -112.0,
+      "side": "Las Vegas Raiders"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.4774774774774775,
+      "line": 3.0,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Miami Dolphins"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.49326424870466323,
+      "line": 40.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Over"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5067357512953368,
+      "line": 40.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Under"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5225225225225226,
+      "line": -3.0,
+      "market": "spreads",
+      "price": -120.0,
+      "side": "Las Vegas Raiders"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.4774774774774775,
+      "line": 3.0,
+      "market": "spreads",
+      "price": -102.0,
+      "side": "Miami Dolphins"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.49326424870466323,
+      "line": 39.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Over"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5067357512953368,
+      "line": 39.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Under"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.5225225225225226,
+      "line": -3.0,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Las Vegas Raiders"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.4774774774774775,
+      "line": 3.0,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Miami Dolphins"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.4842832469775475,
+      "line": 40.5,
+      "market": "totals",
+      "price": -108.0,
+      "side": "Over"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.5157167530224525,
+      "line": 40.5,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Under"
+    }
+  ],
+  "paper_picks": [],
+  "picks": [
+    {
+      "EV": -0.002355157795572216,
+      "book": "betmgm",
+      "conditional_win": 0.5225225225225226,
+      "edge_source": "price",
+      "exact_tie_count": 1,
+      "fair_probability": 0.5225225225225226,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": -3.0,
+      "loo_center": 3.75,
+      "loss": 0.45768566493955093,
+      "market": "spreads",
+      "price": -110.0,
+      "price_edge_cents": -0.5660377358490081,
+      "push": 0.04145077720207254,
+      "quote_updated_at": "2026-09-11T18:31:50Z",
+      "seed": null,
+      "side": "Las Vegas Raiders",
+      "win": 0.5008635578583766
+    },
+    {
+      "EV": -0.010658771280532997,
+      "book": "fanduel",
+      "conditional_win": 0.5067357512953368,
+      "edge_source": "tiebreak",
+      "exact_tie_count": 1,
+      "fair_probability": 0.5067357512953368,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": 39.5,
+      "loo_center": 40.25,
+      "loss": 0.49326424870466323,
+      "market": "totals",
+      "price": -105.0,
+      "price_edge_cents": -2.2689075630252233,
+      "push": 0.0,
+      "quote_updated_at": "2026-09-11T18:32:51Z",
+      "seed": null,
+      "side": "Under",
+      "win": 0.5067357512953368
+    }
+  ],
+  "record_class": "paper_model_pick",
+  "status": "LIVE",
+  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041"
+}

@@ -1,0 +1,510 @@
+{
+  "analysis": {
+    "captured_at": "2026-09-11T18:33:08.624150+00:00",
+    "measured": {
+      "elo_disagreement": 1.6699749767915637,
+      "half_points": [
+        {
+          "buy_price_available": false,
+          "from": 3.0,
+          "same_EV_max_negative_price": 105.30137981118375,
+          "side": "Carolina Panthers",
+          "to": 3.5
+        }
+      ],
+      "spreads": {
+        "best_same_line": {
+          "advantage_cents": 2.0,
+          "book": "betmgm",
+          "fair_probability": 0.4879518072289156,
+          "line": 3.0,
+          "market": "spreads",
+          "price": 100.0,
+          "side": "Carolina Panthers"
+        },
+        "consensus_line": 3.0,
+        "movement": null
+      },
+      "teaser_candidates": [
+        {
+          "book": "draftkings",
+          "fair_probability": 0.4842832469775475,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "line": 47.5,
+          "market": "totals",
+          "price": -110.0,
+          "side": "Over",
+          "teased_line": 41.5
+        }
+      ],
+      "totals": {
+        "best_same_line": {
+          "advantage_cents": null,
+          "book": "betmgm",
+          "fair_probability": 0.5113279888462878,
+          "line": 47.0,
+          "market": "totals",
+          "price": -108.0,
+          "side": "Under"
+        },
+        "consensus_line": 47.5,
+        "movement": null
+      },
+      "wind_rule": false
+    },
+    "sentences": [
+      "Spread consensus is CAR +3. This is the first capture; movement is not yet measured.",
+      "BetMGM has the best captured price for Carolina Panthers +3 at +100, 2 cents better than the next book at the same line.",
+      "Total consensus is +47.5. This is the first capture; movement is not yet measured.",
+      "BetMGM has the best captured price for Under +47 at -108; no other book has a comparable price at that line.",
+      "The spread is on or within a half point of 3.",
+      "Buying Carolina Panthers from +3 to +3.5 preserves the current modeled EV up to -105.3; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+      "Plain Elo disagrees with the market margin by +1.67 points; diagnostic only, with no QB adjustment.",
+      "Teaser candidates: Over +47.5 to +41.5, crossing 44, 47. Ticket prices and a partner are not established.",
+      "QB status: inactives unknown until T-90."
+    ]
+  },
+  "capture": {
+    "label": "FRIDAY",
+    "params": {
+      "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
+      "commenceTimeFrom": "2026-09-13T17:00:00Z",
+      "commenceTimeTo": "2026-09-15T00:15:00Z",
+      "dateFormat": "iso",
+      "markets": "spreads,totals",
+      "oddsFormat": "american"
+    },
+    "received_at": "2026-09-11T18:33:08.624150+00:00",
+    "request_at": "2026-09-11T18:33:08.536726+00:00",
+    "request_id": "LIVE_FRIDAY_2026_W01",
+    "source": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_FRIDAY_2026_W01/sources/1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573.json",
+      "sha256": "1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573"
+    },
+    "status": "CAPTURED"
+  },
+  "capture_label": "FRIDAY",
+  "captured_at": "2026-09-11T18:33:08.624150+00:00",
+  "consensus": {
+    "spreads": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": -3,
+          "line": 3.0,
+          "market": "spreads",
+          "power": 1.0620610589838684,
+          "probabilities": [
+            0.4789473382600413,
+            0.5210526617399588
+          ],
+          "updated_at": "2026-09-11T18:31:49Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": -3,
+          "line": 3.0,
+          "market": "spreads",
+          "power": 1.0698248525605822,
+          "probabilities": [
+            0.4814245062798449,
+            0.5185754937201552
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": -3,
+          "line": 3.0,
+          "market": "spreads",
+          "power": 1.071115843039896,
+          "probabilities": [
+            0.488395545501788,
+            0.5116044544982121
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": -3,
+          "line": 3.0,
+          "market": "spreads",
+          "power": 1.0432096687204968,
+          "probabilities": [
+            0.5,
+            0.5
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": -3.0,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": -3,
+        "retail_median": -3
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": -3.0,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -3,
+          "retail_median": -3.0
+        },
+        "draftkings": {
+          "center": -3.0,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -3,
+          "retail_median": -3.0
+        },
+        "fanduel": {
+          "center": -3.0,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -3,
+          "retail_median": -3.0
+        },
+        "williamhill_us": {
+          "center": -3.0,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -3,
+          "retail_median": -3
+        }
+      }
+    },
+    "totals": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": 48,
+          "line": 47.0,
+          "market": "totals",
+          "power": 1.0647311734675267,
+          "probabilities": [
+            0.5023369847659711,
+            0.49766301523402895
+          ],
+          "updated_at": "2026-09-11T18:31:49Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 48,
+          "line": 47.5,
+          "market": "totals",
+          "power": 1.0719425631310813,
+          "probabilities": [
+            0.5000000000000001,
+            0.5000000000000001
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": 47,
+          "line": 47.5,
+          "market": "totals",
+          "power": 1.0764584395717796,
+          "probabilities": [
+            0.4792472933629884,
+            0.5207527066370117
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": 47,
+          "line": 47.5,
+          "market": "totals",
+          "power": 1.058752976069445,
+          "probabilities": [
+            0.480046818991146,
+            0.5199531810088541
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": 47.5,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": 47,
+        "retail_median": 48
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 47.25,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 47,
+          "retail_median": 47.5
+        },
+        "draftkings": {
+          "center": 47.25,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 47,
+          "retail_median": 47.5
+        },
+        "fanduel": {
+          "center": 47.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 47,
+          "retail_median": 48.0
+        },
+        "williamhill_us": {
+          "center": 47.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 47,
+          "retail_median": 48
+        }
+      }
+    }
+  },
+  "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+  "forecast": {
+    "error": "ValueError",
+    "status": "UNAVAILABLE"
+  },
+  "game": {
+    "away_abbr": "CHI",
+    "away_team": "Chicago Bears",
+    "capture_at": "2026-09-13T15:40:00+00:00",
+    "cutoff_at": "2026-09-13T15:45:00+00:00",
+    "espn_id": "401872661",
+    "game_id": "2026_01_CHI_CAR",
+    "home_abbr": "CAR",
+    "home_team": "Carolina Panthers",
+    "kickoff_at": "2026-09-13T17:00:00+00:00",
+    "latitude": "35.2258152",
+    "longitude": "-80.8528376",
+    "neutral": false,
+    "roof": "outdoors",
+    "season": 2026,
+    "stadium_id": "CAR00",
+    "venue_source_sha256": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
+    "week": 1
+  },
+  "inactives": {
+    "status": "INACTIVES_UNAVAILABLE"
+  },
+  "lifecycle": "live-to-locked-v1",
+  "offers": [
+    {
+      "book": "draftkings",
+      "fair_probability": 0.4879518072289156,
+      "line": 3.0,
+      "market": "spreads",
+      "price": -102.0,
+      "side": "Carolina Panthers"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5120481927710844,
+      "line": -3.0,
+      "market": "spreads",
+      "price": -118.0,
+      "side": "Chicago Bears"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.4842832469775475,
+      "line": 47.5,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Over"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5157167530224525,
+      "line": 47.5,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Under"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.4879518072289156,
+      "line": 3.0,
+      "market": "spreads",
+      "price": -105.0,
+      "side": "Carolina Panthers"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5120481927710844,
+      "line": -3.0,
+      "market": "spreads",
+      "price": -115.0,
+      "side": "Chicago Bears"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.49326424870466323,
+      "line": 47.5,
+      "market": "totals",
+      "price": -102.0,
+      "side": "Over"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5067357512953368,
+      "line": 47.5,
+      "market": "totals",
+      "price": -120.0,
+      "side": "Under"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.4879518072289156,
+      "line": 3.0,
+      "market": "spreads",
+      "price": 100.0,
+      "side": "Carolina Panthers"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.5120481927710844,
+      "line": -3.0,
+      "market": "spreads",
+      "price": -118.0,
+      "side": "Chicago Bears"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.48867201115371206,
+      "line": 47.0,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Over"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.5113279888462878,
+      "line": 47.0,
+      "market": "totals",
+      "price": -108.0,
+      "side": "Under"
+    }
+  ],
+  "paper_picks": [],
+  "picks": [
+    {
+      "EV": -0.02348877374784114,
+      "book": "betmgm",
+      "conditional_win": 0.4879518072289156,
+      "edge_source": "tiebreak",
+      "exact_tie_count": 1,
+      "fair_probability": 0.4879518072289156,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": 3.0,
+      "loo_center": -3.0,
+      "loss": 0.4991364421416235,
+      "market": "spreads",
+      "price": 100.0,
+      "price_edge_cents": -4.938271604938279,
+      "push": 0.02521588946459413,
+      "quote_updated_at": "2026-09-11T18:31:49Z",
+      "seed": null,
+      "side": "Carolina Panthers",
+      "win": 0.47564766839378236
+    },
+    {
+      "EV": -0.015083477259643097,
+      "book": "betmgm",
+      "conditional_win": 0.5113279888462878,
+      "edge_source": "tiebreak",
+      "exact_tie_count": 1,
+      "fair_probability": 0.5113279888462878,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": 47.0,
+      "loo_center": 47.25,
+      "loss": 0.48428324697754754,
+      "market": "totals",
+      "price": -108.0,
+      "price_edge_cents": -3.363766048502171,
+      "push": 0.008981001727115717,
+      "quote_updated_at": "2026-09-11T18:31:49Z",
+      "seed": null,
+      "side": "Under",
+      "win": 0.5067357512953368
+    }
+  ],
+  "record_class": "paper_model_pick",
+  "status": "LIVE",
+  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041"
+}

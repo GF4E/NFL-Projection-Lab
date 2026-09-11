@@ -1,0 +1,536 @@
+{
+  "analysis": {
+    "captured_at": "2026-09-11T18:33:08.624150+00:00",
+    "measured": {
+      "elo_disagreement": 3.7179549556222264,
+      "half_points": [
+        {
+          "buy_price_available": false,
+          "from": -3.0,
+          "same_EV_max_negative_price": 110.30449826989619,
+          "side": "Dallas Cowboys",
+          "to": -2.5
+        }
+      ],
+      "spreads": {
+        "best_same_line": {
+          "advantage_cents": 0.0,
+          "book": "draftkings",
+          "fair_probability": 0.5120481927710844,
+          "line": -3.0,
+          "market": "spreads",
+          "price": -105.0,
+          "side": "Dallas Cowboys"
+        },
+        "consensus_line": 2.5,
+        "movement": null
+      },
+      "teaser_candidates": [
+        {
+          "book": "draftkings",
+          "fair_probability": 0.49326424870466323,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "line": 48.5,
+          "market": "totals",
+          "price": -105.0,
+          "side": "Over",
+          "teased_line": 42.5
+        },
+        {
+          "book": "fanduel",
+          "fair_probability": 0.47564766839378236,
+          "key_numbers_crossed": [
+            3,
+            7
+          ],
+          "line": 2.5,
+          "market": "spreads",
+          "price": 102.0,
+          "side": "New York Giants",
+          "teased_line": 8.5
+        },
+        {
+          "book": "betmgm",
+          "fair_probability": 0.507823613086771,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "line": 48.0,
+          "market": "totals",
+          "price": -110.0,
+          "side": "Over",
+          "teased_line": 42.0
+        }
+      ],
+      "totals": {
+        "best_same_line": {
+          "advantage_cents": null,
+          "book": "betmgm",
+          "fair_probability": 0.507823613086771,
+          "line": 48.0,
+          "market": "totals",
+          "price": -110.0,
+          "side": "Over"
+        },
+        "consensus_line": 48.5,
+        "movement": null
+      },
+      "wind_rule": false
+    },
+    "sentences": [
+      "Spread consensus is NYG +2.5. This is the first capture; movement is not yet measured.",
+      "DraftKings has the best captured price for Dallas Cowboys -3 at -105, 0 cents better than the next book at the same line.",
+      "Total consensus is +48.5. This is the first capture; movement is not yet measured.",
+      "BetMGM has the best captured price for Over +48 at -110; no other book has a comparable price at that line.",
+      "The spread is on or within a half point of 3.",
+      "Buying Dallas Cowboys from -3 to -2.5 preserves the current modeled EV up to -110.3; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+      "Plain Elo disagrees with the market margin by +3.72 points; diagnostic only, with no QB adjustment.",
+      "Teaser candidates: Over +48.5 to +42.5, crossing 44, 47; New York Giants +2.5 to +8.5, crossing 3, 7; Over +48 to +42, crossing 44, 47. Ticket prices and a partner are not established.",
+      "QB status: inactives unknown until T-90."
+    ]
+  },
+  "capture": {
+    "label": "FRIDAY",
+    "params": {
+      "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
+      "commenceTimeFrom": "2026-09-13T17:00:00Z",
+      "commenceTimeTo": "2026-09-15T00:15:00Z",
+      "dateFormat": "iso",
+      "markets": "spreads,totals",
+      "oddsFormat": "american"
+    },
+    "received_at": "2026-09-11T18:33:08.624150+00:00",
+    "request_at": "2026-09-11T18:33:08.536726+00:00",
+    "request_id": "LIVE_FRIDAY_2026_W01",
+    "source": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_FRIDAY_2026_W01/sources/1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573.json",
+      "sha256": "1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573"
+    },
+    "status": "CAPTURED"
+  },
+  "capture_label": "FRIDAY",
+  "captured_at": "2026-09-11T18:33:08.624150+00:00",
+  "consensus": {
+    "spreads": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": -2,
+          "line": 3.0,
+          "market": "spreads",
+          "power": 1.0607640901233029,
+          "probabilities": [
+            0.5082101662533091,
+            0.4917898337466912
+          ],
+          "updated_at": "2026-09-11T18:31:50Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": -2,
+          "line": 3.0,
+          "market": "spreads",
+          "power": 1.071115843039896,
+          "probabilities": [
+            0.5116044544982121,
+            0.488395545501788
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": -3,
+          "line": 2.5,
+          "market": "spreads",
+          "power": 1.0737205190917267,
+          "probabilities": [
+            0.4700434108998488,
+            0.5299565891001513
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": -3,
+          "line": 2.5,
+          "market": "spreads",
+          "power": 1.0439811611001075,
+          "probabilities": [
+            0.4586223610374876,
+            0.5413776389625125
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": -2.5,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": -3,
+        "retail_median": -2
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": -2.75,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -3,
+          "retail_median": -2.5
+        },
+        "draftkings": {
+          "center": -2.75,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -3,
+          "retail_median": -2.5
+        },
+        "fanduel": {
+          "center": -2.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -3,
+          "retail_median": -2.0
+        },
+        "williamhill_us": {
+          "center": -2.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -3,
+          "retail_median": -2
+        }
+      }
+    },
+    "totals": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": 49,
+          "line": 48.0,
+          "market": "totals",
+          "power": 1.0647311734675267,
+          "probabilities": [
+            0.5023369847659711,
+            0.49766301523402895
+          ],
+          "updated_at": "2026-09-11T18:31:50Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 48,
+          "line": 48.5,
+          "market": "totals",
+          "power": 1.071115843039896,
+          "probabilities": [
+            0.488395545501788,
+            0.5116044544982121
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": 48,
+          "line": 48.5,
+          "market": "totals",
+          "power": 1.071115843039896,
+          "probabilities": [
+            0.488395545501788,
+            0.5116044544982121
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": 49,
+          "line": 47.5,
+          "market": "totals",
+          "power": 1.0592896587693277,
+          "probabilities": [
+            0.5176024001146096,
+            0.4823975998853907
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": 48.5,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": 49,
+        "retail_median": 48
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 48.5,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 49,
+          "retail_median": 48.0
+        },
+        "draftkings": {
+          "center": 48.75,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 49,
+          "retail_median": 48.5
+        },
+        "fanduel": {
+          "center": 48.75,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 49,
+          "retail_median": 48.5
+        },
+        "williamhill_us": {
+          "center": 48.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 49,
+          "retail_median": 48
+        }
+      }
+    }
+  },
+  "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+  "forecast": {
+    "error": "ValueError",
+    "status": "UNAVAILABLE"
+  },
+  "game": {
+    "away_abbr": "DAL",
+    "away_team": "Dallas Cowboys",
+    "capture_at": "2026-09-13T23:00:00+00:00",
+    "cutoff_at": "2026-09-13T23:05:00+00:00",
+    "espn_id": "401872930",
+    "game_id": "2026_01_DAL_NYG",
+    "home_abbr": "NYG",
+    "home_team": "New York Giants",
+    "kickoff_at": "2026-09-14T00:20:00+00:00",
+    "latitude": "40.813507465",
+    "longitude": "-74.074342406",
+    "neutral": false,
+    "roof": "outdoors",
+    "season": 2026,
+    "stadium_id": "NYC01",
+    "venue_source_sha256": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
+    "week": 1
+  },
+  "inactives": {
+    "status": "INACTIVES_UNAVAILABLE"
+  },
+  "lifecycle": "live-to-locked-v1",
+  "offers": [
+    {
+      "book": "draftkings",
+      "fair_probability": 0.4879518072289156,
+      "line": 3.0,
+      "market": "spreads",
+      "price": -115.0,
+      "side": "New York Giants"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5120481927710844,
+      "line": -3.0,
+      "market": "spreads",
+      "price": -105.0,
+      "side": "Dallas Cowboys"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.49326424870466323,
+      "line": 48.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Over"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5067357512953368,
+      "line": 48.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Under"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.47564766839378236,
+      "line": 2.5,
+      "market": "spreads",
+      "price": 102.0,
+      "side": "New York Giants"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5243523316062176,
+      "line": -2.5,
+      "market": "spreads",
+      "price": -124.0,
+      "side": "Dallas Cowboys"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.49326424870466323,
+      "line": 48.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Over"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5067357512953368,
+      "line": 48.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Under"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.4879518072289156,
+      "line": 3.0,
+      "market": "spreads",
+      "price": -112.0,
+      "side": "New York Giants"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.5120481927710844,
+      "line": -3.0,
+      "market": "spreads",
+      "price": -105.0,
+      "side": "Dallas Cowboys"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.507823613086771,
+      "line": 48.0,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Over"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.492176386913229,
+      "line": 48.0,
+      "market": "totals",
+      "price": -108.0,
+      "side": "Under"
+    }
+  ],
+  "paper_picks": [],
+  "picks": [
+    {
+      "EV": -0.00027962825890281984,
+      "book": "draftkings",
+      "conditional_win": 0.5120481927710844,
+      "edge_source": "tiebreak",
+      "exact_tie_count": 2,
+      "fair_probability": 0.5120481927710844,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": -3.0,
+      "loo_center": -2.75,
+      "loss": 0.4756476683937823,
+      "market": "spreads",
+      "price": -105.0,
+      "price_edge_cents": -0.061728395061720676,
+      "push": 0.02521588946459413,
+      "quote_updated_at": "2026-09-11T18:32:49Z",
+      "seed": "90a74a1ffcb6886a630e9f2f62e45d6500fc8104386b4a4cf52303973110c956",
+      "side": "Dallas Cowboys",
+      "win": 0.4991364421416235
+    },
+    {
+      "EV": -0.02964358612026996,
+      "book": "betmgm",
+      "conditional_win": 0.507823613086771,
+      "edge_source": "price",
+      "exact_tie_count": 1,
+      "fair_probability": 0.507823613086771,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": 48.0,
+      "loo_center": 48.5,
+      "loss": 0.4780656303972366,
+      "market": "totals",
+      "price": -110.0,
+      "price_edge_cents": -6.820809248554895,
+      "push": 0.028670120898100174,
+      "quote_updated_at": "2026-09-11T18:31:50Z",
+      "seed": null,
+      "side": "Over",
+      "win": 0.49326424870466323
+    }
+  ],
+  "record_class": "paper_model_pick",
+  "status": "LIVE",
+  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041"
+}

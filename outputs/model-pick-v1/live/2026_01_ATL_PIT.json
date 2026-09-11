@@ -1,0 +1,523 @@
+{
+  "analysis": {
+    "captured_at": "2026-09-11T18:33:08.624150+00:00",
+    "measured": {
+      "elo_disagreement": -1.9284945662820974,
+      "half_points": [
+        {
+          "buy_price_available": false,
+          "from": 6.0,
+          "same_EV_max_negative_price": 115.55709342560549,
+          "side": "Atlanta Falcons",
+          "to": 6.5
+        }
+      ],
+      "spreads": {
+        "best_same_line": {
+          "advantage_cents": 0.0,
+          "book": "draftkings",
+          "fair_probability": 0.5120481927710844,
+          "line": 6.0,
+          "market": "spreads",
+          "price": -110.0,
+          "side": "Atlanta Falcons"
+        },
+        "consensus_line": -6.0,
+        "movement": null
+      },
+      "teaser_candidates": [
+        {
+          "book": "draftkings",
+          "fair_probability": 0.5067357512953368,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "line": 41.5,
+          "market": "totals",
+          "price": -110.0,
+          "side": "Under",
+          "teased_line": 47.5
+        },
+        {
+          "book": "fanduel",
+          "fair_probability": 0.4780656303972366,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "line": 40.5,
+          "market": "totals",
+          "price": -105.0,
+          "side": "Under",
+          "teased_line": 46.5
+        }
+      ],
+      "totals": {
+        "best_same_line": {
+          "advantage_cents": null,
+          "book": "fanduel",
+          "fair_probability": 0.5219343696027634,
+          "line": 40.5,
+          "market": "totals",
+          "price": -115.0,
+          "side": "Over"
+        },
+        "consensus_line": 41.5,
+        "movement": null
+      },
+      "wind_rule": false
+    },
+    "sentences": [
+      "Spread consensus is PIT -6. This is the first capture; movement is not yet measured.",
+      "DraftKings has the best captured price for Atlanta Falcons +6 at -110, 0 cents better than the next book at the same line.",
+      "Total consensus is +41.5. This is the first capture; movement is not yet measured.",
+      "FanDuel has the best captured price for Over +40.5 at -115; no other book has a comparable price at that line.",
+      "The spread is not within a half point of 3 or 7.",
+      "Buying Atlanta Falcons from +6 to +6.5 preserves the current modeled EV up to -115.6; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+      "Plain Elo disagrees with the market margin by -1.93 points; diagnostic only, with no QB adjustment.",
+      "Teaser candidates: Under +41.5 to +47.5, crossing 44, 47; Under +40.5 to +46.5, crossing 41, 44. Ticket prices and a partner are not established.",
+      "QB status: inactives unknown until T-90."
+    ]
+  },
+  "capture": {
+    "label": "FRIDAY",
+    "params": {
+      "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
+      "commenceTimeFrom": "2026-09-13T17:00:00Z",
+      "commenceTimeTo": "2026-09-15T00:15:00Z",
+      "dateFormat": "iso",
+      "markets": "spreads,totals",
+      "oddsFormat": "american"
+    },
+    "received_at": "2026-09-11T18:33:08.624150+00:00",
+    "request_at": "2026-09-11T18:33:08.536726+00:00",
+    "request_id": "LIVE_FRIDAY_2026_W01",
+    "source": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_FRIDAY_2026_W01/sources/1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573.json",
+      "sha256": "1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573"
+    },
+    "status": "CAPTURED"
+  },
+  "capture_label": "FRIDAY",
+  "captured_at": "2026-09-11T18:33:08.624150+00:00",
+  "consensus": {
+    "spreads": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": 6,
+          "line": -6.0,
+          "market": "spreads",
+          "power": 1.0647311734675267,
+          "probabilities": [
+            0.49766301523402895,
+            0.5023369847659711
+          ],
+          "updated_at": "2026-09-11T18:31:49Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 6,
+          "line": -6.0,
+          "market": "spreads",
+          "power": 1.0719425631310813,
+          "probabilities": [
+            0.5000000000000001,
+            0.5000000000000001
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": 6,
+          "line": -5.5,
+          "market": "spreads",
+          "power": 1.071115843039896,
+          "probabilities": [
+            0.5116044544982121,
+            0.488395545501788
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": 6,
+          "line": -5.0,
+          "market": "spreads",
+          "power": 1.041171018865629,
+          "probabilities": [
+            0.5190753876879083,
+            0.48092461231209205
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": 6.0,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": 6,
+        "retail_median": 6
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 6.0,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 6,
+          "retail_median": 6.0
+        },
+        "draftkings": {
+          "center": 6.0,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 6,
+          "retail_median": 6.0
+        },
+        "fanduel": {
+          "center": 6.0,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 6,
+          "retail_median": 6.0
+        },
+        "williamhill_us": {
+          "center": 6.0,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 6,
+          "retail_median": 6
+        }
+      }
+    },
+    "totals": {
+      "devigged_books": {
+        "betmgm": {
+          "book": "betmgm",
+          "center": 42,
+          "line": 41.0,
+          "market": "totals",
+          "power": 1.0647311734675267,
+          "probabilities": [
+            0.5023369847659711,
+            0.49766301523402895
+          ],
+          "updated_at": "2026-09-11T18:31:49Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 42,
+          "line": 41.5,
+          "market": "totals",
+          "power": 1.0719425631310813,
+          "probabilities": [
+            0.5000000000000001,
+            0.5000000000000001
+          ],
+          "updated_at": "2026-09-11T18:32:49Z"
+        },
+        "fanduel": {
+          "book": "fanduel",
+          "center": 42,
+          "line": 40.5,
+          "market": "totals",
+          "power": 1.071115843039896,
+          "probabilities": [
+            0.5116044544982121,
+            0.488395545501788
+          ],
+          "updated_at": "2026-09-11T18:32:51Z"
+        },
+        "pinnacle": {
+          "book": "pinnacle",
+          "center": 41,
+          "line": 41.5,
+          "market": "totals",
+          "power": 1.058752976069445,
+          "probabilities": [
+            0.480046818991146,
+            0.5199531810088541
+          ],
+          "updated_at": "2026-09-11T18:32:48Z"
+        }
+      },
+      "full": {
+        "center": 41.5,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": 41,
+        "retail_median": 42
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 41.5,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 41,
+          "retail_median": 42.0
+        },
+        "draftkings": {
+          "center": 41.5,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 41,
+          "retail_median": 42.0
+        },
+        "fanduel": {
+          "center": 41.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 41,
+          "retail_median": 42.0
+        },
+        "williamhill_us": {
+          "center": 41.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 41,
+          "retail_median": 42
+        }
+      }
+    }
+  },
+  "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+  "forecast": {
+    "error": "ValueError",
+    "status": "UNAVAILABLE"
+  },
+  "game": {
+    "away_abbr": "ATL",
+    "away_team": "Atlanta Falcons",
+    "capture_at": "2026-09-13T15:40:00+00:00",
+    "cutoff_at": "2026-09-13T15:45:00+00:00",
+    "espn_id": "401872658",
+    "game_id": "2026_01_ATL_PIT",
+    "home_abbr": "PIT",
+    "home_team": "Pittsburgh Steelers",
+    "kickoff_at": "2026-09-13T17:00:00+00:00",
+    "latitude": "40.4467883",
+    "longitude": "-80.0157692",
+    "neutral": false,
+    "roof": "outdoors",
+    "season": 2026,
+    "stadium_id": "PIT00",
+    "venue_source_sha256": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
+    "week": 1
+  },
+  "inactives": {
+    "status": "INACTIVES_UNAVAILABLE"
+  },
+  "lifecycle": "live-to-locked-v1",
+  "offers": [
+    {
+      "book": "draftkings",
+      "fair_probability": 0.4879518072289156,
+      "line": -6.0,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Pittsburgh Steelers"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5120481927710844,
+      "line": 6.0,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Atlanta Falcons"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.49326424870466323,
+      "line": 41.5,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Over"
+    },
+    {
+      "book": "draftkings",
+      "fair_probability": 0.5067357512953368,
+      "line": 41.5,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Under"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5008635578583766,
+      "line": -5.5,
+      "market": "spreads",
+      "price": -115.0,
+      "side": "Pittsburgh Steelers"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.4991364421416235,
+      "line": 5.5,
+      "market": "spreads",
+      "price": -105.0,
+      "side": "Atlanta Falcons"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5219343696027634,
+      "line": 40.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Over"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.4780656303972366,
+      "line": 40.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Under"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.4879518072289156,
+      "line": -6.0,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Pittsburgh Steelers"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.5120481927710844,
+      "line": 6.0,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Atlanta Falcons"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.507823613086771,
+      "line": 41.0,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Over"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.492176386913229,
+      "line": 41.0,
+      "market": "totals",
+      "price": -108.0,
+      "side": "Under"
+    }
+  ],
+  "paper_picks": [],
+  "picks": [
+    {
+      "EV": -0.021887266446851794,
+      "book": "betmgm",
+      "conditional_win": 0.5120481927710844,
+      "edge_source": "tiebreak",
+      "exact_tie_count": 2,
+      "fair_probability": 0.5120481927710844,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": 6.0,
+      "loo_center": 6.0,
+      "loss": 0.4756476683937823,
+      "market": "spreads",
+      "price": -110.0,
+      "price_edge_cents": -5.061728395061721,
+      "push": 0.02521588946459413,
+      "quote_updated_at": "2026-09-11T18:31:49Z",
+      "seed": "f0976aaf76e3b16b79fba0283364d161999f1bba9ffacd86123e0751138042df",
+      "side": "Atlanta Falcons",
+      "win": 0.4991364421416235
+    },
+    {
+      "EV": -0.02420965682961629,
+      "book": "fanduel",
+      "conditional_win": 0.5219343696027634,
+      "edge_source": "price",
+      "exact_tie_count": 1,
+      "fair_probability": 0.5219343696027634,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": 40.5,
+      "loo_center": 41.5,
+      "loss": 0.4780656303972366,
+      "market": "totals",
+      "price": -115.0,
+      "price_edge_cents": -5.823699421965301,
+      "push": 0.0,
+      "quote_updated_at": "2026-09-11T18:32:51Z",
+      "seed": null,
+      "side": "Over",
+      "win": 0.5219343696027634
+    }
+  ],
+  "record_class": "paper_model_pick",
+  "status": "LIVE",
+  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041"
+}
