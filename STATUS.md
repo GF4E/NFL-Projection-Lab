@@ -2,9 +2,9 @@
 
 Current step: compact locked-pick board, SF/LA final grades, and Caesars executions completed. SF +3.5 is WIN; Over 47.5 is LOSS. Seattle -3 is PUSH and Rams -3 is LOSS in the separate Jaret log. [Evidence and tests](work/board-redesign-v1/experiment.json).
 
-No Odds API credits used by this change. The T80/T75 schedule and frozen engine remain unchanged. The read-only refresh button fetches the latest published board; it does not dispatch odds requests. Hourly public final refreshes preserve every source and first grade.
+No Odds API credits used by this change. Week 1 has 58 of 60 credits remaining after the scheduled SF/LA capture; see the experiment budget snapshot. The T80/T75 schedule and frozen engine remain unchanged. The read-only refresh button fetches the latest published board; it does not dispatch odds requests. Hourly public final refreshes preserve every source and first grade.
 
-Next information from Gabe: Rams stake and timezone-qualified placement times for both Caesars bets. These are marked unknown; this does not block result grading or the board. Last commit before this update: `eb4746b`; this update's commit is available through Git.
+Next information from Gabe: Rams stake and timezone-qualified placement times for both Caesars bets. These are marked unknown; this does not block result grading or the board. Last verified implementation commit: `9a7a4b9`; this update's commit is available through Git.
 
 Earlier status entries below are historical and superseded where they conflict with this current snapshot.
 
