@@ -16,6 +16,11 @@ export type LockedGame = {
   verdicts: { spreads: Verdict; totals: Verdict };
   final_score?: { home: number; away: number }; margin?: number; total?: number;
   grade_status?: string;
+  cutoff_at?: string; note_deadline?: string; captured_at?: string;
+  analysis?: {sentences:string[]};
+  our_note?: {game_id:string;author:'Gabe'|'Jarrett';text:string;market:'spreads'|'totals'|'';side:string;updated_at:string} | null;
+  human_lean_grade?: string;
+  quote_pairs?: {market:'spread'|'total';side:string;point:number;americanPrice:number;book:string;capturedAt:string;marketVigPercent:number}[];
   consensus?: Partial<Record<"spreads" | "totals", {line: number; coverage: number}>>;
   best_captured?: Partial<Record<"spreads" | "totals", {book: string; price: number; side: string; line: number}>>;
   executed_picks?: {side: string; line_at_approval: string; book_price: string; executed_book: string; outcome: string}[];
@@ -23,7 +28,7 @@ export type LockedGame = {
 export type LockedBoard = {
   schema: "locked-board-v1"; version: string; published_at: string;
   content_sha256: string; default_week: number; games: LockedGame[];
-  week_records?: Record<string, Record<"model" | "price" | "paper" | "jaret", {wins: number; losses: number; pushes: number; mean_clv_cents: number | null; clv_n: number}>>;
+  week_records?: Record<string, Record<"model" | "price" | "paper" | "jarrett", {wins: number; losses: number; pushes: number; mean_clv_cents: number | null; clv_n: number}> & {human_lean?: {wins:number;losses:number;pushes:number;mean_clv_cents:number|null;clv_n:number}}>;
   clv_reference?: string;
   publication_status?: "CURRENT" | "STALE";
 };

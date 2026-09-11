@@ -278,3 +278,9 @@ export const marketSentimentSnapshots = sqliteTable("market_sentiment_snapshots"
 
 export type PlayRow = typeof plays.$inferSelect;
 export type NewPlayRow = typeof plays.$inferInsert;
+
+export const engineOurNotes = sqliteTable("engine_our_notes", {
+  gameId: text("game_id").primaryKey(),
+  payload: text("payload").notNull(),
+  cutoffAt: integer("cutoff_at").notNull(),
+});

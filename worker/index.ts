@@ -1,3 +1,4 @@
+import { ourNote } from "../src/server/our-note";
 import { readLockedBoard, refreshLockedBoard } from "../src/server/locked-board";
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
 import handler from "vinext/server/app-router-entry";
@@ -17,6 +18,8 @@ interface Env {
   ASSETS: AssetFetcher;
   DB: D1Database;
   ODDS_API_KEY?: string;
+  NOTE_EDIT_KEY?: string;
+  NOTE_SYNC_KEY?: string;
   IMAGES: {
     input(stream: ReadableStream): {
       transform(options: Record<string, unknown>): {
@@ -75,6 +78,7 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === "/api/our-note" || url.pathname === "/api/our-note/sync") return ourNote(request, env);
     if (url.pathname === "/api/model-board" || url.pathname === "/api/decision-board") {
       if (request.method !== "GET") return json({ error: "Read-only publication" }, 405);
       try { return json(await readLockedBoard(env.DB, fetch, Date.now(), url.searchParams.get("refresh") === "1")); }

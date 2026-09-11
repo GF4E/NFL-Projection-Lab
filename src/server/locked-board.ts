@@ -33,6 +33,7 @@ export function displayBoard(board: LockedBoard, checkedAt: number, now = Date.n
   return { ...board, publication_status: stale ? "STALE" : "CURRENT", games: board.games.map(g => {
     // A lock is immutable history, not a live quote. Never expire its selection.
     if (g.status === "FINAL" || g.lock_status === "LOCKED" || g.lock_status === "MISSED") return g;
+    if (g.lock_status === "LIVE" && !stale) return g;
     const v = { state: null, availability: "STALE", reason: "Awaiting scheduled capture.", edge_source: null, grade: null };
     return { ...g, status: "UPCOMING", verdicts: { spreads: v, totals: v } };
   }) };

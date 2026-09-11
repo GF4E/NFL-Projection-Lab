@@ -8,7 +8,7 @@ import type { LockedBoard, Verdict } from '../src/domain/locked-board';
 const missed:Verdict={state:null,availability:'MISSED',reason:'LATE',edge_source:null,grade:null};
 const v:Verdict={state:'HARD PASS',availability:'LOCKED',reason:'Below filter',side:'San Francisco 49ers',line:3.5,book:'betmgm',price:-102,edge_source:'tiebreak',grade:'W',fair_probability:.499,EV:-.01};
 const stats={wins:1,losses:1,pushes:0,mean_clv_cents:2,clv_n:2};
-const payload:LockedBoard={schema:'locked-board-v1',version:'test-v1',published_at:'2026-09-11T08:00Z',content_sha256:'a'.repeat(64),default_week:1,week_records:{'1':{model:stats,price:stats,paper:stats,jaret:stats}},games:[{
+const payload:LockedBoard={schema:'locked-board-v1',version:'test-v1',published_at:'2026-09-11T08:00Z',content_sha256:'a'.repeat(64),default_week:1,week_records:{'1':{model:stats,price:stats,paper:stats,jarrett:stats}},games:[{
  game_id:'2026_01_SF_LA',season:2026,week:1,home_team:'Los Angeles Rams',away_team:'San Francisco 49ers',home_abbr:'LA',away_abbr:'SF',kickoff_at:'2026-09-11T00:35Z',expires_at:'2026-09-11T00:35Z',status:'FINAL',lock_status:'LOCKED',version:'model-v1-'+ 'a'.repeat(64),freeze_time:'2026-09-10T23:19Z',final_score:{home:7,away:27},margin:-20,total:34,verdicts:{spreads:v,totals:{...v,side:'Over',line:47.5,price:-110,edge_source:'price',grade:'L'}},consensus:{spreads:{line:-4,coverage:3},totals:{line:48.5,coverage:3}},executed_picks:[{side:'Los Angeles Rams',line_at_approval:'-3',book_price:'-120',executed_book:'williamhill_us',outcome:'L'}]
 }]};
 const cached={season:2026,week:1,lines:[{id:'one',gameId:'sf-lar',book:'betmgm' as const,market:'spread' as const,side:'SF',point:3.5,americanPrice:-102,capturedAt:'2026-09-10T23:14Z',sourceEventId:'event',sourceHash:'hash',fairProbability:.49,marketVigPercent:2.3},{id:'two',gameId:'sf-lar',book:'betmgm' as const,market:'spread' as const,side:'LAR',point:-3.5,americanPrice:-118,capturedAt:'2026-09-10T23:14Z',sourceEventId:'event',sourceHash:'hash',fairProbability:.51,marketVigPercent:2.3}]};
@@ -24,12 +24,12 @@ describe('restored row board',()=>{
   expect(container.querySelectorAll('.grid-market-row')).toHaveLength(1);
   expect(container.querySelectorAll('.grid-price-cell')).toHaveLength(6);
   expect(container.querySelectorAll('img')).toHaveLength(2);
-  expect(container.querySelectorAll('.week-records dt')).toHaveLength(4);
+  expect(container.querySelectorAll('.week-records dt')).toHaveLength(5);
   expect(container.textContent).toContain('SF 27 — LA 7 FINAL');
   expect(container.textContent).not.toContain('Sep 10, 5:35');
   expect(container.textContent).toContain('SF +3.5 -102 · PASS · WIN');
   expect(container.textContent).toContain('Over 47.5 -110 · PASS · LOSS');
-  expect(container.textContent).toContain('Jaret · LA -3 -120 · LOSS');
+  expect(container.textContent).toContain('Jarrett · LA -3 -120 · LOSS');
   expect(fn.mock.calls.every(([url])=>String(url).startsWith('/api/model-board')||String(url).startsWith('/api/lines?week='))).toBe(true);
  });
  it('keeps consensus, freeze, shortened version and analytics in the expanding window',async()=>{
