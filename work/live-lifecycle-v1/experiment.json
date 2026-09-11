@@ -3,7 +3,7 @@
   "request": "Mutable live selections at Friday/Saturday noon PT, Sunday 07 PT and T80; T75 lock; measured analysis; shared pre-lock notes; canonical Jarrett name",
   "authorization": "Gabe explicitly superseded lifecycle and authorized both engine-v2 and main pushes and one Friday capture now. Selection, distribution, probability filter and Week 1 60-credit cap unchanged.",
   "lifecycle": "One current JSON per game contains two live picks; overwritten each capture. Only locked picks and frozen human leans enter scoring. Source receipts stay hash-pinned. Earlier frozen records are preserved, not rewritten. Git remains the requested backup, not a live pick history interface.",
-  "notes": "Shared secret code permits Gabe/Jarrett editing on the public site. D1 holds one note per game. Server timestamp and atomic SQL guard reject T75 and later updates. Engine freezes server note with lock. No synthetic note is entered for a real game.",
+  "notes": "Shared secret code permits Gabe/Jarrett editing on the public site. D1 holds one note per game. Server timestamp and atomic SQL guard reject T75 and later updates. Engine freezes server note with lock. No synthetic note is entered for a real game. A sync outage defers publication instead of silently dropping a saved note; captures cannot change a selection after T75, and any recovery delay is recorded in the actual freeze timestamp.",
   "analysis": "Only measured fields or explicit unknowns. Plain Elo without QB adjustment is diagnostic only. No buy-half quote implies no buy recommendation. Wind paper rule retains its existing forecast qualification.",
   "migration": {
     "canonical_source": "jarrett",
@@ -20,7 +20,7 @@
     "main_build": "PASS",
     "site_build": "PASS",
     "typecheck_both": "PASS",
-    "cloud_engine_pass": 143,
+    "cloud_engine_pass": 144,
     "cloud_engine_fail": 0,
     "frozen_hashes_unchanged": 14,
     "note_api": {
@@ -32,7 +32,18 @@
     },
     "sql_checks": "One row updated in place; insert and update past deadline rejected",
     "mac_jarrett_launchd": "Loaded; one run, exit 0, 3600-second interval",
-    "daily_capture_deferral": "Friday/Saturday noon PT and Sunday 07 PT windows defer the hourly daily job; regression test passed"
+    "daily_capture_deferral": "Friday/Saturday noon PT and Sunday 07 PT windows defer the hourly daily job; regression test passed",
+    "systemd": {
+      "capture_result": "success",
+      "capture_exit": 0,
+      "capture_timer": "enabled",
+      "daily_timer": "enabled"
+    },
+    "main_final_suite": {
+      "pass": 254,
+      "fail": 0,
+      "skip": 1
+    }
   },
   "friday_capture": {
     "status": "CAPTURED",
@@ -76,6 +87,7 @@
     "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday",
     "live_API_games": 14,
     "browser_verified": "LIVE prices captured Sep 11 11:33 PT, Jarrett 0-1-1, expanded ANALYSIS and OUR NOTE controls, earlier SF/LA WIN/LOSS and SEA PUSH remain visible",
-    "upstream_cache_fix": "Reader refresh uses timestamped publication query; cadence is unchanged. Site never computes picks."
+    "upstream_cache_fix": "Reader refresh uses timestamped publication query; cadence is unchanged. Site never computes picks.",
+    "analytics_verified": "Live page shows push probability and price-edge cents from the engine publication."
   }
 }

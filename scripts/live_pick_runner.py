@@ -100,6 +100,8 @@ def run():
         put(folder/'processed.json',{'processed_at':dt.datetime.now(dt.timezone.utc).isoformat(),'request_id':job['request_id']})
     due=[g for group in groups for g in group['games'] if timestamp(g['cutoff_at'])<=now and not (OUT/'locks'/g['game_id']/'T75-picks.json').exists()]
     saved_notes=notes() if due else {}
+    if due and saved_notes is None:
+        raise RuntimeError('Note synchronization unavailable; lock publication deferred without changing the selection')
     for g in due:
         dest=OUT/'live'/f'{g["game_id"]}.json';target=OUT/'locks'/g['game_id']/'T75-picks.json'
         if dest.exists():
