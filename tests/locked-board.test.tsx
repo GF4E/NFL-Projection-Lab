@@ -51,3 +51,12 @@ describe('read-only locked board', () => {
     expect(html).toContain('NEEDS_PARTNER');expect(html).toContain('FanDuel');
   });
 });
+
+
+it('shows a teaser price near miss without claiming a TEASE ticket', () => {
+  const v:Verdict={...verdict,state:'HARD PASS',teaser_notice:'TEASE candidate, best teaser price -120 at DraftKings',leg:'Home',original_line:-8,teased_line:-2,best_book:'draftkings',teaser_price:-120,key_numbers_crossed:[3,7],teaser_pricing:{as_of:'2026-09-11',source_page:'https://example.com/teasers',scope:'Posted reference'}};
+  const g={...game,verdicts:{spreads:v,totals:verdict}};
+  expect(renderToStaticMarkup(<GameRow game={g} book="betmgm"/>)).toContain('TEASE candidate, best teaser price -120 at DraftKings');
+  const details=renderToStaticMarkup(<GameDecision game={g}/>);
+  expect(details).toContain('Posted reference');expect(details).toContain('2026-09-11');expect(details).not.toContain('NEEDS_PARTNER');
+});

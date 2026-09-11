@@ -21,7 +21,7 @@ export function VerdictView({ title, verdict: v, game }: { title: string; verdic
   const result=grade(v.grade);
   return <p className="grid-verdict-line" title={`${title} · ${names[v.book!] ?? v.book} · ${v.edge_source === "price" ? "price edge" : "coin flip"}`}>
     <span className="grid-target">{title === "Spread" ? "S" : "T"}</span>
-    <b>{team(v.side,game)} {title === "Spread" ? odds(v.line) : v.line} {odds(v.price)}</b> · <span>{v.state === "HARD PASS" ? "PASS" : v.state}</span>
+    <b>{team(v.side,game)} {title === "Spread" ? odds(v.line) : v.line} {odds(v.price)}</b> · <span style={v.teaser_notice ? {whiteSpace:"normal"} : undefined}>{v.teaser_notice ?? (v.state === "HARD PASS" ? "PASS" : v.state)}</span>
     {result && <> · <strong className={`grade-${result.toLowerCase()}`}>{result}</strong></>}
   </p>;
 }
@@ -35,7 +35,7 @@ export function GameDecision({ game:g }: {game:LockedGame}) {
       <section className="measured-analysis"><h3>ANALYSIS</h3>{g.analysis?.sentences.map((sentence,i)=><p key={i}>{sentence}</p>) ?? <p>No measured analysis saved for this capture.</p>}</section>
       <div className="grid-analytics"><h3>Analytics</h3><table><thead><tr><th>Target / book</th><th>Fair chance</th><th>Push</th><th>EV / unit</th><th>Price edge</th><th>Source</th></tr></thead><tbody>{(["spreads","totals"] as const).map(m=>{const v=g.verdicts[m];return <tr key={m}><th>{m === "spreads"?"Spread":"Total"} · {names[v.book!] ?? v.book}</th><td>{pct(v.fair_probability)}</td><td>{pct(v.analytics?.push)}</td><td>{pct(v.EV)}</td><td>{v.analytics?.price_edge_cents?.toFixed(1) ?? "—"}¢</td><td>{v.edge_source === "price"?"price edge":"coin flip"}</td></tr>;})}</tbody></table></div>
       <p className="grid-detail-note">{g.lock_status === "LIVE" ? "Live selections, recomputed at each capture. They enter the record only at T-75." : "Locked model selections."} PASS means the pick did not qualify for a wager. Fair chance excludes pushes; EV includes them.</p>
-      {(["spreads","totals"] as const).map(m=>{const v=g.verdicts[m];return v.state === "TEASE" && <p className="grid-detail-note" key={m}>{v.leg} → {v.teased_line} · {names[v.best_book!] ?? v.best_book} · Crosses {v.key_numbers_crossed?.join(" / ")} · NEEDS_PARTNER</p>;})}
+      {(["spreads","totals"] as const).map(m=>{const v=g.verdicts[m];return (v.state === "TEASE" || (v.teaser_notice && v.leg)) && <p className="grid-detail-note" key={m}>Teaser candidate: {v.leg} {v.original_line} → {v.teased_line} · {names[v.best_book!] ?? v.best_book} {odds(v.teaser_price)} for two legs · Crosses {v.key_numbers_crossed?.join(" / ")}{v.state === "TEASE" && " · NEEDS_PARTNER"}{v.teaser_pricing && <> · <a href={v.teaser_pricing.source_page} target="_blank" rel="noreferrer">Posted reference · {v.teaser_pricing.as_of}</a> · {v.teaser_pricing.scope}</>} · Grades above are for the straight model pick.</p>;})}
     </> : <p className="grid-detail-note">{g.lock_status === "MISSED" ? "No lock: capture late" : "Awaiting scheduled capture"}</p>}
     <OurNote game={g}/>
     <footer><span title={g.version}>Version: {g.version.replace(/[a-f0-9]{64}/g,h=>h.slice(0,8))}</span><span>Capture: {when(g.captured_at ?? null)}</span><span>Freeze: {when(g.freeze_time)}</span></footer>

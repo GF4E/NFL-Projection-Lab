@@ -4,6 +4,8 @@ export type Verdict = {
   availability: string; reason?: string; side?: string; line?: number;
   book?: string; price?: number; fair_probability?: number; EV?: number;
   edge_source: string | null; grade: "W" | "L" | "PUSH" | null;
+  teaser_notice?: string | null; original_line?: number; teaser_price_basis?: string;
+  teaser_pricing?: {as_of: string; source_page: string; scope: string};
   grade_basis?: string; leg?: string; teased_line?: number;
   key_numbers_crossed?: number[]; best_book?: string; teaser_price?: number;
   analytics?: {win?: number; loss?: number; push?: number; loo_center?: number; price_edge_cents?: number; quote_updated_at?: string};
