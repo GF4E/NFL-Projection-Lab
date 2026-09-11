@@ -1,0 +1,192 @@
+{
+  "experiment": "board-redesign-v1",
+  "recorded_at": "2026-09-11T08:08:45.194687+00:00",
+  "credits_spent": 0,
+  "frozen_code_hashes_unchanged": {
+    "engine/elo.py": true,
+    "engine/live_weather.py": true,
+    "engine/market_distribution.py": true,
+    "engine/model_pick.py": true,
+    "engine/pick_store.py": true,
+    "engine/pricing.py": true,
+    "engine/t75_budget.py": true,
+    "engine/t75_capture.py": true,
+    "engine/t75_grade.py": true,
+    "engine/t75_prepare.py": true,
+    "engine/t75_report.py": true,
+    "engine/t75_shadow.py": true,
+    "scripts/model_pick_daily.py": true,
+    "scripts/model_pick_runner.py": true
+  },
+  "decisions": [
+    "Latest redesign supersedes kickoff quote expiry for display: immutable locked picks remain visible after kickoff and transport delays. No model selection, filter gate, version or frozen lock changed.",
+    "PASS displays the original selected side and its first grade; wins are not presented as filter-qualified plays.",
+    "T75 consensus displays devigged full-consensus fair centers, home-handicap sign; best price is the best qualified executed-book offer for the selected side at its frozen line.",
+    "The daily source is create-only and may precede the finish. A separate hourly public-nflverse results adapter appends hash-pinned source versions and reuses first-grade arithmetic.",
+    "Refresh board forces a read of the published engine artifact; it cannot fetch Odds API quotes, rerun a model or change a lock.",
+    "Model, price subset, paper rules and Jaret have separate weekly W-L-P and pooled mean reference CLV. Unknown Jaret placement time withholds CLV; unknown Rams stake withholds profit.",
+    "Seattle and Rams -3 -120 at Caesars recorded from explicit user confirmation. Seattle stake 200 USD from slip; Rams stake and both timezone-qualified placement timestamps remain unknown."
+  ],
+  "result_source_sha256": "68439e09858154da64ac355e43f9917946d0634cd4b0167a7217f3a0012ec392",
+  "week_1_records": {
+    "jaret": {
+      "clv_n": 0,
+      "losses": 1,
+      "mean_clv_cents": null,
+      "pushes": 1,
+      "wins": 0
+    },
+    "model": {
+      "clv_n": 2,
+      "losses": 1,
+      "mean_clv_cents": -5.953696507504738,
+      "pushes": 0,
+      "wins": 1
+    },
+    "paper": {
+      "clv_n": 0,
+      "losses": 0,
+      "mean_clv_cents": null,
+      "pushes": 0,
+      "wins": 0
+    },
+    "price": {
+      "clv_n": 1,
+      "losses": 1,
+      "mean_clv_cents": -11.907393015009475,
+      "pushes": 0,
+      "wins": 0
+    }
+  },
+  "sf_la": {
+    "away_abbr": "SF",
+    "away_team": "San Francisco 49ers",
+    "best_captured": {
+      "spreads": {
+        "book": "betmgm",
+        "line": 3.5,
+        "price": -102,
+        "side": "San Francisco 49ers"
+      },
+      "totals": {
+        "book": "betmgm",
+        "line": 47.5,
+        "price": -110,
+        "side": "Over"
+      }
+    },
+    "consensus": {
+      "spreads": {
+        "coverage": 3,
+        "line": -4.0
+      },
+      "totals": {
+        "coverage": 3,
+        "line": 48.5
+      }
+    },
+    "cutoff_at": "2026-09-10T23:20:00+00:00",
+    "executed_picks": [
+      {
+        "book_price": "-120",
+        "executed_book": "williamhill_us",
+        "line_at_approval": "-3",
+        "outcome": "L",
+        "side": "Los Angeles Rams",
+        "stake": null,
+        "stake_currency": ""
+      }
+    ],
+    "expires_at": "2026-09-11T00:35:00+00:00",
+    "final_score": {
+      "away": 27.0,
+      "home": 7.0
+    },
+    "final_source": {
+      "provider": "nflverse",
+      "sha256": "68439e09858154da64ac355e43f9917946d0634cd4b0167a7217f3a0012ec392"
+    },
+    "freeze_time": "2026-09-10T23:19:01.101515+00:00",
+    "game_id": "2026_01_SF_LA",
+    "grade_status": "SCORED",
+    "home_abbr": "LA",
+    "home_team": "Los Angeles Rams",
+    "kickoff_at": "2026-09-11T00:35:00+00:00",
+    "lock_status": "LOCKED",
+    "margin": -20.0,
+    "record_class": "paper_model_pick",
+    "recorded_at": "2026-09-10T23:19:01.101515+00:00",
+    "season": 2026,
+    "status": "FINAL",
+    "total": 34.0,
+    "verdicts": {
+      "spreads": {
+        "EV": -0.011514104778353351,
+        "analytics": {
+          "loo_center": 4.0,
+          "loss": 0.5008635578583764,
+          "price_edge_cents": -2.3460207612456685,
+          "push": 0.0,
+          "quote_updated_at": "2026-09-10T23:14:55Z",
+          "win": 0.4991364421416235
+        },
+        "availability": "LOCKED",
+        "book": "betmgm",
+        "edge_source": "tiebreak",
+        "fair_probability": 0.4991364421416235,
+        "grade": "W",
+        "grade_basis": "LOCKED_STRAIGHT_PICK",
+        "grade_source": "68439e09858154da64ac355e43f9917946d0634cd4b0167a7217f3a0012ec392",
+        "line": 3.5,
+        "price": -102.0,
+        "reason": "Locked pick fails the 60\u201370% / 10-cent filter and teaser crossing criteria.",
+        "side": "San Francisco 49ers",
+        "state": "HARD PASS"
+      },
+      "totals": {
+        "EV": -0.00357983984926985,
+        "analytics": {
+          "loo_center": 48.5,
+          "loss": 0.4780656303972366,
+          "price_edge_cents": -0.8236994219653013,
+          "push": 0.0,
+          "quote_updated_at": "2026-09-10T23:14:55Z",
+          "win": 0.5219343696027634
+        },
+        "availability": "LOCKED",
+        "book": "betmgm",
+        "edge_source": "price",
+        "fair_probability": 0.5219343696027634,
+        "grade": "L",
+        "grade_basis": "LOCKED_STRAIGHT_PICK",
+        "grade_source": "68439e09858154da64ac355e43f9917946d0634cd4b0167a7217f3a0012ec392",
+        "line": 47.5,
+        "price": -110.0,
+        "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+        "side": "Over",
+        "state": "HARD PASS"
+      }
+    },
+    "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+    "week": 1
+  },
+  "tests": {
+    "engine_pass": 127,
+    "engine_fail": 0,
+    "main_pass": 246,
+    "main_skip": 1,
+    "reader_pass": 14,
+    "reader_fail": 0
+  },
+  "verification_command": "/opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'",
+  "replay_command": "/opt/anaconda3/bin/python3.12 -B scripts/board_redesign_replay.py",
+  "budget": {
+    "weekly_cap": 60,
+    "accounted_by_week": {
+      "2026-W01": 2
+    },
+    "remaining_by_week": {
+      "2026-W01": 58
+    }
+  }
+}

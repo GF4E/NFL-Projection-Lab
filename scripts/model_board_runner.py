@@ -15,7 +15,7 @@ from scripts.nfl_engine_autopush import guard, git, REMOTE
 def push_board():
     if git('symbolic-ref', '--short', 'HEAD').strip() != b'engine-v2' or git('remote', 'get-url', 'origin').decode().strip() != REMOTE:
         raise RuntimeError('Unexpected publication branch or remote')
-    allowed = ('outputs/model-pick-v1/board.json', 'outputs/model-pick-v1/board-versions/')
+    allowed = ('outputs/model-pick-v1/board.json', 'outputs/model-pick-v1/board-versions/', 'outputs/model-pick-v1/result-refreshes/', 'outputs/model-pick-v1/final-sources/', 'outputs/model-pick-v1/grades/', 'outputs/model-pick-v1/reports/', 'outputs/jaret/grades/', 'outputs/jaret/reports/', 'outputs/jaret/source-reports/')
     staged = git('diff', '--cached', '--name-only').decode().splitlines()
     if any(not any(p == a or p.startswith(a) for a in allowed) for p in staged):
         return {'state': 'PUBLICATION_PENDING_OTHER_STAGED_WORK'}
@@ -38,6 +38,10 @@ def run(mode):
         p = subprocess.run([sys.executable, '-B', str(ROOT/'scripts'/script)], cwd=ROOT)
         if p.returncode:
             print(json.dumps({'worker_exit_code': p.returncode}), flush=True)
+    if mode == 'daily':
+        from engine.board_results import refresh
+        try: print(json.dumps({'public_final_refresh': refresh()}), flush=True)
+        except Exception as exc: print(json.dumps({'public_final_refresh': 'FAILED_LAST_GOOD_RETAINED', 'error_type': type(exc).__name__}), flush=True)
     # Bridge is a separate process boundary from the frozen quote-only worker.
     with (out/'.board-publish.lock').open('a+') as f:
         try: fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)

@@ -35,10 +35,10 @@ class BoardBridgeTests(unittest.TestCase):
         g=b['games'][0];self.assertEqual(g['status'],'FINAL');self.assertEqual(g['lock_status'],'MISSED')
         self.assertIsNone(g['freeze_time']);self.assertEqual(g['margin'],3);self.assertEqual(g['total'],23)
         for v in g['verdicts'].values():self.assertEqual(v['availability'],'MISSED');self.assertIsNone(v['grade'])
-    def test_stale_has_no_verdict(self):
+    def test_locked_pick_survives_kickoff(self):
         g=project([GAME],[RECORD],[],{},None,'test',NOW+dt.timedelta(hours=1))['games'][0]
-        self.assertEqual(g['status'],'STALE')
-        self.assertTrue(all(v['state'] is None for v in g['verdicts'].values()))
+        self.assertEqual(g['status'],'LOCKED')
+        self.assertTrue(all(v['state'] == 'PLAY' for v in g['verdicts'].values()))
     def test_final_grades_use_first_source_and_map_push(self):
         for outcome,expected in [('W','W'),('L','L'),('P','PUSH')]:
             grades=[dict(version='test',game_id='sample',market=m,kind='actual',outcome=outcome,result_source='first') for m in ('spreads','totals')]

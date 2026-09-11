@@ -98,13 +98,13 @@ def project(games, records, grades, feeds, latest_feed, version, now):
         final = bool(result)
         # The original lock remains history after kickoff, but it is no longer
         # an executable offer. Finals always take precedence over stale quotes.
-        stale = not final and (not record or now >= time(game['kickoff_at']))
+        stale = not final and not record
         row = {k: game[k] for k in ('game_id', 'season', 'week', 'home_team', 'away_team', 'home_abbr', 'away_abbr', 'kickoff_at')}
         row.update({'version': v, 'freeze_time': record.get('freeze_timestamp') if record and record['status'] == 'LOCKED' else None,
                     'recorded_at': record.get('freeze_timestamp') if record else None,
                     'cutoff_at': game.get('cutoff_at'),
                     'expires_at': game['kickoff_at'], 'lock_status': available,
-                    'status': 'FINAL' if final else 'MISSED' if available == 'MISSED' else 'STALE' if stale else 'LOCKED',
+                    'status': 'FINAL' if final else 'LOCKED' if available == 'LOCKED' else 'UPCOMING',
                     'record_class': 'paper_model_pick', 'verdicts': {}})
         for market, g in zip(('spreads', 'totals'), actual):
             if record:
@@ -159,7 +159,14 @@ def build(root=ROOT, now=None):
         source = g['result_source']
         if source not in feeds:
             feeds[source] = final_feed(pinned({'path': str(out/'final-sources'/(source+'.csv')), 'sha256': source}), source)
-    return project(list(games.values()), records, grades, feeds, latest, config['version'], now or dt.datetime.now(dt.timezone.utc))
+    refresh_refs = [json.loads(p.read_text()) for p in (out/'result-refreshes').glob('*.json')]
+    refresh_refs += [json.loads(p.read_text()) for p in (out/'daily').glob('*/results-ref.json')]
+    for ref in sorted(refresh_refs, key=lambda r: r.get('received_at', '')):
+        latest = ref['sha256']
+        feeds[latest] = final_feed(pinned(ref), latest)
+    board = project(list(games.values()), records, grades, feeds, latest, config['version'], now or dt.datetime.now(dt.timezone.utc))
+    from engine.board_summary import enrich
+    return enrich(board, records, grades, root)
 
 
 def publish(root=ROOT, now=None):

@@ -42,8 +42,10 @@ def settle(pick,result,shape):
         clv_probability=fair-1/decimal_odds(pick['book_price']) if fair is not None else None,
         clv_status='SLIP_NFLVERSE_CLOSE_PRICED',clv_reference='nflverse_close_vs_executed_price',
         clv_probability_basis='closing_fair_minus_executed_break_even; not as-placed model movement',
-        stake=float(pick['stake']),stake_currency=pick['stake_currency'],profit=float(pick['stake'])*result_grade['units'],source='jaret')
-    if timestamp(pick['placed_at'])>=timestamp(pick['commence_time']):
+        stake=float(pick['stake']) if pick['stake'] else None,stake_currency=pick['stake_currency'],profit=float(pick['stake'])*result_grade['units'] if pick['stake'] else None,source='jaret')
+    if not pick['placed_at']:
+        result_grade.update(clv_cents=None,clv_probability=None,clv_status='UNKNOWN_PLACEMENT_TIME')
+    elif timestamp(pick['placed_at'])>=timestamp(pick['commence_time']):
         result_grade.update(clv_cents=None,clv_probability=None,clv_status='INAPPLICABLE_PLACED_AFTER_PREGAME_CLOSE')
     return result_grade
 
