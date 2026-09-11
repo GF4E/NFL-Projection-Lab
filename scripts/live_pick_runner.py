@@ -50,7 +50,7 @@ def notes():
     private=ROOT/'.cloud-private/note-access.json'
     if not secret and private.exists():secret=json.loads(private.read_text()).get('NOTE_SYNC_KEY')
     if not secret:return None
-    req=urllib.request.Request('https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/api/our-note/sync',headers={'Authorization':'Bearer '+secret})
+    req=urllib.request.Request('https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/api/our-note/sync',headers={'Authorization':'Bearer '+secret,'User-Agent':'Mozilla/5.0 NFL-Engine/1.0'})
     try:
         with urllib.request.urlopen(req,timeout=10) as r:return {n['game_id']:n for n in json.load(r)['notes']}
     except Exception:return None
