@@ -43,7 +43,7 @@ The executable `--harvest elo-anya-v2` comparison pairs plain 538-default Elo an
 
 ## T75 standing model-pick deliverable (September 10 supersession)
 
-The current capture/lock schedule is T80/T75, replacing the scheduled T65 worker. The immutable runtime manifest is `work/model-pick-v1/runtime-config.json`; its version includes the cutoff and empirical distribution hash. Run `scripts/model_pick_runner.py` only on the existing primary Mac host until cloud migration is actually verified. Never claim cloud availability from local launchd status.
+The current capture/lock schedule is T80/T75, replacing the scheduled T65 worker. The immutable runtime manifest is `work/model-pick-v1/runtime-config.json`; its version includes the cutoff and empirical distribution hash. Cloud migration is verified in work/cloud-migration-v1/experiment.json. The primary is DigitalOcean droplet 599707390; systemd invokes scripts/cloud_scheduler.py around the unchanged frozen workers. Mac launchd remains standby and yields to the committed ownership lock. Never invoke the frozen runner directly on either host to bypass ownership. Ownership has no timeout: fence the previous owner and reconcile dispatch receipts and the quota ledger before a handoff. See ops/cloud/README.md. Linux uses the pinned runtime and explicit platform lock in that deployment record; Mac retains /opt/anaconda3/bin/python3.12.
 
 The new live schedule has its own authorized **60 credits per NFL week** hard cap, reserving three per kickoff group and accounting for uncertain dispatches. This supersedes the prior deliverable's cumulative cap for these new prospective requests; keep the old ledger unchanged. No manual/unscheduled refresh, retry after uncertain dispatch, or backfill.
 

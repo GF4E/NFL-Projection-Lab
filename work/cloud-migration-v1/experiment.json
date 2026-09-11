@@ -8,7 +8,7 @@
   "monthly_usd": 4,
   "admin_ssh_key_id": 59273060,
   "image": "ubuntu-24-04-x64",
-  "status": "PROVISIONED_VERIFICATION_PENDING",
+  "status": "VERIFIED_READY_TO_ACTIVATE",
   "odds_credits_spent": 0,
   "ipv4": "159.89.185.88",
   "checkout_path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6",
@@ -24,5 +24,20 @@
   "host_secret_storage": "/etc/nfl-engine/secrets.env, root:root mode 0600, injected by systemd; secret values never committed or logged.",
   "host_sizing": "Lowest available Basic size; 2 GiB swap and systemd memory limits. No backup add-on.",
   "synthetic_mac": "synthetic-mac/experiment.json",
-  "verification_status": "PENDING_CLOUD"
+  "verification_status": "133_TESTS_PASS_EACH_PLATFORM",
+  "tests": {
+    "mac_passed": 133,
+    "cloud_passed": 133,
+    "failed": 0,
+    "mac_log": "tests-mac.log",
+    "cloud_log": "tests-cloud.log"
+  },
+  "synthetic_cloud": "synthetic-cloud/experiment.json",
+  "cross_platform_comparison": {
+    "picks_exactly_equal": true,
+    "consensus_exactly_equal": true,
+    "frozen_files_verified": 14
+  },
+  "cloud_push_commit": "e68e338385ebe30dc6c2831796739775bf4de1c2",
+  "linux_explicit_lock_sha256": "466a0e0464faef03cdeb5d4c5e307e37954e6deb38b9384488d89968eaf7b8e2"
 }
