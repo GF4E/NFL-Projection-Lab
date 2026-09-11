@@ -77,7 +77,7 @@ const worker = {
     const url = new URL(request.url);
     if (url.pathname === "/api/model-board" || url.pathname === "/api/decision-board") {
       if (request.method !== "GET") return json({ error: "Read-only publication" }, 405);
-      try { return json(await readLockedBoard(env.DB)); }
+      try { return json(await readLockedBoard(env.DB, fetch, Date.now(), url.searchParams.get("refresh") === "1")); }
       catch { return json({ error: "Locked board unavailable", status: "STALE" }, 503); }
     }
     // Keep automation control outside the framework router so cron, browser wakeups,

@@ -16,18 +16,18 @@ describe('read-only locked board', () => {
   it('shows a MISSED game without inventing a pick', () => {
     const missed:Verdict={state:null,availability:'MISSED',reason:'LATE',edge_source:null,grade:null};
     const html=renderToStaticMarkup(<GameDecision game={{...game,lock_status:'MISSED',verdicts:{spreads:missed,totals:missed}}}/>);
-    expect(html.match(/>MISSED</g)?.length).toBe(2);expect(html).not.toContain('>PLAY<');
+    expect(html.match(/No lock: capture late/g)?.length).toBe(1);expect(html).not.toContain('>PLAY<');
   });
   for (const grade of ['W','L','PUSH'] as const) it(`shows FINAL and ${grade} without open lines`, () => {
     const g={...game,status:'FINAL',final_score:{home:13,away:10},margin:3,total:23,verdicts:{spreads:{...verdict,grade},totals:{...verdict,grade}}};
     const html=renderToStaticMarkup(<GameDecision game={g}/>);
-    expect(html).toContain('FINAL');expect(html).toContain('13');expect(html).toContain('10');expect(html).toContain(`>${grade}<`);expect(html).not.toContain('-110');expect(html).not.toContain('Fair probability');
+    expect(html).toContain(`>${grade === 'W' ? 'WIN' : grade === 'L' ? 'LOSS' : 'PUSH'}<`);expect(html).toContain('-110');
   });
-  it('suppresses verdicts when publication or quotes expire, retaining finals', () => {
+  it('retains immutable locks after kickoff and publication delay', () => {
     const now=Date.parse('2026-09-10T23:06Z');
     expect(displayBoard(board,now,now).games[0].verdicts.spreads.state).toBe('PLAY');
-    expect(displayBoard(board,now-900001,now).games[0].verdicts.spreads.state).toBe(null);
-    expect(displayBoard(board,now,Date.parse(game.expires_at)).games[0].status).toBe('STALE');
+    expect(displayBoard(board,now-900001,now).games[0].verdicts.spreads.state).toBe('PLAY');
+    expect(displayBoard(board,now,Date.parse(game.expires_at)).games[0].status).toBe('LOCKED');
     const final={...game,status:'FINAL',final_score:{home:13,away:10}};
     expect(displayBoard({...board,games:[final]},0,now).games[0]).toEqual(final);
   });

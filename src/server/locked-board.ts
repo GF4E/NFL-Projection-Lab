@@ -31,10 +31,10 @@ export function validateBoard(value: unknown): LockedBoard {
 export function displayBoard(board: LockedBoard, checkedAt: number, now = Date.now()): LockedBoard {
   const stale = now - checkedAt > STALE_MS;
   return { ...board, publication_status: stale ? "STALE" : "CURRENT", games: board.games.map(g => {
-    if (g.status === "FINAL" || g.lock_status === "MISSED") return g;
-    if (!stale && now < Date.parse(g.expires_at)) return g;
-    const v = { state: null, availability: "STALE", reason: "No current executable locked quote.", edge_source: null, grade: null };
-    return { ...g, status: "STALE", verdicts: { spreads: v, totals: v } };
+    // A lock is immutable history, not a live quote. Never expire its selection.
+    if (g.status === "FINAL" || g.lock_status === "LOCKED" || g.lock_status === "MISSED") return g;
+    const v = { state: null, availability: "STALE", reason: "Awaiting scheduled capture.", edge_source: null, grade: null };
+    return { ...g, status: "UPCOMING", verdicts: { spreads: v, totals: v } };
   }) };
 }
 
@@ -67,9 +67,14 @@ export async function refreshLockedBoard(db: Database, fetcher: typeof fetch = f
   await db.prepare(`INSERT INTO ${TABLE} (id,payload,checked_at) VALUES (1,?,?) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload, checked_at=excluded.checked_at WHERE excluded.checked_at >= ${TABLE}.checked_at`).bind(JSON.stringify(board), now).run();
 }
 
-export async function readLockedBoard(db: Database, fetcher: typeof fetch = fetch, now = Date.now()): Promise<LockedBoard> {
+export async function readLockedBoard(db: Database, fetcher: typeof fetch = fetch, now = Date.now(), fresh = false): Promise<LockedBoard> {
   let row: { payload: string; checked_at: number } | null = null;
   try { row = await db.prepare(`SELECT payload, checked_at FROM ${TABLE} WHERE id=1`).first<{ payload: string; checked_at: number }>(); } catch { /* Bootstrap before the first cron; still read-only. */ }
+  if (fresh) {
+    const latest = await download(fetcher);
+    if (row) assertPublicationProgress(validateBoard(JSON.parse(row.payload)), latest);
+    return displayBoard(latest, now, now);
+  }
   if (row) return displayBoard(validateBoard(JSON.parse(row.payload)), row.checked_at, now);
   return displayBoard(await download(fetcher), now, now);
 }
