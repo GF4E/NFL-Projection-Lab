@@ -1,0 +1,39 @@
+{
+  "event_id": "2026_01_SF_LA",
+  "forecast_issued_at": "2026-09-10T19:57:17+00:00",
+  "forecast_run_initialized_at": "2026-09-10T12:00:00+00:00",
+  "issuance_basis": "max GFS013/GFS025 API availability; exact run requested",
+  "kickoff_at": "2026-09-11T00:35:00+00:00",
+  "model": "gfs_global",
+  "precip_mm": 0.0,
+  "qualified_T75": true,
+  "received_at": "2026-09-10T23:15:11.662645+00:00",
+  "request_at": "2026-09-10T23:15:11.303700+00:00",
+  "requests": [
+    {
+      "received_at": "2026-09-10T23:15:10.996160+00:00",
+      "request_at": "2026-09-10T23:15:10.644492+00:00",
+      "sha256": "638aa35a842531e06046ce3aa52ecc8e8e34e812e49ccf7df6ffd19d7ed72241",
+      "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
+    },
+    {
+      "received_at": "2026-09-10T23:15:11.302148+00:00",
+      "request_at": "2026-09-10T23:15:11.000484+00:00",
+      "sha256": "97c39f79e142bcb05f0842ff5c555025786f0f6272029c397aa0c424d1f6adc0",
+      "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
+    },
+    {
+      "received_at": "2026-09-10T23:15:11.662645+00:00",
+      "request_at": "2026-09-10T23:15:11.303700+00:00",
+      "sha256": "52ae2156ba58be191f491bdaf528748d0bf34edfc12fafb7b7fd92ecfb00f2a6",
+      "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=-37.819943&longitude=144.983447&models=gfs_global&run=2026-09-10T12%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
+    }
+  ],
+  "roof": "outdoors",
+  "source_sha256": "52ae2156ba58be191f491bdaf528748d0bf34edfc12fafb7b7fd92ecfb00f2a6",
+  "status": "FORECAST",
+  "temperature_c": 13.7,
+  "valid_at": "2026-09-11T00:00+00:00",
+  "venue_source_sha256": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
+  "wind_mph": 2.7
+}

@@ -1,0 +1,40 @@
+{
+  "depth_source": {
+    "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/model-pick-v1/depth/5b8502efc9bc2abc918ab291f1a56ed2d57d1967b1679d3f6a482f658d42f166.csv",
+    "sha256": "5b8502efc9bc2abc918ab291f1a56ed2d57d1967b1679d3f6a482f658d42f166",
+    "source": {
+      "encoding": "gzip",
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/model-pick-v1/sources/52edf2ee94b7816e28595f80f3d94d7726d03558f46ad9fda5733d91892c03a6.csv.gz",
+      "raw_sha256": "db0a09454965e6fcd4d7378a19381fa53f251432f80f09ebdcc45f78f5e1bc9f",
+      "received_at": "2026-09-10T17:27:13.726233+00:00",
+      "request_at": "2026-09-10T17:26:53.866115+00:00",
+      "sha256": "52edf2ee94b7816e28595f80f3d94d7726d03558f46ad9fda5733d91892c03a6",
+      "url": "https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2026.csv"
+    }
+  },
+  "fetch_time": "2026-09-10T23:10:03.348647+00:00",
+  "raw_list": null,
+  "received_at": "2026-09-10T23:10:03.957923+00:00",
+  "response_sha256": "54f9f34014e6f5992f4b0af491574f6d75b3aecf486eed73b6f327fbb17de4da",
+  "source": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=401872657",
+  "source_note": "Only dedicated inactives collection accepted; summary injuries and missing names do not establish active status",
+  "status": "INACTIVES_UNAVAILABLE",
+  "teams": {
+    "LA": {
+      "depth_status": "AVAILABLE",
+      "depth_timestamp": "2026-09-10T12:01:46Z",
+      "fetch_status": "INACTIVES_UNAVAILABLE",
+      "listed_starters_inactive": null,
+      "starting_qb_gsis": "00-0026498",
+      "starting_qb_inactive": "unknown"
+    },
+    "SF": {
+      "depth_status": "AVAILABLE",
+      "depth_timestamp": "2026-09-10T12:01:46Z",
+      "fetch_status": "INACTIVES_UNAVAILABLE",
+      "listed_starters_inactive": null,
+      "starting_qb_gsis": "00-0037834",
+      "starting_qb_inactive": "unknown"
+    }
+  }
+}
