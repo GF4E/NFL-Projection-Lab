@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { GameDecision } from '../src/components/locked-model-board';
+import { GameDecision, GameRow } from '../src/components/locked-model-board';
 import { assertPublicationProgress, displayBoard, refreshLockedBoard, validateBoard } from '../src/server/locked-board';
 import type { LockedBoard, LockedGame, Verdict } from '../src/domain/locked-board';
 
@@ -11,16 +11,16 @@ const board: LockedBoard = {schema:'locked-board-v1',version:'test-v1',published
 describe('read-only locked board', () => {
   it('shows two published verdicts and freeze/version', () => {
     const html=renderToStaticMarkup(<GameDecision game={game}/>);
-    expect(html.match(/>PLAY</g)?.length).toBe(2);expect(html).toContain('test-v1');expect(html).toContain('Freeze:');
+    expect(html).toContain('T−75 consensus');expect(html).toContain('test-v1');expect(html).toContain('Freeze:');
   });
   it('shows a MISSED game without inventing a pick', () => {
     const missed:Verdict={state:null,availability:'MISSED',reason:'LATE',edge_source:null,grade:null};
-    const html=renderToStaticMarkup(<GameDecision game={{...game,lock_status:'MISSED',verdicts:{spreads:missed,totals:missed}}}/>);
-    expect(html.match(/No lock: capture late/g)?.length).toBe(1);expect(html).not.toContain('>PLAY<');
+    const html=renderToStaticMarkup(<GameRow book="betmgm" game={{...game,lock_status:'MISSED',verdicts:{spreads:missed,totals:missed}}}/>);
+    expect(html.match(/>no lock</g)?.length).toBe(1);expect(html).not.toContain('>PLAY<');
   });
   for (const grade of ['W','L','PUSH'] as const) it(`shows FINAL and ${grade} without open lines`, () => {
     const g={...game,status:'FINAL',final_score:{home:13,away:10},margin:3,total:23,verdicts:{spreads:{...verdict,grade},totals:{...verdict,grade}}};
-    const html=renderToStaticMarkup(<GameDecision game={g}/>);
+    const html=renderToStaticMarkup(<GameRow game={g} book="betmgm"/>);
     expect(html).toContain(`>${grade === 'W' ? 'WIN' : grade === 'L' ? 'LOSS' : 'PUSH'}<`);expect(html).toContain('-110');
   });
   it('retains immutable locks after kickoff and publication delay', () => {

@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
+import type { LiveLine } from "../domain/line-board";
 import type { LockedBoard, LockedGame, Verdict } from "../domain/locked-board";
 const names: Record<string, string> = { betmgm: "BetMGM", williamhill_us: "Caesars", fanduel: "FanDuel", draftkings: "DraftKings" };
 const odds = (n?: number) => n === undefined ? "—" : n > 0 ? `+${n}` : `${n}`;
@@ -10,35 +12,72 @@ const when = (s: string | null) => s ? new Date(s).toLocaleString("en-US", { tim
 const shortVersion = (s: string) => s.replace(/[a-f0-9]{64}/g, hash => hash.slice(0,8));
 const team = (side: string | undefined, g: LockedGame) => side === g.home_team ? g.home_abbr : side === g.away_team ? g.away_abbr : side;
 
+type CachedLines = {lines?: LiveLine[]; season?: number; week?: number; staleGameIds?: string[]};
+const abbr = (s: string) => s === "LA" ? "LAR" : s;
+const logo = (s: string) => `/team-logos/${s === "WAS" ? "wsh" : abbr(s).toLowerCase()}.png`;
+const lineGameId = (g: LockedGame) => `${abbr(g.away_abbr).toLowerCase()}-${abbr(g.home_abbr).toLowerCase()}`;
+
 export function VerdictView({ title, verdict: v, game }: { title: string; verdict: Verdict; game: LockedGame }) {
-  const label = v.state === "HARD PASS" ? "PASS" : v.state;
-  const result = grade(v.grade);
-  return <div className="pick-row"><span className="market-label">{title}</span><p>
-    <b>{team(v.side,game)} {title === "Spread" ? odds(v.line) : v.line}</b>{" · "}{names[v.book!] ?? v.book} {odds(v.price)}{" · "}
-    <span>{v.edge_source === "price" ? "price edge" : "coin flip"}</span>{" · "}<strong className={`verdict-${label?.toLowerCase()}`}>{label}</strong>
+  const result=grade(v.grade);
+  return <p className="grid-verdict-line" title={`${title} · ${names[v.book!] ?? v.book} · ${v.edge_source === "price" ? "price edge" : "coin flip"}`}>
+    <span className="grid-target">{title === "Spread" ? "S" : "T"}</span>
+    <b>{team(v.side,game)} {title === "Spread" ? odds(v.line) : v.line} {odds(v.price)}</b> · <span>{v.state === "HARD PASS" ? "PASS" : v.state}</span>
     {result && <> · <strong className={`grade-${result.toLowerCase()}`}>{result}</strong></>}
-  </p></div>;
+  </p>;
 }
 
-export function GameDecision({ game: g }: { game: LockedGame }) {
-  const locked = g.lock_status === "LOCKED";
-  const missed = g.lock_status === "MISSED";
-  const spread = g.consensus?.spreads, total = g.consensus?.totals;
-  return <div className="locked-decision">
-    {missed ? <span className="no-lock">No lock: capture late</span> : locked ? <>
-      <p className="consensus-line">T−75 consensus · {g.home_abbr} {odds(spread?.line)} · Total {total?.line ?? "—"}
-        {(["spreads","totals"] as const).map(m => {const b=g.best_captured?.[m];return b && <span key={m}> · Best {team(b.side,g)} {m === "spreads" ? odds(b.line) : b.line}: {names[b.book] ?? b.book} {odds(b.price)}</span>;})}
-      </p>
-      <VerdictView title="Spread" verdict={g.verdicts.spreads} game={g}/>
-      <VerdictView title="Total" verdict={g.verdicts.totals} game={g}/>
-      <details className="pick-analytics"><summary>Analytics</summary><div className="analytics-scroll"><table><thead><tr><th>Target</th><th>Fair chance</th><th>Push</th><th>EV / unit</th><th>Price edge</th></tr></thead><tbody>{(["spreads","totals"] as const).map(m=>{const v=g.verdicts[m];return <tr key={m}><th>{m === "spreads" ? "Spread" : "Total"}</th><td>{pct(v.fair_probability)}</td><td>{pct(v.analytics?.push)}</td><td>{pct(v.EV)}</td><td>{v.analytics?.price_edge_cents?.toFixed(1) ?? "—"}¢</td></tr>;})}</tbody></table></div><p>Frozen model selections. PASS means the pick did not qualify for a wager. Fair chance excludes pushes; EV includes them.</p>{g.verdicts.spreads.state === "TEASE" && <p>{names[g.verdicts.spreads.best_book!] ?? g.verdicts.spreads.best_book} · Teased line {odds(g.verdicts.spreads.teased_line)} · Crosses {g.verdicts.spreads.key_numbers_crossed?.join(" / ")} · NEEDS_PARTNER</p>}</details>
-    </> : <p className="awaiting-capture">{g.status === "UPCOMING" || g.status === "STALE" ? <span>STALE · </span> : null}Awaiting scheduled capture</p>}
-    {!!g.executed_picks?.length && <div className="executed-bets">{g.executed_picks.map((p,i)=><p key={i}>Jaret · {team(p.side,g)} {odds(Number(p.line_at_approval))} · {names[p.executed_book] ?? p.executed_book} {odds(Number(p.book_price))} · <b className={`grade-${grade(p.outcome)?.toLowerCase()}`}>{grade(p.outcome)}</b></p>)}</div>}
-    <footer><span title={g.version}>{shortVersion(g.version)}</span><span>Freeze: {missed ? "No lock" : when(g.freeze_time)}</span></footer>
+export function GameDecision({ game:g }: {game:LockedGame}) {
+  return <div className="grid-decision-window" id={`decision-${g.game_id}`}>
+    <header><b>DECISION WINDOW · {g.away_abbr} @ {g.home_abbr}</b></header>
+    {g.lock_status === "LOCKED" ? <>
+      <p className="consensus-line">T−75 consensus · {g.home_abbr} {odds(g.consensus?.spreads?.line)} · Total {g.consensus?.totals?.line ?? "—"}
+        {(["spreads","totals"] as const).map(m=>{const b=g.best_captured?.[m];return b && <span key={m}> · Best {team(b.side,g)} {m==="spreads"?odds(b.line):b.line}: {names[b.book] ?? b.book} {odds(b.price)}</span>;})}</p>
+      <div className="grid-analytics"><h3>Analytics</h3><table><thead><tr><th>Target / book</th><th>Fair chance</th><th>Push</th><th>EV / unit</th><th>Price edge</th><th>Source</th></tr></thead><tbody>{(["spreads","totals"] as const).map(m=>{const v=g.verdicts[m];return <tr key={m}><th>{m === "spreads"?"Spread":"Total"} · {names[v.book!] ?? v.book}</th><td>{pct(v.fair_probability)}</td><td>{pct(v.analytics?.push)}</td><td>{pct(v.EV)}</td><td>{v.analytics?.price_edge_cents?.toFixed(1) ?? "—"}¢</td><td>{v.edge_source === "price"?"price edge":"coin flip"}</td></tr>;})}</tbody></table></div>
+      <p className="grid-detail-note">Frozen model selections. PASS means the pick did not qualify for a wager. Fair chance excludes pushes; EV includes them.</p>
+      {(["spreads","totals"] as const).map(m=>{const v=g.verdicts[m];return v.state === "TEASE" && <p className="grid-detail-note" key={m}>{v.leg} → {v.teased_line} · {names[v.best_book!] ?? v.best_book} · Crosses {v.key_numbers_crossed?.join(" / ")} · NEEDS_PARTNER</p>;})}
+    </> : <p className="grid-detail-note">{g.lock_status === "MISSED" ? "No lock: capture late" : "Awaiting scheduled capture"}</p>}
+    <footer><span title={g.version}>Version: {shortVersion(g.version)}</span><span>Freeze: {when(g.freeze_time)}</span></footer>
+  </div>;
+}
+
+function PricePair({game:g,lines,market,stale}: {game:LockedGame;lines:LiveLine[];market:LiveLine["market"];stale:boolean}) {
+  const sides=market === "total" ? ["Over","Under"] : [abbr(g.away_abbr),abbr(g.home_abbr)];
+  const pair=sides.map(side=>lines.find(l=>l.market===market && l.side.toLowerCase()===side.toLowerCase()));
+  const vig=pair[0]?.marketVigPercent;
+  return <div className={`grid-price-pair ${stale ? "cached-stale" : ""}`}>
+    {pair.map((line,i)=><div className="grid-price-cell" key={sides[i]} title={line ? `${sides[i]} · ${names[line.book]} · Saved ${when(line.capturedAt)}` : `${sides[i]} ${market} unavailable`}>
+      <strong>{line ? market==="moneyline" ? odds(line.americanPrice) : market==="total" ? `${i===0?'O':'U'} ${line.point}` : odds(line.point ?? undefined) : "—"}</strong>
+      {line && market!=="moneyline" && <span>{odds(line.americanPrice)}</span>}
+    </div>)}
+    <small>VIG {typeof vig==='number' ? `${vig.toFixed(1)}%` : '—'}</small>
+  </div>;
+}
+
+export function GameRow({game:g,quotes,book}: {game:LockedGame;quotes?:CachedLines|null;book:string}) {
+  const [open,setOpen]=useState(false);
+  const id=lineGameId(g);
+  const lines=quotes?.season===g.season && quotes.week===g.week ? quotes.lines?.filter(l=>l.gameId===id && l.book===book) ?? [] : [];
+  const stale=g.status!=='FINAL' && g.lock_status!=='LOCKED' && (!lines.length || !!quotes?.staleGameIds?.includes(id));
+  return <div className="grid-event" aria-label={`${g.away_abbr} at ${g.home_abbr}`}>
+    <div className="grid-market-row">
+      <div className="grid-matchup">
+        <div className={`grid-game-time ${g.status==='FINAL'?'grade-win':''}`}>{g.status==='FINAL' ? `${g.away_abbr} ${g.final_score!.away} — ${g.home_abbr} ${g.final_score!.home} FINAL` : when(g.kickoff_at)}</div>
+        {[['away',g.away_abbr,g.away_team],['home',g.home_abbr,g.home_team]].map(([side,code,name])=><div className="grid-team" key={side} title={name}><Image src={logo(code)} alt="" width={27} height={27} unoptimized /><b>{abbr(code)}</b><span>{name.split(' ').slice(-1)}</span></div>)}
+      </div>
+      {(['spread','total','moneyline'] as const).map(m=><PricePair key={m} game={g} lines={lines} market={m} stale={stale}/>)}
+      <div className="grid-verdict">
+        {g.lock_status==='MISSED' ? <span className="grid-no-lock">no lock</span> : g.lock_status==='LOCKED' ? <><VerdictView title="Spread" verdict={g.verdicts.spreads} game={g}/><VerdictView title="Total" verdict={g.verdicts.totals} game={g}/></> : <span className="grid-waiting">UPCOMING · STALE</span>}
+        <button className="grid-expand" aria-expanded={open} aria-controls={`decision-${g.game_id}`} onClick={()=>setOpen(!open)}>{open?'Close analytics ↑':'Analytics ↓'}</button>
+        {g.executed_picks?.map((p,i)=><p className="grid-jaret" key={i} title={names[p.executed_book] ?? p.executed_book}>Jaret · {team(p.side,g)} {odds(Number(p.line_at_approval))} {odds(Number(p.book_price))} · <b className={`grade-${grade(p.outcome)?.toLowerCase()}`}>{grade(p.outcome)}</b></p>)}
+      </div>
+    </div>
+    {open && <GameDecision game={g}/>}
   </div>;
 }
 
 export function LockedModelBoard() {
+  const [book,setBook]=useState("betmgm");
+  const [quotes,setQuotes]=useState<CachedLines|null>(null);
   const [board,setBoard]=useState<LockedBoard|null>(null);
   const [week,setWeek]=useState<number|null>(null);
   const [error,setError]=useState<string|null>(null);
@@ -55,15 +94,26 @@ export function LockedModelBoard() {
   const selected=week ?? board?.default_week ?? 1;
   const games=board?.games.filter(g=>g.week===selected) ?? [];
   const records=board?.week_records?.[String(selected)];
+  useEffect(()=>{
+    if(refreshing)return;
+    const controller=new AbortController();
+    void fetch(`/api/lines?week=${selected}`,{cache:"no-store",signal:controller.signal}).then(async r=>{
+      if(!r.ok)throw new Error("Cached prices unavailable");
+      const data=await r.json() as CachedLines;
+      if(!controller.signal.aborted)setQuotes(data);
+    }).catch(()=>{if(!controller.signal.aborted)setQuotes(null);});
+    return()=>controller.abort();
+  },[selected,board?.published_at,refreshing]);
   return <section className="locked-board" aria-label="Locked model board">
-    <style>{`.locked-board{max-width:1700px;margin:auto;color:#e9efeb;padding:16px 20px;font-size:14px;font-variant-numeric:tabular-nums}.locked-heading{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:14px}.locked-heading h1{font-size:30px;line-height:1.15;margin:3px 0;font-weight:800;letter-spacing:-.6px}.locked-heading small{font-size:10px;letter-spacing:1.3px;color:#b6c5bb}.board-controls{display:flex;gap:10px;align-items:center}.board-controls select,.board-controls button{background:#17271f;color:#eef4ee;border:1px solid #476051;border-radius:5px;padding:8px 10px;font:inherit;cursor:pointer}.board-controls button:disabled{opacity:.6;cursor:wait}.week-records{display:grid;grid-template-columns:max-content max-content auto;gap:4px 18px;margin:0 0 16px;padding:10px 14px;background:#101d17;border-left:2px solid #b6e877;font-size:12px;max-width:550px}.week-records dt,.week-records dd{margin:0}.week-records dt{color:#b8c8be}.week-records dd{font-weight:600}.week-records small{color:#91a59a}.game-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:12px}.locked-game{border:1px solid #354b3e;background:#101b16;border-radius:7px;overflow:hidden;padding:14px;min-width:0}.game-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}.game-heading h2{font-size:16px;line-height:1.3;margin:0;font-weight:700;letter-spacing:0}.game-heading time{font-size:11px;color:#a7baad;display:block;margin-top:4px}.game-status{border:1px solid #43594b;border-radius:4px;padding:4px 6px;white-space:nowrap;font-size:10px;font-weight:700;letter-spacing:.25px}.status-final{color:#c5f183;border-color:#536e39}.consensus-line{font-size:10px;color:#a2b6a9;line-height:1.6;margin:0 0 7px;padding-bottom:8px;border-bottom:1px solid #2d4134}.pick-row{display:grid;grid-template-columns:45px 1fr;gap:7px;padding:8px 0;border-bottom:1px solid #243b2c;align-items:baseline}.market-label{font-size:10px;text-transform:uppercase;color:#a1b7a8;font-weight:700}.pick-row p{margin:0;font-size:12px;line-height:1.6}.pick-row strong,.pick-row b{font-weight:700}.verdict-pass{color:#b1bbb3}.verdict-play,.grade-win{color:#c4ef81}.verdict-tease{color:#e7c178}.grade-loss{color:#ff9c96}.grade-push{color:#c8d4e0}.no-lock{display:inline-block;font-size:11px;border:1px solid #675b3f;color:#d8c59b;border-radius:4px;padding:4px 7px;margin:2px 0 6px}.awaiting-capture{font-size:12px;color:#8fa698;margin:14px 0}.awaiting-capture span{font-size:10px;color:#c1ab7f}.locked-decision footer{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 12px;font-size:9px;color:#92a79a;padding-top:10px;line-height:1.5}.pick-analytics{margin-top:9px;font-size:11px}.pick-analytics summary{cursor:pointer;color:#bbdba7;font-weight:600;padding:3px 0}.pick-analytics p{color:#a3b3a8;font-size:10px;line-height:1.5;margin:8px 0 0}.analytics-scroll{overflow-x:auto}.pick-analytics table{width:100%;border-collapse:collapse;font-size:10px;margin-top:8px}.pick-analytics th,.pick-analytics td{text-align:right;padding:6px 4px;border-bottom:1px solid #314737}.pick-analytics th:first-child{text-align:left}.executed-bets{font-size:11px;color:#c5d4c9;margin-top:8px;padding:6px 8px;border-radius:3px;background:#1a2b21}.executed-bets p{margin:0;line-height:1.6}.locked-alert{padding:8px 12px;border:1px solid #7b6841;color:#e6ca87;font-size:12px}.record-note{font-size:10px;color:#93a799;margin:0 0 12px}.board-empty{font-size:13px;padding:20px 0}@media(min-width:1900px){.game-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:1000px){.game-grid{grid-template-columns:1fr}}@media(max-width:550px){.locked-board{padding:12px 8px}.locked-heading{align-items:flex-start;gap:8px}.locked-heading h1{font-size:26px}.board-controls{gap:5px;flex-wrap:wrap;justify-content:flex-end;font-size:11px}.game-heading h2{font-size:14px}.locked-game{padding:11px}.pick-row p{font-size:11px}.game-status{white-space:normal;max-width:115px;text-align:right}.week-records{gap:4px 10px}.locked-decision footer{font-size:8px}}`}</style>
+    <style>{`.locked-board{max-width:1700px;margin:auto;color:#e9efeb;padding:14px 18px;font-size:13px;font-variant-numeric:tabular-nums}.locked-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:10px}.locked-heading h1{font-size:30px;line-height:1.15;margin:3px 0;font-weight:800;letter-spacing:-.6px}.locked-heading small{font-size:10px;letter-spacing:1.2px;color:#b6c5bb}.board-controls{display:flex;gap:10px;align-items:center}.board-controls select,.board-controls button,.grid-price-toolbar button{background:#17271f;color:#eef4ee;border:1px solid #476051;border-radius:4px;padding:7px 10px;font:inherit;cursor:pointer}.board-controls button:disabled{opacity:.6;cursor:wait}.week-records{display:grid;grid-template-columns:max-content max-content auto;gap:3px 15px;margin:0 0 10px;padding:7px 12px;background:#101d17;border-left:2px solid #b6e877;font-size:11px;max-width:490px}.week-records dt,.week-records dd{margin:0}.week-records dt{color:#b8c8be}.week-records dd{font-weight:600}.week-records small{color:#91a59a}.record-note{font-size:9px;color:#93a799;margin:0 0 10px}.grid-price-toolbar{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:8px}.grid-price-toolbar>div{display:flex;gap:4px}.grid-price-toolbar button{font-size:10px;padding:5px 10px}.grid-price-toolbar button[aria-pressed=true]{color:#121e18;background:#c5ed8b;border-color:#c5ed8b}.grid-price-toolbar small{font-size:9px;color:#90a69a}.grid-table-scroll{overflow-x:auto;border:1px solid #34453b}.grid-column-head,.grid-market-row{display:grid;grid-template-columns:minmax(170px,1.25fr) repeat(3,minmax(85px,.65fr)) minmax(230px,1.65fr);gap:8px;min-width:720px;align-items:stretch}.grid-column-head{padding:9px 10px;background:#18251e;color:#9cb0a2;font-size:9px;font-weight:800;letter-spacing:1px}.grid-column-head>span:not(:first-child){text-align:center}.grid-event{min-width:720px;border-top:1px solid #33463a;background:#0f1b15}.grid-market-row{padding:8px 10px;min-height:103px}.grid-matchup{min-width:0}.grid-game-time{font-size:9px;color:#a4b9aa;margin-bottom:4px;font-weight:600;white-space:nowrap}.grid-team{display:flex;align-items:center;gap:7px;min-height:30px}.grid-team img{object-fit:contain;width:27px;height:27px;flex:0 0 27px}.grid-team>b{font-size:15px;width:34px}.grid-team>span{font-size:10px;color:#8fa497;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.grid-price-pair{display:grid;grid-template-rows:1fr 1fr 12px;gap:3px;padding-top:14px}.grid-price-cell{display:flex;align-items:center;justify-content:center;gap:7px;min-height:27px;border:1px solid #354c3c;background:#17251c;border-radius:3px}.grid-price-cell strong{font-size:13px;line-height:1.1}.grid-price-cell span{font-size:10px;color:#c4d2c7}.grid-price-pair>small{font-size:8px;color:#96a99a;text-align:center}.grid-price-pair.cached-stale .grid-price-cell{background:#131e17;color:#afbbb2}.grid-verdict{display:flex;flex-direction:column;justify-content:center;gap:5px;padding:3px 0 0 6px;border-left:1px solid #304235;min-width:0}.grid-verdict-line,.grid-jaret{margin:0;font-size:10px;white-space:nowrap;line-height:1.4}.grid-verdict-line>b{font-weight:700}.grid-target{display:inline-block;width:12px;color:#859d8b;font-size:8px}.grade-win{color:#bdec87!important}.grade-loss{color:#ff918b!important}.grade-push{color:#c3d6e4!important}.grid-no-lock{font-size:9px;color:#acb5ae;border:1px solid #566058;border-radius:3px;padding:3px 6px;align-self:flex-start;background:#202a23}.grid-waiting{font-size:9px;color:#91a296}.grid-expand{cursor:pointer;font-family:inherit;font-size:9px;font-weight:600;background:transparent;border:0;color:#b2d19d;text-align:left;padding:0;align-self:flex-start}.grid-jaret{color:#acbfb0;font-size:9px}.grid-decision-window{border-top:1px solid #40543e;background:#17251c;padding:12px 16px}.grid-decision-window header{font-size:10px;letter-spacing:1px;color:#c4e0b1;margin-bottom:8px}.consensus-line{font-size:10px;color:#b5c5b7;line-height:1.6;margin:5px 0 9px}.grid-analytics{overflow-x:auto}.grid-analytics h3{font-size:11px;margin:0 0 4px}.grid-analytics table{width:100%;border-collapse:collapse;font-size:10px}.grid-analytics th,.grid-analytics td{padding:6px 8px;border-bottom:1px solid #354936;text-align:right}.grid-analytics th:first-child{text-align:left}.grid-detail-note{font-size:9px;color:#9aaf9d;margin:8px 0;line-height:1.5}.grid-decision-window footer{display:flex;justify-content:space-between;font-size:9px;gap:10px;color:#94a997;margin-top:10px}.locked-alert{padding:8px 12px;border:1px solid #7b6841;color:#e6ca87;font-size:12px}.board-empty{font-size:13px;padding:20px 0}@media(max-width:550px){.locked-board{padding:12px 6px}.locked-heading{align-items:flex-start;gap:8px}.locked-heading h1{font-size:26px}.board-controls{gap:4px;flex-wrap:wrap;justify-content:flex-end;font-size:10px}.grid-price-toolbar small{max-width:160px;text-align:right}.week-records{gap:3px 8px}}`}</style>
     <header className="locked-heading"><div><small>NFL PROJECTION LAB · BETA</small><h1>Week {selected}</h1></div><div className="board-controls"><label>Week <select aria-label="Week" value={selected} onChange={e=>setWeek(Number(e.target.value))}>{Array.from({length:18},(_,i)=><option key={i+1} value={i+1}>{i+1}</option>)}</select></label><button disabled={refreshing} onClick={()=>{setRefreshing(true);void refresh(undefined,true);}}>{refreshing ? "Refreshing…" : "Refresh board"}</button></div></header>
     <dl className="week-records">{([['model','Model picks'],['price','Price picks'],['paper','Paper rules'],['jaret','Jaret']] as const).map(([key,label])=>{const r=records?.[key];return <div key={key} style={{display:'contents'}}><dt>{label}</dt><dd>{r ? `${r.wins}-${r.losses}-${r.pushes}` : '—'}</dd><small>{r?.mean_clv_cents != null ? `Mean CLV ${r.mean_clv_cents>0?'+':''}${r.mean_clv_cents.toFixed(1)}¢ · n=${r.clv_n}` : 'CLV pending'}</small></div>;})}</dl>
     <p className="record-note">W-L-P · Model and paper picks are separate from Jaret’s wagers. CLV uses the nflverse closing reference.</p>
     {error && <p className="locked-alert" role="status">{error}</p>}
     {board?.publication_status === "STALE" && <p className="locked-alert">Publication update delayed. Saved locks and grades remain visible.</p>}
     {!board && !error && <p className="board-empty">Loading picks…</p>}
-    <div className="game-grid">{games.map(g=><article className="locked-game" key={g.game_id} aria-label={`${g.away_abbr} at ${g.home_abbr}`}><header className="game-heading"><div><h2>{g.away_team} at {g.home_team}</h2><time dateTime={g.kickoff_at}>{when(g.kickoff_at)}</time></div><span className={`game-status ${g.status==='FINAL'?'status-final':''}`}>{g.status==='FINAL'?`${g.away_abbr} ${g.final_score!.away} — ${g.home_abbr} ${g.final_score!.home} FINAL`:g.lock_status==='LOCKED'?'LOCKED':'UPCOMING'}</span></header><GameDecision game={g}/></article>)}</div>
+    <div className="grid-price-toolbar"><div role="group" aria-label="Displayed sportsbook">{['betmgm','fanduel'].map(b=><button key={b} aria-pressed={book===b} onClick={()=>setBook(b)}>{names[b]}</button>)}</div><small>Saved prices · {names[book]} · Model verdict books remain frozen</small></div>
+    <div className="grid-table-scroll"><div className="grid-column-head"><span>MATCHUP</span><span>SPREAD</span><span>TOTAL</span><span>MONEY</span><span>VERDICT</span></div>{games.map(g=><GameRow key={g.game_id} game={g} quotes={quotes} book={book}/>)}</div>
     {board && !games.length && <p className="board-empty">No published games for this week.</p>}
   </section>;
 }
