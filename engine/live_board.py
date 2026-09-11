@@ -23,6 +23,8 @@ def enrich_live(board, records, root):
             g['verdicts']={m:{**verdict(r,m),'availability':'LIVE'} for m in ('spreads','totals')}
             g['consensus']={m:{'line':(-1 if m=='spreads' else 1)*v['full']['center'],'coverage':v['full']['coverage']} for m,v in r['consensus'].items()}
             g['best_captured']={m:r['analysis']['measured'][m]['best_same_line'] for m in ('spreads','totals')}
+            for pick in r['picks']:
+                g['verdicts'][pick['market']]['analytics']={k:pick.get(k) for k in ('win','loss','push','loo_center','price_edge_cents','quote_updated_at')}
         pairs=[]
         for o in r.get('offers',[]):
             same=[p for p in r['offers'] if p['book']==o['book'] and p['market']==o['market']]

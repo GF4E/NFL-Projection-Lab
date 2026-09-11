@@ -56,6 +56,11 @@ class LiveTests(unittest.TestCase):
   for at,label in [('2026-09-11T19:00:00+00:00','FRIDAY'),('2026-09-12T19:00:00+00:00','SATURDAY'),('2026-09-13T14:00:00+00:00','SUNDAY'),('2026-09-13T15:40:00+00:00','T80')]:
    self.assertIn(label,[j['label'] for j in jobs([g],dt.datetime.fromisoformat(at))])
   self.assertFalse(jobs([g],dt.datetime.fromisoformat('2026-09-11T19:01:01+00:00')))
+ def test_daily_yields_for_weekly_capture(self):
+  from scripts.cloud_scheduler import weekly_capture_window
+  for at in ['2026-09-11T19:00:00+00:00','2026-09-12T19:00:15+00:00','2026-09-13T14:00:00+00:00']:
+   self.assertTrue(weekly_capture_window(dt.datetime.fromisoformat(at)))
+  self.assertFalse(weekly_capture_window(dt.datetime.fromisoformat('2026-09-11T20:00:00+00:00')))
  def test_transport_outside_window_no_dispatch(self):
   with patch('engine.live_capture.urllib.request.urlopen') as http:
    with self.assertRaises(ValueError):capture({'start':'2026-09-11T19:00:00Z'},Path('/unused'),Path('/unused'),'test',dt.datetime.fromisoformat('2026-09-11T19:02:00+00:00'))

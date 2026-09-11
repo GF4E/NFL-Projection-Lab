@@ -12,19 +12,70 @@
     "old_jaret_artifacts": "Read-only historical copies, excluded from active readers; kept because deleting files and overwriting first grades is prohibited."
   },
   "verification": {
-    "engine_pass": 143,
+    "engine_pass": 144,
     "engine_fail": 0,
     "web_pass": 254,
     "web_fail": 0,
     "web_skip": 1,
     "main_build": "PASS",
     "site_build": "PASS",
-    "typecheck_both": "PASS"
+    "typecheck_both": "PASS",
+    "cloud_engine_pass": 143,
+    "cloud_engine_fail": 0,
+    "frozen_hashes_unchanged": 14,
+    "note_api": {
+      "no_key": 401,
+      "read": 200,
+      "sync": 200,
+      "final_game_write_rejected": 409,
+      "cloud_sync_available": true
+    },
+    "sql_checks": "One row updated in place; insert and update past deadline rejected",
+    "mac_jarrett_launchd": "Loaded; one run, exit 0, 3600-second interval",
+    "daily_capture_deferral": "Friday/Saturday noon PT and Sunday 07 PT windows defer the hourly daily job; regression test passed"
   },
-  "friday_capture": "PENDING",
+  "friday_capture": {
+    "status": "CAPTURED",
+    "received_at": "2026-09-11T18:33:08.624150+00:00",
+    "local_time_PT": "2026-09-11 11:33:08 PDT",
+    "receipt": "outputs/model-pick-v1/captures/LIVE_FRIDAY_2026_W01/capture.json",
+    "source_sha256": "1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573",
+    "upcoming_games": 14,
+    "live_picks": 28,
+    "pick_log_rows_remain": 2,
+    "credits_spent": 2,
+    "weekly_spent": 4,
+    "weekly_remaining": 56,
+    "weekly_cap": 60,
+    "artifact_commit": "f7941c010a075d3207a404d7a6b81e7b67c6ceb4",
+    "duplicate_noon_dispatch": "same request ID and processed receipt; suppressed"
+  },
   "credits_before": {
     "spent": 2,
     "remaining": 58,
     "cap": 60
+  },
+  "weather": {
+    "outdoor_games": 8,
+    "qualified_forecasts": 0,
+    "reason": "Pinned Open-Meteo GFS013/GFS025 metadata have different initialization times. Existing fail-closed gate preserved. No observed weather substituted, no WIND rule picks created.",
+    "raw_initialization_times": [
+      1789106400,
+      1789128000
+    ]
+  },
+  "verification_commands": {
+    "engine": "/opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'",
+    "offline_replay": "/opt/anaconda3/bin/python3.12 -B scripts/model_pick_replay.py"
+  },
+  "publication": {
+    "site_version": 175,
+    "status": "succeeded",
+    "site_source_commit": "39463744343f0e1176e2b1c367a92d177354b8cf",
+    "main_commit": "974edd8b5e5d887cc58cdff9a8dc669253ad1ab4",
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday",
+    "live_API_games": 14,
+    "browser_verified": "LIVE prices captured Sep 11 11:33 PT, Jarrett 0-1-1, expanded ANALYSIS and OUR NOTE controls, earlier SF/LA WIN/LOSS and SEA PUSH remain visible",
+    "upstream_cache_fix": "Reader refresh uses timestamped publication query; cadence is unchanged. Site never computes picks."
   }
 }

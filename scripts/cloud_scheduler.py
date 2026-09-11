@@ -72,6 +72,15 @@ def publish_artifacts():
     return head
 
 
+def weekly_capture_window(current):
+    from zoneinfo import ZoneInfo
+    local = current.astimezone(ZoneInfo('America/Los_Angeles'))
+    if local.weekday() not in (4, 5, 6):
+        return False
+    scheduled = local.replace(hour=7 if local.weekday() == 6 else 12, minute=0, second=0, microsecond=0)
+    return scheduled-dt.timedelta(minutes=6) <= local <= scheduled+dt.timedelta(minutes=1)
+
+
 def capture_window(current=None):
     """Postpone preparation/grading during a capture/lock window."""
     current = current or dt.datetime.now(dt.timezone.utc)
@@ -81,7 +90,7 @@ def capture_window(current=None):
             continue
         from engine.pick_store import read_pinned
         schedule = read_pinned(json.loads(p.read_text()))
-        return any(dt.datetime.fromisoformat(g['capture_at'])-dt.timedelta(minutes=6)
+        return (weekly_capture_window(current) and any(dt.datetime.fromisoformat(g['cutoff_at']) > current for g in schedule['groups'])) or any(dt.datetime.fromisoformat(g['capture_at'])-dt.timedelta(minutes=6)
                    <= current <= dt.datetime.fromisoformat(g['cutoff_at'])+dt.timedelta(minutes=1)
                    for g in schedule['groups'])
     return False
