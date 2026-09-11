@@ -1,3 +1,13 @@
+# Current status — cloud primary verified September 11, 2026
+
+Current step: cloud scheduler migration complete. DigitalOcean `nfl-engine-primary` (`159.89.185.88`, NYC3) runs the original T80/T75 workers under systemd. Both timers are enabled and both jobs have observed exit 0. Cloud synthetic capture/lock/grade produced two picks and two grades with no provider requests; the host successfully committed and pushed artifacts to `engine-v2`. [Deployment evidence](work/cloud-migration-v1/experiment.json).
+
+Mac capture and daily launchd jobs remain loaded as standby and have been observed yielding to the cloud ownership lock. Ownership is durable; failover requires fencing the old host and reconciling any pending dispatch before assigning the Mac. No automatic takeover on heartbeat loss. [Runbook](ops/cloud/README.md).
+
+Verification: 133 tests passed on each platform, no failures. Synthetic picks and consensus match exactly, and all 14 frozen runtime hashes remain unchanged. Linux pins Python 3.12.2; its pandas 2.2.3 compatibility exception and complete dependency lock are recorded. Odds API spend for migration: zero; Week 1 remains at 58 of 60 credits available. Next registered capture: September 13 at 15:40 UTC, lock at 15:45 UTC. Future capture success remains unverified.
+
+No deployment decision is needed from Gabe. Earlier missing wager details remain unknown. Cloud-generated artifact commit verified: `258b0c1c01f1be0aab8b6f803002a251f3f9f97a`; this final deployment record's commit is available through Git. Earlier status entries below are historical.
+
 # Current status — September 11, 2026
 
 Current step: compact locked-pick board, SF/LA final grades, and Caesars executions completed. SF +3.5 is WIN; Over 47.5 is LOSS. Seattle -3 is PUSH and Rams -3 is LOSS in the separate Jaret log. [Evidence and tests](work/board-redesign-v1/experiment.json).

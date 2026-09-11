@@ -8,6 +8,11 @@ if [ ! -x /usr/local/bin/micromamba ]; then
   install -m 755 /opt/nfl-runtime/bin/micromamba /usr/local/bin/micromamba
 fi
 export MAMBA_ROOT_PREFIX=/opt/nfl-runtime/mamba
-micromamba create -y --prefix /opt/nfl-runtime/env -f /opt/nfl-runtime/environment.yml
+# Rebuild from the checked-in platform lock once the first solve is pinned.
+manifest=/opt/nfl-runtime/environment.yml
+if [ -f /opt/nfl-runtime/linux-64.explicit.txt ]; then
+  manifest=/opt/nfl-runtime/linux-64.explicit.txt
+fi
+micromamba create -y --prefix /opt/nfl-runtime/env -f "$manifest"
 micromamba list --prefix /opt/nfl-runtime/env --explicit > /opt/nfl-runtime/linux-64.explicit.txt
 /opt/nfl-runtime/env/bin/python -c 'import sys,numpy,pandas,scipy,pyarrow,requests; print(sys.version); print(numpy.__version__,pandas.__version__,scipy.__version__,pyarrow.__version__,requests.__version__)'

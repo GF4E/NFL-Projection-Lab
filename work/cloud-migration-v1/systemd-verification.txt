@@ -1,0 +1,20 @@
+Result=success
+ExecMainStartTimestamp=Fri 2026-09-11 18:04:39 UTC
+ExecMainStatus=0
+Id=nfl-engine-capture.service
+
+Result=success
+ExecMainStartTimestamp=Fri 2026-09-11 18:02:35 UTC
+ExecMainStatus=0
+Id=nfl-engine-daily.service
+Id=nfl-engine-capture.timer
+ActiveState=active
+UnitFileState=enabled
+
+Id=nfl-engine-daily.timer
+ActiveState=active
+UnitFileState=enabled
+NTPSynchronized=yes
+600 root:root /etc/nfl-engine/secrets.env
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1       8.7G  6.7G  2.0G  78% /

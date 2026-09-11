@@ -8,7 +8,7 @@
   "monthly_usd": 4,
   "admin_ssh_key_id": 59273060,
   "image": "ubuntu-24-04-x64",
-  "status": "VERIFIED_READY_TO_ACTIVATE",
+  "status": "ACTIVE_VERIFIED",
   "odds_credits_spent": 0,
   "ipv4": "159.89.185.88",
   "checkout_path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6",
@@ -39,5 +39,46 @@
     "frozen_files_verified": 14
   },
   "cloud_push_commit": "e68e338385ebe30dc6c2831796739775bf4de1c2",
-  "linux_explicit_lock_sha256": "466a0e0464faef03cdeb5d4c5e307e37954e6deb38b9384488d89968eaf7b8e2"
+  "linux_explicit_lock_sha256": "466a0e0464faef03cdeb5d4c5e307e37954e6deb38b9384488d89968eaf7b8e2",
+  "verified_at": "2026-09-11T18:04:46.555400+00:00",
+  "systemd": {
+    "capture_timer": "active/enabled",
+    "daily_timer": "active/enabled",
+    "capture_last_exit": 0,
+    "daily_last_exit": 0,
+    "evidence": "systemd-verification.txt"
+  },
+  "mac_fallback": {
+    "capture_launchd": "loaded, observed exit 0",
+    "daily_launchd": "loaded, observed exit 0",
+    "ownership_check": "mac-fallback-verification.json",
+    "automatic_takeover": false
+  },
+  "budget": {
+    "migration_credits_spent": 0,
+    "live_ledger_unchanged": true,
+    "status": {
+      "weekly_cap": 60,
+      "accounted_by_week": {
+        "2026-W01": 2
+      },
+      "remaining_by_week": {
+        "2026-W01": 58
+      }
+    }
+  },
+  "daily_publication_commit": "258b0c1c01f1be0aab8b6f803002a251f3f9f97a",
+  "next_capture": {
+    "capture_utc": "2026-09-13T15:40:00+00:00",
+    "cutoff_utc": "2026-09-13T15:45:00+00:00",
+    "evidence": "latest pinned work/model-pick-v1/daily schedule reference"
+  },
+  "verification_scope": "Cloud synthetic transport/capture/lock/grade, exact cross-platform picks/consensus, Linux regression suite, host artifact push, systemd production worker and daily finals refresh exits, Mac ownership yield. Next scheduled live Odds API capture is prospective.",
+  "operational_checks": {
+    "bootstrap_shell_syntax": "PASS",
+    "pre_push_rejects_main": "PASS",
+    "pre_push_accepts_engine_v2": "PASS",
+    "secrets_mode": "0600 root:root",
+    "clock_synchronized": true
+  }
 }
