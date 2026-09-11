@@ -39,8 +39,8 @@ export function displayBoard(board: LockedBoard, checkedAt: number, now = Date.n
   }) };
 }
 
-async function download(fetcher: typeof fetch): Promise<LockedBoard> {
-  const r = await fetcher(BOARD_URL, { signal: AbortSignal.timeout(10_000), headers: { accept: "application/json" } });
+async function download(fetcher: typeof fetch, now = Date.now()): Promise<LockedBoard> {
+  const r = await fetcher(`${BOARD_URL}?publication=${now}`, { signal: AbortSignal.timeout(10_000), headers: { accept: "application/json" } });
   if (!r.ok) throw new Error(`Board source HTTP ${r.status}`);
   return validateBoard(await r.json());
 }
@@ -61,7 +61,7 @@ export function assertPublicationProgress(previous: LockedBoard, next: LockedBoa
 
 /** Existing scheduled cadence; a failed fetch never overwrites last-good data. */
 export async function refreshLockedBoard(db: Database, fetcher: typeof fetch = fetch, now = Date.now()): Promise<void> {
-  const board = await download(fetcher);
+  const board = await download(fetcher, now);
   await db.exec(`CREATE TABLE IF NOT EXISTS ${TABLE} (id INTEGER PRIMARY KEY, payload TEXT NOT NULL, checked_at INTEGER NOT NULL)`);
   const previous = await db.prepare(`SELECT payload FROM ${TABLE} WHERE id=1`).first<{payload: string}>();
   if (previous) assertPublicationProgress(validateBoard(JSON.parse(previous.payload)), board);
@@ -72,10 +72,10 @@ export async function readLockedBoard(db: Database, fetcher: typeof fetch = fetc
   let row: { payload: string; checked_at: number } | null = null;
   try { row = await db.prepare(`SELECT payload, checked_at FROM ${TABLE} WHERE id=1`).first<{ payload: string; checked_at: number }>(); } catch { /* Bootstrap before the first cron; still read-only. */ }
   if (fresh) {
-    const latest = await download(fetcher);
+    const latest = await download(fetcher, now);
     if (row) assertPublicationProgress(validateBoard(JSON.parse(row.payload)), latest);
     return displayBoard(latest, now, now);
   }
   if (row) return displayBoard(validateBoard(JSON.parse(row.payload)), row.checked_at, now);
-  return displayBoard(await download(fetcher), now, now);
+  return displayBoard(await download(fetcher, now), now, now);
 }
