@@ -40,9 +40,9 @@ def jobs(groups, now):
 def weather(game,folder):
     if game['roof'] not in ('open','outdoors'):return {'status':'INDOOR_OR_ROOF_UNKNOWN'}
     try:
-        from engine.live_weather import capture
+        from engine.live_weather_v2 import capture
         return capture({**game,'event_id':game['game_id']},folder)
-    except Exception as exc:return {'status':'UNAVAILABLE','error':type(exc).__name__}
+    except Exception as exc:return {'status':'UNAVAILABLE','error':type(exc).__name__,'message':str(exc)[:180]}
 
 
 def notes():

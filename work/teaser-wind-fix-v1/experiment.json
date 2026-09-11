@@ -1,0 +1,361 @@
+{
+  "commands": {
+    "replay_experiment": "work/model-pick-v1/synthetic-v1/experiment.json",
+    "replay_named_immutable_experiment": "/opt/anaconda3/bin/python3.12 -B scripts/model_pick_replay.py",
+    "verify": "/opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'"
+  },
+  "date": "2026-09-11",
+  "decisions": [
+    "Approved config-priced teaser eligibility is a board verdict supplement. PLAY priority and model selections unchanged. Both spread Wong candidates and existing total key-crossing candidates use actual offers at the configured book. Unknown teaser prices cannot qualify.",
+    "Freeze config content/hash with live record at T75. Existing immutable locks retain original pricing evidence.",
+    "Saturday wind evaluation is a preview; paper log/scoring only after T75. Existing 30-pick/positive-CLV gate unchanged.",
+    "No extra Odds API dispatch or manual retry. Free weather repair updates analysis only."
+  ],
+  "forecast_count": 8,
+  "forecast_note": "Only upcoming outdoor Week 1 games refreshed. Completed games untouched. BAL/IND and BUF/HOU roof unknown; ineligible. Monday DEN/KC currently in band is not a paper log entry.",
+  "friday_failure": {
+    "api_parameter_note": "Single Runs rejects start_hour/end_hour; request forecast_days=7 and select kickoff-hour entry. Failed probe receipts retained.",
+    "cause": "GFS013 initialized at 06 UTC while GFS025 initialized at 12 UTC. Old adapter required identical initialization times and raised ValueError before requesting the forecast.",
+    "docs": [
+      "https://open-meteo.com/en/docs/model-updates",
+      "https://open-meteo.com/en/docs/single-runs-api"
+    ],
+    "fix": "Request exact archived common run using minimum component initialization. Maximum completed-run availability is a conservative upper bound for common-run availability, not exact issuance. Retain 10-minute replication window.",
+    "source_metadata": [
+      {
+        "metadata": {
+          "chunk_time_length": 481,
+          "crs_wkt": "GEOGCRS[\"WGS 84\",\n    DATUM[\"World Geodetic System 1984\",\n        ELLIPSOID[\"WGS 84\",6378137,298.257223563]],\n    CS[ellipsoidal,2],\n        AXIS[\"latitude\",north],\n        AXIS[\"longitude\",east],\n        ANGLEUNIT[\"degree\",0.0174532925199433]\n    USAGE[\n        SCOPE[\"grid\"],\n        BBOX[-89.912125,-180.0,89.912125,179.88281]]]",
+          "data_end_time": 1790514000,
+          "last_run_availability_time": 1789149090,
+          "last_run_initialisation_time": 1789128000,
+          "last_run_modification_time": 1789148315,
+          "temporal_resolution_seconds": 3600,
+          "update_interval_seconds": 21600
+        },
+        "path": "outputs/model-pick-v1/captures/LIVE_FRIDAY_2026_W01/2026_01_TB_CIN/weather/sources/4a5119eb07812476c8069cc7ac3f9fdd10415840b7de7faf8ef2f410c7dc8c16.json",
+        "sha256": "4a5119eb07812476c8069cc7ac3f9fdd10415840b7de7faf8ef2f410c7dc8c16"
+      },
+      {
+        "metadata": {
+          "chunk_time_length": 481,
+          "crs_wkt": "GEOGCRS[\"WGS 84\",\n    DATUM[\"World Geodetic System 1984\",\n        ELLIPSOID[\"WGS 84\",6378137,298.257223563]],\n    CS[ellipsoidal,2],\n        AXIS[\"latitude\",north],\n        AXIS[\"longitude\",east],\n        ANGLEUNIT[\"degree\",0.0174532925199433]\n    USAGE[\n        SCOPE[\"grid\"],\n        BBOX[-90.0,-180.0,90.0,179.75]]]",
+          "data_end_time": 1790492400,
+          "last_run_availability_time": 1789130906,
+          "last_run_initialisation_time": 1789106400,
+          "last_run_modification_time": 1789127675,
+          "temporal_resolution_seconds": 3600,
+          "update_interval_seconds": 21600
+        },
+        "path": "outputs/model-pick-v1/captures/LIVE_FRIDAY_2026_W01/2026_01_TB_CIN/weather/sources/b751b069d0e27973fa381b2289982ca804b1ddb0d6511646c16e964d4a35bcad.json",
+        "sha256": "b751b069d0e27973fa381b2289982ca804b1ddb0d6511646c16e964d4a35bcad"
+      }
+    ]
+  },
+  "name": "teaser-wind-fix-v1",
+  "odds": {
+    "credits_spent_this_task": 0,
+    "ledger": "outputs/model-pick-v1/budget.jsonl",
+    "ledger_sha256": "edb72b2580f25b8379749222920ede166c13606ec7a940ffd14d7b6b43ccb80d",
+    "ledger_unchanged_from_parent": true,
+    "week1_remaining": 56,
+    "week1_spent": 4
+  },
+  "parent_commit": "e48f6ebe445b8292d92e9e141f39614d90bd2c12",
+  "price_limitation": "Three operator references; BetMGM article dated 2023, Caesars Indiana document dated 2022, DraftKings current posted image. None is an account-specific executable ticket. FanDuel current chart unverified and null. Direct HTML/error responses are not claimed as original source content; review receipts identify extraction method.",
+  "prices": {
+    "books": {
+      "betmgm": {
+        "as_of": "2026-09-11",
+        "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+        "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+        "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+        "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+        "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+        "three_leg": 160,
+        "two_leg": -130,
+        "verification": "OPERATOR_PUBLISHED_REFERENCE"
+      },
+      "draftkings": {
+        "as_of": "2026-09-11",
+        "scope": "Current official football six-point chart; account ticket may differ",
+        "source_artifact": "work/teaser-wind-fix-v1/sources/draftkings-teasers.png",
+        "source_image": "https://support.draftkings.com/sys_attachment.do?sys_id=f8a252556d7d4b90c5db8d6531f40e57",
+        "source_page": "https://support.draftkings.com/dk/en-us/what-is-a-teaser?id=kb_article_view&sysparm_article=KB0010765",
+        "source_sha256": "4d03d4995af3ca9d7afe86936f239837eea00b5778cb1c608dded210d584a361",
+        "three_leg": 140,
+        "two_leg": -135,
+        "verification": "OPERATOR_PUBLISHED_REFERENCE"
+      },
+      "fanduel": {
+        "as_of": "2026-09-11",
+        "scope": "Rules state fixed payout chart; no numeric six-point chart posted here",
+        "source_artifact": "work/teaser-wind-fix-v1/sources/fanduel-review.json",
+        "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+        "source_page": "https://www.fanduel.com/fanduel-sportsbook-house-rules-in",
+        "source_sha256": "54862d2a5a12eeebbe9eca9523a6012b8b6997a33a78e7a2b8f31d6a98ae17d1",
+        "three_leg": null,
+        "two_leg": null,
+        "verification": "CURRENT_PRICE_UNVERIFIED"
+      },
+      "williamhill_us": {
+        "as_of": "2026-09-11",
+        "scope": "Indiana rules dated 2022-04-29, currently posted; jurisdiction-specific reference, not a verified Tennessee account price",
+        "source_artifact": "work/teaser-wind-fix-v1/sources/caesars-table-review.json",
+        "source_hash_basis": "Review receipt, not original PDF",
+        "source_page": "https://www.caesars.com/content/dam/uin/house-rules/uin-winners-circle-house-rules.pdf",
+        "source_sha256": "f23479b4c66c9d23ca3b42df2e5c09fc0d4c39f062b2290214aebd39b586ea39",
+        "three_leg": 160,
+        "two_leg": -120,
+        "verification": "OPERATOR_PUBLISHED_REFERENCE"
+      }
+    },
+    "instructions": "Edit two_leg/three_leg American odds, as_of and source_page together. Null means unknown. These are posted references, not captured ticket quotes. For an account-confirmed manual update use verification MANUALLY_CONFIRMED and describe the book, date and jurisdiction in scope.",
+    "points": 6,
+    "schema": "teaser-prices-v1",
+    "sport": "NFL",
+    "updated_at": "2026-09-11T20:58:20.269771+00:00"
+  },
+  "saturday": {
+    "actual_future_execution_verified": false,
+    "checked_at": "2026-09-11T21:07:43.315655+00:00",
+    "jobs": [
+      {
+        "games": 14,
+        "label": "SATURDAY",
+        "start": "2026-09-12T19:00:00+00:00"
+      }
+    ],
+    "provider_calls": 0,
+    "synthetic_clock": "2026-09-12T19:00:05Z"
+  },
+  "scope": "Dated hand-maintained teaser references and prospective weather repair; zero odds calls; no selection refit or retrospective locks",
+  "verification": {
+    "engine_tests": {
+      "fail": 0,
+      "pass": 151
+    },
+    "frozen_hashes_unchanged": 14,
+    "main_build": "PASS",
+    "main_typecheck": "PASS",
+    "picks_unchanged": true,
+    "reader_tests": {
+      "fail": 0,
+      "pass": 255,
+      "skip": 1
+    },
+    "sites_build": "PASS"
+  },
+  "wind_rows": [
+    {
+      "availability_upper_bound": "",
+      "forecast_run": "",
+      "game": "ARI at LAC",
+      "game_id": "2026_01_ARI_LAC",
+      "kickoff_at": "2026-09-13T20:25:00+00:00",
+      "precip_mm": "",
+      "request_at": "",
+      "roof": "dome",
+      "source_sha256": "",
+      "status": "INDOOR_OR_ROOF_UNKNOWN",
+      "temperature_c": "",
+      "wind_mph": "",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "2026-09-11T19:15:08+00:00",
+      "forecast_run": "2026-09-11T12:00:00+00:00",
+      "game": "ATL at PIT",
+      "game_id": "2026_01_ATL_PIT",
+      "kickoff_at": "2026-09-13T17:00:00+00:00",
+      "precip_mm": "0.0",
+      "request_at": "2026-09-11T21:01:08.227118+00:00",
+      "roof": "outdoors",
+      "source_sha256": "4d60cb0e9e433460e9a33631454fec1bd2dfe6063c7b188738ec46e4437fe120",
+      "status": "FORECAST",
+      "temperature_c": "25.3",
+      "wind_mph": "6.5",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "",
+      "forecast_run": "",
+      "game": "BAL at IND",
+      "game_id": "2026_01_BAL_IND",
+      "kickoff_at": "2026-09-13T17:00:00+00:00",
+      "precip_mm": "",
+      "request_at": "",
+      "roof": "",
+      "source_sha256": "",
+      "status": "INDOOR_OR_ROOF_UNKNOWN",
+      "temperature_c": "",
+      "wind_mph": "",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "",
+      "forecast_run": "",
+      "game": "BUF at HOU",
+      "game_id": "2026_01_BUF_HOU",
+      "kickoff_at": "2026-09-13T17:00:00+00:00",
+      "precip_mm": "",
+      "request_at": "",
+      "roof": "",
+      "source_sha256": "",
+      "status": "INDOOR_OR_ROOF_UNKNOWN",
+      "temperature_c": "",
+      "wind_mph": "",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "2026-09-11T19:15:08+00:00",
+      "forecast_run": "2026-09-11T12:00:00+00:00",
+      "game": "CHI at CAR",
+      "game_id": "2026_01_CHI_CAR",
+      "kickoff_at": "2026-09-13T17:00:00+00:00",
+      "precip_mm": "0.0",
+      "request_at": "2026-09-11T21:01:08.824550+00:00",
+      "roof": "outdoors",
+      "source_sha256": "406279be60c83401eae1fd642bad933a08cd876fa98cb653677c2c2be5512f12",
+      "status": "FORECAST",
+      "temperature_c": "33.9",
+      "wind_mph": "2.7",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "2026-09-11T19:15:08+00:00",
+      "forecast_run": "2026-09-11T12:00:00+00:00",
+      "game": "CLE at JAX",
+      "game_id": "2026_01_CLE_JAX",
+      "kickoff_at": "2026-09-13T17:00:00+00:00",
+      "precip_mm": "0.0",
+      "request_at": "2026-09-11T21:01:09.402591+00:00",
+      "roof": "outdoors",
+      "source_sha256": "c2e35b6fab697bc62ba72fd05b0919e2c215ed7e218a2da474b995d5f1cb496e",
+      "status": "FORECAST",
+      "temperature_c": "30.3",
+      "wind_mph": "3.2",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "2026-09-11T19:15:08+00:00",
+      "forecast_run": "2026-09-11T12:00:00+00:00",
+      "game": "DAL at NYG",
+      "game_id": "2026_01_DAL_NYG",
+      "kickoff_at": "2026-09-14T00:20:00+00:00",
+      "precip_mm": "0.0",
+      "request_at": "2026-09-11T21:01:09.949377+00:00",
+      "roof": "outdoors",
+      "source_sha256": "72e09be9ec81a07708b6b3115390333799b071137261bff37c82c8f6580e5d81",
+      "status": "FORECAST",
+      "temperature_c": "24.4",
+      "wind_mph": "3.1",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "2026-09-11T19:15:08+00:00",
+      "forecast_run": "2026-09-11T12:00:00+00:00",
+      "game": "DEN at KC",
+      "game_id": "2026_01_DEN_KC",
+      "kickoff_at": "2026-09-15T00:15:00+00:00",
+      "precip_mm": "0.0",
+      "request_at": "2026-09-11T21:01:10.538477+00:00",
+      "roof": "outdoors",
+      "source_sha256": "39c74e066cf401cd52b9c24a954ddd64aa1ed53cff255b8fe8b5f2624185a1cb",
+      "status": "FORECAST",
+      "temperature_c": "31.2",
+      "wind_mph": "14.4",
+      "wind_rule": "True"
+    },
+    {
+      "availability_upper_bound": "",
+      "forecast_run": "",
+      "game": "GB at MIN",
+      "game_id": "2026_01_GB_MIN",
+      "kickoff_at": "2026-09-13T20:25:00+00:00",
+      "precip_mm": "",
+      "request_at": "",
+      "roof": "dome",
+      "source_sha256": "",
+      "status": "INDOOR_OR_ROOF_UNKNOWN",
+      "temperature_c": "",
+      "wind_mph": "",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "",
+      "forecast_run": "",
+      "game": "MIA at LV",
+      "game_id": "2026_01_MIA_LV",
+      "kickoff_at": "2026-09-13T20:25:00+00:00",
+      "precip_mm": "",
+      "request_at": "",
+      "roof": "dome",
+      "source_sha256": "",
+      "status": "INDOOR_OR_ROOF_UNKNOWN",
+      "temperature_c": "",
+      "wind_mph": "",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "",
+      "forecast_run": "",
+      "game": "NO at DET",
+      "game_id": "2026_01_NO_DET",
+      "kickoff_at": "2026-09-13T17:00:00+00:00",
+      "precip_mm": "",
+      "request_at": "",
+      "roof": "dome",
+      "source_sha256": "",
+      "status": "INDOOR_OR_ROOF_UNKNOWN",
+      "temperature_c": "",
+      "wind_mph": "",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "2026-09-11T19:15:08+00:00",
+      "forecast_run": "2026-09-11T12:00:00+00:00",
+      "game": "NYJ at TEN",
+      "game_id": "2026_01_NYJ_TEN",
+      "kickoff_at": "2026-09-13T17:00:00+00:00",
+      "precip_mm": "0.0",
+      "request_at": "2026-09-11T21:01:11.182846+00:00",
+      "roof": "outdoors",
+      "source_sha256": "d19126309c87e2b5f6f83324b5403a39f81c3a0fe105d7be37f0220c59cb4b21",
+      "status": "FORECAST",
+      "temperature_c": "34.0",
+      "wind_mph": "2.3",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "2026-09-11T19:15:08+00:00",
+      "forecast_run": "2026-09-11T12:00:00+00:00",
+      "game": "TB at CIN",
+      "game_id": "2026_01_TB_CIN",
+      "kickoff_at": "2026-09-13T17:00:00+00:00",
+      "precip_mm": "0.0",
+      "request_at": "2026-09-11T21:01:11.821547+00:00",
+      "roof": "outdoors",
+      "source_sha256": "282cdd68fecc21d1c048790c556e1eebb3abac946fdf34078517108db7c0d896",
+      "status": "FORECAST",
+      "temperature_c": "30.8",
+      "wind_mph": "4.8",
+      "wind_rule": "False"
+    },
+    {
+      "availability_upper_bound": "2026-09-11T19:15:08+00:00",
+      "forecast_run": "2026-09-11T12:00:00+00:00",
+      "game": "WAS at PHI",
+      "game_id": "2026_01_WAS_PHI",
+      "kickoff_at": "2026-09-13T20:25:00+00:00",
+      "precip_mm": "0.1",
+      "request_at": "2026-09-11T21:01:12.411594+00:00",
+      "roof": "outdoors",
+      "source_sha256": "2a043b43bfb368d6ff4e1b16f5efe625d2487591e3f44782f5e8a7de3003690e",
+      "status": "FORECAST",
+      "temperature_c": "28.7",
+      "wind_mph": "6.5",
+      "wind_rule": "False"
+    }
+  ]
+}

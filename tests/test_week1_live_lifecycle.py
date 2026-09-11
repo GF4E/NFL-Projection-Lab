@@ -65,7 +65,7 @@ class LiveTests(unittest.TestCase):
   with patch('engine.live_capture.urllib.request.urlopen') as http:
    with self.assertRaises(ValueError):capture({'start':'2026-09-11T19:00:00Z'},Path('/unused'),Path('/unused'),'test',dt.datetime.fromisoformat('2026-09-11T19:02:00+00:00'))
    http.assert_not_called()
- def test_wind_rule_requires_t80(self):
-  weather={'status':'FORECAST','forecast_run_initialized_at':'2026-09-13T12:00:00Z','valid_at':'2026-09-13T17:00:00Z','wind_mph':12,'request_at':'2026-09-13T15:40:00Z','received_at':'2026-09-13T15:40:05Z','forecast_issued_at':'2026-09-13T14:00:00Z'}
-  self.assertFalse(self.live(weather=weather)['analysis']['measured']['wind_rule']);self.receipt['label']='T80';self.assertTrue(self.live(weather=weather)['analysis']['measured']['wind_rule'])
+ def test_wind_rule_evaluates_each_refresh(self):
+  weather={'event_id':self.f['game']['game_id'],'precip_mm':0,'temperature_c':20,'source_sha256':'a'*64,'requests':[{'sha256':'a'*64}],'status':'FORECAST','forecast_run_initialized_at':'2026-09-13T12:00:00Z','valid_at':'2026-09-13T17:00:00Z','wind_mph':12,'request_at':'2026-09-13T15:40:00Z','received_at':'2026-09-13T15:40:05Z','forecast_issued_at':'2026-09-13T14:00:00Z'}
+  self.assertTrue(self.live(weather=weather)['analysis']['measured']['wind_rule']);self.receipt['label']='SATURDAY';self.assertTrue(self.live(weather=weather)['analysis']['measured']['wind_rule'])
 if __name__=='__main__':unittest.main()

@@ -11,9 +11,13 @@ def enrich_live(board, records, root):
     locked={r['game']['game_id']:r for r in records}
     human=[json.loads(p.read_text()) for p in (out/'human-grades').glob('*.json')]
     from engine.board_bridge import verdict
+    from engine.teaser_prices import apply as teaser_verdict, load as load_teaser_prices
+    import copy
     for g in board['games']:
         r=locked.get(g['game_id']) or current.get(g['game_id'])
         if not r:continue
+        r=copy.deepcopy(r)
+        if r['status']=='LIVE':r['teaser_prices']=load_teaser_prices(root)
         g['analysis']=r.get('analysis',{'sentences':['No measured analysis was saved for this capture.']})
         g['our_note']=r.get('our_note')
         g['note_deadline']=r['game']['cutoff_at']
@@ -25,6 +29,9 @@ def enrich_live(board, records, root):
             g['best_captured']={m:r['analysis']['measured'][m]['best_same_line'] for m in ('spreads','totals')}
             for pick in r['picks']:
                 g['verdicts'][pick['market']]['analytics']={k:pick.get(k) for k in ('win','loss','push','loo_center','price_edge_cents','quote_updated_at')}
+        if r.get('teaser_prices'):
+            for market in ('spreads','totals'):
+                g['verdicts'][market]=teaser_verdict(g['verdicts'][market],r,market)
         pairs=[]
         for o in r.get('offers',[]):
             same=[p for p in r['offers'] if p['book']==o['book'] and p['market']==o['market']]

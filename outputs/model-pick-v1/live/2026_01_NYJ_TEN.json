@@ -75,7 +75,7 @@
       "DraftKings has the best captured price for Under +38.5 at -108, 0 cents better than the next book at the same line.",
       "The spread is not within a half point of 3 or 7.",
       "Buying Tennessee Titans from -1.5 to -1 preserves the current modeled EV up to -118.6; no captured buy-half price is available, so whether it is worth buying is unknown.",
-      "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+      "Kickoff forecast wind is 2.3 mph. WIND RULE does not apply.",
       "Plain Elo disagrees with the market margin by +0.41 points; diagnostic only, with no QB adjustment.",
       "Teaser candidates: New York Jets +1.5 to +7.5, crossing 3, 7; Under +38.5 to +44.5, crossing 41, 44. Ticket prices and a partner are not established.",
       "QB status: inactives unknown until T-90."
@@ -348,8 +348,46 @@
   },
   "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
   "forecast": {
-    "error": "ValueError",
-    "status": "UNAVAILABLE"
+    "component_initializations": [
+      1789128000,
+      1789128000
+    ],
+    "event_id": "2026_01_NYJ_TEN",
+    "forecast_issued_at": "2026-09-11T19:15:08+00:00",
+    "forecast_run_initialized_at": "2026-09-11T12:00:00+00:00",
+    "issuance_basis": "Conservative upper bound from completed GFS013/GFS025 availability; exact common archived run requested",
+    "kickoff_at": "2026-09-13T17:00:00+00:00",
+    "model": "gfs_global",
+    "precip_mm": 0.0,
+    "received_at": "2026-09-11T21:01:11.404851+00:00",
+    "request_at": "2026-09-11T21:01:11.182846+00:00",
+    "requests": [
+      {
+        "received_at": "2026-09-11T21:01:10.954731+00:00",
+        "request_at": "2026-09-11T21:01:10.750643+00:00",
+        "sha256": "28734592e89f25747a8995355361897f04ddfcbf8dc88e2ae232e1c12da35b37",
+        "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-11T21:01:11.182484+00:00",
+        "request_at": "2026-09-11T21:01:10.955253+00:00",
+        "sha256": "58dcd5df5865aef04a090d8dbf227d09f7146c27d4939e37b906321a77a62814",
+        "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-11T21:01:11.404851+00:00",
+        "request_at": "2026-09-11T21:01:11.182846+00:00",
+        "sha256": "d19126309c87e2b5f6f83324b5403a39f81c3a0fe105d7be37f0220c59cb4b21",
+        "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=36.1664774&longitude=-86.7712938&models=gfs_global&run=2026-09-11T12%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
+      }
+    ],
+    "roof": "outdoors",
+    "source_sha256": "d19126309c87e2b5f6f83324b5403a39f81c3a0fe105d7be37f0220c59cb4b21",
+    "status": "FORECAST",
+    "temperature_c": 34.0,
+    "valid_at": "2026-09-13T17:00:00+00:00",
+    "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+    "wind_mph": 2.3
   },
   "game": {
     "away_abbr": "NYJ",
@@ -519,5 +557,60 @@
   ],
   "record_class": "paper_model_pick",
   "status": "LIVE",
-  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041"
+  "teaser_prices": {
+    "books": {
+      "betmgm": {
+        "as_of": "2026-09-11",
+        "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+        "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+        "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+        "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+        "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+        "three_leg": 160,
+        "two_leg": -130,
+        "verification": "OPERATOR_PUBLISHED_REFERENCE"
+      },
+      "draftkings": {
+        "as_of": "2026-09-11",
+        "scope": "Current official football six-point chart; account ticket may differ",
+        "source_artifact": "work/teaser-wind-fix-v1/sources/draftkings-teasers.png",
+        "source_image": "https://support.draftkings.com/sys_attachment.do?sys_id=f8a252556d7d4b90c5db8d6531f40e57",
+        "source_page": "https://support.draftkings.com/dk/en-us/what-is-a-teaser?id=kb_article_view&sysparm_article=KB0010765",
+        "source_sha256": "4d03d4995af3ca9d7afe86936f239837eea00b5778cb1c608dded210d584a361",
+        "three_leg": 140,
+        "two_leg": -135,
+        "verification": "OPERATOR_PUBLISHED_REFERENCE"
+      },
+      "fanduel": {
+        "as_of": "2026-09-11",
+        "scope": "Rules state fixed payout chart; no numeric six-point chart posted here",
+        "source_artifact": "work/teaser-wind-fix-v1/sources/fanduel-review.json",
+        "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+        "source_page": "https://www.fanduel.com/fanduel-sportsbook-house-rules-in",
+        "source_sha256": "54862d2a5a12eeebbe9eca9523a6012b8b6997a33a78e7a2b8f31d6a98ae17d1",
+        "three_leg": null,
+        "two_leg": null,
+        "verification": "CURRENT_PRICE_UNVERIFIED"
+      },
+      "williamhill_us": {
+        "as_of": "2026-09-11",
+        "scope": "Indiana rules dated 2022-04-29, currently posted; jurisdiction-specific reference, not a verified Tennessee account price",
+        "source_artifact": "work/teaser-wind-fix-v1/sources/caesars-table-review.json",
+        "source_hash_basis": "Review receipt, not original PDF",
+        "source_page": "https://www.caesars.com/content/dam/uin/house-rules/uin-winners-circle-house-rules.pdf",
+        "source_sha256": "f23479b4c66c9d23ca3b42df2e5c09fc0d4c39f062b2290214aebd39b586ea39",
+        "three_leg": 160,
+        "two_leg": -120,
+        "verification": "OPERATOR_PUBLISHED_REFERENCE"
+      }
+    },
+    "instructions": "Edit two_leg/three_leg American odds, as_of and source_page together. Null means unknown. These are posted references, not captured ticket quotes. For an account-confirmed manual update use verification MANUALLY_CONFIRMED and describe the book, date and jurisdiction in scope.",
+    "points": 6,
+    "schema": "teaser-prices-v1",
+    "sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+    "sport": "NFL",
+    "updated_at": "2026-09-11T20:58:20.269771+00:00"
+  },
+  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+  "weather_refreshed_at": "2026-09-11T21:01:11.404851+00:00"
 }

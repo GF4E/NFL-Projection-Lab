@@ -1,0 +1,53 @@
+{
+  "schema": "teaser-prices-v1",
+  "sport": "NFL",
+  "points": 6,
+  "updated_at": "2026-09-11T20:58:20.269771+00:00",
+  "instructions": "Edit two_leg/three_leg American odds, as_of and source_page together. Null means unknown. These are posted references, not captured ticket quotes. For an account-confirmed manual update use verification MANUALLY_CONFIRMED and describe the book, date and jurisdiction in scope.",
+  "books": {
+    "betmgm": {
+      "two_leg": -130,
+      "three_leg": 160,
+      "as_of": "2026-09-11",
+      "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+      "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+      "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+      "verification": "OPERATOR_PUBLISHED_REFERENCE",
+      "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+      "source_hash_basis": "Review receipt; original direct response was an access/interstitial page"
+    },
+    "williamhill_us": {
+      "two_leg": -120,
+      "three_leg": 160,
+      "as_of": "2026-09-11",
+      "source_page": "https://www.caesars.com/content/dam/uin/house-rules/uin-winners-circle-house-rules.pdf",
+      "source_sha256": "f23479b4c66c9d23ca3b42df2e5c09fc0d4c39f062b2290214aebd39b586ea39",
+      "source_artifact": "work/teaser-wind-fix-v1/sources/caesars-table-review.json",
+      "verification": "OPERATOR_PUBLISHED_REFERENCE",
+      "scope": "Indiana rules dated 2022-04-29, currently posted; jurisdiction-specific reference, not a verified Tennessee account price",
+      "source_hash_basis": "Review receipt, not original PDF"
+    },
+    "fanduel": {
+      "two_leg": null,
+      "three_leg": null,
+      "as_of": "2026-09-11",
+      "source_page": "https://www.fanduel.com/fanduel-sportsbook-house-rules-in",
+      "source_sha256": "54862d2a5a12eeebbe9eca9523a6012b8b6997a33a78e7a2b8f31d6a98ae17d1",
+      "source_artifact": "work/teaser-wind-fix-v1/sources/fanduel-review.json",
+      "verification": "CURRENT_PRICE_UNVERIFIED",
+      "scope": "Rules state fixed payout chart; no numeric six-point chart posted here",
+      "source_hash_basis": "Review receipt; original direct response was an access/interstitial page"
+    },
+    "draftkings": {
+      "two_leg": -135,
+      "three_leg": 140,
+      "as_of": "2026-09-11",
+      "source_page": "https://support.draftkings.com/dk/en-us/what-is-a-teaser?id=kb_article_view&sysparm_article=KB0010765",
+      "source_image": "https://support.draftkings.com/sys_attachment.do?sys_id=f8a252556d7d4b90c5db8d6531f40e57",
+      "source_sha256": "4d03d4995af3ca9d7afe86936f239837eea00b5778cb1c608dded210d584a361",
+      "source_artifact": "work/teaser-wind-fix-v1/sources/draftkings-teasers.png",
+      "verification": "OPERATOR_PUBLISHED_REFERENCE",
+      "scope": "Current official football six-point chart; account ticket may differ"
+    }
+  }
+}

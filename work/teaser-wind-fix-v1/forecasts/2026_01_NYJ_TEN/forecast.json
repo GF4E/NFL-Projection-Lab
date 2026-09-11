@@ -1,0 +1,42 @@
+{
+  "component_initializations": [
+    1789128000,
+    1789128000
+  ],
+  "event_id": "2026_01_NYJ_TEN",
+  "forecast_issued_at": "2026-09-11T19:15:08+00:00",
+  "forecast_run_initialized_at": "2026-09-11T12:00:00+00:00",
+  "issuance_basis": "Conservative upper bound from completed GFS013/GFS025 availability; exact common archived run requested",
+  "kickoff_at": "2026-09-13T17:00:00+00:00",
+  "model": "gfs_global",
+  "precip_mm": 0.0,
+  "received_at": "2026-09-11T21:01:11.404851+00:00",
+  "request_at": "2026-09-11T21:01:11.182846+00:00",
+  "requests": [
+    {
+      "received_at": "2026-09-11T21:01:10.954731+00:00",
+      "request_at": "2026-09-11T21:01:10.750643+00:00",
+      "sha256": "28734592e89f25747a8995355361897f04ddfcbf8dc88e2ae232e1c12da35b37",
+      "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
+    },
+    {
+      "received_at": "2026-09-11T21:01:11.182484+00:00",
+      "request_at": "2026-09-11T21:01:10.955253+00:00",
+      "sha256": "58dcd5df5865aef04a090d8dbf227d09f7146c27d4939e37b906321a77a62814",
+      "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
+    },
+    {
+      "received_at": "2026-09-11T21:01:11.404851+00:00",
+      "request_at": "2026-09-11T21:01:11.182846+00:00",
+      "sha256": "d19126309c87e2b5f6f83324b5403a39f81c3a0fe105d7be37f0220c59cb4b21",
+      "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=36.1664774&longitude=-86.7712938&models=gfs_global&run=2026-09-11T12%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
+    }
+  ],
+  "roof": "outdoors",
+  "source_sha256": "d19126309c87e2b5f6f83324b5403a39f81c3a0fe105d7be37f0220c59cb4b21",
+  "status": "FORECAST",
+  "temperature_c": 34.0,
+  "valid_at": "2026-09-13T17:00:00+00:00",
+  "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+  "wind_mph": 2.3
+}

@@ -1,6 +1,6 @@
 {
   "clv_reference": "nflverse_close; reference CLV, not executed-book closing quotes",
-  "content_sha256": "0f00ae00a4bd519555f54a92f06cadde7b73bd0e66f2624c742044fe9d245739",
+  "content_sha256": "eb6da1f68117ec2f1fc141a73ec24151c810b695bdb11876d9af009a2b2d4892",
   "default_week": 1,
   "games": [
     {
@@ -266,7 +266,7 @@
           "FanDuel has the best captured price for Over +40.5 at -115; no other book has a comparable price at that line.",
           "The spread is not within a half point of 3 or 7.",
           "Buying Atlanta Falcons from +6 to +6.5 preserves the current modeled EV up to -115.6; no captured buy-half price is available, so whether it is worth buying is unknown.",
-          "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+          "Kickoff forecast wind is 6.5 mph. WIND RULE does not apply.",
           "Plain Elo disagrees with the market margin by -1.93 points; diagnostic only, with no QB adjustment.",
           "Teaser candidates: Under +41.5 to +47.5, crossing 44, 47; Under +40.5 to +46.5, crossing 41, 44. Ticket prices and a partner are not established.",
           "QB status: inactives unknown until T-90."
@@ -465,17 +465,39 @@
             "win": 0.5219343696027634
           },
           "availability": "LIVE",
+          "best_book": "draftkings",
           "book": "fanduel",
           "edge_source": "price",
           "fair_probability": 0.5219343696027634,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "leg": "Under",
           "line": 40.5,
+          "original_line": 41.5,
           "price": -115.0,
-          "reason": "Locked pick fails the 60\u201370% / 10-cent filter and teaser crossing criteria.",
+          "reason": "TEASE candidate, best teaser price -135 at DraftKings",
           "side": "Over",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 47.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -135 at DraftKings",
+          "teaser_price": -135,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "Current official football six-point chart; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/draftkings-teasers.png",
+            "source_image": "https://support.draftkings.com/sys_attachment.do?sys_id=f8a252556d7d4b90c5db8d6531f40e57",
+            "source_page": "https://support.draftkings.com/dk/en-us/what-is-a-teaser?id=kb_article_view&sysparm_article=KB0010765",
+            "source_sha256": "4d03d4995af3ca9d7afe86936f239837eea00b5778cb1c608dded210d584a361",
+            "three_leg": 140,
+            "two_leg": -135,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -744,17 +766,39 @@
             "win": 0.5219343696027634
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "betmgm",
           "edge_source": "price",
           "fair_probability": 0.5219343696027634,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "leg": "Over",
           "line": 47.5,
+          "original_line": 47.5,
           "price": -112.0,
-          "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Over",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 41.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -1026,17 +1070,39 @@
             "win": 0.4991364421416235
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "fanduel",
           "edge_source": "tiebreak",
           "fair_probability": 0.4991364421416235,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            3,
+            7
+          ],
+          "leg": "Houston Texans",
           "line": -1.5,
+          "original_line": 1.5,
           "price": -106.0,
-          "reason": "Locked pick fails the 60\u201370% / 10-cent filter and teaser crossing criteria.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Buffalo Bills",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 7.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         },
         "totals": {
           "EV": -0.006018333997608594,
@@ -1049,17 +1115,39 @@
             "win": 0.5067357512953368
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "fanduel",
           "edge_source": "tiebreak",
           "fair_probability": 0.5067357512953368,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "leg": "Over",
           "line": 44.5,
+          "original_line": 45.0,
           "price": -104.0,
-          "reason": "Locked pick fails the 60\u201370% / 10-cent filter and teaser crossing criteria.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Under",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 39.0,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -1129,7 +1217,7 @@
           "BetMGM has the best captured price for Under +47 at -108; no other book has a comparable price at that line.",
           "The spread is on or within a half point of 3.",
           "Buying Carolina Panthers from +3 to +3.5 preserves the current modeled EV up to -105.3; no captured buy-half price is available, so whether it is worth buying is unknown.",
-          "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+          "Kickoff forecast wind is 2.7 mph. WIND RULE does not apply.",
           "Plain Elo disagrees with the market margin by +1.67 points; diagnostic only, with no QB adjustment.",
           "Teaser candidates: Over +47.5 to +41.5, crossing 44, 47. Ticket prices and a partner are not established.",
           "QB status: inactives unknown until T-90."
@@ -1328,17 +1416,39 @@
             "win": 0.5067357512953368
           },
           "availability": "LIVE",
+          "best_book": "draftkings",
           "book": "betmgm",
           "edge_source": "tiebreak",
           "fair_probability": 0.5113279888462878,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "leg": "Over",
           "line": 47.0,
+          "original_line": 47.5,
           "price": -108.0,
-          "reason": "Locked pick fails the 60\u201370% / 10-cent filter and teaser crossing criteria.",
+          "reason": "TEASE candidate, best teaser price -135 at DraftKings",
           "side": "Under",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 41.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -135 at DraftKings",
+          "teaser_price": -135,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "Current official football six-point chart; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/draftkings-teasers.png",
+            "source_image": "https://support.draftkings.com/sys_attachment.do?sys_id=f8a252556d7d4b90c5db8d6531f40e57",
+            "source_page": "https://support.draftkings.com/dk/en-us/what-is-a-teaser?id=kb_article_view&sysparm_article=KB0010765",
+            "source_sha256": "4d03d4995af3ca9d7afe86936f239837eea00b5778cb1c608dded210d584a361",
+            "three_leg": 140,
+            "two_leg": -135,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -1447,7 +1557,7 @@
           "DraftKings has the best captured price for Under +39.5 at -102; no other book has a comparable price at that line.",
           "The spread is not within a half point of 3 or 7.",
           "Buying Cleveland Browns from +8.5 to +9 preserves the current modeled EV up to -114.2; no captured buy-half price is available, so whether it is worth buying is unknown.",
-          "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+          "Kickoff forecast wind is 3.2 mph. WIND RULE does not apply.",
           "Plain Elo disagrees with the market margin by -0.61 points; diagnostic only, with no QB adjustment.",
           "Teaser candidates: Jacksonville Jaguars -8.5 to -2.5, crossing 3, 7; Under +39.5 to +45.5, crossing 41, 44; Under +40.5 to +46.5, crossing 41, 44; Under +40 to +46, crossing 41, 44. Ticket prices and a partner are not established.",
           "QB status: inactives unknown until T-90."
@@ -1623,17 +1733,39 @@
             "win": 0.4991364421416235
           },
           "availability": "LIVE",
+          "best_book": "draftkings",
           "book": "fanduel",
           "edge_source": "tiebreak",
           "fair_probability": 0.4991364421416235,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            3,
+            7
+          ],
+          "leg": "Jacksonville Jaguars",
           "line": 8.5,
+          "original_line": -8.5,
           "price": -108.0,
-          "reason": "Locked pick fails the 60\u201370% / 10-cent filter and teaser crossing criteria.",
+          "reason": "TEASE candidate, best teaser price -135 at DraftKings",
           "side": "Cleveland Browns",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": -2.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -135 at DraftKings",
+          "teaser_price": -135,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "Current official football six-point chart; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/draftkings-teasers.png",
+            "source_image": "https://support.draftkings.com/sys_attachment.do?sys_id=f8a252556d7d4b90c5db8d6531f40e57",
+            "source_page": "https://support.draftkings.com/dk/en-us/what-is-a-teaser?id=kb_article_view&sysparm_article=KB0010765",
+            "source_sha256": "4d03d4995af3ca9d7afe86936f239837eea00b5778cb1c608dded210d584a361",
+            "three_leg": 140,
+            "two_leg": -135,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         },
         "totals": {
           "EV": 0.003535507467235577,
@@ -1646,17 +1778,39 @@
             "win": 0.5067357512953368
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "draftkings",
           "edge_source": "price",
           "fair_probability": 0.5067357512953368,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "leg": "Under",
           "line": 39.5,
+          "original_line": 40.0,
           "price": -102.0,
-          "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Under",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 46.0,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -1925,17 +2079,39 @@
             "win": 0.5219343696027634
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "betmgm",
           "edge_source": "price",
           "fair_probability": 0.5219343696027634,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "leg": "Over",
           "line": 49.5,
+          "original_line": 49.5,
           "price": -110.0,
-          "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Over",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 43.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -2018,7 +2194,7 @@
           "DraftKings has the best captured price for Under +38.5 at -108, 0 cents better than the next book at the same line.",
           "The spread is not within a half point of 3 or 7.",
           "Buying Tennessee Titans from -1.5 to -1 preserves the current modeled EV up to -118.6; no captured buy-half price is available, so whether it is worth buying is unknown.",
-          "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+          "Kickoff forecast wind is 2.3 mph. WIND RULE does not apply.",
           "Plain Elo disagrees with the market margin by +0.41 points; diagnostic only, with no QB adjustment.",
           "Teaser candidates: New York Jets +1.5 to +7.5, crossing 3, 7; Under +38.5 to +44.5, crossing 41, 44. Ticket prices and a partner are not established.",
           "QB status: inactives unknown until T-90."
@@ -2194,17 +2370,39 @@
             "win": 0.5008635578583766
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "fanduel",
           "edge_source": "price",
           "fair_probability": 0.5008635578583766,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            3,
+            7
+          ],
+          "leg": "New York Jets",
           "line": -1.5,
+          "original_line": 1.5,
           "price": -108.0,
-          "reason": "Locked pick fails the 60\u201370% / 10-cent filter and teaser crossing criteria.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Tennessee Titans",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 7.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         },
         "totals": {
           "EV": -0.024064478986758786,
@@ -2217,17 +2415,39 @@
             "win": 0.5067357512953368
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "draftkings",
           "edge_source": "tiebreak",
           "fair_probability": 0.5067357512953368,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "leg": "Under",
           "line": 38.5,
+          "original_line": 38.5,
           "price": -108.0,
-          "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Under",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 44.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -2283,7 +2503,7 @@
           "FanDuel has the best captured price for Under +50.5 at -108, 2 cents better than the next book at the same line.",
           "The spread is not within a half point of 3 or 7.",
           "Buying Tampa Bay Buccaneers from +3.5 to +4 preserves the current modeled EV up to -110.9; no captured buy-half price is available, so whether it is worth buying is unknown.",
-          "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+          "Kickoff forecast wind is 4.8 mph. WIND RULE does not apply.",
           "Plain Elo disagrees with the market margin by -1.39 points; diagnostic only, with no QB adjustment.",
           "Neither side of the captured spreads or totals meets the six-point teaser crossing criteria.",
           "QB status: inactives unknown until T-90."
@@ -2761,17 +2981,39 @@
             "win": 0.49326424870466323
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "draftkings",
           "edge_source": "price",
           "fair_probability": 0.49326424870466323,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "leg": "Over",
           "line": 47.5,
+          "original_line": 47.5,
           "price": -102.0,
-          "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Over",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 41.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -3056,17 +3298,39 @@
             "win": 0.4991364421416235
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "betmgm",
           "edge_source": "tiebreak",
           "fair_probability": 0.5120481927710844,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            3,
+            7
+          ],
+          "leg": "Green Bay Packers",
           "line": 2.0,
+          "original_line": 2.0,
           "price": -110.0,
-          "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Green Bay Packers",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 8.0,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         },
         "totals": {
           "EV": -0.0325953838907207,
@@ -3079,17 +3343,39 @@
             "win": 0.5067357512953368
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "betmgm",
           "edge_source": "tiebreak",
           "fair_probability": 0.5067357512953368,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            47,
+            51
+          ],
+          "leg": "Under",
           "line": 46.5,
+          "original_line": 46.5,
           "price": -110.0,
-          "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Under",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 52.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -3371,17 +3657,39 @@
             "win": 0.5067357512953368
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "fanduel",
           "edge_source": "tiebreak",
           "fair_probability": 0.5067357512953368,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "leg": "Under",
           "line": 39.5,
+          "original_line": 40.5,
           "price": -105.0,
-          "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Under",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 46.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -3451,7 +3759,7 @@
           "BetMGM has the best captured price for Under +44.5 at -112, 3 cents better than the next book at the same line.",
           "The spread is not within a half point of 3 or 7.",
           "Buying Washington Commanders from +6 to +6.5 preserves the current modeled EV up to -117.7; no captured buy-half price is available, so whether it is worth buying is unknown.",
-          "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+          "Kickoff forecast wind is 6.5 mph. WIND RULE does not apply.",
           "Plain Elo disagrees with the market margin by +0.39 points; diagnostic only, with no QB adjustment.",
           "Teaser candidates: Over +44.5 to +38.5, crossing 41, 44. Ticket prices and a partner are not established.",
           "QB status: inactives unknown until T-90."
@@ -3650,17 +3958,39 @@
             "win": 0.5157167530224525
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "betmgm",
           "edge_source": "price",
           "fair_probability": 0.5157167530224525,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "leg": "Over",
           "line": 44.5,
+          "original_line": 44.5,
           "price": -112.0,
-          "reason": "Locked pick fails the 60\u201370% / 10-cent filter and teaser crossing criteria.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Under",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 38.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -3756,7 +4086,7 @@
           "BetMGM has the best captured price for Over +48 at -110; no other book has a comparable price at that line.",
           "The spread is on or within a half point of 3.",
           "Buying Dallas Cowboys from -3 to -2.5 preserves the current modeled EV up to -110.3; no captured buy-half price is available, so whether it is worth buying is unknown.",
-          "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+          "Kickoff forecast wind is 3.1 mph. WIND RULE does not apply.",
           "Plain Elo disagrees with the market margin by +3.72 points; diagnostic only, with no QB adjustment.",
           "Teaser candidates: Over +48.5 to +42.5, crossing 44, 47; New York Giants +2.5 to +8.5, crossing 3, 7; Over +48 to +42, crossing 44, 47. Ticket prices and a partner are not established.",
           "QB status: inactives unknown until T-90."
@@ -3942,7 +4272,8 @@
           "price": -105.0,
           "reason": "Locked pick fails the 60\u201370% / 10-cent filter and teaser crossing criteria.",
           "side": "Dallas Cowboys",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teaser_notice": "TEASE candidate, teaser price unverified at FanDuel"
         },
         "totals": {
           "EV": -0.02964358612026996,
@@ -3955,17 +4286,39 @@
             "win": 0.49326424870466323
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "betmgm",
           "edge_source": "price",
           "fair_probability": 0.507823613086771,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "leg": "Over",
           "line": 48.0,
+          "original_line": 48.0,
           "price": -110.0,
-          "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Over",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 42.0,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -4039,7 +4392,7 @@
             "consensus_line": 43.5,
             "movement": null
           },
-          "wind_rule": false
+          "wind_rule": true
         },
         "sentences": [
           "Spread consensus is KC -2.5. This is the first capture; movement is not yet measured.",
@@ -4048,7 +4401,7 @@
           "DraftKings has the best captured price for Under +43.5 at -105, 3 cents better than the next book at the same line.",
           "The spread is on or within a half point of 3.",
           "Buying Denver Broncos from +2.5 to +3 preserves the current modeled EV up to -107.5; no captured buy-half price is available, so whether it is worth buying is unknown.",
-          "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+          "Kickoff forecast wind is 14.4 mph. WIND RULE applies to this live refresh; it is recorded only if qualified at the T75 lock.",
           "Plain Elo disagrees with the market margin by -4.55 points; diagnostic only, with no QB adjustment.",
           "Teaser candidates: Denver Broncos +2.5 to +8.5, crossing 3, 7; Under +43.5 to +49.5, crossing 44, 47. Ticket prices and a partner are not established.",
           "QB status: inactives unknown until T-90."
@@ -4224,17 +4577,39 @@
             "win": 0.4991364421416235
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "draftkings",
           "edge_source": "tiebreak",
           "fair_probability": 0.4991364421416235,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            3,
+            7
+          ],
+          "leg": "Denver Broncos",
           "line": 2.5,
+          "original_line": 2.5,
           "price": -102.0,
-          "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Denver Broncos",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 8.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         },
         "totals": {
           "EV": -0.010658771280532997,
@@ -4247,17 +4622,39 @@
             "win": 0.5067357512953368
           },
           "availability": "LIVE",
+          "best_book": "betmgm",
           "book": "draftkings",
           "edge_source": "tiebreak",
           "fair_probability": 0.5067357512953368,
           "grade": null,
           "grade_basis": "LOCKED_STRAIGHT_PICK",
           "grade_source": null,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "leg": "Under",
           "line": 43.5,
+          "original_line": 43.5,
           "price": -105.0,
-          "reason": "Qualifying teaser leg; no frozen teaser ticket price at -110 or better.",
+          "reason": "TEASE candidate, best teaser price -130 at BetMGM",
           "side": "Under",
-          "state": "HARD PASS"
+          "state": "HARD PASS",
+          "teased_line": 49.5,
+          "teaser_config_sha256": "21763f13d854e14e9d15dc2b0bd8ff16f74a4a65c79f4d0a0c0b4276eb1181f9",
+          "teaser_notice": "TEASE candidate, best teaser price -130 at BetMGM",
+          "teaser_price": -130,
+          "teaser_pricing": {
+            "as_of": "2026-09-11",
+            "scope": "BetMGM operator article, published September 2023; still posted; account ticket may differ",
+            "source_artifact": "work/teaser-wind-fix-v1/sources/betmgm-review.json",
+            "source_hash_basis": "Review receipt; original direct response was an access/interstitial page",
+            "source_page": "https://sports.betmgm.com/en/blog/nfl-betting-predictions-my-5-favorite-week-1-teaser-legs/",
+            "source_sha256": "6cc558a2d129950bedccf535976b9f46d0a1b5a42ed8c8c2e22f7dbdaa4bd6ea",
+            "three_leg": 160,
+            "two_leg": -130,
+            "verification": "OPERATOR_PUBLISHED_REFERENCE"
+          }
         }
       },
       "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
@@ -13224,7 +13621,7 @@
       "week": 18
     }
   ],
-  "published_at": "2026-09-11T18:39:52.711995+00:00",
+  "published_at": "2026-09-11T21:07:44.130935+00:00",
   "schema": "locked-board-v1",
   "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
   "week_records": {

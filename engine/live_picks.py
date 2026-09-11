@@ -43,6 +43,8 @@ def recompute(game, event, receipt, shape, config, previous=None, weather=None, 
     for offer in record['offers']:
         center=centers[offer['market']]['leave_one_out'][offer['book']]['center']
         offer['fair_probability']=probabilities(shape,offer['market'],center,offer,game['home_team'])['conditional_win'] if center is not None else None
+    from engine.teaser_prices import load as load_teaser_prices
+    record['teaser_prices']=load_teaser_prices(Path(__file__).resolve().parents[1])
     record['analysis']=analysis(record,previous,shape,state)
     record['paper_picks']=[]
     if record['analysis']['measured']['wind_rule'] and game['week']<=4 and centers['totals']['full']['coverage']>=2:
@@ -81,10 +83,10 @@ def analysis(record, previous, shape, state):
         fields['half_points'].append({'side':pick['side'],'from':pick['line'],'to':improved['line'],'same_EV_max_negative_price':ceiling,'buy_price_available':False})
         lines.append(f'Buying {pick["side"]} from {pick["line"]:+g} to {improved["line"]:+g} preserves the current modeled EV up to -{ceiling:.1f}; no captured buy-half price is available, so whether it is worth buying is unknown.' if ceiling else 'No comparable buy-half price is captured; the value of buying is unknown.')
     f=record['forecast'];band=f.get('status')=='FORECAST' and game['roof'] in ('open','outdoors') and 10<=f.get('wind_mph',-1)<15
-    from scripts.model_pick_runner import forecast_qualified
-    qualified=band and record['capture_label']=='T80' and forecast_qualified(f,game)
+    from engine.live_weather_v2 import qualified as forecast_qualified
+    qualified=band and 1<=game['week']<=4 and forecast_qualified(f,game)
     fields['wind_rule']=qualified
-    lines.append(f'Kickoff forecast wind is {f["wind_mph"]:.1f} mph. '+('WIND RULE applies at the lock if this forecast remains qualified.' if qualified else 'The wind is in the rule band, but a qualifying T80 forecast is still required.' if band else 'WIND RULE does not apply.') if f.get('status')=='FORECAST' else 'No qualified kickoff forecast is available; WIND RULE cannot apply.' if game['roof'] in ('open','outdoors') else 'The venue is indoors or its roof is unknown; WIND RULE does not apply.')
+    lines.append(f'Kickoff forecast wind is {f["wind_mph"]:.1f} mph. '+('WIND RULE applies to this live refresh; it is recorded only if qualified at the T75 lock.' if qualified else 'The wind is in the rule band, but the stored forecast does not pass the evidence checks.' if band else 'WIND RULE does not apply.') if f.get('status')=='FORECAST' else 'No qualified kickoff forecast is available; WIND RULE cannot apply.' if game['roof'] in ('open','outdoors') else 'The venue is indoors or its roof is unknown; WIND RULE does not apply.')
     elo=None
     if state and tuple(state.get('training_max_origin') or (0,0))<(game['season'],game['week']):
         teams=state['teams'];h=teams.get(canonical(game['home_abbr']));a=teams.get(canonical(game['away_abbr']))
