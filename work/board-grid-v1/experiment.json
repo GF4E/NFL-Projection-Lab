@@ -1,0 +1,47 @@
+{
+  "experiment": "board-grid-v1",
+  "at": "2026-09-11T08:42:39.057644+00:00",
+  "scope": "PRESENTATION_ONLY",
+  "engine_data_and_code_unchanged_from": "e0d71499e439fdd40783adfe252a13cb3fd80540",
+  "main_commit": "efb6289361ad565f2a66f52d0abb27f67e8d8c32",
+  "board_file_sha256": "9dcf4e4394e5ebb58534972d4556a2876925de5a33b578c690acc3f4dbc5d7b6",
+  "credits_spent": 0,
+  "tests": {
+    "main_pass": 248,
+    "main_skip": 1,
+    "main_fail": 0,
+    "production_reader_pass": 16,
+    "production_reader_fail": 0,
+    "typecheck": "PASS both",
+    "lint": "PASS main",
+    "build": "PASS both"
+  },
+  "decisions": [
+    "Restore earlier five-column row layout with original locally cached logos; EDGE becomes VERDICT.",
+    "Use only existing GET model-board and cached lines endpoints; preserve all backend, model, grade, quota, and publication code.",
+    "Displayed market prices use the existing selected-book cached feed; the book selector never changes a frozen verdict. Prices carry saved-capture timestamps in tooltips; no missing price or vig is inferred.",
+    "Keep finals and first grades; row matchup time is replaced by final score. Model picks, price picks, paper rules, and Jaret remain separate in the existing record block.",
+    "Show saved price pairs for historical reference on final games, not executable offers.",
+    "Expandable window holds consensus, freeze, version and published analytics. No card layout or selection recomputation."
+  ],
+  "deployment": {
+    "status": "succeeded",
+    "site_version": 173,
+    "site_source_commit": "3f882c88b8054c4e9839f5ff58d9b131e6f224d1",
+    "deployment_id": "appgdep_6aa3bf3b8ebc819196bc1b5e8afccfc2",
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday"
+  },
+  "live_verification": [
+    "Logos and all five columns rendered",
+    "Two-side prices and vig populated from existing cached feed",
+    "SF spread PASS WIN and total PASS LOSS remain unchanged",
+    "Final score replaces kickoff time in completed rows",
+    "Single grey no lock badge and separate Jaret wager lines",
+    "Decision window opens below row with consensus, freeze, shortened version and analytics",
+    "Four weekly record lines retained"
+  ],
+  "screenshots": {
+    "grid-overview.png": "f517a85f47a77582f1e4934546698a9daae6b8ea4e8c13261d3229a60a2fffc2",
+    "expanded-grid.png": "b732ddc2e0721063fc0757258049593b344fdfc6758c603bb475034e5a302725"
+  }
+}
