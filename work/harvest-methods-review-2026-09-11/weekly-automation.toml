@@ -1,0 +1,10 @@
+version = 1
+id = "weekly-nfl-component-harvest"
+kind = "heartbeat"
+name = "Weekly NFL component harvest"
+prompt = "Run the next pending item in the six-week harvest queue at /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6. Read AGENTS.md, HARVEST.md including Methods and data review (2026-09-11), and work/harvest-methods-review-2026-09-11/queue.json. Replace the former open-ended repo scan with exactly this order: Week 2 opponent-adjusted EPA, success rate and CPOE ridge ratings; Week 3 injury features paired with those ratings; Week 4 EPA per dropback and CPOE QB upgrade; Week 5 home dogs, rest, travel, Week 1 and 18; Week 6 EPA residual threshold retest; Week 7 Bayesian state-space ratings. Use each item's verbatim promotion_gate in queue.json, not the superseded blanket gate. Register inputs, targets, cutoff, population, comparator and operational definitions before viewing comparative results. An unresolved gate definition or missing input is BLOCKED; never invent a threshold or treat missing evidence as passing. Complete the next item before advancing. Record pass or negative outcome and immutable experiment path in the queue; anything failing its criterion is negative and not revisited this season. Implement only the current named component and use the engine.harvest --harvest grade-and-compare workflow where applicable. Pin sources, preserve chronology and cutoff labels, and never copy unlicensed nfelo code. Do not alter historical gates, frozen experiments, or the T75 live package; its Week 4 review and new-version requirements remain. Use no Odds API credits. Test meaningful behavior, run the pinned Python commit guard, commit and push only engine-v2 and verify the remote commit. Stay quiet for unchanged or non-actionable state; notify on completion, failure, or a required decision. After all six items have terminal outcomes, pause this automation and report completion."
+status = "ACTIVE"
+rrule = "FREQ=WEEKLY;BYDAY=TU;BYHOUR=9;BYMINUTE=0;BYSECOND=0"
+target_thread_id = "01a06e57-ea63-71c1-9c75-ba48f42d3a2c"
+created_at = 1788891688457
+updated_at = 1789148773485

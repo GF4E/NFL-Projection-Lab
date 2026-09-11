@@ -1,0 +1,36 @@
+{
+  "id": "harvest-methods-review-2026-09-11",
+  "date": "2026-09-11",
+  "parent_commit": "9cd5885a31babcef730700732a3a2c14abd04f0d",
+  "source_attachment_sha256": "8b805097d4a7bb870cf0f8d1c2a1d5e574c1a8c536b836d64be9d24a1dfa061f",
+  "review_sha256": "027735158bc75d47dbfb8820cdc7c8c28f21ba9632eee389a67ae11e4775eb12",
+  "prior_harvest_sha256": "13352cebedce4f84495db70681e1bec523463f7221316e65fe379746179c8f07",
+  "prior_agents_sha256": "f5b09ab8b428b01cb74855f70de13ad1187a5a685832e2a25116f2ebb9d5a057",
+  "historical_harvest_suffix_sha256": "995f10fc49b161c062949295361e5eaa277027159dc9a4011b7a75e7476c9f93",
+  "historical_harvest_prefix_sha256": "1b91a492e2e16240d3eab6aacf1419dc668c8d65ab25ca78261b28d9765d8cab",
+  "decisions": [
+    "Append supplied review unchanged, excluding its instruction paragraph. Claims are user supplied and were not reverified.",
+    "Replace prospective weekly queue and gates only, preserving historical experiments and T75 live-package restrictions.",
+    "Preserve existing Tuesday 09:00 local cadence and existing heartbeat identity. Advance in order, keep blockers pending, stop after six completed items.",
+    "Record exact success criteria; register any needed operational definitions before viewing comparisons. No new statistical thresholds are invented in this scheduling change."
+  ],
+  "odds_api_credits_spent": 0,
+  "verification": {
+    "passed": 5,
+    "failed": 0,
+    "checks": [
+      "Verbatim appendix matches source bytes and hash",
+      "Six queue items and promotion gates match section 6 in order",
+      "All prior HARVEST content outside replaced weekly loop preserved",
+      "T75 frozen live-package instructions unchanged",
+      "Updated heartbeat persisted with existing identity, cadence and completion stop"
+    ]
+  },
+  "automation": {
+    "id": "weekly-nfl-component-harvest",
+    "status": "ACTIVE",
+    "schedule_snapshot": "weekly-automation.toml",
+    "snapshot_sha256": "128100c27e03dbc2bd17e944d3ab0d0ade1b689d91fbd13a5beeed6c69ad9600",
+    "verification_scope": "Persisted configuration only; future execution not yet observed"
+  }
+}
