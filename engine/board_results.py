@@ -22,7 +22,7 @@ def refresh(root=ROOT):
     put(out/'result-refreshes'/(now.strftime('%Y%m%dT%H%M%SZ')+'-'+ref['sha256']+'.json'),{**ref,'received_at':now.isoformat(),'url':URL})
     result=report(output=out)
     from engine.slip_grade import run
-    jaret=run(results_path=ref['path'])
-    return {'source':ref,'graded':len(grades),'model_report':result,'jaret_report':jaret,'credits_spent':0}
+    jarrett=run(results_path=ref['path'])
+    return {'source':ref,'graded':len(grades),'model_report':result,'jarrett_report':jarrett,'credits_spent':0}
 
 if __name__=='__main__': print(json.dumps(refresh()))

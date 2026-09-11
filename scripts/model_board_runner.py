@@ -15,7 +15,7 @@ from scripts.nfl_engine_autopush import guard, git, REMOTE
 def push_board():
     if git('symbolic-ref', '--short', 'HEAD').strip() != b'engine-v2' or git('remote', 'get-url', 'origin').decode().strip() != REMOTE:
         raise RuntimeError('Unexpected publication branch or remote')
-    allowed = ('outputs/model-pick-v1/board.json', 'outputs/model-pick-v1/board-versions/', 'outputs/model-pick-v1/result-refreshes/', 'outputs/model-pick-v1/final-sources/', 'outputs/model-pick-v1/grades/', 'outputs/model-pick-v1/reports/', 'outputs/jaret/grades/', 'outputs/jaret/reports/', 'outputs/jaret/source-reports/')
+    allowed = ('outputs/model-pick-v1/board.json', 'outputs/model-pick-v1/board-versions/', 'outputs/model-pick-v1/result-refreshes/', 'outputs/model-pick-v1/final-sources/', 'outputs/model-pick-v1/grades/', 'outputs/model-pick-v1/reports/', 'outputs/jarrett/grades/', 'outputs/jarrett/reports/', 'outputs/jarrett/source-reports/')
     staged = git('diff', '--cached', '--name-only').decode().splitlines()
     if any(not any(p == a or p.startswith(a) for a in allowed) for p in staged):
         return {'state': 'PUBLICATION_PENDING_OTHER_STAGED_WORK'}

@@ -1,4 +1,4 @@
-# Import Jaret's executed slips
+# Import Jarrett's executed slips
 
 Run from the repository root. These commands record wagers already placed; they never place a bet or call the Odds API.
 
@@ -20,7 +20,7 @@ A complete text slip imports immediately. Missing, ambiguous or invalid fields p
 
 Use `--confirm field` to accept an OCR value, or `--set field=value` to correct it. The timestamp must include its timezone; dollar/Euro/pound amounts and units remain distinct. Use the exact schedule game ID if a matchup appears more than once. Supported markets are straight, full-game spreads (including alternate lines), totals, and two-way moneylines, with overtime included. Multi-leg, player/period, free-bet and cashed-out slips require their own settlement rules and are blocked from automatic import.
 
-The append-only CSV is `outputs/jaret/pick_log.csv`. Each row has `source=jaret`, `status=executed`, `record_class=live`, game, market, side, frozen line/price, stake/currency, book, actual placement time and ingestion time. No approver or executor fields. Exact semantic duplicates return `already_recorded`. Raw text, screenshots and review drafts stay in ignored `private-input/` storage; only hashes and confirmed structured fields enter Git. Missing as-placed model probabilities remain blank.
+The append-only CSV is `outputs/jarrett/pick_log.csv`. Each row has `source=jarrett`, `status=executed`, `record_class=live`, game, market, side, frozen line/price, stake/currency, book, actual placement time and ingestion time. No approver or executor fields. Exact semantic duplicates return `already_recorded`. Raw text, screenshots and review drafts stay in ignored `private-input/` storage; only hashes and confirmed structured fields enter Git. Missing as-placed model probabilities remain blank.
 
 Grading and source breakdown:
 
@@ -28,9 +28,9 @@ Grading and source breakdown:
 /opt/anaconda3/bin/python3.12 -B -m engine.slip_grade --scorecard
 ```
 
-The command prints the paths to the Jaret scorecard and the combined **source scorecard**. Source rows distinguish Jaret, engine picks and registered paper rules; model versions remain separate. The existing `engine.scorecard --scorecard` also supports `executed` rows and source breakdowns for its supplied legacy logs. Original pick-log headers and frozen T75 programs are unchanged.
+The command prints the paths to the Jarrett scorecard and the combined **source scorecard**. Source rows distinguish Jarrett, engine picks and registered paper rules; model versions remain separate. The existing `engine.scorecard --scorecard` also supports `executed` rows and source breakdowns for its supplied legacy logs. Original pick-log headers and frozen T75 programs are unchanged.
 
-The hourly `com.gabe.nfl-jaret-scorecard` job uses the existing daily cached nflverse finals. Until both final scores and closing lines exist, slips remain pending. Settlement uses the actual locked line and price, including pushes. Grade records store return per unit and profit in the slip's original stake currency. First grades are immutable; later source corrections cannot silently change them.
+The hourly `com.gabe.nfl-jarrett-scorecard` job uses the existing daily cached nflverse finals. Until both final scores and closing lines exist, slips remain pending. Settlement uses the actual locked line and price, including pushes. Grade records store return per unit and profit in the slip's original stake currency. First grades are immutable; later source corrections cannot silently change them.
 
 Slip CLV compares closing fair probability with the executed price's break-even probability, and closing fair American price with the executed price. It is labeled `nflverse_close_vs_executed_price`. This differs from the T75 model's as-placed forecast-movement CLV and legacy executed-book closing quotes; those means are never pooled. A wager placed after kickoff receives no pregame CLV.
 

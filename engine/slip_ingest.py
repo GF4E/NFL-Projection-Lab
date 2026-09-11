@@ -17,7 +17,7 @@ from engine.pricing import decimal_odds
 from engine.pick_store import put, read_pinned, sha
 
 ROOT=Path(__file__).resolve().parents[1]
-DEFAULT_LOG=ROOT/'outputs/jaret/pick_log.csv'
+DEFAULT_LOG=ROOT/'outputs/jarrett/pick_log.csv'
 PRIVATE=ROOT/'work/slip-ingest-v1/private-input'
 EXTRA=['source','game_id','placed_at','stake','stake_currency','ingested_at','slip_id','confirmation_fields']
 SLIP_FIELDS=FIELDS+EXTRA
@@ -151,7 +151,7 @@ def ingest(text,games,log=DEFAULT_LOG,overrides=None,confirmed=(),ocr=(),private
     for key in ('line','price','stake'):canonical[key]=float(canonical[key])
     slip_id=sha(json.dumps(canonical,sort_keys=True).encode())
     row=dict.fromkeys(SLIP_FIELDS,'')
-    row.update(pick_id='jaret:'+slip_id,source='jaret',status='executed',record_class='live',game_id=game['game_id'],
+    row.update(pick_id='jarrett:'+slip_id,source='jarrett',status='executed',record_class='live',game_id=game['game_id'],
         event_id=game.get('event_id',game['game_id']),season=game['season'],week=game['week'],home_team=game['home_team'],away_team=game['away_team'],
         commence_time=game['kickoff_at'],decision_at=placed,placed_at=placed,executed_book=fields['book'],market=fields['market'],side=fields['side'],
         line_at_approval=canonical['line'],book_price=canonical['price'],stake=canonical['stake'],stake_currency=fields['stake_currency'],

@@ -166,7 +166,8 @@ def build(root=ROOT, now=None):
         feeds[latest] = final_feed(pinned(ref), latest)
     board = project(list(games.values()), records, grades, feeds, latest, config['version'], now or dt.datetime.now(dt.timezone.utc))
     from engine.board_summary import enrich
-    return enrich(board, records, grades, root)
+    from engine.live_board import enrich_live
+    return enrich_live(enrich(board, records, grades, root), records, root)
 
 
 def publish(root=ROOT, now=None):
@@ -175,7 +176,7 @@ def publish(root=ROOT, now=None):
     if path.exists() and json.loads(path.read_text()).get('content_sha256') == digest:
         return {'changed': False, 'path': str(path), 'sha256': digest}
     board.update({'content_sha256': digest, 'published_at': (now or dt.datetime.now(dt.timezone.utc)).isoformat()})
-    put(out/'board-versions'/(digest+'.json'), board)
+    # Current publication is overwritten; no new live-pick version snapshots.
     # Atomic mutable last-good pointer; no immutable source is overwritten.
     with tempfile.NamedTemporaryFile(mode='wb', dir=out, prefix='.board-', delete=False) as f:
         f.write(encode(board)); f.flush(); os.fsync(f.fileno()); temporary = f.name

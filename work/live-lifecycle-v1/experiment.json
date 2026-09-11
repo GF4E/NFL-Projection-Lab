@@ -1,0 +1,30 @@
+{
+  "date": "2026-09-11",
+  "request": "Mutable live selections at Friday/Saturday noon PT, Sunday 07 PT and T80; T75 lock; measured analysis; shared pre-lock notes; canonical Jarrett name",
+  "authorization": "Gabe explicitly superseded lifecycle and authorized both engine-v2 and main pushes and one Friday capture now. Selection, distribution, probability filter and Week 1 60-credit cap unchanged.",
+  "lifecycle": "One current JSON per game contains two live picks; overwritten each capture. Only locked picks and frozen human leans enter scoring. Source receipts stay hash-pinned. Earlier frozen records are preserved, not rewritten. Git remains the requested backup, not a live pick history interface.",
+  "notes": "Shared secret code permits Gabe/Jarrett editing on the public site. D1 holds one note per game. Server timestamp and atomic SQL guard reject T75 and later updates. Engine freezes server note with lock. No synthetic note is entered for a real game.",
+  "analysis": "Only measured fields or explicit unknowns. Plain Elo without QB adjustment is diagnostic only. No buy-half quote implies no buy recommendation. Wind paper rule retains its existing forecast qualification.",
+  "migration": {
+    "canonical_source": "jarrett",
+    "caesars_rows": 2,
+    "all_other_row_fields_preserved": true,
+    "old_jaret_artifacts": "Read-only historical copies, excluded from active readers; kept because deleting files and overwriting first grades is prohibited."
+  },
+  "verification": {
+    "engine_pass": 143,
+    "engine_fail": 0,
+    "web_pass": 254,
+    "web_fail": 0,
+    "web_skip": 1,
+    "main_build": "PASS",
+    "site_build": "PASS",
+    "typecheck_both": "PASS"
+  },
+  "friday_capture": "PENDING",
+  "credits_before": {
+    "spent": 2,
+    "remaining": 58,
+    "cap": 60
+  }
+}

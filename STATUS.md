@@ -1,3 +1,7 @@
+# Current status — live lifecycle September 11, 2026
+
+Mutable Friday/Saturday/Sunday/T80 selections and T75 locking are implemented. The compact grid opens measured analysis and a shared pre-lock note, with frozen human leans graded separately. Jarrett is the canonical source; both Caesars rows and original outcomes are preserved. Deployment and the explicitly requested Friday capture are being verified. [Experiment](work/live-lifecycle-v1/experiment.json). Earlier status entries below are historical.
+
 # Current status — cloud primary verified September 11, 2026
 
 Current step: cloud scheduler migration complete. DigitalOcean `nfl-engine-primary` (`159.89.185.88`, NYC3) runs the original T80/T75 workers under systemd. Both timers are enabled and both jobs have observed exit 0. Cloud synthetic capture/lock/grade produced two picks and two grades with no provider requests; the host successfully committed and pushed artifacts to `engine-v2`. [Deployment evidence](work/cloud-migration-v1/experiment.json).
@@ -10,7 +14,7 @@ No deployment decision is needed from Gabe. Earlier missing wager details remain
 
 # Current status — September 11, 2026
 
-Current step: compact locked-pick board, SF/LA final grades, and Caesars executions completed. SF +3.5 is WIN; Over 47.5 is LOSS. Seattle -3 is PUSH and Rams -3 is LOSS in the separate Jaret log. [Evidence and tests](work/board-redesign-v1/experiment.json).
+Current step: compact locked-pick board, SF/LA final grades, and Caesars executions completed. SF +3.5 is WIN; Over 47.5 is LOSS. Seattle -3 is PUSH and Rams -3 is LOSS in the separate Jarrett log. [Evidence and tests](work/board-redesign-v1/experiment.json).
 
 No Odds API credits used by this change. Week 1 has 58 of 60 credits remaining after the scheduled SF/LA capture; see the experiment budget snapshot. The T80/T75 schedule and frozen engine remain unchanged. The read-only refresh button fetches the latest published board; it does not dispatch odds requests. Hourly public final refreshes preserve every source and first grade.
 
@@ -42,10 +46,10 @@ Reports: `outputs/model-pick-v1/reports/`, separated by version; CLV reference i
 
 ## Executed slip ingestion
 
-Implemented `--ingest-slip` for pasted text and local screenshots. Production log: `outputs/jaret/pick_log.csv`, source `jaret`, status `executed`. Missing fields and all OCR fields require confirmation before append. No real slip was supplied. The hourly cached-results grading job has observed exit 0; source scorecards retain separate model versions and CLV references. [Usage](SLIPS.md), [experiment](work/slip-ingest-v1/experiment.json).
+Implemented `--ingest-slip` for pasted text and local screenshots. Production log: `outputs/jarrett/pick_log.csv`, source `jarrett`, status `executed`. Missing fields and all OCR fields require confirmation before append. No real slip was supplied. The hourly cached-results grading job has observed exit 0; source scorecards retain separate model versions and CLV references. [Usage](SLIPS.md), [experiment](work/slip-ingest-v1/experiment.json).
 
 Verification: 117 passed, 0 failed; local screenshot rehearsal and duplicate/idempotent grading verified. Odds API credits spent: 0. Evidence and commands are in the linked experiment. Frozen T75 file hashes are unchanged. Last verified pushed commit before this update: `53916c86cdb70b0012ffe9a23fad48b4aefe2dca`.
 
 ## Locked board bridge — September 11, 2026
 
-Read-only board export and website reader implemented. NE at SEA is 13–10 FINAL, with both immutable model records MISSED; no retrospective picks or grades were invented. Frozen runtime hashes are unchanged. Zero Odds API credits. Verification and decisions: [experiment](work/board-bridge-v1/experiment.json). Reader deployed and verified live. Capture and daily-grade publication wrappers are loaded and each has observed exit 0. The site displays the real final and MISSED state; W/L/PUSH display is covered by synthetic tests. Last verified engine commit before this change: `fa1008c5f5918016f89f4c3427282490c6668512`. Jaret slip remains pending confirmation of the placement timezone.
+Read-only board export and website reader implemented. NE at SEA is 13–10 FINAL, with both immutable model records MISSED; no retrospective picks or grades were invented. Frozen runtime hashes are unchanged. Zero Odds API credits. Verification and decisions: [experiment](work/board-bridge-v1/experiment.json). Reader deployed and verified live. Capture and daily-grade publication wrappers are loaded and each has observed exit 0. The site displays the real final and MISSED state; W/L/PUSH display is covered by synthetic tests. Last verified engine commit before this change: `fa1008c5f5918016f89f4c3427282490c6668512`. Jarrett slip remains pending confirmation of the placement timezone.

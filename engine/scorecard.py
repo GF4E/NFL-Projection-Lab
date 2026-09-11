@@ -99,7 +99,7 @@ def scorecard(picks, results=None, grades=(), output=ROOT/'outputs/scorecard.csv
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--scorecard',action='store_true',required=True)
-    p.add_argument('--picks',nargs='+',default=[str(ROOT/'outputs/week1-pricing/pick_log.csv'),str(ROOT/'outputs/week1-pricing/paper_pick_log.csv'),str(ROOT/'outputs/weather-paper/pick_log.csv')]+([str(ROOT/'outputs/jaret/pick_log.csv')] if (ROOT/'outputs/jaret/pick_log.csv').exists() else []))
+    p.add_argument('--picks',nargs='+',default=[str(ROOT/'outputs/week1-pricing/pick_log.csv'),str(ROOT/'outputs/week1-pricing/paper_pick_log.csv'),str(ROOT/'outputs/weather-paper/pick_log.csv')]+([str(ROOT/'outputs/jarrett/pick_log.csv')] if (ROOT/'outputs/jarrett/pick_log.csv').exists() else []))
     p.add_argument('--results',help='Final results CSV: event_id,home_score,away_score,status; season/week optional cross-check')
     p.add_argument('--grades',nargs='*',default=[],help='Verified pick_clv.csv outputs from --grade, for live and paper')
     p.add_argument('--output',default=str(ROOT/'outputs/scorecard.csv'))

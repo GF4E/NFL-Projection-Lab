@@ -14,7 +14,7 @@ def summary(rows):
 
 def enrich(board, records, grades, root):
     records = {r['game']['game_id']: r for r in records}
-    jaret = [json.loads(p.read_text()) for p in (Path(root)/'outputs/jaret/grades').glob('*.json')]
+    jarrett = [json.loads(p.read_text()) for p in (Path(root)/'outputs/jarrett/grades').glob('*.json')]
     weeks = {}
     for week in sorted({g['week'] for g in board['games']}):
         rows = [r for r in grades if r['week'] == week]
@@ -22,13 +22,13 @@ def enrich(board, records, grades, root):
             'model': summary([r for r in rows if r['kind'] == 'actual']),
             'price': summary([r for r in rows if r['kind'] == 'actual' and r['edge_source'] == 'price']),
             'paper': summary([r for r in rows if r['kind'].startswith('WIND-')]),
-            'jaret': summary([r for r in jaret if int(r['week']) == week]),
+            'jarrett': summary([r for r in jarrett if int(r['week']) == week]),
         }
     board['week_records'] = weeks
     board['clv_reference'] = 'nflverse_close; reference CLV, not executed-book closing quotes'
     for game in board['games']:
         record = records.get(game['game_id'])
-        game['executed_picks'] = [{k: g.get(k) for k in ('side','line_at_approval','book_price','executed_book','outcome','stake','stake_currency')} for g in jaret if g['game_id'] == game['game_id']]
+        game['executed_picks'] = [{k: g.get(k) for k in ('side','line_at_approval','book_price','executed_book','outcome','stake','stake_currency')} for g in jarrett if g['game_id'] == game['game_id']]
         if not record or record['status'] != 'LOCKED': continue
         game['consensus'] = {m: {'line': (-1 if m == 'spreads' else 1)*v['full']['center'],
                                 'coverage': v['full']['coverage']} for m,v in record.get('consensus',{}).items()}

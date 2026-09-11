@@ -20,7 +20,7 @@ class SlipTests(unittest.TestCase):
     def rows(self):return list(csv.DictReader(self.log.read_text().splitlines()))
     def test_complete_text_and_dedup(self):
         r=self.ingest();self.assertEqual(r['status'],'executed');row=self.rows()[0]
-        self.assertEqual((row['source'],row['status'],row['record_class']),('jaret','executed','live'))
+        self.assertEqual((row['source'],row['status'],row['record_class']),('jarrett','executed','live'))
         self.assertEqual(float(row['stake']),25);self.assertEqual(row['placed_at'],'2026-09-10T18:05:00-04:00')
         self.assertEqual(self.ingest()['status'],'already_recorded');self.assertEqual(len(self.rows()),1)
         self.assertEqual(row['fair_probability'],'');self.assertEqual(row['model_probability'],'')
@@ -57,7 +57,7 @@ class SlipTests(unittest.TestCase):
             path=self.root/(name+'.csv');paths.append(path)
             with path.open('w',newline='') as f:w=csv.DictWriter(f,fieldnames=list(rows[0]));w.writeheader();w.writerows(rows)
         rows=scorecard([self.log],paths[0],[paths[1]],self.root/'scorecard.csv')
-        row=next(r for r in rows if r['source']=='jaret' and r['scope']=='cumulative' and r['market']=='spreads' and r['record_class']=='live')
+        row=next(r for r in rows if r['source']=='jarrett' and r['scope']=='cumulative' and r['market']=='spreads' and r['record_class']=='live')
         self.assertEqual(row['pushes'],1);self.assertEqual(row['clv_n'],1)
     def test_moneyline_tie_and_total_settle(self):
         self.ingest();p=self.rows()[0];r={'final':True,'home_score':24,'away_score':24,'spread_line':0,'total_line':46,'source_sha256':'synthetic'}

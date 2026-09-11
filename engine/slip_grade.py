@@ -42,7 +42,7 @@ def settle(pick,result,shape):
         clv_probability=fair-1/decimal_odds(pick['book_price']) if fair is not None else None,
         clv_status='SLIP_NFLVERSE_CLOSE_PRICED',clv_reference='nflverse_close_vs_executed_price',
         clv_probability_basis='closing_fair_minus_executed_break_even; not as-placed model movement',
-        stake=float(pick['stake']) if pick['stake'] else None,stake_currency=pick['stake_currency'],profit=float(pick['stake'])*result_grade['units'] if pick['stake'] else None,source='jaret')
+        stake=float(pick['stake']) if pick['stake'] else None,stake_currency=pick['stake_currency'],profit=float(pick['stake'])*result_grade['units'] if pick['stake'] else None,source='jarrett')
     if not pick['placed_at']:
         result_grade.update(clv_cents=None,clv_probability=None,clv_status='UNKNOWN_PLACEMENT_TIME')
     elif timestamp(pick['placed_at'])>=timestamp(pick['commence_time']):
@@ -50,7 +50,7 @@ def settle(pick,result,shape):
     return result_grade
 
 
-def run(log=DEFAULT_LOG,output=ROOT/'outputs/jaret',results_path=None,*,include_model=True):
+def run(log=DEFAULT_LOG,output=ROOT/'outputs/jarrett',results_path=None,*,include_model=True):
     from engine.scorecard import scorecard
     output=Path(output);picks=read(log) if Path(log).exists() else []
     config=json.loads((ROOT/'work/model-pick-v1/runtime-config.json').read_text());shape=read_pinned(config['distribution'])
@@ -94,7 +94,7 @@ def run(log=DEFAULT_LOG,output=ROOT/'outputs/jaret',results_path=None,*,include_
             combined.append({**r,'source':'engine' if not r['subset'].startswith('WIND-') else 'paper_rule'})
     if (report/'scorecard.csv').exists():
         for r in read(report/'scorecard.csv'):
-            if r['source']=='jaret' or not picks and r['source']=='ALL':combined.append({**r,'source':'jaret','version':'executed-slip-v1'})
+            if r['source']=='jarrett' or not picks and r['source']=='ALL':combined.append({**r,'source':'jarrett','version':'executed-slip-v1'})
     fields=list(dict.fromkeys(k for r in combined for k in r)) or ['source','version','market','week']
     source_id=sha(json.dumps(combined,sort_keys=True).encode())
     source_report=output/'source-reports'/source_id/'scorecard.csv'
@@ -105,5 +105,5 @@ def run(log=DEFAULT_LOG,output=ROOT/'outputs/jaret',results_path=None,*,include_
 
 if __name__=='__main__':
     import argparse
-    p=argparse.ArgumentParser();p.add_argument('--scorecard',action='store_true',required=True);p.add_argument('--log',default=str(DEFAULT_LOG));p.add_argument('--output',default=str(ROOT/'outputs/jaret'));p.add_argument('--results');a=p.parse_args()
+    p=argparse.ArgumentParser();p.add_argument('--scorecard',action='store_true',required=True);p.add_argument('--log',default=str(DEFAULT_LOG));p.add_argument('--output',default=str(ROOT/'outputs/jarrett'));p.add_argument('--results');a=p.parse_args()
     print(json.dumps(run(a.log,a.output,a.results),indent=2))

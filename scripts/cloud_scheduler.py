@@ -19,7 +19,7 @@ from scripts.nfl_engine_autopush import guard, REMOTE
 
 LOCK_PATH = 'work/cloud-migration-v1/ownership.json'
 OUT = ROOT/'outputs/model-pick-v1'
-ALLOWED = ('outputs/model-pick-v1/', 'outputs/jaret/',
+ALLOWED = ('outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
            'work/model-pick-v1/daily/', 'work/model-pick-v1/sources/',
            'work/model-pick-v1/schedules/', 'work/model-pick-v1/states/',
            'work/model-pick-v1/depth/')
@@ -109,12 +109,14 @@ def run(mode, host):
         publish_artifacts()
         if mode == 'daily' and capture_window():
             return {'state': 'DEFERRED_CAPTURE_WINDOW'}
-        code = worker('model_pick_runner.py' if mode == 'capture' else 'model_pick_daily.py')
+        code = worker('live_pick_runner.py' if mode == 'capture' else 'model_pick_daily.py')
         if mode == 'daily':
             from engine.board_results import refresh
             refresh()
             from engine.slip_grade import run as grade_slips
             grade_slips()
+        from engine.live_scorecard import run as live_scorecard
+        live_scorecard(ROOT)
         from engine.board_bridge import publish
         publish()
         commit = publish_artifacts()

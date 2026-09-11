@@ -15,7 +15,7 @@ def record(game, side, line, price, book, evidence, stake=None, log=DEFAULT_LOG)
     if abs(price) < 100: raise ValueError('Invalid American price')
     identity = sha(json.dumps([game['game_id'], side, line, price, book, evidence],sort_keys=True).encode())
     row = dict.fromkeys(SLIP_FIELDS, '')
-    row.update(pick_id='jaret:'+identity, slip_id=identity, source='jaret', status='executed', record_class='live',
+    row.update(pick_id='jarrett:'+identity, slip_id=identity, source='jarrett', status='executed', record_class='live',
                game_id=game['game_id'],event_id=game['game_id'],season=game['season'],week=game['week'],
                home_team=game['home_team'],away_team=game['away_team'],commence_time=game['kickoff_at'],
                executed_book=book,market='spreads',side=side,line_at_approval=line,book_price=price,
