@@ -1,0 +1,25 @@
+[Unit]
+Description=NFL daily preparation and grade with hourly last-good finals publication
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=nflengine
+Group=nflengine
+WorkingDirectory=/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6
+EnvironmentFile=/etc/nfl-engine/secrets.env
+Environment=NFL_RUNNER_ID=digitalocean:599707390
+Environment=GIT_TERMINAL_PROMPT=0
+Environment=OPENBLAS_NUM_THREADS=1
+ExecStart=/opt/nfl-runtime/env/bin/python -B scripts/cloud_scheduler.py daily
+TimeoutStartSec=720
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6
+MemoryHigh=300M
+MemoryMax=400M
+MemorySwapMax=1500M

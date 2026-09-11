@@ -1,0 +1,8 @@
+#!/bin/sh
+# Defense in depth for the repository-scoped deploy key.
+while read local_ref local_sha remote_ref remote_sha; do
+  if [ "$remote_ref" != refs/heads/engine-v2 ]; then
+    echo 'Blocked: cloud publisher may push engine-v2 only.' >&2
+    exit 1
+  fi
+done

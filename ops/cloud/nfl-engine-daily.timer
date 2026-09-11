@@ -1,0 +1,11 @@
+[Unit]
+Description=NFL daily job, retaining hourly public-final refresh cadence
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+AccuracySec=30s
+Unit=nfl-engine-daily.service
+
+[Install]
+WantedBy=timers.target

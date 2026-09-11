@@ -1,0 +1,11 @@
+[Unit]
+Description=Check NFL T80/T75 windows every 15 seconds
+
+[Timer]
+OnBootSec=30s
+OnUnitActiveSec=15s
+AccuracySec=1s
+Unit=nfl-engine-capture.service
+
+[Install]
+WantedBy=timers.target
