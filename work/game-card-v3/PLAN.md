@@ -74,3 +74,7 @@ Final user specification: SPEC-final.md. This revision precedes implementation o
 ## Immediate final display amendment
 
 The later direct request supersedes B2/C5/E2/E3 display requirements: retain quote fields in engine evidence, but no bookmaker, odds price, EV, break-even, movement, or book selector is rendered. The only line beneath picks is the consensus: Line: HOME handicap · Total total. Section D football WHY appears only with existing measured sheet blocks. The removal was committed first: main 9e274da and engine-v2 8065ff4.
+
+## Completion evidence
+
+B1–B9, C1–C8, D1–D6, E1–E9 (with immediate display amendment), F1–F4, G1–G8 and H1–H7 are implemented. `experiment.json`, `live-readback.json`, `rendered-readback.json`, `verification/` and `screenshots/` hold the checks. Missing historical tiles stay NOT_RECORDED; future scheduled locks remain prospective. No book-level detail is rendered. Snapshot coverage is synthetic; live screenshot coverage includes the existing FINAL and UPCOMING states.

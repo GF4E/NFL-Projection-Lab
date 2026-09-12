@@ -1,6 +1,6 @@
 {
   "id": "game-card-v3-final",
-  "status": "IMPLEMENTED_AWAITING_LIVE_VERIFICATION",
+  "status": "VERIFIED_DEPLOYED",
   "spec": "SPEC-final.md",
   "plan": "PLAN.md",
   "latest_amendment": "No book names, prices, EV, movement, selectors or slip controls on cards/site. Consensus only. Football WHY only with measured sheet blocks.",
@@ -10,7 +10,7 @@
   },
   "credits_spent": 0,
   "tests": {
-    "engine": 213,
+    "engine": 214,
     "main": 298,
     "site": 417,
     "render_snapshots": 18,
@@ -25,7 +25,36 @@
     "No measured counter-reason means an explicit absence sentence; OURS retains an Against: absence bullet rather than fabricated football evidence.",
     "Legacy per-person map archived for legacy replay; new guide and scorecard use source ours.",
     "Existing hosted scheduler replay tests now set a deterministic database clock; source scheduler and registered contracts remain unchanged. Missing ignored laboratory manifests restored locally only from hash-matching originals.",
-    "Prior presentation assertions updated for expressly removed price, teaser and methodology displays. Existing model/ledger tests retained."
+    "Prior presentation assertions updated for expressly removed price, teaser and methodology displays. Existing model/ledger tests retained.",
+    "Unchanged input hashes retain draft generation time, preventing scheduler commit churn. No capture schedule or Odds API call changed.",
+    "Historical MISSED records expose no freeze timestamp. Archived failure timestamps remain unchanged.",
+    "Map OAK/WSH/LAR sensor aliases to LV/WAS/LA game labels without inventing missing data. MARKET explanation explicitly says ATS lean, not outright favorite.",
+    "Scheduler-only timestamp commits merged without changing locks, sources or quotes. Reconciled mutable board published with a current publication timestamp to respect last-good rollback protection."
   ],
-  "updated_at": "2026-09-12T21:55:25.676641+00:00"
+  "updated_at": "2026-09-12T22:15:13.254557+00:00",
+  "deployment": {
+    "sites_version": 185,
+    "site_commit": "24c8f90044e7b495847bc7e6b5afd15ee659e244",
+    "status": "succeeded",
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday",
+    "main_commit": "d3f4fef0d8a9e19edfce59df4a0ff273f48a01c9",
+    "reader_builds": "main and Sites production builds passed",
+    "cloud_capture_timer": "active",
+    "cloud_daily_timer": "active",
+    "cloud_capture_result": "success/0",
+    "cloud_daily_result": "success/0",
+    "cloud_shared_entry_sync_verified": true
+  },
+  "verification": {
+    "live_artifact": "live-readback.json",
+    "rendered_text": "rendered-readback.json",
+    "tests": "verification/",
+    "screenshots": [
+      "screenshots/final-390.png",
+      "screenshots/upcoming-390.png",
+      "screenshots/final-1280.png",
+      "screenshots/upcoming-1280.png"
+    ],
+    "screenshot_method": "Native CUA capture at browser viewport overrides. Playwright screenshot output had a compositor scaling mismatch; native screenshot and DOM widths agree. mobile-full-390.png retained as diagnostic only, not acceptance evidence."
+  }
 }
