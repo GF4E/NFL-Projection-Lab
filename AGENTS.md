@@ -80,3 +80,7 @@ Gabe and Jarrett should click selections and lock singles, parlays, or teasers o
 Apply displayed-score consistency checks to every available matchup/market. Do not change a score to justify a pick. Contradictions must be visible and cannot be presented as supported PLAYs; preserve original selections and grades.
 
 The requested successor forecasting foundation is Elo plus weighted heuristics and sourced qualitative football inputs found through web research. Market prices assess the resulting lean, rather than originate the football forecast. Each weight and factual/interpretive input must be versioned and tied to an as-of source. No fabricated web evidence or validated-weight claims. Confidence means strength of evidence supporting the lean, not a guaranteed outcome. Preserve existing frozen records and registered evaluation gates.
+
+## September 12 shared guide simplification
+
+The board is a shared guide, not a person-by-person pick database. No person attribution, per-person record block, or author entry is required in the game guide or shared ticket flow. Display existing wagers as Our wager. Preserve historical records in their existing ledgers; do not delete or rewrite evidence to simplify the interface. New shared tickets already have no person field.

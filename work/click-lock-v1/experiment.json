@@ -1,14 +1,49 @@
 {
-  "experiment_id": "click-lock-v1",
+  "conflicts": 13,
+  "consistency_checks": 30,
   "created_at": "2026-09-12T19:47:09.501876+00:00",
   "credits_spent_by_this_work": 0,
-  "tests": {
-    "engine_passed": 186,
-    "reader_targeted_passed": 37,
-    "main_build": "PASS",
-    "sites_build": "PASS",
-    "sites_typecheck": "PASS"
+  "deployment": {
+    "artifact_check": {
+      "matches_current_engine_hash": true,
+      "matches_ticket_release_hash": false,
+      "note": "Verified current engine content hash after the existing publication cadence propagated the scheduler freshness update; no new Odds capture.",
+      "served_hash": "f4af230ae40522d680552e6e54821ac5e5b72528e2f394546d8a1a7ee47a9993",
+      "week1_matches_ticket_release": false
+    },
+    "browser": {
+      "click_to_slip": true,
+      "guide_text_visible": true,
+      "person_attribution_absent": true,
+      "real_ticket_submitted": false,
+      "screenshot": "work/click-lock-v1/shared-guide.png"
+    },
+    "cloud_ticket_code": "fcf8c43bd7498763b09b1500e2e1dd5f217e1238",
+    "endpoint": {
+      "authenticated_get": 200,
+      "tickets_at_check": 0,
+      "unauthenticated_get": 401
+    },
+    "reader_commit": "80bf1ba2f4fec79fb0ffd63b36de7ba3cf037f55",
+    "site_commit": "619a3a8e669e6076a006225813002ea2158013e0",
+    "status": "SUCCEEDED",
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday",
+    "verified_at": "2026-09-12T20:05:06.469406+00:00",
+    "version": 183
   },
+  "experiment_id": "click-lock-v1",
+  "football_successor": {
+    "experiment": "work/football-evidence-v1/experiment.json",
+    "remaining": [
+      "Complete football research coverage",
+      "Market-independent totals baseline",
+      "Candidate probability calibration and existing promotion requirements"
+    ],
+    "replay": "PASS",
+    "state": "RESEARCH_ONLY_NOT_LIVE",
+    "tests_passed": 6
+  },
+  "schema_note": "Generated Sites migration included unrelated historical schema differences; restricted the new migration to engine_tickets only. No DROP statements from that generated migration are published.",
   "scope": [
     "Click captured spread/total selections to form singles, parlays, or two/three-leg six-point teasers.",
     "Shared authenticated ticket record; paper by default; executed only when explicitly marked already placed. No sportsbook submission.",
@@ -16,10 +51,15 @@
     "Single price from captured quote. Combination price from user-entered sportsbook quote; no independence/product pricing.",
     "Atomic $100 ticket/game cap, idempotent lock, server-clock kickoff deadline, one-hour quote freshness, no mutable lock endpoint.",
     "Daily sync and engine-only grading; pushed combinations require settlement review when book policy is unknown.",
-    "Consistency check on all displayed score/selection pairs; conflicting unrounded means suppress actionable presentation only. Registered picks and filter/scorecards are unchanged."
+    "Consistency check on all displayed score/selection pairs; conflicting unrounded means suppress actionable presentation only. Registered picks and filter/scorecards are unchanged.",
+    "Shared guide supersession: remove person-by-person record block and author entry from game guide. Existing wagers display Our wager. No history deleted; no new per-person ticket field."
   ],
-  "consistency_checks": 30,
-  "conflicts": 13,
-  "deployment": "PENDING",
-  "schema_note": "Generated Sites migration included unrelated historical schema differences; restricted the new migration to engine_tickets only. No DROP statements from that generated migration are published."
+  "tests": {
+    "cloud_ticket_passed": 5,
+    "engine_passed": 192,
+    "main_build": "PASS",
+    "reader_targeted_passed": 37,
+    "sites_build": "PASS",
+    "sites_typecheck": "PASS"
+  }
 }
