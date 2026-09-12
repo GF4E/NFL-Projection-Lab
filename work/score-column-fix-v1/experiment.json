@@ -1,0 +1,19 @@
+{
+  "board_sha256": "ee6424bf052370549bd8a92caa5b1a7a7330537f41bfa26eeb42ed6c344826f5",
+  "checks": {
+    "final_scores_preserved": true,
+    "original_projections_preserved": true,
+    "scores_withheld": true,
+    "verdicts_preserved": true
+  },
+  "created_at": "2026-09-12T20:44:29.733435+00:00",
+  "credits_spent": 0,
+  "decision": "Remove market-derived projected score column across all matchups, not merely a warning. Preserve historical raw projections, selections, registered filters, locks and grades. Suppress unsupported PLAY presentation as before. Actual final scores remain.",
+  "deployment": "PENDING",
+  "experiment_id": "score-column-fix-v1",
+  "tests": {
+    "engine_pass": 192,
+    "fail": 0,
+    "reader_pass": 37
+  }
+}

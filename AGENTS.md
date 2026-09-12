@@ -84,3 +84,7 @@ The requested successor forecasting foundation is Elo plus weighted heuristics a
 ## September 12 shared guide simplification
 
 The board is a shared guide, not a person-by-person pick database. No person attribution, per-person record block, or author entry is required in the game guide or shared ticket flow. Display existing wagers as Our wager. Preserve historical records in their existing ledgers; do not delete or rewrite evidence to simplify the interface. New shared tickets already have no person field.
+
+## September 12 score-column correction
+
+Remove market-derived team-score means from the guide for every matchup. Warnings next to contradictory scores did not solve the presentation problem. Keep actual final scores, original winner and market selections, grades, and archived projection values intact. The guide must not restore a team-score forecast merely by adjusting it to agree with a pick. A future score forecast needs its own football basis.

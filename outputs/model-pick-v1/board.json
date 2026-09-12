@@ -1,6 +1,6 @@
 {
   "clv_reference": "nflverse_close; reference CLV, not executed-book closing quotes",
-  "content_sha256": "f4af230ae40522d680552e6e54821ac5e5b72528e2f394546d8a1a7ee47a9993",
+  "content_sha256": "ee6424bf052370549bd8a92caa5b1a7a7330537f41bfa26eeb42ed6c344826f5",
   "default_week": 1,
   "games": [
     {
@@ -46,7 +46,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -58,6 +57,10 @@
           "version": "week1-display-projection-v1"
         },
         "quote_at": null,
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "reason": "No lock: capture late",
@@ -163,7 +166,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -175,6 +177,10 @@
           "version": "week1-display-projection-v1"
         },
         "quote_at": "2026-09-10T23:15:10.600084+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.011514104778353351,
@@ -432,7 +438,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -458,6 +463,10 @@
           "winner": "Pittsburgh Steelers"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": 0.0019027546032023834,
@@ -844,7 +853,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -870,10 +878,14 @@
           "winner": "Baltimore Ravens"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.011514104778353351,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "betmgm",
             "edge_source": "tiebreak",
             "explanation": "Coin flip: deterministic equal-EV tiebreak.",
@@ -885,7 +897,7 @@
             "price": -102.0,
             "push": 0.0,
             "rationale": {
-              "assessment": "The score estimate has Baltimore Ravens winning by 3.027; the selected spread is -3.5. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -1.2% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -1.2% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is -2.5. Our line gives up 1 point versus that reference.",
                 "BAL must win by more than 3.5 points to cover.",
@@ -1257,7 +1269,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -1283,10 +1294,14 @@
           "winner": "Buffalo Bills"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.025495517723496952,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "fanduel",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
@@ -1298,7 +1313,7 @@
             "price": -105.0,
             "push": 0.0,
             "rationale": {
-              "assessment": "The score estimate has Buffalo Bills winning by 1.027; the selected spread is -1.5. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -2.5% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -2.5% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is -1. Our line gives up 0.5 points versus that reference.",
                 "BUF must win by more than 1.5 points to cover.",
@@ -1318,7 +1333,7 @@
           },
           "totals": {
             "EV": -0.024064478986758786,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "betmgm",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
@@ -1330,7 +1345,7 @@
             "price": -108.0,
             "push": 0.0,
             "rationale": {
-              "assessment": "The score estimate totals 45.401; the selection is Under 44.5. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -2.4% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -2.4% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is 45. Our line gives up 0.5 points versus that reference.",
                 "We need the combined score below 44.5.",
@@ -1678,7 +1693,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -1704,10 +1718,14 @@
           "winner": "Chicago Bears"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.03281519861830745,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "draftkings",
             "edge_source": "tiebreak",
             "explanation": "Coin flip: deterministic equal-EV tiebreak.",
@@ -1719,7 +1737,7 @@
             "price": -102.0,
             "push": 0.02521588946459413,
             "rationale": {
-              "assessment": "The score estimate has Carolina Panthers losing by 3.027; the selected spread is +3. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -3.3% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -3.3% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is +3. Our line matches it; there is no extra cushion from the line.",
                 "CAR can lose by fewer than 3 points and still cover; losing by exactly 3 is a push.",
@@ -1740,7 +1758,7 @@
           },
           "totals": {
             "EV": -0.015083477259643097,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "betmgm",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
@@ -1752,7 +1770,7 @@
             "price": -108.0,
             "push": 0.008981001727115717,
             "rationale": {
-              "assessment": "The score estimate totals 48.401; the selection is Under 47. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -1.5% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -1.5% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is 47.25. Our line gives up 0.25 points versus that reference.",
                 "We need the combined score below 47; exactly 47 is a push.",
@@ -2117,7 +2135,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -2143,6 +2160,10 @@
           "winner": "Jacksonville Jaguars"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.013484296040427168,
@@ -2178,7 +2199,7 @@
           },
           "totals": {
             "EV": 0.003535507467235577,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "draftkings",
             "edge_source": "price",
             "explanation": "Market pricing selected this side; no independent football signal.",
@@ -2190,7 +2211,7 @@
             "price": -102.0,
             "push": 0.0,
             "rationale": {
-              "assessment": "The score estimate totals 41.401; the selection is Under 39.5. SCORE CONFLICT: the score estimate points to the opposite side. The captured price supports this lean with an estimated return of +0.4% per unit staked; this is an estimate, not a verified edge. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The captured price supports this lean with an estimated return of +0.4% per unit staked; this is an estimate, not a verified edge. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is 40.25. Our line gives up 0.75 points versus that reference.",
                 "We need the combined score below 39.5.",
@@ -2538,7 +2559,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -2564,10 +2584,14 @@
           "winner": "Detroit Lions"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.001727115716752936,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "fanduel",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
@@ -2579,7 +2603,7 @@
             "price": 100.0,
             "push": 0.0,
             "rationale": {
-              "assessment": "The score estimate has New Orleans Saints losing by 6.973; the selected spread is +6.5. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -0.2% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -0.2% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is +7. Our line gives up 0.5 points versus that reference.",
                 "NO can lose by fewer than 6.5 points and still cover.",
@@ -2951,7 +2975,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -2977,6 +3000,10 @@
           "winner": "Tennessee Titans"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.03537388856905249,
@@ -3358,7 +3385,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -3384,10 +3410,14 @@
           "winner": "Cincinnati Bengals"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.020924671183738364,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "fanduel",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
@@ -3399,7 +3429,7 @@
             "price": -104.0,
             "push": 0.0,
             "rationale": {
-              "assessment": "The score estimate has Tampa Bay Buccaneers losing by 3.973; the selected spread is +3.5. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -2.1% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -2.1% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is +4. Our line gives up 0.5 points versus that reference.",
                 "TB can lose by fewer than 3.5 points and still cover.",
@@ -3420,7 +3450,7 @@
           },
           "totals": {
             "EV": -0.024064478986758786,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "fanduel",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
@@ -3432,7 +3462,7 @@
             "price": -108.0,
             "push": 0.0,
             "rationale": {
-              "assessment": "The score estimate totals 51.401; the selection is Under 50.5. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -2.4% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -2.4% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is 51. Our line gives up 0.5 points versus that reference.",
                 "We need the combined score below 50.5.",
@@ -3736,7 +3766,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -3762,6 +3791,10 @@
           "winner": "Los Angeles Chargers"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.022123529895550553,
@@ -4187,7 +4220,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -4213,6 +4245,10 @@
           "winner": "Minnesota Vikings"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.013484296040427168,
@@ -4248,7 +4284,7 @@
           },
           "totals": {
             "EV": -0.024064478986758786,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "betmgm",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
@@ -4260,7 +4296,7 @@
             "price": -108.0,
             "push": 0.0,
             "rationale": {
-              "assessment": "The score estimate totals 47.401; the selection is Under 46.5. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -2.4% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -2.4% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is 47. Our line gives up 0.5 points versus that reference.",
                 "We need the combined score below 46.5.",
@@ -4621,7 +4657,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -4647,6 +4682,10 @@
           "winner": "Las Vegas Raiders"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": 0.006076888633020028,
@@ -4683,7 +4722,7 @@
           },
           "totals": {
             "EV": -0.006018333997608594,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "fanduel",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
@@ -4695,7 +4734,7 @@
             "price": -104.0,
             "push": 0.0,
             "rationale": {
-              "assessment": "The score estimate totals 41.401; the selection is Under 39.5. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -0.6% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -0.6% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is 40.25. Our line gives up 0.75 points versus that reference.",
                 "We need the combined score below 39.5.",
@@ -5021,7 +5060,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -5047,6 +5085,10 @@
           "winner": "Philadelphia Eagles"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.029990130767332757,
@@ -5433,7 +5475,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -5459,6 +5500,10 @@
           "winner": "Dallas Cowboys"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": 0.06242289661978784,
@@ -5846,7 +5891,6 @@
       "prediction": {
         "explanation": [
           "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
-          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
           "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
@@ -5872,10 +5916,14 @@
           "winner": "Kansas City Chiefs"
         },
         "quote_at": "2026-09-12T19:00:12.744998+00:00",
+        "score_presentation": {
+          "reason": "Market-derived team means are not a supporting football score forecast.",
+          "status": "WITHHELD"
+        },
         "selections": {
           "spreads": {
             "EV": -0.025495517723496952,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "draftkings",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
@@ -5887,7 +5935,7 @@
             "price": -105.0,
             "push": 0.0,
             "rationale": {
-              "assessment": "The score estimate has Denver Broncos losing by 2.973; the selected spread is +2.5. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -2.5% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -2.5% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is +3. Our line gives up 0.5 points versus that reference.",
                 "DEN can lose by fewer than 2.5 points and still cover.",
@@ -5908,7 +5956,7 @@
           },
           "totals": {
             "EV": -0.010658771280532997,
-            "betting_status": "SCORE CONFLICT \u2014 LEAN ONLY \u00b7 STALE",
+            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
             "book": "draftkings",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
@@ -5920,7 +5968,7 @@
             "price": -105.0,
             "push": 0.0,
             "rationale": {
-              "assessment": "The score estimate totals 44.401; the selection is Under 43.5. SCORE CONFLICT: the score estimate points to the opposite side. The price does not justify confidence: estimated return is -1.1% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -1.1% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
               "reasons": [
                 "The other-book reference for this side is 43.5. Our line matches it; there is no extra cushion from the line.",
                 "We need the combined score below 43.5.",
@@ -15112,7 +15160,7 @@
       "week": 18
     }
   ],
-  "published_at": "2026-09-12T20:00:16.222443+00:00",
+  "published_at": "2026-09-12T20:10:19.080577+00:00",
   "schema": "locked-board-v1",
   "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
   "week_records": {

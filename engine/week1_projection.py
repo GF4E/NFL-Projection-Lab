@@ -95,14 +95,13 @@ def display(record, game, now):
         consistency = score_consistency(projection, pick, record['game'])
         selections[market]['score_consistency'] = consistency
         if consistency['state'] in ('OPPOSES', 'PUSH'):
-            selections[market]['rationale']['assessment'] = consistency['text']+' '+selections[market]['rationale']['assessment']
+            selections[market]['rationale']['assessment'] = 'No independent score forecast supports a point advantage for this selection. '+selections[market]['rationale']['assessment']
             if not final:
-                selections[market]['betting_status'] = 'SCORE CONFLICT — LEAN ONLY' + (' · STALE' if stale else '')
-    return {'projection':projection,'selections':selections,'stale':stale,'quote_at':quote_at,
+                selections[market]['betting_status'] = 'LEAN ONLY — no supporting score forecast' + (' · STALE' if stale else '')
+    return {'score_presentation': {'status': 'WITHHELD', 'reason': 'Market-derived team means are not a supporting football score forecast.'}, 'projection':projection,'selections':selections,'stale':stale,'quote_at':quote_at,
             'winner_grade':winner_grade(projection,game,final) if frozen else 'not recorded' if final else None,
             'frozen':frozen,'explanation':[
                 'The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.',
-                'The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.',
                 'This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.',
                 'Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.',
                 'Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified.']}
