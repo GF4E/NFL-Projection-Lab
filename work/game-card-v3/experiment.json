@@ -1,0 +1,31 @@
+{
+  "id": "game-card-v3-final",
+  "status": "IMPLEMENTED_AWAITING_LIVE_VERIFICATION",
+  "spec": "SPEC-final.md",
+  "plan": "PLAN.md",
+  "latest_amendment": "No book names, prices, EV, movement, selectors or slip controls on cards/site. Consensus only. Football WHY only with measured sheet blocks.",
+  "immediate_removal_commits": {
+    "engine": "8065ff4da679c1e1ab9c7e5d0ed84c96a842f6ae",
+    "main": "9e274da9bb15fc5d3e52dd7708b79881ce2d77c1"
+  },
+  "credits_spent": 0,
+  "tests": {
+    "engine": 213,
+    "main": 298,
+    "site": 417,
+    "render_snapshots": 18,
+    "contrast_pairs": 41,
+    "known_skip": "one pre-existing provider integration test per reader"
+  },
+  "decisions": [
+    "Original model rows and registered PLAY arithmetic preserved. New shared card locks are separate; no retrospective forecasts.",
+    "Best execution for MODEL/RULE stays at its stated line to preserve the attached probability. Human selections use most favorable captured line, then best price. Quotes remain engine evidence only.",
+    "Moneyline prices absent in current capture. Winner uses pinned distribution at consensus unless a complete devigged moneyline exists. No synthetic quote.",
+    "Shared confidence hides map-derived display below 50 graded leans. Push counts toward graded threshold but is excluded from binary Brier and Beta counts. Weekly versions apply only prospectively.",
+    "No measured counter-reason means an explicit absence sentence; OURS retains an Against: absence bullet rather than fabricated football evidence.",
+    "Legacy per-person map archived for legacy replay; new guide and scorecard use source ours.",
+    "Existing hosted scheduler replay tests now set a deterministic database clock; source scheduler and registered contracts remain unchanged. Missing ignored laboratory manifests restored locally only from hash-matching originals.",
+    "Prior presentation assertions updated for expressly removed price, teaser and methodology displays. Existing model/ledger tests retained."
+  ],
+  "updated_at": "2026-09-12T21:55:25.676641+00:00"
+}

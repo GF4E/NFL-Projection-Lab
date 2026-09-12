@@ -62,6 +62,6 @@ def run(root,results,shape):
     if g:put(dest,g)
    all_leans.append(g or lean)
  csv_write(out/'pick_log.csv',all_leans,sorted({k for lean in all_leans for k in lean}) or ['game_id','person','market','source','phase','confidence','tags','line','book','price'])
- config=json.loads((root/'config/confidence_map.json').read_text());rows,cal=scorecard(all_leans,config);csv_write(out/'by-tag-scorecard.csv',rows,FIELDS)
+ config=json.loads((root/'99_archive/superseded/confidence-map-person-v1.json').read_text());rows,cal=scorecard(all_leans,config);csv_write(out/'by-tag-scorecard.csv',rows,FIELDS)
  overwrite(out/'feedback.json',{'schema':'suit-feedback-v1','rows':rows,'calibration':cal,'schema_columns':FIELDS,'note':'Pushes are counted as graded leans but excluded from Brier and binary cover rate; populations never pooled; multi-tag rows overlap.'})
  return rows,cal

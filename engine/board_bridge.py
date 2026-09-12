@@ -167,7 +167,8 @@ def build(root=ROOT, now=None):
     board = project(list(games.values()), records, grades, feeds, latest, config['version'], now or dt.datetime.now(dt.timezone.utc))
     from engine.board_summary import enrich
     from engine.live_board import enrich_live
-    return enrich_live(enrich(board, records, grades, root), records, root, now)
+    from engine.game_card_runtime import enrich as card_enrich
+    return card_enrich(enrich_live(enrich(board, records, grades, root), records, root, now), records, root, now)
 
 
 def publish(root=ROOT, now=None):

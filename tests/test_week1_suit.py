@@ -7,7 +7,7 @@ from engine.suit_publish import early_at
 from engine.suit_budget import transact
 from scripts.suit_runner import jobs,lock
 ROOT=Path(__file__).resolve().parents[1]
-CF=json.loads((ROOT/'config/confidence_map.json').read_text())
+CF=json.loads((ROOT/'99_archive/superseded/confidence-map-person-v1.json').read_text())
 GAME={'game_id':'2026_02_A_B','season':2026,'week':2,'home_team':'B','away_team':'A','kickoff_at':'2026-09-20T17:00:00+00:00','capture_at':'2026-09-20T15:40:00+00:00','cutoff_at':'2026-09-20T15:45:00+00:00'}
 SHAPE={'targets':{t:{'counts':{'-3':1,'0':2,'3':1}} for t in ['margin','total']}}
 def lean(person='Gabe',i=0):
@@ -50,7 +50,7 @@ class SuitTests(unittest.TestCase):
    p=Path(tmp)/'budget';self.assertTrue(all(transact(p,'2026-W02',str(i)) for i in range(25)));self.assertFalse(transact(p,'2026-W02','26'));self.assertTrue(all(transact(p,'2026-W01',str(i)) for i in range(20)));self.assertFalse(transact(p,'2026-W01','21'))
  def test_missed_and_immutable_lock(self):
   with tempfile.TemporaryDirectory() as tmp:
-   r=Path(tmp);(r/'config').mkdir();(r/'work/model-pick-v1').mkdir(parents=True);(r/'config/confidence_map.json').write_text(json.dumps(CF));(r/'work/model-pick-v1/runtime-config.json').write_text('{"distribution":{}}')
+   r=Path(tmp);(r/'config').mkdir();(r/'99_archive/superseded').mkdir(parents=True);(r/'work/model-pick-v1').mkdir(parents=True);(r/'99_archive/superseded/confidence-map-person-v1.json').write_text(json.dumps(CF));(r/'work/model-pick-v1/runtime-config.json').write_text('{"distribution":{}}')
    with patch('scripts.suit_runner.read_pinned',return_value=SHAPE):
     lock(GAME,None,[],'LATE',dt.datetime.fromisoformat(GAME['cutoff_at']),r);p=r/'outputs/iron-man-v1/locks'/f"{GAME['game_id']}-spreads.json";raw=p.read_bytes();self.assertEqual(json.loads(raw)['verdict']['verdict'],'MISSED');lock(GAME,None,[],'LATE',dt.datetime.now(dt.timezone.utc),r);self.assertEqual(p.read_bytes(),raw)
 if __name__=='__main__':unittest.main()

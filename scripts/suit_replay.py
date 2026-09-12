@@ -12,7 +12,7 @@ def run():
  entries=[{'game_id':game['game_id'],'person':p,'spread':-10,'total':52,'confidence':c,'tags':['PRICE'],'input_class':'PRE_OPEN','submitted_at':'2026-09-13T20:00:00+00:00'} for p,c in [('Gabe',4),('Jarrett',3)]]
  with tempfile.TemporaryDirectory() as tmp:
   root=Path(tmp);(root/'config').mkdir();(root/'work/model-pick-v1').mkdir(parents=True)
-  for path in ('config/confidence_map.json','work/model-pick-v1/runtime-config.json'):(root/path).write_bytes((ROOT/path).read_bytes())
+  for path in ('99_archive/superseded/confidence-map-person-v1.json','work/model-pick-v1/runtime-config.json'):(root/path).parent.mkdir(parents=True,exist_ok=True);(root/path).write_bytes((ROOT/path).read_bytes())
   now=dt.datetime.fromisoformat('2026-09-14T16:00:15+00:00');lock(game,context,entries,'EARLY',now,root)
   paths=sorted((root/'outputs/iron-man-v1/locks').glob('*.json'));before={p.name:p.read_bytes() for p in paths};lock(game,context,entries,'EARLY',now,root);assert all(p.read_bytes()==before[p.name] for p in paths)
   records=[json.loads(p.read_text()) for p in paths];assert len(records)==2 and all(r['verdict']['verdict']=='BET' and r['verdict']['person']=='Jarrett' for r in records)

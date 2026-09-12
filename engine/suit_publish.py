@@ -34,5 +34,5 @@ def publish(root=ROOT):
  feedback=json.loads((out/'feedback.json').read_text()) if (out/'feedback.json').exists() else {'rows':[],'calibration':[]}
  maps=sorted((out/'confidence-maps').glob('*.json'))
  confidence_maps=json.loads(maps[-1].read_text()) if maps else None
- value={'confidence_config':json.loads((root/'config/confidence_map.json').read_text()),'confidence_maps':confidence_maps,'schema':'iron-man-suit-v1','season':sensors['season'],'week':sensors['week'],'as_of':sensors['as_of'],'status':sensors['status'],'definitions':sensors['definitions'],'source_hashes':sensors['source_hashes'],'games':games,'distribution':shape,'distribution_hash':config['distribution']['sha256'],'feedback':feedback,'unit_dollars':50,'weekly_sizing_capital':1000}
+ value={'confidence_config':json.loads((root/'99_archive/superseded/confidence-map-person-v1.json').read_text()),'confidence_maps':confidence_maps,'schema':'iron-man-suit-v1','season':sensors['season'],'week':sensors['week'],'as_of':sensors['as_of'],'status':sensors['status'],'definitions':sensors['definitions'],'source_hashes':sensors['source_hashes'],'games':games,'distribution':shape,'distribution_hash':config['distribution']['sha256'],'feedback':feedback,'unit_dollars':50,'weekly_sizing_capital':1000}
  overwrite(out/'board.json',value)

@@ -46,7 +46,7 @@ def make_context(game,event,receipt,shape):
 
 
 def lock(game,context,submitted,phase,now,root=ROOT):
- out=Path(root)/'outputs/iron-man-v1';config=json.loads((Path(root)/'config/confidence_map.json').read_text());shape=read_pinned(json.loads((Path(root)/'work/model-pick-v1/runtime-config.json').read_text())['distribution'])
+ out=Path(root)/'outputs/iron-man-v1';config=json.loads((Path(root)/'99_archive/superseded/confidence-map-person-v1.json').read_text());shape=read_pinned(json.loads((Path(root)/'work/model-pick-v1/runtime-config.json').read_text())['distribution'])
  cutoff=timestamp(early_at(game)) if phase=='EARLY' else timestamp(game['cutoff_at'])
  valid=[e for e in submitted if e['game_id']==game['game_id'] and timestamp(e['submitted_at'])<cutoff]
  if phase=='EARLY' and len(valid)!=2:return
