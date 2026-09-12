@@ -47,19 +47,19 @@
     "Monday/Sunday/T80 future execution is scheduled, not claimed as observed."
   ],
   "deployment": {
-    "version": 177,
-    "site_source_commit": "ec322905b22940b273fb52216b3ce5cee116f1f3",
-    "main_commit": "e09cad0b04728a276f907e46e746f2e0530bd950",
-    "deployment_id": "appgdep_6aa5883bf6fc8191933299e67c4b80b8",
+    "version": 178,
+    "site_source_commit": "8633703ef815ff4753128bb9dc95b531294aaa30",
+    "main_commit": "8b908932782ea0b710f8305d4fbcdd123e5fb39c",
+    "deployment_id": "appgdep_6aa58b834f3481919f7ec1d4b5f0b7ce",
     "status": "succeeded",
     "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/suit",
-    "screenshot": "work/iron-man-v1/sheet-screenshot.png",
+    "screenshot": "work/iron-man-v1/sheet-screenshot-v178.png",
     "private_entry_check": "work/iron-man-v1/live-entry-check.json"
   },
   "cloud": {
     "host": "159.89.185.88",
-    "engine_commit_verified": "7ac9e7541d709f0e3073bc4b71276eaa1c39fae7",
-    "suit_tests_pass": 11,
+    "engine_commit_verified": "157eaf9b64d2e72a218260d6f85df7dc807f0a0b",
+    "suit_tests_pass": 12,
     "suit_tests_fail": 0,
     "synthetic_replay": "PASS identical lock hashes to local",
     "systemd_capture_result": "success",
@@ -75,5 +75,5 @@
     "additional_fix": "Empirical probabilities at 0 or 1 have no finite American fair-price edge; store null cents instead of raising and losing the lock. Covered by the pricing test.",
     "eligibility_alignment": "50 graded leans per person across populations, as requested; per-population Brier, rates and Beta estimates remain separate. Cross-population boundary regression tests updated."
   },
-  "verified_at": "2026-09-12T17:19:53.730407+00:00"
+  "verified_at": "2026-09-12T17:29:36.796363+00:00"
 }
