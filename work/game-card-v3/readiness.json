@@ -1,0 +1,44 @@
+{
+  "at": "2026-09-12T21:02:49.162703+00:00",
+  "capture_markets": [
+    "spreads",
+    "totals"
+  ],
+  "constraint": "No retrospective forecasts, fabricated locks or invented grades; user decision requested for G6 acceptance exception.",
+  "contrast_checks": {
+    "gold_on_background": 9.14,
+    "gold_on_surface": 8.483,
+    "loss_on_background": 4.911,
+    "loss_on_surface": 4.558,
+    "muted_on_background": 6.352,
+    "muted_on_surface": 5.895,
+    "text_on_background": 17.443,
+    "text_on_surface": 16.19
+  },
+  "credits_spent": 0,
+  "evidence_source": "outputs/model-pick-v1/board.json",
+  "experiment_id": "game-card-v3-readiness",
+  "historical_cases": {
+    "2026_01_NE_SEA": {
+      "final": {
+        "away": 10,
+        "home": 13
+      },
+      "model_lock": "MISSED",
+      "spread_grade": null,
+      "total_grade": null,
+      "winner_grade": null
+    },
+    "2026_01_SF_LA": {
+      "final": {
+        "away": 27,
+        "home": 7
+      },
+      "model_lock": "LOCKED",
+      "spread_grade": "WIN",
+      "total_grade": "LOSS",
+      "winner_grade": null
+    }
+  },
+  "implementation_status": "NOT_STARTED_PENDING_HISTORICAL_ACCEPTANCE_DECISION"
+}
