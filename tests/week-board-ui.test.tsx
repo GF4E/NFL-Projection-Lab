@@ -18,12 +18,12 @@ const install=()=>{const fn=vi.fn<typeof fetch>(async url=>response(String(url).
 afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.useRealTimers();});
 
 describe('Week 1 prediction grid',()=>{
- it('shows six prediction columns, logos, selected books and unchanged grades',async()=>{
+ it('shows five guide columns, logos, selected books and unchanged grades',async()=>{
   const fn=install();const {container}=render(<WeekOneBoard/>);
   await screen.findByText('SF +3.5');
-  for(const column of ['MATCHUP','PROJECTED WINNER','PROJECTED SCORE','SPREAD PICK','TOTAL PICK','BETTING STATUS'])expect(screen.getByText(column)).toBeTruthy();
+  for(const column of ['MATCHUP','PROJECTED WINNER','SPREAD PICK','TOTAL PICK','BETTING STATUS'])expect(screen.getByText(column)).toBeTruthy();
   expect(container.querySelectorAll('.prediction-row')).toHaveLength(1);
-  expect(container.querySelectorAll('.prediction-cell')).toHaveLength(6);
+  expect(container.querySelectorAll('.prediction-cell')).toHaveLength(5);
   expect(container.querySelectorAll('img')).toHaveLength(2);
   expect(container.querySelectorAll('.week-records dt')).toHaveLength(0);
   expect(container.textContent).not.toContain('Jarrett');

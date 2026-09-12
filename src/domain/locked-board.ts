@@ -37,6 +37,7 @@ export type LockedBoard = {
 };
 
 export type Week1Prediction = {
+  score_presentation?: {status:string;reason:string};
   projection: {status: string; reason?: string; version: string; generated_at?: string; winner?: string;
     win_probability?: number; tie_probability?: number; coin_flip?: boolean; home_score?: number;
     away_score?: number; score_label?: string; expected_margin?: number; expected_total?: number};
