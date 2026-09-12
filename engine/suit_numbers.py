@@ -26,7 +26,7 @@ def price_number(entry,market,context,shape,confidence):
   p=probabilities(shape,market,location,q,game['home_team']);c=p['conditional_win'];b=decimal_odds(q['price'])-1
   if c is None:continue
   ev=p['win']*b-p['loss'];fraction=max(0.,(c*b-(1-c))/b)/4
-  candidates.append({**q,**p,'fair_probability':c,'EV':ev,'edge_cents':price_edge(c,q['price']),'stake_dollars':min(100.,1000*fraction)})
+  candidates.append({**q,**p,'fair_probability':c,'EV':ev,'edge_cents':price_edge(c,q['price']) if 0<c<1 else None,'stake_dollars':min(100.,1000*fraction)})
  if not candidates:raise ValueError('No executable offer on human side')
  selected=max(candidates,key=lambda q:(q['EV'],q['book'],q['line']));mapping=confidence.get('map',confidence['provisional']);level=min(range(1,6),key=lambda x:(abs(mapping[str(x)]-selected['fair_probability']),x));band='STORY' if abs(gap)<1 else 'LEAN' if abs(gap)<=2 else 'BET'
  return {**selected,'gap':gap,'band':band,'person':entry['person'],'confidence':entry['confidence'],'confidence_probability':mapping[str(entry['confidence'])],'confidence_version':confidence['version'],'conflict':abs(level-entry['confidence'])>1,'tags':entry['tags'],'entry_at':entry['submitted_at'],'home_team':game['home_team'],'number':location,'input_class':entry['input_class'],'status':'PRICED_HUMAN_LEAN'}

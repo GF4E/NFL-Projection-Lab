@@ -37,6 +37,7 @@ class SuitTests(unittest.TestCase):
   ctx={'game':GAME,'consensus':{'spreads':{'full':{'center':3}}},'offers':[{'market':'spreads','side':'B','line':-3,'book':'betmgm','price':-110}]};e={'person':'Gabe','spread':-5,'total':45,'confidence':1,'tags':['PRICE'],'submitted_at':'2026-09-12T00:00:00Z','input_class':'PRE_OPEN'};cfg={'provisional':CF['people']['Gabe']['provisional'],'version':'v1'}
   a=price_number(e,'spreads',ctx,SHAPE,cfg);b=price_number({**e,'confidence':5},'spreads',ctx,SHAPE,cfg);self.assertEqual(a['stake_dollars'],b['stake_dollars']);self.assertTrue(a['conflict']);self.assertFalse(b['conflict'])
   self.assertEqual(price_number({**e,'spread':-3},'spreads',ctx,SHAPE,cfg)['side'],None)
+  extreme=price_number({**e,'spread':-60},'spreads',ctx,SHAPE,cfg);self.assertEqual(extreme['fair_probability'],1);self.assertIsNone(extreme['edge_cents'])
  def test_monday_capture_window(self):
   self.assertEqual(early_at(GAME),'2026-09-14T09:00:00-07:00');self.assertEqual(jobs([GAME],dt.datetime.fromisoformat('2026-09-14T16:00:10+00:00'))[0]['label'],'EARLY');self.assertEqual(jobs([GAME],dt.datetime.fromisoformat('2026-09-14T16:01:00+00:00')),[])
  def test_next_sheet_survives_monday_night_pending(self):

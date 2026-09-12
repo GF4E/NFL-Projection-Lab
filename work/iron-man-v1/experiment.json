@@ -71,7 +71,8 @@
   },
   "final_review": {
     "least_certain": "Sunday to Monday sheet rollover while MNF remains pending",
-    "change": "Keep next-week sheet through Monday and test Sunday evening and Monday 09 PT; no change to lock, sizing, confidence or selection arithmetic"
+    "change": "Keep next-week sheet through Monday and test Sunday evening and Monday 09 PT; no change to lock, sizing, confidence or selection arithmetic",
+    "additional_fix": "Empirical probabilities at 0 or 1 have no finite American fair-price edge; store null cents instead of raising and losing the lock. Covered by the pricing test."
   },
   "verified_at": "2026-09-12T17:19:53.730407+00:00"
 }
