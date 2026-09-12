@@ -42,6 +42,6 @@ export type Week1Prediction = {
     away_score?: number; score_label?: string; expected_margin?: number; expected_total?: number};
   selections: Record<"spreads"|"totals", {status:string; reason?:string; side?:string; line?:number; book?:string;
     price?:number; win?:number; push?:number; fair_probability?:number; EV?:number; betting_status?:string;
-    negative_EV?:boolean; grade?:string|null; explanation?:string}>;
+    negative_EV?:boolean; grade?:string|null; explanation?:string; rationale?:{title:string; reasons:string[]; assessment:string}}>;
   stale:boolean; quote_at?:string; winner_grade?:string|null; frozen:boolean; explanation:string[];
 };

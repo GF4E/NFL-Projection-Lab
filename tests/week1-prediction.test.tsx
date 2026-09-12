@@ -1,5 +1,6 @@
 import {it,expect} from 'vitest';
 import {renderToStaticMarkup} from 'react-dom/server';
+import {GameDecision} from '../src/components/locked-model-board';
 import {Week1PredictionRow} from '../src/components/week1-prediction-row';
 import {displayBoard,validateBoard} from '../src/server/locked-board';
 import type {LockedBoard,LockedGame,Week1Prediction,Verdict} from '../src/domain/locked-board';
@@ -25,3 +26,12 @@ it('does not invent historical winner projections and shows missed badge',()=>{
  expect(html).toContain('not recorded');expect(html).toContain('No lock: capture late');expect(html).not.toContain('58.0%');
 });
 it('rejects malformed projected scores',()=>{expect(()=>validateBoard({...board,games:[{...g,prediction:{...prediction,projection:{...prediction.projection,home_score:NaN}}}]})).toThrow('Invalid projection');});
+
+it('leads analytics with the saved pick rationale and collapses methodology',()=>{
+ const rationale={title:'NE +3.5 at BetMGM -102',reasons:['A three-point loss still covers.'],assessment:'Insufficient support at this price.'};
+ const game={...g,prediction:{...prediction,explanation:['Methodology stays available.'],selections:{spreads:{...pick,rationale},totals:{...pick,rationale}}}};
+ const html=renderToStaticMarkup(<GameDecision game={game}/>);
+ expect(html).toContain('WHY WE LEAN THIS WAY');expect(html).toContain('A three-point loss still covers.');expect(html).toContain('Insufficient support at this price.');
+ expect(html.indexOf('A three-point loss still covers.')).toBeLessThan(html.indexOf('<details'));
+ expect(html).toContain('<summary>Supporting data &amp; how to read it</summary>');expect(html).not.toContain('<details open');
+});
