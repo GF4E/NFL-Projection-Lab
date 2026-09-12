@@ -5,7 +5,9 @@ from engine.pricing import decimal_odds
 from engine.board_summary import summary
 
 
-def enrich_live(board, records, root):
+def enrich_live(board, records, root, now=None):
+    import datetime as dt
+    now=now or dt.datetime.now(dt.timezone.utc)
     root=Path(root);out=root/'outputs/model-pick-v1'
     current={p.stem:json.loads(p.read_text()) for p in (out/'live').glob('*.json')}
     locked={r['game']['game_id']:r for r in records}
@@ -41,5 +43,8 @@ def enrich_live(board, records, root):
         g['quote_pairs']=pairs
         hg=next((p for p in human if p['game_id']==g['game_id']),None)
         if hg:g['human_lean_grade']=hg['outcome']
+        if g['week']==1:
+            from engine.week1_projection import display
+            g['prediction']=display(r,g,now)
     for week,value in board.get('week_records',{}).items():value['human_lean']=summary([g for g in human if int(g['week'])==int(week)])
     return board

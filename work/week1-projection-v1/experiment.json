@@ -1,0 +1,63 @@
+{
+  "authorization": "User September 12: forced Week 1 selections with descriptive winner/score, no gate/model/historical changes; Week 2 human-only unchanged",
+  "available_upcoming_projections": 14,
+  "board_content_sha256": "ca10d90ffae27e6653c85f0fd9f34a3048cf5b834f1ecfcd6f192817c7a2cd52",
+  "created_at": "2026-09-12T18:32:55.411918+00:00",
+  "credits_spent": 0,
+  "decisions": [
+    "Use full consensus for descriptive winner/score; preserve original leave-one-out selected spread and total.",
+    "Outright win probability is unconditional; tie separately. ATS fair probability conditional no-push; display unconditional win and push alongside.",
+    "Freshness display uses existing 3600-second quote horizon; engine stamps stale state, reader also suppresses PLAY during publication delay. This changes display only.",
+    "Current saved live records receive a present-time projection before cutoff, without reselecting picks or calling providers. Their quote timestamps remain Friday. Future captures create new projections and freeze() copies them together at T75.",
+    "No new projection for prior locks, MISSED games, finals, or Week 2. Existing SF/LA winner is not recorded.",
+    "Winner result is derived only from the frozen winner and board final source pinned to existing first grades; it never enters the ATS scorecard.",
+    "No outright frequency calibration or performance claim is added."
+  ],
+  "deployment": "PENDING",
+  "existing_live_picks_and_consensus_unchanged": [
+    "2026_01_TB_CIN",
+    "2026_01_GB_MIN",
+    "2026_01_WAS_PHI",
+    "2026_01_NO_DET",
+    "2026_01_BAL_IND",
+    "2026_01_BUF_HOU",
+    "2026_01_DAL_NYG",
+    "2026_01_ARI_LAC",
+    "2026_01_CHI_CAR",
+    "2026_01_MIA_LV",
+    "2026_01_DEN_KC",
+    "2026_01_NYJ_TEN",
+    "2026_01_ATL_PIT",
+    "2026_01_CLE_JAX"
+  ],
+  "experiment_id": "week1-projection-v1",
+  "frozen_runtime_hashes": {
+    "engine/elo.py": true,
+    "engine/live_weather.py": true,
+    "engine/market_distribution.py": true,
+    "engine/model_pick.py": true,
+    "engine/pick_store.py": true,
+    "engine/pricing.py": true,
+    "engine/t75_budget.py": true,
+    "engine/t75_capture.py": true,
+    "engine/t75_grade.py": true,
+    "engine/t75_prepare.py": true,
+    "engine/t75_report.py": true,
+    "engine/t75_shadow.py": true,
+    "scripts/model_pick_daily.py": true,
+    "scripts/model_pick_runner.py": true
+  },
+  "historical_locks_grades_and_week2_unchanged": true,
+  "tests": {
+    "engine": {
+      "failed": 0,
+      "passed": 176
+    },
+    "main": {
+      "failed": 0,
+      "passed": 267,
+      "skipped": 1
+    }
+  },
+  "verification_command": "cd /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6 && /opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'"
+}

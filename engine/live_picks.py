@@ -54,6 +54,9 @@ def recompute(game, event, receipt, shape, config, previous=None, weather=None, 
             chosen=max(under,key=lambda o:decimal_odds(o['price']))
             pr=probabilities(shape,'totals',center,chosen,game['home_team'])
             record['paper_picks']=[{**chosen,**pr,'fair_probability':pr['conditional_win'],'EV':pr['win']*(decimal_odds(chosen['price'])-1)-pr['loss'],'paper_rule':'WIND-UNDER-10-15-V1-T75','edge_source':'paper_rule','filtered_subset':False}]
+    if game['week']==1:
+        from engine.week1_projection import project
+        record['projection']=project(record,shape)
     return record
 
 

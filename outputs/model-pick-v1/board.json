@@ -1,6 +1,6 @@
 {
   "clv_reference": "nflverse_close; reference CLV, not executed-book closing quotes",
-  "content_sha256": "1e0130c98a20527e73878cef8256bf1e8e0bda2c743b1b9d2d24155ce4934e2c",
+  "content_sha256": "ca10d90ffae27e6653c85f0fd9f34a3048cf5b834f1ecfcd6f192817c7a2cd52",
   "default_week": 1,
   "games": [
     {
@@ -43,6 +43,34 @@
       "margin": 3.0,
       "note_deadline": "2026-09-09T23:05:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "reason": "Winner and score projection not recorded before lock.",
+          "status": "UNAVAILABLE",
+          "version": "week1-display-projection-v1"
+        },
+        "quote_at": null,
+        "selections": {
+          "spreads": {
+            "reason": "No lock: capture late",
+            "status": "UNAVAILABLE"
+          },
+          "totals": {
+            "reason": "No lock: capture late",
+            "status": "UNAVAILABLE"
+          }
+        },
+        "stale": false,
+        "winner_grade": "not recorded"
+      },
       "quote_pairs": [],
       "record_class": "paper_model_pick",
       "recorded_at": "2026-09-10T17:32:12.775419+00:00",
@@ -132,6 +160,62 @@
       "margin": -20.0,
       "note_deadline": "2026-09-10T23:20:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": true,
+        "projection": {
+          "reason": "Winner and score projection not recorded before lock.",
+          "status": "UNAVAILABLE",
+          "version": "week1-display-projection-v1"
+        },
+        "quote_at": "2026-09-10T23:15:10.600084+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.011514104778353351,
+            "betting_status": "FINAL",
+            "book": "betmgm",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.4991364421416235,
+            "filter_pass": false,
+            "grade": "W",
+            "line": 3.5,
+            "negative_EV": true,
+            "price": -102.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "San Francisco 49ers",
+            "status": "AVAILABLE",
+            "win": 0.4991364421416235
+          },
+          "totals": {
+            "EV": -0.00357983984926985,
+            "betting_status": "FINAL",
+            "book": "betmgm",
+            "edge_source": "price",
+            "explanation": "Market pricing selected this side; no independent football signal.",
+            "fair_probability": 0.5219343696027634,
+            "filter_pass": false,
+            "grade": "L",
+            "line": 47.5,
+            "negative_EV": true,
+            "price": -110.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Over",
+            "status": "AVAILABLE",
+            "win": 0.5219343696027634
+          }
+        },
+        "stale": false,
+        "winner_grade": "not recorded"
+      },
       "quote_pairs": [],
       "record_class": "paper_model_pick",
       "recorded_at": "2026-09-10T23:19:01.101515+00:00",
@@ -316,6 +400,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T15:45:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 18.213989637305698,
+          "away_win_probability": 0.3032815198618307,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": 5.972711571675302,
+          "expected_total": 42.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 24.186701208981003,
+          "home_win_probability": 0.6683937823834197,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.028324697754749568,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.6683937823834197,
+          "winner": "Pittsburgh Steelers"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.021887266446851794,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "betmgm",
+            "edge_source": "tiebreak",
+            "explanation": "Coin flip: deterministic equal-EV tiebreak.",
+            "fair_probability": 0.5120481927710844,
+            "filter_pass": false,
+            "grade": null,
+            "line": 6.0,
+            "negative_EV": true,
+            "price": -110.0,
+            "push": 0.02521588946459413,
+            "seed": "f0976aaf76e3b16b79fba0283364d161999f1bba9ffacd86123e0751138042df",
+            "side": "Atlanta Falcons",
+            "status": "AVAILABLE",
+            "win": 0.4991364421416235
+          },
+          "totals": {
+            "EV": -0.02420965682961629,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "fanduel",
+            "edge_source": "price",
+            "explanation": "Market pricing selected this side; no independent football signal.",
+            "fair_probability": 0.5219343696027634,
+            "filter_pass": false,
+            "grade": null,
+            "line": 40.5,
+            "negative_EV": true,
+            "price": -115.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Over",
+            "status": "AVAILABLE",
+            "win": 0.5219343696027634
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -110.0,
@@ -617,6 +771,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T15:45:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 26.213989637305698,
+          "away_win_probability": 0.5930915371329879,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": -3.0272884283246975,
+          "expected_total": 49.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 23.186701208981003,
+          "home_win_probability": 0.37409326424870465,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.03281519861830743,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.5930915371329879,
+          "winner": "Baltimore Ravens"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": 0.013892017721708949,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "draftkings",
+            "edge_source": "price",
+            "explanation": "Market pricing selected this side; no independent football signal.",
+            "fair_probability": 0.542314335060449,
+            "filter_pass": false,
+            "grade": null,
+            "line": 3.5,
+            "negative_EV": false,
+            "price": -115.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Indianapolis Colts",
+            "status": "AVAILABLE",
+            "win": 0.542314335060449
+          },
+          "totals": {
+            "EV": -0.012052800394769303,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "betmgm",
+            "edge_source": "price",
+            "explanation": "Market pricing selected this side; no independent football signal.",
+            "fair_probability": 0.5219343696027634,
+            "filter_pass": false,
+            "grade": null,
+            "line": 47.5,
+            "negative_EV": true,
+            "price": -112.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Over",
+            "status": "AVAILABLE",
+            "win": 0.5219343696027634
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -115.0,
@@ -944,6 +1168,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T15:45:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 23.713989637305698,
+          "away_win_probability": 0.5243523316062176,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": -1.0272884283246977,
+          "expected_total": 46.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 22.686701208981003,
+          "home_win_probability": 0.4369602763385147,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.0386873920552677,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.5243523316062176,
+          "winner": "Buffalo Bills"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.02998012187571275,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "fanduel",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.4991364421416235,
+            "filter_pass": false,
+            "grade": null,
+            "line": -1.5,
+            "negative_EV": true,
+            "price": -106.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Buffalo Bills",
+            "status": "AVAILABLE",
+            "win": 0.4991364421416235
+          },
+          "totals": {
+            "EV": -0.006018333997608594,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "fanduel",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.5067357512953368,
+            "filter_pass": false,
+            "grade": null,
+            "line": 44.5,
+            "negative_EV": true,
+            "price": -104.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Under",
+            "status": "AVAILABLE",
+            "win": 0.5067357512953368
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -112.0,
@@ -1267,6 +1561,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T15:45:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 25.713989637305698,
+          "away_win_probability": 0.5930915371329879,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": -3.0272884283246975,
+          "expected_total": 48.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 22.686701208981003,
+          "home_win_probability": 0.37409326424870465,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.03281519861830743,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.5930915371329879,
+          "winner": "Chicago Bears"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.02348877374784114,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "betmgm",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.4879518072289156,
+            "filter_pass": false,
+            "grade": null,
+            "line": 3.0,
+            "negative_EV": true,
+            "price": 100.0,
+            "push": 0.02521588946459413,
+            "seed": null,
+            "side": "Carolina Panthers",
+            "status": "AVAILABLE",
+            "win": 0.47564766839378236
+          },
+          "totals": {
+            "EV": -0.015083477259643097,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "betmgm",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.5113279888462878,
+            "filter_pass": false,
+            "grade": null,
+            "line": 47.0,
+            "negative_EV": true,
+            "price": -108.0,
+            "push": 0.008981001727115717,
+            "seed": null,
+            "side": "Under",
+            "status": "AVAILABLE",
+            "win": 0.5067357512953368
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -102.0,
@@ -1607,6 +1971,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T15:45:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 16.213989637305698,
+          "away_win_probability": 0.22487046632124352,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": 8.972711571675303,
+          "expected_total": 41.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 25.186701208981003,
+          "home_win_probability": 0.7523316062176166,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.022797927461139896,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.7523316062176166,
+          "winner": "Jacksonville Jaguars"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.0387001855050213,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "fanduel",
+            "edge_source": "tiebreak",
+            "explanation": "Coin flip: deterministic equal-EV tiebreak.",
+            "fair_probability": 0.4991364421416235,
+            "filter_pass": false,
+            "grade": null,
+            "line": 8.5,
+            "negative_EV": true,
+            "price": -108.0,
+            "push": 0.0,
+            "seed": "1d0eadc94e896edc66300dd644a47e34d72a4ccfa503f209d74b39c56472e9b0",
+            "side": "Cleveland Browns",
+            "status": "AVAILABLE",
+            "win": 0.4991364421416235
+          },
+          "totals": {
+            "EV": 0.003535507467235577,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "draftkings",
+            "edge_source": "price",
+            "explanation": "Market pricing selected this side; no independent football signal.",
+            "fair_probability": 0.5067357512953368,
+            "filter_pass": false,
+            "grade": null,
+            "line": 39.5,
+            "negative_EV": false,
+            "price": -102.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Under",
+            "status": "AVAILABLE",
+            "win": 0.5067357512953368
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -112.0,
@@ -1930,6 +2364,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T15:45:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 22.213989637305698,
+          "away_win_probability": 0.27081174438687394,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": 6.972711571675302,
+          "expected_total": 51.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 29.186701208981003,
+          "home_win_probability": 0.6967184801381693,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.03246977547495682,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.6967184801381693,
+          "winner": "Detroit Lions"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.001727115716752936,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "fanduel",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.4991364421416235,
+            "filter_pass": false,
+            "grade": null,
+            "line": 6.5,
+            "negative_EV": true,
+            "price": 100.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "New Orleans Saints",
+            "status": "AVAILABLE",
+            "win": 0.4991364421416235
+          },
+          "totals": {
+            "EV": -0.00357983984926985,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "betmgm",
+            "edge_source": "price",
+            "explanation": "Market pricing selected this side; no independent football signal.",
+            "fair_probability": 0.5219343696027634,
+            "filter_pass": false,
+            "grade": null,
+            "line": 49.5,
+            "negative_EV": true,
+            "price": -110.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Over",
+            "status": "AVAILABLE",
+            "win": 0.5219343696027634
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -108.0,
@@ -2244,6 +2748,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T15:45:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 18.714162348877373,
+          "away_win_probability": 0.4221070811744387,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": 1.9727115716753023,
+          "expected_total": 39.40103626943005,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 20.686873920552678,
+          "home_win_probability": 0.542314335060449,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.03557858376511226,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.542314335060449,
+          "winner": "Tennessee Titans"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.03537388856905249,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "fanduel",
+            "edge_source": "price",
+            "explanation": "Market pricing selected this side; no independent football signal.",
+            "fair_probability": 0.5008635578583766,
+            "filter_pass": false,
+            "grade": null,
+            "line": -1.5,
+            "negative_EV": true,
+            "price": -108.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Tennessee Titans",
+            "status": "AVAILABLE",
+            "win": 0.5008635578583766
+          },
+          "totals": {
+            "EV": -0.024064478986758786,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "draftkings",
+            "edge_source": "tiebreak",
+            "explanation": "Coin flip: deterministic equal-EV tiebreak.",
+            "fair_probability": 0.5067357512953368,
+            "filter_pass": false,
+            "grade": null,
+            "line": 38.5,
+            "negative_EV": true,
+            "price": -108.0,
+            "push": 0.0,
+            "seed": "5d7f3e72cad097cafd76ded143d3b2c3f3fa565cfd8c19258221c685a0fe299b",
+            "side": "Under",
+            "status": "AVAILABLE",
+            "win": 0.5067357512953368
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -110.0,
@@ -2553,6 +3127,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T15:45:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 23.713989637305698,
+          "away_win_probability": 0.3602763385146805,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": 3.9727115716753025,
+          "expected_total": 51.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 27.686701208981003,
+          "home_win_probability": 0.6055267702936097,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.03419689119170984,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.6055267702936097,
+          "winner": "Cincinnati Bengals"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.025495517723496952,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "fanduel",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.4991364421416235,
+            "filter_pass": false,
+            "grade": null,
+            "line": 3.5,
+            "negative_EV": true,
+            "price": -105.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Tampa Bay Buccaneers",
+            "status": "AVAILABLE",
+            "win": 0.4991364421416235
+          },
+          "totals": {
+            "EV": -0.024064478986758786,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "fanduel",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.5067357512953368,
+            "filter_pass": false,
+            "grade": null,
+            "line": 50.5,
+            "negative_EV": true,
+            "price": -108.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Under",
+            "status": "AVAILABLE",
+            "win": 0.5067357512953368
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -112.0,
@@ -2832,6 +3476,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T19:10:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 19.2139896373057,
+          "away_win_probability": 0.1996545768566494,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": 9.972711571675301,
+          "expected_total": 48.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 29.186701208981,
+          "home_win_probability": 0.7751295336787565,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.02521588946459413,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.7751295336787565,
+          "winner": "Los Angeles Chargers"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.022123529895550553,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "fanduel",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.5008635578583766,
+            "filter_pass": false,
+            "grade": null,
+            "line": -9.5,
+            "negative_EV": true,
+            "price": -105.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Los Angeles Chargers",
+            "status": "AVAILABLE",
+            "win": 0.5008635578583766
+          },
+          "totals": {
+            "EV": -0.02314335060449041,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "draftkings",
+            "edge_source": "price",
+            "explanation": "Market pricing selected this side; no independent football signal.",
+            "fair_probability": 0.49326424870466323,
+            "filter_pass": false,
+            "grade": null,
+            "line": 47.5,
+            "negative_EV": true,
+            "price": -102.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Over",
+            "status": "AVAILABLE",
+            "win": 0.49326424870466323
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -115.0,
@@ -3172,6 +3886,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T19:10:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 22.713989637305698,
+          "away_win_probability": 0.4221070811744387,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": 1.9727115716753023,
+          "expected_total": 47.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 24.686701208981003,
+          "home_win_probability": 0.542314335060449,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.03557858376511226,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.542314335060449,
+          "winner": "Minnesota Vikings"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.021887266446851794,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "betmgm",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.5120481927710844,
+            "filter_pass": false,
+            "grade": null,
+            "line": 2.0,
+            "negative_EV": true,
+            "price": -110.0,
+            "push": 0.02521588946459413,
+            "seed": null,
+            "side": "Green Bay Packers",
+            "status": "AVAILABLE",
+            "win": 0.4991364421416235
+          },
+          "totals": {
+            "EV": -0.0325953838907207,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "betmgm",
+            "edge_source": "tiebreak",
+            "explanation": "Coin flip: deterministic equal-EV tiebreak.",
+            "fair_probability": 0.5067357512953368,
+            "filter_pass": false,
+            "grade": null,
+            "line": 46.5,
+            "negative_EV": true,
+            "price": -110.0,
+            "push": 0.0,
+            "seed": "0e749f6f227ddcee2f7131c15cb95839a20c75fa20943367b1420fb66aad7900",
+            "side": "Under",
+            "status": "AVAILABLE",
+            "win": 0.5067357512953368
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -112.0,
@@ -3508,6 +4292,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T19:10:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 18.713989637305698,
+          "away_win_probability": 0.3602763385146805,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": 3.9727115716753025,
+          "expected_total": 41.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 22.686701208981003,
+          "home_win_probability": 0.6055267702936097,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.03419689119170984,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.6055267702936097,
+          "winner": "Las Vegas Raiders"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.002355157795572216,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "betmgm",
+            "edge_source": "price",
+            "explanation": "Market pricing selected this side; no independent football signal.",
+            "fair_probability": 0.5225225225225226,
+            "filter_pass": false,
+            "grade": null,
+            "line": -3.0,
+            "negative_EV": true,
+            "price": -110.0,
+            "push": 0.04145077720207254,
+            "seed": null,
+            "side": "Las Vegas Raiders",
+            "status": "AVAILABLE",
+            "win": 0.5008635578583766
+          },
+          "totals": {
+            "EV": -0.010658771280532997,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "fanduel",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.5067357512953368,
+            "filter_pass": false,
+            "grade": null,
+            "line": 39.5,
+            "negative_EV": true,
+            "price": -105.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Under",
+            "status": "AVAILABLE",
+            "win": 0.5067357512953368
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -112.0,
@@ -3809,6 +4663,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T19:10:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 19.213989637305698,
+          "away_win_probability": 0.3032815198618307,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": 5.972711571675302,
+          "expected_total": 44.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 25.186701208981003,
+          "home_win_probability": 0.6683937823834197,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.028324697754749568,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.6683937823834197,
+          "winner": "Philadelphia Eagles"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.029990130767332757,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "draftkings",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.5120481927710844,
+            "filter_pass": false,
+            "grade": null,
+            "line": 6.0,
+            "negative_EV": true,
+            "price": -112.0,
+            "push": 0.02521588946459413,
+            "seed": null,
+            "side": "Washington Commanders",
+            "status": "AVAILABLE",
+            "win": 0.4991364421416235
+          },
+          "totals": {
+            "EV": -0.023821860350357882,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "betmgm",
+            "edge_source": "price",
+            "explanation": "Market pricing selected this side; no independent football signal.",
+            "fair_probability": 0.5157167530224525,
+            "filter_pass": false,
+            "grade": null,
+            "line": 44.5,
+            "negative_EV": true,
+            "price": -112.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Under",
+            "status": "AVAILABLE",
+            "win": 0.5157167530224525
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -108.0,
@@ -4136,6 +5060,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-13T23:05:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 26.213989637305698,
+          "away_win_probability": 0.5930915371329879,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": -3.0272884283246975,
+          "expected_total": 49.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 23.186701208981003,
+          "home_win_probability": 0.37409326424870465,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.03281519861830743,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.5930915371329879,
+          "winner": "Dallas Cowboys"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.00027962825890281984,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "draftkings",
+            "edge_source": "tiebreak",
+            "explanation": "Coin flip: deterministic equal-EV tiebreak.",
+            "fair_probability": 0.5120481927710844,
+            "filter_pass": false,
+            "grade": null,
+            "line": -3.0,
+            "negative_EV": true,
+            "price": -105.0,
+            "push": 0.02521588946459413,
+            "seed": "90a74a1ffcb6886a630e9f2f62e45d6500fc8104386b4a4cf52303973110c956",
+            "side": "Dallas Cowboys",
+            "status": "AVAILABLE",
+            "win": 0.4991364421416235
+          },
+          "totals": {
+            "EV": -0.02964358612026996,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "betmgm",
+            "edge_source": "price",
+            "explanation": "Market pricing selected this side; no independent football signal.",
+            "fair_probability": 0.507823613086771,
+            "filter_pass": false,
+            "grade": null,
+            "line": 48.0,
+            "negative_EV": true,
+            "price": -110.0,
+            "push": 0.028670120898100174,
+            "seed": null,
+            "side": "Over",
+            "status": "AVAILABLE",
+            "win": 0.49326424870466323
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -115.0,
@@ -4451,6 +5445,76 @@
       "lock_status": "LIVE",
       "note_deadline": "2026-09-14T23:00:00+00:00",
       "our_note": null,
+      "prediction": {
+        "explanation": [
+          "The projected winner is the more likely outright winner. The spread pick can favor the opponent because the handicap changes the settlement threshold.",
+          "The score estimate uses distribution means; the winner uses win probability. An asymmetric distribution can make their orderings differ.",
+          "This engine translates market information into probabilities; it has not demonstrated an independent predictive edge.",
+          "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
+          "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
+        ],
+        "frozen": false,
+        "projection": {
+          "away_score": 20.713989637305698,
+          "away_win_probability": 0.3944732297063903,
+          "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
+          "coin_flip": false,
+          "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+          "expected_margin": 2.972711571675302,
+          "expected_total": 44.4006908462867,
+          "generated_at": "2026-09-12T18:29:47.455297+00:00",
+          "home_score": 23.686701208981003,
+          "home_win_probability": 0.5778929188255613,
+          "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+          "score_label": "market-based score estimate",
+          "status": "AVAILABLE",
+          "tie_probability": 0.027633851468048358,
+          "version": "week1-display-projection-v1",
+          "win_probability": 0.5778929188255613,
+          "winner": "Kansas City Chiefs"
+        },
+        "quote_at": "2026-09-11T18:33:08.624150+00:00",
+        "selections": {
+          "spreads": {
+            "EV": -0.011514104778353351,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "draftkings",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.4991364421416235,
+            "filter_pass": false,
+            "grade": null,
+            "line": 2.5,
+            "negative_EV": true,
+            "price": -102.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Denver Broncos",
+            "status": "AVAILABLE",
+            "win": 0.4991364421416235
+          },
+          "totals": {
+            "EV": -0.010658771280532997,
+            "betting_status": "STALE \u2014 LEAN ONLY",
+            "book": "draftkings",
+            "edge_source": "tiebreak",
+            "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
+            "fair_probability": 0.5067357512953368,
+            "filter_pass": false,
+            "grade": null,
+            "line": 43.5,
+            "negative_EV": true,
+            "price": -105.0,
+            "push": 0.0,
+            "seed": null,
+            "side": "Under",
+            "status": "AVAILABLE",
+            "win": 0.5067357512953368
+          }
+        },
+        "stale": true,
+        "winner_grade": null
+      },
       "quote_pairs": [
         {
           "americanPrice": -118.0,
@@ -13621,7 +14685,7 @@
       "week": 18
     }
   ],
-  "published_at": "2026-09-12T15:00:14.868536+00:00",
+  "published_at": "2026-09-12T18:29:47.455297+00:00",
   "schema": "locked-board-v1",
   "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
   "week_records": {
