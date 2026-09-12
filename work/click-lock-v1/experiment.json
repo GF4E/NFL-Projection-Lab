@@ -1,0 +1,25 @@
+{
+  "experiment_id": "click-lock-v1",
+  "created_at": "2026-09-12T19:47:09.501876+00:00",
+  "credits_spent_by_this_work": 0,
+  "tests": {
+    "engine_passed": 186,
+    "reader_targeted_passed": 37,
+    "main_build": "PASS",
+    "sites_build": "PASS",
+    "sites_typecheck": "PASS"
+  },
+  "scope": [
+    "Click captured spread/total selections to form singles, parlays, or two/three-leg six-point teasers.",
+    "Shared authenticated ticket record; paper by default; executed only when explicitly marked already placed. No sportsbook submission.",
+    "No confidence, authored numbers, or written case required for ticket locking.",
+    "Single price from captured quote. Combination price from user-entered sportsbook quote; no independence/product pricing.",
+    "Atomic $100 ticket/game cap, idempotent lock, server-clock kickoff deadline, one-hour quote freshness, no mutable lock endpoint.",
+    "Daily sync and engine-only grading; pushed combinations require settlement review when book policy is unknown.",
+    "Consistency check on all displayed score/selection pairs; conflicting unrounded means suppress actionable presentation only. Registered picks and filter/scorecards are unchanged."
+  ],
+  "consistency_checks": 30,
+  "conflicts": 13,
+  "deployment": "PENDING",
+  "schema_note": "Generated Sites migration included unrelated historical schema differences; restricted the new migration to engine_tickets only. No DROP statements from that generated migration are published."
+}

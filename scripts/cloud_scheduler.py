@@ -19,7 +19,7 @@ from scripts.nfl_engine_autopush import guard, REMOTE
 
 LOCK_PATH = 'work/cloud-migration-v1/ownership.json'
 OUT = ROOT/'outputs/model-pick-v1'
-ALLOWED = ('outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
+ALLOWED = ('outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
            'work/model-pick-v1/daily/', 'work/model-pick-v1/sources/',
            'work/model-pick-v1/schedules/', 'work/model-pick-v1/states/',
            'work/model-pick-v1/depth/')
@@ -144,6 +144,9 @@ def run(mode, host):
         live_scorecard(ROOT)
         from engine.board_bridge import publish
         publish()
+        if mode == 'daily':
+            from engine.ticket_ledger import run as grade_tickets
+            grade_tickets(ROOT, sync=True)
         from engine.suit_publish import publish as publish_suit
         publish_suit(ROOT)
         commit = publish_artifacts()

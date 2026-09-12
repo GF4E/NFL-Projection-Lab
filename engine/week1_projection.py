@@ -56,6 +56,23 @@ def winner_grade(projection, game, final):
     return 'WIN' if projection['winner'] == actual else 'LOSS'
 
 
+def score_consistency(projection, pick, game):
+    if projection.get('status') != 'AVAILABLE':
+        return {'state': 'NOT_RECORDED', 'text': 'No original score estimate to compare.'}
+    if pick['market'] == 'spreads':
+        margin = projection['expected_margin']
+        selected_margin = margin if pick['side'] == game['home_team'] else -margin
+        delta = selected_margin + pick['line']
+        context = f"The score estimate has {pick['side']} {'winning' if selected_margin >= 0 else 'losing'} by {abs(selected_margin):.3f}; the selected spread is {pick['line']:+g}."
+    else:
+        total = projection['expected_total']
+        delta = total-pick['line'] if pick['side'] == 'Over' else pick['line']-total
+        context = f"The score estimate totals {total:.3f}; the selection is {pick['side']} {pick['line']:g}."
+    state = 'SUPPORTS' if delta > 1e-9 else 'OPPOSES' if delta < -1e-9 else 'PUSH'
+    conclusion = {'SUPPORTS': 'The score estimate is directionally consistent with this selection.', 'OPPOSES': 'SCORE CONFLICT: the score estimate points to the opposite side.', 'PUSH': 'SCORE CONFLICT: the score estimate implies a push, not a winning pick.'}[state]
+    return {'state': state, 'text': context+' '+conclusion}
+
+
 def display(record, game, now):
     projection = record.get('projection') or unavailable('Winner and score projection not recorded before lock.')
     final = game.get('final_score')
@@ -75,6 +92,12 @@ def display(record, game, now):
             filter_pass=passed, negative_EV=pick['EV']<0, grade=game['verdicts'][market].get('grade'),
             explanation='Coin flip: deterministic equal-EV tiebreak.' if pick.get('seed') else 'Market pricing selected this side; no independent football signal.' if pick['edge_source']=='price' else 'Highest estimated return without a positive price/line edge; not necessarily a random tie.')
         selections[market]['rationale'] = rationale(pick, record, stale)
+        consistency = score_consistency(projection, pick, record['game'])
+        selections[market]['score_consistency'] = consistency
+        if consistency['state'] in ('OPPOSES', 'PUSH'):
+            selections[market]['rationale']['assessment'] = consistency['text']+' '+selections[market]['rationale']['assessment']
+            if not final:
+                selections[market]['betting_status'] = 'SCORE CONFLICT — LEAN ONLY' + (' · STALE' if stale else '')
     return {'projection':projection,'selections':selections,'stale':stale,'quote_at':quote_at,
             'winner_grade':winner_grade(projection,game,final) if frozen else 'not recorded' if final else None,
             'frozen':frozen,'explanation':[
