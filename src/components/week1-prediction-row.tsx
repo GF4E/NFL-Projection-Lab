@@ -1,4 +1,5 @@
 "use client";
+import {TicketPick} from "./ticket-slip";
 import {useState, type ReactNode} from 'react';
 import Image from 'next/image';
 import type {LockedGame, Week1Prediction} from '../domain/locked-board';
@@ -12,7 +13,7 @@ function Grade({value}:{value?:string|null}){const v=result(value);return v?<str
 
 function Pick({pick,game,market}:{pick?:Week1Prediction['selections']['spreads'];game:LockedGame;market:'spreads'|'totals'}){
   if(!pick || pick.status!=='AVAILABLE')return <div className="prediction-cell muted">UNAVAILABLE<small>{pick?.reason??'No recorded selection'}</small></div>;
-  return <div className="prediction-cell"><b>{team(pick.side,game)} {market==='spreads'?odds(pick.line):pick.line}</b><span>{names[pick.book!]??pick.book} {odds(pick.price)}</span><small>{market==='spreads'?'Cover':'Win'} {pct(pick.win)} · Push {pct(pick.push)}</small><small>Fair, excluding push {pct(pick.fair_probability)}</small>{game.status==='FINAL'&&<Grade value={pick.grade}/>}</div>;
+  return <div className="prediction-cell"><b><TicketPick game={game} market={market} side={pick.side} line={pick.line} book={pick.book} price={pick.price}>{team(pick.side,game)} {market==='spreads'?odds(pick.line):pick.line}</TicketPick></b><span>{names[pick.book!]??pick.book} {odds(pick.price)}</span><small>{market==='spreads'?'Cover':'Win'} {pct(pick.win)} · Push {pct(pick.push)}</small><small>Fair, excluding push {pct(pick.fair_probability)}</small>{["OPPOSES","PUSH"].includes(pick.score_consistency?.state??"")&&<small className="prediction-ev-negative" title={pick.score_consistency?.text}>Score estimate does not support this pick</small>}{game.status==='FINAL'&&<Grade value={pick.grade}/>}</div>;
 }
 
 export function Week1PredictionRow({game:g,analytics}:{game:LockedGame;analytics:ReactNode}){
