@@ -1,7 +1,7 @@
 {
   "experiment": "iron-man-week2-v1",
   "date": "2026-09-12T17:09:42.005837+00:00",
-  "status": "IMPLEMENTED_LOCAL_VERIFIED_PENDING_DEPLOYMENT",
+  "status": "DEPLOYED_VERIFIED",
   "protocol": "work/iron-man-v1/PROTOCOL.md",
   "spec_sha256": "bd44838b2516cd61017c973197916a85769aae487a7093154a4af222a6239afc",
   "confidence_config_sha256": "a76a92818c8e9eff030d04382db2546b8245af612e98b03e2c302c0b0018b0d7",
@@ -15,7 +15,7 @@
   },
   "tests": {
     "engine": {
-      "pass": 162,
+      "pass": 163,
       "fail": 0
     },
     "main": {
@@ -46,5 +46,32 @@
     "No live human entries or 50-lean calibration cohort yet; behavior tested on synthetic records.",
     "Monday/Sunday/T80 future execution is scheduled, not claimed as observed."
   ],
-  "deployment": null
+  "deployment": {
+    "version": 177,
+    "site_source_commit": "ec322905b22940b273fb52216b3ce5cee116f1f3",
+    "main_commit": "e09cad0b04728a276f907e46e746f2e0530bd950",
+    "deployment_id": "appgdep_6aa5883bf6fc8191933299e67c4b80b8",
+    "status": "succeeded",
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/suit",
+    "screenshot": "work/iron-man-v1/sheet-screenshot.png",
+    "private_entry_check": "work/iron-man-v1/live-entry-check.json"
+  },
+  "cloud": {
+    "host": "159.89.185.88",
+    "engine_commit_verified": "7ac9e7541d709f0e3073bc4b71276eaa1c39fae7",
+    "suit_tests_pass": 11,
+    "suit_tests_fail": 0,
+    "synthetic_replay": "PASS identical lock hashes to local",
+    "systemd_capture_result": "success",
+    "systemd_capture_exit": 0,
+    "systemd_daily_result": "success",
+    "systemd_daily_exit": 0,
+    "capture_and_daily_timers": "enabled",
+    "future_schedule": "not yet observed"
+  },
+  "final_review": {
+    "least_certain": "Sunday to Monday sheet rollover while MNF remains pending",
+    "change": "Keep next-week sheet through Monday and test Sunday evening and Monday 09 PT; no change to lock, sizing, confidence or selection arithmetic"
+  },
+  "verified_at": "2026-09-12T17:19:53.730407+00:00"
 }

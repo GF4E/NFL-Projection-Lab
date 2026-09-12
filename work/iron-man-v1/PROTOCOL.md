@@ -25,3 +25,5 @@ Verify: `/opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test
 Prepare current sheet offline: `/opt/anaconda3/bin/python3.12 -B scripts/suit_prepare.py`.
 Grade offline: `/opt/anaconda3/bin/python3.12 -B scripts/suit_daily.py`.
 Production scheduling remains exclusively through the ownership-fenced cloud wrapper. Never run an unscheduled provider capture. This build spends zero Odds API credits.
+
+The Sunday 20:00 PT next-week sheet remains selected through Monday while the prior week's Monday night game is pending; a regression test covers both sides of this rollover.

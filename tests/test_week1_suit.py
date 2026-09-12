@@ -39,6 +39,11 @@ class SuitTests(unittest.TestCase):
   self.assertEqual(price_number({**e,'spread':-3},'spreads',ctx,SHAPE,cfg)['side'],None)
  def test_monday_capture_window(self):
   self.assertEqual(early_at(GAME),'2026-09-14T09:00:00-07:00');self.assertEqual(jobs([GAME],dt.datetime.fromisoformat('2026-09-14T16:00:10+00:00'))[0]['label'],'EARLY');self.assertEqual(jobs([GAME],dt.datetime.fromisoformat('2026-09-14T16:01:00+00:00')),[])
+ def test_next_sheet_survives_monday_night_pending(self):
+  from scripts.suit_prepare import sheet_week
+  games=[{'week':2,'kickoff_at':'2026-09-20T17:00:00+00:00'},{'week':2,'kickoff_at':'2026-09-22T00:15:00+00:00'},{'week':3,'kickoff_at':'2026-09-25T00:15:00+00:00'}]
+  for now in ['2026-09-21T03:01:00+00:00','2026-09-21T16:00:00+00:00']:
+   self.assertEqual(sheet_week(games,dt.datetime.fromisoformat(now)),3)
  def test_budget_keeps_week1(self):
   with tempfile.TemporaryDirectory() as tmp:
    p=Path(tmp)/'budget';self.assertTrue(all(transact(p,'2026-W02',str(i)) for i in range(25)));self.assertFalse(transact(p,'2026-W02','26'));self.assertTrue(all(transact(p,'2026-W01',str(i)) for i in range(20)));self.assertFalse(transact(p,'2026-W01','21'))
