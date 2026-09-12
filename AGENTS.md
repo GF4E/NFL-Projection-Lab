@@ -88,3 +88,11 @@ The board is a shared guide, not a person-by-person pick database. No person att
 ## September 12 score-column correction
 
 Remove market-derived team-score means from the guide for every matchup. Warnings next to contradictory scores did not solve the presentation problem. Keep actual final scores, original winner and market selections, grades, and archived projection values intact. The guide must not restore a team-score forecast merely by adjusting it to agree with a pick. A future score forecast needs its own football basis.
+
+## Game Card v3 FINAL (September 12 supersession)
+
+Implement work/game-card-v3/SPEC-final.md. Shared entry and source ours; no personal attribution on the site. Engine publishes the card, football-only WHY and shared confidence scorecard; the reader does not compute picks. New card selections freeze at T75 independently of unchanged model-pick-v1 locks. Missing historical tiles are NOT_RECORDED and excluded from records: SEA all three, SF winner only. Shared map in config/confidence_map.json supersedes per-person confidence; archived person map supports legacy replay only. Hide all map-derived displays below 50 graded shared leans; preserve frozen beliefs and first grades. See work/game-card-v3/PLAN.md.
+
+## Immediate display restriction (September 12, final supersession)
+
+No card or decision window may display a book name, a price, break-even, EV, or line movement. Book-level detail exists nowhere on the site until explicitly requested. Remove the old WHY WE LEAN THIS WAY block, other-book references, live/best-book consensus prose, Choose another side or book and Add to slip. Under the picks show only the consensus as Line: PIT -6.5 · Total 42. Football WHY from section D of GAME CARD v3 FINAL is permitted only when measured sheet blocks exist; otherwise omit it. This supersedes conflicting earlier card, analytics and ticket-display instructions.
