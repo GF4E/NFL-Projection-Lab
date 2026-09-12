@@ -14,6 +14,8 @@ class GameCardTests(unittest.TestCase):
  def test_contract(self):
   c=card()
   for key in ('game_id','week','season','kickoff_utc','home','away','venue','roof','status','final','market','model','rules','ours','post_lock','sheet','wagers','grades','version','freeze_timestamp','distribution_hash'):self.assertIn(key,c)
+ def test_missed_has_no_freeze(self):
+  self.assertIsNone(card(dict(R,status='MISSED',freeze_timestamp=G['cutoff_at']))['freeze_timestamp'])
  def test_market_fallback(self):
   c=card()
   for k in ('SPREAD','TOTAL'):self.assertEqual((c['tiles'][k]['probability'],c['tiles'][k]['confidence_source'],c['tiles'][k]['subtitle']),(.5,'MARKET','coin flip'))
@@ -42,6 +44,8 @@ class GameCardTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as d:
    root=Path(d);(root/'work/model-pick-v1').mkdir(parents=True);(root/'work/game-card-v3').mkdir();(root/'config').mkdir();(root/'.cloud-private').mkdir();(root/'work/model-pick-v1/runtime-config.json').write_text('{"distribution":{"sha256":"h"}}');(root/'work/game-card-v3/runtime.json').write_text('{"activated_at":"2026-09-12T00:00:00Z"}');(root/'config/confidence_map.json').write_bytes((ROOT/'config/confidence_map.json').read_bytes());(root/'.cloud-private/card-v3-entries.json').write_text(json.dumps({'entries':[dict(OURS,game_id=G['game_id'])],'synced_at':'2026-09-13T15:45:01Z'}))
    with patch('engine.game_card_runtime.read_pinned',return_value=SHAPE):
+    enrich({'games':[copy.deepcopy(G)]},[copy.deepcopy(R)],root,dt.datetime.fromisoformat('2026-09-13T15:41:00+00:00'));live=root/'outputs/game-card-v3/live'/f"{G['game_id']}.json";unchanged=live.read_bytes()
+    enrich({'games':[copy.deepcopy(G)]},[copy.deepcopy(R)],root,dt.datetime.fromisoformat('2026-09-13T15:42:00+00:00'));self.assertEqual(live.read_bytes(),unchanged)
     enrich({'games':[copy.deepcopy(G)]},[copy.deepcopy(R)],root,dt.datetime.fromisoformat('2026-09-13T15:45:02+00:00'));p=root/'outputs/game-card-v3/locks'/f"{G['game_id']}.json";self.assertTrue(p.exists());raw=p.read_bytes();enrich({'games':[copy.deepcopy(G)]},[dict(R,offers=[])],root,dt.datetime.fromisoformat('2026-09-13T16:00:00+00:00'));self.assertEqual(p.read_bytes(),raw)
  def test_no_input_returns_not_recorded(self):
   r=dict(R,consensus={},offers=[]);self.assertTrue(all(t['grade']=='NOT_RECORDED' for t in card(r)['tiles'].values()))

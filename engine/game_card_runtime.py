@@ -8,7 +8,7 @@ from pathlib import Path
 from engine.live_picks import overwrite
 from engine.pick_store import put,read_pinned
 from engine.pricing import timestamp
-from engine.game_card_v3 import build,VERSION
+from engine.game_card_v3 import build,VERSION,digest
 ROOT=Path(__file__).resolve().parents[1]
 
 def sheet_for(root,week):
@@ -51,7 +51,8 @@ def enrich(board,records,root=ROOT,now=None):
   if 'game' not in r:r['game']=g
   r.setdefault('status','LIVE');r.setdefault('distribution_hash',cfg['distribution']['sha256'])
   all_sheets.setdefault(g['week'],sheet_for(root,g['week']));sheet=copy.deepcopy(all_sheets[g['week']])
-  for block in sheet.values():block['teams']={k:v for k,v in block['teams'].items() if k in (g['home_abbr'],g['away_abbr'])}
+  from engine.harvest import canonical
+  for block in sheet.values():block['teams']={t:block['teams'][canonical(t)] for t in (g['home_abbr'],g['away_abbr']) if canonical(t) in block['teams']}
   entry=[e for e in entries if e['game_id']==g['game_id']]
   lockpath=out/'locks'/f'{g["game_id"]}.json';livepath=out/'live'/f'{g["game_id"]}.json'
   cutoff=timestamp(r['game'].get('cutoff_at',g.get('cutoff_at',g['kickoff_at'])))
@@ -63,6 +64,10 @@ def enrich(board,records,root=ROOT,now=None):
    card['generated_at']=now.isoformat();card['scheduled_cutoff']=cutoff.isoformat()
    from engine.shared_confidence import beliefs
    beliefs(card,root)
+   fingerprint=digest({k:v for k,v in card.items() if k not in ('generated_at','input_hash')})
+   prior=json.loads(livepath.read_text()) if livepath.exists() else None
+   if prior and prior.get('input_hash')==fingerprint:card['generated_at']=prior['generated_at']
+   card['input_hash']=fingerprint
    if now>=cutoff:
     fresh=private.get('synced_at') and timestamp(private['synced_at'])>=cutoff
     capture=r.get('captured_at',r.get('capture',{}).get('received_at'))

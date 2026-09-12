@@ -56,7 +56,7 @@ def generate(card):
  candidates.sort(key=lambda x:(x['priority'],-x['magnitude'],x['text']))
  support=next((x for x in candidates if x['support']>0),None);against=next((x for x in candidates if x['support']<0),None)
  source=card['tiles']['SPREAD'].get('confidence_source') or card['tiles']['WINNER'].get('confidence_source')
- first=f'The market favors {team}; '+(support['text'] if support else 'a measured football advantage is not recorded') if source=='MARKET' else f'Our lean is {team}: '+(support['text'] if support else 'a measured football advantage is not recorded')
+ first=f'The market-based ATS lean favors {team}; '+(support['text'] if support else 'a measured football advantage is not recorded') if source=='MARKET' else f'Our lean is {team}: '+(support['text'] if support else 'a measured football advantage is not recorded')
  second='Against that lean, '+(against['text'] if against else 'no measured counter-reason is recorded')
  selected=candidates[:5]
  if ours:
