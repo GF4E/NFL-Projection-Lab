@@ -16,6 +16,10 @@ export function validateBoard(value: unknown): LockedBoard {
     if (!g.game_id || ids.has(g.game_id) || !g.home_team || !g.away_team || !g.version ||
         !Number.isFinite(Date.parse(g.expires_at)) || !Number.isInteger(g.week)) throw new Error("Invalid game");
     ids.add(g.game_id);
+    if(g.prediction?.projection.status === "AVAILABLE") {
+      const p=g.prediction.projection;
+      if(!p.winner || ![p.win_probability,p.tie_probability,p.home_score,p.away_score].every(n=>typeof n === "number" && Number.isFinite(n))) throw new Error("Invalid projection");
+    }
     if (g.status === "FINAL" && (!g.final_score || !Number.isFinite(g.final_score.home) || !Number.isFinite(g.final_score.away))) throw new Error("Missing final score");
     for (const market of ["spreads", "totals"] as const) {
       const v = g.verdicts?.[market];
@@ -32,6 +36,10 @@ export function displayBoard(board: LockedBoard, checkedAt: number, now = Date.n
   const stale = now - checkedAt > STALE_MS;
   return { ...board, publication_status: stale ? "STALE" : "CURRENT", games: board.games.map(g => {
     // A lock is immutable history, not a live quote. Never expire its selection.
+    if(g.week===1 && g.prediction) {
+      if(!stale || g.status==="FINAL" || g.lock_status==="MISSED") return g;
+      return {...g,prediction:{...g.prediction,stale:true,selections:Object.fromEntries(Object.entries(g.prediction.selections).map(([key,value])=>[key,{...value,betting_status:value.status==="AVAILABLE"?"STALE — LEAN ONLY":value.betting_status}])) as typeof g.prediction.selections}};
+    }
     if (g.status === "FINAL" || g.lock_status === "LOCKED" || g.lock_status === "MISSED") return g;
     if (g.lock_status === "LIVE" && !stale) return g;
     const v = { state: null, availability: "STALE", reason: "Awaiting scheduled capture.", edge_source: null, grade: null };

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
+import { Week1PredictionRow } from "./week1-prediction-row";
 import { OurNote } from "./our-note";
 import type { LiveLine } from "../domain/line-board";
 import type { LockedBoard, LockedGame, Verdict } from "../domain/locked-board";
@@ -32,7 +33,7 @@ export function GameDecision({ game:g }: {game:LockedGame}) {
     {(g.lock_status === "LOCKED" || g.lock_status === "LIVE") ? <>
       <p className="consensus-line">{g.lock_status === "LIVE" ? "Live consensus" : "T−75 consensus"} · {g.home_abbr} {odds(g.consensus?.spreads?.line)} · Total {g.consensus?.totals?.line ?? "—"}
         {(["spreads","totals"] as const).map(m=>{const b=g.best_captured?.[m];return b && <span key={m}> · Best {team(b.side,g)} {m==="spreads"?odds(b.line):b.line}: {names[b.book] ?? b.book} {odds(b.price)}</span>;})}</p>
-      <section className="measured-analysis"><h3>ANALYSIS</h3>{g.analysis?.sentences.map((sentence,i)=><p key={i}>{sentence}</p>) ?? <p>No measured analysis saved for this capture.</p>}</section>
+      <section className="measured-analysis"><h3>ANALYSIS</h3>{g.prediction?.explanation.map((text,i)=><p key={`projection-${i}`}>{text}</p>)}{g.prediction && <p>Projection generated: {when(g.prediction.projection.generated_at ?? null)}. Quote timestamp: {when(g.prediction.quote_at ?? null)}. {g.prediction.stale ? "STALE — saved estimate only; no actionable PLAY." : "Within the recorded quote freshness horizon."}</p>}{g.analysis?.sentences.map((sentence,i)=><p key={i}>{sentence}</p>) ?? <p>No measured analysis saved for this capture.</p>}</section>
       <div className="grid-analytics"><h3>Analytics</h3><table><thead><tr><th>Target / book</th><th>Fair chance</th><th>Push</th><th>EV / unit</th><th>Price edge</th><th>Source</th></tr></thead><tbody>{(["spreads","totals"] as const).map(m=>{const v=g.verdicts[m];return <tr key={m}><th>{m === "spreads"?"Spread":"Total"} · {names[v.book!] ?? v.book}</th><td>{pct(v.fair_probability)}</td><td>{pct(v.analytics?.push)}</td><td>{pct(v.EV)}</td><td>{v.analytics?.price_edge_cents?.toFixed(1) ?? "—"}¢</td><td>{v.edge_source === "price"?"price edge":"coin flip"}</td></tr>;})}</tbody></table></div>
       <p className="grid-detail-note">{g.lock_status === "LIVE" ? "Live selections, recomputed at each capture. They enter the record only at T-75." : "Locked model selections."} PASS means the pick did not qualify for a wager. Fair chance excludes pushes; EV includes them.</p>
       {(["spreads","totals"] as const).map(m=>{const v=g.verdicts[m];return (v.state === "TEASE" || (v.teaser_notice && v.leg)) && <p className="grid-detail-note" key={m}>Teaser candidate: {v.leg} {v.original_line} → {v.teased_line} · {names[v.best_book!] ?? v.best_book} {odds(v.teaser_price)} for two legs · Crosses {v.key_numbers_crossed?.join(" / ")}{v.state === "TEASE" && " · NEEDS_PARTNER"}{v.teaser_pricing && <> · <a href={v.teaser_pricing.source_page} target="_blank" rel="noreferrer">Posted reference · {v.teaser_pricing.as_of}</a> · {v.teaser_pricing.scope}</>} · Grades above are for the straight model pick.</p>;})}
@@ -114,8 +115,8 @@ export function LockedModelBoard() {
     {error && <p className="locked-alert" role="status">{error}</p>}
     {board?.publication_status === "STALE" && <p className="locked-alert">Publication update delayed. Saved locks and grades remain visible.</p>}
     {!board && !error && <p className="board-empty">Loading picks…</p>}
-    <div className="grid-price-toolbar"><div role="group" aria-label="Displayed sportsbook">{['betmgm','williamhill_us','fanduel','draftkings'].map(b=><button key={b} aria-pressed={book===b} onClick={()=>setBook(b)}>{names[b]}</button>)}</div><small>Saved prices · {names[book]} · Verdict books follow each pick</small></div>
-    <div className="grid-table-scroll"><div className="grid-column-head"><span>MATCHUP</span><span>SPREAD</span><span>TOTAL</span><span>MONEY</span><span>VERDICT</span></div>{games.map(g=><GameRow key={g.game_id} game={g} quotes={quotes} book={book}/>)}</div>
+    {selected!==1 && <div className="grid-price-toolbar"><div role="group" aria-label="Displayed sportsbook">{['betmgm','williamhill_us','fanduel','draftkings'].map(b=><button key={b} aria-pressed={book===b} onClick={()=>setBook(b)}>{names[b]}</button>)}</div><small>Saved prices · {names[book]} · Verdict books follow each pick</small></div>}
+    <div className="grid-table-scroll">{selected===1 ? <><div className="week1-column-head"><span>MATCHUP</span><span>PROJECTED WINNER</span><span>PROJECTED SCORE</span><span>SPREAD PICK</span><span>TOTAL PICK</span><span>BETTING STATUS</span></div>{games.map(g=><Week1PredictionRow key={g.game_id} game={g} analytics={<GameDecision game={g}/>}/>)}</> : <><div className="grid-column-head"><span>MATCHUP</span><span>SPREAD</span><span>TOTAL</span><span>MONEY</span><span>VERDICT</span></div>{games.map(g=><GameRow key={g.game_id} game={g} quotes={quotes} book={book}/>)}</>}</div>
     {board && !games.length && <p className="board-empty">No published games for this week.</p>}
   </section>;
 }

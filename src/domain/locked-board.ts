@@ -12,6 +12,7 @@ export type Verdict = {
   partner_status?: "NEEDS_PARTNER";
 };
 export type LockedGame = {
+  prediction?: Week1Prediction;
   game_id: string; season: number; week: number; home_team: string; away_team: string;
   home_abbr: string; away_abbr: string; kickoff_at: string; expires_at: string;
   status: string; lock_status: string; version: string; freeze_time: string | null;
@@ -33,4 +34,14 @@ export type LockedBoard = {
   week_records?: Record<string, Record<"model" | "price" | "paper" | "jarrett", {wins: number; losses: number; pushes: number; mean_clv_cents: number | null; clv_n: number}> & {human_lean?: {wins:number;losses:number;pushes:number;mean_clv_cents:number|null;clv_n:number}}>;
   clv_reference?: string;
   publication_status?: "CURRENT" | "STALE";
+};
+
+export type Week1Prediction = {
+  projection: {status: string; reason?: string; version: string; generated_at?: string; winner?: string;
+    win_probability?: number; tie_probability?: number; coin_flip?: boolean; home_score?: number;
+    away_score?: number; score_label?: string; expected_margin?: number; expected_total?: number};
+  selections: Record<"spreads"|"totals", {status:string; reason?:string; side?:string; line?:number; book?:string;
+    price?:number; win?:number; push?:number; fair_probability?:number; EV?:number; betting_status?:string;
+    negative_EV?:boolean; grade?:string|null; explanation?:string}>;
+  stale:boolean; quote_at?:string; winner_grade?:string|null; frozen:boolean; explanation:string[];
 };
