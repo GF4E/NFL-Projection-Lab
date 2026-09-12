@@ -1,0 +1,35 @@
+{
+  "artifact_hashes": {
+    "scripts/week1_usefulness_audit.py": "263c09d2e95c89730ee1b702cea6b3392e1bdd422ec1c27a6fea47e48b060e43",
+    "tests/test_week1_usefulness_audit.py": "7e0981df9b51ad7380a9b79d37549d9bcd7b8568eb6a768a6afa78489d145ae7",
+    "work/week1-usefulness-audit-v1/caesars-all-offers.csv": "2657fc83468fd5a51c1329ee53e4bb732f7f8044d16af6fb74d43572f93a33b9",
+    "work/week1-usefulness-audit-v1/experiment.json": "e4f0522309a102ffbd690fb15cad65350ca09af4db218d0c3c8b38b30d1e324c",
+    "work/week1-usefulness-audit-v1/game-table.csv": "a5f44cb2eb024bde53b73e6f5df186d5ab18238d858b39552ded06ca071c6f71",
+    "work/week1-usefulness-audit-v1/historical-baseline.csv": "705d44e8dee5f428acd4749aaaa02f4f5a1a460c4eacca6ca2646341f1aeb406",
+    "work/week1-usefulness-audit-v1/inputs.json": "3bb562adde65130cb3f52ef275ea298e611130fdf51101149f121be0a04b9a60",
+    "work/week1-usefulness-audit-v1/live-trace.csv": "7c5e6e5523d5dc16e6437e024671050e7e9c38769b52cb281ba3b7c8c64db5d1",
+    "work/week1-usefulness-audit-v1/protocol.json": "9e83b5625997e42fffb76c6e09f731ff587e110c8e5a6b5aa16103d8735ad307",
+    "work/week1-usefulness-audit-v1/published-board.json": "f1fcf3ed2bf733f2bea0f970e24c1849840d7897c99b32fe7f6f063b66dae0d2",
+    "work/week1-usefulness-audit-v1/report.md": "ae4cfdf8f7b85a409536380a7dac5b8af25c83d50e61a0f04a2c529086b247c6",
+    "work/week1-usefulness-audit-v1/weather.csv": "2dbc1bfe9105037786500ada62af4f9580109b4292a65b2e363f2442a8709c4d",
+    "work/week1-usefulness-audit-v1/website-check.json": "2bbb1bfdd1cc8d869ab9df7a68c63a770c9220e1ff521d1d9ed0ff78af2df5e2"
+  },
+  "audit_checks": {
+    "failed": 0,
+    "passed": 37
+  },
+  "checked_at": "2026-09-12T18:09:00.887370+00:00",
+  "credits_spent": 0,
+  "frozen_runtime_hashes_preserved": 14,
+  "historical_saved_loss_max_error": 0.0,
+  "least_sure": "Whether small displayed edges survive execution-line and timing checks. Repriced exact screenshot lines, assessed rounding sensitivity, separated seeded ties, and withheld a betting shortlist.",
+  "live_replayed_picks": 28,
+  "offline_replay": "byte-for-byte PASS; no production writes; network forbidden in audit test",
+  "repository_tests": {
+    "command": "/opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'",
+    "failed": 0,
+    "passed": 168
+  },
+  "review": "Reviewed source chronology, production-data equality, probability basis, report arithmetic, explicit blockers and secret/size guard before commit.",
+  "website_week1_equal": true
+}
