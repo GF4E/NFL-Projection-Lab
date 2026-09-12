@@ -25,12 +25,14 @@ describe('Week 1 prediction grid',()=>{
   expect(container.querySelectorAll('.prediction-row')).toHaveLength(1);
   expect(container.querySelectorAll('.prediction-cell')).toHaveLength(6);
   expect(container.querySelectorAll('img')).toHaveLength(2);
-  expect(container.querySelectorAll('.week-records dt')).toHaveLength(5);
+  expect(container.querySelectorAll('.week-records dt')).toHaveLength(0);
+  expect(container.textContent).not.toContain('Jarrett');
+  expect(container.textContent).toContain('Our game guide');
   expect(container.textContent).toContain('SF 27 — LA 7 FINAL');
   expect(container.textContent).not.toContain('Sep 10, 5:35');
   expect(container.textContent).toContain('SF +3.5');expect(container.textContent).toContain('WIN');
   expect(container.textContent).toContain('Over 47.5');expect(container.textContent).toContain('LOSS');
-  expect(container.textContent).toContain('Jarrett · LA -3 -120 · LOSS');
+  expect(container.textContent).toContain('Our wager · LA -3 -120 · LOSS');
   expect(fn.mock.calls.every(([url])=>String(url).startsWith('/api/model-board')||String(url).startsWith('/api/lines?week='))).toBe(true);
  });
  it('keeps consensus, freeze, shortened version and analytics in the expanding window',async()=>{
