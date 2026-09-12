@@ -63,6 +63,7 @@ def display(record, game, now):
     quote_at = record.get('captured_at') or record.get('capture',{}).get('received_at')
     stale = not final and (not quote_at or (now-timestamp(quote_at)).total_seconds()>MAX_QUOTE_AGE_SECONDS)
     selections = {}
+    from engine.pick_rationale import rationale
     for market in ('spreads','totals'):
         pick = next((p for p in record.get('picks',[]) if p['market']==market), None)
         if not pick:
@@ -73,6 +74,7 @@ def display(record, game, now):
         selections[market].update(status='AVAILABLE', betting_status='FINAL' if final else 'STALE — LEAN ONLY' if stale else 'PLAY' if passed else 'LEAN ONLY — filter not met',
             filter_pass=passed, negative_EV=pick['EV']<0, grade=game['verdicts'][market].get('grade'),
             explanation='Coin flip: deterministic equal-EV tiebreak.' if pick.get('seed') else 'Market pricing selected this side; no independent football signal.' if pick['edge_source']=='price' else 'Highest estimated return without a positive price/line edge; not necessarily a random tie.')
+        selections[market]['rationale'] = rationale(pick, record, stale)
     return {'projection':projection,'selections':selections,'stale':stale,'quote_at':quote_at,
             'winner_grade':winner_grade(projection,game,final) if frozen else 'not recorded' if final else None,
             'frozen':frozen,'explanation':[

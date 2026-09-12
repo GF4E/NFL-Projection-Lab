@@ -1,0 +1,23 @@
+{
+  "experiment_id": "week1-pick-rationale-v1",
+  "created_at": "2026-09-12T18:52:10.426253+00:00",
+  "scope": "Explain captured pick selection and strength of price support; do not invent football conviction",
+  "credits_spent": 0,
+  "unchanged_game_fields_except_added_rationale": true,
+  "tests": {
+    "engine_passed": 181,
+    "engine_failed": 0,
+    "reader_targeted_passed": 23,
+    "reader_failed": 0,
+    "main_build": "PASS",
+    "sites_build": "PASS"
+  },
+  "decisions": [
+    "All rationale is engine-produced from saved selections and their same-cutoff leave-one-out reference, price, probability and EV.",
+    "Negative EV explicitly says price does not justify confidence. Equal-EV offers explicitly say tiebreak adds no conviction.",
+    "Key-margin outcomes are settlement arithmetic, not additional predictive evidence.",
+    "Methodology and other captured context are collapsed. Weather, Elo and QB context are not asserted as causal selection inputs.",
+    "No new data capture, model arithmetic, gate or historical-lock change. Week 2 has no new rationale."
+  ],
+  "deployment": "PENDING"
+}
