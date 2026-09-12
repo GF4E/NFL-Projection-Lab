@@ -1,3 +1,4 @@
+import { suit, readSuit } from "../src/server/suit";
 import { ourNote } from "../src/server/our-note";
 import { readLockedBoard, refreshLockedBoard } from "../src/server/locked-board";
 import { handleImageOptimization, DEFAULT_DEVICE_SIZES, DEFAULT_IMAGE_SIZES } from "vinext/server/image-optimization";
@@ -19,6 +20,8 @@ interface Env {
   DB: D1Database;
   ODDS_API_KEY?: string;
   NOTE_EDIT_KEY?: string;
+  GABE_EDIT_KEY?: string;
+  JARRETT_EDIT_KEY?: string;
   NOTE_SYNC_KEY?: string;
   IMAGES: {
     input(stream: ReadableStream): {
@@ -78,6 +81,7 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (["/api/suit-board","/api/suit-entry","/api/suit-entry/sync"].includes(url.pathname)) return suit(request,env);
     if (url.pathname === "/api/our-note" || url.pathname === "/api/our-note/sync") return ourNote(request, env);
     if (url.pathname === "/api/model-board" || url.pathname === "/api/decision-board") {
       if (request.method !== "GET") return json({ error: "Read-only publication" }, 405);
@@ -145,6 +149,7 @@ const worker = {
   },
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     ctx.waitUntil(refreshLockedBoard(env.DB).catch(() => undefined));
+    ctx.waitUntil(readSuit(env.DB).catch(() => undefined));
 
   }
 };

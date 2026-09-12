@@ -284,3 +284,8 @@ export const engineOurNotes = sqliteTable("engine_our_notes", {
   payload: text("payload").notNull(),
   cutoffAt: integer("cutoff_at").notNull(),
 });
+
+export const engineSuitEntries = sqliteTable("engine_suit_entries", {
+ gameId: text("game_id").notNull(), person: text("person").notNull(), payload: text("payload").notNull(), cutoffAt: integer("cutoff_at").notNull()
+}, t=>[primaryKey({columns:[t.gameId,t.person]})]);
+export const engineSuitPublication = sqliteTable("engine_suit_publication", {id:integer("id").primaryKey(),payload:text("payload").notNull(),checkedAt:integer("checked_at").notNull()});
