@@ -11,9 +11,19 @@
     "Current saved live records receive a present-time projection before cutoff, without reselecting picks or calling providers. Their quote timestamps remain Friday. Future captures create new projections and freeze() copies them together at T75.",
     "No new projection for prior locks, MISSED games, finals, or Week 2. Existing SF/LA winner is not recorded.",
     "Winner result is derived only from the frozen winner and board final source pinned to existing first grades; it never enters the ATS scorecard.",
-    "No outright frequency calibration or performance claim is added."
+    "No outright frequency calibration or performance claim is added.",
+    "Refreshed the read-only board artifact endpoint to verify publication; no Odds API capture was invoked. Friday quotes remain dated STALE until an authorized scheduled capture."
   ],
-  "deployment": "PENDING",
+  "deployment": {
+    "status": "succeeded",
+    "version": 180,
+    "deployment_id": "appgdep_6aa59cfb1d548191a77206d87e0b3d91",
+    "live_url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday",
+    "sites_source_commit": "3515667339106dea29f83a8a40b16f56411dd55c",
+    "github_main_commit": "4eac104524d93885e6543a59160579146eead460",
+    "engine_implementation_commit": "7923adf20dbfebf425a393c3811119c53ed8e7e2",
+    "cloud_implementation_commit_verified": "7923adf20dbfebf425a393c3811119c53ed8e7e2"
+  },
   "existing_live_picks_and_consensus_unchanged": [
     "2026_01_TB_CIN",
     "2026_01_GB_MIN",
@@ -57,7 +67,24 @@
       "failed": 0,
       "passed": 267,
       "skipped": 1
+    },
+    "main_build": "PASS",
+    "sites_build": "PASS",
+    "sites_affected": {
+      "passed": 29,
+      "failed": 0
+    },
+    "main_responsive_regression": {
+      "passed": 22,
+      "failed": 0
+    },
+    "cloud_projection": {
+      "passed": 8,
+      "failed": 0
     }
   },
-  "verification_command": "cd /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6 && /opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'"
+  "verification_command": "cd /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6 && /opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'",
+  "least_sure": "All six columns fitting the current browser window. Visual review found status offscreen; reduced grid minimum width and moved detailed selection explanations into analytics, then verified deployed layout.",
+  "live_verification": "work/week1-projection-v1/live-verification.json",
+  "screenshot": "work/week1-projection-v1/live-board.png"
 }
