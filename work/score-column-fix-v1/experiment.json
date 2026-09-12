@@ -9,11 +9,28 @@
   "created_at": "2026-09-12T20:44:29.733435+00:00",
   "credits_spent": 0,
   "decision": "Remove market-derived projected score column across all matchups, not merely a warning. Preserve historical raw projections, selections, registered filters, locks and grades. Suppress unsupported PLAY presentation as before. Actual final scores remain.",
-  "deployment": "PENDING",
+  "deployment": {
+    "browser_checks": {
+      "final_scores_present": true,
+      "loaded": true,
+      "market_score_label_absent": true,
+      "projected_score_column_absent": true
+    },
+    "engine_score_policy_present": true,
+    "reader_commit": "331810ac08aa5c3eb105c828b66073d376084856",
+    "screenshot": "work/score-column-fix-v1/live.png",
+    "served_hash": "ee6424bf052370549bd8a92caa5b1a7a7330537f41bfa26eeb42ed6c344826f5",
+    "site_commit": "5cf6421510e280f48bb6c5c14e5a08acb5fdb164",
+    "status": "SUCCEEDED",
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday",
+    "version": 184
+  },
   "experiment_id": "score-column-fix-v1",
   "tests": {
     "engine_pass": 192,
     "fail": 0,
-    "reader_pass": 37
+    "main_build": "PASS",
+    "reader_pass": 37,
+    "sites_build": "PASS"
   }
 }
