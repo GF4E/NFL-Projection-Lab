@@ -1,0 +1,551 @@
+{
+  "as_of": "2026-09-12T19:59:32.797353+00:00",
+  "config": {
+    "categories": {
+      "coverage_and_receivers": 1.0,
+      "quarterback": 3.0,
+      "rest_and_travel": 0.5,
+      "scheme_and_coaching": 0.75,
+      "trenches": 1.5,
+      "weather": 1.0
+    },
+    "elo_points_per_rating": 25,
+    "home_advantage_elo": 65,
+    "market_weight": 0,
+    "maximum_adjustment_points": 6,
+    "maximum_source_age_hours": 72,
+    "status": "PROVISIONAL_RESEARCH_ONLY",
+    "version": "football-evidence-v1",
+    "weight_origin": "Engineering priors, not fitted or validated effects"
+  },
+  "evidence": [
+    {
+      "category": "trenches",
+      "fact": "Baltimore ruled out defensive tackle Nnamdi Madubuike.",
+      "game_id": "2026_01_BAL_IND",
+      "interpretation": "His absence may reduce interior defensive disruption and help the Indianapolis offense. The replacement and scheme effect are not yet measured.",
+      "margin_assessment": 0.5,
+      "mechanism_id": "BAL-interior-defender-Madubuike-out",
+      "source_reliability": 1.0,
+      "sources": [
+        {
+          "observed_at": "2026-09-12T19:59:32.797353+00:00",
+          "published_at": null,
+          "sha256": "f0ea63b72e9e52c74e0ce8ed052f95b7ee722cd625fb30b2c314d9cd64d97e63",
+          "url": "https://www.colts.com/news/colts-do-not-rule-out-any-players-for-week-1-game-against-baltimore-ravens"
+        }
+      ],
+      "status": "CONFIRMED",
+      "total_assessment": 0.0
+    }
+  ],
+  "game": {
+    "away_abbr": "BAL",
+    "game_id": "2026_01_BAL_IND",
+    "home_abbr": "IND",
+    "kickoff_at": "2026-09-13T17:00:00+00:00",
+    "neutral": false,
+    "season": 2026,
+    "week": 1
+  },
+  "state": {
+    "teams": {
+      "ABU": {
+        "elo": 1354.8054014850063,
+        "season": 2026
+      },
+      "AKR": {
+        "elo": 1460.5362466313059,
+        "season": 2026
+      },
+      "ARI": {
+        "elo": 1395.3513226208531,
+        "season": 2026
+      },
+      "ATL": {
+        "elo": 1475.3232855078895,
+        "season": 2026
+      },
+      "ATN": {
+        "elo": 1416.0127576916707,
+        "season": 2026
+      },
+      "BAL": {
+        "elo": 1546.5902173693826,
+        "season": 2026
+      },
+      "BBA": {
+        "elo": 1481.225599521048,
+        "season": 2026
+      },
+      "BCL": {
+        "elo": 1323.4044915401676,
+        "season": 2026
+      },
+      "BDA": {
+        "elo": 1310.1820900077037,
+        "season": 2026
+      },
+      "BFF": {
+        "elo": 1378.2735225993172,
+        "season": 2026
+      },
+      "BKN": {
+        "elo": 1357.92377168841,
+        "season": 2026
+      },
+      "BRL": {
+        "elo": 1350.51726961338,
+        "season": 2026
+      },
+      "BUF": {
+        "elo": 1609.3800454884522,
+        "season": 2026
+      },
+      "BYK": {
+        "elo": 1422.0851985206216,
+        "season": 2026
+      },
+      "CAR": {
+        "elo": 1433.310267897653,
+        "season": 2026
+      },
+      "CBD": {
+        "elo": 1386.0737597210539,
+        "season": 2026
+      },
+      "CCL": {
+        "elo": 1456.1601706831345,
+        "season": 2026
+      },
+      "CHB": {
+        "elo": 1393.3512237149273,
+        "season": 2026
+      },
+      "CHI": {
+        "elo": 1531.5608934778638,
+        "season": 2026
+      },
+      "CHL": {
+        "elo": 1355.736177932962,
+        "season": 2026
+      },
+      "CHT": {
+        "elo": 1379.0203134484252,
+        "season": 2026
+      },
+      "CIB": {
+        "elo": 1548.2467626988641,
+        "season": 2026
+      },
+      "CIN": {
+        "elo": 1483.011666566462,
+        "season": 2026
+      },
+      "CLE": {
+        "elo": 1426.7090913470765,
+        "season": 2026
+      },
+      "CLI": {
+        "elo": 1363.3886886478545,
+        "season": 2026
+      },
+      "CLP": {
+        "elo": 1361.314316625663,
+        "season": 2026
+      },
+      "CNC": {
+        "elo": 1353.2884997769647,
+        "season": 2026
+      },
+      "COL": {
+        "elo": 1392.2935733697382,
+        "season": 2026
+      },
+      "CRA": {
+        "elo": 1364.4612207583052,
+        "season": 2026
+      },
+      "CRP": {
+        "elo": 1353.9391526597985,
+        "season": 2026
+      },
+      "CST": {
+        "elo": 1372.3113475689997,
+        "season": 2026
+      },
+      "CTI": {
+        "elo": 1467.5149012483698,
+        "season": 2026
+      },
+      "CWP": {
+        "elo": 1357.023434149299,
+        "season": 2026
+      },
+      "DAL": {
+        "elo": 1461.4586711408338,
+        "season": 2026
+      },
+      "DAY": {
+        "elo": 1382.037799721706,
+        "season": 2026
+      },
+      "DEN": {
+        "elo": 1607.9071714636998,
+        "season": 2026
+      },
+      "DET": {
+        "elo": 1558.7454892354585,
+        "season": 2026
+      },
+      "DHR": {
+        "elo": 1450.8541392705872,
+        "season": 2026
+      },
+      "DPN": {
+        "elo": 1477.5210950605822,
+        "season": 2026
+      },
+      "DTI": {
+        "elo": 1357.2737992269845,
+        "season": 2026
+      },
+      "DTM": {
+        "elo": 1373.5414411287961,
+        "season": 2026
+      },
+      "DTX": {
+        "elo": 1323.1764948561845,
+        "season": 2026
+      },
+      "DUL": {
+        "elo": 1456.9871966095477,
+        "season": 2026
+      },
+      "DWL": {
+        "elo": 1518.9556123009493,
+        "season": 2026
+      },
+      "ECG": {
+        "elo": 1414.2058297495182,
+        "season": 2026
+      },
+      "ELY": {
+        "elo": 1369.2973027201665,
+        "season": 2026
+      },
+      "FTP": {
+        "elo": 1359.8843360732722,
+        "season": 2026
+      },
+      "FTW": {
+        "elo": 1393.7922815554612,
+        "season": 2026
+      },
+      "FYJ": {
+        "elo": 1395.346740103374,
+        "season": 2026
+      },
+      "GAR": {
+        "elo": 1373.9267475279764,
+        "season": 2026
+      },
+      "GB": {
+        "elo": 1529.3432921104195,
+        "season": 2026
+      },
+      "GUN": {
+        "elo": 1365.8699391892178,
+        "season": 2026
+      },
+      "HAM": {
+        "elo": 1418.2421356503082,
+        "season": 2026
+      },
+      "HOU": {
+        "elo": 1610.3068233200752,
+        "season": 2026
+      },
+      "HRT": {
+        "elo": 1399.8638786214392,
+        "season": 2026
+      },
+      "IND": {
+        "elo": 1470.729355214704,
+        "season": 2026
+      },
+      "JAX": {
+        "elo": 1571.3806969429916,
+        "season": 2026
+      },
+      "KC": {
+        "elo": 1491.7128619515347,
+        "season": 2026
+      },
+      "KCB": {
+        "elo": 1530.6638508955048,
+        "season": 2026
+      },
+      "KEN": {
+        "elo": 1339.8864540414274,
+        "season": 2026
+      },
+      "KEW": {
+        "elo": 1357.5063734021178,
+        "season": 2026
+      },
+      "LAB": {
+        "elo": 1459.8055598749622,
+        "season": 2026
+      },
+      "LAC": {
+        "elo": 1530.50008966934,
+        "season": 2026
+      },
+      "LAN": {
+        "elo": 1368.811423347639,
+        "season": 2026
+      },
+      "LAR": {
+        "elo": 1612.5560472955895,
+        "season": 2026
+      },
+      "LDA": {
+        "elo": 1445.9660058279521,
+        "season": 2026
+      },
+      "LOG": {
+        "elo": 1357.9732449531148,
+        "season": 2026
+      },
+      "LOU": {
+        "elo": 1349.4577523438606,
+        "season": 2026
+      },
+      "MCK": {
+        "elo": 1361.8467841503118,
+        "season": 2026
+      },
+      "MIA": {
+        "elo": 1461.543237150287,
+        "season": 2026
+      },
+      "MIL": {
+        "elo": 1420.1458844920553,
+        "season": 2026
+      },
+      "MIN": {
+        "elo": 1552.2192479488044,
+        "season": 2026
+      },
+      "MNM": {
+        "elo": 1363.0514982901482,
+        "season": 2026
+      },
+      "MNN": {
+        "elo": 1353.339801591973,
+        "season": 2026
+      },
+      "MSA": {
+        "elo": 1265.0444573531781,
+        "season": 2026
+      },
+      "MUN": {
+        "elo": 1440.056217379702,
+        "season": 2026
+      },
+      "MUT": {
+        "elo": 1349.1148343292462,
+        "season": 2026
+      },
+      "NAA": {
+        "elo": 1485.013891549436,
+        "season": 2026
+      },
+      "NE": {
+        "elo": 1598.7900446637677,
+        "season": 2026
+      },
+      "NG1": {
+        "elo": 1349.5213642031158,
+        "season": 2026
+      },
+      "NO": {
+        "elo": 1440.8004013905706,
+        "season": 2026
+      },
+      "NYA": {
+        "elo": 1437.631554362786,
+        "season": 2026
+      },
+      "NYG": {
+        "elo": 1426.9075450313894,
+        "season": 2026
+      },
+      "NYJ": {
+        "elo": 1364.3318882233646,
+        "season": 2026
+      },
+      "NYY": {
+        "elo": 1410.9711305701217,
+        "season": 2026
+      },
+      "OAK": {
+        "elo": 1351.1337568373913,
+        "season": 2026
+      },
+      "OOR": {
+        "elo": 1379.680207735789,
+        "season": 2026
+      },
+      "PHI": {
+        "elo": 1559.6028729364389,
+        "season": 2026
+      },
+      "PIT": {
+        "elo": 1512.110921350837,
+        "season": 2026
+      },
+      "PRV": {
+        "elo": 1471.4731047090747,
+        "season": 2026
+      },
+      "PTB": {
+        "elo": 1460.4325452644475,
+        "season": 2026
+      },
+      "PTQ": {
+        "elo": 1360.25639692914,
+        "season": 2026
+      },
+      "PUL": {
+        "elo": 1364.55073850296,
+        "season": 2026
+      },
+      "RAC": {
+        "elo": 1393.890396259798,
+        "season": 2026
+      },
+      "RCH": {
+        "elo": 1370.8258491025576,
+        "season": 2026
+      },
+      "RCK": {
+        "elo": 1352.4288019108703,
+        "season": 2026
+      },
+      "RED": {
+        "elo": 1326.6956103933662,
+        "season": 2026
+      },
+      "RIC": {
+        "elo": 1354.1216450602947,
+        "season": 2026
+      },
+      "RII": {
+        "elo": 1525.0997035198916,
+        "season": 2026
+      },
+      "ROS": {
+        "elo": 1360.8777801699978,
+        "season": 2026
+      },
+      "SEA": {
+        "elo": 1676.308864509258,
+        "season": 2026
+      },
+      "SEN": {
+        "elo": 1373.5305022266252,
+        "season": 2026
+      },
+      "SF": {
+        "elo": 1563.0984615863458,
+        "season": 2026
+      },
+      "SIS": {
+        "elo": 1428.9944940280561,
+        "season": 2026
+      },
+      "SLA": {
+        "elo": 1351.8841569486165,
+        "season": 2026
+      },
+      "STG": {
+        "elo": 1497.9883955153268,
+        "season": 2026
+      },
+      "STP": {
+        "elo": 1360.2254923043763,
+        "season": 2026
+      },
+      "SYR": {
+        "elo": 1362.9560350578754,
+        "season": 2026
+      },
+      "TB": {
+        "elo": 1482.806998181931,
+        "season": 2026
+      },
+      "TEN": {
+        "elo": 1359.5912667687926,
+        "season": 2026
+      },
+      "THO": {
+        "elo": 1354.1452843602622,
+        "season": 2026
+      },
+      "TLM": {
+        "elo": 1346.8607999120159,
+        "season": 2026
+      },
+      "TOL": {
+        "elo": 1499.993294847345,
+        "season": 2026
+      },
+      "TON": {
+        "elo": 1463.142812337049,
+        "season": 2026
+      },
+      "TOR": {
+        "elo": 1384.5410461873082,
+        "season": 2026
+      },
+      "UAP": {
+        "elo": 1388.8475289771136,
+        "season": 2026
+      },
+      "UTI": {
+        "elo": 1368.4889690966754,
+        "season": 2026
+      },
+      "WBU": {
+        "elo": 1360.4978195718572,
+        "season": 2026
+      },
+      "WGC": {
+        "elo": 1373.1532628910124,
+        "season": 2026
+      },
+      "WHE": {
+        "elo": 1360.4282903241567,
+        "season": 2026
+      },
+      "WJA": {
+        "elo": 1360.2257366549436,
+        "season": 2026
+      },
+      "WSH": {
+        "elo": 1464.85999281114,
+        "season": 2026
+      },
+      "ZAN": {
+        "elo": 1355.5686201696362,
+        "season": 2026
+      }
+    },
+    "training_max_origin": [
+      2025,
+      22
+    ]
+  }
+}

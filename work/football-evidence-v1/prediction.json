@@ -1,0 +1,86 @@
+{
+  "accepted": [
+    {
+      "category": "trenches",
+      "fact": "Baltimore ruled out defensive tackle Nnamdi Madubuike.",
+      "game_id": "2026_01_BAL_IND",
+      "interpretation": "His absence may reduce interior defensive disruption and help the Indianapolis offense. The replacement and scheme effect are not yet measured.",
+      "margin_assessment": 0.5,
+      "margin_points": 0.75,
+      "mechanism_id": "BAL-interior-defender-Madubuike-out",
+      "source_reliability": 1.0,
+      "sources": [
+        {
+          "observed_at": "2026-09-12T19:59:32.797353+00:00",
+          "published_at": null,
+          "sha256": "f0ea63b72e9e52c74e0ce8ed052f95b7ee722cd625fb30b2c314d9cd64d97e63",
+          "url": "https://www.colts.com/news/colts-do-not-rule-out-any-players-for-week-1-game-against-baltimore-ravens"
+        }
+      ],
+      "status": "CONFIRMED",
+      "total_assessment": 0.0,
+      "total_points": 0.0
+    }
+  ],
+  "adjustment_points": {
+    "margin": 0.75,
+    "total": 0.0
+  },
+  "as_of": "2026-09-12T19:59:32.797353+00:00",
+  "away_abbr": "BAL",
+  "category_points_before_caps": {
+    "coverage_and_receivers": {
+      "margin": 0.0,
+      "total": 0.0
+    },
+    "quarterback": {
+      "margin": 0.0,
+      "total": 0.0
+    },
+    "rest_and_travel": {
+      "margin": 0.0,
+      "total": 0.0
+    },
+    "scheme_and_coaching": {
+      "margin": 0.0,
+      "total": 0.0
+    },
+    "trenches": {
+      "margin": 0.75,
+      "total": 0.0
+    },
+    "weather": {
+      "margin": 0.0,
+      "total": 0.0
+    }
+  },
+  "config_sha256": "9479c320ee82e1b5f96a0e973d3c0839a9087701cae1064d7becc2c00f1427b0",
+  "cover_probability": null,
+  "elo_home_margin": -0.4344344861871468,
+  "evidence_sha256": "b9ddb0ac065eb37f6a2a37ac5824250403efa8e50a205e80f2fac6a63741b322",
+  "explanation": [
+    "Elo starts with a home margin of -0.43 points.",
+    "Baltimore ruled out defensive tackle Nnamdi Madubuike. Our interpretation: His absence may reduce interior defensive disruption and help the Indianapolis offense. The replacement and scheme effect are not yet measured. Provisional margin contribution +0.75 points before caps.",
+    "After category caps, football evidence changes the margin by +0.75 points."
+  ],
+  "football_home_margin": 0.3155655138128532,
+  "game_id": "2026_01_BAL_IND",
+  "home_abbr": "IND",
+  "probability_reason": "Candidate residual distribution has not been fitted or validated",
+  "projected_score": null,
+  "projected_winner": "IND",
+  "rejected": [],
+  "state_sha256": "7b7d15ef60c5327c4a80c51e872249ac4271a37fdfca4744f52c7208c3513033",
+  "status": "EXPERIMENTAL_NOT_PROMOTED",
+  "total_projection": null,
+  "total_reason": "Elo supplies no total; a market-independent total baseline is required",
+  "unknown_categories": [
+    "coverage_and_receivers",
+    "quarterback",
+    "rest_and_travel",
+    "scheme_and_coaching",
+    "weather"
+  ],
+  "version": "football-evidence-v1",
+  "winner_basis": "Elo plus football judgments"
+}
