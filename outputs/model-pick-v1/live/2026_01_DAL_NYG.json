@@ -1,29 +1,29 @@
 {
   "analysis": {
-    "captured_at": "2026-09-11T18:33:08.624150+00:00",
+    "captured_at": "2026-09-12T19:00:12.744998+00:00",
     "measured": {
-      "elo_disagreement": 3.7179549556222264,
+      "elo_disagreement": 4.717954955622226,
       "half_points": [
         {
           "buy_price_available": false,
           "from": -3.0,
-          "same_EV_max_negative_price": 110.30449826989619,
+          "same_EV_max_negative_price": 112.74703557312253,
           "side": "Dallas Cowboys",
           "to": -2.5
         }
       ],
       "spreads": {
         "best_same_line": {
-          "advantage_cents": 0.0,
+          "advantage_cents": 3.0,
           "book": "draftkings",
-          "fair_probability": 0.5120481927710844,
+          "fair_probability": 0.5454545454545455,
           "line": -3.0,
           "market": "spreads",
           "price": -105.0,
           "side": "Dallas Cowboys"
         },
-        "consensus_line": 2.5,
-        "movement": null
+        "consensus_line": 3.5,
+        "movement": 1.0
       },
       "teaser_candidates": [
         {
@@ -38,19 +38,6 @@
           "price": -105.0,
           "side": "Over",
           "teased_line": 42.5
-        },
-        {
-          "book": "fanduel",
-          "fair_probability": 0.47564766839378236,
-          "key_numbers_crossed": [
-            3,
-            7
-          ],
-          "line": 2.5,
-          "market": "spreads",
-          "price": 102.0,
-          "side": "New York Giants",
-          "teased_line": 8.5
         },
         {
           "book": "betmgm",
@@ -77,25 +64,25 @@
           "side": "Over"
         },
         "consensus_line": 48.5,
-        "movement": null
+        "movement": 0.0
       },
       "wind_rule": false
     },
     "sentences": [
-      "Spread consensus is NYG +2.5. This is the first capture; movement is not yet measured.",
-      "DraftKings has the best captured price for Dallas Cowboys -3 at -105, 0 cents better than the next book at the same line.",
-      "Total consensus is +48.5. This is the first capture; movement is not yet measured.",
+      "Spread consensus is NYG +3.5. It moved +1 points since the previous capture.",
+      "DraftKings has the best captured price for Dallas Cowboys -3 at -105, 3 cents better than the next book at the same line.",
+      "Total consensus is +48.5. It moved +0 points since the previous capture.",
       "BetMGM has the best captured price for Over +48 at -110; no other book has a comparable price at that line.",
       "The spread is on or within a half point of 3.",
-      "Buying Dallas Cowboys from -3 to -2.5 preserves the current modeled EV up to -110.3; no captured buy-half price is available, so whether it is worth buying is unknown.",
-      "Kickoff forecast wind is 3.1 mph. WIND RULE does not apply.",
-      "Plain Elo disagrees with the market margin by +3.72 points; diagnostic only, with no QB adjustment.",
-      "Teaser candidates: Over +48.5 to +42.5, crossing 44, 47; New York Giants +2.5 to +8.5, crossing 3, 7; Over +48 to +42, crossing 44, 47. Ticket prices and a partner are not established.",
+      "Buying Dallas Cowboys from -3 to -2.5 preserves the current modeled EV up to -112.7; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+      "Plain Elo disagrees with the market margin by +4.72 points; diagnostic only, with no QB adjustment.",
+      "Teaser candidates: Over +48.5 to +42.5, crossing 44, 47; Over +48 to +42, crossing 44, 47. Ticket prices and a partner are not established.",
       "QB status: inactives unknown until T-90."
     ]
   },
   "capture": {
-    "label": "FRIDAY",
+    "label": "SATURDAY",
     "params": {
       "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
       "commenceTimeFrom": "2026-09-13T17:00:00Z",
@@ -104,31 +91,31 @@
       "markets": "spreads,totals",
       "oddsFormat": "american"
     },
-    "received_at": "2026-09-11T18:33:08.624150+00:00",
-    "request_at": "2026-09-11T18:33:08.536726+00:00",
-    "request_id": "LIVE_FRIDAY_2026_W01",
+    "received_at": "2026-09-12T19:00:12.744998+00:00",
+    "request_at": "2026-09-12T19:00:12.575995+00:00",
+    "request_id": "LIVE_SATURDAY_2026_W01",
     "source": {
-      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_FRIDAY_2026_W01/sources/1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573.json",
-      "sha256": "1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573"
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_SATURDAY_2026_W01/sources/4360ef2e8cfe38d78d6db2ae039f1eb63495d56d6bc98d05cb90552ab9e9eeec.json",
+      "sha256": "4360ef2e8cfe38d78d6db2ae039f1eb63495d56d6bc98d05cb90552ab9e9eeec"
     },
     "status": "CAPTURED"
   },
-  "capture_label": "FRIDAY",
-  "captured_at": "2026-09-11T18:33:08.624150+00:00",
+  "capture_label": "SATURDAY",
+  "captured_at": "2026-09-12T19:00:12.744998+00:00",
   "consensus": {
     "spreads": {
       "devigged_books": {
         "betmgm": {
           "book": "betmgm",
-          "center": -2,
+          "center": -3,
           "line": 3.0,
           "market": "spreads",
-          "power": 1.0607640901233029,
+          "power": 1.0647311734675267,
           "probabilities": [
-            0.5082101662533091,
-            0.4917898337466912
+            0.5023369847659711,
+            0.49766301523402895
           ],
-          "updated_at": "2026-09-11T18:31:50Z"
+          "updated_at": "2026-09-12T18:59:34Z"
         },
         "draftkings": {
           "book": "draftkings",
@@ -140,35 +127,35 @@
             0.5116044544982121,
             0.488395545501788
           ],
-          "updated_at": "2026-09-11T18:32:49Z"
+          "updated_at": "2026-09-12T18:59:32Z"
         },
         "fanduel": {
           "book": "fanduel",
           "center": -3,
-          "line": 2.5,
+          "line": 3.0,
           "market": "spreads",
-          "power": 1.0737205190917267,
+          "power": 1.0718103317980505,
           "probabilities": [
-            0.4700434108998488,
-            0.5299565891001513
+            0.5046406578884406,
+            0.4953593421115595
           ],
-          "updated_at": "2026-09-11T18:32:51Z"
+          "updated_at": "2026-09-12T19:00:11Z"
         },
         "pinnacle": {
           "book": "pinnacle",
-          "center": -3,
+          "center": -4,
           "line": 2.5,
           "market": "spreads",
-          "power": 1.0439811611001075,
+          "power": 1.045002176993648,
           "probabilities": [
-            0.4586223610374876,
-            0.5413776389625125
+            0.44719310823071473,
+            0.5528068917692853
           ],
-          "updated_at": "2026-09-11T18:32:48Z"
+          "updated_at": "2026-09-12T19:00:06Z"
         }
       },
       "full": {
-        "center": -2.5,
+        "center": -3.5,
         "contributors": [
           "betmgm",
           "draftkings",
@@ -178,12 +165,12 @@
         "coverage": 3,
         "excluded_book": null,
         "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-        "pinnacle_center": -3,
-        "retail_median": -2
+        "pinnacle_center": -4,
+        "retail_median": -3
       },
       "leave_one_out": {
         "betmgm": {
-          "center": -2.75,
+          "center": -3.25,
           "contributors": [
             "draftkings",
             "fanduel",
@@ -192,11 +179,11 @@
           "coverage": 2,
           "excluded_book": "betmgm",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": -3,
+          "pinnacle_center": -4,
           "retail_median": -2.5
         },
         "draftkings": {
-          "center": -2.75,
+          "center": -3.5,
           "contributors": [
             "betmgm",
             "fanduel",
@@ -205,11 +192,11 @@
           "coverage": 2,
           "excluded_book": "draftkings",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": -3,
-          "retail_median": -2.5
+          "pinnacle_center": -4,
+          "retail_median": -3.0
         },
         "fanduel": {
-          "center": -2.5,
+          "center": -3.25,
           "contributors": [
             "betmgm",
             "draftkings",
@@ -218,11 +205,11 @@
           "coverage": 2,
           "excluded_book": "fanduel",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": -3,
-          "retail_median": -2.0
+          "pinnacle_center": -4,
+          "retail_median": -2.5
         },
         "williamhill_us": {
-          "center": -2.5,
+          "center": -3.5,
           "contributors": [
             "betmgm",
             "draftkings",
@@ -232,8 +219,8 @@
           "coverage": 3,
           "excluded_book": "williamhill_us",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": -3,
-          "retail_median": -2
+          "pinnacle_center": -4,
+          "retail_median": -3
         }
       }
     },
@@ -249,7 +236,7 @@
             0.5023369847659711,
             0.49766301523402895
           ],
-          "updated_at": "2026-09-11T18:31:50Z"
+          "updated_at": "2026-09-12T18:59:34Z"
         },
         "draftkings": {
           "book": "draftkings",
@@ -261,7 +248,7 @@
             0.488395545501788,
             0.5116044544982121
           ],
-          "updated_at": "2026-09-11T18:32:49Z"
+          "updated_at": "2026-09-12T18:59:32Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -273,7 +260,7 @@
             0.488395545501788,
             0.5116044544982121
           ],
-          "updated_at": "2026-09-11T18:32:51Z"
+          "updated_at": "2026-09-12T19:00:11Z"
         },
         "pinnacle": {
           "book": "pinnacle",
@@ -285,7 +272,7 @@
             0.5176024001146096,
             0.4823975998853907
           ],
-          "updated_at": "2026-09-11T18:32:48Z"
+          "updated_at": "2026-09-12T19:00:06Z"
         }
       },
       "full": {
@@ -361,46 +348,9 @@
   },
   "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
   "forecast": {
-    "component_initializations": [
-      1789128000,
-      1789128000
-    ],
-    "event_id": "2026_01_DAL_NYG",
-    "forecast_issued_at": "2026-09-11T19:15:08+00:00",
-    "forecast_run_initialized_at": "2026-09-11T12:00:00+00:00",
-    "issuance_basis": "Conservative upper bound from completed GFS013/GFS025 availability; exact common archived run requested",
-    "kickoff_at": "2026-09-14T00:20:00+00:00",
-    "model": "gfs_global",
-    "precip_mm": 0.0,
-    "received_at": "2026-09-11T21:01:10.130867+00:00",
-    "request_at": "2026-09-11T21:01:09.949377+00:00",
-    "requests": [
-      {
-        "received_at": "2026-09-11T21:01:09.758467+00:00",
-        "request_at": "2026-09-11T21:01:09.576720+00:00",
-        "sha256": "28734592e89f25747a8995355361897f04ddfcbf8dc88e2ae232e1c12da35b37",
-        "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
-      },
-      {
-        "received_at": "2026-09-11T21:01:09.949005+00:00",
-        "request_at": "2026-09-11T21:01:09.758862+00:00",
-        "sha256": "58dcd5df5865aef04a090d8dbf227d09f7146c27d4939e37b906321a77a62814",
-        "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
-      },
-      {
-        "received_at": "2026-09-11T21:01:10.130867+00:00",
-        "request_at": "2026-09-11T21:01:09.949377+00:00",
-        "sha256": "72e09be9ec81a07708b6b3115390333799b071137261bff37c82c8f6580e5d81",
-        "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=40.813507465&longitude=-74.074342406&models=gfs_global&run=2026-09-11T12%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
-      }
-    ],
-    "roof": "outdoors",
-    "source_sha256": "72e09be9ec81a07708b6b3115390333799b071137261bff37c82c8f6580e5d81",
-    "status": "FORECAST",
-    "temperature_c": 24.4,
-    "valid_at": "2026-09-14T00:00:00+00:00",
-    "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
-    "wind_mph": 3.1
+    "error": "ValueError",
+    "message": "GFS availability remains within the 10-minute replication window",
+    "status": "UNAVAILABLE"
   },
   "game": {
     "away_abbr": "DAL",
@@ -428,7 +378,7 @@
   "offers": [
     {
       "book": "draftkings",
-      "fair_probability": 0.4879518072289156,
+      "fair_probability": 0.4545454545454546,
       "line": 3.0,
       "market": "spreads",
       "price": -115.0,
@@ -436,7 +386,7 @@
     },
     {
       "book": "draftkings",
-      "fair_probability": 0.5120481927710844,
+      "fair_probability": 0.5454545454545455,
       "line": -3.0,
       "market": "spreads",
       "price": -105.0,
@@ -460,38 +410,6 @@
     },
     {
       "book": "fanduel",
-      "fair_probability": 0.47564766839378236,
-      "line": 2.5,
-      "market": "spreads",
-      "price": 102.0,
-      "side": "New York Giants"
-    },
-    {
-      "book": "fanduel",
-      "fair_probability": 0.5243523316062176,
-      "line": -2.5,
-      "market": "spreads",
-      "price": -124.0,
-      "side": "Dallas Cowboys"
-    },
-    {
-      "book": "fanduel",
-      "fair_probability": 0.49326424870466323,
-      "line": 48.5,
-      "market": "totals",
-      "price": -105.0,
-      "side": "Over"
-    },
-    {
-      "book": "fanduel",
-      "fair_probability": 0.5067357512953368,
-      "line": 48.5,
-      "market": "totals",
-      "price": -115.0,
-      "side": "Under"
-    },
-    {
-      "book": "betmgm",
       "fair_probability": 0.4879518072289156,
       "line": 3.0,
       "market": "spreads",
@@ -499,11 +417,43 @@
       "side": "New York Giants"
     },
     {
+      "book": "fanduel",
+      "fair_probability": 0.5120481927710844,
+      "line": -3.0,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Dallas Cowboys"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.49326424870466323,
+      "line": 48.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Over"
+    },
+    {
+      "book": "fanduel",
+      "fair_probability": 0.5067357512953368,
+      "line": 48.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Under"
+    },
+    {
+      "book": "betmgm",
+      "fair_probability": 0.4879518072289156,
+      "line": 3.0,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "New York Giants"
+    },
+    {
       "book": "betmgm",
       "fair_probability": 0.5120481927710844,
       "line": -3.0,
       "market": "spreads",
-      "price": -105.0,
+      "price": -108.0,
       "side": "Dallas Cowboys"
     },
     {
@@ -526,25 +476,25 @@
   "paper_picks": [],
   "picks": [
     {
-      "EV": -0.00027962825890281984,
+      "EV": 0.06242289661978784,
       "book": "draftkings",
-      "conditional_win": 0.5120481927710844,
-      "edge_source": "tiebreak",
-      "exact_tie_count": 2,
-      "fair_probability": 0.5120481927710844,
+      "conditional_win": 0.5454545454545455,
+      "edge_source": "price",
+      "exact_tie_count": 1,
+      "fair_probability": 0.5454545454545455,
       "fair_probability_basis": "conditional_non_push",
       "filtered_subset": false,
       "line": -3.0,
-      "loo_center": -2.75,
-      "loss": 0.4756476683937823,
+      "loo_center": -3.5,
+      "loss": 0.43696027633851464,
       "market": "spreads",
       "price": -105.0,
-      "price_edge_cents": -0.061728395061720676,
-      "push": 0.02521588946459413,
-      "quote_updated_at": "2026-09-11T18:32:49Z",
-      "seed": "90a74a1ffcb6886a630e9f2f62e45d6500fc8104386b4a4cf52303973110c956",
+      "price_edge_cents": 15.000000000000043,
+      "push": 0.0386873920552677,
+      "quote_updated_at": "2026-09-12T18:59:32Z",
+      "seed": null,
       "side": "Dallas Cowboys",
-      "win": 0.4991364421416235
+      "win": 0.5243523316062176
     },
     {
       "EV": -0.02964358612026996,
@@ -562,29 +512,29 @@
       "price": -110.0,
       "price_edge_cents": -6.820809248554895,
       "push": 0.028670120898100174,
-      "quote_updated_at": "2026-09-11T18:31:50Z",
+      "quote_updated_at": "2026-09-12T18:59:34Z",
       "seed": null,
       "side": "Over",
       "win": 0.49326424870466323
     }
   ],
   "projection": {
-    "away_score": 26.213989637305698,
-    "away_win_probability": 0.5930915371329879,
+    "away_score": 26.713989637305698,
+    "away_win_probability": 0.6259067357512953,
     "basis": "Full market consensus; empirical residual distribution; not an independent football forecast",
     "coin_flip": false,
     "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
-    "expected_margin": -3.0272884283246975,
+    "expected_margin": -4.027288428324698,
     "expected_total": 49.4006908462867,
-    "generated_at": "2026-09-12T18:29:47.455297+00:00",
-    "home_score": 23.186701208981003,
-    "home_win_probability": 0.37409326424870465,
-    "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+    "generated_at": "2026-09-12T19:00:17.637169+00:00",
+    "home_score": 22.686701208981003,
+    "home_win_probability": 0.34127806563039725,
+    "quote_captured_at": "2026-09-12T19:00:12.744998+00:00",
     "score_label": "market-based score estimate",
     "status": "AVAILABLE",
     "tie_probability": 0.03281519861830743,
     "version": "week1-display-projection-v1",
-    "win_probability": 0.5930915371329879,
+    "win_probability": 0.6259067357512953,
     "winner": "Dallas Cowboys"
   },
   "record_class": "paper_model_pick",
@@ -643,6 +593,5 @@
     "sport": "NFL",
     "updated_at": "2026-09-11T20:58:20.269771+00:00"
   },
-  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
-  "weather_refreshed_at": "2026-09-11T21:01:10.130867+00:00"
+  "version": "model-pick-v1-T75-4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041"
 }

@@ -1,29 +1,29 @@
 {
   "analysis": {
-    "captured_at": "2026-09-11T18:33:08.624150+00:00",
+    "captured_at": "2026-09-12T19:00:12.744998+00:00",
     "measured": {
       "elo_disagreement": 2.065565513812853,
       "half_points": [
         {
           "buy_price_available": false,
-          "from": 3.5,
-          "same_EV_max_negative_price": 124.38427887430677,
-          "side": "Indianapolis Colts",
-          "to": 4.0
+          "from": -3.5,
+          "same_EV_max_negative_price": 107.54155296452494,
+          "side": "Baltimore Ravens",
+          "to": -3.0
         }
       ],
       "spreads": {
         "best_same_line": {
-          "advantage_cents": 5.0,
-          "book": "draftkings",
-          "fair_probability": 0.542314335060449,
-          "line": 3.5,
+          "advantage_cents": 0.0,
+          "book": "fanduel",
+          "fair_probability": 0.4991364421416235,
+          "line": -3.5,
           "market": "spreads",
-          "price": -115.0,
-          "side": "Indianapolis Colts"
+          "price": -102.0,
+          "side": "Baltimore Ravens"
         },
         "consensus_line": 2.5,
-        "movement": null
+        "movement": 0.0
       },
       "teaser_candidates": [
         {
@@ -38,38 +38,51 @@
           "price": -115.0,
           "side": "Over",
           "teased_line": 41.5
+        },
+        {
+          "book": "betmgm",
+          "fair_probability": 0.507823613086771,
+          "key_numbers_crossed": [
+            44,
+            47
+          ],
+          "line": 48.0,
+          "market": "totals",
+          "price": -108.0,
+          "side": "Over",
+          "teased_line": 42.0
         }
       ],
       "totals": {
         "best_same_line": {
-          "advantage_cents": 3.0,
-          "book": "betmgm",
+          "advantage_cents": 1.0,
+          "book": "fanduel",
           "fair_probability": 0.5219343696027634,
           "line": 47.5,
           "market": "totals",
-          "price": -112.0,
+          "price": -114.0,
           "side": "Over"
         },
         "consensus_line": 49.0,
-        "movement": null
+        "movement": 0.0
       },
       "wind_rule": false
     },
     "sentences": [
-      "Spread consensus is IND +2.5. This is the first capture; movement is not yet measured.",
-      "DraftKings has the best captured price for Indianapolis Colts +3.5 at -115, 5 cents better than the next book at the same line.",
-      "Total consensus is +49. This is the first capture; movement is not yet measured.",
-      "BetMGM has the best captured price for Over +47.5 at -112, 3 cents better than the next book at the same line.",
+      "Spread consensus is IND +2.5. It moved +0 points since the previous capture.",
+      "FanDuel has the best captured price for Baltimore Ravens -3.5 at -102, 0 cents better than the next book at the same line.",
+      "Total consensus is +49. It moved +0 points since the previous capture.",
+      "FanDuel has the best captured price for Over +47.5 at -114, 1 cents better than the next book at the same line.",
       "The spread is on or within a half point of 3.",
-      "Buying Indianapolis Colts from +3.5 to +4 preserves the current modeled EV up to -124.4; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "Buying Baltimore Ravens from -3.5 to -3 preserves the current modeled EV up to -107.5; no captured buy-half price is available, so whether it is worth buying is unknown.",
       "The venue is indoors or its roof is unknown; WIND RULE does not apply.",
       "Plain Elo disagrees with the market margin by +2.07 points; diagnostic only, with no QB adjustment.",
-      "Teaser candidates: Over +47.5 to +41.5, crossing 44, 47. Ticket prices and a partner are not established.",
+      "Teaser candidates: Over +47.5 to +41.5, crossing 44, 47; Over +48 to +42, crossing 44, 47. Ticket prices and a partner are not established.",
       "QB status: inactives unknown until T-90."
     ]
   },
   "capture": {
-    "label": "FRIDAY",
+    "label": "SATURDAY",
     "params": {
       "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
       "commenceTimeFrom": "2026-09-13T17:00:00Z",
@@ -78,31 +91,31 @@
       "markets": "spreads,totals",
       "oddsFormat": "american"
     },
-    "received_at": "2026-09-11T18:33:08.624150+00:00",
-    "request_at": "2026-09-11T18:33:08.536726+00:00",
-    "request_id": "LIVE_FRIDAY_2026_W01",
+    "received_at": "2026-09-12T19:00:12.744998+00:00",
+    "request_at": "2026-09-12T19:00:12.575995+00:00",
+    "request_id": "LIVE_SATURDAY_2026_W01",
     "source": {
-      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_FRIDAY_2026_W01/sources/1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573.json",
-      "sha256": "1fd087cf981ebf7660a82e2987666caa38b45beaf81a46d826ffbc8ad31eb573"
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_SATURDAY_2026_W01/sources/4360ef2e8cfe38d78d6db2ae039f1eb63495d56d6bc98d05cb90552ab9e9eeec.json",
+      "sha256": "4360ef2e8cfe38d78d6db2ae039f1eb63495d56d6bc98d05cb90552ab9e9eeec"
     },
     "status": "CAPTURED"
   },
-  "capture_label": "FRIDAY",
-  "captured_at": "2026-09-11T18:33:08.624150+00:00",
+  "capture_label": "SATURDAY",
+  "captured_at": "2026-09-12T19:00:12.744998+00:00",
   "consensus": {
     "spreads": {
       "devigged_books": {
         "betmgm": {
           "book": "betmgm",
-          "center": -2,
+          "center": -3,
           "line": 3.5,
           "market": "spreads",
-          "power": 1.0686317492209367,
+          "power": 1.0597590257815699,
           "probabilities": [
-            0.5232290461518813,
-            0.4767709538481189
+            0.515252877396646,
+            0.4847471226033539
           ],
-          "updated_at": "2026-09-11T18:31:49Z"
+          "updated_at": "2026-09-12T18:59:34Z"
         },
         "draftkings": {
           "book": "draftkings",
@@ -114,7 +127,7 @@
             0.5116044544982121,
             0.488395545501788
           ],
-          "updated_at": "2026-09-11T18:32:49Z"
+          "updated_at": "2026-09-12T18:59:32Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -126,7 +139,7 @@
             0.5207527066370117,
             0.4792472933629884
           ],
-          "updated_at": "2026-09-11T18:32:51Z"
+          "updated_at": "2026-09-12T19:00:11Z"
         },
         "pinnacle": {
           "book": "pinnacle",
@@ -138,7 +151,7 @@
             0.5293633306328306,
             0.4706366693671695
           ],
-          "updated_at": "2026-09-11T18:32:48Z"
+          "updated_at": "2026-09-12T19:00:06Z"
         }
       },
       "full": {
@@ -170,7 +183,7 @@
           "retail_median": -3.0
         },
         "draftkings": {
-          "center": -2.25,
+          "center": -2.5,
           "contributors": [
             "betmgm",
             "fanduel",
@@ -180,10 +193,10 @@
           "excluded_book": "draftkings",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": -2,
-          "retail_median": -2.5
+          "retail_median": -3.0
         },
         "fanduel": {
-          "center": -2.25,
+          "center": -2.5,
           "contributors": [
             "betmgm",
             "draftkings",
@@ -193,7 +206,7 @@
           "excluded_book": "fanduel",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": -2,
-          "retail_median": -2.5
+          "retail_median": -3.0
         },
         "williamhill_us": {
           "center": -2.5,
@@ -216,14 +229,14 @@
         "betmgm": {
           "book": "betmgm",
           "center": 48,
-          "line": 47.5,
+          "line": 48.0,
           "market": "totals",
-          "power": 1.0718103317980505,
+          "power": 1.0647311734675267,
           "probabilities": [
-            0.5046406578884406,
-            0.4953593421115595
+            0.49766301523402895,
+            0.5023369847659711
           ],
-          "updated_at": "2026-09-11T18:31:49Z"
+          "updated_at": "2026-09-12T18:59:34Z"
         },
         "draftkings": {
           "book": "draftkings",
@@ -235,19 +248,19 @@
             0.5116044544982121,
             0.488395545501788
           ],
-          "updated_at": "2026-09-11T18:32:49Z"
+          "updated_at": "2026-09-12T18:59:32Z"
         },
         "fanduel": {
           "book": "fanduel",
           "center": 49,
           "line": 47.5,
           "market": "totals",
-          "power": 1.071115843039896,
+          "power": 1.0714135375354,
           "probabilities": [
-            0.5116044544982121,
-            0.488395545501788
+            0.5092825998442164,
+            0.49071740015578375
           ],
-          "updated_at": "2026-09-11T18:32:51Z"
+          "updated_at": "2026-09-12T19:00:11Z"
         },
         "pinnacle": {
           "book": "pinnacle",
@@ -259,7 +272,7 @@
             0.5199531810088541,
             0.480046818991146
           ],
-          "updated_at": "2026-09-11T18:32:48Z"
+          "updated_at": "2026-09-12T19:00:06Z"
         }
       },
       "full": {
@@ -363,7 +376,7 @@
   "offers": [
     {
       "book": "draftkings",
-      "fair_probability": 0.542314335060449,
+      "fair_probability": 0.5008635578583766,
       "line": 3.5,
       "market": "spreads",
       "price": -115.0,
@@ -371,7 +384,7 @@
     },
     {
       "book": "draftkings",
-      "fair_probability": 0.45768566493955093,
+      "fair_probability": 0.4991364421416235,
       "line": -3.5,
       "market": "spreads",
       "price": -105.0,
@@ -395,7 +408,7 @@
     },
     {
       "book": "fanduel",
-      "fair_probability": 0.542314335060449,
+      "fair_probability": 0.5008635578583766,
       "line": 3.5,
       "market": "spreads",
       "price": -120.0,
@@ -403,7 +416,7 @@
     },
     {
       "book": "fanduel",
-      "fair_probability": 0.45768566493955093,
+      "fair_probability": 0.4991364421416235,
       "line": -3.5,
       "market": "spreads",
       "price": -102.0,
@@ -414,7 +427,7 @@
       "fair_probability": 0.5219343696027634,
       "line": 47.5,
       "market": "totals",
-      "price": -115.0,
+      "price": -114.0,
       "side": "Over"
     },
     {
@@ -422,7 +435,7 @@
       "fair_probability": 0.4780656303972366,
       "line": 47.5,
       "market": "totals",
-      "price": -105.0,
+      "price": -106.0,
       "side": "Under"
     },
     {
@@ -430,7 +443,7 @@
       "fair_probability": 0.5008635578583766,
       "line": 3.5,
       "market": "spreads",
-      "price": -120.0,
+      "price": -115.0,
       "side": "Indianapolis Colts"
     },
     {
@@ -438,52 +451,52 @@
       "fair_probability": 0.4991364421416235,
       "line": -3.5,
       "market": "spreads",
-      "price": 100.0,
+      "price": -102.0,
       "side": "Baltimore Ravens"
     },
     {
       "book": "betmgm",
-      "fair_probability": 0.5219343696027634,
-      "line": 47.5,
+      "fair_probability": 0.507823613086771,
+      "line": 48.0,
       "market": "totals",
-      "price": -112.0,
+      "price": -108.0,
       "side": "Over"
     },
     {
       "book": "betmgm",
-      "fair_probability": 0.4780656303972366,
-      "line": 47.5,
+      "fair_probability": 0.492176386913229,
+      "line": 48.0,
       "market": "totals",
-      "price": -108.0,
+      "price": -110.0,
       "side": "Under"
     }
   ],
   "paper_picks": [],
   "picks": [
     {
-      "EV": 0.013892017721708949,
-      "book": "draftkings",
-      "conditional_win": 0.542314335060449,
-      "edge_source": "price",
-      "exact_tie_count": 1,
-      "fair_probability": 0.542314335060449,
+      "EV": -0.011514104778353351,
+      "book": "betmgm",
+      "conditional_win": 0.4991364421416235,
+      "edge_source": "tiebreak",
+      "exact_tie_count": 2,
+      "fair_probability": 0.4991364421416235,
       "fair_probability_basis": "conditional_non_push",
       "filtered_subset": false,
-      "line": 3.5,
-      "loo_center": -2.25,
-      "loss": 0.457685664939551,
+      "line": -3.5,
+      "loo_center": -2.5,
+      "loss": 0.5008635578583764,
       "market": "spreads",
-      "price": -115.0,
-      "price_edge_cents": 3.4905660377358316,
+      "price": -102.0,
+      "price_edge_cents": -2.3460207612456685,
       "push": 0.0,
-      "quote_updated_at": "2026-09-11T18:32:49Z",
-      "seed": null,
-      "side": "Indianapolis Colts",
-      "win": 0.542314335060449
+      "quote_updated_at": "2026-09-12T18:59:34Z",
+      "seed": "c70a0202a9f8ef1e0b4321347fda69cdbab77a10ed3a484e92c356f7b2cf7672",
+      "side": "Baltimore Ravens",
+      "win": 0.4991364421416235
     },
     {
-      "EV": -0.012052800394769303,
-      "book": "betmgm",
+      "EV": -0.020228464079023067,
+      "book": "fanduel",
       "conditional_win": 0.5219343696027634,
       "edge_source": "price",
       "exact_tie_count": 1,
@@ -491,13 +504,13 @@
       "fair_probability_basis": "conditional_non_push",
       "filtered_subset": false,
       "line": 47.5,
-      "loo_center": 49.0,
+      "loo_center": 48.75,
       "loss": 0.4780656303972366,
       "market": "totals",
-      "price": -112.0,
-      "price_edge_cents": -2.8236994219653013,
+      "price": -114.0,
+      "price_edge_cents": -4.823699421965301,
       "push": 0.0,
-      "quote_updated_at": "2026-09-11T18:31:49Z",
+      "quote_updated_at": "2026-09-12T19:00:11Z",
       "seed": null,
       "side": "Over",
       "win": 0.5219343696027634
@@ -511,10 +524,10 @@
     "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
     "expected_margin": -3.0272884283246975,
     "expected_total": 49.4006908462867,
-    "generated_at": "2026-09-12T18:29:47.455297+00:00",
+    "generated_at": "2026-09-12T19:00:14.105642+00:00",
     "home_score": 23.186701208981003,
     "home_win_probability": 0.37409326424870465,
-    "quote_captured_at": "2026-09-11T18:33:08.624150+00:00",
+    "quote_captured_at": "2026-09-12T19:00:12.744998+00:00",
     "score_label": "market-based score estimate",
     "status": "AVAILABLE",
     "tie_probability": 0.03281519861830743,
