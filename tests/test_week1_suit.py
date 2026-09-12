@@ -22,7 +22,7 @@ class SuitTests(unittest.TestCase):
   c=next(c for c in cal if c['level']==3);self.assertAlmostEqual(c['posterior'],(20*.58+25)/70);self.assertEqual(c['observed'],.5)
   self.assertTrue(all(c['person']=='Gabe' for c in cal));self.assertTrue(any(r['brier_number'] is not None for r in rows if r['person']=='Gabe'));self.assertTrue(all(r['brier_number'] is None for r in rows if r['person']=='Jarrett'))
  def test_populations_never_pool(self):
-  a=[lean(i=i) for i in range(49)];a.append({**lean(),'population':'POSTSEASON'});self.assertEqual(scorecard(a,CF)[1],[])
+  a=[lean(i=i) for i in range(49)];a.append({**lean(),'population':'POSTSEASON'});cal=scorecard(a,CF)[1];reg=next(c for c in cal if c['population']=='REGULAR' and c['level']==3);post=next(c for c in cal if c['population']=='POSTSEASON' and c['level']==3);self.assertEqual(reg['n'],49);self.assertEqual(post['n'],1);self.assertNotEqual(reg['posterior'],post['posterior'])
  def test_push_not_binary_brier(self):
   g=grade(lean(),{'home_score':13,'away_score':10,'spread_line':3.5,'source_sha256':'h'});self.assertEqual(g['outcome'],'PUSH');self.assertIsNone(g['brier_number']);self.assertEqual(g['clv_points'],.5)
  def test_frozen_belief_grade(self):

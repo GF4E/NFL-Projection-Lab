@@ -34,7 +34,7 @@ def scorecard(leans,config):
  rows=[];cal=[]
  for person in ('Gabe','Jarrett'):
   for population in ('REGULAR','POSTSEASON'):
-   pool=[r for r in leans if r['person']==person and r['population']==population];eligible=sum(bool(r.get('outcome')) for r in pool)>=50
+   pool=[r for r in leans if r['person']==person and r['population']==population];eligible=sum(bool(r.get('outcome')) for r in leans if r['person']==person)>=50
    for tag in ['ALL']+sorted({t for r in pool for t in r['tags']}):
     tp=[r for r in pool if tag=='ALL' or tag in r['tags']]
     for week in ['ALL']+sorted({r['week'] for r in tp}):
