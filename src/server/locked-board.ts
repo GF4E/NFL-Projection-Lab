@@ -6,6 +6,13 @@ const STALE_MS = 900_000;
 type Database = Pick<D1Database, "prepare" | "exec">;
 const TABLE = "engine_locked_board_publication";
 
+function validateCard(c:NonNullable<import('../domain/locked-board').LockedGame['card_v3']>,id:string){
+ const fields=['game_id','week','season','kickoff_utc','home','away','venue','roof','status','final','market','model','rules','ours','post_lock','sheet','wagers','grades','version','freeze_timestamp','distribution_hash'];
+ if(fields.some(k=>!(k in c))||c.game_id!==id||!['UPCOMING','LOCKED','FINAL','MISSED'].includes(c.status))throw Error('Incomplete game card');
+ if(!c.why||typeof c.why.statement!=='string'||!Array.isArray(c.why.bullets)||/price|book|cents|break-even|\bEV\b|cushion|reference|filter|stale|Jarrett|Gabe|\$/i.test([c.why.statement,...c.why.bullets].join(' ')))throw Error('Invalid football explanation');
+ for(const k of ['WINNER','SPREAD','TOTAL'] as const){const t=c.tiles?.[k];if(!t||!['WIN','LOSS','PUSH','NOT_RECORDED',null].includes(t.grade))throw Error('Invalid card tile');if(t.pick===null){if(t.grade!=='NOT_RECORDED')throw Error('Unrecorded pick has a grade');}else if(!['OURS','MARKET','RULE','MODEL'].includes(t.confidence_source??'')||typeof t.probability!=='number'||!Number.isFinite(t.probability)||t.probability<0||t.probability>1)throw Error('Invalid card probability');}
+}
+
 export function validateBoard(value: unknown): LockedBoard {
   const b = value as LockedBoard;
   if (!b || b.schema !== "locked-board-v1" || typeof b.version !== "string" ||
@@ -16,6 +23,7 @@ export function validateBoard(value: unknown): LockedBoard {
     if (!g.game_id || ids.has(g.game_id) || !g.home_team || !g.away_team || !g.version ||
         !Number.isFinite(Date.parse(g.expires_at)) || !Number.isInteger(g.week)) throw new Error("Invalid game");
     ids.add(g.game_id);
+    if(g.card_v3)validateCard(g.card_v3,g.game_id);
     if(g.prediction?.projection.status === "AVAILABLE") {
       const p=g.prediction.projection;
       if(!p.winner || ![p.win_probability,p.tie_probability,p.home_score,p.away_score].every(n=>typeof n === "number" && Number.isFinite(n))) throw new Error("Invalid projection");
@@ -57,6 +65,11 @@ async function download(fetcher: typeof fetch, now = Date.now()): Promise<Locked
 export function assertPublicationProgress(previous: LockedBoard, next: LockedBoard): void {
   if (Date.parse(next.published_at) < Date.parse(previous.published_at)) throw new Error("Older board publication");
   for (const prior of previous.games) {
+    if(prior.card_v3 && ['LOCKED','FINAL'].includes(prior.card_v3.status)){
+      const nextCard=next.games.find(g=>g.game_id===prior.game_id)?.card_v3;
+      if(!nextCard)throw Error('Locked card removed');
+      for(const k of ['WINNER','SPREAD','TOTAL'] as const){const a=prior.card_v3.tiles[k],b=nextCard.tiles[k];for(const f of ['pick','line','book','price','probability','confidence_source'] as const)if(a[f]!==b[f])throw Error('Locked card changed');if(a.grade&&a.grade!==b.grade)throw Error('Card first grade changed');}
+    }
     if (prior.status !== "FINAL") continue;
     const current = next.games.find(g => g.game_id === prior.game_id);
     if (!current || current.status !== "FINAL" || current.final_score?.home !== prior.final_score?.home || current.final_score?.away !== prior.final_score?.away) throw new Error("Final score regression");

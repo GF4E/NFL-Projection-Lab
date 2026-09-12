@@ -1,3 +1,4 @@
+import type {Card,RecordLine} from './game-card-v3';
 /** Published display DTO only. No pricing, selection, or grading in the site. */
 export type Verdict = {
   state: "PLAY" | "TEASE" | "HARD PASS" | null;
@@ -12,6 +13,7 @@ export type Verdict = {
   partner_status?: "NEEDS_PARTNER";
 };
 export type LockedGame = {
+  card_v3?: Card;
   prediction?: Week1Prediction;
   game_id: string; season: number; week: number; home_team: string; away_team: string;
   home_abbr: string; away_abbr: string; kickoff_at: string; expires_at: string;
@@ -29,6 +31,7 @@ export type LockedGame = {
   executed_picks?: {side: string; line_at_approval: string; book_price: string; executed_book: string; outcome: string}[];
 };
 export type LockedBoard = {
+  card_records?: Record<string,RecordLine[]>;
   schema: "locked-board-v1"; version: string; published_at: string;
   content_sha256: string; default_week: number; games: LockedGame[];
   week_records?: Record<string, Record<"model" | "price" | "paper" | "jarrett", {wins: number; losses: number; pushes: number; mean_clv_cents: number | null; clv_n: number}> & {human_lean?: {wins:number;losses:number;pushes:number;mean_clv_cents:number|null;clv_n:number}}>;

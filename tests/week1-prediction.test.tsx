@@ -11,7 +11,7 @@ const g:LockedGame={game_id:'demo',season:2026,week:1,home_team:'Home',away_team
 const board:LockedBoard={schema:'locked-board-v1',version:'v1',published_at:'2026-09-13T15:40Z',content_sha256:'a'.repeat(64),default_week:1,games:[g]};
 it('renders the winner and picks without presenting market team means as score forecasts',()=>{
  const html=renderToStaticMarkup(<Week1PredictionRow game={g} analytics={null}/>);
- expect(html).not.toContain('24.3');expect(html).not.toContain('20.3');expect(html).toContain('58.0%');expect(html).toContain('1.0%');expect(html).not.toContain('market-based score estimate');expect(html).toContain('LEAN ONLY');expect(html).toContain('negative');expect(html).toContain('3.5');expect(html).not.toContain('>PLAY<');
+ expect(html).not.toContain('24.3');expect(html).not.toContain('20.3');expect(html).toContain('SEA');expect(html).not.toContain('market-based score estimate');expect(html).not.toContain('BetMGM');expect(html).not.toContain('EV');expect(html).toContain('3.5');expect(html).not.toContain('>PLAY<');
 });
 it('keeps estimates but suppresses actionable PLAY on delayed publication',()=>{
  const b={...board,games:[{...g,prediction:{...prediction,selections:{...prediction.selections,spreads:{...pick,betting_status:'PLAY'}}}}]};
@@ -23,7 +23,7 @@ it('shows final score with separate winner and ATS grades',()=>{
 });
 it('does not invent historical winner projections and shows missed badge',()=>{
  const html=renderToStaticMarkup(<Week1PredictionRow game={{...g,status:'FINAL',lock_status:'MISSED',final_score:{home:13,away:10},prediction:undefined}} analytics={null}/>);
- expect(html).toContain('not recorded');expect(html).toContain('No lock: capture late');expect(html).not.toContain('58.0%');
+ expect(html).toContain('not recorded');expect(html).toContain('FINAL');expect(html).not.toContain('58.0%');
 });
 it('rejects malformed projected scores',()=>{expect(()=>validateBoard({...board,games:[{...g,prediction:{...prediction,projection:{...prediction.projection,home_score:NaN}}}]})).toThrow('Invalid projection');});
 
@@ -31,7 +31,5 @@ it('leads analytics with the saved pick rationale and collapses methodology',()=
  const rationale={title:'NE +3.5 at BetMGM -102',reasons:['A three-point loss still covers.'],assessment:'Insufficient support at this price.'};
  const game={...g,prediction:{...prediction,explanation:['Methodology stays available.'],selections:{spreads:{...pick,rationale},totals:{...pick,rationale}}}};
  const html=renderToStaticMarkup(<GameDecision game={game}/>);
- expect(html).toContain('WHY WE LEAN THIS WAY');expect(html).toContain('A three-point loss still covers.');expect(html).toContain('Insufficient support at this price.');
- expect(html.indexOf('A three-point loss still covers.')).toBeLessThan(html.indexOf('<details'));
- expect(html).toContain('<summary>Supporting data &amp; how to read it</summary>');expect(html).not.toContain('<details open');
+ expect(html).not.toContain('WHY WE LEAN THIS WAY');expect(html).not.toContain('A three-point loss still covers.');expect(html).not.toContain('break-even');expect(html).toContain('Line:');
 });

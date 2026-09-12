@@ -22,7 +22,7 @@ export function VerdictView({ title, verdict: v, game }: { title: string; verdic
   const result=grade(v.grade);
   return <p className="grid-verdict-line" title={title}>
     <span className="grid-target">{title === "Spread" ? "S" : "T"}</span>
-    <b>{team(v.side,game)} {title === "Spread" ? odds(v.line) : v.line}</b> · <span style={v.teaser_notice ? {whiteSpace:"normal"} : undefined}>{v.teaser_notice ?? (v.state === "HARD PASS" ? "PASS" : v.state)}</span>
+    <b>{team(v.side,game)} {title === "Spread" ? odds(v.line) : v.line}</b> · <span style={v.teaser_notice ? {whiteSpace:"normal"} : undefined}>{v.teaser_notice ? "TEASE candidate" : (v.state === "HARD PASS" ? "PASS" : v.state)}</span>
     {result && <> · <strong className={`grade-${result.toLowerCase()}`}>{result}</strong></>}
   </p>;
 }

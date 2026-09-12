@@ -1,2 +1,2 @@
-import { SuitSheet } from "@/components/suit-sheet";
-export default function Page(){return <SuitSheet/>;}
+import {SharedScorecard} from "@/components/shared-scorecard";
+export default function Page(){return <SharedScorecard/>;}

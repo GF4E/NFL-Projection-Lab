@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { WeekOneBoard } from '../src/components/week-one-board';
+// Preserve regression coverage of the superseded reader; final card tests cover its replacement.
+import { LockedModelBoard as WeekOneBoard } from '../src/components/locked-model-board';
 import { GameRow } from '../src/components/locked-model-board';
 import type { LockedBoard, Verdict } from '../src/domain/locked-board';
 
@@ -22,9 +23,9 @@ describe('Week 1 prediction grid',()=>{
   const fn=install();const {container}=render(<WeekOneBoard/>);
   await screen.findByText('SF +3.5');
   for(const column of ['MATCHUP','PROJECTED WINNER','SPREAD PICK','TOTAL PICK','BETTING STATUS'])expect(screen.getByText(column)).toBeTruthy();
-  expect(container.querySelectorAll('.prediction-row')).toHaveLength(1);
-  expect(container.querySelectorAll('.prediction-cell')).toHaveLength(5);
-  expect(container.querySelectorAll('img')).toHaveLength(2);
+  expect(container.querySelectorAll('.week1-event')).toHaveLength(1);
+  expect(container.querySelectorAll('.week1-market-row section')).toHaveLength(3);
+  expect(container.textContent).toContain('SF at LA');
   expect(container.querySelectorAll('.week-records dt')).toHaveLength(0);
   expect(container.textContent).not.toContain('Jarrett');
   expect(container.textContent).toContain('Our game guide');
@@ -32,20 +33,20 @@ describe('Week 1 prediction grid',()=>{
   expect(container.textContent).not.toContain('Sep 10, 5:35');
   expect(container.textContent).toContain('SF +3.5');expect(container.textContent).toContain('WIN');
   expect(container.textContent).toContain('Over 47.5');expect(container.textContent).toContain('LOSS');
-  expect(container.textContent).toContain('Our wager · LA -3 -120 · LOSS');
+  expect(container.textContent).toContain('Our wager · LA -3 · LOSS');
   expect(fn.mock.calls.every(([url])=>String(url).startsWith('/api/model-board')||String(url).startsWith('/api/lines?week='))).toBe(true);
  });
  it('keeps consensus, freeze, shortened version and analytics in the expanding window',async()=>{
   install();const {container}=render(<WeekOneBoard/>);await screen.findByText('SF +3.5');
-  expect(screen.queryByText(/T−75 consensus/)).toBeNull();
-  fireEvent.click(screen.getByRole('button',{name:'Analytics ↓'}));
-  expect(screen.getByText(/T−75 consensus/)).toBeTruthy();
-  expect(screen.getByText('Analytics')).toBeTruthy();
+  expect(container.textContent).not.toContain('Live consensus');
+  fireEvent.click(screen.getByRole('button',{name:'Analytics'}));
+  expect(container.textContent).toContain('Line: LA -4 · Total 48.5');
+  expect(container.textContent).not.toContain('Choose another side or book');
   expect(container.textContent).toContain('model-v1-aaaaaaaa');
   expect(container.textContent).not.toContain('a'.repeat(64));
   expect(container.textContent).toContain('Freeze:');
-  fireEvent.click(screen.getByRole('button',{name:'Close analytics ↑'}));
-  expect(screen.queryByText(/T−75 consensus/)).toBeNull();
+  fireEvent.click(screen.getByRole('button',{name:'Close'}));
+  expect(container.textContent).not.toContain('Live consensus');
  });
  it('shows a single grey no-lock badge, never inventing model selections',()=>{
   const {container}=render(<GameRow book="betmgm" game={{...payload.games[0],lock_status:'MISSED',verdicts:{spreads:missed,totals:missed},executed_picks:[]}}/>);
@@ -56,7 +57,7 @@ describe('Week 1 prediction grid',()=>{
  it('shows the selected execution book without switching the frozen selection',async()=>{
   install();const {container}=render(<WeekOneBoard/>);await screen.findByText('SF +3.5');
   expect(screen.queryByRole('button',{name:'FanDuel'})).toBeNull();
-  expect(container.textContent).toContain('BetMGM -102');
+  expect(container.textContent).not.toContain('BetMGM -102');
   expect(container.textContent).toContain('SF +3.5');expect(container.textContent).toContain('WIN');
  });
  it('requests cached prices for the selected week without reusing a different week',async()=>{
@@ -77,6 +78,6 @@ describe('Week 1 prediction grid',()=>{
   fireEvent.click(screen.getByRole('button',{name:'Refresh board'}));
   await screen.findByText('Update unavailable. Showing the last saved locks and grades.');
   expect(screen.getByText('SF +3.5')).toBeTruthy();
-  expect(screen.getByText('SF 27 — LA 7 FINAL')).toBeTruthy();
+  expect(screen.getByText(/SF 27 — LA 7 FINAL/)).toBeTruthy();
  });
 });

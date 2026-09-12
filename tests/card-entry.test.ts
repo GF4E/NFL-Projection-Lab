@@ -1,0 +1,11 @@
+import {DatabaseSync} from 'node:sqlite';
+import {it,expect,vi} from 'vitest';
+const state=vi.hoisted(()=>({game:{game_id:'test',kickoff_at:'2099-01-01T00:00:00Z',cutoff_at:'2098-12-31T22:45:00Z'}}));
+vi.mock('../src/server/locked-board',()=>({readLockedBoard:async()=>({games:[state.game]})}));
+import {cardEntry} from '../src/server/card-entry';
+it('authenticates, saves one shared number and isolates POST_LOCK atomically',async()=>{const sqlite=new DatabaseSync(':memory:');const DB={exec:async(s:string)=>sqlite.exec(s),prepare:(s:string)=>{let args:unknown[]=[];return {bind(...a:unknown[]){args=a;return this;},async all(){return {results:sqlite.prepare(s).all(...args as never[])};},async run(){const x=sqlite.prepare(s).run(...args as never[]);return {meta:{changes:Number(x.changes)}};}}}} as unknown as D1Database;const env={DB,NOTE_EDIT_KEY:'test-team-code',NOTE_SYNC_KEY:'test-sync-code'};
+ const make=(token:string,spread=-3)=>new Request('https://example.test/api/card-entry?gameId=test',{method:'POST',headers:{authorization:`Bearer ${token}`,'content-type':'application/json'},body:JSON.stringify({spread,total:44,confidence:3,tags:['trenches'],text:'We trust the run game'})});
+ expect((await cardEntry(make('wrong'),env)).status).toBe(401);expect((await cardEntry(make('test-team-code'),env)).status).toBe(200);expect((await cardEntry(make('test-team-code',-4),env)).status).toBe(200);
+ const pre=sqlite.prepare('SELECT payload FROM engine_shared_entries WHERE post_lock=0').get() as {payload:string};expect(JSON.parse(pre.payload).spread).toBe(-4);expect(JSON.parse(pre.payload).source).toBe('ours');
+ state.game.cutoff_at='2000-01-01T00:00:00Z';expect((await cardEntry(make('test-team-code',-8),env)).status).toBe(200);expect((sqlite.prepare('SELECT payload FROM engine_shared_entries WHERE post_lock=0').get() as {payload:string}).payload).toBe(pre.payload);const post=JSON.parse((sqlite.prepare('SELECT payload FROM engine_shared_entries WHERE post_lock=1').get() as {payload:string}).payload);expect(post.post_lock).toBe(true);expect(post.spread).toBe(-8);
+ const sync=await cardEntry(new Request('https://example.test/api/card-entry/sync',{headers:{authorization:'Bearer test-sync-code'}}),env);expect(((await sync.json()) as {entries:unknown[]}).entries.length).toBe(2);sqlite.close();});

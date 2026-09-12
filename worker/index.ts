@@ -1,3 +1,4 @@
+import {cardEntry} from "../src/server/card-entry";
 import { tickets } from "../src/server/tickets";
 import { suit, readSuit } from "../src/server/suit";
 import { ourNote } from "../src/server/our-note";
@@ -82,6 +83,7 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (["/api/card-entry","/api/card-entry/sync"].includes(url.pathname)) return cardEntry(request,env);
     if (url.pathname === "/api/tickets" || url.pathname === "/api/tickets/sync") return tickets(request, env);
     if (["/api/suit-board","/api/suit-entry","/api/suit-entry/sync"].includes(url.pathname)) return suit(request,env);
     if (url.pathname === "/api/our-note" || url.pathname === "/api/our-note/sync") return ourNote(request, env);

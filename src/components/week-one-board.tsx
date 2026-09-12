@@ -1,3 +1,2 @@
 "use client";
-
-export { LockedModelBoard as WeekOneBoard } from "./locked-model-board";
+export {GameCardBoard as WeekOneBoard} from "./game-card-board";
