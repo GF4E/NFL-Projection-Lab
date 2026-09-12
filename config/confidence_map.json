@@ -1,0 +1,30 @@
+{
+  "version": "confidence-map-v1",
+  "registered_at": "2026-09-12T16:30:03.865418+00:00",
+  "people": {
+    "Gabe": {
+      "provisional": {
+        "1": 0.52,
+        "2": 0.55,
+        "3": 0.58,
+        "4": 0.62,
+        "5": 0.66
+      }
+    },
+    "Jarrett": {
+      "provisional": {
+        "1": 0.52,
+        "2": 0.55,
+        "3": 0.58,
+        "4": 0.62,
+        "5": 0.66
+      }
+    }
+  },
+  "minimum_graded_leans": 50,
+  "prior_weight": 20,
+  "update_cadence": "weekly",
+  "display_before_threshold": "hit_rate_by_confidence_only",
+  "brier_basis": "probabilities frozen with each entry; confidence and number separately",
+  "conflict": "nearest map level to number probability differs from stated level by more than one; log always, display after threshold"
+}

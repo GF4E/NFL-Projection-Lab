@@ -1,0 +1,22 @@
+{
+  "version": "iron-man-suit-v1",
+  "start_season": 2026,
+  "start_week": 2,
+  "weekly_credit_cap": 75,
+  "unit_dollars": 50,
+  "weekly_sizing_capital": 1000,
+  "quarter_kelly": 0.25,
+  "ticket_cap_units": 2,
+  "game_cap_units": 2,
+  "boundary_rule": "abs gap <1 STORY; 1 through 2 LEAN; >2 BET only if positive priced EV",
+  "opposite_rule": "PASS_DISAGREE unless one confidence >=4 and other <3",
+  "same_side_rule": "Use lower-confidence person's entered number; ties use smaller stake",
+  "missing_person": "MISSED; no joint pick; retain blind entry privately",
+  "entries": "First submission per person is final, so nobody can revise after revealing the other number",
+  "early": "Monday 09:00 America/Los_Angeles quote snapshot; a market may lock only with both entries submitted before the capture window and joint BET gap >2",
+  "late": "T80 quotes, T75 freeze; only entries received before T75; missing/late capture is MISSED",
+  "market_open_evidence": "Scheduled Monday snapshot, not proof of bookmaker's first opening quote; POST_OPEN means after scheduled Monday cutoff",
+  "population": "REGULAR and POSTSEASON separate",
+  "unsupported_sensors": "UNKNOWN with reason; no proxy silently substituted",
+  "no_harvest_promotion": true
+}

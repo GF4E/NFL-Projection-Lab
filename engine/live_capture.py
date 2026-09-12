@@ -1,4 +1,4 @@
-"""Registered weekly and T80 capture transport; shared 60-credit weekly ledger."""
+"""Registered weekly and T80 capture transport; shared version-aware weekly ledger."""
 import datetime as dt
 import json
 import urllib.parse
@@ -6,7 +6,7 @@ import urllib.request
 from pathlib import Path
 from engine.pick_store import pin, put
 from engine.pricing import timestamp
-from engine.t75_budget import transact
+from engine.suit_budget import transact
 
 
 def capture(job, folder, ledger, secret, current=None):

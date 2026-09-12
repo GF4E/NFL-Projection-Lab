@@ -62,3 +62,13 @@ Gabe authorizes Friday 12:00 PT, Saturday 12:00 PT, Sunday 07:00 PT and T80 capt
 Use hand-editable `config/teaser_prices.json` for dated two-/three-leg six-point prices. Unknown prices stay null. Posted references retain their jurisdiction/date limitations. A candidate must exist in an actual offer at the qualifying book; two-leg -110 or better permits TEASE, otherwise publish the best known near-miss price. Capture the config and its hash with each live selection; locks retain that config. PLAY and the registered selection/filter mathematics remain unchanged.
 
 Scheduled live weather now uses `engine.live_weather_v2`; the original pinned source stays untouched. Saturday noon PT evaluates stored forecast evidence, while only T75 locks enter scoring. No Odds API calls for the one-time weather repair. Evidence: `work/teaser-wind-fix-v1/experiment.json`.
+
+## Final-answer review
+
+Before every DONE report, ask whether this is the best answer you can provide. If not, improve it and review again until yes. Include one line stating what you were least sure of and what changed because of it.
+
+## Iron Man Suit v1 — authorized Week 2 supersession
+
+Implement `IRON-MAN-SUIT-SPEC-v1.md` for Week 2 onward. Only Gabe/Jarrett originate numbers; preserve prior frozen model logic and historical picks. The new human-only package has a 75-credit weekly cap and Monday 09:00 PT EARLY plus T80/T75 LATE plumbing. $50/unit, $1,000 weekly sizing capital, quarter Kelly and two-unit ticket/game caps. Separate persons, tags, REGULAR/POSTSEASON, EARLY/LATE and POST_OPEN evidence. Unsupported sensors remain unknown, MEASURE hypotheses never move numbers.
+
+The final confidence instruction supersedes the earlier 100-lean rule: provisional per-person levels .52/.55/.58/.62/.66, hidden confidence-derived fields below 50 graded leans; then two frozen-probability Brier scores and weekly Beta updates with prior weight 20. Log confidence/number conflicts more than one level apart. Hide conflict/mapping-derived displays below threshold; retain hit rate by confidence. New versioned maps apply prospectively and never rewrite locked probabilities.

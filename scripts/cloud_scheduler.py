@@ -19,7 +19,7 @@ from scripts.nfl_engine_autopush import guard, REMOTE
 
 LOCK_PATH = 'work/cloud-migration-v1/ownership.json'
 OUT = ROOT/'outputs/model-pick-v1'
-ALLOWED = ('outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
+ALLOWED = ('outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
            'work/model-pick-v1/daily/', 'work/model-pick-v1/sources/',
            'work/model-pick-v1/schedules/', 'work/model-pick-v1/states/',
            'work/model-pick-v1/depth/')
@@ -75,9 +75,9 @@ def publish_artifacts():
 def weekly_capture_window(current):
     from zoneinfo import ZoneInfo
     local = current.astimezone(ZoneInfo('America/Los_Angeles'))
-    if local.weekday() not in (4, 5, 6):
+    if local.weekday() not in (0, 4, 5, 6):
         return False
-    scheduled = local.replace(hour=7 if local.weekday() == 6 else 12, minute=0, second=0, microsecond=0)
+    scheduled = local.replace(hour=9 if local.weekday()==0 else 7 if local.weekday() == 6 else 12, minute=0, second=0, microsecond=0)
     return scheduled-dt.timedelta(minutes=6) <= local <= scheduled+dt.timedelta(minutes=1)
 
 
@@ -119,15 +119,33 @@ def run(mode, host):
         if mode == 'daily' and capture_window():
             return {'state': 'DEFERRED_CAPTURE_WINDOW'}
         code = worker('live_pick_runner.py' if mode == 'capture' else 'model_pick_daily.py')
+        if mode == 'capture':
+            code = max(code, worker('suit_runner.py'))
+            from zoneinfo import ZoneInfo
+            pt=dt.datetime.now(ZoneInfo('America/Los_Angeles'))
+            marker=ROOT/'outputs/iron-man-v1/renders'/(pt.date().isoformat()+'.json')
+            if pt.weekday()==6 and pt.hour==20 and not marker.exists():
+                from scripts.suit_prepare import run as prepare_suit
+                from engine.pick_store import put
+                put(marker,prepare_suit(refresh=True))
         if mode == 'daily':
             from engine.board_results import refresh
             refresh()
             from engine.slip_grade import run as grade_slips
             grade_slips()
+            from scripts.suit_daily import main as grade_suit
+            grade_suit()
+            from scripts.suit_prepare import run as prepare_suit
+            marker=ROOT/'outputs/iron-man-v1/renders'/('daily-'+dt.datetime.now(dt.timezone.utc).date().isoformat()+'.json')
+            if not marker.exists():
+                from engine.pick_store import put
+                put(marker,prepare_suit(refresh=True))
         from engine.live_scorecard import run as live_scorecard
         live_scorecard(ROOT)
         from engine.board_bridge import publish
         publish()
+        from engine.suit_publish import publish as publish_suit
+        publish_suit(ROOT)
         commit = publish_artifacts()
         if code:
             raise RuntimeError('Worker failed; available artifacts preserved')

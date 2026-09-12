@@ -59,7 +59,7 @@ def notes():
 def run():
     now=dt.datetime.now(dt.timezone.utc);ref=latest('schedule-ref.json')
     if not ref:return {'state':'MISSING_SCHEDULE'}
-    groups=read_pinned(ref)['groups'];config=json.loads((ROOT/'work/model-pick-v1/runtime-config.json').read_text());shape=read_pinned(config['distribution'])
+    groups=[g for g in read_pinned(ref)['groups'] if g['week']<2];config=json.loads((ROOT/'work/model-pick-v1/runtime-config.json').read_text());shape=read_pinned(config['distribution'])
     # Gather known QB status inside the registered T90-T80 window, once per game.
     from engine.t75_shadow import pull_inactives
     for group in groups:

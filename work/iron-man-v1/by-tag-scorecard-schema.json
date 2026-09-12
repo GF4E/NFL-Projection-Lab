@@ -1,0 +1,40 @@
+{
+  "file": "outputs/iron-man-v1/by-tag-scorecard.csv",
+  "columns": [
+    "person",
+    "tag",
+    "population",
+    "week",
+    "phase",
+    "input_class",
+    "confidence",
+    "leans",
+    "graded",
+    "wins",
+    "losses",
+    "pushes",
+    "hit_rate",
+    "ci95_low",
+    "ci95_high",
+    "mean_clv_points",
+    "clv_n",
+    "brier_confidence",
+    "brier_number",
+    "confidence_status",
+    "conflicts",
+    "better_predictor"
+  ],
+  "source": "human_lean",
+  "null_before_50": [
+    "brier_confidence",
+    "brier_number",
+    "conflicts",
+    "better_predictor"
+  ],
+  "populations": [
+    "REGULAR",
+    "POSTSEASON"
+  ],
+  "rate_denominator": "wins+losses; pushes separate",
+  "tag_overlap": "A lean can appear in multiple tag subsets; ALL is the unique total"
+}

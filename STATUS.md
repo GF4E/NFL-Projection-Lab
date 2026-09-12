@@ -1,3 +1,9 @@
+# Current status — Iron Man Suit Week 2, September 12, 2026
+
+Week 2 human-number sheet, independent private entries, EARLY/LATE locks, and confidence feedback implemented. Final confidence rule: hide map-derived output until 50 graded leans per person and population; weekly Beta prior weight 20; prospective versioned maps. No autonomous Week 2 picks. Sensor gaps remain explicitly unknown. Implementation verification and deployment state: [experiment](work/iron-man-v1/experiment.json). Last preceding engine commit: 834800859069220d373462136c5243273dd0f3e8. This revision is identified by Git.
+
+Odds API credits spent on this build: zero. Week 2 has a separate 75-credit cap; old Week 1 ledger preserved. Next decision from Gabe: enter independent Week 2 numbers before the Monday 09:00 PT EARLY snapshot if desired. Private individual codes are in ignored `.cloud-private/suit-access.json`; never publish or commit them.
+
 # Current status — teaser and weather repair, September 11, 2026
 
 Current step: dated teaser-price configuration and asynchronous GFS forecast repair implemented. Eight upcoming outdoor kickoff forecasts restored; Saturday 12:00 PT evaluation is wired and tested, not yet observed. Only T75 locks enter scoring. Zero Odds API credits spent; 56 Week 1 credits remain. FanDuel current two-/three-leg prices still need account confirmation; its entries remain null. BetMGM and Caesars posted references retain source-age/jurisdiction warnings. [Experiment](work/teaser-wind-fix-v1/experiment.json), [wind and pricing report](work/teaser-wind-fix-v1/report.md). Last verified engine commit: `f320273f25e1f24f188da8c57b67b7ddf50601ad`; main: `05312d0d4574e6234f9e41bf0786eb0d8ac7bbaa`. Cloud source and tests verified; both timers active. Website release succeeded and its public endpoint returned eight forecasts and teaser near misses. This evidence commit is available in Git. Earlier entries below are historical.
