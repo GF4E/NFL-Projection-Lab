@@ -19,5 +19,21 @@
     "Methodology and other captured context are collapsed. Weather, Elo and QB context are not asserted as causal selection inputs.",
     "No new data capture, model arithmetic, gate or historical-lock change. Week 2 has no new rationale."
   ],
-  "deployment": "PENDING"
+  "deployment": {
+    "status": "succeeded",
+    "version": 181,
+    "deployment_id": "appgdep_6aa59fb57b7081919822304b0ad803b3",
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday",
+    "main_commit": "84188230cb5e3ad7016e26ab8258be1842e32531",
+    "sites_commit": "b548acae34870f5c38b787d92bdedcb03af08fa1"
+  },
+  "verification": {
+    "checked_at": "2026-09-12T18:55:29.554497+00:00",
+    "live_week1_equal_to_artifact": true,
+    "rationale_visible_in_expanded_ATL_PIT": true,
+    "methodology_collapsed": true,
+    "cloud_tests_passed": 5,
+    "cloud_code_verified": "9d8b52f54ae60f82f7109448626cc2d07e94ef09"
+  },
+  "least_sure": "Whether explanatory text could imply unearned conviction. Explicitly separate offer ranking, line cushion, break-even price and weak/negative support; do not present weather or Elo as causes of these picks."
 }

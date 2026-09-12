@@ -24,7 +24,7 @@ class RationaleTests(unittest.TestCase):
 
     def test_under_and_over_reference_direction(self):
         self.p.update(market='totals',side='Under',line=44,loo_center=43)
-        self.assertIn('1 extra points',self.text());self.assertIn('exactly 44 is a push',self.text())
+        self.assertIn('1 extra point',self.text());self.assertIn('exactly 44 is a push',self.text())
         self.p.update(side='Over',line=42.5)
         self.assertIn('0.5 extra points',self.text());self.assertIn('above 42.5',self.text())
 

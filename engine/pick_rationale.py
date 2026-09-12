@@ -19,8 +19,8 @@ def rationale(pick, record, stale=False):
         advantage = reference-line if market == 'totals' and side == 'Over' else line-reference
         reference_text = f"{reference:+g}" if market == 'spreads' else f"{reference:g}"
         reasons.append(f"The other-book reference for this side is {reference_text}. " +
-                       (f"Our line gives us {advantage:g} extra points of cushion." if advantage > 0 else
-                        f"Our line gives up {-advantage:g} points versus that reference." if advantage < 0 else
+                       (f"Our line gives us {advantage:g} extra {'point' if advantage == 1 else 'points'} of cushion." if advantage > 0 else
+                        f"Our line gives up {-advantage:g} {'point' if advantage == -1 else 'points'} versus that reference." if advantage < 0 else
                         "Our line matches it; there is no extra cushion from the line."))
     if market == 'spreads':
         if line > 0:
