@@ -8,11 +8,12 @@ export async function projectionEntry(request:Request,env:Env){
  if(!key||token!==key)return reply({error:'Team edit code required'},401);
  if(!['GET','POST'].includes(request.method)||sync&&request.method!=='GET')return reply({error:'Method not allowed'},405);
  if(sync){const rows=await env.DB.prepare('SELECT payload FROM engine_projection_entries').all<{payload:string}>();const history=await env.DB.prepare('SELECT payload FROM engine_projection_edit_history ORDER BY id').all<{payload:string}>();return reply({entries:rows.results.map(x=>JSON.parse(x.payload)),history:history.results.map(x=>JSON.parse(x.payload))});}
- const id=url.searchParams.get('gameId'),board=await readProjection(env.DB),g=board.games.find(x=>x.game_id===id);if(!g)return reply({error:'Unknown game'},404);
+ const id=url.searchParams.get('gameId'),board=await readProjection(env.DB,request.method==='POST'),g=board.games.find(x=>x.game_id===id);if(!g)return reply({error:'Unknown game'},404);
  if(request.method==='POST'){
   if(request.headers.get('origin')&&request.headers.get('origin')!==url.origin)return reply({error:'Origin mismatch'},403);
   const body=await request.text();if(body.length>4096)return reply({error:'Entry too large'},413);
   let v;try{v=JSON.parse(body);}catch{return reply({error:'Invalid JSON'},400);}
+  if(!v||typeof v!=='object')return reply({error:'Invalid entry'},400);
   if(v.projection_version!==g.version||v.projection_issued_at!==g.issued_at)return reply({error:'Projection changed. Refresh the card before saving.'},409);
   if(!validShared(v))return reply({error:'Enter two team scores, confidence 1–5, and football-only reasons.'},400);
   const cutoff=Date.parse(g.cutoff_at??'')||Date.parse(g.kickoff_at)-75*60000;
