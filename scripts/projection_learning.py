@@ -64,7 +64,7 @@ def report():
 def due_week(rows,now):
  local=now.astimezone(ZoneInfo('America/Los_Angeles'));games={r['game_id']:r for r in rows};due=[]
  for week in sorted({r['week'] for r in rows}):
-  slate=[r for r in games.values() if r['week']==week];last=max(dt.date.fromisoformat(r['game']['gameday']) for r in slate)
+  slate=[r for r in games.values() if r['week']==week];last=min(dt.date.fromisoformat(r['game']['gameday']) for r in slate) # Postponed games defer completion, not the scheduled Tuesday.
   tuesday=last+dt.timedelta(days=(1-last.weekday())%7 or 7);deadline=dt.datetime.combine(tuesday,dt.time(6),ZoneInfo('America/Los_Angeles'))
   if local>=deadline:due.append(week)
  return max(due) if due else None

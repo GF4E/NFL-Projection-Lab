@@ -26,6 +26,8 @@ class LearningTests(unittest.TestCase):
  def test_due_time_and_dst(self):
   rows=[{'game_id':'g','week':1,'game':{'gameday':'2026-09-14'}}]
   self.assertIsNone(runtime.due_week(rows,dt.datetime.fromisoformat('2026-09-15T12:59:59+00:00')));self.assertEqual(runtime.due_week(rows,dt.datetime.fromisoformat('2026-09-15T13:00:00+00:00')),1)
+  postponed=[{'game_id':'first','week':1,'game':{'gameday':'2026-09-10'}},{'game_id':'late','week':1,'game':{'gameday':'2026-09-15'}}]
+  self.assertEqual(runtime.due_week(postponed,dt.datetime.fromisoformat('2026-09-15T13:00:00+00:00')),1)
   rows[0]['game']['gameday']='2026-11-02';self.assertIsNone(runtime.due_week(rows,dt.datetime.fromisoformat('2026-11-03T13:59:59+00:00')));self.assertEqual(runtime.due_week(rows,dt.datetime.fromisoformat('2026-11-03T14:00:00+00:00')),1)
  def test_refit_preserves_grade_and_excludes_future_and_retries(self):
   with tempfile.TemporaryDirectory() as directory:
