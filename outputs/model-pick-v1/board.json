@@ -3,7 +3,7 @@
     "1": [
       {
         "label": "MODEL",
-        "text": "1\u20131\u20130 \u00b7 CLV -6.0\u00a2"
+        "text": "1\u20133\u20130 \u00b7 CLV -4.9\u00a2"
       },
       {
         "label": "PRICE",
@@ -326,7 +326,7 @@
     ]
   },
   "clv_reference": "nflverse_close; reference CLV, not executed-book closing quotes",
-  "content_sha256": "2110d038ff9821ec12dfd42873a49069c22a6f417afbf439b365abd7e3b8625c",
+  "content_sha256": "c6b88b84986679dadfede6a06fae92df202ca4c92204e4e89f075e29d8a5ec25",
   "default_week": 1,
   "game_card_version": "game-card-v3",
   "games": [
@@ -1574,7 +1574,7 @@
       },
       "final_source": {
         "provider": "nflverse",
-        "sha256": "bf04dd9d715dbd91f7b603cc5fd106dba422850bcf27d98c243af4b1909fb083"
+        "sha256": "579a45a43d8f7d6c3455d963f7a9ceeee8877d8bd20c8b3e114e39b501d52a74"
       },
       "freeze_time": null,
       "game_id": "2026_01_NE_SEA",
@@ -10284,15 +10284,20 @@
         ],
         "away": "CLE",
         "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
-        "final": null,
+        "final": {
+          "away_score": 10.0,
+          "home_score": 34.0,
+          "margin": 24.0,
+          "total": 44.0
+        },
         "freeze_timestamp": "2026-09-13T15:45:21.236068+00:00",
         "game_id": "2026_01_CLE_JAX",
         "generated_at": "2026-09-13T15:40:18.625282+00:00",
         "grades": {
-          "SPREAD": null,
-          "TOTAL": null,
-          "WINNER": null,
-          "clv": null
+          "SPREAD": "LOSS",
+          "TOTAL": "WIN",
+          "WINNER": "WIN",
+          "clv": 4.058731178191692
         },
         "home": "JAX",
         "input_hash": "0a453cd159a1ab3953702d6bf020f709bc52930282217caf31a2ac30afb135fa",
@@ -11497,7 +11502,7 @@
           }
         },
         "stale": false,
-        "status": "LOCKED",
+        "status": "FINAL",
         "team_colors": {
           "CLE": "#331700",
           "JAX": "#006779"
@@ -11508,10 +11513,10 @@
             "book": "betmgm",
             "book_label": "BetMGM",
             "chip": "LEAN",
-            "clv": null,
+            "clv": 4.938271604938279,
             "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": null,
+            "grade": "LOSS",
             "label": "SPREAD",
             "line": 9.0,
             "pick": "CLE +9",
@@ -11529,10 +11534,10 @@
             "book": "betmgm",
             "book_label": "BetMGM",
             "chip": "LEAN",
-            "clv": null,
+            "clv": 3.1791907514451054,
             "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": null,
+            "grade": "WIN",
             "label": "TOTAL",
             "line": 40.0,
             "pick": "OVER 40",
@@ -11553,7 +11558,7 @@
             "clv": null,
             "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": null,
+            "grade": "WIN",
             "label": "WINNER",
             "line": null,
             "pick": "JAX",
@@ -11651,12 +11656,22 @@
       "cutoff_at": "2026-09-13T15:45:00+00:00",
       "executed_picks": [],
       "expires_at": "2026-09-13T17:00:00+00:00",
+      "final_score": {
+        "away": 10.0,
+        "home": 34.0
+      },
+      "final_source": {
+        "provider": "nflverse",
+        "sha256": "579a45a43d8f7d6c3455d963f7a9ceeee8877d8bd20c8b3e114e39b501d52a74"
+      },
       "freeze_time": "2026-09-13T15:45:15.201638+00:00",
       "game_id": "2026_01_CLE_JAX",
+      "grade_status": "SCORED",
       "home_abbr": "JAX",
       "home_team": "Jacksonville Jaguars",
       "kickoff_at": "2026-09-13T17:00:00+00:00",
       "lock_status": "LOCKED",
+      "margin": 24.0,
       "note_deadline": "2026-09-13T15:45:00+00:00",
       "our_note": null,
       "prediction": {
@@ -11694,19 +11709,19 @@
         "selections": {
           "spreads": {
             "EV": -0.00027962825890281984,
-            "betting_status": "STALE \u2014 LEAN ONLY",
+            "betting_status": "FINAL",
             "book": "betmgm",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
             "fair_probability": 0.5120481927710844,
             "filter_pass": false,
-            "grade": null,
+            "grade": "L",
             "line": 9.0,
             "negative_EV": true,
             "price": -105.0,
             "push": 0.02521588946459413,
             "rationale": {
-              "assessment": "The price does not justify confidence: estimated return is -0.0% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "The price does not justify confidence: estimated return is -0.0% per unit staked. This is only a directional lean. It does not meet the betting filter.",
               "reasons": [
                 "The other-book reference for this side is +9. Our line matches it; there is no extra cushion from the line.",
                 "CLE can lose by fewer than 9 points and still cover; losing by exactly 9 is a push.",
@@ -11726,19 +11741,19 @@
           },
           "totals": {
             "EV": -0.015083477259643097,
-            "betting_status": "LEAN ONLY \u2014 no supporting score forecast \u00b7 STALE",
+            "betting_status": "FINAL",
             "book": "betmgm",
             "edge_source": "tiebreak",
             "explanation": "Highest estimated return without a positive price/line edge; not necessarily a random tie.",
             "fair_probability": 0.5113279888462878,
             "filter_pass": false,
-            "grade": null,
+            "grade": "L",
             "line": 40.0,
             "negative_EV": true,
             "price": -108.0,
             "push": 0.008981001727115717,
             "rationale": {
-              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -1.5% per unit staked. This is only a directional lean. It does not meet the betting filter. The quote is stale, so this is a dated lean pending the next scheduled capture.",
+              "assessment": "No independent score forecast supports a point advantage for this selection. The price does not justify confidence: estimated return is -1.5% per unit staked. This is only a directional lean. It does not meet the betting filter.",
               "reasons": [
                 "The other-book reference for this side is 40. Our line matches it; there is no extra cushion from the line.",
                 "We need the combined score below 40; exactly 40 is a push.",
@@ -11757,8 +11772,8 @@
             "win": 0.5067357512953368
           }
         },
-        "stale": true,
-        "winner_grade": null
+        "stale": false,
+        "winner_grade": "WIN"
       },
       "quote_pairs": [
         {
@@ -11873,7 +11888,8 @@
       "record_class": "paper_model_pick",
       "recorded_at": "2026-09-13T15:45:15.201638+00:00",
       "season": 2026,
-      "status": "LOCKED",
+      "status": "FINAL",
+      "total": 44.0,
       "verdicts": {
         "spreads": {
           "EV": -0.00027962825890281984,
@@ -11890,9 +11906,9 @@
           "book": "betmgm",
           "edge_source": "tiebreak",
           "fair_probability": 0.5120481927710844,
-          "grade": null,
+          "grade": "L",
           "grade_basis": "LOCKED_STRAIGHT_PICK",
-          "grade_source": null,
+          "grade_source": "579a45a43d8f7d6c3455d963f7a9ceeee8877d8bd20c8b3e114e39b501d52a74",
           "key_numbers_crossed": [
             3,
             7
@@ -11935,9 +11951,9 @@
           "book": "betmgm",
           "edge_source": "tiebreak",
           "fair_probability": 0.5113279888462878,
-          "grade": null,
+          "grade": "L",
           "grade_basis": "LOCKED_STRAIGHT_PICK",
-          "grade_source": null,
+          "grade_source": "579a45a43d8f7d6c3455d963f7a9ceeee8877d8bd20c8b3e114e39b501d52a74",
           "key_numbers_crossed": [
             41,
             44
@@ -99938,7 +99954,7 @@
       "week": 18
     }
   ],
-  "published_at": "2026-09-13T19:10:58.701196+00:00",
+  "published_at": "2026-09-13T20:00:17.714320+00:00",
   "schema": "locked-board-v1",
   "shared_confidence": {
     "graded": 0,
@@ -100004,9 +100020,9 @@
         "wins": 0
       },
       "model": {
-        "clv_n": 2,
-        "losses": 1,
-        "mean_clv_cents": -5.953696507504738,
+        "clv_n": 4,
+        "losses": 3,
+        "mean_clv_cents": -4.930704429488099,
         "pushes": 0,
         "wins": 1
       },
