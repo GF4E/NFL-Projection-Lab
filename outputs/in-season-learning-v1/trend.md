@@ -3,32 +3,399 @@
 actual minus projected. 2016–2025 adaptive OOF; coverage excludes 2016 (no prior residuals).
 
 ## AS_ISSUED
-1 graded games; 29 pending.
+8 graded games; 22 pending.
 
 | week | scope | games | team_points_mae | margin_mae | total_mae | team_points_sigma | margin_sigma | total_sigma | margin_coverage_50 | margin_coverage_80 | total_coverage_50 | total_coverage_80 | home_bias | total_bias | favorite_bias_[-inf,3) | favorite_bias_[3,7) | favorite_bias_[7,14) | favorite_bias_[14,inf) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | week | 1 | 8.350780072968108 | 16.701560145936217 | 1.3858090571809214 | 11.809786435586483 | — | — | 0 | 1 | 1 | 1 | 7.657875544377649 | -1.3858090571809214 | — | — | 7.657875544377649 | — |
-| 1 | cumulative | 1 | 8.350780072968108 | 16.701560145936217 | 1.3858090571809214 | 11.809786435586483 | — | — | 0 | 1 | 1 | 1 | 7.657875544377649 | -1.3858090571809214 | — | — | 7.657875544377649 | — |
+| 1 | week | 8 | 9.649786629583375 | 10.498802220576026 | 16.852796844138716 | 11.376198904666344 | 12.161435297976539 | 19.771199186599702 | 0.5 | 0.75 | 0.125 | 0.875 | 3.703759778288571 | 11.131282187882649 | 3.194856349984243 | 19.490401639097932 | 7.657875544377649 | — |
+| 1 | cumulative | 8 | 9.649786629583375 | 10.498802220576026 | 16.852796844138716 | 11.376198904666344 | 12.161435297976539 | 19.771199186599702 | 0.5 | 0.75 | 0.125 | 0.875 | 3.703759778288571 | 11.131282187882649 | 3.194856349984243 | 19.490401639097932 | 7.657875544377649 | — |
 | 2 | week | 0 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
-| 2 | cumulative | 1 | 8.350780072968108 | 16.701560145936217 | 1.3858090571809214 | 11.809786435586483 | — | — | 0 | 1 | 1 | 1 | 7.657875544377649 | -1.3858090571809214 | — | — | 7.657875544377649 | — |
+| 2 | cumulative | 8 | 9.649786629583375 | 10.498802220576026 | 16.852796844138716 | 11.376198904666344 | 12.161435297976539 | 19.771199186599702 | 0.5 | 0.75 | 0.125 | 0.875 | 3.703759778288571 | 11.131282187882649 | 3.194856349984243 | 19.490401639097932 | 7.657875544377649 | — |
 
 ### Diagnostic buckets
 | Input | Band | Count | Mean error | Standard error | Flag |
 |---|---|---|---|---|---|
-| divisional | false | 2 | -0.6929045285904589 | 8.350780072968108 | False |
-| dome | unavailable | 2 | -0.6929045285904589 | 8.350780072968108 | False |
-| elo_difference | [-inf,-100) | 1 | -9.043684601558567 | None | False |
-| elo_difference | [100,inf) | 1 | 7.657875544377649 | None | False |
-| luck_index | [-0.5,0.5) | 2 | -0.6929045285904589 | 8.350780072968108 | False |
-| momentum | [-0.5,0.5) | 1 | -9.043684601558567 | None | False |
-| momentum | [0.5,inf) | 1 | 7.657875544377649 | None | False |
+| divisional | false | 16 | 5.565641093941325 | 2.844049726166586 | False |
+| dome | unavailable | 16 | 5.565641093941325 | 2.844049726166586 | False |
+| elo_difference | [-100,0) | 6 | 1.8466285173587018 | 4.412143446725917 | False |
+| elo_difference | [-inf,-100) | 2 | 0.2745366395227329 | 9.318221241081298 | False |
+| elo_difference | [0,100) | 6 | 10.765377393969239 | 5.4094525854377125 | False |
+| elo_difference | [100,inf) | 2 | 6.414574378024042 | 1.243301166353607 | True |
+| luck_index | [-0.5,0.5) | 16 | 5.565641093941325 | 2.844049726166586 | False |
+| momentum | [-0.5,0.5) | 11 | 5.874391549125605 | 4.129279027751685 | False |
+| momentum | [-inf,-0.5) | 3 | 2.3937723458992863 | 1.5186933546042445 | False |
+| momentum | [0.5,inf) | 2 | 8.625316712490841 | 0.9674411681131917 | True |
+| projected_margin | [-inf,3) | 10 | 2.547772990948208 | 2.79133435350773 | False |
+| projected_margin | [3,7) | 4 | 16.239584162690008 | 6.294255890085334 | True |
 | projected_margin | [7,14) | 2 | -0.6929045285904589 | 8.350780072968108 | False |
-| rest_days | [14,inf) | 2 | -0.6929045285904589 | 8.350780072968108 | False |
+| rest_days | [14,inf) | 16 | 5.565641093941325 | 2.844049726166586 | False |
+| team | ATL | 1 | -8.276114664172372 | None | False |
+| team | BAL | 1 | 16.827890122312628 | None | False |
+| team | BUF | 1 | 11.286842230796417 | None | False |
+| team | CAR | 1 | 16.384775491960134 | None | False |
+| team | CHI | 1 | 33.80953006652543 | None | False |
+| team | CIN | 1 | 9.160116611946982 | None | False |
 | team | CLE | 1 | -9.043684601558567 | None | False |
+| team | DET | 1 | 5.171273211670435 | None | False |
+| team | HOU | 1 | 6.60940238575883 | None | False |
+| team | IND | 1 | -0.05959314485352962 | None | False |
 | team | JAX | 1 | 7.657875544377649 | None | False |
-| wind | unavailable | 2 | -0.6929045285904589 | 8.350780072968108 | False |
+| team | NO | 1 | 9.592757880604033 | None | False |
+| team | NYJ | 1 | 2.0696369708809534 | None | False |
+| team | PIT | 1 | -3.884311793609392 | None | False |
+| team | TB | 1 | 3.153321271364103 | None | False |
+| team | TEN | 1 | -11.40946008094254 | None | False |
+| wind | unavailable | 16 | 5.565641093941325 | 2.844049726166586 | False |
 
 ### Ten largest game errors
+
+2026_01_CHI_CAR · projection-v2-172f3e04-a39aa883 · team MAE 25.097152779242784
+| Side | Input | Value | Contribution |
+|---|---|---|---|
+| away | football_baseline | 21.422328362450724 | 21.422328362450724 |
+| away | baseline | 21.422328362450724 | -0.29344101001358186 |
+| away | elo | 26.64366384461937 | 0.2442389206320148 |
+| away | elo_difference | 94.13563130853572 | 0.9289891206664003 |
+| away | calibration_intercept | 1.0 | 2.8883545397390087 |
+| away | career_fg_long | None | 0.0 |
+| away | career_fg_medium | None | 0.0 |
+| away | career_fg_short | None | 0.0 |
+| away | close_win_rate | 0.6363636363636364 | 0.0 |
+| away | continuity | None | 0.0 |
+| away | def_cpoe | 1.1235706845929365 | 0.0 |
+| away | def_explosive | 0.09427600404164262 | 0.0 |
+| away | def_off_ppd | 2.320256720808699 | 0.0 |
+| away | def_off_ypp | 5.579428562288466 | 0.0 |
+| away | def_pass_epa | 0.09270162089174724 | 0.0 |
+| away | def_rush_epa | 0.0032222093784958043 | 0.0 |
+| away | def_rush_success | 0.4153471173369627 | 0.0 |
+| away | divisional | 0.0 | 0.0 |
+| away | drives | 9.705882352941176 | 0.0 |
+| away | elo_qb_adjustment | None | 0.0 |
+| away | fg_share | 0.232306723372609 | 0.0 |
+| away | fumble_recovery | 0.6666666666666667 | 0.0 |
+| away | home_divisional | 0.0 | 0.0 |
+| away | home_nondivisional | 0.0 | 0.0 |
+| away | luck_index | 0.3030303030303031 | 0.0 |
+| away | momentum | 0.312254688155528 | 0.0 |
+| away | neutral | 0.0 | 0.0 |
+| away | off_cpoe | -1.4174680736414578 | 0.0 |
+| away | off_explosive | 0.10654212790424795 | 0.0 |
+| away | off_off_ppd | 2.3337954473914584 | 0.0 |
+| away | off_off_ypp | 5.645230450211956 | 0.0 |
+| away | off_pass_epa | 0.08546423531145457 | 0.0 |
+| away | off_rush_epa | 0.03417837987192093 | 0.0 |
+| away | off_rush_success | 0.45811114380477214 | 0.0 |
+| away | opponent_drives | 8.705882352941176 | 0.0 |
+| away | plays_per_drive | 6.268213649096002 | 0.0 |
+| away | pressure_allowed | None | 0.0 |
+| away | pressure_generated | None | 0.0 |
+| away | pythagorean | 0.5359419651848623 | 0.0 |
+| away | qb_backup | None | 0.0 |
+| away | qb_career_starts | None | 0.0 |
+| away | qb_cpoe | None | 0.0 |
+| away | qb_epa | None | 0.0 |
+| away | rb_share | 0.14836521268140018 | 0.0 |
+| away | redzone_td | 0.6803921568627451 | 0.0 |
+| away | referee | None | 0.0 |
+| away | rest_days | 252 | 0.0 |
+| away | return_points | 0.7058823529411764 | 0.0 |
+| away | schedule_strength | None | 0.0 |
+| away | season_fg_long | 0.6666666666666667 | 0.0 |
+| away | season_fg_medium | 0.7857142857142857 | 0.0 |
+| away | season_fg_short | 0.9411764705882353 | 0.0 |
+| away | te_share | 0.25465496539235405 | 0.0 |
+| away | travel_miles | 585.9912734978803 | 0.0 |
+| away | turnover_margin | 0.9411764705882353 | 0.0 |
+| away | wind | None | 0.0 |
+| home | football_baseline | 19.12243394952401 | 19.12243394952401 |
+| home | baseline | 19.12243394952401 | 0.15126588210067038 |
+| home | elo | -67.49196746391635 | -0.6178407426574221 |
+| home | elo_difference | -94.13563130853572 | -0.9289891206664003 |
+| home | calibration_intercept | 1.0 | 2.8883545397390087 |
+| home | career_fg_long | None | 0.0 |
+| home | career_fg_medium | None | 0.0 |
+| home | career_fg_short | None | 0.0 |
+| home | close_win_rate | 0.7 | 0.0 |
+| home | continuity | None | 0.0 |
+| home | def_cpoe | 1.502455333930245 | 0.0 |
+| home | def_explosive | 0.10708965676576299 | 0.0 |
+| home | def_off_ppd | 2.216171642344912 | 0.0 |
+| home | def_off_ypp | 5.705491939530368 | 0.0 |
+| home | def_pass_epa | 0.0355579724444586 | 0.0 |
+| home | def_rush_epa | -0.01417891598998781 | 0.0 |
+| home | def_rush_success | 0.43353140909561344 | 0.0 |
+| home | divisional | 0.0 | 0.0 |
+| home | drives | 8.705882352941176 | 0.0 |
+| home | elo_qb_adjustment | None | 0.0 |
+| home | fg_share | 0.21993177155298557 | 0.0 |
+| home | fumble_recovery | 0.36888888888888893 | 0.0 |
+| home | home_divisional | 0.0 | 0.0 |
+| home | home_nondivisional | 1.0 | 0.0 |
+| home | luck_index | 0.06888888888888889 | 0.0 |
+| home | momentum | -0.10773410766492242 | 0.0 |
+| home | neutral | 0.0 | 0.0 |
+| home | off_cpoe | -0.1898319806880603 | 0.0 |
+| home | off_explosive | 0.09039213609976733 | 0.0 |
+| home | off_off_ppd | 1.938222953717812 | 0.0 |
+| home | off_off_ypp | 5.132893184504864 | 0.0 |
+| home | off_pass_epa | -0.035956894404895766 | 0.0 |
+| home | off_rush_epa | -0.030045253363690988 | 0.0 |
+| home | off_rush_success | 0.4249143195934732 | 0.0 |
+| home | opponent_drives | 9.705882352941176 | 0.0 |
+| home | plays_per_drive | 6.1262498938969525 | 0.0 |
+| home | pressure_allowed | None | 0.0 |
+| home | pressure_generated | None | 0.0 |
+| home | pythagorean | 0.3834579249404108 | 0.0 |
+| home | qb_backup | None | 0.0 |
+| home | qb_career_starts | None | 0.0 |
+| home | qb_cpoe | None | 0.0 |
+| home | qb_epa | None | 0.0 |
+| home | rb_share | 0.19299643462584898 | 0.0 |
+| home | redzone_td | 0.5320728291316527 | 0.0 |
+| home | referee | None | 0.0 |
+| home | rest_days | 253 | 0.0 |
+| home | return_points | 0.7058823529411764 | 0.0 |
+| home | schedule_strength | None | 0.0 |
+| home | season_fg_long | 0.5 | 0.0 |
+| home | season_fg_medium | 0.875 | 0.0 |
+| home | season_fg_short | 0.9333333333333333 | 0.0 |
+| home | te_share | 0.19978628990685057 | 0.0 |
+| home | travel_miles | 0.0 | 0.0 |
+| home | turnover_margin | -0.1764705882352941 | 0.0 |
+| home | wind | None | 0.0 |
+
+2026_01_BUF_HOU · projection-v2-172f3e04-a39aa883 · team MAE 8.948122308277624
+| Side | Input | Value | Contribution |
+|---|---|---|---|
+| away | football_baseline | 21.16175372936251 | 21.16175372936251 |
+| away | baseline | 21.16175372936251 | -0.243056377313418 |
+| away | elo | 99.82335256725037 | 0.9144072781040189 |
+| away | elo_difference | -0.8411913306367751 | -0.008301400688536078 |
+| away | calibration_intercept | 1.0 | 2.8883545397390087 |
+| away | career_fg_long | None | 0.0 |
+| away | career_fg_medium | None | 0.0 |
+| away | career_fg_short | None | 0.0 |
+| away | close_win_rate | 0.625 | 0.0 |
+| away | continuity | None | 0.0 |
+| away | def_cpoe | -1.732939254375399 | 0.0 |
+| away | def_explosive | 0.09001940582123759 | 0.0 |
+| away | def_off_ppd | 1.8880115891801583 | 0.0 |
+| away | def_off_ypp | 5.1292094006107645 | 0.0 |
+| away | def_pass_epa | -0.025454555383395215 | 0.0 |
+| away | def_rush_epa | -0.0417320545570116 | 0.0 |
+| away | def_rush_success | 0.40856107896342436 | 0.0 |
+| away | divisional | 0.0 | 0.0 |
+| away | drives | 9.0 | 0.0 |
+| away | elo_qb_adjustment | None | 0.0 |
+| away | fg_share | 0.09860152717084517 | 0.0 |
+| away | fumble_recovery | 0.3392857142857143 | 0.0 |
+| away | home_divisional | 0.0 | 0.0 |
+| away | home_nondivisional | 0.0 | 0.0 |
+| away | luck_index | -0.0357142857142857 | 0.0 |
+| away | momentum | -0.1268969371455659 | 0.0 |
+| away | neutral | 0.0 | 0.0 |
+| away | off_cpoe | 1.4901400744407298 | 0.0 |
+| away | off_explosive | 0.10961731082184516 | 0.0 |
+| away | off_off_ppd | 2.4991812571510934 | 0.0 |
+| away | off_off_ypp | 5.7814967337956205 | 0.0 |
+| away | off_pass_epa | 0.10663741823920264 | 0.0 |
+| away | off_rush_epa | 0.05287026271409665 | 0.0 |
+| away | off_rush_success | 0.463412788593069 | 0.0 |
+| away | opponent_drives | 10.294117647058822 | 0.0 |
+| away | plays_per_drive | 6.380262711145064 | 0.0 |
+| away | pressure_allowed | None | 0.0 |
+| away | pressure_generated | None | 0.0 |
+| away | pythagorean | 0.6579222475956522 | 0.0 |
+| away | qb_backup | None | 0.0 |
+| away | qb_career_starts | None | 0.0 |
+| away | qb_cpoe | None | 0.0 |
+| away | qb_epa | None | 0.0 |
+| away | rb_share | 0.18441889010722767 | 0.0 |
+| away | redzone_td | 0.6778711484593838 | 0.0 |
+| away | referee | None | 0.0 |
+| away | rest_days | 252 | 0.0 |
+| away | return_points | 1.0588235294117645 | 0.0 |
+| away | schedule_strength | None | 0.0 |
+| away | season_fg_long | 1.0 | 0.0 |
+| away | season_fg_medium | 1.0 | 0.0 |
+| away | season_fg_short | 0.9 | 0.0 |
+| away | te_share | 0.2611642400708552 | 0.0 |
+| away | travel_miles | 1290.1326932161214 | 0.0 |
+| away | turnover_margin | 0.058823529411764705 | 0.0 |
+| away | wind | None | 0.0 |
+| home | football_baseline | 20.731739933699902 | 20.731739933699902 |
+| home | baseline | 20.731739933699902 | -0.15990903908756335 |
+| home | elo | 100.66454389788714 | 0.922110779201287 |
+| home | elo_difference | 0.8411913306367751 | 0.008301400688536078 |
+| home | calibration_intercept | 1.0 | 2.8883545397390087 |
+| home | career_fg_long | None | 0.0 |
+| home | career_fg_medium | None | 0.0 |
+| home | career_fg_short | None | 0.0 |
+| home | close_win_rate | 0.6 | 0.0 |
+| home | continuity | None | 0.0 |
+| home | def_cpoe | -2.256924864102496 | 0.0 |
+| home | def_explosive | 0.10243969035482588 | 0.0 |
+| home | def_off_ppd | 2.149643026891133 | 0.0 |
+| home | def_off_ypp | 5.3114707394104475 | 0.0 |
+| home | def_pass_epa | -0.044398942124255346 | 0.0 |
+| home | def_rush_epa | 0.031780141172193396 | 0.0 |
+| home | def_rush_success | 0.44224364246833664 | 0.0 |
+| home | divisional | 0.0 | 0.0 |
+| home | drives | 10.294117647058822 | 0.0 |
+| home | elo_qb_adjustment | None | 0.0 |
+| home | fg_share | 0.3904339126795043 | 0.0 |
+| home | fumble_recovery | 0.511904761904762 | 0.0 |
+| home | home_divisional | 0.0 | 0.0 |
+| home | home_nondivisional | 1.0 | 0.0 |
+| home | luck_index | 0.11190476190476195 | 0.0 |
+| home | momentum | 0.2144102808310647 | 0.0 |
+| home | neutral | 0.0 | 0.0 |
+| home | off_cpoe | -0.3000114073985306 | 0.0 |
+| home | off_explosive | 0.0898707876765435 | 0.0 |
+| home | off_off_ppd | 2.14840061790031 | 0.0 |
+| home | off_off_ypp | 5.351035599828878 | 0.0 |
+| home | off_pass_epa | 0.05330396150998522 | 0.0 |
+| home | off_rush_epa | -0.047415532742593455 | 0.0 |
+| home | off_rush_success | 0.4068575957424523 | 0.0 |
+| home | opponent_drives | 9.0 | 0.0 |
+| home | plays_per_drive | 5.820397086573557 | 0.0 |
+| home | pressure_allowed | None | 0.0 |
+| home | pressure_generated | None | 0.0 |
+| home | pythagorean | 0.6781366339630288 | 0.0 |
+| home | qb_backup | None | 0.0 |
+| home | qb_career_starts | None | 0.0 |
+| home | qb_cpoe | None | 0.0 |
+| home | qb_epa | None | 0.0 |
+| home | rb_share | 0.13528680662594458 | 0.0 |
+| home | redzone_td | 0.503921568627451 | 0.0 |
+| home | referee | None | 0.0 |
+| home | rest_days | 252 | 0.0 |
+| home | return_points | 1.4117647058823528 | 0.0 |
+| home | schedule_strength | None | 0.0 |
+| home | season_fg_long | 0.6923076923076924 | 0.0 |
+| home | season_fg_medium | 1.0 | 0.0 |
+| home | season_fg_short | 1.0 | 0.0 |
+| home | te_share | 0.24889803690728918 | 0.0 |
+| home | travel_miles | 0.0 | 0.0 |
+| home | turnover_margin | 0.588235294117647 | 0.0 |
+| home | wind | None | 0.0 |
+
+2026_01_BAL_IND · projection-v2-172f3e04-a39aa883 · team MAE 8.443741633583079
+| Side | Input | Value | Contribution |
+|---|---|---|---|
+| away | football_baseline | 20.173996359955897 | 20.173996359955897 |
+| away | baseline | 20.173996359955897 | -0.0520639093797343 |
+| away | elo | 43.11737427300841 | 0.3951026322980732 |
+| away | elo_difference | 77.69272388967283 | 0.7667202550741281 |
+| away | calibration_intercept | 1.0 | 2.8883545397390087 |
+| away | career_fg_long | None | 0.0 |
+| away | career_fg_medium | None | 0.0 |
+| away | career_fg_short | None | 0.0 |
+| away | close_win_rate | 0.19999999999999998 | 0.0 |
+| away | continuity | None | 0.0 |
+| away | def_cpoe | -0.027057797863784705 | 0.0 |
+| away | def_explosive | 0.09700544706485781 | 0.0 |
+| away | def_off_ppd | 2.207811895327029 | 0.0 |
+| away | def_off_ypp | 5.533204792284101 | 0.0 |
+| away | def_pass_epa | 0.04295588194445706 | 0.0 |
+| away | def_rush_epa | -0.020076288698825842 | 0.0 |
+| away | def_rush_success | 0.4402369232983523 | 0.0 |
+| away | divisional | 0.0 | 0.0 |
+| away | drives | 8.882352941176471 | 0.0 |
+| away | elo_qb_adjustment | None | 0.0 |
+| away | fg_share | 0.2543171878475353 | 0.0 |
+| away | fumble_recovery | 0.4785714285714286 | 0.0 |
+| away | home_divisional | 0.0 | 0.0 |
+| away | home_nondivisional | 0.0 | 0.0 |
+| away | luck_index | -0.32142857142857145 | 0.0 |
+| away | momentum | 0.43373258655388613 | 0.0 |
+| away | neutral | 0.0 | 0.0 |
+| away | off_cpoe | 2.325494215837219 | 0.0 |
+| away | off_explosive | 0.11012420012296895 | 0.0 |
+| away | off_off_ppd | 2.3497686776862627 | 0.0 |
+| away | off_off_ypp | 5.7939902760149105 | 0.0 |
+| away | off_pass_epa | 0.06713018919038519 | 0.0 |
+| away | off_rush_epa | 0.03848131396098339 | 0.0 |
+| away | off_rush_success | 0.43113042783535716 | 0.0 |
+| away | opponent_drives | 8.823529411764707 | 0.0 |
+| away | plays_per_drive | 5.665421016891605 | 0.0 |
+| away | pressure_allowed | None | 0.0 |
+| away | pressure_generated | None | 0.0 |
+| away | pythagorean | 0.5374241366046332 | 0.0 |
+| away | qb_backup | None | 0.0 |
+| away | qb_career_starts | None | 0.0 |
+| away | qb_cpoe | None | 0.0 |
+| away | qb_epa | None | 0.0 |
+| away | rb_share | 0.18127144301785808 | 0.0 |
+| away | redzone_td | 0.5764705882352941 | 0.0 |
+| away | referee | None | 0.0 |
+| away | rest_days | 252 | 0.0 |
+| away | return_points | 0.0 | 0.0 |
+| away | schedule_strength | None | 0.0 |
+| away | season_fg_long | 0.25 | 0.0 |
+| away | season_fg_medium | 0.8888888888888888 | 0.0 |
+| away | season_fg_short | 1.0 | 0.0 |
+| away | te_share | 0.303740027337119 | 0.0 |
+| away | travel_miles | 509.3885124212152 | 0.0 |
+| away | turnover_margin | -0.17647058823529413 | 0.0 |
+| away | wind | None | 0.0 |
+| home | football_baseline | 21.57787094593191 | 21.57787094593191 |
+| home | baseline | 21.57787094593191 | -0.32351667718445726 |
+| home | elo | -34.575349616664425 | -0.3163954085588027 |
+| home | elo_difference | -77.69272388967283 | -0.7667202550741281 |
+| home | calibration_intercept | 1.0 | 2.8883545397390087 |
+| home | career_fg_long | None | 0.0 |
+| home | career_fg_medium | None | 0.0 |
+| home | career_fg_short | None | 0.0 |
+| home | close_win_rate | 0.3333333333333333 | 0.0 |
+| home | continuity | None | 0.0 |
+| home | def_cpoe | 1.62012388474877 | 0.0 |
+| home | def_explosive | 0.10314606057957526 | 0.0 |
+| home | def_off_ppd | 2.2815396859980086 | 0.0 |
+| home | def_off_ypp | 5.6153705604209305 | 0.0 |
+| home | def_pass_epa | 0.082455060349539 | 0.0 |
+| home | def_rush_epa | -0.01829118010023118 | 0.0 |
+| home | def_rush_success | 0.42490917802047423 | 0.0 |
+| home | divisional | 0.0 | 0.0 |
+| home | drives | 8.823529411764707 | 0.0 |
+| home | elo_qb_adjustment | None | 0.0 |
+| home | fg_share | 0.2205299833577203 | 0.0 |
+| home | fumble_recovery | 0.5974358974358974 | 0.0 |
+| home | home_divisional | 0.0 | 0.0 |
+| home | home_nondivisional | 1.0 | 0.0 |
+| home | luck_index | -0.06923076923076926 | 0.0 |
+| home | momentum | -0.7406602504835936 | 0.0 |
+| home | neutral | 0.0 | 0.0 |
+| home | off_cpoe | 0.8958526608211997 | 0.0 |
+| home | off_explosive | 0.09519255144580162 | 0.0 |
+| home | off_off_ppd | 2.59319527853146 | 0.0 |
+| home | off_off_ypp | 5.734399855873505 | 0.0 |
+| home | off_pass_epa | 0.08345623147315327 | 0.0 |
+| home | off_rush_epa | 0.06181004990993128 | 0.0 |
+| home | off_rush_success | 0.4533925383880768 | 0.0 |
+| home | opponent_drives | 8.882352941176471 | 0.0 |
+| home | plays_per_drive | 6.266802478567184 | 0.0 |
+| home | pressure_allowed | None | 0.0 |
+| home | pressure_generated | None | 0.0 |
+| home | pythagorean | 0.5724599026334206 | 0.0 |
+| home | qb_backup | None | 0.0 |
+| home | qb_career_starts | None | 0.0 |
+| home | qb_cpoe | None | 0.0 |
+| home | qb_epa | None | 0.0 |
+| home | rb_share | 0.1488280385809503 | 0.0 |
+| home | redzone_td | 0.6943977591036414 | 0.0 |
+| home | referee | None | 0.0 |
+| home | rest_days | 252 | 0.0 |
+| home | return_points | 0.3529411764705882 | 0.0 |
+| home | schedule_strength | None | 0.0 |
+| home | season_fg_long | 0.7142857142857143 | 0.0 |
+| home | season_fg_medium | 1.0 | 0.0 |
+| home | season_fg_short | 1.0 | 0.0 |
+| home | te_share | 0.2680199791986581 | 0.0 |
+| home | travel_miles | 0.0 | 0.0 |
+| home | turnover_margin | 0.058823529411764705 | 0.0 |
+| home | wind | None | 0.0 |
 
 2026_01_CLE_JAX · projection-v2-172f3e04-a39aa883 · team MAE 8.350780072968108
 | Side | Input | Value | Contribution |
@@ -144,6 +511,470 @@ actual minus projected. 2016–2025 adaptive OOF; coverage excludes 2016 (no pri
 | home | te_share | 0.19796587508643806 | 0.0 |
 | home | travel_miles | 0.0 | 0.0 |
 | home | turnover_margin | 0.4117647058823529 | 0.0 |
+| home | wind | None | 0.0 |
+
+2026_01_NO_DET · projection-v2-172f3e04-a39aa883 · team MAE 7.382015546137234
+| Side | Input | Value | Contribution |
+|---|---|---|---|
+| away | football_baseline | 19.193247348759126 | 19.193247348759126 |
+| away | baseline | 19.193247348759126 | 0.1375734245178804 |
+| away | elo | -64.07580033729369 | -0.5865560084359364 |
+| away | elo_difference | -124.16900516083183 | -1.225377185184112 |
+| away | calibration_intercept | 1.0 | 2.8883545397390087 |
+| away | career_fg_long | None | 0.0 |
+| away | career_fg_medium | None | 0.0 |
+| away | career_fg_short | None | 0.0 |
+| away | close_win_rate | 0.2857142857142857 | 0.0 |
+| away | continuity | None | 0.0 |
+| away | def_cpoe | -0.246293334219592 | 0.0 |
+| away | def_explosive | 0.09932113229678838 | 0.0 |
+| away | def_off_ppd | 2.1970897614806995 | 0.0 |
+| away | def_off_ypp | 5.405466767943396 | 0.0 |
+| away | def_pass_epa | 0.009607450984471674 | 0.0 |
+| away | def_rush_epa | -0.009614242902079363 | 0.0 |
+| away | def_rush_success | 0.4243279888298358 | 0.0 |
+| away | divisional | 0.0 | 0.0 |
+| away | drives | 9.117647058823529 | 0.0 |
+| away | elo_qb_adjustment | None | 0.0 |
+| away | fg_share | 0.30858176654636693 | 0.0 |
+| away | fumble_recovery | 0.37500000000000006 | 0.0 |
+| away | home_divisional | 0.0 | 0.0 |
+| away | home_nondivisional | 0.0 | 0.0 |
+| away | luck_index | -0.33928571428571425 | 0.0 |
+| away | momentum | 0.7941342544010545 | 0.0 |
+| away | neutral | 0.0 | 0.0 |
+| away | off_cpoe | 1.1059087660415545 | 0.0 |
+| away | off_explosive | 0.08001530334099193 | 0.0 |
+| away | off_off_ppd | 1.9200737076537495 | 0.0 |
+| away | off_off_ypp | 5.2437228986078415 | 0.0 |
+| away | off_pass_epa | -0.002478556109298008 | 0.0 |
+| away | off_rush_epa | -0.08200000898294871 | 0.0 |
+| away | off_rush_success | 0.40320560753766105 | 0.0 |
+| away | opponent_drives | 9.529411764705882 | 0.0 |
+| away | plays_per_drive | 6.086242678889738 | 0.0 |
+| away | pressure_allowed | None | 0.0 |
+| away | pressure_generated | None | 0.0 |
+| away | pythagorean | 0.37006307465320376 | 0.0 |
+| away | qb_backup | None | 0.0 |
+| away | qb_career_starts | None | 0.0 |
+| away | qb_cpoe | None | 0.0 |
+| away | qb_epa | None | 0.0 |
+| away | rb_share | 0.15770267898557214 | 0.0 |
+| away | redzone_td | 0.5333333333333333 | 0.0 |
+| away | referee | None | 0.0 |
+| away | rest_days | 252 | 0.0 |
+| away | return_points | 1.0588235294117645 | 0.0 |
+| away | schedule_strength | None | 0.0 |
+| away | season_fg_long | 0.5833333333333334 | 0.0 |
+| away | season_fg_medium | 0.5555555555555556 | 0.0 |
+| away | season_fg_short | 0.8888888888888888 | 0.0 |
+| away | te_share | 0.21649879704715203 | 0.0 |
+| away | travel_miles | 940.8509079797012 | 0.0 |
+| away | turnover_margin | -0.058823529411764705 | 0.0 |
+| away | wind | None | 0.0 |
+| home | football_baseline | 21.46639140760594 | 21.46639140760594 |
+| home | baseline | 21.46639140760594 | -0.30196102717520906 |
+| home | elo | 60.093204823538144 | 0.550564682975713 |
+| home | elo_difference | 124.16900516083183 | 1.225377185184112 |
+| home | calibration_intercept | 1.0 | 2.8883545397390087 |
+| home | career_fg_long | None | 0.0 |
+| home | career_fg_medium | None | 0.0 |
+| home | career_fg_short | None | 0.0 |
+| home | close_win_rate | 0.2857142857142857 | 0.0 |
+| home | continuity | None | 0.0 |
+| home | def_cpoe | 1.0758262108644518 | 0.0 |
+| home | def_explosive | 0.09675789656314873 | 0.0 |
+| home | def_off_ppd | 2.2518203200855518 | 0.0 |
+| home | def_off_ypp | 5.328726258186728 | 0.0 |
+| home | def_pass_epa | 0.04342926518924631 | 0.0 |
+| home | def_rush_epa | -0.028351995020000437 | 0.0 |
+| home | def_rush_success | 0.4199588959658218 | 0.0 |
+| home | divisional | 0.0 | 0.0 |
+| home | drives | 9.529411764705882 | 0.0 |
+| home | elo_qb_adjustment | None | 0.0 |
+| home | fg_share | 0.17362050169826532 | 0.0 |
+| home | fumble_recovery | 0.24444444444444446 | 0.0 |
+| home | home_divisional | 0.0 | 0.0 |
+| home | home_nondivisional | 1.0 | 0.0 |
+| home | luck_index | -0.46984126984126984 | 0.0 |
+| home | momentum | -0.507347697571931 | 0.0 |
+| home | neutral | 0.0 | 0.0 |
+| home | off_cpoe | 1.9719168497777249 | 0.0 |
+| home | off_explosive | 0.10061426841137382 | 0.0 |
+| home | off_off_ppd | 2.3529576474766056 | 0.0 |
+| home | off_off_ypp | 5.764490128742961 | 0.0 |
+| home | off_pass_epa | 0.11506806532325875 | 0.0 |
+| home | off_rush_epa | -0.03321406479537128 | 0.0 |
+| home | off_rush_success | 0.4146015889786124 | 0.0 |
+| home | opponent_drives | 9.117647058823529 | 0.0 |
+| home | plays_per_drive | 5.995484254307784 | 0.0 |
+| home | pressure_allowed | None | 0.0 |
+| home | pressure_generated | None | 0.0 |
+| home | pythagorean | 0.5893392714465169 | 0.0 |
+| home | qb_backup | None | 0.0 |
+| home | qb_career_starts | None | 0.0 |
+| home | qb_cpoe | None | 0.0 |
+| home | qb_epa | None | 0.0 |
+| home | rb_share | 0.22494344212007353 | 0.0 |
+| home | redzone_td | 0.642016806722689 | 0.0 |
+| home | referee | None | 0.0 |
+| home | rest_days | 252 | 0.0 |
+| home | return_points | 0.3529411764705882 | 0.0 |
+| home | schedule_strength | None | 0.0 |
+| home | season_fg_long | 0.37499999999999994 | 0.0 |
+| home | season_fg_medium | 0.7999999999999999 | 0.0 |
+| home | season_fg_short | 1.0 | 0.0 |
+| home | te_share | 0.16970895565817848 | 0.0 |
+| home | travel_miles | 0.0 | 0.0 |
+| home | turnover_margin | 0.11764705882352944 | 0.0 |
+| home | wind | None | 0.0 |
+
+2026_01_NYJ_TEN · projection-v2-172f3e04-a39aa883 · team MAE 6.739548525911747
+| Side | Input | Value | Contribution |
+|---|---|---|---|
+| away | football_baseline | 19.11171087116824 | 19.11171087116824 |
+| away | baseline | 19.11171087116824 | 0.15333929330715443 |
+| away | elo | -140.0945306603512 | -1.2827238731395714 |
+| away | elo_difference | 6.047671889572939 | 0.059682198044215394 |
+| away | calibration_intercept | 1.0 | 2.8883545397390087 |
+| away | career_fg_long | None | 0.0 |
+| away | career_fg_medium | None | 0.0 |
+| away | career_fg_short | None | 0.0 |
+| away | close_win_rate | 0.37499999999999994 | 0.0 |
+| away | continuity | None | 0.0 |
+| away | def_cpoe | 4.022332098582304 | 0.0 |
+| away | def_explosive | 0.10689866402916529 | 0.0 |
+| away | def_off_ppd | 2.427270296533659 | 0.0 |
+| away | def_off_ypp | 5.838243656850129 | 0.0 |
+| away | def_pass_epa | 0.13437572997040334 | 0.0 |
+| away | def_rush_epa | 0.03626059017199609 | 0.0 |
+| away | def_rush_success | 0.4342450517132173 | 0.0 |
+| away | divisional | 0.0 | 0.0 |
+| away | drives | 9.117647058823529 | 0.0 |
+| away | elo_qb_adjustment | None | 0.0 |
+| away | fg_share | 0.3330328984740749 | 0.0 |
+| away | fumble_recovery | 0.30128205128205127 | 0.0 |
+| away | home_divisional | 0.0 | 0.0 |
+| away | home_nondivisional | 0.0 | 0.0 |
+| away | luck_index | -0.3237179487179488 | 0.0 |
+| away | momentum | -0.7564932811989928 | 0.0 |
+| away | neutral | 0.0 | 0.0 |
+| away | off_cpoe | -3.4506284036580834 | 0.0 |
+| away | off_explosive | 0.08905558675242739 | 0.0 |
+| away | off_off_ppd | 1.7381025856440342 | 0.0 |
+| away | off_off_ypp | 4.809153607803687 | 0.0 |
+| away | off_pass_epa | -0.100447783306928 | 0.0 |
+| away | off_rush_epa | -0.0685470861612117 | 0.0 |
+| away | off_rush_success | 0.4183259928146071 | 0.0 |
+| away | opponent_drives | 9.235294117647058 | 0.0 |
+| away | plays_per_drive | 5.249823868941516 | 0.0 |
+| away | pressure_allowed | None | 0.0 |
+| away | pressure_generated | None | 0.0 |
+| away | pythagorean | 0.22708683353337283 | 0.0 |
+| away | qb_backup | None | 0.0 |
+| away | qb_career_starts | None | 0.0 |
+| away | qb_cpoe | None | 0.0 |
+| away | qb_epa | None | 0.0 |
+| away | rb_share | 0.21351288125833517 | 0.0 |
+| away | redzone_td | 0.35888888888888887 | 0.0 |
+| away | referee | None | 0.0 |
+| away | rest_days | 252 | 0.0 |
+| away | return_points | 1.0588235294117645 | 0.0 |
+| away | schedule_strength | None | 0.0 |
+| away | season_fg_long | 0.875 | 0.0 |
+| away | season_fg_medium | 1.0 | 0.0 |
+| away | season_fg_short | 1.0 | 0.0 |
+| away | te_share | 0.2003301233716968 | 0.0 |
+| away | travel_miles | 757.0367545756321 | 0.0 |
+| away | turnover_margin | -1.0 | 0.0 |
+| away | wind | None | 0.0 |
+| home | football_baseline | 19.92228914043722 | 19.92228914043722 |
+| home | baseline | 19.92228914043722 | -0.003393877100979359 |
+| home | elo | -146.14220254992415 | -1.3381075240884899 |
+| home | elo_difference | -6.047671889572939 | -0.059682198044215394 |
+| home | calibration_intercept | 1.0 | 2.8883545397390087 |
+| home | career_fg_long | None | 0.0 |
+| home | career_fg_medium | None | 0.0 |
+| home | career_fg_short | None | 0.0 |
+| home | close_win_rate | 0.39999999999999997 | 0.0 |
+| home | continuity | None | 0.0 |
+| home | def_cpoe | 1.099158853618274 | 0.0 |
+| home | def_explosive | 0.10545314088717422 | 0.0 |
+| home | def_off_ppd | 2.563910664062687 | 0.0 |
+| home | def_off_ypp | 5.650817493271019 | 0.0 |
+| home | def_pass_epa | 0.17618224583993838 | 0.0 |
+| home | def_rush_epa | 0.015261321001051391 | 0.0 |
+| home | def_rush_success | 0.43433802616862716 | 0.0 |
+| home | divisional | 0.0 | 0.0 |
+| home | drives | 9.235294117647058 | 0.0 |
+| home | elo_qb_adjustment | None | 0.0 |
+| home | fg_share | 0.3385869065145381 | 0.0 |
+| home | fumble_recovery | 0.34722222222222227 | 0.0 |
+| home | home_divisional | 0.0 | 0.0 |
+| home | home_nondivisional | 1.0 | 0.0 |
+| home | luck_index | -0.25277777777777777 | 0.0 |
+| home | momentum | 0.2838355148641159 | 0.0 |
+| home | neutral | 0.0 | 0.0 |
+| home | off_cpoe | -1.615128669293104 | 0.0 |
+| home | off_explosive | 0.09443919231363014 | 0.0 |
+| home | off_off_ppd | 1.7781267126992713 | 0.0 |
+| home | off_off_ypp | 5.016679427694675 | 0.0 |
+| home | off_pass_epa | -0.07097720562464688 | 0.0 |
+| home | off_rush_epa | -0.06054554241464738 | 0.0 |
+| home | off_rush_success | 0.39574016530299233 | 0.0 |
+| home | opponent_drives | 9.117647058823529 | 0.0 |
+| home | plays_per_drive | 5.139122315592903 | 0.0 |
+| home | pressure_allowed | None | 0.0 |
+| home | pressure_generated | None | 0.0 |
+| home | pythagorean | 0.2254980804917778 | 0.0 |
+| home | qb_backup | None | 0.0 |
+| home | qb_career_starts | None | 0.0 |
+| home | qb_cpoe | None | 0.0 |
+| home | qb_epa | None | 0.0 |
+| home | rb_share | 0.16204893093774503 | 0.0 |
+| home | redzone_td | 0.5885416666666667 | 0.0 |
+| home | referee | None | 0.0 |
+| home | rest_days | 252 | 0.0 |
+| home | return_points | 1.4117647058823528 | 0.0 |
+| home | schedule_strength | None | 0.0 |
+| home | season_fg_long | 0.6923076923076924 | 0.0 |
+| home | season_fg_medium | 0.7777777777777777 | 0.0 |
+| home | season_fg_short | 1.0 | 0.0 |
+| home | te_share | 0.2625605680868839 | 0.0 |
+| home | travel_miles | 0.0 | 0.0 |
+| home | turnover_margin | -0.4117647058823529 | 0.0 |
+| home | wind | None | 0.0 |
+
+2026_01_TB_CIN · projection-v2-172f3e04-a39aa883 · team MAE 6.156718941655543
+| Side | Input | Value | Contribution |
+|---|---|---|---|
+| away | football_baseline | 21.441240845096956 | 21.441240845096956 |
+| away | baseline | 21.441240845096956 | -0.2970979219711478 |
+| away | elo | -20.015625335311597 | -0.18305968826266047 |
+| away | elo_difference | -0.27957758391903553 | -0.002759045966258167 |
+| away | calibration_intercept | 1.0 | 2.8883545397390087 |
+| away | career_fg_long | None | 0.0 |
+| away | career_fg_medium | None | 0.0 |
+| away | career_fg_short | None | 0.0 |
+| away | close_win_rate | 0.5 | 0.0 |
+| away | continuity | None | 0.0 |
+| away | def_cpoe | 0.5907383530285989 | 0.0 |
+| away | def_explosive | 0.10778722775225323 | 0.0 |
+| away | def_off_ppd | 2.3675871138914886 | 0.0 |
+| away | def_off_ypp | 5.855125132454332 | 0.0 |
+| away | def_pass_epa | 0.09836096818233178 | 0.0 |
+| away | def_rush_epa | 0.03935554971235714 | 0.0 |
+| away | def_rush_success | 0.44092360580121853 | 0.0 |
+| away | divisional | 0.0 | 0.0 |
+| away | drives | 9.764705882352942 | 0.0 |
+| away | elo_qb_adjustment | None | 0.0 |
+| away | fg_share | 0.2282045569561136 | 0.0 |
+| away | fumble_recovery | 0.565625 | 0.0 |
+| away | home_divisional | 0.0 | 0.0 |
+| away | home_nondivisional | 0.0 | 0.0 |
+| away | luck_index | 0.06562500000000004 | 0.0 |
+| away | momentum | 0.0038155102370929345 | 0.0 |
+| away | neutral | 0.0 | 0.0 |
+| away | off_cpoe | -0.522012458048757 | 0.0 |
+| away | off_explosive | 0.09797188748728701 | 0.0 |
+| away | off_off_ppd | 2.1603767912842655 | 0.0 |
+| away | off_off_ypp | 5.319353068529186 | 0.0 |
+| away | off_pass_epa | 0.05908240387836418 | 0.0 |
+| away | off_rush_epa | 0.014708353034225746 | 0.0 |
+| away | off_rush_success | 0.4328547707312782 | 0.0 |
+| away | opponent_drives | 9.176470588235293 | 0.0 |
+| away | plays_per_drive | 6.040074304780187 | 0.0 |
+| away | pressure_allowed | None | 0.0 |
+| away | pressure_generated | None | 0.0 |
+| away | pythagorean | 0.4536682843267438 | 0.0 |
+| away | qb_backup | None | 0.0 |
+| away | qb_career_starts | None | 0.0 |
+| away | qb_cpoe | None | 0.0 |
+| away | qb_epa | None | 0.0 |
+| away | rb_share | 0.16303233379710205 | 0.0 |
+| away | redzone_td | 0.6385154061624649 | 0.0 |
+| away | referee | None | 0.0 |
+| away | rest_days | 253 | 0.0 |
+| away | return_points | 0.7058823529411764 | 0.0 |
+| away | schedule_strength | None | 0.0 |
+| away | season_fg_long | 0.9 | 0.0 |
+| away | season_fg_medium | 0.7142857142857143 | 0.0 |
+| away | season_fg_short | 0.9375 | 0.0 |
+| away | te_share | 0.16796357033273007 | 0.0 |
+| away | travel_miles | 776.9211020946989 | 0.0 |
+| away | turnover_margin | 0.3529411764705882 | 0.0 |
+| away | wind | None | 0.0 |
+| home | football_baseline | 21.422801695570655 | 21.422801695570655 |
+| home | baseline | 21.422801695570655 | -0.2935325335633224 |
+| home | elo | -19.73604775139256 | -0.18049935965958092 |
+| home | elo_difference | 0.27957758391903553 | 0.002759045966258167 |
+| home | calibration_intercept | 1.0 | 2.8883545397390087 |
+| home | career_fg_long | None | 0.0 |
+| home | career_fg_medium | None | 0.0 |
+| home | career_fg_short | None | 0.0 |
+| home | close_win_rate | 0.37499999999999994 | 0.0 |
+| home | continuity | None | 0.0 |
+| home | def_cpoe | 1.108108256718665 | 0.0 |
+| home | def_explosive | 0.09889655814059439 | 0.0 |
+| home | def_off_ppd | 2.285523494279726 | 0.0 |
+| home | def_off_ypp | 5.6985092972973845 | 0.0 |
+| home | def_pass_epa | 0.056503254826976684 | 0.0 |
+| home | def_rush_epa | -0.038866623993328846 | 0.0 |
+| home | def_rush_success | 0.4200306260593313 | 0.0 |
+| home | divisional | 0.0 | 0.0 |
+| home | drives | 9.176470588235293 | 0.0 |
+| home | elo_qb_adjustment | None | 0.0 |
+| home | fg_share | 0.2416781294445409 | 0.0 |
+| home | fumble_recovery | 0.37962962962962965 | 0.0 |
+| home | home_divisional | 0.0 | 0.0 |
+| home | home_nondivisional | 1.0 | 0.0 |
+| home | luck_index | -0.2453703703703704 | 0.0 |
+| home | momentum | 0.46300020304944 | 0.0 |
+| home | neutral | 0.0 | 0.0 |
+| home | off_cpoe | 0.3874170061936147 | 0.0 |
+| home | off_explosive | 0.08532292133368828 | 0.0 |
+| home | off_off_ppd | 2.238546429008487 | 0.0 |
+| home | off_off_ypp | 5.331815949592869 | 0.0 |
+| home | off_pass_epa | -0.015053628347357746 | 0.0 |
+| home | off_rush_epa | 0.023560815120918226 | 0.0 |
+| home | off_rush_success | 0.4450535413181421 | 0.0 |
+| home | opponent_drives | 9.764705882352942 | 0.0 |
+| home | plays_per_drive | 5.949242424242424 | 0.0 |
+| home | pressure_allowed | None | 0.0 |
+| home | pressure_generated | None | 0.0 |
+| home | pythagorean | 0.39912981449526114 | 0.0 |
+| home | qb_backup | None | 0.0 |
+| home | qb_career_starts | None | 0.0 |
+| home | qb_cpoe | None | 0.0 |
+| home | qb_epa | None | 0.0 |
+| home | rb_share | 0.1765300852847749 | 0.0 |
+| home | redzone_td | 0.6738095238095239 | 0.0 |
+| home | referee | None | 0.0 |
+| home | rest_days | 252 | 0.0 |
+| home | return_points | 0.7058823529411764 | 0.0 |
+| home | schedule_strength | None | 0.0 |
+| home | season_fg_long | 0.7142857142857143 | 0.0 |
+| home | season_fg_medium | 1.0 | 0.0 |
+| home | season_fg_short | 1.0 | 0.0 |
+| home | te_share | 0.2127594688499458 | 0.0 |
+| home | travel_miles | 0.0 | 0.0 |
+| home | turnover_margin | -2.7755575615628914e-17 | 0.0 |
+| home | wind | None | 0.0 |
+
+2026_01_ATL_PIT · projection-v2-172f3e04-a39aa883 · team MAE 6.080213228890882
+| Side | Input | Value | Contribution |
+|---|---|---|---|
+| away | football_baseline | 19.07268502819104 | 19.07268502819104 |
+| away | baseline | 19.07268502819104 | 0.16088531857030736 |
+| away | elo | -29.86509476778133 | -0.2732596175975285 |
+| away | elo_difference | -58.017269990979685 | -0.5725506047304557 |
+| away | calibration_intercept | 1.0 | 2.8883545397390087 |
+| away | career_fg_long | None | 0.0 |
+| away | career_fg_medium | None | 0.0 |
+| away | career_fg_short | None | 0.0 |
+| away | close_win_rate | 0.5 | 0.0 |
+| away | continuity | None | 0.0 |
+| away | def_cpoe | -0.5947038220617378 | 0.0 |
+| away | def_explosive | 0.09414050214576307 | 0.0 |
+| away | def_off_ppd | 2.0653211955557262 | 0.0 |
+| away | def_off_ypp | 5.388707286660741 | 0.0 |
+| away | def_pass_epa | 0.027922750663724624 | 0.0 |
+| away | def_rush_epa | -0.02400111328383185 | 0.0 |
+| away | def_rush_success | 0.4084886261105558 | 0.0 |
+| away | divisional | 0.0 | 0.0 |
+| away | drives | 9.588235294117647 | 0.0 |
+| away | elo_qb_adjustment | None | 0.0 |
+| away | fg_share | 0.2810872389784598 | 0.0 |
+| away | fumble_recovery | 0.37187499999999996 | 0.0 |
+| away | home_divisional | 0.0 | 0.0 |
+| away | home_nondivisional | 0.0 | 0.0 |
+| away | luck_index | -0.12812500000000004 | 0.0 |
+| away | momentum | 0.23130770572730794 | 0.0 |
+| away | neutral | 0.0 | 0.0 |
+| away | off_cpoe | -1.009460015103241 | 0.0 |
+| away | off_explosive | 0.09764622487292084 | 0.0 |
+| away | off_off_ppd | 2.05195684227599 | 0.0 |
+| away | off_off_ypp | 5.509647687207054 | 0.0 |
+| away | off_pass_epa | 0.022750940514306157 | 0.0 |
+| away | off_rush_epa | -0.027445872201927728 | 0.0 |
+| away | off_rush_success | 0.4251544079450669 | 0.0 |
+| away | opponent_drives | 8.941176470588236 | 0.0 |
+| away | plays_per_drive | 5.836274509803921 | 0.0 |
+| away | pressure_allowed | None | 0.0 |
+| away | pressure_generated | None | 0.0 |
+| away | pythagorean | 0.4250297123824779 | 0.0 |
+| away | qb_backup | None | 0.0 |
+| away | qb_career_starts | None | 0.0 |
+| away | qb_cpoe | None | 0.0 |
+| away | qb_epa | None | 0.0 |
+| away | rb_share | 0.2360230042933502 | 0.0 |
+| away | redzone_td | 0.628125 | 0.0 |
+| away | referee | None | 0.0 |
+| away | rest_days | 252 | 0.0 |
+| away | return_points | 0.3529411764705882 | 0.0 |
+| away | schedule_strength | None | 0.0 |
+| away | season_fg_long | 0.7272727272727272 | 0.0 |
+| away | season_fg_medium | 0.8333333333333335 | 0.0 |
+| away | season_fg_short | 0.8461538461538463 | 0.0 |
+| away | te_share | 0.2532654088035642 | 0.0 |
+| away | travel_miles | 521.4898074048928 | 0.0 |
+| away | turnover_margin | 0.23529411764705882 | 0.0 |
+| away | wind | None | 0.0 |
+| home | football_baseline | 20.227825262653106 | 20.227825262653106 |
+| home | baseline | 20.227825262653106 | -0.06247224981912601 |
+| home | elo | 28.152175223198356 | 0.25805363630594835 |
+| home | elo_difference | 58.017269990979685 | 0.5725506047304557 |
+| home | calibration_intercept | 1.0 | 2.8883545397390087 |
+| home | career_fg_long | None | 0.0 |
+| home | career_fg_medium | None | 0.0 |
+| home | career_fg_short | None | 0.0 |
+| home | close_win_rate | 0.7 | 0.0 |
+| home | continuity | None | 0.0 |
+| home | def_cpoe | -1.6544478065545318 | 0.0 |
+| home | def_explosive | 0.09402842354786199 | 0.0 |
+| home | def_off_ppd | 2.1207379320002993 | 0.0 |
+| home | def_off_ypp | 5.278110579678605 | 0.0 |
+| home | def_pass_epa | -0.0025908554670650077 | 0.0 |
+| home | def_rush_epa | -0.004172676659006555 | 0.0 |
+| home | def_rush_success | 0.43476494957524936 | 0.0 |
+| home | divisional | 0.0 | 0.0 |
+| home | drives | 8.941176470588236 | 0.0 |
+| home | elo_qb_adjustment | None | 0.0 |
+| home | fg_share | 0.23067238813986157 | 0.0 |
+| home | fumble_recovery | 0.5424242424242424 | 0.0 |
+| home | home_divisional | 0.0 | 0.0 |
+| home | home_nondivisional | 1.0 | 0.0 |
+| home | luck_index | 0.24242424242424232 | 0.0 |
+| home | momentum | 0.19603904412677073 | 0.0 |
+| home | neutral | 0.0 | 0.0 |
+| home | off_cpoe | -0.021369343062071333 | 0.0 |
+| home | off_explosive | 0.08839723927250781 | 0.0 |
+| home | off_off_ppd | 2.245903712001006 | 0.0 |
+| home | off_off_ypp | 5.351664009498878 | 0.0 |
+| home | off_pass_epa | 0.031352896314339726 | 0.0 |
+| home | off_rush_epa | 0.0199957989130359 | 0.0 |
+| home | off_rush_success | 0.438721277559154 | 0.0 |
+| home | opponent_drives | 9.588235294117647 | 0.0 |
+| home | plays_per_drive | 5.897846108140226 | 0.0 |
+| home | pressure_allowed | None | 0.0 |
+| home | pressure_generated | None | 0.0 |
+| home | pythagorean | 0.5151110125115963 | 0.0 |
+| home | qb_backup | None | 0.0 |
+| home | qb_career_starts | None | 0.0 |
+| home | qb_cpoe | None | 0.0 |
+| home | qb_epa | None | 0.0 |
+| home | rb_share | 0.25459753104224775 | 0.0 |
+| home | redzone_td | 0.657843137254902 | 0.0 |
+| home | referee | None | 0.0 |
+| home | rest_days | 252 | 0.0 |
+| home | return_points | 0.7058823529411764 | 0.0 |
+| home | schedule_strength | None | 0.0 |
+| home | season_fg_long | 0.9 | 0.0 |
+| home | season_fg_medium | 0.9 | 0.0 |
+| home | season_fg_short | 0.7777777777777777 | 0.0 |
+| home | te_share | 0.3084172127695719 | 0.0 |
+| home | travel_miles | 0.0 | 0.0 |
+| home | turnover_margin | 0.7058823529411764 | 0.0 |
 | home | wind | None | 0.0 |
 
 Three-week team streaks: []
