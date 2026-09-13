@@ -1,3 +1,13 @@
+# Current status — Projection v3 personnel refit, September 13, 2026
+
+Version `projection-v3-b7a84dbe-2b5d9d0f` is deployed with preserved v1/v2 locks and first grades. Requested QB, PRESSURE_PROXY and career-kicker histories are implemented and entered the unchanged v2 qualification protocol. None survive its final usefulness checks; the future fit retains calibration on the mandatory raw PPD/pace baseline. Continuity/referee remain zero. V3 passes the raw-baseline gate but its adaptive historical team MAE (7.7613) is worse than v2 (7.7198). No superiority claim.
+
+[Per-season report, source limitations and qualification](work/projection-v3/report.md). [BAL/IND retrospective new-fit contribution diagnostic](work/projection-v3/BAL-IND.md); the original game lock is preserved. Score/winner disagreements come from uncentered empirical residuals plus integer rounding; tie splitting is labeled, remaining v3 contradictions are visible, and no scores/probabilities were forced into agreement.
+
+Sites release 189 succeeded. All 32 live API cards and versioned scorecards match the published engine board; live Week 1 and Week 2 rendering verified. A pending-lock color omission caught during browser checking is fixed in the publisher. Cloud probe verifies actual shared-entry sync and preserves 14 frozen files. Cloud/Mac max numerical difference 1.5632e-13. Engine tests: 43 projection + 214 legacy pass; main 309 pass/one skip; hosted projection checks 11 pass. Both configured builds/typechecks and full offline replay pass. Eighteen unrelated hosted scheduler tests fail identically on the unchanged baseline; not claimed fixed. Zero Odds API calls by this task.
+
+Main reader: `ee9e67103ac4db57a94c28ee99b559d368c1dd6f`. Deployed hosted source: `352ac12473de1f4dc387500ab69cb89786c116ec`. An extra reader fallback is local in work/site-beta at `29e31df9b7eb44b987e844b39a59812da0f41088`; its push is blocked by repeated hosting Git HTTP 500 errors. Core v3 publication is live and rendering. Retry the extra source push when service recovers, then save/deploy the matching prepared archive. Verification: work/projection-v3/verification/*.json. This status revision is identified by Git. Prior entries below are historical.
+
 # Current status — Projection v2 qualification, September 13, 2026
 
 Current step: qualified football projections deployed. Frozen version `projection-v2-172f3e04-a39aa883` retains the per-drive baseline plus scoring calibration and Elo; other optional groups are inactive. Historical intervals use strictly earlier OOF seasons. The first test season has no interval score. Original v1 locked/final/retrospective records and wager evidence are preserved. [Experiment and report](work/projection-v2/report.md).

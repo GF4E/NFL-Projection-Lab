@@ -2,6 +2,8 @@
 
 Experiment: `projection-v3-b7a84dbe-2b5d9d0f`. [Immutable experiment](experiment-ff50930b74f40a69b9a2de61669fdac211ad782b508428b2ffc12580faf964be.json). Zero Odds API credits.
 
+Requested QB, pressure and career-kicker measurements are implemented and entered qualification, but none survived the unchanged production usefulness gates. The deployed fit retains scoring calibration on the mandatory football baseline. Its adaptive historical team MAE is 7.7613, versus v2's 7.7198: this refit does not establish improved accuracy over v2.
+
 ## Decision
 Adaptive release check: **PASS**. Retained optional groups: **calibration**.
 
@@ -117,3 +119,17 @@ V2 margin residual mean/median: +1.5305/+1; home tie-split share at equal scores
 [BAL–IND ranked contribution report](BAL-IND.md). Full counts and numeric audit: audit-70d04aa9e993b9595a3aa255c4834876af218f2fafa92648b3c2b10c5a37d53c.json.
 
 Source documentation: [nflfastR fields](https://nflfastr.com/reference/fast_scraper.html), [nflverse update and depth-chart availability](https://nflreadr.nflverse.com/articles/nflverse_data_schedule.html).
+
+## Completed checks and deployment
+
+Frozen fit verification and full offline qualification replay pass. 43 projection tests and 214 legacy engine tests pass; all 43 projection tests also pass on DigitalOcean. Main reader: 309 passed, one existing skip. Hosted reader projection tests: 11 passed. The full hosted suite had 18 scheduler-fence failures; all 18 reproduce on unchanged source cd90946, so these are not fixed or counted as passing. Both configured vinext builds and typechecks pass.
+
+Initial live viewing exposed an inherited pending-lock branch that omitted team colors and crashed rendering. The publisher now supplies render metadata on every path; reader fallback coverage is also added. The cloud verification probe initially assumed successful synchronization; corrected evidence uses its actual result under the service environment. It verifies successful synchronization and preserves all 14 existing frozen files. All 32 live API records and versioned scorecards match published artifacts. Mac/cloud projection parity differs by at most 1.5632e-13 across 110 checked values. Both cloud timers remain active with last service exits 0. No Odds API call was made by this work.
+
+The live Week 1 reader has been observed rendering v3 cards, preserved v1/v2 records, tie-split labels, and the remaining DAL/NYG score/winner disagreement. Deployment/source synchronization status is recorded in verification/deployment.json.
+
+Least sure: whether successful API matching meant the reader worked. Live browser verification caught the pending-card crash; the publisher fix and regression coverage were added, followed by successful live rendering.
+
+### Remaining hosting limitation
+
+The requested refit and v3 reader are deployed in Sites release 189 (source 352ac12473de1f4dc387500ab69cb89786c116ec). The pending-card publisher repair is deployed and the live Week 1 and Week 2 reader renders correctly. An additional reader-side fallback is tested and committed locally as 29e31df9b7eb44b987e844b39a59812da0f41088, but the Sites source Git service returned HTTP 500 on three attempts; it could not be pushed or included in another hosted release. Public main includes that defensive fix at ee9e67103ac4db57a94c28ee99b559d368c1dd6f. Next action for this extra safeguard: retry that exact source push when the hosting Git service recovers, then save/deploy its already-built matching archive. Do not claim it is hosted.

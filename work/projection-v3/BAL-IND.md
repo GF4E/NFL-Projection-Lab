@@ -30,6 +30,7 @@ Projected BAL 23.179, IND 25.192; IND-minus-BAL margin +2.013; total 48.371. Win
 | wind | +0.0000 | +0.0000 | +0.0000 |
 
 ## Supporting and opposing football terms
+
 - IND's adjusted offense scores 2.59 points per drive versus BAL's 2.35, at 8.9 expected drives. Offensive production supports IND's projected margin by 1.5 points.
 - IND's adjusted defense allows 2.21 points per drive versus BAL's 2.28. Defensive resistance supports IND's projected margin by 0.5 points.
 - Against: No retained measured contribution opposes this direction by at least 0.1 displayed point.
