@@ -6,7 +6,7 @@
     "BetMGM has the best captured price for Under +44 at -108; no other book has a comparable price at that line.",
     "The spread is not within a half point of 3 or 7.",
     "Buying Washington Commanders from +6 to +6.5 preserves the current modeled EV up to -113.5; no captured buy-half price is available, so whether it is worth buying is unknown.",
-    "Kickoff forecast wind is 5.3 mph. WIND RULE does not apply.",
+    "Kickoff forecast wind is 3.4 mph. WIND RULE does not apply.",
     "Plain Elo disagrees with the market margin by +0.39 points; diagnostic only, with no QB adjustment.",
     "Teaser candidates: Over +44.5 to +38.5, crossing 41, 44. Ticket prices and a partner are not established.",
     "QB status: inactives unknown until T-90."
@@ -16,7 +16,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_01_WAS_PHI",
-  "generated_at": "2026-09-13T14:00:20.945394+00:00",
+  "generated_at": "2026-09-13T19:05:16.931363+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -24,7 +24,7 @@
     "clv": null
   },
   "home": "PHI",
-  "input_hash": "379a1cdd30ae083a7e4cf90936351535da0e8bca62c03bf9682eebd6c62714c6",
+  "input_hash": "39dec9822dc7aaabbb9c9c7983c129d5f9069c4852036d047a64f886f33cbdc1",
   "kickoff_utc": "2026-09-13T20:25:00+00:00",
   "market": {
     "books": {
@@ -39,7 +39,7 @@
             "fair_probability": 0.4879518072289156,
             "line": -6.0,
             "market": "spreads",
-            "price": -110.0,
+            "price": -102.0,
             "side": "Philadelphia Eagles"
           },
           "WAS": {
@@ -123,7 +123,7 @@
             "fair_probability": 0.5008635578583766,
             "line": -5.5,
             "market": "spreads",
-            "price": -112.0,
+            "price": -115.0,
             "side": "Philadelphia Eagles"
           },
           "WAS": {
@@ -131,7 +131,7 @@
             "fair_probability": 0.4991364421416235,
             "line": 5.5,
             "market": "spreads",
-            "price": -108.0,
+            "price": -105.0,
             "side": "Washington Commanders"
           }
         },
@@ -169,7 +169,7 @@
         }
       }
     },
-    "capture_time": "2026-09-13T14:00:09.965787+00:00",
+    "capture_time": "2026-09-13T19:05:09.438661+00:00",
     "home_win_prob": 0.6878777106292215,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
     "spread": -6.0,
@@ -1297,45 +1297,45 @@
   "wagers": [],
   "weather": {
     "component_initializations": [
-      1789279200,
-      1789279200
+      1789300800,
+      1789300800
     ],
     "event_id": "2026_01_WAS_PHI",
-    "forecast_issued_at": "2026-09-13T11:55:02+00:00",
-    "forecast_run_initialized_at": "2026-09-13T06:00:00+00:00",
+    "forecast_issued_at": "2026-09-13T18:45:17+00:00",
+    "forecast_run_initialized_at": "2026-09-13T12:00:00+00:00",
     "issuance_basis": "Conservative upper bound from completed GFS013/GFS025 availability; exact common archived run requested",
     "kickoff_at": "2026-09-13T20:25:00+00:00",
     "model": "gfs_global",
     "precip_mm": 0.0,
-    "received_at": "2026-09-13T14:00:14.029387+00:00",
-    "request_at": "2026-09-13T14:00:13.636424+00:00",
+    "received_at": "2026-09-13T19:05:10.825640+00:00",
+    "request_at": "2026-09-13T19:05:10.442380+00:00",
     "requests": [
       {
-        "received_at": "2026-09-13T14:00:13.518525+00:00",
-        "request_at": "2026-09-13T14:00:13.385095+00:00",
-        "sha256": "a7ed9244c7a263ed71112e5337e7f2293e05f17c8a11080da366e557901bd8ab",
+        "received_at": "2026-09-13T19:05:10.034049+00:00",
+        "request_at": "2026-09-13T19:05:09.580175+00:00",
+        "sha256": "f78cc79316d8a413a66793d0c240bd2b4c5f2bc1fd29d13839e4dbb81a5a0fd4",
         "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
       },
       {
-        "received_at": "2026-09-13T14:00:13.635774+00:00",
-        "request_at": "2026-09-13T14:00:13.533391+00:00",
-        "sha256": "a6dd8fd94cec85905bcd0aa4732f4293357d021f8dec723edb62dfcf5fcbe8f2",
+        "received_at": "2026-09-13T19:05:10.441677+00:00",
+        "request_at": "2026-09-13T19:05:10.034756+00:00",
+        "sha256": "38307d0ba612547f6d3e6bb21034ae0a25b840f5aec8063df6726ba8b9124245",
         "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
       },
       {
-        "received_at": "2026-09-13T14:00:14.029387+00:00",
-        "request_at": "2026-09-13T14:00:13.636424+00:00",
-        "sha256": "d27a46015d537fd9aa0ceeabca595e5bb22fbeeba0ff617a88535d0a9ec390a9",
-        "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=39.9007914&longitude=-75.1674645&models=gfs_global&run=2026-09-13T06%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
+        "received_at": "2026-09-13T19:05:10.825640+00:00",
+        "request_at": "2026-09-13T19:05:10.442380+00:00",
+        "sha256": "4015d24cbad6638903bf4343d38902f61cf47eef292e4e87180c432f6d1abf90",
+        "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=39.9007914&longitude=-75.1674645&models=gfs_global&run=2026-09-13T12%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
       }
     ],
     "roof": "outdoors",
-    "source_sha256": "d27a46015d537fd9aa0ceeabca595e5bb22fbeeba0ff617a88535d0a9ec390a9",
+    "source_sha256": "4015d24cbad6638903bf4343d38902f61cf47eef292e4e87180c432f6d1abf90",
     "status": "FORECAST",
-    "temperature_c": 30.1,
+    "temperature_c": 29.7,
     "valid_at": "2026-09-13T20:00:00+00:00",
     "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
-    "wind_mph": 5.3
+    "wind_mph": 3.4
   },
   "week": 1,
   "why": {

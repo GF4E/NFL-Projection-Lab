@@ -1,11 +1,11 @@
 {
   "analysis": [
-    "Spread consensus is LV -3. It moved +0.5 points since the previous capture.",
-    "BetMGM has the best captured price for Miami Dolphins +3 at -105, 3 cents better than the next book at the same line.",
-    "Total consensus is +41. It moved +0.5 points since the previous capture.",
-    "DraftKings has the best captured price for Under +40.5 at -110, 5 cents better than the next book at the same line.",
+    "Spread consensus is LV -3. It moved +0 points since the previous capture.",
+    "FanDuel has the best captured price for Miami Dolphins +3 at -108, 0 cents better than the next book at the same line.",
+    "Total consensus is +41. It moved +0 points since the previous capture.",
+    "DraftKings has the best captured price for Under +40.5 at -110, 2 cents better than the next book at the same line.",
     "The spread is on or within a half point of 3.",
-    "Buying Miami Dolphins from +3 to +3.5 preserves the current modeled EV up to -110.3; no captured buy-half price is available, so whether it is worth buying is unknown.",
+    "Buying Miami Dolphins from +3 to +3.5 preserves the current modeled EV up to -113.5; no captured buy-half price is available, so whether it is worth buying is unknown.",
     "The venue is indoors or its roof is unknown; WIND RULE does not apply.",
     "Plain Elo disagrees with the market margin by -4.82 points; diagnostic only, with no QB adjustment.",
     "Teaser candidates: Under +40.5 to +46.5, crossing 41, 44. Ticket prices and a partner are not established.",
@@ -16,7 +16,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_01_MIA_LV",
-  "generated_at": "2026-09-13T14:00:20.945394+00:00",
+  "generated_at": "2026-09-13T19:05:16.931363+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -24,7 +24,7 @@
     "clv": null
   },
   "home": "LV",
-  "input_hash": "812d01495f3760c867d279f369600bf1118cdbdb709630aaaaae1e4e430453e7",
+  "input_hash": "1df9e545036dffa4b2f7d006b1f1ef8f80e88782ba2c42a522ef58f4f7619e7e",
   "kickoff_utc": "2026-09-13T20:25:00+00:00",
   "market": {
     "books": {
@@ -39,7 +39,7 @@
             "fair_probability": 0.4879518072289156,
             "line": -3.0,
             "market": "spreads",
-            "price": -115.0,
+            "price": -112.0,
             "side": "Las Vegas Raiders"
           },
           "MIA": {
@@ -47,7 +47,7 @@
             "fair_probability": 0.5120481927710844,
             "line": 3.0,
             "market": "spreads",
-            "price": -105.0,
+            "price": -108.0,
             "side": "Miami Dolphins"
           }
         },
@@ -57,7 +57,7 @@
             "fair_probability": 0.49326424870466323,
             "line": 40.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -105.0,
             "side": "Over"
           },
           "Under": {
@@ -65,7 +65,7 @@
             "fair_probability": 0.5067357512953368,
             "line": 40.5,
             "market": "totals",
-            "price": -120.0,
+            "price": -112.0,
             "side": "Under"
           }
         }
@@ -81,7 +81,7 @@
             "fair_probability": 0.4879518072289156,
             "line": -3.0,
             "market": "spreads",
-            "price": -112.0,
+            "price": -110.0,
             "side": "Las Vegas Raiders"
           },
           "MIA": {
@@ -89,7 +89,7 @@
             "fair_probability": 0.5120481927710844,
             "line": 3.0,
             "market": "spreads",
-            "price": -108.0,
+            "price": -110.0,
             "side": "Miami Dolphins"
           }
         },
@@ -169,7 +169,7 @@
         }
       }
     },
-    "capture_time": "2026-09-13T14:00:09.965787+00:00",
+    "capture_time": "2026-09-13T19:05:09.438661+00:00",
     "home_win_prob": 0.5943161634103019,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
     "spread": -3.0,
@@ -181,12 +181,12 @@
   },
   "model": {
     "spreads": {
-      "EV": -0.00027962825890281984,
-      "book": "betmgm",
+      "EV": -0.013484296040427168,
+      "book": "fanduel",
       "edge_source": "tiebreak",
       "fair_probability": 0.5120481927710844,
       "line": 3.0,
-      "price": -105.0,
+      "price": -108.0,
       "side": "Miami Dolphins"
     },
     "totals": {
@@ -1229,7 +1229,7 @@
   "status": "UPCOMING",
   "tiles": {
     "SPREAD": {
-      "EV": -0.023209145488938262,
+      "EV": -0.036103115205014975,
       "book": "betmgm",
       "book_label": "BetMGM",
       "chip": "LEAN",
@@ -1240,7 +1240,7 @@
       "label": "SPREAD",
       "line": 3.0,
       "pick": "MIA +3",
-      "price": -105.0,
+      "price": -108.0,
       "probability": 0.5,
       "probability_percent": 50.0,
       "push_probability": 0.02521588946459413,
@@ -1251,8 +1251,8 @@
     },
     "TOTAL": {
       "EV": -0.023809523809523836,
-      "book": "fanduel",
-      "book_label": "FanDuel",
+      "book": "betmgm",
+      "book_label": "BetMGM",
       "chip": "LEAN",
       "clv": null,
       "confidence_source": "MARKET",

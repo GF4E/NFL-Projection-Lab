@@ -1,8 +1,8 @@
 {
   "analysis": {
-    "captured_at": "2026-09-13T14:00:09.965787+00:00",
+    "captured_at": "2026-09-13T19:05:09.438661+00:00",
     "measured": {
-      "elo_disagreement": -1.994049318060524,
+      "elo_disagreement": -1.494049318060524,
       "half_points": [
         {
           "buy_price_available": false,
@@ -22,8 +22,8 @@
           "price": -115.0,
           "side": "Los Angeles Chargers"
         },
-        "consensus_line": -10.0,
-        "movement": 0.0
+        "consensus_line": -9.5,
+        "movement": 0.5
       },
       "teaser_candidates": [
         {
@@ -35,7 +35,7 @@
           ],
           "line": 47.5,
           "market": "totals",
-          "price": -105.0,
+          "price": -102.0,
           "side": "Over",
           "teased_line": 41.5
         },
@@ -55,12 +55,12 @@
       ],
       "totals": {
         "best_same_line": {
-          "advantage_cents": 1.0,
-          "book": "fanduel",
+          "advantage_cents": 2.0,
+          "book": "draftkings",
           "fair_probability": 0.49326424870466323,
           "line": 47.5,
           "market": "totals",
-          "price": -104.0,
+          "price": -102.0,
           "side": "Over"
         },
         "consensus_line": 47.5,
@@ -69,39 +69,39 @@
       "wind_rule": false
     },
     "sentences": [
-      "Spread consensus is LAC -10. It moved +0 points since the previous capture.",
+      "Spread consensus is LAC -9.5. It moved +0.5 points since the previous capture.",
       "FanDuel has the best captured price for Los Angeles Chargers -8.5 at -115; no other book has a comparable price at that line.",
       "Total consensus is +47.5. It moved +0 points since the previous capture.",
-      "FanDuel has the best captured price for Over +47.5 at -104, 1 cents better than the next book at the same line.",
+      "DraftKings has the best captured price for Over +47.5 at -102, 2 cents better than the next book at the same line.",
       "The spread is not within a half point of 3 or 7.",
       "Buying Los Angeles Chargers from -8.5 to -8 preserves the current modeled EV up to -124.4; no captured buy-half price is available, so whether it is worth buying is unknown.",
       "The venue is indoors or its roof is unknown; WIND RULE does not apply.",
-      "Plain Elo disagrees with the market margin by -1.99 points; diagnostic only, with no QB adjustment.",
+      "Plain Elo disagrees with the market margin by -1.49 points; diagnostic only, with no QB adjustment.",
       "Teaser candidates: Over +47.5 to +41.5, crossing 44, 47; Los Angeles Chargers -8.5 to -2.5, crossing 3, 7. Ticket prices and a partner are not established.",
       "QB status: inactives unknown until T-90."
     ]
   },
   "capture": {
-    "label": "SUNDAY",
+    "label": "T80",
     "params": {
       "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
-      "commenceTimeFrom": "2026-09-13T17:00:00Z",
-      "commenceTimeTo": "2026-09-15T00:15:00Z",
+      "commenceTimeFrom": "2026-09-13T20:25:00Z",
+      "commenceTimeTo": "2026-09-13T20:25:00Z",
       "dateFormat": "iso",
       "markets": "spreads,totals",
       "oddsFormat": "american"
     },
-    "received_at": "2026-09-13T14:00:09.965787+00:00",
-    "request_at": "2026-09-13T14:00:09.508290+00:00",
-    "request_id": "LIVE_SUNDAY_2026_W01",
+    "received_at": "2026-09-13T19:05:09.438661+00:00",
+    "request_at": "2026-09-13T19:05:09.342999+00:00",
+    "request_id": "2026-1-2026-09-13T20:25:00+00:00",
     "source": {
-      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_SUNDAY_2026_W01/sources/4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9.json",
-      "sha256": "4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9"
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/2026-1-2026-09-13T20_25_00+00_00/sources/85cdc07cde0adc19ae1212e986b5531b553f07a22545618d1972191f85b7d40e.json",
+      "sha256": "85cdc07cde0adc19ae1212e986b5531b553f07a22545618d1972191f85b7d40e"
     },
     "status": "CAPTURED"
   },
-  "capture_label": "SUNDAY",
-  "captured_at": "2026-09-13T14:00:09.965787+00:00",
+  "capture_label": "T80",
+  "captured_at": "2026-09-13T19:05:09.438661+00:00",
   "consensus": {
     "spreads": {
       "devigged_books": {
@@ -110,24 +110,24 @@
           "center": 10,
           "line": -9.5,
           "market": "spreads",
-          "power": 1.0647311734675267,
+          "power": 1.10749857792724,
           "probabilities": [
-            0.5023369847659711,
-            0.49766301523402895
+            0.49327872882454105,
+            0.5067212711754592
           ],
-          "updated_at": "2026-09-13T13:59:56Z"
+          "updated_at": "2026-09-13T19:04:11Z"
         },
         "draftkings": {
           "book": "draftkings",
           "center": 10,
           "line": -9.5,
           "market": "spreads",
-          "power": 1.071115843039896,
+          "power": 1.0719425631310813,
           "probabilities": [
-            0.5116044544982121,
-            0.488395545501788
+            0.5000000000000001,
+            0.5000000000000001
           ],
-          "updated_at": "2026-09-13T13:58:28Z"
+          "updated_at": "2026-09-13T19:04:31Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -139,23 +139,23 @@
             0.5116044544982121,
             0.488395545501788
           ],
-          "updated_at": "2026-09-13T13:59:57Z"
+          "updated_at": "2026-09-13T19:04:55Z"
         },
         "pinnacle": {
           "book": "pinnacle",
-          "center": 10,
+          "center": 9,
           "line": -9.5,
           "market": "spreads",
-          "power": 1.0354655833803248,
+          "power": 1.0371153713369767,
           "probabilities": [
-            0.4903718725584925,
-            0.5096281274415075
+            0.4773949206619667,
+            0.5226050793380334
           ],
-          "updated_at": "2026-09-13T13:59:56Z"
+          "updated_at": "2026-09-13T19:04:29Z"
         }
       },
       "full": {
-        "center": 10.0,
+        "center": 9.5,
         "contributors": [
           "betmgm",
           "draftkings",
@@ -165,12 +165,12 @@
         "coverage": 3,
         "excluded_book": null,
         "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-        "pinnacle_center": 10,
+        "pinnacle_center": 9,
         "retail_median": 10
       },
       "leave_one_out": {
         "betmgm": {
-          "center": 9.75,
+          "center": 9.25,
           "contributors": [
             "draftkings",
             "fanduel",
@@ -179,11 +179,11 @@
           "coverage": 2,
           "excluded_book": "betmgm",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": 10,
+          "pinnacle_center": 9,
           "retail_median": 9.5
         },
         "draftkings": {
-          "center": 9.75,
+          "center": 9.25,
           "contributors": [
             "betmgm",
             "fanduel",
@@ -192,11 +192,11 @@
           "coverage": 2,
           "excluded_book": "draftkings",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": 10,
+          "pinnacle_center": 9,
           "retail_median": 9.5
         },
         "fanduel": {
-          "center": 10.0,
+          "center": 9.5,
           "contributors": [
             "betmgm",
             "draftkings",
@@ -205,11 +205,11 @@
           "coverage": 2,
           "excluded_book": "fanduel",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": 10,
+          "pinnacle_center": 9,
           "retail_median": 10.0
         },
         "williamhill_us": {
-          "center": 10.0,
+          "center": 9.5,
           "contributors": [
             "betmgm",
             "draftkings",
@@ -219,7 +219,7 @@
           "coverage": 3,
           "excluded_book": "williamhill_us",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": 10,
+          "pinnacle_center": 9,
           "retail_median": 10
         }
       }
@@ -231,24 +231,24 @@
           "center": 48,
           "line": 47.5,
           "market": "totals",
-          "power": 1.0607640901233029,
+          "power": 1.0647311734675267,
           "probabilities": [
-            0.4917898337466912,
-            0.5082101662533091
+            0.49766301523402895,
+            0.5023369847659711
           ],
-          "updated_at": "2026-09-13T13:59:56Z"
+          "updated_at": "2026-09-13T19:04:11Z"
         },
         "draftkings": {
           "book": "draftkings",
           "center": 47,
           "line": 47.5,
           "market": "totals",
-          "power": 1.071115843039896,
+          "power": 1.0698248525605822,
           "probabilities": [
-            0.488395545501788,
-            0.5116044544982121
+            0.4814245062798449,
+            0.5185754937201552
           ],
-          "updated_at": "2026-09-13T13:58:28Z"
+          "updated_at": "2026-09-13T19:04:31Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -260,19 +260,19 @@
             0.48386487174432585,
             0.5161351282556743
           ],
-          "updated_at": "2026-09-13T13:59:57Z"
+          "updated_at": "2026-09-13T19:04:55Z"
         },
         "pinnacle": {
           "book": "pinnacle",
           "center": 48,
           "line": 47.0,
           "market": "totals",
-          "power": 1.0423544832846647,
+          "power": 1.0429018863905268,
           "probabilities": [
-            0.511947396808178,
-            0.4880526031918223
+            0.5071670142287985,
+            0.4928329857712016
           ],
-          "updated_at": "2026-09-13T13:59:56Z"
+          "updated_at": "2026-09-13T19:04:29Z"
         }
       },
       "full": {
@@ -370,24 +370,61 @@
     "week": 1
   },
   "inactives": {
-    "status": "INACTIVES_UNAVAILABLE"
+    "depth_source": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/model-pick-v1/depth/e600de36014f19597e5d9dc5147b223bf0fe9001820e65d88f26efc4fa89f6c7.csv",
+      "sha256": "e600de36014f19597e5d9dc5147b223bf0fe9001820e65d88f26efc4fa89f6c7",
+      "source": {
+        "encoding": "gzip",
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/model-pick-v1/sources/1d38bc9a0e059c142b22ee6acabfb68366d29622e868cf2dcec11ec1af652182.csv.gz",
+        "raw_sha256": "fede320006ae79ecd30574c3d44e0e96bdc3bcf4027a465e3ab3a83b449a3ab3",
+        "received_at": "2026-09-13T04:00:15.703051+00:00",
+        "request_at": "2026-09-13T04:00:11.311634+00:00",
+        "sha256": "1d38bc9a0e059c142b22ee6acabfb68366d29622e868cf2dcec11ec1af652182",
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2026.csv"
+      }
+    },
+    "fetch_time": "2026-09-13T18:55:02.930439+00:00",
+    "raw_list": null,
+    "received_at": "2026-09-13T18:55:03.031980+00:00",
+    "response_sha256": "3fefed062721ac581c55553dfe5fdcf927cf77df483ee77ba0ad36e3462d8f9f",
+    "source": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=401872926",
+    "source_note": "Only dedicated inactives collection accepted; summary injuries and missing names do not establish active status",
+    "status": "INACTIVES_UNAVAILABLE",
+    "teams": {
+      "ARI": {
+        "depth_status": "AVAILABLE",
+        "depth_timestamp": "2026-09-12T11:36:06Z",
+        "fetch_status": "INACTIVES_UNAVAILABLE",
+        "listed_starters_inactive": null,
+        "starting_qb_gsis": "00-0033119",
+        "starting_qb_inactive": "unknown"
+      },
+      "LAC": {
+        "depth_status": "AVAILABLE",
+        "depth_timestamp": "2026-09-12T11:36:06Z",
+        "fetch_status": "INACTIVES_UNAVAILABLE",
+        "listed_starters_inactive": null,
+        "starting_qb_gsis": "00-0036355",
+        "starting_qb_inactive": "unknown"
+      }
+    }
   },
   "lifecycle": "live-to-locked-v1",
   "offers": [
     {
       "book": "draftkings",
-      "fair_probability": 0.5008635578583766,
+      "fair_probability": 0.47564766839378236,
       "line": -9.5,
       "market": "spreads",
-      "price": -115.0,
+      "price": -110.0,
       "side": "Los Angeles Chargers"
     },
     {
       "book": "draftkings",
-      "fair_probability": 0.4991364421416235,
+      "fair_probability": 0.5243523316062176,
       "line": 9.5,
       "market": "spreads",
-      "price": -105.0,
+      "price": -110.0,
       "side": "Arizona Cardinals"
     },
     {
@@ -395,7 +432,7 @@
       "fair_probability": 0.49326424870466323,
       "line": 47.5,
       "market": "totals",
-      "price": -105.0,
+      "price": -102.0,
       "side": "Over"
     },
     {
@@ -403,7 +440,7 @@
       "fair_probability": 0.5067357512953368,
       "line": 47.5,
       "market": "totals",
-      "price": -115.0,
+      "price": -118.0,
       "side": "Under"
     },
     {
@@ -440,18 +477,18 @@
     },
     {
       "book": "betmgm",
-      "fair_probability": 0.5008635578583766,
+      "fair_probability": 0.47564766839378236,
       "line": -9.5,
       "market": "spreads",
-      "price": -110.0,
+      "price": -112.0,
       "side": "Los Angeles Chargers"
     },
     {
       "book": "betmgm",
-      "fair_probability": 0.4991364421416235,
+      "fair_probability": 0.5243523316062176,
       "line": 9.5,
       "market": "spreads",
-      "price": -108.0,
+      "price": -118.0,
       "side": "Arizona Cardinals"
     },
     {
@@ -459,7 +496,7 @@
       "fair_probability": 0.49326424870466323,
       "line": 47.5,
       "market": "totals",
-      "price": -105.0,
+      "price": -108.0,
       "side": "Over"
     },
     {
@@ -467,7 +504,7 @@
       "fair_probability": 0.5067357512953368,
       "line": 47.5,
       "market": "totals",
-      "price": -112.0,
+      "price": -110.0,
       "side": "Under"
     }
   ],
@@ -483,20 +520,20 @@
       "fair_probability_basis": "conditional_non_push",
       "filtered_subset": false,
       "line": -8.5,
-      "loo_center": 10.0,
+      "loo_center": 9.5,
       "loss": 0.457685664939551,
       "market": "spreads",
       "price": -115.0,
       "price_edge_cents": 3.4905660377358316,
       "push": 0.0,
-      "quote_updated_at": "2026-09-13T13:59:57Z",
+      "quote_updated_at": "2026-09-13T19:04:55Z",
       "seed": null,
       "side": "Los Angeles Chargers",
       "win": 0.542314335060449
     },
     {
-      "EV": -0.03244320446392973,
-      "book": "fanduel",
+      "EV": -0.02314335060449041,
+      "book": "draftkings",
       "conditional_win": 0.49326424870466323,
       "edge_source": "price",
       "exact_tie_count": 1,
@@ -507,10 +544,10 @@
       "loo_center": 47.75,
       "loss": 0.5067357512953368,
       "market": "totals",
-      "price": -104.0,
-      "price_edge_cents": -6.731092436974777,
+      "price": -102.0,
+      "price_edge_cents": -4.731092436974777,
       "push": 0.0,
-      "quote_updated_at": "2026-09-13T13:59:57Z",
+      "quote_updated_at": "2026-09-13T19:04:31Z",
       "seed": null,
       "side": "Over",
       "win": 0.49326424870466323
@@ -524,10 +561,10 @@
     "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
     "expected_margin": 9.972711571675301,
     "expected_total": 48.4006908462867,
-    "generated_at": "2026-09-13T14:00:12.672831+00:00",
+    "generated_at": "2026-09-13T19:05:10.199058+00:00",
     "home_score": 29.186701208981,
     "home_win_probability": 0.7751295336787565,
-    "quote_captured_at": "2026-09-13T14:00:09.965787+00:00",
+    "quote_captured_at": "2026-09-13T19:05:09.438661+00:00",
     "score_label": "market-based score estimate",
     "status": "AVAILABLE",
     "tie_probability": 0.02521588946459413,
