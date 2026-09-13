@@ -1,11 +1,11 @@
 {
   "analysis": [
-    "Spread consensus is CAR +2.5. It moved -0.5 points since the previous capture.",
-    "BetMGM has the best captured price for Chicago Bears -3 at -110, 5 cents better than the next book at the same line.",
+    "Spread consensus is CAR +2.5. It moved +0 points since the previous capture.",
+    "BetMGM has the best captured price for Carolina Panthers +3 at -105, 3 cents better than the next book at the same line.",
     "Total consensus is +47.5. It moved +0 points since the previous capture.",
     "BetMGM has the best captured price for Over +47 at -110; no other book has a comparable price at that line.",
     "The spread is on or within a half point of 3.",
-    "Buying Chicago Bears from -3 to -2.5 preserves the current modeled EV up to -115.6; no captured buy-half price is available, so whether it is worth buying is unknown.",
+    "Buying Carolina Panthers from +3 to +3.5 preserves the current modeled EV up to -113.7; no captured buy-half price is available, so whether it is worth buying is unknown.",
     "Kickoff forecast wind is 3.6 mph. WIND RULE does not apply.",
     "Plain Elo disagrees with the market margin by +1.17 points; diagnostic only, with no QB adjustment.",
     "Teaser candidates: Over +47.5 to +41.5, crossing 44, 47; Over +46.5 to +40.5, crossing 41, 44; Under +46.5 to +52.5, crossing 47, 51. Ticket prices and a partner are not established.",
@@ -16,7 +16,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_01_CHI_CAR",
-  "generated_at": "2026-09-13T14:00:20.945394+00:00",
+  "generated_at": "2026-09-13T15:40:18.625282+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -24,7 +24,7 @@
     "clv": null
   },
   "home": "CAR",
-  "input_hash": "0646d02bfb74c23cb9e0076a68c6c229a761261e2f8c2ab0aa1a2fbdc1549e04",
+  "input_hash": "e4326b963fe4221b6adbd702c36147f37ba9dd040d86d58d8f0163a3375b2302",
   "kickoff_utc": "2026-09-13T17:00:00+00:00",
   "market": {
     "books": {
@@ -36,18 +36,18 @@
         "spreads": {
           "CAR": {
             "book": "betmgm",
-            "fair_probability": 0.4879518072289156,
+            "fair_probability": 0.5225225225225226,
             "line": 3.0,
             "market": "spreads",
-            "price": -108.0,
+            "price": -105.0,
             "side": "Carolina Panthers"
           },
           "CHI": {
             "book": "betmgm",
-            "fair_probability": 0.5120481927710844,
+            "fair_probability": 0.4774774774774775,
             "line": -3.0,
             "market": "spreads",
-            "price": -110.0,
+            "price": -105.0,
             "side": "Chicago Bears"
           }
         },
@@ -78,18 +78,18 @@
         "spreads": {
           "CAR": {
             "book": "draftkings",
-            "fair_probability": 0.4879518072289156,
+            "fair_probability": 0.5225225225225226,
             "line": 3.0,
             "market": "spreads",
-            "price": 100.0,
+            "price": -108.0,
             "side": "Carolina Panthers"
           },
           "CHI": {
             "book": "draftkings",
-            "fair_probability": 0.5120481927710844,
+            "fair_probability": 0.4774774774774775,
             "line": -3.0,
             "market": "spreads",
-            "price": -120.0,
+            "price": -112.0,
             "side": "Chicago Bears"
           }
         },
@@ -99,7 +99,7 @@
             "fair_probability": 0.49326424870466323,
             "line": 47.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -108.0,
             "side": "Over"
           },
           "Under": {
@@ -107,7 +107,7 @@
             "fair_probability": 0.5067357512953368,
             "line": 47.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -112.0,
             "side": "Under"
           }
         }
@@ -123,7 +123,7 @@
             "fair_probability": 0.4879518072289156,
             "line": 3.0,
             "market": "spreads",
-            "price": -105.0,
+            "price": -115.0,
             "side": "Carolina Panthers"
           },
           "CHI": {
@@ -131,7 +131,7 @@
             "fair_probability": 0.5120481927710844,
             "line": -3.0,
             "market": "spreads",
-            "price": -115.0,
+            "price": -105.0,
             "side": "Chicago Bears"
           }
         },
@@ -169,7 +169,7 @@
         }
       }
     },
-    "capture_time": "2026-09-13T14:00:09.965787+00:00",
+    "capture_time": "2026-09-13T15:40:09.572560+00:00",
     "home_win_prob": 0.38678571428571423,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
     "spread": 2.5,
@@ -181,13 +181,13 @@
   },
   "model": {
     "spreads": {
-      "EV": -0.021887266446851794,
+      "EV": 0.019327247306521966,
       "book": "betmgm",
-      "edge_source": "tiebreak",
-      "fair_probability": 0.5120481927710844,
-      "line": -3.0,
-      "price": -110.0,
-      "side": "Chicago Bears"
+      "edge_source": "price",
+      "fair_probability": 0.5225225225225226,
+      "line": 3.0,
+      "price": -105.0,
+      "side": "Carolina Panthers"
     },
     "totals": {
       "EV": -0.02964358612026996,
@@ -1229,25 +1229,25 @@
   "status": "UPCOMING",
   "tiles": {
     "SPREAD": {
-      "EV": 0.0,
-      "book": "draftkings",
-      "book_label": "DraftKings",
+      "EV": 0.01965459167531725,
+      "book": "betmgm",
+      "book_label": "BetMGM",
       "chip": "LEAN",
       "clv": null,
-      "confidence_source": "MARKET",
+      "confidence_source": "MODEL",
       "confidence_used": null,
       "grade": null,
       "label": "SPREAD",
       "line": 3.0,
       "pick": "CAR +3",
-      "price": 100.0,
-      "probability": 0.5,
-      "probability_percent": 50.0,
+      "price": -105.0,
+      "probability": 0.5225225225225226,
+      "probability_percent": 52.3,
       "push_probability": 0.02521588946459413,
-      "ring_offset": 50.0,
+      "ring_offset": 47.74774774774774,
       "side": "CAR",
       "stake_dollars": null,
-      "subtitle": "coin flip"
+      "subtitle": ""
     },
     "TOTAL": {
       "EV": -0.029643586120269932,
@@ -1307,30 +1307,30 @@
     "kickoff_at": "2026-09-13T17:00:00+00:00",
     "model": "gfs_global",
     "precip_mm": 0.0,
-    "received_at": "2026-09-13T14:00:10.759648+00:00",
-    "request_at": "2026-09-13T14:00:10.349534+00:00",
+    "received_at": "2026-09-13T15:40:10.293830+00:00",
+    "request_at": "2026-09-13T15:40:09.851757+00:00",
     "requests": [
       {
-        "received_at": "2026-09-13T14:00:10.200654+00:00",
-        "request_at": "2026-09-13T14:00:10.087660+00:00",
+        "received_at": "2026-09-13T15:40:09.748087+00:00",
+        "request_at": "2026-09-13T15:40:09.641284+00:00",
         "sha256": "a7ed9244c7a263ed71112e5337e7f2293e05f17c8a11080da366e557901bd8ab",
         "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
       },
       {
-        "received_at": "2026-09-13T14:00:10.327556+00:00",
-        "request_at": "2026-09-13T14:00:10.221583+00:00",
+        "received_at": "2026-09-13T15:40:09.851090+00:00",
+        "request_at": "2026-09-13T15:40:09.762694+00:00",
         "sha256": "a6dd8fd94cec85905bcd0aa4732f4293357d021f8dec723edb62dfcf5fcbe8f2",
         "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
       },
       {
-        "received_at": "2026-09-13T14:00:10.759648+00:00",
-        "request_at": "2026-09-13T14:00:10.349534+00:00",
-        "sha256": "d4f3809b2ee63dff8e3c963f3c4fbdc641a86d4a4a78002a7b579574fc31f9cc",
+        "received_at": "2026-09-13T15:40:10.293830+00:00",
+        "request_at": "2026-09-13T15:40:09.851757+00:00",
+        "sha256": "b4bf4b64d57df967c741a49968ed63a52ff016b2b37cf8899f095a2685ec2c2d",
         "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=35.2258152&longitude=-80.8528376&models=gfs_global&run=2026-09-13T06%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
       }
     ],
     "roof": "outdoors",
-    "source_sha256": "d4f3809b2ee63dff8e3c963f3c4fbdc641a86d4a4a78002a7b579574fc31f9cc",
+    "source_sha256": "b4bf4b64d57df967c741a49968ed63a52ff016b2b37cf8899f095a2685ec2c2d",
     "status": "FORECAST",
     "temperature_c": 31.4,
     "valid_at": "2026-09-13T17:00:00+00:00",
@@ -1353,7 +1353,7 @@
       "6.CAR.def_pressure_rate;6.CHI.off_pressure_rate",
       "6.CHI.off_explosive_rate;6.CAR.def_explosive_rate"
     ],
-    "statement": "The market-based ATS lean favors CAR; CAR explosive offense vs defense: #25 vs CHI #29. Against that lean, CHI rush offense vs rush defense: #4 vs CAR #23."
+    "statement": "Our lean is CAR: CAR explosive offense vs defense: #25 vs CHI #29. Against that lean, CHI rush offense vs rush defense: #4 vs CAR #23."
   },
   "winner_bar": {
     "away_percent": 61.3,

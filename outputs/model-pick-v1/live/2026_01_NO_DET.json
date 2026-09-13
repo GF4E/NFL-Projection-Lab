@@ -1,6 +1,6 @@
 {
   "analysis": {
-    "captured_at": "2026-09-13T14:00:09.965787+00:00",
+    "captured_at": "2026-09-13T15:40:09.572560+00:00",
     "measured": {
       "elo_disagreement": 0.31780351379551597,
       "half_points": [
@@ -51,14 +51,14 @@
           "side": "Over"
         },
         "consensus_line": 50.5,
-        "movement": -0.5
+        "movement": 0.0
       },
       "wind_rule": false
     },
     "sentences": [
       "Spread consensus is DET -7. It moved +0 points since the previous capture.",
       "FanDuel has the best captured price for New Orleans Saints +6.5 at +100; no other book has a comparable price at that line.",
-      "Total consensus is +50.5. It moved -0.5 points since the previous capture.",
+      "Total consensus is +50.5. It moved +0 points since the previous capture.",
       "DraftKings has the best captured price for Over +49.5 at -112, 3 cents better than the next book at the same line.",
       "The spread is on or within a half point of 7.",
       "Buying New Orleans Saints from +6.5 to +7 preserves the current modeled EV up to -105.3; no captured buy-half price is available, so whether it is worth buying is unknown.",
@@ -69,26 +69,26 @@
     ]
   },
   "capture": {
-    "label": "SUNDAY",
+    "label": "T80",
     "params": {
       "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
       "commenceTimeFrom": "2026-09-13T17:00:00Z",
-      "commenceTimeTo": "2026-09-15T00:15:00Z",
+      "commenceTimeTo": "2026-09-13T17:00:00Z",
       "dateFormat": "iso",
       "markets": "spreads,totals",
       "oddsFormat": "american"
     },
-    "received_at": "2026-09-13T14:00:09.965787+00:00",
-    "request_at": "2026-09-13T14:00:09.508290+00:00",
-    "request_id": "LIVE_SUNDAY_2026_W01",
+    "received_at": "2026-09-13T15:40:09.572560+00:00",
+    "request_at": "2026-09-13T15:40:09.484474+00:00",
+    "request_id": "2026-1-2026-09-13T17:00:00+00:00",
     "source": {
-      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_SUNDAY_2026_W01/sources/4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9.json",
-      "sha256": "4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9"
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/2026-1-2026-09-13T17_00_00+00_00/sources/55e6d730a625d708fb1888e9665db7666bc1c39a118061f5ea193ec3b7e01f33.json",
+      "sha256": "55e6d730a625d708fb1888e9665db7666bc1c39a118061f5ea193ec3b7e01f33"
     },
     "status": "CAPTURED"
   },
-  "capture_label": "SUNDAY",
-  "captured_at": "2026-09-13T14:00:09.965787+00:00",
+  "capture_label": "T80",
+  "captured_at": "2026-09-13T15:40:09.572560+00:00",
   "consensus": {
     "spreads": {
       "devigged_books": {
@@ -102,7 +102,7 @@
             0.49766301523402895,
             0.5023369847659711
           ],
-          "updated_at": "2026-09-13T13:59:56Z"
+          "updated_at": "2026-09-13T15:39:52Z"
         },
         "draftkings": {
           "book": "draftkings",
@@ -114,7 +114,7 @@
             0.5000000000000001,
             0.5000000000000001
           ],
-          "updated_at": "2026-09-13T13:58:28Z"
+          "updated_at": "2026-09-13T15:39:04Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -126,7 +126,7 @@
             0.525375969813185,
             0.47462403018681526
           ],
-          "updated_at": "2026-09-13T13:59:57Z"
+          "updated_at": "2026-09-13T15:39:54Z"
         },
         "pinnacle": {
           "book": "pinnacle",
@@ -138,7 +138,7 @@
             0.5024065753285692,
             0.4975934246714311
           ],
-          "updated_at": "2026-09-13T13:59:55Z"
+          "updated_at": "2026-09-13T15:39:51Z"
         }
       },
       "full": {
@@ -223,7 +223,7 @@
             0.49766301523402895,
             0.5023369847659711
           ],
-          "updated_at": "2026-09-13T13:59:56Z"
+          "updated_at": "2026-09-13T15:39:52Z"
         },
         "draftkings": {
           "book": "draftkings",
@@ -235,7 +235,7 @@
             0.5046406578884406,
             0.4953593421115595
           ],
-          "updated_at": "2026-09-13T13:58:28Z"
+          "updated_at": "2026-09-13T15:39:04Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -247,7 +247,7 @@
             0.5116044544982121,
             0.488395545501788
           ],
-          "updated_at": "2026-09-13T13:59:57Z"
+          "updated_at": "2026-09-13T15:39:54Z"
         },
         "pinnacle": {
           "book": "pinnacle",
@@ -259,7 +259,7 @@
             0.511947396808178,
             0.4880526031918223
           ],
-          "updated_at": "2026-09-13T13:59:55Z"
+          "updated_at": "2026-09-13T15:39:51Z"
         }
       },
       "full": {
@@ -357,7 +357,44 @@
     "week": 1
   },
   "inactives": {
-    "status": "INACTIVES_UNAVAILABLE"
+    "depth_source": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/model-pick-v1/depth/e600de36014f19597e5d9dc5147b223bf0fe9001820e65d88f26efc4fa89f6c7.csv",
+      "sha256": "e600de36014f19597e5d9dc5147b223bf0fe9001820e65d88f26efc4fa89f6c7",
+      "source": {
+        "encoding": "gzip",
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/model-pick-v1/sources/1d38bc9a0e059c142b22ee6acabfb68366d29622e868cf2dcec11ec1af652182.csv.gz",
+        "raw_sha256": "fede320006ae79ecd30574c3d44e0e96bdc3bcf4027a465e3ab3a83b449a3ab3",
+        "received_at": "2026-09-13T04:00:15.703051+00:00",
+        "request_at": "2026-09-13T04:00:11.311634+00:00",
+        "sha256": "1d38bc9a0e059c142b22ee6acabfb68366d29622e868cf2dcec11ec1af652182",
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2026.csv"
+      }
+    },
+    "fetch_time": "2026-09-13T15:30:02.921199+00:00",
+    "raw_list": null,
+    "received_at": "2026-09-13T15:30:02.978322+00:00",
+    "response_sha256": "7a1c81b89e90f20355aff0336c29410ea3dd49a0de56b9d6a66896e19c46801b",
+    "source": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=401872923",
+    "source_note": "Only dedicated inactives collection accepted; summary injuries and missing names do not establish active status",
+    "status": "INACTIVES_UNAVAILABLE",
+    "teams": {
+      "DET": {
+        "depth_status": "AVAILABLE",
+        "depth_timestamp": "2026-09-12T11:36:06Z",
+        "fetch_status": "INACTIVES_UNAVAILABLE",
+        "listed_starters_inactive": null,
+        "starting_qb_gsis": "00-0033106",
+        "starting_qb_inactive": "unknown"
+      },
+      "NO": {
+        "depth_status": "AVAILABLE",
+        "depth_timestamp": "2026-09-12T11:36:06Z",
+        "fetch_status": "INACTIVES_UNAVAILABLE",
+        "listed_starters_inactive": null,
+        "starting_qb_gsis": "00-0040743",
+        "starting_qb_inactive": "unknown"
+      }
+    }
   },
   "lifecycle": "live-to-locked-v1",
   "offers": [
@@ -476,7 +513,7 @@
       "price": 100.0,
       "price_edge_cents": -0.3460207612456685,
       "push": 0.0,
-      "quote_updated_at": "2026-09-13T13:59:57Z",
+      "quote_updated_at": "2026-09-13T15:39:54Z",
       "seed": null,
       "side": "New Orleans Saints",
       "win": 0.4991364421416235
@@ -497,7 +534,7 @@
       "price": -112.0,
       "price_edge_cents": -2.8236994219653013,
       "push": 0.0,
-      "quote_updated_at": "2026-09-13T13:58:28Z",
+      "quote_updated_at": "2026-09-13T15:39:04Z",
       "seed": null,
       "side": "Over",
       "win": 0.5219343696027634
@@ -511,10 +548,10 @@
     "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
     "expected_margin": 6.972711571675302,
     "expected_total": 51.4006908462867,
-    "generated_at": "2026-09-13T14:00:10.639444+00:00",
+    "generated_at": "2026-09-13T15:40:10.459104+00:00",
     "home_score": 29.186701208981003,
     "home_win_probability": 0.6967184801381693,
-    "quote_captured_at": "2026-09-13T14:00:09.965787+00:00",
+    "quote_captured_at": "2026-09-13T15:40:09.572560+00:00",
     "score_label": "market-based score estimate",
     "status": "AVAILABLE",
     "tie_probability": 0.03246977547495682,
