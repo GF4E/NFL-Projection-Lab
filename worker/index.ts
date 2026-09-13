@@ -1,3 +1,4 @@
+import {readTrend} from '../src/server/projection-trend';
 import {projectionEntry} from '../src/server/projection-entry';
 import {readProjection,refreshProjection} from '../src/server/projection-board';
 import {cardEntry} from "../src/server/card-entry";
@@ -85,6 +86,7 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if(url.pathname==='/api/projection-trend'){if(request.method!=='GET')return json({error:'Read only'},405);try{return json(await readTrend());}catch{return json({error:'Trend temporarily unavailable'},503);}}
     if (url.pathname === '/api/projection-entry' || url.pathname === '/api/projection-entry/sync') return projectionEntry(request,env);
     if (url.pathname === '/api/projection-board') {if(request.method!=='GET')return json({error:'Read-only projection'},405);try{return json(await readProjection(env.DB,url.searchParams.get('refresh')==='1'));}catch{return json({error:'Projection unavailable'},503);}}
     if (["/api/card-entry","/api/card-entry/sync"].includes(url.pathname)) return cardEntry(request,env);

@@ -16,6 +16,7 @@ export function NavLinks() {
   }, []);
   const nav = [
     ["/sunday", "Live slate", `W${week}`],
+    ["/trend", "TREND", ""],
     ["/methodology", "Methodology", ""]
   ] as const;
   return <nav aria-label="Primary navigation">

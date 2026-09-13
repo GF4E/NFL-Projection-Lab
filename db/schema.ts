@@ -296,3 +296,9 @@ export const engineSharedEntries = sqliteTable("engine_shared_entries", {gameId:
 
 export const engineProjectionEntries = sqliteTable("engine_projection_entries", {gameId:text("game_id").notNull(),postLock:integer("post_lock").notNull(),payload:text("payload").notNull()},t=>[primaryKey({columns:[t.gameId,t.postLock]})]);
 export const engineProjectionPublication = sqliteTable("engine_projection_publication", {id:integer("id").primaryKey(),payload:text("payload").notNull(),checkedAt:integer("checked_at").notNull()});
+
+// Append-only revision history; database triggers copy each atomic entry write.
+export const engineProjectionEditHistory = sqliteTable("engine_projection_edit_history", {
+ id: integer("id").primaryKey({autoIncrement:true}),
+ payload: text("payload").notNull()
+});

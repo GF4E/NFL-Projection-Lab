@@ -1,0 +1,2 @@
+export const TREND_URL='https://raw.githubusercontent.com/GF4E/NFL-Projection-Lab/engine-v2/outputs/in-season-learning-v1/trend.json';
+export async function readTrend(){const r=await fetch(TREND_URL+'?t='+Date.now(),{signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('Trend unavailable');const x=await r.json() as {schema?:string};if(x.schema!=='projection-trend-v1')throw Error('Invalid trend');return x;}
