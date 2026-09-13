@@ -5,7 +5,7 @@ actual minus projected. 2016–2025 adaptive OOF; coverage excludes 2016 (no pri
 ## AS_ISSUED
 0 graded games; 30 pending.
 
-| week | scope | games | team_points_mae | team_points_sigma | margin_mae | margin_sigma | margin_coverage_50 | margin_coverage_80 | total_mae | total_sigma | total_coverage_50 | total_coverage_80 | home_bias | total_bias | favorite_bias_[-inf,3) | favorite_bias_[3,7) | favorite_bias_[7,14) | favorite_bias_[14,inf) |
+| week | scope | games | team_points_mae | margin_mae | total_mae | team_points_sigma | margin_sigma | total_sigma | margin_coverage_50 | margin_coverage_80 | total_coverage_50 | total_coverage_80 | home_bias | total_bias | favorite_bias_[-inf,3) | favorite_bias_[3,7) | favorite_bias_[7,14) | favorite_bias_[14,inf) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | week | 0 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
 | 1 | cumulative | 0 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
@@ -23,10 +23,10 @@ Three-week team streaks: []
 ## RETROSPECTIVE
 2 graded games; 0 pending.
 
-| week | scope | games | team_points_mae | team_points_sigma | margin_mae | margin_sigma | margin_coverage_50 | margin_coverage_80 | total_mae | total_sigma | total_coverage_50 | total_coverage_80 | home_bias | total_bias | favorite_bias_[-inf,3) | favorite_bias_[3,7) | favorite_bias_[7,14) | favorite_bias_[14,inf) |
+| week | scope | games | team_points_mae | margin_mae | total_mae | team_points_sigma | margin_sigma | total_sigma | margin_coverage_50 | margin_coverage_80 | total_coverage_50 | total_coverage_80 | home_bias | total_bias | favorite_bias_[-inf,3) | favorite_bias_[3,7) | favorite_bias_[7,14) | favorite_bias_[14,inf) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 1 | week | 2 | 12.474006946341948 | 9.691825528478072 | 12.012743413217672 | 16.988584656280498 | 0.5 | 0.5 | 21.95321662427476 | 8.007740437761939 | 0 | 0.5 | -16.110478403313465 | -21.95321662427476 | -16.110478403313465 | — | — | — |
-| 1 | cumulative | 2 | 12.474006946341948 | 9.691825528478072 | 12.012743413217672 | 16.988584656280498 | 0.5 | 0.5 | 21.95321662427476 | 8.007740437761939 | 0 | 0.5 | -16.110478403313465 | -21.95321662427476 | -16.110478403313465 | — | — | — |
+| 1 | week | 2 | 12.474006946341948 | 12.012743413217672 | 21.95321662427476 | 9.691825528478072 | 16.988584656280498 | 8.007740437761939 | 0.5 | 0.5 | 0 | 0.5 | -16.110478403313465 | -21.95321662427476 | -16.110478403313465 | — | — | — |
+| 1 | cumulative | 2 | 12.474006946341948 | 12.012743413217672 | 21.95321662427476 | 9.691825528478072 | 16.988584656280498 | 8.007740437761939 | 0.5 | 0.5 | 0 | 0.5 | -16.110478403313465 | -21.95321662427476 | -16.110478403313465 | — | — | — |
 
 ### Diagnostic buckets
 | Input | Band | Count | Mean error | Standard error | Flag |

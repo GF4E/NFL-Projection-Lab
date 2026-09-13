@@ -82,7 +82,8 @@ def edit_learning(edits,cards):
  return {'rows':rows,'weekly':weekly,'tags':evidence,'excluded':dict(excluded)}
 
 def build_report(cards,reference,edits=()):
- result={'schema':'projection-trend-v1','season':2026,'reference':reference,'definitions':{'error':'actual minus projected','sigma':'sample standard deviation','coverage':'original issued margin/total intervals','reference':'2016–2025 adaptive OOF; coverage excludes 2016 (no prior residuals)','flags':'abs(mean error) > 2 sample standard errors; exploratory, not multiplicity-adjusted'},'populations':{}}
+ columns=['week','scope','games','team_points_mae','margin_mae','total_mae','team_points_sigma','margin_sigma','total_sigma','margin_coverage_50','margin_coverage_80','total_coverage_50','total_coverage_80','home_bias','total_bias']+[k for k in metrics([]) if k.startswith('favorite_bias_')]
+ result={'columns':columns,'schema':'projection-trend-v1','season':2026,'reference':reference,'definitions':{'error':'actual minus projected','sigma':'sample standard deviation','coverage':'original issued margin/total intervals','reference':'2016–2025 adaptive OOF; coverage excludes 2016 (no prior residuals)','flags':'abs(mean error) > 2 sample standard errors; exploratory, not multiplicity-adjusted'},'populations':{}}
  for evidence in ['AS_ISSUED','RETROSPECTIVE']:
   allcards=[c for c in cards if c.get('evidence')==evidence];graded=[c for c in allcards if c.get('grades')];weeks=sorted({c['week'] for c in allcards});tables=[]
   for week in weeks:
@@ -99,7 +100,7 @@ def markdown(report):
   lines += ['## '+label,f"{p['graded']} graded games; {p['pending']} pending.",'']
   tables=p['tables']
   if tables:
-   keys=list(tables[0]);lines+=['| '+' | '.join(keys)+' |','|'+'|'.join(['---']*len(keys))+'|']
+   keys=report['columns'];lines+=['| '+' | '.join(keys)+' |','|'+'|'.join(['---']*len(keys))+'|']
    for row in tables:lines.append('| '+' | '.join('—' if row[k] is None else str(row[k]) for k in keys)+' |')
   lines+=['','### Diagnostic buckets','| Input | Band | Count | Mean error | Standard error | Flag |','|---|---|---|---|---|---|']
   for b in p['diagnostics']['buckets']:lines.append('| '+' | '.join(str(b[k]) for k in ['input','band','count','mean_signed_error','standard_error','flag'])+' |')
