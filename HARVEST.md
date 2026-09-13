@@ -167,3 +167,7 @@ Discount: any Medium model reporting accuracy without a dated holdout season and
 | 7 | Bayesian state-space ratings | Beats ridge ratings on CRPS in rolling-origin |
 
 Anything that fails its criterion is logged negative and not revisited this season.
+
+## In-season projection learning — authorized September 13, 2026
+
+The new football-only loop is registered in `work/in-season-learning-v1/PLAN.md`. Tuesday weight-only refits do not change inputs, decay, penalty or residual calibration. A method change follows the new user-authorized gate: one supported input-group addition/removal per completed week, paired OOF 2016–2025 team MAE improvement of at least 1%, all margin/total 50/80 coverage rates within three percentage points of nominal, and a current-season as-issued comparison. Proposals and decisions are journaled in `CHANGELOG.md` before activation; absent evidence is deferred. This prospective protocol does not rewrite the six historical queue items or any prior rejection. Input-definition or fitting-code drift fails closed until a separately registered v2 change is evaluated.
