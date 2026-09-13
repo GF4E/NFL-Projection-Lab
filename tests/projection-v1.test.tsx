@@ -21,3 +21,5 @@ it('permits v2 on an unfrozen future card while retaining the original final',()
 it('shows measured support without inventing three reasons',()=>{const html=renderToStaticMarkup(<ProjectionCard g={{...c,version:'projection-v2-qualified-fit',why:{lines:['BAL adjusted scoring efficiency supports the projection by 2.1 points.'],against:'Against: IND home field reduces the margin by 0.8 points.'}}}/>);expect(html).toContain('supports the projection');expect(html).toContain('Against: IND home field');});
 
 it('shows engine-issued score and probability disagreement without changing either',()=>{const html=renderToStaticMarkup(<ProjectionCard g={{...c,score_probability_note:'Projected scores favor BAL; the historical residual distribution favors IND. The score and winner directions disagree.'}}/>);expect(html).toContain('directions disagree');expect(html).toContain('Ties split evenly');expect(html).toContain('Projected: BAL');});
+
+it('renders a pending lock with absent color metadata without crashing',()=>{expect(()=>renderToStaticMarkup(<ProjectionCard g={{...c,team_colors:undefined} as unknown as ProjectionCardData}/>)).not.toThrow();});
