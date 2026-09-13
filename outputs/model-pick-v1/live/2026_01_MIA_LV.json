@@ -1,29 +1,29 @@
 {
   "analysis": {
-    "captured_at": "2026-09-13T14:00:09.965787+00:00",
+    "captured_at": "2026-09-13T19:05:09.438661+00:00",
     "measured": {
       "elo_disagreement": -4.81637921251583,
       "half_points": [
         {
           "buy_price_available": false,
           "from": 3.0,
-          "same_EV_max_negative_price": 110.30449826989619,
+          "same_EV_max_negative_price": 113.4560553633218,
           "side": "Miami Dolphins",
           "to": 3.5
         }
       ],
       "spreads": {
         "best_same_line": {
-          "advantage_cents": 3.0,
-          "book": "betmgm",
+          "advantage_cents": 0.0,
+          "book": "fanduel",
           "fair_probability": 0.5120481927710844,
           "line": 3.0,
           "market": "spreads",
-          "price": -105.0,
+          "price": -108.0,
           "side": "Miami Dolphins"
         },
         "consensus_line": -3.0,
-        "movement": 0.5
+        "movement": 0.0
       },
       "teaser_candidates": [
         {
@@ -42,7 +42,7 @@
       ],
       "totals": {
         "best_same_line": {
-          "advantage_cents": 5.0,
+          "advantage_cents": 2.0,
           "book": "draftkings",
           "fair_probability": 0.5067357512953368,
           "line": 40.5,
@@ -51,17 +51,17 @@
           "side": "Under"
         },
         "consensus_line": 41.0,
-        "movement": 0.5
+        "movement": 0.0
       },
       "wind_rule": false
     },
     "sentences": [
-      "Spread consensus is LV -3. It moved +0.5 points since the previous capture.",
-      "BetMGM has the best captured price for Miami Dolphins +3 at -105, 3 cents better than the next book at the same line.",
-      "Total consensus is +41. It moved +0.5 points since the previous capture.",
-      "DraftKings has the best captured price for Under +40.5 at -110, 5 cents better than the next book at the same line.",
+      "Spread consensus is LV -3. It moved +0 points since the previous capture.",
+      "FanDuel has the best captured price for Miami Dolphins +3 at -108, 0 cents better than the next book at the same line.",
+      "Total consensus is +41. It moved +0 points since the previous capture.",
+      "DraftKings has the best captured price for Under +40.5 at -110, 2 cents better than the next book at the same line.",
       "The spread is on or within a half point of 3.",
-      "Buying Miami Dolphins from +3 to +3.5 preserves the current modeled EV up to -110.3; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "Buying Miami Dolphins from +3 to +3.5 preserves the current modeled EV up to -113.5; no captured buy-half price is available, so whether it is worth buying is unknown.",
       "The venue is indoors or its roof is unknown; WIND RULE does not apply.",
       "Plain Elo disagrees with the market margin by -4.82 points; diagnostic only, with no QB adjustment.",
       "Teaser candidates: Under +40.5 to +46.5, crossing 41, 44. Ticket prices and a partner are not established.",
@@ -69,43 +69,31 @@
     ]
   },
   "capture": {
-    "label": "SUNDAY",
+    "label": "T80",
     "params": {
       "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
-      "commenceTimeFrom": "2026-09-13T17:00:00Z",
-      "commenceTimeTo": "2026-09-15T00:15:00Z",
+      "commenceTimeFrom": "2026-09-13T20:25:00Z",
+      "commenceTimeTo": "2026-09-13T20:25:00Z",
       "dateFormat": "iso",
       "markets": "spreads,totals",
       "oddsFormat": "american"
     },
-    "received_at": "2026-09-13T14:00:09.965787+00:00",
-    "request_at": "2026-09-13T14:00:09.508290+00:00",
-    "request_id": "LIVE_SUNDAY_2026_W01",
+    "received_at": "2026-09-13T19:05:09.438661+00:00",
+    "request_at": "2026-09-13T19:05:09.342999+00:00",
+    "request_id": "2026-1-2026-09-13T20:25:00+00:00",
     "source": {
-      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_SUNDAY_2026_W01/sources/4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9.json",
-      "sha256": "4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9"
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/2026-1-2026-09-13T20_25_00+00_00/sources/85cdc07cde0adc19ae1212e986b5531b553f07a22545618d1972191f85b7d40e.json",
+      "sha256": "85cdc07cde0adc19ae1212e986b5531b553f07a22545618d1972191f85b7d40e"
     },
     "status": "CAPTURED"
   },
-  "capture_label": "SUNDAY",
-  "captured_at": "2026-09-13T14:00:09.965787+00:00",
+  "capture_label": "T80",
+  "captured_at": "2026-09-13T19:05:09.438661+00:00",
   "consensus": {
     "spreads": {
       "devigged_books": {
         "betmgm": {
           "book": "betmgm",
-          "center": 4,
-          "line": -3.0,
-          "market": "spreads",
-          "power": 1.071115843039896,
-          "probabilities": [
-            0.5116044544982121,
-            0.488395545501788
-          ],
-          "updated_at": "2026-09-13T13:59:56Z"
-        },
-        "draftkings": {
-          "book": "draftkings",
           "center": 3,
           "line": -3.0,
           "market": "spreads",
@@ -114,7 +102,19 @@
             0.5046406578884406,
             0.4953593421115595
           ],
-          "updated_at": "2026-09-13T13:58:28Z"
+          "updated_at": "2026-09-13T19:04:11Z"
+        },
+        "draftkings": {
+          "book": "draftkings",
+          "center": 3,
+          "line": -3.0,
+          "market": "spreads",
+          "power": 1.0719425631310813,
+          "probabilities": [
+            0.5000000000000001,
+            0.5000000000000001
+          ],
+          "updated_at": "2026-09-13T19:04:31Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -126,19 +126,19 @@
             0.5046406578884406,
             0.4953593421115595
           ],
-          "updated_at": "2026-09-13T13:59:57Z"
+          "updated_at": "2026-09-13T19:04:55Z"
         },
         "pinnacle": {
           "book": "pinnacle",
           "center": 3,
           "line": -3.0,
           "market": "spreads",
-          "power": 1.0359830935267351,
+          "power": 1.0357071219199514,
           "probabilities": [
-            0.4975934246714311,
-            0.5024065753285692
+            0.4927795437601464,
+            0.5072204562398538
           ],
-          "updated_at": "2026-09-13T13:59:56Z"
+          "updated_at": "2026-09-13T19:04:29Z"
         }
       },
       "full": {
@@ -170,7 +170,7 @@
           "retail_median": 3.0
         },
         "draftkings": {
-          "center": 3.25,
+          "center": 3.0,
           "contributors": [
             "betmgm",
             "fanduel",
@@ -180,10 +180,10 @@
           "excluded_book": "draftkings",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": 3,
-          "retail_median": 3.5
+          "retail_median": 3.0
         },
         "fanduel": {
-          "center": 3.25,
+          "center": 3.0,
           "contributors": [
             "betmgm",
             "draftkings",
@@ -193,7 +193,7 @@
           "excluded_book": "fanduel",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": 3,
-          "retail_median": 3.5
+          "retail_median": 3.0
         },
         "williamhill_us": {
           "center": 3.0,
@@ -218,12 +218,12 @@
           "center": 41,
           "line": 40.5,
           "market": "totals",
-          "power": 1.1069904216458242,
+          "power": 1.0607640901233029,
           "probabilities": [
-            0.4887959885212434,
-            0.5112040114787568
+            0.4917898337466912,
+            0.5082101662533091
           ],
-          "updated_at": "2026-09-13T13:59:56Z"
+          "updated_at": "2026-09-13T19:04:11Z"
         },
         "draftkings": {
           "book": "draftkings",
@@ -235,7 +235,7 @@
             0.5000000000000001,
             0.5000000000000001
           ],
-          "updated_at": "2026-09-13T13:58:28Z"
+          "updated_at": "2026-09-13T19:04:31Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -247,7 +247,7 @@
             0.488395545501788,
             0.5116044544982121
           ],
-          "updated_at": "2026-09-13T13:59:57Z"
+          "updated_at": "2026-09-13T19:04:55Z"
         },
         "pinnacle": {
           "book": "pinnacle",
@@ -259,7 +259,7 @@
             0.4928329857712016,
             0.5071670142287985
           ],
-          "updated_at": "2026-09-13T13:59:56Z"
+          "updated_at": "2026-09-13T19:04:29Z"
         }
       },
       "full": {
@@ -357,7 +357,44 @@
     "week": 1
   },
   "inactives": {
-    "status": "INACTIVES_UNAVAILABLE"
+    "depth_source": {
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/model-pick-v1/depth/e600de36014f19597e5d9dc5147b223bf0fe9001820e65d88f26efc4fa89f6c7.csv",
+      "sha256": "e600de36014f19597e5d9dc5147b223bf0fe9001820e65d88f26efc4fa89f6c7",
+      "source": {
+        "encoding": "gzip",
+        "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/model-pick-v1/sources/1d38bc9a0e059c142b22ee6acabfb68366d29622e868cf2dcec11ec1af652182.csv.gz",
+        "raw_sha256": "fede320006ae79ecd30574c3d44e0e96bdc3bcf4027a465e3ab3a83b449a3ab3",
+        "received_at": "2026-09-13T04:00:15.703051+00:00",
+        "request_at": "2026-09-13T04:00:11.311634+00:00",
+        "sha256": "1d38bc9a0e059c142b22ee6acabfb68366d29622e868cf2dcec11ec1af652182",
+        "url": "https://github.com/nflverse/nflverse-data/releases/download/depth_charts/depth_charts_2026.csv"
+      }
+    },
+    "fetch_time": "2026-09-13T18:55:03.081630+00:00",
+    "raw_list": null,
+    "received_at": "2026-09-13T18:55:03.239338+00:00",
+    "response_sha256": "7eaf9af942d713fb779c25cb899d98505dcda865b7353146256dace458209d77",
+    "source": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/summary?event=401872928",
+    "source_note": "Only dedicated inactives collection accepted; summary injuries and missing names do not establish active status",
+    "status": "INACTIVES_UNAVAILABLE",
+    "teams": {
+      "LV": {
+        "depth_status": "AVAILABLE",
+        "depth_timestamp": "2026-09-12T11:36:06Z",
+        "fetch_status": "INACTIVES_UNAVAILABLE",
+        "listed_starters_inactive": null,
+        "starting_qb_gsis": "00-0029604",
+        "starting_qb_inactive": "unknown"
+      },
+      "MIA": {
+        "depth_status": "AVAILABLE",
+        "depth_timestamp": "2026-09-12T11:36:06Z",
+        "fetch_status": "INACTIVES_UNAVAILABLE",
+        "listed_starters_inactive": null,
+        "starting_qb_gsis": "00-0038128",
+        "starting_qb_inactive": "unknown"
+      }
+    }
   },
   "lifecycle": "live-to-locked-v1",
   "offers": [
@@ -366,7 +403,7 @@
       "fair_probability": 0.4879518072289156,
       "line": -3.0,
       "market": "spreads",
-      "price": -112.0,
+      "price": -110.0,
       "side": "Las Vegas Raiders"
     },
     {
@@ -374,7 +411,7 @@
       "fair_probability": 0.5120481927710844,
       "line": 3.0,
       "market": "spreads",
-      "price": -108.0,
+      "price": -110.0,
       "side": "Miami Dolphins"
     },
     {
@@ -430,7 +467,7 @@
       "fair_probability": 0.4879518072289156,
       "line": -3.0,
       "market": "spreads",
-      "price": -115.0,
+      "price": -112.0,
       "side": "Las Vegas Raiders"
     },
     {
@@ -438,7 +475,7 @@
       "fair_probability": 0.5120481927710844,
       "line": 3.0,
       "market": "spreads",
-      "price": -105.0,
+      "price": -108.0,
       "side": "Miami Dolphins"
     },
     {
@@ -446,7 +483,7 @@
       "fair_probability": 0.49326424870466323,
       "line": 40.5,
       "market": "totals",
-      "price": -110.0,
+      "price": -105.0,
       "side": "Over"
     },
     {
@@ -454,18 +491,18 @@
       "fair_probability": 0.5067357512953368,
       "line": 40.5,
       "market": "totals",
-      "price": -120.0,
+      "price": -112.0,
       "side": "Under"
     }
   ],
   "paper_picks": [],
   "picks": [
     {
-      "EV": -0.00027962825890281984,
-      "book": "betmgm",
+      "EV": -0.013484296040427168,
+      "book": "fanduel",
       "conditional_win": 0.5120481927710844,
       "edge_source": "tiebreak",
-      "exact_tie_count": 1,
+      "exact_tie_count": 2,
       "fair_probability": 0.5120481927710844,
       "fair_probability_basis": "conditional_non_push",
       "filtered_subset": false,
@@ -473,11 +510,11 @@
       "loo_center": 3.0,
       "loss": 0.4756476683937823,
       "market": "spreads",
-      "price": -105.0,
-      "price_edge_cents": -0.061728395061720676,
+      "price": -108.0,
+      "price_edge_cents": -3.0617283950617207,
       "push": 0.02521588946459413,
-      "quote_updated_at": "2026-09-13T13:59:56Z",
-      "seed": null,
+      "quote_updated_at": "2026-09-13T19:04:55Z",
+      "seed": "1be35b249959c53a77cb06cd9177752354e1e606f2a2a6999c179de8bdd48d59",
       "side": "Miami Dolphins",
       "win": 0.4991364421416235
     },
@@ -497,7 +534,7 @@
       "price": -110.0,
       "price_edge_cents": -7.268907563025223,
       "push": 0.0,
-      "quote_updated_at": "2026-09-13T13:58:28Z",
+      "quote_updated_at": "2026-09-13T19:04:31Z",
       "seed": null,
       "side": "Under",
       "win": 0.5067357512953368
@@ -511,10 +548,10 @@
     "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
     "expected_margin": 2.972711571675302,
     "expected_total": 41.4006908462867,
-    "generated_at": "2026-09-13T14:00:13.264138+00:00",
+    "generated_at": "2026-09-13T19:05:10.203246+00:00",
     "home_score": 22.186701208981003,
     "home_win_probability": 0.5778929188255613,
-    "quote_captured_at": "2026-09-13T14:00:09.965787+00:00",
+    "quote_captured_at": "2026-09-13T19:05:09.438661+00:00",
     "score_label": "market-based score estimate",
     "status": "AVAILABLE",
     "tie_probability": 0.027633851468048358,
