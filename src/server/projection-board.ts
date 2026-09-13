@@ -1,6 +1,6 @@
 import type {ProjectionBoardData} from '../domain/projection';
 type DB=Pick<D1Database,'prepare'>;
-export const PROJECTION_URL='https://raw.githubusercontent.com/GF4E/NFL-Projection-Lab/engine-v2/outputs/projection-v1/board.json';
+export const PROJECTION_URL='https://raw.githubusercontent.com/GF4E/NFL-Projection-Lab/engine-v2/outputs/projection-v2/board.json';
 export function validateProjection(b:unknown):ProjectionBoardData{
  const x=b as ProjectionBoardData;
  if(!x||x.schema!=='projection-board-v1'||!Number.isFinite(Date.parse(x.published_at))||!Array.isArray(x.games)||!x.games.length||new Set(x.games.map(g=>g.game_id)).size!==x.games.length)throw Error('Invalid projection artifact');
@@ -9,7 +9,7 @@ export function validateProjection(b:unknown):ProjectionBoardData{
 }
 export function assertProjectionProgress(a:ProjectionBoardData,b:ProjectionBoardData){
  if(Date.parse(b.published_at)<Date.parse(a.published_at))throw Error('Older publication');
- for(const g of a.games.filter(g=>['LOCKED','FINAL'].includes(g.status))){const next=b.games.find(n=>n.game_id===g.game_id);if(!next||JSON.stringify(g.projection)!==JSON.stringify(next.projection)||JSON.stringify(g.ours)!==JSON.stringify(next.ours)||g.evidence!==next.evidence||g.grades&&JSON.stringify(g.grades)!==JSON.stringify(next.grades))throw Error('Frozen projection changed');}
+ for(const g of a.games.filter(g=>['LOCKED','FINAL'].includes(g.status)||g.evidence==='RETROSPECTIVE')){const next=b.games.find(n=>n.game_id===g.game_id);if(!next||g.version!==next.version||g.freeze_time!==next.freeze_time||JSON.stringify(g.why)!==JSON.stringify(next.why)||JSON.stringify(g.projection)!==JSON.stringify(next.projection)||JSON.stringify(g.ours)!==JSON.stringify(next.ours)||g.evidence!==next.evidence||g.grades&&JSON.stringify(g.grades)!==JSON.stringify(next.grades))throw Error('Frozen projection changed');}
 }
 async function download(){const r=await fetch(PROJECTION_URL+'?publication='+Date.now(),{signal:AbortSignal.timeout(10000)});if(!r.ok)throw Error('Projection source unavailable');return validateProjection(await r.json());}
 export async function readProjection(db:DB,fresh=false){let prior:null|{payload:string}=null;try{prior=await db.prepare('SELECT payload FROM engine_projection_publication WHERE id=1').first<{payload:string}>();}catch{}if(prior&&!fresh)return validateProjection(JSON.parse(prior.payload));try{const b=await download();if(prior)assertProjectionProgress(validateProjection(JSON.parse(prior.payload)),b);return b;}catch(e){if(prior)return validateProjection(JSON.parse(prior.payload));throw e;}}
