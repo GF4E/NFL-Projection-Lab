@@ -1,12 +1,12 @@
 {
   "analysis": [
-    "Spread consensus is TEN -1.5. It moved +0.5 points since the previous capture.",
-    "FanDuel has the best captured price for Tennessee Titans -1.5 at -108, 0 cents better than the next book at the same line.",
-    "Total consensus is +39.5. It moved +0.5 points since the previous capture.",
-    "FanDuel has the best captured price for Over +38.5 at -110, 0 cents better than the next book at the same line.",
+    "Spread consensus is TEN -1.5. It moved +0 points since the previous capture.",
+    "DraftKings has the best captured price for Tennessee Titans -1.5 at -105, 0 cents better than the next book at the same line.",
+    "Total consensus is +39.5. It moved +0 points since the previous capture.",
+    "BetMGM has the best captured price for Over +38.5 at -110, 2 cents better than the next book at the same line.",
     "The spread is not within a half point of 3 or 7.",
-    "Buying Tennessee Titans from -1.5 to -1 preserves the current modeled EV up to -118.6; no captured buy-half price is available, so whether it is worth buying is unknown.",
-    "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+    "Buying Tennessee Titans from -1.5 to -1 preserves the current modeled EV up to -115.0; no captured buy-half price is available, so whether it is worth buying is unknown.",
+    "Kickoff forecast wind is 3.2 mph. WIND RULE does not apply.",
     "Plain Elo disagrees with the market margin by +0.91 points; diagnostic only, with no QB adjustment.",
     "Teaser candidates: New York Jets +1.5 to +7.5, crossing 3, 7; Under +38.5 to +44.5, crossing 41, 44. Ticket prices and a partner are not established.",
     "QB status: inactives unknown until T-90."
@@ -16,7 +16,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_01_NYJ_TEN",
-  "generated_at": "2026-09-12T22:05:07.172977+00:00",
+  "generated_at": "2026-09-13T14:00:20.945394+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -24,7 +24,7 @@
     "clv": null
   },
   "home": "TEN",
-  "input_hash": "36e5372ad84edda1a9e1913ddf1fdaf046b31b65a8488642ece0191fb63eeb5d",
+  "input_hash": "27d5703549c72933b36aa9e7f465f1f0dd157703819ef78078a4ceb3774d61a6",
   "kickoff_utc": "2026-09-13T17:00:00+00:00",
   "market": {
     "books": {
@@ -81,7 +81,7 @@
             "fair_probability": 0.4991364421416235,
             "line": 1.5,
             "market": "spreads",
-            "price": -110.0,
+            "price": -115.0,
             "side": "New York Jets"
           },
           "TEN": {
@@ -89,7 +89,7 @@
             "fair_probability": 0.5008635578583766,
             "line": -1.5,
             "market": "spreads",
-            "price": -110.0,
+            "price": -105.0,
             "side": "Tennessee Titans"
           }
         },
@@ -123,7 +123,7 @@
             "fair_probability": 0.4991364421416235,
             "line": 1.5,
             "market": "spreads",
-            "price": -112.0,
+            "price": -115.0,
             "side": "New York Jets"
           },
           "TEN": {
@@ -131,7 +131,7 @@
             "fair_probability": 0.5008635578583766,
             "line": -1.5,
             "market": "spreads",
-            "price": -108.0,
+            "price": -105.0,
             "side": "Tennessee Titans"
           }
         },
@@ -141,7 +141,7 @@
             "fair_probability": 0.5219343696027634,
             "line": 38.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -115.0,
             "side": "Over"
           },
           "Under": {
@@ -149,7 +149,7 @@
             "fair_probability": 0.4780656303972366,
             "line": 38.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -105.0,
             "side": "Under"
           }
         }
@@ -169,7 +169,7 @@
         }
       }
     },
-    "capture_time": "2026-09-12T19:00:12.744998+00:00",
+    "capture_time": "2026-09-13T14:00:09.965787+00:00",
     "home_win_prob": 0.5623209169054441,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
     "spread": -1.5,
@@ -181,17 +181,17 @@
   },
   "model": {
     "spreads": {
-      "EV": -0.03537388856905249,
-      "book": "betmgm",
+      "EV": -0.022123529895550553,
+      "book": "draftkings",
       "edge_source": "tiebreak",
       "fair_probability": 0.5008635578583766,
       "line": -1.5,
-      "price": -108.0,
+      "price": -105.0,
       "side": "Tennessee Titans"
     },
     "totals": {
       "EV": -0.00357983984926985,
-      "book": "fanduel",
+      "book": "betmgm",
       "edge_source": "price",
       "fair_probability": 0.5219343696027634,
       "line": 38.5,
@@ -1229,9 +1229,9 @@
   "status": "UPCOMING",
   "tiles": {
     "SPREAD": {
-      "EV": -0.03703703703703698,
-      "book": "betmgm",
-      "book_label": "BetMGM",
+      "EV": -0.023809523809523836,
+      "book": "draftkings",
+      "book_label": "DraftKings",
       "chip": "LEAN",
       "clv": null,
       "confidence_source": "MARKET",
@@ -1240,7 +1240,7 @@
       "label": "SPREAD",
       "line": -1.5,
       "pick": "TEN -1.5",
-      "price": -108.0,
+      "price": -105.0,
       "probability": 0.5,
       "probability_percent": 50.0,
       "push_probability": 0.0,
@@ -1296,9 +1296,46 @@
   "version": "game-card-v3-7ed2a1b2",
   "wagers": [],
   "weather": {
-    "error": "ValueError",
-    "message": "GFS availability remains within the 10-minute replication window",
-    "status": "UNAVAILABLE"
+    "component_initializations": [
+      1789279200,
+      1789279200
+    ],
+    "event_id": "2026_01_NYJ_TEN",
+    "forecast_issued_at": "2026-09-13T11:55:02+00:00",
+    "forecast_run_initialized_at": "2026-09-13T06:00:00+00:00",
+    "issuance_basis": "Conservative upper bound from completed GFS013/GFS025 availability; exact common archived run requested",
+    "kickoff_at": "2026-09-13T17:00:00+00:00",
+    "model": "gfs_global",
+    "precip_mm": 0.0,
+    "received_at": "2026-09-13T14:00:12.671655+00:00",
+    "request_at": "2026-09-13T14:00:12.195275+00:00",
+    "requests": [
+      {
+        "received_at": "2026-09-13T14:00:12.078566+00:00",
+        "request_at": "2026-09-13T14:00:11.950819+00:00",
+        "sha256": "a7ed9244c7a263ed71112e5337e7f2293e05f17c8a11080da366e557901bd8ab",
+        "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:12.182532+00:00",
+        "request_at": "2026-09-13T14:00:12.093478+00:00",
+        "sha256": "a6dd8fd94cec85905bcd0aa4732f4293357d021f8dec723edb62dfcf5fcbe8f2",
+        "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:12.671655+00:00",
+        "request_at": "2026-09-13T14:00:12.195275+00:00",
+        "sha256": "43675343f7c13f17cbfcf3dfaed686a8150f240b3de53a90980b8924a7b7afb5",
+        "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=36.1664774&longitude=-86.7712938&models=gfs_global&run=2026-09-13T06%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
+      }
+    ],
+    "roof": "outdoors",
+    "source_sha256": "43675343f7c13f17cbfcf3dfaed686a8150f240b3de53a90980b8924a7b7afb5",
+    "status": "FORECAST",
+    "temperature_c": 32.5,
+    "valid_at": "2026-09-13T17:00:00+00:00",
+    "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+    "wind_mph": 3.2
   },
   "week": 1,
   "why": {

@@ -2,13 +2,13 @@
   "analysis": [
     "Spread consensus is JAX -9. It moved +0 points since the previous capture.",
     "BetMGM has the best captured price for Cleveland Browns +9 at -108; no other book has a comparable price at that line.",
-    "Total consensus is +40.5. It moved +0 points since the previous capture.",
-    "DraftKings has the best captured price for Under +39.5 at -102; no other book has a comparable price at that line.",
+    "Total consensus is +40. It moved -0.5 points since the previous capture.",
+    "BetMGM has the best captured price for Under +40 at -108; no other book has a comparable price at that line.",
     "The spread is not within a half point of 3 or 7.",
     "Buying Cleveland Browns from +9 to +9.5 preserves the current modeled EV up to -113.5; no captured buy-half price is available, so whether it is worth buying is unknown.",
-    "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+    "Kickoff forecast wind is 5.7 mph. WIND RULE does not apply.",
     "Plain Elo disagrees with the market margin by -0.61 points; diagnostic only, with no QB adjustment.",
-    "Teaser candidates: Jacksonville Jaguars -8.5 to -2.5, crossing 3, 7; Under +39.5 to +45.5, crossing 41, 44; Under +40.5 to +46.5, crossing 41, 44; Under +40 to +46, crossing 41, 44. Ticket prices and a partner are not established.",
+    "Teaser candidates: Jacksonville Jaguars -8.5 to -2.5, crossing 3, 7; Under +40.5 to +46.5, crossing 41, 44; Under +40 to +46, crossing 41, 44. Ticket prices and a partner are not established.",
     "QB status: inactives unknown until T-90."
   ],
   "away": "CLE",
@@ -16,7 +16,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_01_CLE_JAX",
-  "generated_at": "2026-09-12T22:05:07.172977+00:00",
+  "generated_at": "2026-09-13T14:00:20.945394+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -24,7 +24,7 @@
     "clv": null
   },
   "home": "JAX",
-  "input_hash": "bcbd0f4bbef31ae46eec67b195accef5d20359547eee9b152240cc52b4c05333",
+  "input_hash": "2d4e42b87dd52cb9e9b7dc50c2b1c927516bd3bd2b67b4a46bc01f637a6c7cc2",
   "kickoff_utc": "2026-09-13T17:00:00+00:00",
   "market": {
     "books": {
@@ -96,18 +96,18 @@
         "totals": {
           "Over": {
             "book": "draftkings",
-            "fair_probability": 0.49326424870466323,
-            "line": 39.5,
+            "fair_probability": 0.4842832469775475,
+            "line": 40.5,
             "market": "totals",
-            "price": -118.0,
+            "price": -102.0,
             "side": "Over"
           },
           "Under": {
             "book": "draftkings",
-            "fair_probability": 0.5067357512953368,
-            "line": 39.5,
+            "fair_probability": 0.5157167530224525,
+            "line": 40.5,
             "market": "totals",
-            "price": -102.0,
+            "price": -118.0,
             "side": "Under"
           }
         }
@@ -138,7 +138,7 @@
         "totals": {
           "Over": {
             "book": "fanduel",
-            "fair_probability": 0.49326424870466323,
+            "fair_probability": 0.4842832469775475,
             "line": 40.5,
             "market": "totals",
             "price": -102.0,
@@ -146,7 +146,7 @@
           },
           "Under": {
             "book": "fanduel",
-            "fair_probability": 0.5067357512953368,
+            "fair_probability": 0.5157167530224525,
             "line": 40.5,
             "market": "totals",
             "price": -120.0,
@@ -169,7 +169,7 @@
         }
       }
     },
-    "capture_time": "2026-09-12T19:00:12.744998+00:00",
+    "capture_time": "2026-09-13T14:00:09.965787+00:00",
     "home_win_prob": 0.7698833510074231,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
     "spread": -9.0,
@@ -177,7 +177,7 @@
       "spreads": "TEASE candidate, best teaser price -135 at DraftKings",
       "totals": "TEASE candidate, best teaser price -130 at BetMGM"
     },
-    "total": 40.5
+    "total": 40.0
   },
   "model": {
     "spreads": {
@@ -190,12 +190,12 @@
       "side": "Cleveland Browns"
     },
     "totals": {
-      "EV": 0.003535507467235577,
-      "book": "draftkings",
-      "edge_source": "price",
-      "fair_probability": 0.5067357512953368,
-      "line": 39.5,
-      "price": -102.0,
+      "EV": -0.015083477259643097,
+      "book": "betmgm",
+      "edge_source": "tiebreak",
+      "fair_probability": 0.5113279888462878,
+      "line": 40.0,
+      "price": -108.0,
       "side": "Under"
     }
   },
@@ -1250,25 +1250,25 @@
       "subtitle": "coin flip"
     },
     "TOTAL": {
-      "EV": 0.003535507467235577,
-      "book": "draftkings",
-      "book_label": "DraftKings",
+      "EV": -0.04504631810331288,
+      "book": "betmgm",
+      "book_label": "BetMGM",
       "chip": "LEAN",
       "clv": null,
-      "confidence_source": "MODEL",
+      "confidence_source": "MARKET",
       "confidence_used": null,
       "grade": null,
       "label": "TOTAL",
-      "line": 39.5,
-      "pick": "UNDER 39.5",
-      "price": -102.0,
-      "probability": 0.5067357512953368,
-      "probability_percent": 50.7,
-      "push_probability": 0.0,
-      "ring_offset": 49.326424870466326,
-      "side": "Under",
+      "line": 40.0,
+      "pick": "OVER 40",
+      "price": -110.0,
+      "probability": 0.5,
+      "probability_percent": 50.0,
+      "push_probability": 0.008981001727115717,
+      "ring_offset": 50.0,
+      "side": "Over",
       "stake_dollars": null,
-      "subtitle": ""
+      "subtitle": "coin flip"
     },
     "WINNER": {
       "EV": null,
@@ -1296,9 +1296,46 @@
   "version": "game-card-v3-7ed2a1b2",
   "wagers": [],
   "weather": {
-    "error": "ValueError",
-    "message": "GFS availability remains within the 10-minute replication window",
-    "status": "UNAVAILABLE"
+    "component_initializations": [
+      1789279200,
+      1789279200
+    ],
+    "event_id": "2026_01_CLE_JAX",
+    "forecast_issued_at": "2026-09-13T11:55:02+00:00",
+    "forecast_run_initialized_at": "2026-09-13T06:00:00+00:00",
+    "issuance_basis": "Conservative upper bound from completed GFS013/GFS025 availability; exact common archived run requested",
+    "kickoff_at": "2026-09-13T17:00:00+00:00",
+    "model": "gfs_global",
+    "precip_mm": 0.0,
+    "received_at": "2026-09-13T14:00:11.312697+00:00",
+    "request_at": "2026-09-13T14:00:10.845634+00:00",
+    "requests": [
+      {
+        "received_at": "2026-09-13T14:00:10.743086+00:00",
+        "request_at": "2026-09-13T14:00:10.666315+00:00",
+        "sha256": "a7ed9244c7a263ed71112e5337e7f2293e05f17c8a11080da366e557901bd8ab",
+        "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:10.839593+00:00",
+        "request_at": "2026-09-13T14:00:10.744047+00:00",
+        "sha256": "a6dd8fd94cec85905bcd0aa4732f4293357d021f8dec723edb62dfcf5fcbe8f2",
+        "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:11.312697+00:00",
+        "request_at": "2026-09-13T14:00:10.845634+00:00",
+        "sha256": "33bec82509fb5ab297935c638b0d4d7453418362485b47c53eff0754c49e43fc",
+        "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=30.3239164&longitude=-81.6373486&models=gfs_global&run=2026-09-13T06%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
+      }
+    ],
+    "roof": "outdoors",
+    "source_sha256": "33bec82509fb5ab297935c638b0d4d7453418362485b47c53eff0754c49e43fc",
+    "status": "FORECAST",
+    "temperature_c": 35.5,
+    "valid_at": "2026-09-13T17:00:00+00:00",
+    "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+    "wind_mph": 5.7
   },
   "week": 1,
   "why": {

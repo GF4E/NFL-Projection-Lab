@@ -2,7 +2,7 @@
   "analysis": [
     "Spread consensus is DET -7. It moved +0 points since the previous capture.",
     "FanDuel has the best captured price for New Orleans Saints +6.5 at +100; no other book has a comparable price at that line.",
-    "Total consensus is +51. It moved +0 points since the previous capture.",
+    "Total consensus is +50.5. It moved -0.5 points since the previous capture.",
     "DraftKings has the best captured price for Over +49.5 at -112, 3 cents better than the next book at the same line.",
     "The spread is on or within a half point of 7.",
     "Buying New Orleans Saints from +6.5 to +7 preserves the current modeled EV up to -105.3; no captured buy-half price is available, so whether it is worth buying is unknown.",
@@ -16,7 +16,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_01_NO_DET",
-  "generated_at": "2026-09-12T22:05:07.172977+00:00",
+  "generated_at": "2026-09-13T14:00:20.945394+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -24,7 +24,7 @@
     "clv": null
   },
   "home": "DET",
-  "input_hash": "c77c51912efeea348efcadfa800bfa9620803cc5ad1c19d82f96df25261df264",
+  "input_hash": "0cde68575b24bc638d5b55f4a6375ea426d2d111325ca907e6189678eed92ade",
   "kickoff_utc": "2026-09-13T17:00:00+00:00",
   "market": {
     "books": {
@@ -39,7 +39,7 @@
             "fair_probability": 0.4879518072289156,
             "line": -7.0,
             "market": "spreads",
-            "price": -110.0,
+            "price": -108.0,
             "side": "Detroit Lions"
           },
           "NO": {
@@ -47,23 +47,23 @@
             "fair_probability": 0.5120481927710844,
             "line": 7.0,
             "market": "spreads",
-            "price": -108.0,
+            "price": -110.0,
             "side": "New Orleans Saints"
           }
         },
         "totals": {
           "Over": {
             "book": "betmgm",
-            "fair_probability": 0.5219343696027634,
-            "line": 49.5,
+            "fair_probability": 0.507823613086771,
+            "line": 50.0,
             "market": "totals",
-            "price": -118.0,
+            "price": -108.0,
             "side": "Over"
           },
           "Under": {
             "book": "betmgm",
-            "fair_probability": 0.4780656303972366,
-            "line": 49.5,
+            "fair_probability": 0.492176386913229,
+            "line": 50.0,
             "market": "totals",
             "price": -110.0,
             "side": "Under"
@@ -169,15 +169,15 @@
         }
       }
     },
-    "capture_time": "2026-09-12T19:00:12.744998+00:00",
+    "capture_time": "2026-09-13T14:00:09.965787+00:00",
     "home_win_prob": 0.7200999642984648,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
     "spread": -7.0,
     "teaser_near_miss": {
       "spreads": null,
-      "totals": "TEASE candidate, best teaser price -130 at BetMGM"
+      "totals": "TEASE candidate, best teaser price -135 at DraftKings"
     },
-    "total": 51.0
+    "total": 50.5
   },
   "model": {
     "spreads": {
@@ -1229,7 +1229,7 @@
   "status": "UPCOMING",
   "tiles": {
     "SPREAD": {
-      "EV": -0.036103115205014975,
+      "EV": -0.04430836866070023,
       "book": "betmgm",
       "book_label": "BetMGM",
       "chip": "LEAN",
@@ -1240,7 +1240,7 @@
       "label": "SPREAD",
       "line": 7.0,
       "pick": "NO +7",
-      "price": -108.0,
+      "price": -110.0,
       "probability": 0.5,
       "probability_percent": 50.0,
       "push_probability": 0.02521588946459413,

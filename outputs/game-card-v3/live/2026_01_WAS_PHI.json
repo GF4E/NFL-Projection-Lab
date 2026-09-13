@@ -1,12 +1,12 @@
 {
   "analysis": [
     "Spread consensus is PHI -6. It moved +0 points since the previous capture.",
-    "DraftKings has the best captured price for Washington Commanders +6 at -112; no other book has a comparable price at that line.",
+    "DraftKings has the best captured price for Washington Commanders +6 at -108, 0 cents better than the next book at the same line.",
     "Total consensus is +44. It moved +0 points since the previous capture.",
-    "DraftKings has the best captured price for Under +44.5 at -115, 0 cents better than the next book at the same line.",
+    "BetMGM has the best captured price for Under +44 at -108; no other book has a comparable price at that line.",
     "The spread is not within a half point of 3 or 7.",
-    "Buying Washington Commanders from +6 to +6.5 preserves the current modeled EV up to -117.7; no captured buy-half price is available, so whether it is worth buying is unknown.",
-    "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+    "Buying Washington Commanders from +6 to +6.5 preserves the current modeled EV up to -113.5; no captured buy-half price is available, so whether it is worth buying is unknown.",
+    "Kickoff forecast wind is 5.3 mph. WIND RULE does not apply.",
     "Plain Elo disagrees with the market margin by +0.39 points; diagnostic only, with no QB adjustment.",
     "Teaser candidates: Over +44.5 to +38.5, crossing 41, 44. Ticket prices and a partner are not established.",
     "QB status: inactives unknown until T-90."
@@ -16,7 +16,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_01_WAS_PHI",
-  "generated_at": "2026-09-12T22:05:07.172977+00:00",
+  "generated_at": "2026-09-13T14:00:20.945394+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -24,7 +24,7 @@
     "clv": null
   },
   "home": "PHI",
-  "input_hash": "dc7f928637022d1f112c267c8c00c8651d13334a7cf14bcfc22f9d562aca55c2",
+  "input_hash": "379a1cdd30ae083a7e4cf90936351535da0e8bca62c03bf9682eebd6c62714c6",
   "kickoff_utc": "2026-09-13T20:25:00+00:00",
   "market": {
     "books": {
@@ -36,16 +36,16 @@
         "spreads": {
           "PHI": {
             "book": "betmgm",
-            "fair_probability": 0.5008635578583766,
-            "line": -5.5,
+            "fair_probability": 0.4879518072289156,
+            "line": -6.0,
             "market": "spreads",
             "price": -110.0,
             "side": "Philadelphia Eagles"
           },
           "WAS": {
             "book": "betmgm",
-            "fair_probability": 0.4991364421416235,
-            "line": 5.5,
+            "fair_probability": 0.5120481927710844,
+            "line": 6.0,
             "market": "spreads",
             "price": -108.0,
             "side": "Washington Commanders"
@@ -54,18 +54,18 @@
         "totals": {
           "Over": {
             "book": "betmgm",
-            "fair_probability": 0.4842832469775475,
-            "line": 44.5,
+            "fair_probability": 0.48867201115371206,
+            "line": 44.0,
             "market": "totals",
             "price": -110.0,
             "side": "Over"
           },
           "Under": {
             "book": "betmgm",
-            "fair_probability": 0.5157167530224525,
-            "line": 44.5,
+            "fair_probability": 0.5113279888462878,
+            "line": 44.0,
             "market": "totals",
-            "price": -120.0,
+            "price": -108.0,
             "side": "Under"
           }
         }
@@ -81,7 +81,7 @@
             "fair_probability": 0.4879518072289156,
             "line": -6.0,
             "market": "spreads",
-            "price": -108.0,
+            "price": -112.0,
             "side": "Philadelphia Eagles"
           },
           "WAS": {
@@ -89,7 +89,7 @@
             "fair_probability": 0.5120481927710844,
             "line": 6.0,
             "market": "spreads",
-            "price": -112.0,
+            "price": -108.0,
             "side": "Washington Commanders"
           }
         },
@@ -123,7 +123,7 @@
             "fair_probability": 0.5008635578583766,
             "line": -5.5,
             "market": "spreads",
-            "price": -110.0,
+            "price": -112.0,
             "side": "Philadelphia Eagles"
           },
           "WAS": {
@@ -131,7 +131,7 @@
             "fair_probability": 0.4991364421416235,
             "line": 5.5,
             "market": "spreads",
-            "price": -110.0,
+            "price": -108.0,
             "side": "Washington Commanders"
           }
         },
@@ -169,33 +169,33 @@
         }
       }
     },
-    "capture_time": "2026-09-12T19:00:12.744998+00:00",
+    "capture_time": "2026-09-13T14:00:09.965787+00:00",
     "home_win_prob": 0.6878777106292215,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
     "spread": -6.0,
     "teaser_near_miss": {
       "spreads": null,
-      "totals": "TEASE candidate, best teaser price -130 at BetMGM"
+      "totals": "TEASE candidate, best teaser price -135 at DraftKings"
     },
     "total": 44.0
   },
   "model": {
     "spreads": {
-      "EV": -0.029990130767332757,
+      "EV": -0.013484296040427168,
       "book": "draftkings",
       "edge_source": "tiebreak",
       "fair_probability": 0.5120481927710844,
       "line": 6.0,
-      "price": -112.0,
+      "price": -108.0,
       "side": "Washington Commanders"
     },
     "totals": {
-      "EV": -0.03583389652324115,
-      "book": "draftkings",
-      "edge_source": "price",
-      "fair_probability": 0.5157167530224525,
-      "line": 44.5,
-      "price": -115.0,
+      "EV": -0.015083477259643097,
+      "book": "betmgm",
+      "edge_source": "tiebreak",
+      "fair_probability": 0.5113279888462878,
+      "line": 44.0,
+      "price": -108.0,
       "side": "Under"
     }
   },
@@ -1229,7 +1229,7 @@
   "status": "UPCOMING",
   "tiles": {
     "SPREAD": {
-      "EV": -0.045454545454545414,
+      "EV": -0.036103115205014975,
       "book": "betmgm",
       "book_label": "BetMGM",
       "chip": "LEAN",
@@ -1238,37 +1238,37 @@
       "confidence_used": null,
       "grade": null,
       "label": "SPREAD",
-      "line": -5.5,
-      "pick": "PHI -5.5",
-      "price": -110.0,
+      "line": 6.0,
+      "pick": "WAS +6",
+      "price": -108.0,
       "probability": 0.5,
       "probability_percent": 50.0,
-      "push_probability": 0.0,
+      "push_probability": 0.02521588946459413,
       "ring_offset": 50.0,
-      "side": "PHI",
+      "side": "WAS",
       "stake_dollars": null,
       "subtitle": "coin flip"
     },
     "TOTAL": {
-      "EV": -0.03583389652324115,
-      "book": "draftkings",
-      "book_label": "DraftKings",
+      "EV": -0.04504631810331288,
+      "book": "betmgm",
+      "book_label": "BetMGM",
       "chip": "LEAN",
       "clv": null,
-      "confidence_source": "MODEL",
+      "confidence_source": "MARKET",
       "confidence_used": null,
       "grade": null,
       "label": "TOTAL",
-      "line": 44.5,
-      "pick": "UNDER 44.5",
-      "price": -115.0,
-      "probability": 0.5157167530224525,
-      "probability_percent": 51.6,
-      "push_probability": 0.0,
-      "ring_offset": 48.42832469775475,
-      "side": "Under",
+      "line": 44.0,
+      "pick": "OVER 44",
+      "price": -110.0,
+      "probability": 0.5,
+      "probability_percent": 50.0,
+      "push_probability": 0.008981001727115717,
+      "ring_offset": 50.0,
+      "side": "Over",
       "stake_dollars": null,
-      "subtitle": ""
+      "subtitle": "coin flip"
     },
     "WINNER": {
       "EV": null,
@@ -1296,9 +1296,46 @@
   "version": "game-card-v3-7ed2a1b2",
   "wagers": [],
   "weather": {
-    "error": "ValueError",
-    "message": "GFS availability remains within the 10-minute replication window",
-    "status": "UNAVAILABLE"
+    "component_initializations": [
+      1789279200,
+      1789279200
+    ],
+    "event_id": "2026_01_WAS_PHI",
+    "forecast_issued_at": "2026-09-13T11:55:02+00:00",
+    "forecast_run_initialized_at": "2026-09-13T06:00:00+00:00",
+    "issuance_basis": "Conservative upper bound from completed GFS013/GFS025 availability; exact common archived run requested",
+    "kickoff_at": "2026-09-13T20:25:00+00:00",
+    "model": "gfs_global",
+    "precip_mm": 0.0,
+    "received_at": "2026-09-13T14:00:14.029387+00:00",
+    "request_at": "2026-09-13T14:00:13.636424+00:00",
+    "requests": [
+      {
+        "received_at": "2026-09-13T14:00:13.518525+00:00",
+        "request_at": "2026-09-13T14:00:13.385095+00:00",
+        "sha256": "a7ed9244c7a263ed71112e5337e7f2293e05f17c8a11080da366e557901bd8ab",
+        "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:13.635774+00:00",
+        "request_at": "2026-09-13T14:00:13.533391+00:00",
+        "sha256": "a6dd8fd94cec85905bcd0aa4732f4293357d021f8dec723edb62dfcf5fcbe8f2",
+        "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:14.029387+00:00",
+        "request_at": "2026-09-13T14:00:13.636424+00:00",
+        "sha256": "d27a46015d537fd9aa0ceeabca595e5bb22fbeeba0ff617a88535d0a9ec390a9",
+        "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=39.9007914&longitude=-75.1674645&models=gfs_global&run=2026-09-13T06%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
+      }
+    ],
+    "roof": "outdoors",
+    "source_sha256": "d27a46015d537fd9aa0ceeabca595e5bb22fbeeba0ff617a88535d0a9ec390a9",
+    "status": "FORECAST",
+    "temperature_c": 30.1,
+    "valid_at": "2026-09-13T20:00:00+00:00",
+    "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+    "wind_mph": 5.3
   },
   "week": 1,
   "why": {
@@ -1316,7 +1353,7 @@
       "6.PHI.off_rush_epa;6.WAS.def_rush_epa",
       "6.WAS.off_pass_epa;6.PHI.def_pass_epa"
     ],
-    "statement": "The market-based ATS lean favors PHI; PHI pass offense vs pass defense: #11 vs WAS #30. Against that lean, WAS explosive offense vs defense: #9 vs PHI #15."
+    "statement": "The market-based ATS lean favors WAS; WAS explosive offense vs defense: #9 vs PHI #15. Against that lean, PHI pass offense vs pass defense: #11 vs WAS #30."
   },
   "winner_bar": {
     "away_percent": 31.2,

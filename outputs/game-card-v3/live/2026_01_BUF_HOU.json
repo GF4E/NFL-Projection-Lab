@@ -1,11 +1,11 @@
 {
   "analysis": [
     "Spread consensus is HOU +1. It moved +0 points since the previous capture.",
-    "FanDuel has the best captured price for Buffalo Bills -1.5 at -105, 3 cents better than the next book at the same line.",
-    "Total consensus is +45. It moved -0.5 points since the previous capture.",
-    "BetMGM has the best captured price for Under +44.5 at -108, 2 cents better than the next book at the same line.",
+    "BetMGM has the best captured price for Buffalo Bills -1 at -110; no other book has a comparable price at that line.",
+    "Total consensus is +44.5. It moved -0.5 points since the previous capture.",
+    "DraftKings has the best captured price for Under +44.5 at -110, 0 cents better than the next book at the same line.",
     "The spread is not within a half point of 3 or 7.",
-    "Buying Buffalo Bills from -1.5 to -1 preserves the current modeled EV up to -110.9; no captured buy-half price is available, so whether it is worth buying is unknown.",
+    "Buying Buffalo Bills from -1 to -0.5 preserves the current modeled EV up to -115.6; no captured buy-half price is available, so whether it is worth buying is unknown.",
     "The venue is indoors or its roof is unknown; WIND RULE does not apply.",
     "Plain Elo disagrees with the market margin by +3.64 points; diagnostic only, with no QB adjustment.",
     "Teaser candidates: Houston Texans +1.5 to +7.5, crossing 3, 7; Over +44.5 to +38.5, crossing 41, 44. Ticket prices and a partner are not established.",
@@ -16,7 +16,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_01_BUF_HOU",
-  "generated_at": "2026-09-12T22:05:07.172977+00:00",
+  "generated_at": "2026-09-13T14:00:20.945394+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -24,7 +24,7 @@
     "clv": null
   },
   "home": "HOU",
-  "input_hash": "77f30c199527b39dc39a150009c4fa020cd98cfb03f0a6518885fe7f8c9795ac",
+  "input_hash": "3b899dbc00d8a4cfd33dd765dcc0cf01f1d47e2992bb5665282f20934a418180",
   "kickoff_utc": "2026-09-13T17:00:00+00:00",
   "market": {
     "books": {
@@ -36,18 +36,18 @@
         "spreads": {
           "BUF": {
             "book": "betmgm",
-            "fair_probability": 0.4991364421416235,
-            "line": -1.5,
+            "fair_probability": 0.5120481927710844,
+            "line": -1.0,
             "market": "spreads",
-            "price": -108.0,
+            "price": -110.0,
             "side": "Buffalo Bills"
           },
           "HOU": {
             "book": "betmgm",
-            "fair_probability": 0.5008635578583766,
-            "line": 1.5,
+            "fair_probability": 0.4879518072289156,
+            "line": 1.0,
             "market": "spreads",
-            "price": -110.0,
+            "price": -108.0,
             "side": "Houston Texans"
           }
         },
@@ -57,7 +57,7 @@
             "fair_probability": 0.49326424870466323,
             "line": 44.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -108.0,
             "side": "Over"
           },
           "Under": {
@@ -65,7 +65,7 @@
             "fair_probability": 0.5067357512953368,
             "line": 44.5,
             "market": "totals",
-            "price": -108.0,
+            "price": -110.0,
             "side": "Under"
           }
         }
@@ -169,33 +169,33 @@
         }
       }
     },
-    "capture_time": "2026-09-12T19:00:12.744998+00:00",
+    "capture_time": "2026-09-13T14:00:09.965787+00:00",
     "home_win_prob": 0.4545454545454546,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
     "spread": 1.0,
     "teaser_near_miss": {
-      "spreads": "TEASE candidate, best teaser price -130 at BetMGM",
+      "spreads": "TEASE candidate, best teaser price -135 at DraftKings",
       "totals": "TEASE candidate, best teaser price -130 at BetMGM"
     },
-    "total": 45.0
+    "total": 44.5
   },
   "model": {
     "spreads": {
-      "EV": -0.025495517723496952,
-      "book": "fanduel",
+      "EV": -0.021887266446851794,
+      "book": "betmgm",
       "edge_source": "tiebreak",
-      "fair_probability": 0.4991364421416235,
-      "line": -1.5,
-      "price": -105.0,
+      "fair_probability": 0.5120481927710844,
+      "line": -1.0,
+      "price": -110.0,
       "side": "Buffalo Bills"
     },
     "totals": {
-      "EV": -0.024064478986758786,
-      "book": "betmgm",
+      "EV": -0.0325953838907207,
+      "book": "fanduel",
       "edge_source": "tiebreak",
       "fair_probability": 0.5067357512953368,
       "line": 44.5,
-      "price": -108.0,
+      "price": -110.0,
       "side": "Under"
     }
   },
@@ -1229,21 +1229,21 @@
   "status": "UPCOMING",
   "tiles": {
     "SPREAD": {
-      "EV": -0.023809523809523836,
-      "book": "fanduel",
-      "book_label": "FanDuel",
+      "EV": -0.04430836866070023,
+      "book": "betmgm",
+      "book_label": "BetMGM",
       "chip": "LEAN",
       "clv": null,
       "confidence_source": "MARKET",
       "confidence_used": null,
       "grade": null,
       "label": "SPREAD",
-      "line": -1.5,
-      "pick": "BUF -1.5",
-      "price": -105.0,
+      "line": -1.0,
+      "pick": "BUF -1",
+      "price": -110.0,
       "probability": 0.5,
       "probability_percent": 50.0,
-      "push_probability": 0.0,
+      "push_probability": 0.02521588946459413,
       "ring_offset": 50.0,
       "side": "BUF",
       "stake_dollars": null,
@@ -1260,13 +1260,13 @@
       "grade": null,
       "label": "TOTAL",
       "line": 44.5,
-      "pick": "UNDER 44.5",
+      "pick": "OVER 44.5",
       "price": -108.0,
       "probability": 0.5,
       "probability_percent": 50.0,
       "push_probability": 0.0,
       "ring_offset": 50.0,
-      "side": "Under",
+      "side": "Over",
       "stake_dollars": null,
       "subtitle": "coin flip"
     },

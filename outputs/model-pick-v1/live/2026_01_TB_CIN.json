@@ -1,25 +1,25 @@
 {
   "analysis": {
-    "captured_at": "2026-09-12T19:00:12.744998+00:00",
+    "captured_at": "2026-09-13T14:00:09.965787+00:00",
     "measured": {
       "elo_disagreement": -1.3918132646187589,
       "half_points": [
         {
           "buy_price_available": false,
           "from": 3.5,
-          "same_EV_max_negative_price": 109.76714289888099,
+          "same_EV_max_negative_price": 107.54155296452494,
           "side": "Tampa Bay Buccaneers",
           "to": 4.0
         }
       ],
       "spreads": {
         "best_same_line": {
-          "advantage_cents": 4.0,
-          "book": "fanduel",
+          "advantage_cents": 2.0,
+          "book": "draftkings",
           "fair_probability": 0.4991364421416235,
           "line": 3.5,
           "market": "spreads",
-          "price": -104.0,
+          "price": -102.0,
           "side": "Tampa Bay Buccaneers"
         },
         "consensus_line": -4.0,
@@ -28,12 +28,12 @@
       "teaser_candidates": [],
       "totals": {
         "best_same_line": {
-          "advantage_cents": 2.0,
+          "advantage_cents": 0.0,
           "book": "fanduel",
           "fair_probability": 0.5067357512953368,
           "line": 50.5,
           "market": "totals",
-          "price": -108.0,
+          "price": -110.0,
           "side": "Under"
         },
         "consensus_line": 51.0,
@@ -43,19 +43,19 @@
     },
     "sentences": [
       "Spread consensus is CIN -4. It moved +0 points since the previous capture.",
-      "FanDuel has the best captured price for Tampa Bay Buccaneers +3.5 at -104, 4 cents better than the next book at the same line.",
+      "DraftKings has the best captured price for Tampa Bay Buccaneers +3.5 at -102, 2 cents better than the next book at the same line.",
       "Total consensus is +51. It moved +0 points since the previous capture.",
-      "FanDuel has the best captured price for Under +50.5 at -108, 2 cents better than the next book at the same line.",
+      "FanDuel has the best captured price for Under +50.5 at -110, 0 cents better than the next book at the same line.",
       "The spread is not within a half point of 3 or 7.",
-      "Buying Tampa Bay Buccaneers from +3.5 to +4 preserves the current modeled EV up to -109.8; no captured buy-half price is available, so whether it is worth buying is unknown.",
-      "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+      "Buying Tampa Bay Buccaneers from +3.5 to +4 preserves the current modeled EV up to -107.5; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "Kickoff forecast wind is 5.1 mph. WIND RULE does not apply.",
       "Plain Elo disagrees with the market margin by -1.39 points; diagnostic only, with no QB adjustment.",
       "Neither side of the captured spreads or totals meets the six-point teaser crossing criteria.",
       "QB status: inactives unknown until T-90."
     ]
   },
   "capture": {
-    "label": "SATURDAY",
+    "label": "SUNDAY",
     "params": {
       "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
       "commenceTimeFrom": "2026-09-13T17:00:00Z",
@@ -64,43 +64,43 @@
       "markets": "spreads,totals",
       "oddsFormat": "american"
     },
-    "received_at": "2026-09-12T19:00:12.744998+00:00",
-    "request_at": "2026-09-12T19:00:12.575995+00:00",
-    "request_id": "LIVE_SATURDAY_2026_W01",
+    "received_at": "2026-09-13T14:00:09.965787+00:00",
+    "request_at": "2026-09-13T14:00:09.508290+00:00",
+    "request_id": "LIVE_SUNDAY_2026_W01",
     "source": {
-      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_SATURDAY_2026_W01/sources/4360ef2e8cfe38d78d6db2ae039f1eb63495d56d6bc98d05cb90552ab9e9eeec.json",
-      "sha256": "4360ef2e8cfe38d78d6db2ae039f1eb63495d56d6bc98d05cb90552ab9e9eeec"
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_SUNDAY_2026_W01/sources/4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9.json",
+      "sha256": "4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9"
     },
     "status": "CAPTURED"
   },
-  "capture_label": "SATURDAY",
-  "captured_at": "2026-09-12T19:00:12.744998+00:00",
+  "capture_label": "SUNDAY",
+  "captured_at": "2026-09-13T14:00:09.965787+00:00",
   "consensus": {
     "spreads": {
       "devigged_books": {
         "betmgm": {
           "book": "betmgm",
           "center": 4,
-          "line": -3.5,
+          "line": -4.0,
           "market": "spreads",
           "power": 1.0647311734675267,
           "probabilities": [
-            0.5023369847659711,
-            0.49766301523402895
+            0.49766301523402895,
+            0.5023369847659711
           ],
-          "updated_at": "2026-09-12T18:59:34Z"
+          "updated_at": "2026-09-13T13:59:56Z"
         },
         "draftkings": {
           "book": "draftkings",
           "center": 4,
           "line": -3.5,
           "market": "spreads",
-          "power": 1.0718103317980505,
+          "power": 1.0698248525605822,
           "probabilities": [
-            0.5046406578884406,
-            0.4953593421115595
+            0.5185754937201552,
+            0.4814245062798449
           ],
-          "updated_at": "2026-09-12T18:59:32Z"
+          "updated_at": "2026-09-13T13:58:28Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -112,19 +112,19 @@
             0.5161351282556743,
             0.48386487174432585
           ],
-          "updated_at": "2026-09-12T19:00:11Z"
+          "updated_at": "2026-09-13T13:59:57Z"
         },
         "pinnacle": {
           "book": "pinnacle",
           "center": 4,
           "line": -4.0,
           "market": "spreads",
-          "power": 1.0423544832846647,
+          "power": 1.0351549468081807,
           "probabilities": [
-            0.4880526031918223,
-            0.511947396808178
+            0.48796346983677047,
+            0.5120365301632296
           ],
-          "updated_at": "2026-09-12T19:00:06Z"
+          "updated_at": "2026-09-13T13:59:56Z"
         }
       },
       "full": {
@@ -209,7 +209,7 @@
             0.49766301523402895,
             0.5023369847659711
           ],
-          "updated_at": "2026-09-12T18:59:34Z"
+          "updated_at": "2026-09-13T13:59:56Z"
         },
         "draftkings": {
           "book": "draftkings",
@@ -221,31 +221,31 @@
             0.4953593421115595,
             0.5046406578884406
           ],
-          "updated_at": "2026-09-12T18:59:32Z"
+          "updated_at": "2026-09-13T13:58:28Z"
         },
         "fanduel": {
           "book": "fanduel",
           "center": 51,
           "line": 50.5,
           "market": "totals",
-          "power": 1.0718103317980505,
+          "power": 1.0719425631310813,
           "probabilities": [
-            0.5046406578884406,
-            0.4953593421115595
+            0.5000000000000001,
+            0.5000000000000001
           ],
-          "updated_at": "2026-09-12T19:00:11Z"
+          "updated_at": "2026-09-13T13:59:57Z"
         },
         "pinnacle": {
           "book": "pinnacle",
           "center": 51,
           "line": 50.0,
           "market": "totals",
-          "power": 1.0574485894788523,
+          "power": 1.0430728882888332,
           "probabilities": [
-            0.5047081268292227,
-            0.4952918731707774
+            0.5047777130839807,
+            0.4952222869160195
           ],
-          "updated_at": "2026-09-12T19:00:06Z"
+          "updated_at": "2026-09-13T13:59:56Z"
         }
       },
       "full": {
@@ -321,9 +321,46 @@
   },
   "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
   "forecast": {
-    "error": "ValueError",
-    "message": "GFS availability remains within the 10-minute replication window",
-    "status": "UNAVAILABLE"
+    "component_initializations": [
+      1789279200,
+      1789279200
+    ],
+    "event_id": "2026_01_TB_CIN",
+    "forecast_issued_at": "2026-09-13T11:55:02+00:00",
+    "forecast_run_initialized_at": "2026-09-13T06:00:00+00:00",
+    "issuance_basis": "Conservative upper bound from completed GFS013/GFS025 availability; exact common archived run requested",
+    "kickoff_at": "2026-09-13T17:00:00+00:00",
+    "model": "gfs_global",
+    "precip_mm": 0.0,
+    "received_at": "2026-09-13T14:00:10.758728+00:00",
+    "request_at": "2026-09-13T14:00:10.328970+00:00",
+    "requests": [
+      {
+        "received_at": "2026-09-13T14:00:10.214599+00:00",
+        "request_at": "2026-09-13T14:00:10.078150+00:00",
+        "sha256": "a7ed9244c7a263ed71112e5337e7f2293e05f17c8a11080da366e557901bd8ab",
+        "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:10.328385+00:00",
+        "request_at": "2026-09-13T14:00:10.228671+00:00",
+        "sha256": "a6dd8fd94cec85905bcd0aa4732f4293357d021f8dec723edb62dfcf5fcbe8f2",
+        "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:10.758728+00:00",
+        "request_at": "2026-09-13T14:00:10.328970+00:00",
+        "sha256": "6611e38ed6b5aa416275e0a37ccd14c30002178c56c936097d1e9c1bfb197cbc",
+        "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=39.0954306&longitude=-84.5160435&models=gfs_global&run=2026-09-13T06%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
+      }
+    ],
+    "roof": "outdoors",
+    "source_sha256": "6611e38ed6b5aa416275e0a37ccd14c30002178c56c936097d1e9c1bfb197cbc",
+    "status": "FORECAST",
+    "temperature_c": 29.6,
+    "valid_at": "2026-09-13T17:00:00+00:00",
+    "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+    "wind_mph": 5.1
   },
   "game": {
     "away_abbr": "TB",
@@ -354,7 +391,7 @@
       "fair_probability": 0.5008635578583766,
       "line": -3.5,
       "market": "spreads",
-      "price": -112.0,
+      "price": -118.0,
       "side": "Cincinnati Bengals"
     },
     {
@@ -362,7 +399,7 @@
       "fair_probability": 0.4991364421416235,
       "line": 3.5,
       "market": "spreads",
-      "price": -108.0,
+      "price": -102.0,
       "side": "Tampa Bay Buccaneers"
     },
     {
@@ -402,7 +439,7 @@
       "fair_probability": 0.49326424870466323,
       "line": 50.5,
       "market": "totals",
-      "price": -112.0,
+      "price": -110.0,
       "side": "Over"
     },
     {
@@ -410,23 +447,23 @@
       "fair_probability": 0.5067357512953368,
       "line": 50.5,
       "market": "totals",
-      "price": -108.0,
+      "price": -110.0,
       "side": "Under"
     },
     {
       "book": "betmgm",
-      "fair_probability": 0.5008635578583766,
-      "line": -3.5,
+      "fair_probability": 0.4879518072289156,
+      "line": -4.0,
       "market": "spreads",
-      "price": -110.0,
+      "price": -108.0,
       "side": "Cincinnati Bengals"
     },
     {
       "book": "betmgm",
-      "fair_probability": 0.4991364421416235,
-      "line": 3.5,
+      "fair_probability": 0.5120481927710844,
+      "line": 4.0,
       "market": "spreads",
-      "price": -108.0,
+      "price": -110.0,
       "side": "Tampa Bay Buccaneers"
     },
     {
@@ -449,8 +486,8 @@
   "paper_picks": [],
   "picks": [
     {
-      "EV": -0.020924671183738364,
-      "book": "fanduel",
+      "EV": -0.011514104778353351,
+      "book": "draftkings",
       "conditional_win": 0.4991364421416235,
       "edge_source": "tiebreak",
       "exact_tie_count": 1,
@@ -461,20 +498,20 @@
       "loo_center": 4.0,
       "loss": 0.5008635578583764,
       "market": "spreads",
-      "price": -104.0,
-      "price_edge_cents": -4.3460207612456685,
+      "price": -102.0,
+      "price_edge_cents": -2.3460207612456685,
       "push": 0.0,
-      "quote_updated_at": "2026-09-12T19:00:11Z",
+      "quote_updated_at": "2026-09-13T13:58:28Z",
       "seed": null,
       "side": "Tampa Bay Buccaneers",
       "win": 0.4991364421416235
     },
     {
-      "EV": -0.024064478986758786,
-      "book": "fanduel",
+      "EV": -0.0325953838907207,
+      "book": "betmgm",
       "conditional_win": 0.5067357512953368,
       "edge_source": "tiebreak",
-      "exact_tie_count": 1,
+      "exact_tie_count": 2,
       "fair_probability": 0.5067357512953368,
       "fair_probability_basis": "conditional_non_push",
       "filtered_subset": false,
@@ -482,11 +519,11 @@
       "loo_center": 51.0,
       "loss": 0.49326424870466323,
       "market": "totals",
-      "price": -108.0,
-      "price_edge_cents": -5.268907563025223,
+      "price": -110.0,
+      "price_edge_cents": -7.268907563025223,
       "push": 0.0,
-      "quote_updated_at": "2026-09-12T19:00:11Z",
-      "seed": null,
+      "quote_updated_at": "2026-09-13T13:59:56Z",
+      "seed": "d8daccfdd153f4d3c9c1dc858e2d4ebcc4a27da18b5101b34c771ab4247442bc",
       "side": "Under",
       "win": 0.5067357512953368
     }
@@ -499,10 +536,10 @@
     "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
     "expected_margin": 3.9727115716753025,
     "expected_total": 51.4006908462867,
-    "generated_at": "2026-09-12T19:00:14.612607+00:00",
+    "generated_at": "2026-09-13T14:00:11.892108+00:00",
     "home_score": 27.686701208981003,
     "home_win_probability": 0.6055267702936097,
-    "quote_captured_at": "2026-09-12T19:00:12.744998+00:00",
+    "quote_captured_at": "2026-09-13T14:00:09.965787+00:00",
     "score_label": "market-based score estimate",
     "status": "AVAILABLE",
     "tie_probability": 0.03419689119170984,

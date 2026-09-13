@@ -1,34 +1,34 @@
 {
   "analysis": {
-    "captured_at": "2026-09-12T19:00:12.744998+00:00",
+    "captured_at": "2026-09-13T14:00:09.965787+00:00",
     "measured": {
-      "elo_disagreement": 1.6699749767915637,
+      "elo_disagreement": 1.1699749767915637,
       "half_points": [
         {
           "buy_price_available": false,
-          "from": 3.0,
-          "same_EV_max_negative_price": 107.40740740740742,
-          "side": "Carolina Panthers",
-          "to": 3.5
+          "from": -3.0,
+          "same_EV_max_negative_price": 115.55709342560549,
+          "side": "Chicago Bears",
+          "to": -2.5
         }
       ],
       "spreads": {
         "best_same_line": {
-          "advantage_cents": 0.0,
-          "book": "draftkings",
-          "fair_probability": 0.4879518072289156,
-          "line": 3.0,
+          "advantage_cents": 5.0,
+          "book": "betmgm",
+          "fair_probability": 0.5120481927710844,
+          "line": -3.0,
           "market": "spreads",
-          "price": -102.0,
-          "side": "Carolina Panthers"
+          "price": -110.0,
+          "side": "Chicago Bears"
         },
-        "consensus_line": 3.0,
-        "movement": 0.0
+        "consensus_line": 2.5,
+        "movement": -0.5
       },
       "teaser_candidates": [
         {
           "book": "draftkings",
-          "fair_probability": 0.4842832469775475,
+          "fair_probability": 0.49326424870466323,
           "key_numbers_crossed": [
             44,
             47
@@ -38,17 +38,43 @@
           "price": -110.0,
           "side": "Over",
           "teased_line": 41.5
+        },
+        {
+          "book": "fanduel",
+          "fair_probability": 0.5219343696027634,
+          "key_numbers_crossed": [
+            41,
+            44
+          ],
+          "line": 46.5,
+          "market": "totals",
+          "price": -120.0,
+          "side": "Over",
+          "teased_line": 40.5
+        },
+        {
+          "book": "fanduel",
+          "fair_probability": 0.4780656303972366,
+          "key_numbers_crossed": [
+            47,
+            51
+          ],
+          "line": 46.5,
+          "market": "totals",
+          "price": -102.0,
+          "side": "Under",
+          "teased_line": 52.5
         }
       ],
       "totals": {
         "best_same_line": {
           "advantage_cents": null,
           "book": "betmgm",
-          "fair_probability": 0.5113279888462878,
+          "fair_probability": 0.507823613086771,
           "line": 47.0,
           "market": "totals",
-          "price": -108.0,
-          "side": "Under"
+          "price": -110.0,
+          "side": "Over"
         },
         "consensus_line": 47.5,
         "movement": 0.0
@@ -56,20 +82,20 @@
       "wind_rule": false
     },
     "sentences": [
-      "Spread consensus is CAR +3. It moved +0 points since the previous capture.",
-      "DraftKings has the best captured price for Carolina Panthers +3 at -102, 0 cents better than the next book at the same line.",
+      "Spread consensus is CAR +2.5. It moved -0.5 points since the previous capture.",
+      "BetMGM has the best captured price for Chicago Bears -3 at -110, 5 cents better than the next book at the same line.",
       "Total consensus is +47.5. It moved +0 points since the previous capture.",
-      "BetMGM has the best captured price for Under +47 at -108; no other book has a comparable price at that line.",
+      "BetMGM has the best captured price for Over +47 at -110; no other book has a comparable price at that line.",
       "The spread is on or within a half point of 3.",
-      "Buying Carolina Panthers from +3 to +3.5 preserves the current modeled EV up to -107.4; no captured buy-half price is available, so whether it is worth buying is unknown.",
-      "No qualified kickoff forecast is available; WIND RULE cannot apply.",
-      "Plain Elo disagrees with the market margin by +1.67 points; diagnostic only, with no QB adjustment.",
-      "Teaser candidates: Over +47.5 to +41.5, crossing 44, 47. Ticket prices and a partner are not established.",
+      "Buying Chicago Bears from -3 to -2.5 preserves the current modeled EV up to -115.6; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "Kickoff forecast wind is 3.6 mph. WIND RULE does not apply.",
+      "Plain Elo disagrees with the market margin by +1.17 points; diagnostic only, with no QB adjustment.",
+      "Teaser candidates: Over +47.5 to +41.5, crossing 44, 47; Over +46.5 to +40.5, crossing 41, 44; Under +46.5 to +52.5, crossing 47, 51. Ticket prices and a partner are not established.",
       "QB status: inactives unknown until T-90."
     ]
   },
   "capture": {
-    "label": "SATURDAY",
+    "label": "SUNDAY",
     "params": {
       "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
       "commenceTimeFrom": "2026-09-13T17:00:00Z",
@@ -78,17 +104,17 @@
       "markets": "spreads,totals",
       "oddsFormat": "american"
     },
-    "received_at": "2026-09-12T19:00:12.744998+00:00",
-    "request_at": "2026-09-12T19:00:12.575995+00:00",
-    "request_id": "LIVE_SATURDAY_2026_W01",
+    "received_at": "2026-09-13T14:00:09.965787+00:00",
+    "request_at": "2026-09-13T14:00:09.508290+00:00",
+    "request_id": "LIVE_SUNDAY_2026_W01",
     "source": {
-      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_SATURDAY_2026_W01/sources/4360ef2e8cfe38d78d6db2ae039f1eb63495d56d6bc98d05cb90552ab9e9eeec.json",
-      "sha256": "4360ef2e8cfe38d78d6db2ae039f1eb63495d56d6bc98d05cb90552ab9e9eeec"
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_SUNDAY_2026_W01/sources/4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9.json",
+      "sha256": "4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9"
     },
     "status": "CAPTURED"
   },
-  "capture_label": "SATURDAY",
-  "captured_at": "2026-09-12T19:00:12.744998+00:00",
+  "capture_label": "SUNDAY",
+  "captured_at": "2026-09-13T14:00:09.965787+00:00",
   "consensus": {
     "spreads": {
       "devigged_books": {
@@ -97,24 +123,24 @@
           "center": -3,
           "line": 3.0,
           "market": "spreads",
-          "power": 1.0698248525605822,
+          "power": 1.0647311734675267,
           "probabilities": [
-            0.4814245062798449,
-            0.5185754937201552
+            0.49766301523402895,
+            0.5023369847659711
           ],
-          "updated_at": "2026-09-12T18:59:34Z"
+          "updated_at": "2026-09-13T13:59:56Z"
         },
         "draftkings": {
           "book": "draftkings",
           "center": -3,
           "line": 3.0,
           "market": "spreads",
-          "power": 1.0698248525605822,
+          "power": 1.0686317492209367,
           "probabilities": [
-            0.4814245062798449,
-            0.5185754937201552
+            0.4767709538481189,
+            0.5232290461518813
           ],
-          "updated_at": "2026-09-12T18:59:32Z"
+          "updated_at": "2026-09-13T13:58:28Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -126,23 +152,23 @@
             0.488395545501788,
             0.5116044544982121
           ],
-          "updated_at": "2026-09-12T19:00:11Z"
+          "updated_at": "2026-09-13T13:59:57Z"
         },
         "pinnacle": {
           "book": "pinnacle",
-          "center": -3,
+          "center": -2,
           "line": 3.0,
           "market": "spreads",
-          "power": 1.0432096687204968,
+          "power": 1.0354655833803248,
           "probabilities": [
-            0.5,
-            0.5
+            0.5096281274415075,
+            0.4903718725584925
           ],
-          "updated_at": "2026-09-12T19:00:06Z"
+          "updated_at": "2026-09-13T13:59:55Z"
         }
       },
       "full": {
-        "center": -3.0,
+        "center": -2.5,
         "contributors": [
           "betmgm",
           "draftkings",
@@ -152,12 +178,12 @@
         "coverage": 3,
         "excluded_book": null,
         "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-        "pinnacle_center": -3,
+        "pinnacle_center": -2,
         "retail_median": -3
       },
       "leave_one_out": {
         "betmgm": {
-          "center": -3.0,
+          "center": -2.5,
           "contributors": [
             "draftkings",
             "fanduel",
@@ -166,11 +192,11 @@
           "coverage": 2,
           "excluded_book": "betmgm",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": -3,
+          "pinnacle_center": -2,
           "retail_median": -3.0
         },
         "draftkings": {
-          "center": -3.0,
+          "center": -2.5,
           "contributors": [
             "betmgm",
             "fanduel",
@@ -179,11 +205,11 @@
           "coverage": 2,
           "excluded_book": "draftkings",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": -3,
+          "pinnacle_center": -2,
           "retail_median": -3.0
         },
         "fanduel": {
-          "center": -3.0,
+          "center": -2.5,
           "contributors": [
             "betmgm",
             "draftkings",
@@ -192,11 +218,11 @@
           "coverage": 2,
           "excluded_book": "fanduel",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": -3,
+          "pinnacle_center": -2,
           "retail_median": -3.0
         },
         "williamhill_us": {
-          "center": -3.0,
+          "center": -2.5,
           "contributors": [
             "betmgm",
             "draftkings",
@@ -206,7 +232,7 @@
           "coverage": 3,
           "excluded_book": "williamhill_us",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": -3,
+          "pinnacle_center": -2,
           "retail_median": -3
         }
       }
@@ -223,7 +249,7 @@
             0.5023369847659711,
             0.49766301523402895
           ],
-          "updated_at": "2026-09-12T18:59:34Z"
+          "updated_at": "2026-09-13T13:59:56Z"
         },
         "draftkings": {
           "book": "draftkings",
@@ -235,31 +261,31 @@
             0.5000000000000001,
             0.5000000000000001
           ],
-          "updated_at": "2026-09-12T18:59:32Z"
+          "updated_at": "2026-09-13T13:58:28Z"
         },
         "fanduel": {
           "book": "fanduel",
-          "center": 47,
-          "line": 47.5,
+          "center": 48,
+          "line": 46.5,
           "market": "totals",
           "power": 1.0764584395717796,
           "probabilities": [
-            0.4792472933629884,
-            0.5207527066370117
+            0.5207527066370117,
+            0.4792472933629884
           ],
-          "updated_at": "2026-09-12T19:00:11Z"
+          "updated_at": "2026-09-13T13:59:57Z"
         },
         "pinnacle": {
           "book": "pinnacle",
           "center": 47,
           "line": 47.5,
           "market": "totals",
-          "power": 1.058752976069445,
+          "power": 1.0440704628374475,
           "probabilities": [
-            0.480046818991146,
-            0.5199531810088541
+            0.4774770141341123,
+            0.5225229858658876
           ],
-          "updated_at": "2026-09-12T19:00:06Z"
+          "updated_at": "2026-09-13T13:59:55Z"
         }
       },
       "full": {
@@ -278,7 +304,7 @@
       },
       "leave_one_out": {
         "betmgm": {
-          "center": 47.25,
+          "center": 47.5,
           "contributors": [
             "draftkings",
             "fanduel",
@@ -288,10 +314,10 @@
           "excluded_book": "betmgm",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": 47,
-          "retail_median": 47.5
+          "retail_median": 48.0
         },
         "draftkings": {
-          "center": 47.25,
+          "center": 47.5,
           "contributors": [
             "betmgm",
             "fanduel",
@@ -301,7 +327,7 @@
           "excluded_book": "draftkings",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": 47,
-          "retail_median": 47.5
+          "retail_median": 48.0
         },
         "fanduel": {
           "center": 47.5,
@@ -335,9 +361,46 @@
   },
   "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
   "forecast": {
-    "error": "ValueError",
-    "message": "GFS availability remains within the 10-minute replication window",
-    "status": "UNAVAILABLE"
+    "component_initializations": [
+      1789279200,
+      1789279200
+    ],
+    "event_id": "2026_01_CHI_CAR",
+    "forecast_issued_at": "2026-09-13T11:55:02+00:00",
+    "forecast_run_initialized_at": "2026-09-13T06:00:00+00:00",
+    "issuance_basis": "Conservative upper bound from completed GFS013/GFS025 availability; exact common archived run requested",
+    "kickoff_at": "2026-09-13T17:00:00+00:00",
+    "model": "gfs_global",
+    "precip_mm": 0.0,
+    "received_at": "2026-09-13T14:00:10.759648+00:00",
+    "request_at": "2026-09-13T14:00:10.349534+00:00",
+    "requests": [
+      {
+        "received_at": "2026-09-13T14:00:10.200654+00:00",
+        "request_at": "2026-09-13T14:00:10.087660+00:00",
+        "sha256": "a7ed9244c7a263ed71112e5337e7f2293e05f17c8a11080da366e557901bd8ab",
+        "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:10.327556+00:00",
+        "request_at": "2026-09-13T14:00:10.221583+00:00",
+        "sha256": "a6dd8fd94cec85905bcd0aa4732f4293357d021f8dec723edb62dfcf5fcbe8f2",
+        "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:10.759648+00:00",
+        "request_at": "2026-09-13T14:00:10.349534+00:00",
+        "sha256": "d4f3809b2ee63dff8e3c963f3c4fbdc641a86d4a4a78002a7b579574fc31f9cc",
+        "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=35.2258152&longitude=-80.8528376&models=gfs_global&run=2026-09-13T06%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
+      }
+    ],
+    "roof": "outdoors",
+    "source_sha256": "d4f3809b2ee63dff8e3c963f3c4fbdc641a86d4a4a78002a7b579574fc31f9cc",
+    "status": "FORECAST",
+    "temperature_c": 31.4,
+    "valid_at": "2026-09-13T17:00:00+00:00",
+    "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+    "wind_mph": 3.6
   },
   "game": {
     "away_abbr": "CHI",
@@ -368,7 +431,7 @@
       "fair_probability": 0.4879518072289156,
       "line": 3.0,
       "market": "spreads",
-      "price": -102.0,
+      "price": 100.0,
       "side": "Carolina Panthers"
     },
     {
@@ -376,12 +439,12 @@
       "fair_probability": 0.5120481927710844,
       "line": -3.0,
       "market": "spreads",
-      "price": -118.0,
+      "price": -120.0,
       "side": "Chicago Bears"
     },
     {
       "book": "draftkings",
-      "fair_probability": 0.4842832469775475,
+      "fair_probability": 0.49326424870466323,
       "line": 47.5,
       "market": "totals",
       "price": -110.0,
@@ -389,7 +452,7 @@
     },
     {
       "book": "draftkings",
-      "fair_probability": 0.5157167530224525,
+      "fair_probability": 0.5067357512953368,
       "line": 47.5,
       "market": "totals",
       "price": -110.0,
@@ -413,18 +476,18 @@
     },
     {
       "book": "fanduel",
-      "fair_probability": 0.49326424870466323,
-      "line": 47.5,
+      "fair_probability": 0.5219343696027634,
+      "line": 46.5,
       "market": "totals",
-      "price": -102.0,
+      "price": -120.0,
       "side": "Over"
     },
     {
       "book": "fanduel",
-      "fair_probability": 0.5067357512953368,
-      "line": 47.5,
+      "fair_probability": 0.4780656303972366,
+      "line": 46.5,
       "market": "totals",
-      "price": -120.0,
+      "price": -102.0,
       "side": "Under"
     },
     {
@@ -432,7 +495,7 @@
       "fair_probability": 0.4879518072289156,
       "line": 3.0,
       "market": "spreads",
-      "price": -102.0,
+      "price": -108.0,
       "side": "Carolina Panthers"
     },
     {
@@ -440,12 +503,12 @@
       "fair_probability": 0.5120481927710844,
       "line": -3.0,
       "market": "spreads",
-      "price": -118.0,
+      "price": -110.0,
       "side": "Chicago Bears"
     },
     {
       "book": "betmgm",
-      "fair_probability": 0.48867201115371206,
+      "fair_probability": 0.507823613086771,
       "line": 47.0,
       "market": "totals",
       "price": -110.0,
@@ -453,7 +516,7 @@
     },
     {
       "book": "betmgm",
-      "fair_probability": 0.5113279888462878,
+      "fair_probability": 0.492176386913229,
       "line": 47.0,
       "market": "totals",
       "price": -108.0,
@@ -463,46 +526,46 @@
   "paper_picks": [],
   "picks": [
     {
-      "EV": -0.03281519861830745,
-      "book": "draftkings",
-      "conditional_win": 0.4879518072289156,
-      "edge_source": "tiebreak",
-      "exact_tie_count": 2,
-      "fair_probability": 0.4879518072289156,
-      "fair_probability_basis": "conditional_non_push",
-      "filtered_subset": false,
-      "line": 3.0,
-      "loo_center": -3.0,
-      "loss": 0.4991364421416235,
-      "market": "spreads",
-      "price": -102.0,
-      "price_edge_cents": -6.938271604938279,
-      "push": 0.02521588946459413,
-      "quote_updated_at": "2026-09-12T18:59:32Z",
-      "seed": "b476a5a283125c32d8ffe782f3d8ea05aa30e2ad894138d10e058885a997b503",
-      "side": "Carolina Panthers",
-      "win": 0.47564766839378236
-    },
-    {
-      "EV": -0.015083477259643097,
+      "EV": -0.021887266446851794,
       "book": "betmgm",
-      "conditional_win": 0.5113279888462878,
+      "conditional_win": 0.5120481927710844,
       "edge_source": "tiebreak",
       "exact_tie_count": 1,
-      "fair_probability": 0.5113279888462878,
+      "fair_probability": 0.5120481927710844,
+      "fair_probability_basis": "conditional_non_push",
+      "filtered_subset": false,
+      "line": -3.0,
+      "loo_center": -2.5,
+      "loss": 0.4756476683937823,
+      "market": "spreads",
+      "price": -110.0,
+      "price_edge_cents": -5.061728395061721,
+      "push": 0.02521588946459413,
+      "quote_updated_at": "2026-09-13T13:59:56Z",
+      "seed": null,
+      "side": "Chicago Bears",
+      "win": 0.4991364421416235
+    },
+    {
+      "EV": -0.02964358612026996,
+      "book": "betmgm",
+      "conditional_win": 0.507823613086771,
+      "edge_source": "price",
+      "exact_tie_count": 1,
+      "fair_probability": 0.507823613086771,
       "fair_probability_basis": "conditional_non_push",
       "filtered_subset": false,
       "line": 47.0,
-      "loo_center": 47.25,
-      "loss": 0.48428324697754754,
+      "loo_center": 47.5,
+      "loss": 0.4780656303972366,
       "market": "totals",
-      "price": -108.0,
-      "price_edge_cents": -3.363766048502171,
-      "push": 0.008981001727115717,
-      "quote_updated_at": "2026-09-12T18:59:34Z",
+      "price": -110.0,
+      "price_edge_cents": -6.820809248554895,
+      "push": 0.028670120898100174,
+      "quote_updated_at": "2026-09-13T13:59:56Z",
       "seed": null,
-      "side": "Under",
-      "win": 0.5067357512953368
+      "side": "Over",
+      "win": 0.49326424870466323
     }
   ],
   "projection": {
@@ -513,10 +576,10 @@
     "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
     "expected_margin": -3.0272884283246975,
     "expected_total": 48.4006908462867,
-    "generated_at": "2026-09-12T19:00:14.595042+00:00",
+    "generated_at": "2026-09-13T14:00:11.893671+00:00",
     "home_score": 22.686701208981003,
     "home_win_probability": 0.37409326424870465,
-    "quote_captured_at": "2026-09-12T19:00:12.744998+00:00",
+    "quote_captured_at": "2026-09-13T14:00:09.965787+00:00",
     "score_label": "market-based score estimate",
     "status": "AVAILABLE",
     "tie_probability": 0.03281519861830743,
