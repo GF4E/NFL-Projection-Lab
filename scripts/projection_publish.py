@@ -20,8 +20,9 @@ def sync():
  if not key:return False
  try:
   req=urllib.request.Request('https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/api/projection-entry/sync',headers={'Authorization':'Bearer '+key,'User-Agent':'Mozilla/5.0'})
-  with urllib.request.urlopen(req,timeout=10) as r:values=json.load(r)['entries']
-  save(ROOT/'.cloud-private/projection-entries.json',{'entries':values,'synced_at':dt.datetime.now(dt.timezone.utc).isoformat()});return True
+  with urllib.request.urlopen(req,timeout=10) as r:payload=json.load(r)
+  values=payload['entries']
+  save(ROOT/'.cloud-private/projection-entries.json',{'entries':values,'history':payload.get('history',[]),'synced_at':dt.datetime.now(dt.timezone.utc).isoformat()});return True
  except Exception:return False
 
 def run(now=None,root=ROOT,require_synced_entries=False):

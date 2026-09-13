@@ -19,7 +19,7 @@ from scripts.nfl_engine_autopush import guard, REMOTE
 
 LOCK_PATH = 'work/cloud-migration-v1/ownership.json'
 OUT = ROOT/'outputs/model-pick-v1'
-ALLOWED = ('outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
+ALLOWED = ('outputs/in-season-learning-v1/', 'work/in-season-learning-v1/', 'CHANGELOG.md', 'outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
            'work/model-pick-v1/daily/', 'work/model-pick-v1/sources/',
            'work/model-pick-v1/schedules/', 'work/model-pick-v1/states/',
            'work/model-pick-v1/depth/')
@@ -119,7 +119,20 @@ def run(mode, host):
         if mode == 'daily' and capture_window():
             return {'state': 'DEFERRED_CAPTURE_WINDOW'}
         from scripts.projection_publish import sync as sync_projection
-        sync_projection()
+        entries_synced=sync_projection()
+        if mode=='learning':
+            if not entries_synced: return {'state':'WAITING_FOR_ENTRY_SYNC'}
+            from engine.board_results import refresh
+            from scripts.suit_prepare import run as prepare_suit
+            from scripts.projection_refresh import prepare
+            from scripts.projection_v3_prepare import prepare as prepare_v3
+            from scripts.projection_v3_publish import run as publish_projection
+            from scripts.projection_learning import report,run_weekly
+            refresh();prepare_suit(refresh=True);prepare();prepare_v3()
+            publish_projection(require_synced_entries=True);report()
+            result=run_weekly()
+            publish_projection(require_synced_entries=True);report()
+            return {**result,'commit':publish_artifacts()}
         from engine.game_card_runtime import sync as sync_cards
         sync_cards(ROOT)
         code = worker('live_pick_runner.py' if mode == 'capture' else 'model_pick_daily.py')
@@ -173,6 +186,13 @@ def run(mode, host):
             else:
                 from scripts.projection_publish import run as publish_projection
             publish_projection(require_synced_entries=True)
+            from scripts.projection_learning import report,run_weekly
+            report()
+            if mode=='daily' and entries_synced:
+                weekly=run_weekly()
+                if weekly.get('state')=='REFIT_COMPLETE':
+                    publish_projection(require_synced_entries=True)
+                    report()
         commit = publish_artifacts()
         if code:
             raise RuntimeError('Worker failed; available artifacts preserved')
@@ -187,7 +207,7 @@ def run(mode, host):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('mode', choices=['capture', 'daily'])
+    parser.add_argument('mode', choices=['capture', 'daily', 'learning'])
     parser.add_argument('--host', default=os.environ.get('NFL_RUNNER_ID', 'mac-fallback'))
     args = parser.parse_args()
     try:

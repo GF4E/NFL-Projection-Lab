@@ -1,0 +1,11 @@
+[Unit]
+Description=NFL weekly projection learning (public football data only)
+After=network-online.target
+[Service]
+Type=oneshot
+User=nflengine
+WorkingDirectory=/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6
+EnvironmentFile=/etc/nfl-engine/secrets.env
+Environment=OPENBLAS_NUM_THREADS=1
+ExecStart=/opt/nfl-runtime/env/bin/python -B scripts/cloud_scheduler.py learning --host digitalocean:599707390
+TimeoutStartSec=1800

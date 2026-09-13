@@ -12,8 +12,8 @@ from engine.projection.distribution import summarize
 OUT=ROOT/'outputs/projection-v3';WORK=ROOT/'work/projection-v3'
 
 def shape_for(card,artifact):
- for version in ['v3','v2','v1']:
-  for path in sorted((ROOT/f'work/projection-{version}').glob('fit-*.json')):
+ for version in ['v3','v2','v1','learning']:
+  for path in sorted((ROOT/('work/in-season-learning-v1' if version=='learning' else f'work/projection-{version}')).glob('fit-*.json')):
    if path.name=='fit-ref.json':continue
    a=json.loads(path.read_text())
    if a.get('version')==card['version']:
@@ -32,12 +32,13 @@ def lock_card(card,entry,shapes,cutoff):
  card.update(status='LOCKED',freeze_time=cutoff.isoformat());return card
 
 def run(now=None,require_synced_entries=False):
- now=now or dt.datetime.now(dt.timezone.utc);artifact=read(json.loads((WORK/'fit-ref.json').read_text()));shapes=read(artifact['shapes']);rows=json.loads(gzip.decompress((WORK/'current-features.json.gz').read_bytes()));groups=paired(rows)
+ from scripts.projection_learning import active_artifact,feature_snapshot,trajectories
+ now=now or dt.datetime.now(dt.timezone.utc);artifact=active_artifact();shapes=read(artifact['shapes']);rows=json.loads(gzip.decompress((WORK/'current-features.json.gz').read_bytes()));groups=paired(rows)
  legacy_path=ROOT/'outputs/projection-v2/board.json';legacy={g['game_id']:g for g in json.loads(legacy_path.read_text())['games']} if legacy_path.exists() else {}
  fp=ROOT/'outputs/projection-v1/forecast.json';forecasts=json.loads(fp.read_text()) if fp.exists() else {};ep=ROOT/'.cloud-private/projection-entries.json';cache=json.loads(ep.read_text()) if ep.exists() else {};entries=cache.get('entries',[]);colors=json.loads((ROOT/'config/game_card_team_colors.json').read_text());cards=[]
  for gid,pair in sorted(groups.items()):
   g=copy.deepcopy(pair['home']['game']);week=int(g['week'])
-  if week>2:continue
+  if week>min(18,max([int(r['week']) for r in rows if r.get('actual_points') is not None]+[1])+1):continue
   kickoff=dt.datetime.fromisoformat(g['gameday']+'T'+g['gametime']).replace(tzinfo=ZoneInfo('America/New_York')).astimezone(dt.timezone.utc);cutoff=kickoff-dt.timedelta(minutes=75);g.update(kickoff_at=kickoff.isoformat(),cutoff_at=cutoff.isoformat());lockpath=OUT/'locks'/f'{gid}.json';livepath=OUT/'live'/f'{gid}.json';gradepath=OUT/'grades'/f'{gid}.json';old=legacy.get(gid)
   final=g.get('home_score') not in (None,'') and g.get('away_score') not in (None,'');entry=next((e for e in entries if e['game_id']==gid and not e.get('post_lock') and stamp(e['entered_at'])<cutoff),None)
   if lockpath.exists():card=json.loads(lockpath.read_text())
@@ -52,6 +53,10 @@ def run(now=None,require_synced_entries=False):
   else:
    forecast=forecasts.get(gid);qualified=forecast and str(g.get('roof','')).lower() in ('outdoors','open') and stamp(forecast['received_at'])<=now and stamp(forecast['forecast_issued_at'])<=stamp(forecast['request_at'])<=stamp(forecast['received_at'])
    card=make_card(g,pair,artifact,shapes,now.isoformat(),forecast if qualified else None,entry)
+   card['learning_features']=feature_snapshot(pair)
+   if qualified:
+    for side in ['home','away']:card['learning_features'][side]['features']['wind']=forecast['wind_mph']
+   card['fit_sha256']=hashlib.sha256(json.dumps(artifact['fit'],sort_keys=True,separators=(',',':')).encode()).hexdigest()
    prior=json.loads(livepath.read_text()) if livepath.exists() else None
    if prior and {k:v for k,v in prior.items() if k!='issued_at'}=={k:v for k,v in card.items() if k!='issued_at'}:card['issued_at']=prior['issued_at']
    save(livepath,card)
@@ -63,9 +68,16 @@ def run(now=None,require_synced_entries=False):
  # Every publication branch, including pending locks and missing forecasts, has render metadata.
  for card in cards:
   card.setdefault('team_colors',{t:colors.get(t,{}).get('color','#384352') for t in [card['away'],card['home']]})
+ prefix=ROOT/'work/in-season-learning-v1/trajectory-history.json'
+ history=trajectories((json.loads(prefix.read_text()) if prefix.exists() else [])+rows)
+ from engine.projection.card import code
+ canonical={code(t):t for t in history}
+ for card in cards:
+  card['trajectory']={side:[x for x in sorted(history.get(canonical.get(card[side],card[side]),[]),key=lambda x:(x['season'],x['week'])) if (x['season'],x['week'])<=(card['season'],card['week'])][-6:] for side in ['home','away']}
+  card['trajectory_basis']='Reconstructed pregame weekly adjusted rates; no current-game result used'
  scorecards=[]
  for version in sorted({g['version'] for g in cards}):
-  for week in [None,1,2]:
+  for week in [None]+sorted({g['week'] for g in cards}):
    for evidence in ['AS_ISSUED','RETROSPECTIVE']:
     for source in ['PROJECTION','OURS']:
      samples=[g['grades'][source] for g in cards if g.get('grades') and source in g['grades'] and g['version']==version and g['evidence']==evidence and (week is None or g['week']==week)]

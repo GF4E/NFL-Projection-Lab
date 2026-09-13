@@ -1,0 +1,9 @@
+[Unit]
+Description=Refit Tuesdays at 06:00 Pacific, with DST
+[Timer]
+OnCalendar=Tue *-*-* 06:00:00 America/Los_Angeles
+Persistent=true
+AccuracySec=1s
+Unit=nfl-learning.service
+[Install]
+WantedBy=timers.target

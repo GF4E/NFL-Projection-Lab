@@ -27,3 +27,7 @@ Replay the existing immutable baseline without changing its contents:
 ```
 
 Inspect `systemctl list-timers 'nfl-engine-*'` and `systemctl show nfl-engine-capture.service nfl-engine-daily.service -p Result -p ExecMainStatus`. Successful synthetic execution proves the transport substitute, lock and grader work on Linux; the next actual scheduled paid capture remains prospective.
+
+### In-season learning loop
+
+`nfl-learning.timer` runs Tuesday 06:00 America/Los_Angeles (DST-aware), with `Persistent=true`. Its service uses the same durable owner and `.cloud-dispatch.lock` as capture/daily, public football source refresh, entry sync, grading, then `scripts/projection_learning.py` refit/gate/report. Incomplete grades or PBP fail closed; the existing hourly daily job retries after data arrive. Receipt `outputs/in-season-learning-v1/refits/2026-wN.json` pins the issuing fit SHA256. `work/in-season-learning-v1/active-fit-ref.json` changes only on a completed refit or logged promotion. All original locks and grades retain their issuing fit/distribution. No Odds API call is added by learning mode. `--trend` prints the canonical table report; `outputs/in-season-learning-v1/trend.json` supplies the TREND page. The current season is explicitly 2026; Week 18 completes this season's refit cycle.
