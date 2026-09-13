@@ -1,6 +1,6 @@
 import type {ProjectionBoardData} from '../domain/projection';
 type DB=Pick<D1Database,'prepare'>;
-export const PROJECTION_URL='https://raw.githubusercontent.com/GF4E/NFL-Projection-Lab/engine-v2/outputs/projection-v2/board.json';
+export const PROJECTION_URL='https://raw.githubusercontent.com/GF4E/NFL-Projection-Lab/engine-v2/outputs/projection-v3/board.json';
 export function validateProjection(b:unknown):ProjectionBoardData{
  const x=b as ProjectionBoardData;
  if(!x||x.schema!=='projection-board-v1'||!Number.isFinite(Date.parse(x.published_at))||!Array.isArray(x.games)||!x.games.length||new Set(x.games.map(g=>g.game_id)).size!==x.games.length)throw Error('Invalid projection artifact');
