@@ -79,3 +79,11 @@ Least sure: whether a group improved the forecast or merely duplicated another i
 | V2 final subset, development only | 7.5732 | 10.2407 | 10.8654 |
 
 V2 qualifies against the raw football baseline. It does not establish superior accuracy to v1. Its adaptive record includes the first three seasons with insufficient prior group-validation history, so those forecasts use the baseline only. The final subset's historical performance is reported separately because choosing that subset used the whole development period.
+
+## Deployed verification
+
+Sites release 188 succeeded. The live API matches all 32 engine game records and the version-separated scorecards. DigitalOcean 159.89.185.88 serves the qualified package; both capture and daily timers are active. The ownership-locked publication probe synchronized shared entries and preserved all four v1 frozen files. No Odds API calls. Evidence: [local verification](verification/local.json), [live API](verification/live-api.json), [cloud](verification/cloud.json), [deployment](verification/deployment.json).
+
+Tests: 33 projection, 214 existing engine, 307 main reader and 426 deployed-site tests pass; the two website suites each retain one pre-existing skipped test. Both builds and typechecks pass. Full offline qualification replay reproduces the registered decisions and forecasts.
+
+[390px card](screenshots/bal-ind-390.png) · [1280px card](screenshots/bal-ind-1280.png).

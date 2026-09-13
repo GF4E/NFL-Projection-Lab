@@ -1,3 +1,11 @@
+# Current status — Projection v2 qualification, September 13, 2026
+
+Current step: qualified football projections deployed. Frozen version `projection-v2-172f3e04-a39aa883` retains the per-drive baseline plus scoring calibration and Elo; other optional groups are inactive. Historical intervals use strictly earlier OOF seasons. The first test season has no interval score. Original v1 locked/final/retrospective records and wager evidence are preserved. [Experiment and report](work/projection-v2/report.md).
+
+Cloud host 159.89.185.88 published v2 and both systemd timers are active. Live API matches 32 engine cards. Last verified published engine artifact commit: `5208a606e296728376fd43962ccf98a26355215c`; reader main: `8fb040330933cd20b73ebac507ca1cd5866358a3`. This verification revision is identified by Git.
+
+Odds API credits spent: zero. Reserved live ledgers and caps are unchanged. Next decision needed from Gabe: none for this deliverable. V2 passes the registered raw-baseline qualification; it has not established superior accuracy to v1. Below are historical status entries, superseded where they conflict with this update.
+
 # Current status — Iron Man Suit Week 2, September 12, 2026
 
 Week 2 human-number sheet, independent private entries, EARLY/LATE locks, and confidence feedback deployed at `/suit`. Live entry access, local/cloud synthetic replay, and frozen-file preservation verified. Final confidence rule: hide map-derived output until 50 graded leans per person, with population-specific statistics; weekly Beta prior weight 20; prospective versioned maps. No autonomous Week 2 picks. Sensor gaps remain explicitly unknown. Implementation verification and deployment state: [experiment](work/iron-man-v1/experiment.json). Last preceding engine commit: 834800859069220d373462136c5243273dd0f3e8. This revision is identified by Git.
