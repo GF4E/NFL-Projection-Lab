@@ -1,14 +1,14 @@
 {
   "analysis": [
-    "Spread consensus is LAC -10. It moved -0.5 points since the previous capture.",
-    "FanDuel has the best captured price for Los Angeles Chargers -9.5 at -105, 7 cents better than the next book at the same line.",
+    "Spread consensus is LAC -10. It moved +0 points since the previous capture.",
+    "FanDuel has the best captured price for Los Angeles Chargers -8.5 at -115; no other book has a comparable price at that line.",
     "Total consensus is +47.5. It moved +0 points since the previous capture.",
-    "DraftKings has the best captured price for Over +47.5 at -102, 2 cents better than the next book at the same line.",
+    "FanDuel has the best captured price for Over +47.5 at -104, 1 cents better than the next book at the same line.",
     "The spread is not within a half point of 3 or 7.",
-    "Buying Los Angeles Chargers from -9.5 to -9 preserves the current modeled EV up to -115.0; no captured buy-half price is available, so whether it is worth buying is unknown.",
+    "Buying Los Angeles Chargers from -8.5 to -8 preserves the current modeled EV up to -124.4; no captured buy-half price is available, so whether it is worth buying is unknown.",
     "The venue is indoors or its roof is unknown; WIND RULE does not apply.",
     "Plain Elo disagrees with the market margin by -1.99 points; diagnostic only, with no QB adjustment.",
-    "Teaser candidates: Over +47.5 to +41.5, crossing 44, 47. Ticket prices and a partner are not established.",
+    "Teaser candidates: Over +47.5 to +41.5, crossing 44, 47; Los Angeles Chargers -8.5 to -2.5, crossing 3, 7. Ticket prices and a partner are not established.",
     "QB status: inactives unknown until T-90."
   ],
   "away": "ARI",
@@ -16,7 +16,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_01_ARI_LAC",
-  "generated_at": "2026-09-12T21:59:04.746845+00:00",
+  "generated_at": "2026-09-13T14:00:20.945394+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -24,7 +24,7 @@
     "clv": null
   },
   "home": "LAC",
-  "input_hash": "60a824e55797cc27c73a4b91d1a483e1de084d3957fb7c8d317850f652f80f61",
+  "input_hash": "881ce81027b2cd4d373dd1e30e4ec97200b2b030136a134c15ed14c61ca0f0e2",
   "kickoff_utc": "2026-09-13T20:25:00+00:00",
   "market": {
     "books": {
@@ -39,7 +39,7 @@
             "fair_probability": 0.4991364421416235,
             "line": 9.5,
             "market": "spreads",
-            "price": -118.0,
+            "price": -108.0,
             "side": "Arizona Cardinals"
           },
           "LAC": {
@@ -47,7 +47,7 @@
             "fair_probability": 0.5008635578583766,
             "line": -9.5,
             "market": "spreads",
-            "price": -112.0,
+            "price": -110.0,
             "side": "Los Angeles Chargers"
           }
         },
@@ -57,7 +57,7 @@
             "fair_probability": 0.49326424870466323,
             "line": 47.5,
             "market": "totals",
-            "price": -108.0,
+            "price": -105.0,
             "side": "Over"
           },
           "Under": {
@@ -65,7 +65,7 @@
             "fair_probability": 0.5067357512953368,
             "line": 47.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -112.0,
             "side": "Under"
           }
         }
@@ -99,7 +99,7 @@
             "fair_probability": 0.49326424870466323,
             "line": 47.5,
             "market": "totals",
-            "price": -102.0,
+            "price": -105.0,
             "side": "Over"
           },
           "Under": {
@@ -107,7 +107,7 @@
             "fair_probability": 0.5067357512953368,
             "line": 47.5,
             "market": "totals",
-            "price": -118.0,
+            "price": -115.0,
             "side": "Under"
           }
         }
@@ -120,18 +120,18 @@
         "spreads": {
           "ARI": {
             "book": "fanduel",
-            "fair_probability": 0.4991364421416235,
-            "line": 9.5,
+            "fair_probability": 0.45768566493955093,
+            "line": 8.5,
             "market": "spreads",
-            "price": -115.0,
+            "price": -105.0,
             "side": "Arizona Cardinals"
           },
           "LAC": {
             "book": "fanduel",
-            "fair_probability": 0.5008635578583766,
-            "line": -9.5,
+            "fair_probability": 0.542314335060449,
+            "line": -8.5,
             "market": "spreads",
-            "price": -105.0,
+            "price": -115.0,
             "side": "Los Angeles Chargers"
           }
         },
@@ -169,33 +169,33 @@
         }
       }
     },
-    "capture_time": "2026-09-12T19:00:12.744998+00:00",
+    "capture_time": "2026-09-13T14:00:09.965787+00:00",
     "home_win_prob": 0.7951807228915663,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
     "spread": -10.0,
     "teaser_near_miss": {
-      "spreads": null,
+      "spreads": "TEASE candidate, teaser price unverified at FanDuel",
       "totals": "TEASE candidate, best teaser price -130 at BetMGM"
     },
     "total": 47.5
   },
   "model": {
     "spreads": {
-      "EV": -0.022123529895550553,
+      "EV": 0.013892017721708949,
       "book": "fanduel",
       "edge_source": "price",
-      "fair_probability": 0.5008635578583766,
-      "line": -9.5,
-      "price": -105.0,
+      "fair_probability": 0.542314335060449,
+      "line": -8.5,
+      "price": -115.0,
       "side": "Los Angeles Chargers"
     },
     "totals": {
-      "EV": -0.02314335060449041,
-      "book": "draftkings",
+      "EV": -0.03244320446392973,
+      "book": "fanduel",
       "edge_source": "price",
       "fair_probability": 0.49326424870466323,
       "line": 47.5,
-      "price": -102.0,
+      "price": -104.0,
       "side": "Over"
     }
   },
@@ -1229,7 +1229,7 @@
   "status": "UPCOMING",
   "tiles": {
     "SPREAD": {
-      "EV": -0.022123529895550553,
+      "EV": 0.013892017721708949,
       "book": "fanduel",
       "book_label": "FanDuel",
       "chip": "LEAN",
@@ -1238,21 +1238,21 @@
       "confidence_used": null,
       "grade": null,
       "label": "SPREAD",
-      "line": -9.5,
-      "pick": "LAC -9.5",
-      "price": -105.0,
-      "probability": 0.5008635578583766,
-      "probability_percent": 50.1,
+      "line": -8.5,
+      "pick": "LAC -8.5",
+      "price": -115.0,
+      "probability": 0.542314335060449,
+      "probability_percent": 54.2,
       "push_probability": 0.0,
-      "ring_offset": 49.913644214162346,
+      "ring_offset": 45.7685664939551,
       "side": "LAC",
       "stake_dollars": null,
       "subtitle": ""
     },
     "TOTAL": {
-      "EV": -0.02314335060449041,
-      "book": "draftkings",
-      "book_label": "DraftKings",
+      "EV": -0.03244320446392973,
+      "book": "fanduel",
+      "book_label": "FanDuel",
       "chip": "LEAN",
       "clv": null,
       "confidence_source": "MODEL",
@@ -1261,7 +1261,7 @@
       "label": "TOTAL",
       "line": 47.5,
       "pick": "OVER 47.5",
-      "price": -102.0,
+      "price": -104.0,
       "probability": 0.49326424870466323,
       "probability_percent": 49.3,
       "push_probability": 0.0,

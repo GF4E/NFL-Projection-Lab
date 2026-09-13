@@ -1,29 +1,29 @@
 {
   "analysis": {
-    "captured_at": "2026-09-12T19:00:12.744998+00:00",
+    "captured_at": "2026-09-13T14:00:09.965787+00:00",
     "measured": {
       "elo_disagreement": -5.047772380486604,
       "half_points": [
         {
           "buy_price_available": false,
           "from": 2.5,
-          "same_EV_max_negative_price": 110.88171885847919,
+          "same_EV_max_negative_price": 114.23259354687592,
           "side": "Denver Broncos",
           "to": 3.0
         }
       ],
       "spreads": {
         "best_same_line": {
-          "advantage_cents": 3.0,
-          "book": "draftkings",
+          "advantage_cents": 2.0,
+          "book": "betmgm",
           "fair_probability": 0.4991364421416235,
           "line": 2.5,
           "market": "spreads",
-          "price": -105.0,
+          "price": -108.0,
           "side": "Denver Broncos"
         },
         "consensus_line": -3.0,
-        "movement": -0.5
+        "movement": 0.0
       },
       "teaser_candidates": [
         {
@@ -35,7 +35,7 @@
           ],
           "line": 2.5,
           "market": "spreads",
-          "price": -105.0,
+          "price": -110.0,
           "side": "Denver Broncos",
           "teased_line": 8.5
         },
@@ -48,41 +48,41 @@
           ],
           "line": 43.5,
           "market": "totals",
-          "price": -105.0,
+          "price": -112.0,
           "side": "Under",
           "teased_line": 49.5
         }
       ],
       "totals": {
         "best_same_line": {
-          "advantage_cents": 3.0,
-          "book": "draftkings",
+          "advantage_cents": 0.0,
+          "book": "fanduel",
           "fair_probability": 0.5067357512953368,
           "line": 43.5,
           "market": "totals",
-          "price": -105.0,
+          "price": -108.0,
           "side": "Under"
         },
         "consensus_line": 43.5,
         "movement": 0.0
       },
-      "wind_rule": false
+      "wind_rule": true
     },
     "sentences": [
-      "Spread consensus is KC -3. It moved -0.5 points since the previous capture.",
-      "DraftKings has the best captured price for Denver Broncos +2.5 at -105, 3 cents better than the next book at the same line.",
+      "Spread consensus is KC -3. It moved +0 points since the previous capture.",
+      "BetMGM has the best captured price for Denver Broncos +2.5 at -108, 2 cents better than the next book at the same line.",
       "Total consensus is +43.5. It moved +0 points since the previous capture.",
-      "DraftKings has the best captured price for Under +43.5 at -105, 3 cents better than the next book at the same line.",
+      "FanDuel has the best captured price for Under +43.5 at -108, 0 cents better than the next book at the same line.",
       "The spread is on or within a half point of 3.",
-      "Buying Denver Broncos from +2.5 to +3 preserves the current modeled EV up to -110.9; no captured buy-half price is available, so whether it is worth buying is unknown.",
-      "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+      "Buying Denver Broncos from +2.5 to +3 preserves the current modeled EV up to -114.2; no captured buy-half price is available, so whether it is worth buying is unknown.",
+      "Kickoff forecast wind is 12.7 mph. WIND RULE applies to this live refresh; it is recorded only if qualified at the T75 lock.",
       "Plain Elo disagrees with the market margin by -5.05 points; diagnostic only, with no QB adjustment.",
       "Teaser candidates: Denver Broncos +2.5 to +8.5, crossing 3, 7; Under +43.5 to +49.5, crossing 44, 47. Ticket prices and a partner are not established.",
       "QB status: inactives unknown until T-90."
     ]
   },
   "capture": {
-    "label": "SATURDAY",
+    "label": "SUNDAY",
     "params": {
       "bookmakers": "betmgm,draftkings,fanduel,williamhill_us,pinnacle",
       "commenceTimeFrom": "2026-09-13T17:00:00Z",
@@ -91,17 +91,17 @@
       "markets": "spreads,totals",
       "oddsFormat": "american"
     },
-    "received_at": "2026-09-12T19:00:12.744998+00:00",
-    "request_at": "2026-09-12T19:00:12.575995+00:00",
-    "request_id": "LIVE_SATURDAY_2026_W01",
+    "received_at": "2026-09-13T14:00:09.965787+00:00",
+    "request_at": "2026-09-13T14:00:09.508290+00:00",
+    "request_id": "LIVE_SUNDAY_2026_W01",
     "source": {
-      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_SATURDAY_2026_W01/sources/4360ef2e8cfe38d78d6db2ae039f1eb63495d56d6bc98d05cb90552ab9e9eeec.json",
-      "sha256": "4360ef2e8cfe38d78d6db2ae039f1eb63495d56d6bc98d05cb90552ab9e9eeec"
+      "path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/outputs/model-pick-v1/captures/LIVE_SUNDAY_2026_W01/sources/4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9.json",
+      "sha256": "4eedef00288f2d27d1813471ee321b00e641b06c984f7061d380f3513762fcb9"
     },
     "status": "CAPTURED"
   },
-  "capture_label": "SATURDAY",
-  "captured_at": "2026-09-12T19:00:12.744998+00:00",
+  "capture_label": "SUNDAY",
+  "captured_at": "2026-09-13T14:00:09.965787+00:00",
   "consensus": {
     "spreads": {
       "devigged_books": {
@@ -115,19 +115,19 @@
             0.5023369847659711,
             0.49766301523402895
           ],
-          "updated_at": "2026-09-12T18:59:34Z"
+          "updated_at": "2026-09-13T13:59:56Z"
         },
         "draftkings": {
           "book": "draftkings",
           "center": 3,
           "line": -2.5,
           "market": "spreads",
-          "power": 1.071115843039896,
+          "power": 1.0719425631310813,
           "probabilities": [
-            0.5116044544982121,
-            0.488395545501788
+            0.5000000000000001,
+            0.5000000000000001
           ],
-          "updated_at": "2026-09-12T18:59:32Z"
+          "updated_at": "2026-09-13T13:58:28Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -139,7 +139,7 @@
             0.5000000000000001,
             0.5000000000000001
           ],
-          "updated_at": "2026-09-12T19:00:11Z"
+          "updated_at": "2026-09-13T13:59:57Z"
         },
         "pinnacle": {
           "book": "pinnacle",
@@ -151,7 +151,7 @@
             0.5,
             0.5
           ],
-          "updated_at": "2026-09-12T19:00:06Z"
+          "updated_at": "2026-09-13T13:59:55Z"
         }
       },
       "full": {
@@ -236,19 +236,19 @@
             0.5023369847659711,
             0.49766301523402895
           ],
-          "updated_at": "2026-09-12T18:59:34Z"
+          "updated_at": "2026-09-13T13:59:56Z"
         },
         "draftkings": {
           "book": "draftkings",
-          "center": 45,
+          "center": 44,
           "line": 43.5,
           "market": "totals",
-          "power": 1.071115843039896,
+          "power": 1.0718103317980505,
           "probabilities": [
-            0.5116044544982121,
-            0.488395545501788
+            0.4953593421115595,
+            0.5046406578884406
           ],
-          "updated_at": "2026-09-12T18:59:32Z"
+          "updated_at": "2026-09-13T13:58:28Z"
         },
         "fanduel": {
           "book": "fanduel",
@@ -260,19 +260,19 @@
             0.5046406578884406,
             0.4953593421115595
           ],
-          "updated_at": "2026-09-12T19:00:11Z"
+          "updated_at": "2026-09-13T13:59:57Z"
         },
         "pinnacle": {
           "book": "pinnacle",
           "center": 43,
           "line": 44.0,
           "market": "totals",
-          "power": 1.058187706541304,
+          "power": 1.060879267773874,
           "probabilities": [
-            0.47770705958926357,
-            0.5222929404107365
+            0.4743064851563103,
+            0.52569351484369
           ],
-          "updated_at": "2026-09-12T19:00:06Z"
+          "updated_at": "2026-09-13T13:59:55Z"
         }
       },
       "full": {
@@ -291,7 +291,7 @@
       },
       "leave_one_out": {
         "betmgm": {
-          "center": 43.75,
+          "center": 43.5,
           "contributors": [
             "draftkings",
             "fanduel",
@@ -301,7 +301,7 @@
           "excluded_book": "betmgm",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": 43,
-          "retail_median": 44.5
+          "retail_median": 44.0
         },
         "draftkings": {
           "center": 43.5,
@@ -317,7 +317,7 @@
           "retail_median": 44.0
         },
         "fanduel": {
-          "center": 43.75,
+          "center": 43.5,
           "contributors": [
             "betmgm",
             "draftkings",
@@ -327,7 +327,7 @@
           "excluded_book": "fanduel",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": 43,
-          "retail_median": 44.5
+          "retail_median": 44.0
         },
         "williamhill_us": {
           "center": 43.5,
@@ -348,9 +348,46 @@
   },
   "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
   "forecast": {
-    "error": "ValueError",
-    "message": "GFS availability remains within the 10-minute replication window",
-    "status": "UNAVAILABLE"
+    "component_initializations": [
+      1789279200,
+      1789279200
+    ],
+    "event_id": "2026_01_DEN_KC",
+    "forecast_issued_at": "2026-09-13T11:55:02+00:00",
+    "forecast_run_initialized_at": "2026-09-13T06:00:00+00:00",
+    "issuance_basis": "Conservative upper bound from completed GFS013/GFS025 availability; exact common archived run requested",
+    "kickoff_at": "2026-09-15T00:15:00+00:00",
+    "model": "gfs_global",
+    "precip_mm": 0.0,
+    "received_at": "2026-09-13T14:00:14.224749+00:00",
+    "request_at": "2026-09-13T14:00:13.807708+00:00",
+    "requests": [
+      {
+        "received_at": "2026-09-13T14:00:13.759011+00:00",
+        "request_at": "2026-09-13T14:00:13.700057+00:00",
+        "sha256": "a7ed9244c7a263ed71112e5337e7f2293e05f17c8a11080da366e557901bd8ab",
+        "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:13.807085+00:00",
+        "request_at": "2026-09-13T14:00:13.759634+00:00",
+        "sha256": "a6dd8fd94cec85905bcd0aa4732f4293357d021f8dec723edb62dfcf5fcbe8f2",
+        "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:14.224749+00:00",
+        "request_at": "2026-09-13T14:00:13.807708+00:00",
+        "sha256": "ce30f466f82cc10302411b3ee52082603ee91cceccacbbc33896616b8ad31993",
+        "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=39.0489275&longitude=-94.4839962&models=gfs_global&run=2026-09-13T06%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
+      }
+    ],
+    "roof": "outdoors",
+    "source_sha256": "ce30f466f82cc10302411b3ee52082603ee91cceccacbbc33896616b8ad31993",
+    "status": "FORECAST",
+    "temperature_c": 31.3,
+    "valid_at": "2026-09-15T00:00:00+00:00",
+    "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+    "wind_mph": 12.7
   },
   "game": {
     "away_abbr": "DEN",
@@ -381,7 +418,7 @@
       "fair_probability": 0.5008635578583766,
       "line": -2.5,
       "market": "spreads",
-      "price": -115.0,
+      "price": -110.0,
       "side": "Kansas City Chiefs"
     },
     {
@@ -389,7 +426,7 @@
       "fair_probability": 0.4991364421416235,
       "line": 2.5,
       "market": "spreads",
-      "price": -105.0,
+      "price": -110.0,
       "side": "Denver Broncos"
     },
     {
@@ -397,7 +434,7 @@
       "fair_probability": 0.49326424870466323,
       "line": 43.5,
       "market": "totals",
-      "price": -115.0,
+      "price": -108.0,
       "side": "Over"
     },
     {
@@ -405,7 +442,7 @@
       "fair_probability": 0.5067357512953368,
       "line": 43.5,
       "market": "totals",
-      "price": -105.0,
+      "price": -112.0,
       "side": "Under"
     },
     {
@@ -473,11 +510,28 @@
       "side": "Under"
     }
   ],
-  "paper_picks": [],
+  "paper_picks": [
+    {
+      "EV": -0.024064478986758786,
+      "book": "fanduel",
+      "conditional_win": 0.5067357512953368,
+      "edge_source": "paper_rule",
+      "fair_probability": 0.5067357512953368,
+      "filtered_subset": false,
+      "line": 43.5,
+      "loss": 0.49326424870466323,
+      "market": "totals",
+      "paper_rule": "WIND-UNDER-10-15-V1-T75",
+      "price": -108.0,
+      "push": 0.0,
+      "side": "Under",
+      "win": 0.5067357512953368
+    }
+  ],
   "picks": [
     {
-      "EV": -0.025495517723496952,
-      "book": "draftkings",
+      "EV": -0.0387001855050213,
+      "book": "betmgm",
       "conditional_win": 0.4991364421416235,
       "edge_source": "tiebreak",
       "exact_tie_count": 1,
@@ -488,20 +542,20 @@
       "loo_center": 3.0,
       "loss": 0.5008635578583764,
       "market": "spreads",
-      "price": -105.0,
-      "price_edge_cents": -5.3460207612456685,
+      "price": -108.0,
+      "price_edge_cents": -8.346020761245668,
       "push": 0.0,
-      "quote_updated_at": "2026-09-12T18:59:32Z",
+      "quote_updated_at": "2026-09-13T13:59:56Z",
       "seed": null,
       "side": "Denver Broncos",
       "win": 0.4991364421416235
     },
     {
-      "EV": -0.010658771280532997,
-      "book": "draftkings",
+      "EV": -0.024064478986758786,
+      "book": "betmgm",
       "conditional_win": 0.5067357512953368,
       "edge_source": "tiebreak",
-      "exact_tie_count": 1,
+      "exact_tie_count": 2,
       "fair_probability": 0.5067357512953368,
       "fair_probability_basis": "conditional_non_push",
       "filtered_subset": false,
@@ -509,11 +563,11 @@
       "loo_center": 43.5,
       "loss": 0.49326424870466323,
       "market": "totals",
-      "price": -105.0,
-      "price_edge_cents": -2.2689075630252233,
+      "price": -108.0,
+      "price_edge_cents": -5.268907563025223,
       "push": 0.0,
-      "quote_updated_at": "2026-09-12T18:59:32Z",
-      "seed": null,
+      "quote_updated_at": "2026-09-13T13:59:56Z",
+      "seed": "0c40cc10add2af68fbb4033506bc7806a46f898443b518b2815e56226222d431",
       "side": "Under",
       "win": 0.5067357512953368
     }
@@ -526,10 +580,10 @@
     "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
     "expected_margin": 2.972711571675302,
     "expected_total": 44.4006908462867,
-    "generated_at": "2026-09-12T19:00:17.711716+00:00",
+    "generated_at": "2026-09-13T14:00:14.953552+00:00",
     "home_score": 23.686701208981003,
     "home_win_probability": 0.5778929188255613,
-    "quote_captured_at": "2026-09-12T19:00:12.744998+00:00",
+    "quote_captured_at": "2026-09-13T14:00:09.965787+00:00",
     "score_label": "market-based score estimate",
     "status": "AVAILABLE",
     "tie_probability": 0.027633851468048358,

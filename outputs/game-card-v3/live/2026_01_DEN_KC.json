@@ -1,12 +1,12 @@
 {
   "analysis": [
-    "Spread consensus is KC -3. It moved -0.5 points since the previous capture.",
-    "DraftKings has the best captured price for Denver Broncos +2.5 at -105, 3 cents better than the next book at the same line.",
+    "Spread consensus is KC -3. It moved +0 points since the previous capture.",
+    "BetMGM has the best captured price for Denver Broncos +2.5 at -108, 2 cents better than the next book at the same line.",
     "Total consensus is +43.5. It moved +0 points since the previous capture.",
-    "DraftKings has the best captured price for Under +43.5 at -105, 3 cents better than the next book at the same line.",
+    "FanDuel has the best captured price for Under +43.5 at -108, 0 cents better than the next book at the same line.",
     "The spread is on or within a half point of 3.",
-    "Buying Denver Broncos from +2.5 to +3 preserves the current modeled EV up to -110.9; no captured buy-half price is available, so whether it is worth buying is unknown.",
-    "No qualified kickoff forecast is available; WIND RULE cannot apply.",
+    "Buying Denver Broncos from +2.5 to +3 preserves the current modeled EV up to -114.2; no captured buy-half price is available, so whether it is worth buying is unknown.",
+    "Kickoff forecast wind is 12.7 mph. WIND RULE applies to this live refresh; it is recorded only if qualified at the T75 lock.",
     "Plain Elo disagrees with the market margin by -5.05 points; diagnostic only, with no QB adjustment.",
     "Teaser candidates: Denver Broncos +2.5 to +8.5, crossing 3, 7; Under +43.5 to +49.5, crossing 44, 47. Ticket prices and a partner are not established.",
     "QB status: inactives unknown until T-90."
@@ -16,7 +16,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_01_DEN_KC",
-  "generated_at": "2026-09-12T22:05:07.172977+00:00",
+  "generated_at": "2026-09-13T14:00:20.945394+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -24,7 +24,7 @@
     "clv": null
   },
   "home": "KC",
-  "input_hash": "37f5d16cc7f0012e4ef0e94ec4571d0fd568fe46356e45f458aad8d43846cb75",
+  "input_hash": "e996508270199b90adbf0f964b08751d43710dce0b749d52734901fc13d9a019",
   "kickoff_utc": "2026-09-15T00:15:00+00:00",
   "market": {
     "books": {
@@ -81,7 +81,7 @@
             "fair_probability": 0.4991364421416235,
             "line": 2.5,
             "market": "spreads",
-            "price": -105.0,
+            "price": -110.0,
             "side": "Denver Broncos"
           },
           "KC": {
@@ -89,7 +89,7 @@
             "fair_probability": 0.5008635578583766,
             "line": -2.5,
             "market": "spreads",
-            "price": -115.0,
+            "price": -110.0,
             "side": "Kansas City Chiefs"
           }
         },
@@ -99,7 +99,7 @@
             "fair_probability": 0.49326424870466323,
             "line": 43.5,
             "market": "totals",
-            "price": -115.0,
+            "price": -108.0,
             "side": "Over"
           },
           "Under": {
@@ -107,7 +107,7 @@
             "fair_probability": 0.5067357512953368,
             "line": 43.5,
             "market": "totals",
-            "price": -105.0,
+            "price": -112.0,
             "side": "Under"
           }
         }
@@ -169,7 +169,7 @@
         }
       }
     },
-    "capture_time": "2026-09-12T19:00:12.744998+00:00",
+    "capture_time": "2026-09-13T14:00:09.965787+00:00",
     "home_win_prob": 0.5943161634103019,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
     "spread": -3.0,
@@ -181,21 +181,21 @@
   },
   "model": {
     "spreads": {
-      "EV": -0.025495517723496952,
-      "book": "draftkings",
+      "EV": -0.0387001855050213,
+      "book": "betmgm",
       "edge_source": "tiebreak",
       "fair_probability": 0.4991364421416235,
       "line": 2.5,
-      "price": -105.0,
+      "price": -108.0,
       "side": "Denver Broncos"
     },
     "totals": {
-      "EV": -0.010658771280532997,
-      "book": "draftkings",
+      "EV": -0.024064478986758786,
+      "book": "betmgm",
       "edge_source": "tiebreak",
       "fair_probability": 0.5067357512953368,
       "line": 43.5,
-      "price": -105.0,
+      "price": -108.0,
       "side": "Under"
     }
   },
@@ -203,7 +203,14 @@
   "ours": null,
   "post_lock": false,
   "roof": "outdoors",
-  "rules": [],
+  "rules": [
+    {
+      "market": "totals",
+      "pick": "Under",
+      "probability": 0.5067357512953368,
+      "rule_id": "WIND-UNDER-10-15-V1-T75"
+    }
+  ],
   "scheduled_cutoff": "2026-09-14T23:00:00+00:00",
   "schema": "game-card-v3",
   "season": 2026,
@@ -1229,9 +1236,9 @@
   "status": "UPCOMING",
   "tiles": {
     "SPREAD": {
-      "EV": -0.023809523809523836,
-      "book": "draftkings",
-      "book_label": "DraftKings",
+      "EV": -0.03703703703703698,
+      "book": "betmgm",
+      "book_label": "BetMGM",
       "chip": "LEAN",
       "clv": null,
       "confidence_source": "MARKET",
@@ -1240,7 +1247,7 @@
       "label": "SPREAD",
       "line": 2.5,
       "pick": "DEN +2.5",
-      "price": -105.0,
+      "price": -108.0,
       "probability": 0.5,
       "probability_percent": 50.0,
       "push_probability": 0.0,
@@ -1250,25 +1257,25 @@
       "subtitle": "coin flip"
     },
     "TOTAL": {
-      "EV": -0.023809523809523836,
-      "book": "draftkings",
-      "book_label": "DraftKings",
+      "EV": -0.024064478986758786,
+      "book": "betmgm",
+      "book_label": "BetMGM",
       "chip": "LEAN",
       "clv": null,
-      "confidence_source": "MARKET",
+      "confidence_source": "RULE",
       "confidence_used": null,
       "grade": null,
       "label": "TOTAL",
       "line": 43.5,
       "pick": "UNDER 43.5",
-      "price": -105.0,
-      "probability": 0.5,
-      "probability_percent": 50.0,
+      "price": -108.0,
+      "probability": 0.5067357512953368,
+      "probability_percent": 50.7,
       "push_probability": 0.0,
-      "ring_offset": 50.0,
+      "ring_offset": 49.326424870466326,
       "side": "Under",
       "stake_dollars": null,
-      "subtitle": "coin flip"
+      "subtitle": ""
     },
     "WINNER": {
       "EV": null,
@@ -1296,9 +1303,46 @@
   "version": "game-card-v3-7ed2a1b2",
   "wagers": [],
   "weather": {
-    "error": "ValueError",
-    "message": "GFS availability remains within the 10-minute replication window",
-    "status": "UNAVAILABLE"
+    "component_initializations": [
+      1789279200,
+      1789279200
+    ],
+    "event_id": "2026_01_DEN_KC",
+    "forecast_issued_at": "2026-09-13T11:55:02+00:00",
+    "forecast_run_initialized_at": "2026-09-13T06:00:00+00:00",
+    "issuance_basis": "Conservative upper bound from completed GFS013/GFS025 availability; exact common archived run requested",
+    "kickoff_at": "2026-09-15T00:15:00+00:00",
+    "model": "gfs_global",
+    "precip_mm": 0.0,
+    "received_at": "2026-09-13T14:00:14.224749+00:00",
+    "request_at": "2026-09-13T14:00:13.807708+00:00",
+    "requests": [
+      {
+        "received_at": "2026-09-13T14:00:13.759011+00:00",
+        "request_at": "2026-09-13T14:00:13.700057+00:00",
+        "sha256": "a7ed9244c7a263ed71112e5337e7f2293e05f17c8a11080da366e557901bd8ab",
+        "url": "https://api.open-meteo.com/data/ncep_gfs013/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:13.807085+00:00",
+        "request_at": "2026-09-13T14:00:13.759634+00:00",
+        "sha256": "a6dd8fd94cec85905bcd0aa4732f4293357d021f8dec723edb62dfcf5fcbe8f2",
+        "url": "https://api.open-meteo.com/data/ncep_gfs025/static/meta.json"
+      },
+      {
+        "received_at": "2026-09-13T14:00:14.224749+00:00",
+        "request_at": "2026-09-13T14:00:13.807708+00:00",
+        "sha256": "ce30f466f82cc10302411b3ee52082603ee91cceccacbbc33896616b8ad31993",
+        "url": "https://single-runs-api.open-meteo.com/v1/forecast?latitude=39.0489275&longitude=-94.4839962&models=gfs_global&run=2026-09-13T06%3A00&hourly=wind_speed_10m%2Cprecipitation%2Ctemperature_2m&wind_speed_unit=mph&timezone=UTC&forecast_days=7"
+      }
+    ],
+    "roof": "outdoors",
+    "source_sha256": "ce30f466f82cc10302411b3ee52082603ee91cceccacbbc33896616b8ad31993",
+    "status": "FORECAST",
+    "temperature_c": 31.3,
+    "valid_at": "2026-09-15T00:00:00+00:00",
+    "venue_manifest_sha256": "265455fe1ec44b7f03e863767530684a97d392b55b0149f51f91743512f1f831",
+    "wind_mph": 12.7
   },
   "week": 1,
   "why": {
