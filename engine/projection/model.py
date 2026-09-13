@@ -33,9 +33,10 @@ class Fit:
 
     def predict(self, features):
         values=np.asarray([features[n] for n in self.names],dtype=float)
-        if not np.isfinite(values).all():raise ValueError('Unqualified or missing features')
-        terms=(values-np.asarray(self.means))/np.asarray(self.scales)*np.asarray(self.coefficients)
-        contributions=[{'input':n,'points':float(v)} for n,v in zip(self.names,terms)]
+        active=np.isfinite(values)
+        terms=np.zeros(len(values))
+        terms[active]=(values[active]-np.asarray(self.means)[active])/np.asarray(self.scales)[active]*np.asarray(self.coefficients)[active]
+        contributions=[{'input':n,'points':float(v),'status':'ACTIVE' if ok else 'INACTIVE','value':float(value) if ok else None} for n,v,ok,value in zip(self.names,terms,active,values)]
         contributions.append({'input':'fitted_intercept','points':self.intercept})
         points=math.fsum(x['points'] for x in contributions)
         return {'points':points,'contributions':sorted(contributions,key=lambda x:(-abs(x['points']),x['input']))}
@@ -49,8 +50,11 @@ def fit(rows, names, penalty):
     names=tuple(names)
     x=np.asarray([[r['features'][n] for n in names] for r in rows],dtype=float)
     y=np.asarray([r['actual_points'] for r in rows],dtype=float)
-    if not np.isfinite(x).all() or not np.isfinite(y).all():raise ValueError('Unqualified training values')
-    means=x.mean(axis=0);scales=x.std(axis=0);scales=np.where(scales>0,scales,1.)
-    z=(x-means)/scales;intercept=float(y.mean())
+    if not np.isfinite(y).all():raise ValueError('Unqualified training labels')
+    measured=np.isfinite(x)
+    means=np.array([x[measured[:,j],j].mean() if measured[:,j].any() else 0. for j in range(len(names))]);scales=np.array([x[measured[:,j],j].std() if measured[:,j].any() else 1. for j in range(len(names))]);scales=np.where(scales>0,scales,1.)
+    z=np.zeros_like(x)
+    for j in range(len(names)):z[measured[:,j],j]=(x[measured[:,j],j]-means[j])/scales[j]
+    intercept=float(y.mean())
     coefficients=np.linalg.solve(z.T@z+np.eye(len(names))*penalty,z.T@(y-intercept))
     return Fit(names,tuple(means),tuple(scales),tuple(coefficients),intercept,float(penalty),hash_value(rows))

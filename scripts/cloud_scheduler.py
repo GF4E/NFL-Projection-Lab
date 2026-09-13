@@ -19,7 +19,7 @@ from scripts.nfl_engine_autopush import guard, REMOTE
 
 LOCK_PATH = 'work/cloud-migration-v1/ownership.json'
 OUT = ROOT/'outputs/model-pick-v1'
-ALLOWED = ('outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
+ALLOWED = ('outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
            'work/model-pick-v1/daily/', 'work/model-pick-v1/sources/',
            'work/model-pick-v1/schedules/', 'work/model-pick-v1/states/',
            'work/model-pick-v1/depth/')
@@ -118,6 +118,8 @@ def run(mode, host):
         publish_artifacts()
         if mode == 'daily' and capture_window():
             return {'state': 'DEFERRED_CAPTURE_WINDOW'}
+        from scripts.projection_publish import sync as sync_projection
+        sync_projection()
         from engine.game_card_runtime import sync as sync_cards
         sync_cards(ROOT)
         code = worker('live_pick_runner.py' if mode == 'capture' else 'model_pick_daily.py')
@@ -154,6 +156,13 @@ def run(mode, host):
             grade_tickets(ROOT, sync=True)
         from engine.suit_publish import publish as publish_suit
         publish_suit(ROOT)
+        if (ROOT/'work/projection-v1/fit-ref.json').exists():
+            if mode == 'daily':
+                from scripts.projection_refresh import prepare, forecasts
+                prepare()
+                forecasts()
+            from scripts.projection_publish import run as publish_projection
+            publish_projection()
         commit = publish_artifacts()
         if code:
             raise RuntimeError('Worker failed; available artifacts preserved')
