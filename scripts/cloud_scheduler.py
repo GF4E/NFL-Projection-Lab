@@ -169,6 +169,11 @@ def run(mode, host):
             grade_tickets(ROOT, sync=True)
         from engine.suit_publish import publish as publish_suit
         publish_suit(ROOT)
+        # Every capture tick retries finals independently of hourly model preparation.
+        from engine.projection.finals import refresh as refresh_finals
+        final_status=refresh_finals(ROOT)
+        if final_status['state']=='RETRY_NEXT_TICK':
+            print(json.dumps(final_status),flush=True)
         if (ROOT/'work/projection-v1/fit-ref.json').exists():
             if mode == 'daily':
                 from scripts.projection_refresh import prepare, forecasts

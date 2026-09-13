@@ -34,6 +34,7 @@ def lock_card(card,entry,shapes,cutoff):
 def run(now=None,require_synced_entries=False):
  from scripts.projection_learning import active_artifact,feature_snapshot,trajectories
  now=now or dt.datetime.now(dt.timezone.utc);artifact=active_artifact();shapes=read(artifact['shapes']);rows=json.loads(gzip.decompress((WORK/'current-features.json.gz').read_bytes()));groups=paired(rows)
+ final_path=OUT/'final-feed.json';finals=json.loads(final_path.read_text()).get('games',{}) if final_path.exists() else {}
  legacy_path=ROOT/'outputs/projection-v2/board.json';legacy={g['game_id']:g for g in json.loads(legacy_path.read_text())['games']} if legacy_path.exists() else {}
  fp=ROOT/'outputs/projection-v1/forecast.json';forecasts=json.loads(fp.read_text()) if fp.exists() else {};ep=ROOT/'.cloud-private/projection-entries.json';cache=json.loads(ep.read_text()) if ep.exists() else {};entries=cache.get('entries',[]);colors=json.loads((ROOT/'config/game_card_team_colors.json').read_text());cards=[]
  for gid,pair in sorted(groups.items()):
@@ -60,10 +61,9 @@ def run(now=None,require_synced_entries=False):
    prior=json.loads(livepath.read_text()) if livepath.exists() else None
    if prior and {k:v for k,v in prior.items() if k!='issued_at'}=={k:v for k,v in card.items() if k!='issued_at'}:card['issued_at']=prior['issued_at']
    save(livepath,card)
-  if final and card.get('projection'):
-   if gradepath.exists():card=json.loads(gradepath.read_text())
-   elif card.get('grades'):pass
-   else:card=finish(card,float(g['away_score']),float(g['home_score']));save(gradepath,card,True)
+  from engine.projection.finals import grade_once
+  result=finals.get(gid) or ({'away_score':float(g['away_score']),'home_score':float(g['home_score'])} if final else None)
+  card=grade_once(card,gradepath,result)
   card['team_colors']={t:colors.get(t,{}).get('color','#384352') for t in [card['away'],card['home']]};cards.append(card)
  # Every publication branch, including pending locks and missing forecasts, has render metadata.
  for card in cards:
