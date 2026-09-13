@@ -104,3 +104,7 @@ The current build specification is work/projection-v1/SPEC.md, with requirement 
 ### Authorized projection history resolution
 
 Unqualified inputs remain INACTIVE with zero weight/contribution and no substituted measurement. Wind uses only the 2022–2025 forecast archive and stays PARTIAL_HISTORY; the stitched archive does not prove exact issuance. Week 1 reconstructions are RETROSPECTIVE and never pooled with AS_ISSUED accuracy. The fitted version and annual evidence are pinned in work/projection-v1/experiment.json. The projection lock waits for shared-entry synchronization after its deadline before freezing; it never incorporates post-deadline edits.
+
+## Projection v2 qualification (September 13)
+
+Run the registered protocol in work/projection-v2/PLAN.md on the pinned v1 football data. Optional groups require prior-season usefulness and refitted conditional ablation checks; unavailable histories remain inactive. Historical interval scoring uses strictly earlier out-of-fold errors. The first fold has no interval score. Keep statistical development evidence distinct from a new untouched holdout and from as-issued results. V2 future cards use scripts/projection_v2_publish.py; original v1 locked/final/retrospective projections, explanations and first grades are retained. Accuracy remains separated by version. Football WHY states measured offensive/defensive production and retained grouped contributions, with separate strongest counterevidence; never invent or pad reasons. The protocol changes no frozen prior experiment or betting gate.

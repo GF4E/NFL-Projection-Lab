@@ -19,7 +19,7 @@ from scripts.nfl_engine_autopush import guard, REMOTE
 
 LOCK_PATH = 'work/cloud-migration-v1/ownership.json'
 OUT = ROOT/'outputs/model-pick-v1'
-ALLOWED = ('outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
+ALLOWED = ('outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
            'work/model-pick-v1/daily/', 'work/model-pick-v1/sources/',
            'work/model-pick-v1/schedules/', 'work/model-pick-v1/states/',
            'work/model-pick-v1/depth/')
@@ -161,7 +161,13 @@ def run(mode, host):
                 from scripts.projection_refresh import prepare, forecasts
                 prepare()
                 forecasts()
-            from scripts.projection_publish import run as publish_projection
+            if (ROOT/'work/projection-v2/fit-ref.json').exists():
+                from scripts.projection_v2_prepare import prepare as prepare_v2
+                from scripts.projection_v2_publish import run as publish_projection
+                # Reuse the refreshed football sources; no provider call or refit.
+                prepare_v2()
+            else:
+                from scripts.projection_publish import run as publish_projection
             publish_projection(require_synced_entries=True)
         commit = publish_artifacts()
         if code:
