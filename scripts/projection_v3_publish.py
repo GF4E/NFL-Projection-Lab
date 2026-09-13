@@ -74,6 +74,10 @@ def run(now=None,require_synced_entries=False):
  canonical={code(t):t for t in history}
  for card in cards:
   card['trajectory']={side:[x for x in sorted(history.get(canonical.get(card[side],card[side]),[]),key=lambda x:(x['season'],x['week'])) if (x['season'],x['week'])<=(card['season'],card['week'])][-6:] for side in ['home','away']}
+  for folder in ['locks','grades','live']:
+   sheet_path=ROOT/'outputs/game-card-v3'/folder/(card['game_id']+'.json')
+   if sheet_path.exists():
+    card['sheet']=json.loads(sheet_path.read_text()).get('sheet',{});break
   card['trajectory_basis']='Reconstructed pregame weekly adjusted rates; no current-game result used'
  scorecards=[]
  for version in sorted({g['version'] for g in cards}):
