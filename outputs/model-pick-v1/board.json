@@ -326,7 +326,7 @@
     ]
   },
   "clv_reference": "nflverse_close; reference CLV, not executed-book closing quotes",
-  "content_sha256": "ef2cf15e5153213bfe28756233643098e9f2d266d5ecd139b73f4c6f50af32a5",
+  "content_sha256": "a311b84b87457e3a4edace6386d88abaf814f264a5f033ff3943d21d1ec5624d",
   "default_week": 1,
   "game_card_version": "game-card-v3",
   "games": [
@@ -24374,21 +24374,15 @@
       "away_team": "Dallas Cowboys",
       "best_captured": {
         "spreads": {
-          "advantage_cents": 4.0,
           "book": "betmgm",
-          "fair_probability": 0.5120481927710844,
           "line": -3.0,
-          "market": "spreads",
-          "price": -108.0,
+          "price": -108,
           "side": "Dallas Cowboys"
         },
         "totals": {
-          "advantage_cents": 3.0,
           "book": "draftkings",
-          "fair_probability": 0.5067357512953368,
           "line": 47.5,
-          "market": "totals",
-          "price": -105.0,
+          "price": -105,
           "side": "Under"
         }
       },
@@ -24409,7 +24403,7 @@
         "away": "DAL",
         "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
         "final": null,
-        "freeze_timestamp": null,
+        "freeze_timestamp": "2026-09-13T23:05:16.013760+00:00",
         "game_id": "2026_01_DAL_NYG",
         "generated_at": "2026-09-13T23:00:13.749540+00:00",
         "grades": {
@@ -25621,7 +25615,7 @@
           }
         },
         "stale": false,
-        "status": "UPCOMING",
+        "status": "LOCKED",
         "team_colors": {
           "DAL": "#001D43",
           "NYG": "#001D67"
@@ -25775,12 +25769,12 @@
       "cutoff_at": "2026-09-13T23:05:00+00:00",
       "executed_picks": [],
       "expires_at": "2026-09-14T00:20:00+00:00",
-      "freeze_time": null,
+      "freeze_time": "2026-09-13T23:05:10.507981+00:00",
       "game_id": "2026_01_DAL_NYG",
       "home_abbr": "NYG",
       "home_team": "New York Giants",
       "kickoff_at": "2026-09-14T00:20:00+00:00",
-      "lock_status": "LIVE",
+      "lock_status": "LOCKED",
       "note_deadline": "2026-09-13T23:05:00+00:00",
       "our_note": null,
       "prediction": {
@@ -25790,7 +25784,7 @@
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
         ],
-        "frozen": false,
+        "frozen": true,
         "projection": {
           "away_score": 25.713989637305698,
           "away_win_probability": 0.5930915371329879,
@@ -25996,9 +25990,9 @@
         }
       ],
       "record_class": "paper_model_pick",
-      "recorded_at": null,
+      "recorded_at": "2026-09-13T23:05:10.507981+00:00",
       "season": 2026,
-      "status": "UPCOMING",
+      "status": "LOCKED",
       "verdicts": {
         "spreads": {
           "EV": -0.013484296040427168,
@@ -26010,7 +26004,7 @@
             "quote_updated_at": "2026-09-13T22:59:18Z",
             "win": 0.4991364421416235
           },
-          "availability": "LIVE",
+          "availability": "LOCKED",
           "book": "betmgm",
           "edge_source": "tiebreak",
           "fair_probability": 0.5120481927710844,
@@ -26033,7 +26027,7 @@
             "quote_updated_at": "2026-09-13T22:59:23Z",
             "win": 0.5067357512953368
           },
-          "availability": "LIVE",
+          "availability": "LOCKED",
           "best_book": "betmgm",
           "book": "draftkings",
           "edge_source": "tiebreak",
@@ -99967,7 +99961,7 @@
       "week": 18
     }
   ],
-  "published_at": "2026-09-13T23:00:16.449134+00:00",
+  "published_at": "2026-09-13T23:05:18.243657+00:00",
   "schema": "locked-board-v1",
   "shared_confidence": {
     "graded": 0,
