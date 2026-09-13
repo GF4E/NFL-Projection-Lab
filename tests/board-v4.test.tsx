@@ -4,7 +4,7 @@ import {afterEach,expect,it,vi} from 'vitest';
 import {render,screen,fireEvent,cleanup,waitFor} from '@testing-library/react';
 import {ProjectionCard,PointsBar} from '../src/components/projection-card';
 import {ProjectionRows} from '../src/components/projection-board';
-import {pointShare} from '../src/components/board-v4-format';
+import {pointShare,integerText} from '../src/components/board-v4-format';
 import type {ProjectionCardData} from '../src/domain/projection';
 afterEach(()=>{cleanup();vi.unstubAllGlobals();});
 const p:NonNullable<ProjectionCardData['projection']>={home_points:22.49,away_points:24.12,margin:-1.63,total:46.61,home_win_probability:.45,away_win_probability:.55,tie_probability:.01,intervals:{margin:{'50':[-3.5,7.8],'80':[-9.7,18.2]},total:{'50':[35.5,50.3],'80':[28.7,60.1]}}};
@@ -16,3 +16,5 @@ it('FINAL uses actual points and a projected ghost with errors instead of probab
 it('uses our score and keeps the original split; point proportions sum exactly',()=>{const {container}=render(<PointsBar g={{...g,ours:{...p,away_points:28.7,home_points:20.1}}}/>);const segments=container.querySelectorAll<HTMLElement>('.b4-segment');expect(parseFloat(segments[0].style.width)+parseFloat(segments[1].style.width)).toBeCloseTo(100,12);expect(container.querySelector('.b4-ghost')).not.toBeNull();expect(pointShare(0,0)).toBe(.5);expect(pointShare(0,20)).toBe(0);});
 
 it('saving untouched rounded score fields preserves their full precision',async()=>{const fetcher=vi.fn().mockResolvedValue({ok:true,json:async()=>({})});vi.stubGlobal('fetch',fetcher);const {container}=render(<ProjectionCard g={g} expanded/>);fireEvent.submit(container.querySelector('form')!);await waitFor(()=>expect(fetcher).toHaveBeenCalled());const body=JSON.parse(fetcher.mock.calls[0][1].body);expect(body.away_points).toBe(p.away_points);expect(body.home_points).toBe(p.home_points);});
+
+it('keeps the subpoint reporting threshold accurate in integer-only prose',()=>{expect(integerText('Against: No retained measured contribution opposes this direction by at least 0.1 displayed point.')).toBe('Against: No retained measured contribution opposes this direction at the reporting threshold.');});
