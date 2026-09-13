@@ -64,7 +64,7 @@ def edit_learning(edits,cards):
   if not c or not c.get('grades'):excluded['ungraded']+=1;continue
   if e.get('post_lock') or not e.get('entered_at') or datetime.fromisoformat(e['entered_at'].replace('Z','+00:00'))>=datetime.fromisoformat(c['cutoff_at'].replace('Z','+00:00')):excluded['post_lock']+=1;continue
   if not e.get('projection') or e.get('evidence')!='AS_ISSUED':excluded['missing_issued_snapshot_or_retrospective']+=1;continue
-  if e['game_id'] not in latest or e['entered_at']>latest[e['game_id']]['entered_at']:latest[e['game_id']]=e
+  if e['game_id'] not in latest or e['entered_at']>=latest[e['game_id']]['entered_at']:latest[e['game_id']]=e
  rows=[];tags=defaultdict(list)
  for gid,e in sorted(latest.items()):
   c=by[gid];p=e['projection'];a=c['grades']['PROJECTION']['actual'];ours={'home_points':e['home_points'],'away_points':e['away_points'],'margin':e['home_points']-e['away_points'],'total':e['home_points']+e['away_points']}
