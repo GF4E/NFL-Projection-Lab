@@ -162,7 +162,7 @@ def run(mode, host):
                 prepare()
                 forecasts()
             from scripts.projection_publish import run as publish_projection
-            publish_projection()
+            publish_projection(require_synced_entries=True)
         commit = publish_artifacts()
         if code:
             raise RuntimeError('Worker failed; available artifacts preserved')

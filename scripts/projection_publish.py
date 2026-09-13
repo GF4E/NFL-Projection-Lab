@@ -24,10 +24,10 @@ def sync():
   save(ROOT/'.cloud-private/projection-entries.json',{'entries':values,'synced_at':dt.datetime.now(dt.timezone.utc).isoformat()});return True
  except Exception:return False
 
-def run(now=None,root=ROOT):
+def run(now=None,root=ROOT,require_synced_entries=False):
  now=now or dt.datetime.now(dt.timezone.utc);artifact=read(json.loads((WORK/'fit-ref.json').read_text()));shapes=read(artifact['shapes']);rows=json.loads(gzip.decompress((WORK/'current-features.json.gz').read_bytes()));groups=paired(rows)
  weather_path=OUT/'forecast.json';forecasts=json.loads(weather_path.read_text()) if weather_path.exists() else {}
- entries_path=ROOT/'.cloud-private/projection-entries.json';entries=json.loads(entries_path.read_text()).get('entries',[]) if entries_path.exists() else []
+ entries_path=ROOT/'.cloud-private/projection-entries.json';entry_cache=json.loads(entries_path.read_text()) if entries_path.exists() else {};entries=entry_cache.get('entries',[])
  colors=json.loads((ROOT/'config/game_card_team_colors.json').read_text());cards=[]
  for gid,pair in sorted(groups.items()):
   g=copy.deepcopy(pair['home']['game']);week=int(g['week'])
@@ -39,6 +39,8 @@ def run(now=None,root=ROOT):
   elif retro.exists():card=json.loads(retro.read_text())
   elif now>=cutoff and livepath.exists():
    card=json.loads(livepath.read_text())
+   if require_synced_entries and (not entry_cache.get('synced_at') or stamp(entry_cache['synced_at'])<cutoff):
+    card['lock_pending']='Awaiting shared entry synchronization';card['team_colors']={t:colors.get(t,{}).get('color','#384352') for t in [card['away'],card['home']]};cards.append(card);continue
    if stamp(card['issued_at'])>=cutoff:raise ValueError('Late live projection cannot lock')
    if entry:card.update(ours=None) # Fresh authorized edits are applied below using the frozen original inputs.
    if entry:
@@ -73,4 +75,4 @@ def run(now=None,root=ROOT):
  board['content_sha256']=hashlib.sha256(json.dumps(board,sort_keys=True,separators=(',',':')).encode()).hexdigest();save(old,board);save(OUT/'scorecard.json',scorecards);return board
 if __name__=='__main__':
  if '--sync' in sys.argv:sync()
- b=run();print(json.dumps({'version':b['version'],'games':len(b['games'])}))
+ b=run(require_synced_entries='--sync' in sys.argv);print(json.dumps({'version':b['version'],'games':len(b['games'])}))

@@ -51,9 +51,19 @@ def run():
   if r['name'].startswith('roster_'):
    p=ROOT/r['path'];assert sha(p)==r['sha256'];f=pd.read_parquet(p,columns=['season','gsis_id','position']);positions.update({(int(x.season),x.gsis_id):x.position for x in f.itertuples()});roster_hashes.append(r['sha256'])
  games=[];qbs=[];refs=[]
+ # Historical sanitized rows are pinned and sufficient on the small cloud host.
+ # Reuse them instead of requiring every original multi-gigabyte PBP download.
+ historical=[];historical_qbs=[];prior=ROOT/'work/projection-v1/source-manifest.json'
+ if prior.exists():
+  manifest=json.loads(prior.read_text())
+  for kind,destination in [('team_games',historical),('qb_games',historical_qbs)]:
+   r=manifest[kind];p=ROOT/r['path'];assert sha(p)==r['sha256'];destination.extend(json.loads(p.read_text()))
  for source in sources:
   year=int(Path(source['path']).name.split('_')[3].split('-')[0])
   if not 2014<=year<=2026:continue
+  prior_rows=[r for r in historical if r['season']==year and r['source_hash']==source['sha256']]
+  if year<=2025 and prior_rows:
+   games+=prior_rows;qbs += [r for r in historical_qbs if r['season']==year and r['source_hash']==source['sha256']];refs.append({'kind':'pbp','sha256':source['sha256']});continue
   cache_key=hashlib.sha256(json.dumps([source['sha256'],sorted(roster_hashes),sha(__file__)]).encode()).hexdigest();cache=OUT/f'aggregate-{cache_key}.json'
   if cache.exists():d=json.loads(cache.read_text())
   else:
