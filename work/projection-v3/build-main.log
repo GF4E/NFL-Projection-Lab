@@ -1,0 +1,41 @@
+▲ Next.js 16.3.0 (Turbopack)
+✓ Running next.config.ts took 1616ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1631ms
+  Running TypeScript ...
+
+  We detected TypeScript in your project and reconfigured your tsconfig.json file for you.
+  The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
+
+  	- include was updated to add '.next/types/**/*.ts'
+  	- include was updated to add '.next/dev/types/**/*.ts'
+
+  Finished TypeScript in 3.4s ...
+  Collecting page data using 13 workers ...
+Error: Failed to collect configuration for /api/nflverse
+    at ignore-listed frames {
+  [cause]: Error: Failed to load external module cloudflare:workers: Error: Cannot find module 'cloudflare:workers'
+  Require stack:
+  - /Users/gabe/Documents/Codex/2026-09-04/nfl-board-main/.next/server/chunks/db_index_ts_11ere7b._.js
+  - /Users/gabe/Documents/Codex/2026-09-04/nfl-board-main/.next/server/chunks/[turbopack]_runtime.js
+  - /Users/gabe/Documents/Codex/2026-09-04/nfl-board-main/.next/server/app/auth/callback/route.js
+  - /Users/gabe/Documents/Codex/2026-09-04/nfl-board-main/node_modules/.pnpm/next@16.3.0_@babel+core@7.29.7_supports-color@10.2.2__@types+node@24.13.3_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/next/dist/server/require.js
+  - /Users/gabe/Documents/Codex/2026-09-04/nfl-board-main/node_modules/.pnpm/next@16.3.0_@babel+core@7.29.7_supports-color@10.2.2__@types+node@24.13.3_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/next/dist/server/load-components.js
+  - /Users/gabe/Documents/Codex/2026-09-04/nfl-board-main/node_modules/.pnpm/next@16.3.0_@babel+core@7.29.7_supports-color@10.2.2__@types+node@24.13.3_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/next/dist/build/utils.js
+  - /Users/gabe/Documents/Codex/2026-09-04/nfl-board-main/node_modules/.pnpm/next@16.3.0_@babel+core@7.29.7_supports-color@10.2.2__@types+node@24.13.3_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/next/dist/build/worker.js
+  - /Users/gabe/Documents/Codex/2026-09-04/nfl-board-main/node_modules/.pnpm/next@16.3.0_@babel+core@7.29.7_supports-color@10.2.2__@types+node@24.13.3_react-dom@19.2.8_react@19.2.8__react@19.2.8/node_modules/next/dist/compiled/jest-worker/processChild.js
+      at module evaluation (db/index.ts:1:1)
+      at module evaluation (src/app/api/nflverse/route.ts:2:1)
+  > 1 | import { env } from "cloudflare:workers";
+      | ^
+    2 | import { drizzle } from "drizzle-orm/d1";
+    3 | import * as schema from "./schema";
+    4 |
+}
+
+> Build error occurred
+Error: Failed to collect page data for /api/nflverse
+    at ignore-listed frames {
+  type: 'Error'
+}

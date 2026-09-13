@@ -1,0 +1,36 @@
+sanitized 1999 258
+sanitized 2000 257
+sanitized 2001 259
+sanitized 2002 267
+sanitized 2003 267
+sanitized 2004 267
+sanitized 2005 267
+sanitized 2006 267
+sanitized 2007 267
+sanitized 2008 267
+sanitized 2009 267
+sanitized 2010 267
+sanitized 2011 267
+sanitized 2012 267
+sanitized 2013 267
+sanitized 2014 267
+sanitized 2015 267
+sanitized 2016 267
+sanitized 2017 267
+sanitized 2018 267
+sanitized 2019 267
+sanitized 2020 269
+sanitized 2021 285
+sanitized 2022 284
+sanitized 2023 285
+sanitized 2024 285
+sanitized 2025 285
+sanitized 2026 2
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_sources.py", line 67, in <module>
+    if __name__=='__main__':run()
+                            ^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_sources.py", line 62, in run
+    charts.append({'season':year,'team':canonical(x['club_code']),'position':'QB' if x[pos]=='QB' else 'K','id':x['gsis_id'],'at':None,'week':int(x['week']),'source_hash':h,'received_at':r.get('received_at'),'status':'WEEKLY_PROXY_ISSUANCE_UNVERIFIED'})
+                                                                                                                                              ^^^^^^^^^^^^^^
+ValueError: cannot convert float NaN to integer

@@ -1,0 +1,238 @@
+
+ RUN  v4.1.10 /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/projection-v3/site-baseline
+
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts (31 tests | 18 failed) 4660ms
+     × allows only one of two overlapping workers to own a duplicate trigger 7ms
+     × lets the watchdog detect a missing tick and store timely compute-failure withholding 5ms
+     × never backfills an elapsed origin as prospective 4ms
+     × closes an origin nonprospectively at the exact persistence deadline 4ms
+     × rechecks the deadline before publication and converts a crossing to one fenced late closure 4ms
+     × keeps a later-deadline row timely when a peer crosses during the same batch 4ms
+     × waits for future ineligible revisions and closes earlier-kickoff, late-discovered, and after-kickoff origins honestly 4ms
+     × prioritizes fresh prospective work ahead of a larger late backlog 11ms
+     × renews only the live lease and fences the expired worker after takeover 4ms
+     × rolls back the record and automatic job finalization if its audit event fails 4ms
+     × stores approved timely failure reason no_eligible_package 3ms
+     × stores approved timely failure reason required_source_stale 3ms
+     × stores approved timely failure reason required_source_partial 3ms
+     × stores approved timely failure reason required_source_unavailable 3ms
+     × stores approved timely failure reason schema_invalid 3ms
+     × stores approved timely failure reason provenance_incomplete 3ms
+     × stores approved timely failure reason package_hash_mismatch 3ms
+     × stores approved timely failure reason compute_failure 3ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 18 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > allows only one of two overlapping workers to own a duplicate trigger
+Error: terminal publication requires the current head and exact live fenced lease
+ ❯ Object.run tests/engine-os-interim-scheduler-runtime.test.ts:63:40
+     61|       async run() {
+     62|         counter.queries += 1;
+     63|         const result = db.prepare(sql).run(...parameters);
+       |                                        ^
+     64|         return { success: true, meta: { changes: Number(result.changes…
+     65|       },
+ ❯ Object.batch tests/engine-os-interim-scheduler-runtime.test.ts:86:74
+ ❯ Proxy.<anonymous> src/server/engine-os/interim-scheduler.ts:192:41
+ ❯ publishOriginWithholdingsBatch src/server/engine-os/interim-scheduler.ts:1280:20
+ ❯ processOriginBatch src/server/engine-os/interim-scheduler.ts:1386:9
+ ❯ runInterimSchedulerInvocation src/server/engine-os/interim-scheduler.ts:1512:19
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:430:27
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/18]⎯
+
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > lets the watchdog detect a missing tick and store timely compute-failure withholding
+Error: terminal publication requires the current head and exact live fenced lease
+ ❯ Object.run tests/engine-os-interim-scheduler-runtime.test.ts:63:40
+     61|       async run() {
+     62|         counter.queries += 1;
+     63|         const result = db.prepare(sql).run(...parameters);
+       |                                        ^
+     64|         return { success: true, meta: { changes: Number(result.changes…
+     65|       },
+ ❯ Object.batch tests/engine-os-interim-scheduler-runtime.test.ts:86:74
+ ❯ Proxy.<anonymous> src/server/engine-os/interim-scheduler.ts:192:41
+ ❯ publishOriginWithholdingsBatch src/server/engine-os/interim-scheduler.ts:1280:20
+ ❯ processOriginBatch src/server/engine-os/interim-scheduler.ts:1386:9
+ ❯ runInterimSchedulerInvocation src/server/engine-os/interim-scheduler.ts:1512:19
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:459:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/18]⎯
+
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > never backfills an elapsed origin as prospective
+Error: terminal publication requires the current head and exact live fenced lease
+ ❯ Object.run tests/engine-os-interim-scheduler-runtime.test.ts:63:40
+     61|       async run() {
+     62|         counter.queries += 1;
+     63|         const result = db.prepare(sql).run(...parameters);
+       |                                        ^
+     64|         return { success: true, meta: { changes: Number(result.changes…
+     65|       },
+ ❯ Object.batch tests/engine-os-interim-scheduler-runtime.test.ts:86:74
+ ❯ Proxy.<anonymous> src/server/engine-os/interim-scheduler.ts:192:41
+ ❯ publishOriginWithholdingsBatch src/server/engine-os/interim-scheduler.ts:1280:20
+ ❯ processOriginBatch src/server/engine-os/interim-scheduler.ts:1386:9
+ ❯ runInterimSchedulerInvocation src/server/engine-os/interim-scheduler.ts:1512:19
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:753:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/18]⎯
+
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > closes an origin nonprospectively at the exact persistence deadline
+AssertionError: promise rejected "Error: terminal publication requires the … { …(3) }" instead of resolving
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:824:7
+    822|       generatedAt: exactDeadline,
+    823|       persistedAt: exactDeadline
+    824|     })).resolves.toMatchObject({ duplicate: false });
+       |       ^
+    825|     expect(sqlite.prepare(`SELECT timing, prospective_eligible, withho…
+    826|       persisted_at = persistence_deadline_at AS at_deadline
+
+Caused by: Error: terminal publication requires the current head and exact live fenced lease
+ ❯ Object.run tests/engine-os-interim-scheduler-runtime.test.ts:63:40
+ ❯ Object.batch tests/engine-os-interim-scheduler-runtime.test.ts:86:74
+ ❯ publishInterimSchedulerWithholding src/server/engine-os/interim-scheduler.ts:803:20
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:816:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'ERR_SQLITE_ERROR', errcode: 1811, errstr: 'constraint failed' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/18]⎯
+
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > rechecks the deadline before publication and converts a crossing to one fenced late closure
+Error: terminal publication requires the current head and exact live fenced lease
+ ❯ Object.run tests/engine-os-interim-scheduler-runtime.test.ts:63:40
+     61|       async run() {
+     62|         counter.queries += 1;
+     63|         const result = db.prepare(sql).run(...parameters);
+       |                                        ^
+     64|         return { success: true, meta: { changes: Number(result.changes…
+     65|       },
+ ❯ Object.batch tests/engine-os-interim-scheduler-runtime.test.ts:86:74
+ ❯ Proxy.<anonymous> src/server/engine-os/interim-scheduler.ts:192:41
+ ❯ publishOriginWithholdingsBatch src/server/engine-os/interim-scheduler.ts:1280:20
+ ❯ processOriginBatch src/server/engine-os/interim-scheduler.ts:1386:9
+ ❯ runInterimSchedulerInvocation src/server/engine-os/interim-scheduler.ts:1512:19
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:840:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/18]⎯
+
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > keeps a later-deadline row timely when a peer crosses during the same batch
+Error: terminal publication requires the current head and exact live fenced lease
+ ❯ Object.run tests/engine-os-interim-scheduler-runtime.test.ts:63:40
+     61|       async run() {
+     62|         counter.queries += 1;
+     63|         const result = db.prepare(sql).run(...parameters);
+       |                                        ^
+     64|         return { success: true, meta: { changes: Number(result.changes…
+     65|       },
+ ❯ Object.batch tests/engine-os-interim-scheduler-runtime.test.ts:86:74
+ ❯ Proxy.<anonymous> src/server/engine-os/interim-scheduler.ts:192:41
+ ❯ publishOriginWithholdingsBatch src/server/engine-os/interim-scheduler.ts:1280:20
+ ❯ processOriginBatch src/server/engine-os/interim-scheduler.ts:1386:9
+ ❯ runInterimSchedulerInvocation src/server/engine-os/interim-scheduler.ts:1512:19
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:892:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/18]⎯
+
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > waits for future ineligible revisions and closes earlier-kickoff, late-discovered, and after-kickoff origins honestly
+Error: terminal publication requires the current head and exact live fenced lease
+ ❯ Object.run tests/engine-os-interim-scheduler-runtime.test.ts:63:40
+     61|       async run() {
+     62|         counter.queries += 1;
+     63|         const result = db.prepare(sql).run(...parameters);
+       |                                        ^
+     64|         return { success: true, meta: { changes: Number(result.changes…
+     65|       },
+ ❯ Object.batch tests/engine-os-interim-scheduler-runtime.test.ts:86:74
+ ❯ Proxy.<anonymous> src/server/engine-os/interim-scheduler.ts:192:41
+ ❯ publishOriginWithholdingsBatch src/server/engine-os/interim-scheduler.ts:1280:20
+ ❯ processOriginBatch src/server/engine-os/interim-scheduler.ts:1386:9
+ ❯ runInterimSchedulerInvocation src/server/engine-os/interim-scheduler.ts:1512:19
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:946:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/18]⎯
+
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > prioritizes fresh prospective work ahead of a larger late backlog
+Error: terminal publication requires the current head and exact live fenced lease
+ ❯ Object.run tests/engine-os-interim-scheduler-runtime.test.ts:63:40
+     61|       async run() {
+     62|         counter.queries += 1;
+     63|         const result = db.prepare(sql).run(...parameters);
+       |                                        ^
+     64|         return { success: true, meta: { changes: Number(result.changes…
+     65|       },
+ ❯ Object.batch tests/engine-os-interim-scheduler-runtime.test.ts:86:74
+ ❯ Proxy.<anonymous> src/server/engine-os/interim-scheduler.ts:192:41
+ ❯ publishOriginWithholdingsBatch src/server/engine-os/interim-scheduler.ts:1280:20
+ ❯ processOriginBatch src/server/engine-os/interim-scheduler.ts:1386:9
+ ❯ runInterimSchedulerInvocation src/server/engine-os/interim-scheduler.ts:1512:19
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:1031:20
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/18]⎯
+
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > renews only the live lease and fences the expired worker after takeover
+AssertionError: promise rejected "Error: terminal publication requires the … { …(3) }" instead of resolving
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:1102:7
+    1100|       generatedAt: new Date("2026-09-13T18:07:12Z"),
+    1101|       persistedAt: new Date("2026-09-13T18:07:13Z")
+    1102|     })).resolves.toMatchObject({ duplicate: false });
+       |       ^
+    1103|     expect(sqlite.prepare(`SELECT count(*) AS count FROM engine_origin…
+    1104|       .toEqual({ count: 2 });
+
+Caused by: Error: terminal publication requires the current head and exact live fenced lease
+ ❯ Object.run tests/engine-os-interim-scheduler-runtime.test.ts:63:40
+ ❯ Object.batch tests/engine-os-interim-scheduler-runtime.test.ts:86:74
+ ❯ publishInterimSchedulerWithholding src/server/engine-os/interim-scheduler.ts:803:20
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:1094:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+Serialized Error: { code: 'ERR_SQLITE_ERROR', errcode: 1811, errstr: 'constraint failed' }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/18]⎯
+
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > rolls back the record and automatic job finalization if its audit event fails
+AssertionError: expected [Function] to throw error matching /synthetic event failure/ but got 'terminal publication requires the cur…'
+
+- Expected:
+/synthetic event failure/
+
++ Received:
+"terminal publication requires the current head and exact live fenced lease"
+
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:1217:7
+    1215|       generatedAt: new Date("2026-09-13T18:05:12Z"),
+    1216|       persistedAt: new Date("2026-09-13T18:05:13Z")
+    1217|     })).rejects.toThrow(/synthetic event failure/);
+       |       ^
+    1218|     expect(sqlite.prepare(`SELECT count(*) AS count FROM engine_origin…
+    1219|     expect(job(sqlite, jobKey).state).toBe("running");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/18]⎯
+
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > stores approved timely failure reason no_eligible_package
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > stores approved timely failure reason required_source_stale
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > stores approved timely failure reason required_source_partial
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > stores approved timely failure reason required_source_unavailable
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > stores approved timely failure reason schema_invalid
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > stores approved timely failure reason provenance_incomplete
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > stores approved timely failure reason package_hash_mismatch
+ FAIL  tests/engine-os-interim-scheduler-runtime.test.ts > OS-15A provider-free scheduler runtime > stores approved timely failure reason compute_failure
+Error: terminal publication requires the current head and exact live fenced lease
+ ❯ Object.run tests/engine-os-interim-scheduler-runtime.test.ts:63:40
+     61|       async run() {
+     62|         counter.queries += 1;
+     63|         const result = db.prepare(sql).run(...parameters);
+       |                                        ^
+     64|         return { success: true, meta: { changes: Number(result.changes…
+     65|       },
+ ❯ Object.batch tests/engine-os-interim-scheduler-runtime.test.ts:86:74
+ ❯ publishInterimSchedulerWithholding src/server/engine-os/interim-scheduler.ts:803:20
+ ❯ tests/engine-os-interim-scheduler-runtime.test.ts:1286:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/18]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  18 failed | 13 passed (31)
+   Start at  21:04:12
+   Duration  4.84s (transform 73ms, setup 0ms, import 102ms, tests 4.66s, environment 0ms)
+
