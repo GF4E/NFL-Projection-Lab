@@ -63,3 +63,7 @@ Verification: 117 passed, 0 failed; local screenshot rehearsal and duplicate/ide
 ## Locked board bridge — September 11, 2026
 
 Read-only board export and website reader implemented. NE at SEA is 13–10 FINAL, with both immutable model records MISSED; no retrospective picks or grades were invented. Frozen runtime hashes are unchanged. Zero Odds API credits. Verification and decisions: [experiment](work/board-bridge-v1/experiment.json). Reader deployed and verified live. Capture and daily-grade publication wrappers are loaded and each has observed exit 0. The site displays the real final and MISSED state; W/L/PUSH display is covered by synthetic tests. Last verified engine commit before this change: `fa1008c5f5918016f89f4c3427282490c6668512`. Jarrett slip remains pending confirmation of the placement timezone.
+
+## Projection v1 — September 13, 2026
+
+Football-only fit deployed; Week 2 cards and Week 1 retrospective finals verified. Engine version projection-v1-67c39f9a-2e58a851. Reader main d5fb4d3884d3a1434f4b8e93d4eeb14094c7d5e3; cloud verification ea16d18edcdf7fe1e9796b7f4adf09019a1d987b. This run spent zero Odds API credits; existing scheduled quotas remain unchanged. Next decision from Gabe: none required for the authorized build. Unqualified inputs remain inactive. Annual metrics and deployment evidence: work/projection-v1/report.md and experiment.json.

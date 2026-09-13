@@ -55,7 +55,7 @@
     "source": "work/harvest-weather-followup-v1/run-1/experiment.json"
   },
   "garbage_filter": "Exclude qtr==4 and (wp<0.05 or wp>0.95). Retain endpoints; missing wp tracked, not interpreted as garbage.",
-  "live_site": "New reader built; deployment pending.",
+  "live_site": "Projection v1 deployed; 32 API game records match engine artifact, 16 Week 2 cards inspected; two Week 1 finals are RETROSPECTIVE.",
   "numerical_primitives": {
     "status": "TESTED_NOT_FITTED_MODEL",
     "tests_failed": 0,
@@ -230,7 +230,10 @@
       "sha256": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29"
     }
   ],
-  "provider_calls": 0,
+  "provider_calls": {
+    "odds_api": 0,
+    "open_meteo": "Free forecast and metadata requests performed; responses pinned in outputs/projection-v1/weather-sources."
+  },
   "registered_fit": {
     "features": "All measured listed football components plus baseline; standardized design, missing feature contributes zero with INACTIVE flag and original value null. No measured-value substitution.",
     "penalties": [
@@ -247,10 +250,10 @@
       8
     ]
   },
-  "status": "FITTED_VERIFIED_AWAITING_DEPLOYMENT",
+  "status": "DEPLOYED_VERIFIED",
   "verification": {
     "projection_tests": {
-      "passed": 18,
+      "passed": 19,
       "failed": 0
     },
     "existing_week1": {
@@ -277,7 +280,44 @@
       "credits_spent": 0
     },
     "build_main": "PASS",
-    "build_sites": "PASS"
+    "build_sites": "PASS",
+    "main_typecheck": "PASS",
+    "sites_typecheck": "PASS",
+    "live_api": {
+      "status": "PASS",
+      "version": "projection-v1-67c39f9a-2e58a851",
+      "matching_games": 32,
+      "artifact_sha256": "c39a04f4ffb368fcd9f9537a075789901eda79b9ccecf3f492f3fb08dfa1339c",
+      "checked_at": "2026-09-13T09:24:31.240796+00:00"
+    },
+    "cloud": {
+      "status": "PASS",
+      "version": "projection-v1-67c39f9a-2e58a851",
+      "games": 32,
+      "entry_sync": true,
+      "commit": "ea16d18edcdf7fe1e9796b7f4adf09019a1d987b",
+      "odds_api_calls": 0
+    },
+    "cloud_mac_max_absolute_difference": 7.105427357601002e-14,
+    "visual": {
+      "week2_cards": 16,
+      "week2_projected_scores": 16,
+      "week2_against_lines": 16,
+      "forbidden_financial_text": false,
+      "viewport_widths": [
+        390,
+        1280
+      ],
+      "capture_method": "Native tab screenshot after viewport override; browser screenshot compositor previously unreliable.",
+      "screenshots": [
+        "work/projection-v1/screenshots/bal-ind-390.png",
+        "work/projection-v1/screenshots/bal-ind-1280.png"
+      ],
+      "sha256": {
+        "work/projection-v1/screenshots/bal-ind-390.png": "23ccb6c0ee4693de7e3f643c1ac99315e8dd44e5521b3280e0c99ff5a3595e0e",
+        "work/projection-v1/screenshots/bal-ind-1280.png": "f33dcf3a2ddc96334c3fe37682a5345c87b25bccbefec62826afb734dde066c2"
+      }
+    }
   },
   "implementation_corrections_before_first_deployment": [
     "Removed unrequested 30-day cap from rest feature.",
@@ -794,5 +834,28 @@
     "partial_inputs": "TE/RB target shares have roster-backed history from 2025; earlier missing measurements have zero contribution.",
     "inactives": "No qualifying pregame QB, pressure or kicker career history; zero contribution and original value null.",
     "no_edge_claim": "Football score fit; no independent betting-edge claim or promotion gate change."
+  },
+  "deployment": {
+    "site_version": 187,
+    "status": "succeeded",
+    "deployment_id": "appgdep_6aa66b35a3d8819186f9e9bd2a183060",
+    "reader_main_commit": "d5fb4d3884d3a1434f4b8e93d4eeb14094c7d5e3",
+    "sites_source_commit": "e93bf01ec40579c89a8fc11bcd0feaf1af92c6da",
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday"
+  },
+  "final_review": {
+    "complete": true,
+    "exceptions_authorized": [
+      "INACTIVE missing histories",
+      "PARTIAL_HISTORY wind",
+      "RETROSPECTIVE Week 1 reconstructions"
+    ],
+    "least_sure": "Historical forecast issuance; retained partial-history qualification and separate retrospective evidence.",
+    "additional_fixes": [
+      "Kicking follows registered seasonal blending.",
+      "Cloud preparation reuses pinned historical football rows.",
+      "Lock waits for post-deadline shared-entry synchronization.",
+      "Probability labels remain readable at narrow splits."
+    ]
   }
 }

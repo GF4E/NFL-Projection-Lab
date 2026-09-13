@@ -70,3 +70,9 @@ Offline replay: `OPENBLAS_NUM_THREADS=1 /opt/anaconda3/bin/python3.12 -B scripts
 ## Review
 
 Least sure: forecast-history issuance qualification. Kept wind PARTIAL_HISTORY, omitted unavailable live measurements, and separated retrospective reconstructions and descriptive coverage from as-issued accuracy.
+
+## Deployment and verification
+
+Live: https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday . Sites release 187 succeeded. All 32 API game records match the engine artifact; all 16 Week 2 cards show the three projection tiles and Against text. Cloud football preparation, entry sync and publication passed. 19 projection tests and 214 existing engine tests passed; main 304 and Sites 423 tests passed, with one pre-existing skipped test in each website suite. Both builds and typechecks passed. See experiment.json and verification/ for receipts.
+
+Screenshots: [390px](screenshots/bal-ind-390.png), [1280px](screenshots/bal-ind-1280.png).

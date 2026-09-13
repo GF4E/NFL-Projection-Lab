@@ -52,3 +52,9 @@ class ProjectionFittedAcceptance(unittest.TestCase):
    elif isinstance(x,list):
     for v in x:walk(v)
   walk(self.board)
+
+ def test_lock_waits_for_post_deadline_entry_sync(self):
+  old=runtime.OUT
+  with tempfile.TemporaryDirectory() as directory:
+   runtime.OUT=Path(directory);g=next(g for g in self.board['games'] if g['week']==2);gid=g['game_id'];runtime.save(runtime.OUT/'live'/f'{gid}.json',g);b=runtime.run(dt.datetime.fromisoformat(g['cutoff_at'])+dt.timedelta(minutes=1),require_synced_entries=True);self.assertFalse((runtime.OUT/'locks'/f'{gid}.json').exists());self.assertIn('lock_pending',next(x for x in b['games'] if x['game_id']==gid))
+  runtime.OUT=old

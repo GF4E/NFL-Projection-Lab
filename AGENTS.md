@@ -100,3 +100,7 @@ No card or decision window may display a book name, a price, break-even, EV, or 
 ## Projection Engine v1 FINAL supersession
 
 The current build specification is work/projection-v1/SPEC.md, with requirement mapping in work/projection-v1/PLAN.md. It replaces earlier projection, team-total, tile/source/confidence, shared-entry and WHY instructions. Football inputs only; no financial feed or field enters the new projection, card or its accuracy grader. Existing wager grading remains separate and off the card. Shared edits change the two projected team totals before T75; original projections and frozen records are preserved. No retrospective forecast may be labeled as originally issued. Source qualification and missing-input decisions are recorded in work/projection-v1/experiment.json before fitting.
+
+### Authorized projection history resolution
+
+Unqualified inputs remain INACTIVE with zero weight/contribution and no substituted measurement. Wind uses only the 2022–2025 forecast archive and stays PARTIAL_HISTORY; the stitched archive does not prove exact issuance. Week 1 reconstructions are RETROSPECTIVE and never pooled with AS_ISSUED accuracy. The fitted version and annual evidence are pinned in work/projection-v1/experiment.json. The projection lock waits for shared-entry synchronization after its deadline before freezing; it never incorporates post-deadline edits.
