@@ -60,6 +60,9 @@ def run(now=None,require_synced_entries=False):
    elif card.get('grades'):pass
    else:card=finish(card,float(g['away_score']),float(g['home_score']));save(gradepath,card,True)
   card['team_colors']={t:colors.get(t,{}).get('color','#384352') for t in [card['away'],card['home']]};cards.append(card)
+ # Every publication branch, including pending locks and missing forecasts, has render metadata.
+ for card in cards:
+  card.setdefault('team_colors',{t:colors.get(t,{}).get('color','#384352') for t in [card['away'],card['home']]})
  scorecards=[]
  for version in sorted({g['version'] for g in cards}):
   for week in [None,1,2]:
