@@ -34,7 +34,7 @@ export function GameDecision({game:g}: {game:LockedGame}) {
   </div>;
 }
 
-function PricePair(_props: unknown) { return null; }
+function PricePair(_props: Record<string,unknown>) { return null; }
 
 export function GameRow({game:g,quotes,book}: {game:LockedGame;quotes?:CachedLines|null;book:string}) {
   const [open,setOpen]=useState(false);

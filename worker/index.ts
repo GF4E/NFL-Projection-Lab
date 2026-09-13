@@ -1,3 +1,5 @@
+import {projectionEntry} from '../src/server/projection-entry';
+import {readProjection,refreshProjection} from '../src/server/projection-board';
 import {cardEntry} from "../src/server/card-entry";
 import { tickets } from "../src/server/tickets";
 import { suit, readSuit } from "../src/server/suit";
@@ -83,6 +85,8 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if (url.pathname === '/api/projection-entry' || url.pathname === '/api/projection-entry/sync') return projectionEntry(request,env);
+    if (url.pathname === '/api/projection-board') {if(request.method!=='GET')return json({error:'Read-only projection'},405);try{return json(await readProjection(env.DB,url.searchParams.get('refresh')==='1'));}catch{return json({error:'Projection unavailable'},503);}}
     if (["/api/card-entry","/api/card-entry/sync"].includes(url.pathname)) return cardEntry(request,env);
     if (url.pathname === "/api/tickets" || url.pathname === "/api/tickets/sync") return tickets(request, env);
     if (["/api/suit-board","/api/suit-entry","/api/suit-entry/sync"].includes(url.pathname)) return suit(request,env);
@@ -153,6 +157,7 @@ const worker = {
   },
   async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
     ctx.waitUntil(refreshLockedBoard(env.DB).catch(() => undefined));
+    ctx.waitUntil(refreshProjection(env.DB).catch(()=>undefined));
     ctx.waitUntil(readSuit(env.DB).catch(() => undefined));
 
   }

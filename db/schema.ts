@@ -293,3 +293,6 @@ export const engineSuitPublication = sqliteTable("engine_suit_publication", {id:
 export const engineTickets = sqliteTable("engine_tickets", {id:text("id").primaryKey(),payload:text("payload").notNull(),stakeCents:integer("stake_cents").notNull(),cutoffAt:integer("cutoff_at").notNull(),contractKey:text("contract_key").notNull().unique()});
 
 export const engineSharedEntries = sqliteTable("engine_shared_entries", {gameId:text("game_id").notNull(),postLock:integer("post_lock").notNull(),payload:text("payload").notNull()},t=>[primaryKey({columns:[t.gameId,t.postLock]})]);
+
+export const engineProjectionEntries = sqliteTable("engine_projection_entries", {gameId:text("game_id").notNull(),postLock:integer("post_lock").notNull(),payload:text("payload").notNull()},t=>[primaryKey({columns:[t.gameId,t.postLock]})]);
+export const engineProjectionPublication = sqliteTable("engine_projection_publication", {id:integer("id").primaryKey(),payload:text("payload").notNull(),checkedAt:integer("checked_at").notNull()});

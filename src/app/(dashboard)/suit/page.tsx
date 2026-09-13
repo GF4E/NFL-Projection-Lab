@@ -1,2 +1,2 @@
-import {SharedScorecard} from "@/components/shared-scorecard";
-export default function Page(){return <SharedScorecard/>;}
+import {ProjectionBoard} from "@/components/projection-board";
+export default function SuitPage(){return <div className="page week-one-page"><ProjectionBoard/></div>;}
