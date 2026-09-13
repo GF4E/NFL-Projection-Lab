@@ -96,3 +96,7 @@ Implement work/game-card-v3/SPEC-final.md. Shared entry and source ours; no pers
 ## Immediate display restriction (September 12, final supersession)
 
 No card or decision window may display a book name, a price, break-even, EV, or line movement. Book-level detail exists nowhere on the site until explicitly requested. Remove the old WHY WE LEAN THIS WAY block, other-book references, live/best-book consensus prose, Choose another side or book and Add to slip. Under the picks show only the consensus as Line: PIT -6.5 · Total 42. Football WHY from section D of GAME CARD v3 FINAL is permitted only when measured sheet blocks exist; otherwise omit it. This supersedes conflicting earlier card, analytics and ticket-display instructions.
+
+## Projection Engine v1 FINAL supersession
+
+The current build specification is work/projection-v1/SPEC.md, with requirement mapping in work/projection-v1/PLAN.md. It replaces earlier projection, team-total, tile/source/confidence, shared-entry and WHY instructions. Football inputs only; no financial feed or field enters the new projection, card or its accuracy grader. Existing wager grading remains separate and off the card. Shared edits change the two projected team totals before T75; original projections and frozen records are preserved. No retrospective forecast may be labeled as originally issued. Source qualification and missing-input decisions are recorded in work/projection-v1/experiment.json before fitting.
