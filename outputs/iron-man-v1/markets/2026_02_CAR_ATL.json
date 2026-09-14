@@ -1,0 +1,244 @@
+{
+  "capture_label": "EARLY",
+  "capture_source_hash": "35970d2cee1436893c4840955b6bd3cdb1d2fb35976062ccc14d9d9b7d9af043",
+  "captured_at": "2026-09-14T16:00:13.037681+00:00",
+  "consensus": {
+    "spreads": {
+      "full": {
+        "center": -1,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": null,
+        "retail_median": -1
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": -1.0,
+          "contributors": [
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": -1.0
+        },
+        "draftkings": {
+          "center": -1.0,
+          "contributors": [
+            "betmgm",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": -1.0
+        },
+        "fanduel": {
+          "center": -1.0,
+          "contributors": [
+            "betmgm",
+            "draftkings"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": -1.0
+        },
+        "williamhill_us": {
+          "center": -1,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": -1
+        }
+      }
+    },
+    "totals": {
+      "full": {
+        "center": 45,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": null,
+        "retail_median": 45
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 44.5,
+          "contributors": [
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 44.5
+        },
+        "draftkings": {
+          "center": 44.5,
+          "contributors": [
+            "betmgm",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 44.5
+        },
+        "fanduel": {
+          "center": 45.0,
+          "contributors": [
+            "betmgm",
+            "draftkings"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 45.0
+        },
+        "williamhill_us": {
+          "center": 45,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 45
+        }
+      }
+    }
+  },
+  "game": {
+    "away_abbr": "CAR",
+    "away_team": "Carolina Panthers",
+    "capture_at": "2026-09-20T15:40:00+00:00",
+    "cutoff_at": "2026-09-20T15:45:00+00:00",
+    "espn_id": "401872933",
+    "game_id": "2026_02_CAR_ATL",
+    "home_abbr": "ATL",
+    "home_team": "Atlanta Falcons",
+    "kickoff_at": "2026-09-20T17:00:00+00:00",
+    "latitude": "33.7555052",
+    "longitude": "-84.4008484",
+    "neutral": false,
+    "roof": "",
+    "season": 2026,
+    "stadium_id": "ATL97",
+    "venue_source_sha256": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
+    "week": 2
+  },
+  "offers": [
+    {
+      "book": "draftkings",
+      "line": 1.5,
+      "market": "spreads",
+      "price": -112.0,
+      "side": "Atlanta Falcons"
+    },
+    {
+      "book": "draftkings",
+      "line": -1.5,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Carolina Panthers"
+    },
+    {
+      "book": "draftkings",
+      "line": 44.5,
+      "market": "totals",
+      "price": -108.0,
+      "side": "Over"
+    },
+    {
+      "book": "draftkings",
+      "line": 44.5,
+      "market": "totals",
+      "price": -112.0,
+      "side": "Under"
+    },
+    {
+      "book": "fanduel",
+      "line": 1.5,
+      "market": "spreads",
+      "price": -112.0,
+      "side": "Atlanta Falcons"
+    },
+    {
+      "book": "fanduel",
+      "line": -1.5,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Carolina Panthers"
+    },
+    {
+      "book": "fanduel",
+      "line": 44.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Over"
+    },
+    {
+      "book": "fanduel",
+      "line": 44.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Under"
+    },
+    {
+      "book": "betmgm",
+      "line": 1.5,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Atlanta Falcons"
+    },
+    {
+      "book": "betmgm",
+      "line": -1.5,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Carolina Panthers"
+    },
+    {
+      "book": "betmgm",
+      "line": 44.0,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Over"
+    },
+    {
+      "book": "betmgm",
+      "line": 44.0,
+      "market": "totals",
+      "price": -108.0,
+      "side": "Under"
+    }
+  ]
+}

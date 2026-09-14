@@ -326,7 +326,7 @@
     ]
   },
   "clv_reference": "nflverse_close; reference CLV, not executed-book closing quotes",
-  "content_sha256": "7626315d627283648e3d20c81f91cc5b09699ded7e098c00c8f5be86dbb36437",
+  "content_sha256": "f660bdc8f7d80ecd611ac0cd96750735d545b5de0bbcc90f8a336f75fa99fd21",
   "default_week": 1,
   "game_card_version": "game-card-v3",
   "games": [
@@ -28082,13 +28082,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_DET_BUF",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "BUF",
+        "input_hash": "ac93e17d5edca5c2f4f28929bca11f803fd2d4c8c7bc034248e8369740d5d9b0",
         "kickoff_utc": "2026-09-18T00:15:00+00:00",
         "market": {
           "books": {
@@ -28098,12 +28100,36 @@
                 "DET": null
               },
               "spreads": {
-                "BUF": null,
-                "DET": null
+                "BUF": {
+                  "book": "betmgm",
+                  "line": -4.0,
+                  "market": "spreads",
+                  "price": -112.0,
+                  "side": "Buffalo Bills"
+                },
+                "DET": {
+                  "book": "betmgm",
+                  "line": 4.0,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Detroit Lions"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 53.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 53.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -28112,12 +28138,36 @@
                 "DET": null
               },
               "spreads": {
-                "BUF": null,
-                "DET": null
+                "BUF": {
+                  "book": "draftkings",
+                  "line": -3.5,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Buffalo Bills"
+                },
+                "DET": {
+                  "book": "draftkings",
+                  "line": 3.5,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Detroit Lions"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 53.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 53.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -28126,12 +28176,36 @@
                 "DET": null
               },
               "spreads": {
-                "BUF": null,
-                "DET": null
+                "BUF": {
+                  "book": "fanduel",
+                  "line": -4.5,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Buffalo Bills"
+                },
+                "DET": {
+                  "book": "fanduel",
+                  "line": 4.5,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Detroit Lions"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 53.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 53.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -28149,14 +28223,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.626967095851216,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -4.0,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 53.5
         },
         "model": {
           "spreads": null,
@@ -28165,8 +28240,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "outdoors",
         "rules": [],
+        "scheduled_cutoff": "2026-09-17T23:00:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -29187,54 +29263,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "BUF": "#003091",
           "DET": "#005FAE"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.0652173913043479,
+            "book": "draftkings",
+            "book_label": "DraftKings",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": -3.5,
+            "pick": "BUF -3.5",
+            "price": -115.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "BUF",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.023809523809523836,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 53.5,
+            "pick": "UNDER 53.5",
+            "price": -105.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Under",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -29242,37 +29318,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "BUF",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.626967095851216,
+            "probability_percent": 62.7,
+            "push_probability": 0.03419689119170984,
+            "ring_offset": 37.3032904148784,
+            "side": "BUF",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "BUF00",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "BUF explosive offense vs defense: #2 vs DET #22",
+            "DET explosive offense vs defense: #9 vs BUF #27",
+            "BUF pass offense vs pass defense: #2 vs DET #16",
+            "BUF rush offense vs rush defense: #4 vs DET #18",
+            "BUF pass rush vs protection: #5 vs DET #14"
+          ],
+          "fields": [
+            "6.BUF.off_explosive_rate;6.DET.def_explosive_rate",
+            "6.DET.off_explosive_rate;6.BUF.def_explosive_rate",
+            "6.BUF.off_pass_epa;6.DET.def_pass_epa",
+            "6.BUF.off_rush_epa;6.DET.def_rush_epa",
+            "6.BUF.def_pressure_rate;6.DET.off_pressure_rate"
+          ],
+          "statement": "The market-based ATS lean favors BUF; BUF explosive offense vs defense: #2 vs DET #22. Against that lean, DET explosive offense vs defense: #9 vs BUF #27."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 37.3,
+          "away_width": 37.3032904148784,
+          "home_percent": 62.7,
+          "home_width": 62.6967095851216,
+          "tie_percent": 3.4
         }
       },
       "cutoff_at": "2026-09-17T23:00:00+00:00",
@@ -29317,13 +29406,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_CAR_ATL",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "ATL",
+        "input_hash": "73882df86fc58b0913f16e38c28b6373ce2fe01e208010cdcb3859c92f88663b",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -29333,12 +29424,36 @@
                 "CAR": null
               },
               "spreads": {
-                "ATL": null,
-                "CAR": null
+                "ATL": {
+                  "book": "betmgm",
+                  "line": 1.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Atlanta Falcons"
+                },
+                "CAR": {
+                  "book": "betmgm",
+                  "line": -1.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Carolina Panthers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 44.0,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 44.0,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -29347,12 +29462,36 @@
                 "CAR": null
               },
               "spreads": {
-                "ATL": null,
-                "CAR": null
+                "ATL": {
+                  "book": "draftkings",
+                  "line": 1.5,
+                  "market": "spreads",
+                  "price": -112.0,
+                  "side": "Atlanta Falcons"
+                },
+                "CAR": {
+                  "book": "draftkings",
+                  "line": -1.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Carolina Panthers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -29361,12 +29500,36 @@
                 "CAR": null
               },
               "spreads": {
-                "ATL": null,
-                "CAR": null
+                "ATL": {
+                  "book": "fanduel",
+                  "line": 1.5,
+                  "market": "spreads",
+                  "price": -112.0,
+                  "side": "Atlanta Falcons"
+                },
+                "CAR": {
+                  "book": "fanduel",
+                  "line": -1.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Carolina Panthers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -29384,14 +29547,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.4545454545454546,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": 1,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 45
         },
         "model": {
           "spreads": null,
@@ -29400,8 +29564,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T15:45:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -30422,54 +30587,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "ATL": "#C3122D",
           "CAR": "#006097"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.03703703703703698,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": -1.5,
+            "pick": "CAR -1.5",
+            "price": -108.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "CAR",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.044151358140995405,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 44.0,
+            "pick": "OVER 44",
+            "price": -110.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.028670120898100174,
+            "ring_offset": 50.0,
+            "side": "Over",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -30477,37 +30642,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "CAR",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.5454545454545454,
+            "probability_percent": 54.5,
+            "push_probability": 0.0386873920552677,
+            "ring_offset": 45.45454545454546,
+            "side": "CAR",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "ATL97",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "ATL pass rush vs protection: #10 vs CAR #27",
+            "CAR pass rush vs protection: #32 vs ATL #15",
+            "CAR pass offense vs pass defense: #18 vs ATL #6",
+            "CAR explosive offense vs defense: #16 vs ATL #9",
+            "CAR rush offense vs rush defense: #21 vs ATL #16"
+          ],
+          "fields": [
+            "6.ATL.def_pressure_rate;6.CAR.off_pressure_rate",
+            "6.CAR.def_pressure_rate;6.ATL.off_pressure_rate",
+            "6.CAR.off_pass_epa;6.ATL.def_pass_epa",
+            "6.CAR.off_explosive_rate;6.ATL.def_explosive_rate",
+            "6.CAR.off_rush_epa;6.ATL.def_rush_epa"
+          ],
+          "statement": "The market-based ATS lean favors CAR; ATL rush offense vs rush defense: #29 vs CAR #28. Against that lean, ATL pass rush vs protection: #10 vs CAR #27."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 54.5,
+          "away_width": 54.54545454545454,
+          "home_percent": 45.5,
+          "home_width": 45.45454545454546,
+          "tie_percent": 3.9
         }
       },
       "cutoff_at": "2026-09-20T15:45:00+00:00",
@@ -30552,13 +30730,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_CIN_HOU",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "HOU",
+        "input_hash": "500e5c0c439b0b2bff80d8c87d2442a2463f7a4d6f0ed9731e4b3209c214d18d",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -30568,12 +30748,36 @@
                 "HOU": null
               },
               "spreads": {
-                "CIN": null,
-                "HOU": null
+                "CIN": {
+                  "book": "betmgm",
+                  "line": 3.0,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Cincinnati Bengals"
+                },
+                "HOU": {
+                  "book": "betmgm",
+                  "line": -3.0,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Houston Texans"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 46.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 46.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -30582,12 +30786,36 @@
                 "HOU": null
               },
               "spreads": {
-                "CIN": null,
-                "HOU": null
+                "CIN": {
+                  "book": "draftkings",
+                  "line": 3.0,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Cincinnati Bengals"
+                },
+                "HOU": {
+                  "book": "draftkings",
+                  "line": -3.0,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Houston Texans"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 46.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 46.5,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -30596,12 +30824,36 @@
                 "HOU": null
               },
               "spreads": {
-                "CIN": null,
-                "HOU": null
+                "CIN": {
+                  "book": "fanduel",
+                  "line": 2.5,
+                  "market": "spreads",
+                  "price": -102.0,
+                  "side": "Cincinnati Bengals"
+                },
+                "HOU": {
+                  "book": "fanduel",
+                  "line": -2.5,
+                  "market": "spreads",
+                  "price": -120.0,
+                  "side": "Houston Texans"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 46.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 46.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -30619,14 +30871,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.5943161634103019,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -3.0,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 47.0
         },
         "model": {
           "spreads": null,
@@ -30635,8 +30888,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T15:45:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -31657,54 +31911,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "CIN": "#310F01",
           "HOU": "#121820"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.06357287677404828,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 3.0,
+            "pick": "CIN +3",
+            "price": -115.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.02521588946459413,
+            "ring_offset": 50.0,
+            "side": "CIN",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.023809523809523836,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 46.5,
+            "pick": "UNDER 46.5",
+            "price": -105.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Under",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -31712,37 +31966,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "HOU",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.5943161634103019,
+            "probability_percent": 59.4,
+            "push_probability": 0.027633851468048358,
+            "ring_offset": 40.56838365896981,
+            "side": "HOU",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "HOU00",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "CIN pass offense vs pass defense: #26 vs HOU #8",
+            "CIN explosive offense vs defense: #25 vs HOU #12",
+            "CIN pass rush vs protection: #16 vs HOU #6",
+            "HOU pass offense vs pass defense: #14 vs CIN #21",
+            "HOU explosive offense vs defense: #23 vs CIN #26"
+          ],
+          "fields": [
+            "6.CIN.off_pass_epa;6.HOU.def_pass_epa",
+            "6.CIN.off_explosive_rate;6.HOU.def_explosive_rate",
+            "6.CIN.def_pressure_rate;6.HOU.off_pressure_rate",
+            "6.HOU.off_pass_epa;6.CIN.def_pass_epa",
+            "6.HOU.off_explosive_rate;6.CIN.def_explosive_rate"
+          ],
+          "statement": "The market-based ATS lean favors CIN; HOU rush offense vs rush defense: #26 vs CIN #26. Against that lean, CIN pass offense vs pass defense: #26 vs HOU #8."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 40.6,
+          "away_width": 40.56838365896981,
+          "home_percent": 59.4,
+          "home_width": 59.43161634103019,
+          "tie_percent": 2.8
         }
       },
       "cutoff_at": "2026-09-20T15:45:00+00:00",
@@ -31787,13 +32054,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_CLE_TB",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "TB",
+        "input_hash": "8cae7dfbf95b4e1d083888ccc130518f2b2fe33184af3bc7c5dc4bd6ac0469aa",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -31803,12 +32072,36 @@
                 "TB": null
               },
               "spreads": {
-                "CLE": null,
-                "TB": null
+                "CLE": {
+                  "book": "betmgm",
+                  "line": 8.5,
+                  "market": "spreads",
+                  "price": -112.0,
+                  "side": "Cleveland Browns"
+                },
+                "TB": {
+                  "book": "betmgm",
+                  "line": -8.5,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Tampa Bay Buccaneers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 41.0,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 41.0,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -31817,12 +32110,36 @@
                 "TB": null
               },
               "spreads": {
-                "CLE": null,
-                "TB": null
+                "CLE": {
+                  "book": "draftkings",
+                  "line": 8.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Cleveland Browns"
+                },
+                "TB": {
+                  "book": "draftkings",
+                  "line": -8.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Tampa Bay Buccaneers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 40.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 40.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -31831,12 +32148,36 @@
                 "TB": null
               },
               "spreads": {
-                "CLE": null,
-                "TB": null
+                "CLE": {
+                  "book": "fanduel",
+                  "line": 7.5,
+                  "market": "spreads",
+                  "price": -104.0,
+                  "side": "Cleveland Browns"
+                },
+                "TB": {
+                  "book": "fanduel",
+                  "line": -7.5,
+                  "market": "spreads",
+                  "price": -118.0,
+                  "side": "Tampa Bay Buccaneers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 40.5,
+                  "market": "totals",
+                  "price": -114.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 40.5,
+                  "market": "totals",
+                  "price": -106.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -31854,14 +32195,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.7698833510074231,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -9.0,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 42.0
         },
         "model": {
           "spreads": null,
@@ -31870,8 +32212,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "outdoors",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T15:45:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -32892,54 +33235,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "CLE": "#331700",
           "TB": "#C3122D"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.045454545454545414,
+            "book": "draftkings",
+            "book_label": "DraftKings",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 8.5,
+            "pick": "CLE +8.5",
+            "price": -110.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "CLE",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.03597518070747772,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 41.0,
+            "pick": "UNDER 41",
+            "price": -108.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.028670120898100174,
+            "ring_offset": 50.0,
+            "side": "Under",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -32947,37 +33290,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "TB",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.7698833510074231,
+            "probability_percent": 77.0,
+            "push_probability": 0.022797927461139896,
+            "ring_offset": 23.011664899257696,
+            "side": "TB",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "TAM00",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "TB pass rush vs protection: #3 vs CLE #32",
+            "CLE pass offense vs pass defense: #32 vs TB #20",
+            "CLE explosive offense vs defense: #30 vs TB #19",
+            "CLE pass rush vs protection: #1 vs TB #12",
+            "CLE rush offense vs rush defense: #20 vs TB #10"
+          ],
+          "fields": [
+            "6.TB.def_pressure_rate;6.CLE.off_pressure_rate",
+            "6.CLE.off_pass_epa;6.TB.def_pass_epa",
+            "6.CLE.off_explosive_rate;6.TB.def_explosive_rate",
+            "6.CLE.def_pressure_rate;6.TB.off_pressure_rate",
+            "6.CLE.off_rush_epa;6.TB.def_rush_epa"
+          ],
+          "statement": "The market-based ATS lean favors CLE; CLE pass rush vs protection: #1 vs TB #12. Against that lean, TB pass rush vs protection: #3 vs CLE #32."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 23.0,
+          "away_width": 23.01166489925769,
+          "home_percent": 77.0,
+          "home_width": 76.9883351007423,
+          "tie_percent": 2.3
         }
       },
       "cutoff_at": "2026-09-20T15:45:00+00:00",
@@ -33022,13 +33378,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_GB_NYJ",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "NYJ",
+        "input_hash": "3ba68319b40987bb4e49f21937318913bf94b11b45ffad507bcf7e3b0c8b5672",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -33038,12 +33396,36 @@
                 "NYJ": null
               },
               "spreads": {
-                "GB": null,
-                "NYJ": null
+                "GB": {
+                  "book": "betmgm",
+                  "line": -4.0,
+                  "market": "spreads",
+                  "price": -112.0,
+                  "side": "Green Bay Packers"
+                },
+                "NYJ": {
+                  "book": "betmgm",
+                  "line": 4.0,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "New York Jets"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -33052,12 +33434,36 @@
                 "NYJ": null
               },
               "spreads": {
-                "GB": null,
-                "NYJ": null
+                "GB": {
+                  "book": "draftkings",
+                  "line": -4.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Green Bay Packers"
+                },
+                "NYJ": {
+                  "book": "draftkings",
+                  "line": 4.5,
+                  "market": "spreads",
+                  "price": -112.0,
+                  "side": "New York Jets"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -33066,12 +33472,36 @@
                 "NYJ": null
               },
               "spreads": {
-                "GB": null,
-                "NYJ": null
+                "GB": {
+                  "book": "fanduel",
+                  "line": -4.5,
+                  "market": "spreads",
+                  "price": -106.0,
+                  "side": "Green Bay Packers"
+                },
+                "NYJ": {
+                  "book": "fanduel",
+                  "line": 4.5,
+                  "market": "spreads",
+                  "price": -114.0,
+                  "side": "New York Jets"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -33089,14 +33519,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.35285714285714287,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": 3.5,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 45.0
         },
         "model": {
           "spreads": null,
@@ -33105,8 +33536,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "outdoors",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T15:45:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -34127,54 +34559,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "GB": "#03342D",
           "NYJ": "#00563C"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.05222057735011106,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": -4.0,
+            "pick": "GB -4",
+            "price": -112.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.02521588946459413,
+            "ring_offset": 50.0,
+            "side": "GB",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.03703703703703698,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 44.5,
+            "pick": "UNDER 44.5",
+            "price": -108.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Under",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -34182,37 +34614,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "GB",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.6471428571428571,
+            "probability_percent": 64.7,
+            "push_probability": 0.03281519861830743,
+            "ring_offset": 35.28571428571429,
+            "side": "GB",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "NYC01",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "GB pass offense vs pass defense: #3 vs NYJ #31",
+            "NYJ explosive offense vs defense: #28 vs GB #4",
+            "NYJ rush offense vs rush defense: #30 vs GB #9",
+            "NYJ pass rush vs protection: #30 vs GB #10",
+            "GB explosive offense vs defense: #5 vs NYJ #20"
+          ],
+          "fields": [
+            "6.GB.off_pass_epa;6.NYJ.def_pass_epa",
+            "6.NYJ.off_explosive_rate;6.GB.def_explosive_rate",
+            "6.NYJ.off_rush_epa;6.GB.def_rush_epa",
+            "6.NYJ.def_pressure_rate;6.GB.off_pressure_rate",
+            "6.GB.off_explosive_rate;6.NYJ.def_explosive_rate"
+          ],
+          "statement": "The market-based ATS lean favors GB; GB pass offense vs pass defense: #3 vs NYJ #31. Against that lean, GB adjusted defensive EPA allowed/play 0.009, #19."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 64.7,
+          "away_width": 64.71428571428571,
+          "home_percent": 35.3,
+          "home_width": 35.285714285714285,
+          "tie_percent": 3.3
         }
       },
       "cutoff_at": "2026-09-20T15:45:00+00:00",
@@ -34257,13 +34702,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_MIN_CHI",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "CHI",
+        "input_hash": "6321e17c9e21a5e37d2aabe17ef99a6422e236ad5460e5744f6de090557f1bf2",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -34273,12 +34720,36 @@
                 "MIN": null
               },
               "spreads": {
-                "CHI": null,
-                "MIN": null
+                "CHI": {
+                  "book": "betmgm",
+                  "line": -5.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Chicago Bears"
+                },
+                "MIN": {
+                  "book": "betmgm",
+                  "line": 5.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Minnesota Vikings"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 49.0,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 49.0,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -34287,12 +34758,36 @@
                 "MIN": null
               },
               "spreads": {
-                "CHI": null,
-                "MIN": null
+                "CHI": {
+                  "book": "draftkings",
+                  "line": -5.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Chicago Bears"
+                },
+                "MIN": {
+                  "book": "draftkings",
+                  "line": 5.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Minnesota Vikings"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 49.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 49.5,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -34301,12 +34796,36 @@
                 "MIN": null
               },
               "spreads": {
-                "CHI": null,
-                "MIN": null
+                "CHI": {
+                  "book": "fanduel",
+                  "line": -5.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Chicago Bears"
+                },
+                "MIN": {
+                  "book": "fanduel",
+                  "line": 5.5,
+                  "market": "spreads",
+                  "price": -112.0,
+                  "side": "Minnesota Vikings"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 49.5,
+                  "market": "totals",
+                  "price": -106.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 49.5,
+                  "market": "totals",
+                  "price": -114.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -34324,14 +34843,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.6878777106292215,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -6,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 50
         },
         "model": {
           "spreads": null,
@@ -34340,8 +34860,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "outdoors",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T15:45:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -35362,54 +35883,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "CHI": "#000F26",
           "MIN": "#4F2683"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.03703703703703698,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": -5.5,
+            "pick": "CHI -5.5",
+            "price": -108.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "CHI",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.05203552923760181,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 49.0,
+            "pick": "OVER 49",
+            "price": -112.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.028670120898100174,
+            "ring_offset": 50.0,
+            "side": "Over",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -35417,37 +35938,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "CHI",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.6878777106292215,
+            "probability_percent": 68.8,
+            "push_probability": 0.028324697754749568,
+            "ring_offset": 31.21222893707784,
+            "side": "CHI",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "CHI98",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "MIN pass rush vs protection: #6 vs CHI #22",
+            "MIN explosive offense vs defense: #18 vs CHI #32",
+            "MIN pass offense vs pass defense: #30 vs CHI #23",
+            "CHI pass rush vs protection: #24 vs MIN #30",
+            "CHI rush offense vs rush defense: #1 vs MIN #6"
+          ],
+          "fields": [
+            "6.MIN.def_pressure_rate;6.CHI.off_pressure_rate",
+            "6.MIN.off_explosive_rate;6.CHI.def_explosive_rate",
+            "6.MIN.off_pass_epa;6.CHI.def_pass_epa",
+            "6.CHI.def_pressure_rate;6.MIN.off_pressure_rate",
+            "6.CHI.off_rush_epa;6.MIN.def_rush_epa"
+          ],
+          "statement": "The market-based ATS lean favors CHI; MIN pass offense vs pass defense: #30 vs CHI #23. Against that lean, MIN pass rush vs protection: #6 vs CHI #22."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 31.2,
+          "away_width": 31.212228937077846,
+          "home_percent": 68.8,
+          "home_width": 68.78777106292216,
+          "tie_percent": 2.8
         }
       },
       "cutoff_at": "2026-09-20T15:45:00+00:00",
@@ -35492,13 +36026,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_NO_BAL",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "BAL",
+        "input_hash": "fbfb37a33199a49095af98857cf76a30efc009b28911966cb401a80c0722a8c8",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -35508,12 +36044,36 @@
                 "NO": null
               },
               "spreads": {
-                "BAL": null,
-                "NO": null
+                "BAL": {
+                  "book": "betmgm",
+                  "line": -8.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Baltimore Ravens"
+                },
+                "NO": {
+                  "book": "betmgm",
+                  "line": 8.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "New Orleans Saints"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 47.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 47.5,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -35522,12 +36082,36 @@
                 "NO": null
               },
               "spreads": {
-                "BAL": null,
-                "NO": null
+                "BAL": {
+                  "book": "draftkings",
+                  "line": -8.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Baltimore Ravens"
+                },
+                "NO": {
+                  "book": "draftkings",
+                  "line": 8.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "New Orleans Saints"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 47.5,
+                  "market": "totals",
+                  "price": -102.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 47.5,
+                  "market": "totals",
+                  "price": -118.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -35536,12 +36120,36 @@
                 "NO": null
               },
               "spreads": {
-                "BAL": null,
-                "NO": null
+                "BAL": {
+                  "book": "fanduel",
+                  "line": -8.5,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Baltimore Ravens"
+                },
+                "NO": {
+                  "book": "fanduel",
+                  "line": 8.5,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "New Orleans Saints"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 47.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 47.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -35559,14 +36167,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.7698833510074231,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -9.0,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 47.0
         },
         "model": {
           "spreads": null,
@@ -35575,8 +36184,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "outdoors",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T15:45:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -36597,54 +37207,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "BAL": "#240B61",
           "NO": "#393124"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.023809523809523836,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": -8.5,
+            "pick": "BAL -8.5",
+            "price": -105.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "BAL",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.009803921568627416,
+            "book": "draftkings",
+            "book_label": "DraftKings",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 47.5,
+            "pick": "OVER 47.5",
+            "price": -102.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Over",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -36652,37 +37262,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "BAL",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.7698833510074231,
+            "probability_percent": 77.0,
+            "push_probability": 0.022797927461139896,
+            "ring_offset": 23.011664899257696,
+            "side": "BAL",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "BAL00",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "NO rush offense vs rush defense: #31 vs BAL #11",
+            "BAL explosive offense vs defense: #1 vs NO #15",
+            "BAL pass rush vs protection: #25 vs NO #13",
+            "NO pass offense vs pass defense: #25 vs BAL #14",
+            "NO pass rush vs protection: #21 vs BAL #28"
+          ],
+          "fields": [
+            "6.NO.off_rush_epa;6.BAL.def_rush_epa",
+            "6.BAL.off_explosive_rate;6.NO.def_explosive_rate",
+            "6.BAL.def_pressure_rate;6.NO.off_pressure_rate",
+            "6.NO.off_pass_epa;6.BAL.def_pass_epa",
+            "6.NO.def_pressure_rate;6.BAL.off_pressure_rate"
+          ],
+          "statement": "The market-based ATS lean favors BAL; NO rush offense vs rush defense: #31 vs BAL #11. Against that lean, BAL pass rush vs protection: #25 vs NO #13."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 23.0,
+          "away_width": 23.01166489925769,
+          "home_percent": 77.0,
+          "home_width": 76.9883351007423,
+          "tie_percent": 2.3
         }
       },
       "cutoff_at": "2026-09-20T15:45:00+00:00",
@@ -36727,13 +37350,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_PHI_TEN",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "TEN",
+        "input_hash": "537f98244f19e78c06a95f99211708e76f40d46cb3a570f809627a2615ae0fe6",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -36743,12 +37368,36 @@
                 "TEN": null
               },
               "spreads": {
-                "PHI": null,
-                "TEN": null
+                "PHI": {
+                  "book": "betmgm",
+                  "line": -7.0,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Philadelphia Eagles"
+                },
+                "TEN": {
+                  "book": "betmgm",
+                  "line": 7.0,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Tennessee Titans"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 39.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 39.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -36757,12 +37406,36 @@
                 "TEN": null
               },
               "spreads": {
-                "PHI": null,
-                "TEN": null
+                "PHI": {
+                  "book": "draftkings",
+                  "line": -7.0,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Philadelphia Eagles"
+                },
+                "TEN": {
+                  "book": "draftkings",
+                  "line": 7.0,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Tennessee Titans"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 40.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 40.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -36771,12 +37444,36 @@
                 "TEN": null
               },
               "spreads": {
-                "PHI": null,
-                "TEN": null
+                "PHI": {
+                  "book": "fanduel",
+                  "line": -7.0,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Philadelphia Eagles"
+                },
+                "TEN": {
+                  "book": "fanduel",
+                  "line": 7.0,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Tennessee Titans"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 39.5,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 39.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -36794,14 +37491,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.2670697012802276,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": 7.0,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 40.0
         },
         "model": {
           "spreads": null,
@@ -36810,8 +37508,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "outdoors",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T15:45:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -37832,54 +38531,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "PHI": "#004650",
           "TEN": "#D50A0A"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.036103115205014975,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 7.0,
+            "pick": "TEN +7",
+            "price": -108.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.02521588946459413,
+            "ring_offset": 50.0,
+            "side": "TEN",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.03703703703703698,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 39.5,
+            "pick": "OVER 39.5",
+            "price": -108.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Over",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -37887,37 +38586,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "PHI",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.7329302987197723,
+            "probability_percent": 73.3,
+            "push_probability": 0.028670120898100174,
+            "ring_offset": 26.70697012802276,
+            "side": "PHI",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "NAS00",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "TEN pass offense vs pass defense: #31 vs PHI #5",
+            "PHI pass offense vs pass defense: #11 vs TEN #29",
+            "TEN explosive offense vs defense: #29 vs PHI #11",
+            "PHI pass rush vs protection: #7 vs TEN #24",
+            "PHI explosive offense vs defense: #15 vs TEN #28"
+          ],
+          "fields": [
+            "6.TEN.off_pass_epa;6.PHI.def_pass_epa",
+            "6.PHI.off_pass_epa;6.TEN.def_pass_epa",
+            "6.TEN.off_explosive_rate;6.PHI.def_explosive_rate",
+            "6.PHI.def_pressure_rate;6.TEN.off_pressure_rate",
+            "6.PHI.off_explosive_rate;6.TEN.def_explosive_rate"
+          ],
+          "statement": "The market-based ATS lean favors TEN; PHI adjusted offensive points/drive 2.053, #21. Against that lean, TEN pass offense vs pass defense: #31 vs PHI #5."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 73.3,
+          "away_width": 73.29302987197724,
+          "home_percent": 26.7,
+          "home_width": 26.70697012802276,
+          "tie_percent": 2.9
         }
       },
       "cutoff_at": "2026-09-20T15:45:00+00:00",
@@ -37962,13 +38674,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_PIT_NE",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "NE",
+        "input_hash": "add0738f1e95aa2fd8a771ebd8f754172a60362560a1140de0145b14d7ec7234",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -37978,12 +38692,36 @@
                 "PIT": null
               },
               "spreads": {
-                "NE": null,
-                "PIT": null
+                "NE": {
+                  "book": "betmgm",
+                  "line": -5.0,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "New England Patriots"
+                },
+                "PIT": {
+                  "book": "betmgm",
+                  "line": 5.0,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Pittsburgh Steelers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 41.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 41.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -37992,12 +38730,36 @@
                 "PIT": null
               },
               "spreads": {
-                "NE": null,
-                "PIT": null
+                "NE": {
+                  "book": "draftkings",
+                  "line": -5.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "New England Patriots"
+                },
+                "PIT": {
+                  "book": "draftkings",
+                  "line": 5.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Pittsburgh Steelers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 41.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 41.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -38006,12 +38768,36 @@
                 "PIT": null
               },
               "spreads": {
-                "NE": null,
-                "PIT": null
+                "NE": {
+                  "book": "fanduel",
+                  "line": -4.5,
+                  "market": "spreads",
+                  "price": -118.0,
+                  "side": "New England Patriots"
+                },
+                "PIT": {
+                  "book": "fanduel",
+                  "line": 4.5,
+                  "market": "spreads",
+                  "price": -104.0,
+                  "side": "Pittsburgh Steelers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 42.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 42.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -38029,14 +38815,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.6878777106292215,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -5.5,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 42.5
         },
         "model": {
           "spreads": null,
@@ -38045,8 +38832,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "outdoors",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T15:45:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -39067,54 +39855,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "NE": "#001D43",
           "PIT": "#00539B"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.045454545454545414,
+            "book": "draftkings",
+            "book_label": "DraftKings",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 5.5,
+            "pick": "PIT +5.5",
+            "price": -110.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "PIT",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.045454545454545414,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 41.5,
+            "pick": "OVER 41.5",
+            "price": -110.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Over",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -39122,37 +39910,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "NE",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.6878777106292215,
+            "probability_percent": 68.8,
+            "push_probability": 0.028324697754749568,
+            "ring_offset": 31.21222893707784,
+            "side": "NE",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "BOS00",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "NE pass rush vs protection: #23 vs PIT #1",
+            "PIT explosive offense vs defense: #27 vs NE #14",
+            "PIT rush offense vs rush defense: #22 vs NE #12",
+            "PIT pass offense vs pass defense: #24 vs NE #15",
+            "NE pass offense vs pass defense: #1 vs PIT #7"
+          ],
+          "fields": [
+            "6.NE.def_pressure_rate;6.PIT.off_pressure_rate",
+            "6.PIT.off_explosive_rate;6.NE.def_explosive_rate",
+            "6.PIT.off_rush_epa;6.NE.def_rush_epa",
+            "6.PIT.off_pass_epa;6.NE.def_pass_epa",
+            "6.NE.off_pass_epa;6.PIT.def_pass_epa"
+          ],
+          "statement": "The market-based ATS lean favors PIT; NE pass rush vs protection: #23 vs PIT #1. Against that lean, PIT explosive offense vs defense: #27 vs NE #14."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 31.2,
+          "away_width": 31.212228937077846,
+          "home_percent": 68.8,
+          "home_width": 68.78777106292216,
+          "tie_percent": 2.8
         }
       },
       "cutoff_at": "2026-09-20T15:45:00+00:00",
@@ -39197,13 +39998,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_JAX_DEN",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "DEN",
+        "input_hash": "557630e997964b160595d9bdd67722d4c0914b53c534f30542d2d759be9d3ff2",
         "kickoff_utc": "2026-09-20T20:05:00+00:00",
         "market": {
           "books": {
@@ -39213,12 +40016,36 @@
                 "JAX": null
               },
               "spreads": {
-                "DEN": null,
-                "JAX": null
+                "DEN": {
+                  "book": "betmgm",
+                  "line": -3.0,
+                  "market": "spreads",
+                  "price": 100.0,
+                  "side": "Denver Broncos"
+                },
+                "JAX": {
+                  "book": "betmgm",
+                  "line": 3.0,
+                  "market": "spreads",
+                  "price": -120.0,
+                  "side": "Jacksonville Jaguars"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -39227,12 +40054,36 @@
                 "JAX": null
               },
               "spreads": {
-                "DEN": null,
-                "JAX": null
+                "DEN": {
+                  "book": "draftkings",
+                  "line": -2.5,
+                  "market": "spreads",
+                  "price": -118.0,
+                  "side": "Denver Broncos"
+                },
+                "JAX": {
+                  "book": "draftkings",
+                  "line": 2.5,
+                  "market": "spreads",
+                  "price": -102.0,
+                  "side": "Jacksonville Jaguars"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -39241,12 +40092,36 @@
                 "JAX": null
               },
               "spreads": {
-                "DEN": null,
-                "JAX": null
+                "DEN": {
+                  "book": "fanduel",
+                  "line": -2.5,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Denver Broncos"
+                },
+                "JAX": {
+                  "book": "fanduel",
+                  "line": 2.5,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Jacksonville Jaguars"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 44.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -39264,14 +40139,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.5943161634103019,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -3,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 45
         },
         "model": {
           "spreads": null,
@@ -39280,8 +40156,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "outdoors",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T18:50:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -40302,54 +41179,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "DEN": "#001E42",
           "JAX": "#006779"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.0652173913043479,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": -2.5,
+            "pick": "DEN -2.5",
+            "price": -115.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "DEN",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.023809523809523836,
+            "book": "draftkings",
+            "book_label": "DraftKings",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 44.5,
+            "pick": "UNDER 44.5",
+            "price": -105.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Under",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -40357,37 +41234,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "DEN",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.5943161634103019,
+            "probability_percent": 59.4,
+            "push_probability": 0.027633851468048358,
+            "ring_offset": 40.56838365896981,
+            "side": "DEN",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "DEN00",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "JAX pass rush vs protection: #27 vs DEN #5",
+            "DEN explosive offense vs defense: #21 vs JAX #5",
+            "DEN pass offense vs pass defense: #13 vs JAX #3",
+            "DEN pass rush vs protection: #2 vs JAX #8",
+            "DEN rush offense vs rush defense: #12 vs JAX #17"
+          ],
+          "fields": [
+            "6.JAX.def_pressure_rate;6.DEN.off_pressure_rate",
+            "6.DEN.off_explosive_rate;6.JAX.def_explosive_rate",
+            "6.DEN.off_pass_epa;6.JAX.def_pass_epa",
+            "6.DEN.def_pressure_rate;6.JAX.off_pressure_rate",
+            "6.DEN.off_rush_epa;6.JAX.def_rush_epa"
+          ],
+          "statement": "The market-based ATS lean favors DEN; JAX pass rush vs protection: #27 vs DEN #5. Against that lean, DEN explosive offense vs defense: #21 vs JAX #5."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 40.6,
+          "away_width": 40.56838365896981,
+          "home_percent": 59.4,
+          "home_width": 59.43161634103019,
+          "tie_percent": 2.8
         }
       },
       "cutoff_at": "2026-09-20T18:50:00+00:00",
@@ -40432,13 +41322,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_LV_LAC",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "LAC",
+        "input_hash": "55748a86d62d3a19a88d8e693809030430028a0b4cd18927e8f16ea763e71e05",
         "kickoff_utc": "2026-09-20T20:05:00+00:00",
         "market": {
           "books": {
@@ -40448,12 +41340,36 @@
                 "LV": null
               },
               "spreads": {
-                "LAC": null,
-                "LV": null
+                "LAC": {
+                  "book": "betmgm",
+                  "line": -6.5,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Los Angeles Chargers"
+                },
+                "LV": {
+                  "book": "betmgm",
+                  "line": 6.5,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Las Vegas Raiders"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 43.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 43.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -40462,12 +41378,36 @@
                 "LV": null
               },
               "spreads": {
-                "LAC": null,
-                "LV": null
+                "LAC": {
+                  "book": "draftkings",
+                  "line": -7.0,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Los Angeles Chargers"
+                },
+                "LV": {
+                  "book": "draftkings",
+                  "line": 7.0,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Las Vegas Raiders"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 43.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 43.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -40476,12 +41416,36 @@
                 "LV": null
               },
               "spreads": {
-                "LAC": null,
-                "LV": null
+                "LAC": {
+                  "book": "fanduel",
+                  "line": -7.0,
+                  "market": "spreads",
+                  "price": -112.0,
+                  "side": "Los Angeles Chargers"
+                },
+                "LV": {
+                  "book": "fanduel",
+                  "line": 7.0,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Las Vegas Raiders"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 43.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 43.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -40499,14 +41463,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.7200999642984648,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -7.0,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 43.5
         },
         "model": {
           "spreads": null,
@@ -40515,8 +41480,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "dome",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T18:50:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -41537,54 +42503,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "LAC": "#006BC1",
           "LV": "#121820"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.036103115205014975,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 7.0,
+            "pick": "LV +7",
+            "price": -108.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.02521588946459413,
+            "ring_offset": 50.0,
+            "side": "LV",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.023809523809523836,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 43.5,
+            "pick": "UNDER 43.5",
+            "price": -105.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Under",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -41592,37 +42558,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "LAC",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.7200999642984648,
+            "probability_percent": 72.0,
+            "push_probability": 0.03246977547495682,
+            "ring_offset": 27.99000357015352,
+            "side": "LAC",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "LAX01",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "LV rush offense vs rush defense: #32 vs LAC #2",
+            "LV pass offense vs pass defense: #29 vs LAC #9",
+            "LV explosive offense vs defense: #32 vs LAC #17",
+            "LAC explosive offense vs defense: #22 vs LV #8",
+            "LAC pass rush vs protection: #14 vs LV #25"
+          ],
+          "fields": [
+            "6.LV.off_rush_epa;6.LAC.def_rush_epa",
+            "6.LV.off_pass_epa;6.LAC.def_pass_epa",
+            "6.LV.off_explosive_rate;6.LAC.def_explosive_rate",
+            "6.LAC.off_explosive_rate;6.LV.def_explosive_rate",
+            "6.LAC.def_pressure_rate;6.LV.off_pressure_rate"
+          ],
+          "statement": "The market-based ATS lean favors LV; LAC explosive offense vs defense: #22 vs LV #8. Against that lean, LV rush offense vs rush defense: #32 vs LAC #2."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 28.0,
+          "away_width": 27.990003570153522,
+          "home_percent": 72.0,
+          "home_width": 72.00999642984648,
+          "tie_percent": 3.2
         }
       },
       "cutoff_at": "2026-09-20T18:50:00+00:00",
@@ -41667,13 +42646,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_MIA_SF",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "SF",
+        "input_hash": "50783e478dd9244b3ae15080277d8a745639e3d447eba5251d6ad776f4cc4f00",
         "kickoff_utc": "2026-09-20T20:25:00+00:00",
         "market": {
           "books": {
@@ -41683,12 +42664,36 @@
                 "SF": null
               },
               "spreads": {
-                "MIA": null,
-                "SF": null
+                "MIA": {
+                  "book": "betmgm",
+                  "line": 12.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Miami Dolphins"
+                },
+                "SF": {
+                  "book": "betmgm",
+                  "line": -12.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "San Francisco 49ers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 46.0,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 46.0,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -41697,12 +42702,36 @@
                 "SF": null
               },
               "spreads": {
-                "MIA": null,
-                "SF": null
+                "MIA": {
+                  "book": "draftkings",
+                  "line": 12.5,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Miami Dolphins"
+                },
+                "SF": {
+                  "book": "draftkings",
+                  "line": -12.5,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "San Francisco 49ers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 45.5,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 45.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -41711,12 +42740,36 @@
                 "SF": null
               },
               "spreads": {
-                "MIA": null,
-                "SF": null
+                "MIA": {
+                  "book": "fanduel",
+                  "line": 13.5,
+                  "market": "spreads",
+                  "price": -118.0,
+                  "side": "Miami Dolphins"
+                },
+                "SF": {
+                  "book": "fanduel",
+                  "line": -13.5,
+                  "market": "spreads",
+                  "price": -104.0,
+                  "side": "San Francisco 49ers"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 45.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 45.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -41734,14 +42787,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.8641801548205489,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -13.0,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 46.0
         },
         "model": {
           "spreads": null,
@@ -41750,8 +42804,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "outdoors",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T19:10:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -42772,54 +43827,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "MIA": "#00567A",
           "SF": "#C70000"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.045454545454545414,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": -12.5,
+            "pick": "SF -12.5",
+            "price": -110.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "SF",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.0535714285714286,
+            "book": "draftkings",
+            "book_label": "DraftKings",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 45.5,
+            "pick": "OVER 45.5",
+            "price": -112.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Over",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -42827,37 +43882,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "SF",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.8641801548205489,
+            "probability_percent": 86.4,
+            "push_probability": 0.018307426597582038,
+            "ring_offset": 13.581984517945116,
+            "side": "SF",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "SFO01",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "MIA pass rush vs protection: #26 vs SF #3",
+            "SF pass offense vs pass defense: #6 vs MIA #27",
+            "SF pass rush vs protection: #31 vs MIA #17",
+            "SF rush offense vs rush defense: #9 vs MIA #23",
+            "MIA explosive offense vs defense: #11 vs SF #3"
+          ],
+          "fields": [
+            "6.MIA.def_pressure_rate;6.SF.off_pressure_rate",
+            "6.SF.off_pass_epa;6.MIA.def_pass_epa",
+            "6.SF.def_pressure_rate;6.MIA.off_pressure_rate",
+            "6.SF.off_rush_epa;6.MIA.def_rush_epa",
+            "6.MIA.off_explosive_rate;6.SF.def_explosive_rate"
+          ],
+          "statement": "The market-based ATS lean favors SF; MIA pass rush vs protection: #26 vs SF #3. Against that lean, SF pass rush vs protection: #31 vs MIA #17."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 13.6,
+          "away_width": 13.581984517945111,
+          "home_percent": 86.4,
+          "home_width": 86.41801548205488,
+          "tie_percent": 1.8
         }
       },
       "cutoff_at": "2026-09-20T19:10:00+00:00",
@@ -42902,13 +43970,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_SEA_ARI",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "ARI",
+        "input_hash": "5bbb07d2ec1cf64516639dfff2ddb4fcad23ba01371719b2d3360f7f837400b0",
         "kickoff_utc": "2026-09-20T20:25:00+00:00",
         "market": {
           "books": {
@@ -42918,12 +43988,36 @@
                 "SEA": null
               },
               "spreads": {
-                "ARI": null,
-                "SEA": null
+                "ARI": {
+                  "book": "betmgm",
+                  "line": 4.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Arizona Cardinals"
+                },
+                "SEA": {
+                  "book": "betmgm",
+                  "line": -4.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Seattle Seahawks"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 41.0,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 41.0,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -42932,12 +44026,36 @@
                 "SEA": null
               },
               "spreads": {
-                "ARI": null,
-                "SEA": null
+                "ARI": {
+                  "book": "draftkings",
+                  "line": 4.5,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Arizona Cardinals"
+                },
+                "SEA": {
+                  "book": "draftkings",
+                  "line": -4.5,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Seattle Seahawks"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 41.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 41.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -42946,12 +44064,36 @@
                 "SEA": null
               },
               "spreads": {
-                "ARI": null,
-                "SEA": null
+                "ARI": {
+                  "book": "fanduel",
+                  "line": 4.5,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Arizona Cardinals"
+                },
+                "SEA": {
+                  "book": "fanduel",
+                  "line": -4.5,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Seattle Seahawks"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 41.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 41.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -42969,14 +44111,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.35285714285714287,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": 4.0,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 41.5
         },
         "model": {
           "spreads": null,
@@ -42985,8 +44128,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T19:10:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -44007,54 +45151,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "ARI": "#B01E3E",
           "SEA": "#001D43"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.023809523809523836,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 4.5,
+            "pick": "ARI +4.5",
+            "price": -105.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "ARI",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.023126901883378594,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 41.0,
+            "pick": "OVER 41",
+            "price": -105.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.028670120898100174,
+            "ring_offset": 50.0,
+            "side": "Over",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -44062,37 +45206,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "SEA",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.6471428571428571,
+            "probability_percent": 64.7,
+            "push_probability": 0.03281519861830743,
+            "ring_offset": 35.28571428571429,
+            "side": "SEA",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "PHO00",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "ARI rush offense vs rush defense: #28 vs SEA #1",
+            "ARI explosive offense vs defense: #26 vs SEA #1",
+            "ARI pass rush vs protection: #28 vs SEA #9",
+            "SEA explosive offense vs defense: #4 vs ARI #23",
+            "SEA pass offense vs pass defense: #7 vs ARI #26"
+          ],
+          "fields": [
+            "6.ARI.off_rush_epa;6.SEA.def_rush_epa",
+            "6.ARI.off_explosive_rate;6.SEA.def_explosive_rate",
+            "6.ARI.def_pressure_rate;6.SEA.off_pressure_rate",
+            "6.SEA.off_explosive_rate;6.ARI.def_explosive_rate",
+            "6.SEA.off_pass_epa;6.ARI.def_pass_epa"
+          ],
+          "statement": "The market-based ATS lean favors ARI; SEA rush offense vs rush defense: #24 vs ARI #22. Against that lean, ARI rush offense vs rush defense: #28 vs SEA #1."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 64.7,
+          "away_width": 64.71428571428571,
+          "home_percent": 35.3,
+          "home_width": 35.285714285714285,
+          "tie_percent": 3.3
         }
       },
       "cutoff_at": "2026-09-20T19:10:00+00:00",
@@ -44137,13 +45294,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_WAS_DAL",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "DAL",
+        "input_hash": "ac9b3bfc4e9b389f57c450d92653e52d42ca436f0a44154db04768fd6082394d",
         "kickoff_utc": "2026-09-20T20:25:00+00:00",
         "market": {
           "books": {
@@ -44153,12 +45312,36 @@
                 "WAS": null
               },
               "spreads": {
-                "DAL": null,
-                "WAS": null
+                "DAL": {
+                  "book": "betmgm",
+                  "line": -3.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Dallas Cowboys"
+                },
+                "WAS": {
+                  "book": "betmgm",
+                  "line": 3.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Washington Commanders"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 50.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 50.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -44167,12 +45350,36 @@
                 "WAS": null
               },
               "spreads": {
-                "DAL": null,
-                "WAS": null
+                "DAL": {
+                  "book": "draftkings",
+                  "line": -3.5,
+                  "market": "spreads",
+                  "price": -108.0,
+                  "side": "Dallas Cowboys"
+                },
+                "WAS": {
+                  "book": "draftkings",
+                  "line": 3.5,
+                  "market": "spreads",
+                  "price": -112.0,
+                  "side": "Washington Commanders"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 50.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 50.5,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -44181,12 +45388,36 @@
                 "WAS": null
               },
               "spreads": {
-                "DAL": null,
-                "WAS": null
+                "DAL": {
+                  "book": "fanduel",
+                  "line": -3.5,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Dallas Cowboys"
+                },
+                "WAS": {
+                  "book": "fanduel",
+                  "line": 3.5,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "Washington Commanders"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 50.5,
+                  "market": "totals",
+                  "price": -115.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 50.5,
+                  "market": "totals",
+                  "price": -105.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -44204,14 +45435,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.626967095851216,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -4,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 51
         },
         "model": {
           "spreads": null,
@@ -44220,8 +45452,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T19:10:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -45242,54 +46475,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "DAL": "#001D43",
           "WAS": "#690C0C"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.023809523809523836,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 3.5,
+            "pick": "WAS +3.5",
+            "price": -105.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "WAS",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.023809523809523836,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 50.5,
+            "pick": "UNDER 50.5",
+            "price": -105.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Under",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -45297,37 +46530,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "DAL",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.626967095851216,
+            "probability_percent": 62.7,
+            "push_probability": 0.03419689119170984,
+            "ring_offset": 37.3032904148784,
+            "side": "DAL",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "DAL00",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "DAL pass offense vs pass defense: #9 vs WAS #30",
+            "WAS rush offense vs rush defense: #10 vs DAL #31",
+            "WAS explosive offense vs defense: #10 vs DAL #30",
+            "WAS pass offense vs pass defense: #15 vs DAL #32",
+            "DAL rush offense vs rush defense: #17 vs WAS #29"
+          ],
+          "fields": [
+            "6.DAL.off_pass_epa;6.WAS.def_pass_epa",
+            "6.WAS.off_rush_epa;6.DAL.def_rush_epa",
+            "6.WAS.off_explosive_rate;6.DAL.def_explosive_rate",
+            "6.WAS.off_pass_epa;6.DAL.def_pass_epa",
+            "6.DAL.off_rush_epa;6.WAS.def_rush_epa"
+          ],
+          "statement": "The market-based ATS lean favors WAS; WAS rush offense vs rush defense: #10 vs DAL #31. Against that lean, DAL pass offense vs pass defense: #9 vs WAS #30."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 37.3,
+          "away_width": 37.3032904148784,
+          "home_percent": 62.7,
+          "home_width": 62.6967095851216,
+          "tie_percent": 3.4
         }
       },
       "cutoff_at": "2026-09-20T19:10:00+00:00",
@@ -45372,13 +46618,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_IND_KC",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "KC",
+        "input_hash": "3bd342fa09934ca29f51f19140cc756f2b2143c42f3271833f8038af766e9cf6",
         "kickoff_utc": "2026-09-21T00:20:00+00:00",
         "market": {
           "books": {
@@ -45392,8 +46640,20 @@
                 "KC": null
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 48.0,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 48.0,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -45402,12 +46662,36 @@
                 "KC": null
               },
               "spreads": {
-                "IND": null,
-                "KC": null
+                "IND": {
+                  "book": "draftkings",
+                  "line": 6.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Indianapolis Colts"
+                },
+                "KC": {
+                  "book": "draftkings",
+                  "line": -6.5,
+                  "market": "spreads",
+                  "price": -110.0,
+                  "side": "Kansas City Chiefs"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 48.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 48.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -45416,12 +46700,36 @@
                 "KC": null
               },
               "spreads": {
-                "IND": null,
-                "KC": null
+                "IND": {
+                  "book": "fanduel",
+                  "line": 6.5,
+                  "market": "spreads",
+                  "price": -118.0,
+                  "side": "Indianapolis Colts"
+                },
+                "KC": {
+                  "book": "fanduel",
+                  "line": -6.5,
+                  "market": "spreads",
+                  "price": -104.0,
+                  "side": "Kansas City Chiefs"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 47.5,
+                  "market": "totals",
+                  "price": -118.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 47.5,
+                  "market": "totals",
+                  "price": -104.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -45439,14 +46747,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.7200999642984648,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -6.5,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 49
         },
         "model": {
           "spreads": null,
@@ -45455,8 +46764,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "outdoors",
         "rules": [],
+        "scheduled_cutoff": "2026-09-20T23:05:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -46477,54 +47787,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "IND": "#00306B",
           "KC": "#270308"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.019230769230769162,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": -6.5,
+            "pick": "KC -6.5",
+            "price": -104.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "KC",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.045454545454545414,
+            "book": "draftkings",
+            "book_label": "DraftKings",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 48.5,
+            "pick": "UNDER 48.5",
+            "price": -110.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Under",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -46532,37 +47842,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "KC",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.7200999642984648,
+            "probability_percent": 72.0,
+            "push_probability": 0.03246977547495682,
+            "ring_offset": 27.99000357015352,
+            "side": "KC",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "KAN00",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "KC rush offense vs rush defense: #6 vs IND #25",
+            "IND pass offense vs pass defense: #22 vs KC #12",
+            "KC pass offense vs pass defense: #16 vs IND #24",
+            "IND explosive offense vs defense: #13 vs KC #7",
+            "IND rush offense vs rush defense: #3 vs KC #8"
+          ],
+          "fields": [
+            "6.KC.off_rush_epa;6.IND.def_rush_epa",
+            "6.IND.off_pass_epa;6.KC.def_pass_epa",
+            "6.KC.off_pass_epa;6.IND.def_pass_epa",
+            "6.IND.off_explosive_rate;6.KC.def_explosive_rate",
+            "6.IND.off_rush_epa;6.KC.def_rush_epa"
+          ],
+          "statement": "The market-based ATS lean favors KC; KC rush offense vs rush defense: #6 vs IND #25. Against that lean, IND rush offense vs rush defense: #3 vs KC #8."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 28.0,
+          "away_width": 27.990003570153522,
+          "home_percent": 72.0,
+          "home_width": 72.00999642984648,
+          "tie_percent": 3.2
         }
       },
       "cutoff_at": "2026-09-20T23:05:00+00:00",
@@ -46607,13 +47930,15 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_NYG_LA",
+        "generated_at": "2026-09-14T16:00:26.487193+00:00",
         "grades": {
-          "SPREAD": "NOT_RECORDED",
-          "TOTAL": "NOT_RECORDED",
-          "WINNER": "NOT_RECORDED",
+          "SPREAD": null,
+          "TOTAL": null,
+          "WINNER": null,
           "clv": null
         },
         "home": "LA",
+        "input_hash": "f94ea1fe530bf79f3f87ee782278a89ff1b40e345ba714e25a92e2cb8143443c",
         "kickoff_utc": "2026-09-22T00:15:00+00:00",
         "market": {
           "books": {
@@ -46623,12 +47948,36 @@
                 "NYG": null
               },
               "spreads": {
-                "LA": null,
-                "NYG": null
+                "LA": {
+                  "book": "betmgm",
+                  "line": -7.0,
+                  "market": "spreads",
+                  "price": -112.0,
+                  "side": "Los Angeles Rams"
+                },
+                "NYG": {
+                  "book": "betmgm",
+                  "line": 7.0,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "New York Giants"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "betmgm",
+                  "line": 48.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "betmgm",
+                  "line": 48.5,
+                  "market": "totals",
+                  "price": -110.0,
+                  "side": "Under"
+                }
               }
             },
             "draftkings": {
@@ -46637,12 +47986,36 @@
                 "NYG": null
               },
               "spreads": {
-                "LA": null,
-                "NYG": null
+                "LA": {
+                  "book": "draftkings",
+                  "line": -7.0,
+                  "market": "spreads",
+                  "price": -115.0,
+                  "side": "Los Angeles Rams"
+                },
+                "NYG": {
+                  "book": "draftkings",
+                  "line": 7.0,
+                  "market": "spreads",
+                  "price": -105.0,
+                  "side": "New York Giants"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "draftkings",
+                  "line": 48.5,
+                  "market": "totals",
+                  "price": -108.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "draftkings",
+                  "line": 48.5,
+                  "market": "totals",
+                  "price": -112.0,
+                  "side": "Under"
+                }
               }
             },
             "fanduel": {
@@ -46651,12 +48024,36 @@
                 "NYG": null
               },
               "spreads": {
-                "LA": null,
-                "NYG": null
+                "LA": {
+                  "book": "fanduel",
+                  "line": -7.5,
+                  "market": "spreads",
+                  "price": -102.0,
+                  "side": "Los Angeles Rams"
+                },
+                "NYG": {
+                  "book": "fanduel",
+                  "line": 7.5,
+                  "market": "spreads",
+                  "price": -120.0,
+                  "side": "New York Giants"
+                }
               },
               "totals": {
-                "Over": null,
-                "Under": null
+                "Over": {
+                  "book": "fanduel",
+                  "line": 48.5,
+                  "market": "totals",
+                  "price": -106.0,
+                  "side": "Over"
+                },
+                "Under": {
+                  "book": "fanduel",
+                  "line": 48.5,
+                  "market": "totals",
+                  "price": -114.0,
+                  "side": "Under"
+                }
               }
             },
             "williamhill_us": {
@@ -46674,14 +48071,15 @@
               }
             }
           },
-          "capture_time": null,
-          "home_win_prob": null,
-          "spread": null,
+          "capture_time": "2026-09-14T16:00:13.037681+00:00",
+          "home_win_prob": 0.7464639321074964,
+          "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+          "spread": -8,
           "teaser_near_miss": {
             "spreads": null,
             "totals": null
           },
-          "total": null
+          "total": 49
         },
         "model": {
           "spreads": null,
@@ -46690,8 +48088,9 @@
         "notes": {},
         "ours": null,
         "post_lock": false,
-        "roof": null,
+        "roof": "dome",
         "rules": [],
+        "scheduled_cutoff": "2026-09-21T23:00:00+00:00",
         "schema": "game-card-v3",
         "season": 2026,
         "sheet": {
@@ -47712,54 +49111,54 @@
             }
           }
         },
-        "stale": true,
-        "status": "MISSED",
+        "stale": false,
+        "status": "UPCOMING",
         "team_colors": {
           "LA": "#003594",
           "NYG": "#001D67"
         },
         "tiles": {
           "SPREAD": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.05135085122131757,
+            "book": "betmgm",
+            "book_label": "BetMGM",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "SPREAD",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": -7.0,
+            "pick": "LA -7",
+            "price": -112.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.04145077720207254,
+            "ring_offset": 50.0,
+            "side": "LA",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "TOTAL": {
-            "EV": null,
-            "book": null,
-            "book_label": null,
-            "chip": null,
+            "EV": -0.028301886792452824,
+            "book": "fanduel",
+            "book_label": "FanDuel",
+            "chip": "LEAN",
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "TOTAL",
-            "line": null,
-            "pick": null,
-            "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "line": 48.5,
+            "pick": "OVER 48.5",
+            "price": -106.0,
+            "probability": 0.5,
+            "probability_percent": 50.0,
+            "push_probability": 0.0,
+            "ring_offset": 50.0,
+            "side": "Over",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": "coin flip"
           },
           "WINNER": {
             "EV": null,
@@ -47767,37 +49166,50 @@
             "book_label": null,
             "chip": null,
             "clv": null,
-            "confidence_source": null,
+            "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": "NOT_RECORDED",
+            "grade": null,
             "label": "WINNER",
             "line": null,
-            "pick": null,
+            "pick": "LA",
             "price": null,
-            "probability": null,
-            "probability_percent": null,
-            "push_probability": null,
-            "ring_offset": 100,
-            "side": null,
+            "probability": 0.7464639321074964,
+            "probability_percent": 74.6,
+            "push_probability": 0.0231433506044905,
+            "ring_offset": 25.353606789250364,
+            "side": "LA",
             "stake_dollars": null,
-            "subtitle": "NOT_RECORDED"
+            "subtitle": ""
           }
         },
-        "venue": null,
+        "venue": "LAX01",
         "version": "game-card-v3-7ed2a1b2",
         "wagers": [],
         "weather": null,
         "week": 2,
         "why": {
-          "bullets": [],
-          "fields": [],
-          "statement": ""
+          "bullets": [
+            "LA explosive offense vs defense: #7 vs NYG #31",
+            "LA pass rush vs protection: #9 vs NYG #26",
+            "LA rush offense vs rush defense: #15 vs NYG #32",
+            "NYG pass rush vs protection: #15 vs LA #2",
+            "NYG rush offense vs rush defense: #7 vs LA #20"
+          ],
+          "fields": [
+            "6.LA.off_explosive_rate;6.NYG.def_explosive_rate",
+            "6.LA.def_pressure_rate;6.NYG.off_pressure_rate",
+            "6.LA.off_rush_epa;6.NYG.def_rush_epa",
+            "6.NYG.def_pressure_rate;6.LA.off_pressure_rate",
+            "6.NYG.off_rush_epa;6.LA.def_rush_epa"
+          ],
+          "statement": "The market-based ATS lean favors LA; LA explosive offense vs defense: #7 vs NYG #31. Against that lean, NYG rush offense vs rush defense: #7 vs LA #20."
         },
         "winner_bar": {
-          "away_percent": null,
-          "away_width": 50,
-          "home_percent": null,
-          "home_width": 50
+          "away_percent": 25.4,
+          "away_width": 25.35360678925036,
+          "home_percent": 74.6,
+          "home_width": 74.64639321074964,
+          "tie_percent": 2.3
         }
       },
       "cutoff_at": "2026-09-21T23:00:00+00:00",
@@ -100153,7 +101565,7 @@
       "week": 18
     }
   ],
-  "published_at": "2026-09-14T10:00:34.505268+00:00",
+  "published_at": "2026-09-14T16:00:29.811889+00:00",
   "schema": "locked-board-v1",
   "shared_confidence": {
     "graded": 0,

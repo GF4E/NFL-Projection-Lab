@@ -1,0 +1,1285 @@
+{
+  "analysis": [],
+  "away": "JAX",
+  "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
+  "final": null,
+  "freeze_timestamp": null,
+  "game_id": "2026_02_JAX_DEN",
+  "generated_at": "2026-09-14T16:00:26.487193+00:00",
+  "grades": {
+    "SPREAD": null,
+    "TOTAL": null,
+    "WINNER": null,
+    "clv": null
+  },
+  "home": "DEN",
+  "input_hash": "557630e997964b160595d9bdd67722d4c0914b53c534f30542d2d759be9d3ff2",
+  "kickoff_utc": "2026-09-20T20:05:00+00:00",
+  "market": {
+    "books": {
+      "betmgm": {
+        "h2h": {
+          "DEN": null,
+          "JAX": null
+        },
+        "spreads": {
+          "DEN": {
+            "book": "betmgm",
+            "line": -3.0,
+            "market": "spreads",
+            "price": 100.0,
+            "side": "Denver Broncos"
+          },
+          "JAX": {
+            "book": "betmgm",
+            "line": 3.0,
+            "market": "spreads",
+            "price": -120.0,
+            "side": "Jacksonville Jaguars"
+          }
+        },
+        "totals": {
+          "Over": {
+            "book": "betmgm",
+            "line": 44.5,
+            "market": "totals",
+            "price": -110.0,
+            "side": "Over"
+          },
+          "Under": {
+            "book": "betmgm",
+            "line": 44.5,
+            "market": "totals",
+            "price": -108.0,
+            "side": "Under"
+          }
+        }
+      },
+      "draftkings": {
+        "h2h": {
+          "DEN": null,
+          "JAX": null
+        },
+        "spreads": {
+          "DEN": {
+            "book": "draftkings",
+            "line": -2.5,
+            "market": "spreads",
+            "price": -118.0,
+            "side": "Denver Broncos"
+          },
+          "JAX": {
+            "book": "draftkings",
+            "line": 2.5,
+            "market": "spreads",
+            "price": -102.0,
+            "side": "Jacksonville Jaguars"
+          }
+        },
+        "totals": {
+          "Over": {
+            "book": "draftkings",
+            "line": 44.5,
+            "market": "totals",
+            "price": -115.0,
+            "side": "Over"
+          },
+          "Under": {
+            "book": "draftkings",
+            "line": 44.5,
+            "market": "totals",
+            "price": -105.0,
+            "side": "Under"
+          }
+        }
+      },
+      "fanduel": {
+        "h2h": {
+          "DEN": null,
+          "JAX": null
+        },
+        "spreads": {
+          "DEN": {
+            "book": "fanduel",
+            "line": -2.5,
+            "market": "spreads",
+            "price": -115.0,
+            "side": "Denver Broncos"
+          },
+          "JAX": {
+            "book": "fanduel",
+            "line": 2.5,
+            "market": "spreads",
+            "price": -105.0,
+            "side": "Jacksonville Jaguars"
+          }
+        },
+        "totals": {
+          "Over": {
+            "book": "fanduel",
+            "line": 44.5,
+            "market": "totals",
+            "price": -110.0,
+            "side": "Over"
+          },
+          "Under": {
+            "book": "fanduel",
+            "line": 44.5,
+            "market": "totals",
+            "price": -110.0,
+            "side": "Under"
+          }
+        }
+      },
+      "williamhill_us": {
+        "h2h": {
+          "DEN": null,
+          "JAX": null
+        },
+        "spreads": {
+          "DEN": null,
+          "JAX": null
+        },
+        "totals": {
+          "Over": null,
+          "Under": null
+        }
+      }
+    },
+    "capture_time": "2026-09-14T16:00:13.037681+00:00",
+    "home_win_prob": 0.5943161634103019,
+    "home_win_prob_basis": "pinned empirical distribution at captured consensus",
+    "spread": -3,
+    "teaser_near_miss": {
+      "spreads": null,
+      "totals": null
+    },
+    "total": 45
+  },
+  "model": {
+    "spreads": null,
+    "totals": null
+  },
+  "notes": {},
+  "ours": null,
+  "post_lock": false,
+  "roof": "outdoors",
+  "rules": [],
+  "scheduled_cutoff": "2026-09-20T18:50:00+00:00",
+  "schema": "game-card-v3",
+  "season": 2026,
+  "sheet": {
+    "10": {
+      "data_window": "2025 REG through 2026 Week 1",
+      "measured": true,
+      "name": "Scoring composition and luck",
+      "source_hashes": {
+        "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
+        "depth_charts_2026.parquet": "d7d32089ebead509e9148c1d011468766866082d0ad487bd83803e0ee55bde2e",
+        "ngs_passing.parquet": "f40039cb762c1ae03decc4a3a4dea48fcc554fa3e036664a5197f1b4208180af",
+        "ngs_receiving.parquet": "06cee40f51c141c7d10c1f719d0a2cb0535b17469c805e8068b64310869a26e1",
+        "ngs_rushing.parquet": "0a6a3c47b67c6878806130b3644f1a5d7a20b2e43aba5d18c2c973920a3b5814",
+        "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
+        "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "play_by_play_2026.parquet": "5ad564445cc4315a593e7d5f3a4bad1d6816fae560b7e705211d0b79db782503",
+        "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "roster_2026.parquet": "218b3d5f26353e0a44d10572161bf95d848a3f0d3f71106efc7ccfd99ab937d5",
+        "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
+      },
+      "teams": {
+        "DEN": {
+          "close_games": {
+            "n": 11,
+            "wins": 9
+          },
+          "def_st_td_points": {
+            "measured": true,
+            "n_games": 17,
+            "value": 0.7058823529411764
+          },
+          "fg_share": {
+            "measured": true,
+            "n_games": 17,
+            "value": 0.2490370396717146
+          },
+          "fumble_recovery": {
+            "measured": true,
+            "n_fumbles": 22,
+            "value": 0.3181818181818182
+          },
+          "luck_index": {
+            "measured": false,
+            "reason": "No year-to-year stability study registered as positive",
+            "status": "MEASURE",
+            "value": null
+          },
+          "rb_target_share": {
+            "measured": true,
+            "n_games": 17,
+            "value": 0.2029212718626285
+          },
+          "redzone_td_rate": {
+            "measured": true,
+            "n_games": 17,
+            "value": 0.6033613445378151
+          },
+          "te_target_share": {
+            "measured": true,
+            "n_games": 17,
+            "value": 0.1914786866584714
+          },
+          "turnover_margin": {
+            "measured": true,
+            "n_games": 17,
+            "value": 0.05882352941176469
+          }
+        },
+        "JAX": {
+          "close_games": {
+            "n": 8,
+            "wins": 6
+          },
+          "def_st_td_points": {
+            "measured": true,
+            "n_games": 18,
+            "value": 1.1294117647058823
+          },
+          "fg_share": {
+            "measured": true,
+            "n_games": 18,
+            "value": 0.18334704998892737
+          },
+          "fumble_recovery": {
+            "measured": true,
+            "n_fumbles": 30,
+            "value": 0.5666666666666667
+          },
+          "luck_index": {
+            "measured": false,
+            "reason": "No year-to-year stability study registered as positive",
+            "status": "MEASURE",
+            "value": null
+          },
+          "rb_target_share": {
+            "measured": true,
+            "n_games": 18,
+            "value": 0.13448414378678544
+          },
+          "redzone_td_rate": {
+            "measured": true,
+            "n_games": 18,
+            "value": 0.7061064425770307
+          },
+          "te_target_share": {
+            "measured": true,
+            "n_games": 18,
+            "value": 0.20302445501756616
+          },
+          "turnover_margin": {
+            "measured": true,
+            "n_games": 18,
+            "value": 1.011764705882353
+          }
+        }
+      }
+    },
+    "4": {
+      "data_window": "2025 REG through 2026 Week 1",
+      "measured": true,
+      "name": "Efficiency",
+      "source_hashes": {
+        "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
+        "depth_charts_2026.parquet": "d7d32089ebead509e9148c1d011468766866082d0ad487bd83803e0ee55bde2e",
+        "ngs_passing.parquet": "f40039cb762c1ae03decc4a3a4dea48fcc554fa3e036664a5197f1b4208180af",
+        "ngs_receiving.parquet": "06cee40f51c141c7d10c1f719d0a2cb0535b17469c805e8068b64310869a26e1",
+        "ngs_rushing.parquet": "0a6a3c47b67c6878806130b3644f1a5d7a20b2e43aba5d18c2c973920a3b5814",
+        "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
+        "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "play_by_play_2026.parquet": "5ad564445cc4315a593e7d5f3a4bad1d6816fae560b7e705211d0b79db782503",
+        "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "roster_2026.parquet": "218b3d5f26353e0a44d10572161bf95d848a3f0d3f71106efc7ccfd99ab937d5",
+        "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
+      },
+      "teams": {
+        "DEN": {
+          "def_epa": {
+            "adjusted": -0.04091037712447392,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 6,
+            "raw": -0.0994781138664833,
+            "status": "MEASURED"
+          },
+          "def_epa_pressured": {
+            "adjusted": -0.524327456904843,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 7,
+            "raw": -0.5813863736030135,
+            "status": "MEASURED"
+          },
+          "def_pass_epa": {
+            "adjusted": -0.018825370739161656,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 4,
+            "raw": -0.10526920731685986,
+            "status": "MEASURED"
+          },
+          "def_pass_success": {
+            "adjusted": 0.4139079759052114,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 1,
+            "raw": 0.3611474624195221,
+            "status": "MEASURED"
+          },
+          "def_points_per_drive": {
+            "adjusted": 1.9051442059655226,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 5,
+            "raw": 1.6620211012616075,
+            "status": "MEASURED"
+          },
+          "def_rush_epa": {
+            "adjusted": -0.022075765323953354,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 15,
+            "raw": -0.03553165401393469,
+            "status": "MEASURED"
+          },
+          "def_rush_success": {
+            "adjusted": 0.4092828477891361,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 3,
+            "raw": 0.3890886675197134,
+            "status": "MEASURED"
+          },
+          "def_success": {
+            "adjusted": 0.40508714976067317,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 1,
+            "raw": 0.36419748889699477,
+            "status": "MEASURED"
+          },
+          "def_yards_per_play": {
+            "adjusted": 5.0193827869924466,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 2,
+            "raw": 4.439830711053855,
+            "status": "MEASURED"
+          },
+          "off_epa": {
+            "adjusted": 0.019673951433124646,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 12,
+            "raw": 0.04288509213760393,
+            "status": "MEASURED"
+          },
+          "off_epa_pressured": {
+            "adjusted": -0.4337207142841863,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 9,
+            "raw": -0.38806751053157607,
+            "status": "MEASURED"
+          },
+          "off_pass_epa": {
+            "adjusted": 0.07450960546361798,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 13,
+            "raw": 0.11112904678750417,
+            "status": "MEASURED"
+          },
+          "off_pass_success": {
+            "adjusted": 0.45268821675701104,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 22,
+            "raw": 0.4482618856826722,
+            "status": "MEASURED"
+          },
+          "off_points_per_drive": {
+            "adjusted": 2.080084601668981,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 18,
+            "raw": 2.088691047514577,
+            "status": "MEASURED"
+          },
+          "off_rush_epa": {
+            "adjusted": -0.01041148987228534,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 12,
+            "raw": -0.005089585990281319,
+            "status": "MEASURED"
+          },
+          "off_rush_success": {
+            "adjusted": 0.43089820937667617,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 15,
+            "raw": 0.43651862335220537,
+            "status": "MEASURED"
+          },
+          "off_success": {
+            "adjusted": 0.43749665653909253,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 17,
+            "raw": 0.43677620909250886,
+            "status": "MEASURED"
+          },
+          "off_yards_per_play": {
+            "adjusted": 5.416885803381113,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 16,
+            "raw": 5.418174091641365,
+            "status": "MEASURED"
+          }
+        },
+        "JAX": {
+          "def_epa": {
+            "adjusted": -0.04977619534781752,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 3,
+            "raw": -0.12688258196689453,
+            "status": "MEASURED"
+          },
+          "def_epa_pressured": {
+            "adjusted": -0.5494997949072505,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1030,
+            "rank": 4,
+            "raw": -0.647717134226342,
+            "status": "MEASURED"
+          },
+          "def_pass_epa": {
+            "adjusted": -0.025382549777807822,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 3,
+            "raw": -0.13900376405455844,
+            "status": "MEASURED"
+          },
+          "def_pass_success": {
+            "adjusted": 0.4547108815193357,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 12,
+            "raw": 0.43700645888830597,
+            "status": "MEASURED"
+          },
+          "def_points_per_drive": {
+            "adjusted": 1.9017946667774972,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 3,
+            "raw": 1.6109090909090908,
+            "status": "MEASURED"
+          },
+          "def_rush_epa": {
+            "adjusted": -0.015524914231677272,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 17,
+            "raw": -0.020117994042682708,
+            "status": "MEASURED"
+          },
+          "def_rush_success": {
+            "adjusted": 0.4180540509901874,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 10,
+            "raw": 0.40539297461428064,
+            "status": "MEASURED"
+          },
+          "def_success": {
+            "adjusted": 0.433613761929503,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 11,
+            "raw": 0.41814080590143765,
+            "status": "MEASURED"
+          },
+          "def_yards_per_play": {
+            "adjusted": 5.359352381964397,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 12,
+            "raw": 5.109614327220164,
+            "status": "MEASURED"
+          },
+          "off_epa": {
+            "adjusted": 0.048146779194892346,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 6,
+            "raw": 0.09414895688387843,
+            "status": "MEASURED"
+          },
+          "off_epa_pressured": {
+            "adjusted": -0.42383011316948677,
+            "measured": true,
+            "n_games": 16,
+            "n_plays": 1014,
+            "rank": 7,
+            "raw": -0.37667093541821894,
+            "status": "MEASURED"
+          },
+          "off_pass_epa": {
+            "adjusted": 0.1405763167190197,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 4,
+            "raw": 0.2381207523616521,
+            "status": "MEASURED"
+          },
+          "off_pass_success": {
+            "adjusted": 0.4930255887807127,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 3,
+            "raw": 0.5265043842246664,
+            "status": "MEASURED"
+          },
+          "off_points_per_drive": {
+            "adjusted": 2.3781273850795173,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 2,
+            "raw": 2.640042832984009,
+            "status": "MEASURED"
+          },
+          "off_rush_epa": {
+            "adjusted": -0.014709940906793863,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 14,
+            "raw": -0.02374114448570385,
+            "status": "MEASURED"
+          },
+          "off_rush_success": {
+            "adjusted": 0.43285696006100893,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 12,
+            "raw": 0.4336703860776212,
+            "status": "MEASURED"
+          },
+          "off_success": {
+            "adjusted": 0.458835498957105,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 3,
+            "raw": 0.47600017785889237,
+            "status": "MEASURED"
+          },
+          "off_yards_per_play": {
+            "adjusted": 5.572194576970235,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 9,
+            "raw": 5.6877588238816035,
+            "status": "MEASURED"
+          }
+        }
+      }
+    },
+    "6": {
+      "data_window": "2025 REG through 2026 Week 1",
+      "measured": true,
+      "name": "Matchups",
+      "source_hashes": {
+        "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
+        "depth_charts_2026.parquet": "d7d32089ebead509e9148c1d011468766866082d0ad487bd83803e0ee55bde2e",
+        "ngs_passing.parquet": "f40039cb762c1ae03decc4a3a4dea48fcc554fa3e036664a5197f1b4208180af",
+        "ngs_receiving.parquet": "06cee40f51c141c7d10c1f719d0a2cb0535b17469c805e8068b64310869a26e1",
+        "ngs_rushing.parquet": "0a6a3c47b67c6878806130b3644f1a5d7a20b2e43aba5d18c2c973920a3b5814",
+        "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
+        "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "play_by_play_2026.parquet": "5ad564445cc4315a593e7d5f3a4bad1d6816fae560b7e705211d0b79db782503",
+        "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "roster_2026.parquet": "218b3d5f26353e0a44d10572161bf95d848a3f0d3f71106efc7ccfd99ab937d5",
+        "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
+      },
+      "teams": {
+        "DEN": {
+          "def_cpoe": {
+            "adjusted": -1.0455984954786481,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 4,
+            "raw": -3.6918822800305917,
+            "status": "MEASURED"
+          },
+          "def_epa": {
+            "adjusted": -0.04091037712447392,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 6,
+            "raw": -0.0994781138664833,
+            "status": "MEASURED"
+          },
+          "def_epa_pressured": {
+            "adjusted": -0.524327456904843,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 7,
+            "raw": -0.5813863736030135,
+            "status": "MEASURED"
+          },
+          "def_explosive_rate": {
+            "adjusted": 0.0824493727508532,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 2,
+            "raw": 0.06423796955546085,
+            "status": "MEASURED"
+          },
+          "def_pass_epa": {
+            "adjusted": -0.018825370739161656,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 4,
+            "raw": -0.10526920731685986,
+            "status": "MEASURED"
+          },
+          "def_pass_success": {
+            "adjusted": 0.4139079759052114,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 1,
+            "raw": 0.3611474624195221,
+            "status": "MEASURED"
+          },
+          "def_points_per_drive": {
+            "adjusted": 1.9051442059655226,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 5,
+            "raw": 1.6620211012616075,
+            "status": "MEASURED"
+          },
+          "def_pressure_rate": {
+            "adjusted": 0.32412014635076514,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 2,
+            "raw": 0.3567307225470276,
+            "status": "MEASURED"
+          },
+          "def_rush_epa": {
+            "adjusted": -0.022075765323953354,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 15,
+            "raw": -0.03553165401393469,
+            "status": "MEASURED"
+          },
+          "def_rush_success": {
+            "adjusted": 0.4092828477891361,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 3,
+            "raw": 0.3890886675197134,
+            "status": "MEASURED"
+          },
+          "def_success": {
+            "adjusted": 0.40508714976067317,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 1,
+            "raw": 0.36419748889699477,
+            "status": "MEASURED"
+          },
+          "def_yards_per_play": {
+            "adjusted": 5.0193827869924466,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1055,
+            "rank": 2,
+            "raw": 4.439830711053855,
+            "status": "MEASURED"
+          },
+          "off_cpoe": {
+            "adjusted": -0.09563728820005202,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 27,
+            "raw": -1.2425014159131513,
+            "status": "MEASURED"
+          },
+          "off_epa": {
+            "adjusted": 0.019673951433124646,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 12,
+            "raw": 0.04288509213760393,
+            "status": "MEASURED"
+          },
+          "off_epa_pressured": {
+            "adjusted": -0.4337207142841863,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 9,
+            "raw": -0.38806751053157607,
+            "status": "MEASURED"
+          },
+          "off_explosive_rate": {
+            "adjusted": 0.09384545289099876,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 21,
+            "raw": 0.09085588948179349,
+            "status": "MEASURED"
+          },
+          "off_pass_epa": {
+            "adjusted": 0.07450960546361798,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 13,
+            "raw": 0.11112904678750417,
+            "status": "MEASURED"
+          },
+          "off_pass_success": {
+            "adjusted": 0.45268821675701104,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 22,
+            "raw": 0.4482618856826722,
+            "status": "MEASURED"
+          },
+          "off_points_per_drive": {
+            "adjusted": 2.080084601668981,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 18,
+            "raw": 2.088691047514577,
+            "status": "MEASURED"
+          },
+          "off_pressure_rate": {
+            "adjusted": 0.28188780552956477,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 5,
+            "raw": 0.2645296904663995,
+            "status": "MEASURED"
+          },
+          "off_rush_epa": {
+            "adjusted": -0.01041148987228534,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 12,
+            "raw": -0.005089585990281319,
+            "status": "MEASURED"
+          },
+          "off_rush_success": {
+            "adjusted": 0.43089820937667617,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 15,
+            "raw": 0.43651862335220537,
+            "status": "MEASURED"
+          },
+          "off_success": {
+            "adjusted": 0.43749665653909253,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 17,
+            "raw": 0.43677620909250886,
+            "status": "MEASURED"
+          },
+          "off_yards_per_play": {
+            "adjusted": 5.416885803381113,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1079,
+            "rank": 16,
+            "raw": 5.418174091641365,
+            "status": "MEASURED"
+          }
+        },
+        "JAX": {
+          "def_cpoe": {
+            "adjusted": 1.2269428835588474,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 17,
+            "raw": 0.5324265206477542,
+            "status": "MEASURED"
+          },
+          "def_epa": {
+            "adjusted": -0.04977619534781752,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 3,
+            "raw": -0.12688258196689453,
+            "status": "MEASURED"
+          },
+          "def_epa_pressured": {
+            "adjusted": -0.5494997949072505,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1030,
+            "rank": 4,
+            "raw": -0.647717134226342,
+            "status": "MEASURED"
+          },
+          "def_explosive_rate": {
+            "adjusted": 0.08967317329556551,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 5,
+            "raw": 0.0782842175235191,
+            "status": "MEASURED"
+          },
+          "def_pass_epa": {
+            "adjusted": -0.025382549777807822,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 3,
+            "raw": -0.13900376405455844,
+            "status": "MEASURED"
+          },
+          "def_pass_success": {
+            "adjusted": 0.4547108815193357,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 12,
+            "raw": 0.43700645888830597,
+            "status": "MEASURED"
+          },
+          "def_points_per_drive": {
+            "adjusted": 1.9017946667774972,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 3,
+            "raw": 1.6109090909090908,
+            "status": "MEASURED"
+          },
+          "def_pressure_rate": {
+            "adjusted": 0.28272667573273325,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1030,
+            "rank": 27,
+            "raw": 0.26374196529535254,
+            "status": "MEASURED"
+          },
+          "def_rush_epa": {
+            "adjusted": -0.015524914231677272,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 17,
+            "raw": -0.020117994042682708,
+            "status": "MEASURED"
+          },
+          "def_rush_success": {
+            "adjusted": 0.4180540509901874,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 10,
+            "raw": 0.40539297461428064,
+            "status": "MEASURED"
+          },
+          "def_success": {
+            "adjusted": 0.433613761929503,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 11,
+            "raw": 0.41814080590143765,
+            "status": "MEASURED"
+          },
+          "def_yards_per_play": {
+            "adjusted": 5.359352381964397,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1079,
+            "rank": 12,
+            "raw": 5.109614327220164,
+            "status": "MEASURED"
+          },
+          "off_cpoe": {
+            "adjusted": 2.222746737717478,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 8,
+            "raw": 3.5630189888852573,
+            "status": "MEASURED"
+          },
+          "off_epa": {
+            "adjusted": 0.048146779194892346,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 6,
+            "raw": 0.09414895688387843,
+            "status": "MEASURED"
+          },
+          "off_epa_pressured": {
+            "adjusted": -0.42383011316948677,
+            "measured": true,
+            "n_games": 16,
+            "n_plays": 1014,
+            "rank": 7,
+            "raw": -0.37667093541821894,
+            "status": "MEASURED"
+          },
+          "off_explosive_rate": {
+            "adjusted": 0.1053070873355916,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 6,
+            "raw": 0.11285389840368236,
+            "status": "MEASURED"
+          },
+          "off_pass_epa": {
+            "adjusted": 0.1405763167190197,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 4,
+            "raw": 0.2381207523616521,
+            "status": "MEASURED"
+          },
+          "off_pass_success": {
+            "adjusted": 0.4930255887807127,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 3,
+            "raw": 0.5265043842246664,
+            "status": "MEASURED"
+          },
+          "off_points_per_drive": {
+            "adjusted": 2.3781273850795173,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 2,
+            "raw": 2.640042832984009,
+            "status": "MEASURED"
+          },
+          "off_pressure_rate": {
+            "adjusted": 0.28820164210037197,
+            "measured": true,
+            "n_games": 17,
+            "n_plays": 1074,
+            "rank": 8,
+            "raw": 0.2721023027919673,
+            "status": "MEASURED"
+          },
+          "off_rush_epa": {
+            "adjusted": -0.014709940906793863,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 14,
+            "raw": -0.02374114448570385,
+            "status": "MEASURED"
+          },
+          "off_rush_success": {
+            "adjusted": 0.43285696006100893,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 12,
+            "raw": 0.4336703860776212,
+            "status": "MEASURED"
+          },
+          "off_success": {
+            "adjusted": 0.458835498957105,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 3,
+            "raw": 0.47600017785889237,
+            "status": "MEASURED"
+          },
+          "off_yards_per_play": {
+            "adjusted": 5.572194576970235,
+            "measured": true,
+            "n_games": 18,
+            "n_plays": 1127,
+            "rank": 9,
+            "raw": 5.6877588238816035,
+            "status": "MEASURED"
+          }
+        }
+      }
+    },
+    "7": {
+      "data_window": "2025 REG through 2026 Week 1",
+      "measured": true,
+      "name": "Quarterback",
+      "source_hashes": {
+        "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
+        "depth_charts_2026.parquet": "d7d32089ebead509e9148c1d011468766866082d0ad487bd83803e0ee55bde2e",
+        "ngs_passing.parquet": "f40039cb762c1ae03decc4a3a4dea48fcc554fa3e036664a5197f1b4208180af",
+        "ngs_receiving.parquet": "06cee40f51c141c7d10c1f719d0a2cb0535b17469c805e8068b64310869a26e1",
+        "ngs_rushing.parquet": "0a6a3c47b67c6878806130b3644f1a5d7a20b2e43aba5d18c2c973920a3b5814",
+        "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
+        "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "play_by_play_2026.parquet": "5ad564445cc4315a593e7d5f3a4bad1d6816fae560b7e705211d0b79db782503",
+        "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "roster_2026.parquet": "218b3d5f26353e0a44d10572161bf95d848a3f0d3f71106efc7ccfd99ab937d5",
+        "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
+      },
+      "teams": {
+        "DEN": {
+          "backup_flag": null,
+          "career_starts": 34,
+          "career_starts_status": "nflverse listed REG starters, 1999 onward, through prior week",
+          "cpoe": -1.1956391265011979,
+          "depth_at": "2026-09-13T12:42:08Z",
+          "epa_per_dropback": 0.09079074235446707,
+          "gsis_id": "00-0039732",
+          "identity_status": "DEPTH_CHART_NOT_INACTIVES",
+          "measured": false,
+          "n_dropbacks": 638,
+          "name": "Bo Nix",
+          "ngs_cpoe": -2.2882066869300894,
+          "ngs_n_games": 18,
+          "status": "inactives unknown until T-90"
+        },
+        "JAX": {
+          "backup_flag": null,
+          "career_starts": 77,
+          "career_starts_status": "nflverse listed REG starters, 1999 onward, through prior week",
+          "cpoe": -1.6503801685492996,
+          "depth_at": "2026-09-13T12:42:08Z",
+          "epa_per_dropback": 0.06196666432460188,
+          "gsis_id": "00-0036971",
+          "identity_status": "DEPTH_CHART_NOT_INACTIVES",
+          "measured": false,
+          "n_dropbacks": 624,
+          "name": "Trevor Lawrence",
+          "ngs_cpoe": -2.5604576271186383,
+          "ngs_n_games": 18,
+          "status": "inactives unknown until T-90"
+        }
+      }
+    },
+    "9": {
+      "data_window": "2025 REG through 2026 Week 1",
+      "measured": true,
+      "name": "Momentum",
+      "source_hashes": {
+        "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
+        "depth_charts_2026.parquet": "d7d32089ebead509e9148c1d011468766866082d0ad487bd83803e0ee55bde2e",
+        "ngs_passing.parquet": "f40039cb762c1ae03decc4a3a4dea48fcc554fa3e036664a5197f1b4208180af",
+        "ngs_receiving.parquet": "06cee40f51c141c7d10c1f719d0a2cb0535b17469c805e8068b64310869a26e1",
+        "ngs_rushing.parquet": "0a6a3c47b67c6878806130b3644f1a5d7a20b2e43aba5d18c2c973920a3b5814",
+        "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
+        "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "play_by_play_2026.parquet": "5ad564445cc4315a593e7d5f3a4bad1d6816fae560b7e705211d0b79db782503",
+        "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "roster_2026.parquet": "218b3d5f26353e0a44d10572161bf95d848a3f0d3f71106efc7ccfd99ab937d5",
+        "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
+      },
+      "teams": {
+        "DEN": {
+          "base_rates": null,
+          "components": {
+            "points_against": -0.07633871993869035,
+            "points_for": -0.042551753168346286,
+            "yards_per_play": -0.005426375522659101
+          },
+          "eliminated_status": "NOT_APPLICABLE",
+          "measured": true,
+          "n_games": 4,
+          "status": "UNMEASURED predictive value",
+          "value": -0.041438949543231914
+        },
+        "JAX": {
+          "base_rates": null,
+          "components": {
+            "points_against": 0.4499646433094851,
+            "points_for": 0.43270968490524736,
+            "yards_per_play": 0.11459166708408614
+          },
+          "eliminated_status": "NOT_APPLICABLE",
+          "measured": true,
+          "n_games": 4,
+          "status": "UNMEASURED predictive value",
+          "value": 0.3324219984329395
+        }
+      }
+    }
+  },
+  "stale": false,
+  "status": "UPCOMING",
+  "tiles": {
+    "SPREAD": {
+      "EV": -0.0652173913043479,
+      "book": "fanduel",
+      "book_label": "FanDuel",
+      "chip": "LEAN",
+      "clv": null,
+      "confidence_source": "MARKET",
+      "confidence_used": null,
+      "grade": null,
+      "label": "SPREAD",
+      "line": -2.5,
+      "pick": "DEN -2.5",
+      "price": -115.0,
+      "probability": 0.5,
+      "probability_percent": 50.0,
+      "push_probability": 0.0,
+      "ring_offset": 50.0,
+      "side": "DEN",
+      "stake_dollars": null,
+      "subtitle": "coin flip"
+    },
+    "TOTAL": {
+      "EV": -0.023809523809523836,
+      "book": "draftkings",
+      "book_label": "DraftKings",
+      "chip": "LEAN",
+      "clv": null,
+      "confidence_source": "MARKET",
+      "confidence_used": null,
+      "grade": null,
+      "label": "TOTAL",
+      "line": 44.5,
+      "pick": "UNDER 44.5",
+      "price": -105.0,
+      "probability": 0.5,
+      "probability_percent": 50.0,
+      "push_probability": 0.0,
+      "ring_offset": 50.0,
+      "side": "Under",
+      "stake_dollars": null,
+      "subtitle": "coin flip"
+    },
+    "WINNER": {
+      "EV": null,
+      "book": null,
+      "book_label": null,
+      "chip": null,
+      "clv": null,
+      "confidence_source": "MARKET",
+      "confidence_used": null,
+      "grade": null,
+      "label": "WINNER",
+      "line": null,
+      "pick": "DEN",
+      "price": null,
+      "probability": 0.5943161634103019,
+      "probability_percent": 59.4,
+      "push_probability": 0.027633851468048358,
+      "ring_offset": 40.56838365896981,
+      "side": "DEN",
+      "stake_dollars": null,
+      "subtitle": ""
+    }
+  },
+  "venue": "DEN00",
+  "version": "game-card-v3-7ed2a1b2",
+  "wagers": [],
+  "weather": null,
+  "week": 2,
+  "why": {
+    "bullets": [
+      "JAX pass rush vs protection: #27 vs DEN #5",
+      "DEN explosive offense vs defense: #21 vs JAX #5",
+      "DEN pass offense vs pass defense: #13 vs JAX #3",
+      "DEN pass rush vs protection: #2 vs JAX #8",
+      "DEN rush offense vs rush defense: #12 vs JAX #17"
+    ],
+    "fields": [
+      "6.JAX.def_pressure_rate;6.DEN.off_pressure_rate",
+      "6.DEN.off_explosive_rate;6.JAX.def_explosive_rate",
+      "6.DEN.off_pass_epa;6.JAX.def_pass_epa",
+      "6.DEN.def_pressure_rate;6.JAX.off_pressure_rate",
+      "6.DEN.off_rush_epa;6.JAX.def_rush_epa"
+    ],
+    "statement": "The market-based ATS lean favors DEN; JAX pass rush vs protection: #27 vs DEN #5. Against that lean, DEN explosive offense vs defense: #21 vs JAX #5."
+  },
+  "winner_bar": {
+    "away_percent": 40.6,
+    "away_width": 40.56838365896981,
+    "home_percent": 59.4,
+    "home_width": 59.43161634103019,
+    "tie_percent": 2.8
+  }
+}

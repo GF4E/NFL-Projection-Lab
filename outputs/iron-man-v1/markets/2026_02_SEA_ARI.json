@@ -1,0 +1,254 @@
+{
+  "capture_label": "EARLY",
+  "capture_source_hash": "35970d2cee1436893c4840955b6bd3cdb1d2fb35976062ccc14d9d9b7d9af043",
+  "captured_at": "2026-09-14T16:00:13.037681+00:00",
+  "consensus": {
+    "spreads": {
+      "full": {
+        "center": -4.0,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": -4,
+        "retail_median": -4
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": -4.0,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -4,
+          "retail_median": -4.0
+        },
+        "draftkings": {
+          "center": -4.0,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -4,
+          "retail_median": -4.0
+        },
+        "fanduel": {
+          "center": -4.0,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -4,
+          "retail_median": -4.0
+        },
+        "williamhill_us": {
+          "center": -4.0,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": -4,
+          "retail_median": -4
+        }
+      }
+    },
+    "totals": {
+      "full": {
+        "center": 41.5,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel",
+          "pinnacle"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": 42,
+        "retail_median": 41
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 41.75,
+          "contributors": [
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 42,
+          "retail_median": 41.5
+        },
+        "draftkings": {
+          "center": 41.5,
+          "contributors": [
+            "betmgm",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 42,
+          "retail_median": 41.0
+        },
+        "fanduel": {
+          "center": 41.75,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "pinnacle"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 42,
+          "retail_median": 41.5
+        },
+        "williamhill_us": {
+          "center": 41.5,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel",
+            "pinnacle"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": 42,
+          "retail_median": 41
+        }
+      }
+    }
+  },
+  "game": {
+    "away_abbr": "SEA",
+    "away_team": "Seattle Seahawks",
+    "capture_at": "2026-09-20T19:05:00+00:00",
+    "cutoff_at": "2026-09-20T19:10:00+00:00",
+    "espn_id": "401872943",
+    "game_id": "2026_02_SEA_ARI",
+    "home_abbr": "ARI",
+    "home_team": "Arizona Cardinals",
+    "kickoff_at": "2026-09-20T20:25:00+00:00",
+    "latitude": "33.5277555",
+    "longitude": "-112.2625948",
+    "neutral": false,
+    "roof": "",
+    "season": 2026,
+    "stadium_id": "PHO00",
+    "venue_source_sha256": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
+    "week": 2
+  },
+  "offers": [
+    {
+      "book": "draftkings",
+      "line": 4.5,
+      "market": "spreads",
+      "price": -115.0,
+      "side": "Arizona Cardinals"
+    },
+    {
+      "book": "draftkings",
+      "line": -4.5,
+      "market": "spreads",
+      "price": -105.0,
+      "side": "Seattle Seahawks"
+    },
+    {
+      "book": "draftkings",
+      "line": 41.5,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Over"
+    },
+    {
+      "book": "draftkings",
+      "line": 41.5,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Under"
+    },
+    {
+      "book": "fanduel",
+      "line": 4.5,
+      "market": "spreads",
+      "price": -105.0,
+      "side": "Arizona Cardinals"
+    },
+    {
+      "book": "fanduel",
+      "line": -4.5,
+      "market": "spreads",
+      "price": -115.0,
+      "side": "Seattle Seahawks"
+    },
+    {
+      "book": "fanduel",
+      "line": 41.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Over"
+    },
+    {
+      "book": "fanduel",
+      "line": 41.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Under"
+    },
+    {
+      "book": "betmgm",
+      "line": 4.5,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Arizona Cardinals"
+    },
+    {
+      "book": "betmgm",
+      "line": -4.5,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Seattle Seahawks"
+    },
+    {
+      "book": "betmgm",
+      "line": 41.0,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Over"
+    },
+    {
+      "book": "betmgm",
+      "line": 41.0,
+      "market": "totals",
+      "price": -112.0,
+      "side": "Under"
+    }
+  ]
+}

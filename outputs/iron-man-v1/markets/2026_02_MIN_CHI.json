@@ -1,0 +1,244 @@
+{
+  "capture_label": "EARLY",
+  "capture_source_hash": "35970d2cee1436893c4840955b6bd3cdb1d2fb35976062ccc14d9d9b7d9af043",
+  "captured_at": "2026-09-14T16:00:13.037681+00:00",
+  "consensus": {
+    "spreads": {
+      "full": {
+        "center": 6,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": null,
+        "retail_median": 6
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 6.0,
+          "contributors": [
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 6.0
+        },
+        "draftkings": {
+          "center": 6.0,
+          "contributors": [
+            "betmgm",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 6.0
+        },
+        "fanduel": {
+          "center": 6.0,
+          "contributors": [
+            "betmgm",
+            "draftkings"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 6.0
+        },
+        "williamhill_us": {
+          "center": 6,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 6
+        }
+      }
+    },
+    "totals": {
+      "full": {
+        "center": 50,
+        "contributors": [
+          "betmgm",
+          "draftkings",
+          "fanduel"
+        ],
+        "coverage": 3,
+        "excluded_book": null,
+        "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+        "pinnacle_center": null,
+        "retail_median": 50
+      },
+      "leave_one_out": {
+        "betmgm": {
+          "center": 50.0,
+          "contributors": [
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "betmgm",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 50.0
+        },
+        "draftkings": {
+          "center": 50.0,
+          "contributors": [
+            "betmgm",
+            "fanduel"
+          ],
+          "coverage": 2,
+          "excluded_book": "draftkings",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 50.0
+        },
+        "fanduel": {
+          "center": 50.0,
+          "contributors": [
+            "betmgm",
+            "draftkings"
+          ],
+          "coverage": 2,
+          "excluded_book": "fanduel",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 50.0
+        },
+        "williamhill_us": {
+          "center": 50,
+          "contributors": [
+            "betmgm",
+            "draftkings",
+            "fanduel"
+          ],
+          "coverage": 3,
+          "excluded_book": "williamhill_us",
+          "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
+          "pinnacle_center": null,
+          "retail_median": 50
+        }
+      }
+    }
+  },
+  "game": {
+    "away_abbr": "MIN",
+    "away_team": "Minnesota Vikings",
+    "capture_at": "2026-09-20T15:40:00+00:00",
+    "cutoff_at": "2026-09-20T15:45:00+00:00",
+    "espn_id": "401872937",
+    "game_id": "2026_02_MIN_CHI",
+    "home_abbr": "CHI",
+    "home_team": "Chicago Bears",
+    "kickoff_at": "2026-09-20T17:00:00+00:00",
+    "latitude": "41.8624598",
+    "longitude": "-87.6167762",
+    "neutral": false,
+    "roof": "outdoors",
+    "season": 2026,
+    "stadium_id": "CHI98",
+    "venue_source_sha256": "77574cdc5a5725836780054c3ef959d992887e996e674066ad30b950abee3f9c",
+    "week": 2
+  },
+  "offers": [
+    {
+      "book": "draftkings",
+      "line": -5.5,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Chicago Bears"
+    },
+    {
+      "book": "draftkings",
+      "line": 5.5,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Minnesota Vikings"
+    },
+    {
+      "book": "draftkings",
+      "line": 49.5,
+      "market": "totals",
+      "price": -108.0,
+      "side": "Over"
+    },
+    {
+      "book": "draftkings",
+      "line": 49.5,
+      "market": "totals",
+      "price": -112.0,
+      "side": "Under"
+    },
+    {
+      "book": "fanduel",
+      "line": -5.5,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Chicago Bears"
+    },
+    {
+      "book": "fanduel",
+      "line": 5.5,
+      "market": "spreads",
+      "price": -112.0,
+      "side": "Minnesota Vikings"
+    },
+    {
+      "book": "fanduel",
+      "line": 49.5,
+      "market": "totals",
+      "price": -106.0,
+      "side": "Over"
+    },
+    {
+      "book": "fanduel",
+      "line": 49.5,
+      "market": "totals",
+      "price": -114.0,
+      "side": "Under"
+    },
+    {
+      "book": "betmgm",
+      "line": -5.5,
+      "market": "spreads",
+      "price": -110.0,
+      "side": "Chicago Bears"
+    },
+    {
+      "book": "betmgm",
+      "line": 5.5,
+      "market": "spreads",
+      "price": -108.0,
+      "side": "Minnesota Vikings"
+    },
+    {
+      "book": "betmgm",
+      "line": 49.0,
+      "market": "totals",
+      "price": -112.0,
+      "side": "Over"
+    },
+    {
+      "book": "betmgm",
+      "line": 49.0,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Under"
+    }
+  ]
+}
