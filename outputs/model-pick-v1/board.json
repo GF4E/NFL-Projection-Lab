@@ -326,7 +326,7 @@
     ]
   },
   "clv_reference": "nflverse_close; reference CLV, not executed-book closing quotes",
-  "content_sha256": "b1213a7f5d912ec60959fbe27631c9de4d9f8f5363091956d20acef6280fe66b",
+  "content_sha256": "b80fabbfd0e6d0968ce54b9ef2f1cdcd5454068153c698d2d0f8f1c3763b9bc2",
   "default_week": 1,
   "game_card_version": "game-card-v3",
   "games": [
@@ -26384,21 +26384,15 @@
       "away_team": "Denver Broncos",
       "best_captured": {
         "spreads": {
-          "advantage_cents": null,
           "book": "betmgm",
-          "fair_probability": 0.5225225225225226,
           "line": -2.0,
-          "market": "spreads",
-          "price": -105.0,
+          "price": -105,
           "side": "Kansas City Chiefs"
         },
         "totals": {
-          "advantage_cents": null,
           "book": "betmgm",
-          "fair_probability": 0.5113279888462878,
           "line": 43.0,
-          "market": "totals",
-          "price": -110.0,
+          "price": -110,
           "side": "Under"
         }
       },
@@ -26419,7 +26413,7 @@
         "away": "DEN",
         "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
         "final": null,
-        "freeze_timestamp": null,
+        "freeze_timestamp": "2026-09-14T23:00:27.773974+00:00",
         "game_id": "2026_01_DEN_KC",
         "generated_at": "2026-09-14T22:55:20.591664+00:00",
         "grades": {
@@ -27631,7 +27625,7 @@
           }
         },
         "stale": false,
-        "status": "UPCOMING",
+        "status": "LOCKED",
         "team_colors": {
           "DEN": "#001E42",
           "KC": "#270308"
@@ -27785,12 +27779,12 @@
       "cutoff_at": "2026-09-14T23:00:00+00:00",
       "executed_picks": [],
       "expires_at": "2026-09-15T00:15:00+00:00",
-      "freeze_time": null,
+      "freeze_time": "2026-09-14T23:00:20.140614+00:00",
       "game_id": "2026_01_DEN_KC",
       "home_abbr": "KC",
       "home_team": "Kansas City Chiefs",
       "kickoff_at": "2026-09-15T00:15:00+00:00",
-      "lock_status": "LIVE",
+      "lock_status": "LOCKED",
       "note_deadline": "2026-09-14T23:00:00+00:00",
       "our_note": null,
       "prediction": {
@@ -27800,7 +27794,7 @@
           "Fair chance excludes pushes; win chance includes their possibility. EV includes pushes at zero profit. Negative EV is not a betting recommendation.",
           "Prices more than one hour old are marked STALE and cannot display an actionable PLAY. Inactives remain unknown unless verified."
         ],
-        "frozen": false,
+        "frozen": true,
         "projection": {
           "away_score": 20.213989637305698,
           "away_win_probability": 0.3944732297063903,
@@ -28005,9 +27999,9 @@
         }
       ],
       "record_class": "paper_model_pick",
-      "recorded_at": null,
+      "recorded_at": "2026-09-14T23:00:20.140614+00:00",
       "season": 2026,
-      "status": "UPCOMING",
+      "status": "LOCKED",
       "verdicts": {
         "spreads": {
           "EV": 0.019327247306521966,
@@ -28019,7 +28013,7 @@
             "quote_updated_at": "2026-09-14T22:54:54Z",
             "win": 0.5008635578583766
           },
-          "availability": "LIVE",
+          "availability": "LOCKED",
           "best_book": "betmgm",
           "book": "betmgm",
           "edge_source": "price",
@@ -28064,7 +28058,7 @@
             "quote_updated_at": "2026-09-14T22:54:54Z",
             "win": 0.5067357512953368
           },
-          "availability": "LIVE",
+          "availability": "LOCKED",
           "best_book": "betmgm",
           "book": "betmgm",
           "edge_source": "tiebreak",
@@ -101596,7 +101590,7 @@
       "week": 18
     }
   ],
-  "published_at": "2026-09-14T22:55:23.125618+00:00",
+  "published_at": "2026-09-14T23:00:30.705515+00:00",
   "schema": "locked-board-v1",
   "shared_confidence": {
     "graded": 0,
