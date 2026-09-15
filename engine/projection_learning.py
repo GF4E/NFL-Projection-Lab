@@ -25,6 +25,10 @@ def metrics(cards):
   for field in ['mae','sigma']:out[target+'_'+field]=m.get(field)
   for level in ['50','80']:
    if target!='team_points':out[target+'_coverage_'+level]=m.get('coverage',{}).get(level,{}).get('rate')
+ predicted=[c['projection'][side+'_points'] for c in graded for side in ['home','away']]
+ actual=[c['grades']['PROJECTION']['actual'][side+'_points'] for c in graded for side in ['home','away']]
+ out['projected_team_points_sd']=statistics.pstdev(predicted) if predicted else None
+ out['actual_team_points_sd']=statistics.pstdev(actual) if actual else None
  out['home_bias']=statistics.mean(c['grades']['PROJECTION']['errors']['home_points'] for c in graded) if graded else None
  out['total_bias']=statistics.mean(c['grades']['PROJECTION']['errors']['total'] for c in graded) if graded else None
  favorites=defaultdict(list)
@@ -82,8 +86,8 @@ def edit_learning(edits,cards):
  return {'rows':rows,'weekly':weekly,'tags':evidence,'excluded':dict(excluded)}
 
 def build_report(cards,reference,edits=()):
- columns=['week','scope','games','team_points_mae','margin_mae','total_mae','team_points_sigma','margin_sigma','total_sigma','margin_coverage_50','margin_coverage_80','total_coverage_50','total_coverage_80','home_bias','total_bias']+[k for k in metrics([]) if k.startswith('favorite_bias_')]
- result={'columns':columns,'schema':'projection-trend-v1','season':2026,'reference':reference,'definitions':{'error':'actual minus projected','sigma':'sample standard deviation','coverage':'original issued margin/total intervals','reference':'2016–2025 adaptive OOF; coverage excludes 2016 (no prior residuals)','flags':'abs(mean error) > 2 sample standard errors; exploratory, not multiplicity-adjusted'},'populations':{}}
+ columns=['week','scope','games','team_points_mae','margin_mae','total_mae','team_points_sigma','margin_sigma','total_sigma','margin_coverage_50','margin_coverage_80','total_coverage_50','total_coverage_80','home_bias','total_bias','projected_team_points_sd','actual_team_points_sd']+[k for k in metrics([]) if k.startswith('favorite_bias_')]
+ result={'columns':columns,'schema':'projection-trend-v1','season':2026,'reference':reference,'definitions':{'error':'actual minus projected','sigma':'sample standard deviation','coverage':'original issued margin/total intervals','reference':'2016–2025 adaptive OOF; coverage excludes 2016 (no prior residuals)','compression':'population standard deviation of projected and actual team points on identical graded games; reporting only','flags':'abs(mean error) > 2 sample standard errors; exploratory, not multiplicity-adjusted'},'populations':{}}
  for evidence in ['AS_ISSUED','RETROSPECTIVE']:
   allcards=[c for c in cards if c.get('evidence')==evidence];graded=[c for c in allcards if c.get('grades')];weeks=sorted({c['week'] for c in allcards});tables=[]
   for week in weeks:

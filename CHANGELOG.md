@@ -82,3 +82,16 @@ User authorized the forecast-system architecture and Addendum 1, including 2013�
 | total | 11.6488 | 10.8417 |
 
 Gate FAIL: all ten years fail projected team SD >=4.0; annual coverage failures and negative 2024 total skill also recorded. No gain was forced by constraining b upward. Full annual gates, parameters, per-week verification, compute and BAL–IND WHY: work/projection-v2/phase-a/report.md. 279 tests pass; these do not override failed statistical gates.
+
+## 2026-09-15 — Governance and weekly experiment queue adopted
+
+Governance Prompt 3 supersedes architecture phase ordering/gates. The earlier Phase A result remains immutable exploratory evidence; it does not reject queued E2. E1 Week2 is the next experiment. Linear decay is the unchanged control outside the three-challenger cap; challengers are k4, k8, and state-space. No E1 comparisons have been viewed.
+
+| Behavior | Before | After |
+|---|---|---|
+| Automated method promotion | Weekly group-toggle path could promote or replay promotions | Disabled; weight-only refit continues with lineage |
+| Weekly compression audit | Not a canonical metric | Projected and actual team-point population SD on the same graded games |
+| Release governance | Legacy automatic gate | Hashed registration/evidence, paired comparison, >=1% MAE, coverage, two reviews, unresolved leak/double-count blockers |
+| Architecture Phase A failure | Closed later phases | Retained exploratory evidence; weekly queue now governs |
+
+No method or input weight changed. E1 remains a draft until state-space fitting conventions and evidence-qualified preseason transitions are registered. Staff history is currently unseeded; unknown transitions must not be treated as unchanged. No reviewer responses invented.

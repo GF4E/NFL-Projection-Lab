@@ -94,8 +94,7 @@ def run_weekly(now=None):
  if week>=18:return {'state':'SEASON_COMPLETE'}
  result=weekly_refit(rows,week,now)
  if result['state']=='REFIT_COMPLETE':
-  from scripts.projection_learning_gate import propose
-  result['improvement']=propose(week,now)
+  result['improvement']={'state':'METHOD_PROMOTION_DISABLED','reason':'Registered experiment release decision required; automatic loop is weight-only.'}
  save(OUT/'weekly-status.json',result);return result
 
 if __name__=='__main__':

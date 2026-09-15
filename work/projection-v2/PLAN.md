@@ -1,3 +1,5 @@
+> Governance update, 2026-09-15: `work/projection-governance-v2/GOVERNANCE.md` and its weekly queue now govern. Architecture phase ordering and gates below are historical/superseded. The Phase A artifacts remain unchanged exploratory evidence and do not consume E2.
+
 # Forecast-system v2 requirement map
 
 Registered 2026-09-15 before comparative results. User Forecast-System Architecture and Addendum 1 govern; addendum wins conflicts. Prior qualification protocol preserved byte-for-byte in PLAN-qualification-2026-09-13.md and git history. Original forecasts/grades/artifacts remain unchanged. Namespace forecast_system and version forecast-system-v2 avoid earlier version collisions.

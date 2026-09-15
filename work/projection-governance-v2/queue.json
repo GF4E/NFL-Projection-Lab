@@ -1,0 +1,73 @@
+{
+  "automatic_method_promotion": false,
+  "experiments": [
+    {
+      "id": "E1",
+      "name": "early-season updating",
+      "state": "PREREGISTRATION_PENDING",
+      "week": 2
+    },
+    {
+      "id": "E2",
+      "name": "post-processing",
+      "state": "QUEUED",
+      "week": 3
+    },
+    {
+      "id": "E3",
+      "name": "wind decomposition",
+      "state": "QUEUED",
+      "week": 4
+    },
+    {
+      "id": "E4",
+      "name": "ensemble and predictability floor",
+      "state": "QUEUED",
+      "week": 5
+    },
+    {
+      "id": "E5",
+      "name": "Elo and QB double-count resolution",
+      "state": "QUEUED",
+      "week": 6
+    },
+    {
+      "id": "E6",
+      "name": "gusts and interactions",
+      "state": "QUEUED",
+      "week": 7
+    },
+    {
+      "id": "E7",
+      "name": "precipitation and snow",
+      "state": "QUEUED",
+      "week": 8
+    },
+    {
+      "id": "E8",
+      "name": "forecast blending and scheduled EMOS refit",
+      "state": "QUEUED",
+      "week": 9
+    }
+  ],
+  "governance_sha256": "77b4d4f2663084b6c034c3a740645ec74de0729d975a9dfcb41fea3ede562e67",
+  "later_order": [
+    "altitude",
+    "surface and wet-grass interaction",
+    "per-stadium shielding",
+    "dome/warm-built offense in cold",
+    "lead-time reporting"
+  ],
+  "one_experiment_per_week": true,
+  "prerequisites": {
+    "E1_candidate_count": "Resolved: unchanged linear control is outside cap; three challengers k4,k8,state-space.",
+    "staff_history": "UNSEEDED; state-space preseason variance flags require sourced coach/QB1 transitions"
+  },
+  "prior_phase_a": {
+    "counts_as_E2": false,
+    "path": "work/projection-v2/phase-a/gate.json",
+    "results_already_seen": true,
+    "state": "SUPERSEDED_EXPLORATORY"
+  },
+  "schema": "projection-experiment-queue-v1"
+}
