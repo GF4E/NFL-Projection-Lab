@@ -326,7 +326,7 @@
     ]
   },
   "clv_reference": "nflverse_close; reference CLV, not executed-book closing quotes",
-  "content_sha256": "2700d946763a507120081e9782124f6dc143c0bc17805854840672940ebdb24d",
+  "content_sha256": "9c4d49cd1591aaca168683b9137a57c9853aaaf815ef83376dc52df9b95dd464",
   "default_week": 2,
   "game_card_version": "game-card-v3",
   "games": [
@@ -1574,7 +1574,7 @@
       },
       "final_source": {
         "provider": "nflverse",
-        "sha256": "27ea4a72447e014b68be608fc7a03c5de7ada47eaac10d57da737b5aaa5e63e5"
+        "sha256": "0615e4ba354c9fab13de1db00d3f441e9c277f95a1c92fec8e4d91f11c12f27f"
       },
       "freeze_time": null,
       "game_id": "2026_01_NE_SEA",
@@ -26412,15 +26412,20 @@
         ],
         "away": "DEN",
         "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
-        "final": null,
+        "final": {
+          "away_score": 10.0,
+          "home_score": 31.0,
+          "margin": 21.0,
+          "total": 41.0
+        },
         "freeze_timestamp": "2026-09-14T23:00:27.773974+00:00",
         "game_id": "2026_01_DEN_KC",
         "generated_at": "2026-09-14T22:55:20.591664+00:00",
         "grades": {
-          "SPREAD": null,
-          "TOTAL": null,
-          "WINNER": null,
-          "clv": null
+          "SPREAD": "WIN",
+          "TOTAL": "LOSS",
+          "WINNER": "WIN",
+          "clv": -1.3655462184873883
         },
         "home": "KC",
         "input_hash": "6cae4978455f2627ee643793c3e0c38c3a9f0d996588a48e508bf7571ad3c031",
@@ -27625,7 +27630,7 @@
           }
         },
         "stale": false,
-        "status": "LOCKED",
+        "status": "FINAL",
         "team_colors": {
           "DEN": "#001E42",
           "KC": "#270308"
@@ -27636,10 +27641,10 @@
             "book": "betmgm",
             "book_label": "BetMGM",
             "chip": "LEAN",
-            "clv": null,
+            "clv": 0.0,
             "confidence_source": "MODEL",
             "confidence_used": null,
-            "grade": null,
+            "grade": "WIN",
             "label": "SPREAD",
             "line": -2.0,
             "pick": "KC -2",
@@ -27657,10 +27662,10 @@
             "book": "draftkings",
             "book_label": "DraftKings",
             "chip": "LEAN",
-            "clv": null,
+            "clv": -2.7310924369747767,
             "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": null,
+            "grade": "LOSS",
             "label": "TOTAL",
             "line": 42.5,
             "pick": "OVER 42.5",
@@ -27681,7 +27686,7 @@
             "clv": null,
             "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": null,
+            "grade": "WIN",
             "label": "WINNER",
             "line": null,
             "pick": "KC",
@@ -28118,7 +28123,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_DET_BUF",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -28126,7 +28131,7 @@
           "clv": null
         },
         "home": "BUF",
-        "input_hash": "dd69a52fdd67a793a3885626d95513b87528afcb875df541fec4a9fd4fa215c8",
+        "input_hash": "5c78748c20508a9f4e435b8551dd706a9b9733225f2fa5af5524b66470016944",
         "kickoff_utc": "2026-09-18T00:15:00+00:00",
         "market": {
           "books": {
@@ -28294,7 +28299,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -28408,7 +28413,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -28756,7 +28761,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -29212,7 +29217,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -29264,7 +29269,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -29442,7 +29447,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_CAR_ATL",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -29450,7 +29455,7 @@
           "clv": null
         },
         "home": "ATL",
-        "input_hash": "13958eb3fe2d5eabbcfd29ec4c3b747590793c8a7bdd9d078fe69dea89a6b30b",
+        "input_hash": "42fd2c0ac45d028547f5c8542ff821a0ee04198803725549cd26af781a81ad85",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -29618,7 +29623,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -29732,7 +29737,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -30080,7 +30085,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -30536,7 +30541,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -30588,7 +30593,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -30766,7 +30771,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_CIN_HOU",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -30774,7 +30779,7 @@
           "clv": null
         },
         "home": "HOU",
-        "input_hash": "07131f9ebe2b26f15847caf8ff05dad62fafe783d14af2b27072f31e52de6f0c",
+        "input_hash": "2d33eab285f055e4714db42b5ee856e1d6781f9f0b9fa9f6c2d05a561f15dc6d",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -30942,7 +30947,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -31056,7 +31061,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -31404,7 +31409,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -31860,7 +31865,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -31912,7 +31917,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -32090,7 +32095,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_CLE_TB",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -32098,7 +32103,7 @@
           "clv": null
         },
         "home": "TB",
-        "input_hash": "cac23d6f997c1bda8e0c19c7e198b1036c5aad7305ed0d85e531e6750c00779c",
+        "input_hash": "4970c0164d60fa02fa8cb169c0dbc00378d37bc1faa0152f05ae5ff0e85bb55f",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -32266,7 +32271,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -32380,7 +32385,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -32728,7 +32733,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -33184,7 +33189,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -33236,7 +33241,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -33414,7 +33419,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_GB_NYJ",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -33422,7 +33427,7 @@
           "clv": null
         },
         "home": "NYJ",
-        "input_hash": "4a40b50aeaf65d8bfafb3758ebd9145ae583c568c956a6ccbcc2ddb1b994b4f9",
+        "input_hash": "733ac89d949f3034e4a0d155304c9406e3e7550330e349efb6bdb0ef10d49faf",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -33590,7 +33595,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -33704,7 +33709,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -34052,7 +34057,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -34508,7 +34513,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -34560,7 +34565,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -34738,7 +34743,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_MIN_CHI",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -34746,7 +34751,7 @@
           "clv": null
         },
         "home": "CHI",
-        "input_hash": "0a2d6c1f3c104219bdd4cdd9164510b0d9fc6fc7a0399f4d0dea58efd8e9b1e6",
+        "input_hash": "9c73f61fed1839111d0026ad26a1a982e8a6d6e06f8861c855c9b73e98d3eafd",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -34914,7 +34919,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -35028,7 +35033,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -35376,7 +35381,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -35832,7 +35837,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -35884,7 +35889,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -36062,7 +36067,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_NO_BAL",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -36070,7 +36075,7 @@
           "clv": null
         },
         "home": "BAL",
-        "input_hash": "059cf669dc26bd8bb1eb789c68553fe746c72168b4275c8a3981b2abaf777940",
+        "input_hash": "d4d05783d15738db12472f95e9a3856ca69a11d51874039e05b7aa3c940d8543",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -36238,7 +36243,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -36352,7 +36357,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -36700,7 +36705,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -37156,7 +37161,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -37208,7 +37213,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -37386,7 +37391,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_PHI_TEN",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -37394,7 +37399,7 @@
           "clv": null
         },
         "home": "TEN",
-        "input_hash": "e2c861ecaa3776dda77955bbbf890cd221d8472345a3fb223391ca0cc752e62d",
+        "input_hash": "4f959d98efea18ad0639287e068752732019d41591d59741b54ca6f10e28d27a",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -37562,7 +37567,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -37676,7 +37681,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -38024,7 +38029,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -38480,7 +38485,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -38532,7 +38537,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -38710,7 +38715,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_PIT_NE",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -38718,7 +38723,7 @@
           "clv": null
         },
         "home": "NE",
-        "input_hash": "8a7822b84d4f3969a6a6dedd59ad58bc3e067c9e646d5f53705545515269040a",
+        "input_hash": "9836a138ec6878421150f79c76249c5c13d8b00112be35b9ff980228ec439377",
         "kickoff_utc": "2026-09-20T17:00:00+00:00",
         "market": {
           "books": {
@@ -38886,7 +38891,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -39000,7 +39005,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -39348,7 +39353,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -39804,7 +39809,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -39856,7 +39861,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -40034,7 +40039,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_JAX_DEN",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -40042,7 +40047,7 @@
           "clv": null
         },
         "home": "DEN",
-        "input_hash": "190f789ee699a3e8850a7782c5fb51fad34b4451e2936738fd24d8a5bef8559d",
+        "input_hash": "5ccd92aa19b79604ccff1d9f67123712363b1ca59bb73663717477605f11885e",
         "kickoff_utc": "2026-09-20T20:05:00+00:00",
         "market": {
           "books": {
@@ -40210,7 +40215,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -40324,7 +40329,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -40672,7 +40677,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -41128,7 +41133,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -41180,7 +41185,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -41358,7 +41363,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_LV_LAC",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -41366,7 +41371,7 @@
           "clv": null
         },
         "home": "LAC",
-        "input_hash": "999b6b9d33f43646455f749ffb65e1b4d549d33ecb69045fc95501da27a2b8a3",
+        "input_hash": "bef494661d0c433343c31e27760d2fcb22589d44bd7e86464c994912564d7dac",
         "kickoff_utc": "2026-09-20T20:05:00+00:00",
         "market": {
           "books": {
@@ -41534,7 +41539,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -41648,7 +41653,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -41996,7 +42001,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -42452,7 +42457,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -42504,7 +42509,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -42682,7 +42687,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_MIA_SF",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -42690,7 +42695,7 @@
           "clv": null
         },
         "home": "SF",
-        "input_hash": "8caa37f7af2d52d3d7cc67d30334041e6f2193acb3a09fb7d8a3d5dd351a1820",
+        "input_hash": "29524b467d39623de937f214ddc4c014b8450feb801e97551e6eb684158c872b",
         "kickoff_utc": "2026-09-20T20:25:00+00:00",
         "market": {
           "books": {
@@ -42858,7 +42863,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -42972,7 +42977,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -43320,7 +43325,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -43776,7 +43781,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -43828,7 +43833,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -44006,7 +44011,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_SEA_ARI",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -44014,7 +44019,7 @@
           "clv": null
         },
         "home": "ARI",
-        "input_hash": "c97059391d8a17c8aa108c4a5924fa2b51133fe1de05afb87ebd099850baa062",
+        "input_hash": "baa21d85f19810de98c366b36f893702e5d27e7d8c2feb664070dce40ac9a72e",
         "kickoff_utc": "2026-09-20T20:25:00+00:00",
         "market": {
           "books": {
@@ -44182,7 +44187,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -44296,7 +44301,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -44644,7 +44649,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -45100,7 +45105,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -45152,7 +45157,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -45330,7 +45335,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_WAS_DAL",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -45338,7 +45343,7 @@
           "clv": null
         },
         "home": "DAL",
-        "input_hash": "427202b8c2e3a7a0459573be12595bb6b2afe1bac4ef2799c32c59eecbc2fc28",
+        "input_hash": "14ff3bc0a07f35c6dfe997cf7f4cdf95eda57c9852f2b31d8759d989d4cb8cce",
         "kickoff_utc": "2026-09-20T20:25:00+00:00",
         "market": {
           "books": {
@@ -45506,7 +45511,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -45620,7 +45625,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -45968,7 +45973,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -46424,7 +46429,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -46476,7 +46481,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -46654,7 +46659,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_IND_KC",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -46662,7 +46667,7 @@
           "clv": null
         },
         "home": "KC",
-        "input_hash": "10e1ad260363ab1f9e085d8ebe65fb97ae516c4763d205c8c5ab1f57bcbf3a54",
+        "input_hash": "f86b3caeb5d2efea1771bab18129b203885da33f1ce8b37e9e4e1accde6b6162",
         "kickoff_utc": "2026-09-21T00:20:00+00:00",
         "market": {
           "books": {
@@ -46818,7 +46823,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -46932,7 +46937,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -47280,7 +47285,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -47736,7 +47741,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -47788,7 +47793,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -47966,7 +47971,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_NYG_LA",
-        "generated_at": "2026-09-15T13:05:29.318963+00:00",
+        "generated_at": "2026-09-15T19:03:42.553373+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -47974,7 +47979,7 @@
           "clv": null
         },
         "home": "LA",
-        "input_hash": "24c2ab3936bbcdd3d58415df7b02d2da65f56d51f9c237f871d1c407ab565f14",
+        "input_hash": "46fd47bb969b7843b492fbdebb059dd60ef6d8383a6f648542b5e1cd602b3c97",
         "kickoff_utc": "2026-09-22T00:15:00+00:00",
         "market": {
           "books": {
@@ -48142,7 +48147,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -48256,7 +48261,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -48604,7 +48609,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -49060,7 +49065,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -49112,7 +49117,7 @@
               "ngs_rushing.parquet": "57e03180e1be5247619314fd1505b679c65cad33df63166ae2d98f1af704311b",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "960b9e0064be7f11b0d80dd8e5d6c99a448f2cef84497ec9693ab5427b8b3cae",
+              "play_by_play_2026.parquet": "afbfcb3ac43b8f21e840c7fd339ba5cb40c1f786d2c5939a13aad769f2ee6761",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
               "roster_2026.parquet": "efec019b4c0a871616bdc96609c8ab1a2d4e78a14af4809633c2091163acfe5c",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
@@ -101601,7 +101606,7 @@
       "week": 18
     }
   ],
-  "published_at": "2026-09-15T13:05:34.727098+00:00",
+  "published_at": "2026-09-15T19:03:46.668285+00:00",
   "schema": "locked-board-v1",
   "shared_confidence": {
     "graded": 0,
