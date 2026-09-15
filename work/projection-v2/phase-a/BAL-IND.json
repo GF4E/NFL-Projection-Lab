@@ -1,0 +1,633 @@
+{
+  "state": "COUNTERFACTUAL_DIAGNOSTIC_ONLY",
+  "source_sha256": "8fb2971fd1801597387e9e9da8facec1aeeb122c31d132376ee64fa31e268d44",
+  "emos_sha256": "e213759b1045190aa4636ad7e5b26cb059330122f9dad19682abb3173839c47d",
+  "teams": [
+    {
+      "team": "BAL",
+      "raw_core": 20.112185011533292,
+      "postprocessed": 23.135854213170653,
+      "terms": [
+        {
+          "input": "football_baseline",
+          "label": "football baseline",
+          "before": 20.173996359955947,
+          "after": 18.484379484933047
+        },
+        {
+          "input": "career_fg_long",
+          "label": "Pregame kicker career FG 50+ yards",
+          "before": -0.1429016924504814,
+          "after": -0.13093335921964339
+        },
+        {
+          "input": "career_fg_medium",
+          "label": "Pregame kicker career FG 40-49 yards",
+          "before": 0.17984303338528643,
+          "after": 0.16478078103620597
+        },
+        {
+          "input": "career_fg_short",
+          "label": "Pregame kicker career FG below 40 yards",
+          "before": 0.04202762670193071,
+          "after": 0.03850771988596159
+        },
+        {
+          "input": "close_win_rate",
+          "label": "BAL close win rate",
+          "before": -0.026152055075150133,
+          "after": -0.023961762542966964
+        },
+        {
+          "input": "def_cpoe",
+          "label": "IND defense completion over expectation, rank 14",
+          "before": -0.008952033335533214,
+          "after": -0.008202280717380293
+        },
+        {
+          "input": "def_explosive",
+          "label": "IND defense explosive play rate, rank 18",
+          "before": -0.042225217443004955,
+          "after": -0.03868876196486149
+        },
+        {
+          "input": "def_off_ppd",
+          "label": "IND defense points per drive, rank 17",
+          "before": -0.5551551175952907,
+          "after": -0.5086596469801481
+        },
+        {
+          "input": "def_off_ypp",
+          "label": "IND defense yards per play, rank 19",
+          "before": -0.0018714908936605852,
+          "after": -0.0017147493864767542
+        },
+        {
+          "input": "def_pass_epa",
+          "label": "IND defense pass efficiency, rank 17",
+          "before": -0.029626484823215036,
+          "after": -0.027145201104721132
+        },
+        {
+          "input": "def_rush_epa",
+          "label": "IND defense run efficiency, rank 16",
+          "before": 0.052491912391675666,
+          "after": 0.04809559847366361
+        },
+        {
+          "input": "def_rush_success",
+          "label": "IND defense run success, rank 24",
+          "before": 0.07515909032782317,
+          "after": 0.06886435005606782
+        },
+        {
+          "input": "divisional",
+          "label": "BAL division matchup",
+          "before": 0.19603379268177834,
+          "after": 0.17961552838351927
+        },
+        {
+          "input": "drives",
+          "label": "BAL offensive drives per game",
+          "before": 0.5645179376084023,
+          "after": 0.5172383100810796
+        },
+        {
+          "input": "elo",
+          "label": "BAL pregame Elo",
+          "before": -0.09553147734874752,
+          "after": -0.08753050454473219
+        },
+        {
+          "input": "elo_difference",
+          "label": "BAL Elo advantage over IND",
+          "before": 0.7894136283836856,
+          "after": 0.7232984886715733
+        },
+        {
+          "input": "fg_share",
+          "label": "BAL fg share",
+          "before": -0.03801003595285677,
+          "after": -0.03482661125998574
+        },
+        {
+          "input": "fumble_recovery",
+          "label": "BAL fumble recovery",
+          "before": 0.035989241450633626,
+          "after": 0.032975062772830147
+        },
+        {
+          "input": "home_divisional",
+          "label": "BAL divisional home field",
+          "before": -0.3246497500353249,
+          "after": -0.2974596144595867
+        },
+        {
+          "input": "home_nondivisional",
+          "label": "BAL non-divisional home field",
+          "before": -0.6845636220023906,
+          "after": -0.6272299025387591
+        },
+        {
+          "input": "luck_index",
+          "label": "BAL fumble and close-game luck",
+          "before": 0.0749043267401014,
+          "after": 0.06863092348304932
+        },
+        {
+          "input": "momentum",
+          "label": "BAL last-four-game momentum",
+          "before": 0.2848873427794719,
+          "after": 0.26102739687425314
+        },
+        {
+          "input": "neutral",
+          "label": "Neutral venue",
+          "before": -0.003230722482613165,
+          "after": -0.0029601423195288585
+        },
+        {
+          "input": "off_cpoe",
+          "label": "BAL offense completion over expectation, rank 5",
+          "before": 0.1393713442050252,
+          "after": 0.12769868545849858
+        },
+        {
+          "input": "off_explosive",
+          "label": "BAL offense explosive play rate, rank 2",
+          "before": -0.1537617692631001,
+          "after": -0.1408838805471095
+        },
+        {
+          "input": "off_off_ppd",
+          "label": "BAL offense points per drive, rank 9",
+          "before": -0.8106910685446251,
+          "after": -0.7427938960953318
+        },
+        {
+          "input": "off_off_ypp",
+          "label": "BAL offense yards per play, rank 5",
+          "before": 0.23930344280598081,
+          "after": 0.21926124947939563
+        },
+        {
+          "input": "off_pass_epa",
+          "label": "BAL offense pass efficiency, rank 11",
+          "before": -0.01773120719292425,
+          "after": -0.016246179320749215
+        },
+        {
+          "input": "off_rush_epa",
+          "label": "BAL offense run efficiency, rank 3",
+          "before": 0.00444733017314458,
+          "after": 0.004074856421525443
+        },
+        {
+          "input": "off_rush_success",
+          "label": "BAL offense run success, rank 17",
+          "before": 0.34644921772559245,
+          "after": 0.3174333284509439
+        },
+        {
+          "input": "opponent_drives",
+          "label": "IND offensive drives per game",
+          "before": 0.3681754893148823,
+          "after": 0.3373399766768897
+        },
+        {
+          "input": "plays_per_drive",
+          "label": "BAL plays per drive",
+          "before": 0.006602717587715753,
+          "after": 0.006049725366533485
+        },
+        {
+          "input": "pressure_allowed",
+          "label": "Offense PRESSURE_PROXY allowed",
+          "before": -0.32359748021587664,
+          "after": -0.2964954745680067
+        },
+        {
+          "input": "pressure_generated",
+          "label": "Defense PRESSURE_PROXY generated",
+          "before": 0.22856340100733857,
+          "after": 0.20942070996764073
+        },
+        {
+          "input": "pythagorean",
+          "label": "BAL points-based expected win rate",
+          "before": 0.1712659035234083,
+          "after": 0.15692200479625365
+        },
+        {
+          "input": "qb_backup",
+          "label": "Pregame QB backup flag",
+          "before": 0.10425893797519915,
+          "after": 0.09552702101478353
+        },
+        {
+          "input": "qb_career_starts",
+          "label": "Pregame QB career start proxy",
+          "before": 0.1690233019063258,
+          "after": 0.15486722603135017
+        },
+        {
+          "input": "qb_cpoe",
+          "label": "Pregame QB completion over expectation",
+          "before": 0.00402719229964745,
+          "after": 0.003689906025424018
+        },
+        {
+          "input": "qb_epa",
+          "label": "Pregame QB EPA per dropback",
+          "before": 0.04781919137152903,
+          "after": 0.043814228187751526
+        },
+        {
+          "input": "rb_share",
+          "label": "BAL rb share",
+          "before": -0.0022808171621694477,
+          "after": -0.002089793673452423
+        },
+        {
+          "input": "redzone_td",
+          "label": "BAL redzone td",
+          "before": 0.09932063789662951,
+          "after": 0.09100231450477625
+        },
+        {
+          "input": "rest_days",
+          "label": "BAL rest days since last game",
+          "before": 0.003167218445704685,
+          "after": 0.0029019568863555127
+        },
+        {
+          "input": "return_points",
+          "label": "BAL return points",
+          "before": -0.14472215544850733,
+          "after": -0.1326013544097577
+        },
+        {
+          "input": "schedule_strength",
+          "label": "BAL opponent-adjusted schedule strength",
+          "before": 0.0,
+          "after": 0.0
+        },
+        {
+          "input": "season_fg_long",
+          "label": "BAL long-distance field goals",
+          "before": -0.1063551431853964,
+          "after": -0.09744766439610635
+        },
+        {
+          "input": "season_fg_medium",
+          "label": "BAL medium-distance field goals",
+          "before": -0.027795862048149666,
+          "after": -0.025467897041395553
+        },
+        {
+          "input": "season_fg_short",
+          "label": "BAL short-distance field goals",
+          "before": -0.043058244322424055,
+          "after": -0.03945202099820286
+        },
+        {
+          "input": "te_share",
+          "label": "BAL te share",
+          "before": -0.7259748773656687,
+          "after": -0.6651728735507739
+        },
+        {
+          "input": "travel_miles",
+          "label": "BAL travel from home stadium",
+          "before": -0.006512988658382877,
+          "after": -0.00596751143375724
+        },
+        {
+          "input": "turnover_margin",
+          "label": "BAL turnover margin",
+          "before": 0.026476705733927137,
+          "after": 0.0242592229900591
+        },
+        {
+          "input": "historical_scoring_adjustment",
+          "label": "Historical scoring adjustment for comparable projected scores",
+          "before": 0.0,
+          "after": 4.708109239334658
+        }
+      ]
+    },
+    {
+      "team": "IND",
+      "raw_core": 22.220970782793493,
+      "postprocessed": 25.068024505704894,
+      "terms": [
+        {
+          "input": "football_baseline",
+          "label": "football baseline",
+          "before": 21.577870945931966,
+          "after": 19.770676465135868
+        },
+        {
+          "input": "career_fg_long",
+          "label": "Pregame kicker career FG 50+ yards",
+          "before": -0.050325675080444894,
+          "after": -0.046110788334870756
+        },
+        {
+          "input": "career_fg_medium",
+          "label": "Pregame kicker career FG 40-49 yards",
+          "before": 0.3546119201910003,
+          "after": 0.32491238650672355
+        },
+        {
+          "input": "career_fg_short",
+          "label": "Pregame kicker career FG below 40 yards",
+          "before": 0.04202762670193071,
+          "after": 0.03850771988596159
+        },
+        {
+          "input": "close_win_rate",
+          "label": "IND close win rate",
+          "before": -0.014258507513807136,
+          "after": -0.013064325930836831
+        },
+        {
+          "input": "def_cpoe",
+          "label": "BAL defense completion over expectation, rank 26",
+          "before": 0.018387439510890655,
+          "after": 0.01684745072871108
+        },
+        {
+          "input": "def_explosive",
+          "label": "BAL defense explosive play rate, rank 25",
+          "before": 0.09783769946931949,
+          "after": 0.0896435754550559
+        },
+        {
+          "input": "def_off_ppd",
+          "label": "BAL defense points per drive, rank 22",
+          "before": -0.7838950742418446,
+          "after": -0.7182421256611975
+        },
+        {
+          "input": "def_off_ypp",
+          "label": "BAL defense yards per play, rank 23",
+          "before": 0.0031813456695184484,
+          "after": 0.002914900923886942
+        },
+        {
+          "input": "def_pass_epa",
+          "label": "BAL defense pass efficiency, rank 23",
+          "before": 0.10360803624479631,
+          "after": 0.09493063374587098
+        },
+        {
+          "input": "def_rush_epa",
+          "label": "BAL defense run efficiency, rank 17",
+          "before": 0.05546728561265209,
+          "after": 0.050821777597746476
+        },
+        {
+          "input": "def_rush_success",
+          "label": "BAL defense run success, rank 15",
+          "before": 0.0435954659700814,
+          "after": 0.039944249143070085
+        },
+        {
+          "input": "divisional",
+          "label": "IND division matchup",
+          "before": 0.19603379268177834,
+          "after": 0.17961552838351927
+        },
+        {
+          "input": "drives",
+          "label": "IND offensive drives per game",
+          "before": 0.6013447651451508,
+          "after": 0.5509808092502887
+        },
+        {
+          "input": "elo",
+          "label": "IND pregame Elo",
+          "before": 0.07655941505567705,
+          "after": 0.0701473944866282
+        },
+        {
+          "input": "elo_difference",
+          "label": "IND Elo advantage over BAL",
+          "before": -0.7894136283836856,
+          "after": -0.7232984886715733
+        },
+        {
+          "input": "fg_share",
+          "label": "IND fg share",
+          "before": 0.058811880958421686,
+          "after": 0.05388625567594522
+        },
+        {
+          "input": "fumble_recovery",
+          "label": "IND fumble recovery",
+          "before": 0.22831216507951832,
+          "after": 0.2091905156051942
+        },
+        {
+          "input": "home_divisional",
+          "label": "IND divisional home field",
+          "before": -0.3246497500353249,
+          "after": -0.2974596144595867
+        },
+        {
+          "input": "home_nondivisional",
+          "label": "IND non-divisional home field",
+          "before": 1.522792493662008,
+          "after": 1.395255249749511
+        },
+        {
+          "input": "luck_index",
+          "label": "IND fumble and close-game luck",
+          "before": 0.005256888174220331,
+          "after": 0.004816612147061854
+        },
+        {
+          "input": "momentum",
+          "label": "IND last-four-game momentum",
+          "before": -0.46886194975805967,
+          "after": -0.42959372306501753
+        },
+        {
+          "input": "neutral",
+          "label": "Neutral venue",
+          "before": -0.003230722482613165,
+          "after": -0.0029601423195288585
+        },
+        {
+          "input": "off_cpoe",
+          "label": "IND offense completion over expectation, rank 13",
+          "before": 0.02948422513810887,
+          "after": 0.02701485598330885
+        },
+        {
+          "input": "off_explosive",
+          "label": "IND offense explosive play rate, rank 18",
+          "before": 0.0502726601147684,
+          "after": 0.0460622134899833
+        },
+        {
+          "input": "off_off_ppd",
+          "label": "IND offense points per drive, rank 1",
+          "before": -1.426029787972866,
+          "after": -1.3065966349647258
+        },
+        {
+          "input": "off_off_ypp",
+          "label": "IND offense yards per play, rank 8",
+          "before": 0.17732331092691705,
+          "after": 0.16247209091422019
+        },
+        {
+          "input": "off_pass_epa",
+          "label": "IND offense pass efficiency, rank 10",
+          "before": -0.036490125768061106,
+          "after": -0.0334339969193515
+        },
+        {
+          "input": "off_rush_epa",
+          "label": "IND offense run efficiency, rank 1",
+          "before": 0.0056002817654263425,
+          "after": 0.005131245764481607
+        },
+        {
+          "input": "off_rush_success",
+          "label": "IND offense run success, rank 4",
+          "before": 0.6284646603470494,
+          "after": 0.5758293531658881
+        },
+        {
+          "input": "opponent_drives",
+          "label": "BAL offensive drives per game",
+          "before": 0.3456281320680218,
+          "after": 0.31668101053567466
+        },
+        {
+          "input": "plays_per_drive",
+          "label": "IND plays per drive",
+          "before": -0.023821457277380064,
+          "after": -0.021826357472395946
+        },
+        {
+          "input": "pressure_allowed",
+          "label": "Offense PRESSURE_PROXY allowed",
+          "before": 0.10918596128395963,
+          "after": 0.10004139520942812
+        },
+        {
+          "input": "pressure_generated",
+          "label": "Defense PRESSURE_PROXY generated",
+          "before": 0.14038330648939396,
+          "after": 0.12862589366033217
+        },
+        {
+          "input": "pythagorean",
+          "label": "IND points-based expected win rate",
+          "before": 0.32344957667240765,
+          "after": 0.296359958273869
+        },
+        {
+          "input": "qb_backup",
+          "label": "Pregame QB backup flag",
+          "before": 0.10425893797519915,
+          "after": 0.09552702101478353
+        },
+        {
+          "input": "qb_career_starts",
+          "label": "Pregame QB career start proxy",
+          "before": 0.01987576726476568,
+          "after": 0.01821112773696073
+        },
+        {
+          "input": "qb_cpoe",
+          "label": "Pregame QB completion over expectation",
+          "before": 0.005339072950345434,
+          "after": 0.004891913766169709
+        },
+        {
+          "input": "qb_epa",
+          "label": "Pregame QB EPA per dropback",
+          "before": 0.27900701108160786,
+          "after": 0.2556395559794094
+        },
+        {
+          "input": "rb_share",
+          "label": "IND rb share",
+          "before": -0.11286184039027705,
+          "after": -0.10340941129952601
+        },
+        {
+          "input": "redzone_td",
+          "label": "IND redzone td",
+          "before": -0.3531433772747816,
+          "after": -0.3235668373121585
+        },
+        {
+          "input": "rest_days",
+          "label": "IND rest days since last game",
+          "before": 0.003167218445704685,
+          "after": 0.0029019568863555127
+        },
+        {
+          "input": "return_points",
+          "label": "IND return points",
+          "before": -0.08375771292964887,
+          "after": -0.07674281897139659
+        },
+        {
+          "input": "schedule_strength",
+          "label": "IND opponent-adjusted schedule strength",
+          "before": 0.0,
+          "after": 0.0
+        },
+        {
+          "input": "season_fg_long",
+          "label": "IND long-distance field goals",
+          "before": 0.021007162379193853,
+          "after": 0.019247766004825237
+        },
+        {
+          "input": "season_fg_medium",
+          "label": "IND medium-distance field goals",
+          "before": -0.057244296216899075,
+          "after": -0.05244995962829599
+        },
+        {
+          "input": "season_fg_short",
+          "label": "IND short-distance field goals",
+          "before": -0.043058244322424055,
+          "after": -0.03945202099820286
+        },
+        {
+          "input": "te_share",
+          "label": "IND te share",
+          "before": -0.3743452529349527,
+          "after": -0.34299300892944257
+        },
+        {
+          "input": "travel_miles",
+          "label": "IND travel from home stadium",
+          "before": -0.052996756589393706,
+          "after": -0.04855816085173113
+        },
+        {
+          "input": "turnover_margin",
+          "label": "IND turnover margin",
+          "before": -0.008791508995842271,
+          "after": -0.008055200646655915
+        },
+        {
+          "input": "historical_scoring_adjustment",
+          "label": "Historical scoring adjustment for comparable projected scores",
+          "before": 0.0,
+          "after": 4.708109239334658
+        }
+      ]
+    }
+  ]
+}

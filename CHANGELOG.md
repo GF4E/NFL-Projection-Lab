@@ -70,3 +70,15 @@ Evidence: `work/in-season-learning-v1/proposal-evidence-41e2ab14b6baf2861d7d95c2
 | favorite_bias_[14,inf) | None | None |
 
 Decision receipt: `outputs/in-season-learning-v1/changes/2026-w1.json`
+
+## 2026-09-15 — Forecast-system v2 Phase A: REJECTED, not deployed
+
+User authorized the forecast-system architecture and Addendum 1, including 2013–2015 calibration-only OOF extension. Added isolated empirical-CRPS postprocessing, chronological loader, verification, source extension, deterministic tests and report-only rendering. Existing production artifacts and issued grades remain unchanged. Phases B–E are not started.
+
+| Target | Raw core MAE | Postprocessed MAE |
+|---|---:|---:|
+| team | 7.8709 | 7.5311 |
+| margin | 10.1530 | 10.1677 |
+| total | 11.6488 | 10.8417 |
+
+Gate FAIL: all ten years fail projected team SD >=4.0; annual coverage failures and negative 2024 total skill also recorded. No gain was forced by constraining b upward. Full annual gates, parameters, per-week verification, compute and BAL–IND WHY: work/projection-v2/phase-a/report.md. 279 tests pass; these do not override failed statistical gates.
