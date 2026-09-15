@@ -107,7 +107,7 @@ def run(mode, host):
     OUT.mkdir(parents=True, exist_ok=True)
     with (OUT/'.cloud-dispatch.lock').open('a+') as handle:
         try:
-            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(handle, fcntl.LOCK_EX | (0 if mode == 'learning' else fcntl.LOCK_NB))
         except BlockingIOError:
             return {'state': 'LOCAL_JOB_ACTIVE'}
         record = ownership()
