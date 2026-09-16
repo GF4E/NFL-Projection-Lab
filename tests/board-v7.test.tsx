@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import React from 'react';import {afterEach,describe,it,expect} from 'vitest';import {render,screen,fireEvent,cleanup} from '@testing-library/react';import {BoardView,PointsAxis,ErrorAxis} from '../src/components/board-v7';import {position,sortGames,type BoardEvidence,type GameEvidence} from '../src/domain/board-v7';import type {ProjectionCardData,ProjectionBoardData} from '../src/domain/projection';
+import React from 'react';import {afterEach,describe,it,expect} from 'vitest';import {render,screen,fireEvent,cleanup} from '@testing-library/react';import {BoardView,PointsAxis,ErrorAxis} from '../src/components/board-v7';import {currentBoardWeek,position,sortGames,type BoardEvidence,type GameEvidence} from '../src/domain/board-v7';import type {ProjectionCardData,ProjectionBoardData} from '../src/domain/projection';
 Object.defineProperty(window,'matchMedia',{value:()=>({matches:true})});
 afterEach(cleanup);
 const p={away_points:20.25,home_points:30,margin:9.75,total:50.25,home_win_probability:.7,away_win_probability:.3,intervals:{margin:{'50':[0,15],'80':[-5,25]},total:{'50':[40,60],'80':[30,70]}}};
@@ -21,3 +21,12 @@ it('uses the binding confidence edit label',()=>{const {container}=render(<Board
 it('never renders injected PFF column values or removed controls in either lens or expanded state',()=>{const sentinel='PFF_PRIVATE_COLUMN_CANARY_726184';const g={...game,sheet:{'4':{name:'Efficiency',data_window:'prior games',teams:{BAL:{pff_grade:sentinel,grades_offense:sentinel}}}},contributions:{...game.contributions,away:[{input:'pff_grade',label:sentinel,points:726184,status:'ACTIVE',value:726184,weight:1,source_hashes:[]}]}};const {container}=render(<BoardView board={{...board,games:[g]}} evidence={ev}/>);for(const lens of ['POINTS','ERROR']){fireEvent.click(screen.getByRole('button',{name:lens}));for(let i=0;i<2;i++){fireEvent.click(container.querySelector('.v7-row')!);expect(container.innerHTML).not.toContain(sentinel);expect(container.innerHTML).not.toContain('726184');expect(container.querySelector('[class*="slip"],[class*="winner-bar"],[class*="verdict"],[class*="wager"],[class*="book-selector"]')).toBeNull();expect(container.textContent).not.toMatch(/\b(?:PLAY|PASS|TEASE|odds|EV|Gabe|Jarrett|FanDuel|BetMGM|Caesars|DraftKings)\b|coin flip|break-even|consensus|market line/i)}}});
 import {SeasonView} from '../src/components/season-v7';
 it('keeps PFF column values out of the Season output',()=>{const empty={teams:0,mae:null,inside80:0,eligible80:0,coverage:{margin:{'50':{hit:0,n:0,rate:null},'80':{hit:0,n:0,rate:null}},total:{'50':{hit:0,n:0,rate:null},'80':{hit:0,n:0,rate:null}}},pit:Array(10).fill(0)};const row={game_id:'final',team:'BAL',expected:20,actual:21,error:1,contributions:[{input:'pff_grade',label:'PFF_PRIVATE_COLUMN_CANARY_726184',points:726184,status:'ACTIVE',value:726184,weight:1,source_hashes:[]}]};const data={...ev,weeks:[],trust:empty,closest:[row],furthest:[row],prior_seasons:[],reference:{oof_mae:8,climatology_mae:9,floor:null,floor_status:'uncomputed'},edits:{engine:empty,ours:empty,best_tags:[],worst_tags:[]}} as BoardEvidence;const {container}=render(<SeasonView data={data}/>);expect(container.innerHTML).not.toContain('PFF_PRIVATE_COLUMN_CANARY_726184');expect(container.textContent).not.toContain('726184');expect(container.textContent).not.toMatch(/\b(?:PLAY|PASS|TEASE|odds|EV|Gabe|Jarrett)\b|coin flip|break-even|consensus/i)});
+
+it('opens the current slate despite a stale default and retains history selection',()=>{
+ const games=[game,{...upcoming,game_id:'week2',week:2,kickoff_at:'2026-09-18T00:15:00Z'}];
+ const data={...board,games};
+ expect(currentBoardWeek(data,Date.parse('2026-09-16T12:00:00Z'))).toBe(2);
+ expect(currentBoardWeek(data,Date.parse('2026-09-10T21:00:00Z'))).toBe(1);
+ expect(currentBoardWeek(data,Date.parse('2026-10-01T00:00:00Z'))).toBe(2);
+ expect(currentBoardWeek({...board,games:[]})).toBe(1);
+});

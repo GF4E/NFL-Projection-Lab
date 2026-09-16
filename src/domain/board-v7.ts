@@ -14,3 +14,12 @@ export function emptyLabel(g:ProjectionCardData,e?:GameEvidence){return g.status
 export function sortGames(games:ProjectionCardData[],e:Record<string,GameEvidence>,sort:string){const kickoff=(a:ProjectionCardData,b:ProjectionCardData)=>Date.parse(a.kickoff_at)-Date.parse(b.kickoff_at)||a.game_id.localeCompare(b.game_id);return [...games].sort((a,b)=>{if(sort==='kickoff')return kickoff(a,b);const aa=eligible(a,e[a.game_id]),bb=eligible(b,e[b.game_id]);if(aa!==bb)return aa?-1:1;if(!aa)return kickoff(a,b);const error=(g:ProjectionCardData)=>Math.max(...Object.values(e[g.game_id].teams).map(t=>Math.abs(t!.error??0)));return (sort==='descending'?-1:1)*(error(a)-error(b))||kickoff(a,b);});}
 export function status(e?:GameEvidence){const t=Object.values(e?.teams??{});return !t.length||t.some(x=>x?.actual==null)?'interval unavailable':t.every(x=>x?.hits['50'])?'in 50%':t.every(x=>x?.hits['80'])?'in 80%':'outside 80%';}
 export const text=(s:string)=>s.replace(/(-?\d+)\.\d+/g,x=>integer(Number(x)));
+
+// Open the active/upcoming published slate, not a stale publication default.
+// Keep a slate through its final scheduled game window, then advance.
+export function currentBoardWeek(board: {default_week:number;games:{week:number;kickoff_at:string}[]}, now=Date.now()):number {
+ const ends=new Map<number,number>();
+ for(const game of board.games){const kickoff=Date.parse(game.kickoff_at);if(Number.isFinite(kickoff))ends.set(game.week,Math.max(ends.get(game.week)??-Infinity,kickoff+4*60*60*1000));}
+ const weeks=[...ends].sort((a,b)=>a[0]-b[0]);
+ return weeks.find(([,end])=>end>now)?.[0]??weeks.at(-1)?.[0]??board.default_week;
+}
