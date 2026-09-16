@@ -1,4 +1,4 @@
-CREATE TABLE `engine_shared_entries` (
+CREATE TABLE IF NOT EXISTS `engine_shared_entries` (
 	`game_id` text NOT NULL,
 	`post_lock` integer NOT NULL,
 	`payload` text NOT NULL,

@@ -51,7 +51,9 @@ def main():
   env.update(GIT_AUTHOR_NAME='NFL publish step',GIT_AUTHOR_EMAIL='publish@localhost',GIT_COMMITTER_NAME='NFL publish step',GIT_COMMITTER_EMAIL='publish@localhost')
   commit=git('commit-tree',tree,'-p',parent,'-m',message)
   git('update-ref','refs/heads/'+args.branch,commit)
+  git('symbolic-ref','HEAD','refs/heads/'+args.branch)
   git('push',args.remote,commit+':refs/heads/'+args.branch)
+  if git('rev-parse','--verify','HEAD')!=commit:raise ValueError('Published HEAD mismatch')
   if git('ls-remote',args.remote,'refs/heads/'+args.branch).split()[0]!=commit:raise ValueError('Mirror head mismatch')
   record={'source_commit':source,'deploy_commit':commit,'deploy_parent':parent,'commit_message':message,'repository_of_record':'https://github.com/GF4E/NFL-Projection-Lab.git','mirror_policy':'build-output-only; generated only by publish step','archive_sha256':hashlib.sha256(Path(args.archive).read_bytes()).hexdigest(),'files':files,'checks':'PASS; no source files, raw data, engine artifacts, source maps or PFF column canaries'}
   Path(args.receipt).write_text(json.dumps(record,indent=2)+'\n');print(json.dumps({k:record[k] for k in ('source_commit','deploy_commit','archive_sha256','checks')}))

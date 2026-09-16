@@ -7,3 +7,7 @@ The publish step verifies main is clean and pushed, validates the archive, creat
 Archive tests reject source/data paths, source maps and PFF column canaries. Renderer tests inject private PFF column values and assert they never appear in either lens or expanded DOM; they also reject every removed control category. These are provenance and taint checks, not a claim that a common number such as 1 cannot independently occur in unrelated football data. No PFF files have been ingested for this change.
 
 Sites receives the mirror's deploy commit as its required commit_sha. The corresponding source main SHA and archive/file hashes are preserved in the external deployment receipt. The archive contains exactly the same dist bytes committed by the publish step. Site audience is preserved.
+
+## Deployment retry, 2026-09-16
+
+The first build-only deployment (35977ebf547ae16b351af6a02c337eb1d6014833, source 000c3c756c73e2b219fa485b345ca5ea4a8a21e3) failed because engine_our_notes already existed. Journal migrations 4-9 now use IF NOT EXISTS for their additive table/index/trigger creation, preserving existing records. Earlier applied migrations and unrelated legacy ALTER migrations are unchanged. A SQLite replay test checks pending migrations twice, saved notes and projections, and exactly one history entry per edit. The publish step also verifies HEAD after its push.
