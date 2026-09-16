@@ -1,0 +1,261 @@
+{
+  "status": "PASS",
+  "valid_e1_result": false,
+  "full_schedule_games": 3919,
+  "audited_forecasts": 3919,
+  "scored_period_games": 2639,
+  "unknown_completions": [],
+  "completion_timestamps_used": false,
+  "games_dropped": 0,
+  "by_season": {
+    "2016": {
+      "games": 256,
+      "affected_forecasts": 0
+    },
+    "2017": {
+      "games": 256,
+      "affected_forecasts": 0
+    },
+    "2018": {
+      "games": 256,
+      "affected_forecasts": 0
+    },
+    "2019": {
+      "games": 256,
+      "affected_forecasts": 0
+    },
+    "2020": {
+      "games": 256,
+      "affected_forecasts": 47
+    },
+    "2021": {
+      "games": 272,
+      "affected_forecasts": 18
+    },
+    "2022": {
+      "games": 271,
+      "affected_forecasts": 0
+    },
+    "2023": {
+      "games": 272,
+      "affected_forecasts": 0
+    },
+    "2024": {
+      "games": 272,
+      "affected_forecasts": 0
+    },
+    "2025": {
+      "games": 272,
+      "affected_forecasts": 0
+    }
+  },
+  "rule": "assimilation_available_at = played schedule kickoff UTC + 4 hours; eligible strictly before Tuesday 06:00 America/Los_Angeles cutoff strictly before own T-75 issuance",
+  "availability_convention_sha256": "6431498cb7c45fcc1b20e47124acdd31230bcc114a9b34de3a67e2a96b80a662",
+  "candidates": [
+    "linear",
+    "k4",
+    "k8",
+    "state_space"
+  ],
+  "common_calendar": true,
+  "changed_source_game_ids": [
+    "2020_05_ARI_NYJ",
+    "2020_05_BUF_TEN",
+    "2020_05_CAR_ATL",
+    "2020_05_CIN_BAL",
+    "2020_05_IND_CLE",
+    "2020_05_JAX_HOU",
+    "2020_05_LAC_NO",
+    "2020_05_LA_WAS",
+    "2020_05_LV_KC",
+    "2020_05_MIA_SF",
+    "2020_05_MIN_SEA",
+    "2020_05_NYG_DAL",
+    "2020_05_PHI_PIT",
+    "2020_05_TB_CHI",
+    "2020_12_ARI_NE",
+    "2020_12_BAL_PIT",
+    "2020_12_CAR_MIN",
+    "2020_12_CHI_GB",
+    "2020_12_CLE_JAX",
+    "2020_12_HOU_DET",
+    "2020_12_KC_TB",
+    "2020_12_LAC_BUF",
+    "2020_12_LV_ATL",
+    "2020_12_MIA_NYJ",
+    "2020_12_NO_DEN",
+    "2020_12_NYG_CIN",
+    "2020_12_SEA_PHI",
+    "2020_12_SF_LA",
+    "2020_12_TEN_IND",
+    "2020_12_WAS_DAL",
+    "2020_13_BUF_SF",
+    "2020_13_CIN_MIA",
+    "2020_13_CLE_TEN",
+    "2020_13_DAL_BAL",
+    "2020_13_DEN_KC",
+    "2020_13_DET_CHI",
+    "2020_13_IND_HOU",
+    "2020_13_JAX_MIN",
+    "2020_13_LA_ARI",
+    "2020_13_LV_NYJ",
+    "2020_13_NE_LAC",
+    "2020_13_NO_ATL",
+    "2020_13_NYG_SEA",
+    "2020_13_PHI_GB",
+    "2020_13_WAS_PIT",
+    "2021_15_ARI_DET",
+    "2021_15_ATL_SF",
+    "2021_15_CAR_BUF",
+    "2021_15_CIN_DEN",
+    "2021_15_DAL_NYG",
+    "2021_15_GB_BAL",
+    "2021_15_HOU_JAX",
+    "2021_15_KC_LAC",
+    "2021_15_LV_CLE",
+    "2021_15_MIN_CHI",
+    "2021_15_NE_IND",
+    "2021_15_NO_TB",
+    "2021_15_NYJ_MIA",
+    "2021_15_SEA_LA",
+    "2021_15_TEN_PIT",
+    "2021_15_WAS_PHI"
+  ],
+  "minimum_hours_between_availability_and_assimilation": 6.666666666666667,
+  "affected_definition": "Forecasts with a changed set of available historical game results versus week-label replay; downstream numerical propagation is separate."
+}
+Prepared shrinkage 4 7326
+Prepared shrinkage 8 7326
+E1 likelihood fold 2013 training games 256
+E1 fold cached 2013
+E1 likelihood fold 2014 training games 512
+E1 fold cached 2014
+E1 likelihood fold 2015 training games 768
+E1 fold cached 2015
+E1 likelihood fold 2016 training games 1024
+E1 fold cached 2016
+E1 likelihood fold 2017 training games 1280
+E1 fold cached 2017
+E1 likelihood fold 2018 training games 1536
+E1 fold cached 2018
+E1 likelihood fold 2019 training games 1792
+E1 fold cached 2019
+E1 likelihood fold 2020 training games 2048
+E1 fold cached 2020
+E1 likelihood fold 2021 training games 2304
+E1 fold cached 2021
+E1 likelihood fold 2022 training games 2576
+E1 fold cached 2022
+E1 likelihood fold 2023 training games 2847
+E1 fold cached 2023
+E1 likelihood fold 2024 training games 3119
+E1 fold cached 2024
+E1 likelihood fold 2025 training games 3391
+E1 fold cached 2025
+{
+  "decision": "NO_CHALLENGER_CLEARS_GATE",
+  "gate": {
+    "k4": {
+      "relative_team_mae_improvement": -0.0019046520945469325,
+      "coverage": {
+        "margin": {
+          "50": 0.5028419856006063,
+          "80": 0.7934823796892763
+        },
+        "total": {
+          "50": 0.5058734369079196,
+          "80": 0.7976506252368322
+        }
+      },
+      "coverage_pass": true,
+      "mae_pass": false,
+      "numeric_gate_pass": false,
+      "paired_mae_improvement_interval_95": [
+        -0.023565425973398994,
+        -0.005057616159562732
+      ]
+    },
+    "k8": {
+      "relative_team_mae_improvement": -0.003882940071786356,
+      "coverage": {
+        "margin": {
+          "50": 0.504357711254263,
+          "80": 0.7961348995831754
+        },
+        "total": {
+          "50": 0.5028419856006063,
+          "80": 0.7953770367563471
+        }
+      },
+      "coverage_pass": true,
+      "mae_pass": false,
+      "numeric_gate_pass": false,
+      "paired_mae_improvement_interval_95": [
+        -0.04404536378657424,
+        -0.014188634273448512
+      ]
+    },
+    "state_space": {
+      "relative_team_mae_improvement": -0.00010501216333214103,
+      "coverage": {
+        "margin": {
+          "50": 0.5035998484274347,
+          "80": 0.7957559681697612
+        },
+        "total": {
+          "50": 0.5017051913603637,
+          "80": 0.8006820765441455
+        }
+      },
+      "coverage_pass": true,
+      "mae_pass": false,
+      "numeric_gate_pass": false,
+      "paired_mae_improvement_interval_95": [
+        -0.020156917706889002,
+        0.019695821183147035
+      ]
+    }
+  },
+  "runtime_seconds": 644.5845283750677
+}
+E1 2026 training-only state fit
+Current-season comparison cached 14 games
+Cached posterior states 14
+{
+  "state": "PASS",
+  "preregistration_precedes_comparison": true,
+  "registered_inputs_and_code_hashes_match": true,
+  "active_fit_unchanged": true,
+  "frozen_projections_grades_and_phase_a_unchanged": true,
+  "paired_populations_and_recomputed_metrics": {
+    "k4": {
+      "team_rows": 5278,
+      "games": 2639,
+      "mae": 7.5860467395307625,
+      "own_prior_calibration_coverage_reproduced": true
+    },
+    "k8": {
+      "team_rows": 5278,
+      "games": 2639,
+      "mae": 7.601025595081753,
+      "own_prior_calibration_coverage_reproduced": true
+    },
+    "linear": {
+      "team_rows": 5278,
+      "games": 2639,
+      "mae": 7.571625427301528,
+      "own_prior_calibration_coverage_reproduced": true
+    },
+    "state_space": {
+      "team_rows": 5278,
+      "games": 2639,
+      "mae": 7.572420540067591,
+      "own_prior_calibration_coverage_reproduced": true
+    }
+  },
+  "compressed_artifact_hash_verified": true,
+  "current_as_issued_comparison_verified": true,
+  "test_evidence": "See saved test logs; unit tests do not replace this audit",
+  "gate_runtime_seconds": 644.5845283750677,
+  "current_runtime_seconds": 94.24397700000554
+}

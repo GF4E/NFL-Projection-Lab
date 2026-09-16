@@ -1,3 +1,5 @@
+> Current status: FIRST_VALID_E1_RESULT — all challengers rejected; linear retained. Independent audit PASS. See [corrected E1 report](e1-calendar-corrected/report.md). Earlier blocked/invalidated entries below are historical.
+
 # Governance adoption and E1 preparation
 
 The governing Week 2 experiment protocol applies to every queued experiment. GOVERNANCE.md overrides ARCHITECTURE.md and Addendum 1 where inconsistent. Architecture phase order and gates are superseded; their historical failure record is retained unchanged and does not consume E2. No unseen-holdout claim may be made for previously inspected Phase A history.

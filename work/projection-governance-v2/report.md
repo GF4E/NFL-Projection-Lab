@@ -1,3 +1,5 @@
+> Current status: FIRST_VALID_E1_RESULT — all challengers rejected; linear retained. Independent audit PASS. See [corrected E1 report](e1-calendar-corrected/report.md). Earlier blocked/invalidated entries below are historical.
+
 # Governance implementation report
 
 The experiment queue now supersedes the architecture phase ordering/gates. The earlier Phase A result is retained unchanged exploratory evidence, not an E2 queue decision. No E1 comparative result has been viewed.

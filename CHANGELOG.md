@@ -200,3 +200,19 @@ Authority: user's binding B01 resolution. `assimilation_available_at` is actual-
 Rationale: the fixed rule removes the missing-completion-clock dependency while preserving explicit pregame schedule lineage and identical candidate timing. Two factual corrections are necessary: nflverse's documented `gametime` is Eastern regardless of venue, so localize to America/New_York and convert to UTC (not stadium local); and four hours does not exceed every game duration (2018 TEN–MIA lasted 7h08). Thus this is a user-authorized assimilation-availability convention, not a claimed universal completion bound. Sources: https://github.com/nflverse/nflreadr/blob/main/data-raw/dictionary_schedules.csv and https://www.tennesseetitans.com/news/titans-dolphins-game-notes.
 
 The rule uses actual played dates/times from the pinned schedule, including rescheduling. B01 is resolved. The previous exact-completion policy C25 is superseded, with its resolution retained alongside the other three Tier 2 flags at the report top. Prior failed preflight evidence is preserved in e1-calendar-corrected/blocked-preflight-before-B01-resolution. No comparative decision has yet been made under this rule.
+
+## First valid E1 result — September 16, 2026
+
+The corrected replay and independent audit passed on all 2,639 registered 2016–2025 games. No challenger clears the unchanged 1% team-MAE improvement gate. All challengers pass the four coverage limits. Retain linear; E2 remains Week 3 against linear. No live fit, frozen projection, grade, or Phase A artifact changed. The prior week-label rejection remains withdrawn and preserved as an invalidated run, not an earlier valid E1 result.
+
+| Method | Team MAE | Improvement vs linear | Margin 50 / 80 | Total 50 / 80 | Decision |
+|---|---:|---:|---|---|---|
+| linear | 7.5716 | control | 50.25% / 79.54% | 50.66% / 80.07% | RETAIN |
+| k4 | 7.5860 | -0.1905% | 50.28% / 79.35% | 50.59% / 79.77% | REJECT |
+| k8 | 7.6010 | -0.3883% | 50.44% / 79.61% | 50.28% / 79.54% | REJECT |
+| state-space | 7.5724 | -0.0105% | 50.36% / 79.58% | 50.17% / 80.07% | REJECT |
+
+The identical calendar correction applies to control and all three challengers; none gains an information-timing advantage. Changed available-history sets affect 47 forecasts in 2020 and 18 in 2021, zero in the other eight seasons. No registered game was dropped. The full historical test checks every included result's kickoff-plus-four-hours mark is strictly before the state's cutoff. nflverse times are Eastern, converted to UTC; four hours is the authorized availability convention, not an observed completion timestamp or universal duration bound.
+
+Evidence: work/projection-governance-v2/e1-calendar-corrected/report.md, audit.json (PASS), validity.json (FIRST_VALID_E1_RESULT), verification.json, calendar-audit.json and compressed per-game lineage. 312 tests passed. Historical fit 644.6 seconds; current-season fit 94.2 seconds; peak historical process RSS 908.1 MiB; one worker. Paid provider credits: 0.
+

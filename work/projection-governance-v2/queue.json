@@ -3,7 +3,7 @@
   "experiments": [
     {
       "B01": "RESOLVED_USER_KICKOFF_PLUS_4H",
-      "decision": "PRIOR_NUMERIC_REJECTION_INVALID",
+      "decision": "NO_CHALLENGER_CLEARS_GATE",
       "id": "E1",
       "name": "early-season updating",
       "preregistration_addendum": "work/projection-governance-v2/e1-calendar-corrected/preregistration-addendum.json",
@@ -12,13 +12,14 @@
       "registration_sha256": "a48e85241a47301ff3e462af70db6171c7c0edd750a67ac878ebe2b4411f1e62",
       "report": "work/projection-governance-v2/e1-calendar-corrected/report.md",
       "retained_method": "linear",
-      "state": "READY_FOR_CORRECTED_E1_REPLAY",
+      "state": "CLOSED_REJECTED",
       "tier3_batch": [],
-      "valid_e1_result": false,
+      "valid_e1_result": true,
+      "validity": "work/projection-governance-v2/e1-calendar-corrected/validity.json",
       "week": 2
     },
     {
-      "baseline": "To be determined after valid E1; currently linear remains live",
+      "baseline": "Retained linear control after first valid E1; E2 requires separate Week 3 preregistration",
       "id": "E2",
       "name": "post-processing",
       "state": "QUEUED",
