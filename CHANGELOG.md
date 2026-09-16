@@ -220,3 +220,7 @@ Evidence: work/projection-governance-v2/e1-calendar-corrected/report.md, audit.j
 ## GOVERNANCE — experiment clock (2026-09-16)
 
 Effective 2026-09-16T22:29:05Z: each preregistered experiment has until the following Tuesday 06:00 PT to reach its unchanged gate. Otherwise log INCONCLUSIVE plus its one-line blocker and advance the queue. Return requires blocker-resolution evidence; no experiment may block the queue twice. Returned attempts do not delay the scheduled queue. E1's clock starts now, due September 22 at 06:00 PT; the already audited first valid gate decision satisfies it. Prior decisions and preregistration hashes remain immutable.
+
+## PRIORITY — E1 gate checkpoint (2026-09-16)
+
+Reverified the first valid E1 result receipt, all referenced artifact hashes, and independent PASS audit before any further board work. E1 has reported: NO_CHALLENGER_CLEARS_GATE; retain linear. Blocker: none; Tier 3: no. PFF may be a separate data addition, but E-PFF and PFF fit admission cannot precede E1's report; neither is started here. See work/projection-governance-v2/E1-PRIORITY-CHECKPOINT.md.
