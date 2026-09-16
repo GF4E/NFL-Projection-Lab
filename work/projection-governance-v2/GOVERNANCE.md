@@ -58,3 +58,9 @@ Per experiment: the Week 2 prompt section 9 deliverables in full, plus the stand
 ## 8. Binding decision-latency amendment (2026-09-16)
 
 DECISION-LATENCY.md governs handling of undefined conventions: resolve Tier 1 and Tier 2 locally before implementation, publish a tiered preregistration sweep, flag Tier 2 for nonblocking review, and batch only Tier 3 blockers. Existing registered model choices and gates remain fixed.
+
+## 9. Experiment clock (effective 2026-09-16)
+
+Each registered experiment carries a one-week queue clock starting at the timestamp at which its preregistration hash is recorded. The deadline is the following Tuesday at 06:00 America/Los_Angeles, using the local calendar and daylight-saving rules. If no gate decision exists at that cutoff, record INCONCLUSIVE with a one-line named blocker, advance the queue to the next experiment, and keep the unresolved experiment outside the blocking queue. It returns only after recorded evidence resolves its blocker. No experiment blocks the queue twice: any returned attempt runs without delaying the next scheduled experiment. INCONCLUSIVE is neither a numerical rejection nor a promotion. No clock expiry changes candidates, gates, metrics, populations, chronology, or evidence requirements.
+
+E1's clock starts at amendment adoption: 2026-09-16T22:29:05Z; deadline 2026-09-22T06:00:00-07:00. An existing independently audited gate decision satisfies the clock; adoption does not erase or reopen a completed experiment. Future registrations record started_at, deadline_at, registration_sha256 and queue_block_count beside the immutable preregistration, never by rewriting its hashed contents.

@@ -1,8 +1,23 @@
 {
   "automatic_method_promotion": false,
+  "clock_policy": {
+    "deadline": "following Tuesday 06:00 America/Los_Angeles",
+    "effective_at": "2026-09-16T22:29:05Z",
+    "expired_state": "INCONCLUSIVE",
+    "maximum_queue_blocks": 1,
+    "return_requires": "blocker resolution evidence",
+    "returned_attempt": "nonblocking"
+  },
   "experiments": [
     {
       "B01": "RESOLVED_USER_KICKOFF_PLUS_4H",
+      "clock": {
+        "deadline_at": "2026-09-22T06:00:00-07:00",
+        "queue_block_count": 0,
+        "registration_sha256": "a48e85241a47301ff3e462af70db6171c7c0edd750a67ac878ebe2b4411f1e62",
+        "started_at": "2026-09-16T22:29:05Z",
+        "status": "SATISFIED_EXISTING_VALID_GATE_DECISION"
+      },
       "decision": "NO_CHALLENGER_CLEARS_GATE",
       "id": "E1",
       "name": "early-season updating",

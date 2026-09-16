@@ -216,3 +216,7 @@ The identical calendar correction applies to control and all three challengers; 
 
 Evidence: work/projection-governance-v2/e1-calendar-corrected/report.md, audit.json (PASS), validity.json (FIRST_VALID_E1_RESULT), verification.json, calendar-audit.json and compressed per-game lineage. 312 tests passed. Historical fit 644.6 seconds; current-season fit 94.2 seconds; peak historical process RSS 908.1 MiB; one worker. Paid provider credits: 0.
 
+
+## GOVERNANCE — experiment clock (2026-09-16)
+
+Effective 2026-09-16T22:29:05Z: each preregistered experiment has until the following Tuesday 06:00 PT to reach its unchanged gate. Otherwise log INCONCLUSIVE plus its one-line blocker and advance the queue. Return requires blocker-resolution evidence; no experiment may block the queue twice. Returned attempts do not delay the scheduled queue. E1's clock starts now, due September 22 at 06:00 PT; the already audited first valid gate decision satisfies it. Prior decisions and preregistration hashes remain immutable.
