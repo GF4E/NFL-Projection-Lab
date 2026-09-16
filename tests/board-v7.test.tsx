@@ -17,3 +17,4 @@ describe('BOARD v7 contract',()=>{
  it('contains no forbidden or decimal text',()=>{const {container}=render(<BoardView board={board} evidence={ev}/>);for(const lens of ['POINTS','ERROR']){fireEvent.click(screen.getByRole('button',{name:lens}));expect(container.textContent).not.toMatch(/\d+\.\d+|coin flip|\b(?:odds|EV|PLAY|PASS|TEASE|Gabe|Jarrett|FanDuel|BetMGM|Caesars|DraftKings)\b/i)}});
 });
 it('enforces integer display in expanded view',()=>{const {container}=render(<BoardView board={board} evidence={ev}/>);fireEvent.click(container.querySelector('.v7-row')!);expect(container.textContent).not.toMatch(/\d+\.\d+/);expect(screen.getByText('Football WHY')).toBeTruthy()});
+it('uses the binding confidence edit label',()=>{const {container}=render(<BoardView board={board} evidence={ev}/>);fireEvent.click(container.querySelector('.v7-row')!);expect(screen.getByLabelText('confidence')).toBeTruthy();expect(screen.queryByText('Conviction')).toBeNull()});

@@ -27,5 +27,5 @@ Repository of record: GF4E/NFL-Projection-Lab. Display checkout: ../nfl-board-ma
 - Error-sort scalar: maximum absolute error of the two team projections; ties kickoff then game ID. Unplayed/no-lock remain last.
 - Per-game interval readout is the worse of the two team coverage statuses. Trust/footer count team observations individually.
 - ERROR bands must use each row's issued intervals, translated to residual coordinates, to keep spatial hit status identical to immutable grading; never substitute a later version's widths.
-- Pending user clarification: 24px ERROR rows vs 44px touch targets; confidence edit label vs exactly two confidence locations; exact muted token vs 4.5:1 text contrast.
+- Resolved by binding user amendment: the edit label is confidence; muted text is raised until the contrast script passes; the 24px ERROR drawing lane inside a 44px mobile row target is intended, not an exception. See resolution-2026-09-16.md.
 - Reference floor stays explicitly uncomputed until governed E4; no new model fitted for display work.
