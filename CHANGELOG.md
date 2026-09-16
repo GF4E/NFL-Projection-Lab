@@ -109,3 +109,23 @@ Earlier Phase A post-processing predates the queue and is exploratory evidence o
 | Method activation | Linear | Unchanged pending complete E1 gates and reviews |
 
 Staff data addition does not activate continuity weights and is not credited as a method gain. Source, coverage, unknown rows and content hash are in work/projection-governance-v2/e1/staff-coverage.json. No PFF ingest or other data addition. Full operational definitions, hashes and limitations are frozen in e1/registration.json before comparison.
+
+## 2026-09-16 — E1 rejected; linear decay retained
+
+Hashed preregistration `a48e85241a47301ff3e462af70db6171c7c0edd750a67ac878ebe2b4411f1e62` preceded the first comparative result. All 2,639 eligible 2016–2025 games are paired across the unchanged linear control and three challengers. Candidate-specific calibration uses strictly earlier own OOF residuals. No challenger improves team MAE by the required 1%; all pass the four coverage limits. This closes E1 as rejected, not promoted. No extra E1 settings were tried after seeing the result.
+
+| Candidate | Before: linear team MAE | After: candidate team MAE | Relative improvement | Margin 50 / 80 coverage | Total 50 / 80 coverage | Decision |
+|---|---:|---:|---:|---|---|---|
+| k4 | 7.571551 | 7.585842 | -0.189% | 50.28% / 79.35% | 50.59% / 79.73% | REJECT |
+| k8 | 7.571551 | 7.600756 | -0.386% | 50.44% / 79.61% | 50.25% / 79.54% | REJECT |
+| state_space | 7.571551 | 7.572710 | -0.015% | 50.59% / 79.46% | 50.36% / 80.03% | REJECT |
+
+Evidence: work/projection-governance-v2/e1/report.md and verification.json. Coverage is not the failure: the primary improvement gate fails. The 95% paired improvement interval for state-space includes zero and does not approach the required gain. Coaching history remains unknown after PFR 403; false transition flags follow the binding A.3 fallback. This is evidence about the registered implementations under that limitation, not a universal rejection of state-space methods.
+
+No live method version issued; original forecasts, grades and active fit preserved. E2 remains Week 3 and must be separately preregistered against retained linear. Earlier Phase A remains exploratory, not an E2 result. No PFF ingest or other new data work began.
+
+Current-season comparison: 14 AS_ISSUED games, two retrospective games excluded. Original issued team MAE 8.4277; frozen-input counterfactuals: replay-linear 8.7087, k4 8.6965, k8 8.7366, state-space 8.8531. Original scores remain separate from replay controls. A null-grade filtering bug affected only report assembly; fixed and regression-tested, reusing the identical cached 2026 fit. No optimizer or gate rerun in response to comparative performance.
+
+## 2026-09-16 — E1 week-label replay invalidated by final calendar audit
+
+The numerical rejection above is WITHDRAWN as a valid E1 decision. The final audit found five postponed 2020–2021 games played after the next Tuesday 06:00 PT cutoff, but the replay had assimilated by NFL week label. This is an implementation chronology defect, not evidence to promote or reject a method. The original run and hashes are preserved in work/projection-governance-v2/e1-week-label-run with VALIDITY.json. E1 is blocked on the postponed-game cadence interpretation; no gate or candidate setting is changed, no promotion occurred, and linear remains live. No PFF or other data addition started.

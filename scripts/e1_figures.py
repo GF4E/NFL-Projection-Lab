@@ -16,6 +16,7 @@ def run():
             counts=np.array(report['pooled'][name][target]['pit_histogram'])
             ax.bar(np.arange(10)+(i-1.5)*.19,counts/counts.sum(),width=.18,label=name,color=color)
         ax.axhline(.1,color='black',linewidth=1,linestyle='--',label='Uniform reference')
+        ax.set_ylim(0,.14)
         ax.set(title=target.title()+' PIT',ylabel='Fraction of forecasts',xticks=np.arange(10),xticklabels=[f'{i/10:.1f}–{(i+1)/10:.1f}' for i in range(10)])
         ax.spines[['top','right']].set_visible(False)
     axes[0].legend(ncol=5,frameon=False,fontsize=9)

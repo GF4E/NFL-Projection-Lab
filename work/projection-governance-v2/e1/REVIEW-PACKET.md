@@ -1,8 +1,8 @@
 # E1 review packet
 
-Status: awaiting completed numerical report and two independent reviewer responses. No reviewer answers or approvals have been invented.
+Status: INVALID_CALENDAR_CADENCE. The first numerical rejection is withdrawn; linear remains live. Two independent reviewer responses have not been received. No reviewer answers or approvals have been invented.
 
-Evidence: registration.json, current-season-protocol.json, CONVENTIONS.md, report.md, verification.json, verified-games.json, current-season.json, state-fit-*.json, staff-coverage.json and test logs. Bind responses to the final evidence-receipt hash before release.
+Evidence: registration.json, current-season-protocol.json, CONVENTIONS.md, report.md, verification.json, verified-games.json.gz, current-season.json, state-fit-*.json, staff-coverage.json and test logs. Bind responses to the final evidence-receipt hash before release.
 
 Both reviewers answer:
 1. Is there a leak in feature construction, state/noise fitting, calibration, historical replay, or the current-season counterfactual?
@@ -20,3 +20,5 @@ Specific points to inspect:
 - Historical results were already used for development; no untouched-holdout claim. MAE confidence intervals are descriptive, not multiplicity-adjusted confirmation.
 
 An unresolved reviewer objection naming a leak or double count blocks promotion. Passing the numerical gate alone is not an activation instruction. If no challenger meets the numerical gate, retain linear and log rejection without manufacturing reviewer agreement.
+
+Final audit: five postponed games entered state before the relevant Tuesday cutoff under NFL-week grouping. See validity.json. Do not approve, promote, or close E1 on the archived numerical tables; a cadence clarification and corrected replay are required.

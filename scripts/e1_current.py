@@ -12,6 +12,10 @@ from engine.projection.features import DIV
 from engine.forecast_system.verification import verify
 
 
+def issued_graded_cards(board):
+    return [c for c in board['games'] if c.get('evidence')=='AS_ISSUED' and (c.get('grades') or {}).get('PROJECTION')]
+
+
 def run():
     start=time.monotonic();registration,data=load_inputs();base=data['linear'];games=paired_games(base)
     teams=sorted(DIV);staff=json.loads((ROOT/'config/staff_history.json').read_text())
@@ -28,7 +32,10 @@ def run():
             if row['season']==year and row['game_id'] in by:
                 r=dict(row,features=dict(row['features']));r['features']['baseline']=by[row['game_id']]['points'][0 if row['home'] else 1];state_rows.append(r)
     print('E1 2026 training-only state fit',flush=True)
-    f=state_fit(games,league,changes)
+    cached=OUT/'state-fit-2026.json'
+    f=json.loads(cached.read_text()) if cached.exists() else state_fit(games,league,changes)
+    if cached.exists():
+        assert f['trained_through_season']==2025 and f['league_ppd']==league
     if not f['starts'][f['selected_start']]['success']:raise ValueError('2026 training fit did not converge')
     f.update(season=2026,trained_through_season=2025,league_ppd=league)
     save('state-fit-2026.json',f)
@@ -39,7 +46,7 @@ def run():
         fits[name]=ridge_fit([r for r in populations[name] if r['features']['baseline'] is not None and r['actual_points'] is not None],['calibration','elo'],10)
         save(f'core-{name}-2026.json',fits[name])
     oof=json.loads((OUT/'oof.json').read_text());board=json.loads((OUT/'as-issued-board-snapshot.json').read_text())
-    cards=[c for c in board['games'] if c.get('evidence')=='AS_ISSUED' and c.get('grades',{}).get('PROJECTION')]
+    cards=issued_graded_cards(board)
     if any(c['week']!=1 for c in cards):raise ValueError('This registration covers Week 1 counterfactuals only')
     outputs=[];missing=[]
     for card in sorted(cards,key=lambda c:c['game_id']):

@@ -2,14 +2,20 @@
   "automatic_method_promotion": false,
   "experiments": [
     {
+      "decision": "PRIOR_NUMERIC_REJECTION_INVALID",
       "id": "E1",
       "name": "early-season updating",
+      "promoted": false,
       "registration": "work/projection-governance-v2/e1/registration.json",
       "registration_sha256": "a48e85241a47301ff3e462af70db6171c7c0edd750a67ac878ebe2b4411f1e62",
-      "state": "REGISTERED_RUNNING",
+      "report": "work/projection-governance-v2/e1/report.md",
+      "retained_method": "linear",
+      "state": "BLOCKED_CALENDAR_CADENCE",
+      "valid_e1_result": false,
       "week": 2
     },
     {
+      "baseline": "To be determined after valid E1; currently linear remains live",
       "id": "E2",
       "name": "post-processing",
       "state": "QUEUED",

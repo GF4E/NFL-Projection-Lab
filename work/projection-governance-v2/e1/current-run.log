@@ -1,0 +1,13 @@
+E1 2026 training-only state fit
+Traceback (most recent call last):
+  File "<stdin>", line 6, in <module>
+  File "<frozen runpy>", line 286, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "scripts/e1_current.py", line 76, in <module>
+    if __name__=='__main__':run()
+                            ^^^^^
+  File "scripts/e1_current.py", line 42, in run
+    cards=[c for c in board['games'] if c.get('evidence')=='AS_ISSUED' and c.get('grades',{}).get('PROJECTION')]
+                                                                           ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
