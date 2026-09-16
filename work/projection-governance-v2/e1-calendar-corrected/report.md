@@ -1,4 +1,9 @@
-**REVIEW REQUESTED (nonblocking):** C06 calendar decay clock, C11 reference schedule, C12 preseason covariance, and C25 completion evidence representation. Decisions and untested alternatives are in [the preregistration addendum](PREREGISTRATION-ADDENDUM.md). Work proceeds on all Tier 1/2 items; B01 alone blocks the dependent comparison.
+**REVIEW REQUESTED — nonblocking Tier 2 conventions.** Full sweep and hash: [preregistration addendum](PREREGISTRATION-ADDENDUM.md).
+
+- **C06 Linear decay clock on exceptional schedules:** Retain the corrected implementation: elapsed scheduled assimilation cutoffs from the first forecast cutoff of a season advance the existing linear decay; freeze that weight inside an interval. **Alternative not taken:** Use the forecast game NFL-week label for decay even when two games share one interval. This could change control predictions and conflicts with the frozen-state interpretation.
+- **C11 Reference schedule and steady-state diagnostic:** Retain registered symmetric 32 virtual team-versus-league games and posterior P0; diagonal KH gains and offense/defense half-lives remain diagnostics. **Alternative not taken:** A rotating 16-real-matchup reference schedule. Not evaluated; would require an explicit protocol correction if reviewers establish the retained construction is wrong.
+- **C12 Preseason injection cross-covariances:** Retain registered C[D P0 D]C congruence with sqrt(2) on flagged components, then the registered lambda transition. **Alternative not taken:** Add flagged diagonal variance alone before projection. Not tested; it changes cross-covariances and could change forecasts.
+- **C25 Completion evidence precision and substitutes:** Retain exact qualified completion timestamps for the executable audit. Missing/contradictory clocks remain unknown; do not substitute kickoff plus duration, last-play start, an edit time or a later current FINAL flag. Continue sourcing; stop only the dependent fit. **Alternative not taken:** Accept independently verified completion-time bounds that prove identical cutoff membership while retaining exact time as unknown. This is a possible evidence representation for reviewer consideration, not an approved fabricated timestamp.
 
 # E1 calendar correction — implementation tested; historical replay blocked
 
@@ -55,6 +60,16 @@ QB1 coverage is 446 of 448: the gaps are **2017 MIA and 2017 TB**. Known QB1 cha
 
 ## Verification and release status
 
-304 tests pass: 218 Week 1, 57 projection, 20 forecast-system, and 9 E1/calendar tests. These include strict cutoff equality, DST, week-label independence, two games sharing one state, row-order determinism, unknown-completion rejection and identical calendar availability for all candidates. The full historical preflight fails separately, as it must with missing evidence.
+310 tests pass: 218 Week 1, 57 projection, 20 forecast-system, and 15 E1/calendar/protocol tests. These include strict cutoff equality, DST, week-label independence, two games sharing one state, row-order determinism, unknown-completion rejection and identical calendar availability for all candidates. The full historical preflight fails separately, as it must with missing evidence.
 
 Original registration, prior as-issued forecasts, first grades, Phase A and the invalidated E1 archive are preserved. Linear remains live. No PFF ingestion, E2 comparison or paid provider call occurred. The corrected run, once it passes every check, must be logged as the first valid E1 result; that claim is not made now.
+
+## Decision-latency follow-through
+
+The gap sweep was hashed and pushed before this follow-through in commit `5349830a4f77ad2cd77e6257ae7c9542dbc61d00`. It contains 22 Tier 1 decisions, four nonblocking Tier 2 choices and one Tier 3 evidence blocker. Original registration/candidates/gates/metrics/population remain unchanged. The sweep was not backdated over the earlier invalidated run.
+
+Implemented below Tier 3: addendum integrity checking; an exact 2,639-game population guard (equal reduced intersections are rejected); paired-game leave-one-out MAE sensitivity as reporting only; corrected-directory stage wiring and current-fit cache lineage; and accurate report/unknown-QB wording. The 14 current-season frozen games all use the September 8, 2026 06:00 PT cutoff. No new current-season exception is required.
+
+The corrected entry point was attempted again after the sweep. Its historical completion-evidence preflight still fails before fitting. Tier 2 review flags did not cause the stop. B01 is the entire current Tier 3 batch: source authoritative completion evidence while retaining the population and strict boundaries; do not infer duration or silently delay/drop observations. The post-preflight numerical pipeline has not been exercised on qualified full-history data, and there is still no first valid E1 result.
+
+Least certain: whether the available source fields establish actual completion. Contradictory/missing clocks remain unknown; that changed execution into a failed preflight rather than an invented chronology.

@@ -34,7 +34,24 @@ def run():
                         alpha=1-l/100;lo,hi=np.quantile(sample,[alpha/2,1-alpha/2]);covered[t,l].append(bool(lo<=actual<=hi))
         for (t,l),values in covered.items():assert abs(float(np.mean(values))-report['pooled'][name][t][f'coverage_{l}'])<1e-12
         checks[name]=dict(team_rows=len(scored),games=len(scored)//2,mae=mae,own_prior_calibration_coverage_reproduced=True)
-    for path,expected in reg['file_hashes'].items():assert hashlib.sha256((ROOT/path).read_bytes()).hexdigest()==expected,path
+    if (OUT/'correction-receipt.json').exists():
+        from scripts import e1_calendar_run
+        from scripts.e1_protocol import validate_population
+        e1_calendar_run.OUT=OUT
+        e1_calendar_run.load_corrected_inputs()
+        expected=json.loads((OUT/'registered-population.json').read_text())['game_ids']
+        for rows in oof.values():validate_population(rows,expected)
+        addendum=json.loads((OUT/'preregistration-addendum.json').read_text())
+        assert dt.datetime.fromisoformat(addendum['created_at'])<dt.datetime.fromisoformat(report['first_comparative_result_at'])
+        calendar=json.loads((OUT/'calendar-audit.json').read_text())
+        assert calendar['status']=='PASS' and not calendar['unknown_completions']
+        by={r['game_id']:r for r in json.loads((OUT/'calendar-games.json').read_text())}
+        from engine.forecast_system.calendar import cutoff_before,timestamp
+        for rows in oof.values():
+            for row in rows:
+                assert timestamp(row['state_cutoff'])==cutoff_before(by[row['game_id']]['issuance_at'])
+    else:
+        for path,expected in reg['file_hashes'].items():assert hashlib.sha256((ROOT/path).read_bytes()).hexdigest()==expected,path
     active=json.loads((ROOT/'work/in-season-learning-v1/active-fit-ref.json').read_text());assert active['sha256']==reg['baseline_hash']
     for folder in ('outputs/projection-v3/locks','outputs/projection-v3/grades','work/projection-v2/phase-a'):
         subprocess.run(['git','diff','--exit-code','5fc1e332','--',folder],cwd=ROOT,check=True,capture_output=True)
@@ -47,10 +64,11 @@ def run():
         for g in current['games']:
             assert g['issued']==cards[g['game_id']]['projection']
             assert g['actual']==cards[g['game_id']]['grades']['PROJECTION']['actual']
+    if (OUT/'correction-receipt.json').exists() and current is None:raise ValueError('Current-season audit is required')
     result=dict(state='PASS',preregistration_precedes_comparison=True,registered_inputs_and_code_hashes_match=True,
                 active_fit_unchanged=True,frozen_projections_grades_and_phase_a_unchanged=True,paired_populations_and_recomputed_metrics=checks,
                 compressed_artifact_hash_verified=True,current_as_issued_comparison_verified=current is not None,
-                tests=dict(forecast=20,projection=57,week1=218,reporting=1,total=296),
+                test_evidence='See saved test logs; unit tests do not replace this audit',
                 gate_runtime_seconds=report['runtime_seconds'],current_runtime_seconds=current['runtime_seconds'] if current else None)
     if (OUT/'validity.json').exists():
         validity=json.loads((OUT/'validity.json').read_text())
