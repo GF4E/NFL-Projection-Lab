@@ -1,0 +1,2 @@
+import {defineConfig} from 'vite';import react from '@vitejs/plugin-react';import fs from 'node:fs';
+export default defineConfig({plugins:[react(),{name:'fixture',configureServer(server){server.middlewares.use('/fixture.json',(_req,res)=>{const base='../nfl-prediction-engine-gpt6/';res.setHeader('Content-Type','application/json');res.end(JSON.stringify({board:JSON.parse(fs.readFileSync(base+'outputs/projection-v3/board.json','utf8')),evidence:JSON.parse(fs.readFileSync(base+'outputs/board-v7/evidence.json','utf8'))}))})}}],server:{host:'127.0.0.1',port:4177}});

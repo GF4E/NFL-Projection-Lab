@@ -1,5 +1,2 @@
-import { redirect } from "next/navigation";
-
-export default function BackgroundModelPage() {
-  redirect("/sunday");
-}
+import {BoardV7} from "@/components/board-v7";
+export default function Page(){return <BoardV7/>;}

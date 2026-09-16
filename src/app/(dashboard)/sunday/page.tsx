@@ -1,2 +1,2 @@
-import {ProjectionBoard} from "@/components/projection-board";
-export default function SundayPage(){return <div className="page week-one-page"><ProjectionBoard/></div>;}
+import {BoardV7} from "@/components/board-v7";
+export default function Page(){return <BoardV7/>;}

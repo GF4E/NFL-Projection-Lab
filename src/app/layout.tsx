@@ -16,7 +16,7 @@ export async function generateMetadata() {
     : "https://example.invalid");
   const image = `${origin}/og.png`;
   const title = "NFL Projection Lab · Public NFL Analytics";
-  const description = "Live NFL markets, model probabilities, uncertainty intervals, matchup evidence, and transparent price analysis.";
+  const description = "Team-point projections, observed scores and season calibration.";
   return {
     title,
     description,
