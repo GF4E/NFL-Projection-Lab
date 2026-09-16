@@ -6,7 +6,7 @@ def dated(games):
     for game in games:
         start=datetime(game["season"],9,1,18,tzinfo=timezone.utc)+timedelta(weeks=game["week"]-1)
         game["issuance_at"]=(start-timedelta(minutes=75)).isoformat()
-        game["completed_at"]=(start+timedelta(hours=4)).isoformat()
+        game["assimilation_available_at"]=(start+timedelta(hours=4)).isoformat()
     return games
 
 from engine.forecast_system.state_space import C, constrain, predict, observation, observation_noise, update, stationary, preseason, reference_observations

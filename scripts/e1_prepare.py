@@ -39,13 +39,13 @@ def run(calendar_evidence=None, output=None):
         schedule=[g for g in schedule if g['game_type']=='REG' and g['home_score'] not in ('',None)]
         for g in schedule:
             g['season']=int(g['season']);g['week']=int(g['week'])
-            g.update({k:calendar_evidence[g['game_id']][k] for k in ('issuance_at','completed_at')})
+            g.update({k:calendar_evidence[g['game_id']][k] for k in ('issuance_at','assimilation_available_at')})
         batches=plan(schedule);audit(schedule,batches)
         built=core_features.build(rows,schedule,stadiums,calendar_batches=batches)
         controls=[{k:r[k] for k in ('actual_points','features','game_id','home','opponent','row_id','season','team','week')} for r in built]
         by_cutoff={g['game_id']:b['cutoff'] for b in batches for g in b['forecasts']}
         for r in controls:
-            r.update({k:calendar_evidence[r['game_id']][k] for k in ('issuance_at','completed_at')})
+            r.update({k:calendar_evidence[r['game_id']][k] for k in ('issuance_at','assimilation_available_at')})
             r['state_cutoff']=by_cutoff[r['game_id']]
     data={'linear':controls};original=core_features.weight
     try:
