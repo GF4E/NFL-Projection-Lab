@@ -9,6 +9,7 @@ from engine.projection_v3.model import fit as ridge_fit,predict as ridge_predict
 from engine.forecast_system.state_fit import fit as state_fit,replay
 from engine.forecast_system.verification import verify,skill,reliability
 from engine.projection.features import DIV
+from scripts.e1_protocol import validate_population,influence
 OUT=ROOT/'work/projection-governance-v2/e1'
 NAMES=('linear','k4','k8','state_space')
 
@@ -105,6 +106,11 @@ def run():
     eligibility={name:{r['game_id'] for r in oof[name] if 2016<=r['season']<=2025} for name in NAMES}
     eligible=set.intersection(*eligibility.values())
     if any(ids!=eligible for ids in eligibility.values()):raise ValueError('Candidate game eligibility differs')
+    population_path=OUT/'registered-population.json'
+    if population_path.exists():
+        expected=json.loads(population_path.read_text())['game_ids']
+        for rows in oof.values():validate_population(rows,expected)
+    chronology_sorted=sorted(base,key=lambda r:(r.get('completed_at','9999'),r['row_id']))
     for name in NAMES:
         for year in range(2016,2026):
             calibration=[r for r in oof[name] if year-3<=r['season']<year]
@@ -122,7 +128,7 @@ def run():
                 h,a=pair[True],pair[False];baselines={}
                 for side,row in pair.items():
                     prior=[r['actual_points'] for r in earlier if r['team']==row['team'] and r['season']==year-1]
-                    previous=[r['actual_points'] for r in sorted(base,key=lambda r:(r.get('completed_at','9999'),r['row_id'])) if r['team']==row['team'] and r.get('completed_at','9999')<row.get('state_cutoff','0000') and r['actual_points'] is not None]
+                    previous=[r['actual_points'] for r in chronology_sorted if r['team']==row['team'] and r.get('completed_at','9999')<row.get('state_cutoff','0000') and r['actual_points'] is not None]
                     baselines[side]=dict(prior_team=float(np.mean(prior)),persistence=float(np.mean(previous[-4:])))
                 entries=[('team',h['point']+he,h['point'],h['actual'],True),('team',a['point']+ae,a['point'],a['actual'],False),
                          ('margin',h['point']-a['point']+he-ae,h['point']-a['point'],h['actual']-a['actual'],None),
@@ -162,6 +168,7 @@ def run():
         gate[name]=dict(relative_team_mae_improvement=improvement,coverage=coverage,coverage_pass=coverage_ok,mae_pass=improvement>=.01,
                         numeric_gate_pass=improvement>=.01 and coverage_ok,
                         paired_mae_improvement_interval_95=np.quantile([delta[i].mean() for i in indices],[.025,.975]).tolist())
+    sensitivity={name:influence(control,[losses[name][k] for k in keys],[k[2] for k in keys]) for name in NAMES[1:]}
     ranked=sorted(NAMES[1:],key=lambda name:(pooled[name]['team']['mae'],NAMES.index(name)))
     eligible_candidates=[name for name in ranked if gate[name]['numeric_gate_pass']]
     selected=eligible_candidates[0] if eligible_candidates else None
@@ -173,9 +180,9 @@ def run():
             if lo<=0<=hi:selected=simpler
     decision='NO_CHALLENGER_CLEARS_GATE' if not eligible_candidates else 'NUMERIC_PASS_PENDING_REVIEWS_AND_RELEASE_AUDIT'
     report=dict(registration_sha256=registration['sha256'],first_comparative_result_at=first,population='HISTORICAL_DEVELOPMENT',
-                games=len(eligible),pooled=pooled,annual=annual,weekly=weekly,weeks_1_to_4=early,gate=gate,decision=decision,
+                games=len(eligible),extreme_game_sensitivity=sensitivity,pooled=pooled,annual=annual,weekly=weekly,weeks_1_to_4=early,gate=gate,decision=decision,
                 selected_candidate=selected,promoted=False,retained='linear',review_answers_received=0,
-                limitations=['All coaching fields unknown; transition flags false by A.3.','Historical results are reused development evidence, not untouched holdout.'],
+                limitations=['All coaching fields unknown; coach flags false independently, known QB1 changes still activate variance injection.','Historical results are reused development evidence, not untouched holdout.'],
                 runtime_seconds=time.monotonic()-started,peak_rss_mib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss/(1024**2 if sys.platform=='darwin' else 1024))
     save('verification.json',report);save('verified-games.json',records)
     print(json.dumps(dict(decision=decision,gate=gate,runtime_seconds=report['runtime_seconds']),indent=2),flush=True)

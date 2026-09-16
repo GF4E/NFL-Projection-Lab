@@ -62,7 +62,7 @@ def run():
             'The 2013 and 2014 calibration-only training records contain no effective preseason transition after the mandated 2013 reset; lambda is not separately identified in those pilot fits. The optimizer coordinate is reported without claiming otherwise. Scored 2016–2025 folds have prior preseason transitions.','', '## Staff data addition and limitations','',f"`config/staff_history.json` SHA-256: `{staff['sha256']}`.",'',
             '| Season | Team-seasons | HC | OC | DC | QB1 | Known QB1 changes |','|---|---:|---:|---:|---:|---:|---:|']
     for year,c in staff['coverage'].items():lines.append(f"| {year} | 32 | {c['head_coach']} | {c['offensive_coordinator']} | {c['defensive_coordinator']} | {c['qb1']} | {c['qb1_change_known']} |")
-    lines+=['','PFR returned HTTP 403 for season/coaching-history probes. All 448 HC/OC/DC team-season records remain explicitly unknown, with source URLs and null retrieval timestamps; a successful coaching extraction is **not** claimed. MIA/TB 2017 did not have a Week 1 starter observation. Unknown combined coach/QB transitions use false, per A.3. `staff-coverage.json` enumerates every unknown team-season. No continuity weights, GM/roster fields, or PFF data were added to the model.','']
+    lines+=['','PFR returned HTTP 403 for season/coaching-history probes. All 448 HC/OC/DC team-season records remain explicitly unknown, with source URLs and null retrieval timestamps; a successful coaching extraction is **not** claimed. MIA/TB 2017 did not have a Week 1 starter observation. Unknown coach changes read false independently; known QB1 changes still double preseason variance. `staff-coverage.json` enumerates every unknown team-season. No continuity weights, GM/roster fields, or PFF data were added to the model.','']
     current=OUT/'current-season.json'
     if current.exists():
         c=json.loads(current.read_text());lines+=['## Current-season issued-game comparison','',c['population']+'.','',
@@ -70,9 +70,22 @@ def run():
         for name,m in c['summary'].items():lines.append(f"| {name} | {len(c['games'])} | {m['team']['mae']:.4f} | {m['margin']['mae']:.4f} | {m['total']['mae']:.4f} |")
         lines+=['','Only immutable AS_ISSUED contribution inputs are used for challenger counterfactuals. Original forecasts/grades are untouched. The two retrospective Week 1 games are excluded. All candidate fitting stops at 2025. Replay-linear follows the registered expanding-history refit and can differ from the originally issued version. Compare challengers with replay-linear to isolate the method comparison; originally issued scores remain a separate reference. Per-game before/after scores are in `current-season.json`.','']
     else:lines+=['## Current-season comparison','', 'PENDING: no release is permitted until this evidence is complete.','']
-    lines+=['## Governance and release','', 'Phase A remains exploratory and does not count as E2. E2 is Week 3, separately registered against E1’s promoted method or the retained linear control. All registered challengers failed the numerical improvement gate; E1 is closed as rejected and linear is retained. Two reviewer responses have not been received; none is fabricated. No release approval is claimed. This experiment cannot activate a method.','',
+    lines+=['## Governance and release','', 'Phase A remains exploratory and does not count as E2. E2 is Week 3, separately registered against E1’s promoted method or the retained linear control. The computed decision is reported in the gate table; numerical output cannot activate a method or override an incomplete evidence audit. Two reviewer responses have not been received; none is fabricated. No release approval is claimed. This experiment cannot activate a method.','',
         f"Gate replay: {r['runtime_seconds']:.1f} seconds, peak process RSS {r['peak_rss_mib']:.1f} MiB, one BLAS worker. Cached fits and OOF outputs are retained; this report renderer never refits.",'',
         'Least certain: the nondiagonal reference covariance and team-specific preseason injection. Their exact reference equations and PSD scaling were recorded before results; invariance, convergence, and known-strength recovery were tested.','']
+    if (OUT/'preregistration-addendum.json').exists():
+        addendum=json.loads((OUT/'preregistration-addendum.json').read_text())
+        flags=[item for item in addendum['items'] if item['tier']==2]
+        note=['**REVIEW REQUESTED (nonblocking):** '+', '.join(item['id']+' '+item['topic'] for item in flags)+'. Decisions and untested alternatives: [preregistration addendum](PREREGISTRATION-ADDENDUM.md).','']
+        for item in flags:
+            note+=['- '+item['id']+': '+item['decision']+' **Alternative not taken:** '+item['alternative']]
+        note+=['']
+        lines=note+lines
+        sensitivity=r.get('extreme_game_sensitivity',{})
+        lines+=['## Extreme-game sensitivity (diagnostic only)','','| Candidate | Leave-one-game-out improvement range | Omitted game at minimum / maximum |','|---|---|---|']
+        for name,item in sensitivity.items():
+            lines.append(f"| {name} | {item['minimum']} to {item['maximum']} | {item.get('omitted_game_at_minimum')} / {item.get('omitted_game_at_maximum')} |")
+        lines+=['','Both teams remain paired. This diagnostic never changes eligibility, candidate selection or the release gate.','']
     (OUT/'report.md').write_text('\n'.join(lines))
 
 if __name__=='__main__':run()

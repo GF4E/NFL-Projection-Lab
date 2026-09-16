@@ -1,6 +1,6 @@
 """Week 1 counterfactuals from immutable issued contribution inputs; never live."""
 import datetime as dt
-import json,sys,time
+import hashlib,json,sys,time
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 import numpy as np
@@ -33,11 +33,13 @@ def run():
                 r=dict(row,features=dict(row['features']));r['features']['baseline']=by[row['game_id']]['points'][0 if row['home'] else 1];state_rows.append(r)
     print('E1 2026 training-only state fit',flush=True)
     cached=OUT/'state-fit-2026.json'
+    lineage=hashlib.sha256((OUT/'features-ref.json').read_bytes()+(OUT/'correction-receipt.json').read_bytes()).hexdigest() if (OUT/'correction-receipt.json').exists() else None
     f=json.loads(cached.read_text()) if cached.exists() else state_fit(games,league,changes)
     if cached.exists():
+        if lineage is not None:assert f.get('input_lineage_sha256')==lineage,'Stale current-season cache'
         assert f['trained_through_season']==2025 and f['league_ppd']==league
     if not f['starts'][f['selected_start']]['success']:raise ValueError('2026 training fit did not converge')
-    f.update(season=2026,trained_through_season=2025,league_ppd=league)
+    f.update(season=2026,trained_through_season=2025,league_ppd=league,input_lineage_sha256=lineage)
     save('state-fit-2026.json',f)
     _,_,(x,p),_=replay(games,(f['q'],f['r'],f['retention']),f['rho'],league,changes)
     p0,_=stationary(f['q'],f['r'],f['rho']);x,p=preseason(x,p,p0,f['retention'],changes[2026]);x,p=predict(x,p,f['q'])
@@ -48,6 +50,10 @@ def run():
     oof=json.loads((OUT/'oof.json').read_text());board=json.loads((OUT/'as-issued-board-snapshot.json').read_text())
     cards=issued_graded_cards(board)
     if any(c['week']!=1 for c in cards):raise ValueError('This registration covers Week 1 counterfactuals only')
+    from engine.forecast_system.calendar import cutoff_before
+    cutoffs={cutoff_before(c['cutoff_at']).isoformat() for c in cards}
+    if len(cutoffs)!=1:raise ValueError('Current frozen Week 1 population spans multiple assimilation intervals')
+    state_cutoff=next(iter(cutoffs))
     outputs=[];missing=[]
     for card in sorted(cards,key=lambda c:c['game_id']):
         features={side:{t['input']:t.get('value') for t in card['contributions'][side]} for side in ('home','away')}
@@ -67,7 +73,7 @@ def run():
             predictions['margin']=predictions['home_points']-predictions['away_points'];predictions['total']=predictions['home_points']+predictions['away_points']
             candidates[name]=predictions
         outputs.append(dict(game_id=card['game_id'],issued_version=card['version'],issued=card['projection'],actual=actual,counterfactual=candidates,
-                            input_provenance='Frozen as-issued contribution values; no current-season result enters fitting'))
+                            state_cutoff=state_cutoff,input_provenance='Frozen as-issued contribution values; no current-season result enters fitting'))
     def metrics(rows,key):
         result={}
         for target,fields in [('team',['home_points','away_points']),('margin',['margin']),('total',['total'])]:

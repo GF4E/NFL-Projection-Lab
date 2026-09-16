@@ -184,3 +184,10 @@ Addendum hash: `695999ed579b7174a446f3930815d51f1ec6729bcfa57d0e3eebfe3fcca06224
 | B01 / 3 | Unqualified historical completion evidence: Do not run a valid E1 comparison until every required game has defensible completion/cutoff evidence. Preserve all games and the failed preflight. | Missing evidence cannot be manufactured, and dropping games changes the registered population. This is the only presently identified Tier 3 blocker; all manifestations are batched here. Source: calendar-audit.json; completion-probes.json; binding chronology and unknown-data rules. |
 
 The blocked E1 comparison is not a method rejection. Source qualification continues to be required; no game is dropped, no timestamp invented, and no gate relaxed. All four candidates remain subject to identical chronology.
+
+
+### CONVENTIONS implementation follow-through
+
+After the hashed sweep was pushed in `5349830a4f77ad2cd77e6257ae7c9542dbc61d00`, applied C16/C21/C22/C26: exact registered game-ID and paired-team validation (equal reduced intersections now fail), descriptive paired-game extreme-loss sensitivity, corrected-directory current-season/cache/report/audit wiring, cache lineage validation, and nonblocking Tier 2 flags with explicit alternatives at the top of reports. Removed stale unconditional-rejection and combined-unknown-flag wording from the renderer. These are implementation/reporting corrections; candidate fitting, metrics and gates remain unchanged.
+
+310 tests pass. The frozen 14-game current-season population shares one cutoff, so no exception was needed. Re-attempted the corrected entry point; B01 completion-evidence preflight still stops before fitting. The post-preflight full-history pipeline has not been validated against qualified completion data. No corrected E1 decision, release or rejection is claimed. Original registration and invalidated artifacts remain unchanged.

@@ -26,7 +26,7 @@ def run():
         if abs(float(x.sum()))>1e-10 or error>1e-10 or minimum< -1e-10:raise ValueError('Cached constrained state violates invariants')
         name=f'state-cache-{year}.json'
         save(name,dict(season=year,state=label,team_order=teams,mean=x.tolist(),covariance=p.tolist(),
-            fit_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),registration_sha256=reg['sha256'],unknown_transition_policy='A.3 false, disclosed',
+            fit_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),registration_sha256=reg['sha256'],unknown_transition_policy='Unknown coach half false independently; known QB1 change retained',
             mean_sum=float(x.sum()),null_variance_error=error,minimum_covariance_eigenvalue=minimum,activates_method=False))
         receipt.append(dict(path=name,sha256=hashlib.sha256((OUT/name).read_bytes()).hexdigest()))
     save('state-cache-ref.json',receipt)
