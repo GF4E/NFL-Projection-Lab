@@ -25,17 +25,17 @@ def schedule_kickoff(day,time):
     return datetime.fromisoformat(day+'T'+time).replace(tzinfo=EASTERN).astimezone(timezone.utc)
 
 def plan(games):
-    """Return frozen forecast batches and strictly completed observations per cutoff.
+    """Return frozen forecast batches and strictly available observations per cutoff.
 
-    Every game supplies issuance_at and completed_at as sourced UTC timestamps.
-    Unknown completion is an error, never an inferred duration or silent exclusion.
+    Every game supplies issuance_at and assimilation_available_at in UTC. The latter
+    is the authorized played-schedule kickoff plus four hours, not actual completion.
     """
     ordered=sorted(games,key=lambda g:(timestamp(g['issuance_at']),g['game_id']))
     if not ordered:return []
     forecasts={};observations={};years={}
     for game in ordered:
-        issued=timestamp(game['issuance_at']);completed=timestamp(game['completed_at'])
-        if completed<=issued:raise ValueError('Completion must follow issuance: '+game['game_id'])
+        issued=timestamp(game['issuance_at']);completed=timestamp(game['assimilation_available_at'])
+        if completed<=issued:raise ValueError('Availability must follow issuance: '+game['game_id'])
         cutoff=cutoff_before(issued)
         forecasts.setdefault(cutoff,[]).append(game)
         observations.setdefault(next_cutoff(completed),[]).append(game)
@@ -48,9 +48,9 @@ def plan(games):
             cutoffs.add(current);current=next_cutoff(current)
     result=[];incorporated=[]
     for cutoff in sorted(cutoffs):
-        available=sorted(observations.get(cutoff,[]),key=lambda g:(timestamp(g['completed_at']),g['game_id']))
+        available=sorted(observations.get(cutoff,[]),key=lambda g:(timestamp(g['assimilation_available_at']),g['game_id']))
         for g in available:
-            assert timestamp(g['completed_at'])<cutoff
+            assert timestamp(g['assimilation_available_at'])<cutoff
             incorporated.append(g['game_id'])
         batch=forecasts.get(cutoff,[])
         result.append(dict(cutoff=cutoff.isoformat(),observations=available,forecasts=batch,
@@ -64,9 +64,9 @@ def audit(games,batches):
         for forecast in batch['forecasts']:
             if cutoff!=cutoff_before(forecast['issuance_at']):raise AssertionError('Incorrect forecast cutoff')
             for gid in batch['incorporated']:
-                if timestamp(by[gid]['completed_at'])>=cutoff:raise AssertionError('Result at or after cutoff: '+gid)
-            expected={g['game_id'] for g in games if timestamp(g['completed_at'])<cutoff}
-            if set(batch['incorporated'])!=expected:raise AssertionError('Missing or extra completed result')
+                if timestamp(by[gid]['assimilation_available_at'])>=cutoff:raise AssertionError('Result at or after cutoff: '+gid)
+            expected={g['game_id'] for g in games if timestamp(g['assimilation_available_at'])<cutoff}
+            if set(batch['incorporated'])!=expected:raise AssertionError('Missing or extra available result')
             seen.add(forecast['game_id']);count+=1
     if len(seen)!=len(games) or count!=len(games):raise AssertionError('Missing or duplicate forecasts')
     return count

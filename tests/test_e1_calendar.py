@@ -3,7 +3,7 @@ from engine.forecast_system.calendar import cutoff_before,plan,audit
 
 class CalendarTests(unittest.TestCase):
     def game(self,gid,issued,completed,week=1):
-        return dict(game_id=gid,season=2020,week=week,issuance_at=issued,completed_at=completed)
+        return dict(game_id=gid,season=2020,week=week,issuance_at=issued,assimilation_available_at=completed)
     def test_strict_cutoff_and_dst(self):
         self.assertEqual(cutoff_before('2020-10-13T13:00:00Z').isoformat(),'2020-10-06T13:00:00+00:00')
         self.assertEqual(cutoff_before('2020-10-13T13:00:01Z').isoformat(),'2020-10-13T13:00:00+00:00')
@@ -30,13 +30,13 @@ class FilterCalendarTests(unittest.TestCase):
         from engine.forecast_system.state_fit import replay
         games=[]
         for gid,issued,completed,week in [('a','2020-10-13T16:00Z','2020-10-13T22:00Z',5),('b','2020-10-18T16:00Z','2020-10-18T22:00Z',6),('c','2020-10-25T16:00Z','2020-10-25T22:00Z',7)]:
-            games.append(dict(game_id=gid,season=2020,week=week,issuance_at=issued,completed_at=completed,home_index=0,away_index=1,drives=np.array([10.,10.]),offset=np.zeros(2),actual=np.array([60.,0.])))
+            games.append(dict(game_id=gid,season=2020,week=week,issuance_at=issued,assimilation_available_at=completed,home_index=0,away_index=1,drives=np.array([10.,10.]),offset=np.zeros(2),actual=np.array([60.,0.])))
         records=replay(games,(.01,2.,.5),.2,2.,{})[1]
         self.assertEqual(records[0]['points'],records[1]['points'])
         self.assertEqual(records[0]['state_cutoff'],records[1]['state_cutoff'])
         self.assertNotEqual(records[1]['points'],records[2]['points'])
 
-    def test_real_history_requires_all_completion_timestamps(self):
+    def test_real_history_preserves_entire_scored_population(self):
         import json
         from pathlib import Path
         report=json.loads(Path('work/projection-governance-v2/e1-calendar-corrected/calendar-audit.json').read_text())
@@ -64,7 +64,7 @@ class CoreCalendarTests(unittest.TestCase):
         fixtures=[('prior',2019,1,'2019-09-08','2019-09-08T16:00Z','2019-09-08T23:00Z',21,17),('a',2020,5,'2020-10-13','2020-10-13T16:00Z','2020-10-13T23:00Z',70,0),('b',2020,6,'2020-10-18','2020-10-18T16:00Z','2020-10-18T23:00Z',21,17)]
         games=[];rows=[]
         for gid,year,week,day,issued,completed,hs,aws in fixtures:
-            games.append(dict(game_id=gid,season=year,week=week,game_type='REG',gameday=day,issuance_at=issued,completed_at=completed,home_team='SEA',away_team='SF',home_score=hs,away_score=aws,source_hash='synthetic'))
+            games.append(dict(game_id=gid,season=year,week=week,game_type='REG',gameday=day,issuance_at=issued,assimilation_available_at=completed,home_team='SEA',away_team='SF',home_score=hs,away_score=aws,source_hash='synthetic'))
             for team,other,points in [('SEA','SF',hs),('SF','SEA',aws)]:
                 rows.append(dict(game_id=gid,season=year,week=week,team=team,opponent=other,source_hash='synthetic',drives=10,plays_per_drive=5,fg_points=0,turnovers_lost=0,**{key:points/10 for key in core_features.METRICS}))
         original=core_features.weight
@@ -76,3 +76,30 @@ class CoreCalendarTests(unittest.TestCase):
             b=next(r for r in result if r['game_id']=='b' and r['team']=='SEA')
             for key in ('baseline','elo','elo_difference','drives','opponent_drives'):
                 self.assertEqual(a['features'][key],b['features'][key],(k,key))
+
+class FullHistoricalAvailabilityTests(unittest.TestCase):
+    def test_all_2016_to_2025_forecasts_use_strict_kickoff_plus_four_hours(self):
+        import csv,gzip,json
+        from pathlib import Path
+        from datetime import datetime,timedelta,timezone
+        from zoneinfo import ZoneInfo
+        root=Path('work/projection-governance-v2/e1-calendar-corrected')
+        policy=json.loads((root/'availability-convention.json').read_text())
+        # Independent computation from the pinned schedule, not the replay field.
+        available={g['game_id']:datetime.fromisoformat(g['gameday']+'T'+g['gametime']).replace(tzinfo=ZoneInfo('America/New_York')).astimezone(timezone.utc)+timedelta(hours=4) for g in csv.DictReader(Path(policy['schedule_path']).read_text().splitlines()) if 2011<=int(g['season'])<=2025 and g['game_type']=='REG' and g['home_score']!=''}
+        lineage=json.loads(gzip.decompress((root/'calendar-lineage.json.gz').read_bytes()))
+        expected=set(json.loads((root/'registered-population.json').read_text())['game_ids'])
+        self.assertEqual({r['game_id'] for r in lineage},expected)
+        self.assertEqual(len(lineage),2639)
+        for row in lineage:
+            cutoff=datetime.fromisoformat(row['state_cutoff'])
+            self.assertTrue(all(available[gid]<cutoff for gid in row['incorporated']),row['game_id'])
+            self.assertEqual(set(row['incorporated']),{gid for gid,t in available.items() if t<cutoff})
+        report=json.loads((root/'calendar-audit.json').read_text())
+        self.assertEqual(report['status'],'PASS');self.assertEqual(report['games_dropped'],0)
+        self.assertFalse(report['completion_timestamps_used'])
+
+    def test_nflverse_clock_is_eastern_even_for_western_or_international_venues(self):
+        from engine.forecast_system.calendar import schedule_kickoff
+        self.assertEqual(schedule_kickoff('2020-10-18','16:25').isoformat(),'2020-10-18T20:25:00+00:00')
+        self.assertEqual(schedule_kickoff('2019-10-13','09:30').isoformat(),'2019-10-13T13:30:00+00:00')

@@ -75,7 +75,12 @@ def run():
         'Least certain: the nondiagonal reference covariance and team-specific preseason injection. Their exact reference equations and PSD scaling were recorded before results; invariance, convergence, and known-strength recovery were tested.','']
     if (OUT/'preregistration-addendum.json').exists():
         addendum=json.loads((OUT/'preregistration-addendum.json').read_text())
-        flags=[item for item in addendum['items'] if item['tier']==2]
+        flags=[dict(item) for item in addendum['items'] if item['tier']==2]
+        if (OUT/'availability-convention.json').exists():
+            for item in flags:
+                if item['id']=='C25':
+                    item['decision']='Resolved by binding user instruction: played kickoff plus four hours is assimilation availability; no actual completion clock is used.'
+                    item['alternative']='The previous exact-completion requirement was superseded; no estimated physical completion time is asserted.'
         note=['**REVIEW REQUESTED (nonblocking):** '+', '.join(item['id']+' '+item['topic'] for item in flags)+'. Decisions and untested alternatives: [preregistration addendum](PREREGISTRATION-ADDENDUM.md).','']
         for item in flags:
             note+=['- '+item['id']+': '+item['decision']+' **Alternative not taken:** '+item['alternative']]
@@ -86,6 +91,11 @@ def run():
         for name,item in sensitivity.items():
             lines.append(f"| {name} | {item['minimum']} to {item['maximum']} | {item.get('omitted_game_at_minimum')} / {item.get('omitted_game_at_maximum')} |")
         lines+=['','Both teams remain paired. This diagnostic never changes eligibility, candidate selection or the release gate.','']
+    if (OUT/'availability-convention.json').exists():
+        calendar=json.loads((OUT/'calendar-audit.json').read_text())
+        lines+=['## Calendar correction and affected forecasts','','All four candidates use the identical fixed played-kickoff-plus-four-hours convention. nflverse clock fields are Eastern regardless of venue and are converted to UTC. Four hours is an authorized availability convention, not a universal upper bound on physical game duration. No completion timestamp was invented or required; no registered game was dropped.','','| Season | Games audited | Forecasts with changed available history |','|---|---:|---:|']
+        for year,values in calendar['by_season'].items():lines.append(f"| {year} | {values['games']} | {values['affected_forecasts']} |")
+        lines+=['','Affected means a changed incorporated historical-game-ID set relative to the invalidated week-label replay; numerical downstream propagation is separate. Source-event IDs and each forecast dependency set are preserved in calendar-audit.json and calendar-lineage.json.gz.',f"Minimum gap from the four-hour availability mark to its next assimilation cutoff: {calendar['minimum_hours_between_availability_and_assimilation']:.2f} hours. This schedule check does not measure actual end times.",'','The earlier numerical rejection remains withdrawn and preserved. This corrected run is the first valid E1 result only after its independent audits pass.','']
     (OUT/'report.md').write_text('\n'.join(lines))
 
 if __name__=='__main__':run()

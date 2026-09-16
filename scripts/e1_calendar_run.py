@@ -10,8 +10,8 @@ ORIGINAL=ROOT/'work/projection-governance-v2/e1/registration.json'
 def load_corrected_inputs():
     receipt=json.loads((OUT/'correction-receipt.json').read_text())
     assert hashlib.sha256(ORIGINAL.read_bytes()).hexdigest()==receipt['original_registration_file_sha256']
-    completion=OUT/'completion-evidence.json'
-    assert receipt.get('completion_evidence_sha256') and hashlib.sha256(completion.read_bytes()).hexdigest()==receipt['completion_evidence_sha256'], 'Completion evidence must be pinned before fitting'
+    policy=OUT/'availability-convention.json'
+    assert hashlib.sha256(policy.read_bytes()).hexdigest()==receipt['availability_convention_file_sha256'], 'Availability convention must be pinned before fitting'
     registration=json.loads(ORIGINAL.read_text())
     assert registration['sha256']==e1_evaluate.digest({k:v for k,v in registration.items() if k!='sha256'})
     addendum=json.loads((OUT/'preregistration-addendum.json').read_text())
@@ -28,7 +28,7 @@ def load_corrected_inputs():
     expected=json.loads((OUT/'registered-population.json').read_text())['game_ids']
     for values in rows.values():
         validate_population(values,expected)
-        assert all(r['season']<=2025 and r.get('state_cutoff') and r.get('completed_at') for r in values)
+        assert all(r['season']<=2025 and r.get('state_cutoff') and r.get('assimilation_available_at') for r in values)
         values.sort(key=lambda r:(r['season'],r['issuance_at'],r['row_id']))
     audit=json.loads((OUT/'calendar-audit.json').read_text());assert audit['status']=='PASS'
     return registration,rows
@@ -36,7 +36,7 @@ def load_corrected_inputs():
 def run():
     audit=e1_calendar_audit.run()
     if audit['status']!='PASS':
-        raise SystemExit('BLOCKED: full-history completion audit failed; no fit or comparative result created')
+        raise SystemExit('BLOCKED: full-history availability audit failed; no fit or comparative result created')
     if (OUT/'oof.json').exists():raise SystemExit('Preserve existing corrected run; do not overwrite comparison evidence')
     games=json.loads((OUT/'calendar-games.json').read_text())
     e1_prepare.run({g['game_id']:g for g in games},OUT)

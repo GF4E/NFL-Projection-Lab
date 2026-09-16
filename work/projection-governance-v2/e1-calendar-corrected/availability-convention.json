@@ -1,0 +1,27 @@
+{
+  "B01": "RESOLVED_BY_USER",
+  "C25": "SUPERSEDED_BY_USER; retained in four-flag review display with resolution",
+  "authority": "User B01 resolution; fixed pregame schedule availability rule",
+  "candidates_gate_metrics_population_changed": false,
+  "completion_timestamps_used": false,
+  "created_at": "2026-09-16T19:46:47.400555+00:00",
+  "duration_hours": 4,
+  "factual_corrections": [
+    "nflverse gametime is Eastern, not stadium-local; localize as America/New_York then convert to UTC.",
+    "Four hours is not a universal physical upper bound: 2018 TEN-MIA lasted 7h08. The fixed convention is not evidence of actual completion."
+  ],
+  "long_game_source": "https://www.tennesseetitans.com/news/titans-dolphins-game-notes",
+  "parent_registration_sha256": "a48e85241a47301ff3e462af70db6171c7c0edd750a67ac878ebe2b4411f1e62",
+  "physical_completion_bound_claim": false,
+  "rationale": "The user authorizes a fixed four-hour assimilation convention using the actual played schedule. It removes dependence on missing end clocks and treats all candidates equally without a fitted duration or dropping a registered game.",
+  "rule": "assimilation_available_at = played schedule kickoff UTC + 4 hours; eligible strictly before Tuesday 06:00 America/Los_Angeles cutoff strictly before own T-75 issuance",
+  "schedule_path": "outputs/model-pick-v1/final-sources/c4b302a4e1dc27b0f1db0a2617a353a4f73b5b4ed798b0762dd1403032874b77.csv",
+  "schedule_sha256": "c4b302a4e1dc27b0f1db0a2617a353a4f73b5b4ed798b0762dd1403032874b77",
+  "schema": "E1-assimilation-availability-v1",
+  "sha256": "6431498cb7c45fcc1b20e47124acdd31230bcc114a9b34de3a67e2a96b80a662",
+  "source_definition": "gametime,character,\"The kickoff time of the game. This is represented in 24-hour time and the Eastern time zone, regardless of what time zone the game was being played in.\"",
+  "source_definition_sha256": "f07a07a0b569b2526c2e3944d6da4f0d0b479cd1ead22fcff7a2fc164e0cf0f4",
+  "source_definition_url": "https://raw.githubusercontent.com/nflverse/nflreadr/main/data-raw/dictionary_schedules.csv",
+  "source_timezone": "America/New_York",
+  "tier": 1
+}

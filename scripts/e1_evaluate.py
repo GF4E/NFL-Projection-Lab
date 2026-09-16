@@ -42,7 +42,7 @@ def paired_games(rows):
         d=(f['drives']+f['opponent_drives'])/2
         result.append(dict(game_id=gid,season=h['season'],week=h['week'],home_index=teams.index(h['team']),away_index=teams.index(a['team']),
                            drives=np.array([d,d]),offset=np.zeros(2),actual=np.array([h['actual_points'],a['actual_points']]),
-                           issuance_at=h['issuance_at'],completed_at=h['completed_at']))
+                           issuance_at=h['issuance_at'],assimilation_available_at=h['assimilation_available_at']))
     return result
 
 def summary(records):
@@ -110,7 +110,7 @@ def run():
     if population_path.exists():
         expected=json.loads(population_path.read_text())['game_ids']
         for rows in oof.values():validate_population(rows,expected)
-    chronology_sorted=sorted(base,key=lambda r:(r.get('completed_at','9999'),r['row_id']))
+    chronology_sorted=sorted(base,key=lambda r:(r.get('assimilation_available_at','9999'),r['row_id']))
     for name in NAMES:
         for year in range(2016,2026):
             calibration=[r for r in oof[name] if year-3<=r['season']<year]
@@ -128,7 +128,7 @@ def run():
                 h,a=pair[True],pair[False];baselines={}
                 for side,row in pair.items():
                     prior=[r['actual_points'] for r in earlier if r['team']==row['team'] and r['season']==year-1]
-                    previous=[r['actual_points'] for r in chronology_sorted if r['team']==row['team'] and r.get('completed_at','9999')<row.get('state_cutoff','0000') and r['actual_points'] is not None]
+                    previous=[r['actual_points'] for r in chronology_sorted if r['team']==row['team'] and r.get('assimilation_available_at','9999')<row.get('state_cutoff','0000') and r['actual_points'] is not None]
                     baselines[side]=dict(prior_team=float(np.mean(prior)),persistence=float(np.mean(previous[-4:])))
                 entries=[('team',h['point']+he,h['point'],h['actual'],True),('team',a['point']+ae,a['point'],a['actual'],False),
                          ('margin',h['point']-a['point']+he-ae,h['point']-a['point'],h['actual']-a['actual'],None),
