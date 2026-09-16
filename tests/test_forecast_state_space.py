@@ -57,3 +57,20 @@ class ConstrainedStateTests(unittest.TestCase):
         self.assertEqual(first[1],second[1])
         self.assertLess(np.sqrt(np.mean((first[2][0]-true)**2)),.08)
         self.assertAlmostEqual(first[3]['offense_half_life'],np.log(.5)/np.log1p(-first[3]['offense_gain']))
+
+    def test_preseason_zero_retention_and_doubled_injection(self):
+        p0,_=stationary(.01,2.,.2)
+        mean,_=constrain(np.arange(64,dtype=float),p0)
+        x,p=preseason(mean,3*p0,p0,0.,[False]*32)
+        np.testing.assert_allclose(x,0,atol=1e-14)
+        np.testing.assert_allclose(p,p0,atol=1e-13)
+        x,p=preseason(mean,3*p0,p0,0.,[True]*32)
+        np.testing.assert_allclose(p,2*p0,atol=1e-13)
+
+    def test_reference_half_life_responds_to_injected_noise(self):
+        _,base=stationary(.01,2.,.2)
+        _,more_process=stationary(.1,2.,.2)
+        _,more_observation=stationary(.01,4.,.2)
+        self.assertLess(more_process['offense_half_life'],base['offense_half_life'])
+        self.assertGreater(more_observation['offense_half_life'],base['offense_half_life'])
+
