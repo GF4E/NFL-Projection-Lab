@@ -95,3 +95,17 @@ Governance Prompt 3 supersedes architecture phase ordering/gates. The earlier Ph
 | Architecture Phase A failure | Closed later phases | Retained exploratory evidence; weekly queue now governs |
 
 No method or input weight changed. E1 remains a draft until state-space fitting conventions and evidence-qualified preseason transitions are registered. Staff history is currently unseeded; unknown transitions must not be treated as unchanged. No reviewer responses invented.
+
+## 2026-09-16 — E1 order registered; staff seed is a separate data addition
+
+Earlier Phase A post-processing predates the queue and is exploratory evidence only, not an E2 result. E1 (early-season updating) is Week 2's single registered method change: unchanged linear control, and exactly three challengers, k=4, k=8, constrained state-space. E2 reruns as a properly registered Week 3 experiment against whatever E1 promotes (or retained linear control if E1 rejects). No E1 comparative result has been viewed at this entry.
+
+| Item | Before | Registered treatment |
+|---|---|---|
+| Filter identity | Unidentified 64th direction | Sum-zero projection; 63 identified dimensions; q*C noise |
+| Filter fit | Undefined | Training-only likelihood; three fixed starts; q, r, lambda only searched |
+| Staff data | Empty history | 448 explicit team-season rows; 446 Week 1 QB IDs; coaching evidence unknown after PFR 403 |
+| Missing transitions | Blocked | False flag, explicitly unknown, per binding A.3 |
+| Method activation | Linear | Unchanged pending complete E1 gates and reviews |
+
+Staff data addition does not activate continuity weights and is not credited as a method gain. Source, coverage, unknown rows and content hash are in work/projection-governance-v2/e1/staff-coverage.json. No PFF ingest or other data addition. Full operational definitions, hashes and limitations are frozen in e1/registration.json before comparison.

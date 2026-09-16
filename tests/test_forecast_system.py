@@ -78,7 +78,7 @@ class ForecastSystemTests(unittest.TestCase):
         self.assertEqual(r['bins'][9]['count'], 1)
 
     def test_separation_import_boundary(self):
-        allowed = {'hashlib', 'json', 'math', 'numpy', 'scipy', 'postprocess', 'datetime', 'collections', 'engine'}
+        allowed = {'hashlib', 'json', 'math', 'numpy', 'scipy', 'postprocess', 'datetime', 'collections', 'engine', 'state_space'}
         for path in Path('engine/forecast_system').glob('*.py'):
             tree = ast.parse(path.read_text())
             for node in ast.walk(tree):
