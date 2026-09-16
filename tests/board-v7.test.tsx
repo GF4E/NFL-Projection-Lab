@@ -30,3 +30,24 @@ it('opens the current slate despite a stale default and retains history selectio
  expect(currentBoardWeek(data,Date.parse('2026-10-01T00:00:00Z'))).toBe(2);
  expect(currentBoardWeek({...board,games:[]})).toBe(1);
 });
+
+import {emptySeasonEvidence,SeasonV7} from '../src/components/season-v7';
+it('renders every Season block with a named shortfall when nothing is loaded',()=>{
+ const {container}=render(<SeasonV7/>);
+ for(const name of ['Convergence','Calibration','What we got right and what we got wrong','Early-season effect','Our numbers'])expect(screen.getByRole('heading',{name})).toBeTruthy();
+ expect(container.textContent).not.toMatch(/unavailable|unavailability/i);
+ expect(container.textContent).toContain('0 games loaded');
+ expect(container.textContent).toContain('Needs at least 1 graded game');
+ expect(container.textContent).toContain('Needs weekly out-of-fold results');
+ expect(container.querySelectorAll('[data-reference]')).toHaveLength(3);
+});
+it('shows a single graded week, counts, rankings, and all five historical curves',()=>{
+ const d=emptySeasonEvidence();d.trust={...d.trust,teams:2,mae:4};d.weeks=[{week:1,scope:'week',engine:d.trust,ours:d.edits.ours}];d.prior_seasons=[2021,2022,2023,2024,2025].flatMap(season=>Array.from({length:18},(_,i)=>({season,week:i+1,mae:8})));d.reference={oof_mae:8,climatology_mae:9,floor:null,floor_status:'uncomputed'};
+ const {container}=render(<SeasonView data={d}/>);
+ expect(container.textContent).not.toMatch(/unavailable|unavailability/i);
+ expect(container.textContent).toContain('1 graded games');expect(container.textContent).toContain('One point');
+ expect(container.textContent).toContain('All five historical seasons shown');
+ expect(container.querySelectorAll('[data-reference]')).toHaveLength(3);
+ expect(container.querySelectorAll('circle').length).toBe(92);
+ expect(screen.getByRole('heading',{name:'Week 1 · This week'})).toBeTruthy();
+});

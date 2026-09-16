@@ -29,3 +29,6 @@ Repository of record: GF4E/NFL-Projection-Lab. Display checkout: ../nfl-board-ma
 - ERROR bands must use each row's issued intervals, translated to residual coordinates, to keep spatial hit status identical to immutable grading; never substitute a later version's widths.
 - Resolved by binding user amendment: the edit label is confidence; muted text is raised until the contrast script passes; the 24px ERROR drawing lane inside a 44px mobile row target is intended, not an exception. See resolution-2026-09-16.md.
 - Reference floor stays explicitly uncomputed until governed E4; no new model fitted for display work.
+
+### Season recovery
+Section 10: `src/server/board-v7.ts` reads the self-contained Season artifact independently of the board's current publication hash; board intervals still require an exact hash match. `src/components/season-v7.tsx` always renders all blocks, with named game-count shortfalls; one graded week is sufficient for a point and coverage tables. Reference gaps remain explicit, never invented. Tests cover loading/missing evidence and a single graded week with all five historical seasons.
