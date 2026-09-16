@@ -1,0 +1,11 @@
+/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_board_v7.py:13: ResourceWarning: unclosed file <_io.TextIOWrapper name='outputs/projection-v3/board.json' mode='r' encoding='UTF-8'>
+  b=json.load(open('outputs/projection-v3/board.json'));e=json.load(open('outputs/board-v7/evidence.json'));self.assertEqual(b['content_sha256'],e['board_sha256']);s=summary(b['games'],e['games']);self.assertEqual(s,e['trust']);self.assertEqual(sum(s['pit']),s['teams'])
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_board_v7.py:13: ResourceWarning: unclosed file <_io.TextIOWrapper name='outputs/board-v7/evidence.json' mode='r' encoding='UTF-8'>
+  b=json.load(open('outputs/projection-v3/board.json'));e=json.load(open('outputs/board-v7/evidence.json'));self.assertEqual(b['content_sha256'],e['board_sha256']);s=summary(b['games'],e['games']);self.assertEqual(s,e['trust']);self.assertEqual(sum(s['pit']),s['teams'])
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.030s
+
+OK

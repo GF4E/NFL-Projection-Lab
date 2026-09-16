@@ -90,7 +90,10 @@ def run(now=None,require_synced_entries=False):
  if old.exists():
   prev=json.loads(old.read_text())
   if {k:v for k,v in prev.items() if k not in ('published_at','content_sha256')}=={k:v for k,v in board.items() if k!='published_at'}:board['published_at']=prev['published_at']
- board['content_sha256']=hashlib.sha256(json.dumps(board,sort_keys=True,separators=(',',':')).encode()).hexdigest();save(old,board);save(OUT/'scorecard.json',scorecards);return board
+ board['content_sha256']=hashlib.sha256(json.dumps(board,sort_keys=True,separators=(',',':')).encode()).hexdigest();save(old,board);save(OUT/'scorecard.json',scorecards)
+ from scripts.board_v7_publish import run as publish_board_evidence
+ publish_board_evidence(board)
+ return board
 if __name__=='__main__':
  if '--sync' in sys.argv:sync()
  b=run(require_synced_entries='--sync' in sys.argv);print(json.dumps({'version':b['version'],'games':len(b['games']),'credits_spent':0}))
