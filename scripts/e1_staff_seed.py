@@ -46,9 +46,12 @@ def run():
                 head_coach_changed=None,preseason_variance_doubled=False,
                 transition_status='UNKNOWN_FALSE_BY_A3',
                 qb1_definition='nflverse REG Week 1 starter ID; previous season Week 1 comparison; missing Week 1 stays unknown'))
+    for record in records:
+        record['preseason_variance_doubled']=record['qb1_changed'] is True
+        record['transition_status']='QB1_CHANGE_COACH_UNKNOWN' if record['qb1_changed'] is True else 'NO_KNOWN_CHANGE_COACH_UNKNOWN'
     result=dict(schema='staff-history-v2',seeded=True,status='PARTIAL_QB_ONLY_COACHING_UNKNOWN',records=records,
                 required_roles=prior['required_roles'],unchanged_inactive_roles=['general_manager','roster'],
-                policy='Data addition only. No live continuity weight enabled. Unknown staff transitions use false flag under A.3.',
+                policy='Data addition only. No live continuity weight enabled. Unknown coaching changes independently read false; known QB1 changes still activate the variance flag.',
                 source_evidence=dict(nflverse_url=url,nflverse_raw_sha256=hashlib.sha256(raw).hexdigest(),sanitized_source_sha256=source_hash,
                                      pfr_probe_urls=['https://www.pro-football-reference.com/teams/rav/2025.htm','https://www.pro-football-reference.com/teams/rav/coaches.htm'],pfr_probe_status=403))
     target.write_text(json.dumps(result,sort_keys=True,indent=2)+'\n')

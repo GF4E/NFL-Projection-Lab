@@ -15,7 +15,8 @@ def sample_weight(rows,season,week,half_life,k):
         if subset and w: selected.extend(dict(r,_w=w/len(subset)) for r in subset)
     return selected
 
-def run():
+def run(calendar_evidence=None, output=None):
+    target_dir=output or OUT
     evidence=json.loads((ROOT/'work/projection-v2/phase-a/features-ref.json').read_text())
     raw=(ROOT/evidence['path']).read_bytes()
     assert hashlib.sha256(raw).hexdigest()==evidence['sha256']
@@ -32,11 +33,25 @@ def run():
             for key in ('home_team','away_team'):item[key]=canonical(item[key])
             item['source_hash']=schedule_ref['sha256'];schedule.append(item)
     stadiums=json.loads((ROOT/'config/stadiums.json').read_text())
+    batches=None
+    if calendar_evidence is not None:
+        from engine.forecast_system.calendar import plan,audit
+        schedule=[g for g in schedule if g['game_type']=='REG' and g['home_score'] not in ('',None)]
+        for g in schedule:
+            g['season']=int(g['season']);g['week']=int(g['week'])
+            g.update({k:calendar_evidence[g['game_id']][k] for k in ('issuance_at','completed_at')})
+        batches=plan(schedule);audit(schedule,batches)
+        built=core_features.build(rows,schedule,stadiums,calendar_batches=batches)
+        controls=[{k:r[k] for k in ('actual_points','features','game_id','home','opponent','row_id','season','team','week')} for r in built]
+        by_cutoff={g['game_id']:b['cutoff'] for b in batches for g in b['forecasts']}
+        for r in controls:
+            r.update({k:calendar_evidence[r['game_id']][k] for k in ('issuance_at','completed_at')})
+            r['state_cutoff']=by_cutoff[r['game_id']]
     data={'linear':controls};original=core_features.weight
     try:
         for k in (4,8):
             core_features.weight=lambda rr,s,w,h,k=k:sample_weight(rr,s,w,h,k)
-            built=core_features.build(rows,schedule,stadiums)
+            built=core_features.build(rows,schedule,stadiums,calendar_batches=batches)
             # E1 modifies strength blending only: expected pace and all other
             # existing core inputs remain at the control's as-of values.
             by={r['row_id']:r for r in built};candidate=[]
@@ -51,7 +66,7 @@ def run():
     actual_drives={(r['game_id'],r['team']):r['drives'] for r in rows}
     for r in data['linear']:r['actual_drives']=actual_drives.get((r['game_id'],r['team']))
     payload=gzip.compress(json.dumps(data,sort_keys=True,allow_nan=False).encode(),mtime=0)
-    target=OUT/'features.json.gz';target.write_bytes(payload)
-    (OUT/'features-ref.json').write_text(json.dumps(dict(path=str(target.relative_to(ROOT)),sha256=hashlib.sha256(payload).hexdigest(),parent=evidence['sha256']),indent=2)+'\n')
+    target=target_dir/'features.json.gz';target.write_bytes(payload)
+    (target_dir/'features-ref.json').write_text(json.dumps(dict(path=str(target.relative_to(ROOT)),sha256=hashlib.sha256(payload).hexdigest(),parent=evidence['sha256']),indent=2)+'\n')
 
 if __name__=='__main__':run()

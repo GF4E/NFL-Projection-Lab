@@ -40,7 +40,8 @@ def paired_games(rows):
         if any(r['actual_points'] is None or r['features']['baseline'] is None for r in (h,a)):continue
         d=(f['drives']+f['opponent_drives'])/2
         result.append(dict(game_id=gid,season=h['season'],week=h['week'],home_index=teams.index(h['team']),away_index=teams.index(a['team']),
-                           drives=np.array([d,d]),offset=np.zeros(2),actual=np.array([h['actual_points'],a['actual_points']])))
+                           drives=np.array([d,d]),offset=np.zeros(2),actual=np.array([h['actual_points'],a['actual_points']]),
+                           issuance_at=h['issuance_at'],completed_at=h['completed_at']))
     return result
 
 def summary(records):
@@ -95,7 +96,7 @@ def run():
             save(f'core-{name}-{year}.json',fitted)
             for row in te:
                 p=ridge_predict(fitted,row['features'])['points']
-                oof[name].append(dict(game_id=row['game_id'],row_id=row['row_id'],season=year,week=row['week'],home=row['home'],team=row['team'],point=p,actual=row['actual_points']))
+                oof[name].append(dict(game_id=row['game_id'],row_id=row['row_id'],season=year,week=row['week'],home=row['home'],team=row['team'],point=p,actual=row['actual_points'],state_cutoff=row['state_cutoff'],issuance_at=row['issuance_at']))
         state_history+=state_rows
         print('E1 fold cached',year,flush=True)
     # Save every forecast before producing any comparative result.
@@ -121,7 +122,7 @@ def run():
                 h,a=pair[True],pair[False];baselines={}
                 for side,row in pair.items():
                     prior=[r['actual_points'] for r in earlier if r['team']==row['team'] and r['season']==year-1]
-                    previous=[r['actual_points'] for r in base if r['team']==row['team'] and (r['season'],r['week'])<(year,row['week']) and r['actual_points'] is not None]
+                    previous=[r['actual_points'] for r in sorted(base,key=lambda r:(r.get('completed_at','9999'),r['row_id'])) if r['team']==row['team'] and r.get('completed_at','9999')<row.get('state_cutoff','0000') and r['actual_points'] is not None]
                     baselines[side]=dict(prior_team=float(np.mean(prior)),persistence=float(np.mean(previous[-4:])))
                 entries=[('team',h['point']+he,h['point'],h['actual'],True),('team',a['point']+ae,a['point'],a['actual'],False),
                          ('margin',h['point']-a['point']+he-ae,h['point']-a['point'],h['actual']-a['actual'],None),

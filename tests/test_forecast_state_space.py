@@ -1,5 +1,14 @@
 import unittest
 import numpy as np
+from datetime import datetime,timedelta,timezone
+
+def dated(games):
+    for game in games:
+        start=datetime(game["season"],9,1,18,tzinfo=timezone.utc)+timedelta(weeks=game["week"]-1)
+        game["issuance_at"]=(start-timedelta(minutes=75)).isoformat()
+        game["completed_at"]=(start+timedelta(hours=4)).isoformat()
+    return games
+
 from engine.forecast_system.state_space import C, constrain, predict, observation, observation_noise, update, stationary, preseason, reference_observations
 
 class ConstrainedStateTests(unittest.TestCase):
@@ -52,7 +61,7 @@ class ConstrainedStateTests(unittest.TestCase):
                 h,a=map(int,order[i:i+2]);drives=np.array([10.,10.])
                 actual=(2.+observation(h,a)@true+rng.normal(0,.04,2))*drives
                 games.append(dict(game_id=f'{week:03}-{i:02}',season=2014,week=week,home_index=h,away_index=a,drives=drives,offset=np.zeros(2),actual=actual))
-        first=replay(games,(.001,.5,.7),0.,2.,{})
+        first=replay(dated(games),(.001,.5,.7),0.,2.,{})
         second=replay(list(reversed(games)),(.001,.5,.7),0.,2.,{})
         self.assertEqual(first[1],second[1])
         self.assertLess(np.sqrt(np.mean((first[2][0]-true)**2)),.08)
@@ -86,7 +95,7 @@ class ConstrainedStateTests(unittest.TestCase):
                 for i in range(0,32,2):
                     h,a=map(int,order[i:i+2]);drives=np.array([10.,10.])
                     games.append(dict(game_id=f'{year}-{week}-{i}',season=year,week=week,home_index=h,away_index=a,drives=drives,offset=np.zeros(2),actual=(2.+observation(h,a)@true+rng.normal(0,.6,2))*drives))
-        a=fit(games,2.,{});b=fit(list(reversed(games)),2.,{})
+        a=fit(dated(games),2.,{});b=fit(list(reversed(games)),2.,{})
         self.assertEqual(a,b)
         triple=(a['q'],a['r'],a['retention'])
         self.assertEqual(replay(games,triple,a['rho'],2.,{})[1],replay(list(reversed(games)),triple,b['rho'],2.,{})[1])
@@ -97,7 +106,7 @@ class ConstrainedStateTests(unittest.TestCase):
         for week in (1,2):
             for home,away in ((0,1),(2,3)):
                 games.append(dict(game_id=f'{week}-{home}',season=2014,week=week,home_index=home,away_index=away,drives=np.array([10.,10.]),offset=np.zeros(2),actual=np.array([20.,20.])))
-        before=replay(games,(.01,2.,.5),.2,2.,{})[1]
+        before=replay(dated(games),(.01,2.,.5),.2,2.,{})[1]
         changed=[dict(g) for g in games];changed[0]['actual']=np.array([70.,0.])
         after=replay(changed,(.01,2.,.5),.2,2.,{})[1]
         self.assertEqual([r['points'] for r in before if r['week']==1],[r['points'] for r in after if r['week']==1])

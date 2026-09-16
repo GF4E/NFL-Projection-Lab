@@ -44,13 +44,43 @@ def distance(a,b):
  lat1,lon1,lat2,lon2=map(math.radians,[a['latitude'],a['longitude'],b['latitude'],b['longitude']]);v=math.sin((lat2-lat1)/2)**2+math.cos(lat1)*math.cos(lat2)*math.sin((lon2-lon1)/2)**2
  return 3958.8*2*math.asin(min(1,math.sqrt(v)))
 
-def build(team_games,schedule,stadiums,half_life=None,extra_hashes=()):
+def build(team_games,schedule,stadiums,half_life=None,extra_hashes=(),calendar_batches=None):
  games=sorted([g for g in schedule if g['game_type']=='REG'],key=lambda g:(int(g['season']),int(g['week']),g['game_id']))
  bygame=defaultdict(list)
  for r in team_games:bygame[r['game_id']].append(r)
  teams=sorted(DIV);history=defaultdict(list);last=defaultdict(list);elo=Elo({t:1505 for t in teams});result=[];groups=defaultdict(list);venues={r['stadium_id']:r for r in stadiums['stadiums']}
  for g in games:groups[(int(g['season']),int(g['week']))].append(g)
- for (season,week),slate in sorted(groups.items()):
+ def assimilate(slate):
+  for g in slate:
+   h,a=g['home_team'],g['away_team'];hs=g.get('home_score');aws=g.get('away_score')
+   if hs in ('',None) or aws in ('',None):continue
+   hs=float(hs);aws=float(aws);f=elo.forecast(h,a,g.get('location')=='Neutral',0.,0.);elo.update(h,a,hs,aws,f)
+   rr=bygame[g['game_id']];op={r['team']:r for r in rr}
+   for r in rr:
+    t=r['team'];pf=hs if t==h else aws;pa=aws if t==h else hs;r=dict(r,points_for=pf,points_against=pa,fg_share=r['fg_points']/pf if pf>0 else None,turnover_margin=op.get(r['opponent'],{}).get('turnovers_lost',0)-r['turnovers_lost'],close_win_rate=float(pf>pa) if abs(pf-pa)<=7 else None);history[t].append(r)
+   last[h].append(g);last[a].append(g)
+ if calendar_batches is None:
+  batches=[dict(season=season,decay_week=week,forecasts=slate,observations=None) for (season,week),slate in sorted(groups.items())]
+ else:
+  from .calendar import timestamp
+  first={}
+  for batch in calendar_batches:
+   for g in batch['forecasts']:first.setdefault(int(g['season']),timestamp(batch['cutoff']))
+  batches=[]
+  for batch in calendar_batches:
+   assimilated=batch['observations']
+   slate=batch['forecasts']
+   if not slate:
+    # Preserve availability events even at cutoffs with no forecasts.
+    batches.append(dict(season=None,decay_week=None,forecasts=[],observations=assimilated));continue
+   season=int(slate[0]['season'])
+   # Calendar distance, not schedule labels, advances the existing linear decay.
+   elapsed=(timestamp(batch['cutoff']).date()-first[season].date()).days//7
+   batches.append(dict(season=season,decay_week=elapsed+1,forecasts=slate,observations=assimilated,cutoff=batch['cutoff']))
+ for batch in batches:
+  if batch['observations'] is not None:assimilate(batch['observations'])
+  season,week,slate=batch['season'],batch['decay_week'],batch['forecasts']
+  if not slate:continue
   weighted={t:weight(history[t],season,week,half_life) for t in teams};allrows=[r for v in weighted.values() for r in v];rated=adjusted(allrows,teams) if allrows else {}
   for t in teams:elo.prepare(t,season)
   for g in slate:
@@ -90,14 +120,7 @@ def build(team_games,schedule,stadiums,half_life=None,extra_hashes=()):
     home_venues=[v for v in last[t] if v['home_team']==t and v.get('location')!='Neutral'];home_venue=venues.get(home_venues[-1].get('stadium_id')) if home_venues else None
     add('travel_miles',0. if t==h and not neutral else distance(home_venue,venue),f'{t} travel from home stadium')
     for k,reason in SLOTS.items():add(k,None,reason,'INACTIVE')
-    score=g.get('home_score') if t==h else g.get('away_score');result.append({'row_id':g['game_id']+':'+t,'game_id':g['game_id'],'team':t,'opponent':o,'home':t==h,'season':season,'week':week,'features':values,'metadata':meta,'actual_points':float(score) if score not in ('',None) else None,'source_hashes':sources,'game':g})
+    score=g.get('home_score') if t==h else g.get('away_score');result.append({'row_id':g['game_id']+':'+t,'game_id':g['game_id'],'team':t,'opponent':o,'home':t==h,'season':season,'week':int(g['week']),'features':values,'metadata':meta,'actual_points':float(score) if score not in ('',None) else None,'source_hashes':sources,'game':g})
    # Elo update is deferred until every game in this week's slate has been forecast.
-  for g in slate:
-   h,a=g['home_team'],g['away_team'];hs=g.get('home_score');aws=g.get('away_score')
-   if hs in ('',None) or aws in ('',None):continue
-   hs=float(hs);aws=float(aws);f=elo.forecast(h,a,g.get('location')=='Neutral',0.,0.);elo.update(h,a,hs,aws,f)
-   rr=bygame[g['game_id']];op={r['team']:r for r in rr}
-   for r in rr:
-    t=r['team'];pf=hs if t==h else aws;pa=aws if t==h else hs;r=dict(r,points_for=pf,points_against=pa,fg_share=r['fg_points']/pf if pf>0 else None,turnover_margin=op.get(r['opponent'],{}).get('turnovers_lost',0)-r['turnovers_lost'],close_win_rate=float(pf>pa) if abs(pf-pa)<=7 else None);history[t].append(r)
-   last[h].append(g);last[a].append(g)
+  if calendar_batches is None:assimilate(slate)
  return [r for r in result if r['season']>=2012]

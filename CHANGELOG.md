@@ -129,3 +129,19 @@ Current-season comparison: 14 AS_ISSUED games, two retrospective games excluded.
 ## 2026-09-16 — E1 week-label replay invalidated by final calendar audit
 
 The numerical rejection above is WITHDRAWN as a valid E1 decision. The final audit found five postponed 2020–2021 games played after the next Tuesday 06:00 PT cutoff, but the replay had assimilated by NFL week label. This is an implementation chronology defect, not evidence to promote or reject a method. The original run and hashes are preserved in work/projection-governance-v2/e1-week-label-run with VALIDITY.json. E1 is blocked on the postponed-game cadence interpretation; no gate or candidate setting is changed, no promotion occurred, and linear remains live. No PFF or other data addition started.
+
+## 2026-09-16 — General assimilation calendar correction; E1 rerun preflight blocked
+
+The binding chronology rule replaces week-label assimilation for every game: the latest scheduled Tuesday 06:00 PT cutoff strictly before the game's own T-75 issuance determines state; only results completed strictly before that cutoff enter it. It applies identically to linear control, k4, k8 and state-space. Two games within an interval share state. Week labels no longer advance availability or the shared calendar decay clock. Candidates, tuning settings and release gates are unchanged; the original preregistration remains byte-identical.
+
+The earlier E1 rejection remains **WITHDRAWN / INVALIDATED**, preserved in `work/projection-governance-v2/e1-week-label-run`. Its cause was ordering assimilation by NFL week rather than each game's issuance and completion chronology. The approved chronology interpretation is now implemented; the remaining blocker is verified historical completion timestamps. The corrected entry point was attempted and failed its full-schedule preflight before fitting. **No first valid E1 result exists yet.** Once the corrected run passes, that result must be recorded as the first valid E1 result, never as a second method experiment.
+
+| Evidence | Before | After |
+|---|---|---|
+| Scored-period calendar audit | Five identified late games | Full 2,639-game schedule inspected; missing verified completion evidence blocks replay |
+| Affected forecasts by season | Not computed | Explicitly unknown until complete timestamp evidence permits dependency comparison |
+| Candidate timing | Week labels | Common strict cutoff for all four candidates; no timing advantage assigned to any candidate |
+| Coaching/QB1 flag | Unknown coaching suppressed known QB1 changes | Unknown coach half false independently; 152 known QB1 changes activate flags |
+| Numerical decision | Invalidated rejection | No replacement numerical result; linear stays live |
+
+Coaching fields remain unknown for all 448 team-seasons; no PFR 403 workaround. QB1 coverage remains 446/448, with 2017 MIA and TB missing. Coordinator sourcing is deferred. No PFF or unrelated data ingestion. Completion source probes and the blocked full-history audit are preserved in `work/projection-governance-v2/e1-calendar-corrected/`; its report distinguishes 304 passing code tests from the failed historical evidence audit. No frozen forecasts, grades or model activation changed.
