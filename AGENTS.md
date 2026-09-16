@@ -108,3 +108,8 @@ Unqualified inputs remain INACTIVE with zero weight/contribution and no substitu
 ## Projection v2 qualification (September 13)
 
 Run the registered protocol in work/projection-v2/PLAN.md on the pinned v1 football data. Optional groups require prior-season usefulness and refitted conditional ablation checks; unavailable histories remain inactive. Historical interval scoring uses strictly earlier out-of-fold errors. The first fold has no interval score. Keep statistical development evidence distinct from a new untouched holdout and from as-issued results. V2 future cards use scripts/projection_v2_publish.py; original v1 locked/final/retrospective projections, explanations and first grades are retained. Accuracy remains separated by version. Football WHY states measured offensive/defensive production and retained grouped contributions, with separate strongest counterevidence; never invent or pad reasons. The protocol changes no frozen prior experiment or betting gate.
+
+
+## Experiment decision latency (September 16 supersession)
+
+Apply work/projection-governance-v2/DECISION-LATENCY.md to registered projection experiments. Read the full specification and publish a hashed tiered gap sweep before implementation. Decide/proceed on Tier 1, decide/proceed with REVIEW REQUESTED and alternative on Tier 2, and batch all currently visible Tier 3 stops with recommendations. Unknown data is never invented; a data blocker pauses dependent fitting, not unrelated authorized implementation.

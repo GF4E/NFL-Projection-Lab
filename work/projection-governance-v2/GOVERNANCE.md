@@ -54,3 +54,7 @@ Glickman and Stern 1998 (state-space team strength). Cawley and Talbot 2010 (sel
 ## 7. Report format
 
 Per experiment: the Week 2 prompt section 9 deliverables in full, plus the standing additions in section 2 items 7 and 8 here, plus one line naming the requirement you were least sure of and what you changed because of it.
+
+## 8. Binding decision-latency amendment (2026-09-16)
+
+DECISION-LATENCY.md governs handling of undefined conventions: resolve Tier 1 and Tier 2 locally before implementation, publish a tiered preregistration sweep, flag Tier 2 for nonblocking review, and batch only Tier 3 blockers. Existing registered model choices and gates remain fixed.

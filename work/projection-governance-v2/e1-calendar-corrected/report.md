@@ -1,3 +1,5 @@
+**REVIEW REQUESTED (nonblocking):** C06 calendar decay clock, C11 reference schedule, C12 preseason covariance, and C25 completion evidence representation. Decisions and untested alternatives are in [the preregistration addendum](PREREGISTRATION-ADDENDUM.md). Work proceeds on all Tier 1/2 items; B01 alone blocks the dependent comparison.
+
 # E1 calendar correction — implementation tested; historical replay blocked
 
 The general chronology rule is implemented for the control and all three challengers: take the latest Tuesday 06:00 America/Los_Angeles cutoff strictly before each game's own T-75 issuance; assimilate only games completed strictly before that cutoff. Week labels never determine result availability. Two games inside one interval share a frozen state. DST is handled in the named time zone. This applies equally to rescheduled, flexed, Saturday, Tuesday and international games.
