@@ -22,3 +22,7 @@ body{background:var(--v7-ground)!important;color:var(--v7-text)!important}.v7{ba
 .v7-error-label{top:-8px;transform:translateX(-50%);margin:0;font-size:10px}
 .v7-detail svg{max-width:100%}
 @media(max-width:639px){.v7-projected,.v7-observed{font-size:14px;top:2px}.v7-band.level-80{top:10px}.v7-band.level-50{top:8px}.v7-error-label{top:-4px;font-size:10px}}
+
+/* Keep near-hit score labels apart without moving either data marker. */
+.v7-projected.v7-near-left{transform:translateX(-100%);margin-left:-8px}
+.v7-observed.v7-near-right{transform:none;margin-left:8px}
