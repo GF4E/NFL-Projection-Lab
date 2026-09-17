@@ -9,12 +9,12 @@ def qualified(g):
 def metadata(g,shapes):
  if not g.get('projection'):return {'qualified_lock':False,'teams':{}}
  roof=(g.get('forecast') or {}).get('roof') or g.get('learning_features',{}).get('home',{}).get('game',{}).get('roof')
- out={'outdoors':None if roof is None else str(roof).lower() in ('outdoors','open'),'qualified_lock':qualified(g),'distribution_hash':shapes['team_points']['sha256'],'teams':{}}
+ out={'outdoors':None if roof is None else str(roof).lower() in ('outdoors','open'),'qualified_lock':qualified(g),'distribution_hash':shapes['team_points']['sha256'],'interval_kind':'single-game predictive','spread_model':'constant_within_issuing_version','teams':{}}
  for side in ('away','home'):
   expected=g['projection'][side+'_points'];mass=pmf(shapes['team_points'],expected)
   bands={str(level):[quantile(mass,(1-level/100)/2),quantile(mass,1-(1-level/100)/2)] for level in (50,80)}
   actual=g.get('final',{}).get(side+'_points') if qualified(g) else None
-  out['teams'][side]={'expected':expected,'actual':actual,'intervals':bands,'error':None if actual is None else actual-expected,'hits':{k:None if actual is None else lo<=actual<=hi for k,(lo,hi) in bands.items()},'pit':None if actual is None else sum(p for x,p in mass.items() if x<actual)+sum(p for x,p in mass.items() if x==actual)/2}
+  out['teams'][side]={'quantile_dots':[{'value':quantile(mass,(i+.5)/10),'mass':.1,'probability_lo':i/10,'probability_hi':(i+1)/10} for i in range(10)],'expected':expected,'actual':actual,'intervals':bands,'error':None if actual is None else actual-expected,'hits':{k:None if actual is None else lo<=actual<=hi for k,(lo,hi) in bands.items()},'pit':None if actual is None else sum(p for x,p in mass.items() if x<actual)+sum(p for x,p in mass.items() if x==actual)/2}
  return out
 
 def summary(games,meta,source='PROJECTION'):

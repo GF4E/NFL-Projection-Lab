@@ -1,0 +1,31 @@
+{
+  "primary": "mean team-points CRPS",
+  "gate": {
+    "a_joint": {
+      "CRPS_improvement": 0.0015186128341476701,
+      "coverage_pass": true,
+      "winkler_pass": false,
+      "point_invariance_pass": true,
+      "pass": false
+    },
+    "b_hetero": {
+      "CRPS_improvement": -0.05341036768559415,
+      "coverage_pass": false,
+      "winkler_pass": false,
+      "point_invariance_pass": true,
+      "pass": false
+    },
+    "c_joint_hetero": {
+      "CRPS_improvement": -0.0556607591008742,
+      "coverage_pass": false,
+      "winkler_pass": false,
+      "point_invariance_pass": true,
+      "pass": false
+    }
+  },
+  "decision": "RETAIN_CONTROL",
+  "max_point_difference": 0,
+  "games": 2639,
+  "elapsed_seconds": 7.082563208998181,
+  "peak_memory_unit": "one worker; arrays under 4 GiB"
+}

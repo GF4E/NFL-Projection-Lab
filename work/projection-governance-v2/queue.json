@@ -35,16 +35,22 @@
     },
     {
       "id": "E-UNC",
-      "state": "REGISTERED",
+      "state": "CLOSED_REJECTED",
       "registration": "work/e-unc/registration.json",
       "registration_sha256": "cc426270c4270bc5343f9d00628d538db2c7b0eb88afcfb867c7eb3f500a20e1",
       "clock": {
         "started_at": "2026-09-17T00:00:03.221560+00:00",
         "deadline_at": "2026-09-22T06:00:00-07:00",
-        "queue_block_count": 0
+        "queue_block_count": 0,
+        "status": "SATISFIED_GATE_DECISION"
       },
       "primary_override": "team CRPS for E-UNC only; MAE restored next experiment",
-      "authority": "User amendment: hash then fit now"
+      "authority": "User amendment: hash then fit now",
+      "decision": "RETAIN_CONTROL",
+      "report": "work/e-unc/REPORT.md",
+      "partial_test": true,
+      "secondary": "DATA_BLOCKED_NO_TIMESTAMP_QUALIFIED_WIND",
+      "future_return_requires": "Qualified inactive pregame fields and new preregistration"
     },
     {
       "baseline": "Retained linear control after first valid E1; E2 requires separate Week 3 preregistration",

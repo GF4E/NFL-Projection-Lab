@@ -224,3 +224,17 @@ Effective 2026-09-16T22:29:05Z: each preregistered experiment has until the foll
 ## PRIORITY — E1 gate checkpoint (2026-09-16)
 
 Reverified the first valid E1 result receipt, all referenced artifact hashes, and independent PASS audit before any further board work. E1 has reported: NO_CHALLENGER_CLEARS_GATE; retain linear. Blocker: none; Tier 3: no. PFF may be a separate data addition, but E-PFF and PFF fit admission cannot precede E1's report; neither is started here. See work/projection-governance-v2/E1-PRIORITY-CHECKPOINT.md.
+
+## 2026-09-16 — E-UNC registered, evaluated, retained control
+
+User-approved exception: team-points CRPS primary for E-UNC only; next experiment returns to team MAE. Registration SHA256 cc426270c4270bc5343f9d00628d538db2c7b0eb88afcfb867c7eb3f500a20e1. No candidate moves any point forecast on 2,639 games. Reduced heteroscedastic candidates are PARTIAL TESTS, not a rejection of the general hypothesis. Full before/after tables: work/e-unc/REPORT.md and scores.json. No promotion or fit activated.
+
+|Candidate|Before team CRPS|After team CRPS|Team MAE unchanged|Decision|
+|---|---:|---:|---:|---|
+|a_joint|5.359013|5.350874|7.571625|REJECTED|
+|b_hetero|5.359013|5.645239|7.571625|REJECTED|
+|c_joint_hetero|5.359013|5.657299|7.571625|REJECTED|
+
+CONVENTIONS: GAP-SWEEP.md records Tier 1 central predictive quantiles, paired-game dependence, tie semantics, CRPS/Winkler arithmetic and ten equal probability strata (Wilke chapter 16; Gneiting/Raftery 2007; existing distribution.py). Tier 2 model/diagnostic alternatives remain review-requested. Both Tier 3 amendments resolved by user before final hash. Secondary wind study remains data-blocked: documented archive begins around 2022; stored stitched rows lack pre-issuance timestamps. No reanalysis substituted, no primary game dropped.
+
+Display-only evidence adds issuing-distribution quantile dots and explicit constant-width/predictive labels. Original forecasts, grades and score point values remain unchanged.

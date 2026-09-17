@@ -23,3 +23,32 @@ class Uncertainty(unittest.TestCase):
   self.assertAlmostEqual(sum(d['mass'] for d in dots),1)
   for a,b in zip(dots,dots[1:]):self.assertEqual(a['probability_hi'],b['probability_lo'])
 if __name__=='__main__':unittest.main()
+
+class FullReplayContract(unittest.TestCase):
+ def test_every_candidate_preserves_every_point_and_population(self):
+  import gzip,json
+  from pathlib import Path
+  p=Path('work/e-unc/scored-games.json.gz')
+  self.assertTrue(p.exists(),'Run registered replay before contract test')
+  data=json.loads(gzip.decompress(p.read_bytes()))
+  key=lambda r:(r['game_id'],r['target'],r['side'])
+  control={key(r):r for r in data['control']}
+  for name,rows in data.items():
+   self.assertEqual(set(control),{key(r) for r in rows})
+   for r in rows:self.assertAlmostEqual(r['point'],control[key(r)]['point'],places=12)
+   self.assertEqual(sum(abs(r['actual']-r['point']) for r in rows),sum(abs(r['actual']-r['point']) for r in data['control']))
+ def test_heteroscedastic_widths_vary_in_each_fold(self):
+  import json
+  from pathlib import Path
+  fits=json.loads(Path('work/e-unc/fits.json').read_text())
+  for f in fits:
+   if f['season']>=2016:
+    self.assertLess(f['scale_min'],f['scale_max'])
+    self.assertLess(f['trained_through'],f['season'])
+ def test_row_order_does_not_change_distribution_or_scores(self):
+  pairs=[(10,20),(30,35),(25,17)]
+  a=joint_targets(pairs);b=joint_targets(list(reversed(pairs)))
+  for t in ('home','away','margin','total'):
+   self.assertEqual(crps(a[t],12),crps(b[t],12))
+   self.assertEqual(quantile_dots(a[t]),quantile_dots(b[t]))
+  self.assertEqual(a['home_win_probability'],b['home_win_probability'])
