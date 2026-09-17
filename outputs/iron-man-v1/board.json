@@ -1182,13 +1182,13 @@
         "window": "2016\u20132025 REG"
       },
       "context": {
-        "capture_label": "EARLY",
-        "capture_source_hash": "35970d2cee1436893c4840955b6bd3cdb1d2fb35976062ccc14d9d9b7d9af043",
-        "captured_at": "2026-09-14T16:00:13.037681+00:00",
+        "capture_label": "T80",
+        "capture_source_hash": "0529864efe562dcc8e7b76c1a16bd63eec7988af7bc8de3e840c70b5fff297c5",
+        "captured_at": "2026-09-17T22:55:17.779164+00:00",
         "consensus": {
           "spreads": {
             "full": {
-              "center": 4.0,
+              "center": 6.0,
               "contributors": [
                 "betmgm",
                 "draftkings",
@@ -1198,12 +1198,12 @@
               "coverage": 3,
               "excluded_book": null,
               "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-              "pinnacle_center": 4,
-              "retail_median": 4
+              "pinnacle_center": 6,
+              "retail_median": 6
             },
             "leave_one_out": {
               "betmgm": {
-                "center": 4.25,
+                "center": 6.0,
                 "contributors": [
                   "draftkings",
                   "fanduel",
@@ -1212,11 +1212,11 @@
                 "coverage": 2,
                 "excluded_book": "betmgm",
                 "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-                "pinnacle_center": 4,
-                "retail_median": 4.5
+                "pinnacle_center": 6,
+                "retail_median": 6.0
               },
               "draftkings": {
-                "center": 4.25,
+                "center": 6.0,
                 "contributors": [
                   "betmgm",
                   "fanduel",
@@ -1225,11 +1225,11 @@
                 "coverage": 2,
                 "excluded_book": "draftkings",
                 "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-                "pinnacle_center": 4,
-                "retail_median": 4.5
+                "pinnacle_center": 6,
+                "retail_median": 6.0
               },
               "fanduel": {
-                "center": 4.0,
+                "center": 6.0,
                 "contributors": [
                   "betmgm",
                   "draftkings",
@@ -1238,11 +1238,11 @@
                 "coverage": 2,
                 "excluded_book": "fanduel",
                 "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-                "pinnacle_center": 4,
-                "retail_median": 4.0
+                "pinnacle_center": 6,
+                "retail_median": 6.0
               },
               "williamhill_us": {
-                "center": 4.0,
+                "center": 6.0,
                 "contributors": [
                   "betmgm",
                   "draftkings",
@@ -1252,14 +1252,14 @@
                 "coverage": 3,
                 "excluded_book": "williamhill_us",
                 "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-                "pinnacle_center": 4,
-                "retail_median": 4
+                "pinnacle_center": 6,
+                "retail_median": 6
               }
             }
           },
           "totals": {
             "full": {
-              "center": 53.5,
+              "center": 55.5,
               "contributors": [
                 "betmgm",
                 "draftkings",
@@ -1269,12 +1269,12 @@
               "coverage": 3,
               "excluded_book": null,
               "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-              "pinnacle_center": 53,
-              "retail_median": 54
+              "pinnacle_center": 55,
+              "retail_median": 56
             },
             "leave_one_out": {
               "betmgm": {
-                "center": 53.75,
+                "center": 55.5,
                 "contributors": [
                   "draftkings",
                   "fanduel",
@@ -1283,11 +1283,11 @@
                 "coverage": 2,
                 "excluded_book": "betmgm",
                 "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-                "pinnacle_center": 53,
-                "retail_median": 54.5
+                "pinnacle_center": 55,
+                "retail_median": 56.0
               },
               "draftkings": {
-                "center": 53.75,
+                "center": 55.25,
                 "contributors": [
                   "betmgm",
                   "fanduel",
@@ -1296,11 +1296,11 @@
                 "coverage": 2,
                 "excluded_book": "draftkings",
                 "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-                "pinnacle_center": 53,
-                "retail_median": 54.5
+                "pinnacle_center": 55,
+                "retail_median": 55.5
               },
               "fanduel": {
-                "center": 53.5,
+                "center": 55.25,
                 "contributors": [
                   "betmgm",
                   "draftkings",
@@ -1309,11 +1309,11 @@
                 "coverage": 2,
                 "excluded_book": "fanduel",
                 "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-                "pinnacle_center": 53,
-                "retail_median": 54.0
+                "pinnacle_center": 55,
+                "retail_median": 55.5
               },
               "williamhill_us": {
-                "center": 53.5,
+                "center": 55.5,
                 "contributors": [
                   "betmgm",
                   "draftkings",
@@ -1323,8 +1323,8 @@
                 "coverage": 3,
                 "excluded_book": "williamhill_us",
                 "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-                "pinnacle_center": 53,
-                "retail_median": 54
+                "pinnacle_center": 55,
+                "retail_median": 56
               }
             }
           }
@@ -1351,86 +1351,86 @@
         "offers": [
           {
             "book": "draftkings",
-            "line": -3.5,
+            "line": -5.5,
             "market": "spreads",
-            "price": -115.0,
+            "price": -108.0,
             "side": "Buffalo Bills"
           },
           {
             "book": "draftkings",
-            "line": 3.5,
-            "market": "spreads",
-            "price": -105.0,
-            "side": "Detroit Lions"
-          },
-          {
-            "book": "draftkings",
-            "line": 53.5,
-            "market": "totals",
-            "price": -110.0,
-            "side": "Over"
-          },
-          {
-            "book": "draftkings",
-            "line": 53.5,
-            "market": "totals",
-            "price": -110.0,
-            "side": "Under"
-          },
-          {
-            "book": "fanduel",
-            "line": -4.5,
-            "market": "spreads",
-            "price": -105.0,
-            "side": "Buffalo Bills"
-          },
-          {
-            "book": "fanduel",
-            "line": 4.5,
-            "market": "spreads",
-            "price": -115.0,
-            "side": "Detroit Lions"
-          },
-          {
-            "book": "fanduel",
-            "line": 53.5,
-            "market": "totals",
-            "price": -115.0,
-            "side": "Over"
-          },
-          {
-            "book": "fanduel",
-            "line": 53.5,
-            "market": "totals",
-            "price": -105.0,
-            "side": "Under"
-          },
-          {
-            "book": "betmgm",
-            "line": -4.0,
+            "line": 5.5,
             "market": "spreads",
             "price": -112.0,
+            "side": "Detroit Lions"
+          },
+          {
+            "book": "draftkings",
+            "line": 54.5,
+            "market": "totals",
+            "price": -118.0,
+            "side": "Over"
+          },
+          {
+            "book": "draftkings",
+            "line": 54.5,
+            "market": "totals",
+            "price": -102.0,
+            "side": "Under"
+          },
+          {
+            "book": "fanduel",
+            "line": -5.5,
+            "market": "spreads",
+            "price": -105.0,
+            "side": "Buffalo Bills"
+          },
+          {
+            "book": "fanduel",
+            "line": 5.5,
+            "market": "spreads",
+            "price": -115.0,
+            "side": "Detroit Lions"
+          },
+          {
+            "book": "fanduel",
+            "line": 54.5,
+            "market": "totals",
+            "price": -115.0,
+            "side": "Over"
+          },
+          {
+            "book": "fanduel",
+            "line": 54.5,
+            "market": "totals",
+            "price": -105.0,
+            "side": "Under"
+          },
+          {
+            "book": "betmgm",
+            "line": -5.5,
+            "market": "spreads",
+            "price": -105.0,
             "side": "Buffalo Bills"
           },
           {
             "book": "betmgm",
-            "line": 4.0,
+            "line": 5.5,
             "market": "spreads",
-            "price": -108.0,
+            "price": -105.0,
             "side": "Detroit Lions"
           },
           {
             "book": "betmgm",
-            "line": 53.5,
+            "line": 55.0,
             "market": "totals",
             "price": -110.0,
             "side": "Over"
           },
           {
             "book": "betmgm",
-            "line": 53.5,
+            "line": 55.0,
             "market": "totals",
-            "price": -108.0,
+            "price": -118.0,
             "side": "Under"
           }
         ]
@@ -1457,7 +1457,7 @@
       },
       "locks": [],
       "no_autonomous_picks": true,
-      "outside_view": "Market: BUF by 4, total 53.5.",
+      "outside_view": "Market: BUF by 6, total 55.5.",
       "sheet_status": "CURRENT",
       "teams": {
         "BUF": {
