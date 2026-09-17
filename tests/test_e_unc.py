@@ -52,3 +52,27 @@ class FullReplayContract(unittest.TestCase):
    self.assertEqual(crps(a[t],12),crps(b[t],12))
    self.assertEqual(quantile_dots(a[t]),quantile_dots(b[t]))
   self.assertEqual(a['home_win_probability'],b['home_win_probability'])
+
+class SecondaryAndIntervals(unittest.TestCase):
+ def test_predictive_fixture_contains_parameter_and_game_noise(self):
+  from engine.uncertainty import quantile
+  samples=[p+e for p in (-2,2) for e in (-3,3)]
+  self.assertEqual(sum(x*x for x in samples)/len(samples),13)
+  self.assertEqual((quantile(samples,.1),quantile(samples,.9)),(-5,5))
+  self.assertEqual(predictive_variance([-2,2],9)['predictive'],13)
+ def test_secondary_is_chronological_and_points_are_paired(self):
+  import json,gzip,datetime
+  from pathlib import Path
+  data=json.loads(Path('work/e-unc/qualified-wind.json').read_text())
+  calendar={g['game_id']:g for g in json.loads(Path('work/projection-governance-v2/e1-calendar-corrected/calendar-games.json').read_text())}
+  for r in data['rows']:
+   if r['status']=='QUALIFIED_PREVIOUS_DAY1':
+    self.assertLess(datetime.datetime.fromisoformat(r['forecast_asof_utc']),datetime.datetime.fromisoformat(calendar[r['game_id']]['issuance_at']))
+  results=json.loads(gzip.decompress(Path('work/e-unc/secondary-games.json.gz').read_bytes()))
+  key=lambda r:(r['game_id'],r['target'],r['side'])
+  a={key(r):r for r in results['b_matched']};b={key(r):r for r in results['b_plus_wind']}
+  self.assertEqual(set(a),set(b))
+  for k in a:self.assertEqual(a[k]['point'],b[k]['point'])
+  report=json.loads(Path('work/e-unc/secondary.json').read_text())
+  self.assertFalse(report['primary_gate_affected'])
+  self.assertEqual(report['year_coverage']['2024']['status'],'WARMUP')

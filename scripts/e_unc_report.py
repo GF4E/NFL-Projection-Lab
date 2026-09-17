@@ -43,12 +43,15 @@ def main():
   gids={r['game_id'] for r in base if r['season']==y};available=sum(r['game_id'] in gids for r in wind)
   coverage.append({'season':y,'games':len(gids),'week_and_games_played_and_roof':len(gids),'confirmed_starter_qualified':0,'coach_change_timing_qualified':0,'wind_stitched_rows':available,'wind_pregame_timestamp_qualified':0,'primary_inactive':['confirmed starter','coach/QB change timing','forecast wind']})
  (OUT/'availability.json').write_text(json.dumps(coverage,indent=2)+'\n')
- (OUT/'secondary.json').write_text(json.dumps({'label':'SECONDARY — NOT GATED','period':[2021,2025],'status':'NOT_RUN_NO_TIMESTAMP_QUALIFIED_WIND','source':windref,'reason':'2021 outside documented archive; 2022–2025 stored stitched forecasts lack pre-issuance timestamps. No reanalysis, imputation or tuning. Primary results unaffected.','coverage':[r for r in coverage if r['season']>=2021]},indent=2)+'\n')
+ secondary_path=OUT/'secondary.json'
+ secondary_ready=secondary_path.exists() and json.loads(secondary_path.read_text()).get('status','').startswith('SCORED')
+ if not secondary_ready:
+  (OUT/'secondary.json').write_text(json.dumps({'label':'SECONDARY — NOT GATED','period':[2021,2025],'status':'NOT_RUN_NO_TIMESTAMP_QUALIFIED_WIND','source':windref,'reason':'2021 outside documented archive; 2022–2025 stored stitched forecasts lack pre-issuance timestamps. No reanalysis, imputation or tuning. Primary results unaffected.','coverage':[r for r in coverage if r['season']>=2021]},indent=2)+'\n')
  audit=json.loads((OUT/'audit.json').read_text());var=json.loads((OUT/'variance.json').read_text())
  lines=['# E-UNC review packet','',
  'REVIEW REQUESTED: empirical paired ensemble rather than Gaussian copula; log-absolute-error scale rather than log variance; conditional ridge sandwich rather than full-pipeline bootstrap; interval-score non-worsening tested per target. Details: GAP-SWEEP.md.',
  '', '## Decision', 'RETAIN CONTROL. No challenger passes. Candidate b and c are PARTIAL TESTS; rejection applies only to the reduced feature set. The richer heteroscedastic question returns after inactive histories qualify. Primary objective reverts to team MAE for the next experiment.',
- '', 'Secondary wind analysis is NOT RUN: no stored wind history proves pre-issuance timing; 2021 is outside the documented archive. This is an explicit unfinished data-dependent requirement, not a null wind result. See secondary.json.',
+ '', 'Secondary wind analysis: see SECONDARY-REPORT.md. New fixed-lead Previous Runs forecasts support 2024 training and 2025 testing (272 games each); 2021–2023 remain unscored because qualified GFS wind history is absent. Adding wind worsened CRPS by about 0.12%; it never enters the gate. This is a disclosed partial-period result, not a complete 2021–2025 study.',
  '', '## Audit before model changes',
  '50/80 bands are predictive empirical residual quantiles for a single game, not confidence intervals for a fitted mean. engine/projection/distribution.py::residual_distribution, pmf, quantile, summarize rounds residuals and centers for discrete PMFs. engine/board_v7.py::metadata builds team bands from the issuing version’s pooled team residual PMF; scripts/projection_v3_publish.py::shape_for pins that fit.',
  'Margin and total residuals are formed from home/away errors of the SAME GAME in engine/projection_v2/qualify.py::residuals; summarize uses those PMFs directly. No independent combination defect was found. Winner probability is positive-margin mass plus half tie mass. This semantics is retained and labeled.',
@@ -71,7 +74,7 @@ def main():
  '', '## Evidence and limits','scores.json contains every season/week coverage, width, Winkler, CRPS, PIT, spread-skill, ten-bin reliability, Brier and score dispersion. scored-games.json.gz retains all per-game values. fits.json reports the five scale coefficients, games per parameter and spread range per fold. a has zero fitted scale coefficients; b/c have five. The empirical calibration distributions and estimated dependence are also reported, not counted as searched hyperparameters.',
  '![PIT](pit.png)','![Spread skill](spread-skill.png)','![Reliability](reliability.png)',
  '', 'Least sure: separating physical irreducible variance from model error. Changed the report to label the residual estimate as noise PLUS discrepancy instead of asserting an identified irreducible floor.',
- '','Credits spent: 0. No automatic method promotion. Secondary wind requirement remains data-blocked.']
+ '','Credits spent: 0. No automatic method promotion. Secondary wind requirement is completed on the qualified 2024–2025 subset; full 2021–2025 coverage remains a data gap.']
  (OUT/'REPORT.md').write_text('\n'.join(lines)+'\n')
  print('Report built; no refit')
 if __name__=='__main__':main()

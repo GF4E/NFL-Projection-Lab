@@ -240,3 +240,7 @@ CONVENTIONS: GAP-SWEEP.md records Tier 1 central predictive quantiles, paired-ga
 Display-only evidence adds issuing-distribution quantile dots and explicit constant-width/predictive labels. Original forecasts, grades and score point values remain unchanged.
 
 E-UNC audit source correction: the first correlation diagnostic used the older adaptive reference artifact. Preserved as audit-initial-adaptive-reference.json. The final audit uses the retained linear control's calendar-corrected OOF forecasts, matching the evaluated incumbent; rho is 0.039750. No candidate, fit, comparison, gate or preregistration changed.
+
+## E-UNC secondary wind follow-through
+
+The initial local-history blocker was partially resolved by retrieving fixed 24-hour-lead Previous Runs forecasts. Before secondary fitting, SECONDARY-ADDENDUM.md and secondary-registration.json fixed source, model, matched training/test population and no tuning. 544 qualified game records: 272 training (2024), 272 test (2025). 2021–2023 unscored because documented GFS wind archive coverage is absent. b+wind worsened team CRPS by 0.1231%; not gated and no primary decision change. Full tables and diagrams in work/e-unc/SECONDARY-REPORT.md and secondary.json. Source responses are cached and hashed. No paid credits; no reanalysis. This supersedes the initial NOT_RUN secondary status while preserving that history in Git.

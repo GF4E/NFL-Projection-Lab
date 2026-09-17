@@ -5,7 +5,7 @@ REVIEW REQUESTED: empirical paired ensemble rather than Gaussian copula; log-abs
 ## Decision
 RETAIN CONTROL. No challenger passes. Candidate b and c are PARTIAL TESTS; rejection applies only to the reduced feature set. The richer heteroscedastic question returns after inactive histories qualify. Primary objective reverts to team MAE for the next experiment.
 
-Secondary wind analysis is NOT RUN: no stored wind history proves pre-issuance timing; 2021 is outside the documented archive. This is an explicit unfinished data-dependent requirement, not a null wind result. See secondary.json.
+Secondary wind analysis: see SECONDARY-REPORT.md. New fixed-lead Previous Runs forecasts support 2024 training and 2025 testing (272 games each); 2021–2023 remain unscored because qualified GFS wind history is absent. Adding wind worsened CRPS by about 0.12%; it never enters the gate. This is a disclosed partial-period result, not a complete 2021–2025 study.
 
 ## Audit before model changes
 50/80 bands are predictive empirical residual quantiles for a single game, not confidence intervals for a fitted mean. engine/projection/distribution.py::residual_distribution, pmf, quantile, summarize rounds residuals and centers for discrete PMFs. engine/board_v7.py::metadata builds team bands from the issuing version’s pooled team residual PMF; scripts/projection_v3_publish.py::shape_for pins that fit.
@@ -198,4 +198,4 @@ scores.json contains every season/week coverage, width, Winkler, CRPS, PIT, spre
 
 Least sure: separating physical irreducible variance from model error. Changed the report to label the residual estimate as noise PLUS discrepancy instead of asserting an identified irreducible floor.
 
-Credits spent: 0. No automatic method promotion. Secondary wind requirement remains data-blocked.
+Credits spent: 0. No automatic method promotion. Secondary wind requirement is completed on the qualified 2024–2025 subset; full 2021–2025 coverage remains a data gap.
