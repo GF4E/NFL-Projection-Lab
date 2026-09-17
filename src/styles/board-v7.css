@@ -7,3 +7,18 @@ body{background:var(--v7-ground)!important;color:var(--v7-text)!important}.v7{ba
 @media(max-width:639px){.v7-error .v7-row{grid-template-columns:minmax(0,1fr);grid-template-rows:20px 24px;gap:0}.v7-error .v7-axis-head{padding-left:0}.v7-error .v7-scale{margin:0 8px}}
 
 ::view-transition-old(root),::view-transition-new(root){animation-duration:200ms}
+
+/* E-UNC: graded predictive intervals without caps. */
+.v7-interval-legend{flex-basis:100%;margin:0;font:12px ui-monospace,monospace;color:var(--v7-secondary)}
+.v7-uncertainty-legend{font:12px Arial,sans-serif;color:var(--v7-secondary);margin:8px 0}
+.v7-uncertainty-legend p{margin:4px 0}
+.v7-band.level-80,.v7-error-band.level-80{height:1px;top:11px;opacity:1;border-radius:0}
+.v7-band.level-50{height:4px;top:9px;opacity:.7;border-radius:0}
+.v7-error-band.level-80{top:6px}
+.v7-error-band.level-50{height:4px;top:4px;opacity:.7;border-radius:0}
+.v7-projected,.v7-observed{font:16px ui-monospace,monospace;position:absolute;top:0;margin-left:8px;color:var(--v7-text)}
+.v7-projected{font-style:normal}
+.v7-observed{font-style:italic;transform:translateX(-100%);margin-left:-8px}
+.v7-error-label{top:-8px;transform:translateX(-50%);margin:0;font-size:10px}
+.v7-detail svg{max-width:100%}
+@media(max-width:639px){.v7-projected,.v7-observed{font-size:14px;top:2px}.v7-band.level-80{top:10px}.v7-band.level-50{top:8px}.v7-error-label{top:-4px;font-size:10px}}

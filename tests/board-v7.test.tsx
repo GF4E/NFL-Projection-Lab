@@ -51,3 +51,24 @@ it('shows a single graded week, counts, rankings, and all five historical curves
  expect(container.querySelectorAll('circle').length).toBe(92);
  expect(screen.getByRole('heading',{name:'Week 1 · This week'})).toBeTruthy();
 });
+
+it('labels graded predictive bars and states constant widths for the retained model',()=>{
+ const {container}=render(<BoardView board={board} evidence={ev}/>);
+ expect(screen.getByText('bars show 50% and 80% predictive intervals for a single game')).toBeTruthy();
+ expect(screen.getByText('overlap between the two bars does not determine the winner probability')).toBeTruthy();
+ expect(container.textContent).toContain('constant within each issuing model version');
+ for(const band of container.querySelectorAll('[data-band]')){
+  expect(band.getAttribute('aria-label')).toMatch(/(50|80)%.*predictive interval/);
+  expect(band.getAttribute('aria-label')).toContain('team points');
+ }
+ fireEvent.click(screen.getByRole('button',{name:'ERROR',exact:true}));
+ for(const band of container.querySelectorAll('[data-band]'))expect(band.getAttribute('aria-label')).toMatch(/(50|80)%.*predictive interval/);
+});
+import {QuantileDots} from '../src/components/board-v7';
+it('draws exactly ten dots from each issuing team distribution',()=>{
+ const dots=Array.from({length:10},(_,i)=>({value:10+i,mass:.1,probability_lo:i/10,probability_hi:(i+1)/10}));
+ const detail={...e,teams:{away:{...e.teams.away!,quantile_dots:dots},home:{...e.teams.home!,quantile_dots:dots}}};
+ const {container}=render(<QuantileDots g={game} e={detail}/>);
+ expect(container.querySelectorAll('[data-quantile-dot]')).toHaveLength(20);
+ expect(container.textContent).not.toMatch(/\d+\.\d+/);
+});

@@ -1,7 +1,7 @@
 import type {ProjectionCardData} from './projection';
 export type Bands=Record<'50'|'80',[number,number]>;
-export type TeamEvidence={expected:number;actual:number|null;intervals:Bands;error:number|null;hits:Record<'50'|'80',boolean|null>;pit:number|null};
-export type GameEvidence={outdoors?:boolean|null;qualified_lock:boolean;distribution_hash?:string;teams:Partial<Record<'away'|'home',TeamEvidence>>};
+export type TeamEvidence={quantile_dots?:{value:number;mass:number;probability_lo:number;probability_hi:number}[];expected:number;actual:number|null;intervals:Bands;error:number|null;hits:Record<'50'|'80',boolean|null>;pit:number|null};
+export type GameEvidence={interval_kind?:string;spread_model?:string;outdoors?:boolean|null;qualified_lock:boolean;distribution_hash?:string;teams:Partial<Record<'away'|'home',TeamEvidence>>};
 export type Summary={teams:number;mae:number|null;inside80:number;eligible80:number;coverage:Record<'margin'|'total',Record<'50'|'80',{hit:number;n:number;rate:number|null}>>;pit:number[]};
 export type Ranked={game_id:string;team:string;expected:number;actual:number;error:number;contributions:ProjectionCardData['contributions']['away']};
 export type BoardEvidence={schema:string;board_sha256:string;games:Record<string,GameEvidence>;trust:Summary;weeks:{week:number;scope:string;engine:Summary;ours:Summary}[];closest:Ranked[];furthest:Ranked[];prior_seasons:{season:number;week:number;mae:number}[];reference:{oof_mae:number|null;climatology_mae:number|null;floor:number|null;floor_status:string};edits:{engine:Summary;ours:Summary;best_tags:{game_id:string;mae:number;tags:string[]}[];worst_tags:{game_id:string;mae:number;tags:string[]}[]}};
