@@ -3,6 +3,14 @@
 REVIEW REQUESTED: empirical paired ensemble rather than Gaussian copula; log-absolute-error scale rather than log variance; conditional ridge sandwich rather than full-pipeline bootstrap; interval-score non-worsening tested per target. Details: GAP-SWEEP.md.
 
 ## Decision
+
+Closeout: E-UNC is REJECTED; the joint-ensemble benefit predicted by review was rejected by the registered gate, not established by the small observed gain. Verified engine properties: single-game predictive intervals; paired margin residuals; no independence defect. Within-game residual correlation rounds to 0.04.
+
+Standing audited property: coefficient uncertainty is under 0.2 percent of predictive variance, so interval width is not expected to narrow materially within a season. This describes the conditional coefficient diagnostic for the audited engine, not an identified physical irreducible floor.
+
+Heteroscedastic hypothesis OPEN; the three-feature set is REJECTED. A new attempt must use newly qualified fields and a new preregistration, not repeat this set.
+
+Wind secondary INSUFFICIENT, not negative: one training season and one test season cannot overturn the 2,639-game bucket study. It returns when 2021–2023 forecast history is qualified.
 RETAIN CONTROL. No challenger passes. Candidate b and c are PARTIAL TESTS; rejection applies only to the reduced feature set. The richer heteroscedastic question returns after inactive histories qualify. Primary objective reverts to team MAE for the next experiment.
 
 Secondary wind analysis: see SECONDARY-REPORT.md. New fixed-lead Previous Runs forecasts support 2024 training and 2025 testing (272 games each); 2021–2023 remain unscored because qualified GFS wind history is absent. Adding wind worsened CRPS by about 0.12%; it never enters the gate. This is a disclosed partial-period result, not a complete 2021–2025 study.

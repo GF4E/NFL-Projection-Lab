@@ -244,3 +244,14 @@ E-UNC audit source correction: the first correlation diagnostic used the older a
 ## E-UNC secondary wind follow-through
 
 The initial local-history blocker was partially resolved by retrieving fixed 24-hour-lead Previous Runs forecasts. Before secondary fitting, SECONDARY-ADDENDUM.md and secondary-registration.json fixed source, model, matched training/test population and no tuning. 544 qualified game records: 272 training (2024), 272 test (2025). 2021–2023 unscored because documented GFS wind archive coverage is absent. b+wind worsened team CRPS by 0.1231%; not gated and no primary decision change. Full tables and diagrams in work/e-unc/SECONDARY-REPORT.md and secondary.json. Source responses are cached and hashed. No paid credits; no reanalysis. This supersedes the initial NOT_RUN secondary status while preserving that history in Git.
+
+## E-UNC closeout — REJECTED
+Verified properties of the audited engine: single-game predictive intervals; paired margin residuals; no independence defect. Within-game residual correlation is 0.04 (unrounded 0.0397496332). The joint-ensemble benefit predicted by review was rejected by the data under the registered release gate: about 0.15% CRPS improvement did not meet 1%, and Winkler failed. Existing model retained.
+
+Standing audited fact: coefficient uncertainty is under 0.2 percent of predictive variance, so interval width is not expected to narrow materially within a season. This is the conditional coefficient decomposition of the audited engine; it does not identify a pure physical noise floor.
+
+Wind secondary: INSUFFICIENT, not negative. One training season and one test season cannot overturn the 2,639-game bucket study. The numerical result remains preserved; it is not a rejected wind hypothesis. Conditional return requires qualified 2021–2023 forecast history.
+
+Heteroscedastic hypothesis: OPEN. Its three-feature set (week, games played by each team, roof) is REJECTED. Next attempt requires qualified additional fields and fresh preregistration; repeating the rejected set is prohibited.
+
+Queue advanced to E2, post-processing, READY_FOR_PREREGISTRATION. Team-score MAE resumes as primary. Three registered candidate forms: a/b, a/b/c, and a/b/c plus points-band offsets. Separate hashed gap sweep and preregistration required; older Phase A remains exploratory. No user input needed now; only newly discovered Tier 3 questions would be batched for decision.

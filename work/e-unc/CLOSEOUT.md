@@ -1,0 +1,1 @@
+E-UNC REJECTED. See verified-properties.json and CHANGELOG. Wind INSUFFICIENT, not negative; return when 2021–2023 forecast history is qualified. Heteroscedastic hypothesis OPEN; tested three-feature set REJECTED, no repeat. Next: E2 post-processing, ready for gap sweep and separate preregistration. Nothing needed from the user now. Credits spent: 0.

@@ -1,4 +1,6 @@
-# Secondary wind result — not gated
+# Secondary wind result — INSUFFICIENT, not gated
+
+**INSUFFICIENT, not negative.** One training season and one test season cannot overturn the 2,639-game bucket study. The small observed worsening is descriptive, not a rejection of the wind hypothesis. Return to the queue when 2021–2023 forecast history is qualified.
 
 Requested 2021–2025; qualified 2024 training (272 games), 2025 test (272 games). No documented GFS wind history for 2021–2023; these years are explicitly unscored. This is not a complete five-year result. Primary experiment and gate remain unchanged.
 

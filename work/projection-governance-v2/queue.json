@@ -49,15 +49,45 @@
       "decision": "RETAIN_CONTROL",
       "report": "work/e-unc/REPORT.md",
       "partial_test": true,
-      "secondary": "SCORED_PARTIAL_PERIOD_2025; 2024 warmup; 2021\u20132023 qualified wind absent",
-      "future_return_requires": "Qualified inactive pregame fields and new preregistration"
+      "secondary": "INSUFFICIENT",
+      "future_return_requires": "Qualified inactive pregame fields and new preregistration",
+      "secondary_return_requires": "Qualified 2021\u20132023 pregame forecast wind history and new preregistration",
+      "verified_properties": [
+        "single-game predictive intervals",
+        "paired margin residuals",
+        "no independence defect"
+      ],
+      "within_game_residual_correlation_rounded": 0.04,
+      "heteroscedastic_hypothesis": {
+        "state": "OPEN",
+        "tested_feature_set": "REJECTED",
+        "features": [
+          "week number",
+          "games played by each team",
+          "dome or open roof"
+        ],
+        "repeat_same_feature_set": false,
+        "next_attempt_requires": [
+          "qualified confirmed-starter status",
+          "qualified coaching/QB1-change timing",
+          "qualified pregame forecast wind"
+        ],
+        "new_preregistration_required": true
+      }
     },
     {
       "baseline": "Retained linear control after first valid E1; E2 requires separate Week 3 preregistration",
       "id": "E2",
       "name": "post-processing",
-      "state": "QUEUED",
-      "week": 3
+      "state": "READY_FOR_PREREGISTRATION",
+      "week": 3,
+      "needs_from_user_now": [],
+      "next_steps": [
+        "Publish full tiered gap sweep",
+        "Hash separate E2 preregistration before comparisons",
+        "Fit three EMOS candidates against retained linear control",
+        "Restore team MAE primary and unchanged promotion gate"
+      ]
     },
     {
       "id": "E3",
@@ -116,5 +146,21 @@
     "results_already_seen": true,
     "state": "SUPERSEDED_EXPLORATORY"
   },
-  "schema": "projection-experiment-queue-v1"
+  "schema": "projection-experiment-queue-v1",
+  "next_experiment": "E2",
+  "conditional_return_queue": [
+    {
+      "id": "E-UNC-WIND",
+      "state": "INSUFFICIENT",
+      "return_requires": "2021\u20132023 forecast history qualified",
+      "blocks_main_queue": false
+    },
+    {
+      "id": "E-UNC-HETERO",
+      "hypothesis": "OPEN",
+      "three_feature_test": "REJECTED",
+      "return_requires": "New qualified fields and new preregistration; no repeat of the rejected three-feature set",
+      "blocks_main_queue": false
+    }
+  ]
 }
