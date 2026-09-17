@@ -238,3 +238,5 @@ User-approved exception: team-points CRPS primary for E-UNC only; next experimen
 CONVENTIONS: GAP-SWEEP.md records Tier 1 central predictive quantiles, paired-game dependence, tie semantics, CRPS/Winkler arithmetic and ten equal probability strata (Wilke chapter 16; Gneiting/Raftery 2007; existing distribution.py). Tier 2 model/diagnostic alternatives remain review-requested. Both Tier 3 amendments resolved by user before final hash. Secondary wind study remains data-blocked: documented archive begins around 2022; stored stitched rows lack pre-issuance timestamps. No reanalysis substituted, no primary game dropped.
 
 Display-only evidence adds issuing-distribution quantile dots and explicit constant-width/predictive labels. Original forecasts, grades and score point values remain unchanged.
+
+E-UNC audit source correction: the first correlation diagnostic used the older adaptive reference artifact. Preserved as audit-initial-adaptive-reference.json. The final audit uses the retained linear control's calendar-corrected OOF forecasts, matching the evaluated incumbent; rho is 0.039750. No candidate, fit, comparison, gate or preregistration changed.

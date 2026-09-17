@@ -10,7 +10,7 @@ Secondary wind analysis is NOT RUN: no stored wind history proves pre-issuance t
 ## Audit before model changes
 50/80 bands are predictive empirical residual quantiles for a single game, not confidence intervals for a fitted mean. engine/projection/distribution.py::residual_distribution, pmf, quantile, summarize rounds residuals and centers for discrete PMFs. engine/board_v7.py::metadata builds team bands from the issuing version’s pooled team residual PMF; scripts/projection_v3_publish.py::shape_for pins that fit.
 Margin and total residuals are formed from home/away errors of the SAME GAME in engine/projection_v2/qualify.py::residuals; summarize uses those PMFs directly. No independent combination defect was found. Winner probability is positive-margin mass plus half tie mass. This semantics is retained and labeled.
-Pooled incumbent adaptive OOF correlation (2639 games) = 0.049931. This retrospective number is diagnostic, never inserted into earlier fits. Evaluation uses retained E1 linear point forecasts and fold-specific training dependence.
+Pooled retained linear incumbent OOF correlation (2639 games) = 0.039750. This retrospective number is diagnostic, never inserted into earlier fits. Evaluation uses retained E1 linear point forecasts and fold-specific training dependence.
 The old artifact contains no separately identified parameter/noise components. variance.json adds a conditional training-only game-cluster sandwich estimate for the retained ridge. Its residual component includes misspecification and is NOT a measured physical irreducible floor. Pointwise predictive variance is estimated parameter variance plus that residual estimate.
 
 ## Gate
