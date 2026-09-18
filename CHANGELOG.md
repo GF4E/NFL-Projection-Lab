@@ -1,3 +1,11 @@
+## BOARD v8 — display-only book comparisons and table
+
+The approved table replaces the score-lane base view. Existing Caesars captures are preferred, with BetMGM fallback, in a separate hashed display table at outputs/board-v8-market. No quote is injected into a projection, fit, assimilation, uncertainty distribution, or saved engine forecast. The scheduled publisher derives this table offline after captures; no additional provider requests or quota changes. Full-precision comparisons are rounded only at display. Late quotes are excluded from historical comparisons.
+
+CONVENTIONS: work/board-v8/GAP-SWEEP.md records the pre-implementation decisions and reference resolution. Display-only book selection uses a complete pair from one book/capture. Existing frozen forecasts and experiment queue are unchanged.
+
+Verification: 4 new export/boundary tests, 33 existing projection tests, 218 standing Week 1 tests pass. Paid credits spent: 0. Week 2 coverage: 15/16 BetMGM; IND at KC explicitly missing.
+
 # Projection change log
 
 ## 2026-09-13 — In-season learning loop registered

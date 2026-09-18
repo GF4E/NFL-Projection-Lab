@@ -19,7 +19,7 @@ from scripts.nfl_engine_autopush import guard, REMOTE
 
 LOCK_PATH = 'work/cloud-migration-v1/ownership.json'
 OUT = ROOT/'outputs/model-pick-v1'
-ALLOWED = ('outputs/board-v7/', 'outputs/in-season-learning-v1/', 'work/in-season-learning-v1/', 'CHANGELOG.md', 'outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
+ALLOWED = ('outputs/board-v8-market/', 'outputs/board-v7/', 'outputs/in-season-learning-v1/', 'work/in-season-learning-v1/', 'CHANGELOG.md', 'outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
            'work/model-pick-v1/daily/', 'work/model-pick-v1/sources/',
            'work/model-pick-v1/schedules/', 'work/model-pick-v1/states/',
            'work/model-pick-v1/depth/')
@@ -54,6 +54,8 @@ def allowed(path):
 
 
 def publish_artifacts():
+    from scripts.board_v8_market_publish import run as publish_book_display
+    publish_book_display(ROOT)
     staged = git('diff', '--cached', '--name-only').decode().splitlines()
     if any(not allowed(p) for p in staged):
         raise RuntimeError('Unrelated staged work; publication deferred')
