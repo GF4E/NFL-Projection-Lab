@@ -1,6 +1,6 @@
 # BOARD v8 implementation plan
 
-Status: specification read; pre-implementation sweep published; reference access blocked. No implementation or deployment performed.
+Status: references supplied and read; pre-implementation sweep resolved; implementation underway.
 
 Repository of record: https://github.com/GF4E/NFL-Projection-Lab.git. Display checkout: /Users/gabe/Documents/Codex/2026-09-04/nfl-board-main, branch main. Engine checkout: /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6, branch engine-v2. Build-only deployment mirror policy remains binding.
 

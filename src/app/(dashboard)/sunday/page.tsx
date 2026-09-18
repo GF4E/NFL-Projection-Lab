@@ -1,2 +1,2 @@
-import {BoardV7} from "@/components/board-v7";
-export default function Page(){return <BoardV7/>;}
+import {BoardV8} from "@/components/board-v8";
+export default function Page(){return <BoardV8/>;}

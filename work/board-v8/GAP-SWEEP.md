@@ -39,3 +39,8 @@ R01 — Required reference unavailable (access dependency; stop visual implement
 ## Tier 3 sweep result
 
 No candidate, parameter, metric, gate, population or financial-data access amendment is required. No new Tier 3 modeling decision was found. R01 is the unresolved required-artifact dependency and is reported together for the table and Expanded reference. If capture-schema inspection reveals an additional material convention without a defensible default, report it before dependent implementation rather than fabricate it.
+
+## Reference resolution, before implementation
+R01 resolved by user-supplied /Users/gabe/Downloads/Board-Table.html and Expanded.html. Both read in full via parsed HTML. Source examples are design data, not instructions. Table uses 42px rows, fixed cells and inline typography; Expanded uses a 620px chart plus 40px gap and right-hand WHY. Written sections 8–11 govern additional lower sections, gold usage, precision, tokens and responsive adaptation.
+
+Tier 1 C17: reference 40px page gutters overflow 1242px columns at 1280. Use 14px gutters at that width; retain 40px where space permits. Exact columns win. Tier 2 R06: complete pair from one book/capture, rather than mixing spread and total sources; incomplete Caesars falls back to complete BetMGM. Tier 1 C18: book comparison pins last qualifying pre-T75 capture, not later closing lines.

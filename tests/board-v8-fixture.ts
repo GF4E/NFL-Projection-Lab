@@ -1,0 +1,12 @@
+import type {ProjectionBoardData,ProjectionCardData,Projection} from '../src/domain/projection';
+import type {BoardEvidence,GameEvidence} from '../src/domain/board-v7';
+import type {BookTable} from '../src/domain/board-v8-market';
+const p:Projection={away_points:24,home_points:26,margin:2,total:50,home_win_probability:.55,away_win_probability:.45,tie_probability:.02,intervals:{margin:{'50':[-4,8],'80':[-12,16]},total:{'50':[40,60],'80':[30,70]}}};
+export const final={game_id:'final',away:'SF',home:'LA',week:2,season:2026,kickoff_at:'2026-09-13T20:00:00Z',cutoff_at:'2026-09-13T18:45:00Z',issued_at:'2026-09-12T20:00:00Z',freeze_time:'2026-09-13T18:45:00Z',status:'FINAL',evidence:'AS_ISSUED',projection:p,display:p,ours:null,source:'PROJECTION',coin_flip:false,grades:null,winner:'LA',winner_probability:.55,final:{away_points:27,home_points:7},team_colors:{SF:'#B87D68',LA:'#5B8FC7'},contributions:{away:[{input:'off_rush_epa',points:2,status:'ACTIVE',label:'SF rushing efficiency',value:2,weight:1,source_hashes:[]}],home:[]},version:'projection-v2.w2',why:{lines:['SF run game adds 2 points.'],against:'Against: opponent efficiency.'}} as ProjectionCardData;
+export const upcoming={...final,game_id:'upcoming',away:'DET',home:'BUF',status:'UPCOMING',freeze_time:null,final:undefined,kickoff_at:'2026-09-17T00:15:00Z'} as ProjectionCardData;
+export const missing={...upcoming,game_id:'missing',away:'NO',home:'BAL'};
+const t=(expected:number,actual:number|null)=>({expected,actual,error:actual==null?null:actual-expected,intervals:{'50':[expected-6,expected+6],'80':[expected-12,expected+12]},quantile_dots:Array.from({length:10},(_,i)=>({value:expected-18+i*4,mass:.1,probability_lo:i/10,probability_hi:(i+1)/10})),hits:{'50':false,'80':true},pit:.5});
+export const evidence={games:{final:{qualified_lock:true,teams:{away:t(24,27),home:t(26,7)}},upcoming:{qualified_lock:false,teams:{away:t(24,null),home:t(26,null)}},missing:{qualified_lock:false,teams:{away:t(24,null),home:t(26,null)}}}} as unknown as BoardEvidence;
+export const board={default_week:2,games:[upcoming,final,missing],version:'fixture'} as ProjectionBoardData;
+export const quote={book:'Caesars',home_handicap:-4,total:48.5,captured_at:'2026-09-12T16:00:00Z',cutoff_at:final.cutoff_at,source_sha256:'a'.repeat(64),source_path:'fixture'} as const;
+export const books={schema:'board-v8-market-display',version:'board-v8-market-v1',content_sha256:'b'.repeat(64),games:{final:quote,upcoming:quote}} as BookTable;

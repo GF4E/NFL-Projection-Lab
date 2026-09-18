@@ -61,7 +61,7 @@ it('labels graded predictive bars and states constant widths for the retained mo
   expect(band.getAttribute('aria-label')).toMatch(/(50|80)%.*predictive interval/);
   expect(band.getAttribute('aria-label')).toContain('team points');
  }
- fireEvent.click(screen.getByRole('button',{name:'ERROR',exact:true}));
+ fireEvent.click(screen.getByRole('button',{name:'ERROR'}));
  for(const band of container.querySelectorAll('[data-band]'))expect(band.getAttribute('aria-label')).toMatch(/(50|80)%.*predictive interval/);
 });
 import {QuantileDots} from '../src/components/board-v7';
