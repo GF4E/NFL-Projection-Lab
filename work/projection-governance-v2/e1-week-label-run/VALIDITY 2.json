@@ -1,0 +1,54 @@
+{
+  "active_method_unchanged": "linear",
+  "affected_games": [
+    {
+      "calendar_week": 6,
+      "game_id": "2020_05_BUF_TEN",
+      "gameday": "2020-10-13",
+      "gametime": "19:00",
+      "nfl_week": 5,
+      "tuesday_cutoff": "2020-10-13"
+    },
+    {
+      "calendar_week": 13,
+      "game_id": "2020_12_BAL_PIT",
+      "gameday": "2020-12-02",
+      "gametime": "15:40",
+      "nfl_week": 12,
+      "tuesday_cutoff": "2020-12-01"
+    },
+    {
+      "calendar_week": 14,
+      "game_id": "2020_13_DAL_BAL",
+      "gameday": "2020-12-08",
+      "gametime": "20:05",
+      "nfl_week": 13,
+      "tuesday_cutoff": "2020-12-08"
+    },
+    {
+      "calendar_week": 16,
+      "game_id": "2021_15_SEA_LA",
+      "gameday": "2021-12-21",
+      "gametime": "19:00",
+      "nfl_week": 15,
+      "tuesday_cutoff": "2021-12-21"
+    },
+    {
+      "calendar_week": 16,
+      "game_id": "2021_15_WAS_PHI",
+      "gameday": "2021-12-21",
+      "gametime": "19:00",
+      "nfl_week": 15,
+      "tuesday_cutoff": "2021-12-21"
+    }
+  ],
+  "comparative_results_already_seen": true,
+  "defect": "Replay groups state assimilation by NFL week label rather than actual Tuesday cutoff. Five postponed games entered state before their results were available at that cutoff.",
+  "gate_thresholds_unchanged": true,
+  "prior_numeric_rejection_withdrawn": true,
+  "recorded_at": "2026-09-16T19:17:12.448050+00:00",
+  "required_decision": "How to align postponed-game forecasts and assimilation with Tuesday 06:00 PT and actual T-75 issuance.",
+  "source_schedule_sha256": "c4b302a4e1dc27b0f1db0a2617a353a4f73b5b4ed798b0762dd1403032874b77",
+  "state": "INVALID_WEEK_LABEL_CADENCE",
+  "valid_e1_result": false
+}

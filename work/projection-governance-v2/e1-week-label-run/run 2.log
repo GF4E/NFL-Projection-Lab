@@ -1,0 +1,92 @@
+E1 likelihood fold 2013 training games 256
+E1 fold cached 2013
+E1 likelihood fold 2014 training games 512
+E1 fold cached 2014
+E1 likelihood fold 2015 training games 768
+E1 fold cached 2015
+E1 likelihood fold 2016 training games 1024
+E1 fold cached 2016
+E1 likelihood fold 2017 training games 1280
+E1 fold cached 2017
+E1 likelihood fold 2018 training games 1536
+E1 fold cached 2018
+E1 likelihood fold 2019 training games 1792
+E1 fold cached 2019
+E1 likelihood fold 2020 training games 2048
+E1 fold cached 2020
+E1 likelihood fold 2021 training games 2304
+E1 fold cached 2021
+E1 likelihood fold 2022 training games 2576
+E1 fold cached 2022
+E1 likelihood fold 2023 training games 2847
+E1 fold cached 2023
+E1 likelihood fold 2024 training games 3119
+E1 fold cached 2024
+E1 likelihood fold 2025 training games 3391
+E1 fold cached 2025
+{
+  "decision": "NO_CHALLENGER_CLEARS_GATE",
+  "gate": {
+    "k4": {
+      "relative_team_mae_improvement": -0.0018874022653927458,
+      "coverage": {
+        "margin": {
+          "50": 0.5028419856006063,
+          "80": 0.7934823796892763
+        },
+        "total": {
+          "50": 0.5058734369079196,
+          "80": 0.797271693823418
+        }
+      },
+      "coverage_pass": true,
+      "mae_pass": false,
+      "numeric_gate_pass": false,
+      "paired_mae_improvement_interval_95": [
+        -0.023469361104212508,
+        -0.005032255767663627
+      ]
+    },
+    "k8": {
+      "relative_team_mae_improvement": -0.0038571326733969347,
+      "coverage": {
+        "margin": {
+          "50": 0.504357711254263,
+          "80": 0.7961348995831754
+        },
+        "total": {
+          "50": 0.5024630541871922,
+          "80": 0.7953770367563471
+        }
+      },
+      "coverage_pass": true,
+      "mae_pass": false,
+      "numeric_gate_pass": false,
+      "paired_mae_improvement_interval_95": [
+        -0.043893814218118256,
+        -0.013995472231721746
+      ]
+    },
+    "state_space": {
+      "relative_team_mae_improvement": -0.00015302747867851352,
+      "coverage": {
+        "margin": {
+          "50": 0.5058734369079196,
+          "80": 0.7946191739295188
+        },
+        "total": {
+          "50": 0.5035998484274347,
+          "80": 0.8003031451307313
+        }
+      },
+      "coverage_pass": true,
+      "mae_pass": false,
+      "numeric_gate_pass": false,
+      "paired_mae_improvement_interval_95": [
+        -0.020399326694567396,
+        0.01888356212300271
+      ]
+    }
+  },
+  "runtime_seconds": 976.0176533330232
+}
