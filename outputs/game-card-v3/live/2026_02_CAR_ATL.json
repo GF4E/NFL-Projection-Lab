@@ -5,7 +5,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_02_CAR_ATL",
-  "generated_at": "2026-09-17T18:03:00.421393+00:00",
+  "generated_at": "2026-09-19T19:00:35.044405+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -13,7 +13,7 @@
     "clv": null
   },
   "home": "ATL",
-  "input_hash": "a587a3d86074db59a8c780728504d42cf8977f2c1bbd73dabf667a5edad4ef6d",
+  "input_hash": "1ffb533804bac25cfbd928c2931faed91dcfe1a7d97ef913ff6c61bd7fbc9d5f",
   "kickoff_utc": "2026-09-20T17:00:00+00:00",
   "market": {
     "books": {
@@ -25,30 +25,30 @@
         "spreads": {
           "ATL": {
             "book": "betmgm",
-            "line": 1.5,
+            "line": 2.5,
             "market": "spreads",
-            "price": -110.0,
+            "price": -102.0,
             "side": "Atlanta Falcons"
           },
           "CAR": {
             "book": "betmgm",
-            "line": -1.5,
+            "line": -2.5,
             "market": "spreads",
-            "price": -108.0,
+            "price": -115.0,
             "side": "Carolina Panthers"
           }
         },
         "totals": {
           "Over": {
             "book": "betmgm",
-            "line": 44.0,
+            "line": 43.5,
             "market": "totals",
             "price": -110.0,
             "side": "Over"
           },
           "Under": {
             "book": "betmgm",
-            "line": 44.0,
+            "line": 43.5,
             "market": "totals",
             "price": -108.0,
             "side": "Under"
@@ -63,32 +63,32 @@
         "spreads": {
           "ATL": {
             "book": "draftkings",
-            "line": 1.5,
+            "line": 2.5,
             "market": "spreads",
-            "price": -112.0,
+            "price": 100.0,
             "side": "Atlanta Falcons"
           },
           "CAR": {
             "book": "draftkings",
-            "line": -1.5,
+            "line": -2.5,
             "market": "spreads",
-            "price": -108.0,
+            "price": -120.0,
             "side": "Carolina Panthers"
           }
         },
         "totals": {
           "Over": {
             "book": "draftkings",
-            "line": 44.5,
+            "line": 43.5,
             "market": "totals",
-            "price": -108.0,
+            "price": -110.0,
             "side": "Over"
           },
           "Under": {
             "book": "draftkings",
-            "line": 44.5,
+            "line": 43.5,
             "market": "totals",
-            "price": -112.0,
+            "price": -110.0,
             "side": "Under"
           }
         }
@@ -101,32 +101,32 @@
         "spreads": {
           "ATL": {
             "book": "fanduel",
-            "line": 1.5,
+            "line": 2.5,
             "market": "spreads",
-            "price": -112.0,
+            "price": -105.0,
             "side": "Atlanta Falcons"
           },
           "CAR": {
             "book": "fanduel",
-            "line": -1.5,
+            "line": -2.5,
             "market": "spreads",
-            "price": -108.0,
+            "price": -115.0,
             "side": "Carolina Panthers"
           }
         },
         "totals": {
           "Over": {
             "book": "fanduel",
-            "line": 44.5,
+            "line": 43.5,
             "market": "totals",
-            "price": -105.0,
+            "price": -110.0,
             "side": "Over"
           },
           "Under": {
             "book": "fanduel",
-            "line": 44.5,
+            "line": 43.5,
             "market": "totals",
-            "price": -115.0,
+            "price": -110.0,
             "side": "Under"
           }
         }
@@ -146,15 +146,15 @@
         }
       }
     },
-    "capture_time": "2026-09-14T16:00:13.037681+00:00",
-    "home_win_prob": 0.4545454545454546,
+    "capture_time": "2026-09-19T19:00:21.172699+00:00",
+    "home_win_prob": 0.38678571428571423,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
-    "spread": 1,
+    "spread": 3.0,
     "teaser_near_miss": {
       "spreads": null,
       "totals": null
     },
-    "total": 45
+    "total": 44.0
   },
   "model": {
     "spreads": null,
@@ -1190,6 +1190,27 @@
   "status": "UPCOMING",
   "tiles": {
     "SPREAD": {
+      "EV": 0.0,
+      "book": "draftkings",
+      "book_label": "DraftKings",
+      "chip": "LEAN",
+      "clv": null,
+      "confidence_source": "MARKET",
+      "confidence_used": null,
+      "grade": null,
+      "label": "SPREAD",
+      "line": 2.5,
+      "pick": "ATL +2.5",
+      "price": 100.0,
+      "probability": 0.5,
+      "probability_percent": 50.0,
+      "push_probability": 0.0,
+      "ring_offset": 50.0,
+      "side": "ATL",
+      "stake_dollars": null,
+      "subtitle": "coin flip"
+    },
+    "TOTAL": {
       "EV": -0.03703703703703698,
       "book": "betmgm",
       "book_label": "BetMGM",
@@ -1198,36 +1219,15 @@
       "confidence_source": "MARKET",
       "confidence_used": null,
       "grade": null,
-      "label": "SPREAD",
-      "line": -1.5,
-      "pick": "CAR -1.5",
+      "label": "TOTAL",
+      "line": 43.5,
+      "pick": "UNDER 43.5",
       "price": -108.0,
       "probability": 0.5,
       "probability_percent": 50.0,
       "push_probability": 0.0,
       "ring_offset": 50.0,
-      "side": "CAR",
-      "stake_dollars": null,
-      "subtitle": "coin flip"
-    },
-    "TOTAL": {
-      "EV": -0.044151358140995405,
-      "book": "betmgm",
-      "book_label": "BetMGM",
-      "chip": "LEAN",
-      "clv": null,
-      "confidence_source": "MARKET",
-      "confidence_used": null,
-      "grade": null,
-      "label": "TOTAL",
-      "line": 44.0,
-      "pick": "OVER 44",
-      "price": -110.0,
-      "probability": 0.5,
-      "probability_percent": 50.0,
-      "push_probability": 0.028670120898100174,
-      "ring_offset": 50.0,
-      "side": "Over",
+      "side": "Under",
       "stake_dollars": null,
       "subtitle": "coin flip"
     },
@@ -1244,10 +1244,10 @@
       "line": null,
       "pick": "CAR",
       "price": null,
-      "probability": 0.5454545454545454,
-      "probability_percent": 54.5,
-      "push_probability": 0.0386873920552677,
-      "ring_offset": 45.45454545454546,
+      "probability": 0.6132142857142857,
+      "probability_percent": 61.3,
+      "push_probability": 0.03281519861830743,
+      "ring_offset": 38.67857142857143,
       "side": "CAR",
       "stake_dollars": null,
       "subtitle": ""
@@ -1273,13 +1273,13 @@
       "6.CAR.off_explosive_rate;6.ATL.def_explosive_rate",
       "6.CAR.off_rush_epa;6.ATL.def_rush_epa"
     ],
-    "statement": "The market-based ATS lean favors CAR; ATL pass offense vs pass defense: #28 vs CAR #28. Against that lean, ATL pass rush vs protection: #10 vs CAR #27."
+    "statement": "The market-based ATS lean favors ATL; ATL pass rush vs protection: #10 vs CAR #27. Against that lean, ATL pass offense vs pass defense: #28 vs CAR #28."
   },
   "winner_bar": {
-    "away_percent": 54.5,
-    "away_width": 54.54545454545454,
-    "home_percent": 45.5,
-    "home_width": 45.45454545454546,
-    "tie_percent": 3.9
+    "away_percent": 61.3,
+    "away_width": 61.32142857142857,
+    "home_percent": 38.7,
+    "home_width": 38.67857142857142,
+    "tie_percent": 3.3
   }
 }

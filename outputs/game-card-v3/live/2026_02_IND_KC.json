@@ -5,7 +5,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_02_IND_KC",
-  "generated_at": "2026-09-17T18:03:00.421393+00:00",
+  "generated_at": "2026-09-19T19:00:35.044405+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -13,7 +13,7 @@
     "clv": null
   },
   "home": "KC",
-  "input_hash": "6ca77c14c873f9b31165f279fdbd40ddb6cdb70bc37be7338c13b6954ce7babb",
+  "input_hash": "0f559984f8c59241e64cb587c85a96db411c63a710d8ab7c97d4758d5149f788",
   "kickoff_utc": "2026-09-21T00:20:00+00:00",
   "market": {
     "books": {
@@ -29,14 +29,14 @@
         "totals": {
           "Over": {
             "book": "betmgm",
-            "line": 48.0,
+            "line": 46.5,
             "market": "totals",
             "price": -108.0,
             "side": "Over"
           },
           "Under": {
             "book": "betmgm",
-            "line": 48.0,
+            "line": 46.5,
             "market": "totals",
             "price": -110.0,
             "side": "Under"
@@ -51,32 +51,32 @@
         "spreads": {
           "IND": {
             "book": "draftkings",
-            "line": 6.5,
+            "line": 6.0,
             "market": "spreads",
-            "price": -110.0,
+            "price": -108.0,
             "side": "Indianapolis Colts"
           },
           "KC": {
             "book": "draftkings",
-            "line": -6.5,
+            "line": -6.0,
             "market": "spreads",
-            "price": -110.0,
+            "price": -112.0,
             "side": "Kansas City Chiefs"
           }
         },
         "totals": {
           "Over": {
             "book": "draftkings",
-            "line": 48.5,
+            "line": 46.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -105.0,
             "side": "Over"
           },
           "Under": {
             "book": "draftkings",
-            "line": 48.5,
+            "line": 46.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -115.0,
             "side": "Under"
           }
         }
@@ -91,30 +91,30 @@
             "book": "fanduel",
             "line": 6.5,
             "market": "spreads",
-            "price": -118.0,
+            "price": -115.0,
             "side": "Indianapolis Colts"
           },
           "KC": {
             "book": "fanduel",
             "line": -6.5,
             "market": "spreads",
-            "price": -104.0,
+            "price": -105.0,
             "side": "Kansas City Chiefs"
           }
         },
         "totals": {
           "Over": {
             "book": "fanduel",
-            "line": 47.5,
+            "line": 46.5,
             "market": "totals",
-            "price": -118.0,
+            "price": -110.0,
             "side": "Over"
           },
           "Under": {
             "book": "fanduel",
-            "line": 47.5,
+            "line": 46.5,
             "market": "totals",
-            "price": -104.0,
+            "price": -110.0,
             "side": "Under"
           }
         }
@@ -134,15 +134,15 @@
         }
       }
     },
-    "capture_time": "2026-09-14T16:00:13.037681+00:00",
-    "home_win_prob": 0.7200999642984648,
+    "capture_time": "2026-09-19T19:00:21.172699+00:00",
+    "home_win_prob": 0.6878777106292215,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
-    "spread": -6.5,
+    "spread": -6.25,
     "teaser_near_miss": {
       "spreads": null,
       "totals": null
     },
-    "total": 49
+    "total": 46.5
   },
   "model": {
     "spreads": null,
@@ -1178,28 +1178,28 @@
   "status": "UPCOMING",
   "tiles": {
     "SPREAD": {
-      "EV": -0.019230769230769162,
-      "book": "fanduel",
-      "book_label": "FanDuel",
+      "EV": -0.05222057735011106,
+      "book": "draftkings",
+      "book_label": "DraftKings",
       "chip": "LEAN",
       "clv": null,
       "confidence_source": "MARKET",
       "confidence_used": null,
       "grade": null,
       "label": "SPREAD",
-      "line": -6.5,
-      "pick": "KC -6.5",
-      "price": -104.0,
+      "line": -6.0,
+      "pick": "KC -6",
+      "price": -112.0,
       "probability": 0.5,
       "probability_percent": 50.0,
-      "push_probability": 0.0,
+      "push_probability": 0.02521588946459413,
       "ring_offset": 50.0,
       "side": "KC",
       "stake_dollars": null,
       "subtitle": "coin flip"
     },
     "TOTAL": {
-      "EV": -0.045454545454545414,
+      "EV": -0.023809523809523836,
       "book": "draftkings",
       "book_label": "DraftKings",
       "chip": "LEAN",
@@ -1208,14 +1208,14 @@
       "confidence_used": null,
       "grade": null,
       "label": "TOTAL",
-      "line": 48.5,
-      "pick": "UNDER 48.5",
-      "price": -110.0,
+      "line": 46.5,
+      "pick": "OVER 46.5",
+      "price": -105.0,
       "probability": 0.5,
       "probability_percent": 50.0,
       "push_probability": 0.0,
       "ring_offset": 50.0,
-      "side": "Under",
+      "side": "Over",
       "stake_dollars": null,
       "subtitle": "coin flip"
     },
@@ -1232,10 +1232,10 @@
       "line": null,
       "pick": "KC",
       "price": null,
-      "probability": 0.7200999642984648,
-      "probability_percent": 72.0,
-      "push_probability": 0.03246977547495682,
-      "ring_offset": 27.99000357015352,
+      "probability": 0.6878777106292215,
+      "probability_percent": 68.8,
+      "push_probability": 0.028324697754749568,
+      "ring_offset": 31.21222893707784,
       "side": "KC",
       "stake_dollars": null,
       "subtitle": ""
@@ -1264,10 +1264,10 @@
     "statement": "The market-based ATS lean favors KC; KC rush offense vs rush defense: #4 vs IND #23. Against that lean, IND rush offense vs rush defense: #3 vs KC #6."
   },
   "winner_bar": {
-    "away_percent": 28.0,
-    "away_width": 27.990003570153522,
-    "home_percent": 72.0,
-    "home_width": 72.00999642984648,
-    "tie_percent": 3.2
+    "away_percent": 31.2,
+    "away_width": 31.212228937077846,
+    "home_percent": 68.8,
+    "home_width": 68.78777106292216,
+    "tie_percent": 2.8
   }
 }

@@ -5,7 +5,7 @@
   "final": null,
   "freeze_timestamp": null,
   "game_id": "2026_02_JAX_DEN",
-  "generated_at": "2026-09-17T18:03:00.421393+00:00",
+  "generated_at": "2026-09-19T19:00:35.044405+00:00",
   "grades": {
     "SPREAD": null,
     "TOTAL": null,
@@ -13,7 +13,7 @@
     "clv": null
   },
   "home": "DEN",
-  "input_hash": "37cc05e89993ae750eec29d042331970af6ca7b1253313dbc7b0072d2c86bfcd",
+  "input_hash": "f49d9dd823b0951b14d376c29fa9dd6ec59c74780f2f45de7ce5793a77469cee",
   "kickoff_utc": "2026-09-20T20:05:00+00:00",
   "market": {
     "books": {
@@ -25,32 +25,32 @@
         "spreads": {
           "DEN": {
             "book": "betmgm",
-            "line": -3.0,
+            "line": -2.5,
             "market": "spreads",
-            "price": 100.0,
+            "price": -125.0,
             "side": "Denver Broncos"
           },
           "JAX": {
             "book": "betmgm",
-            "line": 3.0,
+            "line": 2.5,
             "market": "spreads",
-            "price": -120.0,
+            "price": -105.0,
             "side": "Jacksonville Jaguars"
           }
         },
         "totals": {
           "Over": {
             "book": "betmgm",
-            "line": 44.5,
+            "line": 45.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -108.0,
             "side": "Over"
           },
           "Under": {
             "book": "betmgm",
-            "line": 44.5,
+            "line": 45.5,
             "market": "totals",
-            "price": -108.0,
+            "price": -110.0,
             "side": "Under"
           }
         }
@@ -79,16 +79,16 @@
         "totals": {
           "Over": {
             "book": "draftkings",
-            "line": 44.5,
+            "line": 45.5,
             "market": "totals",
-            "price": -115.0,
+            "price": -108.0,
             "side": "Over"
           },
           "Under": {
             "book": "draftkings",
-            "line": 44.5,
+            "line": 45.5,
             "market": "totals",
-            "price": -105.0,
+            "price": -112.0,
             "side": "Under"
           }
         }
@@ -103,30 +103,30 @@
             "book": "fanduel",
             "line": -2.5,
             "market": "spreads",
-            "price": -115.0,
+            "price": -120.0,
             "side": "Denver Broncos"
           },
           "JAX": {
             "book": "fanduel",
             "line": 2.5,
             "market": "spreads",
-            "price": -105.0,
+            "price": -102.0,
             "side": "Jacksonville Jaguars"
           }
         },
         "totals": {
           "Over": {
             "book": "fanduel",
-            "line": 44.5,
+            "line": 45.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -105.0,
             "side": "Over"
           },
           "Under": {
             "book": "fanduel",
-            "line": 44.5,
+            "line": 45.5,
             "market": "totals",
-            "price": -110.0,
+            "price": -115.0,
             "side": "Under"
           }
         }
@@ -146,15 +146,15 @@
         }
       }
     },
-    "capture_time": "2026-09-14T16:00:13.037681+00:00",
-    "home_win_prob": 0.5943161634103019,
+    "capture_time": "2026-09-19T19:00:21.172699+00:00",
+    "home_win_prob": 0.626967095851216,
     "home_win_prob_basis": "pinned empirical distribution at captured consensus",
-    "spread": -3,
+    "spread": -3.5,
     "teaser_near_miss": {
       "spreads": null,
       "totals": null
     },
-    "total": 45
+    "total": 46.0
   },
   "model": {
     "spreads": null,
@@ -1190,28 +1190,7 @@
   "status": "UPCOMING",
   "tiles": {
     "SPREAD": {
-      "EV": -0.0652173913043479,
-      "book": "fanduel",
-      "book_label": "FanDuel",
-      "chip": "LEAN",
-      "clv": null,
-      "confidence_source": "MARKET",
-      "confidence_used": null,
-      "grade": null,
-      "label": "SPREAD",
-      "line": -2.5,
-      "pick": "DEN -2.5",
-      "price": -115.0,
-      "probability": 0.5,
-      "probability_percent": 50.0,
-      "push_probability": 0.0,
-      "ring_offset": 50.0,
-      "side": "DEN",
-      "stake_dollars": null,
-      "subtitle": "coin flip"
-    },
-    "TOTAL": {
-      "EV": -0.023809523809523836,
+      "EV": -0.009803921568627416,
       "book": "draftkings",
       "book_label": "DraftKings",
       "chip": "LEAN",
@@ -1219,15 +1198,36 @@
       "confidence_source": "MARKET",
       "confidence_used": null,
       "grade": null,
+      "label": "SPREAD",
+      "line": 2.5,
+      "pick": "JAX +2.5",
+      "price": -102.0,
+      "probability": 0.5,
+      "probability_percent": 50.0,
+      "push_probability": 0.0,
+      "ring_offset": 50.0,
+      "side": "JAX",
+      "stake_dollars": null,
+      "subtitle": "coin flip"
+    },
+    "TOTAL": {
+      "EV": -0.023809523809523836,
+      "book": "fanduel",
+      "book_label": "FanDuel",
+      "chip": "LEAN",
+      "clv": null,
+      "confidence_source": "MARKET",
+      "confidence_used": null,
+      "grade": null,
       "label": "TOTAL",
-      "line": 44.5,
-      "pick": "UNDER 44.5",
+      "line": 45.5,
+      "pick": "OVER 45.5",
       "price": -105.0,
       "probability": 0.5,
       "probability_percent": 50.0,
       "push_probability": 0.0,
       "ring_offset": 50.0,
-      "side": "Under",
+      "side": "Over",
       "stake_dollars": null,
       "subtitle": "coin flip"
     },
@@ -1244,10 +1244,10 @@
       "line": null,
       "pick": "DEN",
       "price": null,
-      "probability": 0.5943161634103019,
-      "probability_percent": 59.4,
-      "push_probability": 0.027633851468048358,
-      "ring_offset": 40.56838365896981,
+      "probability": 0.626967095851216,
+      "probability_percent": 62.7,
+      "push_probability": 0.03419689119170984,
+      "ring_offset": 37.3032904148784,
       "side": "DEN",
       "stake_dollars": null,
       "subtitle": ""
@@ -1273,13 +1273,13 @@
       "6.JAX.off_rush_epa;6.DEN.def_rush_epa",
       "6.DEN.def_pressure_rate;6.JAX.off_pressure_rate"
     ],
-    "statement": "The market-based ATS lean favors DEN; JAX pass rush vs protection: #27 vs DEN #5. Against that lean, DEN explosive offense vs defense: #27 vs JAX #6."
+    "statement": "The market-based ATS lean favors JAX; DEN explosive offense vs defense: #27 vs JAX #6. Against that lean, JAX pass rush vs protection: #27 vs DEN #5."
   },
   "winner_bar": {
-    "away_percent": 40.6,
-    "away_width": 40.56838365896981,
-    "home_percent": 59.4,
-    "home_width": 59.43161634103019,
-    "tie_percent": 2.8
+    "away_percent": 37.3,
+    "away_width": 37.3032904148784,
+    "home_percent": 62.7,
+    "home_width": 62.6967095851216,
+    "tie_percent": 3.4
   }
 }
