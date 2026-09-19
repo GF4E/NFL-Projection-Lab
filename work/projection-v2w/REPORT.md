@@ -1,3 +1,5 @@
+SERIES NOTICE: This report cites non-authoritative historical/replay series; only work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json is authoritative for future gating. See the SERIES.md catalog.
+
 # Deployed-lineage replay: stop at sign reconciliation
 
 E-POST candidates were not fitted. The historical control has pooled projected-minus-actual bias +0.189, not the hypothesized persistent negative bias. Six seasons have positive bias and four negative. Per the explicit step 2 stop condition, investigate the live lineage before a corrective-layer gate. This is neither an E-POST rejection nor a promotion.

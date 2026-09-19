@@ -1,3 +1,5 @@
+SERIES NOTICE: This report cites non-authoritative historical/replay series; only work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json is authoritative for future gating. See the SERIES.md catalog.
+
 **REVIEW REQUESTED — nonblocking Tier 2 conventions.** Full sweep and hash: [preregistration addendum](PREREGISTRATION-ADDENDUM.md).
 
 - **C06 Linear decay clock on exceptional schedules:** Retain the corrected implementation: elapsed scheduled assimilation cutoffs from the first forecast cutoff of a season advance the existing linear decay; freeze that weight inside an interval. **Alternative not taken:** Use the forecast game NFL-week label for decay even when two games share one interval. This could change control predictions and conflicts with the frozen-state interpretation.

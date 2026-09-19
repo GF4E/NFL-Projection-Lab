@@ -1,3 +1,5 @@
+SERIES NOTICE: This report cites non-authoritative historical/replay series; only work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json is authoritative for future gating. See the SERIES.md catalog.
+
 # Cadence amendment implementation status
 
 Amendment logged in CHANGELOG before code changes. Versioned calendar implemented independently of the original Tuesday-only E1 calendar. It is not connected to live forecasts or installed on the host while the two Tier 3 decisions in GAP-SWEEP.md are pending.

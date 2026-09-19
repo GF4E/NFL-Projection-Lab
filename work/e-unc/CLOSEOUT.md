@@ -1,1 +1,3 @@
+SERIES NOTICE: This report cites non-authoritative historical/replay series; only work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json is authoritative for future gating. See the SERIES.md catalog.
+
 E-UNC REJECTED. See verified-properties.json and CHANGELOG. Wind INSUFFICIENT, not negative; return when 2021–2023 forecast history is qualified. Heteroscedastic hypothesis OPEN; tested three-feature set REJECTED, no repeat. Next: E2 post-processing, ready for gap sweep and separate preregistration. Nothing needed from the user now. Credits spent: 0.

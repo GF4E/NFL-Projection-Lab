@@ -1,3 +1,5 @@
+SERIES NOTICE: This report cites non-authoritative historical/replay series; only work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json is authoritative for future gating. See the SERIES.md catalog.
+
 # E-SCORE registration and control evidence
 
 REVIEW REQUESTED: C02/C03 prior exposure and trend; C04 centering; C05 chronological intercept; C08 definition of systematic bias. See GAP-SWEEP.md for decisions and alternatives. Registration only; challengers have not been fitted.

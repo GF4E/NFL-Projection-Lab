@@ -1,4 +1,8 @@
 {
+  "authoritative_control": {
+    "path": "work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json",
+    "sha256": "6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10"
+  },
   "automatic_method_promotion": false,
   "clock_policy": {
     "deadline": "following Tuesday 06:00 America/Los_Angeles",
@@ -28,20 +32,22 @@
     {
       "addendum": "work/e-post/DEPLOYED-LINEAGE-ADDENDUM.md",
       "addendum_sha256": "c48fe449edcb4728159f0d18fb374af32610cac641e11f5bd4a624d149f2c4fd",
-      "blockers": [
-        "Generated production-lineage pooled historical bias is +0.189; explicit step 2 stop before candidate fitting."
-      ],
+      "blockers": [],
+      "decision": "REJECTED_ON_PREMISE",
       "deployed_control": {
         "path": "work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json",
         "sha256": "6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10"
       },
+      "gate_evaluated": false,
       "host_verification": "work/projection-v2w/host-verification-2026-09-19.json",
       "id": "E-POST",
       "priority": 0,
+      "promoted": false,
+      "reason": "Audit mistook stale v3 baseline for production; fourteen cited grades came from two superseded fits. Deployed-lineage pooled bias +0.189 does not have the alleged persistent negative level defect.",
       "registration": "work/e-post/registration.json",
       "registration_sha256": "511881a2c8796bbf3c5550686fcf56d17247fda7bed0a1cab366618daf0acaaa",
       "report": "work/projection-v2w/REPORT.md",
-      "state": "STOPPED_HISTORICAL_BIAS_SIGN_RECONCILIATION"
+      "state": "REJECTED_ON_PREMISE"
     },
     {
       "B01": "RESOLVED_USER_KICKOFF_PLUS_4H",

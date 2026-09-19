@@ -315,3 +315,7 @@ Closeout publisher inspection: NOT BUILT at start (only consumer guard/receipt c
 ## Host disk recovery, 2026-09-19
 - Recovered zero-free-space root volume to about 719 MiB free using only package caches and log rotation; full removal inventories preserved compressed. Runtime and all artifacts of record retained.
 - Pending final feed was committed by the recovered scheduler; DET-BUF grade subsequently published. All 440 untracked paths traced to unit-test writers and narrowly ignored; zero unknowns. Journal retention bounded to 32 MiB. No paid capture manually invoked.
+
+## E-POST closeout and series hygiene
+- E-POST is REJECTED_ON_PREMISE, not on gate; no candidate gate evaluated. Audit error: v3 baseline is not production, and fourteen cited grades belong to two superseded fits. The authoritative deployed lineage does not exhibit that persistent negative bias.
+- Added SERIES.md identity catalogs with pooled MAE, projected-minus-actual bias, slope, SD, repository dates, hashes and producer/fit-manifest references. The deployed 6a0238fc series is the sole future gating control; E1 is REPLAY; stale baseline is SUPERSEDED. Added first-line non-authority notices to historical experiment reports. Immutable forecast JSON and original audit remain unchanged; prior report revisions remain in Git.

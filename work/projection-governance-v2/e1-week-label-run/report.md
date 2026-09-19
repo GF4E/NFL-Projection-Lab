@@ -1,3 +1,5 @@
+SERIES NOTICE: This report cites non-authoritative historical/replay series; only work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json is authoritative for future gating. See the SERIES.md catalog.
+
 # E1 — Early-season updating rule
 
 Decision: **NO_CHALLENGER_CLEARS_GATE**. Live method remains linear. No automatic promotion.

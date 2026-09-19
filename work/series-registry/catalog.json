@@ -1,0 +1,882 @@
+{
+  "authoritative_control": "work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json",
+  "authority_scope": "All future engine method gates; freeze this control until a separately authorized production-lineage replacement.",
+  "metrics_convention": "2016-2025 available team rows; projected-minus-actual bias; population SD; OLS slope actual on projected",
+  "series": [
+    {
+      "path": "work/e-unc/scored-games.json.gz",
+      "component": "control/point",
+      "sha256": "a493439116afbdf17f41e8eae124bcfb230da2342bbe160c86741e4b76d4ccde",
+      "date_added": "2026-09-16T17:05:28-07:00",
+      "archive_commit": "f8d9c919a26b8ed58264e8e07ccb564c8b1e4f8c",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e_unc_evaluate.py / e_unc_secondary.py; E1 linear point fits and fits.json scale fits",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.571625427301528,
+        "bias": 0.30269886278859914,
+        "slope": 0.9927001412095903,
+        "sd": 3.001909956456423
+      }
+    },
+    {
+      "path": "work/e-unc/scored-games.json.gz",
+      "component": "a_joint/point",
+      "sha256": "a493439116afbdf17f41e8eae124bcfb230da2342bbe160c86741e4b76d4ccde",
+      "date_added": "2026-09-16T17:05:28-07:00",
+      "archive_commit": "f8d9c919a26b8ed58264e8e07ccb564c8b1e4f8c",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e_unc_evaluate.py / e_unc_secondary.py; E1 linear point fits and fits.json scale fits",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.571625427301528,
+        "bias": 0.30269886278859914,
+        "slope": 0.9927001412095903,
+        "sd": 3.001909956456423
+      }
+    },
+    {
+      "path": "work/e-unc/scored-games.json.gz",
+      "component": "b_hetero/point",
+      "sha256": "a493439116afbdf17f41e8eae124bcfb230da2342bbe160c86741e4b76d4ccde",
+      "date_added": "2026-09-16T17:05:28-07:00",
+      "archive_commit": "f8d9c919a26b8ed58264e8e07ccb564c8b1e4f8c",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e_unc_evaluate.py / e_unc_secondary.py; E1 linear point fits and fits.json scale fits",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.571625427301528,
+        "bias": 0.30269886278859914,
+        "slope": 0.9927001412095903,
+        "sd": 3.001909956456423
+      }
+    },
+    {
+      "path": "work/e-unc/scored-games.json.gz",
+      "component": "c_joint_hetero/point",
+      "sha256": "a493439116afbdf17f41e8eae124bcfb230da2342bbe160c86741e4b76d4ccde",
+      "date_added": "2026-09-16T17:05:28-07:00",
+      "archive_commit": "f8d9c919a26b8ed58264e8e07ccb564c8b1e4f8c",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e_unc_evaluate.py / e_unc_secondary.py; E1 linear point fits and fits.json scale fits",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.571625427301528,
+        "bias": 0.30269886278859914,
+        "slope": 0.9927001412095903,
+        "sd": 3.001909956456423
+      }
+    },
+    {
+      "path": "work/e-unc/secondary-games.json.gz",
+      "component": "b_matched/point",
+      "sha256": "941093bbbacb587eaf924892069e6ecc80507f82e184d6917bdd1397e8d5330b",
+      "date_added": "2026-09-16T17:10:38-07:00",
+      "archive_commit": "7e8c5c64370999fa032d1953a891de957e5f94fd",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e_unc_evaluate.py / e_unc_secondary.py; E1 linear point fits and fits.json scale fits",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 272,
+        "team_observations": 544,
+        "mae": 7.569894062747562,
+        "bias": 0.01924006392086497,
+        "slope": 1.016568134566402,
+        "sd": 3.149116147557025
+      }
+    },
+    {
+      "path": "work/e-unc/secondary-games.json.gz",
+      "component": "b_plus_wind/point",
+      "sha256": "941093bbbacb587eaf924892069e6ecc80507f82e184d6917bdd1397e8d5330b",
+      "date_added": "2026-09-16T17:10:38-07:00",
+      "archive_commit": "7e8c5c64370999fa032d1953a891de957e5f94fd",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e_unc_evaluate.py / e_unc_secondary.py; E1 linear point fits and fits.json scale fits",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 272,
+        "team_observations": 544,
+        "mae": 7.569894062747562,
+        "bias": 0.01924006392086497,
+        "slope": 1.016568134566402,
+        "sd": 3.149116147557025
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-calendar-corrected/oof.json",
+      "component": "k4/point",
+      "sha256": "c02926100d9c0c2b5be2eca4e9195feecc7c9460a6fa2decdbb023548b229b32",
+      "date_added": "2026-09-16T13:03:46-07:00",
+      "archive_commit": "e3e3fb145d6b05a352d8c5d675d2b2b40820aa9f",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.5860467395307625,
+        "bias": 0.3404611807480933,
+        "slope": 0.98088732919204,
+        "sd": 2.978839461714242
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-calendar-corrected/oof.json",
+      "component": "k8/point",
+      "sha256": "c02926100d9c0c2b5be2eca4e9195feecc7c9460a6fa2decdbb023548b229b32",
+      "date_added": "2026-09-16T13:03:46-07:00",
+      "archive_commit": "e3e3fb145d6b05a352d8c5d675d2b2b40820aa9f",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.601025595081753,
+        "bias": 0.32353737023207785,
+        "slope": 0.9709102963130021,
+        "sd": 2.9466006024456854
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-calendar-corrected/oof.json",
+      "component": "linear/point",
+      "sha256": "c02926100d9c0c2b5be2eca4e9195feecc7c9460a6fa2decdbb023548b229b32",
+      "date_added": "2026-09-16T13:03:46-07:00",
+      "archive_commit": "e3e3fb145d6b05a352d8c5d675d2b2b40820aa9f",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.571625427301528,
+        "bias": 0.30269886278859914,
+        "slope": 0.9927001412095903,
+        "sd": 3.001909956456423
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-calendar-corrected/oof.json",
+      "component": "state_space/point",
+      "sha256": "c02926100d9c0c2b5be2eca4e9195feecc7c9460a6fa2decdbb023548b229b32",
+      "date_added": "2026-09-16T13:03:46-07:00",
+      "archive_commit": "e3e3fb145d6b05a352d8c5d675d2b2b40820aa9f",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.572420540067592,
+        "bias": 0.12662214494401525,
+        "slope": 0.9997825171324267,
+        "sd": 2.9782935946741675
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-calendar-corrected/verified-games.json.gz",
+      "component": "k4/median",
+      "sha256": "39e506b43f6b7e9ab30bd14253aea11e822f9f6b2f89bf138e08630cab9f5041",
+      "date_added": "2026-09-16T13:03:46-07:00",
+      "archive_commit": "e3e3fb145d6b05a352d8c5d675d2b2b40820aa9f",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.56456183148743,
+        "bias": -0.25134715926428797,
+        "slope": 0.9282401960435246,
+        "sd": 3.1865108500881196
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-calendar-corrected/verified-games.json.gz",
+      "component": "k8/median",
+      "sha256": "39e506b43f6b7e9ab30bd14253aea11e822f9f6b2f89bf138e08630cab9f5041",
+      "date_added": "2026-09-16T13:03:46-07:00",
+      "archive_commit": "e3e3fb145d6b05a352d8c5d675d2b2b40820aa9f",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.586781152340353,
+        "bias": -0.2481097981246272,
+        "slope": 0.899893138191911,
+        "sd": 3.1876879838567995
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-calendar-corrected/verified-games.json.gz",
+      "component": "linear/median",
+      "sha256": "39e506b43f6b7e9ab30bd14253aea11e822f9f6b2f89bf138e08630cab9f5041",
+      "date_added": "2026-09-16T13:03:46-07:00",
+      "archive_commit": "e3e3fb145d6b05a352d8c5d675d2b2b40820aa9f",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.54299854700477,
+        "bias": -0.28063835326364384,
+        "slope": 0.9556052994571421,
+        "sd": 3.1803116563892617
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-calendar-corrected/verified-games.json.gz",
+      "component": "state_space/median",
+      "sha256": "39e506b43f6b7e9ab30bd14253aea11e822f9f6b2f89bf138e08630cab9f5041",
+      "date_added": "2026-09-16T13:03:46-07:00",
+      "archive_commit": "e3e3fb145d6b05a352d8c5d675d2b2b40820aa9f",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.5701680693732865,
+        "bias": -0.4082612523816067,
+        "slope": 0.9262850892298661,
+        "sd": 3.2122233651914054
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/oof 2.json",
+      "component": "k4/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-17T23:00:19-07:00",
+      "archive_commit": "538ce1f424bfe794ecbccf64ccabc8e4e9bbfadc",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.585841802174194,
+        "bias": 0.33968575090429454,
+        "slope": 0.9807802334715509,
+        "sd": 2.9789503544433074
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/oof 2.json",
+      "component": "k8/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-17T23:00:19-07:00",
+      "archive_commit": "538ce1f424bfe794ecbccf64ccabc8e4e9bbfadc",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.600755716885833,
+        "bias": 0.3225813497342003,
+        "slope": 0.9709204751667089,
+        "sd": 2.946638398815407
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/oof 2.json",
+      "component": "linear/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-17T23:00:19-07:00",
+      "archive_commit": "538ce1f424bfe794ecbccf64ccabc8e4e9bbfadc",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.571551239212767,
+        "bias": 0.30209592025538967,
+        "slope": 0.9925699019124703,
+        "sd": 3.0020518310880435
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/oof 2.json",
+      "component": "state_space/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-17T23:00:19-07:00",
+      "archive_commit": "538ce1f424bfe794ecbccf64ccabc8e4e9bbfadc",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.572709894608589,
+        "bias": 0.13397948291977357,
+        "slope": 0.9976133921345398,
+        "sd": 2.984653225479977
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/oof.json",
+      "component": "k4/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.585841802174194,
+        "bias": 0.33968575090429454,
+        "slope": 0.9807802334715509,
+        "sd": 2.9789503544433074
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/oof.json",
+      "component": "k8/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.600755716885833,
+        "bias": 0.3225813497342003,
+        "slope": 0.9709204751667089,
+        "sd": 2.946638398815407
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/oof.json",
+      "component": "linear/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.571551239212767,
+        "bias": 0.30209592025538967,
+        "slope": 0.9925699019124703,
+        "sd": 3.0020518310880435
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/oof.json",
+      "component": "state_space/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.572709894608589,
+        "bias": 0.13397948291977357,
+        "slope": 0.9976133921345398,
+        "sd": 2.984653225479977
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/verified-games.json.gz",
+      "component": "k4/median",
+      "sha256": "84a7c92362f9b3b38acc6eb154c027d79a406740bb08d95adaf5183d3201317f",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.564343952541811,
+        "bias": -0.2512908281404904,
+        "slope": 0.9281887383443355,
+        "sd": 3.1865265648733616
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/verified-games.json.gz",
+      "component": "k8/median",
+      "sha256": "84a7c92362f9b3b38acc6eb154c027d79a406740bb08d95adaf5183d3201317f",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.586436413609943,
+        "bias": -0.24860480695966203,
+        "slope": 0.8999890271989787,
+        "sd": 3.1877038866900387
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/verified-games.json.gz",
+      "component": "linear/median",
+      "sha256": "84a7c92362f9b3b38acc6eb154c027d79a406740bb08d95adaf5183d3201317f",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.542657468668793,
+        "bias": -0.28171175455807074,
+        "slope": 0.955557089937642,
+        "sd": 3.1804440323156182
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1-week-label-run/verified-games.json.gz",
+      "component": "state_space/median",
+      "sha256": "84a7c92362f9b3b38acc6eb154c027d79a406740bb08d95adaf5183d3201317f",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "INVALIDATED_REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.5702579124125124,
+        "bias": -0.42035535494861165,
+        "slope": 0.9258132360694822,
+        "sd": 3.2134687166370584
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1/oof.json",
+      "component": "k4/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.585841802174194,
+        "bias": 0.33968575090429454,
+        "slope": 0.9807802334715509,
+        "sd": 2.9789503544433074
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1/oof.json",
+      "component": "k8/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.600755716885833,
+        "bias": 0.3225813497342003,
+        "slope": 0.9709204751667089,
+        "sd": 2.946638398815407
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1/oof.json",
+      "component": "linear/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.571551239212767,
+        "bias": 0.30209592025538967,
+        "slope": 0.9925699019124703,
+        "sd": 3.0020518310880435
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1/oof.json",
+      "component": "state_space/point",
+      "sha256": "0a8cb314dfbeef70b26b5a2ae14b818a00eaf93180549c9ed13c7c58abbf46b3",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.572709894608589,
+        "bias": 0.13397948291977357,
+        "slope": 0.9976133921345398,
+        "sd": 2.984653225479977
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1/verified-games.json.gz",
+      "component": "k4/median",
+      "sha256": "84a7c92362f9b3b38acc6eb154c027d79a406740bb08d95adaf5183d3201317f",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.564343952541811,
+        "bias": -0.2512908281404904,
+        "slope": 0.9281887383443355,
+        "sd": 3.1865265648733616
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1/verified-games.json.gz",
+      "component": "k8/median",
+      "sha256": "84a7c92362f9b3b38acc6eb154c027d79a406740bb08d95adaf5183d3201317f",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.586436413609943,
+        "bias": -0.24860480695966203,
+        "slope": 0.8999890271989787,
+        "sd": 3.1877038866900387
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1/verified-games.json.gz",
+      "component": "linear/median",
+      "sha256": "84a7c92362f9b3b38acc6eb154c027d79a406740bb08d95adaf5183d3201317f",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.542657468668793,
+        "bias": -0.28171175455807074,
+        "slope": 0.955557089937642,
+        "sd": 3.1804440323156182
+      }
+    },
+    {
+      "path": "work/projection-governance-v2/e1/verified-games.json.gz",
+      "component": "state_space/median",
+      "sha256": "84a7c92362f9b3b38acc6eb154c027d79a406740bb08d95adaf5183d3201317f",
+      "date_added": "2026-09-16T12:19:54-07:00",
+      "archive_commit": "32cb38d88b81818693ad96b12b2a3aa42a30edb1",
+      "status": "REPLAY",
+      "authoritative": false,
+      "producer_and_fit": "scripts/e1_evaluate.py / e1_calendar_run.py; core-<candidate>-<season>.json and state-fit-<season>.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.5702579124125124,
+        "bias": -0.42035535494861165,
+        "slope": 0.9258132360694822,
+        "sd": 3.2134687166370584
+      }
+    },
+    {
+      "path": "work/projection-v1/oof-predictions-81f909f8e4e4fdf01017494e382fc41be2da639f23cf06bbe75893a0b075e695.json",
+      "component": "series/projected_points",
+      "sha256": "81f909f8e4e4fdf01017494e382fc41be2da639f23cf06bbe75893a0b075e695",
+      "date_added": "2026-09-13T11:03:49+02:00",
+      "archive_commit": "3bf59d1585f09ee1d4097739a92a49091d403cb3",
+      "status": "SUPERSEDED",
+      "authoritative": false,
+      "producer_and_fit": "engine/projection_v1/qualify.py (v1: train.py); companion experiment/fit references. Per-season fitted lineage, not today's active fit.",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.56567076207702,
+        "bias": -0.2205742040898997,
+        "slope": 0.8494251473353016,
+        "sd": 3.467686299229758
+      }
+    },
+    {
+      "path": "work/projection-v1/oof-predictions-871fdee0b23a9580348462e8281d2fec39f55f6c64073f112613decc3cf82b2b.json",
+      "component": "series/projected_points",
+      "sha256": "871fdee0b23a9580348462e8281d2fec39f55f6c64073f112613decc3cf82b2b",
+      "date_added": "2026-09-13T11:03:49+02:00",
+      "archive_commit": "3bf59d1585f09ee1d4097739a92a49091d403cb3",
+      "status": "SUPERSEDED",
+      "authoritative": false,
+      "producer_and_fit": "engine/projection_v1/qualify.py (v1: train.py); companion experiment/fit references. Per-season fitted lineage, not today's active fit.",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.561586039382566,
+        "bias": -0.22152195980250156,
+        "slope": 0.8518010484376791,
+        "sd": 3.4692579197594924
+      }
+    },
+    {
+      "path": "work/projection-v1/oof-predictions-da00d5ff6e2a79de7805bd7fcab561f650e8628bd64d4d278bf65afa0ad5901f.json",
+      "component": "series/projected_points",
+      "sha256": "da00d5ff6e2a79de7805bd7fcab561f650e8628bd64d4d278bf65afa0ad5901f",
+      "date_added": "2026-09-13T11:03:49+02:00",
+      "archive_commit": "3bf59d1585f09ee1d4097739a92a49091d403cb3",
+      "status": "SUPERSEDED",
+      "authoritative": false,
+      "producer_and_fit": "engine/projection_v1/qualify.py (v1: train.py); companion experiment/fit references. Per-season fitted lineage, not today's active fit.",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.561294610229561,
+        "bias": -0.22542778320498158,
+        "slope": 0.8527551064496914,
+        "sd": 3.4677542904168517
+      }
+    },
+    {
+      "path": "work/projection-v2/adaptive-oof-220e88d88208d99e0738528ee7684dba13e81f250d0bf3c905c2198ee7ad7746.json",
+      "component": "series/point",
+      "sha256": "220e88d88208d99e0738528ee7684dba13e81f250d0bf3c905c2198ee7ad7746",
+      "date_added": "2026-09-13T15:07:00+02:00",
+      "archive_commit": "247e8016b30c58dfbd41e2794c467e73ba2fb1ae",
+      "status": "SUPERSEDED",
+      "authoritative": false,
+      "producer_and_fit": "engine/projection_v2/qualify.py (v1: train.py); companion experiment/fit references. Per-season fitted lineage, not today's active fit.",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.719819204512189,
+        "bias": -0.7414739441457137,
+        "slope": 0.8093677056162788,
+        "sd": 3.10494343553261
+      }
+    },
+    {
+      "path": "work/projection-v2/baseline-oof-bb7a7f0a18c5b7e83b3d4c3df7a35c82858e4eb645e8df2cc27d8b5fd3096a46.json",
+      "component": "series/point",
+      "sha256": "bb7a7f0a18c5b7e83b3d4c3df7a35c82858e4eb645e8df2cc27d8b5fd3096a46",
+      "date_added": "2026-09-13T15:07:00+02:00",
+      "archive_commit": "247e8016b30c58dfbd41e2794c467e73ba2fb1ae",
+      "status": "SUPERSEDED",
+      "authoritative": false,
+      "producer_and_fit": "engine/projection_v2/qualify.py (v1: train.py); companion experiment/fit references. Per-season fitted lineage, not today's active fit.",
+      "note": "Non-authoritative: never use as current production gate control. Stale uncalibrated baseline: its bias and slope are artifacts of the superseded fit, not production. No deployed fit issued this OOF file as current control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 8.003437355305246,
+        "bias": -2.839558742928375,
+        "slope": 1.4424058071944432,
+        "sd": 1.6874510280323158
+      }
+    },
+    {
+      "path": "work/projection-v2/phase-a/core-oof.json",
+      "component": "series/core_median",
+      "sha256": "a3a88d5daebe4e8be6ffc3e478e9c37faf251bb0f07a41064f5513da30d55002",
+      "date_added": "2026-09-15T19:17:11-04:00",
+      "archive_commit": "7eb0a5f491b752d2fb43c50767d53233cf8b06a9",
+      "status": "SUPERSEDED",
+      "authoritative": false,
+      "producer_and_fit": "scripts/forecast_system_phase_a.py; fold fits in core-manifest.json and emos-YYYY.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.870886906673246,
+        "bias": -3.0255027070244083,
+        "slope": 0.8799061307422442,
+        "sd": 3.540493325029637
+      }
+    },
+    {
+      "path": "work/projection-v2/phase-a/verified-games.json",
+      "component": "series/median",
+      "sha256": "b9389c4e85e64131a5bd08bd613ca2e0efbbffe895eca5b046c4f34cabacec01",
+      "date_added": "2026-09-15T19:17:11-04:00",
+      "archive_commit": "7eb0a5f491b752d2fb43c50767d53233cf8b06a9",
+      "status": "SUPERSEDED",
+      "authoritative": false,
+      "producer_and_fit": "scripts/forecast_system_phase_a.py; fold fits in core-manifest.json and emos-YYYY.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.5311142778440745,
+        "bias": -0.20670001004334893,
+        "slope": 1.0223189903152323,
+        "sd": 3.010848131763831
+      }
+    },
+    {
+      "path": "work/projection-v2/phase-a/verified-games.json",
+      "component": "series/raw",
+      "sha256": "b9389c4e85e64131a5bd08bd613ca2e0efbbffe895eca5b046c4f34cabacec01",
+      "date_added": "2026-09-15T19:17:11-04:00",
+      "archive_commit": "7eb0a5f491b752d2fb43c50767d53233cf8b06a9",
+      "status": "SUPERSEDED",
+      "authoritative": false,
+      "producer_and_fit": "scripts/forecast_system_phase_a.py; fold fits in core-manifest.json and emos-YYYY.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.870886906673246,
+        "bias": -3.0255027070244083,
+        "slope": 0.8799061307422442,
+        "sd": 3.540493325029637
+      }
+    },
+    {
+      "path": "work/projection-v2/phase-a/verified-games.json",
+      "component": "series/v1",
+      "sha256": "b9389c4e85e64131a5bd08bd613ca2e0efbbffe895eca5b046c4f34cabacec01",
+      "date_added": "2026-09-15T19:17:11-04:00",
+      "archive_commit": "7eb0a5f491b752d2fb43c50767d53233cf8b06a9",
+      "status": "SUPERSEDED",
+      "authoritative": false,
+      "producer_and_fit": "scripts/forecast_system_phase_a.py; fold fits in core-manifest.json and emos-YYYY.json",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.56567076207702,
+        "bias": -0.2205742040898997,
+        "slope": 0.8494251473353016,
+        "sd": 3.467686299229758
+      }
+    },
+    {
+      "path": "work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json",
+      "component": "series/point",
+      "sha256": "6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10",
+      "date_added": "2026-09-18T19:32:44-07:00",
+      "archive_commit": "3840450bc9b3d0b3602c10f4a95927d4e1eddcb8",
+      "status": "AUTHORITATIVE",
+      "authoritative": true,
+      "producer_and_fit": "scripts/deployed_lineage_replay.py using source commit 538ce1f4; production fit 8bd58561 settings; per-issuance training hashes in replay-receipt.json",
+      "note": "Sole future gate control; historical delivery timing approximation disclosed in REPLAY-PLAN.md.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.574348007893795,
+        "bias": 0.18887493252614007,
+        "slope": 1.0091114941278594,
+        "sd": 2.942963190128389
+      }
+    },
+    {
+      "path": "work/projection-v3/adaptive-oof-b722919998a17d42f927684c90053ca99097acaa182be6428dcafef5c2f361f2.json",
+      "component": "series/point",
+      "sha256": "b722919998a17d42f927684c90053ca99097acaa182be6428dcafef5c2f361f2",
+      "date_added": "2026-09-13T21:09:13+02:00",
+      "archive_commit": "77c755905585818368b3489e13efb250d3b7b4f2",
+      "status": "SUPERSEDED",
+      "authoritative": false,
+      "producer_and_fit": "engine/projection_v3/qualify.py (v1: train.py); companion experiment/fit references. Per-season fitted lineage, not today's active fit.",
+      "note": "Non-authoritative: never use as current production gate control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.76127289296137,
+        "bias": -1.0482385652805633,
+        "slope": 0.7971099738363114,
+        "sd": 3.0278996309651394
+      }
+    },
+    {
+      "path": "work/projection-v3/baseline-oof-bb7a7f0a18c5b7e83b3d4c3df7a35c82858e4eb645e8df2cc27d8b5fd3096a46.json",
+      "component": "series/point",
+      "sha256": "bb7a7f0a18c5b7e83b3d4c3df7a35c82858e4eb645e8df2cc27d8b5fd3096a46",
+      "date_added": "2026-09-13T21:09:13+02:00",
+      "archive_commit": "77c755905585818368b3489e13efb250d3b7b4f2",
+      "status": "SUPERSEDED",
+      "authoritative": false,
+      "producer_and_fit": "engine/projection_v3/qualify.py (v1: train.py); companion experiment/fit references. Per-season fitted lineage, not today's active fit.",
+      "note": "Non-authoritative: never use as current production gate control. Stale uncalibrated baseline: its bias and slope are artifacts of the superseded fit, not production. No deployed fit issued this OOF file as current control.",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 8.003437355305246,
+        "bias": -2.839558742928375,
+        "slope": 1.4424058071944432,
+        "sd": 1.6874510280323158
+      }
+    }
+  ],
+  "scope": "Tracked out-of-fold series and derived scored/verified series. Unit-test fixtures, per-game live locks and raw inputs are not rolling-origin evaluation series."
+}

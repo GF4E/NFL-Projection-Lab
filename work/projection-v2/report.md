@@ -1,3 +1,5 @@
+SERIES NOTICE: This report cites non-authoritative historical/replay series; only work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json is authoritative for future gating. See the SERIES.md catalog.
+
 # Projection v2 qualification
 
 Experiment: `projection-v2-172f3e04-a39aa883`. [Immutable experiment](experiment-8191b32772b897ec10dfa13d0f27dd9655589b328a88636377f032c1965c42e0.json). Zero Odds API credits.

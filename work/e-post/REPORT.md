@@ -1,3 +1,5 @@
+SERIES NOTICE: This report cites non-authoritative historical/replay series; only work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json is authoritative for future gating. See the SERIES.md catalog.
+
 # E-POST reconciliation — STOPPED, no fitting
 
 Audit read in full and preserved verbatim at work/engine-audit-2026-09-19.md. Audit assertions are independently checked below, not adopted as verified conclusions.

@@ -1,3 +1,5 @@
+SERIES NOTICE: This report cites non-authoritative historical/replay series; only work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json is authoritative for future gating. See the SERIES.md catalog.
+
 # Secondary wind result — INSUFFICIENT, not gated
 
 **INSUFFICIENT, not negative.** One training season and one test season cannot overturn the 2,639-game bucket study. The small observed worsening is descriptive, not a rejection of the wind hypothesis. Return to the queue when 2021–2023 forecast history is qualified.
