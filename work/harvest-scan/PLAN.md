@@ -1,0 +1,8 @@
+# GitHub harvest scan implementation plan
+
+1. Read governing queue, cadence restrictions, existing scoring interfaces and HARVEST.md. Resolve experiment ID collision: existing E-SCORE denotes league scoring environment; preserve its identity, use E-SCORE-TOOLING for newly requested scoring-library work with user-facing alias E-SCORE (scoringrules).
+2. Inspect GitHub repository metadata, stated license, last commit, evaluation code and market inputs. Apply the same fixed-gap rubric to every named candidate; search GitHub for additional candidates. Save dated evidence and rank eligible candidates. No unlicensed code copying.
+3. Publish full pre-registration gap sweep. Register E-WEPA, E-OPP, E-SCORE-TOOLING in that order after league scoring environment, preserving hashes and earlier results. Do not silently resolve Tier 3 changes to metrics, populations or promotion authority. No method fitting this turn.
+4. Pin scoringrules and reconcile CRPS, Winkler and Brier on fixtures at tolerance 1e-6, plus a disclosed tail-weighted CRPS reporting fixture. Switch only if interface/distribution semantics are equivalent; otherwise report discrepancies and preserve production scores.
+5. Implement monthly first-Tuesday-after-closeout scan process with no automatic experiment admission. Produce top three proposals for distinct gaps, preserve separately requested proposals, attribute methods in HARVEST.md. Install an automation only with closeout prerequisite enforced and notify on meaningful results/blockers.
+6. Run relevant tests, commit/push authorized engine-v2 changes to GF4E/NFL-Projection-Lab, report scan, three hashes and reconciliation results. No live model promotion, raw market input, frozen forecast rewrite, or unapproved experiment admission.

@@ -103,6 +103,42 @@
       ]
     },
     {
+      "id": "E-WEPA",
+      "name": "E-WEPA",
+      "state": "REGISTERED_BLOCKED",
+      "registration": "work/harvest-scan/e-wepa/registration.json",
+      "registration_sha256": "befea212c6a7fb391999322f8f6530bc7bed7c82f4a5d60d21daba42fc7e2b23",
+      "blockers": [
+        "training/evaluation overlap",
+        "state-space qualification and observation units"
+      ],
+      "clock": {
+        "status": "WAITING_FOR_TUESDAY_ACTIVATION_AFTER_CLOSEOUT"
+      }
+    },
+    {
+      "id": "E-OPP",
+      "name": "E-OPP",
+      "state": "REGISTERED_PENDING_ACTIVATION",
+      "registration": "work/harvest-scan/e-opp/registration.json",
+      "registration_sha256": "47afc4ce6944f0b1396813f0938f671ec5a19329135376c8a5693579896550c6",
+      "blockers": [],
+      "clock": {
+        "status": "WAITING_FOR_TUESDAY_ACTIVATION_AFTER_CLOSEOUT"
+      }
+    },
+    {
+      "id": "E-SCORE-TOOLING",
+      "name": "E-SCORE-TOOLING",
+      "state": "REGISTERED_PENDING_ACTIVATION",
+      "registration": "work/harvest-scan/e-score-tooling/registration.json",
+      "registration_sha256": "cceec01b2de8c457c7a146aed521fcffca47a728f1d09352ec88721ac710c7f9",
+      "blockers": [],
+      "clock": {
+        "status": "WAITING_FOR_TUESDAY_ACTIVATION_AFTER_CLOSEOUT"
+      }
+    },
+    {
       "baseline": "Retained linear control after first valid E1; E2 requires separate Week 3 preregistration",
       "id": "E2",
       "name": "post-processing",

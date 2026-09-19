@@ -1,0 +1,523 @@
+{
+  "label": "ADDITIVE_REPORT_NOT_A_METHOD_GATE",
+  "package": "scoringrules==0.10.0",
+  "board_sha256": "8318fb6df5cf31370c4ee4ec64cfebfa2d84b459c2ed264b2f8fd97808a54a29",
+  "team_rows": 28,
+  "games": 14,
+  "mean": {
+    "crps": 5.82952888936132,
+    "tail_twcrps": 1.128917305793343,
+    "winkler50": 26.142857142857142,
+    "winkler80": 36.214285714285715
+  },
+  "brier": 0.21053724353437636,
+  "rows": [
+    {
+      "game_id": "2026_01_ATL_PIT",
+      "team": "ATL",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 21.276114664172372,
+      "actual": 13.0,
+      "crps": 5.084109061026914,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        10,
+        34
+      ],
+      "winkler50": 21.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_ATL_PIT",
+      "team": "PIT",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 23.884311793609392,
+      "actual": 20.0,
+      "crps": 3.0727411186244877,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        13,
+        37
+      ],
+      "winkler50": 13.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_BAL_IND",
+      "team": "BAL",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 24.172109877687372,
+      "actual": 41.0,
+      "crps": 11.284184847309593,
+      "tail_twcrps": 3.4692462481267015,
+      "tail_bounds80": [
+        13,
+        37
+      ],
+      "winkler50": 53.0,
+      "winkler80": 64.0
+    },
+    {
+      "game_id": "2026_01_BAL_IND",
+      "team": "IND",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 23.05959314485353,
+      "actual": 23.0,
+      "crps": 2.269785453599856,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        12,
+        36
+      ],
+      "winkler50": 13.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_BUF_HOU",
+      "team": "BUF",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 24.713157769203583,
+      "actual": 36.0,
+      "crps": 6.364139375539984,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        14,
+        38
+      ],
+      "winkler50": 29.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_BUF_HOU",
+      "team": "HOU",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 24.39059761424117,
+      "actual": 31.0,
+      "crps": 3.9253367988063745,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        13,
+        37
+      ],
+      "winkler50": 13.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_CHI_CAR",
+      "team": "CHI",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 25.190469933474567,
+      "actual": 59.0,
+      "crps": 27.825298905665033,
+      "tail_twcrps": 20.010360306482145,
+      "tail_bounds80": [
+        14,
+        38
+      ],
+      "winkler50": 121.0,
+      "winkler80": 234.00000000000003
+    },
+    {
+      "game_id": "2026_01_CHI_CAR",
+      "team": "CAR",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 20.615224508039866,
+      "actual": 37.0,
+      "crps": 10.395211751439948,
+      "tail_twcrps": 2.580273152257054,
+      "tail_bounds80": [
+        10,
+        34
+      ],
+      "winkler50": 49.0,
+      "winkler80": 54.00000000000001
+    },
+    {
+      "game_id": "2026_01_CLE_JAX",
+      "team": "CLE",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 19.043684601558567,
+      "actual": 10.0,
+      "crps": 5.746860103088298,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        8,
+        32
+      ],
+      "winkler50": 25.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_CLE_JAX",
+      "team": "JAX",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 26.34212445562235,
+      "actual": 34.0,
+      "crps": 4.453188257692315,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        15,
+        39
+      ],
+      "winkler50": 17.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_NO_DET",
+      "team": "NO",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 20.407242119395967,
+      "actual": 30.0,
+      "crps": 5.678273517260336,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        9,
+        33
+      ],
+      "winkler50": 25.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_NO_DET",
+      "team": "DET",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 25.828726788329565,
+      "actual": 31.0,
+      "crps": 3.0697096673171727,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        15,
+        39
+      ],
+      "winkler50": 13.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_NYJ_TEN",
+      "team": "NYJ",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 20.930363029119047,
+      "actual": 23.0,
+      "crps": 2.339887765081478,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        10,
+        34
+      ],
+      "winkler50": 13.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_NYJ_TEN",
+      "team": "TEN",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 21.40946008094254,
+      "actual": 10.0,
+      "crps": 7.220145438442599,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        10,
+        34
+      ],
+      "winkler50": 33.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_TB_CIN",
+      "team": "TB",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 23.846678728635897,
+      "actual": 27.0,
+      "crps": 2.510027969704441,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        13,
+        37
+      ],
+      "winkler50": 13.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_TB_CIN",
+      "team": "CIN",
+      "version": "projection-v2-172f3e04-a39aa883",
+      "distribution_sha256": "0c8c1210df396fe3ec079b91d4d9e30a8be947d15238b069b5e20239b57cf047",
+      "point": 23.839883388053018,
+      "actual": 33.0,
+      "crps": 5.042426605551355,
+      "tail_twcrps": 0.05696887033208253,
+      "tail_bounds80": [
+        13,
+        37
+      ],
+      "winkler50": 21.0,
+      "winkler80": 24.0
+    },
+    {
+      "game_id": "2026_01_ARI_LAC",
+      "team": "ARI",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 21.667854699590258,
+      "actual": 26.0,
+      "crps": 2.6896907824897793,
+      "tail_twcrps": 0.0482665144240193,
+      "tail_bounds80": [
+        11,
+        36
+      ],
+      "winkler50": 13.0,
+      "winkler80": 25.0
+    },
+    {
+      "game_id": "2026_01_ARI_LAC",
+      "team": "LAC",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 24.242572396069836,
+      "actual": 14.0,
+      "crps": 6.684006811288566,
+      "tail_twcrps": 0.0482665144240193,
+      "tail_bounds80": [
+        13,
+        38
+      ],
+      "winkler50": 29.0,
+      "winkler80": 25.0
+    },
+    {
+      "game_id": "2026_01_GB_MIN",
+      "team": "GB",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 21.156207150551342,
+      "actual": 22.0,
+      "crps": 2.2664243937061483,
+      "tail_twcrps": 0.0482665144240193,
+      "tail_bounds80": [
+        10,
+        35
+      ],
+      "winkler50": 13.0,
+      "winkler80": 25.0
+    },
+    {
+      "game_id": "2026_01_GB_MIN",
+      "team": "MIN",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 21.512007606328105,
+      "actual": 39.0,
+      "crps": 10.994351638874775,
+      "tail_twcrps": 2.6265158512940463,
+      "tail_bounds80": [
+        11,
+        36
+      ],
+      "winkler50": 53.0,
+      "winkler80": 55.00000000000001
+    },
+    {
+      "game_id": "2026_01_MIA_LV",
+      "team": "MIA",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 21.842550866611074,
+      "actual": 13.0,
+      "crps": 5.9575952917735995,
+      "tail_twcrps": 0.0482665144240193,
+      "tail_bounds80": [
+        11,
+        36
+      ],
+      "winkler50": 25.0,
+      "winkler80": 25.0
+    },
+    {
+      "game_id": "2026_01_MIA_LV",
+      "team": "LV",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 19.19698710378353,
+      "actual": 27.0,
+      "crps": 4.290297072751243,
+      "tail_twcrps": 0.0482665144240193,
+      "tail_bounds80": [
+        8,
+        33
+      ],
+      "winkler50": 17.0,
+      "winkler80": 25.0
+    },
+    {
+      "game_id": "2026_01_WAS_PHI",
+      "team": "WAS",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 19.8879557553422,
+      "actual": 22.0,
+      "crps": 2.3262955570255874,
+      "tail_twcrps": 0.0482665144240193,
+      "tail_bounds80": [
+        9,
+        34
+      ],
+      "winkler50": 13.0,
+      "winkler80": 25.0
+    },
+    {
+      "game_id": "2026_01_WAS_PHI",
+      "team": "PHI",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 23.278118730276443,
+      "actual": 24.0,
+      "crps": 2.2664243937061483,
+      "tail_twcrps": 0.0482665144240193,
+      "tail_bounds80": [
+        12,
+        37
+      ],
+      "winkler50": 13.0,
+      "winkler80": 25.0
+    },
+    {
+      "game_id": "2026_01_DAL_NYG",
+      "team": "DAL",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 24.861097519119923,
+      "actual": 20.0,
+      "crps": 3.598368311856963,
+      "tail_twcrps": 0.0482665144240193,
+      "tail_bounds80": [
+        14,
+        39
+      ],
+      "winkler50": 13.0,
+      "winkler80": 25.0
+    },
+    {
+      "game_id": "2026_01_DAL_NYG",
+      "team": "NYG",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 24.68192359547324,
+      "actual": 28.0,
+      "crps": 2.471426288363216,
+      "tail_twcrps": 0.0482665144240193,
+      "tail_bounds80": [
+        14,
+        39
+      ],
+      "winkler50": 13.0,
+      "winkler80": 25.0
+    },
+    {
+      "game_id": "2026_01_DEN_KC",
+      "team": "DEN",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 23.012603678869556,
+      "actual": 10.0,
+      "crps": 9.110304651379511,
+      "tail_twcrps": 1.7000285454963955,
+      "tail_bounds80": [
+        12,
+        37
+      ],
+      "winkler50": 41.0,
+      "winkler80": 45.0
+    },
+    {
+      "game_id": "2026_01_DEN_KC",
+      "team": "KC",
+      "version": "projection-v3-b7a84dbe-2b5d9d0f",
+      "distribution_sha256": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+      "point": 22.999774964925603,
+      "actual": 31.0,
+      "crps": 4.290297072751243,
+      "tail_twcrps": 0.0482665144240193,
+      "tail_bounds80": [
+        12,
+        37
+      ],
+      "winkler50": 17.0,
+      "winkler80": 25.0
+    }
+  ],
+  "winner_rows": [
+    {
+      "game_id": "2026_01_ATL_PIT",
+      "brier": 0.12579776262466938
+    },
+    {
+      "game_id": "2026_01_BAL_IND",
+      "brier": 0.26149717251689
+    },
+    {
+      "game_id": "2026_01_BUF_HOU",
+      "brier": 0.297746183727028
+    },
+    {
+      "game_id": "2026_01_CHI_CAR",
+      "brier": 0.1417284254990544
+    },
+    {
+      "game_id": "2026_01_CLE_JAX",
+      "brier": 0.058355473563036525
+    },
+    {
+      "game_id": "2026_01_NO_DET",
+      "brier": 0.08691213400416206
+    },
+    {
+      "game_id": "2026_01_NYJ_TEN",
+      "brier": 0.297746183727028
+    },
+    {
+      "game_id": "2026_01_TB_CIN",
+      "brier": 0.2064237130942127
+    },
+    {
+      "game_id": "2026_01_ARI_LAC",
+      "brier": 0.4152163936728362
+    },
+    {
+      "game_id": "2026_01_GB_MIN",
+      "brier": 0.20694052586031006
+    },
+    {
+      "game_id": "2026_01_MIA_LV",
+      "brier": 0.3088057328201845
+    },
+    {
+      "game_id": "2026_01_WAS_PHI",
+      "brier": 0.12647065665123705
+    },
+    {
+      "game_id": "2026_01_DAL_NYG",
+      "brier": 0.20694052586031006
+    },
+    {
+      "game_id": "2026_01_DEN_KC",
+      "brier": 0.20694052586031006
+    }
+  ],
+  "tail_weight": "1 outside each issued forecast central80 interval; 0 inside; forecast-specific diagnostic, not a common-weight cross-model gate"
+}

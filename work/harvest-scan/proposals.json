@@ -1,0 +1,37 @@
+[
+  {
+    "id": "P-HARVEST-PIPELINE",
+    "source": "darkhark/nfl-predictions",
+    "gap": "feature pipeline",
+    "state": "PROPOSED_USER_DECISION_REQUIRED"
+  },
+  {
+    "id": "P-HARVEST-QB",
+    "source": "greerreNFL/nfeloqb; rwjmgm-wq/darko-nfl",
+    "gap": "quarterback value",
+    "after": "E-WEPA",
+    "state": "PROPOSED_USER_DECISION_REQUIRED"
+  },
+  {
+    "id": "P-HARVEST-HFA",
+    "source": "greerreNFL/nfelohfa",
+    "gap": "home field",
+    "after": "E-WEPA",
+    "state": "PROPOSED_USER_DECISION_REQUIRED"
+  },
+  {
+    "id": "P-HARVEST-E8",
+    "source": "renenunezg/momentumnfl",
+    "gap": "early-season blend",
+    "restriction": "market-free rebuild only",
+    "after": "E8 registration",
+    "state": "PROPOSED_USER_DECISION_REQUIRED"
+  },
+  {
+    "id": "P-HARVEST-MAPIE",
+    "source": "scikit-learn-contrib/MAPIE",
+    "gap": "interval construction",
+    "after": "current interval work",
+    "state": "PROPOSED_USER_DECISION_REQUIRED"
+  }
+]

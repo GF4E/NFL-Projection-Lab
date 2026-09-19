@@ -1,0 +1,283 @@
+{
+  "retrieved_at": "2026-09-19T00:20:54.244007+00:00",
+  "repositories": [
+    {
+      "repository": "mitch-avis/nfl-sos-ratings",
+      "license": "MIT",
+      "last_commit": "be1646c6a6556de7f4dabe8bb9f2c59694da1c02",
+      "last_commit_date": "2026-09-09T06:30:57Z",
+      "temporal_test": "YES: weekly prior-only validation, 1999\u20132025; report openly fails team headline comparison",
+      "market_inputs": "No market input identified in reviewed methodology; external baseline distinct",
+      "gap": "opponent adjustment",
+      "quality": "A",
+      "decision": "REGISTERED E-OPP; not evidence of superiority",
+      "evidence_url": "https://github.com/mitch-avis/nfl-sos-ratings/blob/be1646c6a6556de7f4dabe8bb9f2c59694da1c02/docs/validation-report.md",
+      "inspected_files": [
+        {
+          "inspection_file": "mitch-avis_nfl-sos-ratings__docs_validation-report.md",
+          "sha256": "1e6ee10d78c79f3a3630ceac7cef579c934dfb25d8676ff4f4aacd60d74d22cb"
+        },
+        {
+          "inspection_file": "mitch-avis_nfl-sos-ratings__README.md",
+          "sha256": "9a8e2c1bd4c2f1c957a90f770ca5b5ca44264c00311411774cfec8dab26f7872"
+        },
+        {
+          "inspection_file": "mitch-avis_nfl-sos-ratings__docs_methodology.md",
+          "sha256": "d09f34b73e473ef83f42e3af63d6f7b4e49d45c9a2a6ddc189fac23d7afee709"
+        }
+      ]
+    },
+    {
+      "repository": "greerreNFL/wepa_v2",
+      "license": "NONE",
+      "last_commit": "536afb776578ebcf80ae46d0e15ce757b1301c84",
+      "last_commit_date": "2020-09-05T23:08:09Z",
+      "temporal_test": "YES: backward-season training / next-three-season validation; feature selection reused future comparisons, disclosed",
+      "market_inputs": "No line input identified; require market-free WP/context fields locally",
+      "gap": "efficiency input quality",
+      "quality": "B",
+      "decision": "REGISTERED E-WEPA, blocked design; method only",
+      "evidence_url": "https://github.com/greerreNFL/wepa_v2/blob/536afb776578ebcf80ae46d0e15ce757b1301c84/model_compare.py",
+      "inspected_files": [
+        {
+          "inspection_file": "greerreNFL_wepa_v2__non_stationary_weight_optimization_final.py",
+          "sha256": "226cdcf1610c4844be0a522963162f916bc5355587c519ab5b983c881691f9e1"
+        },
+        {
+          "inspection_file": "greerreNFL_wepa_v2__README.md",
+          "sha256": "02f965c3f39ec06e307e923eb3057fd9e6bb2d927db07eb9b4b3202d6d1cdfce"
+        },
+        {
+          "inspection_file": "greerreNFL_wepa_v2__model_compare.py",
+          "sha256": "90fb49d998ecb8d33157773b4f56376b658468021d63918aed0107943be4ee54"
+        }
+      ]
+    },
+    {
+      "repository": "frazane/scoringrules",
+      "license": "Apache-2.0",
+      "last_commit": "e48aa74fdbf2d916ade569e1b7516286dbc8b303",
+      "last_commit_date": "2026-06-20T19:53:41Z",
+      "temporal_test": "N/A: scoring library, not NFL accuracy model; numerical fixtures required",
+      "market_inputs": "No financial input required by scoring functions",
+      "gap": "scoring",
+      "quality": "A-tool",
+      "decision": "REGISTERED E-SCORE-TOOLING; pin 0.10.0",
+      "evidence_url": "https://github.com/frazane/scoringrules/blob/e48aa74fdbf2d916ade569e1b7516286dbc8b303/LICENSE",
+      "inspected_files": [
+        {
+          "inspection_file": "frazane_scoringrules__LICENSE",
+          "sha256": "eee82d044f637e3ef50d02b7636e0b1788b2a925887f102a6ab94981a7d7f2fc"
+        },
+        {
+          "inspection_file": "frazane_scoringrules__docs_weighted_scores.md",
+          "sha256": "551f2635319e90fd007e66861e4bf969fe6d223635cebc87d27edd3674bac005"
+        },
+        {
+          "inspection_file": "frazane_scoringrules__pyproject.toml",
+          "sha256": "3506be4e3de5de68a7628cb0af25a5ba7e381d25dc2d8fa6063510e5a3debfa1"
+        },
+        {
+          "inspection_file": "frazane_scoringrules__docs_crps_estimators.md",
+          "sha256": "14634dfafd1c321a96ff3e8e236d27572a54ad529a4468bdf24c59020f8e7b66"
+        },
+        {
+          "inspection_file": "frazane_scoringrules__scoringrules__brier.py",
+          "sha256": "5d57bad06e43a193ae077fd0fd4238003141aa3a122b02cd15d0ea6871d24fe5"
+        },
+        {
+          "inspection_file": "frazane_scoringrules__scoringrules__interval.py",
+          "sha256": "84f871ac98d9383505611140ae7c741f9dfb0dfab059e0e8b9ed1843da9287e1"
+        }
+      ]
+    },
+    {
+      "repository": "darkhark/nfl-predictions",
+      "license": "NONE",
+      "last_commit": "c0a923b668c03e042e43c1286b4f7cde884975f4",
+      "last_commit_date": "2026-09-17T20:00:21Z",
+      "temporal_test": "YES: 2023 then 2024\u20132025 out-of-time holdouts; repeatedly inspected, not untouched",
+      "market_inputs": "Optional spread/moneyline candidates supported; exclude these and dakota locally",
+      "gap": "feature pipeline",
+      "quality": "B",
+      "decision": "PROPOSAL ONLY: market-free target/opponent symmetry and directional buckets",
+      "evidence_url": "https://github.com/darkhark/nfl-predictions/blob/c0a923b668c03e042e43c1286b4f7cde884975f4/README.md",
+      "inspected_files": [
+        {
+          "inspection_file": "darkhark_nfl-predictions__README.md",
+          "sha256": "37dc9af7a42cded9d03136362458ce9e466b458d2a4fe0f7593ec54c0b93bb27"
+        }
+      ]
+    },
+    {
+      "repository": "rwjmgm-wq/darko-nfl",
+      "license": "MIT",
+      "last_commit": "b8670eb1fb2219c1b1edc64edc3f0023ffa69892",
+      "last_commit_date": "2026-07-28T20:09:08Z",
+      "temporal_test": "YES for LEAF v3 QB: frozen 2019\u20132025 walk-forward; older/non-QB claims retracted",
+      "market_inputs": "No market input identified in reviewed QB methodology; audit selected inputs before reuse",
+      "gap": "quarterback value",
+      "quality": "B",
+      "decision": "PROPOSAL ONLY: QB evidence benchmark, not whole package",
+      "evidence_url": "https://github.com/rwjmgm-wq/darko-nfl/blob/b8670eb1fb2219c1b1edc64edc3f0023ffa69892/docs/LEAF_V3_RESULTS.md",
+      "inspected_files": [
+        {
+          "inspection_file": "rwjmgm-wq_darko-nfl__README.md",
+          "sha256": "0620742eed69c54d9dbbc6cbacfde71ef88082114832cba8a223474d6bbc0d52"
+        },
+        {
+          "inspection_file": "rwjmgm-wq_darko-nfl__docs_LEAF_V3_RESULTS.md",
+          "sha256": "ee3d20bde89becbed047bd9faee720c29bfd2f88155e0062cf1541fd705aaa34"
+        },
+        {
+          "inspection_file": "rwjmgm-wq_darko-nfl__LICENSE",
+          "sha256": "1577e94f4f57200c4852f709e2d5e735a11a474acaf49af8fa45315e86c867a8"
+        }
+      ]
+    },
+    {
+      "repository": "scikit-learn-contrib/MAPIE",
+      "license": "BSD-3-Clause",
+      "last_commit": "7e888f5249bf942912207d398525d3259a5f07c0",
+      "last_commit_date": "2026-09-08T20:42:08Z",
+      "temporal_test": "N/A NFL; time-series methods/examples/tests and explicit calibration split",
+      "market_inputs": "No financial input required by interval API",
+      "gap": "interval construction",
+      "quality": "A-tool",
+      "decision": "PROPOSAL ONLY after interval work; local temporal validation required",
+      "evidence_url": "https://github.com/scikit-learn-contrib/MAPIE/blob/7e888f5249bf942912207d398525d3259a5f07c0/README.md",
+      "inspected_files": [
+        {
+          "inspection_file": "scikit-learn-contrib_MAPIE__LICENSE",
+          "sha256": "92372faa472615c49bd4255fb56d998644e60b255b1093c7dad969ac70c1a60c"
+        },
+        {
+          "inspection_file": "scikit-learn-contrib_MAPIE__README.md",
+          "sha256": "23f0539a22edeb233bc027872c39104f64ab09a6c19bb41fc9d29c0f390fe424"
+        }
+      ]
+    },
+    {
+      "repository": "renenunezg/momentumnfl",
+      "license": "MIT",
+      "last_commit": "df99ec578ea13f73742c94e60101a002d56a64d9",
+      "last_commit_date": "2026-09-17T22:50:32Z",
+      "temporal_test": "YES: walk-forward; 2022\u20132025 repeatedly inspected retrospective validation",
+      "market_inputs": "YES: preseason sportsbook win totals and spread blend; not just grading",
+      "gap": "early-season blend",
+      "quality": "B",
+      "decision": "EXCLUDE published model as independent comparator; preserve football-only E8 rebuild proposal",
+      "evidence_url": "https://github.com/renenunezg/momentumnfl/blob/df99ec578ea13f73742c94e60101a002d56a64d9/README.md",
+      "inspected_files": [
+        {
+          "inspection_file": "renenunezg_momentumnfl__LICENSE",
+          "sha256": "5c0d14ef83e458b244c100bcf42fd84702e32bbb73aea238b78f9807f05c88fb"
+        },
+        {
+          "inspection_file": "renenunezg_momentumnfl__backend_model_market_blend.py",
+          "sha256": "55483a34a4f9fbba2f395c14c2804af39e0adb71e44c2196c9cdd54fecb1563c"
+        },
+        {
+          "inspection_file": "renenunezg_momentumnfl__README.md",
+          "sha256": "071218d0e7128a725216516081cb63ab9c71aded43e0c81af95f6b61ecb9653a"
+        }
+      ]
+    },
+    {
+      "repository": "greerreNFL/nfeloqb",
+      "license": "NONE",
+      "last_commit": "14d9628d18120b541a539e832c5424dd2a84482c",
+      "last_commit_date": "2026-09-15T21:40:32Z",
+      "temporal_test": "Chronological state updates/comparison present; independent held-out-season tuning test not established in reviewed files",
+      "market_inputs": "Not established for full pipeline; no market input evident in VALUE mechanism; audit before use",
+      "gap": "quarterback value",
+      "quality": "C",
+      "decision": "EXCLUDE accuracy claim from ranked evidence; retain user hypothesis-only proposal after WEPA",
+      "evidence_url": "https://github.com/greerreNFL/nfeloqb/blob/14d9628d18120b541a539e832c5424dd2a84482c/README.md",
+      "inspected_files": [
+        {
+          "inspection_file": "greerreNFL_nfeloqb__README.md",
+          "sha256": "398180085cf4aa59d1b394b5f173a3b58f01cb86b342667bb0ef444e4afb22f6"
+        },
+        {
+          "inspection_file": "greerreNFL_nfeloqb__Development_compare.py",
+          "sha256": "230f7458e86f38c47824e57acd7eaf332da33ffed7ab6a0e41f07f20b48f68d8"
+        }
+      ]
+    },
+    {
+      "repository": "greerreNFL/nfelohfa",
+      "license": "NONE",
+      "last_commit": "ba16d3add075f17522c3b0a26f9d4bd871629c84",
+      "last_commit_date": "2026-09-15T08:00:54Z",
+      "temporal_test": "NO qualified temporal test: training explicitly random 60/40 games; README claims accuracy lift",
+      "market_inputs": "SRS-based mechanism; market-free full pipeline not established",
+      "gap": "home field",
+      "quality": "C",
+      "decision": "EXCLUDE accuracy claim; retain user method-only hypothesis after WEPA",
+      "evidence_url": "https://github.com/greerreNFL/nfelohfa/blob/ba16d3add075f17522c3b0a26f9d4bd871629c84/training/README.md",
+      "inspected_files": [
+        {
+          "inspection_file": "greerreNFL_nfelohfa__README.MD",
+          "sha256": "5a1ff8af545e35ac46cc51071a340801c86b4d7a8932a7f297b798cafcbb3960"
+        },
+        {
+          "inspection_file": "greerreNFL_nfelohfa__training_README.md",
+          "sha256": "94edad701967ed4450a96fb99463da4d966b47277351ce7a9792ff1075d44399"
+        }
+      ]
+    },
+    {
+      "repository": "nflverse/nflfastR",
+      "license": "MIT + file LICENSE",
+      "last_commit": "701bbf38bc1c030ff9f1f4825a23191287d3903c",
+      "last_commit_date": "2026-09-18T14:28:08Z",
+      "temporal_test": "N/A as pipeline; no end-to-end team-score held-out claim used here",
+      "market_inputs": "Package includes spread-adjusted WP; only qualified EPA and non-market WP permitted",
+      "gap": "feature pipeline",
+      "quality": "B-tool",
+      "decision": "ALREADY USED; data-quality audit candidate, no automatic new feature admission",
+      "evidence_url": "https://github.com/nflverse/nflfastR/blob/701bbf38bc1c030ff9f1f4825a23191287d3903c/DESCRIPTION",
+      "inspected_files": [
+        {
+          "inspection_file": "nflverse_nflfastR__DESCRIPTION",
+          "sha256": "4b3650e115424d8ad6492036f31e24b0608b2b8fa17d9a4ce95992e56ab25133"
+        },
+        {
+          "inspection_file": "nflverse_nflfastR__README.md",
+          "sha256": "b660083da12e7d2f4d2485c1f2ea1b8d48bc95ab0bb45eaab2325a53d7b47453"
+        },
+        {
+          "inspection_file": "nflverse_nflfastR__LICENSE.md",
+          "sha256": "c4c1517a557e81d9bebb5ab316fafe92c39b54531edce402a13e832e8c0b6db4"
+        }
+      ]
+    },
+    {
+      "repository": "connor-create/brady-algorithm-2",
+      "license": "NONE",
+      "last_commit": "0cd648a8bc5cc63968e0dd5a93530ff0fbcff4c7",
+      "last_commit_date": "2025-01-25T16:33:26Z",
+      "temporal_test": "NO: shuffled rows then 90/10 split; no held-out season; no qualified reported test accuracy",
+      "market_inputs": "No market input identified in reviewed notebook and stats functions",
+      "gap": "quarterback value",
+      "quality": "D",
+      "decision": "WORKED EXCLUSION: chronological evidence absent, QB career inputs already covered, no license",
+      "evidence_url": "https://github.com/connor-create/brady-algorithm-2/blob/0cd648a8bc5cc63968e0dd5a93530ff0fbcff4c7/main.ipynb",
+      "inspected_files": [
+        {
+          "inspection_file": "connor-create_brady-algorithm-2__main.ipynb",
+          "sha256": "babfe52bc6214b82ea9953ca1769f71d4328ce44b52ee85cb4108aab90146c06"
+        },
+        {
+          "inspection_file": "connor-create_brady-algorithm-2__stats_processing.py",
+          "sha256": "78fcf487e6df054ff2f085382147f02c8b162f41120ab1f10f123ca94fd9f646"
+        },
+        {
+          "inspection_file": "connor-create_brady-algorithm-2__models.py",
+          "sha256": "ba210c6a4157985ddc6153b8b2483ee1d5c5264b40333da35f7589a08da24b51"
+        }
+      ]
+    }
+  ]
+}

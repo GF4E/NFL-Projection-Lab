@@ -7,8 +7,9 @@ def _values(values):
  return values
 
 def crps(values,actual):
- from engine.scoring import crps as score
- return score(values,actual)
+ x=_values(values);n=len(x)
+ if not math.isfinite(actual):raise ValueError('Finite actual required')
+ return sum(abs(v-actual) for v in x)/n-sum((2*i-n+1)*v for i,v in enumerate(x))/(n*n)
 
 def quantile(values,p):
  x=_values(values)
@@ -16,14 +17,14 @@ def quantile(values,p):
  return x[max(0,math.ceil(p*len(x)-1e-12)-1)]
 
 def interval_score(lo,hi,actual,level):
- from engine.scoring import interval_score as score
- return score(lo,hi,actual,level)
+ if not 0<level<1 or lo>hi or not all(math.isfinite(v) for v in (lo,hi,actual)):raise ValueError('Invalid interval')
+ return hi-lo+2/(1-level)*(max(lo-actual,0)+max(actual-hi,0))
 
 def coverage(lo,hi,actual):return int(lo<=actual<=hi)
 
 def brier(probability,outcome):
- from engine.scoring import brier as score
- return score(probability,outcome)
+ if not 0<=probability<=1 or outcome not in (0,.5,1):raise ValueError('Invalid probability/outcome')
+ return (probability-outcome)**2
 
 def pit(values,actual):
  x=_values(values);return (sum(v<actual for v in x)+.5*sum(v==actual for v in x))/len(x)
