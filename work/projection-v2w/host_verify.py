@@ -1,0 +1,5 @@
+import os,subprocess,json,hashlib,pathlib,datetime
+r=pathlib.Path('/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6');os.chdir(r)
+def git(*a):return subprocess.check_output(['git','-c','safe.directory='+str(r),*a],env={**os.environ,'GIT_OPTIONAL_LOCKS':'0'}).decode().strip()
+ref=json.loads((r/'work/in-season-learning-v1/active-fit-ref.json').read_text());a=json.loads((r/ref['path']).read_text());files=['scripts/projection_learning.py','scripts/projection_v3_publish.py','scripts/projection_v3_prepare.py','engine/projection_v3/model.py','engine/projection_v3/card.py','engine/projection/features.py','engine/projection/distribution.py']
+print(json.dumps({'observed_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'commit':git('rev-parse','HEAD'),'fit_ref':ref,'fit_actual_sha256':hashlib.sha256((r/ref['path']).read_bytes()).hexdigest(),'version':a['version'],'settings':a['selected'],'groups':a['groups'],'tracked_diff':git('diff','HEAD','--name-status'),'untracked':git('ls-files','--others','--exclude-standard').splitlines(),'source_sha256':{f:hashlib.sha256((r/f).read_bytes()).hexdigest() for f in files}},indent=2))

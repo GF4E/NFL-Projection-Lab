@@ -306,3 +306,8 @@ Closeout publisher inspection: NOT BUILT at start (only consumer guard/receipt c
 - Before fitting, found exact production weekly ridge path does not invoke the requested three-cutoff state-space code. Registered Tier 3 reconciliation with recommendation to retain actual production semantics for the control.
 - Direct droplet command failed host-key verification (exit 255); code/fit identity unverified. Recorded full command/output. Generated only baseline-versus-REPLAY season bias/slope diagnostics, no claimed deployed OOF or gate decision.
 - Corrected scope of the cited 14-game live statistic: mixed older issuing versions, not fourteen projection-v2.w2 games.
+
+### E-POST: verified host and generated production-semantics control
+- Direct SSH with the provisioned admin key succeeded. Host commit 538ce1f4, active fit 8bd58561 verified by byte hash, calibration+Elo / penalty 10 / no decay. One tracked difference (final-feed.json), 440 untracked paths inventoried. Host root disk full; no deletions or live changes made.
+- User resolved production semantics exactly. Generated immutable 2639-game deployed OOF 6a0238fc using verified host numerical source, prior-season initialization and within-season whole-week ridge refits. Two full runs have identical output hash. Registered delivery-timing approximation remains REVIEW REQUESTED; actual historical feed/sync timing is unavailable.
+- Pooled MAE 7.57435, bias projected-minus-actual +0.18887, projected SD 2.94296. The historical bias does not share the audit's persistent negative sign. Per explicit step 2 instruction, STOPPED before E-POST candidate fitting; no gate decision or promotion claimed. The cited live 14-game record is mixed older versions, not fourteen active-lineage games.
