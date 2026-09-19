@@ -300,3 +300,9 @@ Closeout publisher inspection: NOT BUILT at start (only consumer guard/receipt c
 - Preserved the independent audit verbatim and reproduced its baseline/live/replay MAE and bias. Clarified baseline SD: mean within-season 1.537 versus pooled 1.687.
 - Registered E-POST ahead of all queued experiments. STOPPED before fitting under the requested control-identity rule: active publisher uses projection-v2.w2 fit 8bd58561, not an established 8.003-series control. No gate evaluated or promotion made.
 - Governing experiments now require the deployed model's rolling-origin control. E1 and E-UNC annotated as valid within REPLAY, not tested against production; each may be re-registered once. Original results preserved.
+
+### E-POST deployed-lineage amendment and batched reconciliation
+- Accepted the audit's candidate numbers as reference only; removed their reproduction-threshold role for the new deployed control. Preserved original registration; hashed the new addendum.
+- Before fitting, found exact production weekly ridge path does not invoke the requested three-cutoff state-space code. Registered Tier 3 reconciliation with recommendation to retain actual production semantics for the control.
+- Direct droplet command failed host-key verification (exit 255); code/fit identity unverified. Recorded full command/output. Generated only baseline-versus-REPLAY season bias/slope diagnostics, no claimed deployed OOF or gate decision.
+- Corrected scope of the cited 14-game live statistic: mixed older issuing versions, not fourteen projection-v2.w2 games.
