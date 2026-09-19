@@ -1,0 +1,45 @@
+From https://github.com/GF4E/NFL-Projection-Lab
+ * branch              engine-v2  -> FETCH_HEAD
+   5d73c989..258a024d  engine-v2  -> origin/engine-v2
+Updating 5d73c989..258a024d
+Fast-forward
+ .gitignore                                         |  14 +
+ CHANGELOG.md                                       |   4 +
+ ops/cloud/journald/nfl-retention.conf              |   4 +
+ work/host-recovery-2026-09-19/REPORT.md            |  13 +
+ work/host-recovery-2026-09-19/before-details.txt   |  98 +++++
+ work/host-recovery-2026-09-19/cache-after.tsv      |  58 +++
+ work/host-recovery-2026-09-19/cache-before.tsv.gz  | Bin 0 -> 261686 bytes
+ work/host-recovery-2026-09-19/cleanup.log          | 294 ++++++++++++++
+ work/host-recovery-2026-09-19/final-feed-host.json |   1 +
+ work/host-recovery-2026-09-19/host-commit.log      | 142 +++++++
+ .../host-recovery-2026-09-19/removed-files.json.gz | Bin 0 -> 272367 bytes
+ work/host-recovery-2026-09-19/rotation-before.tsv  | 129 ++++++
+ work/host-recovery-2026-09-19/rotation.log         |  73 ++++
+ work/host-recovery-2026-09-19/triage.json          | 448 +++++++++++++++++++++
+ 14 files changed, 1278 insertions(+)
+ create mode 100644 ops/cloud/journald/nfl-retention.conf
+ create mode 100644 work/host-recovery-2026-09-19/REPORT.md
+ create mode 100644 work/host-recovery-2026-09-19/before-details.txt
+ create mode 100644 work/host-recovery-2026-09-19/cache-after.tsv
+ create mode 100644 work/host-recovery-2026-09-19/cache-before.tsv.gz
+ create mode 100644 work/host-recovery-2026-09-19/cleanup.log
+ create mode 100644 work/host-recovery-2026-09-19/final-feed-host.json
+ create mode 100644 work/host-recovery-2026-09-19/host-commit.log
+ create mode 100644 work/host-recovery-2026-09-19/removed-files.json.gz
+ create mode 100644 work/host-recovery-2026-09-19/rotation-before.tsv
+ create mode 100644 work/host-recovery-2026-09-19/rotation.log
+ create mode 100644 work/host-recovery-2026-09-19/triage.json
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/vda1       8.7G  8.0G  729M  92% /
+NEXT                          LEFT LAST                            PASSED UNIT                     ACTIVATES
+Sat 2026-09-19 04:00:00 UTC  14min Sat 2026-09-19 03:00:03 UTC  45min ago nfl-engine-daily.timer   nfl-engine-daily.service
+Tue 2026-09-22 13:00:00 UTC 3 days Tue 2026-09-15 13:00:00 UTC 3 days ago nfl-learning.timer       nfl-learning.service
+-                                - Sat 2026-09-19 03:45:44 UTC  267ms ago nfl-engine-capture.timer nfl-engine-capture.service
+
+3 timers listed.
+Result=success
+ExecMainStatus=0
+
+Result=success
+ExecMainStatus=0
