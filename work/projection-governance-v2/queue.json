@@ -76,6 +76,33 @@
       }
     },
     {
+      "id": "E-SCORE",
+      "name": "league scoring environment",
+      "state": "REGISTERED_NOT_FITTED",
+      "registration": "work/e-scoring-environment/registration.json",
+      "registration_sha256": "44ae73f41d03bff8a99b3ddbaa1a41a76f457c5dcfcfaeb2ebaee4e2bc12beb9",
+      "priority_authority": "User 2026-09-18: next ahead of current E2",
+      "clock": {
+        "started_at": "2026-09-19T00:07:22.059354+00:00",
+        "deadline_at": "2026-09-22T06:00:00-07:00",
+        "queue_block_count": 0,
+        "status": "ACTIVE"
+      },
+      "tier3_batch": [],
+      "review_requested": [
+        "C02",
+        "C03",
+        "C04",
+        "C05",
+        "C08"
+      ],
+      "next_steps": [
+        "Implement fixed candidates with chronology and separation tests",
+        "Evaluate under hashed protocol",
+        "Report gate and review packet before any promotion"
+      ]
+    },
+    {
       "baseline": "Retained linear control after first valid E1; E2 requires separate Week 3 preregistration",
       "id": "E2",
       "name": "post-processing",
@@ -87,7 +114,8 @@
         "Hash separate E2 preregistration before comparisons",
         "Fit three EMOS candidates against retained linear control",
         "Restore team MAE primary and unchanged promotion gate"
-      ]
+      ],
+      "deferred_by": "E-SCORE user priority override; next after its decision or clock expiry"
     },
     {
       "id": "E3",
@@ -147,7 +175,7 @@
     "state": "SUPERSEDED_EXPLORATORY"
   },
   "schema": "projection-experiment-queue-v1",
-  "next_experiment": "E2",
+  "next_experiment": "E-SCORE",
   "conditional_return_queue": [
     {
       "id": "E-UNC-WIND",

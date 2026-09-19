@@ -1,0 +1,1086 @@
+{
+  "lock_path": "outputs/projection-v3/locks/2026_02_DET_BUF.json",
+  "lock_sha256": "30fa21e828a365f4bd6e949d76a21f706521ef0991cd12ecebdc549334e8737f",
+  "version": "projection-v2.w2",
+  "freeze_time": "2026-09-17T23:00:00+00:00",
+  "final_source": "https://www.buffalobills.com/news/bills-41-lions-31-final-score-recap-highlights",
+  "final": {
+    "DET": 31,
+    "BUF": 41
+  },
+  "distribution_hash": "aa8bf211b2480c35fc68bc9958df65926c2dd045006004a8f2f9b1d0a33ef8e4",
+  "teams": {
+    "DET": {
+      "projection": 24.89804962195398,
+      "actual": 31,
+      "error_actual_minus_projection": 6.10195037804602,
+      "intervals": {
+        "50": [
+          19,
+          32
+        ],
+        "80": [
+          14,
+          39
+        ]
+      },
+      "inside": {
+        "50": true,
+        "80": true
+      }
+    },
+    "BUF": {
+      "projection": 27.572729933917444,
+      "actual": 41,
+      "error_actual_minus_projection": 13.427270066082556,
+      "intervals": {
+        "50": [
+          22,
+          35
+        ],
+        "80": [
+          17,
+          42
+        ]
+      },
+      "inside": {
+        "50": false,
+        "80": true
+      }
+    }
+  },
+  "buffalo_contributions": [
+    {
+      "group": "baseline",
+      "input": "football_baseline",
+      "label": "BUF scoring efficiency against DET, at expected pace",
+      "points": 23.75192511462512,
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "ACTIVE",
+      "value": 23.75192511462512,
+      "weight": 1.0
+    },
+    {
+      "group": "calibration",
+      "input": "baseline",
+      "label": "BUF scoring efficiency against DET, at expected pace",
+      "points": -0.774332231528324,
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "ACTIVE",
+      "value": 23.75192511462512,
+      "weight": -0.33700162301136016
+    },
+    {
+      "group": "elo",
+      "input": "elo",
+      "label": "BUF pregame Elo",
+      "points": 1.1088893600231857,
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "ACTIVE",
+      "value": 121.75266719679098,
+      "weight": 0.8693109310547378
+    },
+    {
+      "group": "elo",
+      "input": "elo_difference",
+      "label": "BUF Elo advantage over DET",
+      "points": 0.5882205320679286,
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "ACTIVE",
+      "value": 58.44493951137156,
+      "weight": 1.3485836012767562
+    },
+    {
+      "group": "calibration",
+      "input": "calibration_intercept",
+      "label": "Scoring calibration",
+      "points": 2.8980271587295334,
+      "source_hashes": [
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
+        "2e6f2dce7c7ebd46e985cabe0c17eb72b39a77f98cb4478409294f50b5820150",
+        "333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8",
+        "3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b",
+        "60c3067017db2d28a78f66a79b657268be8578d9a5288e6a827efdcd7fe42540",
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72",
+        "bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb"
+      ],
+      "status": "ACTIVE",
+      "value": 1.0,
+      "weight": 2.8980271587295334
+    },
+    {
+      "group": "career_kicking",
+      "input": "career_fg_long",
+      "label": "Pregame kicker career FG 50+ yards",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
+        "333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8",
+        "3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b",
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60",
+        "931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09",
+        "bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776"
+      ],
+      "status": "INACTIVE",
+      "value": 0.75,
+      "weight": 0.0
+    },
+    {
+      "group": "career_kicking",
+      "input": "career_fg_medium",
+      "label": "Pregame kicker career FG 40-49 yards",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
+        "333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8",
+        "3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b",
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60",
+        "931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09",
+        "bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776"
+      ],
+      "status": "INACTIVE",
+      "value": 0.7346938775510204,
+      "weight": 0.0
+    },
+    {
+      "group": "career_kicking",
+      "input": "career_fg_short",
+      "label": "Pregame kicker career FG below 40 yards",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
+        "333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8",
+        "3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b",
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60",
+        "931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09",
+        "bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776"
+      ],
+      "status": "INACTIVE",
+      "value": 0.9134615384615384,
+      "weight": 0.0
+    },
+    {
+      "group": "turnovers_luck",
+      "input": "close_win_rate",
+      "label": "BUF close win rate",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.7551020408163266,
+      "weight": 0.0
+    },
+    {
+      "group": "unqualified",
+      "input": "continuity",
+      "label": "Staff history unseeded",
+      "points": 0.0,
+      "reason": "No qualifying history; preserved v1 inactive slot",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": null,
+      "weight": 0.0
+    },
+    {
+      "group": "passing",
+      "input": "def_cpoe",
+      "label": "DET defense completion over expectation, rank 10",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": -0.27695463005959986,
+      "weight": 0.0
+    },
+    {
+      "group": "explosiveness",
+      "input": "def_explosive",
+      "label": "DET defense explosive play rate, rank 20",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.10004497173893143,
+      "weight": 0.0
+    },
+    {
+      "group": "efficiency",
+      "input": "def_off_ppd",
+      "label": "DET defense points per drive, rank 15",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 2.2190437087027317,
+      "weight": 0.0
+    },
+    {
+      "group": "efficiency",
+      "input": "def_off_ypp",
+      "label": "DET defense yards per play, rank 18",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 5.44280044723465,
+      "weight": 0.0
+    },
+    {
+      "group": "passing",
+      "input": "def_pass_epa",
+      "label": "DET defense pass efficiency, rank 11",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.01524808090858041,
+      "weight": 0.0
+    },
+    {
+      "group": "rushing",
+      "input": "def_rush_epa",
+      "label": "DET defense run efficiency, rank 19",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": -0.0038788435877752945,
+      "weight": 0.0
+    },
+    {
+      "group": "rushing",
+      "input": "def_rush_success",
+      "label": "DET defense run success, rank 8",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.41942037019682,
+      "weight": 0.0
+    },
+    {
+      "group": "venue",
+      "input": "divisional",
+      "label": "BUF division matchup",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.0,
+      "weight": 0.0
+    },
+    {
+      "group": "pace",
+      "input": "drives",
+      "label": "BUF offensive drives per game",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 9.4,
+      "weight": 0.0
+    },
+    {
+      "group": "unqualified",
+      "input": "elo_qb_adjustment",
+      "label": "ANY/A values exist but historical pregame starter availability is unqualified",
+      "points": 0.0,
+      "reason": "No qualifying history; preserved v1 inactive slot",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": null,
+      "weight": 0.0
+    },
+    {
+      "group": "scoring_composition",
+      "input": "fg_share",
+      "label": "BUF fg share",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.12888122173667613,
+      "weight": 0.0
+    },
+    {
+      "group": "turnovers_luck",
+      "input": "fumble_recovery",
+      "label": "BUF fumble recovery",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.4931506849315068,
+      "weight": 0.0
+    },
+    {
+      "group": "venue",
+      "input": "home_divisional",
+      "label": "BUF divisional home field",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.0,
+      "weight": 0.0
+    },
+    {
+      "group": "venue",
+      "input": "home_nondivisional",
+      "label": "BUF non-divisional home field",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 1.0,
+      "weight": 0.0
+    },
+    {
+      "group": "turnovers_luck",
+      "input": "luck_index",
+      "label": "BUF fumble and close-game luck",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.2482527257478334,
+      "weight": 0.0
+    },
+    {
+      "group": "momentum",
+      "input": "momentum",
+      "label": "BUF last-four-game momentum",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": -0.024186809248404034,
+      "weight": 0.0
+    },
+    {
+      "group": "venue",
+      "input": "neutral",
+      "label": "Neutral venue",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.0,
+      "weight": 0.0
+    },
+    {
+      "group": "passing",
+      "input": "off_cpoe",
+      "label": "BUF offense completion over expectation, rank 6",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 2.2333296742376083,
+      "weight": 0.0
+    },
+    {
+      "group": "explosiveness",
+      "input": "off_explosive",
+      "label": "BUF offense explosive play rate, rank 1",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.11283776130935277,
+      "weight": 0.0
+    },
+    {
+      "group": "efficiency",
+      "input": "off_off_ppd",
+      "label": "BUF offense points per drive, rank 2",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 2.573629608194919,
+      "weight": 0.0
+    },
+    {
+      "group": "efficiency",
+      "input": "off_off_ypp",
+      "label": "BUF offense yards per play, rank 2",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 5.998078101923544,
+      "weight": 0.0
+    },
+    {
+      "group": "passing",
+      "input": "off_pass_epa",
+      "label": "BUF offense pass efficiency, rank 2",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.14555122699673287,
+      "weight": 0.0
+    },
+    {
+      "group": "rushing",
+      "input": "off_rush_epa",
+      "label": "BUF offense run efficiency, rank 6",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.03598653920098649,
+      "weight": 0.0
+    },
+    {
+      "group": "rushing",
+      "input": "off_rush_success",
+      "label": "BUF offense run success, rank 5",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.4516162348634232,
+      "weight": 0.0
+    },
+    {
+      "group": "pace",
+      "input": "opponent_drives",
+      "label": "DET offensive drives per game",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 10.423529411764706,
+      "weight": 0.0
+    },
+    {
+      "group": "pace",
+      "input": "plays_per_drive",
+      "label": "BUF plays per drive",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 6.049664714370596,
+      "weight": 0.0
+    },
+    {
+      "group": "pressure",
+      "input": "pressure_allowed",
+      "label": "Offense PRESSURE_PROXY allowed",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29"
+      ],
+      "status": "INACTIVE",
+      "value": 0.17902097902097902,
+      "weight": 0.0
+    },
+    {
+      "group": "pressure",
+      "input": "pressure_generated",
+      "label": "Defense PRESSURE_PROXY generated",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29"
+      ],
+      "status": "INACTIVE",
+      "value": 0.21285714285714288,
+      "weight": 0.0
+    },
+    {
+      "group": "pythagorean",
+      "input": "pythagorean",
+      "label": "BUF points-based expected win rate",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.6406508451240147,
+      "weight": 0.0
+    },
+    {
+      "group": "quarterback",
+      "input": "qb_backup",
+      "label": "Pregame QB backup flag",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
+        "2e6f2dce7c7ebd46e985cabe0c17eb72b39a77f98cb4478409294f50b5820150",
+        "333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8",
+        "3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b",
+        "60c3067017db2d28a78f66a79b657268be8578d9a5288e6a827efdcd7fe42540",
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60",
+        "931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09",
+        "bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29"
+      ],
+      "status": "INACTIVE",
+      "value": 0.0,
+      "weight": 0.0
+    },
+    {
+      "group": "quarterback",
+      "input": "qb_career_starts",
+      "label": "Pregame QB career start proxy",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
+        "2e6f2dce7c7ebd46e985cabe0c17eb72b39a77f98cb4478409294f50b5820150",
+        "333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8",
+        "3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b",
+        "60c3067017db2d28a78f66a79b657268be8578d9a5288e6a827efdcd7fe42540",
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60",
+        "931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09",
+        "bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29"
+      ],
+      "status": "INACTIVE",
+      "value": 141.0,
+      "weight": 0.0
+    },
+    {
+      "group": "quarterback",
+      "input": "qb_cpoe",
+      "label": "Pregame QB completion over expectation",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
+        "2e6f2dce7c7ebd46e985cabe0c17eb72b39a77f98cb4478409294f50b5820150",
+        "333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8",
+        "3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b",
+        "60c3067017db2d28a78f66a79b657268be8578d9a5288e6a827efdcd7fe42540",
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60",
+        "931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09",
+        "bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29"
+      ],
+      "status": "INACTIVE",
+      "value": 4.342871685316383,
+      "weight": 0.0
+    },
+    {
+      "group": "quarterback",
+      "input": "qb_epa",
+      "label": "Pregame QB EPA per dropback",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
+        "2e6f2dce7c7ebd46e985cabe0c17eb72b39a77f98cb4478409294f50b5820150",
+        "333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8",
+        "3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b",
+        "60c3067017db2d28a78f66a79b657268be8578d9a5288e6a827efdcd7fe42540",
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60",
+        "931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09",
+        "bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29"
+      ],
+      "status": "INACTIVE",
+      "value": 0.2150406661115633,
+      "weight": 0.0
+    },
+    {
+      "group": "target_shares",
+      "input": "rb_share",
+      "label": "BUF rb share",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.17512131898233385,
+      "weight": 0.0
+    },
+    {
+      "group": "scoring_composition",
+      "input": "redzone_td",
+      "label": "BUF redzone td",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.6756302521008404,
+      "weight": 0.0
+    },
+    {
+      "group": "unqualified",
+      "input": "referee",
+      "label": "Week 5 positive study absent",
+      "points": 0.0,
+      "reason": "No qualifying history; preserved v1 inactive slot",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": null,
+      "weight": 0.0
+    },
+    {
+      "group": "rest_travel",
+      "input": "rest_days",
+      "label": "BUF rest days since last game",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 4,
+      "weight": 0.0
+    },
+    {
+      "group": "scoring_composition",
+      "input": "return_points",
+      "label": "BUF return points",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.8470588235294118,
+      "weight": 0.0
+    },
+    {
+      "group": "schedule_strength",
+      "input": "schedule_strength",
+      "label": "BUF opponent-adjusted schedule strength",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.20360125898678882,
+      "weight": 0.0
+    },
+    {
+      "group": "kicking",
+      "input": "season_fg_long",
+      "label": "BUF long-distance field goals",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 1.0,
+      "weight": 0.0
+    },
+    {
+      "group": "kicking",
+      "input": "season_fg_medium",
+      "label": "BUF medium-distance field goals",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 1.0,
+      "weight": 0.0
+    },
+    {
+      "group": "kicking",
+      "input": "season_fg_short",
+      "label": "BUF short-distance field goals",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.9459459459459458,
+      "weight": 0.0
+    },
+    {
+      "group": "target_shares",
+      "input": "te_share",
+      "label": "BUF te share",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.2572072541256497,
+      "weight": 0.0
+    },
+    {
+      "group": "rest_travel",
+      "input": "travel_miles",
+      "label": "BUF travel from home stadium",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.0,
+      "weight": 0.0
+    },
+    {
+      "group": "turnovers_luck",
+      "input": "turnover_margin",
+      "label": "BUF turnover margin",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": 0.4470588235294118,
+      "weight": 0.0
+    },
+    {
+      "group": "wind",
+      "input": "wind",
+      "label": "Separate PARTIAL_HISTORY correction",
+      "points": 0.0,
+      "reason": "Not qualified by v2 prior-season group gate",
+      "source_hashes": [
+        "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+        "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
+        "0d608d584ca36954f5e3bcb278391e0f05a03daa5b80a618b0c03f0f704e7070",
+        "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
+        "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+        "968595e3f6ffcc9f01d9dfc1e6eb289a7ef3ed5dbfebe8b5ce2d4ea3683b8a72"
+      ],
+      "status": "INACTIVE",
+      "value": null,
+      "weight": 0.0
+    }
+  ],
+  "total": {
+    "projected": 52.470779555871424,
+    "actual": 72,
+    "error": 19.529220444128576
+  },
+  "margin": {
+    "projected_home": 2.6746803119634635,
+    "actual_home": 10,
+    "error": 7.3253196880365365
+  }
+}
