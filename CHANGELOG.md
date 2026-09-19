@@ -295,3 +295,8 @@ Closeout publisher inspection: NOT BUILT at start (only consumer guard/receipt c
 - Added immutable weekly closeout publisher and blocked both scheduled weight-refit paths until its evidence is pushed and a publication receipt exists. Scorecard includes dispersion, 50/80 coverage, signed total bias, best/worst five and named unqualified-game counts; trend and Season evidence are refreshed and snapshotted. Remote tip is checked after publishing.
 - Status: built and locally tested; production host execution unverified. E-WEPA fitting waits for this dependency and its queue slot after the league scoring-environment experiment.
 - momentumnfl remains EXCLUDED: pinned preseason.py reads market win totals even with the final blend disabled. No PURE_MODEL_REPRODUCED result claimed.
+
+## E-POST and deployed-control governance correction
+- Preserved the independent audit verbatim and reproduced its baseline/live/replay MAE and bias. Clarified baseline SD: mean within-season 1.537 versus pooled 1.687.
+- Registered E-POST ahead of all queued experiments. STOPPED before fitting under the requested control-identity rule: active publisher uses projection-v2.w2 fit 8bd58561, not an established 8.003-series control. No gate evaluated or promotion made.
+- Governing experiments now require the deployed model's rolling-origin control. E1 and E-UNC annotated as valid within REPLAY, not tested against production; each may be re-registered once. Original results preserved.
