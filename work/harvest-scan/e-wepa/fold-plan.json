@@ -1,0 +1,94 @@
+{
+  "preferred": "nested annual",
+  "folds": [
+    {
+      "evaluation_season": 2016,
+      "training_start": 2006,
+      "training_end": 2015,
+      "training_seasons": 10,
+      "weights_frozen_through": 2016
+    },
+    {
+      "evaluation_season": 2017,
+      "training_start": 2006,
+      "training_end": 2016,
+      "training_seasons": 11,
+      "weights_frozen_through": 2017
+    },
+    {
+      "evaluation_season": 2018,
+      "training_start": 2006,
+      "training_end": 2017,
+      "training_seasons": 12,
+      "weights_frozen_through": 2018
+    },
+    {
+      "evaluation_season": 2019,
+      "training_start": 2006,
+      "training_end": 2018,
+      "training_seasons": 13,
+      "weights_frozen_through": 2019
+    },
+    {
+      "evaluation_season": 2020,
+      "training_start": 2006,
+      "training_end": 2019,
+      "training_seasons": 14,
+      "weights_frozen_through": 2020
+    },
+    {
+      "evaluation_season": 2021,
+      "training_start": 2006,
+      "training_end": 2020,
+      "training_seasons": 15,
+      "weights_frozen_through": 2021
+    },
+    {
+      "evaluation_season": 2022,
+      "training_start": 2006,
+      "training_end": 2021,
+      "training_seasons": 16,
+      "weights_frozen_through": 2022
+    },
+    {
+      "evaluation_season": 2023,
+      "training_start": 2006,
+      "training_end": 2022,
+      "training_seasons": 17,
+      "weights_frozen_through": 2023
+    },
+    {
+      "evaluation_season": 2024,
+      "training_start": 2006,
+      "training_end": 2023,
+      "training_seasons": 18,
+      "weights_frozen_through": 2024
+    },
+    {
+      "evaluation_season": 2025,
+      "training_start": 2006,
+      "training_end": 2024,
+      "training_seasons": 19,
+      "weights_frozen_through": 2025
+    }
+  ],
+  "fallback": {
+    "training_start": 2006,
+    "training_end": 2012,
+    "training_seasons": 7,
+    "evaluation_seasons": [
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "trigger": "per-fold fit exceeds 45-minute ceiling",
+    "label": "FALLBACK"
+  }
+}

@@ -284,3 +284,14 @@ Pre-implementation Tier 3 batch: E1 rejected state-space while production remain
 - Tooling: scoringrules 0.10.0 Apache-2.0 pinned (corrects supplied MIT; avoids unapproved NumPy 2 upgrade). 45 reconciliation cases, no absolute discrepancy above 1e-6; largest Brier difference 8.33e-17. Public library Brier rejects fractional outcomes, so disclosed binary-score identity preserves legacy tie score. Active uncertainty functions delegate to new adapter. Old frozen-reference implementations/artifacts preserved. Tail CRPS added through saved-distribution report, no refit.
 - CONVENTIONS: library estimator `nrg` is empirical energy CRPS, not fair correction; exact PMF weights; Winkler alpha=1-level; fixed forecast central80 bounds for two-tail transform. Tail score is reporting only. Unknown upstream market usage remains unknown; published momentumnfl predictions are market-informed and excluded as independent comparator.
 - Monthly first-Tuesday 09:00 Pacific task created; fail-closed published-closeout receipt prerequisite tested. Initial September 18 scan explicitly authorized outside cadence. Cadence publisher still pending prior Tier 3 resolution. No provider credits spent; no raw market field admitted to projection.
+
+## 2026-09-18 — E-WEPA nested amendment and closeout prerequisite
+
+User resolves E-WEPA fitting overlap with 2006..S-1 annual weight fits for 2016–2025, same-window WEPA/play × plays/drive minus league mean conversion, and promotion through E-WEPA's own gate only. Original registration preserved; amended registration and fold-plan hashes recorded under work/harvest-scan/e-wepa. Timeout fallback is 2006–2012 frozen, disclosed, never selected by observed accuracy. No fitting this turn.
+
+Closeout publisher inspection: NOT BUILT at start (only consumer guard/receipt contract existed). Building that dependency takes priority over experiment implementation. momentumnfl remains excluded pending verified market-free reproduction, not merely disabling its final blend switch.
+
+### Closeout dependency implementation and comparator decision
+- Added immutable weekly closeout publisher and blocked both scheduled weight-refit paths until its evidence is pushed and a publication receipt exists. Scorecard includes dispersion, 50/80 coverage, signed total bias, best/worst five and named unqualified-game counts; trend and Season evidence are refreshed and snapshotted. Remote tip is checked after publishing.
+- Status: built and locally tested; production host execution unverified. E-WEPA fitting waits for this dependency and its queue slot after the league scoring-environment experiment.
+- momentumnfl remains EXCLUDED: pinned preseason.py reads market win totals even with the final blend disabled. No PURE_MODEL_REPRODUCED result claimed.

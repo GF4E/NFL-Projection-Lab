@@ -105,16 +105,20 @@
     {
       "id": "E-WEPA",
       "name": "E-WEPA",
-      "state": "REGISTERED_BLOCKED",
-      "registration": "work/harvest-scan/e-wepa/registration.json",
-      "registration_sha256": "befea212c6a7fb391999322f8f6530bc7bed7c82f4a5d60d21daba42fc7e2b23",
-      "blockers": [
-        "training/evaluation overlap",
-        "state-space qualification and observation units"
-      ],
+      "state": "REGISTERED_PENDING_CLOSEOUT_AND_QUEUE_SLOT",
+      "registration": "work/harvest-scan/e-wepa/registration-amended-2026-09-18.json",
+      "registration_sha256": "c8da4291f5b2b74de1f2bd97548d63843f169be39d4961b59f0f9a00f9eb7065",
+      "blockers": [],
       "clock": {
         "status": "WAITING_FOR_TUESDAY_ACTIVATION_AFTER_CLOSEOUT"
-      }
+      },
+      "previous_registration": "work/harvest-scan/e-wepa/registration.json",
+      "previous_registration_sha256": "befea212c6a7fb391999322f8f6530bc7bed7c82f4a5d60d21daba42fc7e2b23",
+      "execution_prerequisites": [
+        "published Tuesday closeout",
+        "preceding league scoring experiment gate decision",
+        "activation baseline and executable source pins"
+      ]
     },
     {
       "id": "E-OPP",

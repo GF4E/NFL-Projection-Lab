@@ -19,7 +19,7 @@ from scripts.nfl_engine_autopush import guard, REMOTE
 
 LOCK_PATH = 'work/cloud-migration-v1/ownership.json'
 OUT = ROOT/'outputs/model-pick-v1'
-ALLOWED = ('outputs/board-v8-market/', 'outputs/board-v7/', 'outputs/in-season-learning-v1/', 'work/in-season-learning-v1/', 'CHANGELOG.md', 'outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
+ALLOWED = ('outputs/cadence-v2/', 'outputs/board-v8-market/', 'outputs/board-v7/', 'outputs/in-season-learning-v1/', 'work/in-season-learning-v1/', 'CHANGELOG.md', 'outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
            'work/model-pick-v1/daily/', 'work/model-pick-v1/sources/',
            'work/model-pick-v1/schedules/', 'work/model-pick-v1/states/',
            'work/model-pick-v1/depth/')
@@ -71,6 +71,8 @@ def publish_artifacts():
     remote = git('ls-remote', 'origin', 'refs/heads/engine-v2').decode().split()[0]
     if head != remote:
         git('push', 'origin', 'HEAD:refs/heads/engine-v2')
+    if git('ls-remote', 'origin', 'refs/heads/engine-v2').decode().split()[0] != head:
+        raise RuntimeError('Publication remote verification failed')
     return head
 
 
@@ -132,6 +134,9 @@ def run(mode, host):
             from scripts.projection_learning import report,run_weekly
             refresh();prepare_suit(refresh=True);prepare();prepare_v3()
             publish_projection(require_synced_entries=True);report()
+            from scripts.closeout_publish import run as closeout
+            closed=closeout(publish_artifacts)
+            if closed['state'] != 'PUBLISHED': return closed
             result=run_weekly()
             publish_projection(require_synced_entries=True);report()
             return {**result,'commit':publish_artifacts()}
@@ -196,7 +201,9 @@ def run(mode, host):
             from scripts.projection_learning import report,run_weekly
             report()
             if mode=='daily' and entries_synced:
-                weekly=run_weekly()
+                from scripts.closeout_publish import run as closeout
+                closed=closeout(publish_artifacts)
+                weekly=run_weekly() if closed['state']=='PUBLISHED' else closed
                 if weekly.get('state')=='REFIT_COMPLETE':
                     publish_projection(require_synced_entries=True)
                     report()
