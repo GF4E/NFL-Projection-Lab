@@ -1,0 +1,13 @@
+# E-BENCHMARK-GAP — registered descriptive study, no fitting
+
+Registered after host recovery and series hygiene. Sole engine series: deployed-oof-6a0238fc (full hash in registration). Compare 2021–2025 REG games to the pinned nfelo historic_projected_spreads.csv, field home_line_pre_regression (negated to home margin), and nflverse spread_line (home-margin convention), on identical game IDs. Reproduce the audit's 1177 overlap if supported; never force the count by outcome selection. Retain baseline as clearly SUPERSEDED audit comparator only. No feature enters the engine, no coefficients/candidates/gates fitted.
+
+Gap sweep, resolved before comparative results:
+- Tier 1: existing repository duplicate policy excludes every duplicated nfelo game_id; never select by accuracy. Missing model/market values remain missing. Report exact eligibility flow and IDs.
+- Tier 1: loss is absolute home-margin error. Paired difference = engine loss minus comparator loss, positive means comparator better. Report MAE, sum of paired excess loss, excess loss per game, and share of total excess loss. Closing lines are benchmark-only and never projection inputs.
+- Tier 1: season buckets 2021..2025; week bands 1–5 and 6+ (existing early-season division); favorite-size bands |deployed projected margin| <3, [3,7), [7,14), >=14 (existing engine bands), determined before observing actuals. Dome = roof dome/closed; outdoor = open/outdoors; other/missing UNKNOWN.
+- Tier 2 REVIEW REQUESTED: QB-change diagnostic uses nflverse observed starter IDs against that team's previous played regular-season game, including prior season. It is retrospective stratification, NOT pregame confirmed-starter qualification or feature admission. Missing prior/current starter gives UNKNOWN, never inferred. Alternative is pregame-confirmed history, unavailable for the whole period. Game bucket CHANGED if either observed starter changes, UNCHANGED if both known and unchanged, otherwise UNKNOWN.
+- Tier 1: no multiple-comparison discovery is a promotion. Decompositions overlap; do not add contributions across different dimensions. Report bucket counts, avoid causal claims. Suggested next experiment is named by evidence only; no candidate is registered or fitted in this descriptive run.
+- Tier 2 REVIEW REQUESTED: nfelo pre-regression means before final market blending, not necessarily football-only ancestry. Verify the pinned source; label honestly and retain the requested numeric benchmark, without admitting any market-derived feature into our core.
+
+Metrics are descriptive on reused historical data. A temporal or source-cutoff mismatch is disclosed, not interpreted as an independently validated superiority claim.
