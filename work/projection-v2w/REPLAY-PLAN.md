@@ -1,0 +1,15 @@
+# Production-semantics replay plan, before results
+
+Authority: user resolved the choice in favor of production semantics exactly. Source commit 538ce1f424bfe794ecbccf64ccabc8e4e9bbfadc directly verified on droplet, active artifact SHA256 8bd585610049c63e30aea2e675f61cd6e65a5c22b268e87f89971bb3bffa246d. Retain calibration+Elo, no decay, penalty 10, model.fit and model.predict. No state-space assimilation is added. Historical training begins in 2015, as in the deployed historical-ref; each season initializes from strictly earlier seasons. Within-season refits expand through completed prior week, retaining all earlier historical training. Original 2639-game population, T-75 issuance, season/week/game row schema unchanged.
+
+Gap sweep before execution:
+- Tier 1: extract the production numerical modules from the verified host commit; verify their byte hashes against the host. No copied coefficients from 2026 enter historical fits; they define groups/settings only.
+- Tier 1: use pinned historical feature rows built by the same engine feature code. Features depend on previous week, not current-week results. At abnormal calendars, if a prior-week result is unavailable at issuance, rebuild the current season's feature snapshot with uncompleted games' scores withheld and team-game observations withheld, through exactly the same feature builder. Never import E1's alternative feature builder.
+- Tier 1: offseason fit uses all available historical rows strictly before the season; weekly fit uses all previous seasons plus completed current-season rows through the refit week. No Week 18 refit, matching production run_weekly.
+- Tier 2, REVIEW REQUESTED: historical provider delivery and entry-sync timestamps are not available. Replay assumes completed results/PBP available at kickoff+4h, then the next hourly daily retry after the production Tuesday 06:00 PT due time and whole-week completion. Alternative is actual archived provider-receipt timing, which is unavailable. This is a production-algorithm replay under disclosed data availability, not proof of historical operational delivery.
+- Tier 1: production nflverse gametime is interpreted as America/New_York by the publisher; preserve that code convention for T-75. Fixed four-hour result availability is a replay convention, not an observed end time.
+- Tier 1: original immutable historical feature rows are retained for prior seasons; same-season rows use as-of inputs. Non-retained personnel and weather inputs do not affect point estimates; no new data admitted.
+- Tier 1: population SD, bias projected-minus-actual, ordinary least-squares slope for diagnostics only. Paired games remain indivisible. Rows and fits sorted deterministically.
+- Tier 1: the audit candidate MAE is reference only. If generated production-algorithm historical bias is not negative, stop E-POST candidate fitting as explicitly instructed.
+
+No live fit, lock, grade or distribution is changed. Disk-full host is only read. Exact historical wall-clock PBP/sync timing cannot be claimed.
