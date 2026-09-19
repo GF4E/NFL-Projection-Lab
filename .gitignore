@@ -71,3 +71,17 @@ work/projection-v3/*.tar.gz
 # E1 expanded verification cache; content-addressed gzip is retained.
 work/projection-governance-v2/e1/verified-games.json
 /work/projection-governance-v2/e1-calendar-corrected/verified-games.json
+
+# Regenerable unit-test outputs; frozen production records remain tracked.
+/work/harvest-tests/
+/work/joint-scorecard-tests/
+/work/market-distribution-tests/
+/work/live-weather-tests/
+/work/week1-followup-tests/
+/work/week1-pricing-tests/
+/work/model-pick-v1/tests/
+/work/slip-ingest-v1/tests/
+
+# Exact recovery inventories are retained as gzip.
+/work/host-recovery-2026-09-19/cache-before.tsv
+/work/host-recovery-2026-09-19/removed-files.json
