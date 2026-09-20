@@ -1,0 +1,259 @@
+{
+  "premise": "work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json",
+  "generated_at": "2026-09-19 UTC",
+  "authoritative_control_verified": true,
+  "control_max_abs_prediction_difference": 0.0,
+  "control_max_abs_feature_difference": 0.0,
+  "own_elo": {
+    "control": {
+      "games": 2639,
+      "mae": 10.244657262910934,
+      "bias": 0.8761555432746394,
+      "brier": 0.22301878177278245,
+      "slope": 0.9865436699306257,
+      "reliability": [
+        {
+          "lower": 0.0,
+          "n": 0,
+          "forecast": null,
+          "observed": null
+        },
+        {
+          "lower": 0.1,
+          "n": 32,
+          "forecast": 0.168597013154697,
+          "observed": 0.265625
+        },
+        {
+          "lower": 0.2,
+          "n": 131,
+          "forecast": 0.2620309696989818,
+          "observed": 0.33587786259541985
+        },
+        {
+          "lower": 0.3,
+          "n": 249,
+          "forecast": 0.35625650005478504,
+          "observed": 0.321285140562249
+        },
+        {
+          "lower": 0.4,
+          "n": 423,
+          "forecast": 0.4543011010124186,
+          "observed": 0.4101654846335697
+        },
+        {
+          "lower": 0.5,
+          "n": 531,
+          "forecast": 0.5538361302958128,
+          "observed": 0.4839924670433145
+        },
+        {
+          "lower": 0.6,
+          "n": 557,
+          "forecast": 0.6495454110716751,
+          "observed": 0.6157989228007181
+        },
+        {
+          "lower": 0.7,
+          "n": 459,
+          "forecast": 0.7477129636171934,
+          "observed": 0.7004357298474946
+        },
+        {
+          "lower": 0.8,
+          "n": 230,
+          "forecast": 0.8413225563790898,
+          "observed": 0.8282608695652174
+        },
+        {
+          "lower": 0.9,
+          "n": 27,
+          "forecast": 0.9160356916080096,
+          "observed": 0.8888888888888888
+        }
+      ],
+      "reliability_squared_03_08": 0.0024240894375501137
+    },
+    "hfa": {
+      "games": 2639,
+      "mae": 10.216512452724324,
+      "bias": 0.020790990524988263,
+      "brier": 0.2215558939655176,
+      "slope": 0.9793697719328829,
+      "reliability": [
+        {
+          "lower": 0.0,
+          "n": 0,
+          "forecast": null,
+          "observed": null
+        },
+        {
+          "lower": 0.1,
+          "n": 41,
+          "forecast": 0.16168815670306788,
+          "observed": 0.25609756097560976
+        },
+        {
+          "lower": 0.2,
+          "n": 172,
+          "forecast": 0.25696257314575466,
+          "observed": 0.3372093023255814
+        },
+        {
+          "lower": 0.3,
+          "n": 306,
+          "forecast": 0.35563053788338367,
+          "observed": 0.32189542483660133
+        },
+        {
+          "lower": 0.4,
+          "n": 456,
+          "forecast": 0.4516001052713697,
+          "observed": 0.4298245614035088
+        },
+        {
+          "lower": 0.5,
+          "n": 536,
+          "forecast": 0.5490662891556835,
+          "observed": 0.5242537313432836
+        },
+        {
+          "lower": 0.6,
+          "n": 540,
+          "forecast": 0.6461180455189166,
+          "observed": 0.6425925925925926
+        },
+        {
+          "lower": 0.7,
+          "n": 388,
+          "forecast": 0.745957732384075,
+          "observed": 0.7152061855670103
+        },
+        {
+          "lower": 0.8,
+          "n": 185,
+          "forecast": 0.8403845954818776,
+          "observed": 0.8675675675675676
+        },
+        {
+          "lower": 0.9,
+          "n": 15,
+          "forecast": 0.9151315942890932,
+          "observed": 0.8666666666666667
+        }
+      ],
+      "reliability_squared_03_08": 0.0005696726383547348
+    }
+  },
+  "deployed_points": {
+    "control": {
+      "games": 2639,
+      "team_mae": 7.574348007893794,
+      "team_bias": 0.18887493252614243
+    },
+    "hfa": {
+      "games": 2639,
+      "team_mae": 7.575628833271496,
+      "team_bias": 0.1888626093556898
+    }
+  },
+  "checks": {
+    "absolute_elo_bias_improves": true,
+    "reliability_03_08_improves": true,
+    "elo_margin_mae_noninferior_0_1pct": true,
+    "deployed_team_mae_noninferior_0_1pct": true
+  },
+  "decision": "PROMOTION_ELIGIBLE",
+  "parameters": [
+    {
+      "season": 2014,
+      "hfa_elo": 76.21231979030144,
+      "points": 3.048492791612057,
+      "training_games": 763,
+      "last_training_season": 2013
+    },
+    {
+      "season": 2015,
+      "hfa_elo": 69.90131578947368,
+      "points": 2.7960526315789473,
+      "training_games": 760,
+      "last_training_season": 2014
+    },
+    {
+      "season": 2016,
+      "hfa_elo": 60.65303430079155,
+      "points": 2.426121372031662,
+      "training_games": 758,
+      "last_training_season": 2015
+    },
+    {
+      "season": 2017,
+      "hfa_elo": 55.15191545574637,
+      "points": 2.206076618229855,
+      "training_games": 757,
+      "last_training_season": 2016
+    },
+    {
+      "season": 2018,
+      "hfa_elo": 54.794973544973544,
+      "points": 2.191798941798942,
+      "training_games": 756,
+      "last_training_season": 2017
+    },
+    {
+      "season": 2019,
+      "hfa_elo": 62.00396825396825,
+      "points": 2.4801587301587302,
+      "training_games": 756,
+      "last_training_season": 2018
+    },
+    {
+      "season": 2020,
+      "hfa_elo": 40.033112582781456,
+      "points": 1.6013245033112582,
+      "training_games": 755,
+      "last_training_season": 2019
+    },
+    {
+      "season": 2021,
+      "hfa_elo": 20.343461030383093,
+      "points": 0.8137384412153237,
+      "training_games": 757,
+      "last_training_season": 2020
+    },
+    {
+      "season": 2022,
+      "hfa_elo": 14.359637774902975,
+      "points": 0.574385510996119,
+      "training_games": 773,
+      "last_training_season": 2021
+    },
+    {
+      "season": 2023,
+      "hfa_elo": 32.369758576874204,
+      "points": 1.294790343074968,
+      "training_games": 787,
+      "last_training_season": 2022
+    },
+    {
+      "season": 2024,
+      "hfa_elo": 53.308364544319595,
+      "points": 2.132334581772784,
+      "training_games": 801,
+      "last_training_season": 2023
+    },
+    {
+      "season": 2025,
+      "hfa_elo": 54.630788485607006,
+      "points": 2.1852315394242803,
+      "training_games": 799,
+      "last_training_season": 2024
+    }
+  ],
+  "elapsed_seconds": 3.6138067500000943,
+  "population": "2639REGgames2016-2025; no2026orpostseason",
+  "source_commit": "538ce1f424bfe794ecbccf64ccabc8e4e9bbfadc",
+  "method": "HFA prior-three-season nonneutralREGhome margin; exactweeklyproductionfeature/refit chronology",
+  "no_production_activation": true
+}

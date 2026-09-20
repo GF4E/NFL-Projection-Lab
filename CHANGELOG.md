@@ -349,3 +349,36 @@ Tier1: normalize LA/LV/WAS to existing personnel LAR/OAK/WSH conventions before 
 Tier2 REVIEW REQUESTED: preserve schedule-QB membership despite literal-starter/source disputes, with registered disputed-classification sensitivity. Alternative: redefine actual starter population only after gamebook reconciliation. Tier2: current primary articles modified afterT75 remain unqualified for confirmed prelock knowledge absent historical content; report liberal publication-date sensitivity instead of silently treating original publication as content proof. Later retrieval alone is not disqualifying. No unknown is labeled not knowable.
 
 Confidence: medium for the narrower unresolved identification-versus-valuation conclusion: authoritative data support it, but identity and timestamp choices could reasonably differ. Downgrade to low if an independent historical lock/content archive changes those classifications.
+
+## 2026-09-19 — Qualified starter rule; E-ELO-QB and E-ELO-HFA
+
+User specification and hashed gap sweep: `work/e-elo-qb-hfa-v1/REQUEST.md`, `PLAN.md`, E-ELO-QB.json and E-ELO-HFA.json. This supersedes the earlier blanket starter-history restriction: all requested nflverse stats/injury/chart releases are available. The rule retains UNTIMESTAMPED chart selections and uses only earlier-game attempts and pre-T75 injury evidence. The immutable table has5278team-games,5271selected QBs and400UNTIMESTAMPED selections. Historical actual engine locks remain distinct from this authorized reconstruction; they are no longer a prerequisite for the new tests.
+
+| Starter reproduction | Supplied | Recomputed, common1980team-games |
+|---|---:|---:|
+| Full prior-game plus injury rule |89.4%|90.960%|
+| Chart QB1 |85.6%|85.455%|
+| Chart-first combination |89.1%|89.091%|
+
+The supplied primary figures closely reproduce the no-override prior-game rule (89.484%on1978unambiguous comparisons). Full-rule discrepancy exceeds1percentage point, so E-ELO-QB has no candidate fit. Its exact EPA/dropback+CPOE→VALUE scale and inexperienced-QB rule also remain undefined; the existing3.3multiplier assumes VALUE is already supplied. These are reproduction/unit blockers, not missing starter data. Supporting in-sample regression yielded7.794422→7.732279on2806team-games under the disclosed convention, not7.761→7.642on2442; original script/row manifest needed for reconciliation.
+
+### E-ELO-HFA gate decision: PASSED_PENDING_RELEASE
+
+Exact unchanged deployed replay matches6a0238fc with zero point-forecast difference. All2639REGgames2016–2025remain paired. No2026orpostseason enters the gate. The candidate fits only the prior-three-season nonneutralREGhome mean per outer season and retains existing65control,25divisor,20Kand reversion.
+
+| Gate | Before | After | Decision |
+|---|---:|---:|---|
+| Elo margin MAE |10.244657|10.216512|PASS, no>0.1%worsening|
+| Elo signed margin bias |+0.876156|+0.020791|PASS, towardzero|
+| Reliability squared bin error,0.3–0.8 |0.00242409|0.00056967|PASS|
+| Deployed team MAE |7.574348|7.575629|PASS,0.0169%worsening<0.1%|
+
+This is a bias-correction pass, not an accuracy promotion claim. Release remains separate under queue automatic_method_promotion=false; no active fit or frozen forecast was changed. A compatible versioned HFA feature history and fit must be released together. E-ELO-QB does not block this gate decision.
+
+### CONVENTIONS and audit corrections
+
+Tier1: handle player_stats→stats_player rename at2025and depth-chart schema transition. Canonical team aliases; strict UTC cutoffs; deterministic prior-two-game and chart tie-break; no current-game attempts in selector. All2016–2025matched QB Out/Doubtful injury records precedeT75.2022matched count5433reproduces, but late-row count is0rather than1; canceled BUF–CIN injury rows remain explicitly unmatched. Sources preserved as compressed exact bytes with hashes.
+
+Tier2 REVIEW REQUESTED: the reported2778games include17graded2026games and postseason;2244games are2018–2026alltypes. On this audit population, controlMAE10.274796reproduces; HFA MAE10.246808differs0.005592from10.2524, within0.01tolerance. Refitted bias+0.144041differsfrom+0.221 and is disclosed. Actual gate retains the authoritative regular-season population. The chosen HFA training and squared-reliability conventions were preregistered; absolute reliability also improves0.047301→0.021288. There is no divisor change:25.532is the OLS-implied divisor, not the direct-MAE optimum. Site winner probabilities come from projected points plus residuals, not direct Elo logistic output.
+
+Confidence: medium for the HFA bias-correction decision: it holds on authoritative rows but depends on defensible training/reliability conventions. Downgrade to low if the intended conventions reverse a gate check. E-ELO-QB has no scored candidate conclusion.

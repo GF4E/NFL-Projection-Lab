@@ -876,6 +876,39 @@
         "slope": 1.4424058071944432,
         "sd": 1.6874510280323158
       }
+    },
+    {
+      "path": "work/e-elo-qb-hfa-v1/hfa-deployed-oof.json",
+      "sha256": "702b2c09454c72d4849a19f814239c3fe488652e4230a1d19c3ab4736a860c4d",
+      "date_added": "2026-09-20T02:24:51.177394+00:00",
+      "authoritative": false,
+      "status": "EXPERIMENTAL_GATE_PASSED",
+      "component": "hfa",
+      "metric_target": "team_points",
+      "producer_and_fit": "scripts/elo_hfa_deployed_gate.py; verified538ce1f4productionnumericalcode; artifact8bd58561settings;candidateHFAprior-three-seasonmean",
+      "note": "See SERIES.md. Sole deployed gate control remains6a0238fc until an explicitly released replacement."
+    },
+    {
+      "path": "work/e-elo-qb-hfa-v1/hfa-own-margin-control.json",
+      "sha256": "79a1da423283912a0176ce96d8049662b9faa0094903f9fde9988b43d28f4795",
+      "date_added": "2026-09-20T02:24:51.177977+00:00",
+      "authoritative": false,
+      "status": "DIAGNOSTIC_ELO_COMPONENT",
+      "component": "control",
+      "metric_target": "home_margin",
+      "producer_and_fit": "scripts/elo_hfa_deployed_gate.py; verified538ce1f4productionnumericalcode; artifact8bd58561settings;candidateHFAprior-three-seasonmean",
+      "note": "See SERIES.md. Sole deployed gate control remains6a0238fc until an explicitly released replacement."
+    },
+    {
+      "path": "work/e-elo-qb-hfa-v1/hfa-own-margin-hfa.json",
+      "sha256": "94bda76777016da256f135952cbcba6f524e868827d4ac18a72f03ad55878d04",
+      "date_added": "2026-09-20T02:24:51.178241+00:00",
+      "authoritative": false,
+      "status": "DIAGNOSTIC_ELO_COMPONENT",
+      "component": "hfa",
+      "metric_target": "home_margin",
+      "producer_and_fit": "scripts/elo_hfa_deployed_gate.py; verified538ce1f4productionnumericalcode; artifact8bd58561settings;candidateHFAprior-three-seasonmean",
+      "note": "See SERIES.md. Sole deployed gate control remains6a0238fc until an explicitly released replacement."
     }
   ],
   "scope": "Tracked out-of-fold series and derived scored/verified series. Unit-test fixtures, per-game live locks and raw inputs are not rolling-origin evaluation series.",
@@ -888,5 +921,18 @@
     "closing_line": {
       "status": "AUDIT_REFERENCE_ONLY"
     }
-  }
+  },
+  "audit_findings": [
+    {
+      "date": "2026-09-19",
+      "id": "E-ELO-HFA-QB-REPRODUCTION",
+      "report": "work/e-elo-qb-hfa-v1/REPORT.md",
+      "audit_population_correction": "2778 includes postseason and17gamesin2026;2244is2018-2026alltypes",
+      "own_elo_not_production_control": true,
+      "site_probability_path": "projection scores plus empirical residual distribution, not direct Elo logistic",
+      "starter_source_qualification": "AVAILABLE under explicit new rule;400UN_TIMESTAMPED chart selections,5271of5278selected",
+      "HFA_gate": "PASSED_PENDING_RELEASE",
+      "QB_gate": "NOT_RUN_REPRODUCTION_AND_UNIT_DEFINITION"
+    }
+  ]
 }

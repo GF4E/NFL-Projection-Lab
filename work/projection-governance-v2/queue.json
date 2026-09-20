@@ -30,13 +30,39 @@
   "control_policy": "work/projection-governance-v2/DEPLOYED-CONTROL.md",
   "experiments": [
     {
+      "id": "E-ELO-HFA",
+      "registration": "work/e-elo-qb-hfa-v1/E-ELO-HFA.json",
+      "registration_sha256": "5496574c482d1bba7be916bc1a3212c869da26e8e77c3b2c720cf58910cfc1e8",
+      "report": "work/e-elo-qb-hfa-v1/REPORT.md",
+      "state": "PASSED_PENDING_RELEASE",
+      "gate_passed": true,
+      "promoted": false,
+      "production_activated": false,
+      "release_note": "Existing automatic_method_promotion=false; compatible versioned HFA feature history and fit required for release."
+    },
+    {
+      "id": "E-ELO-QB",
+      "registration": "work/e-elo-qb-hfa-v1/E-ELO-QB.json",
+      "registration_sha256": "8c55eb80742ce163616ecfeff7acd8292dad12c6cb0d6ee31e7b447706ef3a5c",
+      "report": "work/e-elo-qb-hfa-v1/REPORT.md",
+      "state": "HELD_FOR_REPRODUCTION_AND_VALUE_DEFINITION",
+      "gate_passed": null,
+      "promoted": false,
+      "blockers": [
+        "Full-rule accuracy differs from supplied no-override accuracy by more than1percentage point",
+        "EPA/dropback+CPOE to VALUE formula and no-history rule unspecified"
+      ],
+      "data_availability": "STARTER_HISTORY_AVAILABLE_QUALIFIED_RULE_WITH_UNTIMESTAMPED_FALLBACKS"
+    },
+    {
       "candidates_registered": 0,
       "control": "Premise: work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json; authoritative deployed lineage: yes; generated 2026-09-19 UTC.",
       "id": "E-QB-CHANGE",
       "registration": "work/e-qb-change/registration.json",
       "registration_sha256": "b3f634cffc128521baa70f1a10c3874defb244be4ca7c3e5f53ff5af28c14127",
       "report": "work/e-qb-change/REPORT.md",
-      "state": "DIAGNOSTIC_INSUFFICIENT_PROVENANCE"
+      "state": "DIAGNOSTIC_INSUFFICIENT_PROVENANCE",
+      "superseded_qualification": "User-qualified previous-game attempts and injury/depth fallback rule in E-ELO-QB supersedes blanket starter-history restriction; original diagnostic remains preserved."
     },
     {
       "id": "E-BENCHMARK-GAP",
