@@ -22,4 +22,7 @@ Tests: 218 standing checks plus 15 focused checks passed. The first check expose
 
 Host disk: 152 MiB before, 273 MiB after apt cache cleaning and 13.5 MiB archived-journal rotation. No source or artifact of record removed. At activation 271876096 bytes remained. Disk capacity is still tight.
 
+
+Operational follow-through: repository synchronization subsequently failed closed while the host had a divergent publication commit and an untracked copy of the activation receipt. The receipt was byte-verified against the pushed copy, committed on the host, and both histories were merged without force or reset. The scheduled capture service resumed successful ticks; the existing public-data daily job then completed successfully at 2026-09-20 03:11:46 UTC, without retrying a paid capture. See post-sync-verification.json. Available root-disk space is approximately 215 MiB (98% used); cache cleanup did not solve the underlying capacity constraint. Future release receipts should be committed through the approved publication paths, or collected outside the host checkout, before synchronization.
+
 Confidence: medium — the correction holds on authoritative data but depends on a reliability convention that could reasonably differ. Move down to low if an independent reconstruction fails the registered reliability or noninferiority check.
