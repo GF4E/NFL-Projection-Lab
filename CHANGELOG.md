@@ -329,3 +329,23 @@ Closeout publisher inspection: NOT BUILT at start (only consumer guard/receipt c
 - Every new/revised report ends with low/medium/high/near-total confidence on independent recomputability, its definition and a one-level downgrade condition. Added mandatory authoritative-control/date/hash premise guard.
 - nfelo withdrawn as a market-free benchmark in registry and HARVEST.md: pre-regression inherits closing-line influence from rating updates. Closing line remains audit-only; no new comparator admitted.
 - Registered E-QB-CHANGE diagnostic, no candidates. Full 2639-game authoritative series: 585 changed, 2052 stable, 2 unknown. Changed team MAE/bias 7.773/+1.182; stable 7.517/-0.098. Requested knowledge/role/value and as-issued correctness splits lack qualified provenance; all 585 remain UNKNOWN for those dimensions. Neither causal failure mode established. Timestamped 2025 charts remain possible qualification evidence, not silently promoted to confirmed-starter locks.
+
+## 2026-09-19 — E-QB-CHANGE evidence review v2 (diagnostic, no fit)
+
+Preserve original E-QB-CHANGE artifacts. Reproduce the authoritative deployed-lineage 585 changed schedule-QB games, 2052 stable and2unknown, but withdraw the prior blanket-unknown evidence interpretation. New ledger contains2639games and660changed team-sides; source qualification and independent review in `work/e-qb-change-review-v2/REPORT.md`. Primary-source acquisition remains incomplete, explicitly itemized; no candidate, gate decision or causal diagnosis is claimed.
+
+| Preserved group | Games | Team MAE | Signed team bias |
+|---|---:|---:|---:|
+| Schedule QB changed |585|7.773328|+1.181590|
+| Schedule QB stable |2052|7.517147|−0.098177|
+| Unknown |2|8.061250|+4.335344|
+
+Verified primary pre/postgame sources contradict schedule QB fields for2025_04_WAS_ATL and2025_16_NYJ_NO; BUF Week18 is literal starter versus primary passer. Preserve membership; report exclusion sensitivities. All-season schedule/first-dropback screen identifies64team-side disagreements, not64proven errors. Primary confirmations, chart listings, reconstructed selector and actual locks remain separate. No2016–2025as-issued personnel lock located in audited local outputs; historical passing-value vintage remains unqualified. No production changes.
+
+### CONVENTIONS
+
+Tier1: normalize LA/LV/WAS to existing personnel LAR/OAK/WSH conventions before chart/source joins. Independent review found9missing2025charts due to this diagnostic join bug; fixed allseasons. All73changed2025sides have eligiblecharts (46scheduleQB matches,27differences). nflverse depth-chart dictionary defines dt as load time, not announcement; preserve that distinction. Source: https://nflreadr.nflverse.com/articles/dictionary_depth_charts.html.
+
+Tier2 REVIEW REQUESTED: preserve schedule-QB membership despite literal-starter/source disputes, with registered disputed-classification sensitivity. Alternative: redefine actual starter population only after gamebook reconciliation. Tier2: current primary articles modified afterT75 remain unqualified for confirmed prelock knowledge absent historical content; report liberal publication-date sensitivity instead of silently treating original publication as content proof. Later retrieval alone is not disqualifying. No unknown is labeled not knowable.
+
+Confidence: medium for the narrower unresolved identification-versus-valuation conclusion: authoritative data support it, but identity and timestamp choices could reasonably differ. Downgrade to low if an independent historical lock/content archive changes those classifications.
