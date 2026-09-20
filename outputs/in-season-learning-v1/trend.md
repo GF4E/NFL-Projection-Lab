@@ -1459,4 +1459,49 @@ Three-week team streaks: []
 | home | def_rush_epa | 0.005970398576838653 | -0.07730585876385071 |
 | home | season_fg_short | 0.8619610726371268 | 0.0728512076820154 |
 | home | season_fg_long | 0.4567863831370551 | -0.05338238411968575 |
-| home | turnover_margin | 0.3944345430313545 | 0
+| home | turnover_margin | 0.3944345430313545 | 0.0400414875157329 |
+| home | close_win_rate | 0.38029009091601945 | 0.03823366539794586 |
+| home | momentum | -0.1514956850722645 | 0.032511787121397025 |
+| home | return_points | 0.3922451146012684 | 0.024881968463515494 |
+| home | def_cpoe | 1.092524698223222 | 0.014197553577171106 |
+| home | drives | 9.470770132263125 | 0.013976576511907052 |
+| home | luck_index | -0.019857006446349523 | 0.009665258415735694 |
+| home | season_fg_medium | 0.8208118047568673 | 0.008407004125838039 |
+| home | def_off_ppd | 2.2370168207030963 | -0.007154450526665646 |
+| home | def_off_ypp | 5.574550253364361 | 0.00496902964062764 |
+| home | off_cpoe | 0.5514312223640663 | -0.0009664588456149024 |
+| home | career_fg_long | None | 0.0 |
+| home | career_fg_medium | None | 0.0 |
+| home | career_fg_short | None | 0.0 |
+| home | continuity | None | 0.0 |
+| home | elo_qb_adjustment | None | 0.0 |
+| home | pressure_allowed | None | 0.0 |
+| home | pressure_generated | None | 0.0 |
+| home | qb_backup | None | 0.0 |
+| home | qb_career_starts | None | 0.0 |
+| home | qb_cpoe | None | 0.0 |
+| home | qb_epa | None | 0.0 |
+| home | referee | None | 0.0 |
+| home | schedule_strength | None | 0.0 |
+| home | wind | None | 0.0 |
+
+Three-week team streaks: []
+
+## Learning from edits
+
+```json
+{
+  "rows": [],
+  "weekly": [
+    {
+      "week": null,
+      "count": 0,
+      "projection_mae": null,
+      "ours_mae": null,
+      "helped_count": 0
+    }
+  ],
+  "tags": [],
+  "excluded": {}
+}
+```
