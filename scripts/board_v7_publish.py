@@ -18,6 +18,9 @@ def run(board=None):
   loss=sum(abs(g['final'][s+'_points']-g['ours'][s+'_points']) for s in ('away','home'))/2
   tagged.append({'game_id':g['game_id'],'mae':loss,'tags':entry.get('tags',[])})
  tagged.sort(key=lambda x:(x['mae'],x['game_id']));result['edits']['best_tags']=tagged[:5];result['edits']['worst_tags']=list(reversed(tagged[-5:]))
- save(ROOT/'outputs/board-v7/evidence.json',result);return result
+ save(ROOT/'outputs/board-v7/evidence.json',result)
+ from scripts.board_v9_publish import run as publish_context
+ publish_context(board,lambda g:shape_for(g,artifact))
+ return result
 if __name__=='__main__':
  r=run();print(json.dumps({'teams':r['trust']['teams'],'inside80':r['trust']['inside80'],'weeks':len(r['weeks'])}))
