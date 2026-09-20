@@ -25,7 +25,7 @@ def select_pregame(previous_two,week,ranks,excluded):
  if selected in excluded:return rank_select(ranks,excluded),'INJURY_OVERRIDE_CHART'
  return selected,reason
 
-def run():
+def run(output_start=2016):
  receipts=json.loads((O/'source-receipts.json').read_text());reg=json.loads((O/'E-ELO-QB.json').read_text());control=json.loads((ROOT/reg['control']).read_text());population={g['game_id'] for g in control}
  schedule=list(csv.DictReader((ROOT/'work/market-distribution-v1/schedules-d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07.csv').open()));sg=[g for g in schedule if g['game_type']=='REG' and g['home_score'] and g['away_score'] and 2014<=int(g['season'])<=2025];sg.sort(key=lambda g:(kickoff(g),g['game_id']));schedulekey={};games={g['game_id']:g for g in sg}
  for g in sg:
@@ -33,7 +33,7 @@ def run():
  stats=collections.defaultdict(list);charts=collections.defaultdict(list);injuries=collections.defaultdict(list);available_inj=set();inj_audit={};chart_audit={};source_schemas=[]
  for r in receipts:
   if r.get('http_status')!=200:continue
-  d=pd.read_csv(ROOT/r.get('compressed_path',r['path']),low_memory=False);y=r['season'];kind=r['kind'];source_schemas.append({'season':y,'kind':kind,'rows':len(d),'columns':list(d.columns),'sha256':r['sha256']})
+  d=pd.read_csv(ROOT/(r.get('compressed_path') or r['path']),low_memory=False);y=r['season'];kind=r['kind'];source_schemas.append({'season':y,'kind':kind,'rows':len(d),'columns':list(d.columns),'sha256':r['sha256']})
   if kind=='player_stats':
    d=d[(d.season_type=='REG')&(d.position=='QB')]
    for v in d.to_dict('records'):
@@ -88,7 +88,7 @@ def run():
    current=stats[g['game_id'],t];best=max((q['attempts'] for q in current),default=0);actuals=[q['id'] for q in current if q['attempts']==best and best>0];actual=actuals[0] if len(actuals)==1 else None
    quality=[v for v in qhistory[selected] if v['end']<cut] if selected else [];den=sum(v['attempts'] for v in quality if v['passing_epa'] is not None);epa=sum(v['passing_epa'] for v in quality if v['passing_epa'] is not None)/den if den else None
    rec={'game_id':g['game_id'],'team':t,'season':y,'week':w,'home':side=='home','T75_utc':cut.isoformat(),'selected_qb':selected,'reason':reason,'UNTIMESTAMPED':reason in ['CHART_TIEBREAK','INJURY_OVERRIDE_CHART','WEEK1_CHART'],'chart_qb':chartqb,'depth_first_qb':depthfirst,'actual_most_attempts_qb_ORACLE_ONLY':actual,'correct':selected==actual if selected and actual else None,'source_previous_game':prior['game_id'] if prior else None,'source_previous_completion':prior['end'].isoformat() if prior else None,'injury_exclusions':sorted(excluded),'injury_evidence':list(qualified.values()),'chart_ranks':ranks,'actual_points':float(g[side+'_score']),'prior_four_scoring':float(np.mean([v['points'] for v in past[-4:]])) if len(past)>=4 else None,'starter_prior_epa_per_attempt':epa,'prior_qb_attempts':den,'oracle_attempts':{v['id']:v['attempts'] for v in current},'authoritative_game':g['game_id'] in population}
-   if y>=2016:rows.append(rec)
+   if y>=output_start:rows.append(rec)
   # Outcomes become usable only after completion proxy; no same-game labels enter selector.
   for side in ['home','away']:
    t=team(g[side+'_team']);end=kickoff(g)+dt.timedelta(hours=4);v=stats[g['game_id'],t];history[t].append({'game_id':g['game_id'],'season':y,'end':end,'stats':v,'points':float(g[side+'_score'])})

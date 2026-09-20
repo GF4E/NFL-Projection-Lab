@@ -1,5 +1,5 @@
 {
-  "authoritative_control": "work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json",
+  "authoritative_control": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
   "authority_scope": "All future engine method gates; freeze this control until a separately authorized production-lineage replacement.",
   "metrics_convention": "2016-2025 available team rows; projected-minus-actual bias; population SD; OLS slope actual on projected",
   "series": [
@@ -826,10 +826,10 @@
       "sha256": "6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10",
       "date_added": "2026-09-18T19:32:44-07:00",
       "archive_commit": "3840450bc9b3d0b3602c10f4a95927d4e1eddcb8",
-      "status": "AUTHORITATIVE",
-      "authoritative": true,
+      "status": "SUPERSEDED_BY_AUTHORIZED_HFA_RELEASE",
+      "authoritative": false,
       "producer_and_fit": "scripts/deployed_lineage_replay.py using source commit 538ce1f4; production fit 8bd58561 settings; per-issuance training hashes in replay-receipt.json",
-      "note": "Sole future gate control; historical delivery timing approximation disclosed in REPLAY-PLAN.md.",
+      "note": "Retained original registered comparator; E-ELO-HFA user-authorized release supersedes this for future gating.",
       "metrics": {
         "games": 2639,
         "team_observations": 5278,
@@ -909,6 +909,136 @@
       "metric_target": "home_margin",
       "producer_and_fit": "scripts/elo_hfa_deployed_gate.py; verified538ce1f4productionnumericalcode; artifact8bd58561settings;candidateHFAprior-three-seasonmean",
       "note": "See SERIES.md. Sole deployed gate control remains6a0238fc until an explicitly released replacement."
+    },
+    {
+      "path": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
+      "sha256": "66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f",
+      "authoritative": true,
+      "status": "AUTHORITATIVE",
+      "date_added": "2026-09-20T02:53:35.244810+00:00",
+      "producer_and_fit": "scripts/elo_hfa_deployed_gate.py; exact shipping equivalence verified by test_elo_hfa_release; release code379cd7ca; fit f7fc497e",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.575628833271496,
+        "bias": 0.1888626093556898,
+        "sd": 2.934554179081857,
+        "slope": 1.0111093664106956
+      }
+    },
+    {
+      "path": "work/e-elo-qb-value-v2/oof.json",
+      "component": "c_original",
+      "sha256": "5ddcdf3ad5bd1635be5cc253e0ef4ffc8c64c8be5e08d57f81d784c70de2234a",
+      "date_added": "2026-09-20T03:07:28.706166+00:00",
+      "authoritative": false,
+      "status": "DIAGNOSTIC_NON_AUTHORITATIVE",
+      "producer_and_fit": "scripts/elo_qb_value_evaluate.py; per-season scales in gate.json and weekly training hashes in ridge-lineage.json",
+      "metrics": {
+        "games": 2639,
+        "team_mae": 7.574348007893794,
+        "team_bias": 0.18887493252614246,
+        "slope": 1.009111494127862,
+        "projected_sd": 2.942963190128389,
+        "margin_mae": 10.240377393468139,
+        "total_mae": 10.86481298128011
+      },
+      "note": "No shipping activation. Oracle contains unavailable future identity; CPOE secondary partial. See SERIES.md."
+    },
+    {
+      "path": "work/e-elo-qb-value-v2/oof.json",
+      "component": "deployed_hfa",
+      "sha256": "5ddcdf3ad5bd1635be5cc253e0ef4ffc8c64c8be5e08d57f81d784c70de2234a",
+      "date_added": "2026-09-20T03:07:28.706376+00:00",
+      "authoritative": false,
+      "status": "DIAGNOSTIC_NON_AUTHORITATIVE",
+      "producer_and_fit": "scripts/elo_qb_value_evaluate.py; per-season scales in gate.json and weekly training hashes in ridge-lineage.json",
+      "metrics": {
+        "games": 2639,
+        "team_mae": 7.575628833271496,
+        "team_bias": 0.1888626093556898,
+        "slope": 1.0111093664106956,
+        "projected_sd": 2.934554179081857,
+        "margin_mae": 10.242308656842017,
+        "total_mae": 10.86462544014432
+      },
+      "note": "No shipping activation. Oracle contains unavailable future identity; CPOE secondary partial. See SERIES.md."
+    },
+    {
+      "path": "work/e-elo-qb-value-v2/oof.json",
+      "component": "a_qb",
+      "sha256": "5ddcdf3ad5bd1635be5cc253e0ef4ffc8c64c8be5e08d57f81d784c70de2234a",
+      "date_added": "2026-09-20T03:07:28.706383+00:00",
+      "authoritative": false,
+      "status": "REGISTERED_REJECTED",
+      "producer_and_fit": "scripts/elo_qb_value_evaluate.py; per-season scales in gate.json and weekly training hashes in ridge-lineage.json",
+      "metrics": {
+        "games": 2639,
+        "team_mae": 7.568093673838847,
+        "team_bias": 0.19027075098979185,
+        "slope": 1.0055224398793126,
+        "projected_sd": 2.972973043714096,
+        "margin_mae": 10.237168837244461,
+        "total_mae": 10.858242213003567
+      },
+      "note": "No shipping activation. Oracle contains unavailable future identity; CPOE secondary partial. See SERIES.md."
+    },
+    {
+      "path": "work/e-elo-qb-value-v2/oof.json",
+      "component": "b_qb_hfa",
+      "sha256": "5ddcdf3ad5bd1635be5cc253e0ef4ffc8c64c8be5e08d57f81d784c70de2234a",
+      "date_added": "2026-09-20T03:07:28.706389+00:00",
+      "authoritative": false,
+      "status": "REGISTERED_REJECTED",
+      "producer_and_fit": "scripts/elo_qb_value_evaluate.py; per-season scales in gate.json and weekly training hashes in ridge-lineage.json",
+      "metrics": {
+        "games": 2639,
+        "team_mae": 7.568582702221145,
+        "team_bias": 0.18924037177052258,
+        "slope": 1.0073417713431958,
+        "projected_sd": 2.9669830826953594,
+        "margin_mae": 10.237712489741686,
+        "total_mae": 10.857930468957333
+      },
+      "note": "No shipping activation. Oracle contains unavailable future identity; CPOE secondary partial. See SERIES.md."
+    },
+    {
+      "path": "work/e-elo-qb-value-v2/oof.json",
+      "component": "oracle_a",
+      "sha256": "5ddcdf3ad5bd1635be5cc253e0ef4ffc8c64c8be5e08d57f81d784c70de2234a",
+      "date_added": "2026-09-20T03:07:28.706393+00:00",
+      "authoritative": false,
+      "status": "DIAGNOSTIC_NON_AUTHORITATIVE",
+      "producer_and_fit": "scripts/elo_qb_value_evaluate.py; per-season scales in gate.json and weekly training hashes in ridge-lineage.json",
+      "metrics": {
+        "games": 2639,
+        "team_mae": 7.558619893751612,
+        "team_bias": 0.18207512884771745,
+        "slope": 1.0021312580282347,
+        "projected_sd": 3.019121884715611,
+        "margin_mae": 10.215538358593903,
+        "total_mae": 10.856418327191014
+      },
+      "note": "No shipping activation. Oracle contains unavailable future identity; CPOE secondary partial. See SERIES.md."
+    },
+    {
+      "path": "work/e-elo-qb-value-v2/oof.json",
+      "component": "secondary_combined",
+      "sha256": "5ddcdf3ad5bd1635be5cc253e0ef4ffc8c64c8be5e08d57f81d784c70de2234a",
+      "date_added": "2026-09-20T03:07:28.706398+00:00",
+      "authoritative": false,
+      "status": "DIAGNOSTIC_NON_AUTHORITATIVE",
+      "producer_and_fit": "scripts/elo_qb_value_evaluate.py; per-season scales in gate.json and weekly training hashes in ridge-lineage.json",
+      "metrics": {
+        "games": 2639,
+        "team_mae": 7.567657472043124,
+        "team_bias": 0.19111599682362726,
+        "slope": 1.003401048876068,
+        "projected_sd": 2.9744366709312975,
+        "margin_mae": 10.233278095388535,
+        "total_mae": 10.860812035379073
+      },
+      "note": "No shipping activation. Oracle contains unavailable future identity; CPOE secondary partial. See SERIES.md."
     }
   ],
   "scope": "Tracked out-of-fold series and derived scored/verified series. Unit-test fixtures, per-game live locks and raw inputs are not rolling-origin evaluation series.",

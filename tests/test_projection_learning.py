@@ -40,3 +40,16 @@ class LearningTests(unittest.TestCase):
  def test_trend_population_and_week_arithmetic(self):
   a=card();b=card();b.update(game_id='b',week=2,evidence='RETROSPECTIVE');r=build_report([a,b],{});self.assertEqual(r['populations']['AS_ISSUED']['tables'][0]['team_points_mae'],3.5);self.assertEqual(r['populations']['AS_ISSUED']['graded'],1)
 if __name__=='__main__':unittest.main()
+
+class HFALineageRefitTest(unittest.TestCase):
+ def test_hfa_history_and_prefix_survive_weekly_refit(self):
+  with tempfile.TemporaryDirectory() as directory:
+   root=Path(directory);work=root/'work';out=root/'out';work.mkdir();out.mkdir();(root/'work/projection-v1').mkdir();(root/'outputs/projection-v3').mkdir(parents=True)
+   (root/'outputs/projection-v3/board.json').write_text('{"games":[]}');(root/'work/projection-v1/source-manifest.json').write_text('{"team_games":{"kind":"games"}}')
+   artifact={'version':'projection-v2.hfa1.w2','version_prefix':'projection-v2.hfa1','learning_method':{'group_change':'elo'},'historical_features':{'kind':'hfa_history'},'groups':['calibration'],'selected':['none',10]}
+   history=[{'row_id':'h','season':2025,'week':1,'actual_points':20,'features':{'baseline':20}}];rows=[{'row_id':'g','game_id':'g','season':2026,'week':2,'actual_points':22,'features':{'baseline':20}}]
+   def read(ref):
+    if ref['kind']=='games':return [{'game_id':'g'}]
+    self.assertEqual(ref['kind'],'hfa_history');return history
+   with patch.multiple(runtime,ROOT=root,WORK=work,OUT=out),patch.object(runtime,'read',side_effect=read),patch.object(runtime,'active_artifact',return_value=artifact):
+    result=runtime.weekly_refit(rows,2,dt.datetime.now(dt.timezone.utc));self.assertEqual(result['version'],'projection-v2.hfa1.w3');saved=json.loads((root/result['fit']['path']).read_text());self.assertEqual(saved['historical_features'],artifact['historical_features'])

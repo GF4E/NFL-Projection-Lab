@@ -23,3 +23,12 @@ class HFAReleaseTests(unittest.TestCase):
   for x,y in zip(f['coefficients'],a['fit']['coefficients']):self.assertAlmostEqual(x,y,12)
   self.assertAlmostEqual(f['intercept'],a['fit']['intercept'],12)
 if __name__=='__main__':unittest.main()
+
+class HFASeparationTest(unittest.TestCase):
+ def test_shipping_adapter_has_no_external_io_or_market_import(self):
+  import ast
+  tree=ast.parse((ROOT/'engine/elo_hfa.py').read_text());imports=[n.module for n in ast.walk(tree) if isinstance(n,ast.ImportFrom)]+[a.name for n in ast.walk(tree) if isinstance(n,ast.Import) for a in n.names]
+  self.assertEqual(set(imports),{'math','engine.elo'})
+  from unittest.mock import patch
+  with patch('builtins.open',side_effect=AssertionError('Forecast attempted external read')):
+   e=SeasonElo({'BUF':1505,'DET':1505},55);p=e.forecast('BUF','DET',False,0,0);e.update('BUF','DET',20,17,p)

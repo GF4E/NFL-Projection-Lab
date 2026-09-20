@@ -1,0 +1,62 @@
+{
+  "max_mae_difference": 1.7763568394002505e-15,
+  "candidates": {
+    "c_original": {
+      "independent_team_mae": 7.5743480078937955,
+      "coverage_recomputed": true,
+      "games": 2639
+    },
+    "deployed_hfa": {
+      "independent_team_mae": 7.575628833271496,
+      "coverage_recomputed": true,
+      "games": 2639
+    },
+    "a_qb": {
+      "independent_team_mae": 7.568093673838847,
+      "coverage_recomputed": true,
+      "games": 2639
+    },
+    "b_qb_hfa": {
+      "independent_team_mae": 7.568582702221145,
+      "coverage_recomputed": true,
+      "games": 2639
+    },
+    "oracle_a": {
+      "independent_team_mae": 7.55861989375161,
+      "coverage_recomputed": true,
+      "games": 2639
+    },
+    "secondary_combined": {
+      "independent_team_mae": 7.567657472043124,
+      "coverage_recomputed": true,
+      "games": 2639
+    }
+  },
+  "production_score_residual_probability": {
+    "c_original": {
+      "games": 2383,
+      "brier": 0.220855328564889
+    },
+    "deployed_hfa": {
+      "games": 2383,
+      "brier": 0.22068986643520938
+    },
+    "a_qb": {
+      "games": 2383,
+      "brier": 0.2201411151546689
+    },
+    "b_qb_hfa": {
+      "games": 2383,
+      "brier": 0.22001120795253354
+    },
+    "oracle_a": {
+      "games": 2383,
+      "brier": 0.21975412023222218
+    },
+    "secondary_combined": {
+      "games": 2383,
+      "brier": 0.2200627713893368
+    }
+  },
+  "arithmetic_separate_implementation": true
+}

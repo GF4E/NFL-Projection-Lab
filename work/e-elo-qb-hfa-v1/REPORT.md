@@ -1,3 +1,5 @@
+Status after authorized HFA release: original 6a0238fc is now non-authoritative for future gates; this historical result remains valid against its then-deployed control. See work/e-elo-hfa-release/SERIES.md.
+
 # Pregame starter qualification and registered Elo experiments
 
 Premise: authoritative deployed-lineage control `work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json`, generated 2026-09-19. The unchanged control was reproduced exactly for every forecast before the HFA gate.

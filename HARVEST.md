@@ -201,3 +201,9 @@ The supplied underlying2778game audit includes17games from2026and postseason. Th
 The stated starter rule produces90.960%on1980common non-Week1team-games, versus supplied89.4%; previous-game-only produces89.484%on1978unambiguous pairs. Chart-only85.455%and chart-first89.091%reproduce within1point. E-ELO-QB remains held for the explicit accuracy reconciliation and the missing EPA/CPOE→VALUE unit formula; no claim of source unavailability and no invented conversion. The supporting regression does not reproduce its supplied sample under the disclosed window convention.
 
 Confidence: medium for the HFA decision—it holds on authoritative data but depends on defensible HFA-training and reliability choices. Downgrade to low if the intended choices reverse a gate check. Source-count corrections are arithmetic on pinned records.
+
+## E-ELO releases and VALUE evidence, 2026-09-19
+
+Source attribution: existing licensed fivethirtyeight/nfl-elo-game implementation remains byte-identical; versioned HFA adapter uses the user-registered prior-three-season nonneutral home-margin method. E-ELO-HFA released as projection-v2.hfa1.w2 (release commit379cd7ca; fitf7fc497e). QB VALUE is an independent implementation of the user's attempt-weighted EPA/CPOE specification on hashed nflverse public player stats, injuries, depth charts and play-by-play; the3.3conversion uses engine/elo.py. No market input. Sources and licenses already recorded for those projects remain applicable.
+
+E-ELO-QB rejected on its registered1%team-MAE gate:0.099%a/0.093%b. Oracle0.225%and partial CPOE0.105%are diagnostics. This does not reject all QB valuation. Reconciled starter validation is authoritative; missing pregame history is no longer a blanket blocker. See work/e-elo-qb-value-v2/REPORT.md.
