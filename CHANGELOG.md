@@ -434,3 +434,9 @@ Binding scope: expected team totals, actual-score accuracy, team-points MAE prim
 Reference displays are reduced to two compact expandable lines labeled DIAGNOSTIC ONLY: CLOSE ATS/total and OPEN spread, with counts/95% intervals pooled and by season. OPEN totals remain INSUFFICIENT at 34.3% historical coverage. No bucket display or default bucket computation. Reconciliation tolerances stay 0.5 points for headlines and max(1.0 points, one game) for historical buckets. Existing diagnostic sidecars are condensed; frozen experiment narratives, predictions and gates remain unchanged. No new betting rule, search, fit or forward test was run.
 
 Confidence: near-total — the scope is explicitly authorized and displayed rates retain verified arithmetic. Move down to high if source, sign or experiment selection validation fails independent checks.
+
+## 2026-09-20 — Item 2: record the supplied 38-condition finding, no experiment
+
+Recorded the user’s exact finding and dead ends in work/series-registry/condition-search-finding.json and SERIES.md. Status DIAGNOSTIC ONLY / UNCONFIRMED_OBSERVATION_NOT_AN_EDGE; no registration, build, forward test, queue entry, retest or model-change justification. The condition-level source artifact was not supplied; no fresh market-relative analysis was run.
+
+Confidence: low on the numerical finding — one supplied search could invert under independent recomputation; contradictory rows would make it unsupported.

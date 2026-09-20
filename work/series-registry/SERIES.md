@@ -37,3 +37,17 @@ The above stop is resolved by the user's revised tolerance: headline ATS/total w
 ATS measures 50.5 percent with a 95 percent interval reaching 52.5, so break-even at 52.4 is not excluded by this evidence, while a large edge is. Power against a 50 percent null remains supporting detail only. OPEN spread: 577/1,151, 50.13%, interval 47.25–53.01; 1,177/1,359 reference coverage (86.6%) in 2021–2025. OPEN total: 227/460 with 466/1,359 coverage (34.3%), INSUFFICIENT, no inference. Sources and all scoped tables: work/reference-line-metric-v2/REPORT.md and its audit appendix.
 
 Confidence: near-total — these rates and the reconciliation are arithmetic on verified rows. Move down to high if a row hash or line sign fails independent recomputation.
+
+## DIAGNOSTIC ONLY — supplied condition-search finding
+
+Provenance: user-supplied findings, recorded verbatim; not independently recomputed. No search, rule, registration, implementation or forward test is authorized by this record.
+
+a search of 38 conditions over 2,639 games found no condition clearing break-even after multiplicity correction; the best candidate, totals in games with a closing spread of 7 or more, ran 416 of 747 at 55.69 percent with a Bonferroni interval of 49.9 to 61.5 and 8 of 10 seasons above break-even, and is recorded as an unconfirmed observation, not an edge and not a queued experiment.
+
+Dead ends — do not retest:
+
+wind 10 or more at 47.7 percent on totals, wind 10 to 15 at 47.5, cold under 40F at 45.2 on spreads, engine-versus-line disagreement of 3 or more points at 49.6 on spreads and 50.1 on totals, pick'em games at 46.5 on totals, and divisional, dome, rest edge, high and low totals all within two points of 50.
+
+These observations cannot score, gate, tune, rank, select or justify any statistical model change.
+
+Confidence: low on the numerical search finding — it rests on one supplied search on one series and could invert under independent recomputation. No lower rating category is defined; contradictory source rows would make the finding unsupported. The supplied text is preserved as an unconfirmed observation.

@@ -1078,5 +1078,21 @@
     "never_a_target": true,
     "never_a_selection_criterion": true,
     "never_justifies_model_change": true
-  }
+  },
+  "diagnostic_findings": [
+    {
+      "path": "work/series-registry/condition-search-finding.json",
+      "label": "DIAGNOSTIC ONLY",
+      "status": "UNCONFIRMED_OBSERVATION_NOT_AN_EDGE",
+      "finding_verbatim": "a search of 38 conditions over 2,639 games found no condition clearing break-even after multiplicity correction; the best candidate, totals in games with a closing spread of 7 or more, ran 416 of 747 at 55.69 percent with a Bonferroni interval of 49.9 to 61.5 and 8 of 10 seasons above break-even, and is recorded as an unconfirmed observation, not an edge and not a queued experiment.",
+      "dead_ends_verbatim": "wind 10 or more at 47.7 percent on totals, wind 10 to 15 at 47.5, cold under 40F at 45.2 on spreads, engine-versus-line disagreement of 3 or more points at 49.6 on spreads and 50.1 on totals, pick'em games at 46.5 on totals, and divisional, dome, rest edge, high and low totals all within two points of 50.",
+      "provenance": "User-supplied scope correction, 2026-09-20; condition-level search artifact not supplied or independently recomputed in this change",
+      "queued_experiment": false,
+      "register": false,
+      "build": false,
+      "forward_test": false,
+      "retest_dead_ends": false,
+      "may_justify_model_change": false
+    }
+  ]
 }
