@@ -138,12 +138,12 @@ RETROSPECTIVE / projection-v1-67c39f9a-2e58a851; original projection and first g
 | OPEN | total | 2026-w1 | 12.4740 | 0/1 | 0.00% | 0.00–79.35% | 1/2 (50.0%) | 0 / 0 | INSUFFICIENT |
 | OPEN | total | [6,7) pts | 13.8078 | 0/1 | 0.00% | 0.00–79.35% | 1/1 (100.0%) | 0 / 0 | INSUFFICIENT |
 
-Reference refresh: PINNED_HISTORICAL_SNAPSHOT. Source retrieval dates below identify the evidence used.
+Reference refresh: REFRESHED. Source retrieval dates below identify the evidence used.
 
 CLOSE source: `outputs/projection-v3/final-sources/e6a5288f3629771e9da61de33728d648f3571bf4cfba2d069960125d8d38e240.csv`; nflverse spread_line and total_line.
 
-OPEN spread source: `work/reference-line-metric-v1/historic_projected_spreads-fae31bfed7963266b935f210a3262f69909b771b252df2f52dd671b602183da0.csv.gz`; `home_line_open`; retrieved 2026-09-20T14:30:05.178737+00:00; SHA256 fae31bfed7963266b935f210a3262f69909b771b252df2f52dd671b602183da0.
+OPEN spread source: `outputs/in-season-learning-v1/reference-sources/historic_projected_spreads-fae31bfed7963266b935f210a3262f69909b771b252df2f52dd671b602183da0.csv.gz`; `home_line_open`; retrieved 2026-09-20T15:00:31.708395+00:00; SHA256 fae31bfed7963266b935f210a3262f69909b771b252df2f52dd671b602183da0.
 
-OPEN total source: `work/reference-line-metric-v1/nfelo_games-c6d4e909deddf0410682ec14dc85c44692aa6244d6a9f1307034d3acf2a6fd2b.csv.gz`; `total_line_open`; retrieved 2026-09-20T14:30:06.481860+00:00; SHA256 c6d4e909deddf0410682ec14dc85c44692aa6244d6a9f1307034d3acf2a6fd2b.
+OPEN total source: `outputs/in-season-learning-v1/reference-sources/nfelo_games-c6d4e909deddf0410682ec14dc85c44692aa6244d6a9f1307034d3acf2a6fd2b.csv.gz`; `total_line_open`; retrieved 2026-09-20T15:00:31.708395+00:00; SHA256 c6d4e909deddf0410682ec14dc85c44692aa6244d6a9f1307034d3acf2a6fd2b.
 
 Confidence: near-total — these audit rates are arithmetic on verified rows. Move down to high if a source hash, line sign, or projection identity is invalidated.
