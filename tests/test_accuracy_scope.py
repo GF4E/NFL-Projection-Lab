@@ -4,7 +4,7 @@ from unittest.mock import patch
 from scripts import reference_reports
 from pathlib import Path
 from scripts.accuracy_scope import validate
-from scripts.reference_lines import ROOT, audit, normalize, render
+from scripts.reference_lines import ROOT, audit, normalize, render, weekly_report
 
 class AccuracyScopeTests(unittest.TestCase):
     def test_team_mae_and_score_supporting_metrics_allowed(self):
@@ -33,6 +33,12 @@ class AccuracyScopeTests(unittest.TestCase):
         with patch.object(reference_reports,'load_references',side_effect=OSError('missing')):
             value=reference_reports.experiment_audit(ROOT/'work/e-elo-qb-value-v2')
             self.assertIn('missing or unverified',value['shortfall'])
+
+    def test_missing_weekly_diagnostic_does_not_block_accuracy_report(self):
+        with patch('scripts.reference_lines.load_references',side_effect=ValueError('unverified')):
+            value=weekly_report([])
+            self.assertIn('missing or unverified',value['shortfall'])
+            self.assertEqual(len(render(value,weekly=True).splitlines()),2)
 
     def test_two_diagnostic_lines_and_no_default_condition_buckets(self):
         refs={k:{'spread':{},'total':{}} for k in ['CLOSE','OPEN']}

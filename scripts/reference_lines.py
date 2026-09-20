@@ -214,7 +214,11 @@ def render(report, title='DIAGNOSTIC ONLY', weekly=False):
 
 
 def weekly_report(cards, root=ROOT):
-    refs,sources=load_references(root,weekly=True)
+    try:
+        refs,sources=load_references(root,weekly=True)
+    except (OSError,ValueError,KeyError) as exc:
+        return {'schema':'reference-lines-report-v1','label':'DIAGNOSTIC ONLY','series':{},
+                'shortfall':'Reference diagnostic source missing or unverified ('+type(exc).__name__+')'}
     batches=defaultdict(list)
     for c in cards:
         grade=(c.get('grades') or {}).get('PROJECTION')
