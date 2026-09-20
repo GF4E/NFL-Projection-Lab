@@ -1,6 +1,9 @@
 """Render the registered Elo reproduction and gate packet; never fit or fetch."""
 import hashlib,json
 from pathlib import Path
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from scripts.reference_reports import report_file
 O=Path(__file__).resolve().parents[1]/'work/e-elo-qb-hfa-v1'
 def read(n):return json.loads((O/n).read_text())
 def run():
@@ -50,5 +53,5 @@ def run():
  'E-ELO-QB needs the exact EPA/dropback+CPOE→VALUE formula, scale and no-history rule. engine/elo.py only accepts supplied VALUE and multiplies its difference by3.3; it does not define that conversion. No invented weights, market values, inaccurate oracle forecast, or out-of-scope candidate was scored. Starter validation disagreement also needs reconciliation, ideally from the independent script/row manifest. Oracle(a) and candidate(b) will follow only once those conditions are resolved.', '',
  'Least sure: matching the independent audit population and VALUE units. That led to an explicit population reconciliation, a separate authoritative HFA gate, and holding only dependent QB fitting.', '',
  'Confidence: medium for the HFA bias-correction decision—it holds on authoritative data but depends on defensible HFA-training and reliability conventions. Downgrade to low if the intended reliability metric or audit HFA implementation reverses a gate check. Starter-source availability and recorded arithmetic are verified; no confidence claim is made for an unrun QB candidate.']
- (O/'REPORT.md').write_text('\n'.join(lines)+'\n')
+ report_file(O/'REPORT.md').write_text('\n'.join(lines)+'\n')
 if __name__=='__main__':run()

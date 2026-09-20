@@ -1,6 +1,9 @@
 """Read-only E-SCORE control audit; no fitting or mutation of issued artifacts."""
 import hashlib,json,statistics,sys
 from pathlib import Path
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from scripts.reference_reports import report_file
 from collections import defaultdict
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
 from engine.board_v7 import metadata
@@ -39,5 +42,5 @@ def run():
  report=['# E-SCORE registration and control evidence','','REVIEW REQUESTED: C02/C03 prior exposure and trend; C04 centering; C05 chronological intercept; C08 definition of systematic bias. See GAP-SWEEP.md for decisions and alternatives. Registration only; challengers have not been fitted.','','Next in queue: E-SCORE, ahead of E2. Deadline Tuesday 2026-09-22 06:00 PT.','',f"Preregistration SHA256: {sha(OUT/'registration.json')}",'','## Historical control signed total bias','Positive = actual total above projection. Corrected E1 linear control, reused historical development evidence.','','| Season | Games | Actual minus projected total |','|---|---:|---:|']
  for r in annual:report.append(f"| {r['season']} | {r['games']} | {r['signed_total_bias']:+.3f} |")
  report+=['',f"Equal-season mean {mean:+.3f}; 95% season-level t interval [{ci[0]:+.3f}, {ci[1]:+.3f}]. Systematic level error under preregistered C08: {result['systematic_under_C08']}. This is control evidence only, not a candidate gate decision.",'',f"Week 1: {len(games)} AS_ISSUED games, mean total error {statistics.mean(errors):+.4f}, {sum(x>0 for x in errors)} above our projected total (supplied count 9 not reproduced). Three largest team misses including DET-BUF: {ranked[:3]}.",'','No fit, production method, frozen forecast or grade changed. Credits spent: 0.','Least sure: full-season fitted intercept could leak; candidate c uses only the training prefix, with hindsight season means isolated as descriptive evidence.']
- (OUT/'REPORT.md').write_text('\n'.join(report)+'\n');assert sha(lockpath)==original;print(json.dumps(result,indent=2))
+ report_file(OUT/'REPORT.md').write_text('\n'.join(report)+'\n');assert sha(lockpath)==original;print(json.dumps(result,indent=2))
 if __name__=='__main__':run()

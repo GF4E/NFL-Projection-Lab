@@ -1,0 +1,17 @@
+# Standing reference-line metric — reconciliation accepted and integration
+
+Effective 2026-09-20. Reporting addition only; no fit, candidate, gate or point forecast changes.
+
+The user resolves the prior stop. Headline ATS/total tolerance is 0.5 percentage points. Bucket tolerance is the larger of 1.0 percentage points or one game, using the larger inverse of the two bucket counts if counts differ. Both supplied series reconcile. Current HFA is the live metric; pre-HFA remains authoritative for its historical lineage, with no change to the sole future gate control.
+
+Lead interpretation: ATS measures 50.5 percent with a 95 percent interval reaching 52.5, so break-even at 52.4 is not excluded by this evidence, while a large edge is. Power against a 50 percent null is supporting detail only, never the headline economic question.
+
+CLOSE uses nflverse spread_line (home margin) and total_line. OPEN spread uses only nfelo output_data/historic_projected_spreads.csv home_line_open, negated into home-margin units. OPEN total uses only nfelo output_data/nfelo_games.csv total_line_open. Preserve conflicting source files, do not blend fields or fill missing OPEN with CLOSE. OPEN spread comparison proceeds; historical OPEN total is INSUFFICIENT because coverage is 34.3% of 2021–2025 and concentrated in 2024–2025. Counts and intervals still display, with no inference. Historical snapshots stay pinned. Daily public OPEN refresh feeds weekly reports with last-good preservation and explicit source receipts; no paid calls or network reads during report rendering.
+
+Scoring uses full-precision forecast minus reference and actual minus reference. Same signs are correct; actual pushes excluded; exact forecast on line is separately excluded as NO_LEAN. Wilson 95% intervals. Population, line availability, push/no-lean counts and missing forecasts remain explicit. Buckets are [k,k+1), k=floor(abs(disagreement)). Reports include season, pooled and bucket tables; weekly reports also include week tables. Team MAE appears alongside each scope.
+
+Implementation: scripts/reference_lines.py is report-only. scripts/projection_learning.py attaches the weekly JSON and Markdown tables; Tuesday closeout includes them in its immutable snapshot. scripts/reference_reports.py finalizes experiment reports and creates separate appendices for existing frozen reports. Registered series identify each candidate; a missing candidate series is a named shortfall, never replaced with current-control performance. Existing producers call the shared finalizer, and the commit guard requires appendix files for changed report documents. No refits in any reporting helper. Future report producers call report_file(path, series={candidate_name: saved_game_rows}) or list hash-pinned records in reference-series.json.
+
+Validation: reproduce current/old CLOSE and revised tolerance; verify OPEN source/coverage; test push/no-lean/missing behavior; preserve forecasts and lineages; test row-order invariance and forbidden report imports into projection/fit modules; test report finalizer and commit check; test refresh failure and idempotence; standing 218 checks, learning/closeout and focused checks. Preserve all original reports, lock and fit bytes. Push engine-v2 and verify the host's report path.
+
+Confidence: near-total — reconciliation is arithmetic on verified rows. Move down to high if source hashes or line signs fail independent verification.

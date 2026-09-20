@@ -1,6 +1,9 @@
 """Render evidence audit tables from pinned ledger. No fitting."""
 import json,collections,hashlib
 from pathlib import Path
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from scripts.reference_reports import report_file
 from scripts.qb_evidence_review import O,ROOT,compare,metrics,write
 
 def run():
@@ -53,5 +56,5 @@ def run():
  'Independent code recomputed membership and all row errors directly from pinned schedule/control, verified seven producing source blobs, inspected primary sources and found alias and starter-definition defects. independent/check_ledger.py verifies all 2639 games, 660 unique changed sides, strict chronology and exact chart reconciliation after the fix. Independent full-table recomputation also passed all 47 comparisons, including 2,000 whole-game bootstrap intervals, with maximum numerical discrepancy 7.11e-15. All 10 seasonal coverage counts and 20 accepted publication bounds passed. This verifies arithmetic and qualified records, not completion of the remaining primary-source search.', '',
  'Remaining work is enumerated in remaining-evidence-queue.json: complete primary announcement/gamebook acquisition, resolve source disagreements, qualify pregame quality vintages, and locate external historical lock records if any exist. Do not register candidates or claim high causal confidence while these dimensions remain unresolved. The eventual intervention question is whether a qualified pregame QB representation improves authoritative forecasts beyond the existing strength inputs; no candidate is registered here.', '',
  'Confidence: medium for the narrower conclusion that these records do not yet distinguish identification failure from valuation failure—supported by authoritative data but dependent on defensible identity and timestamp choices. Downgrade to low if an independent archive establishes historical engine identities or changes the disputed source classifications. Confidence in a positive causal diagnosis is low: it could invert when the missing evidence is qualified. High confidence has not been earned.']
- (O/'REPORT.md').write_text('\n'.join(lines)+'\n')
+ report_file(O/'REPORT.md').write_text('\n'.join(lines)+'\n')
 if __name__=='__main__':run()

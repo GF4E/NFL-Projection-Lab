@@ -837,7 +837,8 @@
         "bias": 0.18887493252614007,
         "slope": 1.0091114941278594,
         "sd": 2.942963190128389
-      }
+      },
+      "audit_authority": "AUTHORITATIVE_FOR_PRE_HFA_HISTORICAL_LINEAGE"
     },
     {
       "path": "work/projection-v3/adaptive-oof-b722919998a17d42f927684c90053ca99097acaa182be6428dcafef5c2f361f2.json",
@@ -924,7 +925,8 @@
         "bias": 0.1888626093556898,
         "sd": 2.934554179081857,
         "slope": 1.0111093664106956
-      }
+      },
+      "audit_authority": "CURRENT_HFA"
     },
     {
       "path": "work/e-elo-qb-value-v2/oof.json",
@@ -1064,5 +1066,12 @@
       "HFA_gate": "PASSED_PENDING_RELEASE",
       "QB_gate": "NOT_RUN_REPRODUCTION_AND_UNIT_DEFINITION"
     }
-  ]
+  ],
+  "reference_line_metric": {
+    "status": "ACTIVE_REPORTING_ONLY",
+    "protocol": "work/projection-governance-v2/REFERENCE-LINE-METRIC.md",
+    "live_series": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
+    "historical_series": "work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json",
+    "gate": false
+  }
 }

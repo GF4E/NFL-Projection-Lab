@@ -6,6 +6,9 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 ROOT=Path(__file__).resolve().parents[1];OUT=ROOT/'work/e-unc'
+import sys
+sys.path.insert(0,str(ROOT))
+from scripts.reference_reports import report_file
 def main():
  scores=json.loads((OUT/'scores.json').read_text());gate=json.loads((OUT/'gate.json').read_text());records=json.loads(gzip.decompress((OUT/'scored-games.json.gz').read_bytes()))
  base=records['control'];ids=sorted({r['game_id'] for r in base});index={g:i for i,g in enumerate(ids)}
@@ -75,6 +78,6 @@ def main():
  '![PIT](pit.png)','![Spread skill](spread-skill.png)','![Reliability](reliability.png)',
  '', 'Least sure: separating physical irreducible variance from model error. Changed the report to label the residual estimate as noise PLUS discrepancy instead of asserting an identified irreducible floor.',
  '','Credits spent: 0. No automatic method promotion. Secondary wind requirement is completed on the qualified 2024–2025 subset; full 2021–2025 coverage remains a data gap.']
- (OUT/'REPORT.md').write_text('\n'.join(lines)+'\n')
+ report_file(OUT/'REPORT.md').write_text('\n'.join(lines)+'\n')
  print('Report built; no refit')
 if __name__=='__main__':main()

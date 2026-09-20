@@ -410,3 +410,19 @@ Requested audit-only CLOSE/OPEN directional accuracy is documented in work/refer
 Pinned public nfelo OPEN sources and recorded coverage, duplicate checks, and 330 conflicting overlapping opening spreads across its two output files. Proposed spread source retains historic_projected_spreads.csv; opening totals use the explicit total_line_open field only, with separate coverage and no CLOSE substitution. Recorded independent-game power and exact historical wording with its pre-HFA scope in the series registry. Corrected the registry prose stale authoritative pointer to match the already-current catalog and released HFA series.
 
 Confidence: near-total — the reproduction discrepancy is arithmetic on verified rows; downgrade to high if source hashes or line signs are invalidated.
+
+## 2026-09-20 — Standing CLOSE/OPEN metric reconciled and integrated
+
+User revised reconciliation: headlines allow 0.5 percentage points; buckets allow max(1.0 percentage points, one game). Both headlines and buckets reconcile. The prior stop is resolved. HFA is live; pre-HFA remains authoritative for its historical lineage, without changing gate control. Current CLOSE ATS 1301/2574 (50.54%, Wilson95 48.61–52.47); total 1285/2618 (49.08%, 47.17–51.00). ATS measures 50.5 percent with a 95 percent interval reaching 52.5, so break-even at 52.4 is not excluded by this evidence, while a large edge is. Power against 50% is supporting detail only.
+
+OPEN spread: 577/1151 (50.13%, 47.25–53.01), 1177/1359 reference coverage in 2021–2025 (86.6%), from historic_projected_spreads.csv home_line_open. OPEN total: 227/460, 466/1359 coverage (34.3%), only 2024–2025 historically, from nfelo_games.csv total_line_open; INSUFFICIENT with no inference. Conflicting files remain unblended.
+
+Report-only helpers now provide weekly and experiment season/pooled/one-point-bucket counts, Wilson intervals, coverage and team MAE. Weekly tables also show week and retain as-issued/retrospective/version separation. Tuesday closeout includes the payload. Existing frozen reports receive separately indexed appendices; future report writers use the common finalizer and a commit check requires appendix files. Public OPEN refresh runs once daily with last-good preservation; historical references remain pinned. No method, fit, prediction, lock, gate or frozen report is rewritten.
+
+Confidence: near-total — arithmetic on verified rows. Move down to high if source hashes, signs, or game matching fail independent recomputation.
+
+### Deployment dependency: disk-full recovery
+
+The host was at 100% capacity. Removed only 321,576,673 bytes of regenerable APT caches/indexes and rotated/vacuumed 15.2 MiB of archived journals under the existing cleanup authorization; the path list is in work/reference-line-metric-v2/host-cache-cleanup.txt. Restored two truncated copies of the previous audit packet from verified repository commit 60565a44 after proving their remaining bytes were exact prefixes. Recovery hashes and host commit are in host-sync-recovery.json. No artifact of record was removed. Stopped tracking outputs/projection-v3/final-feed.tmp, the regenerable atomic-write temporary file whose routine removal had also blocked publication; its final feed and hashed sources remain tracked. Initial free space after cleanup: 289 MiB; storage headroom remains limited.
+
+Confidence: near-total — these recovery actions are recorded by path, byte count and hash. Move down to high if the host receipts fail independent verification.

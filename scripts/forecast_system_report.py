@@ -7,6 +7,9 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 ROOT=Path(__file__).resolve().parents[1]
+import sys
+sys.path.insert(0,str(ROOT))
+from scripts.reference_reports import report_file
 OUT=ROOT/'work/projection-v2/phase-a'
 
 
@@ -60,7 +63,7 @@ def run():
     for i,line in enumerate(text):
         spaced.append(line)
         if line.startswith('#') and i+1<len(text) and text[i+1]:spaced.append('')
-    (OUT/'report.md').write_text('\n'.join(spaced)+'\n')
+    report_file(OUT/'report.md').write_text('\n'.join(spaced)+'\n')
     lines=['# BAL at IND — before and after Phase A postprocessing','','COUNTERFACTUAL DIAGNOSTIC ONLY. This uses pregame feature values and a 2026 experimental core/EMOS fit trained through 2025. It does not change the original Week 1 prediction or grade. The illustration compares the new raw core with its postprocessor, not an overwritten historical issue.','']
     for team in why['teams']:
         for term in team['terms']:

@@ -117,3 +117,7 @@ Apply work/projection-governance-v2/DECISION-LATENCY.md to registered projection
 ## Confidence and experiment premise (September 19 standing rule)
 
 Follow work/projection-governance-v2/CONFIDENCE-AND-PREMISE.md. End every new/revised report with a worded central-claim confidence rating (low, medium, high, near-total), its specified definition, and what would lower it one level. This rates independent recomputation on authoritative data, not test execution. Before fitting, state the control file, authoritative deployed-lineage status and generation date; run scripts.experiment_premise.verify on the registration. Non-authoritative controls cannot start experiments. nfelo is excluded as a football-only benchmark; closing lines are audit references only.
+
+## Standing reference-line reporting (September 20)
+
+Follow work/projection-governance-v2/REFERENCE-LINE-METRIC.md. Every weekly and experiment report includes separate CLOSE/OPEN audit tables alongside team MAE. Current HFA is live; pre-HFA remains historical. OPEN total is INSUFFICIENT, not negative evidence. Use scripts.reference_reports.report_file for report creation, supplying all saved candidate series or hash-pinned reference-series.json entries. Existing frozen reports get separate appendices. The commit check requires the appendix. Neither line enters any model or gate.
