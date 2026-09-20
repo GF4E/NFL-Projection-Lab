@@ -440,3 +440,9 @@ Confidence: near-total — the scope is explicitly authorized and displayed rate
 Recorded the user’s exact finding and dead ends in work/series-registry/condition-search-finding.json and SERIES.md. Status DIAGNOSTIC ONLY / UNCONFIRMED_OBSERVATION_NOT_AN_EDGE; no registration, build, forward test, queue entry, retest or model-change justification. The condition-level source artifact was not supplied; no fresh market-relative analysis was run.
 
 Confidence: low on the numerical finding — one supplied search could invert under independent recomputation; contradictory rows would make it unsupported.
+
+## 2026-09-20 — Item 3: distinguish Gabe’s wind paper rule from engine projections
+
+RULES.md now states that the original wind evidence measured raw outcomes and an unconditional Under selection. The form on paper is WIND-UNDER-10-15-V1-T75 (qualified outdoor forecast 10 <= mph < 15, Under at the frozen total), not an engine-projected Under. Runtime review of engine/live_picks.py confirms eligibility uses the wind flag and quote coverage. The supplied engine-based 47.5–47.7% total results are separately labeled DIAGNOSTIC ONLY. Gabe’s rule, paper records and original registration are preserved; nothing is removed or newly forward-tested.
+
+Confidence: high — the rule text and its runtime selection agree on the raw wind-band Under form. A contrary paper lock or a hidden projection-dependent eligibility path would lower this to medium.
