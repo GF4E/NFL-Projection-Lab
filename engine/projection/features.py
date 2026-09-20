@@ -43,15 +43,19 @@ def distance(a,b):
  lat1,lon1,lat2,lon2=map(math.radians,[a['latitude'],a['longitude'],b['latitude'],b['longitude']]);v=math.sin((lat2-lat1)/2)**2+math.cos(lat1)*math.cos(lat2)*math.sin((lon2-lon1)/2)**2
  return 3958.8*2*math.asin(min(1,math.sqrt(v)))
 
-def build(team_games,schedule,stadiums,half_life=None,extra_hashes=()):
+def build(team_games,schedule,stadiums,half_life=None,extra_hashes=(),elo_hfa=None):
  games=sorted([g for g in schedule if g['game_type']=='REG'],key=lambda g:(int(g['season']),int(g['week']),g['game_id']))
  bygame=defaultdict(list)
  for r in team_games:bygame[r['game_id']].append(r)
  teams=sorted(DIV);history=defaultdict(list);last=defaultdict(list);elo=Elo({t:1505 for t in teams});result=[];groups=defaultdict(list);venues={r['stadium_id']:r for r in stadiums['stadiums']}
+ if elo_hfa is not None:
+  from engine.elo_hfa import SeasonElo
+  elo=SeasonElo({t:1505 for t in teams},65.)
  for g in games:groups[(int(g['season']),int(g['week']))].append(g)
  for (season,week),slate in sorted(groups.items()):
   weighted={t:weight(history[t],season,week,half_life) for t in teams};allrows=[r for v in weighted.values() for r in v];rated=adjusted(allrows,teams) if allrows else {}
   for t in teams:elo.prepare(t,season)
+  if elo_hfa is not None:elo.hfa=float(elo_hfa[str(season)])
   for g in slate:
    h,a=g['home_team'],g['away_team'];neutral=g.get('location')=='Neutral';venue=venues.get(g.get('stadium_id'));div=DIV[h]==DIV[a]
    for t,o in [(a,h),(h,a)]:
