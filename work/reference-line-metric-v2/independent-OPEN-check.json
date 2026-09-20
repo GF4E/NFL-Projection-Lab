@@ -1,0 +1,25 @@
+{
+  "method": "Separate NumPy sign comparison from raw CSV bytes; scipy binomtest Wilson interval; no audit helper imported",
+  "results": {
+    "spread": {
+      "correct": 577,
+      "scored": 1151,
+      "available": 1177,
+      "wilson95": [
+        0.4724615233991789,
+        0.530136235779872
+      ],
+      "source_file": "work/reference-line-metric-v1/historic_projected_spreads-fae31bfed7963266b935f210a3262f69909b771b252df2f52dd671b602183da0.csv.gz"
+    },
+    "total": {
+      "correct": 227,
+      "scored": 460,
+      "available": 466,
+      "wilson95": [
+        0.4480338154302886,
+        0.539030730254664
+      ],
+      "source_file": "work/reference-line-metric-v1/nfelo_games-c6d4e909deddf0410682ec14dc85c44692aa6244d6a9f1307034d3acf2a6fd2b.csv.gz"
+    }
+  }
+}
