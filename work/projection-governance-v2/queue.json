@@ -1,7 +1,7 @@
 {
   "authoritative_control": {
-    "path": "work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json",
-    "sha256": "6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10"
+    "path": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
+    "sha256": "66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f"
   },
   "automatic_method_promotion": false,
   "clock_policy": {
@@ -47,7 +47,7 @@
       "registration": "work/e-elo-qb-value-v2/registration.json",
       "registration_sha256": "b6b8c58e15cfa757423c432cca41b2ea1fe4e09ad264746dc59e97b6859b7a13",
       "report": "work/e-elo-qb-value-v2/REPORT.md",
-      "state": "REJECTED",
+      "state": "LIVE_ACCURACY_REVIEW",
       "gate_passed": false,
       "promoted": false,
       "blockers": [],
@@ -55,7 +55,29 @@
       "reconciliation": "Accepted by user; source and population differences resolved",
       "production_activated": false,
       "decision": "Team MAE gains0.099%a/0.093%b vs1%gate; all coverage checks pass; oracle0.225%diagnostic",
-      "hypothesis_scope": "Specified rolling EPA VALUE through Elo only; no rejection of all QB valuation"
+      "hypothesis_scope": "Specified rolling EPA VALUE through Elo only; no rejection of all QB valuation",
+      "value_specification": "SUPPLIED_AND_IMPLEMENTED",
+      "active_work": "Review completed accuracy-only VALUE result; no identical refit or market-relative experiment",
+      "completed_run": {
+        "id": "E-ELO-QB",
+        "registration": "work/e-elo-qb-value-v2/registration.json",
+        "registration_sha256": "b6b8c58e15cfa757423c432cca41b2ea1fe4e09ad264746dc59e97b6859b7a13",
+        "report": "work/e-elo-qb-value-v2/REPORT.md",
+        "state": "REJECTED",
+        "gate_passed": false,
+        "promoted": false,
+        "blockers": [],
+        "data_availability": "STARTER_HISTORY_AVAILABLE_QUALIFIED_RULE_WITH_UNTIMESTAMPED_FALLBACKS",
+        "reconciliation": "Accepted by user; source and population differences resolved",
+        "production_activated": false,
+        "decision": "Team MAE gains0.099%a/0.093%b vs1%gate; all coverage checks pass; oracle0.225%diagnostic",
+        "hypothesis_scope": "Specified rolling EPA VALUE through Elo only; no rejection of all QB valuation"
+      },
+      "existing_result_preserved": true,
+      "new_fit_started": false,
+      "oracle_completed": true,
+      "scale_fit": "Per outer season, prior seasons only, minimizing Elo margin MAE",
+      "status_correction": "The supplied VALUE specification is not missing. The saved run already completed and rejected the specified candidates against the actual-score accuracy gate. Latest instruction restores accuracy-review priority without rewriting that result."
     },
     {
       "candidates_registered": 0,
@@ -295,7 +317,7 @@
     "dome/warm-built offense in cold",
     "lead-time reporting"
   ],
-  "next_experiment": "E-SCORE",
+  "next_experiment": "E-ELO-QB",
   "one_experiment_per_week": true,
   "prerequisites": {
     "E1_candidate_count": "Resolved: unchanged linear control is outside cap; three challengers k4,k8,state-space.",
@@ -310,5 +332,20 @@
   },
   "schema": "projection-experiment-queue-v1",
   "standing_confidence_and_premise": "work/projection-governance-v2/CONFIDENCE-AND-PREMISE.md",
-  "active_experiment": null
+  "active_experiment": "E-ELO-QB",
+  "scope_policy": "work/projection-governance-v2/ANALYTICS-SCOPE.md",
+  "evaluation_policy": {
+    "primary": "team_points_MAE",
+    "supporting": [
+      "margin_MAE",
+      "total_MAE",
+      "bias",
+      "dispersion",
+      "interval_coverage",
+      "CRPS",
+      "interval_score"
+    ],
+    "market_relative_scoring_gating_tuning_ranking_selection": false,
+    "reference_lines": "DIAGNOSTIC ONLY; never justify a model change"
+  }
 }

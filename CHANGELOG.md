@@ -446,3 +446,11 @@ Confidence: low on the numerical finding — one supplied search could invert un
 RULES.md now states that the original wind evidence measured raw outcomes and an unconditional Under selection. The form on paper is WIND-UNDER-10-15-V1-T75 (qualified outdoor forecast 10 <= mph < 15, Under at the frozen total), not an engine-projected Under. Runtime review of engine/live_picks.py confirms eligibility uses the wind flag and quote coverage. The supplied engine-based 47.5–47.7% total results are separately labeled DIAGNOSTIC ONLY. Gabe’s rule, paper records and original registration are preserved; nothing is removed or newly forward-tested.
 
 Confidence: high — the rule text and its runtime selection agree on the raw wind-band Under form. A contrary paper lock or a hidden projection-dependent eligibility path would lower this to medium.
+
+## 2026-09-20 — Item 4: queue returns to accuracy work; VALUE status corrected
+
+E-ELO-QB is the active accuracy-review priority. VALUE is already supplied, implemented and evaluated; no missing-input blocker is recorded. Preserve the completed accuracy rejection (a 0.099%, b 0.093%, oracle 0.225% team-MAE improvement versus the 1% gate), the per-outer-season fitted scale and oracle evidence. No duplicate fit or market-relative experiment starts. Updated the queue's stale control pointer to the already-authoritative HFA catalog entry. Legacy situational/threshold market-relative queue items are OUT_OF_SCOPE_BETTING_RULE_DO_NOT_RUN; their former criteria are preserved as historical fields. HARVEST.md carries the supersession.
+
+Confidence: high — the saved score-accuracy rejection holds across seasons and the oracle/HFA alternatives. A material independent window or scale discrepancy would lower it to medium.
+
+Item 4 separation verification: experiment report finalization now audits only the deployed model as context, never the experiment candidates, and a missing reference produces a diagnostic shortfall rather than blocking the accuracy report. No fit, target, scale, score-accuracy gate or saved candidate result changed.

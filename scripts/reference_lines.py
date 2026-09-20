@@ -204,7 +204,7 @@ def render(report, title='DIAGNOSTIC ONLY', weekly=False):
             pooled.append(label+': ATS '+rate(data['spread']['pooled'])+('; total '+rate(data['total']['pooled']) if ref=='CLOSE' else cover))
             for year,g in data['spread']['seasons'].items():
                 annual.append(label+' '+year+': ATS '+rate(g)+('; total '+rate(data['total']['seasons'][year]) if ref=='CLOSE' else '')+f"; spread coverage {g['line_available']}/{g['population']}")
-        summary='DIAGNOSTIC ONLY — '+ref+' — '+(' | '.join(pooled) or 'no graded as-issued forecasts')
+        summary='DIAGNOSTIC ONLY — '+ref+' — '+(' | '.join(pooled) or report.get('shortfall','no graded as-issued forecasts'))
         if ref=='OPEN':summary+='; totals INSUFFICIENT (34.3% historical coverage)'
         sources=report.get('sources',{})
         source='nflverse spread_line / total_line' if ref=='CLOSE' else 'nfelo historic_projected_spreads.csv home_line_open; totals source nfelo_games.csv total_line_open, unblended'

@@ -1,5 +1,7 @@
 import json
 import unittest
+from unittest.mock import patch
+from scripts import reference_reports
 from pathlib import Path
 from scripts.accuracy_scope import validate
 from scripts.reference_lines import ROOT, audit, normalize, render
@@ -22,6 +24,15 @@ class AccuracyScopeTests(unittest.TestCase):
         gate=json.loads((ROOT/'work/e-elo-qb-value-v2/gate.json').read_text())
         self.assertIn('oracle_a',gate['summary'])
         self.assertEqual([r['season'] for r in gate['scales']['a_qb']],list(range(2016,2026)))
+
+    def test_experiment_candidates_are_not_market_scored(self):
+        # Invalid candidate data would raise if the diagnostic tried to score it.
+        value=reference_reports.experiment_audit(ROOT/'work/e-elo-qb-value-v2',series={'candidate':[{'invalid':True}]})
+        self.assertEqual(list(value['series']),['current HFA'])
+        self.assertNotIn('candidate',value['series'])
+        with patch.object(reference_reports,'load_references',side_effect=OSError('missing')):
+            value=reference_reports.experiment_audit(ROOT/'work/e-elo-qb-value-v2')
+            self.assertIn('missing or unverified',value['shortfall'])
 
     def test_two_diagnostic_lines_and_no_default_condition_buckets(self):
         refs={k:{'spread':{},'total':{}} for k in ['CLOSE','OPEN']}
