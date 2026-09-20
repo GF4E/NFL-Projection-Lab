@@ -1,0 +1,122 @@
+{
+  "pooled": {
+    "current_HFA": {
+      "spread": {
+        "wins": 1301,
+        "n": 2574,
+        "rate": 0.5054390054390054,
+        "wilson95": [
+          0.48613058808966114,
+          0.5247312125475314
+        ],
+        "wald95_reproduction": [
+          0.4861242983100591,
+          0.5247537125679518
+        ],
+        "standard_error": 0.009854623493746977
+      },
+      "total": {
+        "wins": 1285,
+        "n": 2618,
+        "rate": 0.49083269671504964,
+        "wilson95": [
+          0.4717105329705359,
+          0.5099817238825576
+        ],
+        "wald95_reproduction": [
+          0.4716830720467053,
+          0.5099823213833939
+        ],
+        "standard_error": 0.009770396200845593
+      }
+    },
+    "pre_HFA": {
+      "spread": {
+        "wins": 1302,
+        "n": 2574,
+        "rate": 0.5058275058275058,
+        "wilson95": [
+          0.48651867826651785,
+          0.5251189652733312
+        ],
+        "wald95_reproduction": [
+          0.48651296780195585,
+          0.5251420438530557
+        ],
+        "standard_error": 0.009854537214918508
+      },
+      "total": {
+        "wins": 1285,
+        "n": 2618,
+        "rate": 0.49083269671504964,
+        "wilson95": [
+          0.4717105329705359,
+          0.5099817238825576
+        ],
+        "wald95_reproduction": [
+          0.4716830720467053,
+          0.5099823213833939
+        ],
+        "standard_error": 0.009770396200845593
+      }
+    }
+  },
+  "power": {
+    "independent_game_standard_error_at_50pct": 0.009855206599818044,
+    "tests": {
+      "directional_50pct": {
+        "null_probability": 0.5,
+        "n": 2574,
+        "alpha": 0.05,
+        "test": "equal-tailed two-sided exact binomial, independent games",
+        "rejection_counts": [
+          1236,
+          1338
+        ],
+        "actual_size": 0.04648717736440232,
+        "power_52_38pct": 0.6649184412913859,
+        "power_53pct": 0.854329861211119,
+        "power_55pct": 0.9990107597677599,
+        "power_60pct": 0.9999999999999999,
+        "minimum_rate_for_80pct_power": 0.5278996960487735
+      },
+      "illustrative_minus110_break_even": {
+        "null_probability": 0.5238095238095238,
+        "n": 2574,
+        "alpha": 0.05,
+        "test": "equal-tailed two-sided exact binomial, independent games",
+        "rejection_counts": [
+          1298,
+          1399
+        ],
+        "actual_size": 0.04845109788909781,
+        "power_52_38pct": 0.04845109788909781,
+        "power_53pct": 0.09259246835160882,
+        "power_55pct": 0.7523178461536687,
+        "power_60pct": 0.9999999972647502,
+        "minimum_rate_for_80pct_power": 0.5515660117989472
+      }
+    },
+    "noise_only_simulation": {
+      "games": 1000000,
+      "seed": 20260920,
+      "distribution": "line+independent N(0,1) projection noise and line+independent N(0,1) outcome residual",
+      "cover": {
+        "wins": 499701,
+        "n": 1000000,
+        "rate": 0.499701,
+        "wilson95": [
+          0.4987210212138184,
+          0.5006809810833653
+        ],
+        "wald95_reproduction": [
+          0.4987210181829527,
+          0.5006809818170472
+        ],
+        "standard_error": 0.000499999910598992
+      },
+      "expected_rate": 0.5,
+      "user_reported_49_9pct": "Not an exact reproduction target without original seed, sample size and noise model; preserved as user-supplied illustration."
+    }
+  }
+}

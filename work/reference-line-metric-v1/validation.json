@@ -1,0 +1,14 @@
+{
+  "tests": [
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 /opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_week1*.py'",
+      "passed": 218
+    },
+    {
+      "command": "OPENBLAS_NUM_THREADS=1 /opt/anaconda3/bin/python3.12 -B -m unittest discover -s tests -p 'test_reference_metric_preflight.py'",
+      "passed": 6
+    }
+  ],
+  "independent_arithmetic": "independent-check.json",
+  "production_integration": "NOT_ACTIVATED_PENDING_LINEAGE_RECONCILIATION"
+}
