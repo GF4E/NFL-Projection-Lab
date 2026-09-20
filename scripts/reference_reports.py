@@ -19,7 +19,7 @@ def experiment_audit(folder, root=ROOT, series=None):
         records += [e for e in read(manifest) if e not in records]
     if not records and not series and (folder/'oof.json').exists():
         raise ValueError('Register saved candidate series before publishing report: '+str(folder))
-    result={'schema':'reference-lines-report-v1','sources':sources,'series':{}}
+    result={'schema':'reference-lines-report-v1','label':'DIAGNOSTIC ONLY','sources':sources,'series':{}}
     # The live baseline is explicit context, never substituted for an experiment candidate.
     current=next(e for e in catalog['series'] if e['path']==catalog['authoritative_control'] and e['authoritative'])
     if current not in records:records.insert(0,current)

@@ -134,7 +134,7 @@ def load_references(root=ROOT, weekly=False):
     return refs,metadata
 
 
-def audit(rows, refs):
+def audit(rows, refs, include_buckets=False):
     ids = [r['game_id'] for r in rows]
     if len(ids)!=len(set(ids)):
         raise ValueError('Audit requires one forecast per game within each lineage')
@@ -157,8 +157,8 @@ def audit(rows, refs):
             if delta==0: counts['no_lean']+=1;continue
             n+=1;w+=delta*outcome>0
         return {**interval(w,n),**counts,'coverage':counts['line_available']/len(rr) if rr else None,
-                'team_mae':mean_mae(rr),'status':'INSUFFICIENT' if reference=='OPEN' and target=='total' or not n else 'DESCRIPTIVE'}
-    result = {'schema':'reference-lines-v1','reporting_only':True,'never_a_gate':True,'games':len(rows),
+                'team_mae':mean_mae(rr),'label':'DIAGNOSTIC ONLY','status':'INSUFFICIENT' if reference=='OPEN' and target=='total' or not n else 'DIAGNOSTIC ONLY'}
+    result = {'schema':'reference-lines-v1','label':'DIAGNOSTIC ONLY','reporting_only':True,'never_a_gate':True,'never_a_target':True,'never_a_selection_criterion':True,'games':len(rows),
               'team_mae':mean_mae(rows),'references':{}}
     for reference in ('CLOSE','OPEN'):
         result['references'][reference]={}
@@ -167,7 +167,7 @@ def audit(rows, refs):
             buckets=defaultdict(list)
             for r in rows:
                 line=refs[reference][target].get(r['game_id'])
-                if line is not None and finite(r.get(key)):
+                if include_buckets and line is not None and finite(r.get(key)):
                     buckets[math.floor(abs(r[key]-line))].append(r)
             result['references'][reference][target] = {
                 'pooled':group(rows,reference,target),
@@ -178,37 +178,39 @@ def audit(rows, refs):
     return result
 
 
-def render(report, title='Reference-line audit', weekly=False):
-    lines=[f'## {title}', '', 'Audit references only; never projection inputs or gates. Actual pushes and exact projection-on-line NO_LEAN cases are excluded. Disagreement buckets use full precision [k,k+1). Wilson 95% intervals are descriptive, with no multiple-testing or serial-dependence adjustment.', '',
-           'OPEN spread and total use separate files and coverage. OPEN total is INSUFFICIENT: its historical qualification covers only 2024–2025, and no inference is drawn. Missing references are never filled with CLOSE. OPEN is not proof of the executable line at T-75.', '']
-    for label,item in report['series'].items():
-        lines += [f'### {label}', '', item.get('identity',''), '']
-        if item.get('shortfall'):
-            lines += [item['shortfall'],''];continue
-        data=item['audit']
-        lines += ['| Reference | Target | Scope | Team MAE | Correct/scored | Rate | 95% interval | Line coverage | Push / no lean | Status |',
-                  '|---|---|---|---:|---:|---:|---|---|---|---|']
-        for ref,targets in data['references'].items():
-            for target,m in targets.items():
-                groups=[('pooled',m['pooled'])]+list(m['seasons'].items())
-                if ref=='OPEN': groups.insert(1,('2021 forward',m['coverage_2021_forward']))
-                if weekly: groups+=list(m['weeks'].items())
-                groups += [(f'[{k},{int(k)+1}) pts',v) for k,v in m['buckets'].items()]
-                for name,g in groups:
-                    rate='—' if g['rate'] is None else f"{100*g['rate']:.2f}%"
-                    ci='—' if g['interval95'] is None else f"{100*g['interval95'][0]:.2f}–{100*g['interval95'][1]:.2f}%"
-                    cov='—' if g['coverage'] is None else f"{100*g['coverage']:.1f}%"
-                    mae='—' if g['team_mae'] is None else f"{g['team_mae']:.4f}"
-                    lines.append(f"| {ref} | {target} | {name} | {mae} | {g['correct']}/{g['games']} | {rate} | {ci} | {g['line_available']}/{g['population']} ({cov}) | {g['pushes']} / {g['no_lean']} | {g['status']} |")
-                lines += ['']
-    sources=report.get('sources',{})
-    if sources:
-        lines += ['Reference refresh: '+sources.get('refresh_status',{}).get('state','UNKNOWN')+'. Source retrieval dates below identify the evidence used.', '']
-        lines += [f"CLOSE source: `{sources['CLOSE']['path']}`; nflverse spread_line and total_line.", '']
-        for target,m in sources['OPEN'].items():
-            lines += [f"OPEN {target} source: `{m['path']}`; `{m['column']}`; retrieved {m['retrieved_at']}; SHA256 {m['sha256_uncompressed']}.", '']
-    lines += [CONFIDENCE,'']
-    return '\n'.join(lines)
+def render(report, title='DIAGNOSTIC ONLY', weekly=False):
+    """Exactly two compact lines; annual counts expand without a diagnostic section."""
+    from html import escape
+    def rate(g):
+        if not g or not g.get('games'):
+            return '0 scored; insufficient data'
+        lo,hi=g['interval95']
+        return f"{g['correct']}/{g['games']} ({100*g['rate']:.2f}%; 95% {100*lo:.2f}–{100*hi:.2f}%)"
+    items=list(report.get('series',{}).items())
+    if weekly:
+        items=[(k,v) for k,v in items if k.startswith('AS_ISSUED')]
+    else:
+        live=[(k,v) for k,v in items if 'CURRENT HFA' in v.get('identity','')]
+        if live:items=live
+    lines=[]
+    for ref in ('CLOSE','OPEN'):
+        pooled=[];annual=[]
+        for name,item in items:
+            if not item.get('audit'):continue
+            data=item['audit']['references'][ref]
+            label=name if weekly else 'current HFA' if 'CURRENT HFA' in item.get('identity','') else name
+            coverage=data['spread'].get('coverage_2021_forward',data['spread']['pooled'])
+            cover=f"; spread coverage {coverage['line_available']}/{coverage['population']}" if ref=='OPEN' else ''
+            pooled.append(label+': ATS '+rate(data['spread']['pooled'])+('; total '+rate(data['total']['pooled']) if ref=='CLOSE' else cover))
+            for year,g in data['spread']['seasons'].items():
+                annual.append(label+' '+year+': ATS '+rate(g)+('; total '+rate(data['total']['seasons'][year]) if ref=='CLOSE' else '')+f"; spread coverage {g['line_available']}/{g['population']}")
+        summary='DIAGNOSTIC ONLY — '+ref+' — '+(' | '.join(pooled) or 'no graded as-issued forecasts')
+        if ref=='OPEN':summary+='; totals INSUFFICIENT (34.3% historical coverage)'
+        sources=report.get('sources',{})
+        source='nflverse spread_line / total_line' if ref=='CLOSE' else 'nfelo historic_projected_spreads.csv home_line_open; totals source nfelo_games.csv total_line_open, unblended'
+        detail='By season: '+(' | '.join(annual) or 'no eligible games')+'. Source: '+source+'. Counts exclude actual pushes and exact forecast-on-line cases. Never a target, gate, ranking, selection criterion or justification for a model change.'
+        lines.append('<details><summary>'+escape(summary)+'</summary>'+escape(detail)+'</details>')
+    return '\n'.join(lines)+'\n'
 
 
 def weekly_report(cards, root=ROOT):

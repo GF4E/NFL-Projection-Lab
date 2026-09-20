@@ -426,3 +426,11 @@ Confidence: near-total — arithmetic on verified rows. Move down to high if sou
 The host was at 100% capacity. Removed only 321,576,673 bytes of regenerable APT caches/indexes and rotated/vacuumed 15.2 MiB of archived journals under the existing cleanup authorization; the path list is in work/reference-line-metric-v2/host-cache-cleanup.txt. Restored two truncated copies of the previous audit packet from verified repository commit 60565a44 after proving their remaining bytes were exact prefixes. Recovery hashes and host commit are in host-sync-recovery.json. No artifact of record was removed. Stopped tracking outputs/projection-v3/final-feed.tmp, the regenerable atomic-write temporary file whose routine removal had also blocked publication; its final feed and hashed sources remain tracked. Initial free space after cleanup: 289 MiB; storage headroom remains limited.
 
 Confidence: near-total — these recovery actions are recorded by path, byte count and hash. Move down to high if the host receipts fail independent verification.
+
+## 2026-09-20 — Item 1: statistical analytics scope and two-line diagnostics
+
+Binding scope: expected team totals, actual-score accuracy, team-points MAE primary; margin/total MAE, bias, dispersion, interval coverage, CRPS and interval score supporting. Market-relative measures cannot score, gate, tune, rank, select or justify a model change. The experiment premise validator now enforces accuracy objectives. Existing historical experiments remain preserved.
+
+Reference displays are reduced to two compact expandable lines labeled DIAGNOSTIC ONLY: CLOSE ATS/total and OPEN spread, with counts/95% intervals pooled and by season. OPEN totals remain INSUFFICIENT at 34.3% historical coverage. No bucket display or default bucket computation. Reconciliation tolerances stay 0.5 points for headlines and max(1.0 points, one game) for historical buckets. Existing diagnostic sidecars are condensed; frozen experiment narratives, predictions and gates remain unchanged. No new betting rule, search, fit or forward test was run.
+
+Confidence: near-total — the scope is explicitly authorized and displayed rates retain verified arithmetic. Move down to high if source, sign or experiment selection validation fails independent checks.

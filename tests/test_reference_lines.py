@@ -31,7 +31,7 @@ class ReferenceLinesTests(unittest.TestCase):
 
     def test_no_lean_and_full_precision_buckets(self):
         refs=self.refs();refs['CLOSE']['spread']['2025_01_A_B']=0
-        result=m.audit(m.normalize([self.row(home=24.999)]),refs)
+        result=m.audit(m.normalize([self.row(home=24.999)]),refs,include_buckets=True)
         self.assertIn('4',result['references']['CLOSE']['spread']['buckets'])
         result=m.audit(m.normalize([self.row(home=20.)]),refs)
         self.assertEqual(result['references']['CLOSE']['spread']['pooled']['no_lean'],1)
@@ -52,7 +52,7 @@ class ReferenceLinesTests(unittest.TestCase):
 
     def test_real_reproduction_and_revised_tolerance(self):
         refs,_=m.load_references();catalog=m.read(ROOT/'work/series-registry/catalog.json')
-        current=m.audit(m.normalize(m.read(ROOT/catalog['authoritative_control'])),refs)
+        current=m.audit(m.normalize(m.read(ROOT/catalog['authoritative_control'])),refs,include_buckets=True)
         close=current['references']['CLOSE']
         self.assertEqual((close['spread']['pooled']['correct'],close['spread']['pooled']['games']),(1301,2574))
         self.assertEqual((close['total']['pooled']['correct'],close['total']['pooled']['games']),(1285,2618))
@@ -87,7 +87,9 @@ class ReferenceLinesTests(unittest.TestCase):
             issued=report['series']['AS_ISSUED / v1']['audit'];self.assertEqual(issued['team_mae'],1.5)
             self.assertEqual(issued['references']['CLOSE']['spread']['pooled']['correct'],1)
             text=m.render(report,weekly=True)
-            self.assertIn('2025-w1',text);self.assertIn('1/1',text);self.assertIn('INSUFFICIENT',text)
+            self.assertIn('2025',text);self.assertIn('1/1',text);self.assertIn('INSUFFICIENT',text)
+            self.assertEqual(len(text.splitlines()),2);self.assertEqual(text.count('DIAGNOSTIC ONLY'),2)
+            self.assertNotIn('<table',text);self.assertNotIn('break-even',text)
 
     def test_reporting_never_imported_into_projection_modules(self):
         paths=list((ROOT/'engine/projection').rglob('*.py'))+list((ROOT/'engine/projection_v3').rglob('*.py'))+list((ROOT/'engine/forecast_system').rglob('*.py'))+[ROOT/'engine/elo.py',ROOT/'engine/elo_hfa.py']
