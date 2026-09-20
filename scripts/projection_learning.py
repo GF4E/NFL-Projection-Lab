@@ -63,7 +63,7 @@ def report():
  from scripts.reference_lines import weekly_report,render
  b['reference_lines']=weekly_report(board['games'],ROOT)
  save(OUT/'reference-lines.json',b['reference_lines']);(OUT/'reference-lines.md').write_text(render(b['reference_lines'],weekly=True))
- save(OUT/'trend.json',b);(OUT/'trend.md').write_text(markdown(b)+'\n'+render(b['reference_lines'],weekly=True));return b
+ save(OUT/'trend.json',b);(OUT/'trend.md').write_text(markdown(b)+'\n'+render(b['reference_lines'],weekly=True)+'\nConfidence: near-total — reported errors and diagnostics are arithmetic on saved projections and grades. Move down to high if a source or lineage mismatch invalidates those rows.\n');return b
 
 def due_week(rows,now):
  local=now.astimezone(ZoneInfo('America/Los_Angeles'));games={r['game_id']:r for r in rows};due=[]
@@ -104,4 +104,5 @@ def run_weekly(now=None):
 if __name__=='__main__':
  parser=argparse.ArgumentParser();parser.add_argument('--trend',action='store_true');parser.add_argument('--weekly',action='store_true');args=parser.parse_args()
  if args.weekly:print(json.dumps(run_weekly()))
- if args.trend or not args.weekly:print(markdown(report()))
+ if args.trend or not args.weekly:
+  report();print((OUT/'trend.md').read_text())

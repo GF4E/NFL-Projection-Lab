@@ -1,5 +1,13 @@
 # Registered paper rules
 
+## Owner rule boundary — September 20, 2026
+
+**Gabe’s separate paper rule; not an engine strategy.** The historical wind rule was measured on raw game outcomes: select Under in the wind band, independently of the engine’s projection. It was not measured by following the engine’s predicted total relative to a line. Through the engine, the supplied wind-game results are 47.5–47.7 percent on totals (DIAGNOSTIC ONLY); those are a different test and cannot be conflated with the raw-outcome rule.
+
+**The form on paper is the unconditional wind-band Under rule**, presently the `WIND-UNDER-10-15-V1-T75` version below: qualified outdoor kickoff forecast 10 <= wind mph < 15, then Under at the frozen reference total. It does not require an engine-projected Under. `engine/live_picks.py` selects this paper Under from the wind eligibility flag and quote coverage; expected team totals do not trigger it. “On paper” names the registered rule form, not evidence that a particular game qualified or a wager was placed.
+
+The T60 predecessor and all paper logs/locks remain preserved. This is Gabe’s rule and is not removed or promoted into the statistical engine. All rule-specific execution language below belongs to that separate paper record; it is not authority for a model input, objective, gate, tuning, ranking or new experiment. Betting remains outside the expected-team-totals engine.
+
 ## WIND-UNDER-10-15-V1
 
 Registered September 8, 2026, before the 2026 regular season. Status: **PAPER ONLY**, active for 2026 regular-season Weeks 1–4. This is a distinct paper experiment; it does not change the live board's probability/price filter or the model promotion gate.

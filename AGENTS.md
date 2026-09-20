@@ -121,3 +121,7 @@ Follow work/projection-governance-v2/CONFIDENCE-AND-PREMISE.md. End every new/re
 ## Standing reference-line reporting (September 20)
 
 Follow work/projection-governance-v2/REFERENCE-LINE-METRIC.md. Every weekly and experiment report includes separate CLOSE/OPEN audit tables alongside team MAE. Current HFA is live; pre-HFA remains historical. OPEN total is INSUFFICIENT, not negative evidence. Use scripts.reference_reports.report_file for report creation, supplying all saved candidate series or hash-pinned reference-series.json entries. Existing frozen reports get separate appendices. The commit check requires the appendix. Neither line enters any model or gate.
+
+## Binding analytics scope correction (September 20)
+
+work/projection-governance-v2/ANALYTICS-SCOPE.md supersedes all market-relative experiment directions above. This statistical engine produces expected team totals. Team-points MAE is primary; actual-score margin/total MAE, bias, dispersion, interval coverage, CRPS and interval score support it. No market-relative metric may score, gate, tune, rank or justify a model change. Reference diagnostics are two compact lines labeled DIAGNOSTIC ONLY, with annual counts on expansion; no bucket display or selection. OPEN totals remain INSUFFICIENT. No condition-search betting rule is registered, built or forward-tested. Preserve Gabe's separate paper rule and distinguish its raw-outcome evidence.

@@ -426,3 +426,31 @@ Confidence: near-total — arithmetic on verified rows. Move down to high if sou
 The host was at 100% capacity. Removed only 321,576,673 bytes of regenerable APT caches/indexes and rotated/vacuumed 15.2 MiB of archived journals under the existing cleanup authorization; the path list is in work/reference-line-metric-v2/host-cache-cleanup.txt. Restored two truncated copies of the previous audit packet from verified repository commit 60565a44 after proving their remaining bytes were exact prefixes. Recovery hashes and host commit are in host-sync-recovery.json. No artifact of record was removed. Stopped tracking outputs/projection-v3/final-feed.tmp, the regenerable atomic-write temporary file whose routine removal had also blocked publication; its final feed and hashed sources remain tracked. Initial free space after cleanup: 289 MiB; storage headroom remains limited.
 
 Confidence: near-total — these recovery actions are recorded by path, byte count and hash. Move down to high if the host receipts fail independent verification.
+
+## 2026-09-20 — Item 1: statistical analytics scope and two-line diagnostics
+
+Binding scope: expected team totals, actual-score accuracy, team-points MAE primary; margin/total MAE, bias, dispersion, interval coverage, CRPS and interval score supporting. Market-relative measures cannot score, gate, tune, rank, select or justify a model change. The experiment premise validator now enforces accuracy objectives. Existing historical experiments remain preserved.
+
+Reference displays are reduced to two compact expandable lines labeled DIAGNOSTIC ONLY: CLOSE ATS/total and OPEN spread, with counts/95% intervals pooled and by season. OPEN totals remain INSUFFICIENT at 34.3% historical coverage. No bucket display or default bucket computation. Reconciliation tolerances stay 0.5 points for headlines and max(1.0 points, one game) for historical buckets. Existing diagnostic sidecars are condensed; frozen experiment narratives, predictions and gates remain unchanged. No new betting rule, search, fit or forward test was run.
+
+Confidence: near-total — the scope is explicitly authorized and displayed rates retain verified arithmetic. Move down to high if source, sign or experiment selection validation fails independent checks.
+
+## 2026-09-20 — Item 2: record the supplied 38-condition finding, no experiment
+
+Recorded the user’s exact finding and dead ends in work/series-registry/condition-search-finding.json and SERIES.md. Status DIAGNOSTIC ONLY / UNCONFIRMED_OBSERVATION_NOT_AN_EDGE; no registration, build, forward test, queue entry, retest or model-change justification. The condition-level source artifact was not supplied; no fresh market-relative analysis was run.
+
+Confidence: low on the numerical finding — one supplied search could invert under independent recomputation; contradictory rows would make it unsupported.
+
+## 2026-09-20 — Item 3: distinguish Gabe’s wind paper rule from engine projections
+
+RULES.md now states that the original wind evidence measured raw outcomes and an unconditional Under selection. The form on paper is WIND-UNDER-10-15-V1-T75 (qualified outdoor forecast 10 <= mph < 15, Under at the frozen total), not an engine-projected Under. Runtime review of engine/live_picks.py confirms eligibility uses the wind flag and quote coverage. The supplied engine-based 47.5–47.7% total results are separately labeled DIAGNOSTIC ONLY. Gabe’s rule, paper records and original registration are preserved; nothing is removed or newly forward-tested.
+
+Confidence: high — the rule text and its runtime selection agree on the raw wind-band Under form. A contrary paper lock or a hidden projection-dependent eligibility path would lower this to medium.
+
+## 2026-09-20 — Item 4: queue returns to accuracy work; VALUE status corrected
+
+E-ELO-QB is the active accuracy-review priority. VALUE is already supplied, implemented and evaluated; no missing-input blocker is recorded. Preserve the completed accuracy rejection (a 0.099%, b 0.093%, oracle 0.225% team-MAE improvement versus the 1% gate), the per-outer-season fitted scale and oracle evidence. No duplicate fit or market-relative experiment starts. Updated the queue's stale control pointer to the already-authoritative HFA catalog entry. Legacy situational/threshold market-relative queue items are OUT_OF_SCOPE_BETTING_RULE_DO_NOT_RUN; their former criteria are preserved as historical fields. HARVEST.md carries the supersession.
+
+Confidence: high — the saved score-accuracy rejection holds across seasons and the oracle/HFA alternatives. A material independent window or scale discrepancy would lower it to medium.
+
+Item 4 separation verification: experiment report finalization now audits only the deployed model as context, never the experiment candidates, and a missing reference produces a diagnostic shortfall rather than blocking the accuracy report. No fit, target, scale, score-accuracy gate or saved candidate result changed.

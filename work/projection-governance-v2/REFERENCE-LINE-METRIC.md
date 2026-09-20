@@ -1,3 +1,9 @@
+# DIAGNOSTIC ONLY — scope supersession
+
+The binding current policy is [ANALYTICS-SCOPE.md](ANALYTICS-SCOPE.md). Display exactly two compact lines, CLOSE and OPEN, with pooled counts/95% intervals and annual counts on expansion. No section, bucket display, target, gate, tuning, ranking, selection or model-change justification. OPEN totals remain INSUFFICIENT at 34.3% historical coverage. Historical reconciliation tolerances are unchanged.
+
+The former detailed-table policy below is preserved as superseded history, not current direction.
+
 # Standing reference-line audit
 
 Effective 2026-09-20. Every weekly and experiment report includes CLOSE and OPEN ATS/total accuracy alongside team MAE, by season, pooled and one-point absolute-disagreement bucket, with correct/scored counts and Wilson 95% intervals. Weekly reports also show individual weeks. Actual pushes and exact forecast-on-line no-leans are separate exclusions. Show reference coverage per target and scope. This is NEVER a gate and no reference field enters a fit, feature, forecast or lock.

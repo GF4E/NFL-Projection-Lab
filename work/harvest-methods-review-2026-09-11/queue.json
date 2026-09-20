@@ -24,14 +24,18 @@
     {
       "week": 5,
       "harvest": "Situational retest: home dogs, rest, travel, Week 1 and 18",
-      "promotion_gate": "Any bucket clears break-even after Bonferroni",
-      "status": "PENDING"
+      "status": "OUT_OF_SCOPE_BETTING_RULE_DO_NOT_RUN",
+      "historical_promotion_gate": "Any bucket clears break-even after Bonferroni",
+      "may_retest": false,
+      "reason": "Market-relative condition/threshold selection is outside the expected-team-totals statistical engine."
     },
     {
       "week": 6,
       "harvest": "Threshold retest on the EPA residual model",
-      "promotion_gate": "Over-3-point bucket clears 52.4% with interval above 50%",
-      "status": "PENDING"
+      "status": "OUT_OF_SCOPE_BETTING_RULE_DO_NOT_RUN",
+      "historical_promotion_gate": "Over-3-point bucket clears 52.4% with interval above 50%",
+      "may_retest": false,
+      "reason": "Market-relative condition/threshold selection is outside the expected-team-totals statistical engine."
     },
     {
       "week": 7,
@@ -39,5 +43,7 @@
       "promotion_gate": "Beats ridge ratings on CRPS in rolling-origin",
       "status": "PENDING"
     }
-  ]
+  ],
+  "scope_policy": "work/projection-governance-v2/ANALYTICS-SCOPE.md",
+  "status": "LEGACY_QUEUE_SUBORDINATE_TO_CURRENT_ACCURACY_QUEUE"
 }

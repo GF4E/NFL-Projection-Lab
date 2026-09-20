@@ -1,3 +1,5 @@
+> **September 20 scope supersession:** Statistical accuracy work only; team-points MAE primary. Market-relative condition and threshold retests in the legacy queue are OUT_OF_SCOPE and must not run. The supplied 38-condition search is an unconfirmed registry finding, not a queued experiment or model-change justification. E-ELO-QB is the active accuracy-review item; its supplied VALUE run already completed and remains preserved. See work/projection-governance-v2/ANALYTICS-SCOPE.md.
+
 # Weekly component harvest
 
 Research queue, not live model selection. Metadata checked September 8, 2026; commits and API metadata are pinned in [sources](work/harvest-elo-v1/sources/pins.json).
