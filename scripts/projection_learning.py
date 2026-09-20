@@ -14,7 +14,7 @@ OUT=ROOT/'outputs/in-season-learning-v1';WORK=ROOT/'work/in-season-learning-v1'
 def pinned(name,value):
  raw=(json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False)+'\n').encode();sha=hashlib.sha256(raw).hexdigest();p=WORK/f'{name}-{sha}.json';save(p,value,True);return {'path':str(p.relative_to(ROOT)),'sha256':sha}
 
-METHOD_FILES=['engine/projection/features.py','engine/projection_v3/personnel.py','engine/projection_v3/model.py','scripts/projection_prepare.py']
+METHOD_FILES=['engine/elo_hfa.py','engine/projection/features.py','engine/projection_v3/personnel.py','engine/projection_v3/model.py','scripts/projection_prepare.py']
 
 def method_signature():return {f:hashlib.sha256((ROOT/f).read_bytes()).hexdigest() for f in METHOD_FILES}
 
@@ -83,8 +83,8 @@ def weekly_refit(rows,previous_week,now):
  board=json.loads((ROOT/'outputs/projection-v3/board.json').read_text());missing_grades=[g['game_id'] for g in board['games'] if g['week']<=previous_week and g.get('projection') and not g.get('grades')]
  missing_pbp=sorted({r['game_id'] for r in rows if r['week']<=previous_week}-available)
  if not slate or not finished or missing_pbp or missing_grades:return {'state':'WAITING_FOR_FINALS_AND_PBP','through_week':previous_week,'missing_pbp':missing_pbp,'missing_grades':missing_grades}
- historical=read(json.loads((WORK/'historical-ref.json').read_text()));training=[r for r in historical+rows if r['season']<2026 or r['week']<=previous_week];training=[r for r in training if r.get('actual_points') is not None and r['features'].get('baseline') is not None]
- updated=copy.deepcopy(a);updated['fit']=fit(training,a['groups'],a['selected'][1]);updated['parent_version']=a['version'];updated['version']=f'projection-v1.w{previous_week+1}' if not a.get('learning_method') else f"projection-v2.w{previous_week+1}";updated['through_week']=previous_week;updated['issued_at']=now.isoformat();ref=pinned('fit',updated)
+ historical=read(a.get('historical_features') or json.loads((WORK/'historical-ref.json').read_text()));training=[r for r in historical+rows if r['season']<2026 or r['week']<=previous_week];training=[r for r in training if r.get('actual_points') is not None and r['features'].get('baseline') is not None]
+ updated=copy.deepcopy(a);updated['fit']=fit(training,a['groups'],a['selected'][1]);updated['parent_version']=a['version'];updated['version']=f'projection-v1.w{previous_week+1}' if not a.get('learning_method') else f"{a.get('version_prefix','projection-v2')}.w{previous_week+1}";updated['through_week']=previous_week;updated['issued_at']=now.isoformat();ref=pinned('fit',updated)
  result={'state':'REFIT_COMPLETE','version':updated['version'],'fit':ref,'parent_version':a['version'],'through_week':previous_week,'issued_at':now.isoformat(),'training_rows':len(training),'settings':a['selected'],'groups':a['groups']}
  save(receipt,result,True);save(WORK/'active-fit-ref.json',ref);return result
 

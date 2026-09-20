@@ -1,0 +1,15 @@
+# Authorized HFA release
+
+The user accepted the starter validation and supporting-regression reconciliation and explicitly authorized E-ELO-HFA promotion. The gate passed on the authoritative 2,639-game deployed lineage. Release the exact prior-three-completed-season, nonneutral regular-season home-margin mean times 25; neutral games use zero. Preserve K, reversion, divisor, weekly batch updates, ridge settings and residual distribution.
+
+CONVENTIONS Tier 1: ship HFA as a versioned optional season table, leaving default Elo behavior intact for archived methods. Rebuild matching historical Elo features and refit the ridge through the same completed week as its parent. Pin the historical feature reference inside the fit so later weight-only refits retain the method. The new version prefix is projection-v2.hfa1. Existing locks and grades remain byte-identical. Source publication and activation run under the existing cloud dispatch lock; no paid feeds or capture worker is invoked.
+
+CONVENTIONS Tier 2 REVIEW REQUESTED: E-ELO-QB keeps all three originally named candidates and the original control for reconciliation, but its gate must compare with the newly released HFA lineage under the standing authoritative-control rule. Report both comparisons. Alternative: defer QB gating until explicit control amendment; no gate threshold or candidate is changed by retaining the contemporaneously deployed control.
+
+Reconciliation accepted: the user's 89.4% treated declines as misses and omitted the injury override. Their complete rule scores 90.87%, consistent with the reproduced 90.96% under different season selection. Their override fired 40 times and selected the correct starter 30 times (user-supplied reconciliation, not a new recomputation). Their 2,442-row regression required four prior games plus prior-season QB history; our 2,806-row result and 0.8% gain remain authoritative for our reported population. Preserve both original reports and annotate this resolution.
+
+Confidence: medium — the release implements a result on authoritative data but the reliability convention could reasonably differ. Move down to low if independent reproduction fails to match the pinned gate or production path.
+
+Verification caught a stale local current-feature cache with only four known Week 1 team outcomes. Reconstructed the parent's 32 training rows from its committed source manifest at 6c666abd. Together with 5,790 historical rows they reproduce every retained coefficient and intercept within 5e-15. The all-feature training hash differs because inactive personnel enrichment is not repeated; retained fitting inputs and outcomes are reproduced. The initial 5,794-row draft fit bc828664 was never activated and is preserved as WITHDRAWN_DRAFT. Release uses 5,822 rows; the final fit is pinned by release-ref.json. Earlier preparation drafts are never activated.
+
+Host preflight: 152 MiB free (99% used). Authorized regenerable apt cache clean and journal rotation/vacuum freed approximately 121 MiB; 273 MiB free (97%). Removed apt-generated cache binaries and 13.5 MiB archived system/user journals; no repository artifacts or raw data removed.
