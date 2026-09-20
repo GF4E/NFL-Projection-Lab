@@ -33,26 +33,26 @@
       "id": "E-ELO-HFA",
       "registration": "work/e-elo-qb-hfa-v1/E-ELO-HFA.json",
       "registration_sha256": "5496574c482d1bba7be916bc1a3212c869da26e8e77c3b2c720cf58910cfc1e8",
-      "report": "work/e-elo-qb-hfa-v1/REPORT.md",
-      "state": "PASSED_PENDING_RELEASE",
+      "report": "work/e-elo-hfa-release/REPORT.md",
+      "state": "RELEASED",
       "gate_passed": true,
-      "promoted": false,
-      "production_activated": false,
-      "release_note": "Existing automatic_method_promotion=false; compatible versioned HFA feature history and fit required for release."
+      "promoted": true,
+      "production_activated": true,
+      "release_note": "User explicitly authorized promotion; host verified",
+      "release_commit": "379cd7ca",
+      "fit_sha256": "f7fc497ee581c3a948388891904b52669e345bae1a61c684281034505b5840e4"
     },
     {
       "id": "E-ELO-QB",
-      "registration": "work/e-elo-qb-hfa-v1/E-ELO-QB.json",
-      "registration_sha256": "8c55eb80742ce163616ecfeff7acd8292dad12c6cb0d6ee31e7b447706ef3a5c",
-      "report": "work/e-elo-qb-hfa-v1/REPORT.md",
-      "state": "HELD_FOR_REPRODUCTION_AND_VALUE_DEFINITION",
+      "registration": "work/e-elo-qb-value-v2/registration.json",
+      "registration_sha256": "b6b8c58e15cfa757423c432cca41b2ea1fe4e09ad264746dc59e97b6859b7a13",
+      "report": "work/e-elo-qb-value-v2/REPORT.md",
+      "state": "PREREGISTERED_READY_TO_FIT",
       "gate_passed": null,
       "promoted": false,
-      "blockers": [
-        "Full-rule accuracy differs from supplied no-override accuracy by more than1percentage point",
-        "EPA/dropback+CPOE to VALUE formula and no-history rule unspecified"
-      ],
-      "data_availability": "STARTER_HISTORY_AVAILABLE_QUALIFIED_RULE_WITH_UNTIMESTAMPED_FALLBACKS"
+      "blockers": [],
+      "data_availability": "STARTER_HISTORY_AVAILABLE_QUALIFIED_RULE_WITH_UNTIMESTAMPED_FALLBACKS",
+      "reconciliation": "Accepted by user; source and population differences resolved"
     },
     {
       "candidates_registered": 0,
@@ -306,5 +306,6 @@
     "state": "SUPERSEDED_EXPLORATORY"
   },
   "schema": "projection-experiment-queue-v1",
-  "standing_confidence_and_premise": "work/projection-governance-v2/CONFIDENCE-AND-PREMISE.md"
+  "standing_confidence_and_premise": "work/projection-governance-v2/CONFIDENCE-AND-PREMISE.md",
+  "active_experiment": "E-ELO-QB"
 }

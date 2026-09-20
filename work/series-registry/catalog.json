@@ -1,5 +1,5 @@
 {
-  "authoritative_control": "work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json",
+  "authoritative_control": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
   "authority_scope": "All future engine method gates; freeze this control until a separately authorized production-lineage replacement.",
   "metrics_convention": "2016-2025 available team rows; projected-minus-actual bias; population SD; OLS slope actual on projected",
   "series": [
@@ -826,10 +826,10 @@
       "sha256": "6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10",
       "date_added": "2026-09-18T19:32:44-07:00",
       "archive_commit": "3840450bc9b3d0b3602c10f4a95927d4e1eddcb8",
-      "status": "AUTHORITATIVE",
-      "authoritative": true,
+      "status": "SUPERSEDED_BY_AUTHORIZED_HFA_RELEASE",
+      "authoritative": false,
       "producer_and_fit": "scripts/deployed_lineage_replay.py using source commit 538ce1f4; production fit 8bd58561 settings; per-issuance training hashes in replay-receipt.json",
-      "note": "Sole future gate control; historical delivery timing approximation disclosed in REPLAY-PLAN.md.",
+      "note": "Retained original registered comparator; E-ELO-HFA user-authorized release supersedes this for future gating.",
       "metrics": {
         "games": 2639,
         "team_observations": 5278,
@@ -909,6 +909,22 @@
       "metric_target": "home_margin",
       "producer_and_fit": "scripts/elo_hfa_deployed_gate.py; verified538ce1f4productionnumericalcode; artifact8bd58561settings;candidateHFAprior-three-seasonmean",
       "note": "See SERIES.md. Sole deployed gate control remains6a0238fc until an explicitly released replacement."
+    },
+    {
+      "path": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
+      "sha256": "66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f",
+      "authoritative": true,
+      "status": "AUTHORITATIVE",
+      "date_added": "2026-09-20T02:53:35.244810+00:00",
+      "producer_and_fit": "scripts/elo_hfa_deployed_gate.py; exact shipping equivalence verified by test_elo_hfa_release; release code379cd7ca; fit f7fc497e",
+      "metrics": {
+        "games": 2639,
+        "team_observations": 5278,
+        "mae": 7.575628833271496,
+        "bias": 0.1888626093556898,
+        "sd": 2.934554179081857,
+        "slope": 1.0111093664106956
+      }
     }
   ],
   "scope": "Tracked out-of-fold series and derived scored/verified series. Unit-test fixtures, per-game live locks and raw inputs are not rolling-origin evaluation series.",

@@ -1,3 +1,5 @@
+Status after authorized HFA release: original 6a0238fc is now non-authoritative for future gates; this historical result remains valid against its then-deployed control. See work/e-elo-hfa-release/SERIES.md.
+
 # Historical series identity
 
 Metrics recomputed on available 2016–2025 team-point rows. Bias = projected minus actual; slope = actual on projected; SD = population SD. File-addition dates and archive commits identify repository provenance, not an invented original fit time. A multi-fold series has multiple fits; producer/manifests are listed below.

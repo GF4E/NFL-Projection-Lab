@@ -388,3 +388,9 @@ Confidence: medium for the HFA bias-correction decision: it holds on authoritati
 The user accepts our starter-rule and regression figures as authoritative. Their 89.4% omitted the injury override and scored declines as misses; full-rule 90.87% reconciles with our 90.96% across season selection. Their reported override is correct 30/40 times. Their 2,442 versus our 2,806 regression rows reflect an added prior-season-history requirement (1.5% versus 0.8% gain). These are resolved population/rule differences, not a failed reproduction. Original evidence is preserved.
 
 E-ELO-HFA is PROMOTED by explicit user instruction after passing its registered bias/reliability/noninferiority gate. Release plan: work/e-elo-hfa-release/PLAN.md. CONVENTIONS: optional pinned season HFA table, matching historical features and ridge refit, method-specific version prefix, immutable old locks. QB evaluation must report its original control comparison and the released HFA control under standing deployed-lineage governance.
+
+E-ELO-HFA host release verified: projection-v2.hfa1.w2, fit f7fc497ee581c3a948388891904b52669e345bae1a61c684281034505b5840e4, source release379cd7ca. All22locked/graded files unchanged. Authoritative control now66a3a60c, numerically the exact passed HFA replay; original6a0238fc preserved as superseded comparator.
+
+## CONVENTIONS — E-ELO-QB VALUE before fitting
+
+Gap sweep and user VALUE formula published in work/e-elo-qb-value-v2/PLAN.md. EPA-only primary; strict identical CPOE windows incomplete, so fixed EPA+CPOE is disclosed secondary, never imputed. Nonnegative scale fitted on earlier seasons only; original a/b/c plus oracle retained, with released HFA serving as contemporary gate control. Standard gate unchanged. Reproduction stop resolved. Amended registration b6b8c58e15cfa757423c432cca41b2ea1fe4e09ad264746dc59e97b6859b7a13.
