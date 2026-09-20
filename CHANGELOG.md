@@ -454,3 +454,16 @@ E-ELO-QB is the active accuracy-review priority. VALUE is already supplied, impl
 Confidence: high — the saved score-accuracy rejection holds across seasons and the oracle/HFA alternatives. A material independent window or scale discrepancy would lower it to medium.
 
 Item 4 separation verification: experiment report finalization now audits only the deployed model as context, never the experiment candidates, and a missing reference produces a diagnostic shortfall rather than blocking the accuracy report. No fit, target, scale, score-accuracy gate or saved candidate result changed.
+
+
+## 2026-09-20 — E-ELO-QB CLOSED_REJECTED; Elo route closed
+
+User closeout adopted. Retrospective identity improves team MAE 0.225% versus the 1% gate; rule-to-oracle gap is 0.009474 points per team (0.009 rounded). Identification is settled as not the binding constraint for the tested Elo-adjustment route; the attempt-leader caveat does not reopen this route. Retrospective identity is the operational ceiling used for the closure, not a mathematical bound over other formulations. Scale excluding first fold: 35.7–77.4, 2.2x; a conversion constant varying that much is not behaving like a physical quantity. Finding only, no post-hoc instability gate.
+
+Close QB value routed through Elo; leave direct quarterback quality OPEN. Preserve original registration, report and all numerical artifacts. Supporting 585-game pre-HFA changed-starter bias is +1.182 versus stable -0.098 (not a +1.18 between-group difference); the accepted 2806-row regression improves in-sample MAE 7.794422→7.732279 with the team coefficient 0.404796→0.290567. These remain descriptive/in-sample evidence. Redundancy with Elo/team strength and the two-stage conversion are the successor's working explanation, not a proven cause. Full closeout: work/e-elo-qb-value-v2/CLOSEOUT-2026-09-20.md.
+
+## CONVENTIONS — E-QB-DIRECT preregistration
+
+Full sweep in work/e-qb-direct/PLAN.md: separate native-unit EPA and CPOE features; existing component-wise missing handling, two coefficients only, no Elo route or scale; oracle holds rule-trained ridge fixed; current HFA control and paired population unchanged. Tier 1 decisions follow the existing model.py and prior hashed QB window conventions. Tier 2 alternatives are explicitly flagged. One Tier 3 item B01: define the two-feature coefficient disproving test; no test substituted silently. Registration SHA256 1ec8217ed9d086a9d35bc27dc40cc2b4bd4b95b82d69b0c7b565a9b65fd0c85d; next queue slot E-QB-DIRECT, not fitted; Tuesday published closeout/activation required.
+
+Confidence: high for closing the specified Elo route across seasons and saved alternatives; lower to medium on a material independent replay discrepancy. Direct-feature efficacy and redundancy mechanism are unproven.
