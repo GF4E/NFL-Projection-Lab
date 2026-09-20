@@ -2,6 +2,9 @@
 import json,math,statistics,sys
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
+import sys
+sys.path.insert(0,str(ROOT))
+from scripts.reference_reports import report_file
 from engine.projection_v2.qualify import read,save
 
 def main():
@@ -26,5 +29,5 @@ def main():
  for g,r in last['marginal'].items():
   decision='RETAINED' if g in record['released_groups'] else ('REMOVED: conditional '+removed[g] if g in removed else 'INACTIVE: '+r['reason'] if not r['pass'] else 'REMOVED: release check failed');gain=r.get('relative_team_improvement');text.append(f"| {g} | {len(r['eligible_seasons'])} | {gain*100:.2f}% | {decision} |" if gain is not None else f"| {g} | {len(r['eligible_seasons'])} | N/R | {decision} |")
  text+=['\nConditional comparisons refit and retune the complete remaining subset. Detailed paired counts, seasonal improvements and intervals are in the immutable qualification record linked by the experiment. Failing components remain recorded with zero live weight; no source or v1 evidence is deleted.','\n2016 interval results are unavailable because no earlier OOF season exists. Target shares never acquire an eligible test fold: the first measurements arrive in 2025, after every historical training fold relevant to those measurements. Wind retains its limited 2022–2025 archive qualification; unavailable history is never filled.','\n## Replay','\nVerification: `OPENBLAS_NUM_THREADS=1 /opt/anaconda3/bin/python3.12 -B scripts/projection_v2_replay.py --verify`','\nFull offline qualification replay: `OPENBLAS_NUM_THREADS=1 /opt/anaconda3/bin/python3.12 -B -m engine.projection_v2.qualify`','\nLeast sure: whether a group improved the forecast or merely duplicated another input. Refitted conditional ablations determine the retained set; WHY uses grouped measured contributions and a distinct strongest opposing term.']
- (work/'report.md').write_text('\n'.join(text)+'\n');return audit
+ report_file(work/'report.md').write_text('\n'.join(text)+'\n');return audit
 if __name__=='__main__':main()

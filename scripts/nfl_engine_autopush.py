@@ -15,6 +15,9 @@ def guard():
         if size>50_000_000: raise RuntimeError('Staged file over 50 MB: '+name)
         data=git('show',':'+name)
         if any(p.search(data) for p in patterns): raise RuntimeError('Credential pattern in staged file: '+name)
+    sys.path.insert(0,str(ROOT))
+    from scripts.reference_reports import validate_staged_reports
+    validate_staged_reports(ROOT)
     return True
 
 def main():

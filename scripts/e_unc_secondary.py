@@ -3,6 +3,9 @@ import os
 os.environ.setdefault('OPENBLAS_NUM_THREADS','1')
 import sys,json,gzip
 from pathlib import Path
+import sys
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
+from scripts.reference_reports import report_file
 from collections import defaultdict
 import numpy as np
 ROOT=Path(__file__).resolve().parents[1];sys.path.insert(0,str(ROOT))
@@ -47,6 +50,6 @@ def main():
    r=s[t];a,b=r['50'],r['80'];lines.append(f"|{n}|{t}|{r['n']}|{r['mae']:.6f}|{r['crps']:.6f}|{a['hits']}/{a['n']}|{a['width']:.4f}|{a['winkler']:.4f}|{b['hits']}/{b['n']}|{b['width']:.4f}|{b['winkler']:.4f}|")
   lines.append(f"\n{n} Brier: {s['winner']['brier']:.6f}\n")
  lines+=['','secondary.json contains all weekly scores, 50/80 counts, widths, CRPS, Winkler, midpoint PIT, spread-skill bins and ten-bin reliability. Six versus five fitted coefficients; identical training/test games and point forecasts. Fixed 24-hour-lead wind from Previous Runs, not reanalysis or stitched day-zero values.']
- (OUT/'SECONDARY-REPORT.md').write_text('\n'.join(lines)+'\n')
+ report_file(OUT/'SECONDARY-REPORT.md').write_text('\n'.join(lines)+'\n')
  print(json.dumps({k:report[k] for k in ['status','training_games','scored_games','team_CRPS_relative_change']}))
 if __name__=='__main__':main()

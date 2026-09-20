@@ -59,7 +59,11 @@ def trajectories(rows):
  return history
 
 def report():
- initialize();board=json.loads((ROOT/'outputs/projection-v3/board.json').read_text());cache=ROOT/'.cloud-private/projection-entries.json';entries=json.loads(cache.read_text()) if cache.exists() else {};b=build_report(board['games'],json.loads((WORK/'reference.json').read_text()),entries.get('history',[]));by={c['game_id']:c for c in board['games']};ledger=[{**e,'actual':by.get(e.get('game_id'),{}).get('grades',{}).get('PROJECTION',{}).get('actual') if by.get(e.get('game_id'),{}).get('grades') else None} for e in entries.get('history',[])];save(OUT/'edit-history.json',ledger);b['board_sha256']=board['content_sha256'];b['published_at']=board['published_at'];save(OUT/'trend.json',b);(OUT/'trend.md').write_text(markdown(b));return b
+ initialize();board=json.loads((ROOT/'outputs/projection-v3/board.json').read_text());cache=ROOT/'.cloud-private/projection-entries.json';entries=json.loads(cache.read_text()) if cache.exists() else {};b=build_report(board['games'],json.loads((WORK/'reference.json').read_text()),entries.get('history',[]));by={c['game_id']:c for c in board['games']};ledger=[{**e,'actual':by.get(e.get('game_id'),{}).get('grades',{}).get('PROJECTION',{}).get('actual') if by.get(e.get('game_id'),{}).get('grades') else None} for e in entries.get('history',[])];save(OUT/'edit-history.json',ledger);b['board_sha256']=board['content_sha256'];b['published_at']=board['published_at'];
+ from scripts.reference_lines import weekly_report,render
+ b['reference_lines']=weekly_report(board['games'],ROOT)
+ save(OUT/'reference-lines.json',b['reference_lines']);(OUT/'reference-lines.md').write_text(render(b['reference_lines'],weekly=True))
+ save(OUT/'trend.json',b);(OUT/'trend.md').write_text(markdown(b)+'\n'+render(b['reference_lines'],weekly=True));return b
 
 def due_week(rows,now):
  local=now.astimezone(ZoneInfo('America/Los_Angeles'));games={r['game_id']:r for r in rows};due=[]

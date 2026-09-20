@@ -122,6 +122,9 @@ def run(mode, host):
         publish_artifacts()
         if mode == 'daily' and capture_window():
             return {'state': 'DEFERRED_CAPTURE_WINDOW'}
+        if mode in ('daily','learning'):
+            from scripts.reference_line_refresh import refresh as refresh_audit_lines
+            refresh_audit_lines(ROOT)
         from scripts.projection_publish import sync as sync_projection
         entries_synced=sync_projection()
         if mode=='learning':

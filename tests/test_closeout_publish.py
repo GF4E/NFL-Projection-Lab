@@ -23,8 +23,10 @@ class CloseoutTest(unittest.TestCase):
             board={'games':[{'game_id':'g','final':{'home_points':20,'away_points':10}}]}
             now=dt.datetime.now(dt.timezone.utc)
             with patch('scripts.closeout_publish.qualified',return_value=False):
-                result=publish(root,rows,board,1,push,lambda:({'weeks':[]},{'weeks':[]}),now)
+                result=publish(root,rows,board,1,push,lambda:({'weeks':[],'reference_lines':{'schema':'reference-lines-report-v1','series':{}}},{'weeks':[]}),now)
                 self.assertEqual(events,[False,True])
+                scorecard=json.loads(next(root.glob('outputs/cadence-v2/weeks/*/scorecard.json')).read_text())
+                self.assertEqual(scorecard['reference_lines']['schema'],'reference-lines-report-v1')
                 receipt=next(root.glob('outputs/cadence-v2/closeouts/*.json'))
                 later=dt.datetime.now(dt.timezone.utc)
                 self.assertEqual(require_published(root,receipt,later),result)

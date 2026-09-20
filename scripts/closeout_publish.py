@@ -53,6 +53,7 @@ def publish(root, rows, board, week, publish_callback, refresh_callback, now=Non
     ranked = sorted(eligible, key=lambda g: (sum(abs(g['grades']['PROJECTION']['errors'][s+'_points']) for s in ('away','home'))/2, g['game_id']))
     summary = {'season': season, 'week': week, 'schedule_games': len(slate),
                'as_issued_games': len(eligible), 'unqualified_games': sorted(set(slate)-{g['game_id'] for g in eligible}),
+               'reference_lines': trend.get('reference_lines', {'status':'INSUFFICIENT', 'reason':'Reference audit not supplied by report callback'}),
                'scorecard': metrics(eligible), 'best_five': [g['game_id'] for g in ranked[:5]],
                'worst_five': [g['game_id'] for g in reversed(ranked[-5:])],
                'games': [cards[gid] for gid in sorted(slate)]}

@@ -2,6 +2,9 @@
 import json
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]
+import sys
+sys.path.insert(0,str(ROOT))
+from scripts.reference_reports import report_file
 OUT=ROOT/'work/projection-governance-v2/e1'
 
 def run():
@@ -27,7 +30,7 @@ def run():
                 'Staff file SHA-256: `'+json.loads((OUT/'staff-coverage.json').read_text())['sha256']+'`. Coverage by season and every unknown team-season are listed in `staff-coverage.json`.',
                 '- Active fit, prior projections, grades and Phase A archive remain unchanged. E2 has not started and will use the result of a valid E1.','',
                 'Least certain: calendar-time meaning of Tuesday-only assimilation for postponed games. The actual schedule audit exposed a defect in week-label replay, so the rejection was withdrawn and the cadence decision requested instead of silently changing the protocol.','']
-            (OUT/'report.md').write_text('\n'.join(lines))
+            report_file(OUT/'report.md').write_text('\n'.join(lines))
             return
     r=json.loads((OUT/'verification.json').read_text());reg=json.loads((OUT/'registration.json').read_text())
     staff=json.loads((OUT/'staff-coverage.json').read_text());fits=json.loads((OUT/'state-fits.json').read_text())
@@ -96,6 +99,6 @@ def run():
         lines+=['## Calendar correction and affected forecasts','','All four candidates use the identical fixed played-kickoff-plus-four-hours convention. nflverse clock fields are Eastern regardless of venue and are converted to UTC. Four hours is an authorized availability convention, not a universal upper bound on physical game duration. No completion timestamp was invented or required; no registered game was dropped.','','| Season | Games audited | Forecasts with changed available history |','|---|---:|---:|']
         for year,values in calendar['by_season'].items():lines.append(f"| {year} | {values['games']} | {values['affected_forecasts']} |")
         lines+=['','Affected means a changed incorporated historical-game-ID set relative to the invalidated week-label replay; numerical downstream propagation is separate. Source-event IDs and each forecast dependency set are preserved in calendar-audit.json and calendar-lineage.json.gz.',f"Minimum gap from the four-hour availability mark to its next assimilation cutoff: {calendar['minimum_hours_between_availability_and_assimilation']:.2f} hours. This schedule check does not measure actual end times.",'','The earlier numerical rejection remains withdrawn and preserved. This corrected run is the first valid E1 result only after its independent audits pass.','']
-    (OUT/'report.md').write_text('\n'.join(lines))
+    report_file(OUT/'report.md').write_text('\n'.join(lines))
 
 if __name__=='__main__':run()
