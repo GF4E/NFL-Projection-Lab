@@ -1,0 +1,3 @@
+import {board} from './board-v8-fixture';
+import type {ContextData} from '../src/domain/board-v9';
+export const context={schema:'board-v9-context-v1',content_sha256:'x',games:Object.fromEntries(board.games.map(g=>[g.game_id,{version:g.version,issued_at:g.issued_at,as_of:g.issued_at,points:{away:24,home:26},teams:{away:{percentile:80,n:17,current_version_n:1,prior_season:true,sample_season:2025,game_ids:[],intervals:{'50':[18,30],'80':[12,36]}},home:{percentile:35,n:17,current_version_n:0,prior_season:true,sample_season:2025,game_ids:[],intervals:{'50':[20,32],'80':[14,38]}}},total:{percentile:72,n:14,game_ids:[],interval50:[40,60]}}]))} as ContextData;
