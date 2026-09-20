@@ -1,133 +1,143 @@
 {
-  "capture_label": "EARLY",
-  "capture_source_hash": "35970d2cee1436893c4840955b6bd3cdb1d2fb35976062ccc14d9d9b7d9af043",
-  "captured_at": "2026-09-14T16:00:13.037681+00:00",
+  "capture_label": "REFRESH",
+  "capture_source_hash": "89e483f43444c89de112fe4d9df9bd2f13b75ae7c459b474b5965c326f8d20bb",
+  "captured_at": "2026-09-19T19:00:21.172699+00:00",
   "consensus": {
     "spreads": {
       "full": {
-        "center": 6.5,
+        "center": 6.25,
         "contributors": [
           "draftkings",
-          "fanduel"
+          "fanduel",
+          "pinnacle"
         ],
         "coverage": 2,
         "excluded_book": null,
         "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-        "pinnacle_center": null,
+        "pinnacle_center": 6,
         "retail_median": 6.5
       },
       "leave_one_out": {
         "betmgm": {
-          "center": 6.5,
+          "center": 6.25,
           "contributors": [
             "draftkings",
-            "fanduel"
+            "fanduel",
+            "pinnacle"
           ],
           "coverage": 2,
           "excluded_book": "betmgm",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": null,
+          "pinnacle_center": 6,
           "retail_median": 6.5
         },
         "draftkings": {
-          "center": 6,
+          "center": 6.5,
           "contributors": [
-            "fanduel"
+            "fanduel",
+            "pinnacle"
           ],
           "coverage": 1,
           "excluded_book": "draftkings",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": null,
-          "retail_median": 6
+          "pinnacle_center": 6,
+          "retail_median": 7
         },
         "fanduel": {
-          "center": 7,
+          "center": 6.0,
           "contributors": [
-            "draftkings"
+            "draftkings",
+            "pinnacle"
           ],
           "coverage": 1,
           "excluded_book": "fanduel",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": null,
-          "retail_median": 7
+          "pinnacle_center": 6,
+          "retail_median": 6
         },
         "williamhill_us": {
-          "center": 6.5,
+          "center": 6.25,
           "contributors": [
             "draftkings",
-            "fanduel"
+            "fanduel",
+            "pinnacle"
           ],
           "coverage": 2,
           "excluded_book": "williamhill_us",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": null,
+          "pinnacle_center": 6,
           "retail_median": 6.5
         }
       }
     },
     "totals": {
       "full": {
-        "center": 49,
+        "center": 46.5,
         "contributors": [
           "betmgm",
           "draftkings",
-          "fanduel"
+          "fanduel",
+          "pinnacle"
         ],
         "coverage": 3,
         "excluded_book": null,
         "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-        "pinnacle_center": null,
-        "retail_median": 49
+        "pinnacle_center": 46,
+        "retail_median": 47
       },
       "leave_one_out": {
         "betmgm": {
-          "center": 49.0,
+          "center": 46.25,
           "contributors": [
             "draftkings",
-            "fanduel"
+            "fanduel",
+            "pinnacle"
           ],
           "coverage": 2,
           "excluded_book": "betmgm",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": null,
-          "retail_median": 49.0
+          "pinnacle_center": 46,
+          "retail_median": 46.5
         },
         "draftkings": {
-          "center": 48.5,
+          "center": 46.5,
           "contributors": [
             "betmgm",
-            "fanduel"
+            "fanduel",
+            "pinnacle"
           ],
           "coverage": 2,
           "excluded_book": "draftkings",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": null,
-          "retail_median": 48.5
+          "pinnacle_center": 46,
+          "retail_median": 47.0
         },
         "fanduel": {
-          "center": 48.5,
+          "center": 46.25,
           "contributors": [
             "betmgm",
-            "draftkings"
+            "draftkings",
+            "pinnacle"
           ],
           "coverage": 2,
           "excluded_book": "fanduel",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": null,
-          "retail_median": 48.5
+          "pinnacle_center": 46,
+          "retail_median": 46.5
         },
         "williamhill_us": {
-          "center": 49,
+          "center": 46.5,
           "contributors": [
             "betmgm",
             "draftkings",
-            "fanduel"
+            "fanduel",
+            "pinnacle"
           ],
           "coverage": 3,
           "excluded_book": "williamhill_us",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
-          "pinnacle_center": null,
-          "retail_median": 49
+          "pinnacle_center": 46,
+          "retail_median": 47
         }
       }
     }
@@ -154,70 +164,70 @@
   "offers": [
     {
       "book": "draftkings",
-      "line": -6.5,
+      "line": -6.0,
       "market": "spreads",
-      "price": -110.0,
+      "price": -112.0,
       "side": "Kansas City Chiefs"
     },
     {
       "book": "draftkings",
-      "line": 6.5,
+      "line": 6.0,
       "market": "spreads",
-      "price": -110.0,
+      "price": -108.0,
       "side": "Indianapolis Colts"
     },
     {
       "book": "draftkings",
-      "line": 48.5,
+      "line": 46.5,
       "market": "totals",
-      "price": -110.0,
+      "price": -105.0,
       "side": "Over"
     },
     {
       "book": "draftkings",
-      "line": 48.5,
+      "line": 46.5,
       "market": "totals",
-      "price": -110.0,
+      "price": -115.0,
       "side": "Under"
     },
     {
       "book": "fanduel",
       "line": -6.5,
       "market": "spreads",
-      "price": -104.0,
+      "price": -105.0,
       "side": "Kansas City Chiefs"
     },
     {
       "book": "fanduel",
       "line": 6.5,
       "market": "spreads",
-      "price": -118.0,
+      "price": -115.0,
       "side": "Indianapolis Colts"
     },
     {
       "book": "fanduel",
-      "line": 47.5,
+      "line": 46.5,
       "market": "totals",
-      "price": -118.0,
+      "price": -110.0,
       "side": "Over"
     },
     {
       "book": "fanduel",
-      "line": 47.5,
+      "line": 46.5,
       "market": "totals",
-      "price": -104.0,
+      "price": -110.0,
       "side": "Under"
     },
     {
       "book": "betmgm",
-      "line": 48.0,
+      "line": 46.5,
       "market": "totals",
       "price": -108.0,
       "side": "Over"
     },
     {
       "book": "betmgm",
-      "line": 48.0,
+      "line": 46.5,
       "market": "totals",
       "price": -110.0,
       "side": "Under"
