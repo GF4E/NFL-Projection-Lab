@@ -326,7 +326,7 @@
     ]
   },
   "clv_reference": "nflverse_close; reference CLV, not executed-book closing quotes",
-  "content_sha256": "2334dcd790189adf3c7e42e9df778256c6e1823aca64e300f9b503f018ddbff0",
+  "content_sha256": "7f6686514f28c4b54ccf0706d411f04615c92edd29a9248de621397b8de9d48d",
   "default_week": 2,
   "game_card_version": "game-card-v3",
   "games": [
@@ -1574,7 +1574,7 @@
       },
       "final_source": {
         "provider": "nflverse",
-        "sha256": "4b8d386e2e8f5e210158ba0a20b2c15be59dafd24e955ed04a78a429052641e5"
+        "sha256": "574611537a492762e52443ba8cea66cce54ecb27cf8c9f4eecd5ddb758c69f3e"
       },
       "freeze_time": null,
       "game_id": "2026_01_NE_SEA",
@@ -28120,15 +28120,20 @@
         "analysis": [],
         "away": "DET",
         "distribution_hash": "4a14b3fdf51d13786a2e905526f21d4fe7601226e01da29583be8ff3210a7041",
-        "final": null,
+        "final": {
+          "away_score": 31.0,
+          "home_score": 41.0,
+          "margin": 10.0,
+          "total": 72.0
+        },
         "freeze_timestamp": "2026-09-17T23:00:31.247366+00:00",
         "game_id": "2026_02_DET_BUF",
         "generated_at": "2026-09-17T22:55:26.827359+00:00",
         "grades": {
-          "SPREAD": null,
-          "TOTAL": null,
-          "WINNER": null,
-          "clv": null
+          "SPREAD": "WIN",
+          "TOTAL": "WIN",
+          "WINNER": "WIN",
+          "clv": -1.192535837864547
         },
         "home": "BUF",
         "input_hash": "3dc317d996351a0fa5e0eb1407542aead12a42817c547456edc8290cb5020a00",
@@ -29305,7 +29310,7 @@
           }
         },
         "stale": false,
-        "status": "LOCKED",
+        "status": "FINAL",
         "team_colors": {
           "BUF": "#003091",
           "DET": "#005FAE"
@@ -29316,10 +29321,10 @@
             "book": "betmgm",
             "book_label": "BetMGM",
             "chip": "LEAN",
-            "clv": null,
+            "clv": 0.3460207612456827,
             "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": null,
+            "grade": "WIN",
             "label": "SPREAD",
             "line": -5.5,
             "pick": "BUF -5.5",
@@ -29337,10 +29342,10 @@
             "book": "fanduel",
             "book_label": "FanDuel",
             "chip": "LEAN",
-            "clv": null,
+            "clv": -2.7310924369747767,
             "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": null,
+            "grade": "WIN",
             "label": "TOTAL",
             "line": 54.5,
             "pick": "OVER 54.5",
@@ -29361,7 +29366,7 @@
             "clv": null,
             "confidence_source": "MARKET",
             "confidence_used": null,
-            "grade": null,
+            "grade": "WIN",
             "label": "WINNER",
             "line": null,
             "pick": "BUF",
@@ -29408,29 +29413,40 @@
       "cutoff_at": "2026-09-17T23:00:00+00:00",
       "executed_picks": [],
       "expires_at": "2026-09-18T00:15:00+00:00",
+      "final_score": {
+        "away": 31.0,
+        "home": 41.0
+      },
+      "final_source": {
+        "provider": "nflverse",
+        "sha256": "574611537a492762e52443ba8cea66cce54ecb27cf8c9f4eecd5ddb758c69f3e"
+      },
       "freeze_time": null,
       "game_id": "2026_02_DET_BUF",
+      "grade_status": "PENDING_GRADE",
       "home_abbr": "BUF",
       "home_team": "Buffalo Bills",
       "kickoff_at": "2026-09-18T00:15:00+00:00",
       "lock_status": "WAITING_T75",
+      "margin": 10.0,
       "record_class": "paper_model_pick",
       "recorded_at": null,
       "season": 2026,
-      "status": "UPCOMING",
+      "status": "FINAL",
+      "total": 72.0,
       "verdicts": {
         "spreads": {
-          "availability": "STALE",
+          "availability": "WAITING_T75",
           "edge_source": null,
           "grade": null,
-          "reason": "No current executable locked quote.",
+          "reason": "Waiting for the T75 lock.",
           "state": null
         },
         "totals": {
-          "availability": "STALE",
+          "availability": "WAITING_T75",
           "edge_source": null,
           "grade": null,
-          "reason": "No current executable locked quote.",
+          "reason": "Waiting for the T75 lock.",
           "state": null
         }
       },
@@ -46659,7 +46675,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_IND_KC",
-        "generated_at": "2026-09-19T19:00:35.044405+00:00",
+        "generated_at": "2026-09-20T20:02:54.309299+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -46667,7 +46683,7 @@
           "clv": null
         },
         "home": "KC",
-        "input_hash": "0f559984f8c59241e64cb587c85a96db411c63a710d8ab7c97d4758d5149f788",
+        "input_hash": "c62f9412170f3b8e5187e164f4a0d8163fdf667e3d6bd26bc51235da68847344",
         "kickoff_utc": "2026-09-21T00:20:00+00:00",
         "market": {
           "books": {
@@ -46817,15 +46833,15 @@
             "name": "Scoring composition and luck",
             "source_hashes": {
               "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
-              "depth_charts_2026.parquet": "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
-              "ngs_passing.parquet": "98d98084a28817874189ec8b795501e2998370c6264f5f8e1aa48cadc922e1f5",
-              "ngs_receiving.parquet": "d0ac2e9fcb60a87e419b5ff1c9345ed20f64d63862e7a96fcf7a9c09ab77cbba",
-              "ngs_rushing.parquet": "f8b4c6c3fe945df223cb9d57f733aa5485af4d10ab3372e454d018447f7185a5",
+              "depth_charts_2026.parquet": "706d57ecaa6c74530d35897d5fea5951d3bfecaa2907504828d417eeb8f94bd7",
+              "ngs_passing.parquet": "2dbfb1eda7ed7cf0ffbfce5351a2ed71574bcb13d00dcc5db5c9d391d8acb747",
+              "ngs_receiving.parquet": "d58f28979c89f9cc66c74522041f7c30c42ff636d9511d2110a4104f3c0d0f0a",
+              "ngs_rushing.parquet": "1945ba739329545ff5f136670f4c4205cb52cb5583ab020ccb17b93f4cc94ef4",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+              "play_by_play_2026.parquet": "ceec7d3e3532e844546bb5e8da025dc5007fc08ebf6e6660b25402fbae3b9289",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
-              "roster_2026.parquet": "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+              "roster_2026.parquet": "cacec18471401407ca62f016ce2155b3d8c5b7961ac6247367c517712e7b694d",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
             },
             "teams": {
@@ -46931,15 +46947,15 @@
             "name": "Efficiency",
             "source_hashes": {
               "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
-              "depth_charts_2026.parquet": "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
-              "ngs_passing.parquet": "98d98084a28817874189ec8b795501e2998370c6264f5f8e1aa48cadc922e1f5",
-              "ngs_receiving.parquet": "d0ac2e9fcb60a87e419b5ff1c9345ed20f64d63862e7a96fcf7a9c09ab77cbba",
-              "ngs_rushing.parquet": "f8b4c6c3fe945df223cb9d57f733aa5485af4d10ab3372e454d018447f7185a5",
+              "depth_charts_2026.parquet": "706d57ecaa6c74530d35897d5fea5951d3bfecaa2907504828d417eeb8f94bd7",
+              "ngs_passing.parquet": "2dbfb1eda7ed7cf0ffbfce5351a2ed71574bcb13d00dcc5db5c9d391d8acb747",
+              "ngs_receiving.parquet": "d58f28979c89f9cc66c74522041f7c30c42ff636d9511d2110a4104f3c0d0f0a",
+              "ngs_rushing.parquet": "1945ba739329545ff5f136670f4c4205cb52cb5583ab020ccb17b93f4cc94ef4",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+              "play_by_play_2026.parquet": "ceec7d3e3532e844546bb5e8da025dc5007fc08ebf6e6660b25402fbae3b9289",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
-              "roster_2026.parquet": "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+              "roster_2026.parquet": "cacec18471401407ca62f016ce2155b3d8c5b7961ac6247367c517712e7b694d",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
             },
             "teams": {
@@ -47279,15 +47295,15 @@
             "name": "Matchups",
             "source_hashes": {
               "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
-              "depth_charts_2026.parquet": "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
-              "ngs_passing.parquet": "98d98084a28817874189ec8b795501e2998370c6264f5f8e1aa48cadc922e1f5",
-              "ngs_receiving.parquet": "d0ac2e9fcb60a87e419b5ff1c9345ed20f64d63862e7a96fcf7a9c09ab77cbba",
-              "ngs_rushing.parquet": "f8b4c6c3fe945df223cb9d57f733aa5485af4d10ab3372e454d018447f7185a5",
+              "depth_charts_2026.parquet": "706d57ecaa6c74530d35897d5fea5951d3bfecaa2907504828d417eeb8f94bd7",
+              "ngs_passing.parquet": "2dbfb1eda7ed7cf0ffbfce5351a2ed71574bcb13d00dcc5db5c9d391d8acb747",
+              "ngs_receiving.parquet": "d58f28979c89f9cc66c74522041f7c30c42ff636d9511d2110a4104f3c0d0f0a",
+              "ngs_rushing.parquet": "1945ba739329545ff5f136670f4c4205cb52cb5583ab020ccb17b93f4cc94ef4",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+              "play_by_play_2026.parquet": "ceec7d3e3532e844546bb5e8da025dc5007fc08ebf6e6660b25402fbae3b9289",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
-              "roster_2026.parquet": "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+              "roster_2026.parquet": "cacec18471401407ca62f016ce2155b3d8c5b7961ac6247367c517712e7b694d",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
             },
             "teams": {
@@ -47735,15 +47751,15 @@
             "name": "Quarterback",
             "source_hashes": {
               "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
-              "depth_charts_2026.parquet": "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
-              "ngs_passing.parquet": "98d98084a28817874189ec8b795501e2998370c6264f5f8e1aa48cadc922e1f5",
-              "ngs_receiving.parquet": "d0ac2e9fcb60a87e419b5ff1c9345ed20f64d63862e7a96fcf7a9c09ab77cbba",
-              "ngs_rushing.parquet": "f8b4c6c3fe945df223cb9d57f733aa5485af4d10ab3372e454d018447f7185a5",
+              "depth_charts_2026.parquet": "706d57ecaa6c74530d35897d5fea5951d3bfecaa2907504828d417eeb8f94bd7",
+              "ngs_passing.parquet": "2dbfb1eda7ed7cf0ffbfce5351a2ed71574bcb13d00dcc5db5c9d391d8acb747",
+              "ngs_receiving.parquet": "d58f28979c89f9cc66c74522041f7c30c42ff636d9511d2110a4104f3c0d0f0a",
+              "ngs_rushing.parquet": "1945ba739329545ff5f136670f4c4205cb52cb5583ab020ccb17b93f4cc94ef4",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+              "play_by_play_2026.parquet": "ceec7d3e3532e844546bb5e8da025dc5007fc08ebf6e6660b25402fbae3b9289",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
-              "roster_2026.parquet": "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+              "roster_2026.parquet": "cacec18471401407ca62f016ce2155b3d8c5b7961ac6247367c517712e7b694d",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
             },
             "teams": {
@@ -47752,7 +47768,7 @@
                 "career_starts": 82,
                 "career_starts_status": "nflverse listed REG starters, 1999 onward, through prior week",
                 "cpoe": 2.156858964235982,
-                "depth_at": "2026-09-17T12:34:29Z",
+                "depth_at": "2026-09-20T12:14:30Z",
                 "epa_per_dropback": 0.12734595294308104,
                 "gsis_id": "00-0035710",
                 "identity_status": "DEPTH_CHART_NOT_INACTIVES",
@@ -47768,7 +47784,7 @@
                 "career_starts": 126,
                 "career_starts_status": "nflverse listed REG starters, 1999 onward, through prior week",
                 "cpoe": 0.17660111266620218,
-                "depth_at": "2026-09-17T12:34:29Z",
+                "depth_at": "2026-09-20T12:14:30Z",
                 "epa_per_dropback": 0.12460362030134856,
                 "gsis_id": "00-0033873",
                 "identity_status": "DEPTH_CHART_NOT_INACTIVES",
@@ -47787,15 +47803,15 @@
             "name": "Momentum",
             "source_hashes": {
               "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
-              "depth_charts_2026.parquet": "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
-              "ngs_passing.parquet": "98d98084a28817874189ec8b795501e2998370c6264f5f8e1aa48cadc922e1f5",
-              "ngs_receiving.parquet": "d0ac2e9fcb60a87e419b5ff1c9345ed20f64d63862e7a96fcf7a9c09ab77cbba",
-              "ngs_rushing.parquet": "f8b4c6c3fe945df223cb9d57f733aa5485af4d10ab3372e454d018447f7185a5",
+              "depth_charts_2026.parquet": "706d57ecaa6c74530d35897d5fea5951d3bfecaa2907504828d417eeb8f94bd7",
+              "ngs_passing.parquet": "2dbfb1eda7ed7cf0ffbfce5351a2ed71574bcb13d00dcc5db5c9d391d8acb747",
+              "ngs_receiving.parquet": "d58f28979c89f9cc66c74522041f7c30c42ff636d9511d2110a4104f3c0d0f0a",
+              "ngs_rushing.parquet": "1945ba739329545ff5f136670f4c4205cb52cb5583ab020ccb17b93f4cc94ef4",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+              "play_by_play_2026.parquet": "ceec7d3e3532e844546bb5e8da025dc5007fc08ebf6e6660b25402fbae3b9289",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
-              "roster_2026.parquet": "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+              "roster_2026.parquet": "cacec18471401407ca62f016ce2155b3d8c5b7961ac6247367c517712e7b694d",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
             },
             "teams": {
@@ -47971,7 +47987,7 @@
         "final": null,
         "freeze_timestamp": null,
         "game_id": "2026_02_NYG_LA",
-        "generated_at": "2026-09-19T19:00:35.044405+00:00",
+        "generated_at": "2026-09-20T20:02:54.309299+00:00",
         "grades": {
           "SPREAD": null,
           "TOTAL": null,
@@ -47979,7 +47995,7 @@
           "clv": null
         },
         "home": "LA",
-        "input_hash": "115fd7738e5cea4ac197950de156fdea92d9736af47a19f17d872f3a06f2b0f4",
+        "input_hash": "d08973b2e5d7a60835d06721b31a3ad8279087136f4a34eb5f4cd7fef2785c30",
         "kickoff_utc": "2026-09-22T00:15:00+00:00",
         "market": {
           "books": {
@@ -48141,15 +48157,15 @@
             "name": "Scoring composition and luck",
             "source_hashes": {
               "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
-              "depth_charts_2026.parquet": "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
-              "ngs_passing.parquet": "98d98084a28817874189ec8b795501e2998370c6264f5f8e1aa48cadc922e1f5",
-              "ngs_receiving.parquet": "d0ac2e9fcb60a87e419b5ff1c9345ed20f64d63862e7a96fcf7a9c09ab77cbba",
-              "ngs_rushing.parquet": "f8b4c6c3fe945df223cb9d57f733aa5485af4d10ab3372e454d018447f7185a5",
+              "depth_charts_2026.parquet": "706d57ecaa6c74530d35897d5fea5951d3bfecaa2907504828d417eeb8f94bd7",
+              "ngs_passing.parquet": "2dbfb1eda7ed7cf0ffbfce5351a2ed71574bcb13d00dcc5db5c9d391d8acb747",
+              "ngs_receiving.parquet": "d58f28979c89f9cc66c74522041f7c30c42ff636d9511d2110a4104f3c0d0f0a",
+              "ngs_rushing.parquet": "1945ba739329545ff5f136670f4c4205cb52cb5583ab020ccb17b93f4cc94ef4",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+              "play_by_play_2026.parquet": "ceec7d3e3532e844546bb5e8da025dc5007fc08ebf6e6660b25402fbae3b9289",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
-              "roster_2026.parquet": "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+              "roster_2026.parquet": "cacec18471401407ca62f016ce2155b3d8c5b7961ac6247367c517712e7b694d",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
             },
             "teams": {
@@ -48255,15 +48271,15 @@
             "name": "Efficiency",
             "source_hashes": {
               "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
-              "depth_charts_2026.parquet": "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
-              "ngs_passing.parquet": "98d98084a28817874189ec8b795501e2998370c6264f5f8e1aa48cadc922e1f5",
-              "ngs_receiving.parquet": "d0ac2e9fcb60a87e419b5ff1c9345ed20f64d63862e7a96fcf7a9c09ab77cbba",
-              "ngs_rushing.parquet": "f8b4c6c3fe945df223cb9d57f733aa5485af4d10ab3372e454d018447f7185a5",
+              "depth_charts_2026.parquet": "706d57ecaa6c74530d35897d5fea5951d3bfecaa2907504828d417eeb8f94bd7",
+              "ngs_passing.parquet": "2dbfb1eda7ed7cf0ffbfce5351a2ed71574bcb13d00dcc5db5c9d391d8acb747",
+              "ngs_receiving.parquet": "d58f28979c89f9cc66c74522041f7c30c42ff636d9511d2110a4104f3c0d0f0a",
+              "ngs_rushing.parquet": "1945ba739329545ff5f136670f4c4205cb52cb5583ab020ccb17b93f4cc94ef4",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+              "play_by_play_2026.parquet": "ceec7d3e3532e844546bb5e8da025dc5007fc08ebf6e6660b25402fbae3b9289",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
-              "roster_2026.parquet": "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+              "roster_2026.parquet": "cacec18471401407ca62f016ce2155b3d8c5b7961ac6247367c517712e7b694d",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
             },
             "teams": {
@@ -48603,15 +48619,15 @@
             "name": "Matchups",
             "source_hashes": {
               "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
-              "depth_charts_2026.parquet": "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
-              "ngs_passing.parquet": "98d98084a28817874189ec8b795501e2998370c6264f5f8e1aa48cadc922e1f5",
-              "ngs_receiving.parquet": "d0ac2e9fcb60a87e419b5ff1c9345ed20f64d63862e7a96fcf7a9c09ab77cbba",
-              "ngs_rushing.parquet": "f8b4c6c3fe945df223cb9d57f733aa5485af4d10ab3372e454d018447f7185a5",
+              "depth_charts_2026.parquet": "706d57ecaa6c74530d35897d5fea5951d3bfecaa2907504828d417eeb8f94bd7",
+              "ngs_passing.parquet": "2dbfb1eda7ed7cf0ffbfce5351a2ed71574bcb13d00dcc5db5c9d391d8acb747",
+              "ngs_receiving.parquet": "d58f28979c89f9cc66c74522041f7c30c42ff636d9511d2110a4104f3c0d0f0a",
+              "ngs_rushing.parquet": "1945ba739329545ff5f136670f4c4205cb52cb5583ab020ccb17b93f4cc94ef4",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+              "play_by_play_2026.parquet": "ceec7d3e3532e844546bb5e8da025dc5007fc08ebf6e6660b25402fbae3b9289",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
-              "roster_2026.parquet": "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+              "roster_2026.parquet": "cacec18471401407ca62f016ce2155b3d8c5b7961ac6247367c517712e7b694d",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
             },
             "teams": {
@@ -49059,15 +49075,15 @@
             "name": "Quarterback",
             "source_hashes": {
               "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
-              "depth_charts_2026.parquet": "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
-              "ngs_passing.parquet": "98d98084a28817874189ec8b795501e2998370c6264f5f8e1aa48cadc922e1f5",
-              "ngs_receiving.parquet": "d0ac2e9fcb60a87e419b5ff1c9345ed20f64d63862e7a96fcf7a9c09ab77cbba",
-              "ngs_rushing.parquet": "f8b4c6c3fe945df223cb9d57f733aa5485af4d10ab3372e454d018447f7185a5",
+              "depth_charts_2026.parquet": "706d57ecaa6c74530d35897d5fea5951d3bfecaa2907504828d417eeb8f94bd7",
+              "ngs_passing.parquet": "2dbfb1eda7ed7cf0ffbfce5351a2ed71574bcb13d00dcc5db5c9d391d8acb747",
+              "ngs_receiving.parquet": "d58f28979c89f9cc66c74522041f7c30c42ff636d9511d2110a4104f3c0d0f0a",
+              "ngs_rushing.parquet": "1945ba739329545ff5f136670f4c4205cb52cb5583ab020ccb17b93f4cc94ef4",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+              "play_by_play_2026.parquet": "ceec7d3e3532e844546bb5e8da025dc5007fc08ebf6e6660b25402fbae3b9289",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
-              "roster_2026.parquet": "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+              "roster_2026.parquet": "cacec18471401407ca62f016ce2155b3d8c5b7961ac6247367c517712e7b694d",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
             },
             "teams": {
@@ -49076,7 +49092,7 @@
                 "career_starts": 239,
                 "career_starts_status": "nflverse listed REG starters, 1999 onward, through prior week",
                 "cpoe": 1.4726986102696376,
-                "depth_at": "2026-09-17T12:34:29Z",
+                "depth_at": "2026-09-20T12:14:30Z",
                 "epa_per_dropback": 0.22235284505358724,
                 "gsis_id": "00-0026498",
                 "identity_status": "DEPTH_CHART_NOT_INACTIVES",
@@ -49092,7 +49108,7 @@
                 "career_starts": 12,
                 "career_starts_status": "nflverse listed REG starters, 1999 onward, through prior week",
                 "cpoe": 0.0996287671163623,
-                "depth_at": "2026-09-17T12:34:29Z",
+                "depth_at": "2026-09-20T12:14:30Z",
                 "epa_per_dropback": -0.006067805392880548,
                 "gsis_id": "00-0040691",
                 "identity_status": "DEPTH_CHART_NOT_INACTIVES",
@@ -49111,15 +49127,15 @@
             "name": "Momentum",
             "source_hashes": {
               "depth_charts_2025.parquet": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa",
-              "depth_charts_2026.parquet": "12707da1267f86504f9f13875af0f3cddfffc74310ebfee2c28d544bb1563518",
-              "ngs_passing.parquet": "98d98084a28817874189ec8b795501e2998370c6264f5f8e1aa48cadc922e1f5",
-              "ngs_receiving.parquet": "d0ac2e9fcb60a87e419b5ff1c9345ed20f64d63862e7a96fcf7a9c09ab77cbba",
-              "ngs_rushing.parquet": "f8b4c6c3fe945df223cb9d57f733aa5485af4d10ab3372e454d018447f7185a5",
+              "depth_charts_2026.parquet": "706d57ecaa6c74530d35897d5fea5951d3bfecaa2907504828d417eeb8f94bd7",
+              "ngs_passing.parquet": "2dbfb1eda7ed7cf0ffbfce5351a2ed71574bcb13d00dcc5db5c9d391d8acb747",
+              "ngs_receiving.parquet": "d58f28979c89f9cc66c74522041f7c30c42ff636d9511d2110a4104f3c0d0f0a",
+              "ngs_rushing.parquet": "1945ba739329545ff5f136670f4c4205cb52cb5583ab020ccb17b93f4cc94ef4",
               "pbp_participation_2025.parquet": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f",
               "play_by_play_2025.parquet": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29",
-              "play_by_play_2026.parquet": "7362ff637809647ce6c8bfe1f14a57698effa0e3b0eff0bc17bd27ea9c574625",
+              "play_by_play_2026.parquet": "ceec7d3e3532e844546bb5e8da025dc5007fc08ebf6e6660b25402fbae3b9289",
               "roster_2025.parquet": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70",
-              "roster_2026.parquet": "d6f91fe5af632105a9a8204ccb48a1f6fcf33196b5849bf8a2c0e5b2cb1c56fb",
+              "roster_2026.parquet": "cacec18471401407ca62f016ce2155b3d8c5b7961ac6247367c517712e7b694d",
               "schedules.csv": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
             },
             "teams": {
@@ -101606,7 +101622,7 @@
       "week": 18
     }
   ],
-  "published_at": "2026-09-20T19:10:28.423303+00:00",
+  "published_at": "2026-09-20T20:02:57.979751+00:00",
   "schema": "locked-board-v1",
   "shared_confidence": {
     "graded": 0,
