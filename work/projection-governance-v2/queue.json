@@ -39,7 +39,7 @@
       "promoted": true,
       "production_activated": true,
       "release_note": "User explicitly authorized promotion; host verified",
-      "release_commit": "379cd7ca",
+      "release_commit": "379cd7ca61f3838c240467e4d1cef76fec542390",
       "fit_sha256": "f7fc497ee581c3a948388891904b52669e345bae1a61c684281034505b5840e4"
     },
     {
@@ -47,12 +47,15 @@
       "registration": "work/e-elo-qb-value-v2/registration.json",
       "registration_sha256": "b6b8c58e15cfa757423c432cca41b2ea1fe4e09ad264746dc59e97b6859b7a13",
       "report": "work/e-elo-qb-value-v2/REPORT.md",
-      "state": "PREREGISTERED_READY_TO_FIT",
-      "gate_passed": null,
+      "state": "REJECTED",
+      "gate_passed": false,
       "promoted": false,
       "blockers": [],
       "data_availability": "STARTER_HISTORY_AVAILABLE_QUALIFIED_RULE_WITH_UNTIMESTAMPED_FALLBACKS",
-      "reconciliation": "Accepted by user; source and population differences resolved"
+      "reconciliation": "Accepted by user; source and population differences resolved",
+      "production_activated": false,
+      "decision": "Team MAE gains0.099%a/0.093%b vs1%gate; all coverage checks pass; oracle0.225%diagnostic",
+      "hypothesis_scope": "Specified rolling EPA VALUE through Elo only; no rejection of all QB valuation"
     },
     {
       "candidates_registered": 0,
@@ -307,5 +310,5 @@
   },
   "schema": "projection-experiment-queue-v1",
   "standing_confidence_and_premise": "work/projection-governance-v2/CONFIDENCE-AND-PREMISE.md",
-  "active_experiment": "E-ELO-QB"
+  "active_experiment": null
 }

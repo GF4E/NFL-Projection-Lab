@@ -34,3 +34,15 @@ class QBValueTests(unittest.TestCase):
   a,_=replay([g],v,10,identity='rule',through=2015);self.assertAlmostEqual(a[g['game_id'],'BUF']['elo'],6.6)
   v[g['game_id'],'BUF']['values']['oracle']['epa']['difference']=-999;b,_=replay([g],v,10,identity='rule',through=2015);self.assertEqual(a,b)
 if __name__=='__main__':unittest.main()
+
+class QBOrderingTests(unittest.TestCase):
+ def test_schedule_order_does_not_change_predictions(self):
+  games=[{'game_id':f'2015_{w:02d}_BAL_BUF','season':2015,'week':w,'game_type':'REG','home_team':'BUF','away_team':'BAL','home_score':20+w,'away_score':10} for w in [1,2,3]]
+  a=replay(games,{},0,through=2015);b=replay(list(reversed(games)),{},0,through=2015);self.assertEqual(a,b)
+ def test_future_outcomes_do_not_enter_scale_fit(self):
+  games=[{'game_id':f'{y}_{w:02d}_BAL_BUF','season':y,'week':w,'game_type':'REG','home_team':'BUF','away_team':'BAL','home_score':20+w,'away_score':30 if w==2 else 10} for y in [2015,2016] for w in [1,2]]
+  values={(g['game_id'],'BUF'):{'values':{'rule':{'epa':{'difference':.1}}}} for g in games}
+  a=fit_scale(games,values,2016,None,'epa')
+  for g in games:
+   if g['season']==2016:g['home_score']=100
+  b=fit_scale(list(reversed(games)),values,2016,None,'epa');self.assertEqual(a,b)
