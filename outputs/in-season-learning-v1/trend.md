@@ -1648,7 +1648,7 @@ RETROSPECTIVE / projection-v1-67c39f9a-2e58a851; original projection and first g
 
 Reference refresh: REFRESHED. Source retrieval dates below identify the evidence used.
 
-CLOSE source: `outputs/projection-v3/final-sources/03727292b67cc97195b5c03de19a1a9a361297e9239643dd49d34144808c4474.csv`; nflverse spread_line and total_line.
+CLOSE source: `outputs/projection-v3/final-sources/2a869c68914811f4beb2901b09935022eb45d628f52301fdbdb79ba5c8d39835.csv`; nflverse spread_line and total_line.
 
 OPEN spread source: `outputs/in-season-learning-v1/reference-sources/historic_projected_spreads-fae31bfed7963266b935f210a3262f69909b771b252df2f52dd671b602183da0.csv.gz`; `home_line_open`; retrieved 2026-09-20T15:00:31.708395+00:00; SHA256 fae31bfed7963266b935f210a3262f69909b771b252df2f52dd671b602183da0.
 
