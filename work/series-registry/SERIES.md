@@ -13,3 +13,5 @@ All other catalogued series are non-authoritative. Full identity, per-fold fit r
 - work/projection-v2/phase-a/SERIES.md (4 components)
 - work/projection-v2w/SERIES.md (1 components)
 - work/projection-v3/SERIES.md (2 components)
+
+Effective 2026-09-19: nfelo EXCLUDED as a market-free benchmark because closing lines enter its rating updates; pre-regression does not cure that ancestry. Closing line AUDIT_REFERENCE_ONLY. No replacement admitted.

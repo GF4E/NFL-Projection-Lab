@@ -878,5 +878,15 @@
       }
     }
   ],
-  "scope": "Tracked out-of-fold series and derived scored/verified series. Unit-test fixtures, per-game live locks and raw inputs are not rolling-origin evaluation series."
+  "scope": "Tracked out-of-fold series and derived scored/verified series. Unit-test fixtures, per-game live locks and raw inputs are not rolling-origin evaluation series.",
+  "external_comparators": {
+    "nfelo": {
+      "status": "EXCLUDED_MARKET_ANCESTRY",
+      "reason": "Closing lines used in rating updates, including ancestry of pre-regression output",
+      "source": "https://github.com/greerreNFL/nfelo/blob/3425a6a9c304639f9e7c110cf4a0a79b92ad5b89/nfelo/Model/Nfelo.py"
+    },
+    "closing_line": {
+      "status": "AUDIT_REFERENCE_ONLY"
+    }
+  }
 }

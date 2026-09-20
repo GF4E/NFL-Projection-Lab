@@ -183,3 +183,9 @@ Registered source methods, not yet implemented: [greerreNFL/wepa_v2](https://git
 Proposals only: nfeloqb and nfelohfa (no license, method only after WEPA), momentumnfl (MIT but market-informed published forecasts excluded; only a football-only E8 rebuild can be tested), darkhark target/opponent/bucket method (no license), MAPIE (BSD-3-Clause, after interval work), and LEAF v3 as a QB temporal-validation benchmark. Shuffled-row brady-algorithm-2 is the worked exclusion in the scan; no code copied.
 
 Automation `monthly-nfl-github-harvest-scan` is active for first Tuesday 09:00 local/Pacific in this task. It requires the hashed published-closeout receipt in `outputs/cadence-v2/closeouts/YYYY-MM-DD.json`; missing evidence fails closed with a notification. The prior cadence implementation has not yet installed that publisher, so this dependency is explicitly outstanding. The first scheduled check is October 6, 2026. No claim that a future unattended scan has already succeeded.
+
+## nfelo benchmark exclusion — 2026-09-19
+
+nfelo is EXCLUDED as a football-only benchmark, including home_line_pre_regression. Reviewed pinned Nfelo.py (3425a6a9c304639f9e7c110cf4a0a79b92ad5b89) uses closing lines in rating updates; removing final market regression does not remove market ancestry. Prior benchmark results are retained only as historical audit evidence and must not motivate a claim of market-free superiority. Closing lines remain audit references only. A replacement public comparator requires verified football-only inputs throughout its state updates, priors and predictions; none is admitted here.
+
+Confidence: high — the exclusion holds across seasons and survives the obvious alternative of using the pre-regression output. Move down to medium if a reproducible, fully market-free historical code path is supplied and independently verified.

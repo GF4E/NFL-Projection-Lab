@@ -1,3 +1,5 @@
+BENCHMARK WITHDRAWN: nfelo is excluded as a market-free comparator; the following results are historical audit evidence only.
+
 SERIES NOTICE: The engine uses the sole authoritative deployed-lineage control; the v3 baseline is SUPERSEDED and nfelo/closing lines are external, non-authoritative benchmark comparators.
 
 # E-BENCHMARK-GAP — descriptive result, no fitting
@@ -80,3 +82,6 @@ Closing lines are benchmark-only. No market value entered our projection, histor
 The standard errors saved in results.json are descriptive game-level quantities, not multiple-comparison-adjusted significance or a promotion test.
 
 Artifacts: registration.json/.sha256, per-game.json, excluded-games.json, audit-first_source_row-per-game.json, audit-last_source_row-per-game.json, audit-reconstruction.json, qb-cross-tabs.json and results.json.
+
+
+Confidence: near-total — the displayed paired arithmetic is on verified rows; it does not establish football-only superiority. Move down to high if an independent recomputation identifies a source-row or duplicate-joining error.

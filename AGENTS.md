@@ -113,3 +113,7 @@ Run the registered protocol in work/projection-v2/PLAN.md on the pinned v1 footb
 ## Experiment decision latency (September 16 supersession)
 
 Apply work/projection-governance-v2/DECISION-LATENCY.md to registered projection experiments. Read the full specification and publish a hashed tiered gap sweep before implementation. Decide/proceed on Tier 1, decide/proceed with REVIEW REQUESTED and alternative on Tier 2, and batch all currently visible Tier 3 stops with recommendations. Unknown data is never invented; a data blocker pauses dependent fitting, not unrelated authorized implementation.
+
+## Confidence and experiment premise (September 19 standing rule)
+
+Follow work/projection-governance-v2/CONFIDENCE-AND-PREMISE.md. End every new/revised report with a worded central-claim confidence rating (low, medium, high, near-total), its specified definition, and what would lower it one level. This rates independent recomputation on authoritative data, not test execution. Before fitting, state the control file, authoritative deployed-lineage status and generation date; run scripts.experiment_premise.verify on the registration. Non-authoritative controls cannot start experiments. nfelo is excluded as a football-only benchmark; closing lines are audit references only.

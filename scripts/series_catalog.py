@@ -50,6 +50,8 @@ def main():
   for r in items:lines+=['',f"**{Path(r['path']).name} / {r['component']}**",f"Date added: {r['date_added']}; archive commit: {r['archive_commit']}; SHA256: {r['sha256']}.",r['producer_and_fit']+'.',r['note']]
   (ROOT/folder/'SERIES.md').write_text('\n'.join(lines)+'\n')
  reg={'authoritative_control':CONTROL,'authority_scope':'All future engine method gates; freeze this control until a separately authorized production-lineage replacement.','metrics_convention':'2016-2025 available team rows; projected-minus-actual bias; population SD; OLS slope actual on projected','series':records,'scope':'Tracked out-of-fold series and derived scored/verified series. Unit-test fixtures, per-game live locks and raw inputs are not rolling-origin evaluation series.'}
+ previous=ROOT/'work/series-registry/catalog.json'
+ if previous.exists():reg['external_comparators']=json.loads(previous.read_text()).get('external_comparators',{})
  (ROOT/'work/series-registry/catalog.json').write_text(json.dumps(reg,indent=2)+'\n')
  (ROOT/'work/series-registry/SERIES.md').write_text('# Rolling-origin series registry\n\nSole authoritative gate control: '+CONTROL+'\n\nAll other catalogued series are non-authoritative. Full identity, per-fold fit references, dates, metrics and hashes are in catalog.json and each containing directory’s SERIES.md. Raw immutable series remain unchanged.\n\n'+ '\n'.join(f'- {folder}/SERIES.md ({len(items)} components)' for folder,items in sorted(groups.items()))+'\n')
  print('catalogued',len(records),'components in',len(groups),'directories')

@@ -30,6 +30,15 @@
   "control_policy": "work/projection-governance-v2/DEPLOYED-CONTROL.md",
   "experiments": [
     {
+      "candidates_registered": 0,
+      "control": "Premise: work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json; authoritative deployed lineage: yes; generated 2026-09-19 UTC.",
+      "id": "E-QB-CHANGE",
+      "registration": "work/e-qb-change/registration.json",
+      "registration_sha256": "b3f634cffc128521baa70f1a10c3874defb244be4ca7c3e5f53ff5af28c14127",
+      "report": "work/e-qb-change/REPORT.md",
+      "state": "DIAGNOSTIC_INSUFFICIENT_PROVENANCE"
+    },
+    {
       "id": "E-BENCHMARK-GAP",
       "kind": "NO_FITTING_NO_CANDIDATES",
       "next_question": "E-QB-CHANGE: starter-change handling",
@@ -270,5 +279,6 @@
     "results_already_seen": true,
     "state": "SUPERSEDED_EXPLORATORY"
   },
-  "schema": "projection-experiment-queue-v1"
+  "schema": "projection-experiment-queue-v1",
+  "standing_confidence_and_premise": "work/projection-governance-v2/CONFIDENCE-AND-PREMISE.md"
 }
