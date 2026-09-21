@@ -471,3 +471,14 @@ Confidence: high for closing the specified Elo route across seasons and saved al
 ## 2026-09-20 — BOARD v9, projection-only presentation
 
 Replace the market comparison columns and outcomes with score context, exact issuing total 50% intervals, per-team errors and interval membership. Market references stay off the board. Add a hashed, issuance-bounded context artifact to the existing publication cadence; no forecasts, locks or model weights change. CONVENTIONS: empirical midrank; exact issuing-version current-season cohort; prior-season actual fallback below four games; recorded played kickoff plus four hours strictly before issuance. See work/board-v9/REPORT.md for sample counts and verification. Confidence: high; lower to medium on independently demonstrated chronology or source attribution errors.
+
+
+## 2026-09-21 — Week 2 statistical engine teardown audit (no method change)
+
+Authoritative HFA control and 15 as-issued Week 2 finals frozen at source commit 9b8ad491b78530b29475baae69e7ab3ca1b106c4; NYG at LA pending. Team MAE 8.856 versus prior-season league-mean baseline 8.770, with paired difference interval spanning zero; winner count 8/15, issued Brier 0.2553 versus 0.2500. Historical HFA MAE 7.576 versus baseline 7.977, advantage in all ten seasons and retained by season-block uncertainty. No conclusion of permanently worse-than-chance skill.
+
+Verified active score path omits direct venue while historical home-margin bias is -1.768; intervals/probabilities inherit an older adaptive residual series, and trend references use that older series too. Three-cutoff state assimilation remains disconnected from production; Tuesday closeout publication is wired. Exact live fit reconstructed from 5,822 rows including 32 current-season team rows; independent least-squares coefficients agree within 7.4e-15. All 15 locked scores/grades/finals and contributions reproduce.
+
+Host zero-free-space failures were observed. Previously authorized cache-only recovery removed 69 APT index files (206,257,595 bytes), itemized in work/engine-audit-2026-09-21; no artifact of record removed. Subsequent service exit succeeded; 152 MiB remains, so durable capacity is unresolved. No paid infrastructure or provider call.
+
+Report, reproducible audit, test logs, and controlled rebuild recommendation: work/engine-audit-2026-09-21/REPORT.md and REBUILD.md. 280 existing tests pass. No model replacement, queue reorder, gate change, lock rewrite, or website change. Confidence high in the structural diagnosis; future accuracy improvement remains unproved.

@@ -1,0 +1,9 @@
+# Week 2 engine teardown audit
+
+Read-only numerical audit, no candidate promotion or change to forecasts, grades, gates or experiments. Snapshot engine-v2 9b8ad491b78530b29475baae69e7ab3ca1b106c4. Week 2 is incomplete: 15 finals, NYG at LA pending. Primary evidence is the original as-issued projection, never OURS or retrospective cards. Historical control is the registry-authoritative HFA deployed series, generated 2026-09-20. No fitting of a new method; reproducing the existing fit is a verification only.
+
+Audit: lock/grade/source agreement; full-precision additive reconstruction; exact fit reconstitution; deployed-versus-host source hashes; all active and inactive inputs; venue sensitivity; chronology and operational cadence; interval/probability provenance; report reference lineage; disk and job health.
+
+Predeclared descriptive baselines: previous completed season league mean, league median, home/away means, team means, and prior four completed regular-season team scores. All computed before the target issuance with kickoff + four hours and same eligible games. Do not select or ship a method from this comparison. Measure team/margin/total MAE, bias, RMSE, projected/actual dispersion, score winner count, actual issued Brier and coverage/CRPS/interval score. Compare historical seasons and full historical weeks; quantify Week 2 paired game-bootstrap differences (10,000 draws, seed 20260921), keeping both teams together. Winner chance is a 50/50 diagnostic, not a score-accuracy baseline.
+
+Report verified defects separately from hypotheses and sampling variability. Explain what must survive a controlled rebuild and what is replaced. Existing historical gates remain in force. Any disk recovery uses only previously authorized regenerable caches/log rotation, names every removed file, and preserves all records.

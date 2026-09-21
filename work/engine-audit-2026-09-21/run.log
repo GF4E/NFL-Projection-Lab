@@ -1,0 +1,755 @@
+{
+  "week2": {
+    "engine": {
+      "games": 15,
+      "team_mae": 8.856137231299734,
+      "median_absolute_error": 7.541773348467954,
+      "team_rmse": 10.702206071822307,
+      "team_bias": 2.824871695012327,
+      "away_bias": 1.6173969855027701,
+      "home_bias": 4.032346404521882,
+      "margin_mae": 12.076561630363642,
+      "margin_bias": 2.414949419019112,
+      "total_mae": 12.431842794120799,
+      "total_bias": 5.649743390024654,
+      "projected_sd": 2.853111169459573,
+      "actual_sd": 10.391289086965529,
+      "slope": 0.5873176708680413,
+      "winner_correct": 8,
+      "winner_games": 15,
+      "winner_wilson95": [
+        0.30116980025498397,
+        0.7519046463426261
+      ],
+      "predicted_ties": 0
+    },
+    "league_mean": {
+      "games": 15,
+      "team_mae": 8.770098039215686,
+      "median_absolute_error": 7.9871323529411775,
+      "team_rmse": 10.706674841638563,
+      "team_bias": 2.57953431372549,
+      "away_bias": 1.6128676470588226,
+      "home_bias": 3.5462009803921575,
+      "margin_mae": 12.066666666666666,
+      "margin_bias": 1.9333333333333333,
+      "total_mae": 12.612009803921568,
+      "total_bias": 5.159068627450981,
+      "projected_sd": 7.105427357601002e-15,
+      "actual_sd": 10.391289086965529,
+      "slope": null,
+      "winner_correct": 0,
+      "winner_games": 15,
+      "winner_wilson95": [
+        0.0,
+        0.20388330103584862
+      ],
+      "predicted_ties": 15,
+      "engine_minus_baseline_mae": 0.08603919208404788,
+      "engine_minus_baseline_game_bootstrap95": [
+        -1.0967914549967124,
+        1.1149902518738237
+      ]
+    },
+    "league_median": {
+      "games": 15,
+      "team_mae": 8.766666666666667,
+      "median_absolute_error": 8.0,
+      "team_rmse": 10.703581954965667,
+      "team_bias": 2.566666666666667,
+      "away_bias": 1.6,
+      "home_bias": 3.533333333333333,
+      "margin_mae": 12.066666666666666,
+      "margin_bias": 1.9333333333333333,
+      "total_mae": 12.6,
+      "total_bias": 5.133333333333334,
+      "projected_sd": 0.0,
+      "actual_sd": 10.391289086965529,
+      "slope": null,
+      "winner_correct": 0,
+      "winner_games": 15,
+      "winner_wilson95": [
+        0.0,
+        0.20388330103584862
+      ],
+      "predicted_ties": 15,
+      "engine_minus_baseline_mae": 0.0894705646330672,
+      "engine_minus_baseline_game_bootstrap95": [
+        -1.0947346969015557,
+        1.1206781623423698
+      ]
+    },
+    "venue_mean": {
+      "games": 15,
+      "team_mae": 9.045220588235292,
+      "median_absolute_error": 8.965073529411764,
+      "team_rmse": 10.849185075720554,
+      "team_bias": 2.5795343137254894,
+      "away_bias": 0.577941176470587,
+      "home_bias": 4.581127450980391,
+      "margin_mae": 12.48063725490196,
+      "margin_bias": 4.003186274509805,
+      "total_mae": 12.612009803921568,
+      "total_bias": 5.159068627450981,
+      "projected_sd": 1.0349264705882357,
+      "actual_sd": 10.391289086965529,
+      "slope": -0.934043812907044,
+      "winner_correct": 6,
+      "winner_games": 15,
+      "winner_wilson95": [
+        0.1982449614134158,
+        0.6425316987937539
+      ],
+      "predicted_ties": 0,
+      "engine_minus_baseline_mae": -0.18908335693556008,
+      "engine_minus_baseline_game_bootstrap95": [
+        -1.3060148345022156,
+        0.7351947228912733
+      ]
+    },
+    "team_prior_season": {
+      "games": 15,
+      "team_mae": 8.750980392156864,
+      "median_absolute_error": 7.794117647058824,
+      "team_rmse": 10.63238616326543,
+      "team_bias": 2.350980392156862,
+      "away_bias": 0.831372549019607,
+      "home_bias": 3.8705882352941177,
+      "margin_mae": 12.749019607843138,
+      "margin_bias": 3.0392156862745097,
+      "total_mae": 11.682352941176472,
+      "total_bias": 4.701960784313725,
+      "projected_sd": 3.984668812338302,
+      "actual_sd": 10.391289086965529,
+      "slope": 0.514434252837937,
+      "winner_correct": 7,
+      "winner_games": 15,
+      "winner_wilson95": [
+        0.24809535365737387,
+        0.698830199745016
+      ],
+      "predicted_ties": 1,
+      "engine_minus_baseline_mae": 0.10515683914287106,
+      "engine_minus_baseline_game_bootstrap95": [
+        -0.7357951127703791,
+        0.9494090139908332
+      ]
+    },
+    "team_last4": {
+      "games": 15,
+      "team_mae": 10.266666666666667,
+      "median_absolute_error": 8.875,
+      "team_rmse": 12.513659203712823,
+      "team_bias": 2.1166666666666667,
+      "away_bias": 0.9333333333333333,
+      "home_bias": 3.3,
+      "margin_mae": 12.133333333333333,
+      "margin_bias": 2.3666666666666667,
+      "total_mae": 16.2,
+      "total_bias": 4.233333333333333,
+      "projected_sd": 5.926423879541523,
+      "actual_sd": 10.391289086965529,
+      "slope": -0.12826535696490848,
+      "winner_correct": 8,
+      "winner_games": 15,
+      "winner_wilson95": [
+        0.30116980025498397,
+        0.7519046463426261
+      ],
+      "predicted_ties": 0,
+      "engine_minus_baseline_mae": -1.4105294353669326,
+      "engine_minus_baseline_game_bootstrap95": [
+        -2.691505260079187,
+        -0.1281220593462705
+      ]
+    }
+  },
+  "fit_reproduction": {
+    "training_rows": 5822,
+    "current_season_rows": 32,
+    "exact_match": true,
+    "training_hash": "e53f584bfe47ca76ca3cd388b52103ef20d2aff297700d0d289da98f596721df",
+    "groups": [
+      "calibration",
+      "elo"
+    ],
+    "features": [
+      "baseline",
+      "elo",
+      "elo_difference"
+    ],
+    "coefficients": {
+      "coefficients": [
+        -0.33593290517925284,
+        0.8712676552676972,
+        1.3423874410445251
+      ],
+      "groups": [
+        "calibration",
+        "elo"
+      ],
+      "intercept": 2.8980271587295334,
+      "means": [
+        19.905648554083932,
+        -0.0237165415032361,
+        0.0
+      ],
+      "names": [
+        "baseline",
+        "elo",
+        "elo_difference"
+      ],
+      "penalty": 10,
+      "scales": [
+        1.6739603372761311,
+        94.92973580532556,
+        133.20962144960913
+      ],
+      "training_hash": "e53f584bfe47ca76ca3cd388b52103ef20d2aff297700d0d289da98f596721df"
+    },
+    "independent_augmented_least_squares_max_coefficient_delta": 7.327471962526033e-15,
+    "raw_point_formula": {
+      "intercept": 6.892940641471121,
+      "coefficients": {
+        "baseline": 0.7993184798357391,
+        "elo": 0.009178026757120913,
+        "elo_difference": 0.010077255880141711
+      }
+    }
+  },
+  "inactive_sensitivity": {
+    "original": 24.195139680026514,
+    "changed_venue_qb_wind_rest": 24.195139680026514,
+    "point_change": 0.0,
+    "scope": "Hold retained baseline/Elo fixed; these direct features are absent from the fit."
+  },
+  "distribution_lineage": {
+    "shape_ref": {
+      "path": "work/projection-v3/residuals-1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba.json",
+      "sha256": "1c4a9dbd064f55e01cc121231288947da7ebff9cdf6979e93c72bc7d28b5f3ba"
+    },
+    "residual_means": {
+      "margin": 1.5430087154225085,
+      "team_points": 1.0515346722243275,
+      "total": 2.103448275862069
+    },
+    "equal24_home_probability": 0.5450928381962864,
+    "equal24_distribution_expected_margin": 1.5430087154225085,
+    "equal24_distribution_expected_total": 50.10344827586207,
+    "point_total": 48,
+    "historical_hfa_actual_minus_projection": {
+      "team_points": -0.1888626093556898,
+      "margin": 1.7678524299727643,
+      "total": -0.3777252187113796
+    }
+  },
+  "weekly_context": {
+    "historical_weeks": 175,
+    "weeks_with_at_least_this_mae": 18,
+    "historical_week2": [
+      {
+        "season": 2016,
+        "week": 2,
+        "games": 16,
+        "team_mae": 7.913367940964918,
+        "median_absolute_error": 7.861269188291304,
+        "team_rmse": 9.596497817174313,
+        "team_bias": 0.227699906472549,
+        "away_bias": 2.301055849510991,
+        "home_bias": -1.8456560365658932,
+        "margin_mae": 9.046693734030322,
+        "margin_bias": -4.146711886076885,
+        "total_mae": 12.435143142014724,
+        "total_bias": 0.4553998129450978,
+        "projected_sd": 2.389652454596648,
+        "actual_sd": 10.19114198703953,
+        "slope": 1.5348111760793044,
+        "winner_correct": 10,
+        "winner_games": 16,
+        "winner_wilson95": [
+          0.38641040545502714,
+          0.8151876744113636
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2017,
+        "week": 2,
+        "games": 16,
+        "team_mae": 8.077051173827146,
+        "median_absolute_error": 7.7494700693782494,
+        "team_rmse": 9.890124829456061,
+        "team_bias": 2.292563524759317,
+        "away_bias": 3.6033890857878363,
+        "home_bias": 0.9817379637307975,
+        "margin_mae": 10.164325055586028,
+        "margin_bias": -2.621651122057039,
+        "total_mae": 12.941038370942952,
+        "total_bias": 4.5851270495186345,
+        "projected_sd": 2.3757389842899994,
+        "actual_sd": 10.399397142983819,
+        "slope": 1.880967793795269,
+        "winner_correct": 14,
+        "winner_games": 16,
+        "winner_wilson95": [
+          0.639771727342413,
+          0.9650225122567595
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2018,
+        "week": 2,
+        "games": 16,
+        "team_mae": 6.640836573841195,
+        "median_absolute_error": 5.33074247340573,
+        "team_rmse": 8.319078541334019,
+        "team_bias": -1.0762172702039245,
+        "away_bias": 0.5532718531118508,
+        "home_bias": -2.7057063935197,
+        "margin_mae": 9.065690892835379,
+        "margin_bias": -3.2589782466315507,
+        "total_mae": 10.000171124232379,
+        "total_bias": -2.1524345404078495,
+        "projected_sd": 2.3236094669571004,
+        "actual_sd": 8.422846071103283,
+        "slope": 0.7681446059369382,
+        "winner_correct": 7,
+        "winner_games": 15,
+        "winner_wilson95": [
+          0.24809535365737387,
+          0.698830199745016
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2019,
+        "week": 2,
+        "games": 16,
+        "team_mae": 7.4113911470176665,
+        "median_absolute_error": 5.930236428692112,
+        "team_rmse": 9.266951178287261,
+        "team_bias": 4.076609218387938,
+        "away_bias": 1.8498893696051688,
+        "home_bias": 6.30332906717071,
+        "margin_mae": 10.303452287429359,
+        "margin_bias": 4.453439697565541,
+        "total_mae": 11.29332555003962,
+        "total_bias": 8.153218436775878,
+        "projected_sd": 2.8402117949939054,
+        "actual_sd": 9.234573284673202,
+        "slope": 1.4929399694285093,
+        "winner_correct": 10,
+        "winner_games": 16,
+        "winner_wilson95": [
+          0.38641040545502714,
+          0.8151876744113636
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2020,
+        "week": 2,
+        "games": 16,
+        "team_mae": 7.48884903875264,
+        "median_absolute_error": 6.630767889576736,
+        "team_rmse": 8.727819951641518,
+        "team_bias": -3.73946610882159,
+        "away_bias": -2.0802938354436336,
+        "home_bias": -5.398638382199548,
+        "margin_mae": 8.386749195205011,
+        "margin_bias": -3.318344546755913,
+        "total_mae": 10.911757362248089,
+        "total_bias": -7.478932217643182,
+        "projected_sd": 2.8022968271039295,
+        "actual_sd": 8.465405243548592,
+        "slope": 1.1030823517379533,
+        "winner_correct": 13,
+        "winner_games": 16,
+        "winner_wilson95": [
+          0.5699111903802586,
+          0.9340840092857187
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2021,
+        "week": 2,
+        "games": 16,
+        "team_mae": 7.835583921189845,
+        "median_absolute_error": 6.572857540545808,
+        "team_rmse": 9.569849421976517,
+        "team_bias": 0.3635752537428535,
+        "away_bias": -0.17368122080247606,
+        "home_bias": 0.9008317282881833,
+        "margin_mae": 9.254804936600713,
+        "margin_bias": 1.074512949090659,
+        "total_mae": 12.795908829496994,
+        "total_bias": 0.7271505074857072,
+        "projected_sd": 2.6568540890073122,
+        "actual_sd": 10.11805317242403,
+        "slope": 1.2738606431498092,
+        "winner_correct": 11,
+        "winner_games": 16,
+        "winner_wilson95": [
+          0.44404355834740666,
+          0.8583535614521796
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2022,
+        "week": 2,
+        "games": 16,
+        "team_mae": 8.44591227737356,
+        "median_absolute_error": 6.158064849049952,
+        "team_rmse": 10.490818385749202,
+        "team_bias": 1.1166247227418198,
+        "away_bias": 4.493318377763702,
+        "home_bias": -2.260068932280062,
+        "margin_mae": 10.389856791111853,
+        "margin_bias": -6.753387310043763,
+        "total_mae": 13.263467881739404,
+        "total_bias": 2.2332494454836396,
+        "projected_sd": 2.0990487493142522,
+        "actual_sd": 10.373446796388363,
+        "slope": 0.3635928674659936,
+        "winner_correct": 9,
+        "winner_games": 16,
+        "winner_wilson95": [
+          0.331785563988119,
+          0.7690134759450765
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2023,
+        "week": 2,
+        "games": 16,
+        "team_mae": 5.9860821475361545,
+        "median_absolute_error": 5.3039268319547155,
+        "team_rmse": 7.293079170433053,
+        "team_bias": -2.519999453815245,
+        "away_bias": -1.7659375036930918,
+        "home_bias": -3.274061403937398,
+        "margin_mae": 5.7599832387364875,
+        "margin_bias": -1.508123900244306,
+        "total_mae": 9.49364285397601,
+        "total_bias": -5.0399989076304905,
+        "projected_sd": 2.0520915309259826,
+        "actual_sd": 7.448783457719791,
+        "slope": 1.5265500984242193,
+        "winner_correct": 11,
+        "winner_games": 16,
+        "winner_wilson95": [
+          0.44404355834740666,
+          0.8583535614521796
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2024,
+        "week": 2,
+        "games": 16,
+        "team_mae": 7.109069507086297,
+        "median_absolute_error": 4.950657664008949,
+        "team_rmse": 9.149122627987737,
+        "team_bias": 2.6016550635261417,
+        "away_bias": 1.2838319322912533,
+        "home_bias": 3.91947819476103,
+        "margin_mae": 10.088473180885188,
+        "margin_bias": 2.635646262469776,
+        "total_mae": 9.492601895323393,
+        "total_bias": 5.2033101270522835,
+        "projected_sd": 1.9779624749072189,
+        "actual_sd": 8.497931733663197,
+        "slope": -0.10360262807739877,
+        "winner_correct": 8,
+        "winner_games": 16,
+        "winner_wilson95": [
+          0.27999563610326017,
+          0.7200043638967398
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2025,
+        "week": 2,
+        "games": 16,
+        "team_mae": 6.969720709075558,
+        "median_absolute_error": 5.114859024576534,
+        "team_rmse": 9.182216809766407,
+        "team_bias": -2.1515856804319453,
+        "away_bias": -3.0315932840913065,
+        "home_bias": -1.2715780767725848,
+        "margin_mae": 7.6468813948110075,
+        "margin_bias": 1.7600152073187216,
+        "total_mae": 12.194225644192452,
+        "total_bias": -4.303171360863891,
+        "projected_sd": 2.977604362383236,
+        "actual_sd": 9.520896015475644,
+        "slope": 1.1182900054609106,
+        "winner_correct": 12,
+        "winner_games": 16,
+        "winner_wilson95": [
+          0.5050168346449122,
+          0.8981793250878696
+        ],
+        "predicted_ties": 0
+      }
+    ],
+    "week2s_with_at_least_this_mae": 0,
+    "historical_week2_through_monday06": [
+      {
+        "season": 2016,
+        "cutoff": "2016-09-19T06:00:00-07:00",
+        "games": 15,
+        "team_mae": 8.031255545831675,
+        "median_absolute_error": 8.056724463884107,
+        "team_rmse": 9.77526587512375,
+        "team_bias": 0.13991723818200003,
+        "away_bias": 2.7611671686205757,
+        "home_bias": -2.481332692256575,
+        "margin_mae": 8.83046613390387,
+        "margin_bias": -5.24249986087715,
+        "total_mae": 13.058227360704933,
+        "total_bias": 0.2798344763640003,
+        "projected_sd": 2.4425659657194623,
+        "actual_sd": 10.341340983321908,
+        "slope": 1.4559873914431396,
+        "winner_correct": 9,
+        "winner_games": 15,
+        "winner_wilson95": [
+          0.357468301206246,
+          0.8017550385865841
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2017,
+        "cutoff": "2017-09-18T06:00:00-07:00",
+        "games": 15,
+        "team_mae": 8.178977608971076,
+        "median_absolute_error": 7.7494700693782494,
+        "team_rmse": 9.994422359560492,
+        "team_bias": 2.1199775913667445,
+        "away_bias": 3.954735166241711,
+        "home_bias": 0.28522001649177586,
+        "margin_mae": 9.968859439736002,
+        "margin_bias": -3.669515149749936,
+        "total_mae": 13.152927258919428,
+        "total_bias": 4.239955182733488,
+        "projected_sd": 2.4471755511057376,
+        "actual_sd": 10.555093557141026,
+        "slope": 1.8371776671179008,
+        "winner_correct": 13,
+        "winner_games": 15,
+        "winner_wilson95": [
+          0.6211801716767764,
+          0.9626387408969346
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2018,
+        "cutoff": "2018-09-17T06:00:00-07:00",
+        "games": 15,
+        "team_mae": 6.730145400455657,
+        "median_absolute_error": 5.33074247340573,
+        "team_rmse": 8.47607494427364,
+        "team_bias": -1.2310345856262772,
+        "away_bias": 0.15367353426893307,
+        "home_bias": -2.615742705521488,
+        "margin_mae": 8.963243062407837,
+        "margin_bias": -2.7694162397904214,
+        "total_mae": 10.500710204363688,
+        "total_bias": -2.4620691712525558,
+        "projected_sd": 2.3526333142158222,
+        "actual_sd": 8.622966749069347,
+        "slope": 0.8637976515225352,
+        "winner_correct": 7,
+        "winner_games": 14,
+        "winner_wilson95": [
+          0.26799202452413634,
+          0.7320079754758637
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2019,
+        "cutoff": "2019-09-16T06:00:00-07:00",
+        "games": 15,
+        "team_mae": 7.201285134627084,
+        "median_absolute_error": 5.930236428692112,
+        "team_rmse": 8.88312433482369,
+        "team_bias": 3.6441844107553734,
+        "away_bias": 1.860801451866629,
+        "home_bias": 5.427567369644119,
+        "margin_mae": 9.806779346965563,
+        "margin_bias": 3.5667659177774893,
+        "total_mae": 10.637816408992073,
+        "total_bias": 7.288368821510747,
+        "projected_sd": 2.9186179748855245,
+        "actual_sd": 9.025642482517364,
+        "slope": 1.4293137652630241,
+        "winner_correct": 9,
+        "winner_games": 15,
+        "winner_wilson95": [
+          0.357468301206246,
+          0.8017550385865841
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2020,
+        "cutoff": "2020-09-21T06:00:00-07:00",
+        "games": 15,
+        "team_mae": 7.3962498698888295,
+        "median_absolute_error": 6.630767889576736,
+        "team_rmse": 8.580447968110581,
+        "team_bias": -3.5908796365673497,
+        "away_bias": -2.412951649744851,
+        "home_bias": -4.768807623389847,
+        "margin_mae": 7.7621542653240345,
+        "margin_bias": -2.355855973644997,
+        "total_mae": 10.843439427379934,
+        "total_bias": -7.181759273134699,
+        "projected_sd": 2.7153166607286083,
+        "actual_sd": 8.624577284327234,
+        "slope": 1.4259300974130265,
+        "winner_correct": 13,
+        "winner_games": 15,
+        "winner_wilson95": [
+          0.6211801716767764,
+          0.9626387408969346
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2021,
+        "cutoff": "2021-09-20T06:00:00-07:00",
+        "games": 15,
+        "team_mae": 8.071648831037244,
+        "median_absolute_error": 6.715766804306485,
+        "team_rmse": 9.806734728339904,
+        "team_bias": 0.5258622180926923,
+        "away_bias": -0.3335187063209157,
+        "home_bias": 1.3852431425063003,
+        "margin_mae": 9.299177229243583,
+        "margin_bias": 1.7187618488272165,
+        "total_mae": 13.372872189929497,
+        "total_bias": 1.0517244361853846,
+        "projected_sd": 2.45764237791937,
+        "actual_sd": 10.174259459811095,
+        "slope": 1.13079742992755,
+        "winner_correct": 10,
+        "winner_games": 15,
+        "winner_wilson95": [
+          0.41713547738519774,
+          0.8482367556028526
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2022,
+        "cutoff": "2022-09-19T06:00:00-07:00",
+        "games": 14,
+        "team_mae": 7.9181835911344844,
+        "median_absolute_error": 5.9573350800328395,
+        "team_rmse": 9.926934931319105,
+        "team_bias": 0.7184446256381497,
+        "away_bias": 2.8432355055135723,
+        "home_bias": -1.4063462542372733,
+        "margin_mae": 8.405546880971519,
+        "margin_bias": -4.249581759750845,
+        "total_mae": 13.89253421957825,
+        "total_bias": 1.4368892512762987,
+        "projected_sd": 2.150262854378825,
+        "actual_sd": 9.691412146212496,
+        "slope": 0.056149090826032935,
+        "winner_correct": 8,
+        "winner_games": 14,
+        "winner_wilson95": [
+          0.3259064457965074,
+          0.7861920109552588
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2023,
+        "cutoff": "2023-09-18T06:00:00-07:00",
+        "games": 14,
+        "team_mae": 6.4373883426661695,
+        "median_absolute_error": 5.568973577392024,
+        "team_rmse": 7.696707368119932,
+        "team_bias": -2.9088310373888855,
+        "away_bias": -2.221697832855583,
+        "home_bias": -3.5959642419221884,
+        "margin_mae": 6.099371210701563,
+        "margin_bias": -1.3742664090666048,
+        "total_mae": 10.124917820167644,
+        "total_bias": -5.817662074777771,
+        "projected_sd": 2.1301216629520616,
+        "actual_sd": 7.729069828133477,
+        "slope": 1.4874022529273343,
+        "winner_correct": 10,
+        "winner_games": 14,
+        "winner_wilson95": [
+          0.4535091567010681,
+          0.8827862135542308
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2024,
+        "cutoff": "2024-09-16T06:00:00-07:00",
+        "games": 15,
+        "team_mae": 7.400802058268955,
+        "median_absolute_error": 5.516251043097586,
+        "team_rmse": 9.418140931581425,
+        "team_bias": 2.6987164903158734,
+        "away_bias": 1.4752438996217547,
+        "home_bias": 3.9221890810099933,
+        "margin_mae": 10.396627227698014,
+        "margin_bias": 2.4469451813882386,
+        "total_mae": 9.972677533454265,
+        "total_bias": 5.3974329806317485,
+        "projected_sd": 1.958800876769118,
+        "actual_sd": 8.764131445842194,
+        "slope": -0.10052475452978661,
+        "winner_correct": 8,
+        "winner_games": 15,
+        "winner_wilson95": [
+          0.30116980025498397,
+          0.7519046463426261
+        ],
+        "predicted_ties": 0
+      },
+      {
+        "season": 2025,
+        "cutoff": "2025-09-15T06:00:00-07:00",
+        "games": 14,
+        "team_mae": 7.13762493275348,
+        "median_absolute_error": 5.137117681698317,
+        "team_rmse": 9.507545911604764,
+        "team_bias": -3.2867252266836657,
+        "away_bias": -4.1861416454622935,
+        "home_bias": -2.38730880790504,
+        "margin_mae": 8.218206626123893,
+        "margin_bias": 1.7988328375572527,
+        "total_mae": 12.280717552411346,
+        "total_bias": -6.573450453367333,
+        "projected_sd": 3.051895571828374,
+        "actual_sd": 9.503691549141548,
+        "slope": 1.075972182610311,
+        "winner_correct": 10,
+        "winner_games": 14,
+        "winner_wilson95": [
+          0.4535091567010681,
+          0.8827862135542308
+        ],
+        "predicted_ties": 0
+      }
+    ]
+  }
+}
