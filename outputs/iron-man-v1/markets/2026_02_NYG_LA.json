@@ -1,7 +1,7 @@
 {
-  "capture_label": "REFRESH",
-  "capture_source_hash": "89e483f43444c89de112fe4d9df9bd2f13b75ae7c459b474b5965c326f8d20bb",
-  "captured_at": "2026-09-19T19:00:21.172699+00:00",
+  "capture_label": "T80",
+  "capture_source_hash": "1ed12458751e1f10d2fe85e2f0318525359692662bf5d2a28123d4ac11257171",
+  "captured_at": "2026-09-21T22:55:05.219288+00:00",
   "consensus": {
     "spreads": {
       "full": {
@@ -76,7 +76,7 @@
     },
     "totals": {
       "full": {
-        "center": 48.5,
+        "center": 48.0,
         "contributors": [
           "betmgm",
           "draftkings",
@@ -87,11 +87,11 @@
         "excluded_book": null,
         "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
         "pinnacle_center": 48,
-        "retail_median": 49
+        "retail_median": 48
       },
       "leave_one_out": {
         "betmgm": {
-          "center": 48.5,
+          "center": 47.75,
           "contributors": [
             "draftkings",
             "fanduel",
@@ -101,10 +101,10 @@
           "excluded_book": "betmgm",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": 48,
-          "retail_median": 49.0
+          "retail_median": 47.5
         },
         "draftkings": {
-          "center": 48.25,
+          "center": 47.75,
           "contributors": [
             "betmgm",
             "fanduel",
@@ -114,10 +114,10 @@
           "excluded_book": "draftkings",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": 48,
-          "retail_median": 48.5
+          "retail_median": 47.5
         },
         "fanduel": {
-          "center": 48.25,
+          "center": 48.0,
           "contributors": [
             "betmgm",
             "draftkings",
@@ -127,10 +127,10 @@
           "excluded_book": "fanduel",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": 48,
-          "retail_median": 48.5
+          "retail_median": 48.0
         },
         "williamhill_us": {
-          "center": 48.5,
+          "center": 48.0,
           "contributors": [
             "betmgm",
             "draftkings",
@@ -141,7 +141,7 @@
           "excluded_book": "williamhill_us",
           "method": "power_inverse_integer_PMF; 50% retail median + 50% Pinnacle when both available",
           "pinnacle_center": 48,
-          "retail_median": 49
+          "retail_median": 48
         }
       }
     }
@@ -168,84 +168,84 @@
   "offers": [
     {
       "book": "draftkings",
-      "line": -7.0,
+      "line": -6.5,
       "market": "spreads",
-      "price": -105.0,
+      "price": -115.0,
       "side": "Los Angeles Rams"
     },
     {
       "book": "draftkings",
-      "line": 7.0,
+      "line": 6.5,
       "market": "spreads",
-      "price": -115.0,
+      "price": -105.0,
       "side": "New York Giants"
     },
     {
       "book": "draftkings",
       "line": 47.5,
       "market": "totals",
-      "price": -115.0,
-      "side": "Over"
-    },
-    {
-      "book": "draftkings",
-      "line": 47.5,
-      "market": "totals",
-      "price": -105.0,
-      "side": "Under"
-    },
-    {
-      "book": "fanduel",
-      "line": -7.5,
-      "market": "spreads",
-      "price": 100.0,
-      "side": "Los Angeles Rams"
-    },
-    {
-      "book": "fanduel",
-      "line": 7.5,
-      "market": "spreads",
-      "price": -122.0,
-      "side": "New York Giants"
-    },
-    {
-      "book": "fanduel",
-      "line": 47.5,
-      "market": "totals",
-      "price": -115.0,
-      "side": "Over"
-    },
-    {
-      "book": "fanduel",
-      "line": 47.5,
-      "market": "totals",
-      "price": -105.0,
-      "side": "Under"
-    },
-    {
-      "book": "betmgm",
-      "line": -7.0,
-      "market": "spreads",
-      "price": -108.0,
-      "side": "Los Angeles Rams"
-    },
-    {
-      "book": "betmgm",
-      "line": 7.0,
-      "market": "spreads",
       "price": -110.0,
+      "side": "Over"
+    },
+    {
+      "book": "draftkings",
+      "line": 47.5,
+      "market": "totals",
+      "price": -110.0,
+      "side": "Under"
+    },
+    {
+      "book": "fanduel",
+      "line": -6.5,
+      "market": "spreads",
+      "price": -115.0,
+      "side": "Los Angeles Rams"
+    },
+    {
+      "book": "fanduel",
+      "line": 6.5,
+      "market": "spreads",
+      "price": -105.0,
+      "side": "New York Giants"
+    },
+    {
+      "book": "fanduel",
+      "line": 47.5,
+      "market": "totals",
+      "price": -105.0,
+      "side": "Over"
+    },
+    {
+      "book": "fanduel",
+      "line": 47.5,
+      "market": "totals",
+      "price": -115.0,
+      "side": "Under"
+    },
+    {
+      "book": "betmgm",
+      "line": -6.5,
+      "market": "spreads",
+      "price": -105.0,
+      "side": "Los Angeles Rams"
+    },
+    {
+      "book": "betmgm",
+      "line": 6.5,
+      "market": "spreads",
+      "price": -102.0,
       "side": "New York Giants"
     },
     {
       "book": "betmgm",
-      "line": 48.0,
+      "line": 47.5,
       "market": "totals",
       "price": -108.0,
       "side": "Over"
     },
     {
       "book": "betmgm",
-      "line": 48.0,
+      "line": 47.5,
       "market": "totals",
       "price": -110.0,
       "side": "Under"
