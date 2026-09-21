@@ -3,40 +3,40 @@
 actual minus projected. 2016–2025 adaptive OOF; coverage excludes 2016 (no prior residuals).
 
 ## AS_ISSUED
-28 graded games; 18 pending.
+29 graded games; 17 pending.
 
 | week | scope | games | team_points_mae | margin_mae | total_mae | team_points_sigma | margin_sigma | total_sigma | margin_coverage_50 | margin_coverage_80 | total_coverage_50 | total_coverage_80 | home_bias | total_bias | projected_team_points_sd | actual_team_points_sd | favorite_bias_[-inf,3) | favorite_bias_[3,7) | favorite_bias_[7,14) | favorite_bias_[14,inf) |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | 1 | week | 14 | 8.427663604561916 | 11.602647455761675 | 12.106675023932477 | 10.444043572793632 | 13.596230067716101 | 16.330911440921003 | 0.42857142857142855 | 0.7857142857142857 | 0.42857142857142855 | 0.9285714285714286 | 4.051335273532272 | 6.9079002454371485 | 1.9770869360742034 | 10.837623431022738 | -0.34965503170772794 | 13.234228182639809 | 7.657875544377649 | — |
 | 1 | cumulative | 14 | 8.427663604561916 | 11.602647455761675 | 12.106675023932477 | 10.444043572793632 | 13.596230067716101 | 16.330911440921003 | 0.42857142857142855 | 0.7857142857142857 | 0.42857142857142855 | 0.9285714285714286 | 4.051335273532272 | 6.9079002454371485 | 1.9770869360742034 | 10.837623431022738 | -0.34965503170772794 | 13.234228182639809 | 7.657875544377649 | — |
-| 2 | week | 14 | 8.90052678115774 | 12.929970016074614 | 12.143448203231191 | 10.425414500420978 | 15.272878366282837 | 14.524339430819499 | 0.2857142857142857 | 0.7857142857142857 | 0.5714285714285714 | 0.7857142857142857 | -4.913164408308633 | -7.229679851210361 | 2.928221207140109 | 10.303308365049846 | -7.259161543201849 | -10.066262286442505 | 3.2217228221958947 | — |
-| 2 | cumulative | 28 | 8.664095192859829 | 12.266308735918145 | 12.125061613581835 | 10.93723129928555 | 14.319323558667746 | 16.786915709509838 | 0.35714285714285715 | 0.7857142857142857 | 0.5 | 0.8571428571428571 | -0.43091456738818046 | -0.16088980288660615 | 2.5106808250044486 | 11.072580585226126 | -2.940719973518023 | -1.3285783605366372 | 4.330761002741333 | — |
+| 2 | week | 15 | 8.856137231299734 | 12.07656163036364 | 12.431842794120795 | 10.499128767326285 | 14.73412867405272 | 15.275179454667626 | 0.3333333333333333 | 0.8 | 0.5333333333333333 | 0.8 | -4.032346404521882 | -5.6497433900246525 | 2.853111169459573 | 10.391289086965529 | -5.036551944388351 | -10.066262286442505 | 3.2217228221958947 | — |
+| 2 | cumulative | 29 | 8.649287894253892 | 11.84777547710752 | 12.274865249891953 | 10.85210725728616 | 14.0621408294151 | 16.77119475484976 | 0.3793103448275862 | 0.7931034482758621 | 0.4827586206896552 | 0.8620689655172413 | -0.12987938753022132 | 0.41256733054311334 | 2.4818153686677227 | 10.99536438913875 | -2.2795537604585725 | -1.3285783605366372 | 4.330761002741333 | — |
 | 3 | week | 0 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
-| 3 | cumulative | 28 | 8.664095192859829 | 12.266308735918145 | 12.125061613581835 | 10.93723129928555 | 14.319323558667746 | 16.786915709509838 | 0.35714285714285715 | 0.7857142857142857 | 0.5 | 0.8571428571428571 | -0.43091456738818046 | -0.16088980288660615 | 2.5106808250044486 | 11.072580585226126 | -2.940719973518023 | -1.3285783605366372 | 4.330761002741333 | — |
+| 3 | cumulative | 29 | 8.649287894253892 | 11.84777547710752 | 12.274865249891953 | 10.85210725728616 | 14.0621408294151 | 16.77119475484976 | 0.3793103448275862 | 0.7931034482758621 | 0.4827586206896552 | 0.8620689655172413 | -0.12987938753022132 | 0.41256733054311334 | 2.4818153686677227 | 10.99536438913875 | -2.2795537604585725 | -1.3285783605366372 | 4.330761002741333 | — |
 
 ### Diagnostic buckets
 | Input | Band | Count | Mean error | Standard error | Flag |
 |---|---|---|---|---|---|
-| divisional | false | 38 | 0.726668070544876 | 1.7212387114917698 | False |
+| divisional | false | 40 | 1.1020688436820136 | 1.6549489925715422 | False |
 | divisional | true | 18 | -1.7843500645294585 | 2.7634100526733345 | False |
-| dome | false | 30 | -3.4963436492415094 | 1.8748219970517908 | False |
+| dome | false | 32 | -2.763154450333438 | 1.8283313651197308 | False |
 | dome | true | 2 | -1.440304099044047 | 8.35358937789733 | False |
 | dome | unavailable | 24 | 4.302750133104517 | 2.156403374064396 | False |
-| elo_difference | [-100,0) | 16 | 0.25156797804231257 | 2.7771373323134125 | False |
+| elo_difference | [-100,0) | 17 | 0.7173734745152721 | 2.6499272727777 | False |
 | elo_difference | [-inf,-100) | 12 | 1.4182206477287818 | 2.0136541999682844 | False |
-| elo_difference | [0,100) | 16 | 0.4980389520867108 | 3.7709351616955287 | False |
+| elo_difference | [0,100) | 17 | 0.9569252283458828 | 3.571777299829698 | False |
 | elo_difference | [100,inf) | 12 | -2.7931060946362267 | 2.232463088572366 | False |
-| luck_index | [-0.5,0.5) | 54 | -0.18398213203721342 | 1.5142383552615761 | False |
+| luck_index | [-0.5,0.5) | 56 | 0.11668449886724527 | 1.4747908143119344 | False |
 | luck_index | [-inf,-0.5) | 2 | 2.7150603245922795 | 0.6030160799344806 | True |
 | momentum | [-0.5,0.5) | 46 | -0.6618128595630087 | 1.7410165083204414 | False |
-| momentum | [-inf,-0.5) | 5 | 2.5265517457677253 | 1.8656311759003437 | False |
+| momentum | [-inf,-0.5) | 7 | 4.157446542201984 | 1.6630916867304195 | True |
 | momentum | [0.5,inf) | 5 | 2.661143666046962 | 2.7210947976236146 | False |
-| projected_margin | [-inf,3) | 32 | -0.7506590717830046 | 1.9764811051451767 | False |
+| projected_margin | [-inf,3) | 34 | -0.22210950677884966 | 1.8945480472984586 | False |
 | projected_margin | [3,7) | 16 | 1.5184802694733046 | 3.0539256644007486 | False |
 | projected_margin | [7,14) | 8 | -0.5974385619177114 | 2.7001082170068313 | False |
 | rest_days | [-inf,6) | 2 | 9.764610222064288 | 3.662659844018268 | True |
 | rest_days | [14,inf) | 28 | 3.4539501227185743 | 1.9737387125381758 | False |
-| rest_days | [6,8) | 23 | -5.609046489008354 | 2.1105274294770093 | True |
+| rest_days | [6,8) | 25 | -4.501548087224675 | 2.084278922473479 | True |
 | rest_days | [8,14) | 3 | 2.754443628706172 | 3.7126053210081413 | False |
 | team | ARI | 2 | -3.6327939899792927 | 7.964939290389034 | False |
 | team | ATL | 2 | -14.735627172099443 | 6.459512507927071 | True |
@@ -51,9 +51,9 @@ actual minus projected. 2016–2025 adaptive OOF; coverage excludes 2016 (no pri
 | team | DET | 2 | 5.6366117948582275 | 0.4653385831877923 | True |
 | team | GB | 2 | -2.113583996626284 | 2.9573768460749412 | False |
 | team | HOU | 2 | -6.935293113280077 | 13.544695499038905 | False |
-| team | IND | 1 | -0.05959314485352962 | None | False |
+| team | IND | 2 | 4.0553341366145474 | 4.114927281468077 | False |
 | team | JAX | 2 | -2.213456020836702 | 9.871331565214351 | False |
-| team | KC | 1 | 8.000225035074397 | None | False |
+| team | KC | 2 | 8.149665341783516 | 0.1494403067091188 | True |
 | team | LAC | 2 | -10.018232936505607 | 0.22433945956422896 | True |
 | team | LV | 2 | 7.358149087534876 | 0.44486380868159253 | True |
 | team | MIA | 2 | -6.99652043072123 | 1.8460304358898438 | True |
@@ -69,7 +69,7 @@ actual minus projected. 2016–2025 adaptive OOF; coverage excludes 2016 (no pri
 | team | TB | 2 | -1.0311284310429283 | 4.184449702407031 | False |
 | team | TEN | 2 | -3.8600523552456423 | 7.5494077256968986 | False |
 | team | WAS | 2 | -0.6448363331996116 | 2.7568805778574106 | False |
-| wind | [-inf,10) | 20 | -3.513690743156062 | 2.028239299530919 | False |
+| wind | [-inf,10) | 22 | -2.4456567180248174 | 1.9816191830935785 | False |
 | wind | [10,20) | 2 | -2.5061893218975797 | 10.506414356971977 | False |
 | wind | unavailable | 34 | 2.081802324296807 | 1.9777725763530716 | False |
 
@@ -1514,7 +1514,7 @@ Three-week team streaks: []
 }
 ```
 
-<details><summary>DIAGNOSTIC ONLY — CLOSE — AS_ISSUED / projection-v2-172f3e04-a39aa883: ATS 3/8 (37.50%; 95% 13.68–69.43%); total 2/8 (25.00%; 95% 7.15–59.07%) | AS_ISSUED / projection-v2.hfa1.w2: ATS 5/13 (38.46%; 95% 17.71–64.48%); total 3/13 (23.08%; 95% 8.18–50.26%) | AS_ISSUED / projection-v2.w2: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 0/1 (0.00%; 95% 0.00–79.35%) | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f: ATS 3/6 (50.00%; 95% 18.76–81.24%); total 2/6 (33.33%; 95% 9.68–70.00%)</summary>By season: AS_ISSUED / projection-v2-172f3e04-a39aa883 2026: ATS 3/8 (37.50%; 95% 13.68–69.43%); total 2/8 (25.00%; 95% 7.15–59.07%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2 2026: ATS 5/13 (38.46%; 95% 17.71–64.48%); total 3/13 (23.08%; 95% 8.18–50.26%); spread coverage 13/13 | AS_ISSUED / projection-v2.w2 2026: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f 2026: ATS 3/6 (50.00%; 95% 18.76–81.24%); total 2/6 (33.33%; 95% 9.68–70.00%); spread coverage 6/6. Source: nflverse spread_line / total_line. Counts exclude actual pushes and exact forecast-on-line cases. Never a target, gate, ranking, selection criterion or justification for a model change.</details>
-<details><summary>DIAGNOSTIC ONLY — OPEN — AS_ISSUED / projection-v2-172f3e04-a39aa883: ATS 3/8 (37.50%; 95% 13.68–69.43%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2: ATS 4/12 (33.33%; 95% 13.81–60.94%); spread coverage 12/13 | AS_ISSUED / projection-v2.w2: ATS 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f: ATS 3/5 (60.00%; 95% 23.07–88.24%); spread coverage 5/6; totals INSUFFICIENT (34.3% historical coverage)</summary>By season: AS_ISSUED / projection-v2-172f3e04-a39aa883 2026: ATS 3/8 (37.50%; 95% 13.68–69.43%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2 2026: ATS 4/12 (33.33%; 95% 13.81–60.94%); spread coverage 12/13 | AS_ISSUED / projection-v2.w2 2026: ATS 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f 2026: ATS 3/5 (60.00%; 95% 23.07–88.24%); spread coverage 5/6. Source: nfelo historic_projected_spreads.csv home_line_open; totals source nfelo_games.csv total_line_open, unblended. Counts exclude actual pushes and exact forecast-on-line cases. Never a target, gate, ranking, selection criterion or justification for a model change.</details>
+<details><summary>DIAGNOSTIC ONLY — CLOSE — AS_ISSUED / projection-v2-172f3e04-a39aa883: ATS 3/8 (37.50%; 95% 13.68–69.43%); total 2/8 (25.00%; 95% 7.15–59.07%) | AS_ISSUED / projection-v2.hfa1.w2: ATS 6/14 (42.86%; 95% 21.38–67.41%); total 4/14 (28.57%; 95% 11.72–54.65%) | AS_ISSUED / projection-v2.w2: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 0/1 (0.00%; 95% 0.00–79.35%) | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f: ATS 3/6 (50.00%; 95% 18.76–81.24%); total 2/6 (33.33%; 95% 9.68–70.00%)</summary>By season: AS_ISSUED / projection-v2-172f3e04-a39aa883 2026: ATS 3/8 (37.50%; 95% 13.68–69.43%); total 2/8 (25.00%; 95% 7.15–59.07%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2 2026: ATS 6/14 (42.86%; 95% 21.38–67.41%); total 4/14 (28.57%; 95% 11.72–54.65%); spread coverage 14/14 | AS_ISSUED / projection-v2.w2 2026: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f 2026: ATS 3/6 (50.00%; 95% 18.76–81.24%); total 2/6 (33.33%; 95% 9.68–70.00%); spread coverage 6/6. Source: nflverse spread_line / total_line. Counts exclude actual pushes and exact forecast-on-line cases. Never a target, gate, ranking, selection criterion or justification for a model change.</details>
+<details><summary>DIAGNOSTIC ONLY — OPEN — AS_ISSUED / projection-v2-172f3e04-a39aa883: ATS 3/8 (37.50%; 95% 13.68–69.43%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2: ATS 5/13 (38.46%; 95% 17.71–64.48%); spread coverage 13/14 | AS_ISSUED / projection-v2.w2: ATS 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f: ATS 3/5 (60.00%; 95% 23.07–88.24%); spread coverage 5/6; totals INSUFFICIENT (34.3% historical coverage)</summary>By season: AS_ISSUED / projection-v2-172f3e04-a39aa883 2026: ATS 3/8 (37.50%; 95% 13.68–69.43%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2 2026: ATS 5/13 (38.46%; 95% 17.71–64.48%); spread coverage 13/14 | AS_ISSUED / projection-v2.w2 2026: ATS 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f 2026: ATS 3/5 (60.00%; 95% 23.07–88.24%); spread coverage 5/6. Source: nfelo historic_projected_spreads.csv home_line_open; totals source nfelo_games.csv total_line_open, unblended. Counts exclude actual pushes and exact forecast-on-line cases. Never a target, gate, ranking, selection criterion or justification for a model change.</details>
 
 Confidence: near-total — reported errors and diagnostics are arithmetic on saved projections and grades. Move down to high if a source or lineage mismatch invalidates those rows.
