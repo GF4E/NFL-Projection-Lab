@@ -1,0 +1,206 @@
+{
+  "checked_at": "2026-09-22T14:07:54.433472+00:00",
+  "host_commit": "ebb40a13b2fec60a175a2bfe50c6baec2c02d2fd",
+  "host_observer": {
+    "assessment": {
+      "active": [
+        {
+          "code": "STORAGE_HEADROOM_UNQUALIFIED",
+          "delay_seconds": 0,
+          "details": {},
+          "first_seen": "2026-09-22T14:04:22.447670+00:00"
+        }
+      ],
+      "changed": false,
+      "fingerprint": "a13e274e3eb7f4c0aaf78c87b8cf1fb657f870dc0b0043fe5e6fe5078f9d44f7",
+      "pending": {
+        "STORAGE_HEADROOM_UNQUALIFIED": {
+          "code": "STORAGE_HEADROOM_UNQUALIFIED",
+          "delay_seconds": 0,
+          "details": {},
+          "first_seen": "2026-09-22T14:04:22.447670+00:00"
+        }
+      },
+      "recovered_codes": [],
+      "state": "DEGRADED"
+    },
+    "checked_at": "2026-09-22T14:07:22.731512+00:00",
+    "epoch": "2026-09-22T14:04:17.422466+00:00",
+    "final_reader": {
+      "last_success_at": "2026-09-22T14:06:49.620814+00:00",
+      "reason": null,
+      "state": "HEALTHY"
+    },
+    "observer_source_sha256": "f9a287e0a3948d351dacc40041b829aaad5b98764d9dd225e24344be50912957",
+    "outside_received_at": "2026-09-22T14:07:06.480775+00:00",
+    "policy_sha256": "574085ff6817926657f417f531c729ceedb37a60bdaf194fd4cbe7da685d2978",
+    "schema": "projection-watchdog-v1",
+    "services": {
+      "nfl-engine-capture.service": {
+        "ActiveState": "activating",
+        "ExecMainExitTimestamp": "",
+        "ExecMainStartTimestamp": "Tue 2026-09-22 14:06:55 UTC",
+        "ExecMainStatus": "0",
+        "Result": "success",
+        "SubState": "start"
+      },
+      "nfl-engine-capture.timer": {
+        "ActiveState": "active",
+        "Result": "success",
+        "SubState": "running"
+      }
+    },
+    "source": {
+      "final_commit_receipt": "VERIFIED",
+      "final_received_at": "2026-09-22T14:06:49.620814+00:00",
+      "final_source_sha256": "1d7ac5b52b98776c349f5027fe817fac6dacab00de58d7b36ceed20265c9874a",
+      "findings": [],
+      "identity": {
+        "content_sha256": "b2aa1938049964a5447c5b8cd4e04f27585e555b57217b0b88e371dc93f84a90",
+        "games": 48,
+        "published_at": "2026-09-22T14:01:22.550369+00:00"
+      },
+      "metrics": {
+        "all_missing_or_invalid_game_ids": [
+          "2026_01_NE_SEA",
+          "2026_01_SF_LA"
+        ],
+        "eligible_due_games": 32,
+        "finals_available": 32,
+        "finals_graded": 32,
+        "grade_latency": "UNKNOWN: first verified availability per game not recorded",
+        "grade_latency_unknown_first_seen": 32,
+        "matched_frozen_records": 30,
+        "missing_or_invalid_pregame_games": 2,
+        "on_time_committed_issuance": "NOT_RECORDED: physical commit receipt required",
+        "retrospective_games": 2,
+        "scope": "All due games in the pinned current-season schedule; retrospective included in denominator",
+        "valid_pregame_forecasts": 30
+      },
+      "schedule_ref": {
+        "path": "work/projection-v1/data/schedule-58d0d39ae49472f40aa26e0886b645cb1bbdfa8afa358645ec897498f2244fff.json",
+        "sha256": "58d0d39ae49472f40aa26e0886b645cb1bbdfa8afa358645ec897498f2244fff"
+      }
+    },
+    "storage": {
+      "free_bytes": 79589376,
+      "free_inodes": 1014864,
+      "headroom_qualified": false
+    }
+  },
+  "outside_receipt": {
+    "receipt": {
+      "checked_at": "2026-09-22T14:07:04.775894+00:00",
+      "observer": "gabe-mac",
+      "report_sha256": "0a673911e8085152f5a479322583a7c127c03aefdeb1f409b0fb46a2fc513547",
+      "schema": "projection-watchdog-v1"
+    },
+    "received_at": "2026-09-22T14:07:06.480775+00:00"
+  },
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "fit_ref_verified": true,
+  "tracked_modified_paths": [],
+  "source_hashes": {
+    "engine/projection/watchdog.py": "9777b69763bde1680777d29715e284f4505a45f121c4e28bdada3ca908d50bc7",
+    "scripts/projection_watchdog.py": "3a128b6260af90f0c468749fafb008293b882df7d2c9fa28ab630acd189d4285"
+  },
+  "units": [
+    "Result=success",
+    "ExecMainStartTimestamp=Tue 2026-09-22 14:07:16 UTC",
+    "ExecMainExitTimestamp=Tue 2026-09-22 14:07:23 UTC",
+    "ExecMainStatus=0",
+    "MemoryPeak=[not set]",
+    "CPUUsageNSec=734121000",
+    "MemoryMax=67108864",
+    "RuntimeDirectoryPreserve=yes",
+    "Id=nfl-engine-watchdog.service",
+    "ActiveState=inactive",
+    "",
+    "TimersMonotonic={ OnUnitActiveUSec=1min ; next_elapse=1w 3d 20h 18min 28.013520s }",
+    "TimersMonotonic={ OnBootUSec=30s ; next_elapse=30s }",
+    "Result=success",
+    "Id=nfl-engine-watchdog.timer",
+    "ActiveState=active"
+  ],
+  "mac": {
+    "outside.json": {
+      "assessment": {
+        "active": [
+          {
+            "code": "PUBLIC_ACCESS_UNQUALIFIED",
+            "delay_seconds": 0,
+            "details": {},
+            "first_seen": "2026-09-22T14:04:53.232848+00:00"
+          },
+          {
+            "code": "STORAGE_HEADROOM_UNQUALIFIED",
+            "delay_seconds": 0,
+            "details": {},
+            "first_seen": "2026-09-22T14:04:53.232848+00:00"
+          }
+        ],
+        "changed": false,
+        "fingerprint": "964d348bfe4dfe0c3ac005c31903edfaecd30529e85460a53838612301f706d2",
+        "pending": {
+          "PUBLIC_ACCESS_UNQUALIFIED": {
+            "code": "PUBLIC_ACCESS_UNQUALIFIED",
+            "delay_seconds": 0,
+            "details": {},
+            "first_seen": "2026-09-22T14:04:53.232848+00:00"
+          },
+          "STORAGE_HEADROOM_UNQUALIFIED": {
+            "code": "STORAGE_HEADROOM_UNQUALIFIED",
+            "delay_seconds": 0,
+            "details": {},
+            "first_seen": "2026-09-22T14:04:53.232848+00:00"
+          }
+        },
+        "recovered_codes": [],
+        "state": "DEGRADED"
+      },
+      "checked_at": "2026-09-22T14:07:04.775894+00:00",
+      "failure_domain": "Mac: requires awake, connected, logged-in session",
+      "public": {
+        "http_status": 403,
+        "state": "ACCESS_UNQUALIFIED"
+      },
+      "schema": "projection-watchdog-v1",
+      "started_at": "2026-09-22T14:07:02.108692+00:00"
+    },
+    "acknowledgment.json": {
+      "receipt": {
+        "checked_at": "2026-09-22T14:07:04.775894+00:00",
+        "observer": "gabe-mac",
+        "report_sha256": "0a673911e8085152f5a479322583a7c127c03aefdeb1f409b0fb46a2fc513547",
+        "schema": "projection-watchdog-v1"
+      },
+      "received_at": "2026-09-22T14:07:06.480775+00:00"
+    },
+    "notification.json": {
+      "at": "2026-09-22T14:04:53.232848+00:00",
+      "report_sha256": "c4e837ae4aa3af6154f7a6404219910275e84cf5e11557409753ddf3699b464a",
+      "result": "SUBMITTED_NOT_READ_RECEIPT"
+    }
+  },
+  "ui_observation": {
+    "page": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday",
+    "channel": "Existing in-app browser accessibility tree, read-only",
+    "observed": "Week 2 table renders all sixteen final games, including DET at BUF 31-41 and NYG at LA 6-28; 80% band 24 of 32 displayed",
+    "scope": "Rendered UI observed; does not qualify the unattended unauthenticated API or prove whole-payload hash equality"
+  },
+  "mac_launchctl": [
+    "path = /Users/gabe/Library/LaunchAgents/com.gabe.nfl-projection-watchdog.plist",
+    "state = not running",
+    "program = /opt/anaconda3/bin/python3.12",
+    "stdout path = /Users/gabe/Library/Logs/nfl-projection-watchdog.log",
+    "stderr path = /Users/gabe/Library/Logs/nfl-projection-watchdog.log",
+    "runs = 3",
+    "last exit code = 0",
+    "state = active",
+    "state = active",
+    "run interval = 60 seconds"
+  ]
+}

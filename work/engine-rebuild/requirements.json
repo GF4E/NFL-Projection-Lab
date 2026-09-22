@@ -67,7 +67,9 @@
         "scripts/projection_final_repair.py (explicit fenced repair)",
         "tests-projection-recovery.log",
         "host-recovery-candidate.json (candidate code in memory; isolated fixtures)",
-        "host-verification.json (scheduled ingestion HEALTHY, matching operation/payload, tested source hashes, unchanged fit; not outage recovery)"
+        "host-verification.json (scheduled ingestion HEALTHY, matching operation/payload, tested source hashes, unchanged fit; not outage recovery)",
+        "cache-recovery-2026-09-22T0637.json (112 regenerable cache files only)",
+        "log-rotation-2026-09-22.json (nine prior log sequences preserved; no oldest archive retired)"
       ]
     },
     {
@@ -106,11 +108,15 @@
       "state": "PARTIAL",
       "observed_evidence": [
         "engine/projection/watchdog.py (read-only assessment; no operational takeover)",
-        "scripts/projection_watchdog.py (independent observers; installation pending)",
+        "scripts/projection_watchdog.py (independent observers; installed on host and Mac; limited failure domains)",
         "tests-watchdog.log (19 fault/integrity fixtures)",
         "host-watchdog-candidate.json (isolated candidate fixtures under actual Linux service identity)",
         "watchdog-policy.json (defined detection budgets; missing SLO evidence explicit)",
-        "GAP-SWEEP.md (outside observer limits and website 403)"
+        "GAP-SWEEP.md (outside observer limits and website 403)",
+        "watchdog-installation.json (source-verified systemd timer)",
+        "watchdog-mac-installation.json (launchd timer)",
+        "watchdog-verification.json (scheduled host/Mac receipt exchange; UI render observed, public API still unqualified)",
+        "watchdog-canary.json (live host-observer pause, independent detection, automatic restoration and observed recovery; production workers untouched)"
       ]
     },
     {
@@ -197,7 +203,9 @@
         "tests-closeout-recovery.log",
         "tests-harvest-dependency.log",
         "host-verification.json (d00ed366 checkout, unchanged fit)",
-        "host-recovery-tests.json (29 isolated tests under service identity)"
+        "host-recovery-tests.json (29 isolated tests under service identity)",
+        "observed-tuesday-refit.json (scheduled weight-only w3 refit observed; does not prove public closeout or experiment cycle)",
+        "observed-tuesday-closeout.json (independent artifact/commit hashes and acknowledgment-before-refit check; public Season/experiment/review still unproved)"
       ]
     },
     {
@@ -228,7 +236,10 @@
         "scripts/projection_final_repair.py (explicit fenced repair)",
         "tests-projection-recovery.log",
         "host-recovery-candidate.json (candidate code in memory; isolated fixtures)",
-        "host-verification.json (scheduled ingestion HEALTHY, matching operation/payload, tested source hashes, unchanged fit; not outage recovery)"
+        "host-verification.json (scheduled ingestion HEALTHY, matching operation/payload, tested source hashes, unchanged fit; not outage recovery)",
+        "watchdog-verification.json (actual source hashes, installed resource cap and observed CPU time)",
+        "watchdog-canary.json (bounded monitor-only live outage/recovery)",
+        "host-verification.json (post-canary host, fit, source and reader checks)"
       ]
     },
     {

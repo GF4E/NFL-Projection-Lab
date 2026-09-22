@@ -1,0 +1,17 @@
+{
+  "installed_at": "2026-09-22T14:04:15.436138+00:00",
+  "source_hashes": {
+    "engine/projection/watchdog.py": "9777b69763bde1680777d29715e284f4505a45f121c4e28bdada3ca908d50bc7",
+    "scripts/projection_watchdog.py": "3a128b6260af90f0c468749fafb008293b882df7d2c9fa28ab630acd189d4285",
+    "ops/cloud/nfl-engine-watchdog.service": "998f16252fdbeb9f1d8596fa8621ee1a2f1e3c3f11077bf0cf0d08914f3dad92",
+    "ops/cloud/nfl-engine-watchdog.timer": "db6658e4e4214e1465751aeb6715862edc22199fc97c4e9bee4599087d17ccd4"
+  },
+  "host_commit": "e36333229530d9f44861c5658a46feac9615cf08",
+  "timer": [
+    "Unit=nfl-engine-watchdog.service",
+    "TimersMonotonic={ OnUnitActiveUSec=1min ; next_elapse=0 }",
+    "TimersMonotonic={ OnBootUSec=30s ; next_elapse=30s }",
+    "ActiveState=active"
+  ],
+  "scope": "New independent read-only observer only; no production worker restart, new owner, fit or provider call"
+}

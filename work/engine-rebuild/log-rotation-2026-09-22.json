@@ -1,0 +1,153 @@
+{
+  "attempts": [
+    {
+      "phase": "BEFORE",
+      "at": "2026-09-22T14:03:37.078997+00:00",
+      "files": {
+        "/var/log/syslog.2.gz": {
+          "bytes": 347067,
+          "sha256": "f8711c0826f66a26ba5d6a71e81d5f190fb7ebcd152424b3d7497c0534654448"
+        },
+        "/var/log/syslog": {
+          "bytes": 104459322,
+          "sha256": "75288af49173e01195d3a861f20461be1cf1a72ab1449e44d2cb77ec693f4bce"
+        },
+        "/var/log/syslog.1": {
+          "bytes": 72208976,
+          "sha256": "3cbdfa75dd338ace4d69729f1fa6a204350d9fd58e186bfc8cb6f90aeb49a022"
+        },
+        "/var/log/kern.log": {
+          "bytes": 502,
+          "sha256": "055874594edfb2c3bccf3f1b7d270fd9051c48de9a522e4e5961e02f516616b2"
+        },
+        "/var/log/kern.log.1": {
+          "bytes": 1539,
+          "sha256": "301743503f8f1208feefaf0842ff9c37b3257b2f7f47d835e1081a65b316b698"
+        },
+        "/var/log/kern.log.2.gz": {
+          "bytes": 13116,
+          "sha256": "028a996d9efd81eb16b7ee5de6cfff4be62591b148864f7d1a96c497e524d0c6"
+        },
+        "/var/log/auth.log": {
+          "bytes": 1608923,
+          "sha256": "90f8dd6ede9e377560549fc93df815b5b5d2773613ace5c2cc42d0ecf61f9138"
+        },
+        "/var/log/auth.log.1": {
+          "bytes": 2631363,
+          "sha256": "73e1714eba79ab6440844211f93555c61ab0cb996e6c67ccc0b810df14c3d405"
+        },
+        "/var/log/auth.log.2.gz": {
+          "bytes": 59142,
+          "sha256": "75cdb29aeea9a6293f465d38723946c1c0e36496b0d86b9aaeaebdc49c678f02"
+        }
+      },
+      "free_bytes": 7729152
+    },
+    {
+      "phase": "AFTER",
+      "at": "2026-09-22T14:03:41.417699+00:00",
+      "command": "logrotate --force (existing global su root adm/create and rsyslog fragment)",
+      "exit_code": 0,
+      "error": null,
+      "scope": "No oldest archive retired; verify all prior bytes in rotated destinations",
+      "files": {
+        "/var/log/syslog.3.gz": {
+          "bytes": 347067
+        },
+        "/var/log/syslog.2.gz": {
+          "bytes": 2247018
+        },
+        "/var/log/syslog": {
+          "bytes": 0
+        },
+        "/var/log/syslog.1": {
+          "bytes": 104459475
+        },
+        "/var/log/kern.log": {
+          "bytes": 0
+        },
+        "/var/log/kern.log.3.gz": {
+          "bytes": 13116
+        },
+        "/var/log/kern.log.1": {
+          "bytes": 502
+        },
+        "/var/log/kern.log.2.gz": {
+          "bytes": 362
+        },
+        "/var/log/auth.log": {
+          "bytes": 0
+        },
+        "/var/log/auth.log.1": {
+          "bytes": 1608923
+        },
+        "/var/log/auth.log.2.gz": {
+          "bytes": 361859
+        },
+        "/var/log/auth.log.3.gz": {
+          "bytes": 59142
+        }
+      },
+      "preservation_checks": [
+        {
+          "from": "/var/log/syslog.2.gz",
+          "to": "/var/log/syslog.3.gz",
+          "verified": true,
+          "active_prefix_only": false
+        },
+        {
+          "from": "/var/log/syslog",
+          "to": "/var/log/syslog.1",
+          "verified": true,
+          "active_prefix_only": true
+        },
+        {
+          "from": "/var/log/syslog.1",
+          "to": "/var/log/syslog.2.gz",
+          "verified": true,
+          "active_prefix_only": false
+        },
+        {
+          "from": "/var/log/kern.log",
+          "to": "/var/log/kern.log.1",
+          "verified": true,
+          "active_prefix_only": true
+        },
+        {
+          "from": "/var/log/kern.log.1",
+          "to": "/var/log/kern.log.2.gz",
+          "verified": true,
+          "active_prefix_only": false
+        },
+        {
+          "from": "/var/log/kern.log.2.gz",
+          "to": "/var/log/kern.log.3.gz",
+          "verified": true,
+          "active_prefix_only": false
+        },
+        {
+          "from": "/var/log/auth.log",
+          "to": "/var/log/auth.log.1",
+          "verified": true,
+          "active_prefix_only": true
+        },
+        {
+          "from": "/var/log/auth.log.1",
+          "to": "/var/log/auth.log.2.gz",
+          "verified": true,
+          "active_prefix_only": false
+        },
+        {
+          "from": "/var/log/auth.log.2.gz",
+          "to": "/var/log/auth.log.3.gz",
+          "verified": true,
+          "active_prefix_only": false
+        }
+      ],
+      "all_verified": true,
+      "free_bytes": 79966208
+    }
+  ],
+  "transport_exit": 0,
+  "prior_attempt": "Fragment-only invocation skipped all logs due to absent inherited su directive. Confirmed by debug inspection; corrected using actual installed globals."
+}

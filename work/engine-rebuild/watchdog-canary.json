@@ -1,0 +1,100 @@
+{
+  "plan": {
+    "stopped_at": "2026-09-22T14:11:01.508415+00:00",
+    "restore_unit": "nfl-watchdog-canary-restore-20260922141101",
+    "restore_after_seconds": 240,
+    "host_last_heartbeat": "2026-09-22T14:10:26.378824+00:00",
+    "outside_last_receipt": "2026-09-22T14:10:21.536393+00:00",
+    "scope": "Only new read-only observer timer paused; production capture/daily/learning services untouched; restore timer armed before pause",
+    "expected": "Mac records HOST_OBSERVER_STALE after 180 seconds and then recovery after scheduled restart"
+  },
+  "state": "PASSED",
+  "events": [
+    {
+      "active": [
+        {
+          "code": "HOST_OBSERVER_STALE",
+          "delay_seconds": 0,
+          "details": {},
+          "first_seen": "2026-09-22T14:13:36.917566+00:00"
+        },
+        {
+          "code": "PUBLIC_ACCESS_UNQUALIFIED",
+          "delay_seconds": 0,
+          "details": {},
+          "first_seen": "2026-09-22T14:04:53.232848+00:00"
+        },
+        {
+          "code": "STORAGE_HEADROOM_UNQUALIFIED",
+          "delay_seconds": 0,
+          "details": {},
+          "first_seen": "2026-09-22T14:04:53.232848+00:00"
+        }
+      ],
+      "checked_at": "2026-09-22T14:13:36.917566+00:00",
+      "observer": "outside",
+      "recovered_codes": [],
+      "state": "DEGRADED"
+    },
+    {
+      "active": [
+        {
+          "code": "PUBLIC_ACCESS_UNQUALIFIED",
+          "delay_seconds": 0,
+          "details": {},
+          "first_seen": "2026-09-22T14:04:53.232848+00:00"
+        },
+        {
+          "code": "STORAGE_HEADROOM_UNQUALIFIED",
+          "delay_seconds": 0,
+          "details": {},
+          "first_seen": "2026-09-22T14:04:53.232848+00:00"
+        }
+      ],
+      "checked_at": "2026-09-22T14:15:47.177523+00:00",
+      "observer": "outside",
+      "recovered_codes": [
+        "HOST_OBSERVER_STALE"
+      ],
+      "state": "DEGRADED"
+    }
+  ],
+  "detected_at": "2026-09-22T14:13:36.917566+00:00",
+  "detection_after_deadline_seconds": 10.538742000000013,
+  "recovered_at": "2026-09-22T14:15:47.177523+00:00",
+  "unit_verification": [
+    "Result=success",
+    "Id=nfl-engine-watchdog.timer",
+    "ActiveState=active",
+    "",
+    "Result=success",
+    "ExecMainExitTimestamp=Tue 2026-09-22 14:16:12 UTC",
+    "Id=nfl-engine-watchdog.service",
+    "ActiveState=inactive",
+    "",
+    "Result=success",
+    "Id=nfl-engine-capture.timer",
+    "ActiveState=active",
+    "",
+    "Result=success",
+    "ExecMainExitTimestamp=",
+    "Id=nfl-watchdog-canary-restore-20260922141101.service",
+    "ActiveState=inactive"
+  ],
+  "verification_exit": 0,
+  "checked_at": "2026-09-22T14:16:44.511000+00:00",
+  "restoration_journal": [
+    {
+      "MESSAGE": "Started nfl-watchdog-canary-restore-20260922141101.service - /usr/bin/systemctl start nfl-engine-watchdog.timer.",
+      "__REALTIME_TIMESTAMP": "1790086501751629"
+    },
+    {
+      "MESSAGE": "nfl-watchdog-canary-restore-20260922141101.service: Deactivated successfully.",
+      "__REALTIME_TIMESTAMP": "1790086501895801"
+    }
+  ],
+  "restored_watchdog_timer_active": true,
+  "production_capture_timer_active": true,
+  "watchdog_run_success": true,
+  "restoration_journal_observed": true
+}
