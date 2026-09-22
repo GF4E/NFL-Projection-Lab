@@ -102,6 +102,13 @@ class SchedulerBoundaryTests(unittest.TestCase):
             with patch.object(cloud,'ROOT',root),patch.object(cloud,'OUT',root/'out'),patch.object(cloud,'ownership',return_value={'state':'ACTIVE','owner':'host'}),patch.object(cloud,'synchronize'),patch.object(cloud,'publish_artifacts',return_value='commit'),patch.object(cloud,'capture_window',return_value=False),patch.object(cloud,'weekly_capture_window',return_value=False),patch.object(cloud,'next_capture_boundary',return_value=None),patch.object(worker,'run_due',return_value={'state':'WAITING_FOR_CUTOFF'}) as due,patch.object(cloud,'worker',side_effect=AssertionError('paid worker')),patch('scripts.projection_publish.sync',side_effect=AssertionError('entry network')):
                 self.assertEqual(cloud.run('cutoff','host')['state'],'WAITING_FOR_CUTOFF');due.assert_called_once()
 
+    def test_waited_state_job_rechecks_capture_window_before_publication(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            with patch.object(cloud,'ROOT',root),patch.object(cloud,'OUT',root/'out'),patch.object(cloud,'ownership',return_value={'state':'ACTIVE','owner':'host'}),patch.object(cloud,'synchronize'),patch.object(cloud,'capture_window',return_value=True),patch.object(cloud,'publish_artifacts',side_effect=AssertionError('publication inside capture window')):
+                self.assertEqual(cloud.run('cutoff','host')['state'],'DEFERRED_CAPTURE_WINDOW')
+
     def test_full_budget_reserved_before_weekly_capture(self):
         import tempfile
         with tempfile.TemporaryDirectory() as tmp,patch.object(cloud,'ROOT',Path(tmp)):

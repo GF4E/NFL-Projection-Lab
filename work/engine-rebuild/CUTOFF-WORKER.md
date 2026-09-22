@@ -2,7 +2,7 @@ NON-AUTHORITATIVE: scheduled numerical shadow worker; no point, calibration or c
 
 # Scheduled cutoff worker
 
-The owner-fenced scheduler gains a separate cutoff mode. It does not call entry sync, capture providers, source refresh, fitting or the projection publisher. It uses the same committed owner and exclusive dispatch lock as production. The only production-side writes are inactive state/configuration/operation evidence and the existing artifact publication transaction. The forecast issuer continues using its previous qualified path.
+The owner-fenced scheduler gains a separate cutoff mode. It does not call entry sync, capture providers, source refresh, fitting or the projection publisher. It uses the same committed owner and exclusive dispatch lock as production. It waits for the lock within its execution limit and rechecks the capture window after acquiring it; repeated nonblocking setup polls had collided with capture ticks. The only production-side writes are inactive state/configuration/operation evidence and the existing artifact publication transaction. The forecast issuer continues using its previous qualified path.
 
 Configuration is immutable and pins the qualified state method reference, creation time and first cutoff strictly afterward. Weekly point refits remain separate. A missed state is not rebound to a later fit. A new method/code configuration needs a qualified migration; the worker cannot silently change its mathematics. The first real cutoff is prospective at installation, not a replay labeled live.
 
@@ -20,7 +20,7 @@ The existing independent watchdog reads cutoff evidence and reports a failed ope
 
 The captured-source local/Linux canaries commit three simulated future cutoffs using 3,183 real recorded game bodies. State restores exactly, empty intervals add no duplicate game effects, and 28 team-feature rows match the separate weekly builder. All 52 frozen records remain unchanged. Missing future finals in the simulation are named, not fabricated. The actual first live state is still future.
 
-The full local suite passes 238 projection tests and 218 Week 1 tests. The Linux candidate passes 71 targeted fixtures, including recovery, deadlines, missing data, owner-boundary isolation, and full dependency publication. The final source guard/output refinements also receive an actual-runtime fixture check. Exact counts/hashes are in the JSON receipts and logs.
+The full local suite passes 238 projection tests and 218 Week 1 tests. The Linux candidate passes 71 targeted fixtures; the final owner-wait refinement passes 72 Linux fixtures, including recovery, deadlines, missing data, owner-boundary isolation, and full dependency publication. The final source guard/output refinements also receive an actual-runtime fixture check. Exact counts/hashes are in the JSON receipts and logs.
 
 Not delivered by this increment: numerical activation, common Tuesday refit/closeout ordering, final issuance versus provisional previews, corrected-control authority, compatible full-pipeline rollback, durable storage capacity, statistical migration gates or the complete observed live cycle. No forecast-quality gain follows from a healthy scheduler.
 

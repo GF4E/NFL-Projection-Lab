@@ -134,13 +134,16 @@ def run(mode, host):
     OUT.mkdir(parents=True, exist_ok=True)
     with (OUT/'.cloud-dispatch.lock').open('a+') as handle:
         try:
-            fcntl.flock(handle, fcntl.LOCK_EX | (0 if mode == 'learning' else fcntl.LOCK_NB))
+            fcntl.flock(handle, fcntl.LOCK_EX | (0 if mode in ('learning','cutoff','cutoff-configure') else fcntl.LOCK_NB))
         except BlockingIOError:
             return {'state': 'LOCAL_JOB_ACTIVE'}
         record = ownership()
         if not permitted(record, host):
             return {'state': 'YIELD_TO_OWNER', 'owner': record.get('owner')}
         synchronize()
+        # A waiting state job must yield immediately if a capture window opened.
+        if mode=='cutoff' and (capture_window() or weekly_capture_window(dt.datetime.now(dt.timezone.utc))):
+            return {'state':'DEFERRED_CAPTURE_WINDOW'}
         # Recover any pending artifact publication before another worker call.
         publish_artifacts()
         if mode in ('cutoff','cutoff-configure'):

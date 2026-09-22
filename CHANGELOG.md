@@ -691,3 +691,7 @@ CONVENTIONS: one cutoff per invocation, fixed method reference, three interrupte
 Validation: 238 projection and 218 frozen-workflow tests; actual Linux canary with 71 fixtures and three simulated state commits from 3,183 recorded games. Twenty-eight feature rows match the legacy builder, 52 frozen records remain unchanged. Real cutoff scheduling is verified separately after installation; no simulated date becomes a live receipt. No new spending or provider call.
 
 Confidence: high in tested preservation and bounded recovery across the captured seasons and alternative interruption cases. Lower to medium if independent restoration or an installed fault case produces a duplicate, early observation or false success. Predictive improvement and whole-system readiness remain unproved.
+
+### Cutoff owner-wait correction
+
+Actual setup twice yielded to the busy production lock without creating configuration/state. Fixed nonblocking polls could keep colliding with capture ticks. The cutoff/configuration modes now wait for that same exclusive lock within their execution timeout, following the existing learning mode, and recheck the capture window before artifact publication. No owner bypass or concurrency is introduced. The two preserved installation waits are not successful installations. Twelve focused worker/scheduler tests and 72 final Linux fixtures pass after this correction.

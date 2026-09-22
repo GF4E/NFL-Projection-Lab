@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/install_cutoff_worker.py", line 45, in <module>
+    if r.returncode:raise RuntimeError('Cutoff worker installation failed: '+r.stderr[-1800:])
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Cutoff worker installation failed: Traceback (most recent call last):
+  File "<stdin>", line 14, in <module>
+RuntimeError: Owner lock remained busy; configuration not installed
+

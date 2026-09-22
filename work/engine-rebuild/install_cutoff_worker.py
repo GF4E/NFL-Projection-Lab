@@ -12,11 +12,11 @@ root=Path.cwd()
 assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h for p,h in EXPECTED.items()),'Host source differs'
 assert not (root/'work/projection-cutoff-state-v1/current-ref.json').exists(),'Unexpected prior numerical state'
 config=root/'work/projection-cutoff-state-v1/worker-config.json'
-for attempt in range(6):
+for attempt in range(30):
     run=subprocess.run(['runuser','-u','nflengine','--','env','OPENBLAS_NUM_THREADS=1','/opt/nfl-runtime/env/bin/python','-B','scripts/cloud_scheduler.py','cutoff-configure','--host','digitalocean:599707390'],text=True,capture_output=True,timeout=120)
     if run.returncode:raise RuntimeError('Owner-fenced configuration failed')
     if config.exists():break
-    time.sleep(5)
+    time.sleep(2+attempt%5)
 else:raise RuntimeError('Owner lock remained busy; configuration not installed')
 body=json.loads(config.read_bytes())['body'];now=datetime.datetime.now(datetime.timezone.utc)
 assert datetime.datetime.fromisoformat(body['first_cutoff'])>now,'First cutoff must remain prospective at installation'
@@ -35,7 +35,7 @@ status=subprocess.check_output(['systemctl','show','nfl-cutoff-state.service','n
 assert not (root/'work/projection-cutoff-state-v1/current-ref.json').exists()
 fs=os.statvfs(root)
 print(json.dumps({'status':'INSTALLED_WAITING_FOR_FIRST_REAL_CUTOFF','checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),
- 'host_commit':subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),'expected_source_hashes':EXPECTED,
+ 'host_commit':subprocess.check_output(['runuser','-u','nflengine','--','git','rev-parse','HEAD'],text=True).strip(),'expected_source_hashes':EXPECTED,
  'installed_unit_hashes':{n:hashlib.sha256((Path('/etc/systemd/system')/n).read_bytes()).hexdigest() for n in ('nfl-cutoff-state.service','nfl-cutoff-state.timer')},
  'configuration':body,'configuration_sha256':hashlib.sha256(config.read_bytes()).hexdigest(),'unit_status':status,'backups':backups,
  'numerical_state_created':False,'forecast_activation':False,'free_root_bytes':fs.f_bavail*fs.f_frsize,'new_spending':0,'provider_requests':0}))
