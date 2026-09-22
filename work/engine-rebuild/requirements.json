@@ -69,7 +69,9 @@
         "host-recovery-candidate.json (candidate code in memory; isolated fixtures)",
         "host-verification.json (scheduled ingestion HEALTHY, matching operation/payload, tested source hashes, unchanged fit; not outage recovery)",
         "cache-recovery-2026-09-22T0637.json (112 regenerable cache files only)",
-        "log-rotation-2026-09-22.json (nine prior log sequences preserved; no oldest archive retired)"
+        "log-rotation-2026-09-22.json (nine prior log sequences preserved; no oldest archive retired)",
+        "engine/projection/source_archive.py (prospective lossless storage; prior records unchanged)",
+        "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)"
       ]
     },
     {
@@ -93,7 +95,9 @@
         "engine/projection/recovery.py (bounded public final-feed workflow)",
         "scripts/projection_final_repair.py (explicit fenced repair)",
         "tests-projection-recovery.log",
-        "host-recovery-candidate.json (candidate code in memory; isolated fixtures)"
+        "host-recovery-candidate.json (candidate code in memory; isolated fixtures)",
+        "engine/projection/source_archive.py (prospective lossless storage; prior records unchanged)",
+        "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)"
       ]
     },
     {
@@ -248,7 +252,9 @@
         "host-verification.json (post-canary host, fit, source and reader checks)",
         "bundle-parity.json (isolated publisher timing and compressed growth)",
         "host-bundle-candidate.json (service-user/runtime fixtures, tmpfs only; no live canary yet)",
-        "host-bundle-verification.json (actual scheduled publication; no public-site equality claim)"
+        "host-bundle-verification.json (actual scheduled publication; no public-site equality claim)",
+        "engine/projection/source_archive.py (prospective lossless storage; prior records unchanged)",
+        "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)"
       ]
     },
     {

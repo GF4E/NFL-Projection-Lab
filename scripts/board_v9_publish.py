@@ -15,14 +15,10 @@ def run(board=None,shape_loader=None):
  fit=read(json.loads((ROOT/'work/projection-v1/fit-ref.json').read_text()));ref=fit['source_manifest']['schedule'];schedule=read(ref)
  # Prefer the latest already-recorded public schedule for actual rescheduled kickoffs.
  feed=json.loads((ROOT/'outputs/projection-v3/final-feed.json').read_text())
- source=feed.get('source') or feed.get('source_ref')
- if not source and feed.get('source_sha256'):
-  h=feed['source_sha256'];source={'path':f'outputs/projection-v3/final-sources/{h}.csv','sha256':h}
- if isinstance(source,dict) and source.get('path'):
-  import csv,io
-  raw=(ROOT/source['path']).read_bytes()
-  if hashlib.sha256(raw).hexdigest()!=source['sha256']:raise ValueError('Final schedule hash mismatch')
-  schedule=list(csv.DictReader(io.StringIO(raw.decode())))
+ from engine.projection.source_archive import read_source,reference
+ import csv,io
+ source=reference(feed);raw=read_source(ROOT,feed)
+ schedule=list(csv.DictReader(io.StringIO(raw.decode())))
  result=build(board,schedule,feed['games'],shape_loader);result['schedule_source']=source or ref
  def canonical(x):
   if isinstance(x,float) and x.is_integer():return int(x)

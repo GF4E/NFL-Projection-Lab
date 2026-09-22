@@ -63,3 +63,11 @@ The scoring child receives one batch of allowlisted values and existing fit/resi
 Bundles are immutable deterministic gzip records, committed before card references. An unchanged card/input/release retains its previous issued time and bundle. A release manifest records exact code files, last code-changing commit and scorer environment identity; uncommitted issuing code is refused. This does not install archived executables or implement compatible rollback. Do not switch the current-release reference to an old record as a substitute for that unfinished operation.
 
 Chronology fields explicitly distinguish captured values/hashes from source publication/first-seen/cutoff evidence missing in legacy preparation. Do not call those source vintages verified, or relabel legacy ridge centers as distribution means. Reproduction proves the captured computation; it does not validate all preceding feature construction.
+
+## Lossless final-source archives
+
+Use engine.projection.source_archive.read_source(root, feed). source_sha256 always identifies the original provider bytes. A new source_ref may additionally identify a .csv.gz artifact by its stored-byte sha256, encoding=gzip and sha256_uncompressed. Verify stored bytes first, decompress, then verify the original hash. Do not infer compression solely from a filename or silently fall back when an explicit reference fails.
+
+store_source reuses verified existing CSV or gzip evidence and completes durable retries. It only compresses a new distinct source; no historical migration/deletion occurs. Restore the exact referenced bytes on corruption. Do not rewrite received_at after a failed ingestion. The existing bounded final-reader recovery/owner rules still apply. Board-context, weekly diagnostics and watchdog use this same adapter; no line data enters the scorer.
+
+Compatibility: once a feed references gzip, a pre-adapter final-source reader is incompatible. Any later rollback must retain this storage reader or restore a verified compatible release/data combination. Never strip source_ref or manufacture a CSV fallback to make an old executable appear compatible.

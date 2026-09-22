@@ -89,20 +89,20 @@ def normalize(rows, point='point'):
 
 def load_references(root=ROOT, weekly=False):
     close_path = root/CLOSE
+    source_ref = None
     if weekly:
-        feed = root/'outputs/projection-v3/final-feed.json'
-        if feed.exists():
-            digest = read(feed).get('source_sha256')
-            candidate = root/f'outputs/projection-v3/final-sources/{digest}.csv'
-            if candidate.exists():
-                if sha(candidate) != digest:
-                    raise ValueError('Final-source hash mismatch')
-                close_path = candidate
-    with close_path.open() as handle:
-        schedules = {r['game_id']: r for r in csv.DictReader(handle)}
+        feed_path = root/'outputs/projection-v3/final-feed.json'
+        if feed_path.exists():
+            from engine.projection.source_archive import read_source,reference
+            feed = read(feed_path)
+            close_raw = read_source(root,feed)
+            source_ref = reference(feed)
+    if source_ref is None:
+        close_raw = close_path.read_bytes()
+        source_ref = {'path':str(close_path.relative_to(root)), 'sha256':sha(close_path)}
+    schedules = {r['game_id']: r for r in csv.DictReader(io.StringIO(close_raw.decode()))}
     refs = {'CLOSE': {'spread': {}, 'total': {}}, 'OPEN': {'spread': {}, 'total': {}}}
-    metadata = {'CLOSE': {'path':str(close_path.relative_to(root)), 'sha256':sha(close_path),
-                           'spread_column':'spread_line', 'total_column':'total_line'}, 'OPEN': {}}
+    metadata = {'CLOSE': {**source_ref, 'spread_column':'spread_line', 'total_column':'total_line'}, 'OPEN': {}}
     for gid,r in schedules.items():
         for target,column in [('spread','spread_line'),('total','total_line')]:
             if finite(r.get(column)):

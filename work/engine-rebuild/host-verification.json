@@ -1,20 +1,20 @@
 {
-  "checked_at": "2026-09-22T14:20:26.139966+00:00",
+  "checked_at": "2026-09-22T17:28:13.000355+00:00",
   "working_directory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6",
-  "repository_commit": "75e21cb7b2314439fa7ff453527414be14c49bda",
+  "repository_commit": "d38f982709ef005a9295050f72cf183400ae193c",
   "branch": "engine-v2",
   "foundation_is_ancestor": true,
   "source_hashes": {
     "engine/projection/storage.py": "3eb8f34870d3a55369763cd384589ab7909059fbf7ee0f1325ecc7c0dd43b22f",
-    "engine/projection/lineage.py": "39be243ab345c262fdd560fb284d25ca31aae940682aa85f936d147750eb1505",
+    "engine/projection/lineage.py": "10ce918d070d39043a9b0e410b309ac143194bb7af2d59c31001f20f3307976c",
     "engine/projection/recovery.py": "afedc5e5cfc0d99d8988ddb18c879ad08ba8773abd4362ead800a94feeb32a9a",
     "engine/projection/watchdog.py": "9777b69763bde1680777d29715e284f4505a45f121c4e28bdada3ca908d50bc7",
     "scripts/projection_watchdog.py": "3a128b6260af90f0c468749fafb008293b882df7d2c9fa28ab630acd189d4285",
-    "engine/projection/finals.py": "4ae08b636de91016e9bbf74df13eca1feffadf8cf152e79a14c74aac9700a488",
+    "engine/projection/finals.py": "0049ec53b96ad110bcdd87abe6cbd2cae8561dec6e8f7d158b888ea78b2792f4",
     "scripts/projection_final_repair.py": "b3e80aabc7831218748b412dec0ee15f9004de23a5de27f902bb89ab3e7b9cd3",
     "engine/forecast_system/calendar.py": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b",
     "scripts/projection_publish.py": "24b43f664b613978aa964c0d954b63f212fc3e9b425cc2d08d1053dfa4f66f3a",
-    "scripts/projection_v3_publish.py": "ce454a527996a0eee39579ec72d735f5ed2d4d75fe23770e12ee37dcf7b47776",
+    "scripts/projection_v3_publish.py": "dd09628b6ae8f895c6c5ec00ffe20bcaf0bdb7a2d16bf5d3624d9068ba425bd3",
     "engine/projection_experiments.py": "869044f2abaf079a9f317a25fdb6e69fd61b037ffddca3a6ecea2fd1b7a3c8f3"
   },
   "tracked_modified_paths": [],
@@ -23,8 +23,8 @@
     "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
   },
   "active_fit_verified": true,
-  "free_bytes": 83169280,
-  "free_inodes": 1014798,
+  "free_bytes": 39784448,
+  "free_inodes": 1013574,
   "services": {
     "nfl-engine-capture.service": [
       "Result=success",
@@ -35,30 +35,30 @@
     ],
     "nfl-engine-daily.service": [
       "Result=success",
-      "ExecMainExitTimestamp=Tue 2026-09-22 14:01:49 UTC",
+      "ExecMainExitTimestamp=Tue 2026-09-22 17:00:00 UTC",
       "ExecMainStatus=0",
       "ActiveState=inactive",
       "SubState=dead"
     ],
     "nfl-engine-watchdog.service": [
       "Result=success",
-      "ExecMainExitTimestamp=Tue 2026-09-22 14:20:14 UTC",
+      "ExecMainExitTimestamp=",
       "ExecMainStatus=0",
-      "ActiveState=inactive",
-      "SubState=dead"
+      "ActiveState=activating",
+      "SubState=start"
     ]
   },
   "final_feed_recovery": {
     "state": "HEALTHY",
-    "last_success_at": "2026-09-22T14:19:21.499484+00:00",
+    "last_success_at": "2026-09-22T17:28:02.844815+00:00",
     "operation_matches": true,
     "payload_matches": true,
     "owner": "nfl-engine-primary:1000",
     "reason": null,
     "resources": {
-      "free_bytes": 78528512,
-      "free_inodes": 1014805,
-      "measured_at": "2026-09-22T14:19:21.261122+00:00",
+      "free_bytes": 39907328,
+      "free_inodes": 1013585,
+      "measured_at": "2026-09-22T17:28:02.596341+00:00",
       "scope": "Current free resources, not a proven job-headroom reserve"
     }
   }

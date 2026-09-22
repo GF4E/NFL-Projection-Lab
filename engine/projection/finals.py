@@ -47,22 +47,18 @@ def parse(raw):
 
 
 def _verified_source(root, feed):
-    sha=feed['source_sha256']
-    if len(sha)!=64 or any(c not in '0123456789abcdef' for c in sha):
-        raise ValueError('Invalid final source hash')
-    raw=(root/'outputs/projection-v3/final-sources'/f'{sha}.csv').read_bytes()
-    if hashlib.sha256(raw).hexdigest()!=sha:
-        raise ValueError('Final source hash mismatch')
+    from engine.projection.source_archive import read_source
+    return read_source(root,feed)
 
 
 def _commit_feed(root,recovery,old,raw,finals):
-    from engine.projection.storage import write_bytes,save
+    from engine.projection.storage import save
+    from engine.projection.source_archive import store_source
     sha=hashlib.sha256(raw).hexdigest()
-    source=root/'outputs/projection-v3/final-sources'/f'{sha}.csv'
-    value={'received_at':recovery.now.isoformat(),'source_sha256':sha,
+    source_ref=store_source(root,raw)
+    value={'received_at':recovery.now.isoformat(),'source_sha256':sha,'source_ref':source_ref,
            'games':{**old.get('games',{}),**finals},
            'refresh_operation_id':recovery.state['operation_id']}
-    write_bytes(source,raw,immutable=True)
     recovery.output_intent(value)
     save(root/'outputs/projection-v3/final-feed.json',value)
     return recovery.success(value)
@@ -147,7 +143,8 @@ def resume_after_repair(root,reason,now=None,fetch=None,owner=None):
         finals=parse(raw)  # Failure leaves the existing latch untouched.
         recovery.now=now if fixed_time else dt.datetime.now(dt.timezone.utc)
         sha=hashlib.sha256(raw).hexdigest()
-        write_bytes(root/'outputs/projection-v3/final-sources'/f'{sha}.csv',raw,immutable=True)
+        from engine.projection.source_archive import store_source
+        store_source(root,raw)
         proof={'previous_state_sha256':previous,'reason':reason,'owner':owner,
                'validated_at':recovery.now.isoformat(),'source_sha256':sha,
                'source_rows':len(finals),'validation':'parsed public finals; durable source write'}

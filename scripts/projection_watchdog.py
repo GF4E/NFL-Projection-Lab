@@ -68,11 +68,9 @@ def source_snapshot(root, now, epoch):
     now = now or dt.datetime.now(UTC)
     if stamp(feed['received_at']) > now:
         raise ValueError('Future final retrieval')
+    from engine.projection.source_archive import read_source
+    read_source(root,feed)
     sha = feed['source_sha256']
-    if len(sha) != 64 or any(c not in '0123456789abcdef' for c in sha):
-        raise ValueError('Invalid final source hash')
-    if hashlib.sha256((out/'final-sources'/f'{sha}.csv').read_bytes()).hexdigest() != sha:
-        raise ValueError('Final source hash mismatch')
     matched = {}
     fields = ('version', 'projection', 'ours', 'evidence', 'freeze_time')
     for card in board['games']:

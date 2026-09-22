@@ -1,5 +1,17 @@
 # Rebuild status
 
+Goal ACTIVE. All adopted requirements remain in requirements.json. The previous increment deployed immutable scoring bundles and preserved the point model. This increment reduces future final-source archive growth after fresh host inspection found only about 40 MB of root headroom. No statistical candidate is fitted or promoted.
+
+Implemented prospectively: deterministic lossless gzip for new distinct final sources, exact original and stored-byte hashes, durable same-payload reuse, and one verification adapter across final ingestion/repair, watchdog, board-context and weekly diagnostics. Old CSVs are retained and readable. No archive is migrated, deleted or overwritten. No source timestamps, parsed values, model inputs or scores change. Capacity approval and backup restoration remain unresolved.
+
+Before release: 153 projection tests, 45 archive/recovery/watchdog tests under the actual Linux service identity/runtime, plus reference/board/frozen-workflow checks. The current actual source round-trip preserves all bytes and 7,308 parsed finals, reducing 2,179,542 bytes to 508,398. Existing host source archives total 729,806,574 bytes across 335 objects; all remain. At 17:34:32Z root free bytes were 39,333,888. This is a storage-growth reduction, not durable headroom. Host publication verification is pending after push.
+
+Next: verify the scheduled reader and source-remote artifacts after release; continue compatible executable rollback and consumer/source-time migrations, then E-CAL-LINEAGE and E-VENUE-DIRECT under the actual weekly preconditions. The existing capacity/migration approval request remains pending. No provider credits or new spending in this increment.
+
+Least certain: sustainable capacity, because old archives/system growth remain and new compression cannot recover their occupied space. Confidence: near-total in lossless preservation—exact-byte arithmetic on a verified source. Lower to high if an independent decompression or parser comparison differs. This does not rate full operational readiness or predictive improvement.
+
+## Prior verified bundle increment (preserved history)
+
 Goal ACTIVE. The complete adopted scope is preserved in requirements.json. The current increment adds a strict scoring boundary and immutable forecast records; no statistical candidate was fitted or promoted.
 
 REVIEW REQUESTED — Tier 2: source event/publication/first-seen times and the numerical state cutoff absent from legacy prepared rows remain NOT_RECORDED. New bundles capture the exact values and declared source hashes without inventing those earlier times. The alternative of suspending all otherwise valid legacy forecasts was not taken. Full source-vintage and cadence qualification remains open. Earlier Mac observer, detection-budget and storage limitations still apply.
