@@ -45,6 +45,32 @@
   },
   "experiments": [
     {
+      "authority": "Active researched-rebuild user goal, 2026-09-21 Pacific",
+      "id": "E-CAL-LINEAGE",
+      "name": "E-CAL-LINEAGE",
+      "policy": "work/engine-rebuild/adoption.json",
+      "prerequisites": [
+        "published Tuesday closeout",
+        "verified authoritative production control",
+        "full executable gap sweep",
+        "hashed preregistration before comparative results"
+      ],
+      "state": "ADOPTED_PENDING_PREREGISTRATION"
+    },
+    {
+      "authority": "Active researched-rebuild user goal, 2026-09-21 Pacific",
+      "id": "E-VENUE-DIRECT",
+      "name": "E-VENUE-DIRECT",
+      "policy": "work/engine-rebuild/adoption.json",
+      "prerequisites": [
+        "published Tuesday closeout",
+        "verified authoritative production control",
+        "full executable gap sweep",
+        "hashed preregistration before comparative results"
+      ],
+      "state": "ADOPTED_PENDING_PREREGISTRATION"
+    },
+    {
       "blockers": [
         "B01: coefficient uncertainty definition; Tier 3 before fitting"
       ],
@@ -353,7 +379,7 @@
     "dome/warm-built offense in cold",
     "lead-time reporting"
   ],
-  "next_experiment": "E-QB-DIRECT",
+  "next_experiment": "E-CAL-LINEAGE",
   "one_experiment_per_week": true,
   "prerequisites": {
     "E1_candidate_count": "Resolved: unchanged linear control is outside cap; three challengers k4,k8,state-space.",
@@ -366,6 +392,12 @@
     "results_already_seen": true,
     "state": "SUPERSEDED_EXPLORATORY"
   },
+  "rebuild_order": [
+    "E-CAL-LINEAGE",
+    "E-VENUE-DIRECT",
+    "E-QB-DIRECT",
+    "preserved remaining queue"
+  ],
   "schema": "projection-experiment-queue-v1",
   "scope_policy": "work/projection-governance-v2/ANALYTICS-SCOPE.md",
   "standing_confidence_and_premise": "work/projection-governance-v2/CONFIDENCE-AND-PREMISE.md"

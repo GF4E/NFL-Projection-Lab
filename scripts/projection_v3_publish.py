@@ -9,6 +9,7 @@ from engine.projection_v3.qualify import read
 from engine.projection.train import paired
 from engine.projection.grade import score
 from engine.projection.distribution import summarize
+from engine.forecast_system.calendar import schedule_kickoff
 OUT=ROOT/'outputs/projection-v3';WORK=ROOT/'work/projection-v3'
 
 def shape_for(card,artifact):
@@ -42,7 +43,7 @@ def run(now=None,require_synced_entries=False):
  for gid,pair in sorted(groups.items()):
   g=copy.deepcopy(pair['home']['game']);week=int(g['week'])
   if week>min(18,max([int(r['week']) for r in rows if r.get('actual_points') is not None]+[1])+1):continue
-  kickoff=dt.datetime.fromisoformat(g['gameday']+'T'+g['gametime']).replace(tzinfo=ZoneInfo('America/New_York')).astimezone(dt.timezone.utc);cutoff=kickoff-dt.timedelta(minutes=75);g.update(kickoff_at=kickoff.isoformat(),cutoff_at=cutoff.isoformat());lockpath=OUT/'locks'/f'{gid}.json';livepath=OUT/'live'/f'{gid}.json';gradepath=OUT/'grades'/f'{gid}.json';old=legacy.get(gid)
+  kickoff=schedule_kickoff(g['gameday'],g['gametime']);cutoff=kickoff-dt.timedelta(minutes=75);g.update(kickoff_at=kickoff.isoformat(),cutoff_at=cutoff.isoformat());lockpath=OUT/'locks'/f'{gid}.json';livepath=OUT/'live'/f'{gid}.json';gradepath=OUT/'grades'/f'{gid}.json';old=legacy.get(gid)
   final=g.get('home_score') not in (None,'') and g.get('away_score') not in (None,'');entry=next((e for e in entries if e['game_id']==gid and not e.get('post_lock') and stamp(e['entered_at'])<cutoff),None)
   if lockpath.exists():card=json.loads(lockpath.read_text())
   elif old and (old['status'] in ('LOCKED','FINAL') or old.get('evidence')=='RETROSPECTIVE'):card=copy.deepcopy(old)

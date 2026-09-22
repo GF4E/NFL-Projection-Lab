@@ -482,3 +482,14 @@ Verified active score path omits direct venue while historical home-margin bias 
 Host zero-free-space failures were observed. Previously authorized cache-only recovery removed 69 APT index files (206,257,595 bytes), itemized in work/engine-audit-2026-09-21; no artifact of record removed. Subsequent service exit succeeded; 152 MiB remains, so durable capacity is unresolved. No paid infrastructure or provider call.
 
 Report, reproducible audit, test logs, and controlled rebuild recommendation: work/engine-audit-2026-09-21/REPORT.md and REBUILD.md. 280 existing tests pass. No model replacement, queue reorder, gate change, lock rewrite, or website change. Confidence high in the structural diagnosis; future accuracy improvement remains unproved.
+
+
+## 2026-09-21 — Researched rebuild adopted by active user goal
+
+Adoption/source hash, full requirement map and tiered sweep are recorded in work/engine-rebuild. The new goal adopts the explicit E-CAL-LINEAGE uncertainty-only gate with unchanged point forecasts, then E-VENUE-DIRECT, provider-defined Eastern schedule timestamps, and mean-target semantics with legacy conventions preserved until qualified. Standard point-MAE gates and required reviews remain unchanged. No candidate has been fitted, promoted or silently retried. Three release lanes distinguish numerical-parity infrastructure, disclosed chronology/source corrections, and statistical methods. Durable storage needs separate spending authority; authorized APT-cache-only recovery is itemized in cache-recovery.json.
+
+### Rebuild foundation implementation (no statistical promotion)
+
+Projection saves now retain the existing canonical JSON bytes while using file fsync, same-filesystem atomic commits and directory fsync. Immutable records use atomic create-if-absent; identical retries preserve the record, conflicting retries fail. Final source blobs use the same contract. Shared Eastern-time schedule parsing reproduces all 2,639 historical kickoff instants. The newly adopted E-CAL-LINEAGE gate is isolated to that experiment: unchanged point forecasts, >=1% team CRPS gain, all-target coverage and nonworsening interval scores. No other experiment can borrow the exception.
+
+Evidence: work/engine-rebuild/{foundation.json,calendar-check.json,host-storage-canary.json,tests-*.log}. 304 local tests and nine disposable-file Linux storage tests passed. Frozen audit reproduction is the 15-game snapshot, not a new Week 2 closeout. Cache recovery removed only 55 regenerable package files (111,750,663 bytes); itemized receipt and authority-pending storage plan retained. Goal remains active; workflow recovery, exact-hash bundle integration, numerical cadence replay, statistical decisions and verified full release remain unfinished.

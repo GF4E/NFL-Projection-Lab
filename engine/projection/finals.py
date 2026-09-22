@@ -39,8 +39,8 @@ def refresh(root, now=None, fetch=None):
         raw=fetch() if fetch else urllib.request.urlopen(URL,timeout=8).read()
         finals=parse(raw); digest=hashlib.sha256(raw).hexdigest()
         source=root/'outputs/projection-v3/final-sources'/f'{digest}.csv'
-        source.parent.mkdir(parents=True,exist_ok=True)
-        if not source.exists(): source.write_bytes(raw)
+        from engine.projection.storage import write_bytes
+        write_bytes(source,raw,immutable=True)
         save(path,{'received_at':now.isoformat(),'source_sha256':digest,'games':{**old.get('games',{}),**finals}})
         return {'state':'REFRESHED','finals':len(finals)}
     except (OSError, ValueError, TimeoutError):

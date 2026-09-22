@@ -1,0 +1,13 @@
+{
+  "checked_at": "2026-09-22T05:38:57.067853+00:00",
+  "scope": "Disposable host files only; not a live publication or whole-system canary",
+  "module_sha256": "3eb8f34870d3a55369763cd384589ab7909059fbf7ee0f1325ecc7c0dd43b22f",
+  "python": "3.12.3",
+  "platform": "Linux-6.8.0-124-generic-x86_64-with-glibc2.39",
+  "tests": 9,
+  "failures": 0,
+  "errors": 0,
+  "success": true,
+  "filesystem_block_size": 4096,
+  "test_output": "test_concurrent_different_immutable_writers_cannot_overwrite (storage_canary.DurableProjectionTests.test_concurrent_different_immutable_writers_cannot_overwrite) ... ok\ntest_concurrent_identical_writers_converge (storage_canary.DurableProjectionTests.test_concurrent_identical_writers_converge) ... ok\ntest_directory_fsync_failure_is_not_reported_as_success (storage_canary.DurableProjectionTests.test_directory_fsync_failure_is_not_reported_as_success) ... ok\ntest_existing_wire_format_and_immutable_retry (storage_canary.DurableProjectionTests.test_existing_wire_format_and_immutable_retry) ... ok\ntest_failed_replace_preserves_old_bytes_and_cleans_only_staging (storage_canary.DurableProjectionTests.test_failed_replace_preserves_old_bytes_and_cleans_only_staging) ... ok\ntest_file_fsync_failure_does_not_publish (storage_canary.DurableProjectionTests.test_file_fsync_failure_does_not_publish) ... ok\ntest_invalid_json_and_symlink_do_not_touch_record (storage_canary.DurableProjectionTests.test_invalid_json_and_symlink_do_not_touch_record) ... ok\ntest_post_commit_failure_retries_without_duplicate_or_rewrite (storage_canary.DurableProjectionTests.test_post_commit_failure_retries_without_duplicate_or_rewrite) ... ok\ntest_raw_content_addressed_blob_is_not_overwritten (storage_canary.DurableProjectionTests.test_raw_content_addressed_blob_is_not_overwritten) ... ok\n\n----------------------------------------------------------------------\nRan 9 tests in 0.144s\n\nOK\n"
+}

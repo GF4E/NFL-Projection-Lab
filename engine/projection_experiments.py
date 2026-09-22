@@ -9,6 +9,55 @@ def digest(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
 
 
+CALIBRATION_GATE = 'calibration_lineage_v1'
+POINT_TOLERANCE = 1e-12
+
+
+def _number(value):
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value):
+        raise ValueError('Finite numerical gate evidence required')
+    return value
+
+
+def _calibration_reasons(registration, evidence):
+    """Only the adopted E-CAL-LINEAGE exception; never a method activation."""
+    reasons=[]
+    if registration.get('point_tolerance') != POINT_TOLERANCE:
+        reasons.append('POINT_TOLERANCE_NOT_REGISTERED')
+    try:
+        before=_number(evidence['before_team_crps']);after=_number(evidence['after_team_crps'])
+        if before<=0 or after<0 or (before-after)/before<.01-1e-12:
+            reasons.append('TEAM_CRPS_GATE')
+        for target in ('team','margin','total'):
+            for level in ('50','80'):
+                cov=_number(evidence['coverage'][target][level])
+                if abs(cov-int(level)/100)>.03+1e-12:
+                    reasons.append('COVERAGE_GATE')
+                old=_number(evidence['before_interval_score'][target][level])
+                new=_number(evidence['after_interval_score'][target][level])
+                if old<0 or new<0 or new>old+1e-12:
+                    reasons.append('INTERVAL_SCORE_GATE')
+        old=_number(evidence['before_team_mae']);new=_number(evidence['after_team_mae'])
+        if old<0 or new<0 or abs(old-new)>POINT_TOLERANCE:
+            reasons.append('POINT_MAE_CHANGED')
+        ids=evidence['baseline_game_ids']
+        rows=evidence['point_forecasts']
+        if len(rows)!=len(ids) or len({r['game_id'] for r in rows})!=len(rows) or set(r['game_id'] for r in rows)!=set(ids):
+            reasons.append('POINT_POPULATION_MISMATCH')
+        for row in rows:
+            for field in ('away','home','margin','total'):
+                old=_number(row['before'][field]);new=_number(row['after'][field])
+                if abs(old-new)>POINT_TOLERANCE:
+                    reasons.append('POINT_FORECAST_CHANGED_OUT_OF_SCOPE')
+            for side in ('before','after'):
+                value=row[side]
+                if abs(value['margin']-(value['home']-value['away']))>POINT_TOLERANCE or abs(value['total']-(value['home']+value['away']))>POINT_TOLERANCE:
+                    reasons.append('POINT_IDENTITIES_INVALID')
+    except (KeyError,TypeError,ValueError):
+        reasons.append('MISSING_CALIBRATION_GATE_EVIDENCE')
+    return reasons
+
+
 def release_eligibility(registration, evidence, reviews):
     """Validate a registered result and two independent completed review records.
 
@@ -33,12 +82,18 @@ def release_eligibility(registration, evidence, reviews):
     if evidence.get('population')!='HISTORICAL_DEVELOPMENT':reasons.append('MISLABELED_HISTORICAL_EVIDENCE')
     for field in ('nested_chronology_verified','candidate_specific_calibration','paired_uncertainty','current_as_issued_comparison','separation_tests_passed','immutability_tests_passed'):
         if evidence.get(field) is not True:reasons.append(field.upper())
-    try:
-        before=evidence['before_team_mae'];after=evidence['after_team_mae']
-        if not all(math.isfinite(v) for v in (before,after)) or before<=0 or after<0 or (before-after)/before<.01-1e-12:reasons.append('TEAM_MAE_GATE')
-        coverage=evidence['coverage']
-        if any(coverage[t][str(level)] is None or not math.isfinite(coverage[t][str(level)]) or abs(coverage[t][str(level)]-level/100)>.03+1e-12 for t in ('margin','total') for level in (50,80)):reasons.append('COVERAGE_GATE')
-    except (KeyError,TypeError,ValueError):reasons.append('MISSING_GATE_EVIDENCE')
+    policy=registration.get('gate_policy','standard_point_v1')
+    if policy==CALIBRATION_GATE and registration.get('experiment')=='E-CAL-LINEAGE':
+        reasons.extend(_calibration_reasons(registration,evidence))
+    else:
+        if policy!='standard_point_v1' or registration.get('experiment')=='E-CAL-LINEAGE':
+            reasons.append('UNREGISTERED_GATE_POLICY')
+        try:
+            before=evidence['before_team_mae'];after=evidence['after_team_mae']
+            if not all(math.isfinite(v) for v in (before,after)) or before<=0 or after<0 or (before-after)/before<.01-1e-12:reasons.append('TEAM_MAE_GATE')
+            coverage=evidence['coverage']
+            if any(coverage[t][str(level)] is None or not math.isfinite(coverage[t][str(level)]) or abs(coverage[t][str(level)]-level/100)>.03+1e-12 for t in ('margin','total') for level in (50,80)):reasons.append('COVERAGE_GATE')
+        except (KeyError,TypeError,ValueError):reasons.append('MISSING_GATE_EVIDENCE')
     if evidence.get('registered_extra_gates_passed') is not True:reasons.append('EXPERIMENT_SPECIFIC_GATE')
     if 'data_corrections' not in evidence:reasons.append('CORRECTION_DISCLOSURE_MISSING')
     if evidence.get('another_method_promoted_this_week'):reasons.append('WEEKLY_METHOD_SLOT_USED')

@@ -1,0 +1,204 @@
+{
+  "scope": "Complete referenced specification; no narrowing",
+  "requirements": [
+    {
+      "id": "1",
+      "requirement": "Adoption, authority, tiered gap sweep and durable handoff",
+      "planned_evidence": [
+        "PLAN.md",
+        "GAP-SWEEP.md",
+        "STATUS.md",
+        "adoption.json"
+      ],
+      "acceptance": "Read current sources; preserve permissions; map every requirement",
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "adoption.json",
+        "PLAN.md",
+        "GAP-SWEEP.md",
+        "STATUS.md"
+      ]
+    },
+    {
+      "id": "2",
+      "requirement": "Freeze and independent foundation reproduction",
+      "planned_evidence": [
+        "foundation.json",
+        "audit-reproduction.log"
+      ],
+      "acceptance": "Host/code/environment/input/fit/calibration/control hashes; independent ridge/metric/feature reconstruction; row invariance",
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "foundation.json",
+        "audit-reproduction/results.json",
+        "audit-reproduction.log"
+      ]
+    },
+    {
+      "id": "3",
+      "requirement": "Three release lanes",
+      "planned_evidence": [
+        "release-policy.json",
+        "tests/test_projection_rebuild.py"
+      ],
+      "acceptance": "Numeric parity versus corrected-control disclosure versus registered method eligibility",
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "adoption.json",
+        "engine/projection_experiments.py (gate isolation only)"
+      ]
+    },
+    {
+      "id": "4a",
+      "requirement": "Storage, recovery state machine, retries and checkpointing",
+      "planned_evidence": [
+        "storage-plan.json",
+        "engine/projection/recovery.py"
+      ],
+      "acceptance": "Disk/inodes/writes; bounded safe actions; idempotent work keys; uncertain-provider receipts",
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "storage-plan.json (authority pending)",
+        "cache-recovery.json (temporary capacity only)"
+      ]
+    },
+    {
+      "id": "4b",
+      "requirement": "Atomic commit and immutable history",
+      "planned_evidence": [
+        "engine/projection/storage.py",
+        "tests/test_projection_storage.py"
+      ],
+      "acceptance": "Crash/concurrency tests, old-format byte parity and no changed committed record",
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "engine/projection/storage.py",
+        "tests/test_projection_storage.py",
+        "host-storage-canary.json (9 disposable-host tests; workflow transaction pending)"
+      ]
+    },
+    {
+      "id": "4c",
+      "requirement": "Independent watchdog, SLOs and restoration",
+      "planned_evidence": [
+        "ops/cloud",
+        "watchdog-evidence.json",
+        "restore-evidence.json"
+      ],
+      "acceptance": "Expected versus observed deadlines; watchdog heartbeat; backup restore; accurate failure-domain and freshness claims",
+      "state": "INCOMPLETE",
+      "observed_evidence": []
+    },
+    {
+      "id": "5",
+      "requirement": "Immutable forecast/release bundle and source lineage",
+      "planned_evidence": [
+        "engine/projection/bundle.py",
+        "bundle-parity.json"
+      ],
+      "acceptance": "All consumers resolve exact hashes; typed football-only worker; labels isolated; compatible rollback; frozen records retained",
+      "state": "INCOMPLETE",
+      "observed_evidence": []
+    },
+    {
+      "id": "6",
+      "requirement": "Source timezone and three-cutoff production/replay",
+      "planned_evidence": [
+        "engine/forecast_system/cadence.py",
+        "calendar-replay.json",
+        "host-schedule.txt"
+      ],
+      "acceptance": "All 2639 games plus DST/international/reschedule/equality cases; input actually available; no duplicate observation; numerical direct/downstream counts",
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "calendar-check.json (calendar eligibility only, not numerical replay)",
+        "tests/test_projection_time_contract.py"
+      ]
+    },
+    {
+      "id": "7",
+      "requirement": "Mean/median/distribution semantics and contributions",
+      "planned_evidence": [
+        "forecast-contract.json",
+        "contract-evidence.json"
+      ],
+      "acceptance": "Mean identities only where valid; tie definition; interval nesting/support; no forced probability direction; no fake compression target",
+      "state": "INCOMPLETE",
+      "observed_evidence": []
+    },
+    {
+      "id": "8",
+      "requirement": "E-CAL-LINEAGE registered gate and disposition",
+      "planned_evidence": [
+        "e-cal-lineage/registration.json",
+        "e-cal-lineage/decision.json"
+      ],
+      "acceptance": "Frozen points; >=1% team CRPS; all-target 50/80 coverage +/-3pp and nonworsening interval scores; reviews and released migration if qualified",
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "engine/projection_experiments.py",
+        "tests/test_projection_calibration_gate.py (policy implementation only; not a fitted experiment)"
+      ]
+    },
+    {
+      "id": "9",
+      "requirement": "E-VENUE-DIRECT registered gate and disposition",
+      "planned_evidence": [
+        "e-venue-direct/registration.json",
+        "e-venue-direct/decision.json"
+      ],
+      "acceptance": "Separate weekly slot; smallest registered feature; authoritative control; standard accuracy gate; annual bias/stability",
+      "state": "INCOMPLETE",
+      "observed_evidence": []
+    },
+    {
+      "id": "10a",
+      "requirement": "Closeout/refit/experiment order, clocks and queue",
+      "planned_evidence": [
+        "sequence-evidence.json",
+        "work/projection-governance-v2/queue.json"
+      ],
+      "acceptance": "No experiment before published complete closeout; weight-only refit; one method; truthful INCONCLUSIVE/missed slot; real reviewer evidence",
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "work/projection-governance-v2/queue.json (order adopted; scheduling still incomplete)"
+      ]
+    },
+    {
+      "id": "10b",
+      "requirement": "Trial ledger, diagnostics and prospective evidence",
+      "planned_evidence": [
+        "trial-ledger.json",
+        "prospective-plan.json"
+      ],
+      "acceptance": "Every attempt retained; nested past-only folds; paired and block uncertainty; no repeated-peeking promotion; pre-lock edits; market separation",
+      "state": "INCOMPLETE",
+      "observed_evidence": []
+    },
+    {
+      "id": "11",
+      "requirement": "Resource protection and verified deployment/rollback",
+      "planned_evidence": [
+        "resource-evidence.json",
+        "deployment-evidence.json"
+      ],
+      "acceptance": "Budgets and production priority; passive comparisons; safe canary; actual host/output hashes; immutable rollback; all listed failure fixtures",
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "host-storage-canary.json (storage primitive only)"
+      ]
+    },
+    {
+      "id": "12",
+      "requirement": "Full acceptance matrix/runbook/live cycle",
+      "planned_evidence": [
+        "STATUS.md",
+        "RUNBOOK.md",
+        "completion-audit.json"
+      ],
+      "acceptance": "Every requirement verified; simulated vs observed explicit; reliability and achieved accuracy separate; remaining human dependencies named",
+      "state": "INCOMPLETE",
+      "observed_evidence": []
+    }
+  ]
+}
