@@ -1,0 +1,67 @@
+{
+  "scope": "Reproduction of frozen 15-game audit, not updated Week 2 scorecard",
+  "frozen_input_commit": "9b8ad491b78530b29475baae69e7ab3ca1b106c4",
+  "reproduction_parent_commit": "e25dfba0c4572bcf2ef40d226227915d3fa318be",
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-f7fc497ee581c3a948388891904b52669e345bae1a61c684281034505b5840e4.json",
+    "sha256": "f7fc497ee581c3a948388891904b52669e345bae1a61c684281034505b5840e4"
+  },
+  "independent_fit_reproduction": {
+    "training_rows": 5822,
+    "current_season_rows": 32,
+    "exact_match": true,
+    "training_hash": "e53f584bfe47ca76ca3cd388b52103ef20d2aff297700d0d289da98f596721df",
+    "groups": [
+      "calibration",
+      "elo"
+    ],
+    "features": [
+      "baseline",
+      "elo",
+      "elo_difference"
+    ],
+    "coefficients": {
+      "coefficients": [
+        -0.33593290517925284,
+        0.8712676552676972,
+        1.3423874410445251
+      ],
+      "groups": [
+        "calibration",
+        "elo"
+      ],
+      "intercept": 2.8980271587295334,
+      "means": [
+        19.905648554083932,
+        -0.0237165415032361,
+        0.0
+      ],
+      "names": [
+        "baseline",
+        "elo",
+        "elo_difference"
+      ],
+      "penalty": 10,
+      "scales": [
+        1.6739603372761311,
+        94.92973580532556,
+        133.20962144960913
+      ],
+      "training_hash": "e53f584bfe47ca76ca3cd388b52103ef20d2aff297700d0d289da98f596721df"
+    },
+    "independent_augmented_least_squares_max_coefficient_delta": 7.327471962526033e-15,
+    "raw_point_formula": {
+      "intercept": 6.892940641471121,
+      "coefficients": {
+        "baseline": 0.7993184798357391,
+        "elo": 0.009178026757120913,
+        "elo_difference": 0.010077255880141711
+      }
+    }
+  },
+  "historical_control": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
+  "historical_control_sha256": "66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f",
+  "historical_team_mae": 7.575628833271496,
+  "week2_frozen_team_mae": 8.856137231299734,
+  "all_frozen_lock_grade_checks_passed": true
+}

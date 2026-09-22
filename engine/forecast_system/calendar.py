@@ -22,7 +22,10 @@ def next_cutoff(value):
     return (local+timedelta(days=7)).astimezone(timezone.utc)
 
 def schedule_kickoff(day,time):
-    return datetime.fromisoformat(day+'T'+time).replace(tzinfo=EASTERN).astimezone(timezone.utc)
+    local = datetime.fromisoformat(day+'T'+time)
+    if local.tzinfo is not None:
+        raise ValueError('Schedule gametime must be naive Eastern; use timestamp for an aware instant')
+    return local.replace(tzinfo=EASTERN).astimezone(timezone.utc)
 
 def plan(games):
     """Return frozen forecast batches and strictly available observations per cutoff.

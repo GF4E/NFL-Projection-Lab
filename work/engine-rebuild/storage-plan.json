@@ -1,0 +1,26 @@
+{
+  "status": "AWAITING_SPENDING_AND_VERIFIED_MIGRATION_AUTHORITY",
+  "host_root_device_bytes": 10737418240,
+  "observed_free_bytes_before": 48603136,
+  "observation_at": "2026-09-22T05:26:51Z",
+  "growth_note": "Source audit outputs grew from about 894 MiB to 942 MiB and work from about 1.7 GiB to 1.8 GiB; APT indexes also regrew. Approximate du samples are not a fitted growth rate. Continuous measurement and peak-write profiling remain required.",
+  "cache_receipt": "cache-recovery.json",
+  "proposed_volume_gib": 20,
+  "monthly_usd": 2.0,
+  "pricing_source": "https://docs.digitalocean.com/products/volumes/details/pricing/",
+  "price_basis": "$0.10 per GiB-month, before taxes; no charge incurred",
+  "migration": [
+    "Confirm host region/support and existing storage allocations before purchase",
+    "Provision within approved $2/month incremental cap",
+    "Copy repository runtime artifacts and required state with source/destination hash manifest and restore test",
+    "Fence scheduler during mount/path switch; preserve paths, ownership and all records",
+    "Remove only source copies proven identical and durably restorable after successful cutover, if expressly authorized",
+    "Verify host writes, rollback, and free-space headroom; continue measured capacity tracking"
+  ],
+  "not_claimed_complete": [
+    "measured peak-write reserve",
+    "outside-host backup restore",
+    "migration",
+    "live headroom SLO"
+  ]
+}

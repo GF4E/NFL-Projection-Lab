@@ -9,12 +9,8 @@ from engine.projection.grade import score
 OUT=ROOT/'outputs/projection-v1';WORK=ROOT/'work/projection-v1'
 def stamp(x):return dt.datetime.fromisoformat(x.replace('Z','+00:00'))
 def save(path,value,immutable=False):
- path.parent.mkdir(parents=True,exist_ok=True);raw=json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False)+'\n'
- if immutable and path.exists():
-  if path.read_text()!=raw:raise ValueError('Frozen projection changed')
-  return
- if path.exists() and path.read_text()==raw:return
- tmp=path.with_suffix('.tmp');tmp.write_text(raw);os.replace(tmp,path)
+ from engine.projection.storage import save as durable_save
+ durable_save(path,value,immutable)
 def sync():
  p=ROOT/'.cloud-private/note-access.json';key=os.environ.get('NOTE_SYNC_KEY') or (json.loads(p.read_text()).get('NOTE_SYNC_KEY') if p.exists() else None)
  if not key:return False
