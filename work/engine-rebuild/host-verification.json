@@ -1,12 +1,15 @@
 {
-  "checked_at": "2026-09-22T05:56:51.089088+00:00",
+  "checked_at": "2026-09-22T06:23:36.645188+00:00",
   "working_directory": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6",
-  "repository_commit": "d00ed3667c819d040a5820550433878552ac4c0e",
+  "repository_commit": "ecef2417de1c2a6c370a3414e528a69b2aa666e4",
   "branch": "engine-v2",
   "foundation_is_ancestor": true,
   "source_hashes": {
     "engine/projection/storage.py": "3eb8f34870d3a55369763cd384589ab7909059fbf7ee0f1325ecc7c0dd43b22f",
     "engine/projection/lineage.py": "39be243ab345c262fdd560fb284d25ca31aae940682aa85f936d147750eb1505",
+    "engine/projection/recovery.py": "afedc5e5cfc0d99d8988ddb18c879ad08ba8773abd4362ead800a94feeb32a9a",
+    "engine/projection/finals.py": "4ae08b636de91016e9bbf74df13eca1feffadf8cf152e79a14c74aac9700a488",
+    "scripts/projection_final_repair.py": "b3e80aabc7831218748b412dec0ee15f9004de23a5de27f902bb89ab3e7b9cd3",
     "engine/forecast_system/calendar.py": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b",
     "scripts/projection_publish.py": "24b43f664b613978aa964c0d954b63f212fc3e9b425cc2d08d1053dfa4f66f3a",
     "scripts/projection_v3_publish.py": "ce454a527996a0eee39579ec72d735f5ed2d4d75fe23770e12ee37dcf7b47776",
@@ -18,8 +21,8 @@
     "sha256": "f7fc497ee581c3a948388891904b52669e345bae1a61c684281034505b5840e4"
   },
   "active_fit_verified": true,
-  "free_bytes": 155566080,
-  "free_inodes": 1018152,
+  "free_bytes": 152285184,
+  "free_inodes": 1017976,
   "services": {
     "nfl-engine-capture.service": [
       "Result=success",
@@ -30,10 +33,24 @@
     ],
     "nfl-engine-daily.service": [
       "Result=success",
-      "ExecMainExitTimestamp=Tue 2026-09-22 05:00:00 UTC",
+      "ExecMainExitTimestamp=Tue 2026-09-22 06:00:00 UTC",
       "ExecMainStatus=0",
       "ActiveState=inactive",
       "SubState=dead"
     ]
+  },
+  "final_feed_recovery": {
+    "state": "HEALTHY",
+    "last_success_at": "2026-09-22T06:23:23.480688+00:00",
+    "operation_matches": true,
+    "payload_matches": true,
+    "owner": "nfl-engine-primary:1000",
+    "reason": null,
+    "resources": {
+      "free_bytes": 152387584,
+      "free_inodes": 1017983,
+      "measured_at": "2026-09-22T06:23:23.258924+00:00",
+      "scope": "Current free resources, not a proven job-headroom reserve"
+    }
   }
 }
