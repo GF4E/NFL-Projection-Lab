@@ -638,3 +638,20 @@ Confidence: medium — timing effects hold on the authoritative population but r
 At 19:08 UTC the actual host had zero free root bytes. Preserve the native rotation verification failure and two errno-28 compression failures in their receipts. Previously authorized cleanup removed two regenerable APT binary indexes and seven downloaded package caches; receipts list each path and size. Inactive syslog.1 was then compressed from 104,459,475 to 2,005,897 bytes with exact roundtrip verification and durable directory commit. Its complete content remains in syslog.1.gz; no repository artifact or unique log content was deleted. Receipt: work/engine-rebuild/space-recovery-2026-09-22T1913.json, actual timestamp 19:12:40 UTC, free bytes 104,095,744. This is temporary headroom, not durable capacity or a new retention policy. Existing spending/migration authority remains pending; no spending.
 
 Confidence: near-total in the recorded byte preservation and recovery measurement, meaning hashes/arithmetic on verified records. Lower to high if an independent decompression hash differs. Future headroom is not assured.
+
+## 2026-09-22 — Prospective football observation receipts
+
+CONVENTIONS: collection proves availability of verified local source bytes from its current clock onward. No prepared_at metadata is converted into historical availability. Unchanged game bodies retain the first receipt; revisions link prior observations; missing/withdrawn facts remain named. Future live bootstrap cannot precede collection. No numerical state is activated.
+
+The preparation boundary now writes immutable compressed observation batches and snapshot indexes, with a durable transaction clock and final pointer. Prepared manifests bind that snapshot; release code hashes include the collector and dependencies. No market or in-game starter identity is retained in observation DTOs. First-grade/lock records and the active point/calibration method remain unchanged.
+
+| Evidence | Before | After |
+|---|---|---|
+| Per-game local availability | Not retained | First validated collection clock and source hashes |
+| Revisions | Source file only | Linked immutable observation versions |
+| Prepared feature bytes | 679,581 | Identical 679,581 in actual-runtime comparison |
+| Cutoff numerical model | Legacy shipping path | Unchanged; receipt collection only |
+
+Validation: 209 local projection tests, 218 frozen tests, 19 final bundle tests; 13 new tests on actual Linux runtime. Candidate collects 3,183 source games / 768,492 bytes, unchanged repeat growth zero, all 52 frozen records unchanged. Full old/new preparation parity is exact; initial harness reader error retained. Host installation and scheduled linkage require a separate verification receipt. No provider credits or spending.
+
+Confidence: near-total in exact prepared-byte preservation, meaning arithmetic/hashes on verified records. Lower to high if an independent same-input preparation differs. Full state readiness and predictive improvement remain unproved.

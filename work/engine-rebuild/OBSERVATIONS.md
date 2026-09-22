@@ -1,0 +1,26 @@
+# Prospective observation receipts
+
+This change records when verified completed-game football facts are locally available. It does not activate the new cutoff model, reconstruct a prior live issuance, fit a model or change a point forecast. The authoritative control remains unchanged.
+
+The collector verifies the exact immutable schedule and aggregated team-stat sources, then records its current UTC clock. It stores only allowlisted completed-game fields and paired football statistics. In-game starter identities and market fields are excluded. Missing statistics, a completion proxy not yet reached, or a previously recorded observation that is now unavailable receive named shortfalls. A vanished final does not erase the original receipt.
+
+An unchanged game body reuses its first receipt even if the enclosing source file's metadata or row order changes. A numerical revision creates a linked observation. Old snapshots and observation bytes remain readable. A future state consumer must treat revisions/withdrawals explicitly; this collector does not apply a revised game as a second assimilation.
+
+Storage uses immutable compressed batches plus a compressed snapshot index. It writes a durable transaction record first, preserving the initial collection clock through retry; then the batch, snapshot and final pointer. Corrupt source/object/transaction hashes, malformed pairs, invalid drive denominators and concurrent writers fail closed. A lost response after pointer commit is resolved by reading the committed snapshot; it does not create another observation or move its clock. Uncertain attempts remain preserved.
+
+Collection is called inside the existing preparation ownership boundary. It runs for both a rebuilt and a cached prepared snapshot, and the prepared manifest binds the observation snapshot by hash. The legacy feature builder and its full-precision numerical rows remain in use. Forecast-worker label isolation is unchanged.
+
+This provides evidence for a prospective bootstrap: historical facts verified now may enter a future scheduled cutoff after collection. It does not provide their original historical publication timestamps and cannot justify putting them into a cutoff that already passed. The active state still needs serialization, restoration, cutoff transactions and qualified integration with final issuance. Provisional previews must remain separate from final eligible forecasts.
+
+Host verification must compare old/new feature rows and compressed bytes, check actual-runtime failure fixtures and verify frozen hashes using isolated writes before release. A later installed-host receipt must prove that the scheduled preparation actually binds the new observation snapshot. Those are separate pieces of evidence; tests alone do not prove installation.
+
+The first isolated-host attempt used a forecast-only reader for a sanitized source file and failed in the verification harness. The reader was corrected to the production preparation reader with its original hash checks; no production file was written. That failed attempt is retained in host-observations-attempt-1.log.
+
+Least certain: original historical availability. Collection starts a new evidence clock rather than inventing one. Confidence: medium — prospective availability is supported by verified local source bytes, but historical availability and full live-state readiness remain incomplete. Lower to low if independently checked source hashes or receipt clocks disagree.
+
+
+Verified candidate evidence (2026-09-22T19:32:20.509966+00:00): actual Linux service uid 1000, Python 3.12.2, host checkout 9a6ee7dc787fb42f7421e9d8dca6897d4261c9d1. All 13 new tests passed. Old/new preparation produced identical 544 rows and identical 679,581 compressed bytes (SHA256 0a097e0640959d4b08cc432971083be2496c0958110df87751397f35f9bd0c3e). All 52 frozen records retained their hashes. The collector recorded 3,183 games (2014–2025 plus 32 completed 2026 source games), zero unknown pairs, in 768,492 bytes; unchanged repetition added zero bytes. These are source-game counts, not as-issued grading denominators. The full old/new comparison took 443.89 seconds, with peak RSS 246,248 KiB under a hard 4 GiB address-space cap and one BLAS worker. All candidate writes were in tmpfs. See host-observations-candidate.json. Its source-manifest file hash was observed at the end; the separately recorded schedule/team-stat references identify the exact numerical source bodies used throughout.
+
+Local validation: 209 projection tests, 218 frozen-workflow tests, and 19 bundle tests after extending release code bindings. The new collector and its calendar dependencies are in CODE_PATHS; a release rejects uncommitted differing source bytes. The collector/preparation/test file hashes match the tested host payload. Installed scheduled collection and publication linkage must be verified separately after push.
+
+Confidence: near-total in old/new prepared-byte parity and the recorded source-body counts, meaning arithmetic and hashes on verified rows. Lower to high if independent decompression, row comparison or source verification differs. Historical availability, numerical-state activation and complete operational readiness remain unproved.

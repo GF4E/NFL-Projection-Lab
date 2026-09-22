@@ -1,0 +1,66 @@
+{
+  "checked_at": "2026-09-22T19:32:20.509966+00:00",
+  "host_commit": "9a6ee7dc787fb42f7421e9d8dca6897d4261c9d1",
+  "uid": 1000,
+  "python": "3.12.2",
+  "tests": 13,
+  "success": true,
+  "scope": "Actual Linux runtime and captured host sources; all writes in tmpfs. No active state, forecast, fit, provider or publication mutation.",
+  "candidate_hashes": {
+    "engine/projection/observations.py": "60302e5d5c7adab59ee6a592a5046e10e38aa266664d2cb650ef7ae8c2e602b0",
+    "scripts/projection_v3_prepare.py": "6b328a231cd30da303e0741599a48cc6f8caeda05f65fb3b9a3efdd1119009cf",
+    "tests/test_projection_observations.py": "646a732af24c7aa3cbd1f1b7c4aaf309e541d64f23793efcea3c605bfec5a598"
+  },
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "source_manifest": {
+    "sha256": "612271d3a9991fabcf919e504c597d9d428b105064d75191b08829f6ec8290ea",
+    "schedule": {
+      "path": "work/projection-v1/data/schedule-58d0d39ae49472f40aa26e0886b645cb1bbdfa8afa358645ec897498f2244fff.json",
+      "sha256": "58d0d39ae49472f40aa26e0886b645cb1bbdfa8afa358645ec897498f2244fff"
+    },
+    "team_games": {
+      "path": "work/projection-v1/data/team-games-6cf5212b53222878169d1384154b6939c2cc43dcdf8c57645ce0998b1851bb6d.json",
+      "sha256": "6cf5212b53222878169d1384154b6939c2cc43dcdf8c57645ce0998b1851bb6d"
+    }
+  },
+  "prepared_rows": 544,
+  "prepared_bytes": 679581,
+  "prepared_sha256": "0a097e0640959d4b08cc432971083be2496c0958110df87751397f35f9bd0c3e",
+  "old_new_preparation_exact": true,
+  "collected_games": 3183,
+  "unknown": [],
+  "by_season": {
+    "2014": 256,
+    "2015": 256,
+    "2016": 256,
+    "2017": 256,
+    "2018": 256,
+    "2019": 256,
+    "2020": 256,
+    "2021": 272,
+    "2022": 271,
+    "2023": 272,
+    "2024": 272,
+    "2025": 272,
+    "2026": 32
+  },
+  "observation_snapshot_ref": {
+    "path": "work/projection-observations-v1/snapshots/e504070f38fa11fb0f939694bf53ffe7e2038334aa3290cc761619245bf57b61.json.gz",
+    "sha256": "e504070f38fa11fb0f939694bf53ffe7e2038334aa3290cc761619245bf57b61"
+  },
+  "collection_bytes": 768492,
+  "unchanged_collection_growth_bytes": 0,
+  "collected_at": [
+    "2026-09-22T19:26:20.455453+00:00"
+  ],
+  "frozen_records_unchanged": 52,
+  "wall_seconds": 443.8864974420285,
+  "peak_rss_kib": 246248,
+  "address_space_limit_bytes": 4294967296,
+  "free_root_bytes": 193544192,
+  "provider_credits": 0,
+  "test_log": "test_batch_failure_retry_keeps_original_durable_clock (test_projection_observations.ObservationTests.test_batch_failure_retry_keeps_original_durable_clock) ... ok\ntest_cached_preparation_captures_receipts_without_changing_feature_bytes (test_projection_observations.ObservationTests.test_cached_preparation_captures_receipts_without_changing_feature_bytes) ... ok\ntest_capture_binds_real_collection_clock_and_paired_facts (test_projection_observations.ObservationTests.test_capture_binds_real_collection_clock_and_paired_facts) ... ok\ntest_corrupt_batch_and_pending_clock_are_not_silently_repaired (test_projection_observations.ObservationTests.test_corrupt_batch_and_pending_clock_are_not_silently_repaired) ... ok\ntest_corrupt_committed_batch_fails_and_keeps_pointer (test_projection_observations.ObservationTests.test_corrupt_committed_batch_fails_and_keeps_pointer) ... ok\ntest_market_and_target_identity_columns_cannot_enter_receipts (test_projection_observations.ObservationTests.test_market_and_target_identity_columns_cannot_enter_receipts) ... ok\ntest_missing_pair_future_result_and_final_absence_are_not_invented (test_projection_observations.ObservationTests.test_missing_pair_future_result_and_final_absence_are_not_invented) ... ok\ntest_pointer_failure_and_lost_response_preserve_first_receipt (test_projection_observations.ObservationTests.test_pointer_failure_and_lost_response_preserve_first_receipt) ... ok\ntest_revision_links_old_observation_and_preserves_historical_snapshot (test_projection_observations.ObservationTests.test_revision_links_old_observation_and_preserves_historical_snapshot) ... ok\ntest_unchanged_facts_reuse_first_receipt_despite_new_source_metadata (test_projection_observations.ObservationTests.test_unchanged_facts_reuse_first_receipt_despite_new_source_metadata) ... ok\ntest_withdrawn_final_is_named_and_original_receipt_is_preserved (test_projection_observations.ObservationTests.test_withdrawn_final_is_named_and_original_receipt_is_preserved) ... ok\ntest_writer_contention_fails_without_mutation (test_projection_observations.ObservationTests.test_writer_contention_fails_without_mutation) ... ok\ntest_wrong_hash_duplicate_pair_and_nonfinite_statistic_fail_closed (test_projection_observations.ObservationTests.test_wrong_hash_duplicate_pair_and_nonfinite_statistic_fail_closed) ... ok\n\n----------------------------------------------------------------------\nRan 13 tests in 0.745s\n\nOK\n"
+}
