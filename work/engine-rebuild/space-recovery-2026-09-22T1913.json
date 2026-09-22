@@ -1,0 +1,45 @@
+{
+  "at": "2026-09-22T19:12:40.397987+00:00",
+  "operation": "Previously authorized APT download-cache cleanup, then lossless compression of inactive rotated syslog.1",
+  "removed_regenerable_caches": [
+    {
+      "path": "/var/cache/apt/archives/gir1.2-glib-2.0_2.80.0-6ubuntu3.9_amd64.deb",
+      "bytes": 183412
+    },
+    {
+      "path": "/var/cache/apt/archives/libexpat1_2.6.1-2ubuntu0.5_amd64.deb",
+      "bytes": 95248
+    },
+    {
+      "path": "/var/cache/apt/archives/libglib2.0-0t64_2.80.0-6ubuntu3.9_amd64.deb",
+      "bytes": 1547468
+    },
+    {
+      "path": "/var/cache/apt/archives/libglib2.0-bin_2.80.0-6ubuntu3.9_amd64.deb",
+      "bytes": 97936
+    },
+    {
+      "path": "/var/cache/apt/archives/libglib2.0-data_2.80.0-6ubuntu3.9_all.deb",
+      "bytes": 50146
+    },
+    {
+      "path": "/var/cache/apt/archives/libxml2_2.9.14+dfsg-1.3ubuntu3.9_amd64.deb",
+      "bytes": 764598
+    },
+    {
+      "path": "/var/cache/apt/archives/rsyslog_8.2312.0-3ubuntu9.4_amd64.deb",
+      "bytes": 511396
+    }
+  ],
+  "from": "/var/log/syslog.1",
+  "to": "/var/log/syslog.1.gz",
+  "original_bytes": 104459475,
+  "original_sha256": "a80565ce7b9acb5e89a193100c781fe2feff689c950e4d66534567b2a955834d",
+  "compressed_bytes": 2005897,
+  "compressed_sha256": "416b150fe671d5b00bb86bbfd700b3ae0e596d6be26a39902539160d1221cf36",
+  "roundtrip_verified": true,
+  "free_before": 0,
+  "free_after_cache": 2854912,
+  "free_after": 104095744,
+  "scope": "No historical log content or repository artifact discarded; all original log bytes retained in verified gzip"
+}

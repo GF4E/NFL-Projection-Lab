@@ -617,3 +617,24 @@ While waiting, the service journal showed one prior generic CalledProcessError f
 Independently reproduced the authoritative 2,639-game HFA point metrics and all 48 captured cards' probabilities, intervals and contribution sums, without production numerical helpers. Verified every residual count in the active calibration against the SUPERSEDED adaptive series. Recorded legacy-center versus distribution-mean mismatch and positive negative-score mass in 28 of 32 Week 3 team marginals; no silent truncation, recentering or probability change. Live Season inspection confirms 30 graded games/two weeks but an old reference and explicitly uncomputed floor. See work/engine-rebuild/FORECAST-CONTRACT.md and forecast-contract-audit.json.
 
 CONVENTIONS: work/engine-rebuild/E-CAL-PREFLIGHT.md publishes the executable sweep before fitting. Prior-season reconstruction of each calibration lineage and completed-season-only Week 9 pools are Tier 2 REVIEW REQUESTED; point invariance, raw residual location, paired margin/total errors, discrete conventions, population and the already adopted gate are unchanged. Qualified warmup and common numerical cutoff replay remain prerequisites. This is not a preregistration, candidate comparison, clock start, release or statistical rejection.
+
+## 2026-09-22 — Inactive numerical cutoff reconstruction verified
+
+CONVENTIONS: GAP-SWEEP.md records source-availability reconstruction versus live evidence, actual Eastern kickoff ordering, strict Fri/Mon/Tue cutoff eligibility and the Tier 2 target-week blend choice. No rejected state-space method, new parameter, calibration or gate change.
+
+The legacy path reproduces all 2,639 authoritative HFA points exactly. Cutoff inputs change 2,053 games directly and all 2,639 after refitting the same historical memberships. Zero early/duplicate observations; reversing all inputs and all 175 fits preserves 5,278 forecasts. See work/engine-rebuild/numerical-cutoff/VERIFICATION.md and its hash-pinned current-ref. Earlier attempts are preserved losslessly. The module is inactive; no forecast or registry authority was switched.
+
+| Evidence | Before | After |
+|---|---|---|
+| Numerical cutoff replay | Calendar-only proof | Full registered population, direct/downstream traces |
+| Production feature path | Legacy builder | Unchanged; new cutoff builder inactive |
+| Authoritative control | HFA 66a3a60c… | Unchanged |
+| Live source/bootstrap qualification | Incomplete | Still incomplete; strict API guards added |
+
+Confidence: medium — timing effects hold on the authoritative population but rely on disclosed source-vintage and context conventions. Lower to low if qualified source arrivals materially change inclusion. This is not a claim of improved accuracy or complete recovery.
+
+## 2026-09-22 — Repeated full-disk incident; temporary recovery
+
+At 19:08 UTC the actual host had zero free root bytes. Preserve the native rotation verification failure and two errno-28 compression failures in their receipts. Previously authorized cleanup removed two regenerable APT binary indexes and seven downloaded package caches; receipts list each path and size. Inactive syslog.1 was then compressed from 104,459,475 to 2,005,897 bytes with exact roundtrip verification and durable directory commit. Its complete content remains in syslog.1.gz; no repository artifact or unique log content was deleted. Receipt: work/engine-rebuild/space-recovery-2026-09-22T1913.json, actual timestamp 19:12:40 UTC, free bytes 104,095,744. This is temporary headroom, not durable capacity or a new retention policy. Existing spending/migration authority remains pending; no spending.
+
+Confidence: near-total in the recorded byte preservation and recovery measurement, meaning hashes/arithmetic on verified records. Lower to high if an independent decompression hash differs. Future headroom is not assured.
