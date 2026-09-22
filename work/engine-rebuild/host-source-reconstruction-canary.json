@@ -1,0 +1,61 @@
+{
+  "status": "PASS",
+  "scope": "Captured real sources; simulated future cutoff, preparation, scoring and shadow locks. No production activation.",
+  "checked_at": "2026-09-22T22:23:03.814729+00:00",
+  "observation_ref": {
+    "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+    "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+  },
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "actual_collection_at": "2026-09-22T19:35:10.277779+00:00",
+  "simulated_cutoff": "2026-09-25T13:00:00+00:00",
+  "simulated_preparation": "2026-09-27T15:40:00+00:00",
+  "missing_at_simulated_cutoff": [
+    {
+      "game_id": "2026_03_ATL_GB",
+      "reason": "FINAL_NOT_RECORDED"
+    }
+  ],
+  "slate_games": 14,
+  "feature_parity_rows": 28,
+  "point_and_contribution_parity_games": 14,
+  "source_reconstructed_rows": 28,
+  "schedule_capture_ref": {
+    "path": "work/projection-cutoff-pipeline-v1/schedule-inputs/fb3f26939f0cb5b4b69b4f5b41c4268a4fc9148c82eccb857cd731cd8e466772.json.gz",
+    "sha256": "fb3f26939f0cb5b4b69b4f5b41c4268a4fc9148c82eccb857cd731cd8e466772"
+  },
+  "schedule_clock": "SIMULATED: source reread before simulated preparation; not historical first availability",
+  "contribution_source_associations_changed": 1568,
+  "idempotent_shadow_locks": 14,
+  "scoring_retry_after_deadline_preserved": true,
+  "prior_forecasts_unchanged_after_later_cutoff": true,
+  "frozen_source_records_unchanged": 52,
+  "pipeline_artifact_bytes": 145054,
+  "elapsed_seconds": 404.8836903979536,
+  "peak_rss_bytes": 233885696,
+  "candidate_code": {
+    "engine/projection/cutoff_state.py": "7ef17dc4bc9889170a0d292fde052ae2e92987616d7d2ad0724d108f842b0d3d",
+    "engine/projection/cutoff_features.py": "b7ca7156cef0bfaa51bbbf353f01f360b99d80d64d4d4dab234c16dd5c5575ae",
+    "engine/projection/observations.py": "70afc117137325451492bfa0cf9d75fee3047ec280ec429419ae13baf869d691",
+    "engine/projection/features.py": "9c1172450639deeee99a58211713084fe54bf86a09f31915e90cdd1e0866aef8",
+    "engine/projection/model.py": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead",
+    "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+    "engine/elo_hfa.py": "d9e4052bc7b1b828d88b694f9ddaddf16111c1daa5c06cd0656b0fc64dee4d20",
+    "engine/forecast_system/calendar.py": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b",
+    "engine/forecast_system/cadence.py": "a685a17e69e5f6d104822238e9c2b53cbf67d7a91ee22d77f41bcaa38c6e7b80",
+    "engine/projection/cutoff_pipeline.py": "7a0a1168bdabfdb624905abfab1b96f28e0383dbdec434fa8ea65b51a0b5d52d",
+    "engine/projection/scoring_process.py": "26384d60b626725cc8b6833850cd88140301ba2f6b0840f94552a8734e0e37a0"
+  },
+  "provider_requests": 0,
+  "new_spending": 0,
+  "host_commit": "86b7670f21b76d3a3ef2965ae8ca08b287f853f9",
+  "uid": 1000,
+  "python": "3.12.2",
+  "tests": 27,
+  "test_log": "test_changed_retained_stadiums_or_schedule_cannot_validate_original_rows (test_projection_cutoff_pipeline.PipelineTests.test_changed_retained_stadiums_or_schedule_cannot_validate_original_rows) ... ok\ntest_committed_scoring_retry_after_deadline_reuses_original_receipt (test_projection_cutoff_pipeline.PipelineTests.test_committed_scoring_retry_after_deadline_reuses_original_receipt) ... ok\ntest_common_historical_points_equal_recorded_points_without_borrowed_calibration (test_projection_cutoff_pipeline.PipelineTests.test_common_historical_points_equal_recorded_points_without_borrowed_calibration) ... ok\ntest_consistently_rescored_forged_preparation_cannot_first_lock (test_projection_cutoff_pipeline.PipelineTests.test_consistently_rescored_forged_preparation_cannot_first_lock) ... ok\ntest_daily_catchup_uses_only_labels_available_before_actual_refit (test_projection_cutoff_pipeline.PipelineTests.test_daily_catchup_uses_only_labels_available_before_actual_refit) ... ok\ntest_final_preparation_matches_existing_state_rows_and_is_label_free (test_projection_cutoff_pipeline.PipelineTests.test_final_preparation_matches_existing_state_rows_and_is_label_free) ... ok\ntest_first_lock_reconciles_values_and_fit_with_exact_preparation (test_projection_cutoff_pipeline.PipelineTests.test_first_lock_reconciles_values_and_fit_with_exact_preparation) ... ok\ntest_hash_valid_changed_features_and_metadata_fail_before_scoring (test_projection_cutoff_pipeline.PipelineTests.test_hash_valid_changed_features_and_metadata_fail_before_scoring) ... ok\ntest_hash_valid_preparation_with_late_clock_or_changed_pair_is_rejected (test_projection_cutoff_pipeline.PipelineTests.test_hash_valid_preparation_with_late_clock_or_changed_pair_is_rejected) ... ok\ntest_late_or_unavailable_state_cannot_prepare_final (test_projection_cutoff_pipeline.PipelineTests.test_late_or_unavailable_state_cannot_prepare_final) ... ok\ntest_late_scoring_cannot_turn_old_preparation_into_a_locked_forecast (test_projection_cutoff_pipeline.PipelineTests.test_late_scoring_cannot_turn_old_preparation_into_a_locked_forecast) ... ok\ntest_later_schedule_revision_does_not_rewrite_prepared_input (test_projection_cutoff_pipeline.PipelineTests.test_later_schedule_revision_does_not_rewrite_prepared_input) ... ok\ntest_new_fit_cannot_be_applied_to_earlier_preparation (test_projection_cutoff_pipeline.PipelineTests.test_new_fit_cannot_be_applied_to_earlier_preparation) ... ok\ntest_new_fit_completed_after_lock_is_not_available_to_old_preparation (test_projection_cutoff_pipeline.PipelineTests.test_new_fit_completed_after_lock_is_not_available_to_old_preparation) ... ok\ntest_preview_cannot_lock_even_when_its_state_is_current (test_projection_cutoff_pipeline.PipelineTests.test_preview_cannot_lock_even_when_its_state_is_current) ... ok\ntest_recorded_refit_rejects_future_or_corrupted_closeout_ack (test_projection_cutoff_pipeline.PipelineTests.test_recorded_refit_rejects_future_or_corrupted_closeout_ack) ... ok\ntest_recorded_refit_uses_cutoff_labels_after_ack_and_retains_parent (test_projection_cutoff_pipeline.PipelineTests.test_recorded_refit_uses_cutoff_labels_after_ack_and_retains_parent) ... ok\ntest_recorded_scores_lock_idempotently_and_cannot_replace_prior_forecast (test_projection_cutoff_pipeline.PipelineTests.test_recorded_scores_lock_idempotently_and_cannot_replace_prior_forecast) ... ok\ntest_refit_calculation_recovery_preserves_fit_and_physical_clock (test_projection_cutoff_pipeline.PipelineTests.test_refit_calculation_recovery_preserves_fit_and_physical_clock) ... ok\ntest_refit_joins_paired_prior_labels_and_preserves_feature_history (test_projection_cutoff_pipeline.PipelineTests.test_refit_joins_paired_prior_labels_and_preserves_feature_history) ... ok\ntest_refit_lost_ack_reuses_original_intent_and_label_snapshot (test_projection_cutoff_pipeline.PipelineTests.test_refit_lost_ack_reuses_original_intent_and_label_snapshot) ... ok\ntest_refit_rejects_missing_final_and_forged_label_clock (test_projection_cutoff_pipeline.PipelineTests.test_refit_rejects_missing_final_and_forged_label_clock) ... ok\ntest_refit_rejects_unpublished_closeout_late_labels_wrong_day_and_one_team (test_projection_cutoff_pipeline.PipelineTests.test_refit_rejects_unpublished_closeout_late_labels_wrong_day_and_one_team) ... ok\ntest_retained_source_corruption_prevents_preparation_verification (test_projection_cutoff_pipeline.PipelineTests.test_retained_source_corruption_prevents_preparation_verification) ... ok\ntest_schedule_capture_lost_response_reuses_original_clock_and_changed_source_fails (test_projection_cutoff_pipeline.PipelineTests.test_schedule_capture_lost_response_reuses_original_clock_and_changed_source_fails) ... ok\ntest_scoring_uses_isolated_worker_and_has_no_in_process_fallback (test_projection_cutoff_pipeline.PipelineTests.test_scoring_uses_isolated_worker_and_has_no_in_process_fallback) ... ok\ntest_target_fields_bad_team_and_tampered_artifact_fail_closed (test_projection_cutoff_pipeline.PipelineTests.test_target_fields_bad_team_and_tampered_artifact_fail_closed) ... ok\n\n----------------------------------------------------------------------\nRan 27 tests in 12.608s\n\nOK\n",
+  "address_space_limit_bytes": 4294967296,
+  "free_root_bytes": 162799616
+}

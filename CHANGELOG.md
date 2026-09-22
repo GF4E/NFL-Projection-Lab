@@ -1,5 +1,15 @@
 ## BOARD v8 — display-only book comparisons and table
 
+
+## 2026-09-22 — retained feature reconstruction and prompt revision 3
+
+Infrastructure lane, SHADOW ONLY. Before recorded scoring and first lock, rebuild prepared features/metadata from the exact restored state, retained stadium DTO and hash-verified schedule source. Retain schedule-only revision receipts independently of completed-game assimilation; retries preserve the first capture clock. Reject consistently rescored altered features, changed source metadata and unavailable schedule facts. No model, gate, fit, calibration, production issuer or frozen record changes.
+
+Verified: 266 projection tests, 218 preserved Week 1 tests, and actual Linux candidate evidence (27 targeted fixtures plus 14 captured games/28 rows). All 52 frozen records unchanged; full canary 404.88 seconds and peak RSS 233,885,696 bytes, one worker within 4 GiB. Future cutoff/preparation/lock clocks are simulated. Root free bytes 162,799,616 do not resolve durable capacity. See work/engine-rebuild/SOURCE-RECONSTRUCTION.md and host-source-reconstruction-canary.json.
+
+CONVENTIONS: source reconstruction verifies arithmetic provenance rather than treating matching hashes as correctness. Schedule receipts do not create extra state updates. Stadium retention proves the renderer input, not historical source vintage. Archived replay/canary code remains preserved; no historical result is silently relabeled. Prompt revision 3 carries these checks and the verified hourly catch-up schedule forward. Research-design confidence is separate from runtime readiness and unproved future accuracy. No registered experiment ran.
+
+
 The approved table replaces the score-lane base view. Existing Caesars captures are preferred, with BetMGM fallback, in a separate hashed display table at outputs/board-v8-market. No quote is injected into a projection, fit, assimilation, uncertainty distribution, or saved engine forecast. The scheduled publisher derives this table offline after captures; no additional provider requests or quota changes. Full-precision comparisons are rounded only at display. Late quotes are excluded from historical comparisons.
 
 CONVENTIONS: work/board-v8/GAP-SWEEP.md records the pre-implementation decisions and reference resolution. Display-only book selection uses a complete pair from one book/capture. Existing frozen forecasts and experiment queue are unchanged.

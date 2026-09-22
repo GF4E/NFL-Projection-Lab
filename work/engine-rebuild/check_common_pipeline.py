@@ -54,7 +54,10 @@ def verify(source_root=ROOT,temp_parent=None):
             path=target/name;path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes((source_root/name).read_bytes())
         with patch.object(cs,'now',return_value=first+dt.timedelta(seconds=1)):
             state_ref=cs.advance(target,first,fit_ref)
-        prepared=p.from_recorded(target,state_ref,slate,stadiums,at=at,role='FINAL_ELIGIBLE')
+        with patch.object(p,'now',return_value=at-dt.timedelta(seconds=1)):
+            schedule_ref=p.capture_schedule(target,transaction['sources']['schedule'])
+        prepared=p.from_recorded(target,state_ref,slate,stadiums,at=at,role='FINAL_ELIGIBLE',schedule_ref=schedule_ref)
+        assert p.verify_preparation(target,prepared)
         prep_ref=p.store(target,'preparations',prepared)
         legacy=legacy_build(stats,schedule,stadiums,elo_hfa=artifact['elo_hfa'])
         by_row={r['row_id']:r for r in legacy}
@@ -92,6 +95,8 @@ def verify(source_root=ROOT,temp_parent=None):
         'actual_collection_at':collected.isoformat(),'simulated_cutoff':first.isoformat(),'simulated_preparation':at.isoformat(),
         'missing_at_simulated_cutoff':prepared['state']['missing'],
         'slate_games':len(slate),'feature_parity_rows':len(prepared['rows']),'point_and_contribution_parity_games':len(forecasts),
+        'source_reconstructed_rows':len(prepared['rows']),'schedule_capture_ref':schedule_ref,
+        'schedule_clock':'SIMULATED: source reread before simulated preparation; not historical first availability',
         'contribution_source_associations_changed':source_metadata_changes,
         'idempotent_shadow_locks':len(forecasts),'scoring_retry_after_deadline_preserved':True,
         'prior_forecasts_unchanged_after_later_cutoff':True,'frozen_source_records_unchanged':len(frozen),

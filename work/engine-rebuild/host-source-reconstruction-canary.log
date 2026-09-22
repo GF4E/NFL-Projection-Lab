@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "scope": "Captured real sources; simulated future cutoff, preparation, scoring and shadow locks. No production activation.",
+  "checked_at": "2026-09-22T22:23:03.814729+00:00",
+  "observation_ref": {
+    "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+    "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+  },
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "actual_collection_at": "2026-09-22T19:35:10.277779+00:00",
+  "simulated_cutoff": "2026-09-25T13:00:00+00:00",
+  "simulated_preparation": "2026-09-27T15:40:00+00:00",
+  "missing_at_simulated_cutoff": [
+    {
+      "game_id": "2026_03_ATL_GB",
+      "reason": "FINAL_NOT_RECORDED"
+    }
+  ],
+  "slate_games": 14,
+  "feature_parity_rows": 28,
+  "point_and_contribution_parity_games": 14,
+  "source_reconstructed_rows": 28,
+  "schedule_capture_ref": {
+    "path": "work/projection-cutoff-pipeline-v1/schedule-inputs/fb3f26939f0cb5b4b69b4f5b41c4268a4fc9148c82eccb857cd731cd8e466772.json.gz",
+    "sha256": "fb3f26939f0cb5b4b69b4f5b41c4268a4fc9148c82eccb857cd731cd8e466772"
+  },
+  "schedule_clock": "SIMULATED: source reread before simulated preparation; not historical first availability",
+  "contribution_source_associations_changed": 1568,
+  "idempotent_shadow_locks": 14,
+  "scoring_retry_after_deadline_preserved": true,
+  "prior_forecasts_unchanged_after_later_cutoff": true,
+  "frozen_source_records_unchanged": 52,
+  "pipeline_artifact_bytes": 145054,
+  "elapsed_seconds": 404.8836903979536,
+  "peak_rss_bytes": 233885696,
+  "provider_requests": 0,
+  "new_spending": 0,
+  "host_commit": "86b7670f21b76d3a3ef2965ae8ca08b287f853f9",
+  "uid": 1000,
+  "python": "3.12.2",
+  "tests": 27,
+  "address_space_limit_bytes": 4294967296,
+  "free_root_bytes": 162799616
+}

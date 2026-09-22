@@ -4,8 +4,12 @@ import gzip
 import json
 from pathlib import Path
 import subprocess
+import argparse
 
 ROOT=Path(__file__).resolve().parents[2]
+parser=argparse.ArgumentParser()
+parser.add_argument('--output',default='work/engine-rebuild/host-common-pipeline-canary.json')
+args=parser.parse_args()
 files={str(path.relative_to(ROOT)):path.read_text() for folder in ('engine','scripts')
        for path in (ROOT/folder).rglob('*.py') if '__pycache__' not in path.parts}
 for name in ('tests/test_projection_cutoff_state.py','tests/test_projection_cutoff_pipeline.py',
@@ -39,5 +43,5 @@ result=subprocess.run(['ssh','-i',str(ROOT/'.cloud-private/admin_key'),'-o','Bat
                        'root@159.89.185.88',command],input=program,text=True,capture_output=True,timeout=600)
 if result.returncode:raise RuntimeError('Host common-pipeline verification failed: '+result.stdout[-1600:]+result.stderr[-3000:])
 body=json.loads(result.stdout)
-(ROOT/'work/engine-rebuild/host-common-pipeline-canary.json').write_text(json.dumps(body,indent=2)+'\n')
+(ROOT/args.output).write_text(json.dumps(body,indent=2)+'\n')
 print(json.dumps({k:v for k,v in body.items() if k not in ('candidate_code','test_log')},indent=2))

@@ -70,16 +70,90 @@ def prepare(state,context,slate,stadiums,*,at,role):
             row['personnel']={'status':'INACTIVE_IN_QUALIFIED_CORE','reason':'No qualified personnel vintage supplied to this preparation; no value inferred.'}
         rows.extend(produced)
     return {'schema':SCHEMA,'role':role,'prepared_at':at.isoformat(),'state':copy.deepcopy(context),
+            'render_inputs':{'schema':'cutoff-render-inputs-v1',
+                             'slate':copy.deepcopy(sorted(slate,key=lambda g:g['game_id'])),
+                             'stadiums':copy.deepcopy(stadiums)},
             'rows':sorted(rows,key=lambda r:r['row_id'])}
 
 
-def from_recorded(root,state_ref,slate,stadiums,*,at,role):
+def state_context(body,state_ref):
+    return {'cutoff_at':body['cutoff_at'],'state_sha256':body['state_sha256'],
+            'committed_at':body['created_at'],'state_ref':state_ref,'source_availability':'RECORDED',
+            'observation_ref':body['observation_ref'],'method':body['method'],'missing':body['missing']}
+
+
+def capture_schedule(root,source_ref):
+    """Retain a schedule-only revision without changing the assimilation ledger."""
+    import json
+    from pathlib import Path
+    from .storage import save
+    cutoff_state.obs.read_source(root,source_ref,'schedule')
+    operation=Path(root)/BASE/'schedule-captures'/(source_ref['sha256']+'.json')
+    if operation.exists():
+        ref=json.loads(operation.read_bytes());body=load(root,ref,'schedule-inputs')
+        if body.get('source_ref')!=source_ref:raise ValueError('Schedule capture identity differs')
+        return ref
+    # The source already exists durably. Read this availability clock only after
+    # its bytes pass the hash check, then retain it before returning to preparation.
+    body={'schema':'recorded-schedule-input-v1','source_ref':source_ref,'collected_at':now().isoformat()}
+    ref=store(root,'schedule-inputs',body)
+    save(operation,ref,immutable=True)
+    return ref
+
+
+def schedule_evidence(root,reference,slate,at):
+    """Separate available schedule facts from results in the assimilation state."""
+    if reference and reference['path'].startswith(BASE+'/schedule-inputs/'):
+        body=load(root,reference,'schedule-inputs')
+        if body.get('schema')!='recorded-schedule-input-v1':raise ValueError('Schedule capture schema differs')
+        if timestamp(body['collected_at'])>=timestamp(at):raise ValueError('Schedule unavailable at preparation time')
+        source=body['source_ref']
+        evidence={'schedule_ref':reference,'source_ref':source,'collected_at':body['collected_at']}
+    else:
+        selected,_,transaction=cutoff_state.snapshot_before(root,reference,timestamp(at))
+        source=transaction['sources']['schedule']
+        evidence={'observation_ref':selected,'source_ref':source,'collected_at':transaction['collected_at']}
+    rows=cutoff_state.obs.read_source(root,source,'schedule')
+    by={}
+    for row in rows:
+        gid=row['game_id']
+        if gid in by:raise ValueError('Duplicate retained schedule game')
+        by[gid]={k:row.get(k) for k in features.GAME_FIELDS}
+        by[gid]['source_hash']=source['sha256']
+    for game in slate:
+        if game!=by.get(game['game_id']):raise ValueError('Prepared game differs from retained schedule')
+    return evidence
+
+
+def from_recorded(root,state_ref,slate,stadiums,*,at,role,schedule_ref=None):
     if role=='HISTORICAL_RECONSTRUCTION':raise ValueError('Use explicit replay adapter for reconstruction')
     state,body=cutoff_state.restore(root,state_ref)
-    context={'cutoff_at':body['cutoff_at'],'state_sha256':body['state_sha256'],
-             'committed_at':body['created_at'],'state_ref':state_ref,'source_availability':'RECORDED',
-             'observation_ref':body['observation_ref'],'method':body['method'],'missing':body['missing']}
-    return prepare(state,context,slate,stadiums,at=at,role=role)
+    prepared=prepare(state,state_context(body,state_ref),slate,stadiums,at=at,role=role)
+    prepared['schedule_evidence']=schedule_evidence(root,schedule_ref or cutoff_state.obs.current(root),slate,at)
+    return prepared
+
+
+def verify_preparation(root,prepared):
+    """Rebuild stored rows; hashes alone cannot validate the feature calculation.
+
+    Retained stadium data establishes exact renderer input, not an independently
+    verified historical stadium vintage. Archived preparations without these
+    inputs remain evidence under their old schema and cannot enter new locks.
+    """
+    validate_preparation(prepared)
+    if prepared['role']=='HISTORICAL_RECONSTRUCTION':raise ValueError('Recorded reconstruction cannot qualify historical availability')
+    inputs=prepared.get('render_inputs')
+    if not isinstance(inputs,dict) or inputs.get('schema')!='cutoff-render-inputs-v1':
+        raise ValueError('Retained render inputs required')
+    evidence=prepared.get('schedule_evidence')
+    if not isinstance(evidence,dict):raise ValueError('Recorded schedule evidence required')
+    state_ref=prepared['state']['state_ref'];state,body=cutoff_state.restore(root,state_ref)
+    expected=prepare(state,state_context(body,state_ref),inputs['slate'],inputs['stadiums'],
+                     at=prepared['prepared_at'],role=prepared['role'])
+    expected['schedule_evidence']=schedule_evidence(root,evidence.get('schedule_ref') or evidence.get('observation_ref'),inputs['slate'],prepared['prepared_at'])
+    if cutoff_state.raw(expected)!=cutoff_state.raw(prepared):
+        raise ValueError('Prepared features or evidence do not reconstruct from retained sources')
+    return True
 
 
 def validate_preparation(prepared):
@@ -221,7 +295,7 @@ def refit(history,labels,parent,*,cutoff,through_season,through_week,closeout,fi
 
 
 BASE='work/projection-cutoff-pipeline-v1'
-KINDS={'preparations','forecasts','training','shadow-fits'}
+KINDS={'preparations','forecasts','training','shadow-fits','schedule-inputs'}
 
 
 def store(root,kind,body):
@@ -267,6 +341,7 @@ def recorded_scores(root,preparation_ref,fit_ref):
     started=now()
     if timestamp(prepared['prepared_at'])>started:raise ValueError('Preparation is in the future')
     if any(started>=time_of(r['game']) for r in prepared['rows']):raise ValueError('Cannot score at or after lock')
+    verify_preparation(root,prepared)
     if fit_available_at(root,fit_ref,artifact)>timestamp(prepared['prepared_at']):raise ValueError('Fit unavailable at preparation time')
     if prepared['state']['method']['elo_hfa']!=artifact.get('elo_hfa'):raise ValueError('Prepared state/fit method differs')
     shapes=read_artifact(root,artifact['shapes'])
@@ -325,14 +400,11 @@ def verify_forecast(root,forecast_ref):
     forecast=load(root,forecast_ref,'forecasts')
     prepared=load(root,forecast['preparation_ref'],'preparations')
     artifact=read_fit(root,forecast['fit_ref'])
+    verify_preparation(root,prepared)
     expected=score(prepared,artifact,read_artifact(root,artifact['shapes']))[forecast['game_id']]
     if any(forecast.get(k)!=v for k,v in expected.items()):raise ValueError('Stored forecast differs from its preparation/fit')
     if prepared['state']['method']['elo_hfa']!=artifact.get('elo_hfa'):raise ValueError('Forecast state/fit differs')
     if fit_available_at(root,forecast['fit_ref'],artifact)>timestamp(prepared['prepared_at']):raise ValueError('Fit unavailable at preparation time')
-    state,body=cutoff_state.restore(root,prepared['state']['state_ref'])
-    if state.identity()!=prepared['state']['state_sha256'] or body['cutoff_at']!=prepared['state']['cutoff_at']:
-        raise ValueError('Forecast retained state differs')
-    if timestamp(body['created_at'])>timestamp(prepared['prepared_at']):raise ValueError('State unavailable at preparation time')
     receipt=json.loads((Path(root)/BASE/'scoring-receipts'/(forecast_ref['sha256']+'.json')).read_bytes())
     if (receipt['forecast_ref']!=forecast_ref or receipt['status']!='COMMITTED_PREDEADLINE'
             or timestamp(receipt['completed_at'])>=time_of(forecast['game'])

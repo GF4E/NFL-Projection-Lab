@@ -31,7 +31,10 @@
       "observed_evidence": [
         "foundation.json",
         "audit-reproduction/results.json",
-        "audit-reproduction.log"
+        "audit-reproduction.log",
+        "SOURCE-RECONSTRUCTION.md",
+        "tests-source-reconstruction-projection.log",
+        "host-source-reconstruction-canary.json"
       ]
     },
     {
@@ -188,7 +191,10 @@
         "host-cutoff-worker-verification.json",
         "engine/projection/cutoff_pipeline.py; tests/test_projection_cutoff_pipeline.py (shared shadow preparation/scoring/refit, exact cutoff roles, physical fit availability and retry preservation; not production orchestration)",
         "COMMON-PIPELINE.md; host-common-pipeline-canary.json (21 Linux fixtures, 14 shadow forecasts and 52 original records unchanged; simulated future dates)",
-        "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)"
+        "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)",
+        "SOURCE-RECONSTRUCTION.md",
+        "tests-source-reconstruction-projection.log",
+        "host-source-reconstruction-canary.json"
       ]
     },
     {
@@ -227,7 +233,10 @@
         "engine/projection/cutoff_pipeline.py; tests/test_projection_cutoff_pipeline.py (shared shadow preparation/scoring/refit, exact cutoff roles, physical fit availability and retry preservation; not production orchestration)",
         "COMMON-PIPELINE.md; host-common-pipeline-canary.json (21 Linux fixtures, 14 shadow forecasts and 52 original records unchanged; simulated future dates)",
         "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)",
-        "hourly-catchup/current-ref.json; COMMON-PIPELINE.md (2639-game reconstruction with 175 fits and actual hourly dispatch policy; 61 strict-Tuesday delays resolved; historical latency assumed, inactive path)"
+        "hourly-catchup/current-ref.json; COMMON-PIPELINE.md (2639-game reconstruction with 175 fits and actual hourly dispatch policy; 61 strict-Tuesday delays resolved; historical latency assumed, inactive path)",
+        "SOURCE-RECONSTRUCTION.md",
+        "tests-source-reconstruction-projection.log",
+        "host-source-reconstruction-canary.json"
       ]
     },
     {
@@ -365,7 +374,10 @@
         "host-cutoff-worker-verification.json",
         "engine/projection/cutoff_pipeline.py; tests/test_projection_cutoff_pipeline.py (shared shadow preparation/scoring/refit, exact cutoff roles, physical fit availability and retry preservation; not production orchestration)",
         "COMMON-PIPELINE.md; host-common-pipeline-canary.json (21 Linux fixtures, 14 shadow forecasts and 52 original records unchanged; simulated future dates)",
-        "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)"
+        "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)",
+        "SOURCE-RECONSTRUCTION.md",
+        "tests-source-reconstruction-projection.log",
+        "host-source-reconstruction-canary.json"
       ]
     },
     {

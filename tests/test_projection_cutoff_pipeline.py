@@ -23,15 +23,18 @@ class PipelineTests(Helpers):
     def seed(self):
         self.scoring_clock=patch.object(p,'now',return_value=timestamp('2026-09-13T15:01:00Z'))
         self.scoring_clock.start();self.addCleanup(self.scoring_clock.stop)
-        self.capture()
+        self.target={k:game('sun','2026-09-13','13:00').get(k) for k in cs.features.GAME_FIELDS}
+        self.capture([self.g,self.target],statistics(self.g))
         with patch.object(cs,'now',return_value=timestamp(FRIDAY)):self.state_ref=self.advance(FRIDAY)
         self.fit_ref,self.artifact,self.shapes,_,_,_=fixture(self.root)
         self.artifact.update(elo_hfa={'2026':65.},issued_at='2026-09-09T00:00:00Z')
         self.fit_ref=self.write('work/projection-v3/pipeline-fit.json',self.artifact)
-        self.target=game('sun','2026-09-13','13:00');self.target={k:self.target.get(k) for k in cs.features.GAME_FIELDS};self.target['source_hash']='a'*64
+        _,_,transaction=cs.snapshot_before(self.root,cs.obs.current(self.root),timestamp(FRIDAY))
+        self.target['source_hash']=transaction['sources']['schedule']['sha256']
 
     def prepared(self,role='FINAL_ELIGIBLE'):
-        return p.from_recorded(self.root,self.state_ref,[self.target],{'stadiums':[]},at='2026-09-13T15:00:00Z',role=role)
+        return p.from_recorded(self.root,self.state_ref,[self.target],{'stadiums':[]},at='2026-09-13T15:00:00Z',role=role,
+                               schedule_ref=getattr(self,'schedule_ref',None))
 
     def test_final_preparation_matches_existing_state_rows_and_is_label_free(self):
         self.seed();body=self.prepared()
@@ -46,6 +49,10 @@ class PipelineTests(Helpers):
         self.seed();preview=p.score(self.prepared('PROVISIONAL'),self.artifact,self.shapes)['sun']
         with self.assertRaisesRegex(ValueError,'final-eligible'):p.lockable(preview,p.time_of(self.target))
         self.target['gameday']='2026-09-14';self.target['gametime']='20:30'
+        source=self.source('schedule',[self.g,self.target])
+        with patch.object(p,'now',return_value=timestamp('2026-09-13T14:00:00Z')):
+            self.schedule_ref=p.capture_schedule(self.root,source)
+        self.target['source_hash']=source['sha256']
         self.assertEqual(self.prepared('PROVISIONAL')['role'],'PROVISIONAL')
         with self.assertRaisesRegex(ValueError,'cutoff differs'):self.prepared()
 
@@ -116,6 +123,78 @@ class PipelineTests(Helpers):
         self.seed()
         with patch.object(p,'score_batch',side_effect=ValueError('isolated failure')):
             with self.assertRaisesRegex(ValueError,'isolated failure'):p.score(self.prepared(),self.artifact,self.shapes)
+
+    def test_hash_valid_changed_features_and_metadata_fail_before_scoring(self):
+        self.seed()
+        for field in ('features','metadata','personnel'):
+            body=self.prepared()
+            if field=='features':body['rows'][0][field]['baseline']+=5.
+            elif field=='metadata':body['rows'][0][field]['baseline']['label']='invented context'
+            else:body['rows'][0][field]['status']='invented'
+            ref=p.store(self.root,'preparations',body)
+            with patch.object(p,'score_batch',side_effect=AssertionError('Must reject before scoring')):
+                with self.assertRaisesRegex(ValueError,'do not reconstruct'):
+                    p.recorded_scores(self.root,ref,self.fit_ref)
+
+    def test_consistently_rescored_forged_preparation_cannot_first_lock(self):
+        self.seed();body=self.prepared();body['rows'][0]['features']['elo']+=50.
+        ref=p.store(self.root,'preparations',body)
+        # Simulate a prior producer omitting source verification. All forecast
+        # values and the valid commit receipt agree with the altered preparation.
+        with patch.object(p,'verify_preparation',return_value=True):
+            forecast=p.recorded_scores(self.root,ref,self.fit_ref)['sun']
+        with self.assertRaisesRegex(ValueError,'do not reconstruct'):
+            p.commit_shadow_lock(self.root,forecast,'2026-09-13T15:45:01Z')
+        self.assertFalse((self.root/p.BASE/'locks/sun.json').exists())
+
+    def test_changed_retained_stadiums_or_schedule_cannot_validate_original_rows(self):
+        self.seed();body=self.prepared();body['render_inputs']['stadiums']['note']='changed source'
+        with self.assertRaisesRegex(ValueError,'do not reconstruct'):p.verify_preparation(self.root,body)
+        body=self.prepared();body['render_inputs']['slate'][0]['roof']='dome'
+        with self.assertRaisesRegex(ValueError,'retained schedule'):p.verify_preparation(self.root,body)
+        body=self.prepared();del body['render_inputs']
+        with self.assertRaisesRegex(ValueError,'render inputs required'):p.verify_preparation(self.root,body)
+
+    def test_later_schedule_revision_does_not_rewrite_prepared_input(self):
+        self.seed();original=self.prepared();revision=copy.deepcopy(self.target);revision['roof']='dome'
+        source=self.source('schedule',[self.g,revision])
+        with patch.object(p,'now',return_value=timestamp('2026-09-13T15:00:00Z')):
+            later=p.capture_schedule(self.root,source)
+        self.assertTrue(p.verify_preparation(self.root,original))
+        # An unchanged observation pointer retains the original known schedule.
+        self.assertEqual(self.prepared(),original)
+        revision['source_hash']=source['sha256']
+        with self.assertRaisesRegex(ValueError,'Schedule unavailable'):
+            p.from_recorded(self.root,self.state_ref,[revision],{'stadiums':[]},
+                            at='2026-09-13T15:00:00Z',role='FINAL_ELIGIBLE',schedule_ref=later)
+        revised=p.from_recorded(self.root,self.state_ref,[revision],{'stadiums':[]},
+                                at='2026-09-13T15:01:00Z',role='FINAL_ELIGIBLE',schedule_ref=later)
+        self.assertTrue(p.verify_preparation(self.root,revised))
+        self.assertEqual(revised['state'],original['state'])
+        self.assertNotEqual(revised['schedule_evidence'],original['schedule_evidence'])
+        with patch.object(p,'now',return_value=timestamp('2026-09-14T00:00:00Z')):
+            self.assertEqual(p.capture_schedule(self.root,source),later)
+
+    def test_retained_source_corruption_prevents_preparation_verification(self):
+        self.seed();body=self.prepared();source=self.root/body['schedule_evidence']['source_ref']['path']
+        source.write_bytes(b'[]')
+        with self.assertRaisesRegex(ValueError,'source hash mismatch'):p.verify_preparation(self.root,body)
+
+    def test_schedule_capture_lost_response_reuses_original_clock_and_changed_source_fails(self):
+        self.seed();source=self.source('schedule',[self.g,self.target])
+        from engine.projection import storage
+        original=storage.save
+        def lost(path,body,immutable=False):
+            result=original(path,body,immutable)
+            if 'schedule-captures' in str(path):raise OSError('lost schedule response')
+            return result
+        with patch.object(storage,'save',side_effect=lost):
+            with self.assertRaisesRegex(OSError,'lost schedule'):p.capture_schedule(self.root,source)
+        with patch.object(p,'now',return_value=timestamp('2026-09-14T00:00:00Z')):
+            ref=p.capture_schedule(self.root,source)
+        self.assertEqual(p.load(self.root,ref,'schedule-inputs')['collected_at'],'2026-09-13T15:01:00+00:00')
+        (self.root/source['path']).write_bytes(b'[]')
+        with self.assertRaisesRegex(ValueError,'source hash mismatch'):p.capture_schedule(self.root,source)
 
     def test_target_fields_bad_team_and_tampered_artifact_fail_closed(self):
         self.seed();self.target['home_score']=999
