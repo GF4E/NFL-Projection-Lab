@@ -5,7 +5,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[2];sys.path.insert(0,str(ROOT))
-from engine.projection import cutoff_pipeline as p,cutoff_state as cs,observations as obs,prepared,bundle
+from engine.projection import cutoff_pipeline as p,cutoff_state as cs,cutoff_worker as worker,observations as obs,prepared,bundle
 from engine.projection.lineage import read_artifact
 from engine.projection.scoring import prepare_pair
 from engine.projection.scoring_process import score_batch
@@ -18,7 +18,7 @@ from scripts import projection_v3_prepare as preparer,projection_v3_publish as p
 from engine.projection_v3 import qualify
 
 
-def verify(source_root=ROOT,temp_parent=None):
+def verify(source_root=ROOT,temp_parent=None,scheduled=False):
     source_root=Path(source_root);started=time.monotonic();timings={}
     def elapsed(name,start):
         timings[name]=time.monotonic()-start
@@ -49,6 +49,7 @@ def verify(source_root=ROOT,temp_parent=None):
     paths.update((reference['oof']['path'],historical['path'],v1_ref['path'],v1['source_manifest']['schedule']['path']))
     schedule=obs.read_source(source_root,transaction['sources']['schedule'],'schedule')
     ids={g['game_id'] for g in schedule if g['game_type']=='REG' and cutoff_before(p.time_of(g))==first}
+    if scheduled:ids.update(g['game_id'] for g in schedule if g['game_type']=='REG' and cutoff_before(p.time_of(g))==next_cutoff(first))
     original_rows,_,_=prepared.load(source_root)
     rows=[r for r in original_rows if r['game_id'] in ids]
     assert len(rows)==2*len(ids)>0
@@ -76,7 +77,11 @@ def verify(source_root=ROOT,temp_parent=None):
         save(target/'outputs/projection-v3/final-feed.json',{**final_feed,'source_ref':feed_ref})
         phase=time.monotonic()
         with patch.object(cs,'now',return_value=first+dt.timedelta(seconds=1)):
-            state_ref=cs.advance(target,first,fit_ref)
+            if scheduled:
+                with patch.object(worker,'now',return_value=first-dt.timedelta(hours=1)):worker.configure(target,'canary',fit_ref)
+                with patch.object(worker,'now',side_effect=[first+dt.timedelta(seconds=1),first+dt.timedelta(seconds=2)]):
+                    state_ref=worker.run_due(target,'canary')['state_ref']
+            else:state_ref=cs.advance(target,first,fit_ref)
         elapsed('state_update',phase)
         stack.enter_context(patch.multiple(preparer,ROOT=target))
         stack.enter_context(patch.multiple(publisher,ROOT=target,OUT=target/'outputs/projection-v3',WORK=target/'work/projection-v3'))
@@ -91,7 +96,8 @@ def verify(source_root=ROOT,temp_parent=None):
         stack.enter_context(patch.object(bundle,'capture_code',return_value=code))
         phase=time.monotonic()
         with patch.object(p,'now',return_value=at-dt.timedelta(seconds=1)):
-            preparer.prepare(cutoff_state_ref=state_ref,game_ids=sorted(ids),role='FINAL_ELIGIBLE',at=at)
+            if scheduled:preparer.prepare(select_scheduled=True,at=at)
+            else:preparer.prepare(cutoff_state_ref=state_ref,game_ids=sorted(ids),role='FINAL_ELIGIBLE',at=at)
         elapsed('prepare',phase);phase=time.monotonic()
         with patch.object(p,'now',return_value=at+dt.timedelta(seconds=1)):
             upcoming=publisher.run(at+dt.timedelta(seconds=1))
@@ -101,27 +107,34 @@ def verify(source_root=ROOT,temp_parent=None):
                      for c in upcoming['games'] if c['projection']!=expected[c['game_id']]['projection']]
         if differences:raise ValueError('Captured parity differs: '+json.dumps(differences[:2]))
         assert all(bundle.verify_card(target,c)['chronology']['status']=='RECORDED_CUTOFF_INPUTS' for c in upcoming['games'])
-        deadline=max(timestamp(c['cutoff_at']) for c in upcoming['games'])
+        final_ids={c['game_id'] for c in upcoming['games'] if c['forecast_role']=='FINAL_ELIGIBLE'}
+        preview_ids=ids-final_ids
+        if scheduled:
+            assert final_ids and preview_ids
+            assert all('availability_ref' in bundle.verify_card(target,c)['chronology']['state_lineage'] for c in upcoming['games'])
+        deadline=max(timestamp(c['cutoff_at']) for c in upcoming['games'] if c['game_id'] in final_ids)
         phase=time.monotonic();locked=publisher.run(deadline);elapsed('first_lock_publish_including_board',phase)
-        assert all(c['status']=='LOCKED' for c in locked['games'])
+        assert all(c['status']=='LOCKED' for c in locked['games'] if c['game_id'] in final_ids)
+        assert all(c['forecast_role']=='PROVISIONAL' for c in locked['games'] if c['game_id'] in preview_ids)
         original_locks={f.name:obs.sha(f.read_bytes()) for f in (target/'outputs/projection-v3/locks').glob('*.json')}
         # These future games have no actual final. Deliberately synthetic scores
         # exercise the real grader and board evidence, never an accuracy claim.
         records=list(csv.DictReader(io.StringIO(final_raw.decode())));finals={}
         for row in records:
-            if row['game_id'] not in ids:continue
+            if row['game_id'] not in final_ids:continue
             row.update(away_score='20',home_score='27',result='7',total='47')
             finals[row['game_id']]={'away_score':20.,'home_score':27.}
-        assert set(finals)==ids
+        assert set(finals)==final_ids
         stream=io.StringIO();writer=csv.DictWriter(stream,fieldnames=list(records[0]));writer.writeheader();writer.writerows(records)
         raw=stream.getvalue().encode();ref=store_source(target,raw)
+        grade_time=next_cutoff(first)-dt.timedelta(hours=1) if scheduled else deadline+dt.timedelta(days=1)
         save(target/'outputs/projection-v3/final-feed.json',{'games':{**final_feed['games'],**finals},'source_ref':ref,
-             'source_sha256':obs.sha(raw),'received_at':(deadline+dt.timedelta(days=1)).isoformat(),'simulation':True})
-        phase=time.monotonic();graded=publisher.run(deadline+dt.timedelta(days=1));elapsed('first_grade_publish_including_board',phase)
+             'source_sha256':obs.sha(raw),'received_at':grade_time.isoformat(),'simulation':True})
+        phase=time.monotonic();graded=publisher.run(grade_time);elapsed('first_grade_publish_including_board',phase)
         assert all(c['status']=='FINAL' and c['grades'] and c['forecast_bundle_ref']==old['forecast_bundle_ref']
-                   for c,old in zip(graded['games'],upcoming['games']))
+                   for c,old in zip(graded['games'],upcoming['games']) if c['game_id'] in final_ids)
         grades={f.name:obs.sha(f.read_bytes()) for f in (target/'outputs/projection-v3/grades').glob('*.json')}
-        phase=time.monotonic();publisher.run(deadline+dt.timedelta(days=1,minutes=1));elapsed('duplicate_grade_publish_including_board',phase)
+        phase=time.monotonic();publisher.run(grade_time+dt.timedelta(minutes=1));elapsed('duplicate_grade_publish_including_board',phase)
         assert grades=={f.name:obs.sha(f.read_bytes()) for f in (target/'outputs/projection-v3/grades').glob('*.json')}
         assert original_locks=={f.name:obs.sha(f.read_bytes()) for f in (target/'outputs/projection-v3/locks').glob('*.json')}
         evidence=json.loads((target/'outputs/board-v7/evidence.json').read_bytes())
@@ -131,7 +144,7 @@ def verify(source_root=ROOT,temp_parent=None):
     assert all(obs.sha((source_root/name).read_bytes())==sha for name,sha in frozen.items())
     return {'status':'PASS','scope':'Actual preparer/publisher/bundle/lock/grader/board-evidence code; captured inputs, simulated future clocks and explicitly synthetic final scores. No activation or public website publish.',
             'checked_at':dt.datetime.now(dt.timezone.utc).isoformat(),'fit_ref':fit_ref,'observation_ref':latest,
-            'slate_games':len(ids),'point_probability_interval_parity_games':len(ids),'source_frozen_records_preserved':len(frozen),
+            'slate_games':len(ids),'scheduled_selection':scheduled,'final_eligible_games':len(final_ids),'provisional_games':len(preview_ids),'point_probability_interval_parity_games':len(ids),'source_frozen_records_preserved':len(frozen),
             'reference':'Legacy builder independently rerun on identical captured sources in this runtime; exact projection equality required.',
             'original_cache_max_point_difference':cache_delta,
             'synthetic_first_grades':len(grades),'idempotent_grades':len(grades),'preserved_canary_locks':len(original_locks),

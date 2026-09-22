@@ -1,0 +1,60 @@
+{
+  "status": "PASS",
+  "scope": "Actual preparer/publisher/bundle/lock/grader/board-evidence code; captured inputs, simulated future clocks and explicitly synthetic final scores. No activation or public website publish.",
+  "checked_at": "2026-09-22T23:33:42.703348+00:00",
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "observation_ref": {
+    "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+    "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+  },
+  "slate_games": 15,
+  "scheduled_selection": true,
+  "final_eligible_games": 14,
+  "provisional_games": 1,
+  "point_probability_interval_parity_games": 15,
+  "source_frozen_records_preserved": 52,
+  "reference": "Legacy builder independently rerun on identical captured sources in this runtime; exact projection equality required.",
+  "original_cache_max_point_difference": 0.0,
+  "synthetic_first_grades": 14,
+  "idempotent_grades": 14,
+  "preserved_canary_locks": 14,
+  "board_evidence_games": 15,
+  "board_context_games": 15,
+  "simulated_cutoff": "2026-09-25T13:00:00+00:00",
+  "simulated_preparation": "2026-09-27T15:40:00+00:00",
+  "synthetic_final": {
+    "away": 20,
+    "home": 27
+  },
+  "consumer_code": {
+    "engine/projection/finals.py": "761e1db6f49b50148daacb8c44d322eb865a3a3d27d221aa1145637f816a0c67",
+    "engine/projection/source_archive.py": "c57fd254b478c3b5fcf49e81d043e977d9c126b1c96df2a6b52d4246e8025b5d",
+    "scripts/cloud_scheduler.py": "bf166c006b2de17aa177a1da7fe3c896152517d8e1d86a07e8d2ad4fc51ac55e",
+    "scripts/board_v7_publish.py": "14b30935bcee2a1e046d935010fd04fe8f1f2e5fe247729d702de7056b2c3171",
+    "scripts/board_v9_publish.py": "4c9ab134333935010040ef5d5b43496635f55ae4eee10355db442bf1bc770d4b",
+    "work/engine-rebuild/check_cutoff_publisher.py": "24096e6e376453ab45805005d58c6ef763b0149f4fbfd4bb802ce19664bd0d1e"
+  },
+  "stage_seconds": {
+    "state_update": 9.143919288064353,
+    "prepare": 31.846566969063133,
+    "upcoming_publish_including_board": 51.93401419790462,
+    "first_lock_publish_including_board": 49.42981934500858,
+    "first_grade_publish_including_board": 4.88631772401277,
+    "duplicate_grade_publish_including_board": 37.41586696205195
+  },
+  "elapsed_seconds": 225.56133123696782,
+  "peak_rss_bytes": 282972160,
+  "artifact_bytes": 7598699,
+  "reference_limit": "Board references still use the retained SUPERSEDED adaptive series; current-reference migration remains required.",
+  "provider_requests": 0,
+  "new_spending": 0,
+  "host_commit": "be6bfccf8c25dd2b85afe63105e48688c5048f14",
+  "uid": 1000,
+  "python": "3.12.2",
+  "tests": 44,
+  "address_space_limit_bytes": 4294967296,
+  "free_root_bytes": 145809408
+}

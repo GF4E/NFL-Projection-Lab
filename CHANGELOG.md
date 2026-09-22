@@ -18,6 +18,12 @@ Verification: 4 new export/boundary tests, 33 existing projection tests, 218 sta
 
 # Projection change log
 
+## 2026-09-22 — scheduled cutoff selection and atomic preparation
+
+Infrastructure capability, not a method/calibration change or activation. The actual preparer can automatically resolve each game's exact required cutoff from durable worker completion evidence, using an earlier completed state only as a provisional preview before the required cutoff exists. Retain the configuration and immutable operation receipt in forecast lineage; reconstruct that evidence before first lock. Missing/unacknowledged required state cannot fall back to an older final forecast. Multiple state/role groups commit one prepared pointer after all succeed; an interrupted second group leaves the original pointer intact. A scheduled manifest cannot silently return to manual state selection.
+
+Final source passes 512 local checks and 45 Linux fixtures. The actual-consumer canary passes 15 forecasts (14 final-eligible Sunday games and one Monday preview), 14 synthetic grades/retries and both board-evidence outputs in 234.023 seconds, with 52 original records unchanged and exact numerical parity. Source-hash scope, earlier intermediate receipts and limitations: work/engine-rebuild/SCHEDULED-SELECTION.md. The production scheduler remains on the legacy default; release/rollback, capacity and activation qualification remain unfinished. No provider requests or spending.
+
 ## 2026-09-22 — explicit cutoff contract reaches the actual publisher
 
 Infrastructure only; no live selector, statistical promotion, active fit or calibration change. Connect explicit recorded preparations to actual card/bundle publication, original-source verification before first lock, immutable first grading and board evidence. A predeadline calculation needs a separately durable predeadline card receipt. Provisional cards cannot lock, incomplete mappings cannot revert to legacy, and stripped bundle references cannot downgrade a cutoff record to legacy. Original frozen records retain their original contracts. New immutable source dependencies join the existing scheduler publication graph.

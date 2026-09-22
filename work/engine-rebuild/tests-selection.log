@@ -1,0 +1,21 @@
+...............................................E..........................
+======================================================================
+ERROR: test_projection_cutoff_selection (unittest.loader._FailedTest.test_projection_cutoff_selection)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_projection_cutoff_selection
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.12/unittest/loader.py", line 394, in _find_test_path
+    module = self._get_module_from_name(name)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/unittest/loader.py", line 337, in _get_module_from_name
+    __import__(name)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_cutoff_selection.py", line 110
+    stack.enter_context(patch.multiple(publisher,ROOT=self.root,OUT=self.root/'outputs/projection-v3',WORK=self.root/'work/projection-v3')))
+                                                                                                                                           ^
+SyntaxError: unmatched ')'
+
+
+----------------------------------------------------------------------
+Ran 74 tests in 6.065s
+
+FAILED (errors=1)

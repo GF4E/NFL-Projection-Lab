@@ -1,10 +1,15 @@
 """Read-only source/legacy-publication follow-through after the candidate commit."""
+import argparse
 import json
 from pathlib import Path
 import subprocess
 
 ROOT=Path(__file__).resolve().parents[2]
-candidate=json.loads((ROOT/'work/engine-rebuild/host-cutoff-publisher-qualified-canary.json').read_bytes())
+parser=argparse.ArgumentParser()
+parser.add_argument('--candidate',default='work/engine-rebuild/host-cutoff-publisher-qualified-canary.json')
+parser.add_argument('--output',default='work/engine-rebuild/host-cutoff-publication-followthrough.json')
+args=parser.parse_args()
+candidate=json.loads((ROOT/args.candidate).read_bytes())
 consumer={'consumer_code':candidate['consumer_code']}
 capture=json.loads((ROOT/'work/engine-rebuild/prepared-input-capture.json').read_bytes())
 frozen={p:item['sha256'] for p,item in capture['files'].items()
@@ -51,5 +56,5 @@ result=subprocess.run(['ssh','-i',str(ROOT/'.cloud-private/admin_key'),'-o','Bat
 if result.returncode:raise RuntimeError('Cutoff publication follow-through failed: '+result.stderr[-2000:])
 body=json.loads(result.stdout)
 if body['status']=='VERIFIED_SOURCE_ARRIVAL':
- (ROOT/'work/engine-rebuild/host-cutoff-publication-followthrough.json').write_text(json.dumps(body,indent=2)+'\n')
+ (ROOT/args.output).write_text(json.dumps(body,indent=2)+'\n')
 print(json.dumps({k:v for k,v in body.items() if k!='source_hashes'},indent=2))

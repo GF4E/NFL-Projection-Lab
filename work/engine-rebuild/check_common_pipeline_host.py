@@ -10,14 +10,16 @@ ROOT=Path(__file__).resolve().parents[2]
 parser=argparse.ArgumentParser()
 parser.add_argument('--output',default='work/engine-rebuild/host-common-pipeline-canary.json')
 parser.add_argument('--publisher',action='store_true')
+parser.add_argument('--scheduled',action='store_true')
 args=parser.parse_args()
+if args.scheduled:args.publisher=True
 files={str(path.relative_to(ROOT)):path.read_text() for folder in ('engine','scripts')
        for path in (ROOT/folder).rglob('*.py') if '__pycache__' not in path.parts}
 for name in ('tests/test_projection_cutoff_state.py','tests/test_projection_cutoff_pipeline.py',
-             'tests/test_projection_cutoff_publication.py','tests/test_projection_bundle.py',
+             'tests/test_projection_cutoff_publication.py','tests/test_projection_cutoff_selection.py','tests/test_projection_bundle.py',
              'work/engine-rebuild/check_common_pipeline.py','work/engine-rebuild/check_cutoff_publisher.py'):
     files[name]=(ROOT/name).read_text()
-program='PUBLISHER='+repr(args.publisher)+'\nPAYLOAD='+repr(base64.b64encode(gzip.compress(json.dumps(files).encode())).decode())+'\n'+r'''
+program='SCHEDULED='+repr(args.scheduled)+'\nPUBLISHER='+repr(args.publisher)+'\nPAYLOAD='+repr(base64.b64encode(gzip.compress(json.dumps(files).encode())).decode())+'\n'+r'''
 import base64,contextlib,gzip,hashlib,importlib.util,io,json,os,platform,resource,signal,subprocess,sys,tempfile,unittest
 from pathlib import Path
 root=Path.cwd();commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
@@ -33,11 +35,14 @@ with tempfile.TemporaryDirectory(prefix='common-pipeline-code-',dir='/run/nfl-en
     suite=unittest.defaultTestLoader.discover(str(candidate/'tests'),pattern='test_projection_cutoff_pipeline.py')
     if PUBLISHER:
         suite.addTests(unittest.defaultTestLoader.discover(str(candidate/'tests'),pattern='test_projection_cutoff_publication.py'))
+    if SCHEDULED:
+        suite.addTests(unittest.defaultTestLoader.discover(str(candidate/'tests'),pattern='test_projection_cutoff_selection.py'))
     with contextlib.redirect_stdout(noise):tests=unittest.TextTestRunner(stream=log,verbosity=2).run(suite)
     assert tests.wasSuccessful(),log.getvalue()
     path=candidate/('work/engine-rebuild/check_cutoff_publisher.py' if PUBLISHER else 'work/engine-rebuild/check_common_pipeline.py')
     spec=importlib.util.spec_from_file_location('common_canary',path);module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
-    with contextlib.redirect_stdout(noise):result=module.verify(root,'/run/nfl-engine-monitor')
+    with contextlib.redirect_stdout(noise):
+        result=module.verify(root,'/run/nfl-engine-monitor',scheduled=True) if SCHEDULED else module.verify(root,'/run/nfl-engine-monitor')
     result.update(host_commit=commit,uid=os.getuid(),python=platform.python_version(),tests=tests.testsRun,
                   test_log=log.getvalue(),address_space_limit_bytes=4*1024**3)
     fs=os.statvfs(root);result['free_root_bytes']=fs.f_bavail*fs.f_frsize

@@ -100,3 +100,10 @@ The old current-features.json.gz remains preserved legacy data. New production r
 Preparation and weekly_refit share .cloud-private/projection-preparation/writer.lock. Busy means stop; there is no timeout takeover. Cloud dispatch ownership still encloses the job. The current fit must match at both ends of preparation. After a successful weekly refit, the scheduler prepares that fit before republishing; failures preserve the last completed snapshot and do not justify relabeling it as the new fit. A post-pointer response loss is reconciled by reading the exact pointer and retrying the same payload.
 
 Storage failures can leave unreferenced immutable snapshot files; they are preserved evidence, not accepted publication. No automated deletion is introduced. These snapshots plus a verified scorer package support exact restored computation; full preparation/scheduler rollback activation and the observed Tuesday sequence remain separate requirements.
+
+
+## Scheduled selection capability — not activated
+
+The actual preparer exposes prepare(select_scheduled=True), with no manual state/game/role arguments. It requires an existing configured cutoff worker and completed state-operation receipts. Each due game's exact required cutoff is mandatory; a future-cutoff game may be PROVISIONAL on the latest completed state. Receipt completion time, configuration and exact state hash are retained in preparation and revalidated at first lock. An execution-start timestamp alone is insufficient.
+
+All groups render before one prepared-pointer commit. A staged immutable group left by interruption is not a published update. Retry reconciles unchanged references without refreshing their original clock. A scheduled prepared manifest cannot revert through the default legacy or manual-state adapter; a qualified compatible release/rollback must manage a deliberate switch. The current cloud scheduler has not enabled this option. Do not activate it by editing prepared metadata or bypassing the owner fence. Evidence and unresolved release prerequisites are in SCHEDULED-SELECTION.md.

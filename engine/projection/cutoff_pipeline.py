@@ -125,10 +125,19 @@ def schedule_evidence(root,reference,slate,at):
     return evidence
 
 
-def from_recorded(root,state_ref,slate,stadiums,*,at,role,schedule_ref=None):
+def recorded_context(root,body,state_ref,availability_ref=None):
+    context=state_context(body,state_ref)
+    if availability_ref is not None:
+        from .cutoff_selection import committed_at
+        context['committed_at']=committed_at(root,state_ref,body,availability_ref).isoformat()
+        context['availability_ref']=copy.deepcopy(availability_ref)
+    return context
+
+
+def from_recorded(root,state_ref,slate,stadiums,*,at,role,schedule_ref=None,availability_ref=None):
     if role=='HISTORICAL_RECONSTRUCTION':raise ValueError('Use explicit replay adapter for reconstruction')
     state,body=cutoff_state.restore(root,state_ref)
-    prepared=prepare(state,state_context(body,state_ref),slate,stadiums,at=at,role=role)
+    prepared=prepare(state,recorded_context(root,body,state_ref,availability_ref),slate,stadiums,at=at,role=role)
     prepared['schedule_evidence']=schedule_evidence(root,schedule_ref or cutoff_state.obs.current(root),slate,at)
     return prepared
 
@@ -148,7 +157,7 @@ def verify_preparation(root,prepared):
     evidence=prepared.get('schedule_evidence')
     if not isinstance(evidence,dict):raise ValueError('Recorded schedule evidence required')
     state_ref=prepared['state']['state_ref'];state,body=cutoff_state.restore(root,state_ref)
-    expected=prepare(state,state_context(body,state_ref),inputs['slate'],inputs['stadiums'],
+    expected=prepare(state,recorded_context(root,body,state_ref,prepared['state'].get('availability_ref')),inputs['slate'],inputs['stadiums'],
                      at=prepared['prepared_at'],role=prepared['role'])
     expected['schedule_evidence']=schedule_evidence(root,evidence.get('schedule_ref') or evidence.get('observation_ref'),inputs['slate'],prepared['prepared_at'])
     if cutoff_state.raw(expected)!=cutoff_state.raw(prepared):

@@ -39,3 +39,7 @@ Retain exact render inputs; verify recorded schedule availability and reconstruc
 ## Actual issuer integration increment
 
 Connect an explicit cutoff preparation adapter to the existing immutable prepared snapshot. Route those snapshots through the actual publisher, protected forecast bundle, predeadline issuance receipt and first-grade reader. Execute the real publisher on isolated fixtures, including preview rejection and late bundle rejection. Keep the live state selector inactive until the complete corrected release qualifies; do not claim full activation from this integration test.
+
+## Scheduled selection increment
+
+Resolve each upcoming game's required cutoff automatically using completed worker receipts. Bind the physical acknowledgment/configuration evidence to preparation and first-lock reconstruction; distinguish future-cutoff previews from due-cutoff failures. Render all selected groups before a single prepared commit. Exercise the actual scheduled preparer and publisher on fixtures and captured inputs, retaining the existing active selector until release/rollback qualification.

@@ -26,7 +26,7 @@ CODE_PATHS = (
     'engine/projection/scoring_process.py', 'scripts/projection_score_worker.py',
     'engine/projection/lineage.py','engine/projection/storage.py',
     'engine/projection/observations.py','engine/projection/cutoff_features.py','engine/forecast_system/cadence.py',
-    'engine/projection/cutoff_state.py','engine/projection/cutoff_pipeline.py','engine/projection/cutoff_publication.py',
+    'engine/projection/cutoff_state.py','engine/projection/cutoff_pipeline.py','engine/projection/cutoff_publication.py','engine/projection/cutoff_selection.py','engine/projection/cutoff_worker.py',
     'engine/projection/model.py','engine/projection/card.py','engine/projection/grade.py',
     'engine/projection/distribution.py','engine/projection_v3/card.py','engine/projection_v3/model.py',
     'engine/projection/features.py','engine/projection_v3/personnel.py','engine/elo.py','engine/elo_hfa.py',

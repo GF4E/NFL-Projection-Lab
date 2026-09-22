@@ -1,0 +1,52 @@
+CANARY_STAGE {"state_update": 1.4210914169962052}
+CANARY_STAGE {"prepare": 4.595331624994287}
+CANARY_STAGE {"upcoming_publish_including_board": 5.575286417006282}
+CANARY_STAGE {"first_lock_publish_including_board": 4.804375207982957}
+CANARY_STAGE {"first_grade_publish_including_board": 0.9493830830033403}
+CANARY_STAGE {"duplicate_grade_publish_including_board": 0.8831547499867156}
+{
+  "status": "PASS",
+  "scope": "Actual preparer/publisher/bundle/lock/grader/board-evidence code; captured inputs, simulated future clocks and explicitly synthetic final scores. No activation or public website publish.",
+  "checked_at": "2026-09-22T23:28:16.900407+00:00",
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "observation_ref": {
+    "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+    "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+  },
+  "slate_games": 15,
+  "scheduled_selection": true,
+  "final_eligible_games": 14,
+  "provisional_games": 1,
+  "point_probability_interval_parity_games": 15,
+  "source_frozen_records_preserved": 52,
+  "reference": "Legacy builder independently rerun on identical captured sources in this runtime; exact projection equality required.",
+  "original_cache_max_point_difference": 2.0605739337042905e-13,
+  "synthetic_first_grades": 14,
+  "idempotent_grades": 14,
+  "preserved_canary_locks": 14,
+  "board_evidence_games": 15,
+  "board_context_games": 15,
+  "simulated_cutoff": "2026-09-25T13:00:00+00:00",
+  "simulated_preparation": "2026-09-27T15:40:00+00:00",
+  "synthetic_final": {
+    "away": 20,
+    "home": 27
+  },
+  "stage_seconds": {
+    "state_update": 1.4210914169962052,
+    "prepare": 4.595331624994287,
+    "upcoming_publish_including_board": 5.575286417006282,
+    "first_lock_publish_including_board": 4.804375207982957,
+    "first_grade_publish_including_board": 0.9493830830033403,
+    "duplicate_grade_publish_including_board": 0.8831547499867156
+  },
+  "elapsed_seconds": 23.982962000009138,
+  "peak_rss_bytes": 592429056,
+  "artifact_bytes": 7598348,
+  "reference_limit": "Board references still use the retained SUPERSEDED adaptive series; current-reference migration remains required.",
+  "provider_requests": 0,
+  "new_spending": 0
+}
