@@ -69,8 +69,10 @@ def available(root,observation_ref,cutoff):
     finals={};statistics={};missing=list(snapshot['unknown'])
     for game in schedule:
         gid=game['game_id']
-        if game['game_type']!='REG' or any(game.get(k) in ('',None) for k in ('home_score','away_score')):continue
+        if game['game_type']!='REG':continue
         if schedule_kickoff(game['gameday'],game['gametime'])+dt.timedelta(hours=4)>=cutoff:continue
+        if any(game.get(k) in ('',None) for k in ('home_score','away_score')):
+            missing.append({'game_id':gid,'reason':'FINAL_NOT_RECORDED'});continue
         value={k:game.get(k) for k in obs.GAME_KEYS}
         for k in ('season','week'):value[k]=int(value[k])
         for k in ('home_score','away_score'):

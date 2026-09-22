@@ -128,6 +128,13 @@ def assess_host(snapshot, external, now):
         findings.append(issue('CAPTURE_TIMER_INACTIVE'))
     if capture.get('Result') not in ('success', None, ''):
         findings.append(issue('CAPTURE_RUN_FAILED', POLICY['transient_seconds']))
+    cutoff = snapshot.get('cutoff_state', {})
+    if cutoff.get('state') in {'FAILED_CLOSED','OVERDUE','ACKNOWLEDGMENT_MISSING','INPUTS_INCOMPLETE','UNVERIFIED'}:
+        findings.append(issue('CUTOFF_STATE_'+cutoff['state'], **{k:v for k,v in cutoff.items() if k not in ('state','mode')}))
+    if cutoff.get('state') not in (None,'NOT_CONFIGURED') and snapshot['services'].get('nfl-cutoff-state.timer',{}).get('ActiveState')!='active':
+        findings.append(issue('CUTOFF_TIMER_INACTIVE'))
+    if cutoff.get('state')=='NOT_CONFIGURED' and snapshot['services'].get('nfl-cutoff-state.timer',{}).get('ActiveState')=='active':
+        findings.append(issue('CUTOFF_WORKER_UNCONFIGURED'))
     # Timer ticks can look alive while the reader never completes useful work.
     recovery = snapshot.get('final_reader') or {}
     if recovery.get('state') == 'FAILED_CLOSED':

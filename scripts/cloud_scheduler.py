@@ -19,7 +19,7 @@ from scripts.nfl_engine_autopush import guard, REMOTE
 
 LOCK_PATH = 'work/cloud-migration-v1/ownership.json'
 OUT = ROOT/'outputs/model-pick-v1'
-ALLOWED = ('work/projection-observations-v1/', 'outputs/cadence-v2/', 'outputs/board-v8-market/', 'outputs/board-v7/', 'outputs/in-season-learning-v1/', 'work/in-season-learning-v1/', 'CHANGELOG.md', 'outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
+ALLOWED = ('work/projection-cutoff-state-v1/', 'work/projection-observations-v1/', 'outputs/cadence-v2/', 'outputs/board-v8-market/', 'outputs/board-v7/', 'outputs/in-season-learning-v1/', 'work/in-season-learning-v1/', 'CHANGELOG.md', 'outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
            'work/model-pick-v1/daily/', 'work/model-pick-v1/sources/',
            'work/model-pick-v1/schedules/', 'work/model-pick-v1/states/',
            'work/model-pick-v1/depth/')
@@ -100,6 +100,29 @@ def capture_window(current=None):
     return False
 
 
+def next_capture_boundary(current=None):
+    """Reserve the complete state budget before any known capture/lock window."""
+    from zoneinfo import ZoneInfo
+    current=current or dt.datetime.now(dt.timezone.utc)
+    boundaries=[]
+    local=current.astimezone(ZoneInfo('America/Los_Angeles'))
+    for days in range(8):
+        day=local+dt.timedelta(days=days)
+        if day.weekday() in (0,4,5,6):
+            start=day.replace(hour=9 if day.weekday()==0 else 7 if day.weekday()==6 else 12,minute=0,second=0,microsecond=0)-dt.timedelta(minutes=6)
+            if start>local:boundaries.append(start)
+    for folder in sorted((ROOT/'work/model-pick-v1/daily').glob('*'),reverse=True):
+        path=folder/'schedule-ref.json'
+        if not path.exists():continue
+        from engine.pick_store import read_pinned
+        schedule=read_pinned(json.loads(path.read_bytes()))
+        for g in schedule['groups']:
+            start=dt.datetime.fromisoformat(g['capture_at'])-dt.timedelta(minutes=6)
+            if start>current:boundaries.append(start)
+        break
+    return min(boundaries) if boundaries else None
+
+
 def worker(script):
     result = subprocess.run([sys.executable, '-B', str(ROOT/'scripts'/script)],
                             cwd=ROOT, env=ENV, capture_output=True, text=True, timeout=650)
@@ -120,6 +143,14 @@ def run(mode, host):
         synchronize()
         # Recover any pending artifact publication before another worker call.
         publish_artifacts()
+        if mode in ('cutoff','cutoff-configure'):
+            from engine.projection import cutoff_worker,prepared
+            if mode=='cutoff-configure':
+                result=cutoff_worker.configure(ROOT,host,prepared.active_fit(ROOT))
+                return {'state':'CONFIGURED_NUMERICAL_SHADOW','first_cutoff':result['first_cutoff'],'commit':publish_artifacts()}
+            if capture_window() or weekly_capture_window(dt.datetime.now(dt.timezone.utc)):return {'state':'DEFERRED_CAPTURE_WINDOW'}
+            result=cutoff_worker.run_due(ROOT,host,safe_until=next_capture_boundary())
+            return {**result,'commit':publish_artifacts()}
         if mode == 'daily' and capture_window():
             return {'state': 'DEFERRED_CAPTURE_WINDOW'}
         if mode in ('daily','learning'):
@@ -227,13 +258,15 @@ def run(mode, host):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('mode', choices=['capture', 'daily', 'learning'])
+    parser.add_argument('mode', choices=['capture', 'daily', 'learning','cutoff','cutoff-configure'])
     parser.add_argument('--host', default=os.environ.get('NFL_RUNNER_ID', 'mac-fallback'))
     args = parser.parse_args()
     try:
         result = run(args.mode, args.host)
-        if result['state'] not in ('OK', 'YIELD_TO_OWNER', 'LOCAL_JOB_ACTIVE'):
-            print(json.dumps(result), flush=True)
+        if result['state'] not in ('OK', 'YIELD_TO_OWNER', 'LOCAL_JOB_ACTIVE','WAITING_FOR_CUTOFF'):
+            visible={k:v for k,v in result.items() if k in ('state','mode','cutoff_at','first_cutoff','reason','commit')} if args.mode.startswith('cutoff') else result
+            print(json.dumps(visible), flush=True)
+        if result['state']=='FAILED_CLOSED':return 1
     except Exception as exc:
         print(json.dumps({'state': 'FAILED_CLOSED', 'error_type': type(exc).__name__}), flush=True)
         return 1

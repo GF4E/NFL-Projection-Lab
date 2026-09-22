@@ -1,0 +1,174 @@
+{
+  "status": "PASS",
+  "checked_at": "2026-09-22T20:16:16.824658+00:00",
+  "scope": "Captured source restoration; simulated three future cutoffs only, no production state or issuance.",
+  "source_remote_commit": "7d70582b54a3f900c96a554a751982a623dc2461",
+  "remote_graph_verified": true,
+  "graph_files": 6,
+  "graph_snapshots": 1,
+  "observation_ref": {
+    "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+    "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+  },
+  "actual_collection_clock": "2026-09-22T19:35:10.277779+00:00",
+  "simulated_cutoffs": [
+    "2026-09-25T13:00:00+00:00",
+    "2026-09-28T13:00:00+00:00",
+    "2026-09-29T13:00:00+00:00"
+  ],
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "games_reproduced_from_sources": 3183,
+  "state_games": 3183,
+  "additional_duplicate_effects": 0,
+  "restored_states": 3,
+  "worker_cutoffs_committed": 3,
+  "mode": "NUMERICAL_SHADOW",
+  "missing_by_cutoff": {
+    "2026-09-25T13:00:00+00:00": [
+      {
+        "game_id": "2026_03_ATL_GB",
+        "reason": "FINAL_NOT_RECORDED"
+      }
+    ],
+    "2026-09-28T13:00:00+00:00": [
+      {
+        "game_id": "2026_03_ARI_SF",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_ATL_GB",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_BAL_DAL",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_CAR_CLE",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_CIN_PIT",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_HOU_IND",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_KC_MIA",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_LAC_BUF",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_LA_DEN",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_LV_NO",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_MIN_TB",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_NE_JAX",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_NYJ_DET",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_SEA_WAS",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_TEN_NYG",
+        "reason": "FINAL_NOT_RECORDED"
+      }
+    ],
+    "2026-09-29T13:00:00+00:00": [
+      {
+        "game_id": "2026_03_ARI_SF",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_ATL_GB",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_BAL_DAL",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_CAR_CLE",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_CIN_PIT",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_HOU_IND",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_KC_MIA",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_LAC_BUF",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_LA_DEN",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_LV_NO",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_MIN_TB",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_NE_JAX",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_NYJ_DET",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_PHI_CHI",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_SEA_WAS",
+        "reason": "FINAL_NOT_RECORDED"
+      },
+      {
+        "game_id": "2026_03_TEN_NYG",
+        "reason": "FINAL_NOT_RECORDED"
+      }
+    ]
+  },
+  "same_state_after_empty_cutoffs": true,
+  "state_bytes": 1151024,
+  "legacy_feature_parity_rows": 28,
+  "max_feature_difference": 0,
+  "frozen_records_unchanged": 52,
+  "elapsed_seconds": 13.267837833991507,
+  "peak_rss_bytes": 402391040,
+  "provider_requests": 0,
+  "new_spending": 0
+}

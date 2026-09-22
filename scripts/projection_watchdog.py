@@ -90,7 +90,7 @@ def source_snapshot(root, now, epoch):
 
 
 def services():
-    names = ['nfl-engine-capture.service', 'nfl-engine-capture.timer']
+    names = ['nfl-engine-capture.service', 'nfl-engine-capture.timer', 'nfl-cutoff-state.service', 'nfl-cutoff-state.timer']
     fields = ['Id', 'ActiveState', 'SubState', 'Result', 'ExecMainStatus',
               'ExecMainStartTimestamp', 'ExecMainExitTimestamp']
     args = ['systemctl', 'show', *names]
@@ -137,6 +137,11 @@ def host_once(folder=HOST_STATE, root=ROOT, now=None):
     value['final_reader'] = load(root/'outputs/projection-v3/operations/final-feed.json', {})
     # Export only health evidence, not arbitrary runtime state.
     value['final_reader'] = {k: value['final_reader'].get(k) for k in ('state', 'last_success_at', 'reason')}
+    try:
+        from engine.projection.cutoff_worker import health as cutoff_health
+        value['cutoff_state']=cutoff_health(root,now)
+    except (OSError,ValueError,KeyError,TypeError) as error:
+        value['cutoff_state']={'state':'UNVERIFIED','error_type':type(error).__name__}
     external = load(folder/'outside-receipt.json')
     now = now if fixed_time else dt.datetime.now(UTC)
     value['checked_at'] = now.isoformat()
