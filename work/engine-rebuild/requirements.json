@@ -80,7 +80,9 @@
         "host-storage-canary.json (9 disposable-host tests; workflow transaction pending)",
         "scripts/closeout_publish.py (checkpoint/acknowledgment; source repository only)",
         "tests-closeout-recovery.log",
-        "tests-harvest-dependency.log"
+        "tests-harvest-dependency.log",
+        "host-verification.json (d00ed366 checkout, unchanged fit)",
+        "host-recovery-tests.json (29 isolated tests under service identity)"
       ]
     },
     {
@@ -108,7 +110,9 @@
         "engine/projection/lineage.py (exact fit/calibration references only)",
         "tests/test_projection_lineage.py",
         "publisher-lineage-parity.json",
-        "legacy-calibration-map.json (reconstruction; does not prove original envelope)"
+        "legacy-calibration-map.json (reconstruction; does not prove original envelope)",
+        "host-verification.json (d00ed366 checkout, unchanged fit)",
+        "host-recovery-tests.json (29 isolated tests under service identity)"
       ]
     },
     {
@@ -175,7 +179,9 @@
         "work/projection-governance-v2/queue.json (order adopted; scheduling still incomplete)",
         "scripts/closeout_publish.py (checkpoint/acknowledgment; source repository only)",
         "tests-closeout-recovery.log",
-        "tests-harvest-dependency.log"
+        "tests-harvest-dependency.log",
+        "host-verification.json (d00ed366 checkout, unchanged fit)",
+        "host-recovery-tests.json (29 isolated tests under service identity)"
       ]
     },
     {
@@ -199,7 +205,9 @@
       "acceptance": "Budgets and production priority; passive comparisons; safe canary; actual host/output hashes; immutable rollback; all listed failure fixtures",
       "state": "PARTIAL",
       "observed_evidence": [
-        "host-storage-canary.json (storage primitive only)"
+        "host-storage-canary.json (storage primitive only)",
+        "host-verification.json (d00ed366 checkout, unchanged fit)",
+        "host-recovery-tests.json (29 isolated tests under service identity)"
       ]
     },
     {
