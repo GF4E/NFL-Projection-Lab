@@ -8,6 +8,16 @@ Verification: 4 new export/boundary tests, 33 existing projection tests, 218 sta
 
 # Projection change log
 
+## 2026-09-22 — Data review of rebuild prompt, revision 2
+
+Documentation correction; no candidate, fit, release pointer, gate or production behavior changes. The complete execution prompt is `work/engine-rebuild/PROMPT-reviewed-2026-09-22.md`. Research and independent preserved-control arithmetic support the controlled rebuild strategy, not a promise of future accuracy or universal recovery.
+
+The verified daily scheduler can retry a delayed weekly closeout/refit. The prompt now explicitly preserves that behavior, separates scheduled Tuesday identity from actual refit input-freeze and durable availability, and forbids qualifying a Tuesday-only simulation as the production control. This is a statement of existing dispatch behavior, not a newly registered method. Retry inputs stay fixed; a model completing after lock cannot be backdated. Actual historical catch-up qualification remains required.
+
+The automatic learning loop is enumerated and bounded. Weight-only refit integrity checks do not become new statistical gates; drift alerts do not retune the model. Future-label/market perturbation, late-fit and delayed-closeout tests are explicit acceptance requirements. Research references distinguish loss-function targets, proper probability scoring, repeated model-selection bias and production pipeline reliability. Existing thresholds remain owner-governed policies, not claimed academic constants.
+
+Confidence: high in the rebuild strategy, meaning the central rationale holds across the preserved seasons and survives the obvious alternative specifications. Reduce to medium if independent authoritative reproduction overturns the lineage/cadence diagnosis. Improved future accuracy and complete production readiness remain unproved.
+
 ## 2026-09-13 — In-season learning loop registered
 
 Operational release; no input, ridge setting or weight changed. Tuesday refits inherit the deployed v3 calibration-only model and retain its original lineage. Method proposals begin after a completed week with supported diagnostics or edit evidence. Week 1 has no as-issued grades yet; no improvement proposal or promotion is justified.
