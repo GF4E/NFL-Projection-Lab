@@ -5,7 +5,7 @@ locks=[]
 for p in ['/var/lib/apt/lists/lock','/var/cache/apt/archives/lock']:
  f=open(p,'a');fcntl.lockf(f,fcntl.LOCK_EX|fcntl.LOCK_NB);locks.append(f)
 before=os.statvfs('/');removed=[]
-paths=list(Path('/var/lib/apt/lists').glob('*'))+[Path('/var/cache/apt/pkgcache.bin'),Path('/var/cache/apt/srcpkgcache.bin')]
+paths=list(Path('/var/lib/apt/lists').glob('*'))+list(Path('/var/lib/apt/lists/partial').glob('*'))+[Path('/var/cache/apt/pkgcache.bin'),Path('/var/cache/apt/srcpkgcache.bin')]
 for p in paths:
  if p.name=='lock' or p.is_symlink():continue
  try:s=p.stat()

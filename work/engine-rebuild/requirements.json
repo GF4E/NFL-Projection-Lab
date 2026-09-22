@@ -103,8 +103,15 @@
         "restore-evidence.json"
       ],
       "acceptance": "Expected versus observed deadlines; watchdog heartbeat; backup restore; accurate failure-domain and freshness claims",
-      "state": "INCOMPLETE",
-      "observed_evidence": []
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "engine/projection/watchdog.py (read-only assessment; no operational takeover)",
+        "scripts/projection_watchdog.py (independent observers; installation pending)",
+        "tests-watchdog.log (19 fault/integrity fixtures)",
+        "host-watchdog-candidate.json (isolated candidate fixtures under actual Linux service identity)",
+        "watchdog-policy.json (defined detection budgets; missing SLO evidence explicit)",
+        "GAP-SWEEP.md (outside observer limits and website 403)"
+      ]
     },
     {
       "id": "5",

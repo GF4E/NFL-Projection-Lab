@@ -1,0 +1,39 @@
+{
+  "policy": {
+    "schema": "projection-watchdog-v1",
+    "season": 2026,
+    "poll_seconds": 60,
+    "heartbeat_seconds": 180,
+    "transient_seconds": 60,
+    "publication_lag_seconds": 840,
+    "final_feed_age_seconds": 900,
+    "actions": [
+      "OBSERVE",
+      "RECORD",
+      "NOTIFY"
+    ]
+  },
+  "policy_sha256": "574085ff6817926657f417f531c729ceedb37a60bdaf194fd4cbe7da685d2978",
+  "lane": "INFRASTRUCTURE: no forecast number or method change",
+  "publication_budget_basis_seconds": {
+    "installed_daily_ceiling": 720,
+    "capture_timer": 15,
+    "public_cache": 30,
+    "outside_interval": 60,
+    "transport": 15
+  },
+  "heartbeats": {
+    "host": "/run/nfl-engine-monitor/host.json",
+    "outside": "Mac durable report then authenticated SSH receipt; duplicate receipt never refreshes age",
+    "failure_domain": "Outside protection only while Mac awake, connected and logged in. Simultaneous failure has no independent notification."
+  },
+  "slo_measurements": {
+    "pregame_availability": "All due games from independently hash-pinned current-season schedule; retrospective and missing remain in denominator",
+    "on_time_committed_issuance": "NOT_RECORDED: current logical freeze_time is not physical commit evidence",
+    "grade_latency": "UNKNOWN: existing received_at is latest retrieval, not first verified final availability",
+    "public_completeness": "Exact verified board content identity; old matching publication is not stale solely because time passed",
+    "recovery": "Reader recovery_seconds/deadline_missed receipts; monitor records incident/recovery transitions",
+    "headroom": "UNQUALIFIED pending measured growth, bounded job reserve, durable capacity and restore"
+  },
+  "public_channel": "Initial unauthenticated API 403. ACCESS_UNQUALIFIED latch, not a site outage; explicit recheck after access resolution."
+}

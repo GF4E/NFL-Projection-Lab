@@ -1,0 +1,24 @@
+[Unit]
+Description=Independent read-only NFL artifact and observer monitor
+
+[Service]
+Type=oneshot
+User=nflengine
+Group=nflengine
+WorkingDirectory=/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6
+ExecStart=/opt/nfl-runtime/env/bin/python -B scripts/projection_watchdog.py host
+RuntimeDirectory=nfl-engine-monitor
+RuntimeDirectoryMode=0700
+RuntimeDirectoryPreserve=yes
+TimeoutStartSec=30
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/run/nfl-engine-monitor
+MemoryHigh=32M
+MemoryMax=64M
+CPUQuota=10%
+Nice=19
+IOSchedulingClass=idle

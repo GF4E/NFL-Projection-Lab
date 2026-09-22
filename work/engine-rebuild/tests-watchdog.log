@@ -1,0 +1,26 @@
+test_changing_details_do_not_restart_failure_clock (test_projection_watchdog.WatchdogTests.test_changing_details_do_not_restart_failure_clock) ... ok
+test_clock_and_receipt_rollback_rejected (test_projection_watchdog.WatchdogTests.test_clock_and_receipt_rollback_rejected) ... ok
+test_content_corruption_and_duplicate_ids_are_rejected (test_projection_watchdog.WatchdogTests.test_content_corruption_and_duplicate_ids_are_rejected) ... ok
+test_dead_scheduler_detected_when_timer_or_progress_stops (test_projection_watchdog.WatchdogTests.test_dead_scheduler_detected_when_timer_or_progress_stops) ... ok
+test_equal_deadline_is_not_pregame_and_first_seen_is_unknown (test_projection_watchdog.WatchdogTests.test_equal_deadline_is_not_pregame_and_first_seen_is_unknown) ... ok
+test_forbidden_probe_is_blind_spot_and_not_retried (test_projection_watchdog.WatchdogTests.test_forbidden_probe_is_blind_spot_and_not_retried) ... ok
+test_full_event_storage_does_not_write_success_heartbeat (test_projection_watchdog.WatchdogTests.test_full_event_storage_does_not_write_success_heartbeat) ... ok
+test_host_independently_detects_dead_outside_observer (test_projection_watchdog.WatchdogTests.test_host_independently_detects_dead_outside_observer) ... ok
+test_matching_old_publication_is_not_stale (test_projection_watchdog.WatchdogTests.test_matching_old_publication_is_not_stale) ... ok
+test_old_successful_ack_is_not_new_acknowledgment (test_projection_watchdog.WatchdogTests.test_old_successful_ack_is_not_new_acknowledgment) ... {"state": "DEGRADED", "codes": ["HOST_OBSERVER_UNREACHABLE", "PUBLIC_ACCESS_UNQUALIFIED"], "recovered": []}
+ok
+test_outside_detects_dead_host_observer_despite_live_ssh (test_projection_watchdog.WatchdogTests.test_outside_detects_dead_host_observer_despite_live_ssh) ... ok
+test_outside_read_failure_does_not_fake_host_health (test_projection_watchdog.WatchdogTests.test_outside_read_failure_does_not_fake_host_health) ... {"state": "DEGRADED", "codes": ["HOST_OBSERVER_UNREACHABLE", "PUBLIC_ACCESS_UNQUALIFIED"], "recovered": []}
+ok
+test_reboot_epoch_cannot_hide_missed_lock (test_projection_watchdog.WatchdogTests.test_reboot_epoch_cannot_hide_missed_lock) ... ok
+test_schedule_denominator_includes_absent_and_retrospective_rows (test_projection_watchdog.WatchdogTests.test_schedule_denominator_includes_absent_and_retrospective_rows) ... ok
+test_source_snapshot_verifies_chain_without_writing_source_files (test_projection_watchdog.WatchdogTests.test_source_snapshot_verifies_chain_without_writing_source_files) ... ok
+test_stale_publication_and_equal_timestamp_corruption (test_projection_watchdog.WatchdogTests.test_stale_publication_and_equal_timestamp_corruption) ... ok
+test_storage_failure_detected_even_when_scheduler_reports_success (test_projection_watchdog.WatchdogTests.test_storage_failure_detected_even_when_scheduler_reports_success) ... ok
+test_sustained_failure_not_one_transient_tick_and_not_spam (test_projection_watchdog.WatchdogTests.test_sustained_failure_not_one_transient_tick_and_not_spam) ... ok
+test_uncertain_ack_retry_does_not_refresh_receipt_time (test_projection_watchdog.WatchdogTests.test_uncertain_ack_retry_does_not_refresh_receipt_time) ... ok
+
+----------------------------------------------------------------------
+Ran 19 tests in 0.017s
+
+OK

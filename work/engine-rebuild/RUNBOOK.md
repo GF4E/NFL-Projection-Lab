@@ -1,6 +1,6 @@
 # Rebuild operational runbook — partial implementation
 
-The goal remains active. These procedures cover implemented operations only. Full release rollback, outside-host monitoring, durable capacity and numerical cadence replay are not certified.
+The goal remains active. These procedures cover implemented operations only. Full release rollback, always-on outside-host coverage, durable capacity and numerical cadence replay are not certified.
 
 ## Public final-feed recovery
 
@@ -35,5 +35,21 @@ A new-format closeout first commits its snapshot checkpoint, then writes immutab
 Never rewrite a locked projection or first grade. A conflicting immutable payload fails. On an uncertain write, reconcile the same logical operation and bytes before retrying. Do not delete a pending file owned by another operation or steal its lock.
 
 The root disk remains critically constrained. Package cache removal was temporary recovery only. The prepared 20 GiB volume/migration plan awaits explicit spending and verified-copy-removal authority. No retention changes, artifact deletion or additional paid provider call is authorized by this runbook.
+
+## Independent monitoring
+
+The new `nfl-engine-watchdog.timer` runs a separate read-only observer every 60 seconds, outside the capture/daily dispatch lock. Its current state is `/run/nfl-engine-monitor/host.json`; outside receipts are `outside-receipt.json`. This tmpfs state can still be written when the root data filesystem is full. It is not a backup; reboot begins a new observation epoch. The Mac retains material observations in `~/Library/Application Support/NFLProjectionMonitor/`, with `outside.json`, acknowledgments, and immutable incident changes in `events/`. No normal poll creates a Git commit or incident file.
+
+The Mac LaunchAgent `com.gabe.nfl-projection-watchdog` runs every minute, reading the host's saved heartbeat and checking the actual website API. Its SSH read never refreshes the host heartbeat. Only after a durable local report does it submit a content-hashed outside receipt. Retrying an identical receipt does not extend its age. Each side flags the other's heartbeat after 180 seconds. The Mac is an outside failure domain only while awake, connected and logged in; simultaneous failure of both observers has no independently delivered alarm. Native notifications are requested only for material changes and recoveries; successful submission is not proof the user saw one. Inspect `notification.json` for submission/failure status.
+
+Transient worker failure requires 60 seconds of continuous evidence. Missing locks and integrity failures are immediate. Publication lag allowance is 840 seconds, derived from installed service/cache/observation limits, not a late-issuance allowance. The reader is flagged stale at 900 seconds, adding its normal 60-second poll period. Full-job headroom remains UNQUALIFIED regardless of a positive byte count. An old but identical source/public board is healthy; fresh metadata never substitutes for matching content. See `GAP-SWEEP.md` for the Tier 2 alternatives and detection budgets.
+
+The current unauthenticated website API returns 403. This is `PUBLIC_ACCESS_UNQUALIFIED`, not a website outage finding. That observation channel latches instead of repeating unauthorized requests every minute. Once the endpoint's access is legitimately corrected, explicitly recheck with:
+
+```sh
+/opt/anaconda3/bin/python3.12 -B scripts/projection_watchdog.py outside --retry-public
+```
+
+The monitor never loads browser credentials, takes ownership, restarts a paid worker, changes a fit, or rewrites forecasts. Preserve an unresolved alarm while investigating it. Current metrics use the independently pinned schedule denominator; physical on-time commit receipts and first-verified-final availability are still NOT_RECORDED, so no grade-latency or full issuance-SLO percentage is claimed from them. Installation and actual-cycle evidence belongs in `watchdog-verification.json`; unit definitions or green fixtures alone do not establish it.
 
 Confidence: high for the explicitly tested recovery transitions and invariant preservation under their stated fault model; this is not a claim of complete operational reliability. Lower to medium if a production caller bypasses these controls or an untested filesystem failure changes the commit semantics.
