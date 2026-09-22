@@ -1,5 +1,21 @@
 # Rebuild status
 
+Goal ACTIVE. This increment verifies a private recovery point for committed source and artifacts on the existing Mac. No model, forecast, gate, scheduler or production service changed; no statistical candidate was fitted or promoted.
+
+At 2026-09-22T17:48:02Z, the standalone archive of engine-v2 commit 0b4159af3eddcde06ca7a93111067e94339abcc0 restored successfully into a new private directory without a remote or alternate object store. The 505,772,873-byte archive passed SHA256 and Git object verification; every one of 12,051 tree entries (2,865,749,726 file bytes) matched the pinned snapshot. Restored code/artifacts reproduced 16 immutable forecast bundles and recomputed 32 first grades. The restored tree remained clean. Elapsed time: 71.27 seconds. The Mac's existing Python/NumPy runtime was used; it was not restored from the archive.
+
+Acceptance is content-addressed and separate from attempt status: a later failed attempt cannot overwrite the last accepted receipt. An exclusive local file lock prevents concurrent runs in the same destination. Seven backup tests pass, including corruption, rehashed truncation, occupied destination, altered contents/mode, last-good preservation and duplicate-run prevention. The full projection suite passes 160 tests; the frozen Week 1 suite passes 218. The actual restoration preceded the receipt/lock wrappers; those wrappers have fixture evidence, not a second full-tree restoration claim.
+
+Scope remains committed snapshot/history only. Ignored/uncommitted inputs, credentials and owner state, installed Linux runtime/services, and public deployment are excluded. This is not full-host restoration, automatic recurring backup, compatible executable rollback or authority to delete host originals. Raw archives/restored files stay private and ignored; only verification receipts are committed.
+
+Latest read-only host check at 17:42:12Z: checkout c2b3557b869a19417ad72895bb5c0afe4e5a0886, final reader HEALTHY with verified source/operation hashes, 48 board-context rows readable, unchanged board hash ef00cac013fb14a5293b23abbea47eac6c553d3ea8b6a72caa5fc4bffff7471b. Root free bytes: 35,188,736. There were 336 legacy CSV archives and zero fresh gzip objects; first compressed production-source evidence remains pending. No host deployment is claimed for this Mac-only backup increment.
+
+Next: qualify compatible executable/runtime restoration and the excluded recovery inputs, then continue source-time/consumer migration, numerical cadence and E-CAL-LINEAGE/E-VENUE-DIRECT under their real weekly preconditions. The earlier capacity/migration approval request remains pending; limited free disk space is not resolved by this backup. Requirements remain PARTIAL or INCOMPLETE. Provider credits and new spending: zero.
+
+Least certain: restoring the excluded host runtime and private operational state, so no full-machine recovery claim is made. Confidence: near-total in this committed-snapshot restoration, meaning arithmetic and hashes on verified rows/files. Lower to high if independent restoration changes a file, forecast or grade. Full operational readiness and predictive improvement remain unproved.
+
+## Prior verified lossless-storage increment (preserved history)
+
 Goal ACTIVE. All adopted requirements remain in requirements.json. The previous increment deployed immutable scoring bundles and preserved the point model. This increment reduces future final-source archive growth after fresh host inspection found only about 40 MB of root headroom. No statistical candidate is fitted or promoted.
 
 Implemented prospectively: deterministic lossless gzip for new distinct final sources, exact original and stored-byte hashes, durable same-payload reuse, and one verification adapter across final ingestion/repair, watchdog, board-context and weekly diagnostics. Old CSVs are retained and readable. No archive is migrated, deleted or overwritten. No source timestamps, parsed values, model inputs or scores change. Capacity approval and backup restoration remain unresolved.

@@ -555,3 +555,18 @@ Before release, 45 archive/recovery/watchdog tests passed under the actual Linux
 COMMIT 1756f19f1c71ce83fa38cde13620c262529f6dc6 is pushed and installed. At 17:38:21Z the host checkout was 9fff5cb622e418003349f0a673fadc9722ccffe4. Scheduled ingestion was HEALTHY with matching operation/payload hashes and a verified explicit source reference; the observer, 48-game board-context computation (publication intercepted) and weekly reference reader consumed it. The model board hash stayed ef00cac013fb14a5293b23abbea47eac6c553d3ea8b6a72caa5fc4bffff7471b. Existing CSV reuse was observed; no first fresh compressed production snapshot was yet observed. Exact compressed writes are runtime-fixture evidence at this point. Tests: 153 projection, 18 reference, 4 board-context, 218 Week 1, plus 45 archive/recovery/watchdog fixtures on the actual Linux service runtime. No provider credits or spending.
 
 Confidence: near-total in the verified source round-trip—exact bytes and parsed rows. Lower to high if independent decompression differs. Sustainable capacity and complete recovery/rollback remain unqualified; this increment does not establish predictive improvement or full-goal completion.
+
+## 2026-09-22 — Rebuild committed-record backup restored on the Mac
+
+Infrastructure only. A standalone private Git bundle of engine-v2 snapshot 0b4159af3eddcde06ca7a93111067e94339abcc0 was restored offline into a new directory. Its 12,051 entries matched the Git snapshot; restored code reproduced 16 bundle-backed forecasts and recomputed 32 first grades in a 71.27-second verification. No existing records, fits or production services changed. Accepted receipt: work/engine-rebuild/backup-restore.json, with an immutable content-addressed receipt. The archive and restored checkout are ignored private files.
+
+CONVENTIONS: committed source/history is the first scoped recovery point (Tier 2, REVIEW REQUESTED); ignored/private operational state and installed Linux runtime/services remain excluded rather than inferred. A complete Git object/tree check plus restored application computation is required (Tier 1). Separate attempt/accepted records preserve the last verified recovery point on failure; a local lock prevents duplicate backup work. No permission to delete host originals follows from this result.
+
+| Evidence | Before | After |
+|---|---|---|
+| Committed-snapshot recovery | No verified standalone recovery point in this rebuild | 505,772,873-byte archive, 12,051 verified entries, 16 reproduced forecasts, 32 recomputed grades |
+| Host runtime/private-state restoration | Unqualified | Still unqualified |
+| Point model / statistical gate | Existing authoritative lineage | Unchanged |
+| Durable host headroom | Unresolved | Unresolved; latest read-only check 35,188,736 free bytes |
+
+Validation: 7 backup fixtures, 160 projection tests and 218 standing Week 1 tests pass. Paid-provider credits and new spending: zero. No host installation or public-site update is claimed. Least certain: excluded runtime/private-state recovery. Confidence: near-total in the committed-snapshot restoration, meaning arithmetic/hashes on verified files; lower to high if independent restoration changes any file, forecast or grade. This does not rate full operational readiness or accuracy improvement.

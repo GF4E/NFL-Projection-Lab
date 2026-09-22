@@ -71,3 +71,13 @@ Use engine.projection.source_archive.read_source(root, feed). source_sha256 alwa
 store_source reuses verified existing CSV or gzip evidence and completes durable retries. It only compresses a new distinct source; no historical migration/deletion occurs. Restore the exact referenced bytes on corruption. Do not rewrite received_at after a failed ingestion. The existing bounded final-reader recovery/owner rules still apply. Board-context, weekly diagnostics and watchdog use this same adapter; no line data enters the scorer.
 
 Compatibility: once a feed references gzip, a pre-adapter final-source reader is incompatible. Any later rollback must retain this storage reader or restore a verified compatible release/data combination. Never strip source_ref or manufacture a CSV fallback to make an old executable appear compatible.
+
+## Committed-record recovery point
+
+scripts/projection_backup.py pins the already-fetched origin/engine-v2 commit and writes a standalone Git bundle under .cloud-private/recovery-points on the Mac. It adds a local refs/rebuild-backups/<commit> pin; it does not change the working branch or push that backup ref. One Git packing thread is used. The backup is accepted only when its SHA256, complete Git object graph, every restored tree entry and the restored forecast/grade calculations pass. See work/engine-rebuild/backup-restore.json for the exact accepted commit and path.
+
+Restoration uses a new directory and the local bundle only, with hooks/global Git configuration disabled, no object alternates and no configured remote. It never overwrites an existing restore destination, starts a scheduler, refits or publishes. A failed/interrupted run is not an accepted recovery point; preserve its evidence and inspect the actual process before any restart. The archive file is staged and fsynced before its final name, and receipts use the existing durable writer.
+
+Scope: committed source and artifact history only. Ignored/uncommitted inputs, credentials/ownership state, the installed Linux environment and services, and public-site deployment are excluded. The restored scoring process uses the existing Mac Python runtime; numerical reproduction is not an OS/runtime restoration. Do not use this receipt as authority to remove host originals or to claim a full-host recovery procedure is complete.
+
+Attempts write backup-attempt.json; only a verified restoration writes a new immutable backup-receipts/<hash>.json and updates backup-restore.json. Failed attempts retain the last accepted recovery point. The destination-local .backup.lock is exclusive and nonblocking; LOCAL_BACKUP_ACTIVE performs no archive work. This is local exclusion, not a cross-host ownership transfer.

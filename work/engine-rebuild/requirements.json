@@ -98,7 +98,8 @@
         "tests-projection-recovery.log",
         "host-recovery-candidate.json (candidate code in memory; isolated fixtures)",
         "engine/projection/source_archive.py (prospective lossless storage; prior records unchanged)",
-        "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)"
+        "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)",
+        "scripts/projection_backup.py; tests/test_projection_backup.py (immutable accepted receipt, last-good preservation, local duplicate-run lock)"
       ]
     },
     {
@@ -121,7 +122,8 @@
         "watchdog-installation.json (source-verified systemd timer)",
         "watchdog-mac-installation.json (launchd timer)",
         "watchdog-verification.json (scheduled host/Mac receipt exchange; UI render observed, public API still unqualified)",
-        "watchdog-canary.json (live host-observer pause, independent detection, automatic restoration and observed recovery; production workers untouched)"
+        "watchdog-canary.json (live host-observer pause, independent detection, automatic restoration and observed recovery; production workers untouched)",
+        "backup-restore.json; backup-receipts/cc997799946e44cb96947f98a0c91f3adc17e052d3b9a50ac307da259f7a9e20.json (actual standalone committed-snapshot restoration: 12051 entries, 16 forecasts, 32 grades; host runtime/private state excluded)"
       ]
     },
     {
@@ -256,7 +258,9 @@
         "host-bundle-verification.json (actual scheduled publication; no public-site equality claim)",
         "engine/projection/source_archive.py (prospective lossless storage; prior records unchanged)",
         "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)",
-        "host-source-archive-verification.json (installed code, scheduled HEALTHY reader and downstream source reads; legacy CSV reuse, first fresh compressed production record not yet observed)"
+        "host-source-archive-verification.json (installed code, scheduled HEALTHY reader and downstream source reads; legacy CSV reuse, first fresh compressed production record not yet observed)",
+        "tests-backup.log; tests-backup-projection-suite.log; tests-backup-week1.log (7 backup, 160 projection, 218 frozen workflow fixtures)",
+        "backup-restore.json (71-second Mac committed-record restoration; not executable production rollback or full-machine recovery)"
       ]
     },
     {
