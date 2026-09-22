@@ -1,0 +1,156 @@
+outer season 2016 training 256
+outer season 2017 training 512
+outer season 2018 training 768
+outer season 2019 training 1024
+outer season 2020 training 1280
+outer season 2021 training 1536
+outer season 2022 training 1808
+outer season 2023 training 2079
+outer season 2024 training 2351
+outer season 2025 training 2623
+{
+  "status": "COMMON_PATH_RECONSTRUCTION_NOT_AUTHORITATIVE",
+  "authoritative": false,
+  "scope": "Shared preparation, scoring and Tuesday refit arithmetic; historical availability and closeout execution explicitly simulated. Not a statistical gate or live activation.",
+  "historical_availability": "UNKNOWN; final and paired statistics assumed available at kickoff plus four hours",
+  "uncertainty": "NOT_SCORED; no qualified own-lineage historical calibration",
+  "control": {
+    "path": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
+    "sha256": "66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f",
+    "date_added": "2026-09-20T02:53:35.244810+00:00"
+  },
+  "prior_diagnostic": {
+    "path": "work/engine-rebuild/numerical-cutoff/replay-8a9e0f89dc915f3eb1324bf7001a3849b186c2b34bbb3b3b95847fec7b7469b6.json.gz",
+    "sha256": "8a9e0f89dc915f3eb1324bf7001a3849b186c2b34bbb3b3b95847fec7b7469b6",
+    "encoding": "gzip",
+    "decoded_sha256": "e2ed2cdb283b0b290d367c46467a7f3c2a712e3d8468c696bb11dc2d30221887"
+  },
+  "checkout_commit": "978beb3c6df076b62468e7cfbca41ef01d0954ee",
+  "common_feature_max_difference": 0.0,
+  "calendar_forecasts_checked": 2639,
+  "early_or_duplicate_observations": 0,
+  "training_rows": 5790,
+  "by_season": {
+    "2016": {
+      "games": 256,
+      "changed_from_authoritative_control": 256,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.1539354496739875,
+      "team_bias_projection_minus_actual": 0.1850993317795856,
+      "tuesday_refits": 16
+    },
+    "2017": {
+      "games": 256,
+      "changed_from_authoritative_control": 256,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.839093712197346,
+      "team_bias_projection_minus_actual": 0.45398819961281195,
+      "tuesday_refits": 16
+    },
+    "2018": {
+      "games": 256,
+      "changed_from_authoritative_control": 256,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.877311581877818,
+      "team_bias_projection_minus_actual": 0.08282756326042325,
+      "tuesday_refits": 16
+    },
+    "2019": {
+      "games": 256,
+      "changed_from_authoritative_control": 256,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.514145378612325,
+      "team_bias_projection_minus_actual": -0.029724474386358623,
+      "tuesday_refits": 16
+    },
+    "2020": {
+      "games": 256,
+      "changed_from_authoritative_control": 256,
+      "changed_from_prior_fixed_membership_diagnostic": 45,
+      "team_mae": 7.570188169103669,
+      "team_bias_projection_minus_actual": -0.5386438917113918,
+      "tuesday_refits": 13
+    },
+    "2021": {
+      "games": 272,
+      "changed_from_authoritative_control": 272,
+      "changed_from_prior_fixed_membership_diagnostic": 16,
+      "team_mae": 7.986371073942505,
+      "team_bias_projection_minus_actual": 0.4835326123726596,
+      "tuesday_refits": 16
+    },
+    "2022": {
+      "games": 271,
+      "changed_from_authoritative_control": 271,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.24563427359367,
+      "team_bias_projection_minus_actual": 0.9015914157228753,
+      "tuesday_refits": 17
+    },
+    "2023": {
+      "games": 272,
+      "changed_from_authoritative_control": 272,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.612627454447139,
+      "team_bias_projection_minus_actual": 0.49364076212408525,
+      "tuesday_refits": 17
+    },
+    "2024": {
+      "games": 272,
+      "changed_from_authoritative_control": 272,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.379825399032677,
+      "team_bias_projection_minus_actual": -0.08475304628805545,
+      "tuesday_refits": 17
+    },
+    "2025": {
+      "games": 272,
+      "changed_from_authoritative_control": 272,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.570831732832961,
+      "team_bias_projection_minus_actual": -0.06920127634885248,
+      "tuesday_refits": 17
+    }
+  },
+  "waiting_refits": [
+    {
+      "at": "2020-10-13T13:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-12-01T14:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-08T14:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2021-12-21T14:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    }
+  ],
+  "elapsed_seconds": 764.7130931249994,
+  "peak_rss_bytes": 1344585728,
+  "retained_training_cache": {
+    "path": ".cloud-private/cutoff-replay/common-training-83a425c9f434bf9fbd89287e66d114722b562f9e4646e2be7947119fc6deff34.json.gz",
+    "sha256": "83a425c9f434bf9fbd89287e66d114722b562f9e4646e2be7947119fc6deff34"
+  }
+}

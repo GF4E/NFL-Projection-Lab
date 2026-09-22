@@ -106,7 +106,10 @@
         "host-prepared-candidate.json (19 actual-runtime tmpfs fixtures; 544 snapshot rows, 16 restored executable forecasts, 52 frozen records unchanged; deployment pending)",
         "host-prepared-verification.json (installed source and scheduled immutable pointer; exact pre-migration bytes, 16 forecast reproductions, same fit, 52 original record hashes; not full rollback/public-site proof)",
         "engine/projection/observations.py; tests/test_projection_observations.py; host-observations-candidate.json (prospective source clocks, linked revisions, durable batch/index/pointer, 544-row exact preparation parity under Linux; scheduled installation and numerical state integration pending)",
-        "host-observations-verification.json (installed source and scheduled collection/preparation/bundle linkage; 3,183 source bodies and 16 current forecasts reproduce, 52 frozen hashes preserved; no numerical state activation)"
+        "host-observations-verification.json (installed source and scheduled collection/preparation/bundle linkage; 3,183 source bodies and 16 current forecasts reproduce, 52 frozen hashes preserved; no numerical state activation)",
+        "engine/projection/cutoff_pipeline.py; tests/test_projection_cutoff_pipeline.py (shared shadow preparation/scoring/refit, exact cutoff roles, physical fit availability and retry preservation; not production orchestration)",
+        "COMMON-PIPELINE.md; host-common-pipeline-canary.json (21 Linux fixtures, 14 shadow forecasts and 52 original records unchanged; simulated future dates)",
+        "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)"
       ]
     },
     {
@@ -182,7 +185,10 @@
         "tests-worker-projection.log",
         "tests-worker-week1.log",
         "cutoff-worker-installed.json",
-        "host-cutoff-worker-verification.json"
+        "host-cutoff-worker-verification.json",
+        "engine/projection/cutoff_pipeline.py; tests/test_projection_cutoff_pipeline.py (shared shadow preparation/scoring/refit, exact cutoff roles, physical fit availability and retry preservation; not production orchestration)",
+        "COMMON-PIPELINE.md; host-common-pipeline-canary.json (21 Linux fixtures, 14 shadow forecasts and 52 original records unchanged; simulated future dates)",
+        "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)"
       ]
     },
     {
@@ -217,7 +223,11 @@
         "tests-worker-projection.log",
         "tests-worker-week1.log",
         "cutoff-worker-installed.json",
-        "host-cutoff-worker-verification.json"
+        "host-cutoff-worker-verification.json",
+        "engine/projection/cutoff_pipeline.py; tests/test_projection_cutoff_pipeline.py (shared shadow preparation/scoring/refit, exact cutoff roles, physical fit availability and retry preservation; not production orchestration)",
+        "COMMON-PIPELINE.md; host-common-pipeline-canary.json (21 Linux fixtures, 14 shadow forecasts and 52 original records unchanged; simulated future dates)",
+        "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)",
+        "hourly-catchup/current-ref.json; COMMON-PIPELINE.md (2639-game reconstruction with 175 fits and actual hourly dispatch policy; 61 strict-Tuesday delays resolved; historical latency assumed, inactive path)"
       ]
     },
     {
@@ -282,7 +292,11 @@
         "scripts/cloud_scheduler.py; tests/test_projection_prepared.py (executed learning-mode fixture: closeout, refit, matching preparation, publication)",
         "prepared-input-capture.json; prepared-parity.json (48 captured cards and 32 simulated fresh cards; prepared bytes and 52 frozen records preserved)",
         "host-prepared-candidate.json (19 actual-runtime tmpfs fixtures; 544 snapshot rows, 16 restored executable forecasts, 52 frozen records unchanged; deployment pending)",
-        "FORECAST-CONTRACT.md (actual public Season DOM and screenshot inspection: 30 graded games, 2 weeks; counts match closeout, superseded references and missing floor remain)"
+        "FORECAST-CONTRACT.md (actual public Season DOM and screenshot inspection: 30 graded games, 2 weeks; counts match closeout, superseded references and missing floor remain)",
+        "engine/projection/cutoff_pipeline.py; tests/test_projection_cutoff_pipeline.py (shared shadow preparation/scoring/refit, exact cutoff roles, physical fit availability and retry preservation; not production orchestration)",
+        "COMMON-PIPELINE.md; host-common-pipeline-canary.json (21 Linux fixtures, 14 shadow forecasts and 52 original records unchanged; simulated future dates)",
+        "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)",
+        "public-season-observation-2026-09-22.json (visible 30-game/2-week counts; inspected DOM has no release identity, exact served payload not qualified)"
       ]
     },
     {
@@ -348,7 +362,10 @@
         "tests-worker-projection.log",
         "tests-worker-week1.log",
         "cutoff-worker-installed.json",
-        "host-cutoff-worker-verification.json"
+        "host-cutoff-worker-verification.json",
+        "engine/projection/cutoff_pipeline.py; tests/test_projection_cutoff_pipeline.py (shared shadow preparation/scoring/refit, exact cutoff roles, physical fit availability and retry preservation; not production orchestration)",
+        "COMMON-PIPELINE.md; host-common-pipeline-canary.json (21 Linux fixtures, 14 shadow forecasts and 52 original records unchanged; simulated future dates)",
+        "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)"
       ]
     },
     {

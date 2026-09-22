@@ -1,0 +1,802 @@
+outer season 2016 training 256
+outer season 2017 training 512
+outer season 2018 training 768
+outer season 2019 training 1024
+outer season 2020 training 1280
+outer season 2021 training 1536
+outer season 2022 training 1808
+outer season 2023 training 2079
+outer season 2024 training 2351
+outer season 2025 training 2623
+{
+  "status": "HOURLY_CATCHUP_RECONSTRUCTION_NOT_ACTIVATED",
+  "authoritative": false,
+  "scope": "Hourly catch-up policy from verified host timers; historical source, closeout and fit-completion clocks simulated. Common numerical path remains inactive. Not a gate or live-availability proof.",
+  "historical_availability": "UNKNOWN; final and paired statistics assumed available at kickoff plus four hours",
+  "uncertainty": "NOT_SCORED; no qualified own-lineage historical calibration",
+  "control": {
+    "path": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
+    "sha256": "66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f",
+    "date_added": "2026-09-20T02:53:35.244810+00:00"
+  },
+  "prior_diagnostic": {
+    "path": "work/engine-rebuild/numerical-cutoff/replay-8a9e0f89dc915f3eb1324bf7001a3849b186c2b34bbb3b3b95847fec7b7469b6.json.gz",
+    "sha256": "8a9e0f89dc915f3eb1324bf7001a3849b186c2b34bbb3b3b95847fec7b7469b6",
+    "encoding": "gzip",
+    "decoded_sha256": "e2ed2cdb283b0b290d367c46467a7f3c2a712e3d8468c696bb11dc2d30221887"
+  },
+  "checkout_commit": "f5f1de493b0c6f42954dc924b92e1d07aeacd1d7",
+  "common_feature_max_difference": 0.0,
+  "calendar_forecasts_checked": 2639,
+  "early_or_duplicate_observations": 0,
+  "training_rows": 5790,
+  "by_season": {
+    "2016": {
+      "games": 256,
+      "changed_from_authoritative_control": 256,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.1539354496739875,
+      "team_bias_projection_minus_actual": 0.1850993317795856,
+      "weekly_refits": 16,
+      "catchup_refits": 0
+    },
+    "2017": {
+      "games": 256,
+      "changed_from_authoritative_control": 256,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.839093712197346,
+      "team_bias_projection_minus_actual": 0.45398819961281195,
+      "weekly_refits": 16,
+      "catchup_refits": 0
+    },
+    "2018": {
+      "games": 256,
+      "changed_from_authoritative_control": 256,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.877311581877818,
+      "team_bias_projection_minus_actual": 0.08282756326042325,
+      "weekly_refits": 16,
+      "catchup_refits": 0
+    },
+    "2019": {
+      "games": 256,
+      "changed_from_authoritative_control": 256,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.514145378612325,
+      "team_bias_projection_minus_actual": -0.029724474386358623,
+      "weekly_refits": 16,
+      "catchup_refits": 0
+    },
+    "2020": {
+      "games": 256,
+      "changed_from_authoritative_control": 256,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.5706297513325875,
+      "team_bias_projection_minus_actual": -0.5390900473973149,
+      "weekly_refits": 16,
+      "catchup_refits": 3
+    },
+    "2021": {
+      "games": 272,
+      "changed_from_authoritative_control": 272,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.986227468006437,
+      "team_bias_projection_minus_actual": 0.4817036774443628,
+      "weekly_refits": 17,
+      "catchup_refits": 1
+    },
+    "2022": {
+      "games": 271,
+      "changed_from_authoritative_control": 271,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.24563427359367,
+      "team_bias_projection_minus_actual": 0.9015914157228753,
+      "weekly_refits": 17,
+      "catchup_refits": 0
+    },
+    "2023": {
+      "games": 272,
+      "changed_from_authoritative_control": 272,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.612627454447139,
+      "team_bias_projection_minus_actual": 0.49364076212408525,
+      "weekly_refits": 17,
+      "catchup_refits": 0
+    },
+    "2024": {
+      "games": 272,
+      "changed_from_authoritative_control": 272,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.379825399032677,
+      "team_bias_projection_minus_actual": -0.08475304628805545,
+      "weekly_refits": 17,
+      "catchup_refits": 0
+    },
+    "2025": {
+      "games": 272,
+      "changed_from_authoritative_control": 272,
+      "changed_from_prior_fixed_membership_diagnostic": 0,
+      "team_mae": 7.570831732832961,
+      "team_bias_projection_minus_actual": -0.06920127634885248,
+      "weekly_refits": 17,
+      "catchup_refits": 0
+    }
+  },
+  "fit_latency_assumption_seconds": 600,
+  "host_schedule": {
+    "path": "work/engine-rebuild/common-pipeline-host-schedule.txt",
+    "sha256": "5277715b5f713fce6fb392bfb2b8715f488766d0857bd2a1a39621cbca090039"
+  },
+  "forecasts_inside_fit_latency_window": [],
+  "waiting_refits": [
+    {
+      "at": "2020-10-13T13:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-13T14:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-13T15:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-13T16:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-13T17:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-13T18:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-13T19:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-13T20:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-13T21:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-13T22:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-13T23:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-14T00:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-14T01:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-14T02:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-10-14T03:00:00+00:00",
+      "season": 2020,
+      "through_week": 5,
+      "missing_games": [
+        "2020_05_BUF_TEN"
+      ]
+    },
+    {
+      "at": "2020-12-01T14:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-01T15:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-01T16:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-01T17:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-01T18:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-01T19:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-01T20:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-01T21:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-01T22:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-01T23:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T00:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T01:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T02:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T03:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T04:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T05:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T06:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T07:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T08:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T09:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T10:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T11:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T12:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T13:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T14:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T15:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T16:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T17:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T18:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T19:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T20:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T21:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T22:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-02T23:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-03T00:00:00+00:00",
+      "season": 2020,
+      "through_week": 12,
+      "missing_games": [
+        "2020_12_BAL_PIT"
+      ]
+    },
+    {
+      "at": "2020-12-08T14:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-08T15:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-08T16:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-08T17:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-08T18:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-08T19:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-08T20:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-08T21:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-08T22:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-08T23:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-09T00:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-09T01:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-09T02:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-09T03:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-09T04:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2020-12-09T05:00:00+00:00",
+      "season": 2020,
+      "through_week": 13,
+      "missing_games": [
+        "2020_13_DAL_BAL"
+      ]
+    },
+    {
+      "at": "2021-12-21T14:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-21T15:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-21T16:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-21T17:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-21T18:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-21T19:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-21T20:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-21T21:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-21T22:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-21T23:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-22T00:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-22T01:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-22T02:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-22T03:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    },
+    {
+      "at": "2021-12-22T04:00:00+00:00",
+      "season": 2021,
+      "through_week": 15,
+      "missing_games": [
+        "2021_15_SEA_LA",
+        "2021_15_WAS_PHI"
+      ]
+    }
+  ],
+  "elapsed_seconds": 796.2890019159822,
+  "peak_rss_bytes": 1323417600,
+  "retained_training_cache": {
+    "path": ".cloud-private/cutoff-replay/common-training-83a425c9f434bf9fbd89287e66d114722b562f9e4646e2be7947119fc6deff34.json.gz",
+    "sha256": "83a425c9f434bf9fbd89287e66d114722b562f9e4646e2be7947119fc6deff34"
+  }
+}

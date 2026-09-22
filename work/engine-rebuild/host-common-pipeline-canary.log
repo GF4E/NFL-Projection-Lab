@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "scope": "Captured real sources; simulated future cutoff, preparation, scoring and shadow locks. No production activation.",
+  "checked_at": "2026-09-22T21:43:28.609671+00:00",
+  "observation_ref": {
+    "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+    "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+  },
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "actual_collection_at": "2026-09-22T19:35:10.277779+00:00",
+  "simulated_cutoff": "2026-09-25T13:00:00+00:00",
+  "simulated_preparation": "2026-09-27T15:40:00+00:00",
+  "missing_at_simulated_cutoff": [
+    {
+      "game_id": "2026_03_ATL_GB",
+      "reason": "FINAL_NOT_RECORDED"
+    }
+  ],
+  "slate_games": 14,
+  "feature_parity_rows": 28,
+  "point_and_contribution_parity_games": 14,
+  "contribution_source_associations_changed": 1568,
+  "idempotent_shadow_locks": 14,
+  "scoring_retry_after_deadline_preserved": true,
+  "prior_forecasts_unchanged_after_later_cutoff": true,
+  "frozen_source_records_unchanged": 52,
+  "pipeline_artifact_bytes": 141336,
+  "elapsed_seconds": 144.9052807110129,
+  "peak_rss_bytes": 250970112,
+  "provider_requests": 0,
+  "new_spending": 0,
+  "host_commit": "6833c20020ad3a1ca7f01a70c522aa22ba9cf021",
+  "uid": 1000,
+  "python": "3.12.2",
+  "tests": 21,
+  "address_space_limit_bytes": 4294967296,
+  "free_root_bytes": 178487296
+}

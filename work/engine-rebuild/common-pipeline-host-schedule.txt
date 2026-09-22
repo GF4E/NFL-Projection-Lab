@@ -1,0 +1,23 @@
+# /etc/systemd/system/nfl-engine-daily.timer
+[Unit]
+Description=NFL daily job, retaining hourly public-final refresh cadence
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+AccuracySec=30s
+Unit=nfl-engine-daily.service
+
+[Install]
+WantedBy=timers.target
+
+# /etc/systemd/system/nfl-learning.timer
+[Unit]
+Description=Refit Tuesdays at 06:00 Pacific, with DST
+[Timer]
+OnCalendar=Tue *-*-* 06:00:00 America/Los_Angeles
+Persistent=true
+AccuracySec=1s
+Unit=nfl-learning.service
+[Install]
+WantedBy=timers.target
