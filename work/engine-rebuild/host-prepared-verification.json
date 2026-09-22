@@ -1,0 +1,46 @@
+{
+  "state": "VERIFIED",
+  "checked_at": "2026-09-22T18:24:11.783846+00:00",
+  "host_commit": "83836ff0cd497ffdfe3a1c63a630a2e45b4ecb52",
+  "scope": "Read-only installed-code, exact snapshot, active-fit and scheduled publication verification; no refit or provider call",
+  "code_matches_tested_source": true,
+  "release_matches_installed_code": true,
+  "source_hashes": {
+    "engine/projection/prepared.py": "2188c17fdce4a30d04560f240aa8ea8ebda8a24c330b0a621315877e4d7c2b80",
+    "engine/projection/bundle.py": "ce2263d54c394a76554bd258206c91a99dbb53ef7a7d36e24ef3cdfa85cd4cd2",
+    "scripts/projection_v3_prepare.py": "ff520938f7c53df43bc33ac2a309a1629bc3b3d6bc6adb13cf8c27d20c814220",
+    "scripts/projection_v3_publish.py": "770ddc5864624593140240e6ce54a4f6345065f8670416eee86ebe8966675ffe",
+    "scripts/projection_learning.py": "f7431d6d20fa3cd23ac336181263bbd22906b4e57c7e1f866208cd9e0058acbc",
+    "scripts/cloud_scheduler.py": "b97746c405d409247b9094fc8378b6d11c99df425925eb0e1ac11085051966a6"
+  },
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "version": "projection-v2.hfa1.w3",
+  "release_ref": {
+    "path": "outputs/projection-v3/releases/2ee7837985ed16e63d0b5b17d0e3bdc2d1ddb016a287ab02abec0889b9b2ae7c.json",
+    "sha256": "2ee7837985ed16e63d0b5b17d0e3bdc2d1ddb016a287ab02abec0889b9b2ae7c"
+  },
+  "issuing_code_commit": "5b49d5189c6c6cc224f3a4c932cfaa1ca616b6c8",
+  "prepared_manifest_ref": {
+    "path": "work/projection-v3/prepared-manifests/df36e368627cb1b2f140b448bc5aa26f90f153c1213e41028d6d125b7a730fe0.json",
+    "sha256": "df36e368627cb1b2f140b448bc5aa26f90f153c1213e41028d6d125b7a730fe0"
+  },
+  "features_ref": {
+    "path": "work/projection-v3/prepared-features/0a097e0640959d4b08cc432971083be2496c0958110df87751397f35f9bd0c3e.json.gz",
+    "sha256": "0a097e0640959d4b08cc432971083be2496c0958110df87751397f35f9bd0c3e"
+  },
+  "prepared_sha256": "0a097e0640959d4b08cc432971083be2496c0958110df87751397f35f9bd0c3e",
+  "legacy_alias_sha256": "0a097e0640959d4b08cc432971083be2496c0958110df87751397f35f9bd0c3e",
+  "prepared_rows": 544,
+  "prepared_bytes": 679581,
+  "board_cards": 48,
+  "exact_forecast_reproductions": 16,
+  "frozen_record_hashes_unchanged": 52,
+  "board_content_sha256": "9facb4c26ce0674e36b0718f6ef8470028681ff38c77bc7557c347bda3d1a3f7",
+  "board_published_at": "2026-09-22T18:22:51.108979+00:00",
+  "free_root_bytes": 19959808,
+  "provider_credits": 0,
+  "matches_pre_migration_prepared_bytes": true
+}
