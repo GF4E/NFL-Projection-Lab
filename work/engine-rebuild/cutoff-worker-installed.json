@@ -1,0 +1,83 @@
+{
+  "status": "INSTALLED_WAITING_FOR_FIRST_REAL_CUTOFF",
+  "checked_at": "2026-09-22T20:28:59.966691+00:00",
+  "host_commit": "9ca6a074e8ea07afe8dcd7256816ba7f893398ce",
+  "expected_source_hashes": {
+    "engine/projection/cutoff_state.py": "7ef17dc4bc9889170a0d292fde052ae2e92987616d7d2ad0724d108f842b0d3d",
+    "engine/projection/cutoff_worker.py": "39ebebfff38dd08cf9d84e2dfb3fcc6ce2f01160449c927898a161dc8e8ce489",
+    "scripts/cloud_scheduler.py": "d6e905f4e4f20c8900577f4c83d5da59d82ae80a5d3ac7aec71589367314134c",
+    "scripts/projection_watchdog.py": "27e1aa1a8ce32cc596968fd2eea891d04c60179ac177d5b292f4831364428b43",
+    "engine/projection/watchdog.py": "a35132186dd18b5c630c6fb062e99a919713ed3dcef90369b40ea08cf8273b81",
+    "ops/cloud/nfl-cutoff-state.service": "229c0383fc1c236e564d8a0551c40c5c95f4eb8a000f6e2df167a11bf5680936",
+    "ops/cloud/nfl-cutoff-state.timer": "42bd390c79776270fdb88dd506b3411c6caacaaa0cdbef99020966ee676f9345"
+  },
+  "installed_unit_hashes": {
+    "nfl-cutoff-state.service": "229c0383fc1c236e564d8a0551c40c5c95f4eb8a000f6e2df167a11bf5680936",
+    "nfl-cutoff-state.timer": "42bd390c79776270fdb88dd506b3411c6caacaaa0cdbef99020966ee676f9345"
+  },
+  "configuration": {
+    "bootstrap_observation_ref": {
+      "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+      "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+    },
+    "created_at": "2026-09-22T20:28:51.031843+00:00",
+    "first_cutoff": "2026-09-25T13:00:00+00:00",
+    "fit_ref": {
+      "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+      "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+    },
+    "method": {
+      "code": {
+        "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+        "engine/elo_hfa.py": "d9e4052bc7b1b828d88b694f9ddaddf16111c1daa5c06cd0656b0fc64dee4d20",
+        "engine/forecast_system/cadence.py": "a685a17e69e5f6d104822238e9c2b53cbf67d7a91ee22d77f41bcaa38c6e7b80",
+        "engine/forecast_system/calendar.py": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b",
+        "engine/projection/cutoff_features.py": "b7ca7156cef0bfaa51bbbf353f01f360b99d80d64d4d4dab234c16dd5c5575ae",
+        "engine/projection/cutoff_state.py": "7ef17dc4bc9889170a0d292fde052ae2e92987616d7d2ad0724d108f842b0d3d",
+        "engine/projection/features.py": "9c1172450639deeee99a58211713084fe54bf86a09f31915e90cdd1e0866aef8",
+        "engine/projection/model.py": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead",
+        "engine/projection/observations.py": "70afc117137325451492bfa0cf9d75fee3047ec280ec429419ae13baf869d691"
+      },
+      "elo_hfa": {
+        "2014": 76.21231979030144,
+        "2015": 69.90131578947368,
+        "2016": 60.65303430079155,
+        "2017": 55.15191545574637,
+        "2018": 54.794973544973544,
+        "2019": 62.00396825396825,
+        "2020": 40.033112582781456,
+        "2021": 20.343461030383093,
+        "2022": 14.359637774902975,
+        "2023": 32.369758576874204,
+        "2024": 53.308364544319595,
+        "2025": 54.630788485607006,
+        "2026": 55.131414267834785
+      },
+      "groups": [
+        "calibration",
+        "elo"
+      ],
+      "policy": "approved-method-three-cutoff-v1",
+      "selected": [
+        "none",
+        10
+      ]
+    },
+    "owner": "digitalocean:599707390",
+    "policy": {
+      "cutoff_policy": "Fri/Mon/Tue 06:00 America/Los_Angeles",
+      "max_attempts": 3,
+      "mode": "NUMERICAL_SHADOW",
+      "operation_seconds": 600,
+      "schema": "cutoff-shadow-worker-v1"
+    }
+  },
+  "configuration_sha256": "2e770868f0cbdddc80b2c59ccfc9c59d75cb958b5cd76c35e1b27d33714024e9",
+  "unit_status": "TimeoutStartUSec=10min\nResult=success\nExecMainStatus=0\nMemoryMax=4294967296\nId=nfl-cutoff-state.service\nActiveState=inactive\n\nTimersMonotonic={ OnUnitActiveUSec=1min ; next_elapse=1w 4d 2h 40min 7.602554s }\nTimersMonotonic={ OnBootUSec=30s ; next_elapse=30s }\nTimersCalendar={ OnCalendar=Mon,Tue,Fri *-*-* 06:00:00 America/Los_Angeles ; next_elapse=Fri 2026-09-25 13:00:00 UTC }\nNextElapseUSecRealtime=Fri 2026-09-25 13:00:00 UTC\nResult=success\nId=nfl-cutoff-state.timer\nActiveState=active\n",
+  "backups": [],
+  "numerical_state_created": false,
+  "forecast_activation": false,
+  "free_root_bytes": 192253952,
+  "new_spending": 0,
+  "provider_requests": 0
+}

@@ -1,0 +1,55 @@
+{
+  "state": "VERIFIED",
+  "checked_at": "2026-09-22T20:30:55.648559+00:00",
+  "host_commit": "f9c578d9a2d2b211e9ce43241af773ae9ca9447a",
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "version": "projection-v2.hfa1.w3",
+  "release_ref": {
+    "path": "outputs/projection-v3/releases/2bfd0c5f8ec5ffbd77209e0a11eba2e49810eda82e0296d937c2a24f040bed9d.json",
+    "sha256": "2bfd0c5f8ec5ffbd77209e0a11eba2e49810eda82e0296d937c2a24f040bed9d"
+  },
+  "issuing_code_commit": "808d2161d984404ce14984dd80da251d27e85df6",
+  "observation_snapshot_ref": {
+    "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+    "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+  },
+  "collected_games": 3183,
+  "unknown": [],
+  "collected_at": [
+    "2026-09-22T19:35:10.277779+00:00"
+  ],
+  "prepared_rows": 544,
+  "prepared_bytes": 679581,
+  "prepared_sha256": "0a097e0640959d4b08cc432971083be2496c0958110df87751397f35f9bd0c3e",
+  "exact_source_body_reproductions": 3183,
+  "frozen_records_unchanged": 52,
+  "exact_forecast_reproductions": 16,
+  "release_binds_collector_code": true,
+  "inactive_state_code_sha256": "7ef17dc4bc9889170a0d292fde052ae2e92987616d7d2ad0724d108f842b0d3d",
+  "numerical_state_active": false,
+  "worker_source_hashes": {
+    "engine/projection/cutoff_worker.py": "39ebebfff38dd08cf9d84e2dfb3fcc6ce2f01160449c927898a161dc8e8ce489",
+    "scripts/cloud_scheduler.py": "d6e905f4e4f20c8900577f4c83d5da59d82ae80a5d3ac7aec71589367314134c",
+    "scripts/projection_watchdog.py": "27e1aa1a8ce32cc596968fd2eea891d04c60179ac177d5b292f4831364428b43",
+    "engine/projection/watchdog.py": "a35132186dd18b5c630c6fb062e99a919713ed3dcef90369b40ea08cf8273b81"
+  },
+  "configuration_first_cutoff": "2026-09-25T13:00:00+00:00",
+  "configuration_sha256": "2e770868f0cbdddc80b2c59ccfc9c59d75cb958b5cd76c35e1b27d33714024e9",
+  "independent_observer": {
+    "checked_at": "2026-09-22T20:30:31.686454+00:00",
+    "cutoff_state": {
+      "last_cutoff": null,
+      "mode": "NUMERICAL_SHADOW",
+      "next_cutoff": "2026-09-25T13:00:00+00:00",
+      "state": "WAITING_FOR_CUTOFF"
+    },
+    "observer_source_sha256": "7819eaa91d37f5cddfd90ca91e8b5e1df9c2f47e0005cd27ba68fdcbc38c23a8"
+  },
+  "installed_units": "TimeoutStartUSec=10min\nResult=success\nExecMainStatus=0\nMemoryMax=4294967296\nId=nfl-cutoff-state.service\nActiveState=inactive\n\nTimersCalendar={ OnCalendar=Mon,Tue,Fri *-*-* 06:00:00 America/Los_Angeles ; next_elapse=Fri 2026-09-25 13:00:00 UTC }\nResult=success\nId=nfl-cutoff-state.timer\nActiveState=active\n",
+  "free_root_bytes": 192102400,
+  "provider_credits": 0,
+  "scope": "Installed source and scheduled receipt/prepared/bundle linkage; no state-model activation, refit or public-browser equality claim"
+}
