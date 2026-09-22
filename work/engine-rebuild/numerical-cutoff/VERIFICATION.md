@@ -40,3 +40,11 @@ Every attempt is preserved in prior-attempts.json. Current-ref.json pins the fin
 Least certain: whether historical availability assumptions match provider arrivals. This led to an explicit reconstruction mode and live guards instead of a claim that historical replay proves live eligibility.
 
 Confidence: medium — the timing effect holds on the authoritative population but depends on source-availability and target-week context choices that could reasonably differ. Lower to low if qualified source vintages materially change observation membership. Exact point reproduction and order equality are arithmetic on verified rows; they do not establish operational readiness or predictive improvement.
+
+## September 22 state-restoration rerun
+
+The current reference now pins `work/engine-rebuild/numerical-cutoff/replay-8a9e0f89dc915f3eb1324bf7001a3849b186c2b34bbb3b3b95847fec7b7469b6.json.gz` (SHA256 `8a9e0f89dc915f3eb1324bf7001a3849b186c2b34bbb3b3b95847fec7b7469b6`). The prior selected replay remains preserved above and on disk. The new code separately gates final-score and paired-statistics availability and reconstructs cumulative state in played order. `state-reconciliation.json` verifies exact equality of all 2,639 per-game forecast/training records and all annual counts with the prior replay. All descriptive metrics in the original table therefore remain unchanged. The authoritative control remains the HFA series. This rerun took 161.93 seconds and 830,439,424 peak resident bytes; it does not install a new live scheduler or qualify historical source vintages.
+
+Persisted state and a label-free shadow adapter now have isolated recovery evidence; production integration remains pending. Finals can update Elo/rest before paired statistics arrive, preserving legacy behavior. Missing statistics are explicit, not zero. See ../CUTOFF-STATE.md and ../cutoff-state-canary.json.
+
+Confidence: high in numerical equality with the prior diagnostic across all ten seasons; this survives reversed-row and delayed-arrival fixtures. Lower to medium if independent reconstruction finds a changed point or training identity. Historical live availability and operational readiness remain unqualified.

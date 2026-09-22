@@ -121,16 +121,17 @@ def material(schedule, statistics, collected_at):
             unknown.append({'game_id':gid,'reason':'COMPLETION_PROXY_NOT_REACHED'});continue
         h,a=game['home_team'],game['away_team']
         if h not in DIV or a not in DIV or h==a:raise ValueError('Unknown paired team')
-        rows=by.get(gid,[])
-        if not rows:
-            unknown.append({'game_id':gid,'reason':'TEAM_STATISTICS_UNAVAILABLE'});continue
-        if len(rows)!=2 or {r['team'] for r in rows}!={h,a}:raise ValueError('Paired observation statistics required')
         clean_game={k:game.get(k) for k in GAME_KEYS}
         for k in ('home_score','away_score'):
             value=float(clean_game[k])
             if not math.isfinite(value) or value<0 or not value.is_integer():raise ValueError('Invalid observation score')
             clean_game[k]=value
         for k in ('season','week'):clean_game[k]=int(clean_game[k])
+        rows=by.get(gid,[])
+        if not rows:
+            unknown.append({'game_id':gid,'reason':'TEAM_STATISTICS_UNAVAILABLE',
+                            'final_input_sha256':sha(raw(clean_game))});continue
+        if len(rows)!=2 or {r['team'] for r in rows}!={h,a}:raise ValueError('Paired observation statistics required')
         clean_rows=[]
         for row in sorted(rows,key=lambda r:r['team']):
             if row['opponent']!=(a if row['team']==h else h):raise ValueError('Wrong observation opponent')
@@ -144,6 +145,9 @@ def material(schedule, statistics, collected_at):
                     raise ValueError('Invalid observation statistic')
             if clean['drives'] is None or clean['drives']<=0 or clean['plays_per_drive'] is None or clean['plays_per_drive']<=0:
                 raise ValueError('Invalid drive denominator')
+            required=('fg_points','turnovers_lost')+tuple('fg_'+b+'_'+k for b in ('short','medium','long') for k in ('made','attempts'))
+            if any(clean[k] is None or clean[k]<0 for k in required):raise ValueError('Required observed count unavailable')
+            if any(clean['fg_'+b+'_made']>clean['fg_'+b+'_attempts'] for b in ('short','medium','long')):raise ValueError('Invalid observed kicking counts')
             clean_rows.append(clean)
         body={'game':clean_game,'statistics':clean_rows}
         records[gid]={**body,'input_sha256':sha(raw(body))}

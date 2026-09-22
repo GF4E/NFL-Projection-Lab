@@ -90,6 +90,21 @@ class CutoffFeaturesTests(unittest.TestCase):
         second=new.build(list(reversed(rows)),list(reversed(games)),{'stadiums':[]},mode='HISTORICAL_RECONSTRUCTION')
         self.assertEqual(first,second)
 
+    def test_final_updates_elo_before_late_statistics_without_double_update(self):
+        thu=game('thu','2015-09-10',2,hour='20:30')
+        sun=game('sun','2015-09-13',2);sun.update(home_score=None,away_score=None)
+        mon=game('mon','2015-09-14',2,hour='20:30');mon.update(home_score=None,away_score=None)
+        games=[thu,sun,mon];availability={'thu':{'final_seen_at':'2015-09-11T04:00:00Z','team_stats_seen_at':'2015-09-14T12:00:00Z'}}
+        args=(stats(thu),games,{'stadiums':[]})
+        sunday=new.build(*args,mode='LIVE_RECORDED_AVAILABILITY',availability=availability,through='2015-09-13T15:00:00Z',forecast_ids=['sun'])
+        monday=new.build(*args,mode='LIVE_RECORDED_AVAILABILITY',availability=availability,through='2015-09-14T16:00:00Z',forecast_ids=['mon'])
+        a=next(r for r in sunday['rows'] if r['team']=='BAL');b=next(r for r in monday['rows'] if r['team']=='BAL')
+        self.assertNotEqual(a['features']['elo'],0.)
+        self.assertEqual(a['features']['elo'],b['features']['elo'])
+        self.assertIsNone(a['features']['baseline']);self.assertIsNotNone(b['features']['baseline'])
+        self.assertEqual(sum('thu' in r['added_games'] for r in monday['lineage']),1)
+        self.assertEqual(sum('thu' in r['statistics_games'] for r in monday['lineage']),1)
+
     def test_game_cannot_update_twice_and_missing_pair_fails(self):
         g=game('g','2015-09-13',1);s=new.State();s.observe(g,stats(g))
         with self.assertRaisesRegex(ValueError,'Duplicate'):s.observe(g,stats(g))

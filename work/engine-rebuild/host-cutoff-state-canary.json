@@ -1,0 +1,54 @@
+{
+  "status": "PASS",
+  "checked_at": "2026-09-22T20:01:08.601024+00:00",
+  "scope": "Captured source restoration; simulated three future cutoffs only, no production state or issuance.",
+  "source_remote_commit": null,
+  "remote_graph_verified": false,
+  "graph_files": 6,
+  "graph_snapshots": 1,
+  "observation_ref": {
+    "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+    "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+  },
+  "actual_collection_clock": "2026-09-22T19:35:10.277779+00:00",
+  "simulated_cutoffs": [
+    "2026-09-25T13:00:00+00:00",
+    "2026-09-28T13:00:00+00:00",
+    "2026-09-29T13:00:00+00:00"
+  ],
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "games_reproduced_from_sources": 3183,
+  "state_games": 3183,
+  "additional_duplicate_effects": 0,
+  "restored_states": 3,
+  "same_state_after_empty_cutoffs": true,
+  "state_bytes": 911402,
+  "legacy_feature_parity_rows": 28,
+  "max_feature_difference": 0,
+  "frozen_records_unchanged": 52,
+  "candidate_code": {
+    "engine/projection/cutoff_state.py": "87727edbd355d6b47e9c77e91e5d3f551c4080de581c309a30618788f91b9d6c",
+    "engine/projection/cutoff_features.py": "b7ca7156cef0bfaa51bbbf353f01f360b99d80d64d4d4dab234c16dd5c5575ae",
+    "engine/projection/observations.py": "70afc117137325451492bfa0cf9d75fee3047ec280ec429419ae13baf869d691",
+    "engine/projection/features.py": "9c1172450639deeee99a58211713084fe54bf86a09f31915e90cdd1e0866aef8",
+    "engine/projection/model.py": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead",
+    "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+    "engine/elo_hfa.py": "d9e4052bc7b1b828d88b694f9ddaddf16111c1daa5c06cd0656b0fc64dee4d20",
+    "engine/forecast_system/calendar.py": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b",
+    "engine/forecast_system/cadence.py": "a685a17e69e5f6d104822238e9c2b53cbf67d7a91ee22d77f41bcaa38c6e7b80"
+  },
+  "elapsed_seconds": 86.5972159380326,
+  "peak_rss_bytes": 196571136,
+  "provider_requests": 0,
+  "new_spending": 0,
+  "host_commit": "3c6019d0808a51754a6d94454d4e2f950c748f57",
+  "uid": 1000,
+  "python": "3.12.2",
+  "tests": 39,
+  "test_log": "test_corruption_in_state_or_source_fails_restore (test_projection_cutoff_state.CutoffStateTests.test_corruption_in_state_or_source_fails_restore) ... ok\ntest_cutoff_retries_recover_after_pointer_failure_and_lost_response (test_projection_cutoff_state.CutoffStateTests.test_cutoff_retries_recover_after_pointer_failure_and_lost_response) ... ok\ntest_equal_arrival_clock_waits_until_next_cutoff (test_projection_cutoff_state.CutoffStateTests.test_equal_arrival_clock_waits_until_next_cutoff) ... ok\ntest_failed_object_or_receipt_write_commits_no_effect_and_retry_succeeds (test_projection_cutoff_state.CutoffStateTests.test_failed_object_or_receipt_write_commits_no_effect_and_retry_succeeds) ... ok\ntest_final_and_statistics_arrive_on_independent_clocks (test_projection_cutoff_state.CutoffStateTests.test_final_and_statistics_arrive_on_independent_clocks) ... ok\ntest_late_older_game_rebuilds_in_played_order_not_arrival_order (test_projection_cutoff_state.CutoffStateTests.test_late_older_game_rebuilds_in_played_order_not_arrival_order) ... ok\ntest_no_snapshot_before_cutoff_cannot_be_backdated (test_projection_cutoff_state.CutoffStateTests.test_no_snapshot_before_cutoff_cannot_be_backdated) ... ok\ntest_ownership_and_incompatible_method_fail_closed (test_projection_cutoff_state.CutoffStateTests.test_ownership_and_incompatible_method_fail_closed) ... ok\ntest_proxy_boundary_is_strict_even_when_source_has_a_final (test_projection_cutoff_state.CutoffStateTests.test_proxy_boundary_is_strict_even_when_source_has_a_final) ... ok\ntest_revisions_change_later_state_and_preserve_original (test_projection_cutoff_state.CutoffStateTests.test_revisions_change_later_state_and_preserve_original) ... ok\ntest_shadow_forecast_requires_its_cutoff_and_rejects_labels (test_projection_cutoff_state.CutoffStateTests.test_shadow_forecast_requires_its_cutoff_and_rejects_labels) ... ok\ntest_three_cutoffs_restore_once_and_keep_same_state_without_new_facts (test_projection_cutoff_state.CutoffStateTests.test_three_cutoffs_restore_once_and_keep_same_state_without_new_facts) ... ok\ntest_withdrawn_evidence_or_skipped_cutoff_fails_closed (test_projection_cutoff_state.CutoffStateTests.test_withdrawn_evidence_or_skipped_cutoff_fails_closed) ... ok\ntest_delayed_source_and_boundary_wait_for_later_cutoff (test_projection_cutoff_features.CutoffFeaturesTests.test_delayed_source_and_boundary_wait_for_later_cutoff) ... ok\ntest_equivalent_sunday_history_preserves_every_feature (test_projection_cutoff_features.CutoffFeaturesTests.test_equivalent_sunday_history_preserves_every_feature) ... ok\ntest_final_updates_elo_before_late_statistics_without_double_update (test_projection_cutoff_features.CutoffFeaturesTests.test_final_updates_elo_before_late_statistics_without_double_update) ... ok\ntest_future_final_cannot_change_earlier_projection (test_projection_cutoff_features.CutoffFeaturesTests.test_future_final_cannot_change_earlier_projection) ... ok\ntest_game_cannot_update_twice_and_missing_pair_fails (test_projection_cutoff_features.CutoffFeaturesTests.test_game_cannot_update_twice_and_missing_pair_fails) ... ok\ntest_live_does_not_assume_missing_past_source_availability (test_projection_cutoff_features.CutoffFeaturesTests.test_live_does_not_assume_missing_past_source_availability) ... ok\ntest_live_mode_requires_execution_time (test_projection_cutoff_features.CutoffFeaturesTests.test_live_mode_requires_execution_time) ... ok\ntest_live_refuses_backdated_issuance_and_future_state (test_projection_cutoff_features.CutoffFeaturesTests.test_live_refuses_backdated_issuance_and_future_state) ... ok\ntest_reordering_rows_and_games_is_identical (test_projection_cutoff_features.CutoffFeaturesTests.test_reordering_rows_and_games_is_identical) ... ok\ntest_thursday_result_enters_sunday_via_friday (test_projection_cutoff_features.CutoffFeaturesTests.test_thursday_result_enters_sunday_via_friday) ... ok\ntest_two_games_inside_interval_share_state_even_different_week_labels (test_projection_cutoff_features.CutoffFeaturesTests.test_two_games_inside_interval_share_state_even_different_week_labels) ... ok\ntest_batch_failure_retry_keeps_original_durable_clock (test_projection_observations.ObservationTests.test_batch_failure_retry_keeps_original_durable_clock) ... ok\ntest_cached_preparation_captures_receipts_without_changing_feature_bytes (test_projection_observations.ObservationTests.test_cached_preparation_captures_receipts_without_changing_feature_bytes) ... ok\ntest_capture_binds_real_collection_clock_and_paired_facts (test_projection_observations.ObservationTests.test_capture_binds_real_collection_clock_and_paired_facts) ... ok\ntest_corrupt_batch_and_pending_clock_are_not_silently_repaired (test_projection_observations.ObservationTests.test_corrupt_batch_and_pending_clock_are_not_silently_repaired) ... ok\ntest_corrupt_committed_batch_fails_and_keeps_pointer (test_projection_observations.ObservationTests.test_corrupt_committed_batch_fails_and_keeps_pointer) ... ok\ntest_market_and_target_identity_columns_cannot_enter_receipts (test_projection_observations.ObservationTests.test_market_and_target_identity_columns_cannot_enter_receipts) ... ok\ntest_missing_pair_future_result_and_final_absence_are_not_invented (test_projection_observations.ObservationTests.test_missing_pair_future_result_and_final_absence_are_not_invented) ... ok\ntest_missing_statistics_still_records_final_revisions_and_validates_scores (test_projection_observations.ObservationTests.test_missing_statistics_still_records_final_revisions_and_validates_scores) ... ok\ntest_pointer_failure_and_lost_response_preserve_first_receipt (test_projection_observations.ObservationTests.test_pointer_failure_and_lost_response_preserve_first_receipt) ... ok\ntest_required_kicking_count_is_not_imputed_to_zero (test_projection_observations.ObservationTests.test_required_kicking_count_is_not_imputed_to_zero) ... ok\ntest_revision_links_old_observation_and_preserves_historical_snapshot (test_projection_observations.ObservationTests.test_revision_links_old_observation_and_preserves_historical_snapshot) ... ok\ntest_unchanged_facts_reuse_first_receipt_despite_new_source_metadata (test_projection_observations.ObservationTests.test_unchanged_facts_reuse_first_receipt_despite_new_source_metadata) ... ok\ntest_withdrawn_final_is_named_and_original_receipt_is_preserved (test_projection_observations.ObservationTests.test_withdrawn_final_is_named_and_original_receipt_is_preserved) ... ok\ntest_writer_contention_fails_without_mutation (test_projection_observations.ObservationTests.test_writer_contention_fails_without_mutation) ... ok\ntest_wrong_hash_duplicate_pair_and_nonfinite_statistic_fail_closed (test_projection_observations.ObservationTests.test_wrong_hash_duplicate_pair_and_nonfinite_statistic_fail_closed) ... ok\n\n----------------------------------------------------------------------\nRan 39 tests in 3.190s\n\nOK\n",
+  "address_space_limit_bytes": 4294967296,
+  "free_root_bytes": 200929280
+}

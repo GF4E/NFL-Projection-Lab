@@ -98,7 +98,7 @@ class State:
   h,a=game['home_team'],game['away_team'];hs=float(game['home_score']);aws=float(game['away_score'])
   if not all(math.isfinite(v) and v>=0 for v in (hs,aws)):raise ValueError('Invalid final score')
   op={r['team']:r for r in rows}
-  if len(rows)!=2 or set(op)!={h,a}:raise ValueError('Paired team statistics required: '+gid)
+  if rows and (len(rows)!=2 or set(op)!={h,a}):raise ValueError('Paired team statistics required: '+gid)
   if any(r['opponent']!=(a if r['team']==h else h) for r in rows):raise ValueError('Wrong paired opponent')
   f=self.elo.forecast(h,a,game.get('location')=='Neutral',0.,0.)
   self.elo.update(h,a,hs,aws,f)
@@ -116,13 +116,22 @@ class State:
               'last':dict(self.last),'incorporated':self.incorporated})
 
 
+def reconstruct(finals,statistics,elo_hfa=None):
+ """Build one state from available facts, once per game in played order."""
+ state=State(elo_hfa)
+ for game in sorted(finals,key=lambda g:(schedule_kickoff(g['gameday'],g['gametime']),g['game_id'])):
+  state.observe(game,statistics.get(game['game_id'],[]))
+ return state
+
+
 def build(team_games,schedule,stadiums,half_life=None,extra_hashes=(),elo_hfa=None,*,
           mode,availability=None,through=None,minimum_season=2015,forecast_ids=None):
  """Return label-free numerical rows plus shared-cutoff observation lineage.
 
  Historical mode explicitly assumes provider availability at kickoff+4h; it
- cannot establish historical live availability. Live mode requires per-game
- final_seen_at/team_stats_seen_at and never substitutes a new retrieval date.
+ cannot establish historical live availability. Live mode separately requires
+ final_seen_at for Elo/rest and team_stats_seen_at for paired efficiency data;
+ neither clock is replaced by a new retrieval date.
  `through` caps execution time, so future states cannot be generated as live.
  """
  if mode not in MODES:raise ValueError('Explicit source-availability mode required')
@@ -136,7 +145,7 @@ def build(team_games,schedule,stadiums,half_life=None,extra_hashes=(),elo_hfa=No
  if not targets<={g['game_id'] for g in games}:raise ValueError('Unknown forecast target')
  stats=defaultdict(list)
  for r in team_games:stats[r['game_id']].append(copy.deepcopy(r))
- forecasts=defaultdict(list);observations=defaultdict(list);excluded=[];eligibility={}
+ forecasts=defaultdict(list);observations=defaultdict(list);stat_events=defaultdict(list);excluded=[];eligibility={}
  for game in games:
   gid=game['game_id'];kickoff=schedule_kickoff(game['gameday'],game['gametime'])
   issuance=kickoff-dt.timedelta(minutes=75);cutoff=cutoff_before(issuance)
@@ -147,23 +156,28 @@ def build(team_games,schedule,stadiums,half_life=None,extra_hashes=(),elo_hfa=No
    else:excluded.append({'game_id':gid,'reason':'REQUIRED_FORECAST_CUTOFF_NOT_REACHED'})
   if mode=='LIVE_RECORDED_AVAILABILITY' and kickoff+dt.timedelta(hours=4)>=limit:continue
   if game.get('home_score') in ('',None) or game.get('away_score') in ('',None):continue
-  if not stats.get(gid):
-   excluded.append({'game_id':gid,'reason':'TEAM_STATISTICS_UNAVAILABLE'});continue
-  at=kickoff+dt.timedelta(hours=4)
+  proxy=kickoff+dt.timedelta(hours=4);final_at=proxy;stats_at=proxy if stats.get(gid) else None
+  record=(availability or {}).get(gid,{})
   if mode=='LIVE_RECORDED_AVAILABILITY':
-   record=(availability or {}).get(gid,{})
-   if not record.get('final_seen_at') or not record.get('team_stats_seen_at'):
+   if not record.get('final_seen_at'):
     excluded.append({'game_id':gid,'reason':'SOURCE_AVAILABILITY_NOT_RECORDED'});continue
-   at=max(at,timestamp(record['final_seen_at']),timestamp(record['team_stats_seen_at']))
-  eligible=next_cutoff(at)
+   final_at=max(proxy,timestamp(record['final_seen_at']))
+   stats_at=max(proxy,timestamp(record['team_stats_seen_at'])) if stats.get(gid) and record.get('team_stats_seen_at') else None
+  if stats_at is None:excluded.append({'game_id':gid,'reason':'TEAM_STATISTICS_UNAVAILABLE_OR_UNTIMESTAMPED'})
+  eligible=next_cutoff(final_at)
   if limit is None or eligible<=limit:observations[eligible].append(game)
-  eligibility[gid]={'kickoff_plus_four_hours':(kickoff+dt.timedelta(hours=4)).isoformat(),
-                    'available_after':at.isoformat(),'first_eligible_cutoff':eligible.isoformat(),
+  stat_cutoff=next_cutoff(stats_at) if stats_at is not None else None
+  if stat_cutoff is not None and (limit is None or stat_cutoff<=limit):stat_events[stat_cutoff].append(game)
+  eligibility[gid]={'kickoff_plus_four_hours':proxy.isoformat(),
+                    'available_after':final_at.isoformat(),'first_eligible_cutoff':eligible.isoformat(),
+                    'statistics_available_after':stats_at.isoformat() if stats_at else None,
+                    'statistics_first_eligible_cutoff':stat_cutoff.isoformat() if stat_cutoff else None,
                     'source_availability':'UNKNOWN_ASSUMED_FOR_RECONSTRUCTION' if mode==MODES[0] else 'RECORDED',
-                    'availability_record':(availability or {}).get(gid) if mode==MODES[1] else None}
+                    'availability_record':record if mode==MODES[1] else None}
  state=State(elo_hfa);rows=[];lineage=[]
  # Include empty in-season cutoffs, but do not simulate offseason updates.
- cuts=set(forecasts)|set(observations)
+ finals_available={};stats_available={}
+ cuts=set(forecasts)|set(observations)|set(stat_events)
  for season in sorted({int(g['season']) for g in games}):
   season_cuts=[cutoff_before(schedule_kickoff(g['gameday'],g['gametime'])-dt.timedelta(minutes=75)) for g in games if int(g['season'])==season]
   cursor=min(season_cuts);end=max(season_cuts)
@@ -174,7 +188,10 @@ def build(team_games,schedule,stadiums,half_life=None,extra_hashes=(),elo_hfa=No
   added=sorted(observations[cutoff],key=lambda g:(schedule_kickoff(g['gameday'],g['gametime']),g['game_id']))
   for game in added:
    if timestamp(eligibility[game['game_id']]['available_after'])>=cutoff:raise ValueError('Early numerical observation')
-   state.observe(game,stats[game['game_id']])
+   finals_available[game['game_id']]=game
+  changed_stats=sorted(stat_events[cutoff],key=lambda g:(schedule_kickoff(g['gameday'],g['gametime']),g['game_id']))
+  for game in changed_stats:stats_available[game['game_id']]=stats[game['game_id']]
+  if added or changed_stats:state=reconstruct(list(finals_available.values()),stats_available,elo_hfa)
   by_context=defaultdict(list)
   for g in forecasts[cutoff]:by_context[(int(g['season']),int(g['week']))].append(g)
   contexts=[]
@@ -187,7 +204,7 @@ def build(team_games,schedule,stadiums,half_life=None,extra_hashes=(),elo_hfa=No
                           'source_availability_mode':mode,'weight_context_week':week}
     if row['season']>=minimum_season:rows.append(row)
    contexts.append({'season':season,'week':week,'state_sha256':identity,'forecast_games':[g['game_id'] for g in slate]})
-  lineage.append({'cutoff_at':cutoff.isoformat(),'added_games':[g['game_id'] for g in added],
+  lineage.append({'cutoff_at':cutoff.isoformat(),'added_games':[g['game_id'] for g in added],'statistics_games':[g['game_id'] for g in changed_stats],
                   'incorporated_count':len(state.incorporated),'incorporated_sha256':sha(state.incorporated),
                   'forecast_contexts':contexts})
  return {'policy':POLICY,'mode':mode,'rows':rows,'lineage':lineage,'eligibility':eligibility,'excluded':excluded}

@@ -20,6 +20,7 @@ def fixture():
         row={k:None for k in obs.STAT_FIELDS}
         row.update(game_id='g1',team=team,opponent=opponent,season=2026,week=2,date='2026-09-20',
                    drives=10,plays_per_drive=6,off_ppd=2.,fg_points=3,turnovers_lost=1,source_hash='stats')
+        row.update({k:0 for k in obs.STAT_FIELDS if k.startswith('fg_') and k!='fg_points'})
         rows.append(row)
     return [game],rows
 
@@ -70,6 +71,23 @@ class ObservationTests(unittest.TestCase):
         records,unknown=obs.material(games,stats,NOW)
         self.assertFalse(records);self.assertEqual(unknown[0]['reason'],'COMPLETION_PROXY_NOT_REACHED')
         games[0]['home_score']='';self.assertEqual(obs.material(games,stats,NOW),({},[]))
+
+    def test_missing_statistics_still_records_final_revisions_and_validates_scores(self):
+        self.stats=[];first=obs.capture(self.root,self.manifest())
+        self.games[0]['source_hash']='changed metadata'
+        self.assertEqual(obs.capture(self.root,self.manifest()),first)
+        self.games[0]['home_score']='25'
+        with patch.object(obs,'now',return_value=NOW+dt.timedelta(hours=1)):
+            second=obs.capture(self.root,self.manifest())
+        self.assertNotEqual(first,second)
+        self.assertNotEqual(obs.load(self.root,first)[0]['unknown'],obs.load(self.root,second)[0]['unknown'])
+        self.games[0]['home_score']='nan'
+        with self.assertRaisesRegex(ValueError,'score'):obs.capture(self.root,self.manifest())
+
+    def test_required_kicking_count_is_not_imputed_to_zero(self):
+        self.stats[0]['fg_short_attempts']=None
+        with self.assertRaisesRegex(ValueError,'count unavailable'):obs.capture(self.root,self.manifest())
+        self.assertIsNone(obs.current(self.root))
 
     def test_market_and_target_identity_columns_cannot_enter_receipts(self):
         self.games[0].update(spread_line=777,total_line=999,home_qb_id='SECRET_TARGET_ID')

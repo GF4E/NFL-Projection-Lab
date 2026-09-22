@@ -1,0 +1,47 @@
+{
+  "status": "PASS",
+  "checked_at": "2026-09-22T19:58:44.298461+00:00",
+  "scope": "Captured source restoration; simulated three future cutoffs only, no production state or issuance.",
+  "source_remote_commit": "0083e15b697a3116869007b2624407b420df7e22",
+  "remote_graph_verified": true,
+  "graph_files": 6,
+  "graph_snapshots": 1,
+  "observation_ref": {
+    "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+    "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+  },
+  "actual_collection_clock": "2026-09-22T19:35:10.277779+00:00",
+  "simulated_cutoffs": [
+    "2026-09-25T13:00:00+00:00",
+    "2026-09-28T13:00:00+00:00",
+    "2026-09-29T13:00:00+00:00"
+  ],
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "games_reproduced_from_sources": 3183,
+  "state_games": 3183,
+  "additional_duplicate_effects": 0,
+  "restored_states": 3,
+  "same_state_after_empty_cutoffs": true,
+  "state_bytes": 911406,
+  "legacy_feature_parity_rows": 28,
+  "max_feature_difference": 0,
+  "frozen_records_unchanged": 52,
+  "candidate_code": {
+    "engine/projection/cutoff_state.py": "87727edbd355d6b47e9c77e91e5d3f551c4080de581c309a30618788f91b9d6c",
+    "engine/projection/cutoff_features.py": "b7ca7156cef0bfaa51bbbf353f01f360b99d80d64d4d4dab234c16dd5c5575ae",
+    "engine/projection/observations.py": "70afc117137325451492bfa0cf9d75fee3047ec280ec429419ae13baf869d691",
+    "engine/projection/features.py": "9c1172450639deeee99a58211713084fe54bf86a09f31915e90cdd1e0866aef8",
+    "engine/projection/model.py": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead",
+    "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+    "engine/elo_hfa.py": "d9e4052bc7b1b828d88b694f9ddaddf16111c1daa5c06cd0656b0fc64dee4d20",
+    "engine/forecast_system/calendar.py": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b",
+    "engine/forecast_system/cadence.py": "a685a17e69e5f6d104822238e9c2b53cbf67d7a91ee22d77f41bcaa38c6e7b80"
+  },
+  "elapsed_seconds": 11.19154183298815,
+  "peak_rss_bytes": 386416640,
+  "provider_requests": 0,
+  "new_spending": 0
+}
