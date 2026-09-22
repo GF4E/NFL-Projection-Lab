@@ -1,0 +1,74 @@
+{
+  "checked_at": "2026-09-22T18:17:00.608371+00:00",
+  "capture_time": "2026-09-22T18:15:51.315584+00:00",
+  "host_commit_at_capture": "874561b1beed183fd89b1fa4998aee906443c703",
+  "control_publisher_commit": "2d69f0e7e2b265d75765ffb7d7dd60f17963f431",
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "candidate_source": {
+    "commit": "2d69f0e7e2b265d75765ffb7d7dd60f17963f431",
+    "status": "CANDIDATE_SOURCE_NOT_YET_COMMITTED",
+    "files": {
+      "engine/projection/bundle.py": "ce2263d54c394a76554bd258206c91a99dbb53ef7a7d36e24ef3cdfa85cd4cd2",
+      "engine/projection/scoring.py": "d8f1b3e4ed2fe94101073c6ac91eeb64509a5791d39e332f1dd1774a4700bdf8",
+      "engine/projection/prepared.py": "2188c17fdce4a30d04560f240aa8ea8ebda8a24c330b0a621315877e4d7c2b80",
+      "engine/projection/scoring_process.py": "26384d60b626725cc8b6833850cd88140301ba2f6b0840f94552a8734e0e37a0",
+      "scripts/projection_score_worker.py": "7abb2d3c6e9b9184078ea4ca0bb74e353372d9e47d02904c5ee0f0c22b6705b9",
+      "engine/projection/lineage.py": "10ce918d070d39043a9b0e410b309ac143194bb7af2d59c31001f20f3307976c",
+      "engine/projection/storage.py": "3eb8f34870d3a55369763cd384589ab7909059fbf7ee0f1325ecc7c0dd43b22f",
+      "engine/projection/model.py": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead",
+      "engine/projection/card.py": "df962ff1762ce7a0740de60e78ac4d98f65ec5c8b1b546f5d0d191e38ca954de",
+      "engine/projection/grade.py": "1fdbe81249335a3d5492676d03c9749ea46b660a0297506290d18db765904f31",
+      "engine/projection/distribution.py": "a4c9a71c971267b1c54268293471ad22cbb3e4ee97392d5829c870dbae4593ec",
+      "engine/projection_v3/card.py": "b545b236035a341a3c6e41c047019a309abf890a3b164f482513611c0ceb4e72",
+      "engine/projection_v3/model.py": "9e6d85fbadd86a4ff9b7f18192c9c6e278c3e26e9ae7f01f6d8bd1597d27943b",
+      "engine/projection/features.py": "9c1172450639deeee99a58211713084fe54bf86a09f31915e90cdd1e0866aef8",
+      "engine/projection_v3/personnel.py": "8f1ec9d1865cac162f7905db6d2c90279795ae24e714b8c17884213651c55af9",
+      "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+      "engine/elo_hfa.py": "d9e4052bc7b1b828d88b694f9ddaddf16111c1daa5c06cd0656b0fc64dee4d20",
+      "engine/forecast_system/calendar.py": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b",
+      "scripts/projection_v3_publish.py": "770ddc5864624593140240e6ce54a4f6345065f8670416eee86ebe8966675ffe",
+      "scripts/projection_prepare.py": "e1341be3cecba533fec3537ade9898a84623c3bdcfd3cec5061ef9fc1e7b9f51",
+      "scripts/projection_v3_prepare.py": "ff520938f7c53df43bc33ac2a309a1629bc3b3d6bc6adb13cf8c27d20c814220",
+      "scripts/projection_v3_sources.py": "e576f1464ce259c30f94ce3fbd121f37d7296209b06c0a08512b962a34d42e96",
+      "scripts/projection_learning.py": "f7431d6d20fa3cd23ac336181263bbd22906b4e57c7e1f866208cd9e0058acbc"
+    }
+  },
+  "scope": "Isolated captured-input publication; no production writes, no provider requests, no public rendering",
+  "cards": 48,
+  "all_card_fields_identical_except_declared_metadata": true,
+  "excluded_metadata_fields": [
+    "content_sha256",
+    "forecast_bundle_ref",
+    "issued_at",
+    "published_at",
+    "release_ref"
+  ],
+  "written_card_paths": 18,
+  "immutable_history_verified_unchanged": 52,
+  "prepared_snapshot_ref": {
+    "path": "work/projection-v3/prepared-manifests/f7b93fa76c299d5d148ae28126d0578884b08d47697593170b97fa3251038deb.json",
+    "sha256": "f7b93fa76c299d5d148ae28126d0578884b08d47697593170b97fa3251038deb"
+  },
+  "prepared_features_ref": {
+    "path": "work/projection-v3/prepared-features/0a097e0640959d4b08cc432971083be2496c0958110df87751397f35f9bd0c3e.json.gz",
+    "sha256": "0a097e0640959d4b08cc432971083be2496c0958110df87751397f35f9bd0c3e"
+  },
+  "prepared_bytes": 679581,
+  "legacy_alias_unchanged": true,
+  "new_bundle_cards": 16,
+  "exact_bundle_reproductions": 16,
+  "unchanged_poll_reuses_bundles": true,
+  "new_immutable_bytes": 340029,
+  "control_wall_seconds": 0.8971054170106072,
+  "candidate_wall_seconds": 0.9482528340013232,
+  "provider_credits": 0,
+  "fresh_fixture": {
+    "scope": "Simulated pre-lock time, captured values, labels cleared; not a chronology proof",
+    "cards": 32,
+    "exact_card_parity": true,
+    "candidate_wall_seconds": 0.8878520830185153
+  }
+}

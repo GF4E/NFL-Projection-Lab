@@ -7,6 +7,7 @@ from engine.projection.model import hash_value
 from engine.projection_v3.qualify import read,save
 from engine.projection_v3.personnel import enrich
 from scripts.projection_publish import save as write
+from engine.projection import prepared
 
 def current_personnel(artifact):
  import pandas as pd
@@ -29,8 +30,15 @@ def current_personnel(artifact):
   data['sources']=[r for r in data['sources'] if r['name']!=name]+[source]
  data['games'].sort(key=lambda g:(g['date'],g['game_id']));return data
 
-def prepare():
+def _prepare():
  work=ROOT/'work/projection-v3';active=ROOT/'work/in-season-learning-v1/active-fit-ref.json';ref=json.loads((active if active.exists() else work/'fit-ref.json').read_text());a=read(ref);m=json.loads((ROOT/'work/projection-v1/source-manifest.json').read_text());d=a['selected'][0];stadiums=json.loads((ROOT/'config/stadiums.json').read_text());current=json.loads((ROOT/'outputs/iron-man-v1/source-manifest.json').read_text());signature=hash_value({'fit':ref,'sources':m,'personnel_sources':current,'stadiums':stadiums,'feature_code':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in [ROOT/'engine/projection/features.py',ROOT/'engine/projection_v3/personnel.py',Path(__file__),ROOT/'scripts/projection_v3_sources.py']}});p=work/'current-features.json.gz';rp=work/'current-ref.json';cached=json.loads(rp.read_text()) if rp.exists() else {}
- if p.exists() and cached.get('signature')==signature and cached.get('sha256')==hashlib.sha256(p.read_bytes()).hexdigest():return json.loads(gzip.decompress(p.read_bytes()))
- rows=build(read(m['team_games']),read(m['schedule']),stadiums,None if d=='none' else int(d),m['roster_source_hashes'],elo_hfa=a.get('elo_hfa'));future=enrich([r for r in rows if r['season']==2026],current_personnel(a),None if d=='none' else int(d));raw=gzip.compress(json.dumps(future,sort_keys=True,separators=(',',':'),allow_nan=False).encode(),mtime=0);p.write_bytes(raw);write(rp,{'elo_hfa':a.get('elo_hfa'),'signature':signature,'sha256':hashlib.sha256(raw).hexdigest(),'source_manifest':m,'fit':ref,'personnel_source_hashes':[{k:r.get(k) for k in ['name','sha256','received_at','refresh_error']} for r in current if r['name'] in ['play_by_play_2026.parquet','depth_charts_2026.parquet']]});return future
+ if cached.get('signature')==signature:
+  rows,manifest,raw=prepared.load(ROOT,manifest=cached)
+  if manifest.get('fit')!=ref:raise ValueError('Cached preparation fit differs')
+  prepared.commit(ROOT,raw,manifest)
+  return rows
+ rows=build(read(m['team_games']),read(m['schedule']),stadiums,None if d=='none' else int(d),m['roster_source_hashes'],elo_hfa=a.get('elo_hfa'));future=enrich([r for r in rows if r['season']==2026],current_personnel(a),None if d=='none' else int(d));raw=gzip.compress(json.dumps(future,sort_keys=True,separators=(',',':'),allow_nan=False).encode(),mtime=0);prepared.commit(ROOT,raw,{'elo_hfa':a.get('elo_hfa'),'signature':signature,'sha256':hashlib.sha256(raw).hexdigest(),'source_manifest':m,'fit':ref,'personnel_source_hashes':[{k:r.get(k) for k in ['name','sha256','received_at','refresh_error']} for r in current if r['name'] in ['play_by_play_2026.parquet','depth_charts_2026.parquet']]});return future
+def prepare():
+ with prepared.writer(ROOT):return _prepare()
+
 if __name__=='__main__':print(json.dumps({'team_rows':len(prepare()),'credits_spent':0}))
