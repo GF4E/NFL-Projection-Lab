@@ -189,8 +189,11 @@
         "contract-evidence.json"
       ],
       "acceptance": "Mean identities only where valid; tie definition; interval nesting/support; no forced probability direction; no fake compression target",
-      "state": "INCOMPLETE",
-      "observed_evidence": []
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "audit_forecast_contract.py; forecast-contract-audit.json; tests/test_projection_contract_audit.py (independent counts, probabilities, bands, contributions and control metrics; invalid support and legacy mean mismatch explicitly unresolved)",
+        "FORECAST-CONTRACT.md (current and target semantics; no numerical migration or improved accuracy claimed)"
+      ]
     },
     {
       "id": "8",
@@ -203,7 +206,8 @@
       "state": "PARTIAL",
       "observed_evidence": [
         "engine/projection_experiments.py",
-        "tests/test_projection_calibration_gate.py (policy implementation only; not a fitted experiment)"
+        "tests/test_projection_calibration_gate.py (policy implementation only; not a fitted experiment)",
+        "E-CAL-PREFLIGHT.md (Tier 1/2 executable convention sweep, not hashed registration; own-lineage warmup and numerical chronology qualification still required)"
       ]
     },
     {
@@ -238,7 +242,8 @@
         "engine/projection/prepared.py; tests/test_projection_prepared.py (immutable preparation transaction, same-fit validation, local writer exclusion and historical snapshot reads)",
         "scripts/cloud_scheduler.py; tests/test_projection_prepared.py (executed learning-mode fixture: closeout, refit, matching preparation, publication)",
         "prepared-input-capture.json; prepared-parity.json (48 captured cards and 32 simulated fresh cards; prepared bytes and 52 frozen records preserved)",
-        "host-prepared-candidate.json (19 actual-runtime tmpfs fixtures; 544 snapshot rows, 16 restored executable forecasts, 52 frozen records unchanged; deployment pending)"
+        "host-prepared-candidate.json (19 actual-runtime tmpfs fixtures; 544 snapshot rows, 16 restored executable forecasts, 52 frozen records unchanged; deployment pending)",
+        "FORECAST-CONTRACT.md (actual public Season DOM and screenshot inspection: 30 graded games, 2 weeks; counts match closeout, superseded references and missing floor remain)"
       ]
     },
     {
