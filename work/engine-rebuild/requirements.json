@@ -134,7 +134,12 @@
         "publisher-lineage-parity.json",
         "legacy-calibration-map.json (reconstruction; does not prove original envelope)",
         "host-verification.json (d00ed366 checkout, unchanged fit)",
-        "host-recovery-tests.json (29 isolated tests under service identity)"
+        "host-recovery-tests.json (29 isolated tests under service identity)",
+        "engine/projection/scoring.py; scoring_process.py; scripts/projection_score_worker.py (strict input and isolated worker)",
+        "engine/projection/bundle.py (compressed immutable scoring records and captured release manifests; executable rollback pending)",
+        "bundle-input-capture.json (verified host snapshot; raw files ignored/private)",
+        "bundle-parity.json (48 captured cards, 16 exact bundle reproductions, 52 unchanged frozen records, no unchanged-poll growth)",
+        "tests/test_projection_bundle.py; host-bundle-candidate.json (boundary/corruption/refit/idempotency fixtures under actual Linux runtime)"
       ]
     },
     {
@@ -239,7 +244,9 @@
         "host-verification.json (scheduled ingestion HEALTHY, matching operation/payload, tested source hashes, unchanged fit; not outage recovery)",
         "watchdog-verification.json (actual source hashes, installed resource cap and observed CPU time)",
         "watchdog-canary.json (bounded monitor-only live outage/recovery)",
-        "host-verification.json (post-canary host, fit, source and reader checks)"
+        "host-verification.json (post-canary host, fit, source and reader checks)",
+        "bundle-parity.json (isolated publisher timing and compressed growth)",
+        "host-bundle-candidate.json (service-user/runtime fixtures, tmpfs only; no live canary yet)"
       ]
     },
     {

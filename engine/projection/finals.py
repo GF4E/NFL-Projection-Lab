@@ -163,11 +163,15 @@ def resume_after_repair(root,reason,now=None,fetch=None,owner=None):
         return {'state':'REPAIRED','repair_sha256':proof_sha,**status}
 
 
-def grade_once(card, path, result):
+def grade_once(card, path, result, root=None):
     from engine.projection_v3.card import finish
     from scripts.projection_publish import save
+    from engine.projection.bundle import verify_card
+    root=Path(root) if root is not None else Path(__file__).resolve().parents[2]
+    verify_card(root,card)
     path=Path(path)
-    if path.exists(): return json.loads(path.read_text())
+    if path.exists():
+        existing=json.loads(path.read_text()); verify_card(root,existing); return existing
     if card.get('grades') or not result or not card.get('projection'): return card
     graded=finish(card,result['away_score'],result['home_score'])
     save(path,graded,True)

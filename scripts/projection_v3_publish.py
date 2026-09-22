@@ -11,6 +11,9 @@ from engine.projection.grade import score
 from engine.projection.distribution import summarize
 from engine.forecast_system.calendar import schedule_kickoff
 from engine.projection.lineage import bind,calibration_for
+from engine.projection.scoring import prepare_pair
+from engine.projection.scoring_process import score_batch
+from engine.projection.bundle import release_for,attach,verify_card
 OUT=ROOT/'outputs/projection-v3';WORK=ROOT/'work/projection-v3'
 
 def shape_for(card,artifact):
@@ -30,13 +33,26 @@ def run(now=None,require_synced_entries=False):
  from scripts.projection_learning import active_artifact_with_ref,feature_snapshot,trajectories
  now=now or dt.datetime.now(dt.timezone.utc);artifact_ref,artifact=active_artifact_with_ref()
  if artifact.get('elo_hfa') and json.loads((WORK/'current-ref.json').read_text()).get('elo_hfa')!=artifact['elo_hfa']:raise ValueError('Active fit and prepared HFA method differ')
- shapes=read(artifact['shapes']);rows=json.loads(gzip.decompress((WORK/'current-features.json.gz').read_bytes()));groups=paired(rows)
+ shapes=read(artifact['shapes']);prepared_manifest=json.loads((WORK/'current-ref.json').read_bytes());prepared_raw=(WORK/'current-features.json.gz').read_bytes()
+ if hashlib.sha256(prepared_raw).hexdigest()!=prepared_manifest.get('sha256'):raise ValueError('Prepared input hash mismatch')
+ if prepared_manifest.get('fit')!=artifact_ref:raise ValueError('Prepared inputs and active fit differ')
+ rows=json.loads(gzip.decompress(prepared_raw));groups=paired(rows)
  final_path=OUT/'final-feed.json';finals=json.loads(final_path.read_text()).get('games',{}) if final_path.exists() else {}
  legacy_path=ROOT/'outputs/projection-v2/board.json';legacy={g['game_id']:g for g in json.loads(legacy_path.read_text())['games']} if legacy_path.exists() else {}
  fp=ROOT/'outputs/projection-v1/forecast.json';forecasts=json.loads(fp.read_text()) if fp.exists() else {};ep=ROOT/'.cloud-private/projection-entries.json';cache=json.loads(ep.read_text()) if ep.exists() else {};entries=cache.get('entries',[]);colors=json.loads((ROOT/'config/game_card_team_colors.json').read_text());cards=[]
+ # One label-free batch. Completed rows, private edits and raw sources never enter the worker.
+ latest_week=min(18,max([int(r['week']) for r in rows if r.get('actual_points') is not None]+[1])+1)
+ requests={};qualified_forecasts={}
+ for gid,pair in sorted(groups.items()):
+  g=pair['home']['game'];kickoff=schedule_kickoff(g['gameday'],g['gametime']);cutoff=kickoff-dt.timedelta(minutes=75);old=legacy.get(gid)
+  if int(g['week'])>latest_week or now>=cutoff or (OUT/'locks'/f'{gid}.json').exists() or (old and (old['status'] in ('LOCKED','FINAL') or old.get('evidence')=='RETROSPECTIVE')):continue
+  forecast=forecasts.get(gid);qualified=forecast and str(g.get('roof','')).lower() in ('outdoors','open') and stamp(forecast['received_at'])<=now and stamp(forecast['forecast_issued_at'])<=stamp(forecast['request_at'])<=stamp(forecast['received_at'])
+  qualified_forecasts[gid]=forecast if qualified else None;requests[gid]=prepare_pair(pair,qualified_forecasts[gid])
+ calculations=score_batch(artifact,shapes,list(requests.values()))
+ release_ref=release_for(ROOT,artifact_ref,artifact) if requests else None
  for gid,pair in sorted(groups.items()):
   g=copy.deepcopy(pair['home']['game']);week=int(g['week'])
-  if week>min(18,max([int(r['week']) for r in rows if r.get('actual_points') is not None]+[1])+1):continue
+  if week>latest_week:continue
   kickoff=schedule_kickoff(g['gameday'],g['gametime']);cutoff=kickoff-dt.timedelta(minutes=75);g.update(kickoff_at=kickoff.isoformat(),cutoff_at=cutoff.isoformat());lockpath=OUT/'locks'/f'{gid}.json';livepath=OUT/'live'/f'{gid}.json';gradepath=OUT/'grades'/f'{gid}.json';old=legacy.get(gid)
   final=g.get('home_score') not in (None,'') and g.get('away_score') not in (None,'');entry=next((e for e in entries if e['game_id']==gid and not e.get('post_lock') and stamp(e['entered_at'])<cutoff),None)
   if lockpath.exists():card=json.loads(lockpath.read_text())
@@ -50,18 +66,22 @@ def run(now=None,require_synced_entries=False):
    frozen_shapes,resolution=calibration_for(prior,ROOT)
    card=lock_card(prior,entry,frozen_shapes,cutoff);card['calibration_lineage']=resolution;save(lockpath,card,True)
   else:
-   forecast=forecasts.get(gid);qualified=forecast and str(g.get('roof','')).lower() in ('outdoors','open') and stamp(forecast['received_at'])<=now and stamp(forecast['forecast_issued_at'])<=stamp(forecast['request_at'])<=stamp(forecast['received_at'])
-   card=make_card(g,pair,artifact,shapes,now.isoformat(),forecast if qualified else None,entry)
+   forecast=qualified_forecasts[gid];qualified=forecast is not None
+   card=make_card(g,pair,artifact,shapes,now.isoformat(),forecast,entry,calculation=calculations[gid])
    card['learning_features']=feature_snapshot(pair)
    if qualified:
     for side in ['home','away']:card['learning_features'][side]['features']['wind']=forecast['wind_mph']
    card=bind(card,artifact_ref,artifact)
    prior=json.loads(livepath.read_text()) if livepath.exists() else None
-   if prior and {k:v for k,v in prior.items() if k!='issued_at'}=={k:v for k,v in card.items() if k!='issued_at'}:card['issued_at']=prior['issued_at']
+   if prior:verify_card(ROOT,prior)
+   identity_ignored={'issued_at','forecast_bundle_ref','release_ref'}
+   if prior and prior.get('release_ref')==release_ref and {k:v for k,v in prior.items() if k not in identity_ignored}=={k:v for k,v in card.items() if k not in identity_ignored}:
+    card=prior
+   else:card=attach(ROOT,card,requests[gid],release_ref,prepared_manifest)
    save(livepath,card)
   from engine.projection.finals import grade_once
   result=finals.get(gid) or ({'away_score':float(g['away_score']),'home_score':float(g['home_score'])} if final else None)
-  card=grade_once(card,gradepath,result)
+  card=grade_once(card,gradepath,result,root=ROOT)
   card['team_colors']={t:colors.get(t,{}).get('color','#384352') for t in [card['away'],card['home']]};cards.append(card)
  # Every publication branch, including pending locks and missing forecasts, has render metadata.
  for card in cards:

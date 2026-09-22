@@ -38,6 +38,8 @@ def bind(card, ref, artifact):
 
 
 def calibration_for(card, root):
+    from .bundle import verify_card
+    verify_card(root, card)
     if 'fit_artifact_ref' in card or 'calibration_ref' in card:
         if not card.get('fit_artifact_ref') or not card.get('calibration_ref'):
             raise ValueError('Incomplete exact projection references')

@@ -53,3 +53,13 @@ The current unauthenticated website API returns 403. This is `PUBLIC_ACCESS_UNQU
 The monitor never loads browser credentials, takes ownership, restarts a paid worker, changes a fit, or rewrites forecasts. Preserve an unresolved alarm while investigating it. Current metrics use the independently pinned schedule denominator; physical on-time commit receipts and first-verified-final availability are still NOT_RECORDED, so no grade-latency or full issuance-SLO percentage is claimed from them. Installation and actual-cycle evidence belongs in `watchdog-verification.json`; unit definitions or green fixtures alone do not establish it.
 
 Confidence: high for the explicitly tested recovery transitions and invariant preservation under their stated fault model; this is not a claim of complete operational reliability. Lower to medium if a production caller bypasses these controls or an untested filesystem failure changes the commit semantics.
+
+## Scoring bundles
+
+New cards carry forecast_bundle_ref and release_ref. Resolve them with engine.projection.bundle.verify_card(root, card); never reconstruct from a version name or current fit pointer. A failed hash, schema, missing calibration or changed forecast stops locking/grading/publication. Restore the exact referenced record from verified evidence; do not strip references to force the legacy path. Old cards retain their original convention and frozen calibration registry.
+
+The scoring child receives one batch of allowlisted values and existing fit/residual parameters, with no inherited credentials and one numerical thread. It reads stdin, imports the existing implementation, then forbids further source file/network/process access while calculating. Failure/timeout propagates; no fallback execution with raw rows. The guard is not a hostile native-code sandbox. Prepared inputs must match their recorded hash and active fit.
+
+Bundles are immutable deterministic gzip records, committed before card references. An unchanged card/input/release retains its previous issued time and bundle. A release manifest records exact code files, last code-changing commit and scorer environment identity; uncommitted issuing code is refused. This does not install archived executables or implement compatible rollback. Do not switch the current-release reference to an old record as a substitute for that unfinished operation.
+
+Chronology fields explicitly distinguish captured values/hashes from source publication/first-seen/cutoff evidence missing in legacy preparation. Do not call those source vintages verified, or relabel legacy ridge centers as distribution means. Reproduction proves the captured computation; it does not validate all preceding feature construction.

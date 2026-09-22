@@ -1,5 +1,23 @@
 # Rebuild status
 
+Goal ACTIVE. The complete adopted scope is preserved in requirements.json. The current increment adds a strict scoring boundary and immutable forecast records; no statistical candidate was fitted or promoted.
+
+REVIEW REQUESTED — Tier 2: source event/publication/first-seen times and the numerical state cutoff absent from legacy prepared rows remain NOT_RECORDED. New bundles capture the exact values and declared source hashes without inventing those earlier times. The alternative of suspending all otherwise valid legacy forecasts was not taken. Full source-vintage and cadence qualification remains open. Earlier Mac observer, detection-budget and storage limitations still apply.
+
+Implemented: one isolated, label-free scoring batch uses the unchanged point/distribution/WHY implementation. Extra fields, malformed fits, corrupted residuals, mismatched prepared-file hashes and worker failure stop publication. The child receives no credentials or raw rows and forbids source I/O after imports/stdin. This is an application guard, not a security sandbox. New compressed immutable bundles bind request, forecast, contribution table, WHY and exact release/fit/calibration references before card publication. Locking, calibration resolution and grading validate the bundle. Repeated unchanged polls reuse it. Existing frozen records are preserved. Release manifests capture code and runtime identity but executable rollback remains unfinished.
+
+Evidence before release: hash-verified host snapshot at 2026-09-22T14:42:42Z, host commit 812e8180d892b54cf5d01ddc926e8e1b0e10f82b, active fit 801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f / projection-v2.hfa1.w3. All 48 board cards match the prior publisher except declared provenance/timestamp/hash fields. Sixteen new bundles reproduce exactly, 52 prior locks/grades retain their hashes, and a second unchanged poll creates no new bundle. The fresh 32-game fixture is simulated, not historical issuance. Incremental compressed records for the 16-game captured slate are about 170 KB. Candidate publication takes under one second locally on that snapshot; Linux fault/boundary fixtures use the actual service identity/runtime in disposable tmpfs. Provider spending: zero. Final test counts and deployment receipts accompany this increment.
+
+Not yet established by this increment: public-site payload equality, consumer-wide bundle migration, complete environment/source archives, compatible executable rollback, source-vintage chronology, numerical three-cutoff replay, backup restoration or predictive improvement. Host publication is pending verification after push. Captured tests do not substitute for that observation.
+
+Next actions: commit/push this tested infrastructure increment to engine-v2 and verify the actual host's scheduled bundle output; complete compatible release rollback and remaining consumers; then qualify source chronology/numerical cadence and advance E-CAL-LINEAGE, E-VENUE-DIRECT and the preserved queue under the weekly protocol and real reviews. The approved-cost storage/migration proposal still awaits a reply; no spending, retention changes or unique-record deletion has occurred. The goal is not complete.
+
+Least certain: legacy source availability before issuance; retaining hashes alone cannot answer it. This caused explicit unknown chronology fields rather than a false fully-qualified contract.
+
+Confidence: near-total in captured numerical parity—arithmetic on verified rows. Lower to high if an independent reproduction on the same captured inputs differs. This rating does not cover operational readiness or forecast improvement, which remain unproved.
+
+## Earlier verified operational snapshot (preserved history)
+
 Goal ACTIVE. Full adopted scope remains mapped in requirements.json. The previous increment deployed bounded final-feed recovery; this increment implements independent observation. Neither establishes completion of the operational or statistical rebuild.
 
 REVIEW REQUESTED — Tier 2: the outside observer uses the already-authorized Mac and therefore depends on an awake, connected, logged-in session. A separate host observer checks its heartbeat; the Mac checks the host observer. Both use a 180-second missing-heartbeat budget. Transient service failures require 60 seconds of continuous evidence; publication-lag detection uses 840 seconds derived from installed execution/cache/observation limits. Alternatives and sources are in GAP-SWEEP.md. No late issuance, model change, paid retry, restart or owner transfer is authorized by an alarm.

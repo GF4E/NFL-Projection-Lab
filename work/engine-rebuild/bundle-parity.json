@@ -1,0 +1,63 @@
+{
+  "checked_at": "2026-09-22T14:45:52.582446+00:00",
+  "capture_time": "2026-09-22T14:42:42.307071+00:00",
+  "host_commit_at_capture": "812e8180d892b54cf5d01ddc926e8e1b0e10f82b",
+  "control_publisher_commit": "008730bfb",
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "candidate_source": {
+    "commit": "008730bfb",
+    "status": "CANDIDATE_SOURCE_NOT_YET_COMMITTED",
+    "files": {
+      "engine/projection/bundle.py": "961411877ed0b0d19ebdf49057c3fa84cd2b14a662a380bd5f4abb4b3eb62b59",
+      "engine/projection/scoring.py": "d8f1b3e4ed2fe94101073c6ac91eeb64509a5791d39e332f1dd1774a4700bdf8",
+      "engine/projection/scoring_process.py": "26384d60b626725cc8b6833850cd88140301ba2f6b0840f94552a8734e0e37a0",
+      "scripts/projection_score_worker.py": "7abb2d3c6e9b9184078ea4ca0bb74e353372d9e47d02904c5ee0f0c22b6705b9",
+      "engine/projection/lineage.py": "10ce918d070d39043a9b0e410b309ac143194bb7af2d59c31001f20f3307976c",
+      "engine/projection/storage.py": "3eb8f34870d3a55369763cd384589ab7909059fbf7ee0f1325ecc7c0dd43b22f",
+      "engine/projection/model.py": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead",
+      "engine/projection/card.py": "df962ff1762ce7a0740de60e78ac4d98f65ec5c8b1b546f5d0d191e38ca954de",
+      "engine/projection/grade.py": "1fdbe81249335a3d5492676d03c9749ea46b660a0297506290d18db765904f31",
+      "engine/projection/distribution.py": "a4c9a71c971267b1c54268293471ad22cbb3e4ee97392d5829c870dbae4593ec",
+      "engine/projection_v3/card.py": "b545b236035a341a3c6e41c047019a309abf890a3b164f482513611c0ceb4e72",
+      "engine/projection_v3/model.py": "9e6d85fbadd86a4ff9b7f18192c9c6e278c3e26e9ae7f01f6d8bd1597d27943b",
+      "engine/projection/features.py": "9c1172450639deeee99a58211713084fe54bf86a09f31915e90cdd1e0866aef8",
+      "engine/projection_v3/personnel.py": "8f1ec9d1865cac162f7905db6d2c90279795ae24e714b8c17884213651c55af9",
+      "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+      "engine/elo_hfa.py": "d9e4052bc7b1b828d88b694f9ddaddf16111c1daa5c06cd0656b0fc64dee4d20",
+      "engine/forecast_system/calendar.py": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b",
+      "scripts/projection_v3_publish.py": "dd09628b6ae8f895c6c5ec00ffe20bcaf0bdb7a2d16bf5d3624d9068ba425bd3",
+      "scripts/projection_prepare.py": "e1341be3cecba533fec3537ade9898a84623c3bdcfd3cec5061ef9fc1e7b9f51",
+      "scripts/projection_v3_prepare.py": "036fed4e7445f93112821272d85b1c96355fedf132471c20c1de5f1eeec418ea",
+      "scripts/projection_v3_sources.py": "e576f1464ce259c30f94ce3fbd121f37d7296209b06c0a08512b962a34d42e96",
+      "scripts/projection_learning.py": "1379560df45a882afaec00fda886c745e91336e3ebec7884cf7c39c420cc1fe6"
+    }
+  },
+  "scope": "Isolated captured-input publication; no production writes, no provider requests, no public rendering",
+  "cards": 48,
+  "all_card_fields_identical_except_declared_metadata": true,
+  "excluded_metadata_fields": [
+    "content_sha256",
+    "forecast_bundle_ref",
+    "issued_at",
+    "published_at",
+    "release_ref"
+  ],
+  "written_card_paths": 18,
+  "immutable_history_verified_unchanged": 52,
+  "new_bundle_cards": 16,
+  "exact_bundle_reproductions": 16,
+  "unchanged_poll_reuses_bundles": true,
+  "new_immutable_bytes": 169639,
+  "control_wall_seconds": 0.5349945419875439,
+  "candidate_wall_seconds": 0.8562728750112001,
+  "provider_credits": 0,
+  "fresh_fixture": {
+    "scope": "Simulated pre-lock time, captured values, labels cleared; not a chronology proof",
+    "cards": 32,
+    "exact_card_parity": true,
+    "candidate_wall_seconds": 0.9267644999781623
+  }
+}
