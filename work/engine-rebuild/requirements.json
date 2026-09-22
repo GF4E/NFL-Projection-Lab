@@ -139,7 +139,8 @@
         "engine/projection/bundle.py (compressed immutable scoring records and captured release manifests; executable rollback pending)",
         "bundle-input-capture.json (verified host snapshot; raw files ignored/private)",
         "bundle-parity.json (48 captured cards, 16 exact bundle reproductions, 52 unchanged frozen records, no unchanged-poll growth)",
-        "tests/test_projection_bundle.py; host-bundle-candidate.json (boundary/corruption/refit/idempotency fixtures under actual Linux runtime)"
+        "tests/test_projection_bundle.py; host-bundle-candidate.json (boundary/corruption/refit/idempotency fixtures under actual Linux runtime)",
+        "host-bundle-verification.json (scheduled 16-card exact reproduction; source hashes/fit/release verified; 52 original records unchanged; source remote verified)"
       ]
     },
     {
@@ -246,7 +247,8 @@
         "watchdog-canary.json (bounded monitor-only live outage/recovery)",
         "host-verification.json (post-canary host, fit, source and reader checks)",
         "bundle-parity.json (isolated publisher timing and compressed growth)",
-        "host-bundle-candidate.json (service-user/runtime fixtures, tmpfs only; no live canary yet)"
+        "host-bundle-candidate.json (service-user/runtime fixtures, tmpfs only; no live canary yet)",
+        "host-bundle-verification.json (actual scheduled publication; no public-site equality claim)"
       ]
     },
     {
