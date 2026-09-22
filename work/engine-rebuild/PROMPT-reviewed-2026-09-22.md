@@ -1,0 +1,176 @@
+# PROJECTION ENGINE REBUILD — reviewed implementation prompt and goal
+
+Research and prompt review: September 22, 2026. This is the full revised execution brief, carrying forward the adopted rebuild scope, calibration exception and experiment order. It does not restart completed work, modify a hashed registration, authorize spending, or itself deploy a release. Preserve the prior prompt and all historical specifications, experiments and issued records. Reconcile this brief with the requirement map before execution; a newly consequential change still follows the standing severity tiers.
+
+The current task is a controlled rebuild of a statistical analytics engine. It produces football-only expected team scores. It is not a betting engine. “Self-healing” means bounded, tested recovery from named operational failures. “Self-improving” means automatic evidence collection and a governed experiment process that can reject changes. Neither phrase promises uninterrupted operation or improving accuracy every week.
+
+## Goal
+
+Deliver a football-only expected-team-score system that reliably issues and grades forecasts, detects and safely recovers from defined operational failures, and supports improvement through one reproducible, reviewed experiment per weekly slot when its prerequisites are satisfied. Every production number must trace to its available inputs, cutoff, point model, calibration and release. Preserve the qualified model as the control until a successor earns promotion. Reliability and predictive improvement require separate evidence; neither is guaranteed by automation.
+
+## 1. Scope, authority and first deliverable
+
+Read the complete September 21 audit, rebuild plan, latest user instructions, AGENTS.md, governing protocol, release registry and current queue before implementing. Repository of record: GF4E/NFL-Projection-Lab. Verify the current checkout, remote and actual host state; do not assume the audit snapshot is still today's deployment.
+
+Read and update the existing PLAN.md, requirement-to-file-and-test map, and STATUS.md before edits. Resume from their verified state; do not recreate completed infrastructure or rerun unchanged checks merely to restart the project. STATUS.md carries completed work, remaining dependencies, exact next action and a handoff. Publish the tiered gap sweep; decide Tier 1/2 conventions and batch only Tier 3 questions. Treat missing data as unknown, not zero or evidence against a method.
+
+Carry forward the amendments in the adopted rebuild scope: source timestamps follow verified provider semantics; expected team points target conditional means while team MAE remains the standard selection metric; E-CAL-LINEAGE below receives its narrow uncertainty-only gate; E-CAL-LINEAGE precedes E-VENUE-DIRECT, followed by the existing queue. These changes are prospective and must be logged before registration. No other gate or rejected experiment is reopened. The 1% and coverage thresholds are owner-governed release policies, not thresholds established by academic research.
+
+Continue within existing commit, deployment, provider-budget and reviewer permissions. No new spending, destructive retention policy or external reviewer message is authorized implicitly. Prepare concrete choices only for genuinely missing authority. A completed review is never inferred from silence or from the same agent rereading its own work.
+
+## 2. Freeze and independently reproduce the foundation
+
+Hash the deployed code, environment, settings, input manifest, fit, calibration, publication and authoritative rolling-origin series. Reproduce the audit against its original snapshot and reconcile the current deployment separately. Preserve partial-week denominators and model versions. Do not pool retrospective reconstructions with AS_ISSUED forecasts.
+
+Use an independent numerical route for the ridge and principal metrics, not two wrappers around one helper. Reproduce historical claims at their recorded snapshot: the September 21 audit covered 15 completed Week 2 games, not a completed week. Generate a separate current closeout when more finals exist. “Worse than chance” must name its metric: a 50% probability forecast is a Brier benchmark, not a team-score forecast. Compare team points against qualified pregame league, venue and persistence baselines. Independently verify representative feature calculations from source records, including baselines, Elo, drive denominators and cutoff eligibility. Reordering rows must not change forecasts. Keep training, calibration, issuance and evaluation identities distinct. The independently rechecked preserved control contains 2,639 games, with team MAE 7.5756288333, signed team bias +0.1888626094, projected SD 2.9345541791 and actual-on-projected slope 1.0111093664. These identify that historical artifact, not today's live fit or a newly qualified corrected control. Reverify its registry authority at execution time.
+
+No candidate fitting begins without a verified authoritative-control premise line naming the file, hash, generation date and production lineage. Retain league-average, venue-average and persistence forecasts as descriptive accuracy baselines, calculated using the same eligible games and pregame information.
+
+## 3. Establish three release lanes
+
+A. Infrastructure and presentation corrections preserve the existing numerical forecast bundle. Require parity, fault tests and deployment verification; they do not need a 1% MAE gain.
+
+B. Source or chronology corrections may legitimately change forecasts. Record the old/new evidence and all affected games, rebuild the corrected control, apply the same correction to every challenger and disclose the changes. Do not attribute their benefit to a model candidate. Promote control authority only after verifying the corrected issuing path. A discretionary change to the model's information horizon is not automatically a chronology correction; classify it in the gap sweep.
+
+C. Statistical changes to features, rating/update rules, point forecasts or calibration require a registered experiment and its applicable gate. Do not ship a rejected state-space filter as an infrastructure repair. Weight-only refits remain a separate authorized operation with unchanged method settings.
+
+## 4. Make failures recoverable without corrupting evidence
+
+Implement a small explicit recovery state machine: HEALTHY, DEGRADED, RECOVERING, STALE and FAILED_CLOSED. Specify the evidence, allowed actions, retry limit, deadline, owner and exit check for each transition. Reuse existing tooling; avoid a new orchestration platform unless necessary.
+
+For low storage, check bytes, inodes and write capability. Measure daily growth, largest bounded job writes and retention obligations. Publish a durable headroom requirement and approved-cost plan. Deduplicate exact content by hash and separate disposable caches from records of authority. Cache cleanup cannot be the permanent capacity strategy. Do not remove historical evidence or change its retention without authority. Verify backup restoration from approved storage; a backup's existence is insufficient.
+
+Use staging, validation, durable atomic commit and a final publication pointer. Hash and fsync semantics must survive a crash at each boundary. Protect the pipeline with exclusive ownership/fencing and durable work identifiers. Test that an expired or superseded owner cannot commit, including after a restart. Execution may repeat; its committed effects must be idempotent. Reuse an idempotency key for the same operation; changed payloads under that key must fail. Reconcile receipts before retrying an uncertain paid request; a local key does not make a provider API idempotent.
+
+Allow only enumerated recoveries: bounded backoff with jitter, regeneration of allowlisted caches, checkpoint resume, safe service restart and compatible release rollback. Configuration/schema/credential errors do not get endless retries. Missing required evidence cannot be fabricated. A stale source timestamp cannot be refreshed by rewriting publication metadata. A fallback must already be qualified, hash-bound and clearly labeled. If no eligible forecast exists at the deadline, record MISSED/FAILED_CLOSED; do not silently substitute a preview or erase the game from reliability counts. Preserve the last valid display with its actual age where useful, without representing it as newly issued.
+
+Missed cutoffs can be replayed using data demonstrably available at those cutoffs. Later-arriving data cannot be backdated. If historical availability is unknown, label a reconstruction rather than issuing it retrospectively. Never rewrite a locked forecast or its first grade. Source corrections become linked amendments with separate corrected summaries.
+
+An independent watchdog compares expected deadlines with durable receipts and the user-visible publication. It must detect both a dead scheduler and failure of its own heartbeat. Report whether the watchdog shares the host's failure domain; do not claim host-outage protection without an outside observer. Alert only on actionable failures, exhausted recovery or material recovery.
+
+Define operational SLOs before testing: on-time valid issuance divided by eligible scheduled games; grade latency from first verified final availability; publication completeness/freshness; and recovery time. Show missed games in the denominator. Record hard integrity invariants separately: zero rewritten locks, early results, duplicate committed effects and false-success publications. Derive latency/headroom targets from actual deadlines and measurements, not invented reliability percentages.
+
+## 5. One immutable forecast contract
+
+Bind game identity, kickoff, issuance, state cutoff, input event times, source publication/first-seen times, retrieval times, data revisions, hashes, code/environment, settings, training population, fit, calibration, seeds where applicable, forecast outputs, contribution tables, evidence status and release parent in one immutable bundle.
+
+Every forecasting record has an explicit role: PROVISIONAL preview, FINAL_ELIGIBLE preparation, AS_ISSUED locked forecast, or HISTORICAL_RECONSTRUCTION. Roles do not follow from filenames. A preview can use the latest available state, but it cannot become a valid locked forecast merely because it predates the deadline. To lock, verify the exact required cutoff, qualified inputs, compatible fit/calibration and durable predeadline preparation. Retain both logical issuance time and physical commit time. A delayed lock operation may only freeze already committed predeadline evidence; it may not generate a new forecast and backdate it. Label simulated issuance as simulated.
+
+Use typed allowlisted football inputs. The forecast worker must not read final labels or market fields. Baselines, scaling, imputation, ratings, tuning and calibration must respect the same pregame boundary; protecting only the final regression is insufficient.
+
+Resolve by exact hashes, not a version string. Validate compatibility before publication. Board, grader, closeout and Season page must read this bundle or a declared derivative. Current references follow the current authoritative lineage; historical reports keep their own labeled reference. Reports never trigger fitting. Trace each consumer in an integration test: preparation → isolated scoring → immutable bundle → lock → first grade → weekly report → Season page. Verify the actual values and lineage at each boundary, including expanded board states. An unused common helper or a successful shadow test does not establish that production uses this contract.
+
+A release manifest binds code, fit, calibration, schema and required data together. Rollback switches a compatible manifest for future work; it does not combine an old executable with new incompatible state or relabel locked forecasts. Existing locked games continue to grade from their original bundles.
+
+## 6. One time model and production/replay entry point
+
+Parse source times according to the source's verified data dictionary. nflverse/Lee Sharpe schedule gametime is Eastern time, not stadium-local time. Use America/New_York with daylight-saving rules, then UTC; Pacific schedules use America/Los_Angeles. Fixture-test west-coast, international, DST, rescheduled and boundary-equality cases. Never reinterpret a UTC timestamp twice.
+
+A game is eligible for assimilation only when actual played kickoff plus four hours is strictly before the cutoff. Keep this as the governing eligibility proxy; do not describe it as an observed completion timestamp or a universal guarantee that every game ends within four hours. Production also requires qualified final data actually available at the cutoff. Historical provider-vintage gaps remain disclosed assumptions and cannot establish historical live availability. Store event time, provider publication time where known, first validated local availability and retrieval time separately. A historical file retrieved today cannot prove when its rows were available years ago. For revised observations, preserve the original version and apply any later correction only to subsequent eligible state and training; do not mutate earlier states or grades.
+
+A forecast uses the most recent scheduled cutoff strictly before its own T-75 issuance. No game is incorporated twice. Games inside the same assimilation interval use the same state. Week numbers label schedules, never order data availability.
+
+Install and verify Friday, Monday and Tuesday 06:00 PT assimilation using the approved production method; Friday 12:00 and Sunday 07:00 refreshes; T-80 pull/inactives attempt; T-75 lock; daily grading; Sunday 20:00 next-week PARTIAL sheet. Preserve offseason/Week 9 post-processor cadence unless a specific adopted registration permits otherwise. Conditional components such as an unpromoted ensemble must be labeled inactive, not reported as running.
+
+Keep rating-state updates, weekly ridge refitting and calibration refitting distinct. If a qualified state-space filter is used, elapsed-time propagation must preserve weekly q units; three executions must not triple weekly process variance. Resolve information-horizon changes explicitly rather than silently converting the current weekly model to an unregistered update rule.
+
+Replay every 2016–2025 eligible game through the same preparation, state selection, scoring and refit entry points used in production, with only the clock and source adapter replaced. A replay preserving old weekly training membership is a diagnostic until it also reproduces the specified Tuesday refits and their data boundaries. Refit on retained pregame feature rows joined to eligible labels; do not reconstruct old training features using information learned later. Verify season-boundary initialization, first-fold warmup and late-source handling. Trace direct and downstream differences by season. No live release until cutoff, availability, duplicate and immutable-lock tests pass.
+
+## 7. Forecast meaning and uncertainty
+
+Expected team points target conditional means. Team MAE remains the governed primary point-accuracy metric; RMSE is supporting evidence because absolute and squared loss target different functionals. Do not silently convert existing legacy centers into means or change to median forecasts to optimize a label. Preserve and label the legacy convention until a qualified release makes the new contract true.
+
+For a coherent mean-based release, mean total equals the sum of team means and mean home margin equals home minus away mean. Median totals need not equal sums of team medians; do not enforce a false identity. Predictive intervals describe single-game outcomes, not coefficient confidence intervals. More training data need not materially narrow them.
+
+Document tie handling and probability events, including unconditional win versus win conditional on no tie. Use appropriate reliability counts and scores for the declared event. Do not require the team with the higher mean score to have probability above 50%; skewed distributions can disagree. Validate probabilities, interval nesting, score support and quantile conventions. Use a qualified dependence representation; do not assume independent team errors or demand a new joint ensemble without evidence.
+
+Contribution tables must sum to the point forecast, include any point calibration term and distinguish inactive contextual facts from causes that moved the score. Never inflate point dispersion to match actual-score dispersion. Likewise, the earlier coefficient-uncertainty share below 0.2% belongs to the fitted system and data that established it; retain its provenance and remeasure after a material model redesign rather than treating it as a universal constant.
+
+## 8. Unblock calibration correctly: E-CAL-LINEAGE
+
+This is a new lineage-migration question, not a rerun of E-UNC's rejected hypotheses. Register one challenger using the existing qualified calibration family/settings on the issuing point model's own earlier out-of-fold errors, against the current issued calibration. No point feature, point coefficient or point forecast may change. Specify fitting windows, location/mean treatment, residual dependence, ties and discrete scoring before hashing. Qualify the issuing lineage's own 2013–2015 calibration-only forecasts using strictly earlier data before scoring a 2016 fold that requires them. Current-season residuals or a current calibration table cannot fill that historical gap. If the required warmup cannot be qualified, name the blocker and use the experiment clock; do not silently shrink the scored population. For discrete forecasts, preregister quantile/PIT conventions and report attainable coverage without relaxing the gate after results. Any extra calibration family requires separate registration.
+
+Carry forward the adopted narrow E-CAL-LINEAGE gate: at least 1% improvement in out-of-fold mean team-points CRPS; team, margin and total coverage within three percentage points of nominal at both 50% and 80%; no worsening of the Winkler interval score at either level for any of those targets. Point forecasts must match the control within a preregistered numerical tolerance on every eligible game. Report identical team MAE; report margin/total CRPS and winner Brier/reliability as supporting evidence. Failure of point invariance is out of scope, not a scored result.
+
+This explicit exception prevents an uncertainty-only repair from facing an impossible point-MAE gate. It does not change future point-method gates or reopen E-UNC. Log the one-time prospective calibration release separately from routine offseason/Week 9 refits. If rejected or blocked, retain the legacy distribution with honest provenance and continue independent infrastructure work; do not claim distribution migration complete.
+
+## 9. Next accuracy experiment: E-VENUE-DIRECT
+
+After calibration disposition, register the smallest defensible direct venue feature in the point model. Use the authoritative control current at registration. Historical home-margin bias motivates the question; it does not establish the answer or justify a hand-added generic advantage.
+
+Freeze the candidate count, neutral-site treatment, parameterization, tuning bounds, training windows and tie-break before fitting. No simultaneous QB, state-space, weather or baseline redesign. If another method is needed, queue it separately.
+
+Standard gate: at least 1% out-of-fold team-MAE improvement; margin and total coverage within three percentage points of nominal at 50% and 80%; all existing applicable registered requirements. Report home/away signed errors by season, supporting metrics and parameter stability. Include paired out-of-fold ablations and neutral-site sensitivity as evidence, using the same population and chronological information boundaries. A negative historical home-margin bias is a diagnostic, not proof that a direct venue coefficient will pass. Prefer the simpler candidate under the preregistered tie rule. Failure retains the control. E-QB-DIRECT and other existing items remain queued afterward; settled rejections stay preserved.
+
+## 10. Learning without repeatedly overfitting the backtest
+
+Every Tuesday: publish completed-week closeout and Season refresh; perform the authorized weight-only ridge refit; then run the week's registered experiment; produce the reviewer packet and decision. Prove ordering with durable receipts and timestamps. “Published” means the intended user-visible surface resolves the exact closeout release, not merely that files were written or pushed to Git. Verify the receipt's content hash against the served report/Season payload. If unattended verification lacks access, retain ACCESS_UNQUALIFIED and the evidence it would take to resolve it; do not bypass access controls or claim successful public publication. Missing finals produce a named incomplete closeout and block dependent work; clock expiry still advances the queue.
+
+Preregister no more than three challenger settings, the control, exact population, folds, all preprocessing/tuning/calibration, selection rule and disproving condition before comparative results. Use nested chronological evaluation; train only on the past. Both teams stay together in every split and resample. Report paired-game uncertainty plus season/block sensitivity with the estimand and limited number of seasons explained.
+
+Maintain an experiment ledger of every tried configuration, failed/invalidated run, data correction and viewed evaluation. Predeclare the estimand, fixed candidate set, selection/tie rule, uncertainty procedure and any multiplicity treatment. A bootstrap interval after choosing the best candidate is not automatically valid post-selection evidence. Do not add an unregistered significance threshold to the existing release gate. Ten reused historical seasons remain development evidence regardless of the number of nested replays. Do not call another bootstrap or a new random split an independent replication.
+
+Maintain a predeclared prospective comparison between a frozen reference method and the live method (freeze the reference algorithm and update policy, not necessarily its coefficients), both issuing shadow forecasts from the same available inputs before lock. Freeze update policies, eligible games and review dates; weekly tables are descriptive. No repeatedly inspected significance threshold triggers promotion or reversal. A new confirmatory statistical claim needs a preregistered fixed-horizon or valid sequential design; that changes neither the current release gate nor prior records silently.
+
+Weekly diagnostics include team/margin/total MAE, bias, dispersion, proper scores, interval coverage/width, home/away errors, qualified input buckets, persistent team misses and pre-lock edits. Preserve counts, paired uncertainty and first-grade provenance. Bucket/drift alerts nominate investigations; they never change weights, retire a model or prove causation. Keep the existing two-standard-error bucket rule but label its repeated, multiple-bucket alerts exploratory. Estimate uncertainty with the paired/dependent data structure disclosed. Pre-lock human edits remain separate from original projections; compare them only on edited games, exclude post-lock entries, and do not treat this self-selected sample as evidence that a feature causes better forecasts. Aggregate distribution shift does not by itself prove performance degradation.
+
+Keep each registered experiment clock Tuesday-to-Tuesday. If closeout prevents registration entirely, record a missed slot in the operational ledger; do not invent a preregistration timestamp or write a fitted experiment artifact. Production preconditions still bind every queued item. For a registered experiment, record INCONCLUSIVE with the blocker at expiry; do not let one experiment block the queue twice. Preserve the required Claude and Dr. M reviews, resolve leak/double-count objections and publish the signed release decision. Automated method activation can occur only after those requirements and existing authority are satisfied. Review unavailability is a named human dependency, not an excuse to invent approval.
+
+Market-relative metrics remain exactly the existing two DIAGNOSTIC ONLY report lines, never model inputs, gates, targets, rankings or a reason to change the engine.
+
+## 11. Resource protection, deployment and proof
+
+Keep one worker, 4 GiB, the 45-minute phase-gate limit and 10-minute full-slate update limit. Production deadlines take precedence over research. Cache/checkpoint research and defer it when it cannot finish safely before issuance. Shadow work uses captured inputs and isolated outputs, not extra paid pulls or duplicate publication. Any capacity exception needs approval.
+
+Test candidate code on production-equivalent captured inputs without production writes. Then perform a bounded operational canary and verify the actual host's manifest and public output. Canary latency, schema and integrity checks establish deployment safety, not better football predictions. Switch the release pointer atomically. Preserve a verified rollback manifest and test restoration with immutable records intact.
+
+Keep the approved deployment mirror build-output-only, written by the publish step with its source commit from main recorded. Never place engine artifacts, source code or raw PFF data there. Preserve BOARD v9; this rebuild authorizes correctness, lineage and freshness changes, not another layout redesign. Follow the existing branch and deployment authority; a prompt revision does not grant a new main push.
+
+Fault-inject: disk/inode exhaustion, crash before/after durable commit, duplicate dispatch, lost response, stuck ownership, clock/timezone errors, provider late revision, missing calibration, stale publication, schema mismatch, watcher failure and restart during assimilation. Verify the recovery outcome, not just detection. Some failures require human intervention; unsupported auto-recovery must fail closed and explain why.
+
+## 12. Acceptance and delivery
+
+Build a coverage matrix linking every numbered requirement to implementation, a test or measured evidence, and an unresolved dependency. No single green test count certifies the system. Major paths require an end-to-end run from available input through issuance, lock, final grading, closeout, refit, experiment decision and verified publication. Use simulated time for calendar boundaries and safe host checks; label simulation separately from observed production cycles.
+
+Completion requires verified infrastructure migration, restored evidence/lineage controls, installed cadence within the approved method, tested recovery/rollback, and an honestly reported disposition for each statistical migration. A rejected candidate can complete the experiment but cannot complete an unshipped statistical objective. Report reliability readiness and accuracy improvement separately. A future completed live cycle remains pending until it happens. Keep an acceptance row for every required production capability with one of: NOT_BUILT, BUILT_UNVERIFIED, VERIFIED_IN_SIMULATION, INSTALLED_UNOBSERVED, or OBSERVED_IN_PRODUCTION. These are evidence labels, not substitutions for the recovery state machine. Attach commit/hash, test or receipt, observed time and remaining dependency. Do not keep inventing additional infrastructure once a requirement has passed; continue to the next unresolved acceptance item.
+
+Before activation, verify the complete compatibility set and consumer bindings. After an authorized activation, observe one full scheduled operational cycle before declaring operational acceptance. No live-cycle claim may be based on a simulated future clock. An operational rollback responds to a declared integrity/reliability failure; a bad football week alone does not trigger an unregistered model switch.
+
+Deliver code, manifests, replay tables, recovery receipts, source/parameter lineage, operational targets, runbook, independent review packet and concise release history. Status must state which actions are automatic and which still require a person. Report DONE, TESTS, ARTIFACTS, BLOCKED, COMMIT, host/deploy hash, provider spending, the least-certain requirement, and a worded confidence rating with a downgrade condition.
+
+Do not claim automatic recovery from every possible failure or guaranteed week-over-week predictive improvement. The deliverable is a system that detects defined failures, recovers when safe, preserves truth when it cannot, and changes its statistical method only when reproducible evidence supports the change.
+
+
+## 13. Research basis and limits
+
+These sources support the design principles below; they do not establish that a particular NFL candidate will improve this engine.
+
+- [Hyndman and Athanasopoulos: time-series cross-validation](https://otexts.com/fpp3/tscv.html): train on observations preceding each forecast. Application: replay the entire information pipeline, including tuning and calibration. Historical-vintage requirements are our source-integrity implementation of that principle.
+- [Forecast accuracy and loss functions](https://otexts.com/fpp3/accuracy.html): absolute and squared error elicit different point summaries. Application: retain governed MAE selection, label legacy centers honestly, and test the mean contract independently.
+- [Cawley and Talbot, 2010](https://www.jmlr.org/papers/v11/cawley10a.html): model selection itself can overfit finite evaluation data. Application: limited preregistered candidates, every attempt retained, chronological development tests and separate prospective evidence.
+- [Gneiting and Raftery, 2007](https://sites.stat.washington.edu/raftery/Research/PDF/Gneiting2007jasa.pdf): proper probability and interval scores assess distributions, including interval width and coverage. Application: the uncertainty-only CRPS gate, supporting Brier/reliability, and no promise that narrower intervals are always better.
+- [Breck et al., 2017: The ML Test Score](https://research.google/pubs/the-ml-test-score-a-rubric-for-ml-production-readiness-and-technical-debt-reduction/): production ML needs data, model, integration and monitoring checks beyond offline experiments. Application: test the actual consumer path and separately document operational and statistical evidence.
+- [Google SRE: Data Processing Pipelines](https://sre.google/workbook/data-processing/): pipeline health concerns timeliness, completeness and correctness. Application: deadline receipts, durable effects, recovery checks and source-to-publication validation. The specific state machine and resource limits here are engineering choices and existing project constraints.
+- [Google SRE: Canarying Releases](https://sre.google/workbook/canarying-releases/): canaries limit exposure while assessing a release. Application: isolated captured-source qualification followed by bounded host checks and compatible rollback. A canary cannot establish long-run NFL forecasting skill.
+- [nflseedR: Lee Sharpe schedule dictionary](https://nflseedr.com/reference/load_sharpe_games.html): gametime is Eastern regardless of stadium. Application: provider-specific timezone parsing; kickoff plus four hours remains an eligibility proxy, not measured completion.
+
+## 14. Review of this prompt
+
+The rewrite has been checked against the preserved audit, current repository status records and the sources above. The control's count, MAE, bias, slope and score SD were independently recomputed directly from its hashed rows with standard-library arithmetic. Recompute with `work/engine-rebuild/check_prompt_evidence.py`; the saved evidence is `work/engine-rebuild/prompt-evidence-2026-09-22.json`. This was not a new host audit, full statistical reproduction or completed external review.
+
+| Risk in the instruction | Required resolution in this prompt | Evidence needed to close implementation |
+| --- | --- | --- |
+| “Self-improving” becomes an unsupported guarantee | A rejected experiment is a valid decision; future gains remain unproved | Registered comparisons and later prospective forecasts |
+| Bad week causes wholesale deletion of useful signal | Preserve exact control and locked records; compare meaningful score baselines | Independent row/fit reproduction |
+| Helpers and timers look complete while publishing still uses old code | One actual preparation/refit/issuer path and explicit evidence states | Host and served-output lineage plus full-cycle receipts |
+| Early preview is silently locked | Role and exact-cutoff checks; distinguish logical and physical time | Preview rejection and deadline/restart fixtures |
+| Later data leaks into historical features or calibration | Retained pregame rows, qualified source clocks, earlier calibration warmup | Full chronological replay and source-availability inventory |
+| Uncertainty-only candidate faces an impossible MAE gain | Narrow adopted CRPS gate with invariant points | All-game invariance and proper-score gate table |
+| Repeated backtests masquerade as independent confirmation | Full search ledger, declared selection and prospective design | Preserved registrations and evidence timestamps |
+| Recovery overwrites truth or retries forever | Bounded actions, fenced ownership, immutable records and compatible rollback | Fault injection with restoration and post-fault integrity checks |
+| Source push is mistaken for website publication | Exact served-release verification | Public payload/receipt equality or named access shortfall |
+| High confidence in the plan becomes a claim of better predictions | Rate central claims separately and name downgrade evidence | Independently reproduced results, not just green tests |
+
+Ready within the reviewed design scope. Remaining empirical questions are the size of future predictive gains, historical input availability, release compatibility under real failures and the completed live cycle. They are explicit acceptance work, not resolved by this document.
+
+Confidence: **high in the rebuild strategy**—the central rationale holds across the preserved multi-season evidence and survives the obvious alternatives of retaining the baseline, separating calibration from points, and testing chronology independently. This does not rate every unimplemented component high. Lower to **medium** if independent authoritative reproduction overturns the lineage/cadence diagnosis or a required contract proves incompatible with the production path. Confidence in improved future accuracy remains unestablished until the registered and prospective evidence exists.
