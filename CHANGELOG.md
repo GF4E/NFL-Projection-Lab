@@ -8,6 +8,18 @@ Verification: 4 new export/boundary tests, 33 existing projection tests, 218 sta
 
 # Projection change log
 
+## 2026-09-22 — common shadow pipeline and corrected hourly replay
+
+Infrastructure/chronology qualification; no registered method, active fit, calibration or control promotion. Add common label-free preparation, isolated scoring, explicit preview/final/reconstruction roles, immutable shadow-lock reconciliation and retained-feature weight-only refitting. Closeout acknowledgment is verified for source-repository publication only; public-surface qualification is still required. New fits have separate start, computation and durable-availability clocks and are not labeled issued. Lost calculation/operation acknowledgments reuse the original fit and inputs.
+
+The strict-Tuesday replay's production-semantics claim is withdrawn, preserved as a sensitivity with its exact source archive. Actual host evidence shows that the job named daily dispatches hourly. The corrected reconstruction restores four delayed weekly refits and removes the 61 strict-only forecast changes (45 in 2020, 16 in 2021). It checks all 2,639 games, 627 cutoffs and 175 fits with zero early/duplicate observations. All 5,790 feature rows reproduce. Row reversal leaves all 5,278 team forecasts identical; a separate augmented least-squares solve differs by at most 2.09e-14 in coefficients and 3.55e-14 in points. Historical source/closeout/compute clocks remain explicitly simulated. Zero forecasts lie within the assumed zero-to-ten-minute fit-latency interval.
+
+Descriptive team MAE is 7.574666, signed team bias +0.192097, projected SD 2.938524 and actual-on-projected slope 1.010819. These identify the non-authoritative chronology reconstruction, not a successful statistical experiment. Exact rows, code archive and annual metrics: work/engine-rebuild/hourly-catchup/SERIES.md. The authoritative HFA control remains unchanged. Replay duration 796.29 seconds, peak 1,323,417,600 resident bytes; one worker within existing ceilings.
+
+The actual Linux runtime passes 21 pipeline fixtures and a captured-source canary with 14 unchanged point/contribution forecasts, 28 matching feature rows and 52 preserved frozen records. It uses 144.91 seconds and 250,970,112 peak resident bytes under a hard 4 GiB address-space limit. All writes are isolated, all future clocks simulated, no production activation/provider request/new spending. The full public-closeout/issuer/refit/consumer transaction, feature-source reconstruction at lock, full compatible rollback, capacity resolution, statistical gates/reviews and a completed live cycle remain open.
+
+Confidence: high in the tested numerical and recovery behavior across the ten seasons and alternate arrival/retry cases. Lower to medium if independent source reconstruction or actual dispatch evidence changes an eligible set or frozen result. Production readiness and improved future accuracy remain unproved.
+
 ## 2026-09-22 — Data review of rebuild prompt, revision 2
 
 Documentation correction; no candidate, fit, release pointer, gate or production behavior changes. The complete execution prompt is `work/engine-rebuild/PROMPT-reviewed-2026-09-22.md`. Research and independent preserved-control arithmetic support the controlled rebuild strategy, not a promise of future accuracy or universal recovery.

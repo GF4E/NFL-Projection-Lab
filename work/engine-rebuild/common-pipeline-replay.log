@@ -1,0 +1,28 @@
+outer season 2016 training 256
+outer season 2017 training 512
+outer season 2018 training 768
+outer season 2019 training 1024
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/replay_common_pipeline.py", line 205, in <module>
+    result=run();folder=ROOT/'work/engine-rebuild/common-pipeline';folder.mkdir(exist_ok=True)
+           ^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/replay_common_pipeline.py", line 140, in run
+    context={'cutoff_at':last_cutoff.isoformat(),'state_sha256':state.identity(),
+                                                                ^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_features.py", line 115, in identity
+    return sha({'policy':POLICY,'elo':self.elo.teams,'history':dict(self.history),
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_features.py", line 28, in sha
+    return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/json/__init__.py", line 238, in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/json/encoder.py", line 200, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/json/encoder.py", line 258, in iterencode
+    return _iterencode(o, 0)
+           ^^^^^^^^^^^^^^^^^
+KeyboardInterrupt
+INVALIDATED_BEFORE_COMPLETION: operator stopped the initial diagnostic after scoring-retry code changed during its execution. No result or control pointer was published. The corrected runner pins code before execution and rejects any changed file before producing evidence.
