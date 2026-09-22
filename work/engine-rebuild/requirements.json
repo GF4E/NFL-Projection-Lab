@@ -112,7 +112,12 @@
         "host-observations-verification.json (installed source and scheduled collection/preparation/bundle linkage; 3,183 source bodies and 16 current forecasts reproduce, 52 frozen hashes preserved; no numerical state activation)",
         "engine/projection/cutoff_pipeline.py; tests/test_projection_cutoff_pipeline.py (shared shadow preparation/scoring/refit, exact cutoff roles, physical fit availability and retry preservation; not production orchestration)",
         "COMMON-PIPELINE.md; host-common-pipeline-canary.json (21 Linux fixtures, 14 shadow forecasts and 52 original records unchanged; simulated future dates)",
-        "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)"
+        "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)",
+        "engine/projection/cutoff_publication.py; scripts/projection_v3_prepare.py; scripts/projection_v3_publish.py; tests/test_projection_cutoff_publication.py (explicit real-consumer adapter, predeadline bundle receipt and first-lock/grade protection; not automatic activation)",
+        "CUTOFF-PUBLICATION.md; cutoff-publisher-canary.json; host-cutoff-publisher-canary.json (14 captured-source games through actual preparer/publisher/lock/grader/board evidence; synthetic finals; 52 original frozen records preserved; intermediate source only; qualified final canary below)",
+        "tests-issuer-projection-final.log; tests-issuer-week1.log; tests-issuer-closeout.log",
+        "host-cutoff-publisher-qualified-canary.json; tests-cutoff-publication-qualified.log; tests-cutoff-publication-standing.log (36 Linux fixtures plus 14-game actual-consumer canary; 275 local projection tests and 228 standing checks; exact final candidate hashes; not activation)",
+        "host-cutoff-publisher-final-timeout.json; cutoff-publication-timeout-source.json.gz (preserved timeout; per-invocation verification batching reduces measured first-lock stage from 381 to 41 seconds; unchanged harness/resource limits)"
       ]
     },
     {
@@ -194,7 +199,12 @@
         "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)",
         "SOURCE-RECONSTRUCTION.md",
         "tests-source-reconstruction-projection.log",
-        "host-source-reconstruction-canary.json"
+        "host-source-reconstruction-canary.json",
+        "engine/projection/cutoff_publication.py; scripts/projection_v3_prepare.py; scripts/projection_v3_publish.py; tests/test_projection_cutoff_publication.py (explicit real-consumer adapter, predeadline bundle receipt and first-lock/grade protection; not automatic activation)",
+        "CUTOFF-PUBLICATION.md; cutoff-publisher-canary.json; host-cutoff-publisher-canary.json (14 captured-source games through actual preparer/publisher/lock/grader/board evidence; synthetic finals; 52 original frozen records preserved; intermediate source only; qualified final canary below)",
+        "tests-issuer-projection-final.log; tests-issuer-week1.log; tests-issuer-closeout.log",
+        "host-cutoff-publisher-qualified-canary.json; tests-cutoff-publication-qualified.log; tests-cutoff-publication-standing.log (36 Linux fixtures plus 14-game actual-consumer canary; 275 local projection tests and 228 standing checks; exact final candidate hashes; not activation)",
+        "host-cutoff-publisher-final-timeout.json; cutoff-publication-timeout-source.json.gz (preserved timeout; per-invocation verification batching reduces measured first-lock stage from 381 to 41 seconds; unchanged harness/resource limits)"
       ]
     },
     {
@@ -236,7 +246,12 @@
         "hourly-catchup/current-ref.json; COMMON-PIPELINE.md (2639-game reconstruction with 175 fits and actual hourly dispatch policy; 61 strict-Tuesday delays resolved; historical latency assumed, inactive path)",
         "SOURCE-RECONSTRUCTION.md",
         "tests-source-reconstruction-projection.log",
-        "host-source-reconstruction-canary.json"
+        "host-source-reconstruction-canary.json",
+        "engine/projection/cutoff_publication.py; scripts/projection_v3_prepare.py; scripts/projection_v3_publish.py; tests/test_projection_cutoff_publication.py (explicit real-consumer adapter, predeadline bundle receipt and first-lock/grade protection; not automatic activation)",
+        "CUTOFF-PUBLICATION.md; cutoff-publisher-canary.json; host-cutoff-publisher-canary.json (14 captured-source games through actual preparer/publisher/lock/grader/board evidence; synthetic finals; 52 original frozen records preserved; intermediate source only; qualified final canary below)",
+        "tests-issuer-projection-final.log; tests-issuer-week1.log; tests-issuer-closeout.log",
+        "host-cutoff-publisher-qualified-canary.json; tests-cutoff-publication-qualified.log; tests-cutoff-publication-standing.log (36 Linux fixtures plus 14-game actual-consumer canary; 275 local projection tests and 228 standing checks; exact final candidate hashes; not activation)",
+        "host-cutoff-publisher-final-timeout.json; cutoff-publication-timeout-source.json.gz (preserved timeout; per-invocation verification batching reduces measured first-lock stage from 381 to 41 seconds; unchanged harness/resource limits)"
       ]
     },
     {
@@ -377,7 +392,12 @@
         "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)",
         "SOURCE-RECONSTRUCTION.md",
         "tests-source-reconstruction-projection.log",
-        "host-source-reconstruction-canary.json"
+        "host-source-reconstruction-canary.json",
+        "engine/projection/cutoff_publication.py; scripts/projection_v3_prepare.py; scripts/projection_v3_publish.py; tests/test_projection_cutoff_publication.py (explicit real-consumer adapter, predeadline bundle receipt and first-lock/grade protection; not automatic activation)",
+        "CUTOFF-PUBLICATION.md; cutoff-publisher-canary.json; host-cutoff-publisher-canary.json (14 captured-source games through actual preparer/publisher/lock/grader/board evidence; synthetic finals; 52 original frozen records preserved; intermediate source only; qualified final canary below)",
+        "tests-issuer-projection-final.log; tests-issuer-week1.log; tests-issuer-closeout.log",
+        "host-cutoff-publisher-qualified-canary.json; tests-cutoff-publication-qualified.log; tests-cutoff-publication-standing.log (36 Linux fixtures plus 14-game actual-consumer canary; 275 local projection tests and 228 standing checks; exact final candidate hashes; not activation)",
+        "host-cutoff-publisher-final-timeout.json; cutoff-publication-timeout-source.json.gz (preserved timeout; per-invocation verification batching reduces measured first-lock stage from 381 to 41 seconds; unchanged harness/resource limits)"
       ]
     },
     {
@@ -391,7 +411,12 @@
       "acceptance": "Every requirement verified; simulated vs observed explicit; reliability and achieved accuracy separate; remaining human dependencies named",
       "state": "PARTIAL",
       "observed_evidence": [
-        "RUNBOOK.md (implemented operations and explicit limitations)"
+        "RUNBOOK.md (implemented operations and explicit limitations)",
+        "engine/projection/cutoff_publication.py; scripts/projection_v3_prepare.py; scripts/projection_v3_publish.py; tests/test_projection_cutoff_publication.py (explicit real-consumer adapter, predeadline bundle receipt and first-lock/grade protection; not automatic activation)",
+        "CUTOFF-PUBLICATION.md; cutoff-publisher-canary.json; host-cutoff-publisher-canary.json (14 captured-source games through actual preparer/publisher/lock/grader/board evidence; synthetic finals; 52 original frozen records preserved; intermediate source only; qualified final canary below)",
+        "tests-issuer-projection-final.log; tests-issuer-week1.log; tests-issuer-closeout.log",
+        "host-cutoff-publisher-qualified-canary.json; tests-cutoff-publication-qualified.log; tests-cutoff-publication-standing.log (36 Linux fixtures plus 14-game actual-consumer canary; 275 local projection tests and 228 standing checks; exact final candidate hashes; not activation)",
+        "host-cutoff-publisher-final-timeout.json; cutoff-publication-timeout-source.json.gz (preserved timeout; per-invocation verification batching reduces measured first-lock stage from 381 to 41 seconds; unchanged harness/resource limits)"
       ]
     }
   ]

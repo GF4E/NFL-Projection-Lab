@@ -26,6 +26,7 @@ CODE_PATHS = (
     'engine/projection/scoring_process.py', 'scripts/projection_score_worker.py',
     'engine/projection/lineage.py','engine/projection/storage.py',
     'engine/projection/observations.py','engine/projection/cutoff_features.py','engine/forecast_system/cadence.py',
+    'engine/projection/cutoff_state.py','engine/projection/cutoff_pipeline.py','engine/projection/cutoff_publication.py',
     'engine/projection/model.py','engine/projection/card.py','engine/projection/grade.py',
     'engine/projection/distribution.py','engine/projection_v3/card.py','engine/projection_v3/model.py',
     'engine/projection/features.py','engine/projection_v3/personnel.py','engine/elo.py','engine/elo_hfa.py',
@@ -114,6 +115,7 @@ def release_for(root, ref, artifact):
 
 
 def attach(root, card, request, release_ref, prepared_manifest):
+    from . import cutoff_publication
     validate_pair(request)
     release = resolve(root, release_ref, 'releases')
     if (request['game_id'] != card['game_id'] or release['version'] != card['version']
@@ -127,18 +129,25 @@ def attach(root, card, request, release_ref, prepared_manifest):
     manifest_ref = store(root, 'input-manifests', prepared_manifest)
     body = {'schema':'projection-scoring-bundle-v1', 'release_ref':release_ref,
             'input':request, 'prepared_manifest_ref':manifest_ref,
-            'forecast':{key:copy.deepcopy(card[key]) for key in PROTECTED},
+            'forecast':{**{key:copy.deepcopy(card[key]) for key in PROTECTED},**cutoff_publication.protected(card)},
             'chronology':{'status':'LEGACY_SOURCE_VINTAGES_NOT_QUALIFIED',
                           'state_cutoff':None, 'input_event_times':None,
                           'source_publication_times':None, 'source_first_seen_times':None,
                           'source_retrieval_times':'Only entries explicitly recorded in prepared manifest',
                           'reason':'Exact captured values/hashes; unavailable times are not inferred'},
             'derivatives':'Card may add edits, lock, grade and display fields; forecast fields remain exact'}
+    if cutoff_publication.protected(card):
+        body['chronology']=cutoff_publication.chronology(root,card)
+        forecast=cutoff_publication.validate_card(root,card)
+        if request!=forecast['input']:raise ValueError('Bundle input differs from cutoff calculation')
     ref = store(root, 'bundles', body)
     return {**card, 'forecast_bundle_ref':ref, 'release_ref':release_ref}
 
 
 def verify_card(root, card):
+    from . import cutoff_publication
+    if cutoff_publication.protected(card) and (not card.get('forecast_bundle_ref') or not card.get('release_ref')):
+        raise ValueError('Cutoff forecast requires its immutable bundle and release')
     if 'forecast_bundle_ref' not in card and 'release_ref' not in card:
         return None  # Existing history retains the frozen legacy convention.
     if not card.get('forecast_bundle_ref') or not card.get('release_ref'):
@@ -146,7 +155,7 @@ def verify_card(root, card):
     bundle = resolve(root, card['forecast_bundle_ref'], 'bundles')
     if bundle.get('schema') != 'projection-scoring-bundle-v1' or bundle['release_ref'] != card['release_ref']:
         raise ValueError('Unsupported or incompatible forecast bundle')
-    if bundle['forecast'] != {key:card[key] for key in PROTECTED}:
+    if bundle['forecast'] != {**{key:card[key] for key in PROTECTED},**cutoff_publication.protected(card)}:
         raise ValueError('Card differs from immutable forecast bundle')
     validate_pair(bundle['input'])
     resolve(root, bundle['prepared_manifest_ref'], 'input-manifests')
@@ -161,4 +170,9 @@ def verify_card(root, card):
         or hash_value(artifact_payload(artifact)) != release['scoring_artifact_sha256']):
         raise ValueError('Release components differ')
     read_artifact(root, release['calibration_ref'])
+    if cutoff_publication.protected(card):
+        forecast=cutoff_publication.validate_card(root,card)
+        if bundle['input']!=forecast['input']:raise ValueError('Cutoff bundle input differs')
+        if bundle['chronology']!=cutoff_publication.chronology(root,card):raise ValueError('Cutoff bundle chronology differs')
+        cutoff_publication.verify_receipt(root,card)
     return bundle

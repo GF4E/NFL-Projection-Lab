@@ -1,0 +1,27 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/check_common_pipeline_host.py", line 50, in <module>
+    if result.returncode:raise RuntimeError('Host common-pipeline verification failed: '+result.stdout[-1600:]+result.stderr[-3000:])
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: Host common-pipeline verification failed: CANARY_STAGE {"state_update": 7.26159450400155}
+CANARY_STAGE {"prepare": 22.446445059031248}
+CANARY_STAGE {"upcoming_publish_including_board": 45.612375978031196}
+CANARY_STAGE {"first_lock_publish_including_board": 380.89456425094977}
+CANARY_STAGE {"first_grade_publish_including_board": 2.3164437980158255}
+Traceback (most recent call last):
+  File "<stdin>", line 23, in <module>
+  File "/run/nfl-engine-monitor/common-pipeline-code-qgfj5azo/work/engine-rebuild/check_cutoff_publisher.py", line 124, in verify
+  File "/run/nfl-engine-monitor/common-pipeline-code-qgfj5azo/scripts/projection_v3_publish.py", line 128, in run
+  File "/run/nfl-engine-monitor/common-pipeline-code-qgfj5azo/scripts/board_v7_publish.py", line 12, in run
+  File "/run/nfl-engine-monitor/common-pipeline-code-qgfj5azo/engine/board_v7.py", line 38, in build
+  File "/run/nfl-engine-monitor/common-pipeline-code-qgfj5azo/scripts/board_v7_publish.py", line 12, in <lambda>
+  File "/run/nfl-engine-monitor/common-pipeline-code-qgfj5azo/scripts/projection_v3_publish.py", line 22, in shape_for
+  File "/run/nfl-engine-monitor/common-pipeline-code-qgfj5azo/engine/projection/lineage.py", line 42, in calibration_for
+  File "/run/nfl-engine-monitor/common-pipeline-code-qgfj5azo/engine/projection/bundle.py", line 176, in verify_card
+  File "/run/nfl-engine-monitor/common-pipeline-code-qgfj5azo/engine/projection/cutoff_publication.py", line 106, in chronology
+  File "/run/nfl-engine-monitor/common-pipeline-code-qgfj5azo/engine/projection/cutoff_pipeline.py", line 321, in load
+  File "/opt/nfl-runtime/env/lib/python3.12/gzip.py", line 637, in decompress
+    if crc != zlib.crc32(decompressed):
+              ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<stdin>", line 8, in timeout
+TimeoutError: Candidate runtime verification exceeded 570 seconds
+

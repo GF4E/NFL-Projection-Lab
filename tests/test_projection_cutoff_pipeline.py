@@ -341,5 +341,32 @@ class PipelineTests(Helpers):
         receipt['available_at']='2026-09-13T14:59:30Z';path.write_text(json.dumps(receipt))
         with self.assertRaisesRegex(ValueError,'chronology'):p.fit_available_at(self.root,ref)
 
+    def test_fenced_run_reuses_slate_reconstruction_but_checks_each_forecast_and_receipt(self):
+        self.seed();other={**self.target,'game_id':'sun2','gametime':'16:25'}
+        source=self.source('schedule',[self.g,self.target,other])
+        with patch.object(p,'now',return_value=timestamp('2026-09-13T14:00:00Z')):
+            schedule_ref=p.capture_schedule(self.root,source)
+        games=[{**g,'source_hash':source['sha256']} for g in (self.target,other)]
+        body=p.from_recorded(self.root,self.state_ref,games,{'stadiums':[]},
+                             at='2026-09-13T15:00:00Z',role='FINAL_ELIGIBLE',schedule_ref=schedule_ref)
+        prep=p.store(self.root,'preparations',body);refs=p.recorded_scores(self.root,prep,self.fit_ref)
+        cache={}
+        with patch.object(p,'verify_preparation',wraps=p.verify_preparation) as reconstruction:
+            with patch.object(p,'score',wraps=p.score) as scoring:
+                for gid in ('sun','sun2'):
+                    self.assertEqual(p.verify_forecast(self.root,refs[gid],cache=cache)['game_id'],gid)
+                self.assertEqual(reconstruction.call_count,1);self.assertEqual(scoring.call_count,1)
+                bad=p.load(self.root,refs['sun2'],'forecasts');bad['projection']['home_points']+=1
+                changed=p.store(self.root,'forecasts',bad)
+                with self.assertRaisesRegex(ValueError,'differs from its preparation'):
+                    p.verify_forecast(self.root,changed,cache=cache)
+                receipt=self.root/p.BASE/'scoring-receipts'/(refs['sun2']['sha256']+'.json')
+                saved=json.loads(receipt.read_text());saved['completed_at']='2026-09-14T00:00:00Z'
+                receipt.write_text(json.dumps(saved))
+                with self.assertRaisesRegex(ValueError,'predeadline scoring'):
+                    p.verify_forecast(self.root,refs['sun2'],cache=cache)
+                p.verify_forecast(self.root,refs['sun'])
+                self.assertEqual(reconstruction.call_count,2);self.assertEqual(scoring.call_count,2)
+
 
 if __name__=='__main__':unittest.main()
