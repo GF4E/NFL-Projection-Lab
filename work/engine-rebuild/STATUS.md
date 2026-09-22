@@ -1,5 +1,19 @@
 # Rebuild status
 
+Goal ACTIVE. This increment adds an executable scoring recovery package. It does not activate rollback, change a model, fit a candidate, prepare new inputs or publish a forecast. Existing infrastructure and statistical requirements remain open as mapped in requirements.json.
+
+Actual Linux verification at 2026-09-22T18:06:37Z, host checkout 6f05b52fabedb2a233b8073ebe4ea487a5296833: a package for release f2d26f3a66eb986cea8c05e49ca0d00c25e8e974eb4b8abd72a9eaf9ea9982cd restored the exact scorer import closure from a109bcf73129380a8126fdbdb295a041dc60bde1, with the release's own fit and calibration. All 16 saved forecasts, contribution tables and WHY outputs reproduced exactly. All 52 original lock/grade records retained their hashes. Nine candidate fault tests passed under service uid 1000, CPython 3.12.2 and NumPy 1.26.4. Work occurred in temporary host storage, with no active pointer change or production write.
+
+The verified package is outputs/projection-v3/executables/89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2.json.gz (35,720 bytes, 11 repository code members). It binds 371 interpreter/imported-module/cache/NumPy file entries and 47 mapped Linux native files. Runtime files are fingerprinted, not archived. The restored runner rejects code/member changes, wrong prepared-fit references, artifact/hash/schema mismatches and changed runtime bytes, with no fallback to current source. Additional transitive files absent from the earlier manifest are labeled reconstructed from its pinned Git commit, not originally captured evidence.
+
+Verification took 159.71 seconds including all nine fixtures and actual forecast reproduction; peak child RSS was 110,680 KiB under the 4 GiB address-space limit. Local validation: nine targeted tests, 169 projection tests and 218 standing Week 1 tests. See tests-executable*.log and host-executable-verification.json. No new provider requests, spending or website deployment.
+
+Remaining: full preparation/state and publication compatibility, ownership-fenced activation, compatible executable rollback canary, host runtime/private-state recovery, durable storage capacity, source-time/consumer migration, numerical cadence, E-CAL-LINEAGE then E-VENUE-DIRECT under the actual weekly/reviewer prerequisites, and end-to-end/live-cycle acceptance. Next action is full issuing-pipeline compatibility around this verified scorer package; editing current-release-ref.json alone is prohibited as a rollback. Root free space at verification was 27,803,648 bytes. The existing capacity/migration approval request remains pending; this small package does not resolve headroom.
+
+Least certain: compatibility of restored preparation/state with future issuance, which is why this package is not activated as a production rollback. Confidence: near-total in the 16 exact saved-forecast reproductions, meaning arithmetic and hashes on verified records. Lower to high if independent restoration differs. Full operational readiness and predictive improvement remain unproved.
+
+## Prior verified committed-record recovery (preserved history)
+
 Goal ACTIVE. This increment verifies a private recovery point for committed source and artifacts on the existing Mac. No model, forecast, gate, scheduler or production service changed; no statistical candidate was fitted or promoted.
 
 At 2026-09-22T17:48:02Z, the standalone archive of engine-v2 commit 0b4159af3eddcde06ca7a93111067e94339abcc0 restored successfully into a new private directory without a remote or alternate object store. The 505,772,873-byte archive passed SHA256 and Git object verification; every one of 12,051 tree entries (2,865,749,726 file bytes) matched the pinned snapshot. Restored code/artifacts reproduced 16 immutable forecast bundles and recomputed 32 first grades. The restored tree remained clean. Elapsed time: 71.27 seconds. The Mac's existing Python/NumPy runtime was used; it was not restored from the archive.

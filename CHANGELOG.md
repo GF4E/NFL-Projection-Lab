@@ -570,3 +570,20 @@ CONVENTIONS: committed source/history is the first scoped recovery point (Tier 2
 | Durable host headroom | Unresolved | Unresolved; latest read-only check 35,188,736 free bytes |
 
 Validation: 7 backup fixtures, 160 projection tests and 218 standing Week 1 tests pass. Paid-provider credits and new spending: zero. No host installation or public-site update is claimed. Least certain: excluded runtime/private-state recovery. Confidence: near-total in the committed-snapshot restoration, meaning arithmetic/hashes on verified files; lower to high if independent restoration changes any file, forecast or grade. This does not rate full operational readiness or accuracy improvement.
+
+## 2026-09-22 — Rebuild executable scorer restoration verified on Linux
+
+Infrastructure recovery evidence; no model, feature, gate or active release changes. engine/projection/executable.py archives the complete repository scorer import closure from the exact code commit, plus its fit/calibration bytes. It restores into a new isolated directory and checks code, artifacts, prepared-fit identity, interpreter/imported dependency bytes and Linux mapped native files before execution. Missing/incompatible evidence fails closed with no active-checkout fallback.
+
+CONVENTIONS: Tier 1 exact native runtime verification and isolated restored execution; Tier 2 REVIEW REQUESTED transitive files absent from legacy manifests are reconstructed from their pinned Git commit and require exact saved-forecast reproduction. No claim that old manifests captured those files. The executable package covers scoring; preparation, scheduling, ownership and publication rollback remain open. A runtime fingerprint is not a runtime backup.
+
+| Evidence | Before | After |
+|---|---|---|
+| Executable scorer recovery | Captured release identifiers; no independently executable package | 11 archived code members, exact fit/calibration, 35,720-byte verified package |
+| Actual Linux reproduction | Current installed worker reproduced forecasts | Restored package reproduced all 16 saved forecast/contribution/WHY results |
+| Frozen records | 52 original lock/grade records | All 52 hashes unchanged |
+| Production rollback activation | Unqualified | Still unqualified; no release pointer switched |
+
+Host evidence: work/engine-rebuild/host-executable-verification.json, checkout 6f05b52fabedb2a233b8073ebe4ea487a5296833 at 18:06:37Z. Nine fault fixtures passed under uid 1000 and the actual runtime in tmpfs; whole verification 159.71 seconds, peak child RSS 110,680 KiB. Local: 9 targeted, 169 projection and 218 standing Week 1 tests. Package hash 89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2. Paid-provider credits and new spending: zero. Latest root free bytes 27,803,648; sustainable capacity remains unresolved.
+
+Least certain: full preparation/state compatibility for future issuance, so no production rollback activation is claimed. Confidence: near-total in exact saved-forecast reproduction, meaning arithmetic and hashes on verified rows. Lower to high if an independent restored execution differs. No predictive-improvement claim.

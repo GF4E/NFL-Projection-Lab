@@ -123,7 +123,10 @@
         "watchdog-mac-installation.json (launchd timer)",
         "watchdog-verification.json (scheduled host/Mac receipt exchange; UI render observed, public API still unqualified)",
         "watchdog-canary.json (live host-observer pause, independent detection, automatic restoration and observed recovery; production workers untouched)",
-        "backup-restore.json; backup-receipts/cc997799946e44cb96947f98a0c91f3adc17e052d3b9a50ac307da259f7a9e20.json (actual standalone committed-snapshot restoration: 12051 entries, 16 forecasts, 32 grades; host runtime/private state excluded)"
+        "backup-restore.json; backup-receipts/cc997799946e44cb96947f98a0c91f3adc17e052d3b9a50ac307da259f7a9e20.json (actual standalone committed-snapshot restoration: 12051 entries, 16 forecasts, 32 grades; host runtime/private state excluded)",
+        "engine/projection/executable.py; tests/test_projection_executable.py (complete scorer import closure, bound fit/calibration, restored execution and fail-closed runtime/input compatibility)",
+        "host-executable-verification.json (actual Linux tmpfs restoration: 9 fixtures, 16 exact saved forecasts, 52 frozen hashes unchanged; no production activation)",
+        "outputs/projection-v3/executables/89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2.json.gz (verified scorer package; native runtime fingerprinted, not archived; full pipeline rollback pending)"
       ]
     },
     {
@@ -147,7 +150,10 @@
         "bundle-input-capture.json (verified host snapshot; raw files ignored/private)",
         "bundle-parity.json (48 captured cards, 16 exact bundle reproductions, 52 unchanged frozen records, no unchanged-poll growth)",
         "tests/test_projection_bundle.py; host-bundle-candidate.json (boundary/corruption/refit/idempotency fixtures under actual Linux runtime)",
-        "host-bundle-verification.json (scheduled 16-card exact reproduction; source hashes/fit/release verified; 52 original records unchanged; source remote verified)"
+        "host-bundle-verification.json (scheduled 16-card exact reproduction; source hashes/fit/release verified; 52 original records unchanged; source remote verified)",
+        "engine/projection/executable.py; tests/test_projection_executable.py (complete scorer import closure, bound fit/calibration, restored execution and fail-closed runtime/input compatibility)",
+        "host-executable-verification.json (actual Linux tmpfs restoration: 9 fixtures, 16 exact saved forecasts, 52 frozen hashes unchanged; no production activation)",
+        "outputs/projection-v3/executables/89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2.json.gz (verified scorer package; native runtime fingerprinted, not archived; full pipeline rollback pending)"
       ]
     },
     {
@@ -260,7 +266,10 @@
         "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)",
         "host-source-archive-verification.json (installed code, scheduled HEALTHY reader and downstream source reads; legacy CSV reuse, first fresh compressed production record not yet observed)",
         "tests-backup.log; tests-backup-projection-suite.log; tests-backup-week1.log (7 backup, 160 projection, 218 frozen workflow fixtures)",
-        "backup-restore.json (71-second Mac committed-record restoration; not executable production rollback or full-machine recovery)"
+        "backup-restore.json (71-second Mac committed-record restoration; not executable production rollback or full-machine recovery)",
+        "engine/projection/executable.py; tests/test_projection_executable.py (complete scorer import closure, bound fit/calibration, restored execution and fail-closed runtime/input compatibility)",
+        "host-executable-verification.json (actual Linux tmpfs restoration: 9 fixtures, 16 exact saved forecasts, 52 frozen hashes unchanged; no production activation)",
+        "outputs/projection-v3/executables/89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2.json.gz (verified scorer package; native runtime fingerprinted, not archived; full pipeline rollback pending)"
       ]
     },
     {
