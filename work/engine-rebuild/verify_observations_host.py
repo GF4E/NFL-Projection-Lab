@@ -4,7 +4,9 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 paths=['engine/projection/observations.py','scripts/projection_v3_prepare.py','engine/projection/bundle.py','engine/projection/cutoff_features.py','engine/forecast_system/cadence.py']
 code={p:hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in paths}
-program='EXPECTED='+repr(code)+'\n'+r'''
+capture=json.loads((ROOT/'work/engine-rebuild/prepared-input-capture.json').read_bytes())
+frozen={p:item['sha256'] for p,item in capture['files'].items() if p.startswith(('outputs/projection-v3/locks/','outputs/projection-v3/grades/'))}
+program='EXPECTED='+repr(code)+'\nFROZEN='+repr(frozen)+'\n'+r'''
 import datetime,hashlib,json,os,subprocess
 from pathlib import Path
 root=Path.cwd();commit=subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip()
@@ -41,8 +43,9 @@ for card in board['games']:
   cards.append(card);requests.append(b['input'])
 scored=score_batch(artifact,read_artifact(root,artifact['shapes']),requests) if requests else {}
 for card in cards:assert scored[card['game_id']]=={k:card[k] for k in ('projection','contributions','why')}
+assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==digest for p,digest in FROZEN.items())
 stat=os.statvfs(root)
-print(json.dumps({'state':'VERIFIED' if source_matches and cards else 'WAITING_FOR_MATCHING_PUBLICATION','checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'host_commit':commit,'source_hashes':EXPECTED,'fit_ref':fit,'version':artifact['version'],'release_ref':release_ref,'issuing_code_commit':release['code']['commit'],'observation_snapshot_ref':ref,'collected_games':len(records),'unknown':snapshot['unknown'],'collected_at':sorted({r['collected_at'] for r in records.values()}),'prepared_rows':len(rows),'prepared_bytes':len(data),'prepared_sha256':hashlib.sha256(data).hexdigest(),'exact_source_body_reproductions':len(records),'exact_forecast_reproductions':len(cards),'release_binds_collector_code':source_matches,'free_root_bytes':stat.f_bavail*stat.f_frsize,'provider_credits':0,'scope':'Installed source and scheduled receipt/prepared/bundle linkage; no state-model activation, refit or public-browser equality claim'}))
+print(json.dumps({'state':'VERIFIED' if source_matches and cards else 'WAITING_FOR_MATCHING_PUBLICATION','checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'host_commit':commit,'source_hashes':EXPECTED,'fit_ref':fit,'version':artifact['version'],'release_ref':release_ref,'issuing_code_commit':release['code']['commit'],'observation_snapshot_ref':ref,'collected_games':len(records),'unknown':snapshot['unknown'],'collected_at':sorted({r['collected_at'] for r in records.values()}),'prepared_rows':len(rows),'prepared_bytes':len(data),'prepared_sha256':hashlib.sha256(data).hexdigest(),'exact_source_body_reproductions':len(records),'frozen_records_unchanged':len(FROZEN),'exact_forecast_reproductions':len(cards),'release_binds_collector_code':source_matches,'free_root_bytes':stat.f_bavail*stat.f_frsize,'provider_credits':0,'scope':'Installed source and scheduled receipt/prepared/bundle linkage; no state-model activation, refit or public-browser equality claim'}))
 '''
 command='cd /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6 && runuser -u nflengine -- env OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 /opt/nfl-runtime/env/bin/python -B -'
 r=subprocess.run(['ssh','-i',str(ROOT/'.cloud-private/admin_key'),'-o','BatchMode=yes','-o','ConnectTimeout=10','root@159.89.185.88',command],input=program,text=True,capture_output=True,timeout=90)
