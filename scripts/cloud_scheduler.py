@@ -19,7 +19,7 @@ from scripts.nfl_engine_autopush import guard, REMOTE
 
 LOCK_PATH = 'work/cloud-migration-v1/ownership.json'
 OUT = ROOT/'outputs/model-pick-v1'
-ALLOWED = ('outputs/cadence-v2/', 'outputs/board-v8-market/', 'outputs/board-v7/', 'outputs/in-season-learning-v1/', 'work/in-season-learning-v1/', 'CHANGELOG.md', 'outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
+ALLOWED = ('work/projection-observations-v1/', 'outputs/cadence-v2/', 'outputs/board-v8-market/', 'outputs/board-v7/', 'outputs/in-season-learning-v1/', 'work/in-season-learning-v1/', 'CHANGELOG.md', 'outputs/projection-v3/', 'work/projection-v3/', 'outputs/projection-v2/', 'work/projection-v2/', 'outputs/projection-v1/', 'work/projection-v1/', 'outputs/game-card-v3/', 'outputs/human-tickets-v1/', 'outputs/iron-man-v1/', 'outputs/model-pick-v1/', 'outputs/jarrett/', 'outputs/scorecard.csv',
            'work/model-pick-v1/daily/', 'work/model-pick-v1/sources/',
            'work/model-pick-v1/schedules/', 'work/model-pick-v1/states/',
            'work/model-pick-v1/depth/')

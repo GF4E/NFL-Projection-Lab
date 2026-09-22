@@ -1,0 +1,43 @@
+"""A real Git commit must include the receipt graph referenced by preparation."""
+import json
+from pathlib import Path
+import subprocess
+import tempfile
+import unittest
+from unittest.mock import patch
+from engine.projection import observations as obs
+from scripts import cloud_scheduler
+from test_projection_observations import fixture, NOW
+
+
+class ObservationPublicationTests(unittest.TestCase):
+    def test_scheduler_commits_complete_prepared_observation_graph(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            def git(*args):return subprocess.check_output(['git','-C',str(root),*args],stderr=subprocess.PIPE)
+            git('init','-b','engine-v2');git('config','user.name','Fixture');git('config','user.email','fixture@example.invalid')
+            (root/'README.md').write_text('fixture\n');git('add','README.md');git('commit','-m','fixture')
+            remote={'head':git('rev-parse','HEAD').decode().strip()}
+            games,stats=fixture();manifest={}
+            for key,name,rows in [('schedule','schedule',games),('team_games','team-games',stats)]:
+                data=obs.raw(rows);digest=obs.sha(data);path=root/f'work/projection-v1/data/{name}-{digest}.json'
+                path.parent.mkdir(parents=True,exist_ok=True);path.write_bytes(data)
+                manifest[key]={'path':str(path.relative_to(root)),'sha256':digest}
+            with patch.object(obs,'now',return_value=NOW):ref=obs.capture(root,manifest)
+            p=root/'work/projection-v3/current-ref.json';p.parent.mkdir(parents=True,exist_ok=True)
+            p.write_bytes(obs.raw({'observation_snapshot_ref':ref}))
+            def transport(*args):
+                if args[0]=='ls-remote':return (remote['head']+'\trefs/heads/engine-v2\n').encode()
+                if args[0]=='push':remote['head']=git('rev-parse','HEAD').decode().strip();return b''
+                return git(*args)
+            with patch.object(cloud_scheduler,'ROOT',root),patch.object(cloud_scheduler,'git',side_effect=transport),patch.object(cloud_scheduler,'guard'),patch('scripts.board_v8_market_publish.run'):
+                committed=cloud_scheduler.publish_artifacts()
+            self.assertEqual(committed,remote['head'])
+            required=[p for prefix in (obs.BASE,'work/projection-v1/data') for p in (root/prefix).rglob('*') if p.is_file()]
+            self.assertGreaterEqual(len(required),6)
+            for p in required:self.assertEqual(git('show','HEAD:'+str(p.relative_to(root))),p.read_bytes())
+            current=json.loads(git('show','HEAD:work/projection-v3/current-ref.json'))
+            self.assertEqual(current['observation_snapshot_ref'],ref)
+
+
+if __name__=='__main__':unittest.main()
