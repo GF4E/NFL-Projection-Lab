@@ -1,5 +1,6 @@
 """Read-only host capture into ignored local storage; no provider requests."""
 import base64
+import argparse
 import datetime as dt
 import gzip
 import hashlib
@@ -21,6 +22,11 @@ paths=['work/projection-v3/current-features.json.gz','work/projection-v3/current
        'config/game_card_team_colors.json','outputs/projection-v3/board.json','outputs/projection-v3/final-feed.json',
        'outputs/projection-v2/board.json','outputs/projection-v1/forecast.json',
        'work/in-season-learning-v1/trajectory-history.json']
+prepared=json.loads((root/'work/projection-v3/current-ref.json').read_bytes())
+for key in ('features_ref','prepared_manifest_ref'):
+ if prepared.get(key):paths.append(prepared[key]['path'])
+for kind in ('bundles','releases','input-manifests'):
+ paths += [str(p.relative_to(root)) for p in (root/'outputs/projection-v3'/kind).glob('*') if p.is_file()]
 ref=json.loads((root/paths[2]).read_bytes());a=json.loads((root/ref['path']).read_bytes())
 paths += [ref['path'],a['shapes']['path']]
 registry=json.loads((root/'work/engine-rebuild/legacy-calibration-map.json').read_bytes())
@@ -31,7 +37,8 @@ for folder in ('locks','grades','live'):
  paths += [str(p.relative_to(root)) for p in (root/'outputs/projection-v3'/folder).glob('*.json')]
 files={p:(root/p).read_bytes() for p in sorted(set(paths)) if (root/p).exists()}
 manifest=json.loads(files['work/projection-v3/current-ref.json'])
-assert hashlib.sha256(files['work/projection-v3/current-features.json.gz']).hexdigest()==manifest['sha256']
+feature_path=manifest.get('features_ref',{}).get('path','work/projection-v3/current-features.json.gz')
+assert hashlib.sha256(files[feature_path]).hexdigest()==manifest['sha256']
 assert manifest['fit']==ref
 assert files['work/projection-v3/current-ref.json']==(root/'work/projection-v3/current-ref.json').read_bytes()
 assert files[ref['path']]==(root/ref['path']).read_bytes()
@@ -52,5 +59,6 @@ for name,encoded in data['files'].items():
 result={'captured_at':when,'host_commit':data['commit'],'folder':str(folder.relative_to(ROOT)),
         'scope':'Read-only host files; human entries and credentials excluded. Captured snapshot, not public rendering.',
         'files':manifest,'total_bytes':sum(x['bytes'] for x in manifest.values()),'provider_credits':0}
-(ROOT/'work/engine-rebuild/bundle-input-capture.json').write_text(json.dumps(result,indent=2)+'\n')
+parser=argparse.ArgumentParser();parser.add_argument('--receipt',default='work/engine-rebuild/bundle-input-capture.json');args=parser.parse_args()
+(ROOT/args.receipt).write_text(json.dumps(result,indent=2)+'\n')
 print(json.dumps({k:v for k,v in result.items() if k!='files'}))

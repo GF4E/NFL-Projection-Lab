@@ -20,7 +20,7 @@ class ExecutableTests(unittest.TestCase):
         release = bundle.resolve(cls.original, pointer, 'releases')
         cls.code = executable.code_closure(cls.original, release['code']['commit'])
         for path in bundle.CODE_PATHS:
-            cls.code.setdefault(path, executable.git(cls.original, 'show', release['code']['commit']+':'+path).decode())
+            cls.code[path] = (cls.original/path).read_text()
 
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(); self.addCleanup(self.temp.cleanup)

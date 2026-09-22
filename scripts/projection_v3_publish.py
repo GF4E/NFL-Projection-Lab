@@ -14,6 +14,7 @@ from engine.projection.lineage import bind,calibration_for
 from engine.projection.scoring import prepare_pair
 from engine.projection.scoring_process import score_batch
 from engine.projection.bundle import release_for,attach,verify_card
+from engine.projection.prepared import load as load_prepared_state
 OUT=ROOT/'outputs/projection-v3';WORK=ROOT/'work/projection-v3'
 
 def shape_for(card,artifact):
@@ -32,11 +33,10 @@ def lock_card(card,entry,shapes,cutoff):
 def run(now=None,require_synced_entries=False):
  from scripts.projection_learning import active_artifact_with_ref,feature_snapshot,trajectories
  now=now or dt.datetime.now(dt.timezone.utc);artifact_ref,artifact=active_artifact_with_ref()
- if artifact.get('elo_hfa') and json.loads((WORK/'current-ref.json').read_text()).get('elo_hfa')!=artifact['elo_hfa']:raise ValueError('Active fit and prepared HFA method differ')
- shapes=read(artifact['shapes']);prepared_manifest=json.loads((WORK/'current-ref.json').read_bytes());prepared_raw=(WORK/'current-features.json.gz').read_bytes()
- if hashlib.sha256(prepared_raw).hexdigest()!=prepared_manifest.get('sha256'):raise ValueError('Prepared input hash mismatch')
+ shapes=read(artifact['shapes']);rows,prepared_manifest,prepared_raw=load_prepared_state(ROOT)
+ if artifact.get('elo_hfa') and prepared_manifest.get('elo_hfa')!=artifact['elo_hfa']:raise ValueError('Active fit and prepared HFA method differ')
  if prepared_manifest.get('fit')!=artifact_ref:raise ValueError('Prepared inputs and active fit differ')
- rows=json.loads(gzip.decompress(prepared_raw));groups=paired(rows)
+ groups=paired(rows)
  final_path=OUT/'final-feed.json';finals=json.loads(final_path.read_text()).get('games',{}) if final_path.exists() else {}
  legacy_path=ROOT/'outputs/projection-v2/board.json';legacy={g['game_id']:g for g in json.loads(legacy_path.read_text())['games']} if legacy_path.exists() else {}
  fp=ROOT/'outputs/projection-v1/forecast.json';forecasts=json.loads(fp.read_text()) if fp.exists() else {};ep=ROOT/'.cloud-private/projection-entries.json';cache=json.loads(ep.read_text()) if ep.exists() else {};entries=cache.get('entries',[]);colors=json.loads((ROOT/'config/game_card_team_colors.json').read_text());cards=[]

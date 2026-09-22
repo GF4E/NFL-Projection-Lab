@@ -587,3 +587,21 @@ CONVENTIONS: Tier 1 exact native runtime verification and isolated restored exec
 Host evidence: work/engine-rebuild/host-executable-verification.json, checkout 6f05b52fabedb2a233b8073ebe4ea487a5296833 at 18:06:37Z. Nine fault fixtures passed under uid 1000 and the actual runtime in tmpfs; whole verification 159.71 seconds, peak child RSS 110,680 KiB. Local: 9 targeted, 169 projection and 218 standing Week 1 tests. Package hash 89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2. Paid-provider credits and new spending: zero. Latest root free bytes 27,803,648; sustainable capacity remains unresolved.
 
 Least certain: full preparation/state compatibility for future issuance, so no production rollback activation is claimed. Confidence: near-total in exact saved-forecast reproduction, meaning arithmetic and hashes on verified rows. Lower to high if an independent restored execution differs. No predictive-improvement claim.
+
+## 2026-09-22 — Atomic prepared snapshots and refit publication ordering
+
+Infrastructure correction, no feature mathematics or model gate change. The v3 mutable feature-file/manifest pair could be interrupted between writes. The scheduler also could publish after a weekly refit before preparing inputs for that fit. Preparation now commits immutable feature and manifest records before one durable pointer, and completed refits get matching preparation before publication. Active v3 publisher, learning/closeout and current audit readers resolve the exact snapshot. Existing cloud ownership remains mandatory; preparation/refit use the same additional local writer lock.
+
+CONVENTIONS: Tier 1 atomic snapshot publication and exact same-fit checks; Tier 2 REVIEW REQUESTED legacy migration preserves only verified original bytes and recorded source provenance. No missing source/cutoff timestamp is inferred. Explicit corruption cannot fall back to an obsolete mutable cache. Original caches and historical snapshots are retained, with no retention-policy change.
+
+| Evidence | Before | After |
+|---|---|---|
+| Prepared-state identity | Mutable file plus separately written manifest | Immutable bytes and manifest, one durable current pointer |
+| Post-refit order | Refit could precede publish without matching preparation | Matching preparation required before publisher call |
+| Current-card parity | Deployed control | All 48 captured cards match, excluding declared identity/time metadata |
+| Original locks/grades | 52 records | All 52 byte hashes unchanged |
+| Statistical method | Authoritative HFA lineage | Unchanged |
+
+Verification: 179 projection, 218 standing Week 1 and 10 closeout tests passed; 19 prepared/storage tests passed under actual Linux service identity in tmpfs. All 544 prepared rows/679,581 bytes round-tripped exactly; 16 requests matched saved bundles and reproduced through the restored executable package. The executed scheduler fixture proves the corrected order in simulation, not a future Tuesday run. See work/engine-rebuild/prepared-parity.json and host-prepared-candidate.json. Host deployment verification follows the source commit. Paid-provider credits and new spending: zero.
+
+Least certain: rollback compatibility after a later fit/source-format change; actual pipeline rollback is not activated. Confidence: near-total in prepared-byte and forecast preservation, meaning hashes/arithmetic on verified records. Lower to high if independent migration differs. Full operational readiness and predictive improvement remain unproved.

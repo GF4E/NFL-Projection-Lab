@@ -1,5 +1,21 @@
 # Rebuild status
 
+Goal ACTIVE. This increment replaces the mutable v3 prepared-file/manifest pair with immutable snapshots followed by one durable current pointer. It also prepares inputs for a completed weekly refit before the next publisher call. Feature mathematics, fit settings and calibration are unchanged; no statistical candidate or production rollback is activated.
+
+The active publisher, learning/closeout reader and current-input audit resolve exact prepared snapshots. Legacy data is readable only under its original byte hash. Original current-features.json.gz is retained as legacy data; it is no longer the new writer's output. Preparation and weight-only refitting share local writer exclusion inside the existing cloud ownership boundary. Corrupt explicit references fail closed instead of falling back. A fit change during preparation prevents pointer publication.
+
+Captured-input parity at 2026-09-22T18:17:00Z covered all 48 cards and 32 simulated fresh cards against source 2d69f0e7e2b265d75765ffb7d7dd60f17963f431. Forecasts, contributions, WHY and other card fields matched after excluding declared bundle/release/time metadata. All 52 frozen records retained their hashes. Snapshot migration preserved all 679,581 compressed bytes; repeated unchanged publication reused its bundles.
+
+Actual Linux candidate verification at 18:18:28Z, host checkout 15d083f7aacd2c216241969b8f8a65f69decbc1b: 19 prepared/storage fixtures passed in tmpfs. The snapshot held 544 team rows; all 16 current prepared requests matched their saved bundles and reproduced exactly through the previously restored executable package, with all 52 frozen records unchanged. Total host verification was 17.23 seconds and observed peak RSS 240,612 KiB. Root free bytes were 25,153,536. This is candidate/runtime evidence, not yet an installed new-pointer claim.
+
+Local verification: 179 projection tests, 218 frozen workflow tests and 10 closeout tests passed. Ten prepared-state tests cover snapshot/manifest/pointer failures, lost-response retry, corruption, wrong fit, duplicate/unpaired populations, writer contention and an executed learning-scheduler fixture proving closeout then refit then matching preparation then publication. The scheduler fixture is simulated; a future observed Tuesday cycle remains pending.
+
+Next: commit/push this correction, verify scheduled host migration and exact fit/snapshot references, then complete the explicit rollback selection/activation protocol and source-time/consumer migration. Numerical cadence, E-CAL-LINEAGE, E-VENUE-DIRECT, actual reviews and full live-cycle acceptance remain open. The pending capacity/migration approval is unchanged; snapshots add approximately 680 KB for the first distinct prepared body, not a solution to low storage. No paid-provider requests or new spending.
+
+Least certain: full preparation/state rollback compatibility after a later fit or source-format change; the new snapshot reader rejects mismatches but does not yet activate a prior pipeline. Confidence: near-total in exact prepared-byte and saved-forecast preservation, meaning hashes/arithmetic on verified records. Lower to high if independent migration changes a prepared value or frozen forecast. Operational completion and predictive improvement remain unproved.
+
+## Prior verified executable scorer recovery (preserved history)
+
 Goal ACTIVE. This increment adds an executable scoring recovery package. It does not activate rollback, change a model, fit a candidate, prepare new inputs or publish a forecast. Existing infrastructure and statistical requirements remain open as mapped in requirements.json.
 
 Actual Linux verification at 2026-09-22T18:06:37Z, host checkout 6f05b52fabedb2a233b8073ebe4ea487a5296833: a package for release f2d26f3a66eb986cea8c05e49ca0d00c25e8e974eb4b8abd72a9eaf9ea9982cd restored the exact scorer import closure from a109bcf73129380a8126fdbdb295a041dc60bde1, with the release's own fit and calibration. All 16 saved forecasts, contribution tables and WHY outputs reproduced exactly. All 52 original lock/grade records retained their hashes. Nine candidate fault tests passed under service uid 1000, CPython 3.12.2 and NumPy 1.26.4. Work occurred in temporary host storage, with no active pointer change or production write.

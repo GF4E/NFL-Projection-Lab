@@ -141,6 +141,7 @@ def run(mode, host):
             closed=closeout(publish_artifacts)
             if closed['state'] != 'PUBLISHED': return closed
             result=run_weekly()
+            if result.get('state')=='REFIT_COMPLETE':prepare_v3()
             publish_projection(require_synced_entries=True);report()
             return {**result,'commit':publish_artifacts()}
         from engine.game_card_runtime import sync as sync_cards
@@ -208,6 +209,7 @@ def run(mode, host):
                 closed=closeout(publish_artifacts)
                 weekly=run_weekly() if closed['state']=='PUBLISHED' else closed
                 if weekly.get('state')=='REFIT_COMPLETE':
+                    if (ROOT/'work/projection-v3/fit-ref.json').exists():prepare_v3()
                     publish_projection(require_synced_entries=True)
                     report()
         commit = publish_artifacts()

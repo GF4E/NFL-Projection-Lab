@@ -7,6 +7,7 @@ from engine.projection_v3.card import make_card
 from engine.projection.train import paired
 from engine.projection.distribution import pmf,quantile,integer
 from engine.projection_v3.personnel import NAMES
+from engine.projection.prepared import load as load_current_prepared
 
 def run():
  w=ROOT/'work/projection-v3';record=read(json.loads((w/'record-ref.json').read_text()));artifact=read(record['fit']);shapes=read(artifact['shapes']);prepared,_,_=load_prepared();rows=prepared['none'];v2=read(json.loads((ROOT/'work/projection-v2/record-ref.json').read_text()))
@@ -14,7 +15,7 @@ def run():
  numeric={}
  for name,rec in [('v2',v2),('v3',record)]:
   f=read(rec['fit']);s=read(f['shapes'])['margin'];mass=pmf(s,0);mean=sum(v*p for v,p in mass.items());numeric[name]={'version':f['version'],'residual_mean':mean,'residual_median':quantile(mass,.5),'home_share_at_zero_score_margin':sum(p for v,p in mass.items() if v>0)+mass.get(0,0)/2,'tie_mass_at_zero_margin':mass.get(0,0),'observations':s['n'],'center_rounding':'nearest integer, half away from zero','centered':False,'semantics':'home_win_probability = P(home score margin > 0) + 0.5 P(margin = 0); not outright win probability'}
- current=json.loads(gzip.decompress((w/'current-features.json.gz').read_bytes()));pair=paired(current)['2026_01_BAL_IND'];game={**pair['home']['game'],'kickoff_at':'2026-09-13T17:00:00+00:00','cutoff_at':'2026-09-13T15:45:00+00:00'};now=dt.datetime.now(dt.timezone.utc);card=make_card(game,pair,artifact,shapes,now.isoformat(),evidence='RETROSPECTIVE');card['status']='DIAGNOSTIC_NOT_ISSUED';cardref=save('bal-ind-diagnostic',card)
+ current=load_current_prepared(ROOT)[0];pair=paired(current)['2026_01_BAL_IND'];game={**pair['home']['game'],'kickoff_at':'2026-09-13T17:00:00+00:00','cutoff_at':'2026-09-13T15:45:00+00:00'};now=dt.datetime.now(dt.timezone.utc);card=make_card(game,pair,artifact,shapes,now.isoformat(),evidence='RETROSPECTIVE');card['status']='DIAGNOSTIC_NOT_ISSUED';cardref=save('bal-ind-diagnostic',card)
  groups=collections.defaultdict(lambda:{'away':0.,'home':0.})
  for side in ['away','home']:
   for c in card['contributions'][side]:groups[c['group']][side]+=c['points']

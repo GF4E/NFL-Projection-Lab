@@ -22,7 +22,7 @@ PROTECTED = ('game_id','season','week','home','away','kickoff_at','cutoff_at','v
              'issued_at','evidence','projection','contributions','why','personnel','forecast',
              'fit_artifact_ref','fit_sha256','calibration_ref','probability_semantics')
 CODE_PATHS = (
-    'engine/projection/bundle.py', 'engine/projection/scoring.py',
+    'engine/projection/bundle.py', 'engine/projection/scoring.py', 'engine/projection/prepared.py',
     'engine/projection/scoring_process.py', 'scripts/projection_score_worker.py',
     'engine/projection/lineage.py','engine/projection/storage.py',
     'engine/projection/model.py','engine/projection/card.py','engine/projection/grade.py',

@@ -99,7 +99,11 @@
         "host-recovery-candidate.json (candidate code in memory; isolated fixtures)",
         "engine/projection/source_archive.py (prospective lossless storage; prior records unchanged)",
         "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)",
-        "scripts/projection_backup.py; tests/test_projection_backup.py (immutable accepted receipt, last-good preservation, local duplicate-run lock)"
+        "scripts/projection_backup.py; tests/test_projection_backup.py (immutable accepted receipt, last-good preservation, local duplicate-run lock)",
+        "engine/projection/prepared.py; tests/test_projection_prepared.py (immutable preparation transaction, same-fit validation, local writer exclusion and historical snapshot reads)",
+        "scripts/cloud_scheduler.py; tests/test_projection_prepared.py (executed learning-mode fixture: closeout, refit, matching preparation, publication)",
+        "prepared-input-capture.json; prepared-parity.json (48 captured cards and 32 simulated fresh cards; prepared bytes and 52 frozen records preserved)",
+        "host-prepared-candidate.json (19 actual-runtime tmpfs fixtures; 544 snapshot rows, 16 restored executable forecasts, 52 frozen records unchanged; deployment pending)"
       ]
     },
     {
@@ -153,7 +157,11 @@
         "host-bundle-verification.json (scheduled 16-card exact reproduction; source hashes/fit/release verified; 52 original records unchanged; source remote verified)",
         "engine/projection/executable.py; tests/test_projection_executable.py (complete scorer import closure, bound fit/calibration, restored execution and fail-closed runtime/input compatibility)",
         "host-executable-verification.json (actual Linux tmpfs restoration: 9 fixtures, 16 exact saved forecasts, 52 frozen hashes unchanged; no production activation)",
-        "outputs/projection-v3/executables/89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2.json.gz (verified scorer package; native runtime fingerprinted, not archived; full pipeline rollback pending)"
+        "outputs/projection-v3/executables/89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2.json.gz (verified scorer package; native runtime fingerprinted, not archived; full pipeline rollback pending)",
+        "engine/projection/prepared.py; tests/test_projection_prepared.py (immutable preparation transaction, same-fit validation, local writer exclusion and historical snapshot reads)",
+        "scripts/cloud_scheduler.py; tests/test_projection_prepared.py (executed learning-mode fixture: closeout, refit, matching preparation, publication)",
+        "prepared-input-capture.json; prepared-parity.json (48 captured cards and 32 simulated fresh cards; prepared bytes and 52 frozen records preserved)",
+        "host-prepared-candidate.json (19 actual-runtime tmpfs fixtures; 544 snapshot rows, 16 restored executable forecasts, 52 frozen records unchanged; deployment pending)"
       ]
     },
     {
@@ -224,7 +232,11 @@
         "host-verification.json (d00ed366 checkout, unchanged fit)",
         "host-recovery-tests.json (29 isolated tests under service identity)",
         "observed-tuesday-refit.json (scheduled weight-only w3 refit observed; does not prove public closeout or experiment cycle)",
-        "observed-tuesday-closeout.json (independent artifact/commit hashes and acknowledgment-before-refit check; public Season/experiment/review still unproved)"
+        "observed-tuesday-closeout.json (independent artifact/commit hashes and acknowledgment-before-refit check; public Season/experiment/review still unproved)",
+        "engine/projection/prepared.py; tests/test_projection_prepared.py (immutable preparation transaction, same-fit validation, local writer exclusion and historical snapshot reads)",
+        "scripts/cloud_scheduler.py; tests/test_projection_prepared.py (executed learning-mode fixture: closeout, refit, matching preparation, publication)",
+        "prepared-input-capture.json; prepared-parity.json (48 captured cards and 32 simulated fresh cards; prepared bytes and 52 frozen records preserved)",
+        "host-prepared-candidate.json (19 actual-runtime tmpfs fixtures; 544 snapshot rows, 16 restored executable forecasts, 52 frozen records unchanged; deployment pending)"
       ]
     },
     {
@@ -269,7 +281,11 @@
         "backup-restore.json (71-second Mac committed-record restoration; not executable production rollback or full-machine recovery)",
         "engine/projection/executable.py; tests/test_projection_executable.py (complete scorer import closure, bound fit/calibration, restored execution and fail-closed runtime/input compatibility)",
         "host-executable-verification.json (actual Linux tmpfs restoration: 9 fixtures, 16 exact saved forecasts, 52 frozen hashes unchanged; no production activation)",
-        "outputs/projection-v3/executables/89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2.json.gz (verified scorer package; native runtime fingerprinted, not archived; full pipeline rollback pending)"
+        "outputs/projection-v3/executables/89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2.json.gz (verified scorer package; native runtime fingerprinted, not archived; full pipeline rollback pending)",
+        "engine/projection/prepared.py; tests/test_projection_prepared.py (immutable preparation transaction, same-fit validation, local writer exclusion and historical snapshot reads)",
+        "scripts/cloud_scheduler.py; tests/test_projection_prepared.py (executed learning-mode fixture: closeout, refit, matching preparation, publication)",
+        "prepared-input-capture.json; prepared-parity.json (48 captured cards and 32 simulated fresh cards; prepared bytes and 52 frozen records preserved)",
+        "host-prepared-candidate.json (19 actual-runtime tmpfs fixtures; 544 snapshot rows, 16 restored executable forecasts, 52 frozen records unchanged; deployment pending)"
       ]
     },
     {

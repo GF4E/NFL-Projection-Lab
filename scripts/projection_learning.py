@@ -9,6 +9,7 @@ from engine.projection_v3.model import fit
 from engine.projection.grade import grade
 from engine.projection.distribution import summarize
 from scripts.projection_publish import save
+from engine.projection import prepared
 OUT=ROOT/'outputs/in-season-learning-v1';WORK=ROOT/'work/in-season-learning-v1'
 
 def pinned(name,value):
@@ -45,7 +46,7 @@ def active_artifact_with_ref():
 def active_artifact():
  return active_artifact_with_ref()[1]
 
-def current_rows():return json.loads(gzip.decompress((ROOT/'work/projection-v3/current-features.json.gz').read_bytes()))
+def current_rows():return prepared.load(ROOT)[0]
 
 def feature_snapshot(pair):
  result={}
@@ -77,7 +78,7 @@ def due_week(rows,now):
   if local>=deadline:due.append(week)
  return max(due) if due else None
 
-def weekly_refit(rows,previous_week,now):
+def _weekly_refit(rows,previous_week,now):
  receipt=OUT/'refits'/f'2026-w{previous_week+1}.json'
  if receipt.exists():
   result=json.loads(receipt.read_text())
@@ -95,6 +96,9 @@ def weekly_refit(rows,previous_week,now):
  updated=copy.deepcopy(a);updated['fit']=fit(training,a['groups'],a['selected'][1]);updated['parent_version']=a['version'];updated['version']=f'projection-v1.w{previous_week+1}' if not a.get('learning_method') else f"{a.get('version_prefix','projection-v2')}.w{previous_week+1}";updated['through_week']=previous_week;updated['issued_at']=now.isoformat();ref=pinned('fit',updated)
  result={'state':'REFIT_COMPLETE','version':updated['version'],'fit':ref,'parent_version':a['version'],'through_week':previous_week,'issued_at':now.isoformat(),'training_rows':len(training),'settings':a['selected'],'groups':a['groups']}
  save(receipt,result,True);save(WORK/'active-fit-ref.json',ref);return result
+
+def weekly_refit(rows,previous_week,now):
+ with prepared.writer(ROOT):return _weekly_refit(rows,previous_week,now)
 
 def closeout_for_refit(week,season,now):
  from scripts.closeout_publish import require_published
