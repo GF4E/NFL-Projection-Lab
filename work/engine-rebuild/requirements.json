@@ -97,8 +97,13 @@
         "bundle-parity.json"
       ],
       "acceptance": "All consumers resolve exact hashes; typed football-only worker; labels isolated; compatible rollback; frozen records retained",
-      "state": "INCOMPLETE",
-      "observed_evidence": []
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "engine/projection/lineage.py (exact fit/calibration references only)",
+        "tests/test_projection_lineage.py",
+        "publisher-lineage-parity.json",
+        "legacy-calibration-map.json (reconstruction; does not prove original envelope)"
+      ]
     },
     {
       "id": "6",

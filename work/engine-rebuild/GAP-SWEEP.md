@@ -22,3 +22,7 @@ This is the infrastructure/adoption sweep, before implementation. Each experimen
 | Reviewer responses | External prerequisite | Prepare identical evidence packets; no invented approval or unauthorized messages. Does not stop infrastructure. |
 
 Sources: adopted specification; engine/projection_experiments.py; scripts/projection_publish.py; engine/forecast_system/calendar.py; current host block/device inspection; primary retry/data-processing sources in RESEARCH-REVIEW.md. REVIEW REQUESTED Tier 2 choices will be repeated at the top of the corresponding release report.
+
+## Exact-reference migration convention
+
+REVIEW REQUESTED — Tier 2: old cards without artifact references may use the frozen adoption-time legacy registry only when all hash-verified matching envelopes identify exactly one fit body and one calibration. A recorded fit-body hash is mandatory where the version contains different bodies. If the original card lacks a body hash, the unique fit association is explicitly LEGACY_UNIQUE_FIT_RECONSTRUCTION; original reference remains NOT_RECORDED. Ambiguity fails closed. Alternative not taken: disable all legacy edit locks even where the component identity is uniquely recoverable. This changes no numbers, expands no model and does not rewrite any existing lock or first grade. New cards always bind an exact envelope and calibration reference; incomplete references cannot downgrade to legacy lookup. Sources: source artifact inventory and the specification's preservation/exact-lineage requirements.

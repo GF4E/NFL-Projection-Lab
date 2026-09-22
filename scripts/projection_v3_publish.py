@@ -10,17 +10,11 @@ from engine.projection.train import paired
 from engine.projection.grade import score
 from engine.projection.distribution import summarize
 from engine.forecast_system.calendar import schedule_kickoff
+from engine.projection.lineage import bind,calibration_for
 OUT=ROOT/'outputs/projection-v3';WORK=ROOT/'work/projection-v3'
 
 def shape_for(card,artifact):
- for version in ['v3','v2','v1','learning']:
-  for path in sorted((ROOT/('work/in-season-learning-v1' if version=='learning' else f'work/projection-{version}')).glob('fit-*.json')):
-   if path.name=='fit-ref.json':continue
-   a=json.loads(path.read_text())
-   if a.get('version')==card['version']:
-    if path.stem.rsplit('-',1)[1]!=hashlib.sha256(path.read_bytes()).hexdigest():raise ValueError('Frozen fit hash mismatch')
-    return read(a['shapes'])
- raise ValueError('Frozen distribution version unavailable')
+ return calibration_for(card,ROOT)[0]
 
 def lock_card(card,entry,shapes,cutoff):
  card=copy.deepcopy(card)
@@ -33,8 +27,8 @@ def lock_card(card,entry,shapes,cutoff):
  card.update(status='LOCKED',freeze_time=cutoff.isoformat());return card
 
 def run(now=None,require_synced_entries=False):
- from scripts.projection_learning import active_artifact,feature_snapshot,trajectories
- now=now or dt.datetime.now(dt.timezone.utc);artifact=active_artifact()
+ from scripts.projection_learning import active_artifact_with_ref,feature_snapshot,trajectories
+ now=now or dt.datetime.now(dt.timezone.utc);artifact_ref,artifact=active_artifact_with_ref()
  if artifact.get('elo_hfa') and json.loads((WORK/'current-ref.json').read_text()).get('elo_hfa')!=artifact['elo_hfa']:raise ValueError('Active fit and prepared HFA method differ')
  shapes=read(artifact['shapes']);rows=json.loads(gzip.decompress((WORK/'current-features.json.gz').read_bytes()));groups=paired(rows)
  final_path=OUT/'final-feed.json';finals=json.loads(final_path.read_text()).get('games',{}) if final_path.exists() else {}
@@ -53,14 +47,15 @@ def run(now=None,require_synced_entries=False):
     cards.append({'game_id':gid,'week':week,'season':int(g['season']),'home':pair['home']['team'],'away':pair['away']['team'],'kickoff_at':g['kickoff_at'],'cutoff_at':g['cutoff_at'],'status':'MISSED','reason':'No pre-lock projection recorded','version':artifact['version'],'projection':None});continue
    if require_synced_entries and (not cache.get('synced_at') or stamp(cache['synced_at'])<cutoff):
     card=copy.deepcopy(prior);card['lock_pending']='Awaiting shared entry synchronization';cards.append(card);continue
-   card=lock_card(prior,entry,shape_for(prior,artifact),cutoff);save(lockpath,card,True)
+   frozen_shapes,resolution=calibration_for(prior,ROOT)
+   card=lock_card(prior,entry,frozen_shapes,cutoff);card['calibration_lineage']=resolution;save(lockpath,card,True)
   else:
    forecast=forecasts.get(gid);qualified=forecast and str(g.get('roof','')).lower() in ('outdoors','open') and stamp(forecast['received_at'])<=now and stamp(forecast['forecast_issued_at'])<=stamp(forecast['request_at'])<=stamp(forecast['received_at'])
    card=make_card(g,pair,artifact,shapes,now.isoformat(),forecast if qualified else None,entry)
    card['learning_features']=feature_snapshot(pair)
    if qualified:
     for side in ['home','away']:card['learning_features'][side]['features']['wind']=forecast['wind_mph']
-   card['fit_sha256']=hashlib.sha256(json.dumps(artifact['fit'],sort_keys=True,separators=(',',':')).encode()).hexdigest()
+   card=bind(card,artifact_ref,artifact)
    prior=json.loads(livepath.read_text()) if livepath.exists() else None
    if prior and {k:v for k,v in prior.items() if k!='issued_at'}=={k:v for k,v in card.items() if k!='issued_at'}:card['issued_at']=prior['issued_at']
    save(livepath,card)

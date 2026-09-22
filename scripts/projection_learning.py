@@ -37,9 +37,13 @@ def initialize():
   if '_coverage_' in k:reference[k]=covered[k]
  save(WORK/'reference.json',{'metrics':reference,'oof':exp['oof'],'games':len(cards),'coverage_games':sum(c['season']>2016 for c in cards),'version':a['version']},True)
 
-def active_artifact():
+def active_artifact_with_ref():
  refpath=WORK/'active-fit-ref.json'
- return read(json.loads((refpath if refpath.exists() else WORK/'baseline-ref.json').read_text()))
+ ref=json.loads((refpath if refpath.exists() else WORK/'baseline-ref.json').read_text())
+ return ref,read(ref)
+
+def active_artifact():
+ return active_artifact_with_ref()[1]
 
 def current_rows():return json.loads(gzip.decompress((ROOT/'work/projection-v3/current-features.json.gz').read_bytes()))
 
