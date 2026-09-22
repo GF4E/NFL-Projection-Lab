@@ -17,3 +17,13 @@ Confidence: high in the limited claim that the tested storage primitive preserve
 Host verification at 2026-09-22T05:48:38Z: foundation commit is an ancestor of host 51b7278d, tracked files clean, active fit hash verified unchanged, root free bytes 157,798,400. Exact-reference increment was not yet pushed at that inspection. Receipt: host-verification.json.
 
 Closeout recovery increment: immutable checkpoint resume and confirmed source-remote receipt acknowledgment implemented. Direct weekly refit and monthly scan enforce that acknowledgment for new receipts. Ten closeout and three harvest tests pass, plus 89 projection tests after integration. Public-site verification, bounded recovery policy and the independent watchdog remain incomplete. Exact-reference code was pushed as d6e2bf9abda70b0bc137d5a33f271e71a6263d40.
+
+## Verified checkpoint: 2026-09-21 Pacific
+
+All three implementation commits were pushed and their remote hashes verified: 9c8a88e061b5b3d319b539473209559881e2011d (foundation), d6e2bf9abda70b0bc137d5a33f271e71a6263d40 (exact fit/calibration), d00ed3667c819d040a5820550433878552ac4c0e (closeout recovery). At 2026-09-22T05:56:51Z the actual service checkout was d00ed366, tracked files were clean, active fit f7fc497e verified unchanged, and 155,566,080 root bytes were free. At 05:58:10Z all 29 storage/lineage/closeout tests passed under nflengine and /opt/nfl-runtime/env/bin/python using temporary files and mocked remote publication. This is not an observed Tuesday closeout or public-site deployment test.
+
+Applicable local suites total 327 passing tests (89 projection, 218 Week 1, 3 cadence, 4 HFA, 10 closeout, 3 harvest); dependent suites were rerun when the corresponding code changed. Goal stays ACTIVE. No statistical fit, candidate decision or prediction-accuracy improvement was claimed. Provider spending: zero new paid requests.
+
+Next implementation: bounded recovery state machine and workflow ownership/checkpoints, complete immutable forecast/release contract, outside watchdog and measured operational targets. Numerical three-cutoff replay, installed cadence, statistical registration/decisions, review and verified end-to-end/public/live-cycle evidence remain required. Storage volume/migration approval remains pending; no capacity purchase or record deletion occurred. The requirement matrix deliberately remains partial/incomplete.
+
+Least certain: sustained disk headroom; temporary cleanup has not demonstrated durable capacity or a restored backup. Confidence remains high only for the tested lineage, calendar and parity findings; it drops to medium if the live system uses an unverified path outside these tested functions. Prediction improvement and full recovery readiness remain unproved.
