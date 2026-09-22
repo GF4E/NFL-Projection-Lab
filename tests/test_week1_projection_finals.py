@@ -19,10 +19,13 @@ class FinalsTests(unittest.TestCase):
             p=Path(tmp)/'outputs/projection-v3/final-feed.json';before=p.read_bytes()
             def fail():raise OSError('offline')
             later=now+dt.timedelta(seconds=61)
-            self.assertEqual(refresh(tmp,later,fail)['state'],'RETRY_NEXT_TICK')
+            failed=refresh(tmp,later,fail)
+            self.assertEqual(failed['state'],'RETRY_NEXT_TICK')
             self.assertEqual(p.read_bytes(),before)
-            self.assertEqual(refresh(tmp,later,lambda:RAW)['state'],'REFRESHED')
-            self.assertEqual(refresh(tmp,later,fail)['state'],'FRESH')
+            self.assertEqual(refresh(tmp,later,lambda:self.fail('retry before backoff'))['state'],'DEGRADED')
+            retry=dt.datetime.fromisoformat(failed['next_attempt_at'])
+            self.assertEqual(refresh(tmp,retry,lambda:RAW)['state'],'REFRESHED')
+            self.assertEqual(refresh(tmp,retry,fail)['state'],'FRESH')
 
     def test_grade_is_create_only_and_does_not_change_projection_or_lock(self):
         with tempfile.TemporaryDirectory() as tmp:
