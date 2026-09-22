@@ -96,10 +96,20 @@ def weekly_refit(rows,previous_week,now):
  result={'state':'REFIT_COMPLETE','version':updated['version'],'fit':ref,'parent_version':a['version'],'through_week':previous_week,'issued_at':now.isoformat(),'training_rows':len(training),'settings':a['selected'],'groups':a['groups']}
  save(receipt,result,True);save(WORK/'active-fit-ref.json',ref);return result
 
+def closeout_for_refit(week,season,now):
+ from scripts.closeout_publish import require_published
+ local=now.astimezone(ZoneInfo('America/Los_Angeles'))
+ tuesday=local.date()-dt.timedelta(days=(local.weekday()-1)%7)
+ receipt=ROOT/'outputs/cadence-v2/closeouts'/f'{tuesday}.json'
+ if not receipt.exists():return False
+ closed=require_published(ROOT,receipt,now)
+ return closed['week']==week and closed['season']==season
+
 def run_weekly(now=None):
  initialize();now=now or dt.datetime.now(dt.timezone.utc);rows=current_rows();week=due_week(rows,now)
  if week is None:return {'state':'NOT_DUE'}
  if week>=18:return {'state':'SEASON_COMPLETE'}
+ if not closeout_for_refit(week,max(r['season'] for r in rows),now):return {'state':'WAITING_FOR_PUBLISHED_CLOSEOUT','through_week':week}
  result=weekly_refit(rows,week,now)
  if result['state']=='REFIT_COMPLETE':
   result['improvement']={'state':'METHOD_PROMOTION_DISABLED','reason':'Registered experiment release decision required; automatic loop is weight-only.'}

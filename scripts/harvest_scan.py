@@ -21,6 +21,8 @@ def closeout_ready(root,now):
   for name,h in artifacts.items():
    p=(root/name).resolve()
    if not p.is_relative_to(root.resolve()) or hashlib.sha256(p.read_bytes()).hexdigest()!=h:return False,'CLOSEOUT_HASH_MISMATCH'
+  from scripts.closeout_publish import require_published
+  require_published(root,receipt,now)
  except (ValueError,KeyError,OSError):return False,'INVALID_CLOSEOUT_RECEIPT'
  return True,'READY'
 

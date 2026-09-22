@@ -59,7 +59,10 @@
       "state": "PARTIAL",
       "observed_evidence": [
         "storage-plan.json (authority pending)",
-        "cache-recovery.json (temporary capacity only)"
+        "cache-recovery.json (temporary capacity only)",
+        "scripts/closeout_publish.py (checkpoint/acknowledgment; source repository only)",
+        "tests-closeout-recovery.log",
+        "tests-harvest-dependency.log"
       ]
     },
     {
@@ -74,7 +77,10 @@
       "observed_evidence": [
         "engine/projection/storage.py",
         "tests/test_projection_storage.py",
-        "host-storage-canary.json (9 disposable-host tests; workflow transaction pending)"
+        "host-storage-canary.json (9 disposable-host tests; workflow transaction pending)",
+        "scripts/closeout_publish.py (checkpoint/acknowledgment; source repository only)",
+        "tests-closeout-recovery.log",
+        "tests-harvest-dependency.log"
       ]
     },
     {
@@ -166,7 +172,10 @@
       "acceptance": "No experiment before published complete closeout; weight-only refit; one method; truthful INCONCLUSIVE/missed slot; real reviewer evidence",
       "state": "PARTIAL",
       "observed_evidence": [
-        "work/projection-governance-v2/queue.json (order adopted; scheduling still incomplete)"
+        "work/projection-governance-v2/queue.json (order adopted; scheduling still incomplete)",
+        "scripts/closeout_publish.py (checkpoint/acknowledgment; source repository only)",
+        "tests-closeout-recovery.log",
+        "tests-harvest-dependency.log"
       ]
     },
     {

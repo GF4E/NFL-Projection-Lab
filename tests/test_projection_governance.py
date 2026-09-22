@@ -25,7 +25,7 @@ class GovernanceTests(unittest.TestCase):
             self.assertEqual(legacy.propose(1,dt.datetime.now(dt.timezone.utc))['state'],'METHOD_PROMOTION_DISABLED')
 
     def test_weekly_runner_never_calls_method_proposal(self):
-        with patch.object(runtime,'initialize'),patch.object(runtime,'current_rows',return_value=[]),patch.object(runtime,'due_week',return_value=1),patch.object(runtime,'weekly_refit',return_value={'state':'REFIT_COMPLETE'}),patch.object(runtime,'save'),patch.object(legacy,'propose',side_effect=AssertionError('automatic promotion path called')):
+        with patch.object(runtime,'initialize'),patch.object(runtime,'current_rows',return_value=[{'season':2026}]),patch.object(runtime,'due_week',return_value=1),patch.object(runtime,'closeout_for_refit',return_value=True),patch.object(runtime,'weekly_refit',return_value={'state':'REFIT_COMPLETE'}),patch.object(runtime,'save'),patch.object(legacy,'propose',side_effect=AssertionError('automatic promotion path called')):
             r=runtime.run_weekly()
             self.assertEqual(r['improvement']['state'],'METHOD_PROMOTION_DISABLED')
 
