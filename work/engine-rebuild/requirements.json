@@ -62,7 +62,11 @@
         "cache-recovery.json (temporary capacity only)",
         "scripts/closeout_publish.py (checkpoint/acknowledgment; source repository only)",
         "tests-closeout-recovery.log",
-        "tests-harvest-dependency.log"
+        "tests-harvest-dependency.log",
+        "engine/projection/recovery.py (bounded public final-feed workflow)",
+        "scripts/projection_final_repair.py (explicit fenced repair)",
+        "tests-projection-recovery.log",
+        "host-recovery-candidate.json (candidate code in memory; isolated fixtures)"
       ]
     },
     {
@@ -82,7 +86,11 @@
         "tests-closeout-recovery.log",
         "tests-harvest-dependency.log",
         "host-verification.json (d00ed366 checkout, unchanged fit)",
-        "host-recovery-tests.json (29 isolated tests under service identity)"
+        "host-recovery-tests.json (29 isolated tests under service identity)",
+        "engine/projection/recovery.py (bounded public final-feed workflow)",
+        "scripts/projection_final_repair.py (explicit fenced repair)",
+        "tests-projection-recovery.log",
+        "host-recovery-candidate.json (candidate code in memory; isolated fixtures)"
       ]
     },
     {
@@ -207,7 +215,11 @@
       "observed_evidence": [
         "host-storage-canary.json (storage primitive only)",
         "host-verification.json (d00ed366 checkout, unchanged fit)",
-        "host-recovery-tests.json (29 isolated tests under service identity)"
+        "host-recovery-tests.json (29 isolated tests under service identity)",
+        "engine/projection/recovery.py (bounded public final-feed workflow)",
+        "scripts/projection_final_repair.py (explicit fenced repair)",
+        "tests-projection-recovery.log",
+        "host-recovery-candidate.json (candidate code in memory; isolated fixtures)"
       ]
     },
     {
@@ -219,8 +231,10 @@
         "completion-audit.json"
       ],
       "acceptance": "Every requirement verified; simulated vs observed explicit; reliability and achieved accuracy separate; remaining human dependencies named",
-      "state": "INCOMPLETE",
-      "observed_evidence": []
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "RUNBOOK.md (implemented operations and explicit limitations)"
+      ]
     }
   ]
 }

@@ -182,7 +182,7 @@ def run(mode, host):
         # Every capture tick retries finals independently of hourly model preparation.
         from engine.projection.finals import refresh as refresh_finals
         final_status=refresh_finals(ROOT)
-        if final_status['state']=='RETRY_NEXT_TICK':
+        if final_status['state'] not in ('FRESH','REFRESHED'):
             print(json.dumps(final_status),flush=True)
         if (ROOT/'work/projection-v1/fit-ref.json').exists():
             if mode == 'daily':
@@ -219,7 +219,8 @@ def run(mode, host):
         if previous.get('hour') != hour:
             print(json.dumps({'state': 'HEARTBEAT', 'host': host, 'hour': hour}), flush=True)
         heartbeat.write_text(json.dumps({'hour': hour, 'host': host, 'commit': commit}))
-        return {'state': 'OK', 'mode': mode, 'commit': commit}
+        return {'state': 'OK' if final_status['state'] in ('FRESH','REFRESHED') else 'DEGRADED',
+                'mode': mode, 'commit': commit,'projection_final_feed':final_status}
 
 
 def main():
