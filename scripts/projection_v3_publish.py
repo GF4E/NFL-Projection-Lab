@@ -15,6 +15,7 @@ from engine.projection.scoring import prepare_pair
 from engine.projection.scoring_process import score_batch
 from engine.projection.bundle import release_for,attach,verify_card
 from engine.projection.prepared import load as load_prepared_state
+from engine.projection import cutoff_publication
 OUT=ROOT/'outputs/projection-v3';WORK=ROOT/'work/projection-v3'
 
 def shape_for(card,artifact):
@@ -41,14 +42,23 @@ def run(now=None,require_synced_entries=False):
  legacy_path=ROOT/'outputs/projection-v2/board.json';legacy={g['game_id']:g for g in json.loads(legacy_path.read_text())['games']} if legacy_path.exists() else {}
  fp=ROOT/'outputs/projection-v1/forecast.json';forecasts=json.loads(fp.read_text()) if fp.exists() else {};ep=ROOT/'.cloud-private/projection-entries.json';cache=json.loads(ep.read_text()) if ep.exists() else {};entries=cache.get('entries',[]);colors=json.loads((ROOT/'config/game_card_team_colors.json').read_text());cards=[]
  # One label-free batch. Completed rows, private edits and raw sources never enter the worker.
- latest_week=min(18,max([int(r['week']) for r in rows if r.get('actual_points') is not None]+[1])+1)
- requests={};qualified_forecasts={}
+ latest_week=prepared_manifest.get('publication_week',min(18,max([int(r['week']) for r in rows if r.get('actual_points') is not None]+[1])+1))
+ cutoff_refs=prepared_manifest.get('cutoff_preparations',{})
+ if prepared_manifest.get('cutoff_mode') not in (None,'RECORDED_CUTOFF_V1') or bool(cutoff_refs)!=bool(prepared_manifest.get('cutoff_mode')):
+  raise ValueError('Incomplete or unknown cutoff preparation mode')
+ lock_verification={};requests={};qualified_forecasts={};cutoff_calculations={};cutoff_cache={};cutoff_times={};cutoff_forecasts={}
  for gid,pair in sorted(groups.items()):
   g=pair['home']['game'];kickoff=schedule_kickoff(g['gameday'],g['gametime']);cutoff=kickoff-dt.timedelta(minutes=75);old=legacy.get(gid)
   if int(g['week'])>latest_week or now>=cutoff or (OUT/'locks'/f'{gid}.json').exists() or (old and (old['status'] in ('LOCKED','FINAL') or old.get('evidence')=='RETROSPECTIVE')):continue
+  if prepared_manifest.get('cutoff_mode'):
+   if gid not in cutoff_refs:raise ValueError('Cutoff manifest lacks current forecast game')
+   value,reference,issued_at=cutoff_publication.calculation(ROOT,cutoff_refs[gid],artifact_ref,pair,cutoff_cache)
+   cutoff_forecasts[gid]=reference;cutoff_times[gid]=issued_at;cutoff_calculations[gid]=value
+   requests[gid]=value['input'];qualified_forecasts[gid]=None;continue
   forecast=forecasts.get(gid);qualified=forecast and str(g.get('roof','')).lower() in ('outdoors','open') and stamp(forecast['received_at'])<=now and stamp(forecast['forecast_issued_at'])<=stamp(forecast['request_at'])<=stamp(forecast['received_at'])
   qualified_forecasts[gid]=forecast if qualified else None;requests[gid]=prepare_pair(pair,qualified_forecasts[gid])
- calculations=score_batch(artifact,shapes,list(requests.values()))
+ calculations=score_batch(artifact,shapes,[r for gid,r in requests.items() if gid not in cutoff_calculations])
+ calculations.update(cutoff_calculations)
  release_ref=release_for(ROOT,artifact_ref,artifact) if requests else None
  for gid,pair in sorted(groups.items()):
   g=copy.deepcopy(pair['home']['game']);week=int(g['week'])
@@ -59,15 +69,19 @@ def run(now=None,require_synced_entries=False):
   elif old and (old['status'] in ('LOCKED','FINAL') or old.get('evidence')=='RETROSPECTIVE'):card=copy.deepcopy(old)
   elif now>=cutoff:
    prior=json.loads(livepath.read_text()) if livepath.exists() else old
-   if not prior or not prior.get('projection') or stamp(prior['issued_at'])>=cutoff:
-    cards.append({'game_id':gid,'week':week,'season':int(g['season']),'home':pair['home']['team'],'away':pair['away']['team'],'kickoff_at':g['kickoff_at'],'cutoff_at':g['cutoff_at'],'status':'MISSED','reason':'No pre-lock projection recorded','version':artifact['version'],'projection':None});continue
+   if not prior or not prior.get('projection') or stamp(prior['issued_at'])>=cutoff or prior.get('forecast_role')=='PROVISIONAL' or (prepared_manifest.get('cutoff_mode') and not prior.get('cutoff_forecast_ref')):
+    cards.append({'game_id':gid,'week':week,'season':int(g['season']),'home':pair['home']['team'],'away':pair['away']['team'],'kickoff_at':g['kickoff_at'],'cutoff_at':g['cutoff_at'],'status':'MISSED','reason':'No final-eligible cutoff projection recorded' if prepared_manifest.get('cutoff_mode') or (prior and prior.get('forecast_role')) else 'No pre-lock projection recorded','version':artifact['version'],'projection':None});continue
    if require_synced_entries and (not cache.get('synced_at') or stamp(cache['synced_at'])<cutoff):
     card=copy.deepcopy(prior);card['lock_pending']='Awaiting shared entry synchronization';cards.append(card);continue
    frozen_shapes,resolution=calibration_for(prior,ROOT)
+   cutoff_publication.before_lock(ROOT,prior,cache=lock_verification)
    card=lock_card(prior,entry,frozen_shapes,cutoff);card['calibration_lineage']=resolution;save(lockpath,card,True)
   else:
    forecast=qualified_forecasts[gid];qualified=forecast is not None
-   card=make_card(g,pair,artifact,shapes,now.isoformat(),forecast,entry,calculation=calculations[gid])
+   role=calculations[gid]['role'] if gid in cutoff_forecasts else None
+   card=make_card(g,pair,artifact,shapes,cutoff_times.get(gid,now.isoformat()),forecast,entry,
+                  evidence='PROVISIONAL' if role=='PROVISIONAL' else 'AS_ISSUED',calculation=calculations[gid])
+   if role:card.update(cutoff_forecast_ref=cutoff_forecasts[gid],forecast_role=role)
    card['learning_features']=feature_snapshot(pair)
    if qualified:
     for side in ['home','away']:card['learning_features'][side]['features']['wind']=forecast['wind_mph']
@@ -78,6 +92,7 @@ def run(now=None,require_synced_entries=False):
    if prior and prior.get('release_ref')==release_ref and {k:v for k,v in prior.items() if k not in identity_ignored}=={k:v for k,v in card.items() if k not in identity_ignored}:
     card=prior
    else:card=attach(ROOT,card,requests[gid],release_ref,prepared_manifest)
+   if role:cutoff_publication.issuance_receipt(ROOT,card)
    save(livepath,card)
   from engine.projection.finals import grade_once
   result=finals.get(gid) or ({'away_score':float(g['away_score']),'home_score':float(g['home_score'])} if final else None)

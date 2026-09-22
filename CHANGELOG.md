@@ -18,6 +18,12 @@ Verification: 4 new export/boundary tests, 33 existing projection tests, 218 sta
 
 # Projection change log
 
+## 2026-09-22 — explicit cutoff contract reaches the actual publisher
+
+Infrastructure only; no live selector, statistical promotion, active fit or calibration change. Connect explicit recorded preparations to actual card/bundle publication, original-source verification before first lock, immutable first grading and board evidence. A predeadline calculation needs a separately durable predeadline card receipt. Provisional cards cannot lock, incomplete mappings cannot revert to legacy, and stripped bundle references cannot downgrade a cutoff record to legacy. Original frozen records retain their original contracts. New immutable source dependencies join the existing scheduler publication graph.
+
+The final verification attempt exposed repeated full-slate reconstruction at first lock and reached its 570-second harness limit. Preserve the failed source/log; reuse verified reconstruction only within one publisher call, with per-forecast/receipt checks and no timeout relaxation. Verification and source-hash scope: work/engine-rebuild/CUTOFF-PUBLICATION.md. Final source passes 275 projection tests, 218 Week 1 checks and 10 closeout checks. Linux passes 36 targeted fixtures and the 14-game actual consumer canary in 189.818 seconds with synthetic finals and 52 original records unchanged. First-lock publication falls from a measured 380.895 to 41.246 seconds after batching, with per-forecast/receipt validation retained. Final source/consumer hashes match the qualified receipt. No improved accuracy or completed live cycle is claimed. Automatic selection, full compatible rollback, capacity and current-reference migration remain unfinished. Provider requests/spending: zero.
+
 ## 2026-09-22 — common shadow pipeline and corrected hourly replay
 
 Infrastructure/chronology qualification; no registered method, active fit, calibration or control promotion. Add common label-free preparation, isolated scoring, explicit preview/final/reconstruction roles, immutable shadow-lock reconciliation and retained-feature weight-only refitting. Closeout acknowledgment is verified for source-repository publication only; public-surface qualification is still required. New fits have separate start, computation and durable-availability clocks and are not labeled issued. Lost calculation/operation acknowledgments reuse the original fit and inputs.

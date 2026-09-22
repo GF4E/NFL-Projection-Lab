@@ -35,3 +35,7 @@ September 22 common numerical pipeline: implement role-aware preparation from ex
 ## Next increment: source reconstruction
 
 Retain exact render inputs; verify recorded schedule availability and reconstruct prepared rows before scoring/first lock. Exercise hash-valid feature, metadata, schedule and source tampering, later revisions, and all captured-slate parity cases. Preserve previous canary/replay evidence under its original hashes. This closes the recorded preparation gap; actual publisher activation and complete lifecycle acceptance remain separate required work.
+
+## Actual issuer integration increment
+
+Connect an explicit cutoff preparation adapter to the existing immutable prepared snapshot. Route those snapshots through the actual publisher, protected forecast bundle, predeadline issuance receipt and first-grade reader. Execute the real publisher on isolated fixtures, including preview rejection and late bundle rejection. Keep the live state selector inactive until the complete corrected release qualifies; do not claim full activation from this integration test.

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "<stdin>", line 5, in <module>
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/check_cutoff_publisher.py", line 85, in verify
+    assert all(c['projection']==expected[c['game_id']]['projection'] for c in upcoming['games'])
+AssertionError

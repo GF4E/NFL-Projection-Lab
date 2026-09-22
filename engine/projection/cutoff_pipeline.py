@@ -321,12 +321,15 @@ def load(root,ref,kind):
     return json.loads(gzip.decompress(data))
 
 
-def recorded_scores(root,preparation_ref,fit_ref):
+def recorded_scores(root,preparation_ref,fit_ref,*,purpose='SHADOW_NOT_ISSUED'):
     from .lineage import read_artifact
     from pathlib import Path
     import json
     from .storage import save
-    key=cutoff_state.sha({'preparation_ref':preparation_ref,'fit_ref':fit_ref})
+    if purpose not in ('SHADOW_NOT_ISSUED','ISSUER_PREPARATION'):raise ValueError('Explicit scoring purpose required')
+    identity={'preparation_ref':preparation_ref,'fit_ref':fit_ref}
+    if purpose!='SHADOW_NOT_ISSUED':identity['purpose']=purpose
+    key=cutoff_state.sha(identity)
     operation_path=Path(root)/BASE/'score-operations'/(key+'.json')
     if operation_path.exists():
         saved=json.loads(operation_path.read_bytes())
@@ -349,7 +352,7 @@ def recorded_scores(root,preparation_ref,fit_ref):
     refs={}
     for gid,f in forecasts.items():
         ref=store(root,'forecasts',{**f,'fit_ref':fit_ref,'preparation_ref':preparation_ref,
-               'status':'SHADOW_NOT_ISSUED','uncertainty_provenance':'UNCHANGED_LEGACY_CALIBRATION'})
+               'status':purpose,'uncertainty_provenance':'UNCHANGED_LEGACY_CALIBRATION'})
         # This clock is read after the immutable forecast is durably stored.
         completed=now()
         receipt={'forecast_ref':ref,'started_at':started.isoformat(),'completed_at':completed.isoformat(),
@@ -392,16 +395,20 @@ def fit_available_at(root,ref,artifact=None):
     return completed
 
 
-def verify_forecast(root,forecast_ref):
-    """Reconcile stored values with exact retained inputs before first lock."""
+def verify_forecast(root,forecast_ref,*,cache=None):
+    """Reconcile exact retained inputs; cache only within one fenced caller run."""
     import json
     from pathlib import Path
     from .lineage import read_artifact
     forecast=load(root,forecast_ref,'forecasts')
     prepared=load(root,forecast['preparation_ref'],'preparations')
     artifact=read_fit(root,forecast['fit_ref'])
-    verify_preparation(root,prepared)
-    expected=score(prepared,artifact,read_artifact(root,artifact['shapes']))[forecast['game_id']]
+    key=(str(Path(root).resolve()),forecast['preparation_ref']['sha256'],forecast['fit_ref']['sha256'])
+    cache={} if cache is None else cache
+    if key not in cache:
+        verify_preparation(root,prepared)
+        cache[key]=score(prepared,artifact,read_artifact(root,artifact['shapes']))
+    expected=cache[key][forecast['game_id']]
     if any(forecast.get(k)!=v for k,v in expected.items()):raise ValueError('Stored forecast differs from its preparation/fit')
     if prepared['state']['method']['elo_hfa']!=artifact.get('elo_hfa'):raise ValueError('Forecast state/fit differs')
     if fit_available_at(root,forecast['fit_ref'],artifact)>timestamp(prepared['prepared_at']):raise ValueError('Fit unavailable at preparation time')

@@ -170,6 +170,8 @@ def grade_once(card, path, result, root=None):
     if path.exists():
         existing=json.loads(path.read_text()); verify_card(root,existing); return existing
     if card.get('grades') or not result or not card.get('projection'): return card
+    if card.get('cutoff_forecast_ref') and card['status']!='LOCKED':
+        raise ValueError('Cutoff forecast must lock before first grade')
     graded=finish(card,result['away_score'],result['home_score'])
     save(path,graded,True)
     return graded
