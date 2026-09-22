@@ -71,7 +71,8 @@
         "cache-recovery-2026-09-22T0637.json (112 regenerable cache files only)",
         "log-rotation-2026-09-22.json (nine prior log sequences preserved; no oldest archive retired)",
         "engine/projection/source_archive.py (prospective lossless storage; prior records unchanged)",
-        "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)"
+        "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)",
+        "host-source-archive-verification.json (installed code, scheduled HEALTHY reader and downstream source reads; legacy CSV reuse, first fresh compressed production record not yet observed)"
       ]
     },
     {
@@ -254,7 +255,8 @@
         "host-bundle-candidate.json (service-user/runtime fixtures, tmpfs only; no live canary yet)",
         "host-bundle-verification.json (actual scheduled publication; no public-site equality claim)",
         "engine/projection/source_archive.py (prospective lossless storage; prior records unchanged)",
-        "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)"
+        "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)",
+        "host-source-archive-verification.json (installed code, scheduled HEALTHY reader and downstream source reads; legacy CSV reuse, first fresh compressed production record not yet observed)"
       ]
     },
     {
