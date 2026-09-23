@@ -16,6 +16,10 @@ The supervised calibration CLI retains native execution request/start/result/rec
 
 Historical failed/invalidated trials outside the declared catalog, other experiment runners and unrecorded prior human views are not claimed complete. No prospective comparison was registered or started. Its frozen update policies, eligible population and review dates remain to be declared separately. Requirement 10b is PARTIAL, not complete.
 
+## Installed host verification
+
+Code commit 68fb35eecd8f2ed969e0e04db580dca34cae84f6 is pushed to engine-v2. After ordinary scheduler commits were merged without force, actual host commit 9304a11a290533db6fced7f16c34720b44cd433c contains it. Under UID 1000, all five changed research implementation files match their tested hashes and all 29 imported events/snapshots verify. Active fit remains 801ef079. Host verification observed 4,124,205,056 root-available bytes and 5,239,693,312 artifact-volume-available bytes; this is a current sample, not sustained capacity qualification. See research-ledger/host-installed.json.
+
 ## Verification and retained failures
 
 Local: 10 ledger plus 88 calibration tests pass. Tests include simultaneous duplicate dispatch, failed commit and lost response, changed operation payload, corrupt evidence, path escape, explicit views, native failed-attempt mirroring and no-refit report recovery. The initial local calibration failure was a CLI fixture mocking the old boundary; the fixture now mocks the new wrapper for its exit-code test while the real wrapper has a dedicated retained-failure test. Preserve both logs.
