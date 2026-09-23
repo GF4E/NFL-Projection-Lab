@@ -1,4 +1,5 @@
 import {readBoardV7} from '../src/server/board-v7';
+import {closeoutResponse} from '../src/server/projection-closeout';
 import {readTrend} from '../src/server/projection-trend';
 import {projectionEntry} from '../src/server/projection-entry';
 import {readProjection,refreshProjection} from '../src/server/projection-board';
@@ -87,6 +88,7 @@ async function handleNflverseRequest(request: Request, env: Env): Promise<Respon
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    if(url.pathname.startsWith('/api/closeout/'))return closeoutResponse(request);
     if(url.pathname==='/api/board-v7'){if(request.method!=='GET')return json({error:'Read only'},405);try{return json(await readBoardV7(env.DB));}catch{return json({error:'Board temporarily unavailable'},503);}}
     if(url.pathname==='/api/projection-trend'){if(request.method!=='GET')return json({error:'Read only'},405);try{return json(await readTrend());}catch{return json({error:'Trend temporarily unavailable'},503);}}
     if (url.pathname === '/api/projection-entry' || url.pathname === '/api/projection-entry/sync') return projectionEntry(request,env);

@@ -1,5 +1,5 @@
 import {it,expect,vi,afterEach} from 'vitest';import {webcrypto,createHash} from 'node:crypto';import {readBookTable} from '../src/server/board-v8-market';import {books} from './board-v8-fixture';
-const canon=(x:any):any=>Array.isArray(x)?x.map(canon):x&&typeof x==='object'?Object.fromEntries(Object.entries(x).sort(([a],[b])=>a<b?-1:a>b?1:0).map(([k,v])=>[k,canon(v)])):x;
+const canon=(x:unknown):unknown=>Array.isArray(x)?x.map(canon):x&&typeof x==='object'?Object.fromEntries(Object.entries(x).sort(([a],[b])=>a<b?-1:a>b?1:0).map(([k,v])=>[k,canon(v)])):x;
 afterEach(()=>vi.unstubAllGlobals());
 it('accepts a pinned display table and rejects tampered values',async()=>{vi.stubGlobal('crypto',webcrypto);const {content_sha256,...body}=books;const good={...body,content_sha256:createHash('sha256').update(JSON.stringify(canon(body))).digest('hex')};vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:true,json:async()=>good}));expect((await readBookTable())?.games.final.book).toBe('Caesars');good.games.final={...good.games.final,total:77};expect(await readBookTable()).toBeNull();});
 it('absent book export fails to a missing comparison, never a substitute',async()=>{vi.stubGlobal('fetch',vi.fn().mockResolvedValue({ok:false}));expect(await readBookTable()).toBeNull();});
