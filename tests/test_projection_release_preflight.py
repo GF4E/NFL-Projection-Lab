@@ -58,6 +58,15 @@ class ReleasePreflightTests(unittest.TestCase):
         self.assertEqual(checks['EXTERNAL_REVIEW_Claude'],'NOT_RECORDED')
         self.assertEqual(checks['EXTERNAL_REVIEW_Dr. M'],'NOT_RECORDED')
         self.assertEqual(checks['LIVE_TRANSITION'],'NOT_INSTALLED')
+        for c in report['checks']:
+            if c['name'].startswith('EXTERNAL_REVIEW_'):self.assertFalse(c['blocks_initial_chronology_work'])
+
+    def test_pointer_presence_is_not_verified_activation(self):
+        self.put('outputs/projection-v3/pipeline-releases/active.json',{})
+        self.put('work/projection-weekly-refit-v1/configuration.json',{})
+        report=self.check()
+        self.assertEqual(next(c['status'] for c in report['checks'] if c['name']=='LIVE_TRANSITION'),'NOT_VERIFIED')
+        self.assertFalse(report['activation'])
 
     def test_changed_evidence_rejected_without_rehashing(self):
         (self.root/'consumer.json').write_text('{}')

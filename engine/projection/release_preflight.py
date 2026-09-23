@@ -113,8 +113,13 @@ def check(root, packet_ref, *, runtime_manifest=None):
         add('CURRENT_RUNTIME','PASS',consumer['runtime_manifest_sha256'])
     # This increment deliberately has no self-issued approval/activation route.
     for reviewer in ('Claude','Dr. M'):
-        add('EXTERNAL_REVIEW_'+reviewer,'NOT_RECORDED','Actual decision on this packet and its listed conventions is required; no decision is inferred')
-    add('LIVE_TRANSITION','NOT_INSTALLED','Enforced operator transition, qualified bootstrap and actual issuing/public provenance remain required')
+        add('EXTERNAL_REVIEW_'+reviewer,'NOT_RECORDED','Tier 2 review requested; no decision inferred. Not a new permission stop for authorized chronology work; actual method-promotion reviews remain mandatory')
+        checks[-1]['blocks_initial_chronology_work']=False
+    installed={name:(root/path).is_file() for name,path in {
+        'pipeline_manifest':'outputs/projection-v3/pipeline-releases/active.json',
+        'weekly_refit':'work/projection-weekly-refit-v1/configuration.json'}.items()}
+    add('LIVE_TRANSITION','NOT_VERIFIED' if all(installed.values()) else 'NOT_INSTALLED',
+        {'installed':installed,'remaining':'Enforced operator transition, qualified bootstrap and actual issuing/public provenance'})
     return {'schema':'initial-release-preflight-v1','status':'BLOCKED','packet_ref':packet_ref,
             'checks':checks,'activation':False,'control_authority_changed':False,'provider_requests':0,
             'scope':'Read-only evidence binding; not an experiment, approval, runtime switch or production readiness certificate'}
