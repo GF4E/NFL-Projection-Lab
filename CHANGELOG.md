@@ -1,3 +1,7 @@
+## 2026-09-23 — restore exact live board bytes and monitor verification
+
+Infrastructure lane: website main 81a8faab7 preserves raw JSON through a bounded lossless cache and response; build-only mirror 19f0704a5, Sites version 209. Existing legacy cache is preserved; byte-verifying responses fail closed without qualified raw data. Real Worker/D1 and anonymous droplet checks agree exactly; monitor now VERIFIED, with only storage headroom qualification outstanding. 373 full website tests plus final 11 focused checks, typecheck, lint and build pass. No numerical model or gate change. See work/engine-rebuild/BOARD-BYTES.md. Confidence: high in publication integrity; lower to medium on independent hash disagreement.
+
 ## 2026-09-23 — qualify anonymous closeout transport
 
 CONVENTIONS, Tier 1: select the installed standard curl client for the already-public Sites endpoint after service-account exact-byte verification. No credentials, audience change, redirects, or integrity relaxation. Preserve status/size/time/hash checks; pin client metadata in new proof. 130 tests pass. The monitor now reaches the board and correctly identifies a separate JSON reserialization/content-hash mismatch, with unchanged decoded scores; preserve this finding for the next publication repair. No fit, control promotion or experiment activation. See work/engine-rebuild/PUBLIC-TRANSPORT.md. Confidence: high in the transport diagnosis; lower to medium on independent hash disagreement.

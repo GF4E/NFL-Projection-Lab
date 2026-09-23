@@ -1,3 +1,7 @@
+# Latest checkpoint — exact live board bytes verified
+
+Goal ACTIVE. Website main 81a8faab7 / mirror 19f0704a5 / Sites 209 preserves original JSON bytes in a bounded lossless cache. Anonymous droplet reads exactly match source and provenance; installed Mac observer reports VERIFIED. Only active monitor finding is STORAGE_HEADROOM_UNQUALIFIED. See BOARD-BYTES.md. Next: measure actual growth/peak-write reserve, qualify research runtime, then corrected issuing/control authority and cadence prerequisites. No real registration, candidate fit or statistical promotion. Conditional-mean semantics, actual reviews, prospective evidence and full observed cycle remain open.
+
 # Latest checkpoint — unattended closeout transport qualified
 
 Goal ACTIVE. Actual service account anonymously verified all three frozen Week 2 closeout files using installed curl; the existing site audience is public. 130 tests pass; no auth or audience changes. Endpoint config and proof transport are installed at source 0aedcfea4; the real service account created an immutable exact-byte Week 2 public acknowledgment at 17:50Z, with prepared metadata unchanged. The board monitor now exposes a different failure: 11,285 JSON numeric representation changes break the content hash despite equal decoded values. See PUBLIC-TRANSPORT.md and public-board-digest-diagnosis.json. Next: exact-byte website/cache repair, then runtime/control dependencies. No real calibration fit, corrected-control promotion or model activation. All remaining full-goal acceptance items stay open.
