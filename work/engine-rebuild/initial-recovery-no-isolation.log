@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/mnt/nfl-engine-profiles/source-recovery-76f840b0/restored_consumer.py", line 20, in <module>
+    if os.readlink('/proc/self/ns/'+kind)==expected['namespaces'][kind]:raise ValueError('Namespace isolation absent')
+                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Namespace isolation absent
