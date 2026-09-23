@@ -1,3 +1,9 @@
+# Latest checkpoint — runtime and source restored; isolated consumer running
+
+Goal ACTIVE. Runtime tree restoration passes in 414.358 seconds (27,481 exact entries); standalone source commit 1c34bd80e is restored and verified in 382.212 seconds (12,990 files / 2,949,738,715 bytes, no remotes/alternates). The original incomplete restore remains preserved. Actual Linux namespace-refusal test passes before scoring.
+
+The named host unit nfl-restored-consumer-20260923 runs the actual restored interpreter and pinned source in read-only mount/network isolation under the unchanged 570-second ceiling. Initial parity reproduces all 16 saved forecasts and 32 first grades. Full lifecycle and independent outside-namespace acceptance are still pending; do not relaunch while the unit is active. See EXECUTABLE-RUNTIME-PLAN.md and RUNTIME-RESTORE-CONTINUATION.md. No numerical activation, control transfer or provider spending. All statistical/reviewer/live-cycle requirements remain open.
+
 # Latest checkpoint — volume lifecycle passed; runtime tree recovery in qualification
 
 Goal ACTIVE. Attempt4 completes the captured 2,927-game/16-game-slate lifecycle in 432.239 seconds on the approved volume, under the unchanged 570-second deadline. All 52 original records are preserved. Observed file-allocation peak is 36,229,120 bytes; this is not a complete durable headroom reserve. See STORAGE-PROFILE-COMPLETE.md and exact JSON evidence.
