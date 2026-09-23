@@ -1,7 +1,7 @@
-"""Checked, same-fit preparation-mode transitions; no statistical promotion.
+"""Checked preparation and recorded weight-only transitions; no method promotion.
 
-No active manifest is installed by importing this module. General code/fit
-rollback and the activated weekly-refit handoff still require qualification.
+No active manifest is installed by importing this module. General code/runtime
+rollback and the weekly scheduler handoff still require qualification.
 """
 import datetime as dt
 import fcntl
@@ -9,7 +9,7 @@ import json
 from pathlib import Path
 import re
 
-from . import bundle, prepared
+from . import bundle, prepared, refit_release
 from .lineage import read_artifact
 from .model import hash_value
 from .storage import save
@@ -18,9 +18,11 @@ BASE = 'outputs/projection-v3/pipeline-releases'
 ACTIVE = BASE + '/active.json'
 OPERATION = BASE + '/operation.json'
 OWNER = 'work/cloud-migration-v1/ownership.json'
+FIT_POINTER = 'work/in-season-learning-v1/active-fit-ref.json'
 EXTRA_CODE = ('scripts/cloud_scheduler.py', 'engine/projection/pipeline_release.py',
               'engine/projection/finals.py', 'engine/projection/source_archive.py',
-              'scripts/board_v7_publish.py', 'scripts/board_v9_publish.py')
+              'scripts/board_v7_publish.py', 'scripts/board_v9_publish.py',
+              'engine/projection/refit_release.py')
 
 
 def source(root):
@@ -88,6 +90,8 @@ def validate(root, manifest, *, reconstruct=False):
     if source(root) != manifest['code']:
         raise ValueError('Pipeline code or runtime identity differs')
     artifact = read_artifact(root, manifest['fit_ref'])
+    if artifact.get('recorded_refit_ref'):
+        refit_release.verify(root,manifest['fit_ref'])
     read_artifact(root, manifest['calibration_ref'])
     if artifact['shapes'] != manifest['calibration_ref'] or hash_value(artifact['fit']) != manifest['fit_sha256']:
         raise ValueError('Pipeline fit/calibration differs')
@@ -99,11 +103,11 @@ def validate(root, manifest, *, reconstruct=False):
     if manifest['mode'] == 'SCHEDULED':
         config = selection.configuration(root, manifest['configuration_ref'])
         current = worker.configuration(root, config['owner'])
-        if current != config or config['fit_ref'] != manifest['fit_ref']:
+        if current != config or config['method'] != cutoff_state.method(root, manifest['fit_ref']):
             raise ValueError('Pipeline state configuration differs')
         for ref in {r['sha256']: r for r in metadata['cutoff_preparations'].values()}.values():
             body = pipeline.load(root, ref, 'preparations')
-            if cutoff_state.read(root, body['state']['state_ref'])['fit_ref'] != manifest['fit_ref']:
+            if cutoff_state.read(root, body['state']['state_ref'])['method'] != config['method']:
                 raise ValueError('Pipeline prepared state fit differs')
             if reconstruct:
                 pipeline.verify_preparation(root, body)
@@ -112,13 +116,13 @@ def validate(root, manifest, *, reconstruct=False):
     return metadata
 
 
-def checkpoint(root, *, label):
+def checkpoint(root, *, label, prepared_ref=None):
     """Retain the current compatible checkpoint. Caller owns writer and fence."""
     from . import cutoff_selection as selection
-    rows, metadata, _ = prepared.load(root)
+    rows, metadata, _ = prepared.load(root, ref=prepared_ref)
     if not metadata.get('prepared_manifest_ref'):
         raise ValueError('Immutable prepared checkpoint required')
-    ref = prepared.active_fit(root); artifact = read_artifact(root, ref)
+    ref = metadata['fit']; artifact = read_artifact(root, ref)
     selected = mode(metadata)
     config_ref = selection.retain_configuration(root)[0] if selected == 'SCHEDULED' else None
     manifest = {'schema': 'projection-pipeline-release-v1', 'mode': selected,
@@ -126,7 +130,7 @@ def checkpoint(root, *, label):
                 'fit_sha256': hash_value(artifact['fit']), 'configuration_ref': config_ref,
                 'prepared_ref': metadata['prepared_manifest_ref'], 'label': label,
                 'publication_games':publication_games(rows,metadata),
-                'scope': 'Same-fit preparation transition; code/runtime changes and weekly refit handoff require separate qualification'}
+                'scope': 'Same-runtime preparation and recorded weight-only transitions; executable/runtime changes require separate qualification'}
     validate(root, manifest, reconstruct=True)
     return store(root, 'manifests', manifest)
 
@@ -180,8 +184,15 @@ def switch(root, target, *, owner, operation_id, expected_active):
                 raise ValueError('Release owner differs')
             manifest = read(root, target, 'manifests')
             metadata = validate(root, manifest, reconstruct=True)
-            if prepared.active_fit(root) != manifest['fit_ref']:
-                raise ValueError('Cross-fit rollback requires qualified release handoff')
+            current_fit = prepared.active_fit(root)
+            if current_fit != manifest['fit_ref']:
+                refit_release.linked(root,current_fit,manifest['fit_ref'])
+                # At least one side must bind a verified recorded refit; arbitrary
+                # numerically compatible artifacts cannot use this handoff.
+                candidates=[r for r in (current_fit,manifest['fit_ref'])
+                            if read_artifact(root,r).get('recorded_refit_ref')]
+                if not candidates:raise ValueError('Cross-fit release requires a recorded refit')
+                for candidate in candidates:refit_release.verify(root,candidate)
             current_rows,current_metadata,_=prepared.load(root)
             if not set(publication_games(current_rows,current_metadata))<=set(manifest['publication_games']):
                 raise ValueError('Rollback would omit current publication games; prepare a compatible checkpoint')
@@ -197,7 +208,8 @@ def switch(root, target, *, owner, operation_id, expected_active):
                 if not pending or pending['intent_ref'] != old:
                     if pending != intent['previous_operation']:
                         raise ValueError('Release operation superseded; cannot replay old switch')
-                    if prepared.current(root)!=intent['prepared_before'] or pointer(root,ACTIVE)!=expected_active:
+                    if (prepared.current(root)!=intent['prepared_before'] or pointer(root,ACTIVE)!=expected_active
+                            or current_fit!=intent.get('fit_before',manifest['fit_ref'])):
                         raise ValueError('Release changed before pending intent acknowledgment')
                     save(root / OPERATION, {'intent_ref': old})
                 elif pending.get('receipt_ref'):
@@ -210,7 +222,7 @@ def switch(root, target, *, owner, operation_id, expected_active):
                 if pointer(root, ACTIVE) != expected_active:
                     raise ValueError('Release compare-and-swap failed')
                 before = prepared.current(root)
-                intent = {**request, 'prepared_before': before, 'previous_operation':pending,
+                intent = {**request, 'prepared_before': before, 'fit_before':current_fit, 'previous_operation':pending,
                           'started_at': dt.datetime.now(dt.timezone.utc).isoformat()}
                 old = store(root, 'intents', intent)
                 save(root / id_path, old, immutable=True)
@@ -220,8 +232,11 @@ def switch(root, target, *, owner, operation_id, expected_active):
                 raise ValueError('Preparation changed outside release transaction')
             if pointer(root, ACTIVE) not in (expected_active, target):
                 raise ValueError('Active release changed outside transaction')
+            if prepared.active_fit(root) not in (intent.get('fit_before',manifest['fit_ref']),manifest['fit_ref']):
+                raise ValueError('Active fit changed outside release transaction')
             if pointer(root, OWNER) != fence:
                 raise ValueError('Release fence changed during verification')
+            save(root / FIT_POINTER, manifest['fit_ref'])
             save(root / prepared.POINTER, metadata)
             save(root / ACTIVE, target)
             receipt = store(root, 'receipts', {'intent_ref': old, 'state': 'COMMITTED', 'target': target})

@@ -1,3 +1,13 @@
+# Current increment — recorded weight-only release staging and rollback
+
+Goal ACTIVE. Previous goal turn made progress (train/test contract and membership audit); this increment adds real code for the remaining fit/preparation release handoff. State identity now binds the unchanged method separately from score coefficients. Recorded completed fits become exact immutable issuing envelopes, upcoming preparations are staged and scored without changing active pointers, and the journal switches/recovers fit, preparation and release together. Forward/rollback must follow verified recorded ancestry; changes to method/calibration/penalty fail.
+
+Final local checks: 570 pass (342 projection, 218 Week 1, 10 closeout). Actual Linux service-runtime verification: 25 tests PASS, 17.118 seconds, 49,827,840 peak parent RSS bytes. Source hashes match local code. Actual publisher fixture uses changed coefficients and original bundles verify after rollback. All host writes isolated in /dev/shm; no live fit/mode/timer activation. Root free bytes at read-only inspection: 82,542,592. New spending/provider calls: zero. REFIT-HANDOFF.md records scope, failed assertion evidence and full remaining requirements.
+
+Next: wire the actual weekly dispatch to the recorded refitter and staged transaction with published-closeout proof; run a captured-data complete refit/release/lock/grade/rollback canary. Do not narrow remaining general runtime rollback, capacity, public Season/closeout identity, own-lineage calibration and venue gates, reviews, prospective evaluation or observed-live-cycle requirements. The weekly scheduler still refuses an activated pipeline refit, so no unattended completion is claimed.
+
+Confidence: medium in operational readiness, meaning verified evidence exists but real scheduler/publication integration remains consequential. Lower to low if a captured/live consumer bypasses the journal or changes a frozen record. Predictive improvement remains unproved.
+
 # Current increment — explicit train/validation/test contract
 
 Goal ACTIVE. Prompt revision 7 binds chronological supervised evaluation against completed NFL team scores, with past-only inner validation and later test games kept out of their own fits. The independent saved-replay audit passes 2,639 games / 5,278 team targets, 175 fits and 274,174 membership checks; five focused fixtures pass. See TRAIN-TEST.md. This is non-authoritative historical development evidence, not a new fit, promotion, full feature-vintage qualification or pristine holdout. Requirement 10c remains PARTIAL pending full-pipeline and prospective acceptance.

@@ -1,0 +1,20 @@
+.........................................................................................................................................................................................................................F.......................................................................................evaluated elo
+evaluated elo
+...........................{"state": "DEGRADED", "codes": ["HOST_OBSERVER_UNREACHABLE", "PUBLIC_ACCESS_UNQUALIFIED"], "recovered": []}
+..{"state": "DEGRADED", "codes": ["HOST_OBSERVER_UNREACHABLE", "PUBLIC_ACCESS_UNQUALIFIED"], "recovered": []}
+........
+======================================================================
+FAIL: test_actual_publisher_uses_new_coefficients_and_preserves_bundle_on_rollback (test_projection_refit_release.RefitReleaseTests.test_actual_publisher_uses_new_coefficients_and_preserves_bundle_on_rollback)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_refit_release.py", line 122, in test_actual_publisher_uses_new_coefficients_and_preserves_bundle_on_rollback
+    self.assertEqual(card['fit_sha256'],p.cutoff_state.sha(self.shadow['fit']))
+AssertionError: 'f9d5f3552e12cc2d1151823ce9f00ae8c54742acb037ee2c52f7d2526898059e' != '2aff41e994484ad782e490796a00faf3e6b38ad5861b1ffe599843cf277ea48d'
+- f9d5f3552e12cc2d1151823ce9f00ae8c54742acb037ee2c52f7d2526898059e
++ 2aff41e994484ad782e490796a00faf3e6b38ad5861b1ffe599843cf277ea48d
+
+
+----------------------------------------------------------------------
+Ran 342 tests in 47.873s
+
+FAILED (failures=1)

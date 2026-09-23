@@ -57,3 +57,7 @@ Training qualification retains failed host attempts, separates the Mac and Linux
 ## Explicit train/validation/test requirement
 
 Apply prompt revision 7 section 10: supervised prediction of known completed-game team scores with past-only training, chronological inner validation and later test games. Keep both teams grouped. Preserve production weekly updates and distinguish sequential testing from a frozen-season holdout. Save exact memberships and test errors; complete full-pipeline leakage checks and the prospective comparison before claiming independent confirmation. TRAIN-TEST.md verifies saved replay memberships only; requirement 10c remains PARTIAL. No candidate, gate, population or active fit changes.
+
+## Recorded weight-only handoff increment
+
+Implement REFIT-HANDOFF.md: exact parent-method/calibration preservation; immutable issuing envelope from a completed recorded fit; staged actual preparation/scoring; method-compatible state identity; ancestry-restricted fit/preparation release switches with crash recovery. Qualify on Mac and actual Linux. Then connect weekly dispatch with verified closeout and run the captured full transaction. Keep broader runtime rollback and all other adopted acceptance items open.
