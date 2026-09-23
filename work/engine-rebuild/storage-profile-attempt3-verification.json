@@ -1,0 +1,84 @@
+{
+  "checked_at": "2026-09-23T18:43:42.466420+00:00",
+  "status": "INCOMPLETE_DEADLINE",
+  "exit_code": 137,
+  "deadline_seconds": 570,
+  "checkpoint": {
+    "child_cpu_seconds": 3.200964,
+    "elapsed_seconds": 563.4299538260093,
+    "headroom_qualified": false,
+    "measurement_scope": "Observed atomic-boundary allocated files; incomplete until terminal PASS",
+    "peak_process_rss_bytes": 215416832,
+    "process_cpu_seconds": 266.955601,
+    "profile": {
+      "checkpoint_wall_seconds": 0.8924708651611581,
+      "largest_staging_bytes": 1522643,
+      "observed_namespace_operations": 294,
+      "observer_wall_seconds": 3.4310824726708233,
+      "peak_allocated_bytes": 34099200,
+      "peak_files": 283,
+      "peak_logical_bytes": 33488443,
+      "phases": {
+        "CAPTURED_STATE_READY": 15.653537824051455,
+        "FULL_RECORDED_REFIT_AND_RELEASE": 328.59242078103125,
+        "FULL_SLATE_LOCKED": 563.4135209420929,
+        "SIMULATED_CLOSEOUT_VERIFIED": 104.14868959202431
+      },
+      "sample_count": 298
+    },
+    "status": "IN_PROGRESS"
+  },
+  "isolated_locks": 16,
+  "isolated_grades": 0,
+  "source_immutable_records_unchanged": 52,
+  "active_fit_unchanged": true,
+  "retained_fixture": "/mnt/nfl-engine-profiles/storage-20260923-attempt3/work/full-lifecycle-pn6mi7vz",
+  "storage_history": {
+    "schema": "storage-measurement-summary-v1",
+    "filesystems": {
+      "root": [
+        {
+          "filesystem_id": 8218120851669157479,
+          "total_bytes": 9283444736,
+          "start": "2026-09-23T18:17:57.421473+00:00",
+          "end": "2026-09-23T18:40:06.639358+00:00",
+          "samples": 6,
+          "span_seconds": 1329.217885,
+          "gaps_over_600_seconds": [],
+          "net_consumption_bytes": -3809280,
+          "positive_sampled_depletion_bytes": 905216,
+          "daily_normalized_positive_depletion_bytes": 58839610.33220675,
+          "daily_status": "INSUFFICIENT_CONTINUOUS_DAY",
+          "rate_is_extrapolated": true,
+          "minimum_free_bytes": 4131164160,
+          "minimum_free_inodes": 1034785
+        }
+      ],
+      "artifacts": [
+        {
+          "filesystem_id": 17221713838075122595,
+          "total_bytes": 21125308416,
+          "start": "2026-09-23T18:17:57.421473+00:00",
+          "end": "2026-09-23T18:40:06.639358+00:00",
+          "samples": 6,
+          "span_seconds": 1329.217885,
+          "gaps_over_600_seconds": [],
+          "net_consumption_bytes": 35504128,
+          "positive_sampled_depletion_bytes": 35504128,
+          "daily_normalized_positive_depletion_bytes": 2307790689.40981,
+          "daily_status": "INSUFFICIENT_CONTINUOUS_DAY",
+          "rate_is_extrapolated": true,
+          "minimum_free_bytes": 16085700608,
+          "minimum_free_inodes": 637117
+        }
+      ]
+    },
+    "headroom_qualified": false,
+    "limitations": [
+      "Sampled depletion can miss writes and removals between observations.",
+      "Transient job peak, Git/restore workspace and future growth require separate evidence."
+    ]
+  },
+  "host_commit": "2d836167c20e5647e4598db201510292028a70e3",
+  "interpretation": "Partial observed peak only; no completed rollback/grading or full reserve qualification"
+}

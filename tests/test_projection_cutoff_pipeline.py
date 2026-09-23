@@ -36,6 +36,26 @@ class PipelineTests(Helpers):
         return p.from_recorded(self.root,self.state_ref,[self.target],{'stadiums':[]},at='2026-09-13T15:00:00Z',role=role,
                                schedule_ref=getattr(self,'schedule_ref',None))
 
+    def test_render_identity_is_context_local_and_never_stale_across_calls(self):
+        self.seed();state,body=cs.restore(self.root,self.state_ref)
+        context=p.state_context(body,self.state_ref)
+        games=[dict(self.target,game_id='copy'+str(i),week=2+(i%2)) for i in range(4)]
+        identity=cs.features.State.identity;calls=[]
+        def counted(value):
+            result=identity(value);calls.append(result);return result
+        before=identity(state)
+        with patch.object(cs.features.State,'identity',counted):
+            result=p.prepare(state,context,games,{'stadiums':[]},at='2026-09-13T15:00:00Z',role='PROVISIONAL')
+        self.assertEqual(len(calls),3)  # input validation plus two render contexts, not eight row hashes
+        self.assertEqual(identity(state),before)
+        self.assertEqual(len(result['rows']),8)
+        for row in result['rows']:
+            self.assertEqual(row['state_lineage']['rendered_state_sha256'],calls[1+(row['week']-2)])
+        state.elo.teams[self.target['home_team']]['elo']+=1
+        context['state_sha256']=identity(state)
+        newer=p.prepare(state,context,games,{'stadiums':[]},at='2026-09-13T15:00:00Z',role='PROVISIONAL')
+        self.assertNotEqual(newer['rows'][0]['state_lineage']['rendered_state_sha256'],result['rows'][0]['state_lineage']['rendered_state_sha256'])
+
     def test_final_preparation_matches_existing_state_rows_and_is_label_free(self):
         self.seed();body=self.prepared()
         previous=cs.forecast_rows(self.root,self.state_ref,[self.target],{'stadiums':[]})
