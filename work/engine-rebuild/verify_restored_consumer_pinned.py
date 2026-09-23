@@ -12,12 +12,12 @@ root=Path('/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6')
 base=Path(sys.argv[1]).resolve()/'consumer'
 unit_name=sys.argv[2]
 before=json.loads((base/'before.json').read_text())
-unit={}
-for line in subprocess.check_output(['systemctl','show',unit_name,
- '-p','ActiveState','-p','SubState','-p','Result','-p','ExecMainStatus','-p','MemoryPeak'],text=True).splitlines():
-    k,v=line.split('=',1);unit[k]=v
-if unit['ActiveState']!='inactive' or unit['Result']!='success' or unit['ExecMainStatus']!='0':
-    raise ValueError('Consumer is not terminal-success: '+json.dumps(unit))
+from verify_job_journal import verify as journal_verify
+invocation=sys.argv[3]
+rows=[json.loads(line) for line in subprocess.check_output(['journalctl','-u',unit_name,'-o','json','--no-pager'],text=True).splitlines()]
+terminal=journal_verify(rows,unit_name,invocation)
+unit={'ActiveState':'inactive','Result':'success','ExecMainStatus':'0',
+      'terminal_evidence':'EXACT_INVOCATION_JOURNAL','invocation_id':invocation}
 result=json.loads((base/'consumer.json').read_text())
 if result['status']!='RESTORED_CONSUMER_PASS':raise ValueError('Consumer did not pass')
 for label,path in [('original_source',root),('original_runtime',Path('/opt/nfl-runtime/env'))]:
@@ -33,11 +33,11 @@ for name,sha in result['external_native_files'].items():
 if platform.release()!=result['kernel'] or hashlib.sha256(Path('/etc/os-release').read_bytes()).hexdigest()!=result['os_release_sha256']:
     raise ValueError('Host OS identity differs')
 report={'status':'SAME_HOST_EXECUTABLE_RESTORE_VERIFIED','source_commit':result['source_commit'],
- 'runtime_manifest_sha256':result['runtime_manifest_sha256'],'unit':unit,
+ 'runtime_manifest_sha256':result['runtime_manifest_sha256'],'unit':unit,'terminal_journal':terminal,
  'original_records_and_pointers_unchanged':len(before['original_records']),
  'original_mounts_and_namespaces_unchanged':True,'external_native_files_verified':len(result['external_native_files']),
  'parity':result['parity'],'lifecycle':result['lifecycle'],
  'consumer_receipt_sha256':hashlib.sha256((base/'consumer.json').read_bytes()).hexdigest(),
  'activation':False,'whole_machine_recovery':False,'provider_requests':0,'new_spending':0}
-save(base/'accepted.json',report,immutable=True)
+save(base/'accepted-journal.json',report,immutable=True)
 print(json.dumps(report,indent=2))
