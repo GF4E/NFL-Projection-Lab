@@ -24,10 +24,14 @@ SETTINGS={'family':'EXISTING_EMPIRICAL_INTEGER','window':'PRIOR_COMPLETED_SEASON
 UNCERTAINTY={'replicates':10000,'seed':9132026,'block_weeks':3,'interval':.95,
              'estimand':'mean_game_paired_team_CRPS_control_minus_candidate',
              'sensitivities':['within_season_moving_blocks','whole_seasons','leave_one_season_out']}
+EXECUTION={'maximum_explicit_attempts':3,'lock_scope':'LOCAL_REPOSITORY',
+           'retries':'EXPLICIT_ONLY','recovery':'SEAL_RETAINED_RESULT_ONLY'}
 EVALUATOR_CODE=('engine/projection/calibration_admission.py','engine/projection/calibration_evaluate.py',
                 'engine/projection/calibration_history.py','engine/projection/distribution.py',
                 'engine/projection/model.py','engine/scoring.py','engine/projection_v3/qualify.py',
-                'engine/projection_experiments.py','engine/forecast_system/calendar.py')
+                'engine/projection_experiments.py','engine/forecast_system/calendar.py',
+                'engine/projection/calibration_execute.py','engine/projection/storage.py',
+                'scripts/projection_calibration.py')
 
 
 def environment():
@@ -69,7 +73,7 @@ def preflight(root,registration_ref,*,at):
     if (r.get('experiment')!='E-CAL-LINEAGE' or r.get('gate_policy')!=CALIBRATION_GATE
             or r.get('point_tolerance')!=POINT_TOLERANCE or r.get('candidates')!=['own_lineage_empirical']
             or r.get('gate')!=GATE or r.get('calibration_settings')!=SETTINGS
-            or r.get('uncertainty')!=UNCERTAINTY):
+            or r.get('uncertainty')!=UNCERTAINTY or r.get('execution_policy')!=EXECUTION):
         raise ValueError('Registration changes adopted calibration contract')
     if r.get('evaluation_environment')!=environment():raise ValueError('Evaluator environment changed')
     refs=r.get('evaluation_code',[])

@@ -1,0 +1,39 @@
+Collecting scoringrules==0.10.0
+  Downloading scoringrules-0.10.0-py3-none-any.whl.metadata (17 kB)
+Downloading scoringrules-0.10.0-py3-none-any.whl (95 kB)
+Installing collected packages: scoringrules
+Successfully installed scoringrules-0.10.0
+WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+{"memory_bytes": 4294967296, "oversized_allocation_rejected": true, "threads": 1}
+{"activates_method": false, "attempts": 1, "receipt": {"activates_method": false, "attempt": 1, "recorded_at": "2026-09-23T17:37:38.909990+00:00", "recovered_after_lost_response": false, "result_ref": {"path": "work/e-cal-lineage/executions/51589b21fa9b11839dbef091b0acd541aebdf866727323503efcebf5eaace463/attempts/001/result.json", "sha256": "e5e19427c02e75493ffb959f7e73a1bbdd6b82e6097ea1c846fc1c026f520dff"}, "schema": "calibration-attempt-receipt-v1", "start_sha256": "1f784ee13e91d635e14e324aae80c5338995b71e0fcc394f63a99d0f4ac964c1", "state": "COMPUTED_NOT_RELEASED"}, "registration_sha256": "51589b21fa9b11839dbef091b0acd541aebdf866727323503efcebf5eaace463"}
+{"activates_method": false, "attempts": 1, "receipt": {"activates_method": false, "attempt": 1, "recorded_at": "2026-09-23T17:37:38.909990+00:00", "recovered_after_lost_response": false, "result_ref": {"path": "work/e-cal-lineage/executions/51589b21fa9b11839dbef091b0acd541aebdf866727323503efcebf5eaace463/attempts/001/result.json", "sha256": "e5e19427c02e75493ffb959f7e73a1bbdd6b82e6097ea1c846fc1c026f520dff"}, "schema": "calibration-attempt-receipt-v1", "start_sha256": "1f784ee13e91d635e14e324aae80c5338995b71e0fcc394f63a99d0f4ac964c1", "state": "COMPUTED_NOT_RELEASED"}, "registration_sha256": "51589b21fa9b11839dbef091b0acd541aebdf866727323503efcebf5eaace463"}
+{"synthetic_timeout_exit": -9, "elapsed_seconds": 1.003210183000192}
+Traceback (most recent call last):
+  File "/mnt/nfl-calibration-canary-20260923/calibration_linux_canary.py", line 18, in <module>
+    saved=read(f.root,f.r['sha256']);assert len(saved['attempts'])==1
+                      ~~~^^^^^^^^^^
+KeyError: 'sha256'
+Command exited with non-zero status 1
+	Command being timed: "/opt/nfl-runtime/env/bin/python -B calibration_linux_canary.py"
+	User time (seconds): 2.70
+	System time (seconds): 0.47
+	Percent of CPU this job got: 61%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:05.16
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 63060
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 95
+	Minor (reclaiming a frame) page faults: 37672
+	Voluntary context switches: 483
+	Involuntary context switches: 1323
+	Swaps: 0
+	File system inputs: 39840
+	File system outputs: 600
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 1

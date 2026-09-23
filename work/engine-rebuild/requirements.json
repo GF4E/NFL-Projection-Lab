@@ -81,7 +81,7 @@
       "acceptance": "Disk/inodes/writes; bounded safe actions; idempotent work keys; uncertain-provider receipts",
       "state": "PARTIAL",
       "observed_evidence": [
-        "storage-plan.json (authority pending)",
+        "storage-plan.json (historical proposal; approved migration below supersedes pending authority)",
         "cache-recovery.json (temporary capacity only)",
         "scripts/closeout_publish.py (checkpoint/acknowledgment; source repository only)",
         "tests-closeout-recovery.log",
@@ -96,7 +96,9 @@
         "engine/projection/source_archive.py (prospective lossless storage; prior records unchanged)",
         "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)",
         "host-source-archive-verification.json (installed code, scheduled HEALTHY reader and downstream source reads; legacy CSV reuse, first fresh compressed production record not yet observed)",
-        "storage-recovery-lifecycle.json; storage-journal-vacuum.txt (authorized temporary cache/log relief; durable capacity pending)"
+        "storage-recovery-lifecycle.json; storage-journal-vacuum.txt (authorized temporary cache/log relief; durable capacity pending)",
+        "storage-migration-2026-09-23/STORAGE-MIGRATION.md (approved 20 GiB volume, full copy/restore/rollback, root recovery and two-disk monitor; growth/peak reserve not yet qualified)",
+        "CALIBRATION-EXECUTION.md; tests-calibration-execution-final.log; calibration-linux-canary-qualified.log (84 calibration fixtures, durable recovery/reporting and isolated resource limits; missing installed scoring dependency, no real E-CAL fit or activation)"
       ]
     },
     {
@@ -141,7 +143,9 @@
         "host-cutoff-publisher-final-timeout.json; cutoff-publication-timeout-source.json.gz (preserved timeout; per-invocation verification batching reduces measured first-lock stage from 381 to 41 seconds; unchanged harness/resource limits)",
         "engine/projection/cutoff_selection.py; scripts/projection_v3_prepare.py; tests/test_projection_cutoff_selection.py (exact required state and durable acknowledgment, provisional future cutoff, atomic multi-group preparation; explicit entrypoint, not activation)",
         "SCHEDULED-SELECTION.md; scheduled-publisher-canary.json; host-scheduled-publisher-canary.json (15 captured-source projections, 14 final-eligible/one preview, synthetic grading; intermediate source; final guard follow-through pending)",
-        "host-scheduled-publisher-final-canary.json; tests-scheduled-final.log (final source: 45 Linux fixtures, 15 forecasts with 14 final-eligible/one provisional, exact numerical parity, synthetic grades, 52 original frozen records preserved; 512 local tests; no activation)"
+        "host-scheduled-publisher-final-canary.json; tests-scheduled-final.log (final source: 45 Linux fixtures, 15 forecasts with 14 final-eligible/one provisional, exact numerical parity, synthetic grades, 52 original frozen records preserved; 512 local tests; no activation)",
+        "storage-migration-2026-09-23/STORAGE-MIGRATION.md (approved 20 GiB volume, full copy/restore/rollback, root recovery and two-disk monitor; growth/peak reserve not yet qualified)",
+        "CALIBRATION-EXECUTION.md; tests-calibration-execution-final.log; calibration-linux-canary-qualified.log (84 calibration fixtures, durable recovery/reporting and isolated resource limits; missing installed scoring dependency, no real E-CAL fit or activation)"
       ]
     },
     {
@@ -168,7 +172,8 @@
         "backup-restore.json; backup-receipts/cc997799946e44cb96947f98a0c91f3adc17e052d3b9a50ac307da259f7a9e20.json (actual standalone committed-snapshot restoration: 12051 entries, 16 forecasts, 32 grades; host runtime/private state excluded)",
         "engine/projection/executable.py; tests/test_projection_executable.py (complete scorer import closure, bound fit/calibration, restored execution and fail-closed runtime/input compatibility)",
         "host-executable-verification.json (actual Linux tmpfs restoration: 9 fixtures, 16 exact saved forecasts, 52 frozen hashes unchanged; no production activation)",
-        "outputs/projection-v3/executables/89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2.json.gz (verified scorer package; native runtime fingerprinted, not archived; full pipeline rollback pending)"
+        "outputs/projection-v3/executables/89ce079cce81d50b435fd547320c391c96bbf4b993dd97f08079f0619ae453c2.json.gz (verified scorer package; native runtime fingerprinted, not archived; full pipeline rollback pending)",
+        "storage-migration-2026-09-23/STORAGE-MIGRATION.md (approved 20 GiB volume, full copy/restore/rollback, root recovery and two-disk monitor; growth/peak reserve not yet qualified)"
       ]
     },
     {
@@ -376,7 +381,8 @@
         "DONOR-QUALIFICATION.md; donor-qualification-current.json; donor-qualification-independent-check.json; tests-donor-calendar.log (legacy selection reproduced and corrected; not authority transfer or E-CAL gate)",
         "CALIBRATION-INPUTS.md; calibration-inputs-current.json; calibration-inputs-independent-check.json; calibration-inputs-order-check.json; tests-calibration-inputs.log (complete 3407-game histories per method, no calibration estimated or experiment gated)",
         "CALIBRATION-ADMISSION.md; engine/projection/calibration_admission.py; tests-calibration-admission.log (18 new fixtures, 82 related tests; no real fit, registration, authority transfer or runner activation)",
-        "CALIBRATION-NUMERICS.md; engine/projection/calibration_evaluate.py; tests-calibration-numerics.log (18 added fixtures, 100 related tests; synthetic numerical/integration qualification only)"
+        "CALIBRATION-NUMERICS.md; engine/projection/calibration_evaluate.py; tests-calibration-numerics.log (18 added fixtures, 100 related tests; synthetic numerical/integration qualification only)",
+        "CALIBRATION-EXECUTION.md; tests-calibration-execution-final.log; calibration-linux-canary-qualified.log (84 calibration fixtures, durable recovery/reporting and isolated resource limits; missing installed scoring dependency, no real E-CAL fit or activation)"
       ]
     },
     {
@@ -425,7 +431,8 @@
         "public-closeout-repaired-verification.json (owner-authenticated 200s, exact hashes and matching Season release)",
         "public-closeout-host-access.json (actual host unauthenticated 403; no pipeline activation)",
         "CALIBRATION-ADMISSION.md; engine/projection/calibration_admission.py; tests-calibration-admission.log (18 new fixtures, 82 related tests; no real fit, registration, authority transfer or runner activation)",
-        "CALIBRATION-NUMERICS.md; engine/projection/calibration_evaluate.py; tests-calibration-numerics.log (18 added fixtures, 100 related tests; synthetic numerical/integration qualification only)"
+        "CALIBRATION-NUMERICS.md; engine/projection/calibration_evaluate.py; tests-calibration-numerics.log (18 added fixtures, 100 related tests; synthetic numerical/integration qualification only)",
+        "CALIBRATION-EXECUTION.md; tests-calibration-execution-final.log; calibration-linux-canary-qualified.log (84 calibration fixtures, durable recovery/reporting and isolated resource limits; missing installed scoring dependency, no real E-CAL fit or activation)"
       ]
     },
     {
@@ -532,7 +539,9 @@
         "full-lifecycle-host-attempt1.json (actual Linux UID 1000, 493.15 s, 16 locks/grades, 52 frozen hashes unchanged; simulated clocks/publication/finals)",
         "PUBLIC-CLOSEOUT.md (Worker redirect-mode failure reproduced and fixed; exact live bytes and rendered Week 2/Season verified; unattended access still unqualified)",
         "public-closeout-repaired-verification.json (owner-authenticated 200s, exact hashes and matching Season release)",
-        "public-closeout-host-access.json (actual host unauthenticated 403; no pipeline activation)"
+        "public-closeout-host-access.json (actual host unauthenticated 403; no pipeline activation)",
+        "storage-migration-2026-09-23/STORAGE-MIGRATION.md (approved 20 GiB volume, full copy/restore/rollback, root recovery and two-disk monitor; growth/peak reserve not yet qualified)",
+        "CALIBRATION-EXECUTION.md; tests-calibration-execution-final.log; calibration-linux-canary-qualified.log (84 calibration fixtures, durable recovery/reporting and isolated resource limits; missing installed scoring dependency, no real E-CAL fit or activation)"
       ]
     },
     {
@@ -568,7 +577,9 @@
         "full-lifecycle-host-attempt1.json (actual Linux UID 1000, 493.15 s, 16 locks/grades, 52 frozen hashes unchanged; simulated clocks/publication/finals)",
         "PUBLIC-CLOSEOUT.md (Worker redirect-mode failure reproduced and fixed; exact live bytes and rendered Week 2/Season verified; unattended access still unqualified)",
         "public-closeout-repaired-verification.json (owner-authenticated 200s, exact hashes and matching Season release)",
-        "public-closeout-host-access.json (actual host unauthenticated 403; no pipeline activation)"
+        "public-closeout-host-access.json (actual host unauthenticated 403; no pipeline activation)",
+        "storage-migration-2026-09-23/STORAGE-MIGRATION.md (approved 20 GiB volume, full copy/restore/rollback, root recovery and two-disk monitor; growth/peak reserve not yet qualified)",
+        "CALIBRATION-EXECUTION.md; tests-calibration-execution-final.log; calibration-linux-canary-qualified.log (84 calibration fixtures, durable recovery/reporting and isolated resource limits; missing installed scoring dependency, no real E-CAL fit or activation)"
       ]
     },
     {

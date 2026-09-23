@@ -88,7 +88,7 @@ class AdmissionTests(unittest.TestCase):
         self.r={'experiment':'E-CAL-LINEAGE','gate_policy':a.CALIBRATION_GATE,
             'point_tolerance':a.POINT_TOLERANCE,'candidates':['own_lineage_empirical'],
             'gate':copy.deepcopy(a.GATE),'calibration_settings':copy.deepcopy(a.SETTINGS),
-            'uncertainty':copy.deepcopy(a.UNCERTAINTY),
+            'uncertainty':copy.deepcopy(a.UNCERTAINTY),'execution_policy':copy.deepcopy(a.EXECUTION),
             'training_window':'prior seasons','tuning':'none','tie_break':'retain control',
             'disproving_conditions':'registered gate failure','baseline_hash':self.control_ref['sha256'],
             'week':2,'registered_at':'2026-09-22T14:00:00Z','deadline_at':'2026-09-29T13:00:00Z',
