@@ -43,3 +43,7 @@ The summary contains these measures by season as well. These are NON-AUTHORITATI
 Five additional fixtures verify hand-calculated fractional errors, CSV precision, game grouping, future-label exclusion and nonfinite prediction rejection. Independent pandas recomputation from the exported CSV agrees across all 99 pooled/annual metric cells within 4.09e-14. Missing own-lineage calibration is explicitly named; interval/CRPS metrics are not fabricated. Matched eligible-game baselines, end-to-end feature/tuning/calibration leakage tests and prospective confirmation remain required by acceptance row 10c, which remains PARTIAL.
 
 Confidence: near-total in the reported membership counts and MAE arithmetic, meaning arithmetic on verified saved rows; lower to high if an independent recomputation differs. Confidence in better future predictions is not established by this audit.
+
+## Matched descriptive baselines
+
+BASELINES.md now supplies the previously missing same-population league, venue and last-four-game score comparisons. All 2,639 replay games remain; full independent reconstruction passes. This closes that descriptive subtask, not the full feature/tuning/calibration or prospective acceptance. Historical text above is preserved as the prior checkpoint. Confidence: near-total in independently checked saved-row arithmetic; lower to high on a recomputation mismatch. No production or future-skill claim.

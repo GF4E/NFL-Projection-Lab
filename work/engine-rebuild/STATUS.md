@@ -1,3 +1,13 @@
+# Current increment — matched chronological team-score benchmarks
+
+Goal ACTIVE. User steering requires supervised train/validation/test evaluation on completed NFL game scores. The saved replay membership/row export already passes; this increment adds three pre-cutoff, same-population score benchmarks. Replay MAE 7.5747 versus prior-season league 7.9767, venue 7.9404 and last-four team scoring 8.2677 on exactly 2,639 games. No model was fitted or promoted. All figures are NON-AUTHORITATIVE_REPLAY historical development evidence; no accuracy transfer to production is claimed.
+
+Twelve new focused tests and ten existing membership/export checks pass. Independent pandas reconstruction matches all 15,834 benchmark predictions and source-history identities exactly; 649 metric/count cells agree within 1.60e-13. Preserve the initial verifier failure: source season strings required numeric normalization. Full input reordering also preserves forecasts/history hashes. Venue averaging is Tier 2 REVIEW REQUESTED with the expanding-window alternative disclosed. See BASELINES-PLAN.md and BASELINES.md.
+
+Requirement 10c remains PARTIAL: full feature/tuning/calibration leakage qualification, own-lineage calibration and prospective confirmation are not complete. The broader next task remains the immutable public closeout/Season adapter, followed by reviewed training migration and the full retained acceptance list. The prior captured operational lifecycle is already verified in simulation and need not be restarted. Durable storage approval remains pending. No website, host, active fit, gate, locked record, provider call or spending changes in this increment.
+
+Confidence: near-total in verified-row counts/error arithmetic, meaning independently recomputed arithmetic on hash-verified rows; lower to high if that independent recomputation differs. Predictive improvement remains unproved.
+
 # Current increment — full captured lifecycle and publication access discovery
 
 Goal ACTIVE. The previous goal turn made progress by retaining verified test-score evidence. This turn completes the previously missing captured-data operational canary: actual weekly entry, unmocked full training ledger/refit, stage, release, all sixteen correct-cutoff locks, parent rollback, original-bundle grading and idempotent retries. Mac passes in 58.23 seconds; actual Linux UID 1000 passes in 493.15 seconds under an external 570-second deadline, with 230,907,904 peak parent RSS bytes. All 52 original frozen records remain unchanged. Source availability, closeout HTTP response and future outcomes are explicitly simulated, so this is VERIFIED_IN_SIMULATION, not an observed live cycle or accuracy result.

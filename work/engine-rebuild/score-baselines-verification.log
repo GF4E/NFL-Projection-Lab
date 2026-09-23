@@ -1,0 +1,10 @@
+/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/verify_score_baselines.py:53: RuntimeWarning: Mean of empty slice.
+  expected = data.points.to_numpy().mean()
+/opt/anaconda3/lib/python3.12/site-packages/numpy/core/_methods.py:129: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/verify_score_baselines.py", line 114, in <module>
+    main()
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/verify_score_baselines.py", line 62, in main
+    raise ValueError('Independent history identity mismatch')
+ValueError: Independent history identity mismatch

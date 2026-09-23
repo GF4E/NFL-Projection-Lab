@@ -1,3 +1,11 @@
+## 2026-09-22 — matched chronological score benchmarks
+
+Descriptive audit only, no new fit, statistical candidate, gate or production authority change. Extend the saved NON_AUTHORITATIVE_REPLAY train/test audit with prior-season league/venue averages and the existing four-game team scoring baseline, using exactly the same 2,639 games and strictly earlier cutoff-eligible results. Full-precision predictions are compared with integer final team scores; both teams remain grouped.
+
+CONVENTIONS: prior-season league mean follows the September 21 audit; last-four follows scripts/e1_evaluate.py. Tier 2 REVIEW REQUESTED: prior-season non-neutral venue role means, league mean for neutral targets; expanding venue history is the disclosed alternative. BASELINES-PLAN.md records choices before results. No window search or model selection. Missing histories never silently shrink the test population.
+
+Replay team MAE 7.5747; league 7.9767; venue 7.9404; last-four 8.2677. These reused historical results do not establish production or future skill. Twelve new tests plus ten existing audit checks pass; independent source reconstruction checks 15,834 predictions/history identities and 649 metric cells. Preserve the first independent verifier failure and numeric-season fix. Details: work/engine-rebuild/BASELINES.md. Requirement 10c stays PARTIAL. No spending/provider/host changes. Confidence: near-total in arithmetic on independently verified rows; lower to high if recomputation differs.
+
 ## 2026-09-22 — wire recorded weekly fitting and public-closeout boundary
 
 Infrastructure only, no statistical candidate or promotion. The actual weekly entry selects recorded refitting/staging/release for an activated scheduled pipeline; the scheduler passes its verified owner and held dispatch descriptor. Immutable requests freeze original training/fit/state/publication identities and clocks. Matching partial releases reconcile before other work; completed weeks do not undo later rollbacks. Owner generation changes and mismatched evidence fail. Three failed attempts stop further computation; 600-second elapsed checks prevent late activation, with full hard-deadline qualification still required.
