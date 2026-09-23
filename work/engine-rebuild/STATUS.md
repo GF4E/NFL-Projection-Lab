@@ -1,3 +1,9 @@
+# Latest checkpoint — volume lifecycle passed; runtime tree recovery in qualification
+
+Goal ACTIVE. Attempt4 completes the captured 2,927-game/16-game-slate lifecycle in 432.239 seconds on the approved volume, under the unchanged 570-second deadline. All 52 original records are preserved. Observed file-allocation peak is 36,229,120 bytes; this is not a complete durable headroom reserve. See STORAGE-PROFILE-COMPLETE.md and exact JSON evidence.
+
+Exact private runtime snapshots now reject altered/interrupted copies and preserve internal fixed-prefix symlinks and metadata. Runtime tree capture/restore qualification is in progress; it does not execute or activate the restored interpreter. Complete source recovery, OS/native compatibility and isolated consumer execution remain next under EXECUTABLE-RUNTIME-PLAN.md. Control authority, real cadence admission, daily growth, actual reviewers, statistical dispositions, prospective evidence and observed live cycle remain open. No provider spending or numerical activation.
+
 # Latest checkpoint — measured bottleneck corrected; full-cycle requalification next
 
 Goal ACTIVE. Durable profile checkpoints survive termination. Attempt3 reaches sixteen isolated locks at 563.414 seconds, then exits 137 at the unchanged 570-second ceiling before rollback/grading; original 52 host records and active fit remain exact. Partial allocation peak is 34,099,200 bytes, not a complete reserve. Attempt2's pre-computation directory-permission failure is preserved. See PROFILE-RETRY.md.

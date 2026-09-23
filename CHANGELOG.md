@@ -920,3 +920,9 @@ The first live closeout verification returned 503. workerd reproduced unsupporte
 ## 2026-09-23 — source-to-forecast leakage integration checks
 
 Added six synthetic integration tests across feature construction, production-common refit/scoring, existing chronological selection/prior-residual helpers and recorded late revisions. All 98 related tests pass. Current/future source perturbations preserve earlier forecasts; an eligible-past positive control changes them. No method, setting, gate or production forecast changed. This does not qualify historical provider vintages or complete requirement 10c. See work/engine-rebuild/LEAKAGE.md.
+
+## 2026-09-23 — volume lifecycle and exact private runtime recovery
+
+The optimized captured production workflow passes on the approved volume in 432.239 seconds under the unchanged 570-second limit, including all sixteen locks, rollback and idempotent grading; all 52 original records retain their hashes. Earlier failed attempts remain preserved. Observed allocation peak 36,229,120 bytes is not a full headroom reserve. See work/engine-rebuild/STORAGE-PROFILE-COMPLETE.md.
+
+CONVENTIONS (Tier 1): recover the pinned runtime using fresh private directory copies and exact hashed manifests, with acceptance written last, instead of extracting archives. Preserve fixed-prefix internal symlinks, ownership, modes and timestamps; reject incomplete/altered snapshots and occupied destinations. This implements the existing isolated-restoration requirement without changing model settings, gates or candidates. An exact tree alone is not an executable recovery; native OS compatibility and a restored-consumer canary remain required.
