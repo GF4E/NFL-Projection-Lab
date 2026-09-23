@@ -1,3 +1,7 @@
+# Latest checkpoint — repeated monitor popups corrected; disk still full
+
+Goal ACTIVE. User interrupted rebuild work to report repeated NFL engine monitor notifications. Capture status oscillation re-announced the entire fault list. A separate 15-minute recovery latch now prevents repeated incident alerts, verified by 25 tests and the installed Mac process. See WATCHDOG-NOTIFICATIONS.md. One regenerable firmware metadata cache removed under existing cleanup authority; zero service-writable bytes remain. Storage approval is still pending; no spending or migration occurred. The calibration execution plan remains unimplemented and full rebuild requirements remain open.
+
 # Latest checkpoint — numerical calibration worker verified on synthetic histories
 
 Goal ACTIVE. Previous turn made implementation progress (admission committed). This turn implements both prior-season calibration arms, point invariance, individual/weekly/annual metrics, paired/block/season uncertainty, a numeric-only gate check and read-only file-to-score runner. Eighteen added fixtures; 100 related tests pass. See CALIBRATION-NUMERICS.md. The registration now binds evaluator code/runtime and uncertainty settings. No real registration, historical candidate fit, control transfer, deployment or spending. Next: durable attempt/result retention and report/reviewer packet, then real authority/cadence/resource qualification before any fitting. Preserve the full original requirements, including unresolved capacity authority, unattended access, actual reviews and prospective/live evidence.

@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from engine.projection.storage import save
 from engine.projection.watchdog import (UTC, POLICY, stamp, digest, board_identity,
-                                       assess_source, assess_host, assess_outside, transition)
+                                       assess_source, assess_host, assess_outside, transition, notification_transition)
 from engine.forecast_system.calendar import schedule_kickoff
 
 HOST_STATE = Path('/run/nfl-engine-monitor')
@@ -216,7 +216,14 @@ def remote(mode, receipt=None):
 
 def notify(value):
     codes = [x['code'] for x in value['assessment']['active']]
-    message = ', '.join(codes) if codes else 'Observed faults recovered; see the saved monitor report.'
+    names={'STORAGE_EXHAUSTED':'Server disk is full','CAPTURE_RUN_FAILED':'Game capture failed',
+           'FINAL_READER_STALE':'Final scores are not refreshing',
+           'PUBLIC_ACCESS_UNQUALIFIED':'Website verification is blocked',
+           'STORAGE_HEADROOM_UNQUALIFIED':'Storage capacity needs attention'}
+    message = '; '.join(names.get(c,c.replace('_',' ').lower()) for c in codes)
+    recovered=value['assessment'].get('recovered_codes',[])
+    if recovered:
+        message+=(' — ' if message else '')+'Recovered for 15 minutes: '+', '.join(names.get(c,c.replace('_',' ').lower()) for c in recovered)
     script = 'on run argv\n display notification (item 1 of argv) with title "NFL engine monitor"\nend run'
     try:
         p = subprocess.run(['/usr/bin/osascript', '-e', script, message],
@@ -243,8 +250,18 @@ def outside_once(folder=MAC_STATE, now=None, retry_access=False, notifications=T
              'host': host, 'public': public,
              'assessment': transition(previous, assess_outside(host, public, now), now)}
     record(folder, 'outside', value)
-    if value['assessment']['changed']:
-        result = notify(value) if notifications else 'DISABLED_FOR_CHECK'
+    prior_notice=load(folder/'notification-state.json')
+    # Upgrade without re-announcing the currently displayed incident set.
+    if prior_notice is None and load(folder/'notification.json',{}).get('result')=='SUBMITTED_NOT_READ_RECEIPT':
+        prior_notice=notification_transition(None,previous.get('assessment',{}).get('active',[]),now)
+    complete=host is not None and not any(x['code'] in ('HOST_OBSERVER_STALE','HOST_OBSERVER_UNREACHABLE') for x in value['assessment']['active'])
+    notice=notification_transition(prior_notice,value['assessment']['active'],now,complete=complete)
+    if notifications:
+        # Persist before OS submission: an ambiguous delivery cannot cause a loop.
+        save(folder/'notification-state.json',notice)
+    if notice['notify']:
+        delta={**value,'assessment':{'active':notice['new'],'recovered_codes':notice['recovered_codes']}}
+        result = notify(delta) if notifications else 'DISABLED_FOR_CHECK'
         save(folder/'notification.json', {'at': now.isoformat(), 'result': result,
                                          'report_sha256': digest(value)})
     receipt = {'schema': POLICY['schema'], 'observer': 'gabe-mac',

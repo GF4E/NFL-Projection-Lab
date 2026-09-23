@@ -9,7 +9,7 @@ from unittest.mock import patch
 import urllib.error
 
 from engine.projection.watchdog import (UTC, POLICY, digest, board_identity, assess_source,
-                                       assess_host, assess_outside, transition, issue)
+                                       assess_host, assess_outside, transition, issue, notification_transition)
 from scripts import projection_watchdog as runner
 
 
@@ -37,6 +37,56 @@ def host():
 
 
 class WatchdogTests(unittest.TestCase):
+    def test_capture_flapping_does_not_repeat_persistent_storage_alert(self):
+        storage=issue('STORAGE_EXHAUSTED');capture=issue('CAPTURE_RUN_FAILED')
+        notice=notification_transition(None,[storage,capture],NOW)
+        self.assertTrue(notice['notify'])
+        for minute in range(1,61):
+            active=[storage]+([capture] if minute%2 else [])
+            notice=notification_transition(notice,active,NOW+dt.timedelta(minutes=minute))
+            self.assertFalse(notice['notify'])
+
+    def test_new_fault_and_new_affected_games_still_notify(self):
+        notice=notification_transition(None,[issue('LOCK_NOT_VERIFIED',games=['a'])],NOW)
+        notice=notification_transition(notice,[issue('LOCK_NOT_VERIFIED',games=['a','b'])],NOW+dt.timedelta(minutes=1))
+        self.assertTrue(notice['notify']);self.assertEqual(notice['new'][0]['details']['games'],['a','b'])
+
+    def test_recovery_requires_continuous_observation_then_new_failure_alerts(self):
+        fault=issue('STORAGE_EXHAUSTED');notice=notification_transition(None,[fault],NOW)
+        notice=notification_transition(notice,[],NOW+dt.timedelta(minutes=1))
+        self.assertFalse(notice['notify'])
+        notice=notification_transition(notice,[],NOW+dt.timedelta(minutes=20),complete=False)
+        self.assertFalse(notice['notify'])
+        notice=notification_transition(notice,[],NOW+dt.timedelta(minutes=21))
+        self.assertFalse(notice['notify'])
+        for minute in range(22,37):notice=notification_transition(notice,[],NOW+dt.timedelta(minutes=minute))
+        self.assertEqual(notice['recovered_codes'],['STORAGE_EXHAUSTED'])
+        notice=notification_transition(notice,[fault],NOW+dt.timedelta(minutes=37))
+        self.assertTrue(notice['notify'])
+
+    def test_sleep_gap_does_not_count_as_observed_recovery(self):
+        notice=notification_transition(None,[issue('CAPTURE_RUN_FAILED')],NOW)
+        notice=notification_transition(notice,[],NOW+dt.timedelta(minutes=1))
+        notice=notification_transition(notice,[],NOW+dt.timedelta(hours=2))
+        self.assertFalse(notice['notify'])
+
+    def test_changed_game_list_does_not_claim_same_code_recovered(self):
+        notice=notification_transition(None,[issue('LOCK_NOT_VERIFIED',games=['a'])],NOW)
+        for minute in range(1,18):
+            notice=notification_transition(notice,[issue('LOCK_NOT_VERIFIED',games=['a','b'])],NOW+dt.timedelta(minutes=minute))
+        self.assertEqual(notice['recovered_codes'],[])
+
+    def test_outside_runner_migrates_existing_alert_without_another_popup(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder=Path(directory);h=host();h['assessment']=transition(None,[issue('STORAGE_EXHAUSTED')],NOW)
+            prior={'checked_at':NOW.isoformat(),'assessment':transition(None,[issue('STORAGE_EXHAUSTED'),issue('PUBLIC_ACCESS_UNQUALIFIED')],NOW)}
+            (folder/'outside.json').write_text(json.dumps(prior))
+            (folder/'notification.json').write_text(json.dumps({'result':'SUBMITTED_NOT_READ_RECEIPT'}))
+            with patch.object(runner,'remote',return_value=h),patch.object(runner,'public_probe',return_value={'state':'ACCESS_UNQUALIFIED'}),patch.object(runner,'notify') as notify:
+                runner.outside_once(folder,now=NOW+dt.timedelta(seconds=30))
+                notify.assert_not_called()
+            self.assertTrue((folder/'notification-state.json').exists())
+
     def test_source_snapshot_verifies_chain_without_writing_source_files(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory); out=root/'outputs/projection-v3'; out.mkdir(parents=True)

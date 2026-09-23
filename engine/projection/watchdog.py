@@ -206,3 +206,29 @@ def transition(previous, findings, now):
     return {'pending': pending, 'active': active, 'fingerprint': fingerprint,
             'changed': fingerprint != before, 'state': 'DEGRADED' if active else 'HEALTHY',
             'recovered_codes': sorted({x['code'] for x in prior.get('active', [])}-{x['code'] for x in active})}
+
+
+def notification_transition(previous, active, now, *, complete=True):
+    """Latch each incident until 15 minutes of observed recovery; no flap spam.
+
+    Health assessments and event logs remain immediate. An unavailable observer
+    cannot prove recovery. New codes or newly affected games still notify.
+    """
+    prior=(previous or {}).get('incidents',{})
+    observed_gap=(now-stamp(previous['checked_at'])).total_seconds() if previous and previous.get('checked_at') else 0
+    current={digest({'code':x['code'],'details':x['details']}):x for x in active}
+    retained={};new=[];recovered=[]
+    for key,item in current.items():
+        retained[key]={'code':item['code'],'details':item['details'],'clear_since':None}
+        if key not in prior:new.append({'code':item['code'],'details':item['details']})
+    for key,item in prior.items():
+        if key in current:continue
+        since=item.get('clear_since') if complete and 0<=observed_gap<=POLICY['heartbeat_seconds'] else None
+        if complete and since and (now-stamp(since)).total_seconds()>=900:
+            recovered.append(item['code'])
+        else:
+            retained[key]={**item,'clear_since':(since or now.isoformat()) if complete else None}
+    recovered=[code for code in recovered if not any(x['code']==code for x in retained.values())]
+    return {'schema':'watchdog-notification-latch-v1','checked_at':now.isoformat(),
+            'incidents':retained,'new':new,'recovered_codes':sorted(set(recovered)),
+            'notify':bool(new or recovered)}
