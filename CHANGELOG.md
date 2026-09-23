@@ -815,3 +815,14 @@ CONVENTIONS (Tier 1): signed error is prediction minus actual; dispersion is pop
 Validation: five new hand-calculated/error-boundary fixtures; 99 independent pandas checks on pooled and seasonal exported-score metrics agree within 4.09e-14. See work/engine-rebuild/TRAIN-TEST.md. Membership validation and this score table do not establish full-pipeline leakage prevention or independent future skill; acceptance remains PARTIAL.
 
 Confidence: near-total in arithmetic on verified saved rows; lower to high if independent recomputation differs. Better future predictions remain unproved.
+
+
+## Complete captured-data refit/release lifecycle verification
+
+Actual weekly entry with the unmocked 2,927-game / 5,854-row training ledger now passes refit, stage, release, all sixteen correct-cutoff locks, parent rollback and original-bundle first/duplicate grading on Mac and actual Linux. All 52 original frozen files retain their hashes. Linux completes in 493.15 seconds under the external 570-second canary deadline; no live numerical activation or statistical promotion. First-seen clocks, closeout HTTP evidence and future finals are explicit isolated fixtures. The first local harness failure concerned missing legacy publication_week metadata; the existing publisher fallback fixed the harness without changing engine arithmetic.
+
+Native Sites inspection and owner-authenticated live API reads resolve the previous access-only blocker. Full immutable closeout identity and unattended verification remain unqualified. No site version or access policy changed. Exact evidence and remaining scope: work/engine-rebuild/FULL-LIFECYCLE.md.
+
+Emergency host storage relief used existing authority: rotated archived journals (17.3 MiB) and removed 73 regenerable partial APT indexes (68,270,447 bytes) under the APT lock. No installed package, NFL artifact or original source record was removed. Exact filenames are retained in storage-recovery-lifecycle.json and storage-journal-vacuum.txt; post-cleanup root free space is 86,196,224 bytes. Durable capacity remains pending.
+
+Confidence: medium in operational readiness—captured runtime evidence is verified, but live publication, durable capacity and remaining release qualification still matter. Lower to low on an independently reproduced integrity failure. Improved future accuracy remains unproved.

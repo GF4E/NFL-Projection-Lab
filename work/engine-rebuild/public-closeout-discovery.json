@@ -1,0 +1,53 @@
+{
+  "checked_at": "2026-09-23T05:25:27.984958+00:00",
+  "authentication": "Sites-provided owner verification credential; secret not retained",
+  "endpoints": {
+    "/api/projection-board": {
+      "status": 200,
+      "response_sha256": "6b1f5dd4fe513067bcf58750c0ef04ae51427d986744b94af2cc6dd044a229e8",
+      "keys": [
+        "content_sha256",
+        "default_week",
+        "games",
+        "inactive",
+        "published_at",
+        "schema",
+        "scorecards",
+        "version",
+        "wind_status"
+      ],
+      "board": {
+        "schema": "projection-board-v1",
+        "version": "projection-v2.hfa1.w3",
+        "content_sha256": "16d91f7093c34f2145ca978c93b6a6d9f0261a4acb650503e220e0ccb4a4d63c",
+        "generated_at": null,
+        "as_of": null
+      },
+      "games": 48
+    },
+    "/api/board-v7": {
+      "status": 200,
+      "response_sha256": "1dd7914c38402afc454d3242f8e83afc64d1edc0903d5e9452c5345e072d049b",
+      "keys": [
+        "board",
+        "context",
+        "evidence",
+        "seasonEvidence"
+      ],
+      "board": {
+        "schema": "projection-board-v1",
+        "version": "projection-v2.hfa1.w3",
+        "content_sha256": "16d91f7093c34f2145ca978c93b6a6d9f0261a4acb650503e220e0ccb4a4d63c",
+        "generated_at": null,
+        "as_of": null
+      },
+      "games": 48,
+      "season": {
+        "schema": "board-v7-evidence",
+        "board_sha256": "16d91f7093c34f2145ca978c93b6a6d9f0261a4acb650503e220e0ccb4a4d63c",
+        "generated_at": null,
+        "version": null
+      }
+    }
+  }
+}

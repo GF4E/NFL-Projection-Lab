@@ -20,7 +20,7 @@ Failures are preserved: an inherited test patch handle initially shadowed its so
 
 ## Still required
 
-Run the full captured-data recorded-refit → stage → switch → lock → grade → rollback canary with all retained rows and consumers. Qualify the public closeout/Season delivery channel and training migration; then install the explicit configuration under existing authority. Complete general executable/runtime rollback, durable capacity, own-lineage calibration warmup, E-CAL-LINEAGE and E-VENUE-DIRECT under their weekly gates/reviews, prospective evaluation and an observed live operational cycle. The installed state worker's first scheduled cutoff remains September 25 at 06:00 PT; a simulation cannot establish that observed event.
+The full captured-data recorded-refit → stage → switch → lock → rollback → grade canary now passes on Mac and actual Linux with all 5,854 retained rows and sixteen games; see FULL-LIFECYCLE.md. Clocks, public acknowledgment and finals remain simulation fixtures. Qualify the public closeout/Season delivery channel and training migration; then install the explicit configuration under existing authority. Complete general executable/runtime rollback, durable capacity, own-lineage calibration warmup, E-CAL-LINEAGE and E-VENUE-DIRECT under their weekly gates/reviews, prospective evaluation and an observed live operational cycle. The installed state worker's first scheduled cutoff remains September 25 at 06:00 PT; a simulation cannot establish that observed event.
 
 Least certain: the public closeout adapter required by the existing website. No default endpoint or success receipt was invented, and no production configuration was installed because of that uncertainty.
 
