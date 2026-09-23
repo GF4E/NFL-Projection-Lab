@@ -1,0 +1,54 @@
+verified play_by_play_2011.parquet 512 rows; max difference 1.1102230246251565e-16
+verified play_by_play_2012.parquet 512 rows; max difference 1.1102230246251565e-16
+verified play_by_play_2013.parquet 512 rows; max difference 1.1102230246251565e-16
+{
+  "artifact": {
+    "path": "work/engine-rebuild/early-inputs/77f14d54cb6d9cfd162413488e256db37d343c59fb161ff07b6d86e508721b30.json.gz",
+    "sha256": "77f14d54cb6d9cfd162413488e256db37d343c59fb161ff07b6d86e508721b30"
+  },
+  "checks": [
+    {
+      "all_fields_reproduced": true,
+      "independent_core_fields": 5,
+      "maximum_difference": 1.1102230246251565e-16,
+      "source": "play_by_play_2011.parquet",
+      "team_rows": 512
+    },
+    {
+      "all_fields_reproduced": true,
+      "independent_core_fields": 5,
+      "maximum_difference": 1.1102230246251565e-16,
+      "source": "play_by_play_2012.parquet",
+      "team_rows": 512
+    },
+    {
+      "all_fields_reproduced": true,
+      "independent_core_fields": 5,
+      "maximum_difference": 1.1102230246251565e-16,
+      "source": "play_by_play_2013.parquet",
+      "team_rows": 512
+    }
+  ],
+  "early_hfa": {
+    "2011": {
+      "training_games": 763,
+      "value": 57.37221494102228
+    },
+    "2012": {
+      "training_games": 764,
+      "value": 63.154450261780106
+    },
+    "2013": {
+      "training_games": 764,
+      "value": 65.37958115183245
+    }
+  },
+  "elapsed_seconds": 8.12171100001433,
+  "games": 1280,
+  "generated_at": "2026-09-23T08:18:25.575591+00:00",
+  "hfa_overlap_max_difference": 0.0,
+  "maximum_numeric_difference": 1.1102230246251565e-16,
+  "peak_rss_bytes": 535068672,
+  "status": "VERIFIED_SOURCE_RECONSTRUCTION_NOT_CALIBRATION",
+  "team_rows": 2560
+}

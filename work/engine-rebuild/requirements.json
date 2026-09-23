@@ -49,7 +49,8 @@
         "BASELINES.md (descriptive saved replay, not production authority)",
         "score-baselines/current-ref.json (same 2639 games, 5278 targets, three pre-cutoff baselines)",
         "score-baselines-verification-attempt2.log (15834 independent predictions; 649 metric/count cells)",
-        "tests/test_projection_score_baselines.py (12 focused tests)"
+        "tests/test_projection_score_baselines.py (12 focused tests)",
+        "EARLY-INPUTS.md; early-inputs-verification.json; early-features-verification.json; early-features-independent-check.json (source/feature preparation only; no model fitting or calibration qualification)"
       ]
     },
     {
@@ -332,7 +333,8 @@
         "host-weekly-integration.json (36 Linux synthetic fixtures; ledger read mocked; no activation)",
         "FULL-LIFECYCLE.md; full-lifecycle-local-attempt2.json (complete real ledger/refit, 16 locks and synthetic grades after rollback; simulation only)",
         "full-lifecycle-host-attempt1.json (actual Linux UID 1000, 493.15 s, 16 locks/grades, 52 frozen hashes unchanged; simulated clocks/publication/finals)",
-        "LEAKAGE.md; leakage-verification.json; tests/test_projection_full_pipeline_leakage.py (six synthetic integration tests; ten season boundaries and 30 point-path source perturbations; recorded late revision preserves original forecast; not historical-vintage or calibration-release qualification)"
+        "LEAKAGE.md; leakage-verification.json; tests/test_projection_full_pipeline_leakage.py (six synthetic integration tests; ten season boundaries and 30 point-path source perturbations; recorded late revision preserves original forecast; not historical-vintage or calibration-release qualification)",
+        "EARLY-INPUTS.md; early-inputs-verification.json; early-features-verification.json; early-features-independent-check.json (source/feature preparation only; no model fitting or calibration qualification)"
       ]
     },
     {
@@ -361,7 +363,8 @@
       "observed_evidence": [
         "engine/projection_experiments.py",
         "tests/test_projection_calibration_gate.py (policy implementation only; not a fitted experiment)",
-        "E-CAL-PREFLIGHT.md (Tier 1/2 executable convention sweep, not hashed registration; own-lineage warmup and numerical chronology qualification still required)"
+        "E-CAL-PREFLIGHT.md (Tier 1/2 executable convention sweep, not hashed registration; own-lineage warmup and numerical chronology qualification still required)",
+        "EARLY-INPUTS.md; early-inputs-verification.json; early-features-verification.json; early-features-independent-check.json (source/feature preparation only; no model fitting or calibration qualification)"
       ]
     },
     {
@@ -577,7 +580,8 @@
         "score-baselines/current-ref.json (same 2639 games, 5278 targets, three pre-cutoff baselines)",
         "score-baselines-verification-attempt2.log (15834 independent predictions; 649 metric/count cells)",
         "tests/test_projection_score_baselines.py (12 focused tests)",
-        "LEAKAGE.md; leakage-verification.json; tests/test_projection_full_pipeline_leakage.py (six synthetic integration tests; ten season boundaries and 30 point-path source perturbations; recorded late revision preserves original forecast; not historical-vintage or calibration-release qualification)"
+        "LEAKAGE.md; leakage-verification.json; tests/test_projection_full_pipeline_leakage.py (six synthetic integration tests; ten season boundaries and 30 point-path source perturbations; recorded late revision preserves original forecast; not historical-vintage or calibration-release qualification)",
+        "EARLY-INPUTS.md; early-inputs-verification.json; early-features-verification.json; early-features-independent-check.json (source/feature preparation only; no model fitting or calibration qualification)"
       ]
     }
   ]
