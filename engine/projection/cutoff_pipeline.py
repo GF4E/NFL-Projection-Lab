@@ -500,7 +500,13 @@ def refit_recorded(root,state_ref,training_ref,parent_ref,closeout_path,*,at):
     if fit_available_at(root,parent_ref,parent)>=execution:raise ValueError('Parent fit unavailable at refit')
     if parent.get('elo_hfa')!=body['method']['elo_hfa']:raise ValueError('Refit state method differs')
     training=load(root,training_ref,'training')
-    if training.get('schema')!='retained-pregame-training-v1':raise ValueError('Retained pregame training ledger required')
+    if training.get('schema')=='retained-pregame-training-ledger-v1':
+        from .training_ledger import history
+        if timestamp(training['created_at'])>=execution:raise ValueError('Training ledger unavailable at refit start')
+        training_rows=history(root,training_ref,method_ref=body['fit_ref'])
+    elif training.get('schema')=='retained-pregame-training-v1':
+        training_rows=training['rows']
+    else:raise ValueError('Retained pregame training ledger required')
     selected,finals,_,_=cutoff_state.available(root,intent['label_observation_ref'],execution)
     _,_,transaction=cutoff_state.snapshot_before(root,selected,execution)
     final_hashes,_=cutoff_state.fingerprints(finals,{})
@@ -509,7 +515,11 @@ def refit_recorded(root,state_ref,training_ref,parent_ref,closeout_path,*,at):
                  'available_at':transaction['collected_at'],'source_sha256':final_hashes[gid]} for gid,g in finals.items()}
     event={**closed,'evidence':'VERIFIED_SOURCE_PUBLICATION','confirmed_at':ack['confirmed_at'],
            'receipt_sha256':cutoff_state.obs.sha(path.read_bytes())}
-    result=refit(training['rows'],labels,parent,cutoff=cut,fit_at=execution,through_season=closed['season'],through_week=closed['week'],closeout=event)
+    if training.get('schema')=='retained-pregame-training-ledger-v1':
+        expected={gid for gid,g in finals.items() if int(g['season'])==closed['season'] and int(g['week'])<=closed['week']}
+        actual={r['game_id'] for r in training_rows if r['season']==closed['season'] and r['week']<=closed['week']}
+        if actual!=expected:raise ValueError('Training ledger does not cover the cumulative closeout population')
+    result=refit(training_rows,labels,parent,cutoff=cut,fit_at=execution,through_season=closed['season'],through_week=closed['week'],closeout=event)
     computed=now()
     if computed<execution:raise ValueError('Refit completion precedes its start')
     result.update(parent_fit_ref=parent_ref,state_ref=state_ref,training_ref=training_ref,label_observation_ref=selected,

@@ -1,0 +1,192 @@
+EEEEEEEEE..EEE
+======================================================================
+ERROR: test_base_hash_corruption_is_rejected (test_projection_training_ledger.TrainingLedgerTests.test_base_hash_corruption_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 170, in test_base_hash_corruption_is_rejected
+    body=self.setup_ledger();path=self.root/body['base_ref']['path']
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 60, in setup_ledger
+    base_ref=ledger.retain_base(self.root,base,replay)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 73, in retain_base
+    historical_rows(data)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+======================================================================
+ERROR: test_compacted_rows_leave_ridge_identity_and_forecasts_unchanged (test_projection_training_ledger.TrainingLedgerTests.test_compacted_rows_leave_ridge_identity_and_forecasts_unchanged)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 31, in test_compacted_rows_leave_ridge_identity_and_forecasts_unchanged
+    self.setup_ledger();body=p.load(self.root,self.ledger_ref,'training')
+    ^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 60, in setup_ledger
+    base_ref=ledger.retain_base(self.root,base,replay)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 73, in retain_base
+    historical_rows(data)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+======================================================================
+ERROR: test_hash_valid_corrupted_preparation_is_rejected (test_projection_training_ledger.TrainingLedgerTests.test_hash_valid_corrupted_preparation_is_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 97, in test_hash_valid_corrupted_preparation_is_rejected
+    body=self.setup_ledger();prep=p.load(self.root,body['preparations'][0],'preparations')
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 60, in setup_ledger
+    base_ref=ledger.retain_base(self.root,base,replay)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 73, in retain_base
+    historical_rows(data)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+======================================================================
+ERROR: test_labels_duplicate_rows_and_unknown_roles_rejected (test_projection_training_ledger.TrainingLedgerTests.test_labels_duplicate_rows_and_unknown_roles_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 110, in test_labels_duplicate_rows_and_unknown_roles_rejected
+    self.setup_ledger();rows=ledger.history(self.root,self.ledger_ref)
+    ^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 60, in setup_ledger
+    base_ref=ledger.retain_base(self.root,base,replay)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 73, in retain_base
+    historical_rows(data)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+======================================================================
+ERROR: test_later_outcome_cannot_change_earlier_features (test_projection_training_ledger.TrainingLedgerTests.test_later_outcome_cannot_change_earlier_features)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 88, in test_later_outcome_cannot_change_earlier_features
+    body=self.setup_ledger();before,_=ledger.reconstruct(self.root,body)
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 60, in setup_ledger
+    base_ref=ledger.retain_base(self.root,base,replay)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 73, in retain_base
+    historical_rows(data)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+======================================================================
+ERROR: test_missing_legacy_game_and_mixed_method_rejected (test_projection_training_ledger.TrainingLedgerTests.test_missing_legacy_game_and_mixed_method_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 104, in test_missing_legacy_game_and_mixed_method_rejected
+    body=self.setup_ledger();body['reconstructed_games']=[]
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 60, in setup_ledger
+    base_ref=ledger.retain_base(self.root,base,replay)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 73, in retain_base
+    historical_rows(data)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+======================================================================
+ERROR: test_original_live_lock_appends_without_changing_prior_rows (test_projection_training_ledger.TrainingLedgerTests.test_original_live_lock_appends_without_changing_prior_rows)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 120, in test_original_live_lock_appends_without_changing_prior_rows
+    self.setup_ledger();before=ledger.history(self.root,self.ledger_ref)
+    ^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 60, in setup_ledger
+    base_ref=ledger.retain_base(self.root,base,replay)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 73, in retain_base
+    historical_rows(data)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+======================================================================
+ERROR: test_proxy_equality_excludes_even_a_known_final (test_projection_training_ledger.TrainingLedgerTests.test_proxy_equality_excludes_even_a_known_final)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 144, in test_proxy_equality_excludes_even_a_known_final
+    body=self.setup_ledger();schedule=ledger.read(self.root,body['sources']['schedule'])
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 60, in setup_ledger
+    base_ref=ledger.retain_base(self.root,base,replay)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 73, in retain_base
+    historical_rows(data)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+======================================================================
+ERROR: test_reconstruction_keeps_population_and_never_invents_recorded_clocks (test_projection_training_ledger.TrainingLedgerTests.test_reconstruction_keeps_population_and_never_invents_recorded_clocks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 69, in test_reconstruction_keeps_population_and_never_invents_recorded_clocks
+    body=self.setup_ledger();rows=ledger.history(self.root,self.ledger_ref)
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 60, in setup_ledger
+    base_ref=ledger.retain_base(self.root,base,replay)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 73, in retain_base
+    historical_rows(data)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+======================================================================
+ERROR: test_source_row_reordering_preserves_numerical_reconstruction (test_projection_training_ledger.TrainingLedgerTests.test_source_row_reordering_preserves_numerical_reconstruction)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 80, in test_source_row_reordering_preserves_numerical_reconstruction
+    body=self.setup_ledger();before,_=ledger.reconstruct(self.root,body)
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 60, in setup_ledger
+    base_ref=ledger.retain_base(self.root,base,replay)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 73, in retain_base
+    historical_rows(data)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+======================================================================
+ERROR: test_streamed_cache_preserves_fitting_fields_and_rejects_bad_framing (test_projection_training_ledger.TrainingLedgerTests.test_streamed_cache_preserves_fitting_fields_and_rejects_bad_framing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 25, in test_streamed_cache_preserves_fitting_fields_and_rejects_bad_framing
+    self.assertEqual(ledger.historical_rows(gzip.compress(raw)),[ledger.fit_row(r) for r in rows])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+======================================================================
+ERROR: test_unlocked_or_unbundled_rows_cannot_enter_recorded_training (test_projection_training_ledger.TrainingLedgerTests.test_unlocked_or_unbundled_rows_cannot_enter_recorded_training)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 138, in test_unlocked_or_unbundled_rows_cannot_enter_recorded_training
+    body=self.setup_ledger();card=publisher.run(timestamp('2026-09-13T15:01:00Z'))['games'][0]
+         ^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 60, in setup_ledger
+    base_ref=ledger.retain_base(self.root,base,replay)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 73, in retain_base
+    historical_rows(data)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/training_ledger.py", line 41, in historical_rows
+    raise ValueError('Historical training cache schema differs')
+ValueError: Historical training cache schema differs
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.408s
+
+FAILED (errors=12)

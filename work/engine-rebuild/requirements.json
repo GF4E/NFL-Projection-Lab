@@ -37,7 +37,15 @@
         "host-source-reconstruction-canary.json",
         "TRAINING-INPUT-AUDIT.md",
         "training-input-audit/current-ref.json",
-        "tests/test_projection_training_evidence.py"
+        "tests/test_projection_training_evidence.py",
+        "TRAINING-TRANSITION.md",
+        "training-transition/current-ref.json",
+        "tests/test_projection_training_ledger.py",
+        "training-transition/verification.json (population/source reconstruction; no activation)",
+        "tests-training-transition-final.log (557 local checks)",
+        "host-training-transition-canary.json (captured inputs, simulated clocks; no activation)",
+        "training-transition/compaction-parity.json",
+        "training-transition/linux-current-ref.json"
       ]
     },
     {
@@ -225,7 +233,15 @@
         "host-release-transition-followthrough.json",
         "TRAINING-INPUT-AUDIT.md",
         "training-input-audit/current-ref.json",
-        "tests/test_projection_training_evidence.py"
+        "tests/test_projection_training_evidence.py",
+        "TRAINING-TRANSITION.md",
+        "training-transition/current-ref.json",
+        "tests/test_projection_training_ledger.py",
+        "training-transition/verification.json (population/source reconstruction; no activation)",
+        "tests-training-transition-final.log (557 local checks)",
+        "host-training-transition-canary.json (captured inputs, simulated clocks; no activation)",
+        "training-transition/compaction-parity.json",
+        "training-transition/linux-current-ref.json"
       ]
     },
     {
@@ -280,7 +296,15 @@
         "host-scheduled-selection-followthrough.json (exact final source arrival, 16 current forecasts reproduced from unchanged fit, 52 frozen hashes; cutoff mode null and issuing release still prior source; no activation)",
         "TRAINING-INPUT-AUDIT.md",
         "training-input-audit/current-ref.json",
-        "tests/test_projection_training_evidence.py"
+        "tests/test_projection_training_evidence.py",
+        "TRAINING-TRANSITION.md",
+        "training-transition/current-ref.json",
+        "tests/test_projection_training_ledger.py",
+        "training-transition/verification.json (population/source reconstruction; no activation)",
+        "tests-training-transition-final.log (557 local checks)",
+        "host-training-transition-canary.json (captured inputs, simulated clocks; no activation)",
+        "training-transition/compaction-parity.json",
+        "training-transition/linux-current-ref.json"
       ]
     },
     {
@@ -349,7 +373,11 @@
         "engine/projection/cutoff_pipeline.py; tests/test_projection_cutoff_pipeline.py (shared shadow preparation/scoring/refit, exact cutoff roles, physical fit availability and retry preservation; not production orchestration)",
         "COMMON-PIPELINE.md; host-common-pipeline-canary.json (21 Linux fixtures, 14 shadow forecasts and 52 original records unchanged; simulated future dates)",
         "common-pipeline/DISPOSITION.json (strict Tuesday-only replay retained as non-authoritative sensitivity; production allows hourly catch-up)",
-        "public-season-observation-2026-09-22.json (visible 30-game/2-week counts; inspected DOM has no release identity, exact served payload not qualified)"
+        "public-season-observation-2026-09-22.json (visible 30-game/2-week counts; inspected DOM has no release identity, exact served payload not qualified)",
+        "TRAINING-TRANSITION.md",
+        "host-training-transition-canary.json (captured inputs, simulated clocks; no activation)",
+        "training-transition/compaction-parity.json",
+        "training-transition/linux-current-ref.json"
       ]
     },
     {
@@ -438,7 +466,11 @@
         "tests-release-standing.log",
         "host-release-qualified-canary.json",
         "tests-release-qualified.log",
-        "host-release-transition-followthrough.json"
+        "host-release-transition-followthrough.json",
+        "TRAINING-TRANSITION.md",
+        "host-training-transition-canary.json (captured inputs, simulated clocks; no activation)",
+        "training-transition/compaction-parity.json",
+        "training-transition/linux-current-ref.json"
       ]
     },
     {

@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/check_training_transition_host.py", line 109, in <module>
+    raise RuntimeError(r.stderr[-5000:])
+RuntimeError: {"phase": "START", "elapsed_seconds": 5.709938704967499e-06}
+{"phase": "STAGED", "elapsed_seconds": 2.638448036974296}
+{"phase": "FIXTURES_PASSED", "elapsed_seconds": 10.56865554698743}
+{"phase": "STATE_AND_SIMULATED_CLOSEOUT_READY", "elapsed_seconds": 17.7514558309922}
+Traceback (most recent call last):
+  File "<string>", line 56, in <module>
+  File "/run/nfl-engine-monitor/training-ledger-wqpcvrst/engine/projection/cutoff_pipeline.py", line 506, in refit_recorded
+  File "/opt/nfl-runtime/env/lib/python3.12/unittest/mock.py", line 1134, in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/nfl-runtime/env/lib/python3.12/unittest/mock.py", line 1138, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/nfl-runtime/env/lib/python3.12/unittest/mock.py", line 1199, in _execute_mock_call
+    result = effect(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 38, in capture_history
+  File "/run/nfl-engine-monitor/training-ledger-wqpcvrst/engine/projection/training_ledger.py", line 200, in history
+ValueError: Training preparation does not reconstruct

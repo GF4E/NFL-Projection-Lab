@@ -1,3 +1,13 @@
+## 2026-09-22 — preserve full training population and qualify recorded refit
+
+Infrastructure/chronology qualification, not a statistical promotion. Add immutable training ledgers, unchanged historical base bytes, same-method reconstruction for all 32 pre-activation games, original-lock-only future additions, source/method/population validation and actual recorded-refitter integration. All 2,927 games / 5,854 rows remain. Tier 2 REVIEW REQUESTED: historical reconstruction instead of mixing legacy feature methods; unknown provider availability stays explicit. No original lock, first grade, active fit, authoritative series or cadence changed.
+
+CONVENTIONS: stream the canonical historical cache and omit only unused explanation objects from the in-memory numerical view; retain the exact source archive. Exact full-data fit/training-hash/forecast parity passes. Preserve the failed host timeout and cross-runtime diagnostics. External host deadlines bound the canary; separate Mac/Linux derivative hashes preserve exact runtime-specific reconstruction without loosening saved-artifact checks. Prompt revision 6 records these requirements.
+
+Verification: 557 local checks, 14 Linux fixtures, full recorded refit and committed-retry canary; 185.608 seconds, 186,814,464 peak RSS bytes. Independent ridge coefficient difference 2.55351295663786e-15. Host and source identities, separate Linux ledger, simulated clocks and all limitations are in work/engine-rebuild/TRAINING-TRANSITION.md. Scheduler/refit release handoff, public closeout, durable capacity, reviews/gates and a live cycle remain required. Provider calls/new spending: zero.
+
+Confidence: high in tested population/numerical preservation across seasons and runtimes; lower to medium if independent reconstruction differs. Whole-system readiness remains medium and future predictive improvement is not established.
+
 ## 2026-09-22 — recover legacy training evidence; reviewed prompt revision 5
 
 Data/infrastructure audit only. Retain exact cache bytes matching historical Git preparation digests for 12 AS_ISSUED games without embedded rows, plus 18 original lock-feature pairs. Independent standard-library arithmetic reproduces all 60 team predictions (maximum difference 4.973799150320701e-14). Preserve the full 32-game inventory including two RETROSPECTIVE games. No fit, method, gate, training population, frozen record or live selector changes. Recovered artifacts and rerunnable collector are in work/engine-rebuild/training-input-audit and audit_training_inputs.py.

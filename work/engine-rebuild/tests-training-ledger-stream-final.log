@@ -1,0 +1,13 @@
+............F.
+======================================================================
+FAIL: test_streamed_cache_preserves_fitting_fields_and_rejects_bad_framing (test_projection_training_ledger.TrainingLedgerTests.test_streamed_cache_preserves_fitting_fields_and_rejects_bad_framing) (malformed=b'"schema":"retained-pregame-training-v1"}')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_training_ledger.py", line 27, in test_streamed_cache_preserves_fitting_fields_and_rejects_bad_framing
+    with self.subTest(malformed=malformed[-40:]),self.assertRaises(ValueError):
+AssertionError: ValueError not raised
+
+----------------------------------------------------------------------
+Ran 14 tests in 1.856s
+
+FAILED (failures=1)
