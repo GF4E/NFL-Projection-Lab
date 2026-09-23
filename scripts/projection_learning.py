@@ -98,7 +98,10 @@ def _weekly_refit(rows,previous_week,now):
  save(receipt,result,True);save(WORK/'active-fit-ref.json',ref);return result
 
 def weekly_refit(rows,previous_week,now):
- with prepared.writer(ROOT):return _weekly_refit(rows,previous_week,now)
+ with prepared.writer(ROOT):
+  from engine.projection.pipeline_release import guard
+  if guard(ROOT):raise ValueError('Activated pipeline weekly refit requires qualified release handoff')
+  return _weekly_refit(rows,previous_week,now)
 
 def closeout_for_refit(week,season,now):
  from scripts.closeout_publish import require_published

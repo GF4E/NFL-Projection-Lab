@@ -110,10 +110,17 @@ def _prepare_scheduled(at=None):
  return _prepare_groups(selection['groups'],context,selection)
 
 
-def prepare(*,cutoff_state_ref=None,game_ids=None,role=None,at=None,select_scheduled=False):
+def prepare(*,cutoff_state_ref=None,game_ids=None,role=None,at=None,select_scheduled=None):
  if select_scheduled and any(v is not None for v in (cutoff_state_ref,game_ids,role)):
   raise ValueError('Scheduled selection cannot accept hand-picked state or games')
  with prepared.writer(ROOT):
+  from engine.projection.pipeline_release import guard
+  release=guard(ROOT)
+  if release:
+   scheduled=release['mode']=='SCHEDULED'
+   if any(v is not None for v in (cutoff_state_ref,game_ids,role)) or (select_scheduled is not None and select_scheduled!=scheduled):
+    raise ValueError('Preparation request differs from active pipeline release')
+   select_scheduled=scheduled
   if select_scheduled:return _prepare_scheduled(at)
   return _prepare_cutoff(cutoff_state_ref,game_ids,role,at) if cutoff_state_ref else _prepare()
 

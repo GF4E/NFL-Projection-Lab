@@ -32,6 +32,12 @@ def lock_card(card,entry,shapes,cutoff):
  card.update(status='LOCKED',freeze_time=cutoff.isoformat());return card
 
 def run(now=None,require_synced_entries=False):
+ from engine.projection import prepared,pipeline_release
+ with prepared.writer(ROOT):
+  pipeline_release.guard(ROOT)
+  return _run(now,require_synced_entries)
+
+def _run(now=None,require_synced_entries=False):
  from scripts.projection_learning import active_artifact_with_ref,feature_snapshot,trajectories
  now=now or dt.datetime.now(dt.timezone.utc);artifact_ref,artifact=active_artifact_with_ref()
  shapes=read(artifact['shapes']);rows,prepared_manifest,prepared_raw=load_prepared_state(ROOT)

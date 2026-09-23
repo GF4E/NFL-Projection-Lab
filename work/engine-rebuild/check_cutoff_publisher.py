@@ -18,7 +18,9 @@ from scripts import projection_v3_prepare as preparer,projection_v3_publish as p
 from engine.projection_v3 import qualify
 
 
-def verify(source_root=ROOT,temp_parent=None,scheduled=False):
+def verify(source_root=ROOT,temp_parent=None,scheduled=False,release_transitions=False):
+    if release_transitions and not scheduled:raise ValueError('Release canary requires scheduled selection')
+    from engine.projection import pipeline_release
     source_root=Path(source_root);started=time.monotonic();timings={}
     def elapsed(name,start):
         timings[name]=time.monotonic()-start
@@ -50,7 +52,8 @@ def verify(source_root=ROOT,temp_parent=None,scheduled=False):
     schedule=obs.read_source(source_root,transaction['sources']['schedule'],'schedule')
     ids={g['game_id'] for g in schedule if g['game_type']=='REG' and cutoff_before(p.time_of(g))==first}
     if scheduled:ids.update(g['game_id'] for g in schedule if g['game_type']=='REG' and cutoff_before(p.time_of(g))==next_cutoff(first))
-    original_rows,_,_=prepared.load(source_root)
+    original_rows,original_metadata,_=prepared.load(source_root)
+    publication_week=original_metadata.get('publication_week',min(18,max([int(r['week']) for r in original_rows if r.get('actual_points') is not None]+[1])+1))
     rows=[r for r in original_rows if r['game_id'] in ids]
     assert len(rows)==2*len(ids)>0
     at=min(p.time_of(r['game']) for r in rows)-dt.timedelta(minutes=5)
@@ -72,7 +75,7 @@ def verify(source_root=ROOT,temp_parent=None,scheduled=False):
         save(target/'work/projection-v1/source-manifest.json',transaction['sources'])
         import gzip
         data=gzip.compress(prepared.raw(rows),mtime=0)
-        prepared.commit(target,data,{'fit':fit_ref,'elo_hfa':artifact['elo_hfa'],'sha256':prepared.sha(data),'signature':'captured-slate-subset'})
+        prepared.commit(target,data,{'fit':fit_ref,'elo_hfa':artifact['elo_hfa'],'sha256':prepared.sha(data),'signature':'captured-slate-subset','publication_week':publication_week})
         feed_ref=store_source(target,final_raw)
         save(target/'outputs/projection-v3/final-feed.json',{**final_feed,'source_ref':feed_ref})
         phase=time.monotonic()
@@ -94,11 +97,21 @@ def verify(source_root=ROOT,temp_parent=None,scheduled=False):
         code={'commit':'UNCOMMITTED_CAPTURED_CANDIDATE','files':{n:obs.sha((ROOT/n).read_bytes()) for n in bundle.CODE_PATHS},
               'environment':{'python':sys.version,'scope':'actual canary interpreter'}}
         stack.enter_context(patch.object(bundle,'capture_code',return_value=code))
+        release_receipts=[]
+        if release_transitions:
+            stack.enter_context(patch.object(pipeline_release,'source',return_value=code))
+            save(target/pipeline_release.OWNER,{'state':'ACTIVE','owner':'canary','scope':'ISOLATED_SIMULATION'})
+            legacy_release=pipeline_release.checkpoint(target,label='captured legacy rollback checkpoint')
         phase=time.monotonic()
         with patch.object(p,'now',return_value=at-dt.timedelta(seconds=1)):
             if scheduled:preparer.prepare(select_scheduled=True,at=at)
             else:preparer.prepare(cutoff_state_ref=state_ref,game_ids=sorted(ids),role='FINAL_ELIGIBLE',at=at)
         elapsed('prepare',phase);phase=time.monotonic()
+        if release_transitions:
+            scheduled_release=pipeline_release.checkpoint(target,label='scheduled preparation canary')
+            release_receipts.append(pipeline_release.switch(target,scheduled_release,owner='canary',operation_id='canary-activate',expected_active=None))
+            assert pipeline_release.guard(target)['mode']=='SCHEDULED'
+            elapsed('release_switch',phase);phase=time.monotonic()
         with patch.object(p,'now',return_value=at+dt.timedelta(seconds=1)):
             upcoming=publisher.run(at+dt.timedelta(seconds=1))
         elapsed('upcoming_publish_including_board',phase)
@@ -107,6 +120,8 @@ def verify(source_root=ROOT,temp_parent=None,scheduled=False):
                      for c in upcoming['games'] if c['projection']!=expected[c['game_id']]['projection']]
         if differences:raise ValueError('Captured parity differs: '+json.dumps(differences[:2]))
         assert all(bundle.verify_card(target,c)['chronology']['status']=='RECORDED_CUTOFF_INPUTS' for c in upcoming['games'])
+        if release_transitions:
+            assert all(bundle.resolve(target,c['release_ref'],'releases')['pipeline_release_ref']==scheduled_release for c in upcoming['games'])
         final_ids={c['game_id'] for c in upcoming['games'] if c['forecast_role']=='FINAL_ELIGIBLE'}
         preview_ids=ids-final_ids
         if scheduled:
@@ -117,6 +132,12 @@ def verify(source_root=ROOT,temp_parent=None,scheduled=False):
         assert all(c['status']=='LOCKED' for c in locked['games'] if c['game_id'] in final_ids)
         assert all(c['forecast_role']=='PROVISIONAL' for c in locked['games'] if c['game_id'] in preview_ids)
         original_locks={f.name:obs.sha(f.read_bytes()) for f in (target/'outputs/projection-v3/locks').glob('*.json')}
+        if release_transitions:
+            phase=time.monotonic()
+            release_receipts.append(pipeline_release.switch(target,legacy_release,owner='canary',operation_id='canary-rollback',expected_active=scheduled_release))
+            assert pipeline_release.guard(target)['mode']=='LEGACY'
+            assert original_locks=={f.name:obs.sha(f.read_bytes()) for f in (target/'outputs/projection-v3/locks').glob('*.json')}
+            elapsed('release_rollback_before_grade',phase)
         # These future games have no actual final. Deliberately synthetic scores
         # exercise the real grader and board evidence, never an accuracy claim.
         records=list(csv.DictReader(io.StringIO(final_raw.decode())));finals={}
@@ -133,6 +154,11 @@ def verify(source_root=ROOT,temp_parent=None,scheduled=False):
         phase=time.monotonic();graded=publisher.run(grade_time);elapsed('first_grade_publish_including_board',phase)
         assert all(c['status']=='FINAL' and c['grades'] and c['forecast_bundle_ref']==old['forecast_bundle_ref']
                    for c,old in zip(graded['games'],upcoming['games']) if c['game_id'] in final_ids)
+        if release_transitions:
+            for card in graded['games']:
+                bundle.verify_card(target,card)
+                original=bundle.resolve(target,card['release_ref'],'releases')['pipeline_release_ref']
+                assert original==(scheduled_release if card['game_id'] in final_ids else legacy_release)
         grades={f.name:obs.sha(f.read_bytes()) for f in (target/'outputs/projection-v3/grades').glob('*.json')}
         phase=time.monotonic();publisher.run(grade_time+dt.timedelta(minutes=1));elapsed('duplicate_grade_publish_including_board',phase)
         assert grades=={f.name:obs.sha(f.read_bytes()) for f in (target/'outputs/projection-v3/grades').glob('*.json')}
@@ -144,7 +170,8 @@ def verify(source_root=ROOT,temp_parent=None,scheduled=False):
     assert all(obs.sha((source_root/name).read_bytes())==sha for name,sha in frozen.items())
     return {'status':'PASS','scope':'Actual preparer/publisher/bundle/lock/grader/board-evidence code; captured inputs, simulated future clocks and explicitly synthetic final scores. No activation or public website publish.',
             'checked_at':dt.datetime.now(dt.timezone.utc).isoformat(),'fit_ref':fit_ref,'observation_ref':latest,
-            'slate_games':len(ids),'scheduled_selection':scheduled,'final_eligible_games':len(final_ids),'provisional_games':len(preview_ids),'point_probability_interval_parity_games':len(ids),'source_frozen_records_preserved':len(frozen),
+            'slate_games':len(ids),'scheduled_selection':scheduled,'release_transition_simulation':release_transitions,
+            'release_transition_receipts':release_receipts,'final_eligible_games':len(final_ids),'provisional_games':len(preview_ids),'point_probability_interval_parity_games':len(ids),'source_frozen_records_preserved':len(frozen),
             'reference':'Legacy builder independently rerun on identical captured sources in this runtime; exact projection equality required.',
             'original_cache_max_point_difference':cache_delta,
             'synthetic_first_grades':len(grades),'idempotent_grades':len(grades),'preserved_canary_locks':len(original_locks),

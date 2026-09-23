@@ -22,6 +22,9 @@ PROTECTED = ('game_id','season','week','home','away','kickoff_at','cutoff_at','v
              'issued_at','evidence','projection','contributions','why','personnel','forecast',
              'fit_artifact_ref','fit_sha256','calibration_ref','probability_semantics')
 CODE_PATHS = (
+    'engine/projection/pipeline_release.py','scripts/cloud_scheduler.py',
+    'engine/projection/finals.py','engine/projection/source_archive.py',
+    'scripts/board_v7_publish.py','scripts/board_v9_publish.py',
     'engine/projection/bundle.py', 'engine/projection/scoring.py', 'engine/projection/prepared.py',
     'engine/projection/scoring_process.py', 'scripts/projection_score_worker.py',
     'engine/projection/lineage.py','engine/projection/storage.py',
@@ -102,6 +105,11 @@ def release_for(root, ref, artifact):
                   'probability_semantics':'P(win) plus half P(tie)',
                   'seed':{'status':'NOT_APPLICABLE','reason':'Deterministic empirical residual lookup'},
                   'release_role':'CAPTURED_ISSUING_MANIFEST; compatible executable rollback pending'}
+    from . import pipeline_release
+    pipeline_ref=pipeline_release.pointer(root,pipeline_release.ACTIVE)
+    if pipeline_ref:
+        pipeline_release.guard(root)
+        components['pipeline_release_ref']=pipeline_ref
     pointer = Path(root)/BASE/'current-release-ref.json'
     previous = json.loads(pointer.read_bytes()) if pointer.exists() else None
     if previous:
@@ -170,6 +178,16 @@ def verify_card(root, card):
         or hash_value(artifact_payload(artifact)) != release['scoring_artifact_sha256']):
         raise ValueError('Release components differ')
     read_artifact(root, release['calibration_ref'])
+    if release.get('pipeline_release_ref'):
+        # Old locks resolve their original manifest, never the current active
+        # mode/configuration. Rollback cannot relabel an already issued forecast.
+        from . import pipeline_release
+        pipeline=pipeline_release.read(root,release['pipeline_release_ref'],'manifests')
+        metadata=resolve(root,bundle['prepared_manifest_ref'],'input-manifests')
+        if (pipeline['code']!=release['code'] or pipeline['fit_ref']!=release['fit_artifact_ref']
+                or pipeline['calibration_ref']!=release['calibration_ref']
+                or pipeline_release.mode(metadata)!=pipeline['mode']):
+            raise ValueError('Forecast pipeline release differs')
     if cutoff_publication.protected(card):
         forecast=cutoff_publication.validate_card(root,card)
         if bundle['input']!=forecast['input']:raise ValueError('Cutoff bundle input differs')

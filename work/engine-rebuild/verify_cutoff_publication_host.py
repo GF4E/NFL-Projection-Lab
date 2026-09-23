@@ -37,13 +37,14 @@ values=score_batch(artifact,read_artifact(root,artifact['shapes']),requests)
 for card in cards:assert values[card['game_id']]=={k:card[k] for k in ('projection','contributions','why')}
 assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==s for p,s in FROZEN.items())
 assert not manifest.get('cutoff_mode'),'Unexpected cutoff activation'
+assert not (root/'outputs/projection-v3/pipeline-releases/active.json').exists(),'Unexpected pipeline release activation'
 fs=os.statvfs(root)
 print(json.dumps({'status':'VERIFIED_SOURCE_ARRIVAL' if actual==CODE else 'WAITING_FOR_SOURCE',
  'checked_at':datetime.datetime.now(datetime.timezone.utc).isoformat(),'host_commit':commit,
  'source_matches_final_candidate':actual==CODE,'source_differences':[p for p in CODE if actual[p]!=CODE[p]],
  'source_hashes':actual,'active_fit_ref':fit,'version':artifact['version'],
  'prepared_manifest_ref':manifest['prepared_manifest_ref'],'cutoff_mode':manifest.get('cutoff_mode'),
- 'cutoff_activation':False,'issuing_code_commit':release['code']['commit'],'release_ref':current,
+ 'cutoff_activation':False,'pipeline_activation':False,'issuing_code_commit':release['code']['commit'],'release_ref':current,
  'release_matches_installed_code':release['code']['files']=={p:actual[p] for p in bundle.CODE_PATHS},
  'exact_current_forecast_reproductions':len(cards),'frozen_records_preserved':len(FROZEN),
  'board_published_at':board['published_at'],'board_content_sha256':board['content_sha256'],

@@ -43,3 +43,7 @@ Connect an explicit cutoff preparation adapter to the existing immutable prepare
 ## Scheduled selection increment
 
 Resolve each upcoming game's required cutoff automatically using completed worker receipts. Bind the physical acknowledgment/configuration evidence to preparation and first-lock reconstruction; distinguish future-cutoff previews from due-cutoff failures. Render all selected groups before a single prepared commit. Exercise the actual scheduled preparer and publisher on fixtures and captured inputs, retaining the existing active selector until release/rollback qualification.
+
+## Compatible preparation release increment
+
+Implement RELEASE-TRANSITION.md: immutable manifests, fenced/serialized same-fit mode switches, explicit reconciliation after interrupted writes, actual-consumer guards and no silent fallback. Preserve the original publication population and every frozen record. Verify the captured-source switch → lock → rollback → grade path on Mac and Linux. Keep activation off pending full code/fit/runtime compatibility and weekly-refit handoff; preserve every other adopted acceptance item.

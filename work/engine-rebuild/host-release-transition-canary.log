@@ -1,0 +1,87 @@
+{
+  "status": "PASS",
+  "scope": "Actual preparer/publisher/bundle/lock/grader/board-evidence code; captured inputs, simulated future clocks and explicitly synthetic final scores. No activation or public website publish.",
+  "checked_at": "2026-09-23T00:06:29.384245+00:00",
+  "fit_ref": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "observation_ref": {
+    "path": "work/projection-observations-v1/snapshots/d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba.json.gz",
+    "sha256": "d3656dac9f670b4a670354286d6268a4d8744d1ee39f07097c09f1b380e449ba"
+  },
+  "slate_games": 15,
+  "scheduled_selection": true,
+  "release_transition_simulation": true,
+  "release_transition_receipts": [
+    {
+      "state": "COMMITTED",
+      "release_ref": {
+        "path": "outputs/projection-v3/pipeline-releases/manifests/c868e21b9f6809dcb3767e7a323d0527a298fe656d54bd94893bca888d3f7247.json",
+        "sha256": "c868e21b9f6809dcb3767e7a323d0527a298fe656d54bd94893bca888d3f7247"
+      },
+      "receipt_ref": {
+        "path": "outputs/projection-v3/pipeline-releases/receipts/2ba4e21aeff5e41dccbaaa33727ab5cd56fff2425e8e1eb48f2ccd126aead12c.json",
+        "sha256": "2ba4e21aeff5e41dccbaaa33727ab5cd56fff2425e8e1eb48f2ccd126aead12c"
+      }
+    },
+    {
+      "state": "COMMITTED",
+      "release_ref": {
+        "path": "outputs/projection-v3/pipeline-releases/manifests/d4cf852700b34653b824680382caac3addb8d731afa747de7e9b9bfc730a0f30.json",
+        "sha256": "d4cf852700b34653b824680382caac3addb8d731afa747de7e9b9bfc730a0f30"
+      },
+      "receipt_ref": {
+        "path": "outputs/projection-v3/pipeline-releases/receipts/b9fd3a44e531b21659bf1d554817896e657f299200f1f9d1fff18de5ddd210be.json",
+        "sha256": "b9fd3a44e531b21659bf1d554817896e657f299200f1f9d1fff18de5ddd210be"
+      }
+    }
+  ],
+  "final_eligible_games": 14,
+  "provisional_games": 1,
+  "point_probability_interval_parity_games": 15,
+  "source_frozen_records_preserved": 52,
+  "reference": "Legacy builder independently rerun on identical captured sources in this runtime; exact projection equality required.",
+  "original_cache_max_point_difference": 0.0,
+  "synthetic_first_grades": 14,
+  "idempotent_grades": 14,
+  "preserved_canary_locks": 14,
+  "board_evidence_games": 15,
+  "board_context_games": 15,
+  "simulated_cutoff": "2026-09-25T13:00:00+00:00",
+  "simulated_preparation": "2026-09-27T15:40:00+00:00",
+  "synthetic_final": {
+    "away": 20,
+    "home": 27
+  },
+  "consumer_code": {
+    "engine/projection/finals.py": "761e1db6f49b50148daacb8c44d322eb865a3a3d27d221aa1145637f816a0c67",
+    "engine/projection/source_archive.py": "c57fd254b478c3b5fcf49e81d043e977d9c126b1c96df2a6b52d4246e8025b5d",
+    "scripts/cloud_scheduler.py": "79735e5b962aed60b5e6a0d15558211395a04f3625d2c78631478935504fe455",
+    "scripts/board_v7_publish.py": "14b30935bcee2a1e046d935010fd04fe8f1f2e5fe247729d702de7056b2c3171",
+    "scripts/board_v9_publish.py": "4c9ab134333935010040ef5d5b43496635f55ae4eee10355db442bf1bc770d4b",
+    "work/engine-rebuild/check_cutoff_publisher.py": "38850274d807a60c0294cac9aba6b5c3531260db89a5c896ebc42b3a1999d253"
+  },
+  "stage_seconds": {
+    "state_update": 11.796492028981447,
+    "prepare": 41.84413009299897,
+    "release_switch": 50.99269837094471,
+    "upcoming_publish_including_board": 68.35255041799974,
+    "first_lock_publish_including_board": 61.5947047600057,
+    "release_rollback_before_grade": 0.5466191379819065,
+    "first_grade_publish_including_board": 35.038662577047944,
+    "duplicate_grade_publish_including_board": 5.91281731496565
+  },
+  "elapsed_seconds": 326.7722843539668,
+  "peak_rss_bytes": 269950976,
+  "artifact_bytes": 7770510,
+  "reference_limit": "Board references still use the retained SUPERSEDED adaptive series; current-reference migration remains required.",
+  "provider_requests": 0,
+  "new_spending": 0,
+  "host_commit": "9b795f33e58a33d8d52d261a774aed3df45065e9",
+  "uid": 1000,
+  "python": "3.12.2",
+  "tests": 61,
+  "address_space_limit_bytes": 4294967296,
+  "free_root_bytes": 135622656
+}

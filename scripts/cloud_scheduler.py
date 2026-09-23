@@ -141,6 +141,10 @@ def run(mode, host):
         if not permitted(record, host):
             return {'state': 'YIELD_TO_OWNER', 'owner': record.get('owner')}
         synchronize()
+        # No provider, fit or artifact publication may consume a half-switched
+        # projection release. A mode manifest is absent until separately qualified.
+        from engine.projection.pipeline_release import guard as release_guard
+        release_guard(ROOT)
         # A waiting state job must yield immediately if a capture window opened.
         if mode=='cutoff' and (capture_window() or weekly_capture_window(dt.datetime.now(dt.timezone.utc))):
             return {'state':'DEFERRED_CAPTURE_WINDOW'}

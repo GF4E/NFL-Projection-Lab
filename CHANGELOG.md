@@ -1,3 +1,11 @@
+## 2026-09-22 — preparation release transitions and reviewed prompt revision 4
+
+Infrastructure only; no statistical gate, method, calibration or production selector activation. Retain exact source/environment, fit/calibration, prepared snapshot and scheduled configuration in an immutable preparation release. Serialize the actual publisher with the preparer/refitter. Record transition intent before mutable pointers; dependent workers reject pending transitions, and same-ID retry reconciles without replaying a superseded release. A rollback cannot hide any currently visible game. Preserve original forecast bundles, state history, locks and first grades. New bundles retain the original preparation-release reference across later rollback.
+
+CONVENTIONS, REVIEW REQUESTED (Tier 2): this implementation qualifies same-fit/same-calibration preparation-mode transitions only; changed executables/runtime, cross-fit rollback and the active weekly-refit handoff remain required. It is not a general rollback implementation and is not activated. Tier 1: corrected a slate-only canary that omitted the original publication week/prior graded rows, and added a production check against population loss. Preserve the failed source/result. The full prompt carries that failure-derived requirement forward without changing any registered experiment.
+
+Verification and source/runtime scopes are in work/engine-rebuild/RELEASE-TRANSITION.md and the linked receipts. Final local checks: 529 passed. Final Linux: 62 fixtures, 15 initial forecasts, 14 locks/rollback/synthetic grades, 52 original records unchanged; 300.425 seconds and 270,016,512 peak RSS bytes within the existing limits. No provider requests or spending. Confidence in operational readiness remains medium; a real consumer bypass or frozen-record change lowers it to low. The full rebuild goal remains active.
+
 ## BOARD v8 — display-only book comparisons and table
 
 

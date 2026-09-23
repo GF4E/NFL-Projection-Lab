@@ -1,0 +1,17 @@
+{
+  "state": "FAILED_CANARY",
+  "error": "IndexError in board_v7.build because rollback checkpoint subset omitted publication_week and prior graded rows; publisher selected no week-3 games",
+  "elapsed_stages_seconds": {
+    "state_update": 1.3964969590015244,
+    "prepare": 4.497676375001902,
+    "release_switch": 8.461302708979929,
+    "upcoming_publish_including_board": 5.707794624991948,
+    "first_lock_publish_including_board": 4.836418749997392,
+    "release_rollback_before_grade": 0.0805486660101451
+  },
+  "source_snapshot": {
+    "path": "work/engine-rebuild/release-transition-first-failure-source.json.gz",
+    "sha256": "104f107f6b36c5c9fbb046f872a9098575937594e49f26c7501c2f647c6fe462"
+  },
+  "scope": "Isolated local canary; no host activation, production record mutation or provider calls"
+}
