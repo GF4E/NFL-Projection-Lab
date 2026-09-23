@@ -4,6 +4,8 @@ Goal ACTIVE; this turn PROGRESS after revalidating storage-only prior turn. Coll
 
 REVIEW REQUESTED: five-second/sixty-second budget can exclude a late revision; alternative is scoring until lock. Preserve the earlier frozen-reference and population flags. See PROSPECTIVE-COLLECTOR.md and prospective-collector/ for exact scope, failed tests, source manifests, resource and journal receipts.
 
+Source commit 5fd477b2719689334fe7bb14315e5eab7ed54f9d is pushed. Actual host f98e0aa1c verified all fifty files under UID 1000; disabled collection/health are NOT_ENROLLED, active fit 801ef079 unchanged, and next cutoff remains Friday September 25 13:00Z. First inspection refused writer contention; bounded reacquisition succeeded. See prospective-collector/host-installed.json.
+
 Issuing-source closure is now fifty files. Old forty-six-file packet 33f16c70 is historical and must not authorize this executable. Next: refresh recoverable source, rerun full initial operator on restored source, and bind a new review packet before activation. Actual Friday September 25 06:00 Pacific cutoff and issuing/public/control qualification still precede enrollment and E-CAL. Whole-goal storage-growth, calibration/mean semantics, E-VENUE, real reviewer decisions and live-cycle requirements remain open. Confidence medium in readiness, downgraded on independent parity or retry-integrity failure.
 
 # Latest checkpoint — prospective evidence path fixture and captured-input verified
