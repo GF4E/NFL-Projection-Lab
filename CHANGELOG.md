@@ -847,3 +847,8 @@ Confidence: medium in operational readiness—captured runtime evidence is verif
 ## 2026-09-23 — closeout Worker runtime repair (infrastructure)
 
 The first live closeout verification returned 503. workerd reproduced unsupported `redirect: error` as the cause; main c4310d7b9 uses manual redirects and rejects them without following. Real Worker and live checks now reproduce all frozen Week 2 artifact hashes and Season identity. No numerical model or frozen record changed. Actual-host anonymous access still returns 403, so unattended acknowledgment and dependent pipeline activation remain unqualified. See work/engine-rebuild/PUBLIC-CLOSEOUT.md; initial failures are preserved.
+
+
+## 2026-09-23 — source-to-forecast leakage integration checks
+
+Added six synthetic integration tests across feature construction, production-common refit/scoring, existing chronological selection/prior-residual helpers and recorded late revisions. All 98 related tests pass. Current/future source perturbations preserve earlier forecasts; an eligible-past positive control changes them. No method, setting, gate or production forecast changed. This does not qualify historical provider vintages or complete requirement 10c. See work/engine-rebuild/LEAKAGE.md.

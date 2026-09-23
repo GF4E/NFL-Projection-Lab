@@ -1,0 +1,13 @@
+# Source-to-forecast perturbation checks
+
+September 23. Integrity validation, not a registered method comparison: no candidate, gate, population or live setting changes. Use synthetic completed-game source records with explicit availability assumptions. Run the real cutoff feature builder, production-common preparation/refit/point scorer, and existing v3 chronological study/residual routines. Do not mistake a synthetic passing test for qualification of historical source vintages or activation of a historical calibration adapter.
+
+1. Generate varied paired games over 2014–2025, with 2014 warmup. Perturb current/future final scores and team statistics before feature construction. Verify earlier prepared features, training scaling/coefficients and projections remain identical. Reordering complete source inputs must also preserve results.
+2. Positive control: change an eligible earlier game and require later fitted projections to change, so invariance cannot pass through a disconnected fixture.
+3. Exercise existing chronological setting selection on source-built features, using its unchanged settings; perturb target/future outcomes and inputs. Verify prior forecasts and the target season's selected settings remain unchanged. Check own earlier out-of-fold residual shapes and emitted distribution for the same target. These checks validate historical helper boundaries only, not a newly qualified calibration release.
+4. Prove future-only feature magnitudes cannot change an earlier fit's means/scales. Preserve explicit failure when historical scoring is given an unqualified calibration table. Test a forbidden label in the forecast DTO.
+5. Retain failures and test scope in LEAKAGE.md; leave requirement 10c PARTIAL until real-data full-pipeline/vintage and prospective evidence are qualified. Any discovered production defect is investigated before a correction is proposed. No network, provider credits, live fit, source clock or publication changes.
+
+CONVENTIONS: Tier 1 — use production method ['calibration','elo'] and ['none',10] for the common refit check; unchanged v3 study settings only for its historical helper test. Four games per season are a bounded synthetic test fixture, never an evaluation population or accuracy estimate. Synthetic availability is kickoff plus four hours; real provider first-seen evidence remains separate. No open Tier 2/3 choice is resolved by these tests.
+
+Coverage refinement before final run: exercise each synthetic outer-season boundary 2016–2025; mutate finals and statistics separately as well as jointly. Check the first target forecast's point values separately from its deliberately changed actual label. Require the first fold to report absent earlier calibration rather than fabricate it.
