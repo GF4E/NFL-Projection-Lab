@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "artifact": {
+    "path": "work/engine-rebuild/early-forecasts/4222f29cde17fc765fe4370404205589d8df0b9205cfd00b6b00d5dc97c51129.json.gz",
+    "sha256": "4222f29cde17fc765fe4370404205589d8df0b9205cfd00b6b00d5dc97c51129"
+  },
+  "fits_checked": 51,
+  "games_checked": 768,
+  "team_training_memberships_checked": 64422,
+  "max_independent_fit_difference": 1.2789769243681803e-13,
+  "max_independent_prediction_difference": 2.842170943040401e-14,
+  "source_order_invariant": true,
+  "future_labels_preserve_2013_2014": true,
+  "past_label_positive_control_changed_2013_games": 256,
+  "elapsed_seconds": 15.249562874989351,
+  "checker": {
+    "path": "work/engine-rebuild/verify_early_forecasts.py",
+    "sha256": "b85bdb8b7685cf2882a62fad8889a2ee67c8ba31d77639a546e02b145de2abca"
+  },
+  "scope": "Warmup arithmetic/label boundaries only. Pregame features held fixed in label perturbations; source-to-feature checks are separate. No comparative accuracy or calibration gate."
+}
