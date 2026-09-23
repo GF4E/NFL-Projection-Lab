@@ -1,0 +1,25 @@
+# Calibration numerical evaluator verification
+
+SYNTHETIC VERIFICATION ONLY. No real-data bank fitted, candidate compared, registration clock started, production control changed or release activated.
+
+The read-only evaluator now runs behind the admission boundary. Both arms receive identical control team points, margin and total. The legacy arm estimates the declared donor method's prior-season empirical errors; the candidate uses the point method's own prior-season errors. OFFSEASON and WEEK9 executions have distinct bank identities, even when their permitted prior-season distributions are identical. At exact equality with the Week9 execution time, a forecast uses the older available bank.
+
+The worker retains each bank and individual prediction/actual/error/CRPS/interval record, including inclusive 50/80 hits, interval width/score and midpoint PIT. Summaries are pooled, by season and by NFL week. Team counts are twice game counts; game-level margin/total and winner reliability keep one observation per game. It reports strict home/away win and tie probabilities, the existing half-tie comparison probability, separate distribution means and negative mass. It does not clip the score distributions or claim the legacy point centers have become conditional means.
+
+The scoring functions are the existing scoringrules 0.10.0 adapter. The evaluator compares computed numerical evidence with the adopted gate, but labels release eligibility NOT_ASSESSED. It does not set source-qualification, reviewer, current-as-issued or prospective claims to true. Original issued projections and grades remain untouched.
+
+CONVENTIONS, Tier 1: existing ten-bin reliability/PIT convention; inclusive endpoint hits; control-minus-candidate mean game-level paired team CRPS; 10,000 replicates and seed 9132026 from projection_v3/qualify.py; its existing within-season three-week moving-block procedure; whole-season and leave-one-season-out sensitivity. These are descriptive uncertainty, not extra gates. PIT values within 1e-12 of an endpoint are bounded to [0,1] only to retain histogram membership despite floating-point summation. Raw point values and score distributions remain unchanged. CALIBRATION-NUMERICS-PLAN.md records the plan before implementation.
+
+The future registration must bind the exact uncertainty procedure, evaluator code files and Python/NumPy/scoringrules versions. Both repository bytes and executing code-location bytes are checked before fitting. After computation the runner rechecks all admission evidence and the experiment deadline before returning. Its periodic 45-minute check is cooperative; an external supervisor and actual resource qualification remain necessary before operational use. It performs no filesystem publication or network request.
+
+Verification: 100 related tests pass. This increment adds 13 numerical fixtures, four file-to-score integration fixtures and one code/runtime admission test. Finite-PMF CRPS is independently recomputed from its double-sum definition; interval scores, fractional point errors, coverage counts and tied-result Brier are checked directly. Tests cover source/fold ordering, future/current-season labels, Week9 strict equality, identical point forecasts, donor differences, missing populations, unknown weeks, interruption, expired registration, changed control during computation and rehashed code inconsistent with the executing source. Four integration tests use real admission, history and scoring validators on explicitly synthetic files. They do not establish production accuracy or original provider availability.
+
+The first numerical and integration test logs are retained; both passed. Final combined output is tests-calibration-numerics.log. No real numerical result or new registration artifact was produced.
+
+## Remaining work
+
+Next: implement durable, resumable attempt/result retention and the report/reviewer-packet adapter, with exact code/input/configuration identities and independent metric recomputation. Add current-as-issued evidence under its original lineage and required diagnostics without reading market fields into the scorer. Qualify the full real-data runner's resources and external deadline before execution. Before any real candidate fitting, establish corrected deployed-control authority, hashed Tuesday preregistration, published closeout and completed weight-only refit. The existing host/storage approval, unattended public access, actual reviewers, deployment transition, prospective evidence and observed live-cycle requirements remain open. Historical 2016–2025 results remain development evidence.
+
+Least certain: compatibility with the full prepared historical population and actual installed lifecycle; therefore no production-ready evaluator or predictive improvement is claimed from synthetic qualification.
+
+Confidence: medium in real-experiment readiness, meaning the implementation follows the authoritative contracts but still depends on unresolved lineage and operational choices. Lower to low if independent historical recomputation or installed-lifecycle verification disagrees. Provider credits and spending: zero.

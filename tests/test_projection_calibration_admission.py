@@ -88,6 +88,7 @@ class AdmissionTests(unittest.TestCase):
         self.r={'experiment':'E-CAL-LINEAGE','gate_policy':a.CALIBRATION_GATE,
             'point_tolerance':a.POINT_TOLERANCE,'candidates':['own_lineage_empirical'],
             'gate':copy.deepcopy(a.GATE),'calibration_settings':copy.deepcopy(a.SETTINGS),
+            'uncertainty':copy.deepcopy(a.UNCERTAINTY),
             'training_window':'prior seasons','tuning':'none','tie_break':'retain control',
             'disproving_conditions':'registered gate failure','baseline_hash':self.control_ref['sha256'],
             'week':2,'registered_at':'2026-09-22T14:00:00Z','deadline_at':'2026-09-29T13:00:00Z',
@@ -96,6 +97,12 @@ class AdmissionTests(unittest.TestCase):
             'method_hashes':{k:v['sha256'] for k,v in self.inputs['methods'].items()},
             'population_game_ids':['fixture'],'seasons':[2016],'closeout':closed_ref,
             'weekly_request':request_ref,'weekly_result':result_ref}
+        self.r['evaluation_environment']=a.environment();self.r['evaluation_code']=[]
+        code_root=Path(a.__file__).resolve().parents[2]
+        for path in a.EVALUATOR_CODE:
+            raw=(code_root/path).read_bytes();target=self.root/path
+            target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(raw)
+            self.r['evaluation_code'].append({'path':path,'sha256':hashlib.sha256(raw).hexdigest()})
 
     def save(self,path,value):
         raw=json.dumps(value,sort_keys=True).encode();target=self.root/path
@@ -142,6 +149,14 @@ class AdmissionTests(unittest.TestCase):
     def test_gate_and_settings_cannot_be_weakened(self):
         self.r['gate']['minimum_relative_improvement']=0
         self.rejects('adopted calibration contract')
+
+    def test_code_and_environment_are_bound_before_fitting(self):
+        self.r['evaluation_environment']['numpy']='changed';self.rejects('environment changed')
+        self.r['evaluation_environment']=a.environment()
+        ref=self.r['evaluation_code'][0];(self.root/ref['path']).write_bytes(b'changed')
+        self.rejects('bytes changed')
+        ref['sha256']=hashlib.sha256(b'changed').hexdigest()
+        self.rejects('bytes changed')  # Rehashed fixture differs from executing source.
 
     def test_clock_and_tuesday_registration(self):
         self.r['registered_at']='2026-09-23T14:00:00Z';self.rejects('Tuesday clock')

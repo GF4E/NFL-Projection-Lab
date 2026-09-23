@@ -4,6 +4,8 @@ import gzip
 import hashlib
 import json
 import math
+import platform
+from importlib.metadata import version
 from pathlib import Path
 from engine.forecast_system.calendar import PACIFIC, timestamp
 from engine.projection_experiments import digest, CALIBRATION_GATE, POINT_TOLERANCE
@@ -19,6 +21,17 @@ SETTINGS={'family':'EXISTING_EMPIRICAL_INTEGER','window':'PRIOR_COMPLETED_SEASON
           'residual_location':'RAW','dependence':'PAIRED_GAME_RESIDUALS',
           'rounding':'HALF_AWAY_FROM_ZERO','quantile':'LEFT_INVERSE',
           'ties':'HALF_TIE','negative_mass':'RETAIN_AND_REPORT','cadence':['OFFSEASON','WEEK9']}
+UNCERTAINTY={'replicates':10000,'seed':9132026,'block_weeks':3,'interval':.95,
+             'estimand':'mean_game_paired_team_CRPS_control_minus_candidate',
+             'sensitivities':['within_season_moving_blocks','whole_seasons','leave_one_season_out']}
+EVALUATOR_CODE=('engine/projection/calibration_admission.py','engine/projection/calibration_evaluate.py',
+                'engine/projection/calibration_history.py','engine/projection/distribution.py',
+                'engine/projection/model.py','engine/scoring.py','engine/projection_v3/qualify.py',
+                'engine/projection_experiments.py','engine/forecast_system/calendar.py')
+
+
+def environment():
+    return {'python':platform.python_version(),'numpy':version('numpy'),'scoringrules':version('scoringrules')}
 
 
 def checked_bytes(root,ref):
@@ -55,8 +68,16 @@ def preflight(root,registration_ref,*,at):
     if r.get('sha256')!=digest({k:v for k,v in r.items() if k!='sha256'}): raise ValueError('Registration body changed')
     if (r.get('experiment')!='E-CAL-LINEAGE' or r.get('gate_policy')!=CALIBRATION_GATE
             or r.get('point_tolerance')!=POINT_TOLERANCE or r.get('candidates')!=['own_lineage_empirical']
-            or r.get('gate')!=GATE or r.get('calibration_settings')!=SETTINGS):
+            or r.get('gate')!=GATE or r.get('calibration_settings')!=SETTINGS
+            or r.get('uncertainty')!=UNCERTAINTY):
         raise ValueError('Registration changes adopted calibration contract')
+    if r.get('evaluation_environment')!=environment():raise ValueError('Evaluator environment changed')
+    refs=r.get('evaluation_code',[])
+    if sorted(x['path'] for x in refs)!=sorted(EVALUATOR_CODE):raise ValueError('Complete evaluator code identity required')
+    running_root=Path(__file__).resolve().parents[2]
+    for ref in refs:
+        checked_bytes(root,ref)
+        checked_bytes(running_root,ref)
     for field in ('training_window','tuning','tie_break','disproving_conditions','baseline_hash','week'):
         if not r.get(field):raise ValueError('Incomplete preregistration')
     began=timestamp(r['registered_at']);local=began.astimezone(PACIFIC)
