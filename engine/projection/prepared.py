@@ -116,21 +116,27 @@ def load(root, manifest=None, ref=None):
     return decode(data), manifest, data
 
 
-def commit(root, data, metadata):
-    """Caller holds writer(); records first, current pointer last, same fit only."""
+def retain(root, data, metadata):
+    """Stage immutable preparation without changing either active pointer."""
     root = Path(root)
     decode(data)
     if metadata.get('sha256') != sha(data):
         raise ValueError('Prepared input hash mismatch')
-    if metadata.get('fit') != active_fit(root):
-        raise ValueError('Prepared inputs and active fit differ')
     body = {k:v for k,v in metadata.items() if k not in ('features_ref','prepared_manifest_ref')}
     feature_ref = reference(data,'prepared-features')
     write_bytes(root/feature_ref['path'],data,immutable=True)
     body['features_ref'] = feature_ref
     encoded = raw(body); manifest_ref = reference(encoded,'prepared-manifests')
     write_bytes(root/manifest_ref['path'],encoded,immutable=True)
-    pointer = {**body,'prepared_manifest_ref':manifest_ref}
+    return {**body,'prepared_manifest_ref':manifest_ref}
+
+
+def commit(root, data, metadata):
+    """Caller holds writer(); stage first, pointer last, same fit only."""
+    root = Path(root)
+    if metadata.get('fit') != active_fit(root):
+        raise ValueError('Prepared inputs and active fit differ')
+    pointer = retain(root, data, metadata)
     # An out-of-contract writer must not cause a mismatched pointer to publish.
     if active_fit(root) != metadata['fit']:
         raise ValueError('Active fit changed during preparation')

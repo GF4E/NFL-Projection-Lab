@@ -42,12 +42,12 @@ def _prepare():
   prepared.commit(ROOT,raw,manifest)
   return rows
  rows=build(read(m['team_games']),read(m['schedule']),stadiums,None if d=='none' else int(d),m['roster_source_hashes'],elo_hfa=a.get('elo_hfa'));future=enrich([r for r in rows if r['season']==2026],current_personnel(a),None if d=='none' else int(d));raw=gzip.compress(json.dumps(future,sort_keys=True,separators=(',',':'),allow_nan=False).encode(),mtime=0);prepared.commit(ROOT,raw,{'observation_snapshot_ref':observation_ref,'elo_hfa':a.get('elo_hfa'),'signature':signature,'sha256':hashlib.sha256(raw).hexdigest(),'source_manifest':m,'fit':ref,'personnel_source_hashes':[{k:r.get(k) for k in ['name','sha256','received_at','refresh_error']} for r in current if r['name'] in ['play_by_play_2026.parquet','depth_charts_2026.parquet']]});return future
-def _cutoff_context(at=None):
+def _cutoff_context(at=None,fit_ref=None):
  from engine.projection.lineage import read_artifact
  from engine.forecast_system.calendar import schedule_kickoff,timestamp
  from datetime import timedelta
  old_rows,old_manifest,_=prepared.load(ROOT)
- ref=prepared.active_fit(ROOT);artifact=read_artifact(ROOT,ref);cutoff_pipeline.settings(artifact)
+ ref=fit_ref or prepared.active_fit(ROOT);artifact=read_artifact(ROOT,ref);cutoff_pipeline.settings(artifact)
  manifest=json.loads((ROOT/'work/projection-v1/source-manifest.json').read_bytes())
  schedule_ref=cutoff_pipeline.capture_schedule(ROOT,manifest['schedule'])
  at=timestamp(at if at is not None else cutoff_pipeline.now())
@@ -61,7 +61,7 @@ def _cutoff_context(at=None):
              stadiums=json.loads((ROOT/'config/stadiums.json').read_bytes()),week=min(18,max(completed+[1])+1))
 
 
-def _prepare_groups(groups,context,selection=None):
+def _prepare_groups(groups,context,selection=None,stage=False):
  old_rows=context['old_rows'];old_manifest=context['old_manifest'];ref=context['ref']
  mapping=dict(old_manifest.get('cutoff_preparations',{}));replacements={};seen=set()
  for group in groups:
@@ -80,7 +80,9 @@ def _prepare_groups(groups,context,selection=None):
    body=prior;body_ref=json.loads(next(iter(previous)))
   else:body_ref=cutoff_pipeline.store(ROOT,'preparations',body)
   replacements.update({r['row_id']:r for r in body['rows']});mapping.update({g:body_ref for g in game_ids})
- if not groups:return old_rows
+ if not groups:
+  if stage:raise ValueError('No upcoming games to stage for refit')
+  return old_rows
  rows=[copy.deepcopy(replacements.get(r['row_id'],r)) for r in old_rows]
  raw=gzip.compress(prepared.raw(rows),mtime=0)
  meta={k:v for k,v in old_manifest.items() if k not in ('prepared_manifest_ref','features_ref')}
@@ -90,6 +92,7 @@ def _prepare_groups(groups,context,selection=None):
   prior=meta.get('scheduled_selection')
   meta['scheduled_selection']=prior if prior and all(prior[k]==selection[k] for k in ('groups','games','closed_games')) else selection
  meta['signature']=hash_value({k:v for k,v in meta.items() if k!='signature'})
+ if stage:return prepared.retain(ROOT,raw,meta)
  prepared.commit(ROOT,raw,meta)
  return rows
 
@@ -100,14 +103,35 @@ def _prepare_cutoff(state_ref,game_ids,role,at=None):
  return _prepare_groups([dict(state_ref=state_ref,game_ids=game_ids,role=role)],_cutoff_context(at))
 
 
-def _prepare_scheduled(at=None):
+def _prepare_scheduled(at=None,fit_ref=None,stage=False):
  from engine.projection.cutoff_selection import select
- context=_cutoff_context(at);ids={r['game_id'] for r in context['old_rows'] if int(r['week'])<=context['week']}
+ context=_cutoff_context(at,fit_ref);ids={r['game_id'] for r in context['old_rows'] if int(r['week'])<=context['week']}
  ids={g for g in ids if not (ROOT/'outputs/projection-v3/locks'/f'{g}.json').exists()}
  games=[g for g in context['schedule'] if g['game_id'] in ids]
  if {g['game_id'] for g in games}!=ids:raise ValueError('Scheduled preparation population differs')
  selection=select(ROOT,games,context['at'])
- return _prepare_groups(selection['groups'],context,selection)
+ return _prepare_groups(selection['groups'],context,selection,stage=stage)
+
+
+def stage_refit(shadow_ref,*,at):
+ """Build a weight-only checkpoint; no active fit/preparation/release writes."""
+ from engine.projection import refit_release, pipeline_release
+ from engine.forecast_system.calendar import timestamp
+ with prepared.writer(ROOT):
+  pipeline_release.guard(ROOT)
+  ref=refit_release.retain(ROOT,shadow_ref)
+  artifact=refit_release.verify(ROOT,ref)
+  if artifact['parent_fit_ref']!=prepared.active_fit(ROOT):
+   raise ValueError('Staged refit parent is not active')
+  if timestamp(artifact['issued_at'])>timestamp(at):
+   raise ValueError('Staged refit unavailable at preparation')
+  meta=_prepare_scheduled(at,fit_ref=ref,stage=True)
+  selected=meta['scheduled_selection']['games']
+  refs={meta['cutoff_preparations'][gid]['sha256']:meta['cutoff_preparations'][gid] for gid in selected}
+  for preparation_ref in refs.values():
+   cutoff_pipeline.recorded_scores(ROOT,preparation_ref,ref,purpose='ISSUER_PREPARATION')
+  return pipeline_release.checkpoint(ROOT,label='RECORDED_WEIGHT_ONLY_STAGED',
+                                     prepared_ref=meta['prepared_manifest_ref'])
 
 
 def prepare(*,cutoff_state_ref=None,game_ids=None,role=None,at=None,select_scheduled=None):

@@ -1,3 +1,13 @@
+## 2026-09-22 — staged recorded refit and compatible fit rollback
+
+Infrastructure only. Separate cutoff-state method identity from the weight-only ridge fit identity. Preserve worker configuration and state receipts. A new immutable issuing envelope must reproduce the completed recorded fit, preserve all parent method/calibration fields and fixed feature/penalty settings, and retain its durable availability. No candidate, gate or calibration change.
+
+Stage the actual scheduled preparation and scorer before changing pointers. Extend the fenced release journal to include the active fit; reject unrelated rollback targets and any partial transition until the same operation reconciles. Bundle identity remains original after rollback. CONVENTIONS follow the existing method identity and immutable writer journal; Tier 2 REVIEW REQUESTED remains for the exact-runtime boundary, with general executable/runtime rollback still required.
+
+Evidence: work/engine-rebuild/REFIT-HANDOFF.md; 570 local checks pass (342 projection, 218 Week 1, 10 closeout); 25 focused tests pass on actual Linux service Python in 17.118 seconds. The new publisher fixture verifies the expected coefficient effect and original bundle validity after rollback. Initial broader-run digest assertion failure is preserved and corrected to the canonical fit-hash convention. No live activation, provider call or spending. Full weekly dispatch, captured end-to-end transaction, public closeout, capacity and all statistical/reviewer/live-cycle requirements remain open.
+
+Confidence: medium in operational readiness—verified fixture evidence exists, but real dispatch/publication integration remains consequential. Lower to low if a captured/live consumer bypasses the journal or changes a frozen record.
+
 ## 2026-09-22 — explicit supervised chronological train/test requirement
 
 User clarification; evaluation audit and prompt revision 7, no method change. Completed NFL games supply paired integer team-score targets. Train on past games, choose settings using earlier chronological validation, and evaluate later forecasts against their known finals; each game is excluded from its own fit. Both teams stay together. Full-precision expected points remain regression outputs. Existing gates, candidates and eligible population are unchanged.
