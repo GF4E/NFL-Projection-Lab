@@ -24,14 +24,14 @@ class CloseoutTest(unittest.TestCase):
             now=dt.datetime.now(dt.timezone.utc)
             with patch('scripts.closeout_publish.qualified',return_value=False):
                 result=publish(root,rows,board,1,push,lambda:({'weeks':[],'reference_lines':{'schema':'reference-lines-report-v1','series':{}}},{'weeks':[]}),now)
-                self.assertEqual(events,[False,True])
+                self.assertEqual(events,[False,True,True])
                 scorecard=json.loads(next(root.glob('outputs/cadence-v2/weeks/*/scorecard.json')).read_text())
                 self.assertEqual(scorecard['reference_lines']['schema'],'reference-lines-report-v1')
                 receipt=next(root.glob('outputs/cadence-v2/closeouts/*.json'))
                 later=dt.datetime.now(dt.timezone.utc)
                 self.assertEqual(require_published(root,receipt,later),result)
                 self.assertEqual(publish(root,rows,board,1,push,lambda:self.fail('must reuse'),later),result)
-                self.assertEqual(events,[False,True])
+                self.assertEqual(events,[False,True,True])
                 with self.assertRaises(ValueError):require_published(root,receipt,dt.datetime(2000,1,1,tzinfo=dt.timezone.utc))
                 (root/next(iter(result['artifacts']))).write_text('changed')
                 with self.assertRaises(ValueError):require_published(root,receipt,later)
@@ -64,7 +64,7 @@ class CloseoutRecoveryTest(unittest.TestCase):
         receipt=next(self.root.glob('outputs/cadence-v2/closeouts/*.json'))
         with self.assertRaises(FileNotFoundError):require_published(self.root,receipt,dt.datetime.now(dt.timezone.utc))
         before=receipt.read_bytes();result=self.publish(push,lambda:self.fail('must resume, not regenerate'))
-        self.assertEqual(before,receipt.read_bytes());self.assertEqual(len(calls),3)
+        self.assertEqual(before,receipt.read_bytes());self.assertEqual(len(calls),4)
         self.assertEqual(require_published(self.root,receipt,dt.datetime.now(dt.timezone.utc)),result)
 
     def test_snapshot_reused_after_failed_evidence_push(self):
@@ -108,3 +108,34 @@ class CloseoutRecoveryTest(unittest.TestCase):
         from scripts import projection_learning as runtime
         with patch.object(runtime,'initialize'),patch.object(runtime,'current_rows',return_value=self.rows),patch.object(runtime,'due_week',return_value=1),patch.object(runtime,'closeout_for_refit',return_value=False),patch.object(runtime,'weekly_refit',side_effect=AssertionError('refit before closeout')):
             result=runtime.run_weekly();self.assertEqual(result['state'],'WAITING_FOR_PUBLISHED_CLOSEOUT')
+
+    def test_index_push_failure_retries_without_regenerating(self):
+        calls=[]
+        def push():
+            calls.append(1)
+            if len(calls)==3:raise RuntimeError('index response lost')
+            return 'a'*40
+        with self.assertRaisesRegex(RuntimeError,'index response lost'):self.publish(push)
+        index=self.root/'outputs/cadence-v2/publication-index.json';before=index.read_bytes()
+        self.assertFalse(list(self.root.glob('outputs/cadence-v2/index-acknowledgments/*.json')))
+        self.publish(push,lambda:self.fail('must not regenerate'))
+        self.assertEqual(before,index.read_bytes());self.assertEqual(len(calls),4)
+        self.publish(lambda:self.fail('already acknowledged'),lambda:self.fail('must not regenerate'))
+
+    def test_index_pins_receipt_and_source_and_rejects_replacement(self):
+        self.publish(lambda:'a'*40)
+        p=self.root/'outputs/cadence-v2/publication-index.json';index=json.loads(p.read_bytes())
+        ref=index['releases']['2026-w1']
+        self.assertEqual(index['latest'],'2026-w1')
+        self.assertEqual(ref['receipt_source_commit'],'a'*40)
+        self.assertEqual(len(ref['receipt_sha256']),64)
+        index['releases']['2026-w1']['receipt_sha256']='b'*64;p.write_text(json.dumps(index))
+        with self.assertRaisesRegex(ValueError,'cannot change'):self.publish(lambda:self.fail('must not push changed identity'))
+
+    def test_older_backfill_cannot_move_latest_backwards(self):
+        self.publish(lambda:'a'*40)
+        p=self.root/'outputs/cadence-v2/publication-index.json';index=json.loads(p.read_bytes())
+        index['releases']['2026-w2']={**index['releases']['2026-w1'],'week':2}
+        index['latest']='2026-w2';p.write_text(json.dumps(index))
+        self.publish(lambda:'b'*40)
+        self.assertEqual(json.loads(p.read_text())['latest'],'2026-w2')

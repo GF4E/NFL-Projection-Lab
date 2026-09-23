@@ -1,3 +1,11 @@
+## 2026-09-23 — immutable public closeout index
+
+Infrastructure/reporting only. After immutable snapshot and receipt pushes, publish a release index pinning the receipt hash and its verified Git commit. A third verified push is required before index acknowledgment; failed or lost pushes retry without regenerating grades or snapshots. Existing release identities cannot change; older backfills cannot move latest completed week backwards. Season and the site report are being connected to this exact artifact graph on main; source acknowledgment alone is not public HTTP verification.
+
+CONVENTIONS: reuse existing receipt/source commits and bounded immutable writes. Tier 2 REVIEW REQUESTED: Season follows the last completed closeout while in-progress games remain on the board; a provisional Season view is the alternative. Temporary owner-authenticated observation is not an unattended credential lifecycle. Plan: work/engine-rebuild/PUBLIC-CLOSEOUT-PLAN.md. Thirty-four local integration tests and six subtests pass; 13 closeout/recovery tests pass on actual host service Python/UID in isolated tmpfs. All three Week 2 artifact hashes and the receipt reproduce at their recorded Git commits. No fit, gate, original grade, active pipeline selector or provider call changes. Public deployment/byte evidence follows separately.
+
+Confidence: high in the tested publication ordering and immutable-source identity, meaning verified recovery cases survive the obvious retry and corruption alternatives; lower to medium if live source/index verification differs. Complete unattended readiness remains unproved.
+
 ## 2026-09-22 — matched chronological score benchmarks
 
 Descriptive audit only, no new fit, statistical candidate, gate or production authority change. Extend the saved NON_AUTHORITATIVE_REPLAY train/test audit with prior-season league/venue averages and the existing four-game team scoring baseline, using exactly the same 2,639 games and strictly earlier cutoff-eligible results. Full-precision predictions are compared with integer final team scores; both teams remain grouped.

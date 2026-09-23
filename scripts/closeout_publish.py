@@ -2,6 +2,7 @@
 import datetime as dt
 import hashlib
 import json
+import re
 import subprocess
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -66,6 +67,59 @@ def _confirm(receipt, publish_callback):
     write_bytes(_ack_path(receipt), _encode(acknowledgment), immutable=True)
 
 
+def publish_index(root, receipt, publish_callback):
+    """Pin remotely published receipts; index retries never replace a release."""
+    root, receipt = Path(root), Path(receipt)
+    closed = require_published(root, receipt, dt.datetime.now(dt.timezone.utc))
+    if closed.get('schema') != 'closeout-publication-v2':
+        raise ValueError('Index requires a verified v2 closeout receipt')
+    season, week = closed['season'], closed['week']
+    if type(season) is not int or type(week) is not int or not 2000 <= season <= 2099 or not 1 <= week <= 22:
+        raise ValueError('Invalid closeout season/week')
+    key = f'{season}-w{week}'
+    expected = {f'outputs/cadence-v2/weeks/{key}/{n}.json' for n in ('scorecard', 'trend', 'season')}
+    if set(closed['artifacts']) != expected:
+        raise ValueError('Index requires all three exact closeout paths')
+    relative = str(receipt.resolve().relative_to(root.resolve()))
+    if not re.fullmatch(r'outputs/cadence-v2/closeouts/\d{4}-\d{2}-\d{2}\.json', relative):
+        raise ValueError('Invalid indexed receipt path')
+    ack = json.loads(_ack_path(receipt).read_bytes())
+    entry = {'season': season, 'week': week, 'published_at': closed['published_at'],
+             'receipt_path': relative, 'receipt_sha256': digest(receipt),
+             'receipt_source_commit': _verified_commit(ack['verified_remote_commit'])}
+    path = root/'outputs/cadence-v2/publication-index.json'
+    index = json.loads(path.read_bytes()) if path.exists() else {'schema': 'closeout-index-v1', 'releases': {}}
+    if index.get('schema') != 'closeout-index-v1' or not isinstance(index.get('releases'), dict):
+        raise ValueError('Invalid closeout index')
+    releases = index['releases']
+    for name, prior in releases.items():
+        if (not re.fullmatch(r'20\d{2}-w(?:[1-9]|1\d|2[0-2])', name)
+                or name != f"{prior['season']}-w{prior['week']}"
+                or not re.fullmatch(r'[0-9a-f]{64}', prior['receipt_sha256'])):
+            raise ValueError('Invalid prior index release')
+        _verified_commit(prior['receipt_source_commit'])
+    if key in releases and releases[key] != entry:
+        raise ValueError('Indexed closeout identity cannot change')
+    releases[key] = entry
+    index['latest'] = max(releases, key=lambda k: (releases[k]['season'], releases[k]['week']))
+    raw = _encode(index)
+    write_bytes(path, raw)
+    sha = hashlib.sha256(raw).hexdigest()
+    confirmation = root/f'outputs/cadence-v2/index-acknowledgments/{sha}.json'
+    if confirmation.exists():
+        value = json.loads(confirmation.read_bytes())
+        if value.get('index_sha256') != sha:
+            raise ValueError('Index acknowledgment changed')
+        _verified_commit(value['verified_remote_commit'])
+        return value
+    source = _verified_commit(publish_callback())
+    value = {'schema': 'closeout-index-ack-v1', 'index_sha256': sha,
+             'verified_remote_commit': source,
+             'confirmed_at': dt.datetime.now(dt.timezone.utc).isoformat()}
+    write_bytes(confirmation, _encode(value), immutable=True)
+    return value
+
+
 def publish(root, rows, board, week, publish_callback, refresh_callback, now=None):
     now = now or dt.datetime.now(dt.timezone.utc)
     local = now.astimezone(PT)
@@ -81,8 +135,9 @@ def publish(root, rows, board, week, publish_callback, refresh_callback, now=Non
         if result['season'] == season and result['week'] == week:
             if result.get('schema') == 'closeout-publication-v2' and not _ack_path(receipt).exists():
                 _confirm(receipt, publish_callback)
-                return require_published(root, receipt, dt.datetime.now(dt.timezone.utc))
-            return require_published(root, receipt, now)
+            result = require_published(root, receipt, dt.datetime.now(dt.timezone.utc))
+            publish_index(root, receipt, publish_callback)
+            return result
         raise ValueError('Tuesday already belongs to another closeout')
     slate = {r['game_id']: r for r in rows if r['season'] == season and r['week'] == week}
     cards = {g['game_id']: g for g in board['games']}
@@ -133,6 +188,7 @@ def publish(root, rows, board, week, publish_callback, refresh_callback, now=Non
               'publication_surface': 'source_repository'}
     write_bytes(receipt, _encode(result), immutable=True)
     _confirm(receipt, publish_callback)
+    publish_index(root, receipt, publish_callback)
     return result
 
 
