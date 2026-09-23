@@ -23,6 +23,8 @@ Restart exposed a cold Git-index refresh taking 56.93 seconds, exceeding the exi
 
 After normal timers resumed, the final-score reader refreshed successfully at 2026-09-23 17:10:41 UTC, replacing its stale 10:16:11 UTC success. The 17:11:02 UTC host monitor no longer reported disk exhaustion or a stale final reader; its only remaining local finding was the explicitly unqualified peak-write/growth reserve. The cutoff service also completed successfully at 17:11:08 UTC. These are observed scheduled results, not an inference from service startup. See scheduled-recovery.json; the earlier receipt is retained separately.
 
+The installed host dual-disk monitor subsequently reported both filesystem samples, with an exact code hash match to the source change. See deployment-verification.json.
+
 ## Billing and remaining limits
 
 The user reports USD 3.29 signup credit. The billing API does not expose its promotional balance or expiration, so no deduction or remaining credit is asserted. The approved incremental cost remains USD 2/month before tax. Official pricing: https://docs.digitalocean.com/products/volumes/details/pricing/ .
