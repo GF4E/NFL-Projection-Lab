@@ -73,6 +73,8 @@ refit handoff and remaining executable/runtime compatibility before activation.
 The full requirement map remains PARTIAL. Public payload equality, a real
 scheduled cycle and statistical improvements are not claims of this result.
 
+Source follow-through verified at 2026-09-23T00:15:36.749072+00:00: host checkout `12123cbd5ac6dc9f357a88cb9978aa4143a4da5c` contains the exact final candidate and consumer source, with no differences. Implementation commit `dc50019b8e6d343cf093c9d89f463502d40d1939` is pushed to engine-v2. All 16 current forecasts reproduce exactly; all 52 original locks/grades retain their hashes. Fit remains `801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f` (projection-v2.hfa1.w3). Prepared cutoff mode is null and no active pipeline manifest exists. The observed issuing source is still `527ce6e2247582687b260db7491a8447fb9d42c2`, release `7b9c66ee59137dde6dc08f7fd9843c8bcc136eaba99571f4f77d6cb51e2101ec`; source installation is not new-release issuance or public-site proof. Root free bytes: 133816320. No provider requests or spending. See host-release-transition-followthrough.json.
+
 Confidence: medium — authoritative captured inputs support the bounded release
 claims, but operational readiness still depends on the restricted compatibility
 choice and an unobserved live cycle. Lower to low if a real consumer admits a
