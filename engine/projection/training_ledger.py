@@ -15,6 +15,7 @@ from . import cutoff_pipeline as p, cutoff_state as cs, observations as obs
 from .storage import write_bytes
 
 SCHEMA = 'retained-pregame-training-ledger-v1'
+BOUNDARY_SCHEMA = 'preactivation-training-boundary-v1'
 
 
 def fit_row(row):
@@ -171,6 +172,77 @@ def qualify_base(root, ledger):
     return rows
 
 
+def boundary_sources(root, observation_ref, stadiums_ref, at):
+    """Bind observed source bytes without claiming historical vintage coverage."""
+    selected, _, transaction = cs.snapshot_before(root, observation_ref, at)
+    if selected != observation_ref:
+        raise ValueError('Migration observation snapshot was unavailable at boundary')
+    obs.load(root, observation_ref)
+    sources = {**transaction['sources'], 'stadiums': stadiums_ref}
+    schedule = obs.read_source(root, sources['schedule'], 'schedule')
+    statistics = obs.read_source(root, sources['team_games'], 'team-games')
+    obs.material(schedule, statistics, at)
+    read(root, stadiums_ref)
+    return sources, schedule
+
+
+def legacy_record(root, gid, at):
+    name = f'outputs/projection-v3/locks/{gid}.json'
+    path = Path(root) / name
+    if not path.exists():
+        return {'game_id': gid, 'status': 'NOT_RECORDED', 'lock_ref': None}
+    ref = {'path': name, 'sha256': obs.sha(path.read_bytes())}
+    card = read(root, ref)
+    if card['game_id'] != gid or card.get('status') not in ('LOCKED', 'FINAL'):
+        raise ValueError('Migration requires an original legacy lock')
+    if card.get('cutoff_forecast_ref') or card.get('forecast_role') == 'FINAL_ELIGIBLE':
+        raise ValueError('Recorded-cutoff lock cannot be reconstructed as legacy')
+    if card.get('freeze_time') and p.timestamp(card['freeze_time']) > at:
+        raise ValueError('Migration lock was unavailable at boundary')
+    return {'game_id': gid, 'status': 'RETAINED_ORIGINAL', 'lock_ref': ref}
+
+
+def migration_rows(root, ledger, prior_rows):
+    boundary = ledger.get('migration_boundary')
+    if boundary is None:
+        return []
+    if boundary.get('schema') != BOUNDARY_SCHEMA:
+        raise ValueError('Migration boundary schema differs')
+    at = p.timestamp(boundary['boundary_at'])
+    parent = p.load(root, boundary['parent_ref'], 'training')
+    if (parent.get('migration_boundary') is not None or parent['recorded_locks']
+            or not p.timestamp(parent['created_at']) <= at <= p.timestamp(ledger['created_at'])):
+        raise ValueError('Migration boundary must precede recorded training')
+    if sorted(paired_rows(prior_rows)) != parent['training_games']:
+        raise ValueError('Migration parent population differs')
+    sources, schedule = boundary_sources(root, boundary['observation_ref'], boundary['sources']['stadiums'], at)
+    if sources != boundary['sources']:
+        raise ValueError('Migration sources differ from observed snapshot')
+    targets = sorted(g['game_id'] for g in schedule
+                     if g['game_type'] == 'REG' and int(g['season']) == ledger['transition_season']
+                     and p.time_of(g) < at and g['game_id'] not in parent['training_games'])
+    if boundary['reconstructed_games'] != targets or len(set(targets)) != len(targets):
+        raise ValueError('Migration boundary population differs')
+    if (boundary['evidence'] != 'HISTORICAL_RECONSTRUCTION_NOT_AS_ISSUED'
+            or [r['game_id'] for r in boundary['original_records']] != targets):
+        raise ValueError('Migration original-record evidence differs')
+    for record in boundary['original_records']:
+        if record['status'] == 'NOT_RECORDED' and record['lock_ref'] is None:
+            # This is the captured absence, not a claim about files added later.
+            continue
+        if legacy_record(root, record['game_id'], at) != record:
+            raise ValueError('Migration original lock changed')
+    bodies, receipts = reconstruct(root, {**ledger, 'sources': sources, 'reconstructed_games': targets})
+    if receipts != boundary['reconstruction_receipts'] or len(bodies) != len(boundary['preparations']):
+        raise ValueError('Migration reconstructed state differs')
+    rows = []
+    for body, ref in zip(bodies, boundary['preparations']):
+        if p.load(root, ref, 'preparations') != body:
+            raise ValueError('Migration preparation does not reconstruct')
+        rows.extend(fit_row(r) for r in body['rows'])
+    return rows
+
+
 def history(root, ref, *, method_ref=None):
     """Reverify source reconstruction and immutable locks before actual fitting."""
     ledger = p.load(root,ref,'training')
@@ -185,10 +257,18 @@ def history(root, ref, *, method_ref=None):
         if (parent.get('schema')!=SCHEMA or any(parent[k]!=child[k] for k in immutable)
                 or p.timestamp(parent['created_at'])>p.timestamp(child['created_at'])):
             raise ValueError('Training ledger changed its migration boundary')
+        old_boundary = parent.get('migration_boundary'); new_boundary = child.get('migration_boundary')
+        if old_boundary is not None and old_boundary != new_boundary:
+            raise ValueError('Training ledger revised its sealed migration boundary')
+        if old_boundary is None and new_boundary is not None:
+            if new_boundary['parent_ref'] != parent_ref or parent['recorded_locks'] or child['recorded_locks']:
+                raise ValueError('Migration boundary must precede recorded training')
         new={r['path']:r for r in child['recorded_locks']}
         if any(new.get(r['path'])!=r for r in parent['recorded_locks']) or not set(parent['training_games'])<=set(child['training_games']):
             raise ValueError('Training ledger dropped or revised prior games')
         child=parent
+    if child.get('migration_boundary') is not None:
+        raise ValueError('Migration boundary requires an immutable parent')
     rows = qualify_base(root,ledger)
     if method_ref and cs.method(root,method_ref) != ledger['method']:
         raise ValueError('Refit and training ledger methods differ')
@@ -199,6 +279,7 @@ def history(root, ref, *, method_ref=None):
         if p.load(root,prep_ref,'preparations') != body:
             raise ValueError('Training preparation does not reconstruct')
         rows.extend(fit_row(r) for r in body['rows'])
+    rows.extend(migration_rows(root, ledger, rows))
     from . import bundle, cutoff_publication as publication
     cache = {}
     for lock_ref in ledger['recorded_locks']:
@@ -232,6 +313,40 @@ def create(root, *, replay_ref, base_ref, legacy_audit_ref, method_ref, at):
     ledger['reconstruction_receipts'] = receipts
     ledger['training_games'] = sorted(paired_rows(base+[r for body in bodies for r in body['rows']]))
     return p.store(root,'training',ledger)
+
+
+def extend_migration(root, parent_ref, *, observation_ref, stadiums_ref, at):
+    """Seal the initial boundary once; never revise historical rows or locks.
+
+    Caller freezes ``at`` under the release dispatch fence. This only retains
+    training evidence: it neither installs configuration nor activates a release.
+    """
+    rows = history(root, parent_ref)
+    ledger = p.load(root, parent_ref, 'training'); at = p.timestamp(at)
+    existing = ledger.get('migration_boundary')
+    if existing is not None:
+        if (existing['observation_ref'] == observation_ref and existing['sources']['stadiums'] == stadiums_ref
+                and p.timestamp(existing['boundary_at']) == at):
+            return parent_ref
+        raise ValueError('Migration boundary is already sealed')
+    if ledger['recorded_locks'] or at < p.timestamp(ledger['created_at']):
+        raise ValueError('Migration boundary must precede recorded training')
+    sources, schedule = boundary_sources(root, observation_ref, stadiums_ref, at)
+    targets = sorted(g['game_id'] for g in schedule
+                     if g['game_type'] == 'REG' and int(g['season']) == ledger['transition_season']
+                     and p.time_of(g) < at and g['game_id'] not in ledger['training_games'])
+    records = [legacy_record(root, gid, at) for gid in targets]
+    bodies, receipts = reconstruct(root, {**ledger, 'sources': sources, 'reconstructed_games': targets})
+    boundary = {'schema': BOUNDARY_SCHEMA, 'parent_ref': parent_ref, 'boundary_at': at.isoformat(),
+                'observation_ref': observation_ref, 'sources': sources, 'reconstructed_games': targets,
+                'original_records': records, 'evidence': 'HISTORICAL_RECONSTRUCTION_NOT_AS_ISSUED',
+                'preparations': [p.store(root, 'preparations', body) for body in bodies],
+                'reconstruction_receipts': receipts}
+    ledger.update(parent=parent_ref, created_at=at.isoformat(), migration_boundary=boundary)
+    ledger['training_games'] = sorted(paired_rows(rows + [r for body in bodies for r in body['rows']]))
+    ref = p.store(root, 'training', ledger)
+    history(root, ref)
+    return ref
 
 
 def append_locks(root, parent_ref, lock_refs, *, at):

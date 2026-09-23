@@ -36,9 +36,11 @@ class TrainingLedgerTests(Base):
         self.assertEqual(before,after)
         self.assertEqual([predict(before,r['features']) for r in rows],[predict(after,r['features']) for r in rows])
 
-    def setup_ledger(self):
+    def setup_ledger(self, warm_season=2026):
         self.setup_publisher()
         warm=game('warm','2026-09-03','20:30');retro=game('retro','2026-09-06','13:00')
+        if warm_season != 2026:
+            warm.update(season=warm_season, gameday=f'{warm_season}-09-03')
         future=game('later','2026-09-14','20:30')
         games=[warm,retro,self.g,{**self.target,'home_score':24.,'away_score':20.},future]
         sources={'schedule':self.source('schedule',games),
@@ -53,6 +55,9 @@ class TrainingLedgerTests(Base):
             row['state_lineage'].update(role='HISTORICAL_RECONSTRUCTION',cutoff_at=cut.isoformat(),
                 required_cutoff=cut.isoformat(),prepared_at=issue.isoformat())
         base=gzip.compress(obs.raw({'schema':'retained-pregame-training-v1','rows':rows}),mtime=0)
+        if warm_season != 2026:
+            self.artifact['elo_hfa'][str(warm_season)]=65.
+            self.fit_ref=self.write('work/projection-v3/multiseason-fit.json',self.artifact)
         method=cs.method(self.root,self.fit_ref)
         replay={'retained_training_cache':{'path':'private-cache','sha256':obs.sha(base)},'training_rows':2,
             'sources':{**sources,'active_method':self.fit_ref},'code':[{'path':k,'sha256':v} for k,v in method['code'].items()]}
@@ -170,3 +175,133 @@ class TrainingLedgerTests(Base):
         body=self.setup_ledger();path=self.root/body['base_ref']['path']
         path.write_bytes(path.read_bytes()+b'x')
         with self.assertRaisesRegex(ValueError,'hash mismatch'):ledger.history(self.root,self.ledger_ref)
+
+    def boundary_fixture(self):
+        body=self.setup_ledger(warm_season=2025)
+        games=ledger.read(self.root,body['sources']['schedule'])
+        games.append(game('thursday','2026-09-17','20:30'))
+        games.append(game('future','2026-09-20','13:00'))
+        self.boundary_games=games
+        self.boundary_obs=self.capture(games,at='2026-09-18T12:59:00Z')
+        self.boundary_stadiums=body['sources']['stadiums']
+        self.boundary_at='2026-09-18T13:05:00Z'
+        self.legacy=self.write('outputs/projection-v3/locks/thursday.json',
+            {'game_id':'thursday','status':'LOCKED','evidence':'AS_ISSUED',
+             'freeze_time':'2026-09-17T23:15:00Z','projection':{'home':24.1,'away':21.2}})
+        return body
+
+    def extend_boundary(self, parent=None, **kwargs):
+        args=dict(observation_ref=self.boundary_obs,stadiums_ref=self.boundary_stadiums,at=self.boundary_at)
+        args.update(kwargs)
+        return ledger.extend_migration(self.root,parent or self.ledger_ref,**args)
+
+    def test_boundary_keeps_thursday_and_missing_locks_without_rewriting_any_prior_row(self):
+        original=self.boundary_fixture();before=ledger.history(self.root,self.ledger_ref)
+        lock_before=(self.root/self.legacy['path']).read_bytes()
+        ref=self.extend_boundary();body=p.load(self.root,ref,'training');rows=ledger.history(self.root,ref)
+        self.assertEqual([r for r in rows if r['game_id'] in original['training_games']],before)
+        self.assertEqual(body['migration_boundary']['reconstructed_games'],['later','sun','thu','thursday'])
+        self.assertEqual(len(rows),12)
+        self.assertEqual(body['migration_boundary']['original_records'][-1]['lock_ref'],self.legacy)
+        self.assertEqual(sum(r['status']=='NOT_RECORDED' for r in body['migration_boundary']['original_records']),3)
+        self.assertEqual((self.root/self.legacy['path']).read_bytes(),lock_before)
+        self.assertTrue(all(r['actual_points'] is None for r in rows))
+        self.assertTrue(all(r['state_lineage']['role']=='HISTORICAL_RECONSTRUCTION' for r in rows))
+        for key in ('sources','reconstructed_games','preparations','reconstruction_receipts','base_ref'):
+            self.assertEqual(body[key],original[key])
+        self.assertEqual(self.extend_boundary(ref),ref)
+        self.assertEqual(self.extend_boundary(),ref)
+        with self.assertRaisesRegex(ValueError,'already sealed'):
+            self.extend_boundary(ref,at='2026-09-19T13:05:00Z')
+
+    def test_boundary_checks_source_clock_and_exact_issuance_boundary(self):
+        self.boundary_fixture()
+        with self.assertRaisesRegex(ValueError,'unavailable at boundary'):
+            self.extend_boundary(at='2026-09-18T12:59:00Z')
+        games=copy.deepcopy(self.boundary_games)
+        # 13:05 UTC is T-75 for a 10:20 Eastern kickoff. Equality is not earlier.
+        games.append(game('equal','2026-09-18','10:20'))
+        source=self.capture(games,at='2026-09-18T13:04:00Z')
+        ref=self.extend_boundary(observation_ref=source)
+        self.assertNotIn('equal',p.load(self.root,ref,'training')['training_games'])
+
+    def test_boundary_cannot_omit_games_forge_features_or_relabel_recorded_cutoff_lock(self):
+        self.boundary_fixture();ref=self.extend_boundary();body=p.load(self.root,ref,'training')
+        changed=copy.deepcopy(body);changed['migration_boundary']['reconstructed_games'].remove('thursday')
+        with self.assertRaisesRegex(ValueError,'population differs'):
+            ledger.history(self.root,self.changed(changed))
+        changed=copy.deepcopy(body);refs=changed['migration_boundary']['preparations']
+        prep=p.load(self.root,refs[0],'preparations');prep['rows'][0]['features']['baseline']+=1
+        refs[0]=p.store(self.root,'preparations',prep)
+        with self.assertRaisesRegex(ValueError,'does not reconstruct'):
+            ledger.history(self.root,self.changed(changed))
+        self.write(self.legacy['path'],{'game_id':'thursday','status':'LOCKED','forecast_role':'FINAL_ELIGIBLE'})
+        with self.assertRaisesRegex(ValueError,'cannot be reconstructed'):
+            self.extend_boundary()
+
+    def test_sealed_boundary_cannot_change_or_disappear_in_descendants(self):
+        self.boundary_fixture();ref=self.extend_boundary();body=p.load(self.root,ref,'training')
+        for mode in ('remove','clock','source','records'):
+            changed=copy.deepcopy(body);changed['parent']=ref
+            if mode=='remove':del changed['migration_boundary']
+            elif mode=='clock':changed['migration_boundary']['boundary_at']='2026-09-19T13:05:00Z'
+            elif mode=='source':changed['migration_boundary']['sources']['schedule']['sha256']='0'*64
+            else:changed['migration_boundary']['original_records']=[]
+            with self.subTest(mode=mode),self.assertRaisesRegex(ValueError,'sealed migration boundary'):
+                ledger.history(self.root,self.changed(changed))
+        changed=copy.deepcopy(body);changed['parent']=None
+        with self.assertRaisesRegex(ValueError,'immutable parent'):
+            ledger.history(self.root,self.changed(changed))
+
+    def test_original_legacy_lock_revision_is_detected_on_every_history_read(self):
+        self.boundary_fixture();ref=self.extend_boundary()
+        card=ledger.read(self.root,self.legacy);card['projection']['home']+=1
+        self.write(self.legacy['path'],card)
+        with self.assertRaisesRegex(ValueError,'original lock changed'):
+            ledger.history(self.root,ref)
+
+    def test_boundary_reconstruction_ignores_target_and_future_results_and_row_order(self):
+        self.boundary_fixture();ref=self.extend_boundary();body=p.load(self.root,ref,'training')
+        boundary=body['migration_boundary']
+        reconstruction={**body,'sources':boundary['sources'],'reconstructed_games':['thursday']}
+        before=ledger.reconstruct(self.root,reconstruction)
+        games=copy.deepcopy(self.boundary_games)
+        for g in games:
+            if g['game_id'] in ('thursday','future'):g.update(home_score=99.,away_score=0.)
+        reconstruction['sources']={**reconstruction['sources'],
+            'schedule':self.source('schedule',list(reversed(games))),
+            'team_games':self.source('team-games',list(reversed([r for g in games for r in statistics(g)])))}
+        after=ledger.reconstruct(self.root,reconstruction)
+        self.assertEqual(before,after)
+
+    def test_boundary_cannot_start_after_recorded_training_has_begun(self):
+        body=self.setup_ledger()
+        self.boundary_obs=obs.current(self.root);self.boundary_stadiums=body['sources']['stadiums']
+        self.boundary_at='2026-09-18T13:05:00Z'
+        publisher.run(timestamp('2026-09-13T15:01:00Z'))
+        publisher.run(timestamp('2026-09-13T15:45:00Z'))
+        name='outputs/projection-v3/locks/sun.json'
+        lock={'path':name,'sha256':obs.sha((self.root/name).read_bytes())}
+        ref=ledger.append_locks(self.root,self.ledger_ref,[lock],at='2026-09-15T14:01:00Z')
+        with self.assertRaisesRegex(ValueError,'must precede recorded training'):
+            self.extend_boundary(ref)
+
+    def test_boundary_interrupted_write_and_lost_response_retry_preserve_parent(self):
+        self.boundary_fixture();original=ledger.history(self.root,self.ledger_ref)
+        real=p.store
+        def interrupted(root,kind,body):
+            if kind=='training':raise OSError('injected failure before ledger commit')
+            return real(root,kind,body)
+        with patch.object(p,'store',side_effect=interrupted),self.assertRaises(OSError):
+            self.extend_boundary()
+        self.assertEqual(ledger.history(self.root,self.ledger_ref),original)
+        committed=[]
+        def lost_response(root,kind,body):
+            ref=real(root,kind,body)
+            if kind=='training':
+                committed.append(ref);raise OSError('injected lost response after commit')
+            return ref
+        with patch.object(p,'store',side_effect=lost_response),self.assertRaises(OSError):
+            self.extend_boundary()
+        self.assertEqual(self.extend_boundary(),committed[0])
+        self.assertEqual(ledger.history(self.root,self.ledger_ref),original)
