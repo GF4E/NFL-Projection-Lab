@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/reconstruct_donor_qualification.py", line 142, in <module>
+    if __name__=='__main__': run()
+                             ^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/reconstruct_donor_qualification.py", line 92, in run
+    if idx>=0: assert prefix[idx]<cut,(r['row_id'],'personnel history after cutoff',prefix[idx],cut)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ('2020_14_NE_LA:NE', 'personnel history after cutoff', datetime.datetime(2020, 12, 9, 5, 5, tzinfo=datetime.timezone.utc), datetime.datetime(2020, 12, 8, 14, 0, tzinfo=datetime.timezone.utc))
