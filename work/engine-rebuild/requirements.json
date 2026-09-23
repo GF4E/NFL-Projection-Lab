@@ -34,7 +34,10 @@
         "audit-reproduction.log",
         "SOURCE-RECONSTRUCTION.md",
         "tests-source-reconstruction-projection.log",
-        "host-source-reconstruction-canary.json"
+        "host-source-reconstruction-canary.json",
+        "TRAINING-INPUT-AUDIT.md",
+        "training-input-audit/current-ref.json",
+        "tests/test_projection_training_evidence.py"
       ]
     },
     {
@@ -219,7 +222,10 @@
         "tests-release-standing.log",
         "host-release-qualified-canary.json",
         "tests-release-qualified.log",
-        "host-release-transition-followthrough.json"
+        "host-release-transition-followthrough.json",
+        "TRAINING-INPUT-AUDIT.md",
+        "training-input-audit/current-ref.json",
+        "tests/test_projection_training_evidence.py"
       ]
     },
     {
@@ -271,7 +277,10 @@
         "engine/projection/cutoff_selection.py; scripts/projection_v3_prepare.py; tests/test_projection_cutoff_selection.py (exact required state and durable acknowledgment, provisional future cutoff, atomic multi-group preparation; explicit entrypoint, not activation)",
         "SCHEDULED-SELECTION.md; scheduled-publisher-canary.json; host-scheduled-publisher-canary.json (15 captured-source projections, 14 final-eligible/one preview, synthetic grading; intermediate source; final guard follow-through pending)",
         "host-scheduled-publisher-final-canary.json; tests-scheduled-final.log (final source: 45 Linux fixtures, 15 forecasts with 14 final-eligible/one provisional, exact numerical parity, synthetic grades, 52 original frozen records preserved; 512 local tests; no activation)",
-        "host-scheduled-selection-followthrough.json (exact final source arrival, 16 current forecasts reproduced from unchanged fit, 52 frozen hashes; cutoff mode null and issuing release still prior source; no activation)"
+        "host-scheduled-selection-followthrough.json (exact final source arrival, 16 current forecasts reproduced from unchanged fit, 52 frozen hashes; cutoff mode null and issuing release still prior source; no activation)",
+        "TRAINING-INPUT-AUDIT.md",
+        "training-input-audit/current-ref.json",
+        "tests/test_projection_training_evidence.py"
       ]
     },
     {

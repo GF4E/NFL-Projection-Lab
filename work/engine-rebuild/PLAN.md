@@ -1,5 +1,7 @@
 # Adopted engine rebuild plan
 
+Current training-handoff increment: inventory all 32 cumulative 2026 games, recover missing legacy input snapshots against their historical committed hashes, independently reproduce their original points, and retain evidence without inventing cutoff/availability receipts. Qualify legacy-to-current-method training compatibility and the atomic fit/preparation handoff afterward. This audit cannot silently drop games or approve a new training population.
+
 The active user goal supplied PROMPT-researched.md as its implementation specification on 2026-09-21 Pacific. The draft's non-activation sentence described drafting, not this subsequent explicit goal. Preserve that source document; this adoption record activates its prospective amendments. No spending or external messaging authority is inferred.
 
 Order: (1) freeze current evidence and measure/recover urgent storage safely; (2) durable immutable writes and failure tests, plus pure gate/contract controls; (3) complete bundle/source-time contracts and exact pipeline parity; (4) integrate recovery/watchdog/cadence and verify host with safe canary; (5) reconstruct authoritative control and register/evaluate E-CAL-LINEAGE after required Tuesday closeout, then E-VENUE-DIRECT in the next slot; (6) reviewer decisions, eligible releases, end-to-end verification and live-cycle observation. Existing rejected methods stay closed.
