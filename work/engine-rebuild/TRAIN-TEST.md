@@ -24,4 +24,22 @@ Limits: this checker does not qualify feature vintages, inner tuning, calibratio
 
 The governing prompt now explicitly requires chronological inner validation, a full test-error table, paired game splits, leakage perturbation tests and prospective evidence. See PROMPT-reviewed-2026-09-22.md section 10. The existing seasons have already informed development; this audit cannot establish independently confirmed future skill.
 
+## Individual prediction-versus-actual scores
+
+The test-score audit exports all 5,278 team rows, with game/team, unrounded prediction, actual integer final, signed error (prediction minus actual), absolute error, fit hash, fit availability, training hash and issuance time. The original membership audit is preserved. Reproduce the new artifact with `python -B work/engine-rebuild/check_test_scores.py`; `test-score-audit/current-ref.json` identifies its immutable summary and compressed CSV by SHA256.
+
+| Saved replay metric | Pooled result |
+| --- | ---: |
+| Team MAE | 7.5747 points |
+| Team RMSE | 9.5161 points |
+| Team signed bias | +0.1921 points |
+| Margin MAE | 10.2419 points |
+| Total MAE | 10.8643 points |
+| Projected team-score SD | 2.9385 points |
+| Actual team-score SD | 9.9670 points |
+
+The summary contains these measures by season as well. These are NON-AUTHORITATIVE REPLAY results, not live-lineage accuracy, a fitted challenger, or an untouched test. Positive bias means overprediction. SD uses the full reported population. No rounded display value enters scoring. The difference in forecast and outcome dispersion does not by itself establish a model defect.
+
+Five additional fixtures verify hand-calculated fractional errors, CSV precision, game grouping, future-label exclusion and nonfinite prediction rejection. Independent pandas recomputation from the exported CSV agrees across all 99 pooled/annual metric cells within 4.09e-14. Missing own-lineage calibration is explicitly named; interval/CRPS metrics are not fabricated. Matched eligible-game baselines, end-to-end feature/tuning/calibration leakage tests and prospective confirmation remain required by acceptance row 10c, which remains PARTIAL.
+
 Confidence: near-total in the reported membership counts and MAE arithmetic, meaning arithmetic on verified saved rows; lower to high if an independent recomputation differs. Confidence in better future predictions is not established by this audit.

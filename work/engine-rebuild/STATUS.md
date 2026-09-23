@@ -1,3 +1,11 @@
+# Current increment — explicit held-out prediction-versus-actual table
+
+Goal ACTIVE. The previous turn made progress on weekly scheduler integration. The current user steering emphasizes supervised training/testing against known completed NFL team scores. Prompt revision 7 already binds past-only nested validation and sequential held-out-at-prediction tests. This increment adds the actual 5,278-row test-error export, pooled/annual supporting metrics and independent CSV recomputation; it fits no new model and leaves the original membership audit intact. Five new tests pass; 99 independently recomputed metric cells agree within 4.09e-14. All numerical results are explicitly NON-AUTHORITATIVE REPLAY historical development evidence. Requirement 10c stays PARTIAL.
+
+The production refit/release lifecycle canary remains the next integration task. The steering did not cancel or complete it. Also preserve all outstanding acceptance items: verified public closeout/Season adapter, full feature/tuning/calibration leakage tests, matched-game baselines, durable capacity, general runtime rollback, own-lineage calibration/venue gates and actual reviews, prospective evaluation and an observed live cycle. No live numerical activation or future accuracy improvement is claimed.
+
+Confidence: near-total in exported arithmetic, meaning arithmetic on verified rows; lower to high if independent recomputation differs. Predictive improvement remains unproved.
+
 # Current increment — actual weekly scheduler integration
 
 Goal ACTIVE. Previous goal turn made progress (recorded fit staging and compatible switches). The actual weekly entry now routes an activated scheduled pipeline through recorded fitting, staged scoring and the release journal. It freezes owner generation, parent/state/training/publication identities and original fit-start time, reuses the scheduler dispatch descriptor, resumes matching interrupted switches before other work, and never silently reapplies a completed week after rollback. Three failed attempts exhaust the operation; elapsed deadline checks prevent activation after 600 seconds.

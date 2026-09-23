@@ -804,3 +804,14 @@ The configured method reference is fit `801ef07927ea59bc112fc955ad86249b981d5e60
 The source-wait and two owner-wait attempts are preserved; they created no configuration or state. The owner-wait evidence led to bounded blocking acquisition and a capture-window recheck, tested on 72 Linux fixtures. Installation uses the service Git identity without changing root Git trust. Root free bytes at final verification: 192102400; durable capacity remains unresolved. Provider requests/new spending: zero.
 
 Confidence: high in the bounded worker behavior demonstrated across recorded seasons and interruption/arrival cases. Lower to medium if independent restoration or an installed fault produces a duplicate, early result or false success. Full operational readiness and predictive improvement remain unproved.
+
+
+## Completed-game train/test score evidence
+
+The chronological train/validation/test contract is implemented in prompt revision 7 and now has a retained row-level prediction-versus-actual export: 2,639 saved replay games, 5,278 integer team-score targets, exact fit/issuance references and unrounded errors. No new fitting, control transfer, candidate, gate, population or production change. Historical reused seasons remain development evidence.
+
+CONVENTIONS (Tier 1): signed error is prediction minus actual; dispersion is population SD on reported rows; fractional expected points remain regression outputs and are never rounded before scoring. These follow existing engine practice and the expected-score contract, supported by https://otexts.com/fpp3/accuracy.html and https://otexts.com/fpp3/tscv.html. Unqualified calibration remains a named shortfall.
+
+Validation: five new hand-calculated/error-boundary fixtures; 99 independent pandas checks on pooled and seasonal exported-score metrics agree within 4.09e-14. See work/engine-rebuild/TRAIN-TEST.md. Membership validation and this score table do not establish full-pipeline leakage prevention or independent future skill; acceptance remains PARTIAL.
+
+Confidence: near-total in arithmetic on verified saved rows; lower to high if independent recomputation differs. Better future predictions remain unproved.
