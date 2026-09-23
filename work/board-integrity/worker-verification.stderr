@@ -1,0 +1,9 @@
+file:///Users/gabe/Documents/Codex/2026-09-04/nfl-board-main/scripts/verify_projection_worker.mjs:23
+try{const db=await mf.getD1Database('DB');await db.prepare('CREATE TABLE engine_projection_publication(id INTEGER PRIMARY KEY,payload TEXT,checked_at INTEGER)').run();const response=await mf.dispatchFetch('http://localhost/verify');if(!response.ok)throw Error('Worker verification failed: '+response.status);console.log(await response.text());}finally{await mf.dispose();}
+                                                                                                                                                                                                                                                              ^
+
+Error: Worker verification failed: 500
+    at file:///Users/gabe/Documents/Codex/2026-09-04/nfl-board-main/scripts/verify_projection_worker.mjs:23:255
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+
+Node.js v24.19.0

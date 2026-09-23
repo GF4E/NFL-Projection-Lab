@@ -1,0 +1,38 @@
+
+ RUN  v4.1.10 /Users/gabe/Documents/Codex/2026-09-04/nfl-board-main
+
+ ❯ tests/projection-v1.test.tsx (11 tests | 2 failed) 26ms
+     × projection snapshot 18ms
+     × ours snapshot 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/projection-v1.test.tsx > Projection card > projection snapshot
+Error: Snapshot `Projection card > projection snapshot 1` mismatched
+
+Expected: ""<link rel="preload" as="image" href="/team-logos/bal.png"/><link rel="preload" as="image" href="/team-logos/ind.png"/><article class="b4-game" id="fixture" aria-label="BAL at IND"><button type="button" class="b4-row" aria-expanded="false" aria-controls="analysis-fixture"><span class="b4-matchup"><span class="b4-teams"><img src="/team-logos/bal.png" alt=""/><b>BAL</b><span>at</span><img src="/team-logos/ind.png" alt=""/><b>IND</b></span><small>Sep 20, 7:00 PM</small></span><div class="b4-points"><span class="b4-score-line"><span>Prediction <b>BAL 21 – IND 24</b></span><span>Total 45</span></span><div class="b4-bar" aria-label="Prediction: BAL 21, IND 24"><div class="b4-segment b4-away" style="width:46.666666666666664%;background:#241773"><b>BAL 21</b></div><div class="b4-segment b4-home" style="width:53.333333333333336%;background:#002C5F"><b>IND 24</b></div></div></div><span class="b4-result"><b>IND by 3</b><small>60%</small></span></button></article>""
+Received: ""<link rel="preload" as="image" href="/team-logos/bal.png"/><link rel="preload" as="image" href="/team-logos/ind.png"/><article class="b4-game" id="fixture" aria-label="BAL at IND"><button type="button" class="b4-row" aria-expanded="false" aria-controls="analysis-fixture"><span class="b4-matchup"><span class="b4-teams"><img src="/team-logos/bal.png" alt=""/><b>BAL</b><span>at</span><img src="/team-logos/ind.png" alt=""/><b>IND</b></span><small>Sep 20, 10:00 AM</small></span><div class="b4-points"><span class="b4-score-line"><span>Prediction <b>BAL 21 – IND 24</b></span><span>Total 45</span></span><div class="b4-bar" aria-label="Prediction: BAL 21, IND 24"><div class="b4-segment b4-away" style="width:46.666666666666664%;background:#241773"><b>BAL 21</b></div><div class="b4-segment b4-home" style="width:53.333333333333336%;background:#002C5F"><b>IND 24</b></div></div></div><span class="b4-result"><b>IND by 3</b><small>60%</small></span></button></article>""
+
+ ❯ tests/projection-v1.test.tsx:13:393
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/projection-v1.test.tsx > Projection card > ours snapshot
+Error: Snapshot `Projection card > ours snapshot 1` mismatched
+
+Expected: ""<link rel="preload" as="image" href="/team-logos/bal.png"/><link rel="preload" as="image" href="/team-logos/ind.png"/><article class="b4-game" id="fixture" aria-label="BAL at IND"><button type="button" class="b4-row" aria-expanded="false" aria-controls="analysis-fixture"><span class="b4-matchup"><span class="b4-teams"><img src="/team-logos/bal.png" alt=""/><b>BAL</b><span>at</span><img src="/team-logos/ind.png" alt=""/><b>IND</b></span><small>Sep 20, 7:00 PM</small></span><div class="b4-points"><span class="b4-score-line"><span>Our pick <b>BAL 21 – IND 27</b></span><span>Total 48</span></span><div class="b4-bar" aria-label="Prediction: BAL 21, IND 27"><div class="b4-segment b4-away" style="width:43.75%;background:#241773"><b>BAL 21</b></div><div class="b4-segment b4-home" style="width:56.25%;background:#002C5F"><b>IND 27</b></div></div></div><span class="b4-result"><b>IND by 6</b><small>60%</small></span></button></article>""
+Received: ""<link rel="preload" as="image" href="/team-logos/bal.png"/><link rel="preload" as="image" href="/team-logos/ind.png"/><article class="b4-game" id="fixture" aria-label="BAL at IND"><button type="button" class="b4-row" aria-expanded="false" aria-controls="analysis-fixture"><span class="b4-matchup"><span class="b4-teams"><img src="/team-logos/bal.png" alt=""/><b>BAL</b><span>at</span><img src="/team-logos/ind.png" alt=""/><b>IND</b></span><small>Sep 20, 10:00 AM</small></span><div class="b4-points"><span class="b4-score-line"><span>Our pick <b>BAL 21 – IND 27</b></span><span>Total 48</span></span><div class="b4-bar" aria-label="Prediction: BAL 21, IND 27"><div class="b4-segment b4-away" style="width:43.75%;background:#241773"><b>BAL 21</b></div><div class="b4-segment b4-home" style="width:56.25%;background:#002C5F"><b>IND 27</b></div></div></div><span class="b4-result"><b>IND by 6</b><small>60%</small></span></button></article>""
+
+ ❯ tests/projection-v1.test.tsx:13:393
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+  Snapshots  2 failed
+ Test Files  1 failed | 1 passed (2)
+      Tests  2 failed | 17 passed (19)
+   Start at  10:54:08
+   Duration  202ms (transform 72ms, setup 0ms, import 107ms, tests 41ms, environment 0ms)
+

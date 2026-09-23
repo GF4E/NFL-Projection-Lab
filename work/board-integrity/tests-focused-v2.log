@@ -1,0 +1,26 @@
+
+ RUN  v4.1.10 /Users/gabe/Documents/Codex/2026-09-04/nfl-board-main
+
+stderr | tests/projection-cache.test.ts > rejects a changed frozen game and preserves earlier raw data
+Projection refresh failed; retaining last good board Missing projection
+
+ ❯ tests/projection-cache.test.ts (10 tests | 1 failed) 30ms
+   × rejects a changed frozen game and preserves earlier raw data 2ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/projection-cache.test.ts > rejects a changed frozen game and preserves earlier raw data
+Error: Missing projection
+ ❯ validateProjection src/server/projection-board.ts:7:73
+
+ ❯ readProjectionRaw src/server/projection-board.ts:64:13
+ ❯ tests/projection-cache.test.ts:21:453
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 20 passed (21)
+   Start at  19:55:34
+   Duration  175ms (transform 75ms, setup 0ms, import 105ms, tests 53ms, environment 0ms)
+
