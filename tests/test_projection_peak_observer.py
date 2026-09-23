@@ -34,6 +34,14 @@ class PeakTests(unittest.TestCase):
    with self.assertRaises(ValueError):m.PeakObserver(root,p)
    self.assertEqual(p.read_text(),'prior')
    with self.assertRaises(ValueError):m.PeakObserver(root,root/'receipt.json')
+ def test_allocated_blocks_are_measured_separately_from_logical_size(self):
+  with tempfile.TemporaryDirectory() as d:
+   root=Path(d)/'tree';root.mkdir();file=root/'sparse'
+   with file.open('wb') as stream:stream.truncate(1024*1024*8)
+   o=m.PeakObserver(root,Path(d)/'receipt.json');o.sample();st=file.stat()
+   self.assertEqual(o.state['peak_logical_bytes'],st.st_size)
+   self.assertEqual(o.state['peak_allocated_bytes'],st.st_blocks*512)
+   self.assertEqual(o.state['peak_files'],1)
  def test_killed_worker_retains_partial_checkpoint(self):
   with tempfile.TemporaryDirectory() as d:
    program='''import importlib.util,os,signal,sys

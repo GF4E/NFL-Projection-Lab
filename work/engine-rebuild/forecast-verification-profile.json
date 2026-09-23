@@ -1,0 +1,208 @@
+{
+  "status": "PASS",
+  "scope": "One retained isolated forecast reconstruction; no fitting or writes",
+  "game_id": "2026_03_ARI_SF",
+  "wall_seconds": 22.773459661053494,
+  "top_cumulative": [
+    {
+      "file": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py",
+      "line": 407,
+      "name": "verify_forecast",
+      "calls": 1,
+      "own_seconds": 0.050937609,
+      "cumulative_seconds": 22.748674821
+    },
+    {
+      "file": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py",
+      "line": 145,
+      "name": "verify_preparation",
+      "calls": 1,
+      "own_seconds": 0.028981410000000003,
+      "cumulative_seconds": 20.778849377
+    },
+    {
+      "file": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py",
+      "line": 37,
+      "name": "prepare",
+      "calls": 1,
+      "own_seconds": 0.005927147000000001,
+      "cumulative_seconds": 18.52528551
+    },
+    {
+      "file": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_features.py",
+      "line": 114,
+      "name": "identity",
+      "calls": 30,
+      "own_seconds": 0.001823273,
+      "cumulative_seconds": 15.895245719000002
+    },
+    {
+      "file": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_features.py",
+      "line": 27,
+      "name": "sha",
+      "calls": 30,
+      "own_seconds": 0.064098732,
+      "cumulative_seconds": 15.893422446
+    },
+    {
+      "file": "/opt/nfl-runtime/env/lib/python3.12/json/__init__.py",
+      "line": 183,
+      "name": "dumps",
+      "calls": 9629,
+      "own_seconds": 0.039588902,
+      "cumulative_seconds": 14.62019184
+    },
+    {
+      "file": "/opt/nfl-runtime/env/lib/python3.12/json/encoder.py",
+      "line": 183,
+      "name": "encode",
+      "calls": 9629,
+      "own_seconds": 0.031675429000000005,
+      "cumulative_seconds": 14.573126965
+    },
+    {
+      "file": "/opt/nfl-runtime/env/lib/python3.12/json/encoder.py",
+      "line": 205,
+      "name": "iterencode",
+      "calls": 9629,
+      "own_seconds": 14.526578132000001,
+      "cumulative_seconds": 14.526578132000001
+    },
+    {
+      "file": "/opt/nfl-runtime/env/lib/python3.12/copy.py",
+      "line": 118,
+      "name": "deepcopy",
+      "calls": 555356,
+      "own_seconds": 1.355158034,
+      "cumulative_seconds": 2.6455359290000002
+    },
+    {
+      "file": "/opt/nfl-runtime/env/lib/python3.12/copy.py",
+      "line": 217,
+      "name": "_deepcopy_dict",
+      "calls": 10116,
+      "own_seconds": 0.42820626500000003,
+      "cumulative_seconds": 2.5575208970000003
+    },
+    {
+      "file": "/opt/nfl-runtime/env/lib/python3.12/copy.py",
+      "line": 191,
+      "name": "_deepcopy_list",
+      "calls": 1719,
+      "own_seconds": 0.043206735,
+      "cumulative_seconds": 2.554530724
+    },
+    {
+      "file": "/opt/nfl-runtime/env/lib/python3.12/copy.py",
+      "line": 247,
+      "name": "_reconstruct",
+      "calls": 5,
+      "own_seconds": 0.002133056,
+      "cumulative_seconds": 2.4947625330000003
+    },
+    {
+      "file": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_state.py",
+      "line": 118,
+      "name": "restore",
+      "calls": 1,
+      "own_seconds": 0.014045878000000001,
+      "cumulative_seconds": 1.9865793280000001
+    },
+    {
+      "file": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py",
+      "line": 203,
+      "name": "score",
+      "calls": 1,
+      "own_seconds": 0.0008443970000000001,
+      "cumulative_seconds": 1.876994363
+    },
+    {
+      "file": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/scoring_process.py",
+      "line": 9,
+      "name": "score_batch",
+      "calls": 1,
+      "own_seconds": 0.00033195,
+      "cumulative_seconds": 1.642474594
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "name": "<built-in method _hashlib.openssl_sha256>",
+      "calls": 9648,
+      "own_seconds": 1.6137220300000001,
+      "cumulative_seconds": 1.6137220300000001
+    },
+    {
+      "file": "/opt/nfl-runtime/env/lib/python3.12/subprocess.py",
+      "line": 506,
+      "name": "run",
+      "calls": 1,
+      "own_seconds": 7.892600000000001e-05,
+      "cumulative_seconds": 1.578397228
+    },
+    {
+      "file": "/opt/nfl-runtime/env/lib/python3.12/subprocess.py",
+      "line": 1165,
+      "name": "communicate",
+      "calls": 1,
+      "own_seconds": 4.6314000000000004e-05,
+      "cumulative_seconds": 1.57332745
+    },
+    {
+      "file": "/opt/nfl-runtime/env/lib/python3.12/subprocess.py",
+      "line": 2060,
+      "name": "_communicate",
+      "calls": 1,
+      "own_seconds": 0.005218611000000001,
+      "cumulative_seconds": 1.573265096
+    },
+    {
+      "file": "/opt/nfl-runtime/env/lib/python3.12/selectors.py",
+      "line": 402,
+      "name": "select",
+      "calls": 141,
+      "own_seconds": 0.0017618830000000001,
+      "cumulative_seconds": 1.559084855
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "name": "<method 'poll' of 'select.poll' objects>",
+      "calls": 141,
+      "own_seconds": 1.557101791,
+      "cumulative_seconds": 1.557101791
+    },
+    {
+      "file": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_state.py",
+      "line": 65,
+      "name": "available",
+      "calls": 1,
+      "own_seconds": 0.09126756600000001,
+      "cumulative_seconds": 0.813906361
+    },
+    {
+      "file": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/observations.py",
+      "line": 33,
+      "name": "raw",
+      "calls": 9570,
+      "own_seconds": 0.023362706,
+      "cumulative_seconds": 0.631135346
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "name": "<method 'get' of 'dict' objects>",
+      "calls": 1268213,
+      "own_seconds": 0.5945901570000001,
+      "cumulative_seconds": 0.5945901570000001
+    },
+    {
+      "file": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/observations.py",
+      "line": 88,
+      "name": "load",
+      "calls": 1,
+      "own_seconds": 0.033088626,
+      "cumulative_seconds": 0.581178375
+    }
+  ]
+}

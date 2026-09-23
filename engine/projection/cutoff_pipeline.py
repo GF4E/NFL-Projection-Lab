@@ -63,8 +63,10 @@ def prepare(state,context,slate,stadiums,*,at,role):
     for (season,week),games in sorted(contexts.items()):
         working.prepare(season)
         produced=features.render(working,sorted(games,key=lambda g:g['game_id']),stadiums,None,())
+        # Row annotation does not mutate working; hash the full history once per context.
+        rendered_identity=working.identity()
         for row in produced:
-            row['state_lineage']={**copy.deepcopy(context),'rendered_state_sha256':working.identity(),
+            row['state_lineage']={**copy.deepcopy(context),'rendered_state_sha256':rendered_identity,
                                   'weight_context_week':week,'role':role,'prepared_at':at.isoformat(),
                                   'required_cutoff':cutoff_before(time_of(row['game'])).isoformat()}
             row['personnel']={'status':'INACTIVE_IN_QUALIFIED_CORE','reason':'No qualified personnel vintage supplied to this preparation; no value inferred.'}

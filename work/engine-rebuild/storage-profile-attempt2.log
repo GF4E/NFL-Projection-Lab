@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/profile_lifecycle_storage.py", line 92, in <module>
+    if __name__=='__main__':main(sys.argv[1],sys.argv[2])
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/profile_lifecycle_storage.py", line 73, in main
+    parent=Path(parent);parent.mkdir(parents=True,exist_ok=False)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/nfl-runtime/env/lib/python3.12/pathlib.py", line 1311, in mkdir
+    os.mkdir(self, mode)
+PermissionError: [Errno 13] Permission denied: '/mnt/nfl-engine-profiles/storage-20260923-attempt2'

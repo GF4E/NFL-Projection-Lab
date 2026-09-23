@@ -1,0 +1,17 @@
+# Corrected-control readiness at the September 23 host check
+
+This is an operational premise check, not a registration, comparative fit or release decision. The full rebuild remains active. Current runtime and publication repairs do not by themselves transfer control authority.
+
+At 2026-09-23T18:34:20Z the actual host still had no active pipeline-release pointer and no recorded-weekly-refit configuration. Its prepared cutoff mode and scheduled selector were null. The public closeout endpoint configuration and immutable Week 2 HTTP-byte acknowledgment were present. See release-readiness-host.json for exact file hashes. No E-CAL registration exists in the designated production execution directory.
+
+The sole current authoritative point control remains `work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json`. Its registry entry does not bind the corrected own-method hash or point-history reference required by the already-prepared calibration inputs `477187bc6f4d2622055df0c1d7c12d1ce92d87b6f3514e6034dad9942ef853a5`. The admission check must continue rejecting that pairing. Relabeling the corrected replay as authoritative before the issuing path is qualified would conceal a premise mismatch.
+
+Evidence already available: original deployed-control reproduction; corrected common chronological replay and source/row-order checks; complete own/legacy warmup and residual-input histories; recorded refit and publication integration; preserved original locks; compatible same-runtime rollback; complete captured-data simulated lifecycle; actual public closeout proof; installed scoring dependency with unchanged forecast hashes. Each retains its source/availability and simulation limits. The current storage retry adds measurements; it does not replace these statistical or authority rules.
+
+Remaining release work is specific: qualify the complete preparation/publication executable and runtime recovery boundary, resolve the existing training/cold-start/availability review flags, install the qualified training/refit and scheduled-issuance configuration through the checked transition, verify actual issuing provenance and public derivative identity, then record the new control authority with code/method/history references. General executable/runtime rollback is broader than the existing scorer-only capsule and same-runtime mode switch; neither alone proves it.
+
+The September 22 experiment slot is now recorded as MISSED_UNREGISTERED_SLOT in operational-ledger/2026-09-22-experiment-slot.json. This record is created on September 23 and says so. Public closeout verification was first qualified on September 23; this does not assert that the page was unpublished earlier. No experiment clock or rejection is fabricated. September 29 is the next Tuesday registration opportunity, conditional on all prerequisites. The E-CAL → E-VENUE → existing queue order is unchanged; independent infrastructure work continues.
+
+Least certain: complete executable/runtime recovery across a code change, which has not been demonstrated by the same-runtime canary. It remains a concrete implementation/qualification dependency rather than another statistical convention question.
+
+Confidence: near-total in the current missing-pointer and registry-mismatch claims, meaning direct file/hash checks on verified records. Lower to high if independent inspection at the same snapshot differs. This does not establish statistical readiness or predictive improvement.
