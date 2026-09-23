@@ -1,0 +1,13 @@
+# Historical calibration adapter plan
+
+Implementation and fixture verification only. Do not run comparative historical calibration before the authoritative-control, publication and preregistration prerequisites. Do not activate this adapter in the publisher.
+
+Reuse the empirical integer-residual family, raw actual-minus-projection errors, game-paired margin/total errors, half-away-from-zero rounding, inverse-CDF quantiles and tie split from E-CAL-PREFLIGHT.md. All are existing Tier 1 conventions; the earlier Tier 2 window/donor choices remain review-requested.
+
+Build a content-addressed calibration bank from an explicitly enumerated earlier-game population, with separately bound donor-method and receiving-point-method identities. They may differ only as explicitly declared for the legacy control arm. Require finite point values, integer nonnegative outcomes, unique paired games, donor fit availability before issuance, no target in its own training population, and outcome availability strictly before calibration fitting. Fit only prior completed seasons; no current-season labels at Week 9 under the standing convention. Reject any population shortfall rather than shrinking it.
+
+Record fit manifests, selected donor records, source references, their hashes, fit time, target season and cadence. Validate hashes and regenerate the residual counts when consuming a bank. A manifest identity is not proof of source authority or absence of feature leakage: the external qualification/preregistration layer must verify those separately.
+
+Attach uncertainty only to an already-computed point forecast. The attachment function gets a bank and point values, never invokes ridge fitting, and proves exact point invariance. Use the same bank for every game until its next declared calibration revision. Report negative score mass and the actual marginal distribution means separately from the legacy centers; do not clip support, recenter, inflate dispersion or relabel the model as coherent. Expose strict home/away win probability and tie mass alongside the legacy tie-split display probability. Do not assert the separate marginals define a joint model.
+
+Fixture tests must reject future/current-season rows, current-table transplantation, wrong donor/receiver identities, missing games, duplicate records, self-trained targets, unavailable fits/outcomes and content tampering. Verify paired residual arithmetic, exact point preservation, interval nesting, tie behavior, disclosed negative support and input-order invariance. No new candidate, fitted parameter or gate. Full historical qualification and deployment remain separate acceptance items.

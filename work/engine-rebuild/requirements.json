@@ -349,7 +349,8 @@
       "state": "PARTIAL",
       "observed_evidence": [
         "audit_forecast_contract.py; forecast-contract-audit.json; tests/test_projection_contract_audit.py (independent counts, probabilities, bands, contributions and control metrics; invalid support and legacy mean mismatch explicitly unresolved)",
-        "FORECAST-CONTRACT.md (current and target semantics; no numerical migration or improved accuracy claimed)"
+        "FORECAST-CONTRACT.md (current and target semantics; no numerical migration or improved accuracy claimed)",
+        "CALIBRATION-ADAPTER.md; engine/projection/calibration_history.py; tests/test_projection_calibration_history.py (fixture-verified inactive adapter; full historical qualification and gate still required)"
       ]
     },
     {
@@ -366,7 +367,8 @@
         "tests/test_projection_calibration_gate.py (policy implementation only; not a fitted experiment)",
         "E-CAL-PREFLIGHT.md (Tier 1/2 executable convention sweep, not hashed registration; own-lineage warmup and numerical chronology qualification still required)",
         "EARLY-INPUTS.md; early-inputs-verification.json; early-features-verification.json; early-features-independent-check.json (source/feature preparation only; no model fitting or calibration qualification)",
-        "EARLY-FORECASTS.md; early-forecasts-verification.json; early-forecasts-independent-check.json (calibration-only reconstruction; independent fit/point verification; two review flags; not a gate or production control)"
+        "EARLY-FORECASTS.md; early-forecasts-verification.json; early-forecasts-independent-check.json (calibration-only reconstruction; independent fit/point verification; two review flags; not a gate or production control)",
+        "CALIBRATION-ADAPTER.md; engine/projection/calibration_history.py; tests/test_projection_calibration_history.py (fixture-verified inactive adapter; full historical qualification and gate still required)"
       ]
     },
     {
@@ -584,7 +586,8 @@
         "tests/test_projection_score_baselines.py (12 focused tests)",
         "LEAKAGE.md; leakage-verification.json; tests/test_projection_full_pipeline_leakage.py (six synthetic integration tests; ten season boundaries and 30 point-path source perturbations; recorded late revision preserves original forecast; not historical-vintage or calibration-release qualification)",
         "EARLY-INPUTS.md; early-inputs-verification.json; early-features-verification.json; early-features-independent-check.json (source/feature preparation only; no model fitting or calibration qualification)",
-        "EARLY-FORECASTS.md; early-forecasts-verification.json; early-forecasts-independent-check.json (calibration-only reconstruction; independent fit/point verification; two review flags; not a gate or production control)"
+        "EARLY-FORECASTS.md; early-forecasts-verification.json; early-forecasts-independent-check.json (calibration-only reconstruction; independent fit/point verification; two review flags; not a gate or production control)",
+        "CALIBRATION-ADAPTER.md; engine/projection/calibration_history.py; tests/test_projection_calibration_history.py (fixture-verified inactive adapter; full historical qualification and gate still required)"
       ]
     }
   ]
