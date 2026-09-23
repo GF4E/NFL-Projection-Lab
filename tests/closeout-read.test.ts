@@ -52,3 +52,11 @@ it('bounds upstream reads before parsing or acknowledging content',async()=>{
  const f=await fixture();f.body.scorecard=new Uint8Array(8*1024*1024+1);
  await expect(readCloseout('scorecard')).rejects.toThrow('exceeds limit');
 });
+
+it('uses Worker-supported manual redirects and rejects a redirected source',async()=>{
+ const fetcher=vi.fn<(url:string,options?:RequestInit)=>Promise<Response>>(async()=>new Response(null,{status:302,headers:{location:'https://untrusted.example/source'}}));
+ vi.stubGlobal('fetch',fetcher);
+ await expect(readCloseout('season')).rejects.toThrow('source request');
+ expect(fetcher).toHaveBeenCalledTimes(1);
+ expect(fetcher.mock.calls[0]?.[1]).toMatchObject({redirect:'manual'});
+});

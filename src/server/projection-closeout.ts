@@ -17,7 +17,7 @@ export type Artifact=typeof ARTIFACTS[number];
 
 export async function sha256(bytes:Uint8Array){return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new Uint8Array(bytes)))).map(b=>b.toString(16).padStart(2,'0')).join('');}
 async function raw(url:string,signal:AbortSignal,limit:number,allowMissing=false):Promise<Uint8Array|null>{
-  const response=await fetch(url,{signal,cache:'no-store',redirect:'error'});
+  const response=await fetch(url,{signal,cache:'no-store',redirect:'manual'});
   if(allowMissing&&response.status===404)return null;
   if(!response.ok||!response.body)throw Error('Closeout source request failed');
   const reader=response.body.getReader();const chunks:Uint8Array[]=[];let size=0;
