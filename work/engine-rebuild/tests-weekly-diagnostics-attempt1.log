@@ -1,0 +1,38 @@
+EEE
+======================================================================
+ERROR: test_projection_weekly_diagnostics (unittest.loader._FailedTest.test_projection_weekly_diagnostics)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_projection_weekly_diagnostics
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'tests.test_projection_weekly_diagnostics'
+
+
+======================================================================
+ERROR: test_projection_learning (unittest.loader._FailedTest.test_projection_learning)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_projection_learning
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'tests.test_projection_learning'
+
+
+======================================================================
+ERROR: test_closeout_publish (unittest.loader._FailedTest.test_closeout_publish)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_closeout_publish
+Traceback (most recent call last):
+  File "/opt/anaconda3/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'tests.test_closeout_publish'
+
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.000s
+
+FAILED (errors=3)

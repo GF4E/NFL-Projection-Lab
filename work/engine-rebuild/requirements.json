@@ -504,7 +504,8 @@
       "observed_evidence": [
         "audit_forecast_contract.py; forecast-contract-audit.json; tests/test_projection_contract_audit.py (independent counts, probabilities, bands, contributions and control metrics; invalid support and legacy mean mismatch explicitly unresolved)",
         "FORECAST-CONTRACT.md (current and target semantics; no numerical migration or improved accuracy claimed)",
-        "CALIBRATION-ADAPTER.md; engine/projection/calibration_history.py; tests/test_projection_calibration_history.py (fixture-verified inactive adapter; full historical qualification and gate still required)"
+        "CALIBRATION-ADAPTER.md; engine/projection/calibration_history.py; tests/test_projection_calibration_history.py (fixture-verified inactive adapter; full historical qualification and gate still required)",
+        "WEEKLY-DIAGNOSTICS.md; engine/projection/weekly_diagnostics.py; tests/test_projection_weekly_diagnostics.py; weekly-diagnostics/local/verification.json; weekly-diagnostics/linux-verification.json (first-grade weekly probability metrics, exact-lineage strata and paired diagnostics; not improved accuracy or completed migration)"
       ]
     },
     {
@@ -589,7 +590,8 @@
         "initial-operator-result.json",
         "initial-operator-host-after.json",
         "initial-recovery-job-verification.json",
-        "initial-restored-consumer-journal-accepted.json"
+        "initial-restored-consumer-journal-accepted.json",
+        "WEEKLY-DIAGNOSTICS.md; engine/projection/weekly_diagnostics.py; tests/test_projection_weekly_diagnostics.py; weekly-diagnostics/local/verification.json; weekly-diagnostics/linux-verification.json (first-grade weekly probability metrics, exact-lineage strata and paired diagnostics; not improved accuracy or completed migration)"
       ]
     },
     {
@@ -612,7 +614,8 @@
         "PROSPECTIVE-PLAN.md; PROSPECTIVE.md; engine/projection/prospective.py; tests/test_projection_prospective.py; prospective/linux-attempt2.json (53 Linux checks, 16 captured forecasts/32 independent point checks, unchanged originals; no actual enrollment or scheduled collection; two reference/population review flags)",
         "prospective/host-installed.json (both inactive implementation hashes verified under actual UID1000; no enrollment, unchanged fit; first real cutoff still future)",
         "PROSPECTIVE-COLLECTOR.md; prospective-collector/linux-attempt2.json; prospective-collector/linux-attempt3.json (bounded scheduler integration, real captured parity and synthetic interrupted-slate resume; no enrollment/activation; new 50-file source needs restored qualification)",
-        "prospective-collector/host-installed.json (actual UID1000, fifty issuing files match tested source, disabled path verified, no enrollment or active pipeline; original fit unchanged)"
+        "prospective-collector/host-installed.json (actual UID1000, fifty issuing files match tested source, disabled path verified, no enrollment or active pipeline; original fit unchanged)",
+        "WEEKLY-DIAGNOSTICS.md; engine/projection/weekly_diagnostics.py; tests/test_projection_weekly_diagnostics.py; weekly-diagnostics/local/verification.json; weekly-diagnostics/linux-verification.json (first-grade weekly probability metrics, exact-lineage strata and paired diagnostics; not improved accuracy or completed migration)"
       ]
     },
     {
@@ -858,7 +861,8 @@
         "PROSPECTIVE-COLLECTOR.md; prospective-collector/linux-attempt2.json; prospective-collector/linux-attempt3.json (bounded scheduler integration, real captured parity and synthetic interrupted-slate resume; no enrollment/activation; new 50-file source needs restored qualification)",
         "SOURCE-RECOVERY-50.md; source-recovery-50/source-restored.json; source-recovery-50/accepted-journal.json; release-review/source50-preoperator-ref.json (50-file complete restored executable/actual runtime, preserved originals; operator/live activation still pending)",
         "source-recovery-50/initial-operator.json; source-recovery-50/initial-operator-accepted.json; release-review/current-ref.json (d9ad0e8f; captured restored-source handoff/rollback passed, no actual activation)",
-        "source-recovery-50/final-host-preflight.json; source-recovery-50/final-host-supervision.json (six technical checks on actual host; protected originals unchanged; live transition still not installed)"
+        "source-recovery-50/final-host-preflight.json; source-recovery-50/final-host-supervision.json (six technical checks on actual host; protected originals unchanged; live transition still not installed)",
+        "WEEKLY-DIAGNOSTICS.md; engine/projection/weekly_diagnostics.py; tests/test_projection_weekly_diagnostics.py; weekly-diagnostics/local/verification.json; weekly-diagnostics/linux-verification.json (first-grade weekly probability metrics, exact-lineage strata and paired diagnostics; not improved accuracy or completed migration)"
       ]
     },
     {
@@ -893,7 +897,8 @@
         "CALIBRATION-INPUTS.md; calibration-inputs-current.json; calibration-inputs-independent-check.json; calibration-inputs-order-check.json; tests-calibration-inputs.log (complete 3407-game histories per method, no calibration estimated or experiment gated)",
         "CALIBRATION-NUMERICS.md; engine/projection/calibration_evaluate.py; tests-calibration-numerics.log (18 added fixtures, 100 related tests; synthetic numerical/integration qualification only)",
         "PROSPECTIVE-PLAN.md; PROSPECTIVE.md; engine/projection/prospective.py; tests/test_projection_prospective.py; prospective/linux-attempt2.json (53 Linux checks, 16 captured forecasts/32 independent point checks, unchanged originals; no actual enrollment or scheduled collection; two reference/population review flags)",
-        "PROSPECTIVE-COLLECTOR.md; prospective-collector/linux-attempt2.json; prospective-collector/linux-attempt3.json (bounded scheduler integration, real captured parity and synthetic interrupted-slate resume; no enrollment/activation; new 50-file source needs restored qualification)"
+        "PROSPECTIVE-COLLECTOR.md; prospective-collector/linux-attempt2.json; prospective-collector/linux-attempt3.json (bounded scheduler integration, real captured parity and synthetic interrupted-slate resume; no enrollment/activation; new 50-file source needs restored qualification)",
+        "WEEKLY-DIAGNOSTICS.md; engine/projection/weekly_diagnostics.py; tests/test_projection_weekly_diagnostics.py; weekly-diagnostics/local/verification.json; weekly-diagnostics/linux-verification.json (first-grade weekly probability metrics, exact-lineage strata and paired diagnostics; not improved accuracy or completed migration)"
       ]
     }
   ]
