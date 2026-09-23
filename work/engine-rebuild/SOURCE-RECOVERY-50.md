@@ -25,6 +25,14 @@ Passed on this restored source in 200.735 application seconds and 202.871 servic
 
 The canary exercised pre-operator packet 19345393. The final packet adds its result and independently verified terminal receipt; numerical/fit/runtime content is unchanged. Preserve the preparation refusal: root's Git read was rejected by repository ownership before any numerical work or directory preparation, corrected by running the read under nflengine rather than weakening Git's guard. Availability, Thursday lock, Friday cutoff and final scores remain named simulation fixtures. No live transition, actual prospective enrollment, control-authority promotion or reviewer approval is inferred.
 
+## Final actual-host verification
+
+Packet `d9ad0e8f` passed all six technical checks on the actual host at 2026-09-23 23:19:16 UTC: restored executable, all fifty issuing files, active fit/calibration, training-history binding, retained public closeout, and freshly hashed installed runtime/native files. All 53 protected records/pointers stayed unchanged. The service completed in 39.010 seconds (28.508 application seconds), under observed 570-second/4-GiB/one-CPU/private-network limits. Exact invocation `c99c34703d474975aa377b568e55b14b` has an independently verified successful terminal journal.
+
+The raw receipt's `host_commit` field actually holds `bundle.capture_code`'s issuing-source commit, `5fd477b2719689334fe7bb14315e5eab7ed54f9d`; preserve that receipt and this qualification rather than rewriting it. A separate inspection at 23:19:53 UTC observed checkout HEAD `dd712a0691bad5002694393c4ad93ffebb765953`, with only current final-feed/operation output changes and one new final-source artifact pending the normal scheduler commit. No output was reset. Evidence is in `source-recovery-50/final-host-preflight.json`, its exact invocation script, and `final-host-supervision.json`.
+
+Available bytes at the preflight: root 4,122,611,712; artifact volume 4,620,349,440. This current snapshot does not certify sustained headroom. Preflight status BLOCKED explicitly means the live transition is not installed; it does not invalidate the six technical passes or stop independent authorized work. Both actual reviewer decisions remain NOT_RECORDED, no approval inferred. Actual fit remains 801ef079; the cutoff worker is WAITING_FOR_CUTOFF for September 25 13:00 UTC. No prospective enrollment or production activation occurred.
+
 First actual installed cutoff remains Friday September 25 06:00 Pacific. Production issuing/public provenance must be verified before control authority or E-CAL. Sustained reserve, calibration/conditional-mean migration, E-VENUE, real reviewer decisions and an observed live cycle remain open.
 
 Provider requests and new spending: zero. Least certain: future native/OS compatibility; this evidence covers the verified current host.
