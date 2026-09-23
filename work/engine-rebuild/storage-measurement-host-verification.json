@@ -1,0 +1,105 @@
+{
+  "host_commit": "f2fd4e3f452904cc859cc76e9a8e7f94504d5420",
+  "checked_at": "2026-09-23T18:18:08.523321+00:00",
+  "storage_measurement": {
+    "headroom_qualified": false,
+    "path": "/var/lib/nfl-engine-monitor/storage/2026-09-23T18.json",
+    "sample": {
+      "bucket": 5967291,
+      "filesystems": {
+        "artifacts": {
+          "filesystem_id": 17221713838075122595,
+          "free_bytes": 16121204736,
+          "free_inodes": 637833,
+          "total_bytes": 21125308416
+        },
+        "root": {
+          "filesystem_id": 8218120851669157479,
+          "free_bytes": 4131958784,
+          "free_inodes": 1034865,
+          "total_bytes": 9283444736
+        }
+      },
+      "observed_at": "2026-09-23T18:17:57.421473+00:00"
+    },
+    "state": "RECORDED"
+  },
+  "storage": {
+    "filesystems": {
+      "artifacts": {
+        "filesystem_id": 17221713838075122595,
+        "free_bytes": 16121204736,
+        "free_inodes": 637833,
+        "total_bytes": 21125308416
+      },
+      "root": {
+        "filesystem_id": 8218120851669157479,
+        "free_bytes": 4131958784,
+        "free_inodes": 1034865,
+        "total_bytes": 9283444736
+      }
+    },
+    "free_bytes": 4131958784,
+    "free_inodes": 637833,
+    "headroom_qualified": false
+  },
+  "history": {
+    "schema": "storage-measurement-summary-v1",
+    "filesystems": {
+      "root": [
+        {
+          "filesystem_id": 8218120851669157479,
+          "total_bytes": 9283444736,
+          "start": "2026-09-23T18:17:57.421473+00:00",
+          "end": "2026-09-23T18:17:57.421473+00:00",
+          "samples": 1,
+          "span_seconds": 0.0,
+          "gaps_over_600_seconds": [],
+          "net_consumption_bytes": 0,
+          "positive_sampled_depletion_bytes": 0,
+          "daily_normalized_positive_depletion_bytes": null,
+          "daily_status": "INSUFFICIENT_CONTINUOUS_DAY",
+          "rate_is_extrapolated": true,
+          "minimum_free_bytes": 4131958784,
+          "minimum_free_inodes": 1034865
+        }
+      ],
+      "artifacts": [
+        {
+          "filesystem_id": 17221713838075122595,
+          "total_bytes": 21125308416,
+          "start": "2026-09-23T18:17:57.421473+00:00",
+          "end": "2026-09-23T18:17:57.421473+00:00",
+          "samples": 1,
+          "span_seconds": 0.0,
+          "gaps_over_600_seconds": [],
+          "net_consumption_bytes": 0,
+          "positive_sampled_depletion_bytes": 0,
+          "daily_normalized_positive_depletion_bytes": null,
+          "daily_status": "INSUFFICIENT_CONTINUOUS_DAY",
+          "rate_is_extrapolated": true,
+          "minimum_free_bytes": 16121204736,
+          "minimum_free_inodes": 637833
+        }
+      ]
+    },
+    "headroom_qualified": false,
+    "limitations": [
+      "Sampled depletion can miss writes and removals between observations.",
+      "Transient job peak, Git/restore workspace and future growth require separate evidence."
+    ]
+  },
+  "source_hashes": {
+    "scripts/projection_watchdog.py": "0bda35cc7bfe2c64fcddaadee33d0742b248cdd0d334dbd2048a0563cd955a42",
+    "engine/projection/watchdog.py": "2144942e7df1ce0f0e8aee0abbad074395bb0039bb8368466ab5fa1c267c9681",
+    "engine/projection/storage_measurements.py": "c2fe6882b5a28935c507fc222fe0656c797d25c65209a8996aac60d0a222e59d"
+  },
+  "profile_remainder": {
+    "path": "/mnt/nfl-engine-profiles/storage-20260923",
+    "files": 253,
+    "logical_bytes_at_check": 30182777,
+    "not_a_peak": true,
+    "retained": true
+  },
+  "mount_dropin": "[Unit]\nRequiresMountsFor=/mnt /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6\nConditionPathIsMountPoint=/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6\n"
+}
