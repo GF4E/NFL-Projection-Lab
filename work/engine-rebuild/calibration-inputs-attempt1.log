@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/prepare_calibration_inputs.py", line 142, in <module>
+    if __name__=='__main__':run()
+                            ^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/prepare_calibration_inputs.py", line 76, in run
+    for g in inputs['games']+load(replay['sources']['schedule']):
+             ~~~~~~^^^^^^^^^
+KeyError: 'games'
