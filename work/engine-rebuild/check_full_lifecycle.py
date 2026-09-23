@@ -31,13 +31,14 @@ from scripts import projection_learning, board_v7_publish, board_v9_publish
 from engine.projection_v3 import qualify
 
 
-def verify(source_root=ROOT, temp_parent=None):
+def verify(source_root=ROOT, temp_parent=None, on_phase=None):
     source_root = Path(source_root)
     started = time.monotonic()
     phases = {}
     def phase(name):
         phases[name] = time.monotonic() - started
         print(json.dumps({'phase': name, 'elapsed_seconds': phases[name]}), file=sys.stderr, flush=True)
+        if on_phase is not None:on_phase(name, phases[name])
     frozen = {str(f.relative_to(source_root)): obs.sha(f.read_bytes())
               for kind in ('locks', 'grades') for f in (source_root/'outputs/projection-v3'/kind).glob('*.json')}
     ledger_name = 'linux-current-ref.json' if sys.platform == 'linux' else 'current-ref.json'

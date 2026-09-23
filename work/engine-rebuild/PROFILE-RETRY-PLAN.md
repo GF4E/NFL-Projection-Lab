@@ -1,0 +1,9 @@
+# Full lifecycle profiling retry
+
+Previous turn made verified runtime progress. The first storage profile is terminal with exit 137 at its declared 570-second ceiling; its data and remainder stay preserved. It produced no complete peak summary. This retry changes the observer, not the workload or resource limit.
+
+Use one stat per directory entry with inode deduplication instead of repeated pathlib traversals. Measure the observer's own wall time, process/child CPU and maximum resident memory. Persist bounded progress at least every two seconds when an atomic boundary is observed, plus every lifecycle phase and completion. A killed run therefore retains explicitly partial evidence, not an invented complete peak. Do not add a background numerical worker or paid data request.
+
+Keep the original complete captured population and refit/preparation/lock/rollback/grading assertions. Add an optional phase callback to the operational harness solely for measurement; no production function or numerical setting changes. Verify staging peaks, hardlink deduplication, symlink exclusion, out-of-scope operations, durable interrupted progress and phase callback behavior on fixtures. Then run the same Linux service-identity, one-worker, 4 GiB and 570-second bounded lifecycle once. Do not restart on an observation timeout; inspect its live handle. Preserve an incomplete run and use its actual timings to select the next correction.
+
+Tier 1: observer implementation and durable partial checkpoints are operational corrections with no candidate, parameter, metric, gate or population change. Measured atomic-boundary file allocation is a workload lower bound, not filesystem metadata, between-boundary transient peaks or the complete reserve. Actual daily growth and Git/backup/historical-experiment workloads stay separate.
