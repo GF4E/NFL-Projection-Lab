@@ -8,6 +8,9 @@ Verification: 557 local checks, 14 Linux fixtures, full recorded refit and commi
 
 Confidence: high in tested population/numerical preservation across seasons and runtimes; lower to medium if independent reconstruction differs. Whole-system readiness remains medium and future predictive improvement is not established.
 
+Source follow-through verified at 2026-09-23T04:14:19.744978+00:00: implementation `ce9a6d64e7b7baecc6b99ff82e1f2cc0a6f46e49` is pushed to origin/engine-v2 and installed on host checkout `c2e8c3f6d92001926183f9ba32ec2181390a88b1`. Actual scheduled release `f7954109c14f5ee14e22cee6d6a3dae1e341bd924ba24856b22adeae97311017` binds the tested source exactly. All 16 current bundle-backed forecast/contribution/WHY records reproduce bit-for-bit; all 52 frozen records keep their hashes. Active fit remains `801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f` / projection-v2.hfa1.w3. The preparation migration pointer was absent on the accompanying read-only source-arrival check. No pipeline activation or public-site payload claim. Root free bytes 87,343,104; durable capacity remains pending. Receipt: training-transition/host-after-push.json.
+
+
 ## 2026-09-22 — recover legacy training evidence; reviewed prompt revision 5
 
 Data/infrastructure audit only. Retain exact cache bytes matching historical Git preparation digests for 12 AS_ISSUED games without embedded rows, plus 18 original lock-feature pairs. Independent standard-library arithmetic reproduces all 60 team predictions (maximum difference 4.973799150320701e-14). Preserve the full 32-game inventory including two RETROSPECTIVE games. No fit, method, gate, training population, frozen record or live selector changes. Recovered artifacts and rerunnable collector are in work/engine-rebuild/training-input-audit and audit_training_inputs.py.
