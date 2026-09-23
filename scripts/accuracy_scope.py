@@ -12,8 +12,12 @@ def normalized(value):
 def validate(registration):
     gate = registration.get('gate', {})
     primary = gate.get('primary', registration.get('primary_metric', 'team_points_MAE')) if isinstance(gate, dict) else registration.get('primary_metric','team_points_MAE')
-    if normalized(primary) not in ('teampointsmae', 'teammae', 'teamscoremae'):
-        raise ValueError('Statistical engine requires team-points MAE primary')
+    calibration_exception = (registration.get('experiment') == 'E-CAL-LINEAGE'
+                             and registration.get('gate_policy') == 'calibration_lineage_v1'
+                             and registration.get('point_tolerance') == 1e-12
+                             and normalized(primary) == 'teampointscrps')
+    if normalized(primary) not in ('teampointsmae', 'teammae', 'teamscoremae') and not calibration_exception:
+        raise ValueError('Statistical engine requires team-points MAE primary except registered E-CAL-LINEAGE')
     def check(value):
         if isinstance(value, dict):
             for k,v in value.items():check(k);check(v)

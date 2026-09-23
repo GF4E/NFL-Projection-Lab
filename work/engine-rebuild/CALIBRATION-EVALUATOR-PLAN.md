@@ -1,0 +1,15 @@
+# Preregistration-gated calibration evaluator plan
+
+Implementation and synthetic fixtures only. No real registration, empirical candidate fit, score comparison, authority migration, release or paid call. Keep all adoption requirements and unresolved dependencies.
+
+The shared accuracy-scope validator currently rejects the adopted E-CAL-LINEAGE CRPS exception. Tier 1: permit team-points CRPS only for experiment E-CAL-LINEAGE, policy calibration_lineage_v1 and fixed point tolerance 1e-12. All other experiments retain team-points MAE; market-relative selection remains forbidden.
+
+Implement a read-only preflight that runs before any calibration builder: verify immutable registration file/body hashes, Tuesday registration and following-Tuesday 06:00 Pacific deadline, exact prescribed gate/settings and one candidate, the registry's authoritative control hash/generation date, complete matching game population/point values/finals, matching prepared method identities, the same week's completed closeout plus public byte-verification proof, and the completed weight-only refit's bound request/result/fit. Verify the bound source/code hashes, registration-before-current-run, and closeout-publication-before-refit-before-registration ordering. An expired or changed prerequisite fails without fitting. No automatically fabricated registration or receipt.
+
+Tier 1 authority convention: a future corrected-control registry entry must bind the receiving point-method hash and prepared source-history reference, in addition to being authoritative. Numerical coincidence alone is insufficient lineage. Existing registry entries remain untouched; absent migration evidence blocks use of these corrected histories.
+
+Use actual saved source formats (including weekly request/result envelopes) and existing closeout validators. Add no network request, credential read, registry mutation, method activation or report-triggered fit. Fixture receipts are explicitly synthetic and never mixed with production. The preflight is a necessary admission check, not proof that a receipt was honestly produced or a completed experiment.
+
+Implement the evaluation boundary only after these checks, with a separately callable numerical worker. The worker uses the existing empirical adapter and pinned scoring library, preserves points, and returns evidence; the release gate still requires the existing independent reviews, paired uncertainty, current as-issued comparison and release controls. If this increment does not finish the numerical worker/report orchestration, record that clearly rather than claiming an operational evaluator.
+
+Tests: valid complete synthetic admission; changed registration; wrong/changed control; nonmatching method/history/points/population; future/expired/non-Tuesday clock; absent or changed public closeout; missing or changed weekly refit; forbidden objectives; no fitter call or output artifact on every rejected preflight. Preserve failure logs, no new real experimental result. One worker and existing resource ceilings remain required for the eventual run.
