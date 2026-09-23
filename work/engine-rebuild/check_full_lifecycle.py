@@ -31,7 +31,7 @@ from scripts import projection_learning, board_v7_publish, board_v9_publish
 from engine.projection_v3 import qualify
 
 
-def verify(source_root=ROOT, temp_parent=None, on_phase=None):
+def verify(source_root=ROOT, temp_parent=None, on_phase=None, code_commit=None):
     source_root = Path(source_root)
     started = time.monotonic()
     phases = {}
@@ -75,7 +75,8 @@ def verify(source_root=ROOT, temp_parent=None, on_phase=None):
     if len(rows) != len(ids)*2 or not ids: raise ValueError('Full current slate required')
     final_feed = json.loads((source_root/'outputs/projection-v3/final-feed.json').read_bytes())
     final_raw = read_source(source_root, final_feed)
-    source_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=source_root, text=True).strip()
+    captured_source_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=source_root, text=True).strip()
+    source_commit = code_commit or captured_source_commit
     code = {'commit': source_commit, 'files': {n: obs.sha((ROOT/n).read_bytes()) for n in bundle.CODE_PATHS},
             'environment': {'python': sys.version, 'scope': 'isolated actual interpreter; source bytes captured'}}
     simulated_cutoff = timestamp('2026-09-22T13:00:00Z')
@@ -203,7 +204,8 @@ def verify(source_root=ROOT, temp_parent=None, on_phase=None):
         size = sum(f.stat().st_size for f in root.rglob('*') if f.is_file())
     if any(obs.sha((source_root/name).read_bytes()) != sha for name, sha in frozen.items()): raise ValueError('Source record changed')
     return {'status': 'PASS', 'scope': 'Full captured training ledger and production refit/prepare/score/release/lock/grader/board code. Isolated simulated source availability, closeout HTTP response, cutoff/issuance clocks and finals. No live activation or accuracy claim.',
-        'source_commit': source_commit, 'code': code, 'training_ref': training_ref, 'parent_fit': fit_ref,
+        'source_commit': source_commit, 'captured_data_commit':captured_source_commit,
+        'code': code, 'training_ref': training_ref, 'parent_fit': fit_ref,
         'refitted_fit': result['fit'], 'training_games': len(shadow['training_games']), 'training_rows': 2*len(shadow['training_games']),
         'slate_games': len(ids), 'locks': len(lock_hashes), 'synthetic_grades': len(grade_hashes),
         'cutoff_counts': cutoff_counts, 'original_source_records_preserved': len(frozen),
