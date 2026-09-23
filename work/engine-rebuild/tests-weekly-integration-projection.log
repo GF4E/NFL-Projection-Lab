@@ -1,0 +1,30 @@
+...................................................................................................................................................................................................E.............................................................................................................evaluated elo
+evaluated elo
+...........................{"state": "DEGRADED", "codes": ["HOST_OBSERVER_UNREACHABLE", "PUBLIC_ACCESS_UNQUALIFIED"], "recovered": []}
+..{"state": "DEGRADED", "codes": ["HOST_OBSERVER_UNREACHABLE", "PUBLIC_ACCESS_UNQUALIFIED"], "recovered": []}
+.................
+======================================================================
+ERROR: test_learning_scheduler_prepares_new_fit_before_publishing (test_projection_prepared.PreparedTests.test_learning_scheduler_prepares_new_fit_before_publishing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_prepared.py", line 138, in test_learning_scheduler_prepares_new_fit_before_publishing
+    result=scheduler.run('learning','fixture')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/cloud_scheduler.py", line 183, in run
+    result=run_weekly(owner=host,dispatch_handle=handle)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/unittest/mock.py", line 1134, in __call__
+    return self._mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/unittest/mock.py", line 1138, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/unittest/mock.py", line 1199, in _execute_mock_call
+    result = effect(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: PreparedTests.test_learning_scheduler_prepares_new_fit_before_publishing.<locals>.refit() got an unexpected keyword argument 'owner'
+
+----------------------------------------------------------------------
+Ran 351 tests in 53.806s
+
+FAILED (errors=1)

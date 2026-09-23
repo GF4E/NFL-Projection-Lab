@@ -1,0 +1,166 @@
+EEEEEEE
+======================================================================
+ERROR: test_actual_refit_stages_switches_and_retry_never_refits (test_projection_weekly_refit.WeeklyTests.test_actual_refit_stages_switches_and_retry_never_refits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 51, in setUp
+    preparer.prepare(select_scheduled=True,at=self.clock)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 148, in prepare
+    if select_scheduled:return _prepare_scheduled(at)
+                               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 113, in _prepare_scheduled
+    return _prepare_groups(selection['groups'],context,selection,stage=stage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 75, in _prepare_groups
+    body=cutoff_pipeline.from_recorded(ROOT,group['state_ref'],slate,context['stadiums'],at=context['at'],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 141, in from_recorded
+    prepared['schedule_evidence']=schedule_evidence(root,schedule_ref or cutoff_state.obs.current(root),slate,at)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 109, in schedule_evidence
+    if timestamp(body['collected_at'])>=timestamp(at):raise ValueError('Schedule unavailable at preparation time')
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Schedule unavailable at preparation time
+
+======================================================================
+ERROR: test_actual_weekly_entry_routes_to_recorded_path (test_projection_weekly_refit.WeeklyTests.test_actual_weekly_entry_routes_to_recorded_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 51, in setUp
+    preparer.prepare(select_scheduled=True,at=self.clock)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 148, in prepare
+    if select_scheduled:return _prepare_scheduled(at)
+                               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 113, in _prepare_scheduled
+    return _prepare_groups(selection['groups'],context,selection,stage=stage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 75, in _prepare_groups
+    body=cutoff_pipeline.from_recorded(ROOT,group['state_ref'],slate,context['stadiums'],at=context['at'],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 141, in from_recorded
+    prepared['schedule_evidence']=schedule_evidence(root,schedule_ref or cutoff_state.obs.current(root),slate,at)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 109, in schedule_evidence
+    if timestamp(body['collected_at'])>=timestamp(at):raise ValueError('Schedule unavailable at preparation time')
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Schedule unavailable at preparation time
+
+======================================================================
+ERROR: test_changed_public_content_and_late_evidence_rejected (test_projection_weekly_refit.WeeklyTests.test_changed_public_content_and_late_evidence_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 51, in setUp
+    preparer.prepare(select_scheduled=True,at=self.clock)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 148, in prepare
+    if select_scheduled:return _prepare_scheduled(at)
+                               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 113, in _prepare_scheduled
+    return _prepare_groups(selection['groups'],context,selection,stage=stage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 75, in _prepare_groups
+    body=cutoff_pipeline.from_recorded(ROOT,group['state_ref'],slate,context['stadiums'],at=context['at'],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 141, in from_recorded
+    prepared['schedule_evidence']=schedule_evidence(root,schedule_ref or cutoff_state.obs.current(root),slate,at)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 109, in schedule_evidence
+    if timestamp(body['collected_at'])>=timestamp(at):raise ValueError('Schedule unavailable at preparation time')
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Schedule unavailable at preparation time
+
+======================================================================
+ERROR: test_crash_after_fit_switch_reconciles_before_other_work (test_projection_weekly_refit.WeeklyTests.test_crash_after_fit_switch_reconciles_before_other_work)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 51, in setUp
+    preparer.prepare(select_scheduled=True,at=self.clock)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 148, in prepare
+    if select_scheduled:return _prepare_scheduled(at)
+                               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 113, in _prepare_scheduled
+    return _prepare_groups(selection['groups'],context,selection,stage=stage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 75, in _prepare_groups
+    body=cutoff_pipeline.from_recorded(ROOT,group['state_ref'],slate,context['stadiums'],at=context['at'],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 141, in from_recorded
+    prepared['schedule_evidence']=schedule_evidence(root,schedule_ref or cutoff_state.obs.current(root),slate,at)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 109, in schedule_evidence
+    if timestamp(body['collected_at'])>=timestamp(at):raise ValueError('Schedule unavailable at preparation time')
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Schedule unavailable at preparation time
+
+======================================================================
+ERROR: test_existing_dispatch_descriptor_is_reused_and_wrong_file_rejected (test_projection_weekly_refit.WeeklyTests.test_existing_dispatch_descriptor_is_reused_and_wrong_file_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 51, in setUp
+    preparer.prepare(select_scheduled=True,at=self.clock)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 148, in prepare
+    if select_scheduled:return _prepare_scheduled(at)
+                               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 113, in _prepare_scheduled
+    return _prepare_groups(selection['groups'],context,selection,stage=stage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 75, in _prepare_groups
+    body=cutoff_pipeline.from_recorded(ROOT,group['state_ref'],slate,context['stadiums'],at=context['at'],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 141, in from_recorded
+    prepared['schedule_evidence']=schedule_evidence(root,schedule_ref or cutoff_state.obs.current(root),slate,at)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 109, in schedule_evidence
+    if timestamp(body['collected_at'])>=timestamp(at):raise ValueError('Schedule unavailable at preparation time')
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Schedule unavailable at preparation time
+
+======================================================================
+ERROR: test_public_confirmer_checks_actual_response_bytes (test_projection_weekly_refit.WeeklyTests.test_public_confirmer_checks_actual_response_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 51, in setUp
+    preparer.prepare(select_scheduled=True,at=self.clock)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 148, in prepare
+    if select_scheduled:return _prepare_scheduled(at)
+                               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 113, in _prepare_scheduled
+    return _prepare_groups(selection['groups'],context,selection,stage=stage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 75, in _prepare_groups
+    body=cutoff_pipeline.from_recorded(ROOT,group['state_ref'],slate,context['stadiums'],at=context['at'],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 141, in from_recorded
+    prepared['schedule_evidence']=schedule_evidence(root,schedule_ref or cutoff_state.obs.current(root),slate,at)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 109, in schedule_evidence
+    if timestamp(body['collected_at'])>=timestamp(at):raise ValueError('Schedule unavailable at preparation time')
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Schedule unavailable at preparation time
+
+======================================================================
+ERROR: test_source_push_without_public_proof_never_fits (test_projection_weekly_refit.WeeklyTests.test_source_push_without_public_proof_never_fits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 51, in setUp
+    preparer.prepare(select_scheduled=True,at=self.clock)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 148, in prepare
+    if select_scheduled:return _prepare_scheduled(at)
+                               ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 113, in _prepare_scheduled
+    return _prepare_groups(selection['groups'],context,selection,stage=stage)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_v3_prepare.py", line 75, in _prepare_groups
+    body=cutoff_pipeline.from_recorded(ROOT,group['state_ref'],slate,context['stadiums'],at=context['at'],
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 141, in from_recorded
+    prepared['schedule_evidence']=schedule_evidence(root,schedule_ref or cutoff_state.obs.current(root),slate,at)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/cutoff_pipeline.py", line 109, in schedule_evidence
+    if timestamp(body['collected_at'])>=timestamp(at):raise ValueError('Schedule unavailable at preparation time')
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Schedule unavailable at preparation time
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.882s
+
+FAILED (errors=7)

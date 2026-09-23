@@ -114,7 +114,10 @@ class PreparedTests(unittest.TestCase):
             ref=prepared.active_fit(self.root)
             self.assertEqual(prepared.load(self.root)[1]['fit'],ref)
             events.append('publish-new' if ref==newfit else 'publish-old')
-        def refit():
+        def refit(*,owner,dispatch_handle):
+            self.assertEqual(owner,'fixture')
+            self.assertFalse(dispatch_handle.closed)
+            self.assertEqual(Path(dispatch_handle.name),self.root/'scheduler/.cloud-dispatch.lock')
             events.append('refit');save(self.root/'work/in-season-learning-v1/active-fit-ref.json',newfit)
             return {'state':'REFIT_COMPLETE'}
         def closeout(_):events.append('closeout');return {'state':'PUBLISHED'}

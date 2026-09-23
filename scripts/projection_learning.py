@@ -97,10 +97,13 @@ def _weekly_refit(rows,previous_week,now):
  result={'state':'REFIT_COMPLETE','version':updated['version'],'fit':ref,'parent_version':a['version'],'through_week':previous_week,'issued_at':now.isoformat(),'training_rows':len(training),'settings':a['selected'],'groups':a['groups']}
  save(receipt,result,True);save(WORK/'active-fit-ref.json',ref);return result
 
-def weekly_refit(rows,previous_week,now):
+def weekly_refit(rows,previous_week,now,*,owner=None,dispatch_handle=None):
+ from engine.projection.pipeline_release import guard
+ if guard(ROOT):
+  from engine.projection import weekly_refit as recorded
+  return recorded.run(ROOT,previous_week,now,owner=owner,dispatch_handle=dispatch_handle)
  with prepared.writer(ROOT):
-  from engine.projection.pipeline_release import guard
-  if guard(ROOT):raise ValueError('Activated pipeline weekly refit requires qualified release handoff')
+  if guard(ROOT):raise ValueError('Pipeline release changed before legacy refit')
   return _weekly_refit(rows,previous_week,now)
 
 def closeout_for_refit(week,season,now):
@@ -112,12 +115,12 @@ def closeout_for_refit(week,season,now):
  closed=require_published(ROOT,receipt,now)
  return closed['week']==week and closed['season']==season
 
-def run_weekly(now=None):
+def run_weekly(now=None,*,owner=None,dispatch_handle=None):
  initialize();now=now or dt.datetime.now(dt.timezone.utc);rows=current_rows();week=due_week(rows,now)
  if week is None:return {'state':'NOT_DUE'}
  if week>=18:return {'state':'SEASON_COMPLETE'}
  if not closeout_for_refit(week,max(r['season'] for r in rows),now):return {'state':'WAITING_FOR_PUBLISHED_CLOSEOUT','through_week':week}
- result=weekly_refit(rows,week,now)
+ result=weekly_refit(rows,week,now,owner=owner,dispatch_handle=dispatch_handle)
  if result['state']=='REFIT_COMPLETE':
   result['improvement']={'state':'METHOD_PROMOTION_DISABLED','reason':'Registered experiment release decision required; automatic loop is weight-only.'}
  save(OUT/'weekly-status.json',result);return result

@@ -1,3 +1,15 @@
+# Current increment — actual weekly scheduler integration
+
+Goal ACTIVE. Previous goal turn made progress (recorded fit staging and compatible switches). The actual weekly entry now routes an activated scheduled pipeline through recorded fitting, staged scoring and the release journal. It freezes owner generation, parent/state/training/publication identities and original fit-start time, reuses the scheduler dispatch descriptor, resumes matching interrupted switches before other work, and never silently reapplies a completed week after rollback. Three failed attempts exhaust the operation; elapsed deadline checks prevent activation after 600 seconds.
+
+Public closeout byte verification is implemented behind an explicit uninstalled endpoint mapping. Source Git acknowledgment alone cannot start the new fit. Missing public evidence yields a named wait. No pipeline, training-migration or endpoint configuration is installed by this increment; the live legacy path remains selected. The production hard-deadline boundary and complete captured-data lifecycle are still required. No provider calls or spending; HTTP tests use fixtures.
+
+Final local checks: 581 pass (353 projection, 218 Week 1, 10 closeout). Latest read-only host root free bytes: 77,520,896; capacity remains unresolved. Actual Linux service-runtime checks: 36 tests PASS, 33.796 seconds, 51,187,712 peak parent RSS bytes, source hashes verified. Weekly fixtures run actual fitting/preparation/scoring/release on synthetic rows, mocking the separately tested full ledger reader. This is not a full captured-slate or live-cycle result. Failure logs and scope are in WEEKLY-INTEGRATION.md.
+
+Next: run the complete captured-data refit/stage/release/lock/grade/rollback canary, then qualify the user-visible closeout/Season adapter and training migration before installing configuration. Preserve general runtime rollback, durable capacity, own-lineage warmup/calibration and venue gates/reviews, prospective comparison and observed-cycle requirements. The first configured state cutoff is September 25 06:00 PT; do not claim it already occurred.
+
+Confidence: medium in readiness—verified implementation evidence exists, but publication-adapter and captured-data integration choices remain consequential. Lower to low if an independent consumer bypasses a boundary. Future predictive improvement remains unproved.
+
 # Current increment — recorded weight-only release staging and rollback
 
 Goal ACTIVE. Previous goal turn made progress (train/test contract and membership audit); this increment adds real code for the remaining fit/preparation release handoff. State identity now binds the unchanged method separately from score coefficients. Recorded completed fits become exact immutable issuing envelopes, upcoming preparations are staged and scored without changing active pointers, and the journal switches/recovers fit, preparation and release together. Forward/rollback must follow verified recorded ancestry; changes to method/calibration/penalty fail.

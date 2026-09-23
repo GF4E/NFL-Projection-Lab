@@ -61,3 +61,7 @@ Apply prompt revision 7 section 10: supervised prediction of known completed-gam
 ## Recorded weight-only handoff increment
 
 Implement REFIT-HANDOFF.md: exact parent-method/calibration preservation; immutable issuing envelope from a completed recorded fit; staged actual preparation/scoring; method-compatible state identity; ancestry-restricted fit/preparation release switches with crash recovery. Qualify on Mac and actual Linux. Then connect weekly dispatch with verified closeout and run the captured full transaction. Keep broader runtime rollback and all other adopted acceptance items open.
+
+## Actual weekly-dispatch integration
+
+Wire recorded fitting/staging/release to the actual weekly entry point, pass and verify the held dispatch descriptor, reconcile only matching pending weekly switches before other work, freeze original request inputs and clocks, and require served-closeout acknowledgment before fitting. Reuse the existing three-attempt/600-second operational bounds. Preserve source-only versus public evidence. Complete the captured-data lifecycle and public/training qualification before configuration/activation; see WEEKLY-INTEGRATION.md.

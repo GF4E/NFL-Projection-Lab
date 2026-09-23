@@ -1,0 +1,23 @@
+.............E...
+======================================================================
+ERROR: test_publisher_holds_shared_writer_and_refit_handoff_is_explicit (test_projection_pipeline_release.ReleaseTests.test_publisher_holds_shared_writer_and_refit_handoff_is_explicit)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_pipeline_release.py", line 165, in test_publisher_holds_shared_writer_and_refit_handoff_is_explicit
+    with self.assertRaisesRegex(ValueError,'qualified release handoff'):projection_learning.weekly_refit([],1,None)
+                                                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_learning.py", line 104, in weekly_refit
+    return recorded.run(ROOT,previous_week,now,owner=owner,dispatch_handle=dispatch_handle)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/weekly_refit.py", line 93, in run
+    root=Path(root);at=timestamp(at)
+                       ^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/forecast_system/calendar.py", line 10, in timestamp
+    if result.tzinfo is None:raise ValueError('A timezone-aware timestamp is required')
+       ^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'tzinfo'
+
+----------------------------------------------------------------------
+Ran 17 tests in 2.807s
+
+FAILED (errors=1)
