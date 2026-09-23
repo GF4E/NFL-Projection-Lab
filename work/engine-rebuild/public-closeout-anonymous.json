@@ -1,0 +1,24 @@
+{
+  "observed_at": "2026-09-23T07:43:33.493462+00:00",
+  "authentication": "NONE",
+  "checks": [
+    {
+      "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/api/closeout/2026-w2/scorecard.json",
+      "status": 403,
+      "matches": false
+    },
+    {
+      "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/api/closeout/2026-w2/season.json",
+      "status": 403,
+      "matches": false
+    },
+    {
+      "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/api/closeout/2026-w2/trend.json",
+      "status": 403,
+      "matches": false
+    }
+  ],
+  "status": "FAILED",
+  "source_commit": "b5412ab8a076705ddc8abe59590f876f38008ee8",
+  "deploy_commit": "190bc0fe17d9591568477c311563a07f0b073ccf"
+}

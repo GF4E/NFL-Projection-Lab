@@ -1,0 +1,39 @@
+{
+  "observed_at": "2026-09-23T07:44:40.604066+00:00",
+  "authentication": "EPHEMERAL_SITES_OWNER_CREDENTIAL",
+  "unattended_qualified": false,
+  "status": "FAILED",
+  "checks": [
+    {
+      "artifact": "outputs/cadence-v2/weeks/2026-w2/scorecard.json",
+      "status": 503,
+      "error_type": "HTTPError",
+      "matches": false
+    },
+    {
+      "artifact": "outputs/cadence-v2/weeks/2026-w2/season.json",
+      "status": 503,
+      "error_type": "HTTPError",
+      "matches": false
+    },
+    {
+      "artifact": "outputs/cadence-v2/weeks/2026-w2/trend.json",
+      "status": 503,
+      "error_type": "HTTPError",
+      "matches": false
+    },
+    {
+      "surface": "board",
+      "status": 200,
+      "season_publication": "VERIFICATION_FAILED",
+      "receipt_sha256": null,
+      "matches": false
+    },
+    {
+      "surface": "build",
+      "status": 200,
+      "source_commit": "b5412ab8a076705ddc8abe59590f876f38008ee8",
+      "matches": true
+    }
+  ]
+}

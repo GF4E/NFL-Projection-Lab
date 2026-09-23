@@ -1,3 +1,7 @@
+# Latest checkpoint — supervised evaluation contract confirmed; public closeout verification failed
+
+Goal ACTIVE. See HANDOFF-2026-09-23.md. Revision 7 already contains the requested chronological train/validation/test contract; 22 focused tests pass. No new candidate was fitted or promoted. Source deployment succeeded, but owner-authenticated closeout requests returned 503 and Season reports VERIFICATION_FAILED. Exact-byte publication and unattended verification remain unqualified. Do not activate the dependent pipeline. Next: diagnose the Worker reader before further publication claims. Prior checkpoints below remain historical evidence.
+
 # Current increment — matched chronological team-score benchmarks
 
 Goal ACTIVE. User steering requires supervised train/validation/test evaluation on completed NFL game scores. The saved replay membership/row export already passes; this increment adds three pre-cutoff, same-population score benchmarks. Replay MAE 7.5747 versus prior-season league 7.9767, venue 7.9404 and last-four team scoring 8.2677 on exactly 2,639 games. No model was fitted or promoted. All figures are NON-AUTHORITATIVE_REPLAY historical development evidence; no accuracy transfer to production is claimed.
