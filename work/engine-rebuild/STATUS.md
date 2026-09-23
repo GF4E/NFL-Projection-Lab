@@ -1,3 +1,7 @@
+# Latest checkpoint — closeout runtime repaired and live bytes verified
+
+Goal ACTIVE. Previous turn was progress: it retained a failed production verification that changed the next action. This turn reproduced and repaired the Worker redirect-mode error, deployed main c4310d7b9, and verified all three live frozen files plus Season identity and rendered content. See PUBLIC-CLOSEOUT.md. Actual host anonymous access still returns 403, so unattended verification/configuration remains unqualified; the new pipeline remains inactive. Root free bytes 60,973,056. Next: supported unattended access and independent full-pipeline leakage qualification. Preserve all broader acceptance requirements and pending capacity authority.
+
 # Latest checkpoint — supervised evaluation contract confirmed; public closeout verification failed
 
 Goal ACTIVE. See HANDOFF-2026-09-23.md. Revision 7 already contains the requested chronological train/validation/test contract; 22 focused tests pass. No new candidate was fitted or promoted. Source deployment succeeded, but owner-authenticated closeout requests returned 503 and Season reports VERIFICATION_FAILED. Exact-byte publication and unattended verification remain unqualified. Do not activate the dependent pipeline. Next: diagnose the Worker reader before further publication claims. Prior checkpoints below remain historical evidence.

@@ -1,0 +1,42 @@
+{
+  "observed_at": "2026-09-23T07:55:31.149461+00:00",
+  "authentication": "EPHEMERAL_SITES_OWNER_CREDENTIAL",
+  "unattended_qualified": false,
+  "status": "PASS",
+  "checks": [
+    {
+      "artifact": "outputs/cadence-v2/weeks/2026-w2/scorecard.json",
+      "status": 200,
+      "sha256": "b658abf49f79a0a9354c3329359042186767945b8a2cf15c7d2cc7e5e3257e02",
+      "receipt_sha256": "b6a53166bb32936b8ca193c925382db6c6b9e03ef272596734f68620705c6691",
+      "matches": true
+    },
+    {
+      "artifact": "outputs/cadence-v2/weeks/2026-w2/season.json",
+      "status": 200,
+      "sha256": "f78e12b3c7fae2daa7572f198c0882f43d028797a2cf197c87ad79f1ac85b72c",
+      "receipt_sha256": "b6a53166bb32936b8ca193c925382db6c6b9e03ef272596734f68620705c6691",
+      "matches": true
+    },
+    {
+      "artifact": "outputs/cadence-v2/weeks/2026-w2/trend.json",
+      "status": 200,
+      "sha256": "ce3835f39d1624fbfa721a562afeaed9114f7431c098c86dd8d63c30cfebe3c3",
+      "receipt_sha256": "b6a53166bb32936b8ca193c925382db6c6b9e03ef272596734f68620705c6691",
+      "matches": true
+    },
+    {
+      "surface": "board",
+      "status": 200,
+      "season_publication": "VERIFIED_CLOSEOUT",
+      "receipt_sha256": "b6a53166bb32936b8ca193c925382db6c6b9e03ef272596734f68620705c6691",
+      "matches": true
+    },
+    {
+      "surface": "build",
+      "status": 200,
+      "source_commit": "c4310d7b9eef4e4b22790a48fcd2751639cf96e2",
+      "matches": true
+    }
+  ]
+}

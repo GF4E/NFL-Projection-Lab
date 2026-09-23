@@ -842,3 +842,8 @@ Native Sites inspection and owner-authenticated live API reads resolve the previ
 Emergency host storage relief used existing authority: rotated archived journals (17.3 MiB) and removed 73 regenerable partial APT indexes (68,270,447 bytes) under the APT lock. No installed package, NFL artifact or original source record was removed. Exact filenames are retained in storage-recovery-lifecycle.json and storage-journal-vacuum.txt; post-cleanup root free space is 86,196,224 bytes. Durable capacity remains pending.
 
 Confidence: medium in operational readiness—captured runtime evidence is verified, but live publication, durable capacity and remaining release qualification still matter. Lower to low on an independently reproduced integrity failure. Improved future accuracy remains unproved.
+
+
+## 2026-09-23 — closeout Worker runtime repair (infrastructure)
+
+The first live closeout verification returned 503. workerd reproduced unsupported `redirect: error` as the cause; main c4310d7b9 uses manual redirects and rejects them without following. Real Worker and live checks now reproduce all frozen Week 2 artifact hashes and Season identity. No numerical model or frozen record changed. Actual-host anonymous access still returns 403, so unattended acknowledgment and dependent pipeline activation remain unqualified. See work/engine-rebuild/PUBLIC-CLOSEOUT.md; initial failures are preserved.
