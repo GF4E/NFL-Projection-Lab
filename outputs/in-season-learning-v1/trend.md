@@ -1515,6 +1515,28 @@ Three-week team streaks: []
 }
 ```
 
+## First-grade probability diagnostics
+
+Descriptive operational evidence; no model gate. Errors are actual minus projected. All-fit rows are not a single-model evaluation.
+
+Team intervals are reconstructed from each original calibration. Legacy centers, tie-split probabilities and invalid score support remain unchanged.
+
+REVIEW REQUESTED (Tier 2): paired-game bootstrap ignores cross-game dependence; two observed weeks do not qualify week-block uncertainty. No significance or promotion claim.
+
+| Evidence | Season | Week | Scope | Games | Team MAE | Team CRPS | Margin CRPS | Total CRPS | Team 50 hits/n | Team 80 hits/n | Brier |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| AS_ISSUED | 2026 | all | season | 30 | 8.6456 | 6.0696 | 8.2019 | 9.0349 | 28/60 | 47/60 | 0.2288 |
+| AS_ISSUED | 2026 | 1 | week | 14 | 8.4277 | 5.8295 | 7.7644 | 8.7781 | 12/28 | 23/28 | 0.2105 |
+| AS_ISSUED | 2026 | 1 | cumulative | 14 | 8.4277 | 5.8295 | 7.7644 | 8.7781 | 12/28 | 23/28 | 0.2105 |
+| AS_ISSUED | 2026 | 2 | week | 16 | 8.8364 | 6.2796 | 8.5846 | 9.2596 | 16/32 | 24/32 | 0.2448 |
+| AS_ISSUED | 2026 | 2 | cumulative | 30 | 8.6456 | 6.0696 | 8.2019 | 9.0349 | 28/60 | 47/60 | 0.2288 |
+
+Pending games: 16. Missing immutable first grades: 2.
+Complete counts, interval scores/widths, RMSE, bias, dispersion, PIT, reliability, paired intervals, lineage strata and original evidence hashes are in trend.json → forecast_diagnostics.
+
+- 2026_01_NE_SEA: needs Immutable original first-grade record.
+- 2026_01_SF_LA: needs Immutable original first-grade record.
+
 <details><summary>DIAGNOSTIC ONLY — CLOSE — AS_ISSUED / projection-v2-172f3e04-a39aa883: ATS 3/8 (37.50%; 95% 13.68–69.43%); total 2/8 (25.00%; 95% 7.15–59.07%) | AS_ISSUED / projection-v2.hfa1.w2: ATS 6/15 (40.00%; 95% 19.82–64.25%); total 5/15 (33.33%; 95% 15.18–58.29%) | AS_ISSUED / projection-v2.w2: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 0/1 (0.00%; 95% 0.00–79.35%) | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f: ATS 3/6 (50.00%; 95% 18.76–81.24%); total 2/6 (33.33%; 95% 9.68–70.00%)</summary>By season: AS_ISSUED / projection-v2-172f3e04-a39aa883 2026: ATS 3/8 (37.50%; 95% 13.68–69.43%); total 2/8 (25.00%; 95% 7.15–59.07%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2 2026: ATS 6/15 (40.00%; 95% 19.82–64.25%); total 5/15 (33.33%; 95% 15.18–58.29%); spread coverage 15/15 | AS_ISSUED / projection-v2.w2 2026: ATS 0/1 (0.00%; 95% 0.00–79.35%); total 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f 2026: ATS 3/6 (50.00%; 95% 18.76–81.24%); total 2/6 (33.33%; 95% 9.68–70.00%); spread coverage 6/6. Source: nflverse spread_line / total_line. Counts exclude actual pushes and exact forecast-on-line cases. Never a target, gate, ranking, selection criterion or justification for a model change.</details>
 <details><summary>DIAGNOSTIC ONLY — OPEN — AS_ISSUED / projection-v2-172f3e04-a39aa883: ATS 3/8 (37.50%; 95% 13.68–69.43%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2: ATS 5/13 (38.46%; 95% 17.71–64.48%); spread coverage 13/15 | AS_ISSUED / projection-v2.w2: ATS 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f: ATS 3/5 (60.00%; 95% 23.07–88.24%); spread coverage 5/6; totals INSUFFICIENT (34.3% historical coverage)</summary>By season: AS_ISSUED / projection-v2-172f3e04-a39aa883 2026: ATS 3/8 (37.50%; 95% 13.68–69.43%); spread coverage 8/8 | AS_ISSUED / projection-v2.hfa1.w2 2026: ATS 5/13 (38.46%; 95% 17.71–64.48%); spread coverage 13/15 | AS_ISSUED / projection-v2.w2 2026: ATS 0/1 (0.00%; 95% 0.00–79.35%); spread coverage 1/1 | AS_ISSUED / projection-v3-b7a84dbe-2b5d9d0f 2026: ATS 3/5 (60.00%; 95% 23.07–88.24%); spread coverage 5/6. Source: nfelo historic_projected_spreads.csv home_line_open; totals source nfelo_games.csv total_line_open, unblended. Counts exclude actual pushes and exact forecast-on-line cases. Never a target, gate, ranking, selection criterion or justification for a model change.</details>
 
