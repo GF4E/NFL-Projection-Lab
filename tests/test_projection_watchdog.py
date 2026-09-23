@@ -6,6 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
+from types import SimpleNamespace
 import urllib.error
 
 from engine.projection.watchdog import (UTC, POLICY, digest, board_identity, assess_source,
@@ -238,6 +239,31 @@ class WatchdogTests(unittest.TestCase):
             p=Path(folder)/'acknowledgment.json'; old={'received_at':(NOW-dt.timedelta(hours=2)).isoformat()};p.write_text(json.dumps(old))
             runner.outside_once(Path(folder),now=NOW,notifications=False)
             self.assertEqual(json.loads(p.read_text()),old)
+
+
+class SplitStorageTests(unittest.TestCase):
+    def check(self, root_bytes, artifact_bytes, root_inodes=100, artifact_inodes=100):
+        samples = [SimpleNamespace(f_bavail=root_bytes, f_frsize=1, f_favail=root_inodes),
+                   SimpleNamespace(f_bavail=artifact_bytes, f_frsize=1, f_favail=artifact_inodes)]
+        with patch.object(runner.os, 'statvfs', side_effect=samples):
+            storage = runner.storage_snapshot(Path('/artifacts'))
+        snapshot = host(); snapshot['storage'] = storage
+        return storage, {x['code'] for x in assess_host(snapshot, None, NOW)}
+
+    def test_full_root_is_not_hidden_by_large_artifact_volume(self):
+        storage, codes = self.check(0, 15_000_000_000)
+        self.assertIn('STORAGE_EXHAUSTED', codes)
+        self.assertEqual(storage['filesystems']['artifacts']['free_bytes'], 15_000_000_000)
+
+    def test_full_artifact_volume_and_root_inode_exhaustion(self):
+        self.assertIn('STORAGE_EXHAUSTED', self.check(4_000_000_000, 0)[1])
+        self.assertIn('STORAGE_EXHAUSTED', self.check(4_000_000_000, 15_000_000_000, root_inodes=0)[1])
+
+    def test_available_capacity_does_not_invent_peak_write_qualification(self):
+        storage, codes = self.check(4_000_000_000, 15_000_000_000)
+        self.assertNotIn('STORAGE_EXHAUSTED', codes)
+        self.assertIn('STORAGE_HEADROOM_UNQUALIFIED', codes)
+        self.assertEqual(storage['free_bytes'], 4_000_000_000)
 
 
 if __name__ == '__main__':

@@ -117,16 +117,26 @@ def record(folder, name, value):
     save(folder/f'{name}.json', value)
 
 
+def storage_snapshot(root):
+    """Watch both the OS and artifacts after a separate-volume migration."""
+    samples = {}
+    for name, path in (('root', Path('/')), ('artifacts', root)):
+        disk = os.statvfs(path)
+        samples[name] = {'free_bytes': disk.f_bavail * disk.f_frsize,
+                         'free_inodes': disk.f_favail}
+    return {'free_bytes': min(x['free_bytes'] for x in samples.values()),
+            'free_inodes': min(x['free_inodes'] for x in samples.values()),
+            'filesystems': samples, 'headroom_qualified': False}
+
+
 def host_once(folder=HOST_STATE, root=ROOT, now=None):
     fixed_time = now is not None
     now = now or dt.datetime.now(UTC)
     previous = load(folder/'host.json', {})
     epoch = previous.get('epoch', now.isoformat())
-    disk = os.statvfs(root)
     value = {'schema': POLICY['schema'], 'policy_sha256': digest(POLICY),
              'checked_at': now.isoformat(), 'epoch': epoch,
-             'storage': {'free_bytes': disk.f_bavail*disk.f_frsize,
-                         'free_inodes': disk.f_favail, 'headroom_qualified': False},
+             'storage': storage_snapshot(root),
              'observer_source_sha256': digest({str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
                                                for p in [Path(__file__), ROOT/'engine/projection/watchdog.py']}),
              'services': services()}

@@ -1,0 +1,53 @@
+{
+  "at": "2026-09-23T17:05:19.733520+00:00",
+  "services": {
+    "nfl-engine-capture": {
+      "Result": "success",
+      "ExecMainExitTimestamp": "",
+      "ExecMainStatus": "0",
+      "ActiveState": "activating"
+    },
+    "nfl-engine-daily": {
+      "Result": "success",
+      "ExecMainExitTimestamp": "Wed 2026-09-23 17:04:45 UTC",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive"
+    },
+    "nfl-cutoff-state": {
+      "Result": "success",
+      "ExecMainExitTimestamp": "",
+      "ExecMainStatus": "0",
+      "ActiveState": "activating"
+    },
+    "nfl-learning": {
+      "Result": "success",
+      "ExecMainExitTimestamp": "Tue 2026-09-22 13:04:37 UTC",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive"
+    },
+    "nfl-engine-watchdog": {
+      "Result": "success",
+      "ExecMainExitTimestamp": "Wed 2026-09-23 17:05:00 UTC",
+      "ExecMainStatus": "0",
+      "ActiveState": "inactive"
+    }
+  },
+  "final_reader": {
+    "state": "HEALTHY",
+    "last_success_at": "2026-09-23T10:16:11.614227+00:00",
+    "reason": null
+  },
+  "monitor": {
+    "checked_at": "2026-09-23T17:04:58.729999+00:00",
+    "storage": {
+      "free_bytes": 16062836736,
+      "free_inodes": 632740,
+      "headroom_qualified": false
+    },
+    "active_codes": [
+      "FINAL_READER_STALE",
+      "STORAGE_HEADROOM_UNQUALIFIED"
+    ]
+  },
+  "source_commit": "5c084ae2cbc8a754a32954dc8841f2ee77480418"
+}

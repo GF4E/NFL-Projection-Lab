@@ -1,0 +1,13 @@
+# Approved storage cutover
+
+20 GiB DigitalOcean nyc3 volume, USD 2/month before tax, explicitly approved 2026-09-23. User reports USD 3.29 signup credit; balance API does not expose promotional balance/expiry, so do not claim a credit deduction.
+
+Preserve the full host checkout, including its uncommitted runtime records and Git history. Pause all five existing NFL timers and let active workers finish. Record original states. Mount the new volume, grow its initial filesystem to the provisioned device size, then copy with metadata. Verify every regular file with SHA-256, directory/file ownership and permissions, and symlink targets. Keep the original root copies intact through verification.
+
+Stream a separate archive to the Mac's ignored private storage, verify its members against the source manifest, and perform a restore check. Bind the verified destination at the existing absolute checkout path. Test unmount/rollback/remount before deleting verified redundant root copies. Persist UUID mount and bind mount; require mounts for engine services so missing storage cannot silently fall back to root. Restore exactly the previously active timers. Run service-user write/fsync and storage fault tests, observe scheduled recovery, and report both root and artifact capacity. Keep measured growth/peak reserve qualification separate from restored writable capacity.
+
+Only after verified copy, off-host backup and rollback may redundant original root files be removed. No forecast, grade, ledger, source or evidence is discarded; paths and current method remain unchanged. Preserve manifests and receipts privately if their filenames expose private runtime material; commit aggregate verification evidence and operational code only.
+
+Original paused timers: nfl-engine-capture, nfl-engine-daily, nfl-cutoff-state, nfl-learning, nfl-engine-watchdog. The initial copy was preliminary until all timers were stopped; a complete second copy and equal source/destination manifests establish the authoritative migration snapshot. The final check must use the persisted mount configuration, not only a manual bind.
+
+Mount-isolation correction: the first cleanup guard detected no recovered root blocks. Shared mount propagation had mirrored the destination bind into the temporary root view. Original root and off-host backup remained intact. Restored the one affected destination pack by its expected hash, isolated the underlay recursively, and added device/mount assertions after the path switch before any removal. A disposable mount-namespace canary exercises that exact failure mode. The corrected cutover repeats full source/destination verification.

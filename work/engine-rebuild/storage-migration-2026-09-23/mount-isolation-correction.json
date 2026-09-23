@@ -1,0 +1,10 @@
+{
+  "cause": "shared mount propagation duplicated repository bind inside root underlay",
+  "guard": "root available-space assertion stopped before further removal",
+  "corrected": "root underlay now recursively private; propagated child bind removed; affected volume pack restored from intact root file and hash verified",
+  "affected_path": ".git/objects/pack/pack-3a7677acb3aeb79c1e036878c774b188cff3c78d.pack",
+  "bytes": 253929775,
+  "sha256": "ddac09f912dc022011763438acf0717962134781a3fe51ef442e60adb56a1077",
+  "original_root_copy_preserved": true,
+  "backup_preserved": true
+}

@@ -1,0 +1,35 @@
+{
+  "at": "2026-09-23T17:04:44.948072+00:00",
+  "persisted_mount_remount_verified": true,
+  "service_user_canaries": [
+    {
+      "filesystem_path": "/tmp",
+      "bytes": 1114112,
+      "sha256": "eb040f21b4f57bd18e1ac03e93470a554906f24b2f1b9f418ca8600f95965e39",
+      "write_fsync_atomic_rename_readback": true
+    },
+    {
+      "filesystem_path": "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6",
+      "bytes": 1114112,
+      "sha256": "eb040f21b4f57bd18e1ac03e93470a554906f24b2f1b9f418ca8600f95965e39",
+      "write_fsync_atomic_rename_readback": true
+    }
+  ],
+  "storage_tests_passed": true,
+  "requirements": {
+    "nfl-engine-capture": "RequiresMountsFor=/var/tmp /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6 /mnt\nConditions=[unprintable]",
+    "nfl-engine-daily": "RequiresMountsFor=/mnt /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6 /var/tmp\nConditions=[unprintable]",
+    "nfl-cutoff-state": "RequiresMountsFor=/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6 /var/tmp /mnt\nConditions=[unprintable]",
+    "nfl-learning": "RequiresMountsFor=/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6 /mnt\nConditions=[unprintable]",
+    "nfl-engine-watchdog": "RequiresMountsFor=/mnt /run/nfl-engine-monitor /Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6 /var/tmp\nConditions=[unprintable]"
+  },
+  "timers_after": {
+    "nfl-engine-capture": "active",
+    "nfl-engine-daily": "active",
+    "nfl-cutoff-state": "active",
+    "nfl-learning": "active",
+    "nfl-engine-watchdog": "active"
+  },
+  "root_available_bytes": 4133957632,
+  "artifact_available_bytes": 16063455232
+}
