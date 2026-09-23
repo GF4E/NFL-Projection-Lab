@@ -1,3 +1,13 @@
+## 2026-09-22 — wire recorded weekly fitting and public-closeout boundary
+
+Infrastructure only, no statistical candidate or promotion. The actual weekly entry selects recorded refitting/staging/release for an activated scheduled pipeline; the scheduler passes its verified owner and held dispatch descriptor. Immutable requests freeze original training/fit/state/publication identities and clocks. Matching partial releases reconcile before other work; completed weeks do not undo later rollbacks. Owner generation changes and mismatched evidence fail. Three failed attempts stop further computation; 600-second elapsed checks prevent late activation, with full hard-deadline qualification still required.
+
+A configured HTTPS verifier compares served closeout bytes against immutable artifacts. Source-repository push alone is insufficient; missing/access-unqualified public evidence waits before fitting. No endpoint, migration or pipeline configuration is installed. CONVENTIONS use the existing locks, journal, chronology and operational bounds. Tier 2 REVIEW REQUESTED: public adapter/transition qualification precedes activation; transformed website payloads require their own adapter, not an invented hash acknowledgment.
+
+Verification and preserved failures: work/engine-rebuild/WEEKLY-INTEGRATION.md. All 581 local checks pass (353 projection, 218 Week 1, 10 closeout). Actual Linux service Python passes 36 synthetic handoff/weekly fixtures in 33.796 seconds; weekly tests mock the separately tested ledger reader while exercising real refit/preparation/scoring/switching. Full captured-data lifecycle, publication, capacity, runtime rollback, statistical/reviewer and observed-live-cycle requirements remain. No paid calls or spending.
+
+Confidence: medium in operational readiness—verified code evidence exists, but publication and full captured-data integration remain consequential. Lower to low if an independent consumer bypasses a boundary. No predictive improvement claim.
+
 ## 2026-09-22 — staged recorded refit and compatible fit rollback
 
 Infrastructure only. Separate cutoff-state method identity from the weight-only ridge fit identity. Preserve worker configuration and state receipts. A new immutable issuing envelope must reproduce the completed recorded fit, preserve all parent method/calibration fields and fixed feature/penalty settings, and retain its durable availability. No candidate, gate or calibration change.

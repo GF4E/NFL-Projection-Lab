@@ -1,0 +1,82 @@
+EEEEEEE
+======================================================================
+ERROR: test_actual_refit_stages_switches_and_retry_never_refits (test_projection_weekly_refit.WeeklyTests.test_actual_refit_stages_switches_and_retry_never_refits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 35, in setUp
+    self.capture(finals+[future],[r for g in finals for r in statistics(g)],at='2026-09-15T12:30:00Z')
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_cutoff_state.py", line 54, in capture
+    manifest={'schedule':self.source('schedule',games),'team_games':self.source('team-games',stats)}
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: _patch.__call__() takes 2 positional arguments but 3 were given
+
+======================================================================
+ERROR: test_actual_weekly_entry_routes_to_recorded_path (test_projection_weekly_refit.WeeklyTests.test_actual_weekly_entry_routes_to_recorded_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 35, in setUp
+    self.capture(finals+[future],[r for g in finals for r in statistics(g)],at='2026-09-15T12:30:00Z')
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_cutoff_state.py", line 54, in capture
+    manifest={'schedule':self.source('schedule',games),'team_games':self.source('team-games',stats)}
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: _patch.__call__() takes 2 positional arguments but 3 were given
+
+======================================================================
+ERROR: test_changed_public_content_and_late_evidence_rejected (test_projection_weekly_refit.WeeklyTests.test_changed_public_content_and_late_evidence_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 35, in setUp
+    self.capture(finals+[future],[r for g in finals for r in statistics(g)],at='2026-09-15T12:30:00Z')
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_cutoff_state.py", line 54, in capture
+    manifest={'schedule':self.source('schedule',games),'team_games':self.source('team-games',stats)}
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: _patch.__call__() takes 2 positional arguments but 3 were given
+
+======================================================================
+ERROR: test_crash_after_fit_switch_reconciles_before_other_work (test_projection_weekly_refit.WeeklyTests.test_crash_after_fit_switch_reconciles_before_other_work)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 35, in setUp
+    self.capture(finals+[future],[r for g in finals for r in statistics(g)],at='2026-09-15T12:30:00Z')
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_cutoff_state.py", line 54, in capture
+    manifest={'schedule':self.source('schedule',games),'team_games':self.source('team-games',stats)}
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: _patch.__call__() takes 2 positional arguments but 3 were given
+
+======================================================================
+ERROR: test_existing_dispatch_descriptor_is_reused_and_wrong_file_rejected (test_projection_weekly_refit.WeeklyTests.test_existing_dispatch_descriptor_is_reused_and_wrong_file_rejected)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 35, in setUp
+    self.capture(finals+[future],[r for g in finals for r in statistics(g)],at='2026-09-15T12:30:00Z')
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_cutoff_state.py", line 54, in capture
+    manifest={'schedule':self.source('schedule',games),'team_games':self.source('team-games',stats)}
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: _patch.__call__() takes 2 positional arguments but 3 were given
+
+======================================================================
+ERROR: test_public_confirmer_checks_actual_response_bytes (test_projection_weekly_refit.WeeklyTests.test_public_confirmer_checks_actual_response_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 35, in setUp
+    self.capture(finals+[future],[r for g in finals for r in statistics(g)],at='2026-09-15T12:30:00Z')
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_cutoff_state.py", line 54, in capture
+    manifest={'schedule':self.source('schedule',games),'team_games':self.source('team-games',stats)}
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: _patch.__call__() takes 2 positional arguments but 3 were given
+
+======================================================================
+ERROR: test_source_push_without_public_proof_never_fits (test_projection_weekly_refit.WeeklyTests.test_source_push_without_public_proof_never_fits)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_weekly_refit.py", line 35, in setUp
+    self.capture(finals+[future],[r for g in finals for r in statistics(g)],at='2026-09-15T12:30:00Z')
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_cutoff_state.py", line 54, in capture
+    manifest={'schedule':self.source('schedule',games),'team_games':self.source('team-games',stats)}
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: _patch.__call__() takes 2 positional arguments but 3 were given
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.536s
+
+FAILED (errors=7)

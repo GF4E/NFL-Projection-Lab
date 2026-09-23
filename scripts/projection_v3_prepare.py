@@ -113,7 +113,7 @@ def _prepare_scheduled(at=None,fit_ref=None,stage=False):
  return _prepare_groups(selection['groups'],context,selection,stage=stage)
 
 
-def stage_refit(shadow_ref,*,at):
+def stage_refit(shadow_ref,*,at=None):
  """Build a weight-only checkpoint; no active fit/preparation/release writes."""
  from engine.projection import refit_release, pipeline_release
  from engine.forecast_system.calendar import timestamp
@@ -123,7 +123,7 @@ def stage_refit(shadow_ref,*,at):
   artifact=refit_release.verify(ROOT,ref)
   if artifact['parent_fit_ref']!=prepared.active_fit(ROOT):
    raise ValueError('Staged refit parent is not active')
-  if timestamp(artifact['issued_at'])>timestamp(at):
+  if timestamp(artifact['issued_at'])>timestamp(at if at is not None else cutoff_pipeline.now()):
    raise ValueError('Staged refit unavailable at preparation')
   meta=_prepare_scheduled(at,fit_ref=ref,stage=True)
   selected=meta['scheduled_selection']['games']

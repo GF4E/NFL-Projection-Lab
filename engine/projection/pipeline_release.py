@@ -4,6 +4,8 @@ No active manifest is installed by importing this module. General code/runtime
 rollback and the weekly scheduler handoff still require qualification.
 """
 import datetime as dt
+from contextlib import contextmanager
+import os
 import fcntl
 import json
 from pathlib import Path
@@ -161,7 +163,25 @@ def guard(root):
     return manifest
 
 
-def switch(root, target, *, owner, operation_id, expected_active):
+@contextmanager
+def dispatch(root, handle=None):
+    """Share the actual scheduler descriptor; never bypass lock ownership."""
+    path=Path(root)/'outputs/model-pick-v1/.cloud-dispatch.lock'
+    path.parent.mkdir(parents=True,exist_ok=True)
+    owned=handle is None
+    handle=path.open('a+') if owned else handle
+    try:
+        actual=os.fstat(handle.fileno());expected=path.stat()
+        if (actual.st_dev,actual.st_ino)!=(expected.st_dev,expected.st_ino):
+            raise ValueError('Dispatch descriptor is not the scheduler lock')
+        try:fcntl.flock(handle,fcntl.LOCK_EX|fcntl.LOCK_NB)
+        except BlockingIOError:raise ValueError('Scheduler writer already active') from None
+        yield handle
+    finally:
+        if owned:handle.close()
+
+
+def switch(root, target, *, owner, operation_id, expected_active, dispatch_handle=None):
     """Explicit fenced operation; no retries, provider calls or code checkout.
 
     Lost responses resume with the identical ID/payload. The caller must first
@@ -171,13 +191,7 @@ def switch(root, target, *, owner, operation_id, expected_active):
     root = Path(root)
     if not re.fullmatch('[A-Za-z0-9_-]{1,80}', operation_id):
         raise ValueError('Invalid release operation ID')
-    lock = root / 'outputs/model-pick-v1/.cloud-dispatch.lock'
-    lock.parent.mkdir(parents=True, exist_ok=True)
-    with lock.open('a+') as handle:
-        try:
-            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except BlockingIOError:
-            raise ValueError('Scheduler writer already active') from None
+    with dispatch(root, dispatch_handle):
         with prepared.writer(root):
             fence = pointer(root, OWNER)
             if not fence or fence.get('state') != 'ACTIVE' or fence.get('owner') != owner:

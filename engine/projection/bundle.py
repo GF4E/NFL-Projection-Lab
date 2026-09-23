@@ -28,7 +28,7 @@ CODE_PATHS = (
     'engine/projection/bundle.py', 'engine/projection/scoring.py', 'engine/projection/prepared.py',
     'engine/projection/scoring_process.py', 'scripts/projection_score_worker.py',
     'engine/projection/lineage.py','engine/projection/storage.py',
-    'engine/projection/training_ledger.py','engine/projection/refit_release.py',
+    'engine/projection/training_ledger.py','engine/projection/refit_release.py','engine/projection/weekly_refit.py','engine/projection/public_closeout.py',
     'engine/projection/observations.py','engine/projection/cutoff_features.py','engine/forecast_system/cadence.py',
     'engine/projection/cutoff_state.py','engine/projection/cutoff_pipeline.py','engine/projection/cutoff_publication.py','engine/projection/cutoff_selection.py','engine/projection/cutoff_worker.py',
     'engine/projection/model.py','engine/projection/card.py','engine/projection/grade.py',
