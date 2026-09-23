@@ -1,6 +1,9 @@
 #!/bin/bash
 # Run as root on the newly created Ubuntu host. No credentials in this file.
 set -euo pipefail
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+pip_requirements="$script_dir/pip-requirements.txt"
+test -s "$pip_requirements"
 install -d -m 755 /opt/nfl-runtime
 if [ ! -x /usr/local/bin/micromamba ]; then
   curl --fail --silent --show-error --location https://micro.mamba.pm/api/micromamba/linux-64/latest -o /opt/nfl-runtime/micromamba.tar.bz2
@@ -14,5 +17,9 @@ if [ -f /opt/nfl-runtime/linux-64.explicit.txt ]; then
   manifest=/opt/nfl-runtime/linux-64.explicit.txt
 fi
 micromamba create -y --prefix /opt/nfl-runtime/env -f "$manifest"
+# Explicit conda files contain no pip wheels. Apply this in either restoration path.
+/opt/nfl-runtime/env/bin/python -m pip install --require-hashes --only-binary=:all: --no-deps -r "$pip_requirements"
+/opt/nfl-runtime/env/bin/python -m pip check
+/opt/nfl-runtime/env/bin/python -c 'import importlib.metadata; assert importlib.metadata.version("scoringrules") == "0.10.0"'
 micromamba list --prefix /opt/nfl-runtime/env --explicit > /opt/nfl-runtime/linux-64.explicit.txt
 /opt/nfl-runtime/env/bin/python -c 'import sys,numpy,pandas,scipy,pyarrow,requests; print(sys.version); print(numpy.__version__,pandas.__version__,scipy.__version__,pyarrow.__version__,requests.__version__)'

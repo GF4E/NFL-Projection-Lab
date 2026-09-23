@@ -1,3 +1,9 @@
+# Latest checkpoint — scoring runtime dependency installed and parity verified
+
+Goal ACTIVE. Fixed the explicit-conda bootstrap gap and installed hash-pinned scoringrules 0.10.0 under dispatch exclusion. Actual Linux service identity passes 307 tests (84 calibration, 218 frozen Week 1, five scoring), with four local bootstrap-path tests. No scientific dependency upgraded: 2,988 files, all 16 reproduced forecasts, 52 immutable lock/grade hashes and active fit 801ef079 remain exact. Isolated package rollback passed. See RUNTIME-DEPENDENCY.md and scoring-runtime-parity.json. No real registration, fitting, gate, release/control promotion or provider spending.
+
+Next: retain bounded profile checkpoints and diagnose workload timing before retrying; qualify corrected issuing/control authority and real cadence prerequisites before E-CAL. Daily storage measurements continue and remain insufficient for a full-day rate. The earlier 570-second peak-profile failure is preserved, not reclassified or rerun. Actual reviews, conditional-mean semantics, statistical dispositions, prospective/live evidence and all other adopted requirements remain open. Confidence near-total only in the verified runtime/forecast hashes; lower to high on independent disagreement.
+
 # Latest checkpoint — capacity history installed; peak qualification incomplete
 
 Goal ACTIVE. Approved 20 GiB migration is complete. Durable five-minute measurements are installed on the actual service and verified; root has about 3.85 GiB free and artifacts about 15 GiB. Eight Linux, 45 focused local and 484 projection tests pass. Unit/source identities and retained mount prerequisites match. See STORAGE-MEASUREMENT.md and installed receipt. Daily growth requires elapsed time; headroom remains unqualified.
