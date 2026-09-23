@@ -1,3 +1,7 @@
+# Latest checkpoint — durable storage measurement qualified for installation
+
+Goal ACTIVE. Approved migration remains complete. Eight service-identity Linux fixtures, 45 focused local tests and 484 projection tests pass; systemd unit validation passes. Five-minute capacity history survives reboot and reports gaps, filesystem changes and measurement failures. No reserve is invented; daily growth requires actual elapsed time. Isolated full-slate peak profiling and installed-observer verification are in progress. See STORAGE-MEASUREMENT.md. No model or experiment change, provider spending or new resource purchase. Next: install and verify measurements, record the bounded workload peak, then continue runtime/control authority prerequisites while daily observations accumulate. Actual reviews, statistical dispositions, prospective/live evidence and the full adopted scope remain open.
+
 # Latest checkpoint — exact live board bytes verified
 
 Goal ACTIVE. Website main 81a8faab7 / mirror 19f0704a5 / Sites 209 preserves original JSON bytes in a bounded lossless cache. Anonymous droplet reads exactly match source and provenance; installed Mac observer reports VERIFIED. Only active monitor finding is STORAGE_HEADROOM_UNQUALIFIED. See BOARD-BYTES.md. Next: measure actual growth/peak-write reserve, qualify research runtime, then corrected issuing/control authority and cadence prerequisites. No real registration, candidate fit or statistical promotion. Conditional-mean semantics, actual reviews, prospective evidence and full observed cycle remain open.

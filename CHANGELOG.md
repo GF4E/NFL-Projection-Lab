@@ -1,3 +1,7 @@
+## 2026-09-23 — measure storage growth without declaring an unsupported reserve
+
+Infrastructure lane. Add durable five-minute observations to the existing watchdog, with first-sample retention, filesystem identity, gap disclosure and named collection failures. CONVENTIONS, Tier 1: five-minute buckets and two-interval gap reporting; no interpolation. Tier 2 REVIEW REQUESTED: eventual reserve horizon/safety allowance remains undecided, with no threshold installed. Profile the existing isolated lifecycle at atomic staging boundaries. No records removed, provider requests, new spending, model changes or experiment gate changes. See work/engine-rebuild/STORAGE-MEASUREMENT.md. Daily growth requires actual elapsed time; the headroom alert remains until qualified.
+
 ## 2026-09-23 — restore exact live board bytes and monitor verification
 
 Infrastructure lane: website main 81a8faab7 preserves raw JSON through a bounded lossless cache and response; build-only mirror 19f0704a5, Sites version 209. Existing legacy cache is preserved; byte-verifying responses fail closed without qualified raw data. Real Worker/D1 and anonymous droplet checks agree exactly; monitor now VERIFIED, with only storage headroom qualification outstanding. 373 full website tests plus final 11 focused checks, typecheck, lint and build pass. No numerical model or gate change. See work/engine-rebuild/BOARD-BYTES.md. Confidence: high in publication integrity; lower to medium on independent hash disagreement.

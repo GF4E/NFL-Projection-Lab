@@ -1,0 +1,19 @@
+......E................{"state": "DEGRADED", "codes": ["HOST_OBSERVER_UNREACHABLE", "PUBLIC_ACCESS_UNQUALIFIED"], "recovered": []}
+..{"state": "DEGRADED", "codes": ["HOST_OBSERVER_UNREACHABLE", "PUBLIC_ACCESS_UNQUALIFIED"], "recovered": []}
+....................
+======================================================================
+ERROR: test_monitor_names_collection_failure_without_masking_other_faults (test_projection_storage_measurements.MeasurementsTests.test_monitor_names_collection_failure_without_masking_other_faults)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_storage_measurements.py", line 60, in test_monitor_names_collection_failure_without_masking_other_faults
+    codes={x['code'] for x in assess_host(sample,None,NOW)}
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/watchdog.py", line 153, in assess_host
+    if (now-stamp(snapshot['epoch'])).total_seconds() > POLICY['heartbeat_seconds']:
+                  ~~~~~~~~^^^^^^^^^
+KeyError: 'epoch'
+
+----------------------------------------------------------------------
+Ran 45 tests in 0.068s
+
+FAILED (errors=1)
