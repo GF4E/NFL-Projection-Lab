@@ -28,6 +28,10 @@ Linux: 53 tests pass on 348 individually hashed staged Python files under servic
 
 The first Linux attempt exited 75 before its worker because the production dispatch lock was unavailable for 30 seconds. It is retained separately. Attempt 2 used a 420-second maximum wait inside the same 570-second total limit and finished successfully; no production owner was interrupted. No new provider requests or spending. All 46 issuing files remain unchanged, preserving the existing release recovery proof.
 
+## Installed inactive source
+
+Source commit 9c8f75868 is pushed to engine-v2. Actual host 68225099e167785ef50e4a5bf65ff5fe4c594331, under UID 1000, matches both new implementation hashes. At 2026-09-23T22:07:26Z admission still correctly refused the unqualified scheduled issuing path, with zero enrollments and unchanged fit 801ef079. The installed cutoff worker reports WAITING_FOR_CUTOFF, next 2026-09-25T13:00Z. See prospective/host-installed.json. Source arrival is not collector installation or live enrollment.
+
 ## Remaining work and operation
 
 This implementation does not install a collector or claim unattended collection. After actual cutoff/issuance qualification and honest control-registry association, enroll the exact population before the first included forecast, restore the frozen scorer, and integrate collection under the existing dispatch owner before T-75. Retain per-attempt operational failure reasons and verify a real shadow/lock/grade/closeout cycle. Enrollment and scheduled collection must not be inferred from this canary. The future qualifying control and enrollment hash do not yet exist. The full rebuild remains active, with requirements 10b/10c PARTIAL.
