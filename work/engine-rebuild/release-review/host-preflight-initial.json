@@ -2,8 +2,8 @@
   "schema": "initial-release-preflight-v1",
   "status": "BLOCKED",
   "packet_ref": {
-    "path": "work/engine-rebuild/release-review/packets/7faf4319316b39f20edc0ad7a25f862c9439bb2a74546c32404eb9a22d21a8d3.json",
-    "sha256": "7faf4319316b39f20edc0ad7a25f862c9439bb2a74546c32404eb9a22d21a8d3"
+    "path": "work/engine-rebuild/release-review/packets/2ac5924e12bec045c43312caa54798493d2a31ffaf17d83540438b666108d9f6.json",
+    "sha256": "2ac5924e12bec045c43312caa54798493d2a31ffaf17d83540438b666108d9f6"
   },
   "checks": [
     {
@@ -33,31 +33,23 @@
     },
     {
       "name": "CURRENT_RUNTIME",
-      "status": "NOT_CHECKED",
-      "detail": "Private accepted full-runtime manifest required; copying proof is not a fresh runtime check"
+      "status": "PASS",
+      "detail": "421443b220e5d492d8baf7c714c819ff44f4aa296d235f22aa9b7c1887454a01"
     },
     {
       "name": "EXTERNAL_REVIEW_Claude",
       "status": "NOT_RECORDED",
-      "detail": "Tier 2 review requested; no decision inferred. Not a new permission stop for authorized chronology work; actual method-promotion reviews remain mandatory",
-      "blocks_initial_chronology_work": false
+      "detail": "Actual decision on this packet and its listed conventions is required; no decision is inferred"
     },
     {
       "name": "EXTERNAL_REVIEW_Dr. M",
       "status": "NOT_RECORDED",
-      "detail": "Tier 2 review requested; no decision inferred. Not a new permission stop for authorized chronology work; actual method-promotion reviews remain mandatory",
-      "blocks_initial_chronology_work": false
+      "detail": "Actual decision on this packet and its listed conventions is required; no decision is inferred"
     },
     {
       "name": "LIVE_TRANSITION",
       "status": "NOT_INSTALLED",
-      "detail": {
-        "installed": {
-          "pipeline_manifest": false,
-          "weekly_refit": false
-        },
-        "remaining": "Enforced operator transition, qualified bootstrap and actual issuing/public provenance"
-      }
+      "detail": "Enforced operator transition, qualified bootstrap and actual issuing/public provenance remain required"
     }
   ],
   "activation": false,

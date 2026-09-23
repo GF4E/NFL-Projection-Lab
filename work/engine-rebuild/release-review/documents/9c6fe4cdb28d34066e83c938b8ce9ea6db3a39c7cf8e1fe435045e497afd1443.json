@@ -1,0 +1,15 @@
+{
+  "replay_ref": {
+    "path": "work/engine-rebuild/common-pipeline/replay-ba52a7e926e4429bc2440e49f7167eecc3eeacacedbfc91648c8a8de7d6b54c0.json.gz",
+    "sha256": "ba52a7e926e4429bc2440e49f7167eecc3eeacacedbfc91648c8a8de7d6b54c0"
+  },
+  "status": "STRICT_TUESDAY_SENSITIVITY_ONLY",
+  "authoritative": false,
+  "claim_withdrawn": "Production-semantics weekly refit qualification",
+  "reason": "The existing daily scheduler permits later closeout/refit catch-up. The replay only tried refits at Tuesday cutoffs.",
+  "next_required": "Replay actual daily catch-up with labels bounded by the original actual refit start and durable retry inputs.",
+  "source_archive": {
+    "path": "work/engine-rebuild/common-pipeline/source-88a50c86a59b40f116696843e795145b892b481aebf8c551e4a148f2cbf9a582.json.gz",
+    "sha256": "88a50c86a59b40f116696843e795145b892b481aebf8c551e4a148f2cbf9a582"
+  }
+}
