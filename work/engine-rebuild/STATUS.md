@@ -1,4 +1,8 @@
-# Latest checkpoint — source-to-forecast perturbation checks
+# Latest checkpoint — early calibration source inventory
+
+Goal ACTIVE. Previous turn was progress (source-to-forecast leakage tests). The chronological supervised training/validation/test requirement is already explicit in reviewed prompt revision 7. This increment verifies local earlier calibration sources: 256 paired games per season, 2011–2015, matching source hashes and existing franchise aliases. The existing Phase A 2013–2015 predictions are a different method and cannot supply own-lineage calibration. Current HFA lacks 2011–2013 entries; derive them by its already-promoted prior-season rule. See CALIBRATION-SOURCES.md and calibration-source-inventory.json. No candidate fitting, registration clock, gate, production change or spending. Next: verify early aggregate derivation, extend the common adapter and construct separately identified earlier forecasts; preserve published-closeout and authority prerequisites before comparison. Capacity, unattended access, reviews and all original acceptance requirements remain open.
+
+# Earlier checkpoint — source-to-forecast perturbation checks
 
 Goal ACTIVE. Previous turn was progress (live reader repaired and exact bytes verified). Six new integration tests now cover raw source changes through features, common refitting/scoring, existing chronological setting selection and prior-residual calibration helpers, plus recorded late revisions. All 98 related tests pass. See LEAKAGE.md and leakage-verification.json. Synthetic evidence does not qualify historical vintages or activate calibration; requirement 10c remains PARTIAL. Next: qualify the real-data own-lineage calibration input/adapter and remaining feature-selection boundaries, while preserving the cadence prerequisite on fitting experiments. Unattended publication access and durable storage authority remain unresolved. All original acceptance requirements remain in scope.
 

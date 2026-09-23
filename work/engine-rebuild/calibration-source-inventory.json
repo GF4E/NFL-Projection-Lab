@@ -1,0 +1,173 @@
+{
+  "by_season": {
+    "2011": {
+      "completed_regular_games": 256,
+      "paired_stat_games": 256,
+      "unmatched_or_duplicate_team_pairs": []
+    },
+    "2012": {
+      "completed_regular_games": 256,
+      "paired_stat_games": 256,
+      "unmatched_or_duplicate_team_pairs": []
+    },
+    "2013": {
+      "completed_regular_games": 256,
+      "paired_stat_games": 256,
+      "unmatched_or_duplicate_team_pairs": []
+    },
+    "2014": {
+      "completed_regular_games": 256,
+      "paired_stat_games": 256,
+      "unmatched_or_duplicate_team_pairs": []
+    },
+    "2015": {
+      "completed_regular_games": 256,
+      "paired_stat_games": 256,
+      "unmatched_or_duplicate_team_pairs": []
+    }
+  },
+  "cache_usable_as_issuing_lineage": false,
+  "checker": {
+    "path": "work/engine-rebuild/check_calibration_sources.py",
+    "sha256": "ab173c91ea1479dd7f1ea37072aaf220272fdbaa52b9be2b53365676bc9a70c9"
+  },
+  "existing_2013_2015_cache_games": {
+    "2013": 256,
+    "2014": 256,
+    "2015": 256
+  },
+  "existing_cache_groups": [
+    "career_kicking",
+    "efficiency",
+    "elo",
+    "explosiveness",
+    "kicking",
+    "momentum",
+    "pace",
+    "passing",
+    "pressure",
+    "pythagorean",
+    "quarterback",
+    "rest_travel",
+    "rushing",
+    "schedule_strength",
+    "scoring_composition",
+    "target_shares",
+    "turnovers_luck",
+    "venue"
+  ],
+  "issuing_groups": [
+    "calibration",
+    "elo"
+  ],
+  "issuing_settings": [
+    "none",
+    10
+  ],
+  "limitations": [
+    "Raw bytes and aggregate source tags verified, not independent play-by-play reaggregation.",
+    "Historical provider availability is unknown; retrieval in 2026 does not establish availability at historical issuance.",
+    "No qualified own-lineage residuals, probability accuracy, or release readiness are established."
+  ],
+  "missing_early_hfa_seasons_in_active_artifact": [
+    "2011",
+    "2012",
+    "2013"
+  ],
+  "next_actions": [
+    "Verify aggregate derivation against pinned early play-by-play before extending the common source adapter.",
+    "Derive missing early HFA entries using the existing promoted prior-season rule; do not copy later-season HFA or insert a default.",
+    "Generate separately identified strictly earlier 2013\u20132015 forecasts for both required calibration lineages using their own methods.",
+    "Complete chronology-control authority and unattended closeout prerequisites before preregistration or candidate comparison."
+  ],
+  "purpose": "Identify prerequisites for strictly earlier own-lineage calibration, without fitting or scoring a candidate.",
+  "reason": "Phase A uses different groups, annual fitting and penalty selection; its forecasts cannot be substituted for the issuing weekly-refit method.",
+  "sources": {
+    "active_fit": {
+      "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+      "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+    },
+    "active_pointer": {
+      "path": "work/in-season-learning-v1/active-fit-ref.json",
+      "sha256": "012cd17fa1eb0b16c21e83795f0194f4c3b6ba51c9962aab7fa7b4b0de6c119e"
+    },
+    "current_source_manifest": {
+      "path": "work/projection-v1/source-manifest.json",
+      "sha256": "612271d3a9991fabcf919e504c597d9d428b105064d75191b08829f6ec8290ea"
+    },
+    "early": [
+      {
+        "aggregate": {
+          "path": "work/projection-v2/phase-a/aggregate-c54753b8137b88dab260489b1462cbf1309c3d11741eb8d10e5f1b0a9b8795b1.json",
+          "sha256": "151b5ae4827a8ae77f2b9a79f152b31a4cc1ba5d0609d6caddb83117f0dced2e"
+        },
+        "derivation_status": "HASH_VERIFIED; NOT_REAGGREGATED_THIS_CHECK",
+        "raw": {
+          "kind": "pbp",
+          "name": "play_by_play_2011.parquet",
+          "path": "work/projection-v3/raw/play_by_play_2011.parquet",
+          "received_at": "2026-09-13T18:54:45.088756+00:00",
+          "reused": false,
+          "sha256": "c54753b8137b88dab260489b1462cbf1309c3d11741eb8d10e5f1b0a9b8795b1",
+          "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2011.parquet"
+        },
+        "rows": 512
+      },
+      {
+        "aggregate": {
+          "path": "work/projection-v2/phase-a/aggregate-447b90789104aac70427ec9d3b51df7247234029d0ecabd269279369b1cc6278.json",
+          "sha256": "3cc96aff13f0baef1d25b696fa9f1fea9cd1dfb6488e0622590ec4b765883a94"
+        },
+        "derivation_status": "HASH_VERIFIED; NOT_REAGGREGATED_THIS_CHECK",
+        "raw": {
+          "kind": "pbp",
+          "name": "play_by_play_2012.parquet",
+          "path": "work/projection-v3/raw/play_by_play_2012.parquet",
+          "received_at": "2026-09-13T18:54:48.312756+00:00",
+          "reused": false,
+          "sha256": "447b90789104aac70427ec9d3b51df7247234029d0ecabd269279369b1cc6278",
+          "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2012.parquet"
+        },
+        "rows": 512
+      },
+      {
+        "aggregate": {
+          "path": "work/projection-v2/phase-a/aggregate-f454605a1983b3946baf0ffadf3a0b9f5e04735c4b84732e0483f2049a780d00.json",
+          "sha256": "3c548c08060d6dd1d0ca773150b10e823aa109c9971e63bb7da5e901784aa235"
+        },
+        "derivation_status": "HASH_VERIFIED; NOT_REAGGREGATED_THIS_CHECK",
+        "raw": {
+          "kind": "pbp",
+          "name": "play_by_play_2013.parquet",
+          "path": "work/projection-v3/raw/play_by_play_2013.parquet",
+          "received_at": "2026-09-13T18:54:43.694489+00:00",
+          "reused": false,
+          "sha256": "f454605a1983b3946baf0ffadf3a0b9f5e04735c4b84732e0483f2049a780d00",
+          "url": "https://github.com/nflverse/nflverse-data/releases/download/pbp/play_by_play_2013.parquet"
+        },
+        "rows": 512
+      }
+    ],
+    "existing_method": {
+      "path": "work/projection-v2/phase-a/core-manifest.json",
+      "sha256": "d1712754dea59566732bfc0d235910981fe33610a4ceaf3ac73d0a26002ed057"
+    },
+    "existing_oof": {
+      "path": "work/projection-v2/phase-a/core-oof.json",
+      "sha256": "a3a88d5daebe4e8be6ffc3e478e9c37faf251bb0f07a41064f5513da30d55002"
+    },
+    "franchise_normalization": {
+      "path": "scripts/projection_prepare.py",
+      "sha256": "e1341be3cecba533fec3537ade9898a84623c3bdcfd3cec5061ef9fc1e7b9f51"
+    },
+    "phase_a": {
+      "path": "work/projection-v2/phase-a/features-ref.json",
+      "sha256": "4d102e724c7c91da0ce808bf67ef4b45289cff4bbb3278e8742c3c70606a6866"
+    },
+    "schedule": {
+      "path": "outputs/model-pick-v1/final-sources/c4b302a4e1dc27b0f1db0a2617a353a4f73b5b4ed798b0762dd1403032874b77.csv",
+      "sha256": "c4b302a4e1dc27b0f1db0a2617a353a4f73b5b4ed798b0762dd1403032874b77"
+    }
+  },
+  "status": "SOURCE_INVENTORY_ONLY; CALIBRATION_NOT_QUALIFIED"
+}
