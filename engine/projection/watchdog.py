@@ -123,6 +123,8 @@ def assess_host(snapshot, external, now):
     # No percentage invented here: the unresolved capacity plan is explicit.
     if not disk.get('headroom_qualified', False):
         findings.append(issue('STORAGE_HEADROOM_UNQUALIFIED'))
+    if snapshot.get('storage_measurement',{}).get('state')=='FAILED':
+        findings.append(issue('STORAGE_MEASUREMENT_FAILED'))
     capture = snapshot['services'].get('nfl-engine-capture.service', {})
     if snapshot['services'].get('nfl-engine-capture.timer', {}).get('ActiveState') != 'active':
         findings.append(issue('CAPTURE_TIMER_INACTIVE'))

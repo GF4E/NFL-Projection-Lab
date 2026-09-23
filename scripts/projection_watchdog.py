@@ -19,6 +19,7 @@ from engine.projection.watchdog import (UTC, POLICY, stamp, digest, board_identi
 from engine.forecast_system.calendar import schedule_kickoff
 
 HOST_STATE = Path('/run/nfl-engine-monitor')
+STORAGE_HISTORY = Path('/var/lib/nfl-engine-monitor/storage')
 MAC_STATE = Path.home()/'Library/Application Support/NFLProjectionMonitor'
 PUBLIC_URL = 'https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/api/projection-board'
 MAX_PUBLIC_BYTES = 8_000_000
@@ -123,13 +124,15 @@ def storage_snapshot(root):
     for name, path in (('root', Path('/')), ('artifacts', root)):
         disk = os.statvfs(path)
         samples[name] = {'free_bytes': disk.f_bavail * disk.f_frsize,
-                         'free_inodes': disk.f_favail}
+                         'free_inodes': disk.f_favail,
+                         'total_bytes': getattr(disk,'f_blocks',0) * disk.f_frsize,
+                         'filesystem_id': getattr(disk,'f_fsid',None)}
     return {'free_bytes': min(x['free_bytes'] for x in samples.values()),
             'free_inodes': min(x['free_inodes'] for x in samples.values()),
             'filesystems': samples, 'headroom_qualified': False}
 
 
-def host_once(folder=HOST_STATE, root=ROOT, now=None):
+def host_once(folder=HOST_STATE, root=ROOT, now=None, storage_history=None):
     fixed_time = now is not None
     now = now or dt.datetime.now(UTC)
     previous = load(folder/'host.json', {})
@@ -138,8 +141,13 @@ def host_once(folder=HOST_STATE, root=ROOT, now=None):
              'checked_at': now.isoformat(), 'epoch': epoch,
              'storage': storage_snapshot(root),
              'observer_source_sha256': digest({str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
-                                               for p in [Path(__file__), ROOT/'engine/projection/watchdog.py']}),
+                                               for p in [Path(__file__), ROOT/'engine/projection/watchdog.py',ROOT/'engine/projection/storage_measurements.py']}),
              'services': services()}
+    if storage_history is not None:
+        from engine.projection.storage_measurements import observe
+        try:value['storage_measurement']=observe(storage_history,value['storage'],now.isoformat())
+        except (OSError,ValueError,KeyError,TypeError):
+            value['storage_measurement']={'state':'FAILED','headroom_qualified':False}
     try:
         value['source'] = source_snapshot(root, now if fixed_time else None, stamp(epoch))
     except (OSError, ValueError, KeyError, TypeError) as error:
@@ -236,7 +244,8 @@ def notify(value):
     names={'STORAGE_EXHAUSTED':'Server disk is full','CAPTURE_RUN_FAILED':'Game capture failed',
            'FINAL_READER_STALE':'Final scores are not refreshing',
            'PUBLIC_ACCESS_UNQUALIFIED':'Website verification is blocked',
-           'STORAGE_HEADROOM_UNQUALIFIED':'Storage capacity needs attention'}
+           'STORAGE_HEADROOM_UNQUALIFIED':'Storage capacity needs attention',
+           'STORAGE_MEASUREMENT_FAILED':'Storage measurement could not be saved'}
     message = '; '.join(names.get(c,c.replace('_',' ').lower()) for c in codes)
     recovered=value['assessment'].get('recovered_codes',[])
     if recovered:
@@ -324,7 +333,7 @@ def main():
         except BlockingIOError:
             return
         if args.mode == 'host':
-            host_once()
+            host_once(storage_history=STORAGE_HISTORY)
         else:
             outside_once(retry_access=args.retry_public, notifications=not args.no_notify)
 
