@@ -36,6 +36,9 @@ The complete canary takes 185.608 seconds with 186,814,464 peak RSS bytes. Root 
 
 The cutoff, closeout clocks and source acknowledgment in this canary are explicitly simulated. This qualifies captured-data mechanics, numerical refitting, retry behavior and measured runtime; it does not establish a served closeout, live Tuesday cycle, full release rollback or scheduler activation. The existing production method and active fit remain unchanged. Source push/arrival verification is recorded separately from activation.
 
+
+Source follow-through verified at 2026-09-23T04:14:19.744978+00:00: implementation `ce9a6d64e7b7baecc6b99ff82e1f2cc0a6f46e49` is pushed to origin/engine-v2 and installed on host checkout `c2e8c3f6d92001926183f9ba32ec2181390a88b1`. Actual scheduled release `f7954109c14f5ee14e22cee6d6a3dae1e341bd924ba24856b22adeae97311017` binds the tested source exactly. All 16 current bundle-backed forecast/contribution/WHY records reproduce bit-for-bit; all 52 frozen records keep their hashes. Active fit remains `801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f` / projection-v2.hfa1.w3. The preparation migration pointer was absent on the accompanying read-only source-arrival check. No pipeline activation or public-site payload claim. Root free bytes 87,343,104; durable capacity remains pending. Receipt: training-transition/host-after-push.json.
+
 Least certain: historical provider availability and the reviewed choice to reconstruct the pre-activation training boundary. Both remain explicit; neither is repaired by matching hashes.
 
 Confidence: medium in the migration policy — it holds on authoritative captured inputs but depends on a defensible choice that could reasonably differ. Lower to low if review rejects that choice or source reconstruction fails. Numerical and operational verification results do not establish better future forecast accuracy.
