@@ -1,3 +1,7 @@
+## 2026-09-23 — retain trial and evaluation-exposure evidence
+
+Infrastructure/evidence lane. CONVENTIONS Tier 1: reuse immutable durable storage, explicit operation keys, exact source snapshots and actual observation clocks; generated reports do not establish human viewing. Native calibration execution records remain authoritative and are mirrored on execution/report return, with no-refit retry after ledger failure. Tier 2 REVIEW REQUESTED: import the declared historical document catalog without inventing exhaustive trial counts, original predeclaration or unrecorded views; alternative inferred completeness is rejected. Independent Git/hash verification covers 29 documents and 176,492 bytes. 98 local and 98 isolated Linux tests pass; initial local fixture and Linux staging failures are retained. All 46 issuing files and 53 production records/pointer unchanged. No experiment, numerical change, spending or activation. See work/engine-rebuild/RESEARCH-LEDGER.md. Requirement 10b remains PARTIAL; prospective plan and broader history are outstanding. Confidence high in bounded retention/retry behavior; lower to medium on independent native-record discrepancies.
+
 ## 2026-09-23 — verify initial handoff and qualify terminal journal evidence
 
 Final packet 33f16c70 also passes all six actual-host technical checks; retained loaded-unit limits and exact-invocation completion evidence are in release-review/final-preflight-supervision.json. The pipeline remains unactivated pending its first actual eligible state.

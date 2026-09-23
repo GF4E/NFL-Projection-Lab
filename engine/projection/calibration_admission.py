@@ -31,7 +31,8 @@ EVALUATOR_CODE=('engine/projection/calibration_admission.py','engine/projection/
                 'engine/projection/model.py','engine/scoring.py','engine/projection_v3/qualify.py',
                 'engine/projection_experiments.py','engine/forecast_system/calendar.py',
                 'engine/projection/calibration_execute.py','engine/projection/storage.py',
-                'scripts/projection_calibration.py')
+                'scripts/projection_calibration.py','engine/projection/research_ledger.py',
+                'engine/projection/calibration_report.py')
 
 
 def environment():

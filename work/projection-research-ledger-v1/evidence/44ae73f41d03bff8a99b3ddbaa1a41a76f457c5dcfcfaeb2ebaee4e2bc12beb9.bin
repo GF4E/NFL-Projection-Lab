@@ -1,0 +1,29 @@
+{
+  "experiment": "E-SCORE",
+  "name": "league scoring environment",
+  "status": "REGISTERED_NOT_FITTED",
+  "registered_at": "2026-09-19T00:07:22.059354+00:00",
+  "primary": "mean_team_points_MAE",
+  "control": "retained E1 linear",
+  "candidates": [
+    "a_weekly_ppd",
+    "b_preseason_ppd_only",
+    "c_chronological_season_intercept"
+  ],
+  "comparative_results_viewed": false,
+  "file_hashes": {
+    "work/e-scoring-environment/SPEC.md": "0eae97ee80e89b423b5d29a16eab67fa61f3b71d9c66652d947a8acdc0f7554d",
+    "work/e-scoring-environment/GAP-SWEEP.md": "cd8fa676c48ba965a5a40076904f436ce820f2b03e70585b110efb72e847f5a6",
+    "work/projection-governance-v2/GOVERNANCE.md": "0070ad0784572fd54c7043c369d475fa4fc49d0e1588fcc43b9e0b508fb0d8e3",
+    "work/projection-governance-v2/DECISION-LATENCY.md": "07a99344de5678c50fc0ba87f82b0e006334b0c3c7719da338840699c6cf5d7b",
+    "work/projection-governance-v2/e1-calendar-corrected/oof.json": "c02926100d9c0c2b5be2eca4e9195feecc7c9460a6fa2decdbb023548b229b32",
+    "work/projection-governance-v2/e1-calendar-corrected/features.json.gz": "b5ce4f7cf714f9a12c707b80ca068a8ec0e0a8041983ba4565d5c2cc2a4ebb09",
+    "work/projection-governance-v2/e1/registration.json": "4a992c84d493dfa09c7303f1322c93ee863c8c189a884b312e4c5a77da96cc61",
+    "outputs/projection-v3/locks/2026_02_DET_BUF.json": "30fa21e828a365f4bd6e949d76a21f706521ef0991cd12ecebdc549334e8737f"
+  },
+  "gate": {
+    "team_mae_improvement": 0.01,
+    "margin_total_50_80_coverage_tolerance": 0.03
+  },
+  "deadline_at": "2026-09-22T06:00:00-07:00"
+}

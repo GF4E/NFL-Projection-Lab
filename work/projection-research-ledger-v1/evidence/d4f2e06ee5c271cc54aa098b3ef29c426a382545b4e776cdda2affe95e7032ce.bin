@@ -1,0 +1,404 @@
+{
+  "active_experiment": "E-QB-DIRECT",
+  "authoritative_control": {
+    "path": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
+    "sha256": "66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f"
+  },
+  "automatic_method_promotion": false,
+  "clock_policy": {
+    "deadline": "following Tuesday 06:00 America/Los_Angeles",
+    "effective_at": "2026-09-16T22:29:05Z",
+    "expired_state": "INCONCLUSIVE",
+    "maximum_queue_blocks": 1,
+    "return_requires": "blocker resolution evidence",
+    "returned_attempt": "nonblocking"
+  },
+  "conditional_return_queue": [
+    {
+      "blocks_main_queue": false,
+      "id": "E-UNC-WIND",
+      "return_requires": "2021\u20132023 forecast history qualified",
+      "state": "INSUFFICIENT"
+    },
+    {
+      "blocks_main_queue": false,
+      "hypothesis": "OPEN",
+      "id": "E-UNC-HETERO",
+      "return_requires": "New qualified fields and new preregistration; no repeat of the rejected three-feature set",
+      "three_feature_test": "REJECTED"
+    }
+  ],
+  "control_policy": "work/projection-governance-v2/DEPLOYED-CONTROL.md",
+  "evaluation_policy": {
+    "market_relative_scoring_gating_tuning_ranking_selection": false,
+    "primary": "team_points_MAE",
+    "reference_lines": "DIAGNOSTIC ONLY; never justify a model change",
+    "supporting": [
+      "margin_MAE",
+      "total_MAE",
+      "bias",
+      "dispersion",
+      "interval_coverage",
+      "CRPS",
+      "interval_score"
+    ]
+  },
+  "experiments": [
+    {
+      "authority": "Active researched-rebuild user goal, 2026-09-21 Pacific",
+      "id": "E-CAL-LINEAGE",
+      "name": "E-CAL-LINEAGE",
+      "policy": "work/engine-rebuild/adoption.json",
+      "prerequisites": [
+        "published Tuesday closeout",
+        "verified authoritative production control",
+        "full executable gap sweep",
+        "hashed preregistration before comparative results"
+      ],
+      "state": "ADOPTED_PENDING_PREREGISTRATION"
+    },
+    {
+      "authority": "Active researched-rebuild user goal, 2026-09-21 Pacific",
+      "id": "E-VENUE-DIRECT",
+      "name": "E-VENUE-DIRECT",
+      "policy": "work/engine-rebuild/adoption.json",
+      "prerequisites": [
+        "published Tuesday closeout",
+        "verified authoritative production control",
+        "full executable gap sweep",
+        "hashed preregistration before comparative results"
+      ],
+      "state": "ADOPTED_PENDING_PREREGISTRATION"
+    },
+    {
+      "blockers": [
+        "B01: coefficient uncertainty definition; Tier 3 before fitting"
+      ],
+      "clock": {
+        "deadline": "following Tuesday 06:00 America/Los_Angeles",
+        "maximum_queue_blocks": 1,
+        "status": "WAITING_FOR_TUESDAY_ACTIVATION_AFTER_PUBLISHED_CLOSEOUT"
+      },
+      "fit_started": false,
+      "gate_passed": false,
+      "id": "E-QB-DIRECT",
+      "production_activated": false,
+      "promoted": false,
+      "registration": "work/e-qb-direct/registration.json",
+      "registration_sha256": "1ec8217ed9d086a9d35bc27dc40cc2b4bd4b95b82d69b0c7b565a9b65fd0c85d",
+      "state": "REGISTERED_PENDING_INFERENCE_DEFINITION_AND_TUESDAY_ACTIVATION"
+    },
+    {
+      "fit_sha256": "f7fc497ee581c3a948388891904b52669e345bae1a61c684281034505b5840e4",
+      "gate_passed": true,
+      "id": "E-ELO-HFA",
+      "production_activated": true,
+      "promoted": true,
+      "registration": "work/e-elo-qb-hfa-v1/E-ELO-HFA.json",
+      "registration_sha256": "5496574c482d1bba7be916bc1a3212c869da26e8e77c3b2c720cf58910cfc1e8",
+      "release_commit": "379cd7ca61f3838c240467e4d1cef76fec542390",
+      "release_note": "User explicitly authorized promotion; host verified",
+      "report": "work/e-elo-hfa-release/REPORT.md",
+      "state": "RELEASED"
+    },
+    {
+      "active_work": "Closed; successor E-QB-DIRECT",
+      "blockers": [],
+      "closeout": "work/e-elo-qb-value-v2/CLOSEOUT-2026-09-20.md",
+      "completed_run": {
+        "blockers": [],
+        "data_availability": "STARTER_HISTORY_AVAILABLE_QUALIFIED_RULE_WITH_UNTIMESTAMPED_FALLBACKS",
+        "decision": "Team MAE gains0.099%a/0.093%b vs1%gate; all coverage checks pass; oracle0.225%diagnostic",
+        "gate_passed": false,
+        "hypothesis_scope": "Specified rolling EPA VALUE through Elo only; no rejection of all QB valuation",
+        "id": "E-ELO-QB",
+        "production_activated": false,
+        "promoted": false,
+        "reconciliation": "Accepted by user; source and population differences resolved",
+        "registration": "work/e-elo-qb-value-v2/registration.json",
+        "registration_sha256": "b6b8c58e15cfa757423c432cca41b2ea1fe4e09ad264746dc59e97b6859b7a13",
+        "report": "work/e-elo-qb-value-v2/REPORT.md",
+        "state": "REJECTED"
+      },
+      "data_availability": "STARTER_HISTORY_AVAILABLE_QUALIFIED_RULE_WITH_UNTIMESTAMPED_FALLBACKS",
+      "decision": "Team MAE gains0.099%a/0.093%b vs1%gate; all coverage checks pass; oracle0.225%diagnostic",
+      "existing_result_preserved": true,
+      "gate_passed": false,
+      "hypothesis_scope": "QB value routed through Elo adjustment CLOSED; direct QB quality input OPEN",
+      "id": "E-ELO-QB",
+      "identification_binding_constraint": false,
+      "new_fit_started": false,
+      "oracle_completed": true,
+      "production_activated": false,
+      "promoted": false,
+      "reconciliation": "Accepted by user; source and population differences resolved",
+      "registration": "work/e-elo-qb-value-v2/registration.json",
+      "registration_sha256": "b6b8c58e15cfa757423c432cca41b2ea1fe4e09ad264746dc59e97b6859b7a13",
+      "report": "work/e-elo-qb-value-v2/REPORT.md",
+      "scale_fit": "Per outer season, prior seasons only, minimizing Elo margin MAE",
+      "state": "CLOSED_REJECTED",
+      "status_correction": "Final user closeout supersedes LIVE_ACCURACY_REVIEW; VALUE implemented and evaluated; no missing-VALUE blocker",
+      "successor": "E-QB-DIRECT",
+      "value_specification": "SUPPLIED_AND_IMPLEMENTED"
+    },
+    {
+      "candidates_registered": 0,
+      "control": "Premise: work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json; authoritative deployed lineage: yes; generated 2026-09-19 UTC.",
+      "id": "E-QB-CHANGE",
+      "registration": "work/e-qb-change/registration.json",
+      "registration_sha256": "b3f634cffc128521baa70f1a10c3874defb244be4ca7c3e5f53ff5af28c14127",
+      "report": "work/e-qb-change/REPORT.md",
+      "state": "DIAGNOSTIC_INSUFFICIENT_PROVENANCE",
+      "superseded_qualification": "User-qualified previous-game attempts and injury/depth fallback rule in E-ELO-QB supersedes blanket starter-history restriction; original diagnostic remains preserved."
+    },
+    {
+      "id": "E-BENCHMARK-GAP",
+      "kind": "NO_FITTING_NO_CANDIDATES",
+      "next_question": "E-QB-CHANGE: starter-change handling",
+      "next_question_state": "QUESTION_ONLY_PREMATCH_INPUT_QUALIFICATION_REQUIRED",
+      "promoted": false,
+      "registration": "work/e-benchmark-gap/registration.json",
+      "registration_sha256": "550f8719441b0fbcc9bd13e1f229be8c1167214cfab60da12acb1101ae21b8de",
+      "report": "work/e-benchmark-gap/REPORT.md",
+      "state": "COMPLETED_DESCRIPTIVE"
+    },
+    {
+      "addendum": "work/e-post/DEPLOYED-LINEAGE-ADDENDUM.md",
+      "addendum_sha256": "c48fe449edcb4728159f0d18fb374af32610cac641e11f5bd4a624d149f2c4fd",
+      "blockers": [],
+      "decision": "REJECTED_ON_PREMISE",
+      "deployed_control": {
+        "path": "work/projection-v2w/deployed-oof-6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10.json",
+        "sha256": "6a0238fcb08e5bfcf3a7daa6710e3c9cfb0f04b3c31dae77d3baa5f9b9956c10"
+      },
+      "gate_evaluated": false,
+      "host_verification": "work/projection-v2w/host-verification-2026-09-19.json",
+      "id": "E-POST",
+      "priority": 0,
+      "promoted": false,
+      "reason": "Audit mistook stale v3 baseline for production; fourteen cited grades came from two superseded fits. Deployed-lineage pooled bias +0.189 does not have the alleged persistent negative level defect.",
+      "registration": "work/e-post/registration.json",
+      "registration_sha256": "511881a2c8796bbf3c5550686fcf56d17247fda7bed0a1cab366618daf0acaaa",
+      "report": "work/projection-v2w/REPORT.md",
+      "state": "REJECTED_ON_PREMISE"
+    },
+    {
+      "B01": "RESOLVED_USER_KICKOFF_PLUS_4H",
+      "clock": {
+        "deadline_at": "2026-09-22T06:00:00-07:00",
+        "queue_block_count": 0,
+        "registration_sha256": "a48e85241a47301ff3e462af70db6171c7c0edd750a67ac878ebe2b4411f1e62",
+        "started_at": "2026-09-16T22:29:05Z",
+        "status": "SATISFIED_EXISTING_VALID_GATE_DECISION"
+      },
+      "decision": "NO_CHALLENGER_CLEARS_GATE",
+      "deployed_series_reregistrations_allowed": 1,
+      "id": "E1",
+      "name": "early-season updating",
+      "preregistration_addendum": "work/projection-governance-v2/e1-calendar-corrected/preregistration-addendum.json",
+      "production_applicability": "Valid within REPLAY; not tested against production",
+      "promoted": false,
+      "registration": "work/projection-governance-v2/e1/registration.json",
+      "registration_sha256": "a48e85241a47301ff3e462af70db6171c7c0edd750a67ac878ebe2b4411f1e62",
+      "report": "work/projection-governance-v2/e1-calendar-corrected/report.md",
+      "retained_method": "linear",
+      "state": "CLOSED_REJECTED",
+      "tier3_batch": [],
+      "valid_e1_result": true,
+      "validity": "work/projection-governance-v2/e1-calendar-corrected/validity.json",
+      "week": 2
+    },
+    {
+      "authority": "User amendment: hash then fit now",
+      "clock": {
+        "deadline_at": "2026-09-22T06:00:00-07:00",
+        "queue_block_count": 0,
+        "started_at": "2026-09-17T00:00:03.221560+00:00",
+        "status": "SATISFIED_GATE_DECISION"
+      },
+      "decision": "RETAIN_CONTROL",
+      "deployed_series_reregistrations_allowed": 1,
+      "future_return_requires": "Qualified inactive pregame fields and new preregistration",
+      "heteroscedastic_hypothesis": {
+        "features": [
+          "week number",
+          "games played by each team",
+          "dome or open roof"
+        ],
+        "new_preregistration_required": true,
+        "next_attempt_requires": [
+          "qualified confirmed-starter status",
+          "qualified coaching/QB1-change timing",
+          "qualified pregame forecast wind"
+        ],
+        "repeat_same_feature_set": false,
+        "state": "OPEN",
+        "tested_feature_set": "REJECTED"
+      },
+      "id": "E-UNC",
+      "partial_test": true,
+      "primary_override": "team CRPS for E-UNC only; MAE restored next experiment",
+      "production_applicability": "Valid within REPLAY; not tested against production",
+      "registration": "work/e-unc/registration.json",
+      "registration_sha256": "cc426270c4270bc5343f9d00628d538db2c7b0eb88afcfb867c7eb3f500a20e1",
+      "report": "work/e-unc/REPORT.md",
+      "secondary": "INSUFFICIENT",
+      "secondary_return_requires": "Qualified 2021\u20132023 pregame forecast wind history and new preregistration",
+      "state": "CLOSED_REJECTED",
+      "verified_properties": [
+        "single-game predictive intervals",
+        "paired margin residuals",
+        "no independence defect"
+      ],
+      "within_game_residual_correlation_rounded": 0.04
+    },
+    {
+      "clock": {
+        "deadline_at": "2026-09-22T06:00:00-07:00",
+        "queue_block_count": 0,
+        "started_at": "2026-09-19T00:07:22.059354+00:00",
+        "status": "ACTIVE"
+      },
+      "id": "E-SCORE",
+      "name": "league scoring environment",
+      "next_steps": [
+        "Implement fixed candidates with chronology and separation tests",
+        "Evaluate under hashed protocol",
+        "Report gate and review packet before any promotion"
+      ],
+      "priority_authority": "User 2026-09-18: next ahead of current E2",
+      "registration": "work/e-scoring-environment/registration.json",
+      "registration_sha256": "44ae73f41d03bff8a99b3ddbaa1a41a76f457c5dcfcfaeb2ebaee4e2bc12beb9",
+      "review_requested": [
+        "C02",
+        "C03",
+        "C04",
+        "C05",
+        "C08"
+      ],
+      "state": "REGISTERED_NOT_FITTED",
+      "tier3_batch": []
+    },
+    {
+      "blockers": [],
+      "clock": {
+        "status": "WAITING_FOR_TUESDAY_ACTIVATION_AFTER_CLOSEOUT"
+      },
+      "execution_prerequisites": [
+        "published Tuesday closeout",
+        "preceding league scoring experiment gate decision",
+        "activation baseline and executable source pins"
+      ],
+      "id": "E-WEPA",
+      "name": "E-WEPA",
+      "previous_registration": "work/harvest-scan/e-wepa/registration.json",
+      "previous_registration_sha256": "befea212c6a7fb391999322f8f6530bc7bed7c82f4a5d60d21daba42fc7e2b23",
+      "registration": "work/harvest-scan/e-wepa/registration-amended-2026-09-18.json",
+      "registration_sha256": "c8da4291f5b2b74de1f2bd97548d63843f169be39d4961b59f0f9a00f9eb7065",
+      "state": "REGISTERED_PENDING_CLOSEOUT_AND_QUEUE_SLOT"
+    },
+    {
+      "blockers": [],
+      "clock": {
+        "status": "WAITING_FOR_TUESDAY_ACTIVATION_AFTER_CLOSEOUT"
+      },
+      "id": "E-OPP",
+      "name": "E-OPP",
+      "registration": "work/harvest-scan/e-opp/registration.json",
+      "registration_sha256": "47afc4ce6944f0b1396813f0938f671ec5a19329135376c8a5693579896550c6",
+      "state": "REGISTERED_PENDING_ACTIVATION"
+    },
+    {
+      "blockers": [],
+      "clock": {
+        "status": "WAITING_FOR_TUESDAY_ACTIVATION_AFTER_CLOSEOUT"
+      },
+      "id": "E-SCORE-TOOLING",
+      "name": "E-SCORE-TOOLING",
+      "registration": "work/harvest-scan/e-score-tooling/registration.json",
+      "registration_sha256": "cceec01b2de8c457c7a146aed521fcffca47a728f1d09352ec88721ac710c7f9",
+      "state": "REGISTERED_PENDING_ACTIVATION"
+    },
+    {
+      "baseline": "Retained linear control after first valid E1; E2 requires separate Week 3 preregistration",
+      "deferred_by": "E-SCORE user priority override; next after its decision or clock expiry",
+      "id": "E2",
+      "name": "post-processing",
+      "needs_from_user_now": [],
+      "next_steps": [
+        "Publish full tiered gap sweep",
+        "Hash separate E2 preregistration before comparisons",
+        "Fit three EMOS candidates against retained linear control",
+        "Restore team MAE primary and unchanged promotion gate"
+      ],
+      "state": "READY_FOR_PREREGISTRATION",
+      "week": 3
+    },
+    {
+      "id": "E3",
+      "name": "wind decomposition",
+      "state": "QUEUED",
+      "week": 4
+    },
+    {
+      "id": "E4",
+      "name": "ensemble and predictability floor",
+      "state": "QUEUED",
+      "week": 5
+    },
+    {
+      "id": "E5",
+      "name": "Elo and QB double-count resolution",
+      "state": "QUEUED",
+      "week": 6
+    },
+    {
+      "id": "E6",
+      "name": "gusts and interactions",
+      "state": "QUEUED",
+      "week": 7
+    },
+    {
+      "id": "E7",
+      "name": "precipitation and snow",
+      "state": "QUEUED",
+      "week": 8
+    },
+    {
+      "id": "E8",
+      "name": "forecast blending and scheduled EMOS refit",
+      "state": "QUEUED",
+      "week": 9
+    }
+  ],
+  "governance_sha256": "77b4d4f2663084b6c034c3a740645ec74de0729d975a9dfcb41fea3ede562e67",
+  "later_order": [
+    "altitude",
+    "surface and wet-grass interaction",
+    "per-stadium shielding",
+    "dome/warm-built offense in cold",
+    "lead-time reporting"
+  ],
+  "next_experiment": "E-CAL-LINEAGE",
+  "one_experiment_per_week": true,
+  "prerequisites": {
+    "E1_candidate_count": "Resolved: unchanged linear control is outside cap; three challengers k4,k8,state-space.",
+    "staff_history": "PARTIAL: 446/448 Week 1 QB1 IDs; coaching rows unknown after PFR 403. A.3 explicitly authorizes false unknown transition flags, reported.",
+    "state_space": "Constrained A.2 implemented and tested; exact reference/covariance/noise operations hashed before results."
+  },
+  "prior_phase_a": {
+    "counts_as_E2": false,
+    "path": "work/projection-v2/phase-a/gate.json",
+    "results_already_seen": true,
+    "state": "SUPERSEDED_EXPLORATORY"
+  },
+  "rebuild_order": [
+    "E-CAL-LINEAGE",
+    "E-VENUE-DIRECT",
+    "E-QB-DIRECT",
+    "preserved remaining queue"
+  ],
+  "schema": "projection-experiment-queue-v1",
+  "scope_policy": "work/projection-governance-v2/ANALYTICS-SCOPE.md",
+  "standing_confidence_and_premise": "work/projection-governance-v2/CONFIDENCE-AND-PREMISE.md"
+}

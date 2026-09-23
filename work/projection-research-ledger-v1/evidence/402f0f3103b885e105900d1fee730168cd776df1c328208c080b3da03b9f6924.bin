@@ -1,0 +1,861 @@
+{
+  "authorized_decisions": [
+    "Unqualified inputs have zero contribution and INACTIVE, no substituted measured value.",
+    "Wind trained only on available 2022\u20132025 forecast archive, PARTIAL_HISTORY; stitched archive limitation disclosed, not labeled exact historical issuance.",
+    "Continuity and referee inactive slots.",
+    "Week 1 reconstructions use only pre-kickoff football information, RETROSPECTIVE; never pooled with AS_ISSUED accuracy."
+  ],
+  "code_sha256": {
+    "engine/projection/__init__.py": "6b5b4996642854aee1ffa7334bc0d6a49088b118f6479ec1487f9f23255a19bf",
+    "engine/projection/features.py": "a0dd68de13dfd832c3d814af6f8b8687643d7349af2b9640fcedf73ae4963710",
+    "engine/projection/distribution.py": "a4c9a71c971267b1c54268293471ad22cbb3e4ee97392d5829c870dbae4593ec",
+    "engine/projection/card.py": "df962ff1762ce7a0740de60e78ac4d98f65ec5c8b1b546f5d0d191e38ca954de",
+    "engine/projection/model.py": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead",
+    "engine/projection/edits.py": "e0c3f5d0356ab8e77e45e969786d4edc0f7bfc9465dd27ea74d19e29808b751d",
+    "engine/projection/train.py": "3073f02270d75ddff7ac2d34252d049c3853b5ff2cd34356244feb808c569b65",
+    "engine/projection/contracts.py": "940b5de3bbf1db04918874cce434ea3a333ec028b23b2696477adb9824bc6951",
+    "engine/projection/grade.py": "1fdbe81249335a3d5492676d03c9749ea46b660a0297506290d18db765904f31"
+  },
+  "configuration": {
+    "config/stadiums.json": "af6e903a23481b78902c9fe909338e4a8e162468a73ecf11ae8f1dcdbb31aa21",
+    "config/staff_history.json": "4261606a0b4cf4c81e67fc055f18ad4373b6b5cbbceb74a8e8b44e04e78628b5"
+  },
+  "created_at": "2026-09-13T08:10:39.920465+00:00",
+  "credits_spent": 0,
+  "decisions_needed": [],
+  "definitions": {
+    "baseline": "mean(offensive adjusted points/drive, opposing defensive adjusted points/drive) * mean(drives per game of both teams)",
+    "confidence": "confidence tags retained; never used as a probability source in projection-v1",
+    "point_contributions": "intercept plus each standardized feature times its fitted coefficient; no manual weight",
+    "replay_order": "sort training rows by unique row_id before every reduction and solve",
+    "residual_quantization": "nearest integer, half away from zero; explicit zero count for gaps; no smoothing",
+    "winner_probability": "P(integer margin > 0) + 0.5 P(integer margin == 0)"
+  },
+  "documentation": [
+    {
+      "finding": "Coverage starts around 2022; stitched first forecast hours do not establish an issuance-qualified T75 archive.",
+      "url": "https://open-meteo.com/en/docs/historical-forecast-api"
+    },
+    {
+      "finding": "NGS before 2023 and FTN thereafter; FTN participation released after postseason, so same-season live use requires a different qualified source.",
+      "url": "https://nflreadr.nflverse.com/reference/load_participation.html"
+    }
+  ],
+  "experiment": "projection-v1-source-audit",
+  "forecast_history": {
+    "provider_coverage": "Historical stitched forecasts start around 2022; that series is not a T75-issued forecast archive.",
+    "provider_docs": "https://open-meteo.com/en/docs/historical-forecast-api",
+    "qualification": {
+      "conclusion": "Cannot determine whether rate holds using closest publicly available T60 issuance. Stitched forecast diagnostic does not pass chronology qualification.",
+      "paired_n": 0,
+      "status": "UNAVAILABLE_ISSUANCE_HISTORY",
+      "under_rate": null
+    },
+    "sha256": "ea295b280650bdb741ee062510883ee90ee8b751d1caed5d19140e18e4c39b3e",
+    "source": "work/harvest-weather-followup-v1/run-1/experiment.json"
+  },
+  "garbage_filter": "Exclude qtr==4 and (wp<0.05 or wp>0.95). Retain endpoints; missing wp tracked, not interpreted as garbage.",
+  "live_site": "Projection v1 deployed; 32 API game records match engine artifact, 16 Week 2 cards inspected; two Week 1 finals are RETROSPECTIVE.",
+  "numerical_primitives": {
+    "status": "TESTED_NOT_FITTED_MODEL",
+    "tests_failed": 0,
+    "tests_passed": 9
+  },
+  "other_sources": [
+    {
+      "name": "play_by_play_2026.parquet",
+      "path": "work/iron-man-v1/sources/play_by_play_2026-a2d0e6da2689e3af8cb02f748dbe595ff7af002889a0b66e4f063732abee87a1.parquet",
+      "sha256": "a2d0e6da2689e3af8cb02f748dbe595ff7af002889a0b66e4f063732abee87a1"
+    },
+    {
+      "name": "ngs_passing.parquet",
+      "path": "work/iron-man-v1/sources/ngs_passing-077e3cc1f104e7aad062d45ffdb42c3bea7755583f861f186fd88fc377a18cd6.parquet",
+      "sha256": "077e3cc1f104e7aad062d45ffdb42c3bea7755583f861f186fd88fc377a18cd6"
+    },
+    {
+      "name": "ngs_receiving.parquet",
+      "path": "work/iron-man-v1/sources/ngs_receiving-1b13068c5f3b09f10b296145d69bab8616ba728aa6a3066c45857649f7810358.parquet",
+      "sha256": "1b13068c5f3b09f10b296145d69bab8616ba728aa6a3066c45857649f7810358"
+    },
+    {
+      "name": "ngs_rushing.parquet",
+      "path": "work/iron-man-v1/sources/ngs_rushing-e40f9caa4227e0493e8a56d4349358a7bc873388b705f0d1df0c871abe1ef38e.parquet",
+      "sha256": "e40f9caa4227e0493e8a56d4349358a7bc873388b705f0d1df0c871abe1ef38e"
+    },
+    {
+      "name": "roster_2025.parquet",
+      "path": "work/iron-man-v1/sources/roster_2025-902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70.parquet",
+      "sha256": "902904a0500f066f02ef23f7857e3db35060517e50ffcfe36cc1bc5c6d230f70"
+    },
+    {
+      "name": "roster_2026.parquet",
+      "path": "work/iron-man-v1/sources/roster_2026-5027b17cf79d95cd035ebfc39cdf695dcf36b8dc6f77bafe8e99768c0c1efaee.parquet",
+      "sha256": "5027b17cf79d95cd035ebfc39cdf695dcf36b8dc6f77bafe8e99768c0c1efaee"
+    },
+    {
+      "name": "depth_charts_2025.parquet",
+      "path": "work/iron-man-v1/sources/depth_charts_2025-14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa.parquet",
+      "sha256": "14f74185b3c2c48df234ced284ba3596bda3333d0b2a8df40841f68cd34539fa"
+    },
+    {
+      "name": "depth_charts_2026.parquet",
+      "path": "work/iron-man-v1/sources/depth_charts_2026-9779c033d3ef0bafa19a3acbe21f655b7e86b066384f05b1ac1927201af2a749.parquet",
+      "sha256": "9779c033d3ef0bafa19a3acbe21f655b7e86b066384f05b1ac1927201af2a749"
+    },
+    {
+      "name": "pbp_participation_2025.parquet",
+      "path": "work/iron-man-v1/sources/pbp_participation_2025-3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f.parquet",
+      "sha256": "3b26b9487267f011fdbafbce133800ce964c963fdb8b27725abf65663cc46e0f"
+    },
+    {
+      "name": "play_by_play_2025.parquet",
+      "path": "work/harvest-elo-v2/sources/play_by_play_2025-c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29.parquet",
+      "sha256": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29"
+    },
+    {
+      "name": "schedules.csv",
+      "path": "work/market-distribution-v1/schedules-d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07.csv",
+      "sha256": "d64cef660c4b14c74f0e33ecee387343675137ed2f1a1fac2b0c70951b8a4c07"
+    }
+  ],
+  "pbp": [
+    {
+      "excluded_q4_plays": 5412,
+      "has_direct_pressure_field": false,
+      "path": "work/harvest-elo-v2/sources/play_by_play_2015-01b5ae7d06633a2e66b418404461a3d4ff055ad2f3a87d453cebcc8d3fda7ed9.parquet",
+      "q4_unknown_wp_plays": 243,
+      "regular_games": 256,
+      "regular_plays": 46141,
+      "season": 2015,
+      "sha256": "01b5ae7d06633a2e66b418404461a3d4ff055ad2f3a87d453cebcc8d3fda7ed9"
+    },
+    {
+      "excluded_q4_plays": 5151,
+      "has_direct_pressure_field": false,
+      "path": "work/harvest-elo-v2/sources/play_by_play_2016-95eba04e2145e3c1c8ca502f2a3a76cfb0a5990680c3fb480f02a74a45f54a3b.parquet",
+      "q4_unknown_wp_plays": 250,
+      "regular_games": 256,
+      "regular_plays": 45707,
+      "season": 2016,
+      "sha256": "95eba04e2145e3c1c8ca502f2a3a76cfb0a5990680c3fb480f02a74a45f54a3b"
+    },
+    {
+      "excluded_q4_plays": 5511,
+      "has_direct_pressure_field": false,
+      "path": "work/harvest-elo-v2/sources/play_by_play_2017-84eacd963c1fdd45965f6222c62e9329a7f3412f029d92c1ac5e34a1bb4d3710.parquet",
+      "q4_unknown_wp_plays": 247,
+      "regular_games": 256,
+      "regular_plays": 45268,
+      "season": 2017,
+      "sha256": "84eacd963c1fdd45965f6222c62e9329a7f3412f029d92c1ac5e34a1bb4d3710"
+    },
+    {
+      "excluded_q4_plays": 5175,
+      "has_direct_pressure_field": false,
+      "path": "work/harvest-elo-v2/sources/play_by_play_2018-2e6f2dce7c7ebd46e985cabe0c17eb72b39a77f98cb4478409294f50b5820150.parquet",
+      "q4_unknown_wp_plays": 249,
+      "regular_games": 256,
+      "regular_plays": 45120,
+      "season": 2018,
+      "sha256": "2e6f2dce7c7ebd46e985cabe0c17eb72b39a77f98cb4478409294f50b5820150"
+    },
+    {
+      "excluded_q4_plays": 5519,
+      "has_direct_pressure_field": false,
+      "path": "work/harvest-elo-v2/sources/play_by_play_2019-60c3067017db2d28a78f66a79b657268be8578d9a5288e6a827efdcd7fe42540.parquet",
+      "q4_unknown_wp_plays": 255,
+      "regular_games": 256,
+      "regular_plays": 45339,
+      "season": 2019,
+      "sha256": "60c3067017db2d28a78f66a79b657268be8578d9a5288e6a827efdcd7fe42540"
+    },
+    {
+      "excluded_q4_plays": 5376,
+      "has_direct_pressure_field": false,
+      "path": "work/harvest-elo-v2/sources/play_by_play_2020-8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60.parquet",
+      "q4_unknown_wp_plays": 246,
+      "regular_games": 256,
+      "regular_plays": 45406,
+      "season": 2020,
+      "sha256": "8889f5d8782b5c5dce3c3644acdc0322b228a7e9cb13fa36cbac250e260e9f60"
+    },
+    {
+      "excluded_q4_plays": 5962,
+      "has_direct_pressure_field": false,
+      "path": "work/harvest-elo-v2/sources/play_by_play_2021-333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8.parquet",
+      "q4_unknown_wp_plays": 251,
+      "regular_games": 272,
+      "regular_plays": 47651,
+      "season": 2021,
+      "sha256": "333ad34378e5339d5172717cc83378e908daf02c8699416ab3e17c2ec10f78d8"
+    },
+    {
+      "excluded_q4_plays": 4968,
+      "has_direct_pressure_field": false,
+      "path": "work/harvest-elo-v2/sources/play_by_play_2022-931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09.parquet",
+      "q4_unknown_wp_plays": 251,
+      "regular_games": 271,
+      "regular_plays": 47157,
+      "season": 2022,
+      "sha256": "931121d8897779d7944e2a293e92ed8799c8e5cceef84096ac42339003fedc09"
+    },
+    {
+      "excluded_q4_plays": 5249,
+      "has_direct_pressure_field": false,
+      "path": "work/harvest-elo-v2/sources/play_by_play_2023-bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776.parquet",
+      "q4_unknown_wp_plays": 259,
+      "regular_games": 272,
+      "regular_plays": 47399,
+      "season": 2023,
+      "sha256": "bd3484731408def6b0ec93225bba2bd7b2c65769ca707a2b9444d891abdc6776"
+    },
+    {
+      "excluded_q4_plays": 5322,
+      "has_direct_pressure_field": false,
+      "path": "work/harvest-elo-v2/sources/play_by_play_2024-3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b.parquet",
+      "q4_unknown_wp_plays": 256,
+      "regular_games": 272,
+      "regular_plays": 47274,
+      "season": 2024,
+      "sha256": "3fd2896bc0b911b615142d2f1fabae54a4bbba5ab7b73b28187b118ef8af6a3b"
+    },
+    {
+      "excluded_q4_plays": 5346,
+      "has_direct_pressure_field": false,
+      "path": "work/harvest-elo-v2/sources/play_by_play_2025-c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29.parquet",
+      "q4_unknown_wp_plays": 258,
+      "regular_games": 272,
+      "regular_plays": 46452,
+      "season": 2025,
+      "sha256": "c6ecedd6d678cc37ed316b23ef84ee1ec6abb69c514bb11868a7ebd5a367df29"
+    }
+  ],
+  "provider_calls": {
+    "odds_api": 0,
+    "open_meteo": "Free forecast and metadata requests performed; responses pinned in outputs/projection-v1/weather-sources."
+  },
+  "registered_fit": {
+    "features": "All measured listed football components plus baseline; standardized design, missing feature contributes zero with INACTIVE flag and original value null. No measured-value substitution.",
+    "penalties": [
+      1,
+      10,
+      100
+    ],
+    "population": "REG primary; 2015 warmup; prediction rows sorted season/week/game/team; current-week outcomes never enter feature construction",
+    "selection": "min earlier season OOF team-points MAE, ties smaller penalty then no decay; first 2016 season penalty 10/no-decay preregistered because no earlier OOF seasons",
+    "shape": "Pooled 2016\u20132025 OOF integer residuals for deployment; per-season pooled-shape coverage is descriptive calibration, not prospective interval validation.",
+    "wind": "separate residual correction fit only on prior 2022\u20132025 forecast observations; zero before prior forecast training exists; final coefficient fitted on all available 2022\u20132025 archive rows",
+    "within_season_half_life_weeks": [
+      null,
+      8
+    ]
+  },
+  "status": "DEPLOYED_VERIFIED",
+  "verification": {
+    "projection_tests": {
+      "passed": 19,
+      "failed": 0
+    },
+    "existing_week1": {
+      "passed": 214,
+      "failed": 0
+    },
+    "main_tests": {
+      "passed": 304,
+      "failed": 0,
+      "skipped": 1
+    },
+    "sites_tests": {
+      "passed": 423,
+      "failed": 0,
+      "skipped": 1
+    },
+    "offline_replay": {
+      "experiment": "projection-v1-67c39f9a-2e58a851",
+      "fit_hash": "2e58a8513433b834a0834506902bc259e1859b3f9fe491ac89d1bd6aea7bafd1",
+      "training_team_rows": 5790,
+      "margin_residual_n": 2639,
+      "replay": "PASS",
+      "order_invariant": true,
+      "credits_spent": 0
+    },
+    "build_main": "PASS",
+    "build_sites": "PASS",
+    "main_typecheck": "PASS",
+    "sites_typecheck": "PASS",
+    "live_api": {
+      "status": "PASS",
+      "version": "projection-v1-67c39f9a-2e58a851",
+      "matching_games": 32,
+      "artifact_sha256": "c39a04f4ffb368fcd9f9537a075789901eda79b9ccecf3f492f3fb08dfa1339c",
+      "checked_at": "2026-09-13T09:24:31.240796+00:00"
+    },
+    "cloud": {
+      "status": "PASS",
+      "version": "projection-v1-67c39f9a-2e58a851",
+      "games": 32,
+      "entry_sync": true,
+      "commit": "ea16d18edcdf7fe1e9796b7f4adf09019a1d987b",
+      "odds_api_calls": 0
+    },
+    "cloud_mac_max_absolute_difference": 7.105427357601002e-14,
+    "visual": {
+      "week2_cards": 16,
+      "week2_projected_scores": 16,
+      "week2_against_lines": 16,
+      "forbidden_financial_text": false,
+      "viewport_widths": [
+        390,
+        1280
+      ],
+      "capture_method": "Native tab screenshot after viewport override; browser screenshot compositor previously unreliable.",
+      "screenshots": [
+        "work/projection-v1/screenshots/bal-ind-390.png",
+        "work/projection-v1/screenshots/bal-ind-1280.png"
+      ],
+      "sha256": {
+        "work/projection-v1/screenshots/bal-ind-390.png": "23ccb6c0ee4693de7e3f643c1ac99315e8dd44e5521b3280e0c99ff5a3595e0e",
+        "work/projection-v1/screenshots/bal-ind-1280.png": "f33dcf3a2ddc96334c3fe37682a5345c87b25bccbefec62826afb734dde066c2"
+      }
+    }
+  },
+  "implementation_corrections_before_first_deployment": [
+    "Removed unrequested 30-day cap from rest feature.",
+    "Applied registered seasonal blending weights to kicking attempt and make totals.",
+    "Source/config/code hashes key caches and contribution provenance; missing features retain null."
+  ],
+  "fit": {
+    "path": "work/projection-v1/fit-f6cc53cee92c3375ffd8c116c42487ebbed8653cb0265d7b536cb42104df8a97.json",
+    "sha256": "f6cc53cee92c3375ffd8c116c42487ebbed8653cb0265d7b536cb42104df8a97"
+  },
+  "version": "projection-v1-67c39f9a-2e58a851",
+  "inactive_inputs": [
+    {
+      "input": "career_fg_long",
+      "reason": "No qualifying training observations",
+      "status": "INACTIVE",
+      "weight": 0
+    },
+    {
+      "input": "career_fg_medium",
+      "reason": "No qualifying training observations",
+      "status": "INACTIVE",
+      "weight": 0
+    },
+    {
+      "input": "career_fg_short",
+      "reason": "No qualifying training observations",
+      "status": "INACTIVE",
+      "weight": 0
+    },
+    {
+      "input": "continuity",
+      "reason": "Staff history unseeded",
+      "status": "INACTIVE",
+      "weight": 0
+    },
+    {
+      "input": "elo_qb_adjustment",
+      "reason": "ANY/A values exist but historical pregame starter availability is unqualified",
+      "status": "INACTIVE",
+      "weight": 0
+    },
+    {
+      "input": "pressure_allowed",
+      "reason": "No qualifying training-history pressure series",
+      "status": "INACTIVE",
+      "weight": 0
+    },
+    {
+      "input": "pressure_generated",
+      "reason": "No qualifying training-history pressure series",
+      "status": "INACTIVE",
+      "weight": 0
+    },
+    {
+      "input": "qb_backup",
+      "reason": "Pregame starter history unqualified",
+      "status": "INACTIVE",
+      "weight": 0
+    },
+    {
+      "input": "qb_career_starts",
+      "reason": "Pregame starter history unqualified",
+      "status": "INACTIVE",
+      "weight": 0
+    },
+    {
+      "input": "qb_cpoe",
+      "reason": "Pregame starter history unqualified",
+      "status": "INACTIVE",
+      "weight": 0
+    },
+    {
+      "input": "qb_epa",
+      "reason": "Pregame starter history unqualified",
+      "status": "INACTIVE",
+      "weight": 0
+    },
+    {
+      "input": "referee",
+      "reason": "Week 5 positive study absent",
+      "status": "INACTIVE",
+      "weight": 0
+    }
+  ],
+  "wind": {
+    "status": "PARTIAL_HISTORY",
+    "weight": -0.09866125089055552,
+    "training_team_rows": 1472,
+    "seasons": [
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "limit": "Open-Meteo historical forecast archive begins around 2022; stitched hourly forecasts do not prove exact pregame issuance.",
+    "live_available_games": 9
+  },
+  "season_results": [
+    {
+      "season": 2016,
+      "n": 256,
+      "metrics": {
+        "margin": {
+          "n": 256,
+          "mae": 9.395044444777179,
+          "sigma": 12.078453024860643,
+          "coverage": {
+            "50": {
+              "rate": 0.5234375,
+              "flag": false
+            },
+            "80": {
+              "rate": 0.85546875,
+              "flag": true
+            }
+          }
+        },
+        "total": {
+          "n": 256,
+          "mae": 11.112312974704222,
+          "sigma": 14.016669211047304,
+          "coverage": {
+            "50": {
+              "rate": 0.51171875,
+              "flag": false
+            },
+            "80": {
+              "rate": 0.8203125,
+              "flag": false
+            }
+          }
+        },
+        "team_points": {
+          "n": 512,
+          "mae": 7.286800327092577,
+          "sigma": 9.266978238914882
+        }
+      }
+    },
+    {
+      "season": 2017,
+      "n": 256,
+      "metrics": {
+        "margin": {
+          "n": 256,
+          "mae": 10.59935874304469,
+          "sigma": 13.867226786284238,
+          "coverage": {
+            "50": {
+              "rate": 0.53125,
+              "flag": true
+            },
+            "80": {
+              "rate": 0.79296875,
+              "flag": false
+            }
+          }
+        },
+        "total": {
+          "n": 256,
+          "mae": 11.416638921688554,
+          "sigma": 14.483228201303257,
+          "coverage": {
+            "50": {
+              "rate": 0.50390625,
+              "flag": false
+            },
+            "80": {
+              "rate": 0.7734375,
+              "flag": false
+            }
+          }
+        },
+        "team_points": {
+          "n": 512,
+          "mae": 7.823966536224873,
+          "sigma": 10.01904931157565
+        }
+      }
+    },
+    {
+      "season": 2018,
+      "n": 256,
+      "metrics": {
+        "margin": {
+          "n": 256,
+          "mae": 10.407225726534977,
+          "sigma": 13.597534317074741,
+          "coverage": {
+            "50": {
+              "rate": 0.546875,
+              "flag": true
+            },
+            "80": {
+              "rate": 0.796875,
+              "flag": false
+            }
+          }
+        },
+        "total": {
+          "n": 256,
+          "mae": 11.165271709742646,
+          "sigma": 14.485474920253505,
+          "coverage": {
+            "50": {
+              "rate": 0.546875,
+              "flag": true
+            },
+            "80": {
+              "rate": 0.81640625,
+              "flag": false
+            }
+          }
+        },
+        "team_points": {
+          "n": 512,
+          "mae": 7.838548007762508,
+          "sigma": 9.924339722176367
+        }
+      }
+    },
+    {
+      "season": 2019,
+      "n": 256,
+      "metrics": {
+        "margin": {
+          "n": 256,
+          "mae": 10.635080777621603,
+          "sigma": 13.37375869007539,
+          "coverage": {
+            "50": {
+              "rate": 0.5234375,
+              "flag": false
+            },
+            "80": {
+              "rate": 0.7734375,
+              "flag": false
+            }
+          }
+        },
+        "total": {
+          "n": 256,
+          "mae": 11.013483136341549,
+          "sigma": 13.880614407613782,
+          "coverage": {
+            "50": {
+              "rate": 0.53515625,
+              "flag": true
+            },
+            "80": {
+              "rate": 0.8046875,
+              "flag": false
+            }
+          }
+        },
+        "team_points": {
+          "n": 512,
+          "mae": 7.6565323352332975,
+          "sigma": 9.69705830647271
+        }
+      }
+    },
+    {
+      "season": 2020,
+      "n": 256,
+      "metrics": {
+        "margin": {
+          "n": 256,
+          "mae": 9.988713190824368,
+          "sigma": 12.833604424067259,
+          "coverage": {
+            "50": {
+              "rate": 0.51171875,
+              "flag": false
+            },
+            "80": {
+              "rate": 0.80078125,
+              "flag": false
+            }
+          }
+        },
+        "total": {
+          "n": 256,
+          "mae": 11.214796537930534,
+          "sigma": 13.838800556070034,
+          "coverage": {
+            "50": {
+              "rate": 0.51953125,
+              "flag": false
+            },
+            "80": {
+              "rate": 0.8203125,
+              "flag": false
+            }
+          }
+        },
+        "team_points": {
+          "n": 512,
+          "mae": 7.724503247685628,
+          "sigma": 9.468969144593542
+        }
+      }
+    },
+    {
+      "season": 2021,
+      "n": 272,
+      "metrics": {
+        "margin": {
+          "n": 272,
+          "mae": 11.232756343792978,
+          "sigma": 14.279628568131594,
+          "coverage": {
+            "50": {
+              "rate": 0.47794117647058826,
+              "flag": false
+            },
+            "80": {
+              "rate": 0.7830882352941176,
+              "flag": false
+            }
+          }
+        },
+        "total": {
+          "n": 272,
+          "mae": 11.147615111265774,
+          "sigma": 13.52973279245254,
+          "coverage": {
+            "50": {
+              "rate": 0.46691176470588236,
+              "flag": true
+            },
+            "80": {
+              "rate": 0.8161764705882353,
+              "flag": false
+            }
+          }
+        },
+        "team_points": {
+          "n": 544,
+          "mae": 7.978371404576513,
+          "sigma": 9.826964915306073
+        }
+      }
+    },
+    {
+      "season": 2022,
+      "n": 271,
+      "metrics": {
+        "margin": {
+          "n": 271,
+          "mae": 8.987529206176749,
+          "sigma": 11.760751081324285,
+          "coverage": {
+            "50": {
+              "rate": 0.5682656826568265,
+              "flag": true
+            },
+            "80": {
+              "rate": 0.8487084870848709,
+              "flag": true
+            }
+          }
+        },
+        "total": {
+          "n": 271,
+          "mae": 11.159978551221576,
+          "sigma": 13.65484391522983,
+          "coverage": {
+            "50": {
+              "rate": 0.5092250922509225,
+              "flag": false
+            },
+            "80": {
+              "rate": 0.8154981549815498,
+              "flag": false
+            }
+          }
+        },
+        "team_points": {
+          "n": 542,
+          "mae": 7.209751272543257,
+          "sigma": 9.006851036657745
+        }
+      }
+    },
+    {
+      "season": 2023,
+      "n": 272,
+      "metrics": {
+        "margin": {
+          "n": 272,
+          "mae": 10.385461928659886,
+          "sigma": 13.510578525813319,
+          "coverage": {
+            "50": {
+              "rate": 0.5330882352941176,
+              "flag": true
+            },
+            "80": {
+              "rate": 0.7830882352941176,
+              "flag": false
+            }
+          }
+        },
+        "total": {
+          "n": 272,
+          "mae": 10.226554357960989,
+          "sigma": 13.137228620115177,
+          "coverage": {
+            "50": {
+              "rate": 0.5551470588235294,
+              "flag": true
+            },
+            "80": {
+              "rate": 0.8455882352941176,
+              "flag": true
+            }
+          }
+        },
+        "team_points": {
+          "n": 544,
+          "mae": 7.410477124627645,
+          "sigma": 9.42931584175488
+        }
+      }
+    },
+    {
+      "season": 2024,
+      "n": 272,
+      "metrics": {
+        "margin": {
+          "n": 272,
+          "mae": 9.951751524589529,
+          "sigma": 13.03008206822775,
+          "coverage": {
+            "50": {
+              "rate": 0.5367647058823529,
+              "flag": true
+            },
+            "80": {
+              "rate": 0.8125,
+              "flag": false
+            }
+          }
+        },
+        "total": {
+          "n": 272,
+          "mae": 10.247402201053161,
+          "sigma": 12.988283221459637,
+          "coverage": {
+            "50": {
+              "rate": 0.5735294117647058,
+              "flag": true
+            },
+            "80": {
+              "rate": 0.8419117647058824,
+              "flag": true
+            }
+          }
+        },
+        "team_points": {
+          "n": 544,
+          "mae": 7.351550905410783,
+          "sigma": 9.190468608035188
+        }
+      }
+    },
+    {
+      "season": 2025,
+      "n": 272,
+      "metrics": {
+        "margin": {
+          "n": 272,
+          "mae": 10.125606316262296,
+          "sigma": 12.7317456984124,
+          "coverage": {
+            "50": {
+              "rate": 0.5294117647058824,
+              "flag": false
+            },
+            "80": {
+              "rate": 0.8088235294117647,
+              "flag": false
+            }
+          }
+        },
+        "total": {
+          "n": 272,
+          "mae": 10.751733646128887,
+          "sigma": 13.351353233847368,
+          "coverage": {
+            "50": {
+              "rate": 0.5,
+              "flag": false
+            },
+            "80": {
+              "rate": 0.8382352941176471,
+              "flag": true
+            }
+          }
+        },
+        "team_points": {
+          "n": 544,
+          "mae": 7.404427146408287,
+          "sigma": 9.218615414602763
+        }
+      }
+    }
+  ],
+  "qualifications": {
+    "coverage": "Pooled 2016\u20132025 OOF residual calibration, descriptive; not prospective interval validation.",
+    "retrospective": "Week 1 post-cutoff reconstruction from prior-week inputs only, separately labeled and graded.",
+    "partial_inputs": "TE/RB target shares have roster-backed history from 2025; earlier missing measurements have zero contribution.",
+    "inactives": "No qualifying pregame QB, pressure or kicker career history; zero contribution and original value null.",
+    "no_edge_claim": "Football score fit; no independent betting-edge claim or promotion gate change."
+  },
+  "deployment": {
+    "site_version": 187,
+    "status": "succeeded",
+    "deployment_id": "appgdep_6aa66b35a3d8819186f9e9bd2a183060",
+    "reader_main_commit": "d5fb4d3884d3a1434f4b8e93d4eeb14094c7d5e3",
+    "sites_source_commit": "e93bf01ec40579c89a8fc11bcd0feaf1af92c6da",
+    "url": "https://nfl-projection-lab-2026.psoiawesome.chatgpt.site/sunday"
+  },
+  "final_review": {
+    "complete": true,
+    "exceptions_authorized": [
+      "INACTIVE missing histories",
+      "PARTIAL_HISTORY wind",
+      "RETROSPECTIVE Week 1 reconstructions"
+    ],
+    "least_sure": "Historical forecast issuance; retained partial-history qualification and separate retrospective evidence.",
+    "additional_fixes": [
+      "Kicking follows registered seasonal blending.",
+      "Cloud preparation reuses pinned historical football rows.",
+      "Lock waits for post-deadline shared-entry synchronization.",
+      "Probability labels remain readable at narrow splits."
+    ]
+  }
+}

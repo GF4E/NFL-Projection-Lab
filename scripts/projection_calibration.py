@@ -53,7 +53,7 @@ def main(argv=None):
         result=publish(args.root,args.registration_sha256,
                        diagnostic_ref=json.loads(args.diagnostic_ref) if args.diagnostic_ref else None)
     else:
-        from engine.projection.calibration_execute import run
+        from engine.projection.research_ledger import run_calibration as run
         saved=run(args.root,json.loads(args.registration),retry=args.retry)
         last=saved['attempts'][-1] if saved['attempts'] else None
         result={'registration_sha256':saved['key'],'attempts':len(saved['attempts']),

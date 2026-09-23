@@ -1,0 +1,33 @@
+/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/research_ledger.py:99: SyntaxWarning: invalid escape sequence '\.'
+  if not re.fullmatch('[0-9a-f]{64}\.json',p.name):raise ValueError('Unexpected ledger member')
+..................................E.................................................
+======================================================================
+ERROR: test_cli_returns_failure_for_retained_interrupted_attempt (test_projection_calibration_execute.ExecutionTests.test_cli_returns_failure_for_retained_interrupted_attempt)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_calibration_execute.py", line 269, in test_cli_returns_failure_for_retained_interrupted_attempt
+    self.assertEqual(cli.main(['--root',str(self.root),'_worker','--registration',json.dumps(self.ref)]),1)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_calibration.py", line 57, in main
+    saved=run(args.root,json.loads(args.registration),retry=args.retry)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/research_ledger.py", line 140, in run_calibration
+    sync_calibration(root,key,saved)
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/research_ledger.py", line 118, in sync_calibration
+    evidence=[reference(root,str((folder/name).relative_to(root)))],context=context))
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/research_ledger.py", line 28, in reference
+    return {'path':name,'sha256':sha(path(root,name).read_bytes())}
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/pathlib.py", line 1019, in read_bytes
+    with self.open(mode='rb') as f:
+         ^^^^^^^^^^^^^^^^^^^^
+  File "/opt/anaconda3/lib/python3.12/pathlib.py", line 1013, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/private/var/folders/_w/qdm05hdd4bd6jn63np8pcfrw0000gn/T/tmp4_1vrgvn/work/e-cal-lineage/executions/cfe81a6d0819f3a0ef41f1c918d19d0127fc88537baa64e9a237865f74337852/request.json'
+
+----------------------------------------------------------------------
+Ran 84 tests in 4.598s
+
+FAILED (errors=1)

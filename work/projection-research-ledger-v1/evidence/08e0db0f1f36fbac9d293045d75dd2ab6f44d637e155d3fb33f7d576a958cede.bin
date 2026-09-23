@@ -1,0 +1,283 @@
+{
+  "candidates_gate_metrics_population_unchanged": true,
+  "corrected_comparative_results_viewed": false,
+  "created_at": "2026-09-16T19:37:50.650525+00:00",
+  "invalidated_comparative_results_previously_viewed": true,
+  "items": [
+    {
+      "alternative": null,
+      "decision": "Apply decision-latency amendment, latest calendar/QB directions, constrained A.2, supplement, governance queue, then architecture. E1 only; E2/E4/E5 remain deferred.",
+      "id": "C01",
+      "reason": "Explicit user precedence; no new choice of model.",
+      "source": "GOVERNANCE.md \u00a7\u00a71\u20133; user amendments",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Document precedence and scope"
+    },
+    {
+      "alternative": null,
+      "decision": "Keep original registration byte-identical. Hash this addendum and new implementation receipt before corrected comparisons; disclose the invalidated results were viewed.",
+      "id": "C02",
+      "reason": "A correction does not authorize erasing exposure or backdating registration.",
+      "source": "e1/registration.json; GOVERNANCE.md \u00a72.2\u20133",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Original registration and already-viewed history"
+    },
+    {
+      "alternative": null,
+      "decision": "Use timezone-aware UTC comparisons, America/Los_Angeles for Tuesday 06:00, America/New_York for nflverse schedule clock. Never use a fixed UTC offset.",
+      "id": "C03",
+      "reason": "Existing calendar module and source convention; zero fitted parameters.",
+      "source": "engine/forecast_system/calendar.py; scripts/e1_calendar_audit.py",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Time zones and DST"
+    },
+    {
+      "alternative": null,
+      "decision": "A cutoff equal to issuance is ineligible; a completion equal to cutoff is excluded. Apply to every game, irrespective of week labels.",
+      "id": "C04",
+      "reason": "The binding calendar rule explicitly says strictly before.",
+      "source": "User assimilation calendar rule; calendar.cutoff_before/plan",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Strict boundaries"
+    },
+    {
+      "alternative": null,
+      "decision": "Use one shared result-availability calendar for control, k4, k8 and state-space, including Elo and pace histories. Two games in an interval use the same team state.",
+      "id": "C05",
+      "reason": "No candidate gets a timing advantage; this fixes chronology, not settings.",
+      "source": "User calendar correction; core_features.build; state_fit.replay",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Frozen intervals and common availability"
+    },
+    {
+      "alternative": "Use the forecast game NFL-week label for decay even when two games share one interval. This could change control predictions and conflicts with the frozen-state interpretation.",
+      "decision": "Retain the corrected implementation: elapsed scheduled assimilation cutoffs from the first forecast cutoff of a season advance the existing linear decay; freeze that weight inside an interval.",
+      "id": "C06",
+      "reason": "Retains the linear formula and a single state within an interval; avoids a second calendar and within-interval changes.",
+      "source": "core_features.build(calendar_batches); user week labels never order assimilation",
+      "status": "REVIEW_REQUESTED",
+      "tier": 2,
+      "topic": "Linear decay clock on exceptional schedules"
+    },
+    {
+      "alternative": null,
+      "decision": "Order assimilation by qualified completion timestamp, then game ID; canonical team order and row ID break remaining exact ties. Reordering source rows must be inert.",
+      "id": "C07",
+      "reason": "Existing deterministic chronological implementation.",
+      "source": "calendar.plan; state_fit.fit; tests/test_forecast_state_space.py",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Result ordering and deterministic replay"
+    },
+    {
+      "alternative": null,
+      "decision": "Keep registered 2013 zero/P0 reset, 2012 earlier pilot, preseason shrink, weekly constrained noise on active-season cutoffs and prediction-only byes. No new offseason drift parameter.",
+      "id": "C08",
+      "reason": "Existing registered conventions; no silent alternative search.",
+      "source": "e1/CONVENTIONS.md; state_fit.replay",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Byes, season boundary and initialization"
+    },
+    {
+      "alternative": null,
+      "decision": "Normalize net team points by pregame expected drives; r is PPD squared. Keep actually active calibration/Elo groups and penalty 10; inactive venue/QB/weather/kicking offsets remain inactive.",
+      "id": "C09",
+      "reason": "E1 changes strength updating only; activating other inputs would change the candidate.",
+      "source": "e1/CONVENTIONS.md; e1/registration.json",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Observation units and inactive offsets"
+    },
+    {
+      "alternative": null,
+      "decision": "Retain exact C projection of mean/covariance, q*C, 63 identified dimensions, Joseph-equivalent covariance update, registered Riccati tolerance/cap. No clipping or jitter parameters.",
+      "id": "C10",
+      "reason": "Explicit supplement and implemented constraint; no approximation to identification.",
+      "source": "state_space.py; user A.2 replacement",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Identified space and numerical algebra"
+    },
+    {
+      "alternative": "A rotating 16-real-matchup reference schedule. Not evaluated; would require an explicit protocol correction if reviewers establish the retained construction is wrong.",
+      "decision": "Retain registered symmetric 32 virtual team-versus-league games and posterior P0; diagonal KH gains and offense/defense half-lives remain diagnostics.",
+      "id": "C11",
+      "reason": "Already preregistered before results; changing the reference now would add discretion.",
+      "source": "e1/CONVENTIONS.md; state_space.reference_observations/stationary",
+      "status": "REVIEW_REQUESTED",
+      "tier": 2,
+      "topic": "Reference schedule and steady-state diagnostic"
+    },
+    {
+      "alternative": "Add flagged diagonal variance alone before projection. Not tested; it changes cross-covariances and could change forecasts.",
+      "decision": "Retain registered C[D P0 D]C congruence with sqrt(2) on flagged components, then the registered lambda transition.",
+      "id": "C12",
+      "reason": "Preserves positive semidefiniteness and identification without new parameters; maintains original registered construction.",
+      "source": "e1/CONVENTIONS.md; state_space.preseason",
+      "status": "REVIEW_REQUESTED",
+      "tier": 2,
+      "topic": "Preseason injection cross-covariances"
+    },
+    {
+      "alternative": null,
+      "decision": "Coach unknown independently means false; known QB1 change can still double variance. Report all 448 coaching unknowns and 2017 MIA/TB QB1 gaps. No PFR workaround or coordinator sourcing.",
+      "id": "C13",
+      "reason": "Direct binding instruction.",
+      "source": "config/staff_history.json; user coaching direction",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Staff unknowns and QB flag"
+    },
+    {
+      "alternative": null,
+      "decision": "Estimate rho once from the fixed first-start training-only pilot; do not search it. Retain exactly three q/r/lambda starts/bounds and likelihood selection; no OOF-MAE tuning or adaptive retries.",
+      "id": "C14",
+      "reason": "Existing hashed fitting rule; nuisance estimation is not a search.",
+      "source": "e1/CONVENTIONS.md; state_fit.fit",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Rho and optimizer"
+    },
+    {
+      "alternative": null,
+      "decision": "Retain annual expanding training, own earlier-fold state features, 2013\u20132015 calibration-only forecasts and each candidate\u2019s prior-three-season residuals. Fixed k=4/k=8 need no extra inner MAE search.",
+      "id": "C15",
+      "reason": "Existing registration; no new settings or shorter calibration substitute.",
+      "source": "e1/registration.json; scripts/e1_evaluate.py",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Training and nested chronology"
+    },
+    {
+      "alternative": null,
+      "decision": "Require exactly the registered scored game IDs and two teams per game for every candidate, not merely equal reduced intersections. Unknown required input blocks instead of dropping a game.",
+      "id": "C16",
+      "reason": "Prevents an unnoticed population change; use frozen prior-run identifiers only, not its invalid metrics.",
+      "source": "GOVERNANCE.md \u00a71; e1-week-label-run/oof.json",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Population integrity"
+    },
+    {
+      "alternative": null,
+      "decision": "Retain core points and paired empirical residuals, current numpy quantiles, inclusive interval endpoints, empirical CRPS and mid-P PIT. No E2 recentering or ensemble layer.",
+      "id": "C17",
+      "reason": "Existing metric functions are authoritative; changing them would change registered metrics.",
+      "source": "engine/forecast_system/verification.py; e1/CONVENTIONS.md",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Point and uncertainty semantics"
+    },
+    {
+      "alternative": null,
+      "decision": "Retain home-win event margin>0, including actual ties as not a home win; equal team-observation MAE, population SD of scores, sample SD of errors, 10 reliability/PIT bins. Label semantics.",
+      "id": "C18",
+      "reason": "Existing metrics; do not quietly substitute half-win Brier targets or change denominators.",
+      "source": "scripts/e1_evaluate.py summary; verification.py",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Winner ties and summary weighting"
+    },
+    {
+      "alternative": null,
+      "decision": "Use training-only league and previous-season-team baselines; last four completed games as of the common cutoff, sorted chronologically. Undefined skill denominator remains null and is reported.",
+      "id": "C19",
+      "reason": "Chronology correction and existing skill convention.",
+      "source": "verification.skill; e1_evaluate.py",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Skill and persistence availability"
+    },
+    {
+      "alternative": null,
+      "decision": "Retain 2,000 fixed-seed four-NFL-week circular blocks within each season, both teams together; 1% team MAE and four \u00b13pp coverage gates, existing simpler-candidate tie rule. Week labels can group reports/resampling, never availability.",
+      "id": "C20",
+      "reason": "These are already registered metrics and procedure; no new block-size search.",
+      "source": "e1/registration.json; e1_evaluate.py",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Pairing, uncertainty, ties and release gates"
+    },
+    {
+      "alternative": null,
+      "decision": "Add descriptive leave-one-game-out MAE-improvement range and worst-influence game IDs; never use it as a new gate. Report 3 optimized +1 nuisance, games/3 and games/4; 63 latent dimensions separately.",
+      "id": "C21",
+      "reason": "Standing request for extreme-game sensitivity and honest parameter accounting; no fitted quantity added.",
+      "source": "Week 2 feedback attachment; e1/CONVENTIONS.md",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Extreme-game sensitivity and parameter reporting"
+    },
+    {
+      "alternative": null,
+      "decision": "Keep the frozen 14 AS_ISSUED input games separate from their retrospective challenger counterfactuals; never pool the two RETROSPECTIVE games. Use corrected historical fits only, copy frozen snapshot with its hash, and reject a mismatched cache lineage.",
+      "id": "C22",
+      "reason": "Existing current-season protocol and immutability rules.",
+      "source": "e1/current-season-protocol.json; scripts/e1_current.py",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Current-season population and caches"
+    },
+    {
+      "alternative": null,
+      "decision": "Keep one fit worker/4 GiB/45-minute gate budget; reports read cached results and never fit. Selected optimizer failure or required audit failure blocks; never counts as a method rejection. Two reviews and explicit release remain required.",
+      "id": "C23",
+      "reason": "Existing compute/release rules; no reduced population or relaxed tolerances.",
+      "source": "User Addendum F; GOVERNANCE.md \u00a72/5; e1/CONVENTIONS.md",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Budgets, reports and release state"
+    },
+    {
+      "alternative": null,
+      "decision": "Report distinct forecasts whose incorporated historical game-ID set changes, by season, plus source events separately; do not equate five source games with affected forecast count or numerical propagation.",
+      "id": "C24",
+      "reason": "Straight set comparison; reporting only, no new gate.",
+      "source": "scripts/e1_calendar_audit.py; user full-calendar audit request",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Affected-game counting"
+    },
+    {
+      "alternative": "Accept independently verified completion-time bounds that prove identical cutoff membership while retaining exact time as unknown. This is a possible evidence representation for reviewer consideration, not an approved fabricated timestamp.",
+      "decision": "Retain exact qualified completion timestamps for the executable audit. Missing/contradictory clocks remain unknown; do not substitute kickoff plus duration, last-play start, an edit time or a later current FINAL flag. Continue sourcing; stop only the dependent fit.",
+      "id": "C25",
+      "reason": "Existing conservative evidence policy avoids asserting facts the source does not establish.",
+      "source": "e1-calendar-corrected/completion-probes.json; calendar-audit.json; user unknown-data default",
+      "status": "REVIEW_REQUESTED",
+      "tier": 2,
+      "topic": "Completion evidence precision and substitutes"
+    },
+    {
+      "alternative": null,
+      "decision": "Validate addendum/hash and fixed population before comparisons; run current-season audit and evidence rendering from the corrected directory, not legacy paths. Preserve original and invalidated artifacts.",
+      "id": "C26",
+      "reason": "Routine implementation/lineage corrections, not undefined model settings.",
+      "source": "scripts/e1_calendar_run.py; original registration file hashes",
+      "status": "DECIDED",
+      "tier": 1,
+      "topic": "Implementation receipt and runnable stages"
+    },
+    {
+      "alternative": "Recommendation: obtain authoritative gamebook/end-of-game records, retain the strict audit, and rerun the same candidates. Do not loosen a gate, infer a duration, or exclude troublesome games.",
+      "decision": "Do not run a valid E1 comparison until every required game has defensible completion/cutoff evidence. Preserve all games and the failed preflight.",
+      "id": "B01",
+      "reason": "Missing evidence cannot be manufactured, and dropping games changes the registered population. This is the only presently identified Tier 3 blocker; all manifestations are batched here.",
+      "source": "calendar-audit.json; completion-probes.json; binding chronology and unknown-data rules",
+      "status": "BLOCKED_EVIDENCE",
+      "tier": 3,
+      "topic": "Unqualified historical completion evidence"
+    }
+  ],
+  "original_registration_file_sha256": "4a992c84d493dfa09c7303f1322c93ee863c8c189a884b312e4c5a77da96cc61",
+  "original_registration_sha256": "a48e85241a47301ff3e462af70db6171c7c0edd750a67ac878ebe2b4411f1e62",
+  "schema": "E1-preregistration-addendum-decision-latency-v1",
+  "scope": "Gap sweep before this follow-through; earlier implementation and invalidated results are not retrospectively claimed to have been preregistered by this addendum.",
+  "sha256": "695999ed579b7174a446f3930815d51f1ec6729bcfa57d0e3eebfe3fcca06224"
+}

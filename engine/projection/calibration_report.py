@@ -5,7 +5,7 @@ import statistics
 from pathlib import Path
 from engine.projection_experiments import digest
 from scripts.reference_lines import render as render_reference_lines
-from . import calibration_execute as execution, calibration_admission as admission, storage
+from . import calibration_execute as execution, calibration_admission as admission, storage, research_ledger
 
 REVIEW='REVIEW REQUESTED — maximum three explicit execution attempts; alternative: retries until the experiment deadline. This is an operational limit, not a statistical gate.'
 QUESTIONS=[
@@ -116,6 +116,7 @@ def render(saved,diagnostic):
 def publish(root,key,*,diagnostic_ref=None):
     """Produce immutable derivative artifacts. Never calls admission or a worker."""
     root=Path(root).resolve();saved=execution.read(root,key);r=saved['request']['registration']
+    research_ledger.sync_calibration(root,key,saved)
     diagnostic=diagnostics(root,diagnostic_ref,r['baseline_hash'])
     markdown=render(saved,diagnostic)
     last=saved['attempts'][-1] if saved['attempts'] else None
@@ -137,4 +138,9 @@ def publish(root,key,*,diagnostic_ref=None):
         'diagnostic_ref':diagnostic_ref,'report_ref':execution.ref(root,folder/'evidence.md'),
         'review_packet_ref':execution.ref(root,folder/'review-packet.json'),'activates_method':False}
     storage.save(folder/'manifest.json',execution.seal(descriptor),immutable=True)
+    manifest_ref=execution.ref(root,folder/'manifest.json')
+    research_ledger.record(root,key=f'{key}/report/{identity}',kind='REPORT_GENERATED',
+        experiment='E-CAL-LINEAGE',evidence=[manifest_ref,descriptor['report_ref'],descriptor['review_packet_ref']],
+        context={'evidence_class':'HISTORICAL_DEVELOPMENT','human_viewing':'NOT_ESTABLISHED',
+                 'independent_confirmation':False})
     return descriptor

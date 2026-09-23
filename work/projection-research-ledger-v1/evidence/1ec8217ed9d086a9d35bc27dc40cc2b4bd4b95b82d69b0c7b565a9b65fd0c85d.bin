@@ -1,0 +1,65 @@
+{
+  "authoritative": true,
+  "candidate": {
+    "added_coefficients": 2,
+    "elo_adjustment": false,
+    "features": [
+      "starter_epa_per_attempt",
+      "starter_cpoe_proportion"
+    ],
+    "route": "direct_deployed_ridge",
+    "scale_constant": false
+  },
+  "clock": {
+    "deadline": "following Tuesday 06:00 America/Los_Angeles",
+    "maximum_queue_blocks": 1,
+    "status": "WAITING_FOR_TUESDAY_ACTIVATION_AFTER_PUBLISHED_CLOSEOUT"
+  },
+  "coefficient_test": {
+    "blocker": "B01",
+    "searched": false,
+    "state": "PENDING_USER_RESOLUTION"
+  },
+  "control": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
+  "disproving_condition_verbatim": "the fitted coefficient on the QB feature is not distinguishable from zero on out-of-fold data, which would mean team efficiency already carries quarterback quality and the hypothesis is closed for this engine.",
+  "files": {
+    "engine/projection_v3/model.py": "9e6d85fbadd86a4ff9b7f18192c9c6e278c3e26e9ae7f01f6d8bd1597d27943b",
+    "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json": "66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f",
+    "work/e-elo-qb-value-v2/qb-game-performance-cd328949b367f046174d7164c1acd16792836d8dd46f2609cbdd18961997f7bb.json": "cd328949b367f046174d7164c1acd16792836d8dd46f2609cbdd18961997f7bb",
+    "work/e-elo-qb-value-v2/starter-table-9dcc92523bcf8180a05bd948b0e7ccc451888cc50200dde7924e2e5e7e6f0083.json": "9dcc92523bcf8180a05bd948b0e7ccc451888cc50200dde7924e2e5e7e6f0083",
+    "work/e-elo-qb-value-v2/value-windows-78178c5ddcc11a444b1316c12303cc565cc9ab8febfabc62f2c5c2de437591c8.json": "78178c5ddcc11a444b1316c12303cc565cc9ab8febfabc62f2c5c2de437591c8",
+    "work/e-qb-direct/PLAN.md": "9ab102609b235232302c791c30bc626842324452b78717439c0ee5eddf0d46e1"
+  },
+  "fit_started": false,
+  "gate": {
+    "margin_and_total_coverage_50_80_tolerance": 0.03,
+    "primary": "team_points_MAE",
+    "relative_improvement_min": 0.01
+  },
+  "generated_at": "2026-09-20T02:53:35.244810+00:00",
+  "id": "E-QB-DIRECT",
+  "oracle": "same attempt-leader table; reuse rule-fitted ridge; diagnostic only",
+  "population": {
+    "drop_missing": false,
+    "games": 2639,
+    "seasons": [
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ],
+    "team_outcomes": 5278
+  },
+  "promotion": false,
+  "registered_at": "2026-09-20T16:20:51.293891+00:00",
+  "state": "REGISTERED_PENDING_INFERENCE_DEFINITION_AND_TUESDAY_ACTIVATION",
+  "tier3": [
+    "B01"
+  ]
+}

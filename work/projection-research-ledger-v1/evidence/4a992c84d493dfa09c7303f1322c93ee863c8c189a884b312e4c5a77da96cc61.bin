@@ -1,0 +1,55 @@
+{
+  "baseline_groups": [
+    "calibration",
+    "elo"
+  ],
+  "baseline_hash": "8bd585610049c63e30aea2e675f61cd6e65a5c22b268e87f89971bb3bffa246d",
+  "baseline_penalty": 10,
+  "bootstrap": {
+    "draws": 2000,
+    "seed": 20260916,
+    "unit": "four-week blocks within seasons, both teams kept together"
+  },
+  "candidates": [
+    "k4",
+    "k8",
+    "state_space"
+  ],
+  "comparison_results_viewed": false,
+  "control": "linear",
+  "data_additions": [
+    "staff_history only; coaching unknown and flags false; no other data source"
+  ],
+  "deployment": "Never automatic; retain linear unless all evidence and two reviews authorize explicit release",
+  "disproving_conditions": "Less than 1% pooled team MAE improvement, or any margin/total 50/80 coverage outside nominal \u00b1.03.",
+  "estimated_nuisance_parameters": 1,
+  "experiment": "E1",
+  "file_hashes": {
+    "config/staff_history.json": "a914b09d434d48371544054c26e38f14f9b1da61d9a05eb241688a02305a62a4",
+    "engine/forecast_system/core_features.py": "a178b1cb8769fa7f715bce81e3ae2632f54d7d8780502ae535b6327695a550ab",
+    "engine/forecast_system/state_fit.py": "1d93b8c37356a6599603d21d05c09f6adad0322f095c46d12fa2a187d7b82af4",
+    "engine/forecast_system/state_space.py": "f8b40b2d4bd82f92ee11ac4164d9f10dd512c92ddbf848b40dfa74740118bc28",
+    "engine/forecast_system/verification.py": "daefa5da73d5d667bfb3ba047ebb083f20ea89874e6b5fa6e48540391de59502",
+    "engine/projection_v3/model.py": "9e6d85fbadd86a4ff9b7f18192c9c6e278c3e26e9ae7f01f6d8bd1597d27943b",
+    "scripts/e1_evaluate.py": "6533ae80dda3c2bfb95981455224d9a4c93104ed8320459729631be6a18ffce7",
+    "scripts/e1_prepare.py": "b28306af2e951cc6447bb93d248079c0e2d1aa29406d03e5ff5c705ce786d409",
+    "scripts/e1_staff_seed.py": "08981eba2bb5702a6037d164d58a25554ef067eeb5ce267796a9873874f73c2e",
+    "work/in-season-learning-v1/fit-8bd585610049c63e30aea2e675f61cd6e65a5c22b268e87f89971bb3bffa246d.json": "8bd585610049c63e30aea2e675f61cd6e65a5c22b268e87f89971bb3bffa246d",
+    "work/projection-governance-v2/e1/CONVENTIONS.md": "2140e1bf6d279ecbd50d9ccd8a485e8c74795dc0cb652496b1081e634d6409eb",
+    "work/projection-governance-v2/e1/as-issued-board-snapshot.json": "7e447c2e88afa643e4e30f4458d1f81f8dde7ec7ccf9ea004b52a4d7b97611b9",
+    "work/projection-governance-v2/e1/features.json.gz": "80e54c0072ce4703d41bfc9d1abc91658b40f936d1c6007af34c1024bbb9cba9"
+  },
+  "gate": {
+    "coverage_tolerance": 0.03,
+    "team_mae_relative_improvement": 0.01
+  },
+  "optimized_filter_parameters": 3,
+  "registered_at": "2026-09-16T18:52:19.288870+00:00",
+  "schema": "E1-preregistration-v1",
+  "sha256": "a48e85241a47301ff3e462af70db6171c7c0edd750a67ac878ebe2b4411f1e62",
+  "state": "REGISTERED_BEFORE_COMPARISON",
+  "tie_break": "Paired 95% interval contains zero: eligible simpler candidate k4, k8, state_space order.",
+  "training_window": "Expanding annual folds: strictly earlier seasons; 2012 earlier training pilot, 2013\u20132015 calibration only, 2016\u20132025 scored.",
+  "tuning": "q/r/lambda training-only likelihood with the three fixed starts; fixed plug-in rho from training-only first-start pilot; no MAE tuning; own prior-three-season OOF uncertainty.",
+  "week": 2
+}

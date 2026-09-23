@@ -1,0 +1,43 @@
+{
+  "baseline_groups": [
+    "calibration",
+    "elo"
+  ],
+  "baseline_ref": {
+    "path": "work/in-season-learning-v1/fit-8bd585610049c63e30aea2e675f61cd6e65a5c22b268e87f89971bb3bffa246d.json",
+    "sha256": "8bd585610049c63e30aea2e675f61cd6e65a5c22b268e87f89971bb3bffa246d"
+  },
+  "baseline_settings": [
+    "none",
+    10
+  ],
+  "baseline_version": "projection-v2.w2",
+  "candidate_cap_interpretation": "Three challengers, with unchanged control outside the cap; selected before comparative results under user direction to follow statistical best practices.",
+  "candidate_families": [
+    "linear through Week5",
+    "n/(n+k), k in {4,8}",
+    "offense/defense state space with Elo retained"
+  ],
+  "candidates": [
+    "sample_size_k4",
+    "sample_size_k8",
+    "state_space"
+  ],
+  "comparative_results_viewed": false,
+  "control": "current linear decay through Week5",
+  "experiment": "E1",
+  "gate": {
+    "coverage_tolerance": 0.03,
+    "team_mae_relative_improvement_min": 0.01
+  },
+  "historical_unresolved": [
+    "evidence-qualified preseason coach/QB1 transitions",
+    "state covariance and noise fitting registration"
+  ],
+  "method_change": "early-season updating only",
+  "registration": "work/projection-governance-v2/e1/registration.json",
+  "registration_sha256": "a48e85241a47301ff3e462af70db6171c7c0edd750a67ac878ebe2b4411f1e62",
+  "schema": "experiment-preregistration-draft-v1",
+  "state": "SUPERSEDED_BY_REGISTERED_E1",
+  "week": 2
+}

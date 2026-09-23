@@ -594,8 +594,15 @@
         "prospective-plan.json"
       ],
       "acceptance": "Every attempt retained; nested past-only folds; paired and block uncertainty; no repeated-peeking promotion; pre-lock edits; market separation",
-      "state": "INCOMPLETE",
-      "observed_evidence": []
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "RESEARCH-LEDGER-PLAN.md; RESEARCH-LEDGER.md (tiered conventions and declared incomplete scope)",
+        "engine/projection/research_ledger.py; scripts/projection_research_ledger.py (durable snapshots, actual observation clocks, explicit views, calibration execution/report mirror)",
+        "research-ledger/import-ref.json; research-ledger/independent-verification.json (29 pinned Git documents and 176492 source bytes independently verified; not exhaustive trials or past views)",
+        "research-ledger/linux-attempt2.json; research-ledger/linux-attempt2-terminal.json (98 tests on Linux, actual loaded limits and terminal success, 53 production records/pointer unchanged; synthetic fixtures only)",
+        "research-ledger/linux-attempt1.log; tests-research-ledger-calibration.log (failed verification attempts retained, no statistical result)",
+        "work/projection-research-ledger-v1/events and evidence (retrospective document import only; prospective plan and broader trial reconstruction outstanding)"
+      ]
     },
     {
       "id": "11",

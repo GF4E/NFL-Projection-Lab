@@ -6,7 +6,7 @@ import json
 from unittest.mock import patch
 import test_projection_calibration_runner as runner_fixture
 from engine.projection import calibration_execute as x, calibration_report as report, calibration_evaluate as evaluator
-from engine.projection import calibration_admission as a, storage
+from engine.projection import calibration_admission as a, storage, research_ledger as ledger
 
 
 class Base(runner_fixture.RunnerTests):pass
@@ -265,7 +265,7 @@ x.run(sys.argv[1],json.loads(sys.argv[2]),clock=lambda:datetime.datetime.fromiso
         from pathlib import Path
         from scripts import projection_calibration as cli
         saved={'key':self.key,'attempts':[{'receipt':{'state':'INTERRUPTED'}}]}
-        with patch.object(cli.sys,'platform','linux'),patch.object(resource,'getrlimit',return_value=(cli.MEMORY_BYTES,cli.MEMORY_BYTES)),patch.object(Path,'read_text',return_value='timeout'),patch.object(x,'run',return_value=saved),patch('builtins.print'):
+        with patch.object(cli.sys,'platform','linux'),patch.object(resource,'getrlimit',return_value=(cli.MEMORY_BYTES,cli.MEMORY_BYTES)),patch.object(Path,'read_text',return_value='timeout'),patch.object(ledger,'run_calibration',return_value=saved),patch('builtins.print'):
             self.assertEqual(cli.main(['--root',str(self.root),'_worker','--registration',json.dumps(self.ref)]),1)
 
     def test_cli_supervisor_never_allows_larger_budget_or_unbounded_platform(self):
@@ -276,3 +276,38 @@ x.run(sys.argv[1],json.loads(sys.argv[2]),clock=lambda:datetime.datetime.fromiso
             child.assert_not_called()
         with patch.object(cli.sys,'platform','darwin'),self.assertRaisesRegex(RuntimeError,'qualified Linux'):
             cli.bounded(['fixture'])
+
+    def test_report_indexes_every_native_attempt_without_human_view_claim(self):
+        self.execute()
+        with patch.object(evaluator,'run',side_effect=AssertionError('ledger/report fitted')):
+            report.publish(self.root,self.key);report.publish(self.root,self.key)
+        events=[e['body']['request']['kind'] for e in ledger.inventory(self.root)['events']]
+        self.assertCountEqual(events,['CONFIGURATION_RETAINED','ATTEMPT_STARTED','ATTEMPT_RECEIPT','NUMERICAL_RESULT_RETAINED','REPORT_GENERATED'])
+
+    def test_failed_attempt_is_indexed_without_a_gate_rejection(self):
+        with patch.object(evaluator,'run',side_effect=RuntimeError('failure')):
+            with self.assertRaises(RuntimeError):self.execute()
+        report.publish(self.root,self.key)
+        events=ledger.inventory(self.root)['events']
+        self.assertNotIn('NUMERICAL_RESULT_RETAINED',[e['body']['request']['kind'] for e in events])
+        receipt=next(e['body'] for e in events if e['body']['request']['kind']=='ATTEMPT_RECEIPT')
+        native=json.loads((self.root/receipt['snapshots'][0]['path']).read_bytes())
+        self.assertEqual(native['body']['state'],'FAILED')
+
+    def test_report_ledger_failure_stops_return_then_retries_without_refitting(self):
+        self.execute();real=ledger.record
+        def fail(*args,**kwargs):
+            if kwargs['kind']=='REPORT_GENERATED':raise OSError('ledger unavailable')
+            return real(*args,**kwargs)
+        with patch.object(ledger,'record',side_effect=fail),self.assertRaises(OSError):report.publish(self.root,self.key)
+        with patch.object(evaluator,'run',side_effect=AssertionError('retry refitted')):report.publish(self.root,self.key)
+        kinds=[e['body']['request']['kind'] for e in ledger.inventory(self.root)['events']]
+        self.assertEqual(kinds.count('REPORT_GENERATED'),1)
+
+    def test_worker_wrapper_indexes_failed_native_receipt_before_raising(self):
+        real=x.run
+        def frozen(root,ref,**kwargs):return real(root,ref,clock=self.clock,**kwargs)
+        with patch.object(x,'run',side_effect=frozen),patch.object(evaluator,'run',side_effect=RuntimeError('failure')):
+            with self.assertRaises(RuntimeError):ledger.run_calibration(self.root,self.ref)
+        kinds=[e['body']['request']['kind'] for e in ledger.inventory(self.root)['events']]
+        self.assertCountEqual(kinds,['CONFIGURATION_RETAINED','ATTEMPT_STARTED','ATTEMPT_RECEIPT'])

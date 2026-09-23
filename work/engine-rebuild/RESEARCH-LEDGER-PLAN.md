@@ -1,0 +1,12 @@
+# Trial and evaluation-exposure ledger
+
+Previous turn: PROGRESS (source recovery and captured initial operator verified). This increment addresses requirement 10b while the real first cutoff remains future. No candidate fitting, registration, scientific comparison or shipping-code change.
+
+Gap sweep, before implementation:
+- Tier 1: reuse immutable durable storage and content hashes. One explicit operation key binds one exact payload; retries return the first event, changed payloads fail. Record the actual observation time separately from dates claimed inside source documents. Importing a historical registration does not retroactively prove predeclaration.
+- Tier 1: snapshot referenced documents before committing the event, keeping mutable registrations/reports from erasing older evidence. Derivatives never fit. Use existing no-release/no-approval semantics.
+- Tier 1: record calibration request, every durable attempt start/receipt/result, and generated report before returning report artifacts. A generated report is not proof that a person viewed it. Explicit view events are separate; previous unlogged views remain UNKNOWN.
+- Tier 2 REVIEW REQUESTED: historical import initially indexes every tracked registration/experiment document in the statistical projection and named E-experiment roots, plus explicit rebuild corrections/failed-run indexes. It does not infer configurations from filenames, reproduce unseen historical views, or call the catalog exhaustive. Alternative: infer an exhaustive trial count from reports/Git history; rejected because missing records cannot establish no unrecorded trials. Further source reconciliation remains required.
+- No Tier 3 change: candidates, gates, metrics, populations, clocks and prospective policy are unchanged. Prospective comparison still requires its own frozen plan and actual before-lock records; this ledger does not start it.
+
+Implement an append-only research ledger with evidence snapshots, validated reads, explicit retrospective import and evaluation-view entry, and calibration-report synchronization. Fault tests cover failed commit/lost response, duplicate/changed keys, corruption, traversal and report failure before publication; report tests prove no fitting. Import real current registrations with a pinned Git source commit and retain a complete import manifest. Mark requirement 10b PARTIAL only after those paths pass; do not claim whole-goal completion.

@@ -1,3 +1,11 @@
+# Latest checkpoint — research ledger retained and verified
+
+Goal ACTIVE; PROGRESS. Requirement 10b advances to PARTIAL: durable operation-keyed research events retain exact source snapshots and actual observation clocks, and calibration execution/reporting indexes native attempts without refitting. Independently verified 29 historical documents / 176,492 bytes against pinned Git evidence. Imported dates do not prove preregistration or human viewing; past unlogged views and exhaustive historical trial coverage remain unknown. Tier 2 limited-catalog choice is flagged at the top of RESEARCH-LEDGER.md.
+
+98 tests pass locally and on isolated Linux; preserve the initial mock-boundary and missing-helper test failures. Linux attempt 2 completed with verified loaded limits and exact-invocation terminal success in 29.026 service seconds. All 52 original locks/grades plus active fit pointer unchanged; all 46 issuing files unchanged. No candidate fitting, registration, promotion, provider request, new spending or live activation. Research source is prepared for branch delivery; host installation must be verified separately.
+
+Next: actual Friday September 25 06:00 PT cutoff, then qualified initial handoff and actual issuing/public provenance before control authority or E-CAL. Independent remaining work includes a frozen prospective comparison plan and further historical trial/exposure reconciliation. Sustained storage qualification, calibration/conditional-mean semantics, authentic reviews and a live cycle remain open. Confidence high in bounded ledger integrity/retry behavior, lower to medium on independent missing/inconsistent native-attempt evidence; completeness is not claimed.
+
 # Latest checkpoint — initial handoff captured boundary verified
 
 Goal ACTIVE; PROGRESS. Captured real initial operator passes in 198.856 seconds (206.069 service span): Thursday lock retained, migration 2,927 to 2,928 games, stage preserves pointers, activate/exact retry succeeds, fourteen later games use Friday state, rollback preserves Thursday. Fifty-two original production records and fit pointer remain unchanged. All 46 issuing files match physically restored source 76f840b0. Initial source recovery and operator timing are now qualified on captured inputs; no live activation or scientific claim.
