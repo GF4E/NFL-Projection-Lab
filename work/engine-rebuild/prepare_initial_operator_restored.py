@@ -1,5 +1,5 @@
 """Prepare a fresh isolated initial-operator invocation; no production mutation."""
-import hashlib,json,os,pwd,sys
+import hashlib,json,os,pwd,subprocess,sys
 from pathlib import Path
 ROOT=Path('/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6');sys.path.insert(0,str(ROOT))
 from engine.projection import bundle,release_preflight
@@ -7,7 +7,8 @@ from engine.projection.storage import save
 recovery=Path(sys.argv[1]);base=recovery/'initial-operator';packet_ref=json.loads(Path(sys.argv[2]).read_bytes())
 release_preflight.read(ROOT,packet_ref)
 record=json.loads((recovery/'source.json').read_bytes());source=recovery/'source'
-code=bundle.capture_code(ROOT)
+code=json.loads(subprocess.check_output(['runuser','-u','nflengine','--',sys.executable,'-B','-c',
+    'import json,sys;from pathlib import Path;sys.path.insert(0,sys.argv[1]);from engine.projection.bundle import capture_code;print(json.dumps(capture_code(Path(sys.argv[1]))))',str(ROOT)],text=True))
 assert len(code['files'])==50
 for name,digest in code['files'].items():assert hashlib.sha256((source/name).read_bytes()).hexdigest()==digest,name
 uid=pwd.getpwnam('nflengine').pw_uid;gid=pwd.getpwnam('nflengine').pw_gid

@@ -23,11 +23,14 @@ names=['SOURCE-RECOVERY-50-PLAN.md','SOURCE-RECOVERY-50.md','PROSPECTIVE-COLLECT
        'source-recovery-50/source-restored.json','source-recovery-50/source-terminal.json','source-recovery-50/runtime-reverified.json']
 if a.phase=='complete':names+=['source-recovery-50/initial-operator.json','source-recovery-50/initial-operator-accepted.json']
 for name in names:
- origin='work/engine-rebuild/'+name;data=(ROOT/origin).read_bytes();digest=hashlib.sha256(data).hexdigest()
- path='work/engine-rebuild/release-review/documents/'+digest+Path(name).suffix
- write_bytes(ROOT/path,data,immutable=True);r={'path':path,'sha256':digest}
- if r not in value['documents']:value['documents'].append(r)
- value['document_origins'][path]=origin
+    origin='work/engine-rebuild/'+name;data=(ROOT/origin).read_bytes();digest=hashlib.sha256(data).hexdigest()
+    superseded={path for path,source in value['document_origins'].items() if source==origin}
+    value['documents']=[r for r in value['documents'] if r['path'] not in superseded]
+    value['document_origins']={k:v for k,v in value['document_origins'].items() if k not in superseded}
+    path='work/engine-rebuild/release-review/documents/'+digest+Path(name).suffix
+    write_bytes(ROOT/path,data,immutable=True);r={'path':path,'sha256':digest}
+    if r not in value['documents']:value['documents'].append(r)
+    value['document_origins'][path]=origin
 value['supersedes_packet_ref']=parent
 value['recovery_addendum']='Fifty-file source ec239e0c restored independently; issuing code 5fd477b27. Fresh same-host restored-runtime consumer supersedes older source proof. Earlier historical records remain preserved. No model, gate, control authority or reviewer decision changes.'
 value['terminal_evidence_correction']='Every new job has actual loaded resource limits and terminal success bound to its invocation. No unloaded defaults used as evidence.'
