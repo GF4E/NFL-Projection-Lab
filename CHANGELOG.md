@@ -1,5 +1,7 @@
 ## 2026-09-23 — verify initial handoff and qualify terminal journal evidence
 
+Final packet 33f16c70 also passes all six actual-host technical checks; retained loaded-unit limits and exact-invocation completion evidence are in release-review/final-preflight-supervision.json. The pipeline remains unactivated pending its first actual eligible state.
+
 Infrastructure lane. Captured actual stage/activate/retry/rollback passes in 198.856 seconds, with Thursday lock preserved, training boundary extended by one game and fourteen later forecasts using Friday state. No live activation. CONVENTIONS Tier 1 correction: unloaded transient systemd properties are defaults, not terminal or resource evidence; retain the old snapshots, replace terminal acceptance with exact-invocation journal start/success and failure checks, and capture future limit settings while the unit is loaded. Five focused fixtures pass. No model, registered gate or resource ceiling changes. All original records and fit remain exact; no new paid resources. See work/engine-rebuild/INITIAL-OPERATOR-RESULT.md. Confidence medium in readiness because actual cutoff/issuance and reconstruction assumptions remain; lower to low on independent disagreement.
 
 ## 2026-09-23 — recover the complete initial-handoff executable
