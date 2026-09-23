@@ -1,0 +1,40 @@
+# Initial chronology migration — identical packet for Claude and Dr. M
+
+REVIEW REQUESTED. This is a proposed chronology/infrastructure release, not a registered statistical experiment. No reviewer approval, live activation or control-authority change has occurred. Please assess the choices below against their stated alternatives and identify any leakage, double counting, unsupported chronology or rollback objection. Record a separate decision for each item; do not infer approval from tests passing.
+
+## Central proposal
+
+Preserve the approved HFA/Elo/PPD formulas, ridge settings, calibration and original locked forecasts. Feed future forecasts through the already tested common source/cutoff path. Use the exact Linux training ledger for future authorized weight-only refits. All three assimilation cutoffs stay Friday, Monday and Tuesday 06:00 Pacific; every forecast selects the cutoff strictly before its own T75. An actual transition still requires a source-qualified bootstrap and full operator/configuration integration. It cannot backfill the earlier Tuesday from newly collected data.
+
+The authoritative control remains the HFA deployed series 66a3a60c. The corrected hourly-catch-up series 7560f2b2 remains NON_AUTHORITATIVE_RECONSTRUCTION. The strict-Tuesday series ba52a7e9 is withdrawn as a production-semantics claim and retained only as sensitivity evidence. Do not use it as the candidate control. No E-CAL or E-VENUE candidate is fitted or promoted by this packet.
+
+## Decisions required before the initial live transition
+
+| ID | Existing choice | Alternative and consequence | Evidence |
+|---|---|---|---|
+| R1 | Keep target-week preseason blending as matchup context while observations/Elo stay fixed within an assimilation interval. | Advancing blend at each execution changes the update method. | GAP-SWEEP.md, numerical-cutoff section; common replay and permutation proof. |
+| R2 | Bootstrap from facts actually collected before the first usable cutoff, labeling earlier availability unknown. Never reconstruct an earlier live cutoff from later receipts. | Fabricating old clocks is invalid; waiting for new qualified collection delays activation. | GAP-SWEEP.md, source-qualified bootstrap; immutable observations and cutoff receipts. |
+| R3 | When an older result/revision arrives, reconstruct the eligible game set in actual kickoff order, with each game once. Preserve earlier states and forecasts. | Appending an old result after new ones, or adding a correction twice, distorts Elo and rolling history. | CUTOFF-STATE.md and its source/revision tests. |
+| R4 | Reconstruct all 32 pre-activation 2026 training games using the approved common method and explicitly assumed historical availability. Preserve all original AS_ISSUED locks and first grades. | Keeping the old mixed-method rows makes the training inputs inconsistent with future issuing inputs. | TRAINING-TRANSITION.md; Linux ledger 84fcb3e3; 2,927 games/5,854 rows. Of 60 original retained AS_ISSUED team rows, 30 across 15 games change baseline/Elo inputs; two games lack original pregame rows. |
+| R5 | Historical replay assumes final/PBP availability at kickoff+4h and refit availability ten minutes after actual hourly retry start. Keep this explicitly simulated. | Retained provider/compute clocks do not exist. Zero versus ten minutes selects identical fits for this replay because no target issuance lies inside those windows; neither proves historical live availability. | hourly-catchup/summary.json; no fit-latency boundary games; 2,639 games, 175 fits, exact row-reversal invariance. |
+| R6 | The initial live mode transition and recorded weight-only handoff remain restricted to verified same-code/method/calibration compatibility. A complete restored code/runtime consumer is now proven for the pinned pair. | A general automatic cross-version/schema rollback needs additional qualification. Do not describe the bounded transition as that broader capability. | RELEASE-TRANSITION.md; REFIT-HANDOFF.md; RUNTIME-RESTORE-CONTINUATION.md. |
+
+These are Tier 2 review items already recorded in the project, not six new Tier 3 questions. No fitted parameter, statistical candidate, gate or population changes are proposed here. A rejection requires correction and requalification, not an exception to the existing gate.
+
+## Evidence that is established
+
+The restored interpreter/source reproduced 16 saved forecasts and 32 first grades, then executed the captured 2,927-game refit and full 16-game slate including rollback and idempotent grading in 389.303 seconds under the 570-second ceiling. External verification preserved 52 original records plus the active-fit pointer, original mount/namespace identities, and ten observed external native files. This is isolated operational simulation, not an observed live cycle or an accuracy gain.
+
+Public Week 2 closeout bytes were independently verified at 2026-09-23T17:50:24.820508Z. That proves the retained publication at that observation, not historical first-publication timing. New experiments still require Tuesday ordering, verified current control, actual review and their original gate.
+
+## Later calibration decisions remain separate
+
+Before E-CAL registration, review the existing early-history state initialization in 2011/training in 2012; the raw-baseline donor cold-start for 2013–2015; retained legacy personnel week-window; and the two calibration replay/Week 9 pool choices in E-CAL-PREFLIGHT.md. Their specifications and evidence are linked in the machine packet. They do not authorize changing the initial release's existing calibration, and this packet does not resolve them implicitly.
+
+## What a reviewer response needs
+
+Name the exact packet SHA256 from current-ref.json, identify reviewer and review date, provide APPROVE / REVISE / REJECT for R1–R6 with reasons, and list unresolved objections. Return authentic review text through the existing user-mediated channel. No external message has been sent and no local agent-generated document is treated as your decision. Later calibration comments should be labeled separately.
+
+Least certain: historical source-availability assumptions and the pre-activation training reconstruction policy. Exact recomputation verifies the implementation, not those missing historical clocks.
+
+Confidence: medium in the proposed migration—authoritative captured evidence supports it, but these choices could reasonably differ. Lower to low if independent review finds leakage or rejects the reconstructed training boundary.
