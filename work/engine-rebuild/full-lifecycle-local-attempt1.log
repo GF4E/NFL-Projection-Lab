@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/check_full_lifecycle.py", line 219, in <module>
+    print(json.dumps(verify()))
+                     ^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/check_full_lifecycle.py", line 70, in verify
+    week = original_metadata['publication_week']
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+KeyError: 'publication_week'

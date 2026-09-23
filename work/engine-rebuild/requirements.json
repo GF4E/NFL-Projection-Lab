@@ -86,7 +86,8 @@
         "log-rotation-2026-09-22.json (nine prior log sequences preserved; no oldest archive retired)",
         "engine/projection/source_archive.py (prospective lossless storage; prior records unchanged)",
         "tests/test_projection_source_archive.py; host-source-archive-candidate.json (dual hashes, exact real-source roundtrip, failure/reader fixtures in host tmpfs)",
-        "host-source-archive-verification.json (installed code, scheduled HEALTHY reader and downstream source reads; legacy CSV reuse, first fresh compressed production record not yet observed)"
+        "host-source-archive-verification.json (installed code, scheduled HEALTHY reader and downstream source reads; legacy CSV reuse, first fresh compressed production record not yet observed)",
+        "storage-recovery-lifecycle.json; storage-journal-vacuum.txt (authorized temporary cache/log relief; durable capacity pending)"
       ]
     },
     {
@@ -250,7 +251,9 @@
         "engine/projection/weekly_refit.py",
         "engine/projection/public_closeout.py",
         "tests/test_projection_weekly_refit.py",
-        "host-weekly-integration.json (36 Linux synthetic fixtures; ledger read mocked; no activation)"
+        "host-weekly-integration.json (36 Linux synthetic fixtures; ledger read mocked; no activation)",
+        "FULL-LIFECYCLE.md; full-lifecycle-local-attempt2.json (complete real ledger/refit, 16 locks and synthetic grades after rollback; simulation only)",
+        "full-lifecycle-host-attempt1.json (actual Linux UID 1000, 493.15 s, 16 locks/grades, 52 frozen hashes unchanged; simulated clocks/publication/finals)"
       ]
     },
     {
@@ -318,7 +321,9 @@
         "engine/projection/weekly_refit.py",
         "engine/projection/public_closeout.py",
         "tests/test_projection_weekly_refit.py",
-        "host-weekly-integration.json (36 Linux synthetic fixtures; ledger read mocked; no activation)"
+        "host-weekly-integration.json (36 Linux synthetic fixtures; ledger read mocked; no activation)",
+        "FULL-LIFECYCLE.md; full-lifecycle-local-attempt2.json (complete real ledger/refit, 16 locks and synthetic grades after rollback; simulation only)",
+        "full-lifecycle-host-attempt1.json (actual Linux UID 1000, 493.15 s, 16 locks/grades, 52 frozen hashes unchanged; simulated clocks/publication/finals)"
       ]
     },
     {
@@ -493,7 +498,9 @@
         "engine/projection/weekly_refit.py",
         "engine/projection/public_closeout.py",
         "tests/test_projection_weekly_refit.py",
-        "host-weekly-integration.json (36 Linux synthetic fixtures; ledger read mocked; no activation)"
+        "host-weekly-integration.json (36 Linux synthetic fixtures; ledger read mocked; no activation)",
+        "FULL-LIFECYCLE.md; full-lifecycle-local-attempt2.json (complete real ledger/refit, 16 locks and synthetic grades after rollback; simulation only)",
+        "full-lifecycle-host-attempt1.json (actual Linux UID 1000, 493.15 s, 16 locks/grades, 52 frozen hashes unchanged; simulated clocks/publication/finals)"
       ]
     },
     {
@@ -524,7 +531,9 @@
         "tests-release-standing.log",
         "host-release-qualified-canary.json",
         "tests-release-qualified.log",
-        "host-release-transition-followthrough.json"
+        "host-release-transition-followthrough.json",
+        "FULL-LIFECYCLE.md; full-lifecycle-local-attempt2.json (complete real ledger/refit, 16 locks and synthetic grades after rollback; simulation only)",
+        "full-lifecycle-host-attempt1.json (actual Linux UID 1000, 493.15 s, 16 locks/grades, 52 frozen hashes unchanged; simulated clocks/publication/finals)"
       ]
     },
     {
