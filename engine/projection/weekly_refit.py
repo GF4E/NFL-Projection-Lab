@@ -30,6 +30,11 @@ def record(root,path,body,immutable=False):
 def configuration(root,owner):
     config=load(root,CONFIG)
     if not config:raise ValueError('Activated pipeline weekly refit requires qualified release handoff configuration')
+    return validate_configuration(root,config,owner)
+
+
+def validate_configuration(root,config,owner):
+    """Check staged configuration without installing it or advancing training."""
     if config['schema']!='recorded-weekly-refit-v1' or config['owner']!=owner:
         raise ValueError('Weekly owner or schema differs')
     if p.load(root,config['training_ref'],'training')['schema']!=ledger.SCHEMA:

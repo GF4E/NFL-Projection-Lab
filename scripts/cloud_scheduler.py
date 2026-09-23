@@ -144,7 +144,9 @@ def run(mode, host):
         # No provider, fit or artifact publication may consume a half-switched
         # projection release. A mode manifest is absent until separately qualified.
         from engine.projection.pipeline_release import guard as release_guard
+        from engine.projection.initial_release import recover as recover_initial
         from engine.projection.weekly_refit import recover as recover_weekly
+        recover_initial(ROOT,host,handle)
         recover_weekly(ROOT,host,handle)
         release_guard(ROOT)
         # A waiting state job must yield immediately if a capture window opened.

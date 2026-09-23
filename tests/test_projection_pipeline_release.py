@@ -188,3 +188,55 @@ class ReleaseTests(Base):
             self.assertEqual(bundle.resolve(self.root,card['release_ref'],'releases')['pipeline_release_ref'],self.scheduled)
         self.switch(self.legacy,'rollback',self.scheduled)
         for card in board['games']:self.assertIsNotNone(bundle.verify_card(self.root,card))
+
+    def managed_target(self):
+        from engine.projection import weekly_refit as weekly, training_ledger as ledger,cutoff_state as cs
+        training=pipeline.store(self.root,'training',{'schema':ledger.SCHEMA})
+        config={'schema':'recorded-weekly-refit-v1','owner':'owner',
+                'training_ref':training,'method_fit_ref':self.fit,'method':cs.method(self.root,self.fit)}
+        self.scheduled=release.checkpoint(self.root,label='managed',weekly_configuration=config)
+        return config
+
+    def test_configuration_commits_with_release_and_rollback_disables_without_deletion(self):
+        from engine.projection import weekly_refit as weekly
+        config=self.managed_target();self.switch()
+        self.assertEqual(weekly.configuration(self.root,'owner'),config)
+        inherited=release.checkpoint(self.root,label='later-same-mode')
+        self.assertEqual(release.read(self.root,inherited,'manifests')['weekly_configuration'],config)
+        self.switch(self.legacy,'rollback',self.scheduled)
+        self.assertIsNone(weekly.load(self.root,weekly.CONFIG))
+        self.assertTrue((self.root/weekly.CONFIG).is_file())
+        self.assertEqual(release.guard(self.root)['mode'],'LEGACY')
+
+    def test_configuration_crash_before_write_is_resumable(self):
+        from engine.projection import weekly_refit as weekly
+        self.managed_target();self.crash_and_resume(weekly.CONFIG)
+
+    def test_configuration_crash_after_write_is_resumable(self):
+        from engine.projection import weekly_refit as weekly
+        self.managed_target();self.crash_and_resume(weekly.CONFIG,after=True)
+
+    def test_configuration_drift_after_commit_is_rejected(self):
+        from engine.projection import weekly_refit as weekly
+        config=self.managed_target();self.switch()
+        weekly.record(self.root,weekly.CONFIG,{**config,'owner':'other'})
+        with self.assertRaisesRegex(ValueError,'weekly configuration differs'):release.guard(self.root)
+
+    def test_unmanaged_checkpoint_cannot_discard_installed_configuration(self):
+        self.managed_target();self.switch()
+        old=release.read(self.root,self.legacy,'manifests');del old['weekly_configuration']
+        ref=release.store(self.root,'manifests',old)
+        with self.assertRaisesRegex(ValueError,'Unmanaged checkpoint'):
+            self.switch(ref,'unmanaged',self.scheduled)
+
+    def test_configuration_changed_while_pending_is_not_overwritten(self):
+        from engine.projection import weekly_refit as weekly
+        config=self.managed_target();real=release.save
+        def crash(path,value,immutable=False):
+            result=real(path,value,immutable)
+            if str(path).endswith(weekly.CONFIG):raise OSError('interruption')
+            return result
+        with patch.object(release,'save',side_effect=crash),self.assertRaises(OSError):self.switch()
+        weekly.record(self.root,weekly.CONFIG,{**config,'owner':'other'})
+        with self.assertRaisesRegex(ValueError,'configuration changed outside'):self.switch()
+        self.assertEqual(weekly.load(self.root,weekly.CONFIG)['owner'],'other')
