@@ -24,6 +24,8 @@ Actual enrollment remains closed: production has no qualified scheduled release/
 
 Installed verification: 2026-09-23T22:33:46.293096+00:00, host `f98e0aa1c5ab08aa873e0284ba49988b528ce840`, issuing source `5fd477b2719689334fe7bb14315e5eab7ed54f9d`, all fifty files match the tested manifest under UID 1000. Actual disabled collection returns NOT_ENROLLED, with zero enrollments, no active pipeline and unchanged fit 801ef079. First inspection correctly refused an active dispatch; the bounded second inspection acquired the real fence. Cutoff health remains WAITING_FOR_CUTOFF at 2026-09-25T13:00Z. No public website change is claimed.
 
+Observed scheduled publication at remote 85b245211 uses issuing source 5fd477b27 and the new fifty-file release f6a5d1fa. Comparison with the pre-update board preserves all sixteen upcoming projection payloads and all 53 original records/fit-pointer bytes. This is source-repository publication evidence, not public-site verification or prospective enrollment. See prospective-collector/scheduled-publication-parity.json.
+
 Provider requests and new spending: zero. Least certain: the five-second reserve's effect on late real-world bundle revisions; live shortfall denominators must expose it.
 
 Confidence: medium in prospective operational readiness—authoritative captured forecasts reproduce, but the conclusion depends on a defensible collection-budget choice and still-unobserved live conditions. Lower to low if an independent parity check disagrees or a live retry changes a committed pair. Predictive improvement is not claimed.
