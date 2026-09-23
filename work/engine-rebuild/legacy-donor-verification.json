@@ -1,0 +1,222 @@
+{
+  "annual": {
+    "2016": {
+      "changed_team_fields": {
+        "baseline": 414
+      },
+      "games": 256,
+      "games_with_material_input_difference": 207,
+      "groups": [],
+      "input_max_difference": 0.3245667243053596,
+      "reproduction_max_difference": 0.0,
+      "settings": {
+        "decay": "none",
+        "penalty": 10
+      },
+      "training_games": 256
+    },
+    "2017": {
+      "changed_team_fields": {
+        "baseline": 390
+      },
+      "games": 256,
+      "games_with_material_input_difference": 195,
+      "groups": [],
+      "input_max_difference": 0.41417135146626904,
+      "reproduction_max_difference": 0.0,
+      "settings": {
+        "decay": "none",
+        "penalty": 10
+      },
+      "training_games": 512
+    },
+    "2018": {
+      "changed_team_fields": {
+        "baseline": 386
+      },
+      "games": 256,
+      "games_with_material_input_difference": 193,
+      "groups": [],
+      "input_max_difference": 0.31898270181407185,
+      "reproduction_max_difference": 0.0,
+      "settings": {
+        "decay": "none",
+        "penalty": 10
+      },
+      "training_games": 768
+    },
+    "2019": {
+      "changed_team_fields": {
+        "baseline": 386
+      },
+      "games": 256,
+      "games_with_material_input_difference": 193,
+      "groups": [
+        "calibration",
+        "venue",
+        "elo"
+      ],
+      "input_max_difference": 0.4673495741228493,
+      "reproduction_max_difference": 0.0,
+      "settings": {
+        "decay": "none",
+        "penalty": 100
+      },
+      "training_games": 1024
+    },
+    "2020": {
+      "changed_team_fields": {
+        "baseline": 346
+      },
+      "games": 256,
+      "games_with_material_input_difference": 173,
+      "groups": [
+        "calibration",
+        "elo"
+      ],
+      "input_max_difference": 0.2679260371060579,
+      "reproduction_max_difference": 0.0,
+      "settings": {
+        "decay": "none",
+        "penalty": 100
+      },
+      "training_games": 1280
+    },
+    "2021": {
+      "changed_team_fields": {
+        "baseline": 418
+      },
+      "games": 272,
+      "games_with_material_input_difference": 209,
+      "groups": [
+        "elo"
+      ],
+      "input_max_difference": 0.3721017337948531,
+      "reproduction_max_difference": 0.0,
+      "settings": {
+        "decay": "none",
+        "penalty": 10
+      },
+      "training_games": 1536
+    },
+    "2022": {
+      "changed_team_fields": {
+        "baseline": 442
+      },
+      "games": 271,
+      "games_with_material_input_difference": 221,
+      "groups": [
+        "calibration",
+        "elo"
+      ],
+      "input_max_difference": 0.5458632074898233,
+      "reproduction_max_difference": 0.0,
+      "settings": {
+        "decay": "none",
+        "penalty": 100
+      },
+      "training_games": 1808
+    },
+    "2023": {
+      "changed_team_fields": {
+        "baseline": 444
+      },
+      "games": 272,
+      "games_with_material_input_difference": 222,
+      "groups": [
+        "calibration",
+        "elo"
+      ],
+      "input_max_difference": 0.6101967722888482,
+      "reproduction_max_difference": 0.0,
+      "settings": {
+        "decay": "none",
+        "penalty": 100
+      },
+      "training_games": 2079
+    },
+    "2024": {
+      "changed_team_fields": {
+        "baseline": 440
+      },
+      "games": 272,
+      "games_with_material_input_difference": 220,
+      "groups": [
+        "calibration"
+      ],
+      "input_max_difference": 0.501914080472325,
+      "reproduction_max_difference": 0.0,
+      "settings": {
+        "decay": "none",
+        "penalty": 100
+      },
+      "training_games": 2351
+    },
+    "2025": {
+      "changed_team_fields": {
+        "baseline": 440
+      },
+      "games": 272,
+      "games_with_material_input_difference": 220,
+      "groups": [
+        "calibration",
+        "elo"
+      ],
+      "input_max_difference": 0.4043670621861324,
+      "reproduction_max_difference": 0.0,
+      "settings": {
+        "decay": "none",
+        "penalty": 100
+      },
+      "training_games": 2623
+    }
+  },
+  "artifact": {
+    "path": "work/engine-rebuild/legacy-donor/771786b1720e7ab7b983e676bc10b60a56d71da4e65f6ab9c997245ca98668b2.json.gz",
+    "sha256": "771786b1720e7ab7b983e676bc10b60a56d71da4e65f6ab9c997245ca98668b2"
+  },
+  "authoritative_control_unchanged": {
+    "audit_authority": "CURRENT_HFA",
+    "authoritative": true,
+    "date_added": "2026-09-20T02:53:35.244810+00:00",
+    "metrics": {
+      "bias": 0.1888626093556898,
+      "games": 2639,
+      "mae": 7.575628833271496,
+      "sd": 2.934554179081857,
+      "slope": 1.0111093664106956,
+      "team_observations": 5278
+    },
+    "path": "work/e-elo-hfa-release/deployed-oof-66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f.json",
+    "producer_and_fit": "scripts/elo_hfa_deployed_gate.py; exact shipping equivalence verified by test_elo_hfa_release; release code379cd7ca; fit f7fc497e",
+    "sha256": "66a3a60c0f99e6f25189d88baadd0c72821ca234d20586d5aa6bc7410a4f177f",
+    "status": "AUTHORITATIVE"
+  },
+  "cache": {
+    "path": "work/projection-v3/features-none-cc3d318ef8315397675c47735cceeb093c9b06f4b16178ac8b33e58778bcad28.json.gz",
+    "sha256": "24316c4cc81e567ac529b2756e4f2eb21a2dd6df92c103b36120be49282e528e"
+  },
+  "donor": {
+    "path": "work/projection-v3/adaptive-oof-b722919998a17d42f927684c90053ca99097acaa182be6428dcafef5c2f361f2.json",
+    "sha256": "b722919998a17d42f927684c90053ca99097acaa182be6428dcafef5c2f361f2"
+  },
+  "elapsed_seconds": 35.30892470799154,
+  "independent_fit_max_difference": 1.0796918914479647e-14,
+  "logical_cache_hash": "d3b8695d6c4f6d51e773002aa8b3e2b954bb80c6053f902cb65b9625de9b9d59",
+  "original_experiment": {
+    "path": "work/projection-v3/experiment.json",
+    "sha256": "3df201794dcb1dd8fdfaaa5dd39799598aa9f8b4c13c94eb92737b68de3defc5"
+  },
+  "peak_rss_bytes": 1322680320,
+  "plan": {
+    "path": "work/engine-rebuild/LEGACY-DONOR-PLAN.md",
+    "sha256": "8427b63a952ca2402ff3613c9dfe0d69c279f379e3ccc6275d1c3b6237da30e8"
+  },
+  "qualification_scope": "Recorded eligibility years checked; qualification search not rerun. Source availability unknown. No accuracy comparison.",
+  "reproduction_max_difference": 0.0,
+  "stadiums": {
+    "path": "config/stadiums.json",
+    "sha256": "af6e903a23481b78902c9fe909338e4a8e162468a73ecf11ae8f1dcdbb31aa21"
+  },
+  "status": "ORIGINAL_DONOR_REPRODUCED; CORRECTED_CALENDAR_NOT_QUALIFIED"
+}
