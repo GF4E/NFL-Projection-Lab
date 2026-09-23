@@ -1,8 +1,10 @@
-# Latest checkpoint — runtime and source restored; isolated consumer running
+# Latest checkpoint — same-host restored executable verified
 
-Goal ACTIVE. Runtime tree restoration passes in 414.358 seconds (27,481 exact entries); standalone source commit 1c34bd80e is restored and verified in 382.212 seconds (12,990 files / 2,949,738,715 bytes, no remotes/alternates). The original incomplete restore remains preserved. Actual Linux namespace-refusal test passes before scoring.
+Goal ACTIVE. Full runtime/source restoration and actual restored-consumer execution pass. Runtime: 27,481 exact entries in 414.358 seconds. Source: 12,990 exact files in 382.212 seconds, standalone source commit 1c34bd80e. Restored consumer reproduces 16 saved forecasts and 32 first grades, then completes the actual captured 2,927-game training/full 16-game slate lifecycle in 384.591 seconds (389.303 including initial parity), inside read-only private mount/network namespaces.
 
-The named host unit nfl-restored-consumer-20260923 runs the actual restored interpreter and pinned source in read-only mount/network isolation under the unchanged 570-second ceiling. Initial parity reproduces all 16 saved forecasts and 32 first grades. Full lifecycle and independent outside-namespace acceptance are still pending; do not relaunch while the unit is active. See EXECUTABLE-RUNTIME-PLAN.md and RUNTIME-RESTORE-CONTINUATION.md. No numerical activation, control transfer or provider spending. All statistical/reviewer/live-cycle requirements remain open.
+Independent outside-namespace acceptance verifies 52 original frozen records plus the active-fit pointer, original mounts/namespaces, kernel/OS identity and 10 external native files. Unit is terminal-success; no worker remains. See RUNTIME-RESTORE-CONTINUATION.md, restored-consumer-host-accepted.json and RUNTIME-RECOVERY-RUNBOOK.md. Earlier failed evidence remains preserved. No production activation, control transfer, method change or provider spending.
+
+Next: integrate the verified recovery pair into the controlled live release transition and resolve the existing training/cold-start/availability review flags, then verify actual issuing provenance before any control-authority change. Do not conflate this same-host recovery with arbitrary cross-version/schema rollback or whole-machine restoration. Daily growth, actual reviewers, E-CAL/E-VENUE dispositions, conditional-mean semantics, prospective evidence and observed live cycle remain open. Confidence medium in overall readiness; lower to low on independent integrity failure.
 
 # Latest checkpoint — volume lifecycle passed; runtime tree recovery in qualification
 

@@ -15,3 +15,7 @@ The September 22 experiment slot is now recorded as MISSED_UNREGISTERED_SLOT in 
 Least certain: complete executable/runtime recovery across a code change, which has not been demonstrated by the same-runtime canary. It remains a concrete implementation/qualification dependency rather than another statistical convention question.
 
 Confidence: near-total in the current missing-pointer and registry-mismatch claims, meaning direct file/hash checks on verified records. Lower to high if independent inspection at the same snapshot differs. This does not establish statistical readiness or predictive improvement.
+
+## Subsequent September 23 recovery evidence
+
+Same-host restored source and native runtime now execute the complete captured lifecycle successfully, with outside-namespace integrity checks (RUNTIME-RESTORE-CONTINUATION.md). This resolves the missing restored-consumer demonstration for that captured pair. Controlled live release integration, existing training/cold-start/availability review flags, actual issuing/public provenance and control-authority transfer remain uncompleted. No statistical registration, fitting or authority transfer follows from this operational proof.
