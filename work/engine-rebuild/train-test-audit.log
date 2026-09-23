@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/check_train_test.py", line 80, in <module>
+    result=audit(replay,read(replay['sources']['schedule']));result['replay_ref']=ref
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/work/engine-rebuild/check_train_test.py", line 53, in audit
+    raise ValueError('Test target differs from completed integer score')
+ValueError: Test target differs from completed integer score

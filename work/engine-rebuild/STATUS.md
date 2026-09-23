@@ -1,3 +1,9 @@
+# Current increment — explicit train/validation/test contract
+
+Goal ACTIVE. Prompt revision 7 binds chronological supervised evaluation against completed NFL team scores, with past-only inner validation and later test games kept out of their own fits. The independent saved-replay audit passes 2,639 games / 5,278 team targets, 175 fits and 274,174 membership checks; five focused fixtures pass. See TRAIN-TEST.md. This is non-authoritative historical development evidence, not a new fit, promotion, full feature-vintage qualification or pristine holdout. Requirement 10c remains PARTIAL pending full-pipeline and prospective acceptance.
+
+Next full-rebuild action remains the compatible weight-only fit/preparation handoff and actual scheduler integration; preserve all previously listed capacity, public closeout, calibration, review and live-cycle requirements. No production selector, fit, gate or population changes. Confidence: near-total in arithmetic on verified saved rows; lower to high if independent recomputation differs. Better future accuracy remains unproved.
+
 # Current increment — complete training ledger and bounded host refit
 
 Goal ACTIVE. Previous turn and this turn made concrete progress. The full adopted objective and acceptance matrix remain intact. This increment preserves the complete 2,927-game / 5,854-row training population, reconstructs the 32 pre-activation 2026 games under the corrected approved HFA/cutoff method, and connects that ledger to the actual recorded refitter. Original locked forecasts, grades, historical base bytes and authoritative control remain unchanged. The migration policy is Tier 2 REVIEW REQUESTED before activation; historical source availability remains assumed, never recorded.

@@ -503,6 +503,24 @@
         "tests-release-qualified.log",
         "host-release-transition-followthrough.json"
       ]
+    },
+    {
+      "id": "10c",
+      "requirement": "Explicit chronological supervised train/validation/test evidence on completed NFL team scores",
+      "planned_evidence": [
+        "TRAIN-TEST.md",
+        "train-test-audit.json",
+        "tests/test_projection_train_test_audit.py",
+        "full-pipeline future-label perturbation results",
+        "prospective comparison ledger"
+      ],
+      "acceptance": "Both team targets grouped; past-only training and nested validation; each forecast held out from its own fit; full-pipeline leakage checks; test errors versus same-population baselines; historical development distinguished from prospective confirmation; existing gates unchanged",
+      "state": "PARTIAL",
+      "observed_evidence": [
+        "TRAIN-TEST.md",
+        "train-test-audit.json (saved replay membership/fit/actual-score scope only)",
+        "tests-train-test-audit.log (5 tests)"
+      ]
     }
   ]
 }

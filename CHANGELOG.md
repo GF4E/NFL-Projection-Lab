@@ -1,3 +1,11 @@
+## 2026-09-22 — explicit supervised chronological train/test requirement
+
+User clarification; evaluation audit and prompt revision 7, no method change. Completed NFL games supply paired integer team-score targets. Train on past games, choose settings using earlier chronological validation, and evaluate later forecasts against their known finals; each game is excluded from its own fit. Both teams stay together. Full-precision expected points remain regression outputs. Existing gates, candidates and eligible population are unchanged.
+
+CONVENTIONS (Tier 1): use rolling-origin evaluation under the frozen production refit policy rather than a shuffled split; earlier test-season outcomes can enter later scheduled fits, never their own forecast. Source: Hyndman and Athanasopoulos, https://otexts.com/fpp3/tscv.html and scikit-learn cross-validation documentation, https://scikit-learn.org/stable/modules/cross_validation.html . Reused historical seasons remain development evidence. Only future forecasts issued under a predeclared protocol can supply the intended prospective test.
+
+Saved non-authoritative replay audit: 2,639 games, 5,278 known team targets, 175 fits and 274,174 training-game checks pass; five focused fixtures pass. Full report: work/engine-rebuild/TRAIN-TEST.md. Feature-vintage, tuning/calibration and live availability qualification are outside this check. No new fit or promotion. Confidence: near-total in arithmetic on verified saved rows; lower to high if independent recomputation differs. Future predictive improvement remains unproved.
+
 ## 2026-09-22 — preserve full training population and qualify recorded refit
 
 Infrastructure/chronology qualification, not a statistical promotion. Add immutable training ledgers, unchanged historical base bytes, same-method reconstruction for all 32 pre-activation games, original-lock-only future additions, source/method/population validation and actual recorded-refitter integration. All 2,927 games / 5,854 rows remain. Tier 2 REVIEW REQUESTED: historical reconstruction instead of mixing legacy feature methods; unknown provider availability stays explicit. No original lock, first grade, active fit, authoritative series or cadence changed.
