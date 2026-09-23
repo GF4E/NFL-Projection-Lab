@@ -1,0 +1,113 @@
+{"phase": "CAPTURED_STATE_READY", "elapsed_seconds": 12.95387964695692}
+{"phase": "SIMULATED_CLOSEOUT_VERIFIED", "elapsed_seconds": 36.18973476591054}
+{"phase": "FULL_RECORDED_REFIT_AND_RELEASE", "elapsed_seconds": 165.80482983298134}
+{"phase": "FULL_SLATE_LOCKED", "elapsed_seconds": 314.24769498896785}
+{"phase": "ROLLBACK_AND_IDEMPOTENT_GRADES", "elapsed_seconds": 363.67096136696637}
+{
+  "status": "PASS",
+  "scope": "Full captured training ledger and production refit/prepare/score/release/lock/grader/board code. Isolated simulated source availability, closeout HTTP response, cutoff/issuance clocks and finals. No live activation or accuracy claim.",
+  "source_commit": "eeea8079202e09249fcca7af55de5cb0cdc82e3a",
+  "captured_data_commit": "7e63e7a91c2850b9926a542076f6a158791aa6a6",
+  "code": {
+    "commit": "eeea8079202e09249fcca7af55de5cb0cdc82e3a",
+    "files": {
+      "engine/projection/initial_release.py": "3dc52de8ba4ec91da7043d37ae1d1f3cdb2b8c3e0d8554ee5530f4a8eca5af38",
+      "engine/projection/release_preflight.py": "20c8f7dac9c112eb80256866218a4bcfd020c5187027dbd49cc9b5a774cca201",
+      "scripts/projection_initial_release.py": "288894c422b2ac709aee85c41b7c4e8fb236d45f6a51f960ad1b5561650018c3",
+      "engine/projection/runtime_snapshot.py": "77928f5e24df249c99a05a618db01a2f1c23670b5ca46883443b39c42911e230",
+      "engine/projection/executable.py": "81dc00466fa91a3f89d700a74c4dcd8515fa512517344fa0ff47eafab5ca534d",
+      "engine/projection/pipeline_release.py": "40b611ed1caf2f9a7e06492003ef9325fb47621e7844fba74a94ec17728800a8",
+      "scripts/cloud_scheduler.py": "a1fb88ab728f06e83aef2a99e6ebc8f895c38c7627ff813c55dfeb1c6ed53125",
+      "engine/projection/finals.py": "761e1db6f49b50148daacb8c44d322eb865a3a3d27d221aa1145637f816a0c67",
+      "engine/projection/source_archive.py": "c57fd254b478c3b5fcf49e81d043e977d9c126b1c96df2a6b52d4246e8025b5d",
+      "scripts/board_v7_publish.py": "14b30935bcee2a1e046d935010fd04fe8f1f2e5fe247729d702de7056b2c3171",
+      "scripts/board_v9_publish.py": "4c9ab134333935010040ef5d5b43496635f55ae4eee10355db442bf1bc770d4b",
+      "engine/projection/bundle.py": "c9862fb2610c5ba39949c2512b5ed5d7065bc2a5898b2a89fd76297c5ed102f5",
+      "engine/projection/scoring.py": "d8f1b3e4ed2fe94101073c6ac91eeb64509a5791d39e332f1dd1774a4700bdf8",
+      "engine/projection/prepared.py": "7d5fd29f23eafc3122b41a2dc53360c9adfbb5d2346d4cef6713a74b00750ce2",
+      "engine/projection/scoring_process.py": "26384d60b626725cc8b6833850cd88140301ba2f6b0840f94552a8734e0e37a0",
+      "scripts/projection_score_worker.py": "7abb2d3c6e9b9184078ea4ca0bb74e353372d9e47d02904c5ee0f0c22b6705b9",
+      "engine/projection/lineage.py": "10ce918d070d39043a9b0e410b309ac143194bb7af2d59c31001f20f3307976c",
+      "engine/projection/storage.py": "3eb8f34870d3a55369763cd384589ab7909059fbf7ee0f1325ecc7c0dd43b22f",
+      "engine/projection/training_ledger.py": "195d068b3c7f09104b80304c721b57e72fa1ccbb051ea5e235dcbd1c30510d79",
+      "engine/projection/refit_release.py": "79765976ae1927c1cba6663e544f30e77bf0a00ad5057be89ce4fe2249b94ef2",
+      "engine/projection/weekly_refit.py": "83aed7a9b4d98544506c2c6386f0644c40eeb9dd4cd544f727ef60b93aa1eaf8",
+      "engine/projection/public_closeout.py": "d98aa23ff521bb6a96a080546a4d5e5be42e24655eed520676c3b1d40860d722",
+      "engine/projection/observations.py": "70afc117137325451492bfa0cf9d75fee3047ec280ec429419ae13baf869d691",
+      "engine/projection/cutoff_features.py": "b7ca7156cef0bfaa51bbbf353f01f360b99d80d64d4d4dab234c16dd5c5575ae",
+      "engine/forecast_system/cadence.py": "a685a17e69e5f6d104822238e9c2b53cbf67d7a91ee22d77f41bcaa38c6e7b80",
+      "engine/projection/cutoff_state.py": "7ef17dc4bc9889170a0d292fde052ae2e92987616d7d2ad0724d108f842b0d3d",
+      "engine/projection/cutoff_pipeline.py": "dd697227568ff4fbe59542aba9a2457bf3d61ace6b94ca51a29a48f4504915cc",
+      "engine/projection/cutoff_publication.py": "c2839dce949dc5e8b4ce715b6ee0e6d518eede87c3dc2f1023c60cb16aa106e2",
+      "engine/projection/cutoff_selection.py": "5829216b357492b80b478d91b65977218e91cb36bb986521dadcd56c17d28769",
+      "engine/projection/cutoff_worker.py": "39ebebfff38dd08cf9d84e2dfb3fcc6ce2f01160449c927898a161dc8e8ce489",
+      "engine/projection/model.py": "25d5182a971b88162a46c8e75b18c42b26f60429f2086365e6ebec2493c0bead",
+      "engine/projection/card.py": "df962ff1762ce7a0740de60e78ac4d98f65ec5c8b1b546f5d0d191e38ca954de",
+      "engine/projection/grade.py": "1fdbe81249335a3d5492676d03c9749ea46b660a0297506290d18db765904f31",
+      "engine/projection/distribution.py": "a4c9a71c971267b1c54268293471ad22cbb3e4ee97392d5829c870dbae4593ec",
+      "engine/projection_v3/card.py": "b545b236035a341a3c6e41c047019a309abf890a3b164f482513611c0ceb4e72",
+      "engine/projection_v3/model.py": "9e6d85fbadd86a4ff9b7f18192c9c6e278c3e26e9ae7f01f6d8bd1597d27943b",
+      "engine/projection/features.py": "9c1172450639deeee99a58211713084fe54bf86a09f31915e90cdd1e0866aef8",
+      "engine/projection_v3/personnel.py": "8f1ec9d1865cac162f7905db6d2c90279795ae24e714b8c17884213651c55af9",
+      "engine/elo.py": "79e4efd8ef69c4302d7a50343fec5957e5834ac7de0877fc36058ef42ac567b7",
+      "engine/elo_hfa.py": "d9e4052bc7b1b828d88b694f9ddaddf16111c1daa5c06cd0656b0fc64dee4d20",
+      "engine/forecast_system/calendar.py": "2e9e6b4a84b0c080d39db793f4dc5b05d33d83ce5158e05b2072ad375e13c98b",
+      "scripts/projection_v3_publish.py": "9dc19759a999123d580bc4d886c6941be2e472f21f79f1721fb2bedb48002ea9",
+      "scripts/projection_prepare.py": "e1341be3cecba533fec3537ade9898a84623c3bdcfd3cec5061ef9fc1e7b9f51",
+      "scripts/projection_v3_prepare.py": "6fa12c601df75c821dc4a457f968e978414811fae8f46347d6d4d725e110cc96",
+      "scripts/projection_v3_sources.py": "e576f1464ce259c30f94ce3fbd121f37d7296209b06c0a08512b962a34d42e96",
+      "scripts/projection_learning.py": "9c226d1d8ce72775d746d544bc6082accb15d84ef57348b4ca307c89a01ba25b"
+    },
+    "environment": {
+      "python": "3.12.2 | packaged by conda-forge | (main, Feb 16 2024, 20:50:58) [GCC 12.3.0]",
+      "scope": "isolated actual interpreter; source bytes captured"
+    }
+  },
+  "training_ref": {
+    "path": "work/projection-cutoff-pipeline-v1/training/84fcb3e32e175f38c6831c8faccbbdd1ed7bc93a9e3779045f00670d41f3bf9a.json.gz",
+    "sha256": "84fcb3e32e175f38c6831c8faccbbdd1ed7bc93a9e3779045f00670d41f3bf9a"
+  },
+  "parent_fit": {
+    "path": "work/in-season-learning-v1/fit-801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f.json",
+    "sha256": "801ef07927ea59bc112fc955ad86249b981d5e60a0f4a9636f39b2eb23be623f"
+  },
+  "refitted_fit": {
+    "path": "work/in-season-learning-v1/recorded-fit-0b251fd5a814f2130d56000982e4220e65357e6a631600889469a0551ab73113.json",
+    "sha256": "0b251fd5a814f2130d56000982e4220e65357e6a631600889469a0551ab73113"
+  },
+  "training_games": 2927,
+  "training_rows": 5854,
+  "slate_games": 16,
+  "locks": 16,
+  "synthetic_grades": 16,
+  "cutoff_counts": {
+    "2026-09-22T13:00:00+00:00": 1,
+    "2026-09-25T13:00:00+00:00": 14,
+    "2026-09-28T13:00:00+00:00": 1
+  },
+  "original_source_records_preserved": 52,
+  "numerical_retry_skipped": true,
+  "original_bundles_graded_after_rollback": true,
+  "elapsed_seconds": 364.13126012298744,
+  "phase_seconds": {
+    "CAPTURED_STATE_READY": 12.95387964695692,
+    "SIMULATED_CLOSEOUT_VERIFIED": 36.18973476591054,
+    "FULL_RECORDED_REFIT_AND_RELEASE": 165.80482983298134,
+    "FULL_SLATE_LOCKED": 314.24769498896785,
+    "ROLLBACK_AND_IDEMPOTENT_GRADES": 363.67096136696637
+  },
+  "isolated_bytes": 34280955,
+  "peak_rss_bytes": 227192832,
+  "limitations": [
+    "Source availability and closeout/HTTP evidence are explicit fixtures, not a verified live closeout.",
+    "Future finals are synthetic and enter only grading after every lock; future football statistics remain unavailable.",
+    "Training migration remains subject to review; inherited calibration/reference series remain unchanged.",
+    "This checks same-code fit/preparation rollback, not executable/runtime rollback."
+  ],
+  "provider_requests": 0,
+  "new_spending": 0,
+  "staged_files_verified": 342,
+  "source_restore_verified": false,
+  "source_manifest_sha256": "6d980e6aa5a361318804aa96dc76e502ec519da86f93debd55c3a1d4ccf22ccf",
+  "live_activation": false
+}

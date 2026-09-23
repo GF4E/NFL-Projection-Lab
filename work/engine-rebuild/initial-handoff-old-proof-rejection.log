@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_release_preflight.py", line 16, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/scripts/projection_release_preflight.py", line 14, in main
+    print(json.dumps(check(ROOT,json.loads(args.packet_ref.read_text()),runtime_manifest=args.runtime_manifest),indent=2))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/release_preflight.py", line 80, in check
+    if set(expected)!=set(CODE_PATHS):raise ValueError('Recovered source omits or changes required issuing files')
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: Recovered source omits or changes required issuing files

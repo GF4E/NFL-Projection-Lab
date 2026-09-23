@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/mnt/nfl-engine-profiles/initial-handoff-eeea80792/source/work/engine-rebuild/verify_initial_handoff_host.py", line 36, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/mnt/nfl-engine-profiles/initial-handoff-eeea80792/source/work/engine-rebuild/verify_initial_handoff_host.py", line 26, in main
+    result=module.verify(args.data_root,temp_parent=args.output.parent,code_commit=manifest['source_commit'])
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/nfl-engine-profiles/initial-handoff-eeea80792/source/work/engine-rebuild/check_full_lifecycle.py", line 83, in verify
+    with tempfile.TemporaryDirectory(prefix='full-lifecycle-', dir=temp_parent) as folder, ExitStack() as stack:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/nfl-runtime/env/lib/python3.12/tempfile.py", line 882, in __init__
+    self.name = mkdtemp(suffix, prefix, dir)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/nfl-runtime/env/lib/python3.12/tempfile.py", line 384, in mkdtemp
+    _os.mkdir(file, 0o700)
+PermissionError: [Errno 13] Permission denied: '/mnt/nfl-engine-profiles/initial-handoff-eeea80792/full-lifecycle-06koh8q7'
