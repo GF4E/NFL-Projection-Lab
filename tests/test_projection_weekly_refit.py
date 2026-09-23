@@ -51,12 +51,12 @@ class WeeklyTests(Base):
         with patch.object(p,'now',return_value=timestamp('2026-09-15T13:01:50Z')):
             p.capture_schedule(self.root,transaction['sources']['schedule'])
         preparer.prepare(select_scheduled=True,at=self.clock)
-        self.parent=release.checkpoint(self.root,label='weekly-parent')
-        self.switch(self.parent)
         training_ref=p.store(self.root,'training',{'schema':ledger.SCHEMA,'created_at':'2026-09-15T13:01:00Z',
             'training_games':['thu','sun','mon']})
-        weekly.record(self.root,weekly.CONFIG,{'schema':'recorded-weekly-refit-v1','owner':'owner',
-            'training_ref':training_ref,'method_fit_ref':self.fit,'method':cs.method(self.root,self.fit)},immutable=True)
+        config={'schema':'recorded-weekly-refit-v1','owner':'owner',
+            'training_ref':training_ref,'method_fit_ref':self.fit,'method':cs.method(self.root,self.fit)}
+        self.parent=release.checkpoint(self.root,label='weekly-parent',weekly_configuration=config)
+        self.switch(self.parent)
         evidence=self.write('outputs/cadence-v2/weeks/2026-w2/scorecard.json',{'simulation':True,'games':['thu','sun','mon']})
         self.closed=self.root/'outputs/cadence-v2/closeouts/2026-09-15.json'
         save(self.closed,{'schema':'closeout-publication-v2','state':'PUBLISHED','all_games_graded':True,

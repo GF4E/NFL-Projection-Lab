@@ -11,6 +11,8 @@ from engine.projection import runtime_snapshot
 
 class ReleasePreflightTests(unittest.TestCase):
     def setUp(self):
+        source_files=patch('engine.projection.bundle.CODE_PATHS',('engine/test.py',))
+        source_files.start();self.addCleanup(source_files.stop)
         self.tmp=tempfile.TemporaryDirectory();self.addCleanup(self.tmp.cleanup);self.root=Path(self.tmp.name)
         self.code='print("fixture")\n';self.write('engine/test.py',self.code.encode())
         self.cal=self.put('cal.json',{'fixture':True})
@@ -84,6 +86,10 @@ class ReleasePreflightTests(unittest.TestCase):
     def test_changed_issuing_source_rejected(self):
         self.write('engine/test.py',b'changed')
         with self.assertRaisesRegex(ValueError,'issuing source'):self.check()
+
+    def test_recovery_must_bind_every_current_issuing_file(self):
+        self.consumer['lifecycle']['code']['files']={};self.bind_recovery()
+        with self.assertRaisesRegex(ValueError,'required issuing files'):self.check()
 
     def test_new_active_fit_requires_new_packet(self):
         self.put('work/in-season-learning-v1/active-fit-ref.json',{'path':'new','sha256':'c'*64})

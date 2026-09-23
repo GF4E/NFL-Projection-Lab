@@ -65,7 +65,7 @@ def recovery(root, acceptance_ref, consumer_ref):
     return consumer
 
 
-def check(root, packet_ref, *, runtime_manifest=None):
+def check(root, packet_ref, *, runtime_manifest=None, require_active_fit=True):
     root=Path(root);packet=read(root,packet_ref)
     if packet.get('schema')!='initial-chronology-release-review-v1':raise ValueError('Unsupported release packet')
     if packet.get('authorizes_activation') is not False:raise ValueError('Review packet cannot activate')
@@ -76,11 +76,13 @@ def check(root, packet_ref, *, runtime_manifest=None):
     consumer=recovery(root,evidence['recovery_acceptance'],evidence['restored_consumer'])
     add('RECOVERED_EXECUTABLE','PASS',consumer['source_commit'])
     expected=consumer['lifecycle']['code']['files']
+    from .bundle import CODE_PATHS
+    if set(expected)!=set(CODE_PATHS):raise ValueError('Recovered source omits or changes required issuing files')
     actual={name:sha((root/name).read_bytes()) for name in expected}
     if actual!=expected:raise ValueError('Current issuing source differs from recovered source')
     add('ISSUING_SOURCE','PASS',len(expected))
     fit=read(root,packet['fit_ref'])
-    if json.loads((root/'work/in-season-learning-v1/active-fit-ref.json').read_bytes())!=packet['fit_ref']:
+    if require_active_fit and json.loads((root/'work/in-season-learning-v1/active-fit-ref.json').read_bytes())!=packet['fit_ref']:
         raise ValueError('Active fit changed since packet')
     if consumer['lifecycle']['parent_fit']!=packet['fit_ref'] or fit['shapes']!=packet['calibration_ref']:
         raise ValueError('Recovery/packet fit or calibration differs')
@@ -122,4 +124,5 @@ def check(root, packet_ref, *, runtime_manifest=None):
         {'installed':installed,'remaining':'Enforced operator transition, qualified bootstrap and actual issuing/public provenance'})
     return {'schema':'initial-release-preflight-v1','status':'BLOCKED','packet_ref':packet_ref,
             'checks':checks,'activation':False,'control_authority_changed':False,'provider_requests':0,
+            'active_fit_pointer_checked':require_active_fit,
             'scope':'Read-only evidence binding; not an experiment, approval, runtime switch or production readiness certificate'}

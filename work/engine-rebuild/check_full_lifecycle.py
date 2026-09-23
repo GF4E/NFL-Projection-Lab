@@ -116,10 +116,10 @@ def verify(source_root=ROOT, temp_parent=None, on_phase=None):
         stack.enter_context(patch.object(release, 'source', return_value=code))
         save(root/release.OWNER, {'state': 'ACTIVE', 'owner': 'canary', 'scope': 'ISOLATED_SIMULATION'})
         preparer.prepare(select_scheduled=True)
-        parent = release.checkpoint(root, label='captured scheduled parent')
+        configuration = {'schema': 'recorded-weekly-refit-v1', 'owner': 'canary',
+            'training_ref': training_ref, 'method_fit_ref': fit_ref, 'method': cs.method(root, fit_ref)}
+        parent = release.checkpoint(root, label='captured scheduled parent',weekly_configuration=configuration)
         release.switch(root, parent, owner='canary', operation_id='canary-parent', expected_active=None)
-        weekly.record(root, weekly.CONFIG, {'schema': 'recorded-weekly-refit-v1', 'owner': 'canary',
-            'training_ref': training_ref, 'method_fit_ref': fit_ref, 'method': cs.method(root, fit_ref)}, immutable=True)
         # Exercise the public verifier on a disclosed response fixture, not the live website.
         closed = root/'outputs/cadence-v2/closeouts/2026-09-22.json'
         evidence = root/'outputs/cadence-v2/weeks/2026-w2/scorecard.json'

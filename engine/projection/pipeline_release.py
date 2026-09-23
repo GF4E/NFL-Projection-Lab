@@ -21,6 +21,7 @@ ACTIVE = BASE + '/active.json'
 OPERATION = BASE + '/operation.json'
 OWNER = 'work/cloud-migration-v1/ownership.json'
 FIT_POINTER = 'work/in-season-learning-v1/active-fit-ref.json'
+_INHERIT = object()
 EXTRA_CODE = ('scripts/cloud_scheduler.py', 'engine/projection/pipeline_release.py',
               'engine/projection/finals.py', 'engine/projection/source_archive.py',
               'scripts/board_v7_publish.py', 'scripts/board_v9_publish.py',
@@ -115,10 +116,18 @@ def validate(root, manifest, *, reconstruct=False):
                 pipeline.verify_preparation(root, body)
     elif manifest['configuration_ref'] is not None:
         raise ValueError('Legacy release has a state selection configuration')
+    if manifest.get('weekly_configuration') is not None:
+        from . import weekly_refit as weekly
+        config=manifest['weekly_configuration']
+        weekly.validate_configuration(root,config,config['owner'])
+        if manifest['mode']!='SCHEDULED' or config['method']!=cutoff_state.method(root,manifest['fit_ref']):
+            raise ValueError('Pipeline weekly method or mode differs')
+        if config['owner']!=selection.configuration(root,manifest['configuration_ref'])['owner']:
+            raise ValueError('Pipeline weekly owner differs')
     return metadata
 
 
-def checkpoint(root, *, label, prepared_ref=None):
+def checkpoint(root, *, label, prepared_ref=None, weekly_configuration=_INHERIT, initial_admission_ref=None):
     """Retain the current compatible checkpoint. Caller owns writer and fence."""
     from . import cutoff_selection as selection
     rows, metadata, _ = prepared.load(root, ref=prepared_ref)
@@ -127,12 +136,17 @@ def checkpoint(root, *, label, prepared_ref=None):
     ref = metadata['fit']; artifact = read_artifact(root, ref)
     selected = mode(metadata)
     config_ref = selection.retain_configuration(root)[0] if selected == 'SCHEDULED' else None
+    if weekly_configuration is _INHERIT:
+        from . import weekly_refit as weekly
+        weekly_configuration=weekly.load(root,weekly.CONFIG)
     manifest = {'schema': 'projection-pipeline-release-v1', 'mode': selected,
                 'code': source(root), 'fit_ref': ref, 'calibration_ref': artifact['shapes'],
                 'fit_sha256': hash_value(artifact['fit']), 'configuration_ref': config_ref,
                 'prepared_ref': metadata['prepared_manifest_ref'], 'label': label,
                 'publication_games':publication_games(rows,metadata),
+                'weekly_configuration':weekly_configuration,
                 'scope': 'Same-runtime preparation and recorded weight-only transitions; executable/runtime changes require separate qualification'}
+    if initial_admission_ref is not None:manifest['initial_admission_ref']=initial_admission_ref
     validate(root, manifest, reconstruct=True)
     return store(root, 'manifests', manifest)
 
@@ -160,6 +174,10 @@ def guard(root):
         raise ValueError('Pipeline active fit requires qualified release handoff')
     if mode(metadata) != manifest['mode']:
         raise ValueError('Pipeline current preparation mode differs')
+    if 'weekly_configuration' in manifest:
+        from . import weekly_refit as weekly
+        if weekly.load(root,weekly.CONFIG)!=manifest['weekly_configuration']:
+            raise ValueError('Pipeline weekly configuration differs from active release')
     return manifest
 
 
@@ -198,6 +216,12 @@ def switch(root, target, *, owner, operation_id, expected_active, dispatch_handl
                 raise ValueError('Release owner differs')
             manifest = read(root, target, 'manifests')
             metadata = validate(root, manifest, reconstruct=True)
+            from . import weekly_refit as weekly
+            from .cutoff_state import sha
+            config=manifest.get('weekly_configuration')
+            configuration_after={'body':config,'sha256':sha(config)} if config is not None else None
+            if 'weekly_configuration' not in manifest and pointer(root,weekly.CONFIG) is not None:
+                raise ValueError('Unmanaged checkpoint cannot discard weekly configuration')
             current_fit = prepared.active_fit(root)
             if current_fit != manifest['fit_ref']:
                 refit_release.linked(root,current_fit,manifest['fit_ref'])
@@ -207,6 +231,10 @@ def switch(root, target, *, owner, operation_id, expected_active, dispatch_handl
                             if read_artifact(root,r).get('recorded_refit_ref')]
                 if not candidates:raise ValueError('Cross-fit release requires a recorded refit')
                 for candidate in candidates:refit_release.verify(root,candidate)
+            if manifest.get('initial_admission_ref'):
+                from .initial_release import admission
+                admission(root,manifest['initial_admission_ref'],manifest,owner,
+                          require_active_fit=current_fit==manifest['fit_ref'])
             current_rows,current_metadata,_=prepared.load(root)
             if not set(publication_games(current_rows,current_metadata))<=set(manifest['publication_games']):
                 raise ValueError('Rollback would omit current publication games; prepare a compatible checkpoint')
@@ -237,6 +265,7 @@ def switch(root, target, *, owner, operation_id, expected_active, dispatch_handl
                     raise ValueError('Release compare-and-swap failed')
                 before = prepared.current(root)
                 intent = {**request, 'prepared_before': before, 'fit_before':current_fit, 'previous_operation':pending,
+                          'weekly_before':pointer(root,weekly.CONFIG),'weekly_after':configuration_after,
                           'started_at': dt.datetime.now(dt.timezone.utc).isoformat()}
                 old = store(root, 'intents', intent)
                 save(root / id_path, old, immutable=True)
@@ -250,6 +279,12 @@ def switch(root, target, *, owner, operation_id, expected_active, dispatch_handl
                 raise ValueError('Active fit changed outside release transaction')
             if pointer(root, OWNER) != fence:
                 raise ValueError('Release fence changed during verification')
+            if pointer(root,weekly.CONFIG) not in (intent.get('weekly_before'),configuration_after):
+                raise ValueError('Weekly configuration changed outside release transaction')
+            if intent.get('weekly_after',configuration_after)!=configuration_after:
+                raise ValueError('Release weekly configuration payload differs')
+            # A disabled configuration is an explicit JSON null, never deletion.
+            save(root / weekly.CONFIG, configuration_after)
             save(root / FIT_POINTER, manifest['fit_ref'])
             save(root / prepared.POINTER, metadata)
             save(root / ACTIVE, target)
