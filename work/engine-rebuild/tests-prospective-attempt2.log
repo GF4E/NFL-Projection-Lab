@@ -1,0 +1,17 @@
+...E..........
+======================================================================
+ERROR: test_enrollment_lost_response_retries_original_plan_and_physical_clock (test_projection_prospective.ProspectiveTests.test_enrollment_lost_response_retries_original_plan_and_physical_clock)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_prospective.py", line 111, in test_enrollment_lost_response_retries_original_plan_and_physical_clock
+    ref=p.enroll(self.root,sr,2026);self.assertEqual(ref,pending)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/prospective.py", line 80, in enroll
+    ref=json.loads(enrollment.read_bytes());saved=plan(root,ref)
+                                                  ^^^^
+UnboundLocalError: cannot access local variable 'plan' where it is not associated with a value
+
+----------------------------------------------------------------------
+Ran 14 tests in 2.357s
+
+FAILED (errors=1)

@@ -1,0 +1,16 @@
+E...............
+======================================================================
+ERROR: test_actual_cutoff_publish_pair_lock_grade_and_no_worker_report (test_projection_prospective.EndToEndTests.test_actual_cutoff_publish_pair_lock_grade_and_no_worker_report)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/tests/test_projection_prospective.py", line 155, in test_actual_cutoff_publish_pair_lock_grade_and_no_worker_report
+    paired=p.pair(self.root,ref,first,source)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/gabe/Documents/Codex/2026-09-04/nfl-prediction-engine-gpt6/engine/projection/prospective.py", line 191, in pair
+    raise ValueError('Game outside enrolled population')
+ValueError: Game outside enrolled population
+
+----------------------------------------------------------------------
+Ran 16 tests in 2.689s
+
+FAILED (errors=1)
