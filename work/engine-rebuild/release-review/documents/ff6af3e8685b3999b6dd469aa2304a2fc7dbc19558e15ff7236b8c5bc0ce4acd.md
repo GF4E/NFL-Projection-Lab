@@ -1,0 +1,12 @@
+# Fifty-file source recovery refresh
+
+Previous goal turn PROGRESS. Preserve the complete rebuild and all statistical admission requirements. This work changes recovery evidence only; no fit, cadence, release activation or control-authority transfer.
+
+Pre-implementation gap sweep:
+- Tier 1: use the existing standalone Git backup/strict full-tree restoration, approved volume, restored runtime, private namespaces and actual service identity. The issuing source is 5fd477b27 (50 files); pin an exact descendant containing the retained collector verification evidence. Preserve original forecasts/grades and active fit.
+- Tier 2 REVIEW REQUESTED: classify only the obsolete, independently verified `source-restored-20260923` directory as a regenerable recovery cache. Alternative: retain every expanded historical restore and request more paid storage. Under the user's existing cache-only cleanup authorization, retire this expanded copy only after matching its complete tracked tree and clean status to the retained, hash-verified standalone archive on both Mac and host. Preserve the original archive, all historical receipts, runtime restoration and the newer 76f840b0 recovery copy. Record the removed tree/entry manifest and free-space change. No unique artifact or historical source version is removed. A mismatch stops cleanup.
+- Tier 1: retain the existing two-times-tracked-tree restore reserve; do not weaken it to fit the current 5.2 GB headroom. The verified cache retirement must satisfy it before starting a fresh full restore.
+- Tier 1: reuse verified runtime bytes; verify both installed/restored copies against the accepted runtime manifest. Run restored consumer and captured initial-operator tests under the existing resource ceilings, actual dispatch exclusion and private mount/network isolation. Capture limits while loaded and terminal journal by exact invocation.
+- Tier 1: old proof remains historical. New packet binds new recovery and operator evidence; no old source proof qualifies the new code. Actual Friday cutoff, issuing/public provenance and control qualification remain future dependencies.
+
+No Tier 3 parameter, gate, metric or population changes. No new spending or provider requests. First verify the obsolete cache's complete provenance, then retire only that named duplicate, archive/restore current source, run the restored consumers, and publish the superseding technical packet.
