@@ -1,0 +1,49 @@
+{
+  "at": "2026-09-23T17:48:20.760217+00:00",
+  "source_raw_sha256": "da407ec7de06624163980add9bfe2e0195e9a2a3f1560b47b0ff01060d7eef00",
+  "served_raw_sha256": "6b1f5dd4fe513067bcf58750c0ef04ae51427d986744b94af2cc6dd044a229e8",
+  "same_decoded_values": true,
+  "same_declared_content_hash": true,
+  "source_identity": {
+    "content_sha256": "16d91f7093c34f2145ca978c93b6a6d9f0261a4acb650503e220e0ccb4a4d63c",
+    "published_at": "2026-09-23T04:54:25.667823+00:00",
+    "games": 48
+  },
+  "served_recomputed_content_hash": "5238925ad7fb53756ed34861543d97f022be925508d22d8901b71a3cf1b9017b",
+  "numeric_representation_changes": 11285,
+  "examples": [
+    {
+      "path": "/games/0/grades/PROJECTION/actual/home_points",
+      "source_type": "float",
+      "served_type": "int",
+      "value": 13.0
+    },
+    {
+      "path": "/games/0/grades/PROJECTION/actual/total",
+      "source_type": "float",
+      "served_type": "int",
+      "value": 23.0
+    },
+    {
+      "path": "/games/0/grades/PROJECTION/actual/margin",
+      "source_type": "float",
+      "served_type": "int",
+      "value": 3.0
+    },
+    {
+      "path": "/games/0/grades/PROJECTION/actual/away_points",
+      "source_type": "float",
+      "served_type": "int",
+      "value": 10.0
+    },
+    {
+      "path": "/games/0/contributions/away/0/weight",
+      "source_type": "float",
+      "served_type": "int",
+      "value": 1.0
+    }
+  ],
+  "website_file": "src/server/projection-board.ts",
+  "mechanism": "download parses JSON; cache and response stringify it again",
+  "integrity_check_relaxed": false
+}

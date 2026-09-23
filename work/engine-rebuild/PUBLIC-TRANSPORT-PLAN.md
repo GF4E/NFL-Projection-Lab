@@ -1,0 +1,7 @@
+# Unattended closeout transport qualification
+
+Fresh 2026-09-23 inspection confirms the existing Sites audience is public. The actual droplet's standard curl client receives HTTP 200 anonymously while urllib still receives 403 on the same public route. No audience change, credentials, cookie reuse, browser impersonation or challenge-solving is proposed. Use the installed ordinary curl client with its own default identity, TLS verification, no redirects, no retries, disabled user configuration, bounded transfer and explicit status checks. Verify all three frozen artifact hashes before claiming publication.
+
+Tier 1: a transport correction only; the existing exact-byte proof, lineage, publication ordering and chronology requirements stay unchanged. Default urllib remains for existing fixtures/configurations; explicitly qualified configuration selects curl. Unknown transport fails closed. Retain the transport name and observed version in new proofs. A denied or changed response must not create proof. Reports never refit.
+
+Test failed status, redirect, oversized response, timeout, wrong bytes, unsupported configuration and all existing proof chronology/identity checks. Then exercise the actual service user against live public data with no credentials. Install only the qualified endpoint mapping and verification helper, preserving the active point method and inactive cutoff release. Confirm source hashes and the durable proof after repository publication. This does not activate a corrected control or a real registered experiment.

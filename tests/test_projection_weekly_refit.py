@@ -171,3 +171,17 @@ class WeeklyTests(Base):
             self.run_weekly()
         self.assertEqual(release.pointer(self.root,release.ACTIVE),self.parent)
         self.assertEqual(prepared.active_fit(self.root),self.fit)
+
+    def test_curl_confirmation_never_records_wrong_or_denied_bytes(self):
+        from types import SimpleNamespace
+        import urllib.error
+        public.proof_path(self.closed).unlink()
+        save(self.root/public.CONFIG,{'schema':'public-closeout-endpoints-v1','base_url':'https://fixture.invalid','transport':'curl'})
+        for response,error in [(b'wrong\n200',ValueError),(b'denied\n403',urllib.error.HTTPError)]:
+            with patch.object(public.subprocess,'run',return_value=SimpleNamespace(stdout=response,returncode=0)),self.assertRaises(error):public.confirm(self.root,self.closed)
+            self.assertFalse(public.proof_path(self.closed).exists())
+        payload=(self.root/next(iter(self.urls))).read_bytes()
+        with patch.object(public.subprocess,'run',side_effect=[SimpleNamespace(stdout=payload+b'\n200',returncode=0),SimpleNamespace(stdout=b'curl test\n',returncode=0)]):
+            proof=public.confirm(self.root,self.closed)
+        self.assertEqual(proof['transport']['authentication'],'NONE')
+        self.assertFalse(proof['transport']['redirects'])

@@ -190,22 +190,29 @@ def accept_receipt(folder, receipt, now):
     return value
 
 
-def public_probe(previous=None, retry_access=False):
-    if previous and previous.get('state') in ('ACCESS_UNQUALIFIED', 'SCHEMA_UNQUALIFIED') and not retry_access:
+def public_probe(previous=None, retry_access=False, transport='urllib'):
+    if previous and previous.get('state') in ('ACCESS_UNQUALIFIED', 'SCHEMA_UNQUALIFIED') and not retry_access and previous.get('transport','urllib')==transport:
         return previous
     try:
-        with urllib.request.urlopen(PUBLIC_URL, timeout=10) as response:
-            raw = response.read(MAX_PUBLIC_BYTES+1)
+        if transport=='curl':
+            from engine.projection.public_closeout import fetch
+            raw=fetch(PUBLIC_URL,'curl')
+        elif transport=='urllib':
+            with urllib.request.urlopen(PUBLIC_URL, timeout=10) as response:
+                raw = response.read(MAX_PUBLIC_BYTES+1)
+        else:raise ValueError('Unqualified public transport')
         if len(raw) > MAX_PUBLIC_BYTES:
             raise ValueError('Oversized public response')
-        return {'state': 'VERIFIED', 'identity': board_identity(json.loads(raw))}
+        result={'state': 'VERIFIED', 'identity': board_identity(json.loads(raw))}
     except urllib.error.HTTPError as error:
-        return {'state': 'ACCESS_UNQUALIFIED' if error.code in (401, 403) else 'UNREACHABLE',
+        result={'state': 'ACCESS_UNQUALIFIED' if error.code in (401, 403) else 'UNREACHABLE',
                 'http_status': error.code}
     except (TimeoutError, OSError):
-        return {'state': 'UNREACHABLE'}
+        result={'state': 'UNREACHABLE'}
     except (ValueError, KeyError, TypeError, UnicodeError):
-        return {'state': 'SCHEMA_UNQUALIFIED'}
+        result={'state': 'SCHEMA_UNQUALIFIED'}
+    if transport!='urllib':result['transport']=transport
+    return result
 
 
 def remote(mode, receipt=None):
@@ -252,7 +259,9 @@ def outside_once(folder=MAC_STATE, now=None, retry_access=False, notifications=T
             raise ValueError('Unknown host observer policy')
     except (OSError, RuntimeError, ValueError, subprocess.SubprocessError):
         host = None
-    public = public_probe(load(folder/'public-probe.json'), retry_access)
+    from engine.projection.public_closeout import CONFIG,transport
+    client=transport(ROOT) if (ROOT/CONFIG).exists() else 'urllib'
+    public = public_probe(load(folder/'public-probe.json'), retry_access,client)
     save(folder/'public-probe.json', public)
     now = now or dt.datetime.now(UTC)
     value = {'schema': POLICY['schema'], 'checked_at': now.isoformat(),

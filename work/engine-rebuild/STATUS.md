@@ -1,3 +1,7 @@
+# Latest checkpoint — unattended closeout transport qualified
+
+Goal ACTIVE. Actual service account anonymously verified all three frozen Week 2 closeout files using installed curl; the existing site audience is public. 130 tests pass; no auth or audience changes. Endpoint config and proof transport support are implemented. The board monitor now exposes a different failure: 11,285 JSON numeric representation changes break the content hash despite equal decoded values. See PUBLIC-TRANSPORT.md and public-board-digest-diagnosis.json. Next: installed proof verification and exact-byte website/cache repair, then runtime/control dependencies. No real calibration fit, corrected-control promotion or model activation. All remaining full-goal acceptance items stay open.
+
 # Latest checkpoint — durable calibration execution verified on fixtures
 
 Goal ACTIVE. Immutable attempts/results, bounded explicit recovery and report/reviewer-packet generation are implemented; 84 calibration tests pass. Isolated Linux CLI/resource canary passed after adding scoringrules 0.10.0 to the canary-only path; production runtime still lacks it. Reports do not fit or activate models. No real registration or candidate evaluation occurred. See CALIBRATION-EXECUTION.md. Next: qualify research runtime and resolve control/publication prerequisites; full historical resources, actual reviews, prospective evidence and all remaining original acceptance requirements stay open. Storage approval/migration is resolved; long-term growth/peak reserve remains unqualified.
